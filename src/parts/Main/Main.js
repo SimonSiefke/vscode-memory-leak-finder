@@ -48,7 +48,7 @@ export const runScenario = async (scenarioId) => {
         );
       }
     }
-    console.info(`Scenario ${scenarioId} exited with code 0`);
+    // console.info(`Scenario ${scenarioId} exited with code 0`);
     if (process.send) {
       process.exit(0);
     }
