@@ -4,7 +4,8 @@ import * as TmpDir from "../TmpDir/TmpDir.js";
 
 export const launch = async () => {
   const tmpDir = await TmpDir.create();
-  const binaryPath = Platform.getBinaryPath();
+  const binaryPath = await Platform.getBinaryPath();
+  console.log({ binaryPath });
   const child = await _electron.launch({
     args: ["--wait", "--new-window", "."],
     cwd: tmpDir,

@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/SimonSiefke/vscode-memory-leak-finder#readme",
   "dependencies": {
+    "@vscode/test-electron": "^2.1.3",
     "exit-hook": "^3.0.0",
     "p-timeout": "^5.0.2",
     "tree-kill": "^1.2.2",

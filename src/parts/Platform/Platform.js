@@ -1,18 +1,15 @@
-import { existsSync } from "node:fs";
+import { downloadAndUnzipVSCode } from "@vscode/test-electron";
+// import { existsSync } from "node:fs";
 
-const pathsToTry = [
-  "/snap/code-insiders/current/usr/share/code-insiders/code-insiders",
-  "/snap/code/current/usr/share/code/code",
-];
+// const pathsToTry = [
+//   "/snap/code-insiders/current/usr/share/code-insiders/code-insiders",
+//   "/snap/code/current/usr/share/code/code",
+// ];
 
-export const getBinaryPath = () => {
+export const getBinaryPath = async () => {
   if (process.env.VSCODE_PATH) {
     return process.env.VSCODE_PATH;
   }
-  for (const pathToTry of pathsToTry) {
-    if (existsSync(pathToTry)) {
-      return pathToTry;
-    }
-  }
-  throw new Error("vscode binary path not found");
+  const path = await downloadAndUnzipVSCode("1.66.2");
+  return path;
 };
