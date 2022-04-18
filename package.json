@@ -5,6 +5,7 @@
   "main": "src/main.js",
   "type": "module",
   "scripts": {
+    "postinstall": "node scripts/postinstall.js",
     "e2e": "node --unhandled-rejections=warn --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand --bail --detectOpenHandles --forceExit"
   },
   "repository": {

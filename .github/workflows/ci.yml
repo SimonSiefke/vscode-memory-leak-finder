@@ -28,7 +28,7 @@ jobs:
             ${{ runner.os }}-
       - name: Install Dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm ci && npm run postinstall
+        run: npm ci
       - name: install playwright dependencies
         run: npx playwright install-deps
       - name: Run headless test
