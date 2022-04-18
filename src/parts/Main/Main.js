@@ -9,6 +9,8 @@ const getScenario = (scenarioId) => {
       return import("../Scenarios/ScenarioBase.js");
     case "QuickPick":
       return import("../Scenarios/ScenarioQuickPick.js");
+    case "SideBar":
+      return import("../Scenarios/ScenarioSideBar.js");
     default:
       throw new Error(`unknown scenario ${scenarioId}`);
   }
