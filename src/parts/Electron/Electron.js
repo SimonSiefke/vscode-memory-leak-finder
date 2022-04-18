@@ -1,7 +1,12 @@
 import * as Platform from "../Platform/Platform.js";
 import * as TmpDir from "../TmpDir/TmpDir.js";
-import { spawn } from "node:child_process";
+import { execSync, spawn } from "node:child_process";
 import pTimeout from "p-timeout";
+import _kill from "tree-kill";
+import { promisify } from "node:util";
+import exitHook from "exit-hook";
+
+const kill = promisify(_kill);
 
 const getWebSocketUrl = (data) => {
   return data.trim().slice("DevTools listening on ".length);
@@ -32,17 +37,12 @@ export const launch = async () => {
     process.stderr.write(data);
   });
 
-  process.on("beforeExit", () => {
-    child.kill();
-  });
+  const killChild = () => {
+    // TODO support windows
+    execSync("killall code-insiders");
+  };
 
-  process.on("uncaughtExceptionMonitor", () => {
-    child.kill();
-  });
-
-  process.on("SIGHUP", () => {
-    child.kill();
-  });
+  exitHook(killChild);
 
   const linePromise = new Promise((resolve, reject) => {
     const handleData = (data) => {

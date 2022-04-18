@@ -6,7 +6,7 @@ export const run = async ({ webSocket, sessionId }) => {
     method: "Runtime.evaluate",
     sessionId,
     params: {
-      expression: "document.body.getAttribute('role')",
+      expression: "document.body.innerHTML",
       returnByValue: true,
     },
   });
