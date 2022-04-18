@@ -30,12 +30,26 @@ export const runScenario = async (scenarioId) => {
       });
     };
     const scenario = await getScenario(scenarioId);
-    await scenario.run(page, session, measure);
+    for (let i = 0; i < 2; i++) {
+      // warm up
+      await scenario.run(page, session, () => {});
+    }
+    for (let i = 0; i < 4; i++) {
+      // actual measurements
+      await scenario.run(page, session, measure);
+    }
     console.log({ results });
     console.info(`Scenario ${scenarioId} exited with code 0`);
+    if (process.send) {
+      process.exit(0);
+    }
   } catch (error) {
     console.error(error);
     console.info(`Scenario ${scenarioId} exited with code 1`);
+    if (process.send) {
+      process.exit(1);
+    }
   }
+
   // child.close();
 };

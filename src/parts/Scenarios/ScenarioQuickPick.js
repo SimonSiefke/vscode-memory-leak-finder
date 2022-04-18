@@ -11,7 +11,7 @@ export const run = async (page, session, measure) => {
   await page.keyboard.press("Control+Shift+P");
   const quickPick = page.locator(".quick-input-widget");
   await expect(quickPick).toBeVisible();
-  await measure("middle");
+  // await measure("middle");
 
   await page.keyboard.press("Escape");
   await expect(quickPick).toBeHidden();

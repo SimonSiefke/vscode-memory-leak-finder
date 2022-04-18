@@ -5,7 +5,7 @@
   "main": "src/main.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "e2e": "node --unhandled-rejections=warn --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand --bail --detectOpenHandles --forceExit"
   },
   "repository": {
     "type": "git",
