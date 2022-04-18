@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test";
 import * as ChromeDevtoolsProtocol from "../ChromeDevtoolsProtocol/ChromeDevtoolsProtocol.js";
 import * as Electron from "../Electron/Electron.js";
+import * as Measure from "../Measure/Measure.js";
 
 const getScenario = (scenarioId) => {
   switch (scenarioId) {
@@ -20,9 +21,17 @@ export const runScenario = async (scenarioId) => {
     await page.waitForLoadState("networkidle");
     const main = page.locator('[role="main"]');
     await expect(main).toBeVisible();
+    const results = [];
+    const measure = async (id) => {
+      const htmlElements = await Measure.measureNumberOfHtmlElements(session);
+      results.push({
+        label: id,
+        htmlElements,
+      });
+    };
     const scenario = await getScenario(scenarioId);
-    await scenario.run(page, session);
-    await scenario.run(page, session);
+    await scenario.run(page, session, measure);
+    console.log({ results });
     console.info(`Scenario ${scenarioId} exited with code 0`);
   } catch (error) {
     console.error(error);
