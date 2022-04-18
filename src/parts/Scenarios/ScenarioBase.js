@@ -1,11 +1,8 @@
-import * as Id from "../Id/Id.js";
 import { expect } from "@playwright/test";
 
-export const run = async ({ webSocket, sessionId }) => {
-  const expressionResult = await webSocket.invoke({
-    id: Id.create(),
+export const run = async (connection) => {
+  const expressionResult = await connection.invoke({
     method: "Runtime.evaluate",
-    sessionId,
     params: {
       expression: "document.body.innerHTML",
       returnByValue: true,

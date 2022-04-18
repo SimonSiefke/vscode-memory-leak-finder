@@ -2,30 +2,17 @@
 
 import { WebSocket } from "ws";
 
-export const connect = async (webSocketUrl) => {
-  const webSocket = new WebSocket(webSocketUrl);
-  await new Promise((resolve, reject) => {
-    webSocket.once("open", () => resolve());
-    webSocket.once("error", (error) => {
-      error.message = `Websocket Error: ${error.message}`;
-      reject(error);
-    });
-  });
-  webSocket.on("message", (message) => {
-    const parsed = JSON.parse(message.toString());
-    if (parsed.result) {
-      callbacks[parsed.id].resolve(parsed.result);
-    } else if (parsed.error) {
-      callbacks[parsed.id].reject(parsed.error.message);
-    }
-  });
-  const callbacks = Object.create(null);
+/**
+ *
+ * @param {import('@playwright/test').ElectronApplication} child
+ * @returns
+ */
+export const connect = async (child) => {
+  const page = await child.firstWindow();
+  const session = await page.context().newCDPSession(page);
 
   const invoke = (args) => {
-    return new Promise((resolve, reject) => {
-      callbacks[args.id] = { resolve, reject };
-      webSocket.send(JSON.stringify(args));
-    });
+    return session.send(args.method, args.params);
   };
 
   return {

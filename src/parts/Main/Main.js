@@ -31,32 +31,10 @@ const getTargets = async (webSocket) => {
 };
 
 export const runScenario = async (scenarioId) => {
-  const { child, webSocketUrl } = await Electron.launch();
-  const webSocket = await ChromeDevtoolsProtocol.connect(webSocketUrl);
-
-  const targets = await getTargets(webSocket);
-  console.log(JSON.stringify(targets));
-  const pageTarget = targets.targetInfos.find((info) => info.type === "page");
-  Assert.object(pageTarget);
-
-  const session = await webSocket.invoke({
-    id: Id.create(),
-    method: "Target.attachToTarget",
-    params: {
-      targetId: pageTarget.targetId,
-      flatten: true,
-    },
-  });
-
-  Assert.object(session);
-  const sessionId = session.sessionId;
-  Assert.string(sessionId);
-
+  const child = await Electron.launch();
+  const connection = await ChromeDevtoolsProtocol.connect(child);
   const scenario = await getScenario(scenarioId);
-  await scenario.run({
-    sessionId,
-    webSocket,
-  });
+  await scenario.run(connection);
   console.info(`Scenario ${scenarioId} exited with code 0`);
-  child.kill();
+  child.close();
 };
