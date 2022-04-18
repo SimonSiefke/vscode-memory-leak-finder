@@ -11,6 +11,8 @@ const getScenario = (scenarioId) => {
       return import("../../scenario/toggle-quick-pick.js");
     case "toggle-side-bar":
       return import("../../scenario/toggle-side-bar.js");
+    case "toggle-panel":
+      return import("../../scenario/toggle-panel.js");
     default:
       throw new Error(`unknown scenario ${scenarioId}`);
   }
