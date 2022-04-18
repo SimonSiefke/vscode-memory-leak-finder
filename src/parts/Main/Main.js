@@ -25,14 +25,11 @@ export const runScenario = async (scenarioId) => {
     await page.waitForLoadState("networkidle");
     const main = page.locator('[role="main"]');
     await expect(main).toBeVisible();
+    const notification = page
+      .locator("text=All installed extensions are temporarily disabled")
+      .first();
+    await expect(notification).toBeVisible();
     const results = [];
-    const measure = async (id) => {
-      const result = await getEventListeners(session);
-      results.push({
-        label: id,
-        result,
-      });
-    };
     const scenario = await getScenario(scenarioId);
     // warm up
     for (let i = 0; i < 1; i++) {
