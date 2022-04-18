@@ -13,7 +13,7 @@ jest.setTimeout(35_000);
 
 export const createRunner = (name) => {
   const __dirname = dirname(fileURLToPath(import.meta.url));
-  const mainPath = join(__dirname, "..", "src", `main.js`);
+  const mainPath = join(__dirname, "..", "..", "src", `main.js`);
   const child = fork(mainPath, [], {
     stdio: "pipe",
     env: {
@@ -99,6 +99,7 @@ export const createRunner = (name) => {
           reject();
           return;
         }
+        // @ts-ignore
         succeededCallback = resolve;
         rejectedCallback = reject;
       });

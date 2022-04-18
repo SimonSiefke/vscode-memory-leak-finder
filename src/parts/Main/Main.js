@@ -5,12 +5,12 @@ import * as Electron from "../Electron/Electron.js";
 
 const getScenario = (scenarioId) => {
   switch (scenarioId) {
-    case "Base":
-      return import("../Scenarios/ScenarioBase.js");
-    case "QuickPick":
-      return import("../Scenarios/ScenarioQuickPick.js");
-    case "SideBar":
-      return import("../Scenarios/ScenarioSideBar.js");
+    case "base":
+      return import("../../scenario/base.js");
+    case "toggle-quick-pick":
+      return import("../../scenario/toggle-quick-pick.js");
+    case "toggle-side-bar":
+      return import("../../scenario/toggle-side-bar.js");
     default:
       throw new Error(`unknown scenario ${scenarioId}`);
   }
@@ -32,15 +32,22 @@ export const runScenario = async (scenarioId) => {
       });
     };
     const scenario = await getScenario(scenarioId);
-    for (let i = 0; i < 2; i++) {
-      // warm up
-      await scenario.run(page, session, () => {});
+    // warm up
+    for (let i = 0; i < 1; i++) {
+      await scenario.run(page);
     }
-    for (let i = 0; i < 4; i++) {
-      // actual measurements
-      await scenario.run(page, session, measure);
+    for (let i = 0; i < 1; i++) {
+      const beforeEventListeners = await getEventListeners(session);
+      await scenario.run(page);
+      const afterEventListeners = await getEventListeners(session);
+      if (beforeEventListeners === afterEventListeners) {
+        console.info(`event listener equal: ${beforeEventListeners}`);
+      } else {
+        console.info(
+          `event listener increase: ${beforeEventListeners} -> ${afterEventListeners}`
+        );
+      }
     }
-    console.log({ results });
     console.info(`Scenario ${scenarioId} exited with code 0`);
     if (process.send) {
       process.exit(0);

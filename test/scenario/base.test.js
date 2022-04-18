@@ -3,13 +3,13 @@ import { createRunner } from "./_run.js";
 let runner;
 
 beforeAll(() => {
-  runner = createRunner("Base");
+  runner = createRunner("base");
 });
 
 afterAll(async () => {
   await runner.kill();
 });
 
-test("Base", async () => {
+test("base", async () => {
   await runner.waitForSucceeded();
 });
