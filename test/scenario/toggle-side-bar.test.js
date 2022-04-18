@@ -12,5 +12,7 @@ afterAll(async () => {
 
 test("toggle-side-bar", async () => {
   await runner.waitForSucceeded();
-  expect(runner.stdout).toContain(`event listener equal: 888\n`);
+  expect(runner.stdout).toContain(
+    expect.stringContaining(`event listener equal:`)
+  );
 });
