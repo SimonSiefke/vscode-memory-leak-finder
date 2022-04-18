@@ -1,6 +1,10 @@
 import { expect } from "@playwright/test";
 
-export const run = async (connection) => {
+/**
+ *
+ * @param {import('@playwright/test').Page} page
+ */
+export const run = async (page) => {
   // TODO
   // 1. count number of dom nodes or objects
   // 2. open quickpick
@@ -8,14 +12,9 @@ export const run = async (connection) => {
   // 4. close quickpick
   // 5. count number of dom nodes or objects
   // if number of dom nodes has increased, there is a memory leak
-  const expressionResult = await connection.invoke({
-    method: "Runtime.evaluate",
-    params: {
-      expression: "document.body.innerHTML",
-      returnByValue: true,
-    },
-  });
-  expect(expressionResult.result.value).toContain(
-    `<!-- Startup via workbench.js -->`
-  );
+  await page.keyboard.press("Control+Shift+P");
+  const quickPick = page.locator(".quick-input-widget");
+  await expect(quickPick).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(quickPick).toBeHidden();
 };

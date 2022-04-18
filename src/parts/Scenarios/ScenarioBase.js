@@ -1,14 +1,14 @@
 import { expect } from "@playwright/test";
 
-export const run = async (connection) => {
-  const expressionResult = await connection.invoke({
-    method: "Runtime.evaluate",
-    params: {
-      expression: "document.body.innerHTML",
-      returnByValue: true,
-    },
+/**
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {any} session
+ */
+export const run = async (page, session) => {
+  const html = await page.evaluate(() => {
+    // @ts-ignore
+    return document.body.innerHTML;
   });
-  expect(expressionResult.result.value).toContain(
-    `<!-- Startup via workbench.js -->`
-  );
+  expect(html).toContain(`<!-- Startup via workbench.js -->`);
 };

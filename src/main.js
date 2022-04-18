@@ -1,7 +1,8 @@
 import { runScenario } from "./parts/Main/Main.js";
 
 const main = async () => {
-  await runScenario("Base");
+  const scenario = process.env.SCENARIO || "Base";
+  await runScenario(scenario);
 };
 
 main();

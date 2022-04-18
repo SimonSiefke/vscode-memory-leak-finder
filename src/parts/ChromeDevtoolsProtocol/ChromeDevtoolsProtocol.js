@@ -15,7 +15,5 @@ export const connect = async (child) => {
     return session.send(args.method, args.params);
   };
 
-  return {
-    invoke,
-  };
+  return { page, session: { invoke } };
 };
