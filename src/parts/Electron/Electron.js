@@ -10,7 +10,13 @@ const getWebSocketUrl = (data) => {
 export const launch = async () => {
   const tmpDir = await TmpDir.create();
   const binaryPath = Platform.getBinaryPath();
-  const args = ["--wait", "--remote-debugging-port=0", "--new-window", "."];
+  const args = [
+    "--wait",
+    "--remote-debugging-port=0",
+    "--wait",
+    "--new-window",
+    ".",
+  ];
   const child = spawn(binaryPath, args, {
     cwd: tmpDir,
     stdio: "pipe",
@@ -27,6 +33,14 @@ export const launch = async () => {
   });
 
   process.on("beforeExit", () => {
+    child.kill();
+  });
+
+  process.on("uncaughtExceptionMonitor", () => {
+    child.kill();
+  });
+
+  process.on("SIGHUP", () => {
     child.kill();
   });
 

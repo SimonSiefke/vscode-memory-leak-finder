@@ -1,6 +1,9 @@
 import { existsSync } from "node:fs";
 
-const pathsToTry = ["/snap/code/current/usr/share/code/code"];
+const pathsToTry = [
+  "/snap/code-insiders/current/usr/share/code-insiders/code-insiders",
+  "/snap/code/current/usr/share/code/code",
+];
 
 export const getBinaryPath = () => {
   if (process.env.VSCODE_PATH) {
