@@ -1,7 +1,7 @@
 import { expect } from "@playwright/test";
 import * as ChromeDevtoolsProtocol from "../ChromeDevtoolsProtocol/ChromeDevtoolsProtocol.js";
+import { getEventListeners } from "../ChromeDevtoolsProtocol/getEventListeners.js";
 import * as Electron from "../Electron/Electron.js";
-import * as Measure from "../Measure/Measure.js";
 
 const getScenario = (scenarioId) => {
   switch (scenarioId) {
@@ -23,10 +23,10 @@ export const runScenario = async (scenarioId) => {
     await expect(main).toBeVisible();
     const results = [];
     const measure = async (id) => {
-      const htmlElements = await Measure.measureNumberOfHtmlElements(session);
+      const result = await getEventListeners(session);
       results.push({
         label: id,
-        htmlElements,
+        result,
       });
     };
     const scenario = await getScenario(scenarioId);

@@ -1,5 +1,4 @@
 import { expect } from "@playwright/test";
-import { getHtmlElements } from "../ChromeDevtoolsProtocol/ChromeDevtoolsProtocol.js";
 
 /**
  *
