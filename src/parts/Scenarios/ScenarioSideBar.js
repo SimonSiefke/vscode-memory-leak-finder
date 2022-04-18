@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { inspect } from "util";
 import { getEventListenersForNode } from "../ChromeDevtoolsProtocol/getEventListenersForNode.js";
 
 // get all dom nodes, even those inside open shadow roots. kind of like `querySelectorAll('*')`
@@ -67,10 +68,22 @@ export const run = async (page, session) => {
   });
 
   const nodes = await getDescriptors(session, objectId);
-  for (const node of nodes) {
-    const listeners = await getEventListenersForNode(session, node);
-    console.log({ listeners });
-  }
-  console.log({ descriptors: nodes });
+
+  console.time("getEventListeners");
+  const nodesWithListeners = await Promise.all(
+    nodes.map(async (node) => {
+      const listeners = await getEventListenersForNode(session, node);
+      return {
+        node,
+        listeners,
+      };
+    })
+  );
+
+  // TODO measure leak dom nodes descriptions and leaked event listeners
+
+  // console.timeEnd("getEventListeners");
+  // console.log(JSON.stringify(nodesWithListenersActual, null, 2));
+  // console.log({ nodesWithListeners });
   // expect(html).toContain(`<!-- Startup via workbench.js -->`);
 };
