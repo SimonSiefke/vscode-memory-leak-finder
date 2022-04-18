@@ -22,6 +22,7 @@ export const runScenario = async (scenarioId) => {
     await expect(main).toBeVisible();
     const scenario = await getScenario(scenarioId);
     await scenario.run(page, session);
+    await scenario.run(page, session);
     console.info(`Scenario ${scenarioId} exited with code 0`);
   } catch (error) {
     console.error(error);
