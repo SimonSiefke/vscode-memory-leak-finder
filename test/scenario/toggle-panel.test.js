@@ -12,7 +12,7 @@ afterAll(async () => {
 
 test("toggle-panel", async () => {
   await runner.waitForSucceeded();
-  expect(runner.stdout).toContain(
+  expect(runner.stdout).toContainEqual(
     expect.stringContaining(`event listener equal:`)
   );
 });
