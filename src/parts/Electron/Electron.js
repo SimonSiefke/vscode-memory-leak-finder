@@ -39,7 +39,11 @@ export const launch = async () => {
 
   const killChild = () => {
     // TODO support windows
-    execSync("killall code-insiders");
+    try {
+      execSync("killall code-insiders");
+    } catch {
+      // ignore
+    }
   };
 
   exitHook(killChild);
@@ -56,5 +60,5 @@ export const launch = async () => {
   });
   const line = await pTimeout(linePromise, 1750);
   const webSocketUrl = getWebSocketUrl(line);
-  return webSocketUrl;
+  return { child, webSocketUrl };
 };

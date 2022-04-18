@@ -31,7 +31,7 @@ const getTargets = async (webSocket) => {
 };
 
 export const runScenario = async (scenarioId) => {
-  const webSocketUrl = await Electron.launch();
+  const { child, webSocketUrl } = await Electron.launch();
   const webSocket = await ChromeDevtoolsProtocol.connect(webSocketUrl);
 
   const targets = await getTargets(webSocket);
@@ -57,4 +57,6 @@ export const runScenario = async (scenarioId) => {
     sessionId,
     webSocket,
   });
+  console.info(`Scenario ${scenarioId} exited with code 0`);
+  child.kill();
 };
