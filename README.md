@@ -1,5 +1,5 @@
 # vscode memory leak finder
 
 ```sh
-SCENARIO=QuickPick node src/main.js
+SCENARIO=quick-pick-color-theme node src/main.js
 ```
