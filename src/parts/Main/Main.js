@@ -38,6 +38,8 @@ const getScenario = (scenarioId) => {
       return import("../../scenario/editor-split.js");
     case "editor-rename":
       return import("../../scenario/editor-rename.js");
+    case "editor-definition-no-definition-found":
+      return import("../../scenario/editor-definition-no-definition-found.js");
     default:
       throw new Error(`unknown scenario ${scenarioId}`);
   }
