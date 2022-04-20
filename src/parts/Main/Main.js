@@ -30,6 +30,8 @@ const getScenario = (scenarioId) => {
       return import("../../scenario/quick-pick-color-theme.js");
     case "editor-completion-toggle":
       return import("../../scenario/editor-completion-toggle.js");
+    case "editor-hover-toggle":
+      return import("../../scenario/editor-hover-toggle.js");
     default:
       throw new Error(`unknown scenario ${scenarioId}`);
   }
