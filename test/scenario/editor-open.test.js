@@ -3,7 +3,7 @@ import { createRunner } from "./_run.js";
 let runner;
 
 beforeAll(() => {
-  runner = createRunner("open-editor");
+  runner = createRunner("editor-open");
 });
 
 afterAll(async () => {
@@ -11,7 +11,7 @@ afterAll(async () => {
 });
 
 // TODO open editor might have memory leak
-test.skip("open-editor", async () => {
+test.skip("editor-open", async () => {
   await runner.waitForSucceeded();
   expect(runner.stdout).toContainEqual(
     expect.stringContaining(`event listener equal:`)

@@ -16,8 +16,8 @@ const getScenario = (scenarioId) => {
       return import("../../scenario/toggle-panel.js");
     case "toggle-activity-bar":
       return import("../../scenario/toggle-activity-bar.js");
-    case "open-editor":
-      return import("../../scenario/open-editor.js");
+    case "editor-open":
+      return import("../../scenario/editor-open.js");
     case "editor-scrolling":
       return import("../../scenario/editor-scrolling.js");
     case "editor-tab-context-menu":
