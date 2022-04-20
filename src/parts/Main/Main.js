@@ -13,6 +13,8 @@ const getScenario = (scenarioId) => {
       return import("../../scenario/toggle-side-bar.js");
     case "toggle-panel":
       return import("../../scenario/toggle-panel.js");
+    case "toggle-activity-bar":
+      return import("../../scenario/toggle-activity-bar.js");
     default:
       throw new Error(`unknown scenario ${scenarioId}`);
   }
