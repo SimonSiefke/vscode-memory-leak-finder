@@ -22,6 +22,8 @@ const getScenario = (scenarioId) => {
       return import("../../scenario/editor-scrolling.js");
     case "editor-tab-context-menu":
       return import("../../scenario/editor-tab-context-menu.js");
+    case "explorer-keyboard-navigation":
+      return import("../../scenario/explorer-keyboard-navigation.js");
     default:
       throw new Error(`unknown scenario ${scenarioId}`);
   }
