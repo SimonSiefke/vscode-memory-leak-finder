@@ -10,8 +10,10 @@ const getScenario = (scenarioId) => {
       return import("../../scenario/base.js");
     case "quick-pick-toggle":
       return import("../../scenario/quick-pick-toggle.js");
-    case "toggle-side-bar":
-      return import("../../scenario/toggle-side-bar.js");
+    case "side-bar-toggle":
+      return import("../../scenario/side-bar-toggle.js");
+    case "side-bar-move":
+      return import("../../scenario/side-bar-move.js");
     case "toggle-panel":
       return import("../../scenario/toggle-panel.js");
     case "toggle-activity-bar":
