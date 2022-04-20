@@ -8,8 +8,8 @@ const getScenario = (scenarioId) => {
   switch (scenarioId) {
     case "base":
       return import("../../scenario/base.js");
-    case "toggle-quick-pick":
-      return import("../../scenario/toggle-quick-pick.js");
+    case "quick-pick-toggle":
+      return import("../../scenario/quick-pick-toggle.js");
     case "toggle-side-bar":
       return import("../../scenario/toggle-side-bar.js");
     case "toggle-panel":
@@ -26,6 +26,8 @@ const getScenario = (scenarioId) => {
       return import("../../scenario/editor-tab-context-menu.js");
     case "explorer-keyboard-navigation":
       return import("../../scenario/explorer-keyboard-navigation.js");
+    case "quick-pick-color-theme":
+      return import("../../scenario/quick-pick-color-theme.js");
     default:
       throw new Error(`unknown scenario ${scenarioId}`);
   }
