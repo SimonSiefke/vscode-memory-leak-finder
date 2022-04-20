@@ -7,10 +7,16 @@ const generateFileContent = () => {
 };
 
 /**
+ * @param {{tmpDir:string }} options
+ */
+export const beforeSetup = async ({ tmpDir }) => {
+  await writeFile(join(tmpDir, "file.txt"), generateFileContent());
+};
+
+/**
  * @param {{page: import('@playwright/test').Page, tmpDir:string }} options
  */
 export const setup = async ({ page, tmpDir }) => {
-  await writeFile(join(tmpDir, "file.txt"), generateFileContent());
   await page.keyboard.press("Control+P");
   const quickPick = page.locator(".quick-input-widget");
   await expect(quickPick).toBeVisible();

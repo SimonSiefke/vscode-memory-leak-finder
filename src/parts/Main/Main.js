@@ -20,6 +20,8 @@ const getScenario = (scenarioId) => {
       return import("../../scenario/open-editor.js");
     case "editor-scrolling":
       return import("../../scenario/editor-scrolling.js");
+    case "editor-tab-context-menu":
+      return import("../../scenario/editor-tab-context-menu.js");
     default:
       throw new Error(`unknown scenario ${scenarioId}`);
   }
@@ -28,7 +30,15 @@ const getScenario = (scenarioId) => {
 export const runScenario = async (scenarioId) => {
   try {
     const tmpDir = await TmpDir.create();
-    const child = await Electron.launch(tmpDir);
+    const userDataDir = await TmpDir.create();
+    const scenario = await getScenario(scenarioId);
+
+    // @ts-ignore
+    if (scenario.beforeSetup) {
+      // @ts-ignore
+      scenario.beforeSetup({ tmpDir, userDataDir });
+    }
+    const child = await Electron.launch({ tmpDir, userDataDir });
     const { page, session } = await ChromeDevtoolsProtocol.connect(child);
     await page.waitForLoadState("networkidle");
     const main = page.locator('[role="main"]');
@@ -38,12 +48,11 @@ export const runScenario = async (scenarioId) => {
       .first();
     await expect(notification).toBeVisible();
     const results = [];
-    const scenario = await getScenario(scenarioId);
 
     // @ts-ignore
     if (scenario.setup) {
       // @ts-ignore
-      await scenario.setup({ page, tmpDir });
+      await scenario.setup({ page, tmpDir, userDataDir });
     }
     // warm up
     for (let i = 0; i < 1; i++) {
