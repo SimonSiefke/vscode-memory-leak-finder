@@ -32,6 +32,8 @@ const getScenario = (scenarioId) => {
       return import("../../scenario/editor-completion-toggle.js");
     case "editor-hover-toggle":
       return import("../../scenario/editor-hover-toggle.js");
+    case "editor-split":
+      return import("../../scenario/editor-split.js");
     default:
       throw new Error(`unknown scenario ${scenarioId}`);
   }
