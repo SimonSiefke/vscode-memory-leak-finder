@@ -18,6 +18,8 @@ const getScenario = (scenarioId) => {
       return import("../../scenario/toggle-activity-bar.js");
     case "open-editor":
       return import("../../scenario/open-editor.js");
+    case "editor-scrolling":
+      return import("../../scenario/editor-scrolling.js");
     default:
       throw new Error(`unknown scenario ${scenarioId}`);
   }
@@ -38,8 +40,10 @@ export const runScenario = async (scenarioId) => {
     const results = [];
     const scenario = await getScenario(scenarioId);
 
+    // @ts-ignore
     if (scenario.setup) {
-      await scenario.setup(tmpDir);
+      // @ts-ignore
+      await scenario.setup({ page, tmpDir });
     }
     // warm up
     for (let i = 0; i < 1; i++) {

@@ -2,7 +2,7 @@ import { expect } from "@playwright/test";
 import { writeFile } from "fs/promises";
 import { join } from "path";
 
-export const setup = async (tmpDir) => {
+export const setup = async ({ tmpDir }) => {
   await writeFile(join(tmpDir, "file.txt"), "sample text");
 };
 /**
