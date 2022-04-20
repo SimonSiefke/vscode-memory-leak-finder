@@ -2,8 +2,7 @@ import { _electron } from "@playwright/test";
 import * as Platform from "../Platform/Platform.js";
 import * as TmpDir from "../TmpDir/TmpDir.js";
 
-export const launch = async () => {
-  const tmpDir = await TmpDir.create();
+export const launch = async (tmpDir) => {
   const userDataDir = await TmpDir.create();
   const binaryPath = await Platform.getBinaryPath();
   const child = await _electron.launch({

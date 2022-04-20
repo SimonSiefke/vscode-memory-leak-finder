@@ -2,6 +2,7 @@ import { expect } from "@playwright/test";
 import * as ChromeDevtoolsProtocol from "../ChromeDevtoolsProtocol/ChromeDevtoolsProtocol.js";
 import { getEventListeners } from "../ChromeDevtoolsProtocol/getEventListeners.js";
 import * as Electron from "../Electron/Electron.js";
+import * as TmpDir from "../TmpDir/TmpDir.js";
 
 const getScenario = (scenarioId) => {
   switch (scenarioId) {
@@ -15,6 +16,8 @@ const getScenario = (scenarioId) => {
       return import("../../scenario/toggle-panel.js");
     case "toggle-activity-bar":
       return import("../../scenario/toggle-activity-bar.js");
+    case "open-editor":
+      return import("../../scenario/open-editor.js");
     default:
       throw new Error(`unknown scenario ${scenarioId}`);
   }
@@ -22,7 +25,8 @@ const getScenario = (scenarioId) => {
 
 export const runScenario = async (scenarioId) => {
   try {
-    const child = await Electron.launch();
+    const tmpDir = await TmpDir.create();
+    const child = await Electron.launch(tmpDir);
     const { page, session } = await ChromeDevtoolsProtocol.connect(child);
     await page.waitForLoadState("networkidle");
     const main = page.locator('[role="main"]');
@@ -33,6 +37,10 @@ export const runScenario = async (scenarioId) => {
     await expect(notification).toBeVisible();
     const results = [];
     const scenario = await getScenario(scenarioId);
+
+    if (scenario.setup) {
+      await scenario.setup(tmpDir);
+    }
     // warm up
     for (let i = 0; i < 1; i++) {
       await scenario.run(page);
