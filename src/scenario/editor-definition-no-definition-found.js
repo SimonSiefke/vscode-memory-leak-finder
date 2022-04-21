@@ -34,6 +34,7 @@ export const run = async (page) => {
   const quickPickInput = quickPick.locator('[role="combobox"]');
   await quickPickInput.type("Go to Definition");
   const firstOption = quickPick.locator(".monaco-list-row").first();
+  await expect(firstOption).toContainText("Go to Definition");
   await firstOption.click();
 
   const message = page.locator(".monaco-editor-overlaymessage");
