@@ -44,6 +44,8 @@ const getScenario = (scenarioId) => {
       return import("../../scenario/editor-diagnostic.js");
     case "editor-selection":
       return import("../../scenario/editor-selection.js");
+    case "title-bar-menu-toggle":
+      return import("../../scenario/title-bar-menu-toggle.js");
     default:
       throw new Error(`unknown scenario ${scenarioId}`);
   }
