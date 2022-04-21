@@ -40,6 +40,8 @@ const getScenario = (scenarioId) => {
       return import("../../scenario/editor-rename.js");
     case "editor-definition-no-definition-found":
       return import("../../scenario/editor-definition-no-definition-found.js");
+    case "editor-diagnostic":
+      return import("../../scenario/editor-diagnostic.js");
     default:
       throw new Error(`unknown scenario ${scenarioId}`);
   }
@@ -73,7 +75,7 @@ export const runScenario = async (scenarioId) => {
       await scenario.setup({ page, tmpDir, userDataDir });
     }
     // warm up
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < 2; i++) {
       await scenario.run(page);
     }
     for (let i = 0; i < 1; i++) {
