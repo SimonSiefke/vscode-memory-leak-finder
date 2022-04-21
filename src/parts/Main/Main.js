@@ -42,6 +42,8 @@ const getScenario = (scenarioId) => {
       return import("../../scenario/editor-definition-no-definition-found.js");
     case "editor-diagnostic":
       return import("../../scenario/editor-diagnostic.js");
+    case "editor-selection":
+      return import("../../scenario/editor-selection.js");
     default:
       throw new Error(`unknown scenario ${scenarioId}`);
   }
