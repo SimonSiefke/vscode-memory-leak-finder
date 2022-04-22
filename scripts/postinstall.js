@@ -1,6 +1,6 @@
 import { downloadAndUnzipVSCode } from "@vscode/test-electron";
 import { readFileSync } from "fs";
-import { readdir, writeFile } from "fs/promises";
+import { writeFile } from "fs/promises";
 import { dirname, join } from "path";
 
 const getPlatform = () => {
