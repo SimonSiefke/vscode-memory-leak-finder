@@ -64,6 +64,7 @@ export const runScenario = async (scenarioId) => {
     }
     const child = await Electron.launch({ tmpDir, userDataDir });
     const { page, session } = await ChromeDevtoolsProtocol.connect(child);
+    page.setDefaultTimeout(15_000);
     await page.waitForLoadState("networkidle");
     const main = page.locator('[role="main"]');
     await expect(main).toBeVisible();
