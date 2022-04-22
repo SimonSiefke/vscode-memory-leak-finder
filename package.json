@@ -1,6 +1,6 @@
 {
   "name": "vscode-memory-leak-finder",
-  "version": "1.0.0",
+  "version": "0.0.0-dev",
   "description": "",
   "main": "src/main.js",
   "type": "module",
@@ -14,7 +14,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/SimonSiefke/vscode-memory-leak-finder/issues"
   },

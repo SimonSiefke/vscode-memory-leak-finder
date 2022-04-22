@@ -64,16 +64,17 @@ export const runScenario = async (scenarioId) => {
     }
     const child = await Electron.launch({ tmpDir, userDataDir });
     const { page, session } = await ChromeDevtoolsProtocol.connect(child);
-    page.setDefaultTimeout(15_000);
     await page.waitForLoadState("networkidle");
     const main = page.locator('[role="main"]');
-    await expect(main).toBeVisible();
+    await expect(main).toBeVisible({
+      timeout: 15_000,
+    });
     const notification = page
       .locator("text=All installed extensions are temporarily disabled")
       .first();
-    await expect(notification).toBeVisible();
-    const results = [];
-
+    await expect(notification).toBeVisible({
+      timeout: 15_000,
+    });
     // @ts-ignore
     if (scenario.setup) {
       // @ts-ignore
