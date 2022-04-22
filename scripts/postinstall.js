@@ -1,6 +1,6 @@
 import { downloadAndUnzipVSCode } from "@vscode/test-electron";
 import { readFileSync } from "fs";
-import { writeFile } from "fs/promises";
+import { readdir, writeFile } from "fs/promises";
 import { dirname, join } from "path";
 
 const main = async () => {
@@ -11,6 +11,9 @@ const main = async () => {
     "app",
     "package.json"
   );
+  console.log(await readdir(dirname(dirname(dirname(packageJsonPath)))));
+  console.log(await readdir(dirname(dirname(packageJsonPath))));
+  console.log(await readdir(dirname(packageJsonPath)));
   const originalContent = readFileSync(packageJsonPath, "utf-8");
   const originalParsed = JSON.parse(originalContent);
   const newParsed = {
