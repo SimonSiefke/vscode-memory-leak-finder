@@ -84,17 +84,28 @@ export const runScenario = async (scenarioId) => {
     for (let i = 0; i < 2; i++) {
       await scenario.run(page);
     }
-    for (let i = 0; i < 1; i++) {
+    const results = [];
+    for (let i = 0; i < 2; i++) {
       const beforeEventListeners = await getEventListeners(session);
       await scenario.run(page);
       const afterEventListeners = await getEventListeners(session);
-      if (beforeEventListeners === afterEventListeners) {
-        console.info(`event listener equal: ${beforeEventListeners}`);
-      } else {
+      results.push({
+        beforeEventListeners,
+        afterEventListeners,
+      });
+    }
+    if (
+      results.every(
+        (result) => result.beforeEventListeners < result.afterEventListeners
+      )
+    ) {
+      for (const result of results) {
         console.info(
-          `event listener increase: ${beforeEventListeners} -> ${afterEventListeners}`
+          `event listener increase: ${result.beforeEventListeners} -> ${result.afterEventListeners}`
         );
       }
+    } else {
+      console.info(`event listener equal: ${results[0].beforeEventListeners}`);
     }
     // console.info(`Scenario ${scenarioId} exited with code 0`);
     if (process.send) {
