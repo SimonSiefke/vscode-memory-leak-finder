@@ -60,7 +60,7 @@ export const runScenario = async (scenarioId) => {
     // @ts-ignore
     if (scenario.beforeSetup) {
       // @ts-ignore
-      scenario.beforeSetup({ tmpDir, userDataDir });
+      await scenario.beforeSetup({ tmpDir, userDataDir });
     }
     const child = await Electron.launch({ tmpDir, userDataDir });
     const { page, session } = await ChromeDevtoolsProtocol.connect(child);
