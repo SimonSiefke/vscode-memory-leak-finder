@@ -31,7 +31,7 @@ export const run = async (page) => {
   const selection = page.locator(".selected-text");
   await expect(selection).toBeVisible();
   await expect(selection).toHaveCSS("left", "8px");
-  await expect(selection).toHaveCSS("width", "17px");
+  await expect(selection).toHaveCSS("width", /(15px|17px)/);
 
   await page.keyboard.press("ArrowRight");
   await expect(selection).toBeHidden();
