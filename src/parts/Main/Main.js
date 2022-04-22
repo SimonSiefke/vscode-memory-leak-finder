@@ -67,7 +67,7 @@ export const runScenario = async (scenarioId) => {
     await page.waitForLoadState("networkidle");
     const main = page.locator('[role="main"]');
     await expect(main).toBeVisible({
-      timeout: 15_000,
+      timeout: 30_000,
     });
     const notification = page
       .locator("text=All installed extensions are temporarily disabled")
