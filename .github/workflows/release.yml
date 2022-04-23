@@ -1,17 +1,16 @@
-name: CI
+name: Release
+
 on:
   push:
-    branches:
-      - main
-
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
 jobs:
   ci:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # os: [ubuntu-latest, macOS-latest, windows-latest]
-        os: [ubuntu-latest]
-    timeout-minutes: 10
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
