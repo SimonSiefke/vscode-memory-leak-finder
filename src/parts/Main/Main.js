@@ -50,6 +50,8 @@ const getScenario = (scenarioId) => {
       return import("../../scenario/explorer-rename-file.js");
     case "editor-rename-cancel":
       return import("../../scenario/editor-rename-cancel.js");
+    case "explorer-expand-and-collapse":
+      return import("../../scenario/explorer-expand-and-collapse.js");
     default:
       throw new Error(`unknown scenario ${scenarioId}`);
   }
