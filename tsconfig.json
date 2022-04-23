@@ -14,5 +14,5 @@
     "isolatedModules": true,
     "assumeChangesOnlyAffectDirectDependencies": true
   },
-  "include": ["src", "test", "playground", "scripts"]
+  "include": ["src", "test", "scripts"]
 }
