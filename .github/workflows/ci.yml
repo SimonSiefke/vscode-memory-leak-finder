@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         # os: [ubuntu-latest, macOS-latest, windows-latest]
-        os: [windows-latest]
+        os: [ubuntu-latest]
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
