@@ -8,8 +8,8 @@ import waitForExpect from "wait-for-expect";
 
 const kill = promisify(_kill);
 
-waitForExpect.defaults.timeout = 35_000;
-jest.setTimeout(35_000);
+waitForExpect.defaults.timeout = 60_000;
+jest.setTimeout(60_000);
 
 export const createRunner = (name) => {
   const __dirname = dirname(fileURLToPath(import.meta.url));
