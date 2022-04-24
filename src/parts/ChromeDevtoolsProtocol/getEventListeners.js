@@ -4,6 +4,7 @@
  * @returns {Promise<number>}
  */
 export const getEventListeners = async (session) => {
+  // TODO this does not include hidden dom nodes
   const fnResult = await session.send("Runtime.evaluate", {
     expression: `;(() => {
   const nodes = Array.from(document.querySelectorAll('*'))
