@@ -13,3 +13,7 @@ export const getBinaryPath = async () => {
   const path = await downloadAndUnzipVSCode("1.66.2");
   return path;
 };
+
+export const recordVideos = () => {
+  return process.env.RECORD_VIDEOS;
+};

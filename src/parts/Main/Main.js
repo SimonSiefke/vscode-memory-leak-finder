@@ -1,8 +1,13 @@
 import { expect } from "@playwright/test";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import * as ChromeDevtoolsProtocol from "../ChromeDevtoolsProtocol/ChromeDevtoolsProtocol.js";
 import { getEventListeners } from "../ChromeDevtoolsProtocol/getEventListeners.js";
 import * as Electron from "../Electron/Electron.js";
 import * as TmpDir from "../TmpDir/TmpDir.js";
+import * as Platform from "../Platform/Platform.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const getScenario = (scenarioId) => {
   switch (scenarioId) {
@@ -60,6 +65,8 @@ const getScenario = (scenarioId) => {
 };
 
 export const runScenario = async (scenarioId) => {
+  let _page;
+  let child;
   try {
     const tmpDir = await TmpDir.create();
     const userDataDir = await TmpDir.create();
@@ -70,8 +77,9 @@ export const runScenario = async (scenarioId) => {
       // @ts-ignore
       await scenario.beforeSetup({ tmpDir, userDataDir });
     }
-    const child = await Electron.launch({ tmpDir, userDataDir });
+    child = await Electron.launch({ tmpDir, userDataDir });
     const { page, session } = await ChromeDevtoolsProtocol.connect(child);
+    _page = page;
     await page.waitForLoadState("networkidle");
     const main = page.locator('[role="main"]');
     await expect(main).toBeVisible({
@@ -116,12 +124,28 @@ export const runScenario = async (scenarioId) => {
       console.info(`event listener equal: ${results[0].beforeEventListeners}`);
     }
     // console.info(`Scenario ${scenarioId} exited with code 0`);
+    if (Platform.recordVideos()) {
+      await child.context().close();
+      await page
+        .video()
+        .saveAs(
+          join(__dirname, "..", "..", "..", ".videos", `${scenarioId}.webm`)
+        );
+    }
     if (process.send) {
       process.exit(0);
     }
   } catch (error) {
     console.error(error);
     console.info(`Scenario ${scenarioId} exited with code 1`);
+    if (Platform.recordVideos()) {
+      await child.context().close();
+      await _page
+        .video()
+        .saveAs(
+          join(__dirname, "..", "..", "..", ".videos", `${scenarioId}.webm`)
+        );
+    }
     if (process.send) {
       process.exit(1);
     }
