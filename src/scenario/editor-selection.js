@@ -17,6 +17,7 @@ export const setup = async ({ page }) => {
   const editor = page.locator(".editor-instance");
   await expect(editor).toBeVisible();
 };
+
 /**
  *
  * @param {import('@playwright/test').Page} page

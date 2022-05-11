@@ -54,6 +54,8 @@ const getScenario = (scenarioId) => {
       return import("../../scenario/explorer-expand-and-collapse.js");
     case "problems-toggle":
       return import("../../scenario/problems-toggle.js");
+    case "search":
+      return import("../../scenario/search.js");
     default:
       throw new Error(`unknown scenario ${scenarioId}`);
   }
