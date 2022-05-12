@@ -10,7 +10,10 @@ afterAll(async () => {
   await runner.kill();
 });
 
-test("extensions-suggest-toggle", async () => {
+// TODO test is flaky https://github.com/SimonSiefke/vscode-memory-leak-finder/runs/6406254381?check_suite_focus=true
+// probably need to wait until extensions are loaded
+
+test.skip("extensions-suggest-toggle", async () => {
   await runner.waitForSucceeded();
   expect(runner.stdout).toContainEqual(
     expect.stringContaining(`event listener equal:`)
