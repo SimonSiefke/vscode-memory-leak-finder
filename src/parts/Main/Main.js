@@ -58,6 +58,8 @@ const getScenario = (scenarioId) => {
       return import("../../scenario/search.js");
     case "keybindings-editor":
       return import("../../scenario/keybindings-editor.js");
+    case "extensions-suggest-toggle":
+      return import("../../scenario/extensions-suggest-toggle.js");
     default:
       throw new Error(`unknown scenario ${scenarioId}`);
   }
