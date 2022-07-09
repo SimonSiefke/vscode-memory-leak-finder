@@ -31,7 +31,7 @@ const getPackageJsonPath = (path) => {
 };
 
 const main = async () => {
-  const path = await downloadAndUnzipVSCode("1.66.2");
+  const path = await downloadAndUnzipVSCode("1.69.0");
   const packageJsonPath = getPackageJsonPath(path);
   console.log({ packageJsonPath });
   const originalContent = readFileSync(packageJsonPath, "utf-8");

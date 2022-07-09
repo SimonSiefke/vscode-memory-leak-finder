@@ -10,6 +10,6 @@ export const getBinaryPath = async () => {
   if (process.env.VSCODE_PATH) {
     return process.env.VSCODE_PATH;
   }
-  const path = await downloadAndUnzipVSCode("1.66.2");
+  const path = await downloadAndUnzipVSCode("1.69.0");
   return path;
 };
