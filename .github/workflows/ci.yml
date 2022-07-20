@@ -13,8 +13,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # os: [ubuntu-latest, macOS-latest, windows-latest]
-        os: [ubuntu-latest]
+        # os: [ubuntu-22.04, macOS-latest, windows-latest]
+        os: [ubuntu-22.04]
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
