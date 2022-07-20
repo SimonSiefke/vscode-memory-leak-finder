@@ -2,6 +2,7 @@ import { downloadAndUnzipVSCode } from "@vscode/test-electron";
 import { readFileSync } from "fs";
 import { writeFile } from "fs/promises";
 import { dirname, join } from "path";
+import { vscodeVersion } from "../src/parts/VsCodeVersion/VsCodeVersion.js";
 
 const getPlatform = () => {
   switch (process.platform) {
@@ -31,7 +32,7 @@ const getPackageJsonPath = (path) => {
 };
 
 const main = async () => {
-  const path = await downloadAndUnzipVSCode("1.69.0");
+  const path = await downloadAndUnzipVSCode(vscodeVersion);
   const packageJsonPath = getPackageJsonPath(path);
   console.log({ packageJsonPath });
   const originalContent = readFileSync(packageJsonPath, "utf-8");
