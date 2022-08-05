@@ -1,1 +1,1 @@
-export const vscodeVersion = "1.69.2";
+export const vscodeVersion = "1.70.0";
