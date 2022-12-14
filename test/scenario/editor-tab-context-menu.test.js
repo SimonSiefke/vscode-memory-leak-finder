@@ -10,7 +10,7 @@ afterAll(async () => {
   await runner.kill();
 });
 
-test("editor-tab-context-menu", async () => {
+test.skip("editor-tab-context-menu", async () => {
   await runner.waitForSucceeded();
   expect(runner.stdout).toContainEqual(
     expect.stringContaining(`event listener equal:`)
