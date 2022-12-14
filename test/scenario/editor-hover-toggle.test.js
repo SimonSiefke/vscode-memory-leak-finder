@@ -10,7 +10,7 @@ afterAll(async () => {
   await runner.kill();
 });
 
-test("editor-hover-toggle", async () => {
+test.skip("editor-hover-toggle", async () => {
   await runner.waitForSucceeded();
   expect(runner.stdout).toContainEqual(
     expect.stringContaining(`event listener equal:`)
