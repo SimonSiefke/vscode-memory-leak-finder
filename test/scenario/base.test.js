@@ -10,6 +10,6 @@ afterAll(async () => {
   await runner.kill();
 });
 
-test("base", async () => {
+test.skip("base", async () => {
   await runner.waitForSucceeded();
 });
