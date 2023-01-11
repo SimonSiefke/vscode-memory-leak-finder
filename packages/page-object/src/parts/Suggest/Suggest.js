@@ -1,15 +1,23 @@
-export const create = ({ page, expect }) => {
+export const create = ({ page, expect, VError }) => {
   return {
     async open() {
-      await page.keyboard.press("Control+Space");
-      const suggestWidget = page.locator(".suggest-widget");
-      await expect(suggestWidget).toBeVisible();
+      try {
+        await page.keyboard.press("Control+Space");
+        const suggestWidget = page.locator(".suggest-widget");
+        await expect(suggestWidget).toBeVisible();
+      } catch (error) {
+        throw new VError(error, `Failed to open suggest widget`);
+      }
     },
     async close() {
-      const suggestWidget = page.locator(".suggest-widget");
-      await expect(suggestWidget).toBeVisible();
-      await page.keyboard.press("Escape");
-      await expect(suggestWidget).toBeHidden();
+      try {
+        const suggestWidget = page.locator(".suggest-widget");
+        await expect(suggestWidget).toBeVisible();
+        await page.keyboard.press("Escape");
+        await expect(suggestWidget).toBeHidden();
+      } catch (error) {
+        throw new VError(error, `Failed to close suggest widget`);
+      }
     },
   };
 };

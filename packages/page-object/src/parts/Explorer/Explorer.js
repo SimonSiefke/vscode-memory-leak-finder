@@ -13,29 +13,41 @@ const getNextActiveDescendant = (activeDescendant) => {
   return `list_id_2_${number + 1}`;
 };
 
-export const create = ({ page, expect }) => {
+export const create = ({ page, expect, VError }) => {
   return {
     async focus() {
-      await page.keyboard.press("Control+Shift+P");
-      const quickPick = page.locator(".quick-input-widget");
-      await expect(quickPick).toBeVisible();
-      const quickPickInput = quickPick.locator('[role="combobox"]');
-      await quickPickInput.type("Focus Explorer");
-      const firstOption = quickPick.locator(".monaco-list-row").first();
-      await firstOption.click();
-      const explorer = page.locator(".explorer-folders-view .monaco-list");
-      await expect(explorer).toBeFocused();
+      try {
+        await page.keyboard.press("Control+Shift+P");
+        const quickPick = page.locator(".quick-input-widget");
+        await expect(quickPick).toBeVisible();
+        const quickPickInput = quickPick.locator('[role="combobox"]');
+        await quickPickInput.type("Focus Explorer");
+        const firstOption = quickPick.locator(".monaco-list-row").first();
+        await firstOption.click();
+        const explorer = page.locator(".explorer-folders-view .monaco-list");
+        await expect(explorer).toBeFocused();
+      } catch (error) {
+        throw new VError(error, `Failed to focus explorer`);
+      }
     },
     async focusNext() {
-      const explorer = page.locator(".explorer-folders-view .monaco-list");
-      const current = await explorer.getAttribute("aria-activedescendant");
-      const next = getNextActiveDescendant(current);
-      await page.keyboard.press("ArrowDown");
-      expect(await explorer.getAttribute("aria-activedescendant")).toBe(next);
+      try {
+        const explorer = page.locator(".explorer-folders-view .monaco-list");
+        const current = await explorer.getAttribute("aria-activedescendant");
+        const next = getNextActiveDescendant(current);
+        await page.keyboard.press("ArrowDown");
+        expect(await explorer.getAttribute("aria-activedescendant")).toBe(next);
+      } catch (error) {
+        throw new VError(error, `Failed to focus next item in explorer`);
+      }
     },
     async click() {
-      const explorer = page.locator(".explorer-folders-view .monaco-list");
-      await explorer.click();
+      try {
+        const explorer = page.locator(".explorer-folders-view .monaco-list");
+        await explorer.click();
+      } catch (error) {
+        throw new VError(error, `Failed to click into explorer`);
+      }
     },
   };
 };
