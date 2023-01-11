@@ -24,8 +24,8 @@ jobs:
         id: npm-cache
         with:
           path: |
-            '**/node_modules'
-            '.vscode-test'
+            **/node_modules
+            .vscode-test
           key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
       - name: npm ci
         run: npm ci
