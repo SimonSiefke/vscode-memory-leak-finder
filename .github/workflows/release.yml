@@ -31,6 +31,4 @@ jobs:
         run: npm ci
         if: steps.npm-cache.outputs.cache-hit != 'true'
       - name: Run headless test
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          run: npm run e2e
+        run: xvfb-run -a npm run e2e
