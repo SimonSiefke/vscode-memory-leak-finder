@@ -12,7 +12,9 @@
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
-    "assumeChangesOnlyAffectDirectDependencies": true
+    "assumeChangesOnlyAffectDirectDependencies": true,
+    "strict": true,
+    "noImplicitAny": false
   },
-  "include": ["src", "test", "scripts", "packages/core/scripts/postinstall.js"]
+  "include": ["src", "test", "typings"]
 }

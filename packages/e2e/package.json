@@ -1,0 +1,19 @@
+{
+  "name": "e2e",
+  "version": "0.0.0-dev",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "e2e": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --runInBand --bail --detectOpenHandles --forceExit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "core": "file:../core"
+  },
+  "devDependencies": {
+    "tree-kill": "^1.2.2",
+    "wait-for-expect": "^3.0.2"
+  }
+}

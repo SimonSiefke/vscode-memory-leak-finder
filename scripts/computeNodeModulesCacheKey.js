@@ -4,15 +4,17 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-
 const root = join(__dirname, "..");
 
 const locations = [
+  "lerna.json",
   "package-lock.json",
+  "packages/e2e/package-lock.json",
+  "packages/core/package-lock.json",
   ".github/workflows/ci.yml",
   ".github/workflows/release.yml",
   "scripts/computeNodeModulesCacheKey.js",
-  "src/parts/VsCodeVersion/VsCodeVersion.js",
+  "packages/core/src/parts/VsCodeVersion/VsCodeVersion.js",
 ];
 
 const getAbsolutePath = (relativePath) => {
