@@ -10,6 +10,8 @@ export const setup = async ({ page, expect }) => {
   await quickPickInput.type("index");
   const firstOption = quickPick.locator(".monaco-list-row").first();
   await firstOption.click();
+  const tab = page.locator(".tab", { hasText: "index.html" });
+  await expect(tab).toBeVisible();
   const editor = page.locator(".editor-instance");
   await expect(editor).toBeVisible();
 };
