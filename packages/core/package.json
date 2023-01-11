@@ -11,11 +11,13 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@playwright/test": "^1.29.2",
     "@vscode/test-electron": "^2.2.2",
     "lodash": "^4.17.21",
+    "page-object": "file:../page-object",
     "tree-kill": "^1.2.2",
-    "wait-for-expect": "^3.0.2",
-    "@playwright/test": "^1.29.2"
+    "verror": "^1.10.1",
+    "wait-for-expect": "^3.0.2"
   },
   "jest": {
     "modulePathIgnorePatterns": [

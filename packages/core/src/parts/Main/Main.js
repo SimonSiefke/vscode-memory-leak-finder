@@ -5,6 +5,8 @@ import * as Electron from "../Electron/Electron.js";
 import * as TmpDir from "../TmpDir/TmpDir.js";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
+import * as PageObject from "page-object";
+import VError from "verror";
 
 const writeJson = async (path, value) => {
   await mkdir(dirname(path), { recursive: true });
@@ -45,8 +47,9 @@ export const runScenario = async (scenarioPath) => {
       timeout: 15_000,
     });
 
-    const setupContext = { page, tmpDir, userDataDir, expect };
-    const runContext = { page, expect };
+    const utils = PageObject.create({ page, expect, VError });
+    const setupContext = { page, tmpDir, userDataDir, expect, ...utils };
+    const runContext = { page, expect, ...utils };
     // @ts-ignore
     if (scenario.setup) {
       // @ts-ignore

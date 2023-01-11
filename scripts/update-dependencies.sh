@@ -29,6 +29,7 @@ function updateDependencies {
 updateDependencies &&
 cd packages/e2e && updateDependencies && cd ../../ &&
 cd packages/core && updateDependencies && cd ../../ &&
+cd packages/page-object && updateDependencies && cd ../../ &&
 
 echo "Great Success!"
 
