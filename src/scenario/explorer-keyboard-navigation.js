@@ -26,17 +26,17 @@ export const run = async (page) => {
 
   await page.keyboard.press("ArrowDown");
   expect(await explorer.getAttribute("aria-activedescendant")).toBe(
-    "list_id_1_0"
+    "list_id_2_0"
   );
 
   await page.keyboard.press("ArrowDown");
   expect(await explorer.getAttribute("aria-activedescendant")).toBe(
-    "list_id_1_1"
+    "list_id_2_1"
   );
 
   await page.keyboard.press("ArrowDown");
   expect(await explorer.getAttribute("aria-activedescendant")).toBe(
-    "list_id_1_2"
+    "list_id_2_2"
   );
 
   await explorer.click();
