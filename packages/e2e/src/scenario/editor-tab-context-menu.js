@@ -28,7 +28,7 @@ export const setup = async ({ page, expect }) => {
 };
 
 export const run = async ({ page, expect }) => {
-  const tab = page.locator(".tab");
+  const tab = page.locator(".tab", { hasText: "file.txt" });
   await tab.click({ button: "right" });
   const contextMenu = page.locator(".context-view.monaco-menu-container");
   await expect(contextMenu).toBeVisible();
