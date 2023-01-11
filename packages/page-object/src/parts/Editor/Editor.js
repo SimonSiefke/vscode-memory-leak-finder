@@ -8,6 +8,10 @@ export const create = ({ page, expect, VError }) => {
         const quickPickInput = quickPick.locator('[role="combobox"]');
         await quickPickInput.type(fileName);
         const firstOption = quickPick.locator(".monaco-list-row").first();
+        const label = firstOption
+          .locator(".monaco-icon-label-container")
+          .first();
+        await expect(label).toHaveText(fileName);
         await firstOption.click();
         const tab = page.locator(".tab", { hasText: fileName });
         await expect(tab).toBeVisible();
