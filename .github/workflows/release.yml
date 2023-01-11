@@ -17,26 +17,19 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version-file: ".nvmrc"
-      - name: Cache node modules
-        id: cache-nodemodules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
+      - name: Compute node modules cache key
+        id: nodeModulesCacheKey
+        run: echo "::set-output name=value::$(node scripts/computeNodeModulesCacheKey.js)"
+      - uses: actions/cache@v3
+        id: npm-cache
         with:
-          # caching node_modules
           path: |
-            node_modules
-            .vscode-test
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - name: Install Dependencies
-        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+            '**/node_modules'
+            '.vscode-test'
+          key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+      - name: npm ci
         run: npm ci
-      - name: install playwright dependencies
-        run: npx playwright install-deps
+        if: steps.npm-cache.outputs.cache-hit != 'true'
       - name: Run headless test
         uses: GabrielBB/xvfb-action@v1
         with:
