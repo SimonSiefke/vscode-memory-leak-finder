@@ -7,7 +7,7 @@ export const create = ({ expect, page, VError }) => {
         const sideBar = page.locator(".part.sidebar");
         await expect(sideBar).toBeHidden();
         const quickPick = QuickPick.create({ page, expect, VError });
-        await quickPick.executeCommand("Toggle Side Bar Bar Visibility");
+        await quickPick.executeCommand("Toggle Primary Side Bar Visibility");
         await expect(sideBar).toBeVisible();
       } catch (error) {
         throw new VError(error, `Failed to show side bar`);
@@ -18,7 +18,7 @@ export const create = ({ expect, page, VError }) => {
         const sideBar = page.locator(".part.sidebar");
         await expect(sideBar).toBeVisible();
         const quickPick = QuickPick.create({ page, expect, VError });
-        await quickPick.executeCommand("Toggle Side Bar Bar Visibility");
+        await quickPick.executeCommand("Toggle Primary Side Bar Visibility");
         await expect(sideBar).toBeHidden();
       } catch (error) {
         throw new VError(error, `Failed to hide side bar`);
@@ -30,7 +30,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(sideBar).toBeVisible();
         await expect(sideBar).toHaveClass("part sidebar left");
         const quickPick = QuickPick.create({ page, expect, VError });
-        await quickPick.executeCommand("Toggle Side Bar Bar Position");
+        await quickPick.executeCommand("Toggle Primary Side Bar Position");
         await expect(sideBar).toHaveClass("part sidebar right");
       } catch (error) {
         throw new VError(error, `Failed to move side bar right`);
@@ -42,7 +42,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(sideBar).toBeVisible();
         await expect(sideBar).toHaveClass("part sidebar right");
         const quickPick = QuickPick.create({ page, expect, VError });
-        await quickPick.executeCommand("Toggle Side Bar Bar Position");
+        await quickPick.executeCommand("Toggle Primary Side Bar Position");
         await expect(sideBar).toHaveClass("part sidebar left");
       } catch (error) {
         throw new VError(error, `Failed to move side bar left`);

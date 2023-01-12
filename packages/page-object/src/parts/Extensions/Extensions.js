@@ -18,7 +18,7 @@ export const create = ({ expect, page, VError }) => {
         const extensionsView = page.locator(`.extensions-viewlet`);
         await expect(extensionsView).toBeVisible();
         const quickPick = QuickPick.create({ page, expect, VError });
-        await quickPick.executeCommand("Toggle Side Bar Visibility");
+        await quickPick.executeCommand("Toggle Primary Side Bar Visibility");
         await expect(extensionsView).toBeHidden();
       } catch (error) {
         throw new VError(error, `Failed to hide extensions view`);
