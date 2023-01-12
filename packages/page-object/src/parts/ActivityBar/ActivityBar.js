@@ -16,6 +16,22 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to show activity bar`);
       }
     },
+    async showSearch() {
+      try {
+        const activityBar = page.locator(".part.activitybar");
+        await expect(activityBar).toBeVisible();
+        const activityBarItem = activityBar.locator(
+          `.action-label[aria-label^="Search"]`
+        );
+        await activityBarItem.click();
+        const searchView = page.locator(".search-view");
+        await expect(searchView).toBeVisible();
+        const searchInput = searchView.locator('textarea[title="Search"]');
+        await expect(searchInput).toBeFocused();
+      } catch (error) {
+        throw new VError(error, `Failed to show search`);
+      }
+    },
     async hide() {
       try {
         const activityBar = page.locator(".part.activitybar");
