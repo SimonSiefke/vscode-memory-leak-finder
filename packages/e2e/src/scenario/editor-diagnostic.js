@@ -7,16 +7,12 @@ export const beforeSetup = async ({ tmpDir, writeFile, join }) => {
   );
 };
 
-export const setup = async ({ page, expect }) => {
-  await page.keyboard.press("Control+P");
-  const quickPick = page.locator(".quick-input-widget");
-  await expect(quickPick).toBeVisible();
-  const quickPickInput = quickPick.locator('[role="combobox"]');
-  await quickPickInput.type("index");
-  const firstOption = quickPick.locator(".monaco-list-row").first();
-  await firstOption.click();
-  const editor = page.locator(".editor-instance");
-  await expect(editor).toBeVisible();
+const initialDiagnosticTimeout = 30_000;
+
+export const setup = async ({ page, expect, Editor }) => {
+  await Editor.open("index.css");
+  const squiggle = page.locator(".squiggly-error");
+  await expect(squiggle).toBeVisible({ timeout: initialDiagnosticTimeout });
 };
 
 export const run = async ({ page, expect }) => {
@@ -44,13 +40,4 @@ export const run = async ({ page, expect }) => {
   await expect(squiggle).toBeHidden();
   await page.keyboard.type(" abc");
   await expect(squiggle).toBeVisible();
-
-  // const startTag = editor.locator('[class^="mtk"]', { hasText: "h1" }).first();
-  // await startTag.click();
-  // await startTag.hover();
-  // const hover = page.locator(".monaco-hover");
-  // await expect(hover).toBeVisible();
-
-  // await page.keyboard.press("Escape");
-  // await expect(hover).toBeHidden();
 };
