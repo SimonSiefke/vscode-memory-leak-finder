@@ -13,6 +13,6 @@ afterAll(async () => {
 test("keybindings-editor", async () => {
   await runner.waitForSucceeded();
   expect(runner.stdout).toContainEqual(
-    expect.stringContaining(`event listener increase:`)
+    expect.stringContaining(`event listener equal:`)
   );
 });
