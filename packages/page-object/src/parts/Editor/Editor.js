@@ -5,7 +5,7 @@ const modifier = Platform.isMacos ? "Meta" : "Control";
 
 export const create = ({ page, expect, VError }) => {
   return {
-    async open(fileName) {
+    async open(fileName, { hasText = "" } = {}) {
       try {
         const quickPick = QuickPick.create({ page, expect, VError });
         await quickPick.openFile(fileName);
@@ -13,6 +13,10 @@ export const create = ({ page, expect, VError }) => {
         await expect(tab).toBeVisible();
         const editor = page.locator(".editor-instance");
         await expect(editor).toBeVisible();
+        const lines = editor.locator(`.view-lines`);
+        if (hasText) {
+          await expect(lines).toHaveText(hasText);
+        }
         const editorInput = editor.locator(".inputarea");
         await expect(editorInput).toBeFocused();
       } catch (error) {
