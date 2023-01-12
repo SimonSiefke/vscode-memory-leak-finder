@@ -1,9 +1,5 @@
-export const run = async ({ page, expect }) => {
-  const statusBar = page.locator(".statusbar");
-  const statusBarItemProblems = statusBar.locator(
-    '#status\\.problems [role="button"]'
-  );
-  await statusBarItemProblems.click();
+export const run = async ({ page, expect, StatusBar }) => {
+  await StatusBar.openProblems();
   const panel = page.locator(".panel");
   const messageBoxContainer = panel
     .locator(".pane-body .message-box-container")
@@ -13,7 +9,6 @@ export const run = async ({ page, expect }) => {
   await expect(messageBoxContainer).toHaveText(
     "No problems have been detected in the workspace."
   );
-
-  await statusBarItemProblems.click();
+  await StatusBar.hideProblems();
   await expect(messageBoxContainer).toBeHidden();
 };
