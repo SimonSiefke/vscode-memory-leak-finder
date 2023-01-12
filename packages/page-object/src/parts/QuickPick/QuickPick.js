@@ -19,8 +19,12 @@ export const create = ({ expect, page, VError }) => {
       await page.keyboard.press(`${modifier}+Shift+P`);
       const quickPick = page.locator(".quick-input-widget");
       await expect(quickPick).toBeVisible();
-      const firstOption = quickPick.locator(".monaco-list-row").first();
-      await expect(firstOption).toBeVisible();
+      const quickPickInput = quickPick.locator('[role="combobox"]');
+      await quickPickInput.type(`> ${command}`);
+      const option = quickPick.locator(".monaco-list-row", {
+        hasText: command,
+      });
+      await option.click();
     },
     async openView(view) {
       await page.keyboard.press(`${modifier}+P`);
