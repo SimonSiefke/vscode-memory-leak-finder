@@ -20,7 +20,6 @@ export const create = ({ expect, page, VError }) => {
       try {
         const sideBar = page.locator(".part.sidebar");
         await expect(sideBar).toBeVisible();
-
         await page.keyboard.press("Control+Shift+P");
         const quickPick = page.locator(".quick-input-widget");
         await expect(quickPick).toBeVisible();

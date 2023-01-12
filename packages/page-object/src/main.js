@@ -1,6 +1,7 @@
 import * as ActivityBar from "./parts/ActivityBar/ActivityBar.js";
 import * as Editor from "./parts/Editor/Editor.js";
 import * as Explorer from "./parts/Explorer/Explorer.js";
+import * as Extensions from "./parts/Extensions/Extensions.js";
 import * as KeyBindingsEditor from "./parts/KeyBindingsEditor/KeyBindingsEditor.js";
 import * as Output from "./parts/Output/Output.js";
 import * as Panel from "./parts/Panel/Panel.js";
@@ -15,6 +16,7 @@ export const create = ({ page, expect, VError }) => {
     ActivityBar: ActivityBar.create({ page, expect, VError }),
     Editor: Editor.create({ page, expect, VError }),
     Explorer: Explorer.create({ page, expect, VError }),
+    Extensions: Extensions.create({ page, expect, VError }),
     KeyBindingsEditor: KeyBindingsEditor.create({ page, expect, VError }),
     Output: Output.create({ page, expect, VError }),
     Panel: Panel.create({ page, expect, VError }),
