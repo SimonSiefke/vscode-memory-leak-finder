@@ -8,7 +8,7 @@ export const create = ({ page, expect, VError }) => {
   return {
     async open() {
       try {
-        await page.keyboard.press(`${modifier}+Space`);
+        await page.keyboard.press(`Control+Space`);
         const suggestWidget = page.locator(".suggest-widget");
         await expect(suggestWidget).toBeVisible({
           timeout: TIMEOUT_COMPLETION_OPEN,
