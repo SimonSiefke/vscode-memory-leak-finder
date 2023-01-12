@@ -20,7 +20,7 @@ export const create = ({ expect, page, VError }) => {
       const quickPick = page.locator(".quick-input-widget");
       await expect(quickPick).toBeVisible();
       const quickPickInput = quickPick.locator('[role="combobox"]');
-      await quickPickInput.type(`> ${command}`);
+      await quickPickInput.type(` ${command}`);
       const option = quickPick.locator(".monaco-list-row", {
         hasText: command,
       });
