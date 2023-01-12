@@ -6,6 +6,7 @@ import * as QuickPick from "./parts/QuickPick/QuickPick.js";
 import * as Search from "./parts/Search/Search.js";
 import * as SideBar from "./parts/SideBar/SideBar.js";
 import * as Suggest from "./parts/Suggest/Suggest.js";
+import * as TitleBar from "./parts/TitleBar/TitleBar.js";
 
 export const create = ({ page, expect, VError }) => {
   return {
@@ -17,5 +18,6 @@ export const create = ({ page, expect, VError }) => {
     Search: Search.create({ page, expect, VError }),
     SideBar: SideBar.create({ page, expect, VError }),
     Suggest: Suggest.create({ page, expect, VError }),
+    TitleBar: TitleBar.create({ page, expect, VError }),
   };
 };
