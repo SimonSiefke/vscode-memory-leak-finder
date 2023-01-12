@@ -1,5 +1,5 @@
 export const run = async ({ page, expect, StatusBar }) => {
-  await StatusBar.openProblems();
+  await StatusBar.showProblems();
   const panel = page.locator(".panel");
   const messageBoxContainer = panel
     .locator(".pane-body .message-box-container")
