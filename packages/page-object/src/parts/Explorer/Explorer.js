@@ -49,9 +49,11 @@ export const create = ({ page, expect, VError }) => {
     async expand(folderName) {
       try {
         const explorer = page.locator(".explorer-folders-view .monaco-list");
-        const folder = explorer.locator(".monaco-list-row", {
-          hasText: folderName,
-        });
+        const folder = explorer
+          .locator(".monaco-list-row", {
+            hasText: folderName,
+          })
+          .first();
         // TODO verify that folder has aria-expanded=false
         await folder.click();
       } catch (error) {
@@ -61,9 +63,11 @@ export const create = ({ page, expect, VError }) => {
     async collapse(folderName) {
       try {
         const explorer = page.locator(".explorer-folders-view .monaco-list");
-        const folder = explorer.locator(".monaco-list-row", {
-          hasText: folderName,
-        });
+        const folder = explorer
+          .locator(".monaco-list-row", {
+            hasText: folderName,
+          })
+          .first();
         // TODO verify that folder has aria-expanded=false
         await folder.click();
       } catch (error) {
