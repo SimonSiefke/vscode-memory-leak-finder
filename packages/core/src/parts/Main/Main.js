@@ -60,7 +60,7 @@ export const runScenario = async (scenarioPath) => {
       await scenario.run(runContext);
     }
     const results = [];
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
       const beforeEventListeners = await getEventListeners(session);
       await scenario.run(runContext);
       const afterEventListeners = await getEventListeners(session);
