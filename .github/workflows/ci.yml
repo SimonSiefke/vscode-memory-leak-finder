@@ -34,5 +34,10 @@ jobs:
       - name: npm ci
         run: npm ci
         if: steps.npm-cache.outputs.cache-hit != 'true'
-      - name: Run headless test
+
+      - name: Run e2e tests (Linux)
         run: xvfb-run -a npm run e2e
+        if: ${{ matrix.os == 'ubuntu-22.04' }}
+      - name: Run e2e tests (Windows/Mac)
+        run: npm run e2e
+        if: ${{ matrix.os != 'ubuntu-22.04' }}
