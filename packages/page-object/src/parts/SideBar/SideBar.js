@@ -13,11 +13,6 @@ export const create = ({ expect, page, VError }) => {
         const firstOption = quickPick.locator(".monaco-list-row").first();
         await firstOption.click();
         await expect(sideBar).toHaveClass("part sidebar right");
-        await page.keyboard.press("Control+Shift+P");
-        await expect(quickPick).toBeVisible();
-        await quickPickInput.type("Toggle Side Bar Position");
-        await firstOption.click();
-        await expect(sideBar).toHaveClass("part sidebar left");
       } catch (error) {
         throw new VError(error, `Failed to move side bar right`);
       }
