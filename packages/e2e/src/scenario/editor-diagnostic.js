@@ -44,13 +44,4 @@ export const run = async ({ page, expect }) => {
   await expect(squiggle).toBeHidden();
   await page.keyboard.type(" abc");
   await expect(squiggle).toBeVisible();
-
-  // const startTag = editor.locator('[class^="mtk"]', { hasText: "h1" }).first();
-  // await startTag.click();
-  // await startTag.hover();
-  // const hover = page.locator(".monaco-hover");
-  // await expect(hover).toBeVisible();
-
-  // await page.keyboard.press("Escape");
-  // await expect(hover).toBeHidden();
 };
