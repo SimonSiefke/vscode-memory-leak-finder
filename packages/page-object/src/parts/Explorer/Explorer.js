@@ -20,7 +20,7 @@ export const create = ({ page, expect, VError }) => {
     async focus() {
       try {
         const quickPick = QuickPick.create({ page, expect, VError });
-        await quickPick.executeCommand("Focus Explorer");
+        await quickPick.executeCommand("Focus on Files Explorer");
         const explorer = page.locator(".explorer-folders-view .monaco-list");
         await expect(explorer).toBeFocused();
       } catch (error) {
