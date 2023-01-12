@@ -1,4 +1,5 @@
 import * as Platform from "../Platform/Platform.js";
+import * as QuickPick from "../QuickPick/QuickPick.js";
 
 const modifier = Platform.isMacos ? "Meta" : "Control";
 
@@ -6,17 +7,8 @@ export const create = ({ page, expect, VError }) => {
   return {
     async open(fileName) {
       try {
-        await page.keyboard.press("Control+P");
-        const quickPick = page.locator(".quick-input-widget");
-        await expect(quickPick).toBeVisible();
-        const quickPickInput = quickPick.locator('[role="combobox"]');
-        await quickPickInput.type(fileName);
-        const firstOption = quickPick.locator(".monaco-list-row").first();
-        const label = firstOption
-          .locator(".monaco-icon-label-container")
-          .first();
-        await expect(label).toHaveText(fileName);
-        await firstOption.click();
+        const quickPick = QuickPick.create({ page, expect, VError });
+        await quickPick.openFile(fileName);
         const tab = page.locator(".tab", { hasText: fileName });
         await expect(tab).toBeVisible();
         const editor = page.locator(".editor-instance");

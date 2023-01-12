@@ -27,17 +27,38 @@ export const create = ({ expect, page, VError }) => {
       await option.click();
     },
     async openView(view) {
-      await page.keyboard.press(`${modifier}+P`);
-      const quickPick = page.locator(".quick-input-widget");
-      await expect(quickPick).toBeVisible();
-      const quickPickInput = quickPick.locator('[role="combobox"]');
-      await quickPickInput.type(`view ${view}`);
-      const option = quickPick
-        .locator(".monaco-list-row", {
-          hasText: view,
-        })
-        .first();
-      await option.click();
+      try {
+        await page.keyboard.press(`${modifier}+P`);
+        const quickPick = page.locator(".quick-input-widget");
+        await expect(quickPick).toBeVisible();
+        const quickPickInput = quickPick.locator('[role="combobox"]');
+        await quickPickInput.type(`view ${view}`);
+        const option = quickPick
+          .locator(".monaco-list-row", {
+            hasText: view,
+          })
+          .first();
+        await option.click();
+      } catch (error) {
+        throw new VError(error, `Failed to open view ${view}`);
+      }
+    },
+    async openFile(fileName) {
+      try {
+        await page.keyboard.press(`${modifier}+P`);
+        const quickPick = page.locator(".quick-input-widget");
+        await expect(quickPick).toBeVisible();
+        const quickPickInput = quickPick.locator('[role="combobox"]');
+        await quickPickInput.type(fileName);
+        const option = quickPick
+          .locator(".monaco-list-row", {
+            hasText: fileName,
+          })
+          .first();
+        await option.click();
+      } catch (error) {
+        throw new VError(error, `Failed to open file ${fileName}`);
+      }
     },
     async showColorTheme() {
       try {
