@@ -24,7 +24,8 @@ export const run = async ({ page, expect }) => {
   await expect(editor).toBeVisible();
   const editorInput = editor.locator(".inputarea");
   await expect(editorInput).toBeFocused();
-
+  const editorLines = editor.locator(".view-lines");
+  await expect(editorLines).toHaveText(":root {  --font-size: 10px;}");
   const tokenFontSize = editor
     .locator('[class^="mtk"]', { hasText: "font-size" })
     .first();
