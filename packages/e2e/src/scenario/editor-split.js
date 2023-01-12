@@ -6,16 +6,7 @@ export const setup = async ({ Editor }) => {
   await Editor.open("file.txt");
 };
 
-export const run = async ({ page, expect }) => {
-  const editorActions = page.locator(".editor-actions").first();
-  await expect(editorActions).toBeVisible();
-  const editorActionSplitRight = editorActions.locator(
-    '[title^="Split Editor Right"]'
-  );
-  await editorActionSplitRight.click();
-  const editors = page.locator(".editor-instance");
-  await expect(editors).toHaveCount(2);
-
-  await page.keyboard.press("Control+w");
-  await expect(editors).toHaveCount(1);
+export const run = async ({ Editor }) => {
+  await Editor.splitRight();
+  await Editor.close();
 };
