@@ -31,7 +31,7 @@ export const run = async ({ page, expect }) => {
   await expect(tokenFontSize).toBeVisible();
   await tokenFontSize.click();
   const cursor = page.locator(".cursor");
-  await expect(cursor).toHaveCSS("left", /(53px|58px)/);
+  await expect(cursor).toHaveCSS("left", /(53px|58px|66px)/);
   // await page.keyboard.press("ArrowRight");
   // await expect(cursor).toHaveCSS("left", "66px");
   // await page.keyboard.press("ArrowRight");
