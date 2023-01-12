@@ -1,6 +1,6 @@
 export const create = ({ expect, page, VError }) => {
   return {
-    async openMenu(text) {
+    async showMenu(text) {
       try {
         const titleBar = page.locator(".part.titlebar");
         await expect(titleBar).toBeVisible();

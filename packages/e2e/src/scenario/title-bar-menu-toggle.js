@@ -5,6 +5,6 @@ export const beforeSetup = async ({ userDataDir, writeJson, join }) => {
 };
 
 export const run = async ({ TitleBar }) => {
-  await TitleBar.openMenu();
-  await TitleBar.closeMenu();
+  await TitleBar.showMenu();
+  await TitleBar.hideMenu();
 };
