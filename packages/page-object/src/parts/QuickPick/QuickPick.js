@@ -1,8 +1,12 @@
+import * as Platform from "../Platform/Platform.js";
+
+const modifier = Platform.isMacos ? "Meta" : "Control";
+
 export const create = ({ expect, page, VError }) => {
   return {
     async show() {
       try {
-        await page.keyboard.press("Control+Shift+P");
+        await page.keyboard.press(`${modifier}+Shift+P`);
         const quickPick = page.locator(".quick-input-widget");
         await expect(quickPick).toBeVisible();
         const firstOption = quickPick.locator(".monaco-list-row").first();
@@ -11,19 +15,29 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to show quick pick`);
       }
     },
+    async executeCommand(command) {
+      await page.keyboard.press(`${modifier}+Shift+P`);
+      const quickPick = page.locator(".quick-input-widget");
+      await expect(quickPick).toBeVisible();
+      const firstOption = quickPick.locator(".monaco-list-row").first();
+      await expect(firstOption).toBeVisible();
+    },
+    async openView(view) {
+      await page.keyboard.press(`${modifier}+P`);
+      const quickPick = page.locator(".quick-input-widget");
+      await expect(quickPick).toBeVisible();
+      const quickPickInput = quickPick.locator('[role="combobox"]');
+      await quickPickInput.type(`view ${view}`);
+      const option = quickPick
+        .locator(".monaco-list-row", {
+          hasText: view,
+        })
+        .first();
+      await option.click();
+    },
     async showColorTheme() {
       try {
-        await page.keyboard.press("Control+Shift+P");
-        const quickPick = page.locator(".quick-input-widget");
-        await expect(quickPick).toBeVisible();
-        const quickPickInput = quickPick.locator('[role="combobox"]');
-        // await expect(quickPickInput).toHaveText(">");
-        await quickPickInput.type("Preferences: Color Theme");
-        const firstOption = quickPick.locator(".monaco-list-row").first();
-        const firstOptionLabel = firstOption.locator(".label-name");
-        await expect(firstOptionLabel).toHaveText("Preferences: Color Theme");
-        await expect(firstOption).toBeVisible();
-        await firstOption.click();
+        await this.executeCommand("Preferences: Color Theme");
       } catch (error) {
         throw new VError(error, `Failed to show quick pick color theme`);
       }

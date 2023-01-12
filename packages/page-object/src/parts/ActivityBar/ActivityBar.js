@@ -1,16 +1,13 @@
+import * as QuickPick from "../QuickPick/QuickPick.js";
+
 export const create = ({ expect, page, VError }) => {
   return {
     async show() {
       try {
         const activityBar = page.locator(".part.activitybar");
         await expect(activityBar).toBeHidden();
-        await page.keyboard.press("Control+Shift+P");
-        const quickPick = page.locator(".quick-input-widget");
-        await expect(quickPick).toBeVisible();
-        const quickPickInput = quickPick.locator('[role="combobox"]');
-        await quickPickInput.type("Toggle Activity Bar Visibility");
-        const firstOption = quickPick.locator(".monaco-list-row").first();
-        await firstOption.click();
+        const quickPick = QuickPick.create({ page, expect, VError });
+        await quickPick.executeCommand("Toggle Activity Bar Visibility");
         await expect(activityBar).toBeVisible();
       } catch (error) {
         throw new VError(error, `Failed to show activity bar`);
@@ -36,13 +33,8 @@ export const create = ({ expect, page, VError }) => {
       try {
         const activityBar = page.locator(".part.activitybar");
         await expect(activityBar).toBeVisible();
-        await page.keyboard.press("Control+Shift+P");
-        const quickPick = page.locator(".quick-input-widget");
-        await expect(quickPick).toBeVisible();
-        const quickPickInput = quickPick.locator('[role="combobox"]');
-        await quickPickInput.type("Toggle Activity Bar Visibility");
-        const firstOption = quickPick.locator(".monaco-list-row").first();
-        await firstOption.click();
+        const quickPick = QuickPick.create({ page, expect, VError });
+        await quickPick.executeCommand("Toggle Activity Bar Visibility");
         await expect(activityBar).toBeHidden();
       } catch (error) {
         throw new VError(error, `Failed to hide activity bar`);

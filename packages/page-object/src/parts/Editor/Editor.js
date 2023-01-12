@@ -1,3 +1,7 @@
+import * as Platform from "../Platform/Platform.js";
+
+const modifier = Platform.isMacos ? "Meta" : "Control";
+
 export const create = ({ page, expect, VError }) => {
   return {
     async open(fileName) {
@@ -49,7 +53,7 @@ export const create = ({ page, expect, VError }) => {
         if (currentCount === 0) {
           throw new Error("no open editor found");
         }
-        await page.keyboard.press("Control+w");
+        await page.keyboard.press(`${modifier}+w`);
         await expect(tabs).toHaveCount(currentCount - 1);
       } catch (error) {
         throw new VError(error, `Failed to close editor`);

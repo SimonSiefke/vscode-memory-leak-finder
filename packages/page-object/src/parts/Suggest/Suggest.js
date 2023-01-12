@@ -1,8 +1,12 @@
+import * as Platform from "../Platform/Platform.js";
+
+const modifier = Platform.isMacos ? "Meta" : "Control";
+
 export const create = ({ page, expect, VError }) => {
   return {
     async open() {
       try {
-        await page.keyboard.press("Control+Space");
+        await page.keyboard.press(`${modifier}+Space`);
         const suggestWidget = page.locator(".suggest-widget");
         await expect(suggestWidget).toBeVisible();
       } catch (error) {
