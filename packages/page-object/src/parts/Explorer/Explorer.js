@@ -13,13 +13,17 @@ const getNextActiveDescendant = (activeDescendant) => {
   return `list_id_2_${number + 1}`;
 };
 
+const TIMEOUT_QUICK_PICK_OPEN = 30_000;
+
 export const create = ({ page, expect, VError }) => {
   return {
     async focus() {
       try {
         await page.keyboard.press("Control+Shift+P");
         const quickPick = page.locator(".quick-input-widget");
-        await expect(quickPick).toBeVisible();
+        await expect(quickPick).toBeVisible({
+          timeout: TIMEOUT_QUICK_PICK_OPEN,
+        });
         const quickPickInput = quickPick.locator('[role="combobox"]');
         await quickPickInput.type("Focus Explorer");
         const firstOption = quickPick.locator(".monaco-list-row").first();

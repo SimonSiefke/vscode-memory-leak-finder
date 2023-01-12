@@ -10,3 +10,7 @@ export const getBinaryPath = async () => {
   );
   return path;
 };
+
+export const isWindows = () => {
+  return process.platform === "win32";
+};

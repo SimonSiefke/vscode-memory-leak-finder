@@ -1,16 +1,26 @@
 import { expect } from "@playwright/test";
+import { mkdir, writeFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
+import { pathToFileURL } from "node:url";
+import * as PageObject from "page-object";
+import VError from "verror";
 import * as ChromeDevtoolsProtocol from "../ChromeDevtoolsProtocol/ChromeDevtoolsProtocol.js";
 import { getEventListeners } from "../ChromeDevtoolsProtocol/getEventListeners.js";
 import * as Electron from "../Electron/Electron.js";
+import * as ImportScript from "../ImportScript/ImportScript.js";
+import * as Platform from "../Platform/Platform.js";
 import * as TmpDir from "../TmpDir/TmpDir.js";
-import { mkdir, writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
-import * as PageObject from "page-object";
-import VError from "verror";
 
 const writeJson = async (path, value) => {
   await mkdir(dirname(path), { recursive: true });
   await writeFile(path, JSON.stringify(value, null, 2) + "\n");
+};
+
+const getUri = (path) => {
+  if (Platform.isWindows()) {
+    return pathToFileURL(path);
+  }
+  return path;
 };
 
 export const runScenario = async (scenarioPath) => {
@@ -18,7 +28,8 @@ export const runScenario = async (scenarioPath) => {
   try {
     const tmpDir = await TmpDir.create();
     const userDataDir = await TmpDir.create();
-    const scenario = await import(scenarioPath);
+    const scenarioUri = getUri(scenarioPath);
+    const scenario = await ImportScript.importScript(scenarioUri);
 
     const beforeSetupContext = {
       tmpDir,
