@@ -7,6 +7,8 @@ export const beforeSetup = async ({ tmpDir, writeFile, join }) => {
   );
 };
 
+const initialDiagnosticTimeout = 30_000;
+
 export const setup = async ({ page, expect }) => {
   await page.keyboard.press("Control+P");
   const quickPick = page.locator(".quick-input-widget");
@@ -17,6 +19,8 @@ export const setup = async ({ page, expect }) => {
   await firstOption.click();
   const editor = page.locator(".editor-instance");
   await expect(editor).toBeVisible();
+  const squiggle = page.locator(".squiggly-error");
+  await expect(squiggle).toBeVisible({ timeout: initialDiagnosticTimeout });
 };
 
 export const run = async ({ page, expect }) => {
