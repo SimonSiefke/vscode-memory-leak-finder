@@ -49,5 +49,59 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to click into explorer`);
       }
     },
+    async expand(folderName) {
+      try {
+        const explorer = page.locator(".explorer-folders-view .monaco-list");
+        const folder = explorer.locator(".monaco-list-row", {
+          hasText: folderName,
+        });
+        // TODO verify that folder has aria-expanded=false
+        await folder.click();
+      } catch (error) {
+        throw new VError(error, `Failed to expand explorer folder`);
+      }
+    },
+    async collapse(folderName) {
+      try {
+        const explorer = page.locator(".explorer-folders-view .monaco-list");
+        const folder = explorer.locator(".monaco-list-row", {
+          hasText: folderName,
+        });
+        // TODO verify that folder has aria-expanded=false
+        await folder.click();
+      } catch (error) {
+        throw new VError(error, `Failed to expand explorer folder`);
+      }
+    },
+    async toHaveItem(direntName) {
+      try {
+        const explorer = page.locator(".explorer-folders-view .monaco-list");
+        const dirent = explorer.locator(".monaco-list-row", {
+          hasText: direntName,
+        });
+        await expect(dirent).toBeVisible();
+      } catch (error) {
+        throw new VError(
+          error,
+          `Failed to verify that explorer has dirent ${direntName}`
+        );
+      }
+    },
+    not: {
+      async toHaveItem(direntName) {
+        try {
+          const explorer = page.locator(".explorer-folders-view .monaco-list");
+          const dirent = explorer.locator(".monaco-list-row", {
+            hasText: direntName,
+          });
+          await expect(dirent).not.toBeVisible();
+        } catch (error) {
+          throw new VError(
+            error,
+            `Failed to verify that explorer doesn't have dirent ${direntName}`
+          );
+        }
+      },
+    },
   };
 };
