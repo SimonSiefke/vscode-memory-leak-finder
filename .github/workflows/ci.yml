@@ -12,9 +12,9 @@ jobs:
   ci:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        # os: [ubuntu-22.04, macOS-latest, windows-latest]
-        os: [ubuntu-22.04]
+        os: [ubuntu-22.04, macos-12, windows-2022]
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
