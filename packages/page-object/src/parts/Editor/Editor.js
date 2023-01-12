@@ -17,6 +17,8 @@ export const create = ({ page, expect, VError }) => {
         await expect(tab).toBeVisible();
         const editor = page.locator(".editor-instance");
         await expect(editor).toBeVisible();
+        const editorInput = editor.locator(".inputarea");
+        await expect(editorInput).toBeFocused();
       } catch (error) {
         throw new VError(error, `Failed to open editor ${fileName}`);
       }
