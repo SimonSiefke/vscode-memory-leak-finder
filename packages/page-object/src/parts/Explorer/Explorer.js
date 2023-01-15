@@ -90,9 +90,6 @@ export const create = ({ page, expect, VError }) => {
     },
     async rename(oldDirentName, newDirentName) {
       try {
-        // TODO avoid using timeout
-        const SHORT_TIMEOUT = 250;
-
         const explorer = page.locator(".explorer-folders-view .monaco-list");
         const oldDirent = explorer.locator(".monaco-list-row", {
           hasText: oldDirentName,
@@ -109,14 +106,13 @@ export const create = ({ page, expect, VError }) => {
         const contextMenuItemRename = contextMenu.locator(".action-item", {
           hasText: "Rename",
         });
-        await page.waitForTimeout(SHORT_TIMEOUT);
         await contextMenuItemRename.click();
         const input = explorer.locator("input");
         await input.selectText();
         await input.type(newDirentName);
         await input.press("Enter");
         await expect(oldDirent).toBeHidden();
-        const newDirent = explorer.locator(`text=${newDirentName}`);
+        const newDirent = explorer.locator(`text=${newDirentName}`).first();
         await expect(newDirent).toBeVisible();
       } catch (error) {
         throw new VError(
