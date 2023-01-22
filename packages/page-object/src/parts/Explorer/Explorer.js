@@ -94,6 +94,7 @@ export const create = ({ page, expect, VError }) => {
         const oldDirent = explorer.locator(".monaco-list-row", {
           hasText: oldDirentName,
         });
+        await expect(oldDirent).toHaveCount(1);
         await expect(oldDirent).toBeVisible();
         await oldDirent.click({
           button: "right",
@@ -112,7 +113,8 @@ export const create = ({ page, expect, VError }) => {
         await input.type(newDirentName);
         await input.press("Enter");
         await expect(oldDirent).toBeHidden();
-        const newDirent = explorer.locator(`text=${newDirentName}`).first();
+        const newDirent = explorer.locator(`text=${newDirentName}`);
+        await expect(newDirent).toHaveCount(1);
         await expect(newDirent).toBeVisible();
       } catch (error) {
         throw new VError(
