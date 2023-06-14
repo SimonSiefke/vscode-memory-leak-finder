@@ -26,6 +26,9 @@ const getListId = (classNameString) => {
   throw new Error(`Failed to extract list id from explorer`);
 };
 
+// TODO avoid using timeout
+const SHORT_TIMEOUT = 250;
+
 export const create = ({ page, expect, VError }) => {
   return {
     async focus() {
@@ -88,6 +91,9 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to expand explorer folder`);
       }
     },
+    async shouldHaveItem(direntName) {
+      return this.toHaveItem(direntName);
+    },
     async toHaveItem(direntName) {
       try {
         const explorer = page.locator(".explorer-folders-view .monaco-list");
@@ -102,11 +108,70 @@ export const create = ({ page, expect, VError }) => {
         );
       }
     },
+    async shouldHaveFocusedItem(direntName) {
+      try {
+        const explorer = page.locator(".explorer-folders-view .monaco-list");
+        const dirent = explorer.locator(".monaco-list-row", {
+          hasText: direntName,
+        });
+        await expect(dirent).toBeVisible();
+        const id = await dirent.getAttribute("id");
+        await expect(explorer).toHaveAttribute("aria-activedescendant", id);
+      } catch (error) {
+        throw new VError(
+          error,
+          `Failed to verify that explorer has dirent ${direntName}`
+        );
+      }
+    },
+    async copy(dirent) {
+      try {
+        const explorer = page.locator(".explorer-folders-view .monaco-list");
+        const oldDirent = explorer.locator(".monaco-list-row", {
+          hasText: dirent,
+        });
+        await expect(oldDirent).toBeVisible();
+        await oldDirent.click({
+          button: "right",
+        });
+        const contextMenu = page.locator(
+          ".context-view.monaco-menu-container .actions-container"
+        );
+        await expect(contextMenu).toBeVisible();
+        await expect(contextMenu).toBeFocused();
+        const contextMenuItemCopy = contextMenu
+          .locator(".action-item", {
+            hasText: "Copy",
+          })
+          .first();
+        await page.waitForTimeout(SHORT_TIMEOUT);
+        await contextMenuItemCopy.click();
+      } catch (error) {
+        throw new VError(error, `Failed to copy explorer item ${dirent}`);
+      }
+    },
+    async paste() {
+      try {
+        await page.keyboard.press("Control+V");
+      } catch (error) {
+        throw new VError(error, `Failed to paste`);
+      }
+    },
+    async delete(item) {
+      try {
+        const explorer = page.locator(".explorer-folders-view .monaco-list");
+        const oldDirent = explorer.locator(".monaco-list-row", {
+          hasText: item,
+        });
+        await expect(oldDirent).toBeVisible();
+        await page.keyboard.press("Delete");
+        await expect(oldDirent).toBeHidden();
+      } catch (error) {
+        throw new VError(error, `Failed to delete`);
+      }
+    },
     async rename(oldDirentName, newDirentName) {
       try {
-        // TODO avoid using timeout
-        const SHORT_TIMEOUT = 250;
-
         const explorer = page.locator(".explorer-folders-view .monaco-list");
         const oldDirent = explorer.locator(".monaco-list-row", {
           hasText: oldDirentName,
