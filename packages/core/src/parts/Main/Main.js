@@ -4,8 +4,9 @@ import { dirname, join } from "node:path";
 import * as PageObject from "page-object";
 import VError from "verror";
 import * as ChromeDevtoolsProtocol from "../ChromeDevtoolsProtocol/ChromeDevtoolsProtocol.js";
-import * as Electron from "../Electron/Electron.js";
 import { getEventListeners } from "../GetEventListeners/GetEventListeners.js";
+import * as Electron from "../Electron/Electron.js";
+import * as ImportScenario from "../ImportScenario/ImportScenario.js";
 import * as TmpDir from "../TmpDir/TmpDir.js";
 
 const writeJson = async (path, value) => {
@@ -18,7 +19,7 @@ export const runScenario = async (scenarioPath) => {
   try {
     const tmpDir = await TmpDir.create();
     const userDataDir = await TmpDir.create();
-    const scenario = await import(scenarioPath);
+    const scenario = await ImportScenario.importScenario(scenarioPath);
 
     const beforeSetupContext = {
       tmpDir,
