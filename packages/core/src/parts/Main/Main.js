@@ -3,6 +3,7 @@ import * as ChromeDevtoolsProtocol from "../ChromeDevtoolsProtocol/ChromeDevtool
 import { getEventListeners } from "../ChromeDevtoolsProtocol/getEventListeners.js";
 import * as Electron from "../Electron/Electron.js";
 import * as TmpDir from "../TmpDir/TmpDir.js";
+import * as ImportScenario from "../ImportScenario/ImportScenario.js";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import * as PageObject from "page-object";
@@ -18,7 +19,7 @@ export const runScenario = async (scenarioPath) => {
   try {
     const tmpDir = await TmpDir.create();
     const userDataDir = await TmpDir.create();
-    const scenario = await import(scenarioPath);
+    const scenario = await ImportScenario.importScenario(scenarioPath);
 
     const beforeSetupContext = {
       tmpDir,
