@@ -1,0 +1,13 @@
+export * as ActivityBar from "../ActivityBar/ActivityBar.js";
+export * as Editor from "../Editor/Editor.js";
+export * as Explorer from "../Explorer/Explorer.js";
+export * as Extensions from "../Extensions/Extensions.js";
+export * as KeyBindingsEditor from "../KeyBindingsEditor/KeyBindingsEditor.js";
+export * as Output from "../Output/Output.js";
+export * as Panel from "../Panel/Panel.js";
+export * as QuickPick from "../QuickPick/QuickPick.js";
+export * as Search from "../Search/Search.js";
+export * as SideBar from "../SideBar/SideBar.js";
+export * as Suggest from "../Suggest/Suggest.js";
+export * as TitleBar from "../TitleBar/TitleBar.js";
+export * as Workbench from "../Workbench/Workbench.js";
