@@ -36,5 +36,29 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to hide extensions view`);
       }
     },
+    async openSuggest() {
+      try {
+        const extensionsView = page.locator(".extensions-viewlet");
+        const extensionsInput = extensionsView.locator(".inputarea");
+        await expect(extensionsInput).toBeFocused();
+        await extensionsInput.press("Control+Space");
+        // TODO scope selector to extensions view
+        const suggestions = page.locator('[aria-label="Suggest"]');
+        await expect(suggestions).toBeVisible();
+      } catch (error) {
+        throw new VError(error, `Failed to open extensions suggestions`);
+      }
+    },
+    async closeSuggest() {
+      try {
+        // TODO scope selector to extensions view
+        const suggestions = page.locator('[aria-label="Suggest"]');
+        await expect(suggestions).toBeVisible();
+        await page.keyboard.press("Escape");
+        await expect(suggestions).toBeHidden();
+      } catch (error) {
+        throw new VError(error, `Failed to close extensions suggestions`);
+      }
+    },
   };
 };
