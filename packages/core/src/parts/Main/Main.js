@@ -1,12 +1,12 @@
 import { expect } from "@playwright/test";
-import * as ChromeDevtoolsProtocol from "../ChromeDevtoolsProtocol/ChromeDevtoolsProtocol.js";
-import { getEventListeners } from "../ChromeDevtoolsProtocol/getEventListeners.js";
-import * as Electron from "../Electron/Electron.js";
-import * as TmpDir from "../TmpDir/TmpDir.js";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import * as PageObject from "page-object";
 import VError from "verror";
+import * as ChromeDevtoolsProtocol from "../ChromeDevtoolsProtocol/ChromeDevtoolsProtocol.js";
+import * as Electron from "../Electron/Electron.js";
+import { getEventListeners } from "../GetEventListeners/GetEventListeners.js";
+import * as TmpDir from "../TmpDir/TmpDir.js";
 
 const writeJson = async (path, value) => {
   await mkdir(dirname(path), { recursive: true });
