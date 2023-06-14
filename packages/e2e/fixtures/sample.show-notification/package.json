@@ -1,0 +1,19 @@
+{
+  "name": "helloworld-sample",
+  "displayName": "helloworld-sample",
+  "version": "0.0.0-dev",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [],
+  "activationEvents": [],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.helloWorld",
+        "title": "Hello World"
+      }
+    ]
+  }
+}

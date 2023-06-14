@@ -1,4 +1,4 @@
-export const getVscodeArgs = ({ userDataDir }) => {
+export const getVscodeArgs = ({ userDataDir, extraLaunchArgs }) => {
   return [
     "--wait",
     "--new-window",
@@ -10,6 +10,7 @@ export const getVscodeArgs = ({ userDataDir }) => {
     "--disable-extensions",
     "--user-data-dir",
     userDataDir,
+    ...extraLaunchArgs,
     ".",
   ];
 };

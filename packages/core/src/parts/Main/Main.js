@@ -34,7 +34,12 @@ export const runScenario = async (scenarioPath) => {
       // @ts-ignore
       await scenario.beforeSetup(beforeSetupContext);
     }
-    const child = await Electron.launch({ tmpDir, userDataDir });
+    const extraLaunchArgs = scenario.extraLaunchArgs || [];
+    const child = await Electron.launch({
+      tmpDir,
+      userDataDir,
+      extraLaunchArgs,
+    });
     const { page, session } = await ChromeDevtoolsProtocol.connect(child);
     await page.waitForLoadState("networkidle");
     const main = page.locator('[role="main"]');
