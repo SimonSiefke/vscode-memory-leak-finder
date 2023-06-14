@@ -94,5 +94,31 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to verify editor selection`);
       }
     },
+    async goToDefinition() {
+      try {
+        await page.keyboard.press("Control+Shift+P");
+        const quickPick = page.locator(".quick-input-widget");
+        await expect(quickPick).toBeVisible();
+        const quickPickInput = quickPick.locator('[role="combobox"]');
+        await quickPickInput.type("Go to Definition");
+        const firstOption = quickPick.locator(".monaco-list-row").first();
+        await expect(firstOption).toContainText("Go to Definition");
+        await firstOption.click();
+      } catch (error) {
+        throw new VError(error, `Failed to go to definition`);
+      }
+    },
+    async shouldHaveOverlayMessage(message) {
+      try {
+        const message = page.locator(".monaco-editor-overlaymessage");
+        await expect(message).toBeVisible();
+        await expect(message).toHaveText(message);
+      } catch (error) {
+        throw new VError(
+          error,
+          `Failed to check overlay message with text ${message}`
+        );
+      }
+    },
   };
 };
