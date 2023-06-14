@@ -5,8 +5,6 @@ const getKeybindingButtonsText = (keyBinding) => {
   return keyBinding;
 };
 
-const EDIT_TIMEOUT = 20_000;
-
 export const create = ({ expect, page, VError }) => {
   return {
     async show() {
@@ -37,13 +35,14 @@ export const create = ({ expect, page, VError }) => {
         const defineKeyBindingInput = defineKeyBindingWidget.locator("input");
         await expect(defineKeyBindingInput).toBeFocused();
         await page.keyboard.press(keyBinding);
+        await expect(defineKeyBindingInput).toHaveValue(
+          keyBinding.replace("Control", "ctrl").toLowerCase()
+        );
         await page.keyboard.press("Enter");
         await expect(defineKeyBindingWidget).toBeHidden();
         const keyBindingsButtonText = getKeybindingButtonsText(keyBinding);
         const rowKeybinding = row.locator(".keybinding");
-        await expect(rowKeybinding).toHaveText(keyBindingsButtonText, {
-          timeout: EDIT_TIMEOUT,
-        });
+        await expect(rowKeybinding).toHaveText(keyBindingsButtonText);
       } catch (error) {
         throw new VError(error, `Failed to type into search input`);
       }
