@@ -23,6 +23,33 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to type into search input`);
       }
     },
+    async typeReplace(text) {
+      try {
+        const searchView = page.locator(".search-view");
+        const replaceInput = searchView.locator('textarea[title="Replace"]');
+        await replaceInput.focus();
+        await expect(replaceInput).toBeFocused();
+        await replaceInput.type(text);
+      } catch (error) {
+        throw new VError(error, `Failed to type into replace input`);
+      }
+    },
+    async replace(text) {
+      try {
+        const button = page.locator(
+          '[aria-label="Replace All (Ctrl+Alt+Enter)"]'
+        );
+        await button.click();
+        // TODO
+        // const searchView = page.locator(".search-view");
+        // const replaceInput = searchView.locator('textarea[title="Replace"]');
+        // await replaceInput.focus()
+        // await expect(replaceInput).toBeFocused();
+        // await replaceInput.type(text);
+      } catch (error) {
+        throw new VError(error, `Failed to replace`);
+      }
+    },
     async deleteText() {
       try {
         const searchView = page.locator(".search-view");
