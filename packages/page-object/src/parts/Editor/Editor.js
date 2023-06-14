@@ -55,5 +55,44 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to close editor`);
       }
     },
+    async select(text) {
+      try {
+        const editor = page.locator(".editor-instance");
+        const element = editor
+          .locator('[class^="mtk"]', { hasText: text })
+          .first();
+        await expect(element).toHaveText(text);
+        await element.dblclick();
+        const selection = page.locator(".selected-text");
+        await expect(selection).toBeVisible();
+      } catch (error) {
+        throw new VError(error, `Failed to select ${text}`);
+      }
+    },
+    async cursorRight() {
+      try {
+        await page.keyboard.press("ArrowRight");
+      } catch (error) {
+        throw new VError(error, `Failed to move cursor right`);
+      }
+    },
+    async shouldHaveSelection(left, width) {
+      try {
+        const selection = page.locator(".selected-text");
+        await expect(selection).toBeVisible();
+        await expect(selection).toHaveCSS("left", left);
+        await expect(selection).toHaveCSS("width", width);
+      } catch (error) {
+        throw new VError(error, `Failed to verify editor selection`);
+      }
+    },
+    async shouldHaveEmptySelection() {
+      try {
+        const selection = page.locator(".selected-text");
+        await expect(selection).toBeHidden();
+      } catch (error) {
+        throw new VError(error, `Failed to verify editor selection`);
+      }
+    },
   };
 };
