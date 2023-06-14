@@ -1,16 +1,29 @@
 const RE_NUMER_AT_END = /\d+$/;
 
-const getNextActiveDescendant = (activeDescendant) => {
+const getNextActiveDescendant = (listId, activeDescendant) => {
   // TODO list id can be dynamic
   if (activeDescendant === null) {
-    return "list_id_2_0";
+    return `${listId}_0`;
   }
   const match = activeDescendant.match(RE_NUMER_AT_END);
   if (!match) {
     throw new Error(`Failed to parse active descendant ${activeDescendant}`);
   }
   const number = parseInt(match[0]);
-  return `list_id_2_${number + 1}`;
+  return `${listId}_${number + 1}`;
+};
+
+const getListId = (classNameString) => {
+  if (typeof classNameString !== "string") {
+    throw new Error(`className must be of type string`);
+  }
+  const classNames = classNameString.split(" ");
+  for (const className of classNames) {
+    if (className.startsWith("list_id")) {
+      return className;
+    }
+  }
+  throw new Error(`Failed to extract list id from explorer`);
 };
 
 export const create = ({ page, expect, VError }) => {
@@ -34,7 +47,9 @@ export const create = ({ page, expect, VError }) => {
       try {
         const explorer = page.locator(".explorer-folders-view .monaco-list");
         const current = await explorer.getAttribute("aria-activedescendant");
-        const next = getNextActiveDescendant(current);
+        const className = await explorer.getAttribute("class");
+        const listId = getListId(className);
+        const next = getNextActiveDescendant(listId, current);
         await page.keyboard.press("ArrowDown");
         expect(await explorer.getAttribute("aria-activedescendant")).toBe(next);
       } catch (error) {
