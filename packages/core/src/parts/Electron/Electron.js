@@ -1,8 +1,8 @@
 import { _electron } from "@playwright/test";
-import * as Platform from "../Platform/Platform.js";
+import * as GetBinaryPath from "../GetBinaryPath/GetBinaryPath.js";
 
 export const launch = async ({ tmpDir, userDataDir }) => {
-  const binaryPath = await Platform.getBinaryPath();
+  const binaryPath = await GetBinaryPath.getBinaryPath();
   const child = await _electron.launch({
     args: [
       "--wait",
