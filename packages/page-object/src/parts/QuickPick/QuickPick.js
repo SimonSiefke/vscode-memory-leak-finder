@@ -11,6 +11,21 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to show quick pick`);
       }
     },
+    async select(option) {
+      try {
+        const quickPick = page.locator(".quick-input-widget");
+        await expect(quickPick).toBeVisible();
+        const quickPickInput = quickPick.locator('[role="combobox"]');
+        await quickPickInput.type(option);
+        const firstOption = quickPick.locator(".monaco-list-row").first();
+        const firstOptionLabel = firstOption.locator(".label-name");
+        await expect(firstOptionLabel).toHaveText(option);
+        await expect(firstOption).toBeVisible();
+        await firstOption.click();
+      } catch (error) {
+        throw new VError(error, `Failed to select ${option}`);
+      }
+    },
     async showColorTheme() {
       try {
         await page.keyboard.press("Control+Shift+P");
