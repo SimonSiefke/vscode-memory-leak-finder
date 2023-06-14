@@ -23,6 +23,20 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to open editor ${fileName}`);
       }
     },
+    async hover(text) {
+      try {
+        const editor = page.locator(".editor-instance");
+        await expect(editor).toBeVisible();
+
+        const startTag = editor
+          .locator('[class^="mtk"]', { hasText: "h1" })
+          .first();
+        await startTag.click();
+        await startTag.hover();
+      } catch (error) {
+        throw new VError(error, `Failed to hover ${text}`);
+      }
+    },
     async splitRight() {
       try {
         const editors = page.locator(".editor-instance");
