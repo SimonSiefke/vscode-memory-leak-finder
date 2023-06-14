@@ -8,26 +8,13 @@ const Colors = {
   KimbieDark: " #221a0f",
 };
 
-export const run = async ({ page, expect, QuickPick }) => {
-  const workbench = page.locator(".monaco-workbench");
-  await expect(workbench).toHaveCSS(
-    "--vscode-editor-background",
-    Colors.DarkModern
-  );
+export const run = async ({ QuickPick, Workbench }) => {
+  await Workbench.shouldHaveEditorBackground(Colors.DarkModern);
   await QuickPick.focusNext();
-  await expect(workbench).toHaveCSS(
-    "--vscode-editor-background",
-    Colors.DarkPlus
-  );
+  await Workbench.shouldHaveEditorBackground(Colors.DarkPlus);
   await QuickPick.focusNext();
-  await expect(workbench).toHaveCSS(
-    "--vscode-editor-background",
-    Colors.KimbieDark
-  );
+  await Workbench.shouldHaveEditorBackground(Colors.KimbieDark);
   await QuickPick.focusPrevious();
   await QuickPick.focusPrevious();
-  await expect(workbench).toHaveCSS(
-    "--vscode-editor-background",
-    Colors.DarkModern
-  );
+  await Workbench.shouldHaveEditorBackground(Colors.DarkModern);
 };
