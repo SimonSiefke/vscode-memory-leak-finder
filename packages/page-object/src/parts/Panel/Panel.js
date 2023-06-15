@@ -9,7 +9,9 @@ export const create = ({ expect, page, VError }) => {
         await quickPickInput.type("Toggle Panel Visibility");
         const firstOption = quickPick.locator(".monaco-list-row").first();
         const firstOptionLabel = firstOption.locator(".label-name");
-        await expect(firstOptionLabel).toHaveText("Toggle Panel Visibility");
+        await expect(firstOptionLabel).toHaveText(
+          "View: Toggle Panel Visibility"
+        );
         await expect(firstOption).toBeVisible();
         await firstOption.click();
       } catch (error) {
