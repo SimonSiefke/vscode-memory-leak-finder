@@ -18,6 +18,10 @@ export const create = ({ expect, page, VError }) => {
         await firstOption.click();
         const keyBindingsEditor = page.locator(".keybindings-editor");
         await expect(keyBindingsEditor).toBeVisible();
+        const body = page.locator(".keybindings-body");
+        await expect(body).toBeVisible();
+        const list = body.locator(".monaco-list");
+        await expect(list).toBeVisible();
       } catch (error) {
         throw new VError(error, `Failed to show keybindings editor`);
       }
