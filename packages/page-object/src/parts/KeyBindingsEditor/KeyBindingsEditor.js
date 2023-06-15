@@ -44,7 +44,7 @@ export const create = ({ expect, page, VError }) => {
         const rowKeybinding = row.locator(".keybinding");
         await expect(rowKeybinding).toHaveText(keyBindingsButtonText);
       } catch (error) {
-        throw new VError(error, `Failed to type into search input`);
+        throw new VError(error, `Failed to set keyBinding ${keyBinding}`);
       }
     },
   };
