@@ -4,9 +4,10 @@ import { dirname, join } from "node:path";
 import * as PageObject from "page-object";
 import VError from "verror";
 import * as ChromeDevtoolsProtocol from "../ChromeDevtoolsProtocol/ChromeDevtoolsProtocol.js";
-import { getEventListeners } from "../GetEventListeners/GetEventListeners.js";
 import * as Electron from "../Electron/Electron.js";
+import { getEventListeners } from "../GetEventListeners/GetEventListeners.js";
 import * as ImportScenario from "../ImportScenario/ImportScenario.js";
+import * as Process from "../Process/Process.js";
 import * as TmpDir from "../TmpDir/TmpDir.js";
 
 const writeJson = async (path, value) => {
@@ -89,14 +90,14 @@ export const runScenario = async (scenarioPath) => {
       console.info(`event listener equal: ${results[0].beforeEventListeners}`);
     }
     // console.info(`Scenario ${scenarioId} exited with code 0`);
-    if (process.send) {
-      process.exit(0);
+    if (Process.send) {
+      Process.exit(0);
     }
   } catch (error) {
     console.error(error);
     console.info(`Scenario ${scenarioId} exited with code 1`);
-    if (process.send) {
-      process.exit(1);
+    if (Process.send) {
+      Process.exit(1);
     }
   }
 
