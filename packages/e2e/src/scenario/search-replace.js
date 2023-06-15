@@ -4,12 +4,7 @@ export const beforeSetup = async ({ tmpDir, writeFile, join }) => {
 
 export const setup = async ({ ActivityBar, Electron }) => {
   await ActivityBar.showSearch();
-  await Electron.evaluate(`const electron = globalThis._VSCODE_NODE_MODULES["electron"];
-  electron.dialog.showMessageBox = () => {
-    return {
-      response: 1,
-    }
-  }`);
+  await Electron.mockDialog({ response: 1 });
 };
 
 export const run = async ({ Search }) => {
