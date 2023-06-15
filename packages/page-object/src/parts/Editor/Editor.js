@@ -199,9 +199,21 @@ export const create = ({ page, expect, VError }) => {
       try {
         const editor = page.locator(".editor-instance");
         const editorLines = editor.locator(".view-lines");
-        await expect(editorLines).toHaveText(text);
+        const actualText = text.replaceAll("\n", "");
+        await expect(editorLines).toHaveText(actualText);
       } catch (error) {
         throw new VError(error, `Failed to verify editor text ${text}`);
+      }
+    },
+    async rename(newText) {
+      try {
+        await page.keyboard.press("F2");
+        const renameInput = page.locator(".rename-input");
+        await expect(renameInput).toBeFocused();
+        await renameInput.type(newText);
+        await page.keyboard.press("Enter");
+      } catch (error) {
+        throw new VError(error, `Failed to rename text ${newText}`);
       }
     },
   };
