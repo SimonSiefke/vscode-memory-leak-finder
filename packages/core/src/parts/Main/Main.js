@@ -53,7 +53,7 @@ export const runScenario = async (scenarioPath) => {
       timeout: 15_000,
     });
 
-    const utils = PageObject.create({ page, expect, VError });
+    const utils = PageObject.create({ page, expect, VError, child });
     const setupContext = { page, tmpDir, userDataDir, expect, ...utils };
     const runContext = { page, expect, ...utils };
     // @ts-ignore
