@@ -1,3 +1,5 @@
+const initialDiagnosticTimeout = 30_000;
+
 export const create = ({ page, expect, VError }) => {
   return {
     async open(fileName) {
@@ -27,12 +29,13 @@ export const create = ({ page, expect, VError }) => {
       try {
         const editor = page.locator(".editor-instance");
         await expect(editor).toBeVisible();
-
         const startTag = editor
-          .locator('[class^="mtk"]', { hasText: "h1" })
+          .locator('[class^="mtk"]', { hasText: text })
           .first();
         await startTag.click();
         await startTag.hover();
+        const tooltip = page.locator(".monaco-hover");
+        await expect(tooltip).toBeVisible();
       } catch (error) {
         throw new VError(error, `Failed to hover ${text}`);
       }
@@ -132,6 +135,55 @@ export const create = ({ page, expect, VError }) => {
           error,
           `Failed to check overlay message with text ${message}`
         );
+      }
+    },
+    async click(text) {
+      try {
+        const editor = page.locator(".editor-instance");
+        await expect(editor).toBeVisible();
+        const startTag = editor
+          .locator('[class^="mtk"]', { hasText: text })
+          .first();
+        await startTag.click();
+      } catch (error) {
+        throw new VError(error, `Failed to click ${text}`);
+      }
+    },
+    async shouldHaveSquigglyError() {
+      try {
+        const squiggle = page.locator(".squiggly-error");
+        await expect(squiggle).toBeVisible({
+          timeout: initialDiagnosticTimeout,
+        });
+      } catch (error) {
+        throw new VError(error, `Failed to verify squiggly error`);
+      }
+    },
+    async shouldNotHaveSquigglyError() {
+      try {
+        const squiggle = page.locator(".squiggly-error");
+        await expect(squiggle).toBeHidden();
+      } catch (error) {
+        throw new VError(
+          error,
+          `Failed to verify that editor has no squiggly error`
+        );
+      }
+    },
+    async deleteCharactersLeft({ count }) {
+      try {
+        for (let i = 0; i < count; i++) {
+          await page.keyboard.press("Delete");
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to delete character left`);
+      }
+    },
+    async type(text) {
+      try {
+        await page.keyboard.type(text);
+      } catch (error) {
+        throw new VError(error, `Failed to type ${text}`);
       }
     },
   };

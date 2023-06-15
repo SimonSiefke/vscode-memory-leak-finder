@@ -10,5 +10,17 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to hide hover`);
       }
     },
+    async shouldHaveText(text) {
+      try {
+        const tooltip = page.locator(".monaco-hover");
+        await expect(tooltip).toBeVisible();
+        await expect(tooltip).toContainText(text);
+      } catch (error) {
+        throw new VError(
+          error,
+          `Failed to check that hover has text "${text}"`
+        );
+      }
+    },
   };
 };
