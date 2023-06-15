@@ -6,13 +6,8 @@ export const setup = async ({ Editor }) => {
   await Editor.open("index.html");
 };
 
-export const run = async ({ page, expect, Editor }) => {
-  const editor = page.locator(".editor-instance");
-  await expect(editor).toBeVisible();
-
-  const startTag = editor.locator('[class^="mtk"]', { hasText: "h1" }).first();
-  await startTag.click();
-
+export const run = async ({ Editor }) => {
+  await Editor.click("h1");
   await Editor.goToDefinition("No definition found for 'h1'");
   await Editor.shouldHaveOverlayMessage();
 };

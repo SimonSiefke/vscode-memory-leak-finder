@@ -7,37 +7,18 @@ export const beforeSetup = async ({ tmpDir, writeFile, join }) => {
   );
 };
 
-const initialDiagnosticTimeout = 30_000;
-
 export const setup = async ({ page, expect, Editor }) => {
   await Editor.open("index.css");
-  const squiggle = page.locator(".squiggly-error");
-  await expect(squiggle).toBeVisible({ timeout: initialDiagnosticTimeout });
+  await Editor.shouldHaveSquigglyError();
 };
 
-export const run = async ({ page, expect }) => {
-  const editor = page.locator(".editor-instance");
-  await expect(editor).toBeVisible();
-
-  const squiggle = page.locator(".squiggly-error");
-  await expect(squiggle).toBeVisible();
-
-  const tokenClosingCurlyBrace = page.locator('[class^="mtk"]', {
-    hasText: "}",
-  });
-  await tokenClosingCurlyBrace.hover();
-
-  const tooltip = page.locator(".monaco-hover");
-  await expect(tooltip).toBeVisible();
-  await expect(tooltip).toContainText("colon expected");
-
-  const tokenAbc = editor.locator('[class^="mtk"]', { hasText: "abc" }).first();
-  await tokenAbc.click();
-
-  for (let i = 0; i < 4; i++) {
-    await page.keyboard.press("Delete");
-  }
-  await expect(squiggle).toBeHidden();
-  await page.keyboard.type(" abc");
-  await expect(squiggle).toBeVisible();
+export const run = async ({ Editor, Hover }) => {
+  await Editor.shouldHaveSquigglyError();
+  await Editor.hover("}");
+  await Hover.shouldHaveText("colon expected");
+  await Editor.click("abc");
+  await Editor.deleteCharactersLeft({ count: 4 });
+  await Editor.shouldNotHaveSquigglyError();
+  await Editor.type(" abc");
+  await Editor.shouldHaveSquigglyError();
 };
