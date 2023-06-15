@@ -170,10 +170,19 @@ export const create = ({ page, expect, VError }) => {
         );
       }
     },
-    async deleteCharactersLeft({ count }) {
+    async deleteCharactersRight({ count }) {
       try {
         for (let i = 0; i < count; i++) {
           await page.keyboard.press("Delete");
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to delete character right`);
+      }
+    },
+    async deleteCharactersLeft({ count }) {
+      try {
+        for (let i = 0; i < count; i++) {
+          await page.keyboard.press("Backspace");
         }
       } catch (error) {
         throw new VError(error, `Failed to delete character left`);
@@ -184,6 +193,15 @@ export const create = ({ page, expect, VError }) => {
         await page.keyboard.type(text);
       } catch (error) {
         throw new VError(error, `Failed to type ${text}`);
+      }
+    },
+    async shouldHaveText(text) {
+      try {
+        const editor = page.locator(".editor-instance");
+        const editorLines = editor.locator(".view-lines");
+        await expect(editorLines).toHaveText(text);
+      } catch (error) {
+        throw new VError(error, `Failed to verify editor text ${text}`);
       }
     },
   };
