@@ -17,10 +17,39 @@ export const create = ({ expect, page, VError }) => {
       try {
         const searchView = page.locator(".search-view");
         const searchInput = searchView.locator('textarea[title="Search"]');
+        await searchInput.focus();
         await expect(searchInput).toBeFocused();
+        await searchInput.clear();
         await searchInput.type(text);
       } catch (error) {
         throw new VError(error, `Failed to type into search input`);
+      }
+    },
+    async typeReplace(text) {
+      try {
+        const searchView = page.locator(".search-view");
+        const replaceInput = searchView.locator('textarea[title="Replace"]');
+        await replaceInput.focus();
+        await expect(replaceInput).toBeFocused();
+        await replaceInput.clear();
+        await replaceInput.type(text);
+      } catch (error) {
+        throw new VError(error, `Failed to type into replace input`);
+      }
+    },
+    async replace() {
+      try {
+        const button = page.locator(
+          '[aria-label="Replace All (Ctrl+Alt+Enter)"]'
+        );
+        await button.click();
+        const messageLocator = page.locator(
+          ".text-search-provider-messages .message"
+        );
+        await expect(messageLocator).toBeVisible();
+        await expect(messageLocator).toHaveText(/Replaced/);
+      } catch (error) {
+        throw new VError(error, `Failed to replace`);
       }
     },
     async deleteText() {

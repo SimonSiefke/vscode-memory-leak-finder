@@ -3,17 +3,16 @@ import { createRunner } from "./_run.js";
 let runner;
 
 beforeAll(() => {
-  runner = createRunner("keybindings-editor");
+  runner = createRunner("search-replace");
 });
 
 afterAll(async () => {
   await runner.kill();
 });
 
-// TODO report keybindings editor memory leak to vscode 1.79.0
-test("keybindings-editor", async () => {
+test("search-replace", async () => {
   await runner.waitForSucceeded();
   expect(runner.stdout).toContainEqual(
-    expect.stringContaining(`event listener increase:`)
+    expect.stringContaining(`event listener equal:`)
   );
 });
