@@ -17,13 +17,13 @@ exports.activate = async () => {
   let incrementing = true;
   vscode.commands.registerCommand("code-boilerplate.CodeBoilerPlate", () => {
     const current = parseInt(item.text);
-    const next = incrementing ? current + 1 : current - 1;
-    item.text = `${next}`;
     if (current === 0) {
       incrementing = true;
     }
     if (current === 2) {
       incrementing = false;
     }
+    const next = incrementing ? current + 1 : current - 1;
+    item.text = `${next}`;
   });
 };

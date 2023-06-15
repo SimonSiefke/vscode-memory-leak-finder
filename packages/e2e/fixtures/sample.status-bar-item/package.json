@@ -1,6 +1,7 @@
 {
   "name": "status-bar-sample",
   "displayName": "status-bar-sample",
+  "publisher": "test",
   "version": "0.0.0-dev",
   "license": "MIT",
   "engines": {
