@@ -10,6 +10,7 @@ export * as Panel from "../Panel/Panel.js";
 export * as QuickPick from "../QuickPick/QuickPick.js";
 export * as Search from "../Search/Search.js";
 export * as SideBar from "../SideBar/SideBar.js";
+export * as StatusBar from "../StatusBar/StatusBar.js";
 export * as Suggest from "../Suggest/Suggest.js";
 export * as Tab from "../Tab/Tab.js";
 export * as TitleBar from "../TitleBar/TitleBar.js";
