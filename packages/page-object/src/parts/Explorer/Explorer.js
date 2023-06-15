@@ -150,6 +150,25 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to copy explorer item ${dirent}`);
       }
     },
+    async openContextMenu(dirent, select) {
+      try {
+        const explorer = page.locator(".explorer-folders-view .monaco-list");
+        const oldDirent = explorer.locator(".monaco-list-row", {
+          hasText: dirent,
+        });
+        await expect(oldDirent).toBeVisible();
+        await oldDirent.click({
+          button: "right",
+        });
+        const contextMenu = page.locator(
+          ".context-view.monaco-menu-container .actions-container"
+        );
+        await expect(contextMenu).toBeVisible();
+        await expect(contextMenu).toBeFocused();
+      } catch (error) {
+        throw new VError(error, `Failed to open context menu for ${dirent}`);
+      }
+    },
     async paste() {
       try {
         await page.keyboard.press("Control+V");
