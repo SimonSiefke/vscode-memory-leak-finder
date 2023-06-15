@@ -35,6 +35,9 @@ export const create = ({ expect, page, VError }) => {
         const defineKeyBindingInput = defineKeyBindingWidget.locator("input");
         await expect(defineKeyBindingInput).toBeFocused();
         await page.keyboard.press(keyBinding);
+        await expect(defineKeyBindingInput).toHaveValue(
+          keyBinding.replace("Control", "ctrl").toLowerCase()
+        );
         await page.keyboard.press("Enter");
         await expect(defineKeyBindingWidget).toBeHidden();
         const keyBindingsButtonText = getKeybindingButtonsText(keyBinding);
