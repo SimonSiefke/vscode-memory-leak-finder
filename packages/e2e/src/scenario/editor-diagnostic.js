@@ -17,7 +17,7 @@ export const run = async ({ Editor, Hover }) => {
   await Editor.hover("}");
   await Hover.shouldHaveText("colon expected");
   await Editor.click("abc");
-  await Editor.deleteCharactersLeft({ count: 4 });
+  await Editor.deleteCharactersRight({ count: 4 });
   await Editor.shouldNotHaveSquigglyError();
   await Editor.type(" abc");
   await Editor.shouldHaveSquigglyError();
