@@ -12,6 +12,7 @@ const locations = [
   "packages/e2e/package-lock.json",
   "packages/core/package-lock.json",
   "packages/page-object/package-lock.json",
+  "packages/memory-leak-finder/package-lock.json",
   ".github/workflows/ci.yml",
   ".github/workflows/release.yml",
   "scripts/computeNodeModulesCacheKey.js",

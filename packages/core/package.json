@@ -15,6 +15,7 @@
     "@vscode/test-electron": "^2.3.3",
     "lodash": "^4.17.21",
     "@vscode-memory-leak-finder/page-object": "file:../page-object",
+    "@vscode-memory-leak-finder/memory-leak-finder": "file:../memory-leak-finder",
     "tree-kill": "^1.2.2",
     "verror": "^1.10.1",
     "wait-for-expect": "^3.0.2"
