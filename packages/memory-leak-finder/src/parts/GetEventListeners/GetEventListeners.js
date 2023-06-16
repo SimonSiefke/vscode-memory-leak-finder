@@ -3,17 +3,19 @@ import * as DevtoolsProtocolRuntime from "../DevtoolsProtocolRuntime/DevtoolsPro
 /**
  *
  * @param {import('@playwright/test').CDPSession} session
+ * @param {string} objectGroup
  * @returns {Promise<number>}
  */
-export const getEventListeners = async (session) => {
+export const getEventListeners = async (session, objectGroup) => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: "EventTarget.prototype",
     includeCommandLineAPI: true,
     returnByValue: false,
+    objectGroup,
   });
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
-    // @ts-ignore
     prototypeObjectId: prototype.objectId,
+    objectGroup,
   });
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
@@ -21,6 +23,7 @@ globalThis.____objects = this
 }`,
     objectId: objects.objects.objectId,
     returnByValue: true,
+    objectGroup,
   });
   const fnResult2 = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: `(() => {
@@ -46,6 +49,7 @@ return listenerMap
 })()`,
     returnByValue: true,
     includeCommandLineAPI: true,
+    objectGroup,
   });
   const value = fnResult2;
   return value;
