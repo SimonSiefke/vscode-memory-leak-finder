@@ -13,6 +13,6 @@ afterAll(async () => {
 test("title-bar-menu-toggle", async () => {
   await runner.waitForSucceeded();
   expect(runner.stdout).toContainEqual(
-    expect.stringContaining(`event listener equal:`)
+    expect.stringContaining(`event listener increase:`)
   );
 });
