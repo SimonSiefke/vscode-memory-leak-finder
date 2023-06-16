@@ -1,7 +1,7 @@
 import { expect } from "@playwright/test";
 import { Measures } from "@vscode-memory-leak-finder/memory-leak-finder";
 import * as PageObject from "@vscode-memory-leak-finder/page-object";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import VError from "verror";
 import * as ChromeDevtoolsProtocol from "../ChromeDevtoolsProtocol/ChromeDevtoolsProtocol.js";
@@ -29,6 +29,7 @@ export const runScenario = async (scenarioPath) => {
       writeJson,
       join,
       mkdir,
+      rm,
     };
     // @ts-ignore
     if (scenario.beforeSetup) {
@@ -55,8 +56,14 @@ export const runScenario = async (scenarioPath) => {
     });
 
     const utils = PageObject.create({ page, expect, VError, child });
-    const setupContext = { page, tmpDir, userDataDir, expect, ...utils };
-    const runContext = { page, expect, ...utils };
+    const setupContext = { ...page, tmpDir, userDataDir, expect, ...utils };
+    const runContext = {
+      ...beforeSetupContext,
+      ...setupContext,
+      page,
+      expect,
+      ...utils,
+    };
     // @ts-ignore
     if (scenario.setup) {
       // @ts-ignore
