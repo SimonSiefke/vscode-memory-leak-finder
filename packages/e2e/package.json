@@ -1,5 +1,5 @@
 {
-  "name": "e2e",
+  "name": "@vscode-memory-leak-finder/e2e",
   "version": "0.0.0-dev",
   "description": "",
   "type": "module",
@@ -10,7 +10,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "core": "file:../core"
+    "@vscode-memory-leak-finder/core": "file:../core"
   },
   "devDependencies": {
     "tree-kill": "^1.2.2",
