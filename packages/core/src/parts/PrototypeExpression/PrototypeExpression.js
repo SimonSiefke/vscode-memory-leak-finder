@@ -1,0 +1,7 @@
+export const Node = 'Node.prototype'
+export const HtmlElement = 'HTMLElement.prototype'
+export const IntersectionObserver = 'IntersectionObserver.prototype'
+export const MutationObserver = 'MutationObserver.prototype'
+export const ResizeObserver = 'ResizeObserver.prototype'
+export const Promise = 'Promise.prototype'
+export const MediaQueryList = 'MediaQueryList.prototype'

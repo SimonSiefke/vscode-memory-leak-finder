@@ -5,10 +5,10 @@ import * as PageObject from "page-object";
 import VError from "verror";
 import * as ChromeDevtoolsProtocol from "../ChromeDevtoolsProtocol/ChromeDevtoolsProtocol.js";
 import * as Electron from "../Electron/Electron.js";
-import { getEventListeners } from "../GetEventListeners/GetEventListeners.js";
 import * as ImportScenario from "../ImportScenario/ImportScenario.js";
 import * as Process from "../Process/Process.js";
 import * as TmpDir from "../TmpDir/TmpDir.js";
+import * as WrappedMeasures from "../WrappedMeasures/WrappedMeasures.js";
 
 const writeJson = async (path, value) => {
   await mkdir(dirname(path), { recursive: true });
@@ -67,28 +67,29 @@ export const runScenario = async (scenarioPath) => {
       await scenario.run(runContext);
     }
     const results = [];
+    const measureFactory = WrappedMeasures.Measures.MeasureEventListeners;
+    const measure = await measureFactory.create(session);
     for (let i = 0; i < 3; i++) {
-      const beforeEventListeners = await getEventListeners(session);
+      const before = await measure.start();
       await scenario.run(runContext);
-      const afterEventListeners = await getEventListeners(session);
-      results.push({
-        beforeEventListeners,
-        afterEventListeners,
-      });
+      const after = await measure.stop();
+      const result = measure.compare(before, after);
+      results.push(result);
     }
-    if (
-      results.every(
-        (result) => result.beforeEventListeners < result.afterEventListeners
-      )
-    ) {
-      for (const result of results) {
-        console.info(
-          `event listener increase: ${result.beforeEventListeners} -> ${result.afterEventListeners}`
-        );
-      }
-    } else {
-      console.info(`event listener equal: ${results[0].beforeEventListeners}`);
-    }
+    console.log(results);
+    // if (
+    //   results.every(
+    //     (result) => result.beforeEventListeners < result.afterEventListeners
+    //   )
+    // ) {
+    //   for (const result of results) {
+    //     console.info(
+    //       `event listener increase: ${result.beforeEventListeners} -> ${result.afterEventListeners}`
+    //     );
+    //   }
+    // } else {
+    //   console.info(`event listener equal: ${results[0].beforeEventListeners}`);
+    // }
     // console.info(`Scenario ${scenarioId} exited with code 0`);
     if (Process.send) {
       Process.exit(0);
