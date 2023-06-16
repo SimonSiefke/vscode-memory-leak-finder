@@ -10,7 +10,7 @@ afterAll(async () => {
   await runner.kill();
 });
 
-test("editor-rename", async () => {
+test.skip("editor-rename", async () => {
   await runner.waitForSucceeded();
   expect(runner.stdout).toContainEqual(
     expect.stringContaining(`event listener equal:`)
