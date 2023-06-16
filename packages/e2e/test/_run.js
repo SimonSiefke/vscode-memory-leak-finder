@@ -11,9 +11,11 @@ const kill = promisify(_kill);
 waitForExpect.defaults.timeout = 60_000;
 jest.setTimeout(60_000);
 
+const root = join(__dirname, "..");
+
 export const createRunner = (name) => {
   const __dirname = dirname(fileURLToPath(import.meta.url));
-  const mainPath = join(__dirname, "..", "..", "src", `main.js`);
+  const mainPath = join(root, "src", `main.js`);
   const child = fork(mainPath, [], {
     stdio: "pipe",
     env: {
@@ -92,7 +94,7 @@ export const createRunner = (name) => {
     waitForSucceeded() {
       return new Promise((resolve, reject) => {
         if (isSucceeded) {
-          resolve();
+          resolve(undefined);
           return;
         }
         if (isRejected) {
