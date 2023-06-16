@@ -6,6 +6,10 @@ export const create = ({ expect, page, VError }) => {
         await expect(extensionsView).toBeVisible();
         const extensionsInput = extensionsView.locator(".inputarea");
         await expect(extensionsInput).toBeFocused();
+        const lines = extensionsView.locator(".monaco-editor .view-lines");
+        await page.keyboard.press("Control+A");
+        await page.keyboard.press("Backspace");
+        await expect(lines).toHaveText("");
         await extensionsInput.type(value);
       } catch (error) {
         throw new VError(error, `Failed to search for ${value}`);
@@ -72,6 +76,14 @@ export const create = ({ expect, page, VError }) => {
       } catch (error) {
         throw new VError(error, `Failed to close extensions suggestions`);
       }
+    },
+    first: {
+      async shouldBe(name) {
+        const firstExtension = page.locator(".extension-list-item").first();
+        await expect(firstExtension).toBeVisible();
+        const nameLocator = firstExtension.locator(".name");
+        await expect(nameLocator).toHaveText(name);
+      },
     },
   };
 };
