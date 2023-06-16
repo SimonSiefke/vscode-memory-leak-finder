@@ -1,4 +1,4 @@
-import { runScenario } from "core";
+import { runScenario } from "@vscode-memory-leak-finder/core";
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { join } from "path";

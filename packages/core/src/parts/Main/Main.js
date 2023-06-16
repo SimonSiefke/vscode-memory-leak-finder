@@ -1,7 +1,7 @@
 import { expect } from "@playwright/test";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import * as PageObject from "page-object";
+import * as PageObject from "@vscode-memory-leak-finder/page-object";
 import VError from "verror";
 import * as ChromeDevtoolsProtocol from "../ChromeDevtoolsProtocol/ChromeDevtoolsProtocol.js";
 import * as Electron from "../Electron/Electron.js";
