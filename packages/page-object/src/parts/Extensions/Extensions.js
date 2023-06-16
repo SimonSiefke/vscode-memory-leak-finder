@@ -16,6 +16,8 @@ export const create = ({ expect, page, VError }) => {
           .first();
         await option.click();
         await expect(extensionsView).toBeVisible();
+        const firstExtension = page.locator(".extension-list-item").first();
+        await expect(firstExtension).toBeVisible();
       } catch (error) {
         throw new VError(error, `Failed to show extensions view`);
       }
