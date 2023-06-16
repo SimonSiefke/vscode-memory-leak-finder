@@ -1,5 +1,5 @@
 {
-  "name": "page-object",
+  "name": "@vscode-memory-leak-finder/page-object",
   "version": "0.0.0-dev",
   "description": "",
   "type": "module",

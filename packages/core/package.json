@@ -1,5 +1,5 @@
 {
-  "name": "core",
+  "name": "@vscode-memory-leak-finder/core",
   "version": "0.0.0-dev",
   "description": "",
   "main": "src/main.js",
@@ -14,7 +14,7 @@
     "@playwright/test": "^1.35.0",
     "@vscode/test-electron": "^2.3.3",
     "lodash": "^4.17.21",
-    "page-object": "file:../page-object",
+    "@vscode-memory-leak-finder/page-object": "file:../page-object",
     "tree-kill": "^1.2.2",
     "verror": "^1.10.1",
     "wait-for-expect": "^3.0.2"
