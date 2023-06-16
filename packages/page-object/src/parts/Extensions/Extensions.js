@@ -6,7 +6,10 @@ export const create = ({ expect, page, VError }) => {
         await expect(extensionsView).toBeVisible();
         const extensionsInput = extensionsView.locator(".inputarea");
         await expect(extensionsInput).toBeFocused();
-        await extensionsInput.clear();
+        const lines = extensionsView.locator(".monaco-editor .view-lines");
+        await page.keyboard.press("Control+A");
+        await page.keyboard.press("Backspace");
+        await expect(lines).toHaveText("");
         await extensionsInput.type(value);
       } catch (error) {
         throw new VError(error, `Failed to search for ${value}`);
