@@ -3,6 +3,20 @@ const SHORT_TIMEOUT = 250;
 
 export const create = ({ expect, page, VError }) => {
   return {
+    async open(locator) {
+      try {
+        await locator.click({
+          button: "right",
+        });
+        const contextMenu = page.locator(
+          ".context-view.monaco-menu-container .actions-container"
+        );
+        await expect(contextMenu).toBeVisible();
+        await expect(contextMenu).toBeFocused();
+      } catch (error) {
+        throw new VError(error, `Failed to open context menu`);
+      }
+    },
     async select(option) {
       const contextMenu = page.locator(
         ".context-view.monaco-menu-container .actions-container"
