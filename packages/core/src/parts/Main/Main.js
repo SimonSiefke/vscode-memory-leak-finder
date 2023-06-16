@@ -1,14 +1,14 @@
 import { expect } from "@playwright/test";
+import { Measures } from "@vscode-memory-leak-finder/memory-leak-finder";
+import * as PageObject from "@vscode-memory-leak-finder/page-object";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import * as PageObject from "@vscode-memory-leak-finder/page-object";
 import VError from "verror";
 import * as ChromeDevtoolsProtocol from "../ChromeDevtoolsProtocol/ChromeDevtoolsProtocol.js";
 import * as Electron from "../Electron/Electron.js";
 import * as ImportScenario from "../ImportScenario/ImportScenario.js";
 import * as Process from "../Process/Process.js";
 import * as TmpDir from "../TmpDir/TmpDir.js";
-import * as WrappedMeasures from "../WrappedMeasures/WrappedMeasures.js";
 
 const writeJson = async (path, value) => {
   await mkdir(dirname(path), { recursive: true });
@@ -67,8 +67,8 @@ export const runScenario = async (scenarioPath) => {
       await scenario.run(runContext);
     }
     const results = [];
-    const measureFactory = WrappedMeasures.Measures.MeasureEventListenerCount;
-    const measure = await measureFactory.create(session);
+    const measureFactory = Measures.MeasureEventListenerCount;
+    const measure = measureFactory.create(session);
     for (let i = 0; i < 3; i++) {
       const before = await measure.start();
       await scenario.run(runContext);
