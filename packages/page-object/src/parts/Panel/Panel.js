@@ -7,7 +7,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(quickPick).toBeVisible();
         const quickPickInput = quickPick.locator('[role="combobox"]');
         await expect(quickPickInput).toBeVisible();
-        await expect(quickPickInput).tobeFocused();
+        await expect(quickPickInput).toBeFocused();
         await quickPickInput.type("Toggle Panel Visibility");
         const firstOption = quickPick.locator(".monaco-list-row").first();
         const firstOptionLabel = firstOption.locator(".label-name");
