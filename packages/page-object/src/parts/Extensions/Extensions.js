@@ -84,6 +84,17 @@ export const create = ({ expect, page, VError }) => {
         const nameLocator = firstExtension.locator(".name");
         await expect(nameLocator).toHaveText(name);
       },
+      async click() {
+        const firstExtension = page.locator(".extension-list-item").first();
+        await expect(firstExtension).toBeVisible();
+        const nameLocator = firstExtension.locator(".name");
+        const name = await nameLocator.textContent();
+        await expect(nameLocator).toHaveText(name);
+        const extensionEditor = page.locator(".extension-editor");
+        await expect(extensionEditor).toBeVisible();
+        const heading = extensionEditor.locator(".name").first();
+        await expect(heading).toHaveText(name);
+      },
     },
   };
 };
