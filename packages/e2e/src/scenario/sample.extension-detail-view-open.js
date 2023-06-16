@@ -13,7 +13,7 @@ export const run = async ({ page, expect, Editor }) => {
   await expect(tabLabel).toHaveText(`Extension: ${name}`);
   const extensionEditor = page.locator(".extension-editor");
   await expect(extensionEditor).toBeVisible();
-  const heading = extensionEditor.locator(".name");
+  const heading = extensionEditor.locator(".name").first();
   await expect(heading).toHaveText(name);
   await Editor.close();
 };
