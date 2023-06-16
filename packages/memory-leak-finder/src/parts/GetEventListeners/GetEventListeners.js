@@ -35,13 +35,11 @@ const getAllEventListeners = (nodes) => {
   for (const node of nodes) {
     const listeners = getEventListeners(node)
     for (const [key, value] of Object.entries(listeners)) {
-      listenerMap[key] ||= 0
-      listenerMap[key] += value.length
-      listenerMap.z_total ||= 0
-      listenerMap.z_total += value.length
+      listenerMap[key] ||= []
+      listenerMap[key].push(value)
     }
   }
-  return listenerMap.z_total
+  return listenerMap
 }
 
 const listenerMap = getAllEventListeners([...objects, document, window])
@@ -52,5 +50,6 @@ return listenerMap
     objectGroup,
   });
   const value = fnResult2;
+  console.log(JSON.stringify(value, null, 2));
   return value;
 };

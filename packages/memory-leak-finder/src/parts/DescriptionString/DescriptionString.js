@@ -1,0 +1,5 @@
+export const ReactInternalFunction = '<react internal function>'
+export const SentryInternalFunction = '<sentry internal function>'
+export const LazySizesInternalFunction = '<lazysizes internal function>'
+export const PolymerInternalFunction = '<polymer internal function>'
+export const VueInternalFunction = '<vue internal function>'
