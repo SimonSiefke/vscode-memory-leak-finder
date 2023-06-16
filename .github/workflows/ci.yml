@@ -15,7 +15,7 @@ jobs:
       matrix:
         # os: [ubuntu-22.04, macOS-latest, windows-latest]
         os: [ubuntu-22.04]
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
