@@ -1,5 +1,17 @@
 export const create = ({ expect, page, VError }) => {
   return {
+    async search(value) {
+      try {
+        const extensionsView = page.locator(`.extensions-viewlet`);
+        await expect(extensionsView).toBeVisible();
+        const extensionsInput = extensionsView.locator(".inputarea");
+        await expect(extensionsInput).toBeFocused();
+        await extensionsInput.clear();
+        await extensionsInput.type(value);
+      } catch (error) {
+        throw new VError(error, `Failed to search for ${value}`);
+      }
+    },
     async show() {
       try {
         const extensionsView = page.locator(`.extensions-viewlet`);
@@ -61,6 +73,14 @@ export const create = ({ expect, page, VError }) => {
       } catch (error) {
         throw new VError(error, `Failed to close extensions suggestions`);
       }
+    },
+    first: {
+      async shouldBe(name) {
+        const firstExtension = page.locator(".extension-list-item").first();
+        await expect(firstExtension).toBeVisible();
+        const nameLocator = firstExtension.locator(".name");
+        await expect(nameLocator).toHaveText(name);
+      },
     },
   };
 };
