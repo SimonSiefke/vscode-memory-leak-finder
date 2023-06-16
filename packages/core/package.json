@@ -11,7 +11,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@playwright/test": "^1.35.0",
+    "@playwright/test": "^1.35.1",
     "@vscode/test-electron": "^2.3.3",
     "lodash": "^4.17.21",
     "@vscode-memory-leak-finder/page-object": "file:../page-object",
