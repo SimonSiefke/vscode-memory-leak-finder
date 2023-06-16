@@ -1,5 +1,16 @@
 export const create = ({ expect, page, VError }) => {
   return {
+    async search(value) {
+      try {
+        const extensionsView = page.locator(`.extensions-viewlet`);
+        await expect(extensionsView).toBeVisible();
+        const extensionsInput = extensionsView.locator(".inputarea");
+        await expect(extensionsInput).toBeFocused();
+        await extensionsInput.type(value);
+      } catch (error) {
+        throw new VError(error, `Failed to search for ${value}`);
+      }
+    },
     async show() {
       try {
         const extensionsView = page.locator(`.extensions-viewlet`);
