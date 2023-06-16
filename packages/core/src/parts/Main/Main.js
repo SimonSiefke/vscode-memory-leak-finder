@@ -67,7 +67,7 @@ export const runScenario = async (scenarioPath) => {
       await scenario.run(runContext);
     }
     const results = [];
-    const measureFactory = WrappedMeasures.Measures.GetEventListeners;
+    const measureFactory = WrappedMeasures.Measures.MeasureEventListenerCount;
     const measure = await measureFactory.create(session);
     for (let i = 0; i < 3; i++) {
       const before = await measure.start();
