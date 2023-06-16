@@ -25,6 +25,13 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to open editor ${fileName}`);
       }
     },
+    async focus() {
+      const editor = page.locator(".editor-instance");
+      await expect(editor).toBeVisible();
+      const editorInput = editor.locator(".inputarea");
+      await editorInput.focus();
+      await expect(editorInput).toBeFocused();
+    },
     async hover(text) {
       try {
         const editor = page.locator(".editor-instance");
