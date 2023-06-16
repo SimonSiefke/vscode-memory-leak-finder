@@ -8,6 +8,7 @@ export * as Hover from "../Hover/Hover.js";
 export * as KeyBindingsEditor from "../KeyBindingsEditor/KeyBindingsEditor.js";
 export * as Output from "../Output/Output.js";
 export * as Panel from "../Panel/Panel.js";
+export * as Problems from "../Problems/Problems.js";
 export * as QuickPick from "../QuickPick/QuickPick.js";
 export * as Search from "../Search/Search.js";
 export * as SideBar from "../SideBar/SideBar.js";
