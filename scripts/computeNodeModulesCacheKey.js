@@ -9,6 +9,7 @@ const root = join(__dirname, "..");
 const locations = [
   "lerna.json",
   "package-lock.json",
+  "packages/cli/package-lock.json",
   "packages/e2e/package-lock.json",
   "packages/core/package-lock.json",
   "packages/page-object/package-lock.json",

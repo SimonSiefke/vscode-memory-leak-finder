@@ -1,0 +1,16 @@
+import * as IsWindows from '../IsWindows/IsWindows.js'
+
+export const ArrowDown = '\u001b[B'
+export const ArrowLeft = '\u001b[D'
+export const ArrowRight = '\u001b[C'
+export const ArrowUp = '\u001b[A'
+export const Backspace = Buffer.from(IsWindows.isWindows ? '08' : '7f', 'hex').toString()
+export const ControlC = '\u0003'
+export const ControlD = '\u0004'
+export const ControlU = '\u0015'
+export const Enter = '\r'
+export const Escape = '\u001b'
+export const ControlBackspace = '\x17'
+export const AltBackspace = '\x1B\x7F'
+export const Home = '\x1B[H'
+export const End = '\x1B[F'

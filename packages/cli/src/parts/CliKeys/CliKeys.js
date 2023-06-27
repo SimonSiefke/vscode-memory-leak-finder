@@ -1,0 +1,7 @@
+export const WatchMode = 'w'
+export const FilterMode = 'p'
+export const All = 'a'
+export const Quit = 'q'
+export const Fail = 'f'
+export const ToggleHeadless = 'h'
+export const TriggerTestRun = 'Enter'
