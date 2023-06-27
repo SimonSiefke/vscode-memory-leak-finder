@@ -3,6 +3,7 @@ import * as ObjectType from '../ObjectType/ObjectType.js'
 import * as PageClose from '../PageClose/PageClose.js'
 import * as PageEvaluate from '../PageEvaluate/PageEvaluate.js'
 import * as PageReload from '../PageReload/PageReload.js'
+import * as PageKeyBoard from '../PageKeyBoard/PageKeyBoard.js'
 import * as WebWorker from '../WebWorker/WebWorker.js'
 
 export const create = async ({ electronRpc, electronObjectId, targetId, sessionId, rpc }) => {
@@ -25,6 +26,9 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
     },
     async close() {
       return PageClose.close(this.rpc)
+    },
+    pressKeyExponential(options) {
+      return PageKeyBoard.pressKeyExponential(options)
     },
     webWorker() {
       return WebWorker.waitForWebWorker({ sessionId })

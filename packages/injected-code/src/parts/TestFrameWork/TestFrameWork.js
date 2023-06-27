@@ -168,3 +168,47 @@ export const checkMultiElementCondition = async (locator, fnName, options) => {
   const message = errorMessageFn(locator, options)
   throw new AssertionError(message)
 }
+
+const getKeyboardEventOptions = (rawKey) => {
+  let ctrlKey = false
+  let key = ''
+  if (rawKey.startsWith('Control+')) {
+    ctrlKey = true
+    rawKey = rawKey.slice('Control+'.length)
+  }
+  key = rawKey
+  return {
+    ctrlKey,
+    key,
+  }
+}
+
+export const pressKeyExponential = async ({ key, waitFor, timeout = maxTimeout }) => {
+  Assert.string(key)
+  Assert.object(waitFor)
+  const locator = waitFor
+  const exponentialFactor = 2
+  const startTime = Time.getTimeStamp()
+  const endTime = startTime + timeout
+  let currentTime = startTime
+  const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
+  let current = 1
+  const keyboardEventOptions = getKeyboardEventOptions(key)
+  while (currentTime < endTime) {
+    KeyBoardActions.press(keyboardEventOptions)
+    console.log('press', keyboardEventOptions)
+    const element = QuerySelector.querySelectorWithOptions(locator.selector, {
+      hasText: locator._hasText,
+      nth: locator._nth,
+    })
+    if (element && toBeVisible(element)) {
+      return
+    }
+    current *= exponentialFactor
+    await Timeout.waitForMutation(document.body, current)
+    currentTime = Time.getTimeStamp()
+  }
+  await new Promise((r) => {})
+  const message = `expected locator "${locator.selector}" to be visible when pressing "${key}"`
+  throw new AssertionError(message)
+}

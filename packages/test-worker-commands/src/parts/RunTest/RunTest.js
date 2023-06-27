@@ -14,6 +14,9 @@ import * as PrettyError from '../PrettyError/PrettyError.js'
 import * as Root from '../Root/Root.js'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 import * as WaitForVsCodeToBeReady from '../WaitForVsCodeToBeReady/WaitForVsCodeToBeReady.js'
+import * as PageObject from '../PageObject/PageObject.js'
+import * as TestStage from '../TestStage/TestStage.js'
+import { VError } from '../VError/VError.js'
 
 export const runTest = async (state, file, relativeDirName, relativeFilePath, fileName, root, headlessMode, color, callback) => {
   try {
@@ -44,11 +47,22 @@ export const runTest = async (state, file, relativeDirName, relativeFilePath, fi
     })
     console.log('vscode is ready now')
     const module = await ImportScript.importScript(file)
-    await new Promise((r) => {
-      setTimeout(r, 100000)
-    })
+    const pageObjectContext = {
+      page: firstWindow,
+      expect: Expect.expect,
+      VError,
+      electronApp,
+    }
+    const pageObject = await PageObject.create(pageObjectContext)
+    await TestStage.beforeSetup(module, pageObject)
+    await TestStage.setup(module, pageObject)
+    await TestStage.run(module, pageObject)
+    // console.log({ pageObject })
+    // await new Promise((r) => {
+    // setTimeout(r, 100000)
+    // })
 
-    console.log({ electronApp, binaryPath })
+    // console.log({ electronApp, binaryPath })
     // await module.test({ electronApp, expect });
     const end = performance.now()
     const duration = end - start
