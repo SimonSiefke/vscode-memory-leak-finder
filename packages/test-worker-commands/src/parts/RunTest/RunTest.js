@@ -1,21 +1,20 @@
 import * as CleanUpTestState from '../CleanUpTestState/CleanUpTestState.js'
 import * as GetBinaryPath from '../GetBinaryPath/GetBinaryPath.js'
+import * as GetUserDataDir from '../GetUserDataDir/GetUserDataDir.js'
+import * as GetVsCodeArgs from '../GetVsCodeArgs/GetVsCodeArgs.js'
 import * as ImportScript from '../ImportScript/ImportScript.js'
 import * as JsonRpcEvent from '../JsonRpcEvent/JsonRpcEvent.js'
 import * as LaunchElectron from '../LaunchElectron/LaunchElectron.js'
 import * as LaunchElectronApp from '../LaunchElectronApp/LaunchElectronApp.js'
 import * as PrettyError from '../PrettyError/PrettyError.js'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
-import * as GetVsCodeArgs from '../GetVsCodeArgs/GetVsCodeArgs.js'
-import * as GetUserDataDir from '../GetUserDataDir/GetUserDataDir.js'
 
 export const runTest = async (state, file, relativeDirName, relativeFilePath, fileName, root, headlessMode, color, callback) => {
   try {
     const start = performance.now()
     callback(JsonRpcEvent.create(TestWorkerEventType.TestRunning, [file, relativeDirName, fileName]))
     const binaryPath = await GetBinaryPath.getBinaryPath()
-    const userDataDir = await GetUserDataDir.getUserDataDir()
-    console.log({ userDataDir })
+    const userDataDir = GetUserDataDir.getUserDataDir()
     const args = GetVsCodeArgs.getVscodeArgs({
       userDataDir,
       extraLaunchArgs: [],
