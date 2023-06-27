@@ -20,16 +20,10 @@ export const runTest = async (state, file, relativeDirName, relativeFilePath, fi
       userDataDir,
       extraLaunchArgs: [],
     })
-    const env = {
-      ...process.env,
-      XDG_CONFIG_HOME: userDataDir,
-      XDG_CACHE_HOME: userDataDir,
-    }
     const electronApp = await LaunchElectronApp.launch({
       cliPath: binaryPath,
       args,
       headlessMode: false,
-      env,
     })
 
     const module = await ImportScript.importScript(file)

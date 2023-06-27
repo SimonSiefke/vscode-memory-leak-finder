@@ -1,5 +1,6 @@
-import * as TmpDir from '../TmpDir/TmpDir.js'
+import { join } from 'path'
+import * as Root from '../Root/Root.js'
 
 export const getUserDataDir = () => {
-  return TmpDir.create()
+  return join(Root.root, '.vscode-user-data-dir')
 }

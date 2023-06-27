@@ -29,12 +29,10 @@ const handleStdErr = (data) => {
   // logStream.write(data)
 }
 
-export const launchElectron = async ({ cliPath, args, headlessMode, env = {} }) => {
+export const launchElectron = async ({ cliPath, args, headlessMode }) => {
   try {
     const allArgs = GetElectronArgs.getElectronArgs({ headlessMode, args })
-    const child = Spawn.spawn(cliPath, allArgs, {
-      env,
-    })
+    const child = Spawn.spawn(cliPath, allArgs)
     child.stdout?.setEncoding('utf-8')
     child.stderr?.setEncoding('utf-8')
     child.stdout.on('data', handleStdout)

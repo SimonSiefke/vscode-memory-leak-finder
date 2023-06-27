@@ -9,6 +9,7 @@ export const getVscodeArgs = ({ userDataDir, extraLaunchArgs }) => {
     '--disable-workspace-trust',
     '--disable-extensions',
     '--user-data-dir',
+    userDataDir,
     ...extraLaunchArgs,
     '.',
   ]
