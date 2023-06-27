@@ -2,7 +2,6 @@ import * as TestFrameWork from './TestFrameWork.js'
 
 export const name = 'TestFrameWork'
 
-// prettier-ignore
 export const Commands = {
   checkMultiElementCondition: TestFrameWork.checkMultiElementCondition,
   checkSingleElementCondition: TestFrameWork.checkSingleElementCondition,
@@ -10,4 +9,5 @@ export const Commands = {
   performKeyBoardAction: TestFrameWork.performKeyBoardAction,
   showOverlay: TestFrameWork.showOverlay,
   checkTitle: TestFrameWork.checkTitle,
+  pressKeyExponential: TestFrameWork.pressKeyExponential,
 }
