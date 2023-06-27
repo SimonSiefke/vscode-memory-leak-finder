@@ -9,3 +9,6 @@ export const exit = (code) => {
 export const on = (event, listener) => {
   process.on(event, listener)
 }
+
+export const env = process.env
+export const chdir = process.chdir
