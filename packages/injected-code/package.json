@@ -1,0 +1,20 @@
+{
+  "name": "injected-code",
+  "version": "0.0.0-dev",
+  "description": "",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "build": "rollup -c rollup.config.js",
+    "build:watch": "rollup -c rollup.config.js -w",
+    "postinstall": "npm run build",
+    "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
+    "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "rollup": "^3.25.2"
+  }
+}
