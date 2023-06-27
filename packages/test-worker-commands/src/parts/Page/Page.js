@@ -44,6 +44,12 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
             nth: 0,
           }
         },
+        locator(selector) {
+          return {
+            ...this,
+            selector: `${this.selector} ${selector}`,
+          }
+        },
       }
     },
   }

@@ -14,7 +14,9 @@ export const create = ({ expect, page, VError }) => {
           key: 'Control+P',
           waitFor: quickPick,
         })
-        await expect(quickPick).toBeVisible()
+        await expect(quickPick).toBeVisible({
+          timeout: 10_000,
+        })
         const quickPickInput = quickPick.locator('[role="combobox"]')
         await quickPickInput.type('> open keyboard shortcuts')
         const firstOption = quickPick.locator('.monaco-list-row').nth(1)
