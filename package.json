@@ -32,5 +32,10 @@
     "modulePathIgnorePatterns": [
       "<rootDir>/.vscode-test/"
     ]
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 140
   }
 }
