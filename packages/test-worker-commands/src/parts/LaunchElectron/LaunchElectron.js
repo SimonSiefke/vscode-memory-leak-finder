@@ -29,10 +29,12 @@ const handleStdErr = (data) => {
   // logStream.write(data)
 }
 
-export const launchElectron = async ({ cliPath, args, headlessMode }) => {
+export const launchElectron = async ({ cliPath, args, headlessMode, env = {} }) => {
   try {
     const allArgs = GetElectronArgs.getElectronArgs({ headlessMode, args })
-    const child = Spawn.spawn(cliPath, allArgs)
+    const child = Spawn.spawn(cliPath, allArgs, {
+      env,
+    })
     child.stdout?.setEncoding('utf-8')
     child.stderr?.setEncoding('utf-8')
     child.stdout.on('data', handleStdout)
@@ -53,6 +55,7 @@ export const launchElectron = async ({ cliPath, args, headlessMode }) => {
 }
 
 export const cleanup = () => {
+  console.log('CLEANUP')
   for (const childProcess of state.processes) {
     childProcess.kill('SIGKILL')
   }

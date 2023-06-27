@@ -62,7 +62,8 @@ export const handleRuntimeExecutionContextCreated = (message) => {
 }
 
 export const handleRuntimeExecutionContextDestroyed = (message) => {
-  const uniqueId = message.params.executionContextUniqueId
+  console.log({ message })
+  const uniqueId = message.params.executionContextUniqueId || message.params.executionContextId
   ExecutionContextState.remove(uniqueId)
 }
 
@@ -191,6 +192,7 @@ const handleAttachedToPage = async (message) => {
 const handleAttachedToIframe = (message) => {}
 
 export const handleAttachedToTarget = (message) => {
+  console.log({ message })
   const type = message.params.targetInfo.type
   switch (type) {
     case DevtoolsTargetType.Page:

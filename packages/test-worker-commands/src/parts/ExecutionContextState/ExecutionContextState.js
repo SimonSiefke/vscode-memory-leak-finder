@@ -45,7 +45,6 @@ export const add = (id, executionContext) => {
 }
 
 export const remove = (uniqueId) => {
-  console.log('remove execution context', uniqueId)
   delete state.executionContexts[uniqueId]
 }
 
