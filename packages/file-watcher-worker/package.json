@@ -1,0 +1,14 @@
+{
+  "name": "file-watcher-worker",
+  "version": "0.0.0-dev",
+  "type": "module",
+  "description": "",
+  "main": "src/main.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chokidar": "^3.5.3"
+  }
+}
