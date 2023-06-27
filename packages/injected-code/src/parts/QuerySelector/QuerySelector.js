@@ -43,7 +43,7 @@ export const querySelector = (selector) => {
   if (selector.startsWith('#')) {
     return querySelectorByCss(selector)
   }
-  if (selector.startsWith('[data') || selector.startsWith('[title')) {
+  if (selector.startsWith('[data') || selector.startsWith('[title') || selector.startsWith('[role')) {
     return querySelectorByCss(selector)
   }
   if (isElement(selector)) {

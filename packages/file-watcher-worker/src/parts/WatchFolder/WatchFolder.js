@@ -5,8 +5,6 @@ import * as FileWatcherEventType from '../FileWatcherEventType/FileWatcherEventT
 export const watchFolder = async (folder, callback) => {
   Assert.string(folder)
   Assert.fn(callback)
-  console.log({ folder })
-
   const watcher = chokidar.watch(folder, {})
   const handleChange = (path) => {
     callback({

@@ -2,7 +2,7 @@ import * as DevtoolsProtocolRuntime from '../DevtoolsProtocolRuntime/DevtoolsPro
 import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.js'
 import * as SessionState from '../SessionState/SessionState.js'
 
-export const toBeVisible = async () => {
+export const toBeVisible = async (locator, options = {}) => {
   const pageSession = SessionState.getPageSession()
   if (!pageSession) {
     throw new Error('no page found')
@@ -12,9 +12,26 @@ export const toBeVisible = async () => {
   if (!utilityExecutionContext) {
     throw new Error(`no utility execution context found`)
   }
-  const html = await DevtoolsProtocolRuntime.evaluate(pageSession.rpc, {
-    expression: `document.getElementById('SideBar').style.background="red"`,
-    uniqueContextId: utilityExecutionContext.uniqueId,
+  await DevtoolsProtocolRuntime.callFunctionOn(pageSession.rpc, {
+    functionDeclaration: '(locator, fnName, options) => test.checkSingleElementCondition(locator, fnName, options)',
+    arguments: [
+      {
+        value: {
+          selector: locator.selector,
+          nth: locator.nth,
+        },
+      },
+      {
+        value: 'toBeVisible',
+      },
+      {
+        value: options,
+      },
+    ],
+    executionContextId: utilityExecutionContext.id, // TODO move to uniqueid once supported
+    // uniqueContextId: utilityExecutionContext.uniqueId,
+    awaitPromise: true,
   })
+
   // TODO
 }

@@ -11,7 +11,7 @@ export const toHaveCss = async (locator, key, value) => {
     arguments: [
       {
         value: {
-          _selector: locator.selector,
+          selector: locator.selector,
         },
       },
       {
