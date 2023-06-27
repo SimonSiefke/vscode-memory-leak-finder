@@ -34,6 +34,12 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
         type: ObjectType.Locator,
         selector,
         sessionId,
+        first() {
+          return {
+            ...this,
+            nth: 0,
+          }
+        },
       }
     },
   }

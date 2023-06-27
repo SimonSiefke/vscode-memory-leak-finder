@@ -84,7 +84,7 @@ export const performAction = async (locator, fnName, options) => {
   let currentTime = startTime
   const fn = ElementActions[fnName]
   while (currentTime < endTime) {
-    const element = QuerySelector.querySelectorWithOptions(locator._selector, {
+    const element = QuerySelector.querySelectorWithOptions(locator.selector, {
       hasText: locator._hasText,
       nth: locator._nth,
     })
@@ -108,11 +108,11 @@ export const checkSingleElementCondition = async (locator, fnName, options) => {
   Assert.string(fnName)
   Assert.object(options)
   const startTime = Time.getTimeStamp()
-  const endTime = startTime + maxTimeout
+  const endTime = startTime + options.timeout || maxTimeout
   let currentTime = startTime
   const fn = SingleElementConditionMap.getFunction(fnName)
   while (currentTime < endTime) {
-    const element = QuerySelector.querySelectorWithOptions(locator._selector, {
+    const element = QuerySelector.querySelectorWithOptions(locator.selector, {
       hasText: locator._hasText,
       nth: locator._nth,
     })
@@ -156,7 +156,7 @@ export const checkMultiElementCondition = async (locator, fnName, options) => {
   let currentTime = startTime
   const fn = MultiElementConditionMap.getFunction(fnName)
   while (currentTime < endTime) {
-    const elements = QuerySelector.querySelector(locator._selector)
+    const elements = QuerySelector.querySelector(locator.selector)
     const successful = fn(elements, options)
     if (successful) {
       return

@@ -1,25 +1,28 @@
 import * as QuerySelector from '../QuerySelector/QuerySelector.js'
 
-export const toBeVisible = (locator) => {
-  return `expected selector to be visible ${locator._selector}`
+export const toBeVisible = (locator, options) => {
+  if (options.timeout) {
+    return `expected selector to be visible ${locator.selector} within ${options.timeout} ms`
+  }
+  return `expected selector to be visible ${locator.selector}`
 }
 
 export const toHaveValue = (locator, { value }) => {
-  return `expected selector ${locator._selector} to have value ${value}`
+  return `expected selector ${locator.selector} to have value ${value}`
 }
 
 const printLocator = (locator) => {
   if (locator._nth !== -1) {
-    return `${locator._selector}:nth(${locator._nth})`
+    return `${locator.selector}:nth(${locator._nth})`
   }
   if (locator._hasText) {
-    return `${locator._selector} "${locator._hasText}"`
+    return `${locator.selector} "${locator._hasText}"`
   }
-  return `${locator._selector}`
+  return `${locator.selector}`
 }
 
 export const toHaveText = (locator, { text }) => {
-  const element = QuerySelector.querySelectorWithOptions(locator._selector, {
+  const element = QuerySelector.querySelectorWithOptions(locator.selector, {
     nth: locator._nth,
     hasText: locator._hasText,
   })
@@ -31,7 +34,7 @@ export const toHaveText = (locator, { text }) => {
 }
 
 export const toHaveAttribute = (locator, { key, value }) => {
-  const element = QuerySelector.querySelectorWithOptions(locator._selector, {
+  const element = QuerySelector.querySelectorWithOptions(locator.selector, {
     nth: locator._nth,
     hasText: locator._hasText,
   })
@@ -69,7 +72,7 @@ export const toBeFocused = (locator) => {
 }
 
 export const toHaveClass = (locator, { className }) => {
-  const [element] = QuerySelector.querySelector(locator._selector)
+  const [element] = QuerySelector.querySelector(locator.selector)
   const locatorString = printLocator(locator)
   if (!element) {
     return `expected ${locatorString} to have class ${className} but element was not found`
@@ -78,7 +81,7 @@ export const toHaveClass = (locator, { className }) => {
 }
 
 export const toHaveId = (locator, { id }) => {
-  const [element] = QuerySelector.querySelector(locator._selector)
+  const [element] = QuerySelector.querySelector(locator.selector)
   const locatorString = printLocator(locator)
   if (!element) {
     return `expected ${locatorString} to have id ${id} but element was not found`
@@ -92,7 +95,7 @@ export const toBeHidden = (locator) => {
 }
 
 export const toHaveCss = (locator, { key, value }) => {
-  const [element] = QuerySelector.querySelector(locator._selector)
+  const [element] = QuerySelector.querySelector(locator.selector)
   const locatorString = printLocator(locator)
   if (!element) {
     return `expected ${locatorString} to have css ${key} ${value} but element was not found`

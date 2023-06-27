@@ -1,18 +1,19 @@
+import { mkdir, writeFile } from 'fs/promises'
 import * as CleanUpTestState from '../CleanUpTestState/CleanUpTestState.js'
+import * as Expect from '../Expect/Expect.js'
 import * as GetBinaryPath from '../GetBinaryPath/GetBinaryPath.js'
+import * as GetDefaultVsCodeSettings from '../GetDefaultVscodeSettings/GetDefaultVsCodeSettings.js'
 import * as GetUserDataDir from '../GetUserDataDir/GetUserDataDir.js'
 import * as GetVsCodeArgs from '../GetVsCodeArgs/GetVsCodeArgs.js'
 import * as ImportScript from '../ImportScript/ImportScript.js'
 import * as JsonRpcEvent from '../JsonRpcEvent/JsonRpcEvent.js'
 import * as LaunchElectron from '../LaunchElectron/LaunchElectron.js'
 import * as LaunchElectronApp from '../LaunchElectronApp/LaunchElectronApp.js'
-import * as PrettyError from '../PrettyError/PrettyError.js'
-import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
-import * as Root from '../Root/Root.js'
-import * as GetDefaultVsCodeSettings from '../GetDefaultVscodeSettings/GetDefaultVsCodeSettings.js'
-
 import { join } from '../Path/Path.js'
-import { mkdir, writeFile } from 'fs/promises'
+import * as PrettyError from '../PrettyError/PrettyError.js'
+import * as Root from '../Root/Root.js'
+import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
+import * as WaitForVsCodeToBeReady from '../WaitForVsCodeToBeReady/WaitForVsCodeToBeReady.js'
 
 export const runTest = async (state, file, relativeDirName, relativeFilePath, fileName, root, headlessMode, color, callback) => {
   try {
@@ -36,8 +37,13 @@ export const runTest = async (state, file, relativeDirName, relativeFilePath, fi
       headlessMode: false,
       cwd: testWorkspacePath,
     })
+    const firstWindow = await electronApp.firstWindow()
+    await WaitForVsCodeToBeReady.waitForVsCodeToBeReady({
+      page: firstWindow,
+      expect: Expect.expect,
+    })
+    console.log('vscode is ready now')
     const module = await ImportScript.importScript(file)
-    const win = await electronApp.firstWindow()
     await new Promise((r) => {
       setTimeout(r, 100000)
     })
