@@ -33,7 +33,7 @@ export const createRpc = (ipc) => {
   const onceListeners = Object.create(null)
   let _id = 0
   return {
-    type: ObjectType.Rpc,
+    objectType: ObjectType.Rpc,
     callbacks,
     listeners,
     onceListeners,

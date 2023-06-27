@@ -54,6 +54,7 @@ export const launch = async ({ cliPath, args, headlessMode, cwd }) => {
 
   SessionState.addSession('browser', {
     type: ObjectType.Browser,
+    objectType: ObjectType.Browser,
     url: '',
     sessionId: '',
     rpc: browserRpc,

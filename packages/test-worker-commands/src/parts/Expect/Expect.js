@@ -5,7 +5,7 @@ import * as ExpectPage from '../ExpectPage/ExpectPage.js'
 import * as ObjectType from '../ObjectType/ObjectType.js'
 
 export const expect = (args) => {
-  const type = args ? args.type : ''
+  const type = args ? args.objectType || args.type || '' : ''
   switch (type) {
     case ObjectType.Locator:
       return ExpectLocator.expect(args)

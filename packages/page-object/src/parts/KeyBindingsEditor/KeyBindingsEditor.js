@@ -19,10 +19,15 @@ export const create = ({ expect, page, VError }) => {
         })
         const quickPickInput = quickPick.locator('[role="combobox"]')
         await quickPickInput.type('> open keyboard shortcuts')
-        const firstOption = quickPick.locator('.monaco-list-row').nth(1)
-        await firstOption.click()
+        const option = quickPick.locator('.label-name', {
+          hasText: 'Preferences: Open Keyboard Shortcuts',
+        })
+        await option.click()
+        // await new Promise(() => {})
         const keyBindingsEditor = page.locator('.keybindings-editor')
-        await expect(keyBindingsEditor).toBeVisible()
+        await expect(keyBindingsEditor).toBeVisible({
+          timeout: 3_000,
+        })
         const body = page.locator('.keybindings-body')
         await expect(body).toBeVisible()
         const list = body.locator('.monaco-list')

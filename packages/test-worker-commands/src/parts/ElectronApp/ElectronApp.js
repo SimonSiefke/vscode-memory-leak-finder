@@ -3,7 +3,7 @@ import * as WaitForPage from '../WaitForPage/WaitForPage.js'
 
 export const create = ({ electronRpc, electronObjectId, callFrameId }) => {
   return {
-    type: ObjectType.ElectronApp,
+    objectType: ObjectType.ElectronApp,
     rpc: electronRpc,
     electronObjectId,
     callFrameId,

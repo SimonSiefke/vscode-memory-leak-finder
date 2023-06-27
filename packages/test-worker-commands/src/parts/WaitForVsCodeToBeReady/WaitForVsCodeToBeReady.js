@@ -3,7 +3,7 @@ export const waitForVsCodeToBeReady = async ({ page, expect }) => {
   await expect(main).toBeVisible({
     timeout: 30_000,
   })
-  const notification = page.locator('text=All installed extensions are temporarily disabled.').first()
+  const notification = page.locator('text=All installed extensions are temporarily disabled.')
   await expect(notification).toBeVisible({
     timeout: 15_000,
   })

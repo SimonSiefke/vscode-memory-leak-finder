@@ -5,6 +5,11 @@ export const mouseEvent = (element, eventType, options) => {
   element.dispatchEvent(event)
 }
 
+export const pointerEvent = (element, eventType, options) => {
+  const event = new PointerEvent(eventType, options)
+  element.dispatchEvent(event)
+}
+
 export const mouseDown = (element, options) => {
   mouseEvent(element, DomEventType.MouseDown, options)
 }
@@ -32,6 +37,10 @@ export const hover = (element, options) => {
 
 export const type = (element, options) => {
   element.value = options.text
+  const inputEvent = new InputEvent('input')
+  element.dispatchEvent(inputEvent)
+  const changeEvent = new InputEvent('change')
+  element.dispatchEvent(changeEvent)
 }
 
 export const keyboardEvent = (element, eventType, options) => {

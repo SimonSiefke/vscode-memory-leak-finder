@@ -198,3 +198,15 @@ export const pressKeyExponential = async ({ key, waitFor, timeout = maxTimeout }
   const message = `expected locator "${locator.selector}" to be visible when pressing "${key}"`
   throw new AssertionError(message)
 }
+
+export const type = async (locator, text) => {
+  Assert.object(locator)
+  Assert.string(text)
+  const element = QuerySelector.querySelectorWithOptions(locator.selector, {
+    hasText: locator._hasText,
+    nth: locator._nth,
+  })
+  if (element !== document.activeElement) {
+    throw new AssertionError(`expected element to be focused to type into it`)
+  }
+}

@@ -10,4 +10,5 @@ export const Commands = {
   showOverlay: TestFrameWork.showOverlay,
   checkTitle: TestFrameWork.checkTitle,
   pressKeyExponential: TestFrameWork.pressKeyExponential,
+  type: TestFrameWork.type,
 }

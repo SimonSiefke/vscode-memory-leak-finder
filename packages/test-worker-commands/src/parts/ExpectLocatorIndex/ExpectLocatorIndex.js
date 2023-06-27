@@ -1,3 +1,4 @@
+export * from '../ExpectLocatorToBeFocused/ExpectLocatorToBeFocused.js'
 export * from '../ExpectLocatorToBeVisible/ExpectLocatorToBeVisible.js'
 export * from '../ExpectLocatorToHaveCss/ExpectLocatorToHaveCss.js'
 export * from '../ExpectLocatorToHaveNoWindows/ExpectLocatorToHaveNoWindows.js'
