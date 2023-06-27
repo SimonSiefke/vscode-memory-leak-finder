@@ -1,4 +1,5 @@
 .vscode-user-data-dir
+.vscode-test-workspace
 
 # Logs
 logs
