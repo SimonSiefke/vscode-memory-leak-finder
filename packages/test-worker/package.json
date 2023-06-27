@@ -1,0 +1,23 @@
+{
+  "name": "test-worker",
+  "version": "0.0.0-dev",
+  "description": "",
+  "main": "src/main.js",
+  "type": "module",
+  "bin": {
+    "test-worker": "bin/test-worker.js"
+  },
+  "scripts": {
+    "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
+    "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "verror": "^1.10.1"
+  },
+  "devDependencies": {
+    "@types/verror": "^1.10.6"
+  }
+}

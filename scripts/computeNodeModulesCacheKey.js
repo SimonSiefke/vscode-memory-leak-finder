@@ -14,6 +14,7 @@ const locations = [
   "packages/core/package-lock.json",
   "packages/page-object/package-lock.json",
   "packages/memory-leak-finder/package-lock.json",
+  "packages/test-worker/package-lock.json",
   "packages/test-worker-commands/package-lock.json",
   ".github/workflows/ci.yml",
   ".github/workflows/release.yml",
