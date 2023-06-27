@@ -2,6 +2,7 @@ import * as Assert from '../Assert/Assert.js'
 import { AssertionError } from '../AssertionError/AssertionError.js'
 import * as ConditionErrorMap from '../ConditionErrorMap/ConditionErrorMap.js'
 import * as ElementActions from '../ElementActions/ElementActions.js'
+import * as GetKeyboardEventOptions from '../GetKeyboardEventOptions/GetKeyboardEventOptions.js'
 import * as KeyBoardActions from '../KeyBoardActions/KeyBoardActions.js'
 import * as MultiElementConditionMap from '../MultiElementConditionMap/MultiElementConditionMap.js'
 import * as QuerySelector from '../QuerySelector/QuerySelector.js'
@@ -108,7 +109,8 @@ export const checkSingleElementCondition = async (locator, fnName, options) => {
   Assert.string(fnName)
   Assert.object(options)
   const startTime = Time.getTimeStamp()
-  const endTime = startTime + options.timeout || maxTimeout
+  const timeout = options.timeout || maxTimeout
+  const endTime = startTime + timeout
   let currentTime = startTime
   const fn = SingleElementConditionMap.getFunction(fnName)
   while (currentTime < endTime) {
@@ -169,20 +171,6 @@ export const checkMultiElementCondition = async (locator, fnName, options) => {
   throw new AssertionError(message)
 }
 
-const getKeyboardEventOptions = (rawKey) => {
-  let ctrlKey = false
-  let key = ''
-  if (rawKey.startsWith('Control+')) {
-    ctrlKey = true
-    rawKey = rawKey.slice('Control+'.length)
-  }
-  key = rawKey
-  return {
-    ctrlKey,
-    key,
-  }
-}
-
 export const pressKeyExponential = async ({ key, waitFor, timeout = maxTimeout }) => {
   Assert.string(key)
   Assert.object(waitFor)
@@ -193,10 +181,9 @@ export const pressKeyExponential = async ({ key, waitFor, timeout = maxTimeout }
   let currentTime = startTime
   const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
   let current = 1
-  const keyboardEventOptions = getKeyboardEventOptions(key)
+  const keyboardEventOptions = GetKeyboardEventOptions.getKeyboardEventOptions(key)
   while (currentTime < endTime) {
     KeyBoardActions.press(keyboardEventOptions)
-    console.log('press', keyboardEventOptions)
     const element = QuerySelector.querySelectorWithOptions(locator.selector, {
       hasText: locator._hasText,
       nth: locator._nth,
@@ -208,7 +195,6 @@ export const pressKeyExponential = async ({ key, waitFor, timeout = maxTimeout }
     await Timeout.waitForMutation(document.body, current)
     currentTime = Time.getTimeStamp()
   }
-  await new Promise((r) => {})
   const message = `expected locator "${locator.selector}" to be visible when pressing "${key}"`
   throw new AssertionError(message)
 }

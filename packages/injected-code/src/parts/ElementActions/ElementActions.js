@@ -47,6 +47,10 @@ export const keyUp = (element, options) => {
   keyboardEvent(element, DomEventType.KeyUp, options)
 }
 
+export const keyPress = (element, options) => {
+  keyboardEvent(element, DomEventType.KeyPress, options)
+}
+
 const getEventClass = (eventType) => {
   switch (eventType) {
     case DomEventType.Wheel:
