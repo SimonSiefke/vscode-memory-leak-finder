@@ -1,14 +1,13 @@
 export const beforeSetup = async ({
   tmpDir,
-  userDataDir,
   writeFile,
   join,
-  writeJson,
+  writeSettings,
 }) => {
   await writeFile(join(tmpDir, "file-1.txt"), ``);
   await writeFile(join(tmpDir, "file-2.txt"), ``);
   await writeFile(join(tmpDir, "file-3.txt"), ``);
-  await writeJson(join(userDataDir, "User", "settings.json"), {
+  await writeSettings({
     "window.titleBarStyle": "custom",
   });
 };

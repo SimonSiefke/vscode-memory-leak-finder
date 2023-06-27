@@ -2,16 +2,15 @@ import { readdir } from "fs/promises";
 
 export const beforeSetup = async ({
   tmpDir,
-  userDataDir,
   writeFile,
   join,
-  writeJson,
+  writeSettings,
 }) => {
   for (let i = 0; i < 3; i++) {
     const path = join(tmpDir, `file-${i}.txt`);
     await writeFile(path, ``);
   }
-  await writeJson(join(userDataDir, "User", "settings.json"), {
+  await writeSettings({
     "window.titleBarStyle": "custom",
     "files.watcherExclude": {
       "**/**": true,

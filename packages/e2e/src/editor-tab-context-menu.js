@@ -4,12 +4,11 @@ const generateFileContent = () => {
 
 export const beforeSetup = async ({
   tmpDir,
-  userDataDir,
   writeFile,
   join,
-  writeJson,
+  writeSettings,
 }) => {
-  await writeJson(join(userDataDir, "User", "settings.json"), {
+  await writeSettings({
     "window.titleBarStyle": "custom",
   });
   await writeFile(join(tmpDir, "file.txt"), generateFileContent());

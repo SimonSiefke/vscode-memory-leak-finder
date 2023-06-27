@@ -22,6 +22,10 @@ export const runScenario = async (scenarioPath) => {
     const userDataDir = await TmpDir.create();
     const scenario = await ImportScenario.importScenario(scenarioPath);
 
+    const writeSettings = async (settings) => {
+      await writeJson(join(userDataDir, "User", "settings.json"), settings);
+    };
+
     const beforeSetupContext = {
       tmpDir,
       userDataDir,
@@ -30,6 +34,7 @@ export const runScenario = async (scenarioPath) => {
       join,
       mkdir,
       rm,
+      writeSettings,
     };
     // @ts-ignore
     if (scenario.beforeSetup) {
