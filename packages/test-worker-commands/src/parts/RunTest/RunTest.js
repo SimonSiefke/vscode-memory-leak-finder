@@ -1,5 +1,4 @@
 import * as CleanUpTestState from '../CleanUpTestState/CleanUpTestState.js'
-import * as Expect from '../Expect/Expect.js'
 import * as GetBinaryPath from '../GetBinaryPath/GetBinaryPath.js'
 import * as ImportScript from '../ImportScript/ImportScript.js'
 import * as JsonRpcEvent from '../JsonRpcEvent/JsonRpcEvent.js'
@@ -8,17 +7,21 @@ import * as LaunchElectronApp from '../LaunchElectronApp/LaunchElectronApp.js'
 import * as PrettyError from '../PrettyError/PrettyError.js'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 
-export const runTest = async (file, relativeDirName, relativeFilePath, fileName, root, headlessMode, color, callback) => {
+export const runTest = async (state, file, relativeDirName, relativeFilePath, fileName, root, headlessMode, color, callback) => {
   try {
     const start = performance.now()
     callback(JsonRpcEvent.create(TestWorkerEventType.TestRunning, [file, relativeDirName, fileName]))
-    const module = await ImportScript.importScript(file)
     const binaryPath = await GetBinaryPath.getBinaryPath()
-    const { electronApp } = await LaunchElectronApp.launch({
+    const electronApp = await LaunchElectronApp.launch({
       cliPath: binaryPath,
       args: [],
       headlessMode: false,
     })
+
+    const module = await ImportScript.importScript(file)
+    const win = await electronApp.firstWindow()
+
+    console.log({ electronApp, binaryPath })
     // await module.test({ electronApp, expect });
     const end = performance.now()
     const duration = end - start
