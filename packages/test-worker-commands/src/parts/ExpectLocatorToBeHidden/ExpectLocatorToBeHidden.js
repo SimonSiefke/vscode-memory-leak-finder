@@ -12,16 +12,13 @@ export const toBeHidden = async (locator, options = {}) => {
     throw new Error(`no utility execution context found`)
   }
   await DevtoolsProtocolRuntime.callFunctionOn(pageSession.rpc, {
-    functionDeclaration: '(locator, fnName, options) => test.checkSingleElementCondition(locator, fnName, options)',
+    functionDeclaration: '(locator, options) => test.checkHidden(locator, options)',
     arguments: [
       {
         value: {
           selector: locator.selector,
           nth: locator.nth,
         },
-      },
-      {
-        value: 'toBeHidden',
       },
       {
         value: options,

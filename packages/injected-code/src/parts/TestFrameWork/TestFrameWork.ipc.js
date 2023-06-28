@@ -13,4 +13,5 @@ export const Commands = {
   type: TestFrameWork.type,
   getTextContent: TestFrameWork.getTextContent,
   pressKey: TestFrameWork.pressKey,
+  checkHidden: TestFrameWork.checkHidden,
 }

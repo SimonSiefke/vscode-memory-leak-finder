@@ -135,6 +135,34 @@ export const checkSingleElementCondition = async (locator, fnName, options) => {
   throw new AssertionError(message)
 }
 
+export const checkHidden = async (locator, options) => {
+  Assert.object(locator)
+  Assert.object(options)
+  const startTime = Time.getTimeStamp()
+  const timeout = options.timeout || maxTimeout
+  const endTime = startTime + timeout
+  let currentTime = startTime
+  const fn = SingleElementConditionMap.getFunction('toBeHidden')
+  while (currentTime < endTime) {
+    const element = QuerySelector.querySelectorWithOptions(locator.selector, {
+      hasText: locator.hasText,
+      nth: locator._nth,
+    })
+    if (!element) {
+      return
+    }
+    const successful = fn(element, options)
+    if (successful) {
+      return
+    }
+    await Timeout.waitForMutation(document.body, 100)
+    currentTime = Time.getTimeStamp()
+  }
+  const errorMessageFn = ConditionErrorMap.getFunction('toBeHidden')
+  const message = errorMessageFn(locator, options)
+  throw new AssertionError(message)
+}
+
 export const checkTitle = async (expectedTitle) => {
   Assert.string(expectedTitle)
   const startTime = Time.getTimeStamp()
