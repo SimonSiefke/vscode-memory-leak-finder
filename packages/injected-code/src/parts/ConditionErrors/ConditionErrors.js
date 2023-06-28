@@ -15,8 +15,8 @@ const printLocator = (locator) => {
   if (locator._nth !== -1) {
     return `${locator.selector}:nth(${locator._nth})`
   }
-  if (locator._hasText) {
-    return `${locator.selector} "${locator._hasText}"`
+  if (locator.hasText) {
+    return `${locator.selector} "${locator.hasText}"`
   }
   return `${locator.selector}`
 }
@@ -24,7 +24,7 @@ const printLocator = (locator) => {
 export const toHaveText = (locator, { text }) => {
   const element = QuerySelector.querySelectorWithOptions(locator.selector, {
     nth: locator._nth,
-    hasText: locator._hasText,
+    hasText: locator.hasText,
   })
   const locatorString = printLocator(locator)
   if (!element) {
@@ -36,7 +36,7 @@ export const toHaveText = (locator, { text }) => {
 export const toHaveAttribute = (locator, { key, value }) => {
   const element = QuerySelector.querySelectorWithOptions(locator.selector, {
     nth: locator._nth,
-    hasText: locator._hasText,
+    hasText: locator.hasText,
   })
   const locatorString = printLocator(locator)
   if (!element) {

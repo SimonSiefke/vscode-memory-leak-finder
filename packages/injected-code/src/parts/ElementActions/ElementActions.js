@@ -31,6 +31,11 @@ export const click = (element, options) => {
   }
 }
 
+export const dblclick = (element, options) => {
+  click(element, options)
+  click(element, options)
+}
+
 export const hover = (element, options) => {
   mouseEvent(element, DomEventType.MouseEnter, options)
 }

@@ -84,9 +84,12 @@ export const performAction = async (locator, fnName, options) => {
   const endTime = startTime + maxTimeout
   let currentTime = startTime
   const fn = ElementActions[fnName]
+  if (!fn) {
+    throw new Error(`action ${fnName} not found`)
+  }
   while (currentTime < endTime) {
     const element = QuerySelector.querySelectorWithOptions(locator.selector, {
-      hasText: locator._hasText,
+      hasText: locator.hasText,
       nth: locator._nth,
     })
     if (element) {
@@ -97,6 +100,7 @@ export const performAction = async (locator, fnName, options) => {
     await Timeout.waitForMutation(document.body, 100)
     currentTime = Time.getTimeStamp()
   }
+  throw new Error(`element not found ${locator.selector}`)
 }
 
 export const performKeyBoardAction = (fnName, options) => {
@@ -115,7 +119,7 @@ export const checkSingleElementCondition = async (locator, fnName, options) => {
   const fn = SingleElementConditionMap.getFunction(fnName)
   while (currentTime < endTime) {
     const element = QuerySelector.querySelectorWithOptions(locator.selector, {
-      hasText: locator._hasText,
+      hasText: locator.hasText,
       nth: locator._nth,
     })
     if (element) {
@@ -185,7 +189,7 @@ export const pressKeyExponential = async ({ key, waitFor, timeout = maxTimeout }
   while (currentTime < endTime) {
     KeyBoardActions.press(keyboardEventOptions)
     const element = QuerySelector.querySelectorWithOptions(locator.selector, {
-      hasText: locator._hasText,
+      hasText: locator.hasText,
       nth: locator._nth,
     })
     if (element && toBeVisible(element)) {
@@ -203,10 +207,28 @@ export const type = async (locator, text) => {
   Assert.object(locator)
   Assert.string(text)
   const element = QuerySelector.querySelectorWithOptions(locator.selector, {
-    hasText: locator._hasText,
+    hasText: locator.hasText,
     nth: locator._nth,
   })
   if (element !== document.activeElement) {
     throw new AssertionError(`expected element to be focused to type into it`)
   }
+}
+
+export const getTextContent = async (locator) => {
+  Assert.object(locator)
+  const element = QuerySelector.querySelectorWithOptions(locator.selector, {
+    hasText: locator.hasText,
+    nth: locator._nth,
+  })
+  if (!element) {
+    throw new Error(`element not found`)
+  }
+  const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
+  if (!toBeVisible(element)) {
+    throw new Error(`must be visible`)
+  }
+  const text = element.textContent()
+  console.log({ text })
+  return text
 }

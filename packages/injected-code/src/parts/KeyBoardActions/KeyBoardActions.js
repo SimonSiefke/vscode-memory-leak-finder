@@ -22,7 +22,6 @@ export const press = (options) => {
       code: GetKeyCode.getKeyCode('Shift'),
     })
   }
-  console.log(allOptions)
   for (const option of allOptions) {
     ElementActions.keyDown(element, option)
   }

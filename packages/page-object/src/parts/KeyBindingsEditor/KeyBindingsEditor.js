@@ -23,7 +23,6 @@ export const create = ({ expect, page, VError }) => {
           hasText: 'Preferences: Open Keyboard Shortcuts',
         })
         await option.click()
-        // await new Promise(() => {})
         const keyBindingsEditor = page.locator('.keybindings-editor')
         await expect(keyBindingsEditor).toBeVisible({
           timeout: 3_000,
@@ -42,10 +41,13 @@ export const create = ({ expect, page, VError }) => {
         await expect(keyBindingsEditor).toBeVisible()
         const row = keyBindingsEditor.locator(`.monaco-list-row[aria-label^="${commandName}"]`).first()
         await row.dblclick()
+        console.log(await row.textContent())
+        console.log('double clicked')
+        await new Promise(() => {})
         const defineKeyBindingWidget = page.locator('.defineKeybindingWidget')
         await expect(defineKeyBindingWidget).toBeVisible()
         const defineKeyBindingInput = defineKeyBindingWidget.locator('input')
-        await expect(defineKeyBindingInput).toBeFocused()
+        await expect(defineKeyBindingInput).toBeFocused({ timeout: 10_000 })
         await page.keyboard.press(keyBinding)
         await expect(defineKeyBindingInput).toHaveValue(keyBinding.replace('Control', 'ctrl').toLowerCase())
         await page.keyboard.press('Enter')

@@ -11,4 +11,5 @@ export const Commands = {
   checkTitle: TestFrameWork.checkTitle,
   pressKeyExponential: TestFrameWork.pressKeyExponential,
   type: TestFrameWork.type,
+  getTextContent: TestFrameWork.getTextContent,
 }

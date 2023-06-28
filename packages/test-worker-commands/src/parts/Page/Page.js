@@ -5,6 +5,7 @@ import * as PageClose from '../PageClose/PageClose.js'
 import * as PageEvaluate from '../PageEvaluate/PageEvaluate.js'
 import * as PageKeyBoard from '../PageKeyBoard/PageKeyBoard.js'
 import * as PageReload from '../PageReload/PageReload.js'
+import * as PageTextContent from '../PageTextContent/PageTextContent.js'
 import * as PageType from '../PageType/PageType.js'
 import * as WebWorker from '../WebWorker/WebWorker.js'
 
@@ -54,10 +55,11 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
             selector: `${this.selector}:nth-of-type(${1})`,
           }
         },
-        locator(selector) {
+        locator(selector, { hasText = '' } = {}) {
           return {
             ...this,
             selector: `${this.selector} ${selector}`,
+            hasText,
           }
         },
         type(text) {
@@ -77,6 +79,12 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
         dblclick() {
           return PageClick.dblclick({
             selector: this.selector,
+          })
+        },
+        textContent() {
+          return PageTextContent.getTextContent({
+            selector: this.selector,
+            hastext: this.hasText,
           })
         },
       }
