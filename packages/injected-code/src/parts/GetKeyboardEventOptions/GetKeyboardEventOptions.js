@@ -10,6 +10,7 @@ export const getKeyboardEventOptions = (rawKey) => {
   }
   if (rawKey.startsWith('Shift+')) {
     shiftKey = true
+    rawKey = rawKey.slice('Shift+'.length)
   }
   key = rawKey
   const keyCode = GetKeyCode.getKeyCode(key)

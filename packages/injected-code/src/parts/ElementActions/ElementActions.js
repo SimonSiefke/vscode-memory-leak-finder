@@ -45,7 +45,7 @@ export const hover = (element, options) => {
 }
 
 export const type = (element, options) => {
-  element.value = options.text
+  element.value = element.value + options.text
   const inputEvent = new InputEvent('input')
   element.dispatchEvent(inputEvent)
   const changeEvent = new InputEvent('change')
