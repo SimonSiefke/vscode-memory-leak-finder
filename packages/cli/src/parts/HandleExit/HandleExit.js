@@ -8,14 +8,7 @@ import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerComma
 // TODO how to kill all child processes recursively?
 //
 
-export const handleExit = async () => {
-  Stdin.off('data', HandleStdinData.handleStdinData)
-  Stdin.pause()
-  // console.log('kill proces group')
-  // kill process group
-  // process.kill(process.pid)
-  console.log('start exiting')
-
+export const killWorker = async () => {
   if (RunTest.state.testWorker) {
     console.log('has worker')
     const s = performance.now()
@@ -27,4 +20,14 @@ export const handleExit = async () => {
     const used = process.memoryUsage().heapUsed / 1024 / 1024
     console.log(`The script uses approximately ${Math.round(used * 100) / 100} MB`)
   }
+}
+
+export const handleExit = async () => {
+  Stdin.off('data', HandleStdinData.handleStdinData)
+  Stdin.pause()
+  // console.log('kill proces group')
+  // kill process group
+  // process.kill(process.pid)
+  console.log('start exiting')
+  await killWorker()
 }

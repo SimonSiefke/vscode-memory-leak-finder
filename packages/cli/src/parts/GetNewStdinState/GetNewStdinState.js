@@ -2,6 +2,7 @@ import * as HandleStdinDataFilterWaitingMode from '../HandleStdinDataFilterWaiti
 import * as HandleStdinDataFinishedRunningMode from '../HandleStdinDataFinishedRunningMode/HandleStdinDataFinishedRunningMode.js'
 import * as HandleStdinDataRunningMode from '../HandleStdinDataRunningMode/HandleStdinDataRunningMode.js'
 import * as HandleStdinDataWaitingMode from '../HandleStdinDataWaitingMode/HandleStdinDataWaitingMode.js'
+import * as HandleStdinDataInterruptedMode from '../HandleStdinDataInterruptedMode/HandleStdinDataInterruptedMode.js'
 import * as ModeType from '../ModeType/ModeType.js'
 
 const getFn = (mode) => {
@@ -14,6 +15,8 @@ const getFn = (mode) => {
       return HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode
     case ModeType.FinishedRunning:
       return HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode
+    case ModeType.Interrupted:
+      return HandleStdinDataInterruptedMode.handleStdinDataInterruptedMode
     default:
       throw new Error(`unexpected stdin mode ${mode}`)
   }

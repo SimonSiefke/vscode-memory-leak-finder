@@ -1,5 +1,8 @@
 import * as AnsiKeys from '../AnsiKeys/AnsiKeys.js'
+import * as InterruptedMessage from '../InterruptedMessage/InterruptedMessage.js'
 import * as ModeType from '../ModeType/ModeType.js'
+import * as Stdout from '../Stdout/Stdout.js'
+import * as WatchUsage from '../WatchUsage/WatchUsage.js'
 
 export const handleStdinDataRunningMode = (state, key) => {
   switch (key) {
@@ -18,6 +21,10 @@ export const handleStdinDataRunningMode = (state, key) => {
     case AnsiKeys.ArrowRight:
       return state
     default:
-      return state
+      Stdout.write(InterruptedMessage.print() + '\n' + WatchUsage.print())
+      return {
+        ...state,
+        mode: ModeType.Interrupted,
+      }
   }
 }

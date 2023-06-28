@@ -23,4 +23,7 @@ export const handleStdinData = async (key) => {
   if (newState.mode === ModeType.Running) {
     await StartRunning.startRunning(state.value, /* headlessMode */ true, /* color */ true)
   }
+  if (newState.mode === ModeType.Interrupted) {
+    await HandleExit.killWorker()
+  }
 }
