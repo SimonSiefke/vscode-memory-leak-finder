@@ -8,7 +8,11 @@ export const toBeVisible = (element) => {
 }
 
 export const toBeHidden = (element) => {
-  return !toBeVisible(element)
+  if (typeof element.isVisible === 'function') {
+    return !element.isVisible()
+  }
+  const style = getComputedStyle(element)
+  return style.display === 'none'
 }
 
 export const toHaveValue = (element, { value }) => {

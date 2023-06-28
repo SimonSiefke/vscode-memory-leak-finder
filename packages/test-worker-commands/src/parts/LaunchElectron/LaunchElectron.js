@@ -35,16 +35,20 @@ export const launchElectron = async ({ cliPath, args, headlessMode, cwd }) => {
     const child = Spawn.spawn(cliPath, allArgs, {
       cwd,
     })
-    child.stdout?.setEncoding('utf-8')
-    child.stderr?.setEncoding('utf-8')
-    child.stdout.on('data', handleStdout)
-    child.stderr.on('data', handleStdErr)
+    state.processes.push(child)
+    if (child.stdout) {
+      child.stdout.setEncoding('utf-8')
+      child.stdout.on('data', handleStdout)
+    }
+    if (child.stderr) {
+      child.stderr.setEncoding('utf-8')
+      child.stderr.on('data', handleStdErr)
+    }
     const webSocketUrl = await WaitForDebuggerListening.waitForDebuggerListening(child.stderr)
     const handleExit = () => {
       child.kill()
     }
     exitHook(handleExit)
-    state.processes.push(child)
     return {
       child,
       webSocketUrl,
