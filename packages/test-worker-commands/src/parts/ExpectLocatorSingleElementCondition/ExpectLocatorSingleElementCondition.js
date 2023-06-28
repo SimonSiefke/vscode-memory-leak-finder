@@ -2,11 +2,12 @@ import * as DevtoolsProtocolRuntime from '../DevtoolsProtocolRuntime/DevtoolsPro
 import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.js'
 import * as SessionState from '../SessionState/SessionState.js'
 
-export const toBeHidden = async (locator, options = {}) => {
+export const checkSingleElementCondition = async (fnName, locator, options = {}) => {
   const pageSession = SessionState.getPageSession()
   if (!pageSession) {
     throw new Error('no page found')
   }
+
   const utilityExecutionContext = await ExecutionContextState.waitForUtilityExecutionContext(pageSession.sessionId)
   if (!utilityExecutionContext) {
     throw new Error(`no utility execution context found`)
@@ -17,11 +18,11 @@ export const toBeHidden = async (locator, options = {}) => {
       {
         value: {
           selector: locator.selector,
-          nth: locator.nth,
+          nth: -1,
         },
       },
       {
-        value: 'toBeHidden',
+        value: fnName,
       },
       {
         value: options,
@@ -31,4 +32,6 @@ export const toBeHidden = async (locator, options = {}) => {
     // uniqueContextId: utilityExecutionContext.uniqueId,
     awaitPromise: true,
   })
+
+  // TODO
 }
