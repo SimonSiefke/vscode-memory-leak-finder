@@ -44,7 +44,6 @@ export const runTest = async (state, file, relativeDirName, relativeFilePath, fi
       page: firstWindow,
       expect: Expect.expect,
     })
-    console.log('vscode is ready now')
     const module = await ImportScript.importScript(file)
     const pageObjectContext = {
       page: firstWindow,
