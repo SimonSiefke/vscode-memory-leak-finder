@@ -70,7 +70,7 @@ const getRelevantLines = (lines, stack) => {
     stack.includes('ExpectError:') ||
     stack.includes('at Module.getElectronErrorMessage') ||
     stack.includes('Target was not created page') ||
-    lines[1].includes('at Module.test') ||
+    (lines[1] && lines[1].includes('at Module.test')) ||
     stack.includes('expected') ||
     (stack.includes('at Object.evaluate ') && stack.includes('PageEvaluate/PageEvaluate.js')) ||
     (stack.includes('at Module.evaluate ') && stack.includes('PageEvaluate/PageEvaluate.js'))
