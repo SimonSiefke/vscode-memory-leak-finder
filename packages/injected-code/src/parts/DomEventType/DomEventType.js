@@ -1,5 +1,6 @@
 export const BeforeInput = 'beforeinput'
 export const Click = 'click'
+export const DoubleClick = 'dblclick'
 export const CompositionEnd = 'compositionend'
 export const CompositionStart = 'compositionstart'
 export const CompositionUpdate = 'compositionupdate'

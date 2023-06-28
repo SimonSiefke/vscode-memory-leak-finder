@@ -1,13 +1,16 @@
 import * as DomEventType from '../DomEventType/DomEventType.js'
 
-export const mouseEvent = (element, eventType, options) => {
-  const event = new MouseEvent(eventType, options)
+const emitEvent = (element, constructor, eventType, options) => {
+  const event = new constructor(eventType, options)
   element.dispatchEvent(event)
 }
 
+export const mouseEvent = (element, eventType, options) => {
+  emitEvent(element, MouseEvent, eventType, options)
+}
+
 export const pointerEvent = (element, eventType, options) => {
-  const event = new PointerEvent(eventType, options)
-  element.dispatchEvent(event)
+  emitEvent(element, PointerEvent, eventType, options)
 }
 
 export const mouseDown = (element, options) => {
@@ -34,6 +37,7 @@ export const click = (element, options) => {
 export const dblclick = (element, options) => {
   click(element, options)
   click(element, options)
+  mouseEvent(element, DomEventType.DoubleClick, options)
 }
 
 export const hover = (element, options) => {

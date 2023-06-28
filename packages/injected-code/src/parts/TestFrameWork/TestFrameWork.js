@@ -94,7 +94,6 @@ export const performAction = async (locator, fnName, options) => {
     })
     if (element) {
       fn(element, options)
-      console.log('action was performed')
       return
     }
     await Timeout.waitForMutation(document.body, 100)

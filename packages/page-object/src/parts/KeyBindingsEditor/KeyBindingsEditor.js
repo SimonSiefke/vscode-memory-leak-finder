@@ -35,19 +35,27 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to show keybindings editor`)
       }
     },
+    async searchFor(searchValue) {
+      try {
+        const keyBindingsEditor = page.locator('.keybindings-editor')
+        const input = keyBindingsEditor.locator('.keybindings-header input')
+        await expect(input).toBeFocused()
+        await input.type(searchValue)
+      } catch (error) {
+        throw new VError(error, `Failed to search for ${searchValue}`)
+      }
+    },
     async setKeyBinding(commandName, keyBinding) {
       try {
         const keyBindingsEditor = page.locator('.keybindings-editor')
         await expect(keyBindingsEditor).toBeVisible()
         const row = keyBindingsEditor.locator(`.monaco-list-row[aria-label^="${commandName}"]`).first()
         await row.dblclick()
-        console.log(await row.textContent())
-        console.log('double clicked')
-        await new Promise(() => {})
         const defineKeyBindingWidget = page.locator('.defineKeybindingWidget')
         await expect(defineKeyBindingWidget).toBeVisible()
         const defineKeyBindingInput = defineKeyBindingWidget.locator('input')
         await expect(defineKeyBindingInput).toBeFocused({ timeout: 10_000 })
+        await new Promise(() => {})
         await page.keyboard.press(keyBinding)
         await expect(defineKeyBindingInput).toHaveValue(keyBinding.replace('Control', 'ctrl').toLowerCase())
         await page.keyboard.press('Enter')
