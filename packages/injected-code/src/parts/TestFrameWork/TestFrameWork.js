@@ -202,6 +202,12 @@ export const pressKeyExponential = async ({ key, waitFor, timeout = maxTimeout }
   throw new AssertionError(message)
 }
 
+export const pressKey = async (key) => {
+  Assert.string(key)
+  const keyboardEventOptions = GetKeyboardEventOptions.getKeyboardEventOptions(key)
+  KeyBoardActions.press(keyboardEventOptions)
+}
+
 export const type = async (locator, text) => {
   Assert.object(locator)
   Assert.string(text)
@@ -228,6 +234,5 @@ export const getTextContent = async (locator) => {
     throw new Error(`must be visible`)
   }
   const text = element.textContent()
-  console.log({ text })
   return text
 }

@@ -55,7 +55,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(defineKeyBindingWidget).toBeVisible()
         const defineKeyBindingInput = defineKeyBindingWidget.locator('input')
         await expect(defineKeyBindingInput).toBeFocused({ timeout: 10_000 })
-        await new Promise(() => {})
+        // await new Promise(() => {})
         await page.keyboard.press(keyBinding)
         await expect(defineKeyBindingInput).toHaveValue(keyBinding.replace('Control', 'ctrl').toLowerCase())
         await page.keyboard.press('Enter')

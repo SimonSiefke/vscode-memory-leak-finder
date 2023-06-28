@@ -12,4 +12,5 @@ export const Commands = {
   pressKeyExponential: TestFrameWork.pressKeyExponential,
   type: TestFrameWork.type,
   getTextContent: TestFrameWork.getTextContent,
+  pressKey: TestFrameWork.pressKey,
 }

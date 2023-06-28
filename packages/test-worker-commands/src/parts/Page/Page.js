@@ -9,6 +9,18 @@ import * as PageTextContent from '../PageTextContent/PageTextContent.js'
 import * as PageType from '../PageType/PageType.js'
 import * as WebWorker from '../WebWorker/WebWorker.js'
 
+const createKeyboard = (rpc) => {
+  return {
+    rpc,
+    press(key) {
+      return PageKeyBoard.press(this.rpc, key)
+    },
+    pressKeyExponential(options) {
+      return PageKeyBoard.pressKeyExponential(options)
+    },
+  }
+}
+
 export const create = async ({ electronRpc, electronObjectId, targetId, sessionId, rpc }) => {
   return {
     type: DevtoolsTargetType.Page,
@@ -34,6 +46,7 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
     pressKeyExponential(options) {
       return PageKeyBoard.pressKeyExponential(options)
     },
+    keyboard: createKeyboard(rpc),
     webWorker() {
       return WebWorker.waitForWebWorker({ sessionId })
     },
@@ -84,7 +97,7 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
         textContent() {
           return PageTextContent.getTextContent({
             selector: this.selector,
-            hastext: this.hasText,
+            hasText: this.hasText,
           })
         },
       }

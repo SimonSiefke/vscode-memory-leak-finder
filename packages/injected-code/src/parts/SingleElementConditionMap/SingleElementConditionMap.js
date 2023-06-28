@@ -18,6 +18,8 @@ export const getFunction = (fnName) => {
       return SingleElementConditions.toHaveCss
     case 'toHaveClass':
       return SingleElementConditions.toHaveClass
+    case 'toBeHidden':
+      return SingleElementConditions.toBeHidden
     default:
       throw new Error(`unexpected function name ${fnName}`)
   }
