@@ -1,4 +1,5 @@
 import { copyFile, mkdir } from 'fs/promises'
+import { dirname } from 'path'
 import * as CleanUpTestState from '../CleanUpTestState/CleanUpTestState.js'
 import * as DefaultVscodeSettingsPath from '../DefaultVscodeSettingsPath/DefaultVsCodeSettingsPath.js'
 import * as Expect from '../Expect/Expect.js'
@@ -28,6 +29,7 @@ export const runTest = async (state, file, relativeDirName, relativeFilePath, fi
     const userDataDir = GetUserDataDir.getUserDataDir()
     const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
     const settingsPath = join(userDataDir, 'User', 'settings.json')
+    await mkdir(dirname(settingsPath), { recursive: true })
     await copyFile(defaultSettingsSourcePath, settingsPath)
     const args = GetVsCodeArgs.getVscodeArgs({
       userDataDir,
