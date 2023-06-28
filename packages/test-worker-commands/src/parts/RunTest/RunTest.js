@@ -1,22 +1,22 @@
-import { mkdir, writeFile } from 'fs/promises'
+import { copyFile, mkdir } from 'fs/promises'
 import * as CleanUpTestState from '../CleanUpTestState/CleanUpTestState.js'
+import * as DefaultVscodeSettingsPath from '../DefaultVscodeSettingsPath/DefaultVsCodeSettingsPath.js'
 import * as Expect from '../Expect/Expect.js'
 import * as GetBinaryPath from '../GetBinaryPath/GetBinaryPath.js'
-import * as GetDefaultVsCodeSettings from '../GetDefaultVscodeSettings/GetDefaultVsCodeSettings.js'
 import * as GetUserDataDir from '../GetUserDataDir/GetUserDataDir.js'
 import * as GetVsCodeArgs from '../GetVsCodeArgs/GetVsCodeArgs.js'
 import * as ImportScript from '../ImportScript/ImportScript.js'
 import * as JsonRpcEvent from '../JsonRpcEvent/JsonRpcEvent.js'
 import * as LaunchElectron from '../LaunchElectron/LaunchElectron.js'
 import * as LaunchElectronApp from '../LaunchElectronApp/LaunchElectronApp.js'
+import * as PageObject from '../PageObject/PageObject.js'
 import { join } from '../Path/Path.js'
 import * as PrettyError from '../PrettyError/PrettyError.js'
 import * as Root from '../Root/Root.js'
-import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
-import * as WaitForVsCodeToBeReady from '../WaitForVsCodeToBeReady/WaitForVsCodeToBeReady.js'
-import * as PageObject from '../PageObject/PageObject.js'
 import * as TestStage from '../TestStage/TestStage.js'
+import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 import { VError } from '../VError/VError.js'
+import * as WaitForVsCodeToBeReady from '../WaitForVsCodeToBeReady/WaitForVsCodeToBeReady.js'
 
 export const runTest = async (state, file, relativeDirName, relativeFilePath, fileName, root, headlessMode, color, callback) => {
   try {
@@ -26,10 +26,9 @@ export const runTest = async (state, file, relativeDirName, relativeFilePath, fi
     await mkdir(testWorkspacePath, { recursive: true })
     const binaryPath = await GetBinaryPath.getBinaryPath()
     const userDataDir = GetUserDataDir.getUserDataDir()
-    const settings = GetDefaultVsCodeSettings.getDefaultVsCodeSettings()
-    const settingsString = JSON.stringify(settings, null, 2) + '\n'
+    const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
     const settingsPath = join(userDataDir, 'User', 'settings.json')
-    await writeFile(settingsPath, settingsString)
+    await copyFile(defaultSettingsSourcePath, settingsPath)
     const args = GetVsCodeArgs.getVscodeArgs({
       userDataDir,
       extraLaunchArgs: [],

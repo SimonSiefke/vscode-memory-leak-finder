@@ -1,0 +1,28 @@
+{
+  "git.openRepositoryInParentFolders": "never",
+  "window.titleBarStyle": "custom",
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/*/**": true,
+    "**/.hg/store/**": true,
+    "**/.vscode-test-workspace/**": true,
+    "**/.vscode-user-data-dir/**": true,
+    "**/dist/**": true,
+    "**/fixtures/**": true
+  },
+  "telemetry.telemetryLevel": "off",
+  "update.mode": "none",
+  "update.showReleaseNotes": false,
+  "workbench.startupEditor": "none",
+  "workbench.tips.enabled": false,
+  "editor.minimap.enabled": false,
+  "workbench.layoutControl.enabled": false,
+  "task.allowAutomaticTasks": "off",
+  "task.autoDetect": "off",
+  "task.problemMatchers.neverPrompt": true,
+  "task.reconnection": false,
+  "task.showDecorations": false,
+  "task.saveBeforeRun": false,
+  "workbench.editor.enablePreview": false
+}
