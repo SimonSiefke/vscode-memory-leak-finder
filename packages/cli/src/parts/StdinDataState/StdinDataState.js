@@ -4,11 +4,13 @@ export const state = {
   value: '',
   mode: ModeType.Waiting,
   buffering: false,
+  headless: false,
 }
 
 export const setState = (newState) => {
   state.value = newState.value
   state.mode = newState.mode
+  state.headless = newState.headless
 }
 
 export const setBuffering = (value) => {

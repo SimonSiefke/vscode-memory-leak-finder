@@ -25,6 +25,12 @@ export const handleStdinDataInterruptedMode = (state, key) => {
         ...state,
         mode: ModeType.Exit,
       }
+    case CliKeys.ToggleHeadlessMode:
+      return {
+        ...state,
+        headless: !state.headless,
+        mode: ModeType.Running,
+      }
     case AnsiKeys.Enter:
       return {
         ...state,

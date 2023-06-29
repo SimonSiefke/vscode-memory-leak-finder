@@ -56,3 +56,18 @@ test('handleStdinDataWaitingMode - escape', () => {
   expect(newState).toBe(state)
   expect(Stdout.write).not.toHaveBeenCalled()
 })
+
+test('handleStdinDataWaitingMode - toggle headless mode', () => {
+  const state = {
+    value: 'abc',
+    headless: false,
+  }
+  const key = 'h'
+  const newState = HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
+  expect(newState).toEqual({
+    value: 'abc',
+    headless: true,
+    mode: ModeType.Running,
+  })
+  expect(Stdout.write).not.toHaveBeenCalled()
+})

@@ -55,6 +55,12 @@ export const handleStdinDataWaitingMode = (state, key) => {
         ...state,
         mode: ModeType.Exit,
       }
+    case CliKeys.ToggleHeadlessMode:
+      return {
+        ...state,
+        headless: !state.headless,
+        mode: ModeType.Running,
+      }
     case AnsiKeys.Escape:
       return state
     default:
