@@ -1,6 +1,7 @@
 import chalk from 'chalk'
 import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.js'
 import * as FormatStack from '../FormatStack/FormatStack.js'
+import * as Character from '../Character/Character.js'
 
 const indentLine = (line) => {
   return '    ' + line
@@ -8,7 +9,7 @@ const indentLine = (line) => {
 
 const indent = (string) => {
   if (!string) {
-    return ''
+    return Character.EmptyString
   }
   return string.split('\n').map(indentLine).join('\n')
 }

@@ -3,6 +3,7 @@ import * as AnsiKeys from '../AnsiKeys/AnsiKeys.js'
 import * as ModeType from '../ModeType/ModeType.js'
 import * as Stdout from '../Stdout/Stdout.js'
 import * as WatchUsage from '../WatchUsage/WatchUsage.js'
+import * as Character from '../Character/Character.js'
 
 export const handleStdinDataFilterWaitingMode = (state, key) => {
   switch (key) {
@@ -29,10 +30,10 @@ export const handleStdinDataFilterWaitingMode = (state, key) => {
       Stdout.write(AnsiEscapes.cursorBackward(state.value.length) + AnsiEscapes.eraseEndLine)
       return {
         ...state,
-        value: '',
+        value: Character.EmptyString,
       }
     case AnsiKeys.Backspace:
-      if (state.value === '') {
+      if (state.value === Character.EmptyString) {
         return state
       }
       Stdout.write(AnsiEscapes.backspace)

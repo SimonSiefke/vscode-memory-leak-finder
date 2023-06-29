@@ -4,6 +4,7 @@ import * as CliKeys from '../CliKeys/CliKeys.js'
 import * as ModeType from '../ModeType/ModeType.js'
 import * as PatternUsage from '../PatternUsage/PatternUsage.js'
 import * as Stdout from '../Stdout/Stdout.js'
+import * as Character from '../Character/Character.js'
 
 export const handleStdinDataWaitingMode = (state, key) => {
   switch (key) {
@@ -27,7 +28,7 @@ export const handleStdinDataWaitingMode = (state, key) => {
       Stdout.write(AnsiEscapes.eraseLine + AnsiEscapes.cursorLeft)
       return {
         ...state,
-        value: '',
+        value: Character.EmptyString,
       }
     case AnsiKeys.Backspace:
       return {
@@ -40,14 +41,14 @@ export const handleStdinDataWaitingMode = (state, key) => {
     case CliKeys.All:
       return {
         ...state,
-        value: '',
+        value: Character.EmptyString,
         mode: ModeType.Running,
       }
     case CliKeys.FilterMode:
       Stdout.write(AnsiEscapes.clear + PatternUsage.print())
       return {
         ...state,
-        value: '',
+        value: Character.EmptyString,
         mode: ModeType.FilterWaiting,
       }
     case CliKeys.Quit:

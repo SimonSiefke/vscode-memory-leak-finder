@@ -5,6 +5,7 @@ import * as ModeType from '../ModeType/ModeType.js'
 import * as PatternUsage from '../PatternUsage/PatternUsage.js'
 import * as Stdout from '../Stdout/Stdout.js'
 import * as WatchUsage from '../WatchUsage/WatchUsage.js'
+import * as Character from '../Character/Character.js'
 
 export const handleStdinDataFinishedRunningMode = (state, key) => {
   switch (key) {
@@ -24,7 +25,7 @@ export const handleStdinDataFinishedRunningMode = (state, key) => {
       Stdout.write(AnsiEscapes.clear + PatternUsage.print())
       return {
         ...state,
-        value: '',
+        value: Character.EmptyString,
         mode: ModeType.FilterWaiting,
       }
     case CliKeys.Quit:

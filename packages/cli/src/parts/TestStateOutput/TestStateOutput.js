@@ -1,5 +1,6 @@
 import * as TestOutputState from '../TestOutputState/TestOutputState.js'
 import * as TestOutputType from '../TestOutputType/TestOutputType.js'
+import * as Character from '../Character/Character.js'
 
 export const addStdout = (data) => {
   TestOutputState.add({ type: TestOutputType.Stdout, data })
@@ -20,7 +21,7 @@ const getBuffer = (pending) => {
 export const clearPending = () => {
   const pending = TestOutputState.getAll()
   if (pending.length === 0) {
-    return ''
+    return Character.EmptyString
   }
   TestOutputState.clear()
   const buffer = getBuffer(pending)

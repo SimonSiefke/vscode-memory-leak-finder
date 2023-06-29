@@ -1,7 +1,8 @@
 import * as ModeType from '../ModeType/ModeType.js'
+import * as Character from '../Character/Character.js'
 
 export const state = {
-  value: '',
+  value: Character.EmptyString,
   mode: ModeType.Waiting,
   buffering: false,
   headless: false,
