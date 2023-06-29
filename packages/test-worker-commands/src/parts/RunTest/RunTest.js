@@ -41,7 +41,7 @@ export const runTest = async (state, file, relativeDirName, relativeFilePath, fi
     const electronApp = await LaunchElectronApp.launch({
       cliPath: binaryPath,
       args,
-      headlessMode: false,
+      headlessMode: true,
       cwd: testWorkspacePath,
       env,
     })

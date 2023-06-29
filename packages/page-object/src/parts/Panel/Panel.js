@@ -4,23 +4,16 @@ export const create = ({ expect, page, VError }) => {
   return {
     async toggle() {
       try {
-        const quickPick = await QuickPick.create({ expect, page, VError })
-        await quickPick.show()
-        // await quickPick.
-        // const quickPick = page.locator(".quick-input-widget");
-        // await page.keyboard.press("Control+Shift+P");
-        await expect(quickPick).toBeVisible()
-        const quickPickInput = quickPick.locator('[role="combobox"]')
-        await expect(quickPickInput).toBeVisible()
-        await expect(quickPickInput).toBeFocused()
-        await quickPickInput.type('Toggle Panel Visibility')
-        const firstOption = quickPick.locator('.monaco-list-row').first()
-        const firstOptionLabel = firstOption.locator('.label-name')
-        await expect(firstOptionLabel).toHaveText('View: Toggle Panel Visibility')
-        await expect(firstOption).toBeVisible()
-        await firstOption.click()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.showCommands()
+        await quickPick.type('Toggle Panel Visibility')
+        await new Promise((r) => {
+          setTimeout(r, 1000)
+        })
+        await quickPick.select('View: Toggle Panel Visibility')
       } catch (error) {
-        throw new VError(error, `Failed to toggle panel`)
+        // throw new VError(error, `Failed to toggle panel`)
+        await new Promise(() => {})
       }
     },
     async show() {
@@ -37,8 +30,16 @@ export const create = ({ expect, page, VError }) => {
       try {
         const panel = page.locator('.part.panel')
         await expect(panel).toBeVisible()
+        await new Promise((r) => {
+          setTimeout(r, 1000)
+        })
         await this.toggle()
+        await new Promise((r) => {
+          setTimeout(r, 1000)
+        })
         await expect(panel).toBeHidden()
+        const group = page.locator('.editor-group-container')
+        await expect(group).toBeFocused()
       } catch (error) {
         throw new VError(error, `Failed to hide panel`)
       }

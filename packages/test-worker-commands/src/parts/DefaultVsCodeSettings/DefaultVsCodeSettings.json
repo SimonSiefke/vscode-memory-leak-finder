@@ -24,5 +24,8 @@
   "task.reconnection": false,
   "task.showDecorations": false,
   "task.saveBeforeRun": false,
-  "workbench.editor.enablePreview": false
+  "workbench.editor.enablePreview": false,
+  "workbench.reduceMotion": "on",
+  "window.restoreFullscreen": true,
+  "window.restoreWindows": "none"
 }

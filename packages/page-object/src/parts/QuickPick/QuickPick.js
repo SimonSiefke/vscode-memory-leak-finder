@@ -11,8 +11,9 @@ export const create = ({ expect, page, VError }) => {
           timeout: 10_000,
         })
         await expect(quickPick).toBeVisible()
-        const firstOption = quickPick.locator('.monaco-list-row').first()
-        await expect(firstOption).toBeVisible()
+        const quickPickInput = quickPick.locator('[role="combobox"]')
+        await expect(quickPickInput).toBeVisible()
+        await expect(quickPickInput).toBeFocused()
       } catch (error) {
         throw new VError(error, `Failed to show quick pick`)
       }
@@ -29,8 +30,8 @@ export const create = ({ expect, page, VError }) => {
         const quickPick = page.locator('.quick-input-widget')
         const quickPickInput = quickPick.locator('[role="combobox"]')
         await expect(quickPickInput).toBeVisible()
-        await expect(quickPickInput).toBeFocused()
-        await quickPickInput.type('> open keyboard shortcuts')
+        await expect(quickPickInput).toBeFocused({ timeout: 3000 })
+        await quickPickInput.type(value)
       } catch (error) {
         throw new VError(error, `Failed to type ${value}`)
       }
@@ -43,6 +44,7 @@ export const create = ({ expect, page, VError }) => {
           hasText: text,
         })
         await option.click()
+        await expect(quickPick).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to select ${text}`)
       }

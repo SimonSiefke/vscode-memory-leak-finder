@@ -7,6 +7,7 @@ import * as DevtoolsProtocolTarget from '../DevtoolsProtocolTarget/DevtoolsProto
 import * as ElectronApp from '../ElectronApp/ElectronApp.js'
 import * as LaunchElectron from '../LaunchElectron/LaunchElectron.js'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.js'
+import * as MonkeyPatchElectronHeadlessMode from '../MonkeyPatchElectronHeadlessMode/MonkeyPatchElectronHeadlessMode.js'
 import * as ObjectType from '../ObjectType/ObjectType.js'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
 import * as SessionState from '../SessionState/SessionState.js'
@@ -40,6 +41,12 @@ export const launch = async ({ cliPath, args, headlessMode, cwd, env }) => {
     generatePreview: true,
   })
   const electronObjectId = electron.result.result.objectId
+  if (headlessMode) {
+    await DevtoolsProtocolDebugger.evaluateOnCallFrame(electronRpc, {
+      callFrameId,
+      expression: MonkeyPatchElectronHeadlessMode.monkeyPatchElectronScript,
+    })
+  }
 
   const monkeyPatchedElectron = await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
     functionDeclaration: MonkeyPatchElectronScript.monkeyPatchElectronScript,
