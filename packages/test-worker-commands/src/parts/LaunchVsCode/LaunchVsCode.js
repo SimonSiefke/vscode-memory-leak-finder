@@ -49,5 +49,6 @@ export const launchVsCode = async ({ headlessMode }) => {
   const pageObject = await PageObject.create(pageObjectContext)
   return {
     pageObject,
+    firstWindow,
   }
 }

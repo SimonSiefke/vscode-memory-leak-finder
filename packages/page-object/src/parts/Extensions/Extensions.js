@@ -4,19 +4,12 @@ export const create = ({ expect, page, VError }) => {
       try {
         const extensionsView = page.locator(`.extensions-viewlet`)
         await expect(extensionsView).toBeVisible()
-        console.log('3')
         const extensionsInput = extensionsView.locator('.inputarea')
-        console.log('4')
         await expect(extensionsInput).toBeFocused()
-        console.log('5')
         const lines = extensionsView.locator('.monaco-editor .view-lines')
-        console.log('6')
         await page.keyboard.press('Control+A')
-        console.log('7')
         await page.keyboard.press('Backspace')
-        console.log('8')
         await expect(lines).toHaveText('')
-        console.log('9')
         await extensionsInput.type(value)
       } catch (error) {
         throw new VError(error, `Failed to search for ${value}`)
@@ -39,9 +32,9 @@ export const create = ({ expect, page, VError }) => {
         })
         await option.click()
         await expect(extensionsView).toBeVisible()
-        const firstExtension = page.locator('.extension-list-item').first()
+        // const firstExtension = page.locator('.extension-list-item').first()
         // await expect(firstExtension).toBeVisible({ timeout: 10_000 })
-        await new Promise(() => {})
+        // await new Promise(() => {})
       } catch (error) {
         throw new VError(error, `Failed to show extensions view`)
       }

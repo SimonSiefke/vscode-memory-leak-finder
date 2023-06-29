@@ -1,8 +1,11 @@
 import * as FileSystem from '../FileSystem/FileSystem.js'
-import * as Path from '../Path/Path.js'
-import * as RunTest from '../RunTest/RunTest.js'
 import * as JsonRpcEvent from '../JsonRpcEvent/JsonRpcEvent.js'
+import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.js'
+import * as Path from '../Path/Path.js'
+import * as PrettyError from '../PrettyError/PrettyError.js'
+import * as RunTest from '../RunTest/RunTest.js'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
+import * as Time from '../Time/Time.js'
 
 const getMatchingFiles = (dirents, filterValue) => {
   const matchingFiles = []
@@ -15,7 +18,7 @@ const getMatchingFiles = (dirents, filterValue) => {
 }
 
 export const runTests = async (root, filterValue, headlessMode, color, callback) => {
-  const start = performance.now()
+  const start = Time.now()
   const testsPath = Path.join(root, 'src')
   const testDirents = await FileSystem.readDir(testsPath)
   const matchingDirents = getMatchingFiles(testDirents, filterValue)
@@ -27,13 +30,41 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
     total,
   }
   callback(JsonRpcEvent.create(TestWorkerEventType.TestsStarting, [total]))
-  for (const dirent of matchingDirents) {
-    const absolutePath = Path.join(testsPath, dirent)
+  if (total > 0) {
+    const first = matchingDirents[0]
+    const absolutePath = Path.join(testsPath, first)
     const relativePath = Path.relative(process.cwd(), absolutePath)
     const relativeDirname = Path.dirname(relativePath)
-    await RunTest.runTest(state, absolutePath, relativeDirname, relativePath, dirent, root, headlessMode, color, callback)
+    callback(JsonRpcEvent.create(TestWorkerEventType.TestRunning, [absolutePath, relativeDirname, first]))
+    let pageObject
+    let firstWindow
+    try {
+      const context = await LaunchVsCode.launchVsCode({
+        headlessMode,
+      })
+      pageObject = context.pageObject
+      firstWindow = context.firstWindow
+    } catch (error) {
+      const prettyError = await PrettyError.prepare(error, { root, color })
+      callback(JsonRpcEvent.create(TestWorkerEventType.TestFailed, [absolutePath, relativeDirname, relativePath, first, prettyError]))
+      state.failed++
+      return
+    }
+    for (let i = 0; i < total; i++) {
+      const dirent = matchingDirents[i]
+      const absolutePath = Path.join(testsPath, dirent)
+      const relativePath = Path.relative(process.cwd(), absolutePath)
+      const relativeDirname = Path.dirname(relativePath)
+      if (i !== 0) {
+        callback(JsonRpcEvent.create(TestWorkerEventType.TestRunning, [absolutePath, relativeDirname, dirent]))
+      }
+      await RunTest.runTest(state, absolutePath, relativeDirname, relativePath, dirent, root, headlessMode, color, pageObject, callback)
+      if (i !== total - 1) {
+        await firstWindow.reload()
+      }
+    }
   }
-  const end = performance.now()
+  const end = Time.now()
   const duration = end - start
   callback(
     JsonRpcEvent.create(TestWorkerEventType.AllTestsFinished, [
