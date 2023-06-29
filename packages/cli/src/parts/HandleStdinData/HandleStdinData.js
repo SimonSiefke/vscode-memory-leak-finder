@@ -1,11 +1,9 @@
-import * as Character from '../Character/Character.js'
 import * as GetNewStdinState from '../GetNewStdinState/GetNewStdinState.js'
 import * as HandleExit from '../HandleExit/HandleExit.js'
 import * as ModeType from '../ModeType/ModeType.js'
 import * as StartRunning from '../StartRunning/StartRunning.js'
-import * as Stdin from '../Stdin/Stdin.js'
 import * as StdinDataState from '../StdinDataState/StdinDataState.js'
-import * as Stdout from '../Stdout/Stdout.js'
+import * as KillWorkers from '../KillWorkers/KillWorkers.js'
 
 export const handleStdinData = async (key) => {
   const state = StdinDataState.getState()
@@ -14,16 +12,13 @@ export const handleStdinData = async (key) => {
     return
   }
   if (newState.mode === ModeType.Exit) {
-    Stdin.setRawMode(false)
-    Stdout.write(Character.NewLine)
-    await HandleExit.handleExit()
-    return
+    return HandleExit.handleExit()
   }
   StdinDataState.setState(newState)
   if (newState.mode === ModeType.Running) {
     await StartRunning.startRunning(state.value, state.headless, /* color */ true)
   }
   if (newState.mode === ModeType.Interrupted) {
-    await HandleExit.killWorker()
+    await KillWorkers.killWorkers()
   }
 }
