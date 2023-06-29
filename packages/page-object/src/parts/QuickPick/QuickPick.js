@@ -1,73 +1,94 @@
 export const create = ({ expect, page, VError }) => {
   return {
-    async show() {
+    async show(key = 'Control+P') {
       try {
-        await page.keyboard.press("Control+Shift+P");
-        const quickPick = page.locator(".quick-input-widget");
-        await expect(quickPick).toBeVisible();
-        const firstOption = quickPick.locator(".monaco-list-row").first();
-        await expect(firstOption).toBeVisible();
+        const quickPick = page.locator('.quick-input-widget')
+        await page.pressKeyExponential({
+          key: key,
+          waitFor: quickPick,
+        })
+        await expect(quickPick).toBeVisible({
+          timeout: 10_000,
+        })
+        await expect(quickPick).toBeVisible()
+        const firstOption = quickPick.locator('.monaco-list-row').first()
+        await expect(firstOption).toBeVisible()
       } catch (error) {
-        throw new VError(error, `Failed to show quick pick`);
+        throw new VError(error, `Failed to show quick pick`)
       }
     },
-    async select(option) {
+    async showCommands() {
       try {
-        const quickPick = page.locator(".quick-input-widget");
-        await expect(quickPick).toBeVisible();
-        const quickPickInput = quickPick.locator('[role="combobox"]');
-        await quickPickInput.type(option);
-        const firstOption = quickPick.locator(".monaco-list-row").first();
-        const firstOptionLabel = firstOption.locator(".label-name");
-        await expect(firstOptionLabel).toHaveText(option);
-        await expect(firstOption).toBeVisible();
-        await firstOption.click();
+        return this.show('Control+Shift+P')
       } catch (error) {
-        throw new VError(error, `Failed to select ${option}`);
+        throw new VError(error, `Failed to show quick pick`)
+      }
+    },
+    async type(value) {
+      try {
+        const quickPick = page.locator('.quick-input-widget')
+        const quickPickInput = quickPick.locator('[role="combobox"]')
+        await expect(quickPickInput).toBeVisible()
+        await expect(quickPickInput).toBeFocused()
+        await quickPickInput.type('> open keyboard shortcuts')
+      } catch (error) {
+        throw new VError(error, `Failed to type ${value}`)
+      }
+    },
+    async select(text) {
+      try {
+        const quickPick = page.locator('.quick-input-widget')
+        await expect(quickPick).toBeVisible()
+        const option = quickPick.locator('.label-name', {
+          hasText: text,
+        })
+        await option.click()
+      } catch (error) {
+        throw new VError(error, `Failed to select ${text}`)
       }
     },
     async showColorTheme() {
       try {
-        await page.keyboard.press("Control+Shift+P");
-        const quickPick = page.locator(".quick-input-widget");
-        await expect(quickPick).toBeVisible();
-        const quickPickInput = quickPick.locator('[role="combobox"]');
+        await page.keyboard.press('Control+Shift+P')
+        const quickPick = page.locator('.quick-input-widget')
+        await expect(quickPick).toBeVisible()
+        const quickPickInput = quickPick.locator('[role="combobox"]')
         // await expect(quickPickInput).toHaveText(">");
-        await quickPickInput.type("Preferences: Color Theme");
-        const firstOption = quickPick.locator(".monaco-list-row").first();
-        const firstOptionLabel = firstOption.locator(".label-name");
-        await expect(firstOptionLabel).toHaveText("Preferences: Color Theme");
-        await expect(firstOption).toBeVisible();
-        await firstOption.click();
+        await quickPickInput.type('Preferences: Color Theme')
+        const firstOption = quickPick.locator('.monaco-list-row').first()
+        const firstOptionLabel = firstOption.locator('.label-name')
+        await expect(firstOptionLabel).toHaveText('Preferences: Color Theme')
+        await expect(firstOption).toBeVisible()
+        await firstOption.click()
       } catch (error) {
-        throw new VError(error, `Failed to show quick pick color theme`);
+        throw new VError(error, `Failed to show quick pick color theme`)
       }
     },
     async focusNext() {
       try {
         // TODO verify that aria active descendant has changed
-        await page.keyboard.press("ArrowDown");
+        await page.keyboard.press('ArrowDown')
       } catch (error) {
-        throw new VError(error, `Failed to focus next quick pick item`);
+        throw new VError(error, `Failed to focus next quick pick item`)
       }
     },
     async focusPrevious() {
       try {
         // TODO verify that aria active descendant has changed
-        await page.keyboard.press("ArrowUp");
+        await page.keyboard.press('ArrowUp')
       } catch (error) {
-        throw new VError(error, `Failed to focus previous quick pick item`);
+        throw new VError(error, `Failed to focus previous quick pick item`)
       }
     },
     async hide() {
       try {
-        const quickPick = page.locator(".quick-input-widget");
-        await expect(quickPick).toBeVisible();
-        await page.keyboard.press("Escape");
-        await expect(quickPick).toBeHidden();
+        const quickPick = page.locator('.quick-input-widget')
+        await expect(quickPick).toBeVisible()
+        await page.keyboard.press('Escape')
+        await expect(quickPick).toBeHidden()
       } catch (error) {
-        throw new VError(error, `Failed to hide quick pick`);
+        throw new VError(error, `Failed to hide quick pick`)
       }
     },
-  };
-};
+  }
+}

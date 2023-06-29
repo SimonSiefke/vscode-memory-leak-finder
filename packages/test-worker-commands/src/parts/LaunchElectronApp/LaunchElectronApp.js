@@ -13,8 +13,8 @@ import * as SessionState from '../SessionState/SessionState.js'
 import * as WaitForDebuggerToBePaused from '../WaitForDebuggerToBePaused/WaitForDebuggerToBePaused.js'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.js'
 
-export const launch = async ({ cliPath, args, headlessMode, cwd }) => {
-  const { child, webSocketUrl } = await LaunchElectron.launchElectron({ cliPath, args, headlessMode, cwd })
+export const launch = async ({ cliPath, args, headlessMode, cwd, env }) => {
+  const { child, webSocketUrl } = await LaunchElectron.launchElectron({ cliPath, args, headlessMode, cwd, env })
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc)
 

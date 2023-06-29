@@ -6,6 +6,7 @@ import * as Expect from '../Expect/Expect.js'
 import * as GetBinaryPath from '../GetBinaryPath/GetBinaryPath.js'
 import * as GetUserDataDir from '../GetUserDataDir/GetUserDataDir.js'
 import * as GetVsCodeArgs from '../GetVsCodeArgs/GetVsCodeArgs.js'
+import * as GetVsCodeEnv from '../GetVsCodeEnv/GetVsCodeEnv.js'
 import * as ImportScript from '../ImportScript/ImportScript.js'
 import * as JsonRpcEvent from '../JsonRpcEvent/JsonRpcEvent.js'
 import * as LaunchElectron from '../LaunchElectron/LaunchElectron.js'
@@ -24,6 +25,7 @@ export const runTest = async (state, file, relativeDirName, relativeFilePath, fi
     const start = performance.now()
     callback(JsonRpcEvent.create(TestWorkerEventType.TestRunning, [file, relativeDirName, fileName]))
     const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
+    const testExtensionsPath = join(Root.root, '.vscode-extensions')
     await mkdir(testWorkspacePath, { recursive: true })
     const binaryPath = await GetBinaryPath.getBinaryPath()
     const userDataDir = GetUserDataDir.getUserDataDir()
@@ -35,11 +37,13 @@ export const runTest = async (state, file, relativeDirName, relativeFilePath, fi
       userDataDir,
       extraLaunchArgs: [],
     })
+    const env = GetVsCodeEnv.getVsCodeEnv({ extensionsFolder: testExtensionsPath })
     const electronApp = await LaunchElectronApp.launch({
       cliPath: binaryPath,
       args,
       headlessMode: false,
       cwd: testWorkspacePath,
+      env,
     })
     const firstWindow = await electronApp.firstWindow()
     await WaitForVsCodeToBeReady.waitForVsCodeToBeReady({

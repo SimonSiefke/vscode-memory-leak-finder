@@ -1,3 +1,5 @@
+import * as QuickPick from '../QuickPick/QuickPick.js'
+
 const getKeybindingButtonsText = (keyBinding) => {
   if (keyBinding.startsWith('Control+')) {
     return `Ctrl+${keyBinding.slice('Control+'.length)}`
@@ -9,20 +11,10 @@ export const create = ({ expect, page, VError }) => {
   return {
     async show() {
       try {
-        const quickPick = page.locator('.quick-input-widget')
-        await page.pressKeyExponential({
-          key: 'Control+P',
-          waitFor: quickPick,
-        })
-        await expect(quickPick).toBeVisible({
-          timeout: 10_000,
-        })
-        const quickPickInput = quickPick.locator('[role="combobox"]')
-        await quickPickInput.type('> open keyboard shortcuts')
-        const option = quickPick.locator('.label-name', {
-          hasText: 'Preferences: Open Keyboard Shortcuts',
-        })
-        await option.click()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.showCommands()
+        await quickPick.type('> open keyboard shortcuts')
+        await quickPick.select('Preferences: Open Keyboard Shortcuts')
         const keyBindingsEditor = page.locator('.keybindings-editor')
         await expect(keyBindingsEditor).toBeVisible({
           timeout: 3_000,
