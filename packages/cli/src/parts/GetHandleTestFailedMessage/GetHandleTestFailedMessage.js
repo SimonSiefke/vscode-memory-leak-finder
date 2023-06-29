@@ -17,13 +17,15 @@ const indent = (string) => {
 const FAIL_TEXT = 'FAIL'
 const FAIL = chalk.reset.inverse.bold.red(` ${FAIL_TEXT} `)
 
+const messageCursorUp = AnsiEscapes.cursorUp()
+const messageEraseLine = AnsiEscapes.eraseLine
+const PREFIX = `${messageCursorUp}${messageEraseLine}${FAIL}`
+
 export const getHandleTestFailedMessage = (file, relativeDirName, relativeFilePath, fileName, error) => {
   const formattedStack = FormatStack.formatStack(error.stack, relativeFilePath)
-  const messageCursorUp = AnsiEscapes.cursorUp()
-  const messageEraseLine = AnsiEscapes.eraseLine
   const messageRelativeDirName = chalk.dim(relativeDirName + '/')
   const messageFileName = chalk.bold(fileName)
-  return `${messageCursorUp}${messageEraseLine}${FAIL} ${messageRelativeDirName}${messageFileName}
+  return `${PREFIX} ${messageRelativeDirName}${messageFileName}
 
       ${error.message}
 

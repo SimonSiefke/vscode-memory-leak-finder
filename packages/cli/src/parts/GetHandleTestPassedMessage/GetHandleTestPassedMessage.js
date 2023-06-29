@@ -6,15 +6,17 @@ const PASS_TEXT = 'PASS'
 
 const PASS = chalk.reset.inverse.bold.green(` ${PASS_TEXT} `)
 
+const messageCursorUp = AnsiEscapes.cursorUp()
+const messageEraseLine = AnsiEscapes.eraseLine
+const PREFIX = `${messageCursorUp}${messageEraseLine}${PASS}`
+
 const formatDuration = (duration) => {
   return `(${FormatAsSeconds.formatAsSeconds(duration)})`
 }
 
 export const getHandleTestPassedMessage = (file, relativeDirName, fileName, duration) => {
-  const messageCursorUp = AnsiEscapes.cursorUp()
-  const messageEraseLine = AnsiEscapes.eraseLine
   const messageRelativeDirName = chalk.dim(relativeDirName + '/')
   const messageFileName = chalk.bold(fileName)
   const messageDuration = formatDuration(duration)
-  return `${messageCursorUp}${messageEraseLine}${PASS} ${messageRelativeDirName}${messageFileName} ${messageDuration}\n`
+  return `${PREFIX} ${messageRelativeDirName}${messageFileName} ${messageDuration}\n`
 }
