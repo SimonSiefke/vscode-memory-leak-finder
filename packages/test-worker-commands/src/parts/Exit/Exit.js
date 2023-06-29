@@ -1,12 +1,13 @@
 import * as LaunchElectron from '../LaunchElectron/LaunchElectron.js'
 import * as ParentProcessIpc from '../ParentProcess/ParentProcess.js'
 import * as Process from '../Process/Process.js'
+import * as Time from '../Time/Time.js'
 
 export const exit = () => {
-  const s = performance.now()
+  const s = Time.now()
   LaunchElectron.cleanup()
   ParentProcessIpc.dispose()
-  const e = performance.now()
+  const e = Time.now()
   // process.exit(0)
   console.log(`finished worker cleanup in ${e - s}ms`)
   const used = process.memoryUsage().heapUsed / 1024 / 1024
