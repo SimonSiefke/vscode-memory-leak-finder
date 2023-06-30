@@ -1,5 +1,3 @@
-export const skip = true
-
 export const setup = async ({ KeyBindingsEditor }) => {
   await KeyBindingsEditor.show()
   await KeyBindingsEditor.searchFor('Copy')

@@ -106,9 +106,9 @@ export const toHaveCss = (locator, { key, value }) => {
   const [element] = QuerySelector.querySelector(locator.selector)
   const locatorString = printLocator(locator)
   if (!element) {
-    return `expected ${locatorString} to have css ${key} ${value} but element was not found`
+    return `expected ${locatorString} to have css ${key}: ${value} but element was not found`
   }
   const style = getComputedStyle(element)
   const actual = style[key]
-  return `expected ${locatorString} to have css ${key} ${value} but was ${actual}`
+  return `expected ${locatorString} to have css "${key}: ${value}" but was ${actual}`
 }

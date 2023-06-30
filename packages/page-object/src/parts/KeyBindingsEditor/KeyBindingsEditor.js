@@ -51,7 +51,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(defineKeyBindingWidget).toBeHidden({ timeout: 5000 })
         const keyBindingsButtonText = getKeybindingButtonsText(keyBinding)
         const rowKeybinding = row.locator('.keybinding')
-        await expect(rowKeybinding).toHaveText(keyBindingsButtonText)
+        await expect(rowKeybinding).toHaveText(keyBindingsButtonText, { timeout: 5000 })
       } catch (error) {
         throw new VError(error, `Failed to set keyBinding ${keyBinding}`)
       }
