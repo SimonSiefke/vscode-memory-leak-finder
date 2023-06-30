@@ -20,7 +20,7 @@ export const toHaveValue = (locator, { value }) => {
 }
 
 const printLocator = (locator) => {
-  if (locator._nth !== -1) {
+  if (locator._nth !== -1 && locator._nth !== undefined) {
     return `${locator.selector}:nth(${locator._nth})`
   }
   if (locator.hasText) {

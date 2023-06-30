@@ -3,7 +3,7 @@ export const create = ({ page, expect, VError }) => {
     async shouldHaveEditorBackground(color) {
       try {
         const workbench = page.locator('.monaco-workbench')
-        await expect(workbench).toHaveCSS('--vscode-editor-background', color)
+        await expect(workbench).toHaveCss('--vscode-editor-background', color)
       } catch (error) {
         throw new VError(error, `editor background has not the expected color`)
       }

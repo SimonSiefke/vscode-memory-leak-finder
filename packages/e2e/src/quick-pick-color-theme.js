@@ -1,16 +1,10 @@
-export const skip = true
+export const skip = false
 
 export const setup = async ({ QuickPick }) => {
   await QuickPick.showColorTheme()
 }
 
-const Colors = {
-  DarkModern: ' #1f1f1f',
-  DarkPlus: ' #1e1e1e',
-  KimbieDark: ' #221a0f',
-}
-
-export const run = async ({ QuickPick, Workbench }) => {
+export const run = async ({ QuickPick, Workbench, Colors }) => {
   await Workbench.shouldHaveEditorBackground(Colors.DarkModern)
   await QuickPick.focusNext()
   await Workbench.shouldHaveEditorBackground(Colors.DarkPlus)

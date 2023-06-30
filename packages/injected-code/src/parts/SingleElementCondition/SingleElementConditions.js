@@ -44,10 +44,17 @@ export const toHaveId = (element, { id }) => {
   return element.id === id
 }
 
+const getActualValue = (style, key) => {
+  if (key.startsWith('--')) {
+    return style.getPropertyValue(key)
+  }
+  return style[key]
+}
+
 export const toHaveCss = (element, { key, value }) => {
   Assert.string(key)
   const style = getComputedStyle(element)
-  const actualValue = style[key]
+  const actualValue = getActualValue(style, key)
   if (value instanceof RegExp) {
     return value.test(actualValue)
   }
