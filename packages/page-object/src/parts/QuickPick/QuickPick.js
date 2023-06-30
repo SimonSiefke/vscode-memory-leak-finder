@@ -56,7 +56,7 @@ export const create = ({ expect, page, VError }) => {
         await this.type(command)
         await this.select(command)
       } catch (error) {
-        throw new VError(error, `Failed to execute command ${command}`)
+        throw new VError(error, `Failed to execute command "${command}"`)
       }
     },
     async showColorTheme() {
