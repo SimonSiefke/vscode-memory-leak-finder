@@ -20,6 +20,12 @@ export const runTest = async (
 ) => {
   try {
     const module = await ImportScript.importScript(file)
+    if (module.skip) {
+      const end = Time.now()
+      const duration = end - start
+      callback(JsonRpcEvent.create(TestWorkerEventType.TestSkipped, [file, relativeDirName, fileName, duration]))
+      return
+    }
     await TestStage.beforeSetup(module, pageObject)
     await TestStage.setup(module, pageObject)
     await TestStage.run(module, pageObject)
