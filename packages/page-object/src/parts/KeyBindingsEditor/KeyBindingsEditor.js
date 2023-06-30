@@ -39,7 +39,7 @@ export const create = ({ expect, page, VError }) => {
       try {
         const keyBindingsEditor = page.locator('.keybindings-editor')
         await expect(keyBindingsEditor).toBeVisible()
-        const row = keyBindingsEditor.locator(`.monaco-list-row[aria-label^="${commandName}"]`).first()
+        const row = keyBindingsEditor.locator(`.monaco-list-row[aria-label^="${commandName}"]:nth-of-type(1)`)
         await row.dblclick()
         const defineKeyBindingWidget = page.locator('.defineKeybindingWidget')
         await expect(defineKeyBindingWidget).toBeVisible()
@@ -53,7 +53,9 @@ export const create = ({ expect, page, VError }) => {
         const rowKeybinding = row.locator('.keybinding')
         await expect(rowKeybinding).toHaveText(keyBindingsButtonText, { timeout: 5000 })
       } catch (error) {
-        throw new VError(error, `Failed to set keyBinding ${keyBinding}`)
+        console.log({ error })
+        await new Promise(() => {})
+        // throw new VError(error, `Failed to set keyBinding "${keyBinding}"`)
       }
     },
   }

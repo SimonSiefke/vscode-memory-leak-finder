@@ -27,5 +27,6 @@
   "workbench.editor.enablePreview": false,
   "workbench.reduceMotion": "on",
   "window.restoreFullscreen": true,
-  "window.restoreWindows": "none"
+  "window.restoreWindows": "none",
+  "window.title": ""
 }

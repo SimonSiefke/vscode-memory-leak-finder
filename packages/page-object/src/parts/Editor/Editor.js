@@ -1,4 +1,5 @@
 import * as QuickPick from '../QuickPick/QuickPick.js'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 
 const initialDiagnosticTimeout = 30_000
 
@@ -107,35 +108,31 @@ export const create = ({ page, expect, VError }) => {
     },
     async goToDefinition() {
       try {
-        await page.keyboard.press('Control+Shift+P')
-        const quickPick = page.locator('.quick-input-widget')
-        await expect(quickPick).toBeVisible()
-        const quickPickInput = quickPick.locator('[role="combobox"]')
-        await quickPickInput.type('Go to Definition')
-        const firstOption = quickPick.locator('.monaco-list-row').first()
-        await expect(firstOption).toContainText('Go to Definition')
-        await firstOption.click()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.GoToDefintiion)
       } catch (error) {
         throw new VError(error, `Failed to go to definition`)
       }
     },
     async shouldHaveOverlayMessage(message) {
       try {
-        const message = page.locator('.monaco-editor-overlaymessage')
-        await expect(message).toBeVisible()
-        await expect(message).toHaveText(message)
+        const messageElement = page.locator('.monaco-editor-overlaymessage')
+        await expect(messageElement).toBeVisible()
+        await expect(messageElement).toHaveText(message)
       } catch (error) {
-        throw new VError(error, `Failed to check overlay message with text ${message}`)
+        throw new VError(error, `Failed to check overlay message with text "${message}"`)
       }
     },
     async click(text) {
       try {
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
-        const startTag = editor.locator('[class^="mtk"]', { hasText: text }).first()
+        const startTag = editor.locator('[class^="mtk"]', { hasText: text, nth: 0 })
         await startTag.click()
       } catch (error) {
-        throw new VError(error, `Failed to click ${text}`)
+        console.log(error)
+        await new Promise(() => {})
+        // throw new VError(error, `Failed to click ${text}`)
       }
     },
     async shouldHaveSquigglyError() {

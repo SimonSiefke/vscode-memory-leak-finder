@@ -51,22 +51,25 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
     webWorker() {
       return WebWorker.waitForWebWorker({ sessionId })
     },
-    locator(selector, { hasText = '' } = {}) {
+    locator(selector, { hasText = '', nth = -1 } = {}) {
       return {
         objectType: ObjectType.Locator,
         selector,
         sessionId,
         hasText,
+        _nth: nth,
         nth(value) {
           return {
             ...this,
-            selector: `${this.selector}:nth-of-type(${value + 1})`,
+            selector: `${this.selector}`,
+            _nth: value + 1,
           }
         },
         first() {
           return {
             ...this,
-            selector: `${this.selector}:nth-of-type(${1})`,
+            selector: `${this.selector}`,
+            _nth: 1,
           }
         },
         count() {
@@ -74,17 +77,20 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
             selector: this.selector,
           })
         },
-        locator(selector, { hasText = '' } = {}) {
+        locator(selector, { hasText = '', nth = -1 } = {}) {
           return {
             ...this,
             selector: `${this.selector} ${selector}`,
             hasText,
+            _nth: nth,
           }
         },
         type(text) {
           return PageType.type(
             {
               selector: this.selector,
+              hasText: this.hasText,
+              _nth: this._nth,
             },
             text
           )
@@ -93,17 +99,21 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
           return PageClick.click({
             selector: this.selector,
             hasText: this.hasText,
+            _nth: this._nth,
           })
         },
         dblclick() {
           return PageClick.dblclick({
             selector: this.selector,
+            hasText: this.hasText,
+            _nth: this._nth,
           })
         },
         textContent() {
           return PageTextContent.getTextContent({
             selector: this.selector,
             hasText: this.hasText,
+            _nth: this._nth,
           })
         },
       }

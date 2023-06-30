@@ -87,6 +87,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(nameLocator).toHaveText(name)
       },
       async click() {
+        // TODO select by data index
         const firstExtension = page.locator('.extension-list-item').first()
         await expect(firstExtension).toBeVisible()
         const nameLocator = firstExtension.locator('.name')

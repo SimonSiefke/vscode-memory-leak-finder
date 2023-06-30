@@ -6,3 +6,4 @@ export const TogglePrimarySideBarVisibility = 'View: Toggle Primary Side Bar Vis
 export const TogglePrimarySideBarPosition = 'View: Toggle Primary Side Bar Position'
 export const ToggleActivityBarVisibility = 'View: Toggle Activity Bar Visibility'
 export const TriggerSuggest = 'Trigger Suggest'
+export const GoToDefintiion = 'Go to Definition'
