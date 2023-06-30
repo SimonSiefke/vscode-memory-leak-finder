@@ -7,6 +7,7 @@ import * as PageKeyBoard from '../PageKeyBoard/PageKeyBoard.js'
 import * as PageReload from '../PageReload/PageReload.js'
 import * as PageTextContent from '../PageTextContent/PageTextContent.js'
 import * as PageType from '../PageType/PageType.js'
+import * as PageCount from '../PageCount/PageCount.js'
 import * as WebWorker from '../WebWorker/WebWorker.js'
 
 const createKeyboard = (rpc) => {
@@ -67,6 +68,11 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
             ...this,
             selector: `${this.selector}:nth-of-type(${1})`,
           }
+        },
+        count() {
+          return PageCount.count({
+            selector: this.selector,
+          })
         },
         locator(selector, { hasText = '' } = {}) {
           return {

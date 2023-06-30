@@ -12,6 +12,7 @@ export const Commands = {
   pressKeyExponential: TestFrameWork.pressKeyExponential,
   type: TestFrameWork.type,
   getTextContent: TestFrameWork.getTextContent,
+  count: TestFrameWork.count,
   pressKey: TestFrameWork.pressKey,
   checkHidden: TestFrameWork.checkHidden,
 }

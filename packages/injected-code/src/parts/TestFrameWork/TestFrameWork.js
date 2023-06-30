@@ -264,3 +264,9 @@ export const getTextContent = async (locator) => {
   const text = element.textContent()
   return text
 }
+
+export const count = (locator) => {
+  Assert.object(locator)
+  const elements = QuerySelector.querySelector(locator.selector)
+  return elements.length
+}

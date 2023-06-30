@@ -12,6 +12,7 @@ import { join } from '../Path/Path.js'
 import * as Root from '../Root/Root.js'
 import { VError } from '../VError/VError.js'
 import * as WaitForVsCodeToBeReady from '../WaitForVsCodeToBeReady/WaitForVsCodeToBeReady.js'
+import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.js'
 
 const getCwd = () => {
   if (process.env.VSCODE_CWD) {
@@ -20,14 +21,9 @@ const getCwd = () => {
   return process.cwd()
 }
 
-const createTestWorkspace = async (testWorkspacePath) => {
-  await mkdir(testWorkspacePath, { recursive: true })
-  await writeFile(join(testWorkspacePath, 'index.html'), '')
-}
-
 export const launchVsCode = async ({ headlessMode }) => {
   const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
-  await createTestWorkspace(testWorkspacePath)
+  await CreateTestWorkspace.createTestWorkspace(testWorkspacePath)
   const testExtensionsPath = join(Root.root, '.vscode-extensions')
   const binaryPath = await GetBinaryPath.getBinaryPath()
   const userDataDir = GetUserDataDir.getUserDataDir()
