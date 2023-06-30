@@ -12,7 +12,12 @@ export const toBeHidden = (element) => {
     return !element.isVisible()
   }
   const style = getComputedStyle(element)
-  return style.display === 'none'
+  if (style.display === 'none') {
+    return true
+  }
+  const rect = element.getBoundingClientRect()
+  console.log({ rect })
+  return rect.width === 0 || rect.height === 0
 }
 
 export const toHaveValue = (element, { value }) => {
