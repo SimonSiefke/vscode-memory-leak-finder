@@ -6,7 +6,6 @@ const getKeybindingButtonsText = (keyBinding) => {
   }
   return keyBinding
 }
-
 export const create = ({ expect, page, VError }) => {
   return {
     async show() {

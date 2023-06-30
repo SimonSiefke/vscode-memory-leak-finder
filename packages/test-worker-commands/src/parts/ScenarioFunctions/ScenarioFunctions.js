@@ -102,6 +102,9 @@ const handleAttachedToBrowser = (message) => {
 const handleAttachedToWorker = async (message) => {
   const sessionId = message.params.sessionId
   const browserSession = SessionState.getSession('browser')
+  if (!browserSession) {
+    return
+  }
   const browserRpc = browserSession.rpc
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
 

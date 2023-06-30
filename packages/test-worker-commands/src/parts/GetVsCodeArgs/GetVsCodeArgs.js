@@ -14,6 +14,5 @@ export const getVscodeArgs = ({ userDataDir, extraLaunchArgs }) => {
     '--user-data-dir',
     userDataDir,
     ...extraLaunchArgs,
-    '.',
   ]
 }

@@ -13,6 +13,13 @@ import * as Root from '../Root/Root.js'
 import { VError } from '../VError/VError.js'
 import * as WaitForVsCodeToBeReady from '../WaitForVsCodeToBeReady/WaitForVsCodeToBeReady.js'
 
+const getCwd = () => {
+  if (process.env.VSCODE_CWD) {
+    return process.env.VSCODE_CWD
+  }
+  return process.cwd()
+}
+
 export const launchVsCode = async ({ headlessMode }) => {
   const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
   const testExtensionsPath = join(Root.root, '.vscode-extensions')
@@ -25,14 +32,15 @@ export const launchVsCode = async ({ headlessMode }) => {
   await copyFile(defaultSettingsSourcePath, settingsPath)
   const args = GetVsCodeArgs.getVscodeArgs({
     userDataDir,
-    extraLaunchArgs: [],
+    extraLaunchArgs: [testWorkspacePath],
   })
+  const cwd = getCwd()
   const env = GetVsCodeEnv.getVsCodeEnv({ extensionsFolder: testExtensionsPath })
   const electronApp = await LaunchElectronApp.launch({
     cliPath: binaryPath,
     args,
     headlessMode,
-    cwd: testWorkspacePath,
+    cwd,
     env,
   })
   const firstWindow = await electronApp.firstWindow()
