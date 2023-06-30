@@ -1,9 +1,9 @@
+import * as LocatorClick from '../LocatorClick/LocatorClick.js'
+import * as LocatorCount from '../LocatorCount/LocatorCount.js'
+import * as LocatorHover from '../LocatorHover/LocatorHover.js'
+import * as LocatorTextContent from '../LocatorTextContent/LocatorTextContent.js'
+import * as LocatorType from '../LocatorType/LocatorType.js'
 import * as ObjectType from '../ObjectType/ObjectType.js'
-import * as PageClick from '../PageClick/PageClick.js'
-import * as PageCount from '../PageCount/PageCount.js'
-import * as PageHover from '../PageHover/PageHover.js'
-import * as PageTextContent from '../PageTextContent/PageTextContent.js'
-import * as PageType from '../PageType/PageType.js'
 
 export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}) => {
   return {
@@ -27,7 +27,7 @@ export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}
       }
     },
     count() {
-      return PageCount.count({
+      return LocatorCount.count({
         selector: this.selector,
       })
     },
@@ -40,7 +40,7 @@ export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}
       }
     },
     type(text) {
-      return PageType.type(
+      return LocatorType.type(
         {
           selector: this.selector,
           hasText: this.hasText,
@@ -50,28 +50,28 @@ export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}
       )
     },
     click() {
-      return PageClick.click({
+      return LocatorClick.click({
         selector: this.selector,
         hasText: this.hasText,
         _nth: this._nth,
       })
     },
     dblclick() {
-      return PageClick.dblclick({
+      return LocatorClick.dblclick({
         selector: this.selector,
         hasText: this.hasText,
         _nth: this._nth,
       })
     },
     hover() {
-      return PageHover.hover({
+      return LocatorHover.hover({
         selector: this.selector,
         hasText: this.hasText,
         _nth: this._nth,
       })
     },
     textContent() {
-      return PageTextContent.getTextContent({
+      return LocatorTextContent.getTextContent({
         selector: this.selector,
         hasText: this.hasText,
         _nth: this._nth,
