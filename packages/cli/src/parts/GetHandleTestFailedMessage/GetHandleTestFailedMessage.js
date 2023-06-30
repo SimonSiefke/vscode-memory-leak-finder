@@ -14,8 +14,8 @@ const indent = (string) => {
   return string.split('\n').map(indentLine).join('\n')
 }
 
-const FAIL_TEXT = 'FAIL'
-const FAIL = chalk.reset.inverse.bold.red(` ${FAIL_TEXT} `)
+const FAIL_TEXT = ' FAIL '
+const FAIL = chalk.reset.inverse.bold.red(FAIL_TEXT)
 
 const messageCursorUp = AnsiEscapes.cursorUp()
 const messageEraseLine = AnsiEscapes.eraseLine
