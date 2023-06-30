@@ -1,5 +1,7 @@
+import * as CleanUpTestState from '../CleanUpTestState/CleanUpTestState.js'
 import * as FileSystem from '../FileSystem/FileSystem.js'
 import * as JsonRpcEvent from '../JsonRpcEvent/JsonRpcEvent.js'
+import * as LaunchElectron from '../LaunchElectron/LaunchElectron.js'
 import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.js'
 import * as Path from '../Path/Path.js'
 import * as PrettyError from '../PrettyError/PrettyError.js'
@@ -30,7 +32,7 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
     total,
   }
   callback(JsonRpcEvent.create(TestWorkerEventType.TestsStarting, [total]))
-  if (total > 0) {
+  outer: if (total > 0) {
     const first = matchingDirents[0]
     const absolutePath = Path.join(testsPath, first)
     const relativePath = Path.relative(process.cwd(), absolutePath)
@@ -48,7 +50,7 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
       const prettyError = await PrettyError.prepare(error, { root, color })
       callback(JsonRpcEvent.create(TestWorkerEventType.TestFailed, [absolutePath, relativeDirname, relativePath, first, prettyError]))
       state.failed++
-      return
+      break outer
     }
     for (let i = 0; i < total; i++) {
       const dirent = matchingDirents[i]
@@ -76,4 +78,6 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
       filterValue,
     ])
   )
+  CleanUpTestState.cleanUpTestState()
+  LaunchElectron.cleanup()
 }

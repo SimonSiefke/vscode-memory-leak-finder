@@ -8,7 +8,15 @@ export const toBeVisible = (locator, options) => {
 }
 
 export const toHaveValue = (locator, { value }) => {
-  return `expected selector ${locator.selector} to have value ${value}`
+  const element = QuerySelector.querySelectorWithOptions(locator.selector, {
+    nth: locator._nth,
+    hasText: locator.hasText,
+  })
+  const locatorString = printLocator(locator)
+  if (!element) {
+    return `expected selector ${locatorString} to have value "${value}" element was not found`
+  }
+  return `expected selector ${locatorString} to have text "${value}" but was "${element.value}"`
 }
 
 const printLocator = (locator) => {
