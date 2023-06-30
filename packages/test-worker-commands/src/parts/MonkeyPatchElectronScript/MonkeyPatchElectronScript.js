@@ -1,4 +1,4 @@
-// based on https://github.com/microsoft/playwright/blob/92375f63338c32aee8c4f3f9b70660577e1a87f2/packages/playwright-core/src/server/electron/loader.ts by Microsoft (License MIT)
+// based on https://github.com/microsoft/playwright/blob/92375f63338c32aee8c4f3f9b70660577e1a87f2/packages/playwright-core/src/server/electron/loader.ts by Microsoft (License Apache 2.0)
 
 // it is necessary to defer the app ready event to avoid
 // race conditions when attaching to the debugger

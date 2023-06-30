@@ -3,6 +3,7 @@ differing from this project:
 
 
 1) License Notice for packages/injected-code/src/parts/UsKeyboardLayout/UsKeyboardLayout.js (from https://github.com/microsoft/playwright/tree/main/packages/playwright-core/src/server/usKeyboardLayout.ts)
+                      packages/test-worker-commands/src/parts/ChromiumSwitches/ChromiumSwitches.js (from https://github.com/microsoft/playwright/tree/mainpackages/playwright-core/src/server/chromium/chromiumSwitches.ts)
 ---------------------------------------
 
 Copyright 2017 Google Inc. All rights reserved.
