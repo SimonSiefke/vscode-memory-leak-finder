@@ -40,6 +40,7 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
     callback(JsonRpcEvent.create(TestWorkerEventType.TestRunning, [absolutePath, relativeDirname, first]))
     let pageObject
     let firstWindow
+    const initialStart = Time.now()
     try {
       const context = await LaunchVsCode.launchVsCode({
         headlessMode,
@@ -60,7 +61,20 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
       if (i !== 0) {
         callback(JsonRpcEvent.create(TestWorkerEventType.TestRunning, [absolutePath, relativeDirname, dirent]))
       }
-      await RunTest.runTest(state, absolutePath, relativeDirname, relativePath, dirent, root, headlessMode, color, pageObject, callback)
+      const start = i === 0 ? initialStart : Time.now()
+      await RunTest.runTest(
+        state,
+        absolutePath,
+        relativeDirname,
+        relativePath,
+        dirent,
+        root,
+        headlessMode,
+        color,
+        pageObject,
+        start,
+        callback
+      )
       if (i !== total - 1) {
         await firstWindow.reload()
       }

@@ -15,10 +15,10 @@ export const runTest = async (
   headlessMode,
   color,
   pageObject,
+  start,
   callback
 ) => {
   try {
-    const start = Time.now()
     const module = await ImportScript.importScript(file)
     await TestStage.beforeSetup(module, pageObject)
     await TestStage.setup(module, pageObject)
