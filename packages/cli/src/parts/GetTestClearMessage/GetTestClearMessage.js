@@ -1,9 +1,6 @@
-import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.js'
-
-const messageCursorUp = AnsiEscapes.cursorUp()
-const messageEraseLine = AnsiEscapes.eraseLine
-
-const clearMessage = `${messageCursorUp}${messageEraseLine}`
+const clear = '\r\x1B[K\r\x1B[1A'
+const height = 2
+const clearMessage = clear.repeat(height)
 
 export const getTestClearMessage = () => {
   return clearMessage
