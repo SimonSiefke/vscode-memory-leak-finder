@@ -25,7 +25,6 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to show quick pick`)
       }
     },
-
     async type(value) {
       try {
         const quickPick = page.locator('.quick-input-widget')
@@ -57,6 +56,15 @@ export const create = ({ expect, page, VError }) => {
         await this.select(command)
       } catch (error) {
         throw new VError(error, `Failed to execute command "${command}"`)
+      }
+    },
+    async openFile(fileName) {
+      try {
+        await this.show('Control+P')
+        await this.type(fileName)
+        await this.select(fileName)
+      } catch (error) {
+        throw new VError(error, `Failed to open "${fileName}"`)
       }
     },
     async showColorTheme() {

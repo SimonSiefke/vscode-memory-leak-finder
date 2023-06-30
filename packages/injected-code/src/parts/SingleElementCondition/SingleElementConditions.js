@@ -16,7 +16,6 @@ export const toBeHidden = (element) => {
     return true
   }
   const rect = element.getBoundingClientRect()
-  console.log({ rect })
   return rect.width === 0 || rect.height === 0
 }
 

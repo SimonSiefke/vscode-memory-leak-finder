@@ -19,6 +19,7 @@ export const checkSingleElementCondition = async (fnName, locator, options = {})
         value: {
           selector: locator.selector,
           nth: -1,
+          hasText: locator.hasText,
         },
       },
       {

@@ -1,23 +1,27 @@
+import * as QuickPick from '../QuickPick/QuickPick.js'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
+
 export const create = ({ page, expect, VError }) => {
   return {
     async open() {
       try {
-        await page.keyboard.press("Control+Space");
-        const suggestWidget = page.locator(".suggest-widget");
-        await expect(suggestWidget).toBeVisible();
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.TriggerSuggest)
+        const suggestWidget = page.locator('.suggest-widget')
+        await expect(suggestWidget).toBeVisible()
       } catch (error) {
-        throw new VError(error, `Failed to open suggest widget`);
+        throw new VError(error, `Failed to open suggest widget`)
       }
     },
     async close() {
       try {
-        const suggestWidget = page.locator(".suggest-widget");
-        await expect(suggestWidget).toBeVisible();
-        await page.keyboard.press("Escape");
-        await expect(suggestWidget).toBeHidden();
+        const suggestWidget = page.locator('.suggest-widget')
+        await expect(suggestWidget).toBeVisible()
+        await page.keyboard.press('Escape')
+        await expect(suggestWidget).toBeHidden()
       } catch (error) {
-        throw new VError(error, `Failed to close suggest widget`);
+        throw new VError(error, `Failed to close suggest widget`)
       }
     },
-  };
-};
+  }
+}

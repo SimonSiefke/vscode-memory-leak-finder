@@ -1,4 +1,4 @@
-import { copyFile, mkdir } from 'fs/promises'
+import { copyFile, mkdir, mkdtemp, writeFile } from 'fs/promises'
 import { dirname } from 'path'
 import * as DefaultVscodeSettingsPath from '../DefaultVscodeSettingsPath/DefaultVsCodeSettingsPath.js'
 import * as Expect from '../Expect/Expect.js'
@@ -20,10 +20,15 @@ const getCwd = () => {
   return process.cwd()
 }
 
+const createTestWorkspace = async (testWorkspacePath) => {
+  await mkdir(testWorkspacePath, { recursive: true })
+  await writeFile(join(testWorkspacePath, 'index.html'), '')
+}
+
 export const launchVsCode = async ({ headlessMode }) => {
   const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
+  await createTestWorkspace(testWorkspacePath)
   const testExtensionsPath = join(Root.root, '.vscode-extensions')
-  await mkdir(testWorkspacePath, { recursive: true })
   const binaryPath = await GetBinaryPath.getBinaryPath()
   const userDataDir = GetUserDataDir.getUserDataDir()
   const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
