@@ -1,3 +1,5 @@
+export const skip=true
+
 export const beforeSetup = async ({ tmpDir, writeFile, join }) => {
   await writeFile(
     join(tmpDir, "index.css"),

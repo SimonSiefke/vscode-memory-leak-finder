@@ -85,7 +85,7 @@ export const toHaveClass = (locator, { className }) => {
   if (!element) {
     return `expected ${locatorString} to have class ${className} but element was not found`
   }
-  return `expected ${locatorString} to have class ${className}`
+  return `expected ${locatorString} to have class "${className}" but was "${element.className}"`
 }
 
 export const toHaveId = (locator, { id }) => {

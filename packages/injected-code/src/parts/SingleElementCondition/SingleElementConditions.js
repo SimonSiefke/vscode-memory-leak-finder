@@ -36,7 +36,7 @@ export const toBeFocused = (element) => {
 
 export const toHaveClass = (element, { className }) => {
   Assert.string(className)
-  return element.classList.contains(className)
+  return element.className === className || element.classList.contains(className)
 }
 
 export const toHaveId = (element, { id }) => {
