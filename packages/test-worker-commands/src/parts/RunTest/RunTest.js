@@ -24,6 +24,7 @@ export const runTest = async (
       const end = Time.now()
       const duration = end - start
       callback(JsonRpcEvent.create(TestWorkerEventType.TestSkipped, [file, relativeDirName, fileName, duration]))
+      state.skipped++
       return
     }
     await TestStage.beforeSetup(module, pageObject)
