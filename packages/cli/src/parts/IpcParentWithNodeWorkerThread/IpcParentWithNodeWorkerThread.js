@@ -35,7 +35,6 @@ export const wrap = (worker) => {
     stdout: worker.stdout,
     stderr: worker.stderr,
     dispose() {
-      console.log('terminate worker')
       this.worker.terminate()
     },
     once(event, listener) {
