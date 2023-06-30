@@ -2,12 +2,13 @@ import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.js
 import * as ObjectType from '../ObjectType/ObjectType.js'
 import * as PageClick from '../PageClick/PageClick.js'
 import * as PageClose from '../PageClose/PageClose.js'
+import * as PageCount from '../PageCount/PageCount.js'
 import * as PageEvaluate from '../PageEvaluate/PageEvaluate.js'
+import * as PageHover from '../PageHover/PageHover.js'
 import * as PageKeyBoard from '../PageKeyBoard/PageKeyBoard.js'
 import * as PageReload from '../PageReload/PageReload.js'
 import * as PageTextContent from '../PageTextContent/PageTextContent.js'
 import * as PageType from '../PageType/PageType.js'
-import * as PageCount from '../PageCount/PageCount.js'
 import * as WebWorker from '../WebWorker/WebWorker.js'
 
 const createKeyboard = (rpc) => {
@@ -104,6 +105,13 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
         },
         dblclick() {
           return PageClick.dblclick({
+            selector: this.selector,
+            hasText: this.hasText,
+            _nth: this._nth,
+          })
+        },
+        hover() {
+          return PageHover.hover({
             selector: this.selector,
             hasText: this.hasText,
             _nth: this._nth,
