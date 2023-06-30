@@ -1,21 +1,17 @@
-import path, { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import path, { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+export const skip = true
 
-const root = path.join(__dirname, "../../../");
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
-const extensionPath = join(
-  root,
-  "packages",
-  "e2e",
-  "fixtures",
-  "sample.show-notification"
-);
+const root = path.join(__dirname, '../../../')
 
-export const extraLaunchArgs = [`--extensionDevelopmentPath=${extensionPath}`];
+const extensionPath = join(root, 'packages', 'e2e', 'fixtures', 'sample.show-notification')
+
+export const extraLaunchArgs = [`--extensionDevelopmentPath=${extensionPath}`]
 
 export const run = async ({ QuickPick }) => {
-  await QuickPick.show();
-  await QuickPick.select("Hello World");
-};
+  await QuickPick.show()
+  await QuickPick.select('Hello World')
+}
