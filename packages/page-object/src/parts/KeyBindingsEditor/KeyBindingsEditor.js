@@ -1,4 +1,5 @@
 import * as QuickPick from '../QuickPick/QuickPick.js'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 
 const getKeybindingButtonsText = (keyBinding) => {
   if (keyBinding.startsWith('Control+')) {
@@ -11,9 +12,7 @@ export const create = ({ expect, page, VError }) => {
     async show() {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
-        await quickPick.showCommands()
-        await quickPick.type('> open keyboard shortcuts')
-        await quickPick.select('Preferences: Open Keyboard Shortcuts')
+        await quickPick.executeCommand(WellKnownCommands.OpenKeyboardShortcuts)
         const keyBindingsEditor = page.locator('.keybindings-editor')
         await expect(keyBindingsEditor).toBeVisible({
           timeout: 3_000,

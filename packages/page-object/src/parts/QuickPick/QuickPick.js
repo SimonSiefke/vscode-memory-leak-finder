@@ -25,6 +25,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to show quick pick`)
       }
     },
+
     async type(value) {
       try {
         const quickPick = page.locator('.quick-input-widget')
@@ -47,6 +48,15 @@ export const create = ({ expect, page, VError }) => {
         await expect(quickPick).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to select ${text}`)
+      }
+    },
+    async executeCommand(command) {
+      try {
+        await this.showCommands()
+        await this.type(command)
+        await this.select(command)
+      } catch (error) {
+        throw new VError(error, `Failed to execute command ${command}`)
       }
     },
     async showColorTheme() {

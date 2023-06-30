@@ -11,10 +11,8 @@ export const setup = async ({ Editor }) => {
 export const run = async ({ QuickPick, page, expect }) => {
   const minimap = page.locator('.minimap')
   await expect(minimap).toBeVisible()
-  await QuickPick.show()
-  await QuickPick.select('View: Toggle Minimap')
+  await QuickPick.executeCommand('View: Toggle Minimap')
   await expect(minimap).toBeHidden()
-  await QuickPick.show()
-  await QuickPick.select('View: Toggle Minimap')
+  await QuickPick.executeCommand('View: Toggle Minimap')
   await expect(minimap).toBeVisible()
 }

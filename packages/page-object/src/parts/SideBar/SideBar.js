@@ -1,13 +1,12 @@
 import * as QuickPick from '../QuickPick/QuickPick.js'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 
 export const create = ({ expect, page, VError }) => {
   return {
     async toggle() {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
-        await quickPick.showCommands()
-        await quickPick.type('Toggle Side Bar Visibility')
-        await quickPick.select('View: Toggle Primary Side Bar Visibility')
+        await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
       } catch (error) {
         throw new VError(error, `Failed to show side bar`)
       }
@@ -34,8 +33,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async togglePosition() {
       const quickPick = QuickPick.create({ expect, page, VError })
-      await quickPick.showCommands()
-      await quickPick.type('Toggle Side Bar Position')
+      await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarPosition)
       await quickPick.select('View: Toggle Primary Side Bar Position')
     },
     async moveRight() {
