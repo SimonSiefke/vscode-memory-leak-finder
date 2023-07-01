@@ -4,7 +4,7 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "e2e": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --runInBand --detectOpenHandles --forceExit",
+    "e2e": "node ../cli/bin/test.js",
     "test:watch": "node ../cli/bin/test.js --watch"
   },
   "keywords": [],

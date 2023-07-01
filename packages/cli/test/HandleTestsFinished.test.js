@@ -11,6 +11,16 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.js', () => {
   }
 })
 
+jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.js', () => {
+  return {
+    isWatchMode() {
+      return true
+    },
+    getState() {},
+    setState() {},
+  }
+})
+
 const Stdout = await import('../src/parts/Stdout/Stdout.js')
 const HandleTestsFinished = await import('../src/parts/HandleTestsFinished/HandleTestsFinished.js')
 

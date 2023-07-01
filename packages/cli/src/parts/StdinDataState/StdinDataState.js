@@ -6,12 +6,14 @@ export const state = {
   mode: ModeType.Waiting,
   buffering: false,
   headless: false,
+  watch: false,
 }
 
 export const setState = (newState) => {
   state.value = newState.value
   state.mode = newState.mode
   state.headless = newState.headless
+  state.watch = newState.watch
 }
 
 export const setBuffering = (value) => {
@@ -20,6 +22,10 @@ export const setBuffering = (value) => {
 
 export const isBuffering = () => {
   return state.buffering
+}
+
+export const isWatchMode = () => {
+  return state.watch
 }
 
 export const getState = () => {

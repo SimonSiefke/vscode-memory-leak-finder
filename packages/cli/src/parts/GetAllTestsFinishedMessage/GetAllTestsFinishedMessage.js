@@ -17,15 +17,18 @@ const getRanAllTestSuitesMessage = (filterValue) => {
   return `${ranAllTestSuitsMatching} /${filterValue}/i${dot}`
 }
 
-export const getAllTestsFinishedMessage = (passed, failed, skipped, total, duration, filterValue) => {
+export const getAllTestsFinishedMessage = (passed, failed, skipped, total, duration, filterValue, isWatchMode) => {
   const failedMessage = failed ? `${chalk.bold.red(`${failed} failed`)}, ` : Character.EmptyString
   const skippedMessage = skipped ? `${chalk.bold.yellow(`${skipped} skipped`)}, ` : Character.EmptyString
   const passedMessage = passed ? `${chalk.bold.green(`${passed} passed`)}, ` : Character.EmptyString
   const durationMessage = FormatAsSeconds.formatAsSeconds(duration)
   const ranAllTestSuitesMessage = getRanAllTestSuitesMessage(filterValue)
-  return `
+  let message = `
 ${testSuites} ${failedMessage}${skippedMessage}${passedMessage}${total} total
 ${time}        ${durationMessage}
-${ranAllTestSuitesMessage}
-${WatchUsageShort.print()}`
+${ranAllTestSuitesMessage}\n`
+  if (isWatchMode) {
+    message += `${WatchUsageShort.print()}`
+  }
+  return message
 }
