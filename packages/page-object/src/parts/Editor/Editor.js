@@ -58,7 +58,7 @@ export const create = ({ page, expect, VError }) => {
     async close() {
       try {
         const main = page.locator('[role="main"]')
-        const tabs = main.locator('[role="tab"]')
+        const tabs = main.locator('[role="tab"]').first()
         const currentCount = await tabs.count()
         if (currentCount === 0) {
           throw new Error('no open editor found')

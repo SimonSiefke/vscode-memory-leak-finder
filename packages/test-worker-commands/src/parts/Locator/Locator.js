@@ -5,25 +5,39 @@ import * as LocatorTextContent from '../LocatorTextContent/LocatorTextContent.js
 import * as LocatorType from '../LocatorType/LocatorType.js'
 import * as ObjectType from '../ObjectType/ObjectType.js'
 
+const mergeSelectors = (selector, subSelector = '', hasText = '', nth = -1) => {
+  let merged = selector
+  if (subSelector) {
+    if (merged) {
+      merged += ` ${subSelector}`
+    } else {
+      merged = subSelector
+    }
+  }
+  if (hasText) {
+    merged += `:has-text("${hasText}")`
+  }
+  if (nth !== -1) {
+    merged += `:nth(${nth})`
+  }
+  return merged
+}
+
 export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}) => {
   return {
     objectType: ObjectType.Locator,
-    selector,
+    selector: mergeSelectors('', selector, hasText, nth),
     sessionId,
-    hasText,
-    _nth: nth,
     nth(value) {
       return {
         ...this,
-        selector: `${this.selector}`,
-        _nth: value + 1,
+        selector: `${this.selector}:nth(${value})`,
       }
     },
     first() {
       return {
         ...this,
-        selector: `${this.selector}`,
-        _nth: 1,
+        selector: `${this.selector}:nth(0)`,
       }
     },
     count() {
@@ -34,17 +48,13 @@ export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}
     locator(selector, { hasText = '', nth = -1 } = {}) {
       return {
         ...this,
-        selector: `${this.selector} ${selector}`,
-        hasText,
-        _nth: nth,
+        selector: mergeSelectors(this.selector, selector, hasText, nth),
       }
     },
     type(text) {
       return LocatorType.type(
         {
           selector: this.selector,
-          hasText: this.hasText,
-          _nth: this._nth,
         },
         text
       )
@@ -52,29 +62,21 @@ export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}
     click() {
       return LocatorClick.click({
         selector: this.selector,
-        hasText: this.hasText,
-        _nth: this._nth,
       })
     },
     dblclick() {
       return LocatorClick.dblclick({
         selector: this.selector,
-        hasText: this.hasText,
-        _nth: this._nth,
       })
     },
     hover() {
       return LocatorHover.hover({
         selector: this.selector,
-        hasText: this.hasText,
-        _nth: this._nth,
       })
     },
     textContent() {
       return LocatorTextContent.getTextContent({
         selector: this.selector,
-        hasText: this.hasText,
-        _nth: this._nth,
       })
     },
   }

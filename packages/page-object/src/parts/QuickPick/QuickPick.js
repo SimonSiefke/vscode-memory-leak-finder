@@ -46,7 +46,7 @@ export const create = ({ expect, page, VError }) => {
         await option.click()
         await expect(quickPick).toBeHidden()
       } catch (error) {
-        throw new VError(error, `Failed to select ${text}`)
+        throw new VError(error, `Failed to select "${text}"`)
       }
     },
     async executeCommand(command) {

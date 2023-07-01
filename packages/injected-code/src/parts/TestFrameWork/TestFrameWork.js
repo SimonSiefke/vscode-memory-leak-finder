@@ -88,10 +88,7 @@ export const performAction = async (locator, fnName, options) => {
     throw new Error(`action ${fnName} not found`)
   }
   while (currentTime < endTime) {
-    const element = QuerySelector.querySelectorWithOptions(locator.selector, {
-      hasText: locator.hasText,
-      nth: locator._nth,
-    })
+    const element = QuerySelector.querySelector(locator.selector)
     if (element) {
       fn(element, options)
       return
@@ -117,10 +114,7 @@ export const checkSingleElementCondition = async (locator, fnName, options) => {
   let currentTime = startTime
   const fn = SingleElementConditionMap.getFunction(fnName)
   while (currentTime < endTime) {
-    const element = QuerySelector.querySelectorWithOptions(locator.selector, {
-      hasText: locator.hasText,
-      nth: locator._nth,
-    })
+    const element = QuerySelector.querySelector(locator.selector)
     if (element) {
       const successful = fn(element, options)
       if (successful) {
@@ -144,10 +138,7 @@ export const checkHidden = async (locator, options) => {
   let currentTime = startTime
   const fn = SingleElementConditionMap.getFunction('toBeHidden')
   while (currentTime < endTime) {
-    const element = QuerySelector.querySelectorWithOptions(locator.selector, {
-      hasText: locator.hasText,
-      nth: locator._nth,
-    })
+    const element = QuerySelector.querySelector(locator.selector)
     if (!element) {
       return
     }
@@ -188,8 +179,9 @@ export const checkMultiElementCondition = async (locator, fnName, options) => {
   const endTime = startTime + maxTimeout
   let currentTime = startTime
   const fn = MultiElementConditionMap.getFunction(fnName)
+  console.log({ options })
   while (currentTime < endTime) {
-    const elements = QuerySelector.querySelector(locator.selector)
+    const elements = QuerySelector.querySelectorAll(locator.selector)
     const successful = fn(elements, options)
     if (successful) {
       return
@@ -215,10 +207,7 @@ export const pressKeyExponential = async ({ key, waitFor, timeout = maxTimeout }
   const keyboardEventOptions = GetKeyboardEventOptions.getKeyboardEventOptions(key)
   while (currentTime < endTime) {
     KeyBoardActions.press(keyboardEventOptions)
-    const element = QuerySelector.querySelectorWithOptions(locator.selector, {
-      hasText: locator.hasText,
-      nth: locator._nth,
-    })
+    const element = QuerySelector.querySelector(locator.selector)
     if (element && toBeVisible(element)) {
       return
     }
@@ -239,10 +228,7 @@ export const pressKey = async (key) => {
 export const type = async (locator, text) => {
   Assert.object(locator)
   Assert.string(text)
-  const element = QuerySelector.querySelectorWithOptions(locator.selector, {
-    hasText: locator.hasText,
-    nth: locator._nth,
-  })
+  const element = QuerySelector.querySelector(locator.selector)
   if (element !== document.activeElement) {
     throw new AssertionError(`expected element to be focused to type into it`)
   }
@@ -250,10 +236,7 @@ export const type = async (locator, text) => {
 
 export const getTextContent = async (locator) => {
   Assert.object(locator)
-  const element = QuerySelector.querySelectorWithOptions(locator.selector, {
-    hasText: locator.hasText,
-    nth: locator._nth,
-  })
+  const element = QuerySelector.querySelector(locator.selector)
   if (!element) {
     throw new Error(`element not found`)
   }

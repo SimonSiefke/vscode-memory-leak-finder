@@ -53,9 +53,7 @@ export const create = ({ expect, page, VError }) => {
         const rowKeybinding = row.locator('.keybinding')
         await expect(rowKeybinding).toHaveText(keyBindingsButtonText, { timeout: 5000 })
       } catch (error) {
-        console.log({ error })
-        await new Promise(() => {})
-        // throw new VError(error, `Failed to set keyBinding "${keyBinding}"`)
+        throw new VError(error, `Failed to set keyBinding "${keyBinding}"`)
       }
     },
   }

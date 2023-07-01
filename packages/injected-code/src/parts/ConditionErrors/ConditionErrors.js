@@ -8,10 +8,7 @@ export const toBeVisible = (locator, options) => {
 }
 
 export const toHaveValue = (locator, { value }) => {
-  const element = QuerySelector.querySelectorWithOptions(locator.selector, {
-    nth: locator._nth,
-    hasText: locator.hasText,
-  })
+  const element = QuerySelector.querySelector(locator.selector)
   const locatorString = printLocator(locator)
   if (!element) {
     return `expected selector ${locatorString} to have value "${value}" element was not found`
@@ -30,10 +27,7 @@ const printLocator = (locator) => {
 }
 
 export const toHaveText = (locator, { text }) => {
-  const element = QuerySelector.querySelectorWithOptions(locator.selector, {
-    nth: locator._nth,
-    hasText: locator.hasText,
-  })
+  const element = QuerySelector.querySelector(locator.selector)
   const locatorString = printLocator(locator)
   if (!element) {
     return `expected selector ${locatorString} to have text "${text}" element was not found`
@@ -42,10 +36,7 @@ export const toHaveText = (locator, { text }) => {
 }
 
 export const toHaveAttribute = (locator, { key, value }) => {
-  const element = QuerySelector.querySelectorWithOptions(locator.selector, {
-    nth: locator._nth,
-    hasText: locator.hasText,
-  })
+  const element = QuerySelector.querySelector(locator.selector)
   const locatorString = printLocator(locator)
   if (!element) {
     return `expected ${locatorString} to have attribute ${key} ${value} but element was not found`

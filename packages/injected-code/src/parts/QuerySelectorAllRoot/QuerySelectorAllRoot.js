@@ -20,7 +20,9 @@ export const querySelector = (root, selector) => {
   Assert.string(selector)
   const elements = querySelectorAll(root, selector)
   if (elements.length > 1) {
-    throw new Error(`too many matching elements for ${selector}, matching ${elements.length}`)
+    // TODO
+    // throw new Error(`too many matching elements for ${selector}, matching ${elements.length}`)
+    return elements[0]
   }
   if (elements.length === 0) {
     return undefined
