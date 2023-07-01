@@ -16,7 +16,7 @@ test('parseSelector - html element', () => {
   ])
 })
 
-test('parseSelector - aria role', () => {
+test('parseSelector - role', () => {
   const selector = '[role="main"]'
   expect(ParseSelector.parseSelector(selector)).toEqual([
     {
