@@ -9,7 +9,6 @@ const querySelectorRoot = (root, body) => {
 export const querySelectorAll = (roots, body) => {
   Assert.array(roots)
   Assert.string(body)
-  console.log({ roots })
   return roots.flatMap((root) => {
     return querySelectorRoot(root, body)
   })

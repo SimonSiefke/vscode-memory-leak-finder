@@ -83,3 +83,17 @@ test('parseSelector - text', () => {
     },
   ])
 })
+
+test('parseSelector - text with colon', () => {
+  const selector = 'h1:has-text("test: test")'
+  expect(ParseSelector.parseSelector(selector)).toEqual([
+    {
+      type: SelectorType.Css,
+      body: 'h1',
+    },
+    {
+      type: SelectorType.Text,
+      body: ':has-text("test: test")',
+    },
+  ])
+})

@@ -20,8 +20,10 @@ export const getSpecialSelectorBody = (selector, i, specialSelector) => {
         if (char === Character.RoundOpen) {
           stack.push(state)
           state = State.Round
-        }
-        if (char === Character.Colon || char === Character.Space) {
+        } else if (char === Character.DoubleQuote) {
+          stack.push(state)
+          state = State.DoubleQuote
+        } else if (char === Character.Colon || char === Character.Space) {
           return selector.slice(i, j - 1)
         }
         break
@@ -29,8 +31,7 @@ export const getSpecialSelectorBody = (selector, i, specialSelector) => {
         if (char === Character.DoubleQuote) {
           stack.push(state)
           state = State.DoubleQuote
-        }
-        if (char === Character.RoundClose) {
+        } else if (char === Character.RoundClose) {
           state = stack.pop() || State.TopLevel
         }
         break

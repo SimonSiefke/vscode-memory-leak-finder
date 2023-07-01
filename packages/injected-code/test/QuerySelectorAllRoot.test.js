@@ -108,3 +108,12 @@ test('querySelectorAll - alternative text selector', () => {
   const selector = 'text=1'
   expect(QuerySelectorAllRoot.querySelectorAll(root, selector)).toEqual([element1])
 })
+
+test('querySelectorAll - text with colon', () => {
+  const root = document.createElement('div')
+  const element = document.createElement('h1')
+  element.textContent = 'Preferences: Open Keyboard Shortcuts'
+  root.append(element)
+  const selector = ':has-text("Preferences: Open Keyboard Shortcuts")'
+  expect(QuerySelectorAllRoot.querySelectorAll(root, selector)).toEqual([element])
+})

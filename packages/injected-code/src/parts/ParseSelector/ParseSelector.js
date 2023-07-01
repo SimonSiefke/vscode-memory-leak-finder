@@ -7,6 +7,15 @@ import * as SelectorType from '../SelectorType/SelectorType.js'
 
 export const parseSelector = (selector) => {
   Assert.string(selector)
+  if (selector.startsWith('text=')) {
+    const text = selector.slice('text='.length)
+    return [
+      {
+        type: SelectorType.Text,
+        body: `:has-text("${text}")`,
+      },
+    ]
+  }
   const parts = []
   let start = 0
   const length = selector.length
@@ -24,7 +33,7 @@ export const parseSelector = (selector) => {
         }
         const type = GetSpecialSelectorType.getSpecialSelectorType(specialSelector)
         const body = GetSpecialSelectorBody.getSpecialSelectorBody(selector, i, specialSelector)
-        i += body.length
+        i += specialSelector.length + body.length
         parts.push({
           type,
           body,
