@@ -49,7 +49,7 @@ test('handleTestFailed', () => {
   HandleTestFailed.handleTestFailed(file, relativeDirName, releativeFilePath, fileName, error)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
-    '\x1B[1A\x1B[2K\x1B[0m\x1B[7m\x1B[1m\x1B[31m FAIL \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2msrc/\x1B[22m\x1B[1msample.close-window.js\x1B[22m\n' +
+    '\r\x1B[K\r\x1B[1A\r\x1B[K\r\x1B[1A\x1B[0m\x1B[7m\x1B[1m\x1B[31m FAIL \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2msrc/\x1B[22m\x1B[1msample.close-window.js\x1B[22m\n' +
       '\n' +
       '      expected window count to be 0 but was 1\n' +
       '\n' +
