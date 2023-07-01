@@ -1,3 +1,4 @@
+import * as Assert from '../Assert/Assert.js'
 import * as Character from '../Character/Character.js'
 import * as GetSpecialSelectorBody from '../GetSpecialSelectorBody/GetSpecialSelectorBody.js'
 import * as GetSpecialSelectorType from '../GetSpecialSelectorType/GetSpecialSelectorType.js'
@@ -5,6 +6,7 @@ import * as ParseSpecialSelector from '../ParseSpecialSelector/ParseSpecialSelec
 import * as SelectorType from '../SelectorType/SelectorType.js'
 
 export const parseSelector = (selector) => {
+  Assert.string(selector)
   const parts = []
   let start = 0
   const length = selector.length
