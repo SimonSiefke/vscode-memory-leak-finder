@@ -1,6 +1,8 @@
-# vscode memory leak finder
+# VSCode Memory Leak Finder
 
-> Find memory leaks in vscode to improve robustness and performance
+Find memory leaks in vscode to improve robustness and performance
+
+## Quickstart
 
 ```sh
 git clone git@github.com:SimonSiefke/vscode-memory-leak-finder.git &&
