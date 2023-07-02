@@ -35,4 +35,5 @@ jobs:
       - run: npm run build
       - run: npm test
       - name: Run headless test
-        run: xvfb-run -a npm run e2e
+        uses: coactions/setup-xvfb@v1
+        run: npm run e2e
