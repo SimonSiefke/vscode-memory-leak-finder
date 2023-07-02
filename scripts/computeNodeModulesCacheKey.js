@@ -19,6 +19,7 @@ const locations = [
   'packages/test-worker-commands/package-lock.json',
   'packages/test-worker-commands/src/parts/VsCodeVersion/VsCodeVersion.js',
   '.github/workflows/ci.yml',
+  '.github/workflows/pr.yml',
   '.github/workflows/release.yml',
   'scripts/computeNodeModulesCacheKey.js',
 ]
