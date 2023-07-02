@@ -53,6 +53,7 @@ jobs:
       - name: npm ci
         run: npm ci
         if: steps.npm-cache.outputs.cache-hit != 'true'
+      - run: npm build
       - run: npm test
       - name: Run headless test
         run: xvfb-run -a npm run e2e
