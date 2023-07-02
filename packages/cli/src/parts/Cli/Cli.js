@@ -8,14 +8,14 @@ import * as StdinDataState from '../StdinDataState/StdinDataState.js'
 
 export const run = async () => {
   const options = ParseArgv.parseArgv(Process.argv)
+  StdinDataState.setState({
+    ...StdinDataState.getState(),
+    watch: options.watch,
+  })
   if (options.watch) {
     SpecialStdin.start()
     Stdout.write(WatchUsage.print())
   } else {
-    StdinDataState.setState({
-      ...StdinDataState.getState(),
-      watch: options.watch,
-    })
     await StartRunning.startRunning('', false, true)
   }
 }
