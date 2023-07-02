@@ -1,4 +1,5 @@
 import * as DomEventType from '../DomEventType/DomEventType.js'
+import * as KeyBoardActions from '../KeyBoardActions/KeyBoardActions.js'
 
 const emitEvent = (element, constructor, eventType, options) => {
   const event = new constructor(eventType, options)
@@ -44,6 +45,18 @@ export const hover = (element, options) => {
   mouseEvent(element, DomEventType.MouseEnter, options)
 }
 
+export const focus = (element) => {
+  element.focus()
+}
+
+export const clear = (element) => {
+  element.value = ''
+}
+
+export const selectText = (element) => {
+  element.setSelectionRange(0, element.value.length)
+}
+
 export const type = (element, options) => {
   element.value = element.value + options.text
   const inputEvent = new InputEvent('input')
@@ -67,6 +80,10 @@ export const keyUp = (element, options) => {
 
 export const keyPress = (element, options) => {
   keyboardEvent(element, DomEventType.KeyPress, options)
+}
+
+export const press = (element, options) => {
+  return KeyBoardActions.press(options, element)
 }
 
 const getEventClass = (eventType) => {
