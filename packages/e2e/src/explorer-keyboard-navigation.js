@@ -1,10 +1,19 @@
 export const skip = true
 
-export const beforeSetup = async ({ tmpDir, writeFile, join }) => {
-  const generateFile = async (_, index) => {
-    await writeFile(join(tmpDir, `file-${index}.txt`), `file content ${index}`)
+const createFiles = () => {
+  const files = []
+  for (let i = 0; i < 10; i++) {
+    files.push({
+      name: `file-${i}.txt`,
+      content: `file content ${i}`,
+    })
   }
-  await Promise.all([...Array(10)].map(generateFile))
+  return files
+}
+
+export const beforeSetup = async ({ Workspace }) => {
+  const files = createFiles()
+  await Workspace.setFiles(files)
 }
 
 export const run = async ({ Explorer }) => {
