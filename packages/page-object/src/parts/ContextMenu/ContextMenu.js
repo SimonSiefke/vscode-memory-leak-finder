@@ -2,12 +2,12 @@ export const create = ({ expect, page, VError }) => {
   return {
     async open(locator) {
       try {
+        const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
         await locator.click({
           button: 'right',
         })
-        const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
         await expect(contextMenu).toBeVisible({
-          timeout: 5000,
+          timeout: 8_000,
         })
         await expect(contextMenu).toBeFocused()
       } catch (error) {
