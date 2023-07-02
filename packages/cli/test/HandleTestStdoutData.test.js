@@ -10,6 +10,14 @@ jest.unstable_mockModule('../src/parts/TestStateOutput/TestStateOutput.js', () =
   }
 })
 
+jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.js', () => {
+  return {
+    isBuffering() {
+      return true
+    },
+  }
+})
+
 const TestStateOutput = await import('../src/parts/TestStateOutput/TestStateOutput.js')
 const HandleTestStdoutData = await import('../src/parts/HandleTestStdoutData/HandleTestStdoutData.js')
 
