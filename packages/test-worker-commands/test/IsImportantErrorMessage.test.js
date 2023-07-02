@@ -25,3 +25,11 @@ test('oom score error', () => {
 test('libproxy error', () => {
   expect(IsImportantError.isImportantErrorMessage(`not found (required by /lib/x86_64-linux-gnu/libproxy.so.1)`)).toBe(false)
 })
+
+test('windows decrypt error', () => {
+  expect(
+    IsImportantError.isImportantErrorMessage(
+      `[5484:0702/103931.964:ERROR:os_crypt_win.cc(83)] Failed to decrypt: Key not valid for use in specified state. (0x8009000B)`
+    )
+  ).toBe(false)
+})

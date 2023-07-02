@@ -13,6 +13,12 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.js', () => {
   }
 })
 
+jest.unstable_mockModule('../src/parts/IsWindows/IsWindows.js', () => {
+  return {
+    isWindows: false,
+  }
+})
+
 const Stdout = await import('../src/parts/Stdout/Stdout.js')
 const HandleStdinDataFilterWaitingMode = await import('../src/parts/HandleStdinDataFilterWaitingMode/HandleStdinDataFilterWaitingMode.js')
 
