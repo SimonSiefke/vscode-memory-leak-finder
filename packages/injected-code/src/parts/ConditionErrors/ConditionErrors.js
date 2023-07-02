@@ -46,8 +46,10 @@ export const toHaveAttribute = (locator, { key, value }) => {
 }
 
 export const toHaveCount = (locator, { count }) => {
+  const elements = QuerySelector.querySelectorAll(locator.selector)
+  const actualCount = elements.length
   const locatorString = printLocator(locator)
-  return `expected ${locatorString} to have count ${count}`
+  return `expected ${locatorString} to have count ${count} but was ${actualCount}`
 }
 
 const stringifyElement = (element) => {
