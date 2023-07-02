@@ -33,12 +33,13 @@ export const parseSelector = (selector) => {
         }
         const type = GetSpecialSelectorType.getSpecialSelectorType(specialSelector)
         const body = GetSpecialSelectorBody.getSpecialSelectorBody(selector, i, specialSelector)
-        i += specialSelector.length + body.length
+        i += body.length
         parts.push({
           type,
           body,
         })
         start = i
+        i--
       }
     }
   }
