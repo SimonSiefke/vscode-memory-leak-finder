@@ -27,10 +27,14 @@ function updateDependencies {
 }
 
 updateDependencies &&
+cd packages/cli && updateDependencies && cd ../../ &&
 cd packages/e2e && updateDependencies && cd ../../ &&
-cd packages/core && updateDependencies && cd ../../ &&
-cd packages/page-object && updateDependencies && cd ../../ &&
+cd packages/file-watcher-worker && updateDependencies && cd ../../ &&
+cd packages/injected-code && updateDependencies && cd ../../ &&
 cd packages/memory-leak-finder && updateDependencies && cd ../../ &&
+cd packages/page-object && updateDependencies && cd ../../ &&
+cd packages/test-worker && updateDependencies && cd ../../ &&
+cd packages/test-worker-commands && updateDependencies && cd ../../ &&
 
 echo "Great Success!"
 
