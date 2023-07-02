@@ -179,7 +179,6 @@ export const checkMultiElementCondition = async (locator, fnName, options) => {
   const endTime = startTime + maxTimeout
   let currentTime = startTime
   const fn = MultiElementConditionMap.getFunction(fnName)
-  console.log({ options })
   while (currentTime < endTime) {
     const elements = QuerySelector.querySelectorAll(locator.selector)
     const successful = fn(elements, options)
@@ -234,7 +233,6 @@ export const clickExponential = async ({ locator, waitFor, waitForHidden, timeou
   while (currentTime < endTime) {
     const element = QuerySelector.querySelector(locator.selector)
     if (element) {
-      console.log({ element, clickOptions })
       ElementAction.click(element, clickOptions)
     }
     if (waitFor) {
@@ -288,6 +286,21 @@ export const getTextContent = async (locator) => {
   }
   const text = element.textContent()
   return text
+}
+
+export const getAttribute = async (locator, attributeName) => {
+  Assert.object(locator)
+  const element = QuerySelector.querySelector(locator.selector)
+  if (!element) {
+    throw new Error(`element not found`)
+  }
+  const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
+  if (!toBeVisible(element)) {
+    throw new Error(`must be visible`)
+  }
+  const attributeValue = element.getAttribute(attributeName)
+  console.log({ attributeName, attributeValue, element })
+  return attributeValue
 }
 
 export const count = (locator) => {

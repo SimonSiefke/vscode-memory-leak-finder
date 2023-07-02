@@ -1,6 +1,7 @@
 export * from '../ExpectLocatorToBeFocused/ExpectLocatorToBeFocused.js'
 export * from '../ExpectLocatorToBeHidden/ExpectLocatorToBeHidden.js'
 export * from '../ExpectLocatorToBeVisible/ExpectLocatorToBeVisible.js'
+export * from '../ExpectLocatorToHaveAttribute/ExpectLocatorToHaveAttribute.js'
 export * from '../ExpectLocatorToHaveClass/ExpectLocatorToHaveClass.js'
 export * from '../ExpectLocatorToHaveCount/ExpectLocatorToHaveCount.js'
 export * from '../ExpectLocatorToHaveCss/ExpectLocatorToHaveCss.js'
