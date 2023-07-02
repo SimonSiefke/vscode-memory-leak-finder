@@ -54,7 +54,7 @@ export const create = ({ page, expect, VError }) => {
         const listId = getListId(className)
         const next = getNextActiveDescendant(listId, current)
         await page.keyboard.press('ArrowDown')
-        expect(await explorer.getAttribute('aria-activedescendant')).toBe(next)
+        await expect(explorer).toHaveAttribute('aria-activedescendant', next)
       } catch (error) {
         throw new VError(error, `Failed to focus next item in explorer`)
       }
