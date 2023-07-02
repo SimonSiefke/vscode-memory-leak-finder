@@ -1,7 +1,7 @@
 import * as Assert from '../Assert/Assert.js'
 import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateInUtilityContext.js'
 
-export const click = async (locator) => {
+export const click = async (locator, options) => {
   Assert.object(locator)
   await EvaluateInUtilityContext.evaluateInUtilityContext({
     functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
@@ -15,6 +15,7 @@ export const click = async (locator) => {
       {
         value: {
           bubbles: true,
+          ...options,
         },
       },
     ],

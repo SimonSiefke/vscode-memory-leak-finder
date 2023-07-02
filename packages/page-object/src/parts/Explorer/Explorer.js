@@ -195,9 +195,12 @@ export const create = ({ page, expect, VError }) => {
         await expect(contextMenu).toBeVisible()
         await expect(contextMenu).toBeFocused()
         const contextMenuItemRename = contextMenu.locator('.action-item', {
-          hasText: 'Rename',
+          hasText: 'Rename...',
         })
-        await page.waitForTimeout(SHORT_TIMEOUT)
+        await expect(contextMenuItemRename).toBeVisible()
+        await new Promise((r) => {
+          setTimeout(r, SHORT_TIMEOUT)
+        })
         await contextMenuItemRename.click()
         const input = explorer.locator('input')
         await input.selectText()

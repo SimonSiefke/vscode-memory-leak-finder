@@ -12,7 +12,10 @@ import * as ObjectType from '../ObjectType/ObjectType.js'
 const mergeSelectors = (selector, subSelector = '', hasText = '', nth = -1) => {
   let merged = selector
   if (subSelector) {
-    if (merged) {
+    if (subSelector.startsWith('text=')) {
+      const text = subSelector.slice('text='.length)
+      return `${merged}:has-text("${text}")`
+    } else if (merged) {
       merged += ` ${subSelector}`
     } else {
       merged = subSelector
@@ -63,10 +66,13 @@ export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}
         text
       )
     },
-    click() {
-      return LocatorClick.click({
-        selector: this.selector,
-      })
+    click(options = {}) {
+      return LocatorClick.click(
+        {
+          selector: this.selector,
+        },
+        options
+      )
     },
     clear() {
       return LocatorClear.clear({
