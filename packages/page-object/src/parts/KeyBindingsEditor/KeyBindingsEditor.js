@@ -5,7 +5,7 @@ import * as IsMacos from '../IsMacos/IsMacos.js'
 const getKeybindingButtonsText = (keyBinding) => {
   if (keyBinding.startsWith('Control+')) {
     if (IsMacos.isMacos) {
-      return `^${keyBinding.slice('Control+'.length)}`
+      return `⌃${keyBinding.slice('Control+'.length)}`
     }
     return `Ctrl+${keyBinding.slice('Control+'.length)}`
   }
