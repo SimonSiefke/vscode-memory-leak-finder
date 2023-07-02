@@ -1,14 +1,18 @@
 import { join } from 'path'
-import { pathToFileURL } from 'url'
 import * as Assert from '../Assert/Assert.js'
+import * as ImportScript from '../ImportScript/ImportScript.js'
 import * as Root from '../Root/Root.js'
+import { VError } from '../VError/VError.js'
 
 const pageObjectPath = join(Root.root, 'packages', 'page-object', 'src', 'main.js')
-const pageObjectUrl = pathToFileURL(pageObjectPath).toString()
 
 export const create = async (context) => {
-  Assert.object(context)
-  const pageObjectModule = await import(pageObjectUrl)
-  const pageObject = pageObjectModule.create(context)
-  return pageObject
+  try {
+    Assert.object(context)
+    const pageObjectModule = await ImportScript.importScript(pageObjectPath)
+    const pageObject = pageObjectModule.create(context)
+    return pageObject
+  } catch (error) {
+    throw new VError(error, `Failed to create page object`)
+  }
 }
