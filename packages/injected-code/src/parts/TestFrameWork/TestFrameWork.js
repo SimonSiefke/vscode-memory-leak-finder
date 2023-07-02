@@ -219,6 +219,29 @@ export const pressKeyExponential = async ({ key, waitFor, timeout = maxTimeout }
   throw new AssertionError(message)
 }
 
+export const clickExponential = async ({ locator, waitForHidden, timeout = maxTimeout }) => {
+  Assert.object(waitForHidden)
+  const exponentialFactor = 2
+  const startTime = Time.getTimeStamp()
+  const endTime = startTime + timeout
+  let currentTime = startTime
+  const toBeHidden = SingleElementConditionMap.getFunction('toBeHidden')
+  let current = 1
+  const clickOptions = { bubbles: true }
+  while (currentTime < endTime) {
+    const element = QuerySelector.querySelector(locator.selector)
+    if (!element || toBeHidden(element)) {
+      return
+    }
+    ElementAction.click(element, clickOptions)
+    current *= exponentialFactor
+    await Timeout.waitForMutation(document.body, current)
+    currentTime = Time.getTimeStamp()
+  }
+  const message = `expected locator "${locator.selector}" to be hidden when clicking "${locator.selector}"`
+  throw new AssertionError(message)
+}
+
 export const pressKey = async (key) => {
   Assert.string(key)
   const keyboardEventOptions = GetKeyboardEventOptions.getKeyboardEventOptions(key)

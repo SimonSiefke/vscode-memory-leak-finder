@@ -1,6 +1,3 @@
-// TODO avoid using timeout
-const SHORT_TIMEOUT = 500
-
 export const create = ({ expect, page, VError }) => {
   return {
     async open(locator) {
@@ -22,11 +19,9 @@ export const create = ({ expect, page, VError }) => {
       const contextMenuItem = contextMenu.locator('.action-item', {
         hasText: option,
       })
-      // TODO click item exponential until context menu is hidden
-      await new Promise((resolve) => {
-        setTimeout(resolve, SHORT_TIMEOUT)
+      await contextMenuItem.clickExponential({
+        waitForHidden: contextMenu,
       })
-      await contextMenuItem.click()
     },
     async close() {
       try {

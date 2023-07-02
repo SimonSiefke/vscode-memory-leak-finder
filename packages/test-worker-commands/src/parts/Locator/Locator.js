@@ -6,6 +6,7 @@ import * as LocatorHover from '../LocatorHover/LocatorHover.js'
 import * as LocatorTextContent from '../LocatorTextContent/LocatorTextContent.js'
 import * as LocatorType from '../LocatorType/LocatorType.js'
 import * as LocatorSelectText from '../LocatorSelectText/LocatorSelectText.js'
+import * as LocatorClickExponential from '../LocatorClickExponential/LocatorClickExponential.js'
 import * as LocatorPress from '../LocatorPress/LocatorPress.js'
 import * as ObjectType from '../ObjectType/ObjectType.js'
 
@@ -103,6 +104,14 @@ export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}
       return LocatorSelectText.selectText({
         selector: this.selector,
       })
+    },
+    clickExponential(options) {
+      return LocatorClickExponential.clickExponential(
+        {
+          selector: this.selector,
+        },
+        options
+      )
     },
     press(key) {
       return LocatorPress.press(
