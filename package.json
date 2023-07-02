@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "postinstall": "lerna bootstrap --ci && node scripts/postinstall.js",
+    "test": "lerna run test",
     "e2e": "lerna run e2e"
   },
   "repository": {
