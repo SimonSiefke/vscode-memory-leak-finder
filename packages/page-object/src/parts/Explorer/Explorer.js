@@ -1,3 +1,5 @@
+import * as KeyBindings from '../KeyBindings/KeyBindings.js'
+
 const RE_NUMER_AT_END = /\d+$/
 
 const getNextActiveDescendant = (listId, activeDescendant) => {
@@ -35,7 +37,7 @@ export const create = ({ page, expect, VError }) => {
       try {
         const quickPick = page.locator('.quick-input-widget')
         await page.pressKeyExponential({
-          key: 'Control+Shift+P',
+          key: KeyBindings.OpenQuickPickCommands,
           waitFor: quickPick,
         })
         await expect(quickPick).toBeVisible()
