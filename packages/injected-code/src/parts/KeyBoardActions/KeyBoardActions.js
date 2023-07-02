@@ -2,9 +2,8 @@ import * as Assert from '../Assert/Assert.js'
 import * as ElementActions from '../ElementActions/ElementActions.js'
 import * as GetKeyCode from '../GetKeyCode/GetKeyCode.js'
 
-export const press = (options) => {
+export const press = (options, element = document.activeElement) => {
   Assert.object(options)
-  const element = document.activeElement
   const allOptions = [options]
   if (options.ctrlKey) {
     allOptions.unshift({

@@ -1,10 +1,10 @@
-export const skip = true
-
-export const beforeSetup = async ({ tmpDir, writeFile, join }) => {
-  await writeFile(join(tmpDir, 'file.txt'), 'sample text')
-}
-
-export const setup = async ({ ActivityBar }) => {
+export const setup = async ({ ActivityBar, Workspace }) => {
+  await Workspace.setFiles([
+    {
+      name: 'file.txt',
+      content: 'sample text',
+    },
+  ])
   await ActivityBar.showSearch()
 }
 
