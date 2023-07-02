@@ -24,7 +24,7 @@ export const getSpecialSelectorBody = (selector, i, specialSelector) => {
           stack.push(state)
           state = State.DoubleQuote
         } else if (char === Character.Colon || char === Character.Space) {
-          return selector.slice(i, j - 1)
+          return selector.slice(i, j)
         }
         break
       case State.Round:
