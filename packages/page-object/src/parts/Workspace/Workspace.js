@@ -17,5 +17,16 @@ export const create = () => {
         await writeFile(absolutePath, file.content)
       }
     },
+    async add(file) {
+      const workspace = join(Root.root, '.vscode-test-workspace')
+      const absolutePath = join(workspace, file.name)
+      await mkdir(dirname(absolutePath), { recursive: true })
+      await writeFile(absolutePath, file.content)
+    },
+    async remove(file) {
+      const workspace = join(Root.root, '.vscode-test-workspace')
+      const absolutePath = join(workspace, file)
+      await rm(absolutePath)
+    },
   }
 }
