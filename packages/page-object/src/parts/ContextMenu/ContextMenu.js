@@ -6,7 +6,9 @@ export const create = ({ expect, page, VError }) => {
           button: 'right',
         })
         const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
-        await expect(contextMenu).toBeVisible()
+        await expect(contextMenu).toBeVisible({
+          timeout: 5000,
+        })
         await expect(contextMenu).toBeFocused()
       } catch (error) {
         throw new VError(error, `Failed to open context menu`)
