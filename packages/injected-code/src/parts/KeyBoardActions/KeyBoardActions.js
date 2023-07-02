@@ -1,5 +1,5 @@
 import * as Assert from '../Assert/Assert.js'
-import * as ElementActions from '../ElementActions/ElementActions.js'
+import * as DispatchEvent from '../DispatchEvent/DispatchEvent.js'
 import * as GetKeyCode from '../GetKeyCode/GetKeyCode.js'
 
 export const press = (options, element = document.activeElement) => {
@@ -30,12 +30,12 @@ export const press = (options, element = document.activeElement) => {
     })
   }
   for (const option of allOptions) {
-    ElementActions.keyDown(element, option)
+    DispatchEvent.keyDown(element, option)
   }
   for (const option of allOptions) {
-    ElementActions.keyPress(element, option)
+    DispatchEvent.keyPress(element, option)
   }
   for (const option of allOptions) {
-    ElementActions.keyUp(element, option)
+    DispatchEvent.keyUp(element, option)
   }
 }
