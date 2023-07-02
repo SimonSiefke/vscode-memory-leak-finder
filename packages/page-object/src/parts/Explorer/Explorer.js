@@ -1,3 +1,6 @@
+import * as QuickPick from '../QuickPick/QuickPick.js'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
+
 const RE_NUMER_AT_END = /\d+$/
 
 const getNextActiveDescendant = (listId, activeDescendant) => {
@@ -33,16 +36,12 @@ export const create = ({ page, expect, VError }) => {
   return {
     async focus() {
       try {
-        const quickPick = page.locator('.quick-input-widget')
-        await page.pressKeyExponential({
-          key: 'Control+Shift+P',
-          waitFor: quickPick,
+        const quickPick = QuickPick.create({
+          page,
+          expect,
+          VError,
         })
-        await expect(quickPick).toBeVisible()
-        const quickPickInput = quickPick.locator('[role="combobox"]')
-        await quickPickInput.type('Focus Explorer')
-        const firstOption = quickPick.locator('.monaco-list-row').first()
-        await firstOption.click()
+        await quickPick.executeCommand(WellKnownCommands.FocusExplorer)
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         await expect(explorer).toBeFocused()
       } catch (error) {

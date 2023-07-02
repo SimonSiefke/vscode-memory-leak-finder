@@ -1,6 +1,8 @@
+import * as KeyBindings from '../KeyBindings/KeyBindings.js'
+
 export const create = ({ expect, page, VError }) => {
   return {
-    async show(key = 'Control+P') {
+    async show(key = KeyBindings.OpenQuickPickFiles) {
       try {
         const quickPick = page.locator('.quick-input-widget')
         await page.pressKeyExponential({
@@ -20,7 +22,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async showCommands() {
       try {
-        return this.show('Control+Shift+P')
+        return this.show(KeyBindings.OpenQuickPickCommands)
       } catch (error) {
         throw new VError(error, `Failed to show quick pick`)
       }
@@ -60,7 +62,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async openFile(fileName) {
       try {
-        await this.show('Control+P')
+        await this.show(KeyBindings.OpenQuickPickFiles)
         await this.type(fileName)
         await this.select(fileName)
       } catch (error) {
@@ -69,7 +71,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async showColorTheme() {
       try {
-        await page.keyboard.press('Control+Shift+P')
+        await page.keyboard.press(KeyBindings.OpenQuickPickCommands)
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
         const quickPickInput = quickPick.locator('[role="combobox"]')
@@ -87,7 +89,7 @@ export const create = ({ expect, page, VError }) => {
     async focusNext() {
       try {
         // TODO verify that aria active descendant has changed
-        await page.keyboard.press('ArrowDown')
+        await page.keyboard.press(KeyBindings.ArrowDown)
       } catch (error) {
         throw new VError(error, `Failed to focus next quick pick item`)
       }
@@ -95,7 +97,7 @@ export const create = ({ expect, page, VError }) => {
     async focusPrevious() {
       try {
         // TODO verify that aria active descendant has changed
-        await page.keyboard.press('ArrowUp')
+        await page.keyboard.press(KeyBindings.ArrowUp)
       } catch (error) {
         throw new VError(error, `Failed to focus previous quick pick item`)
       }
@@ -104,7 +106,7 @@ export const create = ({ expect, page, VError }) => {
       try {
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
-        await page.keyboard.press('Escape')
+        await page.keyboard.press(KeyBindings.Escape)
         await expect(quickPick).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to hide quick pick`)

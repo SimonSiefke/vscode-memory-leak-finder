@@ -14,6 +14,14 @@ export const press = (options) => {
       code: GetKeyCode.getCode('Control'),
     })
   }
+  if (options.metaKey) {
+    allOptions.unshift({
+      ...options,
+      key: 'Meta',
+      keyCode: GetKeyCode.getKeyCode('Meta'),
+      code: GetKeyCode.getKeyCode('Meta'),
+    })
+  }
   if (options.shiftKey) {
     allOptions.unshift({
       ...options,
