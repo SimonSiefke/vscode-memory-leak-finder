@@ -1,3 +1,6 @@
+import * as QuickPick from '../QuickPick/QuickPick.js'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
+
 export const create = ({ expect, page, VError }) => {
   return {
     async search(value) {
@@ -17,20 +20,14 @@ export const create = ({ expect, page, VError }) => {
     },
     async show() {
       try {
+        const quickPick = QuickPick.create({
+          page,
+          expect,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.ShowExtensions)
         const extensionsView = page.locator(`.extensions-viewlet`)
-        await expect(extensionsView).toBeHidden()
-        const quickPick = page.locator('.quick-input-widget')
-        await page.pressKeyExponential({
-          key: 'Control+Shift+P',
-          waitFor: quickPick,
-        })
-        await expect(quickPick).toBeVisible()
-        const quickPickInput = quickPick.locator('[role="combobox"]')
-        await quickPickInput.type('view extensions')
-        const option = quickPick.locator('.label-name', {
-          hasText: 'View: Show Extensions',
-        })
-        await option.click()
+
         await expect(extensionsView).toBeVisible()
         // const firstExtension = page.locator('.extension-list-item').first()
         // await expect(firstExtension).toBeVisible({ timeout: 10_000 })
@@ -43,13 +40,12 @@ export const create = ({ expect, page, VError }) => {
       try {
         const extensionsView = page.locator(`.extensions-viewlet`)
         await expect(extensionsView).toBeVisible()
-        await page.keyboard.press('Control+Shift+P')
-        const quickPick = page.locator('.quick-input-widget')
-        await expect(quickPick).toBeVisible()
-        const quickPickInput = quickPick.locator('[role="combobox"]')
-        await quickPickInput.type('Toggle Side Bar Visibility')
-        const firstOption = quickPick.locator('.monaco-list-row').first()
-        await firstOption.click()
+        const quickPick = QuickPick.create({
+          page,
+          expect,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
         await expect(extensionsView).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to hide extensions view`)
