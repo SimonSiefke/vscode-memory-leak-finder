@@ -1,10 +1,12 @@
 export const skip = true
 
-export const beforeSetup = async ({ tmpDir, writeFile, join }) => {
-  await writeFile(join(tmpDir, 'index.html'), '<h1>hello world</h1>')
-}
-
-export const setup = async ({ Editor }) => {
+export const setup = async ({ Editor, Workspace }) => {
+  await Workspace.setFiles([
+    {
+      name: 'index.html',
+      content: '<h1>hello world</h1>',
+    },
+  ])
   await Editor.open('index.html')
 }
 

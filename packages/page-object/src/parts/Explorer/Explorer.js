@@ -207,7 +207,7 @@ export const create = ({ page, expect, VError }) => {
         const newDirent = explorer.locator(`text=${newDirentName}`)
         await expect(newDirent).toBeVisible()
       } catch (error) {
-        throw new VError(error, `Failed to rename explorer item from ${oldDirentName} to ${newDirentName}`)
+        throw new VError(error, `Failed to rename explorer item from "${oldDirentName}" to "${newDirentName}"`)
       }
     },
     not: {
