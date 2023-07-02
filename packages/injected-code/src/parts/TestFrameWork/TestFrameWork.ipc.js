@@ -16,4 +16,5 @@ export const Commands = {
   pressKey: TestFrameWork.pressKey,
   checkHidden: TestFrameWork.checkHidden,
   clickExponential: TestFrameWork.clickExponential,
+  getAttribute: TestFrameWork.getAttribute,
 }

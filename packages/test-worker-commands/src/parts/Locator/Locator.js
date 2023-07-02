@@ -1,13 +1,14 @@
 import * as LocatorClear from '../LocatorClear/LocatorClear.js'
 import * as LocatorClick from '../LocatorClick/LocatorClick.js'
+import * as LocatorClickExponential from '../LocatorClickExponential/LocatorClickExponential.js'
 import * as LocatorCount from '../LocatorCount/LocatorCount.js'
 import * as LocatorFocus from '../LocatorFocus/LocatorFocus.js'
+import * as LocatorGetAttribute from '../LocatorGetAttribute/LocatorGetAttribute.js'
 import * as LocatorHover from '../LocatorHover/LocatorHover.js'
+import * as LocatorPress from '../LocatorPress/LocatorPress.js'
+import * as LocatorSelectText from '../LocatorSelectText/LocatorSelectText.js'
 import * as LocatorTextContent from '../LocatorTextContent/LocatorTextContent.js'
 import * as LocatorType from '../LocatorType/LocatorType.js'
-import * as LocatorSelectText from '../LocatorSelectText/LocatorSelectText.js'
-import * as LocatorClickExponential from '../LocatorClickExponential/LocatorClickExponential.js'
-import * as LocatorPress from '../LocatorPress/LocatorPress.js'
 import * as ObjectType from '../ObjectType/ObjectType.js'
 
 const mergeSelectors = (selector, subSelector = '', hasText = '', nth = -1) => {
@@ -104,6 +105,14 @@ export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}
       return LocatorSelectText.selectText({
         selector: this.selector,
       })
+    },
+    getAttribute(attributeName) {
+      return LocatorGetAttribute.getAttribute(
+        {
+          selector: this.selector,
+        },
+        attributeName
+      )
     },
     clickExponential(options) {
       return LocatorClickExponential.clickExponential(
