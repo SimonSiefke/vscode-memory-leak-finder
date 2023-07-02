@@ -1,10 +1,12 @@
 # vscode memory leak finder
 
+> Find memory leaks in vscode to improve robustness and performance
+
 ```sh
 git clone git@github.com:SimonSiefke/vscode-memory-leak-finder.git &&
 cd vscode-memory-leak-finder &&
 npm ci &&
-SCENARIO=quick-pick-color-theme node src/main.js
+npm run e2e
 ```
 
 ## Gitpod
