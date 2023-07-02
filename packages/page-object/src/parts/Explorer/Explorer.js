@@ -191,6 +191,19 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to rename explorer item from "${oldDirentName}" to "${newDirentName}"`)
       }
     },
+    async refresh() {
+      try {
+        const explorer = page.locator('.explorer-folders-view .monaco-list')
+        await expect(explorer).toBeVisible()
+        const header = page.locator(`.pane-header[aria-label^="Explorer Section"]`)
+        await expect(header).toBeVisible()
+        await header.hover()
+        const button = page.locator(`[role="button"][aria-label="Refresh Explorer"]`)
+        await button.click()
+      } catch (error) {
+        throw new VError(error, `Failed to refresh explorer`)
+      }
+    },
     not: {
       async toHaveItem(direntName) {
         try {
@@ -198,7 +211,7 @@ export const create = ({ page, expect, VError }) => {
           const dirent = explorer.locator('.monaco-list-row', {
             hasText: direntName,
           })
-          await expect(dirent).not.toBeVisible()
+          await expect(dirent).toBeHidden()
         } catch (error) {
           throw new VError(error, `Failed to verify that explorer doesn't have dirent ${direntName}`)
         }
