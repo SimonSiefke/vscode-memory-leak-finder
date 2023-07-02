@@ -20,8 +20,11 @@ export const querySelectorAll = (roots, body) => {
   Assert.array(roots)
   Assert.string(body)
   const text = ParseSpecialSelectorBody.parseString(body, SpecialSelectorPrefix.HasText)
+  if (roots.length === 1 && roots[0] === document.documentElement) {
+    return querySelectorRoot(roots[0], text)
+  }
   // TODO avoid closure
-  return roots.flatMap((root) => {
-    return querySelectorRoot(root, text)
+  return roots.filter((root) => {
+    return (root.textContent = text)
   })
 }
