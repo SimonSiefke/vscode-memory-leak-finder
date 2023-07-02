@@ -1,5 +1,5 @@
-import { readdir, rm, writeFile } from 'fs/promises'
-import { join } from 'path'
+import { mkdir, readdir, rm, writeFile } from 'fs/promises'
+import { dirname, join } from 'path'
 import * as Root from '../Root/Root.js'
 
 export const create = () => {
@@ -13,6 +13,7 @@ export const create = () => {
       }
       for (const file of files) {
         const absolutePath = join(workspace, file.name)
+        await mkdir(dirname(absolutePath), { recursive: true })
         await writeFile(absolutePath, file.content)
       }
     },

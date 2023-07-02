@@ -1,11 +1,24 @@
 export const skip = true
 
-export const beforeSetup = async ({ tmpDir, writeFile, mkdir, join }) => {
-  await writeFile(join(tmpDir, `file-1.txt`), `file content 1`)
-  await writeFile(join(tmpDir, `file-2.txt`), `file content 2`)
-  await mkdir(join(tmpDir, `folder`))
-  await writeFile(join(tmpDir, 'folder', `file-3.txt`), `file content 3`)
-  await writeFile(join(tmpDir, 'folder', `file-4.txt`), `file content 4`)
+export const beforeSetup = async ({ Workspace }) => {
+  await Workspace.setFiles([
+    {
+      name: 'file-1.txt',
+      content: 'file content 1',
+    },
+    {
+      name: 'file-2.txt',
+      content: 'file content 2',
+    },
+    {
+      name: 'folder/file-3.txt',
+      content: 'file content 3',
+    },
+    {
+      name: 'folder/file-4.txt',
+      content: 'file content 4',
+    },
+  ])
 }
 
 export const run = async ({ Explorer }) => {
