@@ -1,7 +1,7 @@
 import * as Assert from '../Assert/Assert.js'
 import { AssertionError } from '../AssertionError/AssertionError.js'
 import * as ConditionErrorMap from '../ConditionErrorMap/ConditionErrorMap.js'
-import * as ElementActions from '../ElementActions/ElementActions.js'
+import * as ElementAction from '../ElementAction/ElementAction.js'
 import * as GetKeyboardEventOptions from '../GetKeyboardEventOptions/GetKeyboardEventOptions.js'
 import * as KeyBoardActions from '../KeyBoardActions/KeyBoardActions.js'
 import * as MultiElementConditionMap from '../MultiElementConditionMap/MultiElementConditionMap.js'
@@ -83,7 +83,7 @@ export const performAction = async (locator, fnName, options) => {
   const startTime = Time.getTimeStamp()
   const endTime = startTime + maxTimeout
   let currentTime = startTime
-  const fn = ElementActions[fnName]
+  const fn = ElementAction[fnName]
   if (!fn) {
     throw new Error(`action ${fnName} not found`)
   }
