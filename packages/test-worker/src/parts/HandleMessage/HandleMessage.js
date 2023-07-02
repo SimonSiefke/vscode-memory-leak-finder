@@ -1,12 +1,11 @@
 import { join } from 'path'
-import { pathToFileURL } from 'url'
+import * as ImportScript from '../ImportScript/ImportScript.js'
 import * as Root from '../Root/Root.js'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.js'
 
 const getModule = async () => {
   const testWorkerCommandsPath = join(Root.root, '..', '..', 'test-worker-commands', 'src', 'main.js')
-  const url = pathToFileURL(testWorkerCommandsPath).toString()
-  const module = await import(url)
+  const module = await ImportScript.importScript(testWorkerCommandsPath)
   return module
 }
 

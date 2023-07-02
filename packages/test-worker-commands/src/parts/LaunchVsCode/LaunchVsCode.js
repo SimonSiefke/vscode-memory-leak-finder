@@ -22,42 +22,46 @@ const getCwd = () => {
 }
 
 export const launchVsCode = async ({ headlessMode }) => {
-  const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
-  await CreateTestWorkspace.createTestWorkspace(testWorkspacePath)
-  const testExtensionsPath = join(Root.root, '.vscode-extensions')
-  const binaryPath = await GetBinaryPath.getBinaryPath()
-  const userDataDir = GetUserDataDir.getUserDataDir()
-  const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
-  const settingsPath = join(userDataDir, 'User', 'settings.json')
-  await mkdir(dirname(settingsPath), { recursive: true })
-  await copyFile(defaultSettingsSourcePath, settingsPath)
-  const args = GetVsCodeArgs.getVscodeArgs({
-    userDataDir,
-    extraLaunchArgs: [testWorkspacePath],
-  })
-  const cwd = getCwd()
-  const env = GetVsCodeEnv.getVsCodeEnv({ extensionsFolder: testExtensionsPath })
-  const electronApp = await LaunchElectronApp.launch({
-    cliPath: binaryPath,
-    args,
-    headlessMode,
-    cwd,
-    env,
-  })
-  const firstWindow = await electronApp.firstWindow()
-  await WaitForVsCodeToBeReady.waitForVsCodeToBeReady({
-    page: firstWindow,
-    expect: Expect.expect,
-  })
-  const pageObjectContext = {
-    page: firstWindow,
-    expect: Expect.expect,
-    VError,
-    electronApp,
-  }
-  const pageObject = await PageObject.create(pageObjectContext)
-  return {
-    pageObject,
-    firstWindow,
+  try {
+    const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
+    await CreateTestWorkspace.createTestWorkspace(testWorkspacePath)
+    const testExtensionsPath = join(Root.root, '.vscode-extensions')
+    const binaryPath = await GetBinaryPath.getBinaryPath()
+    const userDataDir = GetUserDataDir.getUserDataDir()
+    const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
+    const settingsPath = join(userDataDir, 'User', 'settings.json')
+    await mkdir(dirname(settingsPath), { recursive: true })
+    await copyFile(defaultSettingsSourcePath, settingsPath)
+    const args = GetVsCodeArgs.getVscodeArgs({
+      userDataDir,
+      extraLaunchArgs: [testWorkspacePath],
+    })
+    const cwd = getCwd()
+    const env = GetVsCodeEnv.getVsCodeEnv({ extensionsFolder: testExtensionsPath })
+    const electronApp = await LaunchElectronApp.launch({
+      cliPath: binaryPath,
+      args,
+      headlessMode,
+      cwd,
+      env,
+    })
+    const firstWindow = await electronApp.firstWindow()
+    await WaitForVsCodeToBeReady.waitForVsCodeToBeReady({
+      page: firstWindow,
+      expect: Expect.expect,
+    })
+    const pageObjectContext = {
+      page: firstWindow,
+      expect: Expect.expect,
+      VError,
+      electronApp,
+    }
+    const pageObject = await PageObject.create(pageObjectContext)
+    return {
+      pageObject,
+      firstWindow,
+    }
+  } catch (error) {
+    throw new VError(error, `Failed to launch VSCode`)
   }
 }
