@@ -1,12 +1,21 @@
 export const skip = true
 
-export const beforeSetup = async ({ tmpDir, writeFile, join, writeSettings }) => {
-  await writeFile(join(tmpDir, 'file-1.txt'), ``)
-  await writeFile(join(tmpDir, 'file-2.txt'), ``)
-  await writeFile(join(tmpDir, 'file-3.txt'), ``)
-  await writeSettings({
-    'window.titleBarStyle': 'custom',
-  })
+export const beforeSetup = async ({ Workspace, Explorer }) => {
+  await Workspace.setFiles([
+    {
+      name: 'file-1.txt',
+      content: '',
+    },
+    {
+      name: 'file-2.txt',
+      content: '',
+    },
+    {
+      name: 'file-3.txt',
+      content: '',
+    },
+  ])
+  await Explorer.focus()
 }
 
 export const run = async ({ Explorer }) => {
