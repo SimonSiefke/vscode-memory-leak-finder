@@ -1,3 +1,4 @@
+import * as ContextMenu from '../ContextMenu/ContextMenu.js'
 import * as QuickPick from '../QuickPick/QuickPick.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 
@@ -28,9 +29,6 @@ const getListId = (classNameString) => {
   }
   throw new Error(`Failed to extract list id from explorer`)
 }
-
-// TODO avoid using timeout
-const SHORT_TIMEOUT = 250
 
 export const create = ({ page, expect, VError }) => {
   return {
@@ -127,19 +125,7 @@ export const create = ({ page, expect, VError }) => {
           hasText: dirent,
         })
         await expect(oldDirent).toBeVisible()
-        await oldDirent.click({
-          button: 'right',
-        })
-        const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
-        await expect(contextMenu).toBeVisible()
-        await expect(contextMenu).toBeFocused()
-        const contextMenuItemCopy = contextMenu
-          .locator('.action-item', {
-            hasText: 'Copy',
-          })
-          .first()
-        await page.waitForTimeout(SHORT_TIMEOUT)
-        await contextMenuItemCopy.click()
+        await this.executeContextMenuCommand(oldDirent, 'Copy')
       } catch (error) {
         throw new VError(error, `Failed to copy explorer item ${dirent}`)
       }
@@ -181,6 +167,11 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to delete`)
       }
     },
+    async executeContextMenuCommand(locator, option) {
+      const contextMenu = ContextMenu.create({ expect, page, VError })
+      await contextMenu.open(locator)
+      await contextMenu.select(option)
+    },
     async rename(oldDirentName, newDirentName) {
       try {
         const explorer = page.locator('.explorer-folders-view .monaco-list')
@@ -188,20 +179,7 @@ export const create = ({ page, expect, VError }) => {
           hasText: oldDirentName,
         })
         await expect(oldDirent).toBeVisible()
-        await oldDirent.click({
-          button: 'right',
-        })
-        const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
-        await expect(contextMenu).toBeVisible()
-        await expect(contextMenu).toBeFocused()
-        const contextMenuItemRename = contextMenu.locator('.action-item', {
-          hasText: 'Rename...',
-        })
-        await expect(contextMenuItemRename).toBeVisible()
-        await new Promise((r) => {
-          setTimeout(r, SHORT_TIMEOUT)
-        })
-        await contextMenuItemRename.click()
+        await this.executeContextMenuCommand(oldDirent, 'Rename...')
         const input = explorer.locator('input')
         await input.selectText()
         await input.type(newDirentName)
