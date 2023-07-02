@@ -6,13 +6,17 @@ import * as LocatorHover from '../LocatorHover/LocatorHover.js'
 import * as LocatorTextContent from '../LocatorTextContent/LocatorTextContent.js'
 import * as LocatorType from '../LocatorType/LocatorType.js'
 import * as LocatorSelectText from '../LocatorSelectText/LocatorSelectText.js'
+import * as LocatorClickExponential from '../LocatorClickExponential/LocatorClickExponential.js'
 import * as LocatorPress from '../LocatorPress/LocatorPress.js'
 import * as ObjectType from '../ObjectType/ObjectType.js'
 
 const mergeSelectors = (selector, subSelector = '', hasText = '', nth = -1) => {
   let merged = selector
   if (subSelector) {
-    if (merged) {
+    if (subSelector.startsWith('text=')) {
+      const text = subSelector.slice('text='.length)
+      return `${merged}:has-text("${text}")`
+    } else if (merged) {
       merged += ` ${subSelector}`
     } else {
       merged = subSelector
@@ -63,10 +67,13 @@ export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}
         text
       )
     },
-    click() {
-      return LocatorClick.click({
-        selector: this.selector,
-      })
+    click(options = {}) {
+      return LocatorClick.click(
+        {
+          selector: this.selector,
+        },
+        options
+      )
     },
     clear() {
       return LocatorClear.clear({
@@ -97,6 +104,14 @@ export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}
       return LocatorSelectText.selectText({
         selector: this.selector,
       })
+    },
+    clickExponential(options) {
+      return LocatorClickExponential.clickExponential(
+        {
+          selector: this.selector,
+        },
+        options
+      )
     },
     press(key) {
       return LocatorPress.press(

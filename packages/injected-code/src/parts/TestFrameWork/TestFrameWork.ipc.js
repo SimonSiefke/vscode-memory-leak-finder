@@ -15,4 +15,5 @@ export const Commands = {
   count: TestFrameWork.count,
   pressKey: TestFrameWork.pressKey,
   checkHidden: TestFrameWork.checkHidden,
+  clickExponential: TestFrameWork.clickExponential,
 }

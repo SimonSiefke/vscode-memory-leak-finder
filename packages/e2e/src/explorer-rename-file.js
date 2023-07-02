@@ -1,4 +1,4 @@
-export const skip = true
+export const skip = process.platform === 'darwin'
 
 export const beforeSetup = async ({ Workspace, Explorer }) => {
   await Workspace.setFiles([

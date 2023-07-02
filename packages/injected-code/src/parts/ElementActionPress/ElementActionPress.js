@@ -1,7 +1,7 @@
-import * as DispatchEvent from '../DispatchEvent/DispatchEvent.js'
+import * as GetKeyboardEventOptions from '../GetKeyboardEventOptions/GetKeyboardEventOptions.js'
+import * as KeyBoardActions from '../KeyBoardActions/KeyBoardActions.js'
 
-export const press = (element, options) => {
-  DispatchEvent.keyDown(element, options)
-  DispatchEvent.keyPress(element, options)
-  DispatchEvent.keyUp(element, options)
+export const press = (element, { key }) => {
+  const keyboardEventOptions = GetKeyboardEventOptions.getKeyboardEventOptions(key)
+  KeyBoardActions.press(keyboardEventOptions, element)
 }

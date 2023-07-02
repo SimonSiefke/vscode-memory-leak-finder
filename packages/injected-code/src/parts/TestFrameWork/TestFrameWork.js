@@ -219,6 +219,48 @@ export const pressKeyExponential = async ({ key, waitFor, timeout = maxTimeout }
   throw new AssertionError(message)
 }
 
+export const clickExponential = async ({ locator, waitFor, waitForHidden, timeout = maxTimeout, button = '' }) => {
+  const exponentialFactor = 2
+  const startTime = Time.getTimeStamp()
+  const endTime = startTime + timeout
+  let currentTime = startTime
+  const toBeHidden = SingleElementConditionMap.getFunction('toBeHidden')
+  const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
+  let current = 1
+  const clickOptions = {
+    bubbles: true,
+    button,
+  }
+  while (currentTime < endTime) {
+    const element = QuerySelector.querySelector(locator.selector)
+    if (element) {
+      console.log({ element, clickOptions })
+      ElementAction.click(element, clickOptions)
+    }
+    if (waitFor) {
+      const visibleElement = QuerySelector.querySelector(waitFor.selector)
+      if (visibleElement && toBeVisible(visibleElement)) {
+        return
+      }
+    } else if (waitForHidden) {
+      const hiddenElement = QuerySelector.querySelector(waitForHidden.selector)
+      if (!hiddenElement || toBeHidden(hiddenElement)) {
+        return
+      }
+    }
+    current *= exponentialFactor
+    await Timeout.waitForMutation(document.body, current)
+    currentTime = Time.getTimeStamp()
+  }
+  let message = ''
+  if (waitForHidden) {
+    message = `expected locator "${waitForHidden.selector}" to be hidden when clicking "${locator.selector}"`
+  } else if (waitFor) {
+    message = `expected locator "${waitFor.selector}" to be visible when clicking "${locator.selector}"`
+  }
+  throw new AssertionError(message)
+}
+
 export const pressKey = async (key) => {
   Assert.string(key)
   const keyboardEventOptions = GetKeyboardEventOptions.getKeyboardEventOptions(key)

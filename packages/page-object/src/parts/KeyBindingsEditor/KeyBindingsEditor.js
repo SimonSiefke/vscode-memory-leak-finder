@@ -45,6 +45,9 @@ export const create = ({ expect, page, VError }) => {
         const keyBindingsEditor = page.locator('.keybindings-editor')
         await expect(keyBindingsEditor).toBeVisible()
         const row = keyBindingsEditor.locator(`.monaco-list-row[aria-label^="${commandName}"]:nth-of-type(1)`)
+        await expect(row).toBeVisible({
+          timeout: 3_000,
+        })
         await row.dblclick()
         const defineKeyBindingWidget = page.locator('.defineKeybindingWidget')
         await expect(defineKeyBindingWidget).toBeVisible()
