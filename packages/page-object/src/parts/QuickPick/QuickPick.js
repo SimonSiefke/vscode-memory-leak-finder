@@ -1,4 +1,5 @@
 import * as KeyBindings from '../KeyBindings/KeyBindings.js'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 
 export const create = ({ expect, page, VError }) => {
   return {
@@ -38,7 +39,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to type ${value}`)
       }
     },
-    async select(text) {
+    async select(text, stayVisible) {
       try {
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
@@ -46,16 +47,18 @@ export const create = ({ expect, page, VError }) => {
           hasText: text,
         })
         await option.click()
-        await expect(quickPick).toBeHidden()
+        if (!stayVisible) {
+          await expect(quickPick).toBeHidden()
+        }
       } catch (error) {
         throw new VError(error, `Failed to select "${text}"`)
       }
     },
-    async executeCommand(command) {
+    async executeCommand(command, { stayVisible = false } = {}) {
       try {
         await this.showCommands()
         await this.type(command)
-        await this.select(command)
+        await this.select(command, stayVisible)
       } catch (error) {
         throw new VError(error, `Failed to execute command "${command}"`)
       }
@@ -71,17 +74,9 @@ export const create = ({ expect, page, VError }) => {
     },
     async showColorTheme() {
       try {
-        await page.keyboard.press(KeyBindings.OpenQuickPickCommands)
-        const quickPick = page.locator('.quick-input-widget')
-        await expect(quickPick).toBeVisible()
-        const quickPickInput = quickPick.locator('[role="combobox"]')
-        // await expect(quickPickInput).toHaveText(">");
-        await quickPickInput.type('Preferences: Color Theme')
-        const firstOption = quickPick.locator('.monaco-list-row').first()
-        const firstOptionLabel = firstOption.locator('.label-name')
-        await expect(firstOptionLabel).toHaveText('Preferences: Color Theme')
-        await expect(firstOption).toBeVisible()
-        await firstOption.click()
+        await this.executeCommand(WellKnownCommands.SelectColorTheme, {
+          stayVisible: true,
+        })
       } catch (error) {
         throw new VError(error, `Failed to show quick pick color theme`)
       }

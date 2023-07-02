@@ -1,3 +1,4 @@
+export const SelectColorTheme = 'Preferences: Color Theme'
 export const FocusExplorer = 'File: Focus on Files Explorer'
 export const GoToDefintiion = 'Go to Definition'
 export const OpenKeyboardShortcuts = 'Preferences: Open Keyboard Shortcuts'
