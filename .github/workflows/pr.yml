@@ -28,6 +28,7 @@ jobs:
           path: |
             **/node_modules
             **/.vscode-test
+            **/.vscode-user-data-dir
           key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
       - name: npm ci
         run: npm ci
