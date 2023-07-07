@@ -85,6 +85,7 @@ export const create = ({ expect, page, VError }) => {
         const nameLocator = firstExtension.locator('.name')
         const name = await nameLocator.textContent()
         await expect(nameLocator).toHaveText(name)
+        await firstExtension.click()
         const extensionEditor = page.locator('.extension-editor')
         await expect(extensionEditor).toBeVisible()
         const heading = extensionEditor.locator('.name').first()

@@ -20,6 +20,10 @@ const getMatchingFiles = (dirents, filterValue) => {
   return matchingFiles
 }
 
+let context
+let pageObject
+let firstWindow
+
 export const runTests = async (root, filterValue, headlessMode, color, callback) => {
   Logger.log(`[test-worker] start running tests`)
   const start = Time.now()
@@ -40,15 +44,16 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
     const relativePath = Path.relative(process.cwd(), absolutePath)
     const relativeDirname = Path.dirname(relativePath)
     callback(JsonRpcEvent.create(TestWorkerEventType.TestRunning, [absolutePath, relativeDirname, first]))
-    let pageObject
-    let firstWindow
+
     const initialStart = Time.now()
     try {
-      const context = await LaunchVsCode.launchVsCode({
-        headlessMode,
-      })
-      pageObject = context.pageObject
-      firstWindow = context.firstWindow
+      if (!context) {
+        context = await LaunchVsCode.launchVsCode({
+          headlessMode,
+        })
+        pageObject = context.pageObject
+        firstWindow = context.firstWindow
+      }
     } catch (error) {
       const prettyError = await PrettyError.prepare(error, { root, color })
       callback(JsonRpcEvent.create(TestWorkerEventType.TestFailed, [absolutePath, relativeDirname, relativePath, first, prettyError]))
@@ -77,9 +82,10 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
         start,
         callback,
       )
-      if (i !== total - 1) {
-        await firstWindow.reload()
-      }
+      // TODO only reload when leak is found
+      // if (i !== total - 1) {
+      //   await firstWindow.reload()
+      // }
     }
   }
   const end = Time.now()
@@ -95,6 +101,6 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
     ]),
   )
   Logger.log(`[test-worker] finished running tests`)
-  CleanUpTestState.cleanUpTestState()
-  LaunchElectron.cleanup()
+  // CleanUpTestState.cleanUpTestState()
+  // LaunchElectron.cleanup()
 }

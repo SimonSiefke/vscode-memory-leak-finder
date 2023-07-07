@@ -1,5 +1,4 @@
-import * as IpcParentType from '../IpcParentType/IpcParentType.js'
-import * as TestWorker from '../TestWorker/TestWorker.js'
+import * as CreateTestWorkerAndListen from '../CreateTestWorkerAndListen/CreateTestWorkerAndListen.js'
 
 export const state = {
   /**
@@ -8,7 +7,7 @@ export const state = {
   testWorker: undefined,
 }
 
-const cleanup = () => {
+export const cleanup = () => {
   if (state.testWorker) {
     state.testWorker.dispose()
     state.testWorker = undefined
@@ -16,8 +15,9 @@ const cleanup = () => {
 }
 
 export const prepare = async () => {
-  cleanup()
-  const worker = await TestWorker.listen(IpcParentType.NodeWorkerThread)
-  state.testWorker = worker
-  return worker
+  // TODO race condition
+  if (!state.testWorker) {
+    state.testWorker = await CreateTestWorkerAndListen.createTestWorkerAndListen()
+  }
+  return state.testWorker
 }
