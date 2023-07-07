@@ -16,7 +16,7 @@ export const runTest = async (
   color,
   pageObject,
   start,
-  callback
+  callback,
 ) => {
   try {
     const module = await ImportScript.importScript(file)
