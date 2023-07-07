@@ -4,7 +4,7 @@ import * as SpecialSelectorPrefix from '../SpecialSelectorPrefix/SpecialSelector
 export const querySelectorAll = (roots, body, selector) => {
   const nth = ParseSpecialSelectorBody.parseInt(body, SpecialSelectorPrefix.Nth)
   if (nth >= roots.length) {
-    throw new Error(`selector not found: ${selector}`)
+    return []
   }
   return [roots[nth]]
 }
