@@ -305,6 +305,7 @@ export const getAttribute = async (locator, attributeName) => {
 
 export const count = (locator) => {
   Assert.object(locator)
-  const elements = QuerySelector.querySelector(locator.selector)
-  return elements.length
+  const elements = QuerySelector.querySelectorAll(locator.selector)
+  const count = elements.length
+  return count
 }
