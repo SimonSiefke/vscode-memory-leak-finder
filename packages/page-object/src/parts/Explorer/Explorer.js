@@ -181,6 +181,7 @@ export const create = ({ page, expect, VError }) => {
         await expect(oldDirent).toBeVisible()
         await this.executeContextMenuCommand(oldDirent, 'Rename...')
         const input = explorer.locator('input')
+        await expect(input).toBeVisible({ timeout: 3000 })
         await input.selectText()
         await input.type(newDirentName)
         await input.press('Enter')
