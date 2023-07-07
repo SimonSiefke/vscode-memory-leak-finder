@@ -8,6 +8,7 @@ import * as PrettyError from '../PrettyError/PrettyError.js'
 import * as RunTest from '../RunTest/RunTest.js'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 import * as Time from '../Time/Time.js'
+import * as Logger from '../Logger/Logger.js'
 
 const getMatchingFiles = (dirents, filterValue) => {
   const matchingFiles = []
@@ -20,6 +21,7 @@ const getMatchingFiles = (dirents, filterValue) => {
 }
 
 export const runTests = async (root, filterValue, headlessMode, color, callback) => {
+  Logger.log(`[test-worker] start running tests`)
   const start = Time.now()
   const testsPath = Path.join(root, 'src')
   const testDirents = await FileSystem.readDir(testsPath)
@@ -73,7 +75,7 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
         color,
         pageObject,
         start,
-        callback
+        callback,
       )
       if (i !== total - 1) {
         await firstWindow.reload()
@@ -90,8 +92,9 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
       state.total,
       duration,
       filterValue,
-    ])
+    ]),
   )
+  Logger.log(`[test-worker] finished running tests`)
   CleanUpTestState.cleanUpTestState()
   LaunchElectron.cleanup()
 }
