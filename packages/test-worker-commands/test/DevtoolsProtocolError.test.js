@@ -5,5 +5,5 @@ test('DevtoolsProtocolError - TypeError', () => {
     at <anonymous>:1:29`)
   expect(error.message).toBe(`TypeError: Cannot read properties of null (reading 'style')`)
   expect(error.stack).toMatch(`TypeError: Cannot read properties of null (reading 'style')
-    at <anonymous>:1:29`)
+    at dist/injectedCode.js:1:29`)
 })

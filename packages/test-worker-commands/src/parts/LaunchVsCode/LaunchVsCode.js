@@ -13,6 +13,7 @@ import * as Root from '../Root/Root.js'
 import { VError } from '../VError/VError.js'
 import * as WaitForVsCodeToBeReady from '../WaitForVsCodeToBeReady/WaitForVsCodeToBeReady.js'
 import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.js'
+import * as Logger from '../Logger/Logger.js'
 
 const getCwd = () => {
   if (process.env.VSCODE_CWD) {
@@ -23,6 +24,7 @@ const getCwd = () => {
 
 export const launchVsCode = async ({ headlessMode }) => {
   try {
+    Logger.log('[test-worker] launch vscode')
     const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
     await CreateTestWorkspace.createTestWorkspace(testWorkspacePath)
     const testExtensionsPath = join(Root.root, '.vscode-extensions')
@@ -57,6 +59,7 @@ export const launchVsCode = async ({ headlessMode }) => {
       electronApp,
     }
     const pageObject = await PageObject.create(pageObjectContext)
+    Logger.log('[test-worker] finished launching vscode')
     return {
       pageObject,
       firstWindow,

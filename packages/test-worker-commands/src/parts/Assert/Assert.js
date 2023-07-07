@@ -3,6 +3,9 @@ import { AssertionError } from '../AssertionError/AssertionError.js'
 const getType = (value) => {
   switch (typeof value) {
     case 'number':
+      if (isNaN(value)) {
+        return 'nan'
+      }
       return 'number'
     case 'function':
       return 'function'

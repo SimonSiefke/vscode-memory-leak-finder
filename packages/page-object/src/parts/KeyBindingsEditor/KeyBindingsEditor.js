@@ -34,8 +34,9 @@ export const create = ({ expect, page, VError }) => {
       try {
         const keyBindingsEditor = page.locator('.keybindings-editor')
         const input = keyBindingsEditor.locator('.keybindings-header input')
+        await input.focus()
         await expect(input).toBeFocused()
-        await input.type(searchValue)
+        await input.setValue(searchValue)
       } catch (error) {
         throw new VError(error, `Failed to search for ${searchValue}`)
       }
