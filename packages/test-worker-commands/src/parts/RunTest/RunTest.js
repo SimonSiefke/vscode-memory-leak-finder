@@ -1,4 +1,4 @@
-import * as ImportScript from '../ImportScript/ImportScript.js'
+import * as ImportTest from '../ImportTest/ImportTest.js'
 import * as JsonRpcEvent from '../JsonRpcEvent/JsonRpcEvent.js'
 import * as PrettyError from '../PrettyError/PrettyError.js'
 import * as TestStage from '../TestStage/TestStage.js'
@@ -16,10 +16,10 @@ export const runTest = async (
   color,
   pageObject,
   start,
-  callback
+  callback,
 ) => {
   try {
-    const module = await ImportScript.importScript(file)
+    const module = await ImportTest.importTest(start, file)
     if (module.skip) {
       const end = Time.now()
       const duration = end - start
