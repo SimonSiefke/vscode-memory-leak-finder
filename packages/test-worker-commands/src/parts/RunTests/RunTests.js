@@ -48,7 +48,6 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
     const initialStart = Time.now()
     try {
       if (!context) {
-        console.log({ context })
         context = await LaunchVsCode.launchVsCode({
           headlessMode,
         })
@@ -83,9 +82,10 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
         start,
         callback,
       )
-      if (i !== total - 1) {
-        await firstWindow.reload()
-      }
+      // TODO only reload when leak is found
+      // if (i !== total - 1) {
+      //   await firstWindow.reload()
+      // }
     }
   }
   const end = Time.now()
@@ -100,9 +100,7 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
       filterValue,
     ]),
   )
+  Logger.log(`[test-worker] finished running tests`)
   // CleanUpTestState.cleanUpTestState()
   // LaunchElectron.cleanup()
-  Logger.log(`[test-worker] finished running tests`)
-  CleanUpTestState.cleanUpTestState()
-  LaunchElectron.cleanup()
 }

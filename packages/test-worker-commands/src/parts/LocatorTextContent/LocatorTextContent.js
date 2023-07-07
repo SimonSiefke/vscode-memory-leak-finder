@@ -20,6 +20,5 @@ export const getTextContent = async (locator) => {
     ],
     awaitPromise: true,
   })
-  console.log({ text })
   return text
 }
