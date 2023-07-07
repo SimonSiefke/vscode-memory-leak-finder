@@ -10,6 +10,12 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.js', () => {
   }
 })
 
+jest.unstable_mockModule('../src/parts/IsGithubActions/IsGithubActions.js', () => {
+  return {
+    isGithubActions: false,
+  }
+})
+
 jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.js', () => {
   return {
     isBuffering() {
@@ -61,7 +67,7 @@ test('handleTestFailed', () => {
       '    \x1B[0m \x1B[90m 17 |\x1B[39m\x1B[0m\n' +
       '\n' +
       '   \x1B[2m    at Module.test (\x1B[22m/test/e2e/src/sample.close-window.js\x1B[2m:15:29)\x1B[22m\n' +
-      '\n'
+      '\n',
   )
   expect(TestStateOutput.clearPending).toHaveBeenCalledTimes(1)
 })
