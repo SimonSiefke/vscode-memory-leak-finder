@@ -284,7 +284,7 @@ export const getTextContent = async (locator) => {
   if (!toBeVisible(element)) {
     throw new Error(`must be visible`)
   }
-  const text = element.textContent()
+  const text = element.textContent
   return text
 }
 
