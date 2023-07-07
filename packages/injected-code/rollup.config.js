@@ -4,7 +4,7 @@ export default {
     {
       file: 'dist/injectedCode.js',
       format: 'es',
-      sourcemap: 'inline',
+      sourcemap: true,
     },
   ],
   external: [],
