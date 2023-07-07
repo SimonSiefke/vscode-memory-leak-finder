@@ -12,7 +12,9 @@ export const create = ({ expect, page, VError }) => {
         const lines = extensionsView.locator('.monaco-editor .view-lines')
         await page.keyboard.press('Control+A')
         await page.keyboard.press('Backspace')
-        await expect(lines).toHaveText('')
+        await expect(lines).toHaveText('', {
+          timeout: 3000,
+        })
         await extensionsInput.type(value)
       } catch (error) {
         throw new VError(error, `Failed to search for ${value}`)
