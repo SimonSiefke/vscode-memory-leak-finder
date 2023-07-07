@@ -1,5 +1,4 @@
 import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.js'
-import * as FileWatcherWorkerCommandType from '../FileWatcherWorkerCommandType/FileWatcherWorkerCommandType.js'
 import * as JsonRpc from '../JsonRpc/JsonRpc.js'
 import * as RunTest from '../RunTest/RunTest.js'
 import * as RunTestWatcher from '../RunTestWatcher/RunTestWatcher.js'
@@ -11,8 +10,5 @@ export const startRunning = async (filterValue, headlessMode, color) => {
   const cwd = process.cwd()
   const worker = await RunTest.prepare()
   JsonRpc.send(worker, TestWorkerCommandType.RunTests, cwd, filterValue, headlessMode, color)
-  const hasFileWatcher = await RunTestWatcher.prepareWatcher()
-  if (!hasFileWatcher) {
-    JsonRpc.send(RunTestWatcher.state.fileWatcherWorker, FileWatcherWorkerCommandType.WatchFolder, cwd)
-  }
+  await RunTestWatcher.prepare(cwd)
 }

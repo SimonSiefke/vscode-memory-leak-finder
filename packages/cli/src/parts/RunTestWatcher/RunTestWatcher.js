@@ -1,6 +1,4 @@
-import * as FileWatcherWorker from '../FileWatcherWorker/FileWatcherWorker.js'
-import * as HandleIpc from '../HandleIpc/HandleIpc.js'
-import * as IpcParentType from '../IpcParentType/IpcParentType.js'
+import * as CreateFileWatcherWorkerAndListen from '../CreateFileWatcherWorkerAndListen/CreateFileWatcherWorkerAndListen.js'
 
 export const state = {
   /**
@@ -9,13 +7,10 @@ export const state = {
   fileWatcherWorker: undefined,
 }
 
-export const prepareWatcher = async () => {
+export const prepare = async (cwd) => {
   if (state.fileWatcherWorker) {
-    return true
+    // TODO race condition
+    state.fileWatcherWorker = await CreateFileWatcherWorkerAndListen.createFileWatcherWorkerAndListen(cwd)
   }
-  // TODO race condition
-  const fileWatcherWorker = await FileWatcherWorker.listen(IpcParentType.NodeWorkerThread)
-  HandleIpc.handleIpc(fileWatcherWorker)
-  state.fileWatcherWorker = fileWatcherWorker
-  return false
+  return state.fileWatcherWorker
 }
