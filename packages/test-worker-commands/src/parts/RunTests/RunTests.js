@@ -19,6 +19,10 @@ const getMatchingFiles = (dirents, filterValue) => {
   return matchingFiles
 }
 
+let context
+let pageObject
+let firstWindow
+
 export const runTests = async (root, filterValue, headlessMode, color, callback) => {
   const start = Time.now()
   const testsPath = Path.join(root, 'src')
@@ -38,15 +42,17 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
     const relativePath = Path.relative(process.cwd(), absolutePath)
     const relativeDirname = Path.dirname(relativePath)
     callback(JsonRpcEvent.create(TestWorkerEventType.TestRunning, [absolutePath, relativeDirname, first]))
-    let pageObject
-    let firstWindow
+
     const initialStart = Time.now()
     try {
-      const context = await LaunchVsCode.launchVsCode({
-        headlessMode,
-      })
-      pageObject = context.pageObject
-      firstWindow = context.firstWindow
+      if (!context) {
+        console.log({ context })
+        context = await LaunchVsCode.launchVsCode({
+          headlessMode,
+        })
+        pageObject = context.pageObject
+        firstWindow = context.firstWindow
+      }
     } catch (error) {
       const prettyError = await PrettyError.prepare(error, { root, color })
       callback(JsonRpcEvent.create(TestWorkerEventType.TestFailed, [absolutePath, relativeDirname, relativePath, first, prettyError]))
@@ -73,7 +79,7 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
         color,
         pageObject,
         start,
-        callback
+        callback,
       )
       if (i !== total - 1) {
         await firstWindow.reload()
@@ -90,8 +96,8 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
       state.total,
       duration,
       filterValue,
-    ])
+    ]),
   )
-  CleanUpTestState.cleanUpTestState()
-  LaunchElectron.cleanup()
+  // CleanUpTestState.cleanUpTestState()
+  // LaunchElectron.cleanup()
 }

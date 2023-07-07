@@ -1,5 +1,3 @@
-export const skip = true
-
 export const setup = async ({ Extensions }) => {
   await Extensions.show()
   await Extensions.search('@builtin html')
