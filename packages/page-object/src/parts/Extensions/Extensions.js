@@ -27,11 +27,7 @@ export const create = ({ expect, page, VError }) => {
         })
         await quickPick.executeCommand(WellKnownCommands.ShowExtensions)
         const extensionsView = page.locator(`.extensions-viewlet`)
-
         await expect(extensionsView).toBeVisible()
-        // const firstExtension = page.locator('.extension-list-item').first()
-        // await expect(firstExtension).toBeVisible({ timeout: 10_000 })
-        // await new Promise(() => {})
       } catch (error) {
         throw new VError(error, `Failed to show extensions view`)
       }
