@@ -2,6 +2,7 @@
 .vscode-user-data-dir
 .vscode-test-workspace
 .vscode-extensions
+.vscode-test-files
 
 # Logs
 logs
