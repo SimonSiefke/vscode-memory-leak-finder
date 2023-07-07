@@ -13,8 +13,7 @@ export const evaluateInUtilityContext = async (options) => {
   }
   const result = await DevtoolsProtocolRuntime.callFunctionOn(pageSession.rpc, {
     ...options,
-    executionContextId: utilityExecutionContext.id, // TODO move to uniqueid once supported
-    // uniqueContextId: utilityExecutionContext.uniqueId,
+    uniqueContextId: utilityExecutionContext.uniqueId,
   })
   return result
 }
