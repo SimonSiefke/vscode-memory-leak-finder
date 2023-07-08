@@ -1,24 +1,24 @@
 import * as Assert from '../Assert/Assert.js'
 import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateInUtilityContext.js'
 
-export const getTextContent = async (locator) => {
+export const setValue = async (locator, text) => {
   Assert.object(locator)
-  const text = await EvaluateInUtilityContext.evaluateInUtilityContext({
-    functionDeclaration: '(locator) => test.getTextContent(locator)',
+  Assert.string(text)
+  await EvaluateInUtilityContext.evaluateInUtilityContext({
+    functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
     arguments: [
       {
         value: locator,
       },
       {
-        value: 'dblclick',
+        value: 'setValue',
       },
       {
         value: {
-          bubbles: true,
+          text,
         },
       },
     ],
     awaitPromise: true,
   })
-  return text
 }

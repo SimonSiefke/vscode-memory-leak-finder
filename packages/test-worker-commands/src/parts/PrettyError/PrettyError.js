@@ -111,7 +111,7 @@ export const prepare = async (error, { color = true, root = '' } = {}) => {
     return prepareModuleNotFoundError(error)
   }
   if (error && error.message && error.stack && error.codeFrame) {
-    const cleanedStack = CleanStack.cleanStack(error.stack, { root })
+    const cleanedStack = await CleanStack.cleanStack(error.stack, { root })
     const lines = SplitLines.splitLines(cleanedStack)
     const relevantStack = lines.join('\n')
     return {
@@ -127,7 +127,7 @@ export const prepare = async (error, { color = true, root = '' } = {}) => {
       error = cause
     }
   }
-  const cleanedStack = CleanStack.cleanStack(error.stack, { root })
+  const cleanedStack = await CleanStack.cleanStack(error.stack, { root })
   const lines = SplitLines.splitLines(cleanedStack)
   const codeFrame = getCodeFrame(cleanedStack, { color })
   const relevantStack = lines.join('\n')
