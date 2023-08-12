@@ -1,4 +1,4 @@
-import * as DevtoolsProtocolRuntime from "../DevtoolsProtocolRuntime/DevtoolsProtocolRuntime.js";
+import { DevtoolsProtocolRuntime } from '@vscode-memory-leak-finder/devtools-protocol'
 
 /**
  *
@@ -8,15 +8,15 @@ import * as DevtoolsProtocolRuntime from "../DevtoolsProtocolRuntime/DevtoolsPro
  */
 export const getEventListeners = async (session, objectGroup) => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
-    expression: "EventTarget.prototype",
+    expression: 'EventTarget.prototype',
     includeCommandLineAPI: true,
     returnByValue: false,
     objectGroup,
-  });
+  })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
     prototypeObjectId: prototype.objectId,
     objectGroup,
-  });
+  })
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
 globalThis.____objects = this
@@ -24,7 +24,7 @@ globalThis.____objects = this
     objectId: objects.objects.objectId,
     returnByValue: true,
     objectGroup,
-  });
+  })
   const fnResult2 = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: `(() => {
 const objects = globalThis.____objects
@@ -48,8 +48,8 @@ return listenerMap
     returnByValue: true,
     includeCommandLineAPI: true,
     objectGroup,
-  });
-  const value = fnResult2;
-  console.log(JSON.stringify(value, null, 2));
-  return value;
-};
+  })
+  const value = fnResult2
+  console.log(JSON.stringify(value, null, 2))
+  return value
+}

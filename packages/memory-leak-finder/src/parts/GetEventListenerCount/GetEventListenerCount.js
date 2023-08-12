@@ -1,5 +1,5 @@
 import VError from 'verror'
-import * as DevtoolsProtocolRuntime from '../DevtoolsProtocolRuntime/DevtoolsProtocolRuntime.js'
+import { DevtoolsProtocolRuntime } from '@vscode-memory-leak-finder/devtools-protocol'
 
 /**
  *
