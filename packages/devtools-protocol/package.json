@@ -1,5 +1,5 @@
 {
-  "name": "@vscode-memory-leak-finder/memory-leak-finder",
+  "name": "@vscode-memory-leak-finder/devtools-protocol",
   "version": "0.0.0-dev",
   "description": "",
   "main": "src/index.js",
@@ -9,17 +9,13 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "peerDependencies": {
-    "@playwright/test": "^1.35.0"
-  },
   "jest": {
     "modulePathIgnorePatterns": [
       "<rootDir>/.vscode-test/"
     ]
   },
   "dependencies": {
-    "verror": "^1.10.1",
-    "@vscode-memory-leak-finder/devtools-protocol": "file:../devtools-protocol"
+    "verror": "^1.10.1"
   },
   "devDependencies": {
     "@types/verror": "^1.10.6"
