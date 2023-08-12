@@ -1,19 +1,19 @@
 /**
  *
- * @param {import('@playwright/test').CDPSession} session
+ * @param {any} session
  * @returns {Promise<number>}
  */
 export const getDetachedHtmlElements = async (session) => {
-  const prototype = await session.send("Runtime.evaluate", {
-    expression: "HTMLElement.prototype",
+  const prototype = await session.invoke('Runtime.evaluate', {
+    expression: 'HTMLElement.prototype',
     includeCommandLineAPI: true,
     returnByValue: false,
-  });
-  const objects = await session.send("Runtime.queryObjects", {
+  })
+  const objects = await session.invoke('Runtime.queryObjects', {
     // @ts-ignore
     prototypeObjectId: prototype.result.objectId,
-  });
-  const fnResult = await session.send("Runtime.callFunctionOn", {
+  })
+  const fnResult = await session.invoke('Runtime.callFunctionOn', {
     functionDeclaration: `function(){
 const objects = this
 
@@ -48,8 +48,8 @@ return detachedNodes.length
 }`,
     objectId: objects.objects.objectId,
     returnByValue: true,
-  });
-  const value = fnResult.result.value;
+  })
+  const value = fnResult.result.value
 
-  return value;
-};
+  return value
+}

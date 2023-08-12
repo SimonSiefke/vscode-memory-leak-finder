@@ -16,5 +16,11 @@
     "modulePathIgnorePatterns": [
       "<rootDir>/.vscode-test/"
     ]
+  },
+  "dependencies": {
+    "verror": "^1.10.1"
+  },
+  "devDependencies": {
+    "@types/verror": "^1.10.6"
   }
 }

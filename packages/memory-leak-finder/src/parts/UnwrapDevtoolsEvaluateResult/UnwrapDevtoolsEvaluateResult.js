@@ -2,6 +2,9 @@ import { DevtoolsProtocolError } from '../DevtoolsProtocolError/DevtoolsProtocol
 
 export const unwrapResult = (rawResult) => {
   if ('error' in rawResult) {
+    if (rawResult.error.message && rawResult.error.data) {
+      throw new DevtoolsProtocolError(`${rawResult.error.message}: ${rawResult.error.data}`)
+    }
     throw new DevtoolsProtocolError(rawResult.error.message)
   }
   if ('exceptionDetails' in rawResult) {
