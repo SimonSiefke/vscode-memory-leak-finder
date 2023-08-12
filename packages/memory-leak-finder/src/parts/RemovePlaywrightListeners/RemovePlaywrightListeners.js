@@ -1,15 +1,10 @@
-const PLAYWRIGHT_DESCRIPTION_1 =
-  "(event) => {\n      var _a;\n      return (_a = this._hitTargetInterceptor) == null ? void 0 : _a.call(this, event);\n    }";
-const PLAYWRIGHT_TYPE_1 = `__playwright_global_listeners_check__`;
+import * as IsPlaywrightListener from '../IsPlaywrightListener/IsPlaywrightListener.js'
 
-const isPlaywrightListener = (listener) => {
-  return (
-    listener.description === PLAYWRIGHT_DESCRIPTION_1 ||
-    listener.type === PLAYWRIGHT_TYPE_1
-  );
-};
+const isNormalListener = (listener) => {
+  return !IsPlaywrightListener.isPlaywrightListener(listener)
+}
 
 // playwright also adds event listener, filter them out
 export const removePlaywrightListeners = (result) => {
-  return result.filter((result) => !isPlaywrightListener(result));
-};
+  return result.filter(isNormalListener)
+}

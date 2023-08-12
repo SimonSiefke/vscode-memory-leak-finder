@@ -50,6 +50,5 @@ return listenerMap
     objectGroup,
   })
   const value = fnResult2
-  console.log(JSON.stringify(value, null, 2))
   return value
 }
