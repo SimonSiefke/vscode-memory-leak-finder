@@ -71,6 +71,7 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
       const start = i === 0 ? initialStart : Time.now()
       await RunTest.runTest(
         state,
+        context,
         absolutePath,
         relativeDirname,
         relativePath,
