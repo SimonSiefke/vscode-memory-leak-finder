@@ -60,7 +60,7 @@ export const test = async ({ electronApp, expect }) => {
      |                             ^
   16 | }
   17 |`)
-  expect(prettyError.stack).toBe('    at Module.test (/test/e2e/src/sample.close-window.js:15:29)')
+  expect(prettyError.stack).toBe('    at test (/test/e2e/src/sample.close-window.js:15:29)')
 })
 
 test('prepare - exclude electron internal stack', async () => {
