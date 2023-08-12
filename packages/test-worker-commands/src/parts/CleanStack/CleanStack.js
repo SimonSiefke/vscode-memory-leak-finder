@@ -19,6 +19,9 @@ const isInternal = (line) => {
   if (line.includes('at <anonymous>')) {
     return true
   }
+  if (line.includes('devtools-protocol')) {
+    return true
+  }
   return false
 }
 
