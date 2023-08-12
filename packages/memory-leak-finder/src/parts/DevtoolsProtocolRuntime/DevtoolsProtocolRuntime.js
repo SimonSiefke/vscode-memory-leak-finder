@@ -1,5 +1,5 @@
-import * as DevtoolsCommandType from "../DevtoolsCommandType/DevtoolsCommandType.js";
-import * as UnwrapDevtoolsEvaluateResult from "../UnwrapDevtoolsEvaluateResult/UnwrapDevtoolsEvaluateResult.js";
+import * as DevtoolsCommandType from '../DevtoolsCommandType/DevtoolsCommandType.js'
+import * as UnwrapDevtoolsEvaluateResult from '../UnwrapDevtoolsEvaluateResult/UnwrapDevtoolsEvaluateResult.js'
 
 /**
  *
@@ -7,13 +7,10 @@ import * as UnwrapDevtoolsEvaluateResult from "../UnwrapDevtoolsEvaluateResult/U
  * @returns
  */
 export const evaluate = async (session, options) => {
-  const rawResult = await session.send(
-    DevtoolsCommandType.RuntimeEvaluate,
-    options
-  );
-  const result = UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult);
-  return result;
-};
+  const rawResult = await session.invoke(DevtoolsCommandType.RuntimeEvaluate, options)
+  const result = UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult)
+  return result
+}
 
 /**
  *
@@ -21,13 +18,10 @@ export const evaluate = async (session, options) => {
  * @returns
  */
 export const callFunctionOn = async (session, options) => {
-  const rawResult = await session.send(
-    DevtoolsCommandType.RuntimeCallFunctionOn,
-    options
-  );
-  const result = UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult);
-  return result;
-};
+  const rawResult = await session.invoke(DevtoolsCommandType.RuntimeCallFunctionOn, options)
+  const result = UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult)
+  return result
+}
 
 /**
  *
@@ -35,27 +29,22 @@ export const callFunctionOn = async (session, options) => {
  * @returns
  */
 export const getProperties = async (session, options) => {
-  const rawResult = await session.send(
-    DevtoolsCommandType.RuntimeGetProperties,
-    options
-  );
-  const result = UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult);
-  return result;
-};
+  const rawResult = await session.invoke(DevtoolsCommandType.RuntimeGetProperties, options)
+  const result = UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult)
+  return result
+}
 
 /**
  */
 export const enable = async (session) => {
-  const rawResult = await session.send(DevtoolsCommandType.RuntimeEnable);
-  UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult);
-};
+  const rawResult = await session.invoke(DevtoolsCommandType.RuntimeEnable)
+  UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult)
+}
 
 export const runIfWaitingForDebugger = async (session) => {
-  const rawResult = await session.send(
-    DevtoolsCommandType.RuntimeRunIfWaitingForDebugger
-  );
-  UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult);
-};
+  const rawResult = await session.invoke(DevtoolsCommandType.RuntimeRunIfWaitingForDebugger)
+  UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult)
+}
 
 /**
  *
@@ -63,13 +52,10 @@ export const runIfWaitingForDebugger = async (session) => {
  * @returns
  */
 export const queryObjects = async (session, options) => {
-  const rawResult = await session.send(
-    DevtoolsCommandType.RuntimeQueryObjects,
-    options
-  );
-  const result = UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult);
-  return result;
-};
+  const rawResult = await session.invoke(DevtoolsCommandType.RuntimeQueryObjects, options)
+  const result = UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult)
+  return result
+}
 
 /**
  *
@@ -77,10 +63,7 @@ export const queryObjects = async (session, options) => {
  * @returns
  */
 export const releaseObjectGroup = async (session, options) => {
-  const rawResult = await session.send(
-    DevtoolsCommandType.RuntimeReleaseObjectGroup,
-    options
-  );
-  const result = UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult);
-  return result;
-};
+  const rawResult = await session.invoke(DevtoolsCommandType.RuntimeReleaseObjectGroup, options)
+  const result = UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult)
+  return result
+}

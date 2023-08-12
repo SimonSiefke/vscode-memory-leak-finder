@@ -2,7 +2,7 @@ import * as DevtoolsCommandType from '../DevtoolsCommandType/DevtoolsCommandType
 import * as UnwrapDevtoolsEvaluateResult from '../UnwrapDevtoolsEvaluateResult/UnwrapDevtoolsEvaluateResult.js'
 
 export const getEventListeners = async (session, options) => {
-  const rawResult = await session.send(DevtoolsCommandType.DomDebuggerGetEventListeners, options)
+  const rawResult = await session.invoke(DevtoolsCommandType.DomDebuggerGetEventListeners, options)
   const result = UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult)
   return result
 }
