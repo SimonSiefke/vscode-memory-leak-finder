@@ -218,6 +218,33 @@ export const pressKeyExponential = async ({ key, waitFor, timeout = maxTimeout }
   throw new AssertionError(message)
 }
 
+export const typeAndWaitFor = async ({ locator, text, waitFor, timeout = maxTimeout }) => {
+  Assert.object(locator)
+  Assert.string(text)
+  Assert.object(waitFor)
+  const exponentialFactor = 2
+  const startTime = Time.getTimeStamp()
+  const endTime = startTime + timeout
+  let currentTime = startTime
+  const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
+  let current = 1
+  const fn = ElementAction['setValue']
+  while (currentTime < endTime) {
+    const waitForElement = QuerySelector.querySelector(waitFor.selector)
+    if (waitForElement && toBeVisible(waitForElement)) {
+      return
+    }
+    const element = QuerySelector.querySelector(locator.selector)
+    fn(element, { text: '' })
+    fn(element, { text })
+    current *= exponentialFactor
+    await Timeout.waitForMutation(document.body, current)
+    currentTime = Time.getTimeStamp()
+  }
+  const message = `expected locator "${waitFor.selector}" to be visible when typing "${text}"`
+  throw new AssertionError(message)
+}
+
 export const clickExponential = async ({ locator, waitFor, waitForHidden, timeout = maxTimeout, button = '' }) => {
   const exponentialFactor = 2
   const startTime = Time.getTimeStamp()

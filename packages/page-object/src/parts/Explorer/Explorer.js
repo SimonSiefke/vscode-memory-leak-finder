@@ -144,7 +144,7 @@ export const create = ({ page, expect, VError }) => {
         await expect(contextMenu).toBeVisible()
         await expect(contextMenu).toBeFocused()
       } catch (error) {
-        throw new VError(error, `Failed to open context menu for ${dirent}`)
+        throw new VError(error, `Failed to open context menu for "${dirent}"`)
       }
     },
     async paste() {
