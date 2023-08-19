@@ -22,3 +22,17 @@ export const type = async (locator, text) => {
     awaitPromise: true,
   })
 }
+
+export const typeAndWaitFor = async (locator, text, waitFor) => {
+  Assert.object(locator)
+  Assert.string(text)
+  await EvaluateInUtilityContext.evaluateInUtilityContext({
+    functionDeclaration: '(locator, fnName, options) => test.typeAndWaitFor(locator, options)',
+    arguments: [
+      {
+        value: { locator, text, waitFor },
+      },
+    ],
+    awaitPromise: true,
+  })
+}

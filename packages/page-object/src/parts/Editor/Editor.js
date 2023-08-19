@@ -71,6 +71,23 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to close editor`)
       }
     },
+    async closeAll() {
+      try {
+        const main = page.locator('[role="main"]')
+        const tabs = main.locator('[role="tab"]')
+        const currentCount = await tabs.count()
+        if (currentCount === 0) {
+          return
+        }
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.ViewCloseAllEditors)
+        await expect(tabs).toHaveCount(0, {
+          timeout: 3000,
+        })
+      } catch (error) {
+        throw new VError(error, `Failed to close all editors`)
+      }
+    },
     async select(text) {
       try {
         const editor = page.locator('.editor-instance')
