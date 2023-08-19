@@ -8,7 +8,7 @@ export const beforeSetup = async ({ Workspace, Explorer, Editor }) => {
   await Editor.closeAll()
   await Explorer.focus()
   await Explorer.refresh()
-  await Explorer.waitForReady('index.md')
+  await Explorer.shouldBeVisible('index.md')
 }
 
 export const run = async ({ Editor, QuickPick, WellKnownCommands, WebView }) => {
