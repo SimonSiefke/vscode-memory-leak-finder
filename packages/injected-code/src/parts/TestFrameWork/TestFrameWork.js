@@ -231,7 +231,7 @@ export const typeAndWaitFor = async ({ locator, text, waitFor, timeout = maxTime
   const fn = ElementAction['setValue']
   while (currentTime < endTime) {
     const waitForElement = QuerySelector.querySelector(waitFor.selector)
-    if (toBeVisible(waitForElement)) {
+    if (waitForElement && toBeVisible(waitForElement)) {
       return
     }
     const element = QuerySelector.querySelector(locator.selector)
