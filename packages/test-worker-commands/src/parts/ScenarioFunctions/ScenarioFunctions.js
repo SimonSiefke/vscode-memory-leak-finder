@@ -93,13 +93,11 @@ export const getExecutionContexts = () => {
   return ExecutionContextState.getAll()
 }
 
-const handleAttachedToServiceWorker = (message) => {}
-
 const handleAttachedToBrowser = (message) => {
   console.log('attached to browser', message)
 }
 
-const handleAttachedToWorker = async (message) => {
+const handleAttachedToJs = async (message, type) => {
   const sessionId = message.params.sessionId
   const browserSession = SessionState.getSession('browser')
   if (!browserSession) {
@@ -116,7 +114,7 @@ const handleAttachedToWorker = async (message) => {
   })
 
   TargetState.addTarget(message.params.targetInfo.targetId, {
-    type: DevtoolsTargetType.Worker,
+    type,
     targetId: message.params.targetInfo.targetId,
     title: message.params.targetInfo.title,
     url: message.params.targetInfo.url,
@@ -125,6 +123,10 @@ const handleAttachedToWorker = async (message) => {
   })
 
   await Promise.all([DevtoolsProtocolRuntime.enable(sessionRpc), DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc)])
+}
+
+const handleAttachedToWorker = async (message) => {
+  await handleAttachedToJs(message, DevtoolsTargetType.Worker)
 }
 
 export const handleTargetDestroyed = (message) => {
@@ -181,7 +183,7 @@ const handleAttachedToPage = async (message) => {
         DevtoolsProtocolRuntime.enable(sessionRpc),
         DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc),
       ]),
-      { milliseconds: TimeoutConstants.AttachToPage }
+      { milliseconds: TimeoutConstants.AttachToPage },
     )
   } catch (error) {
     if (error && error.name === 'TestFinishedError') {
@@ -191,7 +193,13 @@ const handleAttachedToPage = async (message) => {
   }
 }
 
-const handleAttachedToIframe = (message) => {}
+const handleAttachedToIframe = async (message) => {
+  await handleAttachedToPage(message)
+}
+
+const handleAttachedToServiceWorker = async (message) => {
+  await handleAttachedToJs(message, DevtoolsTargetType.ServiceWorker)
+}
 
 export const handleAttachedToTarget = (message) => {
   const type = message.params.targetInfo.type
@@ -204,6 +212,8 @@ export const handleAttachedToTarget = (message) => {
       return handleAttachedToIframe(message)
     case DevtoolsTargetType.Browser:
       return handleAttachedToBrowser(message)
+    case DevtoolsTargetType.ServiceWorker:
+      return handleAttachedToServiceWorker(message)
     default:
       console.warn(`unsupported attachment type ${type}`)
   }
