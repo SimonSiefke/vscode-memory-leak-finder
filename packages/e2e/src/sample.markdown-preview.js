@@ -1,12 +1,13 @@
 export const beforeSetup = async ({ Workspace, Explorer, Editor }) => {
-  await Editor.closeAll()
-  await Explorer.focus()
   await Workspace.setFiles([
     {
       name: 'index.md',
       content: `# hello world`,
     },
   ])
+  await Editor.closeAll()
+  await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.waitForReady('index.md')
 }
 
