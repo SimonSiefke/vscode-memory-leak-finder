@@ -241,7 +241,7 @@ export const typeAndWaitFor = async ({ locator, text, waitFor, timeout = maxTime
     await Timeout.waitForMutation(document.body, current)
     currentTime = Time.getTimeStamp()
   }
-  const message = `expected locator "${locator.selector}" to be visible when pressing "${key}"`
+  const message = `expected locator "${waitFor.selector}" to be visible when typing "${text}"`
   throw new AssertionError(message)
 }
 
