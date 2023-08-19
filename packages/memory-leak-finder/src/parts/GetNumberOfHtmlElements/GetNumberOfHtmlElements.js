@@ -1,4 +1,4 @@
-import { DevtoolsProtocolRuntime } from '@vscode-memory-leak-finder/devtools-protocol'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 
 /**
  *
