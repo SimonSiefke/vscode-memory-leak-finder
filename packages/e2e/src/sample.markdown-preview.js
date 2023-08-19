@@ -15,5 +15,6 @@ export const run = async ({ Editor, QuickPick, WellKnownCommands, WebView }) => 
   await Editor.open('index.md')
   await QuickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
   await WebView.shouldBeVisible()
+  await WebView.focus()
   await Editor.closeAll()
 }
