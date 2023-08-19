@@ -66,7 +66,15 @@ export const create = ({ expect, page, VError }) => {
     async openFile(fileName) {
       try {
         await this.show(KeyBindings.OpenQuickPickFiles)
-        await this.type(fileName)
+        const quickPick = page.locator('.quick-input-widget')
+        await expect(quickPick).toBeVisible()
+        const quickPickInput = quickPick.locator('[role="combobox"]')
+        await expect(quickPickInput).toBeVisible()
+        await expect(quickPickInput).toBeFocused({ timeout: 3000 })
+        const option = quickPick.locator('.label-name', {
+          hasText: fileName,
+        })
+        await quickPickInput.typeAndWaitFor(fileName, option)
         await this.select(fileName)
       } catch (error) {
         throw new VError(error, `Failed to open "${fileName}"`)

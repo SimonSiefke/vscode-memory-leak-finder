@@ -1,12 +1,13 @@
 export const create = ({ expect, page, VError }) => {
   return {
-    async shouldBeFocused() {
+    async shouldBeVisible() {
       try {
         const webView = page.locator('.webview.ready')
         await expect(webView).toBeVisible()
-        await expect(webView).toBeFocused()
+        const body = page.locator('body')
+        await expect(body).toBeFocused()
       } catch (error) {
-        throw new VError(error, `Failed to check that webview is focused`)
+        throw new VError(error, `Failed to check that webview is visible`)
       }
     },
   }

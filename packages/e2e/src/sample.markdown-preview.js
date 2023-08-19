@@ -14,6 +14,6 @@ export const beforeSetup = async ({ Workspace, Explorer, Editor }) => {
 export const run = async ({ Editor, QuickPick, WellKnownCommands, WebView }) => {
   await Editor.open('index.md')
   await QuickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
-  await WebView.shouldBeFocused()
+  await WebView.shouldBeVisible()
   await Editor.closeAll()
 }

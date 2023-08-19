@@ -17,4 +17,5 @@ export const Commands = {
   checkHidden: TestFrameWork.checkHidden,
   clickExponential: TestFrameWork.clickExponential,
   getAttribute: TestFrameWork.getAttribute,
+  typeAndWaitFor: TestFrameWork.typeAndWaitFor,
 }
