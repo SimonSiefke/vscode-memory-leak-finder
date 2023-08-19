@@ -1,4 +1,5 @@
-export const beforeSetup = async ({ Workspace, Explorer }) => {
+export const beforeSetup = async ({ Workspace, Explorer, Editor }) => {
+  await Editor.closeAll()
   await Explorer.focus()
   await Workspace.setFiles([
     {
