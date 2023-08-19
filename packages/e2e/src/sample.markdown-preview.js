@@ -1,10 +1,12 @@
-export const beforeSetup = async ({ Workspace }) => {
+export const beforeSetup = async ({ Workspace, Explorer }) => {
+  await Explorer.focus()
   await Workspace.setFiles([
     {
       name: 'index.md',
       content: `# hello world`,
     },
   ])
+  await Explorer.waitForReady('index.md')
 }
 
 export const run = async ({ ActivityBar, Explorer, Editor, QuickPick, WellKnownCommands }) => {

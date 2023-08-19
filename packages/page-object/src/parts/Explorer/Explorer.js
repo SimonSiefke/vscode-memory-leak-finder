@@ -218,5 +218,14 @@ export const create = ({ page, expect, VError }) => {
         }
       },
     },
+    async waitForReady(direntName) {
+      try {
+        await this.openContextMenu(direntName)
+        const contextMenu = ContextMenu.create({ expect, page, VError })
+        await contextMenu.close()
+      } catch (error) {
+        throw new VError(error, `Failed check that explorer item is ready ${direntName}`)
+      }
+    },
   }
 }
