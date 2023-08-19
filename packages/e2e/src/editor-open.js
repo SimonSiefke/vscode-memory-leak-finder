@@ -1,12 +1,12 @@
-export const skip = true
-
-export const setup = async ({ Workspace }) => {
+export const setup = async ({ Workspace, Explorer }) => {
+  await Explorer.focus()
   await Workspace.setFiles([
     {
-      nameL: 'file.txt',
+      name: 'file.txt',
       content: '',
     },
   ])
+  await Explorer.waitForReady('file.txt')
 }
 
 export const run = async ({ Editor }) => {
