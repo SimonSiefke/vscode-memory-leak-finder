@@ -16,8 +16,8 @@ export const evaluate = async (rpc, { expression, awaitPromise = false, replMode
         uniqueContextId: utilityExecutionContext.uniqueId,
       }),
       {
-        milliseconds: 1000,
-      }
+        milliseconds: 3000,
+      },
     )
     return result
   } catch (error) {
