@@ -74,7 +74,9 @@ export const create = ({ expect, page, VError }) => {
         const option = quickPick.locator('.label-name', {
           hasText: fileName,
         })
-        await quickPickInput.typeAndWaitFor(fileName, option)
+        await quickPickInput.typeAndWaitFor(fileName, option, {
+          timeout: 4000,
+        })
         await this.select(fileName)
       } catch (error) {
         throw new VError(error, `Failed to open "${fileName}"`)
