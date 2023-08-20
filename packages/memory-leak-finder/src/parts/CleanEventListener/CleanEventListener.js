@@ -1,35 +1,11 @@
 import { cleanEventListenerDescription } from '../CleanEventListenerDescription/CleanEventListenerDescription.js'
 
-const RE_LOCAL_HOST = /^http:\/\/localhost:\d+/
-
-const cleanUrl = (url) => {
-  return url.replace(RE_LOCAL_HOST, '')
-}
-
-const getUrl = (eventListener, scriptMap) => {
-  const scriptId = eventListener.scriptId
-  if (scriptId in scriptMap) {
-    const rawUrl = scriptMap[scriptId].url
-    return cleanUrl(rawUrl)
-  }
-  return ''
-}
-
-const getPrettyUrl = (url) => {
-  if (url.startsWith('/')) {
-    return url.slice(1)
-  }
-  return url
-}
-
-export const cleanEventListener = (eventListener, scriptMap) => {
-  const url = getUrl(eventListener, scriptMap)
-  const prettyUrl = getPrettyUrl(url)
-  const stack = [`listener (${prettyUrl}:${eventListener.lineNumber}:${eventListener.columnNumber})`]
+export const cleanEventListener = (eventListener) => {
   return {
     type: eventListener.type,
+    lineNumber: eventListener.lineNumber,
+    columnNumber: eventListener.columnNumber,
     description: cleanEventListenerDescription(eventListener.handler.description),
     objectId: eventListener.handler.objectId,
-    stack,
   }
 }
