@@ -32,6 +32,11 @@ export const create = ({ expect, page, VError }) => {
     },
     async showSearch() {
       try {
+        const searchItem = page.locator(`.action-item:has([aria-label^="Search"])`)
+        const selected = await searchItem.getAttribute('aria-selected')
+        if (selected === 'true') {
+          return
+        }
         const activityBar = page.locator('.part.activitybar')
         await expect(activityBar).toBeVisible()
         const activityBarItem = activityBar.locator(`.action-label[aria-label^="Search"]`)
