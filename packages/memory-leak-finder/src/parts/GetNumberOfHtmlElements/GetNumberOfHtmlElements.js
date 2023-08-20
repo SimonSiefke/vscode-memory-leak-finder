@@ -1,4 +1,5 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
 
 /**
  *
@@ -7,7 +8,7 @@ import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js
  */
 export const getNumberOfHtmlElements = async (session) => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
-    expression: 'HTMLElement.prototype',
+    expression: PrototypeExpression.HtmlElement,
     includeCommandLineAPI: true,
     returnByValue: false,
   })

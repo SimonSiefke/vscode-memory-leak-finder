@@ -3,6 +3,7 @@ import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js
 import * as GetDescriptors from '../GetDescriptors/GetDescriptors.js'
 import * as GetEventListenersFromMap from '../GetEventListenersFromMap/GetEventListenersFromMap.js'
 import * as GetEventListenersOfTargets from '../GetEventListenersOfTargets/GetEventListenersOfTargets.js'
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
 
 /**
  *
@@ -13,7 +14,7 @@ import * as GetEventListenersOfTargets from '../GetEventListenersOfTargets/GetEv
  */
 export const getEventListeners = async (session, objectGroup, scriptMap) => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
-    expression: 'EventTarget.prototype',
+    expression: PrototypeExpression.EventTarget,
     includeCommandLineAPI: true,
     returnByValue: false,
     objectGroup,

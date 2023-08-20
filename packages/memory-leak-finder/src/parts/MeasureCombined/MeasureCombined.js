@@ -1,3 +1,5 @@
+import * as MeasureId from '../MeasureId/MeasureId.js'
+
 export const combine = (...measures) => {
   const start = async () => {
     const beforeMap = Object.create(null)
@@ -24,7 +26,7 @@ export const combine = (...measures) => {
   }
 
   return {
-    id: 'combined',
+    id: MeasureId.Combined,
     start,
     stop,
     compare,
