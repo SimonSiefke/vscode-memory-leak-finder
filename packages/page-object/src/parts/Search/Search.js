@@ -64,7 +64,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async expandFiles() {
       try {
-        const toggleDetails = page.locator(`[title="Toggle Search Details"]`)
+        const toggleDetails = page.locator(`[role="button"][title="Toggle Search Details"]`)
         const expanded = await toggleDetails.getAttribute('aria-expanded')
         if (expanded === 'true') {
           return
@@ -72,7 +72,7 @@ export const create = ({ expect, page, VError }) => {
         const include = page.locator('.file-types.includes')
         await expect(include).toBeHidden()
         await toggleDetails.click()
-        await expect(toggleDetails).toHaveAttribute('aria-expanded', 'true')
+        await expect(toggleDetails).toHaveAttribute('aria-expanded', 'true', { timeout: 3000 })
         await expect(include).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to expand files`)
