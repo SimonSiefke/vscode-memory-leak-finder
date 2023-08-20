@@ -36,7 +36,7 @@ export const waitForEvent = async ({ frameId, name }) => {
       new Promise((resolve, reject) => {
         state.callbacks.push({ frameId, name, resolve, reject })
       }),
-      { milliseconds: TimeoutConstants.PageEvent }
+      { milliseconds: TimeoutConstants.PageEvent },
     )
   } catch (error) {
     throw new VError(`Failed to wait for page ${name} event: ${error}`)

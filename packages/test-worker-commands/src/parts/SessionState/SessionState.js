@@ -53,7 +53,7 @@ export const waitForTarget = (type, fn) => {
       state.targetCallbackMap[type] = resolve
       // setTimeout(handleTimeout, 500)
     }),
-    { milliseconds: TimeoutConstants.SessionState }
+    { milliseconds: TimeoutConstants.SessionState },
   )
   return cdp
 }

@@ -5,7 +5,7 @@ export const beforeSetup = async ({ tmpDir, writeFile, join }) => {
     join(tmpDir, 'index.css'),
     `h1 {
   abc
-}`
+}`,
   )
 }
 
