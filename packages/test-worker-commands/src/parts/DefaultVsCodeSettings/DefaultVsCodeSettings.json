@@ -29,5 +29,6 @@
   "window.restoreFullscreen": true,
   "window.restoreWindows": "none",
   "window.title": "",
-  "files.hotExit": "off"
+  "files.hotExit": "off",
+  "explorer.confirmDelete": false
 }
