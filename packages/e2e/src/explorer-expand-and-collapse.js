@@ -1,6 +1,4 @@
-export const skip = true
-
-export const beforeSetup = async ({ Workspace }) => {
+export const beforeSetup = async ({ Workspace, Explorer }) => {
   await Workspace.setFiles([
     {
       name: 'file-1.txt',
@@ -19,10 +17,11 @@ export const beforeSetup = async ({ Workspace }) => {
       content: 'file content 4',
     },
   ])
+  await Explorer.focus()
+  await Explorer.shouldHaveItem('file-1.txt')
 }
 
 export const run = async ({ Explorer }) => {
-  await Explorer.focus()
   await Explorer.expand('folder')
   await Explorer.toHaveItem('file-3.txt')
   await Explorer.toHaveItem('file-4.txt')

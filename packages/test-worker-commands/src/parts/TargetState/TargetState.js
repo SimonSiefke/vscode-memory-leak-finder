@@ -76,7 +76,7 @@ export const waitForTarget = async ({ type, index }) => {
           reject,
         })
       }),
-      { milliseconds: TimeoutConstants.Target }
+      { milliseconds: TimeoutConstants.Target },
     )
   } catch (error) {
     throw new VError(`Target was not created ${type}`)
@@ -95,6 +95,6 @@ export const waitForTargetToBeClosed = async (targetId) => {
         resolve,
       })
     }),
-    { milliseconds: TimeoutConstants.Target }
+    { milliseconds: TimeoutConstants.Target },
   )
 }

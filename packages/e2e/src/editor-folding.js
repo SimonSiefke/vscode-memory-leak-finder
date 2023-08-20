@@ -9,7 +9,7 @@ export const beforeSetup = async ({ tmpDir, writeFile, join }) => {
 
 h2 {
   font-size: 15px;
-}`
+}`,
   )
 }
 
