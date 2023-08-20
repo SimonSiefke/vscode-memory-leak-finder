@@ -3,7 +3,6 @@ import * as GetEventListenerKey from '../GetEventListenerKey/GetEventListenerKey
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 import * as RemoveObjectIds from '../RemoveObjectIds/RemoveObjectIds.js'
-import * as RemovePlaywrightListeners from '../RemovePlaywrightListeners/RemovePlaywrightListeners.js'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 
 export const id = MeasureId.EventListeners
@@ -20,7 +19,7 @@ export const create = (session) => {
 
 export const start = async (session, objectGroup) => {
   const result = await GetEventListeners.getEventListeners(session, objectGroup)
-  return RemoveObjectIds.removeObjectIds(RemovePlaywrightListeners.removePlaywrightListeners(result))
+  return RemoveObjectIds.removeObjectIds(result)
 }
 
 export const stop = async (session, objectGroup) => {
@@ -28,7 +27,7 @@ export const stop = async (session, objectGroup) => {
   await DevtoolsProtocolRuntime.releaseObjectGroup(session, {
     objectGroup,
   })
-  return RemoveObjectIds.removeObjectIds(RemovePlaywrightListeners.removePlaywrightListeners(result))
+  return RemoveObjectIds.removeObjectIds(result)
 }
 
 export const compare = (before, after) => {
