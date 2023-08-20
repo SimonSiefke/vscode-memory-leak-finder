@@ -5,6 +5,13 @@ export const create = ({ expect, page, VError }) => {
         const webView = page.locator('.webview')
         await expect(webView).toBeVisible()
         await expect(webView).toHaveClass('ready')
+        await page.evaluate({
+          expression: `await new Promise(resolve => {
+  requestIdleCallback(resolve)
+})`,
+          awaitPromise: true,
+          replMode: true,
+        })
       } catch (error) {
         throw new VError(error, `Failed to check that webview is visible`)
       }

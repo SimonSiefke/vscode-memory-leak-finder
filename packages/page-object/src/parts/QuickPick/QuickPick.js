@@ -59,6 +59,13 @@ export const create = ({ expect, page, VError }) => {
         await this.showCommands()
         await this.type(command)
         await this.select(command, stayVisible)
+        await page.evaluate({
+          expression: `await new Promise(resolve => {
+  requestIdleCallback(resolve)
+})`,
+          awaitPromise: true,
+          replMode: true,
+        })
       } catch (error) {
         throw new VError(error, `Failed to execute command "${command}"`)
       }
