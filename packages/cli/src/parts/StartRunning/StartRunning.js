@@ -11,4 +11,5 @@ export const startRunning = async (filterValue, headlessMode, color) => {
   const worker = await RunTest.prepare()
   JsonRpc.send(worker, TestWorkerCommandType.RunTests, cwd, filterValue, headlessMode, color)
   await RunTestWatcher.prepare(cwd)
+  // TODO move watcher also to coordinator
 }

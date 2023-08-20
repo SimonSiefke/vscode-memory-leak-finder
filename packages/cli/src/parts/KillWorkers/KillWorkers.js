@@ -7,12 +7,12 @@ import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerComma
 //
 
 export const killWorkers = async () => {
-  if (RunTest.state.testWorker) {
+  if (RunTest.state.testCoordinator) {
     // console.log('has worker')
     // const s = performance.now()
-    JsonRpc.send(RunTest.state.testWorker, TestWorkerCommandType.Exit)
+    JsonRpc.send(RunTest.state.testCoordinator, TestWorkerCommandType.Exit)
     // await once(RunTest.state.testWorker, 'exit')
-    RunTest.state.testWorker = undefined
+    RunTest.state.testCoordinator = undefined
     // const e = performance.now()
     // console.log(`took ${e - s}ms`)
     // console.log('worker has terminated')

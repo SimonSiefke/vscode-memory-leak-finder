@@ -1,0 +1,17 @@
+{
+  "name": "test-coordinator",
+  "version": "0.0.0-dev",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "verror": "^1.10.1"
+  },
+  "devDependencies": {
+    "@types/verror": "^1.10.6"
+  }
+}
