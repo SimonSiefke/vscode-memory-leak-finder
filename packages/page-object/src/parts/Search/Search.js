@@ -87,7 +87,7 @@ export const create = ({ expect, page, VError }) => {
         const include = page.locator('.file-types.includes')
         await expect(include).toBeVisible()
         await toggleDetails.click()
-        await expect(include).toBeHidden()
+        await expect(include).toBeHidden({ timeout: 3000 })
       } catch (error) {
         throw new VError(error, `Failed to collapse files`)
       }
