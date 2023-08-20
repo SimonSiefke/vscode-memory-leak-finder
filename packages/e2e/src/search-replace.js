@@ -1,10 +1,10 @@
-export const skip = true
-
-export const beforeSetup = async ({ tmpDir, writeFile, join }) => {
-  await writeFile(join(tmpDir, 'file.txt'), 'sample text')
-}
-
-export const setup = async ({ ActivityBar, Electron }) => {
+export const setup = async ({ ActivityBar, Electron, Workspace }) => {
+  await Workspace.setFiles([
+    {
+      name: 'file.txt',
+      content: 'sample text',
+    },
+  ])
   await ActivityBar.showSearch()
   await Electron.mockDialog({ response: 1 })
 }
