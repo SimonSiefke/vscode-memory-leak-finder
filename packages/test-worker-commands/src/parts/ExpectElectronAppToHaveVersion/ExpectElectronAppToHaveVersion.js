@@ -1,4 +1,4 @@
-import * as DevtoolsProtocolRuntime from '../DevtoolsProtocolRuntime/DevtoolsProtocolRuntime.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import { ExpectError } from '../ExpectError/ExpectError.js'
 import * as FunctionGetElectronAppVersion from '../FunctionGetElectronAppVersion/FunctionGetElectronAppVersion.js'
 
