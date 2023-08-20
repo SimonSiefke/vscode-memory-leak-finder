@@ -1,7 +1,7 @@
 import * as ContextMenu from '../ContextMenu/ContextMenu.js'
 import * as QuickPick from '../QuickPick/QuickPick.js'
-import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 import * as WaitForIdle from '../WaitForIdle/WaitForIdle.js'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 
 const RE_NUMER_AT_END = /\d+$/
 
@@ -35,6 +35,7 @@ export const create = ({ page, expect, VError }) => {
   return {
     async focus() {
       try {
+        await WaitForIdle.waitForIdle(page)
         const quickPick = QuickPick.create({
           page,
           expect,
