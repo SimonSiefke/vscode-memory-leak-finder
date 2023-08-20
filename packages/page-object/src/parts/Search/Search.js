@@ -64,9 +64,13 @@ export const create = ({ expect, page, VError }) => {
     },
     async expandFiles() {
       try {
+        const toggleDetails = page.locator(`[title="Toggle Search Details"]`)
+        const expanded = await toggleDetails.getAttribute('aria-expanded')
+        if (expanded === 'true') {
+          return
+        }
         const include = page.locator('.file-types.includes')
         await expect(include).toBeHidden()
-        const toggleDetails = page.locator(`[title="Toggle Search Details"]`)
         await toggleDetails.click()
         await expect(include).toBeVisible()
       } catch (error) {
@@ -75,9 +79,13 @@ export const create = ({ expect, page, VError }) => {
     },
     async collapseFiles() {
       try {
+        const toggleDetails = page.locator(`[title="Toggle Search Details"]`)
+        const expanded = await toggleDetails.getAttribute('aria-expanded')
+        if (expanded === 'false') {
+          return
+        }
         const include = page.locator('.file-types.includes')
         await expect(include).toBeVisible()
-        const toggleDetails = page.locator(`[title="Toggle Search Details"]`)
         await toggleDetails.click()
         await expect(include).toBeHidden()
       } catch (error) {

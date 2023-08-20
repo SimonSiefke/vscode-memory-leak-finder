@@ -1,4 +1,4 @@
-export const setup = async ({ ActivityBar, Workspace }) => {
+export const setup = async ({ ActivityBar, Workspace, Search }) => {
   await Workspace.setFiles([
     {
       name: 'file.txt',
@@ -6,6 +6,7 @@ export const setup = async ({ ActivityBar, Workspace }) => {
     },
   ])
   await ActivityBar.showSearch()
+  await Search.collapseFiles()
 }
 
 export const run = async ({ Search }) => {
