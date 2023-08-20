@@ -218,5 +218,11 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to rename text ${newText}`)
       }
     },
+    async shouldHaveToken(text, color) {
+      const token = page.locator(`[class^="mtk"]`, {
+        hasText: text,
+      })
+      await expect(token).toHaveCSS('color', color)
+    },
   }
 }

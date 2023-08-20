@@ -1,25 +1,21 @@
 export const skip = true
 
-export const beforeSetup = async ({ tmpDir, writeFile, join }) => {
-  await writeFile(
-    join(tmpDir, 'index.css'),
-    `:root {
+export const setup = async ({ Editor, Workspace }) => {
+  await Workspace.setFiles([
+    {
+      name: 'index.css',
+      content: `:root {
   --font-size: 10px;
 }`,
-  )
-}
-
-export const setup = async ({ Editor, page, expect }) => {
+    },
+  ])
   await Editor.open('index.css')
   await Editor.shouldHaveText(`:root {
   --font-size: 10px;
 }`)
   await Editor.type('abc')
   await Editor.deleteCharactersLeft({ count: 3 })
-  const token = page.locator(`[class^="mtk"]`, {
-    hasText: 'font-size',
-  })
-  await expect(token).toHaveCSS('color', 'rgb(156, 220, 254)')
+  await Editor.shouldHaveToken('font-size', 'rgb(156, 220, 254)')
 }
 
 export const run = async ({ page, expect, Editor }) => {
