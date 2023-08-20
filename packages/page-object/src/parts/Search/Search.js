@@ -79,7 +79,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async collapseFiles() {
       try {
-        const toggleDetails = page.locator(`[title="Toggle Search Details"]`)
+        const toggleDetails = page.locator(`[role="button"][title="Toggle Search Details"]`)
         const expanded = await toggleDetails.getAttribute('aria-expanded')
         if (expanded === 'false') {
           return
