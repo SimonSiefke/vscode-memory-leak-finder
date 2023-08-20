@@ -12,5 +12,5 @@ export const setup = async ({ Workspace, Explorer, Editor }) => {
 
 export const run = async ({ Editor }) => {
   await Editor.open('file.txt')
-  await Editor.close()
+  await Editor.closeAll()
 }
