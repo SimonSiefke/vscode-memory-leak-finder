@@ -1,4 +1,5 @@
-import * as DevtoolsProtocolRuntime from "../DevtoolsProtocolRuntime/DevtoolsProtocolRuntime.js";
+import VError from 'verror'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 
 /**
  *
@@ -6,24 +7,24 @@ import * as DevtoolsProtocolRuntime from "../DevtoolsProtocolRuntime/DevtoolsPro
  * @returns {Promise<number>}
  */
 export const getEventListenerCount = async (session) => {
-  const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
-    expression: "EventTarget.prototype",
-    includeCommandLineAPI: true,
-    returnByValue: false,
-  });
-  const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
-    // @ts-ignore
-    prototypeObjectId: prototype.objectId,
-  });
-  const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
-    functionDeclaration: `function(){
+  try {
+    const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
+      expression: 'EventTarget.prototype',
+      includeCommandLineAPI: true,
+      returnByValue: false,
+    })
+    const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
+      prototypeObjectId: prototype.objectId,
+    })
+    const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
+      functionDeclaration: `function(){
 globalThis.____objects = this
 }`,
-    objectId: objects.objects.objectId,
-    returnByValue: true,
-  });
-  const fnResult2 = await DevtoolsProtocolRuntime.evaluate(session, {
-    expression: `(() => {
+      objectId: objects.objects.objectId,
+      returnByValue: true,
+    })
+    const fnResult2 = await DevtoolsProtocolRuntime.evaluate(session, {
+      expression: `(() => {
 const objects = globalThis.____objects
 delete globalThis.____objects
 
@@ -44,9 +45,12 @@ const getAllEventListeners = (nodes) => {
 const listenerMap = getAllEventListeners([...objects, document, window])
 return listenerMap
 })()`,
-    returnByValue: true,
-    includeCommandLineAPI: true,
-  });
-  const value = fnResult2;
-  return value;
-};
+      returnByValue: true,
+      includeCommandLineAPI: true,
+    })
+    const value = fnResult2
+    return value
+  } catch (error) {
+    throw new VError(error, `Failed to get event listener count`)
+  }
+}

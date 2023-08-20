@@ -6,7 +6,9 @@ import { cp, mkdir } from 'fs/promises'
 const temporaryFiles = join(Root.root, '.vscode-test-files')
 
 export const importTest = async (start, file) => {
-  // workarounf for reloading esmodules, this is a memort leak
+  // workaround for reloading esmodules
+  // this is a memory leak
+  // but there isn't a good wait to reload a es module
   const destination = join(temporaryFiles, `${start}`, basename(file))
   await mkdir(dirname(destination), { recursive: true })
   await cp(file, destination)
