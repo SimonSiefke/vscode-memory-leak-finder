@@ -1,7 +1,7 @@
 import * as ContextMenu from '../ContextMenu/ContextMenu.js'
 import * as QuickPick from '../QuickPick/QuickPick.js'
-import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 import * as WaitForIdle from '../WaitForIdle/WaitForIdle.js'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 
 const RE_NUMER_AT_END = /\d+$/
 
@@ -35,6 +35,7 @@ export const create = ({ page, expect, VError }) => {
   return {
     async focus() {
       try {
+        await WaitForIdle.waitForIdle(page)
         const quickPick = QuickPick.create({
           page,
           expect,
@@ -55,7 +56,7 @@ export const create = ({ page, expect, VError }) => {
         const listId = getListId(className)
         const next = getNextActiveDescendant(listId, current)
         await page.keyboard.press('ArrowDown')
-        expect(await explorer.getAttribute('aria-activedescendant')).toBe(next)
+        await expect(explorer).toHaveAttribute('aria-activedescendant', next)
       } catch (error) {
         throw new VError(error, `Failed to focus next item in explorer`)
       }
@@ -103,7 +104,7 @@ export const create = ({ page, expect, VError }) => {
         })
         await expect(dirent).toBeVisible()
       } catch (error) {
-        throw new VError(error, `Failed to verify that explorer has dirent ${direntName}`)
+        throw new VError(error, `Failed to verify that explorer has dirent "${direntName}"`)
       }
     },
     async shouldHaveFocusedItem(direntName) {
@@ -116,7 +117,7 @@ export const create = ({ page, expect, VError }) => {
         const id = await dirent.getAttribute('id')
         await expect(explorer).toHaveAttribute('aria-activedescendant', id)
       } catch (error) {
-        throw new VError(error, `Failed to verify that explorer has dirent ${direntName}`)
+        throw new VError(error, `Failed to verify that explorer has focused dirent "${direntName}"`)
       }
     },
     async copy(dirent) {
@@ -166,13 +167,17 @@ export const create = ({ page, expect, VError }) => {
         await page.keyboard.press('Delete')
         await expect(oldDirent).toBeHidden()
       } catch (error) {
-        throw new VError(error, `Failed to delete`)
+        throw new VError(error, `Failed to delete ${item}`)
       }
     },
     async executeContextMenuCommand(locator, option) {
+      await WaitForIdle.waitForIdle(page)
       const contextMenu = ContextMenu.create({ expect, page, VError })
+      await WaitForIdle.waitForIdle(page)
       await contextMenu.open(locator)
+      await WaitForIdle.waitForIdle(page)
       await contextMenu.select(option)
+      await WaitForIdle.waitForIdle(page)
     },
     async rename(oldDirentName, newDirentName) {
       try {

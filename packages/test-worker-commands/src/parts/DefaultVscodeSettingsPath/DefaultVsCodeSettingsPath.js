@@ -8,5 +8,5 @@ export const defaultVsCodeSettingsPath = join(
   'src',
   'parts',
   'DefaultVsCodeSettings',
-  'DefaultVsCodeSettings.json'
+  'DefaultVsCodeSettings.json',
 )

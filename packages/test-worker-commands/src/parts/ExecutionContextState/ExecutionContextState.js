@@ -77,7 +77,7 @@ export const waitForDefaultExecutionContext = async (sessionId) => {
       new Promise((resolve, reject) => {
         state.defaultExecutionContextCallbacks[sessionId] = resolve
       }),
-      { milliseconds: TimeoutConstants.DefaultExecutionContext }
+      { milliseconds: TimeoutConstants.DefaultExecutionContext },
     )
   } catch (error) {
     // @ts-ignore
@@ -97,7 +97,7 @@ export const waitForUtilityExecutionContext = async (sessionId) => {
       new Promise((resolve, reject) => {
         state.utilityExecutionContextCallbacks[sessionId] = resolve
       }),
-      { milliseconds: TimeoutConstants.UtilityExecutionContext }
+      { milliseconds: TimeoutConstants.UtilityExecutionContext },
     )
   } catch (error) {
     throw new VError(`Failed to wait for utility execution context: ${error}`)
