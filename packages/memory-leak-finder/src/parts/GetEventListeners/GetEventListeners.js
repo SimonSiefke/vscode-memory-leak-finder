@@ -1,4 +1,5 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
 
 /**
  *
@@ -8,7 +9,7 @@ import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js
  */
 export const getEventListeners = async (session, objectGroup) => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
-    expression: 'EventTarget.prototype',
+    expression: PrototypeExpression.EventTarget,
     includeCommandLineAPI: true,
     returnByValue: false,
     objectGroup,
