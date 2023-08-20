@@ -1,18 +1,8 @@
-export const skip = true
-export const beforeSetup = async ({ writeSettings }) => {
-  await writeSettings({
-    'window.titleBarStyle': 'custom',
-  })
-}
-
-export const setup = async ({ Extensions, page, expect }) => {
+export const setup = async ({ Extensions }) => {
   await Extensions.show()
-  const firstExtension = page.locator('.extension-list-item').first()
-  await expect(firstExtension).toBeVisible()
 }
 
-export const run = async ({ page, ContextMenu }) => {
-  const firstExtension = page.locator('.extension-list-item').first()
-  await ContextMenu.open(firstExtension)
+export const run = async ({ Extensions, ContextMenu }) => {
+  await Extensions.first.openContextMenu()
   await ContextMenu.close()
 }
