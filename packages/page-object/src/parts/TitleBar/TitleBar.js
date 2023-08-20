@@ -4,7 +4,7 @@ export const create = ({ expect, page, VError }) => {
       try {
         const titleBar = page.locator('.part.titlebar')
         await expect(titleBar).toBeVisible()
-        const menuItem = titleBar.locator('.menubar-menu-button', {
+        const menuItem = page.locator('.menubar-menu-button', {
           hasText: text,
         })
         await expect(menuItem).toBeVisible()
