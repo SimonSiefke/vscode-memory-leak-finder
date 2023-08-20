@@ -62,5 +62,27 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to delete search input text`)
       }
     },
+    async expandFiles() {
+      try {
+        const include = page.locator('.file-types.includes')
+        await expect(include).toBeHidden()
+        const toggleDetails = page.locator(`[title="Toggle Search Details"]`)
+        await toggleDetails.click()
+        await expect(include).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to expand files`)
+      }
+    },
+    async collapseFiles() {
+      try {
+        const include = page.locator('.file-types.includes')
+        await expect(include).toBeVisible()
+        const toggleDetails = page.locator(`[title="Toggle Search Details"]`)
+        await toggleDetails.click()
+        await expect(include).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to collapse files`)
+      }
+    },
   }
 }
