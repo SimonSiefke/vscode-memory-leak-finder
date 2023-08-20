@@ -26,6 +26,9 @@ export const unwrapResult = (rawResult) => {
           return rawResult
       }
     }
+    if (rawResult.result.result && rawResult.result.result.value) {
+      return rawResult.result.result.value
+    }
     if (rawResult.result.result) {
       return rawResult.result.result
     }

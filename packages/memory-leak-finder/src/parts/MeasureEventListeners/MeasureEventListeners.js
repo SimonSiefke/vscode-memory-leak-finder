@@ -15,20 +15,33 @@ export const id = MeasureId.EventListeners
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
-  return [session, objectGroup]
+  const scriptMap = Object.create(null)
+  const handleScriptParsed = (event) => {
+    if (!event.url) {
+      return
+    }
+    scriptMap[event.scriptId] = {
+      url: event.url,
+    }
+  }
+  session.on('Debugger.scriptParsed', handleScriptParsed)
+  return [session, objectGroup, scriptMap, handleScriptParsed]
 }
 
-export const start = async (session, objectGroup) => {
-  const result = await GetEventListeners.getEventListeners(session, objectGroup)
-  return RemoveObjectIds.removeObjectIds(RemovePlaywrightListeners.removePlaywrightListeners(result))
+export const start = async (session, objectGroup, scriptMap) => {
+  await session.invoke('Debugger.enable')
+  const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptMap)
+  return result
 }
 
-export const stop = async (session, objectGroup) => {
-  const result = await GetEventListeners.getEventListeners(session, objectGroup)
+export const stop = async (session, objectGroup, scriptMap, handleScriptParsed) => {
+  session.off('Debugger.scriptParsed', handleScriptParsed)
+  await session.invoke('Debugger.disable')
+  const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptMap)
   await DevtoolsProtocolRuntime.releaseObjectGroup(session, {
     objectGroup,
   })
-  return RemoveObjectIds.removeObjectIds(RemovePlaywrightListeners.removePlaywrightListeners(result))
+  return result
 }
 
 export const compare = (before, after) => {

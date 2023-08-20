@@ -1,12 +1,17 @@
+import * as CleanEventListeners from '../CleanEventListeners/CleanEventListeners.js'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import * as GetDescriptors from '../GetDescriptors/GetDescriptors.js'
+import * as GetEventListenersFromMap from '../GetEventListenersFromMap/GetEventListenersFromMap.js'
+import * as GetEventListenersOfTargets from '../GetEventListenersOfTargets/GetEventListenersOfTargets.js'
 
 /**
  *
  * @param {import('@playwright/test').CDPSession} session
  * @param {string} objectGroup
- * @returns {Promise<number>}
+ * @param {any} scriptMap
+ * @returns {Promise<any[]>}
  */
-export const getEventListeners = async (session, objectGroup) => {
+export const getEventListeners = async (session, objectGroup, scriptMap) => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: 'EventTarget.prototype',
     includeCommandLineAPI: true,
@@ -17,38 +22,14 @@ export const getEventListeners = async (session, objectGroup) => {
     prototypeObjectId: prototype.objectId,
     objectGroup,
   })
-  const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
-    functionDeclaration: `function(){
-globalThis.____objects = this
-}`,
+  const fnResult1 = await DevtoolsProtocolRuntime.getProperties(session, {
     objectId: objects.objects.objectId,
-    returnByValue: true,
-    objectGroup,
+    ownProperties: true,
   })
-  const fnResult2 = await DevtoolsProtocolRuntime.evaluate(session, {
-    expression: `(() => {
-const objects = globalThis.____objects
-delete globalThis.____objects
 
-const getAllEventListeners = (nodes) => {
-  const listenerMap = Object.create(null)
-  for (const node of nodes) {
-    const listeners = getEventListeners(node)
-    for (const [key, value] of Object.entries(listeners)) {
-      listenerMap[key] ||= []
-      listenerMap[key].push(value)
-    }
-  }
-  return listenerMap
-}
-
-const listenerMap = getAllEventListeners([...objects, document, window])
-return listenerMap
-})()`,
-    returnByValue: true,
-    includeCommandLineAPI: true,
-    objectGroup,
-  })
-  const value = fnResult2
-  return value
+  const descriptors = GetDescriptors.getDescriptors(fnResult1)
+  const fnResult2 = await GetEventListenersOfTargets.getEventListenersOfTargets(session, descriptors)
+  const eventListeners = fnResult2.flatMap(GetEventListenersFromMap.getEventListenersFromMap)
+  const cleanEventListeners = CleanEventListeners.cleanEventListeners(eventListeners, scriptMap)
+  return cleanEventListeners
 }
