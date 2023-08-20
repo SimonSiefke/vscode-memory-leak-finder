@@ -16,6 +16,9 @@ export const beforeSetup = async ({ Workspace, Explorer }) => {
     },
   ])
   await Explorer.focus()
+  await Explorer.shouldHaveItem('file-1.txt')
+  await Explorer.shouldHaveItem('file-2.txt')
+  await Explorer.shouldHaveItem('file-3.txt')
 }
 
 export const run = async ({ Explorer }) => {
