@@ -72,6 +72,7 @@ export const create = ({ expect, page, VError }) => {
         const include = page.locator('.file-types.includes')
         await expect(include).toBeHidden()
         await toggleDetails.click()
+        await expect(toggleDetails).toHaveAttribute('aria-expanded', 'true')
         await expect(include).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to expand files`)
@@ -88,6 +89,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(include).toBeVisible()
         await expect(toggleDetails).toBeVisible()
         await toggleDetails.click()
+        await expect(toggleDetails).toHaveAttribute('aria-expanded', 'false')
         await expect(include).toBeHidden({ timeout: 3000 })
       } catch (error) {
         throw new VError(error, `Failed to collapse files`)
