@@ -89,7 +89,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(include).toBeVisible()
         await expect(toggleDetails).toBeVisible()
         await toggleDetails.click()
-        await expect(toggleDetails).toHaveAttribute('aria-expanded', 'false')
+        await expect(toggleDetails).toHaveAttribute('aria-expanded', 'false', { timeout: 2000 })
         await expect(include).toBeHidden({ timeout: 3000 })
       } catch (error) {
         throw new VError(error, `Failed to collapse files`)
