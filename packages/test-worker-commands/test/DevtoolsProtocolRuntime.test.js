@@ -1,4 +1,4 @@
-import * as DevtoolsProtocolRuntime from '../src/parts/DevtoolsProtocolRuntime/DevtoolsProtocolRuntime.js'
+import { DevtoolsProtocolRuntime } from '../src/parts/DevtoolsProtocol/DevtoolsProtocol.js'
 import { jest } from '@jest/globals'
 
 test('evaluate - error - failed to parse url', async () => {
@@ -32,6 +32,6 @@ test('evaluate - error - failed to parse url', async () => {
   await expect(
     DevtoolsProtocolRuntime.evaluate(rpc, {
       expression: `fetch('./data.json')`,
-    })
+    }),
   ).rejects.toThrowError(new Error(`TypeError: Failed to execute 'fetch' on 'Window': Failed to parse URL from ./data.json`))
 })

@@ -1,4 +1,4 @@
-import * as DevtoolsProtocolRuntime from '../DevtoolsProtocolRuntime/DevtoolsProtocolRuntime.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.js'
 import { ExpectError } from '../ExpectError/ExpectError.js'
 import * as PTimeout from '../PTimeout/PTimeout.js'
@@ -17,7 +17,7 @@ export const evaluate = async (rpc, { expression, awaitPromise = false, replMode
       }),
       {
         milliseconds: 1000,
-      }
+      },
     )
     return result
   } catch (error) {

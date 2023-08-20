@@ -1,4 +1,4 @@
-import * as DevtoolsProtocolPage from '../DevtoolsProtocolPage/DevtoolsProtocolPage.js'
+import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as PTimeout from '../PTimeout/PTimeout.js'
 
 export const close = async (rpc) => {
