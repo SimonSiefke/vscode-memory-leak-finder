@@ -86,6 +86,7 @@ export const create = ({ expect, page, VError }) => {
         }
         const include = page.locator('.file-types.includes')
         await expect(include).toBeVisible()
+        await expect(toggleDetails).toBeVisible()
         await toggleDetails.click()
         await expect(include).toBeHidden({ timeout: 3000 })
       } catch (error) {
