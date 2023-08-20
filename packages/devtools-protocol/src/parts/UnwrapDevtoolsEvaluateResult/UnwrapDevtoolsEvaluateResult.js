@@ -13,6 +13,9 @@ export const unwrapResult = (rawResult) => {
   if (rawResult && rawResult.result && rawResult.result.result && rawResult.result.result.value) {
     return rawResult.result.result.value
   }
+  if (rawResult && rawResult.result && rawResult.result.result && rawResult.result.result.type === 'undefined') {
+    return undefined
+  }
   if ('result' in rawResult) {
     if ('type' in rawResult.result) {
       switch (rawResult.result.type) {
