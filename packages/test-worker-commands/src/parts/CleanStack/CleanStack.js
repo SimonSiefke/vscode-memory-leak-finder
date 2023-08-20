@@ -1,5 +1,6 @@
-import { relative } from 'node:path'
+import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import * as Root from '../Root/Root.js'
 
 const isTestWorkerLine = (line) => {
   if (line.includes('test-worker/src')) {
@@ -16,6 +17,9 @@ const isInternal = (line) => {
     return true
   }
   if (line.includes('at <anonymous>')) {
+    return true
+  }
+  if (line.includes('devtools-protocol')) {
     return true
   }
   return false
@@ -35,9 +39,32 @@ const getFilePath = (file) => {
   return file
 }
 
-const formatLine = (line, root) => {
+const formatInjectedCodeLine = async (line, root) => {
+  const stackMatch1 = line.match(RE_STACK_PATH_1)
+  if (!stackMatch1) {
+    return line
+  }
+  const lineColumn = stackMatch1[3]
+  const [lineNumberString, columnNumberString] = lineColumn.slice(1, -1).split(':')
+  const lineNumber = parseInt(lineNumberString)
+  const columnNumber = parseInt(columnNumberString)
+  const GetInjectedCodeOriginalPosition = await import('../GetInjectedCodeOriginalPosition/GetInjectedCodeOriginalPosition.js')
+  const sourceMapResult = await GetInjectedCodeOriginalPosition.getInjectedCodeOriginalPosition(lineNumber, columnNumber)
+  if (!sourceMapResult.source) {
+    return line
+  }
+  const absolutePath = join(Root.root, 'packages', 'injected-code', 'dist', sourceMapResult.source)
+  const relativePath = relative(root, absolutePath)
+  const formattedLine = `${stackMatch1[1]}${relativePath}:${sourceMapResult.line}:${sourceMapResult.column})`
+  return formattedLine
+}
+
+const formatLine = async (line, root) => {
   if (!root) {
     return line
+  }
+  if (line.includes('dist/injectedCode.js')) {
+    return formatInjectedCodeLine(line, root)
   }
   const stackMatch1 = line.match(RE_STACK_PATH_1)
   if (stackMatch1) {
@@ -56,12 +83,30 @@ const formatLine = (line, root) => {
   return line
 }
 
-const formatLines = (lines, root) => {
+const cleanLine = (line) => {
+  const trimmedLine = line.trim()
+  if (trimmedLine.startsWith('at Module.')) {
+    return line.replace('at Module.', 'at ')
+  }
+  if (trimmedLine.startsWith('at async Object.')) {
+    return line.replace('at async Object.', 'at async ')
+  }
+  if (trimmedLine.startsWith('at async Module.')) {
+    return line.replace('at async Module.', 'at async ')
+  }
+  return line
+}
+
+const getCleanLines = (lines) => {
+  return lines.map(cleanLine)
+}
+
+const formatLines = async (lines, root) => {
   const formattedLines = []
   for (const line of lines) {
     formattedLines.push(formatLine(line, root))
   }
-  return formattedLines
+  return await Promise.all(formattedLines)
 }
 
 const getRelevantLines = (lines, stack) => {
@@ -87,15 +132,16 @@ const getRelevantLines = (lines, stack) => {
   return relevantLines
 }
 
-export const cleanStack = (stack, { root = '' } = {}) => {
+export const cleanStack = async (stack, { root = '' } = {}) => {
   if (!stack) {
     return ''
   }
   const lines = stack.split('\n')
   const relevantLines = getRelevantLines(lines, stack)
-  const formattedLines = formatLines(relevantLines, root)
-  if (formattedLines[0].startsWith('    at')) {
-    return formattedLines.join('\n')
+  const formattedLines = await formatLines(relevantLines, root)
+  const cleanLines = getCleanLines(formattedLines)
+  if (cleanLines[0].startsWith('    at')) {
+    return cleanLines.join('\n')
   }
-  return formattedLines.slice(1).join('\n')
+  return cleanLines.slice(1).join('\n')
 }

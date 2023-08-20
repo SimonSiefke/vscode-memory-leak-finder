@@ -9,3 +9,6 @@ export const TogglePrimarySideBarPosition = 'View: Toggle Primary Side Bar Posit
 export const TogglePrimarySideBarVisibility = 'View: Toggle Primary Side Bar Visibility'
 export const ToggleZenMode = 'View: Toggle Zen Mode'
 export const TriggerSuggest = 'Trigger Suggest'
+export const ShowExtensions = 'View: Show Extensions'
+export const MarkdownOpenPreviewToTheSide = 'Markdown: Open Preview to the Side'
+export const ViewCloseAllEditors = 'View: Close All Editors'

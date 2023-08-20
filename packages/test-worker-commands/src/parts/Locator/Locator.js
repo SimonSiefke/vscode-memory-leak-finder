@@ -7,6 +7,7 @@ import * as LocatorGetAttribute from '../LocatorGetAttribute/LocatorGetAttribute
 import * as LocatorHover from '../LocatorHover/LocatorHover.js'
 import * as LocatorPress from '../LocatorPress/LocatorPress.js'
 import * as LocatorSelectText from '../LocatorSelectText/LocatorSelectText.js'
+import * as LocatorSetValue from '../LocatorSetValue/LocatorSetValue.js'
 import * as LocatorTextContent from '../LocatorTextContent/LocatorTextContent.js'
 import * as LocatorType from '../LocatorType/LocatorType.js'
 import * as ObjectType from '../ObjectType/ObjectType.js'
@@ -65,7 +66,27 @@ export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}
         {
           selector: this.selector,
         },
-        text
+        text,
+      )
+    },
+    typeAndWaitFor(text, locator, options) {
+      return LocatorType.typeAndWaitFor(
+        {
+          selector: this.selector,
+        },
+        text,
+        {
+          selector: locator.selector,
+        },
+        options,
+      )
+    },
+    setValue(value) {
+      return LocatorSetValue.setValue(
+        {
+          selector: this.selector,
+        },
+        value,
       )
     },
     click(options = {}) {
@@ -73,7 +94,7 @@ export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}
         {
           selector: this.selector,
         },
-        options
+        options,
       )
     },
     clear() {
@@ -111,7 +132,7 @@ export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}
         {
           selector: this.selector,
         },
-        attributeName
+        attributeName,
       )
     },
     clickExponential(options) {
@@ -119,7 +140,7 @@ export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}
         {
           selector: this.selector,
         },
-        options
+        options,
       )
     },
     press(key) {
@@ -127,7 +148,7 @@ export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}
         {
           selector: this.selector,
         },
-        key
+        key,
       )
     },
   }

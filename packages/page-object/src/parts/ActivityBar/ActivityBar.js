@@ -65,7 +65,7 @@ export const create = ({ expect, page, VError }) => {
         await activityBarItem.click()
         const sideBar = page.locator('.sidebar')
         const title = sideBar.locator('.composite.title')
-        await expect(title).toHaveText('Run and Debug: Run')
+        await expect(title).toHaveText(/Run and Debug/)
       } catch (error) {
         throw new VError(error, `Failed to show run and debug`)
       }
@@ -78,7 +78,7 @@ export const create = ({ expect, page, VError }) => {
         await activityBarItem.click()
         const sideBar = page.locator('.sidebar')
         const title = sideBar.locator('.composite.title')
-        await expect(title).toHaveText('Extensions')
+        await expect(title).toHaveText(/Extensions/)
       } catch (error) {
         throw new VError(error, `Failed to show extensions`)
       }

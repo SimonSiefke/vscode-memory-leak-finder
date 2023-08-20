@@ -1,10 +1,12 @@
 import * as ContextMenu from '../ContextMenu/ContextMenu.js'
 import * as QuickPick from '../QuickPick/QuickPick.js'
+import * as WaitForIdle from '../WaitForIdle/WaitForIdle.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 
 const RE_NUMER_AT_END = /\d+$/
 
 const getNextActiveDescendant = (listId, activeDescendant) => {
+  console.log({ activeDescendant })
   // TODO list id can be dynamic
   if (activeDescendant === null) {
     return `${listId}_0`
@@ -34,6 +36,7 @@ export const create = ({ page, expect, VError }) => {
   return {
     async focus() {
       try {
+        await WaitForIdle.waitForIdle(page)
         const quickPick = QuickPick.create({
           page,
           expect,
@@ -137,6 +140,7 @@ export const create = ({ page, expect, VError }) => {
           hasText: dirent,
         })
         await expect(oldDirent).toBeVisible()
+        await WaitForIdle.waitForIdle(page)
         await oldDirent.click({
           button: 'right',
         })
@@ -144,7 +148,7 @@ export const create = ({ page, expect, VError }) => {
         await expect(contextMenu).toBeVisible()
         await expect(contextMenu).toBeFocused()
       } catch (error) {
-        throw new VError(error, `Failed to open context menu for ${dirent}`)
+        throw new VError(error, `Failed to open context menu for "${dirent}"`)
       }
     },
     async paste() {
@@ -168,19 +172,27 @@ export const create = ({ page, expect, VError }) => {
       }
     },
     async executeContextMenuCommand(locator, option) {
+      await WaitForIdle.waitForIdle(page)
       const contextMenu = ContextMenu.create({ expect, page, VError })
+      await WaitForIdle.waitForIdle(page)
       await contextMenu.open(locator)
+      await WaitForIdle.waitForIdle(page)
       await contextMenu.select(option)
+      await WaitForIdle.waitForIdle(page)
     },
     async rename(oldDirentName, newDirentName) {
       try {
+        await WaitForIdle.waitForIdle(page)
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         const oldDirent = explorer.locator('.monaco-list-row', {
           hasText: oldDirentName,
         })
         await expect(oldDirent).toBeVisible()
+        await WaitForIdle.waitForIdle(page)
         await this.executeContextMenuCommand(oldDirent, 'Rename...')
+        await WaitForIdle.waitForIdle(page)
         const input = explorer.locator('input')
+        await expect(input).toBeVisible({ timeout: 5000 })
         await input.selectText()
         await input.type(newDirentName)
         await input.press('Enter')

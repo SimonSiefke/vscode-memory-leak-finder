@@ -1,4 +1,5 @@
 import * as MergeStacks from '../MergeStacks/MergeStacks.js'
+import * as GetDevtoolsProtocolErrorStack from '../GetDevtoolsProtocolErrorStack/GetDevtoolsProtocolErrorStack.js'
 
 const splitMessageAndStack = (input) => {
   const lines = input.split('\n')
@@ -26,7 +27,8 @@ export class DevtoolsProtocolError extends Error {
     super(message)
     this.name = 'DevtoolsProtocolError'
     if (stack) {
-      this.stack = MergeStacks.mergeStacks(this.stack, stack)
+      const cleanStack = GetDevtoolsProtocolErrorStack.getDevtoolsProtocolErrorStack(stack)
+      this.stack = MergeStacks.mergeStacks(this.stack, cleanStack)
     }
   }
 }

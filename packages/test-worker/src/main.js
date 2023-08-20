@@ -1,7 +1,3 @@
-import * as TestWorker from './parts/TestWorker/TestWorker.js'
+import * as Main from './parts/Main/Main.js'
 
-const main = async () => {
-  await TestWorker.listen()
-}
-
-main()
+Main.main()

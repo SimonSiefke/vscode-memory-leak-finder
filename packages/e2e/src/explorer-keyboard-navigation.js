@@ -9,13 +9,14 @@ const createFiles = () => {
   return files
 }
 
-export const beforeSetup = async ({ Workspace }) => {
+export const beforeSetup = async ({ Workspace, Explorer }) => {
   const files = createFiles()
   await Workspace.setFiles(files)
+  await Explorer.focus()
+  await Explorer.shouldHaveItem(`file-9.txt`)
 }
 
 export const run = async ({ Explorer }) => {
-  await Explorer.focus()
   await Explorer.focusNext()
   await Explorer.focusNext()
   await Explorer.focusNext()

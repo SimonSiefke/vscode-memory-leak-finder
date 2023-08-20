@@ -97,3 +97,21 @@ test('parseSelector - text with colon', () => {
     },
   ])
 })
+
+test('parseSelector - mix', () => {
+  const selector = '.editor-instance [class^="mtk"]:has-text("h1"):nth(0)'
+  expect(ParseSelector.parseSelector(selector)).toEqual([
+    {
+      type: SelectorType.Css,
+      body: '.editor-instance [class^="mtk"]',
+    },
+    {
+      type: SelectorType.Text,
+      body: ':has-text("h1")',
+    },
+    {
+      type: SelectorType.Nth,
+      body: ':nth(0)',
+    },
+  ])
+})

@@ -4,6 +4,7 @@ import VError from 'verror'
 import * as GetElectronArgs from '../GetElectronArgs/GetElectronArgs.js'
 import * as Spawn from '../Spawn/Spawn.js'
 import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.js'
+import * as Logger from '../Logger/Logger.js'
 
 export const state = {
   /**
@@ -60,6 +61,7 @@ export const launchElectron = async ({ cliPath, args, headlessMode, cwd, env }) 
 }
 
 export const cleanup = () => {
+  Logger.log(`[test-worker] cleanup ${state.processes.length} child process`)
   for (const childProcess of state.processes) {
     childProcess.kill('SIGKILL')
   }

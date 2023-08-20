@@ -1,27 +1,28 @@
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+
 /**
  *
- * @param {import('@playwright/test').CDPSession} session
+ * @param {any} session
  * @returns {Promise<number>}
  */
 export const getNumberOfHtmlElements = async (session) => {
-  const prototype = await session.send("Runtime.evaluate", {
-    expression: "HTMLElement.prototype",
+  const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
+    expression: 'HTMLElement.prototype',
     includeCommandLineAPI: true,
     returnByValue: false,
-  });
-  const objects = await session.send("Runtime.queryObjects", {
-    // @ts-ignore
+  })
+  const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
     prototypeObjectId: prototype.result.objectId,
-  });
-  const fnResult = await session.send("Runtime.callFunctionOn", {
+  })
+  const fnResult = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
   const objects = this
   return objects.length
 }`,
     objectId: objects.objects.objectId,
     returnByValue: true,
-  });
-  const value = fnResult.result.value;
+  })
+  const value = fnResult.result.value
 
-  return value;
-};
+  return value
+}

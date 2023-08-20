@@ -1,3 +1,6 @@
+import * as QuickPick from '../QuickPick/QuickPick.js'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
+
 export const create = ({ expect, page, VError }) => {
   return {
     async search(value) {
@@ -9,7 +12,9 @@ export const create = ({ expect, page, VError }) => {
         const lines = extensionsView.locator('.monaco-editor .view-lines')
         await page.keyboard.press('Control+A')
         await page.keyboard.press('Backspace')
-        await expect(lines).toHaveText('')
+        await expect(lines).toHaveText('', {
+          timeout: 3000,
+        })
         await extensionsInput.type(value)
       } catch (error) {
         throw new VError(error, `Failed to search for ${value}`)
@@ -17,24 +22,14 @@ export const create = ({ expect, page, VError }) => {
     },
     async show() {
       try {
+        const quickPick = QuickPick.create({
+          page,
+          expect,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.ShowExtensions)
         const extensionsView = page.locator(`.extensions-viewlet`)
-        await expect(extensionsView).toBeHidden()
-        const quickPick = page.locator('.quick-input-widget')
-        await page.pressKeyExponential({
-          key: 'Control+Shift+P',
-          waitFor: quickPick,
-        })
-        await expect(quickPick).toBeVisible()
-        const quickPickInput = quickPick.locator('[role="combobox"]')
-        await quickPickInput.type('view extensions')
-        const option = quickPick.locator('.label-name', {
-          hasText: 'View: Show Extensions',
-        })
-        await option.click()
         await expect(extensionsView).toBeVisible()
-        // const firstExtension = page.locator('.extension-list-item').first()
-        // await expect(firstExtension).toBeVisible({ timeout: 10_000 })
-        // await new Promise(() => {})
       } catch (error) {
         throw new VError(error, `Failed to show extensions view`)
       }
@@ -43,13 +38,12 @@ export const create = ({ expect, page, VError }) => {
       try {
         const extensionsView = page.locator(`.extensions-viewlet`)
         await expect(extensionsView).toBeVisible()
-        await page.keyboard.press('Control+Shift+P')
-        const quickPick = page.locator('.quick-input-widget')
-        await expect(quickPick).toBeVisible()
-        const quickPickInput = quickPick.locator('[role="combobox"]')
-        await quickPickInput.type('Toggle Side Bar Visibility')
-        const firstOption = quickPick.locator('.monaco-list-row').first()
-        await firstOption.click()
+        const quickPick = QuickPick.create({
+          page,
+          expect,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
         await expect(extensionsView).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to hide extensions view`)
@@ -82,7 +76,9 @@ export const create = ({ expect, page, VError }) => {
     first: {
       async shouldBe(name) {
         const firstExtension = page.locator('.extension-list-item').first()
-        await expect(firstExtension).toBeVisible()
+        await expect(firstExtension).toBeVisible({
+          timeout: 3000,
+        })
         const nameLocator = firstExtension.locator('.name')
         await expect(nameLocator).toHaveText(name)
       },
@@ -93,6 +89,7 @@ export const create = ({ expect, page, VError }) => {
         const nameLocator = firstExtension.locator('.name')
         const name = await nameLocator.textContent()
         await expect(nameLocator).toHaveText(name)
+        await firstExtension.click()
         const extensionEditor = page.locator('.extension-editor')
         await expect(extensionEditor).toBeVisible()
         const heading = extensionEditor.locator('.name').first()

@@ -23,9 +23,16 @@ export const toHaveValue = (element, { value }) => {
   return element.value === value
 }
 
-export const toHaveText = (element, { text }) => {
-  Assert.string(text)
-  return element.textContent === text
+export const toHaveText = (element, options) => {
+  if ('text' in options) {
+    Assert.string(options.text)
+    return element.textContent === options.text
+  }
+  if ('regex' in options) {
+    const regex = new RegExp(options.regex)
+    return regex.test(element.textContent)
+  }
+  throw new Error(`invalid options`)
 }
 
 export const toHaveAttribute = (element, { key, value }) => {

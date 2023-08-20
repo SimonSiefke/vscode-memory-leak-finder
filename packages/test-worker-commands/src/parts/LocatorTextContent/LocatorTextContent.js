@@ -9,17 +9,8 @@ export const getTextContent = async (locator) => {
       {
         value: locator,
       },
-      {
-        value: 'dblclick',
-      },
-      {
-        value: {
-          bubbles: true,
-        },
-      },
     ],
     awaitPromise: true,
   })
-  console.log({ text })
   return text
 }
