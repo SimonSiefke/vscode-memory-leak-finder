@@ -1,6 +1,7 @@
 import * as ContextMenu from '../ContextMenu/ContextMenu.js'
 import * as QuickPick from '../QuickPick/QuickPick.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
+import * as WaitForIdle from '../WaitForIdle/WaitForIdle.js'
 
 const RE_NUMER_AT_END = /\d+$/
 
@@ -137,6 +138,7 @@ export const create = ({ page, expect, VError }) => {
           hasText: dirent,
         })
         await expect(oldDirent).toBeVisible()
+        await WaitForIdle.waitForIdle(page)
         await oldDirent.click({
           button: 'right',
         })

@@ -1,5 +1,6 @@
 import * as KeyBindings from '../KeyBindings/KeyBindings.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
+import * as WaitForIdle from '../WaitForIdle/WaitForIdle.js'
 
 export const create = ({ expect, page, VError }) => {
   return {
@@ -59,13 +60,7 @@ export const create = ({ expect, page, VError }) => {
         await this.showCommands()
         await this.type(command)
         await this.select(command, stayVisible)
-        await page.evaluate({
-          expression: `await new Promise(resolve => {
-  requestIdleCallback(resolve)
-})`,
-          awaitPromise: true,
-          replMode: true,
-        })
+        WaitForIdle.waitForIdle(page)
       } catch (error) {
         throw new VError(error, `Failed to execute command "${command}"`)
       }
