@@ -176,12 +176,15 @@ export const create = ({ page, expect, VError }) => {
     },
     async rename(oldDirentName, newDirentName) {
       try {
+        await WaitForIdle.waitForIdle(page)
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         const oldDirent = explorer.locator('.monaco-list-row', {
           hasText: oldDirentName,
         })
         await expect(oldDirent).toBeVisible()
+        await WaitForIdle.waitForIdle(page)
         await this.executeContextMenuCommand(oldDirent, 'Rename...')
+        await WaitForIdle.waitForIdle(page)
         const input = explorer.locator('input')
         await expect(input).toBeVisible({ timeout: 5000 })
         await input.selectText()
