@@ -16,5 +16,12 @@
     "modulePathIgnorePatterns": [
       "<rootDir>/.vscode-test/"
     ]
+  },
+  "dependencies": {
+    "verror": "^1.10.1",
+    "@vscode-memory-leak-finder/devtools-protocol": "file:../devtools-protocol"
+  },
+  "devDependencies": {
+    "@types/verror": "^1.10.6"
   }
 }

@@ -69,6 +69,18 @@ export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}
         text,
       )
     },
+    typeAndWaitFor(text, locator, options) {
+      return LocatorType.typeAndWaitFor(
+        {
+          selector: this.selector,
+        },
+        text,
+        {
+          selector: locator.selector,
+        },
+        options,
+      )
+    },
     setValue(value) {
       return LocatorSetValue.setValue(
         {

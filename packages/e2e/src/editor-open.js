@@ -1,15 +1,16 @@
-export const skip = true
-
-export const setup = async ({ Workspace }) => {
+export const setup = async ({ Workspace, Explorer, Editor }) => {
   await Workspace.setFiles([
     {
-      nameL: 'file.txt',
+      name: 'file.txt',
       content: '',
     },
   ])
+  await Editor.closeAll()
+  await Explorer.focus()
+  await Explorer.shouldHaveItem('file.txt')
 }
 
 export const run = async ({ Editor }) => {
   await Editor.open('file.txt')
-  await Editor.close()
+  await Editor.closeAll()
 }

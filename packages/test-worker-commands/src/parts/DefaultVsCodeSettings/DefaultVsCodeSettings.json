@@ -28,5 +28,6 @@
   "workbench.reduceMotion": "on",
   "window.restoreFullscreen": true,
   "window.restoreWindows": "none",
-  "window.title": ""
+  "window.title": "",
+  "files.hotExit": "off"
 }
