@@ -1,6 +1,6 @@
 import VError from 'verror'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
 /**
  *
  * @param {import('@playwright/test').CDPSession} session
@@ -9,7 +9,7 @@ import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js
 export const getEventListenerCount = async (session) => {
   try {
     const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
-      expression: 'EventTarget.prototype',
+      expression: PrototypeExpression.EventTarget,
       includeCommandLineAPI: true,
       returnByValue: false,
     })
