@@ -6,7 +6,6 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 const RE_NUMER_AT_END = /\d+$/
 
 const getNextActiveDescendant = (listId, activeDescendant) => {
-  console.log({ activeDescendant })
   // TODO list id can be dynamic
   if (activeDescendant === null) {
     return `${listId}_0`
