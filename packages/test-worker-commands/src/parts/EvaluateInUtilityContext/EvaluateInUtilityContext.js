@@ -1,4 +1,4 @@
-import * as DevtoolsProtocolRuntime from '../DevtoolsProtocolRuntime/DevtoolsProtocolRuntime.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.js'
 import * as SessionState from '../SessionState/SessionState.js'
 

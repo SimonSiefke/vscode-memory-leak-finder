@@ -3,7 +3,6 @@ import * as GetEventListenerKey from '../GetEventListenerKey/GetEventListenerKey
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 import * as RemoveObjectIds from '../RemoveObjectIds/RemoveObjectIds.js'
-import * as RemovePlaywrightListeners from '../RemovePlaywrightListeners/RemovePlaywrightListeners.js'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 
 export const id = MeasureId.EventListeners

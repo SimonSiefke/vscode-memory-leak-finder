@@ -1,5 +1,6 @@
 import * as QuickPick from '../QuickPick/QuickPick.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
+import * as ContextMenu from '../ContextMenu/ContextMenu.js'
 
 export const create = ({ expect, page, VError }) => {
   return {
@@ -12,7 +13,9 @@ export const create = ({ expect, page, VError }) => {
         const lines = extensionsView.locator('.monaco-editor .view-lines')
         await page.keyboard.press('Control+A')
         await page.keyboard.press('Backspace')
-        await expect(lines).toHaveText('')
+        await expect(lines).toHaveText('', {
+          timeout: 3000,
+        })
         await extensionsInput.type(value)
       } catch (error) {
         throw new VError(error, `Failed to search for ${value}`)
@@ -27,11 +30,7 @@ export const create = ({ expect, page, VError }) => {
         })
         await quickPick.executeCommand(WellKnownCommands.ShowExtensions)
         const extensionsView = page.locator(`.extensions-viewlet`)
-
         await expect(extensionsView).toBeVisible()
-        // const firstExtension = page.locator('.extension-list-item').first()
-        // await expect(firstExtension).toBeVisible({ timeout: 10_000 })
-        // await new Promise(() => {})
       } catch (error) {
         throw new VError(error, `Failed to show extensions view`)
       }
@@ -96,6 +95,16 @@ export const create = ({ expect, page, VError }) => {
         await expect(extensionEditor).toBeVisible()
         const heading = extensionEditor.locator('.name').first()
         await expect(heading).toHaveText(name)
+      },
+      async openContextMenu() {
+        const firstExtension = page.locator('.extension-list-item').first()
+        await expect(firstExtension).toBeVisible()
+        const nameLocator = firstExtension.locator('.name')
+        const name = await nameLocator.textContent()
+        await expect(nameLocator).toHaveText(name)
+        const contextMenu = ContextMenu.create({ page, expect, VError })
+        await contextMenu.open(firstExtension)
+        await contextMenu.close()
       },
     },
   }

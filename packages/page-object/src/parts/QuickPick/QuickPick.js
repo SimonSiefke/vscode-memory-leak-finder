@@ -1,5 +1,6 @@
 import * as KeyBindings from '../KeyBindings/KeyBindings.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
+import * as WaitForIdle from '../WaitForIdle/WaitForIdle.js'
 
 export const create = ({ expect, page, VError }) => {
   return {
@@ -59,12 +60,14 @@ export const create = ({ expect, page, VError }) => {
         await this.showCommands()
         await this.type(command)
         await this.select(command, stayVisible)
+        WaitForIdle.waitForIdle(page)
       } catch (error) {
         throw new VError(error, `Failed to execute command "${command}"`)
       }
     },
     async openFile(fileName) {
       try {
+        WaitForIdle.waitForIdle(page)
         await this.show(KeyBindings.OpenQuickPickFiles)
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
@@ -74,7 +77,9 @@ export const create = ({ expect, page, VError }) => {
         const option = quickPick.locator('.label-name', {
           hasText: fileName,
         })
-        await quickPickInput.typeAndWaitFor(fileName, option)
+        await quickPickInput.typeAndWaitFor(fileName, option, {
+          timeout: 4000,
+        })
         await this.select(fileName)
       } catch (error) {
         throw new VError(error, `Failed to open "${fileName}"`)
