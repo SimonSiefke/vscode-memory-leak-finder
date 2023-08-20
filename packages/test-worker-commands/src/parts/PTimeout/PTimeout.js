@@ -2,7 +2,7 @@ import { setTimeout } from 'node:timers/promises'
 
 const rejectAfterTimeout = async (milliseconds) => {
   await setTimeout(milliseconds)
-  throw new Error('timeout reached')
+  throw new Error(`timeout of ${milliseconds}ms reached`)
 }
 
 export const pTimeout = async (promise, options) => {
