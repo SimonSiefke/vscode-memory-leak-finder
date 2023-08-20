@@ -1,9 +1,8 @@
-import * as GetEventListeners from '../GetEventListeners/GetEventListeners.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as GetEventListenerKey from '../GetEventListenerKey/GetEventListenerKey.js'
+import * as GetEventListeners from '../GetEventListeners/GetEventListeners.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
-import * as RemoveObjectIds from '../RemoveObjectIds/RemoveObjectIds.js'
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 
 export const id = MeasureId.EventListeners
 
