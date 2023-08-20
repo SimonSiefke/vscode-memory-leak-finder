@@ -1,4 +1,4 @@
-import * as DevtoolsProtocolRuntime from '../DevtoolsProtocolRuntime/DevtoolsProtocolRuntime.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as FunctionExpectElectronWindowToBeMaximized from '../FunctionExpectElectronWindowToBeMaximized/FunctionExpectElectronWindowToBeMaximized.js'
 
 export const toBeMaximized = async (page) => {
