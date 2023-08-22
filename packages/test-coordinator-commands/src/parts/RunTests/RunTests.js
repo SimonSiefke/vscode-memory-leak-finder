@@ -77,7 +77,7 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
       filterValue,
     ]),
   )
-  Logger.log(`[test-worker] finished running tests`)
+  Logger.log(`[test-coordinator] finished running tests`)
   // CleanUpTestState.cleanUpTestState()
   // LaunchElectron.cleanup()
 }

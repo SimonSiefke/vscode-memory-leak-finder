@@ -1,11 +1,9 @@
 import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.js'
-import * as TargetState from '../TargetState/TargetState.js'
 import * as Time from '../Time/Time.js'
 
 export const cleanUpTestState = () => {
   try {
     const s = Time.now()
-    TargetState.reset()
     ExecutionContextState.reset()
     const e = Time.now()
     // console.log('clean up finished in ', e - s, 'ms')
