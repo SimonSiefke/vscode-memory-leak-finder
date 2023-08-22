@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "lib": ["esnext"],
+    "target": "esnext",
+    "checkJs": true,
+    "module": "esnext",
+    "types": ["node", "jest"],
+    "moduleResolution": "node",
+    "isolatedModules": true,
+    "noImplicitAny": false,
+    "skipLibCheck": true,
+    "rootDir": ".",
+    "noEmit": true,
+    "allowSyntheticDefaultImports": true,
+    "assumeChangesOnlyAffectDirectDependencies": true,
+    "strict": true,
+    "useUnknownInCatchVariables": false
+  },
+  "include": ["src", "test"]
+}
