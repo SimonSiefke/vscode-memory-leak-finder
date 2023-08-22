@@ -4,7 +4,6 @@ import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.js'
 import * as Logger from '../Logger/Logger.js'
 import * as Path from '../Path/Path.js'
 import * as PrettyError from '../PrettyError/PrettyError.js'
-import * as RunTest from '../RunTest/RunTest.js'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 import * as Time from '../Time/Time.js'
 
@@ -18,10 +17,15 @@ const getMatchingFiles = (dirents, filterValue) => {
   return matchingFiles
 }
 
-let context
-let pageObject
-let firstWindow
+let child
+let webSocketUrl
 
+// 1. get matching files
+// 2. launch vscode
+// 3. get websocket url
+// 4. launch test worker
+// 5. pass websocket url to test worker and wait for connection
+// 6. pass matching files to test worker
 export const runTests = async (root, filterValue, headlessMode, color, callback) => {
   Logger.log(`[test-coordinator] start running tests`)
   const start = Time.now()
@@ -45,45 +49,20 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
 
     const initialStart = Time.now()
     try {
-      if (!context) {
-        context = await LaunchVsCode.launchVsCode({
+      console.log('launching vscode')
+      if (!child) {
+        const context = await LaunchVsCode.launchVsCode({
           headlessMode,
         })
-        pageObject = context.pageObject
-        firstWindow = context.firstWindow
+        child = context.child
+        webSocketUrl = context.webSocketUrl
       }
+      console.log('launched vscode')
     } catch (error) {
       const prettyError = await PrettyError.prepare(error, { root, color })
       callback(JsonRpcEvent.create(TestWorkerEventType.TestFailed, [absolutePath, relativeDirname, relativePath, first, prettyError]))
       state.failed++
       break outer
-    }
-    for (let i = 0; i < total; i++) {
-      const dirent = matchingDirents[i]
-      const absolutePath = Path.join(testsPath, dirent)
-      const relativePath = Path.relative(process.cwd(), absolutePath)
-      const relativeDirname = Path.dirname(relativePath)
-      if (i !== 0) {
-        callback(JsonRpcEvent.create(TestWorkerEventType.TestRunning, [absolutePath, relativeDirname, dirent]))
-      }
-      const start = i === 0 ? initialStart : Time.now()
-      await RunTest.runTest(
-        state,
-        absolutePath,
-        relativeDirname,
-        relativePath,
-        dirent,
-        root,
-        headlessMode,
-        color,
-        pageObject,
-        start,
-        callback,
-      )
-      // TODO only reload when leak is found
-      // if (i !== total - 1) {
-      //   await firstWindow.reload()
-      // }
     }
   }
   const end = Time.now()
