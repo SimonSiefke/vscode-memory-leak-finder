@@ -1,7 +1,7 @@
 import { join } from 'path'
 import * as ImportScript from '../ImportScript/ImportScript.js'
 import * as Root from '../Root/Root.js'
-import * as TestWorkerCommandType from '../TestCoordinatorCommandType/TestCoordinatorCommandType.js'
+import * as TestCoordinatorCommandType from '../TestCoordinatorCommandType/TestCoordinatorCommandType.js'
 
 const getModule = async () => {
   const testCoordinatorCommandsPath = join(Root.root, '..', '..', 'test-coordinator-commands', 'src', 'main.js')
@@ -12,11 +12,11 @@ const getModule = async () => {
 export const getFn = async (method) => {
   const module = await getModule()
   switch (method) {
-    case TestWorkerCommandType.RunTest:
+    case TestCoordinatorCommandType.RunTest:
       return module.runTest
-    case TestWorkerCommandType.RunTests:
+    case TestCoordinatorCommandType.RunTests:
       return module.runTests
-    case TestWorkerCommandType.Exit:
+    case TestCoordinatorCommandType.Exit:
       return module.exit
     default:
       throw new Error(`unexpected method ${method}`)

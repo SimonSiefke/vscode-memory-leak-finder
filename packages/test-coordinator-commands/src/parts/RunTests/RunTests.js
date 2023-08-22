@@ -6,16 +6,7 @@ import * as Path from '../Path/Path.js'
 import * as PrettyError from '../PrettyError/PrettyError.js'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 import * as Time from '../Time/Time.js'
-
-const getMatchingFiles = (dirents, filterValue) => {
-  const matchingFiles = []
-  for (const dirent of dirents) {
-    if (dirent.includes(filterValue)) {
-      matchingFiles.push(dirent)
-    }
-  }
-  return matchingFiles
-}
+import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.js'
 
 let child
 let webSocketUrl
@@ -26,44 +17,41 @@ let webSocketUrl
 // 4. launch test worker
 // 5. pass websocket url to test worker and wait for connection
 // 6. pass matching files to test worker
+
 export const runTests = async (root, filterValue, headlessMode, color, callback) => {
+  console.log('run tests', root, filterValue, headlessMode, color, callback)
   Logger.log(`[test-coordinator] start running tests`)
   const start = Time.now()
-  const testsPath = Path.join(root, 'src')
-  const testDirents = await FileSystem.readDir(testsPath)
-  const matchingDirents = getMatchingFiles(testDirents, filterValue)
-  const total = matchingDirents.length
+  // TODO pass process cwd as parameter
+  const cwd = process.cwd()
+  const formattedPaths = await GetTestToRun.getTestsToRun(root, cwd, filterValue)
+  const total = formattedPaths.length
+  if (total === 0) {
+    return callback(JsonRpcEvent.create(TestWorkerEventType.AllTestsFinished, [0, 0, 0, 0, 0, filterValue]))
+  }
   const state = {
     passed: 0,
     failed: 0,
     skipped: 0,
     total,
   }
-  callback(JsonRpcEvent.create(TestWorkerEventType.TestsStarting, [total]))
-  outer: if (total > 0) {
-    const first = matchingDirents[0]
-    const absolutePath = Path.join(testsPath, first)
-    const relativePath = Path.relative(process.cwd(), absolutePath)
-    const relativeDirname = Path.dirname(relativePath)
-    callback(JsonRpcEvent.create(TestWorkerEventType.TestRunning, [absolutePath, relativeDirname, first]))
-
-    const initialStart = Time.now()
-    try {
-      console.log('launching vscode')
-      if (!child) {
-        const context = await LaunchVsCode.launchVsCode({
-          headlessMode,
-        })
-        child = context.child
-        webSocketUrl = context.webSocketUrl
-      }
-      console.log('launched vscode')
-    } catch (error) {
-      const prettyError = await PrettyError.prepare(error, { root, color })
-      callback(JsonRpcEvent.create(TestWorkerEventType.TestFailed, [absolutePath, relativeDirname, relativePath, first, prettyError]))
-      state.failed++
-      break outer
+  const first = formattedPaths[0]
+  const { absolutePath, relativePath, relativeDirname, dirent } = first
+  callback(JsonRpcEvent.create(TestWorkerEventType.TestRunning, [absolutePath, relativeDirname, dirent]))
+  const initialStart = Time.now()
+  try {
+    if (!child) {
+      const context = await LaunchVsCode.launchVsCode({
+        headlessMode,
+      })
+      child = context.child
+      webSocketUrl = context.webSocketUrl
     }
+    console.log('launched vscode')
+  } catch (error) {
+    const prettyError = await PrettyError.prepare(error, { root, color })
+    callback(JsonRpcEvent.create(TestWorkerEventType.TestFailed, [absolutePath, relativeDirname, relativePath, first, prettyError]))
+    state.failed++
   }
   const end = Time.now()
   const duration = end - start
