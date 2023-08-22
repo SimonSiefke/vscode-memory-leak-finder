@@ -1,5 +1,4 @@
 import * as Assert from '../Assert/Assert.js'
-import * as FileWatcherEventType from '../FileWatcherEventType/FileWatcherEventType.js'
 import * as HandleFileChanged from '../HandleFileChanged/HandleFileChanged.js'
 import * as HandleTestFailed from '../HandleTestFailed/HandleTestFailed.js'
 import * as HandleTestPassed from '../HandleTestPassed/HandleTestPassed.js'
@@ -22,8 +21,6 @@ const getFn = (method) => {
       return HandleTestsFinished.handleTestsFinished
     case TestWorkerEventType.TestsStarting:
       return HandleTestsStarting.handleTestsStarting
-    case FileWatcherEventType.HandleFileChanged:
-      return HandleFileChanged.handleFileChanged
     case TestWorkerEventType.TestSkipped:
       return HandleTestSkipped.handleTestSkipped
     default:
