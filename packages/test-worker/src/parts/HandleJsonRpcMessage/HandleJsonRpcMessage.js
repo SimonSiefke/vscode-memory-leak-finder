@@ -6,6 +6,7 @@ export const handleJsonRpcMessage = async (ipc, message, execute, resolve) => {
     return
   }
   const response = await GetResponse.getResponse(message, execute)
+  console.log({ response })
   if ('id' in message) {
     ipc.send(response)
   }
