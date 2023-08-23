@@ -8,6 +8,6 @@ export const startRunning = async (filterValue, headlessMode, color) => {
   Stdout.write(AnsiEscapes.clear)
   const cwd = process.cwd()
   const worker = await RunTest.prepare()
-  JsonRpc.send(worker, TestWorkerCommandType.RunTests, cwd, filterValue, headlessMode, color)
+  JsonRpc.send(worker, TestWorkerCommandType.RunTests, cwd, cwd, filterValue, headlessMode, color)
   // TODO move watcher also to coordinator
 }

@@ -1,15 +1,11 @@
-import * as FileSystem from '../FileSystem/FileSystem.js'
+import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.js'
 import * as JsonRpcEvent from '../JsonRpcEvent/JsonRpcEvent.js'
 import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.js'
 import * as Logger from '../Logger/Logger.js'
-import * as Path from '../Path/Path.js'
-import * as PrettyError from '../PrettyError/PrettyError.js'
+import * as TestWorker from '../TestWorker/TestWorker.js'
+import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.js'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 import * as Time from '../Time/Time.js'
-import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.js'
-
-let child
-let webSocketUrl
 
 // 1. get matching files
 // 2. launch vscode
@@ -18,12 +14,10 @@ let webSocketUrl
 // 5. pass websocket url to test worker and wait for connection
 // 6. pass matching files to test worker
 
-export const runTests = async (root, filterValue, headlessMode, color, callback) => {
+export const runTests = async (root, cwd, filterValue, headlessMode, color, callback) => {
   console.log('run tests', root, filterValue, headlessMode, color, callback)
   Logger.log(`[test-coordinator] start running tests`)
   const start = Time.now()
-  // TODO pass process cwd as parameter
-  const cwd = process.cwd()
   const formattedPaths = await GetTestToRun.getTestsToRun(root, cwd, filterValue)
   const total = formattedPaths.length
   if (total === 0) {
@@ -39,20 +33,19 @@ export const runTests = async (root, filterValue, headlessMode, color, callback)
   const { absolutePath, relativePath, relativeDirname, dirent } = first
   callback(JsonRpcEvent.create(TestWorkerEventType.TestRunning, [absolutePath, relativeDirname, dirent]))
   const initialStart = Time.now()
-  try {
-    if (!child) {
-      const context = await LaunchVsCode.launchVsCode({
-        headlessMode,
-      })
-      child = context.child
-      webSocketUrl = context.webSocketUrl
-    }
-    console.log('launched vscode')
-  } catch (error) {
-    const prettyError = await PrettyError.prepare(error, { root, color })
-    callback(JsonRpcEvent.create(TestWorkerEventType.TestFailed, [absolutePath, relativeDirname, relativePath, first, prettyError]))
-    state.failed++
-  }
+  console.time('launch vscode')
+  const context = await LaunchVsCode.launchVsCode({
+    headlessMode,
+  })
+  console.timeEnd('launch vscode')
+  const child = context.child
+  const webSocketUrl = context.webSocketUrl
+
+  const rpc = await TestWorker.launch()
+
+  await rpc.invoke(TestWorkerCommandType.Connect, webSocketUrl)
+  console.log('launched test worker')
+
   const end = Time.now()
   const duration = end - start
   callback(
