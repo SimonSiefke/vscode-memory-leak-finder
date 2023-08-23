@@ -1,6 +1,6 @@
 import * as HandleMessage from '../HandleMessage/HandleMessage.js'
 
-export const handleIpc = async (ipc) => {
+export const handleIpc = (ipc) => {
   const callback = (message) => {
     ipc.send(message)
   }

@@ -44,6 +44,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, call
   const rpc = await TestWorker.launch()
 
   await rpc.invoke(TestWorkerCommandType.Connect, webSocketUrl)
+
   console.log('launched test worker')
 
   const end = Time.now()

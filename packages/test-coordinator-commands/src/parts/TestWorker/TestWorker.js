@@ -2,6 +2,9 @@ import * as IpcParent from '../IpcParent/IpcParent.js'
 import * as IpcParentType from '../IpcParentType/IpcParentType.js'
 import * as GetTestWorkerUrl from '../GetTestWorkerUrl/GetTestWorkerUrl.js'
 import * as JsonRpc from '../JsonRpc/JsonRpc.js'
+import * as HandleIpc from '../HandleIpc/HandleIpc.js'
+import * as Command from '../Command/Command.js'
+import * as Callback from '../Callback/Callback.js'
 
 // TODO dispose worker on next test run
 export const launch = async () => {
@@ -11,6 +14,7 @@ export const launch = async () => {
     url,
     stdio: 'inherit',
   })
+  HandleIpc.handleIpc(ipc, Command.execute, Callback.resolve)
   return {
     ipc,
     invoke(method, ...params) {

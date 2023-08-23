@@ -39,32 +39,9 @@ const getFilePath = (file) => {
   return file
 }
 
-const formatInjectedCodeLine = async (line, root) => {
-  const stackMatch1 = line.match(RE_STACK_PATH_1)
-  if (!stackMatch1) {
-    return line
-  }
-  const lineColumn = stackMatch1[3]
-  const [lineNumberString, columnNumberString] = lineColumn.slice(1, -1).split(':')
-  const lineNumber = parseInt(lineNumberString)
-  const columnNumber = parseInt(columnNumberString)
-  const GetInjectedCodeOriginalPosition = await import('../GetInjectedCodeOriginalPosition/GetInjectedCodeOriginalPosition.js')
-  const sourceMapResult = await GetInjectedCodeOriginalPosition.getInjectedCodeOriginalPosition(lineNumber, columnNumber)
-  if (!sourceMapResult.source) {
-    return line
-  }
-  const absolutePath = join(Root.root, 'packages', 'injected-code', 'dist', sourceMapResult.source)
-  const relativePath = relative(root, absolutePath)
-  const formattedLine = `${stackMatch1[1]}${relativePath}:${sourceMapResult.line}:${sourceMapResult.column})`
-  return formattedLine
-}
-
-const formatLine = async (line, root) => {
+const formatLine = (line, root) => {
   if (!root) {
     return line
-  }
-  if (line.includes('dist/injectedCode.js')) {
-    return formatInjectedCodeLine(line, root)
   }
   const stackMatch1 = line.match(RE_STACK_PATH_1)
   if (stackMatch1) {
@@ -132,13 +109,13 @@ const getRelevantLines = (lines, stack) => {
   return relevantLines
 }
 
-export const cleanStack = async (stack, { root = '' } = {}) => {
+export const cleanStack = (stack, { root = '' } = {}) => {
   if (!stack) {
     return ''
   }
   const lines = stack.split('\n')
   const relevantLines = getRelevantLines(lines, stack)
-  const formattedLines = await formatLines(relevantLines, root)
+  const formattedLines = formatLines(relevantLines, root)
   const cleanLines = getCleanLines(formattedLines)
   if (cleanLines[0].startsWith('    at')) {
     return cleanLines.join('\n')

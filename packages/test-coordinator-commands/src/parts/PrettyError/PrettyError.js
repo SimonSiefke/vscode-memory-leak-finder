@@ -3,8 +3,8 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import * as CleanStack from '../CleanStack/CleanStack.js'
 import * as ErrorCodes from '../ErrorCodes/ErrorCodes.js'
-import * as SplitLines from '../SplitLines/SplitLines.js'
 import * as FileSystem from '../FileSystem/FileSystem.js'
+import * as SplitLines from '../SplitLines/SplitLines.js'
 
 const getActualPath = (fileUri) => {
   if (fileUri.startsWith('file://')) {
@@ -106,12 +106,12 @@ const getCodeFrame = (cleanedStack, { color }) => {
   }
 }
 
-export const prepare = async (error, { color = true, root = '' } = {}) => {
+export const prepare = (error, { color = true, root = '' } = {}) => {
   if (error && error.code === ErrorCodes.ERR_MODULE_NOT_FOUND) {
     return prepareModuleNotFoundError(error)
   }
   if (error && error.message && error.stack && error.codeFrame) {
-    const cleanedStack = await CleanStack.cleanStack(error.stack, { root })
+    const cleanedStack = CleanStack.cleanStack(error.stack, { root })
     const lines = SplitLines.splitLines(cleanedStack)
     const relevantStack = lines.join('\n')
     return {
@@ -127,7 +127,7 @@ export const prepare = async (error, { color = true, root = '' } = {}) => {
       error = cause
     }
   }
-  const cleanedStack = await CleanStack.cleanStack(error.stack, { root })
+  const cleanedStack = CleanStack.cleanStack(error.stack, { root })
   const lines = SplitLines.splitLines(cleanedStack)
   const codeFrame = getCodeFrame(cleanedStack, { color })
   const relevantStack = lines.join('\n')
