@@ -41,7 +41,7 @@ const prepareModuleNotFoundError = (error) => {
       column,
     },
   }
-  const codeFrame = codeFrameColumns(rawLines, location)
+  const codeFrame = codeFrameColumns(rawLines, location, { highlightCode: false })
   const stackLines = SplitLines.splitLines(error.stack)
   const newStackLines = [stackLines[0], `    at ${importedFrom}:${line}:${column}`, ...stackLines.slice(1)]
   const newStack = JoinLines.joinLines(newStackLines)

@@ -78,12 +78,12 @@ const getCleanLines = (lines) => {
   return lines.map(cleanLine)
 }
 
-const formatLines = async (lines, root) => {
+const formatLines = (lines, root) => {
   const formattedLines = []
   for (const line of lines) {
     formattedLines.push(formatLine(line, root))
   }
-  return await Promise.all(formattedLines)
+  return formattedLines
 }
 
 const getRelevantLines = (lines, stack) => {
