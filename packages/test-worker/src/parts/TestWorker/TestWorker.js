@@ -11,6 +11,7 @@ export const listen = async () => {
   console.timeEnd('load commands')
   CommandState.registerCommands(commandMap)
   const ipc = await IpcChild.listen({ method: IpcChildType.Auto() })
+  console.log('ready')
   HandleIpc.handleIpc(ipc)
   ParentProcess.setIpc(ipc)
 }
