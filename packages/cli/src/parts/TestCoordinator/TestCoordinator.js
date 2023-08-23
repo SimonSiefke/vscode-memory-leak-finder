@@ -6,5 +6,7 @@ export const listen = async (method) => {
   return IpcParent.create({
     method,
     url,
+    name: 'Test Coordinator',
+    ref: false,
   })
 }
