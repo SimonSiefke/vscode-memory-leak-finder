@@ -1,10 +1,10 @@
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.js'
 import * as Id from '../Id/Id.js'
 import * as PrepareTests from '../PrepareTests/PrepareTests.js'
+import * as PrettyError from '../PrettyError/PrettyError.js'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.js'
 import * as Time from '../Time/Time.js'
-import * as PrettyError from '../PrettyError/PrettyError.js'
 
 // 1. get matching files
 // 2. launch vscode
