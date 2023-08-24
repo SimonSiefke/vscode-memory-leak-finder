@@ -58,7 +58,7 @@ export const wrap = (worker) => {
           this.worker.on('error', listener)
           break
         case 'message':
-          this.worker.on('event', listener)
+          this.worker.on('message', listener)
           break
         default:
           throw new Error(`unexpected listener ${event}`)

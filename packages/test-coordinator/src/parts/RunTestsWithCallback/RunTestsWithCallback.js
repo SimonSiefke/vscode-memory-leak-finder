@@ -6,6 +6,7 @@ import * as TestWorker from '../TestWorker/TestWorker.js'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.js'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 import * as Time from '../Time/Time.js'
+import * as Connect from '../Connect/Connect.js'
 
 // 1. get matching files
 // 2. launch vscode
@@ -33,20 +34,15 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, call
   const { absolutePath, relativePath, relativeDirname, dirent } = first
   callback(JsonRpcEvent.create(TestWorkerEventType.TestRunning, [absolutePath, relativeDirname, dirent]))
   const initialStart = Time.now()
-  console.time('launch vscode')
   const context = await LaunchVsCode.launchVsCode({
     headlessMode,
     cwd,
   })
-  console.timeEnd('launch vscode')
   const child = context.child
   const webSocketUrl = context.webSocketUrl
 
-  const rpc = await TestWorker.launch()
-
-  await rpc.invoke(TestWorkerCommandType.Connect, webSocketUrl)
-
-  console.log('launched test worker')
+  const ipc = await TestWorker.launch()
+  await Connect.connect(ipc, webSocketUrl)
 
   const end = Time.now()
   const duration = end - start

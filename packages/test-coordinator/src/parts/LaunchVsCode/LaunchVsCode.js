@@ -14,7 +14,6 @@ import { VError } from '../VError/VError.js'
 
 export const launchVsCode = async ({ headlessMode, cwd }) => {
   try {
-    Logger.log('[test-worker] launch vscode')
     const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
     await CreateTestWorkspace.createTestWorkspace(testWorkspacePath)
     const testExtensionsPath = join(Root.root, '.vscode-extensions')
