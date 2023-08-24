@@ -1,12 +1,9 @@
-import * as Connect from '../Connect/Connect.js'
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.js'
-import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.js'
-import * as TestWorker from '../TestWorker/TestWorker.js'
+import * as Id from '../Id/Id.js'
+import * as PrepareTests from '../PrepareTests/PrepareTests.js'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.js'
 import * as Time from '../Time/Time.js'
-import * as Id from '../Id/Id.js'
-import * as PageObject from '../PageObject/PageObject.js'
 
 // 1. get matching files
 // 2. launch vscode
@@ -22,25 +19,8 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, call
   if (total === 0) {
     return callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, 0, filterValue)
   }
-  const state = {
-    passed: 0,
-    failed: 0,
-    skipped: 0,
-    total,
-  }
-  const first = formattedPaths[0]
-  const { absolutePath, relativePath, relativeDirname, dirent } = first
-  callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent)
-  const initialStart = Time.now()
-  const { child, webSocketUrl } = await LaunchVsCode.launchVsCode({
-    headlessMode,
-    cwd,
-  })
-  console.log({ webSocketUrl })
-  const ipc = await TestWorker.launch()
   const connectionId = Id.create()
-  await Connect.connectViaDebugger(ipc, connectionId, headlessMode, webSocketUrl)
-  await PageObject.create(ipc, connectionId)
+  const ipc = await PrepareTests.prepareTests(cwd, headlessMode)
   for (const formattedPath of formattedPaths) {
     await TestWorkerRunTest.testWorkerRunTest(ipc, connectionId, formattedPaths)
   }
@@ -49,5 +29,5 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, call
 
   const end = Time.now()
   const duration = end - start
-  callback(TestWorkerEventType.AllTestsFinished, state.passed, state.failed, state.skipped, state.total, duration, filterValue)
+  callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, duration, filterValue)
 }

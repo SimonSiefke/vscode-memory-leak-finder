@@ -1,66 +1,23 @@
 import * as Assert from '../Assert/Assert.js'
-import * as ConnectionState from '../ConnectionState/ConnectionState.js'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.js'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.js'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
-import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import { DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as ElectronApp from '../ElectronApp/ElectronApp.js'
-import * as MonkeyPatchElectronHeadlessMode from '../MonkeyPatchElectronHeadlessMode/MonkeyPatchElectronHeadlessMode.js'
+import * as ElectronAppState from '../ElectronAppState/ElectronAppState.js'
+import * as IntermediateConnectionState from '../IntermediateConnectionState/IntermediateConnectionState.js'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.js'
 import * as ObjectType from '../ObjectType/ObjectType.js'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
 import * as SessionState from '../SessionState/SessionState.js'
-import * as WaitForDebuggerToBePaused from '../WaitForDebuggerToBePaused/WaitForDebuggerToBePaused.js'
-import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.js'
 
-export const connect = async (connectionId, headlessMode, webSocketUrl) => {
+export const connectDevtools = async (connectionId, devtoolsWebSocketUrl) => {
   Assert.number(connectionId)
-  Assert.string(webSocketUrl)
-  const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
-  ConnectionState.set(connectionId, electronIpc)
-
-  const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc)
-
-  electronRpc.on(DevtoolsEventType.DebuggerPaused, ScenarioFunctions.handlePaused)
-  electronRpc.on(DevtoolsEventType.DebuggerResumed, ScenarioFunctions.handleResumed)
-  electronRpc.on(DevtoolsEventType.DebuggerScriptParsed, ScenarioFunctions.handleScriptParsed)
-  electronRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, ScenarioFunctions.handleRuntimeExecutionContextCreated)
-  electronRpc.on(DevtoolsEventType.RuntimeExecutionContextDestroyed, ScenarioFunctions.handleRuntimeExecutionContextDestroyed)
-
-  await Promise.all([
-    DevtoolsProtocolDebugger.enable(electronRpc),
-    DevtoolsProtocolRuntime.enable(electronRpc),
-    DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc),
-  ])
-
-  const msg = await WaitForDebuggerToBePaused.waitForDebuggerToBePaused(electronRpc)
-  const callFrame = msg.params.callFrames[0]
-  const callFrameId = callFrame.callFrameId
-
-  const electron = await DevtoolsProtocolDebugger.evaluateOnCallFrame(electronRpc, {
-    callFrameId,
-    expression: `require('electron')`,
-    generatePreview: true,
-  })
-  const electronObjectId = electron.result.result.objectId
-  if (headlessMode) {
-    await DevtoolsProtocolDebugger.evaluateOnCallFrame(electronRpc, {
-      callFrameId,
-      expression: MonkeyPatchElectronHeadlessMode.monkeyPatchElectronScript,
-    })
-  }
-
-  const monkeyPatchedElectron = await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-    functionDeclaration: MonkeyPatchElectronScript.monkeyPatchElectronScript,
-    objectId: electronObjectId,
-  })
-  await DevtoolsProtocolDebugger.resume(electronRpc)
-
-  console.log('resumed')
-  await new Promise((r) => {})
-  const devtoolsUrl = await WaitForDevtoolsListening.waitForDevtoolsListening(child.stderr)
-
-  const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsUrl)
+  Assert.string(devtoolsWebSocketUrl)
+  const intermediateConnection = IntermediateConnectionState.get(connectionId)
+  IntermediateConnectionState.remove(connectionId)
+  const { electronRpc, monkeyPatchedElectron, electronObjectId, callFrameId } = intermediateConnection
+  const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
 
   SessionState.addSession('browser', {
@@ -106,5 +63,5 @@ export const connect = async (connectionId, headlessMode, webSocketUrl) => {
     electronObjectId,
     callFrameId,
   })
-  ConnectionState.set(connectionId, electronApp)
+  ElectronAppState.set(connectionId, electronApp)
 }

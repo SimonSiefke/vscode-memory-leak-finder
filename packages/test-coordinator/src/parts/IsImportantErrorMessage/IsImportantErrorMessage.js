@@ -17,6 +17,9 @@ export const isImportantErrorMessage = (data) => {
   if (data.includes('Failed to decrypt: Key not valid for use in specified state')) {
     return false
   }
+  if (data.trim() === 'Debugger attached.') {
+    return false
+  }
   if (RE_LIB_PROXY_NOT_FOUND.test(data)) {
     return false
   }
