@@ -55,5 +55,5 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, call
   }
   const end = Time.now()
   const duration = end - start
-  callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, duration, filterValue)
+  callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, total, duration, filterValue)
 }
