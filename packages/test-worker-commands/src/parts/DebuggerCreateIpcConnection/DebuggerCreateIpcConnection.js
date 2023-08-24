@@ -2,6 +2,7 @@ import { once } from 'node:events'
 import { WebSocket } from 'ws'
 import * as Json from '../Json/Json.js'
 import VError from 'verror'
+import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWebSocketToBeOpen.js'
 
 /**
  * @param {string} wsUrl
@@ -9,7 +10,7 @@ import VError from 'verror'
 export const createConnection = async (wsUrl) => {
   try {
     const webSocket = new WebSocket(wsUrl)
-    await once(webSocket, 'open')
+    await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket)
     return {
       /**
        *

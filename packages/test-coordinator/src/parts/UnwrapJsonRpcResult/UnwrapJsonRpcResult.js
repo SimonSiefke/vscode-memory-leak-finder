@@ -4,6 +4,7 @@ import * as RestoreJsonRpcError from '../RestoreJsonRpcError/RestoreJsonRpcError
 export const unwrapJsonRpcResult = (responseMessage) => {
   if ('error' in responseMessage) {
     const restoredError = RestoreJsonRpcError.restoreJsonRpcError(responseMessage.error)
+    console.log({ restoredError })
     throw restoredError
   }
   if ('result' in responseMessage) {

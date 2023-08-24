@@ -12,8 +12,7 @@ export const create = async ({ url, stdio }) => {
   })
   const { type, event } = await GetFirstNodeWorkerEvent.getFirstNodeWorkerEvent(worker)
   if (type === FirstNodeWorkerEventType.Error) {
-    console.log(event)
-    throw new IpcError(`Failed to start node worker: ${event}`)
+    throw new IpcError(`Failed to start node worker: ${event.message}`)
   }
   if (type === FirstNodeWorkerEventType.Exit) {
     throw new IpcError(`Node worker exited unexpectedly`)

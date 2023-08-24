@@ -6,12 +6,9 @@ import * as IpcChildType from '../IpcChildType/IpcChildType.js'
 import * as ParentProcess from '../ParentProcess/ParentProcess.js'
 
 export const listen = async () => {
-  console.time('load commands')
   const commandMap = await CommandMap.load()
-  console.timeEnd('load commands')
   CommandState.registerCommands(commandMap)
   const ipc = await IpcChild.listen({ method: IpcChildType.Auto() })
-  console.log('ready')
   HandleIpc.handleIpc(ipc)
   ParentProcess.setIpc(ipc)
 }

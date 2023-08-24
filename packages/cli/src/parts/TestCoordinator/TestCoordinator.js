@@ -3,10 +3,11 @@ import * as IpcParent from '../IpcParent/IpcParent.js'
 
 export const listen = async (method) => {
   const url = GetTestCoordinatorUrl.getTestCoordinatorUrl()
-  return IpcParent.create({
+  const ipc = await IpcParent.create({
     method,
     url,
     name: 'Test Coordinator',
     ref: false,
   })
+  return ipc
 }
