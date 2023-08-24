@@ -1,16 +1,7 @@
 import { CommandNotFoundError } from '../CommandNotFoundError/CommandNotFoundError.js'
-import * as ErrorCodes from '../ErrorCodes/ErrorCodes.js'
 import * as JsonRpcErrorCode from '../JsonRpcErrorCode/JsonRpcErrorCode.js'
 import * as JsonRpcVersion from '../JsonRpcVersion/JsonRpcVersion.js'
 import * as PrettyError from '../PrettyError/PrettyError.js'
-import * as PrintPrettyError from '../PrintPrettyError/PrintPrettyError.js'
-
-const shouldLogError = (error) => {
-  if (error && error.code === ErrorCodes.ENOENT) {
-    return false
-  }
-  return true
-}
 
 export const getErrorResponse = (message, error) => {
   if (error && error instanceof CommandNotFoundError) {
@@ -24,21 +15,8 @@ export const getErrorResponse = (message, error) => {
       },
     }
   }
-  if (!shouldLogError(error)) {
-    return {
-      jsonrpc: JsonRpcVersion.Two,
-      id: message.id,
-      error: {
-        code: JsonRpcErrorCode.Custom,
-        message: `${error}`,
-        data: {
-          code: error.code,
-        },
-      },
-    }
-  }
+
   const prettyError = PrettyError.prepare(error)
-  PrintPrettyError.printPrettyError(prettyError, `[test-worker] `)
   return {
     jsonrpc: JsonRpcVersion.Two,
     id: message.id,

@@ -2,9 +2,8 @@ import * as Assert from '../Assert/Assert.js'
 import * as JsonRpc from '../JsonRpc/JsonRpc.js'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.js'
 
-export const connect = (ipc, connectionId, webSocketUrl) => {
+export const testWorkerRunTests = (ipc, connectionId, formattedPaths) => {
   Assert.object(ipc)
-  Assert.number(connectionId)
-  Assert.string(webSocketUrl)
-  return JsonRpc.invoke(ipc, TestWorkerCommandType.Connect, connectionId, webSocketUrl)
+  Assert.array(formattedPaths)
+  return JsonRpc.invoke(ipc, TestWorkerCommandType.RunTests, connectionId, formattedPaths)
 }

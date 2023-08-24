@@ -3,7 +3,9 @@ import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.js'
 import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.js'
 import * as TestWorker from '../TestWorker/TestWorker.js'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
+import * as TestWorkerRunTests from '../TestWorkerRunTests/TestWorkerRunTests.js'
 import * as Time from '../Time/Time.js'
+import * as Id from '../Id/Id.js'
 
 // 1. get matching files
 // 2. launch vscode
@@ -37,7 +39,11 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, call
   const webSocketUrl = context.webSocketUrl
 
   const ipc = await TestWorker.launch()
-  await Connect.connect(ipc, webSocketUrl)
+  const connectionId = Id.create()
+  await Connect.connect(ipc, connectionId, webSocketUrl)
+  await TestWorkerRunTests.testWorkerRunTests(ipc, connectionId, formattedPaths)
+
+  console.log({ formattedPaths })
 
   const end = Time.now()
   const duration = end - start
