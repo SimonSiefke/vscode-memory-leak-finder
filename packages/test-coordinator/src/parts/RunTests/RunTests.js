@@ -1,7 +1,8 @@
 import * as RunTestsWithCallback from '../RunTestsWithCallback/RunTestsWithCallback.js'
+import * as CliProcess from '../CliProcess/CliProcess.js'
 
 const callback = (method, ...params) => {
-  console.log({ callback: method, params })
+  CliProcess.send(method, ...params)
 }
 
 export const runTests = async (root, cwd, filterValue, headlessMode, color) => {
