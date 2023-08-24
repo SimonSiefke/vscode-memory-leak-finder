@@ -1,10 +1,8 @@
-import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.js'
-import * as RunTests from '../RunTests/RunTests.js'
-import * as Exit from '../Exit/Exit.js'
 import * as Connect from '../Connect/Connect.js'
+import * as RunTest from '../RunTest/RunTest.js'
+import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.js'
 
 export const commandMap = {
-  [TestWorkerCommandType.RunTests]: RunTests.runTests,
-  [TestWorkerCommandType.Exit]: Exit.exit,
   [TestWorkerCommandType.Connect]: Connect.connect,
+  [TestWorkerCommandType.RunTest]: RunTest.runTest,
 }

@@ -1,2 +1,3 @@
 export const Connect = 'Connect.connect'
-export const RunTests = 'RunTests.runTests'
+export const RunTest = 'RunTest.runTest'
+export const PageObjectCreate = 'PageObject.create'

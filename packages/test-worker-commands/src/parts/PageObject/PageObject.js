@@ -2,6 +2,7 @@ import { join } from 'path'
 import * as Assert from '../Assert/Assert.js'
 import * as ImportScript from '../ImportScript/ImportScript.js'
 import * as Root from '../Root/Root.js'
+import * as PageObjectState from '../PageObjectState/PageObjectState.js'
 import { VError } from '../VError/VError.js'
 
 const pageObjectPath = join(Root.root, 'packages', 'page-object', 'src', 'main.js')

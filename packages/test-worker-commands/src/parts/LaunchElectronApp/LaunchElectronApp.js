@@ -3,17 +3,15 @@ import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/Deb
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
 import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as ElectronApp from '../ElectronApp/ElectronApp.js'
-import * as LaunchElectron from '../LaunchElectron/LaunchElectron.js'
-import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.js'
 import * as MonkeyPatchElectronHeadlessMode from '../MonkeyPatchElectronHeadlessMode/MonkeyPatchElectronHeadlessMode.js'
+import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.js'
 import * as ObjectType from '../ObjectType/ObjectType.js'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
 import * as SessionState from '../SessionState/SessionState.js'
 import * as WaitForDebuggerToBePaused from '../WaitForDebuggerToBePaused/WaitForDebuggerToBePaused.js'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.js'
 
-export const launch = async ({ cliPath, args, headlessMode, cwd, env }) => {
-  const { child, webSocketUrl } = await LaunchElectron.launchElectron({ cliPath, args, headlessMode, cwd, env })
+export const launch = async ({ headlessMode, webSocketUrl }) => {
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc)
 
