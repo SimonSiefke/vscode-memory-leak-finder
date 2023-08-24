@@ -3,7 +3,6 @@ import { dirname } from 'path'
 import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.js'
 import * as DefaultVscodeSettingsPath from '../DefaultVscodeSettingsPath/DefaultVsCodeSettingsPath.js'
 import * as GetBinaryPath from '../GetBinaryPath/GetBinaryPath.js'
-import * as GetCwd from '../GetCwd/GetCwd.js'
 import * as GetUserDataDir from '../GetUserDataDir/GetUserDataDir.js'
 import * as GetVsCodeArgs from '../GetVsCodeArgs/GetVsCodeArgs.js'
 import * as GetVsCodeEnv from '../GetVsCodeEnv/GetVsCodeEnv.js'
@@ -13,7 +12,7 @@ import { join } from '../Path/Path.js'
 import * as Root from '../Root/Root.js'
 import { VError } from '../VError/VError.js'
 
-export const launchVsCode = async ({ headlessMode }) => {
+export const launchVsCode = async ({ headlessMode, cwd }) => {
   try {
     Logger.log('[test-worker] launch vscode')
     const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
@@ -29,7 +28,6 @@ export const launchVsCode = async ({ headlessMode }) => {
       userDataDir,
       extraLaunchArgs: [testWorkspacePath],
     })
-    const cwd = GetCwd.getCwd()
     const env = GetVsCodeEnv.getVsCodeEnv({ extensionsFolder: testExtensionsPath })
     const { child, webSocketUrl } = await LaunchElectron.launchElectron({
       cliPath: binaryPath,
