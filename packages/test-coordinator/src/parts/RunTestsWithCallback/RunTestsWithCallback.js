@@ -20,9 +20,9 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, call
     return callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, 0, filterValue)
   }
   const connectionId = Id.create()
-  const ipc = await PrepareTests.prepareTests(cwd, headlessMode)
+  const ipc = await PrepareTests.prepareTests(cwd, headlessMode, connectionId)
   for (const formattedPath of formattedPaths) {
-    await TestWorkerRunTest.testWorkerRunTest(ipc, connectionId, formattedPaths)
+    await TestWorkerRunTest.testWorkerRunTest(ipc, connectionId, formattedPath.absolutePath, root, color)
   }
 
   // console.log({ formattedPaths })
