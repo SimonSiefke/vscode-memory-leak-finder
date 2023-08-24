@@ -1,10 +1,10 @@
 import * as ImportTest from '../ImportTest/ImportTest.js'
 import * as TestStage from '../TestStage/TestStage.js'
 
-export const runTestWithCallback = async (pageObject, file, root, color, callback) => {
+export const runTestWithCallback = async (pageObject, file) => {
   const module = await ImportTest.importTest(file)
   if (module.skip) {
-    return
+    return true
   }
   await TestStage.beforeSetup(module, pageObject)
   await TestStage.setup(module, pageObject)

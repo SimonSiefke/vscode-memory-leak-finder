@@ -3,15 +3,13 @@ import * as Assert from '../Assert/Assert.js'
 import * as PageObjectState from '../PageObjectState/PageObjectState.js'
 import * as RunTestWithCallback from '../RunTestWithCallback/RunTestWithCallback.js'
 
-export const runTest = async (connectionId, absolutePath, root, color) => {
+export const runTest = async (connectionId, absolutePath) => {
   Assert.number(connectionId)
   Assert.string(absolutePath)
-  Assert.string(root)
-  Assert.boolean(color)
   const pageObject = PageObjectState.get(connectionId)
   if (!pageObject) {
     throw new VError(`no page object ${connectionId} found`)
   }
-  const stats = await RunTestWithCallback.runTestWithCallback(pageObject, absolutePath, root, color)
-  return stats
+  const skipped = await RunTestWithCallback.runTestWithCallback(pageObject, absolutePath)
+  return skipped
 }
