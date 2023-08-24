@@ -32,16 +32,14 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, call
   const { absolutePath, relativePath, relativeDirname, dirent } = first
   callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent)
   const initialStart = Time.now()
-  const context = await LaunchVsCode.launchVsCode({
+  const { child, webSocketUrl } = await LaunchVsCode.launchVsCode({
     headlessMode,
     cwd,
   })
-  const child = context.child
-  const webSocketUrl = context.webSocketUrl
-
+  console.log({ webSocketUrl })
   const ipc = await TestWorker.launch()
   const connectionId = Id.create()
-  await Connect.connect(ipc, connectionId, webSocketUrl)
+  await Connect.connectViaDebugger(ipc, connectionId, headlessMode, webSocketUrl)
   await PageObject.create(ipc, connectionId)
   for (const formattedPath of formattedPaths) {
     await TestWorkerRunTest.testWorkerRunTest(ipc, connectionId, formattedPaths)

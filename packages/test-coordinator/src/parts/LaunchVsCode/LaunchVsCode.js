@@ -7,7 +7,6 @@ import * as GetUserDataDir from '../GetUserDataDir/GetUserDataDir.js'
 import * as GetVsCodeArgs from '../GetVsCodeArgs/GetVsCodeArgs.js'
 import * as GetVsCodeEnv from '../GetVsCodeEnv/GetVsCodeEnv.js'
 import * as LaunchElectron from '../LaunchElectron/LaunchElectron.js'
-import * as Logger from '../Logger/Logger.js'
 import { join } from '../Path/Path.js'
 import * as Root from '../Root/Root.js'
 import { VError } from '../VError/VError.js'
@@ -28,6 +27,7 @@ export const launchVsCode = async ({ headlessMode, cwd }) => {
       extraLaunchArgs: [testWorkspacePath],
     })
     const env = GetVsCodeEnv.getVsCodeEnv({ extensionsFolder: testExtensionsPath })
+    console.log({ args })
     const { child, webSocketUrl } = await LaunchElectron.launchElectron({
       cliPath: binaryPath,
       args,

@@ -28,6 +28,7 @@ const handleStdout = (data) => {
  */
 const handleStdErr = (data) => {
   // logStream.write(data)
+  console.log({ data })
 }
 
 export const launchElectron = async ({ cliPath, args, headlessMode, cwd, env }) => {

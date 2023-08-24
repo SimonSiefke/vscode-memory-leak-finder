@@ -11,8 +11,7 @@ import * as SessionState from '../SessionState/SessionState.js'
 import * as WaitForDebuggerToBePaused from '../WaitForDebuggerToBePaused/WaitForDebuggerToBePaused.js'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.js'
 
-export const launch = async ({ headlessMode, webSocketUrl }) => {
-  const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
+export const launch = async ({ headlessMode, electronIpc }) => {
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc)
 
   electronRpc.on(DevtoolsEventType.DebuggerPaused, ScenarioFunctions.handlePaused)
