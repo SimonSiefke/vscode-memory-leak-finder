@@ -6,7 +6,6 @@ export const runTestWithCallback = async (pageObject, file, root, color, callbac
   if (module.skip) {
     return
   }
-  console.log({ module })
   await TestStage.beforeSetup(module, pageObject)
   await TestStage.setup(module, pageObject)
   await TestStage.run(module, pageObject)
