@@ -16,6 +16,7 @@ export const launchVsCode = async ({ headlessMode, cwd }) => {
     const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
     await CreateTestWorkspace.createTestWorkspace(testWorkspacePath)
     const testExtensionsPath = join(Root.root, '.vscode-extensions')
+    const runtimeDir = join(Root.root, '.vscode-runtime-dir')
     const binaryPath = await GetBinaryPath.getBinaryPath()
     const userDataDir = GetUserDataDir.getUserDataDir()
     const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
@@ -26,7 +27,7 @@ export const launchVsCode = async ({ headlessMode, cwd }) => {
       userDataDir,
       extraLaunchArgs: [testWorkspacePath],
     })
-    const env = GetVsCodeEnv.getVsCodeEnv({ extensionsFolder: testExtensionsPath })
+    const env = GetVsCodeEnv.getVsCodeEnv({ extensionsFolder: testExtensionsPath, runtimeDir })
     const { child, webSocketUrl } = await LaunchElectron.launchElectron({
       cliPath: binaryPath,
       args,
