@@ -5,6 +5,6 @@ const callback = (method, ...params) => {
   CliProcess.send(method, ...params)
 }
 
-export const runTests = async (root, cwd, filterValue, headlessMode, color) => {
+export const runTests = (root, cwd, filterValue, headlessMode, color) => {
   return RunTestsWithCallback.runTests(root, cwd, filterValue, headlessMode, color, callback)
 }

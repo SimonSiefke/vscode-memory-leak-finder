@@ -1,11 +1,11 @@
 import * as Assert from '../Assert/Assert.js'
-import * as HandleFileChanged from '../HandleFileChanged/HandleFileChanged.js'
 import * as HandleTestFailed from '../HandleTestFailed/HandleTestFailed.js'
 import * as HandleTestPassed from '../HandleTestPassed/HandleTestPassed.js'
 import * as HandleTestRunning from '../HandleTestRunning/HandleTestRunning.js'
 import * as HandleTestSkipped from '../HandleTestSkipped/HandleTestSkipped.js'
 import * as HandleTestsFinished from '../HandleTestsFinished/HandleTestsFinished.js'
 import * as HandleTestsStarting from '../HandleTestsStarting/HandleTestsStarting.js'
+import * as HandleTestsUnexpectedError from '../HandleTestsUnexpectedError/HandleTestsUnexpectedError.js'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 
 const getFn = (method) => {
@@ -23,6 +23,8 @@ const getFn = (method) => {
       return HandleTestsStarting.handleTestsStarting
     case TestWorkerEventType.TestSkipped:
       return HandleTestSkipped.handleTestSkipped
+    case TestWorkerEventType.UnexpectedTestError:
+      return HandleTestsUnexpectedError.handleTestsUnexpectedError
     default:
       throw new Error(`method not found ${method}`)
   }

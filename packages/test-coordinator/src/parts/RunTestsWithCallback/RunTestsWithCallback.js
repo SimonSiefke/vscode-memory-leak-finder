@@ -14,46 +14,52 @@ import * as Time from '../Time/Time.js'
 // 6. pass matching files to test worker
 
 export const runTests = async (root, cwd, filterValue, headlessMode, color, callback) => {
-  const start = Time.now()
-  const formattedPaths = await GetTestToRun.getTestsToRun(root, cwd, filterValue)
-  const total = formattedPaths.length
-  if (total === 0) {
-    return callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, 0, filterValue)
-  }
-  let passed = 0
-  let failed = 0
-  let skipped = 0
-  const initialStart = Time.now()
-  const first = formattedPaths[0]
-  callback(TestWorkerEventType.TestsStarting, total)
-  callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent)
-  const connectionId = Id.create()
-  const ipc = await PrepareTests.prepareTests(cwd, headlessMode, connectionId)
-  for (let i = 0; i < formattedPaths.length; i++) {
-    const formattedPath = formattedPaths[i]
-    const { absolutePath, relativeDirname, dirent, relativePath } = formattedPath
-    if (i !== 0) {
-      callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent)
+  try {
+    let passed = 0
+    let failed = 0
+    let skipped = 0
+    const start = Time.now()
+    const formattedPaths = await GetTestToRun.getTestsToRun(root, cwd, filterValue)
+    const total = formattedPaths.length
+    if (total === 0) {
+      return callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, 0, filterValue)
     }
-    try {
-      const start = i === 0 ? initialStart : Time.now()
-      const testSkipped = await TestWorkerRunTest.testWorkerRunTest(ipc, connectionId, formattedPath.absolutePath, root, color)
-      const end = Time.now()
-      const duration = end - start
-      if (testSkipped) {
-        skipped++
-        callback(TestWorkerEventType.TestSkipped, absolutePath, relativeDirname, dirent, duration)
-      } else {
-        callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration)
-        passed++
+
+    const initialStart = Time.now()
+    const first = formattedPaths[0]
+    // callback(TestWorkerEventType.TestsStarting, total)
+    // callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent)
+    const connectionId = Id.create()
+    const ipc = await PrepareTests.prepareTests(cwd, headlessMode, connectionId)
+    for (let i = 0; i < formattedPaths.length; i++) {
+      const formattedPath = formattedPaths[i]
+      const { absolutePath, relativeDirname, dirent, relativePath } = formattedPath
+      if (i !== 0) {
+        callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent)
       }
-    } catch (error) {
-      failed++
-      const prettyError = await PrettyError.prepare(error, { color, root })
-      callback(TestWorkerEventType.TestFailed, absolutePath, relativeDirname, relativePath, dirent, prettyError)
+      try {
+        const start = i === 0 ? initialStart : Time.now()
+        const testSkipped = await TestWorkerRunTest.testWorkerRunTest(ipc, connectionId, formattedPath.absolutePath, root, color)
+        const end = Time.now()
+        const duration = end - start
+        if (testSkipped) {
+          skipped++
+          callback(TestWorkerEventType.TestSkipped, absolutePath, relativeDirname, dirent, duration)
+        } else {
+          callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration)
+          passed++
+        }
+      } catch (error) {
+        failed++
+        const prettyError = await PrettyError.prepare(error, { color, root })
+        callback(TestWorkerEventType.TestFailed, absolutePath, relativeDirname, relativePath, dirent, prettyError)
+      }
     }
+    const end = Time.now()
+    const duration = end - start
+    callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, total, duration, filterValue)
+  } catch (error) {
+    const prettyError = await PrettyError.prepare(error, { color, root })
+    callback(TestWorkerEventType.UnexpectedTestError, prettyError)
   }
-  const end = Time.now()
-  const duration = end - start
-  callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, total, duration, filterValue)
 }
