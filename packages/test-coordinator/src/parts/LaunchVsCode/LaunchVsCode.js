@@ -13,8 +13,9 @@ import { VError } from '../VError/VError.js'
 
 const getRuntimeDir = () => {
   const runtimeDir = join(Root.root, '.vscode-runtime-dir')
-  // vscode doesn't allow runtime that is longer than 107 characters
-  if (runtimeDir.length > 107) {
+  // vscode doesn't allow a socket file that is longer than 107 characters
+  // the socket file is ~30 characters longer than runtimeDir
+  if (runtimeDir.length > 70) {
     return ''
   }
   return runtimeDir
