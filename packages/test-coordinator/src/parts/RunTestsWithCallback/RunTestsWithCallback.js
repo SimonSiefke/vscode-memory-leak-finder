@@ -27,8 +27,8 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, call
 
     const initialStart = Time.now()
     const first = formattedPaths[0]
-    // callback(TestWorkerEventType.TestsStarting, total)
-    // callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent)
+    callback(TestWorkerEventType.TestsStarting, total)
+    callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent)
     const connectionId = Id.create()
     const ipc = await PrepareTests.prepareTests(cwd, headlessMode, connectionId)
     for (let i = 0; i < formattedPaths.length; i++) {
