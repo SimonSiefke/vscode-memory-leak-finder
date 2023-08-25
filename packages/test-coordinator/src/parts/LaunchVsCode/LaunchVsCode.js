@@ -11,12 +11,21 @@ import { join } from '../Path/Path.js'
 import * as Root from '../Root/Root.js'
 import { VError } from '../VError/VError.js'
 
+const getRuntimeDir = () => {
+  const runtimeDir = join(Root.root, '.vscode-runtime-dir')
+  // vscode doesn't allow runtime that is longer than 107 characters
+  if (runtimeDir.length > 107) {
+    return ''
+  }
+  return runtimeDir
+}
+
 export const launchVsCode = async ({ headlessMode, cwd }) => {
   try {
     const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
     await CreateTestWorkspace.createTestWorkspace(testWorkspacePath)
     const testExtensionsPath = join(Root.root, '.vscode-extensions')
-    const runtimeDir = join(Root.root, '.vscode-runtime-dir')
+    const runtimeDir = getRuntimeDir()
     const binaryPath = await GetBinaryPath.getBinaryPath()
     const userDataDir = GetUserDataDir.getUserDataDir()
     const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath

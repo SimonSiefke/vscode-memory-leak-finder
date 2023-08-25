@@ -2,7 +2,9 @@ export const getVsCodeEnv = ({ extensionsFolder, runtimeDir }) => {
   const env = {
     ...process.env,
     VSCODE_EXTENSIONS: extensionsFolder,
-    XDG_RUNTIME_DIR: runtimeDir,
+  }
+  if (runtimeDir) {
+    env['XDG_RUNTIME_DIR'] = runtimeDir
   }
   delete env['GIT_ASKPASS']
   delete env['VSCODE_GIT_ASKPASS_MAIN']
