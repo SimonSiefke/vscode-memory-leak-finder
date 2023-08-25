@@ -24,7 +24,6 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, call
     if (total === 0) {
       return callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, 0, filterValue)
     }
-
     const initialStart = Time.now()
     const first = formattedPaths[0]
     callback(TestWorkerEventType.TestsStarting, total)
