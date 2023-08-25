@@ -2,9 +2,9 @@ import exitHook from 'exit-hook'
 import { ChildProcess } from 'node:child_process'
 import VError from 'verror'
 import * as GetElectronArgs from '../GetElectronArgs/GetElectronArgs.js'
+import * as Logger from '../Logger/Logger.js'
 import * as Spawn from '../Spawn/Spawn.js'
 import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.js'
-import * as Logger from '../Logger/Logger.js'
 
 export const state = {
   /**
