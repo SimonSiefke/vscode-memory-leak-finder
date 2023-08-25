@@ -15,7 +15,6 @@ export const killExistingVsCodeInstances = async () => {
     const content = await readFile(lockPath, 'utf8')
     const pid = parseInt(content)
     process.kill(pid, 'SIGKILL')
-    console.log('killed vscode')
   } catch (error) {
     if (error && (error.code === ErrorCodes.ENOENT || error.code === ErrorCodes.ESRCH)) {
       return
