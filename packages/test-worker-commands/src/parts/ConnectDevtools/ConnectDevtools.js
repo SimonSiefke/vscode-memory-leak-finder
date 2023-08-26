@@ -14,7 +14,7 @@ import * as SessionState from '../SessionState/SessionState.js'
 export const connectDevtools = async (connectionId, devtoolsWebSocketUrl, monkeyPatchedElectron, electronObjectId, callFrameId) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
-  Assert.string(monkeyPatchedElectron)
+  Assert.object(monkeyPatchedElectron)
   Assert.string(electronObjectId)
   Assert.string(callFrameId)
   const electronRpc = IntermediateConnectionState.get(connectionId)
