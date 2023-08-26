@@ -2,7 +2,7 @@
 // where sometimes quickpick opens, but the webview is focused
 // and then quickpick doesn't work
 const waitForExtraIdle = async (page) => {
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 20; i++) {
     await page.waitForIdle()
   }
 }
