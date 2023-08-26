@@ -33,7 +33,8 @@ export const prepareTestsOrAttach = async (cwd, headlessMode, connectionId) => {
     return ipc
   }
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, callFrameId, monkeyPatchedElectron } = await state.promise
-  await ConnectElectron.connectElectron(ipc, connectionId, headlessMode, webSocketUrl, false)
+  const isFirstConnection = false
+  await ConnectElectron.connectElectron(ipc, connectionId, headlessMode, webSocketUrl, isFirstConnection)
   await ConnectDevtools.connectDevtools(
     ipc,
     connectionId,
@@ -41,8 +42,8 @@ export const prepareTestsOrAttach = async (cwd, headlessMode, connectionId) => {
     monkeyPatchedElectron,
     electronObjectId,
     callFrameId,
-    false,
+    isFirstConnection,
   )
-  await PageObject.create(ipc, connectionId)
+  await PageObject.create(ipc, connectionId, isFirstConnection)
   return ipc
 }

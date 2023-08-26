@@ -8,7 +8,7 @@ test('unwrapResult - undefined', () => {
           type: 'undefined',
         },
       },
-    })
+    }),
   ).toBeUndefined()
 })
 
@@ -21,7 +21,7 @@ test('unwrapResult - number', () => {
           value: 1,
         },
       },
-    })
+    }),
   ).toBe(1)
 })
 
@@ -34,7 +34,7 @@ test('unwrapResult - string', () => {
           value: 'test',
         },
       },
-    })
+    }),
   ).toBe('test')
 })
 
@@ -47,6 +47,30 @@ test('unwrapResult - object', () => {
           value: {},
         },
       },
-    })
+    }),
+  ).toEqual({
+    type: 'object',
+    value: {},
+  })
+})
+
+test('unwrapResult - unknown value', () => {
+  expect(() =>
+    UnwrapDevtoolsEvaluateResult.unwrapResult({
+      id: 1,
+    }),
+  ).toThrowError(new Error(`Failed to unwrap devtools evaluate result`))
+})
+
+test('unwrapResult - result with empty object', () => {
+  expect(
+    UnwrapDevtoolsEvaluateResult.unwrapResult({
+      id: 2,
+      result: {},
+    }),
   ).toEqual({})
+})
+
+test('unwrapResult - wrapped null', () => {
+  expect(UnwrapDevtoolsEvaluateResult.unwrapResult({ result: { result: { type: 'object', subtype: 'null', value: null } } })).toBe(null)
 })

@@ -6,6 +6,7 @@ import * as PageObject from '../PageObject/PageObject.js'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.js'
 
 export const prepareTests = async (ipc, cwd, headlessMode, connectionId) => {
+  const isFirstConnection = true
   await KillExistingVscodeInstances.killExistingVsCodeInstances()
   const { child, webSocketUrl } = await LaunchVsCode.launchVsCode({
     headlessMode,
@@ -17,11 +18,19 @@ export const prepareTests = async (ipc, cwd, headlessMode, connectionId) => {
     connectionId,
     headlessMode,
     webSocketUrl,
-    true,
+    isFirstConnection,
   )
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
-  await ConnectDevtools.connectDevtools(ipc, connectionId, devtoolsWebSocketUrl, monkeyPatchedElectron, electronObjectId, callFrameId, true)
-  await PageObject.create(ipc, connectionId)
+  await ConnectDevtools.connectDevtools(
+    ipc,
+    connectionId,
+    devtoolsWebSocketUrl,
+    monkeyPatchedElectron,
+    electronObjectId,
+    callFrameId,
+    isFirstConnection,
+  )
+  await PageObject.create(ipc, connectionId, isFirstConnection)
   return {
     ipc,
     webSocketUrl,
