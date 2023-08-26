@@ -4,14 +4,14 @@ const generateFileContent = () => {
   return Array(200).fill('sample text').join('\n')
 }
 
-export const beforeSetup = async ({ tmpDir, writeFile, join, writeSettings }) => {
-  await writeSettings({
-    'window.titleBarStyle': 'custom',
-  })
-  await writeFile(join(tmpDir, 'file.txt'), generateFileContent())
-}
-
-export const setup = async ({ Editor }) => {
+export const setup = async ({ Editor, Workspace }) => {
+  await Workspace.setFiles([
+    {
+      name: 'file.txt',
+      content: generateFileContent(),
+    },
+  ])
+  await Editor.closeAll()
   await Editor.open('file.txt')
 }
 
