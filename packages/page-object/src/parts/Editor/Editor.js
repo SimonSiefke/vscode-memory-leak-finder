@@ -1,5 +1,6 @@
 import * as QuickPick from '../QuickPick/QuickPick.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
+import * as Character from '../Character/Character.js'
 
 const initialDiagnosticTimeout = 30_000
 
@@ -224,8 +225,10 @@ export const create = ({ page, expect, VError }) => {
       try {
         const editor = page.locator('.editor-instance')
         const editorLines = editor.locator('.view-lines')
-        const actualText = text.replaceAll('\n', '')
-        await expect(editorLines).toHaveText(actualText)
+        const actualText = text.replaceAll(Character.NewLine, Character.EmptyString).replaceAll(Character.NonBreakingSpace, Character.Space)
+        await expect(editorLines).toHaveText(actualText, {
+          timeout: 3000,
+        })
       } catch (error) {
         throw new VError(error, `Failed to verify editor text ${text}`)
       }
