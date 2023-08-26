@@ -7,6 +7,7 @@ import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDe
 
 export const prepareTests = async (ipc, cwd, headlessMode, connectionId) => {
   const isFirstConnection = true
+  await Remo
   await KillExistingVscodeInstances.killExistingVsCodeInstances()
   const { child, webSocketUrl } = await LaunchVsCode.launchVsCode({
     headlessMode,
