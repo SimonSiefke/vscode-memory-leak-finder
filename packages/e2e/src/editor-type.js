@@ -13,7 +13,7 @@ export const setup = async ({ Editor, Workspace }) => {
 export const run = async ({ Editor }) => {
   await Editor.shouldHaveText('sample text')
   await Editor.type('More ')
-  await Editor.shouldHaveText('sample textMore ')
+  await Editor.shouldHaveText('More sample text')
   await Editor.deleteCharactersLeft({ count: 5 })
   await Editor.shouldHaveText('sample text')
   await Editor.save()
