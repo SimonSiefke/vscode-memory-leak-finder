@@ -93,6 +93,14 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to expand explorer folder`)
       }
     },
+    async collapseAll() {
+      try {
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.CollapseFoldersInExplorer)
+      } catch (error) {
+        throw new VError(error, `Failed to collapse all`)
+      }
+    },
     async shouldHaveItem(direntName) {
       return this.toHaveItem(direntName)
     },

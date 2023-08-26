@@ -13,9 +13,7 @@ export const create = ({ expect, page, VError }) => {
       try {
         const titleBar = page.locator('.part.titlebar')
         await expect(titleBar).toBeVisible()
-        const menuItem = page.locator('.menubar-menu-button', {
-          hasText: text,
-        })
+        const menuItem = page.locator(`.menubar-menu-button[aria-label="${text}"]`)
         await expect(menuItem).toBeVisible()
         await menuItem.click()
         const menu = page.locator('.monaco-menu .actions-container')
@@ -32,9 +30,7 @@ export const create = ({ expect, page, VError }) => {
       try {
         const titleBar = page.locator('.part.titlebar')
         await expect(titleBar).toBeVisible()
-        const menuItem = titleBar.locator('.menubar-menu-button', {
-          hasText: text,
-        })
+        const menuItem = titleBar.locator(`.menubar-menu-button[aria-label="${text}"]`)
         const menu = page.locator('.monaco-menu .actions-container')
         await expect(menu).toBeVisible()
         await expect(menu).toBeFocused()
