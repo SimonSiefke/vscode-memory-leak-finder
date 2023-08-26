@@ -14,9 +14,14 @@ export const prepareTests = async (cwd, headlessMode, connectionId) => {
   })
   const ipc = await TestWorker.launch()
   const devtoolsWebSocketUrlPromise = WaitForDevtoolsListening.waitForDevtoolsListening(child.stderr)
-  await ConnectElectron.connectElectron(ipc, connectionId, headlessMode, webSocketUrl)
+  const { monkeyPatchedElectron, electronObjectId, callFrameId } = await ConnectElectron.connectElectron(
+    ipc,
+    connectionId,
+    headlessMode,
+    webSocketUrl,
+  )
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
-  await ConnectDevtools.connectDevtools(ipc, connectionId, devtoolsWebSocketUrl)
+  await ConnectDevtools.connectDevtools(ipc, connectionId, devtoolsWebSocketUrl, monkeyPatchedElectron, electronObjectId, callFrameId)
   await PageObject.create(ipc, connectionId)
   return ipc
 }
