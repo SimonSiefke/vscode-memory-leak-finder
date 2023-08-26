@@ -1,10 +1,8 @@
-import * as WaitForIdle from '../WaitForIdle/WaitForIdle.js'
-
 export const create = ({ expect, page, VError }) => {
   return {
     async open(locator) {
       try {
-        await WaitForIdle.waitForIdle(page)
+        await page.waitForIdle()
         const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
         await locator.click({
           button: 'right',
@@ -24,7 +22,7 @@ export const create = ({ expect, page, VError }) => {
       const contextMenuItem = contextMenu.locator('.action-item', {
         hasText: option,
       })
-      await WaitForIdle.waitForIdle(page)
+      await page.waitForIdle()
       await contextMenuItem.clickExponential({
         waitForHidden: contextMenu,
       })

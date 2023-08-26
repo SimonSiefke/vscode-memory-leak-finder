@@ -4,6 +4,7 @@ import * as PageClose from '../PageClose/PageClose.js'
 import * as PageEvaluate from '../PageEvaluate/PageEvaluate.js'
 import * as PageKeyBoard from '../PageKeyBoard/PageKeyBoard.js'
 import * as PageReload from '../PageReload/PageReload.js'
+import * as PageWaitForIdle from '../PageWaitForIdle/PageWaitForIdle.js'
 import * as WebWorker from '../WebWorker/WebWorker.js'
 
 const createKeyboard = (rpc) => {
@@ -33,6 +34,9 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
         awaitPromise,
         replMode,
       })
+    },
+    async waitForIdle() {
+      return PageWaitForIdle.waitForIdle(this.rpc)
     },
     async reload() {
       return PageReload.reload(this.rpc)

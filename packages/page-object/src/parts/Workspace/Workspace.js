@@ -1,7 +1,6 @@
 import { mkdir, readdir, rm, writeFile } from 'fs/promises'
 import { dirname, join } from 'path'
 import * as Root from '../Root/Root.js'
-import * as WaitForIdle from '../WaitForIdle/WaitForIdle.js'
 
 export const create = ({ page }) => {
   return {
@@ -17,7 +16,7 @@ export const create = ({ page }) => {
         await mkdir(dirname(absolutePath), { recursive: true })
         await writeFile(absolutePath, file.content)
       }
-      await WaitForIdle.waitForIdle(page)
+      await page.waitForIdle()
     },
     async add(file) {
       const workspace = join(Root.root, '.vscode-test-workspace')
