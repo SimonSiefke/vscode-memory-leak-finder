@@ -1,3 +1,12 @@
+// this is a workaround for a race condition in vscode
+// where sometimes quickpick opens, but the webview is focused
+// and then quickpick doesn't work
+const waitForExtraIdle = async (page) => {
+  for (let i = 0; i < 8; i++) {
+    await page.waitForIdle()
+  }
+}
+
 export const create = ({ expect, page, VError }) => {
   return {
     async shouldBeVisible() {
@@ -6,7 +15,7 @@ export const create = ({ expect, page, VError }) => {
         const webView = page.locator('.webview')
         await expect(webView).toBeVisible()
         await expect(webView).toHaveClass('ready')
-        await page.waitForIdle()
+        await waitForExtraIdle(page)
       } catch (error) {
         throw new VError(error, `Failed to check that webview is visible`)
       }
