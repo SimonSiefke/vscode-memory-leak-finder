@@ -17,7 +17,6 @@ export const getFirstWindow = (pageObjectId) => {
   }
   return value.firstWindow
 }
-}
 
 export const set = (pageObjectId, pageObject) => {
   state.pageObjects[pageObjectId] = pageObject
