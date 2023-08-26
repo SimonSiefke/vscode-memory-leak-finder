@@ -5,6 +5,5 @@ export const compare = async (instanceId, before, after) => {
   if (!measure) {
     throw new Error(`no measure found`)
   }
-  console.log({ before, after })
   return measure.compare(before, after)
 }
