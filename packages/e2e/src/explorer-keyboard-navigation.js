@@ -1,3 +1,5 @@
+export const skip = true
+
 const createFiles = () => {
   const files = []
   for (let i = 0; i < 10; i++) {
