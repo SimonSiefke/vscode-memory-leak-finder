@@ -16,6 +16,7 @@ const locations = [
   'packages/memory-leak-finder/package-lock.json',
   'packages/page-object/package-lock.json',
   'packages/test-worker/package-lock.json',
+  'packages/test-coordinator/package-lock.json',
   'packages/devtools-protocol/package-lock.json',
   'packages/test-worker-commands/package-lock.json',
   'packages/test-worker-commands/src/parts/VsCodeVersion/VsCodeVersion.js',
