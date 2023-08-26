@@ -1,5 +1,4 @@
 import * as Assert from '../Assert/Assert.js'
-import * as ConnectionState from '../ConnectionState/ConnectionState.js'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.js'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.js'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
@@ -15,8 +14,6 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl, 
   Assert.boolean(headlessMode)
   Assert.string(webSocketUrl)
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
-  ConnectionState.set(connectionId, electronIpc)
-
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc)
   IntermediateConnectionState.set(connectionId, electronRpc)
 
