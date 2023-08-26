@@ -55,6 +55,29 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to split editor right`)
       }
     },
+    async split(command) {
+      try {
+        const editors = page.locator('.editor-instance')
+        const currentCount = await editors.count()
+        if (currentCount === 0) {
+          throw new Error('no open editor found')
+        }
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(command)
+        await expect(editors).toHaveCount(currentCount + 1)
+      } catch (error) {
+        throw new VError(error, `Failed to split editor`)
+      }
+    },
+    async splitDown() {
+      return this.split(WellKnownCommands.ViewSplitEditorDown)
+    },
+    async splitUp() {
+      return this.split(WellKnownCommands.ViewSplitEditorUp)
+    },
+    async splitLeft() {
+      return this.split(WellKnownCommands.ViewSplitEditorLeft)
+    },
     async close() {
       try {
         const main = page.locator('[role="main"]')
@@ -217,6 +240,12 @@ export const create = ({ page, expect, VError }) => {
       } catch (error) {
         throw new VError(error, `Failed to rename text ${newText}`)
       }
+    },
+    async shouldHaveToken(text, color) {
+      const token = page.locator(`[class^="mtk"]`, {
+        hasText: text,
+      })
+      await expect(token).toHaveCSS('color', color)
     },
   }
 }

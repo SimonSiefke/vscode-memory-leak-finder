@@ -1,3 +1,5 @@
+import * as WaitForIdle from '../WaitForIdle/WaitForIdle.js'
+
 export const create = ({ expect, page, VError }) => {
   return {
     async toHaveResults(results) {
@@ -60,6 +62,41 @@ export const create = ({ expect, page, VError }) => {
         await expect(searchInput).toHaveText('')
       } catch (error) {
         throw new VError(error, `Failed to delete search input text`)
+      }
+    },
+    async expandFiles() {
+      try {
+        await WaitForIdle.waitForIdle(page)
+        const toggleDetails = page.locator(`[role="button"][title="Toggle Search Details"]`)
+        const expanded = await toggleDetails.getAttribute('aria-expanded')
+        if (expanded === 'true') {
+          return
+        }
+        const include = page.locator('.file-types.includes')
+        await expect(include).toBeHidden()
+        await toggleDetails.click()
+        await expect(toggleDetails).toHaveAttribute('aria-expanded', 'true', { timeout: 3000 })
+        await expect(include).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to expand files`)
+      }
+    },
+    async collapseFiles() {
+      try {
+        await WaitForIdle.waitForIdle(page)
+        const toggleDetails = page.locator(`[role="button"][title="Toggle Search Details"]`)
+        const expanded = await toggleDetails.getAttribute('aria-expanded')
+        if (expanded === 'false') {
+          return
+        }
+        const include = page.locator('.file-types.includes')
+        await expect(include).toBeVisible()
+        await expect(toggleDetails).toBeVisible()
+        await toggleDetails.click()
+        await expect(toggleDetails).toHaveAttribute('aria-expanded', 'false', { timeout: 2000 })
+        await expect(include).toBeHidden({ timeout: 3000 })
+      } catch (error) {
+        throw new VError(error, `Failed to collapse files`)
       }
     },
   }

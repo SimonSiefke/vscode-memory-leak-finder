@@ -305,7 +305,7 @@ export const getTextContent = async (locator) => {
   Assert.object(locator)
   const element = QuerySelector.querySelector(locator.selector)
   if (!element) {
-    throw new Error(`element not found`)
+    throw new Error(`element not found ${locator.selector}`)
   }
   const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
   if (!toBeVisible(element)) {
@@ -319,7 +319,7 @@ export const getAttribute = async (locator, attributeName) => {
   Assert.object(locator)
   const element = QuerySelector.querySelector(locator.selector)
   if (!element) {
-    throw new Error(`element not found`)
+    throw new Error(`element not found ${locator.selector}`)
   }
   const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
   if (!toBeVisible(element)) {

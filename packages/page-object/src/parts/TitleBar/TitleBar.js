@@ -1,3 +1,12 @@
+const TitleBarMenuItems = {
+  File: 'File',
+  Edit: 'Edit',
+  Selection: 'Selection',
+  View: 'View',
+  Go: 'Go',
+  Run: 'Run',
+}
+
 export const create = ({ expect, page, VError }) => {
   return {
     async showMenu(text) {
@@ -16,6 +25,9 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to open title bar menu`)
       }
     },
+    async showMenuFile() {
+      return this.showMenu(TitleBarMenuItems.File)
+    },
     async hideMenu(text) {
       try {
         const titleBar = page.locator('.part.titlebar')
@@ -32,6 +44,9 @@ export const create = ({ expect, page, VError }) => {
       } catch (error) {
         throw new VError(error, `Failed to hide title bar menu`)
       }
+    },
+    async hideMenuFile() {
+      return this.hideMenu(TitleBarMenuItems.File)
     },
   }
 }
