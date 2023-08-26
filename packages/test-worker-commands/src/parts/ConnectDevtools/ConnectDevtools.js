@@ -11,12 +11,14 @@ import * as ObjectType from '../ObjectType/ObjectType.js'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
 import * as SessionState from '../SessionState/SessionState.js'
 
-export const connectDevtools = async (connectionId, devtoolsWebSocketUrl) => {
+export const connectDevtools = async (connectionId, devtoolsWebSocketUrl, monkeyPatchedElectron, electronObjectId, callFrameId) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
-  const intermediateConnection = IntermediateConnectionState.get(connectionId)
+  Assert.string(monkeyPatchedElectron)
+  Assert.string(electronObjectId)
+  Assert.string(callFrameId)
+  const electronRpc = IntermediateConnectionState.get(connectionId)
   IntermediateConnectionState.remove(connectionId)
-  const { electronRpc, monkeyPatchedElectron, electronObjectId, callFrameId } = intermediateConnection
   const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
 

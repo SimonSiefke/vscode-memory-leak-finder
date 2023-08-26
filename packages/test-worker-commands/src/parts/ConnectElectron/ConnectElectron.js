@@ -47,16 +47,15 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl) 
       expression: MonkeyPatchElectronHeadlessMode.monkeyPatchElectronScript,
     })
   }
-
   const monkeyPatchedElectron = await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
     functionDeclaration: MonkeyPatchElectronScript.monkeyPatchElectronScript,
     objectId: electronObjectId,
   })
   await DevtoolsProtocolDebugger.resume(electronRpc)
-  IntermediateConnectionState.set(connectionId, {
-    electronRpc,
+  IntermediateConnectionState.set(connectionId, electronRpc)
+  return {
     monkeyPatchedElectron,
     electronObjectId,
     callFrameId,
-  })
+  }
 }
