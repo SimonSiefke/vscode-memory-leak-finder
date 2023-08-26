@@ -2,7 +2,7 @@ import * as IsImportantError from '../src/parts/IsImportantErrorMessage/IsImport
 
 test('libgiolibproxy error', () => {
   expect(
-    IsImportantError.isImportantErrorMessage(`Failed to load module: /test/snap/code/common/.cache/gio-modules/libgiolibproxy.so`)
+    IsImportantError.isImportantErrorMessage(`Failed to load module: /test/snap/code/common/.cache/gio-modules/libgiolibproxy.so`),
   ).toBe(false)
 })
 
@@ -29,7 +29,11 @@ test('libproxy error', () => {
 test('windows decrypt error', () => {
   expect(
     IsImportantError.isImportantErrorMessage(
-      `[5484:0702/103931.964:ERROR:os_crypt_win.cc(83)] Failed to decrypt: Key not valid for use in specified state. (0x8009000B)`
-    )
+      `[5484:0702/103931.964:ERROR:os_crypt_win.cc(83)] Failed to decrypt: Key not valid for use in specified state. (0x8009000B)`,
+    ),
   ).toBe(false)
+})
+
+test('nodejs info message', () => {
+  expect(IsImportantError.isImportantErrorMessage(`For help, see: https://nodejs.org/en/docs/inspector`)).toBe(false)
 })
