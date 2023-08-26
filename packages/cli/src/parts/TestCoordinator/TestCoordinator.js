@@ -8,6 +8,7 @@ export const listen = async (method) => {
     url,
     name: 'Test Coordinator',
     ref: false,
+    stdio: 'inherit',
   })
   return ipc
 }

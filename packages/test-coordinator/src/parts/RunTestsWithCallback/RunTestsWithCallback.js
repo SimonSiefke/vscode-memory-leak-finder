@@ -4,6 +4,7 @@ import * as PrepareTests from '../PrepareTests/PrepareTests.js'
 import * as PrettyError from '../PrettyError/PrettyError.js'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.js'
+import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.js'
 import * as Time from '../Time/Time.js'
 
 // 1. get matching files
@@ -29,7 +30,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, call
     callback(TestWorkerEventType.TestsStarting, total)
     callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent)
     const connectionId = Id.create()
-    const ipc = await PrepareTests.prepareTests(cwd, headlessMode, connectionId)
+    const ipc = await PrepareTestsOrAttach.prepareTestsOrAttach(cwd, headlessMode, connectionId)
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
       const { absolutePath, relativeDirname, dirent, relativePath } = formattedPath
