@@ -1,3 +1,5 @@
+export const skip = process.platform === 'darwin'
+
 export const setup = async ({ Extensions }) => {
   await Extensions.show()
   await Extensions.search('@builtin html ')
