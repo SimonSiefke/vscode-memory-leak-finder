@@ -2,7 +2,6 @@ import { CommandNotFoundError } from '../CommandNotFoundError/CommandNotFoundErr
 import * as ErrorCodes from '../ErrorCodes/ErrorCodes.js'
 import * as JsonRpcErrorCode from '../JsonRpcErrorCode/JsonRpcErrorCode.js'
 import * as JsonRpcVersion from '../JsonRpcVersion/JsonRpcVersion.js'
-import * as PrettyError from '../PrettyError/PrettyError.js'
 import * as PrintPrettyError from '../PrintPrettyError/PrintPrettyError.js'
 
 const shouldLogError = (error) => {
@@ -37,6 +36,7 @@ export const getErrorResponse = async (message, error) => {
       },
     }
   }
+  const PrettyError = await import('../PrettyError/PrettyError.js')
   const prettyError = PrettyError.prepare(error)
   PrintPrettyError.printPrettyError(prettyError, `[test-coordinator] `)
   return {

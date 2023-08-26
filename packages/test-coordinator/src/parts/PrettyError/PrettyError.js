@@ -106,7 +106,7 @@ const getCodeFrame = (cleanedStack, { color }) => {
   }
 }
 
-export const prepare = (error, { color = true, root = '' } = {}) => {
+export const prepare = async (error, { color = true, root = '' } = {}) => {
   if (error && error.code === ErrorCodes.ERR_MODULE_NOT_FOUND) {
     return prepareModuleNotFoundError(error)
   }

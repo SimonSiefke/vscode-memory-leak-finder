@@ -1,7 +1,6 @@
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.js'
 import * as Id from '../Id/Id.js'
 import * as PrepareTests from '../PrepareTests/PrepareTests.js'
-import * as PrettyError from '../PrettyError/PrettyError.js'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.js'
 import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.js'
@@ -51,6 +50,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, call
         }
       } catch (error) {
         failed++
+        const PrettyError = await import('../PrettyError/PrettyError.js')
         const prettyError = await PrettyError.prepare(error, { color, root })
         callback(TestWorkerEventType.TestFailed, absolutePath, relativeDirname, relativePath, dirent, prettyError)
       }
@@ -59,6 +59,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, call
     const duration = end - start
     callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, total, duration, filterValue)
   } catch (error) {
+    const PrettyError = await import('../PrettyError/PrettyError.js')
     const prettyError = await PrettyError.prepare(error, { color, root })
     callback(TestWorkerEventType.UnexpectedTestError, prettyError)
   }
