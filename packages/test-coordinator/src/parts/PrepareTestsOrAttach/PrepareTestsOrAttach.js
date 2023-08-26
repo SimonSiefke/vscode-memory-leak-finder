@@ -43,5 +43,6 @@ export const prepareTestsOrAttach = async (cwd, headlessMode, connectionId) => {
     callFrameId,
     false,
   )
+  await PageObject.create(ipc, connectionId)
   return ipc
 }

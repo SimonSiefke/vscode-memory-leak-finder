@@ -7,7 +7,6 @@ export const runTest = async (connectionId, absolutePath) => {
   Assert.number(connectionId)
   Assert.string(absolutePath)
   const pageObject = PageObjectState.get(connectionId)
-  console.log(PageObjectState.state.pageObjects)
   if (!pageObject) {
     throw new VError(`no page object ${connectionId} found`)
   }
