@@ -29,7 +29,11 @@ export const unwrapResult = (rawResult) => {
         case 'undefined':
           return undefined
         case 'function':
+          return rawResult.result
         case 'object':
+          if (rawResult.result.subtype === 'null') {
+            return null
+          }
           return rawResult.result
         default:
           return rawResult

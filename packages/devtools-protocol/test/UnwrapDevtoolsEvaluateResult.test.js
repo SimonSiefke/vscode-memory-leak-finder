@@ -55,7 +55,11 @@ test('unwrapResult - object', () => {
 })
 
 test('unwrapResult - unknown value', () => {
-  expect(() => UnwrapDevtoolsEvaluateResult.unwrapResult({})).toThrowError(new Error(`Failed to unwrap devtools evaluate result`))
+  expect(() =>
+    UnwrapDevtoolsEvaluateResult.unwrapResult({
+      id: 1,
+    }),
+  ).toThrowError(new Error(`Failed to unwrap devtools evaluate result`))
 })
 
 test('unwrapResult - result with empty object', () => {
@@ -65,4 +69,8 @@ test('unwrapResult - result with empty object', () => {
       result: {},
     }),
   ).toEqual({})
+})
+
+test('unwrapResult - wrapped null', () => {
+  expect(UnwrapDevtoolsEvaluateResult.unwrapResult({ result: { result: { type: 'object', subtype: 'null', value: null } } })).toBe(null)
 })
