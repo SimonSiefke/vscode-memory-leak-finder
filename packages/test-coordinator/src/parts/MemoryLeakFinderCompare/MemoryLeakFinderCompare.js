@@ -5,5 +5,5 @@ import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerComma
 export const compare = (ipc, connectionId, before, after) => {
   Assert.object(ipc)
   Assert.number(connectionId)
-  return JsonRpc.invoke(ipc, TestWorkerCommandType.MemoryLeakFinderStop, connectionId, before, after)
+  return JsonRpc.invoke(ipc, TestWorkerCommandType.MemoryLeakFinderCompare, connectionId, before, after)
 }
