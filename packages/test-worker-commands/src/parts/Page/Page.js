@@ -12,6 +12,9 @@ const createKeyboard = (rpc) => {
     press(key) {
       return PageKeyBoard.press(this.rpc, key)
     },
+    type(text) {
+      return PageKeyBoard.type(this.rpc, text)
+    },
     pressKeyExponential(options) {
       return PageKeyBoard.pressKeyExponential(options)
     },

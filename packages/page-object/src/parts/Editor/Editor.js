@@ -225,7 +225,7 @@ export const create = ({ page, expect, VError }) => {
       try {
         const editor = page.locator('.editor-instance')
         const editorLines = editor.locator('.view-lines')
-        const actualText = text.replaceAll(Character.NewLine, Character.EmptyString).replaceAll(Character.NonBreakingSpace, Character.Space)
+        const actualText = text.replaceAll(Character.NewLine, Character.EmptyString).replaceAll(Character.Space, Character.NonBreakingSpace)
         await expect(editorLines).toHaveText(actualText, {
           timeout: 3000,
         })
@@ -249,6 +249,14 @@ export const create = ({ page, expect, VError }) => {
         hasText: text,
       })
       await expect(token).toHaveCSS('color', color)
+    },
+    async save() {
+      try {
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.FileSave)
+      } catch (error) {
+        throw new VError(error, `Failed to save file`)
+      }
     },
   }
 }
