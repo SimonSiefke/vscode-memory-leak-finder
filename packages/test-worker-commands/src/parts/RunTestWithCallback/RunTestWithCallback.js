@@ -1,5 +1,6 @@
 import * as ImportTest from '../ImportTest/ImportTest.js'
 import * as TestStage from '../TestStage/TestStage.js'
+import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.js'
 
 export const runTestWithCallback = async (pageObject, file) => {
   const module = await ImportTest.importTest(file)
