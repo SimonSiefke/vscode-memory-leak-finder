@@ -18,6 +18,7 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl, 
   ConnectionState.set(connectionId, electronIpc)
 
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc)
+  IntermediateConnectionState.set(connectionId, electronRpc)
 
   electronRpc.on(DevtoolsEventType.DebuggerPaused, ScenarioFunctions.handlePaused)
   electronRpc.on(DevtoolsEventType.DebuggerResumed, ScenarioFunctions.handleResumed)
@@ -25,16 +26,19 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl, 
   electronRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, ScenarioFunctions.handleRuntimeExecutionContextCreated)
   electronRpc.on(DevtoolsEventType.RuntimeExecutionContextDestroyed, ScenarioFunctions.handleRuntimeExecutionContextDestroyed)
 
+  let debuggerPausedPromise
+  if (isFirstConnection) {
+    debuggerPausedPromise = WaitForDebuggerToBePaused.waitForDebuggerToBePaused(electronRpc)
+  }
   await Promise.all([
     DevtoolsProtocolDebugger.enable(electronRpc),
     DevtoolsProtocolRuntime.enable(electronRpc),
     DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc),
   ])
-  IntermediateConnectionState.set(connectionId, electronRpc)
   if (!isFirstConnection) {
     return
   }
-  const msg = await WaitForDebuggerToBePaused.waitForDebuggerToBePaused(electronRpc)
+  const msg = await debuggerPausedPromise
   const callFrame = msg.params.callFrames[0]
   const callFrameId = callFrame.callFrameId
 
