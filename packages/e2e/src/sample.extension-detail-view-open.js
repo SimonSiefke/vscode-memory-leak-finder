@@ -7,5 +7,5 @@ export const setup = async ({ Extensions, Editor }) => {
 
 export const run = async ({ Extensions, Editor }) => {
   await Extensions.first.click()
-  await Editor.close()
+  await Editor.closeAll()
 }
