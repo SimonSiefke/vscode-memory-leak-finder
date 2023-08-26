@@ -10,7 +10,7 @@ import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyP
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
 import * as WaitForDebuggerToBePaused from '../WaitForDebuggerToBePaused/WaitForDebuggerToBePaused.js'
 
-export const connectElectron = async (connectionId, headlessMode, webSocketUrl) => {
+export const connectElectron = async (connectionId, headlessMode, webSocketUrl, isFirstConnection) => {
   Assert.number(connectionId)
   Assert.boolean(headlessMode)
   Assert.string(webSocketUrl)
@@ -30,7 +30,10 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl) 
     DevtoolsProtocolRuntime.enable(electronRpc),
     DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc),
   ])
-
+  IntermediateConnectionState.set(connectionId, electronRpc)
+  if (!isFirstConnection) {
+    return
+  }
   const msg = await WaitForDebuggerToBePaused.waitForDebuggerToBePaused(electronRpc)
   const callFrame = msg.params.callFrames[0]
   const callFrameId = callFrame.callFrameId
@@ -52,7 +55,6 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl) 
     objectId: electronObjectId,
   })
   await DevtoolsProtocolDebugger.resume(electronRpc)
-  IntermediateConnectionState.set(connectionId, electronRpc)
   return {
     monkeyPatchedElectron,
     electronObjectId,

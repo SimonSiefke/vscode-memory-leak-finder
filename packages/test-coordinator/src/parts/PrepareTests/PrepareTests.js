@@ -17,13 +17,17 @@ export const prepareTests = async (ipc, cwd, headlessMode, connectionId) => {
     connectionId,
     headlessMode,
     webSocketUrl,
+    true,
   )
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
-  await ConnectDevtools.connectDevtools(ipc, connectionId, devtoolsWebSocketUrl, monkeyPatchedElectron, electronObjectId, callFrameId)
+  await ConnectDevtools.connectDevtools(ipc, connectionId, devtoolsWebSocketUrl, monkeyPatchedElectron, electronObjectId, callFrameId, true)
   await PageObject.create(ipc, connectionId)
   return {
     ipc,
     webSocketUrl,
     devtoolsWebSocketUrl,
+    electronObjectId,
+    callFrameId,
+    monkeyPatchedElectron,
   }
 }

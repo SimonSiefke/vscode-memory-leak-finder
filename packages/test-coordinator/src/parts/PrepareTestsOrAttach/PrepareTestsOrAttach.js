@@ -32,8 +32,16 @@ export const prepareTestsOrAttach = async (cwd, headlessMode, connectionId) => {
     await state.promise
     return ipc
   }
-  const { webSocketUrl, devtoolsWebSocketUrl } = await state.promise
-  await ConnectDevtools.connectDevtools(ipc)
-
+  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, callFrameId, monkeyPatchedElectron } = await state.promise
+  await ConnectElectron.connectElectron(ipc, connectionId, headlessMode, webSocketUrl, false)
+  await ConnectDevtools.connectDevtools(
+    ipc,
+    connectionId,
+    devtoolsWebSocketUrl,
+    monkeyPatchedElectron,
+    electronObjectId,
+    callFrameId,
+    false,
+  )
   return ipc
 }
