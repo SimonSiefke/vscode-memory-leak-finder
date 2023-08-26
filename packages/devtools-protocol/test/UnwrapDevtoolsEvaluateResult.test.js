@@ -57,3 +57,12 @@ test('unwrapResult - object', () => {
 test('unwrapResult - unknown value', () => {
   expect(() => UnwrapDevtoolsEvaluateResult.unwrapResult({})).toThrowError(new Error(`Failed to unwrap devtools evaluate result`))
 })
+
+test('unwrapResult - result with empty object', () => {
+  expect(
+    UnwrapDevtoolsEvaluateResult.unwrapResult({
+      id: 2,
+      result: {},
+    }),
+  ).toEqual({})
+})

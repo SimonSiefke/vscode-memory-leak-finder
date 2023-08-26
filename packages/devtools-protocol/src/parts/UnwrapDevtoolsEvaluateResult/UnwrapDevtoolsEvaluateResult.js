@@ -40,5 +40,8 @@ export const unwrapResult = (rawResult) => {
     }
     return rawResult.result
   }
+  if (typeof rawResult === 'object' && Object.keys(rawResult).length === 0) {
+    return rawResult
+  }
   throw new Error(`Failed to unwrap devtools evaluate result`)
 }
