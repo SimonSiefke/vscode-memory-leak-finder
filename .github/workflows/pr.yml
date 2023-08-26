@@ -15,6 +15,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v3
+      - run: |
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/main:refs/remotes/origin/main
       - uses: actions/setup-node@v3
         with:
           node-version-file: '.nvmrc'
@@ -34,7 +36,7 @@ jobs:
         run: npm ci
         if: steps.npm-cache.outputs.cache-hit != 'true'
       - run: npm run build
-      - run: npm test
+      - run: npx lerna run test --since origin/main
       - name: Run headless test
         uses: coactions/setup-xvfb@v1
         with:

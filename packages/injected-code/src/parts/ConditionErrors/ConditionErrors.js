@@ -26,13 +26,25 @@ const printLocator = (locator) => {
   return `${locator.selector}`
 }
 
-export const toHaveText = (locator, { text }) => {
+export const toHaveText = (locator, options) => {
   const element = QuerySelector.querySelector(locator.selector)
   const locatorString = printLocator(locator)
   if (!element) {
-    return `expected selector ${locatorString} to have text "${text}" element was not found`
+    if ('text' in options) {
+      return `expected selector ${locatorString} to have text "${options.regex}" element was not found`
+    }
+    if ('regex' in options) {
+      return `expected selector ${locatorString} to match "${options.regex}" element was not found`
+    }
+    return 'unknown text error'
   }
-  return `expected selector ${locatorString} to have text "${text}" but was "${element.textContent}"`
+  if ('text' in options) {
+    return `expected selector ${locatorString} to have text "${options.text}" but was "${element.textContent}"`
+  }
+  if ('regex' in options) {
+    return `expected selector ${locatorString} to match "${options.regex}" but was "${element.textContent}"`
+  }
+  return 'unknown text error'
 }
 
 export const toHaveAttribute = (locator, { key, value }) => {
