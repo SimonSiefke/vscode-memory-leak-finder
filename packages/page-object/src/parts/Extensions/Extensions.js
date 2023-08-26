@@ -1,6 +1,9 @@
 import * as QuickPick from '../QuickPick/QuickPick.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 import * as ContextMenu from '../ContextMenu/ContextMenu.js'
+import * as IsMacos from '../IsMacos/IsMacos.js'
+
+const selectAll = IsMacos.isMacos ? 'Cmd+A' : 'Control:A'
 
 export const create = ({ expect, page, VError }) => {
   return {
@@ -12,7 +15,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(extensionsInput).toBeFocused()
         const lines = extensionsView.locator('.monaco-editor .view-lines')
         await extensionsInput.setValue('')
-        await page.keyboard.press('Control+A')
+        await page.keyboard.press(selectAll)
         await page.keyboard.press('Backspace')
         await expect(lines).toHaveText('', {
           timeout: 3000,
