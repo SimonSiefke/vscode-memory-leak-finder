@@ -55,6 +55,20 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to split editor right`)
       }
     },
+    async splitDown() {
+      try {
+        const editors = page.locator('.editor-instance')
+        const currentCount = await editors.count()
+        if (currentCount === 0) {
+          throw new Error('no open editor found')
+        }
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.ViewSplitEditorDown)
+        await expect(editors).toHaveCount(currentCount + 1)
+      } catch (error) {
+        throw new VError(error, `Failed to split editor down`)
+      }
+    },
     async close() {
       try {
         const main = page.locator('[role="main"]')
