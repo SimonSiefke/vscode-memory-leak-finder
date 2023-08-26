@@ -6,6 +6,6 @@ const loadMemoryLeakFinder = async () => {
 export const create = async (context) => {
   const MemoryLeakFinder = await loadMemoryLeakFinder()
   const session = context.firstWindow.rpc
-  const measure = MemoryLeakFinder.combine(MemoryLeakFinder.Measures.MeasureEventListeners.create(session))
+  const measure = MemoryLeakFinder.combine(MemoryLeakFinder.Measures.MeasureEventListenerCount.create(session))
   return measure
 }
