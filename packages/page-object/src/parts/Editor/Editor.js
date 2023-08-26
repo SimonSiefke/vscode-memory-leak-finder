@@ -15,6 +15,7 @@ export const create = ({ page, expect, VError }) => {
         await expect(editor).toBeVisible()
         const editorInput = editor.locator('.inputarea')
         await expect(editorInput).toBeFocused()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open editor ${fileName}`)
       }

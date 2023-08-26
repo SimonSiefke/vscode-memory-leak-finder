@@ -56,6 +56,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async executeCommand(command, { stayVisible = false } = {}) {
       try {
+        await page.waitForIdle()
         await this.showCommands()
         await this.type(command)
         await this.select(command, stayVisible)
