@@ -42,6 +42,8 @@ export const create = ({ expect, page, VError }) => {
     async replace() {
       try {
         const button = page.locator('[aria-label^="Replace All"]')
+        await expect(button).toBeVisible()
+        await page.waitForIdle()
         await button.click()
         const messageLocator = page.locator('.text-search-provider-messages .message')
         await expect(messageLocator).toBeVisible()
