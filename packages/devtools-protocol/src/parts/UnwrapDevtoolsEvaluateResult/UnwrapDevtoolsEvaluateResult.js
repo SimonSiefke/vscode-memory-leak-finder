@@ -1,6 +1,9 @@
 import { DevtoolsProtocolError } from '../DevtoolsProtocolError/DevtoolsProtocolError.js'
 
 export const unwrapResult = (rawResult) => {
+  if ('result' in rawResult) {
+    rawResult = rawResult.result
+  }
   if ('error' in rawResult) {
     if (rawResult.error.message && rawResult.error.data) {
       throw new DevtoolsProtocolError(`${rawResult.error.message}: ${rawResult.error.data}`)
@@ -37,5 +40,5 @@ export const unwrapResult = (rawResult) => {
     }
     return rawResult.result
   }
-  return rawResult
+  throw new Error(`failed to unwrap devtools evaluate result`)
 }
