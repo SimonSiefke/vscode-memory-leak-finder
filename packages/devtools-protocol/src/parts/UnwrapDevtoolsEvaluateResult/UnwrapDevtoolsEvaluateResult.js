@@ -40,5 +40,5 @@ export const unwrapResult = (rawResult) => {
     }
     return rawResult.result
   }
-  throw new Error(`failed to unwrap devtools evaluate result`)
+  throw new Error(`Failed to unwrap devtools evaluate result`)
 }

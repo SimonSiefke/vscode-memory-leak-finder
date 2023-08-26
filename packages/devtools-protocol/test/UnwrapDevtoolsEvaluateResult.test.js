@@ -8,7 +8,7 @@ test('unwrapResult - undefined', () => {
           type: 'undefined',
         },
       },
-    })
+    }),
   ).toBeUndefined()
 })
 
@@ -21,7 +21,7 @@ test('unwrapResult - number', () => {
           value: 1,
         },
       },
-    })
+    }),
   ).toBe(1)
 })
 
@@ -34,7 +34,7 @@ test('unwrapResult - string', () => {
           value: 'test',
         },
       },
-    })
+    }),
   ).toBe('test')
 })
 
@@ -47,6 +47,13 @@ test('unwrapResult - object', () => {
           value: {},
         },
       },
-    })
-  ).toEqual({})
+    }),
+  ).toEqual({
+    type: 'object',
+    value: {},
+  })
+})
+
+test('unwrapResult - unknown value', () => {
+  expect(() => UnwrapDevtoolsEvaluateResult.unwrapResult({})).toThrowError(new Error(`Failed to unwrap devtools evaluate result`))
 })
