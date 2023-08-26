@@ -11,6 +11,7 @@ export const create = ({ expect, page, VError }) => {
         const extensionsInput = extensionsView.locator('.inputarea')
         await expect(extensionsInput).toBeFocused()
         const lines = extensionsView.locator('.monaco-editor .view-lines')
+        await extensionsInput.setValue('')
         await page.keyboard.press('Control+A')
         await page.keyboard.press('Backspace')
         await expect(lines).toHaveText('', {
@@ -23,6 +24,17 @@ export const create = ({ expect, page, VError }) => {
     },
     async show() {
       try {
+        const searchItem = page.locator(`.action-item:has([aria-label^="Extensions"])`)
+        const selected = await searchItem.getAttribute('aria-selected')
+        if (selected === 'true') {
+          const extensionsView = page.locator(`.extensions-viewlet`)
+          const extensionsInput = extensionsView.locator('.inputarea')
+          await expect(extensionsInput).toBeVisible()
+          await extensionsInput.click()
+          await extensionsInput.focus()
+          await expect(extensionsInput).toBeFocused()
+          return
+        }
         const quickPick = QuickPick.create({
           page,
           expect,
