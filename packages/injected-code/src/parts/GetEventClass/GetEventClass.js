@@ -13,6 +13,8 @@ export const getEventClass = (eventType) => {
     case DomEventType.DoubleClick:
     case DomEventType.MouseEnter:
     case DomEventType.MouseLeave:
+    case DomEventType.MouseDown:
+    case DomEventType.MouseUp:
       return MouseEvent
     case DomEventType.KeyDown:
     case DomEventType.KeyPress:
