@@ -1,15 +1,15 @@
 import * as Assert from '../Assert/Assert.js'
 
 export const toBeVisible = (element) => {
-  if (typeof element.isVisible === 'function') {
-    return element.isVisible()
+  if (typeof element.checkVisible === 'function') {
+    return element.checkVisible()
   }
   return element.isConnected
 }
 
 export const toBeHidden = (element) => {
-  if (typeof element.isVisible === 'function') {
-    return !element.isVisible()
+  if (typeof element.checkVisible === 'function') {
+    return !element.checkVisible()
   }
   const style = getComputedStyle(element)
   if (style.display === 'none') {
