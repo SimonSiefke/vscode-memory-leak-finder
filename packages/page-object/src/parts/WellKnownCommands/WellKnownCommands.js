@@ -1,4 +1,5 @@
 export const CollapseFoldersInExplorer = 'Collapse Folders in Explorer'
+export const FileSave = 'File: Save'
 export const FocusExplorer = 'File: Focus on Files Explorer'
 export const GoToDefintiion = 'Go to Definition'
 export const HelpWelcome = 'Help: Welcome'

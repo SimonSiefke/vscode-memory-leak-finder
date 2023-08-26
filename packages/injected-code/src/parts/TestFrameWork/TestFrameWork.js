@@ -292,13 +292,10 @@ export const pressKey = async (key) => {
   KeyBoardActions.press(keyboardEventOptions)
 }
 
-export const type = async (locator, text) => {
-  Assert.object(locator)
+export const type = (text) => {
   Assert.string(text)
-  const element = QuerySelector.querySelector(locator.selector)
-  if (element !== document.activeElement) {
-    throw new AssertionError(`expected element to be focused to type into it`)
-  }
+  const fn = ElementAction.type
+  fn(document.activeElement, { text })
 }
 
 export const getTextContent = async (locator) => {

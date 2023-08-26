@@ -30,5 +30,6 @@
   "window.restoreWindows": "none",
   "window.title": "",
   "files.hotExit": "off",
-  "explorer.confirmDelete": false
+  "explorer.confirmDelete": false,
+  "files.saveConflictResolution": "overwriteFileOnDisk"
 }
