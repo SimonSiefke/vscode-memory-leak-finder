@@ -14,9 +14,12 @@ export const killExistingVsCodeInstances = async () => {
     const lockPath = join(Root.root, '.vscode-user-data-dir', 'code.lock')
     const content = await readFile(lockPath, 'utf8')
     const pid = parseInt(content)
+    if (isNaN(pid)) {
+      return
+    }
     process.kill(pid, 'SIGKILL')
   } catch (error) {
-    if (error && (error.code === ErrorCodes.ENOENT || error.code === ErrorCodes.ESRCH)) {
+    if (error && (error.code === ErrorCodes.ENOENT || error.code === ErrorCodes.ESRCH || error.code === ErrorCodes.EPERM)) {
       return
     }
     throw new VError(error, `Failed to kill existing vscode processes`)
