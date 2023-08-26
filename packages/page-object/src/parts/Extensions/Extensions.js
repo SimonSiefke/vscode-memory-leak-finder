@@ -3,7 +3,7 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 import * as ContextMenu from '../ContextMenu/ContextMenu.js'
 import * as IsMacos from '../IsMacos/IsMacos.js'
 
-const selectAll = IsMacos.isMacos ? 'Cmd+A' : 'Control+A'
+const selectAll = IsMacos.isMacos ? 'Meta+A' : 'Control+A'
 
 export const create = ({ expect, page, VError }) => {
   return {
