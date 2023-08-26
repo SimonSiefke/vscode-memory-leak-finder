@@ -1,9 +1,9 @@
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.js'
 import * as Id from '../Id/Id.js'
-import * as PrepareTests from '../PrepareTests/PrepareTests.js'
+import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.js'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.js'
-import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.js'
+import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.js'
 import * as Time from '../Time/Time.js'
 
 // 1. get matching files
@@ -38,13 +38,16 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, call
       }
       try {
         const start = i === 0 ? initialStart : Time.now()
-        const testSkipped = await TestWorkerRunTest.testWorkerRunTest(ipc, connectionId, formattedPath.absolutePath, root, color)
-        const end = Time.now()
-        const duration = end - start
+        const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(ipc, connectionId, formattedPath.absolutePath)
         if (testSkipped) {
           skipped++
+          const end = Time.now()
+          const duration = end - start
           callback(TestWorkerEventType.TestSkipped, absolutePath, relativeDirname, dirent, duration)
         } else {
+          await TestWorkerRunTest.testWorkerRunTest(ipc, connectionId, formattedPath.absolutePath, root, color)
+          const end = Time.now()
+          const duration = end - start
           callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration)
           passed++
         }
