@@ -19,7 +19,6 @@ export const stop = (session) => {
 export const compare = (before, after) => {
   Assert.number(before)
   Assert.number(after)
-  console.log({ before, after })
   return {
     before,
     after,
