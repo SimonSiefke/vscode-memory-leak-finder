@@ -1,6 +1,5 @@
 import * as KeyBindings from '../KeyBindings/KeyBindings.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
-import * as WaitForIdle from '../WaitForIdle/WaitForIdle.js'
 
 export const create = ({ expect, page, VError }) => {
   return {

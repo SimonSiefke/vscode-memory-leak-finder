@@ -1,5 +1,3 @@
-import * as WaitForIdle from '../WaitForIdle/WaitForIdle.js'
-
 export const create = ({ expect, page, VError }) => {
   return {
     async open(locator) {
