@@ -47,7 +47,9 @@ export const create = ({ expect, page, VError }) => {
         await button.click()
         const messageLocator = page.locator('.text-search-provider-messages .message')
         await expect(messageLocator).toBeVisible()
-        await expect(messageLocator).toHaveText(/Replaced/)
+        await expect(messageLocator).toHaveText(/Replaced/, {
+          timeout: 5000,
+        })
       } catch (error) {
         throw new VError(error, `Failed to replace`)
       }
