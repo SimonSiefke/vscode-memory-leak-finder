@@ -1,13 +1,16 @@
-import * as HandleMessage from '../HandleMessage/HandleMessage.js'
+import * as Callback from '../Callback/Callback.js'
+import * as Command from '../Command/Command.js'
+import * as HandleJsonRpcMessage from '../HandleJsonRpcMessage/HandleJsonRpcMessage.js'
 
-export const handleIpc = async (ipc) => {
+export const handleIpc = (ipc) => {
   const callback = (message) => {
     ipc.send(message)
   }
-  const handleMessage = async (message) => {
-    const { method, params } = message
-    const fn = await HandleMessage.getFn(method)
-    fn(...params, callback)
+  const execute = (method, ...params) => {
+    return Command.execute(method, ...params, callback)
+  }
+  const handleMessage = (message) => {
+    return HandleJsonRpcMessage.handleJsonRpcMessage(ipc, message, execute, Callback.resolve)
   }
   ipc.on('message', handleMessage)
 }

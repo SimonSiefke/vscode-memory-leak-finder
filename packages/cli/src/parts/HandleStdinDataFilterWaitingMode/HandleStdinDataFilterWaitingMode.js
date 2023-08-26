@@ -15,7 +15,9 @@ export const handleStdinDataFilterWaitingMode = (state, key) => {
         mode: ModeType.Exit,
       }
     case AnsiKeys.Enter:
-      PreviousFilters.add(state.value)
+      if (state.value) {
+        PreviousFilters.add(state.value)
+      }
       Stdout.write(AnsiEscapes.eraseLine + AnsiEscapes.cursorLeft)
       return {
         ...state,

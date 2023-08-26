@@ -1,0 +1,27 @@
+{
+  "name": "test-coordinator",
+  "version": "0.0.0-dev",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "@babel/code-frame": "^7.22.10",
+    "@vscode/test-electron": "^2.3.4",
+    "clean-stack": "^5.2.0",
+    "exit-hook": "^3.2.0",
+    "got": "^13.0.0",
+    "source-map": "^0.7.4",
+    "strip-ansi": "^7.1.0",
+    "verror": "^1.10.1",
+    "ws": "^8.13.0"
+  },
+  "devDependencies": {
+    "@types/babel__code-frame": "^7.0.3",
+    "@types/verror": "^1.10.6",
+    "@types/ws": "^8.5.5"
+  }
+}

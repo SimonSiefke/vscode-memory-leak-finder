@@ -3,13 +3,17 @@ import * as FirstNodeWorkerEventType from '../FirstNodeWorkerEventType/FirstNode
 import * as GetFirstNodeWorkerEvent from '../GetFirstNodeWorkerEvent/GetFirstNodeWorkerEvent.js'
 import { IpcError } from '../IpcError/IpcError.js'
 
-export const create = async ({ url, stdio }) => {
+export const create = async ({ url, stdio, name, ref }) => {
   const ignoreStdio = stdio === 'inherit' ? undefined : true
   const worker = new Worker(url, {
     stdout: ignoreStdio,
     stderr: ignoreStdio,
     argv: ['--ipc-type=worker-thread'],
+    name,
   })
+  if (ref === false) {
+    worker.unref()
+  }
   const { type, event } = await GetFirstNodeWorkerEvent.getFirstNodeWorkerEvent(worker)
   if (type === FirstNodeWorkerEventType.Error) {
     throw new IpcError(`Failed to start node worker: ${event}`)

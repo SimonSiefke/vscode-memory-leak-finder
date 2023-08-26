@@ -4,6 +4,7 @@
 .vscode-extensions
 .vscode-test-files
 .vscode-previous-filters
+.vscode-runtime-dir
 
 # Logs
 logs

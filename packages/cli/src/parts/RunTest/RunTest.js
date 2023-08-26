@@ -1,23 +1,23 @@
-import * as CreateTestWorkerAndListen from '../CreateTestWorkerAndListen/CreateTestWorkerAndListen.js'
+import * as CreateTestCoordinatorAndListen from '../CreateTestCoordinatorAndListen/CreateTestCoordinatorAndListen.js'
 
 export const state = {
   /**
    * @type {any}
    */
-  testWorker: undefined,
+  testCoordinator: undefined,
 }
 
 export const cleanup = () => {
-  if (state.testWorker) {
-    state.testWorker.dispose()
-    state.testWorker = undefined
+  if (state.testCoordinator) {
+    state.testCoordinator.dispose()
+    state.testCoordinator = undefined
   }
 }
 
 export const prepare = async () => {
   // TODO race condition
-  if (!state.testWorker) {
-    state.testWorker = await CreateTestWorkerAndListen.createTestWorkerAndListen()
+  if (!state.testCoordinator) {
+    state.testCoordinator = await CreateTestCoordinatorAndListen.createTestCoordinatorAndListen()
   }
-  return state.testWorker
+  return state.testCoordinator
 }
