@@ -43,7 +43,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async replace() {
       try {
-        const button = page.locator('[aria-label="Replace All (Ctrl+Alt+Enter)"]')
+        const button = page.locator('[aria-label^="Replace All"]')
         await button.click()
         const messageLocator = page.locator('.text-search-provider-messages .message')
         await expect(messageLocator).toBeVisible()
