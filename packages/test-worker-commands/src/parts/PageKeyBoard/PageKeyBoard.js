@@ -15,6 +15,20 @@ export const press = async (rpc, key) => {
   })
 }
 
+export const type = async (rpc, text) => {
+  Assert.object(rpc)
+  Assert.string(text)
+  await EvaluateInUtilityContext.evaluateInUtilityContext({
+    functionDeclaration: '(text) => test.type(text)',
+    arguments: [
+      {
+        value: text,
+      },
+    ],
+    awaitPromise: true,
+  })
+}
+
 export const pressKeyExponential = async (options) => {
   Assert.object(options)
   Assert.string(options.key)
