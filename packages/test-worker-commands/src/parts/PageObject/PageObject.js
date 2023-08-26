@@ -7,18 +7,21 @@ import * as PageObjectState from '../PageObjectState/PageObjectState.js'
 import { VError } from '../VError/VError.js'
 import * as WaitForVsCodeToBeReady from '../WaitForVsCodeToBeReady/WaitForVsCodeToBeReady.js'
 
-export const create = async (connectionId) => {
+export const create = async (connectionId, isFirstConnection) => {
   try {
     Assert.number(connectionId)
+    Assert.boolean(isFirstConnection)
     const pageObjectPath = GetPageObjectPath.getPageObjectPath()
     const pageObjectModule = await ImportScript.importScript(pageObjectPath)
     const electronApp = ElectronAppState.get(connectionId)
     ElectronAppState.remove(connectionId)
     const firstWindow = await electronApp.firstWindow()
-    await WaitForVsCodeToBeReady.waitForVsCodeToBeReady({
-      page: firstWindow,
-      expect: Expect.expect,
-    })
+    if (isFirstConnection) {
+      await WaitForVsCodeToBeReady.waitForVsCodeToBeReady({
+        page: firstWindow,
+        expect: Expect.expect,
+      })
+    }
     const pageObjectContext = {
       page: firstWindow,
       expect: Expect.expect,
