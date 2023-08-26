@@ -28,6 +28,8 @@ export const create = ({ expect, page, VError }) => {
         const selected = await searchItem.getAttribute('aria-selected')
         if (selected === 'true') {
           const extensionsView = page.locator(`.extensions-viewlet`)
+          const suggestContainer = page.locator(`.suggest-input-container`)
+          await suggestContainer.click()
           const extensionsInput = extensionsView.locator('.inputarea')
           await expect(extensionsInput).toBeVisible()
           await extensionsInput.click()
