@@ -17,7 +17,7 @@ export const create = ({ page }) => {
         await mkdir(dirname(absolutePath), { recursive: true })
         await writeFile(absolutePath, file.content)
       }
-      await WaitForIdle.waitForIdle(page)
+      await page.waitForIdle()
     },
     async add(file) {
       const workspace = join(Root.root, '.vscode-test-workspace')
