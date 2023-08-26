@@ -17,6 +17,9 @@ export const isImportantErrorMessage = (data) => {
   if (data.includes('Failed to decrypt: Key not valid for use in specified state')) {
     return false
   }
+  if (data.includes(`For help, see: https://nodejs.org/en/docs/inspector`)) {
+    return false
+  }
   if (data.trim() === 'Debugger attached.') {
     return false
   }
@@ -26,5 +29,6 @@ export const isImportantErrorMessage = (data) => {
   if (RE_LIB_GIO_PROXY_ERROR.test(data)) {
     return false
   }
+
   return true
 }
