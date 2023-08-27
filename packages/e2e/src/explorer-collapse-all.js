@@ -1,4 +1,4 @@
-export const beforeSetup = async ({ Workspace, Explorer }) => {
+export const setup = async ({ Workspace, Explorer }) => {
   await Workspace.setFiles([
     {
       name: 'folder-1/file-1.txt',

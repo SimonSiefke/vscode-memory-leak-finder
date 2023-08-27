@@ -1,0 +1,21 @@
+{
+  "name": "memory-leak-worker",
+  "version": "0.0.0-dev",
+  "description": "",
+  "main": "src/main.js",
+  "type": "module",
+  "bin": {
+    "memory-leak-worker": "bin/memory-leak-worker.js"
+  },
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "verror": "^1.10.1"
+  },
+  "devDependencies": {
+    "@types/babel__code-frame": "^7.0.3",
+    "@types/verror": "^1.10.6"
+  }
+}
