@@ -1,4 +1,4 @@
-export const beforeSetup = async ({ Workspace, Explorer, Editor }) => {
+export const setup = async ({ Workspace, Explorer, Editor }) => {
   await Workspace.setFiles([
     {
       name: 'index.md',

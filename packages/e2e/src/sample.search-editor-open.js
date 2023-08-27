@@ -1,6 +1,6 @@
 export const skip = true
 
-export const beforeSetup = async ({ tmpDir, writeFile, join }) => {
+export const setup = async ({ tmpDir, writeFile, join }) => {
   await writeFile(join(tmpDir, 'file.txt'), 'sample text')
 }
 
