@@ -110,6 +110,7 @@ export const create = ({ page, expect, VError }) => {
         await expect(tabs).toHaveCount(0, {
           timeout: 4000,
         })
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to close all editors`)
       }
