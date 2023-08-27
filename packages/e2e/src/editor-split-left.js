@@ -6,10 +6,10 @@ export const setup = async ({ Editor, Workspace }) => {
     },
   ])
   await Editor.closeAll()
-  await Editor.open('file.txt')
 }
 
 export const run = async ({ Editor }) => {
+  await Editor.open('file.txt')
   await Editor.splitLeft()
   await Editor.closeAll()
 }
