@@ -104,10 +104,11 @@ export const create = ({ page, expect, VError }) => {
         if (currentCount === 0) {
           return
         }
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewCloseAllEditors)
         await expect(tabs).toHaveCount(0, {
-          timeout: 3000,
+          timeout: 4000,
         })
       } catch (error) {
         throw new VError(error, `Failed to close all editors`)
