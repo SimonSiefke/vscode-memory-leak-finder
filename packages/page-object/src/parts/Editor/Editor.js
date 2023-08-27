@@ -260,5 +260,14 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to save file`)
       }
     },
+    async switchToTab(name) {
+      try {
+        const tab = page.locator(`[role="tab"][data-resource-name="${name}"]`)
+        await expect(tab).toBeVisible()
+        await tab.click()
+      } catch (error) {
+        throw new VError(error, `Failed to switch to tab ${name}`)
+      }
+    },
   }
 }

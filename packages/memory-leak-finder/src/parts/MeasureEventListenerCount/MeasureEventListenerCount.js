@@ -1,5 +1,6 @@
 import * as GetEventListenerCount from '../GetEventListenerCount/GetEventListenerCount.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
+import * as Assert from '../Assert/Assert.js'
 
 export const id = MeasureId.EventListenerCount
 
@@ -16,6 +17,8 @@ export const stop = (session) => {
 }
 
 export const compare = (before, after) => {
+  Assert.number(before)
+  Assert.number(after)
   return {
     before,
     after,
