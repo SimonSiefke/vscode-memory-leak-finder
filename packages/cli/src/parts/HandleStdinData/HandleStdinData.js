@@ -1,9 +1,9 @@
 import * as GetNewStdinState from '../GetNewStdinState/GetNewStdinState.js'
 import * as HandleExit from '../HandleExit/HandleExit.js'
+import * as KillWorkers from '../KillWorkers/KillWorkers.js'
 import * as ModeType from '../ModeType/ModeType.js'
 import * as StartRunning from '../StartRunning/StartRunning.js'
 import * as StdinDataState from '../StdinDataState/StdinDataState.js'
-import * as KillWorkers from '../KillWorkers/KillWorkers.js'
 
 export const handleStdinData = async (key) => {
   const state = StdinDataState.getState()
@@ -19,6 +19,6 @@ export const handleStdinData = async (key) => {
     await StartRunning.startRunning(state.value, state.headless, /* color */ true, state.checkLeaks, state.runs)
   }
   if (newState.mode === ModeType.Interrupted) {
-    await KillWorkers.killWorkers()
+    KillWorkers.killWorkers()
   }
 }
