@@ -35,15 +35,18 @@ export const connectDevtools = async (devtoolsWebSocketUrl) => {
   browserRpc.on(DevtoolsEventType.TargetTargetDestroyed, ScenarioFunctions.handleTargetDestroyed)
   browserRpc.on(DevtoolsEventType.TargetTargetInfoChanged, ScenarioFunctions.handleTargetInfoChanged)
 
-  await Promise.all([
-    // DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
-    //   autoAttach: true,
-    //   waitForDebuggerOnStart: true,
-    //   flatten: true,
-    // }),
-    // DevtoolsProtocolTarget.setDiscoverTargets(browserRpc, {
-    //   discover: true,
-    // }),
-  ])
+  setTimeout(() => {
+    Promise.all([
+      DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
+        autoAttach: true,
+        waitForDebuggerOnStart: true,
+        flatten: true,
+      }),
+      DevtoolsProtocolTarget.setDiscoverTargets(browserRpc, {
+        discover: true,
+      }),
+    ])
+  }, 3000)
+
   // console.log('attached to devtools')
 }

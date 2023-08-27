@@ -135,7 +135,9 @@ export const handleTargetCrashed = (message) => {
 }
 
 const handleFrame = (message) => {
-  console.log({ message })
+  const { data, metadata } = message.params
+  const buffer = Buffer.from(data)
+  console.log({ buffer, metadata })
 }
 
 const handleAttachedToPage = async (message) => {
@@ -163,9 +165,18 @@ const handleAttachedToPage = async (message) => {
       targetId,
     })
     sessionRpc.on(DevtoolsEventType.PageScreencastFrame, handleFrame)
-    await PTimeout.pTimeout(Promise.all([DevtoolsProtocolPage.enable(sessionRpc), DevtoolsProtocolPage.startScreencast(sessionRpc)]), {
-      milliseconds: TimeoutConstants.AttachToPage,
-    })
+    await PTimeout.pTimeout(
+      Promise.all([
+        DevtoolsProtocolPage.enable(sessionRpc),
+        DevtoolsProtocolPage.startScreencast(sessionRpc, {
+          format: 'jpeg',
+          quality: 90,
+        }),
+      ]),
+      {
+        milliseconds: TimeoutConstants.AttachToPage,
+      },
+    )
   } catch (error) {
     if (error && error.name === 'TestFinishedError') {
       return
