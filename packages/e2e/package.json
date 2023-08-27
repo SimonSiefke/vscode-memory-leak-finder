@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "e2e": "node ../cli/bin/test.js",
-    "test:watch": "node ../cli/bin/test.js --watch"
+    "test:watch": "node ../cli/bin/test.js --watch",
+    "e2e:check-flakyness": "node ../cli/bin/test.js --runs=10"
   },
   "keywords": [],
   "author": "",
