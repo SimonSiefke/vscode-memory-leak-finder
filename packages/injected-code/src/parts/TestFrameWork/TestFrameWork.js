@@ -323,7 +323,6 @@ export const getAttribute = async (locator, attributeName) => {
     throw new Error(`must be visible`)
   }
   const attributeValue = element.getAttribute(attributeName)
-  console.log({ attributeName, attributeValue, element })
   return attributeValue
 }
 
