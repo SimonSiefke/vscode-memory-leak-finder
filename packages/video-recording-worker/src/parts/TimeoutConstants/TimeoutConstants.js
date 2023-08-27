@@ -1,6 +1,6 @@
 import * as IsWindows from '../IsWindows/IsWindows.js'
 
-export const AttachToPage = IsWindows.IsWindows ? 5000 : 1000
+export const AttachToPage = IsWindows.IsWindows ? 5000 : 4000
 export const DefaultExecutionContext = 500
 export const PageEvent = 2000
 export const SessionState = 500

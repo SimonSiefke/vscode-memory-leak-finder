@@ -7,6 +7,7 @@ export const PageFrameDetached = 'Page.frameDetached'
 export const PageFrameNavigated = 'Page.frameNavigated'
 export const PageLifeCycleEvent = 'Page.lifecycleEvent'
 export const PageLoadEventFired = 'Page.loadEventFired'
+export const PageScreencastFrame = 'Page.screencastFrame'
 
 export const RuntimeConsoleApiCalled = 'Runtime.consoleAPICalled'
 export const RuntimeExecutionContextCreated = 'Runtime.executionContextCreated'

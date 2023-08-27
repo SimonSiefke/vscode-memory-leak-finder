@@ -6,6 +6,7 @@ import * as PTimeout from '../PTimeout/PTimeout.js'
 import * as SessionState from '../SessionState/SessionState.js'
 import * as TargetState from '../TargetState/TargetState.js'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
+import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
 
 export const Locator = (selector) => {
   return {
@@ -133,9 +134,14 @@ export const handleTargetCrashed = (message) => {
   console.log('target crashed', message)
 }
 
+const handleFrame = (message) => {
+  console.log({ message })
+}
+
 const handleAttachedToPage = async (message) => {
   try {
     const sessionId = message.params.sessionId
+    console.log('attached to page', sessionId)
     const browserSession = SessionState.getSession('browser')
     const browserRpc = browserSession.rpc
     const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
@@ -149,7 +155,6 @@ const handleAttachedToPage = async (message) => {
       sessionId,
       rpc: sessionRpc,
     })
-
     TargetState.addTarget(targetId, {
       type: DevtoolsTargetType.Page,
       url,
@@ -157,21 +162,10 @@ const handleAttachedToPage = async (message) => {
       sessionId,
       targetId,
     })
-
-    await PTimeout.pTimeout(
-      Promise.all([
-        DevtoolsProtocolPage.enable(sessionRpc),
-        DevtoolsProtocolPage.setLifecycleEventsEnabled(sessionRpc, { enabled: true }),
-        DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
-          autoAttach: true,
-          waitForDebuggerOnStart: true,
-          flatten: true,
-        }),
-        DevtoolsProtocolRuntime.enable(sessionRpc),
-        DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc),
-      ]),
-      { milliseconds: TimeoutConstants.AttachToPage },
-    )
+    sessionRpc.on(DevtoolsEventType.PageScreencastFrame, handleFrame)
+    await PTimeout.pTimeout(Promise.all([DevtoolsProtocolPage.enable(sessionRpc), DevtoolsProtocolPage.startScreencast(sessionRpc)]), {
+      milliseconds: TimeoutConstants.AttachToPage,
+    })
   } catch (error) {
     if (error && error.name === 'TestFinishedError') {
       return
