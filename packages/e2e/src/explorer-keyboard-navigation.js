@@ -9,7 +9,7 @@ const createFiles = () => {
   return files
 }
 
-export const beforeSetup = async ({ Workspace, Explorer }) => {
+export const setup = async ({ Workspace, Explorer }) => {
   const files = createFiles()
   await Workspace.setFiles(files)
   await Explorer.focus()

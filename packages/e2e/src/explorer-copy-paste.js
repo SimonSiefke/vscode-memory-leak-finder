@@ -1,6 +1,6 @@
 export const skip = true
 
-export const beforeSetup = async ({ Workspace, Explorer }) => {
+export const setup = async ({ Workspace, Explorer }) => {
   await Workspace.setFiles([
     {
       name: 'file-1.txt',
