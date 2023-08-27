@@ -250,7 +250,7 @@ export const create = ({ page, expect, VError }) => {
       const token = page.locator(`[class^="mtk"]`, {
         hasText: text,
       })
-      await expect(token).toHaveCSS('color', color)
+      await expect(token).toHaveCss('color', color)
     },
     async save() {
       try {

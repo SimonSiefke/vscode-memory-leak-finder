@@ -21,7 +21,7 @@ export const setup = async ({ Editor, Workspace }) => {
 export const run = async ({ page, expect, Editor }) => {
   await Editor.click('font-size')
   const cursor = page.locator('.cursor')
-  await expect(cursor).toHaveCSS('left', /(53px|58px|66px)/)
+  await expect(cursor).toHaveCss('left', /(53px|58px|66px)/)
   await Editor.rename('--abc')
   await Editor.shouldHaveText(`:root {
   --abc: 10px;
