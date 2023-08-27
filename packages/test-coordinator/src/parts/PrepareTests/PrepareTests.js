@@ -4,6 +4,7 @@ import * as KillExistingVscodeInstances from '../KillExistingVscodeInstances/Kil
 import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.js'
 import * as PageObject from '../PageObject/PageObject.js'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.js'
+import * as VideoRecording from '../VideoRecording/VideoRecording.js'
 
 export const prepareTests = async (ipc, cwd, headlessMode, connectionId) => {
   const isFirstConnection = true
@@ -21,6 +22,7 @@ export const prepareTests = async (ipc, cwd, headlessMode, connectionId) => {
     isFirstConnection,
   )
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
+  // await VideoRecording.start(devtoolsWebSocketUrl)
   await ConnectDevtools.connectDevtools(
     ipc,
     connectionId,
