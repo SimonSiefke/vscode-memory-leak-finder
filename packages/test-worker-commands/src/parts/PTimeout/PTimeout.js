@@ -1,11 +1,17 @@
 import { setTimeout } from 'node:timers/promises'
 
-const rejectAfterTimeout = async (milliseconds) => {
+const timeoutValue = {}
+
+const createTimeoutPromise = async (milliseconds) => {
   await setTimeout(milliseconds)
-  throw new Error(`timeout of ${milliseconds}ms reached`)
+  return timeoutValue
 }
 
 export const pTimeout = async (promise, options) => {
-  const timeoutPromise = rejectAfterTimeout(options.milliseconds)
-  return Promise.race([promise, timeoutPromise])
+  const timeoutPromise = createTimeoutPromise(options.milliseconds)
+  const result = await Promise.race([promise, timeoutPromise])
+  if (result === timeoutValue) {
+    throw new Error(`timeout of ${options.milliseconds}ms reached`)
+  }
+  return result
 }
