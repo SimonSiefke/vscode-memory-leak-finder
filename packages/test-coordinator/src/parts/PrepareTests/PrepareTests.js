@@ -31,7 +31,7 @@ export const prepareTests = async (ipc, cwd, headlessMode, connectionId) => {
     callFrameId,
     isFirstConnection,
   )
-  // await VideoRecording.start(devtoolsWebSocketUrl)
+  await VideoRecording.start(devtoolsWebSocketUrl)
   await PageObject.create(ipc, connectionId, isFirstConnection)
   return {
     ipc,
