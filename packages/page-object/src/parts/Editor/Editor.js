@@ -98,13 +98,13 @@ export const create = ({ page, expect, VError }) => {
     },
     async closeAll() {
       try {
+        await page.waitForIdle()
         const main = page.locator('[role="main"]')
         const tabs = main.locator('[role="tab"]')
         const currentCount = await tabs.count()
         if (currentCount === 0) {
           return
         }
-        await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewCloseAllEditors)
         await expect(tabs).toHaveCount(0, {

@@ -1,7 +1,3 @@
-import * as Cli from './parts/Cli/Cli.js'
+import * as Main from './parts/Main/Main.js'
 
-const main = () => {
-  Cli.run()
-}
-
-main()
+Main.main()

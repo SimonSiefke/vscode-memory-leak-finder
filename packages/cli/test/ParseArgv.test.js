@@ -5,6 +5,7 @@ test('parseArgv - empty', () => {
   expect(ParseArgv.parseArgv(argv)).toEqual({
     watch: false,
     headless: false,
+    checkLeaks: false,
   })
 })
 
@@ -13,6 +14,7 @@ test('parseArgv - watch mode', () => {
   expect(ParseArgv.parseArgv(argv)).toEqual({
     watch: true,
     headless: false,
+    checkLeaks: false,
   })
 })
 
@@ -21,5 +23,6 @@ test('parseArgv - headless mode', () => {
   expect(ParseArgv.parseArgv(argv)).toEqual({
     watch: false,
     headless: true,
+    checkLeaks: false,
   })
 })
