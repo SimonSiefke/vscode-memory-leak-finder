@@ -38,7 +38,7 @@ export const getErrorResponse = async (message, error) => {
   }
   const PrettyError = await import('../PrettyError/PrettyError.js')
   const prettyError = await PrettyError.prepare(error)
-  PrintPrettyError.printPrettyError(prettyError, `[test-coordinator] `)
+  PrintPrettyError.printPrettyError(prettyError, `[video-recording-worker] `)
   return {
     jsonrpc: JsonRpcVersion.Two,
     id: message.id,

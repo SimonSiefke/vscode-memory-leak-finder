@@ -9,7 +9,6 @@ export const start = async (devtoolsWebsocketUrl) => {
   Assert.string(devtoolsWebsocketUrl)
   const ipc = await VideoRecordingWorker.start()
   HandleIpc.handleIpc(ipc, Command.execute, Callback.resolve)
-  await JsonRpc.invoke(ipc, 'ConnectDevtools.connectDevtools')
+  await JsonRpc.invoke(ipc, 'ConnectDevtools.connectDevtools', devtoolsWebsocketUrl)
   await JsonRpc.invoke(ipc, 'VideoRecording.start')
-  console.log('worker ready')
 }
