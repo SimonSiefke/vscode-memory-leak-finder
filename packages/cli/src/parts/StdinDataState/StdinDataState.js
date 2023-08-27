@@ -8,6 +8,7 @@ export const state = {
   headless: false,
   watch: false,
   checkLeaks: false,
+  runs: 1,
 }
 
 export const setState = (newState) => {
@@ -16,6 +17,7 @@ export const setState = (newState) => {
   state.headless = newState.headless
   state.watch = newState.watch
   state.checkLeaks = newState.checkLeaks
+  state.runs = newState.runs
 }
 
 export const setBuffering = (value) => {
@@ -32,6 +34,10 @@ export const isWatchMode = () => {
 
 export const shouldCheckLeaks = () => {
   return state.checkLeaks
+}
+
+export const getRuns = () => {
+  return state.runs
 }
 
 export const getState = () => {
