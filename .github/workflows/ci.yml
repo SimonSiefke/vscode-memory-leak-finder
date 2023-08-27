@@ -39,6 +39,7 @@ jobs:
         with:
           run: npm run e2e
       - name: Run headless test (flakyness check)
+        if: matrix.os != 'macos-12'
         uses: coactions/setup-xvfb@v1
         with:
           run: npm run e2e:check-flakyness
