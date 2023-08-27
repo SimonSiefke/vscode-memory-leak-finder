@@ -112,6 +112,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(extensionEditor).toBeVisible()
         const heading = extensionEditor.locator('.name').first()
         await expect(heading).toHaveText(name)
+        await page.waitForIdle()
       },
       async openContextMenu() {
         const firstExtension = page.locator('.extension-list-item').first()
