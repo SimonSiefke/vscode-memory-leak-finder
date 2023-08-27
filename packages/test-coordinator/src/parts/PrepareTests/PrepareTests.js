@@ -22,7 +22,7 @@ export const prepareTests = async (ipc, cwd, headlessMode, connectionId) => {
     isFirstConnection,
   )
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
-  // await VideoRecording.start(devtoolsWebSocketUrl)
+  await VideoRecording.start(devtoolsWebSocketUrl)
   await ConnectDevtools.connectDevtools(
     ipc,
     connectionId,

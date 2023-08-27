@@ -1,8 +1,7 @@
 import * as VideoWorkerCommandType from '../VideoWorkerCommandType/VideoWorkerCommandType.js'
-import * as RunTests from '../RunTests/RunTests.js'
-import * as Exit from '../Exit/Exit.js'
+import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.js'
 
 export const commandMap = {
-  [VideoWorkerCommandType.VideoRecordingStart]: RunTests.runTests,
-  [VideoWorkerCommandType.ConnectDevtools]: Exit.exit,
+  [VideoWorkerCommandType.VideoRecordingStart]: ConnectDevtools.connectDevtools,
+  [VideoWorkerCommandType.ConnectDevtools]: ConnectDevtools.connectDevtools,
 }

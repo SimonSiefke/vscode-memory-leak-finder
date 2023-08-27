@@ -1,13 +1,8 @@
-import * as HandleMessage from '../HandleMessage/HandleMessage.js'
+import * as HandleJsonRpcMessage from '../HandleJsonRpcMessage/HandleJsonRpcMessage.js'
 
-export const handleIpc = async (ipc) => {
-  const callback = (message) => {
-    ipc.send(message)
-  }
-  const handleMessage = async (message) => {
-    const { method, params } = message
-    const fn = HandleMessage.getFn(method)
-    fn(...params, callback)
+export const handleIpc = (ipc, execute, resolve) => {
+  const handleMessage = (message) => {
+    return HandleJsonRpcMessage.handleJsonRpcMessage(ipc, message, execute, resolve)
   }
   ipc.on('message', handleMessage)
 }

@@ -2,9 +2,7 @@ import * as Assert from '../Assert/Assert.js'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.js'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.js'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
-import { DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as ElectronApp from '../ElectronApp/ElectronApp.js'
-import * as ElectronAppState from '../ElectronAppState/ElectronAppState.js'
+import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as IntermediateConnectionState from '../IntermediateConnectionState/IntermediateConnectionState.js'
 import * as ObjectType from '../ObjectType/ObjectType.js'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
@@ -62,17 +60,4 @@ export const connectDevtools = async (
       discover: true,
     }),
   ])
-
-  if (isFirstConnection) {
-    const result = await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-      functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
-      objectId: monkeyPatchedElectron.objectId,
-    })
-  }
-  const electronApp = ElectronApp.create({
-    electronRpc,
-    electronObjectId,
-    callFrameId,
-  })
-  ElectronAppState.set(connectionId, electronApp)
 }
