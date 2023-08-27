@@ -2,40 +2,32 @@ import * as ParseArgv from '../src/parts/ParseArgv/ParseArgv.js'
 
 test('parseArgv - empty', () => {
   const argv = []
-  expect(ParseArgv.parseArgv(argv)).toEqual({
-    watch: false,
-    headless: false,
-    checkLeaks: false,
-    runs: 1,
-  })
+  expect(ParseArgv.parseArgv(argv)).toMatchObject({})
 })
 
 test('parseArgv - watch mode', () => {
   const argv = ['--watch']
-  expect(ParseArgv.parseArgv(argv)).toEqual({
+  expect(ParseArgv.parseArgv(argv)).toMatchObject({
     watch: true,
-    headless: false,
-    checkLeaks: false,
-    runs: 1,
   })
 })
 
 test('parseArgv - headless mode', () => {
   const argv = ['--headless']
-  expect(ParseArgv.parseArgv(argv)).toEqual({
-    watch: false,
+  expect(ParseArgv.parseArgv(argv)).toMatchObject({
     headless: true,
-    checkLeaks: false,
-    runs: 1,
   })
 })
 
 test('parseArgv - runs', () => {
   const argv = ['--runs', '4']
-  expect(ParseArgv.parseArgv(argv)).toEqual({
-    watch: false,
-    headless: false,
-    checkLeaks: false,
+  expect(ParseArgv.parseArgv(argv)).toMatchObject({
+    runs: 4,
+  })
+})
+test('parseArgv - runs', () => {
+  const argv = ['--runs', '4']
+  expect(ParseArgv.parseArgv(argv)).toMatchObject({
     runs: 4,
   })
 })

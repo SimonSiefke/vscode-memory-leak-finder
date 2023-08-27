@@ -17,6 +17,6 @@ export const run = async () => {
     SpecialStdin.start()
     Stdout.write(WatchUsage.print())
   } else {
-    await StartRunning.startRunning('', false, true, options.checkLeaks, options.runs)
+    await StartRunning.startRunning('', options.headless, options.color, options.checkLeaks, options.runs)
   }
 }

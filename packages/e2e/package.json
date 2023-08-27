@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "e2e": "node ../cli/bin/test.js",
+    "e2e:headless": "node ../cli/bin/test.js --headless",
     "test:watch": "node ../cli/bin/test.js --watch"
   },
   "keywords": [],
