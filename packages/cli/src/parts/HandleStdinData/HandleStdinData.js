@@ -16,7 +16,7 @@ export const handleStdinData = async (key) => {
   }
   StdinDataState.setState(newState)
   if (newState.mode === ModeType.Running) {
-    await StartRunning.startRunning(state.value, state.headless, /* color */ true)
+    await StartRunning.startRunning(state.value, state.headless, /* color */ true, state.checkLeaks)
   }
   if (newState.mode === ModeType.Interrupted) {
     await KillWorkers.killWorkers()
