@@ -13,7 +13,7 @@ import * as Time from '../Time/Time.js'
 // 5. pass websocket url to test worker and wait for connection
 // 6. pass matching files to test worker
 
-export const runTests = async (root, cwd, filterValue, headlessMode, color, checkLeaks, callback) => {
+export const runTests = async (root, cwd, filterValue, headlessMode, color, checkLeaks, runs, callback) => {
   try {
     let passed = 0
     let failed = 0
@@ -55,7 +55,9 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
             const result = await MemoryLeakFinder.compare(ipc, connectionId, before, after)
             console.log({ result })
           } else {
-            await TestWorkerRunTest.testWorkerRunTest(ipc, connectionId, formattedPath.absolutePath, root, color)
+            for (let i = 0; i < runs; i++) {
+              await TestWorkerRunTest.testWorkerRunTest(ipc, connectionId, formattedPath.absolutePath, root, color)
+            }
           }
           const end = Time.now()
           const duration = end - start
