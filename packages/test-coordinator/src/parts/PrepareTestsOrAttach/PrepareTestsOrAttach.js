@@ -1,11 +1,8 @@
 import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.js'
 import * as ConnectElectron from '../ConnectElectron/ConnectElectron.js'
-import * as KillExistingVscodeInstances from '../KillExistingVscodeInstances/KillExistingVscodeInstances.js'
-import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.js'
 import * as PageObject from '../PageObject/PageObject.js'
-import * as TestWorker from '../TestWorker/TestWorker.js'
-import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.js'
 import * as PrepareTests from '../PrepareTests/PrepareTests.js'
+import * as TestWorker from '../TestWorker/TestWorker.js'
 
 export const state = {
   firstLaunch: false,
@@ -17,11 +14,6 @@ export const state = {
    * @type {Promise|undefined}
    */
   promise: undefined,
-}
-
-const createDevtoolsUrlPromise = async (childPromise) => {
-  const { child } = await childPromise
-  return WaitForDevtoolsListening.waitForDevtoolsListening(child.stderr)
 }
 
 export const prepareTestsOrAttach = async (cwd, headlessMode, connectionId) => {
