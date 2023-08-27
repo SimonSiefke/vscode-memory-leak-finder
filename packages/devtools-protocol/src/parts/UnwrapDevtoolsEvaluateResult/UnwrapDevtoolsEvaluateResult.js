@@ -50,5 +50,8 @@ export const unwrapResult = (rawResult) => {
   if (typeof rawResult === 'object' && 'objects' in rawResult) {
     return rawResult
   }
+  if (typeof rawResult === 'object' && 'identifier' in rawResult) {
+    return rawResult
+  }
   throw new Error(`Failed to unwrap devtools evaluate result`)
 }

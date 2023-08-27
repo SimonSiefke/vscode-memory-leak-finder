@@ -52,6 +52,8 @@ export const PageAddScriptToEvaluateOnNewDocument = 'Page.addScriptToEvaluateOnN
 
 export const PageSetLifecycleEventsEnabled = 'Page.setLifecycleEventsEnabled'
 
+export const PageScreencastFrameAck = 'Page.screencastFrameAck'
+
 export const DebuggerStepInto = 'Debugger.stepInto'
 
 export const DebuggerStepOut = 'Debugger.stepOut'

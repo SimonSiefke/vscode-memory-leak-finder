@@ -1,64 +1,44 @@
 import * as DevtoolsCommandType from '../DevtoolsCommandType/DevtoolsCommandType.js'
-import { DevtoolsProtocolError } from '../DevtoolsProtocolError/DevtoolsProtocolError.js'
+import * as Invoke from '../Invoke/Invoke.js'
 
 export const setFontSizes = () => {
   throw new Error('not implemented')
 }
 
-export const startScreencast = async (rpc, options) => {
-  const rawResult = await rpc.invoke(DevtoolsCommandType.PageStartScreenCast, options)
-  if ('error' in rawResult) {
-    throw new DevtoolsProtocolError(rawResult.error.message)
-  }
+export const startScreencast = (rpc, options) => {
+  return Invoke.invoke(rpc, DevtoolsCommandType.PageStartScreenCast, options)
 }
 
-export const stopScreencast = async (rpc, options) => {
-  const rawResult = await rpc.invoke(DevtoolsCommandType.PageStopScreenCast, options)
-  if ('error' in rawResult) {
-    throw new DevtoolsProtocolError(rawResult.error.message)
-  }
+export const screencastFrameAck = (rpc, options) => {
+  return Invoke.invoke(rpc, DevtoolsCommandType.PageScreencastFrameAck, options)
 }
 
-export const enable = async (rpc, options) => {
-  const rawResult = await rpc.invoke(DevtoolsCommandType.PageEnable, options)
-  if ('error' in rawResult) {
-    throw new DevtoolsProtocolError(rawResult.error.message)
-  }
+export const stopScreencast = (rpc, options) => {
+  return Invoke.invoke(rpc, DevtoolsCommandType.PageStopScreenCast, options)
 }
 
-export const reload = async (rpc, options) => {
-  const rawResult = await rpc.invoke(DevtoolsCommandType.PageReload, options)
-  if ('error' in rawResult) {
-    throw new DevtoolsProtocolError(rawResult.error.message)
-  }
+export const enable = (rpc, options) => {
+  return Invoke.invoke(rpc, DevtoolsCommandType.PageEnable, options)
+}
+
+export const reload = (rpc, options) => {
+  return Invoke.invoke(rpc, DevtoolsCommandType.PageReload, options)
 }
 
 /**
  *
  * @param {{source:string, worldName?:string}} options
  */
-export const addScriptToEvaluateOnNewDocument = async (rpc, options) => {
-  const rawResult = await rpc.invoke(DevtoolsCommandType.PageAddScriptToEvaluateOnNewDocument, options)
-  if ('error' in rawResult) {
-    throw new DevtoolsProtocolError(rawResult.error.message)
-  }
-  return rawResult
+export const addScriptToEvaluateOnNewDocument = (rpc, options) => {
+  return Invoke.invoke(rpc, DevtoolsCommandType.PageAddScriptToEvaluateOnNewDocument, options)
 }
 
-export const captureScreenshot = async (rpc, options) => {
-  const rawResult = await rpc.invoke(DevtoolsCommandType.PageCaptureScreenshot, options)
-  if ('error' in rawResult) {
-    throw new DevtoolsProtocolError(rawResult.error.message)
-  }
-  return rawResult.result.data
+export const captureScreenshot = (rpc, options) => {
+  return Invoke.invoke(rpc, DevtoolsCommandType.PageCaptureScreenshot, options)
 }
 
-export const close = async (rpc, options) => {
-  const rawResult = await rpc.invoke(DevtoolsCommandType.PageClose, options)
-  if ('error' in rawResult) {
-    throw new DevtoolsProtocolError(rawResult.error.message)
-  }
-  return rawResult.result.data
+export const close = (rpc, options) => {
+  return Invoke.invoke(rpc, DevtoolsCommandType.PageClose, options)
 }
 
 /**
@@ -67,10 +47,6 @@ export const close = async (rpc, options) => {
  * @param {{enabled:boolean}} options
  * @returns
  */
-export const setLifecycleEventsEnabled = async (rpc, options) => {
-  const rawResult = await rpc.invoke(DevtoolsCommandType.PageSetLifecycleEventsEnabled, options)
-  if ('error' in rawResult) {
-    throw new DevtoolsProtocolError(rawResult.error.message)
-  }
-  return rawResult.result.data
+export const setLifecycleEventsEnabled = (rpc, options) => {
+  return Invoke.invoke(rpc, DevtoolsCommandType.PageSetLifecycleEventsEnabled, options)
 }
