@@ -8,6 +8,7 @@ export const create = ({ page, expect, VError }) => {
   return {
     async open(fileName) {
       try {
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.openFile(fileName)
         const tab = page.locator('.tab', { hasText: fileName })
