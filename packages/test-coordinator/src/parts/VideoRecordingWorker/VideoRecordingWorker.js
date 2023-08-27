@@ -6,6 +6,7 @@ export const start = async () => {
   const ipc = await IpcParent.create({
     method: IpcParentType.NodeWorkerThread,
     url: VideoRecordingWorkerPath.videoRecordingWorkerPath,
+    stdio: 'inherit',
   })
   return ipc
 }

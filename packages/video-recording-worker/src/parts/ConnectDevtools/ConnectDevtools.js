@@ -3,27 +3,12 @@ import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/Deb
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.js'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
 import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as IntermediateConnectionState from '../IntermediateConnectionState/IntermediateConnectionState.js'
 import * as ObjectType from '../ObjectType/ObjectType.js'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
 import * as SessionState from '../SessionState/SessionState.js'
 
-export const connectDevtools = async (
-  connectionId,
-  devtoolsWebSocketUrl,
-  monkeyPatchedElectron,
-  electronObjectId,
-  callFrameId,
-  isFirstConnection,
-) => {
-  Assert.number(connectionId)
+export const connectDevtools = async (devtoolsWebSocketUrl) => {
   Assert.string(devtoolsWebSocketUrl)
-  Assert.object(monkeyPatchedElectron)
-  Assert.string(electronObjectId)
-  Assert.string(callFrameId)
-  Assert.boolean(isFirstConnection)
-  const electronRpc = IntermediateConnectionState.get(connectionId)
-  IntermediateConnectionState.remove(connectionId)
   const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
 
