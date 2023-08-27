@@ -49,6 +49,9 @@ return listenerMap
       includeCommandLineAPI: true,
     })
     const value = fnResult2
+    if (typeof value !== 'number') {
+      throw new Error(`Event listener count must be of type number`)
+    }
     return value
   } catch (error) {
     throw new VError(error, `Failed to get event listener count`)
