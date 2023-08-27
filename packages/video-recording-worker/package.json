@@ -1,0 +1,16 @@
+{
+  "name": "video-recording-worker",
+  "version": "0.0.0-dev",
+  "description": "",
+  "main": "src/main.js",
+  "type": "module",
+  "bin": {
+    "video-recording-worker": "bin/video-recording-worker.js"
+  },
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}
