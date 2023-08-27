@@ -5,6 +5,7 @@
 .vscode-test-files
 .vscode-previous-filters
 .vscode-runtime-dir
+.videos
 
 # Logs
 logs
