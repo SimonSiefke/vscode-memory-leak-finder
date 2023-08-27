@@ -1,6 +1,6 @@
 export const skip = true
 
-export const beforeSetup = async ({ writeSettings }) => {
+export const setup = async ({ writeSettings }) => {
   await writeSettings({
     'window.titleBarStyle': 'custom',
   })
