@@ -29,7 +29,7 @@ export const create = async (connectionId, isFirstConnection) => {
       electronApp,
     }
     const pageObject = pageObjectModule.create(pageObjectContext)
-    PageObjectState.set(connectionId, pageObject)
+    PageObjectState.set(connectionId, { pageObject, firstWindow })
   } catch (error) {
     throw new VError(error, `Failed to create page object`)
   }
