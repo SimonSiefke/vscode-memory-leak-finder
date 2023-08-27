@@ -41,3 +41,7 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: npm run e2e
+      - name: Run headless test (flakyness check)
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: cd packages/e2e && node ../cli/bin/test.js --runs 10
