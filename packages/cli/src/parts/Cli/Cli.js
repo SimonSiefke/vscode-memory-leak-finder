@@ -10,11 +10,12 @@ export const run = async () => {
   StdinDataState.setState({
     ...StdinDataState.getState(),
     watch: options.watch,
+    checkLeaks: options.checkLeaks,
   })
   if (options.watch) {
     SpecialStdin.start()
     Stdout.write(WatchUsage.print())
   } else {
-    await StartRunning.startRunning('', false, true)
+    await StartRunning.startRunning('', false, true, options.checkLeaks)
   }
 }

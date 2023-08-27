@@ -13,7 +13,7 @@ import * as Time from '../Time/Time.js'
 // 5. pass websocket url to test worker and wait for connection
 // 6. pass matching files to test worker
 
-export const runTests = async (root, cwd, filterValue, headlessMode, color, callback) => {
+export const runTests = async (root, cwd, filterValue, headlessMode, color, checkLeaks, callback) => {
   try {
     let passed = 0
     let failed = 0
