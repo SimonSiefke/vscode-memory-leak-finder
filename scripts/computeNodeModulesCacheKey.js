@@ -21,6 +21,7 @@ const locations = [
   'packages/test-coordinator/src/parts/VsCodeVersion/VsCodeVersion.js',
   'packages/test-worker-commands/package-lock.json',
   'packages/test-worker/package-lock.json',
+  'packages/video-recording-worker/package-lock.json',
   '.github/workflows/ci.yml',
   '.github/workflows/pr.yml',
   '.github/workflows/release.yml',
