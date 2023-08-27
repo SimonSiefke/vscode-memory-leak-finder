@@ -4,6 +4,7 @@ export const parseArgv = (argv) => {
     headless: false,
     checkLeaks: false,
     runs: 1,
+    color: true,
   }
   if (argv.includes('--watch')) {
     options.watch = true

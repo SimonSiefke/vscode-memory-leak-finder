@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "e2e": "node ../cli/bin/test.js",
-    "test:watch": "node ../cli/bin/test.js --watch",
-    "e2e:check-flakyness": "node ../cli/bin/test.js --runs 10"
+    "e2e:check-flakyness": "node ../cli/bin/test.js --runs 10",
+    "e2e:headless": "node ../cli/bin/test.js --headless",
+    "test:watch": "node ../cli/bin/test.js --watch"
   },
   "keywords": [],
   "author": "",
