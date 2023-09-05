@@ -17,18 +17,18 @@ export const state = {
 }
 
 export const prepareTestsOrAttach = async (cwd, headlessMode, connectionId) => {
-  const ipc = await TestWorker.launch()
+  const testWorkerIpc = await TestWorker.launch()
   const isFirst = state.promise === undefined
   if (isFirst) {
-    state.promise = PrepareTests.prepareTests(ipc, cwd, headlessMode, connectionId)
+    state.promise = PrepareTests.prepareTests(testWorkerIpc, cwd, headlessMode, connectionId)
     await state.promise
-    return ipc
+    return testWorkerIpc
   }
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, callFrameId, monkeyPatchedElectron } = await state.promise
   const isFirstConnection = false
-  await ConnectElectron.connectElectron(ipc, connectionId, headlessMode, webSocketUrl, isFirstConnection)
+  await ConnectElectron.connectElectron(testWorkerIpc, connectionId, headlessMode, webSocketUrl, isFirstConnection)
   await ConnectDevtools.connectDevtools(
-    ipc,
+    testWorkerIpc,
     connectionId,
     devtoolsWebSocketUrl,
     monkeyPatchedElectron,
@@ -36,6 +36,6 @@ export const prepareTestsOrAttach = async (cwd, headlessMode, connectionId) => {
     callFrameId,
     isFirstConnection,
   )
-  await PageObject.create(ipc, connectionId, isFirstConnection)
-  return ipc
+  await PageObject.create(testWorkerIpc, connectionId, isFirstConnection)
+  return testWorkerIpc
 }
