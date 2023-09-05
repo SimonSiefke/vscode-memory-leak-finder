@@ -5,6 +5,7 @@ import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.js'
 import * as PageObject from '../PageObject/PageObject.js'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.js'
 import * as VideoRecording from '../VideoRecording/VideoRecording.js'
+import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
 
 export const prepareTests = async (ipc, cwd, headlessMode, connectionId) => {
   const isFirstConnection = true
@@ -23,6 +24,7 @@ export const prepareTests = async (ipc, cwd, headlessMode, connectionId) => {
   )
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
   await VideoRecording.start(devtoolsWebSocketUrl)
+  await MemoryLeakWorker.startWorker(devtoolsWebSocketUrl)
   await ConnectDevtools.connectDevtools(
     ipc,
     connectionId,
