@@ -13,11 +13,9 @@
   "license": "MIT",
   "dependencies": {
     "@lvce-editor/verror": "^1.1.0",
-    "verror": "^1.10.1",
     "ws": "^8.13.0"
   },
   "devDependencies": {
-    "@types/verror": "^1.10.6",
     "@types/ws": "^8.5.5"
   }
 }
