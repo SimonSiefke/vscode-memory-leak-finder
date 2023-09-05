@@ -1,6 +1,5 @@
-import { join, relative } from 'node:path'
+import { relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import * as Root from '../Root/Root.js'
 
 const isTestWorkerLine = (line) => {
   if (line.includes('test-worker/src')) {
@@ -20,6 +19,15 @@ const isInternal = (line) => {
     return true
   }
   if (line.includes('devtools-protocol')) {
+    return true
+  }
+  if (line.includes('at restoreJsonRpcError')) {
+    return true
+  }
+  if (line.includes('at unwrapJsonRpcResult')) {
+    return true
+  }
+  if (line.includes('at async handleJsonRpcMessage')) {
     return true
   }
   return false
