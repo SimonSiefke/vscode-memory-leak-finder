@@ -5,6 +5,7 @@ import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAtt
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.js'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.js'
+import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
 import * as Time from '../Time/Time.js'
 // 1. get matching files
 // 2. launch vscode
@@ -29,9 +30,10 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
     callback(TestWorkerEventType.TestsStarting, total)
     callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent)
     const connectionId = Id.create()
-    const ipc = await PrepareTestsOrAttach.prepareTestsOrAttach(cwd, headlessMode, connectionId)
+    const testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(cwd, headlessMode, connectionId)
+    const memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()
     if (checkLeaks) {
-      await MemoryLeakFinder.setup(ipc, connectionId)
+      await MemoryLeakFinder.setup(testWorkerIpc, connectionId)
     }
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
@@ -41,7 +43,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
       }
       try {
         const start = i === 0 ? initialStart : Time.now()
-        const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(ipc, connectionId, formattedPath.absolutePath)
+        const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(testWorkerIpc, connectionId, formattedPath.absolutePath)
         if (testSkipped) {
           skipped++
           const end = Time.now()
@@ -49,14 +51,14 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
           callback(TestWorkerEventType.TestSkipped, absolutePath, relativeDirname, dirent, duration)
         } else {
           if (checkLeaks) {
-            const before = await MemoryLeakFinder.start(ipc, connectionId)
-            await TestWorkerRunTest.testWorkerRunTest(ipc, connectionId, formattedPath.absolutePath, root, color)
-            const after = await MemoryLeakFinder.stop(ipc, connectionId)
-            const result = await MemoryLeakFinder.compare(ipc, connectionId, before, after)
+            const before = await MemoryLeakFinder.start(testWorkerIpc, connectionId)
+            await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, formattedPath.absolutePath, root, color)
+            const after = await MemoryLeakFinder.stop(testWorkerIpc, connectionId)
+            const result = await MemoryLeakFinder.compare(testWorkerIpc, connectionId, before, after)
             console.log({ result })
           } else {
             for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(ipc, connectionId, formattedPath.absolutePath, root, color)
+              await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, formattedPath.absolutePath, root, color)
             }
           }
           const end = Time.now()

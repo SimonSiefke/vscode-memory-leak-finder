@@ -44,5 +44,4 @@ export const connectDevtools = async (devtoolsWebSocketUrl) => {
     //   discover: true,
     // }),
   ])
-  // console.log('attached to devtools')
 }
