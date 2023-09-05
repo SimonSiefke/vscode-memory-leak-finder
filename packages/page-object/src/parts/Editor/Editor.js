@@ -12,11 +12,11 @@ export const create = ({ page, expect, VError }) => {
   return {
     async open(fileName) {
       try {
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.openFile(fileName)
         const tab = page.locator('.tab', { hasText: fileName })
         await expect(tab).toBeVisible()
-
         if (isNotebook(fileName)) {
           const editor = page.locator('.notebook-editor')
           const list = editor.locator('.monaco-list.element-focused')
