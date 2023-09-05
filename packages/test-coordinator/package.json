@@ -9,11 +9,11 @@
   "license": "MIT",
   "description": "",
   "dependencies": {
-    "@babel/code-frame": "^7.22.10",
+    "@babel/code-frame": "^7.22.13",
     "@lvce-editor/verror": "^1.1.0",
     "@vscode/test-electron": "^2.3.4",
     "clean-stack": "^5.2.0",
-    "exit-hook": "^3.2.0",
+    "exit-hook": "^4.0.0",
     "got": "^13.0.0",
     "source-map": "^0.7.4",
     "strip-ansi": "^7.1.0",
