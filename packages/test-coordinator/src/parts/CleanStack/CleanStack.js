@@ -1,6 +1,5 @@
-import { join, relative } from 'node:path'
+import { relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import * as Root from '../Root/Root.js'
 
 const isTestWorkerLine = (line) => {
   if (line.includes('test-worker/src')) {
@@ -22,11 +21,16 @@ const isInternal = (line) => {
   if (line.includes('devtools-protocol')) {
     return true
   }
+  if (line.includes('at restoreJsonRpcError')) {
+    return true
+  }
+  if (line.includes('at unwrapJsonRpcResult')) {
+    return true
+  }
+  if (line.includes('at async handleJsonRpcMessage')) {
+    return true
+  }
   return false
-}
-
-const isRelevant = (line) => {
-  return !isInternal(line)
 }
 
 const RE_STACK_PATH_1 = /(^\s*at .*?\(?)([^()]+)(:[0-9]+:[0-9]+\)?.*$)/
