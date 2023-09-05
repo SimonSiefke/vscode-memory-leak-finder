@@ -17,7 +17,6 @@ export const create = ({ page, expect, VError }) => {
         await quickPick.openFile(fileName)
         const tab = page.locator('.tab', { hasText: fileName })
         await expect(tab).toBeVisible()
-
         if (isNotebook(fileName)) {
           const editor = page.locator('.notebook-editor')
           const list = editor.locator('.monaco-list.element-focused')
