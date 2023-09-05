@@ -11,7 +11,9 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "@lvce-editor/verror": "^1.1.1"
+  },
   "devDependencies": {
     "@types/babel__code-frame": "^7.0.3"
   }
