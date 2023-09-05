@@ -4,6 +4,10 @@ import * as Character from '../Character/Character.js'
 
 const initialDiagnosticTimeout = 30_000
 
+const isNotebook = (file) => {
+  return file.endsWith('.ipynb')
+}
+
 export const create = ({ page, expect, VError }) => {
   return {
     async open(fileName) {
@@ -12,10 +16,17 @@ export const create = ({ page, expect, VError }) => {
         await quickPick.openFile(fileName)
         const tab = page.locator('.tab', { hasText: fileName })
         await expect(tab).toBeVisible()
-        const editor = page.locator('.editor-instance')
-        await expect(editor).toBeVisible()
-        const editorInput = editor.locator('.inputarea')
-        await expect(editorInput).toBeFocused()
+
+        if (isNotebook(fileName)) {
+          const editor = page.locator('.notebook-editor')
+          const list = editor.locator('.monaco-list.element-focused')
+          await expect(list).toBeFocused()
+        } else {
+          const editor = page.locator('.editor-instance')
+          await expect(editor).toBeVisible()
+          const editorInput = editor.locator('.inputarea')
+          await expect(editorInput).toBeFocused()
+        }
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open editor ${fileName}`)
