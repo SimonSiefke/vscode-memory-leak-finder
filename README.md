@@ -15,6 +15,21 @@ npm run e2e
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io#https://github.com/SimonSiefke/vscode-memory-leak-finder)
 
+## Project Structure
+
+- packages/cli: Command Line Interface, similar to jest
+- packages/devtools-protocol: Functionality related to Chrome Devtools Protocol
+- packages/e2e: The e2e test scenarios
+- packages/file-watcher-worker: Watch files for changes
+- packages/injected-code: Code injected to the page for e2e tests
+- packages/memory-leak-finder: Library for finding memory leaks
+- packages/memory-leak-worker: Process for finding memory leaks (uses the library from above)
+- packages/page-object: Page Object Model to simplify e2e tests
+- packages/test-coordinator: Determines which tests to run, launches VSCode, file-watcher-worker, test-worker, memory-leak-worker, video-recording-worker
+- packages/test-worker: Runs tests
+- packages/test-worker-commands: Functions used by test-worker
+- packages/video-recording-worker: Record screencasts of the tests
+
 ## Credits
 
 This project is based on the [jest cli](https://github.com/jestjs/jest), [playwright](https://github.com/microsoft/playwright/) and [fuite](https://github.com/nolanlawson/fuite).
