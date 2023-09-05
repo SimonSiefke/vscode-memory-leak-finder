@@ -1,4 +1,4 @@
-import VError from 'verror'
+import { VError } from '../VError/VError.js'
 import { WebSocket } from 'ws'
 import * as Json from '../Json/Json.js'
 import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWebSocketToBeOpen.js'

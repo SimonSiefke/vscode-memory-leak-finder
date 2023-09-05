@@ -1,5 +1,5 @@
 import { pathToFileURL } from 'url'
-import VError from 'verror'
+import { VError } from '../VError/VError.js'
 
 export const importScript = async (path) => {
   try {

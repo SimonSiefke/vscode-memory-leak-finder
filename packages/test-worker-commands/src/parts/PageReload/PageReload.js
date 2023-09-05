@@ -1,4 +1,4 @@
-import VError from 'verror'
+import { VError } from '../VError/VError.js'
 import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as PTimeout from '../PTimeout/PTimeout.js'
 
