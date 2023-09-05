@@ -1,4 +1,4 @@
-import VError from 'verror'
+import { VError } from '../VError/VError.js'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
 import * as PTimeout from '../PTimeout/PTimeout.js'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'

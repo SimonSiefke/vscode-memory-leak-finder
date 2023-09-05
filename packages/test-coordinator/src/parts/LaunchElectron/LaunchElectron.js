@@ -1,6 +1,6 @@
 import exitHook from 'exit-hook'
 import { ChildProcess } from 'node:child_process'
-import VError from 'verror'
+import { VError } from '../VError/VError.js'
 import * as GetElectronArgs from '../GetElectronArgs/GetElectronArgs.js'
 import * as Logger from '../Logger/Logger.js'
 import * as Spawn from '../Spawn/Spawn.js'
