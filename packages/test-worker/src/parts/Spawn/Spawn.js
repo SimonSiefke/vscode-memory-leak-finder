@@ -1,5 +1,5 @@
 import * as NodeChildProcess from 'node:child_process'
-import VError from 'verror'
+import { VError } from '../VError/VError.js'
 
 /**
  *

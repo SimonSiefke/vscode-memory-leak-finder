@@ -19,6 +19,6 @@ test('createConnection - error - invalid url', async () => {
     throw new SyntaxError(`Invalid URL: ${url}`)
   })
   await expect(DebuggerCreateIpcConnection.createConnection('abc')).rejects.toThrowError(
-    new Error(`Failed to create websocket connection: Invalid URL: abc`)
+    new Error(`Failed to create websocket connection: SyntaxError: Invalid URL: abc`),
   )
 })

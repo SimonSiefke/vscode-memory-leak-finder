@@ -1,5 +1,5 @@
 import got, { HTTPError } from 'got'
-import VError from 'verror'
+import { VError } from '../VError/VError.js'
 
 /**
  *

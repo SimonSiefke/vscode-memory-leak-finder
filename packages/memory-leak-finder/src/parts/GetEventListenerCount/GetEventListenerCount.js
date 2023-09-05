@@ -1,4 +1,4 @@
-import VError from 'verror'
+import { VError } from '../VError/VError.js'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
 /**

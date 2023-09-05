@@ -1,4 +1,4 @@
-import VError from 'verror'
+import { VError } from '../VError/VError.js'
 import * as ImportScript from '../ImportScript/ImportScript.js'
 
 export const importTest = async (file) => {
