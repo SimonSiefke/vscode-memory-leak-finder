@@ -33,7 +33,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
     const testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(cwd, headlessMode, connectionId)
     const memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()
     if (checkLeaks) {
-      await MemoryLeakFinder.setup(testWorkerIpc, connectionId)
+      await MemoryLeakFinder.setup(memoryLeakWorkerIpc, connectionId)
     }
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
@@ -51,10 +51,10 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
           callback(TestWorkerEventType.TestSkipped, absolutePath, relativeDirname, dirent, duration)
         } else {
           if (checkLeaks) {
-            const before = await MemoryLeakFinder.start(testWorkerIpc, connectionId)
+            const before = await MemoryLeakFinder.start(memoryLeakWorkerIpc, connectionId)
             await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, formattedPath.absolutePath, root, color)
-            const after = await MemoryLeakFinder.stop(testWorkerIpc, connectionId)
-            const result = await MemoryLeakFinder.compare(testWorkerIpc, connectionId, before, after)
+            const after = await MemoryLeakFinder.stop(memoryLeakWorkerIpc, connectionId)
+            const result = await MemoryLeakFinder.compare(memoryLeakWorkerIpc, connectionId, before, after)
             console.log({ result })
           } else {
             for (let i = 0; i < runs; i++) {
