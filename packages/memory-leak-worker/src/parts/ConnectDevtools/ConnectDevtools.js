@@ -2,6 +2,7 @@ import * as Assert from '../Assert/Assert.js'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.js'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.js'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
+import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as ObjectType from '../ObjectType/ObjectType.js'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
 import * as SessionState from '../SessionState/SessionState.js'
@@ -35,13 +36,10 @@ export const connectDevtools = async (devtoolsWebSocketUrl) => {
   browserRpc.on(DevtoolsEventType.TargetTargetInfoChanged, ScenarioFunctions.handleTargetInfoChanged)
 
   await Promise.all([
-    // DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
-    //   autoAttach: true,
-    //   waitForDebuggerOnStart: true,
-    //   flatten: true,
-    // }),
-    // DevtoolsProtocolTarget.setDiscoverTargets(browserRpc, {
-    //   discover: true,
-    // }),
+    DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
+      autoAttach: true,
+      waitForDebuggerOnStart: true,
+      flatten: true,
+    }),
   ])
 }

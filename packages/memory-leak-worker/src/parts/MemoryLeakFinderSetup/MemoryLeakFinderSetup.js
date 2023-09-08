@@ -1,17 +1,13 @@
+import * as LoadMemoryLeakFinder from '../LoadMemoryLeakFinder/LoadMemoryLeakFinder.js'
 import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinderState.js'
-import * as PageObjectState from '../PageObjectState/PageObjectState.js'
 import { VError } from '../VError/VError.js'
-
-const loadMemoryLeakFinder = async () => {
-  const MemoryLeakFinder = await import('../../../../memory-leak-finder/src/index.js')
-  return MemoryLeakFinder
-}
+import * as WaitForPage from '../WaitForPage/WaitForPage.js'
 
 export const setup = async (connectionId, instanceId) => {
   try {
-    const firstWindow = PageObjectState.getFirstWindow(connectionId)
-    const session = firstWindow.rpc
-    const MemoryLeakFinder = await loadMemoryLeakFinder()
+    const page = await WaitForPage.waitForPage({ index: 0 })
+    const session = page.rpc
+    const MemoryLeakFinder = await LoadMemoryLeakFinder.loadMemoryLeakFinder()
     const measure = MemoryLeakFinder.combine(MemoryLeakFinder.Measures.MeasureEventListenerCount.create(session))
     MemoryLeakFinderState.set(instanceId, measure)
   } catch (error) {
