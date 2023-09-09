@@ -1,8 +1,5 @@
-import * as DownloadExecutable from '../DownloadExecutable/DownloadExecutable.js'
+import * as DownloadFfmpeg from '../DownloadFfmpeg/DownloadFfmpeg.js'
 
 export const main = async () => {
-  const hostPlatform = `ubuntu22.04`
-  const name = 'ffmpeg'
-  const revision = '1009'
-  await DownloadExecutable.downloadExecutable(name, revision, hostPlatform)
+  await DownloadFfmpeg.downloadFfmpeg()
 }
