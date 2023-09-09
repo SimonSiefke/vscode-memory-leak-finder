@@ -16,9 +16,6 @@ export const Locator = (selector) => {
   }
 }
 
-export const handlePaused = () => {}
-export const handleResumed = () => {}
-
 export const handleScriptParsed = (x) => {
   // console.log("script parsed", x);
 }
@@ -40,36 +37,6 @@ const getSessionId = (message) => {
     return message.sessionId
   }
   return ''
-}
-
-export const handleRuntimeExecutionContextCreated = (message) => {
-  const uniqueId = message.params.context.uniqueId
-  const id = message.params.context.id
-  const type = getExecutionContextType(message)
-  const sessionId = getSessionId(message)
-  const name = message.params.context.name
-  const origin = message.params.context.origin
-  const context = {
-    id,
-    uniqueId,
-    sessionId,
-    origin,
-    name,
-    type,
-  }
-  ExecutionContextState.add(uniqueId, context)
-}
-
-export const handleRuntimeExecutionContextDestroyed = (message) => {
-  const uniqueId = message.params.executionContextUniqueId
-  ExecutionContextState.remove(uniqueId)
-}
-
-export const handleRuntimeExecutionContextsCleared = (message) => {
-  const sessionId = message.sessionId
-  ExecutionContextState.removeBySessionId(sessionId)
-
-  // console.log('execution contexts cleared', message)
 }
 
 const handlePageFrameAttached = (event) => {
@@ -244,22 +211,4 @@ export const waitForDevtoolsListening = async (stderr) => {
   const devtoolsMatch = devtoolsData.match(/DevTools listening on (ws:\/\/.*)/)
   const devtoolsUrl = devtoolsMatch[1]
   return devtoolsUrl
-}
-
-export const handlePageLoadEventFired = (message) => {
-  // console.log('load event fired', message)
-}
-
-export const handlePageLifeCycleEvent = (message) => {
-  PageEventState.addEvent({
-    sessionId: message.sessionId,
-    frameId: message.params.frameId,
-    loaderId: message.params.loaderId,
-    name: message.params.name,
-    timestamp: message.params.timestamp,
-  })
-}
-
-export const handlePageFrameNavigated = (message) => {
-  // console.log('frame navigated', message)
 }
