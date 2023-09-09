@@ -25,7 +25,7 @@ export const addEvent = (event) => {
   }
 }
 
-export const waitForEvent = async ({ frameId, name }) => {
+export const waitForEvent = async ({ frameId, name, timeout = TimeoutConstants.PageEvent }) => {
   try {
     for (const event of state.events) {
       if (event.frameId === frameId && event.name === name) {
@@ -36,7 +36,7 @@ export const waitForEvent = async ({ frameId, name }) => {
       new Promise((resolve, reject) => {
         state.callbacks.push({ frameId, name, resolve, reject })
       }),
-      { milliseconds: TimeoutConstants.PageEvent },
+      { milliseconds: timeout },
     )
   } catch (error) {
     throw new VError(`Failed to wait for page ${name} event: ${error}`)
