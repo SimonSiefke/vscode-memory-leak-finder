@@ -25,9 +25,17 @@ test('parseArgv - runs', () => {
     runs: 4,
   })
 })
+
 test('parseArgv - runs', () => {
   const argv = ['--runs', '4']
   expect(ParseArgv.parseArgv(argv)).toMatchObject({
     runs: 4,
+  })
+})
+
+test('parseArgv - record video', () => {
+  const argv = ['--record-video']
+  expect(ParseArgv.parseArgv(argv)).toMatchObject({
+    recordVideo: true,
   })
 })
