@@ -1,12 +1,11 @@
 import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.js'
-import { DevtoolsProtocolPage, DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
+import { DevtoolsProtocolPage, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.js'
-import * as PageEventState from '../PageEventState/PageEventState.js'
 import * as PTimeout from '../PTimeout/PTimeout.js'
 import * as SessionState from '../SessionState/SessionState.js'
 import * as TargetState from '../TargetState/TargetState.js'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
-import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
 
 export const Locator = (selector) => {
   return {
@@ -226,16 +225,6 @@ export const waitForDevtoolsListening = async (stderr) => {
 
 export const handlePageLoadEventFired = (message) => {
   // console.log('load event fired', message)
-}
-
-export const handlePageLifeCycleEvent = (message) => {
-  PageEventState.addEvent({
-    sessionId: message.sessionId,
-    frameId: message.params.frameId,
-    loaderId: message.params.loaderId,
-    name: message.params.name,
-    timestamp: message.params.timestamp,
-  })
 }
 
 export const handlePageFrameNavigated = (message) => {
