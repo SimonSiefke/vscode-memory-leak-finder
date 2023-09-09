@@ -7,8 +7,9 @@ export const handleStdoutData = (data) => {
   if (IsUnimportantStdoutMessage.isUnimportantStdoutMessage(data.toString())) {
     return
   }
-  if (!StdinDataState.isBuffering()) {
+  if (StdinDataState.isBuffering()) {
+    TestStateOutput.addStdout(data)
+  } else {
     Stdout.write(data)
   }
-  TestStateOutput.addStdout(data)
 }
