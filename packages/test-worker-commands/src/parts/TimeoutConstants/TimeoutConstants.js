@@ -7,3 +7,4 @@ export const SessionState = 500
 export const Target = 8000
 export const UtilityExecutionContext = IsWindows.IsWindows ? 16000 : 8500
 export const WaitForDebuggerToBePaused = 1000
+export const InteractiveTime = 9000
