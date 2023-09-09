@@ -9,6 +9,7 @@ export const state = {
   watch: false,
   checkLeaks: false,
   runs: 1,
+  recordVideo: false,
 }
 
 export const setState = (newState) => {
@@ -18,6 +19,7 @@ export const setState = (newState) => {
   state.watch = newState.watch
   state.checkLeaks = newState.checkLeaks
   state.runs = newState.runs
+  state.recordVideo = newState.recordVideo
 }
 
 export const setBuffering = (value) => {
