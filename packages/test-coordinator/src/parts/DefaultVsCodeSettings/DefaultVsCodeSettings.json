@@ -31,5 +31,6 @@
   "window.title": "",
   "files.hotExit": "off",
   "explorer.confirmDelete": false,
-  "files.saveConflictResolution": "overwriteFileOnDisk"
+  "files.saveConflictResolution": "overwriteFileOnDisk",
+  "window.commandCenter": false
 }

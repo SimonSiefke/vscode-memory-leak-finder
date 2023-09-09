@@ -4,7 +4,7 @@ import * as Root from '../Root/Root.js'
 export const defaultVsCodeSettingsPath = join(
   Root.root,
   'packages',
-  'test-worker-commands',
+  'test-coordinator',
   'src',
   'parts',
   'DefaultVsCodeSettings',
