@@ -12,8 +12,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@lvce-editor/verror": "^1.1.0",
-    "ws": "^8.13.0"
+    "@lvce-editor/verror": "^1.1.1",
+    "ws": "^8.14.1"
   },
   "devDependencies": {
     "@types/ws": "^8.5.5"
