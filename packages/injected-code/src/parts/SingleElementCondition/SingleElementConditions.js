@@ -1,4 +1,5 @@
 import * as Assert from '../Assert/Assert.js'
+import * as GetStyleValue from '../GetStyleValue/GetStyleValue.js'
 
 export const toBeVisible = (element) => {
   if (typeof element.checkVisible === 'function') {
@@ -55,17 +56,10 @@ export const toHaveId = (element, { id }) => {
   return element.id === id
 }
 
-const getActualValue = (style, key) => {
-  if (key.startsWith('--')) {
-    return style.getPropertyValue(key)
-  }
-  return style[key]
-}
-
 export const toHaveCss = (element, { key, value }) => {
   Assert.string(key)
   const style = getComputedStyle(element)
-  const actualValue = getActualValue(style, key)
+  const actualValue = GetStyleValue.getStyleValue(style, key)
   if (value instanceof RegExp) {
     return value.test(actualValue)
   }
