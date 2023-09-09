@@ -116,5 +116,5 @@ export const toHaveCss = (locator, { key, value }) => {
     return `expected ${locatorString} to have css ${key}: ${value} but element was not found`
   }
   const actual = GetStyleValue.getStyleValue(element, key)
-  return `expected ${locatorString} to have css "${key}: ${value}" but was ${actual}`
+  return `expected ${locatorString} to have css "${key}": "${value}" but was "${actual}"`
 }
