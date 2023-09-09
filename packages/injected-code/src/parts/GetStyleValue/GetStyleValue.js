@@ -1,7 +1,11 @@
 export const getStyleValue = (element, key) => {
   const style = getComputedStyle(element)
   if (key.startsWith('--')) {
-    return style.getPropertyValue(key)
+    const rawValue = style.getPropertyValue(key)
+    if (typeof rawValue === 'string') {
+      return rawValue.trim()
+    }
+    return rawValue
   }
   return style[key]
 }
