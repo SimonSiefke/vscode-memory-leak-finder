@@ -43,3 +43,7 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: npm run e2e:check-flakyness
+      - uses: actions/upload-artifact@v3
+        with:
+          name: vscode-memory-leak-finder-results
+          path: .vscode-memory-leak-finder-results
