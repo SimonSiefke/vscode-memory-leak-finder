@@ -7,7 +7,7 @@ export const create = ({ page, expect, VError }) => {
           timeout: 1000,
         })
       } catch (error) {
-        throw new VError(error, `workbench background has not the expected color`)
+        throw new VError(error, `workbench has not the expected background color`)
       }
     },
     async shouldBeVisible() {

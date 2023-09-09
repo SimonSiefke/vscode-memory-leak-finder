@@ -1,3 +1,4 @@
+import * as GetStyleValue from '../GetStyleValue/GetStyleValue.js'
 import * as QuerySelector from '../QuerySelector/QuerySelector.js'
 
 export const toBeVisible = (locator, options) => {
@@ -114,7 +115,6 @@ export const toHaveCss = (locator, { key, value }) => {
   if (!element) {
     return `expected ${locatorString} to have css ${key}: ${value} but element was not found`
   }
-  const style = getComputedStyle(element)
-  const actual = style[key]
+  const actual = GetStyleValue.getStyleValue(element, key)
   return `expected ${locatorString} to have css "${key}: ${value}" but was ${actual}`
 }
