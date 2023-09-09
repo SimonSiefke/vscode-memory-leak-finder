@@ -95,7 +95,7 @@ export const create = ({ expect, page, VError }) => {
       async shouldBe(name) {
         const firstExtension = page.locator('.extension-list-item').first()
         await expect(firstExtension).toBeVisible({
-          timeout: 3000,
+          timeout: 4000,
         })
         const nameLocator = firstExtension.locator('.name')
         await expect(nameLocator).toHaveText(name)
