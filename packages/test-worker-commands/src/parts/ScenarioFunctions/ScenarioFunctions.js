@@ -192,7 +192,9 @@ const handleAttachedToPage = async (message) => {
     if (error && error.name === 'TestFinishedError') {
       return
     }
-    console.error(`Failed to attach to page ${message.params.targetInfo.targetId} ${message.params.targetInfo.browserContextId}: ${error}`)
+    console.error(
+      `[test-worker] Failed to attach to page ${message.params.targetInfo.targetId} ${message.params.targetInfo.browserContextId}: ${error}`,
+    )
   }
 }
 

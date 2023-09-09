@@ -1,12 +1,16 @@
+import { join } from 'path'
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.js'
 import * as Id from '../Id/Id.js'
+import * as JsonFile from '../JsonFile/JsonFile.js'
 import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.js'
+import * as MemoryLeakResultsPath from '../MemoryLeakResultsPath/MemoryLeakResultsPath.js'
+import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
 import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.js'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.js'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.js'
-import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
 import * as Time from '../Time/Time.js'
+
 // 1. get matching files
 // 2. launch vscode
 // 3. get websocket url
@@ -55,6 +59,8 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
             await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, formattedPath.absolutePath, root, color)
             const after = await MemoryLeakFinder.stop(memoryLeakWorkerIpc, connectionId)
             const result = await MemoryLeakFinder.compare(memoryLeakWorkerIpc, connectionId, before, after)
+            const absolutePath = join(MemoryLeakResultsPath.memoryLeakResultsPath, `${dirent}.json`)
+            JsonFile.writeJson(absolutePath, result)
             console.log({ result })
           } else {
             for (let i = 0; i < runs; i++) {
