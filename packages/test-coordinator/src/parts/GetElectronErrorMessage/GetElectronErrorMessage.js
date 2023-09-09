@@ -1,6 +1,7 @@
 import { once } from 'events'
 import stripAnsi from 'strip-ansi'
 import * as MergeStacks from '../MergeStacks/MergeStacks.js'
+import { LaunchError } from '../LaunchError/LaunchError.js'
 
 const RE_ES_MODULES_NOT_SUPPORTED = /require\(\) of ES Module .* not supported/
 const RE_PATH = /^(\/.*\.js:\d+)$/
@@ -32,7 +33,7 @@ export const getElectronErrorMessage = async (firstData, stream) => {
     const normalData = stripAnsi(firstData)
     const lines = normalData.split('\n')
     const message = lines.map(normalizeLine).filter(Boolean).map(maybeAddColon).join(' ')
-    return new Error(message)
+    return new LaunchError(message)
   }
   if (firstData.includes('App threw an error during load')) {
     const [secondData] = await once(stream, 'data')
