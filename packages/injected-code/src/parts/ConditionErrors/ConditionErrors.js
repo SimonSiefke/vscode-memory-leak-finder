@@ -13,6 +13,7 @@ export const toHaveValue = (locator, { value }) => {
   if (!element) {
     return `expected selector ${locatorString} to have value "${value}" element was not found`
   }
+  // @ts-ignore
   return `expected selector ${locatorString} to have text "${value}" but was "${element.value}"`
 }
 
@@ -85,7 +86,7 @@ export const toBeFocused = (locator) => {
 }
 
 export const toHaveClass = (locator, { className }) => {
-  const [element] = QuerySelector.querySelector(locator.selector)
+  const element = QuerySelector.querySelector(locator.selector)
   const locatorString = printLocator(locator)
   if (!element) {
     return `expected ${locatorString} to have class ${className} but element was not found`
@@ -94,7 +95,7 @@ export const toHaveClass = (locator, { className }) => {
 }
 
 export const toHaveId = (locator, { id }) => {
-  const [element] = QuerySelector.querySelector(locator.selector)
+  const element = QuerySelector.querySelector(locator.selector)
   const locatorString = printLocator(locator)
   if (!element) {
     return `expected ${locatorString} to have id ${id} but element was not found`
@@ -108,7 +109,7 @@ export const toBeHidden = (locator) => {
 }
 
 export const toHaveCss = (locator, { key, value }) => {
-  const [element] = QuerySelector.querySelector(locator.selector)
+  const element = QuerySelector.querySelector(locator.selector)
   const locatorString = printLocator(locator)
   if (!element) {
     return `expected ${locatorString} to have css ${key}: ${value} but element was not found`
