@@ -5,6 +5,7 @@ export const parseArgv = (argv) => {
     checkLeaks: false,
     runs: 1,
     color: true,
+    recordVideo: false,
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -14,6 +15,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--check-leaks')) {
     options.checkLeaks = true
+  }
+  if (argv.includes('--record-video')) {
+    options.recordVideo = true
   }
   if (argv.includes('--runs')) {
     const index = argv.indexOf('--runs')
