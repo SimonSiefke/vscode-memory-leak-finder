@@ -58,8 +58,7 @@ export const toHaveId = (element, { id }) => {
 
 export const toHaveCss = (element, { key, value }) => {
   Assert.string(key)
-  const style = getComputedStyle(element)
-  const actualValue = GetStyleValue.getStyleValue(style, key)
+  const actualValue = GetStyleValue.getStyleValue(element, key)
   if (value instanceof RegExp) {
     return value.test(actualValue)
   }
