@@ -1,3 +1,4 @@
+import { VError } from '../VError/VError.js'
 import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.js'
 import { DevtoolsProtocolPage, DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.js'
@@ -124,7 +125,11 @@ const handleAttachedToJs = async (message, type) => {
 }
 
 const handleAttachedToWorker = async (message) => {
-  await handleAttachedToJs(message, DevtoolsTargetType.Worker)
+  try {
+    await handleAttachedToJs(message, DevtoolsTargetType.Worker)
+  } catch (error) {
+    console.warn(new VError(error, `Failed to attach to worker`))
+  }
 }
 
 export const handleTargetDestroyed = (message) => {
