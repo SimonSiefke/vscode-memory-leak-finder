@@ -1,0 +1,18 @@
+{
+  "name": "download-worker",
+  "version": "0.0.0-dev",
+  "description": "",
+  "main": "src/main.js",
+  "type": "module",
+  "bin": {
+    "download-worker": "bin/download-worker.js"
+  },
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@lvce-editor/verror": "^1.1.1",
+    "got": "^13.0.0"
+  }
+}
