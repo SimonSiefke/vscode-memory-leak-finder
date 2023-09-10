@@ -13,11 +13,12 @@ export const run = async () => {
     checkLeaks: options.checkLeaks,
     runs: options.runs,
     recordVideo: options.recordVideo,
+    cwd: options.cwd,
   })
   if (options.watch) {
     SpecialStdin.start()
     Stdout.write(WatchUsage.print())
   } else {
-    await StartRunning.startRunning('', options.headless, options.color, options.checkLeaks, options.recordVideo, options.runs)
+    await StartRunning.startRunning('', options.headless, options.color, options.checkLeaks, options.recordVideo, options.cwd, options.runs)
   }
 }

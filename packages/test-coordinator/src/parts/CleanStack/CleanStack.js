@@ -69,6 +69,9 @@ const cleanLine = (line) => {
   if (trimmedLine.startsWith('at Module.')) {
     return line.replace('at Module.', 'at ')
   }
+  if (trimmedLine.startsWith('at Object.')) {
+    return line.replace('at Object.', 'at ')
+  }
   if (trimmedLine.startsWith('at async Object.')) {
     return line.replace('at async Object.', 'at async ')
   }
