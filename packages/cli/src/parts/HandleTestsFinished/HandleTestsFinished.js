@@ -1,6 +1,6 @@
 import * as GetAllTestsFinishedMessage from '../GetAllTestsFinishedMessage/GetAllTestsFinishedMessage.js'
+import * as HandleExit from '../HandleExit/HandleExit.js'
 import * as ModeType from '../ModeType/ModeType.js'
-import * as Process from '../Process/Process.js'
 import * as StdinDataState from '../StdinDataState/StdinDataState.js'
 import * as Stdout from '../Stdout/Stdout.js'
 
@@ -13,10 +13,9 @@ export const handleTestsFinished = (passed, failed, skipped, total, duration, fi
     mode: ModeType.FinishedRunning,
   })
   if (!isWatchMode) {
-    const exitCode = failed ? 1 : 0
-    // TODO exit naturally
-    // TODO dispose worker
-    // TODO don't create file watcher worker when not in watch mode
-    Process.exit(exitCode)
+    if (failed) {
+      process.exitCode = 1
+    }
+    HandleExit.handleExit()
   }
 }
