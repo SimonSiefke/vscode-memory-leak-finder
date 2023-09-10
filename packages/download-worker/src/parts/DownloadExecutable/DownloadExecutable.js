@@ -4,7 +4,7 @@ import * as Download from '../Download/Download.js'
 import * as GetDownloadUrls from '../GetDownloadUrls/GetDownloadUrls.js'
 import * as Root from '../Root/Root.js'
 
-export const downloadExecutable = async (name, revision, hostPlatform) => {
+export const downloadExecutable = async (name, revision, hostPlatform, executablePath) => {
   Assert.string(name)
   Assert.string(revision)
   Assert.string(hostPlatform)
