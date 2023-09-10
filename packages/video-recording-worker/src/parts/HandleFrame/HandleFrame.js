@@ -14,7 +14,6 @@ export const handleFrame = async (message) => {
   }
   // console.log({ ffmpegProcess: true })
   const { data, metadata, sessionId } = message.params
-  console.log('write frame', data.length)
   ffmpegProcess.stdin.write(data, 'base64')
   const session = SessionState.getSession(message.sessionId)
   await DevtoolsProtocolPage.screencastFrameAck(session.rpc, { sessionId })
