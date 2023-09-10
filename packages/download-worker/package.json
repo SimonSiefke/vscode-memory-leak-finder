@@ -13,6 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "@lvce-editor/verror": "^1.1.1",
+    "extract-zip": "^2.0.1",
     "got": "^13.0.0"
   }
 }
