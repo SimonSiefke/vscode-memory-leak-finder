@@ -1,6 +1,7 @@
 import * as Assert from '../Assert/Assert.js'
 import * as FileSystem from '../FileSystem/FileSystem.js'
 import * as Path from '../Path/Path.js'
+import { VError } from '../VError/VError.js'
 
 const getMatchingFiles = (dirents, filterValue) => {
   const matchingFiles = []
@@ -33,12 +34,16 @@ const formatPaths = (cwd, testsPath, dirents) => {
 }
 
 export const getTestsToRun = async (root, cwd, filterValue) => {
-  Assert.string(root)
-  Assert.string(cwd)
-  Assert.string(filterValue)
-  const testsPath = Path.join(root, 'src')
-  const testDirents = await FileSystem.readDir(testsPath)
-  const matchingDirents = getMatchingFiles(testDirents, filterValue)
-  const formattedPaths = formatPaths(cwd, testsPath, matchingDirents)
-  return formattedPaths
+  try {
+    Assert.string(root)
+    Assert.string(cwd)
+    Assert.string(filterValue)
+    const testsPath = Path.join(root, 'src')
+    const testDirents = await FileSystem.readDir(testsPath)
+    const matchingDirents = getMatchingFiles(testDirents, filterValue)
+    const formattedPaths = formatPaths(cwd, testsPath, matchingDirents)
+    return formattedPaths
+  } catch (error) {
+    throw new VError(error, `Failed to determine which tests to run`)
+  }
 }
