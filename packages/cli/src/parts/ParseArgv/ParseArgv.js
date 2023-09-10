@@ -6,6 +6,7 @@ export const parseArgv = (argv) => {
     runs: 1,
     color: true,
     recordVideo: false,
+    cwd: process.cwd(),
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -26,6 +27,14 @@ export const parseArgv = (argv) => {
     const parsed = parseInt(value)
     if (!isNaN(parsed) && isFinite(parsed)) {
       options.runs = parsed
+    }
+  }
+  if (argv.includes('--cwd')) {
+    const index = argv.indexof('--cwd')
+    const next = index + 1
+    const value = argv[next]
+    if (typeof value === 'string') {
+      options.cwd = value
     }
   }
   return options

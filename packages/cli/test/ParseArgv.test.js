@@ -39,3 +39,10 @@ test('parseArgv - record video', () => {
     recordVideo: true,
   })
 })
+
+test('parseArgv - cwd', () => {
+  const argv = ['--cwd /test']
+  expect(ParseArgv.parseArgv(argv)).toMatchObject({
+    cwd: '/test',
+  })
+})
