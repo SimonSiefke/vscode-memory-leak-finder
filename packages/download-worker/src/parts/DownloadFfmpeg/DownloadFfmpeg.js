@@ -1,8 +1,8 @@
 import * as DownloadExecutable from '../DownloadExecutable/DownloadExecutable.js'
+import * as GetExecutablePath from '../GetExecutablePath/GetExecutablePath.js'
 import * as GetHostPlatform from '../GetHostPlatform/GetHostPlatform.js'
 import * as IsFfmpeg from '../IsFfmpeg/IsFfmpeg.js'
 import * as Registry from '../Registry/Registry.js'
-import * as GetExecutablePath from '../GetExecutablePath/GetExecutablePath.js'
 
 export const downloadFfmpeg = async () => {
   const platform = process.platform
