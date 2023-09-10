@@ -21,6 +21,9 @@ export const combine = (...measures) => {
     const resultMap = Object.create(null)
     for (const measure of measures) {
       resultMap[measure.id] = measure.compare(before[measure.id], after[measure.id])
+      if (measure.isLeak) {
+        resultMap.isLeak = measure.isLeak(before[measure.id], after[measure.id])
+      }
     }
     return resultMap
   }

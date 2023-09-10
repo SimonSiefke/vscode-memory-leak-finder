@@ -54,6 +54,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
           const duration = end - start
           callback(TestWorkerEventType.TestSkipped, absolutePath, relativeDirname, dirent, duration)
         } else {
+          let isLeak = false
           if (checkLeaks) {
             const before = await MemoryLeakFinder.start(memoryLeakWorkerIpc, connectionId)
             await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, formattedPath.absolutePath, root, color)
@@ -61,6 +62,9 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
             const result = await MemoryLeakFinder.compare(memoryLeakWorkerIpc, connectionId, before, after)
             const absolutePath = join(MemoryLeakResultsPath.memoryLeakResultsPath, `${dirent}.json`)
             JsonFile.writeJson(absolutePath, result)
+            if (result.isLeak) {
+              isLeak = true
+            }
             console.log({ result })
           } else {
             for (let i = 0; i < runs; i++) {
@@ -69,7 +73,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
           }
           const end = Time.now()
           const duration = end - start
-          callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration)
+          callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration, isLeak)
           passed++
         }
       } catch (error) {

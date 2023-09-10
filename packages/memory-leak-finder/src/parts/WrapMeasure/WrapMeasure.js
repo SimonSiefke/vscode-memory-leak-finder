@@ -10,9 +10,8 @@ export const wrapMeasure = (measure) => {
         stop() {
           return measure.stop(...args)
         },
-        compare(before, after) {
-          return measure.compare(before, after)
-        },
+        compare: measure.compare,
+        isLeak: measure.isLeak,
       }
     },
   }
