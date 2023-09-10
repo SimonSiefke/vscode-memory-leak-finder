@@ -4,6 +4,7 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 export const create = ({ expect, page, VError }) => {
   return {
     async toggle() {
+      await page.waitForIdle()
       const quickPick = QuickPick.create({ expect, page, VError })
       await quickPick.executeCommand(WellKnownCommands.ToggleActivityBarVisibility)
     },
