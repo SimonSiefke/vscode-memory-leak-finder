@@ -106,8 +106,8 @@ abc
   18 |`)
   if (process.platform === 'win32') {
     // TODO stack should be the same on windows, using slash
-    expect(prettyError.stack).toBe('    at Object.<anonymous> (fixtures\\sample.reference-error-in-main\\main.js:16:1)')
+    expect(prettyError.stack).toBe('    at <anonymous> (fixtures\\sample.reference-error-in-main\\main.js:16:1)')
   } else {
-    expect(prettyError.stack).toBe('    at Object.<anonymous> (fixtures/sample.reference-error-in-main/main.js:16:1)')
+    expect(prettyError.stack).toBe('    at <anonymous> (fixtures/sample.reference-error-in-main/main.js:16:1)')
   }
 })
