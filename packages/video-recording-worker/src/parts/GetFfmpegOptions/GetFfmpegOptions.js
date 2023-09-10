@@ -1,12 +1,13 @@
 import * as Assert from '../Assert/Assert.js'
 
-export const getFfmpegOptions = (fps, width, height) => {
+export const getFfmpegOptions = (fps, width, height, outFile) => {
   Assert.number(fps)
   Assert.number(width)
   Assert.number(height)
+  Assert.string(outFile)
   const args = [
     '-loglevel',
-    'error',
+    'info',
     '-f',
     'image2pipe',
     '-avioflags',
@@ -43,6 +44,7 @@ export const getFfmpegOptions = (fps, width, height) => {
     '1',
     '-vf',
     `pad=${width}:${height}:0:0:gray,crop=${width}:${height}:0:0`,
+    outFile,
   ]
   return args
 }
