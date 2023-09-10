@@ -12,6 +12,7 @@ export const run = async () => {
     watch: options.watch,
     checkLeaks: options.checkLeaks,
     runs: options.runs,
+    recordVideo: options.recordVideo,
   })
   if (options.watch) {
     SpecialStdin.start()
