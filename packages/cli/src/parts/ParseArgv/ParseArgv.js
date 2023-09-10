@@ -30,7 +30,7 @@ export const parseArgv = (argv) => {
     }
   }
   if (argv.includes('--cwd')) {
-    const index = argv.indexof('--cwd')
+    const index = argv.indexOf('--cwd')
     const next = index + 1
     const value = argv[next]
     if (typeof value === 'string') {
