@@ -26,7 +26,6 @@ export const start = async (outFile) => {
   const childProcess = spawn(ffmpegPath, options, {
     stdio: ['pipe', 'pipe', 'pipe'],
   })
-  console.log({ options })
   FfmpegProcessState.set(childProcess)
   childProcess.stdout.on('data', (x) => {
     console.log({ x: x.toString() })
