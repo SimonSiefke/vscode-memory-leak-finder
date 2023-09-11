@@ -7,7 +7,9 @@
   "bin": {
     "download-worker": "bin/download-worker.js"
   },
-  "scripts": {},
+  "scripts": {
+    "postinstall": "node src/parts/PostInstall/PostInstall.js"
+  },
   "keywords": [],
   "author": "",
   "license": "MIT",
