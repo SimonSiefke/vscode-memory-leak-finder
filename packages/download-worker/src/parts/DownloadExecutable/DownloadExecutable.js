@@ -13,7 +13,7 @@ export const downloadExecutable = async (name, revision, hostPlatform, executabl
   const urls = GetDownloadUrls.getDownloadUrls(name, revision, hostPlatform)
   const outDir = join(Root.root, '.vscode-ffmpeg')
   await DownloadAndExtract.downloadAndExtract(name, urls, outDir)
-  const outFile = join(outDir, 'ffmpeg-linux')
+  const outFile = join(outDir, ...executablePath)
   await MakeExecutable.makeExecutable(outFile)
   // TODO extract zip file
   // TODO chmod binary
