@@ -13,6 +13,7 @@ const locations = [
   'packages/e2e/package-lock.json',
   'packages/devtools-protocol/package-lock.json',
   'packages/file-watcher-worker/package-lock.json',
+  'packages/download-worker/package.json',
   'packages/download-worker/package-lock.json',
   'packages/injected-code/package-lock.json',
   'packages/memory-leak-finder/package-lock.json',

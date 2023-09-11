@@ -28,6 +28,7 @@ jobs:
             **/node_modules
             **/.vscode-test
             **/.vscode-user-data-dir
+            **/.vscode-ffmpeg
           key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
       - name: npm ci
         run: npm ci

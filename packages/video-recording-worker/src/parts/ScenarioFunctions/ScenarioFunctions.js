@@ -8,31 +8,8 @@ import * as SessionState from '../SessionState/SessionState.js'
 import * as TargetState from '../TargetState/TargetState.js'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
 
-export const Locator = (selector) => {
-  return {
-    selector,
-  }
-}
-
-export const getSessions = () => {
-  return SessionState.getAllSessions()
-}
-
 const handleAttachedToBrowser = (message) => {
   console.log('attached to browser', message)
-}
-
-export const handleTargetDestroyed = (message) => {
-  const targetId = message.params.targetId
-  TargetState.removeTarget(targetId)
-}
-
-export const handleTargetInfoChanged = (message) => {
-  // console.log('target info changed', message)
-}
-
-export const handleTargetCrashed = (message) => {
-  console.log('target crashed', message)
 }
 
 const handleAttachedToPage = async (message) => {
@@ -97,14 +74,4 @@ export const handleAttachedToTarget = (message) => {
 
 export const handleDetachedFromTarget = (message) => {
   SessionState.removeSession(message.params.sessionId)
-}
-
-export const handleTargetCreated = async (message) => {}
-
-export const handlePageLoadEventFired = (message) => {
-  // console.log('load event fired', message)
-}
-
-export const handlePageFrameNavigated = (message) => {
-  // console.log('frame navigated', message)
 }
