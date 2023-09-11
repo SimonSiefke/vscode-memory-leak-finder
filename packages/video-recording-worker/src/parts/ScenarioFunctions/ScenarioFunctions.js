@@ -60,9 +60,20 @@ const handleAttachedToPage = async (message) => {
       targetId,
     })
     sessionRpc.on(DevtoolsEventType.PageScreencastFrame, HandleFrame.handleFrame)
-    await PTimeout.pTimeout(Promise.all([DevtoolsProtocolPage.enable(sessionRpc), DevtoolsProtocolPage.startScreencast(sessionRpc)]), {
-      milliseconds: TimeoutConstants.AttachToPage,
-    })
+    await PTimeout.pTimeout(
+      Promise.all([
+        DevtoolsProtocolPage.enable(sessionRpc),
+        DevtoolsProtocolPage.startScreencast(sessionRpc, {
+          format: 'jpeg',
+          quality: 90,
+          maxWidth: 1024,
+          maxHeight: 768,
+        }),
+      ]),
+      {
+        milliseconds: TimeoutConstants.AttachToPage,
+      },
+    )
     console.log('page enabled')
   } catch (error) {
     if (error && error.name === 'TestFinishedError') {

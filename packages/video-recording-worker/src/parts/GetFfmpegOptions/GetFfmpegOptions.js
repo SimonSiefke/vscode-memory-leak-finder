@@ -7,7 +7,7 @@ export const getFfmpegOptions = (fps, width, height, outFile) => {
   Assert.string(outFile)
   const args = [
     '-loglevel',
-    'info',
+    'error',
     '-f',
     'image2pipe',
     '-avioflags',
