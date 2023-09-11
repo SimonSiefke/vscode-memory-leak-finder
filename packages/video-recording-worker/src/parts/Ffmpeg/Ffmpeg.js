@@ -17,9 +17,9 @@ const handleExit = () => {
 
 export const start = async () => {
   const ffmpegPath = GetFfmpegPath.getFfmpegPath()
-  const fps = 15
-  const width = 400
-  const height = 400
+  const fps = 25
+  const width = 1024
+  const height = 768
   const outFile = '/tmp/video.webm'
   const options = GetFfmpegOptions.getFfmpegOptions(fps, width, height, outFile)
   const childProcess = spawn(ffmpegPath, options, {
@@ -36,4 +36,8 @@ export const start = async () => {
   childProcess.stdin.on('finish', handleStdinFinished)
   childProcess.stdin.on('error', handleStdinError)
   childProcess.on('exit', handleExit)
+  setTimeout(() => {
+    console.log('finish video')
+    childProcess.stdin.end()
+  }, 15_000)
 }
