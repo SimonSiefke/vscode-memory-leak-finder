@@ -56,6 +56,27 @@ const formatLine = (line, root) => {
   return line
 }
 
+const cleanLine = (line) => {
+  const trimmedLine = line.trim()
+  if (trimmedLine.startsWith('at Module.')) {
+    return line.replace('at Module.', 'at ')
+  }
+  if (trimmedLine.startsWith('at Object.')) {
+    return line.replace('at Object.', 'at ')
+  }
+  if (trimmedLine.startsWith('at async Object.')) {
+    return line.replace('at async Object.', 'at async ')
+  }
+  if (trimmedLine.startsWith('at async Module.')) {
+    return line.replace('at async Module.', 'at async ')
+  }
+  return line
+}
+
+const getCleanLines = (lines) => {
+  return lines.map(cleanLine)
+}
+
 const formatLines = (lines, root) => {
   const formattedLines = []
   for (const line of lines) {
@@ -94,8 +115,9 @@ export const cleanStack = (stack, { root = '' } = {}) => {
   const lines = stack.split('\n')
   const relevantLines = getRelevantLines(lines, stack)
   const formattedLines = formatLines(relevantLines, root)
-  if (formattedLines[0].startsWith('    at')) {
-    return formattedLines.join('\n')
+  const cleanLines = getCleanLines(formattedLines)
+  if (cleanLines[0].startsWith('    at')) {
+    return cleanLines.join('\n')
   }
-  return formattedLines.slice(1).join('\n')
+  return cleanLines.slice(1).join('\n')
 }
