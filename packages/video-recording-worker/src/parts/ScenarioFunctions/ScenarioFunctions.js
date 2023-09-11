@@ -38,7 +38,6 @@ export const handleTargetCrashed = (message) => {
 const handleAttachedToPage = async (message) => {
   try {
     const sessionId = message.params.sessionId
-    console.log('attached to page', sessionId)
     const browserSession = SessionState.getSession('browser')
     const browserRpc = browserSession.rpc
     const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
@@ -74,7 +73,6 @@ const handleAttachedToPage = async (message) => {
         milliseconds: TimeoutConstants.AttachToPage,
       },
     )
-    console.log('page enabled')
   } catch (error) {
     if (error && error.name === 'TestFinishedError') {
       return
