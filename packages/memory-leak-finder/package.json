@@ -9,9 +9,6 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "peerDependencies": {
-    "@playwright/test": "^1.35.0"
-  },
   "jest": {
     "modulePathIgnorePatterns": [
       "<rootDir>/.vscode-test/"
