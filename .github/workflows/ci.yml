@@ -54,7 +54,7 @@ jobs:
           name: vscode-memory-leak-finder-results
           path: .vscode-memory-leak-finder-results
       - uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: vscode-videos
           path: .vscode-videos
-          if: always()

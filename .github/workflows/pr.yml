@@ -53,7 +53,7 @@ jobs:
         with:
           run: npm run e2e:check-flakyness
       - uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: vscode-videos
           path: .vscode-videos
-          if: always()
