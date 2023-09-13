@@ -76,7 +76,6 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
             }
             console.log({ result })
           } else {
-            console.log({ runs })
             for (let i = 0; i < runs; i++) {
               await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, formattedPath.absolutePath, root, color)
             }
