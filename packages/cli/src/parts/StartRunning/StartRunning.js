@@ -7,5 +7,5 @@ import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerComma
 export const startRunning = async (filterValue, headlessMode, color, checkLeaks, recordVideo, cwd, runs) => {
   Stdout.write(AnsiEscapes.clear)
   const worker = await RunTest.prepare()
-  JsonRpc.send(worker, TestWorkerCommandType.RunTests, cwd, cwd, filterValue, headlessMode, color, checkLeaks, recordVideo, cwd, runs)
+  JsonRpc.send(worker, TestWorkerCommandType.RunTests, cwd, cwd, filterValue, headlessMode, color, checkLeaks, recordVideo, runs)
 }
