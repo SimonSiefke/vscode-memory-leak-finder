@@ -1,5 +1,6 @@
 import * as GetStyleValue from '../GetStyleValue/GetStyleValue.js'
 import * as QuerySelector from '../QuerySelector/QuerySelector.js'
+import * as StringifyElement from '../StringifyElement/StringifyElement.js'
 
 export const toBeVisible = (locator, options) => {
   if (options.timeout) {
@@ -66,23 +67,10 @@ export const toHaveCount = (locator, { count }) => {
   return `expected ${locatorString} to have count ${count} but was ${actualCount}`
 }
 
-const stringifyElement = (element) => {
-  if (element.id) {
-    return `#${element.id}`
-  }
-  if (element.className) {
-    return `.${element.className}`
-  }
-  if (element === document.body) {
-    return 'document.body'
-  }
-  return element.tagName
-}
-
 export const toBeFocused = (locator) => {
   const locatorString = printLocator(locator)
   const activeElement = document.activeElement
-  const stringifiedActiveElement = stringifyElement(activeElement)
+  const stringifiedActiveElement = StringifyElement.stringifyElement(activeElement)
   return `expected ${locatorString} to be focused but active element is ${stringifiedActiveElement}`
 }
 
