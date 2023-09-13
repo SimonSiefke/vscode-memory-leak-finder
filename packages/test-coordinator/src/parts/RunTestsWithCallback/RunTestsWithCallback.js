@@ -1,4 +1,5 @@
 import { join } from 'path'
+import * as Assert from '../Assert/Assert.js'
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.js'
 import * as Id from '../Id/Id.js'
 import * as JsonFile from '../JsonFile/JsonFile.js'
@@ -20,6 +21,14 @@ import * as Time from '../Time/Time.js'
 
 export const runTests = async (root, cwd, filterValue, headlessMode, color, checkLeaks, recordVideo, runs, callback) => {
   try {
+    Assert.string(root)
+    Assert.string(cwd)
+    Assert.string(filterValue)
+    Assert.boolean(headlessMode)
+    Assert.boolean(color)
+    Assert.boolean(checkLeaks)
+    Assert.boolean(recordVideo)
+    Assert.number(runs)
     let passed = 0
     let failed = 0
     let skipped = 0

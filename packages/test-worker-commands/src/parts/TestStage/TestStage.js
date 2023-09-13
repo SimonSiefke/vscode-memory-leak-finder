@@ -17,7 +17,8 @@ export const teardown = async (module, context) => {
 }
 
 export const run = async (module, context) => {
-  if (module.run) {
-    await module.run(context)
+  if (!module.run) {
+    throw new Error(`test case is missing a run function`)
   }
+  await module.run(context)
 }
