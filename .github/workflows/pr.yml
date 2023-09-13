@@ -52,6 +52,11 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: npm run e2e:check-flakyness
+      - name: Run headless test (check leaks)
+        if: matrix.os != 'macos-12'
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks
       - uses: actions/upload-artifact@v3
         if: always()
         with:
