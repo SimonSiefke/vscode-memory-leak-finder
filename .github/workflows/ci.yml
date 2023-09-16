@@ -60,5 +60,5 @@ jobs:
       - uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: vscode-videos
+          name: vscode-videos-${{ runner.os }}
           path: .vscode-videos
