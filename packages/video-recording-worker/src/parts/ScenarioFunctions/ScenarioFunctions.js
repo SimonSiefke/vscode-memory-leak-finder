@@ -68,10 +68,9 @@ export const handleAttachedToTarget = (message) => {
     case DevtoolsTargetType.Browser:
       return handleAttachedToBrowser(message)
     default:
-      console.warn(`unsupported attachment type ${type}`)
+      break
   }
 }
-
 export const handleDetachedFromTarget = (message) => {
   SessionState.removeSession(message.params.sessionId)
 }
