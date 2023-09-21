@@ -1,8 +1,8 @@
 import { spawn } from 'child_process'
+import * as Assert from '../Assert/Assert.js'
+import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.js'
 import * as GetFfmpegOptions from '../GetFfmpegOptions/GetFfmpegOptions.js'
 import * as GetFfmpegPath from '../GetFfmpegPath/GetFfmpegPath.js'
-import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.js'
-import * as Assert from '../Assert/Assert.js'
 
 const handleStdinError = () => {
   console.log('ffmpeg error')
@@ -36,8 +36,4 @@ export const start = async (outFile) => {
   childProcess.stdin.on('finish', handleStdinFinished)
   childProcess.stdin.on('error', handleStdinError)
   childProcess.on('exit', handleExit)
-  setTimeout(() => {
-    console.log('finish video')
-    childProcess.stdin.end()
-  }, 15_000)
 }
