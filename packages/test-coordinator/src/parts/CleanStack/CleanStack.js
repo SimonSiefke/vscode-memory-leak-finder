@@ -30,6 +30,9 @@ const isInternal = (line) => {
   if (line.includes('at async handleJsonRpcMessage')) {
     return true
   }
+  if (line.includes('at invoke ') && line.includes('JsonRpc/JsonRpc.js')) {
+    return true
+  }
   return false
 }
 
