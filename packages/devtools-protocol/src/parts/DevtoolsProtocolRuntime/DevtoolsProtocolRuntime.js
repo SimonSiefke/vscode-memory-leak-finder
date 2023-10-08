@@ -12,7 +12,7 @@ export const evaluate = (session, options) => {
 
 /**
  *
- * @param {{functionDeclaration:string, objectId?:string, arguments?:any[], uniqueContextId?:string, executionContextId?:number, awaitPromise?:boolean, returnByValue?:boolean, objectGroup?:string}} options
+ * @param {{functionDeclaration:string, objectId?:string, arguments?:any[], uniqueContextId?:string, executionContextId?:number, awaitPromise?:boolean, returnByValue?:boolean, objectGroup?:string, includeCommandLineAPI?:boolean}} options
  * @returns
  */
 export const callFunctionOn = (session, options) => {

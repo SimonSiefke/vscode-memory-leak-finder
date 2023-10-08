@@ -39,6 +39,7 @@ return listenerMap
 }`,
       objectId: objects.objects.objectId,
       returnByValue: true,
+      includeCommandLineAPI: true,
     })
 
     const value = fnResult1
