@@ -1,15 +1,14 @@
-import { dirname, resolve } from 'node:path'
+import { resolve } from 'node:path'
 import * as AdjustVscodeProductJson from '../AdjustVscodeProductJson/AdjustVscodeProductJson.js'
 import * as Env from '../Env/Env.js'
 import * as JsonFile from '../JsonFile/JsonFile.js'
 import * as VscodeTestCachePath from '../VscodeTestCachePath/VscodeTestCachePath.js'
 
 const getProductJsonPath = (path) => {
-  const folderPath = dirname(path)
   if (process.platform === 'darwin') {
-    return resolve(folderPath, '..', '..', '..', 'resources', 'app', 'product.json')
+    return resolve(path, '..', '..', '..', 'resources', 'app', 'product.json')
   }
-  return resolve(folderPath, '..', 'resources', 'app', 'product.json')
+  return resolve(path, '..', 'resources', 'app', 'product.json')
 }
 
 /**
