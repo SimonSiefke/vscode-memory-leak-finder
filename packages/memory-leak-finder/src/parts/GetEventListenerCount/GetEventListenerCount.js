@@ -1,9 +1,9 @@
-import { VError } from '../VError/VError.js'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
+import { VError } from '../VError/VError.js'
 /**
  *
- * @param {import('@playwright/test').CDPSession} session
+ * @param {any} session
  * @returns {Promise<number>}
  */
 export const getEventListenerCount = async (session) => {
@@ -18,15 +18,7 @@ export const getEventListenerCount = async (session) => {
     })
     const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
       functionDeclaration: `function(){
-globalThis.____objects = this
-}`,
-      objectId: objects.objects.objectId,
-      returnByValue: true,
-    })
-    const fnResult2 = await DevtoolsProtocolRuntime.evaluate(session, {
-      expression: `(() => {
-const objects = globalThis.____objects
-delete globalThis.____objects
+const objects = this
 
 const getAllEventListeners = (nodes) => {
   const listenerMap = Object.create(null)
@@ -44,11 +36,12 @@ const getAllEventListeners = (nodes) => {
 
 const listenerMap = getAllEventListeners([...objects, document, window])
 return listenerMap
-})()`,
+}`,
+      objectId: objects.objects.objectId,
       returnByValue: true,
-      includeCommandLineAPI: true,
     })
-    const value = fnResult2
+
+    const value = fnResult1
     if (typeof value !== 'number') {
       throw new Error(`Event listener count must be of type number`)
     }
