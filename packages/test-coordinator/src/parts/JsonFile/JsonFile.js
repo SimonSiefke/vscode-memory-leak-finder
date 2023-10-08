@@ -1,6 +1,6 @@
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import { VError } from '../VError/VError.js'
-import { mkdir, writeFile } from 'node:fs/promises'
 
 export const writeJson = async (path, json) => {
   try {
@@ -9,5 +9,14 @@ export const writeJson = async (path, json) => {
     await writeFile(path, content)
   } catch (error) {
     throw new VError(error, `Failed to write json`)
+  }
+}
+
+export const readJson = async (path) => {
+  try {
+    const content = await readFile(path, 'utf8')
+    return JSON.parse(content)
+  } catch (error) {
+    throw new VError(error, `Failed to read json`)
   }
 }
