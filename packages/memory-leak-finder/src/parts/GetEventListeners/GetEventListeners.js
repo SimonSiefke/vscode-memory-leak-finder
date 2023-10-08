@@ -3,7 +3,7 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 
 /**
  *
- * @param {import('@playwright/test').CDPSession} session
+ * @param {any} session
  * @param {string} objectGroup
  * @returns {Promise<number>}
  */
@@ -20,16 +20,7 @@ export const getEventListeners = async (session, objectGroup) => {
   })
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
-globalThis.____objects = this
-}`,
-    objectId: objects.objects.objectId,
-    returnByValue: true,
-    objectGroup,
-  })
-  const fnResult2 = await DevtoolsProtocolRuntime.evaluate(session, {
-    expression: `(() => {
-const objects = globalThis.____objects
-delete globalThis.____objects
+const objects = this
 
 const getAllEventListeners = (nodes) => {
   const listenerMap = Object.create(null)
@@ -45,11 +36,11 @@ const getAllEventListeners = (nodes) => {
 
 const listenerMap = getAllEventListeners([...objects, document, window])
 return listenerMap
-})()`,
+}`,
+    objectId: objects.objects.objectId,
     returnByValue: true,
-    includeCommandLineAPI: true,
     objectGroup,
   })
-  const value = fnResult2
+  const value = fnResult1
   return value
 }
