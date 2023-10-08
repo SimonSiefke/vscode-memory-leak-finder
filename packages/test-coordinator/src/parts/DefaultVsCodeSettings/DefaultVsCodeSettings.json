@@ -32,5 +32,6 @@
   "files.hotExit": "off",
   "explorer.confirmDelete": false,
   "files.saveConflictResolution": "overwriteFileOnDisk",
-  "window.commandCenter": false
+  "window.commandCenter": false,
+  "extensions.ignoreRecommendations": true
 }
