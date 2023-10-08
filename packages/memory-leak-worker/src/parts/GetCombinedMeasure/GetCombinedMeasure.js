@@ -2,6 +2,7 @@ import * as LoadMemoryLeakFinder from '../LoadMemoryLeakFinder/LoadMemoryLeakFin
 
 export const getCombinedMeasure = async (session) => {
   const MemoryLeakFinder = await LoadMemoryLeakFinder.loadMemoryLeakFinder()
-  const measure = MemoryLeakFinder.combine(MemoryLeakFinder.Measures.MeasureEventListenerCount.create(session))
-  return measure
+  const measure = MemoryLeakFinder.Measures.MeasureEventListenerCount
+  const combinedMeasure = MemoryLeakFinder.combine(measure.create(session))
+  return combinedMeasure
 }
