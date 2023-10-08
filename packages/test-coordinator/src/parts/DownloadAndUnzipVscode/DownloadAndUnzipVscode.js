@@ -6,7 +6,7 @@ import * as VscodeTestCachePath from '../VscodeTestCachePath/VscodeTestCachePath
 
 const getProductJsonPath = (path) => {
   if (process.platform === 'darwin') {
-    return resolve(path, '..', '..', '..', '..', 'resources', 'app', 'product.json')
+    return resolve(path, '..', '..', '..', 'Resources', 'app', 'product.json')
   }
   return resolve(path, '..', 'resources', 'app', 'product.json')
 }
