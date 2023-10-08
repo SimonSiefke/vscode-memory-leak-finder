@@ -241,7 +241,7 @@ export const typeAndWaitFor = async ({ locator, text, waitFor, timeout = maxTime
     await Timeout.waitForMutation(document.body, current)
     currentTime = Time.getTimeStamp()
   }
-  const message = `expected locator "${waitFor.selector}" to be visible within ${maxTimeout}ms when typing "${text}"`
+  const message = `expected locator "${waitFor.selector}" to be visible within ${timeout}ms when typing "${text}"`
   throw new AssertionError(message)
 }
 
