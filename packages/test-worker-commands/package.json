@@ -16,7 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "@lvce-editor/verror": "^1.1.1",
-    "@vscode/test-electron": "^2.3.4",
+    "@vscode/test-electron": "^2.3.5",
     "exit-hook": "^4.0.0",
     "got": "^13.0.0",
     "source-map": "^0.7.4",
@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@babel/code-frame": "^7.22.13",
-    "@types/ws": "^8.5.5",
+    "@types/ws": "^8.5.6",
     "clean-stack": "^5.2.0"
   }
 }
