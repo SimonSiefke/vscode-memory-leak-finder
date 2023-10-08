@@ -1,14 +1,21 @@
-import { dirname, join } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import * as AdjustVscodeProductJson from '../AdjustVscodeProductJson/AdjustVscodeProductJson.js'
 import * as Env from '../Env/Env.js'
 import * as JsonFile from '../JsonFile/JsonFile.js'
 import * as VscodeTestCachePath from '../VscodeTestCachePath/VscodeTestCachePath.js'
 
+const getProductJsonPath = (path) => {
+  const folderPath = dirname(path)
+  if (process.platform === 'darwin') {
+    return resolve(folderPath, '..', '..', '..', 'resources', 'app', 'product.json')
+  }
+  return resolve(folderPath, '..', 'resources', 'app', 'product.json')
+}
+
 /**
  * @param {string} vscodeVersion
  */
 export const downloadAndUnzipVscode = async (vscodeVersion) => {
-  console.log({ vscodeVersion })
   if (Env.env.VSCODE_PATH) {
     return Env.env.VSCODE_PATH
   }
@@ -17,8 +24,7 @@ export const downloadAndUnzipVscode = async (vscodeVersion) => {
     version: vscodeVersion,
     cachePath: VscodeTestCachePath.vscodeTestCachePath,
   })
-  const folderPath = dirname(path)
-  const productPath = join(folderPath, 'resources', 'app', 'product.json')
+  const productPath = getProductJsonPath(path)
   const productJson = await JsonFile.readJson(productPath)
   const newProductJson = AdjustVscodeProductJson.adjustVscodeProductJson(productJson)
   await JsonFile.writeJson(productPath, newProductJson)
