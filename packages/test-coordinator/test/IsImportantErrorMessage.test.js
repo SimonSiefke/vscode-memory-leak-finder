@@ -37,3 +37,11 @@ test('windows decrypt error', () => {
 test('nodejs info message', () => {
   expect(IsImportantError.isImportantErrorMessage(`For help, see: https://nodejs.org/en/docs/inspector`)).toBe(false)
 })
+
+test('portal desktop', () => {
+  expect(
+    IsImportantError.isImportantErrorMessage(
+      `[2372:1008/085056.108783:ERROR:object_proxy.cc(590)] Failed to call method: org.freedesktop.portal.Settings.Read: object_path= /org/freedesktop/portal/desktop: unknown error type: `,
+    ),
+  ).toBe(false)
+})
