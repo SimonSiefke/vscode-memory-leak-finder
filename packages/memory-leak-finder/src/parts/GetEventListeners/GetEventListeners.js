@@ -1,13 +1,17 @@
+import * as CleanEventListeners from '../CleanEventListeners/CleanEventListeners.js'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import * as GetDescriptors from '../GetDescriptors/GetDescriptors.js'
+import * as GetEventListenersFromMap from '../GetEventListenersFromMap/GetEventListenersFromMap.js'
+import * as GetEventListenersOfTargets from '../GetEventListenersOfTargets/GetEventListenersOfTargets.js'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
 
 /**
  *
  * @param {any} session
  * @param {string} objectGroup
- * @returns {Promise<number>}
+ * @returns {Promise<any[]>}
  */
-export const getEventListeners = async (session, objectGroup) => {
+export const getEventListeners = async (session, objectGroup, scriptMap) => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.EventTarget,
     includeCommandLineAPI: true,
@@ -18,29 +22,13 @@ export const getEventListeners = async (session, objectGroup) => {
     prototypeObjectId: prototype.objectId,
     objectGroup,
   })
-  const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
-    functionDeclaration: `function(){
-const objects = this
-
-const getAllEventListeners = (nodes) => {
-  const listenerMap = Object.create(null)
-  for (const node of nodes) {
-    const listeners = getEventListeners(node)
-    for (const [key, value] of Object.entries(listeners)) {
-      listenerMap[key] ||= []
-      listenerMap[key].push(value)
-    }
-  }
-  return listenerMap
-}
-
-const listenerMap = getAllEventListeners([...objects, document, window])
-return listenerMap
-}`,
+  const fnResult1 = await DevtoolsProtocolRuntime.getProperties(session, {
     objectId: objects.objects.objectId,
-    returnByValue: true,
-    objectGroup,
+    ownProperties: true,
   })
-  const value = fnResult1
-  return value
+  const descriptors = GetDescriptors.getDescriptors(fnResult1)
+  const fnResult2 = await GetEventListenersOfTargets.getEventListenersOfTargets(session, descriptors)
+  const eventListeners = fnResult2.flatMap(GetEventListenersFromMap.getEventListenersFromMap)
+  const cleanEventListeners = CleanEventListeners.cleanEventListeners(eventListeners, scriptMap)
+  return cleanEventListeners
 }

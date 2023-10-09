@@ -8,21 +8,35 @@ export const id = MeasureId.EventListeners
 
 /**
  *
- * @param {import('@playwright/test').CDPSession} session
+ * @param {any} session
  */
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
-  return [session, objectGroup]
+  const scriptMap = Object.create(null)
+  const handleScriptParsed = (event) => {
+    const { url, scriptId } = event.params
+    if (!url) {
+      return
+    }
+    scriptMap[scriptId] = {
+      url,
+    }
+  }
+  session.on('Debugger.scriptParsed', handleScriptParsed)
+  return [session, objectGroup, scriptMap, handleScriptParsed]
 }
 
-export const start = async (session, objectGroup) => {
-  const result = await GetEventListeners.getEventListeners(session, objectGroup)
+export const start = async (session, objectGroup, scriptMap) => {
+  await session.invoke('Debugger.enable')
+  const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptMap)
   return result
 }
 
-export const stop = async (session, objectGroup) => {
-  const result = await GetEventListeners.getEventListeners(session, objectGroup)
+export const stop = async (session, objectGroup, scriptMap, handleScriptParsed) => {
+  session.off('Debugger.scriptParsed', handleScriptParsed)
+  await session.invoke('Debugger.disable')
+  const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptMap)
   await DevtoolsProtocolRuntime.releaseObjectGroup(session, {
     objectGroup,
   })

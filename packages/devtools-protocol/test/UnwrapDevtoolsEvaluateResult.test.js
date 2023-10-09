@@ -48,10 +48,7 @@ test('unwrapResult - object', () => {
         },
       },
     }),
-  ).toEqual({
-    type: 'object',
-    value: {},
-  })
+  ).toEqual({})
 })
 
 test('unwrapResult - unknown value', () => {
