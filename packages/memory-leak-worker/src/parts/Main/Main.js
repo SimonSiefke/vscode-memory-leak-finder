@@ -7,6 +7,7 @@ import * as IpcChild from '../IpcChild/IpcChild.js'
 import * as IpcChildType from '../IpcChildType/IpcChildType.js'
 
 const handleUncaughtExceptionMonitor = (error) => {
+  console.error(error)
   console.error(`[memory leak worker] uncaught exception: ${error}`)
 }
 

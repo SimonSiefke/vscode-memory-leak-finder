@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@lvce-editor/verror": "^1.1.1",
-    "@vscode-memory-leak-finder/devtools-protocol": "file:../devtools-protocol"
-  },
-  "devDependencies": {}
+    "@vscode-memory-leak-finder/devtools-protocol": "file:../devtools-protocol",
+    "got": "^13.0.0"
+  }
 }
