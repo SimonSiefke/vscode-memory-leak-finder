@@ -3,7 +3,7 @@ import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
 /**
  *
- * @param {import('@playwright/test').CDPSession} session
+ * @param {any} session
  * @returns {Promise<number>}
  */
 export const getEventListenerCount = async (session) => {

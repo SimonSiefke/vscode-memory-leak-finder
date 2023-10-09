@@ -8,7 +8,7 @@ export const id = MeasureId.EventListeners
 
 /**
  *
- * @param {import('@playwright/test').CDPSession} session
+ * @param {any} session
  */
 
 export const create = (session) => {
@@ -30,14 +30,16 @@ export const stop = async (session, objectGroup) => {
 }
 
 export const compare = (before, after) => {
+  const beforeArray = Object.values(before).flat(1)
+  const afterArray = Object.values(after).flat(1)
   const map = Object.create(null)
-  for (const listener of before) {
+  for (const listener of beforeArray) {
     const key = GetEventListenerKey.getEventListenerKey(listener)
     map[key] ||= 0
     map[key]++
   }
   const leaked = []
-  for (const listener of after) {
+  for (const listener of afterArray) {
     const key = GetEventListenerKey.getEventListenerKey(listener)
     if (!map[key]) {
       leaked.push(listener)

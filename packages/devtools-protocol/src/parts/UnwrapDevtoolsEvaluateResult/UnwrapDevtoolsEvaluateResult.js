@@ -13,6 +13,9 @@ export const unwrapResult = (rawResult) => {
   if ('exceptionDetails' in rawResult) {
     throw new DevtoolsProtocolError(rawResult.exceptionDetails.exception.description)
   }
+  if (rawResult && rawResult.result && rawResult.result.value) {
+    return rawResult.result.value
+  }
   if (rawResult && rawResult.result && rawResult.result.result && rawResult.result.result.value) {
     return rawResult.result.result.value
   }

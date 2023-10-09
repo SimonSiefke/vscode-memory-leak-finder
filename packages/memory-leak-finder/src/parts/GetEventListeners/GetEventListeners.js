@@ -20,7 +20,15 @@ export const getEventListeners = async (session, objectGroup) => {
   })
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
-const objects = this
+globalThis.____objects = this
+}`,
+    objectId: objects.objects.objectId,
+    returnByValue: true,
+  })
+  const fnResult2 = await DevtoolsProtocolRuntime.evaluate(session, {
+    expression: `(() => {
+const objects = globalThis.____objects
+delete globalThis.____objects
 
 const getAllEventListeners = (nodes) => {
   const listenerMap = Object.create(null)
@@ -28,7 +36,7 @@ const getAllEventListeners = (nodes) => {
     const listeners = getEventListeners(node)
     for (const [key, value] of Object.entries(listeners)) {
       listenerMap[key] ||= []
-      listenerMap[key].push(value)
+      listenerMap[key].push(...value)
     }
   }
   return listenerMap
@@ -36,11 +44,11 @@ const getAllEventListeners = (nodes) => {
 
 const listenerMap = getAllEventListeners([...objects, document, window])
 return listenerMap
-}`,
-    objectId: objects.objects.objectId,
+})()`,
     returnByValue: true,
     objectGroup,
+    includeCommandLineAPI: true,
   })
-  const value = fnResult1
+  const value = fnResult2
   return value
 }
