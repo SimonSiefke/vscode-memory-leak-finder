@@ -64,7 +64,9 @@ export const compare = async (before, after) => {
   }
   for (const listener of leaked) {
     const original = await GetEventListenerOriginalSource.getEventListenerOriginalSource(listener)
-    console.log({ original })
+    if (original) {
+      listener.originalStack = [`${original.source}:${original.line}:${original.column}`]
+    }
   }
   return leaked
 }
