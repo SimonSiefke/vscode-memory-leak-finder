@@ -15,11 +15,12 @@ export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
   const scriptMap = Object.create(null)
   const handleScriptParsed = (event) => {
-    if (!event.url) {
+    const { url, scriptId } = event.params
+    if (!url) {
       return
     }
-    scriptMap[event.scriptId] = {
-      url: event.url,
+    scriptMap[scriptId] = {
+      url,
     }
   }
   session.on('Debugger.scriptParsed', handleScriptParsed)
