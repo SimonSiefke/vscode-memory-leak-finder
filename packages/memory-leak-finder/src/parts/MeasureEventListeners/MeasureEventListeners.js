@@ -44,7 +44,6 @@ export const stop = async (session, objectGroup, scriptMap, handleScriptParsed) 
 }
 
 export const compare = (before, after) => {
-  // console.log({ before, after })
   const map = Object.create(null)
   for (const listener of before) {
     const key = GetEventListenerKey.getEventListenerKey(listener)
