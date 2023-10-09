@@ -5,7 +5,6 @@ export const getOriginalPosition = async (sourceMap, line, column) => {
   Assert.object(sourceMap)
   Assert.number(line)
   Assert.number(column)
-  console.log({ line, column })
   const originalPosition = await SourceMapConsumer.with(sourceMap, null, (consumer) => {
     return consumer.originalPositionFor({
       line: line + 1,
