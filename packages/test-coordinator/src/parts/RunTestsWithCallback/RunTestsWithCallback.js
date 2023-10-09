@@ -75,7 +75,11 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
             if (result.isLeak) {
               isLeak = true
             }
-            console.log({ result })
+            if (result && result.eventListeners) {
+              console.log({ eventListeners: result.eventListeners })
+            } else {
+              console.log({ result })
+            }
           } else {
             for (let i = 0; i < runs; i++) {
               await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, formattedPath.absolutePath, root, color)

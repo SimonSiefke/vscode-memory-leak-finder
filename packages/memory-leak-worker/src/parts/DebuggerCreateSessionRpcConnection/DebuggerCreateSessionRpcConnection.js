@@ -6,6 +6,7 @@ export const createSessionRpcConnection = (rpc, sessionId) => {
       return rpc.invokeWithSession(sessionId, method, params)
     },
     on: rpc.on,
+    off: rpc.off,
     once: rpc.once,
     sessionId,
   }
