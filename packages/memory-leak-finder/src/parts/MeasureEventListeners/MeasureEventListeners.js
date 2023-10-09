@@ -1,5 +1,6 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as GetEventListenerKey from '../GetEventListenerKey/GetEventListenerKey.js'
+import * as GetEventListenerOriginalSource from '../GetEventListenerOriginalSource/GetEventListenerOriginalSource.js'
 import * as GetEventListeners from '../GetEventListeners/GetEventListeners.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
@@ -15,12 +16,13 @@ export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
   const scriptMap = Object.create(null)
   const handleScriptParsed = (event) => {
-    const { url, scriptId } = event.params
+    const { url, scriptId, sourceMapURL } = event.params
     if (!url) {
       return
     }
     scriptMap[scriptId] = {
       url,
+      sourceMapUrl: sourceMapURL,
     }
   }
   session.on('Debugger.scriptParsed', handleScriptParsed)
@@ -43,7 +45,7 @@ export const stop = async (session, objectGroup, scriptMap, handleScriptParsed) 
   return result
 }
 
-export const compare = (before, after) => {
+export const compare = async (before, after) => {
   const map = Object.create(null)
   for (const listener of before) {
     const key = GetEventListenerKey.getEventListenerKey(listener)
@@ -54,9 +56,16 @@ export const compare = (before, after) => {
   for (const listener of after) {
     const key = GetEventListenerKey.getEventListenerKey(listener)
     if (!map[key]) {
+      console.log({ listener })
       leaked.push(listener)
     } else {
       map[key]--
+    }
+  }
+  for (const listener of leaked) {
+    const original = await GetEventListenerOriginalSource.getEventListenerOriginalSource(listener)
+    if (original) {
+      listener.originalStack = [`${original.source}:${original.line}:${original.column}`]
     }
   }
   return leaked
