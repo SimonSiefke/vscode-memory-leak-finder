@@ -52,10 +52,8 @@ const getSourceMapUrlMap = (eventListeners) => {
 const getCleanPositionsMap = async (map) => {
   const cleanPositionMap = Object.create(null)
   for (const [key, value] of Object.entries(map)) {
-    console.log({ key, value })
     const sourceMap = await LoadSourceMap.loadSourceMap(key)
     const originalPositions = await SourceMap.getOriginalPositions(sourceMap, value)
-    console.log({ originalPositions })
     const cleanPositions = originalPositions.map(GetCleanPosition.getCleanPosition)
     cleanPositionMap[key] = cleanPositions
   }
