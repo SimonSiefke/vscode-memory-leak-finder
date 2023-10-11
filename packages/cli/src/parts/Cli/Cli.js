@@ -14,6 +14,7 @@ export const run = async () => {
     runs: options.runs,
     recordVideo: options.recordVideo,
     cwd: options.cwd,
+    headless: options.headless,
   })
   if (options.watch) {
     SpecialStdin.start()

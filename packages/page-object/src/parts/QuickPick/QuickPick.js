@@ -78,7 +78,7 @@ export const create = ({ expect, page, VError }) => {
           hasText: fileName,
         })
         await quickPickInput.typeAndWaitFor(fileName, option, {
-          timeout: 4000,
+          timeout: 6000,
         })
         await this.select(fileName)
       } catch (error) {

@@ -17,10 +17,10 @@ export const combine = (...measures) => {
     return afterMap
   }
 
-  const compare = (before, after) => {
+  const compare = async (before, after) => {
     const resultMap = Object.create(null)
     for (const measure of measures) {
-      resultMap[measure.id] = measure.compare(before[measure.id], after[measure.id])
+      resultMap[measure.id] = await measure.compare(before[measure.id], after[measure.id])
       if (measure.isLeak) {
         resultMap.isLeak = measure.isLeak(before[measure.id], after[measure.id])
       }

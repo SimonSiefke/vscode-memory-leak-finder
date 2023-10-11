@@ -17,5 +17,3 @@ export const kill = (pid) => {
 export const on = (event, listener) => {
   NodeProcess.on(event, listener)
 }
-
-export const argv = NodeProcess.argv

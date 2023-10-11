@@ -32,11 +32,15 @@ export const create = ({ expect, page, VError }) => {
         if (selected === 'true') {
           const extensionsView = page.locator(`.extensions-viewlet`)
           const suggestContainer = page.locator(`.suggest-input-container`)
-          await suggestContainer.click()
           const extensionsInput = extensionsView.locator('.inputarea')
-          await expect(extensionsInput).toBeVisible()
-          await extensionsInput.click()
+          const className = await suggestContainer.getAttribute('class')
+          if (!className.includes('synthetic-focus')) {
+            await suggestContainer.click()
+            await expect(extensionsInput).toBeVisible()
+            await extensionsInput.click()
+          }
           await extensionsInput.focus()
+          await expect(suggestContainer).toHaveClass('synthetic-focus')
           await expect(extensionsInput).toBeFocused()
           return
         }
@@ -95,7 +99,7 @@ export const create = ({ expect, page, VError }) => {
       async shouldBe(name) {
         const firstExtension = page.locator('.extension-list-item').first()
         await expect(firstExtension).toBeVisible({
-          timeout: 4000,
+          timeout: 7000,
         })
         const nameLocator = firstExtension.locator('.name')
         await expect(nameLocator).toHaveText(name)

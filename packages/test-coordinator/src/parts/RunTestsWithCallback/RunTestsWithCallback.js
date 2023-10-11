@@ -29,6 +29,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
     Assert.boolean(checkLeaks)
     Assert.boolean(recordVideo)
     Assert.number(runs)
+    const measureId = 'event-listener-count'
     let passed = 0
     let failed = 0
     let skipped = 0
@@ -46,7 +47,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
     const testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(cwd, headlessMode, recordVideo, connectionId)
     const memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()
     if (checkLeaks) {
-      await MemoryLeakFinder.setup(memoryLeakWorkerIpc, connectionId)
+      await MemoryLeakFinder.setup(memoryLeakWorkerIpc, connectionId, measureId)
     }
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
@@ -69,12 +70,17 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
             await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, formattedPath.absolutePath, root, color)
             const after = await MemoryLeakFinder.stop(memoryLeakWorkerIpc, connectionId)
             const result = await MemoryLeakFinder.compare(memoryLeakWorkerIpc, connectionId, before, after)
-            const absolutePath = join(MemoryLeakResultsPath.memoryLeakResultsPath, `${dirent}.json`)
+            const fileName = dirent.replace('.js', '.json')
+            const absolutePath = join(MemoryLeakResultsPath.memoryLeakResultsPath, fileName)
             JsonFile.writeJson(absolutePath, result)
             if (result.isLeak) {
               isLeak = true
             }
-            console.log({ result })
+            if (result && result.eventListeners) {
+              console.log({ eventListeners: result.eventListeners })
+            } else {
+              console.log({ result })
+            }
           } else {
             for (let i = 0; i < runs; i++) {
               await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, formattedPath.absolutePath, root, color)
