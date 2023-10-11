@@ -3,11 +3,11 @@ import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinde
 import { VError } from '../VError/VError.js'
 import * as WaitForPage from '../WaitForPage/WaitForPage.js'
 
-export const setup = async (connectionId, instanceId) => {
+export const setup = async (connectionId, instanceId, measureId) => {
   try {
     const page = await WaitForPage.waitForPage({ index: 0 })
     const session = page.rpc
-    const measure = await GetCombinedMeasure.getCombinedMeasure(session)
+    const measure = await GetCombinedMeasure.getCombinedMeasure(session, measureId)
     MemoryLeakFinderState.set(instanceId, measure)
   } catch (error) {
     throw new VError(error, `Failed to setup memory leak finder`)
