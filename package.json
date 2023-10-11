@@ -28,10 +28,10 @@
     "execa": "^8.0.1",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "lerna": "^7.3.0",
+    "lerna": "^7.3.1",
     "prettier": "^3.0.3",
     "typescript": "^5.2.2",
-    "@lerna/legacy-package-management": "^7.3.0"
+    "@lerna/legacy-package-management": "^7.3.1"
   },
   "jest": {
     "modulePathIgnorePatterns": [
