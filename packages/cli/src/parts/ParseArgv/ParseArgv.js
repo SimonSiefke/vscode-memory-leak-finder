@@ -1,3 +1,24 @@
+const parseArgvNumber = (argv, name) => {
+  const index = argv.indexOf(name)
+  const next = index + 1
+  const value = argv[next]
+  const parsed = parseInt(value)
+  if (!isNaN(parsed) && isFinite(parsed)) {
+    return parsed
+  }
+  return 1
+}
+
+const parseArgvString = (argv, name) => {
+  const index = argv.indexOf(name)
+  const next = index + 1
+  const value = argv[next]
+  if (typeof value === 'string') {
+    return value
+  }
+  return ''
+}
+
 export const parseArgv = (argv) => {
   const options = {
     watch: false,
@@ -7,6 +28,7 @@ export const parseArgv = (argv) => {
     color: true,
     recordVideo: false,
     cwd: process.cwd(),
+    measure: '',
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -21,21 +43,13 @@ export const parseArgv = (argv) => {
     options.recordVideo = true
   }
   if (argv.includes('--runs')) {
-    const index = argv.indexOf('--runs')
-    const next = index + 1
-    const value = argv[next]
-    const parsed = parseInt(value)
-    if (!isNaN(parsed) && isFinite(parsed)) {
-      options.runs = parsed
-    }
+    options.runs = parseArgvNumber(argv, '--runs')
   }
   if (argv.includes('--cwd')) {
-    const index = argv.indexOf('--cwd')
-    const next = index + 1
-    const value = argv[next]
-    if (typeof value === 'string') {
-      options.cwd = value
-    }
+    options.cwd = parseArgvString(argv, '--cwd')
+  }
+  if (argv.includes('--measure')) {
+    options.measure = parseArgvString(argv, '--measure')
   }
   return options
 }
