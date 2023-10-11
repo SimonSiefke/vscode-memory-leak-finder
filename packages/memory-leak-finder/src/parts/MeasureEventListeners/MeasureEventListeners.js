@@ -56,7 +56,6 @@ export const compare = async (before, after) => {
   for (const listener of after) {
     const key = GetEventListenerKey.getEventListenerKey(listener)
     if (!map[key]) {
-      console.log({ listener })
       leaked.push(listener)
     } else {
       map[key]--

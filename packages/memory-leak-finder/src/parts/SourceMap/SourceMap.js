@@ -11,7 +11,6 @@ export const getOriginalPosition = async (sourceMap, line, column) => {
       column: column + 1,
     })
   })
-  console.log({ originalPosition })
   return {
     source: originalPosition.source,
     line: originalPosition.line,
