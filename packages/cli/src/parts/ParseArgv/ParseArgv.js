@@ -1,5 +1,5 @@
 const parseArgvNumber = (argv, name) => {
-  const index = argv.indexOf(`--${name}`)
+  const index = argv.indexOf(name)
   const next = index + 1
   const value = argv[next]
   const parsed = parseInt(value)
