@@ -24,6 +24,7 @@ export const handleStdinData = async (key) => {
       state.recordVideo,
       state.cwd,
       state.runs,
+      state.measure,
     )
   }
   if (newState.mode === ModeType.Interrupted) {

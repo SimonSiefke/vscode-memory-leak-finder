@@ -10,7 +10,8 @@ export const state = {
   checkLeaks: false,
   runs: 1,
   recordVideo: false,
-  cwd: '',
+  cwd: Character.EmptyString,
+  measure: Character.EmptyString,
 }
 
 export const setState = (newState) => {
@@ -22,6 +23,7 @@ export const setState = (newState) => {
   state.runs = newState.runs
   state.recordVideo = newState.recordVideo
   state.cwd = newState.cwd
+  state.measure = newState.measure
 }
 
 export const setBuffering = (value) => {
