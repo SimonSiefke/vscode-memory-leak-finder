@@ -19,7 +19,7 @@ import * as Time from '../Time/Time.js'
 // 5. pass websocket url to test worker and wait for connection
 // 6. pass matching files to test worker
 
-export const runTests = async (root, cwd, filterValue, headlessMode, color, checkLeaks, recordVideo, runs, callback) => {
+export const runTests = async (root, cwd, filterValue, headlessMode, color, checkLeaks, recordVideo, runs, measure, callback) => {
   try {
     Assert.string(root)
     Assert.string(cwd)
@@ -29,7 +29,6 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
     Assert.boolean(checkLeaks)
     Assert.boolean(recordVideo)
     Assert.number(runs)
-    const measureId = 'event-listener-count'
     let passed = 0
     let failed = 0
     let skipped = 0
@@ -47,7 +46,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
     const testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(cwd, headlessMode, recordVideo, connectionId)
     const memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()
     if (checkLeaks) {
-      await MemoryLeakFinder.setup(memoryLeakWorkerIpc, connectionId, measureId)
+      await MemoryLeakFinder.setup(memoryLeakWorkerIpc, connectionId, measure)
     }
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
