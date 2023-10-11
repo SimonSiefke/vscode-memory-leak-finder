@@ -1,3 +1,4 @@
+import * as GetCleanPosition from '../GetCleanPosition/GetCleanPosition.js'
 import * as LoadSourceMap from '../LoadSourceMap/LoadSourceMap.js'
 import * as SourceMap from '../SourceMap/SourceMap.js'
 
@@ -27,5 +28,6 @@ export const getEventListenerOriginalSource = async (eventListener) => {
   const firstSourceMapUrl = sourceMaps[0]
   const sourceMap = await LoadSourceMap.loadSourceMap(firstSourceMapUrl)
   const originalPosition = await SourceMap.getOriginalPosition(sourceMap, parsed.line, parsed.column)
-  return originalPosition
+  const cleanPosition = GetCleanPosition.getCleanPosition(originalPosition)
+  return cleanPosition
 }
