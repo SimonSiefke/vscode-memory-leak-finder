@@ -29,6 +29,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
     Assert.boolean(checkLeaks)
     Assert.boolean(recordVideo)
     Assert.number(runs)
+    Assert.string(measure)
     let passed = 0
     let failed = 0
     let skipped = 0

@@ -28,6 +28,7 @@ export const parseArgv = (argv) => {
     color: true,
     recordVideo: false,
     cwd: process.cwd(),
+    measure: '',
   }
   if (argv.includes('--watch')) {
     options.watch = true
