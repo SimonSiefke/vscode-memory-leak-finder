@@ -1,6 +1,6 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as GetEventListenerKey from '../GetEventListenerKey/GetEventListenerKey.js'
-import * as GetEventListenerOriginalSources from '../GetEventListenerOriginalSources/GetEventListenerOriginalSources.js'
+import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
 import * as GetEventListeners from '../GetEventListeners/GetEventListeners.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
@@ -61,7 +61,7 @@ export const compare = async (before, after) => {
       map[key]--
     }
   }
-  const cleanLeakedEventListeners = await GetEventListenerOriginalSources.getEventListenerOriginalSources(leaked)
+  const cleanLeakedEventListeners = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(leaked)
   return cleanLeakedEventListeners
 }
 
