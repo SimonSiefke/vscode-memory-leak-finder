@@ -64,3 +64,7 @@ export const compare = async (before, after) => {
   const cleanLeakedEventListeners = await GetEventListenerOriginalSources.getEventListenerOriginalSources(leaked)
   return cleanLeakedEventListeners
 }
+
+export const isLeak = (comparison) => {
+  return Object.keys(comparison).length === 0
+}
