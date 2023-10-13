@@ -6,7 +6,6 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
  * @param {any} session
  * @returns {Promise<number>}
  */
-export const getPromiseCount = async (session, objectGroup) => {
-  const count = await GetObjectCount.getObjectCount(session, PrototypeExpression.Promise)
-  return count
+export const getMutationObserverCount = (session) => {
+  return GetObjectCount.getObjectCount(session, PrototypeExpression.MutationObserver)
 }
