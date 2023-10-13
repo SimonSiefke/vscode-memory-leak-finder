@@ -33,6 +33,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
     let passed = 0
     let failed = 0
     let skipped = 0
+    let leaking = 0
     const start = Time.now()
     const formattedPaths = await GetTestToRun.getTestsToRun(root, cwd, filterValue)
     const total = formattedPaths.length
@@ -75,6 +76,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
             JsonFile.writeJson(absolutePath, result)
             if (result.isLeak) {
               isLeak = true
+              leaking++
             }
             if (result && result.eventListeners) {
               console.log({ eventListeners: result.eventListeners })
@@ -100,7 +102,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
     }
     const end = Time.now()
     const duration = end - start
-    callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, total, duration, filterValue)
+    callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, leaking, total, duration, filterValue)
   } catch (error) {
     const PrettyError = await import('../PrettyError/PrettyError.js')
     const prettyError = await PrettyError.prepare(error, { color, root })
