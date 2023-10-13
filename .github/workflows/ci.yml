@@ -30,6 +30,8 @@ jobs:
             **/.vscode-test
             **/.vscode-user-data-dir
             **/.vscode-ffmpeg
+            **/.vscode-source-maps
+            **/.vscode-resolve-source-map-cache
           key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
       - name: npm ci
         run: npm ci
