@@ -5,5 +5,6 @@ import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerComma
 export const setup = (ipc, connectionId, measureId) => {
   Assert.object(ipc)
   Assert.number(connectionId)
+  Assert.string(measureId)
   return JsonRpc.invoke(ipc, TestWorkerCommandType.MemoryLeakFinderSetup, connectionId, connectionId, measureId)
 }

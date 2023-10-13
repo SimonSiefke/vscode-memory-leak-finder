@@ -15,11 +15,21 @@ export const run = async () => {
     recordVideo: options.recordVideo,
     cwd: options.cwd,
     headless: options.headless,
+    measure: options.measure,
   })
   if (options.watch) {
     SpecialStdin.start()
     Stdout.write(WatchUsage.print())
   } else {
-    await StartRunning.startRunning('', options.headless, options.color, options.checkLeaks, options.recordVideo, options.cwd, options.runs)
+    await StartRunning.startRunning(
+      '',
+      options.headless,
+      options.color,
+      options.checkLeaks,
+      options.recordVideo,
+      options.cwd,
+      options.runs,
+      options.measure,
+    )
   }
 }

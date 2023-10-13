@@ -4,9 +4,18 @@ import * as ModeType from '../ModeType/ModeType.js'
 import * as StdinDataState from '../StdinDataState/StdinDataState.js'
 import * as Stdout from '../Stdout/Stdout.js'
 
-export const handleTestsFinished = (passed, failed, skipped, total, duration, filterValue) => {
+export const handleTestsFinished = (passed, failed, skipped, leaked, total, duration, filterValue) => {
   const isWatchMode = StdinDataState.isWatchMode()
-  const message = GetAllTestsFinishedMessage.getAllTestsFinishedMessage(passed, failed, skipped, total, duration, filterValue, isWatchMode)
+  const message = GetAllTestsFinishedMessage.getAllTestsFinishedMessage(
+    passed,
+    failed,
+    skipped,
+    leaked,
+    total,
+    duration,
+    filterValue,
+    isWatchMode,
+  )
   Stdout.write(message)
   StdinDataState.setState({
     ...StdinDataState.getState(),

@@ -19,7 +19,7 @@ import * as Time from '../Time/Time.js'
 // 5. pass websocket url to test worker and wait for connection
 // 6. pass matching files to test worker
 
-export const runTests = async (root, cwd, filterValue, headlessMode, color, checkLeaks, recordVideo, runs, callback) => {
+export const runTests = async (root, cwd, filterValue, headlessMode, color, checkLeaks, recordVideo, runs, measure, callback) => {
   try {
     Assert.string(root)
     Assert.string(cwd)
@@ -29,10 +29,11 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
     Assert.boolean(checkLeaks)
     Assert.boolean(recordVideo)
     Assert.number(runs)
-    const measureId = 'event-listener-count'
+    Assert.string(measure)
     let passed = 0
     let failed = 0
     let skipped = 0
+    let leaking = 0
     const start = Time.now()
     const formattedPaths = await GetTestToRun.getTestsToRun(root, cwd, filterValue)
     const total = formattedPaths.length
@@ -47,7 +48,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
     const testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(cwd, headlessMode, recordVideo, connectionId)
     const memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()
     if (checkLeaks) {
-      await MemoryLeakFinder.setup(memoryLeakWorkerIpc, connectionId, measureId)
+      await MemoryLeakFinder.setup(memoryLeakWorkerIpc, connectionId, measure)
     }
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
@@ -75,6 +76,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
             JsonFile.writeJson(absolutePath, result)
             if (result.isLeak) {
               isLeak = true
+              leaking++
             }
             if (result && result.eventListeners) {
               console.log({ eventListeners: result.eventListeners })
@@ -100,7 +102,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
     }
     const end = Time.now()
     const duration = end - start
-    callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, total, duration, filterValue)
+    callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, leaking, total, duration, filterValue)
   } catch (error) {
     const PrettyError = await import('../PrettyError/PrettyError.js')
     const prettyError = await PrettyError.prepare(error, { color, root })
