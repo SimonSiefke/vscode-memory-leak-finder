@@ -12,6 +12,7 @@ ffmpeg-linux
 .vscode-previous-filters
 .vscode-runtime-dir
 .vscode-source-maps
+.vscode-resolve-source-map-cache
 
 # Logs
 logs
