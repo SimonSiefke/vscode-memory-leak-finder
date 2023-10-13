@@ -75,3 +75,8 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure event-listeners
+      - name: upload artifacts
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.RG_VERSION }}
+          files: .vscode-memory-leak-finder-results
