@@ -73,7 +73,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
             const result = await MemoryLeakFinder.compare(memoryLeakWorkerIpc, connectionId, before, after)
             const fileName = dirent.replace('.js', '.json')
             const absolutePath = join(MemoryLeakResultsPath.memoryLeakResultsPath, fileName)
-            JsonFile.writeJson(absolutePath, result)
+            await JsonFile.writeJson(absolutePath, result)
             if (result.isLeak) {
               isLeak = true
               leaking++
