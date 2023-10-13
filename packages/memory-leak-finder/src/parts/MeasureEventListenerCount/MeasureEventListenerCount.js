@@ -25,6 +25,6 @@ export const compare = (before, after) => {
   }
 }
 
-export const isLeak = (before, after) => {
+export const isLeak = ({ before, after }) => {
   return after > before
 }
