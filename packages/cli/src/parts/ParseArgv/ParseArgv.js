@@ -29,6 +29,7 @@ export const parseArgv = (argv) => {
     recordVideo: false,
     cwd: process.cwd(),
     measure: '',
+    filter: '',
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -50,6 +51,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--measure')) {
     options.measure = parseArgvString(argv, '--measure')
+  }
+  if (argv.includes('--only')) {
+    options.filter = parseArgvString(argv, '--only')
   }
   return options
 }

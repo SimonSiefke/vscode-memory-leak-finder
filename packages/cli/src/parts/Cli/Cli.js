@@ -16,13 +16,14 @@ export const run = async () => {
     cwd: options.cwd,
     headless: options.headless,
     measure: options.measure,
+    filter: options.filter,
   })
   if (options.watch) {
     SpecialStdin.start()
     Stdout.write(WatchUsage.print())
   } else {
     await StartRunning.startRunning(
-      '',
+      options.filter,
       options.headless,
       options.color,
       options.checkLeaks,
