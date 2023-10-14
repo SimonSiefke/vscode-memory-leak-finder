@@ -1,3 +1,4 @@
+import * as DeduplicateEventListeners from '../DeduplicateEventListeners/DeduplicateEventListeners.js'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as GetEventListenerKey from '../GetEventListenerKey/GetEventListenerKey.js'
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
@@ -61,7 +62,9 @@ export const compare = async (before, after) => {
       map[key]--
     }
   }
-  const cleanLeakedEventListeners = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(leaked)
+  const deduplicatedEventListeners = DeduplicateEventListeners.deduplicateEventListeners(leaked)
+  const cleanLeakedEventListeners =
+    await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(deduplicatedEventListeners)
   return cleanLeakedEventListeners
 }
 
