@@ -65,6 +65,6 @@ export const compare = async (before, after) => {
   return cleanLeakedEventListeners
 }
 
-export const isLeak = (comparison) => {
-  return Object.keys(comparison).length === 0
+export const isLeak = (leakedEventListeners) => {
+  return leakedEventListeners.length > 0
 }
