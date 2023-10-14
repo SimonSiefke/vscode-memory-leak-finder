@@ -1,5 +1,8 @@
 export * as MeasureDetachedDomNodeCount from '../MeasureDetachedDomNodeCount/MeasureDetachedDomNodeCount.js'
 export * as MeasureEventListenerCount from '../MeasureEventListenerCount/MeasureEventListenerCount.js'
 export * as MeasureEventListeners from '../MeasureEventListeners/MeasureEventListeners.js'
+export * as MeasureIntersectionObserverCount from '../MeasureIntersectionObserverCount/MeasureIntersectionObserverCount.js'
 export * as MeasureMutationObserverCount from '../MeasureMutationObserverCount/MeasureMutationObserverCount.js'
 export * as MeasurePromiseCount from '../MeasurePromiseCount/MeasurePromiseCount.js'
+export * as MeasureResizeObserverCount from '../MeasureResizeObserverCount/MeasureResizeObserverCount.js'
+export * as MeasureSetTimeout from '../MeasureSetTimeout/MeasureSetTimeout.js'
