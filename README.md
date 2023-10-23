@@ -30,6 +30,12 @@ npm run e2e
 - packages/test-worker-commands: Functions used by test-worker
 - packages/video-recording-worker: Record screencasts of the tests
 
+## Memory Leaks
+
+| Component | Issue                                             | Status    |
+| --------- | ------------------------------------------------- | --------- |
+| Menu      | https://github.com/microsoft/vscode/issues/195580 | in Review |
+
 ## Credits
 
 This project is based on the [jest cli](https://github.com/jestjs/jest), [playwright](https://github.com/microsoft/playwright/) and [fuite](https://github.com/nolanlawson/fuite).
