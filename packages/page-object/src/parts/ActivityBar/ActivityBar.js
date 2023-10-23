@@ -31,6 +31,22 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to show ${ariaLabel.toLowerCase()}`)
       }
     },
+    async hideCurrentView() {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+        const activityBarItem = activityBar.locator(`.action-label[aria-expanded="true"]`)
+        const currentCount = await activityBarItem.count()
+        if (currentCount === 0) {
+          return
+        }
+        await activityBarItem.click()
+        const sideBar = page.locator('.sidebar')
+        await expect(sideBar).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to hide current view`)
+      }
+    },
     showExplorer() {
       return this.showView({ ariaLabel: 'Explorer' })
     },
