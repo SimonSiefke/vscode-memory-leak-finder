@@ -1,9 +1,6 @@
 import * as GetOptions from '../GetOptions/GetOptions.js'
-import * as SpecialStdin from '../SpecialStdin/SpecialStdin.js'
-import * as StartRunning from '../StartRunning/StartRunning.js'
+import * as InitialStart from '../InitialStart/InitialStart.js'
 import * as StdinDataState from '../StdinDataState/StdinDataState.js'
-import * as Stdout from '../Stdout/Stdout.js'
-import * as WatchUsage from '../WatchUsage/WatchUsage.js'
 
 export const run = async () => {
   const options = GetOptions.getOptions()
@@ -18,19 +15,5 @@ export const run = async () => {
     measure: options.measure,
     filter: options.filter,
   })
-  if (options.watch) {
-    SpecialStdin.start()
-    Stdout.write(WatchUsage.print())
-  } else {
-    await StartRunning.startRunning(
-      options.filter,
-      options.headless,
-      options.color,
-      options.checkLeaks,
-      options.recordVideo,
-      options.cwd,
-      options.runs,
-      options.measure,
-    )
-  }
+  return InitialStart.initialStart(options)
 }
