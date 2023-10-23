@@ -32,9 +32,9 @@ npm run e2e
 
 ## Memory Leaks
 
-| Component | Issue                                             | Status    |
-| --------- | ------------------------------------------------- | --------- |
-| Menu      | https://github.com/microsoft/vscode/issues/195580 | in Review |
+| Component | Issue                                             | Status |
+| --------- | ------------------------------------------------- | ------ |
+| Menu      | https://github.com/microsoft/vscode/issues/195580 | Fixed  |
 
 ## Credits
 
