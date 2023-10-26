@@ -1,6 +1,6 @@
 import * as CleanEventListeners from '../CleanEventListeners/CleanEventListeners.js'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as GetDescriptors from '../GetDescriptors/GetDescriptors.js'
+import * as GetDescriptors from '../GetDescriptorValues/GetDescriptorValues.js'
 import * as GetEventListenersFromMap from '../GetEventListenersFromMap/GetEventListenersFromMap.js'
 import * as GetEventListenersOfTargets from '../GetEventListenersOfTargets/GetEventListenersOfTargets.js'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
@@ -26,7 +26,7 @@ export const getEventListeners = async (session, objectGroup, scriptMap) => {
     objectId: objects.objects.objectId,
     ownProperties: true,
   })
-  const descriptors = GetDescriptors.getDescriptors(fnResult1)
+  const descriptors = GetDescriptors.getDescriptorValues(fnResult1)
   const fnResult2 = await GetEventListenersOfTargets.getEventListenersOfTargets(session, descriptors)
   const eventListeners = fnResult2.flatMap(GetEventListenersFromMap.getEventListenersFromMap)
   const cleanEventListeners = CleanEventListeners.cleanEventListeners(eventListeners, scriptMap)
