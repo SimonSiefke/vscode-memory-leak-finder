@@ -1,4 +1,5 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+
 /**
  *
  * @param {any} session

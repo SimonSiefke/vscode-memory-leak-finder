@@ -2,6 +2,7 @@ import { jest } from '@jest/globals'
 
 beforeEach(() => {
   jest.resetModules()
+  jest.resetAllMocks()
 })
 
 jest.unstable_mockModule('../src/parts/IsGithubActions/IsGithubActions.js', () => {
@@ -19,8 +20,16 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.js', () => {
 const Stdout = await import('../src/parts/Stdout/Stdout.js')
 const HandleTestRunning = await import('../src/parts/HandleTestRunning/HandleTestRunning.js')
 
-test('handleTestRunning', () => {
-  HandleTestRunning.handleTestRunning('/test/app.test.js', '/test', 'app.test.js')
+test('handleTestRunning - first', () => {
+  HandleTestRunning.handleTestRunning('/test/app.test.js', '/test', 'app.test.js', /* isFirst */ true)
+  expect(Stdout.write).toHaveBeenCalledTimes(1)
+  expect(Stdout.write).toHaveBeenCalledWith(
+    '\x1B[0m\x1B[7m\x1B[33m\x1B[1m RUNS \x1B[22m\x1B[39m\x1B[27m\x1B[0m \x1B[2m/test/\x1B[22m\x1B[1mapp.test.js\x1B[22m\n',
+  )
+})
+
+test('handleTestRunning - second', () => {
+  HandleTestRunning.handleTestRunning('/test/app.test.js', '/test', 'app.test.js', /* isFirst */ false)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
     '\n' + '\x1B[0m\x1B[7m\x1B[33m\x1B[1m RUNS \x1B[22m\x1B[39m\x1B[27m\x1B[0m \x1B[2m/test/\x1B[22m\x1B[1mapp.test.js\x1B[22m\n',
