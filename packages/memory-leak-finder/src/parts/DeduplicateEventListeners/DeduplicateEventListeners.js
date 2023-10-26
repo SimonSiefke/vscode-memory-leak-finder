@@ -1,15 +1,10 @@
-const getEventListenerKey = (eventListener) => {
-  if (eventListener && eventListener.stack && eventListener.stack.length > 0) {
-    return eventListener.stack[0]
-  }
-  return ''
-}
+import * as GetEventListenerKey from '../GetEventListenerKey/GetEventListenerKey.js'
 
 export const deduplicateEventListeners = (eventListeners) => {
   const countMap = Object.create(null)
   const eventListenerMap = Object.create(null)
   for (const eventListener of eventListeners) {
-    const key = getEventListenerKey(eventListener)
+    const key = GetEventListenerKey.getEventListenerKey(eventListener)
     eventListenerMap[key] = eventListener
     countMap[key] ||= 0
     countMap[key]++
