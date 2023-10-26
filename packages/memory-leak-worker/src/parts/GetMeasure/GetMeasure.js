@@ -12,6 +12,8 @@ export const getMeasure = (MemoryLeakFinder, measureId) => {
       return MemoryLeakFinder.Measures.ResizeObserverCount
     case 'intersection-observer-count':
       return MemoryLeakFinder.Measures.IntersectionOberserverCount
+    case 'detached-dom-nodes':
+      return MemoryLeakFinder.Measures.MeasureDetachedDomNodes
     default:
       return MemoryLeakFinder.Measures.MeasureEventListenerCount
   }
