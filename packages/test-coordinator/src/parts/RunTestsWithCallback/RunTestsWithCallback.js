@@ -43,7 +43,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
     const initialStart = Time.now()
     const first = formattedPaths[0]
     callback(TestWorkerEventType.TestsStarting, total)
-    callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent)
+    callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
     const connectionId = Id.create()
     const testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(cwd, headlessMode, recordVideo, connectionId)
     const memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()
@@ -54,7 +54,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
       const formattedPath = formattedPaths[i]
       const { absolutePath, relativeDirname, dirent, relativePath } = formattedPath
       if (i !== 0) {
-        callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent)
+        callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, /* isFirst */ true)
       }
       try {
         const start = i === 0 ? initialStart : Time.now()
