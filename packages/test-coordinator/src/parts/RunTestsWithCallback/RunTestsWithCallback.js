@@ -91,7 +91,9 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
           const end = Time.now()
           const duration = end - start
           callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration, isLeak)
-          passed++
+          if (!isLeak) {
+            passed++
+          }
         }
       } catch (error) {
         failed++
