@@ -1,7 +1,5 @@
-import * as DeduplicateEventListeners from '../DeduplicateEventListeners/DeduplicateEventListeners.js'
+import * as CompareEventListeners from '../CompareEventListeners/CompareEventListeners.js'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as GetEventListenerKey from '../GetEventListenerKey/GetEventListenerKey.js'
-import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
 import * as GetEventListeners from '../GetEventListeners/GetEventListeners.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
@@ -46,27 +44,7 @@ export const stop = async (session, objectGroup, scriptMap, handleScriptParsed) 
   return result
 }
 
-export const compare = async (before, after) => {
-  const map = Object.create(null)
-  for (const listener of before) {
-    const key = GetEventListenerKey.getEventListenerKey(listener)
-    map[key] ||= 0
-    map[key]++
-  }
-  const leaked = []
-  for (const listener of after) {
-    const key = GetEventListenerKey.getEventListenerKey(listener)
-    if (!map[key]) {
-      leaked.push(listener)
-    } else {
-      map[key]--
-    }
-  }
-  const deduplicatedEventListeners = DeduplicateEventListeners.deduplicateEventListeners(leaked)
-  const cleanLeakedEventListeners =
-    await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(deduplicatedEventListeners)
-  return cleanLeakedEventListeners
-}
+export const compare = CompareEventListeners.compareEventListeners
 
 export const isLeak = (leakedEventListeners) => {
   return leakedEventListeners.length > 0
