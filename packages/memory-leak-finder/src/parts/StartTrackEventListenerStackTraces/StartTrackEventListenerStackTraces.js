@@ -5,7 +5,7 @@ import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js
  * @param {string} objectGroup
  * @returns {Promise<any>}
  */
-export const startTrackingEventListenerStackTraces = async (session, objectGroup, scriptMap) => {
+export const startTrackingEventListenerStackTraces = async (session, objectGroup) => {
   await DevtoolsProtocolRuntime.evaluate(session, {
     expression: `(()=>{
 globalThis.___eventListenerStackTraces = []
