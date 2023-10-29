@@ -15,18 +15,29 @@ const getCleanPositionsMap = async (map) => {
   return cleanPositionMap
 }
 
+const getChunkItemOriginalStack = (cleanPosition) => {
+  return `${cleanPosition.source}:${cleanPosition.line}:${cleanPosition.column}`
+}
+
+const getChunkOriginalStack = (cleanPositions) => {
+  return cleanPositions.map(getChunkItemOriginalStack)
+}
+
 const getCleanEventlisteners = (cleanPositionMap, eventListeners) => {
   const newEventListeners = []
   const indexMap = Object.create(null)
   for (const eventListener of eventListeners) {
     const { sourceMapUrl } = GetSourceMapUrl.getSourceMapUrl(eventListener)
     indexMap[sourceMapUrl] ||= 0
-    const index = indexMap[sourceMapUrl]++
-    const cleanPosition = cleanPositionMap[sourceMapUrl][index]
-    if (cleanPosition) {
+    const stackLength = eventListener.stack.length
+    const startIndex = indexMap[sourceMapUrl]
+    const endIndex = startIndex + stackLength
+    indexMap[sourceMapUrl] = endIndex
+    const chunk = cleanPositionMap[sourceMapUrl].slice(startIndex, endIndex)
+    if (chunk.length > 0) {
       newEventListeners.push({
         ...eventListener,
-        originalStack: [`${cleanPosition.source}:${cleanPosition.line}:${cleanPosition.column}`],
+        originalStack: getChunkOriginalStack(chunk),
       })
     } else {
       newEventListeners.push(eventListener)

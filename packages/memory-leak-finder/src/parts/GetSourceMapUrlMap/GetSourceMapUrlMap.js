@@ -13,34 +13,39 @@ const parseLineAndColumn = (line) => {
 
 const emptySourceMapUrl = {
   sourceMapUrl: '',
-  line: 0,
-  column: 0,
+  results: [],
 }
 
-const getSourceMapUrl = (eventListener) => {
+const getSourceMapUrls = (eventListener) => {
+  console.log(eventListener)
   const { stack, sourceMaps } = eventListener
   if (!stack || !sourceMaps) {
     return emptySourceMapUrl
   }
-  const firstStackLine = stack[0]
-  const parsed = parseLineAndColumn(firstStackLine)
-  if (!parsed) {
-    return emptySourceMapUrl
-  }
   const sourceMapUrl = sourceMaps[0]
+  const results = []
+  for (const stackLine of stack) {
+    const parsed = parseLineAndColumn(stackLine)
+    if (!parsed) {
+      continue
+    }
+    results.push({
+      line: parsed.line,
+      column: parsed.column,
+    })
+  }
   return {
     sourceMapUrl,
-    line: parsed.line,
-    column: parsed.column,
+    results,
   }
 }
 
 export const getSourceMapUrlMap = (eventListeners) => {
   const map = Object.create(null)
   for (const eventListener of eventListeners) {
-    const { sourceMapUrl, line, column } = getSourceMapUrl(eventListener)
+    const { sourceMapUrl, results } = getSourceMapUrls(eventListener)
     map[sourceMapUrl] ||= []
-    map[sourceMapUrl].push({ line, column })
+    map[sourceMapUrl].push(...results)
   }
   return map
 }
