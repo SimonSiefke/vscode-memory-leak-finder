@@ -14,8 +14,8 @@ jobs:
         os: [ubuntu-22.04, macos-13, windows-2022]
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
       - name: Compute node modules cache key
