@@ -21,7 +21,7 @@
     "why-is-node-running": "^2.2.2"
   },
   "devDependencies": {
-    "@types/node": "^20.8.0"
+    "@types/node": "^20.8.10"
   },
   "jest": {
     "moduleNameMapper": {
