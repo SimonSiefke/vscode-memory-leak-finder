@@ -29,6 +29,30 @@ export const addTarget = (targetId, target) => {
     for (const target of Object.values(state.targets)) {
       if (target.type === callback.type) {
         if (currentIndex === callback.index) {
+          if (target.url === '') {
+            return
+          }
+          callback.resolve(target) // TODO remove callback
+        }
+        currentIndex++
+      }
+    }
+  }
+}
+
+export const changeTarget = (targetId, target) => {
+  Assert.string(targetId)
+  Assert.object(target)
+  const existing = state.targets[targetId]
+  state.targets[targetId] = { ...existing, ...target }
+  for (const callback of state.callbacks) {
+    let currentIndex = 0
+    for (const target of Object.values(state.targets)) {
+      if (target.type === callback.type) {
+        if (currentIndex === callback.index) {
+          if (target.url === '') {
+            return
+          }
           callback.resolve(target) // TODO remove callback
         }
         currentIndex++
@@ -62,6 +86,9 @@ export const waitForTarget = async ({ type, index }) => {
     for (const target of Object.values(state.targets)) {
       if (target.type === type) {
         if (currentIndex === index) {
+          if (target.url === '') {
+            break
+          }
           return target
         }
         currentIndex++
