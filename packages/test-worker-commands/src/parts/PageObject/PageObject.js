@@ -3,13 +3,11 @@ import * as ElectronAppState from '../ElectronAppState/ElectronAppState.js'
 import * as Expect from '../Expect/Expect.js'
 import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.js'
 import * as ImportScript from '../ImportScript/ImportScript.js'
-import * as PageEventState from '../PageEventState/PageEventState.js'
 import * as PageObjectState from '../PageObjectState/PageObjectState.js'
-import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
 import { VError } from '../VError/VError.js'
 import * as WaitForVsCodeToBeReady from '../WaitForVsCodeToBeReady/WaitForVsCodeToBeReady.js'
 
-export const create = async (connectionId, isFirstConnection) => {
+export const create = async (connectionId, isFirstConnection, isHeadless) => {
   try {
     Assert.number(connectionId)
     Assert.boolean(isFirstConnection)
@@ -17,18 +15,12 @@ export const create = async (connectionId, isFirstConnection) => {
     const pageObjectModule = await ImportScript.importScript(pageObjectPath)
     const electronApp = ElectronAppState.get(connectionId)
     ElectronAppState.remove(connectionId)
-    const firstWindow = await electronApp.firstWindow()
-    if (isFirstConnection) {
-      await PageEventState.waitForEvent({
-        frameId: firstWindow.targetId,
-        name: 'InteractiveTime',
-        timeout: TimeoutConstants.InteractiveTime,
-      })
-      await WaitForVsCodeToBeReady.waitForVsCodeToBeReady({
-        page: firstWindow,
-        expect: Expect.expect,
-      })
-    }
+    const firstWindow = await WaitForVsCodeToBeReady.waitForVsCodeToBeReady({
+      electronApp,
+      isFirstConnection,
+      isHeadless,
+      expect: Expect.expect,
+    })
     const pageObjectContext = {
       page: firstWindow,
       expect: Expect.expect,

@@ -137,8 +137,23 @@ export const handleTargetDestroyed = (message) => {
   TargetState.removeTarget(targetId)
 }
 
+const handleTargetInfoChangePage = (message, type) => {
+  TargetState.changeTarget(message.params.targetInfo.targetId, {
+    type,
+    targetId: message.params.targetInfo.targetId,
+    title: message.params.targetInfo.title,
+    url: message.params.targetInfo.url,
+  })
+}
+
 export const handleTargetInfoChanged = (message) => {
-  // console.log('target info changed', message)
+  const type = message.params.targetInfo.type
+  switch (type) {
+    case DevtoolsTargetType.Page:
+      return handleTargetInfoChangePage(message, type)
+    default:
+      return
+  }
 }
 
 export const handleTargetCrashed = (message) => {
