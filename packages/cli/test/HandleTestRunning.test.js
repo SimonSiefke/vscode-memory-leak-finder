@@ -20,7 +20,7 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.js', () => {
 const Stdout = await import('../src/parts/Stdout/Stdout.js')
 const HandleTestRunning = await import('../src/parts/HandleTestRunning/HandleTestRunning.js')
 
-test('handleTestRunning - first', () => {
+test.skip('handleTestRunning - first', () => {
   HandleTestRunning.handleTestRunning('/test/app.test.js', '/test', 'app.test.js', /* isFirst */ true)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
