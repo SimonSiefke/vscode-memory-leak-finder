@@ -20,7 +20,7 @@ export const getHandleTestFailedMessage = (file, relativeDirName, relativeFilePa
   const messageFileName = chalk.bold(fileName)
   return `${TestPrefix.Fail} ${messageRelativeDirName}${messageFileName}
 
-      ${error.message}
+      ${error.type}: ${error.message}
 
 ${indent(error.codeFrame)}
 
