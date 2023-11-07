@@ -23,7 +23,7 @@
     "ws": "^8.14.2"
   },
   "devDependencies": {
-    "@types/babel__code-frame": "^7.0.5",
+    "@types/babel__code-frame": "^7.0.6",
     "@types/ws": "^8.5.8"
   }
 }
