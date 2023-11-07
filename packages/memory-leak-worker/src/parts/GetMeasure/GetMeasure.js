@@ -7,13 +7,13 @@ export const getMeasure = (MemoryLeakFinder, measureId) => {
     case 'detached-dom-node-count':
       return MemoryLeakFinder.Measures.MeasureDetachedDomNodeCount
     case 'set-timeout':
-      return MemoryLeakFinder.Measures.SetTimeout
+      return MemoryLeakFinder.Measures.MeasureSetTimeout
     case 'promise-count':
-      return MemoryLeakFinder.Measures.PromiseCount
+      return MemoryLeakFinder.Measures.MeasurePromiseCount
     case 'resize-observer-count':
-      return MemoryLeakFinder.Measures.ResizeObserverCount
+      return MemoryLeakFinder.Measures.MeasureResizeObserverCount
     case 'intersection-observer-count':
-      return MemoryLeakFinder.Measures.IntersectionOberserverCount
+      return MemoryLeakFinder.Measures.MeasureIntersectionOberserverCount
     case 'detached-dom-nodes':
       return MemoryLeakFinder.Measures.MeasureDetachedDomNodes
     default:
