@@ -6,7 +6,7 @@ export const getTestsUnexpectedErrorMessage = (error) => {
   const formattedStack = FormatStack.formatStack(error.stack, '')
   return `${TestPrefix.UnexpectedError}
 
-      ${error.message}
+      ${error.type}: ${error.message}
 
 ${Indent.indent(error.codeFrame)}
 
