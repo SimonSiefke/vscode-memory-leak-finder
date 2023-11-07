@@ -36,6 +36,6 @@ export const prepareTestsOrAttach = async (cwd, headlessMode, recordVideo, conne
     callFrameId,
     isFirstConnection,
   )
-  await PageObject.create(testWorkerIpc, connectionId, isFirstConnection)
+  await PageObject.create(testWorkerIpc, connectionId, isFirstConnection, headlessMode)
   return testWorkerIpc
 }
