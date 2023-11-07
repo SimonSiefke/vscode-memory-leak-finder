@@ -28,5 +28,7 @@ export const compareDetachedDomNodes = (before, after) => {
     }
   }
   leaked.sort(compareDetachedDomNode)
-  return leaked
+  return {
+    leaked,
+  }
 }
