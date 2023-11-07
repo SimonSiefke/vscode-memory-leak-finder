@@ -33,6 +33,7 @@ test('compareDetachedDomNodes', () => {
         subtype: 'node',
         className: 'HTMLDivElement',
         description: 'div.editor-widget.suggest-widget.no-icons',
+        count: 1,
       },
     ],
   })
