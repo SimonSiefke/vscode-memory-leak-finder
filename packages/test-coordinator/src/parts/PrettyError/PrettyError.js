@@ -115,6 +115,7 @@ export const prepare = async (error, { color = true, root = '' } = {}) => {
     const lines = SplitLines.splitLines(cleanedStack)
     const relevantStack = lines.join('\n')
     return {
+      type: error.constructor.name,
       message: error.message,
       stack: relevantStack,
       codeFrame: error.codeFrame,
@@ -132,6 +133,7 @@ export const prepare = async (error, { color = true, root = '' } = {}) => {
   const codeFrame = getCodeFrame(cleanedStack, { color })
   const relevantStack = lines.join('\n')
   return {
+    type: error.constructor.name,
     message,
     stack: relevantStack,
     codeFrame,
