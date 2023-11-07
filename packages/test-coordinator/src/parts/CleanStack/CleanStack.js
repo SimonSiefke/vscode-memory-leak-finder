@@ -36,37 +36,6 @@ const isInternal = (line) => {
   return false
 }
 
-const RE_STACK_PATH_1 = /(^\s*at .*?\(?)([^()]+)(:[0-9]+:[0-9]+\)?.*$)/
-const RE_STACK_PATH_2 = /(^\s*at .*?)([^()]+)(:\d+$)/
-
-const getFilePath = (file) => {
-  if (file.startsWith('file://')) {
-    return fileURLToPath(file)
-  }
-  return file
-}
-
-const formatLine = (line, root) => {
-  if (!root) {
-    return line
-  }
-  const stackMatch1 = line.match(RE_STACK_PATH_1)
-  if (stackMatch1) {
-    const fileMatch = stackMatch1[2]
-    const filePath = getFilePath(fileMatch)
-    const relativeFilePath = relative(root, filePath)
-    return stackMatch1[1] + relativeFilePath + stackMatch1[3]
-  }
-  const stackMatch2 = line.match(RE_STACK_PATH_2)
-  if (stackMatch2) {
-    const fileMatch = stackMatch2[2]
-    const filePath = getFilePath(fileMatch)
-    const relativeFilePath = relative(root, filePath)
-    return stackMatch2[1] + relativeFilePath + stackMatch2[3]
-  }
-  return line
-}
-
 const cleanLine = (line) => {
   const trimmedLine = line.trim()
   if (trimmedLine.startsWith('at Module.')) {
@@ -86,14 +55,6 @@ const cleanLine = (line) => {
 
 const getCleanLines = (lines) => {
   return lines.map(cleanLine)
-}
-
-const formatLines = (lines, root) => {
-  const formattedLines = []
-  for (const line of lines) {
-    formattedLines.push(formatLine(line, root))
-  }
-  return formattedLines
 }
 
 const getRelevantLines = (lines, stack) => {
@@ -125,8 +86,7 @@ export const cleanStack = (stack, { root = '' } = {}) => {
   }
   const lines = stack.split('\n')
   const relevantLines = getRelevantLines(lines, stack)
-  const formattedLines = formatLines(relevantLines, root)
-  const cleanLines = getCleanLines(formattedLines)
+  const cleanLines = getCleanLines(relevantLines)
   if (cleanLines[0].startsWith('    at')) {
     return cleanLines.join('\n')
   }
