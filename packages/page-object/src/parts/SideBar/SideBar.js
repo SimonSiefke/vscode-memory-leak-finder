@@ -40,9 +40,9 @@ export const create = ({ expect, page, VError }) => {
       try {
         const sideBar = page.locator('.part.sidebar')
         await expect(sideBar).toBeVisible()
-        await expect(sideBar).toHaveClass('part sidebar left')
+        await expect(sideBar).toHaveClass('left')
         await this.togglePosition()
-        await expect(sideBar).toHaveClass('part sidebar right')
+        await expect(sideBar).toHaveClass('right')
       } catch (error) {
         throw new VError(error, `Failed to move side bar right`)
       }
@@ -51,9 +51,9 @@ export const create = ({ expect, page, VError }) => {
       try {
         const sideBar = page.locator('.part.sidebar')
         await expect(sideBar).toBeVisible()
-        await expect(sideBar).toHaveClass('part sidebar right')
+        await expect(sideBar).toHaveClass('right')
         await this.togglePosition()
-        await expect(sideBar).toHaveClass('part sidebar left')
+        await expect(sideBar).toHaveClass('left')
       } catch (error) {
         throw new VError(error, `Failed to move side bar left`)
       }

@@ -1,3 +1,4 @@
+import * as DeduplicateDetachedDomNodes from '../DeduplicateDetachedDomNodes/DeduplicateDetachedDomNodes.js'
 import * as GetDomNodeKey from '../GetDomNodeKey/GetDomNodeKey.js'
 
 const compareDetachedDomNode = (a, b) => {
@@ -27,6 +28,9 @@ export const compareDetachedDomNodes = (before, after) => {
       map[key]--
     }
   }
-  leaked.sort(compareDetachedDomNode)
-  return leaked
+  const deduplicated = DeduplicateDetachedDomNodes.deduplicatedDetachedDomNodes(leaked)
+  deduplicated.sort(compareDetachedDomNode)
+  return {
+    leaked: deduplicated,
+  }
 }

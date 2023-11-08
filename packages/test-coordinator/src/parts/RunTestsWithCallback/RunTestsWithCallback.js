@@ -38,7 +38,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
     const formattedPaths = await GetTestToRun.getTestsToRun(root, cwd, filterValue)
     const total = formattedPaths.length
     if (total === 0) {
-      return callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, 0, filterValue)
+      return callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, leaking, total, 0, filterValue)
     }
     const initialStart = Time.now()
     const first = formattedPaths[0]

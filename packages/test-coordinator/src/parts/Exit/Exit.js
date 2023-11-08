@@ -1,6 +1,7 @@
 import * as LaunchElectron from '../LaunchElectron/LaunchElectron.js'
 import * as Process from '../Process/Process.js'
 import * as Time from '../Time/Time.js'
+import * as ExitCode from '../ExitCode/ExitCode.js'
 
 export const exit = () => {
   const s = Time.now()
@@ -11,7 +12,7 @@ export const exit = () => {
   const used = process.memoryUsage().heapUsed / 1024 / 1024
   console.log(`worker uses approximately ${Math.round(used * 100) / 100} MB`)
   setTimeout(() => {
-    Process.exit(0)
+    Process.exit(ExitCode.Success)
   }, 0)
   // console.log(process._activeHandles)
 

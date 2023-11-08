@@ -42,6 +42,7 @@ test('handleTestFailed', () => {
   const releativeFilePath = `src/sample.close-window.js`
   const fileName = 'sample.close-window.js'
   const error = {
+    type: 'Error',
     message: 'expected window count to be 0 but was 1',
     stack: '    at Module.test (/test/e2e/src/sample.close-window.js:15:29)',
     codeFrame:
@@ -57,7 +58,7 @@ test('handleTestFailed', () => {
   expect(Stdout.write).toHaveBeenCalledWith(
     '\r\x1B[K\r\x1B[1A\r\x1B[K\r\x1B[1A\x1B[0m\x1B[7m\x1B[1m\x1B[31m FAIL \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2msrc/\x1B[22m\x1B[1msample.close-window.js\x1B[22m\n' +
       '\n' +
-      '      expected window count to be 0 but was 1\n' +
+      '      Error: expected window count to be 0 but was 1\n' +
       '\n' +
       '    \x1B[0m \x1B[90m 13 |\x1B[39m   \x1B[36mconst\x1B[39m window \x1B[33m=\x1B[39m \x1B[36mawait\x1B[39m electronApp\x1B[33m.\x1B[39mfirstWindow()\x1B[0m\n' +
       '    \x1B[0m \x1B[90m 14 |\x1B[39m   \x1B[36mawait\x1B[39m window\x1B[33m.\x1B[39mclose()\x1B[0m\n' +

@@ -3,16 +3,12 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 
 export const create = ({ expect, page, VError }) => {
   return {
-    async toggle() {
-      await page.waitForIdle()
-      const quickPick = QuickPick.create({ expect, page, VError })
-      await quickPick.executeCommand(WellKnownCommands.ToggleActivityBarVisibility)
-    },
     async show() {
       try {
         const activityBar = page.locator('.part.activitybar')
         await expect(activityBar).toBeHidden()
-        await this.toggle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.ShowActivityBar)
         await expect(activityBar).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to show activity bar`)
@@ -58,7 +54,8 @@ export const create = ({ expect, page, VError }) => {
       try {
         const activityBar = page.locator('.part.activitybar')
         await expect(activityBar).toBeVisible()
-        await this.toggle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.HideActivityBar)
         await expect(activityBar).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to hide activity bar`)

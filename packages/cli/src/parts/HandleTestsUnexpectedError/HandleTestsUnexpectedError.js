@@ -1,3 +1,4 @@
+import * as ExitCode from '../ExitCode/ExitCode.js'
 import * as GetTestsUnexpectedErrorMessage from '../GetTestsUnexpectedErrorMessage/GetTestsUnexpectedErrorMessage.js'
 import * as ModeType from '../ModeType/ModeType.js'
 import * as Process from '../Process/Process.js'
@@ -15,10 +16,9 @@ export const handleTestsUnexpectedError = (prettyError) => {
     mode: ModeType.FinishedRunning,
   })
   if (!isWatchMode) {
-    const exitCode = 129
     // TODO exit naturally
     // TODO dispose worker
     // TODO don't create file watcher worker when not in watch mode
-    Process.exit(exitCode)
+    Process.exit(ExitCode.UnexpectedTestError)
   }
 }

@@ -11,11 +11,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-12, windows-2022]
+        os: [ubuntu-22.04, macos-13, windows-2022]
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
       - name: Compute node modules cache key
@@ -39,7 +39,7 @@ jobs:
       - run: npm run build
       - run: npm test
       - name: Run headless test (with videos)
-        if: matrix.os != 'macos-12'
+        if: matrix.os != 'macos-13'
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --record-video
@@ -48,12 +48,12 @@ jobs:
         with:
           run: npm run e2e
       - name: Run headless test (flakyness check)
-        if: matrix.os != 'macos-12'
+        if: matrix.os != 'macos-13'
         uses: coactions/setup-xvfb@v1
         with:
           run: npm run e2e:check-flakyness
       - name: Run headless test (check leaks)
-        if: matrix.os != 'macos-12'
+        if: matrix.os != 'macos-13'
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks

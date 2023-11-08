@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url'
 import * as CleanStack from '../CleanStack/CleanStack.js'
 import * as ErrorCodes from '../ErrorCodes/ErrorCodes.js'
 import * as FileSystem from '../FileSystem/FileSystem.js'
+import * as PrettyStack from '../PrettyStack/PrettyStack.js'
 import * as SplitLines from '../SplitLines/SplitLines.js'
 
 const getActualPath = (fileUri) => {
@@ -115,6 +116,7 @@ export const prepare = async (error, { color = true, root = '' } = {}) => {
     const lines = SplitLines.splitLines(cleanedStack)
     const relevantStack = lines.join('\n')
     return {
+      type: error.constructor.name,
       message: error.message,
       stack: relevantStack,
       codeFrame: error.codeFrame,
@@ -130,8 +132,10 @@ export const prepare = async (error, { color = true, root = '' } = {}) => {
   const cleanedStack = CleanStack.cleanStack(error.stack, { root })
   const lines = SplitLines.splitLines(cleanedStack)
   const codeFrame = getCodeFrame(cleanedStack, { color })
-  const relevantStack = lines.join('\n')
+  const prettyStack = PrettyStack.prettyStack(lines, root)
+  const relevantStack = prettyStack.join('\n')
   return {
+    type: error.constructor.name,
     message,
     stack: relevantStack,
     codeFrame,
