@@ -13,7 +13,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@lvce-editor/verror": "^1.1.1",
+    "@lvce-editor/verror": "^1.1.2",
     "@vscode-memory-leak-finder/devtools-protocol": "file:../devtools-protocol",
     "got": "^13.0.0",
     "source-map": "^0.7.4"
