@@ -7,6 +7,9 @@ export const getCombinedMeasure = async (session, measureId) => {
   Assert.string(measureId)
   const MemoryLeakFinder = await LoadMemoryLeakFinder.loadMemoryLeakFinder()
   const measure = GetMeasure.getMeasure(MemoryLeakFinder, measureId)
+  if (!measure) {
+    throw new Error(`measure not found ${measureId}`)
+  }
   const combinedMeasure = MemoryLeakFinder.combine(measure.create(session))
   return combinedMeasure
 }
