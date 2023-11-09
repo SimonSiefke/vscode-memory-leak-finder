@@ -9,7 +9,8 @@ export const compareMapLeak = (before, after, getKey) => {
   for (const element of after) {
     const key = getKey(element)
     if (!map[key]) {
-      leaked.push(element)
+      const { objectId, ...rest } = element
+      leaked.push(rest)
     } else {
       map[key]--
     }
