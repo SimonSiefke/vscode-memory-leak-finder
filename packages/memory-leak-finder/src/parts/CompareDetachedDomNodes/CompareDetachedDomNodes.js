@@ -23,8 +23,6 @@ export const compareDetachedDomNodes = (before, after) => {
   const deduplicated = DeduplicateDetachedDomNodes.deduplicatedDetachedDomNodes(leaked)
   deduplicated.sort(CompareDetachedDomNode.compareDetachedDomNode)
   return {
-    before,
-    after,
     leaked: deduplicated,
   }
 }
