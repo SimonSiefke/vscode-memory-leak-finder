@@ -1,26 +1,30 @@
-import got from 'got'
 import { VError } from '../VError/VError.js'
-import * as Root from '../Root/Root.js'
-import { pipeline } from 'stream/promises'
-import { createWriteStream, existsSync } from 'fs'
-import { dirname, join } from 'path'
-import { mkdir, readFile } from 'fs/promises'
 
-const getOutFileName = (url) => {
-  const slashIndex = url.lastIndexOf('/')
-  return url.slice(slashIndex)
+const getModule = (protocol) => {
+  switch (protocol) {
+    case 'data':
+      return import('../LoadSourceMapFromDataUrl/LoadSourceMapFromData.js')
+    case 'http':
+    case 'https':
+      return import('../LoadSourceMapFromUrl/LoadSourceMapFromUrl.js')
+    default:
+      throw new Error(`unsupported protocol ${protocol}`)
+  }
+}
+
+const getProtocol = (url) => {
+  const colonIndex = url.indexOf(':')
+  if (colonIndex === -1) {
+    throw new Error(`unsupported url ${url}`)
+  }
+  return url.slice(0, colonIndex)
 }
 
 export const loadSourceMap = async (url) => {
   try {
-    const outFileName = getOutFileName(url)
-    const outFilePath = join(Root.root, '.vscode-source-maps', outFileName)
-    if (!existsSync(outFilePath)) {
-      await mkdir(dirname(outFilePath), { recursive: true })
-      await pipeline(got.stream(url), createWriteStream(outFilePath))
-    }
-    const content = await readFile(outFilePath, 'utf8')
-    const data = JSON.parse(content)
+    const protocol = getProtocol(url)
+    const module = await getModule(protocol)
+    const data = await module.loadSourceMap(url)
     return data
   } catch (error) {
     throw new VError(error, `Failed to load source map for ${url}`)
