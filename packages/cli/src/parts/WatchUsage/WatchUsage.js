@@ -17,7 +17,7 @@ ${press}${CliKeys.Fail}${toRunOnlyFailedTests}
 ${press}${CliKeys.FilterMode}${toFilterTests}
 ${press}${CliKeys.ToggleHeadlessMode}${toToggleHeadlessMode}
 ${press}${CliKeys.Quit}${toQuitWatchMode}
-${press}${CliKeys.TriggerTestRun}${toTriggerATestRun}
+${press}${CliKeys.Enter}${toTriggerATestRun}
 `
 
 export const print = () => {
