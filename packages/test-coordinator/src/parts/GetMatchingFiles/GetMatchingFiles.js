@@ -1,7 +1,9 @@
+import * as MatchesFilterValue from '../MatchesFilterValue/MatchesFilterValue.js'
+
 export const getMatchingFiles = (dirents, filterValue) => {
   const matchingFiles = []
   for (const dirent of dirents) {
-    if (dirent.includes(filterValue)) {
+    if (MatchesFilterValue.matchesFilterValue(dirent, filterValue)) {
       matchingFiles.push(dirent)
     }
   }
