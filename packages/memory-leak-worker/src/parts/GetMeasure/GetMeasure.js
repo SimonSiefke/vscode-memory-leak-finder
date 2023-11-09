@@ -20,6 +20,8 @@ export const getMeasure = (MemoryLeakFinder, measureId) => {
       return MemoryLeakFinder.Measures.MeasureDetachedDomNodes
     case 'media-query-list-count':
       return MemoryLeakFinder.Measures.MeasureMediaQueryListCount
+    case 'map-size':
+      return MemoryLeakFinder.Measures.MapSize
     default:
       return MemoryLeakFinder.Measures.MeasureEventListenerCount
   }
