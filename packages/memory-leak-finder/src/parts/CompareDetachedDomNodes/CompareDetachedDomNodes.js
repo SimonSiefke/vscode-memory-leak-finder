@@ -1,35 +1,12 @@
+import * as CompareDetachedDomNode from '../CompareDetachedDomNode/CompareDetachedDomNode.js'
+import * as CompareMapLeak from '../CompareMapLeak/CompareMapLeak.js'
 import * as DeduplicateDetachedDomNodes from '../DeduplicateDetachedDomNodes/DeduplicateDetachedDomNodes.js'
-import * as GetDomNodeKey from '../GetDomNodeKey/GetDomNodeKey.js'
-
-const compareDetachedDomNode = (a, b) => {
-  if (!a.description) {
-    return b
-  }
-  if (!b.description) {
-    return a
-  }
-  return a.description.localeCompare(b.description)
-}
+import * as GetDomNodeHash from '../GetDomNodeHash/GetDomNodeHash.js'
 
 export const compareDetachedDomNodes = (before, after) => {
-  const map = Object.create(null)
-  for (const domNode of before) {
-    const key = GetDomNodeKey.getDomNodeKey(domNode)
-    map[key] ||= 0
-    map[key]++
-  }
-  const leaked = []
-  for (const domNode of after) {
-    const key = GetDomNodeKey.getDomNodeKey(domNode)
-    if (!map[key]) {
-      const { objectId, ...rest } = domNode
-      leaked.push(rest)
-    } else {
-      map[key]--
-    }
-  }
+  const leaked = CompareMapLeak.compareMapLeak(before, after, GetDomNodeHash.getDomNodeHash)
   const deduplicated = DeduplicateDetachedDomNodes.deduplicatedDetachedDomNodes(leaked)
-  deduplicated.sort(compareDetachedDomNode)
+  deduplicated.sort(CompareDetachedDomNode.compareDetachedDomNode)
   return {
     leaked: deduplicated,
   }
