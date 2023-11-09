@@ -1,4 +1,5 @@
 import chalk from 'chalk'
+import * as CliKeys from '../CliKeys/CliKeys.js'
 
 const patternModeUsage = chalk.bold('Pattern Mode Usage')
 const press = chalk.dim('\u203A Press')
@@ -9,8 +10,8 @@ const pattern = chalk.dim(' pattern \u203A')
 export const print = () => {
   return `
 ${patternModeUsage}
- ${press} Esc ${toExitPatternMode}
- ${press} Enter ${toFilterByARegexPattern}
+ ${press} ${CliKeys.Escape} ${toExitPatternMode}
+ ${press} ${CliKeys.Enter} ${toFilterByARegexPattern}
 
 ${pattern} `
 }
