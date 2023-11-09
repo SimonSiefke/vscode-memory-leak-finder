@@ -1,5 +1,7 @@
 export const getMeasure = (MemoryLeakFinder, measureId) => {
   switch (measureId) {
+    case 'event-target-count':
+      return MemoryLeakFinder.Measures.MeasureEventTargetCount
     case 'event-listeners':
       return MemoryLeakFinder.Measures.MeasureEventListeners
     case 'event-listeners-with-stack-traces':
