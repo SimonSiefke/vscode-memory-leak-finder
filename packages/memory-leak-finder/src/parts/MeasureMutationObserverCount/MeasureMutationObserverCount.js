@@ -1,5 +1,7 @@
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as GetMutationObserverCount from '../GetMutationObserverCount/GetMutationObserverCount.js'
+import * as CompareCount from '../CompareCount/CompareCount.js'
+import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
 
 export const id = MeasureId.MutationObserverCount
 
@@ -15,9 +17,6 @@ export const stop = (session) => {
   return GetMutationObserverCount.getMutationObserverCount(session)
 }
 
-export const compare = (before, after) => {
-  return {
-    before,
-    after,
-  }
-}
+export const compare = CompareCount.compareCount
+
+export const isLeak = IsLeakCount.isLeakCount
