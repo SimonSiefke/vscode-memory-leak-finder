@@ -1,5 +1,6 @@
 export const Array = 'Array.prototype'
 export const EventTarget = 'EventTarget.prototype'
+export const Function = 'Function.prototype'
 export const HtmlElement = 'HTMLElement.prototype'
 export const IntersectionObserver = 'IntersectionObserver.prototype'
 export const MediaQueryList = 'MediaQueryList.prototype'

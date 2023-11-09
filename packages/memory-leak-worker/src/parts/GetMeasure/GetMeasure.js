@@ -8,6 +8,8 @@ export const getMeasure = (MemoryLeakFinder, measureId) => {
       return MemoryLeakFinder.Measures.MeasureEventListeners
     case 'event-listeners-with-stack-traces':
       return MemoryLeakFinder.Measures.MeasureEventListenersWithStackTraces
+    case 'function-count':
+      return MemoryLeakFinder.Measures.MeasureFunctionCount
     case 'detached-dom-node-count':
       return MemoryLeakFinder.Measures.MeasureDetachedDomNodeCount
     case 'set-timeout':
