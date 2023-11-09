@@ -4,6 +4,7 @@ export * as MeasureEventListenerCount from '../MeasureEventListenerCount/Measure
 export * as MeasureEventListeners from '../MeasureEventListeners/MeasureEventListeners.js'
 export * as MeasureEventListenersWithStackTraces from '../MeasureEventListenersWithStackTraces/MeasureEventListenersWithStackTraces.js'
 export * as MeasureEventTargetCount from '../MeasureEventTargetCount/MeasureEventTargetCount.js'
+export * as MeasureFunctionCount from '../MeasureFunctionCount/MeasureFunctionCount.js'
 export * as MeasureIntersectionObserverCount from '../MeasureIntersectionObserverCount/MeasureIntersectionObserverCount.js'
 export * as MeasureMediaQueryListCount from '../MeasureMediaQueryListCount/MeasureMediaQueryListCount.js'
 export * as MeasureMutationObserverCount from '../MeasureMutationObserverCount/MeasureMutationObserverCount.js'
