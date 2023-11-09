@@ -1,3 +1,4 @@
+export const ArrayElementCount = 'arrayElementCount'
 export const Combined = 'combined'
 export const DetachedDomNodeCount = 'detachedDomNodeCount'
 export const DetachedDomNodes = 'detachedDomNodes'
