@@ -1,18 +1,10 @@
+import * as CompareDetachedDomNode from '../CompareDetachedDomNode/CompareDetachedDomNode.js'
 import * as DeduplicateDetachedDomNodes from '../DeduplicateDetachedDomNodes/DeduplicateDetachedDomNodes.js'
 import * as GetDomNodeKey from '../GetDomNodeKey/GetDomNodeKey.js'
 
-const compareDetachedDomNode = (a, b) => {
-  if (!a.description) {
-    return b
-  }
-  if (!b.description) {
-    return a
-  }
-  return a.description.localeCompare(b.description)
-}
-
 export const compareDetachedDomNodes = (before, after) => {
   const map = Object.create(null)
+  console.log({ before, after })
   for (const domNode of before) {
     const key = GetDomNodeKey.getDomNodeKey(domNode)
     map[key] ||= 0
@@ -29,8 +21,10 @@ export const compareDetachedDomNodes = (before, after) => {
     }
   }
   const deduplicated = DeduplicateDetachedDomNodes.deduplicatedDetachedDomNodes(leaked)
-  deduplicated.sort(compareDetachedDomNode)
+  deduplicated.sort(CompareDetachedDomNode.compareDetachedDomNode)
   return {
+    before,
+    after,
     leaked: deduplicated,
   }
 }
