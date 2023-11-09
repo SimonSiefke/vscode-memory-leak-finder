@@ -1,5 +1,5 @@
 import * as DeduplicateDetachedDomNodes from '../DeduplicateDetachedDomNodes/DeduplicateDetachedDomNodes.js'
-import * as GetDomNodeKey from '../GetDomNodeKey/GetDomNodeKey.js'
+import * as GetDomNodeHash from '../GetDomNodeHash/GetDomNodeHash.js'
 
 const compareDetachedDomNode = (a, b) => {
   if (!a.description) {
@@ -14,13 +14,13 @@ const compareDetachedDomNode = (a, b) => {
 export const compareDetachedDomNodes = (before, after) => {
   const map = Object.create(null)
   for (const domNode of before) {
-    const key = GetDomNodeKey.getDomNodeKey(domNode)
+    const key = GetDomNodeHash.getDomNodeHash(domNode)
     map[key] ||= 0
     map[key]++
   }
   const leaked = []
   for (const domNode of after) {
-    const key = GetDomNodeKey.getDomNodeKey(domNode)
+    const key = GetDomNodeHash.getDomNodeHash(domNode)
     if (!map[key]) {
       const { objectId, ...rest } = domNode
       leaked.push(rest)
