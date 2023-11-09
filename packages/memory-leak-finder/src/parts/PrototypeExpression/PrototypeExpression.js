@@ -1,3 +1,4 @@
+export const Array = 'Array.prototype'
 export const EventTarget = 'EventTarget.prototype'
 export const HtmlElement = 'HTMLElement.prototype'
 export const IntersectionObserver = 'IntersectionObserver.prototype'
