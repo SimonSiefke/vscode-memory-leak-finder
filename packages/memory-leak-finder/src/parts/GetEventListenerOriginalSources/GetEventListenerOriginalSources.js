@@ -11,8 +11,9 @@ const getCleanEventlisteners = (cleanPositionMap, eventListeners) => {
     const index = indexMap[sourceMapUrl]++
     const cleanPosition = cleanPositionMap[sourceMapUrl][index]
     if (cleanPosition) {
+      const { sourceMaps, ...rest } = eventListener
       newEventListeners.push({
-        ...eventListener,
+        ...rest,
         originalStack: [`${cleanPosition.source}:${cleanPosition.line}:${cleanPosition.column}`],
       })
     } else {
