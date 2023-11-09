@@ -11,3 +11,4 @@ export * as MeasureMutationObserverCount from '../MeasureMutationObserverCount/M
 export * as MeasurePromiseCount from '../MeasurePromiseCount/MeasurePromiseCount.js'
 export * as MeasureResizeObserverCount from '../MeasureResizeObserverCount/MeasureResizeObserverCount.js'
 export * as MeasureSetTimeout from '../MeasureSetTimeout/MeasureSetTimeout.js'
+export * as MeasureWeakMapCount from '../MeasureWeakMapCount/MeasureWeakMapCount.js'
