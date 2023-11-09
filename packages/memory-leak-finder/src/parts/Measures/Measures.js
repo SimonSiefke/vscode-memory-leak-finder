@@ -7,6 +7,7 @@ export * as MeasureEventTargetCount from '../MeasureEventTargetCount/MeasureEven
 export * as MeasureIntersectionObserverCount from '../MeasureIntersectionObserverCount/MeasureIntersectionObserverCount.js'
 export * as MeasureMediaQueryListCount from '../MeasureMediaQueryListCount/MeasureMediaQueryListCount.js'
 export * as MeasureMutationObserverCount from '../MeasureMutationObserverCount/MeasureMutationObserverCount.js'
+export * as MeasureObjectCount from '../MeasureObjectCount/MeasureObjectCount.js'
 export * as MeasurePromiseCount from '../MeasurePromiseCount/MeasurePromiseCount.js'
 export * as MeasureResizeObserverCount from '../MeasureResizeObserverCount/MeasureResizeObserverCount.js'
 export * as MeasureSetTimeout from '../MeasureSetTimeout/MeasureSetTimeout.js'
