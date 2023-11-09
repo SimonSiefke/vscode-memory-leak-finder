@@ -3,6 +3,7 @@ export * as MeasureDetachedDomNodes from '../MeasureDetachedDomNodes/MeasureDeta
 export * as MeasureEventListenerCount from '../MeasureEventListenerCount/MeasureEventListenerCount.js'
 export * as MeasureEventListeners from '../MeasureEventListeners/MeasureEventListeners.js'
 export * as MeasureEventListenersWithStackTraces from '../MeasureEventListenersWithStackTraces/MeasureEventListenersWithStackTraces.js'
+export * as MeasureEventTargetCount from '../MeasureEventTargetCount/MeasureEventTargetCount.js'
 export * as MeasureIntersectionObserverCount from '../MeasureIntersectionObserverCount/MeasureIntersectionObserverCount.js'
 export * as MeasureMutationObserverCount from '../MeasureMutationObserverCount/MeasureMutationObserverCount.js'
 export * as MeasurePromiseCount from '../MeasurePromiseCount/MeasurePromiseCount.js'
