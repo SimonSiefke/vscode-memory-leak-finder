@@ -24,6 +24,7 @@ export const setState = (newState) => {
   state.recordVideo = newState.recordVideo
   state.cwd = newState.cwd
   state.measure = newState.measure
+  state.filter = newState.filter
 }
 
 export const setBuffering = (value) => {
