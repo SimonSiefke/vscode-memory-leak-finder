@@ -14,6 +14,8 @@ export const getMeasure = (MemoryLeakFinder, measureId) => {
       return MemoryLeakFinder.Measures.MeasureDetachedDomNodeCount
     case 'set-timeout':
       return MemoryLeakFinder.Measures.MeasureSetTimeout
+    case 'object-count':
+      return MemoryLeakFinder.Measures.MeasureObjectCount
     case 'promise-count':
       return MemoryLeakFinder.Measures.MeasurePromiseCount
     case 'resize-observer-count':
