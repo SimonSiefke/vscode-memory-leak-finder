@@ -44,7 +44,7 @@ export const getInstanceCounts = async (session, objectGroup) => {
     if(map.has(instance.constructor)){
       map.set(instance.constructor, map.get(instance.constructor) + 1)
     } else {
-      map.set(instance.constructor, 0)
+      map.set(instance.constructor, 1)
     }
   }
 
