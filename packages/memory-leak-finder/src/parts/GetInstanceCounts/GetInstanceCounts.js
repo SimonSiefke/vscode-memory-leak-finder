@@ -14,7 +14,19 @@ export const getInstanceCounts = async (session) => {
     functionDeclaration: `function(){
   const objects = this
 
-  const nativeConstructors = [Object, Array, Function, Set, Map, WeakMap, WeakSet, RegExp]
+  const nativeConstructors = [
+    Object,
+    Array,
+    Function,
+    Set,
+    Map,
+    WeakMap,
+    WeakSet,
+    RegExp,
+    Node,
+    AsyncFunction,
+    HTMLScriptElement
+  ]
 
   const isInstance = (object) => {
     return object && !nativeConstructors.includes(object.constructor)
