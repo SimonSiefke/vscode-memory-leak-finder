@@ -1,3 +1,4 @@
+export const ArrayCount = 'arrayCount'
 export const ArrayElementCount = 'arrayElementCount'
 export const ClassCount = 'classCount'
 export const Combined = 'combined'
