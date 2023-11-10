@@ -10,6 +10,8 @@ export const getMeasure = (MemoryLeakFinder, measureId) => {
       return MemoryLeakFinder.Measures.MeasureDetachedDomNodes
     case 'event-target-count':
       return MemoryLeakFinder.Measures.MeasureEventTargetCount
+    case 'event-targets':
+      return MemoryLeakFinder.Measures.MeasureEventTargets
     case 'event-listeners':
       return MemoryLeakFinder.Measures.MeasureEventListeners
     case 'event-listeners-with-stack-traces':
