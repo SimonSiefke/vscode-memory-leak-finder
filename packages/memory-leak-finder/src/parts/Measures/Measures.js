@@ -9,6 +9,7 @@ export * as MeasureEventListenersWithStackTraces from '../MeasureEventListenersW
 export * as MeasureEventTargetCount from '../MeasureEventTargetCount/MeasureEventTargetCount.js'
 export * as MeasureEventTargets from '../MeasureEventTargets/MeasureEventTargets.js'
 export * as MeasureFunctionCount from '../MeasureFunctionCount/MeasureFunctionCount.js'
+export * as MeasureInstanceCounts from '../MeasureInstanceCounts/MeasureInstanceCounts.js'
 export * as MeasureIntersectionObserverCount from '../MeasureIntersectionObserverCount/MeasureIntersectionObserverCount.js'
 export * as MeasureMapSize from '../MeasureMapSize/MeasureMapSize.js'
 export * as MeasureMediaQueryListCount from '../MeasureMediaQueryListCount/MeasureMediaQueryListCount.js'
