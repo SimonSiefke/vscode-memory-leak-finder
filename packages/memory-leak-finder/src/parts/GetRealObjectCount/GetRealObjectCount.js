@@ -18,7 +18,21 @@ export const getRealObjectCount = async (session) => {
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
 const objects = this
-return objects.length
+const isRealObject = object => {
+  if(!object){
+    return false
+  }
+  if(Array.isArray(object)){
+    return false
+  }
+  if(typeof object !== 'object'){
+    return false
+  }
+  return true
+}
+
+const realObjects = objects.filter(isRealObject)
+return realObjects.length
 }`,
     objectId: objects.objects.objectId,
     returnByValue: true,
