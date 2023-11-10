@@ -16,6 +16,7 @@ export * as MeasureMutationObserverCount from '../MeasureMutationObserverCount/M
 export * as MeasureObjectCount from '../MeasureObjectCount/MeasureObjectCount.js'
 export * as MeasurePromiseCount from '../MeasurePromiseCount/MeasurePromiseCount.js'
 export * as MeasureRealObjectCount from '../MeasureRealObjectCount/MeasureRealObjectCount.js'
+export * as MeasureRegexCount from '../MeasureRegexCount/MeasureRegexCount.js'
 export * as MeasureResizeObserverCount from '../MeasureResizeObserverCount/MeasureResizeObserverCount.js'
 export * as MeasureSetSize from '../MeasureSetSize/MeasureSetSize.js'
 export * as MeasureSetTimeout from '../MeasureSetTimeout/MeasureSetTimeout.js'
