@@ -3,7 +3,7 @@ import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as CompareCount from '../CompareCount/CompareCount.js'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
 
-export const id = MeasureId.EventTarget
+export const id = MeasureId.EventTargetCount
 
 export const create = (session) => {
   return [session]
