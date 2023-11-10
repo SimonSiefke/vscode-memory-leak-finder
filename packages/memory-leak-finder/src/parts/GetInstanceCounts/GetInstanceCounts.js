@@ -24,7 +24,6 @@ export const getInstanceCounts = async (session) => {
     WeakSet,
     RegExp,
     Node,
-    AsyncFunction,
     HTMLScriptElement
   ]
 
@@ -49,7 +48,7 @@ export const getInstanceCounts = async (session) => {
   for(const [instanceConstructor, count] of map.entries()){
     array.push({
       name: instanceConstructor.name,
-      count
+      count,
     })
   }
 
