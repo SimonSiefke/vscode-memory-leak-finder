@@ -85,6 +85,5 @@ export const getInstanceCounts = async (session) => {
   const descriptorValues = GetDescriptorValues.getDescriptorValues(fnResult4)
   const objectIds = descriptorValues.map(GetObjectId.getObjectId)
   const combined = CombineInstanceCountsAndObjectIds.combineInstanceCountsAndObjectIds(fnResult2, objectIds)
-  console.log({ combined })
   return combined
 }
