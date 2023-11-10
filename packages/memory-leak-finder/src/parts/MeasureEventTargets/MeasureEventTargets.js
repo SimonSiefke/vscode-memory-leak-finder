@@ -1,3 +1,4 @@
+import * as CompareEventTargets from '../CompareEventTargets/CompareEventTargets.js'
 import * as GetEventTargets from '../GetEventTargets/GetEventTargets.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
@@ -17,6 +18,8 @@ export const stop = (session, objectGroup) => {
   return GetEventTargets.getEventTargets(session, objectGroup)
 }
 
-export const compare = (before, after) => {
-  return { before, after }
+export const compare = CompareEventTargets.compareEventTargets
+
+export const isLeak = (leaked) => {
+  return leaked.length > 0
 }
