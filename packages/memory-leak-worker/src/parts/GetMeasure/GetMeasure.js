@@ -24,6 +24,8 @@ export const getMeasure = (MemoryLeakFinder, measureId) => {
       return MemoryLeakFinder.Measures.MeasureObjectCount
     case 'promise-count':
       return MemoryLeakFinder.Measures.MeasurePromiseCount
+    case 'real-object-count':
+      return MemoryLeakFinder.Measures.MeasureRealObjectCount
     case 'resize-observer-count':
       return MemoryLeakFinder.Measures.MeasureResizeObserverCount
     case 'set-size':
