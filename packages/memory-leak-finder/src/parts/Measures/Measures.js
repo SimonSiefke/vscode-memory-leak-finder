@@ -17,3 +17,4 @@ export * as MeasureResizeObserverCount from '../MeasureResizeObserverCount/Measu
 export * as MeasureSetSize from '../MeasureSetSize/MeasureSetSize.js'
 export * as MeasureSetTimeout from '../MeasureSetTimeout/MeasureSetTimeout.js'
 export * as MeasureWeakMapCount from '../MeasureWeakMapCount/MeasureWeakMapCount.js'
+export * as MeasureWeakSetCount from '../MeasureWeakSetCount/MeasureWeakSetCount.js'

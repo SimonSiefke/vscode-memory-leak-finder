@@ -32,6 +32,8 @@ export const getMeasure = (MemoryLeakFinder, measureId) => {
       return MemoryLeakFinder.Measures.MeasureSetTimeout
     case 'weak-map-count':
       return MemoryLeakFinder.Measures.MeasureWeakMapCount
+    case 'weak-set-count':
+      return MemoryLeakFinder.Measures.WeakSetCount
     default:
       return MemoryLeakFinder.Measures.MeasureEventListenerCount
   }
