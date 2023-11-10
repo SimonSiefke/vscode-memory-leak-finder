@@ -11,11 +11,11 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  return GetInstanceCounts.getInstanceCounts(session)
+  return GetInstanceCounts.getInstanceCounts(session, objectGroup)
 }
 
 export const stop = (session, objectGroup) => {
-  return GetInstanceCounts.getInstanceCounts(session)
+  return GetInstanceCounts.getInstanceCounts(session, objectGroup)
 }
 
 export const compare = CompareInstanceCounts.compareInstanceCounts

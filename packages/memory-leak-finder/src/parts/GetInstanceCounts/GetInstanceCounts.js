@@ -1,14 +1,19 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
+import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.js'
+import * as GetObjectId from '../GetObjectId/GetObjectId.js'
+import * as CombineInstanceCountsAndObjectIds from '../CombineInstanceCountsAndObjectIds/CombineInstanceCountsAndObjectIds.js'
 
-export const getInstanceCounts = async (session) => {
+export const getInstanceCounts = async (session, objectGroup) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Object,
     includeCommandLineAPI: true,
     returnByValue: false,
+    objectGroup,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
     prototypeObjectId: prototypeDescriptor.objectId,
+    objectGroup,
   })
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
@@ -39,10 +44,20 @@ export const getInstanceCounts = async (session) => {
     if(map.has(instance.constructor)){
       map.set(instance.constructor, map.get(instance.constructor) + 1)
     } else {
-      map.set(instance.constructor, 0)
+      map.set(instance.constructor, 1)
     }
   }
 
+  return map
+
+}`,
+    objectId: objects.objects.objectId,
+    returnByValue: false,
+    objectGroup,
+  })
+  const fnResult2 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
+    functionDeclaration: `function(){
+  const map = this
   const array = []
 
   for(const [instanceConstructor, count] of map.entries()){
@@ -54,8 +69,33 @@ export const getInstanceCounts = async (session) => {
 
   return array
 }`,
-    objectId: objects.objects.objectId,
+    objectId: fnResult1.objectId,
     returnByValue: true,
+    objectGroup,
   })
-  return fnResult1
+  const fnResult3 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
+    functionDeclaration: `function(){
+  const map = this
+  const array = []
+
+  for(const [instanceConstructor, count] of map.entries()){
+    array.push(instanceConstructor)
+  }
+
+  return array
+}`,
+    objectId: fnResult1.objectId,
+    returnByValue: false,
+    objectGroup,
+  })
+
+  const fnResult4 = await DevtoolsProtocolRuntime.getProperties(session, {
+    objectId: fnResult3.objectId,
+    ownProperties: true,
+  })
+  const descriptorValues = GetDescriptorValues.getDescriptorValues(fnResult4)
+  const objectIds = descriptorValues.map(GetObjectId.getObjectId)
+
+  const combined = CombineInstanceCountsAndObjectIds.combineInstanceCountsAndObjectIds(fnResult2, objectIds)
+  return combined
 }
