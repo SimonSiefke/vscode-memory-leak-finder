@@ -29,7 +29,17 @@ export const getInstanceCounts = async (session, objectGroup) => {
     WeakSet,
     RegExp,
     Node,
-    HTMLScriptElement
+    HTMLScriptElement,
+    DOMRectReadOnly,
+    DOMRect,
+    HTMLHtmlElement,
+    Node,
+    DOMTokenList,
+    HTMLUListElement,
+    HTMLStyleElement,
+    HTMLDivElement,
+    HTMLCollection,
+    FocusEvent
   ]
 
   const isInstance = (object) => {
