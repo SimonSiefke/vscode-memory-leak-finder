@@ -4,14 +4,16 @@ import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues
 import * as GetObjectId from '../GetObjectId/GetObjectId.js'
 import * as CombineInstanceCountsAndObjectIds from '../CombineInstanceCountsAndObjectIds/CombineInstanceCountsAndObjectIds.js'
 
-export const getInstanceCounts = async (session) => {
+export const getInstanceCounts = async (session, objectGroup) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Object,
     includeCommandLineAPI: true,
     returnByValue: false,
+    objectGroup,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
     prototypeObjectId: prototypeDescriptor.objectId,
+    objectGroup,
   })
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
@@ -51,6 +53,7 @@ export const getInstanceCounts = async (session) => {
 }`,
     objectId: objects.objects.objectId,
     returnByValue: false,
+    objectGroup,
   })
   const fnResult2 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
@@ -68,14 +71,22 @@ export const getInstanceCounts = async (session) => {
 }`,
     objectId: fnResult1.objectId,
     returnByValue: true,
+    objectGroup,
   })
   const fnResult3 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
   const map = this
-  return [...map.keys()]
+  const array = []
+
+  for(const [instanceConstructor, count] of map.entries()){
+    array.push(instanceConstructor)
+  }
+
+  return array
 }`,
     objectId: fnResult1.objectId,
     returnByValue: false,
+    objectGroup,
   })
 
   const fnResult4 = await DevtoolsProtocolRuntime.getProperties(session, {
@@ -84,6 +95,7 @@ export const getInstanceCounts = async (session) => {
   })
   const descriptorValues = GetDescriptorValues.getDescriptorValues(fnResult4)
   const objectIds = descriptorValues.map(GetObjectId.getObjectId)
+
   const combined = CombineInstanceCountsAndObjectIds.combineInstanceCountsAndObjectIds(fnResult2, objectIds)
   return combined
 }
