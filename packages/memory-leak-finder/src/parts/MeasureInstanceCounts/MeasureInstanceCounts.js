@@ -2,7 +2,7 @@ import * as GetInstanceCounts from '../GetInstanceCounts/GetInstanceCounts.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 
-export const id = MeasureId.PromiseCount
+export const id = MeasureId.InstanceCounts
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
