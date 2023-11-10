@@ -13,7 +13,7 @@ export const getArrayElementCount = async (session) => {
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
   const objects = this
-  let total=0
+  let total = 0
   for(const object of objects){
     total += object.length
   }
