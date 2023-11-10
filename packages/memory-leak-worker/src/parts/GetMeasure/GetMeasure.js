@@ -20,6 +20,8 @@ export const getMeasure = (MemoryLeakFinder, measureId) => {
       return MemoryLeakFinder.Measures.MeasureEventListenersWithStackTraces
     case 'function-count':
       return MemoryLeakFinder.Measures.MeasureFunctionCount
+    case 'instance-counts':
+      return MemoryLeakFinder.Measures.InstanceCounts
     case 'intersection-observer-count':
       return MemoryLeakFinder.Measures.MeasureIntersectionObserverCount
     case 'map-size':
