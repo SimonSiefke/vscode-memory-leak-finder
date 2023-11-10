@@ -1,4 +1,5 @@
 export * as MeasureArrayElementCount from '../MeasureArrayElementCount/MeasureArrayElementCount.js'
+export * as MeasureClassCount from '../MeasureClassCount/MeasureClassCount.js'
 export * as MeasureDetachedDomNodeCount from '../MeasureDetachedDomNodeCount/MeasureDetachedDomNodeCount.js'
 export * as MeasureDetachedDomNodes from '../MeasureDetachedDomNodes/MeasureDetachedDomNodes.js'
 export * as MeasureEventListenerCount from '../MeasureEventListenerCount/MeasureEventListenerCount.js'
@@ -17,3 +18,4 @@ export * as MeasureResizeObserverCount from '../MeasureResizeObserverCount/Measu
 export * as MeasureSetSize from '../MeasureSetSize/MeasureSetSize.js'
 export * as MeasureSetTimeout from '../MeasureSetTimeout/MeasureSetTimeout.js'
 export * as MeasureWeakMapCount from '../MeasureWeakMapCount/MeasureWeakMapCount.js'
+export * as MeasureWeakSetCount from '../MeasureWeakSetCount/MeasureWeakSetCount.js'
