@@ -5,6 +5,9 @@ import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOrigi
 
 export const compareEventListeners = async (before, after) => {
   const leaked = CompareMapLeak.compareMapLeak(before, after, GetEventListenerKey.getEventListenerKey)
+  if (leaked.length === 0) {
+    return []
+  }
   const deduplicatedEventListeners = DeduplicateEventListeners.deduplicateEventListeners(leaked)
   const cleanLeakedEventListeners =
     await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(deduplicatedEventListeners)
