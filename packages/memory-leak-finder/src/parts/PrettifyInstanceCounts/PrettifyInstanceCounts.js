@@ -1,5 +1,5 @@
-import * as CompareInstance from '../CompareInstance/CompareInstance.js'
 import * as Assert from '../Assert/Assert.js'
+import * as CompareInstance from '../CompareInstance/CompareInstance.js'
 
 export const prettifyInstanceCounts = (instances) => {
   Assert.array(instances)
