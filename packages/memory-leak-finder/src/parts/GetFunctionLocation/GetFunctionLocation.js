@@ -2,9 +2,18 @@ import * as Assert from '../Assert/Assert.js'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as IsFunctionLocation from '../IsFunctionLocation/IsFunctionLocation.js'
 
+const emptyFunctionLocation = {
+  scriptId: '',
+  lineNumber: 0,
+  columnNumber: 0,
+}
+
 export const getFunctionLocation = async (session, objectId) => {
   Assert.object(session)
   Assert.string(objectId)
+  if (!objectId) {
+    return emptyFunctionLocation
+  }
   const fnResult1 = await DevtoolsProtocolRuntime.getProperties(session, {
     objectId,
     accessorPropertiesOnly: false,
@@ -14,11 +23,7 @@ export const getFunctionLocation = async (session, objectId) => {
   })
   const functionLocation = fnResult1.internalProperties.find(IsFunctionLocation.isFunctionLocation)
   if (!functionLocation) {
-    return {
-      scriptId: '',
-      lineNumber: 0,
-      columnNumber: 0,
-    }
+    return emptyFunctionLocation
   }
   return functionLocation.value.value
 }
