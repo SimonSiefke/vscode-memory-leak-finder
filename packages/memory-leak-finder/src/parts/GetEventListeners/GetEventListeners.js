@@ -25,7 +25,7 @@ export const getEventListeners = async (session, objectGroup, scriptMap) => {
     objectId: objects.objects.objectId,
     ownProperties: true,
   })
-  const descriptors = GetDescriptorValues.getDescriptorValues(fnResult1)
+  const descriptors = GetDescriptorValues.getDescriptorValues(fnResult1.result)
   const fnResult2 = await GetEventListenersOfTargets.getEventListenersOfTargets(session, descriptors)
   const eventListeners = fnResult2.flatMap(GetEventListenersFromMap.getEventListenersFromMap)
   const cleanEventListeners = CleanEventListeners.cleanEventListeners(eventListeners, scriptMap)

@@ -1,5 +1,5 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as GetDescriptors from '../GetDescriptorValues/GetDescriptorValues.js'
+import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.js'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
 
 export const getPromises = async (session, objectGroup) => {
@@ -20,7 +20,6 @@ export const getPromises = async (session, objectGroup) => {
     accessorPropertiesOnly: false,
     nonIndexedPropertiesOnly: false,
   })
-  const descriptors = GetDescriptors.getDescriptorValues(fnResult1)
-  console.log({ descriptors })
+  const descriptors = GetDescriptorValues.getDescriptorValues(fnResult1.result)
   return descriptors
 }

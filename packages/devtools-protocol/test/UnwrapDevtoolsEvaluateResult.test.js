@@ -71,3 +71,17 @@ test('unwrapResult - result with empty object', () => {
 test('unwrapResult - wrapped null', () => {
   expect(UnwrapDevtoolsEvaluateResult.unwrapResult({ result: { result: { type: 'object', subtype: 'null', value: null } } })).toBe(null)
 })
+
+test('unwrapResult - result and internalProperties', () => {
+  expect(
+    UnwrapDevtoolsEvaluateResult.unwrapResult({
+      result: {
+        result: [],
+        internalProperties: [],
+      },
+    }),
+  ).toEqual({
+    result: [],
+    internalProperties: [],
+  })
+})

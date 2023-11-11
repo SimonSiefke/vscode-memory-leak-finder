@@ -42,8 +42,11 @@ export const unwrapResult = (rawResult) => {
           return rawResult
       }
     }
-    if (rawResult.result.result) {
+    if (rawResult.result.result && rawResult.result.result) {
       return rawResult.result.result
+    }
+    if (Object.keys(rawResult).length > 1) {
+      return rawResult
     }
     return rawResult.result
   }
