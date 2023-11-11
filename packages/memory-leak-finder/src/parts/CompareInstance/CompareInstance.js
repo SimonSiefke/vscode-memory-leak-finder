@@ -1,3 +1,3 @@
 export const compareInstance = (a, b) => {
-  return b.afterCount - a.afterCount
+  return b.count - a.count
 }
