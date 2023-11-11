@@ -18,6 +18,6 @@ export const stop = (session) => {
 
 export const compare = CompareDetachedDomNodes.compareDetachedDomNodes
 
-export const isLeak = ({ leaked }) => {
-  return leaked.length > 0
+export const isLeak = ({ before, after }) => {
+  return after.length > before.length
 }
