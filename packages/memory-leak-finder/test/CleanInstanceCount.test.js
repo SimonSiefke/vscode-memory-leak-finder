@@ -7,12 +7,14 @@ test('cleanInstanceCount', () => {
     lineNumber: 1552,
     columnNumber: 2776,
   }
-  const scriptMap = {}
+  const scriptMap = {
+    16: { url: 'index.js', sourceMapUrl: 'index.js.map' },
+  }
   expect(CleanInstanceCount.cleanInstanceCount(instance, constructorLocation, scriptMap)).toEqual({
     columnNumber: 2776,
     lineNumber: 1552,
     scriptId: '16',
-    sourceMaps: [''],
-    stack: [''],
+    sourceMaps: ['index.js.map'],
+    stack: ['index.js:1552:2776'],
   })
 })
