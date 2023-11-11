@@ -9,7 +9,6 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 export const getRealObjectCount = async (session) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Object,
-    includeCommandLineAPI: true,
     returnByValue: false,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {

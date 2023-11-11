@@ -10,7 +10,6 @@ import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues
 export const getDescriptors = async (session, prototype) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: prototype,
-    includeCommandLineAPI: true,
     returnByValue: false,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
