@@ -1,9 +1,4 @@
-const cleanSource = (source) => {
-  if (!source) {
-    return ''
-  }
-  return source.replace('out-vscode/vs/workbench/file:/mnt/vss/_work/1/s', '')
-}
+import * as CleanSource from '../CleanSource/CleanSource.js'
 
 export const getCleanPosition = (position) => {
   if (!position) {
@@ -12,6 +7,6 @@ export const getCleanPosition = (position) => {
   const { source } = position
   return {
     ...position,
-    source: cleanSource(source),
+    source: CleanSource.cleanSource(source),
   }
 }
