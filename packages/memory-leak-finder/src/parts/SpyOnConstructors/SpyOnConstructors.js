@@ -7,7 +7,22 @@ export const spyOnContructors = async (session, objectGroup, constructorsObjectI
   //    and calls the original prototype constructor
   await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
-  globalThis.___instanceStackTraces = []
+  const constructors = this
+
+  const getConstructor = instance => {
+    return instance.prototype
+  }
+
+  const unique = (array) => {
+    const result = []
+    for(const element of array){
+      if(!result.includes(element)){
+        result.push(element)
+      }
+    }
+    return result
+  }
+
 
 
   // based on https://github.com/sindresorhus/callsites
@@ -49,17 +64,28 @@ export const spyOnContructors = async (session, objectGroup, constructorsObjectI
     })
   }
 
-  const spyOnPropertyEventListeners = object => {
-    const eventListenerKeys = Object.keys(object).filter(isEventListenerKey)
-    for(const eventListenerKey of eventListenerKeys){
-      spyOnPropertyEventListener(object, eventListenerKey)
+  const spyOnPrototype = (object, originalPrototype) => {
+    const newPrototype = function(...args){
+      console.log('constructing', originalPrototype)
+      return Reflect.construct(originalPrototype, args)
     }
   }
 
-  for(const object of [HTMLElement.prototype, Document.prototype, window]){
-    spyOnPropertyEventListeners(object)
-
+  const spyOnPrototypes = (objects) => {
+    const seen = []
+    for(const object of constructors){
+      const originalPrototype = object.prototype
+      if(seen.includes(originalPrototype)){
+        continue
+      }
+      seen.push(originalPrototype)
+      spyOnPrototype(object, originalPrototype)
+    }
   }
+
+  globalThis.___instanceStackTraces = []
+
+  spyOnPrototypes(constructors)
 }
 `,
     objectGroup,
