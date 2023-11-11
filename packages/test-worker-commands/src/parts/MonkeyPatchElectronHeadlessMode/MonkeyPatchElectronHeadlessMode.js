@@ -1,6 +1,6 @@
 // overwrite electron module for headless mode
 export const monkeyPatchElectronScript = `
-const originalElectron=require('electron')
+const originalElectron = require('electron')
 const Module = require('node:module')
 
 const createElectronModule = () => {
