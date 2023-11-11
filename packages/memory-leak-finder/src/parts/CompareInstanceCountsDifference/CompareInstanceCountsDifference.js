@@ -1,6 +1,6 @@
 import * as PrettifyInstanceCounts from '../PrettifyInstanceCounts/PrettifyInstanceCounts.js'
 
-export const compareInstanceCountsDifference = (before, after) => {
+export const compareInstanceCountsDifference = async (before, after) => {
   const beforeMap = Object.create(null)
   for (const element of before) {
     beforeMap[element.name] = element.count
@@ -17,6 +17,6 @@ export const compareInstanceCountsDifference = (before, after) => {
       })
     }
   }
-  const prettyLeaked = PrettifyInstanceCounts.prettifyInstanceCounts(leaked)
+  const prettyLeaked = await PrettifyInstanceCounts.prettifyInstanceCounts(leaked)
   return prettyLeaked
 }
