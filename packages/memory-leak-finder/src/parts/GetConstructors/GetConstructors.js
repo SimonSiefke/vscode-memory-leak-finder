@@ -1,0 +1,32 @@
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+
+export const getConstructors = async (session, objectGroup, instancesObjectId) => {
+  const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
+    functionDeclaration: `function(){
+  const instances = this
+
+
+  const getConstructor = instance => {
+    return instance.prototype
+  }
+
+  const constructors = instances.map(getConstructor)
+
+  const unique = (array) => {
+    const result = []
+    for(const element of array){
+      if(!result.includes(element)){
+        result.push(element)
+      }
+    }
+    return result
+  }
+
+  const uniqueConstructors = unique(constructors)
+  return uniqueConstructors
+}`,
+    objectGroup,
+    objectId: instancesObjectId,
+  })
+  return fnResult1
+}
