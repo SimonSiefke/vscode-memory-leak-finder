@@ -9,7 +9,6 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 export const getNumberOfHtmlElements = async (session) => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.HtmlElement,
-    includeCommandLineAPI: true,
     returnByValue: false,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {

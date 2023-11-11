@@ -9,7 +9,6 @@ import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js
 export const getObjectCount = async (session, prototype) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: prototype,
-    includeCommandLineAPI: true,
     returnByValue: false,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
