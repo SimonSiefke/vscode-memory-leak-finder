@@ -14,5 +14,5 @@ export const getInstanceCounts = async (session, objectGroup, scriptMap) => {
   const fnResult1 = await GetInstanceCountArray.getInstanceCountArray(session, objectGroup, map)
   const fnResult2 = await GetConstructorLocations.getConstructorLocations(session, objectGroup, map)
   const cleanInstances = CleanInstanceCounts.cleanInstanceCounts(fnResult1, fnResult2, scriptMap)
-  return fnResult1
+  return cleanInstances
 }
