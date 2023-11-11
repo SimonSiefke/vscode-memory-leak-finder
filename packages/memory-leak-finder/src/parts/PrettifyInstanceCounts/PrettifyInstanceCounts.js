@@ -1,8 +1,10 @@
 import * as Assert from '../Assert/Assert.js'
 import * as CompareInstance from '../CompareInstance/CompareInstance.js'
+import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
 
-export const prettifyInstanceCounts = (instances) => {
+export const prettifyInstanceCounts = async (instances) => {
   Assert.array(instances)
   const prettyInstances = [...instances].sort(CompareInstance.compareInstance)
-  return prettyInstances
+  const cleanPrettyInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(prettyInstances)
+  return cleanPrettyInstances
 }

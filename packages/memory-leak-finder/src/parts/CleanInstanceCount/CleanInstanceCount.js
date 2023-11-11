@@ -9,7 +9,7 @@ export const cleanInstanceCount = (instance, constructorLocation, scriptMap) => 
   return {
     ...instance,
     ...constructorLocation,
-    url,
-    sourceMapUrl,
+    stack: [url],
+    sourceMaps: [sourceMapUrl],
   }
 }
