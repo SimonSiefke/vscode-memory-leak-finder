@@ -3,21 +3,10 @@ import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues
 import * as GetFunctionLocations from '../GetFunctionLocations/GetFunctionLocations.js'
 import * as GetFunctionObjectIds from '../GetFunctionObjectIds/GetFunctionObjectIds.js'
 
-export const getConstructorLocations = async (session, objectGroup, objects) => {
+export const getConstructorLocations = async (session, objectGroup, map) => {
   const fnResult2 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
-  const instances = this
-
-  const map = new Map()
-
-  for(const instance of instances){
-    if(map.has(instance.constructor)){
-      map.set(instance.constructor, map.get(instance.constructor) + 1)
-    } else {
-      map.set(instance.constructor, 1)
-    }
-  }
-
+  const map = this
   const array = []
 
   for(const [instanceConstructor, count] of map.entries()){
@@ -26,7 +15,7 @@ export const getConstructorLocations = async (session, objectGroup, objects) => 
 
   return array
 }`,
-    objectId: objects.objectId,
+    objectId: map.objectId,
     returnByValue: false,
     objectGroup,
   })
