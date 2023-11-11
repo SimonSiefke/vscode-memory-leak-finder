@@ -1,6 +1,6 @@
 import * as CompareInstanceCountsDifference from '../src/parts/CompareInstanceCountsDifference/CompareInstanceCountsDifference.js'
 
-test('compareInstanceCountsDifference', () => {
+test('compareInstanceCountsDifference', async () => {
   const before = [
     {
       name: 'LoaderEvent',
@@ -61,7 +61,7 @@ test('compareInstanceCountsDifference', () => {
       count: 2118,
     },
   ]
-  expect(CompareInstanceCountsDifference.compareInstanceCountsDifference(before, after)).toEqual([
+  expect(await CompareInstanceCountsDifference.compareInstanceCountsDifference(before, after)).toEqual([
     {
       name: 'UniqueContainer',
       count: 2460,
