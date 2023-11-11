@@ -27,10 +27,20 @@ test('compareDetachedDomNodes', () => {
     },
   ]
   expect(CompareDetachedDomNodes.compareDetachedDomNodes(before, after)).toEqual({
-    leaked: [
+    before: [
       {
-        type: 'object',
-        subtype: 'node',
+        className: 'HTMLDivElement',
+        description: 'div.suggest-details-container',
+        count: 1,
+      },
+    ],
+    after: [
+      {
+        className: 'HTMLDivElement',
+        description: 'div.suggest-details-container',
+        count: 1,
+      },
+      {
         className: 'HTMLDivElement',
         description: 'div.editor-widget.suggest-widget.no-icons',
         count: 1,

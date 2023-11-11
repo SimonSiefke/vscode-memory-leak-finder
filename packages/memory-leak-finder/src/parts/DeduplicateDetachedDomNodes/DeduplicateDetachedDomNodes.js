@@ -1,5 +1,9 @@
 import * as GetDomNodeHash from '../GetDomNodeHash/GetDomNodeHash.js'
 
+const compareNode = (a, b) => {
+  return b.count - a.count
+}
+
 export const deduplicatedDetachedDomNodes = (detachedDomNodes) => {
   const countMap = Object.create(null)
   const detachedDomNodeMap = Object.create(null)
@@ -13,10 +17,12 @@ export const deduplicatedDetachedDomNodes = (detachedDomNodes) => {
   const deduplicated = []
   for (const [key, value] of Object.entries(detachedDomNodeMap)) {
     const count = countMap[key]
+    const { objectId, type, subtype, ...rest } = value
     deduplicated.push({
-      ...value,
+      ...rest,
       count,
     })
   }
+  deduplicated.sort(compareNode)
   return deduplicated
 }
