@@ -14,7 +14,11 @@ export const getFunctionLocation = async (session, objectId) => {
   })
   const functionLocation = fnResult1.internalProperties.find(IsFunctionLocation.isFunctionLocation)
   if (!functionLocation) {
-    return undefined
+    return {
+      scriptId: '',
+      lineNumber: 0,
+      columnNumber: 0,
+    }
   }
   return functionLocation.value.value
 }
