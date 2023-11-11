@@ -6,7 +6,7 @@ import * as GetSourceMapUrlFromScriptMap from '../GetSourceMapUrlFromScriptMap/G
 export const cleanEventListener = (eventListener, scriptMap) => {
   Assert.object(eventListener)
   Assert.object(scriptMap)
-  const { url, sourceMapUrl } = GetSourceMapUrlFromScriptMap.getSourceMapUrlFromScriptMap(eventListener, scriptMap)
+  const { url, sourceMapUrl } = GetSourceMapUrlFromScriptMap.getSourceMapUrlFromScriptMap(eventListener.scriptId, scriptMap)
   const prettyUrl = GetPrettyEventListenerUrl.getPrettyEventListenerUrl(url)
   const stack = [`listener (${prettyUrl}:${eventListener.lineNumber}:${eventListener.columnNumber})`]
   const sourceMaps = [sourceMapUrl]
