@@ -23,5 +23,5 @@ export const getFunctionLocation = async (session, objectId) => {
   if (!functionLocation) {
     return undefined
   }
-  return functionLocation.value
+  return functionLocation.value.value
 }
