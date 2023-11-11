@@ -10,7 +10,6 @@ export const getEventListenerCount = async (session) => {
   try {
     const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
       expression: PrototypeExpression.EventTarget,
-      includeCommandLineAPI: true,
       returnByValue: false,
     })
     const objects = await DevtoolsProtocolRuntime.queryObjects(session, {

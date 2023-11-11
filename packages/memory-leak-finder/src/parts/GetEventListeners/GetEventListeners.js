@@ -14,7 +14,6 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 export const getEventListeners = async (session, objectGroup, scriptMap) => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.EventTarget,
-    includeCommandLineAPI: true,
     returnByValue: false,
     objectGroup,
   })

@@ -4,7 +4,6 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 export const getMapSize = async (session) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Map,
-    includeCommandLineAPI: true,
     returnByValue: false,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
