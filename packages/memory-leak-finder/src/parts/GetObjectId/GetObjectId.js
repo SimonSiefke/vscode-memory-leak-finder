@@ -1,3 +1,3 @@
 export const getObjectId = (value) => {
-  return value.objectId
+  return value.objectId || ''
 }
