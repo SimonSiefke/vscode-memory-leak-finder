@@ -1,7 +1,7 @@
+import * as CompareInstanceCountsDifference from '../CompareInstanceCountsDifference/CompareInstanceCountsDifference.js'
 import * as GetInstanceCounts from '../GetInstanceCounts/GetInstanceCounts.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
-import * as CompareInstanceCountsDifference from '../CompareInstanceCountsDifference/CompareInstanceCountsDifference.js'
 
 export const id = MeasureId.InstanceCountsDifference
 
