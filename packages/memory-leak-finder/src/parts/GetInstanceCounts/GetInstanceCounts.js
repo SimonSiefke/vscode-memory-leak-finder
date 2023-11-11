@@ -38,7 +38,9 @@ export const getInstanceCounts = async (session, objectGroup) => {
     HTMLCollection,
     FocusEvent,
     Promise,
-    HTMLLinkElement
+    HTMLLinkElement,
+    HTMLLIElement,
+    HTMLAnchorElement
   ]
 
   const isInstance = (object) => {
