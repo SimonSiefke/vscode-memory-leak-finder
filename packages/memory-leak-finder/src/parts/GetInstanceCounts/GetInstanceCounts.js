@@ -1,53 +1,11 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
+import * as GetInstances from '../GetInstances/GetInstances.js'
 
 export const getInstanceCounts = async (session, objectGroup) => {
-  const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
-    expression: PrototypeExpression.Object,
-    returnByValue: false,
-    objectGroup,
-  })
-  const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
-    prototypeObjectId: prototypeDescriptor.objectId,
-    objectGroup,
-  })
+  const objects = await GetInstances.getInstances(session, objectGroup)
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
-  const objects = this
-
-  const nativeConstructors = [
-    Object,
-    Array,
-    Function,
-    Set,
-    Map,
-    WeakMap,
-    WeakSet,
-    RegExp,
-    Node,
-    HTMLScriptElement,
-    DOMRectReadOnly,
-    DOMRect,
-    HTMLHtmlElement,
-    Node,
-    DOMTokenList,
-    HTMLUListElement,
-    HTMLStyleElement,
-    HTMLDivElement,
-    HTMLCollection,
-    FocusEvent,
-    Promise,
-    HTMLLinkElement,
-    HTMLLIElement,
-    HTMLAnchorElement,
-    HTMLSpanElement
-  ]
-
-  const isInstance = (object) => {
-    return object && !nativeConstructors.includes(object.constructor)
-  }
-
-  const instances = objects.filter(isInstance)
+  const instances = this
 
   const map = new Map()
 
@@ -70,7 +28,7 @@ export const getInstanceCounts = async (session, objectGroup) => {
 
   return array
 }`,
-    objectId: objects.objects.objectId,
+    objectId: objects.objectId,
     returnByValue: true,
     objectGroup,
   })
