@@ -6,7 +6,6 @@ export const getPromises = async (session, objectGroup) => {
   // TODO get promises array with [[PromiseState]] and [[PromiseResult]]
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Promise,
-    includeCommandLineAPI: true,
     returnByValue: false,
     objectGroup,
   })

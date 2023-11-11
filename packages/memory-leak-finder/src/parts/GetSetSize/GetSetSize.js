@@ -4,7 +4,6 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 export const getSetSize = async (session) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Set,
-    includeCommandLineAPI: true,
     returnByValue: false,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {

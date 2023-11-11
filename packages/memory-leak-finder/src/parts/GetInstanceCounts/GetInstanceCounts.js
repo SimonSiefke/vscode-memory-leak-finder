@@ -4,7 +4,6 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 export const getInstanceCounts = async (session, objectGroup) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Object,
-    includeCommandLineAPI: true,
     returnByValue: false,
     objectGroup,
   })

@@ -46,7 +46,6 @@ export const stopTrackingTimeouts = async (session, objectGroup) => {
 export const getTimeoutCount = async (session) => {
   const count = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: 'globalThis.___timeouts',
-    includeCommandLineAPI: true,
     returnByValue: false,
   })
   return count
