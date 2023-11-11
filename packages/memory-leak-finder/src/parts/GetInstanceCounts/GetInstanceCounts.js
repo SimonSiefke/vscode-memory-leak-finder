@@ -39,7 +39,8 @@ export const getInstanceCounts = async (session, objectGroup) => {
     Promise,
     HTMLLinkElement,
     HTMLLIElement,
-    HTMLAnchorElement
+    HTMLAnchorElement,
+    HTMLSpanElement
   ]
 
   const isInstance = (object) => {
