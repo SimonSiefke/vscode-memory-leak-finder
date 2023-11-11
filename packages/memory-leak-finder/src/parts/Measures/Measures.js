@@ -16,6 +16,7 @@ export * as MeasureMediaQueryListCount from '../MeasureMediaQueryListCount/Measu
 export * as MeasureMutationObserverCount from '../MeasureMutationObserverCount/MeasureMutationObserverCount.js'
 export * as MeasureObjectCount from '../MeasureObjectCount/MeasureObjectCount.js'
 export * as MeasurePromiseCount from '../MeasurePromiseCount/MeasurePromiseCount.js'
+export * as MeasurePromises from '../MeasurePromises/MeasurePromises.js'
 export * as MeasureRealObjectCount from '../MeasureRealObjectCount/MeasureRealObjectCount.js'
 export * as MeasureRegexCount from '../MeasureRegexCount/MeasureRegexCount.js'
 export * as MeasureResizeObserverCount from '../MeasureResizeObserverCount/MeasureResizeObserverCount.js'
