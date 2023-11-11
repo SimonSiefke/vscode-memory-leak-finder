@@ -6,7 +6,7 @@ export const getConstructors = async (session, objectGroup, instancesObjectId) =
   const instances = this
 
   const getConstructor = instance => {
-    return instance.prototype
+    return instance.constructor
   }
 
   const unique = (array) => {
