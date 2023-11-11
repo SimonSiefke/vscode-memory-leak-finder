@@ -1,7 +1,7 @@
 import * as GetInstanceCounts from '../GetInstanceCounts/GetInstanceCounts.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
-import * as CompareInstanceCounts from '../CompareInstanceCounts/CompareInstanceCounts.js'
+import * as CompareInstanceCountsDifference from '../CompareInstanceCountsDifference/CompareInstanceCountsDifference.js'
 
 export const id = MeasureId.InstanceCountsDifference
 
@@ -18,4 +18,4 @@ export const stop = (session, objectGroup) => {
   return GetInstanceCounts.getInstanceCounts(session, objectGroup)
 }
 
-export const compare = CompareInstanceCounts.compareInstanceCounts
+export const compare = CompareInstanceCountsDifference.compareInstanceCountsDifference
