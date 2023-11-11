@@ -12,7 +12,7 @@ test('cleanInstanceCount', () => {
     columnNumber: 2776,
     lineNumber: 1552,
     scriptId: '16',
-    sourceMapUrl: '',
-    url: '',
+    sourceMaps: [''],
+    stack: [''],
   })
 })
