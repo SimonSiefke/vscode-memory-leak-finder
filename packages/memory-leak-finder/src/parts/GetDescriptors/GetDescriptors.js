@@ -78,6 +78,6 @@ return detachedRoots
     objectId: fnResult1.objectId,
     ownProperties: true,
   })
-  const descriptors = GetDescriptorValues.getDescriptorValues(fnResult2)
+  const descriptors = GetDescriptorValues.getDescriptorValues(fnResult2.result)
   return descriptors
 }

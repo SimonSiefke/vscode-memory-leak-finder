@@ -22,6 +22,6 @@ export const getEventTargets = async (session, objectGroup, scriptMap) => {
     objectId: objects.objects.objectId,
     ownProperties: true,
   })
-  const descriptors = GetDescriptors.getDescriptorValues(fnResult1)
+  const descriptors = GetDescriptors.getDescriptorValues(fnResult1.result)
   return descriptors
 }
