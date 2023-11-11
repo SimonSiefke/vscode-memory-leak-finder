@@ -2,6 +2,7 @@ import * as CompareInstanceCountsDifference from '../CompareInstanceCountsDiffer
 import * as GetInstanceCounts from '../GetInstanceCounts/GetInstanceCounts.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as StartTrackingInstanceCounts from '../StartTrackingInstanceCounts/StartTrackingInstanceCounts.js'
 
 export const id = MeasureId.InstanceCountsDifferenceWithStackTraces
 
@@ -10,7 +11,8 @@ export const create = (session) => {
   return [session, objectGroup]
 }
 
-export const start = (session, objectGroup) => {
+export const start = async (session, objectGroup) => {
+  await StartTrackingInstanceCounts.startTrackingInstanceCounts(session, objectGroup)
   return GetInstanceCounts.getInstanceCounts(session, objectGroup)
 }
 
