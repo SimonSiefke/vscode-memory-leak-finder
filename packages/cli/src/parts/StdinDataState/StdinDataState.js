@@ -2,29 +2,29 @@ import * as ModeType from '../ModeType/ModeType.js'
 import * as Character from '../Character/Character.js'
 
 export const state = {
-  value: Character.EmptyString,
-  mode: ModeType.Waiting,
   buffering: false,
-  headless: false,
-  watch: false,
   checkLeaks: false,
-  runs: 1,
-  recordVideo: false,
   cwd: Character.EmptyString,
+  filter: Character.EmptyString,
+  headless: false,
   measure: Character.EmptyString,
+  mode: ModeType.Waiting,
+  recordVideo: false,
+  runs: 1,
+  value: Character.EmptyString,
+  watch: false,
 }
 
 export const setState = (newState) => {
-  state.value = newState.value
-  state.mode = newState.mode
-  state.headless = newState.headless
-  state.watch = newState.watch
   state.checkLeaks = newState.checkLeaks
-  state.runs = newState.runs
-  state.recordVideo = newState.recordVideo
   state.cwd = newState.cwd
+  state.headless = newState.headless
   state.measure = newState.measure
-  state.filter = newState.filter
+  state.mode = newState.mode
+  state.recordVideo = newState.recordVideo
+  state.runs = newState.runs
+  state.value = newState.value
+  state.watch = newState.watch
 }
 
 export const setBuffering = (value) => {

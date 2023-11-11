@@ -13,7 +13,7 @@ export const run = async () => {
     cwd: options.cwd,
     headless: options.headless,
     measure: options.measure,
-    filter: options.filter,
+    value: options.filter,
   })
   return InitialStart.initialStart(options)
 }
