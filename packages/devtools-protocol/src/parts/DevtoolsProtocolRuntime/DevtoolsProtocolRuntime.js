@@ -21,7 +21,7 @@ export const callFunctionOn = (session, options) => {
 
 /**
  *
- * @param {{objectId: string, ownProperties?:boolean, generatePreview?:boolean}} options
+ * @param {{objectId: string, ownProperties?:boolean, generatePreview?:boolean, accessorPropertiesOnly?:boolean, nonIndexedPropertiesOnly?: boolean}} options
  * @returns
  */
 export const getProperties = (session, options) => {

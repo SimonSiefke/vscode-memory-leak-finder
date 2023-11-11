@@ -10,11 +10,11 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  return GetPromises.getPromises(session)
+  return GetPromises.getPromises(session, objectGroup)
 }
 
 export const stop = (session, objectGroup) => {
-  return GetPromises.getPromises(session)
+  return GetPromises.getPromises(session, objectGroup)
 }
 
 export const compare = (before, after) => {
