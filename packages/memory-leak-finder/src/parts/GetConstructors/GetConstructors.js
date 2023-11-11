@@ -10,8 +10,6 @@ export const getConstructors = async (session, objectGroup, instancesObjectId) =
     return instance.prototype
   }
 
-  const constructors = instances.map(getConstructor)
-
   const unique = (array) => {
     const result = []
     for(const element of array){
@@ -22,6 +20,7 @@ export const getConstructors = async (session, objectGroup, instancesObjectId) =
     return result
   }
 
+  const constructors = instances.map(getConstructor)
   const uniqueConstructors = unique(constructors)
   return uniqueConstructors
 }`,
