@@ -32,46 +32,21 @@ export const spyOnContructors = async (session, objectGroup, constructorsObjectI
     return stack.join('\\n')
   }
 
-
-  // based on https://gist.github.com/nolanlawson/0e18b8d7b5f6eb11554b5aa1fc4b5a4a
-  const originalAddEventListener = Node.prototype.addEventListener
-  Node.prototype.addEventListener = function (...args){
-    const stackTrace = callsites()
-    globalThis.___eventListenerStackTraces.push({args, stackTrace})
-    return originalAddEventListener.apply(this, args)
-  }
-
-  // based on https://github.com/facebook/jest/pull/5107/files
-  const spyOnPropertyEventListener = (object, eventListenerKey) => {
-    const descriptor = Object.getOwnPropertyDescriptor(object, eventListenerKey)
-    if(!descriptor.configurable){
-      return
-    }
-    Object.defineProperty(object, eventListenerKey, {
-      set(newValue){
-        const stackTrace = callsites()
-        globalThis.___eventListenerStackTraces.push({args: [eventListenerKey, newValue], stackTrace})
-        descriptor.set.call(this, newValue)
-      },
-      get(){
-        return descriptor.get.call(this)
-      },
-      configurable: true,
-      writeable: true,
-      enumerable: true
-    })
-  }
-
   const spyOnPrototype = (object, originalPrototype) => {
     const newPrototype = function(...args){
       console.log('constructing', originalPrototype)
       return Reflect.construct(originalPrototype, args)
     }
+    try {
+      Object.setPrototypeOf(object, newPrototype)
+    } catch (error){
+      console.error(error)
+    }
   }
 
   const spyOnPrototypes = (objects) => {
     const seen = []
-    for(const object of constructors){
+    for(const object of objects){
       const originalPrototype = object.prototype
       if(seen.includes(originalPrototype)){
         continue
