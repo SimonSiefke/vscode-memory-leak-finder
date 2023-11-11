@@ -17,8 +17,6 @@ test('deduplicateDetachedDomNodes', () => {
   ]
   expect(DeduplicateDetachedDomNodes.deduplicatedDetachedDomNodes(detachedDomNodes)).toEqual([
     {
-      type: 'object',
-      subtype: 'node',
       className: 'HTMLAnchorElement',
       description: 'a.action-label.codicon.codicon-references',
       count: 2,
