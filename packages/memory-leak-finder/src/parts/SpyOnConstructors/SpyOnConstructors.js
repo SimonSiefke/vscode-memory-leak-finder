@@ -23,8 +23,6 @@ export const spyOnContructors = async (session, objectGroup, constructorsObjectI
     return result
   }
 
-
-
   // based on https://github.com/sindresorhus/callsites
   const callsites = () => {
     const _prepareStackTrace = Error.prepareStackTrace;

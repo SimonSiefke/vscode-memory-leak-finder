@@ -5,7 +5,6 @@ export const getConstructors = async (session, objectGroup, instancesObjectId) =
     functionDeclaration: `function(){
   const instances = this
 
-
   const getConstructor = instance => {
     return instance.prototype
   }
@@ -13,7 +12,7 @@ export const getConstructors = async (session, objectGroup, instancesObjectId) =
   const unique = (array) => {
     const result = []
     for(const element of array){
-      if(!result.includes(element)){
+      if(element && !result.includes(element)){
         result.push(element)
       }
     }
