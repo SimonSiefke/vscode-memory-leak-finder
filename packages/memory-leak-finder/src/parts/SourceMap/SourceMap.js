@@ -1,5 +1,6 @@
 import { SourceMapConsumer } from 'source-map'
 import * as Assert from '../Assert/Assert.js'
+import * as GetOriginalClassName from '../GetOriginalClassName/GetOriginalClassName.js'
 
 export const getOriginalPosition = async (sourceMap, line, column) => {
   Assert.object(sourceMap)
@@ -19,18 +20,23 @@ export const getOriginalPosition = async (sourceMap, line, column) => {
   }
 }
 
-export const getOriginalPositions = async (sourceMap, positions) => {
+export const getOriginalPositions = async (sourceMap, positions, classNames) => {
   Assert.object(sourceMap)
   Assert.array(positions)
   const originalPositions = await SourceMapConsumer.with(sourceMap, null, (consumer) => {
     const originalPositions = []
     for (const position of positions) {
-      originalPositions.push(
-        consumer.originalPositionFor({
-          line: position.line + 1,
-          column: position.column + 1,
-        }),
-      )
+      const originalPosition = consumer.originalPositionFor({
+        line: position.line + 1,
+        column: position.column + 1,
+      })
+      if (originalPosition.source) {
+        const index = sourceMap.sources.indexOf(originalPosition.source)
+        const originalCode = sourceMap.sourcesContent[index]
+        const originalClassName = GetOriginalClassName.getOriginalClassName(originalCode, originalPosition.line, originalPosition.column)
+        originalPosition.name = originalClassName
+      }
+      originalPositions.push(originalPosition)
     }
     return originalPositions
   })
