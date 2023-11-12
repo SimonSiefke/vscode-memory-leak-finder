@@ -16,7 +16,7 @@ export const getSourceMapUrl = (eventListener) => {
   if (!parsed) {
     return emptySourceMapUrl
   }
-  const sourceMapUrl = sourceMaps[0]
+  const sourceMapUrl = sourceMaps[0] || ''
   return {
     sourceMapUrl,
     line: parsed.line,
