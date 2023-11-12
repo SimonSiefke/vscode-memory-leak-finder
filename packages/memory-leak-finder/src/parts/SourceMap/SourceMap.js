@@ -25,10 +25,12 @@ export const getOriginalPositions = async (sourceMap, positions, classNames) => 
   Assert.array(positions)
   const originalPositions = await SourceMapConsumer.with(sourceMap, null, (consumer) => {
     const originalPositions = []
-    for (const position of positions) {
+    for (let i = 0; i < positions.length; i += 2) {
+      const line = positions[i]
+      const column = positions[i + 1]
       const originalPosition = consumer.originalPositionFor({
-        line: position.line + 1,
-        column: position.column + 1,
+        line: line + 1,
+        column: column + 1,
       })
       if (classNames && originalPosition.source) {
         const index = sourceMap.sources.indexOf(originalPosition.source)

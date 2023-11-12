@@ -5,7 +5,7 @@ export const getSourceMapUrlMap = (eventListeners) => {
   for (const eventListener of eventListeners) {
     const { sourceMapUrl, line, column } = GetSourceMapUrl.getSourceMapUrl(eventListener)
     map[sourceMapUrl] ||= []
-    map[sourceMapUrl].push({ line, column })
+    map[sourceMapUrl].push(line, column)
   }
   return map
 }
