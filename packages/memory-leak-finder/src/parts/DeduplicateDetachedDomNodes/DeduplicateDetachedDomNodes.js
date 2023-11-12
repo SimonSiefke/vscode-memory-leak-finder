@@ -1,4 +1,5 @@
 import * as GetDomNodeHash from '../GetDomNodeHash/GetDomNodeHash.js'
+import * as Arrays from '../Arrays/Arrays.js'
 
 const compareNode = (a, b) => {
   return b.count - a.count
@@ -23,6 +24,6 @@ export const deduplicatedDetachedDomNodes = (detachedDomNodes) => {
       count,
     })
   }
-  deduplicated.sort(compareNode)
-  return deduplicated
+  const sorted = Arrays.toSorted(deduplicated, compareNode)
+  return sorted
 }
