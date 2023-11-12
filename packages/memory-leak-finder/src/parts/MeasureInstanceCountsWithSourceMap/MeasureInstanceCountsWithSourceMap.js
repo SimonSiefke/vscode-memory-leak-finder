@@ -1,7 +1,7 @@
-import * as GetInstanceCounts from '../GetInstanceCounts/GetInstanceCounts.js'
+import * as CompareInstanceCountsWithSourceMap from '../CompareInstanceCountsWithSourceMap/CompareInstanceCountsWithSourceMap.js'
+import * as GetInstanceCountsWithSourceMap from '../GetInstanceCountsWithSourceMap/GetInstanceCountsWithSourceMap.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
-import * as CompareInstanceCounts from '../CompareInstanceCounts/CompareInstanceCounts.js'
 
 export const id = MeasureId.InstanceCountsWithSourceMap
 
@@ -24,13 +24,13 @@ export const create = (session) => {
 
 export const start = async (session, objectGroup, scriptMap) => {
   await session.invoke('Debugger.enable')
-  return GetInstanceCounts.getInstanceCounts(session, objectGroup, scriptMap)
+  return GetInstanceCountsWithSourceMap.getInstanceCountsWithSourceMap(session, objectGroup, scriptMap)
 }
 
 export const stop = async (session, objectGroup, scriptMap, handleScriptParsed) => {
   session.off('Debugger.scriptParsed', handleScriptParsed)
   await session.invoke('Debugger.disable')
-  return GetInstanceCounts.getInstanceCounts(session, objectGroup, scriptMap)
+  return GetInstanceCountsWithSourceMap.getInstanceCountsWithSourceMap(session, objectGroup, scriptMap)
 }
 
-export const compare = CompareInstanceCounts.compareInstanceCounts
+export const compare = CompareInstanceCountsWithSourceMap.compareInstanceCountsWithSourceMap
