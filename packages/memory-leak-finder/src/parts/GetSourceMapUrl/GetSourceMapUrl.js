@@ -1,18 +1,4 @@
-const RE_LINE_COLUMN = /(\d+):(\d+)/
-
-const parseLineAndColumn = (line) => {
-  if (!line) {
-    return undefined
-  }
-  const match = line.match(RE_LINE_COLUMN)
-  if (!match) {
-    return undefined
-  }
-  return {
-    line: parseInt(match[1]),
-    column: parseInt(match[2]),
-  }
-}
+import * as ParseLineAndColumn from '../ParseLineAndColumn/ParseLineAndColumn.js'
 
 const emptySourceMapUrl = {
   sourceMapUrl: '',
@@ -26,7 +12,7 @@ export const getSourceMapUrl = (eventListener) => {
     return emptySourceMapUrl
   }
   const firstStackLine = stack[0]
-  const parsed = parseLineAndColumn(firstStackLine)
+  const parsed = ParseLineAndColumn.parseLineAndColumn(firstStackLine)
   if (!parsed) {
     return emptySourceMapUrl
   }
