@@ -3,11 +3,12 @@ import { mkdir, readFile } from 'fs/promises'
 import got from 'got'
 import { dirname, join } from 'path'
 import { pipeline } from 'stream/promises'
+import * as Hash from '../Hash/Hash.js'
 import * as Root from '../Root/Root.js'
 
 const getOutFileName = (url) => {
-  const slashIndex = url.lastIndexOf('/')
-  return url.slice(slashIndex)
+  const hash = Hash.hash(url)
+  return `${hash}.js.map`
 }
 
 export const loadSourceMap = async (url) => {
