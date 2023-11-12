@@ -12,9 +12,6 @@ test('getSourceMapUrlMap', () => {
     },
   ]
   expect(GetSourceMapUrlMap.getSourceMapUrlMap(eventListeners)).toEqual({
-    'index.js.map': [
-      { line: 1, column: 1 },
-      { line: 1, column: 1 },
-    ],
+    'index.js.map': [1, 1, 1, 1],
   })
 })
