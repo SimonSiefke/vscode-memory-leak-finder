@@ -1,6 +1,6 @@
 import * as Arrays from '../Arrays/Arrays.js'
+import * as Assert from '../Assert/Assert.js'
 import * as GetSourceMapUrl from '../GetSourceMapUrl/GetSourceMapUrl.js'
-import * as GetSourceMapUrlMap from '../GetSourceMapUrlMap/GetSourceMapUrlMap.js'
 
 const compareCount = (a, b) => {
   return b.count - a.count
@@ -17,9 +17,11 @@ const getIndex = (values, line, column) => {
   return -1
 }
 
-export const combineEventListenersWithSourceMapResults = (eventListeners, cleanPositionMap) => {
+export const combineEventListenersWithSourceMapResults = (eventListeners, map, cleanPositionMap) => {
+  Assert.array(eventListeners)
+  Assert.object(map)
+  Assert.object(cleanPositionMap)
   const newEventListeners = []
-  const map = GetSourceMapUrlMap.getSourceMapUrlMap(eventListeners)
   for (const eventListener of eventListeners) {
     const { sourceMapUrl, line, column } = GetSourceMapUrl.getSourceMapUrl(eventListener)
     const index = getIndex(map[sourceMapUrl], line, column)

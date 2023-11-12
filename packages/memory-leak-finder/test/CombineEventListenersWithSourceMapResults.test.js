@@ -1,4 +1,5 @@
 import * as CombineEventListenersWithSourceMapResults from '../src/parts/CombineEventListenersWithSourceMapResults/CombineEventListenersWithSourceMapResults.js'
+import * as GetSourceMapUrlMap from '../src/parts/GetSourceMapUrlMap/GetSourceMapUrlMap.js'
 
 test('combineEventListenersWithSourceMapResults', () => {
   const eventListeners = [
@@ -7,6 +8,7 @@ test('combineEventListenersWithSourceMapResults', () => {
       sourceMaps: ['index.js.map'],
     },
   ]
+  const map = GetSourceMapUrlMap.getSourceMapUrlMap(eventListeners)
   const cleanPositionMap = {
     'index.js.map': [
       {
@@ -17,7 +19,9 @@ test('combineEventListenersWithSourceMapResults', () => {
       },
     ],
   }
-  expect(CombineEventListenersWithSourceMapResults.combineEventListenersWithSourceMapResults(eventListeners, cleanPositionMap)).toEqual([
+  expect(
+    CombineEventListenersWithSourceMapResults.combineEventListenersWithSourceMapResults(eventListeners, map, cleanPositionMap),
+  ).toEqual([
     {
       stack: ['index.js:1:1'],
       originalStack: [`index.ts:2:2`],
@@ -36,6 +40,7 @@ test('combineEventListenersWithSourceMapResults - multiple inputs', () => {
       sourceMaps: ['index.js.map'],
     },
   ]
+  const map = GetSourceMapUrlMap.getSourceMapUrlMap(eventListeners)
   const cleanPositionMap = {
     'index.js.map': [
       {
@@ -46,7 +51,9 @@ test('combineEventListenersWithSourceMapResults - multiple inputs', () => {
       },
     ],
   }
-  expect(CombineEventListenersWithSourceMapResults.combineEventListenersWithSourceMapResults(eventListeners, cleanPositionMap)).toEqual([
+  expect(
+    CombineEventListenersWithSourceMapResults.combineEventListenersWithSourceMapResults(eventListeners, map, cleanPositionMap),
+  ).toEqual([
     {
       stack: ['index.js:1:1'],
       originalStack: [`index.ts:2:2`],
