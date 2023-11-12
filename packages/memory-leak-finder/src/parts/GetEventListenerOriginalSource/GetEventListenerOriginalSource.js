@@ -1,19 +1,7 @@
 import * as GetCleanPosition from '../GetCleanPosition/GetCleanPosition.js'
 import * as LoadSourceMap from '../LoadSourceMap/LoadSourceMap.js'
+import * as ParseLineAndColumn from '../ParseLineAndColumn/ParseLineAndColumn.js'
 import * as SourceMap from '../SourceMap/SourceMap.js'
-
-const RE_LINE_COLUMN = /(\d+):(\d+)/
-
-const parseLineAndColumn = (line) => {
-  const match = line.match(RE_LINE_COLUMN)
-  if (!match) {
-    return undefined
-  }
-  return {
-    line: parseInt(match[1]),
-    column: parseInt(match[2]),
-  }
-}
 
 export const getEventListenerOriginalSource = async (eventListener) => {
   const { stack, sourceMaps } = eventListener
@@ -21,7 +9,7 @@ export const getEventListenerOriginalSource = async (eventListener) => {
     return undefined
   }
   const firstStackLine = stack[0]
-  const parsed = parseLineAndColumn(firstStackLine)
+  const parsed = ParseLineAndColumn.parseLineAndColumn(firstStackLine)
   if (!parsed) {
     return undefined
   }
