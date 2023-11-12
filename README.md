@@ -35,7 +35,7 @@ npm run e2e
 | Component | Issue                                             | Status |
 | --------- | ------------------------------------------------- | ------ |
 | Menu      | https://github.com/microsoft/vscode/issues/195580 | Fixed  |
-| Dropdown  | https://github.com/microsoft/vscode/issues/197767 | Review |
+| Dropdown  | https://github.com/microsoft/vscode/issues/197767 | Fixed  |
 
 ## Credits
 
