@@ -1,6 +1,9 @@
 const RE_LINE_COLUMN = /(\d+):(\d+)/
 
 const parseLineAndColumn = (line) => {
+  if (!line) {
+    return undefined
+  }
   const match = line.match(RE_LINE_COLUMN)
   if (!match) {
     return undefined
