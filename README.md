@@ -36,6 +36,7 @@ npm run e2e
 | --------- | ------------------------------------------------- | ------ |
 | Menu      | https://github.com/microsoft/vscode/issues/195580 | Fixed  |
 | Dropdown  | https://github.com/microsoft/vscode/issues/197767 | Fixed  |
+| MenuBar   | https://github.com/microsoft/vscode/issues/198051 | Review |
 
 ## Credits
 
