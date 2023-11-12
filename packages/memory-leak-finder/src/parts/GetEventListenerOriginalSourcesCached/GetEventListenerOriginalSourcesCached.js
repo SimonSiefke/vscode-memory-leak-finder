@@ -17,5 +17,5 @@ export const getEventListenerOriginalSourcesCached = async (eventListeners, clas
     await JsonFile.writeJson(cachePath, result)
   }
   const sourceMapResults = await JsonFile.readJson(cachePath)
-  return CombineEventListenersWithSourceMapResults.combineEventListenersWithSourceMapResults(eventListeners, sourceMapResults)
+  return CombineEventListenersWithSourceMapResults.combineEventListenersWithSourceMapResults(sorted, sourceMapUrlMap, sourceMapResults)
 }
