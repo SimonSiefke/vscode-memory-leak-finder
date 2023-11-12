@@ -1,5 +1,6 @@
 const RE_CLASSNAME = /^[a-zA-Z\d]+/
 const classPrefix = 'class '
+const extendsPrefix = 'extends'
 
 export const getOriginalClassName = (sourceContent, originalLine, originalColumn) => {
   const lines = sourceContent.split('\n')
@@ -11,6 +12,13 @@ export const getOriginalClassName = (sourceContent, originalLine, originalColumn
       const match = rest.match(RE_CLASSNAME)
       if (match) {
         const originalClassName = match[0]
+        if (originalClassName === extendsPrefix) {
+          const other = rest.slice(extendsPrefix.length + 1)
+          const otherMatch = other.match(RE_CLASSNAME)
+          if (otherMatch) {
+            return `class extends ` + otherMatch[0]
+          }
+        }
         return originalClassName
       }
     }
