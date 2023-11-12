@@ -69,8 +69,11 @@ export const compare = async (before, after) => {
     }
   }
   const deduplicatedEventListeners = DeduplicateEventListeners.deduplicateEventListeners(leaked)
-  const cleanLeakedEventListeners =
-    await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(deduplicatedEventListeners)
+  const classNames = false
+  const cleanLeakedEventListeners = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(
+    deduplicatedEventListeners,
+    classNames,
+  )
   return cleanLeakedEventListeners
 }
 

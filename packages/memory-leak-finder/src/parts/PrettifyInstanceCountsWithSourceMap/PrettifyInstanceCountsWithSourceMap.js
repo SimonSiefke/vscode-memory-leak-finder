@@ -5,6 +5,10 @@ import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOrigi
 export const prettifyInstanceCountsWithSourceMap = async (instances) => {
   Assert.array(instances)
   const prettyInstances = [...instances].sort(CompareInstance.compareInstance)
-  const cleanPrettyInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(prettyInstances)
+  const classNames = true
+  const cleanPrettyInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(
+    prettyInstances,
+    classNames,
+  )
   return cleanPrettyInstances
 }
