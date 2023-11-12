@@ -1,5 +1,10 @@
 import * as GetCleanPositionsMap from '../GetCleanPositionsMap/GetCleanPositionsMap.js'
 import * as GetSourceMapUrl from '../GetSourceMapUrl/GetSourceMapUrl.js'
+import * as Arrays from '../Arrays/Arrays.js'
+
+const compareCount = (a, b) => {
+  return b.count - a.count
+}
 
 const getCleanEventlisteners = (cleanPositionMap, eventListeners) => {
   const newEventListeners = []
@@ -20,7 +25,8 @@ const getCleanEventlisteners = (cleanPositionMap, eventListeners) => {
       newEventListeners.push(eventListener)
     }
   }
-  return newEventListeners
+  const sorted = Arrays.toSorted(newEventListeners, compareCount)
+  return sorted
 }
 
 export const getEventListenerOriginalSources = async (eventListeners, sourceMapUrlMap, classNames) => {
