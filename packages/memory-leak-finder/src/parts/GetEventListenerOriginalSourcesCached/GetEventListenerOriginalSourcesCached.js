@@ -5,12 +5,12 @@ import * as Hash from '../Hash/Hash.js'
 import * as JsonFile from '../JsonFile/JsonFile.js'
 
 export const getEventListenerOriginalSourcesCached = async (eventListeners, classNames) => {
-  const map = GetSourceMapUrlMap.getSourceMapUrlMap(eventListeners)
-  const hash = Hash.hash({ ...map, classNames })
+  const sourceMapUrlMap = GetSourceMapUrlMap.getSourceMapUrlMap(eventListeners)
+  const hash = Hash.hash({ ...sourceMapUrlMap, classNames })
   const cachePath = GetResolvedSourceMapCachePath.getResolvedSourceMapCachePath(hash)
   if (!Exists.exists(cachePath)) {
     const GetEventListenerOriginalSources = await import('../GetEventListenerOriginalSources/GetEventListenerOriginalSources.js')
-    const result = await GetEventListenerOriginalSources.getEventListenerOriginalSources(eventListeners, classNames)
+    const result = await GetEventListenerOriginalSources.getEventListenerOriginalSources(eventListeners, sourceMapUrlMap, classNames)
     await JsonFile.writeJson(cachePath, result)
   }
   return JsonFile.readJson(cachePath)

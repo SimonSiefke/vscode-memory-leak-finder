@@ -1,6 +1,5 @@
 import * as GetCleanPositionsMap from '../GetCleanPositionsMap/GetCleanPositionsMap.js'
 import * as GetSourceMapUrl from '../GetSourceMapUrl/GetSourceMapUrl.js'
-import * as GetSourceMapUrlMap from '../GetSourceMapUrlMap/GetSourceMapUrlMap.js'
 
 const getCleanEventlisteners = (cleanPositionMap, eventListeners) => {
   const newEventListeners = []
@@ -24,9 +23,8 @@ const getCleanEventlisteners = (cleanPositionMap, eventListeners) => {
   return newEventListeners
 }
 
-export const getEventListenerOriginalSources = async (eventListeners, classNames) => {
-  const map = GetSourceMapUrlMap.getSourceMapUrlMap(eventListeners)
-  const cleanPositionMap = await GetCleanPositionsMap.getCleanPositionsMap(map, classNames)
+export const getEventListenerOriginalSources = async (eventListeners, sourceMapUrlMap, classNames) => {
+  const cleanPositionMap = await GetCleanPositionsMap.getCleanPositionsMap(sourceMapUrlMap, classNames)
   const cleanEventListeners = getCleanEventlisteners(cleanPositionMap, eventListeners)
   return cleanEventListeners
 }
