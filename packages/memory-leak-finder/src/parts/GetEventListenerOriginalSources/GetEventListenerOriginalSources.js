@@ -15,6 +15,7 @@ const getCleanEventlisteners = (cleanPositionMap, eventListeners) => {
       newEventListeners.push({
         ...rest,
         originalStack: [`${cleanPosition.source}:${cleanPosition.line}:${cleanPosition.column}`],
+        originalName: cleanPosition.name,
       })
     } else {
       newEventListeners.push(eventListener)
