@@ -30,7 +30,7 @@ export const getOriginalPositions = async (sourceMap, positions, classNames) => 
         line: position.line + 1,
         column: position.column + 1,
       })
-      if (originalPosition.source) {
+      if (classNames && originalPosition.source) {
         const index = sourceMap.sources.indexOf(originalPosition.source)
         const originalCode = sourceMap.sourcesContent[index]
         const originalClassName = GetOriginalClassName.getOriginalClassName(originalCode, originalPosition.line, originalPosition.column)

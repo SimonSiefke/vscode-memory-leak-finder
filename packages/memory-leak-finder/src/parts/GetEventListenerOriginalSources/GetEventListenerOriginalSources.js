@@ -24,9 +24,9 @@ const getCleanEventlisteners = (cleanPositionMap, eventListeners) => {
   return newEventListeners
 }
 
-export const getEventListenerOriginalSources = async (eventListeners) => {
+export const getEventListenerOriginalSources = async (eventListeners, classNames) => {
   const map = GetSourceMapUrlMap.getSourceMapUrlMap(eventListeners)
-  const cleanPositionMap = await GetCleanPositionsMap.getCleanPositionsMap(map)
+  const cleanPositionMap = await GetCleanPositionsMap.getCleanPositionsMap(map, classNames)
   const cleanEventListeners = getCleanEventlisteners(cleanPositionMap, eventListeners)
   return cleanEventListeners
 }
