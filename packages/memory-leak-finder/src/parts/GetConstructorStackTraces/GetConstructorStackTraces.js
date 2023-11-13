@@ -19,7 +19,6 @@ export const getConstructorStackTraces = async (session, objectGroup, key) => {
     returnByValue: true,
     objectGroup,
   })
-  console.log({ stackTraces })
   const betterStackTraces = stackTraces.map(getPrettyStackTrace)
   return betterStackTraces
 }
