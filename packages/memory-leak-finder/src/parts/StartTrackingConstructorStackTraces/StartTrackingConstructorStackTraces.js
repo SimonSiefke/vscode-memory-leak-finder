@@ -22,12 +22,14 @@ const callsites = () => {
 
 const mockGlobalConstructor = key => {
   const originalConstructor = globalThis[key]
-  globalThis['___stackTraces'+key] = []
+  const map = new WeakMap()
   globalThis['___original'+key] = originalConstructor
+  globalThis['___map'+key] = map
   globalThis[key] = function (...args){
     const stackTrace = callsites()
-    globalThis['___stackTraces'+key].push({stackTrace})
-    return Reflect.construct(originalConstructor, args)
+    const instance = Reflect.construct(originalConstructor, args)
+    map.set(instance, stackTrace)
+    return instance
   }
 }
 
