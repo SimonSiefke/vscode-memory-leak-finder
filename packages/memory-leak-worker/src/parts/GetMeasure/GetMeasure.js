@@ -34,6 +34,8 @@ export const getMeasure = (MemoryLeakFinder, measureId) => {
       return MemoryLeakFinder.Measures.MeasureInstanceCountsDifferenceWithStackTraces
     case 'intersection-observer-count':
       return MemoryLeakFinder.Measures.MeasureIntersectionObserverCount
+    case 'intersection-observers-with-stack-traces':
+      return MemoryLeakFinder.Measures.MeasureIntersectionObserversWithStackTraces
     case 'map-size':
       return MemoryLeakFinder.Measures.MapSize
     case 'media-query-list-count':
