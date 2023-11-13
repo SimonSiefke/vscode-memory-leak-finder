@@ -9,10 +9,28 @@ const getPrettyStackTrace = (value) => {
 }
 
 export const getConstructorStackTraces = async (session, objectGroup, key) => {
-  const stackTraces = await DevtoolsProtocolRuntime.evaluate(session, {
-    expression: `(()=>{
-  const getStackTraces = key => {
-    return globalThis['___stackTraces'+key]
+  const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
+    expression: `___original${key}.prototype`,
+    returnByValue: false,
+    objectGroup,
+  })
+  const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
+    prototypeObjectId: prototypeDescriptor.objectId,
+    objectGroup,
+  })
+  const stackTraces = await DevtoolsProtocolRuntime.callFunctionOn(session, {
+    functionDeclaration: `function(){
+  const objects = this
+  const getStackTraces = (objects, key) => {
+    const map = globalThis['___map'+key]
+    const stackTraces = []
+    for(const object of objects){
+      const value = map.get(object)
+      if(value){
+        stackTraces.push(value)
+      }
+    }
+    return stackTraces
   }
   return getStackTraces('${key}')
 })()`,
