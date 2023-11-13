@@ -12,8 +12,8 @@ export const stopTrackingEventListenerStackTraces = async (session, objectGroup,
 const unmockGlobalConstructor = key => {
   const originalConstructor = globalThis['___original'+key]
   globalThis[key] = originalConstructor
-  delete globalThis['___stackTraces'+key]
   delete globalThis['___original'+key]
+  delete globalThis['___map'+key]
 }
 
 unmockGlobalConstructor('${key}')
