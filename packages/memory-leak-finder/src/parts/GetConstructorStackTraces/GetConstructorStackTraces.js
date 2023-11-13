@@ -1,5 +1,4 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
 import * as SplitLines from '../SplitLines/SplitLines.js'
 
 const getPrettyStackTrace = (value) => {
@@ -11,7 +10,7 @@ const getPrettyStackTrace = (value) => {
 
 export const getConstructorStackTraces = async (session, objectGroup, key) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
-    expression: PrototypeExpression.MutationObserver,
+    expression: `___original${key}.prototype`,
     returnByValue: false,
     objectGroup,
   })
