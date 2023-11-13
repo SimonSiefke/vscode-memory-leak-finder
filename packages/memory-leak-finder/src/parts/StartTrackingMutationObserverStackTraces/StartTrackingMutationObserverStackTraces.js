@@ -1,3 +1,4 @@
+import * as ConstructorKey from '../ConstructorKey/ConstructorKey.js'
 import * as StartTrackingConstructorStackTraces from '../StartTrackingConstructorStackTraces/StartTrackingConstructorStackTraces.js'
 
 /**
@@ -6,5 +7,5 @@ import * as StartTrackingConstructorStackTraces from '../StartTrackingConstructo
  * @returns {Promise<any>}
  */
 export const startTrackingMutationObserverStackTraces = async (session, objectGroup) => {
-  await StartTrackingConstructorStackTraces.startTrackingMutationObserverStackTraces(session, objectGroup, 'MutationObserver')
+  await StartTrackingConstructorStackTraces.startTrackingMutationObserverStackTraces(session, objectGroup, ConstructorKey.MutationObserver)
 }
