@@ -1,3 +1,4 @@
+import * as Arrays from '../Arrays/Arrays.js'
 import * as CompareInstanceCountsWithSourceMap from '../CompareInstanceCountsWithSourceMap/CompareInstanceCountsWithSourceMap.js'
 import * as GetInstanceCountsWithSourceMap from '../GetInstanceCountsWithSourceMap/GetInstanceCountsWithSourceMap.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
@@ -34,3 +35,15 @@ export const stop = async (session, objectGroup, scriptMap, handleScriptParsed) 
 }
 
 export const compare = CompareInstanceCountsWithSourceMap.compareInstanceCountsWithSourceMap
+
+const getCount = (value) => {
+  return value.count
+}
+
+const getTotalCount = (instances) => {
+  return Arrays.sum(instances.map(getCount))
+}
+
+export const isLeak = ({ before, after }) => {
+  return getTotalCount(after) > getTotalCount(before)
+}
