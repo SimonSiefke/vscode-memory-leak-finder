@@ -1,6 +1,5 @@
-import * as CompareCount from '../CompareCount/CompareCount.js'
 import * as GetMutationObserverCount from '../GetMutationObserverCount/GetMutationObserverCount.js'
-import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
+import * as GetMutationObserversWithStackTraces from '../GetMutationObserversWithStackTraces/GetMutationObserversWithStackTraces.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 import * as StartTrackingMutationObserverStackTraces from '../StartTrackingMutationObserverStackTraces/StartTrackingMutationObserverStackTraces.js'
@@ -19,10 +18,15 @@ export const start = async (session, objectGroup) => {
 }
 
 export const stop = async (session, objectGroup) => {
+  const added = await GetMutationObserversWithStackTraces.getMutationObserversWithStackTraces(session, objectGroup)
   await StopTrackingMutationObserverStackTraces.stopTrackingMutationObserverStackTraces(session, objectGroup)
-  return GetMutationObserverCount.getMutationObserverCount(session)
+  return added
 }
 
-export const compare = CompareCount.compareCount
+export const compare = (before, after) => {
+  return after
+}
 
-export const isLeak = IsLeakCount.isLeakCount
+export const isLeak = (leaked) => {
+  return leaked.length > 0
+}
