@@ -1,4 +1,5 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import * as SplitLines from '../SplitLines/SplitLines.js'
 
 export const getConstructorStackTraces = async (session, objectGroup, key) => {
   const stackTraces = await DevtoolsProtocolRuntime.evaluate(session, {
@@ -11,6 +12,6 @@ export const getConstructorStackTraces = async (session, objectGroup, key) => {
     returnByValue: true,
     objectGroup,
   })
-  console.log({ stackTraces })
-  return stackTraces
+  const betterStackTraces = stackTraces.map(SplitLines.splitLines)
+  return betterStackTraces
 }
