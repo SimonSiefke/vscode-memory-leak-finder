@@ -19,3 +19,7 @@ export const stop = (session, objectGroup) => {
 }
 
 export const compare = CompareInstanceCountsDifference.compareInstanceCountsDifference
+
+export const isLeak = (leaked) => {
+  return leaked.length > 0
+}
