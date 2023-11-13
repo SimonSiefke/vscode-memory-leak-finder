@@ -15,7 +15,11 @@ export const create = ({ expect, page, VError }) => {
         await expect(titleBar).toBeVisible()
         const menuItem = page.locator(`.menubar-menu-button[aria-label="${text}"]`)
         await expect(menuItem).toBeVisible()
-        await menuItem.click()
+        const className = await menuItem.getAttribute('class')
+        const isOpen = className.includes('open')
+        if (!isOpen) {
+          await menuItem.click()
+        }
         const menu = page.locator('.monaco-menu .actions-container')
         await expect(menu).toBeVisible()
         await expect(menu).toBeFocused()
