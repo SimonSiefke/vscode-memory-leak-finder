@@ -32,9 +32,10 @@ export const getConstructorStackTraces = async (session, objectGroup, key) => {
     }
     return stackTraces
   }
-  return getStackTraces('${key}')
-})()`,
+  return getStackTraces(objects, '${key}')
+}`,
     returnByValue: true,
+    objectId: objects.objects.objectId,
     objectGroup,
   })
   const betterStackTraces = stackTraces.map(getPrettyStackTrace)
