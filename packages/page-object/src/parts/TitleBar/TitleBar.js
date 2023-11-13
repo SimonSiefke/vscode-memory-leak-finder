@@ -26,6 +26,9 @@ export const create = ({ expect, page, VError }) => {
     async showMenuFile() {
       return this.showMenu(TitleBarMenuItems.File)
     },
+    async showMenuEdit() {
+      return this.showMenu(TitleBarMenuItems.Edit)
+    },
     async hideMenu(text) {
       try {
         const titleBar = page.locator('.part.titlebar')
