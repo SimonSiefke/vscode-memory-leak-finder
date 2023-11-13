@@ -25,7 +25,8 @@ const mockGlobalConstructor = key => {
   globalThis['___stackTraces'+key] = []
   globalThis['___original'+key] = originalConstructor
   globalThis[key] = function (...args){
-    console.trace('constructed'+key)
+    const stackTrace = callsites()
+    globalThis['___stackTraces'+key].push({stackTrace})
     return Reflect.construct(originalConstructor, args)
   }
 }
