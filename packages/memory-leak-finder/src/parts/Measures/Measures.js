@@ -19,6 +19,7 @@ export * as MeasureIntersectionObserverCount from '../MeasureIntersectionObserve
 export * as MeasureMapSize from '../MeasureMapSize/MeasureMapSize.js'
 export * as MeasureMediaQueryListCount from '../MeasureMediaQueryListCount/MeasureMediaQueryListCount.js'
 export * as MeasureMutationObserverCount from '../MeasureMutationObserverCount/MeasureMutationObserverCount.js'
+export * as MeasureMutationObserversWithStackTraces from '../MeasureMutationObserversWithStackTraces/MeasureMutationObserversWithStackTraces.js'
 export * as MeasureObjectCount from '../MeasureObjectCount/MeasureObjectCount.js'
 export * as MeasurePromiseCount from '../MeasurePromiseCount/MeasurePromiseCount.js'
 export * as MeasurePromises from '../MeasurePromises/MeasurePromises.js'

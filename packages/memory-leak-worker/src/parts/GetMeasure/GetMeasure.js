@@ -40,6 +40,8 @@ export const getMeasure = (MemoryLeakFinder, measureId) => {
       return MemoryLeakFinder.Measures.MeasureMediaQueryListCount
     case 'mutation-observer-count':
       return MemoryLeakFinder.Measures.MeasureMutationObserverCount
+    case 'mutation-observers-with-stack-traces':
+      return MemoryLeakFinder.Measures.MeasureMutationObserversWithStackTrces
     case 'object-count':
       return MemoryLeakFinder.Measures.MeasureObjectCount
     case 'promise-count':
