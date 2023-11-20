@@ -14,6 +14,7 @@ export const run = async () => {
     headless: options.headless,
     measure: options.measure,
     value: options.filter,
+    measureAfter: options.measureAfter,
   })
   return InitialStart.initialStart(options)
 }

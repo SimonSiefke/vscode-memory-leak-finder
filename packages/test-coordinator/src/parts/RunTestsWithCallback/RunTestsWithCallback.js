@@ -19,7 +19,19 @@ import * as Time from '../Time/Time.js'
 // 5. pass websocket url to test worker and wait for connection
 // 6. pass matching files to test worker
 
-export const runTests = async (root, cwd, filterValue, headlessMode, color, checkLeaks, recordVideo, runs, measure, callback) => {
+export const runTests = async (
+  root,
+  cwd,
+  filterValue,
+  headlessMode,
+  color,
+  checkLeaks,
+  recordVideo,
+  runs,
+  measure,
+  measureAfter,
+  callback,
+) => {
   try {
     Assert.string(root)
     Assert.string(cwd)
@@ -30,6 +42,7 @@ export const runTests = async (root, cwd, filterValue, headlessMode, color, chec
     Assert.boolean(recordVideo)
     Assert.number(runs)
     Assert.string(measure)
+    Assert.boolean(measureAfter)
     let passed = 0
     let failed = 0
     let skipped = 0

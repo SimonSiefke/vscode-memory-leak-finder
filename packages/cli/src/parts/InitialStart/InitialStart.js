@@ -20,5 +20,6 @@ export const initialStart = async (options) => {
     options.cwd,
     options.runs,
     options.measure,
+    options.measureAfter,
   )
 }

@@ -25,6 +25,7 @@ export const handleStdinData = async (key) => {
       state.cwd,
       state.runs,
       state.measure,
+      state.measureAfter,
     )
   }
   if (newState.mode === ModeType.Interrupted) {
