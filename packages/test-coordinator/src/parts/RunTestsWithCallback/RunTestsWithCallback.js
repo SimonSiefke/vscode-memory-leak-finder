@@ -80,6 +80,11 @@ export const runTests = async (
         } else {
           let isLeak = false
           if (checkLeaks) {
+            if (measureAfter) {
+              for (let i = 0; i < 2; i++) {
+                await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, formattedPath.absolutePath, root, color)
+              }
+            }
             const before = await MemoryLeakFinder.start(memoryLeakWorkerIpc, connectionId)
             for (let i = 0; i < runs; i++) {
               await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, formattedPath.absolutePath, root, color)
