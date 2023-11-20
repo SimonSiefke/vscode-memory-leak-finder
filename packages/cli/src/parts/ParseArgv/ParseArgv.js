@@ -56,7 +56,7 @@ export const parseArgv = (argv) => {
   if (argv.includes('--only')) {
     options.filter = parseArgvString(argv, '--only')
   }
-  if (argv.includes('--measureAfter')) {
+  if (argv.includes('--measure-after')) {
     options.measureAfter = true
   }
   return options
