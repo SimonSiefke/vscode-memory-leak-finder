@@ -16,10 +16,10 @@ export const initialStart = async (options) => {
     options.headless,
     options.color,
     options.checkLeaks,
-    options.measureAfter,
     options.recordVideo,
     options.cwd,
     options.runs,
     options.measure,
+    options.measureAfter,
   )
 }
