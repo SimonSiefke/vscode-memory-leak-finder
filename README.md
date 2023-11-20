@@ -32,11 +32,12 @@ npm run e2e
 
 ## Memory Leaks
 
-| Component | Issue                                             | Status |
-| --------- | ------------------------------------------------- | ------ |
-| Menu      | https://github.com/microsoft/vscode/issues/195580 | Fixed  |
-| Dropdown  | https://github.com/microsoft/vscode/issues/197767 | Fixed  |
-| MenuBar   | https://github.com/microsoft/vscode/issues/198051 | Review |
+| Component            | Issue                                             | Status |
+| -------------------- | ------------------------------------------------- | ------ |
+| Menu                 | https://github.com/microsoft/vscode/issues/195580 | Fixed  |
+| Dropdown             | https://github.com/microsoft/vscode/issues/197767 | Fixed  |
+| MenuBar              | https://github.com/microsoft/vscode/issues/198051 | Review |
+| DefaultWorkerFactory | https://github.com/microsoft/vscode/issues/198709 | Review |
 
 ## Credits
 
