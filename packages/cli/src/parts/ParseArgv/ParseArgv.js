@@ -30,6 +30,7 @@ export const parseArgv = (argv) => {
     cwd: process.cwd(),
     filter: '',
     measure: 'event-listener-count',
+    measureAfter: false,
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -54,6 +55,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--only')) {
     options.filter = parseArgvString(argv, '--only')
+  }
+  if (argv.includes('--measureAfter')) {
+    options.measureAfter = true
   }
   return options
 }

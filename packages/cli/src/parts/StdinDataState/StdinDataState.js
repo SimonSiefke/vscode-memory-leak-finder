@@ -13,6 +13,7 @@ export const state = {
   runs: 1,
   value: Character.EmptyString,
   watch: false,
+  measureAfter: false,
 }
 
 export const setState = (newState) => {
@@ -25,6 +26,7 @@ export const setState = (newState) => {
   state.runs = newState.runs
   state.value = newState.value
   state.watch = newState.watch
+  state.measureAfter = newState.measureAfter
 }
 
 export const setBuffering = (value) => {
