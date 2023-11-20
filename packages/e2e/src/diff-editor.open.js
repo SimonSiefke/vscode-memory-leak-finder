@@ -1,23 +1,30 @@
-export const skip = true
+export const skip = process.platform === 'darwin'
 
-export const setup = async ({ tmpDir, writeFile, join, writeSettings }) => {
-  await writeFile(join(tmpDir, 'a.txt'), 'a')
-  await writeFile(join(tmpDir, 'b.txt'), 'b')
-  await writeSettings({
-    'window.titleBarStyle': 'custom',
-  })
+export const setup = async ({ Workspace, Editor, Explorer }) => {
+  await Workspace.setFiles([
+    {
+      name: 'a.txt',
+      content: 'a',
+    },
+    {
+      name: 'b.txt',
+      content: 'b',
+    },
+  ])
+  await Editor.closeAll()
+  await Explorer.focus()
+  await Explorer.shouldHaveItem('a.txt')
+  await Explorer.shouldHaveItem('b.txt')
 }
 
-export const run = async ({ Editor, Explorer, ContextMenu, page, expect }) => {
+export const run = async ({ Editor, Explorer, ContextMenu, DiffEditor, SideBar }) => {
+  await Explorer.focus()
   await Explorer.openContextMenu('a.txt')
   await ContextMenu.select('Select for Compare')
   await Explorer.openContextMenu('b.txt')
   await ContextMenu.select('Compare with Selected')
-  const original = page.locator('.editor.original .view-lines')
-  const modified = page.locator('.editor.modified .view-lines')
-  await expect(original).toBeVisible()
-  await expect(modified).toBeVisible()
-  await expect(original).toHaveText('a')
-  await expect(modified).toHaveText('b')
+  await SideBar.hide()
+  await DiffEditor.expectOriginal('a')
+  await DiffEditor.expectModified('b')
   await Editor.close()
 }
