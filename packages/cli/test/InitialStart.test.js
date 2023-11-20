@@ -57,7 +57,17 @@ test('initialStart - watch mode - start running', async () => {
   expect(SpecialStdin.start).toHaveBeenCalledTimes(1)
   expect(Stdout.write).not.toHaveBeenCalled()
   expect(StartRunning.startRunning).toHaveBeenCalledTimes(1)
-  expect(StartRunning.startRunning).toHaveBeenCalledWith('a', undefined, undefined, undefined, undefined, undefined, undefined, undefined)
+  expect(StartRunning.startRunning).toHaveBeenCalledWith(
+    'a',
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+  )
 })
 
 test('initialStart - start running', async () => {
@@ -69,5 +79,15 @@ test('initialStart - start running', async () => {
   expect(SpecialStdin.start).not.toHaveBeenCalled()
   expect(Stdout.write).not.toHaveBeenCalled()
   expect(StartRunning.startRunning).toHaveBeenCalledTimes(1)
-  expect(StartRunning.startRunning).toHaveBeenCalledWith('a', undefined, undefined, undefined, undefined, undefined, undefined, undefined)
+  expect(StartRunning.startRunning).toHaveBeenCalledWith(
+    'a',
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+  )
 })
