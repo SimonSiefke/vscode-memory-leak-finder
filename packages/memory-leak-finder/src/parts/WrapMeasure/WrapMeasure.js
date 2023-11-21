@@ -4,6 +4,7 @@ export const wrapMeasure = (measure) => {
       const args = measure.create(session, scriptMap)
       return {
         id: measure.id,
+        requiresDebugger: measure.requiresDebugger,
         start() {
           return measure.start(...args)
         },
