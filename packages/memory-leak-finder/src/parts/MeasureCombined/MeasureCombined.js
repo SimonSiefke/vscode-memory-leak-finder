@@ -1,5 +1,9 @@
 import * as MeasureId from '../MeasureId/MeasureId.js'
 
+const instancesRequiresDebugger = (measure) => {
+  return measure.requiresDebugger
+}
+
 export const combine = (...measures) => {
   const start = async () => {
     const beforeMap = Object.create(null)
@@ -29,10 +33,13 @@ export const combine = (...measures) => {
     return resultMap
   }
 
+  const requiresDebugger = measures.some(instancesRequiresDebugger)
+
   return {
     id: MeasureId.Combined,
     start,
     stop,
     compare,
+    requiresDebugger,
   }
 }

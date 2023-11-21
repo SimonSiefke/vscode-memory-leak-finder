@@ -6,37 +6,24 @@ import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 
 export const id = MeasureId.EventListeners
 
+export const requiresDebugger = true
+
 /**
  *
  * @param {any} session
  */
 
-export const create = (session) => {
+export const create = (session, scriptMap) => {
   const objectGroup = ObjectGroupId.create()
-  const scriptMap = Object.create(null)
-  const handleScriptParsed = (event) => {
-    const { url, scriptId, sourceMapURL } = event.params
-    if (!url) {
-      return
-    }
-    scriptMap[scriptId] = {
-      url,
-      sourceMapUrl: sourceMapURL,
-    }
-  }
-  session.on('Debugger.scriptParsed', handleScriptParsed)
-  return [session, objectGroup, scriptMap, handleScriptParsed]
+  return [session, objectGroup, scriptMap]
 }
 
 export const start = async (session, objectGroup, scriptMap) => {
-  await session.invoke('Debugger.enable')
   const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptMap)
   return result
 }
 
-export const stop = async (session, objectGroup, scriptMap, handleScriptParsed) => {
-  session.off('Debugger.scriptParsed', handleScriptParsed)
-  await session.invoke('Debugger.disable')
+export const stop = async (session, objectGroup, scriptMap) => {
   const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptMap)
   await DevtoolsProtocolRuntime.releaseObjectGroup(session, {
     objectGroup,

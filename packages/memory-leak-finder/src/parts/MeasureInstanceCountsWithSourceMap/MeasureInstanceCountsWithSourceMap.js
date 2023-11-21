@@ -6,31 +6,18 @@ import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 
 export const id = MeasureId.InstanceCountsWithSourceMap
 
-export const create = (session) => {
+export const requiresDebugger = true
+
+export const create = (session, scriptMap) => {
   const objectGroup = ObjectGroupId.create()
-  const scriptMap = Object.create(null)
-  const handleScriptParsed = (event) => {
-    const { url, scriptId, sourceMapURL } = event.params
-    if (!url) {
-      return
-    }
-    scriptMap[scriptId] = {
-      url,
-      sourceMapUrl: sourceMapURL,
-    }
-  }
-  session.on('Debugger.scriptParsed', handleScriptParsed)
-  return [session, objectGroup, scriptMap, handleScriptParsed]
+  return [session, objectGroup, scriptMap]
 }
 
 export const start = async (session, objectGroup, scriptMap) => {
-  await session.invoke('Debugger.enable')
   return GetInstanceCountsWithSourceMap.getInstanceCountsWithSourceMap(session, objectGroup, scriptMap)
 }
 
-export const stop = async (session, objectGroup, scriptMap, handleScriptParsed) => {
-  session.off('Debugger.scriptParsed', handleScriptParsed)
-  await session.invoke('Debugger.disable')
+export const stop = async (session, objectGroup, scriptMap) => {
   return GetInstanceCountsWithSourceMap.getInstanceCountsWithSourceMap(session, objectGroup, scriptMap)
 }
 

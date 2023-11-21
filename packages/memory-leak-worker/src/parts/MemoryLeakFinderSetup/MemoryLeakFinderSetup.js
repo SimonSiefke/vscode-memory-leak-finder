@@ -7,7 +7,23 @@ export const setup = async (connectionId, instanceId, measureId) => {
   try {
     const page = await WaitForPage.waitForPage({ index: 0 })
     const session = page.rpc
-    const measure = await GetCombinedMeasure.getCombinedMeasure(session, measureId)
+    const scriptMap = Object.create(null)
+    const measure = await GetCombinedMeasure.getCombinedMeasure(session, scriptMap, measureId)
+    // @ts-ignore
+    if (measure.requiresDebugger) {
+      const handleScriptParsed = (event) => {
+        const { url, scriptId, sourceMapURL } = event.params
+        if (!url) {
+          return
+        }
+        scriptMap[scriptId] = {
+          url,
+          sourceMapUrl: sourceMapURL,
+        }
+      }
+      session.on('Debugger.scriptParsed', handleScriptParsed)
+      await session.invoke('Debugger.enable')
+    }
     MemoryLeakFinderState.set(instanceId, measure)
   } catch (error) {
     throw new VError(error, `Failed to setup memory leak finder`)
