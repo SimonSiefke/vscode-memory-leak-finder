@@ -4,7 +4,7 @@ import * as CompareInstance from '../CompareInstance/CompareInstance.js'
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
 import * as GetSourceMapUrl from '../GetSourceMapUrl/GetSourceMapUrl.js'
 
-const RE_URL = /\((.*):(\d+):(\d+)\)/
+const RE_URL = /(.*)\((.*):(\d+):(\d+)\)/s
 
 const parseUrl = (stackLine) => {
   const urlMatch = stackLine.match(RE_URL)
@@ -16,9 +16,10 @@ const parseUrl = (stackLine) => {
     }
   }
   return {
-    url: urlMatch[1],
-    line: parseInt(urlMatch[2]),
-    column: parseInt(urlMatch[3]),
+    prefix: urlMatch[1],
+    url: urlMatch[2],
+    line: parseInt(urlMatch[3]),
+    column: parseInt(urlMatch[4]),
   }
 }
 
@@ -29,14 +30,13 @@ export const prettifyConstructorStackTracesWithSourceMap = async (constructorSta
     reverseScriptMap[value.url] = value.sourceMapUrl
   }
   const eventListeners = first.map((stackLine, index) => {
-    const { url, line, column } = parseUrl(stackLine)
+    const { prefix, url, line, column } = parseUrl(stackLine)
     const sourceMapUrl = reverseScriptMap[url]
+    const newStackLine = `${prefix}(${url}:${line - 1}:${column})`
     return {
       url,
-      line,
-      column,
       uuid: index,
-      stack: [stackLine],
+      stack: [newStackLine],
       sourceMaps: [sourceMapUrl],
     }
   })
