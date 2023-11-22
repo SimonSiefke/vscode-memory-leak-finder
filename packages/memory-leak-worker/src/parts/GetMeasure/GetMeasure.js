@@ -44,6 +44,8 @@ export const getMeasure = (MemoryLeakFinder, measureId) => {
       return MemoryLeakFinder.Measures.MeasureMutationObserverCount
     case 'mutation-observers-with-stack-traces':
       return MemoryLeakFinder.Measures.MeasureMutationObserversWithStackTraces
+    case 'mutation-observers-with-stack-traces-with-source-maps':
+      return MemoryLeakFinder.Measures.MeasureMutationObserversWithStackTracesWithSourceMaps
     case 'object-count':
       return MemoryLeakFinder.Measures.MeasureObjectCount
     case 'promise-count':
