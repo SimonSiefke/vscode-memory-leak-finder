@@ -8,7 +8,7 @@ export const create = ({ expect, page, VError }) => {
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
       } catch (error) {
-        throw new VError(error, `Failed to show side bar`)
+        throw new VError(error, `Failed to toggle side bar`)
       }
     },
     async show() {
@@ -34,12 +34,10 @@ export const create = ({ expect, page, VError }) => {
     async togglePosition() {
       const quickPick = QuickPick.create({ expect, page, VError })
       await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarPosition)
-      await quickPick.select('View: Toggle Primary Side Bar Position')
     },
     async moveRight() {
       try {
         const sideBar = page.locator('.part.sidebar')
-        await expect(sideBar).toBeVisible()
         await expect(sideBar).toHaveClass('left')
         await this.togglePosition()
         await expect(sideBar).toHaveClass('right')
@@ -50,7 +48,6 @@ export const create = ({ expect, page, VError }) => {
     async moveLeft() {
       try {
         const sideBar = page.locator('.part.sidebar')
-        await expect(sideBar).toBeVisible()
         await expect(sideBar).toHaveClass('right')
         await this.togglePosition()
         await expect(sideBar).toHaveClass('left')

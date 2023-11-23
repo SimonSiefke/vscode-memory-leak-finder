@@ -299,5 +299,27 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to switch to tab ${name}`)
       }
     },
+    async showColorPicker() {
+      try {
+        const colorPicker = page.locator('.standalone-colorpicker-body')
+        await expect(colorPicker).toBeHidden()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.ShowOrFocusStandaloneColorPicker)
+        await expect(colorPicker).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to show color picker`)
+      }
+    },
+    async hideColorPicker() {
+      try {
+        const colorPicker = page.locator('.standalone-colorpicker-body')
+        await expect(colorPicker).toBeVisible()
+        await colorPicker.focus()
+        await page.keyboard.press('Escape')
+        await expect(colorPicker).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to hide color picker`)
+      }
+    },
   }
 }
