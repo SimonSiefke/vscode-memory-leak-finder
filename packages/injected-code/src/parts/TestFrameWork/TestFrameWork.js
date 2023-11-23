@@ -326,6 +326,16 @@ export const getAttribute = async (locator, attributeName) => {
   return attributeValue
 }
 
+export const isVisible = async (locator) => {
+  Assert.object(locator)
+  const element = QuerySelector.querySelector(locator.selector)
+  if (!element) {
+    return false
+  }
+  const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
+  return toBeVisible(element)
+}
+
 export const count = (locator) => {
   Assert.object(locator)
   const elements = QuerySelector.querySelectorAll(locator.selector)

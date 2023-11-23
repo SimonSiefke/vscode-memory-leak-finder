@@ -5,6 +5,7 @@ import * as LocatorCount from '../LocatorCount/LocatorCount.js'
 import * as LocatorFocus from '../LocatorFocus/LocatorFocus.js'
 import * as LocatorGetAttribute from '../LocatorGetAttribute/LocatorGetAttribute.js'
 import * as LocatorHover from '../LocatorHover/LocatorHover.js'
+import * as LocatorIsVisible from '../LocatorIsVisible/LocatorIsVisible.js'
 import * as LocatorPress from '../LocatorPress/LocatorPress.js'
 import * as LocatorSelectText from '../LocatorSelectText/LocatorSelectText.js'
 import * as LocatorSetValue from '../LocatorSetValue/LocatorSetValue.js'
@@ -150,6 +151,11 @@ export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}
         },
         key,
       )
+    },
+    isVisible() {
+      return LocatorIsVisible.isVisible({
+        selector: this.selector,
+      })
     },
   }
 }
