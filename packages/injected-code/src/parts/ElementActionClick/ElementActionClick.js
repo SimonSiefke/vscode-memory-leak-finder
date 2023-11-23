@@ -5,12 +5,15 @@ export const click = (element, options) => {
   options.clientX = (rect.left + rect.right) / 2
   options.clientY = (rect.top + rect.bottom) / 2
   options.cancelable = true
+  if (options.button === 'right') {
+    options.button = 2
+  }
   DispatchEvent.pointerDown(element, options)
   DispatchEvent.mouseDown(element, options)
   DispatchEvent.click(element, options)
   DispatchEvent.mouseUp(element, options)
   DispatchEvent.pointerUp(element, options)
-  if (options.button === 2 /* right */ || options.button === 'right') {
+  if (options.button === 2 /* right */) {
     DispatchEvent.contextMenu(element, options)
   }
 }
