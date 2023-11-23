@@ -14,7 +14,7 @@
   "dependencies": {
     "@babel/code-frame": "^7.23.4",
     "@lvce-editor/verror": "^1.1.2",
-    "@vscode/test-electron": "^2.3.6",
+    "@vscode/test-electron": "^2.3.7",
     "clean-stack": "^5.2.0",
     "exit-hook": "^4.0.0",
     "got": "^13.0.0",
