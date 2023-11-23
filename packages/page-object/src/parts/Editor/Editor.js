@@ -1,6 +1,6 @@
+import * as Character from '../Character/Character.js'
 import * as QuickPick from '../QuickPick/QuickPick.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
-import * as Character from '../Character/Character.js'
 
 const initialDiagnosticTimeout = 30_000
 
@@ -39,15 +39,33 @@ export const create = ({ page, expect, VError }) => {
       await editorInput.focus()
       await expect(editorInput).toBeFocused()
     },
-    async hover(text) {
+    async hover(text, hoverText) {
       try {
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
         const startTag = editor.locator('[class^="mtk"]', { hasText: text }).first()
         await startTag.click()
-        await startTag.hover()
-        const tooltip = page.locator('.monaco-hover')
-        await expect(tooltip).toBeVisible()
+        let tries = 0
+        const quickPick = QuickPick.create({ expect, page, VError })
+        const tooltip = editor.locator('.monaco-hover')
+        while (true) {
+          for (let i = 0; i < tries; i++) {
+            await page.waitForIdle()
+          }
+          await quickPick.executeCommand(WellKnownCommands.ShowOrFocusHover)
+          const isVisible = await tooltip.isVisible()
+          if (isVisible) {
+            break
+          }
+          for (let i = 0; i < tries; i++) {
+            await page.waitForIdle()
+          }
+          tries++
+          if (tries === 30) {
+            throw new Error(`Failed to wait for hover`)
+          }
+        }
+        await expect(tooltip).toHaveText(hoverText)
       } catch (error) {
         throw new VError(error, `Failed to hover ${text}`)
       }
