@@ -5,9 +5,9 @@ export const toBeVisible = (element) => {
   if (typeof element.checkVisible === 'function') {
     return element.checkVisible()
   }
-  if (typeof element.checkVisibility === 'function') {
-    return element.checkVisibility()
-  }
+  // if (typeof element.checkVisibility === 'function') {
+  //   return element.checkVisibility()
+  // }
   return element.isConnected
 }
 
