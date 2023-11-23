@@ -10,7 +10,6 @@ export const addStackTraceToEventListener = async (session, eventListener) => {
     functionDeclaration: `
 function () {
 const eventListener = this
-console.log(globalThis.___eventListenerStackTraces)
 for(const stackTrace of globalThis.___eventListenerStackTraces){
   if(stackTrace.args[1] === eventListener){
     return stackTrace.stackTrace
