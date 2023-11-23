@@ -4,12 +4,23 @@ export const create = ({ expect, page, VError }) => {
       try {
         await page.waitForIdle()
         const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
-        await locator.click({
-          button: 'right',
-        })
-        await expect(contextMenu).toBeVisible({
-          timeout: 8_000,
-        })
+        await expect(contextMenu).toBeHidden()
+        let tries = 0
+        while (true) {
+          await page.waitForIdle()
+          await locator.click({
+            button: 'right',
+          })
+          const isVisible = await contextMenu.isVisible()
+          if (isVisible) {
+            break
+          }
+          await page.waitForIdle()
+          if (tries++ === 11) {
+            throw new Error(`failed to open`)
+          }
+        }
+        await expect(contextMenu).toBeVisible()
         await expect(contextMenu).toBeFocused()
       } catch (error) {
         throw new VError(error, `Failed to open context menu`)
@@ -34,7 +45,7 @@ export const create = ({ expect, page, VError }) => {
         await page.keyboard.press('Escape')
         await expect(contextMenu).toBeHidden()
       } catch (error) {
-        throw new VError(error, `Failed to close tab context menu`)
+        throw new VError(error, `Failed to close context menu`)
       }
     },
   }
