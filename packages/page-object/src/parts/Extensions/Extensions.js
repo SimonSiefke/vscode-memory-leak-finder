@@ -29,29 +29,28 @@ export const create = ({ expect, page, VError }) => {
       try {
         const searchItem = page.locator(`.action-item:has([aria-label^="Extensions"])`)
         const selected = await searchItem.getAttribute('aria-selected')
-        if (selected === 'true') {
+        if (selected !== 'true') {
+          const quickPick = QuickPick.create({
+            page,
+            expect,
+            VError,
+          })
+          await quickPick.executeCommand(WellKnownCommands.ShowExtensions)
           const extensionsView = page.locator(`.extensions-viewlet`)
-          const suggestContainer = page.locator(`.suggest-input-container`)
-          const extensionsInput = extensionsView.locator('.inputarea')
-          const className = await suggestContainer.getAttribute('class')
-          if (!className.includes('synthetic-focus')) {
-            await suggestContainer.click()
-            await expect(extensionsInput).toBeVisible()
-            await extensionsInput.click()
-          }
-          await extensionsInput.focus()
-          await expect(suggestContainer).toHaveClass('synthetic-focus')
-          await expect(extensionsInput).toBeFocused()
-          return
+          await expect(extensionsView).toBeVisible()
         }
-        const quickPick = QuickPick.create({
-          page,
-          expect,
-          VError,
-        })
-        await quickPick.executeCommand(WellKnownCommands.ShowExtensions)
         const extensionsView = page.locator(`.extensions-viewlet`)
-        await expect(extensionsView).toBeVisible()
+        const suggestContainer = page.locator(`.suggest-input-container`)
+        const extensionsInput = extensionsView.locator('.inputarea')
+        const className = await suggestContainer.getAttribute('class')
+        if (!className.includes('synthetic-focus')) {
+          await suggestContainer.click()
+          await expect(extensionsInput).toBeVisible()
+          await extensionsInput.click()
+        }
+        await extensionsInput.focus()
+        await expect(suggestContainer).toHaveClass('synthetic-focus')
+        await expect(extensionsInput).toBeFocused()
       } catch (error) {
         throw new VError(error, `Failed to show extensions view`)
       }
