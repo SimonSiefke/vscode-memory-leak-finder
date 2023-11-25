@@ -321,5 +321,30 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to hide color picker`)
       }
     },
+    async openFind() {
+      try {
+        console.log('open find')
+        const findWidget = page.locator('.find-widget')
+        await expect(findWidget).toBeHidden()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.Find)
+        await expect(findWidget).toBeVisible()
+        await expect(findWidget).toHaveClass(/visible/)
+      } catch (error) {
+        throw new VError(error, `Failed to show find widget`)
+      }
+    },
+    async closeFind() {
+      try {
+        const findWidget = page.locator('.find-widget')
+        await expect(findWidget).toBeVisible()
+        await expect(findWidget).toHaveClass(/visible/)
+        const closeButton = findWidget.locator('[aria-label="Close (Escape)"]')
+        await closeButton.click()
+        await expect(findWidget).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to hide find widget`)
+      }
+    },
   }
 }
