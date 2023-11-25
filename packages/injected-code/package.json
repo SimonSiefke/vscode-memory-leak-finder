@@ -15,6 +15,6 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "rollup": "^4.5.1"
+    "rollup": "^4.5.2"
   }
 }
