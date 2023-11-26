@@ -324,7 +324,10 @@ export const create = ({ page, expect, VError }) => {
     async openFind() {
       try {
         const findWidget = page.locator('.find-widget')
-        await expect(findWidget).toHaveAttribute('aria-hidden', 'true')
+        const count = await findWidget.count()
+        if (count > 0) {
+          await expect(findWidget).toHaveAttribute('aria-hidden', 'true')
+        }
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.Find)
         await expect(findWidget).toBeVisible()
