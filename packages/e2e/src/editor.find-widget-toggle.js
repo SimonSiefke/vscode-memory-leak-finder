@@ -1,4 +1,4 @@
-export const skip = true
+export const skip = false
 
 export const setup = async ({ Editor, Workspace, Explorer }) => {
   await Workspace.setFiles([
@@ -14,7 +14,6 @@ export const setup = async ({ Editor, Workspace, Explorer }) => {
 }
 
 export const run = async ({ Editor }) => {
-  console.log('toggle find')
   await Editor.openFind()
   await Editor.closeFind()
 }
