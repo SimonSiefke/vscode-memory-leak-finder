@@ -14,7 +14,6 @@ export const setup = async ({ Editor, Workspace, Explorer }) => {
 }
 
 export const run = async ({ Editor }) => {
-  console.log('toggle find')
   await Editor.openFind()
   await Editor.closeFind()
 }
