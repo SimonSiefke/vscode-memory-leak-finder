@@ -323,6 +323,7 @@ export const create = ({ page, expect, VError }) => {
     },
     async openFind() {
       try {
+        await page.waitForIdle()
         const findWidget = page.locator('.find-widget')
         const count = await findWidget.count()
         if (count > 0) {
