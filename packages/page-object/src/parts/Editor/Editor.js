@@ -315,6 +315,7 @@ export const create = ({ page, expect, VError }) => {
         const colorPicker = page.locator('.standalone-colorpicker-body')
         await expect(colorPicker).toBeVisible()
         await colorPicker.focus()
+        await page.waitForIdle()
         await expect(colorPicker).toBeFocused()
         await page.keyboard.press('Escape')
         await expect(colorPicker).toBeHidden()
