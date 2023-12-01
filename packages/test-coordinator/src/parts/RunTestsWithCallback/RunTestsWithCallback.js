@@ -74,6 +74,7 @@ export const runTests = async (
       try {
         const start = i === 0 ? initialStart : Time.now()
         const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(testWorkerIpc, connectionId, formattedPath.absolutePath, forceRun)
+        console.log({ testSkipped })
         if (testSkipped) {
           skipped++
           const end = Time.now()
