@@ -312,12 +312,14 @@ export const create = ({ page, expect, VError }) => {
     },
     async hideColorPicker() {
       try {
+        await page.waitForIdle()
         const colorPicker = page.locator('.standalone-colorpicker-body')
         await expect(colorPicker).toBeVisible()
         await colorPicker.focus()
-        await page.waitForIdle()
         await expect(colorPicker).toBeFocused()
+        await page.waitForIdle()
         await page.keyboard.press('Escape')
+        await page.waitForIdle()
         await expect(colorPicker).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to hide color picker`)
