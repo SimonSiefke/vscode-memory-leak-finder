@@ -66,6 +66,7 @@ export const runTests = async (
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
       const { absolutePath, relativeDirname, dirent, relativePath } = formattedPath
+      const forceRun = dirent === filterValue
       if (i !== 0) {
         callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, /* isFirst */ true)
       }
@@ -82,12 +83,12 @@ export const runTests = async (
           if (checkLeaks) {
             if (measureAfter) {
               for (let i = 0; i < 2; i++) {
-                await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, formattedPath.absolutePath, root, color)
+                await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, formattedPath.absolutePath, forceRun)
               }
             }
             const before = await MemoryLeakFinder.start(memoryLeakWorkerIpc, connectionId)
             for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, formattedPath.absolutePath, root, color)
+              await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, formattedPath.absolutePath, forceRun)
             }
             const after = await MemoryLeakFinder.stop(memoryLeakWorkerIpc, connectionId)
             const result = await MemoryLeakFinder.compare(memoryLeakWorkerIpc, connectionId, before, after)
@@ -105,7 +106,7 @@ export const runTests = async (
             }
           } else {
             for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, formattedPath.absolutePath, root, color)
+              await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, formattedPath.absolutePath, forceRun)
             }
           }
           const end = Time.now()
