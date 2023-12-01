@@ -66,13 +66,14 @@ export const runTests = async (
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
       const { absolutePath, relativeDirname, dirent, relativePath } = formattedPath
-      const forceRun = dirent === filterValue
+      const forceRun = dirent === `${filterValue}.js`
+      console.log({ forceRun })
       if (i !== 0) {
         callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, /* isFirst */ true)
       }
       try {
         const start = i === 0 ? initialStart : Time.now()
-        const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(testWorkerIpc, connectionId, formattedPath.absolutePath)
+        const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(testWorkerIpc, connectionId, formattedPath.absolutePath, forceRun)
         if (testSkipped) {
           skipped++
           const end = Time.now()
