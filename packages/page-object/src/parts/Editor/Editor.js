@@ -301,21 +301,29 @@ export const create = ({ page, expect, VError }) => {
     },
     async showColorPicker() {
       try {
+        await page.waitForIdle()
         const colorPicker = page.locator('.standalone-colorpicker-body')
         await expect(colorPicker).toBeHidden()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.ShowOrFocusStandaloneColorPicker)
         await expect(colorPicker).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show color picker`)
       }
     },
     async hideColorPicker() {
       try {
+        await page.waitForIdle()
         const colorPicker = page.locator('.standalone-colorpicker-body')
         await expect(colorPicker).toBeVisible()
+        await page.waitForIdle()
         await colorPicker.focus()
+        await page.waitForIdle()
         await expect(colorPicker).toBeFocused()
+        await page.waitForIdle()
+        await page.keyboard.press('Escape')
+        await page.keyboard.press('Escape')
         await page.keyboard.press('Escape')
         await expect(colorPicker).toBeHidden()
       } catch (error) {
