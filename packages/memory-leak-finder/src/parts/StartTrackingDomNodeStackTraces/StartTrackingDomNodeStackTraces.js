@@ -8,7 +8,7 @@ import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js
 export const startTrackingDomNodeStackTraces = async (session, objectGroup) => {
   await DevtoolsProtocolRuntime.evaluate(session, {
     expression: `(()=>{
-globalThis.___domNodeStackTraces = []
+globalThis.___domNodeStackTraces = new WeakMap
 
 // based on https://github.com/sindresorhus/callsites
 const callsites = () => {
@@ -24,8 +24,9 @@ globalThis.___originalCreateElement = originalCreateElement
 
 document.createElement = function (...args){
   const stackTrace = callsites()
-  globalThis.___domNodeStackTraces.push({args, stackTrace})
-  return originalCreateElement.apply(this, args)
+  const node = originalCreateElement.apply(this, args)
+  globalThis.___domNodeStackTraces.set(node, { args, stackTrace })
+  return node
 }
 })()
 undefined
