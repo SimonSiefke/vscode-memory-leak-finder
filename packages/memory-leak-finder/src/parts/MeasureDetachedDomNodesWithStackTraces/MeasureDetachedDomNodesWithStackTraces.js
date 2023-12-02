@@ -1,12 +1,12 @@
-import * as CompareDetachedDomNodes from '../CompareDetachedDomNodes/CompareDetachedDomNodes.js'
-import * as GetDetachedDomNodes from '../GetDetachedDomNodes/GetDetachedDomNodes.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as Arrays from '../Arrays/Arrays.js'
+import * as Assert from '../Assert/Assert.js'
+import * as CompareDetachedDomNodesWithStackTraces from '../CompareDetachedDomNodesWithStackTraces/CompareDetachedDomNodesWithStackTraces.js'
+import * as GetDetachedDomNodes from '../GetDetachedDomNodes/GetDetachedDomNodes.js'
+import * as GetDetachedDomNodesWithStackTraces from '../GetDetachedDomNodesWithStackTraces/GetDetachedDomNodesWithStackTraces.js'
+import * as MeasureId from '../MeasureId/MeasureId.js'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 import * as StartTrackingDomNodeStackTraces from '../StartTrackingDomNodeStackTraces/StartTrackingDomNodeStackTraces.js'
 import * as StopTrackingDomNodeStackTraces from '../StopTrackingDomNodeStackTraces/StopTrackingDomNodeStackTraces.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
-import * as GetDetachedDomNodesWithStackTraces from '../GetDetachedDomNodesWithStackTraces/GetDetachedDomNodesWithStackTraces.js'
-import * as Assert from '../Assert/Assert.js'
 
 export const id = MeasureId.DetachedDomNodesWithStackTraces
 
@@ -26,9 +26,7 @@ export const stop = async (session, objectGroup) => {
   return result
 }
 
-export const compare = (before, after) => {
-  return CompareDetachedDomNodes.compareDetachedDomNodes(before, after.descriptors)
-}
+export const compare = CompareDetachedDomNodesWithStackTraces.compareDetachedDomNodesWithStackTraces
 
 const getCount = (instance) => {
   return instance.count

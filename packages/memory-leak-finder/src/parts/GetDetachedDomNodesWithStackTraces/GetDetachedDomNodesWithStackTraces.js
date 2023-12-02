@@ -81,7 +81,7 @@ return detachedRoots
 const detachedRoots = this
 
 const getStackTrace = (detachedNode, stackTraceMap) => {
-  return stackTraceMap.get(detachedNode) || {}
+  return stackTraceMap.get(detachedNode) || ''
 }
 
 const getStackTraces = (detachedNodes, stackTraceMap) => {
