@@ -1,6 +1,7 @@
 export * as ActivityBar from '../ActivityBar/ActivityBar.js'
 export * as Colors from '../Colors/Colors.js'
 export * as ContextMenu from '../ContextMenu/ContextMenu.js'
+export * as DebugConsole from '../DebugConsole/DebugConsole.js'
 export * as DiffEditor from '../DiffEditor/DiffEditor.js'
 export * as Editor from '../Editor/Editor.js'
 export * as Electron from '../Electron/Electron.js'
