@@ -84,7 +84,7 @@ const getStackTrace = (detachedNode, stackTraceMap) => {
   return stackTraceMap.get(detachedNode) || {}
 }
 
-const addStackTracesToNodes = (detachedNodes, stackTraceMap) => {
+const getStackTraces = (detachedNodes, stackTraceMap) => {
   const stackTraces = []
   for(const detachedNode of detachedNodes){
     const stackTrace = getStackTrace(detachedNode, stackTraceMap)
@@ -93,7 +93,7 @@ const addStackTracesToNodes = (detachedNodes, stackTraceMap) => {
   return stackTraces
 }
 
-const stackTraces = addStackTracesToNodes(detachedRoots, globalThis.___domNodeStackTraces)
+const stackTraces = getStackTraces(detachedRoots, globalThis.___domNodeStackTraces)
 return stackTraces
 }`,
     objectId: fnResult1.objectId,
