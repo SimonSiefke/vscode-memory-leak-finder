@@ -4,6 +4,7 @@ import * as Assert from '../Assert/Assert.js'
 
 const RE_STACK_PATH_1 = /(^\s*at .*?\(?)([^()]+)(:[0-9]+:[0-9]+\)?.*$)/
 const RE_STACK_PATH_2 = /(^\s*at .*?)([^()]+)(:\d+$)/
+const RE_AT = /^\s*at/
 
 const getFilePath = (file) => {
   if (file.startsWith('file://')) {
@@ -39,6 +40,9 @@ export const prettyStack = (lines, root) => {
   const newLines = []
   for (const line of lines) {
     newLines.push(formatLine(line, root))
+  }
+  if (newLines[0] && !RE_AT.test(newLines[0])) {
+    return newLines.slice(1)
   }
   return newLines
 }
