@@ -1,12 +1,10 @@
-const isEnumerable = (property) => {
-  return property.enumerable
-}
+import * as IsEnumerable from '../IsEnumerable/IsEnumerable.js'
 
 const getValue = (object) => {
   return object.value
 }
 
 export const getDescriptorValues = (properties) => {
-  const descriptors = properties.filter(isEnumerable).map(getValue)
+  const descriptors = properties.filter(IsEnumerable.isEnumerable).map(getValue)
   return descriptors
 }
