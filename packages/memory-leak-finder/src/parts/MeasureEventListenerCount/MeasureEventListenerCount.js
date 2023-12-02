@@ -1,4 +1,4 @@
-import * as CleanEventListeners from '../CleanEventListeners/CleanEventListeners.js'
+import * as CleanEventListenerCount from '../CleanEventListenerCount/CleanEventListenerCount.js'
 import * as CompareCount from '../CompareCount/CompareCount.js'
 import * as GetEventListenerCount from '../GetEventListenerCount/GetEventListenerCount.js'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
@@ -12,12 +12,12 @@ export const create = (session) => {
 
 export const start = async (session) => {
   const listeners = await GetEventListenerCount.getEventListenerCount(session)
-  return CleanEventListeners.cleanEventListeners(listeners)
+  return CleanEventListenerCount.cleanEventListenerCount(listeners)
 }
 
 export const stop = async (session) => {
   const listeners = await GetEventListenerCount.getEventListenerCount(session)
-  return CleanEventListeners.cleanEventListeners(listeners)
+  return CleanEventListenerCount.cleanEventListenerCount(listeners)
 }
 
 export const compare = CompareCount.compareCount
