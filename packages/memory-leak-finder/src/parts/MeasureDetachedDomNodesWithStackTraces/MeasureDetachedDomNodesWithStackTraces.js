@@ -2,28 +2,40 @@ import * as CompareDetachedDomNodes from '../CompareDetachedDomNodes/CompareDeta
 import * as GetDetachedDomNodes from '../GetDetachedDomNodes/GetDetachedDomNodes.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as Arrays from '../Arrays/Arrays.js'
+import * as StartTrackingDomNodeStackTraces from '../StartTrackingDomNodeStackTraces/StartTrackingDomNodeStackTraces.js'
+import * as StopTrackingDomNodeStackTraces from '../StopTrackingDomNodeStackTraces/StopTrackingDomNodeStackTraces.js'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as GetDetachedDomNodesWithStackTraces from '../GetDetachedDomNodesWithStackTraces/GetDetachedDomNodesWithStackTraces.js'
+import * as Assert from '../Assert/Assert.js'
 
 export const id = MeasureId.DetachedDomNodesWithStackTraces
 
 export const create = (session) => {
-  return [session]
+  const objectGroup = ObjectGroupId.create()
+  return [session, objectGroup]
 }
 
-export const start = (session) => {
+export const start = async (session, objectGroup) => {
+  await StartTrackingDomNodeStackTraces.startTrackingDomNodeStackTraces(session, objectGroup)
   return GetDetachedDomNodes.getDetachedDomNodes(session)
 }
 
-export const stop = (session) => {
-  return GetDetachedDomNodes.getDetachedDomNodes(session)
+export const stop = async (session, objectGroup) => {
+  const result = await GetDetachedDomNodesWithStackTraces.getDetachedDomNodesWithStackTraces(session, objectGroup)
+  await StopTrackingDomNodeStackTraces.stopTrackingDomNodeStackTraces(session, objectGroup)
+  return result
 }
 
-export const compare = CompareDetachedDomNodes.compareDetachedDomNodes
+export const compare = (before, after) => {
+  return CompareDetachedDomNodes.compareDetachedDomNodes(before, after.descriptors)
+}
 
 const getCount = (instance) => {
   return instance.count
 }
 
 const getTotal = (instance) => {
+  Assert.array(instance)
   const counts = instance.map(getCount)
   return Arrays.sum(counts)
 }
