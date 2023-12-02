@@ -1,5 +1,4 @@
 import { jest } from '@jest/globals'
-import { AssertionError } from '../src/parts/AssertionError/AssertionError.js'
 
 beforeEach(() => {
   jest.resetModules()
@@ -179,6 +178,12 @@ export const boolean = (value) => {
 }
 `
   })
+  class AssertionError extends Error {
+    constructor(message) {
+      super(message)
+      this.name = 'AssertionError'
+    }
+  }
   const error = new AssertionError(`expected value to be of type boolean`)
   error.stack = ` AssertionError: expected value to be of type boolean
     at Module.boolean (/test/e2e/vscode-memory-leak-finder/packages/test-coordinator/src/parts/Assert/Assert.js:57:11)
