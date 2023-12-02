@@ -1,6 +1,7 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.js'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
+import * as SplitLines from '../SplitLines/SplitLines.js'
 
 export const getDetachedDomNodesWithStackTraces = async (session, objectGroup) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
@@ -100,8 +101,14 @@ return stackTraces
     returnByValue: true,
     objectGroup,
   })
-  return {
-    descriptors,
-    stackTraces,
+  const merged = []
+  for (let i = 0; i < descriptors.length; i++) {
+    const descriptor = descriptors[i]
+    const stackTrace = stackTraces[i]
+    merged.push({
+      ...descriptor,
+      stackTrace: SplitLines.splitLines(stackTrace),
+    })
   }
+  return merged
 }
