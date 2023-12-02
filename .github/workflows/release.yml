@@ -69,7 +69,7 @@ jobs:
         if: matrix.os != 'macos-13'
         uses: coactions/setup-xvfb@v1
         with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after
       - name: Run headless test (check leaks, event listeners)
         if: matrix.os == 'ubuntu-22.04'
         uses: coactions/setup-xvfb@v1
