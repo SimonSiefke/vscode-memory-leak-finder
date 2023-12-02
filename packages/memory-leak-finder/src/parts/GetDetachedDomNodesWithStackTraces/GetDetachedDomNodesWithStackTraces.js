@@ -81,7 +81,7 @@ return detachedRoots
 const detachedRoots = this
 
 const getStackTrace = (detachedNode, stackTraceMap) => {
-  return stackTraceMap.get(detachedNode) || {}
+  return stackTraceMap.get(detachedNode) || ''
 }
 
 const getStackTraces = (detachedNodes, stackTraceMap) => {
@@ -94,12 +94,14 @@ const getStackTraces = (detachedNodes, stackTraceMap) => {
 }
 
 const stackTraces = getStackTraces(detachedRoots, globalThis.___domNodeStackTraces)
+console.log(stackTraces)
 return stackTraces
 }`,
     objectId: fnResult1.objectId,
     returnByValue: true,
     objectGroup,
   })
+  console.log({ stackTraces })
   return {
     descriptors,
     stackTraces,
