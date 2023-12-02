@@ -9,7 +9,7 @@ export const create = ({ expect, page, VError }) => {
         const activityBar = page.locator('.part.activitybar')
         await expect(activityBar).toBeHidden()
         const quickPick = QuickPick.create({ expect, page, VError })
-        await quickPick.executeCommand(WellKnownCommands.ShowActivityBar)
+        await quickPick.executeCommand(WellKnownCommands.FocusActivityBar)
         await expect(activityBar).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to show activity bar`)
@@ -19,8 +19,11 @@ export const create = ({ expect, page, VError }) => {
       try {
         const activityBar = page.locator('.part.activitybar')
         await expect(activityBar).toBeVisible()
-        const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
-        await activityBarItem.click()
+        const activityBarItem = activityBar.locator(`.action-item:has(.action-label[aria-label^="${ariaLabel}"])`)
+        const expanded = await activityBarItem.getAttribute('aria-expanded')
+        if (expanded === 'false') {
+          await activityBarItem.click()
+        }
         const sideBar = page.locator('.sidebar')
         const title = sideBar.locator('.composite.title')
         await expect(title).toHaveText(`${ariaLabel}`)
