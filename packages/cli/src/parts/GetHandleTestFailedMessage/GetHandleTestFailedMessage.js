@@ -1,18 +1,7 @@
 import chalk from 'chalk'
-import * as Character from '../Character/Character.js'
 import * as FormatStack from '../FormatStack/FormatStack.js'
+import * as Indent from '../Indent/Indent.js'
 import * as TestPrefix from '../TestPrefix/TestPrefix.js'
-
-const indentLine = (line) => {
-  return '    ' + line
-}
-
-const indent = (string) => {
-  if (!string) {
-    return Character.EmptyString
-  }
-  return string.split('\n').map(indentLine).join('\n')
-}
 
 export const getHandleTestFailedMessage = (file, relativeDirName, relativeFilePath, fileName, error) => {
   const formattedStack = FormatStack.formatStack(error.stack, relativeFilePath)
@@ -22,7 +11,7 @@ export const getHandleTestFailedMessage = (file, relativeDirName, relativeFilePa
 
       ${error.type}: ${error.message}
 
-${indent(error.codeFrame)}
+${Indent.indent(error.codeFrame)}
 
 ${formattedStack}
 

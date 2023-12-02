@@ -1,5 +1,6 @@
 import * as QuickPick from '../QuickPick/QuickPick.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
+import * as IsMacos from '../IsMacos/IsMacos.js'
 
 export const create = ({ expect, page, VError }) => {
   return {
@@ -59,6 +60,38 @@ export const create = ({ expect, page, VError }) => {
         await expect(activityBar).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to hide activity bar`)
+      }
+    },
+    async showTooltipExplorer() {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+        const ariaLabel = 'Explorer'
+        const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
+        await activityBarItem.hover()
+        const tooltip = page.locator('[role="tooltip"]')
+        await expect(tooltip).toBeVisible()
+        const keyBinding = IsMacos.isMacos ? '⇧⌘E' : 'Ctrl+Shift+E'
+        await expect(tooltip).toHaveText(`Explorer (${keyBinding})`)
+      } catch (error) {
+        throw new VError(error, `Failed to show explorer tooltip`)
+      }
+    },
+    async hideTooltip() {
+      try {
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+        const ariaLabel = 'Explorer'
+        const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
+        await activityBarItem.hover()
+        const tooltip = page.locator('[role="tooltip"]')
+        await expect(tooltip).toBeVisible()
+        await tooltip.focus()
+        await expect(tooltip).toBeFocused()
+        await page.keyboard.press('Escape')
+        await expect(tooltip).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to hide tooltip`)
       }
     },
   }
