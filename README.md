@@ -15,6 +15,176 @@ npm run e2e
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io#https://github.com/SimonSiefke/vscode-memory-leak-finder)
 
+## Measures
+
+### ArrayCount
+
+Measures the total number of arrays.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure array-count --only base
+```
+
+### ArrayElementCount
+
+Measures the total number of elements in all arrays.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure array-element-count --only base
+```
+
+### ClassCount
+
+Measures the total number of classes.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure class-count --only base
+```
+
+### DetachedDomNodeCount
+
+Measures the total number of detached dom nodes.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure detached-dom-node-count --only base
+```
+
+### DomNodeCount
+
+Measures the total number of dom nodes.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure dom-node-count --only base
+```
+
+### EventListenerCount
+
+Measures the total number of event listeners.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure event-listener-count --only base
+```
+
+### EventListeners
+
+Measures the event listeners.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure event-listeners --only base
+```
+
+### FunctionCount
+
+Measures the total number of functions.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure function-count --only base
+```
+
+### InstanceCounts
+
+Measures the number of instances of each class.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure instance-counts --only base
+```
+
+### IntersectionObserverCount
+
+Measures the number of intersection observers.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure intersection-observer-count --only base
+```
+
+### MapSize
+
+Measures the total number of elements in all Maps.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure map-size --only base
+```
+
+### MediaQueryListCount
+
+Measures the total number of MediaQueryLists.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure media-query-list-count --only base
+```
+
+### MutationObserverCount
+
+Measures the total number of MutationObservers.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure mutation-observer-count --only base
+```
+
+### PromiseCount
+
+Measures the total number of Promises.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure promise-count --only base
+```
+
+### RegexCount
+
+Measures the total number of Regex instances.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure regex-count --only base
+```
+
+### ResizeObserverCount
+
+Measures the total number of ResizeObservers.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure resize-observer-count --only base
+```
+
+### SetSize
+
+Measures the total number of elements in all Sets.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure set-size --only base
+```
+
+### SetTime
+
+Measures the total number of Timeouts.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure set-timeout --only base
+```
+
+### WeakMapCount
+
+Measures the total number of WeakMaps.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure weak-map-count --only base
+```
+
+### WeakSetCount
+
+Measures the total number of WeakSets.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure weak-set-count --only base
+```
+
+### WindowCount
+
+Measures the total number of Windows.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure window-count --only base
+```
+
 ## Project Structure
 
 - packages/cli: Command Line Interface, similar to jest
@@ -194,7 +364,8 @@ It seems there is memory leak when opening and closing a notebook. But just look
 | MenuBar              | https://github.com/microsoft/vscode/issues/198051 | Review |
 | DefaultWorkerFactory | https://github.com/microsoft/vscode/issues/198709 | Review |
 | ExtensionList        | https://github.com/microsoft/vscode/issues/198709 | Fixed  |
-| SimpleFindWidget     | https://github.com/microsoft/vscode/issues/199043 | Review |
+| SimpleFindWidget     | https://github.com/microsoft/vscode/issues/199043 | Fixed  |
+| ColorPickerWidget    | https://github.com/microsoft/vscode/issues/199814 | Review |
 
 ## Credits
 
