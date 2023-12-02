@@ -1,5 +1,6 @@
 import * as QuickPick from '../QuickPick/QuickPick.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
+import * as IsMacos from '../IsMacos/IsMacos.js'
 
 export const create = ({ expect, page, VError }) => {
   return {
@@ -70,7 +71,8 @@ export const create = ({ expect, page, VError }) => {
         await activityBarItem.hover()
         const tooltip = page.locator('[role="tooltip"]')
         await expect(tooltip).toBeVisible()
-        await expect(tooltip).toHaveText('Explorer (Ctrl+Shift+E)')
+        const keyBinding = IsMacos.isMacos ? '⇧⌘E' : 'Ctrl+Shift+E'
+        await expect(tooltip).toHaveText(`Explorer (${keyBinding})`)
       } catch (error) {
         throw new VError(error, `Failed to show explorer tooltip`)
       }
