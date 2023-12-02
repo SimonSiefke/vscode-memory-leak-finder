@@ -2,13 +2,15 @@ import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.js'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
 
-export const getDetachedDomNodesWithStackTraces = async (session) => {
+export const getDetachedDomNodesWithStackTraces = async (session, objectGroup) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Node,
     returnByValue: false,
+    objectGroup,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
     prototypeObjectId: prototypeDescriptor.objectId,
+    objectGroup,
   })
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
@@ -66,6 +68,7 @@ return detachedRoots
 }`,
     objectId: objects.objects.objectId,
     returnByValue: false,
+    objectGroup,
   })
 
   const fnResult2 = await DevtoolsProtocolRuntime.getProperties(session, {
@@ -82,19 +85,20 @@ const getStackTrace = (detachedNode, stackTraceMap) => {
 }
 
 const addStackTracesToNodes = (detachedNodes, stackTraceMap) => {
-  const stackTrces = []
+  const stackTraces = []
   for(const detachedNode of detachedNodes){
-    const stackTrace = getStackTrace(detached, stackTraceMap)
+    const stackTrace = getStackTrace(detachedNode, stackTraceMap)
     stackTraces.push(stackTrace)
   }
   return stackTraces
 }
 
-const stackTraces = addStackTracesToNodes(detachedRoots, globalThis.__domNodeStackTraces)
+const stackTraces = addStackTracesToNodes(detachedRoots, globalThis.___domNodeStackTraces)
 return stackTraces
 }`,
     objectId: fnResult1.objectId,
     returnByValue: true,
+    objectGroup,
   })
   return {
     descriptors,
