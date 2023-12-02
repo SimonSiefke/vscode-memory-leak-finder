@@ -16,5 +16,8 @@
   "license": "MIT",
   "devDependencies": {
     "rollup": "^4.6.1"
+  },
+  "dependencies": {
+    "@lvce-editor/assert": "^1.0.1"
   }
 }
