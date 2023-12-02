@@ -94,14 +94,12 @@ const getStackTraces = (detachedNodes, stackTraceMap) => {
 }
 
 const stackTraces = getStackTraces(detachedRoots, globalThis.___domNodeStackTraces)
-console.log(stackTraces)
 return stackTraces
 }`,
     objectId: fnResult1.objectId,
     returnByValue: true,
     objectGroup,
   })
-  console.log({ stackTraces })
   return {
     descriptors,
     stackTraces,
