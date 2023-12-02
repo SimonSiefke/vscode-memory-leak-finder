@@ -68,16 +68,26 @@ export const create = ({ expect, page, VError }) => {
         const ariaLabel = 'Explorer'
         const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
         await activityBarItem.hover()
-        await new Promise((r) => {
-          setTimeout(r, 3000)
-        })
+        const tooltip = page.locator('[role="tooltip"]')
+        await expect(tooltip).toBeVisible()
+        await expect(tooltip).toHaveText('Explorer (Ctrl+Shift+E)')
       } catch (error) {
         throw new VError(error, `Failed to show explorer tooltip`)
       }
     },
     async hideTooltip() {
       try {
-        // TODO
+        const activityBar = page.locator('.part.activitybar')
+        await expect(activityBar).toBeVisible()
+        const ariaLabel = 'Explorer'
+        const activityBarItem = activityBar.locator(`.action-label[aria-label^="${ariaLabel}"]`)
+        await activityBarItem.hover()
+        const tooltip = page.locator('[role="tooltip"]')
+        await expect(tooltip).toBeVisible()
+        await tooltip.focus()
+        await expect(tooltip).toBeFocused()
+        await page.keyboard.press('Escape')
+        await expect(tooltip).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to hide tooltip`)
       }
