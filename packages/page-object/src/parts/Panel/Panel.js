@@ -24,6 +24,10 @@ export const create = ({ expect, page, VError }) => {
     async hide() {
       try {
         const panel = page.locator('.part.panel')
+        const isVisible = await panel.isVisible()
+        if (!isVisible) {
+          return
+        }
         await expect(panel).toBeVisible()
         await this.toggle()
         await expect(panel).toBeHidden()
