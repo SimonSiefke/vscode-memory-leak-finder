@@ -1,18 +1,16 @@
 export const skip = true
 
-export const beforeSetup = async ({ tmpDir, writeFile, join }) => {
-  await writeFile(join(tmpDir, 'file.txt'), 'sample text')
-}
-
-export const setup = async ({ Editor }) => {
+export const setup = async ({ Workspace, Editor }) => {
+  await Workspace.setFiles([
+    {
+      name: 'file.txt',
+      content: 'sample text',
+    },
+  ])
   await Editor.open('file.txt')
 }
 
-export const run = async ({ QuickPick, page, expect }) => {
-  const minimap = page.locator('.minimap')
-  await expect(minimap).toBeVisible()
-  await QuickPick.executeCommand('View: Toggle Minimap')
-  await expect(minimap).toBeHidden()
-  await QuickPick.executeCommand('View: Toggle Minimap')
-  await expect(minimap).toBeVisible()
+export const run = async ({ Editor }) => {
+  await Editor.showMinimap()
+  await Editor.hideMinimap()
 }

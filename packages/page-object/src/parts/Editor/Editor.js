@@ -357,5 +357,27 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to hide find widget`)
       }
     },
+    async showMinimap() {
+      try {
+        const minimap = page.locator('.minimap')
+        await expect(minimap).toBeHidden()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.ViewToggleMinimap)
+        await expect(minimap).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to show minimap`)
+      }
+    },
+    async hideMinimap() {
+      try {
+        const minimap = page.locator('.minimap')
+        await expect(minimap).toBeVisible()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.ViewToggleMinimap)
+        await expect(minimap).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to hide minimap`)
+      }
+    },
   }
 }
