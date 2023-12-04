@@ -11,7 +11,8 @@ export const setup = async ({ Workspace, Explorer, Editor, Notebook }) => {
   await Editor.open('file.ipynb')
 }
 
-export const run = async ({ Notebook }) => {
+export const run = async ({ Notebook, Editor }) => {
   await Notebook.addMarkdownCell()
   await Notebook.removeMarkdownCell()
+  await Editor.save()
 }
