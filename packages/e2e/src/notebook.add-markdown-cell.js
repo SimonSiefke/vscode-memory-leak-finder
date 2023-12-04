@@ -1,6 +1,4 @@
-export const skip = true
-
-export const setup = async ({ Workspace, Explorer, Editor }) => {
+export const setup = async ({ Workspace, Explorer, Editor, Notebook }) => {
   await Workspace.setFiles([
     {
       name: 'file.ipynb',
@@ -13,7 +11,7 @@ export const setup = async ({ Workspace, Explorer, Editor }) => {
   await Editor.open('file.ipynb')
 }
 
-export const run = async ({ Editor, Notebook }) => {
+export const run = async ({ Notebook }) => {
   await Notebook.addMarkdownCell()
   await Notebook.removeMarkdownCell()
 }
