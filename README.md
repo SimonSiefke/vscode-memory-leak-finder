@@ -362,10 +362,11 @@ It seems there is memory leak when opening and closing a notebook. But just look
 | Menu                 | https://github.com/microsoft/vscode/issues/195580 | Fixed  |
 | Dropdown             | https://github.com/microsoft/vscode/issues/197767 | Fixed  |
 | MenuBar              | https://github.com/microsoft/vscode/issues/198051 | Review |
-| DefaultWorkerFactory | https://github.com/microsoft/vscode/issues/198709 | Review |
+| DefaultWorkerFactory | https://github.com/microsoft/vscode/issues/198709 | Fixed  |
 | ExtensionList        | https://github.com/microsoft/vscode/issues/198709 | Fixed  |
 | SimpleFindWidget     | https://github.com/microsoft/vscode/issues/199043 | Fixed  |
 | ColorPickerWidget    | https://github.com/microsoft/vscode/issues/199814 | Fixed  |
+| DiffEditor           | https://github.com/microsoft/vscode/issues/200381 | Review |
 
 ## Credits
 
