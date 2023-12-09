@@ -5,7 +5,7 @@ export const getEventListenerKey = (listener) => {
     return listener.location
   }
   if ('stack' in listener) {
-    return listener.stack[0]
+    return listener.stack.join('')
   }
   Assert.number(listener.lineNumber)
   Assert.number(listener.columnNumber)
