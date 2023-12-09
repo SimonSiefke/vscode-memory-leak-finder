@@ -10,6 +10,8 @@ import * as LocatorPress from '../LocatorPress/LocatorPress.js'
 import * as LocatorSelectText from '../LocatorSelectText/LocatorSelectText.js'
 import * as LocatorSetValue from '../LocatorSetValue/LocatorSetValue.js'
 import * as LocatorTextContent from '../LocatorTextContent/LocatorTextContent.js'
+import * as LocatorScrollDown from '../LocatorScrollDown/LocatorScrollDown.js'
+import * as LocatorScrollUp from '../LocatorScrollUp/LocatorScrollUp.js'
 import * as LocatorType from '../LocatorType/LocatorType.js'
 import * as ObjectType from '../ObjectType/ObjectType.js'
 
@@ -154,6 +156,16 @@ export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}
     },
     isVisible() {
       return LocatorIsVisible.isVisible({
+        selector: this.selector,
+      })
+    },
+    scrollDown() {
+      return LocatorScrollDown.scrollDown({
+        selector: this.selector,
+      })
+    },
+    scrollUp() {
+      return LocatorScrollUp.scrollUp({
         selector: this.selector,
       })
     },
