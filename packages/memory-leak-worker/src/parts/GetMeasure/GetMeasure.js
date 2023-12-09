@@ -39,7 +39,7 @@ export const getMeasure = (MemoryLeakFinder, measureId) => {
     case 'intersection-observers-with-stack-traces':
       return MemoryLeakFinder.Measures.MeasureIntersectionObserversWithStackTraces
     case 'map-size':
-      return MemoryLeakFinder.Measures.MapSize
+      return MemoryLeakFinder.Measures.MeasureMapSize
     case 'media-query-list-count':
       return MemoryLeakFinder.Measures.MeasureMediaQueryListCount
     case 'mutation-observer-count':
