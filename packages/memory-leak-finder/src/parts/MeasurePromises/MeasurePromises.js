@@ -20,3 +20,7 @@ export const stop = (session, objectGroup) => {
 export const compare = (before, after) => {
   return { before, after }
 }
+
+export const isLeak = (result) => {
+  return result.after.length > result.before.length
+}
