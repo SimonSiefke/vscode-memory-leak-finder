@@ -1,6 +1,3 @@
-import * as QuickPick from '../QuickPick/QuickPick.js'
-import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
-
 export const create = ({ expect, page, VError }) => {
   return {
     async addMarkdownCell() {
@@ -13,6 +10,18 @@ export const create = ({ expect, page, VError }) => {
       try {
       } catch (error) {
         throw new VError(error, `Failed to remove markdown cell`)
+      }
+    },
+    async scrollDown() {
+      try {
+      } catch (error) {
+        throw new VError(error, `Failed to scroll down in notebook`)
+      }
+    },
+    async scrollUp() {
+      try {
+      } catch (error) {
+        throw new VError(error, `Failed to scroll up in notebook`)
       }
     },
   }
