@@ -20,6 +20,7 @@ export const InstanceCountsDifferenceWithStackTraces = 'instanceCountsDifference
 export const InstanceCountsWithSourceMap = 'instanceCountsWithSourceMap'
 export const IntersectionObserverCount = 'intersectionObserverCount'
 export const IntersectionObserversWithStackTraces = 'intersectionObserversWithStackTraces'
+export const DisposableCount = 'disposableCount'
 export const MapSize = 'mapSize'
 export const MediaQueryListCount = 'mediaQueryListCount'
 export const MutationObserverCount = 'mutationObserverCount'
