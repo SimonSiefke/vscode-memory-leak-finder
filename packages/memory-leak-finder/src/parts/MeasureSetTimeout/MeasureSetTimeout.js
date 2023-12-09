@@ -25,3 +25,7 @@ export const compare = (before, after) => {
     after,
   }
 }
+
+export const isLeak = (result) => {
+  return result.after > result.before
+}

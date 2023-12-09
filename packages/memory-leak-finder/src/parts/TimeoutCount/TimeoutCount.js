@@ -7,6 +7,7 @@ export const startTrackingTimeouts = async (session, objectGroup) => {
   const evaluateResult = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: `(()=>{
 globalThis.___timeouts = 0
+globalThis.___knownIds = Object.create(null)
 
 globalThis.___originalSetTimeout = globalThis.setTimeout.bind(globalThis)
 globalThis.___originalClearTimeout = globalThis.clearTimeout.bind(globalThis)
@@ -16,11 +17,16 @@ globalThis.setTimeout = (fn, timeout) => {
     globalThis.___timeouts--
     fn()
   }
-  globalThis.___originalSetTimeout(wrapper, timeout)
+  const id = globalThis.___originalSetTimeout(wrapper, timeout)
+  globalThis.___knownIds[id] = true
+  return id
 }
 
 globalThis.clearTimeout = (id) => {
-  globalThis.___timeouts--
+  if(globalThis.___knownIds[id]){
+    globalThis.___timeouts--
+    delete globalThis.___knownIds[id]
+  }
   globalThis.___originalClearTimeout(id)
 }
 
@@ -30,12 +36,19 @@ undefined
 `,
     objectGroup,
   })
-
-  return 0
 }
 
 export const stopTrackingTimeouts = async (session, objectGroup) => {
-  // TODO
+  const evaluateResult = await DevtoolsProtocolRuntime.evaluate(session, {
+    expression: `(()=>{
+globalThis.___knownIds = Object.create(null)
+globalThis.setTimeout = globalThis.___originalSetTimeout
+globalThis.clearTimeout = globalThis.___originalClearTimeout
+})()
+undefined
+`,
+    objectGroup,
+  })
 }
 
 /**
