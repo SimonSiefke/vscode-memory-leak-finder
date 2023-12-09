@@ -5,6 +5,7 @@ export * as MeasureDetachedDomNodeCount from '../MeasureDetachedDomNodeCount/Mea
 export * as MeasureDetachedDomNodes from '../MeasureDetachedDomNodes/MeasureDetachedDomNodes.js'
 export * as MeasureDetachedDomNodesDifference from '../MeasureDetachedDomNodesDifference/MeasureDetachedDomNodesDifference.js'
 export * as MeasureDetachedDomNodesWithStackTraces from '../MeasureDetachedDomNodesWithStackTraces/MeasureDetachedDomNodesWithStackTraces.js'
+export * as MeasureDisposableCount from '../MeasureDisposableCount/MeasureDisposableCount.js'
 export * as MeasureDomNodeCount from '../MeasureDomNodeCount/MeasureDomNodeCount.js'
 export * as MeasureDomTimerCount from '../MeasureDomTimerCount/MeasureDomTimerCount.js'
 export * as MeasureEventListenerCount from '../MeasureEventListenerCount/MeasureEventListenerCount.js'
