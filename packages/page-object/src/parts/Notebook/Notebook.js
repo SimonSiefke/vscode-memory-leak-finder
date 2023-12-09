@@ -14,6 +14,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async scrollDown() {
       try {
+        await page.waitForIdle()
         const scrollContainer = page.locator('[aria-label^="Notebook"] .monaco-scrollable-element')
         await expect(scrollContainer).toBeVisible()
         await scrollContainer.scrollDown()
@@ -23,6 +24,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async scrollUp() {
       try {
+        await page.waitForIdle()
         const scrollContainer = page.locator('[aria-label^="Notebook"] .monaco-scrollable-element')
         await expect(scrollContainer).toBeVisible()
         await scrollContainer.scrollUp()
