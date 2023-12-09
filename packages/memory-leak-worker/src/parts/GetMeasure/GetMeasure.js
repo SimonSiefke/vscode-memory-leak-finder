@@ -1,5 +1,7 @@
 export const getMeasure = (MemoryLeakFinder, measureId) => {
   switch (measureId) {
+    case 'dom-timer-count':
+      return MemoryLeakFinder.Measures.MeasureDomTimerCount
     case 'array-count':
       return MemoryLeakFinder.Measures.MeasureArrayCount
     case 'array-element-count':
