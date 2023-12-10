@@ -1,7 +1,7 @@
-import * as Arrays from '../Arrays/Arrays.js'
-import * as GetDisposableStoreSizes from '../GetDisposableStoreSizes/GetDisposableStoreSizes.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as StartTrackingDisposableStores from '../StartTrackingDisposableStores/StartTrackingDisposableStores.js'
+import * as StopTrackingDisposableStores from '../StopTrackingDisposableStores/StopTrackingDisposableStores.js'
 
 // TODO
 // 1. find the DisposableStore constructor
@@ -21,12 +21,14 @@ export const create = (session) => {
   return [session, objectGroup]
 }
 
-export const start = (session, objectGroup) => {
-  return GetDisposableStoreSizes.getDisposableStoreSizes(session, objectGroup)
+export const start = async (session, objectGroup) => {
+  await StartTrackingDisposableStores.startTrackingDisposableStores(session, objectGroup)
+  return []
 }
 
-export const stop = (session, objectGroup) => {
-  return GetDisposableStoreSizes.getDisposableStoreSizes(session, objectGroup)
+export const stop = async (session, objectGroup) => {
+  await StopTrackingDisposableStores.stopTrackingDisposableStores(session, objectGroup)
+  return []
 }
 
 export const compare = (before, after) => {
@@ -36,10 +38,6 @@ export const compare = (before, after) => {
   }
 }
 
-const getTotal = (disposableStoreSizes) => {
-  return Arrays.sum(disposableStoreSizes)
-}
-
 export const isLeak = ({ before, after }) => {
-  return getTotal(after) > getTotal(before)
+  return false
 }
