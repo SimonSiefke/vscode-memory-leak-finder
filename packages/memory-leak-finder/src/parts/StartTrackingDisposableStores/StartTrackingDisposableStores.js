@@ -14,11 +14,11 @@ export const startTrackingDisposableStores = async (session, objectGroup) => {
   const first = disposableStores[0]
   const prototype = first.constructor
 
-  if(!prototype.add){
+  if(!prototype.prototype.add){
     throw new Error("no disposable add function found")
   }
 
-  globalThis.___disposableStoreOriginalAdd = prototype.add.bind(prototype)
+  globalThis.___disposableStoreOriginalAdd = prototype.prototype.add
 
   // based on https://github.com/sindresorhus/callsites
   const callsites = () => {
@@ -29,10 +29,10 @@ export const startTrackingDisposableStores = async (session, objectGroup) => {
     return stack.join('\\n')
   }
 
-  prototype.add = function(...args) {
+  prototype.prototype.add = function(...args) {
     const stackTrace = callsites()
     this.___stackTraces ||= []
-    this.___stackTraces.push(stackTraces)
+    this.___stackTraces.push(stackTrace)
     return globalThis.___disposableStoreOriginalAdd.apply(this, args)
   }
 }`,
