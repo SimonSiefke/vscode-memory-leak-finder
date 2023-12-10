@@ -8,10 +8,11 @@ export const getDisposableStoresWithStackTraces = async (session, objectGroup) =
   const disposableStores = this
 
   const getStackTraces = instance => {
-    return instance.___stackTraces
+    return instance.___stackTraces || []
   }
 
-  return disposableStores.map(getStackTraces)
+  const allStackTraces = disposableStores.map(getStackTraces)
+  return allStackTraces
 }`,
     objectId: fnResult1.objectId,
     returnByValue: true,
