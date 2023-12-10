@@ -1,3 +1,4 @@
+import * as GetDisposableStoresWithStackTraces from '../GetDisposableStoresWithStackTraces/GetDisposableStoresWithStackTraces.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 import * as StartTrackingDisposableStores from '../StartTrackingDisposableStores/StartTrackingDisposableStores.js'
@@ -27,8 +28,10 @@ export const start = async (session, objectGroup) => {
 }
 
 export const stop = async (session, objectGroup) => {
+  const stackTraces = await GetDisposableStoresWithStackTraces.getDisposableStoresWithStackTraces(session, objectGroup)
   await StopTrackingDisposableStores.stopTrackingDisposableStores(session, objectGroup)
-  return []
+  console.log({ stackTraces })
+  return stackTraces
 }
 
 export const compare = (before, after) => {

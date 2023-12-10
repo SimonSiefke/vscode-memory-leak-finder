@@ -14,11 +14,11 @@ export const startTrackingDisposableStores = async (session, objectGroup) => {
   const first = disposableStores[0]
   const prototype = first.constructor
 
-  if(!prototype.add){
+  if(!prototype.prototype.add){
     throw new Error("no disposable add function found")
   }
 
-  globalThis.___disposableStoreOriginalAdd = prototype.add.bind(prototype)
+  globalThis.___disposableStoreOriginalAdd = prototype.prototype.add.bind(prototype)
 
   // based on https://github.com/sindresorhus/callsites
   const callsites = () => {
