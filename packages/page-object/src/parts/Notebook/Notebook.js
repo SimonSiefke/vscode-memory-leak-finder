@@ -28,6 +28,7 @@ export const create = ({ expect, page, VError }) => {
         const scrollContainer = page.locator('[aria-label^="Notebook"] .monaco-scrollable-element')
         await expect(scrollContainer).toBeVisible()
         await scrollContainer.scrollUp()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to scroll up in notebook`)
       }
