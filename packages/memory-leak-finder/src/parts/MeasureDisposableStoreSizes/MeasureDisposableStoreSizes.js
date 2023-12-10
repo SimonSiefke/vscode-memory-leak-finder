@@ -18,10 +18,18 @@ export const stop = (session, objectGroup) => {
   return GetDisposableStoreSizes.getDisposableStoreSizes(session, objectGroup)
 }
 
+const compareSize = (a, b) => {
+  return b - a
+}
+
+const cleanArray = (sizes) => {
+  return Arrays.toSorted(sizes, compareSize)
+}
+
 export const compare = (before, after) => {
   return {
-    before,
-    after,
+    before: cleanArray(before),
+    after: cleanArray(after),
   }
 }
 
