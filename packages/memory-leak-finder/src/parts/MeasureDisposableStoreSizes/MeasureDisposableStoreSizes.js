@@ -1,10 +1,9 @@
-import * as CompareCount from '../CompareCount/CompareCount.js'
-import * as GetDisposableCount from '../GetDisposableCount/GetDisposableCount.js'
-import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
+import * as Arrays from '../Arrays/Arrays.js'
+import * as GetDisposableStoreSizes from '../GetDisposableStoreSizes/GetDisposableStoreSizes.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 
-export const id = MeasureId.DisposableCount
+export const id = MeasureId.DisposableStoreSizes
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
@@ -12,13 +11,24 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  return GetDisposableCount.getDisposableCount(session, objectGroup)
+  return GetDisposableStoreSizes.getDisposableStoreSizes(session, objectGroup)
 }
 
 export const stop = (session, objectGroup) => {
-  return GetDisposableCount.getDisposableCount(session, objectGroup)
+  return GetDisposableStoreSizes.getDisposableStoreSizes(session, objectGroup)
 }
 
-export const compare = CompareCount.compareCount
+export const compare = (before, after) => {
+  return {
+    before,
+    after,
+  }
+}
 
-export const isLeak = IsLeakCount.isLeakCount
+const getTotal = (disposableStoreSizes) => {
+  return Arrays.sum(disposableStoreSizes)
+}
+
+export const isLeak = ({ before, after }) => {
+  return getTotal(after) > getTotal(before)
+}
