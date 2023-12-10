@@ -12,6 +12,8 @@ export const getMeasure = (MemoryLeakFinder, measureId) => {
       return MemoryLeakFinder.Measures.MeasureDomNodeCount
     case 'disposable-count':
       return MemoryLeakFinder.Measures.MeasureDisposableCount
+    case 'disposable-store-sizes':
+      return MemoryLeakFinder.Measures.MeasureDisposableStoreSizes
     case 'detached-dom-node-count':
       return MemoryLeakFinder.Measures.MeasureDetachedDomNodeCount
     case 'detached-dom-nodes':
