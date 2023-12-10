@@ -13,9 +13,9 @@ export const stopTrackingDisposableStores = async (session, objectGroup) => {
 
   const first = disposableStores[0]
   const prototype = first.constructor
-  prototype.prototype.add = globalThis.___originalDisposableStoreAdd
+  prototype.prototype.add = globalThis.___disposableStoreOriginalAdd
 
-  delete globalThis.___originalDisposableStoreAdd
+  delete globalThis.___disposableStoreOriginalAdd
 }`,
     objectId: fnResult1.objectId,
     returnByValue: false,
