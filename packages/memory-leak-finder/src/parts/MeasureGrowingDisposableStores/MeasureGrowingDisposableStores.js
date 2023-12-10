@@ -30,7 +30,6 @@ export const start = async (session, objectGroup) => {
 export const stop = async (session, objectGroup) => {
   const stackTraces = await GetDisposableStoresWithStackTraces.getDisposableStoresWithStackTraces(session, objectGroup)
   await StopTrackingDisposableStores.stopTrackingDisposableStores(session, objectGroup)
-  console.log({ stackTraces })
   return stackTraces
 }
 
@@ -42,5 +41,5 @@ export const compare = (before, after) => {
 }
 
 export const isLeak = ({ before, after }) => {
-  return false
+  return after.length > 0
 }

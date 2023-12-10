@@ -11,7 +11,11 @@ export const getDisposableStoresWithStackTraces = async (session, objectGroup) =
     return instance.___stackTraces || []
   }
 
-  const allStackTraces = disposableStores.map(getStackTraces)
+  const hasLength = array => {
+    return array.length > 0
+  }
+
+  const allStackTraces = disposableStores.map(getStackTraces).filter(hasLength)
   return allStackTraces
 }`,
     objectId: fnResult1.objectId,
