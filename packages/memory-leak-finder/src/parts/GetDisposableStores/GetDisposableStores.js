@@ -16,10 +16,14 @@ export const getDisposableStores = async (session, objectGroup) => {
   const objects = this
 
   const isDisposableStore = (object) => {
-    return object && typeof object === 'object' && object.constructor && object.constructor.name === 'DisposableStore'
+    return object &&
+           object.constructor &&
+           object.constructor.name === 'DisposableStore' &&
+           '_toDispose' in object
   }
 
   const instances = objects.filter(isDisposableStore)
+
   return instances
 }`,
     objectId: objects.objects.objectId,

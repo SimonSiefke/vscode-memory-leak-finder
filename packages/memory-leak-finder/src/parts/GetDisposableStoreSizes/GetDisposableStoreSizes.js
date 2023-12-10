@@ -13,7 +13,7 @@ export const getDisposableStoreSizes = async (session, objectGroup) => {
   const disposableStores = this
 
   const getSize = (disposableStore) => {
-    return disposableStore.disposables.length
+    return disposableStore._toDispose.size
   }
 
   const disposableStoresWithSizes = disposableStores.map(getSize)
