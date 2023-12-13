@@ -21,7 +21,7 @@
     "got": "^14.0.0",
     "source-map": "^0.7.4",
     "strip-ansi": "^7.1.0",
-    "ws": "^8.15.0"
+    "ws": "^8.15.1"
   },
   "devDependencies": {
     "@babel/code-frame": "^7.23.5",
