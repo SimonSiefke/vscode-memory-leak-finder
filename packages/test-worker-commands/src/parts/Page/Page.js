@@ -1,7 +1,9 @@
 import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.js'
 import * as Locator from '../Locator/Locator.js'
+import * as PageBlur from '../PageBlur/PageBlur.js'
 import * as PageClose from '../PageClose/PageClose.js'
 import * as PageEvaluate from '../PageEvaluate/PageEvaluate.js'
+import * as PageFocus from '../PageFocus/PageFocus.js'
 import * as PageKeyBoard from '../PageKeyBoard/PageKeyBoard.js'
 import * as PageReload from '../PageReload/PageReload.js'
 import * as PageWaitForIdle from '../PageWaitForIdle/PageWaitForIdle.js'
@@ -56,6 +58,18 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
     },
     locator(selector, options = {}) {
       return Locator.create(this.rpc, this.sessionId, selector, options)
+    },
+    blur() {
+      return PageBlur.blur({
+        electronRpc: this.electronRpc,
+        electronObjectId: this.electronObjectId,
+      })
+    },
+    focus() {
+      return PageFocus.focus({
+        electronRpc: this.electronRpc,
+        electronObjectId: this.electronObjectId,
+      })
     },
   }
 }
