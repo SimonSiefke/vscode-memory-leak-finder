@@ -81,20 +81,20 @@ return detachedRoots
     functionDeclaration: `function(){
 const detachedRoots = this
 
-const getStackTrace = (detachedNode, stackTraceMap) => {
-  return stackTraceMap.get(detachedNode) || ''
+const getStackTrace = (detachedNode) => {
+  return detachedNode.___stackTrace || ''
 }
 
-const getStackTraces = (detachedNodes, stackTraceMap) => {
+const getStackTraces = (detachedNodes) => {
   const stackTraces = []
   for(const detachedNode of detachedNodes){
-    const stackTrace = getStackTrace(detachedNode, stackTraceMap)
+    const stackTrace = getStackTrace(detachedNode)
     stackTraces.push(stackTrace)
   }
   return stackTraces
 }
 
-const stackTraces = getStackTraces(detachedRoots, globalThis.___domNodeStackTraces)
+const stackTraces = getStackTraces(detachedRoots)
 return stackTraces
 }`,
     objectId: fnResult1.objectId,
