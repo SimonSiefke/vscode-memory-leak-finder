@@ -16,8 +16,8 @@ RUN sudo apt-get update \
 
 
 RUN bash -c ". .nvm/nvm.sh \
-    && nvm install 18.18.2 \
-    && nvm use 18.18.2 \
-    && nvm alias default 18.18.2"
+    && nvm install 18.19.0 \
+    && nvm use 18.19.0 \
+    && nvm alias default 18.19.0"
 
 RUN echo "nvm use default &>/dev/null" >> ~/.bashrc.d/51-nvm-fix
