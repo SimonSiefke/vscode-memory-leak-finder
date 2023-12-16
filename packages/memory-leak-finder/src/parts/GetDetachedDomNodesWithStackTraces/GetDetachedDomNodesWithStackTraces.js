@@ -21,7 +21,7 @@ const isDetached = node => {
   try {
     node.nodeType
     return false
-  } catch (error) {
+  } catch {
     return true
   }
 }
