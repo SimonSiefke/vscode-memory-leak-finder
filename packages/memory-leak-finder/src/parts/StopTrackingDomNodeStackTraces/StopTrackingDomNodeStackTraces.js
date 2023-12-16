@@ -11,7 +11,6 @@ export const stopTrackingDomNodeStackTraces = async (session, objectGroup) => {
 document.createElement = globalThis.___originalCreateElement
 
 delete globalThis.___originalCreateElement
-delete globalThis.___domNodeStackTraces
 
 })()
 undefined
