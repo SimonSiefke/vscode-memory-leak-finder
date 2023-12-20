@@ -8,6 +8,7 @@ export * as MeasureDetachedDomNodesDifference from '../MeasureDetachedDomNodesDi
 export * as MeasureDetachedDomNodesWithStackTraces from '../MeasureDetachedDomNodesWithStackTraces/MeasureDetachedDomNodesWithStackTraces.js'
 export * as MeasureDisposableCount from '../MeasureDisposableCount/MeasureDisposableCount.js'
 export * as MeasureDisposableStoreSizes from '../MeasureDisposableStoreSizes/MeasureDisposableStoreSizes.js'
+export * as MeasureDisposables from '../MeasureDisposables/MeasureDisposables.js'
 export * as MeasureDomNodeCount from '../MeasureDomNodeCount/MeasureDomNodeCount.js'
 export * as MeasureDomTimerCount from '../MeasureDomTimerCount/MeasureDomTimerCount.js'
 export * as MeasureEventListenerCount from '../MeasureEventListenerCount/MeasureEventListenerCount.js'
