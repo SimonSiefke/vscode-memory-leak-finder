@@ -5,7 +5,7 @@ import * as GetFunctionLocations from '../GetFunctionLocations/GetFunctionLocati
 import * as GetFunctionObjectIds from '../GetFunctionObjectIds/GetFunctionObjectIds.js'
 import * as CleanFunctionLocations from '../CleanFunctionLocations/CleanFunctionLocations.js'
 
-export const getDisposablesWithLocation = async (session, objectGroup) => {
+export const getDisposablesWithLocation = async (session, objectGroup, scriptMap) => {
   const disposables = await GetDisposables.getDisposables(session, objectGroup)
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
@@ -35,6 +35,5 @@ export const getDisposablesWithLocation = async (session, objectGroup) => {
   const functionObjectIds = GetFunctionObjectIds.getFunctionObjectIds(descriptors)
   const functionLocations = await GetFunctionLocations.getFunctionLocations(session, functionObjectIds)
   const cleanFunctionLocations = CleanFunctionLocations.cleanFunctionLocations(functionLocations)
-  console.log({ cleanFunctionLocations })
   return cleanFunctionLocations
 }
