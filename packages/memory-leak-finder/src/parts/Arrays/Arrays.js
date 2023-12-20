@@ -9,3 +9,13 @@ export const sum = (values) => {
   }
   return total
 }
+
+export const unique = (values) => {
+  const seen = []
+  for (const value of values) {
+    if (!seen.includes(value)) {
+      seen.push(value)
+    }
+  }
+  return seen
+}

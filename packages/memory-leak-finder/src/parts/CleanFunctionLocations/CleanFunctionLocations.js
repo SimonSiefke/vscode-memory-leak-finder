@@ -8,7 +8,7 @@ const compareCount = (a, b) => {
   return b.count - a.count
 }
 
-export const cleanFunctionLocations = (functionLocations) => {
+export const cleanFunctionLocations = (counts, functionObjectIds, functionLocations) => {
   const countMap = Object.create(null)
   const instances = []
   for (const functionLocation of functionLocations) {
