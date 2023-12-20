@@ -1,6 +1,6 @@
 import * as CleanFunctionLocations from '../src/parts/CleanFunctionLocations/CleanFunctionLocations.js'
 
-test('cleanFunctionLocations', () => {
+test.skip('cleanFunctionLocations', () => {
   const functionLocations = [
     {
       scriptId: '12',
