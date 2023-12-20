@@ -3,7 +3,7 @@ import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOrigi
 
 const prepareDisposable = (disposable, scriptMap) => {
   const { lineNumber, columnNumber, count, scriptId } = disposable
-  const script = scriptMap[scriptId]
+  const script = scriptMap[scriptId] || {}
   return {
     stack: [`${script.url}:${lineNumber}:${columnNumber}`],
     sourceMaps: [script.sourceMapUrl],
