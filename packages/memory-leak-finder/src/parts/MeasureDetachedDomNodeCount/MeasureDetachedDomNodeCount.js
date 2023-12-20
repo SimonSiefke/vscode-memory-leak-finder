@@ -1,20 +1,22 @@
-import * as GetDetachedDomNodeCount from '../GetDetachedDomNodeCount/GetDetachedDomNodeCount.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as CompareCount from '../CompareCount/CompareCount.js'
+import * as GetDetachedDomNodeCount from '../GetDetachedDomNodeCount/GetDetachedDomNodeCount.js'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
+import * as MeasureId from '../MeasureId/MeasureId.js'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 
 export const id = MeasureId.DetachedDomNodeCount
 
 export const create = (session) => {
-  return [session]
+  const objectGroup = ObjectGroupId.create()
+  return [session, objectGroup]
 }
 
-export const start = (session) => {
-  return GetDetachedDomNodeCount.getDetachedDomNodeCount(session)
+export const start = (session, objectGroup) => {
+  return GetDetachedDomNodeCount.getDetachedDomNodeCount(session, objectGroup)
 }
 
-export const stop = (session) => {
-  return GetDetachedDomNodeCount.getDetachedDomNodeCount(session)
+export const stop = (session, objectGroup) => {
+  return GetDetachedDomNodeCount.getDetachedDomNodeCount(session, objectGroup)
 }
 
 export const compare = CompareCount.compareCount
