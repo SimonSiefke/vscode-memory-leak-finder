@@ -9,7 +9,7 @@ export const waitForDebuggerListening = async (stream) => {
     if (RE_STARTING_INSPECTOR_FAILED.test(firstData)) {
       throw new Error(firstData.trim())
     }
-    throw new Error(`Failed to connect to debugger: unexpected first message: ${firstData}`)
+    throw new Error(`Failed to connect to debugger: Unexpected first message: ${firstData}`)
   }
   const match = firstData.match(RE_LISTENING_ON)
   if (!match) {

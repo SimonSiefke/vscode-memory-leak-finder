@@ -36,7 +36,7 @@ test('launch - error - address already in use', async () => {
   })
   // TODO mock WaitForDebuggerlistening module instead of mocking spawn
   await expect(LaunchElectron.launchElectron({ cliPath: '', args: [], headlessMode: true })).rejects.toThrowError(
-    new Error(`Failed to launch electron: Starting inspector on 127.0.0.1:4444 failed: address already in use`)
+    new Error(`Failed to launch electron: Starting inspector on 127.0.0.1:4444 failed: address already in use`),
   )
 })
 
@@ -59,7 +59,7 @@ test('launch - error - unexpected first message', async () => {
     }
   })
   await expect(LaunchElectron.launchElectron({ cliPath: '', args: [], headlessMode: true })).rejects.toThrowError(
-    new Error('Failed to launch electron: Failed to connect to debugger: unexpected first message: abc')
+    new Error('Failed to launch electron: Failed to connect to debugger: Unexpected first message: abc'),
   )
 })
 
@@ -69,6 +69,6 @@ test('launch - error - empty cli path', async () => {
     throw new Error("The argument 'file' cannot be empty. Received ''")
   })
   await expect(LaunchElectron.launchElectron({ cliPath: '', args: [], headlessMode: true })).rejects.toThrowError(
-    new Error(`Failed to launch electron: The argument 'file' cannot be empty. Received ''`)
+    new Error(`Failed to launch electron: The argument 'file' cannot be empty. Received ''`),
   )
 })

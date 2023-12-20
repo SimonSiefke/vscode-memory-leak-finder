@@ -63,5 +63,5 @@ export const getElectronErrorMessage = async (firstData, stream) => {
     }
     return new Error(`${firstData}${secondData}`)
   }
-  return new Error(`Failed to connect to devtools: unexpected first message: ${firstData}`)
+  return new Error(`Failed to connect to devtools: Unexpected first message: ${firstData}`)
 }
