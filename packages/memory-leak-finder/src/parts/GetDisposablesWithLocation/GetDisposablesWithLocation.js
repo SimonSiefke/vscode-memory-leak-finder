@@ -3,6 +3,7 @@ import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues
 import * as GetDisposables from '../GetDisposables/GetDisposables.js'
 import * as GetFunctionLocations from '../GetFunctionLocations/GetFunctionLocations.js'
 import * as GetFunctionObjectIds from '../GetFunctionObjectIds/GetFunctionObjectIds.js'
+import * as CleanFunctionLocations from '../CleanFunctionLocations/CleanFunctionLocations.js'
 
 export const getDisposablesWithLocation = async (session, objectGroup) => {
   const disposables = await GetDisposables.getDisposables(session, objectGroup)
@@ -33,7 +34,7 @@ export const getDisposablesWithLocation = async (session, objectGroup) => {
   const descriptors = GetDescriptorValues.getDescriptorValues(fnResult2.result)
   const functionObjectIds = GetFunctionObjectIds.getFunctionObjectIds(descriptors)
   const functionLocations = await GetFunctionLocations.getFunctionLocations(session, functionObjectIds)
-
-  console.log({ functionLocations })
-  return functionLocations
+  const cleanFunctionLocations = CleanFunctionLocations.cleanFunctionLocations(functionLocations)
+  console.log({ cleanFunctionLocations })
+  return cleanFunctionLocations
 }
