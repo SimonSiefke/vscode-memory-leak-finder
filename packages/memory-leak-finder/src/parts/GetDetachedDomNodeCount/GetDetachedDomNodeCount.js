@@ -20,7 +20,7 @@ export const getDetachedDomNodeCount = async (session, objectGroup) => {
     functionDeclaration: `function(){
 const objects = this
 
-const isDetached = node => {
+const isGarbageCollected = node => {
   try {
     node.nodeType
     return false
@@ -46,7 +46,7 @@ const getDetachedNodes = (nodes) => {
   const list = getAllNodes()
   const detached = []
   for (const node of nodes) {
-    if (list.includes(node) || isDetached(node)) {
+    if (list.includes(node) || isGarbageCollected(node)) {
       continue
     }
     detached.push(node)
