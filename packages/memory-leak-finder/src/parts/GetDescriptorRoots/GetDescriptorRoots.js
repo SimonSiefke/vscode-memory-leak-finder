@@ -19,7 +19,7 @@ export const getDescriptors = async (session, prototype) => {
     functionDeclaration: `function(){
 const objects = this
 
-const isGarbageCollected = node => {
+const isDetached = node => {
   try {
     node.nodeType
     return false
@@ -45,7 +45,7 @@ const getDetachedNodes = (nodes) => {
   const list = getAllNodes()
   const detached = []
   for (const node of nodes) {
-    if (list.includes(node) || node === document || isGarbageCollected(node)) {
+    if (list.includes(node) || node === document || isDetached(node)) {
       continue
     }
     detached.push(node)
@@ -53,8 +53,22 @@ const getDetachedNodes = (nodes) => {
   return detached
 }
 
+const getDetachedRoots = detachedNodes => {
+  const detachedRoots = []
+  for(const detachedNode of detachedNodes){
+    if(detachedNodes.includes(detachedNode.parentNode)){
+      continue
+    }
+    detachedRoots.push(detachedNode)
+  }
+  return detachedRoots
+}
+
+
+
 const detachedNodes = getDetachedNodes(objects)
-return detachedNodes
+const detachedRoots = getDetachedRoots(detachedNodes)
+return detachedRoots
 }`,
     objectId: objects.objects.objectId,
     returnByValue: false,
