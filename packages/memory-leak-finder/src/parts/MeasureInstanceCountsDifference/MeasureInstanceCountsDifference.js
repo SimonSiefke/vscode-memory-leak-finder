@@ -1,8 +1,8 @@
 import * as CompareInstanceCountsDifference from '../CompareInstanceCountsDifference/CompareInstanceCountsDifference.js'
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as GetInstanceCounts from '../GetInstanceCounts/GetInstanceCounts.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
 
 export const id = MeasureId.InstanceCountsDifference
 
@@ -17,7 +17,7 @@ export const start = (session, objectGroup) => {
 
 export const stop = async (session, objectGroup) => {
   const result = await GetInstanceCounts.getInstanceCounts(session, objectGroup)
-  await DevtoolsProtocolRuntime.releaseObjectGroup(session, { objectGroup })
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return result
 }
 

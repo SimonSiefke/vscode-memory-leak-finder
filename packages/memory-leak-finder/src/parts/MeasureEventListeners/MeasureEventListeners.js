@@ -1,8 +1,8 @@
 import * as CompareEventListeners from '../CompareEventListeners/CompareEventListeners.js'
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as GetEventListeners from '../GetEventListeners/GetEventListeners.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
 
 export const id = MeasureId.EventListeners
 
@@ -38,9 +38,7 @@ export const stop = async (session, objectGroup, scriptMap, handleScriptParsed) 
   session.off('Debugger.scriptParsed', handleScriptParsed)
   await session.invoke('Debugger.disable')
   const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptMap)
-  await DevtoolsProtocolRuntime.releaseObjectGroup(session, {
-    objectGroup,
-  })
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return result
 }
 
