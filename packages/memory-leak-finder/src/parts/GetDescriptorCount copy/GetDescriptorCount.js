@@ -1,13 +1,12 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.js'
 
 /**
  *
  * @param {any} session
  * @param {string} prototype
- * @returns {Promise<any>}
+ * @returns {Promise<number>}
  */
-export const getDescriptors = async (session, prototype) => {
+export const getDescriptorCount = async (session, prototype) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: prototype,
     returnByValue: false,
@@ -19,11 +18,11 @@ export const getDescriptors = async (session, prototype) => {
     functionDeclaration: `function(){
 const objects = this
 
-const isGarbageCollected = node => {
+const isDetached = node => {
   try {
     node.nodeType
     return false
-  } catch {
+  } catch (error) {
     return true
   }
 }
@@ -45,7 +44,7 @@ const getDetachedNodes = (nodes) => {
   const list = getAllNodes()
   const detached = []
   for (const node of nodes) {
-    if (list.includes(node) || node === document || isGarbageCollected(node)) {
+    if (list.includes(node) || node === document || isDetached(node)) {
       continue
     }
     detached.push(node)
@@ -53,17 +52,24 @@ const getDetachedNodes = (nodes) => {
   return detached
 }
 
+const getDetachedRoots = detachedNodes => {
+  const detachedRoots = []
+  for(const detachedNode of detachedNodes){
+    if(detachedNodes.includes(detachedNode.parentNode)){
+      continue
+    }
+    detachedRoots.push(detachedNode)
+  }
+  return detachedRoots
+}
+
 const detachedNodes = getDetachedNodes(objects)
-return detachedNodes
+const detachedRoots = getDetachedRoots(detachedNodes)
+return detachedRoots.length
 }`,
     objectId: objects.objects.objectId,
-    returnByValue: false,
+    returnByValue: true,
   })
 
-  const fnResult2 = await DevtoolsProtocolRuntime.getProperties(session, {
-    objectId: fnResult1.objectId,
-    ownProperties: true,
-  })
-  const descriptors = GetDescriptorValues.getDescriptorValues(fnResult2.result)
-  return descriptors
+  return fnResult1
 }

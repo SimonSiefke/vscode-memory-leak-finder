@@ -18,6 +18,8 @@ export const getMeasure = (MemoryLeakFinder, measureId) => {
       return MemoryLeakFinder.Measures.MeasureDetachedDomNodeCount
     case 'detached-dom-nodes':
       return MemoryLeakFinder.Measures.MeasureDetachedDomNodes
+    case 'detached-dom-node-roots':
+      return MemoryLeakFinder.Measures.MeasureDetachedDomNodeRoots
     case 'detached-dom-nodes-with-stack-traces':
       return MemoryLeakFinder.Measures.MeasureDetachedDomNodesWithStackTraces
     case 'growing-disposable-stores':
