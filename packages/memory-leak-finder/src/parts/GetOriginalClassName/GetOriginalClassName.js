@@ -3,6 +3,9 @@ const classPrefix = 'class '
 const extendsPrefix = 'extends'
 
 export const getOriginalClassName = (sourceContent, originalLine, originalColumn) => {
+  if (!sourceContent) {
+    return 'unknown'
+  }
   const lines = sourceContent.split('\n')
   for (let i = originalLine; i >= 0; i--) {
     const line = lines[i]
