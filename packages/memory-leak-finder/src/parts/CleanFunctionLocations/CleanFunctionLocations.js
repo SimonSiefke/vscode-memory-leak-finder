@@ -1,31 +1,18 @@
 import * as Arrays from '../Arrays/Arrays.js'
 
-const getFunctionKey = (value) => {
-  return `${value.scriptId}:${value.lineNumber}:${value.columnNumber}`
-}
-
 const compareCount = (a, b) => {
   return b.count - a.count
 }
 
-export const cleanFunctionLocations = (counts, functionObjectIds, functionLocations) => {
-  const countMap = Object.create(null)
+export const cleanFunctionLocations = (counts, functionLocations) => {
   const instances = []
-  for (const functionLocation of functionLocations) {
-    const key = getFunctionKey(functionLocation)
-    if (countMap[key]) {
-      countMap[key]++
-    } else {
-      instances.push({
-        ...functionLocation,
-        count: 0,
-      })
-      countMap[key] = 1
-    }
-  }
-  for (const instance of instances) {
-    const key = getFunctionKey(instance)
-    instance.count = countMap[key]
+  for (let i = 0; i < functionLocations.length; i++) {
+    const count = counts[i]
+    const functionLocation = functionLocations[i]
+    instances.push({
+      ...functionLocation,
+      count,
+    })
   }
   const sorted = Arrays.toSorted(instances, compareCount)
   return sorted

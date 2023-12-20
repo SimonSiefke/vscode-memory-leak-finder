@@ -80,6 +80,6 @@ export const getDisposablesWithLocation = async (session, objectGroup, scriptMap
   const descriptors = GetDescriptorValues.getDescriptorValues(fnResult4.result)
   const functionObjectIds = GetFunctionObjectIds.getFunctionObjectIds(descriptors)
   const functionLocations = await GetFunctionLocations.getFunctionLocations(session, functionObjectIds)
-  const cleanFunctionLocations = CleanFunctionLocations.cleanFunctionLocations(fnResult3, functionObjectIds, functionLocations)
+  const cleanFunctionLocations = CleanFunctionLocations.cleanFunctionLocations(fnResult3, functionLocations)
   return cleanFunctionLocations
 }
