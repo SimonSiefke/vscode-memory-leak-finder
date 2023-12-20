@@ -1,5 +1,6 @@
 import * as CompareDisposablesWithLocation from '../CompareDisposablesWithLocation/CompareDisposablesWithLocation.js'
 import * as GetDisposablesWithLocation from '../GetDisposablesWithLocation/GetDisposablesWithLocation.js'
+import * as IsLeakDisposables from '../IsLeakDisposables/IsLeakDisposables.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 
@@ -47,6 +48,4 @@ export const stop = async (session, objectGroup, scriptMap, handleScriptParsed) 
 
 export const compare = CompareDisposablesWithLocation.compareDisposablesWithLocation
 
-export const isLeak = ({ before, after }) => {
-  return false
-}
+export const isLeak = IsLeakDisposables.isLeakDisposables
