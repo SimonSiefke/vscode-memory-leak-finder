@@ -74,7 +74,7 @@ export const runTests = async (
       }
       try {
         const start = i === 0 ? initialStart : Time.now()
-        const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(testWorkerIpc, connectionId, formattedPath.absolutePath, forceRun)
+        const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(testWorkerIpc, connectionId, absolutePath, forceRun)
         if (testSkipped) {
           skipped++
           const end = Time.now()
@@ -85,18 +85,18 @@ export const runTests = async (
           if (checkLeaks) {
             if (measureAfter) {
               for (let i = 0; i < 2; i++) {
-                await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, formattedPath.absolutePath, forceRun)
+                await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun)
               }
             }
             const before = await MemoryLeakFinder.start(memoryLeakWorkerIpc, connectionId)
             for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, formattedPath.absolutePath, forceRun)
+              await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun)
             }
             const after = await MemoryLeakFinder.stop(memoryLeakWorkerIpc, connectionId)
             const result = await MemoryLeakFinder.compare(memoryLeakWorkerIpc, connectionId, before, after)
             const fileName = dirent.replace('.js', '.json')
-            const absolutePath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
-            await JsonFile.writeJson(absolutePath, result)
+            const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
+            await JsonFile.writeJson(resultPath, result)
             if (result.isLeak) {
               isLeak = true
               leaking++
@@ -108,7 +108,7 @@ export const runTests = async (
             }
           } else {
             for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, formattedPath.absolutePath, forceRun)
+              await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun)
             }
           }
           const end = Time.now()
