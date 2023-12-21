@@ -5,6 +5,12 @@ export const getModule = (protocol) => {
     case 'http':
     case 'https':
       return import('../LoadSourceMapFromUrl/LoadSourceMapFromUrl.js')
+    case 'noop':
+      return {
+        loadSourceMap() {
+          return {}
+        },
+      }
     default:
       throw new Error(`unsupported protocol ${protocol}`)
   }

@@ -28,7 +28,7 @@ export const combineEventListenersWithSourceMapResults = (eventListeners, map, c
     if (index === -1) {
       throw new Error(`index not found for ${sourceMapUrl}:${line}:${column}`)
     }
-    const cleanPosition = cleanPositionMap[sourceMapUrl][index]
+    const cleanPosition = cleanPositionMap[sourceMapUrl]?.[index]
     if (cleanPosition) {
       const { sourceMaps, ...rest } = eventListener
       newEventListeners.push({
