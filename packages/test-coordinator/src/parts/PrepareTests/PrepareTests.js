@@ -7,7 +7,7 @@ import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDe
 import * as VideoRecording from '../VideoRecording/VideoRecording.js'
 import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
 
-export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connectionId) => {
+export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connectionId, timeouts) => {
   const isFirstConnection = true
   await KillExistingVscodeInstances.killExistingVsCodeInstances()
   const { child, webSocketUrl } = await LaunchVsCode.launchVsCode({
@@ -36,7 +36,7 @@ export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connecti
     callFrameId,
     isFirstConnection,
   )
-  await PageObject.create(ipc, connectionId, isFirstConnection, headlessMode)
+  await PageObject.create(ipc, connectionId, isFirstConnection, headlessMode, timeouts)
   return {
     ipc,
     webSocketUrl,
