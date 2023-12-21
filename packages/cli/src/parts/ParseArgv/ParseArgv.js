@@ -32,6 +32,7 @@ export const parseArgv = (argv) => {
     measure: 'event-listener-count',
     measureAfter: false,
     timeouts: true,
+    timeoutBetween: 0,
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -62,6 +63,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--disable-timeouts')) {
     options.timeouts = false
+  }
+  if (argv.includes('--timeout-between')) {
+    options.timeoutBetween = parseArgvNumber(argv, '--timeout-between')
   }
   return options
 }
