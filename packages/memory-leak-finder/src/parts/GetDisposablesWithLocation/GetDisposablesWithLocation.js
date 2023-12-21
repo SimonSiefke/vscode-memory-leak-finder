@@ -47,6 +47,25 @@ export const getDisposablesWithLocation = async (session, objectGroup, scriptMap
     returnByValue: false,
     objectGroup,
   })
+  const fnResult5 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
+    functionDeclaration: `function(){
+  const uniqueLocations = this
+
+  const getName = value => {
+    return value.name
+  }
+
+  const getNames = values => {
+    return values.map(getName)
+  }
+
+  const names = getNames(uniqueLocations)
+  return names
+}`,
+    objectId: fnResult2.objectId,
+    returnByValue: true,
+    objectGroup,
+  })
   const fnResult3 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
   const locations = this
@@ -80,6 +99,6 @@ export const getDisposablesWithLocation = async (session, objectGroup, scriptMap
   const descriptors = GetDescriptorValues.getDescriptorValues(fnResult4.result)
   const functionObjectIds = GetFunctionObjectIds.getFunctionObjectIds(descriptors)
   const functionLocations = await GetFunctionLocations.getFunctionLocations(session, functionObjectIds)
-  const cleanFunctionLocations = CleanFunctionLocations.cleanFunctionLocations(fnResult3, functionLocations)
+  const cleanFunctionLocations = CleanFunctionLocations.cleanFunctionLocations(fnResult5, fnResult3, functionLocations)
   return cleanFunctionLocations
 }

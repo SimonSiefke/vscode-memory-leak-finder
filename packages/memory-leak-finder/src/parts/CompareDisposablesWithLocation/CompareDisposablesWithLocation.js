@@ -2,12 +2,13 @@ import * as Assert from '../Assert/Assert.js'
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
 
 const prepareDisposable = (disposable, scriptMap) => {
-  const { lineNumber, columnNumber, count, scriptId } = disposable
+  const { lineNumber, columnNumber, count, scriptId, name } = disposable
   const script = scriptMap[scriptId] || {}
   return {
     stack: [`${script.url}:${lineNumber}:${columnNumber}`],
     sourceMaps: [script.sourceMapUrl],
     count,
+    name,
   }
 }
 
@@ -20,9 +21,9 @@ const prepareDisposables = (disposables, scriptMap) => {
 }
 
 const finishDisposable = (disposableWithStack) => {
-  const { stack, count, originalStack, originalName } = disposableWithStack
+  const { stack, count, originalStack, originalName, name } = disposableWithStack
   return {
-    name: originalName,
+    name: originalName || name,
     count,
     location: originalStack?.[0] || stack?.[0] || '',
   }
