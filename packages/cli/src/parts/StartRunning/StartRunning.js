@@ -15,6 +15,7 @@ export const startRunning = async (
   measure,
   measureAfter,
   timeouts,
+  timeoutBetween,
 ) => {
   Stdout.write(AnsiEscapes.clear)
   const worker = await RunTest.prepare()
@@ -32,5 +33,6 @@ export const startRunning = async (
     measure,
     measureAfter,
     timeouts,
+    timeoutBetween,
   )
 }
