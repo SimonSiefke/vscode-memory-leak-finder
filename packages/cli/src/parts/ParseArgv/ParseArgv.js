@@ -31,6 +31,7 @@ export const parseArgv = (argv) => {
     filter: '',
     measure: 'event-listener-count',
     measureAfter: false,
+    timeouts: true,
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -58,6 +59,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--measure-after')) {
     options.measureAfter = true
+  }
+  if (argv.includes('--disable-timeouts')) {
+    options.timeouts = false
   }
   return options
 }

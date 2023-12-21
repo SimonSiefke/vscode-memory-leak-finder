@@ -14,6 +14,7 @@ export const state = {
   value: Character.EmptyString,
   watch: false,
   measureAfter: false,
+  timeouts: true,
 }
 
 export const setState = (newState) => {
@@ -27,6 +28,7 @@ export const setState = (newState) => {
   state.value = newState.value
   state.watch = newState.watch
   state.measureAfter = newState.measureAfter
+  state.timeouts = newState.timeouts
 }
 
 export const setBuffering = (value) => {

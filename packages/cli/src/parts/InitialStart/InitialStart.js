@@ -21,5 +21,6 @@ export const initialStart = async (options) => {
     options.runs,
     options.measure,
     options.measureAfter,
+    options.timeouts,
   )
 }
