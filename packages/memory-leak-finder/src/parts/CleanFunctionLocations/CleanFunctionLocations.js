@@ -1,7 +1,7 @@
 import * as Arrays from '../Arrays/Arrays.js'
 
-const compareCount = (a, b) => {
-  return b.count - a.count
+const compareFunction = (a, b) => {
+  return b.count - a.count || a.name.localeCompare(b.name)
 }
 
 export const cleanFunctionLocations = (names, counts, functionLocations) => {
@@ -16,6 +16,6 @@ export const cleanFunctionLocations = (names, counts, functionLocations) => {
       name,
     })
   }
-  const sorted = Arrays.toSorted(instances, compareCount)
+  const sorted = Arrays.toSorted(instances, compareFunction)
   return sorted
 }
