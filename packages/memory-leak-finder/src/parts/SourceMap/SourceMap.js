@@ -34,9 +34,11 @@ export const getOriginalPositions = async (sourceMap, positions, classNames) => 
       })
       if (classNames && originalPosition.source) {
         const index = sourceMap.sources.indexOf(originalPosition.source)
-        const originalCode = sourceMap.sourcesContent[index]
-        const originalClassName = GetOriginalClassName.getOriginalClassName(originalCode, originalPosition.line, originalPosition.column)
-        originalPosition.name = originalClassName
+        if (index !== -1) {
+          const originalCode = sourceMap.sourcesContent[index]
+          const originalClassName = GetOriginalClassName.getOriginalClassName(originalCode, originalPosition.line, originalPosition.column)
+          originalPosition.name = originalClassName
+        }
       }
       originalPositions.push(originalPosition)
     }
