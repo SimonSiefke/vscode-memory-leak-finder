@@ -11,6 +11,7 @@ import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType
 import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.js'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.js'
 import * as Time from '../Time/Time.js'
+import * as Timeout from '../Timeout/Timeout.js'
 
 // 1. get matching files
 // 2. launch vscode
@@ -95,6 +96,9 @@ export const runTests = async (
               await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun)
             }
             const after = await MemoryLeakFinder.stop(memoryLeakWorkerIpc, connectionId)
+            if (timeoutBetween) {
+              await Timeout.setTimeout(timeoutBetween)
+            }
             const result = await MemoryLeakFinder.compare(memoryLeakWorkerIpc, connectionId, before, after)
             const fileName = dirent.replace('.js', '.json')
             const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
