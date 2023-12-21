@@ -8,7 +8,9 @@ export const getModule = (protocol) => {
     case 'noop':
       return {
         loadSourceMap() {
-          return {}
+          return {
+            version: '3',
+          }
         },
       }
     default:
