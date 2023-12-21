@@ -5,7 +5,7 @@ const hasDifference = (item) => {
 }
 
 export const compareDisposablesWithLocationDifference = async (before, after) => {
-  const result = CompareDisposablesWithLocation.compareDisposablesWithLocation(before, after)
+  const result = await CompareDisposablesWithLocation.compareDisposablesWithLocation(before, after)
   const filtered = result.filter(hasDifference)
   return filtered
 }
