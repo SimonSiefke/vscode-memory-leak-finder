@@ -1,13 +1,7 @@
-const getTotalCount = (values) => {
-  let total = 0
-  for (const value of values) {
-    total += value.count
-  }
-  return total
+const hasGreaterCount = (item) => {
+  return item.count > item.oldCount
 }
 
-export const isLeakDisposables = ({ before, after }) => {
-  const totalBefore = getTotalCount(before)
-  const totalAfter = getTotalCount(after)
-  return totalAfter > totalBefore
+export const isLeakDisposables = (newItems) => {
+  return newItems.some(hasGreaterCount)
 }

@@ -41,6 +41,24 @@ const improveDisposableOutput = async (disposables, scriptMap) => {
   return finished
 }
 
+const addDeltas = (prettyBefore, prettyAfter) => {
+  const newItems = []
+  const countMap = Object.create(null)
+  for (const item of prettyBefore) {
+    countMap[item.name] = item.count
+  }
+  for (const item of prettyAfter) {
+    const { name, count, location } = item
+    newItems.push({
+      name,
+      count,
+      oldCount: countMap[item.name] || 0,
+      location,
+    })
+  }
+  return newItems
+}
+
 export const compareDisposablesWithLocation = async (before, after) => {
   const beforeResult = before
   const afterResult = after.result
@@ -50,8 +68,6 @@ export const compareDisposablesWithLocation = async (before, after) => {
   Assert.object(scriptMap)
   const prettyBefore = await improveDisposableOutput(beforeResult, scriptMap)
   const prettyAfter = await improveDisposableOutput(afterResult, scriptMap)
-  return {
-    before: prettyBefore,
-    after: prettyAfter,
-  }
+  const withDeltas = addDeltas(prettyBefore, prettyAfter)
+  return withDeltas
 }
