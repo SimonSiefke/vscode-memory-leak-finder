@@ -4,7 +4,8 @@ import * as LoadSourceMapModule from '../LoadSourceMapModule/LoadSourceMapModule
 const getProtocol = (url) => {
   const colonIndex = url.indexOf(':')
   if (colonIndex === -1) {
-    throw new Error(`Unsupported source map url ${url}`)
+    console.warn(`Unsupported source map url ${url}`)
+    return 'noop'
   }
   return url.slice(0, colonIndex)
 }
