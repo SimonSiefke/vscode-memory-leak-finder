@@ -1,7 +1,3 @@
-import * as TestFrameWork from './parts/TestFrameWork/TestFrameWork.ipc.js'
+import * as Main from './parts/Main/Main.js'
 
-const main = () => {
-  globalThis.test = TestFrameWork.Commands
-}
-
-main()
+Main.main()
