@@ -4,6 +4,7 @@ import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.js'
 import * as HandleFrame from '../HandleFrame/HandleFrame.js'
 import * as PTimeout from '../PTimeout/PTimeout.js'
+import * as ScreencastQuality from '../ScreencastQuality/ScreencastQuality.js'
 import * as SessionState from '../SessionState/SessionState.js'
 import * as TargetState from '../TargetState/TargetState.js'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
@@ -41,7 +42,7 @@ const handleAttachedToPage = async (message) => {
         DevtoolsProtocolPage.enable(sessionRpc),
         DevtoolsProtocolPage.startScreencast(sessionRpc, {
           format: 'jpeg',
-          quality: 90,
+          quality: ScreencastQuality.screencastQuality,
           maxWidth: 1024,
           maxHeight: 768,
         }),
