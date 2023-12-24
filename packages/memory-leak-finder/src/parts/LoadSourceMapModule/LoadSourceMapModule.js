@@ -10,6 +10,8 @@ export const getModule = (protocol) => {
         loadSourceMap() {
           return {
             version: '3',
+            sources: [],
+            mappings: [],
           }
         },
       }
