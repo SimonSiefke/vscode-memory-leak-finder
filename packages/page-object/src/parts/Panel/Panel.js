@@ -29,7 +29,8 @@ export const create = ({ expect, page, VError }) => {
           return
         }
         await expect(panel).toBeVisible()
-        await this.toggle()
+        const closeButton = page.locator('[aria-label="Close Panel"]')
+        await closeButton.click()
         await expect(panel).toBeHidden()
         const group = page.locator('.editor-group-container')
         await expect(group).toBeFocused()
