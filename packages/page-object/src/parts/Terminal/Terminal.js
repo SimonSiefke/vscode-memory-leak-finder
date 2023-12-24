@@ -17,7 +17,9 @@ export const create = ({ expect, page, VError }) => {
         const panel = Panel.create({ expect, page, VError })
         await panel.show()
         const terminal = page.locator('.terminal')
-        await expect(terminal).toHaveCount(1)
+        await expect(terminal).toHaveCount(1, {
+          timeout: 3000,
+        })
         await expect(terminal).toBeVisible()
         await expect(terminal).toHaveClass('focus')
         await page.waitForIdle()
