@@ -1,5 +1,3 @@
-export const skip = true
-
 export const setup = async ({ Terminal, Panel }) => {
   await Panel.hide()
   await Terminal.killAll()
