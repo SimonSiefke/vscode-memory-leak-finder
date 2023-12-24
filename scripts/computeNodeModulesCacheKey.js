@@ -28,6 +28,7 @@ const locations = [
   '.github/workflows/pr.yml',
   '.github/workflows/release.yml',
   'scripts/computeNodeModulesCacheKey.js',
+  'scripts/postinstall.js',
 ]
 
 const getAbsolutePath = (relativePath) => {
