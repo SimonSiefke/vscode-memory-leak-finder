@@ -19,7 +19,7 @@ export const killExistingVsCodeInstances = async () => {
       return
     }
     const { default: kill } = await import('tree-kill-promise')
-    await kill(pid, Signal.SIGKILL)
+    await kill(pid)
   } catch (error) {
     if (error && (error.code === ErrorCodes.ENOENT || error.code === ErrorCodes.ESRCH || error.code === ErrorCodes.EPERM)) {
       return
