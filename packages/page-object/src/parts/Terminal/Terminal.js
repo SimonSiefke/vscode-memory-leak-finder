@@ -14,15 +14,15 @@ export const create = ({ expect, page, VError }) => {
     },
     async show() {
       try {
-        const panel = Panel.create({ expect, page, VError })
-        await panel.show()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.FocusTerminal)
         const terminal = page.locator('.terminal')
         await expect(terminal).toHaveCount(1)
         await expect(terminal).toBeVisible()
         await expect(terminal).toHaveClass('focus')
         await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to show panel`)
+        throw new VError(error, `Failed to show terminal`)
       }
     },
     async add() {
