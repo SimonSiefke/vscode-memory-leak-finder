@@ -22,7 +22,7 @@
     "source-map": "^0.7.4",
     "strip-ansi": "^7.1.0",
     "tree-kill-promise": "^3.0.14",
-    "ws": "^8.15.1"
+    "ws": "^8.16.0"
   },
   "devDependencies": {
     "@types/babel__code-frame": "^7.0.6",
