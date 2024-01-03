@@ -1,8 +1,8 @@
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 import * as ErrorCodes from '../ErrorCodes/ErrorCodes.js'
+import * as KillProcess from '../KillProcess/KillProcess.js'
 import * as Root from '../Root/Root.js'
-import * as Signal from '../Signal/Signal.js'
 import { VError } from '../VError/VError.js'
 
 // in some cases it can happen that after running tests
@@ -18,7 +18,7 @@ export const killExistingVsCodeInstances = async () => {
     if (isNaN(pid)) {
       return
     }
-    process.kill(pid, Signal.SIGKILL)
+    KillProcess.killProcess(pid)
   } catch (error) {
     if (error && (error.code === ErrorCodes.ENOENT || error.code === ErrorCodes.ESRCH || error.code === ErrorCodes.EPERM)) {
       return
