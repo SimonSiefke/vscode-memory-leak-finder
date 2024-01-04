@@ -1,3 +1,4 @@
+import { dirname } from 'node:path'
 import * as ParseLineAndColumn from '../ParseLineAndColumn/ParseLineAndColumn.js'
 
 const emptySourceMapUrl = {
@@ -40,7 +41,7 @@ export const getSourceMapUrl = (eventListener) => {
     const pathMatch = firstStackLine.match(RE_PATH, '')
     if (pathMatch) {
       const path = pathMatch[1]
-      sourceMapUrl = path + sourceMapUrl
+      sourceMapUrl = dirname(path) + '/' + sourceMapUrl
     }
     console.log({ sourceMapUrl, pathMatch, firstStackLine })
   }
