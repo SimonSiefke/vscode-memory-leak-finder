@@ -1,5 +1,6 @@
 import { dirname } from 'node:path'
 import * as ParseLineAndColumn from '../ParseLineAndColumn/ParseLineAndColumn.js'
+import { fileURLToPath } from 'node:url'
 
 const emptySourceMapUrl = {
   sourceMapUrl: '',
@@ -23,7 +24,6 @@ const isRelativeSourceMap = (sourceMapUrl) => {
   return true
 }
 
-const RE_LINE_COLUMN = /(\d+):(\d+)/
 const RE_PATH = /\((.+)\:\d+\:\d+\)$/
 
 export const getSourceMapUrl = (eventListener) => {
@@ -42,6 +42,7 @@ export const getSourceMapUrl = (eventListener) => {
     if (pathMatch) {
       const path = pathMatch[1]
       sourceMapUrl = dirname(path) + '/' + sourceMapUrl
+      sourceMapUrl = fileURLToPath(sourceMapUrl)
     }
     console.log({ sourceMapUrl, pathMatch, firstStackLine })
   }
