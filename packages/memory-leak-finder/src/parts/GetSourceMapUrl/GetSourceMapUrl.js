@@ -44,7 +44,6 @@ export const getSourceMapUrl = (eventListener) => {
       sourceMapUrl = dirname(path) + '/' + sourceMapUrl
       sourceMapUrl = fileURLToPath(sourceMapUrl)
     }
-    console.log({ sourceMapUrl, pathMatch, firstStackLine })
   }
 
   return {
