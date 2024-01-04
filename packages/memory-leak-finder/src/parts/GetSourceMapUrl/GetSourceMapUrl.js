@@ -1,3 +1,4 @@
+import { dirname, sep } from 'node:path'
 import * as ParseLineAndColumn from '../ParseLineAndColumn/ParseLineAndColumn.js'
 
 const emptySourceMapUrl = {
@@ -5,6 +6,24 @@ const emptySourceMapUrl = {
   line: 0,
   column: 0,
 }
+
+const isRelativeSourceMap = (sourceMapUrl) => {
+  if (sourceMapUrl.startsWith('file://')) {
+    return false
+  }
+  if (sourceMapUrl.startsWith('data:')) {
+    return false
+  }
+  if (sourceMapUrl.startsWith('http://')) {
+    return false
+  }
+  if (sourceMapUrl.startsWith('https://')) {
+    return false
+  }
+  return true
+}
+
+const RE_PATH = /\((.+)\:\d+\:\d+\)$/
 
 export const getSourceMapUrl = (eventListener) => {
   const { stack, sourceMaps } = eventListener
@@ -16,7 +35,15 @@ export const getSourceMapUrl = (eventListener) => {
   if (!parsed) {
     return emptySourceMapUrl
   }
-  const sourceMapUrl = sourceMaps[0] || ''
+  let sourceMapUrl = sourceMaps[0] || ''
+  if (sourceMapUrl && isRelativeSourceMap(sourceMapUrl)) {
+    const pathMatch = firstStackLine.match(RE_PATH, '')
+    if (pathMatch) {
+      const path = pathMatch[1]
+      sourceMapUrl = dirname(path) + sep + sourceMapUrl
+    }
+  }
+
   return {
     sourceMapUrl,
     line: parsed.line,
