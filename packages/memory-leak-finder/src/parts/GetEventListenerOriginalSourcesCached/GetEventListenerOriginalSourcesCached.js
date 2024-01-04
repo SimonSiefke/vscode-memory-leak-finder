@@ -11,6 +11,7 @@ export const getEventListenerOriginalSourcesCached = async (eventListeners, clas
   const sourceMapUrlMap = GetSourceMapUrlMap.getSourceMapUrlMap(sorted)
   const hash = Hash.hash({ ...sourceMapUrlMap, classNames })
   const cachePath = GetResolvedSourceMapCachePath.getResolvedSourceMapCachePath(hash)
+  // console.log({ sourceMapUrlMap })
   if (!Exists.exists(cachePath)) {
     const GetCleanPositionsMap = await import('../GetCleanPositionsMap/GetCleanPositionsMap.js')
     const result = await GetCleanPositionsMap.getCleanPositionsMap(sourceMapUrlMap, classNames)

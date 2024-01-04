@@ -6,6 +6,25 @@ const emptySourceMapUrl = {
   column: 0,
 }
 
+const isRelativeSourceMap = (sourceMapUrl) => {
+  if (sourceMapUrl.startsWith('file://')) {
+    return false
+  }
+  if (sourceMapUrl.startsWith('data:')) {
+    return false
+  }
+  if (sourceMapUrl.startsWith('http://')) {
+    return false
+  }
+  if (sourceMapUrl.startsWith('https://')) {
+    return false
+  }
+  return true
+}
+
+const RE_LINE_COLUMN = /(\d+):(\d+)/
+const RE_PATH = /\((.+)\:\d+\:\d+\)$/
+
 export const getSourceMapUrl = (eventListener) => {
   const { stack, sourceMaps } = eventListener
   if (!stack || !sourceMaps) {
@@ -16,7 +35,16 @@ export const getSourceMapUrl = (eventListener) => {
   if (!parsed) {
     return emptySourceMapUrl
   }
-  const sourceMapUrl = sourceMaps[0] || ''
+  let sourceMapUrl = sourceMaps[0] || ''
+  if (sourceMapUrl && isRelativeSourceMap(sourceMapUrl)) {
+    const pathMatch = firstStackLine.match(RE_PATH, '')
+    if (pathMatch) {
+      const path = pathMatch[1]
+      sourceMapUrl = path + sourceMapUrl
+    }
+    console.log({ sourceMapUrl, pathMatch, firstStackLine })
+  }
+
   return {
     sourceMapUrl,
     line: parsed.line,

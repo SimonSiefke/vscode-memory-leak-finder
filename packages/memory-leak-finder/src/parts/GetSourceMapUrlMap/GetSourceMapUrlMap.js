@@ -16,6 +16,7 @@ const getUniqueInputs = (inputs) => {
 }
 
 export const getSourceMapUrlMap = (eventListeners) => {
+  // console.log(eventListeners)
   const map = Object.create(null)
   const inputs = eventListeners.map(GetSourceMapUrl.getSourceMapUrl)
   const uniqueInputs = getUniqueInputs(inputs)
