@@ -5,6 +5,8 @@ export const getModule = (protocol) => {
     case 'http':
     case 'https':
       return import('../LoadSourceMapFromUrl/LoadSourceMapFromUrl.js')
+    case 'file':
+      return import('../LoadSourceMapFromFile/LoadSourceMapFromFile.js')
     case 'noop':
       return {
         loadSourceMap() {

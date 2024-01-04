@@ -1,6 +1,5 @@
-import { dirname } from 'node:path'
+import { dirname, sep } from 'node:path'
 import * as ParseLineAndColumn from '../ParseLineAndColumn/ParseLineAndColumn.js'
-import { fileURLToPath } from 'node:url'
 
 const emptySourceMapUrl = {
   sourceMapUrl: '',
@@ -41,8 +40,7 @@ export const getSourceMapUrl = (eventListener) => {
     const pathMatch = firstStackLine.match(RE_PATH, '')
     if (pathMatch) {
       const path = pathMatch[1]
-      sourceMapUrl = dirname(path) + '/' + sourceMapUrl
-      sourceMapUrl = fileURLToPath(sourceMapUrl)
+      sourceMapUrl = dirname(path) + sep + sourceMapUrl
     }
   }
 
