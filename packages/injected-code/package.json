@@ -16,9 +16,9 @@
   "license": "MIT",
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.2.3",
-    "rollup": "^4.9.2"
+    "rollup": "^4.9.4"
   },
   "dependencies": {
-    "@lvce-editor/assert": "^1.0.1"
+    "@lvce-editor/assert": "^1.1.0"
   }
 }
