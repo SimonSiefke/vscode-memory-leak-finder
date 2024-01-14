@@ -14,6 +14,6 @@ export const setup = async ({ Editor, Workspace, Explorer }) => {
 }
 
 export const run = async ({ Editor }) => {
-  await Editor.showSourceAction()
+  await Editor.showSourceActionEmpty()
   await Editor.hideSourceAction()
 }
