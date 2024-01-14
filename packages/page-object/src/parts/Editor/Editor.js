@@ -189,6 +189,14 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to go to definition`)
       }
     },
+    async newTextFile() {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.NewUntitledTextFile)
+      } catch (error) {
+        throw new VError(error, `Failed to create new untitled text file`)
+      }
+    },
     async shouldHaveOverlayMessage(message) {
       try {
         const messageElement = page.locator('.monaco-editor-overlaymessage')
