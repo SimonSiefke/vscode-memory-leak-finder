@@ -1,5 +1,3 @@
-export const skip = true
-
 export const setup = async ({ Workspace, Explorer, Editor }) => {
   await Workspace.setFiles([])
   await Editor.closeAll()
