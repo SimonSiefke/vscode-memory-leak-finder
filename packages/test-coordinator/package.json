@@ -13,7 +13,7 @@
   "description": "",
   "dependencies": {
     "@babel/code-frame": "^7.23.5",
-    "@lvce-editor/assert": "^1.1.0",
+    "@lvce-editor/assert": "^1.2.0",
     "@lvce-editor/verror": "^1.1.2",
     "@vscode/test-electron": "^2.3.8",
     "clean-stack": "^5.2.0",
