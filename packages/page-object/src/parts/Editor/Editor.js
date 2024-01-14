@@ -379,5 +379,28 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to hide minimap`)
       }
     },
+    async showSourceAction() {
+      try {
+        const sourceAction = page.locator('.monaco-editor-overlaymessage')
+        await expect(sourceAction).toBeHidden()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.SourceAction)
+        await expect(sourceAction).toBeVisible()
+        await expect(sourceAction).toHaveText('No source actions available')
+      } catch (error) {
+        throw new VError(error, `Failed to show source action`)
+      }
+    },
+    async hideSourceAction() {
+      try {
+        const sourceAction = page.locator('.monaco-editor-overlaymessage')
+        await expect(sourceAction).toBeVisible()
+        await page.waitForIdle()
+        await page.keyboard.press('Escape')
+        await expect(sourceAction).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to hide source action`)
+      }
+    },
   }
 }
