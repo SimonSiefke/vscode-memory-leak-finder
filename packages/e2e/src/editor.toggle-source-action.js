@@ -3,14 +3,16 @@ export const skip = true
 export const setup = async ({ Editor, Workspace, Explorer }) => {
   await Workspace.setFiles([
     {
-      name: 'index.html',
-      content: '<h1>hello world</h1>',
+      name: 'index.js',
+      content: `import {readFile} from 'node:fs'
+
+readFile`,
     },
   ])
   await Editor.closeAll()
   await Explorer.focus()
-  await Explorer.shouldHaveItem('index.html')
-  await Editor.open('index.html')
+  await Explorer.shouldHaveItem('index.js')
+  await Editor.open('index.js')
 }
 
 export const run = async ({ Editor }) => {

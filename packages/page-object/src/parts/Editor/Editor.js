@@ -388,24 +388,37 @@ export const create = ({ page, expect, VError }) => {
         await expect(sourceAction).toBeVisible()
         await expect(sourceAction).toHaveText('No source actions available')
       } catch (error) {
-        throw new VError(error, `Failed to show source action`)
+        throw new VError(error, `Failed to show empty source action`)
+      }
+    },
+    async hideSourceActionEmpty() {
+      try {
+        const sourceAction = page.locator('.monaco-editor-overlaymessage')
+        await expect(sourceAction).toBeVisible()
+        await page.waitForIdle()
+        await page.keyboard.press('Escape')
+        await expect(sourceAction).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to hide empty source action`)
       }
     },
     async showSourceAction() {
       try {
-        const sourceAction = page.locator('.monaco-editor-overlaymessage')
+        const sourceAction = page.locator('[aria-label="Action Widget"]')
         await expect(sourceAction).toBeHidden()
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.SourceAction)
+        await page.waitForIdle()
         await expect(sourceAction).toBeVisible()
-        await expect(sourceAction).toHaveText('No source actions available')
+        await expect(sourceAction).toHaveText(/Source Action/)
       } catch (error) {
         throw new VError(error, `Failed to show source action`)
       }
     },
     async hideSourceAction() {
       try {
-        const sourceAction = page.locator('.monaco-editor-overlaymessage')
+        const sourceAction = page.locator('[aria-label="Action Widget"]')
         await expect(sourceAction).toBeVisible()
         await page.waitForIdle()
         await page.keyboard.press('Escape')
