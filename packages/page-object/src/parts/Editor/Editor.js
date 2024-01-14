@@ -193,6 +193,8 @@ export const create = ({ page, expect, VError }) => {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.NewUntitledTextFile)
+        const tab = page.locator('[role="tab"][data-resource-name="Untitled-1"]')
+        await expect(tab).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to create new untitled text file`)
       }
