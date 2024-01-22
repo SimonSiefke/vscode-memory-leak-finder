@@ -15,7 +15,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to show activity bar`)
       }
     },
-    async showView({ ariaLabel }) {
+    async showView({ ariaLabel, titleLabel = ariaLabel }) {
       try {
         const activityBar = page.locator('.part.activitybar')
         await expect(activityBar).toBeVisible()
@@ -26,7 +26,7 @@ export const create = ({ expect, page, VError }) => {
         }
         const sideBar = page.locator('.sidebar')
         const title = sideBar.locator('.composite.title')
-        await expect(title).toHaveText(`${ariaLabel}`)
+        await expect(title).toHaveText(titleLabel)
       } catch (error) {
         throw new VError(error, `Failed to show ${ariaLabel.toLowerCase()}`)
       }
@@ -47,6 +47,7 @@ export const create = ({ expect, page, VError }) => {
     showRunAndDebug() {
       return this.showView({
         ariaLabel: 'Run and Debug',
+        titleLabel: /Run and Debug/,
       })
     },
     showExtensions() {
