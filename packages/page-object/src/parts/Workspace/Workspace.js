@@ -1,6 +1,7 @@
 import { mkdir, readdir, rm, writeFile } from 'fs/promises'
 import { dirname, join } from 'path'
 import * as Root from '../Root/Root.js'
+import { execa } from 'execa'
 
 export const create = ({ page }) => {
   return {
@@ -17,6 +18,10 @@ export const create = ({ page }) => {
         await writeFile(absolutePath, file.content)
       }
       await page.waitForIdle()
+    },
+    async initializeGitRepository() {
+      const workspace = join(Root.root, '.vscode-test-workspace')
+      await execa('git', ['init'], { cwd: workspace })
     },
     async add(file) {
       const workspace = join(Root.root, '.vscode-test-workspace')
