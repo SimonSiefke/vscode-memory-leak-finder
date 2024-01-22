@@ -340,6 +340,36 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to hide color picker`)
       }
     },
+    async showBreadCrumbs() {
+      try {
+        await page.waitForIdle()
+        const breadcrumbs = page.locator('.monaco-breadcrumbs')
+        const count = await breadcrumbs.count()
+        if (count > 0) {
+          return
+        }
+        await expect(breadcrumbs).toBeHidden()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.ViewToggleBreadCrumbs)
+        await expect(breadcrumbs).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to show breadcrumbs`)
+      }
+    },
+    async hideBreadCrumbs() {
+      try {
+        await page.waitForIdle()
+        const breadcrumbs = page.locator('.monaco-breadcrumbs')
+        await expect(breadcrumbs).toBeVisible()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.ViewToggleBreadCrumbs)
+        await expect(breadcrumbs).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to hide breadcrumbs`)
+      }
+    },
     async openFind() {
       try {
         const findWidget = page.locator('.find-widget')
