@@ -1,4 +1,5 @@
-export const setup = async ({ ActivityBar, Workspace }) => {
+export const setup = async ({ ActivityBar, Workspace, SideBar }) => {
+  await SideBar.hide()
   await Workspace.setFiles([
     {
       name: 'file.txt',
