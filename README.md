@@ -214,12 +214,12 @@ We get an array of event listeners `before` and `after`, for example
     "description": "()=>this.j()",
     "objectId": "524841679309534768.4.2930",
     "stack": [
-      "listener (file:///home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test/vscode-linux-x64-1.83.1/resources/app/out/vs/workbench/workbench.desktop.main.js:148:37007)"
+      "listener (file:///home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test/vscode-linux-x64-1.83.1/resources/app/out/vs/workbench/workbench.desktop.main.js:148:37007)",
     ],
     "sourceMaps": [
-      "https://ticino.blob.core.windows.net/sourcemaps/f1b07bd25dfad64b0167beb15359ae573aecd2cc/core/vs/workbench/workbench.desktop.main.js.map"
-    ]
-  }
+      "https://ticino.blob.core.windows.net/sourcemaps/f1b07bd25dfad64b0167beb15359ae573aecd2cc/core/vs/workbench/workbench.desktop.main.js.map",
+    ],
+  },
 ]
 ```
 
@@ -233,24 +233,24 @@ and
     "description": "()=>this.j()",
     "objectId": "524841679309534768.4.2930",
     "stack": [
-      "listener (file:///home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test/vscode-linux-x64-1.83.1/resources/app/out/vs/workbench/workbench.desktop.main.js:148:37007)"
+      "listener (file:///home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test/vscode-linux-x64-1.83.1/resources/app/out/vs/workbench/workbench.desktop.main.js:148:37007)",
     ],
     "sourceMaps": [
-      "https://ticino.blob.core.windows.net/sourcemaps/f1b07bd25dfad64b0167beb15359ae573aecd2cc/core/vs/workbench/workbench.desktop.main.js.map"
-    ]
+      "https://ticino.blob.core.windows.net/sourcemaps/f1b07bd25dfad64b0167beb15359ae573aecd2cc/core/vs/workbench/workbench.desktop.main.js.map",
+    ],
   },
   {
     "type": "keydown",
     "description": "N=>{new P.$qO(N).equals(2)&&N.preventDefault()}",
     "objectId": "3680313440875909344.4.4572",
     "stack": [
-      "listener (file:///home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test/vscode-linux-x64-1.83.1/resources/app/out/vs/workbench/workbench.desktop.main.js:244:39878)"
+      "listener (file:///home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test/vscode-linux-x64-1.83.1/resources/app/out/vs/workbench/workbench.desktop.main.js:244:39878)",
     ],
     "sourceMaps": [
-      "https://ticino.blob.core.windows.net/sourcemaps/f1b07bd25dfad64b0167beb15359ae573aecd2cc/core/vs/workbench/workbench.desktop.main.js.map"
+      "https://ticino.blob.core.windows.net/sourcemaps/f1b07bd25dfad64b0167beb15359ae573aecd2cc/core/vs/workbench/workbench.desktop.main.js.map",
     ],
-    "originalStack": ["/src/vs/base/browser/ui/menu/menu.ts:122:58"]
-  }
+    "originalStack": ["/src/vs/base/browser/ui/menu/menu.ts:122:58"],
+  },
 ]
 ```
 
@@ -368,6 +368,8 @@ It seems there is memory leak when opening and closing a notebook. But just look
 | ColorPickerWidget    | https://github.com/microsoft/vscode/issues/199814 | Fixed  |
 | DiffEditor           | https://github.com/microsoft/vscode/issues/200381 | Fixed  |
 | QuickPick            | https://github.com/microsoft/vscode/issues/201320 | Fixed  |
+| Terminal             | https://github.com/xtermjs/xterm.js/issues/4935   | Review |
+| KeyBindingsEditor    | https://github.com/microsoft/vscode/issues/202455 | -      |
 
 ## Credits
 
