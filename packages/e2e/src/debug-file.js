@@ -4,8 +4,12 @@ export const setup = async ({ Editor, Workspace, Explorer }) => {
   await Workspace.setFiles([
     {
       name: 'index.js',
-      content: `setInterval(()=>{
+      content: `const add = (a, b) => {
+  return a + b
+}
 
+setInterval(()=>{
+  add(1, 2)
 }, 1000)`,
     },
   ])

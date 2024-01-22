@@ -1,3 +1,6 @@
+import * as QuickPick from '../QuickPick/QuickPick.js'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
+
 export const create = ({ expect, page, VError }) => {
   return {
     async startRunAndDebug() {
@@ -32,10 +35,8 @@ export const create = ({ expect, page, VError }) => {
         await expect(debugToolBar).toBeVisible()
         const pauseButton = debugToolBar.locator('[aria-label^="Pause"]')
         await expect(pauseButton).toBeVisible()
-        for (let i = 0; i < 26; i++) {
-          await page.waitForIdle()
-        }
-        await pauseButton.click()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.DebugPause)
         await page.waitForIdle()
         await expect(pauseButton).toBeHidden({
           timeout: 20_000,
@@ -52,7 +53,8 @@ export const create = ({ expect, page, VError }) => {
         await expect(debugToolBar).toBeVisible()
         const stopButton = debugToolBar.locator('[aria-label^="Stop"]')
         await expect(stopButton).toBeVisible()
-        await stopButton.click()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.DebugStop)
         await expect(stopButton).toBeHidden()
         await expect(debugToolBar).toBeHidden()
       } catch (error) {
