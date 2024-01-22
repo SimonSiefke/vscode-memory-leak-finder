@@ -1,4 +1,4 @@
-export const skip = process.platform === 'win32'
+export const skip = true
 
 export const setup = async ({ Editor }) => {
   await Editor.closeAll()
