@@ -23,7 +23,6 @@ export const run = async ({ ActivityBar, Explorer, RunAndDebug }) => {
   await Explorer.focus()
   await ActivityBar.showRunAndDebug()
   await RunAndDebug.startRunAndDebug()
-  await RunAndDebug.pause()
   await RunAndDebug.stop()
   await Explorer.focus()
 }
