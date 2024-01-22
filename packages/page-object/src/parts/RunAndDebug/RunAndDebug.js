@@ -1,3 +1,6 @@
+import * as QuickPick from '../QuickPick/QuickPick.js'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
+
 export const create = ({ expect, page, VError }) => {
   return {
     async startRunAndDebug() {
@@ -5,11 +8,21 @@ export const create = ({ expect, page, VError }) => {
         const button = page.locator('.monaco-button:has-text("Run and Debug")')
         await expect(button).toBeVisible()
         await button.click()
+        await page.waitForIdle()
         const quickPickWidget = page.locator('.quick-input-widget')
-        await expect(quickPickWidget).toBeVisible()
-        const nodeJsOption = page.locator('[role="option"][aria-label="Node.js"]')
-        await nodeJsOption.click()
+        const quickPickPromise = expect(quickPickWidget)
+          .toBeVisible()
+          .then(() => 1)
         const debugToolBar = page.locator('.debug-toolbar')
+        const debugToolBarPromise = expect(debugToolBar)
+          .toBeVisible()
+          .then(() => 2)
+        const value = await Promise.race([quickPickPromise, debugToolBarPromise])
+        if (value === 1) {
+          const nodeJsOption = page.locator('[role="option"][aria-label="Node.js"]')
+          await expect(quickPickWidget).toBeVisible()
+          await nodeJsOption.click()
+        }
         await expect(debugToolBar).toBeVisible()
         await page.waitForIdle()
       } catch (error) {
@@ -23,18 +36,8 @@ export const create = ({ expect, page, VError }) => {
         const pauseButton = debugToolBar.locator('[aria-label^="Pause"]')
         await expect(pauseButton).toBeVisible()
         await page.waitForIdle()
-        await page.waitForIdle()
-        await page.waitForIdle()
-        await page.waitForIdle()
-        await page.waitForIdle()
-        await page.waitForIdle()
-        await page.waitForIdle()
-        await page.waitForIdle()
-        await page.waitForIdle()
-        await page.waitForIdle()
-        await page.waitForIdle()
-        await page.waitForIdle()
-        await pauseButton.click()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.DebugPause)
         await page.waitForIdle()
         await expect(pauseButton).toBeHidden({
           timeout: 20_000,
@@ -51,8 +54,11 @@ export const create = ({ expect, page, VError }) => {
         await expect(debugToolBar).toBeVisible()
         const stopButton = debugToolBar.locator('[aria-label^="Stop"]')
         await expect(stopButton).toBeVisible()
-        await stopButton.click()
-        await expect(stopButton).toBeHidden()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.DebugStop)
+        await expect(stopButton).toBeHidden({
+          timeout: 5000,
+        })
         await expect(debugToolBar).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to stop`)

@@ -4,8 +4,12 @@ export const setup = async ({ Editor, Workspace, Explorer }) => {
   await Workspace.setFiles([
     {
       name: 'index.js',
-      content: `setInterval(()=>{
+      content: `const add = (a, b) => {
+  return a + b
+}
 
+setInterval(()=>{
+  add(1, 2)
 }, 1000)`,
     },
   ])
@@ -19,7 +23,6 @@ export const run = async ({ ActivityBar, Explorer, RunAndDebug }) => {
   await Explorer.focus()
   await ActivityBar.showRunAndDebug()
   await RunAndDebug.startRunAndDebug()
-  await RunAndDebug.pause()
   await RunAndDebug.stop()
   await Explorer.focus()
 }
