@@ -8,6 +8,7 @@ export const setup = async ({ Workspace, Editor }) => {
     },
   ])
   await Editor.open('file.txt')
+  await Editor.hideBreadCrumbs()
 }
 
 export const run = async ({ Editor }) => {
