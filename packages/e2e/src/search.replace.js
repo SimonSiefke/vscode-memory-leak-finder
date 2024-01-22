@@ -1,4 +1,5 @@
-export const setup = async ({ ActivityBar, Electron, Workspace }) => {
+export const setup = async ({ ActivityBar, Electron, Workspace, Editor }) => {
+  await Editor.closeAll()
   await Workspace.setFiles([
     {
       name: 'file.txt',
