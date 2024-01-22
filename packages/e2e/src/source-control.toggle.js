@@ -5,7 +5,7 @@ export const setup = async ({ Editor, Workspace, Explorer, ActivityBar }) => {
   await ActivityBar.showSourceControl()
 }
 
-export const run = async ({ ActivityBar, Explorer, SideBar }) => {
+export const run = async ({ ActivityBar, SideBar }) => {
   await SideBar.hide()
   await ActivityBar.showSourceControl()
 }
