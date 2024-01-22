@@ -1,4 +1,3 @@
-import * as Panel from '../Panel/Panel.js'
 import * as QuickPick from '../QuickPick/QuickPick.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 
