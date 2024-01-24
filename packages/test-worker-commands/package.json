@@ -16,7 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "@lvce-editor/verror": "^1.1.2",
-    "@vscode/test-electron": "^2.3.8",
+    "@vscode/test-electron": "^2.3.9",
     "exit-hook": "^4.0.0",
     "got": "^14.0.0",
     "source-map": "^0.7.4",
