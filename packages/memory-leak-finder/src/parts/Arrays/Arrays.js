@@ -19,3 +19,11 @@ export const unique = (values) => {
   }
   return seen
 }
+
+export const contextMap = (array, fn, ...context) => {
+  const result = []
+  for (const element of array) {
+    result.push(fn(element, ...context))
+  }
+  return result
+}
