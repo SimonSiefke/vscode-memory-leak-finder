@@ -4,7 +4,7 @@
     "target": "esnext",
     "checkJs": true,
     "module": "NodeNext",
-    "types": ["node", "jest"],
+    "types": ["node"],
     "moduleResolution": "NodeNext",
     "isolatedModules": true,
     "noImplicitAny": false,
@@ -14,7 +14,8 @@
     "allowSyntheticDefaultImports": true,
     "assumeChangesOnlyAffectDirectDependencies": true,
     "strict": true,
-    "useUnknownInCatchVariables": false
+    "useUnknownInCatchVariables": false,
+    "strictNullChecks": false,
   },
-  "include": ["src", "test"]
+  "include": ["src", "test"],
 }
