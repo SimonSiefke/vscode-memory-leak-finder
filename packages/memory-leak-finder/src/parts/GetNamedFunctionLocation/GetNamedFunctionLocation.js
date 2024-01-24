@@ -6,9 +6,10 @@ const emptyFunctionLocation = {
   scriptId: '',
   lineNumber: 0,
   columnNumber: 0,
+  name: '',
 }
 
-export const getFunctionLocation = async (session, objectId) => {
+export const getNamedFunctionLocation = async (session, objectId) => {
   Assert.object(session)
   Assert.string(objectId)
   if (!objectId) {

@@ -1,7 +1,7 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.js'
-import * as GetFunctionLocations from '../GetFunctionLocations/GetFunctionLocations.js'
 import * as GetFunctionObjectIds from '../GetFunctionObjectIds/GetFunctionObjectIds.js'
+import * as GetNamedFunctionLocations from '../GetNamedFunctionLocations/GetNamedFunctionLocations.js'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
 
 /**
@@ -38,7 +38,6 @@ export const getNamedFunctionCount = async (session, objectGroup) => {
   })
   const descriptors = GetDescriptorValues.getDescriptorValues(fnResult3.result)
   const functionObjectIds = GetFunctionObjectIds.getFunctionObjectIds(descriptors)
-  // TODO get functions with name here
-  const functionLocations = await GetFunctionLocations.getFunctionLocations(session, functionObjectIds)
+  const functionLocations = await GetNamedFunctionLocations.getNamedFunctionLocations(session, functionObjectIds)
   return functionLocations
 }
