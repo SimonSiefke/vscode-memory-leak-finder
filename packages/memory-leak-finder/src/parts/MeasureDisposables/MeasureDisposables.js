@@ -3,6 +3,7 @@ import * as GetDisposablesWithLocation from '../GetDisposablesWithLocation/GetDi
 import * as IsLeakDisposables from '../IsLeakDisposables/IsLeakDisposables.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as ScriptHandler from '../ScriptHandler/ScriptHandler.js'
 
 // TODO
 // 1. query all objects
@@ -16,33 +17,21 @@ export const id = MeasureId.Disposables
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
-  const scriptMap = Object.create(null)
-  const handleScriptParsed = (event) => {
-    const { url, scriptId, sourceMapURL } = event.params
-    if (!url) {
-      return
-    }
-    scriptMap[scriptId] = {
-      url,
-      sourceMapUrl: sourceMapURL,
-    }
-  }
-  session.on('Debugger.scriptParsed', handleScriptParsed)
-  return [session, objectGroup, scriptMap, handleScriptParsed]
+  const scriptHandler = ScriptHandler.create()
+  return [session, objectGroup, scriptHandler]
 }
 
-export const start = async (session, objectGroup, scriptMap) => {
-  await session.invoke('Debugger.enable')
+export const start = async (session, objectGroup, scriptHandler) => {
+  await scriptHandler.start(session)
   return GetDisposablesWithLocation.getDisposablesWithLocation(session, objectGroup, scriptMap)
 }
 
-export const stop = async (session, objectGroup, scriptMap, handleScriptParsed) => {
-  session.off('Debugger.scriptParsed', handleScriptParsed)
-  await session.invoke('Debugger.disable')
+export const stop = async (session, objectGroup, scriptHandler) => {
+  await scriptHandler.stop(session)
   const result = await GetDisposablesWithLocation.getDisposablesWithLocation(session, objectGroup, scriptMap)
   return {
     result,
-    scriptMap,
+    scriptMap: scriptHandler.scriptMap,
   }
 }
 
