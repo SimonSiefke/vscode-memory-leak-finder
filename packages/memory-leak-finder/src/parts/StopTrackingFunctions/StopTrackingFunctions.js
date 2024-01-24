@@ -1,9 +1,12 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.js'
+import * as GetFunctionLocations from '../GetFunctionLocations/GetFunctionLocations.js'
+import * as GetFunctionObjectIds from '../GetFunctionObjectIds/GetFunctionObjectIds.js'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
 
 export const stopTrackingFunctions = async (session, objectGroup) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
-    expression: PrototypeExpression.Object,
+    expression: PrototypeExpression.Function,
     returnByValue: false,
     objectGroup,
   })
@@ -27,5 +30,14 @@ export const stopTrackingFunctions = async (session, objectGroup) => {
     returnByValue: false,
     objectGroup,
   })
-  return fnResult1
+  const fnResult3 = await DevtoolsProtocolRuntime.getProperties(session, {
+    objectId: fnResult1.objectId,
+    generatePreview: false,
+    ownProperties: true,
+  })
+  const descriptors = GetDescriptorValues.getDescriptorValues(fnResult3.result)
+  const functionObjectIds = GetFunctionObjectIds.getFunctionObjectIds(descriptors)
+  console.log({ functionObjectIds })
+  const functionLocations = await GetFunctionLocations.getFunctionLocations(session, functionObjectIds)
+  return functionLocations
 }

@@ -21,6 +21,8 @@ export const getFunctionLocation = async (session, objectId) => {
     generatePreview: false,
     ownProperties: true,
   })
+  console.log(JSON.stringify(fnResult1, null, 2))
+  // console.log({ fnResult1: fnResult1.internalProperties, r: fnResult1.result })
   const functionLocation = fnResult1.internalProperties.find(IsFunctionLocation.isFunctionLocation)
   if (!functionLocation) {
     return emptyFunctionLocation

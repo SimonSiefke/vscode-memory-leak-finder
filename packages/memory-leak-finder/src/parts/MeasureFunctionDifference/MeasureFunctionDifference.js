@@ -3,6 +3,7 @@ import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
 import * as StartTrackingFunctions from '../StartTrackingFunctions/StartTrackingFunctions.js'
 import * as StopTrackingFunctions from '../StopTrackingFunctions/StopTrackingFunctions.js'
+import * as CompareFunctionDifference from '../CompareFunctionDifference/CompareFunctionDifference.js'
 
 export const id = MeasureId.FunctionDifference
 
@@ -22,9 +23,7 @@ export const stop = async (session, objectGroup) => {
   return result
 }
 
-export const compare = () => {
-  return {}
-}
+export const compare = CompareFunctionDifference.compareFunctionDifference
 
 export const isLeak = () => {
   return false
