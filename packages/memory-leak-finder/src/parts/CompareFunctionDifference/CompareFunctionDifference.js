@@ -1,12 +1,13 @@
 import * as AddFunctionLocationsToFunctions from '../AddFunctionLocationsToFunctions/AddFunctionLocationsToFunctions.js'
 import * as Arrays from '../Arrays/Arrays.js'
 import * as Assert from '../Assert/Assert.js'
+import * as GetUrl from '../FormatUrl/FormatUrl.js'
 
 const aggregateFunctionLocations = (functionLocations) => {
   const map = Object.create(null)
   for (const functionLocation of functionLocations) {
     const { url, lineNumber, columnNumber } = functionLocation
-    const key = `${url}:${lineNumber}:${columnNumber}`
+    const key = GetUrl.formatUrl(url, lineNumber, columnNumber)
     map[key] ||= 0
     map[key]++
   }

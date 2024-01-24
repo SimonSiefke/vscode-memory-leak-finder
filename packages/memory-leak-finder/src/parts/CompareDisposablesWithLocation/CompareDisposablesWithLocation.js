@@ -1,11 +1,13 @@
 import * as Assert from '../Assert/Assert.js'
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
+import * as FormatUrl from '../FormatUrl/FormatUrl.js'
 
 const prepareDisposable = (disposable, scriptMap) => {
   const { lineNumber, columnNumber, count, scriptId, name } = disposable
   const script = scriptMap[scriptId] || {}
+  const formattedUrl = FormatUrl.formatUrl(script.url, lineNumber, columnNumber)
   return {
-    stack: [`${script.url}:${lineNumber}:${columnNumber}`],
+    stack: [formattedUrl],
     sourceMaps: [script.sourceMapUrl],
     count,
     name,
