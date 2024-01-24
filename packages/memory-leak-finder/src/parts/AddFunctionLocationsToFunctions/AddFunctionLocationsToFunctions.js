@@ -1,3 +1,5 @@
+import * as Arrays from '../Arrays/Arrays.js'
+
 const empty = {
   url: '',
   sourceMapUrl: '',
@@ -14,9 +16,6 @@ const addFunctionLocationToFunction = (functionLocation, scriptMap) => {
 }
 
 export const addFunctionLocationsToFunctions = (functionLocations, scriptMap) => {
-  const results = []
-  for (const functionLocation of functionLocations) {
-    results.push(addFunctionLocationToFunction(functionLocation, scriptMap))
-  }
+  const results = Arrays.contextMap(functionLocations, addFunctionLocationToFunction, scriptMap)
   return results
 }
