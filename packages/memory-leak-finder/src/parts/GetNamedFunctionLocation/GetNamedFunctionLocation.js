@@ -13,7 +13,10 @@ export const getNamedFunctionLocation = async (session, objectId) => {
   Assert.object(session)
   Assert.string(objectId)
   if (!objectId) {
-    return emptyFunctionLocation
+    return {
+      ...emptyFunctionLocation,
+      objectId,
+    }
   }
   const fnResult1 = await DevtoolsProtocolRuntime.getProperties(session, {
     objectId,
@@ -24,7 +27,14 @@ export const getNamedFunctionLocation = async (session, objectId) => {
   })
   const functionLocation = fnResult1.internalProperties.find(IsFunctionLocation.isFunctionLocation)
   if (!functionLocation) {
-    return emptyFunctionLocation
+    return {
+      ...emptyFunctionLocation,
+      objectId,
+    }
   }
-  return functionLocation.value.value
+  console.log({ functionLocation: functionLocation.value })
+  return {
+    ...functionLocation.value.value,
+    objectId,
+  }
 }
