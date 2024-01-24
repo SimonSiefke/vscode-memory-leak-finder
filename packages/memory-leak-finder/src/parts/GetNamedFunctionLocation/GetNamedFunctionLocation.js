@@ -9,6 +9,26 @@ const emptyFunctionLocation = {
   name: '',
 }
 
+const isFunctionName = (value) => {
+  return value === 'name'
+}
+
+const getFunctionNameProperty = (fnResult) => {
+  const match = fnResult.result.find(isFunctionName)
+  if (!match) {
+    return ''
+  }
+  return match.value.value
+}
+
+const getFunctionLocationProperty = (fnResult) => {
+  const functionLocation = fnResult.internalProperties.find(IsFunctionLocation.isFunctionLocation)
+  if (!functionLocation) {
+    return emptyFunctionLocation
+  }
+  return functionLocation.value.value
+}
+
 export const getNamedFunctionLocation = async (session, objectId) => {
   Assert.object(session)
   Assert.string(objectId)
@@ -16,6 +36,7 @@ export const getNamedFunctionLocation = async (session, objectId) => {
     return {
       ...emptyFunctionLocation,
       objectId,
+      name: '',
     }
   }
   const fnResult1 = await DevtoolsProtocolRuntime.getProperties(session, {
@@ -25,16 +46,11 @@ export const getNamedFunctionLocation = async (session, objectId) => {
     generatePreview: false,
     ownProperties: true,
   })
-  const functionLocation = fnResult1.internalProperties.find(IsFunctionLocation.isFunctionLocation)
-  if (!functionLocation) {
-    return {
-      ...emptyFunctionLocation,
-      objectId,
-    }
-  }
-  console.log({ functionLocation: functionLocation.value })
+  const functionLocation = getFunctionLocationProperty(fnResult1)
+  const functionName = getFunctionNameProperty(fnResult1)
   return {
-    ...functionLocation.value.value,
+    ...functionLocation,
     objectId,
+    name: functionName,
   }
 }
