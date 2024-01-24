@@ -1,10 +1,10 @@
 import { join } from 'path'
 import * as Root from '../Root/Root.js'
 import { readFile, readdir } from 'fs/promises'
-import { existsSync } from 'fs'
+import { existsSync } from 'node:fs'
 
-export const getFunctionCountsData = async () => {
-  const resultsPath = join(Root.root, '.vscode-memory-leak-finder-results', 'function-count')
+export const getObjectCountsData = async () => {
+  const resultsPath = join(Root.root, '.vscode-memory-leak-finder-results', 'object-count')
   if (!existsSync(resultsPath)) {
     return []
   }
@@ -17,7 +17,7 @@ export const getFunctionCountsData = async () => {
     const data = JSON.parse(content)
     allData.push({
       name: dirent,
-      count: data.functionCount.after,
+      count: data.objectCount.after,
       index: index++,
     })
   }
