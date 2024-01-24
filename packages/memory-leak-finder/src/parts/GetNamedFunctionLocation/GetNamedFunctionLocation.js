@@ -6,11 +6,10 @@ const emptyFunctionLocation = {
   scriptId: '',
   lineNumber: 0,
   columnNumber: 0,
-  name: '',
 }
 
 const isFunctionName = (value) => {
-  return value === 'name'
+  return value.name === 'name'
 }
 
 const getFunctionNameProperty = (fnResult) => {
