@@ -40,6 +40,8 @@ export const getMeasure = (MemoryLeakFinder, measureId) => {
       return MemoryLeakFinder.Measures.MeasureEventListenersWithStackTraces
     case 'function-count':
       return MemoryLeakFinder.Measures.MeasureFunctionCount
+    case 'function-difference':
+      return MemoryLeakFinder.Measures.MeasureFunctionDifference
     case 'instance-counts':
       return MemoryLeakFinder.Measures.MeasureInstanceCounts
     case 'instance-counts-with-source-map':
