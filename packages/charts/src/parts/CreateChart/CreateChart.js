@@ -1,6 +1,16 @@
 import * as Plot from '../Plot/Plot.js'
 
 export const createChart = (data, options) => {
-  const l = Plot.lineY(data, options).plot()
-  return l.outerHTML
+  return Plot.plot({
+    style: 'overflow: visible;background:white',
+    marginLeft: 60,
+    y: {
+      grid: true,
+      label: 'Function Count',
+    },
+    x: {
+      label: 'Index',
+    },
+    marks: [Plot.lineY(data, options)],
+  }).outerHTML
 }
