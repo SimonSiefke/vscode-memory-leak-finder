@@ -26,6 +26,9 @@ export const isImportantErrorMessage = (data) => {
   if (data.includes(`Failed to call method: org.freedesktop.portal.Settings.Read: object_path= /org/freedesktop/portal/desktop`)) {
     return false
   }
+  if (data.includes('Floss manager not present')) {
+    return false
+  }
   if (RE_LIB_PROXY_NOT_FOUND.test(data)) {
     return false
   }

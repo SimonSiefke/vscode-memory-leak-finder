@@ -45,3 +45,11 @@ test('portal desktop', () => {
     ),
   ).toBe(false)
 })
+
+test('floss error', () => {
+  expect(
+    IsImportantError.isImportantErrorMessage(
+      `[156268:0124/201646.574827:WARNING:bluez_dbus_manager.cc(247)] Floss manager not present, cannot set Floss enable/disable.`,
+    ),
+  ).toBe(false)
+})
