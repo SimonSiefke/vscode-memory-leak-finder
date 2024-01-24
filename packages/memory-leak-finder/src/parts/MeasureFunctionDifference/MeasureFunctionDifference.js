@@ -9,18 +9,35 @@ export const id = MeasureId.FunctionDifference
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
-  return [session, objectGroup]
+  const scriptMap = Object.create(null)
+  const handleScriptParsed = (event) => {
+    const { url, scriptId, sourceMapURL } = event.params
+    if (!url) {
+      return
+    }
+    scriptMap[scriptId] = {
+      url,
+      sourceMapUrl: sourceMapURL,
+    }
+  }
+  session.on('Debugger.scriptParsed', handleScriptParsed)
+  return [session, objectGroup, scriptMap, handleScriptParsed]
 }
 
-export const start = (session, objectGroup) => {
+export const start = async (session, objectGroup) => {
+  await session.invoke('Debugger.enable')
   return StartTrackingFunctions.startTrackingFunctions(session, objectGroup)
 }
 
-export const stop = async (session, objectGroup) => {
+export const stop = async (session, objectGroup, scriptMap, handleScriptParsed) => {
+  session.off('Debugger.scriptParsed', handleScriptParsed)
+  await session.invoke('Debugger.disable')
   const result = await StopTrackingFunctions.stopTrackingFunctions(session, objectGroup)
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
-  console.log({ result })
-  return result
+  return {
+    result,
+    scriptMap,
+  }
 }
 
 export const compare = CompareFunctionDifference.compareFunctionDifference
