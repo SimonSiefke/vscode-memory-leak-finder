@@ -2,41 +2,33 @@ import * as GetMutationObserverCount from '../GetMutationObserverCount/GetMutati
 import * as GetMutationObserversWithStackTraces from '../GetMutationObserversWithStackTraces/GetMutationObserversWithStackTraces.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as PrettifyConstructorStackTracesWithSourceMap from '../PrettifyConstructorStackTracesWithSourceMap/PrettifyConstructorStackTracesWithSourceMap.js'
+import * as ScriptHandler from '../ScriptHandler/ScriptHandler.js'
 import * as StartTrackingMutationObserverStackTraces from '../StartTrackingMutationObserverStackTraces/StartTrackingMutationObserverStackTraces.js'
 import * as StopTrackingMutationObserverStackTraces from '../StopTrackingMutationObserverStackTraces/StopTrackingMutationObserverStackTraces.js'
-import * as PrettifyConstructorStackTracesWithSourceMap from '../PrettifyConstructorStackTracesWithSourceMap/PrettifyConstructorStackTracesWithSourceMap.js'
 
 export const id = MeasureId.MutationObserversWithStackTracesWithSourceMaps
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
-  const scriptMap = Object.create(null)
-  const handleScriptParsed = (event) => {
-    const { url, scriptId, sourceMapURL } = event.params
-    if (!url) {
-      return
-    }
-    scriptMap[scriptId] = {
-      url,
-      sourceMapUrl: sourceMapURL,
-    }
-  }
-  session.on('Debugger.scriptParsed', handleScriptParsed)
-  return [session, objectGroup, scriptMap, handleScriptParsed]
+  const scriptHandler = ScriptHandler.create()
+  return [session, objectGroup, scriptHandler]
 }
 
-export const start = async (session, objectGroup) => {
-  await session.invoke('Debugger.enable')
+export const start = async (session, objectGroup, scriptHandler) => {
+  await scriptHandler.start()
   await StartTrackingMutationObserverStackTraces.startTrackingMutationObserverStackTraces(session, objectGroup)
   return GetMutationObserverCount.getMutationObserverCount(session)
 }
 
-export const stop = async (session, objectGroup, scriptMap, handleScriptParsed) => {
-  session.off('Debugger.scriptParsed', handleScriptParsed)
-  await session.invoke('Debugger.disable')
+export const stop = async (session, objectGroup, scriptHandler) => {
+  await scriptHandler.stop()
   const added = await GetMutationObserversWithStackTraces.getMutationObserversWithStackTraces(session, objectGroup)
   await StopTrackingMutationObserverStackTraces.stopTrackingMutationObserverStackTraces(session, objectGroup)
-  const pretty = await PrettifyConstructorStackTracesWithSourceMap.prettifyConstructorStackTracesWithSourceMap(added, scriptMap)
+  const pretty = await PrettifyConstructorStackTracesWithSourceMap.prettifyConstructorStackTracesWithSourceMap(
+    added,
+    scriptHandler.scriptMap,
+  )
   // console.log({ scriptMap, added })
   return pretty
 }
