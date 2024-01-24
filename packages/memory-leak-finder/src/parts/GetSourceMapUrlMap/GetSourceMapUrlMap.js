@@ -1,11 +1,12 @@
 import * as GetSourceMapUrl from '../GetSourceMapUrl/GetSourceMapUrl.js'
+import * as FormatUrl from '../FormatUrl/FormatUrl.js'
 
 const getUniqueInputs = (inputs) => {
   const seen = Object.create(null)
   const result = []
   for (const input of inputs) {
     const { sourceMapUrl, line, column } = input
-    const key = `${sourceMapUrl}:${line}:${column}`
+    const key = FormatUrl.formatUrl(sourceMapUrl, line, column)
     if (key in seen) {
       continue
     }

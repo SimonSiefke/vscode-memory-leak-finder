@@ -1,11 +1,13 @@
 import * as Assert from '../Assert/Assert.js'
 import * as GetSourceMapUrlFromScriptMap from '../GetSourceMapUrlFromScriptMap/GetSourceMapUrlFromScriptMap.js'
+import * as FormatUrl from '../FormatUrl/FormatUrl.js'
 
 const getStack = (url, lineNumber, columnNumber) => {
   if (!url) {
     return []
   }
-  return [`${url}:${lineNumber}:${columnNumber}`]
+  const formattedUrl = FormatUrl.formatUrl(url, lineNumber, columnNumber)
+  return [formattedUrl]
 }
 
 const getSourceMaps = (sourceMapUrl) => {
