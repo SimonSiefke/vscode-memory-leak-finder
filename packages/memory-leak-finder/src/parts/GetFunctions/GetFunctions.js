@@ -3,7 +3,7 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 
 export const getFunctions = async (session, objectGroup) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
-    expression: PrototypeExpression.Object,
+    expression: PrototypeExpression.Function,
     returnByValue: false,
     objectGroup,
   })
