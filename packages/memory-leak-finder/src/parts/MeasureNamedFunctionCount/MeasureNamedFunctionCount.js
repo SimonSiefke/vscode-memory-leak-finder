@@ -4,12 +4,6 @@ import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.js'
 
-// TODO
-// 1. query all function locations and names
-// 2. run test case
-// 3. query all function locations and names again
-// 4. compare before and after function locations
-
 export const id = MeasureId.NamedFunctionCount
 
 export const create = (session) => {
