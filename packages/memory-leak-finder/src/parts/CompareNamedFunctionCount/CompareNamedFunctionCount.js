@@ -16,7 +16,11 @@ const sort = (array) => {
   const map = Object.create(null)
   for (const element of array) {
     const key = getKey(element)
-    map[key] ||= { count: 0, name: element.name }
+    map[key] ||= {
+      count: 0,
+      name: element.name,
+      url: `${element.url}:${element.lineNumber}:${element.columnNumber}`,
+    }
     map[key].count++
   }
   const values = Object.values(map)

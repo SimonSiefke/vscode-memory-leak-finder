@@ -28,7 +28,15 @@ const getFunctionLocationProperty = (fnResult) => {
   return functionLocation.value.value
 }
 
-export const getNamedFunctionLocation = async (session, objectId) => {
+const getFunctionUrl = (functionLocation, scriptMap) => {
+  const match = scriptMap[functionLocation.scriptId]
+  if (!match) {
+    return ''
+  }
+  return match.url
+}
+
+export const getNamedFunctionLocation = async (session, objectId, scriptMap) => {
   Assert.object(session)
   Assert.string(objectId)
   if (!objectId) {
@@ -47,9 +55,11 @@ export const getNamedFunctionLocation = async (session, objectId) => {
   })
   const functionLocation = getFunctionLocationProperty(fnResult1)
   const functionName = getFunctionNameProperty(fnResult1)
+  const functionUrl = getFunctionUrl(functionLocation, scriptMap)
   return {
     ...functionLocation,
     objectId,
     name: functionName,
+    url: functionUrl,
   }
 }

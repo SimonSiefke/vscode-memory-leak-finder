@@ -2,6 +2,7 @@ import * as CompareNamedFunctionCount from '../CompareNamedFunctionCount/Compare
 import * as GetNamedFunctionCount from '../GetNamedFunctionCount/GetNamedFunctionCount.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as ScriptHandler from '../ScriptHandler/ScriptHandler.js'
 
 // TODO
 // 1. query all function locations and names
@@ -13,15 +14,18 @@ export const id = MeasureId.NamedFunctionCount
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
-  return [session, objectGroup]
+  const scriptHandler = ScriptHandler.create()
+  return [session, objectGroup, scriptHandler]
 }
 
-export const start = (session, objectGroup) => {
-  return GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup)
+export const start = async (session, objectGroup, scriptHandler) => {
+  await scriptHandler.start(session)
+  return GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap)
 }
 
-export const stop = (session, objectGroup) => {
-  return GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup)
+export const stop = async (session, objectGroup, scriptHandler) => {
+  await scriptHandler.stop(session)
+  return GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap)
 }
 
 export const compare = CompareNamedFunctionCount.compareNamedFunctionCount
