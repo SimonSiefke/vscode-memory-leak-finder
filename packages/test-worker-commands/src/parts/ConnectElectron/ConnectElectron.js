@@ -9,12 +9,14 @@ import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyP
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
 import * as WaitForDebuggerToBePaused from '../WaitForDebuggerToBePaused/WaitForDebuggerToBePaused.js'
 
-export const connectElectron = async (connectionId, headlessMode, webSocketUrl, isFirstConnection) => {
+export const connectElectron = async (connectionId, headlessMode, webSocketUrl, isFirstConnection, isLocalVsCode) => {
   Assert.number(connectionId)
   Assert.boolean(headlessMode)
   Assert.string(webSocketUrl)
+  Assert.boolean(isFirstConnection)
+  Assert.boolean(isLocalVsCode)
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
-  const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc)
+  const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc, isLocalVsCode)
   IntermediateConnectionState.set(connectionId, electronRpc)
 
   electronRpc.on(DevtoolsEventType.DebuggerPaused, ScenarioFunctions.handlePaused)

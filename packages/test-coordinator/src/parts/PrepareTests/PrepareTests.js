@@ -9,6 +9,7 @@ import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
 
 export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connectionId, timeouts) => {
   const isFirstConnection = true
+  const isLocalVsCode = Boolean(process.env.VSCODE_PATH)
   await KillExistingVscodeInstances.killExistingVsCodeInstances()
   const { child, webSocketUrl } = await LaunchVsCode.launchVsCode({
     headlessMode,
@@ -21,6 +22,7 @@ export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connecti
     headlessMode,
     webSocketUrl,
     isFirstConnection,
+    isLocalVsCode,
   )
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
   if (recordVideo) {

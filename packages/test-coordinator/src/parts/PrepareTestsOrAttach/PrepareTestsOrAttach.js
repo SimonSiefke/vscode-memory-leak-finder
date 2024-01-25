@@ -26,7 +26,8 @@ export const prepareTestsOrAttach = async (cwd, headlessMode, recordVideo, conne
   }
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, callFrameId, monkeyPatchedElectron } = await state.promise
   const isFirstConnection = false
-  await ConnectElectron.connectElectron(testWorkerIpc, connectionId, headlessMode, webSocketUrl, isFirstConnection)
+  const isLocalVsCode = Boolean(process.env.VSCODE_PATH)
+  await ConnectElectron.connectElectron(testWorkerIpc, connectionId, headlessMode, webSocketUrl, isFirstConnection, isLocalVsCode)
   await ConnectDevtools.connectDevtools(
     testWorkerIpc,
     connectionId,

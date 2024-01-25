@@ -4,24 +4,35 @@ import { ExpectError } from '../ExpectError/ExpectError.js'
 import * as PTimeout from '../PTimeout/PTimeout.js'
 import { VError } from '../VError/VError.js'
 
+const getExpression = (isLocalVsCode) => {
+  if (isLocalVsCode) {
+    return `await new Promise(resolve => {
+  setTimeout(resolve, 5000) // TODO
+})`
+  }
+  return `await new Promise(resolve => {
+  requestIdleCallback(resolve)
+})`
+}
+
+const waitRpcIdle = (rpc, uniqueId) => {
+  const expression = getExpression(rpc.isLocalVsCode)
+  return DevtoolsProtocolRuntime.evaluate(rpc, {
+    awaitPromise: true,
+    replMode: true,
+    expression,
+    returnByValue: true,
+    generatePreview: true,
+    uniqueContextId: uniqueId,
+  })
+}
+
 export const waitForIdle = async (rpc) => {
   try {
     const utilityExecutionContext = await ExecutionContextState.waitForUtilityExecutionContext(rpc.sessionId)
-    const result = await PTimeout.pTimeout(
-      DevtoolsProtocolRuntime.evaluate(rpc, {
-        awaitPromise: true,
-        replMode: true,
-        expression: `await new Promise(resolve => {
-          requestIdleCallback(resolve)
-        })`,
-        returnByValue: true,
-        generatePreview: true,
-        uniqueContextId: utilityExecutionContext.uniqueId,
-      }),
-      {
-        milliseconds: 15000,
-      },
-    )
+    const result = await PTimeout.pTimeout(waitRpcIdle(rpc, utilityExecutionContext.uniqueId), {
+      milliseconds: 30000,
+    })
     return result
   } catch (error) {
     if (error && error.message === 'uniqueContextId not found') {
