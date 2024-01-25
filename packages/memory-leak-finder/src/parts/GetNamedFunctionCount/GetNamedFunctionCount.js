@@ -21,10 +21,6 @@ export const getNamedFunctionCount = async (session, objectGroup, scriptMap) => 
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
   const functions = this
-
-  for(const value of functions){
-    value.___existsBefore = true
-  }
   return functions
 }`,
     objectId: objects.objects.objectId,
