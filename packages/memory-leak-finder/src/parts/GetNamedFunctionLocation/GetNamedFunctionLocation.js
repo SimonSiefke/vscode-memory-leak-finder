@@ -28,12 +28,9 @@ const getFunctionLocationProperty = (session, fnResult, scriptMap) => {
   if (!functionLocation) {
     const boundFunctionValue = getBoundFunctionValue(fnResult)
     if (!boundFunctionValue) {
-      console.log(JSON.stringify(fnResult, null, 2))
-
       return EmptyFunctionLocation.emptyFunctionLocation
     }
     const boundFunctionObjectId = boundFunctionValue.value.objectId
-    console.log({ boundFunctionObjectId })
     return getNamedFunctionLocation(boundFunctionObjectId, session, scriptMap)
   }
   return functionLocation.value.value
@@ -65,7 +62,6 @@ export const getNamedFunctionLocation = async (objectId, session, scriptMap) => 
     generatePreview: false,
     ownProperties: true,
   })
-
   const functionLocation = await getFunctionLocationProperty(session, fnResult1, scriptMap)
   const functionName = getFunctionNameProperty(fnResult1)
   const functionUrl = getFunctionUrl(functionLocation, scriptMap)
