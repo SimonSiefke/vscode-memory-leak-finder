@@ -6,14 +6,15 @@ import * as PTimeout from '../PTimeout/PTimeout.js'
 import { VError } from '../VError/VError.js'
 
 const getExpression = (canUseIdleCallback) => {
+  console.log({ canUseIdleCallback })
   Assert.boolean(canUseIdleCallback)
   if (canUseIdleCallback) {
     return `await new Promise(resolve => {
-    requestIdleCallback(resolve)
-    })`
+  requestIdleCallback(resolve)
+})`
   }
   return `await new Promise(resolve => {
-setTimeout(resolve, 16)
+  setTimeout(resolve, 16)
 })`
 }
 
