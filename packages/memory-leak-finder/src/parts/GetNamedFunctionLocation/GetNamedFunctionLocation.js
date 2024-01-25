@@ -1,12 +1,7 @@
 import * as Assert from '../Assert/Assert.js'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import * as EmptyFunctionLocation from '../EmptyFunctionLocation/EmptyFunctionLocation.js'
 import * as IsFunctionLocation from '../IsFunctionLocation/IsFunctionLocation.js'
-
-const emptyFunctionLocation = {
-  scriptId: '',
-  lineNumber: 0,
-  columnNumber: 0,
-}
 
 const isFunctionName = (value) => {
   return value.name === 'name'
@@ -23,7 +18,7 @@ const getFunctionNameProperty = (fnResult) => {
 const getFunctionLocationProperty = (fnResult) => {
   const functionLocation = fnResult.internalProperties.find(IsFunctionLocation.isFunctionLocation)
   if (!functionLocation) {
-    return emptyFunctionLocation
+    return EmptyFunctionLocation.emptyFunctionLocation
   }
   return functionLocation.value.value
 }
@@ -41,7 +36,7 @@ export const getNamedFunctionLocation = async (objectId, session, scriptMap) => 
   Assert.string(objectId)
   if (!objectId) {
     return {
-      ...emptyFunctionLocation,
+      ...EmptyFunctionLocation.emptyFunctionLocation,
       objectId,
       name: '',
     }
