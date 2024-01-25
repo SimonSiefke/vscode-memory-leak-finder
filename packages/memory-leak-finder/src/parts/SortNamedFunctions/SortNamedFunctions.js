@@ -1,5 +1,6 @@
 import * as Arrays from '../Arrays/Arrays.js'
 import * as Assert from '../Assert/Assert.js'
+import * as FormatUrl from '../FormatUrl/FormatUrl.js'
 
 const getKey = (element) => {
   return `${element.scriptId}:${element.lineNumber}:${element.columnNumber}`
@@ -21,7 +22,7 @@ export const sortNamedFunctions = (array) => {
     map[key] ||= {
       count: 0,
       name: element.name,
-      url: `${element.url}:${element.lineNumber}:${element.columnNumber}`,
+      url: FormatUrl.formatUrl(element.url, element.lineNumber, element.columnNumber),
     }
     map[key].count++
   }
