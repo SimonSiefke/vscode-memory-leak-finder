@@ -36,7 +36,7 @@ const getFunctionUrl = (functionLocation, scriptMap) => {
   return match.url
 }
 
-export const getNamedFunctionLocation = async (session, objectId, scriptMap) => {
+export const getNamedFunctionLocation = async (objectId, session, scriptMap) => {
   Assert.object(session)
   Assert.string(objectId)
   if (!objectId) {
