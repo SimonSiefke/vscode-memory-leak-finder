@@ -15,14 +15,6 @@ const createElectronModule = () => {
         super({
           ...options,
           show: false,
-          // backgroundColor: "green",
-          // backgroundThrottling: false,
-          // webPreferences:{
-          //   // ...options.webPreferences,
-          //   backgroundThrottling: false,
-          //   preload: options.webPreferences.preload,
-          //   additionalArguments: options.webPreferences.additionalArguments,
-          // }
         });
 
         Object.defineProperty(this.webContents, 'openDevTools', {
@@ -30,8 +22,7 @@ const createElectronModule = () => {
           writable: false
         })
 
-        this.show = () => {
-        }
+        this.show = () => {}
 
         this.focus = () => {}
 
@@ -39,14 +30,6 @@ const createElectronModule = () => {
       }
     },
   };
-
-  // Object.defineProperty(electronModule.exports.app, 'focus', {
-  //   value(){},
-  //   writable: false
-  // })
-  // electronModule.exports.app.commandLine.appendSwitch('no-sandbox');
-  // electronModule.exports.app.commandLine.appendSwitch('disable-gpu-sandbox');
-  electronModule.exports.app.commandLine.appendSwitch('--disable-background-timer-throttling');
   return electronModule;
 };
 
