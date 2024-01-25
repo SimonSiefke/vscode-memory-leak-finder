@@ -6,7 +6,7 @@ import * as ScriptHandler from '../ScriptHandler/ScriptHandler.js'
 import * as StartTrackingFunctions from '../StartTrackingFunctions/StartTrackingFunctions.js'
 import * as StopTrackingFunctions from '../StopTrackingFunctions/StopTrackingFunctions.js'
 
-export const id = MeasureId.FunctionDifference
+export const id = MeasureId.NamedFunctionDifference
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
