@@ -1,43 +1,32 @@
-import * as AddFunctionLocationsToFunctions from '../AddFunctionLocationsToFunctions/AddFunctionLocationsToFunctions.js'
-import * as Arrays from '../Arrays/Arrays.js'
 import * as Assert from '../Assert/Assert.js'
-import * as GetUrl from '../FormatUrl/FormatUrl.js'
+import * as SortNamedFunctions from '../SortNamedFunctions/SortNamedFunctions.js'
 
-const aggregateFunctionLocations = (functionLocations) => {
-  const map = Object.create(null)
-  for (const functionLocation of functionLocations) {
-    const { url, lineNumber, columnNumber } = functionLocation
-    const key = GetUrl.formatUrl(url, lineNumber, columnNumber)
-    map[key] ||= 0
-    map[key]++
+const getDifference = (sortedBefore, sortedAfter) => {
+  const result = []
+  const beforeMap = Object.create(null)
+  for (const value of sortedBefore) {
+    beforeMap[value.url] = value.count
   }
-  return map
-}
-
-// const sortArray = (array, compared)
-
-const compareElement = (a, b) => {
-  return b.value - a.value
-}
-
-const sortMap = (map) => {
-  const array = []
-  for (const [key, value] of Object.entries(map)) {
-    array.push({ key, value })
+  for (const value of sortedAfter) {
+    const beforeCount = beforeMap[value.url] || 0
+    if (value.count <= beforeCount) {
+      continue
+    }
+    result.push({
+      name: value.name,
+      count: value.count,
+      beforeCount,
+      url: value.url,
+    })
   }
-  const sorted = Arrays.toSorted(array, compareElement)
-  const sortedMap = Object.create(null)
-  for (const element of sorted) {
-    sortedMap[element.key] = element.value
-  }
-  return sortedMap
+  return result
 }
 
 export const compareFunctionDifference = (before, after) => {
-  Assert.object(after)
-  const { result, scriptMap } = after
-  const withLocations = AddFunctionLocationsToFunctions.addFunctionLocationsToFunctions(result, scriptMap)
-  const aggregated = aggregateFunctionLocations(withLocations)
-  const sorted = sortMap(aggregated)
-  return sorted
+  Assert.array(before)
+  Assert.array(after)
+  const sortedBefore = SortNamedFunctions.sortNamedFunctions(before)
+  const sortedAfter = SortNamedFunctions.sortNamedFunctions(after)
+  const difference = getDifference(sortedBefore, sortedAfter)
+  return difference
 }

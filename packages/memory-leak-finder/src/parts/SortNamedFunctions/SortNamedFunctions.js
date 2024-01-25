@@ -1,4 +1,5 @@
 import * as Arrays from '../Arrays/Arrays.js'
+import * as Assert from '../Assert/Assert.js'
 
 const getKey = (element) => {
   return `${element.scriptId}:${element.lineNumber}:${element.columnNumber}`
@@ -13,6 +14,7 @@ const sortValues = (values) => {
 }
 
 export const sortNamedFunctions = (array) => {
+  Assert.array(array)
   const map = Object.create(null)
   for (const element of array) {
     const key = getKey(element)
