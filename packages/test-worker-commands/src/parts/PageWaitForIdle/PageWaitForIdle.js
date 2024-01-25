@@ -33,7 +33,7 @@ export const waitForIdle = async (rpc, canUseIdleCallback) => {
   try {
     const utilityExecutionContext = await ExecutionContextState.waitForUtilityExecutionContext(rpc.sessionId)
     const result = await PTimeout.pTimeout(waitRpcIdle(rpc, utilityExecutionContext.uniqueId, canUseIdleCallback), {
-      milliseconds: 30000,
+      milliseconds: 5000,
     })
     return result
   } catch (error) {
