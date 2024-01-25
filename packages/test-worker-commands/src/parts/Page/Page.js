@@ -41,7 +41,7 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
       })
     },
     async waitForIdle() {
-      return PageWaitForIdle.waitForIdle(this.rpc)
+      return PageWaitForIdle.waitForIdle(this.rpc, this.electronRpc.isLocalVsCode)
     },
     async reload() {
       return PageReload.reload(this.rpc)
