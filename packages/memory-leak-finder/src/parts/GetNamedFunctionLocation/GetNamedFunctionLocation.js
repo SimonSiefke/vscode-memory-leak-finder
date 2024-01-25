@@ -15,10 +15,23 @@ const getFunctionNameProperty = (fnResult) => {
   return match.value.value
 }
 
-const getFunctionLocationProperty = (fnResult) => {
+const isBoundFunctionProperty = (value) => {
+  return value.name === '[[TargetFunction]]'
+}
+
+const getBoundFunctionValue = (fnResult) => {
+  return fnResult.internalProperties.find(isBoundFunctionProperty)
+}
+
+const getFunctionLocationProperty = (session, fnResult, scriptMap) => {
   const functionLocation = fnResult.internalProperties.find(IsFunctionLocation.isFunctionLocation)
   if (!functionLocation) {
-    return EmptyFunctionLocation.emptyFunctionLocation
+    const boundFunctionValue = getBoundFunctionValue(fnResult)
+    if (!boundFunctionValue) {
+      return EmptyFunctionLocation.emptyFunctionLocation
+    }
+    const boundFunctionObjectId = boundFunctionValue.value.objectId
+    return getNamedFunctionLocation(boundFunctionObjectId, session, scriptMap)
   }
   return functionLocation.value.value
 }
@@ -33,6 +46,7 @@ const getFunctionUrl = (functionLocation, scriptMap) => {
 
 export const getNamedFunctionLocation = async (objectId, session, scriptMap) => {
   Assert.object(session)
+  Assert.object(scriptMap)
   Assert.string(objectId)
   if (!objectId) {
     return {
@@ -48,7 +62,7 @@ export const getNamedFunctionLocation = async (objectId, session, scriptMap) => 
     generatePreview: false,
     ownProperties: true,
   })
-  const functionLocation = getFunctionLocationProperty(fnResult1)
+  const functionLocation = await getFunctionLocationProperty(session, fnResult1, scriptMap)
   const functionName = getFunctionNameProperty(fnResult1)
   const functionUrl = getFunctionUrl(functionLocation, scriptMap)
   return {
