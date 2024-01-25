@@ -5,6 +5,7 @@ import * as GetNamedFunctionLocation from '../GetNamedFunctionLocation/GetNamedF
 export const getNamedFunctionLocations = async (session, objectIds, scriptMap) => {
   Assert.object(session)
   Assert.array(objectIds)
+  Assert.object(scriptMap)
   const promises = Arrays.contextMap(objectIds, GetNamedFunctionLocation.getNamedFunctionLocation, session, scriptMap)
   const results = await Promise.all(promises)
   return results
