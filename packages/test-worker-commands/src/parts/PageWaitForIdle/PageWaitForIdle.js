@@ -13,7 +13,7 @@ const getExpression = (canUseIdleCallback) => {
     })`
   }
   return `await new Promise(resolve => {
-setTimeout(resolve, 1)
+setTimeout(resolve, 16)
 })`
 }
 
