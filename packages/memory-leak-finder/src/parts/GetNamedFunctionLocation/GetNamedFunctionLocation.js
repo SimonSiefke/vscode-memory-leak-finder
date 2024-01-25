@@ -1,6 +1,7 @@
 import * as Assert from '../Assert/Assert.js'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as EmptyFunctionLocation from '../EmptyFunctionLocation/EmptyFunctionLocation.js'
+import * as GetBoundFunctionValue from '../GetBoundFunctionValue/GetBoundFunctionValue.js'
 import * as IsFunctionLocation from '../IsFunctionLocation/IsFunctionLocation.js'
 
 const isFunctionName = (value) => {
@@ -15,18 +16,10 @@ const getFunctionNameProperty = (fnResult) => {
   return match.value.value
 }
 
-const isBoundFunctionProperty = (value) => {
-  return value.name === '[[TargetFunction]]'
-}
-
-const getBoundFunctionValue = (fnResult) => {
-  return fnResult.internalProperties.find(isBoundFunctionProperty)
-}
-
 const getFunctionLocationProperty = (session, fnResult, scriptMap) => {
   const functionLocation = fnResult.internalProperties.find(IsFunctionLocation.isFunctionLocation)
   if (!functionLocation) {
-    const boundFunctionValue = getBoundFunctionValue(fnResult)
+    const boundFunctionValue = GetBoundFunctionValue.getBoundFunctionValue(fnResult)
     if (!boundFunctionValue) {
       return EmptyFunctionLocation.emptyFunctionLocation
     }
