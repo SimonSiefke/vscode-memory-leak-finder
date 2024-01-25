@@ -6,10 +6,11 @@ import * as PageObject from '../PageObject/PageObject.js'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.js'
 import * as VideoRecording from '../VideoRecording/VideoRecording.js'
 import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
+import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.js'
 
 export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connectionId, timeouts) => {
   const isFirstConnection = true
-  const isLocalVsCode = Boolean(process.env.VSCODE_PATH)
+  const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingVscodeInstances.killExistingVsCodeInstances()
   const { child, webSocketUrl } = await LaunchVsCode.launchVsCode({
     headlessMode,
@@ -22,7 +23,7 @@ export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connecti
     headlessMode,
     webSocketUrl,
     isFirstConnection,
-    isLocalVsCode,
+    canUseIdleCallback,
   )
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
   if (recordVideo) {

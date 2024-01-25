@@ -5,20 +5,20 @@ import { ExpectError } from '../ExpectError/ExpectError.js'
 import * as PTimeout from '../PTimeout/PTimeout.js'
 import { VError } from '../VError/VError.js'
 
-const getExpression = (isLocalVsCode) => {
-  Assert.boolean(isLocalVsCode)
-  if (isLocalVsCode) {
+const getExpression = (canUseIdleCallback) => {
+  Assert.boolean(canUseIdleCallback)
+  if (canUseIdleCallback) {
     return `await new Promise(resolve => {
-  setTimeout(resolve, 0)
-})`
+    requestIdleCallback(resolve)
+    })`
   }
   return `await new Promise(resolve => {
-  requestIdleCallback(resolve)
+setTimeout(resolve, 1)
 })`
 }
 
-const waitRpcIdle = (rpc, uniqueId, isLocalVsCode) => {
-  const expression = getExpression(isLocalVsCode)
+const waitRpcIdle = (rpc, uniqueId, canUseIdleCallback) => {
+  const expression = getExpression(canUseIdleCallback)
   return DevtoolsProtocolRuntime.evaluate(rpc, {
     awaitPromise: true,
     replMode: true,
@@ -29,10 +29,10 @@ const waitRpcIdle = (rpc, uniqueId, isLocalVsCode) => {
   })
 }
 
-export const waitForIdle = async (rpc, isLocalVsCode) => {
+export const waitForIdle = async (rpc, canUseIdleCallback) => {
   try {
     const utilityExecutionContext = await ExecutionContextState.waitForUtilityExecutionContext(rpc.sessionId)
-    const result = await PTimeout.pTimeout(waitRpcIdle(rpc, utilityExecutionContext.uniqueId, isLocalVsCode), {
+    const result = await PTimeout.pTimeout(waitRpcIdle(rpc, utilityExecutionContext.uniqueId, canUseIdleCallback), {
       milliseconds: 30000,
     })
     return result

@@ -1,6 +1,7 @@
 import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.js'
 import * as ConnectElectron from '../ConnectElectron/ConnectElectron.js'
 import * as PageObject from '../PageObject/PageObject.js'
+import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.js'
 import * as PrepareTests from '../PrepareTests/PrepareTests.js'
 import * as TestWorker from '../TestWorker/TestWorker.js'
 
@@ -26,8 +27,8 @@ export const prepareTestsOrAttach = async (cwd, headlessMode, recordVideo, conne
   }
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, callFrameId, monkeyPatchedElectron } = await state.promise
   const isFirstConnection = false
-  const isLocalVsCode = Boolean(process.env.VSCODE_PATH)
-  await ConnectElectron.connectElectron(testWorkerIpc, connectionId, headlessMode, webSocketUrl, isFirstConnection, isLocalVsCode)
+  const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
+  await ConnectElectron.connectElectron(testWorkerIpc, connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback)
   await ConnectDevtools.connectDevtools(
     testWorkerIpc,
     connectionId,
