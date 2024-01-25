@@ -12,12 +12,27 @@ const createElectronModule = () => {
     ...originalElectron,
     BrowserWindow: class extends originalElectron.BrowserWindow {
       constructor(options) {
-        super({ ...options, show: false, backgroundColor: "green" });
+        super({
+          ...options,
+          show: false,
+        });
+
+        Object.defineProperty(this.webContents, 'openDevTools', {
+          value(){},
+          writable: false
+        })
+
+        this.show = () => {}
+
+        this.focus = () => {}
+
+        this.restore = () => {}
       }
     },
   };
   return electronModule;
 };
+
 
 
 Module._cache["electron"] = createElectronModule();

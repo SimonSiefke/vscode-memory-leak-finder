@@ -5,7 +5,7 @@ import * as ObjectType from '../ObjectType/ObjectType.js'
  * @param {any} ipc
  * @returns
  */
-export const createRpc = (ipc) => {
+export const createRpc = (ipc, canUseIdleCallback) => {
   const callbacks = Object.create(null)
   const handleMessage = (message) => {
     if ('id' in message) {
@@ -37,6 +37,7 @@ export const createRpc = (ipc) => {
     callbacks,
     listeners,
     onceListeners,
+    canUseIdleCallback,
     invoke(method, params) {
       return new Promise((resolve, reject) => {
         const id = _id++
