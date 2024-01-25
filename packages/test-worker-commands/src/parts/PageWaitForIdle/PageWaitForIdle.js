@@ -19,7 +19,7 @@ export const waitForIdle = async (rpc) => {
         uniqueContextId: utilityExecutionContext.uniqueId,
       }),
       {
-        milliseconds: 5000,
+        milliseconds: 15000,
       },
     )
     return result

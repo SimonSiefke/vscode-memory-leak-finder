@@ -12,10 +12,30 @@ const createElectronModule = () => {
     ...originalElectron,
     BrowserWindow: class extends originalElectron.BrowserWindow {
       constructor(options) {
-        super({ ...options, show: false, backgroundColor: "green" });
+        super({
+          ...options,
+          show: false,
+          backgroundColor: "green",
+        });
+
+        Object.defineProperty(this.webContents, 'openDevTools', {
+          value(){},
+          writable: false
+        })
+
+        this.show = () => {}
+
+        this.focus = () => {}
+
+        this.restore = () => {}
       }
     },
   };
+
+  Object.defineProperty(electronModule.exports.app, 'focus', {
+    value(){},
+    writable: false
+  })
   return electronModule;
 };
 
