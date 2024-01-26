@@ -121,6 +121,22 @@ Measures the total number of MutationObservers.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure mutation-observer-count --only base
 ```
 
+### NamedFunctionCount
+
+Measures the count of each function.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure named-function-count --only base
+```
+
+### NamedFunctionDifference
+
+Measures the difference in counts of each function.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure named-function-difference --only base
+```
+
 ### PromiseCount
 
 Measures the total number of Promises.
@@ -369,7 +385,7 @@ It seems there is memory leak when opening and closing a notebook. But just look
 | DiffEditor           | https://github.com/microsoft/vscode/issues/200381 | Fixed  |
 | QuickPick            | https://github.com/microsoft/vscode/issues/201320 | Fixed  |
 | Terminal             | https://github.com/xtermjs/xterm.js/issues/4935   | Review |
-| KeyBindingsEditor    | https://github.com/microsoft/vscode/issues/202455 | -      |
+| KeyBindingsEditor    | https://github.com/microsoft/vscode/issues/202455 | Review |
 
 ## Credits
 
