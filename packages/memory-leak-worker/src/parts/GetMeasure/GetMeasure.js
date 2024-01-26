@@ -66,6 +66,8 @@ export const getMeasure = (MemoryLeakFinder, measureId) => {
       return MemoryLeakFinder.Measures.MeasureNamedFunctionCount
     case 'named-function-difference':
       return MemoryLeakFinder.Measures.MeasureNamedFunctionDifference
+    case 'named-function-difference-with-source-map':
+      return MemoryLeakFinder.Measures.MeasureNamedFunctionDifferenceWithSourceMap
     case 'object-count':
       return MemoryLeakFinder.Measures.MeasureObjectCount
     case 'promise-count':
