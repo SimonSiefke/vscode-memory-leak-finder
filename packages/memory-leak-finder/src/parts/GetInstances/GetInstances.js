@@ -43,8 +43,12 @@ export const getInstances = async (session, objectGroup) => {
     HTMLSpanElement
   ]
 
+  const isNativeConstructor = object => {
+    return nativeConstructors.includes(object.constructor) || object.constructor.name === 'AsyncFunction'
+  }
+
   const isInstance = (object) => {
-    return object && !nativeConstructors.includes(object.constructor)
+    return object && !isNativeConstructor(object)
   }
 
   const instances = objects.filter(isInstance)
