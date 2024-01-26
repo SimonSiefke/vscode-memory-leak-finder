@@ -42,28 +42,18 @@ jobs:
       - run: npx lerna run test --since origin/main
       - name: Run headless test (with videos)
         if: matrix.os != 'macos-13'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --record-video
+        run: node packages/cli/bin/test.js --cwd packages/e2e --record-video
       - name: Run headless test
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: npm run e2e
+        run: npm run e2e
       - name: Run headless test (flakyness check)
         if: matrix.os != 'macos-13'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: npm run e2e:check-flakyness
+        run: npm run e2e:check-flakyness
       - name: Run headless test (check leaks, event listener count)
         if: matrix.os != 'macos-13'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after
+        run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after
       - name: Run headless test (check leaks, event listeners)
         if: matrix.os == 'ubuntu-22.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure event-listeners
+        run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure event-listeners
       - uses: actions/upload-artifact@v4
         if: always()
         with:
