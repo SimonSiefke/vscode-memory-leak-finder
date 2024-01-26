@@ -23,6 +23,7 @@ export const sortNamedFunctions = (array) => {
       count: 0,
       name: element.name,
       url: FormatUrl.formatUrl(element.url, element.lineNumber, element.columnNumber),
+      sourceMapUrl: element.sourceMapUrl,
     }
     map[key].count++
   }

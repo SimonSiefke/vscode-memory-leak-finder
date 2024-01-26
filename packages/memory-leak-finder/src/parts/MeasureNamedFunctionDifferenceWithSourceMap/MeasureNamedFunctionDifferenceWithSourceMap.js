@@ -1,4 +1,4 @@
-import * as CompareFunctionDifference from '../CompareFunctionDifference/CompareFunctionDifference.js'
+import * as CompareNamedFunctionDifferenceWithSourceMap from '../CompareNamedFunctionDifferenceWithSourceMap/CompareNamedFunctionDifferenceWithSourceMap.js'
 import * as GetNamedFunctionCount from '../GetNamedFunctionCount/GetNamedFunctionCount.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
@@ -22,10 +22,12 @@ export const stop = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.stop(session)
   const result = await GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap)
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
+  // @ts-ignore
+  result.scriptMap = scriptHandler.scriptMap
   return result
 }
 
-export const compare = CompareFunctionDifference.compareFunctionDifference
+export const compare = CompareNamedFunctionDifferenceWithSourceMap.compareFunctionDifference
 
 export const isLeak = (difference) => {
   return difference.length > 0

@@ -18,6 +18,7 @@ export const getDifference = (sortedBefore, sortedAfter) => {
       count: value.count,
       beforeCount,
       url: value.url,
+      sourceMapUrl: value.sourceMapUrl,
     })
   }
   return result
