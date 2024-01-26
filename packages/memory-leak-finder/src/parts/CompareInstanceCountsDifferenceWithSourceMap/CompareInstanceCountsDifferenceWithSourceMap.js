@@ -1,4 +1,4 @@
-import * as PrettifyInstanceCounts from '../PrettifyInstanceCounts/PrettifyInstanceCounts.js'
+import * as PrettifyInstanceCountsWithSourceMap from '../PrettifyInstanceCountsWithSourceMap/PrettifyInstanceCountsWithSourceMap.js'
 
 const getKey = (element) => {
   return `${element.scriptId}:${element.lineNumber}:${element.columnNumber}`
@@ -19,10 +19,10 @@ export const compareInstanceCountsDifferenceWithSourceMap = async (before, after
     if (delta > 0) {
       leaked.push({
         ...element,
-        delta,
+        beforeCount,
       })
     }
   }
-  const prettyLeaked = await PrettifyInstanceCounts.prettifyInstanceCounts(leaked)
+  const prettyLeaked = await PrettifyInstanceCountsWithSourceMap.prettifyInstanceCountsWithSourceMap(leaked)
   return prettyLeaked
 }
