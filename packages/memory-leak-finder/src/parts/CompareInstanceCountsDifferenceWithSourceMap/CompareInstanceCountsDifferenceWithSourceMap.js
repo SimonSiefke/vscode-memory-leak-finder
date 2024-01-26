@@ -1,7 +1,7 @@
 import * as CreateCountMap from '../CreateCountMap/CreateCountMap.js'
 import * as PrettifyInstanceCounts from '../PrettifyInstanceCounts/PrettifyInstanceCounts.js'
 
-export const compareInstanceCountsDifference = async (before, after) => {
+export const compareInstanceCountsDifferenceWithSourceMap = async (before, after) => {
   const beforeMap = CreateCountMap.createCountMap(before, 'name')
   const leaked = []
   for (const element of after) {
