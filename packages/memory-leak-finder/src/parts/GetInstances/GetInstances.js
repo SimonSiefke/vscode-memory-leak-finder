@@ -40,11 +40,30 @@ export const getInstances = async (session, objectGroup) => {
     HTMLLinkElement,
     HTMLLIElement,
     HTMLAnchorElement,
-    HTMLSpanElement
+    HTMLSpanElement,
+    ArrayBuffer,
+    Uint16Array,
+    HTMLLabelElement,
+    TrustedTypePolicy,
+    Uint8Array,
+    Uint32Array,
+    HTMLHeadingElement,
+    MediaQueryList,
+    HTMLDocument,
+    TextDecoder,
+    TextEncoder,
+    HTMLInputElement,
+    HTMLCanvasElement,
+    HTMLIFrameElement,
+    Int32Array,
+    CSSStyleDeclaration
   ]
 
   const isNativeConstructor = object => {
-    return nativeConstructors.includes(object.constructor) || object.constructor.name === 'AsyncFunction'
+    return nativeConstructors.includes(object.constructor) ||
+           object.constructor.name === 'AsyncFunction' ||
+           object.constructor.name === 'GeneratorFunction' ||
+           object.constructor.name === 'AsyncGeneratorFunction'
   }
 
   const isInstance = (object) => {
