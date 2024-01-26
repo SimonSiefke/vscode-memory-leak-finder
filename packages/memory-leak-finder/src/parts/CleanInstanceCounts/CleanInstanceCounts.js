@@ -1,11 +1,7 @@
+import * as Arrays from '../Arrays/Arrays.js'
 import * as CleanInstanceCount from '../CleanInstanceCount/CleanInstanceCount.js'
 
 export const cleanInstanceCounts = (instances, constructorLocations, scriptMap) => {
-  const cleanInstanceCounts = []
-  for (let i = 0; i < instances.length; i++) {
-    const instance = instances[i]
-    const constructorLocation = constructorLocations[i]
-    cleanInstanceCounts.push(CleanInstanceCount.cleanInstanceCount(instance, constructorLocation, scriptMap))
-  }
+  const cleanInstanceCounts = Arrays.contextZipMap(instances, constructorLocations, CleanInstanceCount.cleanInstanceCount, scriptMap)
   return cleanInstanceCounts
 }
