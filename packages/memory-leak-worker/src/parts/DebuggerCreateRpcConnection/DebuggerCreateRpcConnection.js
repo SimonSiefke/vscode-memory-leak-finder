@@ -1,4 +1,5 @@
 import * as ObjectType from '../ObjectType/ObjectType.js'
+import * as Promises from '../Promises/Promises.js'
 
 /**
  *
@@ -38,27 +39,27 @@ export const createRpc = (ipc) => {
     listeners,
     onceListeners,
     invoke(method, params) {
-      return new Promise((resolve, reject) => {
-        const id = _id++
-        callbacks[id] = { resolve, reject }
-        ipc.send({
-          method,
-          params,
-          id,
-        })
+      const { resolve, reject, promise } = Promises.withResolvers()
+      const id = _id++
+      callbacks[id] = { resolve, reject }
+      ipc.send({
+        method,
+        params,
+        id,
       })
+      return promise
     },
     invokeWithSession(sessionId, method, params) {
-      return new Promise((resolve, reject) => {
-        const id = _id++
-        callbacks[id] = { resolve, reject }
-        ipc.send({
-          sessionId,
-          method,
-          params,
-          id,
-        })
+      const { resolve, reject, promise } = Promises.withResolvers()
+      const id = _id++
+      callbacks[id] = { resolve, reject }
+      ipc.send({
+        sessionId,
+        method,
+        params,
+        id,
       })
+      return promise
     },
     on(event, listener) {
       listeners[event] = listener
