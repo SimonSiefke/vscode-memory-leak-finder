@@ -14,7 +14,6 @@ const cleanInstance = (instance) => {
 export const prettifyInstanceCountsWithSourceMap = async (instances) => {
   Assert.array(instances)
   const classNames = true
-  console.log(instances)
   const cleanPrettyInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(instances, classNames)
   const sorted = Arrays.toSorted(cleanPrettyInstances, CompareInstance.compareInstance)
   const clean = sorted.map(cleanInstance)
