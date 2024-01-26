@@ -1,7 +1,11 @@
-export const skip = true
-
 export const setup = async ({ Editor, Workspace, Explorer, ActivityBar }) => {
-  await Workspace.setFiles([])
+  await Workspace.setFiles([
+    {
+      name: 'index.html',
+      content: '<h1>hello world</h1>',
+    },
+  ])
+  await Workspace.initializeGitRepository()
   await Editor.closeAll()
   await Explorer.focus()
   await ActivityBar.showSourceControl()
