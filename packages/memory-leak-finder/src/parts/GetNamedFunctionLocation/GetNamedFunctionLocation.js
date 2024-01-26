@@ -1,41 +1,9 @@
 import * as Assert from '../Assert/Assert.js'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as EmptyFunctionLocation from '../EmptyFunctionLocation/EmptyFunctionLocation.js'
-import * as GetBoundFunctionValue from '../GetBoundFunctionValue/GetBoundFunctionValue.js'
-import * as IsFunctionLocation from '../IsFunctionLocation/IsFunctionLocation.js'
-
-const isFunctionName = (value) => {
-  return value.name === 'name'
-}
-
-const getFunctionNameProperty = (fnResult) => {
-  const match = fnResult.result.find(isFunctionName)
-  if (!match) {
-    return ''
-  }
-  return match.value.value
-}
-
-const getFunctionLocationProperty = (session, fnResult, scriptMap) => {
-  const functionLocation = fnResult.internalProperties.find(IsFunctionLocation.isFunctionLocation)
-  if (!functionLocation) {
-    const boundFunctionValue = GetBoundFunctionValue.getBoundFunctionValue(fnResult)
-    if (!boundFunctionValue) {
-      return EmptyFunctionLocation.emptyFunctionLocation
-    }
-    const boundFunctionObjectId = boundFunctionValue.value.objectId
-    return getNamedFunctionLocation(boundFunctionObjectId, session, scriptMap)
-  }
-  return functionLocation.value.value
-}
-
-const getFunctionUrl = (functionLocation, scriptMap) => {
-  const match = scriptMap[functionLocation.scriptId]
-  if (!match) {
-    return ''
-  }
-  return match.url
-}
+import * as GetFunctionNameProperty from '../GetFunctionNameProperty/GetFunctionNameProperty.js'
+import * as GetFunctionUrl from '../GetFunctionUrl/GetFunctionUrl.js'
+import * as GetNamedFunctionLocationProperty from '../GetNamedFunctionLocationProperty/GetNamedFunctionLocationProperty.js'
 
 export const getNamedFunctionLocation = async (objectId, session, scriptMap) => {
   Assert.object(session)
@@ -55,9 +23,14 @@ export const getNamedFunctionLocation = async (objectId, session, scriptMap) => 
     generatePreview: false,
     ownProperties: true,
   })
-  const functionLocation = await getFunctionLocationProperty(session, fnResult1, scriptMap)
-  const functionName = getFunctionNameProperty(fnResult1)
-  const functionUrl = getFunctionUrl(functionLocation, scriptMap)
+  const functionLocation = await GetNamedFunctionLocationProperty.getNamedFunctionLocationProperty(
+    session,
+    fnResult1,
+    scriptMap,
+    getNamedFunctionLocation,
+  )
+  const functionName = GetFunctionNameProperty.getFunctionNameProperty(fnResult1)
+  const functionUrl = GetFunctionUrl.getFunctionUrl(functionLocation, scriptMap)
   return {
     ...functionLocation,
     objectId,
