@@ -1,7 +1,5 @@
-const isBoundFunctionProperty = (value) => {
-  return value.name === '[[TargetFunction]]'
-}
+import * as IsBoundFunctionProperty from '../IsBoundFunctionProperty/IsBoundFunctionProperty.js'
 
 export const getBoundFunctionValue = (fnResult) => {
-  return fnResult.internalProperties.find(isBoundFunctionProperty)
+  return fnResult.internalProperties.find(IsBoundFunctionProperty.isBoundFunctionProperty)
 }
