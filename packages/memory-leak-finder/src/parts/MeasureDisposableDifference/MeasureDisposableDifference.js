@@ -15,12 +15,12 @@ export const create = (session) => {
 
 export const start = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.start(session)
-  return GetDisposablesWithLocation.getDisposablesWithLocation(session, objectGroup, scriptMap)
+  return GetDisposablesWithLocation.getDisposablesWithLocation(session, objectGroup, scriptHandler.scriptMap)
 }
 
 export const stop = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.stop(session)
-  const result = await GetDisposablesWithLocation.getDisposablesWithLocation(session, objectGroup, scriptMap)
+  const result = await GetDisposablesWithLocation.getDisposablesWithLocation(session, objectGroup, scriptHandler.scriptMap)
   return {
     result,
     scriptMap: scriptHandler.scriptMap,
