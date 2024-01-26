@@ -4,6 +4,7 @@ import * as GetEventListeners from '../GetEventListeners/GetEventListeners.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
+import * as ScriptHandler from '../ScriptHandler/ScriptHandler.js'
 import * as StartTrackEventListenerStackTraces from '../StartTrackEventListenerStackTraces/StartTrackEventListenerStackTraces.js'
 import * as StopTrackingEventListenerStackTraces from '../StopTrackingEventListenerStackTraces/StopTrackingEventListenerStackTraces.js'
 
@@ -16,32 +17,20 @@ export const id = MeasureId.EventListenersWithStackTrace
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
-  const scriptMap = Object.create(null)
-  const handleScriptParsed = (event) => {
-    const { url, scriptId, sourceMapURL } = event.params
-    if (!url) {
-      return
-    }
-    scriptMap[scriptId] = {
-      url,
-      sourceMapUrl: sourceMapURL,
-    }
-  }
-  session.on('Debugger.scriptParsed', handleScriptParsed)
-  return [session, objectGroup, scriptMap, handleScriptParsed]
+  const scriptHandler = ScriptHandler.create()
+  return [session, objectGroup, scriptHandler]
 }
 
-export const start = async (session, objectGroup, scriptMap) => {
-  await session.invoke('Debugger.enable')
+export const start = async (session, objectGroup, scriptHandler) => {
+  await scriptHandler.start()
   await StartTrackEventListenerStackTraces.startTrackingEventListenerStackTraces(session, objectGroup)
-  const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptMap)
+  const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptHandler.scriptMap)
   return result
 }
 
-export const stop = async (session, objectGroup, scriptMap, handleScriptParsed) => {
-  session.off('Debugger.scriptParsed', handleScriptParsed)
-  await session.invoke('Debugger.disable')
-  const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptMap)
+export const stop = async (session, objectGroup, scriptHandler) => {
+  await scriptHandler.stop()
+  const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptHandler.scriptMap)
   const resultWithStackTraces = await AddStackTracesToEventListeners.addStackTracesToEventListeners(session, result)
   await StopTrackingEventListenerStackTraces.stopTrackingEventListenerStackTraces(session, objectGroup)
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)

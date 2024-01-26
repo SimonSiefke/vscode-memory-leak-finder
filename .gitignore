@@ -14,6 +14,7 @@ ffmpeg-linux
 .vscode-runtime-dir
 .vscode-source-maps
 .vscode-resolve-source-map-cache
+.vscode-charts
 
 # Logs
 logs

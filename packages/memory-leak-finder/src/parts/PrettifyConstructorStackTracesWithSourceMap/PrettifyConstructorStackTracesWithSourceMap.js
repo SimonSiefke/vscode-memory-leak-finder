@@ -1,4 +1,5 @@
 import * as Arrays from '../Arrays/Arrays.js'
+import * as FormatUrl from '../FormatUrl/FormatUrl.js'
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
 
 const RE_URL = /(.*)\((.*):(\d+):(\d+)\)/s
@@ -36,7 +37,8 @@ const getEventListenerQuery = (stackLines, scriptMap, index) => {
   const eventListeners = stackLines.map((stackLine, index) => {
     const { prefix, url, line, column } = parseUrl(stackLine)
     const sourceMapUrl = reverseScriptMap[url]
-    const newStackLine = `${prefix}(${url}:${line - 1}:${column})`
+    const formattedUrl = FormatUrl.formatUrl(url, line - 1, column)
+    const newStackLine = `${prefix}(${formattedUrl})`
     return {
       url,
       originalIndex: index,

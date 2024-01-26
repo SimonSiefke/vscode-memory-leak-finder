@@ -15,7 +15,7 @@
     "@babel/code-frame": "^7.23.5",
     "@lvce-editor/assert": "^1.2.0",
     "@lvce-editor/verror": "^1.1.2",
-    "@vscode/test-electron": "^2.3.8",
+    "@vscode/test-electron": "^2.3.9",
     "clean-stack": "^5.2.0",
     "exit-hook": "^4.0.0",
     "got": "^14.0.0",
