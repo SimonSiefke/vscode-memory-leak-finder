@@ -22,14 +22,14 @@ export const create = (session) => {
 }
 
 export const start = async (session, objectGroup, scriptHandler) => {
-  await scriptHandler.start()
+  await scriptHandler.start(session)
   await StartTrackEventListenerStackTraces.startTrackingEventListenerStackTraces(session, objectGroup)
   const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptHandler.scriptMap)
   return result
 }
 
 export const stop = async (session, objectGroup, scriptHandler) => {
-  await scriptHandler.stop()
+  await scriptHandler.stop(session)
   const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptHandler.scriptMap)
   const resultWithStackTraces = await AddStackTracesToEventListeners.addStackTracesToEventListeners(session, result)
   await StopTrackingEventListenerStackTraces.stopTrackingEventListenerStackTraces(session, objectGroup)
