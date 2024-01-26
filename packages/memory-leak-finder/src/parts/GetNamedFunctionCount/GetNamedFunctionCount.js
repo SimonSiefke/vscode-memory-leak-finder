@@ -18,17 +18,8 @@ export const getNamedFunctionCount = async (session, objectGroup, scriptMap) => 
     prototypeObjectId: prototypeDescriptor.objectId,
     objectGroup,
   })
-  const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
-    functionDeclaration: `function(){
-  const functions = this
-  return functions
-}`,
-    objectId: objects.objects.objectId,
-    returnByValue: false,
-    objectGroup,
-  })
   const fnResult3 = await DevtoolsProtocolRuntime.getProperties(session, {
-    objectId: fnResult1.objectId,
+    objectId: objects.objects.objectId,
     generatePreview: false,
     ownProperties: true,
   })
