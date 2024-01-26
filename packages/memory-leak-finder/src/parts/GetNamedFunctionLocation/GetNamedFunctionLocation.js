@@ -5,6 +5,14 @@ import * as GetFunctionNameProperty from '../GetFunctionNameProperty/GetFunction
 import * as GetFunctionUrl from '../GetFunctionUrl/GetFunctionUrl.js'
 import * as GetNamedFunctionLocationProperty from '../GetNamedFunctionLocationProperty/GetNamedFunctionLocationProperty.js'
 
+export const getFunctionSourceMapUrl = (functionLocation, scriptMap) => {
+  const match = scriptMap[functionLocation.scriptId]
+  if (!match) {
+    return ''
+  }
+  return match.sourceMapUrl
+}
+
 export const getNamedFunctionLocation = async (objectId, session, scriptMap) => {
   Assert.object(session)
   Assert.object(scriptMap)
@@ -14,6 +22,8 @@ export const getNamedFunctionLocation = async (objectId, session, scriptMap) => 
       ...EmptyFunctionLocation.emptyFunctionLocation,
       objectId,
       name: '',
+      url: '',
+      sourceMapUrl: '',
     }
   }
   const fnResult1 = await DevtoolsProtocolRuntime.getProperties(session, {
@@ -31,10 +41,12 @@ export const getNamedFunctionLocation = async (objectId, session, scriptMap) => 
   )
   const functionName = GetFunctionNameProperty.getFunctionNameProperty(fnResult1)
   const functionUrl = GetFunctionUrl.getFunctionUrl(functionLocation, scriptMap)
+  const functionSourceMapUrl = getFunctionSourceMapUrl(functionLocation, scriptMap)
   return {
     ...functionLocation,
     objectId,
     name: functionName,
     url: functionUrl,
+    sourceMapUrl: functionSourceMapUrl,
   }
 }

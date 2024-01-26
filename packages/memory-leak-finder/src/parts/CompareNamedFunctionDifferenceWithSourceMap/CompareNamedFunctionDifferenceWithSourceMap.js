@@ -2,31 +2,32 @@ import * as Assert from '../Assert/Assert.js'
 import * as CompareFunctionDifference from '../CompareFunctionDifference/CompareFunctionDifference.js'
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
 
-const prepareBaseDifferenceItem = (baseDifferenceItem, scriptMap) => {
-  const { url, count, name, scriptId } = baseDifferenceItem
-  const script = scriptMap[scriptId] || {}
+const prepareBaseDifferenceItem = (baseDifferenceItem) => {
+  const { url, sourceMapUrl, count, beforeCount, name } = baseDifferenceItem
   return {
     stack: [url],
-    sourceMaps: [script.sourceMapUrl],
+    sourceMaps: [sourceMapUrl],
     count,
+    beforeCount,
     name,
   }
 }
 
-const prepareBaseDifference = (baseDifference, scriptMap) => {
+const prepareBaseDifference = (baseDifference) => {
   const prepared = []
   for (const item of baseDifference) {
-    prepared.push(prepareBaseDifferenceItem(item, scriptMap))
+    prepared.push(prepareBaseDifferenceItem(item))
   }
   return prepared
 }
 
 const finishBaseDifferenceItem = (baseDifferenceItem) => {
-  const { stack, count, originalStack, originalName, name } = baseDifferenceItem
+  const { stack, count, originalStack, originalName, name, beforeCount } = baseDifferenceItem
   return {
     name: originalName || name,
     count,
-    location: originalStack?.[0] || stack?.[0] || '',
+    beforeCount,
+    url: originalStack?.[0] || stack?.[0] || '',
   }
 }
 
@@ -34,8 +35,8 @@ const finishBaseDifferenceItems = (baseDifferenceItemsWithStack) => {
   return baseDifferenceItemsWithStack.map(finishBaseDifferenceItem)
 }
 
-const addSourceMapsToFunctionDifference = async (baseDifference, scriptMap) => {
-  const prepared = prepareBaseDifference(baseDifference, scriptMap)
+const addSourceMapsToFunctionDifference = async (baseDifference) => {
+  const prepared = prepareBaseDifference(baseDifference)
   const classNames = false
   const withOriginalStack = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(prepared, classNames)
   const finished = finishBaseDifferenceItems(withOriginalStack)
@@ -45,8 +46,7 @@ const addSourceMapsToFunctionDifference = async (baseDifference, scriptMap) => {
 export const compareFunctionDifference = async (before, after) => {
   Assert.array(before)
   Assert.array(after)
-  const scriptMap = after.scriptMap
   const baseDifference = CompareFunctionDifference.compareFunctionDifference(before, after)
-  const difference = await addSourceMapsToFunctionDifference(baseDifference, scriptMap)
+  const difference = await addSourceMapsToFunctionDifference(baseDifference)
   return difference
 }
