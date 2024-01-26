@@ -27,3 +27,13 @@ export const contextMap = (array, fn, ...context) => {
   }
   return result
 }
+
+export const contextZipMap = (array1, array2, fn, ...context) => {
+  const result = []
+  for (let i = 0; i < array1.length; i++) {
+    const a = array1[i]
+    const b = array2[i]
+    result.push(fn(a, b, ...context))
+  }
+  return result
+}
