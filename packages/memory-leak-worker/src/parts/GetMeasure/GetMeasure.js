@@ -48,6 +48,8 @@ export const getMeasure = (MemoryLeakFinder, measureId) => {
       return MemoryLeakFinder.Measures.MeasureInstanceCountsDifference
     case 'instance-counts-difference-with-stack-traces':
       return MemoryLeakFinder.Measures.MeasureInstanceCountsDifferenceWithStackTraces
+    case 'instance-counts-difference-with-source-map':
+      return MemoryLeakFinder.Measures.MeasureInstanceCountsWithSourceMap
     case 'intersection-observer-count':
       return MemoryLeakFinder.Measures.MeasureIntersectionObserverCount
     case 'intersection-observers-with-stack-traces':

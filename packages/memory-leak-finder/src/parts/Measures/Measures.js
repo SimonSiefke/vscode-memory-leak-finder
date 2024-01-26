@@ -21,6 +21,7 @@ export * as MeasureFunctionCount from '../MeasureFunctionCount/MeasureFunctionCo
 export * as MeasureGrowingDisposableStores from '../MeasureGrowingDisposableStores/MeasureGrowingDisposableStores.js'
 export * as MeasureInstanceCounts from '../MeasureInstanceCounts/MeasureInstanceCounts.js'
 export * as MeasureInstanceCountsDifference from '../MeasureInstanceCountsDifference/MeasureInstanceCountsDifference.js'
+export * as MeasureInstanceCountsDifferenceWithSourceMap from '../MeasureInstanceCountsDifferenceWithSourceMap/MeasureInstanceCountsDifferenceWithSourceMap.js'
 export * as MeasureInstanceCountsDifferenceWithStackTraces from '../MeasureInstanceCountsDifferenceWithStackTraces/MeasureInstanceCountsDifferenceWithStackTraces.js'
 export * as MeasureInstanceCountsWithSourceMap from '../MeasureInstanceCountsWithSourceMap/MeasureInstanceCountsWithSourceMap.js'
 export * as MeasureIntersectionObserverCount from '../MeasureIntersectionObserverCount/MeasureIntersectionObserverCount.js'
