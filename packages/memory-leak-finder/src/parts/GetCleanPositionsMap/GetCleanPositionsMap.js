@@ -4,26 +4,21 @@ import * as SourceMap from '../SourceMap/SourceMap.js'
 import * as IpcParent from '../IpcParent/IpcParent.js'
 import * as IpcParentType from '../IpcParentType/IpcParentType.js'
 import * as Root from '../Root/Root.js'
+import * as HandleIpc from '../HandleIpc/HandleIpc.js'
+import * as JsonRpc from '../JsonRpc/JsonRpc.js'
+import * as Callback from '../Callback/Callback.js'
 import { join } from 'path'
 
-export const getCleanPositionsMap = async (sourceMapUrlMap, classNames) => {
-  // const sourceMapWorkerPath = join(Root.root, 'packages', 'source-map-worker', 'src', 'sourceMapWorkerMain.js')
+const execute = () => {}
 
-  // const ipc = await IpcParent.create({
-  //   method: IpcParentType.NodeWorkerThread,
-  //   stdio: 'inherit',
-  //   url: sourceMapWorkerPath,
-  // })
-  const cleanPositionMap = Object.create(null)
-  for (const [key, value] of Object.entries(sourceMapUrlMap)) {
-    if (!key) {
-      cleanPositionMap[key] = []
-      continue
-    }
-    const sourceMap = await LoadSourceMap.loadSourceMap(key)
-    const originalPositions = await SourceMap.getOriginalPositions(sourceMap, value, classNames)
-    const cleanPositions = originalPositions.map(GetCleanPosition.getCleanPosition)
-    cleanPositionMap[key] = cleanPositions
-  }
-  return cleanPositionMap
+export const getCleanPositionsMap = async (sourceMapUrlMap, classNames) => {
+  const sourceMapWorkerPath = join(Root.root, 'packages', 'source-map-worker', 'src', 'sourceMapWorkerMain.js')
+  const ipc = await IpcParent.create({
+    method: IpcParentType.NodeWorkerThread,
+    stdio: 'inherit',
+    url: sourceMapWorkerPath,
+  })
+  HandleIpc.handleIpc(ipc, execute, Callback.resolve)
+  const response = await JsonRpc.invoke(ipc, 'SourceMap.getCleanPositionsMap', sourceMapUrlMap, classNames)
+  return response
 }
