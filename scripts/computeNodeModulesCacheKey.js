@@ -11,6 +11,7 @@ const locations = [
   'package-lock.json',
   'packages/cli/package-lock.json',
   'packages/charts/package-lock.json',
+  'packages/source-map-worker/package-lock.json',
   'packages/e2e/package-lock.json',
   'packages/devtools-protocol/package-lock.json',
   'packages/file-watcher-worker/package-lock.json',
