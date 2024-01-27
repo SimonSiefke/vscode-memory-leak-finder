@@ -1,5 +1,5 @@
-import * as DeduplicateDetachedDomNodes from '../DeduplicateDetachedDomNodes/DeduplicateDetachedDomNodes.js'
 import * as Assert from '../Assert/Assert.js'
+import * as DeduplicateDetachedDomNodes from '../DeduplicateDetachedDomNodes/DeduplicateDetachedDomNodes.js'
 
 const getDifference = (prettyBefore, prettyAfter) => {
   const beforeMap = Object.create(null)
