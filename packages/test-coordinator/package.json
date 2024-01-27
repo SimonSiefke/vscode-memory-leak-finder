@@ -16,16 +16,10 @@
     "@lvce-editor/assert": "^1.2.0",
     "@lvce-editor/verror": "^1.1.2",
     "@vscode/test-electron": "^2.3.9",
-    "clean-stack": "^5.2.0",
     "exit-hook": "^4.0.0",
-    "got": "^14.0.0",
-    "source-map": "^0.7.4",
-    "strip-ansi": "^7.1.0",
-    "tree-kill-promise": "^3.0.14",
-    "ws": "^8.16.0"
+    "strip-ansi": "^7.1.0"
   },
   "devDependencies": {
-    "@types/babel__code-frame": "^7.0.6",
-    "@types/ws": "^8.5.10"
+    "@types/babel__code-frame": "^7.0.6"
   }
 }
