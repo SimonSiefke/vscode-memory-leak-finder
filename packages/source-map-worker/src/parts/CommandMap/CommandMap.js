@@ -1,6 +1,6 @@
-import * as SourceMap from '../SourceMap/SourceMap.js'
+import * as GetCleanPositionsMap from '../GetCleanPositionsMap/GetCleanPositionsMap.js'
 import * as SourceMapWorkerCommandType from '../SourceMapWorkerCommandType/SourceMapWorkerCommandType.js'
 
 export const commandMap = {
-  [SourceMapWorkerCommandType.GetOrignalPositions]: SourceMap.getOriginalPositions,
+  [SourceMapWorkerCommandType.GetCleanPositionsMap]: GetCleanPositionsMap.getCleanPositionsMap,
 }
