@@ -1,5 +1,5 @@
 {
-  "name": "injected-code",
+  "name": "@vscode-memory-leak-finder/injected-code",
   "version": "0.0.0-dev",
   "description": "",
   "main": "src/main.js",

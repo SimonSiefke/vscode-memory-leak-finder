@@ -1,5 +1,5 @@
 {
-  "name": "video-recording-worker",
+  "name": "@vscode-memory-leak-finder/video-recording-worker",
   "version": "0.0.0-dev",
   "description": "",
   "main": "src/main.js",

@@ -1,5 +1,5 @@
 {
-  "name": "cli",
+  "name": "@vscode-memory-leak-finder/cli",
   "version": "0.0.0-dev",
   "description": "",
   "main": "index.js",

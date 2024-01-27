@@ -1,5 +1,5 @@
 {
-  "name": "test-coordinator",
+  "name": "@vscode-memory-leak-finder/test-coordinator",
   "version": "0.0.0-dev",
   "main": "src/main.js",
   "type": "module",
