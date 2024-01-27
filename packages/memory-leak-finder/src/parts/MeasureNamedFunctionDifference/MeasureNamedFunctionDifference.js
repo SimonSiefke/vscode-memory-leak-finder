@@ -17,11 +17,7 @@ const includeSourceMap = false
 
 export const start = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.start(session)
-  console.log('before')
-  const result = await GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap, includeSourceMap)
-  console.log(result)
-  console.log('resultSize', JSON.stringify(result).length)
-  return {}
+  return GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap, includeSourceMap)
 }
 
 export const stop = async (session, objectGroup, scriptHandler) => {
