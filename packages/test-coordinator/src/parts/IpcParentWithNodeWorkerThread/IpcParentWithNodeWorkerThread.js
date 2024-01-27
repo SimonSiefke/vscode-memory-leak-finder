@@ -24,9 +24,6 @@ export const create = async ({ url, stdio }) => {
 }
 
 export const wrap = (worker) => {
-  worker.on('error', () => {
-    console.log('ipc worker error test c')
-  })
   return {
     worker,
     send(message) {
