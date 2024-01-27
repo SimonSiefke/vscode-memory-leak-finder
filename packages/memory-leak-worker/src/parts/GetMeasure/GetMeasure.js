@@ -34,6 +34,8 @@ export const getMeasure = (MemoryLeakFinder, measureId) => {
       return MemoryLeakFinder.Measures.MeasureEventTargetCount
     case 'event-targets':
       return MemoryLeakFinder.Measures.MeasureEventTargets
+    case 'event-target-difference':
+      return MemoryLeakFinder.Measures.MeasureEventTargetDifference
     case 'event-listeners':
       return MemoryLeakFinder.Measures.MeasureEventListeners
     case 'event-listeners-with-stack-traces':

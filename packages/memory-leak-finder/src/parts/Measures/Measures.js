@@ -16,6 +16,7 @@ export * as MeasureEventListenerCount from '../MeasureEventListenerCount/Measure
 export * as MeasureEventListeners from '../MeasureEventListeners/MeasureEventListeners.js'
 export * as MeasureEventListenersWithStackTraces from '../MeasureEventListenersWithStackTraces/MeasureEventListenersWithStackTraces.js'
 export * as MeasureEventTargetCount from '../MeasureEventTargetCount/MeasureEventTargetCount.js'
+export * as MeasureEventTargetDifference from '../MeasureEventTargetDifference/MeasureEventTargetDifference.js'
 export * as MeasureEventTargets from '../MeasureEventTargets/MeasureEventTargets.js'
 export * as MeasureFunctionCount from '../MeasureFunctionCount/MeasureFunctionCount.js'
 export * as MeasureGrowingDisposableStores from '../MeasureGrowingDisposableStores/MeasureGrowingDisposableStores.js'
