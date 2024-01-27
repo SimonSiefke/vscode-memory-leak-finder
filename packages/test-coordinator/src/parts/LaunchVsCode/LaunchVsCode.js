@@ -37,7 +37,7 @@ export const launchVsCode = async ({ headlessMode, cwd }) => {
       userDataDir,
       extraLaunchArgs: [testWorkspacePath],
     })
-    const env = GetVsCodeEnv.getVsCodeEnv({ extensionsFolder: testExtensionsPath, runtimeDir })
+    const env = GetVsCodeEnv.getVsCodeEnv({ extensionsFolder: testExtensionsPath, runtimeDir, processEnv: process.env })
     const { child, webSocketUrl } = await LaunchElectron.launchElectron({
       cliPath: binaryPath,
       args,
