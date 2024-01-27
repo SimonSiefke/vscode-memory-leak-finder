@@ -28,9 +28,6 @@ export const create = async ({ url, stdio, name, ref }) => {
 }
 
 export const wrap = (worker) => {
-  worker.on('error', (x) => {
-    console.log('cli child worker error')
-  })
   return {
     worker,
     send(message) {
