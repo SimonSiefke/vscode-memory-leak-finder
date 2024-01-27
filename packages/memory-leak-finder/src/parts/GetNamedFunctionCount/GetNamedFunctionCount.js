@@ -25,13 +25,11 @@ export const getNamedFunctionCount = async (session, objectGroup, scriptMap, inc
   })
   const descriptors = GetDescriptorValues.getDescriptorValues(fnResult3.result)
   const functionObjectIds = GetFunctionObjectIds.getFunctionObjectIds(descriptors)
-  console.time('function-locations')
   const functionLocations = await GetNamedFunctionLocations.getNamedFunctionLocations(
     session,
     functionObjectIds,
     scriptMap,
     includeSourceMap,
   )
-  console.timeEnd('function-locations')
   return functionLocations
 }
