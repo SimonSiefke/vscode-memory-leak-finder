@@ -13,14 +13,16 @@ export const create = (session) => {
   return [session, objectGroup, scriptHandler]
 }
 
+const includeSourceMap = true
+
 export const start = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.start(session)
-  return GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap)
+  return GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap, includeSourceMap)
 }
 
 export const stop = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.stop(session)
-  const result = await GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap)
+  const result = await GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap, includeSourceMap)
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   // @ts-ignore
   result.scriptMap = scriptHandler.scriptMap
