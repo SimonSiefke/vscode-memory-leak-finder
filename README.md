@@ -203,6 +203,7 @@ node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after 
 
 ## Project Structure
 
+- packages/charts: Visualizations for test output
 - packages/cli: Command Line Interface, similar to jest
 - packages/devtools-protocol: Functionality related to Chrome Devtools Protocol
 - packages/e2e: The e2e test scenarios
@@ -211,6 +212,7 @@ node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after 
 - packages/memory-leak-finder: Library for finding memory leaks
 - packages/memory-leak-worker: Process for finding memory leaks (uses the library from above)
 - packages/page-object: Page Object Model to simplify e2e tests
+- packages/source-map-worker: Functions for querying original positions and function names using source maps
 - packages/test-coordinator: Determines which tests to run, launches VSCode, file-watcher-worker, test-worker, memory-leak-worker, video-recording-worker
 - packages/test-worker: Runs tests
 - packages/test-worker-commands: Functions used by test-worker
