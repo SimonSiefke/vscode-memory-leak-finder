@@ -1,0 +1,16 @@
+{
+  "name": "@vscode-memory-leak-finder/source-map-worker",
+  "version": "0.0.0-dev",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@lvce-editor/assert": "^1.2.0",
+    "@lvce-editor/verror": "^1.1.2",
+    "got": "^14.0.0",
+    "source-map": "^0.7.4"
+  }
+}
