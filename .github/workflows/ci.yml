@@ -62,6 +62,11 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure event-listeners
+      - name: Run headless test (check leaks, detached dom node count)
+        if: matrix.os == 'ubuntu-22.04'
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure detached-dom-node-count
       - name: Run headless test (check leaks, disposable counts)
         if: matrix.os == 'ubuntu-22.04'
         uses: coactions/setup-xvfb@v1
