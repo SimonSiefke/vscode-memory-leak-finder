@@ -2,10 +2,6 @@ import * as Arrays from '../Arrays/Arrays.js'
 import * as Assert from '../Assert/Assert.js'
 import * as GetNamedFunctionLocation from '../GetNamedFunctionLocation/GetNamedFunctionLocation.js'
 
-setInterval(() => {
-  console.log('heap' + process.memoryUsage().heapUsed)
-}, 1000)
-
 export const getNamedFunctionLocations = async (session, objectIds, scriptMap, includeSourceMap) => {
   Assert.object(session)
   Assert.array(objectIds)
