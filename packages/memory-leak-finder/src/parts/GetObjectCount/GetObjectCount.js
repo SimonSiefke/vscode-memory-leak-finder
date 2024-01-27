@@ -1,4 +1,5 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import * as GetRemoteObjectLength from '../GetRemoteObjectLength/GetRemoteObjectLength.js'
 
 /**
  *
@@ -14,13 +15,6 @@ export const getObjectCount = async (session, prototype) => {
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
     prototypeObjectId: prototypeDescriptor.objectId,
   })
-  const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
-    functionDeclaration: `function(){
-const objects = this
-return objects.length
-}`,
-    objectId: objects.objects.objectId,
-    returnByValue: true,
-  })
+  const fnResult1 = await GetRemoteObjectLength.getRemoteObjectLength(session, objects.objects.objectId, undefined)
   return fnResult1
 }
