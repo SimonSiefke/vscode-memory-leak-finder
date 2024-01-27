@@ -1,5 +1,5 @@
 {
-  "name": "memory-leak-worker",
+  "name": "@vscode-memory-leak-finder/memory-leak-worker",
   "version": "0.0.0-dev",
   "description": "",
   "main": "src/main.js",

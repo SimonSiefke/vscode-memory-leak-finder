@@ -1,5 +1,5 @@
 {
-  "name": "charts",
+  "name": "@vscode-memory-leak-finder/charts",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

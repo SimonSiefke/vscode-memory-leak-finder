@@ -1,5 +1,5 @@
 {
-  "name": "test-worker-commands",
+  "name": "@vscode-memory-leak-finder/test-worker-commands",
   "version": "0.0.0-dev",
   "description": "",
   "main": "src/main.js",
