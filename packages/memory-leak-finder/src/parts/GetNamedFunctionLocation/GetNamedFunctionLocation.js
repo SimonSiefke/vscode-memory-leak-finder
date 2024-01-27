@@ -13,7 +13,7 @@ export const getFunctionSourceMapUrl = (functionLocation, scriptMap) => {
   return match.sourceMapUrl
 }
 
-export const getNamedFunctionLocation = async (objectId, session, scriptMap) => {
+export const getNamedFunctionLocation = async (objectId, session, scriptMap, includeSourceMap) => {
   Assert.object(session)
   Assert.object(scriptMap)
   Assert.string(objectId)
@@ -37,6 +37,7 @@ export const getNamedFunctionLocation = async (objectId, session, scriptMap) => 
     session,
     fnResult1,
     scriptMap,
+    includeSourceMap,
     getNamedFunctionLocation,
   )
   const functionName = GetFunctionNameProperty.getFunctionNameProperty(fnResult1)
@@ -47,6 +48,6 @@ export const getNamedFunctionLocation = async (objectId, session, scriptMap) => 
     objectId,
     name: functionName,
     url: functionUrl,
-    sourceMapUrl: functionSourceMapUrl,
+    sourceMapUrl: includeSourceMap ? functionSourceMapUrl : '',
   }
 }

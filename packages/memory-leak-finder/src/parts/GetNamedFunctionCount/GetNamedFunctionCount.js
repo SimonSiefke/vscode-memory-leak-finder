@@ -8,7 +8,7 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
  * @param {any} session
  * @returns {Promise<any[]>}
  */
-export const getNamedFunctionCount = async (session, objectGroup, scriptMap) => {
+export const getNamedFunctionCount = async (session, objectGroup, scriptMap, includeSourceMap) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Function,
     returnByValue: false,
@@ -25,6 +25,13 @@ export const getNamedFunctionCount = async (session, objectGroup, scriptMap) => 
   })
   const descriptors = GetDescriptorValues.getDescriptorValues(fnResult3.result)
   const functionObjectIds = GetFunctionObjectIds.getFunctionObjectIds(descriptors)
-  const functionLocations = await GetNamedFunctionLocations.getNamedFunctionLocations(session, functionObjectIds, scriptMap)
+  console.time('function-locations')
+  const functionLocations = await GetNamedFunctionLocations.getNamedFunctionLocations(
+    session,
+    functionObjectIds,
+    scriptMap,
+    includeSourceMap,
+  )
+  console.timeEnd('function-locations')
   return functionLocations
 }

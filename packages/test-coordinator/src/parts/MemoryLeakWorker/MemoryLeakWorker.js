@@ -21,6 +21,9 @@ export const startWorker = async (devtoolsWebsocketUrl) => {
     url: MemoryLeakWorkerUrl.memoryLeakWorkerUrl,
     stdio: 'inherit',
   })
+  ipc.on('error', () => {
+    console.log('memory leak worker had an error')
+  })
   state.ipc = ipc
   HandleIpc.handleIpc(ipc, Command.execute, Callback.resolve)
   await JsonRpc.invoke(ipc, 'ConnectDevtools.connectDevtools', devtoolsWebsocketUrl)

@@ -92,9 +92,13 @@ export const runTests = async (
               }
             }
             const before = await MemoryLeakFinder.start(memoryLeakWorkerIpc, connectionId)
+            console.log('beforeSize', JSON.stringify(before).length)
             for (let i = 0; i < runs; i++) {
               await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun)
             }
+            await new Promise((r) => {
+              setTimeout(r, 10_000)
+            })
             const after = await MemoryLeakFinder.stop(memoryLeakWorkerIpc, connectionId)
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
