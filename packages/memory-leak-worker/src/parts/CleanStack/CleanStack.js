@@ -25,7 +25,7 @@ const isRelevant = (line) => {
   return !isInternal(line)
 }
 
-const RE_STACK_PATH_1 = /(^\s*at .*?\(?)([^()]+)(:[0-9]+:[0-9]+\)?.*$)/
+const RE_STACK_PATH_1 = /(^\s*at .*?\(?)([^()]+)(:\d+:\d+\)?.*$)/
 const RE_STACK_PATH_2 = /(^\s*at .*?)([^()]+)(:\d+$)/
 
 const getFilePath = (file) => {

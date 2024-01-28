@@ -78,7 +78,7 @@ export const waitForTarget = async ({ type, index }) => {
       }),
       { milliseconds: TimeoutConstants.Target },
     )
-  } catch (error) {
+  } catch {
     throw new VError(`Target was not created ${type}`)
   }
 }

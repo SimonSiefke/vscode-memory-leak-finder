@@ -1,6 +1,6 @@
-import { codeFrameColumns } from '@babel/code-frame'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { codeFrameColumns } from '@babel/code-frame'
 import * as CleanStack from '../CleanStack/CleanStack.js'
 import * as ErrorCodes from '../ErrorCodes/ErrorCodes.js'
 import * as FileSystem from '../FileSystem/FileSystem.js'
@@ -59,7 +59,7 @@ const prepareModuleNotFoundError = (error) => {
 
 const getPathDetails = (lines) => {
   for (let i = 0; i < lines.length; i++) {
-    let file = lines[i]
+    const file = lines[i]
     if (file) {
       let match = file.match(/\((.*):(\d+):(\d+)\)$/)
       if (!match) {
@@ -91,7 +91,7 @@ const getCodeFrame = (cleanedStack, { color }) => {
     }
     const { path, line, column } = pathDetails
     const actualPath = getActualPath(path)
-    const rawLines = FileSystem.readFileSync(actualPath, 'utf-8')
+    const rawLines = FileSystem.readFileSync(actualPath, 'utf8')
     const location = {
       start: {
         line: line,
