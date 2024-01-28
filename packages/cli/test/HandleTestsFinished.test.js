@@ -34,11 +34,11 @@ test('handleTestsFinished - no filter value', () => {
   HandleTestsFinished.handleTestsFinished(2, 1, 0, 0, 3, 3000, '')
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
-    '\n\x1B[1mTest Suites:\x1B[22m \x1B[1m\x1B[31m1 failed\x1B[39m\x1B[22m, \x1B[1m\x1B[32m2 passed\x1B[39m\x1B[22m, 3 total\n' +
-      '\x1B[1mTime:\x1B[22m        3.000 s\n' +
-      '\x1B[2mRan all test suites.\x1B[22m\n' +
+    '\n\u001B[1mTest Suites:\u001B[22m \u001B[1m\u001B[31m1 failed\u001B[39m\u001B[22m, \u001B[1m\u001B[32m2 passed\u001B[39m\u001B[22m, 3 total\n' +
+      '\u001B[1mTime:\u001B[22m        3.000 s\n' +
+      '\u001B[2mRan all test suites.\u001B[22m\n' +
       '\n' +
-      '\x1B[1mWatch Usage: \x1B[22m\x1B[2mPress \x1B[22mw\x1B[2m to show more.\x1B[22m',
+      '\u001B[1mWatch Usage: \u001B[22m\u001B[2mPress \u001B[22mw\u001B[2m to show more.\u001B[22m',
   )
 })
 
@@ -46,11 +46,11 @@ test('handleTestsFinished - with filter value', () => {
   HandleTestsFinished.handleTestsFinished(2, 1, 0, 0, 3, 3000, 'abc')
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
-    '\n\x1B[1mTest Suites:\x1B[22m \x1B[1m\x1B[31m1 failed\x1B[39m\x1B[22m, \x1B[1m\x1B[32m2 passed\x1B[39m\x1B[22m, 3 total\n' +
-      '\x1B[1mTime:\x1B[22m        3.000 s\n' +
-      '\x1B[2mRan all test suites matching\x1B[22m /abc/i\x1B[2m.\x1B[22m\n' +
+    '\n\u001B[1mTest Suites:\u001B[22m \u001B[1m\u001B[31m1 failed\u001B[39m\u001B[22m, \u001B[1m\u001B[32m2 passed\u001B[39m\u001B[22m, 3 total\n' +
+      '\u001B[1mTime:\u001B[22m        3.000 s\n' +
+      '\u001B[2mRan all test suites matching\u001B[22m /abc/i\u001B[2m.\u001B[22m\n' +
       '\n' +
-      '\x1B[1mWatch Usage: \x1B[22m\x1B[2mPress \x1B[22mw\x1B[2m to show more.\x1B[22m',
+      '\u001B[1mWatch Usage: \u001B[22m\u001B[2mPress \u001B[22mw\u001B[2m to show more.\u001B[22m',
   )
 })
 
@@ -59,10 +59,10 @@ test('handleTestsFinished - with leak', () => {
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
     '\n' +
-      '\x1B[1mTest Suites:\x1B[22m \x1B[1m\x1B[31m1 failed\x1B[39m\x1B[22m, \x1B[1m\x1B[32m2 passed\x1B[39m\x1B[22m, \x1B[1m\x1B[34m1 leaked\x1B[39m\x1B[22m, 4 total\n' +
-      '\x1B[1mTime:\x1B[22m        3.000 s\n' +
-      '\x1B[2mRan all test suites.\x1B[22m\n' +
+      '\u001B[1mTest Suites:\u001B[22m \u001B[1m\u001B[31m1 failed\u001B[39m\u001B[22m, \u001B[1m\u001B[32m2 passed\u001B[39m\u001B[22m, \u001B[1m\u001B[34m1 leaked\u001B[39m\u001B[22m, 4 total\n' +
+      '\u001B[1mTime:\u001B[22m        3.000 s\n' +
+      '\u001B[2mRan all test suites.\u001B[22m\n' +
       '\n' +
-      '\x1B[1mWatch Usage: \x1B[22m\x1B[2mPress \x1B[22mw\x1B[2m to show more.\x1B[22m',
+      '\u001B[1mWatch Usage: \u001B[22m\u001B[2mPress \u001B[22mw\u001B[2m to show more.\u001B[22m',
   )
 })

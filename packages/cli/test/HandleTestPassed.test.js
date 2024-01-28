@@ -40,7 +40,7 @@ test('handleTestPassed', () => {
   HandleTestPassed.handleTestPassed('/test/app.test.js', '/test', 'app.test.js', 100)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
-    '\r\x1B[K\r\x1B[1A\r\x1B[K\r\x1B[1A\x1B[0m\x1B[7m\x1B[1m\x1B[32m PASS \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2m/test/\x1B[22m\x1B[1mapp.test.js\x1B[22m (0.100 s)\n',
+    '\r\u001B[K\r\u001B[1A\r\u001B[K\r\u001B[1A\u001B[0m\u001B[7m\u001B[1m\u001B[32m PASS \u001B[39m\u001B[22m\u001B[27m\u001B[0m \u001B[2m/test/\u001B[22m\u001B[1mapp.test.js\u001B[22m (0.100 s)\n',
   )
   expect(TestStateOutput.clearPending).toHaveBeenCalledTimes(1)
 })

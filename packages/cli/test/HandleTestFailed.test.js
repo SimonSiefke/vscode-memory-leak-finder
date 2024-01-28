@@ -46,28 +46,28 @@ test('handleTestFailed', () => {
     message: 'expected window count to be 0 but was 1',
     stack: '    at Module.test (/test/e2e/src/sample.close-window.js:15:29)',
     codeFrame:
-      '\x1B[0m \x1B[90m 13 |\x1B[39m   \x1B[36mconst\x1B[39m window \x1B[33m=\x1B[39m \x1B[36mawait\x1B[39m electronApp\x1B[33m.\x1B[39mfirstWindow()\x1B[0m\n' +
-      '\x1B[0m \x1B[90m 14 |\x1B[39m   \x1B[36mawait\x1B[39m window\x1B[33m.\x1B[39mclose()\x1B[0m\n' +
-      '\x1B[0m\x1B[31m\x1B[1m>\x1B[22m\x1B[39m\x1B[90m 15 |\x1B[39m   \x1B[36mawait\x1B[39m expect(electronApp)\x1B[33m.\x1B[39mtoHaveWindowCount(\x1B[35m0\x1B[39m)\x1B[0m\n' +
-      '\x1B[0m \x1B[90m    |\x1B[39m                             \x1B[31m\x1B[1m^\x1B[22m\x1B[39m\x1B[0m\n' +
-      '\x1B[0m \x1B[90m 16 |\x1B[39m }\x1B[0m\n' +
-      '\x1B[0m \x1B[90m 17 |\x1B[39m\x1B[0m',
+      '\u001B[0m \u001B[90m 13 |\u001B[39m   \u001B[36mconst\u001B[39m window \u001B[33m=\u001B[39m \u001B[36mawait\u001B[39m electronApp\u001B[33m.\u001B[39mfirstWindow()\u001B[0m\n' +
+      '\u001B[0m \u001B[90m 14 |\u001B[39m   \u001B[36mawait\u001B[39m window\u001B[33m.\u001B[39mclose()\u001B[0m\n' +
+      '\u001B[0m\u001B[31m\u001B[1m>\u001B[22m\u001B[39m\u001B[90m 15 |\u001B[39m   \u001B[36mawait\u001B[39m expect(electronApp)\u001B[33m.\u001B[39mtoHaveWindowCount(\u001B[35m0\u001B[39m)\u001B[0m\n' +
+      '\u001B[0m \u001B[90m    |\u001B[39m                             \u001B[31m\u001B[1m^\u001B[22m\u001B[39m\u001B[0m\n' +
+      '\u001B[0m \u001B[90m 16 |\u001B[39m }\u001B[0m\n' +
+      '\u001B[0m \u001B[90m 17 |\u001B[39m\u001B[0m',
   }
   HandleTestFailed.handleTestFailed(file, relativeDirName, releativeFilePath, fileName, error)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
-    '\r\x1B[K\r\x1B[1A\r\x1B[K\r\x1B[1A\x1B[0m\x1B[7m\x1B[1m\x1B[31m FAIL \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2msrc/\x1B[22m\x1B[1msample.close-window.js\x1B[22m\n' +
+    '\r\u001B[K\r\u001B[1A\r\u001B[K\r\u001B[1A\u001B[0m\u001B[7m\u001B[1m\u001B[31m FAIL \u001B[39m\u001B[22m\u001B[27m\u001B[0m \u001B[2msrc/\u001B[22m\u001B[1msample.close-window.js\u001B[22m\n' +
       '\n' +
       '      Error: expected window count to be 0 but was 1\n' +
       '\n' +
-      '    \x1B[0m \x1B[90m 13 |\x1B[39m   \x1B[36mconst\x1B[39m window \x1B[33m=\x1B[39m \x1B[36mawait\x1B[39m electronApp\x1B[33m.\x1B[39mfirstWindow()\x1B[0m\n' +
-      '    \x1B[0m \x1B[90m 14 |\x1B[39m   \x1B[36mawait\x1B[39m window\x1B[33m.\x1B[39mclose()\x1B[0m\n' +
-      '    \x1B[0m\x1B[31m\x1B[1m>\x1B[22m\x1B[39m\x1B[90m 15 |\x1B[39m   \x1B[36mawait\x1B[39m expect(electronApp)\x1B[33m.\x1B[39mtoHaveWindowCount(\x1B[35m0\x1B[39m)\x1B[0m\n' +
-      '    \x1B[0m \x1B[90m    |\x1B[39m                             \x1B[31m\x1B[1m^\x1B[22m\x1B[39m\x1B[0m\n' +
-      '    \x1B[0m \x1B[90m 16 |\x1B[39m }\x1B[0m\n' +
-      '    \x1B[0m \x1B[90m 17 |\x1B[39m\x1B[0m\n' +
+      '    \u001B[0m \u001B[90m 13 |\u001B[39m   \u001B[36mconst\u001B[39m window \u001B[33m=\u001B[39m \u001B[36mawait\u001B[39m electronApp\u001B[33m.\u001B[39mfirstWindow()\u001B[0m\n' +
+      '    \u001B[0m \u001B[90m 14 |\u001B[39m   \u001B[36mawait\u001B[39m window\u001B[33m.\u001B[39mclose()\u001B[0m\n' +
+      '    \u001B[0m\u001B[31m\u001B[1m>\u001B[22m\u001B[39m\u001B[90m 15 |\u001B[39m   \u001B[36mawait\u001B[39m expect(electronApp)\u001B[33m.\u001B[39mtoHaveWindowCount(\u001B[35m0\u001B[39m)\u001B[0m\n' +
+      '    \u001B[0m \u001B[90m    |\u001B[39m                             \u001B[31m\u001B[1m^\u001B[22m\u001B[39m\u001B[0m\n' +
+      '    \u001B[0m \u001B[90m 16 |\u001B[39m }\u001B[0m\n' +
+      '    \u001B[0m \u001B[90m 17 |\u001B[39m\u001B[0m\n' +
       '\n' +
-      '   \x1B[2m    at Module.test (\x1B[22m/test/e2e/src/sample.close-window.js\x1B[2m:15:29)\x1B[22m\n' +
+      '   \u001B[2m    at Module.test (\u001B[22m/test/e2e/src/sample.close-window.js\u001B[2m:15:29)\u001B[22m\n' +
       '\n',
   )
   expect(TestStateOutput.clearPending).toHaveBeenCalledTimes(1)

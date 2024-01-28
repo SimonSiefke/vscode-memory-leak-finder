@@ -35,14 +35,14 @@ test('handleStdinDataFinishedRunningMode - show watch mode details', () => {
   expect(newState.mode).toBe(ModeType.Waiting)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
-    '\x1B[1A\x1B[J\n' +
-      '\x1B[1mWatch Usage\x1B[22m\n' +
-      '\x1B[2m › Press \x1B[22ma\x1B[2m to run all tests.\x1B[22m\n' +
-      '\x1B[2m › Press \x1B[22mf\x1B[2m to run only failed tests.\x1B[22m\n' +
-      '\x1B[2m › Press \x1B[22mp\x1B[2m to filter tests by a filename regex pattern.\x1B[22m\n' +
-      '\x1B[2m › Press \x1B[22mh\x1B[2m to toggle headless mode.\x1B[22m\n' +
-      '\x1B[2m › Press \x1B[22mq\x1B[2m to quit watch mode.\x1B[22m\n' +
-      '\x1B[2m › Press \x1B[22mEnter\x1B[2m to trigger a test run.\x1B[22m\n'
+    '\u001B[1A\u001B[J\n' +
+      '\u001B[1mWatch Usage\u001B[22m\n' +
+      '\u001B[2m › Press \u001B[22ma\u001B[2m to run all tests.\u001B[22m\n' +
+      '\u001B[2m › Press \u001B[22mf\u001B[2m to run only failed tests.\u001B[22m\n' +
+      '\u001B[2m › Press \u001B[22mp\u001B[2m to filter tests by a filename regex pattern.\u001B[22m\n' +
+      '\u001B[2m › Press \u001B[22mh\u001B[2m to toggle headless mode.\u001B[22m\n' +
+      '\u001B[2m › Press \u001B[22mq\u001B[2m to quit watch mode.\u001B[22m\n' +
+      '\u001B[2m › Press \u001B[22mEnter\u001B[2m to trigger a test run.\u001B[22m\n'
   )
 })
 
@@ -56,12 +56,12 @@ test('handleStdinDataFinishedRunningMode - go to filter mode', () => {
   expect(newState.mode).toBe(ModeType.FilterWaiting)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
-    '\x1B[2J\x1B[3J\x1B[H\n' +
-      '\x1B[1mPattern Mode Usage\x1B[22m\n' +
-      ' \x1B[2m› Press\x1B[22m Esc \x1B[2mto exit pattern mode.\x1B[22m\n' +
-      ' \x1B[2m› Press\x1B[22m Enter \x1B[2mto filter by a regex pattern.\x1B[22m\n' +
+    '\u001B[2J\u001B[3J\u001B[H\n' +
+      '\u001B[1mPattern Mode Usage\u001B[22m\n' +
+      ' \u001B[2m› Press\u001B[22m Esc \u001B[2mto exit pattern mode.\u001B[22m\n' +
+      ' \u001B[2m› Press\u001B[22m Enter \u001B[2mto filter by a regex pattern.\u001B[22m\n' +
       '\n' +
-      '\x1B[2m pattern ›\x1B[22m '
+      '\u001B[2m pattern ›\u001B[22m '
   )
 })
 

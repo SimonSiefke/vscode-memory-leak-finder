@@ -24,7 +24,7 @@ test.skip('handleTestRunning - first', () => {
   HandleTestRunning.handleTestRunning('/test/app.test.js', '/test', 'app.test.js', /* isFirst */ true)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
-    '\x1B[0m\x1B[7m\x1B[33m\x1B[1m RUNS \x1B[22m\x1B[39m\x1B[27m\x1B[0m \x1B[2m/test/\x1B[22m\x1B[1mapp.test.js\x1B[22m\n',
+    '\u001B[0m\u001B[7m\u001B[33m\u001B[1m RUNS \u001B[22m\u001B[39m\u001B[27m\u001B[0m \u001B[2m/test/\u001B[22m\u001B[1mapp.test.js\u001B[22m\n',
   )
 })
 
@@ -32,6 +32,6 @@ test('handleTestRunning - second', () => {
   HandleTestRunning.handleTestRunning('/test/app.test.js', '/test', 'app.test.js', /* isFirst */ false)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
-    '\n' + '\x1B[0m\x1B[7m\x1B[33m\x1B[1m RUNS \x1B[22m\x1B[39m\x1B[27m\x1B[0m \x1B[2m/test/\x1B[22m\x1B[1mapp.test.js\x1B[22m\n',
+    '\n' + '\u001B[0m\u001B[7m\u001B[33m\u001B[1m RUNS \u001B[22m\u001B[39m\u001B[27m\u001B[0m \u001B[2m/test/\u001B[22m\u001B[1mapp.test.js\u001B[22m\n',
   )
 })
