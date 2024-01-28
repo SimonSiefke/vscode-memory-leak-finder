@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises'
-import { fileURLToPath } from 'url'
+import { fileURLToPath } from 'node:url'
 
 export const loadSourceMap = async (url) => {
   const path = fileURLToPath(url)
