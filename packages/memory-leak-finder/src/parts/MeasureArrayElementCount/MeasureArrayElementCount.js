@@ -1,18 +1,23 @@
 import * as GetArrayElementCount from '../GetArrayElementCount/GetArrayElementCount.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 
 export const id = MeasureId.ArrayElementCount
 
 export const create = (session) => {
-  return [session]
+  const objectGroup = ObjectGroupId.create()
+  return [session, objectGroup]
 }
 
-export const start = (session) => {
-  return GetArrayElementCount.getArrayElementCount(session)
+export const start = (session, objectGroup) => {
+  return GetArrayElementCount.getArrayElementCount(session, objectGroup)
 }
 
-export const stop = (session) => {
-  return GetArrayElementCount.getArrayElementCount(session)
+export const stop = async (session, objectGroup) => {
+  const result = await GetArrayElementCount.getArrayElementCount(session, objectGroup)
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
+  return result
 }
 
 export const compare = (before, after) => {
