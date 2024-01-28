@@ -2,5 +2,8 @@ import * as CompareDetachedDomNodes from '../CompareDetachedDomNodes/CompareDeta
 
 export const compareDetachedDomNodesWithStackTraces = (before, after) => {
   const result = CompareDetachedDomNodes.compareDetachedDomNodes(before, after)
-  return result
+  return {
+    after: result.after,
+    before: result.before,
+  }
 }
