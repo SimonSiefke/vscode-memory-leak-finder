@@ -5,6 +5,7 @@ import * as GetDetachedDomNodes from '../GetDetachedDomNodes/GetDetachedDomNodes
 import * as GetDetachedDomNodesWithStackTraces from '../GetDetachedDomNodesWithStackTraces/GetDetachedDomNodesWithStackTraces.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
 import * as StartTrackingDomNodeStackTraces from '../StartTrackingDomNodeStackTraces/StartTrackingDomNodeStackTraces.js'
 import * as StopTrackingDomNodeStackTraces from '../StopTrackingDomNodeStackTraces/StopTrackingDomNodeStackTraces.js'
 
@@ -23,6 +24,7 @@ export const start = async (session, objectGroup) => {
 export const stop = async (session, objectGroup) => {
   const result = await GetDetachedDomNodesWithStackTraces.getDetachedDomNodesWithStackTraces(session, objectGroup)
   await StopTrackingDomNodeStackTraces.stopTrackingDomNodeStackTraces(session, objectGroup)
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return result
 }
 
