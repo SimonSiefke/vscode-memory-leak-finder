@@ -7,13 +7,15 @@ import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues
  * @param {string} prototype
  * @returns {Promise<any>}
  */
-export const getDescriptors = async (session, prototype) => {
+export const getDescriptors = async (session, prototype, objectGroup) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: prototype,
     returnByValue: false,
+    objectGroup,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
     prototypeObjectId: prototypeDescriptor.objectId,
+    objectGroup,
   })
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
@@ -58,6 +60,7 @@ return detachedNodes
 }`,
     objectId: objects.objects.objectId,
     returnByValue: false,
+    objectGroup,
   })
 
   const fnResult2 = await DevtoolsProtocolRuntime.getProperties(session, {
