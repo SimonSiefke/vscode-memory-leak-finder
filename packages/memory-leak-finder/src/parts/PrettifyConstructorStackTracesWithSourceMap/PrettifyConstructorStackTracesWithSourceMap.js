@@ -16,8 +16,8 @@ const parseUrl = (stackLine) => {
   return {
     prefix: urlMatch[1],
     url: urlMatch[2],
-    line: parseInt(urlMatch[3]),
-    column: parseInt(urlMatch[4]),
+    line: Number.parseInt(urlMatch[3]),
+    column: Number.parseInt(urlMatch[4]),
   }
 }
 

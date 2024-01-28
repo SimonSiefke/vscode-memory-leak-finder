@@ -12,10 +12,10 @@ export const compareEventListenersWithStackTraces = async (before, after) => {
   const leaked = []
   for (const listener of after) {
     const key = GetEventListenerKey.getEventListenerKey(listener)
-    if (!map[key]) {
-      leaked.push(listener)
-    } else {
+    if (map[key]) {
       map[key]--
+    } else {
+      leaked.push(listener)
     }
   }
   const deduplicatedEventListeners = DeduplicateEventListeners.deduplicateEventListeners(leaked)

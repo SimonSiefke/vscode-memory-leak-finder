@@ -9,7 +9,7 @@ export const parseLineAndColumn = (line) => {
     return undefined
   }
   return {
-    line: parseInt(match[1]),
-    column: parseInt(match[2]),
+    line: Number.parseInt(match[1]),
+    column: Number.parseInt(match[2]),
   }
 }
