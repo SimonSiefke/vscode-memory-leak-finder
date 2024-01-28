@@ -23,7 +23,7 @@ const isRelativeSourceMap = (sourceMapUrl) => {
   return true
 }
 
-const RE_PATH = /\((.+)\:\d+\:\d+\)$/
+const RE_PATH = /\((.+):\d+:\d+\)$/
 
 export const getSourceMapUrl = (eventListener) => {
   const { stack, sourceMaps } = eventListener

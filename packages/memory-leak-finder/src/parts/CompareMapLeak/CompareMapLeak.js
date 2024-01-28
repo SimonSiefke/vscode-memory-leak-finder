@@ -8,11 +8,11 @@ export const compareMapLeak = (before, after, getKey) => {
   const leaked = []
   for (const element of after) {
     const key = getKey(element)
-    if (!map[key]) {
+    if (map[key]) {
+      map[key]--
+    } else {
       const { objectId, ...rest } = element
       leaked.push(rest)
-    } else {
-      map[key]--
     }
   }
   return leaked

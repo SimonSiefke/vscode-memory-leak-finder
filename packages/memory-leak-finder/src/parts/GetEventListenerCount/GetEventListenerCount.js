@@ -49,7 +49,7 @@ return listenerMap
     })
     const value = fnResult2
     if (typeof value !== 'number') {
-      throw new Error(`Event listener count must be of type number`)
+      throw new TypeError(`Event listener count must be of type number`)
     }
     return value
   } catch (error) {
