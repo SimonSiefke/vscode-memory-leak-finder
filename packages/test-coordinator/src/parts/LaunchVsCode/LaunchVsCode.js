@@ -1,5 +1,5 @@
-import { copyFile, mkdir } from 'fs/promises'
-import { dirname } from 'path'
+import { copyFile, mkdir } from 'node:fs/promises'
+import { dirname } from 'node:path'
 import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.js'
 import * as DefaultVscodeSettingsPath from '../DefaultVscodeSettingsPath/DefaultVsCodeSettingsPath.js'
 import * as GetBinaryPath from '../GetBinaryPath/GetBinaryPath.js'

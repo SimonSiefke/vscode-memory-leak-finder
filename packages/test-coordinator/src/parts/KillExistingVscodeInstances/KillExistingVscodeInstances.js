@@ -1,5 +1,5 @@
-import { readFile } from 'fs/promises'
-import { join } from 'path'
+import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import * as ErrorCodes from '../ErrorCodes/ErrorCodes.js'
 import * as KillProcess from '../KillProcess/KillProcess.js'
 import * as Root from '../Root/Root.js'
@@ -14,7 +14,7 @@ export const killExistingVsCodeInstances = async () => {
   try {
     const lockPath = join(Root.root, '.vscode-user-data-dir', 'code.lock')
     const content = await readFile(lockPath, 'utf8')
-    const pid = parseInt(content)
+    const pid = Number.parseInt(content)
     if (isNaN(pid)) {
       return
     }

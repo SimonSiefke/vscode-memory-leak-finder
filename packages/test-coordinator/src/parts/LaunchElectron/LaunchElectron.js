@@ -1,5 +1,5 @@
-import exitHook from 'exit-hook'
 import { ChildProcess } from 'node:child_process'
+import exitHook from 'exit-hook'
 import { VError } from '../VError/VError.js'
 import * as GetElectronArgs from '../GetElectronArgs/GetElectronArgs.js'
 import * as Logger from '../Logger/Logger.js'

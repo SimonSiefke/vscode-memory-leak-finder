@@ -1,4 +1,4 @@
-import { once } from 'events'
+import { once } from 'node:events'
 import stripAnsi from 'strip-ansi'
 import * as MergeStacks from '../MergeStacks/MergeStacks.js'
 import { LaunchError } from '../LaunchError/LaunchError.js'
@@ -50,7 +50,7 @@ export const getElectronErrorMessage = async (firstData, stream) => {
       error.stack = mergedStack
       return error
     }
-    if (lines[0].match(RE_PATH)) {
+    if (RE_PATH.test(lines[0])) {
       const error = new Error()
       const messageLine = lines[stackLineIndex - 1]
       const codeFrameLines = lines.slice(1, stackLineIndex - 1)

@@ -1,5 +1,5 @@
-import { VError } from '@lvce-editor/verror'
 import { resolve } from 'node:path'
+import { VError } from '@lvce-editor/verror'
 import * as AdjustVscodeProductJson from '../AdjustVscodeProductJson/AdjustVscodeProductJson.js'
 import * as Env from '../Env/Env.js'
 import * as JsonFile from '../JsonFile/JsonFile.js'
