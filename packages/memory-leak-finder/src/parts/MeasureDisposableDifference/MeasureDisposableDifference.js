@@ -3,8 +3,8 @@ import * as GetDisposablesWithLocation from '../GetDisposablesWithLocation/GetDi
 import * as IsLeakDisposables from '../IsLeakDisposables/IsLeakDisposables.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
-import * as ScriptHandler from '../ScriptHandler/ScriptHandler.js'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
+import * as ScriptHandler from '../ScriptHandler/ScriptHandler.js'
 
 export const id = MeasureId.DisposableDifference
 
