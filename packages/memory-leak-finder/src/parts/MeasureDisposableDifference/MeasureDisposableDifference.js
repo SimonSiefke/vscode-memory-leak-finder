@@ -3,6 +3,7 @@ import * as GetDisposablesWithLocation from '../GetDisposablesWithLocation/GetDi
 import * as IsLeakDisposables from '../IsLeakDisposables/IsLeakDisposables.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.js'
 
 export const id = MeasureId.DisposableDifference
@@ -21,6 +22,7 @@ export const start = async (session, objectGroup, scriptHandler) => {
 export const stop = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.stop(session)
   const result = await GetDisposablesWithLocation.getDisposablesWithLocation(session, objectGroup, scriptHandler.scriptMap)
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return {
     result,
     scriptMap: scriptHandler.scriptMap,
