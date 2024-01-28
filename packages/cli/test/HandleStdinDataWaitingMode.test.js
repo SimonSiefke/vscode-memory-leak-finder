@@ -44,7 +44,7 @@ test('handleStdinDataWaitingMode - enter', () => {
   const newState = HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Running)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
-  expect(Stdout.write).toHaveBeenCalledWith('\x1B[2K\x1B[G')
+  expect(Stdout.write).toHaveBeenCalledWith('\u001B[2K\u001B[G')
 })
 
 test('handleStdinDataWaitingMode - escape', () => {

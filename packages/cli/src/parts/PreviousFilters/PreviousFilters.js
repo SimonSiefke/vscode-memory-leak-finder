@@ -1,6 +1,6 @@
-import { dirname, join } from 'path'
+import { dirname, join } from 'node:path'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import * as Root from '../Root/Root.js'
-import { mkdirSync, readFileSync, writeFileSync } from 'fs'
 import { VError } from '../VError/VError.js'
 
 const getPreviousFilterPath = () => {

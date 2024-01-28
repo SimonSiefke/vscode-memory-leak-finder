@@ -2,7 +2,7 @@ const parseArgvNumber = (argv, name) => {
   const index = argv.indexOf(name)
   const next = index + 1
   const value = argv[next]
-  const parsed = parseInt(value)
+  const parsed = Number.parseInt(value)
   if (!isNaN(parsed) && isFinite(parsed)) {
     return parsed
   }
