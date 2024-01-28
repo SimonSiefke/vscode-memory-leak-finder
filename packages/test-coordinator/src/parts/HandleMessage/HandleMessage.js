@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join } from 'node:path'
 import * as ImportScript from '../ImportScript/ImportScript.js'
 import * as Root from '../Root/Root.js'
 import * as TestCoordinatorCommandType from '../TestCoordinatorCommandType/TestCoordinatorCommandType.js'

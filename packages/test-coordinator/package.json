@@ -21,5 +21,52 @@
   },
   "devDependencies": {
     "@types/babel__code-frame": "^7.0.6"
+  },
+  "xo": {
+    "rules": {
+      "unicorn/filename-case": "off",
+      "indent": "off",
+      "semi": "off",
+      "no-unused-vars": "off",
+      "unicorn/numeric-separators-style": "off",
+      "no-extra-semi": "off",
+      "arrow-body-style": "off",
+      "padded-blocks": "off",
+      "capitalized-comments": "off",
+      "padding-line-between-statements": "off",
+      "arrow-parens": "off",
+      "no-warning-comments": "off",
+      "array-bracket-spacing": "off",
+      "comma-spacing": "off",
+      "unicorn/no-array-callback-reference": "off",
+      "comma-dangle": "off",
+      "operator-linebreak": "off",
+      "no-case-declarations": "off",
+      "no-undef": "off",
+      "object-curly-spacing": "off",
+      "object-shorthand": "off",
+      "complexity": "off",
+      "no-labels": "off",
+      "no-multi-assign": "off",
+      "max-params": "off",
+      "no-bitwise": "off",
+      "unicorn/prefer-math-trunc": "off",
+      "no-await-in-loop": "off",
+      "unicorn/prefer-add-event-listener": "off",
+      "no-unused-expressions": "off",
+      "node/prefer-global/process": "off",
+      "unicorn/prevent-abbreviations": "off",
+      "unicorn/no-process-exit": "off",
+      "quotes": "off",
+      "unicorn/switch-case-braces": "off",
+      "unicorn/no-for-loop": "off",
+      "n/prefer-global/process": [
+        "error",
+        "always"
+      ]
+    },
+    "ignores": [
+      "distmin"
+    ]
   }
 }

@@ -2,7 +2,7 @@ import { relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import * as Assert from '../Assert/Assert.js'
 
-const RE_STACK_PATH_1 = /(^\s*at .*?\(?)([^()]+)(:[0-9]+:[0-9]+\)?.*$)/
+const RE_STACK_PATH_1 = /(^\s*at .*?\(?)([^()]+)(:\d+:\d+\)?.*$)/
 const RE_STACK_PATH_2 = /(^\s*at .*?)([^()]+)(:\d+$)/
 const RE_AT = /^\s*at/
 

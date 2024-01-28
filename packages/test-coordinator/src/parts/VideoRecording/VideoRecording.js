@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join } from 'node:path'
 import * as Assert from '../Assert/Assert.js'
 import * as Callback from '../Callback/Callback.js'
 import * as Command from '../Command/Command.js'
