@@ -1,7 +1,7 @@
-import { mkdir, readdir, rm, writeFile } from 'fs/promises'
-import { dirname, join } from 'path'
-import * as Root from '../Root/Root.js'
+import { mkdir, readdir, rm, writeFile } from 'node:fs/promises'
+import { dirname, join } from 'node:path'
 import { execa } from 'execa'
+import * as Root from '../Root/Root.js'
 
 export const create = ({ page }) => {
   return {

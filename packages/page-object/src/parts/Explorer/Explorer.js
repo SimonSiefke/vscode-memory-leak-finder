@@ -13,13 +13,13 @@ const getNextActiveDescendant = (listId, activeDescendant) => {
   if (!match) {
     throw new Error(`Failed to parse active descendant ${activeDescendant}`)
   }
-  const number = parseInt(match[0])
+  const number = Number.parseInt(match[0])
   return `${listId}_${number + 1}`
 }
 
 const getListId = (classNameString) => {
   if (typeof classNameString !== 'string') {
-    throw new Error(`className must be of type string`)
+    throw new TypeError(`className must be of type string`)
   }
   const classNames = classNameString.split(' ')
   for (const className of classNames) {
