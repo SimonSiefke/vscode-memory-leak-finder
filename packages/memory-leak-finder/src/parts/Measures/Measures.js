@@ -5,6 +5,7 @@ export * as MeasureDetachedDomNodeCount from '../MeasureDetachedDomNodeCount/Mea
 export * as MeasureDetachedDomNodeRoots from '../MeasureDetachedDomNodeRoots/MeasureDetachedDomNodeRoots.js'
 export * as MeasureDetachedDomNodes from '../MeasureDetachedDomNodes/MeasureDetachedDomNodes.js'
 export * as MeasureDetachedDomNodesDifference from '../MeasureDetachedDomNodesDifference/MeasureDetachedDomNodesDifference.js'
+export * as MeasureDetachedDomNodesDifferenceWithStackTraces from '../MeasureDetachedDomNodesDifferenceWithStackTraces/MeasureDetachedDomNodesDifferenceWithStackTraces.js'
 export * as MeasureDetachedDomNodesWithStackTraces from '../MeasureDetachedDomNodesWithStackTraces/MeasureDetachedDomNodesWithStackTraces.js'
 export * as MeasureDisposableCount from '../MeasureDisposableCount/MeasureDisposableCount.js'
 export * as MeasureDisposableDifference from '../MeasureDisposableDifference/MeasureDisposableDifference.js'
