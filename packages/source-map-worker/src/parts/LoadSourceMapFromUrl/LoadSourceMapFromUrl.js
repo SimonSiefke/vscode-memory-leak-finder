@@ -1,8 +1,8 @@
-import { createWriteStream, existsSync } from 'fs'
-import { mkdir, readFile } from 'fs/promises'
+import { createWriteStream, existsSync } from 'node:fs'
+import { mkdir, readFile } from 'node:fs/promises'
+import { dirname, join } from 'node:path'
+import { pipeline } from 'node:stream/promises'
 import got from 'got'
-import { dirname, join } from 'path'
-import { pipeline } from 'stream/promises'
 import * as Hash from '../Hash/Hash.js'
 import * as Root from '../Root/Root.js'
 
