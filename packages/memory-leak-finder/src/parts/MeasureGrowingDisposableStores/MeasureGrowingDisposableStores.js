@@ -3,6 +3,7 @@ import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 import * as StartTrackingDisposableStores from '../StartTrackingDisposableStores/StartTrackingDisposableStores.js'
 import * as StopTrackingDisposableStores from '../StopTrackingDisposableStores/StopTrackingDisposableStores.js'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
 
 // TODO
 // 1. find the DisposableStore constructor
@@ -30,6 +31,7 @@ export const start = async (session, objectGroup) => {
 export const stop = async (session, objectGroup) => {
   const stackTraces = await GetDisposableStoresWithStackTraces.getDisposableStoresWithStackTraces(session, objectGroup)
   await StopTrackingDisposableStores.stopTrackingDisposableStores(session, objectGroup)
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return stackTraces
 }
 
