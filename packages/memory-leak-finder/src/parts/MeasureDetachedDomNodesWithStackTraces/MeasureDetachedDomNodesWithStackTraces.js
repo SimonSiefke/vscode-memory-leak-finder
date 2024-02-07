@@ -1,8 +1,7 @@
-import * as Arrays from '../Arrays/Arrays.js'
-import * as Assert from '../Assert/Assert.js'
 import * as CompareDetachedDomNodesWithStackTraces from '../CompareDetachedDomNodesWithStackTraces/CompareDetachedDomNodesWithStackTraces.js'
 import * as GetDetachedDomNodes from '../GetDetachedDomNodes/GetDetachedDomNodes.js'
 import * as GetDetachedDomNodesWithStackTraces from '../GetDetachedDomNodesWithStackTraces/GetDetachedDomNodesWithStackTraces.js'
+import * as GetTotalInstanceCounts from '../GetTotalInstanceCounts/GetTotalInstanceCounts.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
@@ -30,16 +29,13 @@ export const stop = async (session, objectGroup) => {
 
 export const compare = CompareDetachedDomNodesWithStackTraces.compareDetachedDomNodesWithStackTraces
 
-const getCount = (instance) => {
-  return instance.count
-}
-
-const getTotal = (instance) => {
-  Assert.array(instance)
-  const counts = instance.map(getCount)
-  return Arrays.sum(counts)
-}
-
 export const isLeak = ({ before, after }) => {
-  return getTotal(after) > getTotal(before)
+  return GetTotalInstanceCounts.getTotalInstanceCounts(after) > GetTotalInstanceCounts.getTotalInstanceCounts(before)
+}
+
+export const summary = ({ before, after }) => {
+  return {
+    before: GetTotalInstanceCounts.getTotalInstanceCounts(before),
+    after: GetTotalInstanceCounts.getTotalInstanceCounts(after),
+  }
 }

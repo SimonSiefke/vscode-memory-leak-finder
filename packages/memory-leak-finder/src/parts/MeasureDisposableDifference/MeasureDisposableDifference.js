@@ -32,3 +32,9 @@ export const stop = async (session, objectGroup, scriptHandler) => {
 export const compare = CompareDisposablesWithLocationDifference.compareDisposablesWithLocationDifference
 
 export const isLeak = IsLeakDisposables.isLeakDisposables
+
+export const summary = (leaked) => {
+  return {
+    disposableDifference: leaked.length,
+  }
+}
