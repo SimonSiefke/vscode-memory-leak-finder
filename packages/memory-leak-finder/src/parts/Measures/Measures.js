@@ -3,6 +3,7 @@ export * as MeasureArrayElementCount from '../MeasureArrayElementCount/MeasureAr
 export * as MeasureClassCount from '../MeasureClassCount/MeasureClassCount.js'
 export * as MeasureDetachedDomNodeCount from '../MeasureDetachedDomNodeCount/MeasureDetachedDomNodeCount.js'
 export * as MeasureDetachedDomNodeRoots from '../MeasureDetachedDomNodeRoots/MeasureDetachedDomNodeRoots.js'
+export * as MeasureDetachedDomNodeRootsWithStackTraces from '../MeasureDetachedDomNodeRootsWithStackTraces/MeasureDetachedDomNodeRootsWithStackTraces.js'
 export * as MeasureDetachedDomNodes from '../MeasureDetachedDomNodes/MeasureDetachedDomNodes.js'
 export * as MeasureDetachedDomNodesDifference from '../MeasureDetachedDomNodesDifference/MeasureDetachedDomNodesDifference.js'
 export * as MeasureDetachedDomNodesDifferenceWithStackTraces from '../MeasureDetachedDomNodesDifferenceWithStackTraces/MeasureDetachedDomNodesDifferenceWithStackTraces.js'
