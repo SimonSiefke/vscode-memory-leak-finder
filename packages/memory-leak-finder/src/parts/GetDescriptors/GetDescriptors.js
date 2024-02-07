@@ -7,7 +7,7 @@ import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues
  * @param {string} prototype
  * @returns {Promise<any>}
  */
-export const getDescriptors = async (session, prototype, objectGroup) => {
+export const getDescriptors = async (session, prototype, objectGroup, raw = false) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: prototype,
     returnByValue: false,
@@ -62,7 +62,9 @@ return detachedNodes
     returnByValue: false,
     objectGroup,
   })
-
+  if (raw) {
+    return fnResult1
+  }
   const fnResult2 = await DevtoolsProtocolRuntime.getProperties(session, {
     objectId: fnResult1.objectId,
     ownProperties: true,
