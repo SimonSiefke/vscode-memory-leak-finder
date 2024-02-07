@@ -17,7 +17,7 @@ export const create = (session) => {
 
 export const start = async (session, objectGroup) => {
   await StartTrackingDomNodeStackTraces.startTrackingDomNodeStackTraces(session, objectGroup)
-  return GetDetachedDomNodes.getDetachedDomNodes(session)
+  return GetDetachedDomNodesWithStackTraces.getDetachedDomNodesWithStackTraces(session, objectGroup)
 }
 
 export const stop = async (session, objectGroup) => {

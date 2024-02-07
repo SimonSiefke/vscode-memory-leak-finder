@@ -1,77 +1,10 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.js'
-import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
+import * as GetDetachedDomNodeRoots from '../GetDetachedDomNodeRoots/GetDetachedDomNodeRoots.js'
 import * as SplitLines from '../SplitLines/SplitLines.js'
 
 export const getDetachedDomNodesWithStackTraces = async (session, objectGroup) => {
-  const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
-    expression: PrototypeExpression.Node,
-    returnByValue: false,
-    objectGroup,
-  })
-  const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
-    prototypeObjectId: prototypeDescriptor.objectId,
-    objectGroup,
-  })
-  const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
-    functionDeclaration: `function(){
-const objects = this
-
-const isDetached = node => {
-  try {
-    node.nodeType
-    return false
-  } catch {
-    return true
-  }
-}
-
-const getAllNodes = (root) => {
-  const iter = document.createNodeIterator(
-    document.documentElement,
-    NodeFilter.SHOW_ALL
-  )
-  const list = []
-  let node
-  while ((node = iter.nextNode())) {
-    list.push(node)
-  }
-  return list
-}
-
-const getDetachedNodes = (nodes) => {
-  const list = getAllNodes()
-  const detached = []
-  for (const node of nodes) {
-    if (list.includes(node) || node === document || isDetached(node)) {
-      continue
-    }
-    detached.push(node)
-  }
-  return detached
-}
-
-const getDetachedRoots = detachedNodes => {
-  const detachedRoots = []
-  for(const detachedNode of detachedNodes){
-    if(detachedNodes.includes(detachedNode.parentNode)){
-      continue
-    }
-    detachedRoots.push(detachedNode)
-  }
-  return detachedRoots
-}
-
-
-const detachedNodes = getDetachedNodes(objects)
-const detachedRoots = getDetachedRoots(detachedNodes)
-return detachedRoots
-}`,
-    objectId: objects.objects.objectId,
-    returnByValue: false,
-    objectGroup,
-  })
-
+  const fnResult1 = await GetDetachedDomNodeRoots.getDetachedDomNodeRoots(session, objectGroup)
   const fnResult2 = await DevtoolsProtocolRuntime.getProperties(session, {
     objectId: fnResult1.objectId,
     ownProperties: true,
@@ -102,6 +35,9 @@ return stackTraces
     objectGroup,
   })
   const merged = []
+  if (descriptors.length !== stackTraces.length) {
+    throw new Error(`descriptor length mismatch`)
+  }
   for (let i = 0; i < descriptors.length; i++) {
     const descriptor = descriptors[i]
     const stackTrace = stackTraces[i]
