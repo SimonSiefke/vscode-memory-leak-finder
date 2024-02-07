@@ -3,15 +3,13 @@ export const wrapMeasure = (measure) => {
     create(session) {
       const args = measure.create(session)
       return {
-        id: measure.id,
+        ...measure,
         start() {
           return measure.start(...args)
         },
         stop() {
           return measure.stop(...args)
         },
-        compare: measure.compare,
-        isLeak: measure.isLeak,
       }
     },
   }
