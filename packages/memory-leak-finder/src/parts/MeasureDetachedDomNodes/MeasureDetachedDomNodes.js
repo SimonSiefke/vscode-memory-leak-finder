@@ -36,3 +36,10 @@ const getTotal = (instance) => {
 export const isLeak = ({ before, after }) => {
   return getTotal(after) > getTotal(before)
 }
+
+export const summary = ({ before, after }) => {
+  return {
+    before: getTotal(before),
+    after: getTotal(after),
+  }
+}

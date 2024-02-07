@@ -25,6 +25,10 @@ export const combine = (...measures) => {
       if (measure.isLeak) {
         resultMap.isLeak = measure.isLeak(comparison)
       }
+      console.log(measure)
+      if (measure.summary) {
+        resultMap.summary = measure.summary(comparison)
+      }
     }
     return resultMap
   }

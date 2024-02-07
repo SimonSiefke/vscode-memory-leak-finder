@@ -20,6 +20,16 @@ import * as Timeout from '../Timeout/Timeout.js'
 // 5. pass websocket url to test worker and wait for connection
 // 6. pass matching files to test worker
 
+const getSummary = (result) => {
+  if (result && result.eventListeners) {
+    return { eventListeners: result.eventListeners }
+  }
+  if (result && result.summary) {
+    return result.summary
+  }
+  return { result }
+}
+
 export const runTests = async (
   root,
   cwd,
@@ -107,11 +117,8 @@ export const runTests = async (
               isLeak = true
               leaking++
             }
-            if (result && result.eventListeners) {
-              console.log({ eventListeners: result.eventListeners })
-            } else {
-              console.log({ result })
-            }
+            const summary = getSummary(result)
+            console.log(summary)
           } else {
             for (let i = 0; i < runs; i++) {
               await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun)
