@@ -31,8 +31,9 @@ export const startTrackingDisposableStores = async (session, objectGroup) => {
 
   prototype.prototype.add = function(...args) {
     const stackTrace = callsites()
-    this.___stackTraces ||= []
-    this.___stackTraces.push(stackTrace)
+    for(const arg of args){
+      arg.___stackTrace = stackTrace
+    }
     return globalThis.___disposableStoreOriginalAdd.apply(this, args)
   }
 }`,

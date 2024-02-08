@@ -7,8 +7,15 @@ export const getDisposableStoresWithStackTraces = async (session, objectGroup) =
     functionDeclaration: `function(){
   const disposableStores = this
 
+  const getStackTrace = disposable => {
+    return disposable.___stackTrace || ''
+  }
+
   const getStackTraces = instance => {
-    return instance.___stackTraces || []
+    const toDispose=instance._toDispose || new Set()
+    const toDisposeArray = [...toDispose]
+    const stackTraces = toDisposeArray.map(getStackTrace)
+    return stackTraces
   }
 
   const hasLength = array => {
