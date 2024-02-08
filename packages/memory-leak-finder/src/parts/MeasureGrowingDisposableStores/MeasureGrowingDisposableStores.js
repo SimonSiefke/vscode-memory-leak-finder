@@ -1,9 +1,10 @@
+import * as CompareDisposableStores from '../CompareDisposableStores/CompareDisposableStores.js'
 import * as GetDisposableStoresWithStackTraces from '../GetDisposableStoresWithStackTraces/GetDisposableStoresWithStackTraces.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
 import * as StartTrackingDisposableStores from '../StartTrackingDisposableStores/StartTrackingDisposableStores.js'
 import * as StopTrackingDisposableStores from '../StopTrackingDisposableStores/StopTrackingDisposableStores.js'
-import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
 
 // TODO
 // 1. find the DisposableStore constructor
@@ -35,12 +36,7 @@ export const stop = async (session, objectGroup) => {
   return stackTraces
 }
 
-export const compare = (before, after) => {
-  return {
-    before,
-    after,
-  }
-}
+export const compare = CompareDisposableStores.compareDisposableStores
 
 export const isLeak = ({ before, after }) => {
   return after.length > 0
