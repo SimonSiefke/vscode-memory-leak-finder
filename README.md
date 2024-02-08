@@ -388,6 +388,7 @@ It seems there is memory leak when opening and closing a notebook. But just look
 | QuickPick            | https://github.com/microsoft/vscode/issues/201320 | Fixed  |
 | Terminal             | https://github.com/xtermjs/xterm.js/issues/4935   | Review |
 | KeyBindingsEditor    | https://github.com/microsoft/vscode/issues/202455 | Review |
+| NotebookEditorWidget | https://github.com/microsoft/vscode/issues/204756 | Open   |
 
 ## Credits
 
