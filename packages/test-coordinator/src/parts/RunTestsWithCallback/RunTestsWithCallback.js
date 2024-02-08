@@ -105,10 +105,10 @@ export const runTests = async (
             for (let i = 0; i < runs; i++) {
               await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun)
             }
-            const after = await MemoryLeakFinder.stop(memoryLeakWorkerIpc, connectionId)
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
             }
+            const after = await MemoryLeakFinder.stop(memoryLeakWorkerIpc, connectionId)
             const result = await MemoryLeakFinder.compare(memoryLeakWorkerIpc, connectionId, before, after)
             const fileName = dirent.replace('.js', '.json')
             const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
