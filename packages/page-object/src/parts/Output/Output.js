@@ -20,7 +20,7 @@ export const create = ({ expect, page, VError }) => {
         const outputView = page.locator('.pane-body.output-view')
         await expect(outputView).toBeVisible()
         const panel = Panel.create({ expect, page, VError })
-        await panel.hide()
+        await panel.close()
         await expect(outputView).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to hide output`)
