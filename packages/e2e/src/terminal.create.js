@@ -1,7 +1,7 @@
 export const skip = process.platform === 'win32'
 
 export const setup = async ({ Terminal, Panel }) => {
-  await Panel.hide()
+  await Panel.close()
   await Terminal.killAll()
   await Terminal.show()
 }
