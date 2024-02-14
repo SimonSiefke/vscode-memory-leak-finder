@@ -21,7 +21,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to show panel`)
       }
     },
-    async hide() {
+    async closeOrHide(text) {
       try {
         const panel = page.locator('.part.panel')
         const isVisible = await panel.isVisible()
@@ -29,7 +29,7 @@ export const create = ({ expect, page, VError }) => {
           return
         }
         await expect(panel).toBeVisible()
-        const closeButton = page.locator('[aria-label="Hide Panel"]')
+        const closeButton = page.locator(`[aria-label="${text}"]`)
         await closeButton.click()
         await expect(panel).toBeHidden()
         const group = page.locator('.editor-group-container')
@@ -37,6 +37,12 @@ export const create = ({ expect, page, VError }) => {
       } catch (error) {
         throw new VError(error, `Failed to hide panel`)
       }
+    },
+    async hide() {
+      return this.closeOrHide('Hide Panel')
+    },
+    async close() {
+      return this.closeOrHide('Close Panel')
     },
   }
 }

@@ -6,5 +6,5 @@ export const setup = async ({ Panel }) => {
 
 export const run = async ({ Panel }) => {
   await Panel.show()
-  await Panel.hide()
+  await Panel.close()
 }
