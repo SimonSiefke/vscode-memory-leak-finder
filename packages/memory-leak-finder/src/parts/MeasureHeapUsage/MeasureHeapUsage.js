@@ -1,3 +1,4 @@
+import * as CompareHeapUsage from '../CompareHeapUsage/CompareHeapUsage.js'
 import * as GetHeapUsage from '../GetHeapUsage/GetHeapUsage.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 
@@ -15,12 +16,7 @@ export const stop = (session) => {
   return GetHeapUsage.getHeapUsage(session)
 }
 
-export const compare = (before, after) => {
-  return {
-    before,
-    after,
-  }
-}
+export const compare = CompareHeapUsage.compareHeapUsage
 
 export const isLeak = () => {
   return false

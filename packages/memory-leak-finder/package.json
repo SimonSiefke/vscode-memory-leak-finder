@@ -15,7 +15,8 @@
   "dependencies": {
     "@lvce-editor/assert": "^1.2.0",
     "@lvce-editor/verror": "^1.1.2",
-    "@vscode-memory-leak-finder/devtools-protocol": "file:../devtools-protocol"
+    "@vscode-memory-leak-finder/devtools-protocol": "file:../devtools-protocol",
+    "pretty-bytes": "^6.1.1"
   },
   "xo": {
     "rules": {
