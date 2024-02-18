@@ -12,6 +12,7 @@ export * as MeasureDisposableCount from '../MeasureDisposableCount/MeasureDispos
 export * as MeasureDisposableDifference from '../MeasureDisposableDifference/MeasureDisposableDifference.js'
 export * as MeasureDisposableStoreSizes from '../MeasureDisposableStoreSizes/MeasureDisposableStoreSizes.js'
 export * as MeasureDisposables from '../MeasureDisposables/MeasureDisposables.js'
+export * as MeasureDomCounters from '../MeasureDomCounters/MeasureDomCounters.js'
 export * as MeasureDomNodeCount from '../MeasureDomNodeCount/MeasureDomNodeCount.js'
 export * as MeasureDomTimerCount from '../MeasureDomTimerCount/MeasureDomTimerCount.js'
 export * as MeasureEventListenerCount from '../MeasureEventListenerCount/MeasureEventListenerCount.js'
