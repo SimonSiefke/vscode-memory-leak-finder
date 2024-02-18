@@ -85,3 +85,16 @@ test('unwrapResult - result and internalProperties', () => {
     internalProperties: [],
   })
 })
+
+test('unwrapResult - dom counters', () => {
+  const rawResult = {
+    id: 9,
+    result: { documents: 4, nodes: 1065, jsEventListeners: 1907 },
+    sessionId: 'EC3785F8DB8BF6BAD8FAA4D8539CC71D',
+  }
+  expect(UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult)).toEqual({
+    documents: 4,
+    nodes: 1065,
+    jsEventListeners: 1907,
+  })
+})
