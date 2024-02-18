@@ -98,3 +98,15 @@ test('unwrapResult - dom counters', () => {
     jsEventListeners: 1907,
   })
 })
+
+test('unwrapResult - heap usage', () => {
+  const rawResult = {
+    id: 9,
+    result: { usedSize: 58546384, totalSize: 72617984 },
+    sessionId: '1E8CFE6179C022F428E3CCF6C2E0E7D4',
+  }
+  expect(UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult)).toEqual({
+    usedSize: 58546384,
+    totalSize: 72617984,
+  })
+})
