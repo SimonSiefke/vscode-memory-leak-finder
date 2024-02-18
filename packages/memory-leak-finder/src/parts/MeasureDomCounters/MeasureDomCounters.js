@@ -1,5 +1,6 @@
 import * as GetDomCounters from '../GetDomCounters/GetDomCounters.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
+import * as IsLeakDomCounters from '../IsLeakDomCounters/IsLeakDomCounters.js'
 
 export const id = MeasureId.DomCounters
 
@@ -22,9 +23,7 @@ export const compare = (before, after) => {
   }
 }
 
-export const isLeak = () => {
-  return false
-}
+export const isLeak = IsLeakDomCounters.isLeakDomCounters
 
 export const summary = ({ before, after }) => {
   const documentsBefore = before.documents
