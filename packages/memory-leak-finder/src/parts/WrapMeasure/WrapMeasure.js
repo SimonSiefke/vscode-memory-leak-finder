@@ -1,5 +1,6 @@
 export const wrapMeasure = (measure) => {
   return {
+    id: measure.id,
     create(session) {
       const args = measure.create(session)
       return {
