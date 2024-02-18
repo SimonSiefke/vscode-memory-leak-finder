@@ -5,3 +5,4 @@ export * as DevtoolsProtocolDomDebugger from '../DevtoolsProtocolDomDebugger/Dev
 export * as DevtoolsProtocolPage from '../DevtoolsProtocolPage/DevtoolsProtocolPage.js'
 export * as DevtoolsProtocolRuntime from '../DevtoolsProtocolRuntime/DevtoolsProtocolRuntime.js'
 export * as DevtoolsProtocolTarget from '../DevtoolsProtocolTarget/DevtoolsProtocolTarget.js'
+export * as DevtoolsProtocolMemory from '../DevtoolsProtocolMemory/DevtoolsProtocolMemory.js'
