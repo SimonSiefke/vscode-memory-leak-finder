@@ -77,3 +77,5 @@ export const DomDebuggerGetEventListeners = 'DOMDebugger.getEventListeners'
 export const RuntimeReleaseObjectGroup = 'Runtime.releaseObjectGroup'
 
 export const MemoryGetDomCounters = 'Memory.getDOMCounters'
+
+export const RuntimeGetHeapUsage = 'Runtime.getHeapUsage'

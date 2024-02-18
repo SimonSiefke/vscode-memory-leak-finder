@@ -55,3 +55,7 @@ export const queryObjects = (session, options) => {
 export const releaseObjectGroup = (session, options) => {
   return Invoke.invoke(session, DevtoolsCommandType.RuntimeReleaseObjectGroup, options)
 }
+
+export const getHeapUsage = (session, options) => {
+  return Invoke.invoke(session, DevtoolsCommandType.RuntimeGetHeapUsage, options)
+}

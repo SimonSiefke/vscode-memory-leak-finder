@@ -1,7 +1,6 @@
-export const getHeapUsage = (session) => {
-  // TODO ask session for heap usage
-  return {
-    usedSize: 0,
-    totalSize: 0,
-  }
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+
+export const getHeapUsage = async (session) => {
+  const heapUsage = await DevtoolsProtocolRuntime.getHeapUsage(session, {})
+  return heapUsage
 }
