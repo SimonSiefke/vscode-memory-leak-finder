@@ -110,3 +110,14 @@ test('unwrapResult - heap usage', () => {
     totalSize: 72617984,
   })
 })
+
+test('unwrapResult - global lexical scope names', () => {
+  const rawResult = {
+    id: 9,
+    result: { names: [] },
+    sessionId: '1E8CFE6179C022F428E3CCF6C2E0E7D4',
+  }
+  expect(UnwrapDevtoolsEvaluateResult.unwrapResult(rawResult)).toEqual({
+    names: [],
+  })
+})
