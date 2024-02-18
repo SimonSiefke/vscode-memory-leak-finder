@@ -1,4 +1,6 @@
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+
 export const getGlobalLexicalScopeNames = async (session) => {
-  // TODO query global lexical scope names
-  return []
+  const scopeNamesResult = await DevtoolsProtocolRuntime.globalLexicalScopeNames(session, {})
+  return scopeNamesResult.names
 }
