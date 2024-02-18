@@ -22,6 +22,7 @@ export * as MeasureEventTargetCount from '../MeasureEventTargetCount/MeasureEven
 export * as MeasureEventTargetDifference from '../MeasureEventTargetDifference/MeasureEventTargetDifference.js'
 export * as MeasureEventTargets from '../MeasureEventTargets/MeasureEventTargets.js'
 export * as MeasureFunctionCount from '../MeasureFunctionCount/MeasureFunctionCount.js'
+export * as MeasureGlobalLexicalScopeNames from '../MeasureGlobalLexicalScopeNames/MeasureGlobalLexicalScopeNames.js'
 export * as MeasureGrowingDisposableStores from '../MeasureGrowingDisposableStores/MeasureGrowingDisposableStores.js'
 export * as MeasureHeapUsage from '../MeasureHeapUsage/MeasureHeapUsage.js'
 export * as MeasureInstanceCounts from '../MeasureInstanceCounts/MeasureInstanceCounts.js'
