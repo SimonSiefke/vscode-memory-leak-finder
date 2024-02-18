@@ -49,6 +49,14 @@ Measures the total number of detached dom nodes.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure detached-dom-node-count --only base
 ```
 
+### DomCounters
+
+Measures dom nodes, jsEventListeners and documents.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure dom-counters --only base
+```
+
 ### DomNodeCount
 
 Measures the total number of dom nodes.
@@ -79,6 +87,22 @@ Measures the total number of functions.
 
 ```sh
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure function-count --only base
+```
+
+### GlobalLexicalScopeNames
+
+Measures global variables / global lexical scope names.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure global-lexical-scope-names --only base
+```
+
+### HeapUsage
+
+Measures heap usage.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure heap-usage --only base
 ```
 
 ### InstanceCounts
