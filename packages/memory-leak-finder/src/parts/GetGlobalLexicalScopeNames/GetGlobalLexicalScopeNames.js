@@ -1,6 +1,6 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 
 export const getGlobalLexicalScopeNames = async (session) => {
-  const scopeNames = await DevtoolsProtocolRuntime.globalLexicalScopeNames(session, {})
-  return scopeNames
+  const scopeNamesResult = await DevtoolsProtocolRuntime.globalLexicalScopeNames(session, {})
+  return scopeNamesResult.names
 }
