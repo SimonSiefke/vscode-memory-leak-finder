@@ -1,8 +1,6 @@
-export const getDomCounters = (session) => {
-  // TODO ask session for domCounters
-  return {
-    documents: 0,
-    nodes: 0,
-    jsEventListeners: 0,
-  }
+import { DevtoolsProtocolMemory } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+
+export const getDomCounters = async (session) => {
+  const domCounters = await DevtoolsProtocolMemory.getDomCounters(session, {})
+  return domCounters
 }

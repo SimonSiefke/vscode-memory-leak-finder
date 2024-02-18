@@ -4,6 +4,9 @@ export const unwrapResult = (rawResult) => {
   if ('result' in rawResult) {
     rawResult = rawResult.result
   }
+  if ('documents' in rawResult) {
+    return rawResult
+  }
   if ('error' in rawResult) {
     if (rawResult.error.message && rawResult.error.data) {
       throw new DevtoolsProtocolError(`${rawResult.error.message}: ${rawResult.error.data}`)

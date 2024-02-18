@@ -75,3 +75,5 @@ export const DomDescribeNode = 'DOM.describeNode'
 export const DomDebuggerGetEventListeners = 'DOMDebugger.getEventListeners'
 
 export const RuntimeReleaseObjectGroup = 'Runtime.releaseObjectGroup'
+
+export const MemoryGetDomCounters = 'Memory.getDOMCounters'
