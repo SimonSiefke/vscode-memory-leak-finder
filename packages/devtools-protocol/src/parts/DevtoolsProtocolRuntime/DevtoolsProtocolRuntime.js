@@ -59,3 +59,7 @@ export const releaseObjectGroup = (session, options) => {
 export const getHeapUsage = (session, options) => {
   return Invoke.invoke(session, DevtoolsCommandType.RuntimeGetHeapUsage, options)
 }
+
+export const globalLexicalScopeNames = (session, options) => {
+  return Invoke.invoke(session, DevtoolsCommandType.RuntimeGlobalLexicalScopeNames, options)
+}
