@@ -1,5 +1,4 @@
 import * as CompareDetachedDomNodesWithStackTraces from '../CompareDetachedDomNodesWithStackTraces/CompareDetachedDomNodesWithStackTraces.js'
-import * as GetDetachedDomNodes from '../GetDetachedDomNodes/GetDetachedDomNodes.js'
 import * as GetDetachedDomNodesWithStackTraces from '../GetDetachedDomNodesWithStackTraces/GetDetachedDomNodesWithStackTraces.js'
 import * as GetTotalInstanceCounts from '../GetTotalInstanceCounts/GetTotalInstanceCounts.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
