@@ -23,5 +23,6 @@ export const initialStart = async (options) => {
     options.measureAfter,
     options.timeouts,
     options.timeoutBetween,
+    options.restartBetween,
   )
 }
