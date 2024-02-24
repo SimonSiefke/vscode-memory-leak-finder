@@ -75,7 +75,7 @@ export const runTests = async (
     callback(TestWorkerEventType.TestsStarting, total)
     callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
     const connectionId = Id.create()
-    const testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(cwd, headlessMode, recordVideo, connectionId, timeouts)
+    let testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(cwd, headlessMode, recordVideo, connectionId, timeouts)
     const memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()
     if (checkLeaks) {
       await MemoryLeakFinder.setup(memoryLeakWorkerIpc, connectionId, measure)
@@ -90,6 +90,7 @@ export const runTests = async (
       try {
         const start = i === 0 ? initialStart : Time.now()
         const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(testWorkerIpc, connectionId, absolutePath, forceRun, timeouts)
+
         if (testSkipped) {
           skipped++
           const end = Time.now()
@@ -131,6 +132,10 @@ export const runTests = async (
           callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration, isLeak)
           if (!isLeak) {
             passed++
+          }
+          if (restartBetween) {
+            PrepareTestsOrAttach.state.promise = undefined
+            testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(cwd, headlessMode, recordVideo, connectionId, timeouts)
           }
         }
       } catch (error) {
