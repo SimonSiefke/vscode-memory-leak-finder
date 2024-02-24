@@ -16,6 +16,7 @@ export const state = {
   measureAfter: false,
   timeouts: true,
   timeoutBetween: 0,
+  restartBetween: false,
 }
 
 export const setState = (newState) => {
@@ -31,6 +32,7 @@ export const setState = (newState) => {
   state.measureAfter = newState.measureAfter
   state.timeouts = newState.timeouts
   state.timeoutBetween = newState.timeoutBetween
+  state.restartBetween = newState.restartBetween
 }
 
 export const setBuffering = (value) => {

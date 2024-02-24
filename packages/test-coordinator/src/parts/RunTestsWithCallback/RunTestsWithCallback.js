@@ -43,6 +43,7 @@ export const runTests = async (
   measureAfter,
   timeouts,
   timeoutBetween,
+  restartBetween,
   callback,
 ) => {
   try {
@@ -58,6 +59,7 @@ export const runTests = async (
     Assert.boolean(measureAfter)
     Assert.boolean(timeouts)
     Assert.number(timeoutBetween)
+    Assert.boolean(restartBetween)
     let passed = 0
     let failed = 0
     let skipped = 0

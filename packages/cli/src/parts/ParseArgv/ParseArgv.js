@@ -33,6 +33,7 @@ export const parseArgv = (argv) => {
     measureAfter: false,
     timeouts: true,
     timeoutBetween: 0,
+    restartBetween: false,
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -66,6 +67,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--timeout-between')) {
     options.timeoutBetween = parseArgvNumber(argv, '--timeout-between')
+  }
+  if (argv.includes('--restart-between')) {
+    options.restartBetween = true
   }
   return options
 }

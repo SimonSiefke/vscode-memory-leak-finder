@@ -17,6 +17,7 @@ export const run = async () => {
     measureAfter: options.measureAfter,
     timeouts: options.timeouts,
     timeoutBetween: options.timeoutBetween,
+    restartBetween: options.restartBetween,
   })
   return InitialStart.initialStart(options)
 }
