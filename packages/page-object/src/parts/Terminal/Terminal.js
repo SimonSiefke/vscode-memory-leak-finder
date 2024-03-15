@@ -44,7 +44,7 @@ export const create = ({ expect, page, VError }) => {
         const tabsEntry = page.locator('.terminal-tabs-entry')
         await expect(tabsEntry).toHaveCount(2)
         const secondEntry = tabsEntry.nth(1)
-        const deleteAction = secondEntry.locator('[title^="Kill"]')
+        const deleteAction = secondEntry.locator('[aria-label^="Kill"]')
         await deleteAction.click()
         await expect(terminalTabs).toHaveCount(0)
         await page.waitForIdle()
