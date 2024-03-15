@@ -71,20 +71,7 @@ export const create = ({ page, expect, VError }) => {
       }
     },
     async splitRight() {
-      try {
-        const editors = page.locator('.editor-instance')
-        const currentCount = await editors.count()
-        const editorActions = page.locator('.editor-actions').first()
-        if (currentCount === 0) {
-          throw new Error('no open editor found')
-        }
-        await expect(editorActions).toBeVisible()
-        const editorActionSplitRight = editorActions.locator('[title^="Split Editor Right"]')
-        await editorActionSplitRight.click()
-        await expect(editors).toHaveCount(currentCount + 1)
-      } catch (error) {
-        throw new VError(error, `Failed to split editor right`)
-      }
+      return this.split(WellKnownCommands.ViewSplitEditorRight)
     },
     async split(command) {
       try {
