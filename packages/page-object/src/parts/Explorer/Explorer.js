@@ -141,6 +141,7 @@ export const create = ({ page, expect, VError }) => {
     },
     async openContextMenu(dirent, select) {
       try {
+        await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         const oldDirent = explorer.locator('.monaco-list-row', {
           hasText: dirent,
