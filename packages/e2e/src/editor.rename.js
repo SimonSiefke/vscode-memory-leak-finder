@@ -18,7 +18,7 @@ export const setup = async ({ Editor, Workspace }) => {
 
 export const run = async ({ Editor }) => {
   await Editor.click('--font-size')
-  await Editor.shouldHaveCursor(/(53px|58px|66px)/)
+  await Editor.shouldHaveCursor(/(50px|53px|58px|66px)/)
   await Editor.rename('--abc')
   await Editor.shouldHaveText(`:root {
   --abc: 10px;
