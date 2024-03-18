@@ -350,6 +350,10 @@ export const create = ({ page, expect, VError }) => {
       try {
         await page.waitForIdle()
         const breadcrumbs = page.locator('.monaco-breadcrumbs')
+        const count = await breadcrumbs.count()
+        if (count === 0) {
+          return
+        }
         await expect(breadcrumbs).toBeVisible()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewToggleBreadCrumbs)
