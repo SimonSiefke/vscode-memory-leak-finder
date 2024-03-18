@@ -28,13 +28,14 @@ export const toHaveValue = (element, { value }) => {
 }
 
 export const toHaveText = (element, options) => {
+  const existingText = element.textContent
   if ('text' in options) {
     Assert.string(options.text)
-    return element.textContent === options.text
+    return existingText === options.text
   }
   if ('regex' in options) {
     const regex = new RegExp(options.regex)
-    return regex.test(element.textContent)
+    return regex.test(existingText)
   }
   throw new Error(`invalid options`)
 }
