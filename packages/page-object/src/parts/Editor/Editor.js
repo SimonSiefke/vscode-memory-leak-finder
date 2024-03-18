@@ -143,6 +143,22 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to select ${text}`)
       }
     },
+    async duplicateSelection() {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.DuplicateSelection)
+      } catch (error) {
+        throw new VError(error, `Failed to duplicate selection`)
+      }
+    },
+    async undo() {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.Undo)
+      } catch (error) {
+        throw new VError(error, `Failed to undo`)
+      }
+    },
     async cursorRight() {
       try {
         await page.keyboard.press('ArrowRight')
