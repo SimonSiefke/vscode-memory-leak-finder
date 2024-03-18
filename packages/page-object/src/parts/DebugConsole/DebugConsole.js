@@ -22,6 +22,7 @@ export const create = ({ expect, page, VError }) => {
         const panel = Panel.create({ expect, page, VError })
         await panel.hide()
         await expect(repl).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to hide debug console`)
       }
