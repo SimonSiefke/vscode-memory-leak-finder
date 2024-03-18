@@ -273,6 +273,19 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to rename text ${newText}`)
       }
     },
+    async renameCancel(newText) {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.RenameSymbol)
+        const renameInput = page.locator('.rename-input')
+        await expect(renameInput).toBeVisible()
+        await expect(renameInput).toBeFocused()
+        await renameInput.type(newText)
+        await page.keyboard.press('Escape')
+      } catch (error) {
+        throw new VError(error, `Failed to rename cancel ${newText}`)
+      }
+    },
     async shouldHaveToken(text, color) {
       const token = page.locator(`[class^="mtk"]`, {
         hasText: text,
