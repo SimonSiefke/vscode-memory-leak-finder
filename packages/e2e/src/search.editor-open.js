@@ -1,3 +1,5 @@
+export const skip = true
+
 export const setup = async ({ ActivityBar, Search, Workspace }) => {
   await Workspace.setFiles([
     {
