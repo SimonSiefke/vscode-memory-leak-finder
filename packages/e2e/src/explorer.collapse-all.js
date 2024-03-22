@@ -1,4 +1,4 @@
-export const setup = async ({ Workspace, Explorer }) => {
+export const setup = async ({ Workspace, Explorer, Editor }) => {
   await Workspace.setFiles([
     {
       name: 'folder-1/file-1.txt',
@@ -17,6 +17,7 @@ export const setup = async ({ Workspace, Explorer }) => {
       content: 'file content 4',
     },
   ])
+  await Editor.closeAll()
   await Explorer.focus()
   await Explorer.shouldHaveItem('folder-1')
 }
