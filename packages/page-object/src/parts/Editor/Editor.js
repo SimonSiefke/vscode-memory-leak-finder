@@ -280,8 +280,10 @@ export const create = ({ page, expect, VError }) => {
     },
     async rename(newText) {
       try {
-        await page.keyboard.press('F2')
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.RenameSymbol)
         const renameInput = page.locator('.rename-input')
+        await expect(renameInput).toBeVisible()
         await expect(renameInput).toBeFocused()
         await renameInput.type(newText)
         await page.keyboard.press('Enter')
@@ -306,7 +308,7 @@ export const create = ({ page, expect, VError }) => {
       const token = page.locator(`[class^="mtk"]`, {
         hasText: text,
       })
-      await expect(token).toHaveCSS('color', color)
+      await expect(token).toHaveCss('color', color)
     },
     async save() {
       try {
@@ -485,6 +487,15 @@ export const create = ({ page, expect, VError }) => {
         await expect(sourceAction).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to hide source action`)
+      }
+    },
+    async shouldHaveCursor(estimate) {
+      try {
+        const cursor = page.locator('.cursor')
+        await expect(cursor).toBeVisible()
+        await expect(cursor).toHaveCss('left', estimate)
+      } catch (error) {
+        throw new VError(error, `Failed cursor assertion`)
       }
     },
   }

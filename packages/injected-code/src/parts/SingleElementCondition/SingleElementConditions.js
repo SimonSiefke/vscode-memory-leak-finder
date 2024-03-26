@@ -59,10 +59,11 @@ export const toHaveId = (element, { id }) => {
   return element.id === id
 }
 
-export const toHaveCss = (element, { key, value }) => {
+export const toHaveCss = (element, { key, value, isRegex }) => {
   Assert.string(key)
   const actualValue = GetStyleValue.getStyleValue(element, key)
-  if (value instanceof RegExp) {
+  if (isRegex) {
+    value = new RegExp(value.slice(1, -1))
     return value.test(actualValue)
   }
   return actualValue === value
