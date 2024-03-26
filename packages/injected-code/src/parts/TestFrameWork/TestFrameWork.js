@@ -120,6 +120,7 @@ export const checkSingleElementCondition = async (locator, fnName, options) => {
       if (successful) {
         return
       }
+      console.log({ successful, element })
     }
     await Timeout.waitForMutation(document.body, 100)
     currentTime = Time.getTimeStamp()
