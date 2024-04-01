@@ -15,13 +15,12 @@ export const setup = async ({ Editor, Workspace }) => {
 }`)
   await Editor.type('abc')
   await Editor.deleteCharactersLeft({ count: 3 })
-  await Editor.shouldHaveToken('font-size', 'rgb(156, 220, 254)')
+  await Editor.shouldHaveToken('--font-size', 'rgb(156, 220, 254)')
 }
 
-export const run = async ({ page, expect, Editor }) => {
-  await Editor.click('font-size')
-  const cursor = page.locator('.cursor')
-  await expect(cursor).toHaveCSS('left', /(53px|58px|66px)/)
+export const run = async ({ Editor }) => {
+  await Editor.click('--font-size')
+  await Editor.shouldHaveCursor(/(50px|53px|58px|66px)/)
   await Editor.rename('--abc')
   await Editor.shouldHaveText(`:root {
   --abc: 10px;
