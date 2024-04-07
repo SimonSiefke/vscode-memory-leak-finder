@@ -97,5 +97,26 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to collapse files`)
       }
     },
+    async openEditor() {
+      try {
+        await page.waitForIdle()
+        const link = page.locator('a', {
+          hasText: 'Open in editor',
+        })
+        await expect(link).toBeVisible()
+        await link.click()
+        const tabLabel = page.locator('.tab-label')
+        await expect(tabLabel).toBeVisible()
+        await expect(tabLabel).toHaveText(`Search: sample`)
+        const searchEditor = page.locator('.search-editor')
+        await expect(searchEditor).toBeVisible()
+        await page.waitForIdle()
+        const line = searchEditor.locator('.view-line').first()
+        await expect(line).toBeVisible()
+        await expect(line).toHaveText(/result/)
+      } catch (error) {
+        throw new VError(error, `Failed to open search editor`)
+      }
+    },
   }
 }
