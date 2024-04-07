@@ -14,7 +14,7 @@
   "dependencies": {
     "@babel/code-frame": "^7.24.2",
     "@lvce-editor/assert": "^1.2.0",
-    "@lvce-editor/verror": "^1.1.2",
+    "@lvce-editor/verror": "^1.2.0",
     "@vscode/test-electron": "^2.3.9",
     "exit-hook": "^4.0.0",
     "strip-ansi": "^7.1.0"
