@@ -16,12 +16,12 @@
   "license": "MIT",
   "dependencies": {
     "@lvce-editor/assert": "^1.2.0",
-    "@lvce-editor/verror": "^1.2.0",
-    "ansi-escapes": "^6.2.1",
+    "@lvce-editor/verror": "^1.1.2",
+    "ansi-escapes": "^6.2.0",
     "chalk": "^5.3.0"
   },
   "devDependencies": {
-    "@types/node": "^20.12.5"
+    "@types/node": "^20.8.10"
   },
   "jest": {
     "moduleNameMapper": {
