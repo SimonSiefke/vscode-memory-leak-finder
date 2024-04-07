@@ -14,7 +14,7 @@
   "dependencies": {
     "@lvce-editor/assert": "^1.2.0",
     "@lvce-editor/verror": "^1.1.2",
-    "got": "^14.0.0",
+    "got": "^14.2.1",
     "source-map": "^0.7.4"
   },
   "xo": {
