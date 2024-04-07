@@ -15,7 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "@lvce-editor/assert": "^1.2.0",
-    "@lvce-editor/verror": "^1.1.2",
+    "@lvce-editor/verror": "^1.2.0",
     "extract-zip": "^2.0.1",
     "got": "^14.2.1"
   }
