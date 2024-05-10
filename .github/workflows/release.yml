@@ -34,7 +34,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-22.04, macos-13, windows-2022]
+        os: [ubuntu-22.04, macos-14, windows-2022]
     timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
@@ -66,7 +66,7 @@ jobs:
         with:
           run: npm run e2e
       - name: Run headless test (check leaks)
-        if: matrix.os != 'macos-13'
+        if: matrix.os != 'macos-14'
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after
