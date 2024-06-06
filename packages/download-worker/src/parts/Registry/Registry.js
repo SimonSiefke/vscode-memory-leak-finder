@@ -1,4 +1,4 @@
-import Browsers from '../Browsers/Browsers.json' assert { type: 'json' }
+import Browsers from '../Browsers/Browsers.json' with { type: 'json' }
 
 export const load = () => {
   return Browsers.browsers
