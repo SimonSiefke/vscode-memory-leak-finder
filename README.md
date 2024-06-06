@@ -410,7 +410,7 @@ It seems there is memory leak when opening and closing a notebook. But just look
 | ColorPickerWidget    | https://github.com/microsoft/vscode/issues/199814 | Fixed  |
 | DiffEditor           | https://github.com/microsoft/vscode/issues/200381 | Fixed  |
 | QuickPick            | https://github.com/microsoft/vscode/issues/201320 | Fixed  |
-| Terminal             | https://github.com/xtermjs/xterm.js/issues/4935   | Review |
+| Terminal             | https://github.com/xtermjs/xterm.js/issues/4935   | Fixed  |
 | KeyBindingsEditor    | https://github.com/microsoft/vscode/issues/202455 | Review |
 | NotebookEditorWidget | https://github.com/microsoft/vscode/issues/204756 | Review |
 
