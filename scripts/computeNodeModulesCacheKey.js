@@ -7,6 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = join(__dirname, '..')
 
 const locations = [
+  '.nvmrc',
   'lerna.json',
   'package-lock.json',
   'packages/cli/package-lock.json',
