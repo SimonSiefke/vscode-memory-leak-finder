@@ -53,3 +53,7 @@ test('floss error', () => {
     ),
   ).toBe(false)
 })
+
+test('mesa error', () => {
+  expect(IsImportantError.isImportantErrorMessage(`MESA: error: ZINK: vkCreateInstance failed (VK_ERROR_INCOMPATIBLE_DRIVER)`)).toBe(false)
+})
