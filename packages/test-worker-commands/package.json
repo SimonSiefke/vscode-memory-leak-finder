@@ -15,16 +15,16 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@lvce-editor/verror": "^1.2.0",
-    "@vscode/test-electron": "^2.3.9",
+    "@lvce-editor/verror": "^1.3.0",
+    "@vscode/test-electron": "^2.4.0",
     "exit-hook": "^4.0.0",
-    "got": "^14.2.1",
+    "got": "^14.4.0",
     "source-map": "^0.7.4",
     "strip-ansi": "^7.1.0",
     "ws": "^8.17.0"
   },
   "devDependencies": {
-    "@babel/code-frame": "^7.24.2",
+    "@babel/code-frame": "^7.24.7",
     "@types/ws": "^8.5.10",
     "clean-stack": "^5.2.0"
   }
