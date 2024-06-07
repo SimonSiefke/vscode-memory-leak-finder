@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-14, windows-2022]
+        os: [ubuntu-24.04, macos-14, windows-2022]
     timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
@@ -65,7 +65,7 @@ jobs:
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after
       - name: Run headless test (check leaks, event listeners)
-        if: matrix.os == 'ubuntu-22.04'
+        if: matrix.os == 'ubuntu-24.04'
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure event-listeners
