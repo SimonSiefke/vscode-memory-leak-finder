@@ -57,3 +57,7 @@ test('floss error', () => {
 test('mesa error', () => {
   expect(IsImportantError.isImportantErrorMessage(`MESA: error: ZINK: vkCreateInstance failed (VK_ERROR_INCOMPATIBLE_DRIVER)`)).toBe(false)
 })
+
+test('glx error', () => {
+  expect(IsImportantError.isImportantErrorMessage(`glx: failed to create drisw screen`)).toBe(false)
+})
