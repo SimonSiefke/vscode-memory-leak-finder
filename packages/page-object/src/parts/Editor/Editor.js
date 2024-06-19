@@ -192,6 +192,14 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to go to definition`)
       }
     },
+    async findAllReferences() {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.FindAllReferences)
+      } catch (error) {
+        throw new VError(error, `Failed to find all references`)
+      }
+    },
     async newTextFile() {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
