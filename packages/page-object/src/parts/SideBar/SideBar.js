@@ -17,6 +17,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(sideBar).toBeHidden()
         await this.toggle()
         await expect(sideBar).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show side bar`)
       }
@@ -27,6 +28,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(sideBar).toBeVisible()
         await this.toggle()
         await expect(sideBar).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to hide side bar`)
       }

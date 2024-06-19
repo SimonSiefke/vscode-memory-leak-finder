@@ -192,6 +192,14 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to go to definition`)
       }
     },
+    async findAllReferences() {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.FindAllReferences)
+      } catch (error) {
+        throw new VError(error, `Failed to find all references`)
+      }
+    },
     async newTextFile() {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
@@ -310,10 +318,17 @@ export const create = ({ page, expect, VError }) => {
       })
       await expect(token).toHaveCss('color', color)
     },
+    async shouldHaveBreadCrumb(text) {
+      const breadCrumb = page.locator(`.monaco-breadcrumb-item`, {
+        hasText: text,
+      })
+      await expect(breadCrumb).toBeVisible()
+    },
     async save() {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.FileSave)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to save file`)
       }
