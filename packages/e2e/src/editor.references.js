@@ -13,8 +13,6 @@ export const setup = async ({ Editor, Workspace }) => {
   --font-size: 10px;
   --font-size: 10px;
 }`)
-  await Editor.type('abc')
-  await Editor.deleteCharactersLeft({ count: 3 })
   await Editor.shouldHaveToken('--font-size', 'rgb(156, 220, 254)')
   await Editor.save()
 }
