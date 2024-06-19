@@ -1,5 +1,3 @@
-export const skip = true
-
 export const setup = async ({ Editor, Workspace }) => {
   await Workspace.setFiles([
     {
@@ -8,6 +6,7 @@ export const setup = async ({ Editor, Workspace }) => {
     },
   ])
   await Editor.open('index.html')
+  await Editor.shouldHaveBreadCrumb('h1')
 }
 
 export const run = async ({ Suggest }) => {

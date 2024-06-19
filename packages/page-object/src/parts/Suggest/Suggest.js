@@ -9,6 +9,7 @@ export const create = ({ page, expect, VError }) => {
         await quickPick.executeCommand(WellKnownCommands.TriggerSuggest)
         const suggestWidget = page.locator('.suggest-widget')
         await expect(suggestWidget).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open suggest widget`)
       }
@@ -19,6 +20,7 @@ export const create = ({ page, expect, VError }) => {
         await expect(suggestWidget).toBeVisible()
         await page.keyboard.press('Escape')
         await expect(suggestWidget).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to close suggest widget`)
       }
