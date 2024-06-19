@@ -1,4 +1,4 @@
-export const setup = async ({ Editor, Workspace }) => {
+export const setup = async ({ Editor, Workspace, QuickPick }) => {
   await Workspace.setFiles([
     {
       name: 'index.css',
@@ -15,6 +15,7 @@ export const setup = async ({ Editor, Workspace }) => {
 }`)
   await Editor.shouldHaveToken('--font-size', 'rgb(156, 220, 254)')
   await Editor.save()
+  await Editor.shouldHaveBreadCrumb(':root')
 }
 
 export const run = async ({ Editor, References }) => {

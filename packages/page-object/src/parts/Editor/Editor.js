@@ -318,6 +318,12 @@ export const create = ({ page, expect, VError }) => {
       })
       await expect(token).toHaveCss('color', color)
     },
+    async shouldHaveBreadCrumb(text) {
+      const breadCrumb = page.locator(`.monaco-breadcrumb-item`, {
+        hasText: text,
+      })
+      await expect(breadCrumb).toBeVisible()
+    },
     async save() {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
