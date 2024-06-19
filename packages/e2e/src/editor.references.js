@@ -16,6 +16,7 @@ export const setup = async ({ Editor, Workspace }) => {
   await Editor.type('abc')
   await Editor.deleteCharactersLeft({ count: 3 })
   await Editor.shouldHaveToken('--font-size', 'rgb(156, 220, 254)')
+  await Editor.save()
 }
 
 export const run = async ({ Editor, References }) => {
