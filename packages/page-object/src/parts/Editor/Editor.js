@@ -322,6 +322,7 @@ export const create = ({ page, expect, VError }) => {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.FileSave)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to save file`)
       }
