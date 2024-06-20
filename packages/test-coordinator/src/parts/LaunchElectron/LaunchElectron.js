@@ -20,7 +20,6 @@ export const state = {
  * @param {string} data
  */
 const handleStdout = (data) => {
-  console.log({ data })
   // logStream.write(data)
 }
 
@@ -28,7 +27,6 @@ const handleStdout = (data) => {
  * @param {string} data
  */
 const handleStdErr = (data) => {
-  console.log({ data })
   // logStream.write(data)
 }
 
