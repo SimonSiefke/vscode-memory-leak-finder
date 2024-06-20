@@ -75,7 +75,6 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl, 
   electronRpc.on(DevtoolsEventType.DebuggerPaused, handleIntermediatePaused)
 
   await DevtoolsProtocolDebugger.resume(electronRpc)
-  await DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc)
 
   return {
     monkeyPatchedElectron,
