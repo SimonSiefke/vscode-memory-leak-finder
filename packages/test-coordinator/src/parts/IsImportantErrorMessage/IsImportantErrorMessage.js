@@ -2,6 +2,9 @@ const RE_LIB_GIO_PROXY_ERROR = /Failed to load module: .*libgiolibproxy.so/
 const RE_LIB_PROXY_NOT_FOUND = /not found \(required by .*libproxy.so/
 
 export const isImportantErrorMessage = (data) => {
+  if (data.includes('fs.Stats constructor is deprecated')) {
+    return false
+  }
   if (data.includes('glx: failed to create drisw screen')) {
     return false
   }

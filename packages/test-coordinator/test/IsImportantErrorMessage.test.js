@@ -61,3 +61,7 @@ test('mesa error', () => {
 test('glx error', () => {
   expect(IsImportantError.isImportantErrorMessage(`glx: failed to create drisw screen`)).toBe(false)
 })
+
+test('fs stats constructor deprecated', () => {
+  expect(IsImportantError.isImportantErrorMessage(`fs.Stats constructor is deprecated`)).toBe(false)
+})
