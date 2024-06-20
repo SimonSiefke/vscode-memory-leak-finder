@@ -54,7 +54,7 @@ export const setPauseOnExceptions = async (rpc, options) => {
 
 /**
  *
- * @param {{callFrameId:string, expression:string, generatePreview?:boolean}} params
+ * @param {{callFrameId:string, expression:string, generatePreview?:boolean, includeCommandLineAPI?:boolean}} params
  * @returns
  */
 export const evaluateOnCallFrame = async (rpc, params) => {

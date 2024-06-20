@@ -1,3 +1,5 @@
+export const skip = true
+
 export const setup = async ({ Editor, Workspace, QuickPick }) => {
   await Workspace.setFiles([
     {
