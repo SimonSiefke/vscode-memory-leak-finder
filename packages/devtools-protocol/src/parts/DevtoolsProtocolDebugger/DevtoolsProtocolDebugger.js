@@ -22,7 +22,6 @@ export const resume = async (rpc) => {
   if ('error' in rawResult) {
     throw new DevtoolsProtocolError(rawResult.error.message)
   }
-  console.log({ rawResult })
 }
 
 export const stepInto = async (rpc) => {
