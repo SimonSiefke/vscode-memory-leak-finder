@@ -21,6 +21,7 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl, 
   IntermediateConnectionState.set(connectionId, electronRpc)
 
   const handleIntermediatePaused = async (x) => {
+    console.log('PAUSE')
     // since electron 29, electron cause pause again during connecting
     if (IsPausedOnStartEvent.isPausedOnStartEvent(x)) {
       await DevtoolsProtocolDebugger.resume(electronRpc)
@@ -29,7 +30,7 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl, 
     console.log('intermediate paused due to' + JSON.stringify(x.params.reason, null, 2).slice(0, 100))
   }
 
-  electronRpc.on(DevtoolsEventType.DebuggerPaused, handleIntermediatePaused)
+  // electronRpc.on(DevtoolsEventType.DebuggerPaused, handleIntermediatePaused)
   electronRpc.on(DevtoolsEventType.DebuggerResumed, ScenarioFunctions.handleResumed)
   electronRpc.on(DevtoolsEventType.DebuggerScriptParsed, ScenarioFunctions.handleScriptParsed)
   electronRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, ScenarioFunctions.handleRuntimeExecutionContextCreated)
@@ -60,33 +61,24 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl, 
   await DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc)
 
   const electronObjectId = electron.result.result.objectId
-  // if (headlessMode) {
-  //   await DevtoolsProtocolDebugger.evaluateOnCallFrame(electronRpc, {
-  //     callFrameId,
-  //     expression: MonkeyPatchElectronHeadlessMode.monkeyPatchElectronScript,
-  //   })
-  // }
-  // const monkeyPatchedElectron = await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-  //   functionDeclaration: MonkeyPatchElectronScript.monkeyPatchElectronScript,
-  //   objectId: electronObjectId,
-  // })
+  if (headlessMode) {
+    await DevtoolsProtocolDebugger.evaluateOnCallFrame(electronRpc, {
+      callFrameId,
+      expression: MonkeyPatchElectronHeadlessMode.monkeyPatchElectronScript,
+    })
+  }
+  const monkeyPatchedElectron = await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+    functionDeclaration: MonkeyPatchElectronScript.monkeyPatchElectronScript,
+    objectId: electronObjectId,
+  })
+
+  electronRpc.on(DevtoolsEventType.DebuggerPaused, handleIntermediatePaused)
+
   await DevtoolsProtocolDebugger.resume(electronRpc)
   await DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc)
 
-  console.log('resume')
-
-  //   const s = await DevtoolsProtocolRuntime.evaluate(electronRpc, {
-  //     expression: `(async () => {
-  //   const {app} = require('electron'); process.exit = ()=>{console.log('exit prevented')}; app.emit = () => {console.log('emit')}; app.quit = ()=>{console.log('quit prevented')}; await app.whenReady();const {BrowserWindow}=require('electron');const win = new BrowserWindow({}); win.show()
-  // })()
-  //       `,
-  //     generatePreview: true,
-  //     includeCommandLineAPI: true,
-  //     awaitPromise: true,
-  //   })
-  // console.log({ s })
   return {
-    monkeyPatchedElectron: {},
+    monkeyPatchedElectron,
     electronObjectId,
     callFrameId,
   }
