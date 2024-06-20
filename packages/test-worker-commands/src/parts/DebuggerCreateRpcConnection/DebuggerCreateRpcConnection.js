@@ -64,6 +64,9 @@ export const createRpc = (ipc, canUseIdleCallback) => {
     on(event, listener) {
       listeners[event] = listener
     },
+    off(event, listener) {
+      delete listener[event]
+    },
     once(event) {
       return new Promise((resolve) => {
         onceListeners[event] = resolve
