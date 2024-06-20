@@ -16,8 +16,8 @@ RUN sudo apt-get update \
 
 
 RUN bash -c ". .nvm/nvm.sh \
-    && nvm install 22.2.0 \
-    && nvm use 22.2.0 \
-    && nvm alias default 22.2.0"
+    && nvm install 22.3.0 \
+    && nvm use 22.3.0 \
+    && nvm alias default 22.3.0"
 
 RUN echo "nvm use default &>/dev/null" >> ~/.bashrc.d/51-nvm-fix
