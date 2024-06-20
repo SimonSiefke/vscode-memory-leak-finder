@@ -47,6 +47,22 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to focus explorer`)
       }
     },
+    async newFile(name) {
+      try {
+        await page.waitForIdle()
+        const newFileButton = page.locator('.sidebar [aria-label="New File..."]')
+        await expect(newFileButton).toBeVisible()
+        await newFileButton.click()
+        const inputBox = await page.locator('.monaco-inputbox input')
+        await expect(inputBox).toBeVisible()
+        await expect(inputBox).toBeFocused()
+        await inputBox.type(name)
+        await page.keyboard.press('Enter')
+        await this.shouldHaveItem(name)
+      } catch (error) {
+        throw new VError(error, `Failed to create new file`)
+      }
+    },
     async focusNext() {
       try {
         const explorer = page.locator('.explorer-folders-view .monaco-list')
