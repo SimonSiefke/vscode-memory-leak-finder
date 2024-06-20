@@ -21,16 +21,14 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl, 
   IntermediateConnectionState.set(connectionId, electronRpc)
 
   const handleIntermediatePaused = async (x) => {
-    console.log('PAUSE')
+    electronRpc.off(DevtoolsEventType.DebuggerPaused, handleIntermediatePaused)
     // since electron 29, electron cause pause again during connecting
     if (IsPausedOnStartEvent.isPausedOnStartEvent(x)) {
       await DevtoolsProtocolDebugger.resume(electronRpc)
       return
     }
-    console.log('intermediate paused due to' + JSON.stringify(x.params.reason, null, 2).slice(0, 100))
   }
 
-  // electronRpc.on(DevtoolsEventType.DebuggerPaused, handleIntermediatePaused)
   electronRpc.on(DevtoolsEventType.DebuggerResumed, ScenarioFunctions.handleResumed)
   electronRpc.on(DevtoolsEventType.DebuggerScriptParsed, ScenarioFunctions.handleScriptParsed)
   electronRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, ScenarioFunctions.handleRuntimeExecutionContextCreated)
