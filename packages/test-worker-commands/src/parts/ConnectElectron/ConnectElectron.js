@@ -45,6 +45,7 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl, 
     callFrameId,
     expression: `require('electron')`,
     generatePreview: true,
+    includeCommandLineAPI: true,
   })
   const electronObjectId = electron.result.result.objectId
   if (headlessMode) {
