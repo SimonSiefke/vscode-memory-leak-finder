@@ -4,6 +4,7 @@ import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/Deb
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
 import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as IntermediateConnectionState from '../IntermediateConnectionState/IntermediateConnectionState.js'
+import * as IsPausedOnStartEvent from '../IsPausedOnStartEvent/IsPausedOnStartEvent.js'
 import * as MonkeyPatchElectronHeadlessMode from '../MonkeyPatchElectronHeadlessMode/MonkeyPatchElectronHeadlessMode.js'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.js'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
@@ -19,7 +20,15 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl, 
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc, canUseIdleCallback)
   IntermediateConnectionState.set(connectionId, electronRpc)
 
-  electronRpc.on(DevtoolsEventType.DebuggerPaused, ScenarioFunctions.handlePaused)
+  const handleIntermediatePaused = async (x) => {
+    electronRpc.off(DevtoolsEventType.DebuggerPaused, handleIntermediatePaused)
+    // since electron 29, electron cause pause again during connecting
+    if (IsPausedOnStartEvent.isPausedOnStartEvent(x)) {
+      await DevtoolsProtocolDebugger.resume(electronRpc)
+      return
+    }
+  }
+
   electronRpc.on(DevtoolsEventType.DebuggerResumed, ScenarioFunctions.handleResumed)
   electronRpc.on(DevtoolsEventType.DebuggerScriptParsed, ScenarioFunctions.handleScriptParsed)
   electronRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, ScenarioFunctions.handleRuntimeExecutionContextCreated)
@@ -47,6 +56,8 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl, 
     generatePreview: true,
     includeCommandLineAPI: true,
   })
+  await DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc)
+
   const electronObjectId = electron.result.result.objectId
   if (headlessMode) {
     await DevtoolsProtocolDebugger.evaluateOnCallFrame(electronRpc, {
@@ -58,7 +69,11 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl, 
     functionDeclaration: MonkeyPatchElectronScript.monkeyPatchElectronScript,
     objectId: electronObjectId,
   })
+
+  electronRpc.on(DevtoolsEventType.DebuggerPaused, handleIntermediatePaused)
+
   await DevtoolsProtocolDebugger.resume(electronRpc)
+
   return {
     monkeyPatchedElectron,
     electronObjectId,
