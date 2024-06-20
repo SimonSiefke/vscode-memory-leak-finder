@@ -4,11 +4,11 @@ import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/Deb
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
 import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as IntermediateConnectionState from '../IntermediateConnectionState/IntermediateConnectionState.js'
+import * as IsPausedOnStartEvent from '../IsPausedOnStartEvent/IsPausedOnStartEvent.js'
 import * as MonkeyPatchElectronHeadlessMode from '../MonkeyPatchElectronHeadlessMode/MonkeyPatchElectronHeadlessMode.js'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.js'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
 import * as WaitForDebuggerToBePaused from '../WaitForDebuggerToBePaused/WaitForDebuggerToBePaused.js'
-import * as IsPausedOnStartEvent from '../IsPausedOnStartEvent/IsPausedOnStartEvent.js'
 
 export const connectElectron = async (connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback) => {
   Assert.number(connectionId)
