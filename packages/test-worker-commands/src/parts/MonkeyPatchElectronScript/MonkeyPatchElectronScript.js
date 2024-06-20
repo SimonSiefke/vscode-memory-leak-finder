@@ -33,9 +33,9 @@ export const monkeyPatchElectronScript = `function () {
     return isReady
   }
 
-  app.emit = patchedAppEmit
-  app.whenReady = patchedWhenReady
-  app.isReady = patchedIsReady
+  // app.emit = patchedAppEmit
+  // app.whenReady = patchedWhenReady
+  // app.isReady = patchedIsReady
 
   return async () => {
     const event = await originalWhenReady

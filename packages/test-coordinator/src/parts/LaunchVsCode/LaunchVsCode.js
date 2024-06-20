@@ -45,6 +45,7 @@ export const launchVsCode = async ({ headlessMode, cwd }) => {
       cwd,
       env,
     })
+    console.log({ webSocketUrl })
     return {
       child,
       webSocketUrl,

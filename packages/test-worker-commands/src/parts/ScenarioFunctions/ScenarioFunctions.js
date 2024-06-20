@@ -16,7 +16,9 @@ export const Locator = (selector) => {
   }
 }
 
-export const handlePaused = () => {}
+export const handlePaused = () => {
+  console.log('DEBUGGER PAUSED')
+}
 export const handleResumed = () => {}
 
 export const handleScriptParsed = (x) => {

@@ -25,7 +25,9 @@ export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connecti
     isFirstConnection,
     canUseIdleCallback,
   )
+  console.log('before wait')
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
+  console.log('after wait')
   if (recordVideo) {
     await VideoRecording.start(devtoolsWebSocketUrl)
   }
