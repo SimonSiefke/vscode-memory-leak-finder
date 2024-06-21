@@ -73,5 +73,19 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to open select`)
       }
     },
+    async toggleCheckBox({ name }) {
+      try {
+        await page.waitForIdle()
+        const checkbox = page.locator(`.monaco-custom-toggle[aria-label="${name}"]`)
+        await expect(checkbox).toBeVisible()
+        const checkedValue = checkbox.getAttribute('aria-checked')
+        const nextValue = checkedValue === 'true' ? 'false' : 'true'
+        await checkbox.click()
+        await page.waitForIdle()
+        await expect(checkbox).toHaveAttribute('aria-checked', nextValue)
+      } catch (error) {
+        throw new VError(error, `Failed to toggle checkbox "${name}"`)
+      }
+    },
   }
 }
