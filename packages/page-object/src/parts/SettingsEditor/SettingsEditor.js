@@ -62,6 +62,7 @@ export const create = ({ expect, page, VError }) => {
         const select = page.locator(`.monaco-select-box[aria-label="${name}"]`)
         await expect(select).toBeVisible()
         await select.click()
+        await page.waitForIdle()
         const dropdown = page.locator('.monaco-select-box-dropdown-container')
         await expect(dropdown).toBeVisible()
         const option = dropdown.locator('[role="option"]', {
