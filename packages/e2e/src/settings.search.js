@@ -5,8 +5,8 @@ export const setup = async ({ Editor, SettingsEditor }) => {
 
 export const run = async ({ SettingsEditor }) => {
   await SettingsEditor.search({
-    value: 'abc',
-    resultCount: 1,
+    value: 'Editor: Auto Closing Comments',
+    resultCount: 2,
   })
   await SettingsEditor.clear()
 }
