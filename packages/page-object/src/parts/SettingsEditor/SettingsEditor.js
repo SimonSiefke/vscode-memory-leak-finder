@@ -35,7 +35,8 @@ export const create = ({ expect, page, VError }) => {
         await searchInput.type(value)
         await page.waitForIdle()
         const searchCount = page.locator('.settings-count-widget')
-        await expect(searchCount).toHaveText(`${resultCount} Setting Found`)
+        const word = resultCount === 1 ? 'Setting' : 'Settings'
+        await expect(searchCount).toHaveText(`${resultCount} ${word} Found`)
       } catch (error) {
         throw new VError(error, `Failed to search for ${value}`)
       }
@@ -53,6 +54,22 @@ export const create = ({ expect, page, VError }) => {
         await expect(searchCount).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to clear search input`)
+      }
+    },
+    async select({ name, value }) {
+      try {
+        await page.waitForIdle()
+        const select = page.locator(`.monaco-select-box[aria-label="${name}"]`)
+        await expect(select).toBeVisible()
+        await select.click()
+        const dropdown = page.locator('.monaco-select-box-dropdown-container')
+        await expect(dropdown).toBeVisible()
+        const option = dropdown.locator('[role="option"]', {
+          hasText: value,
+        })
+        await option.click()
+      } catch (error) {
+        throw new VError(error, `Failed to open select`)
       }
     },
   }
