@@ -70,8 +70,7 @@ jobs:
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure event-listeners
       - name: Generate charts
-        with:
-          run: node packages/charts/src/main.js
+        run: node packages/charts/src/main.js
       - uses: actions/upload-artifact@v4
         if: always()
         with:

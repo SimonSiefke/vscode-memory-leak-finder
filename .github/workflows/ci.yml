@@ -99,8 +99,7 @@ jobs:
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure instance-counts-with-source-map
       - name: Generate charts
-        with:
-          run: node packages/charts/src/main.js
+        run: node packages/charts/src/main.js
       - uses: actions/upload-artifact@v4
         with:
           name: vscode-memory-leak-finder-results-${{ runner.os }}
