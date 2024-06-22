@@ -1,4 +1,4 @@
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, VError, electronApp }) => {
   return {
     async shouldHaveHeading(id) {
       try {
@@ -18,6 +18,10 @@ export const create = ({ expect, page, VError }) => {
         const webView = page.locator('.webview')
         await expect(webView).toBeVisible()
         await expect(webView).toHaveClass('ready')
+        const childView = await electronApp.waitForTarget({
+          type: 'iframe',
+          url: /extensionId=vscode.markdown-language-features/,
+        })
       } catch (error) {
         throw new VError(error, `Failed to check that markdown preview is visible`)
       }
