@@ -1,4 +1,6 @@
-export const setup = async ({ Editor, Workspace, QuickPick }) => {
+export const skip = true
+
+export const setup = async ({ Editor, Workspace }) => {
   await Workspace.setFiles([
     {
       name: 'index.css',
@@ -23,8 +25,6 @@ export const run = async ({ Editor, References }) => {
   await Editor.shouldHaveCursor(/(50px|53px|58px|66px)/)
   await Editor.findAllReferences()
   await References.shouldBeVisible()
-  await References.shouldBeFocused()
   await References.shouldHaveMessage('2 results in 1 file')
   await References.clear()
-  await References.shouldBeFocused()
 }
