@@ -18,8 +18,7 @@ export const create = ({ expect, page, VError, electronApp }) => {
         const webView = page.locator('.webview')
         await expect(webView).toBeVisible()
         await expect(webView).toHaveClass('ready')
-        const childView = await electronApp.waitForTarget({
-          type: 'iframe',
+        const childView = await electronApp.waitForIframe({
           url: /extensionId=vscode.markdown-language-features/,
         })
       } catch (error) {

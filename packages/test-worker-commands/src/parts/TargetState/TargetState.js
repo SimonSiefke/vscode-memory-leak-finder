@@ -21,10 +21,7 @@ export const reset = () => {
   state.callbacks = []
 }
 
-export const addTarget = (targetId, target) => {
-  Assert.string(targetId)
-  Assert.object(target)
-  state.targets[targetId] = target
+const runCallbacks = () => {
   for (const callback of state.callbacks) {
     let currentIndex = 0
     for (const target of Object.values(state.targets)) {
@@ -37,25 +34,19 @@ export const addTarget = (targetId, target) => {
   }
 }
 
+export const addTarget = (targetId, target) => {
+  Assert.string(targetId)
+  Assert.object(target)
+  state.targets[targetId] = target
+  runCallbacks()
+}
+
 export const changeTarget = (targetId, target) => {
   Assert.string(targetId)
   Assert.object(target)
   const existing = state.targets[targetId]
   state.targets[targetId] = { ...existing, ...target }
-  for (const callback of state.callbacks) {
-    let currentIndex = 0
-    for (const target of Object.values(state.targets)) {
-      if (target.type === callback.type) {
-        if (currentIndex === callback.index) {
-          if (target.url === '') {
-            return
-          }
-          callback.resolve(target) // TODO remove callback
-        }
-        currentIndex++
-      }
-    }
-  }
+  runCallbacks()
 }
 
 export const removeTarget = (targetId) => {
