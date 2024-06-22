@@ -1,19 +1,14 @@
 import { mkdir, writeFile } from 'fs/promises'
 import { dirname, join } from 'path'
-import * as CreateFunctionCountChart from '../CreateFunctionCountChart/CreateFunctionCountChart.js'
-import * as CreateObjectCountChart from '../CreateObjectCountChart/CreateObjectCountChart.js'
+import * as Charts from '../Charts/Charts.js'
 import * as Root from '../Root/Root.js'
 
-const visitors = [
-  {
-    name: 'function-count',
-    fn: CreateFunctionCountChart.createFunctionCountChart,
-  },
-  {
-    name: 'object-count',
-    fn: CreateObjectCountChart.createFunctionCountChart,
-  },
-]
+const visitors = Object.values(Charts).map((value) => {
+  return {
+    name: value.name,
+    fn: value.createChart,
+  }
+})
 
 export const generateCharts = async () => {
   for (const visitor of visitors) {
