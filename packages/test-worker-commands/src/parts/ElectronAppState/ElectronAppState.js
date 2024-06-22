@@ -1,15 +1,13 @@
-export const state = {
-  electronApps: Object.create(null),
-}
+const electronApps = Object.create(null)
 
 export const get = (connectionId) => {
-  return state.electronApps[connectionId]
+  return electronApps[connectionId]
 }
 
 export const remove = (connectionId) => {
-  delete state.electronApps[connectionId]
+  delete electronApps[connectionId]
 }
 
 export const set = (connectionId, value) => {
-  state.electronApps[connectionId] = value
+  electronApps[connectionId] = value
 }
