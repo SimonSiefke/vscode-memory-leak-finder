@@ -3,21 +3,24 @@ import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateI
 
 export const clear = async (locator) => {
   Assert.object(locator)
-  await EvaluateInUtilityContext.evaluateInUtilityContext({
-    functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
-    arguments: [
-      {
-        value: locator,
-      },
-      {
-        value: 'clear',
-      },
-      {
-        value: {
-          bubbles: true,
+  await EvaluateInUtilityContext.evaluateInUtilityContext(
+    {
+      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
+      arguments: [
+        {
+          value: locator,
         },
-      },
-    ],
-    awaitPromise: true,
-  })
+        {
+          value: 'clear',
+        },
+        {
+          value: {
+            bubbles: true,
+          },
+        },
+      ],
+      awaitPromise: true,
+    },
+    locator.sessionId,
+  )
 }

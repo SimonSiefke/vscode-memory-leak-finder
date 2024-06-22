@@ -3,22 +3,25 @@ import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateI
 
 export const scrollUp = async (locator, options) => {
   Assert.object(locator)
-  await EvaluateInUtilityContext.evaluateInUtilityContext({
-    functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
-    arguments: [
-      {
-        value: locator,
-      },
-      {
-        value: 'scrollUp',
-      },
-      {
-        value: {
-          bubbles: true,
-          ...options,
+  await EvaluateInUtilityContext.evaluateInUtilityContext(
+    {
+      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
+      arguments: [
+        {
+          value: locator,
         },
-      },
-    ],
-    awaitPromise: true,
-  })
+        {
+          value: 'scrollUp',
+        },
+        {
+          value: {
+            bubbles: true,
+            ...options,
+          },
+        },
+      ],
+      awaitPromise: true,
+    },
+    locator.sessionId,
+  )
 }

@@ -70,3 +70,7 @@ export const getPageSession = () => {
   }
   return undefined
 }
+
+export const getPageSessionById = (id) => {
+  return state.sessionMap[id]
+}

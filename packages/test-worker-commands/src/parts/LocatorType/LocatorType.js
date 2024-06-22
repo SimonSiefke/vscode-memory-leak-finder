@@ -4,35 +4,41 @@ import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateI
 export const type = async (locator, text) => {
   Assert.object(locator)
   Assert.string(text)
-  await EvaluateInUtilityContext.evaluateInUtilityContext({
-    functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
-    arguments: [
-      {
-        value: locator,
-      },
-      {
-        value: 'type',
-      },
-      {
-        value: {
-          text,
+  await EvaluateInUtilityContext.evaluateInUtilityContext(
+    {
+      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
+      arguments: [
+        {
+          value: locator,
         },
-      },
-    ],
-    awaitPromise: true,
-  })
+        {
+          value: 'type',
+        },
+        {
+          value: {
+            text,
+          },
+        },
+      ],
+      awaitPromise: true,
+    },
+    locator.sessionId,
+  )
 }
 
 export const typeAndWaitFor = async (locator, text, waitFor, options) => {
   Assert.object(locator)
   Assert.string(text)
-  await EvaluateInUtilityContext.evaluateInUtilityContext({
-    functionDeclaration: '(options) => test.typeAndWaitFor(options)',
-    arguments: [
-      {
-        value: { locator, text, waitFor, ...options },
-      },
-    ],
-    awaitPromise: true,
-  })
+  await EvaluateInUtilityContext.evaluateInUtilityContext(
+    {
+      functionDeclaration: '(options) => test.typeAndWaitFor(options)',
+      arguments: [
+        {
+          value: { locator, text, waitFor, ...options },
+        },
+      ],
+      awaitPromise: true,
+    },
+    locator.sessionId,
+  )
 }
