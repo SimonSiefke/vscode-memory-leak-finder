@@ -23,5 +23,6 @@ export const create = ({ electronRpc, electronObjectId, callFrameId }) => {
         expression,
       })
     },
+    waitForTarget({ type, url }) {},
   }
 }
