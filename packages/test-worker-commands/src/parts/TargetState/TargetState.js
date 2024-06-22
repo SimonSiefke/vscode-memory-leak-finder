@@ -72,15 +72,10 @@ export const waitForTarget = async ({ type, index = -1, url = new RegExp('') }) 
   try {
     let currentIndex = 0
     for (const target of Object.values(state.targets)) {
-      if (target.type === type) {
-        if (currentIndex === index) {
-          if (target.url === '') {
-            break
-          }
-          return target
-        }
-        currentIndex++
+      if (MatchesCallback.matchesCallback(target, { url, type, index }, currentIndex)) {
+        return target
       }
+      currentIndex++
     }
     return await PTimeout.pTimeout(
       new Promise((resolve, reject) => {
