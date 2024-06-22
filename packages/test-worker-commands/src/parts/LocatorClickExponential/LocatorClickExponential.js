@@ -3,16 +3,19 @@ import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateI
 
 export const clickExponential = async (locator, options) => {
   Assert.object(locator)
-  await EvaluateInUtilityContext.evaluateInUtilityContext({
-    functionDeclaration: '(options) => test.clickExponential(options)',
-    arguments: [
-      {
-        value: {
-          locator,
-          ...options,
+  await EvaluateInUtilityContext.evaluateInUtilityContext(
+    {
+      functionDeclaration: '(options) => test.clickExponential(options)',
+      arguments: [
+        {
+          value: {
+            locator,
+            ...options,
+          },
         },
-      },
-    ],
-    awaitPromise: true,
-  })
+      ],
+      awaitPromise: true,
+    },
+    locator.sessionId,
+  )
 }
