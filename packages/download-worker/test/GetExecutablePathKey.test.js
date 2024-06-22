@@ -1,5 +1,4 @@
 import { expect, test } from '@jest/globals'
-import * as Root from '../src/parts/Root/Root.js'
 import * as GetExecutablePathKey from '../src/parts/GetExecutablePathKey/GetExecutablePathKey.js'
 
 test('linux', () => {
