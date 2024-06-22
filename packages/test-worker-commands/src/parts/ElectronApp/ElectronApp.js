@@ -1,5 +1,6 @@
 import * as ObjectType from '../ObjectType/ObjectType.js'
 import * as WaitForPage from '../WaitForPage/WaitForPage.js'
+import * as WaitForIframe from '../WaitForIframe/WaitForIframe.js'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 
 export const create = ({ electronRpc, electronObjectId, callFrameId }) => {
@@ -23,6 +24,12 @@ export const create = ({ electronRpc, electronObjectId, callFrameId }) => {
         expression,
       })
     },
-    waitForTarget({ type, url }) {},
+    waitForIframe({ url }) {
+      return WaitForIframe.waitForIframe({
+        electronObjectId,
+        electronRpc,
+        url,
+      })
+    },
   }
 }
