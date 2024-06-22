@@ -1,6 +1,6 @@
 // based on microsoft/playwright/packages/playwright-core/src/utils/hostPlatform.ts (License Apache 2.0)
 
-import os from 'node:os'
+import * as os from 'node:os'
 
 export const getHostPlatform = () => {
   const ver = os
