@@ -5,6 +5,12 @@ on:
     branches:
       - main
 
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   ci:
     runs-on: ${{ matrix.os }}
@@ -92,6 +98,8 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure instance-counts-with-source-map
+      - name: Generate charts
+        run: node packages/charts/src/main.js
       - uses: actions/upload-artifact@v4
         with:
           name: vscode-memory-leak-finder-results-${{ runner.os }}
@@ -101,3 +109,19 @@ jobs:
         with:
           name: vscode-videos-${{ runner.os }}
           path: .vscode-videos
+      - name: Upload artifact
+        if: matrix.os == 'ubuntu-22.04'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./.vscode-charts
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-22.04
+    needs: ci
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
