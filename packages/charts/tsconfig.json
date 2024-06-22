@@ -16,6 +16,7 @@
     "strict": true,
     "useUnknownInCatchVariables": false,
     "strictNullChecks": false,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["src", "test"],
+  "include": ["src", "test"]
 }

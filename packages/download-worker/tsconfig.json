@@ -15,7 +15,8 @@
     "assumeChangesOnlyAffectDirectDependencies": true,
     "strict": true,
     "useUnknownInCatchVariables": false,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["src", "test"]
 }
