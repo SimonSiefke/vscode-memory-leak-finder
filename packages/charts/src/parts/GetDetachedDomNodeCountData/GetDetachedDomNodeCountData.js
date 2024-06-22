@@ -4,7 +4,7 @@ import { readFile, readdir } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 
 export const getDetachedDomNodeCountData = async () => {
-  const resultsPath = join(Root.root, '.vscode-memory-leak-finder-results', 'detached-dom-node-count-count')
+  const resultsPath = join(Root.root, '.vscode-memory-leak-finder-results', 'detached-dom-node-count')
   if (!existsSync(resultsPath)) {
     return []
   }
