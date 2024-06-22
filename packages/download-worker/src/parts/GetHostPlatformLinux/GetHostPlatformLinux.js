@@ -1,10 +1,11 @@
 // based on microsoft/playwright/packages/playwright-core/src/utils/hostPlatform.ts (License Apache 2.0)
 
-import os from 'node:os'
 import * as GetLinuxDistributionInfo from '../GetLinuxDistributionInfo/GetLinuxDistibutionInfo.js'
+import * as os from 'node:os'
 
 export const getHostPlatform = async () => {
-  const archSuffix = os.arch() === 'arm64' ? '-arm64' : ''
+  const osArch = os.arch()
+  const archSuffix = osArch === 'arm64' ? '-arm64' : ''
   const distroInfo = await GetLinuxDistributionInfo.getLinuxDistributionInfo()
 
   // Pop!_OS is ubuntu-based and has the same versions.
