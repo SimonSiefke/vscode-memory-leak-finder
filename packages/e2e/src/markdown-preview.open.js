@@ -11,12 +11,12 @@ export const setup = async ({ Workspace, Explorer, Editor }) => {
   await Explorer.focus()
   await Explorer.refresh()
   await Explorer.shouldHaveItem('index.md')
+  await Editor.open('index.md')
 }
 
-export const run = async ({ Editor, QuickPick, WellKnownCommands, WebView }) => {
-  await Editor.open('index.md')
+export const run = async ({ Editor, QuickPick, WellKnownCommands, MarkdownPreview }) => {
   await QuickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
-  await WebView.shouldBeVisible()
-  await WebView.focus()
-  await Editor.closeAll()
+  await MarkdownPreview.shouldBeVisible()
+  await MarkdownPreview.shouldHaveHeading('hello-world')
+  // await Editor.close('Preview index.md')
 }
