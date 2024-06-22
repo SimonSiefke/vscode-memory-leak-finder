@@ -3,14 +3,17 @@ import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateI
 
 export const getTextContent = async (locator) => {
   Assert.object(locator)
-  const text = await EvaluateInUtilityContext.evaluateInUtilityContext({
-    functionDeclaration: '(locator) => test.getTextContent(locator)',
-    arguments: [
-      {
-        value: locator,
-      },
-    ],
-    awaitPromise: true,
-  })
+  const text = await EvaluateInUtilityContext.evaluateInUtilityContext(
+    {
+      functionDeclaration: '(locator) => test.getTextContent(locator)',
+      arguments: [
+        {
+          value: locator,
+        },
+      ],
+      awaitPromise: true,
+    },
+    locator.sessionId,
+  )
   return text
 }
