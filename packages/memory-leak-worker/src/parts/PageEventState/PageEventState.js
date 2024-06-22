@@ -1,6 +1,7 @@
-import { VError } from '../VError/VError.js'
 import * as PTimeout from '../PTimeout/PTimeout.js'
+import * as Promises from '../Promises/Promises.js'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
+import { VError } from '../VError/VError.js'
 
 export const state = {
   /**
@@ -32,12 +33,9 @@ export const waitForEvent = async ({ frameId, name }) => {
         return
       }
     }
-    return await PTimeout.pTimeout(
-      new Promise((resolve, reject) => {
-        state.callbacks.push({ frameId, name, resolve, reject })
-      }),
-      { milliseconds: TimeoutConstants.PageEvent },
-    )
+    const { resolve, reject, promise } = Promises.withResolvers()
+    state.callbacks.push({ frameId, name, resolve, reject })
+    return await PTimeout.pTimeout(promise, { milliseconds: TimeoutConstants.PageEvent })
   } catch (error) {
     throw new VError(`Failed to wait for page ${name} event: ${error}`)
   }

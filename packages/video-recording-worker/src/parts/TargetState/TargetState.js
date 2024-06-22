@@ -1,7 +1,8 @@
-import { VError } from '../VError/VError.js'
 import * as Assert from '../Assert/Assert.js'
 import * as PTimeout from '../PTimeout/PTimeout.js'
+import * as Promises from '../Promises/Promises.js'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
+import { VError } from '../VError/VError.js'
 
 export const state = {
   targets: Object.create(null),
@@ -67,17 +68,14 @@ export const waitForTarget = async ({ type, index }) => {
         currentIndex++
       }
     }
-    return await PTimeout.pTimeout(
-      new Promise((resolve, reject) => {
-        state.callbacks.push({
-          type,
-          index,
-          resolve,
-          reject,
-        })
-      }),
-      { milliseconds: TimeoutConstants.Target },
-    )
+    const { resolve, reject, promise } = Promises.withResolvers()
+    state.callbacks.push({
+      type,
+      index,
+      resolve,
+      reject,
+    })
+    return await PTimeout.pTimeout(promise, { milliseconds: TimeoutConstants.Target })
   } catch (error) {
     throw new VError(`Target was not created ${type}`)
   }
@@ -88,13 +86,10 @@ export const waitForTargetToBeClosed = async (targetId) => {
   if (!(targetId in state.targets)) {
     return
   }
-  return await PTimeout.pTimeout(
-    new Promise((resolve, reject) => {
-      state.destroyedCallbacks.push({
-        targetId,
-        resolve,
-      })
-    }),
-    { milliseconds: TimeoutConstants.Target },
-  )
+  const { resolve, promise } = Promises.withResolvers()
+  state.destroyedCallbacks.push({
+    targetId,
+    resolve,
+  })
+  return await PTimeout.pTimeout(promise, { milliseconds: TimeoutConstants.Target })
 }
