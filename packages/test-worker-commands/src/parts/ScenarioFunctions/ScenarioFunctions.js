@@ -177,8 +177,10 @@ const handleAttachedToPage = async (message) => {
       rpc: sessionRpc,
     })
 
+    const actualType = type === 'iframe' ? 'iframe' : DevtoolsTargetType.Page
+
     TargetState.addTarget(targetId, {
-      type: DevtoolsTargetType.Page,
+      type: actualType,
       url,
       browserContextId,
       sessionId,
