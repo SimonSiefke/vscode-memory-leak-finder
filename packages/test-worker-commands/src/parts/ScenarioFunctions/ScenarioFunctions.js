@@ -150,6 +150,7 @@ export const handleTargetInfoChanged = (message) => {
   const type = message.params.targetInfo.type
   switch (type) {
     case DevtoolsTargetType.Page:
+    case DevtoolsTargetType.Iframe:
       return handleTargetInfoChangePage(message, type)
     default:
       return
