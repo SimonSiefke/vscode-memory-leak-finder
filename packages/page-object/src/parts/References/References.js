@@ -20,6 +20,17 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Expected references to have message ${message}`)
       }
     },
+    async shouldBeFocused() {
+      try {
+        await page.waitForIdle()
+        const results = page.locator('[aria-label="Reference Search Results"]')
+        await expect(results).toBeVisible()
+        await expect(results).toBeFocused()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Expected references to be focused`)
+      }
+    },
     async clear() {
       try {
         await page.waitForIdle()
