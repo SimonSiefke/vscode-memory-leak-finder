@@ -22,6 +22,15 @@
     "got": "^14.4.1"
   },
   "jest": {
-    "injectGlobals": false
+    "injectGlobals": false,
+    "collectCoverage": true,
+    "coverageThreshold": {
+      "global": {
+        "branches": 10,
+        "functions": 71,
+        "lines": 58,
+        "statements": 54
+      }
+    }
   }
 }
