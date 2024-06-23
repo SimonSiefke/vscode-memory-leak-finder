@@ -206,8 +206,6 @@ const handleAttachedToPage = async (message) => {
       ]),
       { milliseconds: TimeoutConstants.AttachToPage },
     )
-    const targets = await DevtoolsProtocolTarget.getTargets(sessionRpc)
-    // console.log({ targets, sessionRpc })
   } catch (error) {
     if (error && error.name === 'TestFinishedError') {
       return
@@ -228,7 +226,6 @@ const handleAttachedToServiceWorker = async (message) => {
 
 export const handleAttachedToTarget = (message) => {
   const type = message.params.targetInfo.type
-  // console.log('attached', type)
   switch (type) {
     case DevtoolsTargetType.Page:
       return handleAttachedToPage(message)
