@@ -114,5 +114,24 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to disable checkbox "${name}"`)
       }
     },
+    async openSettingsContextMenu(name) {
+      try {
+        await page.waitForIdle()
+        const item = page.locator(`.setting-item-category`, {
+          hasText: `${name}: `,
+        })
+        await expect(item).toBeVisible()
+        await item.click()
+        await page.waitForIdle()
+        const outerItem = page.locator(`.settings-editor-tree .monaco-list-row[aria-label^="${name}"]`)
+        await expect(outerItem).toHaveCount(1)
+        await expect(outerItem).toHaveAttribute('aria-selected', 'true')
+        const moreActions = outerItem.locator('[aria-label^="More Actions"]')
+        await expect(moreActions).toBeVisible()
+        await moreActions.click()
+      } catch (error) {
+        throw new VError(error, `Failed to open settings context menu for "${name}"`)
+      }
+    },
   }
 }
