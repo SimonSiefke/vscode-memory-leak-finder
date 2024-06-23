@@ -30,5 +30,5 @@ test('select inside iframe', () => {
     },
   }
   const roots = [element]
-  expect(QuerySelectorAllInternalEnterFrame.querySelectorAll(roots)).toEqual([h1])
+  expect(QuerySelectorAllInternalEnterFrame.querySelectorAll(roots)).toEqual([element.contentDocument])
 })
