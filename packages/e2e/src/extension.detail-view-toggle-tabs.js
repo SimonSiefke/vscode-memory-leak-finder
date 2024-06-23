@@ -1,5 +1,3 @@
-export const skip = true
-
 export const setup = async ({ Extensions, Editor, ExtensionDetailView }) => {
   await Editor.closeAll()
   await Extensions.show()
