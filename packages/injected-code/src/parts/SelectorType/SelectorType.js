@@ -5,3 +5,4 @@ export const Nth = 4
 export const None = 5
 export const Iframe = 6
 export const InternalEnterFrame = 7
+export const EnterShadow = 8
