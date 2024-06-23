@@ -39,6 +39,18 @@ export const create = ({ expect, page, VError }) => {
         waitForHidden: contextMenu,
       })
     },
+    async shouldHaveItem(option) {
+      await page.waitForIdle()
+      const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
+      const contextMenuCount = await contextMenu.count()
+      await expect(contextMenu).toBeVisible()
+      await expect(contextMenu).toBeFocused()
+      const contextMenuItem = contextMenu.locator('.action-item', {
+        hasText: option,
+      })
+      await page.waitForIdle()
+      await expect(contextMenuItem).toBeVisible()
+    },
     async close() {
       try {
         const contextMenu = page.locator('.context-view.monaco-menu-container')

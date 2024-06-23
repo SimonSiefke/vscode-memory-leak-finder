@@ -126,9 +126,11 @@ export const create = ({ expect, page, VError }) => {
         const outerItem = page.locator(`.settings-editor-tree .monaco-list-row[aria-label^="${name}"]`)
         await expect(outerItem).toHaveCount(1)
         await expect(outerItem).toHaveAttribute('aria-selected', 'true')
+        await page.waitForIdle()
         const moreActions = outerItem.locator('[aria-label^="More Actions"]')
         await expect(moreActions).toBeVisible()
         await moreActions.click()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open settings context menu for "${name}"`)
       }
