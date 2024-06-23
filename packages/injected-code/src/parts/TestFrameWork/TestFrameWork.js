@@ -112,11 +112,6 @@ export const checkSingleElementCondition = async (locator, fnName, options) => {
   const timeout = options.timeout || maxTimeout
   const endTime = startTime + timeout
   let currentTime = startTime
-  // console.log({ fnName })
-  if (fnName === 'toBeVisible') {
-    // console.log({ href: location.href })
-    console.log({ html: document.body.textContent })
-  }
   const fn = SingleElementConditionMap.getFunction(fnName)
   while (currentTime < endTime) {
     const element = QuerySelector.querySelector(locator.selector)
@@ -125,6 +120,7 @@ export const checkSingleElementCondition = async (locator, fnName, options) => {
       if (successful) {
         return
       }
+      console.log({ successful, element })
     }
     await Timeout.waitForMutation(document.body, 100)
     currentTime = Time.getTimeStamp()
