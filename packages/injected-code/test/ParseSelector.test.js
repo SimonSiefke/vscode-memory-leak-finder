@@ -84,6 +84,7 @@ test('parseSelector - enter iframe', () => {
     },
   ])
 })
+
 test('parseSelector - enter shadow', () => {
   const selector = 'div:enter-shadow()'
   expect(ParseSelector.parseSelector(selector)).toEqual([
