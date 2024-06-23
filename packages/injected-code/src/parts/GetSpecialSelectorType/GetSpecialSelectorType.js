@@ -7,6 +7,8 @@ export const getSpecialSelectorType = (specialSelector) => {
       return SelectorType.Text
     case SpecialSelectorPrefix.Nth:
       return SelectorType.Nth
+    case SpecialSelectorPrefix.InternalEnterFrame:
+      return SelectorType.InternalEnterFrame
     default:
       return SelectorType.None
   }

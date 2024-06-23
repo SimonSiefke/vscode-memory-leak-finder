@@ -72,7 +72,7 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
       })
     },
     frameLocator(selector, options = {}) {
-      return Locator.create(this.rpc, this.sessionId, selector, options)
+      return Locator.create(this.rpc, this.sessionId, `:internal-enter-frame() ${selector}`, options)
     },
     getIframe() {
       const originalLocator = this.locator.bind(this)
