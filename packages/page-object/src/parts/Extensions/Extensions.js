@@ -5,6 +5,9 @@ import * as IsMacos from '../IsMacos/IsMacos.js'
 
 const selectAll = IsMacos.isMacos ? 'Meta+A' : 'Control+A'
 
+const space = ' '
+const nonBreakingSpace = String.fromCharCode(160)
+
 export const create = ({ expect, page, VError }) => {
   return {
     async search(value) {
@@ -30,7 +33,8 @@ export const create = ({ expect, page, VError }) => {
         const extensionsView = page.locator(`.extensions-viewlet`)
         await expect(extensionsView).toBeVisible()
         const extensionsInputElement = page.locator('.extensions-search-container .view-lines')
-        await expect(extensionsInputElement).toHaveText(value)
+        const actualText = value.replaceAll(space, nonBreakingSpace)
+        await expect(extensionsInputElement).toHaveText(actualText)
       } catch (error) {
         throw new VError(error, `Failed to verify that extension input has value ${value}`)
       }
