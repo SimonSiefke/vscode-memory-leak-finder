@@ -12,7 +12,6 @@ export const create = ({ expect, page, VError, electronApp }) => {
         const frame = childPage.frameLocator('iframe')
         const heading = frame.locator(`#${id}`)
         await expect(heading).toBeVisible()
-        await new Promise((r) => {})
       } catch (error) {
         throw new VError(error, `Failed to check that markdown preview has heading ${id}`)
       }
