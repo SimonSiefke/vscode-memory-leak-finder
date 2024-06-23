@@ -25,6 +25,16 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to search for ${value}`)
       }
     },
+    async shouldHaveValue(value) {
+      try {
+        const extensionsView = page.locator(`.extensions-viewlet`)
+        await expect(extensionsView).toBeVisible()
+        const extensionsInputElement = page.locator('.extensions-search-container .view-lines')
+        await expect(extensionsInputElement).toHaveText(value)
+      } catch (error) {
+        throw new VError(error, `Failed to verify that extension input has value ${value}`)
+      }
+    },
     async show() {
       try {
         const searchItem = page.locator(`.action-item:has([aria-label^="Extensions"])`)
