@@ -9,6 +9,8 @@ export const getSpecialSelectorType = (specialSelector) => {
       return SelectorType.Nth
     case SpecialSelectorPrefix.InternalEnterFrame:
       return SelectorType.InternalEnterFrame
+    case SpecialSelectorPrefix.EnterShadow:
+      return SelectorType.EnterShadow
     default:
       return SelectorType.None
   }

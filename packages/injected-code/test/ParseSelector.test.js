@@ -85,6 +85,20 @@ test('parseSelector - enter iframe', () => {
   ])
 })
 
+test('parseSelector - enter shadow', () => {
+  const selector = 'div:enter-shadow()'
+  expect(ParseSelector.parseSelector(selector)).toEqual([
+    {
+      type: SelectorType.Css,
+      body: 'div',
+    },
+    {
+      type: SelectorType.EnterShadow,
+      body: ':enter-shadow()',
+    },
+  ])
+})
+
 test('parseSelector - text', () => {
   const selector = 'h1:has-text("test")'
   expect(ParseSelector.parseSelector(selector)).toEqual([
