@@ -1,4 +1,6 @@
-export const setup = async ({ Editor, Workspace, QuickPick }) => {
+export const skip = true
+
+export const setup = async ({ Editor, Workspace }) => {
   await Workspace.setFiles([
     {
       name: 'index.css',

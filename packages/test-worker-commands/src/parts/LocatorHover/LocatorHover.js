@@ -5,21 +5,24 @@ import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateI
 // TODO pass page session as parameter
 export const hover = async (locator) => {
   Assert.object(locator)
-  await EvaluateInUtilityContext.evaluateInUtilityContext({
-    functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
-    arguments: [
-      {
-        value: locator,
-      },
-      {
-        value: 'hover',
-      },
-      {
-        value: {
-          bubbles: true,
+  await EvaluateInUtilityContext.evaluateInUtilityContext(
+    {
+      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
+      arguments: [
+        {
+          value: locator,
         },
-      },
-    ],
-    awaitPromise: true,
-  })
+        {
+          value: 'hover',
+        },
+        {
+          value: {
+            bubbles: true,
+          },
+        },
+      ],
+      awaitPromise: true,
+    },
+    locator.sessionId,
+  )
 }

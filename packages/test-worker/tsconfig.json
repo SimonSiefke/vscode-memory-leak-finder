@@ -14,7 +14,8 @@
     "allowSyntheticDefaultImports": true,
     "assumeChangesOnlyAffectDirectDependencies": true,
     "strict": true,
-    "useUnknownInCatchVariables": false
+    "useUnknownInCatchVariables": false,
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["src", "test"]
 }

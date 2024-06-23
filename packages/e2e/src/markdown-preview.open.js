@@ -17,6 +17,6 @@ export const setup = async ({ Workspace, Explorer, Editor }) => {
 export const run = async ({ Editor, QuickPick, WellKnownCommands, MarkdownPreview }) => {
   await QuickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
   await MarkdownPreview.shouldBeVisible()
-  // await MarkdownPreview.shouldHaveHeading('hello-world')
+  await MarkdownPreview.shouldHaveHeading('hello-world')
   // await Editor.close('Preview index.md')
 }

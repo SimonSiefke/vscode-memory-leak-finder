@@ -1,7 +1,8 @@
-import { VError } from '../VError/VError.js'
 import * as Assert from '../Assert/Assert.js'
+import * as MatchesCallback from '../MatchesCallback/MatchesCallback.js'
 import * as PTimeout from '../PTimeout/PTimeout.js'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
+import { VError } from '../VError/VError.js'
 
 export const state = {
   targets: Object.create(null),
@@ -20,24 +21,24 @@ export const reset = () => {
   state.callbacks = []
 }
 
-export const addTarget = (targetId, target) => {
-  Assert.string(targetId)
-  Assert.object(target)
-  state.targets[targetId] = target
+const runCallbacks = () => {
   for (const callback of state.callbacks) {
     let currentIndex = 0
     for (const target of Object.values(state.targets)) {
-      if (target.type === callback.type) {
-        if (currentIndex === callback.index) {
-          if (target.url === '') {
-            return
-          }
-          callback.resolve(target) // TODO remove callback
-        }
+      if (MatchesCallback.matchesCallback(target, callback, currentIndex)) {
+        callback.resolve(target) // TODO remove callbac
+      } else {
         currentIndex++
       }
     }
   }
+}
+
+export const addTarget = (targetId, target) => {
+  Assert.string(targetId)
+  Assert.object(target)
+  state.targets[targetId] = target
+  runCallbacks()
 }
 
 export const changeTarget = (targetId, target) => {
@@ -45,20 +46,7 @@ export const changeTarget = (targetId, target) => {
   Assert.object(target)
   const existing = state.targets[targetId]
   state.targets[targetId] = { ...existing, ...target }
-  for (const callback of state.callbacks) {
-    let currentIndex = 0
-    for (const target of Object.values(state.targets)) {
-      if (target.type === callback.type) {
-        if (currentIndex === callback.index) {
-          if (target.url === '') {
-            return
-          }
-          callback.resolve(target) // TODO remove callback
-        }
-        currentIndex++
-      }
-    }
-  }
+  runCallbacks()
 }
 
 export const removeTarget = (targetId) => {
@@ -80,24 +68,20 @@ export const removeTarget = (targetId) => {
   state.destroyedCallbacks = newCallbacks
 }
 
-export const waitForTarget = async ({ type, index }) => {
+export const waitForTarget = async ({ type, index = -1, url = new RegExp('') }) => {
   try {
     let currentIndex = 0
     for (const target of Object.values(state.targets)) {
-      if (target.type === type) {
-        if (currentIndex === index) {
-          if (target.url === '') {
-            break
-          }
-          return target
-        }
-        currentIndex++
+      if (MatchesCallback.matchesCallback(target, { url, type, index }, currentIndex)) {
+        return target
       }
+      currentIndex++
     }
     return await PTimeout.pTimeout(
       new Promise((resolve, reject) => {
         state.callbacks.push({
           type,
+          url,
           index,
           resolve,
           reject,
