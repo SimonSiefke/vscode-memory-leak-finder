@@ -1,10 +1,7 @@
 import * as Assert from '../Assert/Assert.js'
 import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateInUtilityContext.js'
 
-/**
- * @deprecated use Locator.fill instead
- */
-export const type = async (locator, text) => {
+export const fill = async (locator, text) => {
   Assert.object(locator)
   Assert.string(text)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
@@ -15,29 +12,12 @@ export const type = async (locator, text) => {
           value: locator,
         },
         {
-          value: 'type',
+          value: 'fill',
         },
         {
           value: {
             text,
           },
-        },
-      ],
-      awaitPromise: true,
-    },
-    locator.sessionId,
-  )
-}
-
-export const typeAndWaitFor = async (locator, text, waitFor, options) => {
-  Assert.object(locator)
-  Assert.string(text)
-  await EvaluateInUtilityContext.evaluateInUtilityContext(
-    {
-      functionDeclaration: '(options) => test.typeAndWaitFor(options)',
-      arguments: [
-        {
-          value: { locator, text, waitFor, ...options },
         },
       ],
       awaitPromise: true,

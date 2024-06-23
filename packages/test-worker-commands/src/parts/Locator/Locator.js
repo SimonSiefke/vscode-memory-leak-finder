@@ -13,6 +13,7 @@ import * as LocatorTextContent from '../LocatorTextContent/LocatorTextContent.js
 import * as LocatorScrollDown from '../LocatorScrollDown/LocatorScrollDown.js'
 import * as LocatorScrollUp from '../LocatorScrollUp/LocatorScrollUp.js'
 import * as LocatorType from '../LocatorType/LocatorType.js'
+import * as LocatorFill from '../LocatorFill/LocatorFill.js'
 import * as ObjectType from '../ObjectType/ObjectType.js'
 
 const mergeSelectors = (selector, subSelector = '', hasText = '', nth = -1) => {
@@ -63,6 +64,14 @@ export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}
         ...this,
         selector: mergeSelectors(this.selector, selector, hasText, nth),
       }
+    },
+    fill(text) {
+      return LocatorFill.fill(
+        {
+          selector: this.selector,
+        },
+        text,
+      )
     },
     type(text) {
       return LocatorType.type(
