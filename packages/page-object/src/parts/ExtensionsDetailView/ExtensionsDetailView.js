@@ -11,6 +11,17 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to verify extension detail heading ${text}`)
       }
     },
+    async selectCategory(text) {
+      try {
+        const category = page.locator('.extension-editor .category', {
+          hasText: text,
+        })
+        await expect(category).toBeVisible()
+        await category.click()
+      } catch (error) {
+        throw new VError(error, `Failed to select extension detail category ${text}`)
+      }
+    },
     async shouldHaveTab(text) {
       try {
         const tab = page.locator('.extension-editor .action-label', {
