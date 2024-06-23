@@ -10,8 +10,7 @@ export const create = ({ expect, page, VError, electronApp }) => {
           url: /extensionId=vscode.markdown-language-features/,
         })
         const frame = childPage.frameLocator('iframe')
-        const childChildPage = childPage.getIframe(0)
-        const heading = childChildPage.locator(`#${id}`)
+        const heading = frame.locator(`#${id}`)
         await expect(heading).toBeVisible()
         await new Promise((r) => {})
       } catch (error) {
