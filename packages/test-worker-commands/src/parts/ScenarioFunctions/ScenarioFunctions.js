@@ -137,21 +137,13 @@ export const handleTargetDestroyed = (message) => {
   TargetState.removeTarget(targetId)
 }
 
-const handleTargetInfoChangePage = async (message, type) => {
+const handleTargetInfoChangePage = (message, type) => {
   TargetState.changeTarget(message.params.targetInfo.targetId, {
     type,
     targetId: message.params.targetInfo.targetId,
     title: message.params.targetInfo.title,
     url: message.params.targetInfo.url,
   })
-  if (type === DevtoolsTargetType.Iframe && message.params.targetInfo.url.startsWith('vscode-webview')) {
-    const sessionId = message.params.sessionId
-    const browserSession = SessionState.getSession('browser')
-    const browserRpc = browserSession.rpc
-    const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
-    const targets = await DevtoolsProtocolTarget.getTargets(sessionRpc)
-    console.log({ targets, sessionRpc })
-  }
 }
 
 export const handleTargetInfoChanged = (message) => {
@@ -214,8 +206,6 @@ const handleAttachedToPage = async (message) => {
       ]),
       { milliseconds: TimeoutConstants.AttachToPage },
     )
-    const targets = await DevtoolsProtocolTarget.getTargets(sessionRpc)
-    // console.log({ targets, sessionRpc })
   } catch (error) {
     if (error && error.name === 'TestFinishedError') {
       return
@@ -236,7 +226,6 @@ const handleAttachedToServiceWorker = async (message) => {
 
 export const handleAttachedToTarget = (message) => {
   const type = message.params.targetInfo.type
-  // console.log('attached', type)
   switch (type) {
     case DevtoolsTargetType.Page:
       return handleAttachedToPage(message)
