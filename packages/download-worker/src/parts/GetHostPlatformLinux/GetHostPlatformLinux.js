@@ -8,6 +8,7 @@ export const getHostPlatform = async () => {
   const archSuffix = osArch === 'arm64' ? '-arm64' : ''
   const distroInfo = await GetLinuxDistributionInfo.getLinuxDistributionInfo()
 
+  console.log({ distroInfo })
   // Pop!_OS is ubuntu-based and has the same versions.
   // KDE Neon is ubuntu-based and has the same versions.
   // TUXEDO OS is ubuntu-based and has the same versions.
