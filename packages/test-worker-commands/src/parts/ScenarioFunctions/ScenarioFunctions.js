@@ -156,8 +156,6 @@ const handleTargetInfoChangePage = async (message, type) => {
 
 export const handleTargetInfoChanged = (message) => {
   const type = message.params.targetInfo.type
-  console.log('change', type, message.params.targetInfo.url)
-
   switch (type) {
     case DevtoolsTargetType.Page:
     case DevtoolsTargetType.Iframe:
