@@ -2,6 +2,7 @@
  * @jest-environment jsdom
  */
 import * as QuerySelectorAllRoot from '../src/parts/QuerySelectorAllRoot/QuerySelectorAllRoot.js'
+import { test, expect } from '@jest/globals'
 
 test('querySelectorAll - html element - match', () => {
   const root = document.createElement('div')

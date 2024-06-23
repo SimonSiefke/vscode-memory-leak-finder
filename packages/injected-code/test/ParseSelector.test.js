@@ -1,5 +1,6 @@
 import * as ParseSelector from '../src/parts/ParseSelector/ParseSelector.js'
 import * as SelectorType from '../src/parts/SelectorType/SelectorType.js'
+import { test, expect } from '@jest/globals'
 
 test('parseSelector - empty', () => {
   const selector = ''
@@ -66,6 +67,20 @@ test('parseSelector - nth', () => {
     {
       type: SelectorType.Nth,
       body: ':nth(1)',
+    },
+  ])
+})
+
+test('parseSelector - enter iframe', () => {
+  const selector = 'iframe:internal-enter-frame()'
+  expect(ParseSelector.parseSelector(selector)).toEqual([
+    {
+      type: SelectorType.Css,
+      body: 'iframe',
+    },
+    {
+      type: SelectorType.InternalEnterFrame,
+      body: ':internal-enter-frame()',
     },
   ])
 })

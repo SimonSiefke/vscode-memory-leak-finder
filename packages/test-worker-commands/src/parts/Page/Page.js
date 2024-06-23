@@ -71,5 +71,8 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
         electronObjectId: this.electronObjectId,
       })
     },
+    frameLocator(selector, options = {}) {
+      return Locator.create(this.rpc, this.sessionId, `${selector}:internal-enter-frame()`, options)
+    },
   }
 }

@@ -7,6 +7,8 @@ import * as SelectorType from '../SelectorType/SelectorType.js'
 
 export const parseSelector = (selector) => {
   Assert.string(selector)
+  // TODO remove support for text=
+  // use :has-text instead
   if (selector.startsWith('text=')) {
     const text = selector.slice('text='.length)
     return [
