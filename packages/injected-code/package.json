@@ -20,5 +20,17 @@
   },
   "dependencies": {
     "@lvce-editor/assert": "^1.2.0"
+  },
+  "jest": {
+    "injectGlobals": false,
+    "collectCoverage": true,
+    "coverageThreshold": {
+      "global": {
+        "branches": 92,
+        "functions": 88,
+        "lines": 88,
+        "statements": 88
+      }
+    }
   }
 }

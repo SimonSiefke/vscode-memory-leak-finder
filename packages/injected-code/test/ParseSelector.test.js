@@ -1,5 +1,6 @@
 import * as ParseSelector from '../src/parts/ParseSelector/ParseSelector.js'
 import * as SelectorType from '../src/parts/SelectorType/SelectorType.js'
+import { test, expect } from '@jest/globals'
 
 test('parseSelector - empty', () => {
   const selector = ''
