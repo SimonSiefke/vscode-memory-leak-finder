@@ -1,6 +1,21 @@
-import { expect, test } from '@jest/globals'
+import { expect, test, jest } from '@jest/globals'
 import * as GetHostPlatformLinux from '../src/parts/GetHostPlatformLinux/GetHostPlatformLinux.js'
 
-test.skip('linux', async () => {
-  expect(GetHostPlatformLinux.getHostPlatform()).toBe('')
+jest.unstable_mockModule('../src/parts/GetLinuxDistributionInfo/GetLinuxDistributionInfo.js', () => {
+  return {
+    id: 'ubuntu',
+    version: '18',
+  }
+})
+
+jest.unstable_mockModule('node:os', () => {
+  return {
+    arch() {
+      return 'x64'
+    },
+  }
+})
+
+test('ubuntu 18.04', async () => {
+  expect(await GetHostPlatformLinux.getHostPlatform()).toBe('')
 })
