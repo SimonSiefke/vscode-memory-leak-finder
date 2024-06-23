@@ -5,7 +5,7 @@ import * as os from 'node:os'
 
 export const getHostPlatform = async () => {
   const osArch = os.arch()
-  const archSuffix = osArch === 'arm64' ? '-arm64' : ''
+  const archSuffix = osArch === 'arm64' ? '-arm64' : '-x64'
   const distroInfo = await GetLinuxDistributionInfo.getLinuxDistributionInfo()
 
   // Pop!_OS is ubuntu-based and has the same versions.
