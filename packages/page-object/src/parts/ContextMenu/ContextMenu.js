@@ -42,6 +42,7 @@ export const create = ({ expect, page, VError }) => {
     async shouldHaveItem(option) {
       await page.waitForIdle()
       const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
+      const contextMenuCount = await contextMenu.count()
       await expect(contextMenu).toBeVisible()
       await expect(contextMenu).toBeFocused()
       const contextMenuItem = contextMenu.locator('.action-item', {
