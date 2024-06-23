@@ -3,6 +3,7 @@
  */
 import * as GetEventClass from '../src/parts/GetEventClass/GetEventClass.js'
 import * as DomEventType from '../src/parts/DomEventType/DomEventType.js'
+import { test, expect, beforeAll } from '@jest/globals'
 
 beforeAll(() => {
   // @ts-ignore

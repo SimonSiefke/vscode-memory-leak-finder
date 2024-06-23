@@ -20,15 +20,12 @@ test('element is not of type iframe', () => {
 })
 
 test('select inside iframe', () => {
-  const h1 = document.createElement('h1')
   const element = {
     nodeName: 'IFRAME',
     contentDocument: {
-      querySelectorAll(selector) {
-        return [h1]
-      },
+      querySelectorAll() {},
     },
   }
   const roots = [element]
-  expect(QuerySelectorAllInternalEnterFrame.querySelectorAll(roots)).toEqual([h1])
+  expect(QuerySelectorAllInternalEnterFrame.querySelectorAll(roots)).toEqual([element.contentDocument])
 })
