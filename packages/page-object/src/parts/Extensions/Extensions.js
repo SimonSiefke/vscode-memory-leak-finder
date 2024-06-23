@@ -28,6 +28,15 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to search for ${value}`)
       }
     },
+    async clear() {
+      try {
+        const clearButton = page.locator('[aria-label="Clear Extensions Search Results"]')
+        await clearButton.click()
+        await this.shouldHaveValue('')
+      } catch (error) {
+        throw new VError(error, `Failed to clear`)
+      }
+    },
     async shouldHaveValue(value) {
       try {
         const extensionsView = page.locator(`.extensions-viewlet`)

@@ -1,5 +1,3 @@
-export const skip = true
-
 export const setup = async ({ Extensions, Editor, ExtensionDetailView }) => {
   await Editor.closeAll()
   await Extensions.show()
@@ -13,4 +11,5 @@ export const setup = async ({ Extensions, Editor, ExtensionDetailView }) => {
 export const run = async ({ ExtensionDetailView, Extensions }) => {
   await ExtensionDetailView.selectCategory('Programming Languages')
   await Extensions.shouldHaveValue('@category:"Programming Languages"')
+  await Extensions.clear()
 }
