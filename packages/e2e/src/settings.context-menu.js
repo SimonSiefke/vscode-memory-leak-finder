@@ -11,5 +11,6 @@ export const setup = async ({ Editor, SettingsEditor }) => {
 
 export const run = async ({ SettingsEditor, ContextMenu }) => {
   await SettingsEditor.openSettingsContextMenu('Comments')
+  await ContextMenu.shouldHaveItem('Reset Setting')
   await ContextMenu.close()
 }
