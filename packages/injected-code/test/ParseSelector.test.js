@@ -70,6 +70,20 @@ test('parseSelector - nth', () => {
   ])
 })
 
+test('parseSelector - enter iframe', () => {
+  const selector = 'iframe:internal-enter-frame()'
+  expect(ParseSelector.parseSelector(selector)).toEqual([
+    {
+      type: SelectorType.Css,
+      body: 'iframe',
+    },
+    {
+      type: SelectorType.InternalEnterFrame,
+      body: ':internal-enter-frame()',
+    },
+  ])
+})
+
 test('parseSelector - text', () => {
   const selector = 'h1:has-text("test")'
   expect(ParseSelector.parseSelector(selector)).toEqual([
