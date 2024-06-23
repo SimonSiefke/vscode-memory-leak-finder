@@ -9,8 +9,10 @@ export const create = ({ expect, page, VError, electronApp }) => {
         const childPage = await electronApp.waitForIframe({
           url: /extensionId=vscode.markdown-language-features/,
         })
-        const heading = childPage.locator(`#${id}`)
+        const childChildPage = childPage.getIframe(0)
+        const heading = childChildPage.locator(`#${id}`)
         await expect(heading).toBeVisible()
+        await new Promise((r) => {})
       } catch (error) {
         throw new VError(error, `Failed to check that markdown preview has heading ${id}`)
       }

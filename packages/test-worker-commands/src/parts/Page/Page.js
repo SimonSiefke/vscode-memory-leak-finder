@@ -71,5 +71,14 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
         electronObjectId: this.electronObjectId,
       })
     },
+    getIframe() {
+      const originalLocator = this.locator.bind(this)
+      return {
+        ...this,
+        locator(selector, options) {
+          return originalLocator(`iframe ${selector}`, options)
+        },
+      }
+    },
   }
 }
