@@ -137,21 +137,13 @@ export const handleTargetDestroyed = (message) => {
   TargetState.removeTarget(targetId)
 }
 
-const handleTargetInfoChangePage = async (message, type) => {
+const handleTargetInfoChangePage = (message, type) => {
   TargetState.changeTarget(message.params.targetInfo.targetId, {
     type,
     targetId: message.params.targetInfo.targetId,
     title: message.params.targetInfo.title,
     url: message.params.targetInfo.url,
   })
-  if (type === DevtoolsTargetType.Iframe && message.params.targetInfo.url.startsWith('vscode-webview')) {
-    const sessionId = message.params.sessionId
-    const browserSession = SessionState.getSession('browser')
-    const browserRpc = browserSession.rpc
-    const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
-    const targets = await DevtoolsProtocolTarget.getTargets(sessionRpc)
-    console.log({ targets, sessionRpc })
-  }
 }
 
 export const handleTargetInfoChanged = (message) => {
