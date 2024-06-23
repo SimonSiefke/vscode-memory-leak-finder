@@ -23,7 +23,7 @@ test('select inside iframe', () => {
   const element = {
     nodeName: 'IFRAME',
     contentDocument: {
-      querySelectorAll(selector) {},
+      querySelectorAll() {},
     },
   }
   const roots = [element]
