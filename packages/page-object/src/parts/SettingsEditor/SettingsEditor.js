@@ -78,10 +78,9 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const checkbox = page.locator(`.monaco-custom-toggle[aria-label="${name}"]`)
         await expect(checkbox).toBeVisible()
-        const checkedValue = checkbox.getAttribute('aria-checked')
+        const checkedValue = await checkbox.getAttribute('aria-checked')
         const nextValue = checkedValue === 'true' ? 'false' : 'true'
         await checkbox.click()
-        await page.waitForIdle()
         await expect(checkbox).toHaveAttribute('aria-checked', nextValue)
       } catch (error) {
         throw new VError(error, `Failed to toggle checkbox "${name}"`)
@@ -104,6 +103,34 @@ export const create = ({ expect, page, VError }) => {
         await moreActions.click()
       } catch (error) {
         throw new VError(error, `Failed to open settings context menu for "${name}"`)
+      }
+    },
+    async enableCheckBox({ name }) {
+      try {
+        await page.waitForIdle()
+        const checkbox = page.locator(`.monaco-custom-toggle[aria-label="${name}"]`)
+        await expect(checkbox).toBeVisible()
+        const checkedValue = checkbox.getAttribute('aria-checked')
+        if (checkedValue === 'true') {
+          return
+        }
+        await this.toggleCheckBox({ name })
+      } catch (error) {
+        throw new VError(error, `Failed to enable checkbox "${name}"`)
+      }
+    },
+    async disableCheckBox({ name }) {
+      try {
+        await page.waitForIdle()
+        const checkbox = page.locator(`.monaco-custom-toggle[aria-label="${name}"]`)
+        await expect(checkbox).toBeVisible()
+        const checkedValue = checkbox.getAttribute('aria-checked')
+        if (checkedValue === 'false') {
+          return
+        }
+        await this.toggleCheckBox({ name })
+      } catch (error) {
+        throw new VError(error, `Failed to disable checkbox "${name}"`)
       }
     },
   }

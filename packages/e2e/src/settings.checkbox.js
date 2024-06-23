@@ -7,13 +7,16 @@ export const setup = async ({ Editor, SettingsEditor }) => {
     value: 'Editor: Auto Closing Comments',
     resultCount: 2,
   })
+  await SettingsEditor.enableCheckBox({
+    name: 'comments.visible',
+  })
 }
 
 export const run = async ({ SettingsEditor }) => {
-  await SettingsEditor.toggleCheckBox({
+  await SettingsEditor.disableCheckBox({
     name: 'comments.visible',
   })
-  await SettingsEditor.toggleCheckBox({
+  await SettingsEditor.enableCheckBox({
     name: 'comments.visible',
   })
 }
