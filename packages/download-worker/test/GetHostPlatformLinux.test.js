@@ -22,7 +22,7 @@ test('ubuntu 18.04 - x64', async () => {
     version: '18',
   })
   jest.spyOn(os, 'arch').mockReturnValue('x64')
-  expect(await GetHostPlatformLinux.getHostPlatform()).toBe('ubuntu18.04')
+  expect(await GetHostPlatformLinux.getHostPlatform()).toBe('ubuntu18.04-x64')
 })
 
 test('ubuntu 18.04 - arm64', async () => {
@@ -40,7 +40,7 @@ test('ubuntu 20.04 - x64', async () => {
     version: '20',
   })
   jest.spyOn(os, 'arch').mockReturnValue('x64')
-  expect(await GetHostPlatformLinux.getHostPlatform()).toBe('ubuntu20.04')
+  expect(await GetHostPlatformLinux.getHostPlatform()).toBe('ubuntu20.04-x64')
 })
 
 test('ubuntu 20.04 - arm64', async () => {
@@ -58,7 +58,7 @@ test('ubuntu 22.04 - x64', async () => {
     version: '22',
   })
   jest.spyOn(os, 'arch').mockReturnValue('x64')
-  expect(await GetHostPlatformLinux.getHostPlatform()).toBe('ubuntu22.04')
+  expect(await GetHostPlatformLinux.getHostPlatform()).toBe('ubuntu22.04-x64')
 })
 
 test('ubuntu 22.04 - arm64', async () => {
@@ -76,7 +76,7 @@ test.skip('ubuntu 24.04 - x64', async () => {
     version: '24',
   })
   jest.spyOn(os, 'arch').mockReturnValue('x64')
-  expect(await GetHostPlatformLinux.getHostPlatform()).toBe('ubuntu24.04')
+  expect(await GetHostPlatformLinux.getHostPlatform()).toBe('ubuntu24.04-x64')
 })
 
 test.skip('ubuntu 24.04 - arm64', async () => {
@@ -94,7 +94,7 @@ test('debian 11 - x64', async () => {
     version: '11',
   })
   jest.spyOn(os, 'arch').mockReturnValue('x64')
-  expect(await GetHostPlatformLinux.getHostPlatform()).toBe('debian11')
+  expect(await GetHostPlatformLinux.getHostPlatform()).toBe('debian11-x64')
 })
 
 test('debian 12 - x64', async () => {
@@ -103,7 +103,7 @@ test('debian 12 - x64', async () => {
     version: '12',
   })
   jest.spyOn(os, 'arch').mockReturnValue('x64')
-  expect(await GetHostPlatformLinux.getHostPlatform()).toBe('debian12')
+  expect(await GetHostPlatformLinux.getHostPlatform()).toBe('debian12-x64')
 })
 
 test('generic linux - x64', async () => {
@@ -112,5 +112,5 @@ test('generic linux - x64', async () => {
     version: '1',
   })
   jest.spyOn(os, 'arch').mockReturnValue('x64')
-  expect(await GetHostPlatformLinux.getHostPlatform()).toBe('generic-linux')
+  expect(await GetHostPlatformLinux.getHostPlatform()).toBe('generic-linux-x64')
 })
