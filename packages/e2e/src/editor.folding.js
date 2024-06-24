@@ -17,7 +17,7 @@ export const setup = async ({ Editor }) => {
   await Editor.open('file.css')
 }
 
-export const run = async ({ Editor, page, expect }) => {
+export const run = async ({ page, expect }) => {
   const inlineFolded = page.locator('.inline-folded')
   await expect(inlineFolded).toBeHidden()
   const collapsedIcon = page.locator('.codicon-folding-collapsed').first()
