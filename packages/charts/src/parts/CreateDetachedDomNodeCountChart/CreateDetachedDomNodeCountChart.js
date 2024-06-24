@@ -3,8 +3,9 @@ import * as GetDetachedDomNodeCountData from '../GetDetachedDomNodeCountData/Get
 
 export const name = 'detached-dom-node-count'
 
-export const createChart = async () => {
-  const data = await GetDetachedDomNodeCountData.getDetachedDomNodeCountData()
+export const getData = GetDetachedDomNodeCountData.getDetachedDomNodeCountData
+
+export const createChart = (data) => {
   return CreateChart.createChart(data, {
     x: 'index',
     y: 'count',

@@ -3,8 +3,9 @@ import * as GetObjectCountsData from '../GetObjectCountsData/GetObjectCountsData
 
 export const name = 'object-count'
 
-export const createChart = async () => {
-  const data = await GetObjectCountsData.getObjectCountsData()
+export const getData = GetObjectCountsData.getObjectCountsData
+
+export const createChart = (data) => {
   return CreateChart.createChart(data, {
     x: 'index',
     y: 'count',
