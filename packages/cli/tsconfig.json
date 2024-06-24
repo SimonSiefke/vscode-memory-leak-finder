@@ -13,7 +13,9 @@
     "assumeChangesOnlyAffectDirectDependencies": true,
     "strict": true,
     "noImplicitAny": false,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false
   },
   "include": ["src", "test"]
 }

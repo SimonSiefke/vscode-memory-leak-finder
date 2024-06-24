@@ -1,5 +1,6 @@
 export * as MeasureArrayCount from '../MeasureArrayCount/MeasureArrayCount.js'
 export * as MeasureArrayElementCount from '../MeasureArrayElementCount/MeasureArrayElementCount.js'
+export * as MeasureCanvasCount from '../MeasureCanvasCount/MeasureCanvasCount.js'
 export * as MeasureClassCount from '../MeasureClassCount/MeasureClassCount.js'
 export * as MeasureDetachedDomNodeCount from '../MeasureDetachedDomNodeCount/MeasureDetachedDomNodeCount.js'
 export * as MeasureDetachedDomNodeRoots from '../MeasureDetachedDomNodeRoots/MeasureDetachedDomNodeRoots.js'
