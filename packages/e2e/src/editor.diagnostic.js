@@ -9,7 +9,7 @@ export const beforeSetup = async ({ tmpDir, writeFile, join }) => {
   )
 }
 
-export const setup = async ({ page, expect, Editor }) => {
+export const setup = async ({ Editor }) => {
   await Editor.open('index.css')
   await Editor.shouldHaveSquigglyError()
 }
