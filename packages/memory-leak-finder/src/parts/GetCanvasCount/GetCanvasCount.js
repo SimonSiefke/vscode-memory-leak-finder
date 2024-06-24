@@ -7,5 +7,5 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
  * @returns {Promise<number>}
  */
 export const getCanvasCount = async (session, objectGroup) => {
-  return GetObjectCount.getObjectCount(session, PrototypeExpression.HtmlElement, objectGroup)
+  return GetObjectCount.getObjectCount(session, PrototypeExpression.Canvas, objectGroup)
 }
