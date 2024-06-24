@@ -24,6 +24,6 @@ export const stop = async (session, objectGroup, scriptHandler) => {
 
 export const compare = CompareNamedFunctionCount.compareNamedFunctionCount
 
-export const isLeak = () => {
-  return false
+export const isLeak = (leaked) => {
+  return leaked.length > 0
 }
