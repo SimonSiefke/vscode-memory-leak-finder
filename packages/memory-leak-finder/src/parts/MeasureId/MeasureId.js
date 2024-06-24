@@ -1,5 +1,6 @@
 export const ArrayCount = 'arrayCount'
 export const ArrayElementCount = 'arrayElementCount'
+export const CanvasCount = 'canvasCount'
 export const ClassCount = 'classCount'
 export const Combined = 'combined'
 export const DetachedDomNodeCount = 'detachedDomNodeCount'
