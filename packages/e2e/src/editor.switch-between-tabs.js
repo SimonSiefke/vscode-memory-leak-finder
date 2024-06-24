@@ -1,4 +1,4 @@
-export const setup = async ({ Workspace, Explorer, Editor }) => {
+export const setup = async ({ Workspace, Editor }) => {
   await Workspace.setFiles([
     {
       name: 'a.txt',
