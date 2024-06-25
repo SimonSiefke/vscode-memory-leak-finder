@@ -3,8 +3,9 @@ import * as GetFunctionCountsData from '../GetFunctionCountsData/GetFunctionCoun
 
 export const name = 'function-count'
 
-export const createChart = async () => {
-  const data = await GetFunctionCountsData.getFunctionCountsData()
+export const getData = GetFunctionCountsData.getFunctionCountsData
+
+export const createChart = (data) => {
   return CreateChart.createChart(data, {
     x: 'index',
     y: 'count',

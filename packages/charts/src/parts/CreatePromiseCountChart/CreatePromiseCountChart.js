@@ -3,8 +3,9 @@ import * as GetPromiseCountData from '../GetPromiseCountData/GetPromiseCountData
 
 export const name = 'promise-count'
 
-export const createChart = async () => {
-  const data = await GetPromiseCountData.getPromiseCountData()
+export const getData = GetPromiseCountData.getPromiseCountData
+
+export const createChart = (data) => {
   return CreateChart.createChart(data, {
     x: 'index',
     y: 'count',
