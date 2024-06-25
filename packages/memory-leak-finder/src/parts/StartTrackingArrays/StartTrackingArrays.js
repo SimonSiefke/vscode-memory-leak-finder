@@ -38,26 +38,26 @@ export const startTrackingArrays = async (session, objectGroup) => {
   })
   const enumerableObjectIds = getEnumerableValues(smallerArrayProperties.result).map(getObjectId)
   const fullMap = Object.create(null)
-  for (const objectId of enumerableObjectIds) {
-    const fnResult3 = await DevtoolsProtocolRuntime.getProperties(session, {
-      objectId: objectId,
-      generatePreview: false,
-      ownProperties: true,
-    })
-    const enumerableValueObjectIds = getEnumerableValues(fnResult3.result).map(getObjectId).slice(0, 10)
-    const subProperties = await Promise.all(
-      enumerableValueObjectIds.map(async (objectId) => {
-        const fnResult4 = await DevtoolsProtocolRuntime.getProperties(session, {
-          objectId: objectId,
-          generatePreview: false,
-          ownProperties: true,
-          // nonIndexedPropertiesOnly: true,
-        })
-        console.log({ fnResult4: fnResult4.internalProperties })
-        return fnResult4
-      }),
-    )
-    // console.log({ fnResult3: enumerableValues })
-  }
+  // for (const objectId of enumerableObjectIds) {
+  //   const fnResult3 = await DevtoolsProtocolRuntime.getProperties(session, {
+  //     objectId: objectId,
+  //     generatePreview: false,
+  //     ownProperties: true,
+  //   })
+  //   const enumerableValueObjectIds = getEnumerableValues(fnResult3.result).map(getObjectId).slice(0, 10)
+  //   const subProperties = await Promise.all(
+  //     enumerableValueObjectIds.map(async (objectId) => {
+  //       const fnResult4 = await DevtoolsProtocolRuntime.getProperties(session, {
+  //         objectId: objectId,
+  //         generatePreview: false,
+  //         ownProperties: true,
+  //         // nonIndexedPropertiesOnly: true,
+  //       })
+  //       console.log({ fnResult4: fnResult4.internalProperties })
+  //       return fnResult4
+  //     }),
+  //   )
+  //   // console.log({ fnResult3: enumerableValues })
+  // }
   return []
 }

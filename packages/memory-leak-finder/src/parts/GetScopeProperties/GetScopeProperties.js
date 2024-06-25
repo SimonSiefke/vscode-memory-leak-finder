@@ -2,7 +2,7 @@ import * as Assert from '../Assert/Assert.js'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as ParseScopes from '../ParseScopes/ParseScopes.js'
 
-export const getScopeProperties = async (session, objectGroup, objectId) => {
+export const getScopeListProperties = async (session, objectGroup, objectId) => {
   Assert.object(session)
   Assert.string(objectGroup)
   Assert.string(objectId)

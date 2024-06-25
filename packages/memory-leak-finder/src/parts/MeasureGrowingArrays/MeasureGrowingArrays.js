@@ -1,3 +1,4 @@
+import * as GetArrays from '../GetArrays/GetArrays.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
@@ -12,12 +13,13 @@ export const create = (session) => {
 
 export const start = async (session, objectGroup) => {
   await StartTrackingArrays.startTrackingArrays(session, objectGroup)
-  return []
+  return GetArrays.getArrays(session, objectGroup)
 }
 
 export const stop = async (session, objectGroup) => {
   // const stackTraces = await GetDisposableStoresWithStackTraces.getDisposableStoresWithStackTraces(session, objectGroup)
   // await StopTrackingDisposableStores.stopTrackingDisposableStores(session, objectGroup)
+  // const result = await GetArrays.getArrays(session, objectGroup)
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return []
 }
