@@ -1,5 +1,6 @@
 import * as Assert from '../Assert/Assert.js'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import * as ParseScopes from '../ParseScopes/ParseScopes.js'
 
 export const getScopeProperties = async (session, objectGroup, objectId) => {
   Assert.object(session)
@@ -10,5 +11,6 @@ export const getScopeProperties = async (session, objectGroup, objectId) => {
     ownProperties: true,
     generatePreview: false,
   })
-  return fnResult1.internalProperties
+  const scopes = ParseScopes.parseScopes(fnResult1)
+  return scopes
 }

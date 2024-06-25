@@ -1,8 +1,7 @@
 import * as CompareCount from '../CompareCount/CompareCount.js'
-import * as GetFunctionCount from '../GetFunctionCount/GetFunctionCount.js'
+import * as GetScopeCount from '../GetScopeCount/GetScopeCount.js'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as GetScopeCount from '../GetScopeCount/GetScopeCount.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 
 // TODO
