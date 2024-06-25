@@ -34,7 +34,7 @@ export const getAllScopeProperties = async (session, objectGroup, objectIds) => 
   let seen = objectIds
   let allScopeProperties = []
   while (remaining.length > 0) {
-    const scopeProperties = await GetAllScopePropertiesInternal.getAllScopePropertiesInternal(session, objectGroup, remaining)
+    const scopeProperties = await GetAllScopePropertiesInternal.getAllScopeListPropertiesInternal(session, objectGroup, remaining)
     const newObjectIds = getScopePropertiesObjectIds(scopeProperties)
     seen = getNewSeen(seen, newObjectIds)
     remaining = getNewRemaining(seen, newObjectIds)

@@ -4,13 +4,7 @@ export const parseScopes = (result) => {
   const { internalProperties } = result
   const scope = internalProperties.find(IsInternalScopeList.isInternalScopeList)
   if (!scope) {
-    return {
-      objectId: '',
-      description: '',
-    }
+    return ''
   }
-  return {
-    objectId: scope.value.objectId,
-    description: scope.value.description,
-  }
+  return scope.value.objectId
 }

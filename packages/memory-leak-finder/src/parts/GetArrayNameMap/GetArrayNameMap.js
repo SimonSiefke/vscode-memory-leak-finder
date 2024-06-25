@@ -15,11 +15,11 @@ const isArrayScopeValue = (rawScopeValue) => {
 }
 
 const parseScopeValues = (result) => {
-  const actualResult = result.result
-  return actualResult.filter(isArrayScopeValue).map(parseScopeValue)
+  Assert.array(result)
+  return result.filter(isArrayScopeValue).map(parseScopeValue)
 }
 
-const getScopeValues = async (session, objectGroup, objectId) => {
+const getScopeValues = async (session, objectId) => {
   const rawResult = await DevtoolsProtocolRuntime.getProperties(session, {
     objectId,
     generatePreview: true,
@@ -29,19 +29,10 @@ const getScopeValues = async (session, objectGroup, objectId) => {
   return scopeValues
 }
 
-const mergeScopeArrayValues = (scopeArrayValues) => {
-  Assert.array(scopeArrayValues)
-  const merged = []
-  for (const scopeArrayValue of scopeArrayValues) {
-    merged.push(...scopeArrayValue)
-  }
-  return merged
-}
-
-const getNameMap = (scopeValues) => {
-  Assert.array(scopeValues)
+const getNameMap = (scopeValueArray) => {
+  Assert.array(scopeValueArray)
   const map = Object.create(null)
-  for (const scopeValue of scopeValues) {
+  for (const scopeValue of scopeValueArray) {
     map[scopeValue.objectId] = scopeValue.name
   }
   return map
@@ -51,13 +42,16 @@ export const getArrayNameMap = async (session, objectGroup) => {
   Assert.object(session)
   Assert.string(objectGroup)
   const functionObjectIds = await GetAllFunctions.getAllFunctions(session, objectGroup)
-  const scopeLists = await GetAllScopePropertiesInternal.getAllScopePropertiesInternal(session, objectGroup, functionObjectIds)
+  // functionObjectIds.length = 243
+  const scopeListsObjectIds = await GetAllScopePropertiesInternal.getAllScopeListPropertiesInternal(session, objectGroup, functionObjectIds)
   const scopeArrayPromises = []
-  for (const scopeList of scopeLists) {
-    scopeArrayPromises.push(getScopeValues(session, objectGroup, scopeList.objectId))
+  for (const scopeListObjectId of scopeListsObjectIds) {
+    scopeArrayPromises.push(getScopeValues(session, scopeListObjectId))
   }
   const scopeArrayValues = await Promise.all(scopeArrayPromises)
-  const mergedScopeArrays = mergeScopeArrayValues(scopeArrayValues)
+  const mergedScopeArrays = scopeArrayValues.flat(1)
   const map = getNameMap(mergedScopeArrays)
-  return map
+  console.log(JSON.stringify(map, null, 2))
+  // return map
+  return {}
 }
