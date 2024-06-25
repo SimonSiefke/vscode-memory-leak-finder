@@ -10,7 +10,7 @@ export const parseScopes = (result) => {
     }
   }
   return {
-    objectId: scope.objectId,
-    description: scope.description,
+    objectId: scope.value.objectId,
+    description: scope.value.description,
   }
 }

@@ -1,3 +1,7 @@
-export const isInternalScopeList = (value) => {
-  return typeof value === 'object' && value.type === 'object' && value.subtype === 'internal#scopeList'
+import * as ScopeListSubType from '../ScopeListSubType/ScopeListSubType.js'
+import * as ScopeListType from '../ScopeListType/ScopeListType.js'
+
+export const isInternalScopeList = (result) => {
+  const { value } = result
+  return value.type === ScopeListType.Object && value.subtype === ScopeListSubType.InternalScopeList
 }
