@@ -1,5 +1,5 @@
-import * as CompareCount from '../CompareCount/CompareCount.js'
-import * as GetDisposedDisposableCount from '../GetDisposedDisposableCount/GetDisposedDisposableCount.js'
+import * as CompareDisposablesWithLocation from '../CompareDisposablesWithLocation/CompareDisposablesWithLocation.js'
+import * as GetDisposedDisposablesWithLocation from '../GetDisposedDisposablesWithLocation/GetDisposedDisposablesWithLocation.js'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
@@ -16,15 +16,16 @@ export const create = (session) => {
 
 export const start = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.start(session)
-  return GetDisposedDisposableCount.getDisposedDisposableCount(session, objectGroup)
+  return GetDisposedDisposablesWithLocation.getDisposedDisposablesWithLocation(session, objectGroup, scriptHandler.scriptMap)
 }
 
-export const stop = async (session, objectGroup) => {
-  const result = await GetDisposedDisposableCount.getDisposedDisposableCount(session, objectGroup)
+export const stop = async (session, objectGroup, scriptHandler) => {
+  await scriptHandler.stop(session)
+  const result = await GetDisposedDisposablesWithLocation.getDisposedDisposablesWithLocation(session, objectGroup, scriptHandler.scriptMap)
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return result
 }
 
-export const compare = CompareCount.compareCount
+export const compare = CompareDisposablesWithLocation.compareDisposablesWithLocation
 
 export const isLeak = IsLeakCount.isLeakCount
