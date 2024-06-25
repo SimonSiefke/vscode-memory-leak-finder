@@ -1,6 +1,6 @@
 import * as CompareDisposablesWithLocation from '../CompareDisposablesWithLocation/CompareDisposablesWithLocation.js'
 import * as GetDisposedDisposablesWithLocation from '../GetDisposedDisposablesWithLocation/GetDisposedDisposablesWithLocation.js'
-import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
+import * as IsLeakDisposables from '../IsLeakDisposables/IsLeakDisposables.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
@@ -23,9 +23,12 @@ export const stop = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.stop(session)
   const result = await GetDisposedDisposablesWithLocation.getDisposedDisposablesWithLocation(session, objectGroup, scriptHandler.scriptMap)
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
-  return result
+  return {
+    result,
+    scriptMap: scriptHandler.scriptMap,
+  }
 }
 
 export const compare = CompareDisposablesWithLocation.compareDisposablesWithLocation
 
-export const isLeak = IsLeakCount.isLeakCount
+export const isLeak = IsLeakDisposables.isLeakDisposables
