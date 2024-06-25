@@ -1,9 +1,8 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
+import * as GetAllScopeProperties from '../GetAllScopeProperties/GetAllScopeProperties.js'
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.js'
 import * as GetObjectIds from '../GetObjectIds/GetObjectIds.js'
-
-const getObjectIds = (descriptors) => {}
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
 
 export const getScopeCount = async (session, objectGroup) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
@@ -21,6 +20,7 @@ export const getScopeCount = async (session, objectGroup) => {
   })
   const descriptors = GetDescriptorValues.getDescriptorValues(fnResult1.result)
   const objectIds = GetObjectIds.getObjectIds(descriptors)
-  console.log({ objectIds })
+  const scopeProperties = await GetAllScopeProperties.getAllScopeProperties(session, objectGroup, objectIds)
+  console.log(scopeProperties)
   return 0
 }
