@@ -3,8 +3,9 @@ import * as GetCanvasCountsData from '../GetCanvasCountsData/GetCanvasCountsData
 
 export const name = 'canvas-count'
 
-export const createChart = async () => {
-  const data = await GetCanvasCountsData.getCanvasCountsData()
+export const getData = GetCanvasCountsData.getCanvasCountsData
+
+export const createChart = (data) => {
   return CreateChart.createChart(data, {
     x: 'index',
     y: 'count',
