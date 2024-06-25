@@ -22,7 +22,7 @@ const getEnumerableValues = (result) => {
 
 export const startTrackingArrays = async (session, objectGroup) => {
   const arrayDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
-    expression: PrototypeExpression.Object,
+    expression: PrototypeExpression.Array,
     returnByValue: false,
     objectGroup,
   })
@@ -37,7 +37,6 @@ export const startTrackingArrays = async (session, objectGroup) => {
     ownProperties: true,
   })
   const enumerableObjectIds = getEnumerableValues(smallerArrayProperties.result).map(getObjectId)
-  console.log(enumerableObjectIds)
   const fullMap = Object.create(null)
   for (const objectId of enumerableObjectIds) {
     const fnResult3 = await DevtoolsProtocolRuntime.getProperties(session, {
@@ -45,9 +44,20 @@ export const startTrackingArrays = async (session, objectGroup) => {
       generatePreview: false,
       ownProperties: true,
     })
-    const enumerableValues = getEnumerableValues(fnResult3.result)
-    console.log({ fnResult3: enumerableValues })
+    const enumerableValueObjectIds = getEnumerableValues(fnResult3.result).map(getObjectId).slice(0, 10)
+    const subProperties = await Promise.all(
+      enumerableValueObjectIds.map(async (objectId) => {
+        const fnResult4 = await DevtoolsProtocolRuntime.getProperties(session, {
+          objectId: objectId,
+          generatePreview: false,
+          ownProperties: true,
+          // nonIndexedPropertiesOnly: true,
+        })
+        console.log({ fnResult4: fnResult4.internalProperties })
+        return fnResult4
+      }),
+    )
+    // console.log({ fnResult3: enumerableValues })
   }
-  // console.log({ smallerArrays })
   return []
 }
