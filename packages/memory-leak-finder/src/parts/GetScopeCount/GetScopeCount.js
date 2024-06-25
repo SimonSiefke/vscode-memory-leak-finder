@@ -21,6 +21,5 @@ export const getScopeCount = async (session, objectGroup) => {
   const descriptors = GetDescriptorValues.getDescriptorValues(fnResult1.result)
   const objectIds = GetObjectIds.getObjectIds(descriptors)
   const scopeProperties = await GetAllScopeProperties.getAllScopeProperties(session, objectGroup, objectIds)
-  console.log(scopeProperties)
-  return 0
+  return scopeProperties.length
 }

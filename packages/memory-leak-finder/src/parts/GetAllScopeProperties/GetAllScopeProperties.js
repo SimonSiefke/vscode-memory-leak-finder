@@ -4,8 +4,9 @@ import * as GetObjectId from '../GetObjectId/GetObjectId.js'
 
 const getNewRemaining = (seen, newObjectIds) => {
   const newRemaining = []
+  const seenSet = new Set(seen)
   for (const objectId of newObjectIds) {
-    if (seen.includes(objectId)) {
+    if (seenSet.has(objectId)) {
       continue
     }
     newRemaining.push(objectId)
@@ -33,7 +34,7 @@ export const getAllScopeProperties = async (session, objectGroup, objectIds) => 
   let seen = objectIds
   let allScopeProperties = []
   while (remaining.length > 0) {
-    console.log('pending', remaining.length)
+    console.log('remaining', remaining.length)
     const scopeProperties = await GetAllScopePropertiesInternal.getAllScopePropertiesInternal(session, objectGroup, remaining)
     const newObjectIds = getScopePropertiesObjectIds(scopeProperties)
     seen = getNewSeen(seen, newObjectIds)
