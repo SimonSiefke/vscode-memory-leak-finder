@@ -1,6 +1,5 @@
 import * as Assert from '../Assert/Assert.js'
 import * as GetAllScopePropertiesInternal from '../GetAllScopePropertiesInternal/GetAllScopePropertiesInternal.js'
-import * as GetObjectId from '../GetObjectId/GetObjectId.js'
 
 const getNewRemaining = (seen, newObjectIds) => {
   const newRemaining = []
@@ -12,10 +11,6 @@ const getNewRemaining = (seen, newObjectIds) => {
     newRemaining.push(objectId)
   }
   return newRemaining
-}
-
-const getScopePropertiesObjectIds = (scopeProperties) => {
-  return scopeProperties.map(GetObjectId.getObjectId)
 }
 
 const getNewSeen = (seen, objectIds) => {
@@ -34,11 +29,10 @@ export const getAllScopeProperties = async (session, objectGroup, objectIds) => 
   let seen = objectIds
   let allScopeProperties = []
   while (remaining.length > 0) {
-    const scopeProperties = await GetAllScopePropertiesInternal.getAllScopeListPropertiesInternal(session, objectGroup, remaining)
-    const newObjectIds = getScopePropertiesObjectIds(scopeProperties)
+    const newObjectIds = await GetAllScopePropertiesInternal.getAllScopeListPropertiesInternal(session, objectGroup, remaining)
     seen = getNewSeen(seen, newObjectIds)
     remaining = getNewRemaining(seen, newObjectIds)
-    allScopeProperties = getNewAllScopeProperties(allScopeProperties, scopeProperties)
+    allScopeProperties = getNewAllScopeProperties(allScopeProperties, newObjectIds)
   }
   return allScopeProperties
 }
