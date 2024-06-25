@@ -2,6 +2,7 @@ import * as CompareCount from '../CompareCount/CompareCount.js'
 import * as GetFunctionCount from '../GetFunctionCount/GetFunctionCount.js'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
+import * as GetScopeCount from '../GetScopeCount/GetScopeCount.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 
 // TODO
@@ -19,11 +20,11 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  return GetFunctionCount.getFunctionCount(session, objectGroup)
+  return GetScopeCount.getScopeCount(session, objectGroup)
 }
 
 export const stop = (session, objectGroup) => {
-  return GetFunctionCount.getFunctionCount(session, objectGroup)
+  return GetScopeCount.getScopeCount(session, objectGroup)
 }
 
 export const compare = CompareCount.compareCount
