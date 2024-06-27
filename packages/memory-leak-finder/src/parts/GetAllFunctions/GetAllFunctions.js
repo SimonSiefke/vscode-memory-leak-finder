@@ -15,7 +15,6 @@ export const getAllFunctions = async (session, objectGroup) => {
     prototypeObjectId: prototypeDescriptor.objectId,
     objectGroup,
   })
-  console.log({ objects })
   const fnResult1 = await DevtoolsProtocolRuntime.getProperties(session, {
     objectId: objects.objects.objectId,
     ownProperties: true,
