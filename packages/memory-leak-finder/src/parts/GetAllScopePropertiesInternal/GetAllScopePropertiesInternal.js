@@ -1,5 +1,5 @@
 import * as Assert from '../Assert/Assert.js'
-import * as GetScopeProperties from '../GetScopeProperties/GetScopeProperties.js'
+import * as GetScopeProperties from '../GetFunctionScopeProperty/GetScopeProperties.js'
 
 const isDefined = (value) => {
   return value !== ''
@@ -11,7 +11,7 @@ export const getAllScopeListPropertiesInternal = async (session, objectGroup, ob
   Assert.array(objectIds)
   const promises = []
   for (const objectId of objectIds) {
-    promises.push(GetScopeProperties.getScopeListProperties(session, objectGroup, objectId))
+    promises.push(GetScopeProperties.getFunctionScopeProperty(session, objectGroup, objectId))
   }
   const scopeProperties = await Promise.all(promises)
   const actualScopeProperties = scopeProperties.filter(isDefined)
