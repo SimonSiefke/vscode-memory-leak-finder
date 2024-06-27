@@ -1,6 +1,8 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as GetAllFunctions from '../GetAllFunctions/GetAllFunctions.js'
 import * as GetFunctionScopeProperty from '../GetFunctionScopeProperty/GetFunctionScopeProperty.js'
+import * as Assert from '../Assert/Assert.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import * as ParseFunctionScopeListProperty from '../ParseFunctionScopeListProperty/ParseFunctionScopeListProperty.js'
 
 const getScopeListProperties = async (session, objectId) => {
   const fnResult1 = await DevtoolsProtocolRuntime.getProperties(session, {
@@ -11,8 +13,9 @@ const getScopeListProperties = async (session, objectId) => {
   return fnResult1
 }
 
-export const getFlatScopeList = async (session, objectGroup) => {
+export const getScopes = async (session, objectGroup) => {
   const objectIds = await GetAllFunctions.getAllFunctions(session, objectGroup)
+  // console.log(objectIds)
   const promises = []
   for (const objectId of objectIds) {
     promises.push(GetFunctionScopeProperty.getFunctionScopeProperty(session, objectGroup, objectId))
@@ -27,5 +30,7 @@ export const getFlatScopeList = async (session, objectGroup) => {
   }
   const scopeLists = await Promise.all(promises2)
   const flatScopeLists = scopeLists.flat(1)
-  return flatScopeLists
+  console.log(flatScopeLists)
+  // const scopeProperties = await GetAllScopeProperties.getAllScopeProperties(session, objectGroup, objectIds)
+  return 0
 }

@@ -1,5 +1,5 @@
 import * as Assert from '../Assert/Assert.js'
-import * as GetScopeProperties from '../GetFunctionScopeProperty/GetScopeProperties.js'
+import * as GetScopeProperties from '../GetFunctionScopeProperty/GetFunctionScopeProperty.js'
 
 const isDefined = (value) => {
   return value !== ''
