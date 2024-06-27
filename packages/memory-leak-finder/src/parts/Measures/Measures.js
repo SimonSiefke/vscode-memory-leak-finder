@@ -37,6 +37,7 @@ export * as MeasureInstanceCountsWithSourceMap from '../MeasureInstanceCountsWit
 export * as MeasureIntersectionObserverCount from '../MeasureIntersectionObserverCount/MeasureIntersectionObserverCount.js'
 export * as MeasureIntersectionObserversWithStackTraces from '../MeasureIntersectionObserversWithStackTraces/MeasureIntersectionObserversWithStackTraces.js'
 export * as MeasureMapSize from '../MeasureMapSize/MeasureMapSize.js'
+export * as MeasureScopes from '../MeasureScopes/MeasureScopes.js'
 export * as MeasureMediaQueryListCount from '../MeasureMediaQueryListCount/MeasureMediaQueryListCount.js'
 export * as MeasureMutationObserverCount from '../MeasureMutationObserverCount/MeasureMutationObserverCount.js'
 export * as MeasureMutationObserversWithStackTraces from '../MeasureMutationObserversWithStackTraces/MeasureMutationObserversWithStackTraces.js'
