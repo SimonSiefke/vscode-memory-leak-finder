@@ -1,6 +1,4 @@
-import * as CompareCount from '../CompareCount/CompareCount.js'
-import * as GetScopeCount from '../GetScopeCount/GetScopeCount.js'
-import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
+import * as GetScopes from '../GetScopes/GetScopes.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 
@@ -18,13 +16,20 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  return GetScopeCount.getScopeCount(session, objectGroup)
+  return GetScopes.getScopes(session, objectGroup)
 }
 
 export const stop = (session, objectGroup) => {
-  return GetScopeCount.getScopeCount(session, objectGroup)
+  return GetScopes.getScopes(session, objectGroup)
 }
 
-export const compare = CompareCount.compareCount
+export const compare = (before, after) => {
+  return {
+    before,
+    after,
+  }
+}
 
-export const isLeak = IsLeakCount.isLeakCount
+export const isLeak = (result) => {
+  return true
+}
