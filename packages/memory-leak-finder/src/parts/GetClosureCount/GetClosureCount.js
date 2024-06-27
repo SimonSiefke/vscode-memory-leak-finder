@@ -1,7 +1,7 @@
 import * as GetFlatScopeList from '../GetFlatScopeList/GetFlatScopeList.js'
 
 const isClosure = (scope) => {
-  return scope.value && scope.value.type === 'object' && scope.value.description.startsWith('Closure (')
+  return scope.description.startsWith('Closure (')
 }
 
 export const getClosureCount = async (session, objectGroup) => {
