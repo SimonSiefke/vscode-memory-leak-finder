@@ -33,11 +33,10 @@ const filterArrays = (flatScopeItems) => {
  * @param {any} session
  * @returns {Promise<any>}
  */
-export const getNamedArrayCount = async (session, objectGroup) => {
+export const getNamedArrayCount = async (session, objectGroup, maxItems) => {
   const flatScopeList = await GetFlatScopeList.getFlatScopeList(session, objectGroup)
-  const maxLength = 10_000
-  if (flatScopeList.length > maxLength) {
-    flatScopeList.length = maxLength
+  if (flatScopeList.length > maxItems) {
+    flatScopeList.length = maxItems
   }
   const promises = []
   for (const item of flatScopeList) {
