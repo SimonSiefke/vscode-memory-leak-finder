@@ -1,6 +1,5 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as GetAllFunctions from '../GetAllFunctions/GetAllFunctions.js'
-import * as GetFunctionScopeProperty from '../GetFunctionScopeProperty/GetFunctionScopeProperty.js'
+import * as GetFunctionScopeProperties from '../GetFunctionScopeProperties/GetFunctionScopeProperties.js'
 
 const getScopeListProperties = async (session, objectId) => {
   const fnResult1 = await DevtoolsProtocolRuntime.getProperties(session, {
@@ -12,12 +11,7 @@ const getScopeListProperties = async (session, objectId) => {
 }
 
 export const getFlatScopeList = async (session, objectGroup) => {
-  const objectIds = await GetAllFunctions.getAllFunctions(session, objectGroup)
-  const promises = []
-  for (const objectId of objectIds) {
-    promises.push(GetFunctionScopeProperty.getFunctionScopeProperty(session, objectGroup, objectId))
-  }
-  const scopeListsObjectIds = await Promise.all(promises)
+  const scopeListsObjectIds = await GetFunctionScopeProperties.getFunctionScopeProperties(session, objectGroup)
   const promises2 = []
   for (const objectId of scopeListsObjectIds) {
     if (!objectId) {
