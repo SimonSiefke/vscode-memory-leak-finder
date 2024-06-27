@@ -1,8 +1,8 @@
 import * as Assert from '../Assert/Assert.js'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as ParseScopes from '../ParseScopes/ParseScopes.js'
+import * as ParseFunctionScopeListProperty from '../ParseFunctionScopeListProperty/ParseFunctionScopeListProperty.js'
 
-export const getScopeListProperties = async (session, objectGroup, objectId) => {
+export const getFunctionScopeProperty = async (session, objectGroup, objectId) => {
   Assert.object(session)
   Assert.string(objectGroup)
   Assert.string(objectId)
@@ -11,6 +11,6 @@ export const getScopeListProperties = async (session, objectGroup, objectId) => 
     ownProperties: true,
     generatePreview: false,
   })
-  const scopes = ParseScopes.parseScopes(fnResult1)
-  return scopes
+  const scopeListObjectId = ParseFunctionScopeListProperty.parseFunctionScopeListProperty(fnResult1)
+  return scopeListObjectId
 }
