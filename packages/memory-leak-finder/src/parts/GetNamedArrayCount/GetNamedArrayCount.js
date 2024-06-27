@@ -11,6 +11,24 @@ const getScopeItems = async (session, objectId) => {
   return items
 }
 
+const prettifyFlatScopeItem = (item) => {
+  const { name, value } = item
+  const { description } = value
+  return { name, description }
+}
+
+const prettifyFlatScopeItems = (items) => {
+  return items.map(prettifyFlatScopeItem)
+}
+
+const isArray = (flatScopeItem) => {
+  return flatScopeItem && flatScopeItem.value && flatScopeItem.value.type === 'object' && flatScopeItem.value.subtype === 'array'
+}
+
+const filterArrays = (flatScopeItems) => {
+  return flatScopeItems.filter(isArray)
+}
+
 /**
  * @param {any} session
  * @returns {Promise<any>}
@@ -27,6 +45,7 @@ export const getNamedArrayCount = async (session, objectGroup) => {
   }
   const scopeItems = await Promise.all(promises)
   const flatScopeItems = scopeItems.flat(1)
-  console.log(flatScopeItems)
-  return 0
+  const filteredItems = filterArrays(flatScopeItems)
+  const prettyItems = prettifyFlatScopeItems(filteredItems)
+  return prettyItems
 }
