@@ -17,6 +17,7 @@ export * as MeasureDisposables from '../MeasureDisposables/MeasureDisposables.js
 export * as MeasureDisposedDisposableCount from '../MeasureDisposedDisposableCount/MeasureDisposedDisposableCount.js'
 export * as MeasureDisposedDisposables from '../MeasureDisposedDisposables/MeasureDisposedDisposables.js'
 export * as MeasureDomCounters from '../MeasureDomCounters/MeasureDomCounters.js'
+export * as GetObjectShapeCout from '../GetObjectShapeCout/GetObjectShapeCout.js'
 export * as MeasureDomNodeCount from '../MeasureDomNodeCount/MeasureDomNodeCount.js'
 export * as MeasureDomTimerCount from '../MeasureDomTimerCount/MeasureDomTimerCount.js'
 export * as MeasureEventListenerCount from '../MeasureEventListenerCount/MeasureEventListenerCount.js'
