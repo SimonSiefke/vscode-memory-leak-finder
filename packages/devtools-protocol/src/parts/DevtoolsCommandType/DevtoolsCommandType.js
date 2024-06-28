@@ -6,6 +6,12 @@ export const CssEnable = 'Css.enable'
 
 export const CssDisable = 'Css.disable'
 
+export const HeapProfilerTakeHeapSnapshot = 'HeapProfiler.takeHeapSnapshot'
+
+export const HeapProfilerEnable = 'HeapProfiler.enable'
+
+export const HeapProfilerDisable = 'HeapProfiler.disable'
+
 export const RuntimeEvaluate = 'Runtime.evaluate'
 
 export const RuntimeQueryObjects = 'Runtime.queryObjects'

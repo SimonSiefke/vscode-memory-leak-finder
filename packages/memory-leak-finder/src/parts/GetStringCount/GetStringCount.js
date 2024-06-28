@@ -1,12 +1,13 @@
-import * as GetObjectCount from '../GetObjectCount/GetObjectCount.js'
-import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
-
+import { join } from 'path'
+import * as HeapSnapshot from '../HeapSnapshot/Heapsnapshot.js'
+import * as Root from '../Root/Root.js'
 /**
  *
  * @param {any} session
  * @returns {Promise<number>}
  */
 export const getStringCount = async (session, objectGroup) => {
-  const count = await GetObjectCount.getObjectCount(session, PrototypeExpression.Function)
-  return count
+  const outFile = join(Root.root, '.vscode-heapsnapshots', `1.json`)
+  await HeapSnapshot.takeHeapSnapshot(session, outFile)
+  return 0
 }

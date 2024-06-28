@@ -3,6 +3,7 @@ export const DebuggerResumed = 'Debugger.resumed'
 export const DebuggerScriptParsed = 'Debugger.scriptParsed'
 
 export const HeapProfilerAddHeapSnapshotChunk = 'HeapProfiler.addHeapSnapshotChunk'
+export const HeapProfilerReportHeapSnapshotProgress = 'HeapProfiler.reportHeapSnapshotProgress'
 
 export const PageFrameAttached = 'Page.frameAttached'
 export const PageFrameDetached = 'Page.frameDetached'

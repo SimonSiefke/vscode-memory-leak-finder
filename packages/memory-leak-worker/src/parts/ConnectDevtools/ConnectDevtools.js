@@ -26,6 +26,7 @@ export const connectDevtools = async (devtoolsWebSocketUrl) => {
   browserRpc.on(DevtoolsEventType.TargetTargetCreated, ScenarioFunctions.handleTargetCreated)
   browserRpc.on(DevtoolsEventType.TargetTargetDestroyed, ScenarioFunctions.handleTargetDestroyed)
   browserRpc.on(DevtoolsEventType.TargetTargetInfoChanged, ScenarioFunctions.handleTargetInfoChanged)
+  browserRpc.on(DevtoolsEventType.HeapProfilerAddHeapSnapshotChunk, ScenarioFunctions.handleHeapSnapshotChunk)
 
   await Promise.all([
     DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
