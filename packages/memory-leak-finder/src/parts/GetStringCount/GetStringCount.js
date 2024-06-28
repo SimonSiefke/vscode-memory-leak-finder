@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises'
 import { join } from 'path'
-import * as HeapSnapshot from '../HeapSnapshot/Heapsnapshot.js'
+import * as HeapSnapshot from '../HeapSnapshot/HeapSnapshot.js'
 import * as ParseHeapSnapshotStrings from '../ParseHeapSnapshotStrings/ParseHeapSnapshotStrings.js'
 import * as Root from '../Root/Root.js'
 /**

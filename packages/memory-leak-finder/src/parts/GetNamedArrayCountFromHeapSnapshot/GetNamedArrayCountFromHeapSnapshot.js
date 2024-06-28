@@ -15,7 +15,6 @@ export const getNamedArrayCountFromHeapSnapshot = (heapsnapshot) => {
     const nameIndex = nodes[i + 1]
     if (typeIndex === arrayIndex) {
       const name = strings[nameIndex]
-      console.log({ name, nameIndex })
       arrayCountMap[name] ||= 0
       arrayCountMap[name]++
     }
