@@ -47,6 +47,7 @@ export * as MeasureNamedFunctionCount from '../MeasureNamedFunctionCount/Measure
 export * as MeasureNamedFunctionDifference from '../MeasureNamedFunctionDifference/MeasureNamedFunctionDifference.js'
 export * as MeasureNamedFunctionDifferenceWithSourceMap from '../MeasureNamedFunctionDifferenceWithSourceMap/MeasureNamedFunctionDifferenceWithSourceMap.js'
 export * as MeasureObjectCount from '../MeasureObjectCount/MeasureObjectCount.js'
+export * as MeasureObjectShapeCount from '../MeasureObjectShapeCount/MeasureObjectShapeCount.js'
 export * as MeasurePromiseCount from '../MeasurePromiseCount/MeasurePromiseCount.js'
 export * as MeasurePromises from '../MeasurePromises/MeasurePromises.js'
 export * as MeasureRealObjectCount from '../MeasureRealObjectCount/MeasureRealObjectCount.js'
