@@ -9,7 +9,8 @@ export const getNamedArrayCountFromHeapSnapshot = (heapsnapshot) => {
   const { node_types } = meta
   const arrayIndex = node_types[0].indexOf('array')
   const arrayCountMap = Object.create(null)
-  for (let i = 0; i < nodes.length; i += ITEMS_PER_NODE) {
+  const nodesArray = new Uint32Array(nodes)
+  for (let i = 0; i < nodesArray.length; i += ITEMS_PER_NODE) {
     const typeIndex = nodes[i]
     const nameIndex = nodes[i + 1]
     if (typeIndex === arrayIndex) {
