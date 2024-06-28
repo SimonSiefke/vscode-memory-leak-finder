@@ -1,14 +1,18 @@
-import { VError } from '../VError/VError.js'
 import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.js'
-import { DevtoolsProtocolPage, DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import {
+  DevtoolsProtocolHeapProfiler,
+  DevtoolsProtocolPage,
+  DevtoolsProtocolRuntime,
+  DevtoolsProtocolTarget,
+} from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.js'
 import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.js'
-import * as PageEventState from '../PageEventState/PageEventState.js'
 import * as PTimeout from '../PTimeout/PTimeout.js'
 import * as SessionState from '../SessionState/SessionState.js'
 import * as TargetState from '../TargetState/TargetState.js'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
 import * as UtilityScript from '../UtilityScript/UtilityScript.js'
+import { VError } from '../VError/VError.js'
 
 export const Locator = (selector) => {
   return {
@@ -88,7 +92,11 @@ const handleAttachedToJs = async (message, type) => {
     browserContextId: message.params.browserContextId,
   })
 
-  await Promise.all([DevtoolsProtocolRuntime.enable(sessionRpc), DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc)])
+  await Promise.all([
+    DevtoolsProtocolHeapProfiler.enable(sessionRpc),
+    DevtoolsProtocolRuntime.enable(sessionRpc),
+    DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc),
+  ])
 }
 
 const handleAttachedToWorker = async (message) => {
