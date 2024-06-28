@@ -16,6 +16,7 @@ export const getNamedArrayCountFromHeapSnapshot = (heapsnapshot) => {
   let edgeIndex = 0
   const nodeMap = Object.create(null)
   for (let i = 0; i < nodesArray.length; i += ITEMS_PER_NODE) {
+    console.log('check', i)
     const typeIndex = nodes[i]
     const nameIndex = nodes[i + 1]
     const idIndex = node_types[i + 2]
@@ -26,15 +27,21 @@ export const getNamedArrayCountFromHeapSnapshot = (heapsnapshot) => {
 
     if (typeIndex === closureIndex) {
       const closureName = strings[nameIndex]
-      arrayCountMap[closureName]
+      console.log('is closure', closureName)
       const itemSize = edgeCount * ITEMS_PER_EDGE
+      console.log({ itemSize })
       for (let j = 0; j < itemSize; j += ITEMS_PER_EDGE) {
-        const edgeType = edgesArray[j]
-        const nameOrIndex = edgesArray[j + 1]
-        const toNodeIndex = edgesArray[j + 2]
+        console.log('inner')
+        const edgeType = edgesArray[edgeIndex + j]
+        console.log(edgesArray)
+        console.log('inside', edgeType)
+        const nameOrIndex = edgesArray[edgeIndex + j + 1]
+        const toNodeIndex = edgesArray[edgeIndex + j + 2]
         const connectedNodeType = nodesArray[toNodeIndex]
         const connectedNodeNameIndex = nodesArray[toNodeIndex + 1]
+        console.log({ connectedNodeType, toNodeIndex })
         if (connectedNodeType === arrayIndex) {
+          console.log('is arr')
           const connectedNodeName = strings[connectedNodeNameIndex]
           const edgeName = strings[nameIndex]
           arrayCountMap[edgeName] ||= 0
@@ -42,7 +49,7 @@ export const getNamedArrayCountFromHeapSnapshot = (heapsnapshot) => {
         }
       }
     }
-    edgeIndex += edgeCount
+    edgeIndex += edgeCount * ITEMS_PER_EDGE
   }
   return arrayCountMap
 }

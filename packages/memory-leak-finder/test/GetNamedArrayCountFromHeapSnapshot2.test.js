@@ -1,6 +1,6 @@
-import * as GetNamedArrayCountFromHeapSnapshot from '../src/parts/GetNamedArrayCountFromHeapSnapshot/GetNamedArrayCountFromHeapSnapshot.js'
+import * as GetNamedArrayCountFromHeapSnapshot2 from '../src/parts/GetNamedArrayCountFromHeapSnapshot2/GetNamedArrayCountFromHeapSnapshot2.js'
 
-test.skip('getNamedArrayCountFromHeapSnapshot', () => {
+test.skip('getNamedArrayCountFromHeapSnapshot2', () => {
   const heapsnapshot = {
     snapshot: {
       meta: {
@@ -28,12 +28,12 @@ test.skip('getNamedArrayCountFromHeapSnapshot', () => {
     // prettier-ignore
     nodes: [
       5, 0, 0, 0, 1, 0, 0, // closure
-      1, 1, 0, 0, 0, 0, 0, // array
+      1, 2, 0, 0, 0, 0, 0, // array
     ],
-    edges: [],
-    strings: ['a', 'b'],
+    edges: [0, 1, 7],
+    strings: ['a', 'b', 'c'],
   }
-  expect(GetNamedArrayCountFromHeapSnapshot.getNamedArrayCountFromHeapSnapshot(heapsnapshot)).toEqual({
+  expect(GetNamedArrayCountFromHeapSnapshot2.getNamedArrayCountFromHeapSnapshot(heapsnapshot)).toEqual({
     a: 1,
   })
 })
