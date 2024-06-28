@@ -116,10 +116,6 @@ export const handleTargetInfoChanged = (message) => {
   // console.log('target info changed', message)
 }
 
-export const handleHeapSnapshotChunk = (chunk) => {
-  console.log({ chunk })
-}
-
 export const handleTargetCrashed = (message) => {
   console.log('target crashed', message)
 }
