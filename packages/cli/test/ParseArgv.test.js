@@ -1,3 +1,4 @@
+import { expect, test } from '@jest/globals'
 import * as ParseArgv from '../src/parts/ParseArgv/ParseArgv.js'
 
 test('parseArgv - empty', () => {
