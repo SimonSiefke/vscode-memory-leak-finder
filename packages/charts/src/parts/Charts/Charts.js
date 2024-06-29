@@ -4,3 +4,4 @@ export * as FunctionCount from '../CreateFunctionCountChart/CreateFunctionCountC
 export * as MutationObserverCount from '../CreateMutationObserverCountChart/CreateMutationObserverCountChart.js'
 export * as ObjectCount from '../CreateObjectCountChart/CreateObjectCountChart.js'
 export * as PromiseCount from '../CreatePromiseCountChart/CreatePromiseCountChart.js'
+export * as RegexCount from '../CreateRegexCountChart/CreateRegexCountChart.js'
