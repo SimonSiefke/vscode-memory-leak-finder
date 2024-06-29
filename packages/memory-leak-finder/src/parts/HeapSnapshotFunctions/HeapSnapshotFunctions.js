@@ -1,3 +1,5 @@
+import * as HeapSnapshotWorker from '../HeapSnapshotWorker/HeapSnapshotWorker.js'
+
 // TODO move these functions to heapsnapshot worker,
 // process the whole heapsnapshot in worker
 // to reduce memory usage in memory leak worker
@@ -13,6 +15,5 @@ export const parseHeapSnapshotStrings = async (value) => {
 }
 
 export const getNamedArrayCountFromHeapSnapshot = async (value) => {
-  // return GetNamedArrayCountFromHeapSnapshot.getNamedArrayCountFromHeapSnapshot(value)
-  return {}
+  return HeapSnapshotWorker.invoke('HeapSnapshot.parseNamedArrayCount', value)
 }
