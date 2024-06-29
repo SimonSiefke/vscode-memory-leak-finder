@@ -7,15 +7,18 @@
     "types": ["node", "jest"],
     "moduleResolution": "NodeNext",
     "isolatedModules": true,
+    "strict": true,
     "noImplicitAny": false,
     "skipLibCheck": true,
-    "rootDir": ".",
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "assumeChangesOnlyAffectDirectDependencies": true,
-    "strict": true,
-    "useUnknownInCatchVariables": false,
-    "forceConsistentCasingInFileNames": true
+    "resolveJsonModule": true,
+    "rootDir": ".",
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "composite": true
   },
   "include": ["src", "test"]
 }

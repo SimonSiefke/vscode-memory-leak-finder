@@ -8,6 +8,7 @@ export const enable = async (rpc) => {
 
 export const disable = async (rpc) => {
   const rawResult = await rpc.invoke(DevtoolsCommandType.DebuggerDisable)
+  return rawResult
 }
 
 export const pause = async (rpc) => {

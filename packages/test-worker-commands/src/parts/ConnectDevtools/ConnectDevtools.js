@@ -28,6 +28,7 @@ export const connectDevtools = async (
   const electronRpc = IntermediateConnectionState.get(connectionId)
   IntermediateConnectionState.remove(connectionId)
   const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
+  // @ts-ignore
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
 
   SessionState.addSession('browser', {
@@ -65,7 +66,7 @@ export const connectDevtools = async (
   ])
 
   if (isFirstConnection) {
-    const result = await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+    await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
       functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
       objectId: monkeyPatchedElectron.objectId,
     })

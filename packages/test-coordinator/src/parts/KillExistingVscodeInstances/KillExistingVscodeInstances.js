@@ -20,6 +20,7 @@ export const killExistingVsCodeInstances = async () => {
     }
     KillProcess.killProcess(pid)
   } catch (error) {
+    // @ts-ignore
     if (error && (error.code === ErrorCodes.ENOENT || error.code === ErrorCodes.ESRCH || error.code === ErrorCodes.EPERM)) {
       return
     }
