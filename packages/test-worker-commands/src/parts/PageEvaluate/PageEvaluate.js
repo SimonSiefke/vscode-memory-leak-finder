@@ -21,6 +21,7 @@ export const evaluate = async (rpc, { expression, awaitPromise = false, replMode
     )
     return result
   } catch (error) {
+    // @ts-ignore
     if (error && error.message === 'uniqueContextId not found') {
       throw new ExpectError(`Please wait for window to be loaded before evaluating, e.g. await expect(window).toBeLoaded()`)
     }
