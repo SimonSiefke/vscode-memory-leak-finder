@@ -18,7 +18,8 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noUnusedLocals": false,
-    "composite": true
+    "composite": true,
+    "useUnknownInCatchVariables": false
   },
   "include": ["src", "test"]
 }
