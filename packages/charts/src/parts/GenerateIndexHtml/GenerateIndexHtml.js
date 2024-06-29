@@ -9,6 +9,13 @@ const baseStructure = `
   <head>
     <meta charset="utf-8">
     <title>Charts</title>
+    <style>
+      .Charts {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+    </style>
   </head>
 
   <body>
@@ -19,12 +26,12 @@ const baseStructure = `
 `
 
 const getMiddleHtml = (dirents) => {
-  let html = '<ul>\n'
+  let html = '<ul class="Charts">\n'
   for (const dirent of dirents) {
     if (!dirent.endsWith('.svg')) {
       continue
     }
-    html += `      <li><img src="./${dirent}" alt="${dirent}"></li>\n`
+    html += `      <li class="Chart"><img class="ChartImage" src="./${dirent}" alt="${dirent}"></li>\n`
   }
   html += '    </ul>'
   return html
