@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals'
+import { beforeEach, expect, jest, test } from '@jest/globals'
 import * as CliKeys from '../src/parts/CliKeys/CliKeys.js'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.js'
 import * as ModeType from '../src/parts/ModeType/ModeType.js'
@@ -49,7 +49,7 @@ test('HandleStdinDataInterruptedMode - go to filter mode', () => {
       ' \u001B[2m› Press\u001B[22m Esc \u001B[2mto exit pattern mode.\u001B[22m\n' +
       ' \u001B[2m› Press\u001B[22m Enter \u001B[2mto filter by a regex pattern.\u001B[22m\n' +
       '\n' +
-      '\u001B[2m pattern ›\u001B[22m '
+      '\u001B[2m pattern ›\u001B[22m ',
   )
 })
 
