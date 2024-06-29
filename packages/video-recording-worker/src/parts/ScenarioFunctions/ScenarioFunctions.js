@@ -52,6 +52,7 @@ const handleAttachedToPage = async (message) => {
       },
     )
   } catch (error) {
+    // @ts-ignore
     if (error && error.name === 'TestFinishedError') {
       return
     }

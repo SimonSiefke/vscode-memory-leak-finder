@@ -9,7 +9,7 @@ export const handleFrame = async (message) => {
   if (!ffmpegProcess || !ffmpegProcess.stdin) {
     return
   }
-  const { data, metadata, sessionId } = message.params
+  const { data, sessionId } = message.params
   await mkdir(VideosPath.videosPath, { recursive: true })
   ffmpegProcess.stdin.write(data, 'base64')
   const session = SessionState.getSession(message.sessionId)

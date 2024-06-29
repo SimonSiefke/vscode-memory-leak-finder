@@ -164,6 +164,7 @@ const handleAttachedToPage = async (message) => {
       { milliseconds: TimeoutConstants.AttachToPage },
     )
   } catch (error) {
+    // @ts-ignore
     if (error && error.name === 'TestFinishedError') {
       return
     }

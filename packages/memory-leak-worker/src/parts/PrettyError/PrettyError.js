@@ -98,6 +98,7 @@ const getCodeFrame = (cleanedStack, { color }) => {
         column: column,
       },
     }
+    // @ts-ignore
     const codeFrame = codeFrameColumns(rawLines, location, { highlightCode: color, forceColor: color })
     return codeFrame
   } catch (error) {

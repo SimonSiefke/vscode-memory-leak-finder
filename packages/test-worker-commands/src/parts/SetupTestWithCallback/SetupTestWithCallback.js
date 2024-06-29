@@ -2,6 +2,7 @@ import * as ImportTest from '../ImportTest/ImportTest.js'
 import * as TestStage from '../TestStage/TestStage.js'
 import * as Assert from '../Assert/Assert.js'
 
+// @ts-ignore
 export const setupTestWithCallback = async (pageObject, file, forceRun) => {
   Assert.object(pageObject)
   Assert.string(file)
