@@ -1,3 +1,4 @@
+import { expect, test } from '@jest/globals'
 import { DevtoolsProtocolError } from '../src/parts/DevtoolsProtocolError/DevtoolsProtocolError.js'
 import * as IsDevtoolsCannotFindContextError from '../src/parts/IsDevtoolsCannotFindContextError/IsDevtoolsCannotFindContextError.js'
 
