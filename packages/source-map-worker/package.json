@@ -63,5 +63,17 @@
     "ignores": [
       "distmin"
     ]
+  },
+  "jest": {
+    "injectGlobals": false,
+    "collectCoverage": true,
+    "coverageThreshold": {
+      "global": {
+        "branches": 70,
+        "functions": 88,
+        "lines": 88,
+        "statements": 88
+      }
+    }
   }
 }
