@@ -1,6 +1,7 @@
 import * as ImportTest from '../ImportTest/ImportTest.js'
 import * as TestStage from '../TestStage/TestStage.js'
 
+// @ts-ignore
 export const runTestWithCallback = async (pageObject, file, forceRun) => {
   const module = await ImportTest.importTest(file)
   if (module.skip && !forceRun) {

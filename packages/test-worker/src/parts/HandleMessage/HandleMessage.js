@@ -1,6 +1,7 @@
 import { join } from 'path'
 import * as ImportScript from '../ImportScript/ImportScript.js'
 import * as Root from '../Root/Root.js'
+// @ts-ignore
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.js'
 
 const getModule = async () => {
