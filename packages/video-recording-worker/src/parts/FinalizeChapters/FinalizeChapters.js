@@ -44,6 +44,5 @@ export const finalizeChapters = async () => {
   await writeFile(metaDataPath, data)
   await Exec.exec(ffmpegPath, metaDataArgs, {
     cwd: folderName,
-    stdio: 'inherit',
   })
 }
