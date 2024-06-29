@@ -7,6 +7,13 @@ import * as JsonRpc from '../JsonRpc/JsonRpc.js'
 import * as Root from '../Root/Root.js'
 import * as VideoRecordingWorker from '../VideoRecordingWorker/VideoRecordingWorker.js'
 
+export const state = {
+  /**
+   * @type {any}
+   */
+  ipc: undefined,
+}
+
 export const start = async (devtoolsWebsocketUrl) => {
   Assert.string(devtoolsWebsocketUrl)
   const ipc = await VideoRecordingWorker.start()
@@ -14,4 +21,10 @@ export const start = async (devtoolsWebsocketUrl) => {
   await JsonRpc.invoke(ipc, 'ConnectDevtools.connectDevtools', devtoolsWebsocketUrl)
   const outFile = join(Root.root, '.vscode-videos', 'video.webm')
   await JsonRpc.invoke(ipc, 'VideoRecording.start', outFile)
+  state.ipc = ipc
+}
+
+export const addChapter = (name) => {
+  const { ipc } = state
+  return JsonRpc.invoke(ipc, 'VideoRecording.addChapter', name)
 }

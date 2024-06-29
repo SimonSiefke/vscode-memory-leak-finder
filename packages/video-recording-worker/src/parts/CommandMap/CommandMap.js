@@ -5,4 +5,5 @@ import * as VideoWorkerCommandType from '../VideoWorkerCommandType/VideoWorkerCo
 export const commandMap = {
   [VideoWorkerCommandType.ConnectDevtools]: ConnectDevtools.connectDevtools,
   [VideoWorkerCommandType.VideoRecordingStart]: VideoRecording.start,
+  [VideoWorkerCommandType.VideoRecordingAddChapter]: VideoRecording.addChapter,
 }

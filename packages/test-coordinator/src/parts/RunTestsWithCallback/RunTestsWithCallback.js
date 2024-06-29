@@ -10,6 +10,7 @@ import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAtt
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.js'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.js'
+import * as VideoRecording from '../VideoRecording/VideoRecording.js'
 import * as Time from '../Time/Time.js'
 import * as Timeout from '../Timeout/Timeout.js'
 
@@ -86,6 +87,9 @@ export const runTests = async (
       const forceRun = dirent === `${filterValue}.js`
       if (i !== 0) {
         callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, /* isFirst */ true)
+      }
+      if (recordVideo) {
+        await VideoRecording.addChapter(dirent)
       }
       try {
         const start = i === 0 ? initialStart : Time.now()
