@@ -1,4 +1,5 @@
 import * as GetVsCodeEnv from '../src/parts/GetVsCodeEnv/GetVsCodeEnv.js'
+import {test, expect} from '@jest/globals'
 
 test('getVsCodeEnv - remove node options', () => {
   const extensionsFolder = ''
