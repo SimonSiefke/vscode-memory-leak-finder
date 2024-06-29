@@ -5,13 +5,33 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "node src/main.js"
+    "dev": "node src/main.js",
+    "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
+    "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@observablehq/plot": "^0.6.13",
     "jsdom": "^24.0.0"
+  },
+  "jest": {
+    "testMatch": [
+      "<rootDir>/test/**/*.js"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/.vscode-test/"
+    ],
+    "injectGlobals": false,
+    "collectCoverage": true,
+    "coverageThreshold": {
+      "global": {
+        "branches": 0,
+        "functions": 0,
+        "lines": 10,
+        "statements": 10
+      }
+    }
   }
 }
