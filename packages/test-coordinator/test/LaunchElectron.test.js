@@ -109,6 +109,7 @@ test('launch - error - yarn is not installed', async () => {
       stderr,
     }
   })
+  // @ts-ignore
   await expect(LaunchElectron.launchElectron({ cliPath: '', args: [], headlessMode: true })).rejects.toThrow(
     new Error(`Failed to launch electron: yarn not installed in this node version (test-node-version)`),
   )
