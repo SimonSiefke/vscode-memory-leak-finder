@@ -44,10 +44,10 @@ export const getNamedArrayCountFromHeapSnapshot = (heapsnapshot) => {
   // // console.log({ other, len: parsedNodes.length })
   // const items = edges.map((edge) => parsedNodes[edge])
   //  graph[interesting.id]
-  console.log({ items })
+  // console.log({ items })
   return {
-    interesting,
+    // interesting,
     // graph,
-    items,
+    // items,
   }
 }
