@@ -3,4 +3,5 @@ export * as DetachedDomNodeCount from '../CreateDetachedDomNodeCountChart/Create
 export * as FunctionCount from '../CreateFunctionCountChart/CreateFunctionCountChart.js'
 export * as ObjectCount from '../CreateObjectCountChart/CreateObjectCountChart.js'
 export * as PromiseCount from '../CreatePromiseCountChart/CreatePromiseCountChart.js'
+export * as RegexCount from '../CreateRegexCountChart/CreateRegexCountChart.js'
 export * as StringCount from '../CreateStringCountChart/CreateStringCountChart.js'
