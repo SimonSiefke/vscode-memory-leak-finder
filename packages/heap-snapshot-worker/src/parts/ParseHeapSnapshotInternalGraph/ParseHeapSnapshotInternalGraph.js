@@ -11,6 +11,9 @@ export const parseHeapSnapshotInternalGraph = (nodes, edges) => {
   for (const node of nodes) {
     for (let i = 0; i < node.edgeCount; i++) {
       const edge = edges[edgeIndex++]
+      if (edge.toNode === 1168727) {
+        console.log(edge)
+      }
       graph[node.id].push(edge.toNode)
     }
   }
