@@ -1,5 +1,6 @@
 import EventEmitter from 'node:events'
 import { jest } from '@jest/globals'
+import { test, expect, beforeEach } from '@jest/globals'
 
 beforeEach(() => {
   jest.resetAllMocks()

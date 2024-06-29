@@ -1,4 +1,5 @@
 import * as CleanStack from '../src/parts/CleanStack/CleanStack.js'
+import { test, expect } from '@jest/globals'
 
 test('cleanStack - show internal errors', async () => {
   const stack = `DevtoolsProtocolError: uniqueContextId not found
