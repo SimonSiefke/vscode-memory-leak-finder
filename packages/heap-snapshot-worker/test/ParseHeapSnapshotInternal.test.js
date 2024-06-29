@@ -1,4 +1,4 @@
-import * as ParseHeapSnapshotInternal from '../../memory-leak-finder/src/parts/ParseHeapSnapshotInternal/ParseHeapSnapshotInternal.js'
+import * as ParseHeapSnapshotInternal from '../src/parts/ParseHeapSnapshotInternal/ParseHeapSnapshotInternal.js'
 import { test, expect } from '@jest/globals'
 
 test('single node', () => {
