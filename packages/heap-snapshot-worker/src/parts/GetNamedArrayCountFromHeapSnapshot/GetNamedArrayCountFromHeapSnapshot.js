@@ -18,10 +18,13 @@ export const getNamedArrayCountFromHeapSnapshot = (heapsnapshot) => {
   // for (const closureNode of closureNodes) {
   // }
   const interesting = closureNodes.find((item) => item.name === 'IpcChildWithModuleWorker')
+  // const
   const other = parsedNodes[204218]
   console.log({ other, len: parsedNodes.length })
+  const items = graph[interesting.id]
   return {
     interesting,
-    graph,
+    // graph,
+    items,
   }
 }
