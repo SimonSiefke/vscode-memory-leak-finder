@@ -1,3 +1,4 @@
+import { expect, test } from '@jest/globals'
 import * as WatchUsageShort from '../src/parts/WatchUsageShort/WatchUsageShort.js'
 
 test('print', () => {

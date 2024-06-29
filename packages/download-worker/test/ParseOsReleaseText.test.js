@@ -11,3 +11,10 @@ VERSION_ID="24.04"`
     version: '24.04 LTS (Noble Numbat)',
   })
 })
+
+test('parseOsReleaseText - empty lines', () => {
+  const releaseText = `
+
+`
+  expect(ParseOsReleaseText.parseOSReleaseText(releaseText)).toEqual({})
+})
