@@ -24,7 +24,12 @@ export const start = async (devtoolsWebsocketUrl) => {
   state.ipc = ipc
 }
 
-export const addChapter = (name) => {
+export const addChapter = (name, time) => {
   const { ipc } = state
-  return JsonRpc.invoke(ipc, 'VideoRecording.addChapter', name)
+  return JsonRpc.invoke(ipc, 'VideoRecording.addChapter', name, time)
+}
+
+export const finalize = () => {
+  const { ipc } = state
+  return JsonRpc.invoke(ipc, 'VideoRecording.finalize')
 }
