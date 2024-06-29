@@ -1,3 +1,4 @@
+// @ts-ignore
 import * as Callback from '../Callback/Callback.js'
 import * as JsonRpcVersion from '../JsonRpcVersion/JsonRpcVersion.js'
 
