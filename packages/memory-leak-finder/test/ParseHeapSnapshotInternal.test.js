@@ -1,103 +1,153 @@
 import * as ParseHeapSnapshotInternal from '../src/parts/ParseHeapSnapshotInternal/ParseHeapSnapshotInternal.js'
 
 test('single node', () => {
-  const nodes = new Uint32Array([0, 0, 0, 0, 0, 0, 0])
-  const edges = new Uint32Array()
-  expect(ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, edges)).toEqual([
-    {
-      type: 'node',
-      a: 0,
-      b: 0,
-      c: 0,
-      d: 0,
-      e: 0,
-      f: 0,
-      g: 0,
-      references: [],
-      referrers: [],
-    },
-  ])
+  const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness']
+  const nodeTypes = [
+    'hidden',
+    'array',
+    'string',
+    'object',
+    'code',
+    'closure',
+    'regexp',
+    'number',
+    'native',
+    'synthetic',
+    'concatenated string',
+    'sliced string',
+    'symbol',
+    'bigint',
+    'object shape',
+  ]
+  const edgeFields = ['type', 'name_or_index', 'to_node']
+  const edgeTypes = ['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']
+  const nodes = [0, 0, 0, 0, 0, 0, 0]
+  const edges = []
+  const strings = ['a']
+  expect(ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings)).toEqual({
+    graph: { 0: [] },
+    parsedNodes: [
+      {
+        detachedness: 0,
+        edgeCount: 0,
+        id: 0,
+        name: 'a',
+        selfSize: 0,
+        traceNodeId: 0,
+        type: 'hidden',
+      },
+    ],
+  })
 })
 
 test('two nodes', () => {
+  const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness']
+  const nodeTypes = [
+    'hidden',
+    'array',
+    'string',
+    'object',
+    'code',
+    'closure',
+    'regexp',
+    'number',
+    'native',
+    'synthetic',
+    'concatenated string',
+    'sliced string',
+    'symbol',
+    'bigint',
+    'object shape',
+  ]
+  const edgeFields = ['type', 'name_or_index', 'to_node']
+  const edgeTypes = ['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']
   // prettier-ignore
-  const nodes = new Uint32Array([
+  const nodes = [
     0, 0, 0, 0, 0, 0, 0, // first node
-    0, 0, 0, 0, 0, 0, 0 // second node
-  ])
-  const edges = new Uint32Array()
-  expect(ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, edges)).toEqual([
-    {
-      type: 'node',
-      a: 0,
-      b: 0,
-      c: 0,
-      d: 0,
-      e: 0,
-      f: 0,
-      g: 0,
-      references: [],
-      referrers: [],
+    0, 1, 1, 0, 0, 0, 0 // second node
+  ]
+  const edges = []
+  const strings = ['a', 'b']
+  expect(ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings)).toEqual({
+    graph: {
+      0: [],
+      1: [],
     },
-    {
-      type: 'node',
-      a: 0,
-      b: 0,
-      c: 0,
-      d: 0,
-      e: 0,
-      f: 0,
-      g: 0,
-      references: [],
-      referrers: [],
-    },
-  ])
+    parsedNodes: [
+      {
+        detachedness: 0,
+        edgeCount: 0,
+        id: 0,
+        name: 'a',
+        selfSize: 0,
+        traceNodeId: 0,
+        type: 'hidden',
+      },
+      {
+        detachedness: 0,
+        edgeCount: 0,
+        id: 1,
+        name: 'b',
+        selfSize: 0,
+        traceNodeId: 0,
+        type: 'hidden',
+      },
+    ],
+  })
 })
 
-test.skip('two nodes connected by edge', () => {
+test('two nodes connected by edge', () => {
+  const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness']
+  const nodeTypes = [
+    'hidden',
+    'array',
+    'string',
+    'object',
+    'code',
+    'closure',
+    'regexp',
+    'number',
+    'native',
+    'synthetic',
+    'concatenated string',
+    'sliced string',
+    'symbol',
+    'bigint',
+    'object shape',
+  ]
+  const edgeFields = ['type', 'name_or_index', 'to_node']
+  const edgeTypes = ['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']
   // prettier-ignore
-  const nodes = new Uint32Array([
+  const nodes = [
     0, 0, 0, 0, 1, 0, 0, // first node
-    0, 0, 0, 0, 0, 0, 0 // second node
-  ])
-  const edges = new Uint32Array([0, 0, 1])
-  expect(ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, edges)).toEqual([
-    {
-      type: 'node',
-      a: 0,
-      b: 0,
-      c: 0,
-      d: 0,
-      e: 0,
-      f: 0,
-      g: 0,
-      references: [
-        {
-          type: 'node',
-          a: 0,
-          b: 0,
-          c: 0,
-          d: 0,
-          e: 0,
-          f: 0,
-          g: 0,
-          references: [],
-          referrers: [],
-        },
-      ],
-      referrers: [],
+    0, 1, 1, 0, 0, 0, 0 // second node
+  ]
+  const edges = [0, 0, 1]
+  const strings = ['a', 'b']
+  expect(ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings)).toEqual({
+    graph: {
+      0: [1],
+      1: [],
     },
-    {
-      type: 'node',
-      a: 0,
-      b: 0,
-      c: 0,
-      d: 0,
-      e: 0,
-      f: 0,
-      g: 0,
-      references: [],
-      referrers: [],
-    },
-  ])
+    parsedNodes: [
+      {
+        detachedness: 0,
+        edgeCount: 1,
+        id: 0,
+        name: 'a',
+        selfSize: 0,
+        traceNodeId: 0,
+        type: 'hidden',
+      },
+      {
+        detachedness: 0,
+        edgeCount: 0,
+        id: 1,
+        name: 'b',
+        selfSize: 0,
+        traceNodeId: 0,
+        type: 'hidden',
+      },
+    ],
+  })
 })
