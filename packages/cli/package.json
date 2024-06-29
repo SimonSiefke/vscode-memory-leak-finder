@@ -30,7 +30,20 @@
     },
     "testMatch": [
       "<rootDir>/test/**/*.js"
-    ]
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/.vscode-test/"
+    ],
+    "injectGlobals": false,
+    "collectCoverage": true,
+    "coverageThreshold": {
+      "global": {
+        "branches": 40,
+        "functions": 40,
+        "lines": 40,
+        "statements": 40
+      }
+    }
   },
   "xo": {
     "rules": {
