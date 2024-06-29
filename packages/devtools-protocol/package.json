@@ -12,11 +12,21 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {},
   "jest": {
     "modulePathIgnorePatterns": [
       "<rootDir>/.vscode-test/"
-    ]
-  },
-  "dependencies": {},
-  "devDependencies": {}
+    ],
+    "injectGlobals": false,
+    "collectCoverage": true,
+    "coverageThreshold": {
+      "global": {
+        "branches": 10,
+        "functions": 10,
+        "lines": 10,
+        "statements": 10
+      }
+    }
+  }
 }
