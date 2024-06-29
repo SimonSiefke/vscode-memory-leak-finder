@@ -1,7 +1,7 @@
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 import * as HeapSnapshot from '../HeapSnapshot/HeapSnapshot.js'
-import * as ParseHeapSnapshotStrings from '../ParseHeapSnapshotStrings/ParseHeapSnapshotStrings.js'
+import * as HeapSnapshotFunctions from '../HeapSnapshotFunctions/HeapSnapshotFunctions.js'
 import * as Root from '../Root/Root.js'
 /**
  *
@@ -13,7 +13,7 @@ export const getStringCount = async (session, objectGroup) => {
   await HeapSnapshot.takeHeapSnapshot(session, outFile)
   const content = await readFile(outFile, 'utf8')
   const value = JSON.parse(content)
-  const strings = ParseHeapSnapshotStrings.parseHeapSnapshotStrings(value)
+  const strings = await HeapSnapshotFunctions.parseHeapSnapshotStrings(value)
   const stringCount = strings.length
   return stringCount
 }
