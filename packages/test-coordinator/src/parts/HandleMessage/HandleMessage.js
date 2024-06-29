@@ -1,4 +1,5 @@
 import { join } from 'node:path'
+// @ts-ignore
 import * as ImportScript from '../ImportScript/ImportScript.js'
 import * as Root from '../Root/Root.js'
 import * as TestCoordinatorCommandType from '../TestCoordinatorCommandType/TestCoordinatorCommandType.js'

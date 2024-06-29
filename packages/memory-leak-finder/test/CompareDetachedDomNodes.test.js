@@ -1,4 +1,5 @@
 import * as CompareDetachedDomNodes from '../src/parts/CompareDetachedDomNodes/CompareDetachedDomNodes.js'
+import { test, expect } from '@jest/globals'
 
 test('compareDetachedDomNodes', () => {
   const before = [

@@ -1,4 +1,5 @@
 import * as CompareInstance from '../src/parts/CompareInstance/CompareInstance.js'
+import { test, expect } from '@jest/globals'
 
 test('compareInstance - by name', () => {
   const a = {

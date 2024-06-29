@@ -1,17 +1,13 @@
-import * as GetAllScopePropertiesInternal from '../GetAllScopePropertiesInternal/GetAllScopePropertiesInternal.js'
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
-import * as GetAllFunctions from '../GetAllFunctions/GetAllFunctions.js'
 import * as GetArrayNameMap from '../GetArrayNameMap/GetArrayNameMap.js'
 
 const getAllScopes = async (session, objectGroup) => {
-  const scopes = await GetAllScopePropertiesInternal.getAllScopePropertiesInternal(session, objectGroup, functionObjectIds)
-  const firstObjectId = scopes[0].objectId
-  const scopeListProperties = await DevtoolsProtocolRuntime.getProperties(session, {
-    objectId: firstObjectId,
-    generatePreview: true,
-    ownProperties: true,
-  })
+  // const scopes = await GetAllScopePropertiesInternal.getAllScopePropertiesInternal(session, objectGroup, functionObjectIds)
+  // const firstObjectId = scopes[0].objectId
+  // const scopeListProperties = await DevtoolsProtocolRuntime.getProperties(session, {
+  //   objectId: firstObjectId,
+  //   generatePreview: true,
+  //   ownProperties: true,
+  // })
 }
 
 export const getArrays = async (session, objectGroup) => {
