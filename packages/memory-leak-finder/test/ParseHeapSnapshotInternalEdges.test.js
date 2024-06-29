@@ -1,4 +1,5 @@
 import * as ParseHeapSnapshotInternalEdges from '../src/parts/ParseHeapSnapshotInternalEdges/ParseHeapSnapshotInternalEdges.js'
+import { test, expect } from '@jest/globals'
 
 test('single node', () => {
   const edgeFields = ['type', 'name_or_index', 'to_node']
