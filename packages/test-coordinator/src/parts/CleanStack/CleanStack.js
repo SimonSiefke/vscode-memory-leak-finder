@@ -1,6 +1,3 @@
-import { relative } from 'node:path'
-import { fileURLToPath } from 'node:url'
-
 const isTestWorkerLine = (line) => {
   if (line.includes('test-worker/src')) {
     return true

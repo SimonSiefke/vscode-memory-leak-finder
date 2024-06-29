@@ -20,6 +20,7 @@ export const getErrorResponse = async (message, error) => {
     jsonrpc: JsonRpcVersion.Two,
     id: message.id,
     error: {
+      // @ts-ignore
       code: JsonRpcErrorCode.Custom,
       message: prettyError.message,
       data: {
