@@ -72,18 +72,6 @@ export const handleRuntimeExecutionContextsCleared = (message) => {
   // console.log('execution contexts cleared', message)
 }
 
-const handlePageFrameAttached = (event) => {
-  console.log('frame attached', event)
-}
-
-const handlePageFrameDetached = (event) => {
-  console.log('frame detached', event)
-}
-
-const handleConsoleApiCalled = (event) => {
-  console.log(`page:`, event.params.args[0].value)
-}
-
 export const getSessions = () => {
   return SessionState.getAllSessions()
 }
@@ -207,6 +195,7 @@ const handleAttachedToPage = async (message) => {
       { milliseconds: TimeoutConstants.AttachToPage },
     )
   } catch (error) {
+    // @ts-ignore
     if (error && error.name === 'TestFinishedError') {
       return
     }

@@ -3,6 +3,7 @@ import * as FunctionExpectElectronWindowTitle from '../FunctionExpectElectronWin
 
 export const toHaveBounds = async (page, x, y, width, height) => {
   // TODO pass expected bounds as arguments
+  // @ts-ignore
   const title = await DevtoolsProtocolRuntime.callFunctionOn(page.electronRpc, {
     objectId: page.electronObjectId,
     returnByValue: true,
