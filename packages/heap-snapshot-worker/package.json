@@ -7,7 +7,10 @@
   "bin": {
     "memory-leak-worker": "bin/heap-snapshot-worker.js"
   },
-  "scripts": {},
+  "scripts": {
+    "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
+    "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
+  },
   "keywords": [],
   "author": "",
   "license": "MIT",
@@ -61,5 +64,17 @@
     "ignores": [
       "distmin"
     ]
+  },
+  "jest": {
+    "injectGlobals": false,
+    "collectCoverage": true,
+    "coverageThreshold": {
+      "global": {
+        "branches": 50,
+        "functions": 60,
+        "lines": 60,
+        "statements": 60
+      }
+    }
   }
 }

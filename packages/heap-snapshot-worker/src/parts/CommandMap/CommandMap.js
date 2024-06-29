@@ -1,14 +1,11 @@
-import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.js'
-import * as MemoryLeakFinderCompare from '../MemoryLeakFinderCompare/MemoryLeakFinderCompare.js'
-import * as MemoryLeakFinderSetup from '../MemoryLeakFinderSetup/MemoryLeakFinderSetup.js'
-import * as MemoryLeakFinderStart from '../MemoryLeakFinderStart/MemoryLeakFinderStart.js'
-import * as MemoryLeakFinderStop from '../MemoryLeakFinderStop/MemoryLeakFinderStop.js'
-import * as MemoryLeakWorkerCommandType from '../MemoryLeakWorkerCommandType/MemoryLeakWorkerCommandType.js'
+import * as GetNamedArrayCountFromHeapSnapshot from '../GetNamedArrayCountFromHeapSnapshot/GetNamedArrayCountFromHeapSnapshot.js'
+import * as GetObjectShapeCountFromHeapSnapshot from '../GetObjectShapeCountFromHeapSnapshot/GetObjectShapeCountFromHeapSnapshot.js'
+import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
+import * as ParseHeapSnapshotStrings from '../ParseHeapSnapshotStrings/ParseHeapSnapshotStrings.js'
 
 export const commandMap = {
-  [MemoryLeakWorkerCommandType.ConnectDevtools]: ConnectDevtools.connectDevtools,
-  [MemoryLeakWorkerCommandType.MemoryLeakFinderCompare]: MemoryLeakFinderCompare.compare,
-  [MemoryLeakWorkerCommandType.MemoryLeakFinderSetup]: MemoryLeakFinderSetup.setup,
-  [MemoryLeakWorkerCommandType.MemoryLeakFinderStart]: MemoryLeakFinderStart.start,
-  [MemoryLeakWorkerCommandType.MemoryLeakFinderStop]: MemoryLeakFinderStop.stop,
+  'HeapSnapshot.parseStrings': ParseHeapSnapshotStrings.parseHeapSnapshotStrings,
+  'HeapSnapshot.parseHeapSnapshot': ParseHeapSnapshot.parseHeapSnapshot,
+  'HeapSnapshot.parseObjectShapeCount': GetObjectShapeCountFromHeapSnapshot.getObjectShapeCountFromHeapSnapshot,
+  'HeapSnapshot.parseNamedArrayCount': GetNamedArrayCountFromHeapSnapshot.getNamedArrayCountFromHeapSnapshot,
 }
