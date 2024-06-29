@@ -8,7 +8,7 @@ test('single node', () => {
     {
       nameOrIndex: 1,
       toNode: 7,
-      type: 1,
+      type: 'element',
     },
   ])
 })

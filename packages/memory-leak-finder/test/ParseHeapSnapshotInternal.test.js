@@ -25,7 +25,17 @@ test('single node', () => {
   const edges = []
   expect(ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes)).toEqual({
     graph: { 0: [] },
-    parsedNodes: [{ detachedness: 0, edgeCount: 0, id: 0, name: 0, selfSize: 0, traceNodeId: 0, type: 0 }],
+    parsedNodes: [
+      {
+        detachedness: 0,
+        edgeCount: 0,
+        id: 0,
+        name: 0,
+        selfSize: 0,
+        traceNodeId: 0,
+        type: 'hidden',
+      },
+    ],
   })
 })
 
@@ -69,7 +79,7 @@ test('two nodes', () => {
         name: 0,
         selfSize: 0,
         traceNodeId: 0,
-        type: 0,
+        type: 'hidden',
       },
       {
         detachedness: 0,
@@ -78,7 +88,7 @@ test('two nodes', () => {
         name: 0,
         selfSize: 0,
         traceNodeId: 0,
-        type: 0,
+        type: 'hidden',
       },
     ],
   })
@@ -124,7 +134,7 @@ test('two nodes connected by edge', () => {
         name: 0,
         selfSize: 0,
         traceNodeId: 0,
-        type: 0,
+        type: 'hidden',
       },
       {
         detachedness: 0,
@@ -133,7 +143,7 @@ test('two nodes connected by edge', () => {
         name: 0,
         selfSize: 0,
         traceNodeId: 0,
-        type: 0,
+        type: 'hidden',
       },
     ],
   })

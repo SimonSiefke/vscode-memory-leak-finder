@@ -28,7 +28,7 @@ test('single node', () => {
       name: 0,
       selfSize: 0,
       traceNodeId: 0,
-      type: 0,
+      type: 'hidden',
     },
   ])
 })
