@@ -7,5 +7,5 @@ export const finalize = async () => {
     return
   }
   ffmpegProcess.stdin.end()
-  // await FinalizeChapters.finalizeChapters()
+  await FinalizeChapters.finalizeChapters()
 }

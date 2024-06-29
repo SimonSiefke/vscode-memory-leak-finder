@@ -1,13 +1,17 @@
 import * as Assert from '../Assert/Assert.js'
 
-const chapters = []
+export const state = {
+  /**
+   * @type {any[]}
+   */
+  chapters: [],
+}
 
 export const addChapter = (name, time) => {
   Assert.string(name)
   Assert.number(time)
-  chapters.push({
+  state.chapters.push({
     name,
     time,
   })
-  console.log('chapter', name, time)
 }
