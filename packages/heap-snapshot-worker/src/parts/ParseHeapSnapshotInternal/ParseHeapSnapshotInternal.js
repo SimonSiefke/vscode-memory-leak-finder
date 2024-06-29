@@ -1,8 +1,8 @@
 import * as Assert from '../Assert/Assert.js'
+import * as CleanNodes from '../CleanNodes/CleanNodes.js'
 import * as ParseHeapSnapshotInternalEdges from '../ParseHeapSnapshotInternalEdges/ParseHeapSnapshotInternalEdges.js'
 import * as ParseHeapSnapshotInternalGraph from '../ParseHeapSnapshotInternalGraph/ParseHeapSnapshotInternalGraph.js'
 import * as ParseHeapSnapshotInternalNodes from '../ParseHeapSnapshotInternalNodes/ParseHeapSnapshotInternalNodes.js'
-import * as CleanNodes from '../CleanNodes/CleanNodes.js'
 
 export const parseHeapSnapshotInternal = (nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings) => {
   Assert.array(nodes)
