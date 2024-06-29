@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/SimonSiefke/vscode-memory-leak-finder#readme",
   "devDependencies": {
-    "@types/node": "^20.14.2",
+    "@types/node": "^20.14.9",
     "execa": "^9.3.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
