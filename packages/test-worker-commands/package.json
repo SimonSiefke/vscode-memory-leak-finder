@@ -28,5 +28,20 @@
     "@babel/code-frame": "^7.24.7",
     "@types/ws": "^8.5.10",
     "clean-stack": "^5.2.0"
+  },
+  "jest": {
+    "testMatch": [
+      "<rootDir>/test/**/*.js"
+    ],
+    "injectGlobals": false,
+    "collectCoverage": true,
+    "coverageThreshold": {
+      "global": {
+        "branches": 30,
+        "functions": 30,
+        "lines": 30,
+        "statements": 30
+      }
+    }
   }
 }

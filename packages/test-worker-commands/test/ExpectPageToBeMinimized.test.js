@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals'
+import { expect, jest, test } from '@jest/globals'
 import * as DevtoolsCommandType from '../src/parts/DevtoolsCommandType/DevtoolsCommandType.js'
 import * as ExpectPageToBeMinimized from '../src/parts/ExpectPageToBeMinimized/ExpectPageToBeMinimized.js'
 
