@@ -1,6 +1,24 @@
 import * as ParseHeapSnapshotInternal from '../src/parts/ParseHeapSnapshotInternal/ParseHeapSnapshotInternal.js'
 
 test('single node', () => {
+  const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness']
+  const nodeTypes = [
+    'hidden',
+    'array',
+    'string',
+    'object',
+    'code',
+    'closure',
+    'regexp',
+    'number',
+    'native',
+    'synthetic',
+    'concatenated string',
+    'sliced string',
+    'symbol',
+    'bigint',
+    'object shape',
+  ]
   const nodes = new Uint32Array([0, 0, 0, 0, 0, 0, 0])
   const edges = new Uint32Array()
   expect(ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, edges)).toEqual([
