@@ -1,5 +1,5 @@
 import * as GetCountData from '../GetCountData/GetCountData.js'
 
-export const getWeakSetCountData = () => {
+export const getObjectCountsData = () => {
   return GetCountData.getCountData('object-count', 'objectCount')
 }
