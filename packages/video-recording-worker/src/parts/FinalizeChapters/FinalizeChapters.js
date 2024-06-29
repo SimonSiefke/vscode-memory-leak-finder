@@ -1,7 +1,7 @@
-import { spawn } from 'child_process'
 import { existsSync } from 'fs'
 import { writeFile } from 'fs/promises'
 import { basename, dirname, join } from 'path'
+import * as Exec from '../Exec/Exec.js'
 import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.js'
 import * as VideoChapter from '../VideoChapter/VideoChapter.js'
 
@@ -42,11 +42,8 @@ export const finalizeChapters = async () => {
   const data = getChaptersData(chapters)
   const metaDataPath = join(folderName, 'metadata.txt')
   await writeFile(metaDataPath, data)
-  const child = spawn(ffmpegPath, metaDataArgs, {
+  await Exec.exec(ffmpegPath, metaDataArgs, {
     cwd: folderName,
     stdio: 'inherit',
-  })
-  await new Promise((r) => {
-    child.on('exit', r)
   })
 }
