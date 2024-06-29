@@ -1,4 +1,5 @@
 import * as ParseHeapSnapshotInternalGraph from '../src/parts/ParseHeapSnapshotInternalGraph/ParseHeapSnapshotInternalGraph.js'
+import { test, expect } from '@jest/globals'
 
 test('single node', () => {
   const nodes = [

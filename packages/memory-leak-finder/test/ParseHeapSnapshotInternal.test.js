@@ -1,4 +1,5 @@
 import * as ParseHeapSnapshotInternal from '../src/parts/ParseHeapSnapshotInternal/ParseHeapSnapshotInternal.js'
+import { test, expect } from '@jest/globals'
 
 test('single node', () => {
   const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness']

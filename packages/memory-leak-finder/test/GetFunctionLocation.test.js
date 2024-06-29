@@ -1,4 +1,5 @@
 import * as GetFunctionLocation from '../src/parts/GetFunctionLocation/GetFunctionLocation.js'
+import { test, expect } from '@jest/globals'
 
 test('getFunctionLocation', async () => {
   const session = {
