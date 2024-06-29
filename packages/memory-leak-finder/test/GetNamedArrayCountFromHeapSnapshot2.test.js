@@ -1,4 +1,5 @@
 import * as GetNamedArrayCountFromHeapSnapshot2 from '../src/parts/GetNamedArrayCountFromHeapSnapshot2/GetNamedArrayCountFromHeapSnapshot2.js'
+import { test, expect } from '@jest/globals'
 
 test.skip('getNamedArrayCountFromHeapSnapshot2', () => {
   const heapsnapshot = {

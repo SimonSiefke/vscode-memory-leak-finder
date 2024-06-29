@@ -1,4 +1,5 @@
 import * as CleanFunctionLocations from '../src/parts/CleanFunctionLocations/CleanFunctionLocations.js'
+import { test, expect } from '@jest/globals'
 
 test('cleanFunctionLocations', () => {
   const names = ['a', 'b']
