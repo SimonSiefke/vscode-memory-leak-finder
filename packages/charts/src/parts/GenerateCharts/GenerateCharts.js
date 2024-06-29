@@ -14,6 +14,9 @@ const visitors = Object.values(Charts).map((value) => {
 export const generateCharts = async () => {
   for (const visitor of visitors) {
     const data = await visitor.getData()
+    if (data.length === 0) {
+      continue
+    }
     const svg = visitor.fn(data)
     const outPath = join(Root.root, '.vscode-charts', `${visitor.name}.svg`)
     await mkdir(dirname(outPath), { recursive: true })
