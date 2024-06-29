@@ -6,7 +6,7 @@ import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.js
 import * as VideoChapter from '../VideoChapter/VideoChapter.js'
 
 const getMetaDataInputOptions = (baseName) => {
-  return ['-i', baseName, '-i', '-y', 'meta.ffmeta']
+  return ['-i', baseName, '-y', 'meta.ffmeta']
 }
 
 const getMetaDataOutputOptions = (baseName) => {
