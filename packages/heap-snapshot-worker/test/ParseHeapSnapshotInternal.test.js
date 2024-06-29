@@ -29,12 +29,8 @@ test('single node', () => {
     graph: { 0: [] },
     parsedNodes: [
       {
-        detachedness: 0,
-        edgeCount: 0,
         id: 0,
         name: 'a',
-        selfSize: 0,
-        traceNodeId: 0,
         type: 'hidden',
       },
     ],
@@ -76,21 +72,13 @@ test('two nodes', () => {
     },
     parsedNodes: [
       {
-        detachedness: 0,
-        edgeCount: 0,
         id: 0,
         name: 'a',
-        selfSize: 0,
-        traceNodeId: 0,
         type: 'hidden',
       },
       {
-        detachedness: 0,
-        edgeCount: 0,
         id: 1,
         name: 'b',
-        selfSize: 0,
-        traceNodeId: 0,
         type: 'hidden',
       },
     ],
@@ -123,30 +111,27 @@ test('two nodes connected by edge', () => {
     0, 0, 0, 0, 1, 0, 0, // first node
     0, 1, 1, 0, 0, 0, 0 // second node
   ]
-  const edges = [0, 0, 1]
+  const edges = [0, 0, 7]
   const strings = ['a', 'b']
   expect(ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings)).toEqual({
     graph: {
-      0: [1],
+      0: [
+        {
+          index: 1,
+          name: 'a',
+        },
+      ],
       1: [],
     },
     parsedNodes: [
       {
-        detachedness: 0,
-        edgeCount: 1,
         id: 0,
         name: 'a',
-        selfSize: 0,
-        traceNodeId: 0,
         type: 'hidden',
       },
       {
-        detachedness: 0,
-        edgeCount: 0,
         id: 1,
         name: 'b',
-        selfSize: 0,
-        traceNodeId: 0,
         type: 'hidden',
       },
     ],
