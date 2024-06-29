@@ -76,7 +76,12 @@ test('two connected nodes', () => {
     },
   ]
   expect(ParseHeapSnapshotInternalGraph.parseHeapSnapshotInternalGraph(nodes, edges)).toEqual({
-    0: [1],
+    0: [
+      {
+        index: 1,
+        name: 1,
+      },
+    ],
     1: [],
   })
 })
