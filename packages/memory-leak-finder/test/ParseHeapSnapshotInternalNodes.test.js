@@ -20,12 +20,13 @@ test('single node', () => {
     'object shape',
   ]
   const nodes = [0, 0, 0, 0, 0, 0, 0]
-  expect(ParseHeapSnapshotInternalNodes.parseHeapSnapshotInternalNodes(nodes, nodeFields, nodeTypes)).toEqual([
+  const strings = ['a']
+  expect(ParseHeapSnapshotInternalNodes.parseHeapSnapshotInternalNodes(nodes, nodeFields, nodeTypes, strings)).toEqual([
     {
       detachedness: 0,
       edgeCount: 0,
       id: 0,
-      name: 0,
+      name: 'a',
       selfSize: 0,
       traceNodeId: 0,
       type: 'hidden',

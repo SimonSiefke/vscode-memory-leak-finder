@@ -23,14 +23,15 @@ test('single node', () => {
   const edgeTypes = ['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']
   const nodes = [0, 0, 0, 0, 0, 0, 0]
   const edges = []
-  expect(ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes)).toEqual({
+  const strings = ['a']
+  expect(ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings)).toEqual({
     graph: { 0: [] },
     parsedNodes: [
       {
         detachedness: 0,
         edgeCount: 0,
         id: 0,
-        name: 0,
+        name: 'a',
         selfSize: 0,
         traceNodeId: 0,
         type: 'hidden',
@@ -63,10 +64,11 @@ test('two nodes', () => {
   // prettier-ignore
   const nodes = [
     0, 0, 0, 0, 0, 0, 0, // first node
-    0, 0, 1, 0, 0, 0, 0 // second node
+    0, 1, 1, 0, 0, 0, 0 // second node
   ]
   const edges = []
-  expect(ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes)).toEqual({
+  const strings = ['a', 'b']
+  expect(ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings)).toEqual({
     graph: {
       0: [],
       1: [],
@@ -76,7 +78,7 @@ test('two nodes', () => {
         detachedness: 0,
         edgeCount: 0,
         id: 0,
-        name: 0,
+        name: 'a',
         selfSize: 0,
         traceNodeId: 0,
         type: 'hidden',
@@ -85,7 +87,7 @@ test('two nodes', () => {
         detachedness: 0,
         edgeCount: 0,
         id: 1,
-        name: 0,
+        name: 'b',
         selfSize: 0,
         traceNodeId: 0,
         type: 'hidden',
@@ -118,10 +120,11 @@ test('two nodes connected by edge', () => {
   // prettier-ignore
   const nodes = [
     0, 0, 0, 0, 1, 0, 0, // first node
-    0, 0, 1, 0, 0, 0, 0 // second node
+    0, 1, 1, 0, 0, 0, 0 // second node
   ]
   const edges = [0, 0, 1]
-  expect(ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes)).toEqual({
+  const strings = ['a', 'b']
+  expect(ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings)).toEqual({
     graph: {
       0: [1],
       1: [],
@@ -131,7 +134,7 @@ test('two nodes connected by edge', () => {
         detachedness: 0,
         edgeCount: 1,
         id: 0,
-        name: 0,
+        name: 'a',
         selfSize: 0,
         traceNodeId: 0,
         type: 'hidden',
@@ -140,7 +143,7 @@ test('two nodes connected by edge', () => {
         detachedness: 0,
         edgeCount: 0,
         id: 1,
-        name: 0,
+        name: 'b',
         selfSize: 0,
         traceNodeId: 0,
         type: 'hidden',
