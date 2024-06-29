@@ -1,5 +1,8 @@
+// @ts-ignore
 import * as FileWatcherCommandType from '../FileWatcherCommandType/FileWatcherCommandType.js'
+// @ts-ignore
 import * as WatchFile from '../WatchFile/WatchFile.js'
+// @ts-ignore
 import * as WatchFolder from '../WatchFolder/WatchFolder.js'
 
 export const getFn = (method) => {
