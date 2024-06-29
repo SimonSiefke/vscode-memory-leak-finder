@@ -10,6 +10,7 @@ import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAtt
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.js'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.js'
+import * as VideoRecording from '../VideoRecording/VideoRecording.js'
 import * as Time from '../Time/Time.js'
 import * as Timeout from '../Timeout/Timeout.js'
 
@@ -87,9 +88,14 @@ export const runTests = async (
       if (i !== 0) {
         callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, /* isFirst */ true)
       }
+
       try {
         const start = i === 0 ? initialStart : Time.now()
         const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(testWorkerIpc, connectionId, absolutePath, forceRun, timeouts)
+
+        if (recordVideo) {
+          await VideoRecording.addChapter(dirent, start)
+        }
 
         if (testSkipped) {
           skipped++
@@ -147,6 +153,9 @@ export const runTests = async (
     }
     const end = Time.now()
     const duration = end - start
+    if (recordVideo) {
+      await VideoRecording.finalize()
+    }
     callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, leaking, total, duration, filterValue)
   } catch (error) {
     const PrettyError = await import('../PrettyError/PrettyError.js')
