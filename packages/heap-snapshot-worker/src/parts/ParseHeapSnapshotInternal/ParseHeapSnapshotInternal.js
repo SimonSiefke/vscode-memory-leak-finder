@@ -12,7 +12,10 @@ export const parseHeapSnapshotInternal = (nodes, nodeFields, nodeTypes, edges, e
   Assert.array(edgeFields)
   Assert.array(edgeTypes)
   Assert.array(strings)
+  console.time('nodes')
   const parsedNodes = ParseHeapSnapshotInternalNodes.parseHeapSnapshotInternalNodes(nodes, nodeFields, nodeTypes, strings)
+  console.timeEnd('nodes')
+  console.time('edges')
   const parsedEdges = ParseHeapSnapshotInternalEdges.parseHeapSnapshotInternalEdges(
     edges,
     edgeFields,
@@ -20,8 +23,13 @@ export const parseHeapSnapshotInternal = (nodes, nodeFields, nodeTypes, edges, e
     nodeFields.length,
     strings,
   )
+  console.timeEnd('edges')
+  console.time('graph')
   const graph = ParseHeapSnapshotInternalGraph.parseHeapSnapshotInternalGraph(parsedNodes, parsedEdges)
+  console.timeEnd('graph')
+  console.time('clean')
   const cleanNodes = CleanNodes.cleanNode(parsedNodes)
+  console.timeEnd('clean')
   return {
     parsedNodes: cleanNodes,
     graph,
