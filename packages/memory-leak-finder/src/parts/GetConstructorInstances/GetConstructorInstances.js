@@ -29,6 +29,8 @@ export const getConstructorInstances = async (session, objectGroup, constructorN
     throw new Error('no ${constructorName} constructor found')
   }
 
+  console.log({widgetConstructor})
+
   const isWidget = object => {
     return object && object instanceof widgetConstructor
   }
