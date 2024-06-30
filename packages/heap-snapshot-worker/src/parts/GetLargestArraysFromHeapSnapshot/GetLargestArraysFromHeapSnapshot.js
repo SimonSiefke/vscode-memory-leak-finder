@@ -59,7 +59,7 @@ const addNames = (items, nameMap) => {
 
 export const getLargestArraysFromHeapSnapshot = async (heapsnapshot) => {
   Assert.object(heapsnapshot)
-  const minLength = 100
+  const minLength = 1
   const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
   const arrayNodes = parsedNodes.filter(isArray)
   const arraysWithLength = getArraysWithCount(parsedNodes, graph, arrayNodes)
