@@ -1,5 +1,6 @@
 export * as CanvasCount from '../CreateCanvasCountChart/CreateCanvasCountChart.js'
 export * as DetachedDomNodeCount from '../CreateDetachedDomNodeCountChart/CreateDetachedDomNodeCountChart.js'
+export * as EmitterCount from '../CreateEmitterCountChart/CreateEmitterCountChart.js'
 export * as EventListenerCount from '../CreateEventListenerCountChart/CreateEventListenerCountChart.js'
 export * as FunctionCount from '../CreateFunctionCountChart/CreateFunctionCountChart.js'
 export * as MutationObserverCount from '../CreateMutationObserverCountChart/CreateMutationObserverCountChart.js'
