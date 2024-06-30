@@ -8,10 +8,24 @@ export const getDomListeners = async (session, objectGroup) => {
   const domListeners = this
   const array = []
 
+  const getNodeDescription = (node) => {
+    if(!node){
+      return ''
+    }
+    if(node.className){
+      return node.className
+    }
+    if(node.nodeName){
+      node.nodeName.toLowerCase()
+    }
+    return ''
+  }
+
   for(const domListener of domListeners){
     array.push({
       type: domListener._type,
-      handlerName: domListener._handler?.name || 'anonymous'
+      handlerName: domListener._handler?.name || 'anonymous',
+      nodeDescription: getNodeDescription(domListener._node)
     })
   }
 
