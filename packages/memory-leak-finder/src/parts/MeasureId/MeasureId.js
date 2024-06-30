@@ -51,6 +51,7 @@ export const MutationObserversWithStackTraces = 'mutationObserversWithStackTrace
 export const MutationObserversWithStackTracesWithSourceMaps = 'mutationObserversWithStackTracesWithSourceMaps'
 export const NamedArrayCount = 'namedArrayCount'
 export const NamedArrayCountDifference = 'namedArrayCountDifference'
+export const NamedClosureCount = 'namedClosureCount'
 export const NamedFunctionCount = 'namedFunctionCount'
 export const NamedFunctionDifference = 'namedFunctionDifference'
 export const NamedFunctionDifferenceWithSourceMap = 'namedFunctionDifferenceWithSourceMap'

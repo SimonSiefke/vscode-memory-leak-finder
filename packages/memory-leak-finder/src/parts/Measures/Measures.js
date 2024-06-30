@@ -49,6 +49,7 @@ export * as MeasureMutationObserversWithStackTraces from '../MeasureMutationObse
 export * as MeasureMutationObserversWithStackTracesWithSourceMaps from '../MeasureMutationObserversWithStackTracesWithSourceMaps/MeasureMutationObserversWithStackTracesWithSourceMaps.js'
 export * as MeasureNamedArrayCount from '../MeasureNamedArrayCount/MeasureNamedArrayCount.js'
 export * as MeasureNamedArrayCountDifference from '../MeasureNamedArrayCountDifference/MeasureNamedArrayCountDifference.js'
+export * as MeasureNamedClosureCount from '../MeasureNamedClosureCount/MeasureNamedClosureCount.js'
 export * as MeasureNamedFunctionCount from '../MeasureNamedFunctionCount/MeasureNamedFunctionCount.js'
 export * as MeasureNamedFunctionDifference from '../MeasureNamedFunctionDifference/MeasureNamedFunctionDifference.js'
 export * as MeasureNamedFunctionDifferenceWithSourceMap from '../MeasureNamedFunctionDifferenceWithSourceMap/MeasureNamedFunctionDifferenceWithSourceMap.js'
