@@ -45,15 +45,54 @@ const createFinalMap = (sortedItems) => {
   return map
 }
 
+const isClosure = (node) => {
+  return node.type === 'closure'
+}
+
+const isImportantEdge = (edge) => {
+  const { name } = edge
+  switch (name) {
+    case '__proto__':
+    case 'feedback_cell':
+    case 'shared':
+    case 'context':
+    case 'code':
+    case 'map':
+      return false
+    default:
+      return true
+  }
+}
+
+const isContext = (edge) => {
+  return edge.name === 'context'
+}
+
 export const getNamedClosureCountFromHeapSnapshot = async (heapsnapshot) => {
   Assert.object(heapsnapshot)
   const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
-  console.log({ parsedNodes })
+  const closures = parsedNodes.filter(isClosure)
+  const mapped = closures.map((node) => {
+    const edges = graph[node.id]
+    const contextEdge = edges.find(isContext)
+    if (!contextEdge) {
+      return node
+    }
+    const contextNode = parsedNodes[contextEdge.index]
+    const contextNodeEdges = graph[contextNode.id]
+    return {
+      ...node,
+      contextNodeEdges,
+    }
+  })
+  // const first = closures[0]
+  // const edges = graph[first.id]
+  // console.log({ first, edges })
   // const nameMap = CreateNameMap.createNameMap(parsedNodes, graph)
   // const arrayNames = getArrayNames(nameMap)
   // const countMap = createCountMap(arrayNames)
   // const arrayNamesWithCount = getArrayNamesWithCount(countMap)
   // const sortedArrayNamesWithCount = SortCountMap.sortCountMap(arrayNamesWithCount)
   // const map = createFinalMap(sortedArrayNamesWithCount)
-  return {}
+  return mapped
 }

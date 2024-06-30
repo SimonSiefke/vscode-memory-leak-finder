@@ -7,7 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const root = join(__dirname, '..', '..', '..')
 
-const fn = commandMap['HeapSnapshot.getLargestArraysFromHeapSnapshot']
+const fn = commandMap['HeapSnapshot.parseNamedClosureCount']
 
 // const c = await readFile(join(root, '.vscode-heapsnapshots', 'lvce-web.json'), 'utf8')
 const v = JSON.parse(await readFile(join(root, '.vscode-heapsnapshots', 'array-count.heapsnapshot'), 'utf8'))
