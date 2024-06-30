@@ -1,6 +1,7 @@
 import * as Arrays from '../Arrays/Arrays.js'
 import * as Assert from '../Assert/Assert.js'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
+import * as CreateNameMap from '../CreateNameMap/CreateNameMap.js'
 
 const isArray = (node) => {
   return node.type === 'object' && node.name === 'Array'
@@ -44,6 +45,18 @@ const filterByMinLength = (arrays, minLength) => {
   return arrays.filter((array) => array.count >= minLength)
 }
 
+const addNames = (items, nameMap) => {
+  const withNames = []
+  for (const item of items) {
+    const nameObject = nameMap[item.id]
+    withNames.push({
+      ...item,
+      name: nameObject.edgeName || nameObject.nodeName,
+    })
+  }
+  return withNames
+}
+
 export const getLargestArraysFromHeapSnapshot = async (heapsnapshot) => {
   Assert.object(heapsnapshot)
   const minLength = 100
@@ -52,5 +65,7 @@ export const getLargestArraysFromHeapSnapshot = async (heapsnapshot) => {
   const arraysWithLength = getArraysWithCount(parsedNodes, graph, arrayNodes)
   const filtered = filterByMinLength(arraysWithLength, minLength)
   const sorted = sortByLength(filtered)
-  return sorted
+  const nameMap = CreateNameMap.createNameMap(parsedNodes, graph)
+  const sortedWithNames = addNames(sorted, nameMap)
+  return sortedWithNames
 }

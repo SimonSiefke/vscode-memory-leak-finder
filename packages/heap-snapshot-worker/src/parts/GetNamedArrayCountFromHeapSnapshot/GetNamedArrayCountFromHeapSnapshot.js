@@ -1,4 +1,5 @@
 import * as Assert from '../Assert/Assert.js'
+import * as CreateNameMap from '../CreateNameMap/CreateNameMap.js'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
 import * as SortCountMap from '../SortCountMap/SortCountMap.js'
 
@@ -9,21 +10,6 @@ const createCountMap = (names) => {
     map[name]++
   }
   return map
-}
-
-const createNameMap = (parsedNodes, graph) => {
-  const nameMap = Object.create(null)
-  for (const node of parsedNodes) {
-    const edges = graph[node.id]
-    for (const edge of edges) {
-      const toNode = parsedNodes[edge.index]
-      nameMap[toNode.id] ||= {
-        edgeName: edge.name,
-        nodeName: toNode.name,
-      }
-    }
-  }
-  return nameMap
 }
 
 const filterByArray = (value) => {
@@ -62,7 +48,7 @@ const createFinalMap = (sortedItems) => {
 export const getNamedArrayCountFromHeapSnapshot = async (heapsnapshot) => {
   Assert.object(heapsnapshot)
   const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
-  const nameMap = createNameMap(parsedNodes, graph)
+  const nameMap = CreateNameMap.createNameMap(parsedNodes, graph)
   const arrayNames = getArrayNames(nameMap)
   const countMap = createCountMap(arrayNames)
   const arrayNamesWithCount = getArrayNamesWithCount(countMap)
