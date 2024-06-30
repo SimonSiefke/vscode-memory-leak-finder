@@ -1,7 +1,7 @@
 import * as Arrays from '../Arrays/Arrays.js'
 
 const getHash = (node) => {
-  return `${node.type}:${node.handlerName}:${node.nodeDescription}`
+  return `${node.type}:${node.disposed}:${node.handlerName}:${node.nodeDescription}`
 }
 
 const getUnique = (nodes) => {
@@ -51,6 +51,7 @@ export const compareDomListeners = (before, after) => {
         type: item.type,
         handlerName: item.handlerName,
         nodeDescription: item.nodeDescription,
+        disposed: item.disposed,
         count: newCount,
         delta,
       })

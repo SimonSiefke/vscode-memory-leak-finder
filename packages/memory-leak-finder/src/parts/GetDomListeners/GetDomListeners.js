@@ -25,7 +25,8 @@ export const getDomListeners = async (session, objectGroup) => {
     array.push({
       type: domListener._type,
       handlerName: domListener._handler?.name || 'anonymous',
-      nodeDescription: getNodeDescription(domListener._node)
+      nodeDescription: getNodeDescription(domListener._node),
+      disposed: domListener._node === null && domListener._handler === null
     })
   }
 
