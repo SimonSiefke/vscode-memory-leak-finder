@@ -40,6 +40,7 @@ export * as MeasureIntersectionObserverCount from '../MeasureIntersectionObserve
 export * as MeasureIntersectionObserversWithStackTraces from '../MeasureIntersectionObserversWithStackTraces/MeasureIntersectionObserversWithStackTraces.js'
 export * as MeasureMapSize from '../MeasureMapSize/MeasureMapSize.js'
 export * as MeasureMediaQueryListCount from '../MeasureMediaQueryListCount/MeasureMediaQueryListCount.js'
+export * as MeasureMinimapCount from '../MeasureMinimapCount/MeasureMinimapCount.js'
 export * as MeasureMutationObserverCount from '../MeasureMutationObserverCount/MeasureMutationObserverCount.js'
 export * as MeasureMutationObserversWithStackTraces from '../MeasureMutationObserversWithStackTraces/MeasureMutationObserversWithStackTraces.js'
 export * as MeasureMutationObserversWithStackTracesWithSourceMaps from '../MeasureMutationObserversWithStackTracesWithSourceMaps/MeasureMutationObserversWithStackTracesWithSourceMaps.js'
