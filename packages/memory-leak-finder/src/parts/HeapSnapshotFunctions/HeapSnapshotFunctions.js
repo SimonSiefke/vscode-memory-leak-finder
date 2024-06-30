@@ -17,6 +17,10 @@ export const getNamedArrayCountFromHeapSnapshot = async (value) => {
   return HeapSnapshotWorker.invoke('HeapSnapshot.parseNamedArrayCount', value)
 }
 
+export const getNamedClosureCountFromHeapSnapshot = async (value) => {
+  return HeapSnapshotWorker.invoke('HeapSnapshot.parseNamedClosureCount', value)
+}
+
 export const getLargestArraysFromHeapSnapshot = async (value) => {
   return HeapSnapshotWorker.invoke('HeapSnapshot.getLargestArraysFromHeapSnapshot', value)
 }
