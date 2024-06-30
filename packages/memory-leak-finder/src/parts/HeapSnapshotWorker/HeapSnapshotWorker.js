@@ -18,9 +18,10 @@ const execute = () => {
 
 const create = async () => {
   const ipc = await IpcParent.create({
-    method: IpcParentType.NodeWorkerThread,
+    method: IpcParentType.NodeForkedProcess,
     stdio: 'inherit',
     url: HeapSnapshotWorkerPath.heapSnapshotWorkerPath,
+    execArgv: ['--max-old-space-size=8192'],
   })
   HandleIpc.handleIpc(ipc, execute, Callback.resolve)
   return ipc

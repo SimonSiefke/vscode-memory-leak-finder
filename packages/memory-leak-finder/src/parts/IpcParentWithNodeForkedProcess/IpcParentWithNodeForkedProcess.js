@@ -1,8 +1,9 @@
 import { fork } from 'node:child_process'
 
-export const create = async ({ url }) => {
+export const create = async ({ url, execArgv = [] }) => {
   const childProcess = fork(url, ['--ipc-type=forked-process'], {
     stdio: 'pipe',
+    execArgv,
   })
   childProcess.stdout?.pipe(process.stdout)
   childProcess.stderr?.pipe(process.stderr)
@@ -27,6 +28,10 @@ export const wrap = (childProcess) => {
       switch (event) {
         case 'exit':
           this.childProcess.on('exit', listener)
+          break
+        case 'message':
+          this.childProcess.on('message', listener)
+          break
         default:
           throw new Error('unexpected listener')
       }
