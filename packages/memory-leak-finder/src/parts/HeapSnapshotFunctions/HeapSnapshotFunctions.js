@@ -10,8 +10,7 @@ export const getObjectShapeCountFromHeapSnapshot = async (value) => {
 }
 
 export const parseHeapSnapshotStrings = async (value) => {
-  // return ParseHeapSnapshotStrings.parseHeapSnapshotStrings(value)
-  return []
+  return HeapSnapshotWorker.invoke('HeapSnapshot.parseStrings', value)
 }
 
 export const getNamedArrayCountFromHeapSnapshot = async (value) => {
