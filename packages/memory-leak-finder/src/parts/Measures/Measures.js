@@ -39,6 +39,7 @@ export * as MeasureInstanceCountsDifferenceWithStackTraces from '../MeasureInsta
 export * as MeasureInstanceCountsWithSourceMap from '../MeasureInstanceCountsWithSourceMap/MeasureInstanceCountsWithSourceMap.js'
 export * as MeasureIntersectionObserverCount from '../MeasureIntersectionObserverCount/MeasureIntersectionObserverCount.js'
 export * as MeasureIntersectionObserversWithStackTraces from '../MeasureIntersectionObserversWithStackTraces/MeasureIntersectionObserversWithStackTraces.js'
+export * as MeasureLargestArrayCount from '../MeasureLargestArrayCount/MeasureLargestArrayCount.js'
 export * as MeasureMapSize from '../MeasureMapSize/MeasureMapSize.js'
 export * as MeasureMediaQueryListCount from '../MeasureMediaQueryListCount/MeasureMediaQueryListCount.js'
 export * as MeasureMinimapCount from '../MeasureMinimapCount/MeasureMinimapCount.js'
