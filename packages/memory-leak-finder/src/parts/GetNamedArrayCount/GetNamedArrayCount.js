@@ -13,6 +13,6 @@ export const getNamedArrayCount = async (session, objectGroup) => {
   await HeapSnapshot.takeHeapSnapshot(session, outFile)
   const content = await readFile(outFile, 'utf8')
   const value = JSON.parse(content)
-  const arrayCountMap = await HeapSnapshotFunctions.getNamedArrayCountFromHeapSnapshot(HeapSnapshot)
+  const arrayCountMap = await HeapSnapshotFunctions.getNamedArrayCountFromHeapSnapshot(value)
   return arrayCountMap
 }

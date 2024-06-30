@@ -1,24 +1,20 @@
-import * as CommandMap from '../src/parts/CommandMap/CommandMap.js'
-import { readFile, writeFile } from 'fs/promises'
-
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { commandMap } from '../src/parts/CommandMap/CommandMap.js'
+import { readFile, writeFile } from 'node:fs/promises'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const root = join(__dirname, '..', '..', '..')
-const snapshotPath = join(root, '.vscode-heapsnapshots', 'lvce-web.json')
-const snapshotContent = await readFile(snapshotPath, 'utf8')
-const snapshot = JSON.parse(snapshotContent)
 
-const fn = CommandMap.commandMap['HeapSnapshot.parseNamedArrayCount']
-// const fn = CommandMap.commandMap['HeapSnapshot.parseObjectShapeCount']
+const fn = commandMap['HeapSnapshot.parseNamedArrayCount']
+
+// const c = await readFile(join(root, '.vscode-heapsnapshots', 'lvce-web.json'), 'utf8')
+const c = await readFile(join(root, '.vscode-heapsnapshots', 'array-count.heapsnapshot'), 'utf8')
+const v = JSON.parse(c)
 
 console.time('parse')
-const result = await fn(snapshot)
+const r = await fn(v)
 console.timeEnd('parse')
 
-const outPath = join(root, '.vscode-heapsnapshots', 'result.json')
-const resultContent = JSON.stringify(result, null, 2) + '\n'
-await writeFile(outPath, resultContent)
-// console.log({ result })
+await writeFile(join(root, '.vscode-heapsnapshots', 'result.json'), JSON.stringify(r, null, 2) + '\n')
