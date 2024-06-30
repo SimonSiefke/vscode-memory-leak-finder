@@ -1,3 +1,16 @@
+import * as Arrays from '../Arrays/Arrays.js'
+import * as Assert from '../Assert/Assert.js'
+
+const compareItem = (a, b) => {
+  return b.count - a.count
+}
+
+const sortByCounts = (items) => {
+  Assert.array(items)
+  const sorted = Arrays.toSorted(items, compareItem)
+  return sorted
+}
+
 const mergeItems = (beforeMap, afterMap) => {
   const leaked = []
   for (const [name, afterCount] of Object.entries(afterMap)) {
@@ -16,5 +29,6 @@ const mergeItems = (beforeMap, afterMap) => {
 
 export const compareNamedArrayCountDifference = (before, after) => {
   const leaked = mergeItems(before, after)
-  return leaked
+  const sorted = sortByCounts(leaked)
+  return sorted
 }
