@@ -3,6 +3,7 @@ export * as MeasureArrayElementCount from '../MeasureArrayElementCount/MeasureAr
 export * as MeasureCanvasCount from '../MeasureCanvasCount/MeasureCanvasCount.js'
 export * as MeasureClassCount from '../MeasureClassCount/MeasureClassCount.js'
 export * as MeasureClosureCount from '../MeasureClosureCount/MeasureClosureCount.js'
+export * as MeasureCodeEditorWidgetCount from '../MeasureCodeEditorWidgetCount/MeasureCodeEditorWidgetCount.js'
 export * as MeasureDetachedDomNodeCount from '../MeasureDetachedDomNodeCount/MeasureDetachedDomNodeCount.js'
 export * as MeasureDetachedDomNodeRoots from '../MeasureDetachedDomNodeRoots/MeasureDetachedDomNodeRoots.js'
 export * as MeasureDetachedDomNodeRootsWithStackTraces from '../MeasureDetachedDomNodeRootsWithStackTraces/MeasureDetachedDomNodeRootsWithStackTraces.js'
