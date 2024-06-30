@@ -88,6 +88,11 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure promise-count
+      - name: Run headless test (check leaks, regex count)
+        if: matrix.os == 'ubuntu-24.04'
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure regex-count
       - name: Run headless test (check leaks, function count)
         if: matrix.os == 'ubuntu-24.04'
         uses: coactions/setup-xvfb@v1
