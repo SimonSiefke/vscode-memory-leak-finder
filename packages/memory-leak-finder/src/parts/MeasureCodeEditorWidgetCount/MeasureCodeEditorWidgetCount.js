@@ -4,7 +4,7 @@ import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 
-export const id = MeasureId.WidgetCount
+export const id = MeasureId.CodeEditorWidgetCount
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
