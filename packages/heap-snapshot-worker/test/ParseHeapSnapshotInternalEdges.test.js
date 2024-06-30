@@ -1,4 +1,4 @@
-import * as ParseHeapSnapshotInternalEdges from '../../memory-leak-finder/src/parts/ParseHeapSnapshotInternalEdges/ParseHeapSnapshotInternalEdges.js'
+import * as ParseHeapSnapshotInternalEdges from '../src/parts/ParseHeapSnapshotInternalEdges/ParseHeapSnapshotInternalEdges.js'
 import { test, expect } from '@jest/globals'
 
 test('single node', () => {
@@ -6,10 +6,11 @@ test('single node', () => {
   const edgeTypes = ['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']
   const edges = [1, 0, 7]
   const strings = ['a']
-  expect(ParseHeapSnapshotInternalEdges.parseHeapSnapshotInternalEdges(edges, edgeFields, edgeTypes, strings)).toEqual([
+  const nodeFieldCount = 7
+  expect(ParseHeapSnapshotInternalEdges.parseHeapSnapshotInternalEdges(edges, edgeFields, edgeTypes, nodeFieldCount, strings)).toEqual([
     {
       nameOrIndex: 'a',
-      toNode: 7,
+      toNode: 1,
       type: 'element',
     },
   ])
