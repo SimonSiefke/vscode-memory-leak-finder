@@ -11,7 +11,7 @@ export const compareLargestArrayCount = (before, after) => {
     if (delta > 0) {
       leaked.push({
         name: after.name,
-        count: afterCount,
+        length: afterCount,
         delta,
       })
     }
