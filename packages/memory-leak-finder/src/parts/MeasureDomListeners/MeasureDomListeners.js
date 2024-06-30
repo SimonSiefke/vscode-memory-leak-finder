@@ -2,7 +2,7 @@ import * as GetDomListeners from '../GetDomListeners/GetDomListeners.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 
-export const id = MeasureId.Promises
+export const id = MeasureId.DomListeners
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
