@@ -18,24 +18,37 @@ export const getConstructorInstances = async (session, objectGroup, constructorN
   })
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
-  const objects = this
+  const objects = this;
 
-  const isWidgetConstructor = (object) => {
-    return object && typeof object === 'function' && object.name === '${constructorName}'
+  const constructorName = '${constructorName}'
+
+  const RE_CLASS = /^\s*class\s+/;
+
+  const isClass = (object) => {
+    return object.toString().startsWith('class ')
   }
 
-  const widgetConstructor = objects.find(isWidgetConstructor)
+  const isFunction = object => {
+    return object && typeof object === 'function'
+  }
+
+  const isPossibleWidgetConstructor = (object) => {
+    return object.name === constructorName;
+  }
+
+  const functions = objects.filter(isFunction);
+  const possibleConstructors = functions.filter(isPossibleWidgetConstructor);
+  const widgetConstructor = possibleConstructors.find(isClass);
+
   if(!widgetConstructor){
-    throw new Error('no ${constructorName} constructor found')
+    throw new Error('no \${constructorName} constructor found')
   }
-
-  console.log({widgetConstructor})
 
   const isWidget = object => {
-    return object && object instanceof widgetConstructor
+    return object && object instanceof widgetConstructor;
   }
 
-  const instances = objects.filter(isWidget)
+  const instances = objects.filter(isWidget);
   return instances
 }`,
     objectId: objects.objects.objectId,
