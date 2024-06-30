@@ -5,6 +5,6 @@ import * as GetConstructorInstanceCount from '../GetConstructorInstanceCount/Get
  * @param {any} session
  * @returns {Promise<number>}
  */
-export const getWidgetCount = async (session, objectGroup) => {
-  return GetConstructorInstanceCount.getConstructorInstanceCount(session, objectGroup, 'Widget')
+export const getMinimapCount = async (session, objectGroup) => {
+  return GetConstructorInstanceCount.getConstructorInstanceCount(session, objectGroup, 'Minimap')
 }
