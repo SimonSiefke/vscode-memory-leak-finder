@@ -1,5 +1,5 @@
 import * as CompareCount from '../CompareCount/CompareCount.js'
-import * as GetPromiseCount from '../GetPromiseCount/GetPromiseCount.js'
+import * as GetCodeEditorWidgetCount from '../GetCodeEditorWidgetCount/GetCodeEditorWidgetCount.js'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
@@ -12,11 +12,11 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  return GetPromiseCount.getPromiseCount(session, objectGroup)
+  return GetCodeEditorWidgetCount.getCodeEditorWidgetCount(session, objectGroup)
 }
 
 export const stop = (session, objectGroup) => {
-  return GetPromiseCount.getPromiseCount(session, objectGroup)
+  return GetCodeEditorWidgetCount.getCodeEditorWidgetCount(session, objectGroup)
 }
 
 export const compare = CompareCount.compareCount
