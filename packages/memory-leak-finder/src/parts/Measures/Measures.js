@@ -20,6 +20,7 @@ export * as MeasureDisposedDisposables from '../MeasureDisposedDisposables/Measu
 export * as MeasureDomCounters from '../MeasureDomCounters/MeasureDomCounters.js'
 export * as MeasureDomNodeCount from '../MeasureDomNodeCount/MeasureDomNodeCount.js'
 export * as MeasureDomTimerCount from '../MeasureDomTimerCount/MeasureDomTimerCount.js'
+export * as MeasureEmitterCount from '../MeasureEmitterCount/MeasureEmitterCount.js'
 export * as MeasureEventListenerCount from '../MeasureEventListenerCount/MeasureEventListenerCount.js'
 export * as MeasureEventListeners from '../MeasureEventListeners/MeasureEventListeners.js'
 export * as MeasureEventListenersWithStackTraces from '../MeasureEventListenersWithStackTraces/MeasureEventListenersWithStackTraces.js'
