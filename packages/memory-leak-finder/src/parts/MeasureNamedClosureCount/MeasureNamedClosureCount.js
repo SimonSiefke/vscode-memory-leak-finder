@@ -1,4 +1,4 @@
-import * as CompareCount from '../CompareCount/CompareCount.js'
+import * as CompareNamedClosureCount from '../CompareNamedClosureCount/CompareNamedClosureCount.js'
 import * as GetNamedClosureCount from '../GetNamedClosureCount/GetNamedClosureCount.js'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
@@ -19,6 +19,6 @@ export const stop = (session, objectGroup) => {
   return GetNamedClosureCount.getNamedClosureCount(session, objectGroup)
 }
 
-export const compare = CompareCount.compareCount
+export const compare = CompareNamedClosureCount.compareNamedClosureCount
 
 export const isLeak = IsLeakCount.isLeakCount
