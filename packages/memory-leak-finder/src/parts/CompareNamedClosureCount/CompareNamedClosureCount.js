@@ -27,6 +27,9 @@ export const compareNamedClosureCount = (before, after) => {
     const beforeCount = beforeMap[key] || 0
     const afterCount = value
     const delta = afterCount - beforeCount
+    if (!delta || delta < 0) {
+      continue
+    }
     result.push({
       name: key,
       contextNodeCount: afterCount,
