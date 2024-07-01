@@ -3,6 +3,7 @@ import * as GetNamedClosureCount from '../GetNamedClosureCount/GetNamedClosureCo
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as CompareNamedClosureCount from '../CompareNamedClosureCount/CompareNamedClosureCount.js'
 
 export const id = MeasureId.NamedClosureCount
 

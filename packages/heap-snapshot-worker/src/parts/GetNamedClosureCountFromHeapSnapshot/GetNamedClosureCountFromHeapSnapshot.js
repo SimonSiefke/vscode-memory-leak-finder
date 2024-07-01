@@ -10,6 +10,16 @@ const isContext = (edge) => {
   return edge.name === 'context'
 }
 
+const getName = (node, contextNodes) => {
+  if (node.name) {
+    return node.name
+  }
+  return contextNodes
+    .map((node) => node.name)
+    .join(':')
+    .slice(0, 100)
+}
+
 export const getNamedClosureCountFromHeapSnapshot = async (heapsnapshot) => {
   Assert.object(heapsnapshot)
   const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
@@ -22,9 +32,12 @@ export const getNamedClosureCountFromHeapSnapshot = async (heapsnapshot) => {
     }
     const contextNode = parsedNodes[contextEdge.index]
     const contextNodeEdges = graph[contextNode.id].filter(IsImportantEdge.isImportantEdge)
+    const contextNodeCount = contextNodeEdges.length
+    const name = getName(node, contextNodeEdges)
     return {
       ...node,
-      contextNodeEdges,
+      name,
+      contextNodeCount,
     }
   })
   return mapped
