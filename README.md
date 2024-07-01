@@ -411,8 +411,11 @@ It seems there is memory leak when opening and closing a notebook. But just look
 | DiffEditor           | https://github.com/microsoft/vscode/issues/200381 | Fixed  |
 | QuickPick            | https://github.com/microsoft/vscode/issues/201320 | Fixed  |
 | Terminal             | https://github.com/xtermjs/xterm.js/issues/4935   | Fixed  |
-| KeyBindingsEditor    | https://github.com/microsoft/vscode/issues/202455 | Review |
-| NotebookEditorWidget | https://github.com/microsoft/vscode/issues/204756 | Review |
+| KeyBindingsEditor    | https://github.com/microsoft/vscode/issues/202455 | Fixed  |
+| NotebookEditorWidget | https://github.com/microsoft/vscode/issues/204756 | Fixed  |
+| GettingStarted       | https://github.com/microsoft/vscode/issues/216858 | Review |
+| SettingEnumRenderer  | https://github.com/microsoft/vscode/pull/216855   | Fixed  |
+| SettingsEditor2      | https://github.com/microsoft/vscode/pull/216763   | Fixed  |
 
 ## Credits
 
