@@ -10,7 +10,7 @@ const root = join(__dirname, '..', '..', '..')
 const fn = commandMap['HeapSnapshot.parseNamedClosureCount']
 
 // const c = await readFile(join(root, '.vscode-heapsnapshots', 'lvce-web.json'), 'utf8')
-const v = JSON.parse(await readFile(join(root, '.vscode-heapsnapshots', 'lvce-web.heapsnapshot'), 'utf8'))
+const v = JSON.parse(await readFile(join(root, '.vscode-heapsnapshots', 'array-count.heapsnapshot'), 'utf8'))
 
 console.time('parse')
 const r = await fn(v)
