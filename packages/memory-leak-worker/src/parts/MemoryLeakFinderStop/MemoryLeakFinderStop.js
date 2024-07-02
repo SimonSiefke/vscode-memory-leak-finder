@@ -5,5 +5,7 @@ export const stop = async (instanceId) => {
   if (!measure) {
     throw new Error(`no measure found`)
   }
-  return measure.stop()
+  const result = await measure.stop()
+  await measure.releaseResources()
+  return result
 }
