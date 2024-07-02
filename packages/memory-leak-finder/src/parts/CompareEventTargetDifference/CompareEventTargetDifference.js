@@ -15,7 +15,7 @@ export const compareEventTargets = (before, after) => {
   Assert.array(after)
   const pretty = CompareEventTargets.compareEventTargets(before, after)
   const beforeMap = Object.create(null)
-  for (const item of before.pretty) {
+  for (const item of pretty.before) {
     beforeMap[item.description] ||= 0
     beforeMap[item.description] += item.count
   }
