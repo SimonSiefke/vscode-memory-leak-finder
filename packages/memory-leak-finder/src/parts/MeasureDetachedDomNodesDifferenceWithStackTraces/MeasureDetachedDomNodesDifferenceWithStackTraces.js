@@ -24,8 +24,11 @@ export const start = async (session, objectGroup) => {
 export const stop = async (session, objectGroup) => {
   const result = await GetDetachedDomNodesWithStackTraces.getDetachedDomNodesWithStackTraces(session, objectGroup)
   await StopTrackingDomNodeStackTraces.stopTrackingDomNodeStackTraces(session, objectGroup)
-  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return result
+}
+
+export const releaseResources = async (session, objectGroup) => {
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 
 export const compare = CompareDetachedDomNodesWithStackTraces.compareDetachedDomNodesWithStackTraces
