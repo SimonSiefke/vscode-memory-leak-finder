@@ -4,6 +4,7 @@ import * as IsLeakDisposables from '../IsLeakDisposables/IsLeakDisposables.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.js'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
 
 // TODO
 // 1. query all objects
@@ -33,6 +34,10 @@ export const stop = async (session, objectGroup, scriptHandler) => {
     result,
     scriptMap: scriptHandler.scriptMap,
   }
+}
+
+export const releaseResources = async (session, objectGroup) => {
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 
 export const compare = CompareDisposablesWithLocation.compareDisposablesWithLocation

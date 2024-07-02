@@ -32,8 +32,11 @@ export const start = async (session, objectGroup) => {
 export const stop = async (session, objectGroup) => {
   const stackTraces = await GetDisposableStoresWithStackTraces.getDisposableStoresWithStackTraces(session, objectGroup)
   await StopTrackingDisposableStores.stopTrackingDisposableStores(session, objectGroup)
-  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return stackTraces
+}
+
+export const releaseResources = async (session, objectGroup) => {
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 
 export const compare = CompareDisposableStores.compareDisposableStores

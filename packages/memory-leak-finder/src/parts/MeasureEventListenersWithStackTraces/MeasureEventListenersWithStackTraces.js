@@ -33,8 +33,11 @@ export const stop = async (session, objectGroup, scriptHandler) => {
   const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptHandler.scriptMap)
   const resultWithStackTraces = await AddStackTracesToEventListeners.addStackTracesToEventListeners(session, result)
   await StopTrackingEventListenerStackTraces.stopTrackingEventListenerStackTraces(session, objectGroup)
-  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return resultWithStackTraces
+}
+
+export const releaseResources = async (session, objectGroup) => {
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 
 export const compare = CompareEventListenersWithStackTraces.compareEventListenersWithStackTraces

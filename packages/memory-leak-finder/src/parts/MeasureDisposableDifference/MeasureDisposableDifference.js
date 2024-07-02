@@ -22,11 +22,14 @@ export const start = async (session, objectGroup, scriptHandler) => {
 export const stop = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.stop(session)
   const result = await GetDisposablesWithLocation.getDisposablesWithLocation(session, objectGroup, scriptHandler.scriptMap)
-  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return {
     result,
     scriptMap: scriptHandler.scriptMap,
   }
+}
+
+export const releaseResources = async (session, objectGroup) => {
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 
 export const compare = CompareDisposablesWithLocationDifference.compareDisposablesWithLocationDifference

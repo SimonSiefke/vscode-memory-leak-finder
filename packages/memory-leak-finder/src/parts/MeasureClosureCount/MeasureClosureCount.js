@@ -3,6 +3,7 @@ import * as GetClosureCount from '../GetClosureCount/GetClosureCount.js'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
 
 export const id = MeasureId.ClosureCount
 
@@ -17,6 +18,10 @@ export const start = (session, objectGroup) => {
 
 export const stop = (session, objectGroup) => {
   return GetClosureCount.getClosureCount(session, objectGroup)
+}
+
+export const releaseResources = async (session, objectGroup) => {
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 
 export const compare = CompareCount.compareCount

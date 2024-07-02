@@ -18,8 +18,11 @@ export const start = (session, objectGroup) => {
 
 export const stop = async (session, objectGroup) => {
   const result = await GetObjectShapeCount.getObjectShapeCount(session, objectGroup)
-  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return result
+}
+
+export const releaseResources = async (session, objectGroup) => {
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 
 export const compare = CompareCount.compareCount

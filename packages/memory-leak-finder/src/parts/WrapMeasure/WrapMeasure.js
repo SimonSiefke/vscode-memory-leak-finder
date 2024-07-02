@@ -11,6 +11,11 @@ export const wrapMeasure = (measure) => {
         stop() {
           return measure.stop(...args)
         },
+        async releaseResources() {
+          if (measure.releaseResources) {
+            await measure.releaseResources(...args)
+          }
+        },
       }
     },
   }
