@@ -32,10 +32,17 @@ export const combine = (...measures) => {
     return resultMap
   }
 
+  const releaseResources = async () => {
+    for (const measure of measures) {
+      await measure.releaseResources()
+    }
+  }
+
   return {
     id: MeasureId.Combined,
     start,
     stop,
     compare,
+    releaseResources,
   }
 }

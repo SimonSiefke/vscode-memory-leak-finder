@@ -6,6 +6,7 @@ export const stop = async (instanceId) => {
     throw new Error(`no measure found`)
   }
   const result = await measure.stop()
+  console.log({ measure })
   await measure.releaseResources()
   return result
 }
