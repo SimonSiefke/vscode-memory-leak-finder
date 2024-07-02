@@ -11,24 +11,26 @@ const sortByCounts = (items) => {
   return sorted
 }
 
-const mergeItems = (beforeMap, afterMap) => {
+export const compareNamedArrayCountDifference = (before, after) => {
+  Assert.array(before)
+  Assert.array(after)
+  const beforeMap = Object.create(null)
+  for (const item of before) {
+    beforeMap[item.name] ||= 0
+    beforeMap[item.name] += item.count
+  }
   const leaked = []
-  for (const [name, afterCount] of Object.entries(afterMap)) {
-    const beforeCount = beforeMap[name] || 0
-    const delta = afterCount - beforeCount
+  for (const item of after) {
+    const oldCount = beforeMap[item.name] || 0
+    const afterCount = item.count
+    const delta = afterCount - oldCount
     if (delta > 0) {
       leaked.push({
-        name,
-        count: afterCount,
+        ...item,
         delta,
       })
     }
   }
-  return leaked
-}
-
-export const compareNamedArrayCountDifference = (before, after) => {
-  const leaked = mergeItems(before, after)
   const sorted = sortByCounts(leaked)
   return sorted
 }

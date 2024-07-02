@@ -37,14 +37,6 @@ const getArrayNamesWithCount = (countMap) => {
   return arrayNamesWithCount
 }
 
-const createFinalMap = (sortedItems) => {
-  const map = Object.create(null)
-  for (const item of sortedItems) {
-    map[item.name] = item.count
-  }
-  return map
-}
-
 export const getNamedArrayCountFromHeapSnapshot = async (heapsnapshot) => {
   Assert.object(heapsnapshot)
   const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
@@ -53,6 +45,5 @@ export const getNamedArrayCountFromHeapSnapshot = async (heapsnapshot) => {
   const countMap = createCountMap(arrayNames)
   const arrayNamesWithCount = getArrayNamesWithCount(countMap)
   const sortedArrayNamesWithCount = SortCountMap.sortCountMap(arrayNamesWithCount)
-  const map = createFinalMap(sortedArrayNamesWithCount)
-  return map
+  return sortedArrayNamesWithCount
 }
