@@ -22,7 +22,6 @@ export const stop = async (session, objectGroup) => {
 }
 
 export const releaseResources = async (session, objectGroup) => {
-  console.log('release', objectGroup)
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 
