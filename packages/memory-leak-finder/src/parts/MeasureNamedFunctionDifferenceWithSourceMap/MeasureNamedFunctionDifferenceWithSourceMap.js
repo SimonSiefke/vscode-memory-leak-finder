@@ -23,10 +23,13 @@ export const start = async (session, objectGroup, scriptHandler) => {
 export const stop = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.stop(session)
   const result = await GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap, includeSourceMap)
-  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   // @ts-ignore
   result.scriptMap = scriptHandler.scriptMap
   return result
+}
+
+export const releaseResources = async (session, objectGroup) => {
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 
 export const compare = CompareNamedFunctionDifferenceWithSourceMap.compareFunctionDifference
