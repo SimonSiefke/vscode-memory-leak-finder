@@ -35,7 +35,7 @@ export const compareEventTargets = (before, after) => {
     const delta = afterCount - beforeCount
     if (delta > 0) {
       leaked.push({
-        ...after,
+        ...item,
         delta,
       })
     }
