@@ -2,8 +2,17 @@ import * as Arrays from '../Arrays/Arrays.js'
 import * as Assert from '../Assert/Assert.js'
 import * as CompareEventTargets from '../CompareEventTargets/CompareEventTargets.js'
 
+const compareCount = (a, b) => {
+  return b.count - a.count
+}
+
+const compareDescription = (a, b) => {
+  const aDescription = a.description || ''
+  const bDescription = b.description || ''
+  return aDescription.localeCompare(bDescription)
+}
 const compareEventTarget = (a, b) => {
-  return b.count - a.count || a.description.localeCompare(b.description)
+  return compareCount(a, b) || compareDescription(a, b)
 }
 
 const sort = (eventTargets) => {
