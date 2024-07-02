@@ -1,4 +1,4 @@
-import * as CompareEventTargets from '../CompareEventTargets/CompareEventTargets.js'
+import * as CompareEventTargetDifference from '../CompareEventTargetDifference/CompareEventTargetDifference.js'
 import * as GetEventTargets from '../GetEventTargets/GetEventTargets.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
@@ -11,7 +11,6 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  // TODO measure difference
   return GetEventTargets.getEventTargets(session, objectGroup)
 }
 
@@ -19,7 +18,7 @@ export const stop = (session, objectGroup) => {
   return GetEventTargets.getEventTargets(session, objectGroup)
 }
 
-export const compare = CompareEventTargets.compareEventTargets
+export const compare = CompareEventTargetDifference.compareEventTargets
 
 export const isLeak = (leaked) => {
   return leaked.length > 0
