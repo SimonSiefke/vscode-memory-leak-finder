@@ -17,8 +17,11 @@ export const start = (session, objectGroup) => {
 
 export const stop = async (session, objectGroup) => {
   const result = await GetDisposableStoreSizes.getDisposableStoreSizes(session, objectGroup)
-  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return result
+}
+
+export const releaseResources = async (session, objectGroup) => {
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 
 const compareSize = (a, b) => {
