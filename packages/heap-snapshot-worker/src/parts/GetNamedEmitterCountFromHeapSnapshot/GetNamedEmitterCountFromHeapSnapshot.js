@@ -54,31 +54,61 @@ const getEventEmitterNode = (nodes, graph) => {
   return undefined
 }
 
+const RE_NUMERIC = /^\d+$/
+
+const isRelevantEdge = (edge) => {
+  const { name } = edge
+  if (name === 'this') {
+    return false
+  }
+  if (RE_NUMERIC.test(name)) {
+    return false
+  }
+  return true
+}
+
+const createCountedValues = (names) => {
+  const countMap = Object.create(null)
+  for (const name of names) {
+    countMap[name] ||= 0
+    countMap[name]++
+  }
+  const entries = Object.entries(countMap)
+  const result = entries.map(([key, value]) => {
+    return {
+      name: key,
+      count: value,
+    }
+  })
+  return result
+}
+
 export const getNamedEmitterCountFromHeapSnapshot = async (heapsnapshot) => {
   Assert.object(heapsnapshot)
   const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
-  const emitterNode = getEventEmitterNode(parsedNodes, graph)
-  console.log({ emitterNode })
-  if (!emitterNode) {
-    throw new Error('no emitter found')
-  }
-  const emitterNodeIndex = parsedNodes.indexOf(emitterNode)
-  const childNodes = parsedNodes.filter((node) => {
-    const edges = graph[node.id]
-    return edges.some((edge) => edge.index === emitterNodeIndex)
+  const emitters = parsedNodes.filter(isEventEmitterConstructorCandidate)
+  const allEdges = Object.values(graph).flat(1)
+  const allValues = []
+  const indices = emitters.map((emitter) => {
+    return parsedNodes.indexOf(emitter)
   })
-  console.log({ childNodes })
-  const randomNode = parsedNodes.find((node) => node.id === 276279)
-  console.log({ randomNode })
-  const randomEdges = graph[randomNode.id]
-  console.log({ randomEdges })
-  const randomEdgeProto = randomEdges.find((edge) => edge.name === '__proto__')
-  console.log({ randomEdgeProto })
-  const protoNode = parsedNodes[randomEdgeProto.index]
-  console.log({ protoNode })
-  // const firstEdge = edges[0]
-  // const node = parsedNodes[39]
-  // const mapEdges = graph[node.id]
-  // console.log({ mapEdges })
-  return parsedNodes
+  const indicesSet = new Set(indices)
+  const reverseMap = Object.create(null)
+  for (const edge of allEdges) {
+    if (indicesSet.has(edge.index)) {
+      reverseMap[edge.index] ||= []
+      reverseMap[edge.index].push(edge)
+    }
+  }
+  for (const item of emitters) {
+    const index = parsedNodes.indexOf(item)
+    const matchingEdges = reverseMap[index] || []
+    const relevantEdge = matchingEdges.find(isRelevantEdge)
+    if (!relevantEdge) {
+      continue
+    }
+    allValues.push(relevantEdge.name)
+  }
+  const countedValues = createCountedValues(allValues)
+  return countedValues
 }
