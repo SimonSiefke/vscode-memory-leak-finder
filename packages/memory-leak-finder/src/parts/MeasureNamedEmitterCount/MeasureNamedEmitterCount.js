@@ -1,3 +1,4 @@
+import * as CompareNamedEmitterCount from '../CompareNamedEmitterCount/CompareNamedEmitterCount.js'
 import * as GetNamedEmitterCount from '../GetNamedEmitterCount/GetNamedEmitterCount.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
@@ -17,12 +18,7 @@ export const stop = (session, objectGroup) => {
   return GetNamedEmitterCount.getNamedEmitterCount(session, objectGroup)
 }
 
-export const compare = (before, after) => {
-  return {
-    before,
-    after,
-  }
-}
+export const compare = CompareNamedEmitterCount.compareNamedEmitterCount
 
 export const isLeak = () => {
   return true
