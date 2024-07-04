@@ -1,6 +1,4 @@
-import * as CompareCount from '../CompareCount/CompareCount.js'
 import * as GetNamedEmitterCount from '../GetNamedEmitterCount/GetNamedEmitterCount.js'
-import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 
