@@ -32,11 +32,6 @@ const getSummary = (result) => {
   return { result }
 }
 
-const logStream = createWriteStream('/tmp/log.txt')
-const log = (...args) => {
-  logStream.write(JSON.stringify(args, null, 2) + '\n')
-}
-
 export const runTests = async (
   root,
   cwd,
@@ -89,7 +84,6 @@ export const runTests = async (
       await MemoryLeakFinder.setup(memoryLeakWorkerIpc, connectionId, measure)
     }
     for (let i = 0; i < formattedPaths.length; i++) {
-      log('i' + i)
       const formattedPath = formattedPaths[i]
       const { absolutePath, relativeDirname, dirent, relativePath } = formattedPath
       const forceRun = dirent === `${filterValue}.js`
@@ -99,9 +93,7 @@ export const runTests = async (
 
       try {
         const start = i === 0 ? initialStart : Time.now()
-        log('before serup')
         const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(testWorkerIpc, connectionId, absolutePath, forceRun, timeouts)
-        log('after serup')
 
         if (recordVideo) {
           await VideoRecording.addChapter(dirent, start)
@@ -120,20 +112,15 @@ export const runTests = async (
                 await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun)
               }
             }
-            log('before sraer')
             const before = await MemoryLeakFinder.start(memoryLeakWorkerIpc, connectionId)
             console.log('after start')
             for (let i = 0; i < runs; i++) {
-              log('before run')
               await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun)
-              log('after run')
             }
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
             }
-            log('before stop')
             const after = await MemoryLeakFinder.stop(memoryLeakWorkerIpc, connectionId)
-            log('after stop')
 
             const result = await MemoryLeakFinder.compare(memoryLeakWorkerIpc, connectionId, before, after)
             const fileName = dirent.replace('.js', '.json')
@@ -157,7 +144,6 @@ export const runTests = async (
             passed++
           }
           if (restartBetween) {
-            log('restarting')
             if (checkLeaks) {
               // TODO dispose old ipc
               MemoryLeakWorker.state.ipc = undefined
@@ -168,7 +154,6 @@ export const runTests = async (
               memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()
               await MemoryLeakFinder.setup(memoryLeakWorkerIpc, connectionId, measure)
             }
-            log('did restart')
           }
         }
       } catch (error) {
