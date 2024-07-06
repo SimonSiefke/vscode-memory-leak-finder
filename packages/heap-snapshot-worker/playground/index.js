@@ -17,5 +17,3 @@ const r = await fn(v)
 console.timeEnd('parse')
 
 await writeFile(join(root, '.vscode-heapsnapshots', 'result.json'), JSON.stringify(r, null, 2) + '\n')
-
-// await new Promise((r) => {})
