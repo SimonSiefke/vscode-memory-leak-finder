@@ -1,7 +1,7 @@
 import * as Assert from '../Assert/Assert.js'
-import * as GetConstructorScope from '../GetConstructorScope/GetConstructorScope.js'
+import * as CreateNameMap from '../CreateNameMap/CreateNameMap.js'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
-import * as GetConstructorScopeMap from '../GetConstructorScopeMap/GetConstructorScopeMap.js'
+import * as SortCountMap from '../SortCountMap/SortCountMap.js'
 
 const createCountMap = (names) => {
   const map = Object.create(null)
@@ -88,100 +88,29 @@ const anonymousEdge = {
   name: '<anonymous>',
 }
 
-const createNamesMap = (parsedNodes, graph) => {
-  const namesMap = Object.create(null)
-  const allEdges = Object.values(graph).flat(1)
-  for (const edge of allEdges) {
-    namesMap[edge.index] ||= []
-    namesMap[edge.index].push(edge.name)
-  }
-  const namesIdMap = Object.create(null)
-  for (let i = 0; i < parsedNodes.length; i++) {
-    const node = parsedNodes[i]
-    namesIdMap[node.id] = namesMap[i] || []
-    namesIdMap[node.id].unshift(node.name)
-  }
-  return namesIdMap
-}
-
-const isIgnoredEdge = (edge) => {
-  return edge.name === 'this' || edge.name === 'bound_this'
-}
-
-const getConstructorScope = (parsedNodes, graph, node) => {
-  const nodeIndex = parsedNodes.indexOf(node)
-  for (const parsedNode of parsedNodes) {
-    const edges = graph[parsedNode.id]
-    for (const edge of edges) {
-      if (edge.index === nodeIndex) {
-        if (isIgnoredEdge(edge)) {
-          continue
-        }
-        return parsedNode
-      }
-    }
-  }
-  return undefined
-}
-
 export const getNamedEmitterCountFromHeapSnapshot = async (heapsnapshot) => {
   Assert.object(heapsnapshot)
   const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
-  const namesIdMap = createNamesMap(parsedNodes, graph)
-  const randomNode = parsedNodes.find((node) => node.id === 1496365)
-  const randomNodeIndex = parsedNodes.indexOf(randomNode)
-  const edges = graph[randomNode.id]
-  // const names = namesIdMap[randomNode.id]
-  console.log({ randomNode, edges })
-
-  console.time('constructorScopeMap')
-  const constructorScopeMap = GetConstructorScopeMap.getConstructorScopeMap(parsedNodes, graph)
-  console.timeEnd('constructorScopeMap')
-  // console.log(scopeMap)
-  const parent = parsedNodes[constructorScopeMap[randomNodeIndex]]
-  console.log({ parent })
-  console.time('getconstructorScope')
-  const constructorScope = GetConstructorScope.getConstructorScope(parsedNodes, constructorScopeMap, randomNode)
-  console.timeEnd('getconstructorScope')
-
-  // const otherNode = parsedNodes.find((node) => node.id === 1090027)
-  // const otherEdges = graph[otherNode.id]
-  console.log({ constructorScope })
-
-  const relayScope = GetConstructorScope.getConstructorScope(parsedNodes, graph, constructorScope)
-  console.log({ relayScope })
-  // // console.log({ namesIdMap })
-  // const emitters = parsedNodes.filter(isEventEmitterConstructorCandidate)
-  // const allValues = []
-  // const indices = emitters.map((emitter) => {
-  //   return parsedNodes.indexOf(emitter)
-  // })
-  // const indicesSet = new Set(indices)
-  // const reverseMap = Object.create(null)
-  // for (const edge of allEdges) {
-  //   if (indicesSet.has(edge.index)) {
-  //     reverseMap[edge.index] ||= []
-  //     reverseMap[edge.index].push(edge)
-  //   }
-  // }
-  // for (const item of emitters) {
-  //   const index = parsedNodes.indexOf(item)
-  //   const matchingEdges = reverseMap[index] || []
-  //   const relevantEdge = matchingEdges.find(isRelevantEdge) || anonymousEdge
-  //   console.log({ relevantEdge })
-  //   allValues.push(relevantEdge.name)
-  //   const relevantEdgeNode = parsedNodes[relevantEdge.index]
-  //   const relevantThisEdge = matchingEdges.find((edge) => edge.name === 'this')
-  //   if (relevantThisEdge) {
-  //     const relevantThisNode = parsedNodes[relevantThisEdge.index]
-  //     const relevantThisNodeEdges = graph[relevantThisNode.id]
-
-  //     console.log({ relevantEdge, relevantEdgeNode, matchingEdges, relevantThisNode, relevantThisNodeEdges })
-  //   }
-  // }
-  // const countedValues = createCountedValues(allValues)
-  return {
-    // namesIdMap,
-    // countedValues,
+  const emitters = parsedNodes.filter(isEventEmitterConstructorCandidate)
+  const allEdges = Object.values(graph).flat(1)
+  const allValues = []
+  const indices = emitters.map((emitter) => {
+    return parsedNodes.indexOf(emitter)
+  })
+  const indicesSet = new Set(indices)
+  const reverseMap = Object.create(null)
+  for (const edge of allEdges) {
+    if (indicesSet.has(edge.index)) {
+      reverseMap[edge.index] ||= []
+      reverseMap[edge.index].push(edge)
+    }
   }
+  for (const item of emitters) {
+    const index = parsedNodes.indexOf(item)
+    const matchingEdges = reverseMap[index] || []
+    const relevantEdge = matchingEdges.find(isRelevantEdge) || anonymousEdge
+    allValues.push(relevantEdge.name)
+  }
+  const countedValues = createCountedValues(allValues)
+  return countedValues
 }
