@@ -11,10 +11,8 @@ export const getNamedConstructorCountFromHeapSnapshot = async (heapsnapshot, con
   const constructorScopeMap = GetConstructorScopeMap.getConstructorScopeMap(parsedNodes, graph)
   const constructorNodesWithInfo = constructorNodes.map((node) => {
     const constructorScope = GetConstructorScope.getConstructorScope(parsedNodes, constructorScopeMap, node)
-    return {
-      ...node,
-      constructorScope,
-    }
+    const mergedNamed = `${constructorScope.name}:${node.name}`
+    return mergedNamed
   })
   return constructorNodesWithInfo
 }
