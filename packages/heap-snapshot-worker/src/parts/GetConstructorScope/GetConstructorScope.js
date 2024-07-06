@@ -2,6 +2,7 @@ import * as IsIgnoredConstructorScopeEdge from '../IsIgnoredConstructorScopeEdge
 
 export const getConstructorScope = (parsedNodes, graph, node) => {
   const nodeIndex = parsedNodes.indexOf(node)
+  const nodes = []
   for (const parsedNode of parsedNodes) {
     const edges = graph[parsedNode.id]
     for (const edge of edges) {
@@ -9,9 +10,10 @@ export const getConstructorScope = (parsedNodes, graph, node) => {
         if (IsIgnoredConstructorScopeEdge.isIgnoredConstructorScopeEdge(edge)) {
           continue
         }
-        return parsedNode
+        nodes.push(edge)
+        // return parsedNode
       }
     }
   }
-  return undefined
+  return nodes
 }
