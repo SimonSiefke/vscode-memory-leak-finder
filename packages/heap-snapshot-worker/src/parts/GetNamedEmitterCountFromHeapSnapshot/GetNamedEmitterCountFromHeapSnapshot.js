@@ -2,6 +2,7 @@ import * as Assert from '../Assert/Assert.js'
 import * as GetConstructorScope from '../GetConstructorScope/GetConstructorScope.js'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
 import * as GetConstructorScopeMap from '../GetConstructorScopeMap/GetConstructorScopeMap.js'
+import * as GetConstructorNodes from '../GetConstructorNodes/GetConstructorNodes.js'
 
 const createCountMap = (names) => {
   const map = Object.create(null)
@@ -127,29 +128,16 @@ const getConstructorScope = (parsedNodes, graph, node) => {
 export const getNamedEmitterCountFromHeapSnapshot = async (heapsnapshot) => {
   Assert.object(heapsnapshot)
   const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
-  const namesIdMap = createNamesMap(parsedNodes, graph)
-  const randomNode = parsedNodes.find((node) => node.id === 1496365)
-  const randomNodeIndex = parsedNodes.indexOf(randomNode)
-  const edges = graph[randomNode.id]
-  // const names = namesIdMap[randomNode.id]
-  console.log({ randomNode, edges })
-
-  console.time('constructorScopeMap')
+  const constructorName = 'Emitter'
+  const emitterNodes = GetConstructorNodes.getConstructorNodes(parsedNodes, constructorName)
   const constructorScopeMap = GetConstructorScopeMap.getConstructorScopeMap(parsedNodes, graph)
-  console.timeEnd('constructorScopeMap')
-  // console.log(scopeMap)
-  const parent = parsedNodes[constructorScopeMap[randomNodeIndex]]
-  console.log({ parent })
-  console.time('getconstructorScope')
-  const constructorScope = GetConstructorScope.getConstructorScope(parsedNodes, constructorScopeMap, randomNode)
-  console.timeEnd('getconstructorScope')
-
-  // const otherNode = parsedNodes.find((node) => node.id === 1090027)
-  // const otherEdges = graph[otherNode.id]
-  console.log({ constructorScope })
-
-  const relayScope = GetConstructorScope.getConstructorScope(parsedNodes, graph, constructorScope)
-  console.log({ relayScope })
+  const emitterNodesWithInfo = emitterNodes.map((node) => {
+    const constructorScope = GetConstructorScope.getConstructorScope(parsedNodes, constructorScopeMap, node)
+    return {
+      ...node,
+      constructorScope,
+    }
+  })
   // // console.log({ namesIdMap })
   // const emitters = parsedNodes.filter(isEventEmitterConstructorCandidate)
   // const allValues = []
@@ -182,6 +170,6 @@ export const getNamedEmitterCountFromHeapSnapshot = async (heapsnapshot) => {
   // const countedValues = createCountedValues(allValues)
   return {
     // namesIdMap,
-    // countedValues,
+    emitterNodesWithInfo,
   }
 }
