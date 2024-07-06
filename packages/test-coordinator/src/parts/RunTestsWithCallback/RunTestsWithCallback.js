@@ -10,9 +10,9 @@ import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAtt
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.js'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.js'
-import * as VideoRecording from '../VideoRecording/VideoRecording.js'
 import * as Time from '../Time/Time.js'
 import * as Timeout from '../Timeout/Timeout.js'
+import * as VideoRecording from '../VideoRecording/VideoRecording.js'
 
 // 1. get matching files
 // 2. launch vscode
@@ -77,7 +77,7 @@ export const runTests = async (
     callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
     const connectionId = Id.create()
     let testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(cwd, headlessMode, recordVideo, connectionId, timeouts)
-    const memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()
+    let memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()
     if (checkLeaks) {
       await MemoryLeakFinder.setup(memoryLeakWorkerIpc, connectionId, measure)
     }
@@ -118,6 +118,7 @@ export const runTests = async (
               await Timeout.setTimeout(timeoutBetween)
             }
             const after = await MemoryLeakFinder.stop(memoryLeakWorkerIpc, connectionId)
+
             const result = await MemoryLeakFinder.compare(memoryLeakWorkerIpc, connectionId, before, after)
             const fileName = dirent.replace('.js', '.json')
             const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
@@ -140,8 +141,19 @@ export const runTests = async (
             passed++
           }
           if (restartBetween) {
+            if (memoryLeakWorkerIpc) {
+              memoryLeakWorkerIpc.dispose()
+              memoryLeakWorkerIpc = undefined
+            }
+            if (testWorkerIpc) {
+              testWorkerIpc.dispose()
+            }
             PrepareTestsOrAttach.state.promise = undefined
             testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(cwd, headlessMode, recordVideo, connectionId, timeouts)
+            if (checkLeaks) {
+              memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()
+              await MemoryLeakFinder.setup(memoryLeakWorkerIpc, connectionId, measure)
+            }
           }
         }
       } catch (error) {
