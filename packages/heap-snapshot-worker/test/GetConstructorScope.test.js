@@ -27,14 +27,14 @@ test('ignore unimportant scope', () => {
     },
   ]
   const graph = {
-    1: [
-      {
-        index: 0,
-      },
-    ],
+    1: [],
     2: [
       {
         index: 1,
+        name: 'abc',
+      },
+      {
+        index: 0,
         name: 'this',
       },
       {
@@ -45,7 +45,7 @@ test('ignore unimportant scope', () => {
   }
   const node = parsedNodes[0]
   expect(GetConstructorScope.getConstructorScope(parsedNodes, graph, node)).toEqual({
-    id: 1,
-    name: 'Emitter',
+    id: 2,
+    name: 'Relay',
   })
 })
