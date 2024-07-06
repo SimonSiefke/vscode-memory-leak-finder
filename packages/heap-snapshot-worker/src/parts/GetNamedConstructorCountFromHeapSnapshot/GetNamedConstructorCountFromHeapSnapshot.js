@@ -9,8 +9,6 @@ export const getNamedConstructorCountFromHeapSnapshot = async (heapsnapshot, con
   const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
   const constructorNodes = GetConstructorNodes.getConstructorNodes(parsedNodes, constructorName)
   const { scopeMap, edgeMap } = GetConstructorScopeMap.getConstructorScopeMap(parsedNodes, graph)
-  const randomNode = constructorNodes.find((node) => node.id === 1496365)
-  console.log({ randomNode })
   const constructorNodesWithInfo = constructorNodes.map((node) => {
     const { scopeNode, scopeEdge } = GetConstructorScope.getConstructorScope(parsedNodes, scopeMap, edgeMap, node)
     const parentScope = GetConstructorScope.getConstructorScope(parsedNodes, scopeMap, edgeMap, scopeNode)
