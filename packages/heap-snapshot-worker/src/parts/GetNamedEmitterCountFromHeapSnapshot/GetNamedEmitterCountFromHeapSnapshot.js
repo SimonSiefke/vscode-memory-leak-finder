@@ -91,9 +91,20 @@ const anonymousEdge = {
 export const getNamedEmitterCountFromHeapSnapshot = async (heapsnapshot) => {
   Assert.object(heapsnapshot)
   const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
-  console.log(process.memoryUsage().heapUsed)
-  const emitters = parsedNodes.filter(isEventEmitterConstructorCandidate)
+  const namesMap = Object.create(null)
   const allEdges = Object.values(graph).flat(1)
+  for (const edge of allEdges) {
+    namesMap[edge.index] ||= []
+    namesMap[edge.index].push(edge.name)
+  }
+  const namesIdMap = Object.create(null)
+  for (let i = 0; i < parsedNodes.length; i++) {
+    const node = parsedNodes[i]
+    namesIdMap[node.id] = namesMap[i] || []
+    namesIdMap[node.id].unshift(node.name)
+  }
+  // console.log({ namesIdMap })
+  const emitters = parsedNodes.filter(isEventEmitterConstructorCandidate)
   const allValues = []
   const indices = emitters.map((emitter) => {
     return parsedNodes.indexOf(emitter)
@@ -122,5 +133,8 @@ export const getNamedEmitterCountFromHeapSnapshot = async (heapsnapshot) => {
     }
   }
   const countedValues = createCountedValues(allValues)
-  return countedValues
+  return {
+    namesIdMap,
+    countedValues,
+  }
 }
