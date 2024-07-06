@@ -6,10 +6,12 @@ test('getConstructorNodes', () => {
     {
       id: 1,
       name: 'a',
+      type: 'object',
     },
     {
       id: 2,
       name: 'Emitter',
+      type: 'object',
     },
   ]
   const constructorName = 'Emitter'
@@ -17,6 +19,7 @@ test('getConstructorNodes', () => {
     {
       id: 2,
       name: 'Emitter',
+      type: 'object',
     },
   ])
 })
