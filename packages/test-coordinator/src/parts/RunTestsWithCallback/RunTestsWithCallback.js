@@ -10,10 +10,9 @@ import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAtt
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.js'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.js'
-import * as VideoRecording from '../VideoRecording/VideoRecording.js'
 import * as Time from '../Time/Time.js'
 import * as Timeout from '../Timeout/Timeout.js'
-import { createWriteStream } from 'node:fs'
+import * as VideoRecording from '../VideoRecording/VideoRecording.js'
 
 // 1. get matching files
 // 2. launch vscode
@@ -62,7 +61,6 @@ export const runTests = async (
     Assert.boolean(timeouts)
     Assert.number(timeoutBetween)
     Assert.boolean(restartBetween)
-    console.log({ restartBetween })
     let passed = 0
     let failed = 0
     let skipped = 0
@@ -144,9 +142,12 @@ export const runTests = async (
             passed++
           }
           if (restartBetween) {
-            if (checkLeaks) {
-              // TODO dispose old ipc
-              MemoryLeakWorker.state.ipc = undefined
+            if (memoryLeakWorkerIpc) {
+              memoryLeakWorkerIpc.dispose()
+              memoryLeakWorkerIpc = undefined
+            }
+            if (testWorkerIpc) {
+              testWorkerIpc.dispose()
             }
             PrepareTestsOrAttach.state.promise = undefined
             testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(cwd, headlessMode, recordVideo, connectionId, timeouts)
