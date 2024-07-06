@@ -1,3 +1,5 @@
+import * as IgnoredConstructorScopeEdges from '../IgnoredConstructorScopeEdges/IgnoredConstructorScopeEdges.js'
+
 export const isIgnoredConstructorScopeEdge = (edge) => {
-  return edge.name === 'this' || edge.name === 'bound_this'
+  return IgnoredConstructorScopeEdges.ignoredConstructorScopeEdges.includes(edge)
 }
