@@ -135,13 +135,13 @@ export const getNamedEmitterCountFromHeapSnapshot = async (heapsnapshot) => {
   console.log({ randomNode, edges })
 
   console.time('constructorScopeMap')
-  const scopeMap = GetConstructorScopeMap.getConstructorScopeMap(parsedNodes, graph)
+  const constructorScopeMap = GetConstructorScopeMap.getConstructorScopeMap(parsedNodes, graph)
   console.timeEnd('constructorScopeMap')
   // console.log(scopeMap)
-  const parent = parsedNodes[scopeMap[randomNodeIndex]]
+  const parent = parsedNodes[constructorScopeMap[randomNodeIndex]]
   console.log({ parent })
   console.time('getconstructorScope')
-  const constructorScope = GetConstructorScope.getConstructorScope(parsedNodes, graph, randomNode)
+  const constructorScope = GetConstructorScope.getConstructorScope(parsedNodes, constructorScopeMap, randomNode)
   console.timeEnd('getconstructorScope')
 
   // const otherNode = parsedNodes.find((node) => node.id === 1090027)
