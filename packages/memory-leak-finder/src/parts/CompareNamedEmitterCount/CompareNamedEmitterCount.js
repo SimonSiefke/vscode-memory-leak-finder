@@ -22,11 +22,13 @@ export const compareNamedEmitterCount = (before, after) => {
     const beforeCount = beforeMap[item.name] || 0
     const afterCount = item.count
     const delta = afterCount - beforeCount
-    result.push({
-      name: item.name,
-      count: afterCount,
-      delta,
-    })
+    if (delta > 0) {
+      result.push({
+        name: item.name,
+        count: afterCount,
+        delta,
+      })
+    }
   }
   const sorted = sortByCounts(result)
   return sorted
