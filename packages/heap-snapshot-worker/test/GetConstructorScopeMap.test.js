@@ -26,7 +26,7 @@ test('getConstructorScopeMap', () => {
   expect(scopeMapArray).toEqual([1, 0])
 })
 
-test('getConstructorScopeMap', () => {
+test('ignore unimportant scopes', () => {
   const parsedNodes = [
     {
       id: 1,
@@ -40,6 +40,10 @@ test('getConstructorScopeMap', () => {
   const graph = {
     1: [],
     2: [
+      {
+        index: 0,
+        name: 'this',
+      },
       {
         name: 'emitter',
         index: 0,
