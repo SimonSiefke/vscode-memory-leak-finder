@@ -111,7 +111,6 @@ export const runTests = async (
               }
             }
             const before = await MemoryLeakFinder.start(memoryLeakWorkerIpc, connectionId)
-            console.log('after start')
             for (let i = 0; i < runs; i++) {
               await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun)
             }
