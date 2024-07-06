@@ -20,13 +20,16 @@ const createCounts = (constructorNodesWithInfo) => {
 }
 
 const isImportantScopeName = (name) => {
-  if (!name) {
-    return false
+  switch (name) {
+    case '':
+    case 'Set':
+    case 'Array':
+    case '(object properties)':
+    case 'system / Context':
+      return false
+    default:
+      return true
   }
-  if (name === 'Set') {
-    return false
-  }
-  return true
 }
 
 const getDetailedNodeInfo = (parsedNodes, scopeMap, edgeMap, node) => {
