@@ -1,6 +1,4 @@
-const isIgnoredEdge = (edge) => {
-  return edge.name === 'this' || edge.name === 'bound_this'
-}
+import * as IsIgnoredConstructorScopeEdge from '../IsIgnoredConstructorScopeEdge/IsIgnoredConstructorScopeEdge.js'
 
 export const getConstructorScope = (parsedNodes, graph, node) => {
   const nodeIndex = parsedNodes.indexOf(node)
@@ -8,7 +6,7 @@ export const getConstructorScope = (parsedNodes, graph, node) => {
     const edges = graph[parsedNode.id]
     for (const edge of edges) {
       if (edge.index === nodeIndex) {
-        if (isIgnoredEdge(edge)) {
+        if (IsIgnoredConstructorScopeEdge.isIgnoredConstructorScopeEdge(edge)) {
           continue
         }
         return parsedNode
