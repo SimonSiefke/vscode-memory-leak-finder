@@ -2,6 +2,7 @@ import * as IsIgnoredConstructorScopeEdge from '../IsIgnoredConstructorScopeEdge
 
 export const getConstructorScopeMap = (parsedNodes, graph) => {
   const scopeMap = new Uint32Array(parsedNodes.length)
+  const edgeMap = [...new Array(parsedNodes.length).fill('')]
   for (let i = 0; i < parsedNodes.length; i++) {
     const node = parsedNodes[i]
     const edges = graph[node.id]
@@ -9,8 +10,15 @@ export const getConstructorScopeMap = (parsedNodes, graph) => {
       if (IsIgnoredConstructorScopeEdge.isIgnoredConstructorScopeEdge(edge)) {
         continue
       }
-      scopeMap[edge.index] ||= i
+      if (scopeMap[edge.index]) {
+        continue
+      }
+      scopeMap[edge.index] = i
+      edgeMap[edge.index] = edge.name
     }
   }
-  return scopeMap
+  return {
+    scopeMap,
+    edgeMap,
+  }
 }

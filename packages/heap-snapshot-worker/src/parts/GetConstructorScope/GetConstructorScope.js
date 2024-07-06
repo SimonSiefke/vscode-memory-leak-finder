@@ -1,7 +1,11 @@
-export const getConstructorScope = (parsedNodes, constructorScopeMap, node) => {
+export const getConstructorScope = (parsedNodes, constructorScopeMap, edgeMap, node) => {
   // TODO avoid indexOf
   const nodeIndex = parsedNodes.indexOf(node)
   const constructorScopeIndex = constructorScopeMap[nodeIndex]
   const constructorScope = parsedNodes[constructorScopeIndex]
-  return constructorScope
+  const edge = edgeMap[nodeIndex]
+  return {
+    scopeNode: constructorScope,
+    scopeEdge: edge,
+  }
 }

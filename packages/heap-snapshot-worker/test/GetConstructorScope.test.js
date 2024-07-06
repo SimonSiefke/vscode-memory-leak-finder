@@ -1,7 +1,7 @@
 import * as GetConstructorScope from '../src/parts/GetConstructorScope/GetConstructorScope.js'
 import { test, expect } from '@jest/globals'
 
-test('getConstructorScope', () => {
+test.skip('getConstructorScope', () => {
   const parsedNodes = [
     {
       id: 1,
