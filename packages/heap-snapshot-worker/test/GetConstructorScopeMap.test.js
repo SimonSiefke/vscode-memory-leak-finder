@@ -21,7 +21,7 @@ test('getConstructorScopeMap', () => {
       },
     ],
   }
-  const scopeMap = GetConstructorScopeMap.getConstructorScopeMap(parsedNodes, graph)
+  const { scopeMap } = GetConstructorScopeMap.getConstructorScopeMap(parsedNodes, graph)
   const scopeMapArray = [...scopeMap]
   expect(scopeMapArray).toEqual([1, 0])
 })
@@ -50,7 +50,7 @@ test('ignore unimportant scopes', () => {
       },
     ],
   }
-  const scopeMap = GetConstructorScopeMap.getConstructorScopeMap(parsedNodes, graph)
+  const { scopeMap } = GetConstructorScopeMap.getConstructorScopeMap(parsedNodes, graph)
   const scopeMapArray = [...scopeMap]
   expect(scopeMapArray).toEqual([1, 0])
 })
