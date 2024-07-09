@@ -78,7 +78,7 @@ export const runTests = async (
     callback(TestWorkerEventType.TestsStarting, total)
     callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
     const connectionId = Id.create()
-    let testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(cwd, headlessMode, recordVideo, connectionId, timeouts)
+    let testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(cwd, headlessMode, recordVideo, connectionId, timeouts, runMode)
     let memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()
     if (checkLeaks) {
       await MemoryLeakFinder.setup(memoryLeakWorkerIpc, connectionId, measure)
