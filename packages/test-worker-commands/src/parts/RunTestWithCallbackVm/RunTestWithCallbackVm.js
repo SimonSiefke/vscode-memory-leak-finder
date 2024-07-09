@@ -1,15 +1,11 @@
-import { readFile } from 'node:fs/promises'
-import * as vm from 'node:vm'
+import * as ImportUsingVm from '../ImportUsingVm/ImportUsingVm.js'
+import * as TestStage from '../TestStage/TestStage.js'
 
 export const runTest = async (pageObject, file, forceRun) => {
-  // TODO use vm
-  console.log('use vm')
-  const content = await readFile(file, 'utf8')
-  const module = new vm.SourceTextModule(content)
-  // @ts-ignore
-  await module.link(() => {})
-  await module.evaluate()
-  // const contextifiedObject = vm.createContext({ secret: 42 })
-  // await TestStage.run(module, pageObject)
+  const module = await ImportUsingVm.importUsingVm(file)
+  if (module.skip) {
+    return true
+  }
+  await TestStage.run(module, pageObject)
   return false
 }
