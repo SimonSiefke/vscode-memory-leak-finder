@@ -1,3 +1,5 @@
+import * as TestRunMode from '../TestRunMode/TestRunMode.js'
+
 const parseArgvNumber = (argv, name) => {
   const index = argv.indexOf(name)
   const next = index + 1
@@ -34,6 +36,7 @@ export const parseArgv = (argv) => {
     timeouts: true,
     timeoutBetween: 0,
     restartBetween: false,
+    runMode: TestRunMode.Vm,
   }
   if (argv.includes('--watch')) {
     options.watch = true
