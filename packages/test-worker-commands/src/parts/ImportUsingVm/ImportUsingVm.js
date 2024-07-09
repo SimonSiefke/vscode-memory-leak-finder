@@ -14,7 +14,14 @@ const linker = () => {
 export const importUsingVm = async (file) => {
   try {
     const content = await readFile(file, 'utf8')
-    const module = new vm.SourceTextModule(content)
+    const context = vm.createContext({
+      process: {
+        platform: process.platform,
+      },
+    })
+    const module = new vm.SourceTextModule(content, {
+      context,
+    })
     await module.link(linker)
     await module.evaluate()
     return module.namespace
