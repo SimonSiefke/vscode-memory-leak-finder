@@ -6,6 +6,7 @@ export const runTest = async (pageObject, file, forceRun) => {
   if (module.skip) {
     return true
   }
+  console.log(Object.prototype.abc)
   await TestStage.run(module, pageObject)
   return false
 }
