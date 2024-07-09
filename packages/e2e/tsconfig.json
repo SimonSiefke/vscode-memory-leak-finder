@@ -4,7 +4,7 @@
     "target": "esnext",
     "checkJs": true,
     "module": "NodeNext",
-    "types": ["node"],
+    "types": [],
     "moduleResolution": "NodeNext",
     "isolatedModules": true,
     "strict": true,
@@ -20,5 +20,5 @@
     "noUnusedLocals": true,
     "composite": true
   },
-  "include": ["src", "test"]
+  "include": ["src", "test", "types.d.ts"]
 }
