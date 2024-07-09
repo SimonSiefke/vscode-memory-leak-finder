@@ -17,6 +17,7 @@ export const state = {
   timeouts: true,
   timeoutBetween: 0,
   restartBetween: false,
+  runMode: 2, // set 1 for vm
 }
 
 export const setState = (newState) => {
@@ -33,6 +34,7 @@ export const setState = (newState) => {
   state.timeouts = newState.timeouts
   state.timeoutBetween = newState.timeoutBetween
   state.restartBetween = newState.restartBetween
+  state.runMode = newState.runMode
 }
 
 export const setBuffering = (value) => {

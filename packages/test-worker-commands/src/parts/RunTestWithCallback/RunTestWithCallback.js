@@ -1,11 +1,17 @@
-import * as ImportTest from '../ImportTest/ImportTest.js'
-import * as TestStage from '../TestStage/TestStage.js'
+import * as RunTestWithCallbackImport from '../RunTestWithCallbackImport/RunTestWithCallbackImport.js'
+import * as RunTestWithCallbackVm from '../RunTestWithCallbackVm/RunTestWithCallbackVm.js'
+import * as TestRunMode from '../TestRunMode/TestRunMode.js'
 
-// @ts-ignore
-export const runTestWithCallback = async (pageObject, file, forceRun) => {
-  const module = await ImportTest.importTest(file)
-  if (module.skip && !forceRun) {
-    return true
+const getModule = (runMode) => {
+  switch (runMode) {
+    case TestRunMode.Vm:
+      return RunTestWithCallbackVm
+    default:
+      return RunTestWithCallbackImport
   }
-  await TestStage.run(module, pageObject)
+}
+
+export const runTestWithCallback = async (pageObject, file, forceRun, runMode) => {
+  const module = getModule(runMode)
+  await module.runTest(pageObject, file, forceRun)
 }

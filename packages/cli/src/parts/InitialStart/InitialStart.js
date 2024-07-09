@@ -24,5 +24,6 @@ export const initialStart = async (options) => {
     options.timeouts,
     options.timeoutBetween,
     options.restartBetween,
+    options.runMode,
   )
 }
