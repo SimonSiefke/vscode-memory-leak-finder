@@ -16,7 +16,7 @@ fi
 
 function updateDependencies {
   echo "updating dependencies..."
-  OUTPUT=`ncu -u -x @types/node -x @types/jest -x rollup`
+  OUTPUT=`ncu -u`
   SUB='All dependencies match the latest package versions'
   if [[ "$OUTPUT" == *"$SUB"* ]]; then
     echo "$OUTPUT"
