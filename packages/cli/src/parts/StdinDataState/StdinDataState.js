@@ -18,7 +18,7 @@ export const state = {
   timeouts: true,
   timeoutBetween: 0,
   restartBetween: false,
-  runMode: TestRunMode.Vm,
+  runMode: TestRunMode.Auto,
 }
 
 export const setState = (newState) => {
