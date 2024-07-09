@@ -45,6 +45,7 @@ export const runTests = async (
   timeouts,
   timeoutBetween,
   restartBetween,
+  runMode,
   callback,
 ) => {
   try {
@@ -60,6 +61,7 @@ export const runTests = async (
     Assert.boolean(measureAfter)
     Assert.boolean(timeouts)
     Assert.number(timeoutBetween)
+    Assert.number(runMode)
     Assert.boolean(restartBetween)
     let passed = 0
     let failed = 0
@@ -107,12 +109,12 @@ export const runTests = async (
           if (checkLeaks) {
             if (measureAfter) {
               for (let i = 0; i < 2; i++) {
-                await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun)
+                await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun, runMode)
               }
             }
             const before = await MemoryLeakFinder.start(memoryLeakWorkerIpc, connectionId)
             for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun)
+              await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun, runMode)
             }
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
@@ -131,7 +133,7 @@ export const runTests = async (
             console.log(summary)
           } else {
             for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun)
+              await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun, runMode)
             }
           }
           const end = Time.now()

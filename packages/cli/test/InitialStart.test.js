@@ -70,6 +70,7 @@ test('initialStart - watch mode - start running', async () => {
     undefined,
     undefined,
     undefined,
+    undefined,
   )
 })
 
@@ -84,6 +85,7 @@ test('initialStart - start running', async () => {
   expect(StartRunning.startRunning).toHaveBeenCalledTimes(1)
   expect(StartRunning.startRunning).toHaveBeenCalledWith(
     'a',
+    undefined,
     undefined,
     undefined,
     undefined,
