@@ -17,8 +17,8 @@ export const state = {
   promise: undefined,
 }
 
-export const prepareTestsOrAttach = async (cwd, headlessMode, recordVideo, connectionId, timeouts) => {
-  const testWorkerIpc = await TestWorker.launch()
+export const prepareTestsOrAttach = async (cwd, headlessMode, recordVideo, connectionId, timeouts, runMode) => {
+  const testWorkerIpc = await TestWorker.launch(runMode)
   const isFirst = state.promise === undefined
   if (isFirst) {
     state.promise = PrepareTests.prepareTests(testWorkerIpc, cwd, headlessMode, recordVideo, connectionId, timeouts)
