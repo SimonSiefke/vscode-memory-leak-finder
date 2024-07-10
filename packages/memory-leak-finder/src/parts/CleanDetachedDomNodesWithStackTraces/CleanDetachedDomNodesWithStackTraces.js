@@ -8,7 +8,7 @@ const mergeOriginal = (nodes, cleanInstances) => {
   }
   const merged = []
   let originalIndex = 0
-  console.log(JSON.stringify(reverseMap, null, 2))
+  // console.log(JSON.stringify(reverseMap, null, 2))
   for (const node of nodes) {
     originalIndex++
     const originalStack = []
@@ -17,7 +17,9 @@ const mergeOriginal = (nodes, cleanInstances) => {
       // console.log({ originalIndex })
       const instance = reverseMap[originalIndex]
       // console.log({ instance })
-      originalStack.push(instance.originalStack[0])
+      if (instance) {
+        originalStack.push(instance.originalStack[0])
+      }
     }
     merged.push({
       ...node,
@@ -31,7 +33,7 @@ export const cleanDetachedDomNodesWithStackTraces = async (nodes, scriptMap) => 
   const stackTraces = nodes.map((node) => node.stackTrace)
   const fullQuery = GetEventListenersQuery.getEventListenerQuery(stackTraces, scriptMap)
   const cleanInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(fullQuery, false)
-  console.log({ cleanInstances })
+  // console.log({ cleanInstances })
   const sorted = mergeOriginal(nodes, cleanInstances)
   return sorted
 }

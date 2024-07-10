@@ -28,7 +28,6 @@ export const getEventListenerQuery = (stacks, scriptMap) => {
   const allQueries = []
   for (const stack of stacks) {
     originalIndex++
-    const itemQueryStack = []
     let sourceMapUrl = ''
     for (const stackLine of stack) {
       originalIndex++
@@ -36,13 +35,12 @@ export const getEventListenerQuery = (stacks, scriptMap) => {
       sourceMapUrl ||= reverseScriptMap[url]
       const formattedUrl = FormatUrl.formatUrl(url, line - 1, column)
       const newStackLine = `${prefix}(${formattedUrl})`
-      itemQueryStack.push(newStackLine)
+      allQueries.push({
+        originalIndex,
+        stack: [newStackLine],
+        sourceMaps: [sourceMapUrl],
+      })
     }
-    allQueries.push({
-      originalIndex,
-      stack: itemQueryStack,
-      sourceMaps: [sourceMapUrl],
-    })
   }
   return allQueries
 }
