@@ -1,20 +1,12 @@
-export const setup = async ({ Editor, SettingsEditor }) => {
+export const setup = async ({ Editor }) => {
   await Editor.closeAll()
-  await SettingsEditor.open()
-  await SettingsEditor.search({
-    value: 'Editor: Auto Closing Comments',
-    resultCount: 2,
-  })
-  await SettingsEditor.enableCheckBox({
-    name: 'comments.visible',
-  })
 }
 
-export const run = async ({ SettingsEditor }) => {
-  await SettingsEditor.disableCheckBox({
-    name: 'comments.visible',
+export const run = async ({ Profile }) => {
+  await Profile.create({
+    name: 'test',
   })
-  await SettingsEditor.enableCheckBox({
-    name: 'comments.visible',
+  await Profile.remove({
+    name: 'test',
   })
 }
