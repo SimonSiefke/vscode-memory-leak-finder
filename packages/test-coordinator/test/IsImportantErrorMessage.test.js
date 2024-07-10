@@ -66,3 +66,7 @@ test('glx error', () => {
 test('fs stats constructor deprecated', () => {
   expect(IsImportantError.isImportantErrorMessage(`fs.Stats constructor is deprecated`)).toBe(false)
 })
+
+test('punycode deprecated', () => {
+  expect(IsImportantError.isImportantErrorMessage('The `punycode` module is deprecated')).toBe(false)
+})

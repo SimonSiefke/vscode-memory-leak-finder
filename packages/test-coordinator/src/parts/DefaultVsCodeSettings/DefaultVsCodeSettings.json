@@ -33,5 +33,6 @@
   "explorer.confirmDelete": false,
   "files.saveConflictResolution": "overwriteFileOnDisk",
   "window.commandCenter": false,
-  "extensions.ignoreRecommendations": true
+  "extensions.ignoreRecommendations": true,
+  "workbench.experimental.enableNewProfilesUI": false
 }
