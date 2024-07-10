@@ -30,8 +30,19 @@ export const cleanDetachedDomNodesWithStackTraces = async (nodes, scriptMap) => 
     const query = GetEventListenersQuery.getEventListenerQuery(stackTrace, scriptMap)
     fullQuery.push(...query)
   }
+  // console.log({ fullQuery })
   const cleanInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(fullQuery, false)
   // console.log(JSON.stringify(cleanInstances, null, 2))
+
+  // console.log({
+  //   a: fullQuery.length,
+  //   b: cleanInstances.length,
+  // })
+  for (let i = 0; i < 5; i++) {
+    const a = fullQuery[i]
+    const b = cleanInstances[i]
+    console.log({ a, b })
+  }
   const sorted = sortOriginal(cleanInstances, nodes)
   return sorted
 }
