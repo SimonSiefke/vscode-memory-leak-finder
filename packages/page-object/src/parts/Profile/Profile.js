@@ -28,24 +28,28 @@ export const create = ({ page, expect, VError }) => {
       }
     },
     async remove(info) {
-      await page.waitForIdle()
-      const quickPick = QuickPick.create({ page, expect, VError })
-      await quickPick.executeCommand(WellKnownCommands.ProfilesDeleteProfile, {
-        stayVisible: true,
-      })
-      const input = page.locator('[placeholder="Select Profiles to Delete"]')
-      await input.type(info.name)
-      const row = page.locator('.monaco-list-row[aria-label="test, Current"]')
-      await row.click()
-      await expect(row).toHaveAttribute('aria-checked', 'true')
-      const okButton = page.locator('.monaco-button', {
-        hasText: 'OK',
-      })
-      await okButton.click()
-      const profileBadge = page.locator('.profile-badge', {
-        hasText: 'TE',
-      })
-      await expect(profileBadge).toHaveCount(0)
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.ProfilesDeleteProfile, {
+          stayVisible: true,
+        })
+        const input = page.locator('[placeholder="Select Profiles to Delete"]')
+        await input.type(info.name)
+        const row = page.locator('.monaco-list-row[aria-label="test, Current"]')
+        await row.click()
+        await expect(row).toHaveAttribute('aria-checked', 'true')
+        const okButton = page.locator('.monaco-button', {
+          hasText: 'OK',
+        })
+        await okButton.click()
+        const profileBadge = page.locator('.profile-badge', {
+          hasText: 'TE',
+        })
+        await expect(profileBadge).toHaveCount(0)
+      } catch (error) {
+        throw new VError(error, `Failed to remove profile`)
+      }
     },
   }
 }
