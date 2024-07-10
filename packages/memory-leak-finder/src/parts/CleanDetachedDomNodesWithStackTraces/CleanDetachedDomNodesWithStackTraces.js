@@ -1,37 +1,35 @@
-import * as GetEventListenersQuery from '../GetEventListenersQuery/GetEventListenersQuery.js'
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
+import * as GetEventListenersQuery from '../GetEventListenersQuery/GetEventListenersQuery.js'
 
-const sortOriginal = (cleanInstances, nodes) => {
-  const sorted = []
-  let outerIndex = 0
+const mergeOriginal = (nodes, cleanInstances) => {
+  const reverseMap = Object.create(null)
+  for (const instance of cleanInstances) {
+    reverseMap[instance.originalIndex] = instance
+  }
+  const merged = []
+  let originalIndex = 0
   for (const node of nodes) {
-    const length = node.stackTrace.length
+    originalIndex++
     const originalStack = []
-    for (let i = 0; i < length; i++) {
-      const original = cleanInstances[outerIndex + i]
-      if (original && original.originalStack) {
-        originalStack.push(original.originalStack[0])
+    for (let i = 0; i < node.stackTrace.length; i++) {
+      originalIndex++
+      const instance = reverseMap[originalIndex]
+      if (instance && instance.originalStack) {
+        originalStack.push(instance.originalStack[0])
       }
     }
-    outerIndex += length
-    sorted.push({
+    merged.push({
       ...node,
       originalStack,
     })
   }
-  return sorted
+  return merged
 }
 
 export const cleanDetachedDomNodesWithStackTraces = async (nodes, scriptMap) => {
-  // console.log({ scriptMap, nodes })
-  const fullQuery = []
-  for (const node of nodes) {
-    const stackTrace = node.stackTrace
-    const query = GetEventListenersQuery.getEventListenerQuery(stackTrace, scriptMap)
-    fullQuery.push(...query)
-  }
+  const stackTraces = nodes.map((node) => node.stackTrace)
+  const fullQuery = GetEventListenersQuery.getEventListenerQuery(stackTraces, scriptMap)
   const cleanInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(fullQuery, false)
-  // console.log(JSON.stringify(cleanInstances, null, 2))
-  const sorted = sortOriginal(cleanInstances, nodes)
+  const sorted = mergeOriginal(nodes, cleanInstances)
   return sorted
 }
