@@ -19,12 +19,12 @@ export const create = (session) => {
 export const start = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.start(session)
   await StartTrackingDomNodeStackTraces.startTrackingDomNodeStackTraces(session, objectGroup)
-  return GetDetachedDomNodesWithStackTraces.getDetachedDomNodesWithStackTraces(session, objectGroup)
+  return GetDetachedDomNodesWithStackTraces.getDetachedDomNodesWithStackTraces(session, objectGroup, scriptHandler.scriptMap)
 }
 
 export const stop = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.stop(session)
-  const result = await GetDetachedDomNodesWithStackTraces.getDetachedDomNodesWithStackTraces(session, objectGroup)
+  const result = await GetDetachedDomNodesWithStackTraces.getDetachedDomNodesWithStackTraces(session, objectGroup, scriptHandler.scriptMap)
   await StopTrackingDomNodeStackTraces.stopTrackingDomNodeStackTraces(session, objectGroup)
   return result
 }
