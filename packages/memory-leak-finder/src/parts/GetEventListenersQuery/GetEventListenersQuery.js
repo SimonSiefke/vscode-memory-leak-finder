@@ -28,11 +28,10 @@ export const getEventListenerQuery = (stacks, scriptMap) => {
   const allQueries = []
   for (const stack of stacks) {
     originalIndex++
-    let sourceMapUrl = ''
     for (const stackLine of stack) {
       originalIndex++
       const { prefix, url, line, column } = parseUrl(stackLine)
-      sourceMapUrl ||= reverseScriptMap[url]
+      const sourceMapUrl = reverseScriptMap[url]
       const formattedUrl = FormatUrl.formatUrl(url, line - 1, column)
       const newStackLine = `${prefix}(${formattedUrl})`
       allQueries.push({

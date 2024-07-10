@@ -17,7 +17,7 @@ const mergeOriginal = (nodes, cleanInstances) => {
       // console.log({ originalIndex })
       const instance = reverseMap[originalIndex]
       // console.log({ instance })
-      if (instance) {
+      if (instance && instance.originalStack) {
         originalStack.push(instance.originalStack[0])
       }
     }
