@@ -37,7 +37,8 @@ export const create = ({ page, expect, VError }) => {
         const input = page.locator('[placeholder="Select Profiles to Delete"]')
         await input.type(info.name)
         const row = page.locator('.monaco-list-row[aria-label="test, Current"]')
-        await row.click()
+        const rowLabel = row.locator('.quick-input-list-label')
+        await rowLabel.click()
         await expect(row).toHaveAttribute('aria-checked', 'true')
         const okButton = page.locator('.monaco-button', {
           hasText: 'OK',
