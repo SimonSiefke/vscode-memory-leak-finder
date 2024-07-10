@@ -19,7 +19,7 @@ const parseUrl = (stackLine) => {
   }
 }
 
-export const getEventListenerQuery = (stackLines, scriptMap, index) => {
+export const getEventListenerQuery = (stackLines, scriptMap) => {
   const reverseScriptMap = Object.create(null)
   for (const value of Object.values(scriptMap)) {
     reverseScriptMap[value.url] = value.sourceMapUrl

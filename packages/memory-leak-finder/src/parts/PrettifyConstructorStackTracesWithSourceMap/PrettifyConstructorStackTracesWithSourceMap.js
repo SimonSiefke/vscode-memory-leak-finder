@@ -23,7 +23,7 @@ export const prettifyConstructorStackTracesWithSourceMap = async (constructorSta
   const fullQuery = []
   for (let i = 0; i < constructorStackTraces.length; i++) {
     const stackTrace = constructorStackTraces[i]
-    const eventListeners = GetEventListenersQuery.getEventListenerQuery(stackTrace, scriptMap, i)
+    const eventListeners = GetEventListenersQuery.getEventListenerQuery(stackTrace, scriptMap)
     fullQuery.push(...eventListeners)
   }
   const cleanPrettyInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(fullQuery, false)
