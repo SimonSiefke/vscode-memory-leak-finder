@@ -19,22 +19,30 @@ const parseUrl = (stackLine) => {
   }
 }
 
-export const getEventListenerQuery = (stack, scriptMap) => {
+export const getEventListenerQuery = (stacks, scriptMap) => {
   const reverseScriptMap = Object.create(null)
   for (const value of Object.values(scriptMap)) {
     reverseScriptMap[value.url] = value.sourceMapUrl
   }
-  const itemQueryStack = []
-  let sourceMapUrl = ''
-  for (const stackLine of stack) {
-    const { prefix, url, line, column } = parseUrl(stackLine)
-    sourceMapUrl ||= reverseScriptMap[url]
-    const formattedUrl = FormatUrl.formatUrl(url, line - 1, column)
-    const newStackLine = `${prefix}(${formattedUrl})`
-    itemQueryStack.push(newStackLine)
+  let originalIndex = 0
+  const allQueries = []
+  for (const stack of stacks) {
+    originalIndex++
+    const itemQueryStack = []
+    let sourceMapUrl = ''
+    for (const stackLine of stack) {
+      originalIndex++
+      const { prefix, url, line, column } = parseUrl(stackLine)
+      sourceMapUrl ||= reverseScriptMap[url]
+      const formattedUrl = FormatUrl.formatUrl(url, line - 1, column)
+      const newStackLine = `${prefix}(${formattedUrl})`
+      itemQueryStack.push(newStackLine)
+    }
+    allQueries.push({
+      originalIndex,
+      stack: itemQueryStack,
+      sourceMaps: [sourceMapUrl],
+    })
   }
-  return {
-    stack: itemQueryStack,
-    sourceMaps: [sourceMapUrl],
-  }
+  return allQueries
 }

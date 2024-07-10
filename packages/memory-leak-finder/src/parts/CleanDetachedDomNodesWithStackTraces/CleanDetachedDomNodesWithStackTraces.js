@@ -2,26 +2,36 @@ import * as GetEventListenersQuery from '../GetEventListenersQuery/GetEventListe
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
 
 const mergeOriginal = (nodes, cleanInstances) => {
+  const reverseMap = Object.create(null)
+  for (const instance of cleanInstances) {
+    reverseMap[instance.originalIndex] = instance
+  }
   const merged = []
-  for (let i = 0; i < nodes.length; i++) {
-    const node = nodes[i]
-    const instance = cleanInstances[i]
+  let originalIndex = 0
+  console.log(JSON.stringify(reverseMap, null, 2))
+  for (const node of nodes) {
+    originalIndex++
+    const originalStack = []
+    for (const stackLine of node.stackTrace) {
+      originalIndex++
+      // console.log({ originalIndex })
+      const instance = reverseMap[originalIndex]
+      // console.log({ instance })
+      originalStack.push(instance.originalStack[0])
+    }
     merged.push({
       ...node,
-      originalStack: instance.originalStack,
+      originalStack,
     })
   }
   return merged
 }
 
 export const cleanDetachedDomNodesWithStackTraces = async (nodes, scriptMap) => {
-  const fullQuery = []
-  for (const node of nodes) {
-    const stackTrace = node.stackTrace
-    const query = GetEventListenersQuery.getEventListenerQuery(stackTrace, scriptMap)
-    fullQuery.push(query)
-  }
+  const stackTraces = nodes.map((node) => node.stackTrace)
+  const fullQuery = GetEventListenersQuery.getEventListenerQuery(stackTraces, scriptMap)
   const cleanInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(fullQuery, false)
+  console.log({ cleanInstances })
   const sorted = mergeOriginal(nodes, cleanInstances)
   return sorted
 }
