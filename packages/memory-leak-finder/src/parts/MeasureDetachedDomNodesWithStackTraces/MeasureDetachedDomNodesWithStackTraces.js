@@ -6,20 +6,24 @@ import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
 import * as StartTrackingDomNodeStackTraces from '../StartTrackingDomNodeStackTraces/StartTrackingDomNodeStackTraces.js'
 import * as StopTrackingDomNodeStackTraces from '../StopTrackingDomNodeStackTraces/StopTrackingDomNodeStackTraces.js'
+import * as ScriptHandler from '../ScriptHandler/ScriptHandler.js'
 
 export const id = MeasureId.DetachedDomNodesWithStackTraces
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
-  return [session, objectGroup]
+  const scriptHandler = ScriptHandler.create()
+  return [session, objectGroup, scriptHandler]
 }
 
-export const start = async (session, objectGroup) => {
+export const start = async (session, objectGroup, scriptHandler) => {
+  await scriptHandler.start(session)
   await StartTrackingDomNodeStackTraces.startTrackingDomNodeStackTraces(session, objectGroup)
   return GetDetachedDomNodesWithStackTraces.getDetachedDomNodesWithStackTraces(session, objectGroup)
 }
 
-export const stop = async (session, objectGroup) => {
+export const stop = async (session, objectGroup, scriptHandler) => {
+  await scriptHandler.stop(session)
   const result = await GetDetachedDomNodesWithStackTraces.getDetachedDomNodesWithStackTraces(session, objectGroup)
   await StopTrackingDomNodeStackTraces.stopTrackingDomNodeStackTraces(session, objectGroup)
   return result
