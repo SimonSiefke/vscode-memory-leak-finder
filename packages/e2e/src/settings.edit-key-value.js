@@ -10,8 +10,8 @@ export const setup = async ({ Editor, SettingsEditor }) => {
 export const run = async ({ SettingsEditor }) => {
   await SettingsEditor.addItem({
     name: 'files.associations',
-    key: 'test',
-    value: 'test',
+    key: 'test-key',
+    value: 'test-value',
   })
   await SettingsEditor.removeItem({
     name: 'files.associations',
