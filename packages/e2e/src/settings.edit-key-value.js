@@ -15,6 +15,5 @@ export const run = async ({ SettingsEditor }) => {
   })
   await SettingsEditor.removeItem({
     name: 'files.associations',
-    key: 'test',
   })
 }

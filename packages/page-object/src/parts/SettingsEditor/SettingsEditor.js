@@ -195,19 +195,17 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to add item`)
       }
     },
-    async removeItem({ name, key }) {
+    async removeItem({ name }) {
       try {
-        // await page.waitForIdle()
-        // const select = page.locator(`.monaco-select-box[aria-label="${name}"]`)
-        // await expect(select).toBeVisible()
-        // await select.click()
-        // await page.waitForIdle()
-        // const dropdown = page.locator('.monaco-select-box-dropdown-container')
-        // await expect(dropdown).toBeVisible()
-        // const option = dropdown.locator('[role="option"]', {
-        //   hasText: value,
-        // })
-        // await option.click()
+        await page.waitForIdle()
+        const block = page.locator(`.setting-item-contents[aria-label="${name}"]`)
+        await expect(block).toBeVisible()
+        const row = block.locator('.setting-list-object-row')
+        await expect(row).toHaveCount(1)
+        await row.click()
+        const removeButton = row.locator('[aria-label="Remove Item"]')
+        await removeButton.click()
+        await expect(row).toHaveCount(0)
       } catch (error) {
         throw new VError(error, `Failed to remove item`)
       }
