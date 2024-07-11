@@ -135,5 +135,27 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to open settings context menu for "${name}"`)
       }
     },
+    async expand(groupName) {
+      try {
+        const group = page.locator(`[aria=label="${groupName}, group"]`)
+        await expect(group).toBeVisible()
+        await expect(group).toHaveAttribute('aria-expanded', 'false')
+        await group.click()
+        await expect(group).toHaveAttribute('aria-expanded', 'true')
+      } catch (error) {
+        throw new VError(error, `Failed to expand ${groupName}`)
+      }
+    },
+    async collapse(groupName) {
+      try {
+        const group = page.locator(`[aria=label="${groupName}, group"]`)
+        await expect(group).toBeVisible()
+        await expect(group).toHaveAttribute('aria-expanded', 'trye')
+        await group.click()
+        await expect(group).toHaveAttribute('aria-expanded', 'false')
+      } catch (error) {
+        throw new VError(error, `Failed to collapse ${groupName}`)
+      }
+    },
   }
 }
