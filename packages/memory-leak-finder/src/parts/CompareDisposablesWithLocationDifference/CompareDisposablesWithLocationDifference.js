@@ -1,7 +1,7 @@
 import * as CompareDisposablesWithLocation from '../CompareDisposablesWithLocation/CompareDisposablesWithLocation.js'
 
 const hasDifference = (item) => {
-  return item.count !== item.oldCount
+  return item.delta > 0
 }
 
 export const compareDisposablesWithLocationDifference = async (before, after) => {
