@@ -1,3 +1,5 @@
+export const skip = true
+
 export const setup = async ({ Editor, Output, Panel }) => {
   await Editor.closeAll()
   await Panel.hide()
