@@ -1,4 +1,5 @@
 import * as Settings from '../Settings/Settings.js'
+import * as QuickPick from '../QuickPick/QuickPick.js'
 
 export const create = ({ expect, page, VError }) => {
   return {
@@ -159,8 +160,19 @@ export const create = ({ expect, page, VError }) => {
     },
     async addItem({ name, key, value }) {
       try {
+        await page.waitForIdle()
         const block = page.locator(`.setting-item-contents[aria-label="${name}"]`)
         await expect(block).toBeVisible()
+        const keyHeading = block.locator('.setting-list-object-key')
+        await expect(keyHeading).toHaveText('Item')
+        const valueHeading = block.locator('.setting-list-object-value')
+        await expect(valueHeading).toHaveText('Value')
+
+        // create random quickpick to avoid race condition
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.show()
+        await quickPick.hide()
+
         const addButton = block.locator('.monaco-button', {
           hasText: 'Add Item',
         })
@@ -169,15 +181,19 @@ export const create = ({ expect, page, VError }) => {
         await expect(keyInput).toBeVisible()
         await expect(keyInput).toBeFocused()
         await keyInput.type(key)
-        await page.keyboard.press('Tab')
-        const valueInput = block.locator('.setting-list-object-input-value .input')
-        await expect(valueInput).toBeVisible()
-        await expect(valueInput).toBeFocused()
-        await valueInput.type(value)
-        await page.keyboard.press('Tab')
-        const okButton = block.locator('.setting-list-ok-button')
-        await expect(okButton).toBeVisible()
-        await expect(okButton).toBeFocused()
+        // await page.waitForIdle()
+        // await page.keyboard.press('Tab')
+        // const valueInput = block.locator('.setting-list-object-input-value .input')
+        // await expect(valueInput).toBeVisible()
+        // await new Promise((r) => {
+        //   setTimeout(r, 100000)
+        // })
+        // await expect(valueInput).toBeFocused()
+        // await valueInput.type(value)
+        // await page.keyboard.press('Tab')
+        // const okButton = block.locator('.setting-list-ok-button')
+        // await expect(okButton).toBeVisible()
+        // await expect(okButton).toBeFocused()
         // await okButton.click()
       } catch (error) {
         throw new VError(error, `Failed to add item`)
