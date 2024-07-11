@@ -1,4 +1,5 @@
 import * as Settings from '../Settings/Settings.js'
+import * as QuickPick from '../QuickPick/QuickPick.js'
 
 export const create = ({ expect, page, VError }) => {
   return {
@@ -155,6 +156,59 @@ export const create = ({ expect, page, VError }) => {
         await expect(group).toHaveAttribute('aria-expanded', 'false')
       } catch (error) {
         throw new VError(error, `Failed to collapse ${groupName}`)
+      }
+    },
+    async ensureIdle() {
+      // create random quickpick to avoid race condition
+      const quickPick = QuickPick.create({ page, expect, VError })
+      await quickPick.show()
+      await quickPick.hide()
+    },
+    async addItem({ name, key, value }) {
+      try {
+        await page.waitForIdle()
+        const block = page.locator(`.setting-item-contents[aria-label="${name}"]`)
+        await expect(block).toBeVisible()
+        const keyHeading = block.locator('.setting-list-object-key')
+        await expect(keyHeading).toHaveText('Item')
+        const valueHeading = block.locator('.setting-list-object-value')
+        await expect(valueHeading).toHaveText('Value')
+
+        const addButton = block.locator('.monaco-button', {
+          hasText: 'Add Item',
+        })
+        await addButton.click()
+        const keyInput = block.locator('.setting-list-object-input-key .input')
+        await expect(keyInput).toBeVisible()
+        await expect(keyInput).toBeFocused()
+        await keyInput.type(key)
+        const valueInput = block.locator('.setting-list-object-input-value .input')
+        await expect(valueInput).toBeVisible()
+        await valueInput.focus()
+        await valueInput.type(value)
+        const okButton = block.locator('.setting-list-ok-button')
+        await expect(okButton).toBeVisible()
+        await okButton.click()
+        const row = block.locator('.setting-list-object-row')
+        await expect(row).toHaveCount(1)
+        await expect(row).toHaveAttribute('aria-label', `The property \`${key}\` is set to \`${value}\`.`)
+      } catch (error) {
+        throw new VError(error, `Failed to add item`)
+      }
+    },
+    async removeItem({ name }) {
+      try {
+        await page.waitForIdle()
+        const block = page.locator(`.setting-item-contents[aria-label="${name}"]`)
+        await expect(block).toBeVisible()
+        const row = block.locator('.setting-list-object-row')
+        await expect(row).toHaveCount(1)
+        await row.click()
+        const removeButton = row.locator('[aria-label="Remove Item"]')
+        await removeButton.click()
+        await expect(row).toHaveCount(0)
+      } catch (error) {
+        throw new VError(error, `Failed to remove item`)
       }
     },
   }
