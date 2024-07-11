@@ -2,18 +2,19 @@ export const setup = async ({ Editor, SettingsEditor }) => {
   await Editor.closeAll()
   await SettingsEditor.open()
   await SettingsEditor.search({
-    value: 'Editor: Auto Closing Comments',
-    resultCount: 2,
+    value: 'Files: Associations',
+    resultCount: 1,
   })
 }
 
 export const run = async ({ SettingsEditor }) => {
-  await SettingsEditor.select({
-    name: 'editor.autoClosingComments',
-    value: 'never',
+  await SettingsEditor.addItem({
+    name: 'files.associations',
+    key: 'test',
+    value: 'test',
   })
-  await SettingsEditor.select({
-    name: 'editor.autoClosingComments',
-    value: 'languageDefined',
+  await SettingsEditor.removeItem({
+    name: 'files.associations',
+    key: 'test',
   })
 }

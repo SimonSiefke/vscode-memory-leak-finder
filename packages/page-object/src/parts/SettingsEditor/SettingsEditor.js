@@ -157,5 +157,48 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to collapse ${groupName}`)
       }
     },
+    async addItem({ name, key, value }) {
+      try {
+        const block = page.locator(`.setting-item-contents[aria-label="${name}"]`)
+        await expect(block).toBeVisible()
+        const addButton = block.locator('.monaco-button', {
+          hasText: 'Add Item',
+        })
+        await addButton.click()
+        const keyInput = block.locator('.setting-list-object-input-key .input')
+        await expect(keyInput).toBeVisible()
+        await expect(keyInput).toBeFocused()
+        await keyInput.type(key)
+        await page.keyboard.press('Tab')
+        const valueInput = block.locator('.setting-list-object-input-value .input')
+        await expect(valueInput).toBeVisible()
+        await expect(valueInput).toBeFocused()
+        await valueInput.type(value)
+        await page.keyboard.press('Tab')
+        const okButton = block.locator('.setting-list-ok-button')
+        await expect(okButton).toBeVisible()
+        await expect(okButton).toBeFocused()
+        // await okButton.click()
+      } catch (error) {
+        throw new VError(error, `Failed to add item`)
+      }
+    },
+    async removeItem({ name, key }) {
+      try {
+        // await page.waitForIdle()
+        // const select = page.locator(`.monaco-select-box[aria-label="${name}"]`)
+        // await expect(select).toBeVisible()
+        // await select.click()
+        // await page.waitForIdle()
+        // const dropdown = page.locator('.monaco-select-box-dropdown-container')
+        // await expect(dropdown).toBeVisible()
+        // const option = dropdown.locator('[role="option"]', {
+        //   hasText: value,
+        // })
+        // await option.click()
+      } catch (error) {
+        throw new VError(error, `Failed to remove item`)
+      }
+    },
   }
 }
