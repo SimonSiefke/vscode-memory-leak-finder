@@ -11,6 +11,11 @@ export const create = ({ expect, page, VError }) => {
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.OutputFocusOnOutputView)
         await expect(outputView).toBeVisible()
+        const paneBody = page.locator('.pane-body.output-view')
+        await expect(paneBody).toBeVisible()
+        const inputArea = paneBody.locator('.inputarea')
+        await expect(inputArea).toBeFocused()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show output`)
       }
@@ -28,10 +33,8 @@ export const create = ({ expect, page, VError }) => {
     },
     async select(channelName) {
       try {
-        await page.waitForIdle()
         const outputView = page.locator('.pane-body.output-view')
         await expect(outputView).toBeVisible()
-        await page.waitForIdle()
         const select = page.locator('[aria-label="Output actions"] .monaco-select-box')
         await select.click()
         const monacoList = page.locator('.select-box-dropdown-list-container .monaco-list')
@@ -40,6 +43,7 @@ export const create = ({ expect, page, VError }) => {
         const option = monacoList.locator(`[role="option"][aria-label="${channelName}"]`)
         await expect(option).toBeVisible()
         await option.click()
+        await expect(monacoList).toBeHidden()
         await expect(select).toBeFocused()
         await expect(select).toHaveValue(channelName)
         await page.waitForIdle()
