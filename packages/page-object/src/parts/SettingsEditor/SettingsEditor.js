@@ -137,7 +137,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async expand(groupName) {
       try {
-        const group = page.locator(`[aria=label="${groupName}, group"]`)
+        const group = page.locator(`[aria-label="${groupName}, group"]`)
         await expect(group).toBeVisible()
         await expect(group).toHaveAttribute('aria-expanded', 'false')
         await group.click()
@@ -148,9 +148,9 @@ export const create = ({ expect, page, VError }) => {
     },
     async collapse(groupName) {
       try {
-        const group = page.locator(`[aria=label="${groupName}, group"]`)
+        const group = page.locator(`[aria-label="${groupName}, group"]`)
         await expect(group).toBeVisible()
-        await expect(group).toHaveAttribute('aria-expanded', 'trye')
+        await expect(group).toHaveAttribute('aria-expanded', 'true')
         await group.click()
         await expect(group).toHaveAttribute('aria-expanded', 'false')
       } catch (error) {
