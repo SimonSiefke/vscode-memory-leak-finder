@@ -36,6 +36,9 @@ export const create = ({ expect, page, VError }) => {
         const outputView = page.locator('.pane-body.output-view')
         await expect(outputView).toBeVisible()
         const select = page.locator('[aria-label="Output actions"] .monaco-select-box')
+        for (let i = 0; i < 50; i++) {
+          await page.waitForIdle()
+        }
         await select.click()
         const monacoList = page.locator('.select-box-dropdown-list-container .monaco-list')
         await expect(monacoList).toBeVisible()
