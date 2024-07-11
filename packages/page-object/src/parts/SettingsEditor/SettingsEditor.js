@@ -158,6 +158,12 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to collapse ${groupName}`)
       }
     },
+    async ensureIdle() {
+      // create random quickpick to avoid race condition
+      const quickPick = QuickPick.create({ page, expect, VError })
+      await quickPick.show()
+      await quickPick.hide()
+    },
     async addItem({ name, key, value }) {
       try {
         await page.waitForIdle()
@@ -167,11 +173,6 @@ export const create = ({ expect, page, VError }) => {
         await expect(keyHeading).toHaveText('Item')
         const valueHeading = block.locator('.setting-list-object-value')
         await expect(valueHeading).toHaveText('Value')
-
-        // create random quickpick to avoid race condition
-        const quickPick = QuickPick.create({ page, expect, VError })
-        await quickPick.show()
-        await quickPick.hide()
 
         const addButton = block.locator('.monaco-button', {
           hasText: 'Add Item',

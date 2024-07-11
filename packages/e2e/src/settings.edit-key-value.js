@@ -5,6 +5,7 @@ export const setup = async ({ Editor, SettingsEditor }) => {
     value: 'Files: Associations',
     resultCount: 1,
   })
+  await SettingsEditor.ensureIdle()
 }
 
 export const run = async ({ SettingsEditor }) => {
