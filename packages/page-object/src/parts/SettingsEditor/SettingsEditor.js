@@ -183,7 +183,6 @@ export const create = ({ expect, page, VError }) => {
         await expect(keyHeading).toHaveText('Item')
         const valueHeading = block.locator('.setting-list-object-value')
         await expect(valueHeading).toHaveText('Value')
-
         const addButton = block.locator('.monaco-button', {
           hasText: 'Add Item',
         })
