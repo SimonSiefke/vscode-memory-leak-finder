@@ -220,6 +220,19 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to remove item`)
       }
     },
+    async collapseOutline() {
+      try {
+        await page.waitForIdle()
+        const tableOfContents = page.locator('[aria-label="Settings Table of Contents"]')
+        await expect(tableOfContents).toBeVisible()
+        await tableOfContents.focus()
+        await page.keyboard.press('Control+ArrowLeft')
+        const expandedItems = tableOfContents.locator('[aria-expanded="true"]')
+        await expect(expandedItems).toHaveCount(0)
+      } catch (error) {
+        throw new VError(error, `Failed to collapse outline`)
+      }
+    },
     async focusOutline(name) {
       try {
         await page.waitForIdle()
