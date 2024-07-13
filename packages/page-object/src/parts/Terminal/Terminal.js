@@ -66,6 +66,9 @@ export const create = ({ expect, page, VError }) => {
         await deleteAction.click()
         await expect(terminalTabs).toHaveCount(0)
         await page.waitForIdle()
+        const terminal = page.locator('.terminal')
+        await expect(terminal).toHaveCount(1)
+        await expect(terminal).toHaveClass('focus')
       } catch (error) {
         throw new VError(error, `Failed to kill second terminal`)
       }
