@@ -65,7 +65,7 @@ export const create = ({ expect, page, VError }) => {
     async expandFiles() {
       try {
         await page.waitForIdle()
-        const toggleDetails = page.locator(`[role="button"][title="Toggle Search Details"]`)
+        const toggleDetails = page.locator(`[role="button"].codicon-search-details`)
         const expanded = await toggleDetails.getAttribute('aria-expanded')
         if (expanded === 'true') {
           return
@@ -82,7 +82,7 @@ export const create = ({ expect, page, VError }) => {
     async collapseFiles() {
       try {
         await page.waitForIdle()
-        const toggleDetails = page.locator(`[role="button"][title="Toggle Search Details"]`)
+        const toggleDetails = page.locator(`[role="button"].codicon-search-details`)
         const expanded = await toggleDetails.getAttribute('aria-expanded')
         if (expanded === 'false') {
           return
