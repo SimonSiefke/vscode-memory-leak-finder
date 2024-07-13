@@ -34,5 +34,13 @@ export const create = ({ page }) => {
       const absolutePath = join(workspace, file)
       await rm(absolutePath)
     },
+    getWorkspacePath() {
+      const workspace = join(Root.root, '.vscode-test-workspace')
+      return workspace
+    },
+    getWorkspaceFilePath(relativePath) {
+      const filePath = join(Root.root, '.vscode-test-workspace', relativePath)
+      return filePath
+    },
   }
 }
