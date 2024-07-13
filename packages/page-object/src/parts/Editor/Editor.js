@@ -417,8 +417,8 @@ export const create = ({ page, expect, VError }) => {
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.Find)
         await page.waitForIdle()
-        // await expect(findWidget).toBeVisible()
-        // await expect(findWidget).toHaveClass('visible')
+        await expect(findWidget).toBeVisible()
+        await expect(findWidget).toHaveClass('visible')
       } catch (error) {
         throw new VError(error, `Failed to show find widget`)
       }
