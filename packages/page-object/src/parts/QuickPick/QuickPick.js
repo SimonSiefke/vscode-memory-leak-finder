@@ -46,13 +46,6 @@ export const create = ({ expect, page, VError }) => {
         const option = quickPick.locator('.label-name', {
           hasText: text,
         })
-        const optionText = await option.textContent()
-        console.log({ optionText })
-        if (optionText === 'Find') {
-          await new Promise((r) => {
-            setTimeout(r, 3000)
-          })
-        }
         await option.click()
         if (!stayVisible) {
           await expect(quickPick).toBeHidden()
@@ -66,9 +59,6 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         await this.showCommands()
         await this.type(command)
-        // await new Promise((r) => {
-        //   setTimeout(r, 3000)
-        // })
         await this.select(command, stayVisible)
         await page.waitForIdle()
       } catch (error) {
