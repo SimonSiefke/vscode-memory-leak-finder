@@ -419,12 +419,10 @@ export const create = ({ page, expect, VError }) => {
         const quickPick = QuickPick.create({ expect, page, VError })
 
         // create random quickpick to avoid race condition
-        // for (let i = 0; i < 10; i++) {
-        //   await quickPick.show()
-        //   await page.waitForIdle()
-        //   await quickPick.hide()
-        //   await page.waitForIdle()
-        // }
+        await quickPick.show()
+        await page.waitForIdle()
+        await quickPick.hide()
+        await page.waitForIdle()
 
         await quickPick.executeCommand(WellKnownCommands.Find)
         await page.waitForIdle()
