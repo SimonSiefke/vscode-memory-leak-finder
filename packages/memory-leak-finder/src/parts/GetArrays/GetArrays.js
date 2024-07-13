@@ -21,7 +21,6 @@ export const getArrays = async (session, objectGroup) => {
   //   objectGroup,
   // })
   const nameMap = await GetArrayNameMap.getArrayNameMap(session, objectGroup)
-  console.log({ nameMap })
   // const functionObjectIds = await GetAllFunctions.getAllFunctions(session, objectGroup)
   // functionObjectIds.length = 42 // TODO
   // const scopes = await GetAllScopePropertiesInternal.getAllScopePropertiesInternal(session, objectGroup, functionObjectIds)

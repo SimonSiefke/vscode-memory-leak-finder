@@ -60,9 +60,5 @@ export const getArrayNameMap = async (session, objectGroup) => {
     scopeArrayPromises.push(getScopeValues(session, scopeListObjectId))
   }
   const scopeArrayValues = await Promise.all(scopeArrayPromises)
-  console.log(JSON.stringify(scopeArrayValues, null, 2))
-  // const mergedScopeArrays = scopeArrayValues.flat(1)
-  // const map = getNameMap(mergedScopeArrays)
-  // return map
   return {}
 }

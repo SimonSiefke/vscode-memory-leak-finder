@@ -129,6 +129,5 @@ export const getUtilityExecutionContext = (sessionId) => {
       return executionContext
     }
   }
-  console.log(Object.values(state.executionContexts))
   return undefined
 }

@@ -32,7 +32,6 @@ export const stop = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.stop(session)
   const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptHandler.scriptMap)
   const resultWithStackTraces = await AddStackTracesToEventListeners.addStackTracesToEventListeners(session, result)
-  console.log(JSON.stringify(resultWithStackTraces, null, 2))
   await StopTrackingEventListenerStackTraces.stopTrackingEventListenerStackTraces(session, objectGroup)
   return resultWithStackTraces
 }
