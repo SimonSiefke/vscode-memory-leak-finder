@@ -15,6 +15,8 @@ export const create = ({ expect, page, VError }) => {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.FocusTerminal)
+        const terminalSplitPane = page.locator('.terminal-split-pane')
+        await expect(terminalSplitPane).toBeVisible()
         const terminal = page.locator('.terminal')
         await expect(terminal).toHaveCount(1)
         await expect(terminal).toBeVisible()
@@ -22,6 +24,26 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show terminal`)
+      }
+    },
+    async split() {
+      try {
+        // for (let i = 0; i < 50000; i++) {
+        // await page.waitForIdle()
+        // }
+        // const quickPick = QuickPick.create({ expect, page, VError })
+        // await quickPick.executeCommand(WellKnownCommands.TerminalSplitTerminal)
+        await page.waitForIdle()
+        const splitTerminalButton = page.locator('.action-label[aria-label^="Split Terminal"]')
+        await expect(splitTerminalButton).toBeVisible()
+        await splitTerminalButton.click()
+        const terminal = page.locator('.terminal')
+        await expect(terminal).toHaveCount(2)
+        // await expect(terminal).toBeVisible()
+        // await expect(terminal).toHaveClass('focus')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to split terminal`)
       }
     },
     async add() {
