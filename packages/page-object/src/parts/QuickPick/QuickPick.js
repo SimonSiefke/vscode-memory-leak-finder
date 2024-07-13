@@ -46,6 +46,11 @@ export const create = ({ expect, page, VError }) => {
         const option = quickPick.locator('.label-name', {
           hasText: text,
         })
+        if (text === 'Find') {
+          await new Promise((r) => {
+            setTimeout(r, 3500)
+          })
+        }
         await option.click()
         if (!stayVisible) {
           await expect(quickPick).toBeHidden()

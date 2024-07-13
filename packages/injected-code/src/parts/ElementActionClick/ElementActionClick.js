@@ -1,6 +1,7 @@
 import * as DispatchEvent from '../DispatchEvent/DispatchEvent.js'
 
 export const click = (element, options) => {
+  console.log({ parentHtml: element.parentNode.outerHTML })
   const rect = element.getBoundingClientRect()
   options.clientX = (rect.left + rect.right) / 2
   options.clientY = (rect.top + rect.bottom) / 2
