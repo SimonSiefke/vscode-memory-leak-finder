@@ -525,5 +525,35 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed cursor assertion`)
       }
     },
+    async inspectTokens() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.DeveloperInspectTokensAndScopes)
+        const inspectWidget = page.locator('.token-inspect-widget')
+        await expect(inspectWidget).toBeVisible()
+        await this.focus()
+      } catch (error) {
+        throw new VError(error, `Failed inspect tokens`)
+      }
+    },
+    async shouldHaveInspectedToken(name) {
+      try {
+        const inspectedToken = page.locator('h2.tiw-token')
+        await expect(inspectedToken).toHaveText(name)
+      } catch (error) {
+        throw new VError(error, `Failed verify inspected token`)
+      }
+    },
+    async closeInspectedTokens() {
+      try {
+        const inspectWidget = page.locator('.token-inspect-widget')
+        await expect(inspectWidget).toBeVisible()
+        await page.keyboard.press('Escape')
+        await expect(inspectWidget).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed close inspect widget`)
+      }
+    },
   }
 }
