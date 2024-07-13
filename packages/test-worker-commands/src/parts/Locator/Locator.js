@@ -16,7 +16,7 @@ import * as LocatorType from '../LocatorType/LocatorType.js'
 import * as LocatorFill from '../LocatorFill/LocatorFill.js'
 import * as ObjectType from '../ObjectType/ObjectType.js'
 
-const mergeSelectors = (selector, subSelector = '', hasText = '', nth = -1) => {
+const mergeSelectors = (selector, subSelector = '', hasText = '', hasExactText = '', nth = -1) => {
   let merged = selector
   if (subSelector) {
     if (subSelector.startsWith('text=')) {
@@ -30,6 +30,9 @@ const mergeSelectors = (selector, subSelector = '', hasText = '', nth = -1) => {
   }
   if (hasText) {
     merged += `:has-text("${hasText}")`
+  }
+  if (hasExactText) {
+    merged += `:has-exact-text("${hasExactText}")`
   }
   if (nth !== -1) {
     merged += `:nth(${nth})`
