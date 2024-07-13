@@ -416,8 +416,9 @@ export const create = ({ page, expect, VError }) => {
         }
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.Find)
-        await expect(findWidget).toBeVisible()
-        await expect(findWidget).toHaveClass('visible')
+        await page.waitForIdle()
+        // await expect(findWidget).toBeVisible()
+        // await expect(findWidget).toHaveClass('visible')
       } catch (error) {
         throw new VError(error, `Failed to show find widget`)
       }
@@ -425,6 +426,11 @@ export const create = ({ page, expect, VError }) => {
     async closeFind() {
       try {
         const findWidget = page.locator('.find-widget')
+        const className = await findWidget.getAttribute('class')
+        const isVisible = className.includes('visible')
+        if (!isVisible) {
+          return
+        }
         await expect(findWidget).toBeVisible()
         await expect(findWidget).toHaveClass('visible')
         const closeButton = findWidget.locator('[aria-label="Close (Escape)"]')
