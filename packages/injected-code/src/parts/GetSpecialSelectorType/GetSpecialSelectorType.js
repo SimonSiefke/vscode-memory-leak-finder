@@ -11,6 +11,8 @@ export const getSpecialSelectorType = (specialSelector) => {
       return SelectorType.InternalEnterFrame
     case SpecialSelectorPrefix.EnterShadow:
       return SelectorType.EnterShadow
+    case SpecialSelectorPrefix.HasExactText:
+      return SelectorType.ExactText
     default:
       return SelectorType.None
   }

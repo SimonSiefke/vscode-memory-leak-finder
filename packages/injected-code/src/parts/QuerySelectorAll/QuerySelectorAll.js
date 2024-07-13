@@ -1,4 +1,5 @@
 import * as QuerySelectorAllByCss from '../QuerySelectorAllByCss/QuerySelectorAllByCss.js'
+import * as QuerySelectorAllByExactText from '../QuerySelectorAllByExactText/QuerySelectorAllByExactText.js'
 import * as QuerySelectorAllByText from '../QuerySelectorAllByText/QuerySelectorAllByText.js'
 import * as QuerySelectorAllEnterShadow from '../QuerySelectorAllEnterShadow/QuerySelectorAllEnterShadow.js'
 import * as QuerySelectorAllInternalEnterFrame from '../QuerySelectorAllInternalEnterFrame/QuerySelectorAllInternalEnterFrame.js'
@@ -17,6 +18,8 @@ export const getSelectorModule = (type) => {
       return QuerySelectorAllInternalEnterFrame
     case SelectorType.EnterShadow:
       return QuerySelectorAllEnterShadow
+    case SelectorType.ExactText:
+      return QuerySelectorAllByExactText
     default:
       throw new Error('not found')
   }
