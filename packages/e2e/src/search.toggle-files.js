@@ -1,5 +1,3 @@
-export const skip = true
-
 export const setup = async ({ ActivityBar, Workspace, Search }) => {
   await Workspace.setFiles([
     {
@@ -12,6 +10,6 @@ export const setup = async ({ ActivityBar, Workspace, Search }) => {
 }
 
 export const run = async ({ Search }) => {
-  await Search.expandFiles(['file.txt1', 'sample text'])
-  await Search.collapseFiles(['file.txt1', 'sample text'])
+  await Search.expandFiles()
+  await Search.collapseFiles()
 }

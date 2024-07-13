@@ -65,7 +65,7 @@ export const create = ({ expect, page, VError }) => {
     async expandFiles() {
       try {
         await page.waitForIdle()
-        const toggleDetails = page.locator(`[role="button"][title="Toggle Search Details"]`)
+        const toggleDetails = page.locator(`[role="button"].codicon-search-details`)
         const expanded = await toggleDetails.getAttribute('aria-expanded')
         if (expanded === 'true') {
           return
@@ -75,6 +75,8 @@ export const create = ({ expect, page, VError }) => {
         await toggleDetails.click()
         await expect(toggleDetails).toHaveAttribute('aria-expanded', 'true', { timeout: 3000 })
         await expect(include).toBeVisible()
+        const includeInput = include.locator('.input')
+        await expect(includeInput).toBeFocused()
       } catch (error) {
         throw new VError(error, `Failed to expand files`)
       }
@@ -82,9 +84,9 @@ export const create = ({ expect, page, VError }) => {
     async collapseFiles() {
       try {
         await page.waitForIdle()
-        const toggleDetails = page.locator(`[role="button"][title="Toggle Search Details"]`)
+        const toggleDetails = page.locator(`[role="button"].codicon-search-details`)
         const expanded = await toggleDetails.getAttribute('aria-expanded')
-        if (expanded === 'false') {
+        if (!expanded || expanded === 'false') {
           return
         }
         const include = page.locator('.file-types.includes')
