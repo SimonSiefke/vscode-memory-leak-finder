@@ -34,7 +34,7 @@ export const create = ({ expect, page, VError }) => {
         await splitTerminalButton.click()
         const terminal = page.locator('.terminal')
         await expect(terminal).toHaveCount(2)
-        const secondTerminal = terminal.nth(2)
+        const secondTerminal = terminal.nth(1)
         await expect(secondTerminal).toBeVisible()
         await expect(secondTerminal).toHaveClass('focus')
         await page.waitForIdle()
