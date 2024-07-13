@@ -1,6 +1,16 @@
 import * as Settings from '../Settings/Settings.js'
 import * as QuickPick from '../QuickPick/QuickPick.js'
 
+const RE_LIST_ID = /(list_id_\d+)/
+
+const getListIdFromClassName = (className) => {
+  const match = className.match(RE_LIST_ID)
+  if (!match) {
+    throw new Error('no list id match')
+  }
+  return match[0]
+}
+
 export const create = ({ expect, page, VError }) => {
   return {
     async open() {
@@ -173,7 +183,6 @@ export const create = ({ expect, page, VError }) => {
         await expect(keyHeading).toHaveText('Item')
         const valueHeading = block.locator('.setting-list-object-value')
         await expect(valueHeading).toHaveText('Value')
-
         const addButton = block.locator('.monaco-button', {
           hasText: 'Add Item',
         })
@@ -209,6 +218,35 @@ export const create = ({ expect, page, VError }) => {
         await expect(row).toHaveCount(0)
       } catch (error) {
         throw new VError(error, `Failed to remove item`)
+      }
+    },
+    async collapseOutline() {
+      try {
+        await page.waitForIdle()
+        const tableOfContents = page.locator('[aria-label="Settings Table of Contents"]')
+        await expect(tableOfContents).toBeVisible()
+        await tableOfContents.focus()
+        await page.keyboard.press('Control+ArrowLeft')
+        const expandedItems = tableOfContents.locator('[aria-expanded="true"]')
+        await expect(expandedItems).toHaveCount(0)
+      } catch (error) {
+        throw new VError(error, `Failed to collapse outline`)
+      }
+    },
+    async focusOutline(name) {
+      try {
+        await page.waitForIdle()
+        const tableOfContents = page.locator('[aria-label="Settings Table of Contents"]')
+        await expect(tableOfContents).toBeVisible()
+        const item = page.locator(`[aria-label="${name}, group"]`)
+        await item.click({
+          button: 'right',
+        })
+        const heading = page.locator('.settings-group-level-1').nth(0)
+        await expect(heading).toBeVisible()
+        await expect(heading).toHaveText(name)
+      } catch (error) {
+        throw new VError(error, `Failed to focus outline item`)
       }
     },
   }
