@@ -44,7 +44,7 @@ export const create = ({ expect, page, VError }) => {
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
         const option = quickPick.locator('.label-name', {
-          hasText: text,
+          hasExactText: text,
         })
         await option.click()
         if (!stayVisible) {

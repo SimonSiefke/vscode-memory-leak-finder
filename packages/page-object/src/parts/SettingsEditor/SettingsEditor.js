@@ -1,16 +1,6 @@
 import * as Settings from '../Settings/Settings.js'
 import * as QuickPick from '../QuickPick/QuickPick.js'
 
-const RE_LIST_ID = /(list_id_\d+)/
-
-const getListIdFromClassName = (className) => {
-  const match = className.match(RE_LIST_ID)
-  if (!match) {
-    throw new Error('no list id match')
-  }
-  return match[0]
-}
-
 export const create = ({ expect, page, VError }) => {
   return {
     async open() {
