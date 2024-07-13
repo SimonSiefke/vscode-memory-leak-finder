@@ -409,13 +409,23 @@ export const create = ({ page, expect, VError }) => {
     },
     async openFind() {
       try {
+        await page.waitForIdle()
         const findWidget = page.locator('.find-widget')
         const count = await findWidget.count()
         if (count > 0) {
           await expect(findWidget).toHaveAttribute('aria-hidden', 'true')
         }
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, VError })
+
+        // create random quickpick to avoid race condition
+        await quickPick.show()
+        await page.waitForIdle()
+        await quickPick.hide()
+        await page.waitForIdle()
+
         await quickPick.executeCommand(WellKnownCommands.Find)
+        await page.waitForIdle()
         await expect(findWidget).toBeVisible()
         await expect(findWidget).toHaveClass('visible')
       } catch (error) {
@@ -425,6 +435,15 @@ export const create = ({ page, expect, VError }) => {
     async closeFind() {
       try {
         const findWidget = page.locator('.find-widget')
+        const count = await findWidget.count()
+        if (count === 0) {
+          return
+        }
+        const className = await findWidget.getAttribute('class')
+        const isVisible = className.includes('visible')
+        if (!isVisible) {
+          return
+        }
         await expect(findWidget).toBeVisible()
         await expect(findWidget).toHaveClass('visible')
         const closeButton = findWidget.locator('[aria-label="Close (Escape)"]')
