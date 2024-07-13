@@ -1,9 +1,6 @@
 import * as Assert from '../Assert/Assert.js'
 
 const querySelectorRoot = (root, body) => {
-  if (!root) {
-    console.log({ root })
-  }
   Assert.object(root)
   Assert.string(body)
   return Array.from(root.querySelectorAll(body))
