@@ -3,7 +3,6 @@ export const setup = async ({ Editor }) => {
 }
 
 export const run = async ({ Profile }) => {
-  await Profile.show()
   await Profile.export({
     name: 'test',
   })

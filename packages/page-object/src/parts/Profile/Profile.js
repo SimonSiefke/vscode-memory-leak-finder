@@ -52,5 +52,37 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to remove profile`)
       }
     },
+    async export({ name }) {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.ProfilesExport)
+        const profileViewContainer = page.locator('.profile-view-tree-container')
+        await expect(profileViewContainer).toBeVisible()
+        const settings = profileViewContainer.locator('[aria-label="Settings "]')
+        await expect(settings).toBeVisible()
+        await expect(settings).toHaveAttribute('aria-expanded', 'true')
+        const exportButton = page.locator('.profile-view-button', {
+          hasText: 'Export',
+        })
+        await expect(exportButton).toBeVisible()
+        await exportButton.click()
+        const quickInput = page.locator('.quick-input-box input')
+        await expect(quickInput).toBeVisible()
+        await quickInput.type(name)
+        await page.keyboard.press('Enter')
+        // const se
+        const quickInputTitle = page.locator('.quick-input-title')
+        await expect(quickInputTitle).toBeVisible()
+        await expect(quickInputTitle).toHaveText(`Export '${name}' profile as...`)
+        const fileOption = page.locator('.quick-input-list-entry .label-description', {
+          hasText: 'file',
+        })
+        await expect(fileOption).toBeVisible()
+        await fileOption.click()
+      } catch (error) {
+        throw new VError(error, `Failed to remove profile`)
+      }
+    },
   }
 }
