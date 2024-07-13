@@ -71,6 +71,7 @@ export const create = ({ page, expect, VError }) => {
         await expect(quickInput).toBeVisible()
         await quickInput.type(name)
         await page.keyboard.press('Enter')
+        await page.waitForIdle()
         const quickInputTitle = page.locator('.quick-input-title')
         await expect(quickInputTitle).toBeVisible()
         await expect(quickInputTitle).toHaveText(`Export '${name}' profile as...`)
