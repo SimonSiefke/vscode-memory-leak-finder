@@ -75,6 +75,8 @@ export const create = ({ expect, page, VError }) => {
         await toggleDetails.click()
         await expect(toggleDetails).toHaveAttribute('aria-expanded', 'true', { timeout: 3000 })
         await expect(include).toBeVisible()
+        const includeInput = include.locator('.input')
+        await expect(includeInput).toBeFocused()
       } catch (error) {
         throw new VError(error, `Failed to expand files`)
       }
