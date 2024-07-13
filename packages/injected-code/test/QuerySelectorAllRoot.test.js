@@ -149,7 +149,7 @@ test('querySelectorAll - element with exact text - exact match', () => {
   expect(QuerySelectorAllRoot.querySelectorAll(root, selector)).toEqual([element])
 })
 
-test('querySelectorAll - element with exact text - child element match', () => {
+test.only('querySelectorAll - element with exact text - child element match', () => {
   const root = document.createElement('div')
   const element = document.createElement('h1')
   const child1 = document.createElement('span')

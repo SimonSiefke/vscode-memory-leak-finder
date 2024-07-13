@@ -5,7 +5,7 @@ import * as SpecialSelectorPrefix from '../SpecialSelectorPrefix/SpecialSelector
 export const querySelectorAll = (roots, body) => {
   Assert.array(roots)
   Assert.string(body)
-  const text = ParseSpecialSelectorBody.parseString(body, SpecialSelectorPrefix.HasText)
+  const text = ParseSpecialSelectorBody.parseString(body, SpecialSelectorPrefix.HasExactText)
   const matches = []
   for (const element of roots) {
     if (element.textContent === text) {

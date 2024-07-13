@@ -6,11 +6,13 @@ export const querySelectorAll = (root, selector) => {
   Assert.object(root)
   Assert.string(selector)
   const parts = ParseSelector.parseSelector(selector)
+  console.log({ parts })
   let currentRoots = [root]
   for (const part of parts) {
     const { type, body } = part
     const module = QuerySelectorAll.getSelectorModule(type)
     currentRoots = module.querySelectorAll(currentRoots, body, selector)
+    console.log({ currentRoots })
   }
   return currentRoots
 }
