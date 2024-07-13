@@ -9,7 +9,8 @@
     "test": "lerna run test",
     "e2e": "lerna run e2e",
     "e2e:check-flakyness": "lerna run e2e:check-flakyness",
-    "build": "lerna run build"
+    "build": "lerna run build",
+    "type-check": "tsc -b"
   },
   "repository": {
     "type": "git",
