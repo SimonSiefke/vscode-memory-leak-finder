@@ -86,7 +86,7 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const toggleDetails = page.locator(`[role="button"].codicon-search-details`)
         const expanded = await toggleDetails.getAttribute('aria-expanded')
-        if (expanded === 'false') {
+        if (!expanded || expanded === 'false') {
           return
         }
         const include = page.locator('.file-types.includes')
