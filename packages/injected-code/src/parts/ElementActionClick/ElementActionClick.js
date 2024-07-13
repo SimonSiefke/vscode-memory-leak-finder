@@ -10,7 +10,9 @@ export const click = (element, options) => {
   }
   DispatchEvent.pointerDown(element, options)
   DispatchEvent.mouseDown(element, options)
-  DispatchEvent.click(element, options)
+  if (options.button !== 2 /* right */) {
+    DispatchEvent.click(element, options)
+  }
   DispatchEvent.mouseUp(element, options)
   DispatchEvent.pointerUp(element, options)
   if (options.button === 2 /* right */) {
