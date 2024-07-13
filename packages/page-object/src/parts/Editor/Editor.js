@@ -409,12 +409,21 @@ export const create = ({ page, expect, VError }) => {
     },
     async openFind() {
       try {
+        await page.waitForIdle()
         const findWidget = page.locator('.find-widget')
         const count = await findWidget.count()
         if (count > 0) {
           await expect(findWidget).toHaveAttribute('aria-hidden', 'true')
         }
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, VError })
+
+        // create random quickpick to avoid race condition
+        await quickPick.show()
+        await page.waitForIdle()
+        await quickPick.hide()
+        await page.waitForIdle()
+
         await quickPick.executeCommand(WellKnownCommands.Find)
         await page.waitForIdle()
         await expect(findWidget).toBeVisible()
