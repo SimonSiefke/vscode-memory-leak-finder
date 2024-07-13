@@ -142,5 +142,5 @@ test.only('querySelectorAll - element with text - child element match', () => {
   element.append(child1, child2)
   root.append(element)
   const selector = 'h1 *:has-text("abc")'
-  expect(QuerySelectorAllRoot.querySelectorAll(root, selector)).toEqual([])
+  expect(QuerySelectorAllRoot.querySelectorAll(root, selector)).toEqual([child1])
 })
