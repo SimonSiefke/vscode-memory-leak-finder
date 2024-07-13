@@ -1,10 +1,14 @@
 import * as QuickPick from '../QuickPick/QuickPick.js'
+import * as Panel from '../Panel/Panel.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 
 export const create = ({ expect, page, VError }) => {
   return {
     async killAll() {
       try {
+        const panel = Panel.create({ page, expect, VError })
+        await panel.hide()
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.KillAllTerminals)
       } catch (error) {
