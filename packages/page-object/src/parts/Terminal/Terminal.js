@@ -1,10 +1,14 @@
 import * as QuickPick from '../QuickPick/QuickPick.js'
+import * as Panel from '../Panel/Panel.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 
 export const create = ({ expect, page, VError }) => {
   return {
     async killAll() {
       try {
+        const panel = Panel.create({ page, expect, VError })
+        await panel.hide()
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.KillAllTerminals)
       } catch (error) {
@@ -15,6 +19,8 @@ export const create = ({ expect, page, VError }) => {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.FocusTerminal)
+        const terminalSplitPane = page.locator('.terminal-split-pane')
+        await expect(terminalSplitPane).toBeVisible()
         const terminal = page.locator('.terminal')
         await expect(terminal).toHaveCount(1)
         await expect(terminal).toBeVisible()
@@ -22,6 +28,22 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show terminal`)
+      }
+    },
+    async split() {
+      try {
+        await page.waitForIdle()
+        const splitTerminalButton = page.locator('.action-label[aria-label^="Split Terminal"]')
+        await expect(splitTerminalButton).toBeVisible()
+        await splitTerminalButton.click()
+        const terminal = page.locator('.terminal')
+        await expect(terminal).toHaveCount(2)
+        const secondTerminal = terminal.nth(1)
+        await expect(secondTerminal).toBeVisible()
+        await expect(secondTerminal).toHaveClass('focus')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to split terminal`)
       }
     },
     async add() {
@@ -48,6 +70,9 @@ export const create = ({ expect, page, VError }) => {
         await deleteAction.click()
         await expect(terminalTabs).toHaveCount(0)
         await page.waitForIdle()
+        const terminal = page.locator('.terminal')
+        await expect(terminal).toHaveCount(1)
+        await expect(terminal).toHaveClass('focus')
       } catch (error) {
         throw new VError(error, `Failed to kill second terminal`)
       }
