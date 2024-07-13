@@ -40,10 +40,10 @@ const mergeSelectors = (selector, subSelector = '', hasText = '', hasExactText =
   return merged
 }
 
-export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}) => {
+export const create = (rpc, sessionId, selector, { hasText = '', hasExactText = '', nth = -1 } = {}) => {
   return {
     objectType: ObjectType.Locator,
-    selector: mergeSelectors('', selector, hasText, nth),
+    selector: mergeSelectors('', selector, hasText, hasExactText, nth),
     sessionId,
     nth(value) {
       return {
@@ -62,10 +62,10 @@ export const create = (rpc, sessionId, selector, { hasText = '', nth = -1 } = {}
         selector: this.selector,
       })
     },
-    locator(selector, { hasText = '', nth = -1 } = {}) {
+    locator(selector, { hasText = '', hasExactText = '', nth = -1 } = {}) {
       return {
         ...this,
-        selector: mergeSelectors(this.selector, selector, hasText, nth),
+        selector: mergeSelectors(this.selector, selector, hasText, hasExactText, nth),
       }
     },
     fill(text) {
