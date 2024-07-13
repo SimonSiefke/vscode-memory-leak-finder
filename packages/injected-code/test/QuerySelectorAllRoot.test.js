@@ -4,6 +4,14 @@
 import * as QuerySelectorAllRoot from '../src/parts/QuerySelectorAllRoot/QuerySelectorAllRoot.js'
 import { test, expect } from '@jest/globals'
 
+test('querySelector - match', () => {
+  const root = document.createElement('div')
+  const element = document.createElement('h1')
+  root.append(element)
+  const selector = 'h1'
+  expect(QuerySelectorAllRoot.querySelector(root, selector)).toEqual(element)
+})
+
 test('querySelectorAll - html element - match', () => {
   const root = document.createElement('div')
   const element = document.createElement('h1')
