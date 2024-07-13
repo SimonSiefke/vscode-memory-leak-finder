@@ -549,9 +549,6 @@ export const create = ({ page, expect, VError }) => {
       try {
         const inspectWidget = page.locator('.token-inspect-widget')
         await expect(inspectWidget).toBeVisible()
-        await new Promise((r) => {
-          setTimeout(r, 30)
-        })
         await page.keyboard.press('Escape')
         await expect(inspectWidget).toBeHidden()
       } catch (error) {
