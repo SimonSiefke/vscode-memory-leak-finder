@@ -7,6 +7,8 @@ export const getModule = (protocol) => {
       return import('../LoadSourceMapFromUrl/LoadSourceMapFromUrl.js')
     case 'file':
       return import('../LoadSourceMapFromFile/LoadSourceMapFromFile.js')
+    case 'vscode-file':
+      return import('../LoadSourceMapFromVscodeFile/LoadSourceMapFromVscodeFile.js')
     case 'noop':
       return {
         loadSourceMap() {
