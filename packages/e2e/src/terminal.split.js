@@ -8,5 +8,5 @@ export const setup = async ({ Terminal, Panel }) => {
 
 export const run = async ({ Terminal }) => {
   await Terminal.split()
-  // await Terminal.killSecond()
+  await Terminal.killSecond()
 }
