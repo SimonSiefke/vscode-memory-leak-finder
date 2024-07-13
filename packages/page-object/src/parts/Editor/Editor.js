@@ -426,6 +426,10 @@ export const create = ({ page, expect, VError }) => {
     async closeFind() {
       try {
         const findWidget = page.locator('.find-widget')
+        const count = await findWidget.count()
+        if (count === 0) {
+          return
+        }
         const className = await findWidget.getAttribute('class')
         const isVisible = className.includes('visible')
         if (!isVisible) {
