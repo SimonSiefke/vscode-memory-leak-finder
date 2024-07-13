@@ -16,5 +16,5 @@ export const setup = async ({ Editor, Workspace, Explorer }) => {
 
 export const run = async ({ Editor }) => {
   await Editor.openFind()
-  // await Editor.closeFind()
+  await Editor.closeFind()
 }
