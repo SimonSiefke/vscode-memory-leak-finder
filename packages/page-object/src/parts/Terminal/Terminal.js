@@ -28,19 +28,15 @@ export const create = ({ expect, page, VError }) => {
     },
     async split() {
       try {
-        // for (let i = 0; i < 50000; i++) {
-        // await page.waitForIdle()
-        // }
-        // const quickPick = QuickPick.create({ expect, page, VError })
-        // await quickPick.executeCommand(WellKnownCommands.TerminalSplitTerminal)
         await page.waitForIdle()
         const splitTerminalButton = page.locator('.action-label[aria-label^="Split Terminal"]')
         await expect(splitTerminalButton).toBeVisible()
         await splitTerminalButton.click()
         const terminal = page.locator('.terminal')
         await expect(terminal).toHaveCount(2)
-        // await expect(terminal).toBeVisible()
-        // await expect(terminal).toHaveClass('focus')
+        const secondTerminal = terminal.nth(2)
+        await expect(secondTerminal).toBeVisible()
+        await expect(secondTerminal).toHaveClass('focus')
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to split terminal`)
