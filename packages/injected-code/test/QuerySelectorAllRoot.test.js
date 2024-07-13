@@ -119,7 +119,7 @@ test('querySelectorAll - text with colon', () => {
   expect(QuerySelectorAllRoot.querySelectorAll(root, selector)).toEqual([element])
 })
 
-test.skip('querySelectorAll - element with text - no exact match', () => {
+test('querySelectorAll - element with text - no exact match', () => {
   const root = document.createElement('div')
   const element = document.createElement('h1')
   const child1 = document.createElement('span')
@@ -132,7 +132,16 @@ test.skip('querySelectorAll - element with text - no exact match', () => {
   expect(QuerySelectorAllRoot.querySelectorAll(root, selector)).toEqual([])
 })
 
-test.only('querySelectorAll - element with text - child element match', () => {
+test('querySelectorAll - element with text - exact match', () => {
+  const root = document.createElement('div')
+  const element = document.createElement('h1')
+  element.textContent = 'abc'
+  root.append(element)
+  const selector = 'h1:has-text("abc")'
+  expect(QuerySelectorAllRoot.querySelectorAll(root, selector)).toEqual([element])
+})
+
+test('querySelectorAll - element with text - child element match', () => {
   const root = document.createElement('div')
   const element = document.createElement('h1')
   const child1 = document.createElement('span')
