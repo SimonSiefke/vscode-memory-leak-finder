@@ -84,7 +84,7 @@ test('querySelectorAll - text - match', () => {
   const element = document.createElement('div')
   element.textContent = 'test'
   root.append(element)
-  const selector = ':has-text("test")'
+  const selector = ':has-exact-text("test")'
   expect(QuerySelectorAllRoot.querySelectorAll(root, selector)).toEqual([root])
 })
 
@@ -92,7 +92,7 @@ test('querySelectorAll - text - no match', () => {
   const root = document.createElement('div')
   const element = document.createElement('div')
   root.append(element)
-  const selector = ':has-text("test")'
+  const selector = ':has-exact-text("test")'
   expect(QuerySelectorAllRoot.querySelectorAll(root, selector)).toEqual([])
 })
 
@@ -123,7 +123,7 @@ test('querySelectorAll - text with colon', () => {
   const element = document.createElement('h1')
   element.textContent = 'Preferences: Open Keyboard Shortcuts'
   root.append(element)
-  const selector = ':has-text("Preferences: Open Keyboard Shortcuts")'
+  const selector = ':has-exact-text("Preferences: Open Keyboard Shortcuts")'
   expect(QuerySelectorAllRoot.querySelectorAll(root, selector)).toEqual([root])
 })
 
