@@ -417,13 +417,6 @@ export const create = ({ page, expect, VError }) => {
         }
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, VError })
-
-        // create random quickpick to avoid race condition
-        await quickPick.show()
-        await page.waitForIdle()
-        await quickPick.hide()
-        await page.waitForIdle()
-
         await quickPick.executeCommand(WellKnownCommands.Find)
         await page.waitForIdle()
         await expect(findWidget).toBeVisible()
