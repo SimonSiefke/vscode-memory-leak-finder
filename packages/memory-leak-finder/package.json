@@ -14,7 +14,7 @@
   "license": "MIT",
   "dependencies": {
     "@lvce-editor/assert": "^1.2.0",
-    "@lvce-editor/json-rpc": "^1.3.0",
+    "@lvce-editor/json-rpc": "^1.4.0",
     "@lvce-editor/verror": "^1.3.0",
     "@vscode-memory-leak-finder/devtools-protocol": "file:../devtools-protocol",
     "pretty-bytes": "^6.1.1"
