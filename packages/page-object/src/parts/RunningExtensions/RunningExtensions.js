@@ -1,7 +1,5 @@
 import * as QuickPick from '../QuickPick/QuickPick.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
-import * as ContextMenu from '../ContextMenu/ContextMenu.js'
-import * as IsMacos from '../IsMacos/IsMacos.js'
 
 export const create = ({ expect, page, VError }) => {
   return {
@@ -48,6 +46,9 @@ export const create = ({ expect, page, VError }) => {
         await expect(actionLabel).toBeHidden()
         const startLabel = page.locator('.action-label[aria-label="Start Extension Host Profile"]')
         await expect(startLabel).toBeVisible()
+        const gitExtensionProfileTime = page.locator('.editor-container [aria-label="git"] .extension .profile-time')
+        await expect(gitExtensionProfileTime).toBeVisible()
+        await expect(gitExtensionProfileTime).toHaveText(/^Profile: /)
       } catch (error) {
         throw new VError(error, `Failed to stop profiling extension host`)
       }
