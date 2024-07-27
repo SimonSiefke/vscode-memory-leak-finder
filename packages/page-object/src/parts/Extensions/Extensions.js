@@ -1,7 +1,7 @@
-import * as QuickPick from '../QuickPick/QuickPick.js'
-import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 import * as ContextMenu from '../ContextMenu/ContextMenu.js'
 import * as IsMacos from '../IsMacos/IsMacos.js'
+import * as QuickPick from '../QuickPick/QuickPick.js'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 
 const selectAll = IsMacos.isMacos ? 'Meta+A' : 'Control+A'
 
@@ -150,20 +150,6 @@ export const create = ({ expect, page, VError }) => {
         await contextMenu.open(firstExtension)
         await contextMenu.close()
       },
-    },
-    async showRunningExtensions() {
-      const quickPick = QuickPick.create({
-        page,
-        expect,
-        VError,
-      })
-      await quickPick.executeCommand(WellKnownCommands.ShowRunningExtensions)
-      const tabLabel = page.locator('.tab-label[aria-label="Running Extensions"]')
-      await expect(tabLabel).toBeVisible()
-      const gitExtension = page.locator('.editor-container .extension .name', {
-        hasExactText: 'Git',
-      })
-      await expect(gitExtension).toBeVisible()
     },
   }
 }
