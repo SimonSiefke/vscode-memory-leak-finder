@@ -150,16 +150,20 @@ export const create = ({ expect, page, VError }) => {
         await contextMenu.open(firstExtension)
         await contextMenu.close()
       },
-      async showRunningExtensions() {
-        const quickPick = QuickPick.create({
-          page,
-          expect,
-          VError,
-        })
-        await quickPick.executeCommand(WellKnownCommands.ShowRunningExtensions)
-        const view = page.locator('.abc')
-        await expect(view).toBeVisible()
-      },
+    },
+    async showRunningExtensions() {
+      const quickPick = QuickPick.create({
+        page,
+        expect,
+        VError,
+      })
+      await quickPick.executeCommand(WellKnownCommands.ShowRunningExtensions)
+      const tabLabel = page.locator('.tab-label[aria-label="Running Extensions"]')
+      await expect(tabLabel).toBeVisible()
+      const gitExtension = page.locator('.editor-container .extension .name', {
+        hasExactText: 'Git',
+      })
+      await expect(gitExtension).toBeVisible()
     },
   }
 }
