@@ -3,6 +3,6 @@ export const setup = async ({ Editor }) => {
 }
 
 export const run = async ({ Editor, Extensions }) => {
-  await Editor.closeAll()
   await Extensions.showRunningExtensions()
+  await Editor.closeAll()
 }
