@@ -1,21 +1,22 @@
-import { once } from 'node:events'
 import * as GetElectronErrorMessage from '../GetElectronErrorMessage/GetElectronErrorMessage.js'
 import * as IsImportantErrorMessage from '../IsImportantErrorMessage/IsImportantErrorMessage.js'
+import * as WaitForData from '../WaitForData/WaitForData.js'
 
 const RE_LISTENING_ON = /DevTools listening on (ws:\/\/.*)/
 
-const waitForRelevantData = async (stream) => {
-  for (let i = 0; i < 10; i++) {
-    const [data] = await once(stream, 'data')
-    if (data.includes('DevTools listening on')) {
-      return data
-    }
-    if (IsImportantErrorMessage.isImportantErrorMessage(data)) {
-      const error = await GetElectronErrorMessage.getElectronErrorMessage(data, stream)
-      throw error
-    }
+const errorChecker = async (data, stream) => {
+  if (IsImportantErrorMessage.isImportantErrorMessage(data)) {
+    const error = await GetElectronErrorMessage.getElectronErrorMessage(data, stream)
+    throw error
   }
-  throw new Error(`Failed to extract websocket url from stderr`)
+}
+
+const waitForRelevantData = async (stream) => {
+  const data = await WaitForData.waitForData(stream, 'DevTools listening on', errorChecker)
+  if (!data) {
+    throw new Error(`Failed to extract websocket url from stderr`)
+  }
+  return data
 }
 
 export const waitForDevtoolsListening = async (stream) => {
