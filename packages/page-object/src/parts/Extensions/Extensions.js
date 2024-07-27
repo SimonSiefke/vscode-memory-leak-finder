@@ -150,6 +150,16 @@ export const create = ({ expect, page, VError }) => {
         await contextMenu.open(firstExtension)
         await contextMenu.close()
       },
+      async showRunningExtensions() {
+        const quickPick = QuickPick.create({
+          page,
+          expect,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.ShowRunningExtensions)
+        const view = page.locator('.abc')
+        await expect(view).toBeVisible()
+      },
     },
   }
 }
