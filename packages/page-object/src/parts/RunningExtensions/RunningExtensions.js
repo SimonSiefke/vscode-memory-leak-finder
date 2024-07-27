@@ -28,5 +28,29 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to start debugging extension host`)
       }
     },
+    async startProfilingExtensionHost() {
+      try {
+        const actionLabel = page.locator('.action-label[aria-label="Start Extension Host Profile"]')
+        await expect(actionLabel).toBeVisible()
+        await actionLabel.click()
+        await expect(actionLabel).toBeHidden()
+        const stopLabel = page.locator('.action-label[aria-label="Stop Extension Host Profile"]')
+        await expect(stopLabel).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to start profiling extension host`)
+      }
+    },
+    async stopProfilingExtensionHost() {
+      try {
+        const actionLabel = page.locator('.action-label[aria-label="Stop Extension Host Profile"]')
+        await expect(actionLabel).toBeVisible()
+        await actionLabel.click()
+        await expect(actionLabel).toBeHidden()
+        const startLabel = page.locator('.action-label[aria-label="Start Extension Host Profile"]')
+        await expect(startLabel).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to stop profiling extension host`)
+      }
+    },
   }
 }
