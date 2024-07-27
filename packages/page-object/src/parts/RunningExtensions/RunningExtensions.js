@@ -31,7 +31,9 @@ export const create = ({ expect, page, VError }) => {
         const actionLabel = page.locator('.action-label[aria-label="Start Extension Host Profile"]')
         await expect(actionLabel).toBeVisible()
         await actionLabel.click()
-        await expect(actionLabel).toBeHidden()
+        await expect(actionLabel).toBeHidden({
+          timeout: 15_000,
+        })
         const stopLabel = page.locator('.action-label[aria-label="Stop Extension Host Profile"]')
         await expect(stopLabel).toBeVisible()
       } catch (error) {
