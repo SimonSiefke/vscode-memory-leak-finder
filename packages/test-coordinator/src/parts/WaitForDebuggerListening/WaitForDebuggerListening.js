@@ -1,4 +1,3 @@
-import { once } from 'node:events'
 import * as NodeVersion from '../NodeVersion/NodeVersion.js'
 import * as WaitForData from '../WaitForData/WaitForData.js'
 
