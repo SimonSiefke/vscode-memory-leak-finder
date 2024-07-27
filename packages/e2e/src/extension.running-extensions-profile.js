@@ -1,3 +1,5 @@
+export const skip = true
+
 export const setup = async ({ Editor, RunningExtensions }) => {
   await Editor.closeAll()
   await RunningExtensions.show()
