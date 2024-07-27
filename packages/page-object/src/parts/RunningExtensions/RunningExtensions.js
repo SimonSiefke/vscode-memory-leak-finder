@@ -21,9 +21,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async startDebuggingExtensionHost() {
       try {
-        const actionLabel = page.locator('.action-label', {
-          hasExactText: 'Start Debugging Extension Host',
-        })
+        const actionLabel = page.locator('.action-label[aria-label="Start Debugging Extension Host"]')
         await expect(actionLabel).toBeVisible()
         await actionLabel.click()
       } catch (error) {
