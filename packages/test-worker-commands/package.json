@@ -19,7 +19,7 @@
     "@lvce-editor/verror": "^1.3.0",
     "@vscode/test-electron": "^2.4.1",
     "exit-hook": "^4.0.0",
-    "got": "^14.4.1",
+    "got": "^14.4.2",
     "source-map": "^0.7.4",
     "strip-ansi": "^7.1.0",
     "ws": "^8.18.0"
