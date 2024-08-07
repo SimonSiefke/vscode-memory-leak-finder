@@ -11,8 +11,10 @@ export const create = (session) => {
   return [session, objectGroup]
 }
 
-export const start = (session, objectGroup) => {
-  return GetInstanceCounts.getInstanceCounts(session, objectGroup)
+export const start = async (session, objectGroup) => {
+  const result = await GetInstanceCounts.getInstanceCounts(session, objectGroup)
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
+  return result
 }
 
 export const stop = async (session, objectGroup) => {

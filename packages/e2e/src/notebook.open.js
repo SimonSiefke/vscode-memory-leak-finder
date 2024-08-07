@@ -14,5 +14,11 @@ export const setup = async ({ Workspace, Explorer, Editor }) => {
 
 export const run = async ({ Editor }) => {
   await Editor.open('file.ipynb')
+  // await new Promise((r) => {
+  //   setTimeout(r, 3000)
+  // })
   await Editor.closeAll()
+  // await new Promise((r) => {
+  //   setTimeout(r, 3000)
+  // })
 }
