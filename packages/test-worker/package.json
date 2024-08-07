@@ -16,6 +16,6 @@
   "license": "MIT",
   "dependencies": {
     "@lvce-editor/assert": "^1.2.0",
-    "@lvce-editor/verror": "^1.3.0"
+    "@lvce-editor/verror": "^1.4.0"
   }
 }
