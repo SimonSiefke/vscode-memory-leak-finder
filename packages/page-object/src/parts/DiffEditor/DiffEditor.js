@@ -1,3 +1,7 @@
+import * as Explorer from '../Explorer/Explorer.js'
+import * as ContextMenu from '../ContextMenu/ContextMenu.js'
+import * as SideBar from '../SideBar/SideBar.js'
+
 export const create = ({ page, expect, VError }) => {
   return {
     async expectOriginal(text) {
@@ -14,6 +18,21 @@ export const create = ({ page, expect, VError }) => {
         await expect(modified).toHaveText(text)
       } catch (error) {
         throw new VError(error, `Failed to verify modified text ${text}`)
+      }
+    },
+    async open(a, b) {
+      try {
+        const explorer = Explorer.create({ page, expect, VError })
+        const contextMenu = ContextMenu.create({ page, expect, VError })
+        const sideBar = SideBar.create({ page, expect, VError })
+        await explorer.focus()
+        await explorer.openContextMenu(a)
+        await contextMenu.select('Select for Compare')
+        await explorer.openContextMenu(b)
+        await contextMenu.select('Compare with Selected')
+        await sideBar.hide()
+      } catch (error) {
+        throw new VError(error, `Failed to open diff editor`)
       }
     },
   }

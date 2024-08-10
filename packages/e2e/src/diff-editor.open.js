@@ -17,13 +17,8 @@ export const setup = async ({ Workspace, Editor, Explorer }) => {
   await Explorer.shouldHaveItem('b.txt')
 }
 
-export const run = async ({ Editor, Explorer, ContextMenu, DiffEditor, SideBar }) => {
-  await Explorer.focus()
-  await Explorer.openContextMenu('a.txt')
-  await ContextMenu.select('Select for Compare')
-  await Explorer.openContextMenu('b.txt')
-  await ContextMenu.select('Compare with Selected')
-  await SideBar.hide()
+export const run = async ({ Editor, DiffEditor }) => {
+  await DiffEditor.open('a.txt', 'b.txt')
   await DiffEditor.expectOriginal('a')
   await DiffEditor.expectModified('b')
   await Editor.close()
