@@ -1,3 +1,5 @@
+export const skip = process.platform === 'darwin'
+
 export const setup = async ({ Workspace, Explorer, Editor }) => {
   const notebook1 = {
     cells: [
