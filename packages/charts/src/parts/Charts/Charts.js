@@ -8,3 +8,5 @@ export * as ObjectCount from '../CreateObjectCountChart/CreateObjectCountChart.j
 export * as PromiseCount from '../CreatePromiseCountChart/CreatePromiseCountChart.js'
 export * as RegexCount from '../CreateRegexCountChart/CreateRegexCountChart.js'
 export * as StringCount from '../CreateStringCountChart/CreateStringCountChart.js'
+export * as WeakMapCount from '../CreateWeakMapCountChart/CreateWeakMapCountChart.js'
+export * as WeakSetCount from '../CreateWeakSetCountChart/CreateWeakSetCountChart.js'
