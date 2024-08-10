@@ -203,7 +203,7 @@ export const setup = async ({ Workspace, Explorer, Editor }) => {
 
 export const run = async ({ DiffEditor, Editor }) => {
   await DiffEditor.open('notebook-1.ipynb', 'notebook-2.ipynb')
-  await DiffEditor.shouldHaveOriginalEditor('aa')
+  await DiffEditor.shouldHaveOriginalEditor('a')
   await DiffEditor.shouldHaveModifiedEditor('aa')
   await Editor.closeAll()
 }
