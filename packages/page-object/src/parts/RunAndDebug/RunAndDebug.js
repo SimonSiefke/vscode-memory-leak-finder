@@ -64,5 +64,18 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to stop`)
       }
     },
+    async runAndWaitForPaused() {
+      try {
+        const quickPick = QuickPick.create({
+          page,
+          expect,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.ShowRunAndDebug)
+        await this.startRunAndDebug()
+      } catch (error) {
+        throw new VError(error, `Failed to run debugger`)
+      }
+    },
   }
 }

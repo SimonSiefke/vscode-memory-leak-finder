@@ -18,8 +18,9 @@ setInterval(()=>{
 
 export const run = async ({ Editor, RunAndDebug }) => {
   await Editor.open('index.js')
-  await Editor.setBreakpoint(6)
+  await Editor.setBreakpoint(4)
   await RunAndDebug.runAndWaitForPaused()
+  await new Promise((r) => {})
   await RunAndDebug.stop()
   await Editor.closeAll()
 }

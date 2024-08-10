@@ -555,5 +555,15 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed close inspect widget`)
       }
     },
+    async setBreakpoint(lineNumber) {
+      try {
+        const editor = page.locator('.part.editor .editor-instance')
+        const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber})`)
+        await expect(lineNumberElement).toBeVisible()
+        await lineNumberElement.click()
+      } catch (error) {
+        throw new VError(error, `Failed set breakpoint`)
+      }
+    },
   }
 }
