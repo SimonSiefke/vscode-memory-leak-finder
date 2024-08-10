@@ -64,6 +64,12 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to stop`)
       }
     },
+    async waitForPaused() {
+      await page.waitForIdle()
+      const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
+      // TODO long timeout here
+      await expect(continueButton).toBeVisible()
+    },
     async runAndWaitForPaused() {
       try {
         const quickPick = QuickPick.create({
@@ -73,6 +79,7 @@ export const create = ({ expect, page, VError }) => {
         })
         await quickPick.executeCommand(WellKnownCommands.ShowRunAndDebug)
         await this.startRunAndDebug()
+        await this.waitForPaused()
       } catch (error) {
         throw new VError(error, `Failed to run debugger`)
       }
