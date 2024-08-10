@@ -1,7 +1,7 @@
-import * as Explorer from '../Explorer/Explorer.js'
-import * as ContextMenu from '../ContextMenu/ContextMenu.js'
-import * as SideBar from '../SideBar/SideBar.js'
 import * as Character from '../Character/Character.js'
+import * as ContextMenu from '../ContextMenu/ContextMenu.js'
+import * as Explorer from '../Explorer/Explorer.js'
+import * as SideBar from '../SideBar/SideBar.js'
 
 export const create = ({ page, expect, VError }) => {
   return {
