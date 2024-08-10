@@ -1,6 +1,6 @@
 export const skip = true
 
-export const setup = async ({ Editor, Workspace, Explorer }) => {
+export const setup = async ({ Editor, Workspace, Explorer, RunAndDebug }) => {
   await Workspace.setFiles([
     {
       name: 'index.js',
@@ -14,6 +14,7 @@ setInterval(()=>{
   await Editor.closeAll()
   await Explorer.focus()
   await Explorer.shouldHaveItem('index.js')
+  await RunAndDebug.removeAllBreakpoints()
 }
 
 export const run = async ({ Editor, RunAndDebug }) => {
@@ -21,5 +22,6 @@ export const run = async ({ Editor, RunAndDebug }) => {
   await Editor.setBreakpoint(4)
   await RunAndDebug.runAndWaitForPaused()
   await RunAndDebug.stop()
+  await RunAndDebug.removeAllBreakpoints()
   await Editor.closeAll()
 }

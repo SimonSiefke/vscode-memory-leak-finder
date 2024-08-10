@@ -85,5 +85,17 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to run debugger`)
       }
     },
+    async removeAllBreakpoints() {
+      try {
+        const quickPick = QuickPick.create({
+          page,
+          expect,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.RemoveAllBreakpoints)
+      } catch (error) {
+        throw new VError(error, `Failed to remove all breakpoints`)
+      }
+    },
   }
 }
