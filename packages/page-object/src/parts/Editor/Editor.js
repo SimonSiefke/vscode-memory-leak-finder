@@ -1,6 +1,7 @@
 import * as Character from '../Character/Character.js'
 import * as QuickPick from '../QuickPick/QuickPick.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
+import * as ContextMenu from '../ContextMenu/ContextMenu.js'
 
 const initialDiagnosticTimeout = 30_000
 
@@ -558,9 +559,11 @@ export const create = ({ page, expect, VError }) => {
     async setBreakpoint(lineNumber) {
       try {
         const editor = page.locator('.part.editor .editor-instance')
-        const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber})`)
+        const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber - 1})`)
         await expect(lineNumberElement).toBeVisible()
-        await lineNumberElement.click()
+        const contextMenu = ContextMenu.create({ page, expect, VError })
+        await contextMenu.open(lineNumberElement)
+        await contextMenu.select('Add Breakpoint')
       } catch (error) {
         throw new VError(error, `Failed set breakpoint`)
       }
