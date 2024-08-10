@@ -60,5 +60,26 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to assert modified editor contents`)
       }
     },
+    async scrollDown() {
+      try {
+        await page.waitForIdle()
+        const scrollContainer = page.locator('.notebook-text-diff-editor .monaco-scrollable-element')
+        await expect(scrollContainer).toBeVisible()
+        await scrollContainer.scrollDown()
+      } catch (error) {
+        throw new VError(error, `Failed to scroll down in diff editor`)
+      }
+    },
+    async scrollUp() {
+      try {
+        await page.waitForIdle()
+        const scrollContainer = page.locator('.notebook-text-diff-editor .monaco-scrollable-element')
+        await expect(scrollContainer).toBeVisible()
+        await scrollContainer.scrollUp()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to scroll up in diff editor`)
+      }
+    },
   }
 }
