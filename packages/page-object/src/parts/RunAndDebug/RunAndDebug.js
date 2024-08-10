@@ -69,6 +69,7 @@ export const create = ({ expect, page, VError }) => {
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
       // TODO long timeout here
       await expect(continueButton).toBeVisible()
+      await page.waitForIdle()
     },
     async runAndWaitForPaused() {
       try {
