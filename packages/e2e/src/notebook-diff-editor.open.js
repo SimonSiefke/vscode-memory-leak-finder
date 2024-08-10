@@ -1,5 +1,3 @@
-export const skip = true
-
 export const setup = async ({ Workspace, Explorer, Editor }) => {
   const notebook1 = {
     cells: [
@@ -201,7 +199,6 @@ export const setup = async ({ Workspace, Explorer, Editor }) => {
   await Editor.open('notebook-1.ipynb')
 }
 
-export const run = async ({ Notebook }) => {
-  await Notebook.scrollDown()
-  await Notebook.scrollUp()
+export const run = async ({ Notebook, DiffEditor }) => {
+  await DiffEditor.open('notebook-1.ipynb', 'notebook-2.ipynb')
 }
