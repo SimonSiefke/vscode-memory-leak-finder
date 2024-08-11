@@ -22,10 +22,14 @@ export const create = ({ expect, page, VError }) => {
     },
     async collapseProperty(name) {
       try {
-        const property = page.locator(`.debug-property[aria-label="${name}"]`)
-        await expect(property).toBeVisible()
-        await property.click()
-        await expect(property).toBeHidden()
+        const hoverTree = page.locator('.debug-hover-tree')
+        await expect(hoverTree).toBeVisible()
+        const nameRow = hoverTree.locator(`.monaco-list-row[aria-label^="${name},"]`)
+        const nameElement = nameRow.locator('.name')
+        await expect(nameElement).toHaveAttribute('aria-expanded', 'true')
+        await nameElement.click()
+        await expect(nameElement).toHaveAttribute('aria-expanded', 'false')
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to collapse debug hover property`)
       }
