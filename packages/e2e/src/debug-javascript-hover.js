@@ -22,12 +22,16 @@ setInterval(()=>{
     line: 4,
     callStackSize: 11,
   })
+  await Editor.goToFile({
+    file: 'index.js',
+    line: 3,
+    column: 0,
+  })
 }
 
-export const run = async ({ DebugConsole }) => {
-  // await DebugConsole.type('glob')
-  // await DebugConsole.shouldHaveCompletions(['global', 'globalThis'])
-  // await DebugConsole.clearInput()
+export const run = async ({ Editor }) => {
+  await Editor.showDebugHover()
+  await Editor.hideDebugHover()
 }
 
 export const teardown = async ({ RunAndDebug, Editor }) => {

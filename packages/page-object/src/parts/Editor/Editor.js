@@ -568,5 +568,18 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed set breakpoint`)
       }
     },
+    async goToFile({ file, line, column }) {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.GoToFile, {
+          stayVisible: true,
+        })
+        const input = `${file}:${line}:${column}`
+        await quickPick.type(input)
+        await quickPick.select(file)
+      } catch (error) {
+        throw new VError(error, `Failed go to file ${file}`)
+      }
+    },
   }
 }
