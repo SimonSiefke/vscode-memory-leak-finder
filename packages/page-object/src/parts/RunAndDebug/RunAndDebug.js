@@ -12,13 +12,13 @@ export const create = ({ expect, page, VError }) => {
         const quickPickWidget = page.locator('.quick-input-widget')
         const quickPickPromise = expect(quickPickWidget)
           .toBeVisible({
-            timeout: 5000,
+            timeout: 15000,
           })
           .then(() => 1)
         const debugToolBar = page.locator('.debug-toolbar')
         const debugToolBarPromise = expect(debugToolBar)
           .toBeVisible({
-            timeout: 5000,
+            timeout: 15000,
           })
           .then(() => 2)
         const value = await Promise.race([quickPickPromise, debugToolBarPromise])
