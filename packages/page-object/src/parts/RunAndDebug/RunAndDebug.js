@@ -27,7 +27,9 @@ export const create = ({ expect, page, VError }) => {
           await expect(quickPickWidget).toBeVisible()
           await nodeJsOption.click()
         }
-        await expect(debugToolBar).toBeVisible()
+        await expect(debugToolBar).toBeVisible({
+          timeout: 30_000,
+        })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to start run and debug`)
