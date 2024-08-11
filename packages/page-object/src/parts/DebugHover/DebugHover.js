@@ -26,9 +26,9 @@ export const create = ({ expect, page, VError }) => {
         await expect(hoverTree).toBeVisible()
         const nameRow = hoverTree.locator(`.monaco-list-row[aria-label^="${name},"]`)
         const nameElement = nameRow.locator('.name')
-        await expect(nameElement).toHaveAttribute('aria-expanded', 'true')
+        await expect(nameRow).toHaveAttribute('aria-expanded', 'true')
         await nameElement.click()
-        await expect(nameElement).toHaveAttribute('aria-expanded', 'false')
+        await expect(nameRow).toHaveAttribute('aria-expanded', 'false')
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to collapse debug hover property`)
