@@ -22,10 +22,10 @@ setInterval(()=>{
 
 export const run = async ({ DebugConsole }) => {
   await DebugConsole.evaluate({
-    expression: 'x',
+    expression: 'glob',
     expectedResult: {
-      type: 'number',
-      message: '1',
+      type: 'error',
+      message: /Uncaught ReferenceError ReferenceError: glob is not defined/,
     },
   })
   await DebugConsole.clear()
