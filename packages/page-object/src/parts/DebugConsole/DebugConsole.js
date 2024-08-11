@@ -27,5 +27,21 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to hide debug console`)
       }
     },
+    async evaluate(expression, expectedValue) {
+      try {
+        const replInputWrapper = page.locator('.repl-input-wrapper')
+        await expect(replInputWrapper).toBeVisible()
+        const replInput = replInputWrapper.locator('.inputarea')
+        await replInput.focus()
+        // const repl = page.locator('.repl')
+        // await expect(repl).toBeVisible()
+        // const panel = Panel.create({ expect, page, VError })
+        // await panel.hide()
+        // await expect(repl).toBeHidden()
+        // await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to evaluate expression in debug console`)
+      }
+    },
   }
 }
