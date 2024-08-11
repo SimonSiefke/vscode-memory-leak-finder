@@ -1,9 +1,8 @@
 import * as Assert from '../Assert/Assert.js'
 import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateInUtilityContext.js'
 
-export const blur = async (locator, text) => {
+export const blur = async (locator) => {
   Assert.object(locator)
-  Assert.string(text)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
       functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
@@ -15,9 +14,7 @@ export const blur = async (locator, text) => {
           value: 'blur',
         },
         {
-          value: {
-            text,
-          },
+          value: {},
         },
       ],
       awaitPromise: true,
