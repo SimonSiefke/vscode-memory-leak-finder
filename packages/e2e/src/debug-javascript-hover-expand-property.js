@@ -33,8 +33,8 @@ setInterval(()=>{
 }
 
 export const run = async ({ DebugHover }) => {
-  await DebugHover.expandProperty('abc')
-  await DebugHover.collapseProperty('abc')
+  await DebugHover.expandProperty('prototype', ['constructor', '[[Prototype]]'])
+  await DebugHover.collapseProperty('prototype')
 }
 
 export const teardown = async ({ RunAndDebug, Editor }) => {
