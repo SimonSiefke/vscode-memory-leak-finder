@@ -92,5 +92,15 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to verify debug console completion items`)
       }
     },
+    async clearInput() {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.SelectAll)
+        await quickPick.executeCommand(WellKnownCommands.DeleteAllLeft)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to clear debug console input`)
+      }
+    },
   }
 }

@@ -27,7 +27,7 @@ setInterval(()=>{
 export const run = async ({ DebugConsole }) => {
   await DebugConsole.type('glob')
   await DebugConsole.shouldHaveCompletions(['global', 'globalThis'])
-  // TODO clear input value
+  await DebugConsole.clearInput()
 }
 
 export const teardown = async ({ RunAndDebug, Editor }) => {
