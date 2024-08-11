@@ -97,5 +97,22 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to remove all breakpoints`)
       }
     },
+    async step(expectedFile, expectedPauseLine) {
+      try {
+        const quickPick = QuickPick.create({
+          page,
+          expect,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.DebugStepOver)
+        await page.waitForIdle()
+        await this.waitForPaused()
+        const stackFrame = page.locator('.debug-call-stack .monaco-list-row.selected')
+        await expect(stackFrame).toBeVisible()
+        await expect(stackFrame).toHaveAttribute('aria-label', `Stack Frame <anonymous>, line ${expectedPauseLine}, ${expectedFile}`)
+      } catch (error) {
+        throw new VError(error, `Failed to step over`)
+      }
+    },
   }
 }

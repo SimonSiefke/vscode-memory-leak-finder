@@ -35,6 +35,7 @@ export const ShowOrFocusStandaloneColorPicker = 'Show or Focus Standalone Color 
 export const ShowReleaseNotes = 'Code: Show Release Notes'
 export const ShowRunAndDebug = 'View: Show Run and Debug'
 export const RemoveAllBreakpoints = 'Remove All Breakpoints'
+export const DebugStepOver = 'Debug: Step Over'
 export const ShowRunningExtensions = 'Developer: Show Running Extensions'
 export const SourceAction = 'Source Action...'
 export const TerminalSplitTerminal = 'Terminal: Split Terminal'

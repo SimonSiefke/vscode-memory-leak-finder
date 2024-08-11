@@ -22,7 +22,7 @@ export const run = async ({ Editor, RunAndDebug }) => {
   await Editor.open('index.js')
   await Editor.setBreakpoint(4)
   await RunAndDebug.runAndWaitForPaused()
-  await RunAndDebug.step()
+  await RunAndDebug.step('index.js', 5)
   await RunAndDebug.stop()
   await RunAndDebug.removeAllBreakpoints()
   await Editor.closeAll()
