@@ -8,12 +8,14 @@ export const unwrapResult = (rawResult) => {
     return rawResult
   }
   if ('error' in rawResult) {
+    console.log(rawResult)
     if (rawResult.error.message && rawResult.error.data) {
       throw new DevtoolsProtocolError(`${rawResult.error.message}: ${rawResult.error.data}`)
     }
     throw new DevtoolsProtocolError(rawResult.error.message)
   }
   if ('exceptionDetails' in rawResult) {
+    console.log(rawResult)
     throw new DevtoolsProtocolError(rawResult.exceptionDetails.exception.description)
   }
   if (rawResult && rawResult.result && rawResult.result.value) {
