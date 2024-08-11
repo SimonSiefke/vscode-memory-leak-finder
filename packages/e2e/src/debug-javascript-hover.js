@@ -30,7 +30,9 @@ setInterval(()=>{
 }
 
 export const run = async ({ Editor }) => {
-  await Editor.showDebugHover()
+  await Editor.showDebugHover({
+    expectedTitle: /ƒ setInterval\(callback, repeat, arg1, arg2, arg3\)/,
+  })
   await Editor.hideDebugHover()
 }
 
