@@ -70,6 +70,9 @@ export const create = ({ expect, page, VError }) => {
       // TODO long timeout here
       await expect(continueButton).toBeVisible()
       await page.waitForIdle()
+      const editor = page.locator('[role="textbox"][aria-roledescription="editor"]')
+      await expect(editor).toBeFocused()
+      await page.waitForIdle()
     },
     async runAndWaitForPaused() {
       try {
