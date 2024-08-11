@@ -64,5 +64,82 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to stop`)
       }
     },
+    async waitForPaused() {
+      await page.waitForIdle()
+      const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
+      // TODO long timeout here
+      await expect(continueButton).toBeVisible()
+      await page.waitForIdle()
+    },
+    async runAndWaitForPaused() {
+      try {
+        const quickPick = QuickPick.create({
+          page,
+          expect,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.ShowRunAndDebug)
+        await this.startRunAndDebug()
+        await this.waitForPaused()
+      } catch (error) {
+        throw new VError(error, `Failed to run debugger`)
+      }
+    },
+    async removeAllBreakpoints() {
+      try {
+        const quickPick = QuickPick.create({
+          page,
+          expect,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.RemoveAllBreakpoints)
+      } catch (error) {
+        throw new VError(error, `Failed to remove all breakpoints`)
+      }
+    },
+    async step(expectedFile, expectedPauseLine) {
+      try {
+        const quickPick = QuickPick.create({
+          page,
+          expect,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.DebugStepOver)
+        await page.waitForIdle()
+        await this.waitForPaused()
+        const stackFrame = page.locator('.debug-call-stack .monaco-list-row.selected')
+        await expect(stackFrame).toBeVisible()
+        await expect(stackFrame).toHaveAttribute('aria-label', `Stack Frame <anonymous>, line ${expectedPauseLine}, ${expectedFile}`)
+      } catch (error) {
+        throw new VError(error, `Failed to step over`)
+      }
+    },
+    async setValue(variableName, variableValue, newVariableValue) {
+      try {
+        const debugVariables = page.locator('.debug-variables')
+        const scopeLocal = debugVariables.locator('[aria-label="Scope Local"]')
+        await expect(scopeLocal).toBeVisible()
+        const scopeModule = debugVariables.locator('[aria-label="Scope Module"]')
+        await expect(scopeModule).toBeVisible()
+        const isExpanded = await scopeModule.getAttribute('aria-expanded')
+        if (isExpanded === 'false') {
+          const scopeModuleText = scopeModule.locator('.monaco-highlighted-label')
+          await scopeModuleText.click()
+        }
+        await expect(scopeModule).toHaveAttribute('aria-expanded', 'true')
+        const variableRow = debugVariables.locator(`[aria-label="${variableName}, value ${variableValue}"]`)
+        await variableRow.dblclick()
+        const input = page.locator('input[aria-label="Type new variable value"]')
+        await expect(input).toBeVisible()
+        await expect(input).toHaveValue(variableValue)
+        await input.type(newVariableValue)
+        await input.blur()
+        await expect(input).toBeHidden()
+        const newVariableRow = debugVariables.locator(`[aria-label="${variableName}, value ${newVariableValue}"]`)
+        await expect(newVariableRow).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to set variable value for ${variableName}`)
+      }
+    },
   }
 }
