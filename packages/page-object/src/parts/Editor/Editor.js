@@ -578,7 +578,17 @@ export const create = ({ page, expect, VError }) => {
         await quickPick.type(input)
         await quickPick.select(file)
       } catch (error) {
-        throw new VError(error, `Failed go to file ${file}`)
+        throw new VError(error, `Failed to go to file ${file}`)
+      }
+    },
+    async showDebugHover({ expectedContents }) {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.DebugShowHover)
+        const debugHover = page.locator('.abc')
+        await expect(debugHover).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to open debug hover`)
       }
     },
   }
