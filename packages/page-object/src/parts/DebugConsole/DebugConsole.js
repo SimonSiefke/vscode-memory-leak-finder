@@ -35,12 +35,9 @@ export const create = ({ expect, page, VError }) => {
         await replInput.focus()
         await replInput.type(expression)
         await page.keyboard.press('Enter')
-        // const repl = page.locator('.repl')
-        // await expect(repl).toBeVisible()
-        // const panel = Panel.create({ expect, page, VError })
-        // await panel.hide()
-        // await expect(repl).toBeHidden()
-        // await page.waitForIdle()
+        const firstResult = page.locator('[aria-label="Debug Console"] [role="treeitem"] .evaluation-result')
+        await expect(firstResult).toBeVisible()
+        await expect(firstResult).toHaveText(expectedValue)
       } catch (error) {
         throw new VError(error, `Failed to evaluate expression in debug console`)
       }
