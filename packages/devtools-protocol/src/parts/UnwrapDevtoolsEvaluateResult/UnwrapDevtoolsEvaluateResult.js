@@ -1,4 +1,12 @@
 import { DevtoolsProtocolError } from '../DevtoolsProtocolError/DevtoolsProtocolError.js'
+import * as ErrorCodes from '../ErrorCodes/ErrorCodes.js'
+
+const getErrorCode = (rawResult) => {
+  if (rawResult && rawResult.error && rawResult.error.code && rawResult.error.code === -32000) {
+    return ErrorCodes.E_DEVTOOLS_INTERNAL_ERROR
+  }
+  return ''
+}
 
 export const unwrapResult = (rawResult) => {
   if ('result' in rawResult) {
@@ -8,14 +16,13 @@ export const unwrapResult = (rawResult) => {
     return rawResult
   }
   if ('error' in rawResult) {
-    console.log(rawResult)
+    const errorCode = getErrorCode(rawResult)
     if (rawResult.error.message && rawResult.error.data) {
-      throw new DevtoolsProtocolError(`${rawResult.error.message}: ${rawResult.error.data}`)
+      throw new DevtoolsProtocolError(`${rawResult.error.message}: ${rawResult.error.data}`, errorCode)
     }
-    throw new DevtoolsProtocolError(rawResult.error.message)
+    throw new DevtoolsProtocolError(rawResult.error.message, errorCode)
   }
   if ('exceptionDetails' in rawResult) {
-    console.log(rawResult)
     throw new DevtoolsProtocolError(rawResult.exceptionDetails.exception.description)
   }
   if (rawResult && rawResult.result && rawResult.result.value) {
