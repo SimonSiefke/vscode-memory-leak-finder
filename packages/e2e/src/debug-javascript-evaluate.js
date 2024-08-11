@@ -22,6 +22,7 @@ setInterval(()=>{
 
 export const run = async ({ DebugConsole }) => {
   await DebugConsole.evaluate('x', '1')
+  await DebugConsole.clear()
 }
 
 export const teardown = async ({ RunAndDebug, Editor }) => {
