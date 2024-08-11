@@ -85,7 +85,7 @@ export const create = ({ expect, page, VError }) => {
       await expect(editor).toBeFocused()
       await page.waitForIdle()
     },
-    async runAndWaitForPaused() {
+    async runAndWaitForPaused({ file, line }) {
       try {
         const quickPick = QuickPick.create({
           page,
@@ -94,7 +94,7 @@ export const create = ({ expect, page, VError }) => {
         })
         await quickPick.executeCommand(WellKnownCommands.ShowRunAndDebug)
         await this.startRunAndDebug()
-        await this.waitForPaused()
+        await this.waitForPaused({ file, line })
       } catch (error) {
         throw new VError(error, `Failed to run debugger`)
       }
