@@ -21,7 +21,13 @@ setInterval(()=>{
 }
 
 export const run = async ({ DebugConsole }) => {
-  await DebugConsole.evaluate('x', '1')
+  await DebugConsole.evaluate({
+    expression: 'x',
+    expectedResult: {
+      type: 'number',
+      message: '1',
+    },
+  })
   await DebugConsole.clear()
 }
 
