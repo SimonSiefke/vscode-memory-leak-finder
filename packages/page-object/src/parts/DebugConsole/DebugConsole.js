@@ -27,5 +27,30 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to hide debug console`)
       }
     },
+    async evaluate(expression, expectedValue) {
+      try {
+        const replInputWrapper = page.locator('.repl-input-wrapper')
+        await expect(replInputWrapper).toBeVisible()
+        const replInput = replInputWrapper.locator('.inputarea')
+        await replInput.focus()
+        await replInput.type(expression)
+        await page.keyboard.press('Enter')
+        const firstResult = page.locator('[aria-label="Debug Console"] [role="treeitem"] .evaluation-result')
+        await expect(firstResult).toBeVisible()
+        await expect(firstResult).toHaveText(expectedValue)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to evaluate expression in debug console`)
+      }
+    },
+    async clear() {
+      try {
+        const clearConsoleButton = page.locator('[aria-label="Clear Console"]')
+        await clearConsoleButton.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to clear debug console`)
+      }
+    },
   }
 }
