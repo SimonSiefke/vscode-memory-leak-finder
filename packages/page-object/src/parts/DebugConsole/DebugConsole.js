@@ -38,6 +38,7 @@ export const create = ({ expect, page, VError }) => {
         const firstResult = page.locator('[aria-label="Debug Console"] [role="treeitem"] .evaluation-result')
         await expect(firstResult).toBeVisible()
         await expect(firstResult).toHaveText(expectedValue)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to evaluate expression in debug console`)
       }
@@ -46,6 +47,7 @@ export const create = ({ expect, page, VError }) => {
       try {
         const clearConsoleButton = page.locator('[aria-label="Clear Console"]')
         await clearConsoleButton.click()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to clear debug console`)
       }
