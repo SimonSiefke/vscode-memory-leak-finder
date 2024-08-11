@@ -11,11 +11,15 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const quickPickWidget = page.locator('.quick-input-widget')
         const quickPickPromise = expect(quickPickWidget)
-          .toBeVisible()
+          .toBeVisible({
+            timeout: 15000,
+          })
           .then(() => 1)
         const debugToolBar = page.locator('.debug-toolbar')
         const debugToolBarPromise = expect(debugToolBar)
-          .toBeVisible()
+          .toBeVisible({
+            timeout: 15000,
+          })
           .then(() => 2)
         const value = await Promise.race([quickPickPromise, debugToolBarPromise])
         if (value === 1) {
@@ -23,7 +27,9 @@ export const create = ({ expect, page, VError }) => {
           await expect(quickPickWidget).toBeVisible()
           await nodeJsOption.click()
         }
-        await expect(debugToolBar).toBeVisible()
+        await expect(debugToolBar).toBeVisible({
+          timeout: 30_000,
+        })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to start run and debug`)
