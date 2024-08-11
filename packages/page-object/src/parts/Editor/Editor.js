@@ -568,5 +568,42 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed set breakpoint`)
       }
     },
+    async goToFile({ file, line, column }) {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.GoToFile, {
+          stayVisible: true,
+        })
+        const input = `${file}:${line}:${column}`
+        await quickPick.type(input)
+        await quickPick.select(file)
+      } catch (error) {
+        throw new VError(error, `Failed to go to file ${file}`)
+      }
+    },
+    async showDebugHover({ expectedTitle }) {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.DebugShowHover)
+        const debugHover = page.locator('.debug-hover-widget')
+        await expect(debugHover).toBeVisible()
+        const debugHoverTitle = debugHover.locator('.title')
+        await expect(debugHoverTitle).toHaveText(expectedTitle)
+      } catch (error) {
+        throw new VError(error, `Failed to open debug hover`)
+      }
+    },
+    async hideDebugHover() {
+      try {
+        const debugHover = page.locator('.debug-hover-widget')
+        await expect(debugHover).toBeVisible()
+        await page.waitForIdle()
+        await page.keyboard.press('Escape')
+        await expect(debugHover).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to hide debug hover`)
+      }
+    },
   }
 }
