@@ -26,6 +26,7 @@ export const checkSingleElementCondition = async (fnName, locator, options = {})
         },
         locator.sessionId,
       )
+      return
     } catch (error) {
       if (IsDevtoolsInternalError.isDevtoolsInternalError(error)) {
         console.info(`[single element condition devtools internal error] ${error}`)
