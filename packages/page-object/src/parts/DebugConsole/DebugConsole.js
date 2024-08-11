@@ -33,6 +33,8 @@ export const create = ({ expect, page, VError }) => {
         await expect(replInputWrapper).toBeVisible()
         const replInput = replInputWrapper.locator('.inputarea')
         await replInput.focus()
+        await replInput.type(expression)
+        await page.keyboard.press('Enter')
         // const repl = page.locator('.repl')
         // await expect(repl).toBeVisible()
         // const panel = Panel.create({ expect, page, VError })
@@ -41,6 +43,14 @@ export const create = ({ expect, page, VError }) => {
         // await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to evaluate expression in debug console`)
+      }
+    },
+    async clear() {
+      try {
+        const clearConsoleButton = page.locator('[aria-label="Clear Console"]')
+        await clearConsoleButton.click()
+      } catch (error) {
+        throw new VError(error, `Failed to clear debug console`)
       }
     },
   }
