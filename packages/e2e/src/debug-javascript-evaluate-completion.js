@@ -20,18 +20,14 @@ setInterval(()=>{
   await RunAndDebug.runAndWaitForPaused({
     file: 'index.js',
     line: 4,
+    callStackSize: 11,
   })
 }
 
 export const run = async ({ DebugConsole }) => {
-  await DebugConsole.evaluate({
-    expression: 'glob',
-    expectedResult: {
-      type: 'error',
-      message: /Uncaught ReferenceError ReferenceError: glob is not defined/,
-    },
-  })
-  await DebugConsole.clear()
+  await DebugConsole.type('glob')
+  await DebugConsole.shouldHaveCompletions(['global', 'globalThis'])
+  await DebugConsole.clearInput()
 }
 
 export const teardown = async ({ RunAndDebug, Editor }) => {
