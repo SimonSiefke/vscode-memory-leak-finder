@@ -43,6 +43,18 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to evaluate expression in debug console`)
       }
     },
+    async type(value) {
+      try {
+        const replInputWrapper = page.locator('.repl-input-wrapper')
+        await expect(replInputWrapper).toBeVisible()
+        const replInput = replInputWrapper.locator('.inputarea')
+        await replInput.focus()
+        await replInput.type(value)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to type into debug console`)
+      }
+    },
     async clear() {
       try {
         const clearConsoleButton = page.locator('[aria-label="Clear Console"]')
@@ -50,6 +62,21 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to clear debug console`)
+      }
+    },
+    async shouldHaveCompletions(items) {
+      try {
+        const completions = page.locator('.repl-input-wrapper .suggest-widget')
+        await expect(completions).toBeVisible()
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i]
+          const completionItem = completions.locator(`[role="option"][aria-postinset="${i + 1}"]`)
+          await expect(completionItem).toBeVisible()
+          await expect(completionItem).toHaveAttribute('aria-label', item)
+        }
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify debug console completion items`)
       }
     },
   }

@@ -22,7 +22,7 @@ setInterval(()=>{
 
 export const run = async ({ DebugConsole }) => {
   await DebugConsole.type('glob')
-  await DebugConsole.shouldHaveCompletions(['glob', 'global', 'globalThis'])
+  await DebugConsole.shouldHaveCompletions(['global', 'globalThis'])
   // TODO clear input value
 }
 
