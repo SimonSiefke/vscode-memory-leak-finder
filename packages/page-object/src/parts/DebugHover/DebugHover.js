@@ -14,7 +14,7 @@ export const create = ({ expect, page, VError }) => {
           const nextIndex = index + i + 1
           const row = hoverTree.locator(`.monaco-list-row[data-index="${nextIndex}"]`)
           const nextRowName = row.locator('.name')
-          await expect(nextRowName).toHaveText(childProperties[i])
+          await expect(nextRowName).toHaveText(`${childProperties[i]} =`)
         }
       } catch (error) {
         throw new VError(error, `Failed to expand debug hover property`)
