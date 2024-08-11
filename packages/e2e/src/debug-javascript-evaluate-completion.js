@@ -25,6 +25,9 @@ setInterval(()=>{
 
 export const run = async ({ DebugConsole }) => {
   await DebugConsole.type('glob')
+  await new Promise((r) => {
+    setTimeout(r, 4000)
+  })
   await DebugConsole.shouldHaveCompletions(['global', 'globalThis'])
   // TODO clear input value
 }
