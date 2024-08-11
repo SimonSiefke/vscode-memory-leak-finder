@@ -64,7 +64,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to stop`)
       }
     },
-    async waitForPaused() {
+    async waitForPaused({ file, line }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
       // TODO long timeout here
@@ -77,6 +77,9 @@ export const create = ({ expect, page, VError }) => {
       const sessionLabel = debugCallStack.locator('.state.label')
       await expect(sessionLabel).toBeVisible()
       await expect(sessionLabel).toHaveText('Paused on breakpoint')
+      const stackFrame = page.locator('.debug-call-stack .monaco-list-row.selected')
+      await expect(stackFrame).toBeVisible()
+      await expect(stackFrame).toHaveAttribute('aria-label', `Stack Frame <anonymous>, line ${line}, ${file}`)
       await page.waitForIdle()
       const editor = page.locator('[role="textbox"][aria-roledescription="editor"]')
       await expect(editor).toBeFocused()
@@ -117,10 +120,10 @@ export const create = ({ expect, page, VError }) => {
         })
         await quickPick.executeCommand(WellKnownCommands.DebugStepOver)
         await page.waitForIdle()
-        await this.waitForPaused()
-        const stackFrame = page.locator('.debug-call-stack .monaco-list-row.selected')
-        await expect(stackFrame).toBeVisible()
-        await expect(stackFrame).toHaveAttribute('aria-label', `Stack Frame <anonymous>, line ${expectedPauseLine}, ${expectedFile}`)
+        await this.waitForPaused({
+          file: expectedFile,
+          line: expectedPauseLine,
+        })
       } catch (error) {
         throw new VError(error, `Failed to step over`)
       }
