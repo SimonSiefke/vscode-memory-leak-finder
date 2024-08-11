@@ -81,7 +81,13 @@ export const create = ({ expect, page, VError }) => {
       await expect(stackFrame).toBeVisible()
       await expect(stackFrame).toHaveAttribute('aria-label', `Stack Frame <anonymous>, line ${line}, ${file}`)
       await page.waitForIdle()
-      const editor = page.locator('[role="textbox"][aria-roledescription="editor"]')
+      const cursor = page.locator('.part.editor .monaco-editor .cursor')
+      await expect(cursor).toBeVisible()
+      if (line === 4) {
+        // TODO compute this dynamically
+        await expect(cursor).toHaveCss('top', '57px')
+      }
+      const editor = page.locator('.part.editor [role="textbox"][aria-roledescription="editor"]')
       await expect(editor).toBeFocused()
       await page.waitForIdle()
     },
