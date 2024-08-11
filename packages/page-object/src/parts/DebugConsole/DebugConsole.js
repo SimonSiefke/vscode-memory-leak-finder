@@ -27,7 +27,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to hide debug console`)
       }
     },
-    async evaluate(expression, expectedValue) {
+    async evaluate({ expression, expectedResult }) {
       try {
         const replInputWrapper = page.locator('.repl-input-wrapper')
         await expect(replInputWrapper).toBeVisible()
@@ -37,7 +37,7 @@ export const create = ({ expect, page, VError }) => {
         await page.keyboard.press('Enter')
         const firstResult = page.locator('[aria-label="Debug Console"] [role="treeitem"] .evaluation-result')
         await expect(firstResult).toBeVisible()
-        await expect(firstResult).toHaveText(expectedValue)
+        await expect(firstResult).toHaveText(expectedResult.message)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to evaluate expression in debug console`)
