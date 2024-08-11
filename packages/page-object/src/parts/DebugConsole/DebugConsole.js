@@ -83,7 +83,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(completions).toBeVisible()
         for (let i = 0; i < items.length; i++) {
           const item = items[i]
-          const completionItem = completions.locator(`[role="option"][aria-postinset="${i + 1}"]`)
+          const completionItem = completions.locator(`[role="option"][aria-posinset="${i + 1}"]`)
           await expect(completionItem).toBeVisible()
           await expect(completionItem).toHaveAttribute('aria-label', item)
         }
