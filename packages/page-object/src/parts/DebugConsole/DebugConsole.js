@@ -72,6 +72,12 @@ export const create = ({ expect, page, VError }) => {
     async shouldHaveCompletions(items) {
       try {
         const completions = page.locator('.repl-input-wrapper .suggest-widget')
+        const count = await completions.count()
+        if (count === 0) {
+          const quickPick = QuickPick.create({ page, expect, VError })
+          await quickPick.executeCommand(WellKnownCommands.TriggerSuggest)
+          await page.waitForIdle()
+        }
         await expect(completions).toBeVisible()
         for (let i = 0; i < items.length; i++) {
           const item = items[i]
