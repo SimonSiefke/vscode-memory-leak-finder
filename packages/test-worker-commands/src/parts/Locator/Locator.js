@@ -11,6 +11,7 @@ import * as LocatorSelectText from '../LocatorSelectText/LocatorSelectText.js'
 import * as LocatorSetValue from '../LocatorSetValue/LocatorSetValue.js'
 import * as LocatorTextContent from '../LocatorTextContent/LocatorTextContent.js'
 import * as LocatorScrollDown from '../LocatorScrollDown/LocatorScrollDown.js'
+import * as LocatorBlur from '../LocatorBlur/LocatorBlur.js'
 import * as LocatorScrollUp from '../LocatorScrollUp/LocatorScrollUp.js'
 import * as LocatorType from '../LocatorType/LocatorType.js'
 import * as LocatorFill from '../LocatorFill/LocatorFill.js'
@@ -129,6 +130,11 @@ export const create = (rpc, sessionId, selector, { hasText = '', hasExactText = 
     },
     focus() {
       return LocatorFocus.focus({
+        selector: this.selector,
+      })
+    },
+    blur() {
+      return LocatorBlur.blur({
         selector: this.selector,
       })
     },
