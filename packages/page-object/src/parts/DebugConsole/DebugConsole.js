@@ -47,6 +47,14 @@ export const create = ({ expect, page, VError }) => {
       try {
         const replInputWrapper = page.locator('.repl-input-wrapper')
         await expect(replInputWrapper).toBeVisible()
+        const viewLine = replInputWrapper.locator('.view-line')
+        await expect(viewLine).toBeVisible()
+        await viewLine.click()
+        const cursor = replInputWrapper.locator('.cursor')
+        await expect(cursor).toBeVisible()
+        await new Promise((r) => {
+          setTimeout(r, 150000)
+        })
         const replInput = replInputWrapper.locator('.inputarea')
         await replInput.focus()
         await replInput.type(value)
