@@ -131,7 +131,7 @@ export const create = ({ expect, page, VError }) => {
         await variableRow.dblclick()
         const input = page.locator('input[aria-label="Type new variable value"]')
         await expect(input).toBeVisible()
-        await expect(input).toHaveValue('1')
+        await expect(input).toHaveValue(variableValue)
         await input.type(newVariableValue)
         await input.blur()
         await expect(input).toBeHidden()
