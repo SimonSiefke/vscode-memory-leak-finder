@@ -64,7 +64,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to stop`)
       }
     },
-    async waitForPaused({ file, line }) {
+    async waitForPaused({ file, line, callStackSize }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
       // TODO long timeout here
@@ -80,6 +80,9 @@ export const create = ({ expect, page, VError }) => {
       const stackFrame = page.locator('.debug-call-stack .monaco-list-row.selected')
       await expect(stackFrame).toBeVisible()
       await expect(stackFrame).toHaveAttribute('aria-label', `Stack Frame <anonymous>, line ${line}, ${file}`)
+      if (callStackSize) {
+        await expect(stackFrame).toHaveAttribute(`aria-setsize`, `${callStackSize}`)
+      }
       await page.waitForIdle()
       const cursor = page.locator('.part.editor .monaco-editor .cursor')
       await expect(cursor).toBeVisible()
@@ -91,7 +94,7 @@ export const create = ({ expect, page, VError }) => {
       await expect(editor).toBeFocused()
       await page.waitForIdle()
     },
-    async runAndWaitForPaused({ file, line }) {
+    async runAndWaitForPaused({ file, line, callStackSize }) {
       try {
         const quickPick = QuickPick.create({
           page,
@@ -100,7 +103,7 @@ export const create = ({ expect, page, VError }) => {
         })
         await quickPick.executeCommand(WellKnownCommands.ShowRunAndDebug)
         await this.startRunAndDebug()
-        await this.waitForPaused({ file, line })
+        await this.waitForPaused({ file, line, callStackSize })
       } catch (error) {
         throw new VError(error, `Failed to run debugger`)
       }
@@ -117,7 +120,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to remove all breakpoints`)
       }
     },
-    async step(expectedFile, expectedPauseLine) {
+    async step(expectedFile, expectedPauseLine, expectedCallStackSize) {
       try {
         const quickPick = QuickPick.create({
           page,
@@ -129,6 +132,7 @@ export const create = ({ expect, page, VError }) => {
         await this.waitForPaused({
           file: expectedFile,
           line: expectedPauseLine,
+          callStackSize: expectedCallStackSize,
         })
       } catch (error) {
         throw new VError(error, `Failed to step over`)

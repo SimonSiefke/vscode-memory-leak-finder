@@ -20,6 +20,7 @@ setInterval(()=>{
   await RunAndDebug.runAndWaitForPaused({
     file: 'index.js',
     line: 4,
+    callStackSize: 11,
   })
 }
 
