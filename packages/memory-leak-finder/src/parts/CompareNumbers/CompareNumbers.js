@@ -10,7 +10,12 @@ export const compareNumbers = (before, after) => {
     afterMap[element]++
   }
   const result = []
+  const seen = []
   for (const element of after) {
+    if (seen.includes(element)) {
+      continue
+    }
+    seen.push(element)
     const beforeCount = beforeMap[element] || 0
     const afterCount = afterMap[element] || 0
     const delta = afterCount - beforeCount
