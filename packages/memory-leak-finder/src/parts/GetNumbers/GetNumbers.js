@@ -39,7 +39,7 @@ export const getNumbers = async (session, objectGroup) => {
     }
   }
 
-  const maxArrayLength = 10_000_000
+  const maxArrayLength = 100_000_000
 
   for(const object of objects){
     const values = getValues(object)
