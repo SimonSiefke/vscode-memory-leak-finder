@@ -10,7 +10,9 @@ import * as Root from '../Root/Root.js'
  */
 export const getNumbers = async (session, objectGroup) => {
   const outFile = join(Root.root, '.vscode-heapsnapshots', `1.json`)
-  await HeapSnapshot.takeHeapSnapshot(session, outFile)
+  await HeapSnapshot.takeHeapSnapshot(session, outFile, {
+    captureNumericValue: true,
+  })
   const content = await readFile(outFile, 'utf8')
   const value = JSON.parse(content)
   const numbers = await HeapSnapshotFunctions.parseHeapSnapshotNumbers(value)

@@ -5,11 +5,11 @@ import { pipeline } from 'node:stream/promises'
 import * as Assert from '../Assert/Assert.js'
 import * as HeapSnapshotStream from '../HeapSnapshotStream/HeapSnapshotStream.js'
 
-export const takeHeapSnapshot = async (session, outFile) => {
+export const takeHeapSnapshot = async (session, outFile, options = {}) => {
   Assert.object(session)
   Assert.string(outFile)
   await mkdir(dirname(outFile), { recursive: true })
-  const stream = HeapSnapshotStream.create(session)
+  const stream = HeapSnapshotStream.create(session, options)
   const writeStream = createWriteStream(outFile)
   const pipelinePromise = pipeline(stream, writeStream)
   await stream.start()
