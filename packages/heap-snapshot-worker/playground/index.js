@@ -7,11 +7,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const root = join(__dirname, '..', '..', '..')
 
-// const fn = commandMap['HeapSnapshot.parseNumbers']
-const fn = commandMap['HeapSnapshot.parseNamedClosureCount']
+const fn = commandMap['HeapSnapshot.parseNamedEmitterCount']
 
 // const c = await readFile(join(root, '.vscode-heapsnapshots', 'lvce-web.json'), 'utf8')
-const v = JSON.parse(await readFile(join(root, '.vscode-heapsnapshots', '1.json'), 'utf8'))
+const v = JSON.parse(await readFile(join(root, '.vscode-heapsnapshots', 'emitter-count.json'), 'utf8'))
 
 console.time('parse')
 const r = await fn(v)
