@@ -1,3 +1,5 @@
+import * as SortCountMap from '../SortCountMap/SortCountMap.js'
+
 export const compareNumbers = (before, after) => {
   const beforeMap = Object.create(null)
   for (const element of before) {
@@ -25,5 +27,6 @@ export const compareNumbers = (before, after) => {
       delta,
     })
   }
-  return result
+  const sortedResult = SortCountMap.sortCountMap(result)
+  return sortedResult
 }

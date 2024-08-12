@@ -39,10 +39,12 @@ export const getNumbers = async (session, objectGroup) => {
     }
   }
 
+  const maxArrayLength = 100_000_000
+
   for(const object of objects){
     const values = getValues(object)
     for(const value of values){
-      if(typeof value === 'number'){
+      if(typeof value === 'number' && numbers.length < maxArrayLength){
         numbers.push(value)
       }
     }
