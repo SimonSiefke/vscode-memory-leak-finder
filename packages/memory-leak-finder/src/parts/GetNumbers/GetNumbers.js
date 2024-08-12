@@ -42,7 +42,7 @@ export const getNumbers = async (session, objectGroup) => {
   for(const object of objects){
     const values = getValues(object)
     for(const value of values){
-      if(typeof value === 'number'){
+      if(typeof value === 'number' && numbers.length < 1_000_000){
         numbers.push(value)
       }
     }
