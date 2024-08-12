@@ -5,6 +5,7 @@ export * as EventListenerCount from '../CreateEventListenerCountChart/CreateEven
 export * as FunctionCount from '../CreateFunctionCountChart/CreateFunctionCountChart.js'
 export * as MapSize from '../CreateMapSizeChart/CreateMapSizeChart.js'
 export * as MutationObserverCount from '../CreateMutationObserverCountChart/CreateMutationObserverCountChart.js'
+export * as NumberCount from '../CreateNumberCountChart/CreateNumberCountChart.js'
 export * as ObjectCount from '../CreateObjectCountChart/CreateObjectCountChart.js'
 export * as PromiseCount from '../CreatePromiseCountChart/CreatePromiseCountChart.js'
 export * as RegexCount from '../CreateRegexCountChart/CreateRegexCountChart.js'
