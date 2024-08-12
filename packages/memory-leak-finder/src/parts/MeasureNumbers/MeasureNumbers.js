@@ -1,3 +1,4 @@
+import * as CompareNumbers from '../CompareNumbers/CompareNumbers.js'
 import * as GetNumbers from '../GetNumbers/GetNumbers.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
@@ -17,12 +18,7 @@ export const stop = (session, objectGroup) => {
   return GetNumbers.getNumbers(session, objectGroup)
 }
 
-export const compare = (before, after) => {
-  return {
-    before,
-    after,
-  }
-}
+export const compare = CompareNumbers.compareNumbers
 
 export const isLeak = () => {
   return true
