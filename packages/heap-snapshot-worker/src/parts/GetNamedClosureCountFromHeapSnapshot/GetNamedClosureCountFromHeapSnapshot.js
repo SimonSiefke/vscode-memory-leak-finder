@@ -32,9 +32,6 @@ export const getNamedClosureCountFromHeapSnapshot = async (heapsnapshot) => {
     }
     const contextNode = parsedNodes[contextEdge.index]
     const contextNodeEdges = graph[contextNode.id].filter(IsImportantEdge.isImportantEdge)
-    if (node.id === 322689) {
-      console.log({ contextNode, contextNodeEdges })
-    }
     const contextNodeCount = contextNodeEdges.length
     const name = getName(node, contextNodeEdges)
     return {
