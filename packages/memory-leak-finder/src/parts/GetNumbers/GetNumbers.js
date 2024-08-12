@@ -17,7 +17,7 @@ const sortNumbers = (numbers) => {
  */
 export const getNumbers = async (session, objectGroup) => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
-    expression: PrototypeExpression.Array,
+    expression: PrototypeExpression.Object,
     returnByValue: false,
     objectGroup,
   })
@@ -30,10 +30,20 @@ export const getNumbers = async (session, objectGroup) => {
   const objects = this
 
   const numbers = []
+
+  const getValues = object => {
+    try {
+      return Object.values(object)
+    } catch {
+      return []
+    }
+  }
+
   for(const object of objects){
-    for(const item of object){
-      if(typeof item === 'number'){
-        numbers.push(item)
+    const values = getValues(object)
+    for(const value of values){
+      if(typeof value === 'number'){
+        numbers.push(value)
       }
     }
   }
