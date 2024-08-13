@@ -1,5 +1,5 @@
 import * as CompareCount from '../CompareCount/CompareCount.js'
-import * as GetNumberCount from '../GetNumberCount/GetNumberCount.js'
+import * as GetBooleanCount from '../GetBooleanCount/GetBooleanCount.js'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
@@ -12,11 +12,11 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  return GetNumberCount.getNumberCount(session, objectGroup)
+  return GetBooleanCount.getBooleanCount(session, objectGroup)
 }
 
 export const stop = (session, objectGroup) => {
-  return GetNumberCount.getNumberCount(session, objectGroup)
+  return GetBooleanCount.getBooleanCount(session, objectGroup)
 }
 
 export const compare = CompareCount.compareCount
