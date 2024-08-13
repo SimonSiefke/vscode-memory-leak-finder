@@ -114,6 +114,11 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure weak-map-count
+      - name: Run headless test (check leaks, number count)
+        if: matrix.os == 'ubuntu-24.04'
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure number-count
       - name: Run headless test (check leaks, weak set count)
         if: matrix.os == 'ubuntu-24.04'
         uses: coactions/setup-xvfb@v1
