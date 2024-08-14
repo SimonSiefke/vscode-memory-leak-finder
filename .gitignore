@@ -10,11 +10,11 @@ ffmpeg-linux
 .vscode-logs-history
 .vscode-user-data-dir
 .vscode-test-workspace
+.vscode-extensions
 .vscode-test-files
 .vscode-previous-filters
 .vscode-runtime-dir
 .vscode-source-maps
-.vscode-extensions
 .vscode-resolve-source-map-cache
 .vscode-charts
 
