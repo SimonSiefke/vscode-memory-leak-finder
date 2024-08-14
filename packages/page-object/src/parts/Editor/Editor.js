@@ -605,5 +605,17 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to hide debug hover`)
       }
     },
+    async autoFix() {
+      try {
+        const quickPick = QuickPick.create({
+          page,
+          expect,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.AutoFix)
+      } catch (error) {
+        throw new VError(error, `Failed to execute auto fix`)
+      }
+    },
   }
 }
