@@ -1,11 +1,18 @@
 export const setup = async ({ Workspace, Explorer, Editor }) => {
   await Workspace.setFiles([
     {
-      name: 'file.txt',
-      content: '',
-    },
-    {
-      name: '.vscode',
+      name: 'test-file-1.md',
+      content: `# Easy Math
+
+2 + 2 = 4 // this test will pass
+2 + 2 = 5 // this test will fail
+
+# Harder Math
+
+230230 + 5819123 = 6049353
+
+3 - 1 = 2
+`,
     },
   ])
   await Editor.closeAll()
