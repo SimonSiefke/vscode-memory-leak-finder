@@ -2,8 +2,11 @@ import { execa } from 'execa'
 import { cp, mkdir, readdir, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import * as Root from '../Root/Root.js'
+import * as QuickPick from '../QuickPick/QuickPick.js'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
+import * as Electron from '../Electron/Electron.js'
 
-export const create = ({ page }) => {
+export const create = ({ electronApp, page, expect, VError }) => {
   return {
     async setFiles(files) {
       const workspace = join(Root.root, '.vscode-test-workspace')
@@ -20,15 +23,26 @@ export const create = ({ page }) => {
       await page.waitForIdle()
     },
     async addExtension(name) {
+      const electron = Electron.create({ electronApp, VError })
       const extensionsFolder = join(Root.root, '.vscode-extensions-source', name)
-      const destination = join(Root.root, '.vscode-test-workspace', '.vscode', 'extensions', name)
-      await mkdir(dirname(destination), {
-        recursive: true,
+      await electron.mockOpenDialog({
+        response: {
+          canceled: false,
+          filePaths: [extensionsFolder],
+          bookmarks: [],
+        },
       })
-      await cp(extensionsFolder, destination, {
-        recursive: true,
-      })
-      await page.waitForIdle()
+      const quickPick = QuickPick.create({ page, expect, VError })
+      await quickPick.executeCommand(WellKnownCommands.InstallExtensionFromLocation)
+      // const destination = join(Root.root, '.vscode-test-workspace', '.vscode', 'extensions', name)
+      // await mkdir(dirname(destination), {
+      //   recursive: true,
+      // })
+      // await cp(extensionsFolder, destination, {
+      //   recursive: true,
+      // })
+      // await page.waitForIdle()
+      // TODO mock dialog
     },
     async initializeGitRepository() {
       const workspace = join(Root.root, '.vscode-test-workspace')
