@@ -27,5 +27,80 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to hide debug console`)
       }
     },
+    async evaluate({ expression, expectedResult }) {
+      try {
+        const replInputWrapper = page.locator('.repl-input-wrapper')
+        await expect(replInputWrapper).toBeVisible()
+        const replInput = replInputWrapper.locator('.inputarea')
+        await replInput.focus()
+        await replInput.type(expression)
+        await page.keyboard.press('Enter')
+        const firstResult = page.locator('[aria-label="Debug Console"] [role="treeitem"] .evaluation-result')
+        await expect(firstResult).toBeVisible()
+        await expect(firstResult).toHaveText(expectedResult.message)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to evaluate expression in debug console`)
+      }
+    },
+    async type(value) {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.DebugConsoleFocusOnDebugConsoleView)
+        const replInputWrapper = page.locator('.repl-input-wrapper')
+        await expect(replInputWrapper).toBeVisible()
+        const viewLine = replInputWrapper.locator('.view-line')
+        await expect(viewLine).toBeVisible()
+        await viewLine.click()
+        const cursor = replInputWrapper.locator('.cursor')
+        await expect(cursor).toBeVisible()
+        const replInput = replInputWrapper.locator('.inputarea')
+        await replInput.focus()
+        await replInput.type(value)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to type into debug console`)
+      }
+    },
+    async clear() {
+      try {
+        const clearConsoleButton = page.locator('[aria-label="Clear Console"]')
+        await clearConsoleButton.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to clear debug console`)
+      }
+    },
+    async shouldHaveCompletions(items) {
+      try {
+        const completions = page.locator('.repl-input-wrapper .suggest-widget')
+        const count = await completions.count()
+        if (count === 0) {
+          const quickPick = QuickPick.create({ page, expect, VError })
+          await quickPick.executeCommand(WellKnownCommands.TriggerSuggest)
+          await page.waitForIdle()
+        }
+        await expect(completions).toBeVisible()
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i]
+          const completionItem = completions.locator(`[role="option"][aria-posinset="${i + 1}"]`)
+          await expect(completionItem).toBeVisible()
+          await expect(completionItem).toHaveAttribute('aria-label', item)
+        }
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify debug console completion items`)
+      }
+    },
+    async clearInput() {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.SelectAll)
+        await quickPick.executeCommand(WellKnownCommands.DeleteAllLeft)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to clear debug console input`)
+      }
+    },
   }
 }

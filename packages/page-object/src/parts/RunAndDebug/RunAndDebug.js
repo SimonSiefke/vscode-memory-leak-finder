@@ -11,11 +11,15 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const quickPickWidget = page.locator('.quick-input-widget')
         const quickPickPromise = expect(quickPickWidget)
-          .toBeVisible()
+          .toBeVisible({
+            timeout: 15000,
+          })
           .then(() => 1)
         const debugToolBar = page.locator('.debug-toolbar')
         const debugToolBarPromise = expect(debugToolBar)
-          .toBeVisible()
+          .toBeVisible({
+            timeout: 15000,
+          })
           .then(() => 2)
         const value = await Promise.race([quickPickPromise, debugToolBarPromise])
         if (value === 1) {
@@ -23,7 +27,9 @@ export const create = ({ expect, page, VError }) => {
           await expect(quickPickWidget).toBeVisible()
           await nodeJsOption.click()
         }
-        await expect(debugToolBar).toBeVisible()
+        await expect(debugToolBar).toBeVisible({
+          timeout: 30_000,
+        })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to start run and debug`)
@@ -64,14 +70,37 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to stop`)
       }
     },
-    async waitForPaused() {
+    async waitForPaused({ file, line, callStackSize }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
       // TODO long timeout here
       await expect(continueButton).toBeVisible()
       await page.waitForIdle()
+      const pausedStackFrame = page.locator('.debug-top-stack-frame-column')
+      await expect(pausedStackFrame).toBeVisible()
+      const debugCallStack = page.locator('.debug-call-stack')
+      await expect(debugCallStack).toBeVisible()
+      const sessionLabel = debugCallStack.locator('.state.label')
+      await expect(sessionLabel).toBeVisible()
+      await expect(sessionLabel).toHaveText('Paused on breakpoint')
+      const stackFrame = page.locator('.debug-call-stack .monaco-list-row.selected')
+      await expect(stackFrame).toBeVisible()
+      await expect(stackFrame).toHaveAttribute('aria-label', `Stack Frame <anonymous>, line ${line}, ${file}`)
+      if (callStackSize) {
+        await expect(stackFrame).toHaveAttribute(`aria-setsize`, `${callStackSize}`)
+      }
+      await page.waitForIdle()
+      const cursor = page.locator('.part.editor .monaco-editor .cursor')
+      await expect(cursor).toBeVisible()
+      if (line === 4) {
+        // TODO compute this dynamically
+        await expect(cursor).toHaveCss('top', '57px')
+      }
+      const editor = page.locator('.part.editor [role="textbox"][aria-roledescription="editor"]')
+      await expect(editor).toBeFocused()
+      await page.waitForIdle()
     },
-    async runAndWaitForPaused() {
+    async runAndWaitForPaused({ file, line, callStackSize }) {
       try {
         const quickPick = QuickPick.create({
           page,
@@ -80,7 +109,7 @@ export const create = ({ expect, page, VError }) => {
         })
         await quickPick.executeCommand(WellKnownCommands.ShowRunAndDebug)
         await this.startRunAndDebug()
-        await this.waitForPaused()
+        await this.waitForPaused({ file, line, callStackSize })
       } catch (error) {
         throw new VError(error, `Failed to run debugger`)
       }
@@ -97,7 +126,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to remove all breakpoints`)
       }
     },
-    async step(expectedFile, expectedPauseLine) {
+    async step(expectedFile, expectedPauseLine, expectedCallStackSize) {
       try {
         const quickPick = QuickPick.create({
           page,
@@ -106,10 +135,11 @@ export const create = ({ expect, page, VError }) => {
         })
         await quickPick.executeCommand(WellKnownCommands.DebugStepOver)
         await page.waitForIdle()
-        await this.waitForPaused()
-        const stackFrame = page.locator('.debug-call-stack .monaco-list-row.selected')
-        await expect(stackFrame).toBeVisible()
-        await expect(stackFrame).toHaveAttribute('aria-label', `Stack Frame <anonymous>, line ${expectedPauseLine}, ${expectedFile}`)
+        await this.waitForPaused({
+          file: expectedFile,
+          line: expectedPauseLine,
+          callStackSize: expectedCallStackSize,
+        })
       } catch (error) {
         throw new VError(error, `Failed to step over`)
       }

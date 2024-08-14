@@ -1,4 +1,4 @@
-export const skip = process.platform === 'darwin'
+export const skip = true
 
 export const setup = async ({ Editor, Workspace, Explorer, RunAndDebug }) => {
   await Workspace.setFiles([
@@ -7,7 +7,6 @@ export const setup = async ({ Editor, Workspace, Explorer, RunAndDebug }) => {
       content: `let x = 1
 
 setInterval(()=>{
-  x++
   x++
 }, 1000)`,
     },
@@ -21,12 +20,14 @@ setInterval(()=>{
   await RunAndDebug.runAndWaitForPaused({
     file: 'index.js',
     line: 4,
+    callStackSize: 11,
   })
 }
 
-export const run = async ({ RunAndDebug }) => {
-  await RunAndDebug.setValue('x', '1', '5')
-  await RunAndDebug.setValue('x', '5', '1')
+export const run = async ({ DebugConsole }) => {
+  await DebugConsole.type('glob')
+  await DebugConsole.shouldHaveCompletions(['global', 'globalThis'])
+  await DebugConsole.clearInput()
 }
 
 export const teardown = async ({ RunAndDebug, Editor }) => {

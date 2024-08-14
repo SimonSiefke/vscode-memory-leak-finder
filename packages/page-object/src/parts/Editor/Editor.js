@@ -568,5 +568,87 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed set breakpoint`)
       }
     },
+    async goToFile({ file, line, column }) {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.GoToFile, {
+          stayVisible: true,
+        })
+        const input = `${file}:${line}:${column}`
+        await quickPick.type(input)
+        await quickPick.select(file)
+      } catch (error) {
+        throw new VError(error, `Failed to go to file ${file}`)
+      }
+    },
+    async showDebugHover({ expectedTitle }) {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.DebugShowHover)
+        const debugHover = page.locator('.debug-hover-widget')
+        await expect(debugHover).toBeVisible()
+        const debugHoverTitle = debugHover.locator('.title')
+        await expect(debugHoverTitle).toHaveText(expectedTitle)
+      } catch (error) {
+        throw new VError(error, `Failed to open debug hover`)
+      }
+    },
+    async hideDebugHover() {
+      try {
+        const debugHover = page.locator('.debug-hover-widget')
+        await expect(debugHover).toBeVisible()
+        await page.waitForIdle()
+        await page.keyboard.press('Escape')
+        await expect(debugHover).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to hide debug hover`)
+      }
+    },
+    async autoFix({ hasFixes }) {
+      try {
+        const quickPick = QuickPick.create({
+          page,
+          expect,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.AutoFix)
+        if (hasFixes) {
+          // TODO
+        } else {
+          const overlayMessage = page.locator('.monaco-editor-overlaymessage')
+          await expect(overlayMessage).toBeVisible()
+          await expect(overlayMessage).toHaveText('No auto fixes available')
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to execute auto fix`)
+      }
+    },
+    async closeAutoFix() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.show()
+        await quickPick.hide()
+        const overlayMessage = page.locator('.monaco-editor-overlaymessage')
+        await expect(overlayMessage).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to hide auto fix`)
+      }
+    },
+    async shouldHaveError(fileName) {
+      try {
+        await page.waitForIdle()
+        const tab = page.locator(`[role="tab"][aria-label="${fileName}"]`)
+        await expect(tab).toBeVisible()
+        const tabLabel = tab.locator('.monaco-icon-label')
+        await expect(tabLabel).toBeVisible()
+        await expect(tabLabel).toHaveAttribute('aria-label', /1 problem in this file/, {
+          timeout: 15_000,
+        })
+      } catch (error) {
+        throw new VError(error, `Failed to wait for editor error`)
+      }
+    },
   }
 }

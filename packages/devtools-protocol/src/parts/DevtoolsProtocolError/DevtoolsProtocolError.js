@@ -21,12 +21,15 @@ const splitMessageAndStack = (input) => {
 }
 
 export class DevtoolsProtocolError extends Error {
-  constructor(input) {
+  constructor(input, errorCode) {
     const { message, stack } = splitMessageAndStack(input)
     super(message)
     this.name = 'DevtoolsProtocolError'
     if (stack) {
       this.stack = MergeStacks.mergeStacks(this.stack, stack)
+    }
+    if (errorCode) {
+      this.code = errorCode
     }
   }
 }
