@@ -1,4 +1,4 @@
-import { copyFile, mkdir } from 'node:fs/promises'
+import { copyFile, mkdir, rm } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.js'
 import * as DefaultVscodeSettingsPath from '../DefaultVscodeSettingsPath/DefaultVsCodeSettingsPath.js'
@@ -30,6 +30,7 @@ export const launchVsCode = async ({ headlessMode, cwd }) => {
     const binaryPath = await GetBinaryPath.getBinaryPath()
     const userDataDir = GetUserDataDir.getUserDataDir()
     const extensionsDir = GetExtensionsDir.getExtensionsDir()
+    await rm(extensionsDir, { recursive: true, force: true })
     const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
     const settingsPath = join(userDataDir, 'User', 'settings.json')
     await mkdir(dirname(settingsPath), { recursive: true })
