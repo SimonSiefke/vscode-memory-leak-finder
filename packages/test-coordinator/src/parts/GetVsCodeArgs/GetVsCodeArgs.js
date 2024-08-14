@@ -10,7 +10,7 @@ export const getVscodeArgs = ({ extensionsDir, userDataDir, extraLaunchArgs }) =
     '--skip-welcome',
     '--skip-release-notes',
     '--disable-workspace-trust',
-    '--disable-extensions',
+    // '--disable-extensions',
     '--extensions-dir',
     extensionsDir,
     '--user-data-dir',

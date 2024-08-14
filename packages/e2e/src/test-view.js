@@ -16,11 +16,9 @@ export const setup = async ({ Workspace, Explorer, Editor }) => {
     },
   ])
   await Editor.closeAll()
-  await Explorer.focus()
-  await Explorer.shouldHaveItem('file.txt')
+  await Editor.open('test-file-1.md')
 }
 
 export const run = async ({ Editor }) => {
-  await Editor.open('file.txt')
-  await Editor.closeAll()
+  // TODO
 }

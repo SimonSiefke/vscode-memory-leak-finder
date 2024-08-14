@@ -26,7 +26,6 @@ export const launchVsCode = async ({ headlessMode, cwd }) => {
       await RemoveVscodeGlobalStorage.removeVsCodeGlobalStorage()
     }
     await RemoveVscodeBackups.removeVscodeBackups()
-    const testExtensionsPath = join(Root.root, '.vscode-extensions')
     const runtimeDir = GetVscodeRuntimeDir.getVscodeRuntimeDir()
     const binaryPath = await GetBinaryPath.getBinaryPath()
     const userDataDir = GetUserDataDir.getUserDataDir()
@@ -40,7 +39,7 @@ export const launchVsCode = async ({ headlessMode, cwd }) => {
       extensionsDir,
       extraLaunchArgs: [testWorkspacePath],
     })
-    const env = GetVsCodeEnv.getVsCodeEnv({ extensionsFolder: testExtensionsPath, runtimeDir, processEnv: process.env })
+    const env = GetVsCodeEnv.getVsCodeEnv({ runtimeDir, processEnv: process.env })
     const { child, webSocketUrl } = await LaunchElectron.launchElectron({
       cliPath: binaryPath,
       args,
