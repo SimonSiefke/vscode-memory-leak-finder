@@ -31,6 +31,7 @@ export const launchVsCode = async ({ headlessMode, cwd }) => {
     const userDataDir = GetUserDataDir.getUserDataDir()
     const extensionsDir = GetExtensionsDir.getExtensionsDir()
     await rm(extensionsDir, { recursive: true, force: true })
+    await mkdir(extensionsDir)
     const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
     const settingsPath = join(userDataDir, 'User', 'settings.json')
     await mkdir(dirname(settingsPath), { recursive: true })
