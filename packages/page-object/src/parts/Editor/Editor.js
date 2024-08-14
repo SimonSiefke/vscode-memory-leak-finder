@@ -605,7 +605,7 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to hide debug hover`)
       }
     },
-    async autoFix() {
+    async autoFix({ hasFixes }) {
       try {
         const quickPick = QuickPick.create({
           page,
@@ -613,8 +613,27 @@ export const create = ({ page, expect, VError }) => {
           VError,
         })
         await quickPick.executeCommand(WellKnownCommands.AutoFix)
+        if (hasFixes) {
+          // TODO
+        } else {
+          const overlayMessage = page.locator('.monaco-editor-overlaymessage')
+          await expect(overlayMessage).toBeVisible()
+          await expect(overlayMessage).toHaveText('No auto fixes available')
+        }
       } catch (error) {
         throw new VError(error, `Failed to execute auto fix`)
+      }
+    },
+    async closeAutoFix() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.show()
+        await quickPick.hide()
+        const overlayMessage = page.locator('.monaco-editor-overlaymessage')
+        await expect(overlayMessage).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to hide auto fix`)
       }
     },
   }
