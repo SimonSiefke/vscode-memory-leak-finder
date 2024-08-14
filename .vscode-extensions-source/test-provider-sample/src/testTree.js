@@ -1,6 +1,6 @@
-import { TextDecoder } from 'util'
-import * as vscode from 'vscode'
-import { parseMarkdown } from './parser'
+const { TextDecoder } = require('util')
+const vscode = require('vscode')
+const { parseMarkdown } = require('./parser')
 
 const textDecoder = new TextDecoder('utf-8')
 

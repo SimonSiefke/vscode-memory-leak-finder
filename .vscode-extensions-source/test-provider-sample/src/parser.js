@@ -1,4 +1,4 @@
-import * as vscode from 'vscode'
+const vscode = require('vscode')
 
 const testRe = /^([0-9]+)\s*([+*/-])\s*([0-9]+)\s*=\s*([0-9]+)/
 const headingRe = /^(#+)\s*(.+)$/
