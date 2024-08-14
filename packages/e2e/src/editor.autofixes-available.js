@@ -1,4 +1,8 @@
 export const setup = async ({ Editor, Workspace }) => {
+  await Editor.closeAll()
+}
+
+export const run = async ({ Workspace, Editor }) => {
   await Workspace.setFiles([
     {
       name: 'file.ts',
@@ -11,9 +15,8 @@ const def = abcd + 1
   await Editor.open('file.ts')
   await Editor.goToFile({ file: 'file.ts', line: 3, column: 14 })
   await Editor.shouldHaveError('file.ts')
-}
-
-export const run = async ({ Editor }) => {
   await Editor.autoFix({ hasFixes: false })
-  await Editor.closeAutoFix()
+  await Editor.shouldHaveText(`let abc = 1
+
+const def = abc + 1`)
 }
