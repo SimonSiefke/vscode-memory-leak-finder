@@ -40,10 +40,14 @@ export const toHaveText = (element, options) => {
   throw new Error(`invalid options`)
 }
 
-export const toHaveAttribute = (element, { key, value }) => {
+export const toHaveAttribute = (element, { key, value, isRegex }) => {
   Assert.string(key)
-  const attribute = element.getAttribute(key)
-  return attribute === value
+  const actualValue = element.getAttribute(key)
+  if (isRegex) {
+    value = new RegExp(value.slice(1, -1))
+    return value.test(actualValue)
+  }
+  return actualValue === value
 }
 
 export const toBeFocused = (element) => {

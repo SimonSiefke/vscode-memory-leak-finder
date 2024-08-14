@@ -644,7 +644,7 @@ export const create = ({ page, expect, VError }) => {
         const tabLabel = tab.locator('.monaco-icon-label')
         await expect(tabLabel).toBeVisible()
         await expect(tabLabel).toHaveAttribute('aria-label', /1 problem in this file/, {
-          timeout: 60_000,
+          timeout: 15_000,
         })
       } catch (error) {
         throw new VError(error, `Failed to wait for editor error`)
