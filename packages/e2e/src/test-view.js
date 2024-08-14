@@ -15,6 +15,7 @@ export const setup = async ({ Workspace, Explorer, Editor }) => {
 `,
     },
   ])
+  await Workspace.addExtension('test-provider-sample')
   await Editor.closeAll()
   await Editor.open('test-file-1.md')
 }

@@ -1,6 +1,6 @@
-import { mkdir, readdir, rm, writeFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
 import { execa } from 'execa'
+import { cp, mkdir, readdir, rm, writeFile } from 'node:fs/promises'
+import { dirname, join } from 'node:path'
 import * as Root from '../Root/Root.js'
 
 export const create = ({ page }) => {
@@ -17,6 +17,17 @@ export const create = ({ page }) => {
         await mkdir(dirname(absolutePath), { recursive: true })
         await writeFile(absolutePath, file.content)
       }
+      await page.waitForIdle()
+    },
+    async addExtension(name) {
+      const extensionsFolder = join(Root.root, '.vscode-extensions', name)
+      const destination = join(Root.root, '.vscode-test-workspace', '.vscode', 'extensions', name)
+      await mkdir(dirname(destination), {
+        recursive: true,
+      })
+      await cp(extensionsFolder, destination, {
+        recursive: true,
+      })
       await page.waitForIdle()
     },
     async initializeGitRepository() {
