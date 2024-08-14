@@ -636,5 +636,19 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to hide auto fix`)
       }
     },
+    async shouldHaveError(fileName) {
+      try {
+        await page.waitForIdle()
+        const tab = page.locator(`[role="tab"][aria-label="${fileName}"]`)
+        await expect(tab).toBeVisible()
+        const tabLabel = tab.locator('.monaco-icon-label')
+        await expect(tabLabel).toBeVisible()
+        await expect(tabLabel).toHaveAttribute('aria-label', /1 problem in this file/, {
+          timeout: 60_000,
+        })
+      } catch (error) {
+        throw new VError(error, `Failed to wait for editor error`)
+      }
+    },
   }
 }
