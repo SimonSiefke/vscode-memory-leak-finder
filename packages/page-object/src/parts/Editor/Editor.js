@@ -605,5 +605,50 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to hide debug hover`)
       }
     },
+    async autoFix({ hasFixes }) {
+      try {
+        const quickPick = QuickPick.create({
+          page,
+          expect,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.AutoFix)
+        if (hasFixes) {
+          // TODO
+        } else {
+          const overlayMessage = page.locator('.monaco-editor-overlaymessage')
+          await expect(overlayMessage).toBeVisible()
+          await expect(overlayMessage).toHaveText('No auto fixes available')
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to execute auto fix`)
+      }
+    },
+    async closeAutoFix() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.show()
+        await quickPick.hide()
+        const overlayMessage = page.locator('.monaco-editor-overlaymessage')
+        await expect(overlayMessage).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to hide auto fix`)
+      }
+    },
+    async shouldHaveError(fileName) {
+      try {
+        await page.waitForIdle()
+        const tab = page.locator(`[role="tab"][aria-label="${fileName}"]`)
+        await expect(tab).toBeVisible()
+        const tabLabel = tab.locator('.monaco-icon-label')
+        await expect(tabLabel).toBeVisible()
+        await expect(tabLabel).toHaveAttribute('aria-label', /1 problem in this file/, {
+          timeout: 15_000,
+        })
+      } catch (error) {
+        throw new VError(error, `Failed to wait for editor error`)
+      }
+    },
   }
 }
