@@ -18,7 +18,7 @@ exports.getContentFromFilesystem = async (uri) => {
   }
 }
 
-export class TestFile {
+exports.TestFile = class {
   didResolve = false
 
   async updateFromDisk(controller, item) {
@@ -76,13 +76,13 @@ export class TestFile {
   }
 }
 
-export class TestHeading {
+exports.TestHeading = class {
   constructor(generation) {
     this.generation = generation
   }
 }
 
-export class TestCase {
+exports.TestCase = class {
   constructor(a, operator, b, expected, generation) {
     this.a = a
     this.operator = operator
