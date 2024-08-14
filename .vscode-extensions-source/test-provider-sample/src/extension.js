@@ -1,7 +1,7 @@
 const vscode = require('vscode')
 const { getContentFromFilesystem, TestCase, testData, TestFile } = require('./testTree')
 
-exports.activae = async function (context) {
+exports.activate = async function (context) {
   const ctrl = vscode.tests.createTestController('mathTestController', 'Markdown Math')
   context.subscriptions.push(ctrl)
 

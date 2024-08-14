@@ -4,11 +4,11 @@ const { parseMarkdown } = require('./parser')
 
 const textDecoder = new TextDecoder('utf-8')
 
-export const testData = new WeakMap()
+exports.testData = new WeakMap()
 
 let generationCounter = 0
 
-export const getContentFromFilesystem = async (uri) => {
+exports.getContentFromFilesystem = async (uri) => {
   try {
     const rawContent = await vscode.workspace.fs.readFile(uri)
     return textDecoder.decode(rawContent)

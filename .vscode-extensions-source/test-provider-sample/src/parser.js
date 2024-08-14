@@ -3,7 +3,7 @@ const vscode = require('vscode')
 const testRe = /^([0-9]+)\s*([+*/-])\s*([0-9]+)\s*=\s*([0-9]+)/
 const headingRe = /^(#+)\s*(.+)$/
 
-export const parseMarkdown = (text, events) => {
+exports.parseMarkdown = (text, events) => {
   const lines = text.split('\n')
 
   for (let lineNo = 0; lineNo < lines.length; lineNo++) {
