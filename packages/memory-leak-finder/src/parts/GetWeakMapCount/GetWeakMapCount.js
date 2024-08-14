@@ -6,6 +6,6 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
  * @param {any} session
  * @returns {Promise<number>}
  */
-export const getWeakMapCount = (session) => {
-  return GetObjectCount.getObjectCount(session, PrototypeExpression.WeakMap)
+export const getWeakMapCount = (session, objectGroup) => {
+  return GetObjectCount.getObjectCount(session, PrototypeExpression.WeakMap, objectGroup)
 }
