@@ -4,6 +4,7 @@ import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace
 import * as DefaultVscodeSettingsPath from '../DefaultVscodeSettingsPath/DefaultVsCodeSettingsPath.js'
 import * as GetBinaryPath from '../GetBinaryPath/GetBinaryPath.js'
 import * as GetUserDataDir from '../GetUserDataDir/GetUserDataDir.js'
+import * as GetExtensionsDir from '../GetExtensionsDir/GetExtensionsDir.js'
 import * as GetVsCodeArgs from '../GetVsCodeArgs/GetVsCodeArgs.js'
 import * as GetVsCodeEnv from '../GetVsCodeEnv/GetVsCodeEnv.js'
 import * as GetVscodeRuntimeDir from '../GetVscodeRuntimeDir/GetVscodeRuntimeDir.js'
@@ -29,12 +30,14 @@ export const launchVsCode = async ({ headlessMode, cwd }) => {
     const runtimeDir = GetVscodeRuntimeDir.getVscodeRuntimeDir()
     const binaryPath = await GetBinaryPath.getBinaryPath()
     const userDataDir = GetUserDataDir.getUserDataDir()
+    const extensionsDir = GetExtensionsDir.getExtensionsDir()
     const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
     const settingsPath = join(userDataDir, 'User', 'settings.json')
     await mkdir(dirname(settingsPath), { recursive: true })
     await copyFile(defaultSettingsSourcePath, settingsPath)
     const args = GetVsCodeArgs.getVscodeArgs({
       userDataDir,
+      extensionsDir,
       extraLaunchArgs: [testWorkspacePath],
     })
     const env = GetVsCodeEnv.getVsCodeEnv({ extensionsFolder: testExtensionsPath, runtimeDir, processEnv: process.env })

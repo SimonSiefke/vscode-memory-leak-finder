@@ -4,6 +4,9 @@ export const setup = async ({ Workspace, Explorer, Editor }) => {
       name: 'file.txt',
       content: '',
     },
+    {
+      name: '.vscode',
+    },
   ])
   await Editor.closeAll()
   await Explorer.focus()
