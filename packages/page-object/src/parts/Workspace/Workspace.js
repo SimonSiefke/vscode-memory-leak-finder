@@ -20,7 +20,7 @@ export const create = ({ page }) => {
       await page.waitForIdle()
     },
     async addExtension(name) {
-      const extensionsFolder = join(Root.root, '.vscode-extensions', name)
+      const extensionsFolder = join(Root.root, '.vscode-extensions-source', name)
       const destination = join(Root.root, '.vscode-test-workspace', '.vscode', 'extensions', name)
       await mkdir(dirname(destination), {
         recursive: true,
