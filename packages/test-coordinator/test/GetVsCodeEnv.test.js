@@ -7,7 +7,6 @@ test('getVsCodeEnv - remove node options', () => {
     NODE_OPTIONS: '--max-old-space-size=8192',
   }
   expect(GetVsCodeEnv.getVsCodeEnv({ runtimeDir, processEnv })).toEqual({
-    VSCODE_EXTENSIONS: '',
     XDG_RUNTIME_DIR: '/test',
   })
 })
