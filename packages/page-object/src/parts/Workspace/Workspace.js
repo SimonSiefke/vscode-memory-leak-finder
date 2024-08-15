@@ -1,10 +1,10 @@
 import { execa } from 'execa'
-import { cp, mkdir, readdir, rm, writeFile } from 'node:fs/promises'
+import { mkdir, readdir, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
-import * as Root from '../Root/Root.js'
-import * as QuickPick from '../QuickPick/QuickPick.js'
-import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 import * as Electron from '../Electron/Electron.js'
+import * as QuickPick from '../QuickPick/QuickPick.js'
+import * as Root from '../Root/Root.js'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 
 export const create = ({ electronApp, page, expect, VError }) => {
   return {
