@@ -1,6 +1,6 @@
 import * as ChromiumSwitches from '../ChromiumSwitches/ChromiumSwitches.js'
 
-export const getVscodeArgs = ({ userDataDir, extraLaunchArgs }) => {
+export const getVscodeArgs = ({ extensionsDir, userDataDir, extraLaunchArgs }) => {
   return [
     ...ChromiumSwitches.chromiumSwitches,
     '--wait',
@@ -11,6 +11,8 @@ export const getVscodeArgs = ({ userDataDir, extraLaunchArgs }) => {
     '--skip-release-notes',
     '--disable-workspace-trust',
     '--disable-extensions',
+    '--extensions-dir',
+    extensionsDir,
     '--user-data-dir',
     userDataDir,
     ...extraLaunchArgs,
