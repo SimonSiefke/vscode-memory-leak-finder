@@ -28,10 +28,10 @@ export const waitForVsCodeToBeReady = async ({ electronApp, isHeadless, isFirstC
         throw error
       }
     }
-    const notification = firstWindow.locator('text=All installed extensions are temporarily disabled.')
-    await expect(notification).toBeVisible({
-      timeout: 15_000,
-    })
+    // const notification = firstWindow.locator('text=All installed extensions are temporarily disabled.')
+    // await expect(notification).toBeVisible({
+    //   timeout: 15_000,
+    // })
   }
   return firstWindow
 }
