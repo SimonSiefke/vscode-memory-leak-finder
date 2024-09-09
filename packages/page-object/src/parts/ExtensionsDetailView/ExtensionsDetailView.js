@@ -33,7 +33,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to verify extension detail tab ${text}`)
       }
     },
-    async openTab(text) {
+    async openTab(text, options) {
       try {
         const tab = page.locator('.extension-editor .action-label', {
           hasText: text,
@@ -42,6 +42,14 @@ export const create = ({ expect, page, VError }) => {
         await tab.click()
         await expect(tab).toHaveAttribute('aria-checked', 'true')
         await page.waitForIdle()
+        if (options && options.webView) {
+          const webView = page.locator('.webview')
+          await expect(webView).toBeVisible()
+          await expect(webView).toHaveClass('ready')
+        } else if (options) {
+          const webView = page.locator('.webview')
+          await expect(webView).toBeHidden()
+        }
       } catch (error) {
         throw new VError(error, `Failed to open extension detail tab ${text}`)
       }
