@@ -50,6 +50,12 @@ export const create = ({ page, expect, VError }) => {
         await expect(profileListItem).toBeVisible()
         const useButton = profileListItem.locator('[aria-label="Use this Profile for Current Window"]')
         await useButton.click()
+
+        const profileBadge = page.locator('.profile-badge', {
+          hasText: 'TE',
+        })
+        await expect(profileListItem).toBeVisible()
+        await expect(profileBadge).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to create profile`)
       }
