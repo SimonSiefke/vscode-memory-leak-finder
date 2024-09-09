@@ -15,7 +15,7 @@ export const create = ({ page, expect, VError }) => {
           await contextMenu.open(second)
           await contextMenu.shouldHaveItem('Delete')
           await contextMenu.select('Delete')
-          await expect(profileListIems).toHaveCount(count - i)
+          await expect(profileListIems).toHaveCount(count - i + 1)
         }
       } catch (error) {
         throw new VError(error, `Failed to remove other profiles`)
@@ -56,26 +56,25 @@ export const create = ({ page, expect, VError }) => {
     },
     async remove(info) {
       try {
-        // TODO
-        // await page.waitForIdle()
-        // const quickPick = QuickPick.create({ page, expect, VError })
-        // await quickPick.executeCommand(WellKnownCommands.ProfilesDeleteProfile, {
-        //   stayVisible: true,
-        // })
-        // const input = page.locator('[placeholder="Select Profiles to Delete"]')
-        // await input.type(info.name)
-        // const row = page.locator('.monaco-list-row[aria-label="test, Current"]')
-        // const rowLabel = row.locator('.quick-input-list-label')
-        // await rowLabel.click()
-        // await expect(row).toHaveAttribute('aria-checked', 'true')
-        // const okButton = page.locator('.monaco-button', {
-        //   hasText: 'OK',
-        // })
-        // await okButton.click()
-        // const profileBadge = page.locator('.profile-badge', {
-        //   hasText: 'TE',
-        // })
-        // await expect(profileBadge).toHaveCount(0)
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.ProfilesDeleteProfile, {
+          stayVisible: true,
+        })
+        const input = page.locator('[placeholder="Select Profiles to Delete"]')
+        await input.type(info.name)
+        const row = page.locator('.monaco-list-row[aria-label="test, Current"]')
+        const rowLabel = row.locator('.quick-input-list-label')
+        await rowLabel.click()
+        await expect(row).toHaveAttribute('aria-checked', 'true')
+        const okButton = page.locator('.monaco-button', {
+          hasText: 'OK',
+        })
+        await okButton.click()
+        const profileBadge = page.locator('.profile-badge', {
+          hasText: 'TE',
+        })
+        await expect(profileBadge).toHaveCount(0)
       } catch (error) {
         throw new VError(error, `Failed to remove profile`)
       }
