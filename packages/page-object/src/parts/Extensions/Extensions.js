@@ -74,6 +74,7 @@ export const create = ({ expect, page, VError }) => {
         await extensionsInput.focus()
         await expect(suggestContainer).toHaveClass('synthetic-focus')
         await expect(extensionsInput).toBeFocused()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show extensions view`)
       }
@@ -89,6 +90,7 @@ export const create = ({ expect, page, VError }) => {
         })
         await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
         await expect(extensionsView).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to hide extensions view`)
       }
@@ -125,6 +127,7 @@ export const create = ({ expect, page, VError }) => {
         })
         const nameLocator = firstExtension.locator('.name')
         await expect(nameLocator).toHaveText(name)
+        await page.waitForIdle()
       },
       async click() {
         // TODO select by data index

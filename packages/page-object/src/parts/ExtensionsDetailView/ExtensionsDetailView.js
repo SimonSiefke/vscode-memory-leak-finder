@@ -41,6 +41,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(tab).toBeVisible()
         await tab.click()
         await expect(tab).toHaveAttribute('aria-checked', 'true')
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open extension detail tab ${text}`)
       }
