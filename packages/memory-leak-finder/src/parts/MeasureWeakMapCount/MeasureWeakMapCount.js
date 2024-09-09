@@ -14,14 +14,14 @@ export const create = (session) => {
 export const start = async (session) => {
   const objectGroup = ObjectGroupId.create()
   const result = await GetWeakMapCount.getWeakMapCount(session, objectGroup)
-  await ReleaseObjectGroup.releaseObjectGroup(objectGroup)
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return result
 }
 
 export const stop = async (session) => {
   const objectGroup = await ObjectGroupId.create()
   const result = await GetWeakMapCount.getWeakMapCount(session, objectGroup)
-  await ReleaseObjectGroup.releaseObjectGroup(objectGroup)
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return result
 }
 
