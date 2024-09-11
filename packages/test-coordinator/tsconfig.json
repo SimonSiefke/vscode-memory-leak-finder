@@ -18,7 +18,7 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
-    "composite": true
+    "declaration": false
   },
   "include": ["src", "test"]
 }
