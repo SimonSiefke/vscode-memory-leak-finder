@@ -9,7 +9,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "execa": "^9.3.1"
+    "execa": "^9.4.0"
   },
   "xo": {
     "rules": {
