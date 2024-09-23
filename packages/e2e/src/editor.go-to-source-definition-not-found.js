@@ -1,7 +1,12 @@
 export const setup = async ({ Editor, Workspace }) => {
   await Workspace.setFiles([
     {
-      name: 'file.js',
+      name: 'tsconfig.json',
+      content: `{}
+`,
+    },
+    {
+      name: 'file.ts',
       content: `abc
 def`,
     },
