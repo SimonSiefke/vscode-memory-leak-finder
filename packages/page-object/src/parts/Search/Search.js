@@ -18,7 +18,7 @@ export const create = ({ expect, page, VError }) => {
     async type(text) {
       try {
         const searchView = page.locator('.search-view')
-        const searchInput = searchView.locator('textarea[title="Search"]')
+        const searchInput = searchView.locator('textarea[placeholder="Search"]')
         await searchInput.focus()
         await expect(searchInput).toBeFocused()
         await searchInput.clear()
@@ -30,7 +30,7 @@ export const create = ({ expect, page, VError }) => {
     async typeReplace(text) {
       try {
         const searchView = page.locator('.search-view')
-        const replaceInput = searchView.locator('textarea[title="Replace"]')
+        const replaceInput = searchView.locator('textarea[placeholder="Replace"]')
         await replaceInput.focus()
         await expect(replaceInput).toBeFocused()
         await replaceInput.clear()
@@ -53,13 +53,27 @@ export const create = ({ expect, page, VError }) => {
     async deleteText() {
       try {
         const searchView = page.locator('.search-view')
-        const searchInput = searchView.locator('textarea[title="Search"]')
+        const searchInput = searchView.locator('textarea[placeholder="Search"]')
         await expect(searchInput).toBeFocused()
         await searchInput.selectText()
         await searchInput.press('Backspace')
         await expect(searchInput).toHaveText('')
       } catch (error) {
         throw new VError(error, `Failed to delete search input text`)
+      }
+    },
+    async shouldHaveNoResults() {
+      try {
+        const searchView = page.locator('.search-view')
+        const searchInput = searchView.locator('textarea[placeholder="Search"]')
+        await expect(searchInput).toBeFocused()
+        const messages = page.locator('.text-search-provider-messages')
+        await expect(messages).toBeVisible()
+        await expect(messages).toHaveText(
+          `No results found. Review your settings for configured exclusions and check your gitignore files - Open Settings - Learn More`,
+        )
+      } catch (error) {
+        throw new VError(error, `Failed to verify search message`)
       }
     },
     async expandFiles() {

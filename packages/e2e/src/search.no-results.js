@@ -9,7 +9,7 @@ export const setup = async ({ ActivityBar, Workspace }) => {
 }
 
 export const run = async ({ Search }) => {
-  await Search.type('sample')
-  await Search.toHaveResults(['file.txt1', 'sample text'])
+  await Search.type('not-found')
+  await Search.shouldHaveNoResults()
   await Search.clear()
 }
