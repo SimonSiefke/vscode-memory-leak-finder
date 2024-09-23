@@ -1,23 +1,31 @@
 export const skip = true
 
-export const setup = async ({ Editor, Workspace }) => {
+export const setup = async ({ Editor, Workspace, Hover }) => {
   await Workspace.setFiles([
     {
       name: 'index.css',
-      content: `:root {
+      content: `h1 {
+  color: yellow;
   --font-size: 10px;
   --font-size: 10px;
 }`,
     },
   ])
   await Editor.open('index.css')
-  await Editor.shouldHaveText(`:root {
+  await Editor.shouldHaveText(`h1 {
+  color: yellow;
   --font-size: 10px;
   --font-size: 10px;
 }`)
-  await Editor.shouldHaveToken('--font-size', 'rgb(156, 220, 254)')
-  await Editor.save()
-  await Editor.shouldHaveBreadCrumb(':root')
+  await Editor.hover(
+    'color',
+    `Sets the color of an element's text
+
+(Edge 12, Firefox 1, Safari 1, Chrome 1, IE 3, Opera 3)
+
+Syntax: <color>`,
+  )
+  await Hover.hide()
 }
 
 export const run = async ({ Editor, References }) => {
