@@ -12,10 +12,9 @@ def`,
     },
   ])
   await Editor.open('file.ts')
-  // await Editor.goToFile({ file: 'file.ts', line: 2, column: 1 })
 }
 
-export const run = async ({ Editor }) => {
-  await Editor.autoFix({ hasFixes: false })
-  await Editor.closeAutoFix()
+export const run = async ({ Editor, Notification }) => {
+  await Editor.goToSourceDefinition()
+  await Notification.closeAll()
 }
