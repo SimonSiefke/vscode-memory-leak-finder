@@ -27,6 +27,17 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to type into search input`)
       }
     },
+    async clear() {
+      try {
+        const searchView = page.locator('.search-view')
+        const searchInput = searchView.locator('textarea[placeholder="Search"]')
+        await searchInput.focus()
+        await expect(searchInput).toBeFocused()
+        await searchInput.clear()
+      } catch (error) {
+        throw new VError(error, `Failed to clear search input`)
+      }
+    },
     async typeReplace(text) {
       try {
         const searchView = page.locator('.search-view')
