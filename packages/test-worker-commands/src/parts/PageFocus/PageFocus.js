@@ -1,3 +1,4 @@
+import { VError } from '@lvce-editor/verror'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 
 const script = `function () {
@@ -12,8 +13,12 @@ const script = `function () {
 }`
 
 export const focus = async ({ electronRpc, electronObjectId }) => {
-  await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-    functionDeclaration: script,
-    objectId: electronObjectId,
-  })
+  try {
+    await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+      functionDeclaration: script,
+      objectId: electronObjectId,
+    })
+  } catch (error) {
+    throw new VError(error, `Failed to focus page`)
+  }
 }

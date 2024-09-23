@@ -17,6 +17,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async show() {
       try {
+        await page.focus()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.FocusTerminal)
         const terminalSplitPane = page.locator('.terminal-split-pane')

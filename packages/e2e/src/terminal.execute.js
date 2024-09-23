@@ -4,6 +4,9 @@ export const setup = async ({ Terminal, Workspace, SideBar }) => {
   await Terminal.killAll()
   await Workspace.setFiles([])
   await SideBar.hide()
+  await new Promise((r) => {
+    setTimeout(r, 1000)
+  })
   await Terminal.show()
   // await Terminal.focus()
 }
