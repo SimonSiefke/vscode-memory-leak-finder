@@ -97,6 +97,20 @@ export const create = ({ page, expect, VError }) => {
     async splitLeft() {
       return this.split(WellKnownCommands.ViewSplitEditorLeft)
     },
+    async goToSourceDefinition({ hasDefinition }) {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.TypeScriptGoToSourceDefinition)
+        if (hasDefinition) {
+          // TODO
+        } else {
+          const notification = page.locator('[role="dialog"][aria-label^="No source definitions found."]')
+          await expect(notification).toBeVisible()
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to go to source definition`)
+      }
+    },
     async close() {
       try {
         const main = page.locator('[role="main"]')
