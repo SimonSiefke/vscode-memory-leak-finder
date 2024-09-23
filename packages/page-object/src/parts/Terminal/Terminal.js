@@ -17,7 +17,6 @@ export const create = ({ expect, page, VError }) => {
     },
     async show() {
       try {
-        await page.focus()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.FocusTerminal)
         const terminalSplitPane = page.locator('.terminal-split-pane')
@@ -25,39 +24,10 @@ export const create = ({ expect, page, VError }) => {
         const terminal = page.locator('.terminal')
         await expect(terminal).toHaveCount(1)
         await expect(terminal).toBeVisible()
-        const maxTries = 25
-        for (let i = 0; i < maxTries; i++) {
-          const className = await terminal.getAttribute('class')
-          if (className.includes('focus')) {
-            break
-          }
-          await page.waitForIdle()
-          const screen = terminal.locator('.xterm-screen')
-          await new Promise((r) => {
-            setTimeout(r, 1000)
-          })
-          await screen.click()
-          console.log({ className })
-        }
         await expect(terminal).toHaveClass('focus')
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show terminal`)
-      }
-    },
-    async focus() {
-      try {
-        const quickPick = QuickPick.create({ expect, page, VError })
-        await quickPick.executeCommand(WellKnownCommands.FocusTerminal)
-        // const terminalSplitPane = page.locator('.terminal-split-pane')
-        // await expect(terminalSplitPane).toBeVisible()
-        // const terminal = page.locator('.terminal')
-        // await expect(terminal).toHaveCount(1)
-        // await expect(terminal).toBeVisible()
-        // await expect(terminal).toHaveClass('focus')
-        // await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to focus terminal`)
       }
     },
     async split() {
