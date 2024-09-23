@@ -90,5 +90,24 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to kill terminal`)
       }
     },
+    async execute(command) {
+      try {
+        await page.waitForIdle()
+        // TODO
+        // 1. type text into terminal
+        // 2. press enter
+        // 3. verify command has executed successfully
+      } catch (error) {
+        throw new VError(error, `Failed to execute terminal command`)
+      }
+    },
+    async clear() {
+      try {
+        await page.waitForIdle()
+        // TODO
+      } catch (error) {
+        throw new VError(error, `Failed to clear terminal`)
+      }
+    },
   }
 }
