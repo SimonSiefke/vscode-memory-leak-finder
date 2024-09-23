@@ -37,6 +37,8 @@ export const monkeyPatchElectronScript = `function () {
   app.whenReady = patchedWhenReady
   app.isReady = patchedIsReady
 
+  globalThis._____electron = electron
+
   return async () => {
     const event = await originalWhenReady
     isReady = true
