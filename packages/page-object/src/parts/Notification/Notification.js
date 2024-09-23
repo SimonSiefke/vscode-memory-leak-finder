@@ -1,7 +1,3 @@
-import * as QuickPick from '../QuickPick/QuickPick.js'
-import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
-import * as IsMacos from '../IsMacos/IsMacos.js'
-
 export const create = ({ expect, page, VError }) => {
   return {
     async closeAll() {
