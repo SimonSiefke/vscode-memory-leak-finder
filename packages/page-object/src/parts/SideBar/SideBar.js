@@ -25,10 +25,6 @@ export const create = ({ expect, page, VError }) => {
     async hide() {
       try {
         const sideBar = page.locator('.part.sidebar')
-        const isVisible = await sideBar.isVisible()
-        if (!isVisible) {
-          return
-        }
         await expect(sideBar).toBeVisible()
         await this.toggle()
         await expect(sideBar).toBeHidden()
