@@ -14,13 +14,11 @@ const script = `(async function () {
 })()`
 
 export const focus = async ({ electronRpc, electronObjectId }) => {
-  console.log({ electronRpc, electronObjectId })
   try {
-    const r = await DevtoolsProtocolRuntime.evaluate(electronRpc, {
+    await DevtoolsProtocolRuntime.evaluate(electronRpc, {
       expression: script,
       awaitPromise: true,
     })
-    console.log({ r })
   } catch (error) {
     throw new VError(error, `Failed to focus page`)
   }
