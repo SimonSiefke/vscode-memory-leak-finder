@@ -9,6 +9,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "chokidar": "^4.0.0"
+    "chokidar": "^4.0.1"
   }
 }
