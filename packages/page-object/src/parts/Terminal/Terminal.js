@@ -93,10 +93,14 @@ export const create = ({ expect, page, VError }) => {
     async execute(command) {
       try {
         await page.waitForIdle()
+        const terminal = page.locator('.terminal')
+        const textarea = terminal.locator('.xterm-helper-textarea')
+        await expect(textarea).toBeFocused()
         // TODO
         // 1. type text into terminal
         // 2. press enter
         // 3. verify command has executed successfully
+        await textarea.type(command)
       } catch (error) {
         throw new VError(error, `Failed to execute terminal command`)
       }
