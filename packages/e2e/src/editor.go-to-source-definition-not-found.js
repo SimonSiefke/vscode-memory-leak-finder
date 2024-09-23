@@ -15,6 +15,6 @@ def`,
 }
 
 export const run = async ({ Editor, Notification }) => {
-  await Editor.goToSourceDefinition()
+  await Editor.goToSourceDefinition({ hasDefinition: false })
   await Notification.closeAll()
 }
