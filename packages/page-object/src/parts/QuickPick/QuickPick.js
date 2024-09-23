@@ -58,17 +58,8 @@ export const create = ({ expect, page, VError }) => {
       try {
         await page.waitForIdle()
         await this.showCommands()
-        await new Promise((r) => {
-          setTimeout(r, 1000)
-        })
         await this.type(command)
-        await new Promise((r) => {
-          setTimeout(r, 2000)
-        })
         await this.select(command, stayVisible)
-        await new Promise((r) => {
-          setTimeout(r, 2000)
-        })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to execute command "${command}"`)
