@@ -1,7 +1,9 @@
+import { VError } from '@lvce-editor/verror'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 
-const script = `function () {
-  const electron = this
+// TODO emulate a focused page?
+const script = `(async function () {
+  const electron = globalThis._____electron
   const { BrowserWindow } = electron
   const browserWindows = BrowserWindow.getAllWindows()
   const browserWindow = browserWindows[0]
@@ -9,11 +11,15 @@ const script = `function () {
     throw new Error("no browser window found")
   }
   browserWindow.focus()
-}`
+})()`
 
-export const focus = async ({ electronRpc, electronObjectId }) => {
-  await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-    functionDeclaration: script,
-    objectId: electronObjectId,
-  })
+export const focus = async ({ electronRpc }) => {
+  try {
+    await DevtoolsProtocolRuntime.evaluate(electronRpc, {
+      expression: script,
+      awaitPromise: true,
+    })
+  } catch (error) {
+    throw new VError(error, `Failed to focus page`)
+  }
 }
