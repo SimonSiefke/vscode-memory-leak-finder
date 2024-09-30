@@ -101,6 +101,21 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to enable checkbox "${name}"`)
       }
     },
+    async openTab(tabName) {
+      try {
+        const settingsSwitcher = page.locator('[aria-label="Settings Switcher"]')
+        await expect(settingsSwitcher).toBeVisible()
+        const tab = settingsSwitcher.locator(`[aria-label="${tabName}"]`)
+        await expect(tab).toBeVisible()
+        await expect(tab).toHaveAttribute('aria-selected', 'false')
+        await tab.click()
+        await page.waitForIdle()
+        await expect(tab).toHaveAttribute('aria-selected', 'true')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open tab "${tabName}"`)
+      }
+    },
     async disableCheckBox({ name }) {
       try {
         await page.waitForIdle()
