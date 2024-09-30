@@ -13,5 +13,5 @@ export const run = async ({ SettingsEditor, SettingsEditorFilter, SettingsEditor
     filterText: '@tag:',
   })
   await SettingsEditorCompletion.select('@tag:accessibility')
-  await SettingsEditor.clear()
+  // await SettingsEditor.clear()
 }
