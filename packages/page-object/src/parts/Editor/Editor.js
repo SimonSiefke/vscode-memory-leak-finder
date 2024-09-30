@@ -671,7 +671,7 @@ export const create = ({ page, expect, VError }) => {
         const tabsContainer = page.locator('.tabs-and-actions-container')
         await expect(tabsContainer).toBeVisible()
         const activeTab = tabsContainer.locator('.tab.active')
-        await expect(activeTab).not.toHaveClass('sticky-normal')
+        await expect(activeTab).notToHaveClass('sticky-normal')
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.PinEditor)
         await page.waitForIdle()
@@ -689,7 +689,7 @@ export const create = ({ page, expect, VError }) => {
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.UnPinEditor)
         await page.waitForIdle()
-        await expect(activeTab).not.toHaveClass('sticky-normal')
+        await expect(activeTab).notToHaveClass('sticky-normal')
       } catch (error) {
         throw new VError(error, `Failed to unpin editor`)
       }

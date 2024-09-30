@@ -59,6 +59,11 @@ export const toHaveClass = (element, { className }) => {
   return element.className === className || element.classList.contains(className)
 }
 
+export const notToHaveClass = (element, { className }) => {
+  Assert.string(className)
+  return !element.classList.contains(className)
+}
+
 export const toHaveId = (element, { id }) => {
   Assert.string(id)
   return element.id === id
