@@ -11,6 +11,8 @@ export const create = ({ expect, page, VError }) => {
       await page.waitForIdle()
       const dropDown = page.locator('.monaco-dropdown.active')
       await expect(dropDown).toBeVisible()
+      const shadowRootHost = dropDown.locator('.shadow-root-host')
+      await expect(shadowRootHost).toBeVisible()
       const menu = dropDown.locator('ul[role="menu"]')
       await expect(menu).toBeVisible()
       const menuItem = menu.locator(`[aria-label="${filterName}"]`)
