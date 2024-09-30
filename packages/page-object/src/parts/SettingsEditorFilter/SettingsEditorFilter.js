@@ -9,15 +9,15 @@ export const create = ({ expect, page, VError }) => {
       const settingsFilter = page.locator('[aria-label="Filter Settings"]')
       await settingsFilter.click()
       await page.waitForIdle()
-      const contextMenu = ContextMenu.create({
-        page,
-        expect,
-        VError,
-      })
-      await contextMenu.shouldHaveItem(filterName)
-      await contextMenu.select(filterName)
-      const settings = Settings.create({ expect, page, VError })
-      await settings.open()
+      const dropDown = page.locator('.monaco-dropdown.active')
+      await expect(dropDown).toBeVisible()
+      const menu = dropDown.locator('ul[role="menu"]')
+      await expect(menu).toBeVisible()
+      const menuItem = menu.locator(`[aria-label="${filterName}"]`)
+      await expect(menuItem).toBeVisible()
+      await menuItem.click()
+      await page.waitForIdle()
+      await expect(menu).toBeHidden()
     },
   }
 }
