@@ -8,6 +8,10 @@ export const setup = async ({ Editor, SettingsEditor }) => {
 }
 
 export const run = async ({ SettingsEditor }) => {
-  await SettingsEditor.openTab('Workspace')
-  await SettingsEditor.openTab('User')
+  await SettingsEditor.applyFilter({
+    filterName: 'Tag...',
+    filterText: '@tag:',
+  })
+  await SettingsEditor.selectCompletion('@tag:accessibility')
+  await SettingsEditor.clear()
 }
