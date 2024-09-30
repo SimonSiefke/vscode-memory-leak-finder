@@ -13,10 +13,9 @@ export const create = ({ expect, page, VError }) => {
       const menuItem = menu.locator(`.action-label[aria-label="${filterName}"]`)
       await expect(menuItem).toBeVisible()
       await page.waitForIdle()
-      await new Promise((r) => {
-        setTimeout(r, 1000)
+      await menuItem.clickExponential({
+        waitForHidden: menu,
       })
-      await menuItem.click()
       await page.waitForIdle()
       await expect(menu).toBeHidden()
     },
