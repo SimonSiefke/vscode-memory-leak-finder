@@ -664,5 +664,19 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to wait for editor error`)
       }
     },
+    async pin() {
+      try {
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to pin editor`)
+      }
+    },
+    async unpin() {
+      try {
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to unpin editor`)
+      }
+    },
   }
 }
