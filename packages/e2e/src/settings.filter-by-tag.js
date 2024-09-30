@@ -7,11 +7,11 @@ export const setup = async ({ Editor, SettingsEditor }) => {
   await SettingsEditor.collapseOutline()
 }
 
-export const run = async ({ SettingsEditor }) => {
-  await SettingsEditor.applyFilter({
+export const run = async ({ SettingsEditor, SettingsEditorFilter, SettingsEditorCompletion }) => {
+  await SettingsEditorFilter.select({
     filterName: 'Tag...',
     filterText: '@tag:',
   })
-  await SettingsEditor.selectCompletion('@tag:accessibility')
+  await SettingsEditorCompletion.select('@tag:accessibility')
   await SettingsEditor.clear()
 }
