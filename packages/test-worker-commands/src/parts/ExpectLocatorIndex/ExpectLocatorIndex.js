@@ -1,3 +1,4 @@
+export * from '../ExpectLocatorNotToHaveClass/ExpectLocatorNotToHaveClass.js'
 export * from '../ExpectLocatorToBeFocused/ExpectLocatorToBeFocused.js'
 export * from '../ExpectLocatorToBeHidden/ExpectLocatorToBeHidden.js'
 export * from '../ExpectLocatorToBeVisible/ExpectLocatorToBeVisible.js'

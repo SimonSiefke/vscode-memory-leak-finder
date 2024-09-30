@@ -664,5 +664,35 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to wait for editor error`)
       }
     },
+    // tab tab-actions-right sizing-fit has-icon active selected tab-border-bottom tab-border-top sticky sticky-normal
+    // tab tab-actions-right sizing-fit has-icon active selected tab-border-bottom tab-border-top
+    async pin() {
+      try {
+        const tabsContainer = page.locator('.tabs-and-actions-container')
+        await expect(tabsContainer).toBeVisible()
+        const activeTab = tabsContainer.locator('.tab.active')
+        await expect(activeTab).notToHaveClass('sticky-normal')
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.PinEditor)
+        await page.waitForIdle()
+        await expect(activeTab).toHaveClass('sticky-normal')
+      } catch (error) {
+        throw new VError(error, `Failed to pin editor`)
+      }
+    },
+    async unpin() {
+      try {
+        const tabsContainer = page.locator('.tabs-and-actions-container')
+        await expect(tabsContainer).toBeVisible()
+        const activeTab = tabsContainer.locator('.tab.active')
+        await expect(activeTab).toHaveClass('sticky-normal')
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.UnPinEditor)
+        await page.waitForIdle()
+        await expect(activeTab).notToHaveClass('sticky-normal')
+      } catch (error) {
+        throw new VError(error, `Failed to unpin editor`)
+      }
+    },
   }
 }
