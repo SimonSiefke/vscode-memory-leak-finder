@@ -1,4 +1,4 @@
-import * as Character from '../Character/Character.js'
+import * as SettingsEditorInput from '../SettingsEditorInput/SettingsEditorInput.js'
 
 export const create = ({ expect, page, VError }) => {
   return {
@@ -21,16 +21,8 @@ export const create = ({ expect, page, VError }) => {
         })
         await page.waitForIdle()
         await expect(menu).toBeHidden()
-        const settingsHeader = page.locator('.settings-header')
-        await expect(settingsHeader).toBeVisible()
-        const settingsHeaderInputContainer = settingsHeader.locator('.suggest-input-container')
-        await expect(settingsHeaderInputContainer).toBeVisible()
-        await expect(settingsHeaderInputContainer).toHaveClass('synthetic-focus')
-        const viewLines = settingsHeaderInputContainer.locator('.view-lines')
-        await expect(viewLines).toBeVisible()
-        const viewLine = viewLines.locator('.view-line')
-        await expect(viewLine).toBeVisible()
-        await expect(viewLine).toHaveText(`${Character.NonBreakingSpace}${filterText}`)
+        const settingsEditorInput = SettingsEditorInput.create({ page, expect, VError })
+        await settingsEditorInput.shouldHaveText(filterText)
       } catch (error) {
         throw new VError(error, `Failed to select filter ${filterName}`)
       }
