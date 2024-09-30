@@ -1,7 +1,3 @@
-import * as Settings from '../Settings/Settings.js'
-import * as QuickPick from '../QuickPick/QuickPick.js'
-import * as ContextMenu from '../ContextMenu/ContextMenu.js'
-
 export const create = ({ expect, page, VError }) => {
   return {
     async select({ filterName, filterText }) {
