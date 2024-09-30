@@ -666,6 +666,8 @@ export const create = ({ page, expect, VError }) => {
     },
     async pin() {
       try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.PinEditor)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to pin editor`)
@@ -673,6 +675,8 @@ export const create = ({ page, expect, VError }) => {
     },
     async unpin() {
       try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.UnPinEditor)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to unpin editor`)
