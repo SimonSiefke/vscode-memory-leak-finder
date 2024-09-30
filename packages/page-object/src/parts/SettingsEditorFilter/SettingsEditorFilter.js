@@ -14,7 +14,7 @@ export const create = ({ expect, page, VError }) => {
       const menu = dropDown.locator('.shadow-root-host:enter-shadow() ul[role="menu"]')
       await expect(menu).toBeVisible()
       await page.waitForIdle()
-      const menuItem = menu.locator(`[role="menuitem"][aria-label="${filterName}"]`)
+      const menuItem = menu.locator(`.action-label[aria-label="${filterName}"]`)
       await expect(menuItem).toBeVisible()
       await page.waitForIdle()
       await menuItem.click()
