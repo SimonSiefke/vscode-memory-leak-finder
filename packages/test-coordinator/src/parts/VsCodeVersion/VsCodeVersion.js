@@ -1,3 +1,3 @@
 import * as Env from '../Env/Env.js'
 
-export const vscodeVersion = Env.env.VSCODE_VERSION || '1.93.1'
+export const vscodeVersion = Env.env.VSCODE_VERSION || '1.94.0'
