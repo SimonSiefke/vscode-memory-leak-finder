@@ -17,6 +17,7 @@ const errorChecker = (data) => {
 
 export const waitForDebuggerListening = async (stream) => {
   const firstData = await WaitForData.waitForData(stream, 'Debugger listening on', errorChecker)
+  // @ts-ignore
   const match = firstData.match(RE_LISTENING_ON)
   if (!match) {
     throw new Error(`Failed to extract websocket url from stdout`)

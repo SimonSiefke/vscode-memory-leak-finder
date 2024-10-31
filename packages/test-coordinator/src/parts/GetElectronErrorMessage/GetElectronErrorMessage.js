@@ -37,7 +37,9 @@ export const getElectronErrorMessage = async (firstData, stream) => {
   }
   if (firstData.includes('App threw an error during load')) {
     const [secondData] = await once(stream, 'data')
+    // @ts-ignore
     const lines = secondData.trim().split('\n')
+    // @ts-ignore
     if (RE_ES_MODULES_NOT_SUPPORTED.test(secondData)) {
       return new Error(`App threw an error during load: ${lines[0]}`)
     }
