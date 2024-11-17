@@ -4,7 +4,9 @@ export const create = async ({ url }) => {
   const childProcess = fork(url, ['--ipc-type=forked-process'], {
     stdio: 'pipe',
   })
+  // @ts-ignore
   childProcess.stdout?.pipe(process.stdout)
+  // @ts-ignore
   childProcess.stderr?.pipe(process.stderr)
   return childProcess
 }
