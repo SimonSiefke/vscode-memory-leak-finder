@@ -1,5 +1,4 @@
 import * as ContextMenu from '../ContextMenu/ContextMenu.js'
-import { Explorer } from '../Parts/Parts.js'
 import * as QuickPick from '../QuickPick/QuickPick.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 
