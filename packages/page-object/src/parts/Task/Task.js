@@ -23,6 +23,48 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to open task`)
       }
     },
+    async openRun() {
+      try {
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.RunTask, { stayVisible: true })
+        await page.waitForIdle()
+        // await quickPick.select('Create tasks.json file from template', true)
+        // await page.waitForIdle()
+        // await quickPick.select('Others')
+        // const tabsContainer = page.locator('.tabs-and-actions-container')
+        // await expect(tabsContainer).toBeVisible()
+        // const activeTab = tabsContainer.locator('.tab.active')
+        // const activeTabLabel = activeTab.locator('.tab-label')
+        // await expect(activeTabLabel).toHaveText(`tasks.json`)
+        // await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open configuration`)
+      }
+    },
+    async pin(name) {
+      try {
+        const quickPick = QuickPick.create({ expect, page, VError })
+        const option = quickPick.locator('.label-name', {
+          hasExactText: name,
+        })
+        await expect(option).toBeVisible()
+        await option.click()
+      } catch (error) {
+        throw new VError(error, `Failed to pin ${name}`)
+      }
+    },
+    async unpin(name) {
+      try {
+        const quickPick = QuickPick.create({ expect, page, VError })
+        const option = quickPick.locator('.label-name', {
+          hasExactText: name,
+        })
+        await expect(option).toBeVisible()
+        await option.click()
+      } catch (error) {
+        throw new VError(error, `Failed to pin ${name}`)
+      }
+    },
     async run(taskName) {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
