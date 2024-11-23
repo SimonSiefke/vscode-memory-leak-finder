@@ -1,5 +1,4 @@
 import * as QuickPick from '../QuickPick/QuickPick.js'
-import * as Panel from '../Panel/Panel.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 
 export const create = ({ page, expect, VError }) => {
