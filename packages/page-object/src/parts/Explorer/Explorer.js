@@ -1,4 +1,5 @@
 import * as ContextMenu from '../ContextMenu/ContextMenu.js'
+import { Explorer } from '../Parts/Parts.js'
 import * as QuickPick from '../QuickPick/QuickPick.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 
@@ -61,6 +62,40 @@ export const create = ({ page, expect, VError }) => {
         await this.shouldHaveItem(name)
       } catch (error) {
         throw new VError(error, `Failed to create new file`)
+      }
+    },
+    async newFolder({ name, error }) {
+      try {
+        await page.waitForIdle()
+        const newFolderButton = page.locator('.sidebar [aria-label="New Folder..."]')
+        await expect(newFolderButton).toBeVisible()
+        await newFolderButton.click()
+        const inputBox = await page.locator('.monaco-inputbox input')
+        await expect(inputBox).toBeVisible()
+        await expect(inputBox).toBeFocused()
+        if (name) {
+          await inputBox.type(name)
+        }
+        await page.keyboard.press('Enter')
+        if (error) {
+          const errorElement = page.locator('.monaco-inputbox-message.error')
+          await expect(errorElement).toBeVisible()
+          await expect(errorElement).toHaveText(error)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to create new folder`)
+      }
+    },
+    async cancel() {
+      try {
+        await page.waitForIdle()
+        await page.keyboard.press('Escape')
+        const inputBox = await page.locator('.monaco-inputbox input')
+        await expect(inputBox).toBeHidden()
+        const errorElement = page.locator('.monaco-inputbox-message.error')
+        await expect(errorElement).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to cancel input`)
       }
     },
     async focusNext() {
