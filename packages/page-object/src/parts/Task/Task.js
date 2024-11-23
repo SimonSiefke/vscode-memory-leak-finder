@@ -1,5 +1,7 @@
 import * as QuickPick from '../QuickPick/QuickPick.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
+import * as ContextMenu from '../ContextMenu/ContextMenu.js'
+import * as IconSelect from '../IconSelect/IconSelect.js'
 
 export const create = ({ page, expect, VError }) => {
   return {
@@ -43,6 +45,26 @@ export const create = ({ page, expect, VError }) => {
         await expect(check).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to run task`)
+      }
+    },
+    async changeIcon(fromIcon, toIcon) {
+      try {
+        const terminalActions = page.locator('[aria-label="Terminal actions"]')
+        await expect(terminalActions).toBeVisible()
+        const actionLabel = terminalActions.locator('.action-label')
+        await expect(actionLabel).toBeVisible()
+        await expect(actionLabel).toHaveText(' echo  -  Task ')
+        const currentIcon = actionLabel.locator(`.codicon-${fromIcon}`)
+        await expect(currentIcon).toBeVisible()
+        await actionLabel.click()
+        const contextMenu = ContextMenu.create({ page, expect, VError })
+        await contextMenu.select('Change Icon...')
+        const iconSelect = IconSelect.create({ page, expect, VError })
+        await iconSelect.select(toIcon)
+        const newIcon = actionLabel.locator(`.codicon-${toIcon}`)
+        await expect(newIcon).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to change task icon`)
       }
     },
   }
