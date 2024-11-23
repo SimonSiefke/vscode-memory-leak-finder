@@ -1,5 +1,6 @@
 import * as Settings from '../Settings/Settings.js'
 import * as QuickPick from '../QuickPick/QuickPick.js'
+import * as ContextMenu from '../ContextMenu/ContextMenu.js'
 
 export const create = ({ expect, page, VError }) => {
   return {
@@ -99,6 +100,21 @@ export const create = ({ expect, page, VError }) => {
         await this.toggleCheckBox({ name })
       } catch (error) {
         throw new VError(error, `Failed to enable checkbox "${name}"`)
+      }
+    },
+    async openTab(tabName) {
+      try {
+        const settingsSwitcher = page.locator('[aria-label="Settings Switcher"]')
+        await expect(settingsSwitcher).toBeVisible()
+        const tab = settingsSwitcher.locator(`[aria-label="${tabName}"]`)
+        await expect(tab).toBeVisible()
+        await expect(tab).toHaveAttribute('aria-selected', 'false')
+        await tab.click()
+        await page.waitForIdle()
+        await expect(tab).toHaveAttribute('aria-selected', 'true')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open tab "${tabName}"`)
       }
     },
     async disableCheckBox({ name }) {
@@ -237,6 +253,23 @@ export const create = ({ expect, page, VError }) => {
         await expect(heading).toHaveText(name)
       } catch (error) {
         throw new VError(error, `Failed to focus outline item`)
+      }
+    },
+    async applyFilter({ filterName, filterText }) {
+      try {
+        await page.waitForIdle()
+        const settingsFilter = page.locator('[aria-label="Filter Settings"]')
+        await settingsFilter.click()
+        await page.waitForIdle()
+        const contextMenu = ContextMenu.create({
+          page,
+          expect,
+          VError,
+        })
+        await contextMenu.shouldHaveItem(filterName)
+        await contextMenu.select(filterName)
+      } catch (error) {
+        throw new VError(error, `Failed to apply filter ${filterName}`)
       }
     },
   }

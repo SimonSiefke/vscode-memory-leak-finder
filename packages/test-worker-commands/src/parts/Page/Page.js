@@ -68,7 +68,6 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
     focus() {
       return PageFocus.focus({
         electronRpc: this.electronRpc,
-        electronObjectId: this.electronObjectId,
       })
     },
     frameLocator(selector, options = {}) {

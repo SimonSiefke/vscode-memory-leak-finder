@@ -21,6 +21,7 @@ const waitForRelevantData = async (stream) => {
 
 export const waitForDevtoolsListening = async (stream) => {
   const relevantData = await waitForRelevantData(stream)
+  // @ts-ignore
   const match = relevantData.match(RE_LISTENING_ON)
   if (!match) {
     throw new Error(`Failed to extract websocket url from stderr`)

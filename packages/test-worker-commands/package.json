@@ -15,18 +15,18 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@lvce-editor/assert": "^1.2.0",
-    "@lvce-editor/verror": "^1.4.0",
+    "@lvce-editor/assert": "^1.3.0",
+    "@lvce-editor/verror": "^1.6.0",
     "@vscode/test-electron": "^2.4.1",
     "exit-hook": "^4.0.0",
-    "got": "^14.4.2",
+    "got": "^14.4.4",
     "source-map": "^0.7.4",
     "strip-ansi": "^7.1.0",
     "ws": "^8.18.0"
   },
   "devDependencies": {
-    "@babel/code-frame": "^7.24.7",
-    "@types/ws": "^8.5.12",
+    "@babel/code-frame": "^7.26.2",
+    "@types/ws": "^8.5.13",
     "clean-stack": "^5.2.0"
   },
   "jest": {

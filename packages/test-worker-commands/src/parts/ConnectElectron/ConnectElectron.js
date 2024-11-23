@@ -5,6 +5,7 @@ import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
 import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as IntermediateConnectionState from '../IntermediateConnectionState/IntermediateConnectionState.js'
 import * as IsPausedOnStartEvent from '../IsPausedOnStartEvent/IsPausedOnStartEvent.js'
+import * as MakeElectronAvailableGlobally from '../MakeElectronAvailableGlobally/MakeElectronAvailableGlobally.js'
 import * as MonkeyPatchElectronHeadlessMode from '../MonkeyPatchElectronHeadlessMode/MonkeyPatchElectronHeadlessMode.js'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.js'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
@@ -69,6 +70,8 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl, 
     functionDeclaration: MonkeyPatchElectronScript.monkeyPatchElectronScript,
     objectId: electronObjectId,
   })
+
+  await MakeElectronAvailableGlobally.makeElectronAvailableGlobally(electronRpc, electronObjectId)
 
   electronRpc.on(DevtoolsEventType.DebuggerPaused, handleIntermediatePaused)
 

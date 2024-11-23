@@ -1,9 +1,10 @@
-import { copyFile, mkdir } from 'node:fs/promises'
+import { copyFile, mkdir, rm } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.js'
 import * as DefaultVscodeSettingsPath from '../DefaultVscodeSettingsPath/DefaultVsCodeSettingsPath.js'
 import * as GetBinaryPath from '../GetBinaryPath/GetBinaryPath.js'
 import * as GetUserDataDir from '../GetUserDataDir/GetUserDataDir.js'
+import * as GetExtensionsDir from '../GetExtensionsDir/GetExtensionsDir.js'
 import * as GetVsCodeArgs from '../GetVsCodeArgs/GetVsCodeArgs.js'
 import * as GetVsCodeEnv from '../GetVsCodeEnv/GetVsCodeEnv.js'
 import * as GetVscodeRuntimeDir from '../GetVscodeRuntimeDir/GetVscodeRuntimeDir.js'
@@ -25,19 +26,22 @@ export const launchVsCode = async ({ headlessMode, cwd }) => {
       await RemoveVscodeGlobalStorage.removeVsCodeGlobalStorage()
     }
     await RemoveVscodeBackups.removeVscodeBackups()
-    const testExtensionsPath = join(Root.root, '.vscode-extensions')
     const runtimeDir = GetVscodeRuntimeDir.getVscodeRuntimeDir()
     const binaryPath = await GetBinaryPath.getBinaryPath()
     const userDataDir = GetUserDataDir.getUserDataDir()
+    const extensionsDir = GetExtensionsDir.getExtensionsDir()
+    await rm(extensionsDir, { recursive: true, force: true })
+    await mkdir(extensionsDir)
     const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
     const settingsPath = join(userDataDir, 'User', 'settings.json')
     await mkdir(dirname(settingsPath), { recursive: true })
     await copyFile(defaultSettingsSourcePath, settingsPath)
     const args = GetVsCodeArgs.getVscodeArgs({
       userDataDir,
+      extensionsDir,
       extraLaunchArgs: [testWorkspacePath],
     })
-    const env = GetVsCodeEnv.getVsCodeEnv({ extensionsFolder: testExtensionsPath, runtimeDir, processEnv: process.env })
+    const env = GetVsCodeEnv.getVsCodeEnv({ runtimeDir, processEnv: process.env })
     const { child, webSocketUrl } = await LaunchElectron.launchElectron({
       cliPath: binaryPath,
       args,

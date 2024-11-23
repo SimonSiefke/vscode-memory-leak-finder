@@ -1,7 +1,6 @@
-export const getVsCodeEnv = ({ extensionsFolder, runtimeDir, processEnv }) => {
+export const getVsCodeEnv = ({ runtimeDir, processEnv }) => {
   const env = {
     ...processEnv,
-    VSCODE_EXTENSIONS: extensionsFolder,
   }
   if (runtimeDir) {
     env.XDG_RUNTIME_DIR = runtimeDir
