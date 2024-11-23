@@ -34,6 +34,7 @@ export * as MeasureGlobalLexicalScopeNames from '../MeasureGlobalLexicalScopeNam
 export * as MeasureGrowingArrays from '../MeasureGrowingArrays/MeasureGrowingArrays.js'
 export * as MeasureGrowingDisposableStores from '../MeasureGrowingDisposableStores/MeasureGrowingDisposableStores.js'
 export * as MeasureHeapUsage from '../MeasureHeapUsage/MeasureHeapUsage.js'
+export * as MeasureIframeCount from '../MeasureIframeCount/MeasureIframeCount.js'
 export * as MeasureInstanceCounts from '../MeasureInstanceCounts/MeasureInstanceCounts.js'
 export * as MeasureInstanceCountsDifference from '../MeasureInstanceCountsDifference/MeasureInstanceCountsDifference.js'
 export * as MeasureInstanceCountsDifferenceWithSourceMap from '../MeasureInstanceCountsDifferenceWithSourceMap/MeasureInstanceCountsDifferenceWithSourceMap.js'
