@@ -46,7 +46,7 @@ export const create = ({ page, expect, VError }) => {
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
         const option = quickPick.locator('.label-name', {
-          hasExactText: name,
+          hasExactText: ` ${name}`,
         })
         await expect(option).toBeVisible()
       } catch (error) {
@@ -57,7 +57,7 @@ export const create = ({ page, expect, VError }) => {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
         const option = quickPick.locator('.label-name', {
-          hasExactText: name,
+          hasExactText: ` ${name}`,
         })
         await expect(option).toBeVisible()
       } catch (error) {
