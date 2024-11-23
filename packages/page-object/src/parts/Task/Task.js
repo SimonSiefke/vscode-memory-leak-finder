@@ -43,14 +43,15 @@ export const create = ({ page, expect, VError }) => {
     },
     async pin(name) {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
+        const quickPick = page.locator('.quick-input-widget')
+        await expect(quickPick).toBeVisible()
         const option = quickPick.locator('.label-name', {
           hasExactText: name,
         })
         await expect(option).toBeVisible()
         await option.click()
       } catch (error) {
-        throw new VError(error, `Failed to pin ${name}`)
+        throw new VError(error, `Failed to pin "${name}"`)
       }
     },
     async unpin(name) {
