@@ -49,7 +49,6 @@ export const create = ({ page, expect, VError }) => {
           hasExactText: name,
         })
         await expect(option).toBeVisible()
-        await option.click()
       } catch (error) {
         throw new VError(error, `Failed to pin "${name}"`)
       }
@@ -61,7 +60,6 @@ export const create = ({ page, expect, VError }) => {
           hasExactText: name,
         })
         await expect(option).toBeVisible()
-        await option.click()
       } catch (error) {
         throw new VError(error, `Failed to pin ${name}`)
       }
