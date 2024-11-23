@@ -40,6 +40,8 @@ export const create = ({ page, expect, VError }) => {
         const actionLabel = terminalActions.locator('.action-label')
         await expect(actionLabel).toBeVisible()
         await expect(actionLabel).toHaveText(' echo  -  Task ')
+        const check = actionLabel.locator('.codicon-check')
+        await expect(check).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to run task`)
       }
