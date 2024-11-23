@@ -59,6 +59,7 @@ export * as MeasureNumberCount from '../MeasureNumberCount/MeasureNumberCount.js
 export * as MeasureNumbers from '../MeasureNumbers/MeasureNumbers.js'
 export * as MeasureObjectCount from '../MeasureObjectCount/MeasureObjectCount.js'
 export * as MeasureObjectShapeCount from '../MeasureObjectShapeCount/MeasureObjectShapeCount.js'
+export * as MeasureOffscreenCanvasCount from '../MeasureOffscreenCanvasCount/MeasureOffscreenCanvasCount.js'
 export * as MeasurePromiseCount from '../MeasurePromiseCount/MeasurePromiseCount.js'
 export * as MeasurePromises from '../MeasurePromises/MeasurePromises.js'
 export * as MeasureRealObjectCount from '../MeasureRealObjectCount/MeasureRealObjectCount.js'
