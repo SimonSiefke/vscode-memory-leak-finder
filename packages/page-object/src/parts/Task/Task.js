@@ -49,6 +49,14 @@ export const create = ({ page, expect, VError }) => {
           hasExactText: ` ${name}`,
         })
         await expect(option).toBeVisible()
+        const focusedRow = quickPick.locator('.monaco-list-row.focused')
+        await expect(focusedRow).toBeVisible()
+        const pinAction = focusedRow.locator('[aria-label="Pin command"]')
+        await expect(pinAction).toBeVisible()
+        await pinAction.click()
+        await expect(pinAction).toBeHidden()
+        const unpinAction = focusedRow.locator('[aria-label="Pinned command"]')
+        await expect(unpinAction).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to pin "${name}"`)
       }
@@ -61,6 +69,14 @@ export const create = ({ page, expect, VError }) => {
           hasExactText: ` ${name}`,
         })
         await expect(option).toBeVisible()
+        const focusedRow = quickPick.locator('.monaco-list-row.focused')
+        await expect(focusedRow).toBeVisible()
+        const unpinAction = focusedRow.locator('[aria-label="Pinned command"]')
+        await expect(unpinAction).toBeVisible()
+        await unpinAction.click()
+        await expect(unpinAction).toBeHidden()
+        const pinAction = focusedRow.locator('[aria-label="Pin command"]')
+        await expect(pinAction).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to pin ${name}`)
       }
