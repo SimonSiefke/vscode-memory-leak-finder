@@ -483,6 +483,30 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to hide minimap`)
       }
     },
+    async removeAllBreakpoints() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.RemoveAllBreakpoints)
+      } catch (error) {
+        throw new VError(error, `Failed to remove all breakpoints`)
+      }
+    },
+    async toggleBreakpoint() {
+      try {
+        const glyphMarginWidgets = page.locator('.glyph-margin-widgets')
+        await expect(glyphMarginWidgets).toBeVisible()
+        const breakpoints = glyphMarginWidgets.locator('.codicon-debug-breakpoint')
+        const breakpointCount = await breakpoints.count()
+        const newBreakpointCount = breakpointCount === 0 ? 1 : 0
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.ToggleBreakpoint)
+        await page.waitForIdle()
+        await expect(breakpoints).toHaveCount(newBreakpointCount)
+      } catch (error) {
+        throw new VError(error, `Failed to toggle breakpoint`)
+      }
+    },
     async showSourceActionEmpty() {
       try {
         const overlayMessage = page.locator('.monaco-editor-overlaymessage')
