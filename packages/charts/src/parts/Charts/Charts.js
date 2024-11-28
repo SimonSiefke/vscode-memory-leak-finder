@@ -3,6 +3,7 @@ export * as DetachedDomNodeCount from '../CreateDetachedDomNodeCountChart/Create
 export * as EmitterCount from '../CreateEmitterCountChart/CreateEmitterCountChart.js'
 export * as EventListenerCount from '../CreateEventListenerCountChart/CreateEventListenerCountChart.js'
 export * as FunctionCount from '../CreateFunctionCountChart/CreateFunctionCountChart.js'
+export * as IframeCount from '../CreateIframeCountChart/CreateIframeCountChart.js'
 export * as MapSize from '../CreateMapSizeChart/CreateMapSizeChart.js'
 export * as MutationObserverCount from '../CreateMutationObserverCountChart/CreateMutationObserverCountChart.js'
 export * as NumberCount from '../CreateNumberCountChart/CreateNumberCountChart.js'
