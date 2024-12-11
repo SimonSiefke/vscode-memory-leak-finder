@@ -48,6 +48,7 @@ export const IntersectionObserversWithStackTraces = 'intersectionObserversWithSt
 export const LargestArrayCount = 'largestArrayCount'
 export const MapSize = 'mapSize'
 export const MediaQueryListCount = 'mediaQueryListCount'
+export const MessagePortCount = 'messagePortCount'
 export const MinimapCount = 'minimapCount'
 export const MutationObserverCount = 'mutationObserverCount'
 export const MutationObserversWithStackTraces = 'mutationObserversWithStackTraces'
