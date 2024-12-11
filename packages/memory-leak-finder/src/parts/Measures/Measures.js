@@ -46,6 +46,7 @@ export * as MeasureIntersectionObserversWithStackTraces from '../MeasureIntersec
 export * as MeasureLargestArrayCount from '../MeasureLargestArrayCount/MeasureLargestArrayCount.js'
 export * as MeasureMapSize from '../MeasureMapSize/MeasureMapSize.js'
 export * as MeasureMediaQueryListCount from '../MeasureMediaQueryListCount/MeasureMediaQueryListCount.js'
+export * as MeasureMessagePortCount from '../MeasureMessagePortCount/MeasureMessagePortCount.js'
 export * as MeasureMinimapCount from '../MeasureMinimapCount/MeasureMinimapCount.js'
 export * as MeasureMutationObserverCount from '../MeasureMutationObserverCount/MeasureMutationObserverCount.js'
 export * as MeasureMutationObserversWithStackTraces from '../MeasureMutationObserversWithStackTraces/MeasureMutationObserversWithStackTraces.js'
