@@ -76,6 +76,7 @@ export * as MeasureStringCount from '../MeasureStringCount/MeasureStringCount.js
 export * as MeasureStringDifference from '../MeasureStringDifference/MeasureStringDifference.js'
 export * as MeasureStyleElementCount from '../MeasureStyleElementCount/MeasureStyleElementCount.js'
 export * as MeasureSymbolCount from '../MeasureSymbolCount/MeasureSymbolCount.js'
+export * as MeasureSymbols from '../MeasureSymbols/MeasureSymbols.js'
 export * as MeasureUserStringCount from '../MeasureUserStringCount/MeasureUserStringCount.js'
 export * as MeasureWeakMapCount from '../MeasureWeakMapCount/MeasureWeakMapCount.js'
 export * as MeasureWeakSetCount from '../MeasureWeakSetCount/MeasureWeakSetCount.js'
