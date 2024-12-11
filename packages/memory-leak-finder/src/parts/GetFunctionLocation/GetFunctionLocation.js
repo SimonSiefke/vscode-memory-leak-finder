@@ -20,8 +20,8 @@ export const getFunctionLocation = async (session, objectId, i) => {
   })
   const e = performance.now()
   if (e - s > 1000) {
-    console.log('i', i)
-    console.log(fnResult1.internalProperties[0].value)
+    // console.log('i', i)
+    // console.log(fnResult1.internalProperties[0].value)
   }
   // if (fnResult1.result.length >= 7) {
   //   console.log('fn result', fnResult1.result.length)
