@@ -143,6 +143,7 @@ export const registerCrashListener = (targetId, fn) => {
 
 export const removeCrashListener = (targetId) => {
   Assert.string(targetId)
+  console.log('remove crash listener', targetId)
   delete state.crashCallbacks[targetId]
 }
 
