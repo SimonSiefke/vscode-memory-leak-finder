@@ -13,6 +13,7 @@ export const getConstructorLocations = async (session, objectGroup, map) => {
     array.push(instanceConstructor)
   }
 
+  globalThis.yy=array
   return array
 }`,
     objectId: map.objectId,

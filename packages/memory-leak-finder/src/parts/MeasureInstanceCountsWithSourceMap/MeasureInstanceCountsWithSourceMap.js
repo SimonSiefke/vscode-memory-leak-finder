@@ -20,6 +20,7 @@ export const start = async (session, objectGroup, scriptHandler) => {
 }
 
 export const stop = async (session, objectGroup, scriptHandler) => {
+  // await new Promise((r) => {})
   await scriptHandler.stop(session)
   return GetInstanceCountsWithSourceMap.getInstanceCountsWithSourceMap(session, objectGroup, scriptHandler.scriptMap)
 }
