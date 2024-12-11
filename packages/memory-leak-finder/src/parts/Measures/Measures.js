@@ -80,5 +80,6 @@ export * as MeasureSymbolCount from '../MeasureSymbolCount/MeasureSymbolCount.js
 export * as MeasureSymbols from '../MeasureSymbols/MeasureSymbols.js'
 export * as MeasureUserStringCount from '../MeasureUserStringCount/MeasureUserStringCount.js'
 export * as MeasureWeakMapCount from '../MeasureWeakMapCount/MeasureWeakMapCount.js'
+export * as MeasureWeakRefCount from '../MeasureWeakRefCount/MeasureWeakRefCount.js'
 export * as MeasureWeakSetCount from '../MeasureWeakSetCount/MeasureWeakSetCount.js'
 export * as MeasureWidgetCount from '../MeasureWidgetCount/MeasureWidgetCount.js'
