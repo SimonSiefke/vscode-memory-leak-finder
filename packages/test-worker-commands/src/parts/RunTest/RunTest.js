@@ -11,7 +11,9 @@ export const runTest = async (connectionId, absolutePath, forceRun, runMode) => 
   const crashInfo = WaitForCrash.waitForCrash(firstWindow)
   const testResultPromise = RunTestWithCallback.runTestWithCallback(pageObject, absolutePath, forceRun, runMode)
   const intermediateResult = await Promise.race([crashInfo.promise, testResultPromise])
+  console.log({ intermediateResult })
   if (intermediateResult && intermediateResult.crashed) {
+    console.log('throw error')
     throw new Error(`Target crashed`)
   }
   crashInfo.cleanup()
