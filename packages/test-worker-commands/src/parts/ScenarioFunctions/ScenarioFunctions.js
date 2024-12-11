@@ -1,4 +1,3 @@
-import { VError } from '../VError/VError.js'
 import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.js'
 import { DevtoolsProtocolPage, DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.js'
@@ -9,6 +8,7 @@ import * as SessionState from '../SessionState/SessionState.js'
 import * as TargetState from '../TargetState/TargetState.js'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
 import * as UtilityScript from '../UtilityScript/UtilityScript.js'
+import { VError } from '../VError/VError.js'
 
 export const Locator = (selector) => {
   return {
@@ -146,7 +146,8 @@ export const handleTargetInfoChanged = (message) => {
 }
 
 export const handleTargetCrashed = (message) => {
-  console.log('target crashed 2', message)
+  console.log('target crashed', message)
+  ExecutionContextState.executeCrashListener(message.params.targetId)
 }
 
 const handleAttachedToPage = async (message) => {

@@ -7,12 +7,14 @@ export const state = {
   executionContexts: Object.create(null),
   defaultExecutionContextCallbacks: Object.create(null),
   utilityExecutionContextCallbacks: Object.create(null),
+  crashCallbacks: Object.create(null),
 }
 
 export const reset = () => {
   state.executionContexts = Object.create(null)
   state.defaultExecutionContextCallbacks = Object.create(null)
   state.utilityExecutionContextCallbacks = Object.create(null)
+  state.crashCallbacks = Object.create(null)
 }
 
 const isDefaultExecutionContext = (executionContext, sessionId) => {
@@ -131,4 +133,19 @@ export const getUtilityExecutionContext = (sessionId) => {
   }
   console.log(Object.values(state.executionContexts))
   return undefined
+}
+
+export const registerCrashListener = (targetId, fn) => {
+  state.crashCallbacks[targetId] = fn
+}
+
+export const removeCrashListener = (targetId) => {
+  delete state.crashCallbacks[targetId]
+}
+
+export const executeCrashListener = (targetId) => {
+  const fn = state.crashCallbacks[targetId]
+  if (fn) {
+    fn()
+  }
 }
