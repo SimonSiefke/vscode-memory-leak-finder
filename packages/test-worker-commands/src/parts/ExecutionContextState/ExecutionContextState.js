@@ -136,14 +136,18 @@ export const getUtilityExecutionContext = (sessionId) => {
 }
 
 export const registerCrashListener = (targetId, fn) => {
+  Assert.string(targetId)
+  Assert.fn(fn)
   state.crashCallbacks[targetId] = fn
 }
 
 export const removeCrashListener = (targetId) => {
+  Assert.string(targetId)
   delete state.crashCallbacks[targetId]
 }
 
 export const executeCrashListener = (targetId) => {
+  Assert.string(targetId)
   const fn = state.crashCallbacks[targetId]
   if (!fn) {
     console.log(state.crashCallbacks)
