@@ -26,13 +26,11 @@ export const getFunctionLocations = async (session, objectIds) => {
     const batchResults = await processBatch(session, objectIds, i)
 
     // give browser some time
-    console.time('idle')
 
-    await DevtoolsProtocolRuntime.evaluate(session, {
-      expression: `new Promise(resolve => { requestIdleCallback(resolve) })`,
-      awaitPromise: true,
-    })
-    console.timeEnd('idle')
+    // await DevtoolsProtocolRuntime.evaluate(session, {
+    //   expression: `new Promise(resolve => { requestIdleCallback(resolve) })`,
+    //   awaitPromise: true,
+    // })
     console.timeEnd('batch' + i)
     results.push(...batchResults)
   }
