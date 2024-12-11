@@ -117,7 +117,7 @@ export const handleTargetInfoChanged = (message) => {
 }
 
 export const handleTargetCrashed = (message) => {
-  console.log('target crashed', message)
+  console.log('target crashed 1', message)
 }
 
 const handleAttachedToPage = async (message) => {
