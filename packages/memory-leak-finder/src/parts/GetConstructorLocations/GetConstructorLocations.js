@@ -28,7 +28,6 @@ export const getConstructorLocations = async (session, objectGroup, map) => {
   console.timeEnd('properties')
   const descriptors = GetDescriptorValues.getDescriptorValues(fnResult3.result)
   const functionObjectIds = GetFunctionObjectIds.getFunctionObjectIds(descriptors)
-  console.log({ functionObjectIds })
   console.time('locations')
   const functionLocations = await GetFunctionLocations.getFunctionLocations(session, functionObjectIds)
   console.timeEnd('locations')
