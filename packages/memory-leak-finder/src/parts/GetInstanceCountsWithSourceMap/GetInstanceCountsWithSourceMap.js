@@ -15,6 +15,7 @@ export const getInstanceCountsWithSourceMap = async (session, objectGroup, scrip
   console.time('map')
   const map = await GetInstanceCountMap.getInstanceCountMap(session, objectGroup, objects)
   console.timeEnd('map')
+  console.log('objects size', map)
   console.time('array')
   const fnResult1 = await GetInstanceCountArray.getInstanceCountArray(session, objectGroup, map)
   console.timeEnd('array')
