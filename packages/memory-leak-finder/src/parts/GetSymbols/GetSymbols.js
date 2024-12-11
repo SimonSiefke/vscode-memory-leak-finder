@@ -7,7 +7,6 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
  * @returns {Promise<number[]>}
  */
 export const getSymbols = async (session, objectGroup) => {
-  // TODO get symbols and groups them by name
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Object,
     returnByValue: false,
@@ -55,7 +54,14 @@ export const getSymbols = async (session, objectGroup) => {
       }
     }
   }
-  return symbols.length
+
+  const symbolMap = Object.create(null)
+  for(const symbol of symbols){
+    key = symbol.toString()
+    symbolMap[key] ||= 0
+    symbolMap[key]++
+  }
+  return symbolMap
 }`,
     objectId: objects.objects.objectId,
     returnByValue: true,

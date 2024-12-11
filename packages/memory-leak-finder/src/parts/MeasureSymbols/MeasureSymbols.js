@@ -19,6 +19,13 @@ export const stop = (session, objectGroup) => {
   return GetSymbols.getSymbols(session, objectGroup)
 }
 
-export const compare = CompareCount.compareCount
+export const compare = (before, after) => {
+  return {
+    before,
+    after,
+  }
+}
 
-export const isLeak = IsLeakCount.isLeakCount
+export const isLeak = (before, after) => {
+  return false
+}
