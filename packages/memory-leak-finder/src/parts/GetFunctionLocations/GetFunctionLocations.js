@@ -2,7 +2,7 @@ import * as Assert from '../Assert/Assert.js'
 import * as GetFunctionLocation from '../GetFunctionLocation/GetFunctionLocation.js'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 
-const BATCH_SIZE = 50
+const BATCH_SIZE = 500
 
 const processBatch = async (session, objectIds, startIndex) => {
   const promises = []
