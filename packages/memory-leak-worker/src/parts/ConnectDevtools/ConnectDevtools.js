@@ -3,11 +3,16 @@ import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/Deb
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.js'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
 import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import * as ElectronApp from '../ElectronApp/ElectronApp.js'
+import * as ElectronAppState from '../ElectronAppState/ElectronAppState.js'
+import * as IntermediateConnectionState from '../IntermediateConnectionState/IntermediateConnectionState.js'
 import * as ObjectType from '../ObjectType/ObjectType.js'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
 import * as SessionState from '../SessionState/SessionState.js'
 
 export const connectDevtools = async (devtoolsWebSocketUrl) => {
+  const electronRpc = IntermediateConnectionState.get(connectionId)
+  IntermediateConnectionState.remove(connectionId)
   Assert.string(devtoolsWebSocketUrl)
   const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
@@ -37,4 +42,11 @@ export const connectDevtools = async (devtoolsWebSocketUrl) => {
       discover: true,
     }),
   ])
+
+  const electronApp = ElectronApp.create({
+    electronRpc,
+    electronObjectId,
+    callFrameId,
+  })
+  ElectronAppState.set(connectionId, electronApp)
 }
