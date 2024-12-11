@@ -146,6 +146,8 @@ export const removeCrashListener = (targetId) => {
 export const executeCrashListener = (targetId) => {
   const fn = state.crashCallbacks[targetId]
   if (!fn) {
+    console.log(state.crashCallbacks)
+    console.log(targetId)
     console.info('no crash listener')
     return
   }
