@@ -80,8 +80,10 @@ export const runTests = async (
     const connectionId = Id.create()
     let testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(cwd, headlessMode, recordVideo, connectionId, timeouts, runMode)
     let memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()
+    let targetId = ''
     if (checkLeaks) {
-      await MemoryLeakFinder.setup(memoryLeakWorkerIpc, connectionId, measure)
+      const info = await MemoryLeakFinder.setup(memoryLeakWorkerIpc, connectionId, measure)
+      targetId = info.targetId
     }
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
@@ -112,14 +114,14 @@ export const runTests = async (
                 await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun, runMode)
               }
             }
-            const before = await MemoryLeakFinder.start(memoryLeakWorkerIpc, connectionId)
+            const before = await MemoryLeakFinder.start(memoryLeakWorkerIpc, connectionId, targetId)
             for (let i = 0; i < runs; i++) {
               await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun, runMode)
             }
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
             }
-            const after = await MemoryLeakFinder.stop(memoryLeakWorkerIpc, connectionId)
+            const after = await MemoryLeakFinder.stop(memoryLeakWorkerIpc, connectionId, targetId)
 
             const result = await MemoryLeakFinder.compare(memoryLeakWorkerIpc, connectionId, before, after)
             const fileName = dirent.replace('.js', '.json')
