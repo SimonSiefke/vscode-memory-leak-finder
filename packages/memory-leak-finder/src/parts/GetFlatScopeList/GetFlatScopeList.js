@@ -1,9 +1,11 @@
 import * as GetFunctionScopeProperties from '../GetFunctionScopeProperties/GetFunctionScopeProperties.js'
 import * as GetScopeListProperties from '../GetScopeListProperties/GetScopeListProperties.js'
 import * as PrettifyFlatScopeList from '../PrettifyFlatScopeList/PrettifyFlatScopeList.js'
+import * as GetAllFunctions from '../GetAllFunctions/GetAllFunctions.js'
 
 export const getFlatScopeList = async (session, objectGroup) => {
-  const scopeListsObjectIds = await GetFunctionScopeProperties.getFunctionScopeProperties(session, objectGroup)
+  const objectIds = await GetAllFunctions.getAllFunctions(session, objectGroup)
+  const scopeListsObjectIds = await GetFunctionScopeProperties.getFunctionScopeProperties(session, objectGroup, objectIds)
   console.log({ scopeListsObjectIds })
   const promises2 = []
   for (const objectId of scopeListsObjectIds) {
