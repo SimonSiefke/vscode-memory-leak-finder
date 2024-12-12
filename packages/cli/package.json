@@ -2,7 +2,7 @@
   "name": "@vscode-memory-leak-finder/cli",
   "version": "0.0.0-dev",
   "description": "",
-  "main": "index.js",
+  "main": "src/main.js",
   "type": "module",
   "bin": {
     "test-electron": "./bin/test.js"
@@ -14,12 +14,7 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "dependencies": {
-    "@lvce-editor/assert": "^1.3.0",
-    "@lvce-editor/verror": "^1.6.0",
-    "ansi-escapes": "^7.0.0",
-    "chalk": "^5.3.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^22.10.2"
   },
