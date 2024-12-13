@@ -71,6 +71,7 @@ export * as MeasureResizeObserverCount from '../MeasureResizeObserverCount/Measu
 export * as MeasureResizeObserversWithStackTraces from '../MeasureResizeObserversWithStackTraces/MeasureResizeObserversWithStackTraces.js'
 export * as MeasureScopeCount from '../MeasureScopeCount/MeasureScopeCount.js'
 export * as MeasureScopes from '../MeasureScopes/MeasureScopes.js'
+export * as MeasureSetCount from '../MeasureSetCount/MeasureSetCount.js'
 export * as MeasureSetSize from '../MeasureSetSize/MeasureSetSize.js'
 export * as MeasureSetTimeout from '../MeasureSetTimeout/MeasureSetTimeout.js'
 export * as MeasureStringCount from '../MeasureStringCount/MeasureStringCount.js'
