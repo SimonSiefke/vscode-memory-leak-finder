@@ -19,11 +19,11 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  return GetScopeCount2.getScopeCount(session, objectGroup)
+  return GetScopeCount2.getScopeCount2(session, objectGroup)
 }
 
 export const stop = (session, objectGroup) => {
-  return GetScopeCount2.getScopeCount(session, objectGroup)
+  return GetScopeCount2.getScopeCount2(session, objectGroup)
 }
 
 export const compare = CompareCount.compareCount
