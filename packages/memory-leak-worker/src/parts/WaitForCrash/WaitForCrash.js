@@ -12,7 +12,6 @@ export const waitForCrash = (targetId) => {
     ExecutionContextState.removeCrashListener(targetId)
     resolve({ crashed: false })
   }
-  console.log('register crash', targetId)
   ExecutionContextState.registerCrashListener(targetId, crashCallback)
   return {
     resolve,
