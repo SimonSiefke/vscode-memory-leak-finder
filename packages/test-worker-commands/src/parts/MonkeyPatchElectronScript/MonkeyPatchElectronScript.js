@@ -33,6 +33,8 @@ export const monkeyPatchElectronScript = `function () {
     return isReady
   }
 
+  app.commandLine.appendSwitch('js-flags', "--allow-natives-syntax");
+
   app.emit = patchedAppEmit
   app.whenReady = patchedWhenReady
   app.isReady = patchedIsReady
