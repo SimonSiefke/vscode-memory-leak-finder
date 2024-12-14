@@ -1,5 +1,5 @@
 import * as CompareCount from '../CompareCount/CompareCount.js'
-import * as GetArrayCount from '../GetArrayCount/GetArrayCount.js'
+import * as GetSlowArrayCount from '../GetSlowArrayCount/GetSlowArrayCount.js'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
@@ -13,11 +13,11 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  return GetArrayCount.getArrayCount(session, objectGroup)
+  return GetSlowArrayCount.getSlowArrayCount(session, objectGroup)
 }
 
 export const stop = async (session, objectGroup) => {
-  const result = await GetArrayCount.getArrayCount(session, objectGroup)
+  const result = await GetSlowArrayCount.getSlowArrayCount(session, objectGroup)
   return result
 }
 
