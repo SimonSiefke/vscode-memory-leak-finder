@@ -74,6 +74,7 @@ export * as MeasureScopeCount2 from '../MeasureScopeCount2/MeasureScopeCount2.js
 export * as MeasureScopes from '../MeasureScopes/MeasureScopes.js'
 export * as MeasureSetSize from '../MeasureSetSize/MeasureSetSize.js'
 export * as MeasureSetTimeout from '../MeasureSetTimeout/MeasureSetTimeout.js'
+export * as MeasureSlowArrayCount from '../MeasureSlowArrayCount/MeasureSlowArrayCount.js'
 export * as MeasureStringCount from '../MeasureStringCount/MeasureStringCount.js'
 export * as MeasureStringDifference from '../MeasureStringDifference/MeasureStringDifference.js'
 export * as MeasureStyleElementCount from '../MeasureStyleElementCount/MeasureStyleElementCount.js'
