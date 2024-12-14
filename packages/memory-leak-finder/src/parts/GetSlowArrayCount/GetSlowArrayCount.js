@@ -1,5 +1,7 @@
 import * as GetObjectCount from '../GetObjectCount/GetObjectCount.js'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import * as GetRemoteObjectLength from '../GetRemoteObjectLength/GetRemoteObjectLength.js'
 
 /**
  *
@@ -7,6 +9,26 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
  * @returns {Promise<number>}
  */
 export const getSlowArrayCount = async (session, objectGroup) => {
-  const count = await GetObjectCount.getObjectCount(session, PrototypeExpression.Array)
+  const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
+    expression: PrototypeExpression.Array,
+    returnByValue: false,
+  })
+  const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
+    prototypeObjectId: prototypeDescriptor.objectId,
+    objectGroup,
+  })
+  const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
+    functionDeclaration: `function(){
+  const objects = this
+  let total = 0
+  for(const object of objects){
+    total += object.length
+  }
+  return total
+}`,
+    objectId: objects.objects.objectId,
+    returnByValue: true,
+    objectGroup,
+  })
   return count
 }
