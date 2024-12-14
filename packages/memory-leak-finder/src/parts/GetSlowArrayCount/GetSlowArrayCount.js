@@ -1,7 +1,5 @@
-import * as GetObjectCount from '../GetObjectCount/GetObjectCount.js'
-import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as GetRemoteObjectLength from '../GetRemoteObjectLength/GetRemoteObjectLength.js'
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
 
 /**
  *
@@ -19,10 +17,13 @@ export const getSlowArrayCount = async (session, objectGroup) => {
   })
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
-  const objects = this
+  const arrays = this
   let total = 0
-  for(const object of objects){
-    total += object.length
+  for(const array of arrays){
+    const hasFastElements = %HasFastPackedElements(array)
+    if(!hasFastElements){
+      total++
+    }
   }
   return total
 }`,
@@ -30,5 +31,5 @@ export const getSlowArrayCount = async (session, objectGroup) => {
     returnByValue: true,
     objectGroup,
   })
-  return count
+  return 0
 }
