@@ -67,5 +67,5 @@ export const getTypedArrayCount = async (session, objectGroup) => {
     returnByValue: true,
     objectGroup,
   })
-  return 0
+  return fnResult1
 }
