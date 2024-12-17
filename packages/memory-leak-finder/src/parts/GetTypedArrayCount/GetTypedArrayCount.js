@@ -57,9 +57,6 @@ export const getTypedArrayCount = async (session, objectGroup) => {
   for(const object of objects){
     const values = getValues(object)
     const typed = values.filter(isTypedArray)
-    if(typed.length > 0){
-      console.log({typed})
-    }
     total += typed.length
   }
 
