@@ -8,7 +8,7 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
  */
 export const getTypedArrayCount = async (session, objectGroup) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
-    expression: PrototypeExpression.Array,
+    expression: PrototypeExpression.Object,
     returnByValue: false,
     objectGroup,
   })
@@ -18,11 +18,49 @@ export const getTypedArrayCount = async (session, objectGroup) => {
   })
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
+
+
   const objects = this
-  let total = 0
-  for(const object of objects){
-    total += object.length
+
+  const getValues = object => {
+    try {
+      return Object.values(object)
+    } catch {
+      return []
+    }
   }
+
+  const typedArrayConstructors = new Set([
+    Uint8ClampedArray,
+    Float16Array,
+    Float32Array,
+    Float64Array,
+    Int16Array,
+    Int32Array,
+    Int8Array,
+    Uint16Array,
+    Uint32Array,
+    Uint8Array,
+    BigInt64Array,
+    BigUint64Array,
+  ])
+
+  const isTypedArray = value => {
+    try {
+      return typedArrayConstructors.has(value)
+    } catch {
+      return false
+    }
+  }
+
+  let total = 0
+
+  for(const object of objects){
+    const values = getValues(object)
+    const typed = values.filter(isTypedArray)
+    total += typed.length
+  }
+
   return total
 }`,
     objectId: objects.objects.objectId,
