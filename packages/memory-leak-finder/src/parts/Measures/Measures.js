@@ -82,6 +82,7 @@ export * as MeasureStringDifference from '../MeasureStringDifference/MeasureStri
 export * as MeasureStyleElementCount from '../MeasureStyleElementCount/MeasureStyleElementCount.js'
 export * as MeasureSymbolCount from '../MeasureSymbolCount/MeasureSymbolCount.js'
 export * as MeasureSymbols from '../MeasureSymbols/MeasureSymbols.js'
+export * as MeasureTypedArrayCount from '../MeasureTypedArrayCount/MeasureTypedArrayCount.js'
 export * as MeasureUserStringCount from '../MeasureUserStringCount/MeasureUserStringCount.js'
 export * as MeasureWeakMapCount from '../MeasureWeakMapCount/MeasureWeakMapCount.js'
 export * as MeasureWeakRefCount from '../MeasureWeakRefCount/MeasureWeakRefCount.js'
