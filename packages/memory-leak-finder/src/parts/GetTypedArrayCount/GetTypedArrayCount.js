@@ -32,7 +32,6 @@ export const getTypedArrayCount = async (session, objectGroup) => {
 
   const typedArrayConstructors = new Set([
     Uint8ClampedArray,
-    Float16Array,
     Float32Array,
     Float64Array,
     Int16Array,
