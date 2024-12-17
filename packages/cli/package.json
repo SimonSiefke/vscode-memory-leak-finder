@@ -2,7 +2,7 @@
   "name": "@vscode-memory-leak-finder/cli",
   "version": "0.0.0-dev",
   "description": "",
-  "main": "index.js",
+  "main": "src/main.js",
   "type": "module",
   "bin": {
     "test-electron": "./bin/test.js"
@@ -21,7 +21,7 @@
     "chalk": "^5.3.0"
   },
   "devDependencies": {
-    "@types/node": "^22.9.3"
+    "@types/node": "^22.10.2"
   },
   "jest": {
     "moduleNameMapper": {

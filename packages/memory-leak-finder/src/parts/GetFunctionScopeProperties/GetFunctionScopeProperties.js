@@ -1,10 +1,7 @@
 import * as Assert from '../Assert/Assert.js'
 import * as GetAllFunctions from '../GetAllFunctions/GetAllFunctions.js'
 import * as GetFunctionScopeProperty from '../GetFunctionScopeProperty/GetFunctionScopeProperty.js'
-
-const isDefined = (value) => {
-  return value !== ''
-}
+import * as IsDefined from '../IsDefined/IsDefined.js'
 
 export const getFunctionScopeProperties = async (session, objectGroup) => {
   Assert.object(session)
@@ -15,6 +12,6 @@ export const getFunctionScopeProperties = async (session, objectGroup) => {
     promises.push(GetFunctionScopeProperty.getFunctionScopeProperty(session, objectGroup, objectId))
   }
   const scopeListsObjectIds = await Promise.all(promises)
-  const defined = scopeListsObjectIds.filter(isDefined)
+  const defined = scopeListsObjectIds.filter(IsDefined.isDefined)
   return defined
 }

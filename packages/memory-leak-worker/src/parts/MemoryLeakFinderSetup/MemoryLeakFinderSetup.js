@@ -9,6 +9,9 @@ export const setup = async (connectionId, instanceId, measureId) => {
     const session = page.rpc
     const measure = await GetCombinedMeasure.getCombinedMeasure(session, measureId)
     MemoryLeakFinderState.set(instanceId, measure)
+    return {
+      targetId: page.targetId,
+    }
   } catch (error) {
     throw new VError(error, `Failed to setup memory leak finder`)
   }

@@ -33,5 +33,8 @@ export const connectDevtools = async (devtoolsWebSocketUrl) => {
       waitForDebuggerOnStart: true,
       flatten: true,
     }),
+    DevtoolsProtocolTarget.setDiscoverTargets(browserRpc, {
+      discover: true,
+    }),
   ])
 }
