@@ -1,3 +1,4 @@
+export * as AttachedDomNodeCount from '../CreateAttachedDomNodeCountChart/CreateAttachedDomNodeCountChart.js'
 export * as CanvasCount from '../CreateCanvasCountChart/CreateCanvasCountChart.js'
 export * as DetachedDomNodeCount from '../CreateDetachedDomNodeCountChart/CreateDetachedDomNodeCountChart.js'
 export * as EmitterCount from '../CreateEmitterCountChart/CreateEmitterCountChart.js'
