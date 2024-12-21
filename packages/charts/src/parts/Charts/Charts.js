@@ -13,5 +13,6 @@ export * as PromiseCount from '../CreatePromiseCountChart/CreatePromiseCountChar
 export * as RegexCount from '../CreateRegexCountChart/CreateRegexCountChart.js'
 export * as StringCount from '../CreateStringCountChart/CreateStringCountChart.js'
 export * as SymbolCount from '../CreateSymbolCountChart/CreateSymbolCountChart.js'
+export * as TypedArrayCount from '../CreateTypedArrayCountChart/CreateTypedArrayCountChart.js'
 export * as WeakMapCount from '../CreateWeakMapCountChart/CreateWeakMapCountChart.js'
 export * as WeakSetCount from '../CreateWeakSetCountChart/CreateWeakSetCountChart.js'
