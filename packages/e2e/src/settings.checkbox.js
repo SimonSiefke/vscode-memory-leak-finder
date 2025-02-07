@@ -2,8 +2,8 @@ export const setup = async ({ Editor, SettingsEditor }) => {
   await Editor.closeAll()
   await SettingsEditor.open()
   await SettingsEditor.search({
-    value: 'editor.autoClosingComments',
-    resultCount: 1,
+    value: 'comments.visible',
+    resultCount: 2,
   })
   await SettingsEditor.enableCheckBox({
     name: 'comments.visible',
