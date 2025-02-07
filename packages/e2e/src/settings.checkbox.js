@@ -3,7 +3,7 @@ export const setup = async ({ Editor, SettingsEditor }) => {
   await SettingsEditor.open()
   await SettingsEditor.search({
     value: 'comments.visible',
-    resultCount: 2,
+    resultCount: 1,
   })
   await SettingsEditor.enableCheckBox({
     name: 'comments.visible',
