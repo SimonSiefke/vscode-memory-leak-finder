@@ -1,5 +1,6 @@
 # playground
 .vscode-heapsnapshots
+.cursor-test-workspace
 out.txt
 .vscode-tool-downloads
 .vscode-ffmpeg
