@@ -10,6 +10,8 @@ import * as Root from '../Root/Root.js'
 // TODO make this more configurable in case the setting names change
 const keyPrivacyMode = 'cursorai/donotchange/privacyMode'
 const storageKey = 'src.vs.platform.reactivestorage.browser.reactiveStorageServiceImpl.persistentStorage.applicationUser'
+const startupKey = `workbench.services.onFirstStartupService.isVeryFirstTime`
+const membershipKey = `cursorAuth/stripeMembershipType`
 
 export const skipCursorWelcome = async () => {
   try {
@@ -23,20 +25,20 @@ export const skipCursorWelcome = async () => {
     if (privacyMode === 'true') {
       return
     }
-    const mockConfigString = JSON.stringify(JSON.stringify(MockCursorConfig.mockCursorConfig))
-    await ExecuteSql.executeSql(
-      db,
-      `UPDATE ItemTable
-SET ${storageKey} = ${mockConfigString}
-; `,
-    )
-    const privacyValue = JSON.stringify(true)
-    await ExecuteSql.executeSql(
-      db,
-      `UPDATE ItemTable
-SET ${keyPrivacyMode} = ${privacyValue}
-; `,
-    )
+    const stringifiedConfig = JSON.stringify(MockCursorConfig.mockCursorConfig)
+
+    const privacyValue = true
+    const startupValue = 'false'
+    const membershipValue = 'free'
+    const statement = `INSERT INTO ItemTable (key, value)
+VALUES
+('${keyPrivacyMode}', '${privacyValue}'),
+('${storageKey}', '${stringifiedConfig}'),
+('${startupKey}', '${startupValue}'),
+('${membershipKey}', '${membershipValue}');
+`
+
+    await ExecuteSql.executeSql(db, statement)
   } catch (error) {
     throw new VError(error, `Failed to skip cursor welcome`)
   }
