@@ -12,12 +12,6 @@ const downloadUrl = 'https://dl.todesktop.com/230313mzl4w4u92/versions/0.42.4/li
 
 export const downloadAndUnzipCursor = async () => {
   try {
-    // TODO
-    // 1. download the appimage
-    // 2. extract the appimage
-    // 3. move the appimage contents into workspace folder
-    // 4. return binary path
-
     const outFile = join(Root.root, '.vscode-tool-downloads', 'cursor.AppImage')
     if (!existsSync(outFile)) {
       await rm(outFile, { recursive: true, force: true })
@@ -25,11 +19,9 @@ export const downloadAndUnzipCursor = async () => {
     }
     await MakeExecutable.makeExecutable(outFile)
     await ExtractAppImage.extractAppImage(outFile)
-    console.log('done')
-    return ''
+    const cursorPath = join(Root.root, '.vscode-tool-downloads', 'squashfs-root', 'cursor')
+    return cursorPath
   } catch (error) {
     throw new VError(error, `Failed to download cursor`)
   }
 }
-
-downloadAndUnzipCursor()
