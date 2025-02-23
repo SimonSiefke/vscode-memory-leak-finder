@@ -6,7 +6,7 @@ import * as IpcParent from '../IpcParent/IpcParent.js'
 import * as IpcParentType from '../IpcParentType/IpcParentType.js'
 
 // TODO dispose worker on next test run
-export const launch = async (runMode) => {
+export const launch = async () => {
   const url = GetDownloadWorkerUrl.getDownloadWorkerUrl()
   const ipc = await IpcParent.create({
     method: IpcParentType.NodeWorkerThread,
