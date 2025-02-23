@@ -18,7 +18,7 @@ export const downloadAndUnzipCursor = async () => {
       return cursorPath
     }
     await rm(outFile, { recursive: true, force: true })
-    await Download.download('cursor', downloadUrl, outFile)
+    await Download.download('cursor', [downloadUrl], outFile)
     await MakeExecutable.makeExecutable(outFile)
     await ExtractAppImage.extractAppImage(outFile)
     return cursorPath
