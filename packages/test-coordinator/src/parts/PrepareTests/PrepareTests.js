@@ -7,11 +7,12 @@ import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDe
 import * as VideoRecording from '../VideoRecording/VideoRecording.js'
 import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
 import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.js'
+import * as KillExistingIdeInstances from '../KillExistingIdeInstances/KillExistingIdeInstances.js'
 
-export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connectionId, timeouts) => {
+export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connectionId, timeouts, ide) => {
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
-  await KillExistingVscodeInstances.killExistingVsCodeInstances()
+  await KillExistingIdeInstances.killExisingIdeInstances(ide)
   const { child, webSocketUrl } = await LaunchVsCode.launchVsCode({
     headlessMode,
     cwd,
