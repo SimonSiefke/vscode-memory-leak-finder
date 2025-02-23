@@ -18,7 +18,7 @@ export const launchCursorOnce = async () => {
   const child = spawn(cursorPath, args)
   // TODO don't use numeric timeout, maybe connect with devtools debugger and verify
   // the initial page is loaded
-  await setTimeout(3000)
-  child.kill('SIGINT')
-  await setTimeout(3000)
+  await setTimeout(6000)
+  child.kill('SIGKILL')
+  await setTimeout(6000)
 }
