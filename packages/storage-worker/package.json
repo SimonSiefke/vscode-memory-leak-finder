@@ -4,6 +4,9 @@
   "description": "",
   "type": "module",
   "main": "src/storageWorkerMain.js",
+  "bin": {
+    "storage-worker": "bin/storage-worker.js"
+  },
   "scripts": {
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
