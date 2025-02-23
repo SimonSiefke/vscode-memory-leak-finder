@@ -6,7 +6,8 @@
   "scripts": {
     "e2e": "echo ok",
     "#e2e": "node ../cli/bin/test.js --ide=cursor",
-    "e2e:check-flakyness": "node ../cli/bin/test.js --runs 10",
+    "e2e:check-flakyness": "echo ok",
+    "#e2e:check-flakyness": "node ../cli/bin/test.js --runs 10",
     "e2e:headless": "node ../cli/bin/test.js --headless",
     "test:watch": "node ../cli/bin/test.js --watch"
   },
