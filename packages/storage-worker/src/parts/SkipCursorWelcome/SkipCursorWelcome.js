@@ -5,6 +5,12 @@ import * as ExecuteSql from '../ExecuteSql/ExecuteSql.js'
 import * as GetDb from '../GetDb/GetDb.js'
 import * as LaunchCursorOnce from '../LaunchCursorOnce/LaunchCursorOnce.js'
 import * as Root from '../Root/Root.js'
+import { join } from 'path'
+import * as Root from '../Root/Root.js'
+import * as ExecuteSql from '../ExecuteSql/ExecuteSql.js'
+import * as GetDb from '../GetDb/GetDb.js'
+import { existsSync } from 'fs'
+import { VError } from '@lvce-editor/verror'
 
 const keyPrivacyMode = 'cursorai/donotchange/privacyMode'
 
