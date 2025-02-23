@@ -7,12 +7,13 @@ import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDe
 import * as VideoRecording from '../VideoRecording/VideoRecording.js'
 import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
 import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.js'
+import * as LaunchCursor from '../LaunchCursor/LaunchCursor.js'
 
 export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connectionId, timeouts) => {
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingVscodeInstances.killExistingVsCodeInstances()
-  const { child, webSocketUrl } = await LaunchVsCode.launchVsCode({
+  const { child, webSocketUrl } = await LaunchCursor.launchCursor({
     headlessMode,
     cwd,
   })
