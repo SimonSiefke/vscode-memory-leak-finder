@@ -2,7 +2,6 @@ import { VError } from '@lvce-editor/verror'
 import { existsSync } from 'fs'
 import { rm } from 'fs/promises'
 import { join } from 'path'
-import * as DisableCursorWelcome from '../DisableCursorWelcome/DisableCursorWelcome.js'
 import * as Download from '../Download/Download.js'
 import * as ExtractAppImage from '../ExtractAppImage/ExtractAppImage.js'
 import * as MakeExecutable from '../MakeExecutable/MakeExecutable.js'
@@ -22,7 +21,6 @@ export const downloadAndUnzipCursor = async () => {
     await Download.download('cursor', downloadUrl, outFile)
     await MakeExecutable.makeExecutable(outFile)
     await ExtractAppImage.extractAppImage(outFile)
-    await DisableCursorWelcome.disableCursorWelcome()
     return cursorPath
   } catch (error) {
     throw new VError(error, `Failed to download cursor`)
