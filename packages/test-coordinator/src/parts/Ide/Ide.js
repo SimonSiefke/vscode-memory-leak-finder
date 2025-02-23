@@ -1,2 +1,2 @@
-export const Cursor = 'cursor'
 export const VsCode = 'vscode'
+export const Cursor = 'cursor'
