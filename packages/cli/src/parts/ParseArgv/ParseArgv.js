@@ -38,6 +38,7 @@ export const parseArgv = (argv) => {
     timeoutBetween: 0,
     restartBetween: false,
     runMode: TestRunMode.Auto,
+    ide: Ide.VsCode,
   }
   if (argv.includes('--watch')) {
     options.watch = true
