@@ -45,3 +45,17 @@ export const pressKeyExponential = async (options) => {
 
   // TODO
 }
+
+export const contentEditableInsert = async (options) => {
+  Assert.object(options)
+  Assert.string(options.value)
+  await EvaluateInUtilityContext.evaluateInUtilityContext({
+    functionDeclaration: '(options) => test.contentEditableInsert(options)',
+    arguments: [
+      {
+        value: options,
+      },
+    ],
+    awaitPromise: true,
+  })
+}

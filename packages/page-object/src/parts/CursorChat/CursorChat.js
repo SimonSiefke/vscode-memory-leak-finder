@@ -16,10 +16,31 @@ export const create = ({ expect, page, VError }) => {
       try {
         const chat = page.locator('.composer-bar')
         await expect(chat).toBeVisible()
-        await page.keyboard.type(question)
+        await page.keyboard.contentEditableInsert({ value: question })
         await page.keyboard.press('Enter')
       } catch (error) {
         throw new VError(error, `Failed to send message`)
+      }
+    },
+    async shouldHaveMessageCount(count) {
+      try {
+        const conversations = page.locator('.conversations')
+        await expect(conversations).toBeVisible()
+        const messages = page.locator('[id^="bubble"]')
+        await expect(messages).toHaveCount(count)
+      } catch (error) {
+        throw new VError(error, `Failed to verify message count`)
+      }
+    },
+    async shouldHaveResponse(responseText) {
+      try {
+        const conversations = page.locator('.conversations')
+        await expect(conversations).toBeVisible()
+        const last = page.locator('[id^="bubble"]').nth(1)
+        await expect(last).toBeVisible()
+        await expect(last).toHaveText(responseText)
+      } catch (error) {
+        throw new VError(error, `Failed to verify response text`)
       }
     },
   }
