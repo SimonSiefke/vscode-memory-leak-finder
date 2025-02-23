@@ -1,5 +1,6 @@
 import * as ModeType from '../ModeType/ModeType.js'
 import * as Character from '../Character/Character.js'
+import * as Ide from '../Ide/Ide.js'
 import * as TestRunMode from '../TestRunMode/TestRunMode.js'
 
 export const state = {
@@ -19,6 +20,7 @@ export const state = {
   timeoutBetween: 0,
   restartBetween: false,
   runMode: TestRunMode.Auto,
+  ide: Ide.VsCode,
 }
 
 export const setState = (newState) => {
@@ -36,6 +38,7 @@ export const setState = (newState) => {
   state.timeoutBetween = newState.timeoutBetween
   state.restartBetween = newState.restartBetween
   state.runMode = newState.runMode
+  state.ide = newState.ide
 }
 
 export const setBuffering = (value) => {
