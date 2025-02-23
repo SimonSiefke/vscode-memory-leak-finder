@@ -2,7 +2,7 @@ import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.js
 import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.js'
 import * as ConnectElectron from '../ConnectElectron/ConnectElectron.js'
 import * as KillExistingIdeInstances from '../KillExistingIdeInstances/KillExistingIdeInstances.js'
-import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.js'
+import * as LaunchIde from '../LaunchIde/LaunchIde.js'
 import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
 import * as PageObject from '../PageObject/PageObject.js'
 import * as VideoRecording from '../VideoRecording/VideoRecording.js'
@@ -12,9 +12,10 @@ export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connecti
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
-  const { child, webSocketUrl } = await LaunchVsCode.launchVsCode({
+  const { child, webSocketUrl } = await LaunchIde.launchIde({
     headlessMode,
     cwd,
+    ide,
   })
   const devtoolsWebSocketUrlPromise = WaitForDevtoolsListening.waitForDevtoolsListening(child.stderr)
   const { monkeyPatchedElectron, electronObjectId, callFrameId } = await ConnectElectron.connectElectron(
