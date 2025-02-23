@@ -46,8 +46,9 @@ export const create = ({ expect, page, VError }) => {
     },
     async resetFocus() {
       try {
-        const body = page.locator('body')
-        await body.focus()
+        await page.waitForIdle()
+        await page.keyboard.press('Escape')
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to reset focus`)
       }
