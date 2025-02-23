@@ -25,6 +25,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async shouldHaveMessageCount(count) {
       try {
+        await page.waitForIdle()
         const conversations = page.locator('.conversations')
         await expect(conversations).toBeVisible()
         const messages = page.locator('[id^="bubble"]')
@@ -35,10 +36,11 @@ export const create = ({ expect, page, VError }) => {
     },
     async shouldHaveResponse(responseText) {
       try {
+        await page.waitForIdle()
         const conversations = page.locator('.conversations')
         await expect(conversations).toBeVisible()
         const last = page.locator('[id^="bubble"]').nth(1)
-        await expect(last).toBeVisible()
+        await expect(last).toBeVisible({ timeout: 5000 })
         await expect(last).toHaveText(responseText)
       } catch (error) {
         throw new VError(error, `Failed to verify response text`)
