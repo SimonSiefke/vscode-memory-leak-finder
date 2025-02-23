@@ -4,8 +4,7 @@ import * as Root from '../Root/Root.js'
 import { join } from 'path'
 
 // TODO support macos and windows also and different architecture
-const downloadUrl =
-  'https://anysphere-binaries.s3.us-east-1.amazonaws.com/production/client/linux/x64/appimage/Cursor-0.45.15-73dd83bb6f8e3a3704ad8078a8e455ac6d4260d1.deb.glibc2.25-x86_64.AppImage'
+const downloadUrl = 'https://dl.todesktop.com/230313mzl4w4u92/versions/0.42.4/linux/zip/x64'
 
 export const downloadAndUnzipCursor = async () => {
   try {
