@@ -51,6 +51,6 @@ export const launchCursor = async ({ headlessMode, cwd }) => {
       webSocketUrl,
     }
   } catch (error) {
-    throw new VError(error, `Failed to launch VSCode`)
+    throw new VError(error, `Failed to launch Cursor`)
   }
 }
