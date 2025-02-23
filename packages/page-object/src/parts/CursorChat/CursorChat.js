@@ -44,5 +44,13 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to verify response text`)
       }
     },
+    async resetFocus() {
+      try {
+        const body = page.locator('body')
+        await body.focus()
+      } catch (error) {
+        throw new VError(error, `Failed to reset focus`)
+      }
+    },
   }
 }
