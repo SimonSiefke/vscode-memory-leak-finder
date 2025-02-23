@@ -7,6 +7,7 @@
     { "path": "./packages/devtools-protocol" },
     { "path": "./packages/download-worker" },
     { "path": "./packages/e2e" },
+    { "path": "./packages/cursor-e2e" },
     { "path": "./packages/file-watcher-worker" },
     { "path": "./packages/heap-snapshot-worker" },
     { "path": "./packages/injected-code" },
