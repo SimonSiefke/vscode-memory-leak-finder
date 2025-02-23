@@ -17,6 +17,7 @@ export const create = ({ expect, page, VError }) => {
         const chat = page.locator('.composer-bar')
         await expect(chat).toBeVisible()
         await page.keyboard.contentEditableInsert({ value: question })
+        await page.waitForIdle()
         await page.keyboard.press('Enter')
       } catch (error) {
         throw new VError(error, `Failed to send message`)
