@@ -5,8 +5,8 @@ export const create = ({ expect, page, VError }) => {
     async show() {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
-        await quickPick.executeCommand('New Chat')
-        const chat = page.locator('.aichat-container')
+        await quickPick.executeCommand('Cursor: New Chat')
+        const chat = page.locator('.composer-bar')
         await expect(chat).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to show chat`)
@@ -14,7 +14,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async sendMessage(question) {
       try {
-        const chat = page.locator('.aichat-container')
+        const chat = page.locator('.composer-bar')
         await expect(chat).toBeVisible()
         await page.keyboard.type(question)
         await page.keyboard.press('Enter')
