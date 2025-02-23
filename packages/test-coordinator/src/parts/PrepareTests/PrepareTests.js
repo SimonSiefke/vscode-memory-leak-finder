@@ -1,13 +1,12 @@
+import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.js'
 import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.js'
 import * as ConnectElectron from '../ConnectElectron/ConnectElectron.js'
-import * as KillExistingVscodeInstances from '../KillExistingVscodeInstances/KillExistingVscodeInstances.js'
-import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.js'
-import * as PageObject from '../PageObject/PageObject.js'
-import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.js'
-import * as VideoRecording from '../VideoRecording/VideoRecording.js'
-import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
-import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.js'
 import * as KillExistingIdeInstances from '../KillExistingIdeInstances/KillExistingIdeInstances.js'
+import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.js'
+import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
+import * as PageObject from '../PageObject/PageObject.js'
+import * as VideoRecording from '../VideoRecording/VideoRecording.js'
+import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.js'
 
 export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connectionId, timeouts, ide) => {
   const isFirstConnection = true
