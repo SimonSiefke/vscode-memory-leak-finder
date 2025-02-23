@@ -1,11 +1,12 @@
 import { VError } from '@lvce-editor/verror'
-import * as Download from '../Download/Download.js'
-import * as Root from '../Root/Root.js'
-import * as MakeExecutable from '../MakeExecutable/MakeExecutable.js'
-import * as ExtractAppImage from '../ExtractAppImage/ExtractAppImage.js'
-import { join } from 'path'
-import { rm } from 'fs/promises'
 import { existsSync } from 'fs'
+import { rm } from 'fs/promises'
+import { join } from 'path'
+import * as DisableCursorWelcome from '../DisableCursorWelcome/DisableCursorWelcome.js'
+import * as Download from '../Download/Download.js'
+import * as ExtractAppImage from '../ExtractAppImage/ExtractAppImage.js'
+import * as MakeExecutable from '../MakeExecutable/MakeExecutable.js'
+import * as Root from '../Root/Root.js'
 
 // TODO support macos and windows also and different architecture
 const downloadUrl = 'https://dl.todesktop.com/230313mzl4w4u92/versions/0.42.4/linux/zip/x64'
@@ -21,6 +22,7 @@ export const downloadAndUnzipCursor = async () => {
     await Download.download('cursor', downloadUrl, outFile)
     await MakeExecutable.makeExecutable(outFile)
     await ExtractAppImage.extractAppImage(outFile)
+    await DisableCursorWelcome.disableCursorWelcome()
     return cursorPath
   } catch (error) {
     throw new VError(error, `Failed to download cursor`)
