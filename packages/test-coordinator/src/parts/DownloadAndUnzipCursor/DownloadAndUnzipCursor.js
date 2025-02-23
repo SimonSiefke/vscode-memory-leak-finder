@@ -18,8 +18,11 @@ export const downloadAndUnzipCursor = async () => {
     const outFile = join(Root.root, '.vscode-tool-downloads', 'cursor.AppImage')
 
     await Download.download('cursor', downloadUrl, outFile)
+    console.log('done')
     return ''
   } catch (error) {
     throw new VError(error, `Failed to download cursor`)
   }
 }
+
+downloadAndUnzipCursor()
