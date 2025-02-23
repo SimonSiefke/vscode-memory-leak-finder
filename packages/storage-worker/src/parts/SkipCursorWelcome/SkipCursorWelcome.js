@@ -1,5 +1,5 @@
 import { VError } from '@lvce-editor/verror'
-import { existsSync, writeFileSync } from 'fs'
+import { existsSync } from 'fs'
 import { join } from 'path'
 import * as ExecuteSql from '../ExecuteSql/ExecuteSql.js'
 import * as GetDb from '../GetDb/GetDb.js'
@@ -22,7 +22,6 @@ export const skipCursorWelcome = async () => {
     const db = await GetDb.getDb(storagePath)
     const rows = await ExecuteSql.executeSql(db, 'SELECT * FROM ItemTable')
     const privacyMode = rows.find((row) => row.key === keyPrivacyMode)
-    writeFileSync('./rows.json', JSON.stringify(rows, null, 2))
     if (privacyMode === 'true') {
       return
     }
