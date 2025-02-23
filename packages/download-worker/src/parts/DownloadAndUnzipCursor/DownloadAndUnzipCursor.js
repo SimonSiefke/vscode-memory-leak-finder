@@ -8,7 +8,7 @@ import * as MakeExecutable from '../MakeExecutable/MakeExecutable.js'
 import * as Root from '../Root/Root.js'
 
 // TODO support macos and windows also and different architecture
-const downloadUrl = 'https://dl.todesktop.com/230313mzl4w4u92/versions/0.42.4/linux/zip/x64'
+const downloadUrl = 'https://dl.todesktop.com/230313mzl4w4u92/versions/0.45.14/linux/zip/x64'
 
 export const downloadAndUnzipCursor = async () => {
   try {
