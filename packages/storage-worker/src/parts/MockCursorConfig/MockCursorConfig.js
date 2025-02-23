@@ -210,7 +210,7 @@ export const mockCursorConfig = {
   },
   membershipType: 'pro',
   havePerformedSettingsServiceMigration: true,
-  SPECIAL_KEY_id: '68012653-4dec-44fc-9f9a-286f558ae737',
+  SPECIAL_KEY_id: 'abc',
   cppHasLoadedConfigFromCopilot: true,
   hasDisabledErrorLensForAiLinter: true,
   cursorPredictionState: {
