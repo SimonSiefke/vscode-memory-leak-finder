@@ -4,6 +4,7 @@
   "references": [
     { "path": "./packages/charts" },
     { "path": "./packages/cli" },
+    { "path": "./packages/cursor-e2e" },
     { "path": "./packages/devtools-protocol" },
     { "path": "./packages/download-worker" },
     { "path": "./packages/e2e" },
@@ -14,9 +15,10 @@
     { "path": "./packages/memory-leak-worker" },
     { "path": "./packages/page-object" },
     { "path": "./packages/source-map-worker" },
+    { "path": "./packages/storage-worker" },
     { "path": "./packages/test-coordinator" },
-    { "path": "./packages/test-worker" },
     { "path": "./packages/test-worker-commands" },
+    { "path": "./packages/test-worker" },
     { "path": "./packages/video-recording-worker" }
   ]
 }
