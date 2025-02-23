@@ -16,7 +16,9 @@
     "@lvce-editor/assert": "^1.3.0",
     "@lvce-editor/verror": "^1.6.0",
     "@vscode/test-electron": "^2.4.1",
+    "execa": "^9.5.2",
     "exit-hook": "^4.0.0",
+    "got": "^14.4.6",
     "strip-ansi": "^7.1.0"
   },
   "devDependencies": {
