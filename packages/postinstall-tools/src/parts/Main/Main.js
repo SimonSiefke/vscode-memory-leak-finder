@@ -1,4 +1,8 @@
+import * as DownloadWorker from '../DownloadWorker/DownloadWorker.js'
+import * as JsonRpc from '../JsonRpc/JsonRpc.js'
+
 export const main = async () => {
-  // TODO ask download worker to download ffmpeg
-  // if it fails, print a warning, but don't exit with error
+  const ipc = await DownloadWorker.launch()
+  await JsonRpc.invoke(ipc, 'Download.downloadFfmpegMaybe')
+  ipc.dispose()
 }
