@@ -5,6 +5,8 @@ import * as GetDb from '../GetDb/GetDb.js'
 import { existsSync } from 'fs'
 import { VError } from '@lvce-editor/verror'
 
+const keyPrivacyMode = 'cursorai/donotchange/privacyMode'
+
 export const skipCursorWelcome = async () => {
   try {
     const storagePath = join(Root.root, '.vscode-user-data-dir', 'User', 'globalStorage', 'state.vscdb')
@@ -13,9 +15,10 @@ export const skipCursorWelcome = async () => {
     }
     const db = await GetDb.getDb(storagePath)
     const rows = await ExecuteSql.executeSql(db, 'SELECT * FROM ItemTable')
-    console.log({ rows })
-    // TODO
-    console.log('skip welcome')
+    const privacyMode = rows.find((row) => row.key === keyPrivacyMode)
+    if (privacyMode === 'true') {
+      return
+    }
   } catch (error) {
     throw new VError(error, `Failed to skip cursor welcome`)
   }
