@@ -1,21 +1,21 @@
+import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.js'
 import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.js'
 import * as ConnectElectron from '../ConnectElectron/ConnectElectron.js'
 import * as KillExistingVscodeInstances from '../KillExistingVscodeInstances/KillExistingVscodeInstances.js'
-import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.js'
-import * as PageObject from '../PageObject/PageObject.js'
-import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.js'
-import * as VideoRecording from '../VideoRecording/VideoRecording.js'
+import * as LaunchIde from '../LaunchIde/LaunchIde.js'
 import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
-import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.js'
-import * as LaunchCursor from '../LaunchCursor/LaunchCursor.js'
+import * as PageObject from '../PageObject/PageObject.js'
+import * as VideoRecording from '../VideoRecording/VideoRecording.js'
+import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.js'
 
-export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connectionId, timeouts) => {
+export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connectionId, timeouts, ide) => {
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingVscodeInstances.killExistingVsCodeInstances()
-  const { child, webSocketUrl } = await LaunchCursor.launchCursor({
+  const { child, webSocketUrl } = await LaunchIde.launchIde({
     headlessMode,
     cwd,
+    ide,
   })
   const devtoolsWebSocketUrlPromise = WaitForDevtoolsListening.waitForDevtoolsListening(child.stderr)
   const { monkeyPatchedElectron, electronObjectId, callFrameId } = await ConnectElectron.connectElectron(
