@@ -46,6 +46,7 @@ export const runTests = async (
   timeoutBetween,
   restartBetween,
   runMode,
+  ide,
   callback,
 ) => {
   try {
@@ -63,6 +64,7 @@ export const runTests = async (
     Assert.number(timeoutBetween)
     Assert.number(runMode)
     Assert.boolean(restartBetween)
+    Assert.string(ide)
     let passed = 0
     let failed = 0
     let skipped = 0
@@ -78,7 +80,15 @@ export const runTests = async (
     callback(TestWorkerEventType.TestsStarting, total)
     callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
     const connectionId = Id.create()
-    let testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(cwd, headlessMode, recordVideo, connectionId, timeouts, runMode)
+    let testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
+      cwd,
+      headlessMode,
+      recordVideo,
+      connectionId,
+      timeouts,
+      runMode,
+      ide,
+    )
     let memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()
     let targetId = ''
     if (checkLeaks) {
@@ -153,7 +163,15 @@ export const runTests = async (
               testWorkerIpc.dispose()
             }
             PrepareTestsOrAttach.state.promise = undefined
-            testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(cwd, headlessMode, recordVideo, connectionId, timeouts)
+            testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
+              cwd,
+              headlessMode,
+              recordVideo,
+              connectionId,
+              timeouts,
+              runMode,
+              ide,
+            )
             if (checkLeaks) {
               memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()
               await MemoryLeakFinder.setup(memoryLeakWorkerIpc, connectionId, measure)
