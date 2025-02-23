@@ -23,6 +23,7 @@ const locations = [
   'packages/memory-leak-finder/package-lock.json',
   'packages/memory-leak-worker/package-lock.json',
   'packages/page-object/package-lock.json',
+  'packages/postinstall-tools/package-lock.json',
   'packages/source-map-worker/package-lock.json',
   'packages/storage-worker/package-lock.json',
   'packages/test-coordinator/package-lock.json',
