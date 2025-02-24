@@ -298,6 +298,11 @@ export const type = (text) => {
   fn(document.activeElement, { text })
 }
 
+export const contentEditableInsert = ({ value }) => {
+  // TODO find non-deprecated alternative
+  document.execCommand('insertText', false, value)
+}
+
 export const getTextContent = async (locator) => {
   Assert.object(locator)
   const element = QuerySelector.querySelector(locator.selector)

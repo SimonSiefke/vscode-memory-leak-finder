@@ -21,6 +21,9 @@ const createKeyboard = (rpc) => {
     pressKeyExponential(options) {
       return PageKeyBoard.pressKeyExponential(options)
     },
+    contentEditableInsert(options) {
+      return PageKeyBoard.contentEditableInsert(options)
+    },
   }
 }
 

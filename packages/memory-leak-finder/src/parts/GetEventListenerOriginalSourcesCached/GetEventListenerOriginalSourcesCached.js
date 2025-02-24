@@ -12,6 +12,11 @@ export const getEventListenerOriginalSourcesCached = async (eventListeners, clas
   const sourceMapUrlMap = GetSourceMapUrlMap.getSourceMapUrlMap(sorted)
   const hash = Hash.hash({ ...sourceMapUrlMap, classNames })
   const cachePath = GetResolvedSourceMapCachePath.getResolvedSourceMapCachePath(hash)
+  const hasCursorSourceMaps = Object.keys(sourceMapUrlMap).some((url) => url.startsWith('https://cursor-sourcemaps'))
+  if (hasCursorSourceMaps) {
+    // 403 status
+    return eventListeners
+  }
   if (!Exists.exists(cachePath)) {
     const result = await GetCleanPositionsMap.getCleanPositionsMap(sourceMapUrlMap, classNames)
     await JsonFile.writeJson(cachePath, result)
