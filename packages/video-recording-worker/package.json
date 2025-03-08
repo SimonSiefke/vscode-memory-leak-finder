@@ -16,9 +16,9 @@
     "@lvce-editor/json-rpc": "^5.4.0",
     "@lvce-editor/verror": "^1.6.0",
     "execa": "^9.5.2",
-    "ws": "^8.18.0"
+    "ws": "^8.18.1"
   },
   "devDependencies": {
-    "@types/ws": "^8.5.14"
+    "@types/ws": "^8.18.0"
   }
 }
