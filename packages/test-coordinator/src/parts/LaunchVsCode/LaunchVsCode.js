@@ -17,7 +17,7 @@ import * as RemoveVscodeWorkspaceStorage from '../RemoveVscodeWorkspaceStorage/R
 import * as Root from '../Root/Root.js'
 import { VError } from '../VError/VError.js'
 
-export const launchVsCode = async ({ headlessMode, cwd }) => {
+export const launchVsCode = async ({ headlessMode, cwd, vscodeVersion }) => {
   try {
     const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
     await CreateTestWorkspace.createTestWorkspace(testWorkspacePath)
@@ -27,7 +27,7 @@ export const launchVsCode = async ({ headlessMode, cwd }) => {
     }
     await RemoveVscodeBackups.removeVscodeBackups()
     const runtimeDir = GetVscodeRuntimeDir.getVscodeRuntimeDir()
-    const binaryPath = await GetBinaryPath.getBinaryPath()
+    const binaryPath = await GetBinaryPath.getBinaryPath(vscodeVersion)
     const userDataDir = GetUserDataDir.getUserDataDir()
     const extensionsDir = GetExtensionsDir.getExtensionsDir()
     await rm(extensionsDir, { recursive: true, force: true })
