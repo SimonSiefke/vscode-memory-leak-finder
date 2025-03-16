@@ -8,10 +8,14 @@ import * as MakeExecutable from '../MakeExecutable/MakeExecutable.js'
 import * as Root from '../Root/Root.js'
 
 // TODO support macos and windows also and different architecture
-const downloadUrl = 'https://dl.todesktop.com/230313mzl4w4u92/versions/0.45.14/linux/zip/x64'
+const getDownloadUrl = (version) => {
+  const downloadUrl = `https://dl.todesktop.com/230313mzl4w4u92/versions/${version}/linux/zip/x64`
+  return downloadUrl
+}
 
-export const downloadAndUnzipCursor = async () => {
+export const downloadAndUnzipCursor = async (cursorVersion) => {
   try {
+    const downloadUrl = getDownloadUrl(cursorVersion)
     const outFile = join(Root.root, '.vscode-tool-downloads', 'cursor.AppImage')
     const cursorPath = join(Root.root, '.vscode-tool-downloads', 'squashfs-root', 'cursor')
     if (existsSync(cursorPath)) {
