@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-14, windows-2022]
+        os: [ubuntu-24.04, macos-15, windows-2025]
     timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
@@ -42,7 +42,7 @@ jobs:
       - run: npm run build
       - run: npx lerna run test --since origin/main
       - name: Run headless test (with videos)
-        if: matrix.os != 'macos-14'
+        if: matrix.os != 'macos-15'
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --record-video
@@ -51,17 +51,17 @@ jobs:
         with:
           run: npm run e2e
       - name: Run headless test (flakyness check)
-        if: matrix.os != 'macos-14'
+        if: matrix.os != 'macos-15'
         uses: coactions/setup-xvfb@v1
         with:
           run: npm run e2e:check-flakyness
       - name: Run headless test (second flakyness check)
-        if: matrix.os != 'macos-14'
+        if: matrix.os != 'macos-15'
         uses: coactions/setup-xvfb@v1
         with:
           run: npm run e2e:check-flakyness
       - name: Run headless test (check leaks, event listener count)
-        if: matrix.os != 'macos-14'
+        if: matrix.os != 'macos-15'
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after

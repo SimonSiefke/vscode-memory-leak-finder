@@ -20,8 +20,6 @@ export const getSymbolCount = async (session, objectGroup) => {
     functionDeclaration: `function () {
   const objects = this
 
-  const symbols = []
-
   const getValues = object => {
     try {
       return Object.values(object)
@@ -31,20 +29,7 @@ export const getSymbolCount = async (session, objectGroup) => {
   }
 
   const getSymbols = object => {
-    try {
-      const allSymbols = []
-      for(const value of Object.values(object)){
-
-      }
-      return allSymbols
-    } catch {
-      return []
-    }
-  }
-
-  const maxArrayLength = 100_000_000
-
-  for(const object of objects){
+    const symbols = []
     const ownSymbols = Object.getOwnPropertySymbols(object)
     symbols.push(...ownSymbols)
     const values = getValues(object)
@@ -53,7 +38,11 @@ export const getSymbolCount = async (session, objectGroup) => {
         symbols.push(value)
       }
     }
+    return symbols
   }
+
+  const symbols = objects.flatMap(getSymbols)
+
   return symbols.length
 }`,
     objectId: objects.objects.objectId,

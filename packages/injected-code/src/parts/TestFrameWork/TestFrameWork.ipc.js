@@ -19,4 +19,5 @@ export const Commands = {
   showOverlay: TestFrameWork.showOverlay,
   type: TestFrameWork.type,
   typeAndWaitFor: TestFrameWork.typeAndWaitFor,
+  contentEditableInsert: TestFrameWork.contentEditableInsert,
 }

@@ -20,6 +20,7 @@ export const runTests = (
   timeoutBetween,
   restartBetween,
   runMode,
+  ide,
 ) => {
   return RunTestsWithCallback.runTests(
     root,
@@ -36,6 +37,7 @@ export const runTests = (
     timeoutBetween,
     restartBetween,
     runMode,
+    ide,
     callback,
   )
 }

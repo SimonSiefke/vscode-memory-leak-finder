@@ -14,7 +14,7 @@ export const create = ({ expect, page, VError }) => {
           timeout: 10_000,
         })
         await expect(quickPick).toBeVisible()
-        const quickPickInput = quickPick.locator('[role="combobox"]')
+        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
         await expect(quickPickInput).toBeVisible()
         await expect(quickPickInput).toBeFocused()
       } catch (error) {
@@ -31,7 +31,7 @@ export const create = ({ expect, page, VError }) => {
     async type(value) {
       try {
         const quickPick = page.locator('.quick-input-widget')
-        const quickPickInput = quickPick.locator('[role="combobox"]')
+        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
         await expect(quickPickInput).toBeVisible()
         await expect(quickPickInput).toBeFocused({ timeout: 3000 })
         await quickPickInput.type(value)
@@ -71,7 +71,7 @@ export const create = ({ expect, page, VError }) => {
         await this.show(KeyBindings.OpenQuickPickFiles)
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
-        const quickPickInput = quickPick.locator('[role="combobox"]')
+        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
         await expect(quickPickInput).toBeVisible()
         await expect(quickPickInput).toBeFocused({ timeout: 3000 })
         const option = quickPick.locator('.label-name', {

@@ -1,6 +1,7 @@
 export * as ActivityBar from '../ActivityBar/ActivityBar.js'
 export * as Colors from '../Colors/Colors.js'
 export * as ContextMenu from '../ContextMenu/ContextMenu.js'
+export * as CursorChat from '../CursorChat/CursorChat.js'
 export * as DebugConsole from '../DebugConsole/DebugConsole.js'
 export * as DebugHover from '../DebugHover/DebugHover.js'
 export * as DiffEditor from '../DiffEditor/DiffEditor.js'

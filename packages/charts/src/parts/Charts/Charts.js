@@ -1,3 +1,4 @@
+export * as AttachedDomNodeCount from '../CreateAttachedDomNodeCountChart/CreateAttachedDomNodeCountChart.js'
 export * as CanvasCount from '../CreateCanvasCountChart/CreateCanvasCountChart.js'
 export * as DetachedDomNodeCount from '../CreateDetachedDomNodeCountChart/CreateDetachedDomNodeCountChart.js'
 export * as EmitterCount from '../CreateEmitterCountChart/CreateEmitterCountChart.js'
@@ -13,5 +14,6 @@ export * as PromiseCount from '../CreatePromiseCountChart/CreatePromiseCountChar
 export * as RegexCount from '../CreateRegexCountChart/CreateRegexCountChart.js'
 export * as StringCount from '../CreateStringCountChart/CreateStringCountChart.js'
 export * as SymbolCount from '../CreateSymbolCountChart/CreateSymbolCountChart.js'
+export * as TypedArrayCount from '../CreateTypedArrayCountChart/CreateTypedArrayCountChart.js'
 export * as WeakMapCount from '../CreateWeakMapCountChart/CreateWeakMapCountChart.js'
 export * as WeakSetCount from '../CreateWeakSetCountChart/CreateWeakSetCountChart.js'

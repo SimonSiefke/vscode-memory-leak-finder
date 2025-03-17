@@ -2,8 +2,8 @@ export const setup = async ({ Editor, SettingsEditor }) => {
   await Editor.closeAll()
   await SettingsEditor.open()
   await SettingsEditor.search({
-    value: 'Files: Associations',
-    resultCount: 1,
+    value: 'Associations',
+    resultCount: 2,
   })
   await SettingsEditor.ensureIdle()
 }

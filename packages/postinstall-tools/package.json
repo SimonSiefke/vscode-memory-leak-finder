@@ -1,0 +1,17 @@
+{
+  "name": "@vscode-memory-leak-finder/postinstall-tools",
+  "version": "0.0.0-dev",
+  "description": "",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "postinstall": "node src/main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@lvce-editor/assert": "^1.3.0",
+    "@lvce-editor/verror": "^1.6.0"
+  }
+}

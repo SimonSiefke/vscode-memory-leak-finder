@@ -29,7 +29,7 @@ export const create = ({ expect, page, VError }) => {
           return
         }
         await expect(panel).toBeVisible()
-        const closeButton = page.locator('[aria-label="Hide Panel"]')
+        const closeButton = page.locator('[aria-label^="Hide Panel"]')
         await closeButton.click()
         await expect(panel).toBeHidden()
         const group = page.locator('.editor-group-container')

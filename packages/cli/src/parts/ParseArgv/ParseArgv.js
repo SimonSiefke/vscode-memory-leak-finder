@@ -1,4 +1,5 @@
 import * as TestRunMode from '../TestRunMode/TestRunMode.js'
+import * as Ide from '../Ide/Ide.js'
 
 const parseArgvNumber = (argv, name) => {
   const index = argv.indexOf(name)
@@ -37,6 +38,7 @@ export const parseArgv = (argv) => {
     timeoutBetween: 0,
     restartBetween: false,
     runMode: TestRunMode.Auto,
+    ide: Ide.VsCode,
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -79,6 +81,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--run-mode=import')) {
     options.runMode = TestRunMode.Import
+  }
+  if (argv.includes('--ide=cursor')) {
+    options.ide = Ide.Cursor
   }
   return options
 }
