@@ -444,7 +444,7 @@ export const create = ({ page, expect, VError }) => {
         await page.waitForIdle()
         const stickyWidget = page.locator('.sticky-widget')
         const count = await stickyWidget.count()
-        if (count > 0) {
+        if (count === 0) {
           return
         }
         await expect(stickyWidget).toBeVisible()
