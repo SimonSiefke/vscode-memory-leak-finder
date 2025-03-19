@@ -422,6 +422,39 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to hide breadcrumbs`)
       }
     },
+    async enableStickyScroll() {
+      try {
+        await page.waitForIdle()
+        const stickyWidget = page.locator('.sticky-widget')
+        const count = await stickyWidget.count()
+        if (count > 0) {
+          return
+        }
+        await expect(stickyWidget).toBeHidden()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.ViewToggleEditorStickyScroll)
+        await expect(stickyWidget).toHaveCount(count + 1)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to enable sticky scroll`)
+      }
+    },
+    async disableStickyScroll() {
+      try {
+        await page.waitForIdle()
+        const stickyWidget = page.locator('.sticky-widget')
+        const count = await stickyWidget.count()
+        if (count === 0) {
+          return
+        }
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.ViewToggleEditorStickyScroll)
+        await expect(stickyWidget).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to disable sticky scroll`)
+      }
+    },
     async openFind() {
       try {
         await page.waitForIdle()
