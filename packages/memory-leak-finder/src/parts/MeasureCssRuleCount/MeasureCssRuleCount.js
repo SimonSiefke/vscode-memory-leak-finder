@@ -12,11 +12,11 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  return GetCssRuleCount.getPromiseCount(session, objectGroup)
+  return GetCssRuleCount.getCssRuleCount(session, objectGroup)
 }
 
 export const stop = (session, objectGroup) => {
-  return GetCssRuleCount.getPromiseCount(session, objectGroup)
+  return GetCssRuleCount.getCssRuleCount(session, objectGroup)
 }
 
 export const compare = CompareCount.compareCount
