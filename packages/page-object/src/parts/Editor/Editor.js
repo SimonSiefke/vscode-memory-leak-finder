@@ -422,6 +422,40 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to hide breadcrumbs`)
       }
     },
+    async enableStickyScroll() {
+      try {
+        await page.waitForIdle()
+        const breadcrumbs = page.locator('.monaco-breadcrumbs')
+        const count = await breadcrumbs.count()
+        if (count > 0) {
+          return
+        }
+        await expect(breadcrumbs).toBeHidden()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.ViewToggleEditorStickyScroll)
+        await expect(breadcrumbs).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to enable sticky scroll`)
+      }
+    },
+    async disableStickyScroll() {
+      try {
+        await page.waitForIdle()
+        const breadcrumbs = page.locator('.monaco-breadcrumbs')
+        const count = await breadcrumbs.count()
+        if (count === 0) {
+          return
+        }
+        await expect(breadcrumbs).toBeVisible()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.ViewToggleEditorStickyScroll)
+        await expect(breadcrumbs).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to disable sticky scroll`)
+      }
+    },
     async openFind() {
       try {
         await page.waitForIdle()
