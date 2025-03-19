@@ -1,13 +1,29 @@
 export const skip = true
 
+const getContent = (letterCount) => {
+  let code = ''
+  for (let i = 0; i < letterCount; i++) {
+    const letterCode = 97 + i
+    const letter = String.fromCharCode(letterCode)
+    const indent = '  '.repeat(i)
+    code += indent + `function ${letter}(){\n\n\n`
+  }
+  for (let i = 0; i < letterCount; i++) {
+    const indent = '  '.repeat(letterCount - i - 1)
+    code += indent + `}\n\n`
+  }
+  return code
+}
+
 export const setup = async ({ Workspace, Editor }) => {
+  const content = getContent(20)
   await Workspace.setFiles([
     {
-      name: 'file.txt',
-      content: 'sample text',
+      name: 'file.js',
+      content: content,
     },
   ])
-  await Editor.open('file.txt')
+  await Editor.open('file.js')
   await Editor.disableStickyScroll()
 }
 
