@@ -433,7 +433,7 @@ export const create = ({ page, expect, VError }) => {
         await expect(stickyWidget).toBeHidden()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewToggleEditorStickyScroll)
-        await expect(stickyWidget).toBeVisible()
+        await expect(stickyWidget).toHaveCount(count + 1)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to enable sticky scroll`)
@@ -447,7 +447,6 @@ export const create = ({ page, expect, VError }) => {
         if (count === 0) {
           return
         }
-        await expect(stickyWidget).toBeVisible()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.ViewToggleEditorStickyScroll)
         await expect(stickyWidget).toBeHidden()
