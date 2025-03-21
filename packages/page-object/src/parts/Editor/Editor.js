@@ -158,6 +158,14 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to select ${text}`)
       }
     },
+    async selectAll() {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.SelectAll)
+      } catch (error) {
+        throw new VError(error, `Failed to select all`)
+      }
+    },
     async duplicateSelection() {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
@@ -420,6 +428,39 @@ export const create = ({ page, expect, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to hide breadcrumbs`)
+      }
+    },
+    async enableStickyScroll() {
+      try {
+        await page.waitForIdle()
+        const stickyWidget = page.locator('.sticky-widget')
+        const count = await stickyWidget.count()
+        if (count > 0) {
+          return
+        }
+        await expect(stickyWidget).toBeHidden()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.ViewToggleEditorStickyScroll)
+        await expect(stickyWidget).toHaveCount(count + 1)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to enable sticky scroll`)
+      }
+    },
+    async disableStickyScroll() {
+      try {
+        await page.waitForIdle()
+        const stickyWidget = page.locator('.sticky-widget')
+        const count = await stickyWidget.count()
+        if (count === 0) {
+          return
+        }
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.ViewToggleEditorStickyScroll)
+        await expect(stickyWidget).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to disable sticky scroll`)
       }
     },
     async openFind() {
@@ -716,6 +757,40 @@ export const create = ({ page, expect, VError }) => {
         await expect(activeTab).notToHaveClass('sticky-normal')
       } catch (error) {
         throw new VError(error, `Failed to unpin editor`)
+      }
+    },
+    async scrollDown() {
+      try {
+        await page.waitForIdle()
+        await this.selectAll()
+        await page.waitForIdle()
+        await page.keyboard.press('ArrowRight')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to scroll down in editor`)
+      }
+    },
+    async scrollUp() {
+      try {
+        await page.waitForIdle()
+        await this.selectAll()
+        await page.waitForIdle()
+        await page.keyboard.press('ArrowLeft')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to scroll up in editor`)
+      }
+    },
+    async shouldHaveActiveLineNumber(value) {
+      try {
+        const stringValue = `${value}`
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        const lineNumber = editor.locator('.active-line-number')
+        await expect(lineNumber).toHaveText(stringValue)
+      } catch (error) {
+        throw new VError(error, `Failed to verify active line number ${value}`)
       }
     },
   }
