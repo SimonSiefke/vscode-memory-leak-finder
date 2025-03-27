@@ -8,6 +8,7 @@ export * as MeasureClosureCount from '../MeasureClosureCount/MeasureClosureCount
 export * as MeasureCodeEditorWidgetCount from '../MeasureCodeEditorWidgetCount/MeasureCodeEditorWidgetCount.js'
 export * as MeasureCssInlineStyles from '../MeasureCssInlineStyles/MeasureCssInlineStyles.js'
 export * as MeasureCssRuleCount from '../MeasureCssRuleCount/MeasureCssRuleCount.js'
+export * as MeasureCssStyleSheetCount from '../MeasureCssStyleSheetCount/MeasureCssStyleSheetCount.js'
 export * as MeasureDetachedDomNodeCount from '../MeasureDetachedDomNodeCount/MeasureDetachedDomNodeCount.js'
 export * as MeasureDetachedDomNodeRoots from '../MeasureDetachedDomNodeRoots/MeasureDetachedDomNodeRoots.js'
 export * as MeasureDetachedDomNodeRootsWithStackTraces from '../MeasureDetachedDomNodeRootsWithStackTraces/MeasureDetachedDomNodeRootsWithStackTraces.js'
