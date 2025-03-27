@@ -1,6 +1,6 @@
-import * as CompareCount from '../CompareCount/CompareCount.js'
+import * as CompareCssInlineStyles from '../CompareCssInlineStyles/CompareCssInlineStyles.js'
 import * as GetCssInlineStyles from '../GetCssInlineStyles/GetCssInlineStyles.js'
-import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
+import * as IsLeakCssInlineStyles from '../IsLeakCssInlineStyles/IsLeakCssInlineStyles.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 
@@ -19,6 +19,6 @@ export const stop = (session, objectGroup) => {
   return GetCssInlineStyles.getCssInlineStyles(session, objectGroup)
 }
 
-export const compare = CompareCount.compareCount
+export const compare = CompareCssInlineStyles.compareCssInlineStyles
 
-export const isLeak = IsLeakCount.isLeakCount
+export const isLeak = IsLeakCssInlineStyles.isLeakCssInlineStyles

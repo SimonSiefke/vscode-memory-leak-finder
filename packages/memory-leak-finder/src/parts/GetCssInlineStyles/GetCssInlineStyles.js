@@ -41,12 +41,11 @@ const createCountMap = (array) => {
 const getTotalInlineStyleCount = (nodes) => {
   const inlineStyles = nodes.flatMap(getNodeInlineStyles)
   const countMap = createCountMap(inlineStyles)
-  const total = inlineStyles.length
-  return total
+  return countMap
 }
 
-const totalCount = getTotalInlineStyleCount(objects)
-return totalCount
+const countMap = getTotalInlineStyleCount(objects)
+return countMap
 }`,
     objectId: objects.objects.objectId,
     returnByValue: true,
