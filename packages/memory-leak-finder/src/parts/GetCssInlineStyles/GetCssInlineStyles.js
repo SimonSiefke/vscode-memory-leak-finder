@@ -29,13 +29,18 @@ const getNodeInlineStyles = (node) => {
   }
 }
 
-const getNodesInlineStyles = (nodes) => {
-  return nodes.flatMap(getNodeInlineStyles)
+const createCountMap = (array) => {
+  const map = Object.create(null)
+  for(const item of array){
+    map[item] ||= 0
+    map[item]++
+  }
+  return map
 }
 
 const getTotalInlineStyleCount = (nodes) => {
-  const inlineStyles = getNodesInlineStyles(nodes)
-  console.log(inlineStyles)
+  const inlineStyles = nodes.flatMap(getNodeInlineStyles)
+  const countMap = createCountMap(inlineStyles)
   const total = inlineStyles.length
   return total
 }
