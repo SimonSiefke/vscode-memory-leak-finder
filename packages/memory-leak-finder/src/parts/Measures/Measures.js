@@ -29,6 +29,7 @@ export * as MeasureDomNodeCount from '../MeasureDomNodeCount/MeasureDomNodeCount
 export * as MeasureDomTimerCount from '../MeasureDomTimerCount/MeasureDomTimerCount.js'
 export * as MeasureDomTokenListCount from '../MeasureDomTokenListCount/MeasureDomTokenListCount.js'
 export * as MeasureEmitterCount from '../MeasureEmitterCount/MeasureEmitterCount.js'
+export * as MeasureErrorCount from '../MeasureErrorCount/MeasureErrorCount.js'
 export * as MeasureEventListenerCount from '../MeasureEventListenerCount/MeasureEventListenerCount.js'
 export * as MeasureEventListeners from '../MeasureEventListeners/MeasureEventListeners.js'
 export * as MeasureEventListenersWithStackTraces from '../MeasureEventListenersWithStackTraces/MeasureEventListenersWithStackTraces.js'
