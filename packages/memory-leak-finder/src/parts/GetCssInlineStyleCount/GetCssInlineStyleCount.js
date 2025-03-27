@@ -20,25 +20,26 @@ export const getCssInlineStyleCount = async (session, objectGroup) => {
     functionDeclaration: `function(){
 const objects = this
 
-const getInlineStyleCount = node => {
+const getNodeInlineStyles = (node) => {
   try {
     const styleArray = [...node.style]
-    return styleArray.length
+    return styleArray
   } catch {
-    return 0
+    return []
   }
 }
 
-const getInlineStyleCounts = (nodes) => {
-  let total = 0
-  for (const node of nodes) {
-    const count = getInlineStyleCount(node)
-    total += count
-  }
+const getNodesInlineStyles = (nodes) => {
+  return nodes.flatMap(getNodeInlineStyles)
+}
+
+const getTotalInlineStyleCount = (nodes) => {
+  const inlineStyles = getNodesInlineStyles(nodes)
+  const total = inlineStyles.length
   return total
 }
 
-const totalCount = getInlineStyleCounts(objects)
+const totalCount = getTotalInlineStyleCount(objects)
 return totalCount
 }`,
     objectId: objects.objects.objectId,
