@@ -12,6 +12,7 @@ export * as MutationObserverCount from '../CreateMutationObserverCountChart/Crea
 export * as NumberCount from '../CreateNumberCountChart/CreateNumberCountChart.js'
 export * as ObjectCount from '../CreateObjectCountChart/CreateObjectCountChart.js'
 export * as PromiseCount from '../CreatePromiseCountChart/CreatePromiseCountChart.js'
+export * as ProxyCount from '../CreateProxyCountChart/CreateProxyCountChart.js'
 export * as RegexCount from '../CreateRegexCountChart/CreateRegexCountChart.js'
 export * as StringCount from '../CreateStringCountChart/CreateStringCountChart.js'
 export * as SymbolCount from '../CreateSymbolCountChart/CreateSymbolCountChart.js'
