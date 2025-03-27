@@ -1,6 +1,7 @@
 export const Array = 'Array.prototype'
 export const Canvas = 'HTMLCanvasElement.prototype'
 export const DomTokenList = 'DOMTokenList.prototype'
+export const Error = 'Error.prototype'
 export const EventTarget = 'EventTarget.prototype'
 export const Function = 'Function.prototype'
 export const HtmlElement = 'HTMLElement.prototype'
