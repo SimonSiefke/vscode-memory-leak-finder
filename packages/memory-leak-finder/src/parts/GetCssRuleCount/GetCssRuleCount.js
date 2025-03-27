@@ -1,6 +1,4 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as GetObjectCount from '../GetObjectCount/GetObjectCount.js'
-import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
 
 /**
  *
