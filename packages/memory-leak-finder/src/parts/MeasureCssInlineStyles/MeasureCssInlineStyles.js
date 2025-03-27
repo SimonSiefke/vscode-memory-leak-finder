@@ -12,11 +12,11 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  return GetCssInlineStyles.getCssInlineStyleCount(session, objectGroup)
+  return GetCssInlineStyles.getCssInlineStyles(session, objectGroup)
 }
 
 export const stop = (session, objectGroup) => {
-  return GetCssInlineStyles.getCssInlineStyleCount(session, objectGroup)
+  return GetCssInlineStyles.getCssInlineStyles(session, objectGroup)
 }
 
 export const compare = CompareCount.compareCount

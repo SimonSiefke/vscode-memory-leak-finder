@@ -6,7 +6,7 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
  * @param {any} session
  * @returns {Promise<number>}
  */
-export const getCssInlineStyleCount = async (session, objectGroup) => {
+export const getCssInlineStyles = async (session, objectGroup) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Node,
     returnByValue: false,
