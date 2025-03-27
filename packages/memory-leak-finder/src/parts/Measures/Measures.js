@@ -6,6 +6,7 @@ export * as MeasureCanvasCount from '../MeasureCanvasCount/MeasureCanvasCount.js
 export * as MeasureClassCount from '../MeasureClassCount/MeasureClassCount.js'
 export * as MeasureClosureCount from '../MeasureClosureCount/MeasureClosureCount.js'
 export * as MeasureCodeEditorWidgetCount from '../MeasureCodeEditorWidgetCount/MeasureCodeEditorWidgetCount.js'
+export * as MeasureCssInlineStyleCount from '../MeasureCssInlineStyleCount/MeasureCssInlineStyleCount.js'
 export * as MeasureCssRuleCount from '../MeasureCssRuleCount/MeasureCssRuleCount.js'
 export * as MeasureCssStyleSheetCount from '../MeasureCssStyleSheetCount/MeasureCssStyleSheetCount.js'
 export * as MeasureDetachedDomNodeCount from '../MeasureDetachedDomNodeCount/MeasureDetachedDomNodeCount.js'
