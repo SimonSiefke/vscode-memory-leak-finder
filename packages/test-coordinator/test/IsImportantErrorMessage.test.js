@@ -47,6 +47,14 @@ test('portal desktop', () => {
   ).toBe(false)
 })
 
+test('portal desktop', () => {
+  expect(
+    IsImportantError.isImportantErrorMessage(
+      `[27695:0327/214150.508600:ERROR:object_proxy.cc(576)] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: `,
+    ),
+  ).toBe(false)
+})
+
 test('floss error', () => {
   expect(
     IsImportantError.isImportantErrorMessage(

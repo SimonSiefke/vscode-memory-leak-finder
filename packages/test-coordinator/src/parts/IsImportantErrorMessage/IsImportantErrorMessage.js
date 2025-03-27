@@ -38,6 +38,9 @@ export const isImportantErrorMessage = (data) => {
   if (data.includes(`Failed to call method: org.freedesktop.portal.Settings.Read: object_path= /org/freedesktop/portal/desktop`)) {
     return false
   }
+  if (data.includes(`Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus`)) {
+    return false
+  }
   if (data.includes('Floss manager not present')) {
     return false
   }
