@@ -21,7 +21,7 @@
     "chalk": "^5.4.1"
   },
   "devDependencies": {
-    "@types/node": "^22.13.11"
+    "@types/node": "^22.14.0"
   },
   "jest": {
     "moduleNameMapper": {

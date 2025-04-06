@@ -19,7 +19,7 @@
     "@lvce-editor/verror": "^1.6.0",
     "@vscode/test-electron": "^2.4.1",
     "extract-zip": "^2.0.1",
-    "got": "^14.4.6"
+    "got": "^14.4.7"
   },
   "jest": {
     "injectGlobals": false,
