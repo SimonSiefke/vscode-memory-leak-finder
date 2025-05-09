@@ -17,7 +17,7 @@
     "@lvce-editor/json-rpc": "^5.4.0",
     "@lvce-editor/verror": "^1.6.0",
     "@vscode-memory-leak-finder/devtools-protocol": "file:../devtools-protocol",
-    "pretty-bytes": "^6.1.1"
+    "pretty-bytes": "^7.0.0"
   },
   "xo": {
     "rules": {
