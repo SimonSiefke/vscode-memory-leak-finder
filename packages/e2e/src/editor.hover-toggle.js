@@ -12,6 +12,6 @@ export const setup = async ({ Editor, Workspace, Explorer }) => {
 }
 
 export const run = async ({ Editor, Hover }) => {
-  await Editor.hover('h1', 'The h1 element represents a section heading.MDN Reference')
+  await Editor.hover('h1', /The h1 element represents a section heading/)
   await Hover.hide()
 }

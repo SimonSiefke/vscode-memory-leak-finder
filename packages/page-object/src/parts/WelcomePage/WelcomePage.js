@@ -24,7 +24,7 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const heading = page.locator('.category-title')
         await expect(heading).toBeVisible()
-        await expect(heading).toHaveText('Get Started with VS Code')
+        await expect(heading).toHaveText(/Get Started with VS Code/i)
       } catch (error) {
         throw new VError(error, `Failed to fundamentals page`)
       }

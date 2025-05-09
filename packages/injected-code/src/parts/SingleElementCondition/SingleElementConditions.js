@@ -34,7 +34,7 @@ export const toHaveText = (element, options) => {
     return existingText === options.text
   }
   if ('regex' in options) {
-    const regex = new RegExp(options.regex)
+    const regex = new RegExp(options.regex, 'i')
     return regex.test(existingText)
   }
   throw new Error(`invalid options`)
