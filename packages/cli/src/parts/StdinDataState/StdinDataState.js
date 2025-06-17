@@ -21,6 +21,7 @@ export const state = {
   restartBetween: false,
   runMode: TestRunMode.Auto,
   ide: Ide.VsCode,
+  ideVersion: Ide.VsCode,
 }
 
 export const setState = (newState) => {
@@ -39,6 +40,7 @@ export const setState = (newState) => {
   state.restartBetween = newState.restartBetween
   state.runMode = newState.runMode
   state.ide = newState.ide
+  state.ideVersion = newState.ideVersion
 }
 
 export const setBuffering = (value) => {
