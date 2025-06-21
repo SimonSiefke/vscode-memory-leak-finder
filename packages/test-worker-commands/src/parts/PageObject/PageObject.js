@@ -31,7 +31,7 @@ export const create = async (connectionId, isFirstConnection, isHeadless, timeou
       electronApp,
       vscodeVersion: ideVersion,
     }
-    const pageObject = pageObjectModule.create(pageObjectContext)
+    const pageObject = await pageObjectModule.create(pageObjectContext)
     PageObjectState.set(connectionId, { pageObject, firstWindow })
     if (timeouts === false) {
       await DisableTimeouts.disableTimeouts(firstWindow)
