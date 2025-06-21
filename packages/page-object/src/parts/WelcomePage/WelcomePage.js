@@ -2,7 +2,7 @@ import * as Editor from '../Editor/Editor.js'
 import * as QuickPick from '../QuickPick/QuickPick.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, VError, ideVersion }) => {
   return {
     async show() {
       try {
@@ -43,7 +43,7 @@ export const create = ({ expect, page, VError }) => {
       try {
         const gettingStartedContainer = page.locator('.gettingStartedContainer')
         await expect(gettingStartedContainer).toBeVisible()
-        const editor = Editor.create({ expect, page, VError })
+        const editor = Editor.create({ expect, page, VError, ideVersion })
         await editor.closeAll()
         await expect(gettingStartedContainer).toBeHidden()
       } catch (error) {
