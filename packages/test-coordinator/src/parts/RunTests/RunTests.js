@@ -21,6 +21,7 @@ export const runTests = (
   restartBetween,
   runMode,
   ide,
+  ideVersion,
 ) => {
   return RunTestsWithCallback.runTests(
     root,
@@ -38,6 +39,7 @@ export const runTests = (
     restartBetween,
     runMode,
     ide,
+    ideVersion,
     callback,
   )
 }

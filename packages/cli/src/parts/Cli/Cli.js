@@ -20,6 +20,7 @@ export const run = async () => {
     restartBetween: options.restartBetween,
     runMode: options.runMode,
     ide: options.ide,
+    ideVersion: options.ideVersion,
   })
   return InitialStart.initialStart(options)
 }

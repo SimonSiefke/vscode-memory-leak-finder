@@ -47,6 +47,7 @@ export const runTests = async (
   restartBetween,
   runMode,
   ide,
+  ideVersion,
   callback,
 ) => {
   try {
@@ -65,6 +66,7 @@ export const runTests = async (
     Assert.number(runMode)
     Assert.boolean(restartBetween)
     Assert.string(ide)
+    Assert.string(ideVersion)
     let passed = 0
     let failed = 0
     let skipped = 0
@@ -88,6 +90,7 @@ export const runTests = async (
       timeouts,
       runMode,
       ide,
+      ideVersion,
     )
     let memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()
     let targetId = ''
@@ -171,6 +174,7 @@ export const runTests = async (
               timeouts,
               runMode,
               ide,
+              ideVersion,
             )
             if (checkLeaks) {
               memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()

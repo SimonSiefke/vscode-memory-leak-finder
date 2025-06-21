@@ -17,7 +17,7 @@ export const state = {
   promise: undefined,
 }
 
-export const prepareTestsOrAttach = async (cwd, headlessMode, recordVideo, connectionId, timeouts, runMode, ide) => {
+export const prepareTestsOrAttach = async (cwd, headlessMode, recordVideo, connectionId, timeouts, runMode, ide, ideVersion) => {
   const testWorkerIpc = await TestWorker.launch(runMode)
   const isFirst = state.promise === undefined
   if (isFirst) {
@@ -38,6 +38,6 @@ export const prepareTestsOrAttach = async (cwd, headlessMode, recordVideo, conne
     callFrameId,
     isFirstConnection,
   )
-  await PageObject.create(testWorkerIpc, connectionId, isFirstConnection, headlessMode, timeouts)
+  await PageObject.create(testWorkerIpc, connectionId, isFirstConnection, headlessMode, timeouts, ideVersion)
   return testWorkerIpc
 }
