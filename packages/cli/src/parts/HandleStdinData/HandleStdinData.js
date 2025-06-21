@@ -31,6 +31,7 @@ export const handleStdinData = async (key) => {
       state.restartBetween,
       state.runMode,
       state.ide,
+      state.ideVersion,
     )
   }
   if (newState.mode === ModeType.Interrupted) {
