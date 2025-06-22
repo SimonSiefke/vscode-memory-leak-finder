@@ -8,7 +8,7 @@ const selectAll = IsMacos.isMacos ? 'Meta+A' : 'Control+A'
 const space = ' '
 const nonBreakingSpace = String.fromCharCode(160)
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, VError, ideVersion }) => {
   return {
     async search(value) {
       try {
@@ -64,17 +64,31 @@ export const create = ({ expect, page, VError }) => {
         }
         const extensionsView = page.locator(`.extensions-viewlet`)
         const suggestContainer = page.locator(`.suggest-input-container`)
-        const extensionsInput = extensionsView.locator('.inputarea')
-        const className = await suggestContainer.getAttribute('class')
-        if (!className.includes('synthetic-focus')) {
-          await suggestContainer.click()
-          await expect(extensionsInput).toBeVisible()
-          await extensionsInput.click()
+        if (ideVersion && ideVersion.minor <= 100) {
+          const extensionsInput = extensionsView.locator('.inputarea')
+          const className = await suggestContainer.getAttribute('class')
+          if (!className.includes('synthetic-focus')) {
+            await suggestContainer.click()
+            await expect(extensionsInput).toBeVisible()
+            await extensionsInput.click()
+          }
+          await extensionsInput.focus()
+          await expect(suggestContainer).toHaveClass('synthetic-focus')
+          await expect(extensionsInput).toBeFocused()
+          await page.waitForIdle()
+        } else {
+          const extensionsInput = extensionsView.locator('.native-edit-context')
+          const className = await suggestContainer.getAttribute('class')
+          if (!className.includes('synthetic-focus')) {
+            await suggestContainer.click()
+            await expect(extensionsInput).toBeVisible()
+            await extensionsInput.click()
+          }
+          await extensionsInput.focus()
+          await expect(suggestContainer).toHaveClass('synthetic-focus')
+          await expect(extensionsInput).toBeFocused()
+          await page.waitForIdle()
         }
-        await extensionsInput.focus()
-        await expect(suggestContainer).toHaveClass('synthetic-focus')
-        await expect(extensionsInput).toBeFocused()
-        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show extensions view`)
       }
