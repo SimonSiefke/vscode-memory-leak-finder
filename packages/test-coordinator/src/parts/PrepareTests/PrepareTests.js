@@ -8,7 +8,7 @@ import * as PageObject from '../PageObject/PageObject.js'
 import * as VideoRecording from '../VideoRecording/VideoRecording.js'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.js'
 
-export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connectionId, timeouts, ide) => {
+export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connectionId, timeouts, ide, ideVersion) => {
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
@@ -40,7 +40,7 @@ export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connecti
     callFrameId,
     isFirstConnection,
   )
-  await PageObject.create(ipc, connectionId, isFirstConnection, headlessMode, timeouts)
+  await PageObject.create(ipc, connectionId, isFirstConnection, headlessMode, timeouts, ideVersion)
   return {
     ipc,
     webSocketUrl,
