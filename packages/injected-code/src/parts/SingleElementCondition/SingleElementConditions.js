@@ -24,7 +24,13 @@ export const toBeHidden = (element) => {
 }
 
 export const toHaveValue = (element, { value }) => {
-  return element.value === value
+  if (element.value === value) {
+    return true
+  }
+  if (element.editContext && typeof element.editContext.text === 'string') {
+    return element.editContext.text === value
+  }
+  return false
 }
 
 export const toHaveText = (element, options) => {
