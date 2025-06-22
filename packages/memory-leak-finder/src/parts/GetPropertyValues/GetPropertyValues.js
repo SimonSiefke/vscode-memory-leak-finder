@@ -14,6 +14,7 @@ export const getPropertyValues = async (session, objectGroup, objectId) => {
     generatePreview: false,
     ownProperties: true,
   })
+  // TODO maybe filter properties in debugger instead of node because amount of properties can be huge
   const ownProperties = rawResult.result.filter(IsEnumerable.isEnumerable)
   const values = ownProperties.map((property) => property.value)
   return values
