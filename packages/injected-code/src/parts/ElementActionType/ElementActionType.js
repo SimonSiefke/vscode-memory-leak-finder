@@ -1,3 +1,4 @@
+import { dispatchEditContextUpdate } from '../DispatchEditContextUpdate/DispatchEditContextUpdate.js'
 import * as DispatchEvent from '../DispatchEvent/DispatchEvent.js'
 
 const getNewValue = (value, selectionStart, selectionEnd, text) => {
@@ -14,4 +15,5 @@ export const type = (element, options) => {
   element.value = newValue
   DispatchEvent.input(element, {})
   DispatchEvent.change(element, {})
+  dispatchEditContextUpdate(element, newValue)
 }
