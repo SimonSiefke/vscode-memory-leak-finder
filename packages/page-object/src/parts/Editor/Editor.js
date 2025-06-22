@@ -9,7 +9,7 @@ const isNotebook = (file) => {
   return file.endsWith('.ipynb')
 }
 
-export const create = ({ page, expect, VError }) => {
+export const create = ({ page, expect, VError, ideVersion }) => {
   return {
     async open(fileName) {
       try {
@@ -25,8 +25,13 @@ export const create = ({ page, expect, VError }) => {
         } else {
           const editor = page.locator('.editor-instance')
           await expect(editor).toBeVisible()
-          const editorInput = editor.locator('.inputarea')
-          await expect(editorInput).toBeFocused()
+          if (ideVersion && ideVersion.minor >= 101) {
+            const editContext = editor.locator('.native-edit-context')
+            await expect(editContext).toBeFocused()
+          } else {
+            const editorInput = editor.locator('.inputarea')
+            await expect(editorInput).toBeFocused()
+          }
         }
         await page.waitForIdle()
       } catch (error) {
