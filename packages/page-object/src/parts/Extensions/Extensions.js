@@ -14,16 +14,28 @@ export const create = ({ expect, page, VError, ideVersion }) => {
       try {
         const extensionsView = page.locator(`.extensions-viewlet`)
         await expect(extensionsView).toBeVisible()
-        const extensionsInput = extensionsView.locator('.inputarea')
-        await expect(extensionsInput).toBeFocused()
+        if (ideVersion && ideVersion.minor <= 100) {
+          const extensionsInput = extensionsView.locator('.inputarea')
+          await expect(extensionsInput).toBeFocused()
+          await extensionsInput.setValue('')
+        } else {
+          const extensionsInput = extensionsView.locator('.native-edit-context')
+          await expect(extensionsInput).toBeFocused()
+          await extensionsInput.setValue('')
+        }
         const lines = extensionsView.locator('.monaco-editor .view-lines')
-        await extensionsInput.setValue('')
         await page.keyboard.press(selectAll)
         await page.keyboard.press('Backspace')
         await expect(lines).toHaveText('', {
           timeout: 3000,
         })
-        await extensionsInput.type(value)
+        if (ideVersion && ideVersion.minor <= 100) {
+          const extensionsInput = extensionsView.locator('.inputarea')
+          await extensionsInput.type(value)
+        } else {
+          const extensionsInput = extensionsView.locator('.native-edit-context')
+          await extensionsInput.type(value)
+        }
       } catch (error) {
         throw new VError(error, `Failed to search for ${value}`)
       }
