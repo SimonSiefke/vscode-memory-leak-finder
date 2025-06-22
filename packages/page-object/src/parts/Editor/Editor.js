@@ -41,9 +41,15 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     async focus() {
       const editor = page.locator('.editor-instance')
       await expect(editor).toBeVisible()
-      const editorInput = editor.locator('.inputarea')
-      await editorInput.focus()
-      await expect(editorInput).toBeFocused()
+      if (ideVersion && ideVersion.minor <= 100) {
+        const editorInput = editor.locator('.inputarea')
+        await editorInput.focus()
+        await expect(editorInput).toBeFocused()
+      } else {
+        const editContext = editor.locator('.native-edit-context')
+        await editContext.focus()
+        await expect(editContext).toBeFocused()
+      }
     },
     async hover(text, hoverText) {
       try {
