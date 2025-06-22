@@ -11,9 +11,10 @@ const getNewValue = (value, selectionStart, selectionEnd, text) => {
 export const type = (element, options) => {
   const selectionStart = element.selectionStart
   const selectionEnd = element.selectionEnd
-  const newValue = getNewValue(element.value, selectionStart, selectionEnd, options.text)
+  const oldValue = element.value || ''
+  const newValue = getNewValue(oldValue, selectionStart, selectionEnd, options.text)
   element.value = newValue
+  dispatchEditContextUpdate(element, newValue)
   DispatchEvent.input(element, {})
   DispatchEvent.change(element, {})
-  dispatchEditContextUpdate(element, newValue)
 }
