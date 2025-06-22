@@ -25,12 +25,12 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         } else {
           const editor = page.locator('.editor-instance')
           await expect(editor).toBeVisible()
-          if (ideVersion && ideVersion.minor <= 100) {
-            const editorInput = editor.locator('.inputarea')
-            await expect(editorInput).toBeFocused()
-          } else {
+          if (ideVersion && ideVersion.minor >= 101) {
             const editContext = editor.locator('.native-edit-context')
             await expect(editContext).toBeFocused()
+          } else {
+            const editorInput = editor.locator('.inputarea')
+            await expect(editorInput).toBeFocused()
           }
         }
         await page.waitForIdle()
