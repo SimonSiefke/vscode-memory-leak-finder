@@ -2,7 +2,7 @@ import * as Panel from '../Panel/Panel.js'
 import * as QuickPick from '../QuickPick/QuickPick.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, VError, ideVersion }) => {
   return {
     async show() {
       try {
@@ -13,8 +13,13 @@ export const create = ({ expect, page, VError }) => {
         await expect(outputView).toBeVisible()
         const paneBody = page.locator('.pane-body.output-view')
         await expect(paneBody).toBeVisible()
-        const inputArea = paneBody.locator('.inputarea')
-        await expect(inputArea).toBeFocused()
+        if (ideVersion && ideVersion.minor <= 100) {
+          const inputArea = paneBody.locator('.inputarea')
+          await expect(inputArea).toBeFocused()
+        } else {
+          const inputArea = paneBody.locator('.native-edit-context')
+          await expect(inputArea).toBeFocused()
+        }
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show output`)
