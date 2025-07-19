@@ -13,6 +13,6 @@ export const run = async ({ Extensions, Editor, ExtensionDetailView }) => {
   await ExtensionDetailView.shouldHaveTab('Details')
   await ExtensionDetailView.openTab('Features', { webView: false })
   await ExtensionDetailView.openFeature('Settings')
-  // TODO check that feature table exists
+  await ExtensionDetailView.shouldHaveFeatureHeading('Settings')
   await Editor.closeAll()
 }
