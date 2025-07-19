@@ -1,4 +1,5 @@
 export const Array = 'Array.prototype'
+export const Blob = 'Blob.prototype'
 export const Canvas = 'HTMLCanvasElement.prototype'
 export const DomTokenList = 'DOMTokenList.prototype'
 export const EditContext = 'EditContext.prototype'
