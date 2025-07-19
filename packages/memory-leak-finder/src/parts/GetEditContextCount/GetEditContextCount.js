@@ -1,4 +1,6 @@
 import { VError } from '@lvce-editor/verror'
+import * as GetObjectCount from '../GetObjectCount/GetObjectCount.js'
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
 
 /**
  *
@@ -7,8 +9,7 @@ import { VError } from '@lvce-editor/verror'
  */
 export const getEditContextCount = async (session, objectGroup) => {
   try {
-    // TODO compute edit context count
-    return 0
+    return await GetObjectCount.getObjectCount(session, PrototypeExpression.EditContext, objectGroup)
   } catch (error) {
     throw new VError(error, `Failed to get edit context count`)
   }
