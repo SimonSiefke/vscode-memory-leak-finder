@@ -2,6 +2,7 @@ export * as AttachedDomNodeCount from '../CreateAttachedDomNodeCountChart/Create
 export * as CanvasCount from '../CreateCanvasCountChart/CreateCanvasCountChart.js'
 export * as CssRuleCount from '../CreateCssRuleCountChart/CreateCssRuleCountChart.js'
 export * as DetachedDomNodeCount from '../CreateDetachedDomNodeCountChart/CreateDetachedDomNodeCountChart.js'
+export * as EditContextCount from '../CreateEditContextCountChart/CreateEditContextCountChart.js'
 export * as EmitterCount from '../CreateEmitterCountChart/CreateEmitterCountChart.js'
 export * as ErrorCount from '../CreateErrorCountChart/CreateErrorCountChart.js'
 export * as EventListenerCount from '../CreateEventListenerCountChart/CreateEventListenerCountChart.js'
