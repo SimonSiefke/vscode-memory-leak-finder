@@ -91,6 +91,7 @@ export * as MeasureStringDifference from '../MeasureStringDifference/MeasureStri
 export * as MeasureStyleElementCount from '../MeasureStyleElementCount/MeasureStyleElementCount.js'
 export * as MeasureSymbolCount from '../MeasureSymbolCount/MeasureSymbolCount.js'
 export * as MeasureSymbols from '../MeasureSymbols/MeasureSymbols.js'
+export * as MeasureTextDecoderCount from '../MeasureTextDecoderCount/MeasureTextDecoderCount.js'
 export * as MeasureTextEncoderCount from '../MeasureTextEncoderCount/MeasureTextEncoderCount.js'
 export * as MeasureTypedArrayCount from '../MeasureTypedArrayCount/MeasureTypedArrayCount.js'
 export * as MeasureUserStringCount from '../MeasureUserStringCount/MeasureUserStringCount.js'
