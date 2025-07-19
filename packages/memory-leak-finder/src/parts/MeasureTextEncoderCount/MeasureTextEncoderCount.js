@@ -1,11 +1,11 @@
 import * as CompareCount from '../CompareCount/CompareCount.js'
-import * as GetDomTokenListCount from '../GetDomTokenListCount/GetDomTokenListCount.js'
+import * as GetTextEncoderCount from '../GetTextEncoderCount/GetTextEncoderCount.js'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
 
-export const id = MeasureId.DomTokenListCount
+export const id = MeasureId.TextEncoderCount
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
@@ -13,12 +13,11 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  return GetDomTokenListCount.getDomTokenListCount(session, objectGroup)
+  return GetTextEncoderCount.getTextEncoderCount(session, objectGroup)
 }
 
 export const stop = async (session, objectGroup) => {
-  const result = await GetDomTokenListCount.getDomTokenListCount(session, objectGroup)
-  return result
+  return GetTextEncoderCount.getTextEncoderCount(session, objectGroup)
 }
 
 export const releaseResources = async (session, objectGroup) => {
