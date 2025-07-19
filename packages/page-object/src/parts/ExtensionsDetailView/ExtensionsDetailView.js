@@ -33,6 +33,26 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to verify extension detail tab ${text}`)
       }
     },
+    async openFeature(featureName) {
+      try {
+        const tab = page.locator(`.extension-feature-list-item[aria-label="${featureName}"]`)
+        await expect(tab).toBeVisible()
+        await tab.click()
+        await page.waitForIdle()
+        await expect(tab).toHaveAttribute('aria-selected', 'true')
+      } catch (error) {
+        throw new VError(error, `Failed to open feature ${featureName}`)
+      }
+    },
+    async shouldHaveFeatureHeading(featureText) {
+      try {
+        const featureTitle = page.locator(`.feature-title`)
+        await expect(featureTitle).toBeVisible()
+        await expect(featureTitle).toHaveText(featureText)
+      } catch (error) {
+        throw new VError(error, `Failed to check feature heading ${featureText}`)
+      }
+    },
     async openTab(text, options) {
       try {
         const tab = page.locator('.extension-editor .action-label', {
