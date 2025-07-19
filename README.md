@@ -65,6 +65,14 @@ Measures the total number of dom nodes.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure dom-node-count --only base
 ```
 
+### EditContextCount
+
+Measures the total number of edit context.
+
+```sh
+node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure edit-context-count --only base
+```
+
 ### EventListenerCount
 
 Measures the total number of event listeners.
