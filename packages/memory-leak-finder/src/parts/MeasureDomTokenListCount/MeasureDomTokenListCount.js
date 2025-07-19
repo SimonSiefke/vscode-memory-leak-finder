@@ -5,7 +5,7 @@ import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
 
-export const id = MeasureId.DomTokenList
+export const id = MeasureId.DomTokenListCount
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
