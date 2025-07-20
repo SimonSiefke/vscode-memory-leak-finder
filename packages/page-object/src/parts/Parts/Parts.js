@@ -1,4 +1,5 @@
 export * as ActivityBar from '../ActivityBar/ActivityBar.js'
+export * as ChatEditor from '../ChatEditor/ChatEditor.js'
 export * as Colors from '../Colors/Colors.js'
 export * as ContextMenu from '../ContextMenu/ContextMenu.js'
 export * as CursorChat from '../CursorChat/CursorChat.js'
