@@ -74,5 +74,30 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to open extension detail tab ${text}`)
       }
     },
+    async enableExtension(options) {
+      try {
+        const extensionEditor = page.locator('.extension-editor')
+        const disabledStatusLabel = extensionEditor.locator('.extension-status-label[aria-label="Disabled"]')
+        if (!options?.force) {
+          await expect(disabledStatusLabel).toBeVisible()
+        }
+        const action = extensionEditor.locator('.action-label[aria-label^="Enable"]')
+        await action.click()
+        await expect(disabledStatusLabel).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to enable extension`)
+      }
+    },
+    async disableExtension() {
+      try {
+        const extensionEditor = page.locator('.extension-editor')
+        const action = extensionEditor.locator('.action-label[aria-label^="Disable"]')
+        await action.click()
+        const disabledStatusLabel = extensionEditor.locator('.extension-status-label[aria-label="Disabled"]')
+        await expect(disabledStatusLabel).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to disable extension`)
+      }
+    },
   }
 }
