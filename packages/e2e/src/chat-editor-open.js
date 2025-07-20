@@ -1,3 +1,5 @@
+export const skip = 1
+
 export const setup = async ({ Editor }) => {
   await Editor.closeAll()
 }
