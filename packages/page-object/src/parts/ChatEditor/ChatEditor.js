@@ -27,5 +27,26 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to send chat message`)
       }
     },
+    async setMode(modeLabel) {
+      try {
+        const chatView = page.locator('.interactive-session')
+        const setModeButton = chatView.locator('[aria-label^="Set Mode"]')
+        await expect(setModeButton).toBeVisible()
+        await setModeButton.click()
+        await page.waitForIdle()
+        const actionWidget = page.locator('.monaco-list[aria-label="Action Widget"]')
+        await expect(actionWidget).toBeVisible()
+        await expect(actionWidget).toBeFocused()
+        const option = actionWidget.locator(`.monaco-list-row.action[aria-label="${modeLabel}"]`)
+        await expect(option).toBeVisible()
+        await option.click()
+        await page.waitForIdle()
+        await expect(actionWidget).toBeHidden()
+        const modeLabelElement = chatView.locator('.chat-model-label')
+        await expect(modeLabelElement).toHaveText(modeLabel)
+      } catch (error) {
+        throw new VError(error, `Failed to set chat mode to ${modeLabel}`)
+      }
+    },
   }
 }
