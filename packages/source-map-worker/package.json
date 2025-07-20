@@ -12,9 +12,9 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@lvce-editor/assert": "^1.2.0",
-    "@lvce-editor/verror": "^1.1.2",
-    "got": "^14.2.1",
+    "@lvce-editor/assert": "^1.4.0",
+    "@lvce-editor/verror": "^1.7.0",
+    "got": "^14.4.7",
     "source-map": "^0.7.4"
   },
   "xo": {
