@@ -8,6 +8,9 @@ export const create = ({ expect, page, VError }) => {
         await quickPick.executeCommand('Chat: New Chat Editor')
         const chatView = page.locator('.interactive-session')
         await expect(chatView).toBeVisible()
+        await page.waitForIdle()
+        const editContext = page.locator('.native-edit-context')
+        await expect(editContext).toBeFocused()
       } catch (error) {
         throw new VError(error, `Failed to open chat editor`)
       }
@@ -46,6 +49,33 @@ export const create = ({ expect, page, VError }) => {
         await expect(modeLabelElement).toHaveText(modeLabel)
       } catch (error) {
         throw new VError(error, `Failed to set chat mode to ${modeLabel}`)
+      }
+    },
+    async openFinishSetup() {
+      try {
+        const statusBarItem = page.locator('#chat\\.statusBarEntry .statusbar-item-label')
+        await expect(statusBarItem).toBeVisible()
+        await statusBarItem.click()
+        await page.waitForIdle()
+        const hover = page.locator('.context-view .monaco-hover[role="tooltip"]')
+        await expect(hover).toBeVisible()
+        await expect(hover).toBeFocused()
+      } catch (error) {
+        throw new VError(error, `Failed to open finish setup`)
+      }
+    },
+    async closeFinishSetup() {
+      try {
+        const hover = page.locator('.context-view .monaco-hover[role="tooltip"]')
+        await expect(hover).toBeVisible()
+        const statusBarItem = page.locator('#chat\\.statusBarEntry')
+        await expect(statusBarItem).toBeVisible()
+        await page.waitForIdle()
+        await page.keyboard.press('Escape')
+        await page.waitForIdle()
+        await expect(hover).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to close finish setup`)
       }
     },
   }
