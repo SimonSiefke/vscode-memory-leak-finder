@@ -201,7 +201,7 @@ Measures the total number of elements in all Sets.
 node packages/cli/bin/test.js --cwd packages/e2e  --check-leaks --measure-after --measure set-size --only base
 ```
 
-### SetTime
+### SetTimeout
 
 Measures the total number of Timeouts.
 
