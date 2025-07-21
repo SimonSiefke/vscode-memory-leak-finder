@@ -9,3 +9,7 @@ export const run = async ({ ChatEditor }) => {
   await ChatEditor.addContext('Problems...', 'All Problems', 'All Problems')
   await ChatEditor.clearContext('All Problems')
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}

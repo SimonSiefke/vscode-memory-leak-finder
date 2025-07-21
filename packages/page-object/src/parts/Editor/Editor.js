@@ -811,5 +811,45 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to verify active line number ${value}`)
       }
     },
+    async moveScrollBar(y) {
+      try {
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        const scrollbar = editor.locator('.scrollbar.vertical').first()
+        await scrollbar.hover()
+        const scrollbarSlider = scrollbar.locator('.slider')
+
+        const elementBox1 = await scrollbarSlider.boundingBox()
+        console.log({ elementBox1 })
+        if (!elementBox1) {
+          throw new Error('Unable to find bounding box on element')
+        }
+
+        const elementCenterX = elementBox1.x + elementBox1.width / 2
+        const elementCenterY = elementBox1.y + elementBox1.height / 2
+
+        const xOffset = 0
+        const yOffset = y
+
+        await scrollbarSlider.hover()
+        await page.mouse.down()
+        await page.mouse.move(elementCenterX + xOffset, elementCenterY + yOffset)
+        await page.mouse.up()
+
+        const elementBox2 = await scrollbarSlider.boundingBox()
+        if (!elementBox2) {
+          throw new Error('Unable to find bounding box on element')
+        }
+
+        const elementCenterX2 = elementBox1.x + elementBox1.width / 2
+        const elementCenterY2 = elementBox1.y + elementBox1.height / 2
+
+        await page.mouse.down()
+        await page.mouse.move(elementCenterX2 + xOffset, elementCenterY2 - yOffset)
+        await page.mouse.up()
+      } catch (error) {
+        throw new VError(error, `Failed to scroll in editor`)
+      }
+    },
   }
 }
