@@ -358,11 +358,18 @@ export const create = ({ page, expect, VError, ideVersion }) => {
       })
       await expect(breadCrumb).toBeVisible()
     },
-    async save() {
+    async save(options) {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
-        await quickPick.executeCommand(WellKnownCommands.FileSave)
-        await page.waitForIdle()
+        if (options?.viaKeyBoard) {
+          await page.keyboard.press('Control+S')
+          await page.waitForIdle()
+          const dirtyTabs = page.locator('.tab.dirty')
+          await expect(dirtyTabs).toHaveCount(0)
+        } else {
+          const quickPick = QuickPick.create({ expect, page, VError })
+          await quickPick.executeCommand(WellKnownCommands.FileSave)
+          await page.waitForIdle()
+        }
       } catch (error) {
         throw new VError(error, `Failed to save file`)
       }
