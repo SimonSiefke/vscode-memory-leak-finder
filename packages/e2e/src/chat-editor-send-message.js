@@ -9,3 +9,7 @@ export const run = async ({ ChatEditor, Editor }) => {
   // TODO send message and clear it
   await ChatEditor.sendMessage('test')
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}

@@ -9,3 +9,7 @@ export const run = async ({ ChatEditor, Editor }) => {
   await ChatEditor.openFinishSetup()
   await ChatEditor.closeFinishSetup()
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}
