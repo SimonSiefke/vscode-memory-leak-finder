@@ -13,7 +13,7 @@ export const setup = async ({ Editor, Workspace }) => {
 export const run = async ({ Editor }) => {
   await Editor.click('h1')
   await Editor.goToDefinition()
-  await Editor.shouldHaveOverlayMessage('No definition found')
+  await Editor.shouldHaveOverlayMessage(`No definition found for 'h1'`)
 }
 
 export const teardown = async ({ Editor }) => {
