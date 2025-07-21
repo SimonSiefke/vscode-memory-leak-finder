@@ -19,3 +19,8 @@ export const run = async ({ Editor }) => {
   await Editor.shouldHaveText('<h1>hello world</h1>\n<h1>hello world</h1>')
   await Editor.undo()
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.save()
+  await Editor.closeAll()
+}
