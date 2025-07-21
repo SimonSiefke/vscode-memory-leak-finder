@@ -78,5 +78,36 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to close finish setup`)
       }
     },
+    async addContext(initialPrompt, secondPrompt, confirmText) {
+      try {
+        const addContextButton = page.locator('[role="button"][aria-label^="Add Context"]')
+        await addContextButton.click()
+        await page.waitForIdle()
+
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.select(initialPrompt, true)
+        await quickPick.select(secondPrompt)
+        await page.waitForIdle()
+
+        const contextLabel = page.locator(`[aria-label="Attached context, ${confirmText}"]`)
+        await expect(contextLabel).toBeVisible()
+        // TODO navigate to first quickpick
+        // TODO navigate to second quickpick
+        // TODO verify that context has been applied
+      } catch (error) {
+        throw new VError(error, `Failed to set chat context`)
+      }
+    },
+    async clearContext(contextName) {
+      try {
+        const contextLabel = page.locator(`[aria-label="Attached context, ${contextName}"]`)
+        await expect(contextLabel).toBeVisible()
+        const removeButton = contextLabel.locator('[role="button"][aria-label^="Remove from context"]')
+        await expect(removeButton).toBeVisible()
+        await removeButton.click()
+      } catch (error) {
+        throw new VError(error, `Failed to clear chat context`)
+      }
+    },
   }
 }
