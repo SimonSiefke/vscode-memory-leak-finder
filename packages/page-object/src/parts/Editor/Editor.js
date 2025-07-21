@@ -115,7 +115,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         if (hasDefinition) {
           // TODO
         } else {
-          const notification = page.locator('[role="dialog"][aria-label^="No source definitions found."]')
+          const notification = page.locator('[role="dialog"][aria-label^="Error: No source definitions found."]')
           await expect(notification).toBeVisible()
         }
       } catch (error) {
