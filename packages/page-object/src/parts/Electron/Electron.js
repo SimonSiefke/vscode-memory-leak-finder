@@ -11,7 +11,6 @@ export const create = ({ electronApp, VError }) => {
   electron.dialog.showMessageBox = () => {
   return JSON.parse(${responseString})
 }
-// m.syncBuiltinESMExports()
 })()`)
       } catch (error) {
         throw new VError(error, `Failed to mock electron dialog`)
