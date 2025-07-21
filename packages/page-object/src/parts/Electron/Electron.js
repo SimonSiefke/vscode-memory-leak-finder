@@ -7,10 +7,10 @@ export const create = ({ electronApp, VError }) => {
       try {
         const responseString = JSON.stringify(JSON.stringify(response))
         await this.evaluate(`(() => {
-  const electron = globalThis._VSCODE_NODE_MODULES["electron"];
+  const electron = globalThis._____electron
   electron.dialog.showMessageBox = () => {
-    return JSON.parse(${responseString})
-  }
+  return JSON.parse(${responseString})
+}
 })()`)
       } catch (error) {
         throw new VError(error, `Failed to mock electron dialog`)
@@ -20,7 +20,7 @@ export const create = ({ electronApp, VError }) => {
       try {
         const responseString = JSON.stringify(JSON.stringify(response))
         await this.evaluate(`(() => {
-  const electron = globalThis._VSCODE_NODE_MODULES["electron"];
+  const electron = globalThis._____electron
   electron.dialog.showSaveDialog = () => {
     return JSON.parse(${responseString})
   }
@@ -34,7 +34,7 @@ export const create = ({ electronApp, VError }) => {
         const responseString = JSON.stringify(JSON.stringify(response))
         console.log({ responseString })
         await this.evaluate(`(() => {
-  const electron = globalThis._VSCODE_NODE_MODULES["electron"];
+  const electron = globalThis._____electron
   electron.dialog.showOpenDialog = async () => {
     return JSON.parse(${responseString})
   }

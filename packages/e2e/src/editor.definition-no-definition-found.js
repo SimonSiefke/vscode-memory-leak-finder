@@ -15,3 +15,7 @@ export const run = async ({ Editor }) => {
   await Editor.goToDefinition()
   await Editor.shouldHaveOverlayMessage('No definition found')
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}

@@ -30,3 +30,7 @@ export const run = async ({ Editor }) => {
   --font-size: 10px;
 }`)
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}

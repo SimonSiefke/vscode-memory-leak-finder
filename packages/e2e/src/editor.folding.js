@@ -32,3 +32,7 @@ export const run = async ({ page, expect }) => {
   await expect(inlineFolded).toBeHidden()
   await expect(collapsedIcon).toBeHidden()
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}

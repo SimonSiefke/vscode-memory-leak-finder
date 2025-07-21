@@ -18,3 +18,7 @@ export const run = async ({ Editor }) => {
   await Editor.openFind()
   await Editor.closeFind()
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}

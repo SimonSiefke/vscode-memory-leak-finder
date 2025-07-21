@@ -19,3 +19,7 @@ export const setup = async ({ Editor, Workspace }) => {
 }
 
 export const run = async ({}) => {}
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}

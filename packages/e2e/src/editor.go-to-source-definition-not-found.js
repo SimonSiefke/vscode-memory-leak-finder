@@ -20,3 +20,7 @@ export const run = async ({ Editor, Notification }) => {
   await Editor.goToSourceDefinition({ hasDefinition: false })
   await Notification.closeAll()
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}

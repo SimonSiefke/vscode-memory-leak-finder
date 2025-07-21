@@ -17,3 +17,7 @@ export const run = async ({ Editor }) => {
   await Editor.showColorPicker()
   await Editor.hideColorPicker()
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}
