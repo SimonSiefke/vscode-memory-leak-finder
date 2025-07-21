@@ -31,7 +31,7 @@ export const create = ({ expect, page, VError }) => {
       try {
         const replInputWrapper = page.locator('.repl-input-wrapper')
         await expect(replInputWrapper).toBeVisible()
-        const replInput = replInputWrapper.locator('.inputarea')
+        const replInput = replInputWrapper.locator('.native-edit-context')
         await replInput.focus()
         await replInput.type(expression)
         await page.keyboard.press('Enter')
@@ -54,7 +54,7 @@ export const create = ({ expect, page, VError }) => {
         await viewLine.click()
         const cursor = replInputWrapper.locator('.cursor')
         await expect(cursor).toBeVisible()
-        const replInput = replInputWrapper.locator('.inputarea')
+        const replInput = replInputWrapper.locator('.native-edit-context')
         await replInput.focus()
         await replInput.type(value)
         await page.waitForIdle()
