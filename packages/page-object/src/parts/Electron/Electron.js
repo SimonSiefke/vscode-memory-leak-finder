@@ -7,7 +7,11 @@ export const create = ({ electronApp, VError }) => {
       try {
         const responseString = JSON.stringify(JSON.stringify(response))
         await this.evaluate(`(() => {
-  const electron = globalThis._VSCODE_NODE_MODULES["electron"];
+  const nodeModules = globalThis._VSCODE_NODE_MODULES
+  if(!nodeModules){
+    throw new Error('node modules global variable not found')
+  }
+  const electron = nodeModules["electron"];
   electron.dialog.showMessageBox = () => {
     return JSON.parse(${responseString})
   }
