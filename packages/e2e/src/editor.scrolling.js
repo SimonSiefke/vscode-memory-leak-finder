@@ -47,3 +47,7 @@ export const run = async ({ page, expect }) => {
   await page.mouse.move(elementCenterX2 + xOffset, elementCenterY2 - yOffset)
   await page.mouse.up()
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}

@@ -13,3 +13,7 @@ export const run = async ({ Suggest }) => {
   await Suggest.open()
   await Suggest.close()
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}

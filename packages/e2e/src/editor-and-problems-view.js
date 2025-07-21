@@ -34,3 +34,7 @@ export const run = async ({ Editor, Problems }) => {
   await Editor.shouldHaveSquigglyError()
   await Problems.shouldHaveCount(2)
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}

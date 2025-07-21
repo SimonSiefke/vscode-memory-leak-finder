@@ -16,3 +16,7 @@ export const run = async ({ Editor }) => {
   await Editor.cursorRight()
   await Editor.shouldHaveEmptySelection()
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}

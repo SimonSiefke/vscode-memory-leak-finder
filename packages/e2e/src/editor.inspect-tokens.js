@@ -22,3 +22,7 @@ export const run = async ({ Editor }) => {
   await Editor.shouldHaveInspectedToken('h12 chars')
   await Editor.closeInspectedTokens()
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}

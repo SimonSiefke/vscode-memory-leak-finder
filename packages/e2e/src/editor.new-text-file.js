@@ -8,3 +8,7 @@ export const run = async ({ Editor }) => {
   await Editor.newTextFile()
   await Editor.closeAll()
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}

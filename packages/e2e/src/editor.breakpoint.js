@@ -15,3 +15,7 @@ export const run = async ({ Editor }) => {
   await Editor.toggleBreakpoint()
   await Editor.toggleBreakpoint()
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}
