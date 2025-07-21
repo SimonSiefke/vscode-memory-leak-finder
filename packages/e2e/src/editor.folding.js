@@ -1,19 +1,18 @@
 export const skip = true
 
-export const beforeSetup = async ({ tmpDir, writeFile, join }) => {
-  await writeFile(
-    join(tmpDir, 'file.css'),
-    `h1 {
+export const setup = async ({ Editor, Workspace }) => {
+  await Workspace.setFiles([
+    {
+      name: 'file.css',
+      content: `h1 {
   font-size: 20px
 }
 
 h2 {
   font-size: 15px;
 }`,
-  )
-}
-
-export const setup = async ({ Editor }) => {
+    },
+  ])
   await Editor.open('file.css')
 }
 
