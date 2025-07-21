@@ -24,3 +24,7 @@ export const run = async ({ Editor, Hover }) => {
   await Editor.type(' abc')
   await Editor.shouldHaveSquigglyError()
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}

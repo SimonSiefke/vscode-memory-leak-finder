@@ -22,3 +22,7 @@ const def = abc + 1`)
   await Editor.save()
   await Editor.closeAll()
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}

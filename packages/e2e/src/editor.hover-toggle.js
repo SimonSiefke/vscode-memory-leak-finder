@@ -15,3 +15,7 @@ export const run = async ({ Editor, Hover }) => {
   await Editor.hover('h1', /The h1 element represents a section heading/)
   await Hover.hide()
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}

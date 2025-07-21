@@ -14,3 +14,7 @@ export const run = async ({ Editor }) => {
   await Editor.open('file.txt')
   await Editor.closeAll()
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}

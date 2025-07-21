@@ -14,3 +14,7 @@ export const run = async ({ Editor }) => {
   await Editor.autoFix({ hasFixes: false })
   await Editor.closeAutoFix()
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}

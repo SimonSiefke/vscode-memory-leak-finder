@@ -36,3 +36,7 @@ export const run = async ({ Editor }) => {
   await Editor.scrollUp()
   await Editor.shouldHaveActiveLineNumber(1)
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}

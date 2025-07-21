@@ -28,3 +28,7 @@ export const run = async ({ Editor, References }) => {
   await References.shouldHaveMessage('2 results in 1 file')
   await References.clear()
 }
+
+export const teardown = async ({ Editor }) => {
+  await Editor.closeAll()
+}
