@@ -12,6 +12,7 @@ import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.js'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.js'
 import * as Time from '../Time/Time.js'
 import * as Timeout from '../Timeout/Timeout.js'
+import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTearDownTest.js'
 import * as VideoRecording from '../VideoRecording/VideoRecording.js'
 
 // 1. get matching files
@@ -151,6 +152,7 @@ export const runTests = async (
               await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun, runMode)
             }
           }
+          await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerIpc, connectionId, absolutePath)
           const end = Time.now()
           const duration = end - start
           callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration, isLeak)
