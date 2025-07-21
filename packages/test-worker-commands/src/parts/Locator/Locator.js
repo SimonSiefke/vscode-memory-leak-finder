@@ -6,6 +6,7 @@ import * as LocatorCount from '../LocatorCount/LocatorCount.js'
 import * as LocatorFill from '../LocatorFill/LocatorFill.js'
 import * as LocatorFocus from '../LocatorFocus/LocatorFocus.js'
 import * as LocatorGetAttribute from '../LocatorGetAttribute/LocatorGetAttribute.js'
+import * as LocatorBoundingBox from '../LocatorBoundingBox/LocatorBoundingBox.js'
 import * as LocatorHover from '../LocatorHover/LocatorHover.js'
 import * as LocatorIsVisible from '../LocatorIsVisible/LocatorIsVisible.js'
 import * as LocatorPress from '../LocatorPress/LocatorPress.js'
@@ -115,6 +116,11 @@ export const create = (rpc, sessionId, selector, { hasText = '', hasExactText = 
     },
     clear() {
       return LocatorClear.clear({
+        selector: this.selector,
+      })
+    },
+    boundingBox() {
+      return LocatorBoundingBox.boundingBox({
         selector: this.selector,
       })
     },
