@@ -1,15 +1,14 @@
 export const skip = true
 
-export const beforeSetup = async ({ tmpDir, writeFile, join }) => {
-  await writeFile(
-    join(tmpDir, 'index.css'),
-    `h1{
+export const setup = async ({ Editor, Workspace }) => {
+  await Workspace.setFiles([
+    {
+      name: 'index.css',
+      content: `h1{
     abc
 }`,
-  )
-}
-
-export const setup = async ({ Editor }) => {
+    },
+  ])
   await Editor.open('index.css')
   await Editor.shouldHaveSquigglyError()
 }
