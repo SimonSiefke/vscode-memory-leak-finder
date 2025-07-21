@@ -19,5 +19,6 @@ export const run = async ({ Editor }) => {
 }
 
 export const teardown = async ({ Editor }) => {
+  await Editor.save()
   await Editor.closeAll()
 }
