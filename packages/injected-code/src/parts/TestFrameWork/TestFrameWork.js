@@ -303,6 +303,20 @@ export const contentEditableInsert = ({ value }) => {
   document.execCommand('insertText', false, value)
 }
 
+export const boundingBox = (locator) => {
+  const element = QuerySelector.querySelector(locator.selector)
+  if (!element) {
+    throw new Error(`element not found ${locator.selector}`)
+  }
+  const rect = element.getBoundingClientRect()
+  return {
+    x: rect.x,
+    y: rect.y,
+    width: rect.width,
+    height: rect.height,
+  }
+}
+
 export const getTextContent = async (locator) => {
   Assert.object(locator)
   const element = QuerySelector.querySelector(locator.selector)
