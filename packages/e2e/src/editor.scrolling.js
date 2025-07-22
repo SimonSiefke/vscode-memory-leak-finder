@@ -17,9 +17,9 @@ export const setup = async ({ Editor, Workspace }) => {
 
 export const run = async ({ Editor }) => {
   await Editor.moveScrollBar(200)
-  await Editor.moveScrollBar(0)
+  // await Editor.moveScrollBar(0)
 }
 
 export const teardown = async ({ Editor }) => {
-  await Editor.closeAll()
+  // await Editor.closeAll()
 }
