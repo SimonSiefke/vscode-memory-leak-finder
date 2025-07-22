@@ -4,10 +4,10 @@ import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateI
 export const mockPointerEvents = async (rpc) => {
   Assert.object(rpc)
   await EvaluateInUtilityContext.evaluateInDefaultContext({
-    functionDeclaration: `(()=>{
+    functionDeclaration: `() => {
   Element.prototype.setPointerCapture = () => {}
   Element.prototype.releasePointerCapture = () => {}
-})()`,
+}`,
     arguments: [],
     awaitPromise: true,
   })
