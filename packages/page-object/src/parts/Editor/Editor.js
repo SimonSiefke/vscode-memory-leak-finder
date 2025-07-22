@@ -813,6 +813,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     },
     async moveScrollBar(y, expectedScrollBarY) {
       try {
+        await page.mouse.mockPointerEvents()
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
         const scrollbar = editor.locator('.scrollbar.vertical').first()

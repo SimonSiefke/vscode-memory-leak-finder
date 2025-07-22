@@ -22,3 +22,24 @@ export const evaluateInUtilityContext = async (options, sessionId = '') => {
   })
   return result
 }
+
+export const evaluateInDefaultContext = async (options, sessionId = '') => {
+  if (!sessionId) {
+    // TODO remove this code and make sessionId a required argument
+    const pageSession = SessionState.getPageSession()
+    if (!pageSession) {
+      throw new Error('no page found')
+    }
+    sessionId = pageSession.sessionId
+  }
+  const pageSession = SessionState.getPageSessionById(sessionId)
+  const executionContext = await ExecutionContextState.waitForDefaultExecutionContext(sessionId)
+  if (!executionContext) {
+    throw new Error(`no default execution context found`)
+  }
+  const result = await DevtoolsProtocolRuntime.callFunctionOn(pageSession.rpc, {
+    ...options,
+    uniqueContextId: executionContext.uniqueId,
+  })
+  return result
+}

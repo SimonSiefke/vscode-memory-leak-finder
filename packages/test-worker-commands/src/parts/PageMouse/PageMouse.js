@@ -1,6 +1,17 @@
 import * as Assert from '../Assert/Assert.js'
 import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateInUtilityContext.js'
 
+export const mockPointerEvents = async (rpc) => {
+  Assert.object(rpc)
+  await EvaluateInUtilityContext.evaluateInDefaultContext({
+    functionDeclaration: `(()=>{
+  Element.prototype.setPointerCapture = () => {}
+  Element.prototype.releasePointerCapture = () => {}
+})()`,
+    arguments: [],
+    awaitPromise: true,
+  })
+}
 export const down = async (rpc) => {
   Assert.object(rpc)
   await EvaluateInUtilityContext.evaluateInUtilityContext({

@@ -403,12 +403,6 @@ const pointerLikeEvent = (element, pointerEventType, mouseEventType, x, y) => {
   })
 }
 
-const mockPointercapture = () => {
-  // mock pointer capture since it work with custom events
-  window.Element.prototype.setPointerCapture = () => {}
-  window.Element.prototype.releasePointerCapture = () => {}
-}
-
 export const mouseDown = async () => {
   const { x, y } = mouseState
   const element = document.elementFromPoint(x, y)
@@ -416,7 +410,6 @@ export const mouseDown = async () => {
   if (!element) {
     throw new Error(`no element found at mouse position ${x} ${y}`)
   }
-  mockPointercapture()
   pointerLikeEvent(element, DomEventType.PointerDown, DomEventType.MouseDown, x, y)
 }
 
