@@ -397,7 +397,6 @@ const pointerLikeEvent = (element, pointerEventType, mouseEventType, x, y) => {
 export const mouseDown = async () => {
   const { x, y } = mouseState
   const element = document.elementFromPoint(x, y)
-  console.log({ element })
   if (!element) {
     throw new Error(`no element found at mouse position ${x} ${y}`)
   }

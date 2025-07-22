@@ -28,5 +28,6 @@ export const run = async ({ Editor }) => {
 }
 
 export const teardown = async ({ Editor }) => {
+  await Editor.save({ viaKeyBoard: true })
   await Editor.closeAll()
 }
