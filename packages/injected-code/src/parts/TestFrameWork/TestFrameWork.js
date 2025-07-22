@@ -361,3 +361,9 @@ export const count = (locator) => {
   const count = elements.length
   return count
 }
+
+export const mouseDown = async () => {}
+
+export const mouseMove = async () => {}
+
+export const mouseUp = async () => {}
