@@ -371,17 +371,18 @@ const mouseState = {
 }
 
 export const mouseDown = async () => {
-  const element = document.elementFromPoint(mouseState.x, mouseState.y)
+  const { x, y } = mouseState
+  const element = document.elementFromPoint(x, y)
   if (!element) {
-    throw new Error('no element found at mouse position')
+    throw new Error(`no element found at mouse position ${x} ${y}`)
   }
   actuallyDispatchEvent(element, DomEventType.PointerDown, {
-    clientX: mouseState.x,
-    clientY: mouseState.y,
+    clientX: x,
+    clientY: y,
   })
   actuallyDispatchEvent(element, DomEventType.MouseDown, {
-    clientX: mouseState.x,
-    clientY: mouseState.y,
+    clientX: x,
+    clientY: y,
   })
 }
 
@@ -394,16 +395,17 @@ export const mouseMove = async (x, y) => {
 }
 
 export const mouseUp = async () => {
-  const element = document.elementFromPoint(mouseState.x, mouseState.y)
+  const { x, y } = mouseState
+  const element = document.elementFromPoint(x, y)
   if (!element) {
-    throw new Error('no element found at mouse position')
+    throw new Error(`no element found at mouse position ${x} ${y}`)
   }
   actuallyDispatchEvent(element, DomEventType.PointerUp, {
-    clientX: mouseState.x,
-    clientY: mouseState.y,
+    clientX: x,
+    clientY: y,
   })
   actuallyDispatchEvent(element, DomEventType.MouseUp, {
-    clientX: mouseState.x,
-    clientY: mouseState.y,
+    clientX: x,
+    clientY: y,
   })
 }
