@@ -370,40 +370,65 @@ const mouseState = {
   y: 0,
 }
 
+const pointerLikeEvent = (element, pointerEventType, mouseEventType, x, y) => {
+  const rect = element.getBoundingClientRect()
+  const offsetX = x - rect.x
+  const offsetY = y - rect.y
+  const button = 0 /* mouse */
+  const pointerType = 'mouse'
+  const buttons = 1 /* mouse */
+  actuallyDispatchEvent(element, pointerEventType, {
+    clientX: x,
+    clientY: y,
+    offsetX,
+    offsetY,
+    button,
+    buttons,
+    pointerType,
+  })
+  actuallyDispatchEvent(element, mouseEventType, {
+    clientX: x,
+    clientY: y,
+    offsetX,
+    offsetY,
+    button,
+    buttons,
+    pointerType,
+  })
+}
+
 export const mouseDown = async () => {
-  const element = document.elementFromPoint(mouseState.x, mouseState.y)
+  const { x, y } = mouseState
+  const element = document.elementFromPoint(x, y)
   if (!element) {
-    throw new Error('no element found at mouse position')
+    throw new Error(`no element found at mouse position ${x} ${y}`)
   }
-  actuallyDispatchEvent(element, DomEventType.PointerDown, {
-    clientX: mouseState.x,
-    clientY: mouseState.y,
-  })
-  actuallyDispatchEvent(element, DomEventType.MouseDown, {
-    clientX: mouseState.x,
-    clientY: mouseState.y,
-  })
+  pointerLikeEvent(element, DomEventType.PointerDown, DomEventType.MouseDown, x, y)
 }
 
 export const mouseMove = async (x, y) => {
   Assert.number(x)
   Assert.number(y)
+  if (x < 0) {
+    throw new Error(`x must be positive`)
+  }
+  if (y < 0) {
+    throw new Error(`y must be positive`)
+  }
   mouseState.x = x
   mouseState.y = y
-  // TODO trigger pointermove and mousemove events
+  const element = document.elementFromPoint(x, y)
+  if (!element) {
+    throw new Error(`no element found at mouse position ${x} ${y}`)
+  }
+  pointerLikeEvent(element, DomEventType.PointerMove, DomEventType.MouseMove, x, y)
 }
 
 export const mouseUp = async () => {
-  const element = document.elementFromPoint(mouseState.x, mouseState.y)
+  const { x, y } = mouseState
+  const element = document.elementFromPoint(x, y)
   if (!element) {
-    throw new Error('no element found at mouse position')
+    throw new Error(`no element found at mouse position ${x} ${y}`)
   }
-  actuallyDispatchEvent(element, DomEventType.PointerUp, {
-    clientX: mouseState.x,
-    clientY: mouseState.y,
-  })
-  actuallyDispatchEvent(element, DomEventType.MouseUp, {
-    clientX: mouseState.x,
-    clientY: mouseState.y,
-  })
+  pointerLikeEvent(element, DomEventType.PointerUp, DomEventType.MouseUp, x, y)
 }
