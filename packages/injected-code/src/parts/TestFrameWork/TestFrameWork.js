@@ -371,29 +371,26 @@ const mouseState = {
 }
 
 const pointerLikeEvent = (element, pointerEventType, mouseEventType, x, y) => {
-  const rect = element.getBoundingClientRect()
-  const offsetX = x - rect.x
-  const offsetY = y - rect.y
-  const button = 0 /* mouse */
-  const pointerType = 'mouse'
-  const buttons = 1 /* mouse */
+  const button = 0
+  const buttons = 0
+  const bubbles = true
   actuallyDispatchEvent(element, pointerEventType, {
     clientX: x,
     clientY: y,
-    offsetX,
-    offsetY,
     button,
     buttons,
-    pointerType,
+    // pointerType,
+    bubbles,
+    // pointerId,
   })
   actuallyDispatchEvent(element, mouseEventType, {
     clientX: x,
     clientY: y,
-    offsetX,
-    offsetY,
     button,
     buttons,
-    pointerType,
+    // pointerType,
+    bubbles,
+    // pointerId,
   })
 }
 

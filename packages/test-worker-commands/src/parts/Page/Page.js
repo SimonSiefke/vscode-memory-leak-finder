@@ -40,6 +40,9 @@ const createMouse = (rpc) => {
     up() {
       return PageMouse.up(this.rpc)
     },
+    mockPointerEvents() {
+      return PageMouse.mockPointerEvents(this.rpc)
+    },
   }
 }
 
