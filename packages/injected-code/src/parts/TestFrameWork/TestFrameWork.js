@@ -389,6 +389,12 @@ export const mouseDown = async () => {
 export const mouseMove = async (x, y) => {
   Assert.number(x)
   Assert.number(y)
+  if (x < 0) {
+    throw new Error(`x must be positive`)
+  }
+  if (y < 0) {
+    throw new Error(`y must be positive`)
+  }
   mouseState.x = x
   mouseState.y = y
   // TODO trigger pointermove and mousemove events

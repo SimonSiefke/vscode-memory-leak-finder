@@ -811,7 +811,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to verify active line number ${value}`)
       }
     },
-    async moveScrollBar(y) {
+    async moveScrollBar(y, expectedScrollBarY) {
       try {
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
@@ -832,22 +832,13 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         const yOffset = y
 
         await scrollbarSlider.hover()
+        console.log({ elementCenterX, elementCenterY })
         await page.mouse.move(elementCenterX, elementCenterY)
         await page.mouse.down()
         await page.mouse.move(elementCenterX + xOffset, elementCenterY + yOffset)
         await page.mouse.up()
 
-        const elementBox2 = await scrollbarSlider.boundingBox()
-        if (!elementBox2) {
-          throw new Error('Unable to find bounding box on element')
-        }
-
-        const elementCenterX2 = elementBox1.x + elementBox1.width / 2
-        const elementCenterY2 = elementBox1.y + elementBox1.height / 2
-
-        await page.mouse.down()
-        await page.mouse.move(elementCenterX2 + xOffset, elementCenterY2 - yOffset)
-        await page.mouse.up()
+        await expect(scrollbarSlider).toHaveCss('top', `${expectedScrollBarY}px`)
       } catch (error) {
         throw new VError(error, `Failed to scroll in editor`)
       }
