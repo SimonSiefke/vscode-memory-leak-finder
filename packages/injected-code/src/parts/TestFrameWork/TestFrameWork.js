@@ -1,8 +1,10 @@
+import { actuallyDispatchEvent } from '../ActuallyDispatchEvent/ActuallyDispatchEvent.js'
 import * as Assert from '../Assert/Assert.js'
 import { AssertionError } from '../AssertionError/AssertionError.js'
 import * as ConditionErrorMap from '../ConditionErrorMap/ConditionErrorMap.js'
 import * as ElementAction from '../ElementAction/ElementAction.js'
 import * as GetKeyboardEventOptions from '../GetKeyboardEventOptions/GetKeyboardEventOptions.js'
+import * as DomEventType from '../DomEventType/DomEventType.js'
 import * as KeyBoardActions from '../KeyBoardActions/KeyBoardActions.js'
 import * as MultiElementConditionMap from '../MultiElementConditionMap/MultiElementConditionMap.js'
 import * as QuerySelector from '../QuerySelector/QuerySelector.js'
@@ -360,4 +362,48 @@ export const count = (locator) => {
   const elements = QuerySelector.querySelectorAll(locator.selector)
   const count = elements.length
   return count
+}
+
+// TODO move mouseState to node process?
+const mouseState = {
+  x: 0,
+  y: 0,
+}
+
+export const mouseDown = async () => {
+  const element = document.elementFromPoint(mouseState.x, mouseState.y)
+  if (!element) {
+    throw new Error('no element found at mouse position')
+  }
+  actuallyDispatchEvent(element, DomEventType.PointerDown, {
+    clientX: mouseState.x,
+    clientY: mouseState.y,
+  })
+  actuallyDispatchEvent(element, DomEventType.MouseDown, {
+    clientX: mouseState.x,
+    clientY: mouseState.y,
+  })
+}
+
+export const mouseMove = async (x, y) => {
+  Assert.number(x)
+  Assert.number(y)
+  mouseState.x = x
+  mouseState.y = y
+  // TODO trigger pointermove and mousemove events
+}
+
+export const mouseUp = async () => {
+  const element = document.elementFromPoint(mouseState.x, mouseState.y)
+  if (!element) {
+    throw new Error('no element found at mouse position')
+  }
+  actuallyDispatchEvent(element, DomEventType.PointerUp, {
+    clientX: mouseState.x,
+    clientY: mouseState.y,
+  })
+  actuallyDispatchEvent(element, DomEventType.MouseUp, {
+    clientX: mouseState.x,
+    clientY: mouseState.y,
+  })
 }

@@ -832,6 +832,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         const yOffset = y
 
         await scrollbarSlider.hover()
+        await page.mouse.move(elementCenterX, elementCenterY)
         await page.mouse.down()
         await page.mouse.move(elementCenterX + xOffset, elementCenterY + yOffset)
         await page.mouse.up()

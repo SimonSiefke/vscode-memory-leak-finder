@@ -15,6 +15,7 @@ export const getEventClass = (eventType) => {
     case DomEventType.MouseLeave:
     case DomEventType.MouseDown:
     case DomEventType.MouseUp:
+    case DomEventType.MouseMove:
       return MouseEvent
     case DomEventType.KeyDown:
     case DomEventType.KeyPress:
