@@ -374,9 +374,10 @@ const pointerLikeEvent = (element, pointerEventType, mouseEventType, x, y) => {
   const rect = element.getBoundingClientRect()
   const offsetX = x - rect.x
   const offsetY = y - rect.y
-  const button = 0 /* mouse */
+  const button = 1 /* mouse */
   const pointerType = 'mouse'
   const buttons = 1 /* mouse */
+  const bubbles = true
   actuallyDispatchEvent(element, pointerEventType, {
     clientX: x,
     clientY: y,
@@ -385,6 +386,7 @@ const pointerLikeEvent = (element, pointerEventType, mouseEventType, x, y) => {
     button,
     buttons,
     pointerType,
+    bubbles,
   })
   actuallyDispatchEvent(element, mouseEventType, {
     clientX: x,
@@ -394,12 +396,14 @@ const pointerLikeEvent = (element, pointerEventType, mouseEventType, x, y) => {
     button,
     buttons,
     pointerType,
+    bubbles,
   })
 }
 
 export const mouseDown = async () => {
   const { x, y } = mouseState
   const element = document.elementFromPoint(x, y)
+  console.log({ element })
   if (!element) {
     throw new Error(`no element found at mouse position ${x} ${y}`)
   }
