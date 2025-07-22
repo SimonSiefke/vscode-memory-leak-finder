@@ -378,6 +378,7 @@ const pointerLikeEvent = (element, pointerEventType, mouseEventType, x, y) => {
   const pointerType = 'mouse'
   const buttons = 1 /* mouse */
   const bubbles = true
+  const pointerId = 1
   actuallyDispatchEvent(element, pointerEventType, {
     clientX: x,
     clientY: y,
@@ -387,6 +388,7 @@ const pointerLikeEvent = (element, pointerEventType, mouseEventType, x, y) => {
     buttons,
     pointerType,
     bubbles,
+    pointerId,
   })
   actuallyDispatchEvent(element, mouseEventType, {
     clientX: x,
@@ -397,6 +399,7 @@ const pointerLikeEvent = (element, pointerEventType, mouseEventType, x, y) => {
     buttons,
     pointerType,
     bubbles,
+    pointerId,
   })
 }
 

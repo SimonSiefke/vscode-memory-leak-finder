@@ -817,8 +817,8 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await expect(editor).toBeVisible()
         const scrollbar = editor.locator('.scrollbar.vertical').first()
         await scrollbar.hover()
+        await page.waitForIdle()
         const scrollbarSlider = scrollbar.locator('.slider')
-
         const elementBox1 = await scrollbarSlider.boundingBox()
         console.log({ elementBox1 })
         if (!elementBox1) {
@@ -835,6 +835,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         console.log({ elementCenterX, elementCenterY })
         await page.mouse.move(elementCenterX, elementCenterY)
         await page.mouse.down()
+        await expect(scrollbarSlider).toHaveClass('slider active')
         await page.mouse.move(elementCenterX + xOffset, elementCenterY + yOffset)
         await page.mouse.up()
 
