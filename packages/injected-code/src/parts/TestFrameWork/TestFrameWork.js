@@ -370,33 +370,40 @@ const mouseState = {
   y: 0,
 }
 
+const pointerLikeEvent = (element, pointerEventType, mouseEventType, x, y) => {
+  const rect = element.getBoundingClientRect()
+  const offsetX = x - rect.x
+  const offsetY = y - rect.y
+  const button = 0 /* mouse */
+  const pointerType = 'mouse'
+  const buttons = 1 /* mouse */
+  actuallyDispatchEvent(element, pointerEventType, {
+    clientX: x,
+    clientY: y,
+    offsetX,
+    offsetY,
+    button,
+    buttons,
+    pointerType,
+  })
+  actuallyDispatchEvent(element, mouseEventType, {
+    clientX: x,
+    clientY: y,
+    offsetX,
+    offsetY,
+    button,
+    buttons,
+    pointerType,
+  })
+}
+
 export const mouseDown = async () => {
   const { x, y } = mouseState
   const element = document.elementFromPoint(x, y)
   if (!element) {
     throw new Error(`no element found at mouse position ${x} ${y}`)
   }
-  const rect = element.getBoundingClientRect()
-  const offsetX = x - rect.x
-  const offsetY = y - rect.y
-  const button = 0 /* mouse */
-  const pointerType = 'mouse'
-  actuallyDispatchEvent(element, DomEventType.PointerDown, {
-    clientX: x,
-    clientY: y,
-    offsetX,
-    offsetY,
-    button,
-    pointerType,
-  })
-  actuallyDispatchEvent(element, DomEventType.MouseDown, {
-    clientX: x,
-    clientY: y,
-    offsetX,
-    offsetY,
-    button,
-    pointerType,
-  })
+  pointerLikeEvent(element, DomEventType.PointerDown, DomEventType.MouseDown, x, y)
 }
 
 export const mouseMove = async (x, y) => {
@@ -414,28 +421,7 @@ export const mouseMove = async (x, y) => {
   if (!element) {
     throw new Error(`no element found at mouse position ${x} ${y}`)
   }
-  const rect = element.getBoundingClientRect()
-  const offsetX = x - rect.x
-  const offsetY = y - rect.y
-  const button = 0 /* mouse */
-  const pointerType = 'mouse'
-  actuallyDispatchEvent(element, DomEventType.PointerMove, {
-    clientX: x,
-    clientY: y,
-    offsetX,
-    offsetY,
-    button,
-    pointerType,
-  })
-  actuallyDispatchEvent(element, DomEventType.PointerUp, {
-    clientX: x,
-    clientY: y,
-    offsetX,
-    offsetY,
-    button,
-    pointerType,
-  })
-  // TODO trigger pointermove and mousemove events
+  pointerLikeEvent(element, DomEventType.PointerMove, DomEventType.MouseMove, x, y)
 }
 
 export const mouseUp = async () => {
@@ -444,25 +430,5 @@ export const mouseUp = async () => {
   if (!element) {
     throw new Error(`no element found at mouse position ${x} ${y}`)
   }
-  const rect = element.getBoundingClientRect()
-  const offsetX = x - rect.x
-  const offsetY = y - rect.y
-  const button = 0 /* mouse */
-  const pointerType = 'mouse'
-  actuallyDispatchEvent(element, DomEventType.PointerUp, {
-    clientX: x,
-    clientY: y,
-    offsetX,
-    offsetY,
-    button,
-    pointerType,
-  })
-  actuallyDispatchEvent(element, DomEventType.MouseUp, {
-    clientX: x,
-    clientY: y,
-    offsetX,
-    offsetY,
-    button,
-    pointerType,
-  })
+  pointerLikeEvent(element, DomEventType.PointerUp, DomEventType.MouseUp, x, y)
 }
