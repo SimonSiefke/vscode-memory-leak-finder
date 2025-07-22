@@ -15,7 +15,7 @@ export const move = async (rpc, x, y) => {
   Assert.number(x)
   Assert.number(y)
   await EvaluateInUtilityContext.evaluateInUtilityContext({
-    functionDeclaration: '(text) => test.mouseMove(text)',
+    functionDeclaration: '(x,y) => test.mouseMove(x,y)',
     arguments: [
       {
         value: x,
