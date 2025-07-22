@@ -44,9 +44,6 @@ export const isImportantErrorMessage = (data) => {
   if (data.includes('Floss manager not present')) {
     return false
   }
-  if (data.includes('fs.Stats constructor is deprecated')) {
-    return false
-  }
   if (RE_LIB_PROXY_NOT_FOUND.test(data)) {
     return false
   }
