@@ -821,7 +821,6 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
         const scrollbarSlider = scrollbar.locator('.slider')
         const elementBox1 = await scrollbarSlider.boundingBox()
-        console.log({ elementBox1 })
         if (!elementBox1) {
           throw new Error('Unable to find bounding box on element')
         }
@@ -833,7 +832,6 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         const yOffset = y
 
         await scrollbarSlider.hover()
-        console.log({ elementCenterX, elementCenterY })
         await page.mouse.move(elementCenterX, elementCenterY)
         await page.mouse.down()
         await expect(scrollbarSlider).toHaveClass('slider active')
