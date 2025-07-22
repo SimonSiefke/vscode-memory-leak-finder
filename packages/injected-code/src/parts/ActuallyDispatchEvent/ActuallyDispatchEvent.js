@@ -7,6 +7,9 @@ export const actuallyDispatchEvent = (element, eventType, options) => {
     dispatch: true,
     eventType,
     options,
+    element,
+    constructor,
+    event,
   })
   element.dispatchEvent(event)
 }

@@ -374,9 +374,9 @@ const pointerLikeEvent = (element, pointerEventType, mouseEventType, x, y) => {
   const rect = element.getBoundingClientRect()
   const offsetX = x - rect.x
   const offsetY = y - rect.y
-  const button = 1 /* mouse */
+  const button = 0 /* mouse */
   const pointerType = 'mouse'
-  const buttons = 1 /* mouse */
+  const buttons = 0 /* mouse */
   const bubbles = true
   const pointerId = 1
   actuallyDispatchEvent(element, pointerEventType, {
@@ -403,6 +403,12 @@ const pointerLikeEvent = (element, pointerEventType, mouseEventType, x, y) => {
   })
 }
 
+const mockPointercapture = () => {
+  // mock pointer capture since it work with custom events
+  window.Element.prototype.setPointerCapture = () => {}
+  window.Element.prototype.releasePointerCapture = () => {}
+}
+
 export const mouseDown = async () => {
   const { x, y } = mouseState
   const element = document.elementFromPoint(x, y)
@@ -410,6 +416,7 @@ export const mouseDown = async () => {
   if (!element) {
     throw new Error(`no element found at mouse position ${x} ${y}`)
   }
+  mockPointercapture()
   pointerLikeEvent(element, DomEventType.PointerDown, DomEventType.MouseDown, x, y)
 }
 
