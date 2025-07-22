@@ -397,6 +397,18 @@ export const mouseMove = async (x, y) => {
   }
   mouseState.x = x
   mouseState.y = y
+  const element = document.elementFromPoint(x, y)
+  if (!element) {
+    throw new Error(`no element found at mouse position ${x} ${y}`)
+  }
+  actuallyDispatchEvent(element, DomEventType.PointerMove, {
+    clientX: x,
+    clientY: y,
+  })
+  actuallyDispatchEvent(element, DomEventType.PointerUp, {
+    clientX: x,
+    clientY: y,
+  })
   // TODO trigger pointermove and mousemove events
 }
 
