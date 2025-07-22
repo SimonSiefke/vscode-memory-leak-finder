@@ -6,6 +6,7 @@ import * as PageEvaluate from '../PageEvaluate/PageEvaluate.js'
 import * as PageFocus from '../PageFocus/PageFocus.js'
 import * as PageKeyBoard from '../PageKeyBoard/PageKeyBoard.js'
 import * as PageReload from '../PageReload/PageReload.js'
+import * as PageMouse from '../PageMouse/PageMouse.js'
 import * as PageWaitForIdle from '../PageWaitForIdle/PageWaitForIdle.js'
 import * as WebWorker from '../WebWorker/WebWorker.js'
 
@@ -23,6 +24,21 @@ const createKeyboard = (rpc) => {
     },
     contentEditableInsert(options) {
       return PageKeyBoard.contentEditableInsert(options)
+    },
+  }
+}
+
+const createMouse = (rpc) => {
+  return {
+    rpc,
+    down() {
+      return PageMouse.down(this.rpc)
+    },
+    move(x, y) {
+      return PageMouse.move(this.rpc, x, y)
+    },
+    up() {
+      return PageMouse.up(this.rpc)
     },
   }
 }
@@ -56,6 +72,7 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
       return PageKeyBoard.pressKeyExponential(options)
     },
     keyboard: createKeyboard(rpc),
+    mouse: createMouse(rpc),
     webWorker() {
       return WebWorker.waitForWebWorker({ sessionId })
     },
