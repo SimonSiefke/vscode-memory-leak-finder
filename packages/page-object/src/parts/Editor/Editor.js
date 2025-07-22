@@ -837,7 +837,9 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.mouse.move(elementCenterX, elementCenterY)
         await page.mouse.down()
         await expect(scrollbarSlider).toHaveClass('slider active')
+        await page.waitForIdle()
         await page.mouse.move(elementCenterX + xOffset, elementCenterY + yOffset)
+        await page.waitForIdle()
         await page.mouse.up()
 
         await expect(scrollbarSlider).toHaveCss('top', `${expectedScrollBarY}px`)

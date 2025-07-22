@@ -16,7 +16,7 @@ export const setup = async ({ Editor, Workspace }) => {
 }
 
 export const run = async ({ Editor }) => {
-  await Editor.moveScrollBar(200, 23)
+  await Editor.moveScrollBar(20, 20)
   // await Editor.moveScrollBar(0, 0)
 }
 
