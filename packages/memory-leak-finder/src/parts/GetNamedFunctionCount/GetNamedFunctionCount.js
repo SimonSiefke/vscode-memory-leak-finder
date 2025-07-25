@@ -26,7 +26,6 @@ export const getNamedFunctionCount = async (session, objectGroup, scriptMap, inc
     ownProperties: true,
   })
   const descriptors = GetDescriptorValues.getDescriptorValues(fnResult3.result)
-  const descriptorsJson = JSON.stringify(descriptors, null, 2) + '\n'
   const functionObjectIds = GetFunctionObjectIds.getFunctionObjectIds(descriptors)
   const functionLocations = await GetNamedFunctionLocations.getNamedFunctionLocations(
     session,
