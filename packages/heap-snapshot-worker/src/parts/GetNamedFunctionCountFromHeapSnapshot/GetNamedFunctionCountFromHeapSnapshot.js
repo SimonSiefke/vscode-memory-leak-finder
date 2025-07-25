@@ -1,6 +1,7 @@
 import * as Assert from '../Assert/Assert.js'
 import { getFunctionsWithLocations } from '../GetFunctionsWithLocations/GetFunctionsWithLocations.js'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
+import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
 
 const normalizeFunctionObjects = (functionObjects) => {
   const normalized = []
@@ -38,7 +39,8 @@ const aggregateFunctionObjects = (functionObjects) => {
   return aggregated
 }
 
-export const getNamedFunctionCountFromHeapSnapshot = async (heapsnapshot, scriptMap) => {
+export const getNamedFunctionCountFromHeapSnapshot = async (id, scriptMap) => {
+  const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
   console.time('parse')
   const { parsedNodes, graph, locations } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)

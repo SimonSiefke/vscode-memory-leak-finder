@@ -17,6 +17,14 @@ export const parseHeapSnapshotFunctions = async (value, scriptMap) => {
   return HeapSnapshotWorker.invoke('HeapSnapshot.parseFunctions', value, scriptMap)
 }
 
+export const loadHeapSnapshot = async (path) => {
+  return HeapSnapshotWorker.invoke('HeapSnapshot.load', path)
+}
+
+export const disposeHeapSnapshot = async (path) => {
+  return HeapSnapshotWorker.invoke('HeapSnapshot.dispose', path)
+}
+
 export const parseHeapSnapshotNumbers = async (value) => {
   return HeapSnapshotWorker.invoke('HeapSnapshot.parseNumbers', value)
 }

@@ -16,14 +16,14 @@ export const parseHeapSnapshotInternal = (
   locations,
   locationFields,
 ) => {
-  Assert.array(nodes)
+  // Assert.array(nodes)
   Assert.array(nodeFields)
   Assert.array(nodeTypes)
-  Assert.array(edges)
+  // Assert.array(edges)
   Assert.array(edgeFields)
   Assert.array(edgeTypes)
   Assert.array(strings)
-  Assert.array(locations)
+  // Assert.array(locations)
   Assert.array(locationFields)
   const parsedNodes = ParseHeapSnapshotInternalNodes.parseHeapSnapshotInternalNodes(nodes, nodeFields, nodeTypes, strings)
   const parsedEdges = ParseHeapSnapshotInternalEdges.parseHeapSnapshotInternalEdges(

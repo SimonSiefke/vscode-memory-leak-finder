@@ -1,4 +1,3 @@
-import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as HeapSnapshot from '../HeapSnapshot/HeapSnapshot.js'
 import * as HeapSnapshotFunctions from '../HeapSnapshotFunctions/HeapSnapshotFunctions.js'
@@ -12,10 +11,11 @@ export const getNamedFunctionCount2 = async (session, objectGroup, scriptMap, in
   const outFile = join(Root.root, '.vscode-heapsnapshots', `1.json`)
   console.info('taking heapsnapshot')
   await HeapSnapshot.takeHeapSnapshot(session, outFile)
-  const content = await readFile(outFile, 'utf8')
   console.info('parsing heapsnapshot')
-  const value = JSON.parse(content)
-  console.info('analysing heapsnapshot')
-  const functions = await HeapSnapshotFunctions.parseHeapSnapshotFunctions(value, scriptMap)
+  console.time('load')
+  await HeapSnapshotFunctions.loadHeapSnapshot(outFile)
+  console.timeEnd('load')
+  const functions = await HeapSnapshotFunctions.parseHeapSnapshotFunctions(outFile, scriptMap)
+  await HeapSnapshotFunctions.disposeHeapSnapshot(outFile)
   return functions
 }
