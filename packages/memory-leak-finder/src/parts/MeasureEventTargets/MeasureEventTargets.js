@@ -20,6 +20,23 @@ export const stop = (session, objectGroup) => {
 
 export const compare = CompareEventTargets.compareEventTargets
 
+const sum = (numbers) => {
+  let total = 0
+  for (const number of numbers) {
+    total += number
+  }
+  return total
+}
+
+const getTotalCount = (items) => {
+  const counts = items.map((item) => item.count)
+  const total = sum(counts)
+  return total
+}
+
 export const isLeak = (leaked) => {
-  return leaked.length > 0
+  const { before, after } = leaked
+  const totalBefore = getTotalCount(before)
+  const totalAfter = getTotalCount(after)
+  return totalAfter > totalBefore
 }
