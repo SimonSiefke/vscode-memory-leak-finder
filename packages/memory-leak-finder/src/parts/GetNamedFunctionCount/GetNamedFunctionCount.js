@@ -18,8 +18,33 @@ export const getNamedFunctionCount = async (session, objectGroup, scriptMap, inc
     prototypeObjectId: prototypeDescriptor.objectId,
     objectGroup,
   })
-  const fnResult3 = await DevtoolsProtocolRuntime.getProperties(session, {
+  const fnResult2 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
+    functionDeclaration: `function(){
+  const functions = this
+
+  const getDescription = fn => {
+    try {
+      return fn?.toString()
+    } catch {
+      return 'toString error'
+    }
+  }
+
+  const isNonNative = fn => {
+    const description = getDescription(fn)
+    return !description.includes('[native code]')
+  }
+
+  const nonNativeFunctions = functions.filter(isNonNative)
+  return nonNativeFunctions
+}`,
     objectId: objects.objects.objectId,
+    returnByValue: false,
+    objectGroup,
+  })
+
+  const fnResult3 = await DevtoolsProtocolRuntime.getProperties(session, {
+    objectId: fnResult2.objectId,
     generatePreview: false,
     ownProperties: true,
   })
