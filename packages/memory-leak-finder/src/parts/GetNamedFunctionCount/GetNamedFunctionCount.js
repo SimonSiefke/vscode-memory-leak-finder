@@ -1,4 +1,5 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import { filterNamedFunctions } from '../FilterNamedFunctions/FilterNamedFunctions.js'
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.js'
 import * as GetFunctionObjectIds from '../GetFunctionObjectIds/GetFunctionObjectIds.js'
 import * as GetNamedFunctionLocations from '../GetNamedFunctionLocations/GetNamedFunctionLocations.js'
@@ -18,8 +19,9 @@ export const getNamedFunctionCount = async (session, objectGroup, scriptMap, inc
     prototypeObjectId: prototypeDescriptor.objectId,
     objectGroup,
   })
+  const fnResult2 = await filterNamedFunctions(session, objects, objectGroup)
   const fnResult3 = await DevtoolsProtocolRuntime.getProperties(session, {
-    objectId: objects.objects.objectId,
+    objectId: fnResult2.objectId,
     generatePreview: false,
     ownProperties: true,
   })
