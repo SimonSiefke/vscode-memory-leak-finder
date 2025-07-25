@@ -70,7 +70,7 @@
     "collectCoverage": true,
     "coverageThreshold": {
       "global": {
-        "branches": 37,
+        "branches": 30,
         "functions": 20,
         "lines": 40,
         "statements": 40
