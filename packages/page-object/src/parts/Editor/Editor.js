@@ -177,6 +177,15 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to select all`)
       }
     },
+    async deleteAll() {
+      try {
+        await this.selectAll()
+        await page.keyboard.press('Delete')
+        await this.shouldHaveText('')
+      } catch (error) {
+        throw new VError(error, `Failed to delete all`)
+      }
+    },
     async duplicateSelection() {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
