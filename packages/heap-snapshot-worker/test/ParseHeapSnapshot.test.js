@@ -27,7 +27,7 @@ test('single node', () => {
         node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
         edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
-        locationFields: ['object_index', 'script_id', 'line', 'column'],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
       },
     },
     nodes: [0, 0, 0, 0, 0, 0, 0],
@@ -44,5 +44,6 @@ test('single node', () => {
         type: 'hidden',
       },
     ],
+    locations: [],
   })
 })
