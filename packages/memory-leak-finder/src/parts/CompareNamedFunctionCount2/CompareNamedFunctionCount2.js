@@ -1,4 +1,5 @@
 import * as CreateCountMap from '../CreateCountMap/CreateCountMap.js'
+import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
 
 const mergeFunctions = (beforeFunctions, afterFunctions) => {
   const beforeMap = CreateCountMap.createCountMap(beforeFunctions, 'url')
@@ -17,7 +18,31 @@ const mergeFunctions = (beforeFunctions, afterFunctions) => {
   return leaked
 }
 
-export const compareNamedFunctionCount2 = (before, after) => {
+const addSourceLocations = async (functionObjects) => {
+  const classNames = false
+  const requests = functionObjects.map((item) => {
+    return {
+      ...item,
+      stack: [item.url],
+      sourceMaps: [item.sourceMapUrl],
+    }
+  })
+  const withOriginalStack = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(requests, classNames)
+  const normalized = withOriginalStack.map((item) => {
+    const { stack, count, originalStack, originalName, name, beforeCount, delta } = item
+
+    return {
+      name: originalName || name,
+      count,
+      delta,
+      url: originalStack?.[0] || stack?.[0] || '',
+    }
+  })
+  return normalized
+}
+
+export const compareNamedFunctionCount2 = async (before, after) => {
   const leaked = mergeFunctions(before, after)
-  return leaked
+  const withSourceLocations = await addSourceLocations(leaked)
+  return withSourceLocations
 }
