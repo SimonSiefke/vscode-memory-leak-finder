@@ -25,7 +25,21 @@ test('single node', () => {
   const nodes = [0, 0, 0, 0, 0, 0, 0]
   const edges = []
   const strings = ['a']
-  expect(ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings)).toEqual({
+  const locations = []
+  const locationFields = ['object_index', 'script_id', 'line', 'column']
+  expect(
+    ParseHeapSnapshotInternal.parseHeapSnapshotInternal(
+      nodes,
+      nodeFields,
+      nodeTypes,
+      edges,
+      edgeFields,
+      edgeTypes,
+      strings,
+      locations,
+      locationFields,
+    ),
+  ).toEqual({
     graph: { 0: [] },
     parsedNodes: [
       {
