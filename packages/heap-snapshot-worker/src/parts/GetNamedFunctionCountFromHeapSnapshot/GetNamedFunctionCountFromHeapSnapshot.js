@@ -24,7 +24,7 @@ const aggregateFunctionObjects = (functionObjects) => {
   }
   const seen = Object.create(null)
   const aggregated = []
-  for (const { url, name } of functionObjects) {
+  for (const { url, sourceMapUrl, name } of functionObjects) {
     if (url in seen) {
       continue
     }
@@ -32,6 +32,7 @@ const aggregateFunctionObjects = (functionObjects) => {
     aggregated.push({
       name,
       url,
+      sourceMapUrl,
       count: map[url],
     })
   }
