@@ -16,5 +16,5 @@ export const run = async ({ Editor }) => {
     await Editor.type('a')
   }
   await Editor.deleteAll()
-  await Editor.save()
+  await Editor.save({ viaKeyBoard: true })
 }
