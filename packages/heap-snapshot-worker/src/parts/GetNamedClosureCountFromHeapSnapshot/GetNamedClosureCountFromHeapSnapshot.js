@@ -1,6 +1,10 @@
 import * as Assert from '../Assert/Assert.js'
 import * as IsImportantEdge from '../IsImportantEdge/IsImportantEdge.js'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
+import * as Assert from '../Assert/Assert.js'
+import { getFunctionsWithLocations } from '../GetFunctionsWithLocations/GetFunctionsWithLocations.js'
+import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
+import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
 
 const isClosure = (node) => {
   return node.type === 'closure'
@@ -20,7 +24,8 @@ const getName = (node, contextNodes) => {
     .slice(0, 100)
 }
 
-export const getNamedClosureCountFromHeapSnapshot = async (heapsnapshot) => {
+export const getNamedClosureCountFromHeapSnapshot = async (id) => {
+  const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
   const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
   const closures = parsedNodes.filter(isClosure)

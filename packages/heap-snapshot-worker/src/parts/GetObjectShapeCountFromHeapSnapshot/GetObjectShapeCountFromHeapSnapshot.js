@@ -1,8 +1,10 @@
 import * as Assert from '../Assert/Assert.js'
+import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
 
 const ITEMS_PER_NODE = 7
 
-export const getObjectShapeCountFromHeapSnapshot = (heapsnapshot) => {
+export const getObjectShapeCountFromHeapSnapshot = (id) => {
+  const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
   const { snapshot, nodes } = heapsnapshot
   const { meta } = snapshot

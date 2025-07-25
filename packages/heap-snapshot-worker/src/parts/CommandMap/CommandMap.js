@@ -6,7 +6,6 @@ import * as GetNamedFunctionCountFromHeapSnapshot from '../GetNamedFunctionCount
 import * as GetObjectShapeCountFromHeapSnapshot from '../GetObjectShapeCountFromHeapSnapshot/GetObjectShapeCountFromHeapSnapshot.js'
 import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
 import * as LoadHeapSnapshot from '../LoadHeapSnapshot/LoadHeapSnapshot.js'
-import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
 import * as ParseHeapSnapshotNumbers from '../ParseHeapSnapshotNumbers/ParseHeapSnapshotNumbers.js'
 import * as ParseHeapSnapshotStrings from '../ParseHeapSnapshotStrings/ParseHeapSnapshotStrings.js'
 
@@ -15,7 +14,6 @@ export const commandMap = {
   'HeapSnapshot.getLargestArraysFromHeapSnapshot': GetLargestArraysFromHeapSnapshot.getLargestArraysFromHeapSnapshot,
   'HeapSnapshot.load': LoadHeapSnapshot.loadHeapSnapshot,
   'HeapSnapshot.parseFunctions': GetNamedFunctionCountFromHeapSnapshot.getNamedFunctionCountFromHeapSnapshot,
-  'HeapSnapshot.parseHeapSnapshot': ParseHeapSnapshot.parseHeapSnapshot,
   'HeapSnapshot.parseNamedArrayCount': GetNamedArrayCountFromHeapSnapshot.getNamedArrayCountFromHeapSnapshot,
   'HeapSnapshot.parseNamedClosureCount': GetNamedClosureCountFromHeapSnapshot.getNamedClosureCountFromHeapSnapshot,
   'HeapSnapshot.parseNamedEmitterCount': GetNamedEmitterCountFromHeapSnapshot.getNamedEmitterCountFromHeapSnapshot,
