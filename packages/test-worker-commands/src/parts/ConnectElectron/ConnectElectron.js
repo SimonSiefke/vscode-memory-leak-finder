@@ -7,6 +7,7 @@ import * as IntermediateConnectionState from '../IntermediateConnectionState/Int
 import * as IsPausedOnStartEvent from '../IsPausedOnStartEvent/IsPausedOnStartEvent.js'
 import * as MakeElectronAvailableGlobally from '../MakeElectronAvailableGlobally/MakeElectronAvailableGlobally.js'
 import * as MonkeyPatchElectronHeadlessMode from '../MonkeyPatchElectronHeadlessMode/MonkeyPatchElectronHeadlessMode.js'
+import * as MakeRequireAvailableGlobally from '../MakeRequireAvailableGlobally/MakeRequireAvailableGlobally.js'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.js'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
 import * as WaitForDebuggerToBePaused from '../WaitForDebuggerToBePaused/WaitForDebuggerToBePaused.js'
@@ -57,9 +58,16 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl, 
     generatePreview: true,
     includeCommandLineAPI: true,
   })
+  const require = await DevtoolsProtocolDebugger.evaluateOnCallFrame(electronRpc, {
+    callFrameId,
+    expression: `require`,
+    generatePreview: true,
+    includeCommandLineAPI: true,
+  })
   await DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc)
 
   const electronObjectId = electron.result.result.objectId
+  const requireObjectId = require.result.result.objectId
   if (headlessMode) {
     await DevtoolsProtocolDebugger.evaluateOnCallFrame(electronRpc, {
       callFrameId,
@@ -72,6 +80,7 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl, 
   })
 
   await MakeElectronAvailableGlobally.makeElectronAvailableGlobally(electronRpc, electronObjectId)
+  await MakeRequireAvailableGlobally.makeRequireAvailableGlobally(electronRpc, requireObjectId)
 
   electronRpc.on(DevtoolsEventType.DebuggerPaused, handleIntermediatePaused)
 
