@@ -64,6 +64,7 @@ export * as MeasureNamedArrayCountDifference from '../MeasureNamedArrayCountDiff
 export * as MeasureNamedClosureCount from '../MeasureNamedClosureCount/MeasureNamedClosureCount.js'
 export * as MeasureNamedEmitterCount from '../MeasureNamedEmitterCount/MeasureNamedEmitterCount.js'
 export * as MeasureNamedFunctionCount from '../MeasureNamedFunctionCount/MeasureNamedFunctionCount.js'
+export * as MeasureNamedFunctionCount2 from '../MeasureNamedFunctionCount2/MeasureNamedFunctionCount2.js'
 export * as MeasureNamedFunctionDifference from '../MeasureNamedFunctionDifference/MeasureNamedFunctionDifference.js'
 export * as MeasureNamedFunctionDifferenceWithSourceMap from '../MeasureNamedFunctionDifferenceWithSourceMap/MeasureNamedFunctionDifferenceWithSourceMap.js'
 export * as MeasureNumberCount from '../MeasureNumberCount/MeasureNumberCount.js'
