@@ -1,0 +1,33 @@
+import * as GetNamedFunctionCount2 from '../GetNamedFunctionCount2/GetNamedFunctionCount2.js'
+import * as MeasureId from '../MeasureId/MeasureId.js'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as ScriptHandler from '../ScriptHandler/ScriptHandler.js'
+
+export const id = MeasureId.NamedFunctionCount2
+
+export const create = (session) => {
+  const objectGroup = ObjectGroupId.create()
+  const scriptHandler = ScriptHandler.create()
+  return [session, objectGroup, scriptHandler]
+}
+
+export const start = async (session, objectGroup, scriptHandler) => {
+  await scriptHandler.start(session)
+  return GetNamedFunctionCount2.getNamedFunctionCount2(session, objectGroup, scriptHandler.scriptMap)
+}
+
+export const stop = async (session, objectGroup, scriptHandler) => {
+  await scriptHandler.stop(session)
+  return GetNamedFunctionCount2.getNamedFunctionCount2(session, objectGroup, scriptHandler.scriptMap)
+}
+
+export const compare = (before, after) => {
+  return {
+    before,
+    after,
+  }
+}
+
+export const isLeak = (leaked) => {
+  return leaked.length > 0
+}
