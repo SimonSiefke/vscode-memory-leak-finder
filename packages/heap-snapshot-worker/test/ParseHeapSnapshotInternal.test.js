@@ -25,7 +25,22 @@ test('single node', () => {
   const nodes = [0, 0, 0, 0, 0, 0, 0]
   const edges = []
   const strings = ['a']
-  expect(ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings)).toEqual({
+  const locations = []
+  const locationFields = ['object_index', 'script_id', 'line', 'column']
+  expect(
+    ParseHeapSnapshotInternal.parseHeapSnapshotInternal(
+      nodes,
+      nodeFields,
+      nodeTypes,
+      edges,
+      edgeFields,
+      edgeTypes,
+      strings,
+      locations,
+      locationFields,
+    ),
+  ).toEqual({
+    locations: [],
     graph: { 0: [] },
     parsedNodes: [
       {
@@ -65,11 +80,26 @@ test('two nodes', () => {
   ]
   const edges = []
   const strings = ['a', 'b']
-  expect(ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings)).toEqual({
+  const locations = []
+  const locationFields = ['object_index', 'script_id', 'line', 'column']
+  expect(
+    ParseHeapSnapshotInternal.parseHeapSnapshotInternal(
+      nodes,
+      nodeFields,
+      nodeTypes,
+      edges,
+      edgeFields,
+      edgeTypes,
+      strings,
+      locations,
+      locationFields,
+    ),
+  ).toEqual({
     graph: {
       0: [],
       1: [],
     },
+    locations: [],
     parsedNodes: [
       {
         id: 0,
@@ -113,7 +143,21 @@ test('two nodes connected by edge', () => {
   ]
   const edges = [0, 0, 7]
   const strings = ['a', 'b']
-  expect(ParseHeapSnapshotInternal.parseHeapSnapshotInternal(nodes, nodeFields, nodeTypes, edges, edgeFields, edgeTypes, strings)).toEqual({
+  const locations = []
+  const locationFields = ['object_index', 'script_id', 'line', 'column']
+  expect(
+    ParseHeapSnapshotInternal.parseHeapSnapshotInternal(
+      nodes,
+      nodeFields,
+      nodeTypes,
+      edges,
+      edgeFields,
+      edgeTypes,
+      strings,
+      locations,
+      locationFields,
+    ),
+  ).toEqual({
     graph: {
       0: [
         {
@@ -123,6 +167,7 @@ test('two nodes connected by edge', () => {
       ],
       1: [],
     },
+    locations: [],
     parsedNodes: [
       {
         id: 0,
