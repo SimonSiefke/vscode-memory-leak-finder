@@ -19,7 +19,7 @@ const mergeFunctions = (beforeFunctions, afterFunctions) => {
 }
 
 const addSourceLocations = async (functionObjects) => {
-  const classNames = false
+  const classNames = true
   const requests = functionObjects.map((item) => {
     return {
       ...item,
