@@ -1,5 +1,6 @@
 import * as ContextMenu from '../ContextMenu/ContextMenu.js'
 import * as QuickPick from '../QuickPick/QuickPick.js'
+import * as Electron from '../Electron/Electron.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
 
 const RE_NUMER_AT_END = /\d+$/
@@ -30,7 +31,7 @@ const getListId = (classNameString) => {
   throw new Error(`Failed to extract list id from explorer`)
 }
 
-export const create = ({ page, expect, VError }) => {
+export const create = ({ electronApp, page, expect, VError }) => {
   return {
     async focus() {
       try {
@@ -217,6 +218,8 @@ export const create = ({ page, expect, VError }) => {
     },
     async delete(item) {
       try {
+        const electron = Electron.create({ electronApp, VError })
+        await electron.mockShellTrashItem()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         const oldDirent = explorer.locator('.monaco-list-row', {
           hasText: item,
