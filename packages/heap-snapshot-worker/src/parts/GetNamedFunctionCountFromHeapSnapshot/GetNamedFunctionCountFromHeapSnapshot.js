@@ -1,15 +1,17 @@
 import * as Assert from '../Assert/Assert.js'
 import { getFunctionsWithLocations } from '../GetFunctionsWithLocations/GetFunctionsWithLocations.js'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
+import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
 
 const normalizeFunctionObjects = (functionObjects) => {
   const normalized = []
   for (const functionObject of functionObjects) {
-    const { url, lineIndex, columnIndex, name } = functionObject
+    const { url, lineIndex, columnIndex, name, sourceMapUrl } = functionObject
     const displayUrl = `${url}:${lineIndex}:${columnIndex}`
     normalized.push({
       url: displayUrl,
       name,
+      sourceMapUrl,
     })
   }
   return normalized
@@ -23,7 +25,7 @@ const aggregateFunctionObjects = (functionObjects) => {
   }
   const seen = Object.create(null)
   const aggregated = []
-  for (const { url, name } of functionObjects) {
+  for (const { url, sourceMapUrl, name } of functionObjects) {
     if (url in seen) {
       continue
     }
@@ -31,6 +33,7 @@ const aggregateFunctionObjects = (functionObjects) => {
     aggregated.push({
       name,
       url,
+      sourceMapUrl,
       count: map[url],
     })
   }
@@ -38,7 +41,8 @@ const aggregateFunctionObjects = (functionObjects) => {
   return aggregated
 }
 
-export const getNamedFunctionCountFromHeapSnapshot = async (heapsnapshot, scriptMap) => {
+export const getNamedFunctionCountFromHeapSnapshot = async (id, scriptMap) => {
+  const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
   console.time('parse')
   const { parsedNodes, graph, locations } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)

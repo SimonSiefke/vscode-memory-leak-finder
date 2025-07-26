@@ -1,7 +1,7 @@
 import * as Assert from '../Assert/Assert.js'
 
 export const parseHeapSnapshotLocations = (locations, locationFields, nodeFieldCount) => {
-  Assert.array(locations)
+  // Assert.array(locations)
   Assert.array(locationFields)
   Assert.number(nodeFieldCount)
   const objectIndexIndex = locationFields.indexOf('object_index')

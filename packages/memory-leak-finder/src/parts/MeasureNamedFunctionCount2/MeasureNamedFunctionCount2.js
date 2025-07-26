@@ -1,3 +1,4 @@
+import { compareNamedFunctionCount2 } from '../CompareNamedFunctionCount2/CompareNamedFunctionCount2.js'
 import * as GetNamedFunctionCount2 from '../GetNamedFunctionCount2/GetNamedFunctionCount2.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
@@ -21,12 +22,7 @@ export const stop = async (session, objectGroup, scriptHandler) => {
   return GetNamedFunctionCount2.getNamedFunctionCount2(session, objectGroup, scriptHandler.scriptMap)
 }
 
-export const compare = (before, after) => {
-  return {
-    before,
-    after,
-  }
-}
+export const compare = compareNamedFunctionCount2
 
 export const isLeak = (leaked) => {
   return leaked.length > 0

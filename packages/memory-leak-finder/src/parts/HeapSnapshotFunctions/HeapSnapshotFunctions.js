@@ -9,20 +9,28 @@ export const getObjectShapeCountFromHeapSnapshot = async (value) => {
   return 0
 }
 
-export const parseHeapSnapshotStrings = async (value) => {
-  return HeapSnapshotWorker.invoke('HeapSnapshot.parseStrings', value)
+export const parseHeapSnapshotStrings = async (id) => {
+  return HeapSnapshotWorker.invoke('HeapSnapshot.parseStrings', id)
 }
 
-export const parseHeapSnapshotFunctions = async (value, scriptMap) => {
-  return HeapSnapshotWorker.invoke('HeapSnapshot.parseFunctions', value, scriptMap)
+export const parseHeapSnapshotFunctions = async (id, scriptMap) => {
+  return HeapSnapshotWorker.invoke('HeapSnapshot.parseFunctions', id, scriptMap)
 }
 
-export const parseHeapSnapshotNumbers = async (value) => {
-  return HeapSnapshotWorker.invoke('HeapSnapshot.parseNumbers', value)
+export const loadHeapSnapshot = async (path) => {
+  return HeapSnapshotWorker.invoke('HeapSnapshot.load', path)
 }
 
-export const parseHeapSnapshotUserStrings = async (value) => {
-  return HeapSnapshotWorker.invoke('HeapSnapshot.parseUserStrings', value)
+export const disposeHeapSnapshot = async (id) => {
+  return HeapSnapshotWorker.invoke('HeapSnapshot.dispose', id)
+}
+
+export const parseHeapSnapshotNumbers = async (id) => {
+  return HeapSnapshotWorker.invoke('HeapSnapshot.parseNumbers', id)
+}
+
+export const parseHeapSnapshotUserStrings = async (id) => {
+  return HeapSnapshotWorker.invoke('HeapSnapshot.parseUserStrings', id)
 }
 
 export const getNamedArrayCountFromHeapSnapshot = async (value) => {

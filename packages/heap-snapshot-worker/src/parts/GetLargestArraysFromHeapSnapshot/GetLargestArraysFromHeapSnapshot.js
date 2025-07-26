@@ -1,7 +1,8 @@
 import * as Arrays from '../Arrays/Arrays.js'
 import * as Assert from '../Assert/Assert.js'
-import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
 import * as CreateNameMap from '../CreateNameMap/CreateNameMap.js'
+import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
+import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
 
 const isArray = (node) => {
   return node.type === 'object' && node.name === 'Array'
@@ -57,7 +58,8 @@ const addNames = (items, nameMap) => {
   return withNames
 }
 
-export const getLargestArraysFromHeapSnapshot = async (heapsnapshot) => {
+export const getLargestArraysFromHeapSnapshot = async (id) => {
+  const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
   const minLength = 1
   const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
