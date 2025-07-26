@@ -10,11 +10,11 @@ const getProtocol = (url) => {
   return url.slice(0, colonIndex)
 }
 
-export const loadSourceMap = async (url) => {
+export const loadSourceMap = async (url, hash) => {
   try {
     const protocol = getProtocol(url)
     const module = await LoadSourceMapModule.getModule(protocol)
-    const data = await module.loadSourceMap(url)
+    const data = await module.loadSourceMap(url, hash)
     return data
   } catch (error) {
     throw new VError(error, `Failed to load source map for ${url}`)
