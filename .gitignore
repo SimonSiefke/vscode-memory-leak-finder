@@ -1,4 +1,5 @@
 # playground
+.vscode-sources
 .vscode-heapsnapshots
 .cursor-test-workspace
 out.txt
