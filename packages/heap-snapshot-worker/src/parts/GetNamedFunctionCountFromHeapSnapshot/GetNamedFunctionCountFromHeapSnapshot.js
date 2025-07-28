@@ -22,8 +22,10 @@ export const getNamedFunctionCountFromHeapSnapshot = async (id, scriptMap) => {
   console.timeEnd('aggregate')
   console.time('sort')
   const sorted = aggregated.toSorted((a, b) => b.count - a.count)
+  const limited = sorted.filter((item) => item.count > 1)
   console.timeEnd('sort')
-  return sorted
+  // console.log(JSON.stringify(sorted.slice(0, sorted.length / 20)).length)
+  return limited
 }
 
 // const path = join(import.meta.dirname, '../../../../../.vscode-heapsnapshots', '1.json')
