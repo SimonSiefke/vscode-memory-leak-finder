@@ -3,6 +3,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { normalizeSourceMap } from '../NormalizeSourceMap/NormalizeSourceMap.js'
 import * as Root from '../Root/Root.js'
+import { readJson } from '../ReadJson/ReadJson.js'
 
 const prefix = 'data:application/json;base64,'
 
@@ -21,5 +22,6 @@ export const loadSourceMap = async (dataUrl, hash) => {
     await writeFile(originalPath, JSON.stringify(data))
     await normalizeSourceMap(originalPath, outFilePath)
   }
-  return data
+  const newData = await readJson(outFilePath)
+  return newData
 }
