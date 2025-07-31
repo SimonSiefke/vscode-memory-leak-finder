@@ -1,3 +1,4 @@
+import { fixHtmlNamespace } from '../FixXmlNamespace/FixXmlNamespace.js'
 import * as Plot from '../Plot/Plot.js'
 
 export const createChart = (data, { x, y, xLabel, yLabel }) => {
@@ -13,6 +14,6 @@ export const createChart = (data, { x, y, xLabel, yLabel }) => {
     },
     marks: [Plot.lineY(data, { x, y })],
   }).outerHTML
-  const finalHtml = baseHtml.replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" ')
+  const finalHtml = fixHtmlNamespace(baseHtml)
   return finalHtml
 }

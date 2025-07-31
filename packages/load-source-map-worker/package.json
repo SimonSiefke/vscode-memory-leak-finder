@@ -15,7 +15,7 @@
     "@lvce-editor/assert": "^1.4.0",
     "@lvce-editor/verror": "^1.7.0",
     "got": "^14.4.7",
-    "source-map": "^0.7.4"
+    "source-map": "^0.7.6"
   },
   "jest": {
     "injectGlobals": false,
