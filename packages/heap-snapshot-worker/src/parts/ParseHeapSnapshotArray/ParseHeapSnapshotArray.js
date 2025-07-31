@@ -1,10 +1,10 @@
 import { charTypes } from '../CreateCharTypesLookupTable/CreateCharTypesLookupTable.js'
 
-// Pre-computed lookup tables for faster character classification
 const DIGIT = 1
 const SEPARATOR = 2
 const CLOSING_BRACKET = 3
 const OTHER = 0
+const CHAR_0 = '0'.charCodeAt(0)
 
 /**
  * Parses comma-separated numbers from a Uint8Array buffer into a Uint32Array
@@ -28,7 +28,7 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
 
     switch (charType) {
       case DIGIT:
-        currentNumber = currentNumber * 10 + (code - 48) // '0' = 48
+        currentNumber = currentNumber * 10 + (code - CHAR_0)
         hasDigits = true
         break
 
@@ -56,7 +56,6 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
         dataIndex = i + 1
         return { dataIndex, arrayIndex, done }
 
-      case OTHER:
       default:
         // Non-digit, non-separator, non-bracket character - stop parsing
         dataIndex = i
