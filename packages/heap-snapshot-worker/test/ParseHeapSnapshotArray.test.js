@@ -64,7 +64,7 @@ test('parseHeapSnapshotArray - incomplete number at end', () => {
 test('parseHeapSnapshotArray - streaming scenario', () => {
   // First chunk: "1, 2"
   const data1 = `1, 2`
-  const array = new Uint32Array(3)
+  const array = new Uint32Array(4) // Make it large enough for 4 numbers
   const index = 0
   const result1 = parseHeapSnapshotArray(data1, array, index)
   expect(array[0]).toBe(1)
@@ -76,6 +76,7 @@ test('parseHeapSnapshotArray - streaming scenario', () => {
   const data2 = `2, 3`
   const result2 = parseHeapSnapshotArray(data2, array, result1.arrayIndex)
   expect(array[2]).toBe(2) // Should parse as 2 from the new chunk
+  expect(array[3]).toBe(3) // Should parse as 3 from the new chunk
   expect(result2.dataIndex).toBe(4) // "2, 3" is 4 characters
   expect(result2.arrayIndex).toBe(4) // Should store 2 numbers starting from index 2
 })
