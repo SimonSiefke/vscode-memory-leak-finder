@@ -3,6 +3,7 @@ import { parseHeapSnapshotMetaDataIndices } from '../ParseHeapSnapshotMetaDataIn
 export const EMPTY_DATA = {
   couldParse: false,
   data: {},
+  endIndex: -1,
 }
 
 export const parseHeapSnapshotMetaData = (data) => {
