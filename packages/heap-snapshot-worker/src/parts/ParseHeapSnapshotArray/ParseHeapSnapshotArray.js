@@ -38,9 +38,6 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
 
       case SEPARATOR:
         if (hasDigits) {
-          if (arrayIndex >= arrayLength) {
-            throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
-          }
           array[arrayIndex] = currentNumber
           arrayIndex++
           currentNumber = 0
@@ -50,9 +47,6 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
 
       case CLOSING_BRACKET:
         if (hasDigits) {
-          if (arrayIndex >= arrayLength) {
-            throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
-          }
           array[arrayIndex] = currentNumber
           arrayIndex++
         }
