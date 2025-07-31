@@ -93,7 +93,7 @@ test('parseHeapSnapshotArray - done with closing bracket', () => {
   expect(array[0]).toBe(1)
   expect(array[1]).toBe(2)
   expect(array[2]).toBe(3)
-  expect(result.dataIndex).toBe(7) // Should consume the entire string including ']'
+  expect(result.dataIndex).toBe(8) // Should consume the entire string including ']' (positions 0-7)
   expect(result.arrayIndex).toBe(3) // Should store all 3 numbers
   expect(result.done).toBe(true) // Should be done since we found ']'
 })
