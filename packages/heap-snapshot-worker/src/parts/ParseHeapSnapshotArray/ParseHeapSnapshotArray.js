@@ -38,51 +38,43 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
 
   for (let i = 0; i < dataLength; i++) {
     const code = data[i] // Direct array access instead of charCodeAt()
+    const charType = charTypes[code]
 
-    // Use lookup table for fast character classification
-    if (code < 128) {
-      const charType = charTypes[code]
+    switch (charType) {
+      case DIGIT:
+        currentNumber = currentNumber * 10 + (code - 48) // '0' = 48
+        hasDigits = true
+        break
 
-      switch (charType) {
-        case DIGIT:
-          currentNumber = currentNumber * 10 + (code - 48) // '0' = 48
-          hasDigits = true
-          break
-
-        case SEPARATOR:
-          if (hasDigits) {
-            if (arrayIndex >= arrayLength) {
-              throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
-            }
-            array[arrayIndex] = currentNumber
-            arrayIndex++
-            currentNumber = 0
-            hasDigits = false
+      case SEPARATOR:
+        if (hasDigits) {
+          if (arrayIndex >= arrayLength) {
+            throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
           }
-          break
+          array[arrayIndex] = currentNumber
+          arrayIndex++
+          currentNumber = 0
+          hasDigits = false
+        }
+        break
 
-        case CLOSING_BRACKET:
-          if (hasDigits) {
-            if (arrayIndex >= arrayLength) {
-              throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
-            }
-            array[arrayIndex] = currentNumber
-            arrayIndex++
+      case CLOSING_BRACKET:
+        if (hasDigits) {
+          if (arrayIndex >= arrayLength) {
+            throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
           }
-          done = true
-          dataIndex = i + 1
-          return { dataIndex, arrayIndex, done }
+          array[arrayIndex] = currentNumber
+          arrayIndex++
+        }
+        done = true
+        dataIndex = i + 1
+        return { dataIndex, arrayIndex, done }
 
-        case OTHER:
-        default:
-          // Non-digit, non-separator, non-bracket character - stop parsing
-          dataIndex = i
-          return { dataIndex, arrayIndex, done }
-      }
-    } else {
-      // Non-ASCII character - treat as other
-      dataIndex = i
-      return { dataIndex, arrayIndex, done }
+      case OTHER:
+      default:
+        // Non-digit, non-separator, non-bracket character - stop parsing
+        dataIndex = i
+        return { dataIndex, arrayIndex, done }
     }
   }
 
