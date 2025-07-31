@@ -66,6 +66,8 @@ export class HeapSnapshotWriteStream extends Writable {
       throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${array.length}`)
     }
     this.arrayIndex = arrayIndex
+    this.data = this.data.slice(dataIndex)
+
     if (done) {
       if (arrayIndex !== array.length) {
         throw new RangeError(`Incorrect number of nodes in heapsnapshot, expected ${array.length}, but got ${arrayIndex}`)
