@@ -18,7 +18,6 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
   const arrayLength = array.length
   let currentNumber = 0
   let hasDigits = false
-  let dataIndex = 0
   let done = false
 
   for (let i = 0; i < dataLength; i++) {
@@ -45,24 +44,19 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
 
       case CLOSING_BRACKET:
         if (hasDigits) {
-          if (arrayIndex >= arrayLength) {
-            throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
-          }
+
           array[arrayIndex] = currentNumber
           arrayIndex++
         }
         done = true
-        dataIndex = i + 1
-        return { dataIndex, arrayIndex, done }
+        return { dataIndex: i + 1, arrayIndex, done }
 
       default:
         // Non-digit, non-separator, non-bracket character - stop parsing
-        dataIndex = i
-        return { dataIndex, arrayIndex, done }
+        return { dataIndex: i, arrayIndex, done }
     }
   }
 
   // If we have digits at the end, don't store them - more data might come in next chunk
-  dataIndex = dataLength
-  return { dataIndex, arrayIndex, done }
+  return { dataIndex: dataLength, arrayIndex, done }
 }
