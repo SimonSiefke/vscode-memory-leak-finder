@@ -16,6 +16,10 @@ const decodeArray = (data) => {
   return new TextDecoder().decode(data)
 }
 
+let nodeStart = 0
+let edgeStart = 0
+let locationsStart = 0
+
 export class HeapSnapshotWriteStream extends Writable {
   constructor() {
     super()
@@ -123,22 +127,32 @@ export class HeapSnapshotWriteStream extends Writable {
         this.writeMetaData(chunk)
         break
       case HeapSnapshotParsingState.ParsingNodesMetaData:
+        nodeStart = performance.now()
         this.writeParsingNodesMetaData(chunk)
         break
       case HeapSnapshotParsingState.ParsingNodes:
         this.writeParsingNodes(chunk)
         break
       case HeapSnapshotParsingState.ParsingEdgesMetaData:
+        console.log('node', performance.now() - edgeStart)
+
+        edgeStart = performance.now()
         this.writeParsingEdgesMetaData(chunk)
         break
       case HeapSnapshotParsingState.ParsingEdges:
         this.writeParsingEdges(chunk)
         break
       case HeapSnapshotParsingState.ParsingLocationsMetaData:
+        console.log('edge', performance.now() - edgeStart)
+
+        locationsStart = performance.now()
         this.writeParsingLocationsMetaData(chunk)
         break
       case HeapSnapshotParsingState.ParsingLocations:
         this.writeParsingLocations(chunk)
+        break
+      case HeapSnapshotParsingState.Done:
+        console.log('locations', performance.now() - locationsStart)
         break
       default:
         break
