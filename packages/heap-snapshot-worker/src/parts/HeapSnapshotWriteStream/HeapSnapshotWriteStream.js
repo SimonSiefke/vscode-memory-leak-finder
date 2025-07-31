@@ -4,12 +4,15 @@ import { Writable } from 'node:stream'
 import * as HeapSnapshotParsingState from '../HeapSnapshotParsingState/HeapSnapshotParsingState.js'
 import { parseHeapSnapshotArray } from '../ParseHeapSnapshotArray/ParseHeapSnapshotArray.js'
 import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.js'
-import { parseHeapSnapshotArrayWithDynamicSize } from '../ParseHeapSnapshotArrayWithDynamicSize/ParseHeapSnapshotArrayWithDynamicSize.js'
 import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.js'
 
 const concatArray = (array, other) => {
   // TODO check if concatenating many uint8 arrays could possibly negatively impact performance
   return new Uint8Array(Buffer.concat([array, other]))
+}
+const concatUint32Array = (array, other) => {
+  // TODO check if concatenating many uint8 arrays could possibly negatively impact performance
+  return new Uint32Array(Buffer.concat([array, other]))
 }
 
 const decodeArray = (data) => {
@@ -27,6 +30,7 @@ export class HeapSnapshotWriteStream extends Writable {
     this.data = new Uint8Array()
     this.edges = new Uint32Array()
     this.locations = new Uint32Array()
+    this.intermediateArray = new Uint32Array(this.writableHighWaterMark)
     this.metaData = {}
     this.nodes = new Uint32Array()
     this.snapshotTokenIndex = -1
@@ -104,12 +108,15 @@ export class HeapSnapshotWriteStream extends Writable {
   writeResizableArrayData(chunk, nextState) {
     this.data = concatArray(this.data, chunk)
 
-    const { dataIndex, arrayIndex, done } = parseHeapSnapshotArrayWithDynamicSize(this.data, this.locationsState, this.arrayIndex)
+    const { dataIndex, arrayIndex, done } = parseHeapSnapshotArray(this.data, this.intermediateArray, 0)
     if (dataIndex === -1) {
       return
     }
 
-    this.arrayIndex = arrayIndex
+    // Concatenate the parsed numbers to the main array
+    const parsedNumbers = this.intermediateArray.slice(0, arrayIndex)
+    this.locations = concatUint32Array(this.locations, parsedNumbers)
+
     this.data = this.data.slice(dataIndex)
 
     if (done) {
