@@ -57,7 +57,7 @@ export class HeapSnapshotWriteStream extends Writable {
   }
 
   writeArrayData(chunk, array, nextState) {
-    this.data = concatArray(this.data, chunk)
+    this.data = concatArray(this.data, chunk) // TODO try to avoid concatenating arrays
     const { dataIndex, arrayIndex, done } = parseHeapSnapshotArray(this.data, array, this.arrayIndex)
     if (dataIndex === -1) {
       return
@@ -67,12 +67,10 @@ export class HeapSnapshotWriteStream extends Writable {
     }
     this.arrayIndex = arrayIndex
     this.data = this.data.slice(dataIndex)
-
     if (done) {
       if (arrayIndex !== array.length) {
         throw new RangeError(`Incorrect number of nodes in heapsnapshot, expected ${array.length}, but got ${arrayIndex}`)
       }
-
       this.state = nextState
     }
   }
