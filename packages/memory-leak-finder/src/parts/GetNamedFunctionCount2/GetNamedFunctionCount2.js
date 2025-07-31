@@ -15,7 +15,8 @@ export const getNamedFunctionCount2 = async (session, objectGroup, scriptMap, in
   console.time('load')
   await HeapSnapshotFunctions.loadHeapSnapshot(outFile)
   console.timeEnd('load')
-  const functions = await HeapSnapshotFunctions.parseHeapSnapshotFunctions(outFile, scriptMap)
+  const minCount = 1
+  const functions = await HeapSnapshotFunctions.parseHeapSnapshotFunctions(outFile, scriptMap, minCount)
   await HeapSnapshotFunctions.disposeHeapSnapshot(outFile)
   return functions
 }
