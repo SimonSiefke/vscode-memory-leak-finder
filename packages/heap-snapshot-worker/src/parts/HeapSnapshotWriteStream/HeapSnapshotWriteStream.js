@@ -48,6 +48,7 @@ export class HeapSnapshotWriteStream extends Writable {
       return
     }
     this.arrayIndex = 0
+    this.data = this.data.slice(endIndex)
     this.state = nextState
   }
 
