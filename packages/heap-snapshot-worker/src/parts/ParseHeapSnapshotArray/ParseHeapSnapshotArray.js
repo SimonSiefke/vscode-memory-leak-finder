@@ -3,6 +3,7 @@ import { charTypes } from '../CreateCharTypesLookupTable/CreateCharTypesLookupTa
 const DIGIT = 1
 const SEPARATOR = 2
 const CLOSING_BRACKET = 3
+const MINUS = 4
 const CHAR_0 = '0'.charCodeAt(0)
 
 const getDigitCount = (number) => {
