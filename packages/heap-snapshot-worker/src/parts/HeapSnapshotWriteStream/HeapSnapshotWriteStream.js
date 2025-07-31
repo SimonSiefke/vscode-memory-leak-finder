@@ -1,8 +1,8 @@
 import { Writable } from 'node:stream'
-import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.js'
-import { parseHeapSnapshotArray } from '../ParseHeapSnapshotArray/ParseHeapSnapshotArray.js'
 import * as HeapSnapshotParsingState from '../HeapSnapshotParsingState/HeapSnapshotParsingState.js'
 import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.js'
+import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.js'
+import { parseHeapSnapshotArray } from '../ParseHeapSnapshotArray/ParseHeapSnapshotArray.js'
 
 export class HeapSnapshotWriteStream extends Writable {
   constructor() {
@@ -14,7 +14,9 @@ export class HeapSnapshotWriteStream extends Writable {
     this.snapshotTokenIndex = -1
     this.metaData = {}
     this.nodes = new Uint32Array()
+    this.nodesIndex = 0
     this.edges = new Uint32Array()
+    this.edgesIndex = 0
   }
 
   writeMetaData(chunk) {
@@ -46,12 +48,17 @@ export class HeapSnapshotWriteStream extends Writable {
     this.writeParsingArrayMetaData(chunk, 'nodes', HeapSnapshotParsingState.ParsingNodes)
   }
 
+  writeArrayData(chunk, array, index) {
+    this.data += chunk
+    const { dataIndex, arrayIndex } = parseHeapSnapshotArray(this.data, array, index)
+    if (dataIndex === -1) {
+      return
+    }
+    this.data = this.data.slice(dataIndex)
+  }
+
   writeParsingNodes(chunk) {
-    // TODO parse nodes
-    // this.data += chunk
-    // const endIndex = parseHeapSnapshotArray(this.data, this.nodes)
-    // // console.log(this.data)
-    // this.state = HeapSnapshotParsingState.ParsingEdges
+    this.writeArrayData(chunk, this.nodes, this.nodesIndex)
   }
 
   writeParsingEdgesMetaData(chunk) {
@@ -59,7 +66,8 @@ export class HeapSnapshotWriteStream extends Writable {
   }
 
   writeParsingEdges(chunk) {
-    this.state = HeapSnapshotParsingState.Done
+    this.writeArrayData(chunk, this.edges, this.edgesIndex)
+    // this.state = HeapSnapshotParsingState.Done
   }
 
   async _write(chunk, encoding, callback) {
