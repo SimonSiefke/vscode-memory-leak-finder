@@ -46,12 +46,11 @@ export class HeapSnapshotWriteStream extends Writable {
     this.data = concatArray(this.data, chunk)
     const dataString = decodeArray(this.data)
     const endIndex = parseHeapSnapshotArrayHeader(dataString, nodeName)
-    console.log({ endIndex })
     if (endIndex === -1) {
       return
     }
     this.data = this.data.slice(endIndex)
-    console.log(decodeArray(this.data.slice(0, 100)))
+    this.arrayIndex = 0
     this.state = nextState
   }
 
@@ -61,9 +60,13 @@ export class HeapSnapshotWriteStream extends Writable {
 
   writeArrayData(chunk, array, nextState) {
     this.data = concatArray(this.data, chunk)
+    console.log('datalength', this.data.length, 'index', this.arrayIndex)
     const { dataIndex, arrayIndex, done } = parseHeapSnapshotArray(this.data, array, this.arrayIndex)
     if (dataIndex === -1) {
       return
+    }
+    if (arrayIndex > array.length) {
+      throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${array.length}`)
     }
     this.arrayIndex = arrayIndex
     this.data = this.data.slice(dataIndex)

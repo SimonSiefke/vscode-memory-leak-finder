@@ -51,9 +51,7 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
           array[arrayIndex] = currentNumber
           arrayIndex++
         }
-        if (arrayIndex > arrayLength) {
-          throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
-        }
+
         return {
           dataIndex: i + 1,
           arrayIndex,
