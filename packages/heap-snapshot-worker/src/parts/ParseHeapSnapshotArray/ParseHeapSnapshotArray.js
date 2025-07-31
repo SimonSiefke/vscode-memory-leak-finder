@@ -58,6 +58,16 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
     }
   }
 
+  // If we have digits at the end, backtrack to the beginning of the current number
+  if (hasDigits) {
+    const digitCount = Math.floor(Math.log10(currentNumber)) + 1
+    return {
+      dataIndex: dataLength - digitCount,
+      arrayIndex,
+      done,
+    }
+  }
+
   return {
     dataIndex: dataLength,
     arrayIndex,

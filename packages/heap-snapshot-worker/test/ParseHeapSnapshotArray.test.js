@@ -54,7 +54,7 @@ test('parseHeapSnapshotArray - incomplete number at end', () => {
   const result = parseHeapSnapshotArray(data, array, index)
   expect(array[0]).toBe(1)
   expect(array[1]).toBe(0) // Should not store the incomplete number 22
-  expect(result.dataIndex).toBe(5) // Should consume all data
+  expect(result.dataIndex).toBe(3) // Should backtrack to beginning of incomplete number
   expect(result.arrayIndex).toBe(1) // Should only store the complete number
 })
 
@@ -186,7 +186,7 @@ test('parseHeapSnapshotArray - streaming with incomplete number', () => {
   expect(array[0]).toBe(1)
   expect(array[1]).toBe(0) // Should not store the incomplete number 22
   expect(array[2]).toBe(0) // Should not be set
-  expect(result1.dataIndex).toBe(5) // Should consume all data
+  expect(result1.dataIndex).toBe(3) // Should backtrack to beginning of incomplete number
   expect(result1.arrayIndex).toBe(1) // Should only store the complete number
 
   // Second chunk should be parsed independently
