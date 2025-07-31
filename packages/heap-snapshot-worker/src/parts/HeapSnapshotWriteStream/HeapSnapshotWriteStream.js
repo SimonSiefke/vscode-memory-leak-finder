@@ -72,11 +72,11 @@ export class HeapSnapshotWriteStream extends Writable {
     const nodeCount = metaData.data.node_count * metaData.data.meta.node_fields.length
     const edgeCount = metaData.data.edge_count * metaData.data.meta.edge_fields.length
     this.metaData = metaData
-    const leftoverData = this.data.slice(metaData.endIndex)
     this.nodes = new Uint32Array(nodeCount)
     this.edges = new Uint32Array(edgeCount)
     this.state = HeapSnapshotParsingState.ParsingNodesMetaData
 
+    const leftoverData = this.data.slice(metaData.endIndex)
     // Process any leftover data with the new state
     if (leftoverData.length > 0) {
       this.handleChunk(leftoverData)
@@ -190,7 +190,7 @@ export class HeapSnapshotWriteStream extends Writable {
     this.writeResizableArrayData(chunk, HeapSnapshotParsingState.Done)
   }
 
-  handleChunk(chunk){
+  handleChunk(chunk) {
     switch (this.state) {
       case HeapSnapshotParsingState.SearchingSnapshotMetaData:
         this.writeMetaData(chunk)
