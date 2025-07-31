@@ -32,9 +32,6 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
 
       case SEPARATOR:
         if (hasDigits) {
-          if (arrayIndex >= arrayLength) {
-            throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
-          }
           array[arrayIndex] = currentNumber
           arrayIndex++
           currentNumber = 0
@@ -44,12 +41,17 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
 
       case CLOSING_BRACKET:
         if (hasDigits) {
-
           array[arrayIndex] = currentNumber
           arrayIndex++
         }
-        done = true
-        return { dataIndex: i + 1, arrayIndex, done }
+        if (arrayIndex >= arrayLength) {
+          throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
+        }
+        return {
+          dataIndex: i + 1,
+          arrayIndex,
+          done: true,
+        }
 
       default:
         // Non-digit, non-separator, non-bracket character - stop parsing
