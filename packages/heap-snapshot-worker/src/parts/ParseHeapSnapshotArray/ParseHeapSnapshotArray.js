@@ -58,6 +58,9 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
     }
   }
 
-  // If we have digits at the end, don't store them - more data might come in next chunk
-  return { dataIndex: dataLength, arrayIndex, done }
+  return {
+    dataIndex: dataLength,
+    arrayIndex,
+    done,
+  }
 }
