@@ -74,7 +74,7 @@ test('parseHeapSnapshotArray - stops at non-digit character', () => {
   const index = 0
   expect(() => {
     parseHeapSnapshotArray(data, array, index)
-  }).toThrow(new Error('unexpected token'))
+  }).toThrow(new Error('unexpected token 120'))
 })
 
 test('parseHeapSnapshotArray - done with closing bracket', () => {
