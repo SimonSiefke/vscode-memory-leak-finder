@@ -3,7 +3,6 @@ import { charTypes } from '../CreateCharTypesLookupTable/CreateCharTypesLookupTa
 const DIGIT = 1
 const SEPARATOR = 2
 const CLOSING_BRACKET = 3
-const OTHER = 0
 const CHAR_0 = '0'.charCodeAt(0)
 
 /**
