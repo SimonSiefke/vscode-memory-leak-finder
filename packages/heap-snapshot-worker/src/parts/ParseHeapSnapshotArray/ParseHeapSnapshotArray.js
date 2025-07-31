@@ -65,8 +65,7 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
           hasDigits: false,
         }
       default:
-        // Ignore other characters (including MINUS)
-        break
+        throw new Error(`unexpected token ${code}`)
     }
   }
 
