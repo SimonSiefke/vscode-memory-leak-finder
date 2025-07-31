@@ -36,8 +36,6 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
         currentNumber = currentNumber * 10 + (code - CHAR_0)
         hasDigits = true
         break
-      case MINUS:
-        break
       case SEPARATOR:
         if (hasDigits) {
           array[arrayIndex] = currentNumber
@@ -46,18 +44,18 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
           hasDigits = false
         }
         break
-
       case CLOSING_BRACKET:
         if (hasDigits) {
           array[arrayIndex] = currentNumber
           arrayIndex++
         }
-
         return {
           dataIndex: i + 1,
           arrayIndex,
           done: true,
         }
+      case MINUS:
+        break
       default:
         throw new Error(`unexpected token ${code}`)
     }
