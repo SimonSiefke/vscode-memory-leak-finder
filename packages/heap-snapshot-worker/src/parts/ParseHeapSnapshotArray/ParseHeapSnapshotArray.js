@@ -23,7 +23,6 @@ const getDigitCount = (number) => {
  */
 export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
   const dataLength = data.length
-  const arrayLength = array.length
   let currentNumber = 0
   let hasDigits = false
 
