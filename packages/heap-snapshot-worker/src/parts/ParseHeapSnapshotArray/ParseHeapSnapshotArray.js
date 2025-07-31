@@ -17,14 +17,14 @@ const getDigitCount = (number) => {
  * @param {Uint8Array} data - The buffer containing comma-separated numbers
  * @param {any} array - The array to store parsed numbers
  * @param {number} arrayIndex - The starting index in the array
- * @param {number} [currentNumber=0] - Current number being parsed
- * @param {boolean} [hasDigits=false] - Whether we have digits in current number
  * @returns {{dataIndex: number, arrayIndex: number, done: boolean, currentNumber: number, hasDigits: boolean}} - The new data index, array index, completion status, and final parsing state
  * @throws {RangeError} When array index is out of bounds
  */
-export const parseHeapSnapshotArray = (data, array, arrayIndex, currentNumber = 0, hasDigits = false) => {
+export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
   const dataLength = data.length
   const arrayLength = array.length
+  let currentNumber = 0
+  let hasDigits = false
 
   for (let i = 0; i < dataLength; i++) {
     const code = data[i] // Direct array access instead of charCodeAt()
