@@ -54,7 +54,8 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
         }
 
       default:
-        throw new Error(`unexpected token`)
+        console.log({ arrayIndex })
+        throw new Error(`unexpected token ${code}`)
     }
   }
 

@@ -10,7 +10,7 @@ export class HeapSnapshotWriteStream extends Writable {
       objectMode: true,
     })
     this.state = HeapSnapshotParsingState.SearchingSnapshotMetaData
-    this.data = ''
+    this.data = new Uint8Array()
     this.snapshotTokenIndex = -1
     this.metaData = {}
     this.nodes = new Uint32Array()
@@ -20,23 +20,25 @@ export class HeapSnapshotWriteStream extends Writable {
   }
 
   writeMetaData(chunk) {
-    this.data += chunk
-    const metaData = parseHeapSnapshotMetaData(this.data)
-    if (metaData !== EMPTY_DATA) {
-      this.metaData = metaData
-      this.state = HeapSnapshotParsingState.ParsingNodes
-      this.data = this.data.slice(metaData.endIndex)
-      const nodeCount = metaData.data.node_count
-      const edgeCount = metaData.data.edge_count
-      this.nodes = new Uint32Array(nodeCount)
-      this.edges = new Uint32Array(edgeCount)
-      console.log({ nodeCount, edgeCount })
+    this.data = new Uint8Array(Buffer.concat([this.data, chunk]))
+    const dataString = new TextDecoder().decode(this.data)
+    const metaData = parseHeapSnapshotMetaData(dataString)
+    if (metaData === EMPTY_DATA) {
+      return
     }
+    this.metaData = metaData
+    this.data = this.data.slice(metaData.endIndex)
+    const nodeCount = metaData.data.node_count
+    const edgeCount = metaData.data.edge_count
+    this.nodes = new Uint32Array(nodeCount)
+    this.edges = new Uint32Array(edgeCount)
+    this.state = HeapSnapshotParsingState.ParsingNodes
   }
 
   writeParsingArrayMetaData(chunk, nodeName, nextState) {
-    this.data += chunk
+    this.data = new Uint8Array(Buffer.concat([this.data, chunk]))
     const endIndex = parseHeapSnapshotArrayHeader(this.data, nodeName)
+    console.log({ endIndex })
     if (endIndex === -1) {
       return
     }

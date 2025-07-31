@@ -26,9 +26,9 @@ export const loadHeapSnapshot2 = async (path) => {
 
   // const content = await readFile(path, 'utf8')
   const read = createReadStream(path)
-  const stringTransform = new StringTransform()
+  // const stringTransform = new StringTransform()
   const write = new HeapSnapshotWriteStream()
-  await pipeline(read, stringTransform, write)
+  await pipeline(read, write)
   // const value = JSON.parse(content)
   // const mergedStrings = value.strings.join('\n')
   // value.merged = mergedStrings
