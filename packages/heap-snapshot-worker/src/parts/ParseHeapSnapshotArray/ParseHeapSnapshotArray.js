@@ -59,5 +59,6 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
   return {
     dataIndex,
     arrayIndex,
+    done:true
   }
 }
