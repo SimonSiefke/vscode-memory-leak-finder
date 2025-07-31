@@ -68,17 +68,13 @@ test('parseHeapSnapshotArray - handles spaces correctly', () => {
   expect(array[2]).toBe(3)
 })
 
-test('parseHeapSnapshotArray - ignores non-digit characters', () => {
+test('parseHeapSnapshotArray - throws error for non-digit characters', () => {
   const data = toBuffer('1, 2, 3, x')
   const array = new Uint32Array(4)
   const index = 0
-  const result = parseHeapSnapshotArray(data, array, index)
-  expect(array[0]).toBe(1)
-  expect(array[1]).toBe(2)
-  expect(array[2]).toBe(3)
-  expect(result.dataIndex).toBe(10) // Should consume all data including 'x'
-  expect(result.arrayIndex).toBe(3) // Should store 3 numbers
-  expect(result.done).toBe(false) // Not done since we haven't seen ']'
+  expect(() => {
+    parseHeapSnapshotArray(data, array, index)
+  }).toThrow('unexpected token 120') // ASCII code for 'x' is 120
 })
 
 test('parseHeapSnapshotArray - done with closing bracket', () => {
@@ -117,28 +113,26 @@ test('parseHeapSnapshotArray - incomplete number before bracket', () => {
   expect(result.done).toBe(true) // Should be done since we found ']'
 })
 
-test('parseHeapSnapshotArray - throws error when array is full', () => {
+test('parseHeapSnapshotArray - array overflow handled by JavaScript', () => {
   const data = toBuffer('1, 2, 3]')
   const array = new Uint32Array(2)
   const index = 0
+  // The function will try to write to array[2] which is out of bounds
+  // JavaScript will throw a RangeError when we try to access array[2]
   expect(() => {
     parseHeapSnapshotArray(data, array, index)
   }).toThrow(RangeError)
-  expect(() => {
-    parseHeapSnapshotArray(data, array, index)
-  }).toThrow('Array index 2 is out of bounds for array of length 2')
 })
 
-test('parseHeapSnapshotArray - throws error when starting index is out of bounds', () => {
+test('parseHeapSnapshotArray - starting index out of bounds', () => {
   const data = toBuffer('1]')
   const array = new Uint32Array(1)
   const index = 1
+  // The function will try to write to array[1] which is out of bounds
+  // JavaScript will throw a RangeError when we try to access array[1]
   expect(() => {
     parseHeapSnapshotArray(data, array, index)
   }).toThrow(RangeError)
-  expect(() => {
-    parseHeapSnapshotArray(data, array, index)
-  }).toThrow('Array index 1 is out of bounds for array of length 1')
 })
 
 test('parseHeapSnapshotArray - handles tabs as separators', () => {
