@@ -36,7 +36,8 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
         currentNumber = currentNumber * 10 + (code - CHAR_0)
         hasDigits = true
         break
-
+      case MINUS:
+        break
       case SEPARATOR:
         if (hasDigits) {
           array[arrayIndex] = currentNumber
