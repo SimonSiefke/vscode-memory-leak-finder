@@ -1,24 +1,28 @@
 import { parseHeapSnapshotMetaDataIndices } from '../ParseHeapSnapshotMetaDataIndices/ParseHeapSnapshotMetaDataIndices.js'
 
-const char0 = '0'.charCodeAt(0)
-const char1 = '1'.charCodeAt(0)
-const char2 = '2'.charCodeAt(0)
-const char3 = '3'.charCodeAt(0)
-const char4 = '4'.charCodeAt(0)
-const char5 = '5'.charCodeAt(0)
-const char6 = '6'.charCodeAt(0)
-const char7 = '7'.charCodeAt(0)
-const char8 = '8'.charCodeAt(0)
-const char9 = '9'.charCodeAt(0)
-const comma = ','.charCodeAt(0)
-const space = ' '.charCodeAt(0)
-const tab = '\t'.charCodeAt(0)
-const newline = '\n'.charCodeAt(0)
-const closingBracket = ']'.charCodeAt(0)
+// Pre-computed lookup tables for faster character classification
+const charTypes = new Uint8Array(128) // ASCII characters 0-127
+const DIGIT = 1
+const SEPARATOR = 2
+const CLOSING_BRACKET = 3
+const OTHER = 0
+
+// Initialize lookup table
+for (let i = 0; i < 128; i++) {
+  if (i >= 48 && i <= 57) { // '0' to '9'
+    charTypes[i] = DIGIT
+  } else if (i === 44 || i === 32 || i === 9 || i === 10) { // comma, space, tab, newline
+    charTypes[i] = SEPARATOR
+  } else if (i === 93) { // ']'
+    charTypes[i] = CLOSING_BRACKET
+  } else {
+    charTypes[i] = OTHER
+  }
+}
 
 /**
- * Parses comma-separated numbers from a string into a Uint32Array
- * @param {string} data - The string containing comma-separated numbers
+ * Parses comma-separated numbers from a Uint8Array buffer into a Uint32Array
+ * @param {Uint8Array} data - The buffer containing comma-separated numbers
  * @param {Uint32Array} array - The array to store parsed numbers
  * @param {number} arrayIndex - The starting index in the array
  * @returns {{dataIndex: number, arrayIndex: number, done: boolean}} - The new data index, array index, and completion status
@@ -33,54 +37,52 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
   let done = false
 
   for (let i = 0; i < dataLength; i++) {
-    const code = data.charCodeAt(i)
+    const code = data[i] // Direct array access instead of charCodeAt()
 
-    switch (code) {
-      case char0:
-      case char1:
-      case char2:
-      case char3:
-      case char4:
-      case char5:
-      case char6:
-      case char7:
-      case char8:
-      case char9:
-        currentNumber = currentNumber * 10 + (code - char0)
-        hasDigits = true
-        break
+    // Use lookup table for fast character classification
+    if (code < 128) {
+      const charType = charTypes[code]
 
-      case comma:
-      case space:
-      case tab:
-      case newline:
-        if (hasDigits) {
-          if (arrayIndex >= arrayLength) {
-            throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
+      switch (charType) {
+        case DIGIT:
+          currentNumber = currentNumber * 10 + (code - 48) // '0' = 48
+          hasDigits = true
+          break
+
+        case SEPARATOR:
+          if (hasDigits) {
+            if (arrayIndex >= arrayLength) {
+              throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
+            }
+            array[arrayIndex] = currentNumber
+            arrayIndex++
+            currentNumber = 0
+            hasDigits = false
           }
-          array[arrayIndex] = currentNumber
-          arrayIndex++
-          currentNumber = 0
-          hasDigits = false
-        }
-        break
+          break
 
-      case closingBracket:
-        if (hasDigits) {
-          if (arrayIndex >= arrayLength) {
-            throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
+        case CLOSING_BRACKET:
+          if (hasDigits) {
+            if (arrayIndex >= arrayLength) {
+              throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
+            }
+            array[arrayIndex] = currentNumber
+            arrayIndex++
           }
-          array[arrayIndex] = currentNumber
-          arrayIndex++
-        }
-        done = true
-        dataIndex = i + 1
-        return { dataIndex, arrayIndex, done }
+          done = true
+          dataIndex = i + 1
+          return { dataIndex, arrayIndex, done }
 
-      default:
-        // Non-digit, non-separator, non-bracket character - stop parsing
-        dataIndex = i
-        return { dataIndex, arrayIndex, done }
+        case OTHER:
+        default:
+          // Non-digit, non-separator, non-bracket character - stop parsing
+          dataIndex = i
+          return { dataIndex, arrayIndex, done }
+      }
+    } else {
+      // Non-ASCII character - treat as other
+      dataIndex = i
+      return { dataIndex, arrayIndex, done }
     }
   }
 
