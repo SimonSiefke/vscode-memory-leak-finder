@@ -4,18 +4,20 @@ const char0 = '0'.charCodeAt(0)
 const char9 = '9'.charCodeAt(0)
 const comma = ','.charCodeAt(0)
 const space = ' '.charCodeAt(0)
+const closingBracket = ']'.charCodeAt(0)
 
 /**
  * Parses comma-separated numbers from a string into a Uint32Array
  * @param {string} data - The string containing comma-separated numbers
  * @param {Uint32Array} array - The array to store parsed numbers
  * @param {number} arrayIndex - The starting index in the array
- * @returns {{dataIndex: number, arrayIndex: number}} - The new data index and array index
+ * @returns {{dataIndex: number, arrayIndex: number, done: boolean}} - The new data index, array index, and completion status
  */
 export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
   let currentNumber = 0
   let hasDigits = false
   let dataIndex = 0
+  let done = false
 
   for (let i = 0; i < data.length; i++) {
     const code = data.charCodeAt(i)
@@ -40,15 +42,26 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
           i++
         }
       }
+    } else if (code === closingBracket) {
+      // Closing bracket found - if we have digits, store the number and mark as done
+      if (hasDigits) {
+        if (arrayIndex < array.length) {
+          array[arrayIndex] = currentNumber
+          arrayIndex++
+        }
+      }
+      done = true
+      dataIndex = i + 1
+      break
     } else {
-      // Non-digit, non-comma character - stop parsing
+      // Non-digit, non-comma, non-bracket character - stop parsing
       break
     }
     dataIndex = i + 1
   }
 
-  // If we have digits at the end, store the number (it's complete)
-  if (hasDigits) {
+  // If we have digits at the end and no closing bracket, store the number (it's complete)
+  if (hasDigits && !done) {
     if (arrayIndex < array.length) {
       array[arrayIndex] = currentNumber
       arrayIndex++
@@ -59,6 +72,6 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
   return {
     dataIndex,
     arrayIndex,
-    done:true
+    done,
   }
 }
