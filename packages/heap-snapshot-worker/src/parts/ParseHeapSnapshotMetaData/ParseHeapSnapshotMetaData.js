@@ -15,5 +15,6 @@ export const parseHeapSnapshotMetaData = (data) => {
   return {
     couldParse: true,
     data: parsed,
+    endIndex,
   }
 }

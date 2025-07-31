@@ -1,8 +1,3 @@
-const State = {
-  TopLevel: 0,
-  InsideString: 1,
-}
-
 const Character = {
   Quote: '"',
   CurlyOpen: '{',
@@ -13,10 +8,14 @@ const Character = {
 
 export const getBalancedJsonIndices = (data, startIndex) => {
   let balance = 0
-  let state = State.TopLevel
   for (let i = startIndex; i < data.length; i++) {
     switch (data[i]) {
       case Character.Quote:
+        const endIndex = data.indexOf(Character.Quote, i + 1)
+        if (endIndex === -1) {
+          return -1
+        }
+        i = endIndex + 1
         break
       case Character.CurlyOpen:
         balance++
@@ -32,10 +31,6 @@ export const getBalancedJsonIndices = (data, startIndex) => {
       case Character.SquareClose:
         break
     }
-    // switch(state){
-    // case State.TopLevel
-    // }
-    const char = data[i]
   }
   return -1
 }
