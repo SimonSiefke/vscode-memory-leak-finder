@@ -113,26 +113,31 @@ test('parseHeapSnapshotArray - incomplete number before bracket', () => {
   expect(result.done).toBe(true) // Should be done since we found ']'
 })
 
-test('parseHeapSnapshotArray - array overflow handled by JavaScript', () => {
+test('parseHeapSnapshotArray - array overflow handled silently', () => {
   const data = toBuffer('1, 2, 3]')
   const array = new Uint32Array(2)
   const index = 0
   // The function will try to write to array[2] which is out of bounds
-  // JavaScript will throw a RangeError when we try to access array[2]
-  expect(() => {
-    parseHeapSnapshotArray(data, array, index)
-  }).toThrow(RangeError)
+  // TypedArrays don't throw errors for out-of-bounds access, they just silently fail
+  const result = parseHeapSnapshotArray(data, array, index)
+  expect(array[0]).toBe(1)
+  expect(array[1]).toBe(2)
+  // array[2] would be undefined if we could access it, but it's out of bounds
+  expect(result.arrayIndex).toBe(3) // The function thinks it wrote 3 values
+  expect(result.done).toBe(true)
 })
 
-test('parseHeapSnapshotArray - starting index out of bounds', () => {
+test('parseHeapSnapshotArray - starting index out of bounds handled silently', () => {
   const data = toBuffer('1]')
   const array = new Uint32Array(1)
   const index = 1
   // The function will try to write to array[1] which is out of bounds
-  // JavaScript will throw a RangeError when we try to access array[1]
-  expect(() => {
-    parseHeapSnapshotArray(data, array, index)
-  }).toThrow(RangeError)
+  // TypedArrays don't throw errors for out-of-bounds access, they just silently fail
+  const result = parseHeapSnapshotArray(data, array, index)
+  expect(array[0]).toBe(0) // Unchanged
+  // array[1] would be undefined if we could access it, but it's out of bounds
+  expect(result.arrayIndex).toBe(2) // The function thinks it wrote to index 1
+  expect(result.done).toBe(true)
 })
 
 test('parseHeapSnapshotArray - handles tabs as separators', () => {
