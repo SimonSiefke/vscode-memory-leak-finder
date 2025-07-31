@@ -121,28 +121,28 @@ test('parseHeapSnapshotArray - incomplete number before bracket', () => {
   expect(result.done).toBe(true) // Should be done since we found ']'
 })
 
-test('parseHeapSnapshotArray - throws error when array index out of bounds', () => {
+test('parseHeapSnapshotArray - throws error when array is full', () => {
   const data = `1, 2, 3]`
   const array = new Uint32Array(2) // Array can only hold 2 numbers
   const index = 0
-  const result = parseHeapSnapshotArray(data, array, index)
-  expect(array[0]).toBe(1)
-  expect(array[1]).toBe(2)
-  expect(array[2]).toBe(0) // Should not be set (array only has 2 elements)
-  expect(result.dataIndex).toBe(4) // Should stop at position 4 (after "1, 2")
-  expect(result.arrayIndex).toBe(2) // Should have stored 2 numbers
-  expect(result.done).toBe(false) // Should not be done since we stopped due to array being full
+  expect(() => {
+    parseHeapSnapshotArray(data, array, index)
+  }).toThrow(RangeError)
+  expect(() => {
+    parseHeapSnapshotArray(data, array, index)
+  }).toThrow('Array index 2 is out of bounds for array of length 2')
 })
 
 test('parseHeapSnapshotArray - throws error when starting index is out of bounds', () => {
   const data = `1]`
   const array = new Uint32Array(1)
   const index = 1 // Starting at index 1, but array only has length 1
-  const result = parseHeapSnapshotArray(data, array, index)
-  expect(array[0]).toBe(0) // Should not be set since we started at index 1
-  expect(result.dataIndex).toBe(0) // Should stop immediately
-  expect(result.arrayIndex).toBe(1) // Should return the starting index
-  expect(result.done).toBe(false) // Should not be done
+  expect(() => {
+    parseHeapSnapshotArray(data, array, index)
+  }).toThrow(RangeError)
+  expect(() => {
+    parseHeapSnapshotArray(data, array, index)
+  }).toThrow('Array index 1 is out of bounds for array of length 1')
 })
 
 test('parseHeapSnapshotArray - handles tabs as separators', () => {
