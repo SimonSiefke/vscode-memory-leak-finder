@@ -21,7 +21,6 @@ export class HeapSnapshotWriteStream extends Writable {
     this.locations = new Uint32Array()
     this.metaData = {}
     this.nodes = new Uint32Array()
-    this.snapshotTokenIndex = -1
     this.state = HeapSnapshotParsingState.SearchingSnapshotMetaData
   }
 
