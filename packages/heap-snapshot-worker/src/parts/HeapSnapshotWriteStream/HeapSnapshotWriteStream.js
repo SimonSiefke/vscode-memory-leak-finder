@@ -60,7 +60,6 @@ export class HeapSnapshotWriteStream extends Writable {
 
   writeArrayData(chunk, array, nextState) {
     this.data = concatArray(this.data, chunk)
-    console.log('datalength', this.data.length, 'index', this.arrayIndex)
     const { dataIndex, arrayIndex, done } = parseHeapSnapshotArray(this.data, array, this.arrayIndex)
     if (dataIndex === -1) {
       return
@@ -88,10 +87,9 @@ export class HeapSnapshotWriteStream extends Writable {
 
   writeParsingEdges(chunk) {
     this.writeArrayData(chunk, this.edges, HeapSnapshotParsingState.Done)
-    // this.state = HeapSnapshotParsingState.Done
   }
 
-  async _write(chunk, encoding, callback) {
+  _write(chunk, encoding, callback) {
     switch (this.state) {
       case HeapSnapshotParsingState.SearchingSnapshotMetaData:
         this.writeMetaData(chunk)
