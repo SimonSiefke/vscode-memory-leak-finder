@@ -1,7 +1,6 @@
-import { createCharTypesLookupTable } from '../CreateCharTypesLookupTable/CreateCharTypesLookupTable.js'
+import { charTypes } from '../CreateCharTypesLookupTable/CreateCharTypesLookupTable.js'
 
 // Pre-computed lookup tables for faster character classification
-const charTypes = createCharTypesLookupTable()
 const DIGIT = 1
 const SEPARATOR = 2
 const CLOSING_BRACKET = 3
