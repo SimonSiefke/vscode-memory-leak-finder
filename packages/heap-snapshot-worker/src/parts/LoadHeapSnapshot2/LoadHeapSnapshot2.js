@@ -9,9 +9,16 @@ import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.
 export const loadHeapSnapshot2 = async (path) => {
   const read = createReadStream(path)
 
-  const { metaData, nodes, edges } = await prepareHeapSnapshot(read)
+  const { metaData, nodes, edges, locations } = await prepareHeapSnapshot(read)
 
-  console.log({ metaData, nodes, edges })
+  console.log({ locations: locations.length })
+
+  // for (const node of edges) {
+  //   if (node > 2 ** 16 - 1) {
+  //     console.log('is large', node)
+  //   }
+  // }
+  // console.log({ metaData, nodes, edges })
 
   // TODO create lightweight facade around nodes and edges,
   // making traversing nodes and edges fast and efficient

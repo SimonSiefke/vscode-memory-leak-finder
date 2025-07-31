@@ -26,7 +26,7 @@ export class HeapSnapshotWriteStream extends Writable {
     this.arrayIndex = 0
     this.data = new Uint8Array()
     this.edges = new Uint32Array()
-    this.locationsState = { array: null, buffer: null, capacity: 0 }
+    this.locations = new Uint32Array()
     this.metaData = {}
     this.nodes = new Uint32Array()
     this.snapshotTokenIndex = -1
@@ -167,7 +167,7 @@ export class HeapSnapshotWriteStream extends Writable {
       metaData: this.metaData,
       edges: this.edges,
       nodes: this.nodes,
-      locations: this.locationsState.array,
+      locations: this.locations,
       // TODO parse strings?
     }
   }
