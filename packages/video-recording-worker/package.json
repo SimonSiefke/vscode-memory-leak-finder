@@ -13,7 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "@lvce-editor/assert": "^1.4.0",
-    "@lvce-editor/json-rpc": "^6.2.0",
+    "@lvce-editor/json-rpc": "^7.0.0",
     "@lvce-editor/verror": "^1.7.0",
     "execa": "^9.6.0",
     "ws": "^8.18.3"
