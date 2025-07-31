@@ -4,7 +4,7 @@ import { Writable } from 'node:stream'
 import * as HeapSnapshotParsingState from '../HeapSnapshotParsingState/HeapSnapshotParsingState.js'
 import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.js'
 import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.js'
-import { parseHeapSnapshotArray } from '../ParseHeapSnapshotArray/ParseHeapSnapshotArray.js'
+import { parseHeapSnapshotArray, parseHeapSnapshotArrayWithDynamicSize } from '../ParseHeapSnapshotArray/ParseHeapSnapshotArray.js'
 
 const concatArray = (array, other) => {
   // TODO check if concatenating many uint8 arrays could possibly negatively impact performance
@@ -23,7 +23,7 @@ export class HeapSnapshotWriteStream extends Writable {
     this.arrayIndex = 0
     this.data = new Uint8Array()
     this.edges = new Uint32Array()
-    this.locations = new Uint32Array()
+    this.locationsState = { array: null, buffer: null, capacity: 0 }
     this.metaData = {}
     this.nodes = new Uint32Array()
     this.snapshotTokenIndex = -1
@@ -97,8 +97,24 @@ export class HeapSnapshotWriteStream extends Writable {
     this.writeParsingArrayMetaData(chunk, 'locations', HeapSnapshotParsingState.ParsingLocations)
   }
 
+  writeResizableArrayData(chunk, nextState) {
+    this.data = concatArray(this.data, chunk)
+
+    const { dataIndex, arrayIndex, done } = parseHeapSnapshotArrayWithDynamicSize(this.data, this.locationsState, this.arrayIndex)
+    if (dataIndex === -1) {
+      return
+    }
+
+    this.arrayIndex = arrayIndex
+    this.data = this.data.slice(dataIndex)
+
+    if (done) {
+      this.state = nextState
+    }
+  }
+
   writeParsingLocations(chunk) {
-    this.writeArrayData(chunk, this.locations, HeapSnapshotParsingState.Done)
+    this.writeResizableArrayData(chunk, HeapSnapshotParsingState.Done)
   }
 
   _write(chunk, encoding, callback) {
@@ -118,6 +134,12 @@ export class HeapSnapshotWriteStream extends Writable {
       case HeapSnapshotParsingState.ParsingEdges:
         this.writeParsingEdges(chunk)
         break
+      case HeapSnapshotParsingState.ParsingLocationsMetaData:
+        this.writeParsingLocationsMetaData(chunk)
+        break
+      case HeapSnapshotParsingState.ParsingLocations:
+        this.writeParsingLocations(chunk)
+        break
       default:
         break
     }
@@ -131,7 +153,7 @@ export class HeapSnapshotWriteStream extends Writable {
       metaData: this.metaData,
       edges: this.edges,
       nodes: this.nodes,
-      locations: this.locations,
+      locations: this.locationsState.array,
       // TODO parse strings?
     }
   }
