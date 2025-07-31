@@ -20,7 +20,7 @@
     "@vscode/test-electron": "^2.5.2",
     "exit-hook": "^4.0.0",
     "got": "^14.4.7",
-    "source-map": "^0.7.4",
+    "source-map": "^0.7.6",
     "strip-ansi": "^7.1.0",
     "ws": "^8.18.3"
   },
