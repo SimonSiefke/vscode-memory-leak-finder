@@ -1,9 +1,9 @@
-const vscode = require("vscode");
+const vscode = require('vscode')
 
 const showNotification = async () => {
-  await vscode.window.showInformationMessage("Hello World!");
-};
+  await vscode.window.showInformationMessage('Hello World!')
+}
 
 exports.activate = () => {
-  vscode.commands.registerCommand("extension.helloWorld", showNotification);
-};
+  vscode.commands.registerCommand('extension.helloWorld', showNotification)
+}
