@@ -64,7 +64,6 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex, currentNumber = 
           currentNumber: 0,
           hasDigits: false,
         }
-
       default:
         // Ignore other characters (including MINUS)
         break
