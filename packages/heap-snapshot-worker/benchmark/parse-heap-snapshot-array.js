@@ -1,8 +1,9 @@
 import { parseHeapSnapshotArray } from '../src/parts/ParseHeapSnapshotArray/ParseHeapSnapshotArray.js'
 import { readFileSync } from 'fs'
+import { join } from 'path'
 
 // Read the real heap snapshot file as a buffer
-const heapSnapshotPath = '../../.vscode-heapsnapshots/1.json'
+const heapSnapshotPath = join(import.meta.dirname, '../../../.vscode-heapsnapshots/1.json')
 console.log('Reading heap snapshot from:', heapSnapshotPath)
 
 // Read the file as a buffer for better performance
@@ -84,7 +85,7 @@ console.log(`Total iterations: ${iterations}`)
 console.log(`Total time: ${totalTime.toFixed(2)}ms`)
 console.log(`Average time per iteration: ${avgTime.toFixed(3)}ms`)
 console.log(`Numbers parsed per second: ${numbersPerSecond.toFixed(0)}`)
-console.log(`Bytes processed per second: ${((sampleData.length * iterations) / totalTime * 1000).toFixed(0)}`)
+console.log(`Bytes processed per second: ${(((sampleData.length * iterations) / totalTime) * 1000).toFixed(0)}`)
 
 // Test with different chunk sizes to simulate streaming
 console.log('\n=== STREAMING SIMULATION (BUFFER-BASED) ===')
