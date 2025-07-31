@@ -2,9 +2,10 @@
 
 import { Writable } from 'node:stream'
 import * as HeapSnapshotParsingState from '../HeapSnapshotParsingState/HeapSnapshotParsingState.js'
+import { parseHeapSnapshotArray } from '../ParseHeapSnapshotArray/ParseHeapSnapshotArray.js'
 import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.js'
+import { parseHeapSnapshotArrayWithDynamicSize } from '../ParseHeapSnapshotArrayWithDynamicSize/ParseHeapSnapshotArrayWithDynamicSize.js'
 import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.js'
-import { parseHeapSnapshotArray, parseHeapSnapshotArrayWithDynamicSize } from '../ParseHeapSnapshotArray/ParseHeapSnapshotArray.js'
 
 const concatArray = (array, other) => {
   // TODO check if concatenating many uint8 arrays could possibly negatively impact performance
@@ -17,9 +18,7 @@ const decodeArray = (data) => {
 
 export class HeapSnapshotWriteStream extends Writable {
   constructor() {
-    super({
-      objectMode: true, // TODO?
-    })
+    super()
     this.arrayIndex = 0
     this.data = new Uint8Array()
     this.edges = new Uint32Array()
@@ -28,6 +27,7 @@ export class HeapSnapshotWriteStream extends Writable {
     this.nodes = new Uint32Array()
     this.snapshotTokenIndex = -1
     this.state = HeapSnapshotParsingState.SearchingSnapshotMetaData
+    console.log({ watermark: this.writableHighWaterMark })
   }
 
   writeMetaData(chunk) {
