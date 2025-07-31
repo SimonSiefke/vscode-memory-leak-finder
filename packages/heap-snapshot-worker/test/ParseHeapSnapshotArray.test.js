@@ -68,13 +68,17 @@ test('parseHeapSnapshotArray - handles spaces correctly', () => {
   expect(array[2]).toBe(3)
 })
 
-test('parseHeapSnapshotArray - stops at non-digit character', () => {
+test('parseHeapSnapshotArray - ignores non-digit characters', () => {
   const data = toBuffer('1, 2, 3, x')
   const array = new Uint32Array(4)
   const index = 0
-  expect(() => {
-    parseHeapSnapshotArray(data, array, index)
-  }).toThrow(new Error('unexpected token'))
+  const result = parseHeapSnapshotArray(data, array, index)
+  expect(array[0]).toBe(1)
+  expect(array[1]).toBe(2)
+  expect(array[2]).toBe(3)
+  expect(result.dataIndex).toBe(10) // Should consume all data including 'x'
+  expect(result.arrayIndex).toBe(3) // Should store 3 numbers
+  expect(result.done).toBe(false) // Not done since we haven't seen ']'
 })
 
 test('parseHeapSnapshotArray - done with closing bracket', () => {
@@ -198,28 +202,28 @@ test('parseHeapSnapshotArray - streaming with incomplete number', () => {
   expect(result2.arrayIndex).toBe(3) // Should store 2 more numbers
 })
 
-test('parseHeapSnapshotArray - handles negative numbers', () => {
+test('parseHeapSnapshotArray - ignores negative signs', () => {
   const data = toBuffer('-1, -2, -3]')
-  const array = new Int32Array(3)
+  const array = new Uint32Array(3)
   const index = 0
   const result = parseHeapSnapshotArray(data, array, index)
-  expect(array[0]).toBe(-1)
-  expect(array[1]).toBe(-2)
-  expect(array[2]).toBe(-3)
+  expect(array[0]).toBe(1)
+  expect(array[1]).toBe(2)
+  expect(array[2]).toBe(3)
   expect(result.dataIndex).toBe(11) // Should consume the entire string including ']'
   expect(result.arrayIndex).toBe(3) // Should store all 3 numbers
   expect(result.done).toBe(true) // Should be done since we found ']'
 })
 
-test('parseHeapSnapshotArray - handles mixed positive and negative numbers', () => {
+test('parseHeapSnapshotArray - ignores negative signs in mixed numbers', () => {
   const data = toBuffer('1, -2, 3, -4]')
-  const array = new Int32Array(4)
+  const array = new Uint32Array(4)
   const index = 0
   const result = parseHeapSnapshotArray(data, array, index)
   expect(array[0]).toBe(1)
-  expect(array[1]).toBe(-2)
+  expect(array[1]).toBe(2)
   expect(array[2]).toBe(3)
-  expect(array[3]).toBe(-4)
+  expect(array[3]).toBe(4)
   expect(result.dataIndex).toBe(13) // Should consume the entire string including ']'
   expect(result.arrayIndex).toBe(4) // Should store all 4 numbers
   expect(result.done).toBe(true) // Should be done since we found ']'
@@ -229,13 +233,13 @@ test('parseHeapSnapshotArray - simulates original edges parsing error', () => {
   // This test simulates the original error where edges contained negative numbers
   // and the parser would throw "unexpected token 45" (ASCII code for '-')
   const data = toBuffer('1, -2, 3, -4, 5]')
-  const array = new Int32Array(5)
+  const array = new Uint32Array(5)
   const index = 0
   const result = parseHeapSnapshotArray(data, array, index)
   expect(array[0]).toBe(1)
-  expect(array[1]).toBe(-2)
+  expect(array[1]).toBe(2)
   expect(array[2]).toBe(3)
-  expect(array[3]).toBe(-4)
+  expect(array[3]).toBe(4)
   expect(array[4]).toBe(5)
   expect(result.done).toBe(true)
   // This should not throw "unexpected token 45" anymore
