@@ -72,13 +72,9 @@ test('parseHeapSnapshotArray - stops at non-digit character', () => {
   const data = toBuffer('1, 2, 3, x')
   const array = new Uint32Array(4)
   const index = 0
-  const result = parseHeapSnapshotArray(data, array, index)
-  expect(array[0]).toBe(1)
-  expect(array[1]).toBe(2)
-  expect(array[2]).toBe(3)
-  expect(array[3]).toBe(0) // Should not be set
-  expect(result.dataIndex).toBe(9) // Should stop at 'x' (position 9)
-  expect(result.arrayIndex).toBe(3) // Should store 3 numbers
+  expect(() => {
+    parseHeapSnapshotArray(data, array, index)
+  }).toThrow(new Error('unexpected token'))
 })
 
 test('parseHeapSnapshotArray - done with closing bracket', () => {
@@ -126,7 +122,7 @@ test('parseHeapSnapshotArray - throws error when array is full', () => {
   }).toThrow(RangeError)
   expect(() => {
     parseHeapSnapshotArray(data, array, index)
-  }).toThrow('Array index 2 is out of bounds for array of length 2')
+  }).toThrow('Array index 3 is out of bounds for array of length 2')
 })
 
 test('parseHeapSnapshotArray - throws error when starting index is out of bounds', () => {
@@ -138,7 +134,7 @@ test('parseHeapSnapshotArray - throws error when starting index is out of bounds
   }).toThrow(RangeError)
   expect(() => {
     parseHeapSnapshotArray(data, array, index)
-  }).toThrow('Array index 1 is out of bounds for array of length 1')
+  }).toThrow('Array index 2 is out of bounds for array of length 1')
 })
 
 test('parseHeapSnapshotArray - handles tabs as separators', () => {

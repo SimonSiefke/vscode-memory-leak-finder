@@ -44,7 +44,7 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
           array[arrayIndex] = currentNumber
           arrayIndex++
         }
-        if (arrayIndex >= arrayLength) {
+        if (arrayIndex > arrayLength) {
           throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
         }
         return {
@@ -54,8 +54,7 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
         }
 
       default:
-        // Non-digit, non-separator, non-bracket character - stop parsing
-        return { dataIndex: i, arrayIndex, done }
+        throw new Error(`unexpected token`)
     }
   }
 
