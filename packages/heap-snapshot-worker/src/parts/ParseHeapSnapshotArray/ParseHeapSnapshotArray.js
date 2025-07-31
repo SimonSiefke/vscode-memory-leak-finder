@@ -3,28 +3,30 @@ import { charTypes } from '../CreateCharTypesLookupTable/CreateCharTypesLookupTa
 const DIGIT = 1
 const SEPARATOR = 2
 const CLOSING_BRACKET = 3
+const MINUS = 4
 const CHAR_0 = '0'.charCodeAt(0)
 
 const getDigitCount = (number) => {
   if (number === 0) {
     return 1
   }
-  return Math.floor(Math.log10(number)) + 1
+  return Math.floor(Math.log10(Math.abs(number))) + 1
 }
 
 /**
- * Parses comma-separated numbers from a Uint8Array buffer into a Uint32Array
+ * Parses comma-separated numbers from a Uint8Array buffer into a number array
  * @param {Uint8Array} data - The buffer containing comma-separated numbers
- * @param {Uint32Array} array - The array to store parsed numbers
+ * @param {any} array - The array to store parsed numbers
  * @param {number} arrayIndex - The starting index in the array
  * @returns {{dataIndex: number, arrayIndex: number, done: boolean}} - The new data index, array index, and completion status
- * @throws {RangeError} When array index is out of bounds (except when reaching closing bracket)
+ * @throws {RangeError} When array index is out of bounds
  */
 export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
   const dataLength = data.length
   const arrayLength = array.length
   let currentNumber = 0
   let hasDigits = false
+  let isNegative = false
   let done = false
 
   for (let i = 0; i < dataLength; i++) {
@@ -37,17 +39,38 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
         hasDigits = true
         break
 
+      case MINUS:
+        if (!hasDigits && !isNegative) {
+          isNegative = true
+        } else {
+          throw new Error('unexpected token')
+        }
+        break
+
       case SEPARATOR:
         if (hasDigits) {
+          if (isNegative) {
+            currentNumber = -currentNumber
+          }
+          if (arrayIndex >= arrayLength) {
+            throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
+          }
           array[arrayIndex] = currentNumber
           arrayIndex++
           currentNumber = 0
           hasDigits = false
+          isNegative = false
         }
         break
 
       case CLOSING_BRACKET:
         if (hasDigits) {
+          if (isNegative) {
+            currentNumber = -currentNumber
+          }
+          if (arrayIndex >= arrayLength) {
+            throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
+          }
           array[arrayIndex] = currentNumber
           arrayIndex++
         }
@@ -59,8 +82,7 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
         }
 
       default:
-        console.log({ arrayIndex })
-        throw new Error(`unexpected token ${code}`)
+        throw new Error('unexpected token')
     }
   }
 
