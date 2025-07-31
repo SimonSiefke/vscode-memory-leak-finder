@@ -5,6 +5,13 @@ const SEPARATOR = 2
 const CLOSING_BRACKET = 3
 const CHAR_0 = '0'.charCodeAt(0)
 
+const getDigitCount = (number) => {
+  if (number === 0) {
+    return 1
+  }
+  return Math.floor(Math.log10(number)) + 1
+}
+
 /**
  * Parses comma-separated numbers from a Uint8Array buffer into a Uint32Array
  * @param {Uint8Array} data - The buffer containing comma-separated numbers
@@ -61,7 +68,7 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
 
   // If we have digits at the end, backtrack to the beginning of the current number
   if (hasDigits) {
-    const digitCount = Math.floor(Math.log10(currentNumber)) + 1
+    const digitCount = getDigitCount(currentNumber)
     return {
       dataIndex: dataLength - digitCount,
       arrayIndex,
