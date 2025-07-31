@@ -5,7 +5,7 @@ import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
 import { normalizeFunctionObjects } from '../NormalizeFunctionObjects/NormalizeFunctionObjects.js'
 import { aggregateFunctionObjects } from '../AggregateFunctionObjects/AggregateFunctionObjects.js'
 
-export const getNamedFunctionCountFromHeapSnapshot = async (id, scriptMap) => {
+export const getNamedFunctionCountFromHeapSnapshot = async (id, scriptMap, minCount) => {
   const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
   console.time('parse')
@@ -22,18 +22,7 @@ export const getNamedFunctionCountFromHeapSnapshot = async (id, scriptMap) => {
   console.timeEnd('aggregate')
   console.time('sort')
   const sorted = aggregated.toSorted((a, b) => b.count - a.count)
-  const limited = sorted.filter((item) => item.count > 1)
+  const limited = sorted.filter((item) => item.count >= minCount)
   console.timeEnd('sort')
-  // console.log(JSON.stringify(sorted.slice(0, sorted.length / 20)).length)
   return limited
 }
-
-// const path = join(import.meta.dirname, '../../../../../.vscode-heapsnapshots', '1.json')
-// const content = readFileSync(path, 'utf8')
-// const parsed = JSON.parse(content)
-// const pathScriptMap = join(import.meta.dirname, '../../../../../.vscode-heapsnapshots', 'scriptMap.json')
-// const contentScriptMap = readFileSync(pathScriptMap, 'utf8')
-// const parsedContentScriptMap = JSON.parse(contentScriptMap)
-
-// const result = await getNamedFunctionCountFromHeapSnapshot(parsed, parsedContentScriptMap)
-// writeFileSync('/tmp/parsed-nodes.json', JSON.stringify(result, null, 2) + '\n')
