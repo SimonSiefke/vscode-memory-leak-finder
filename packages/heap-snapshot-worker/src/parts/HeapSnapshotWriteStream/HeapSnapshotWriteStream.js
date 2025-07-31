@@ -33,8 +33,8 @@ export class HeapSnapshotWriteStream extends Writable {
     if (metaData === EMPTY_DATA) {
       return
     }
-    const nodeCount = metaData.data.node_count
-    const edgeCount = metaData.data.edge_count
+    const nodeCount = metaData.data.node_count * metaData.data.meta.node_fields.length
+    const edgeCount = metaData.data.edge_count * metaData.data.meta.edge_fields.length
     this.metaData = metaData
     this.data = this.data.slice(metaData.endIndex)
     this.nodes = new Uint32Array(nodeCount)
