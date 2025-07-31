@@ -56,9 +56,9 @@ test('parseHeapSnapshotArray - incomplete number at end', () => {
   const index = 0
   const result = parseHeapSnapshotArray(data, array, index)
   expect(array[0]).toBe(1)
-  expect(array[1]).toBe(22)
+  expect(array[1]).toBe(0) // Should not store the incomplete number 22
   expect(result.dataIndex).toBe(5) // Should consume all data
-  expect(result.arrayIndex).toBe(2) // Should store both numbers
+  expect(result.arrayIndex).toBe(1) // Should only store the complete number
 })
 
 test('parseHeapSnapshotArray - handles spaces correctly', () => {
@@ -143,4 +143,44 @@ test('parseHeapSnapshotArray - throws error when starting index is out of bounds
   expect(() => {
     parseHeapSnapshotArray(data, array, index)
   }).toThrow('Array index 1 is out of bounds for array of length 1')
+})
+
+test('parseHeapSnapshotArray - handles tabs as separators', () => {
+  const data = `1\t2\t3]`
+  const array = new Uint32Array(3)
+  const index = 0
+  const result = parseHeapSnapshotArray(data, array, index)
+  expect(array[0]).toBe(1)
+  expect(array[1]).toBe(2)
+  expect(array[2]).toBe(3)
+  expect(result.dataIndex).toBe(6) // Should consume the entire string including ']' (positions 0-5)
+  expect(result.arrayIndex).toBe(3) // Should store all 3 numbers
+  expect(result.done).toBe(true) // Should be done since we found ']'
+})
+
+test('parseHeapSnapshotArray - handles newlines as separators', () => {
+  const data = `1\n2\n3]`
+  const array = new Uint32Array(3)
+  const index = 0
+  const result = parseHeapSnapshotArray(data, array, index)
+  expect(array[0]).toBe(1)
+  expect(array[1]).toBe(2)
+  expect(array[2]).toBe(3)
+  expect(result.dataIndex).toBe(6) // Should consume the entire string including ']' (positions 0-5)
+  expect(result.arrayIndex).toBe(3) // Should store all 3 numbers
+  expect(result.done).toBe(true) // Should be done since we found ']'
+})
+
+test('parseHeapSnapshotArray - handles mixed separators', () => {
+  const data = `1, 2\t3\n4]`
+  const array = new Uint32Array(4)
+  const index = 0
+  const result = parseHeapSnapshotArray(data, array, index)
+  expect(array[0]).toBe(1)
+  expect(array[1]).toBe(2)
+  expect(array[2]).toBe(3)
+  expect(array[3]).toBe(4)
+  expect(result.dataIndex).toBe(9) // Should consume the entire string including ']' (positions 0-8)
+  expect(result.arrayIndex).toBe(4) // Should store all 4 numbers
+  expect(result.done).toBe(true) // Should be done since we found ']'
 })

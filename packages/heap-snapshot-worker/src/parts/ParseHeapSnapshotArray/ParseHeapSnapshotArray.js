@@ -1,9 +1,19 @@
 import { parseHeapSnapshotMetaDataIndices } from '../ParseHeapSnapshotMetaDataIndices/ParseHeapSnapshotMetaDataIndices.js'
 
 const char0 = '0'.charCodeAt(0)
+const char1 = '1'.charCodeAt(0)
+const char2 = '2'.charCodeAt(0)
+const char3 = '3'.charCodeAt(0)
+const char4 = '4'.charCodeAt(0)
+const char5 = '5'.charCodeAt(0)
+const char6 = '6'.charCodeAt(0)
+const char7 = '7'.charCodeAt(0)
+const char8 = '8'.charCodeAt(0)
 const char9 = '9'.charCodeAt(0)
 const comma = ','.charCodeAt(0)
 const space = ' '.charCodeAt(0)
+const tab = '\t'.charCodeAt(0)
+const newline = '\n'.charCodeAt(0)
 const closingBracket = ']'.charCodeAt(0)
 
 /**
@@ -25,59 +35,56 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
   for (let i = 0; i < dataLength; i++) {
     const code = data.charCodeAt(i)
 
-    if (char0 <= code && code <= char9) {
-      // Digit found
-      currentNumber = currentNumber * 10 + (code - char0)
-      hasDigits = true
-    } else if (code === comma || code === space) {
-      // Comma or space found - if we have digits, store the number
-      if (hasDigits) {
-        if (arrayIndex >= arrayLength) {
-          throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
+    switch (code) {
+      case char0:
+      case char1:
+      case char2:
+      case char3:
+      case char4:
+      case char5:
+      case char6:
+      case char7:
+      case char8:
+      case char9:
+        currentNumber = currentNumber * 10 + (code - char0)
+        hasDigits = true
+        break
+
+      case comma:
+      case space:
+      case tab:
+      case newline:
+        if (hasDigits) {
+          if (arrayIndex >= arrayLength) {
+            throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
+          }
+          array[arrayIndex] = currentNumber
+          arrayIndex++
+          currentNumber = 0
+          hasDigits = false
         }
-        array[arrayIndex] = currentNumber
-        arrayIndex++
-        currentNumber = 0
-        hasDigits = false
-      }
-      // Skip spaces after comma
-      if (code === comma) {
-        while (i + 1 < dataLength && data.charCodeAt(i + 1) === space) {
-          i++
+        break
+
+      case closingBracket:
+        if (hasDigits) {
+          if (arrayIndex >= arrayLength) {
+            throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
+          }
+          array[arrayIndex] = currentNumber
+          arrayIndex++
         }
-      }
-    } else if (code === closingBracket) {
-      // Closing bracket found - if we have digits, store the number and mark as done
-      if (hasDigits) {
-        if (arrayIndex >= arrayLength) {
-          throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
-        }
-        array[arrayIndex] = currentNumber
-        arrayIndex++
-      }
-      done = true
-      dataIndex = i + 1
-      break
-    } else {
-      // Non-digit, non-comma, non-bracket character - stop parsing
-      break
+        done = true
+        dataIndex = i + 1
+        return { dataIndex, arrayIndex, done }
+
+      default:
+        // Non-digit, non-separator, non-bracket character - stop parsing
+        dataIndex = i
+        return { dataIndex, arrayIndex, done }
     }
-    dataIndex = i + 1
   }
 
-  // If we have digits at the end and no closing bracket, store the number (it's complete)
-  if (hasDigits && !done) {
-    if (arrayIndex >= arrayLength) {
-      throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
-    }
-    array[arrayIndex] = currentNumber
-    arrayIndex++
-    dataIndex = dataLength
-  }
-
-  return {
-    dataIndex,
-    arrayIndex,
-    done,
-  }
+  // If we have digits at the end, don't store them - more data might come in next chunk
+  dataIndex = dataLength
+  return { dataIndex, arrayIndex, done }
 }
