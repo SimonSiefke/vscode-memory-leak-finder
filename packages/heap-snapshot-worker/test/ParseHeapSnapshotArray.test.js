@@ -120,3 +120,27 @@ test('parseHeapSnapshotArray - incomplete number before bracket', () => {
   expect(result.arrayIndex).toBe(2) // Should store both numbers
   expect(result.done).toBe(true) // Should be done since we found ']'
 })
+
+test('parseHeapSnapshotArray - throws error when array index out of bounds', () => {
+  const data = `1, 2, 3]`
+  const array = new Uint32Array(2) // Array can only hold 2 numbers
+  const index = 0
+  expect(() => {
+    parseHeapSnapshotArray(data, array, index)
+  }).toThrow(RangeError)
+  expect(() => {
+    parseHeapSnapshotArray(data, array, index)
+  }).toThrow('Array index 2 is out of bounds for array of length 2')
+})
+
+test('parseHeapSnapshotArray - throws error when starting index is out of bounds', () => {
+  const data = `1]`
+  const array = new Uint32Array(1)
+  const index = 1 // Starting at index 1, but array only has length 1
+  expect(() => {
+    parseHeapSnapshotArray(data, array, index)
+  }).toThrow(RangeError)
+  expect(() => {
+    parseHeapSnapshotArray(data, array, index)
+  }).toThrow('Array index 1 is out of bounds for array of length 1')
+})

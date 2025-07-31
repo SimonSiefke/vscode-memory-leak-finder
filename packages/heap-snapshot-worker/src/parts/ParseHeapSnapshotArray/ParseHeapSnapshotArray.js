@@ -12,6 +12,7 @@ const closingBracket = ']'.charCodeAt(0)
  * @param {Uint32Array} array - The array to store parsed numbers
  * @param {number} arrayIndex - The starting index in the array
  * @returns {{dataIndex: number, arrayIndex: number, done: boolean}} - The new data index, array index, and completion status
+ * @throws {RangeError} When array index is out of bounds
  */
 export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
   let currentNumber = 0
@@ -29,10 +30,11 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
     } else if (code === comma || code === space) {
       // Comma or space found - if we have digits, store the number
       if (hasDigits) {
-        if (arrayIndex < array.length) {
-          array[arrayIndex] = currentNumber
-          arrayIndex++
+        if (arrayIndex >= array.length) {
+          throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${array.length}`)
         }
+        array[arrayIndex] = currentNumber
+        arrayIndex++
         currentNumber = 0
         hasDigits = false
       }
@@ -45,10 +47,11 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
     } else if (code === closingBracket) {
       // Closing bracket found - if we have digits, store the number and mark as done
       if (hasDigits) {
-        if (arrayIndex < array.length) {
-          array[arrayIndex] = currentNumber
-          arrayIndex++
+        if (arrayIndex >= array.length) {
+          throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${array.length}`)
         }
+        array[arrayIndex] = currentNumber
+        arrayIndex++
       }
       done = true
       dataIndex = i + 1
@@ -62,10 +65,11 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
 
   // If we have digits at the end and no closing bracket, store the number (it's complete)
   if (hasDigits && !done) {
-    if (arrayIndex < array.length) {
-      array[arrayIndex] = currentNumber
-      arrayIndex++
+    if (arrayIndex >= array.length) {
+      throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${array.length}`)
     }
+    array[arrayIndex] = currentNumber
+    arrayIndex++
     dataIndex = data.length
   }
 
