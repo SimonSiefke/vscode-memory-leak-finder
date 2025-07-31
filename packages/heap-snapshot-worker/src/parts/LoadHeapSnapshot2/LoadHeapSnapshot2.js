@@ -2,8 +2,9 @@
 import { readFile } from 'node:fs/promises'
 import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
 import { createReadStream } from 'node:fs'
-import { HeapSnapshotWriteStream, StringTransform } from '../HeapSnapshotWriteStream/HeapSnaspshotWriteStream.js'
+import { HeapSnapshotWriteStream } from '../HeapSnapshotWriteStream/HeapSnapshotWriteStream.js'
 import { pipeline } from 'node:stream/promises'
+import { StringTransform } from '../StringTransform/StringTransform.js'
 
 //  const findToken(token, startIndex)=> {
 //     while (true) {
