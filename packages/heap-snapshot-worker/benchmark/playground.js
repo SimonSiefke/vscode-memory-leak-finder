@@ -1,5 +1,4 @@
 import { join } from 'path'
-import { commandMap } from '../src/parts/CommandMap/CommandMap.js'
 import { loadHeapSnapshot2 } from '../src/parts/LoadHeapSnapshot2/LoadHeapSnapshot2.js'
 
 const main = async () => {
