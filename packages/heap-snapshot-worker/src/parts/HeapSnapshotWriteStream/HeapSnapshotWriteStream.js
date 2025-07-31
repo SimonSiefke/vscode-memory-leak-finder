@@ -15,10 +15,8 @@ export class HeapSnapshotWriteStream extends Writable {
   constructor() {
     super()
     this.arrayIndex = 0
-    this.currentNumber = 0
     this.data = new Uint8Array()
     this.edges = new Uint32Array()
-    this.hasDigits = false
     this.intermediateArray = new Uint32Array(this.writableHighWaterMark)
     this.locations = new Uint32Array()
     this.metaData = {}
