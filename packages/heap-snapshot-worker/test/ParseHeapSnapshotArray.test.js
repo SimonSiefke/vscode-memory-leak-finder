@@ -184,3 +184,26 @@ test('parseHeapSnapshotArray - handles mixed separators', () => {
   expect(result.arrayIndex).toBe(4) // Should store all 4 numbers
   expect(result.done).toBe(true) // Should be done since we found ']'
 })
+
+test('parseHeapSnapshotArray - streaming with incomplete number', () => {
+  // First chunk: "1, 22" (incomplete number at end)
+  const data1 = `1, 22`
+  const array = new Uint32Array(3)
+  const index = 0
+  const result1 = parseHeapSnapshotArray(data1, array, index)
+  expect(array[0]).toBe(1)
+  expect(array[1]).toBe(0) // Should not store the incomplete number 22
+  expect(array[2]).toBe(0) // Should not be set
+  expect(result1.dataIndex).toBe(5) // Should consume all data
+  expect(result1.arrayIndex).toBe(1) // Should only store the complete number
+  expect(result1.done).toBe(false) // Should not be done
+
+  // Second chunk: "3, 4]" (continuing from where we left off)
+  const data2 = `3, 4]`
+  const result2 = parseHeapSnapshotArray(data2, array, result1.arrayIndex)
+  expect(array[1]).toBe(3) // Should parse as 3 (incomplete number from previous chunk is lost)
+  expect(array[2]).toBe(4) // Should parse as 4
+  expect(result2.dataIndex).toBe(5) // Should consume the entire string including ']'
+  expect(result2.arrayIndex).toBe(3) // Should store 2 numbers starting from index 1
+  expect(result2.done).toBe(true) // Should be done since we found ']'
+})
