@@ -22,7 +22,6 @@ const closingBracket = ']'.charCodeAt(0)
  * @param {Uint32Array} array - The array to store parsed numbers
  * @param {number} arrayIndex - The starting index in the array
  * @returns {{dataIndex: number, arrayIndex: number, done: boolean}} - The new data index, array index, and completion status
- * @throws {RangeError} When array index is out of bounds
  */
 export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
   const dataLength = data.length
@@ -56,7 +55,7 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
       case newline:
         if (hasDigits) {
           if (arrayIndex >= arrayLength) {
-            throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
+            return { dataIndex: i, arrayIndex, done }
           }
           array[arrayIndex] = currentNumber
           arrayIndex++
@@ -68,7 +67,7 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex) => {
       case closingBracket:
         if (hasDigits) {
           if (arrayIndex >= arrayLength) {
-            throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${arrayLength}`)
+            return { dataIndex: i, arrayIndex, done }
           }
           array[arrayIndex] = currentNumber
           arrayIndex++
