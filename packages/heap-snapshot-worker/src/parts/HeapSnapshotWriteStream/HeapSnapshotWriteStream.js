@@ -18,15 +18,16 @@ const decodeArray = (data) => {
 export class HeapSnapshotWriteStream extends Writable {
   constructor() {
     super({
-      objectMode: true,
+      objectMode: true, // TODO?
     })
-    this.state = HeapSnapshotParsingState.SearchingSnapshotMetaData
+    this.arrayIndex = 0
     this.data = new Uint8Array()
-    this.snapshotTokenIndex = -1
+    this.edges = new Uint32Array()
+    this.locations = new Uint32Array()
     this.metaData = {}
     this.nodes = new Uint32Array()
-    this.edges = new Uint32Array()
-    this.arrayIndex = 0
+    this.snapshotTokenIndex = -1
+    this.state = HeapSnapshotParsingState.SearchingSnapshotMetaData
   }
 
   writeMetaData(chunk) {
@@ -89,7 +90,15 @@ export class HeapSnapshotWriteStream extends Writable {
   }
 
   writeParsingEdges(chunk) {
-    this.writeArrayData(chunk, this.edges, HeapSnapshotParsingState.Done)
+    this.writeArrayData(chunk, this.edges, HeapSnapshotParsingState.ParsingLocationsMetaData)
+  }
+
+  writeParsingLocationsMetaData(chunk) {
+    this.writeParsingArrayMetaData(chunk, 'locations', HeapSnapshotParsingState.ParsingLocations)
+  }
+
+  writeParsingLocations(chunk) {
+    this.writeArrayData(chunk, this.locations, HeapSnapshotParsingState.Done)
   }
 
   _write(chunk, encoding, callback) {
@@ -122,8 +131,8 @@ export class HeapSnapshotWriteStream extends Writable {
       metaData: this.metaData,
       edges: this.edges,
       nodes: this.nodes,
+      locations: this.locations,
       // TODO parse strings?
-      // TODO parse locations?
     }
   }
 }
