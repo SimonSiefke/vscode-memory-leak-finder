@@ -5,6 +5,7 @@ import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaD
 import { parseHeapSnapshotArray } from '../ParseHeapSnapshotArray/ParseHeapSnapshotArray.js'
 
 const concatArray = (array, other) => {
+  // TODO check if concatenating many uint8 arrays could possibly negatively impact performance
   return new Uint8Array(Buffer.concat([array, other]))
 }
 
