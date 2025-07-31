@@ -1,3 +1,5 @@
+// based on chrome devtools HeapSnapshotLoader.ts (https://github.com/ChromeDevTools/devtools-frontend/blob/main/front_end/entrypoints/heap_snapshot_worker/HeapSnapshotLoader.ts), BSD-3-Clause license
+
 import { Writable } from 'node:stream'
 import * as HeapSnapshotParsingState from '../HeapSnapshotParsingState/HeapSnapshotParsingState.js'
 import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.js'
@@ -113,5 +115,15 @@ export class HeapSnapshotWriteStream extends Writable {
     callback()
   }
 
-  async start() {}
+  start() {}
+
+  getResult() {
+    return {
+      metaData: this.metaData,
+      edges: this.edges,
+      nodes: this.nodes,
+      // TODO parse strings?
+      // TODO parse locations?
+    }
+  }
 }
