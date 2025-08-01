@@ -1,8 +1,5 @@
-import { createReadStream } from 'node:fs'
-import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.js'
 import { getUniqueLocationMap } from '../GetUniqueLocationMap/GetUniqueLocationMap.js'
 
-const ITEMS_PER_NODE = 7
 const ITEMS_PER_LOCATION = 4
 
 /**
