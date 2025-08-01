@@ -3,19 +3,6 @@ const scriptOffset = 1
 const lineOffset = 2
 const columnOffset = 3
 
-// Normalize script IDs to valid range
-const normalizeScriptId = (scriptId) => {
-  // If script ID is in valid range (0-10), use it as is
-  if (scriptId <= 10) {
-    return scriptId
-  }
-
-  // For large script IDs, map them to valid ones based on modulo
-  // This is a temporary fix for the byte order/data type issue
-  const validScriptIds = [4, 9, 10]
-  return validScriptIds[scriptId % validScriptIds.length]
-}
-
 export const getUniqueLocationMap = (locations, scriptMap = {}) => {
   const locationMap = Object.create(null)
   let debugCount = 0
@@ -24,8 +11,6 @@ export const getUniqueLocationMap = (locations, scriptMap = {}) => {
     let scriptIdIndex = locations[i + scriptOffset]
     const lineIndex = locations[i + lineOffset]
     const columnIndex = locations[i + columnOffset]
-
-
 
     // Get the URL from scriptMap, fallback to empty string if not found
     const script = scriptMap[scriptIdIndex]
