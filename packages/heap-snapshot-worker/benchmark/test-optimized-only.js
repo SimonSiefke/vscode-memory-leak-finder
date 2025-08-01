@@ -8,15 +8,17 @@ import { prepareHeapSnapshot } from '../src/parts/PrepareHeapSnapshot/PrepareHea
 // Use the actual script map from VSCode
 const getActualScriptMap = () => {
   return {
-    '4': { url: 'node:electron/js2c/sandbox_bundle', sourceMapUrl: '' },
-    '9': {
+    4: { url: 'node:electron/js2c/sandbox_bundle', sourceMapUrl: '' },
+    9: {
       url: 'vscode-file://vscode-app/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test/vscode-linux-x64-1.102.3/resources/app/out/vs/code/electron-browser/workbench/workbench.js',
-      sourceMapUrl: 'https://main.vscode-cdn.net/sourcemaps/488a1f239235055e34e673291fb8d8c810886f81/core/vs/code/electron-browser/workbench/workbench.js.map'
+      sourceMapUrl:
+        'https://main.vscode-cdn.net/sourcemaps/488a1f239235055e34e673291fb8d8c810886f81/core/vs/code/electron-browser/workbench/workbench.js.map',
     },
-    '10': {
+    10: {
       url: 'vscode-file://vscode-app/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test/vscode-linux-x64-1.102.3/resources/app/out/vs/workbench/workbench.desktop.main.js',
-      sourceMapUrl: 'https://main.vscode-cdn.net/sourcemaps/488a1f239235055e34e673291fb8d8c810886f81/core/vs/workbench/workbench.desktop.main.js.map'
-    }
+      sourceMapUrl:
+        'https://main.vscode-cdn.net/sourcemaps/488a1f239235055e34e673291fb8d8c810886f81/core/vs/workbench/workbench.desktop.main.js.map',
+    },
   }
 }
 
@@ -57,7 +59,7 @@ const compare = (result1, result2, scriptMap) => {
     // Extract line and column from key (format: "line:column")
     const [line, column] = key.split(':').map(Number)
 
-        // Find the URL for this function by looking up the script ID from the original locations
+    // Find the URL for this function by looking up the script ID from the original locations
     // We need to find a location with this line:column combination
     let url = ''
     for (let i = 0; i < result2.locations.length; i += 4) {
@@ -75,12 +77,14 @@ const compare = (result1, result2, scriptMap) => {
       }
     }
 
-    array.push({
-      name: '', // Function name would need to be extracted from source code
-      count: newItem.count,
-      delta,
-      url: url ? `${url}:${line}:${column}` : `:${line}:${column}`,
-    })
+    if (delta > 0) {
+      array.push({
+        name: '', // Function name would need to be extracted from source code
+        count: newItem.count,
+        delta,
+        url: url ? `${url}:${line}:${column}` : `:${line}:${column}`,
+      })
+    }
   }
   array.sort((a, b) => b.count - a.count)
   return array
@@ -107,7 +111,7 @@ const testOptimized = async () => {
       return null
     }
 
-        // Load both snapshots first to extract script map from metadata
+    // Load both snapshots first to extract script map from metadata
     const { locations: locations1, metaData: metaData1 } = await prepareHeapSnapshot(createReadStream(filePath1))
     const { locations: locations2, metaData: metaData2 } = await prepareHeapSnapshot(createReadStream(filePath2))
 
