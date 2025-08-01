@@ -1,4 +1,5 @@
 import * as CreateCountMap from '../CreateCountMap/CreateCountMap.js'
+import * as HeapSnapshotFunctions from '../HeapSnapshotFunctions/HeapSnapshotFunctions.js'
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
 
 // const mergeFunctions = (beforeFunctions, afterFunctions) => {
@@ -46,6 +47,7 @@ export const compareNamedFunctionCount2 = async (beforePath, afterPath) => {
   // TODO then for the leaked functions, add sourcemap info
   // const leaked = mergeFunctions(before, after)
   // const withSourceLocations = await addSourceLocations(leaked)
-  console.log({ beforePath, afterPath })
+  const result = await HeapSnapshotFunctions.compareHeapSnapshotFunctions(beforePath, afterPath)
+  console.log({ result })
   return []
 }
