@@ -1,17 +1,23 @@
 const ITEMS_PER_LOCATION = 4
-const ITEMS_PER_RESULT = 4
+const ITEMS_PER_RESULT = 5
 
 export const getUniqueLocationsResult = (locationMap, locations) => {
   const values = Object.values(locationMap)
 
-  const result = new Uint32Array(values.length * 4)
+  const result = new Uint32Array(values.length * ITEMS_PER_RESULT)
+  console.log({ values })
   for (const value of values) {
     const { count, index } = value
     const location = locations[index]
-    result[index * ITEMS_PER_RESULT] = location[index * ITEMS_PER_LOCATION]
-    result[index * ITEMS_PER_RESULT + 1] = location[index * ITEMS_PER_LOCATION + 1]
-    result[index * ITEMS_PER_RESULT + 2] = location[index * ITEMS_PER_LOCATION + 2]
-    result[index * ITEMS_PER_RESULT + 3] = count
+    const objectIndex = location[index * ITEMS_PER_LOCATION]
+    const scriptId = location[index * ITEMS_PER_LOCATION + 1]
+    const line = location[index * ITEMS_PER_LOCATION + 2]
+    const column = location[index * ITEMS_PER_LOCATION + 3]
+    result[index * ITEMS_PER_RESULT] = objectIndex
+    result[index * ITEMS_PER_RESULT + 1] = scriptId
+    result[index * ITEMS_PER_RESULT + 2] = line
+    result[index * ITEMS_PER_RESULT + 3] = column
+    result[index * ITEMS_PER_RESULT + 4] = count
   }
 
   return result

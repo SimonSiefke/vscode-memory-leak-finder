@@ -3,5 +3,5 @@ import { getNamedFunctionCountFromHeapSnapshot2 } from '../src/parts/GetNamedFun
 
 test('getNamedFunctionCountFromHeapSnapshot2 - merge duplicates', () => {
   const locations = new Uint32Array([1, 2, 3, 4, 1, 2, 3, 4])
-  expect(getNamedFunctionCountFromHeapSnapshot2(locations)).toEqual(new Uint32Array([0, 0, 0, 2]))
+  expect(getNamedFunctionCountFromHeapSnapshot2(locations)).toEqual(new Uint32Array([0, 0, 0, 0, 2]))
 })
