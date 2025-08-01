@@ -12,7 +12,7 @@ const prepareFunctions = async (path) => {
 }
 
 export const compareHeapSnapshotFunctions = async (pathA, pathB) => {
-  // TODO parsing could be done in parallal
+  // TODO parsing could be done in parallel using worker threads and transfering the result buffers
   const resultA = await prepareFunctions(pathA)
   const resultB = await prepareFunctions(pathB)
   const result = compareHeapSnapshotFunctionsInternal(resultA, resultB)
