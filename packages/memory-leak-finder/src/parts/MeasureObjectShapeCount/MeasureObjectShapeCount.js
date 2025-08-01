@@ -13,11 +13,13 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  return GetObjectShapeCount.getObjectShapeCount(session, objectGroup)
+  const id = 0
+  return GetObjectShapeCount.getObjectShapeCount(session, objectGroup, id)
 }
 
 export const stop = async (session, objectGroup) => {
-  const result = await GetObjectShapeCount.getObjectShapeCount(session, objectGroup)
+  const id = 1
+  const result = await GetObjectShapeCount.getObjectShapeCount(session, objectGroup, id)
   return result
 }
 

@@ -12,11 +12,13 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  return GetStringCount.getStringCount(session, objectGroup)
+  const id = 0
+  return GetStringCount.getStringCount(session, objectGroup, id)
 }
 
 export const stop = (session, objectGroup) => {
-  return GetStringCount.getStringCount(session, objectGroup)
+  const id = 1
+  return GetStringCount.getStringCount(session, objectGroup, id)
 }
 
 export const compare = CompareCount.compareCount

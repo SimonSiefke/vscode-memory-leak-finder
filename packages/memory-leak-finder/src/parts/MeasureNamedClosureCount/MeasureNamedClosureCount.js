@@ -12,11 +12,13 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  return GetNamedClosureCount.getNamedClosureCount(session, objectGroup)
+  const id = 0
+  return GetNamedClosureCount.getNamedClosureCount(session, objectGroup, id)
 }
 
 export const stop = (session, objectGroup) => {
-  return GetNamedClosureCount.getNamedClosureCount(session, objectGroup)
+  const id = 1
+  return GetNamedClosureCount.getNamedClosureCount(session, objectGroup, id)
 }
 
 export const compare = CompareNamedClosureCount.compareNamedClosureCount

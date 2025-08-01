@@ -7,8 +7,8 @@ import * as Root from '../Root/Root.js'
  * @param {any} session
  * @returns {Promise<any>}
  */
-export const getNamedClosureCount = async (session, objectGroup) => {
-  const outFile = join(Root.root, '.vscode-heapsnapshots', `closure-count.json`)
+export const getNamedClosureCount = async (session, objectGroup, id) => {
+  const outFile = join(Root.root, '.vscode-heapsnapshots', `closure-count-${id}.json`)
   await HeapSnapshot.takeHeapSnapshot(session, outFile)
   await HeapSnapshotFunctions.loadHeapSnapshot(outFile)
   const counts = await HeapSnapshotFunctions.getNamedClosureCountFromHeapSnapshot(outFile)

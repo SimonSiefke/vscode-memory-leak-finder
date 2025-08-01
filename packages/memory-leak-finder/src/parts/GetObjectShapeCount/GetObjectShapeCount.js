@@ -8,8 +8,8 @@ import * as Root from '../Root/Root.js'
  * @param {any} session
  * @returns {Promise<number>}
  */
-export const getObjectShapeCount = async (session, objectGroup) => {
-  const outFile = join(Root.root, '.vscode-heapsnapshots', `object-shape.json`)
+export const getObjectShapeCount = async (session, objectGroup, id) => {
+  const outFile = join(Root.root, '.vscode-heapsnapshots', `object-shape-${id}.json`)
   await HeapSnapshot.takeHeapSnapshot(session, outFile)
   await HeapSnapshotFunctions.loadHeapSnapshot(outFile)
   const count = await HeapSnapshotFunctions.getObjectShapeCountFromHeapSnapshot(outFile)

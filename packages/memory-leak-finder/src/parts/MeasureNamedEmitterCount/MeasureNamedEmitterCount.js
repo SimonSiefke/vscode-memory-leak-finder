@@ -11,11 +11,13 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  return GetNamedEmitterCount.getNamedEmitterCount(session, objectGroup)
+  const id = 0
+  return GetNamedEmitterCount.getNamedEmitterCount(session, objectGroup, id)
 }
 
 export const stop = (session, objectGroup) => {
-  return GetNamedEmitterCount.getNamedEmitterCount(session, objectGroup)
+  const id = 1
+  return GetNamedEmitterCount.getNamedEmitterCount(session, objectGroup, id)
 }
 
 export const compare = CompareNamedEmitterCount.compareNamedEmitterCount

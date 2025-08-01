@@ -13,11 +13,13 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  return GetStrings.getStrings(session, objectGroup)
+  const id = 0
+  return GetStrings.getStrings(session, objectGroup, id)
 }
 
 export const stop = (session, objectGroup) => {
-  return GetStrings.getStrings(session, objectGroup)
+  const id = 1
+  return GetStrings.getStrings(session, objectGroup, id)
 }
 
 export const compare = CompareStrings.compareStrings

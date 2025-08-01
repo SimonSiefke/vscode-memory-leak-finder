@@ -12,11 +12,13 @@ export const create = (session) => {
 }
 
 export const start = async (session, objectGroup) => {
-  return GetNamedArrayCount.getNamedArrayCount(session, objectGroup)
+  const id = 0
+  return GetNamedArrayCount.getNamedArrayCount(session, objectGroup, id)
 }
 
 export const stop = async (session, objectGroup) => {
-  return GetNamedArrayCount.getNamedArrayCount(session, objectGroup)
+  const id = 1
+  return GetNamedArrayCount.getNamedArrayCount(session, objectGroup, id)
 }
 
 export const releaseResources = async (session, objectGroup) => {
