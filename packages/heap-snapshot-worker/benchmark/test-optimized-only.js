@@ -1,5 +1,6 @@
 import { join } from 'node:path'
 import { performance } from 'node:perf_hooks'
+import { compareHeapSnapshotFunctions } from '../src/parts/CompareHeapSnapshotsFunctions/CompareHeapSnapshotsFunctions.js'
 
 const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
 const filePath2 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/1.json')
@@ -15,6 +16,7 @@ const testOptimized = async () => {
   const startTime = performance.now()
 
   try {
+    const result = await compareHeapSnapshotFunctions(filePath1, filePath2)
     console.log({ result })
     const endTime = performance.now()
     const duration = endTime - startTime
@@ -39,7 +41,6 @@ const testOptimized = async () => {
     // return { duration, count: result.length }
   } catch (error) {
     console.error('Error:', error.message)
-    return null
   }
 }
 
