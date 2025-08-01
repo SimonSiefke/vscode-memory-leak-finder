@@ -53,7 +53,7 @@ export const compareHeapSnapshots = (locations1, locations2, scriptMap = {}) => 
           delta,
           scriptId,
           line,
-          column
+          column,
         })
       }
     } else {
@@ -63,7 +63,7 @@ export const compareHeapSnapshots = (locations1, locations2, scriptMap = {}) => 
         delta: count, // All instances are new
         scriptId,
         line,
-        column
+        column,
       })
     }
   }

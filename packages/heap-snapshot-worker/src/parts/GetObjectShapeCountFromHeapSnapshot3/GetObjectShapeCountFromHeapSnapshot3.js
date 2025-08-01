@@ -46,8 +46,8 @@ export const getObjectShapeCountFromHeapSnapshot3 = async (path, numWorkers = 8)
           startNode,
           endNode,
           itemsPerNode: ITEMS_PER_NODE,
-          objectShapeIndex
-        }
+          objectShapeIndex,
+        },
       })
 
       worker.on('message', (result) => {

@@ -24,7 +24,7 @@ const convertOptimizedToOriginalFormat = (optimizedResult, locations, scriptMap)
       name: `function_${objectIndex}`, // We don't have the actual name, so use a placeholder
       url: `${url}:${lineIndex}:${columnIndex}`,
       sourceMapUrl,
-      count
+      count,
     })
   }
 
@@ -57,7 +57,7 @@ const analyzeOptimizedResult = (optimizedResult) => {
   return {
     totalUniqueLocations: uniqueLocations.size,
     totalItems: optimizedResult.length / ITEMS_PER_RESULT,
-    uniqueLocations: Array.from(uniqueLocations.entries())
+    uniqueLocations: Array.from(uniqueLocations.entries()),
   }
 }
 
@@ -74,8 +74,14 @@ test('getNamedFunctionCountFromHeapSnapshot2 - basic functionality', () => {
 test('getNamedFunctionCountFromHeapSnapshot2 - multiple unique locations', () => {
   const locations = new Uint32Array([
     // objectIndex, scriptIdIndex, lineIndex, columnIndex
-    0, 0, 10, 5,  // Function at script 0, line 10, column 5
-    1, 1, 20, 15, // Function at script 1, line 20, column 15
+    0,
+    0,
+    10,
+    5, // Function at script 0, line 10, column 5
+    1,
+    1,
+    20,
+    15, // Function at script 1, line 20, column 15
   ])
 
   const result = getNamedFunctionCountFromHeapSnapshot2(locations)
@@ -90,12 +96,18 @@ test('compare logic by simulating original function behavior', () => {
 
   const locations = new Uint32Array([
     // objectIndex, scriptIdIndex, lineIndex, columnIndex
-    0, 0, 10, 5,  // First function at script 0, line 10, column 5
-    1, 0, 10, 5,  // Second function at script 0, line 10, column 5 (same location!)
+    0,
+    0,
+    10,
+    5, // First function at script 0, line 10, column 5
+    1,
+    0,
+    10,
+    5, // Second function at script 0, line 10, column 5 (same location!)
   ])
 
   const scriptMap = {
-    0: { url: 'test.js', sourceMapUrl: '' }
+    0: { url: 'test.js', sourceMapUrl: '' },
   }
 
   // Simulate original function behavior:
@@ -118,7 +130,7 @@ test('compare logic by simulating original function behavior', () => {
       columnIndex,
       url,
       sourceMapUrl,
-      name: `function_${objectIndex}` // placeholder name
+      name: `function_${objectIndex}`, // placeholder name
     })
   }
 
@@ -191,15 +203,27 @@ test('verify optimized function produces same results as original logic', () => 
   // Test with multiple functions at different locations
   const locations = new Uint32Array([
     // objectIndex, scriptIdIndex, lineIndex, columnIndex
-    0, 0, 10, 5,  // Function at script 0, line 10, column 5
-    1, 0, 10, 5,  // Another function at script 0, line 10, column 5 (same location)
-    2, 1, 20, 15, // Function at script 1, line 20, column 15
-    3, 0, 30, 25, // Function at script 0, line 30, column 25
+    0,
+    0,
+    10,
+    5, // Function at script 0, line 10, column 5
+    1,
+    0,
+    10,
+    5, // Another function at script 0, line 10, column 5 (same location)
+    2,
+    1,
+    20,
+    15, // Function at script 1, line 20, column 15
+    3,
+    0,
+    30,
+    25, // Function at script 0, line 30, column 25
   ])
 
   const scriptMap = {
     0: { url: 'script1.js', sourceMapUrl: '' },
-    1: { url: 'script2.js', sourceMapUrl: '' }
+    1: { url: 'script2.js', sourceMapUrl: '' },
   }
 
   // Simulate original function behavior
@@ -221,7 +245,7 @@ test('verify optimized function produces same results as original logic', () => 
       columnIndex,
       url,
       sourceMapUrl,
-      name: `function_${objectIndex}`
+      name: `function_${objectIndex}`,
     })
   }
 
@@ -280,23 +304,47 @@ test('debug aggregation issue with larger dataset', () => {
   // Create a larger dataset to test aggregation
   const locations = new Uint32Array([
     // Multiple functions at the same location
-    0, 0, 10, 5,  // Function at script 0, line 10, column 5
-    1, 0, 10, 5,  // Another function at script 0, line 10, column 5
-    2, 0, 10, 5,  // Third function at script 0, line 10, column 5
-    3, 0, 10, 5,  // Fourth function at script 0, line 10, column 5
+    0,
+    0,
+    10,
+    5, // Function at script 0, line 10, column 5
+    1,
+    0,
+    10,
+    5, // Another function at script 0, line 10, column 5
+    2,
+    0,
+    10,
+    5, // Third function at script 0, line 10, column 5
+    3,
+    0,
+    10,
+    5, // Fourth function at script 0, line 10, column 5
 
     // Functions at different locations
-    4, 1, 20, 15, // Function at script 1, line 20, column 15
-    5, 1, 20, 15, // Another function at script 1, line 20, column 15
+    4,
+    1,
+    20,
+    15, // Function at script 1, line 20, column 15
+    5,
+    1,
+    20,
+    15, // Another function at script 1, line 20, column 15
 
-    6, 0, 30, 25, // Function at script 0, line 30, column 25
-    7, 2, 40, 35, // Function at script 2, line 40, column 35
+    6,
+    0,
+    30,
+    25, // Function at script 0, line 30, column 25
+    7,
+    2,
+    40,
+    35, // Function at script 2, line 40, column 35
   ])
 
   const scriptMap = {
     0: { url: 'script1.js', sourceMapUrl: '' },
     1: { url: 'script2.js', sourceMapUrl: '' },
-    2: { url: 'script3.js', sourceMapUrl: '' }
+    2: { url: 'script3.js', sourceMapUrl: '' },
   }
 
   // Test optimized function
@@ -318,7 +366,7 @@ test('debug aggregation issue with larger dataset', () => {
   // Expected: 4 unique locations with counts [4, 2, 1, 1]
   expect(convertedResult.length).toBe(4)
 
-  const counts = convertedResult.map(item => item.count).sort((a, b) => b - a)
+  const counts = convertedResult.map((item) => item.count).sort((a, b) => b - a)
   expect(counts).toEqual([4, 2, 1, 1])
 })
 
@@ -330,13 +378,28 @@ test('verify that optimized function should filter by function nodes', () => {
   // Simulate a heap snapshot with mixed node types
   const locations = new Uint32Array([
     // Function nodes (should be counted)
-    0, 0, 10, 5,  // Function at script 0, line 10, column 5
-    1, 0, 10, 5,  // Another function at script 0, line 10, column 5
+    0,
+    0,
+    10,
+    5, // Function at script 0, line 10, column 5
+    1,
+    0,
+    10,
+    5, // Another function at script 0, line 10, column 5
 
     // Non-function nodes (should NOT be counted)
-    2, 1, 20, 15, // String object at script 1, line 20, column 15
-    3, 2, 30, 25, // Array object at script 2, line 30, column 25
-    4, 0, 40, 35, // Object at script 0, line 40, column 35
+    2,
+    1,
+    20,
+    15, // String object at script 1, line 20, column 15
+    3,
+    2,
+    30,
+    25, // Array object at script 2, line 30, column 25
+    4,
+    0,
+    40,
+    35, // Object at script 0, line 40, column 35
   ])
 
   // In a real heap snapshot, we would need to filter locations based on node types
@@ -352,10 +415,10 @@ test('verify that optimized function should filter by function nodes', () => {
     const objectIndex = locations[i]
     if (functionNodeIndices.has(objectIndex)) {
       functionLocations.push(
-        locations[i],     // objectIndex
+        locations[i], // objectIndex
         locations[i + 1], // scriptIdIndex
         locations[i + 2], // lineIndex
-        locations[i + 3]  // columnIndex
+        locations[i + 3], // columnIndex
       )
     }
   }

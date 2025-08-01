@@ -28,7 +28,7 @@ const debugHeapSnapshot = async (filePath) => {
 
   console.log('\nNode counts by type:')
   Object.entries(typeCounts)
-    .sort(([,a], [,b]) => b - a)
+    .sort(([, a], [, b]) => b - a)
     .forEach(([type, count]) => {
       console.log(`  ${type}: ${count}`)
     })

@@ -11,11 +11,13 @@ export const create = (session) => {
 }
 
 export const start = async (session, objectGroup) => {
-  return GetLargestArrayCount.getLargestArrayCount(session, objectGroup)
+  const id = 0
+  return GetLargestArrayCount.getLargestArrayCount(session, objectGroup, id)
 }
 
 export const stop = async (session, objectGroup) => {
-  return GetLargestArrayCount.getLargestArrayCount(session, objectGroup)
+  const id = 1
+  return GetLargestArrayCount.getLargestArrayCount(session, objectGroup, id)
 }
 
 export const compare = CompareLargestArrayCount.compareLargestArrayCount

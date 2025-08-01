@@ -67,7 +67,9 @@ const demoCompareSnapshots = async (filePath1, filePath2) => {
       console.log('├─────────┼─────────┼─────────┼─────────┼─────────┤')
 
       for (const leak of topLeaks) {
-        console.log(`│ ${leak.count.toString().padStart(7)} │ ${leak.delta.toString().padStart(7)} │ ${leak.scriptId.toString().padStart(7)} │ ${leak.line.toString().padStart(7)} │ ${leak.column.toString().padStart(7)} │`)
+        console.log(
+          `│ ${leak.count.toString().padStart(7)} │ ${leak.delta.toString().padStart(7)} │ ${leak.scriptId.toString().padStart(7)} │ ${leak.line.toString().padStart(7)} │ ${leak.column.toString().padStart(7)} │`,
+        )
       }
       console.log('└─────────┴─────────┴─────────┴─────────┴─────────┘')
 
@@ -83,7 +85,6 @@ const demoCompareSnapshots = async (filePath1, filePath2) => {
       console.log(`   Total current instances: ${totalCount}`)
       console.log(`   Average delta per function: ${(totalDelta / leakedFunctions.length).toFixed(1)}`)
     }
-
   } catch (error) {
     console.error('❌ Error comparing heap snapshots:', error.message)
     process.exit(1)

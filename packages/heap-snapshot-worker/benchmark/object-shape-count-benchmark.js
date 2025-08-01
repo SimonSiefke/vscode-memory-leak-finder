@@ -9,7 +9,7 @@ const runBenchmark = async (filePath, iterations = 5) => {
   console.log(`\n=== Benchmarking Object Shape Count for: ${filePath} ===`)
   console.log(`Running ${iterations} iterations for each approach\n`)
 
-    // Test original approach
+  // Test original approach
   console.log('Original Approach (LoadHeapSnapshot + getObjectShapeCountFromHeapSnapshot):')
   const originalTimes = []
 
@@ -54,7 +54,7 @@ const runBenchmark = async (filePath, iterations = 5) => {
     console.log(`  Iteration ${i + 1}: ${duration.toFixed(2)}ms (count: ${count})`)
   }
 
-    const incrementalAvg = incrementalTimes.reduce((a, b) => a + b, 0) / incrementalTimes.length
+  const incrementalAvg = incrementalTimes.reduce((a, b) => a + b, 0) / incrementalTimes.length
   const incrementalMin = Math.min(...incrementalTimes)
   const incrementalMax = Math.max(...incrementalTimes)
 
@@ -90,9 +90,9 @@ const runBenchmark = async (filePath, iterations = 5) => {
   // Compare results
   console.log('\n=== Comparison ===')
   const speedupIncremental = originalAvg / incrementalAvg
-  const improvementIncremental = ((originalAvg - incrementalAvg) / originalAvg * 100)
+  const improvementIncremental = ((originalAvg - incrementalAvg) / originalAvg) * 100
   const speedupParallelized = originalAvg / parallelizedAvg
-  const improvementParallelized = ((originalAvg - parallelizedAvg) / originalAvg * 100)
+  const improvementParallelized = ((originalAvg - parallelizedAvg) / originalAvg) * 100
   const speedupParallelizedVsIncremental = incrementalAvg / parallelizedAvg
 
   console.log(`Incremental vs Original:`)
@@ -105,7 +105,7 @@ const runBenchmark = async (filePath, iterations = 5) => {
 
   console.log(`\nParallelized vs Incremental:`)
   console.log(`  Speedup: ${speedupParallelizedVsIncremental.toFixed(2)}x`)
-  console.log(`  Improvement: ${((incrementalAvg - parallelizedAvg) / incrementalAvg * 100).toFixed(1)}%`)
+  console.log(`  Improvement: ${(((incrementalAvg - parallelizedAvg) / incrementalAvg) * 100).toFixed(1)}%`)
 
   if (speedupParallelized > speedupIncremental) {
     console.log('✅ Parallelized approach is the fastest!')
@@ -122,7 +122,7 @@ const runBenchmark = async (filePath, iterations = 5) => {
     speedupIncremental,
     improvementIncremental,
     speedupParallelized,
-    improvementParallelized
+    improvementParallelized,
   }
 }
 

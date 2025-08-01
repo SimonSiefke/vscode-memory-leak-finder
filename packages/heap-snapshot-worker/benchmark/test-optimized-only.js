@@ -7,7 +7,7 @@ const createMockScriptMap = () => {
   for (let i = 0; i < 1000; i++) {
     scriptMap[i] = {
       url: `https://example.com/script${i}.js`,
-      sourceMapUrl: `https://example.com/script${i}.js.map`
+      sourceMapUrl: `https://example.com/script${i}.js.map`,
     }
   }
   return scriptMap
@@ -30,7 +30,7 @@ const testOptimized = async (filePath) => {
     const endTime = performance.now()
     const duration = endTime - startTime
 
-        console.log(`  Duration: ${duration.toFixed(2)}ms`)
+    console.log(`  Duration: ${duration.toFixed(2)}ms`)
     console.log(`  Functions found: ${result.length / 4}`)
 
     if (result.length > 0) {
