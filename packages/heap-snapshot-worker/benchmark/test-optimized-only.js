@@ -10,15 +10,15 @@ const createMockScriptMap = () => {
   const scriptMap = {}
   for (let i = 0; i < 1000; i++) {
     scriptMap[i] = {
-      url: `https://example.com/script${i}.js`,
-      sourceMapUrl: `https://example.com/script${i}.js.map`,
+      url: `script${i}.js`,
+      sourceMapUrl: `script${i}.js.map`,
     }
   }
   return scriptMap
 }
 
 const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
-const filePath2 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
+const filePath2 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/1.json')
 const outPath = join(import.meta.dirname, '../benchmark-results/named-function-count.json')
 
 const getMap = async (filePath, scriptMap) => {
@@ -32,7 +32,9 @@ const getMap = async (filePath, scriptMap) => {
   }
 }
 
-const compare = (map1, map2) => {
+const compare = (result1, result2) => {
+  const map1 = result1.map
+  const map2 = result2.map
   const array = []
   for (const key of Object.keys(map2)) {
     const oldItem = map1[key]
