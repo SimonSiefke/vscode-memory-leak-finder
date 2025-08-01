@@ -7,6 +7,8 @@ const addSourceLocations = async (functionObjects, scriptMap) => {
     const script = scriptMap[item.scriptId]
     return {
       ...item,
+      name: 'abc',
+      url: script.url,
       stack: [script.url],
       sourceMaps: [script.sourceMapUrl],
     }
