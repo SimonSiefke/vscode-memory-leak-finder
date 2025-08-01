@@ -8,11 +8,11 @@ export const getUniqueLocationsResult = (locationMap, locations) => {
   console.log({ values })
   for (const value of values) {
     const { count, index } = value
-    const location = locations[index]
-    const objectIndex = location[index * ITEMS_PER_LOCATION]
-    const scriptId = location[index * ITEMS_PER_LOCATION + 1]
-    const line = location[index * ITEMS_PER_LOCATION + 2]
-    const column = location[index * ITEMS_PER_LOCATION + 3]
+    const objectIndex = locations[index * ITEMS_PER_LOCATION]
+    const scriptId = locations[index * ITEMS_PER_LOCATION + 1]
+    const line = locations[index * ITEMS_PER_LOCATION + 2]
+    const column = locations[index * ITEMS_PER_LOCATION + 3]
+    console.log({ objectIndex, scriptId, line, column })
     result[index * ITEMS_PER_RESULT] = objectIndex
     result[index * ITEMS_PER_RESULT + 1] = scriptId
     result[index * ITEMS_PER_RESULT + 2] = line
