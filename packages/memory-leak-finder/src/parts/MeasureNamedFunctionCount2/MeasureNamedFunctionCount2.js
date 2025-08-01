@@ -21,7 +21,11 @@ export const start = async (session, objectGroup, scriptHandler) => {
 export const stop = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.stop(session)
   const id = 1
-  return getHeapSnapshot(session, id)
+  const heapSnapshotPath = await getHeapSnapshot(session, id)
+  return {
+    heapSnapshotPath,
+    scriptMap: scriptHandler.scriptMap,
+  }
 }
 
 export const compare = compareNamedFunctionCount2
