@@ -22,7 +22,7 @@ export const start = async (session, objectGroup, scriptHandler) => {
 export const stop = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.stop(session)
   const includeSourceMap = true
-  const id = 0
+  const id = 1
   return GetNamedFunctionCount2.getNamedFunctionCount2(session, objectGroup, scriptHandler.scriptMap, includeSourceMap, id)
 }
 
