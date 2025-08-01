@@ -17,7 +17,6 @@ const testOptimized = async () => {
 
   try {
     const result = await compareHeapSnapshotFunctions(filePath1, filePath2)
-    console.log({ result })
     const endTime = performance.now()
     const duration = endTime - startTime
 

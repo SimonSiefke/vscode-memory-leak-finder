@@ -1,4 +1,3 @@
-import { createReadStream } from 'node:fs'
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.js'
 
 const ITEMS_PER_NODE = 7
@@ -8,8 +7,7 @@ const ITEMS_PER_NODE = 7
  * @returns {Promise<number>}
  */
 export const getObjectShapeCountFromHeapSnapshot2 = async (path) => {
-  const readStream = createReadStream(path)
-  const { metaData, nodes } = await prepareHeapSnapshot(readStream)
+  const { metaData, nodes } = await prepareHeapSnapshot(path)
 
   const { node_types } = metaData.data.meta
   const objectShapeIndex = node_types[0].indexOf('object shape')
