@@ -1,18 +1,20 @@
 /**
  *
- * @param {Uint8Array} array
- * @param {Uint8Array} other
+ * @param {Uint8Array<ArrayBuffer>} array
+ * @param {Uint8Array<ArrayBuffer>} other
  * @returns {Uint8Array<ArrayBuffer>}
  */
 export const concatArray = (array, other) => {
-  // TODO check if concatenating many uint8 arrays could possibly negatively impact performance
+  if (array.length === 0) {
+    return other
+  }
   return new Uint8Array(Buffer.concat([array, other]))
 }
 
 /**
  *
- * @param {Uint32Array} array
- * @param {Uint32Array} other
+ * @param {Uint32Array<ArrayBuffer>} array
+ * @param {Uint32Array<ArrayBuffer>} other
  * @returns {Uint32Array<ArrayBuffer>}
  */
 export const concatUint32Array = (array, other) => {
