@@ -2,7 +2,7 @@ const emptyItem = {
   count: 0,
 }
 
-export const compare = (result1, result2) => {
+export const compareHeapSnapshotFunctions = (result1, result2) => {
   const map1 = result1.map
   const map2 = result2.map
   const array = []
@@ -12,6 +12,7 @@ export const compare = (result1, result2) => {
     const delta = newItem.count - oldItem.count
     if (delta > 0) {
       array.push({
+        index: newItem.index,
         count: newItem.count,
         delta,
       })

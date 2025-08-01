@@ -130,7 +130,7 @@ const testOptimized = async () => {
     console.timeEnd('our compare')
 
     console.log('\n=== Testing Original Approach ===')
-    const { compareHeapSnapshots } = await import('../src/parts/CompareHeapSnapshots/CompareHeapSnapshots.js')
+    const { compareHeapSnapshots } = await import('../src/parts/CompareHeapSnapshotsFunctions/CompareHeapSnapshotsFunctions.js')
 
     console.time('original compare')
     const originalResult = compareHeapSnapshots(locations1, locations2, scriptMap)
