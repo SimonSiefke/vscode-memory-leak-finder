@@ -1,4 +1,7 @@
 const ITEMS_PER_LOCATION = 4
+const scriptOffset = 1
+const lineOffset = 2
+const columnOffset = 3
 
 /**
  * @param {Uint32Array} locations
@@ -8,9 +11,9 @@ export const getUniqueLocationMap = (locations, scriptMap = {}) => {
   const locationMap = Object.create(null)
 
   for (let i = 0; i < locations.length; i += ITEMS_PER_LOCATION) {
-    const scriptIdIndex = locations[i + 1]
-    const lineIndex = locations[i + 2]
-    const columnIndex = locations[i + 3]
+    const scriptIdIndex = locations[i + scriptOffset]
+    const lineIndex = locations[i + lineOffset]
+    const columnIndex = locations[i + columnOffset]
 
     // Get the URL from scriptMap, fallback to empty string if not found
     const script = scriptMap[scriptIdIndex]

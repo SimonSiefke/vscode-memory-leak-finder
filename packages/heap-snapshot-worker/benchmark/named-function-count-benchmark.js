@@ -4,6 +4,8 @@ import { getNamedFunctionCountFromHeapSnapshot } from '../src/parts/GetNamedFunc
 import { getNamedFunctionCountFromHeapSnapshot2 } from '../src/parts/GetNamedFunctionCountFromHeapSnapshot2/GetNamedFunctionCountFromHeapSnapshot2.js'
 import { loadHeapSnapshot } from '../src/parts/LoadHeapSnapshot/LoadHeapSnapshot.js'
 import { prepareHeapSnapshot } from '../src/parts/PrepareHeapSnapshot/PrepareHeapSnapshot.js'
+import { mkdir, writeFile } from 'node:fs/promises'
+import { dirname, join } from 'node:path'
 
 // Mock scriptMap for testing
 const createMockScriptMap = () => {
@@ -36,6 +38,9 @@ const runBenchmark = async (filePath, iterations = 3) => {
 
     // Count named functions
     const result = await getNamedFunctionCountFromHeapSnapshot(filePath, scriptMap, minCount)
+    const outpath = join(import.meta.dirname, '..', 'benchmark-results', 'original.json')
+    await mkdir(dirname(outpath), { recursive: true })
+    await writeFile(outpath, JSON.stringify(result, null, 2))
 
     const endTime = performance.now()
     const duration = endTime - startTime

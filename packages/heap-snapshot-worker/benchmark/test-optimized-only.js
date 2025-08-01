@@ -1,5 +1,7 @@
 import { performance } from 'node:perf_hooks'
 import { getNamedFunctionCountFromHeapSnapshot2 } from '../src/parts/GetNamedFunctionCountFromHeapSnapshot2/GetNamedFunctionCountFromHeapSnapshot2.js'
+import { prepareHeapSnapshot } from '../src/parts/PrepareHeapSnapshot/PrepareHeapSnapshot.js'
+import { createReadStream } from 'node:fs'
 
 // Mock scriptMap for testing
 const createMockScriptMap = () => {
@@ -25,17 +27,19 @@ const testOptimized = async (filePath) => {
 
   try {
     // Count named functions using optimized incremental parsing
-    const result = await getNamedFunctionCountFromHeapSnapshot2(filePath, scriptMap, minCount)
+    const { locations } = await prepareHeapSnapshot(createReadStream(filePath))
+    console.log({ locations })
+    const result = await getNamedFunctionCountFromHeapSnapshot2(locations, scriptMap)
 
     const endTime = performance.now()
     const duration = endTime - startTime
 
     console.log(`  Duration: ${duration.toFixed(2)}ms`)
-    console.log(`  Functions found: ${result.length / 4}`)
+    console.log(`  Functions found: ${result.length / 5}`)
 
     if (result.length > 0) {
       console.log(`  Top 5 functions:`)
-      for (let i = 0; i < Math.min(5, result.length / 4); i++) {
+      for (let i = 0; i < Math.min(5, result.length / 5); i++) {
         const arrayIndex = i * 4
         const scriptIdIndex = result[arrayIndex]
         const lineIndex = result[arrayIndex + 1]
