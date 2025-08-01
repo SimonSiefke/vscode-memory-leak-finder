@@ -1,5 +1,6 @@
 import * as MeasureId from '../MeasureId/MeasureId.js'
 
+// TODO for large data and multiple measures, it might be bad to store much data in memory
 export const combine = (...measures) => {
   const start = async () => {
     const beforeMap = Object.create(null)
