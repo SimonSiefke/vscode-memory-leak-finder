@@ -18,7 +18,7 @@ test('createConnection - error - invalid url', async () => {
   ws.WebSocket.mockImplementation((url) => {
     throw new SyntaxError(`Invalid URL: ${url}`)
   })
-  await expect(DebuggerCreateIpcConnection.createConnection('abc')).rejects.toThrowError(
+  await expect(DebuggerCreateIpcConnection.createConnection('abc')).rejects.toThrow(
     new Error(`Failed to create websocket connection: SyntaxError: Invalid URL: abc`),
   )
 })
