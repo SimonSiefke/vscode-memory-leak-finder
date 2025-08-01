@@ -5,21 +5,19 @@ import { performance } from 'node:perf_hooks'
 import { getUniqueLocationMap } from '../src/parts/GetUniqueLocationMap/GetUniqueLocationMap.js'
 import { prepareHeapSnapshot } from '../src/parts/PrepareHeapSnapshot/PrepareHeapSnapshot.js'
 
-// Extract scriptMap from heap snapshot metadata
-const extractScriptMap = (metaData) => {
-  const scriptMap = {}
-
-  // The script information should be in the metadata
-  if (metaData && metaData.data && metaData.data.scripts) {
-    for (const script of metaData.data.scripts) {
-      scriptMap[script.scriptId] = {
-        url: script.url || '',
-        sourceMapUrl: script.sourceMapURL || '',
-      }
+// Use the actual script map from VSCode
+const getActualScriptMap = () => {
+  return {
+    '4': { url: 'node:electron/js2c/sandbox_bundle', sourceMapUrl: '' },
+    '9': {
+      url: 'vscode-file://vscode-app/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test/vscode-linux-x64-1.102.3/resources/app/out/vs/code/electron-browser/workbench/workbench.js',
+      sourceMapUrl: 'https://main.vscode-cdn.net/sourcemaps/488a1f239235055e34e673291fb8d8c810886f81/core/vs/code/electron-browser/workbench/workbench.js.map'
+    },
+    '10': {
+      url: 'vscode-file://vscode-app/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-test/vscode-linux-x64-1.102.3/resources/app/out/vs/workbench/workbench.desktop.main.js',
+      sourceMapUrl: 'https://main.vscode-cdn.net/sourcemaps/488a1f239235055e34e673291fb8d8c810886f81/core/vs/workbench/workbench.desktop.main.js.map'
     }
   }
-
-  return scriptMap
 }
 
 const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
@@ -37,7 +35,7 @@ const getMap = async (filePath, scriptMap) => {
   }
 }
 
-const compare = (result1, result2) => {
+const compare = (result1, result2, scriptMap) => {
   const map1 = result1.map
   const map2 = result2.map
 
@@ -55,13 +53,34 @@ const compare = (result1, result2) => {
     const newItem = map2[key]
     const oldCount = oldItem?.count || 0
     const delta = newItem.count - oldCount
-    // if (delta > 0) {
+
+    // Extract line and column from key (format: "line:column")
+    const [line, column] = key.split(':').map(Number)
+
+        // Find the URL for this function by looking up the script ID from the original locations
+    // We need to find a location with this line:column combination
+    let url = ''
+    for (let i = 0; i < result2.locations.length; i += 4) {
+      const scriptId = result2.locations[i + 1]
+      const locLine = result2.locations[i + 2]
+      const locColumn = result2.locations[i + 3]
+
+      if (locLine === line && locColumn === column) {
+        // Normalize script ID to valid range (same as in GetUniqueLocationMap)
+        const validScriptIds = [4, 9, 10]
+        const normalizedScriptId = scriptId > 10 ? validScriptIds[scriptId % validScriptIds.length] : scriptId
+        const script = scriptMap[normalizedScriptId]
+        url = script?.url || ''
+        break
+      }
+    }
+
     array.push({
-      key,
-      ...newItem,
+      name: '', // Function name would need to be extracted from source code
+      count: newItem.count,
       delta,
+      url: url ? `${url}:${line}:${column}` : `:${line}:${column}`,
     })
-    // }
   }
   array.sort((a, b) => b.count - a.count)
   return array
@@ -92,18 +111,28 @@ const testOptimized = async () => {
     const { locations: locations1, metaData: metaData1 } = await prepareHeapSnapshot(createReadStream(filePath1))
     const { locations: locations2, metaData: metaData2 } = await prepareHeapSnapshot(createReadStream(filePath2))
 
-    // Extract script map from metadata (use first snapshot's metadata as they should be the same)
-    const scriptMap = extractScriptMap(metaData1)
-    console.log(`ScriptMap extracted with ${Object.keys(scriptMap).length} entries`)
+    // Use the actual script map from VSCode
+    const scriptMap = getActualScriptMap()
+    console.log(`ScriptMap with ${Object.keys(scriptMap).length} entries`)
     console.log('ScriptMap:', JSON.stringify(scriptMap, null, 2))
 
-    // Count named functions using optimized incremental parsing
+    // Test both approaches
+    console.log('\n=== Testing Our Approach ===')
     const result1 = await getMap(filePath1, scriptMap)
     const result2 = await getMap(filePath2, scriptMap)
 
-    console.time('compare')
-    const result = compare(result1, result2)
-    console.timeEnd('compare')
+    console.time('our compare')
+    const result = compare(result1, result2, scriptMap)
+    console.timeEnd('our compare')
+
+    console.log('\n=== Testing Original Approach ===')
+    const { compareHeapSnapshots } = await import('../src/parts/CompareHeapSnapshots/CompareHeapSnapshots.js')
+
+    console.time('original compare')
+    const originalResult = compareHeapSnapshots(locations1, locations2, scriptMap)
+    console.timeEnd('original compare')
+
+    console.log('Original result sample:', originalResult.slice(0, 5))
 
     await writeFile(outPath, JSON.stringify(result, null, 2) + '\n')
 

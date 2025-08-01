@@ -10,11 +10,16 @@ export const parseHeapSnapshotLocations = (locations, locationFields, nodeFieldC
   const columnIndexIndex = locationFields.indexOf('column')
   const fieldCount = locationFields.length
   const parsedLocations = []
+  let debugCount = 0
+
   for (let i = 0; i < locations.length; i += fieldCount) {
     const objectIndex = locations[i + objectIndexIndex] / nodeFieldCount
     const scriptIdIndex = locations[i + scriptIdIndexIndex]
     const lineIndex = locations[i + lineIndexIndex]
     const columnIndex = locations[i + columnIndexIndex]
+
+
+
     parsedLocations.push({
       objectIndex,
       scriptIdIndex,
