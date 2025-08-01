@@ -100,9 +100,7 @@ export class HeapSnapshotWriteStream extends Writable {
       this.resetParsingState()
       this.state = nextState
       const rest = chunk.slice(dataIndex)
-      if (rest.length > 0) {
-        this.handleChunk(rest)
-      }
+      this.handleChunk(rest)
     }
     // When not done, we don't need to store leftover data - the parsing state handles it
   }
