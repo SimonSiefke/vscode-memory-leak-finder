@@ -15,13 +15,23 @@ export class HeapSnapshotWriteStream extends Writable {
   constructor() {
     super()
     this.arrayIndex = 0
+    this.currentNumber = 0
     this.data = new Uint8Array()
     this.edges = new Uint32Array()
+    this.hasDigits = false
     this.intermediateArray = new Uint32Array(this.writableHighWaterMark)
     this.locations = new Uint32Array()
     this.metaData = {}
     this.nodes = new Uint32Array()
     this.state = HeapSnapshotParsingState.SearchingSnapshotMetaData
+  }
+
+  /**
+   * Resets parsing state for new array parsing
+   */
+  resetParsingState() {
+    this.currentNumber = 0
+    this.hasDigits = false
   }
 
   writeMetaData(chunk) {
@@ -33,11 +43,15 @@ export class HeapSnapshotWriteStream extends Writable {
     }
     const nodeCount = metaData.data.node_count * metaData.data.meta.node_fields.length
     const edgeCount = metaData.data.edge_count * metaData.data.meta.edge_fields.length
-    this.data = this.data.slice(metaData.endIndex)
     this.edges = new Uint32Array(edgeCount)
     this.metaData = metaData
     this.nodes = new Uint32Array(nodeCount)
     this.state = HeapSnapshotParsingState.ParsingNodesMetaData
+    const rest = this.data.slice(metaData.endIndex)
+    this.data = new Uint8Array()
+    if (rest.length > 0) {
+      this.handleChunk(rest)
+    }
   }
 
   writeParsingArrayMetaData(chunk, nodeName, nextState) {
@@ -47,9 +61,12 @@ export class HeapSnapshotWriteStream extends Writable {
     if (endIndex === -1) {
       return
     }
+    const rest = this.data.slice(endIndex)
+    this.data = new Uint8Array()
     this.arrayIndex = 0
-    this.data = this.data.slice(endIndex)
+    this.resetParsingState()
     this.state = nextState
+    this.handleChunk(rest)
   }
 
   writeParsingNodesMetaData(chunk) {
@@ -57,8 +74,14 @@ export class HeapSnapshotWriteStream extends Writable {
   }
 
   writeArrayData(chunk, array, nextState) {
-    this.data = concatArray(this.data, chunk) // TODO try to avoid concatenating arrays
-    const { dataIndex, arrayIndex, done } = parseHeapSnapshotArray(this.data, array, this.arrayIndex)
+    // Parse the chunk directly - no concatenation needed due to stateful parsing
+    const { dataIndex, arrayIndex, done, currentNumber, hasDigits } = parseHeapSnapshotArray(
+      chunk,
+      array,
+      this.arrayIndex,
+      this.currentNumber,
+      this.hasDigits,
+    )
     if (dataIndex === -1) {
       return
     }
@@ -66,13 +89,24 @@ export class HeapSnapshotWriteStream extends Writable {
       throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${array.length}`)
     }
     this.arrayIndex = arrayIndex
-    this.data = this.data.slice(dataIndex)
+
+    // Update parsing state for next chunk
+    this.currentNumber = currentNumber
+    this.hasDigits = hasDigits
+
+    // Only store leftover data when we're done with this section
     if (done) {
       if (arrayIndex !== array.length) {
         throw new RangeError(`Incorrect number of nodes in heapsnapshot, expected ${array.length}, but got ${arrayIndex}`)
       }
+      this.resetParsingState()
       this.state = nextState
+      const rest = chunk.slice(dataIndex)
+      if (rest.length > 0) {
+        this.handleChunk(rest)
+      }
     }
+    // When not done, we don't need to store leftover data - the parsing state handles it
   }
 
   writeParsingNodes(chunk) {
@@ -92,8 +126,15 @@ export class HeapSnapshotWriteStream extends Writable {
   }
 
   writeResizableArrayData(chunk, nextState) {
-    // Parse the chunk directly - no concatenation needed due to stateful parsing
-    const { dataIndex, arrayIndex, done } = parseHeapSnapshotArray(chunk, this.intermediateArray, 0)
+    // If we have leftover data, concatenate it with the new chunk
+    const dataToParse = this.data.length > 0 ? concatArray(this.data, chunk) : chunk
+    const { dataIndex, arrayIndex, done, currentNumber, hasDigits } = parseHeapSnapshotArray(
+      dataToParse,
+      this.intermediateArray,
+      0,
+      this.currentNumber,
+      this.hasDigits,
+    )
     if (dataIndex === -1) {
       return
     }
@@ -102,9 +143,17 @@ export class HeapSnapshotWriteStream extends Writable {
     const parsedNumbers = this.intermediateArray.slice(0, arrayIndex)
     this.locations = concatUint32Array(this.locations, parsedNumbers)
 
+    // Update parsing state for next chunk
+    this.currentNumber = currentNumber
+    this.hasDigits = hasDigits
+
     if (done) {
-      this.data = chunk.slice(dataIndex)
+      this.data = dataToParse.slice(dataIndex)
+      this.resetParsingState()
       this.state = nextState
+    } else {
+      // When not done, store leftover data for next chunk
+      this.data = dataToParse.slice(dataIndex)
     }
   }
 
