@@ -1,8 +1,9 @@
+import { createReadStream } from 'node:fs'
 import { performance } from 'node:perf_hooks'
 import { getNamedFunctionCountFromHeapSnapshot } from '../src/parts/GetNamedFunctionCountFromHeapSnapshot/GetNamedFunctionCountFromHeapSnapshot.js'
 import { getNamedFunctionCountFromHeapSnapshot2 } from '../src/parts/GetNamedFunctionCountFromHeapSnapshot2/GetNamedFunctionCountFromHeapSnapshot2.js'
 import { loadHeapSnapshot } from '../src/parts/LoadHeapSnapshot/LoadHeapSnapshot.js'
-import * as HeapSnapshotState from '../src/parts/HeapSnapshotState/HeapSnapshotState.js'
+import { prepareHeapSnapshot } from '../src/parts/PrepareHeapSnapshot/PrepareHeapSnapshot.js'
 
 // Mock scriptMap for testing
 const createMockScriptMap = () => {
@@ -10,7 +11,7 @@ const createMockScriptMap = () => {
   for (let i = 0; i < 1000; i++) {
     scriptMap[i] = {
       url: `https://example.com/script${i}.js`,
-      sourceMapUrl: `https://example.com/script${i}.js.map`
+      sourceMapUrl: `https://example.com/script${i}.js.map`,
     }
   }
   return scriptMap
@@ -59,7 +60,10 @@ const runBenchmark = async (filePath, iterations = 3) => {
     const startTime = performance.now()
 
     // Count named functions using optimized incremental parsing
-    const result = await getNamedFunctionCountFromHeapSnapshot2(filePath, scriptMap, minCount)
+    const { locations } = await prepareHeapSnapshot(createReadStream(filePath))
+    console.time('parse')
+    const result = getNamedFunctionCountFromHeapSnapshot2(locations)
+    console.timeEnd('parse')
 
     const endTime = performance.now()
     const duration = endTime - startTime
@@ -79,7 +83,7 @@ const runBenchmark = async (filePath, iterations = 3) => {
   // Compare results
   console.log('\n=== Comparison ===')
   const speedup = originalAvg / optimizedAvg
-  const improvement = ((originalAvg - optimizedAvg) / originalAvg * 100)
+  const improvement = ((originalAvg - optimizedAvg) / originalAvg) * 100
 
   console.log(`Speedup: ${speedup.toFixed(2)}x`)
   console.log(`Improvement: ${improvement.toFixed(1)}%`)
@@ -94,7 +98,7 @@ const runBenchmark = async (filePath, iterations = 3) => {
     original: { avg: originalAvg, min: originalMin, max: originalMax },
     optimized: { avg: optimizedAvg, min: optimizedMin, max: optimizedMax },
     speedup,
-    improvement
+    improvement,
   }
 }
 
