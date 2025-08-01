@@ -10,8 +10,8 @@ const createMockScriptMap = () => {
   const scriptMap = {}
   for (let i = 0; i < 1000; i++) {
     scriptMap[i] = {
-      url: `script${i}.js`,
-      sourceMapUrl: `script${i}.js.map`,
+      url: `${i}.js`,
+      sourceMapUrl: `${i}.js.map`,
     }
   }
   return scriptMap
@@ -40,11 +40,13 @@ const compare = (result1, result2) => {
     const oldItem = map1[key]
     const newItem = map2[key]
     const delta = newItem.count - oldItem.count
+    // if (delta > 0) {
     array.push({
       key,
       ...newItem,
       delta,
     })
+    // }
   }
   array.sort((a, b) => b.count - a.count)
   return array
