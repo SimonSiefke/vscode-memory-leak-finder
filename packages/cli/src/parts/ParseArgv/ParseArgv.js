@@ -40,6 +40,7 @@ export const parseArgv = (argv) => {
     runMode: TestRunMode.Auto,
     ide: Ide.VsCode,
     ideVersion: '', // TODO
+    vscodePath: '',
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -85,6 +86,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--ide=cursor')) {
     options.ide = Ide.Cursor
+  }
+  if (argv.includes('--vscode-path')) {
+    options.vscodePath = parseArgvString(argv, '--vscode-path')
   }
   return options
 }

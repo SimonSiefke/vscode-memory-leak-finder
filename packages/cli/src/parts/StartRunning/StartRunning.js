@@ -20,6 +20,7 @@ export const startRunning = async (
   runMode,
   ide,
   ideVersion,
+  vscodePath,
 ) => {
   Stdout.write(AnsiEscapes.clear)
   const worker = await RunTest.prepare()
@@ -42,5 +43,6 @@ export const startRunning = async (
     runMode,
     ide,
     ideVersion,
+    vscodePath,
   )
 }
