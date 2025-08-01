@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import { compareHeapSnapshotFunctions } from '../src/parts/CompareHeapSnapshotsFunctions/CompareHeapSnapshotsFunctions.js'
+import { compareHeapSnapshotFunctions } from '../src/parts/CompareHeapSnapshotsFunctionsInternal/CompareHeapSnapshotsFunctionsInternal.js'
 
 test('compareHeapSnapshots - no leaks', () => {
   const result1 = {
