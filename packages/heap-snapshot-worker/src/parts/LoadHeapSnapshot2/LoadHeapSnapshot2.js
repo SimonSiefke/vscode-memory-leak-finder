@@ -1,5 +1,4 @@
 // based on chrome devtools HeapSnapshotLoader.ts (https://github.com/ChromeDevTools/devtools-frontend/blob/main/front_end/entrypoints/heap_snapshot_worker/HeapSnapshotLoader.ts), BSD-3-Clause license
-import { createReadStream } from 'node:fs'
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.js'
 
 /**
@@ -7,9 +6,7 @@ import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.
  * @returns {Promise<void>}
  */
 export const loadHeapSnapshot2 = async (path) => {
-  const read = createReadStream(path)
-
-  const { metaData, nodes, edges, locations } = await prepareHeapSnapshot(read)
+  const { metaData, nodes, edges, locations } = await prepareHeapSnapshot(path)
 
   console.log({ locations: locations.length })
 
