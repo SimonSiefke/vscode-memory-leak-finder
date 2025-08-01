@@ -1,6 +1,7 @@
 import { getUniqueLocationMap } from '../GetUniqueLocationMap/GetUniqueLocationMap.js'
 
 const ITEMS_PER_LOCATION = 4
+const ITEMS_PER_RESULT = 4
 
 /**
  * @param {Uint32Array} locations
@@ -16,10 +17,10 @@ export const getNamedFunctionCountFromHeapSnapshot2 = (locations) => {
   for (const value of values) {
     const { count, index } = value
     const location = locations[index]
-    result[index * ITEMS_PER_LOCATION] = location[index * ITEMS_PER_LOCATION]
-    result[index * ITEMS_PER_LOCATION + 1] = location[index * ITEMS_PER_LOCATION + 1]
-    result[index * ITEMS_PER_LOCATION + 2] = location[index * ITEMS_PER_LOCATION + 2]
-    result[index * ITEMS_PER_LOCATION + 3] = count
+    result[index * ITEMS_PER_RESULT] = location[index * ITEMS_PER_LOCATION]
+    result[index * ITEMS_PER_RESULT + 1] = location[index * ITEMS_PER_LOCATION + 1]
+    result[index * ITEMS_PER_RESULT + 2] = location[index * ITEMS_PER_LOCATION + 2]
+    result[index * ITEMS_PER_RESULT + 3] = count
   }
 
   return result

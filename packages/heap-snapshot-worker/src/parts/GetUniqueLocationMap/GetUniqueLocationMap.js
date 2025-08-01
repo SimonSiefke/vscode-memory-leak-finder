@@ -15,8 +15,8 @@ export const getUniqueLocationMap = (locations) => {
       locationMap[locationKey].count++
     } else {
       locationMap[locationKey] = {
-        count: 0,
-        index: i,
+        count: 1,
+        index: i / ITEMS_PER_LOCATION,
       }
     }
   }
