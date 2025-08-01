@@ -3,11 +3,10 @@ import { getUniqueLocationsResult } from '../GetUniqueLocationsResult/GetUniqueL
 
 /**
  * @param {Uint32Array} locations
- * @param {Object} scriptMap - Optional: Map of scriptIdIndex to script info with url
  * @returns {Uint32Array<ArrayBuffer>}
  */
-export const getNamedFunctionCountFromHeapSnapshot2 = (locations, scriptMap = {}) => {
-  const locationMap = getUniqueLocationMap(locations, scriptMap)
+export const getNamedFunctionCountFromHeapSnapshot2 = (locations) => {
+  const locationMap = getUniqueLocationMap(locations)
   const result = getUniqueLocationsResult(locationMap, locations)
   return result
 }
