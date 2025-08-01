@@ -8,7 +8,7 @@ import * as Root from '../Root/Root.js'
  * @returns {Promise<any[]>}
  */
 export const getNamedFunctionCount2 = async (session, objectGroup, scriptMap, includeSourceMap) => {
-  const outFile = join(Root.root, '.vscode-heapsnapshots', `1.json`)
+  const outFile = join(Root.root, '.vscode-heapsnapshots', `1.json`) // TODO
   console.info('taking heapsnapshot')
   await HeapSnapshot.takeHeapSnapshot(session, outFile)
   console.info('parsing heapsnapshot')

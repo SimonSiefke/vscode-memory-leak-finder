@@ -69,7 +69,8 @@ const runBenchmark = async (filePath, iterations = 3) => {
     const duration = endTime - startTime
     optimizedTimes.push(duration)
 
-    console.log(`  Iteration ${i + 1}: ${duration.toFixed(2)}ms (functions: ${result.length})`)
+    const perItm = 5
+    console.log(`  Iteration ${i + 1}: ${duration.toFixed(2)}ms (functions: ${result.length / perItm})`)
   }
 
   const optimizedAvg = optimizedTimes.reduce((a, b) => a + b, 0) / optimizedTimes.length
