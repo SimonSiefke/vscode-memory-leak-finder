@@ -28,7 +28,7 @@ const outPath = join(import.meta.dirname, '../benchmark-results/named-function-c
 
 const getMap = async (filePath, scriptMap) => {
   // Count named functions using optimized incremental parsing
-  const { locations } = await prepareHeapSnapshot(createReadStream(filePath))
+  const { locations } = await prepareHeapSnapshot(filePath)
   console.log({ locations })
   const map = getUniqueLocationMap(locations, scriptMap)
   return {
