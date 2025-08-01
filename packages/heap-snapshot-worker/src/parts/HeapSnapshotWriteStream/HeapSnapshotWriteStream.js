@@ -138,8 +138,6 @@ export class HeapSnapshotWriteStream extends Writable {
     const parsedNumbers = this.intermediateArray.slice(0, arrayIndex)
     this.locations = concatUint32Array(this.locations, parsedNumbers)
 
-
-
     // Update parsing state for next chunk
     this.currentNumber = currentNumber
     this.hasDigits = hasDigits
