@@ -49,9 +49,7 @@ export class HeapSnapshotWriteStream extends Writable {
     this.state = HeapSnapshotParsingState.ParsingNodesMetaData
     const rest = this.data.slice(metaData.endIndex)
     this.data = new Uint8Array()
-    if (rest.length > 0) {
-      this.handleChunk(rest)
-    }
+    this.handleChunk(rest)
   }
 
   writeParsingArrayMetaData(chunk, nodeName, nextState) {
