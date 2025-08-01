@@ -23,7 +23,7 @@ const outPath = join(import.meta.dirname, '../benchmark-results/named-function-c
 
 const getMap = async (filePath, scriptMap) => {
   // Count named functions using optimized incremental parsing
-  const { locations } = await prepareHeapSnapshot(createReadStream(filePath1))
+  const { locations } = await prepareHeapSnapshot(createReadStream(filePath))
   console.log({ locations })
   const map = getUniqueLocationMap(locations, scriptMap)
   return {
@@ -39,7 +39,8 @@ const compare = (result1, result2) => {
   for (const key of Object.keys(map2)) {
     const oldItem = map1[key]
     const newItem = map2[key]
-    const delta = newItem.count - oldItem.count
+    const oldCount = oldItem?.count || 0
+    const delta = newItem.count - oldCount
     // if (delta > 0) {
     array.push({
       key,
@@ -63,9 +64,18 @@ const testOptimized = async () => {
   const startTime = performance.now()
 
   try {
+    // Check if files exist
+    const { access } = await import('node:fs/promises')
+    try {
+      await access(filePath1)
+      await access(filePath2)
+    } catch (error) {
+      console.error(`Heap snapshot files not found: ${filePath1} or ${filePath2}`)
+      console.error('Please ensure the heap snapshot files exist at the specified paths')
+      return null
+    }
+
     // Count named functions using optimized incremental parsing
-    const { locations } = await prepareHeapSnapshot(createReadStream(filePath1))
-    console.log({ locations })
     const result1 = await getMap(filePath1, scriptMap)
     const result2 = await getMap(filePath2, scriptMap)
 
@@ -104,15 +114,6 @@ const testOptimized = async () => {
 }
 
 const main = async () => {
-  const args = process.argv.slice(2)
-
-  if (args.length === 0) {
-    console.error('Usage: node test-optimized-only.js <heap-snapshot-file>')
-    process.exit(1)
-  }
-
-  const filePath = args[0]
-
   try {
     await testOptimized()
   } catch (error) {
