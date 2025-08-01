@@ -1,29 +1,26 @@
-const vscode = require("vscode");
+const vscode = require('vscode')
 
 const createStatusBarItem = () => {
-  const sbItem = vscode.window.createStatusBarItem(
-    vscode.StatusBarAlignment.Left,
-    1
-  );
-  sbItem.text = "0";
-  sbItem.tooltip = "Counter";
-  sbItem.command = "code-boilerplate.CodeBoilerPlate";
-  sbItem.show();
-  return sbItem;
-};
+  const sbItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1)
+  sbItem.text = '0'
+  sbItem.tooltip = 'Counter'
+  sbItem.command = 'code-boilerplate.CodeBoilerPlate'
+  sbItem.show()
+  return sbItem
+}
 
 exports.activate = async () => {
-  const item = createStatusBarItem();
-  let incrementing = true;
-  vscode.commands.registerCommand("code-boilerplate.CodeBoilerPlate", () => {
-    const current = parseInt(item.text);
+  const item = createStatusBarItem()
+  let incrementing = true
+  vscode.commands.registerCommand('code-boilerplate.CodeBoilerPlate', () => {
+    const current = parseInt(item.text)
     if (current === 0) {
-      incrementing = true;
+      incrementing = true
     }
     if (current === 2) {
-      incrementing = false;
+      incrementing = false
     }
-    const next = incrementing ? current + 1 : current - 1;
-    item.text = `${next}`;
-  });
-};
+    const next = incrementing ? current + 1 : current - 1
+    item.text = `${next}`
+  })
+}
