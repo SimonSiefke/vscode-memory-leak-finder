@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import { compareHeapSnapshotFunctions } from '../src/parts/CompareHeapSnapshotsFunctionsInternal/CompareHeapSnapshotsFunctionsInternal.js'
+import { compareHeapSnapshotFunctionsInternal } from '../src/parts/CompareHeapSnapshotsFunctionsInternal/CompareHeapSnapshotsFunctionsInternal.js'
 
 test('compareHeapSnapshots - no leaks', () => {
   const result1 = {
@@ -19,7 +19,7 @@ test('compareHeapSnapshots - no leaks', () => {
     },
   }
 
-  const result = compareHeapSnapshotFunctions(result1, result2)
+  const result = compareHeapSnapshotFunctionsInternal(result1, result2)
   expect(result).toEqual([])
 })
 
@@ -40,7 +40,7 @@ test('compareHeapSnapshots - one function count increased', () => {
       },
     },
   }
-  const result = compareHeapSnapshotFunctions(result1, result2)
+  const result = compareHeapSnapshotFunctionsInternal(result1, result2)
   expect(result).toEqual([
     {
       count: 2,
