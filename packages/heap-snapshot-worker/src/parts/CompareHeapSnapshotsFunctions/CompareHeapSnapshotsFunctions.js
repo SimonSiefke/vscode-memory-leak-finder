@@ -13,8 +13,12 @@ const prepareFunctions = async (path) => {
 
 export const compareHeapSnapshotFunctions = async (pathA, pathB) => {
   // TODO parsing could be done in parallel using worker threads and transfering the result buffers
+  console.time('parse')
   const resultA = await prepareFunctions(pathA)
   const resultB = await prepareFunctions(pathB)
+  console.timeEnd('parse')
+  console.time('compare')
   const result = compareHeapSnapshotFunctionsInternal(resultA, resultB)
+  console.timeEnd('compare')
   return result
 }
