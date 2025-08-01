@@ -5,15 +5,20 @@ import { performance } from 'node:perf_hooks'
 import { getUniqueLocationMap } from '../src/parts/GetUniqueLocationMap/GetUniqueLocationMap.js'
 import { prepareHeapSnapshot } from '../src/parts/PrepareHeapSnapshot/PrepareHeapSnapshot.js'
 
-// Mock scriptMap for testing
-const createMockScriptMap = () => {
+// Extract scriptMap from heap snapshot metadata
+const extractScriptMap = (metaData) => {
   const scriptMap = {}
-  for (let i = 0; i < 1000; i++) {
-    scriptMap[i] = {
-      url: `${i}.js`,
-      sourceMapUrl: `${i}.js.map`,
+
+  // The script information should be in the metadata
+  if (metaData && metaData.data && metaData.data.scripts) {
+    for (const script of metaData.data.scripts) {
+      scriptMap[script.scriptId] = {
+        url: script.url || '',
+        sourceMapUrl: script.sourceMapURL || '',
+      }
     }
   }
+
   return scriptMap
 }
 
@@ -35,6 +40,15 @@ const getMap = async (filePath, scriptMap) => {
 const compare = (result1, result2) => {
   const map1 = result1.map
   const map2 = result2.map
+
+  // Debug: show some keys from both maps
+  const keys1 = Object.keys(map1).slice(0, 5)
+  const keys2 = Object.keys(map2).slice(0, 5)
+  console.log('Sample keys from map1:', keys1)
+  console.log('Sample keys from map2:', keys2)
+  console.log('Map1 size:', Object.keys(map1).length)
+  console.log('Map2 size:', Object.keys(map2).length)
+
   const array = []
   for (const key of Object.keys(map2)) {
     const oldItem = map1[key]
@@ -56,7 +70,6 @@ const compare = (result1, result2) => {
 const testOptimized = async () => {
   // console.log(`\n=== Testing Optimized Named Function Count for: ${filePath} ===`)
 
-  const scriptMap = createMockScriptMap()
   const minCount = 1
 
   console.log('Testing Optimized Approach (getNamedFunctionCountFromHeapSnapshot2):')
@@ -74,6 +87,15 @@ const testOptimized = async () => {
       console.error('Please ensure the heap snapshot files exist at the specified paths')
       return null
     }
+
+        // Load both snapshots first to extract script map from metadata
+    const { locations: locations1, metaData: metaData1 } = await prepareHeapSnapshot(createReadStream(filePath1))
+    const { locations: locations2, metaData: metaData2 } = await prepareHeapSnapshot(createReadStream(filePath2))
+
+    // Extract script map from metadata (use first snapshot's metadata as they should be the same)
+    const scriptMap = extractScriptMap(metaData1)
+    console.log(`ScriptMap extracted with ${Object.keys(scriptMap).length} entries`)
+    console.log('ScriptMap:', JSON.stringify(scriptMap, null, 2))
 
     // Count named functions using optimized incremental parsing
     const result1 = await getMap(filePath1, scriptMap)
