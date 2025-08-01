@@ -14,9 +14,6 @@ export const parseHeapSnapshotStrings = async (id) => {
 }
 
 export const parseHeapSnapshotFunctions = async (id, scriptMap, minCount) => {
-  console.log({
-    scriptMap,
-  })
   return HeapSnapshotWorker.invoke('HeapSnapshot.parseFunctions', id, scriptMap, minCount)
 }
 
