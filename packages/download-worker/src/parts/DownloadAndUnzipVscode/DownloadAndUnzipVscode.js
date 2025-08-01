@@ -18,6 +18,7 @@ const getProductJsonPath = (path) => {
 export const downloadAndUnzipVscode = async (vscodeVersion) => {
   try {
     if (Env.env.VSCODE_PATH) {
+      console.warn('Warning: Using VSCODE_PATH environment variable is deprecated. Please use --vscode-path CLI flag instead.')
       return Env.env.VSCODE_PATH
     }
     const { downloadAndUnzipVSCode } = await import('@vscode/test-electron')

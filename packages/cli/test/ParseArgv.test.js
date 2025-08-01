@@ -47,3 +47,21 @@ test('parseArgv - cwd', () => {
     cwd: '/test',
   })
 })
+
+test('parseArgv - vscode-path flag', () => {
+  const argv = ['--vscode-path', '/path/to/vscode']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.vscodePath).toBe('/path/to/vscode')
+})
+
+test('parseArgv - vscode-path flag empty', () => {
+  const argv = ['--vscode-path', '']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.vscodePath).toBe('')
+})
+
+test('parseArgv - vscode-path flag not present', () => {
+  const argv = []
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.vscodePath).toBe('')
+})

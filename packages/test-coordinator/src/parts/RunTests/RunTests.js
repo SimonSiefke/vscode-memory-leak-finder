@@ -22,6 +22,7 @@ export const runTests = (
   runMode,
   ide,
   ideVersion,
+  vscodePath,
 ) => {
   return RunTestsWithCallback.runTests(
     root,
@@ -40,6 +41,7 @@ export const runTests = (
     runMode,
     ide,
     ideVersion,
+    vscodePath,
     callback,
   )
 }
