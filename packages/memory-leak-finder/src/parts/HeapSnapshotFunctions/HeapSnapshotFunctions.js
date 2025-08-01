@@ -48,3 +48,7 @@ export const getNamedClosureCountFromHeapSnapshot = async (value) => {
 export const getLargestArraysFromHeapSnapshot = async (value) => {
   return HeapSnapshotWorker.invoke('HeapSnapshot.getLargestArraysFromHeapSnapshot', value)
 }
+
+export const compareHeapSnapshotFunctions = async (pathA, pathB) => {
+  return HeapSnapshotWorker.invoke('HeapSnapshot.compareFunctions', pathA, pathB)
+}

@@ -1,3 +1,5 @@
+// deprecated in favor of namedFunctionCount2, which works with heapsnapshot
+// whereas this queries chrome for all function locations individually, crashing chrome
 import * as CompareNamedFunctionCount from '../CompareNamedFunctionCount/CompareNamedFunctionCount.js'
 import * as GetNamedFunctionCount from '../GetNamedFunctionCount/GetNamedFunctionCount.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'

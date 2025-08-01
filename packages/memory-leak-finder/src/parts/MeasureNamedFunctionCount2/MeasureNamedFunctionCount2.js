@@ -1,5 +1,5 @@
 import { compareNamedFunctionCount2 } from '../CompareNamedFunctionCount2/CompareNamedFunctionCount2.js'
-import * as GetNamedFunctionCount2 from '../GetNamedFunctionCount2/GetNamedFunctionCount2.js'
+import { getHeapSnapshot } from '../GetHeapSnapshot/GetHeapSnapshot.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.js'
@@ -14,16 +14,18 @@ export const create = (session) => {
 
 export const start = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.start(session)
-  const includeSourceMap = true
   const id = 0
-  return GetNamedFunctionCount2.getNamedFunctionCount2(session, objectGroup, scriptHandler.scriptMap, includeSourceMap, id)
+  return getHeapSnapshot(session, id)
 }
 
 export const stop = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.stop(session)
-  const includeSourceMap = true
   const id = 1
-  return GetNamedFunctionCount2.getNamedFunctionCount2(session, objectGroup, scriptHandler.scriptMap, includeSourceMap, id)
+  const heapSnapshotPath = await getHeapSnapshot(session, id)
+  return {
+    heapSnapshotPath,
+    scriptMap: scriptHandler.scriptMap,
+  }
 }
 
 export const compare = compareNamedFunctionCount2

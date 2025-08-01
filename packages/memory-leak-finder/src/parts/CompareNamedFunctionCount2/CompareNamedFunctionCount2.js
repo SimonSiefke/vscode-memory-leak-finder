@@ -1,30 +1,17 @@
-import * as CreateCountMap from '../CreateCountMap/CreateCountMap.js'
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
+import * as HeapSnapshotFunctions from '../HeapSnapshotFunctions/HeapSnapshotFunctions.js'
 
-const mergeFunctions = (beforeFunctions, afterFunctions) => {
-  const beforeMap = CreateCountMap.createCountMap(beforeFunctions, 'url')
-  const leaked = []
-  for (const element of afterFunctions) {
-    const beforeCount = beforeMap[element.url] || ''
-    const afterCount = element.count
-    const delta = afterCount - beforeCount
-    if (delta > 0) {
-      leaked.push({
-        ...element,
-        delta,
-      })
-    }
-  }
-  return leaked
-}
-
-const addSourceLocations = async (functionObjects) => {
+const addSourceLocations = async (functionObjects, scriptMap) => {
   const classNames = true
   const requests = functionObjects.map((item) => {
+    const script = scriptMap[item.scriptId]
+    const url = `${script.url}:${item.line}:${item.column}`
     return {
       ...item,
-      stack: [item.url],
-      sourceMaps: [item.sourceMapUrl],
+      name: 'abc',
+      url: url,
+      stack: [url],
+      sourceMaps: [script.sourceMapUrl],
     }
   })
   const withOriginalStack = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(requests, classNames)
@@ -41,8 +28,17 @@ const addSourceLocations = async (functionObjects) => {
   return normalized
 }
 
-export const compareNamedFunctionCount2 = async (before, after) => {
-  const leaked = mergeFunctions(before, after)
-  const withSourceLocations = await addSourceLocations(leaked)
+export const compareNamedFunctionCount2 = async (beforePath, after) => {
+  // TODO ask heapsnapshot worker to compare functions
+  // TODO then for the leaked functions, add sourcemap info
+  const afterPath = after.heapSnapshotPath
+  const scriptMap = after.scriptMap
+  console.log({ scriptMap })
+  console.time('check')
+  const leaked = await HeapSnapshotFunctions.compareHeapSnapshotFunctions(beforePath, afterPath)
+  console.timeEnd('check')
+  console.time('sourcemap')
+  const withSourceLocations = await addSourceLocations(leaked, scriptMap)
+  console.timeEnd('sourcemap')
   return withSourceLocations
 }
