@@ -19,6 +19,8 @@ const makeMemoryEfficient = (heapSnapshot) => {
 export const loadHeapSnapshot = async (path) => {
   const content = await readFile(path, 'utf8')
   const value = JSON.parse(content)
-  const efficient = makeMemoryEfficient(value)
-  HeapSnapshotState.set(path, efficient)
+  const mergedStrings = value.strings.join('\n')
+  value.merged = mergedStrings
+  // const efficient = makeMemoryEfficient(value)
+  HeapSnapshotState.set(path, value)
 }
