@@ -4,7 +4,8 @@ import { getUniqueLocationsResult } from '../src/parts/GetUniqueLocationsResult/
 
 test('getUniqueLocationMap - merge duplicates', () => {
   const locations = new Uint32Array([1, 2, 3, 4, 1, 2, 3, 4])
-  const locationMap = getUniqueLocationMap(locations)
-  const result = getUniqueLocationsResult(locationMap, locations)
+  const locationFields = ['object_index', 'script_id', 'line', 'column']
+  const locationMap = getUniqueLocationMap(locations, 4, 1, 2, 3)
+  const result = getUniqueLocationsResult(locationMap, locations, locationFields)
   expect(result).toEqual(new Uint32Array([1, 2, 3, 4, 2]))
 })

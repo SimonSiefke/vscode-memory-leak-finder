@@ -16,5 +16,6 @@ export const prepareHeapSnapshot = async (path) => {
     nodes,
     edges,
     locations,
+    locationFields: metaData.data.meta.location_fields,
   }
 }

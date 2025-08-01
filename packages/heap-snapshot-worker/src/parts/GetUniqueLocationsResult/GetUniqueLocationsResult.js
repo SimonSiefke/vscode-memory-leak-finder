@@ -1,17 +1,19 @@
-const ITEMS_PER_LOCATION = 4
+import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.js'
+
 const ITEMS_PER_RESULT = 5
 
-export const getUniqueLocationsResult = (locationMap, locations) => {
+export const getUniqueLocationsResult = (locationMap, locations, locationFields) => {
+  const { itemsPerLocation, objectIndexOffset, scriptIdOffset, lineOffset, columnOffset } = getLocationFieldOffsets(locationFields)
   const values = Object.values(locationMap)
 
   const result = new Uint32Array(values.length * ITEMS_PER_RESULT)
   let resultIndex = 0
   for (const value of values) {
     const { count, index } = value
-    const objectIndex = locations[index * ITEMS_PER_LOCATION]
-    const scriptId = locations[index * ITEMS_PER_LOCATION + 1]
-    const line = locations[index * ITEMS_PER_LOCATION + 2]
-    const column = locations[index * ITEMS_PER_LOCATION + 3]
+    const objectIndex = locations[index * itemsPerLocation + objectIndexOffset]
+    const scriptId = locations[index * itemsPerLocation + scriptIdOffset]
+    const line = locations[index * itemsPerLocation + lineOffset]
+    const column = locations[index * itemsPerLocation + columnOffset]
     result[resultIndex * ITEMS_PER_RESULT] = objectIndex
     result[resultIndex * ITEMS_PER_RESULT + 1] = scriptId
     result[resultIndex * ITEMS_PER_RESULT + 2] = line

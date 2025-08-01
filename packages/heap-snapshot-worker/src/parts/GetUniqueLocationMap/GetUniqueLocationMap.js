@@ -1,14 +1,9 @@
 import { getLocationKey } from '../GetLocationKey/GetLocationKey.js'
 
-const ITEMS_PER_LOCATION = 4
-const scriptOffset = 1
-const lineOffset = 2
-const columnOffset = 3
-
-export const getUniqueLocationMap = (locations) => {
+export const getUniqueLocationMap = (locations, itemsPerLocation, scriptIdOffset, lineOffset, columnOffset) => {
   const locationMap = Object.create(null)
-  for (let i = 0; i < locations.length; i += ITEMS_PER_LOCATION) {
-    const scriptId = locations[i + scriptOffset]
+  for (let i = 0; i < locations.length; i += itemsPerLocation) {
+    const scriptId = locations[i + scriptIdOffset]
     const lineIndex = locations[i + lineOffset]
     const columnIndex = locations[i + columnOffset]
     const key = getLocationKey(scriptId, lineIndex, columnIndex)
@@ -17,7 +12,7 @@ export const getUniqueLocationMap = (locations) => {
     } else {
       locationMap[key] = {
         count: 1,
-        index: i / ITEMS_PER_LOCATION,
+        index: i / itemsPerLocation,
       }
     }
   }
