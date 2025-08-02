@@ -1,7 +1,7 @@
 import { join } from 'node:path'
-import { access } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { VError } from '@lvce-editor/verror'
+import { pathExists } from 'path-exists'
 import * as ResolveCommitHash from '../ResolveCommitHash/ResolveCommitHash.js'
 import { setupNodeModulesFromCache } from '../SetupNodeModulesFromCache/SetupNodeModulesFromCache.js'
 import { cacheNodeModules } from '../CacheNodeModules/CacheNodeModules.js'
@@ -13,19 +13,7 @@ import * as RunCompile from '../RunCompile/RunCompile.js'
 const VSCODE_REPO_URL = 'https://github.com/microsoft/vscode.git'
 const VSCODE_REPOS_DIR = '.vscode-repos'
 
-/**
- * Checks if a file or directory exists
- * @param {string} path - The path to check
- * @returns {Promise<boolean>} True if the path exists, false otherwise
- */
-const exists = async (path) => {
-  try {
-    await access(path)
-    return true
-  } catch {
-    return false
-  }
-}
+
 
 /**
  * @param {string} commitRef - The commit reference (branch name, tag, or commit hash)
@@ -41,11 +29,11 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
     const nodeModulesPath = join(repoPath, 'node_modules')
     const outPath = join(repoPath, 'out')
 
-    if (!(await exists(mainJsPath))) {
+    if (!(await pathExists(mainJsPath))) {
       console.log(`Building VS Code for commit ${commitHash}...`)
 
       // Check if node_modules exists in the repo
-      if (!(await exists(nodeModulesPath))) {
+      if (!(await pathExists(nodeModulesPath))) {
         console.log(`node_modules not found in repo, attempting to restore from cache...`)
 
         // Try to use cached node_modules first
@@ -67,7 +55,7 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
       }
 
       // Check if out folder exists before attempting to compile
-      if (!(await exists(outPath))) {
+      if (!(await pathExists(outPath))) {
         console.log(`out folder not found, running npm run compile for commit ${commitHash}...`)
         // Run compilation with resource management (use nice on Linux)
         const useNice = platform() === 'linux'
@@ -77,7 +65,7 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
       }
 
       // Verify build was successful
-      if (!(await exists(mainJsPath))) {
+      if (!(await pathExists(mainJsPath))) {
         throw new Error(`Build failed: out/main.js not found after compilation`)
       }
 
@@ -89,7 +77,7 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
 
     // Return the path to the code.sh script
     const codeScriptPath = join(repoPath, 'scripts', 'code.sh')
-    if (!(await exists(codeScriptPath))) {
+    if (!(await pathExists(codeScriptPath))) {
       throw new Error(`VS Code script not found at ${codeScriptPath}`)
     }
 
