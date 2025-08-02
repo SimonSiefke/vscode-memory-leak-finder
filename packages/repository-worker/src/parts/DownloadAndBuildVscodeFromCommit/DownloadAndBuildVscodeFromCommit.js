@@ -32,7 +32,7 @@ const exists = async (path) => {
  */
 export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
   // Resolve the commit reference to an actual commit hash
-  const commitHash = await ResolveCommitHash.resolveCommitHash(commitRef)
+  const commitHash = await ResolveCommitHash.resolveCommitHash(VSCODE_REPO_URL, commitRef)
   try {
     const repoPath = await DownloadVscodeCommit.downloadVscodeCommit(VSCODE_REPO_URL, commitHash, VSCODE_REPOS_DIR)
 
