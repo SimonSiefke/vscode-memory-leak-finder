@@ -70,22 +70,14 @@ export const setupNodeModulesFromCache = async (repoPath) => {
     }
 
     // Check if cached node_modules exists
-    if (existsSync(cachedNodeModulesPath)) {
+    const cachedNodeModulesTreePath = join(cachedNodeModulesPath, 'node_modules')
+    if (existsSync(cachedNodeModulesTreePath)) {
       console.log(`Using cached node_modules for cache key: ${cacheKey}`)
 
-      // Find all cached node_modules directories
-      const cachedDirs = readdirSync(cachedNodeModulesPath)
-
-      for (const dir of cachedDirs) {
-        const cachedDirPath = join(cachedNodeModulesPath, dir)
-        const targetDirPath = join(repoPath, dir)
-
-        if (statSync(cachedDirPath).isDirectory()) {
-          console.log(`Restoring cached node_modules from: ${dir}`)
-          // Use force option to overwrite existing files
-          cpSync(cachedDirPath, targetDirPath, { recursive: true, force: true })
-        }
-      }
+      // Restore the entire node_modules tree
+      const targetNodeModulesPath = join(repoPath, 'node_modules')
+      console.log('Restoring cached node_modules tree')
+      cpSync(cachedNodeModulesTreePath, targetNodeModulesPath, { recursive: true, force: true })
 
       return true
     } else {
@@ -107,12 +99,11 @@ export const cacheNodeModules = async (repoPath) => {
     const cacheKey = await ComputeVscodeNodeModulesCacheKey.computeVscodeNodeModulesCacheKey(repoPath)
     const cacheDir = join(Root.root, VSCODE_NODE_MODULES_CACHE_DIR)
     const cachedNodeModulesPath = join(cacheDir, cacheKey)
+    const sourceNodeModulesPath = join(repoPath, 'node_modules')
 
-    // Find all node_modules directories in the repo
-    const nodeModulesDirs = findAllNodeModulesDirs(repoPath)
-
-    if (nodeModulesDirs.length === 0) {
-      console.log('No node_modules found to cache')
+    // Check if top-level node_modules exists
+    if (!existsSync(sourceNodeModulesPath)) {
+      console.log('No top-level node_modules found to cache')
       return
     }
 
@@ -126,22 +117,9 @@ export const cacheNodeModules = async (repoPath) => {
       mkdirSync(cachedNodeModulesPath, { recursive: true })
     }
 
-    // Copy each node_modules directory to cache
-    console.log(`Caching ${nodeModulesDirs.length} node_modules directories with cache key: ${cacheKey}`)
-
-    for (const nodeModulesDir of nodeModulesDirs) {
-      const sourcePath = join(repoPath, nodeModulesDir)
-      const cachePath = join(cachedNodeModulesPath, nodeModulesDir)
-
-      // Create parent directories in cache if they don't exist
-      const cacheParentDir = join(cachedNodeModulesPath, nodeModulesDir.split('/').slice(0, -1).join('/'))
-      if (!existsSync(cacheParentDir)) {
-        mkdirSync(cacheParentDir, { recursive: true })
-      }
-
-      console.log(`Caching node_modules from: ${nodeModulesDir}`)
-      cpSync(sourcePath, cachePath, { recursive: true })
-    }
+    // Copy the entire node_modules tree to cache
+    console.log(`Caching node_modules tree with cache key: ${cacheKey}`)
+    cpSync(sourceNodeModulesPath, join(cachedNodeModulesPath, 'node_modules'), { recursive: true })
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     console.warn(`Failed to cache node_modules: ${errorMessage}`)
@@ -153,22 +131,11 @@ export const cacheNodeModules = async (repoPath) => {
  */
 export const cleanupNodeModules = (repoPath) => {
   try {
-    // Find all node_modules directories in the repo
-    const nodeModulesDirs = findAllNodeModulesDirs(repoPath)
+    const nodeModulesPath = join(repoPath, 'node_modules')
 
-    if (nodeModulesDirs.length === 0) {
-      return
-    }
-
-    console.log(`Cleaning up ${nodeModulesDirs.length} node_modules directories to save disk space`)
-
-    for (const nodeModulesDir of nodeModulesDirs) {
-      const nodeModulesPath = join(repoPath, nodeModulesDir)
-
-      if (existsSync(nodeModulesPath)) {
-        console.log(`Cleaning up: ${nodeModulesDir}`)
-        rmSync(nodeModulesPath, { recursive: true, force: true })
-      }
+    if (existsSync(nodeModulesPath)) {
+      console.log('Cleaning up node_modules to save disk space')
+      rmSync(nodeModulesPath, { recursive: true, force: true })
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
