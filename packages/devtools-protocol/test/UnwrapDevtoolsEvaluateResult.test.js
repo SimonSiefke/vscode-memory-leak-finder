@@ -57,7 +57,7 @@ test('unwrapResult - unknown value', () => {
     UnwrapDevtoolsEvaluateResult.unwrapResult({
       id: 1,
     }),
-  ).toThrowError(new Error(`Failed to unwrap devtools evaluate result`))
+  ).toThrow(new Error(`Failed to unwrap devtools evaluate result`))
 })
 
 test('unwrapResult - result with empty object', () => {

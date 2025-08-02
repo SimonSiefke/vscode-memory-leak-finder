@@ -37,7 +37,7 @@ Require stack:
 - `,
     )
   }, 0)
-  await expect(WaitForDevtoolsListening.waitForDevtoolsListening(stream)).rejects.toThrowError(
+  await expect(WaitForDevtoolsListening.waitForDevtoolsListening(stream)).rejects.toThrow(
     new Error(
       "Error launching app: Unable to find Electron app at /test/e2e/fixtures/not-found: Cannot find module '/test/e2e/fixtures/not-found': Require stack: - /test/e2e/node_modules/electron/dist/resources/default_app.asar/main.js",
     ),
@@ -59,7 +59,7 @@ test('waitForDevtoolsListening - error - main not found', async () => {
         `Cannot find module '/test/e2e/fixtures/sample.error-main-not-found/not-found.js'. Please verify that the package.json has a valid "main" entry\u001B[0m\n`,
     )
   }, 0)
-  await expect(WaitForDevtoolsListening.waitForDevtoolsListening(stream)).rejects.toThrowError(
+  await expect(WaitForDevtoolsListening.waitForDevtoolsListening(stream)).rejects.toThrow(
     new Error(
       'Error launching app: Unable to find Electron app at /test/e2e/fixtures/sample.error-main-not-found: Cannot find module \'/test/e2e/fixtures/sample.error-main-not-found/not-found.js\'. Please verify that the package.json has a valid "main" entry',
     ),
@@ -81,7 +81,7 @@ test('waitForDevtoolsListening - error - invalid package json', async () => {
         "/test/e2e/fixtures/sample.error-invalid-package-json/package.json: Expected ',' or '}' after property value in JSON at position 182\u001B[0m\n",
     )
   }, 0)
-  await expect(WaitForDevtoolsListening.waitForDevtoolsListening(stream)).rejects.toThrowError(
+  await expect(WaitForDevtoolsListening.waitForDevtoolsListening(stream)).rejects.toThrow(
     new Error(
       "Error launching app: Unable to parse /test/e2e/fixtures/sample.error-invalid-package-json/package.json: /test/e2e/fixtures/sample.error-invalid-package-json/package.json: Expected ',' or '}' after property value in JSON at position 182",
     ),
@@ -114,7 +114,7 @@ test('waitForDevtoolsListening - error - es modules not supported', async () => 
       )
     }, 0)
   }, 0)
-  await expect(WaitForDevtoolsListening.waitForDevtoolsListening(stream)).rejects.toThrowError(
+  await expect(WaitForDevtoolsListening.waitForDevtoolsListening(stream)).rejects.toThrow(
     new Error(
       'App threw an error during load: Error [ERR_REQUIRE_ESM]: require() of ES Module /test/e2e/fixtures/sample.error-es-modules-not-supported/main.js from /test/e2e/node_modules/electron/dist/resources/default_app.asar/main.js not supported.',
     ),
