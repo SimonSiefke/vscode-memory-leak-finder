@@ -1,16 +1,15 @@
-import { join } from 'node:path'
 import { mkdir } from 'node:fs/promises'
 import { platform } from 'node:os'
+import { join } from 'node:path'
 import { pathExists } from 'path-exists'
-import * as ResolveCommitHash from '../ResolveCommitHash/ResolveCommitHash.js'
-import { setupNodeModulesFromCache } from '../SetupNodeModulesFromCache/SetupNodeModulesFromCache.js'
 import { addNodeModulesToCache } from '../CacheNodeModules/CacheNodeModules.js'
 import { checkCacheExists } from '../CheckCacheExists/CheckCacheExists.js'
-import { cloneRepository } from '../CloneRepository/CloneRepository.js'
 import { checkoutCommit } from '../CheckoutCommit/CheckoutCommit.js'
-import * as Root from '../Root/Root.js'
+import { cloneRepository } from '../CloneRepository/CloneRepository.js'
 import * as InstallDependencies from '../InstallDependencies/InstallDependencies.js'
+import * as ResolveCommitHash from '../ResolveCommitHash/ResolveCommitHash.js'
 import * as RunCompile from '../RunCompile/RunCompile.js'
+import { setupNodeModulesFromCache } from '../SetupNodeModulesFromCache/SetupNodeModulesFromCache.js'
 
 /**
  * @param {string} commitRef - The commit reference (branch name, tag, or commit hash)
@@ -21,11 +20,10 @@ import * as RunCompile from '../RunCompile/RunCompile.js'
 export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, reposDir, cacheDir) => {
   // Resolve the commit reference to an actual commit hash
   const commitHash = await ResolveCommitHash.resolveCommitHash(repoUrl, commitRef)
-  const reposDirPath = join(Root.root, reposDir)
-  const repoPath = join(reposDirPath, commitHash)
+  const repoPath = join(reposDir, commitHash)
 
   // Create parent directory if it doesn't exist
-  const existsReposDir = await pathExists(reposDirPath)
+  const existsReposDir = await pathExists(reposDir)
 
   // Check what's needed at the start
   const mainJsPath = join(repoPath, 'out', 'main.js')
