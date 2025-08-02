@@ -36,7 +36,6 @@ export const getCacheFileOperations = async (repoPathUri, cacheKey, cacheDirUri,
 
   // Convert URIs to paths for path manipulation
   const repoPath = fileURLToPath(repoPathUri)
-  const cacheDir = fileURLToPath(cacheDirUri)
   const cachedNodeModulesPath = fileURLToPath(cachedNodeModulesPathUri)
 
   // Add directory creation operations

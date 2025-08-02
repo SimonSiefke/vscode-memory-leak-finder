@@ -3,7 +3,6 @@ import { mkdir } from 'node:fs/promises'
 import { execa } from 'execa'
 import { pathExists } from 'path-exists'
 import { VError } from '@lvce-editor/verror'
-import * as Root from '../Root/Root.js'
 
 /**
  * Clones a repository to a local directory
