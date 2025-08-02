@@ -1,4 +1,3 @@
-import { platform } from 'node:os'
 import { execa } from 'execa'
 
 /**
@@ -7,7 +6,7 @@ import { execa } from 'execa'
  * @param {boolean} useNice - Whether to use nice command for resource management
  */
 export const installDependencies = async (cwd, useNice) => {
-  if (useNice && platform() === 'linux') {
+  if (useNice) {
     console.log(`Using nice to reduce system resource usage...`)
     await execa('nice', ['-n', '10', 'npm', 'ci'], { cwd })
   } else {

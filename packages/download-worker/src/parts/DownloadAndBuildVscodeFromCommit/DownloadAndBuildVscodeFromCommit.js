@@ -1,5 +1,6 @@
 import { join } from 'node:path'
 import { access } from 'node:fs/promises'
+import { platform } from 'node:os'
 import { VError } from '@lvce-editor/verror'
 import * as ResolveCommitHash from '../ResolveCommitHash/ResolveCommitHash.js'
 import * as VscodeNodeModulesCache from '../VscodeNodeModulesCache/VscodeNodeModulesCache.js'
@@ -50,8 +51,9 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
 
         if (!cacheHit) {
           console.log(`No cached node_modules found, running npm ci for commit ${commitHash}...`)
-          // Install dependencies with resource management
-          await InstallDependencies.installDependencies(repoPath, true)
+          // Install dependencies with resource management (use nice on Linux)
+          const useNice = platform() === 'linux'
+          await InstallDependencies.installDependencies(repoPath, useNice)
 
           // Cache the node_modules for future use
           await VscodeNodeModulesCache.cacheNodeModules(repoPath)
@@ -65,8 +67,9 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
       // Check if out folder exists before attempting to compile
       if (!(await exists(outPath))) {
         console.log(`out folder not found, running npm run compile for commit ${commitHash}...`)
-        // Run compilation with resource management
-        await RunCompile.runCompile(repoPath, true)
+        // Run compilation with resource management (use nice on Linux)
+        const useNice = platform() === 'linux'
+        await RunCompile.runCompile(repoPath, useNice)
       } else {
         console.log(`out folder already exists for commit ${commitHash}, skipping compilation...`)
       }
