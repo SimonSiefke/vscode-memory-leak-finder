@@ -1,4 +1,4 @@
-import { test, expect, jest } from '@jest/globals'
+import { test, expect, jest, beforeEach } from '@jest/globals'
 import { pathToFileURL } from 'node:url'
 
 // Mock the glob function
@@ -6,6 +6,10 @@ const mockGlob = jest.fn()
 jest.unstable_mockModule('node:fs/promises', () => ({
   glob: mockGlob
 }))
+
+beforeEach(() => {
+  mockGlob.mockClear()
+})
 
 test('findPackageLockFiles - returns empty array when no package-lock.json files found', async () => {
   // Mock glob to return empty results
@@ -47,7 +51,8 @@ test('findPackageLockFiles - returns file URIs when package-lock.json files foun
 
 test('findPackageLockFiles - excludes node_modules package-lock.json files', async () => {
   // Mock glob to return package-lock.json files including some in node_modules
-  const mockPaths = ['package-lock.json', 'node_modules/some-package/package-lock.json', 'subdir/package-lock.json']
+  // Since we're using the exclude option, glob should not return node_modules paths
+  const mockPaths = ['package-lock.json', 'subdir/package-lock.json']
   mockGlob.mockReturnValue((async function* () {
     for (const path of mockPaths) {
       yield path
@@ -62,6 +67,11 @@ test('findPackageLockFiles - excludes node_modules package-lock.json files', asy
     'file:///test/path/package-lock.json',
     'file:///test/path/subdir/package-lock.json'
   ])
+  expect(mockGlob).toHaveBeenCalledTimes(1)
+  expect(mockGlob).toHaveBeenCalledWith('**/package-lock.json', {
+    cwd: '/test/path',
+    exclude: ['**/node_modules/**']
+  })
 })
 
 test('findPackageLockFiles - throws VError when glob fails', async () => {
@@ -74,6 +84,7 @@ test('findPackageLockFiles - throws VError when glob fails', async () => {
   await expect(findPackageLockFiles(pathToFileURL('/test/path').href))
     .rejects.toThrow('Failed to find package-lock.json files in directory')
 
+  expect(mockGlob).toHaveBeenCalledTimes(1)
   expect(mockGlob).toHaveBeenCalledWith('**/package-lock.json', {
     cwd: '/test/path',
     exclude: ['**/node_modules/**']
