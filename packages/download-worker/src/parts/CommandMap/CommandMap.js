@@ -3,7 +3,9 @@ import * as DownloadAndUnzipVscode from '../DownloadAndUnzipVscode/DownloadAndUn
 import * as DownloadAndBuildVscodeFromCommit from '../DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js'
 import * as DownloadFfmpeg from '../DownloadFfmpeg/DownloadFfmpeg.js'
 import * as DownloadFfmpegMaybe from '../DownloadFfmpegMaybe/DownloadFfmpegMaybe.js'
-import * as VscodeNodeModulesCache from '../VscodeNodeModulesCache/VscodeNodeModulesCache.js'
+import { setupNodeModulesFromCache } from '../SetupNodeModulesFromCache/SetupNodeModulesFromCache.js'
+import { cacheNodeModules } from '../CacheNodeModules/CacheNodeModules.js'
+import { cleanupNodeModules } from '../CleanupNodeModules/CleanupNodeModules.js'
 import * as ResolveCommitHash from '../ResolveCommitHash/ResolveCommitHash.js'
 
 export const commandMap = {
@@ -12,8 +14,8 @@ export const commandMap = {
   'Download.downloadAndBuildVscodeFromCommit': DownloadAndBuildVscodeFromCommit.downloadAndBuildVscodeFromCommit,
   'Download.downloadFfmpeg': DownloadFfmpeg.downloadFfmpeg,
   'Download.downloadFfmpegMaybe': DownloadFfmpegMaybe.downloadFfmpegMaybe,
-  'VscodeNodeModulesCache.setupNodeModulesFromCache': VscodeNodeModulesCache.setupNodeModulesFromCache,
-  'VscodeNodeModulesCache.cacheNodeModules': VscodeNodeModulesCache.cacheNodeModules,
-  'VscodeNodeModulesCache.cleanupNodeModules': VscodeNodeModulesCache.cleanupNodeModules,
+  'VscodeNodeModulesCache.setupNodeModulesFromCache': setupNodeModulesFromCache,
+  'VscodeNodeModulesCache.cacheNodeModules': cacheNodeModules,
+  'VscodeNodeModulesCache.cleanupNodeModules': cleanupNodeModules,
   'ResolveCommitHash.resolveCommitHash': ResolveCommitHash.resolveCommitHash,
 }

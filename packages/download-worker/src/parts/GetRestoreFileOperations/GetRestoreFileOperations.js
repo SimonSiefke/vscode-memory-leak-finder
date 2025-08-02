@@ -72,7 +72,7 @@ export const getRestoreFileOperations = async (repoPathUri, cacheKey, cacheDirUr
         const targetPathUri = new URL(relativePath, repoPathUri).href
         fileOperations.push({
           type: /** @type {'copy'} */ ('copy'),
-          from: cachedNodeModulesPathUri,
+          from: sourceNodeModulesPathUri,
           to: targetPathUri,
         })
       }

@@ -1,5 +1,6 @@
 import { join } from 'node:path'
 import { glob } from 'node:fs/promises'
+import { pathToFileURL } from 'node:url'
 import * as GetRestoreFileOperations from '../GetRestoreFileOperations/GetRestoreFileOperations.js'
 import * as ApplyFileOperations from '../ApplyFileOperations/ApplyFileOperations.js'
 import * as ComputeVscodeNodeModulesCacheKey from '../ComputeVscodeNodeModulesCacheKey/ComputeVscodeNodeModulesCacheKey.js'
@@ -16,6 +17,11 @@ export const setupNodeModulesFromCache = async (repoPath) => {
     const cacheDir = join(Root.root, VSCODE_NODE_MODULES_CACHE_DIR)
     const cachedNodeModulesPath = join(cacheDir, cacheKey)
 
+    // Convert paths to file URIs
+    const repoPathUri = pathToFileURL(repoPath).href
+    const cacheDirUri = pathToFileURL(cacheDir).href
+    const cachedNodeModulesPathUri = pathToFileURL(cachedNodeModulesPath).href
+
     // Find all cached node_modules directories using glob
     const allCachedNodeModulesPaths = await Array.fromAsync(
       glob('**/node_modules', { cwd: cachedNodeModulesPath }),
@@ -25,7 +31,7 @@ export const setupNodeModulesFromCache = async (repoPath) => {
       !path.includes('node_modules/node_modules')
     )
 
-    const fileOperations = await GetRestoreFileOperations.getRestoreFileOperations(repoPath, cacheKey, cacheDir, cachedNodeModulesPath, cachedNodeModulesPaths)
+    const fileOperations = await GetRestoreFileOperations.getRestoreFileOperations(repoPathUri, cacheKey, cacheDirUri, cachedNodeModulesPathUri, cachedNodeModulesPaths)
 
     if (fileOperations.length > 0) {
       await ApplyFileOperations.applyFileOperations(fileOperations)

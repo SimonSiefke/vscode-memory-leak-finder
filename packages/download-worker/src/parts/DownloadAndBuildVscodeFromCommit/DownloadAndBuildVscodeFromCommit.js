@@ -3,7 +3,9 @@ import { access } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { VError } from '@lvce-editor/verror'
 import * as ResolveCommitHash from '../ResolveCommitHash/ResolveCommitHash.js'
-import * as VscodeNodeModulesCache from '../VscodeNodeModulesCache/VscodeNodeModulesCache.js'
+import { setupNodeModulesFromCache } from '../SetupNodeModulesFromCache/SetupNodeModulesFromCache.js'
+import { cacheNodeModules } from '../CacheNodeModules/CacheNodeModules.js'
+import { cleanupNodeModules } from '../CleanupNodeModules/CleanupNodeModules.js'
 import * as DownloadVscodeCommit from '../DownloadVscodeCommit/DownloadVscodeCommit.js'
 import * as InstallDependencies from '../InstallDependencies/InstallDependencies.js'
 import * as RunCompile from '../RunCompile/RunCompile.js'
@@ -47,7 +49,7 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
         console.log(`node_modules not found in repo, attempting to restore from cache...`)
 
         // Try to use cached node_modules first
-        const cacheHit = await VscodeNodeModulesCache.setupNodeModulesFromCache(repoPath)
+        const cacheHit = await setupNodeModulesFromCache(repoPath)
 
         if (!cacheHit) {
           console.log(`No cached node_modules found, running npm ci for commit ${commitHash}...`)
@@ -56,7 +58,7 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
           await InstallDependencies.installDependencies(repoPath, useNice)
 
           // Cache the node_modules for future use
-          await VscodeNodeModulesCache.cacheNodeModules(repoPath)
+          await cacheNodeModules(repoPath)
         } else {
           console.log(`Successfully restored node_modules from cache for commit ${commitHash}`)
         }
@@ -80,7 +82,7 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
       }
 
       // Clean up node_modules to save disk space
-      VscodeNodeModulesCache.cleanupNodeModules(repoPath)
+      cleanupNodeModules(repoPath)
     } else {
       console.log(`VS Code build for commit ${commitHash} already exists, skipping build...`)
     }
