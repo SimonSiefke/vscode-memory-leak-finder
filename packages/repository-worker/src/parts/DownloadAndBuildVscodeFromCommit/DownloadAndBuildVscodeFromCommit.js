@@ -25,9 +25,6 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, repos
 
   // Create parent directory if it doesn't exist
   const existsReposDir = await pathExists(reposDirPath)
-  if (!existsReposDir) {
-    await mkdir(reposDirPath, { recursive: true })
-  }
 
   // Check what's needed at the start
   const mainJsPath = join(repoPath, 'out', 'main.js')
@@ -42,6 +39,10 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, repos
   const needsClone = !existsRepoPath
   const needsInstall = !existsMainJsPath && !existsNodeModulesPath
   const needsCompile = !existsMainJsPath && !existsOutPath
+
+  if (!existsReposDir) {
+    await mkdir(reposDirPath, { recursive: true })
+  }
 
   // Clone the repository if needed
   if (needsClone) {
