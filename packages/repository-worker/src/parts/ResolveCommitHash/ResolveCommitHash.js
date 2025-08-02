@@ -1,6 +1,7 @@
 import { execa } from 'execa'
 import { VError } from '@lvce-editor/verror'
 import { isFullCommitHash } from '../IsFullCommitHash/IsFullCommitHash.js'
+import { parseCommitHash } from '../ParseCommitHash/ParseCommitHash.js'
 
 /**
  * Resolves a commit reference (branch name, tag, or commit hash) to an actual commit hash
@@ -18,21 +19,7 @@ export const resolveCommitHash = async (repoUrl, commitRef) => {
     // Use git ls-remote to get the commit hash for the reference
     const { stdout } = await execa('git', ['ls-remote', repoUrl, commitRef])
 
-    // Parse the output to get the commit hash
-    const lines = stdout.trim().split('\n')
-    if (lines.length === 0 || lines[0] === '') {
-      throw new Error(`No commit found for reference '${commitRef}'`)
-    }
-
-    // Take the first line and extract the commit hash (first 40 characters)
-    const commitHash = lines[0].slice(0, 40)
-
-    // Validate that it's a proper commit hash
-    if (!isFullCommitHash(commitHash)) {
-      throw new Error(`Invalid commit hash resolved: ${commitHash}`)
-    }
-
-    return commitHash
+    return parseCommitHash(stdout, commitRef)
   } catch (error) {
     throw new VError(error, `Failed to resolve commit reference '${commitRef}'`)
   }
