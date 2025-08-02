@@ -31,62 +31,58 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
       await mkdir(reposDir, { recursive: true })
     }
 
-    // Clone the repository
-    await cloneRepository(VSCODE_REPO_URL, repoPath)
-
-    // Checkout the specific commit
-    await checkoutCommit(repoPath, commitHash)
-
-    // Check if out/main.js exists (build was successful)
+    // Check what's needed at the start
     const mainJsPath = join(repoPath, 'out', 'main.js')
     const nodeModulesPath = join(repoPath, 'node_modules')
     const outPath = join(repoPath, 'out')
 
-    if (!(await pathExists(mainJsPath))) {
-      console.log(`Building VS Code for commit ${commitHash}...`)
+    const needsClone = !(await pathExists(repoPath))
+    const needsInstall = !(await pathExists(mainJsPath)) && !(await pathExists(nodeModulesPath))
+    const needsCompile = !(await pathExists(mainJsPath)) && !(await pathExists(outPath))
 
-      // Check if node_modules exists in the repo
-      if (!(await pathExists(nodeModulesPath))) {
-        console.log(`node_modules not found in repo, attempting to restore from cache...`)
-
-        // Try to use cached node_modules first
-        const cacheHit = await setupNodeModulesFromCache(repoPath)
-
-        if (!cacheHit) {
-          console.log(`No cached node_modules found, running npm ci for commit ${commitHash}...`)
-          // Install dependencies with resource management (use nice on Linux)
-          const useNice = platform() === 'linux'
-          await InstallDependencies.installDependencies(repoPath, useNice)
-
-          // Cache the node_modules for future use
-          await addNodeModulesToCache(repoPath)
-        } else {
-          console.log(`Successfully restored node_modules from cache for commit ${commitHash}`)
-        }
-      } else {
-        console.log(`node_modules already exists in repo for commit ${commitHash}, skipping npm ci...`)
-      }
-
-      // Check if out folder exists before attempting to compile
-      if (!(await pathExists(outPath))) {
-        console.log(`out folder not found, running npm run compile for commit ${commitHash}...`)
-        // Run compilation with resource management (use nice on Linux)
-        const useNice = platform() === 'linux'
-        await RunCompile.runCompile(repoPath, useNice)
-      } else {
-        console.log(`out folder already exists for commit ${commitHash}, skipping compilation...`)
-      }
-
-      // Verify build was successful
-      if (!(await pathExists(mainJsPath))) {
-        throw new Error(`Build failed: out/main.js not found after compilation`)
-      }
-
-      // Clean up node_modules to save disk space
-      cleanupNodeModules(repoPath)
-    } else {
-      console.log(`VS Code build for commit ${commitHash} already exists, skipping build...`)
+    // Clone the repository if needed
+    if (needsClone) {
+      await cloneRepository(VSCODE_REPO_URL, repoPath)
+      await checkoutCommit(repoPath, commitHash)
     }
+
+    // Install dependencies if needed
+    if (needsInstall) {
+      console.log(`Installing dependencies for commit ${commitHash}...`)
+      
+      // Try to use cached node_modules first
+      const cacheHit = await setupNodeModulesFromCache(repoPath)
+      
+      if (!cacheHit) {
+        console.log(`No cached node_modules found, running npm ci for commit ${commitHash}...`)
+        // Install dependencies with resource management (use nice on Linux)
+        const useNice = platform() === 'linux'
+        await InstallDependencies.installDependencies(repoPath, useNice)
+
+        // Cache the node_modules for future use
+        await addNodeModulesToCache(repoPath)
+      } else {
+        console.log(`Successfully restored node_modules from cache for commit ${commitHash}`)
+      }
+    } else if (!(await pathExists(mainJsPath))) {
+      console.log(`node_modules already exists in repo for commit ${commitHash}, skipping npm ci...`)
+    }
+
+    // Compile if needed
+    if (needsCompile) {
+      console.log(`Compiling VS Code for commit ${commitHash}...`)
+      // Run compilation with resource management (use nice on Linux)
+      const useNice = platform() === 'linux'
+      await RunCompile.runCompile(repoPath, useNice)
+    }
+
+    // Verify build was successful
+    if (!(await pathExists(mainJsPath))) {
+      throw new Error(`Build failed: out/main.js not found after compilation`)
+    }
+
+    // Clean up node_modules to save disk space
+    cleanupNodeModules(repoPath)
 
     // Return the path to the code.sh script
     const codeScriptPath = join(repoPath, 'scripts', 'code.sh')
