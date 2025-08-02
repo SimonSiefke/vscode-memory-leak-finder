@@ -1,40 +1,40 @@
 import { test, expect, jest, beforeEach } from '@jest/globals'
 import { VError } from '@lvce-editor/verror'
 
-const mockExeca = jest.fn()
-jest.unstable_mockModule('execa', () => ({
-  execa: mockExeca,
+const mockExec = jest.fn()
+jest.unstable_mockModule('../src/parts/Exec/Exec.js', () => ({
+  exec: mockExec,
 }))
 
 beforeEach(() => {
-  mockExeca.mockClear()
+  mockExec.mockClear()
 })
 
 test('installDependencies - runs npm ci without nice', async () => {
-  mockExeca.mockImplementation(() => Promise.resolve({ stdout: '', stderr: '' }))
+  mockExec.mockImplementation(() => Promise.resolve({ stdout: '', stderr: '' }))
 
   const { installDependencies } = await import('../src/parts/InstallDependencies/InstallDependencies.js')
 
   await installDependencies('/test/path', false)
 
-  expect(mockExeca).toHaveBeenCalledWith('npm', ['ci'], { cwd: '/test/path' })
-  expect(mockExeca).toHaveBeenCalledTimes(1)
+  expect(mockExec).toHaveBeenCalledWith('npm', ['ci'], { cwd: '/test/path' })
+  expect(mockExec).toHaveBeenCalledTimes(1)
 })
 
 test('installDependencies - runs npm ci with nice', async () => {
-  mockExeca.mockImplementation(() => Promise.resolve({ stdout: '', stderr: '' }))
+  mockExec.mockImplementation(() => Promise.resolve({ stdout: '', stderr: '' }))
 
   const { installDependencies } = await import('../src/parts/InstallDependencies/InstallDependencies.js')
 
   await installDependencies('/test/path', true)
 
-  expect(mockExeca).toHaveBeenCalledWith('nice', ['-n', '10', 'npm', 'ci'], { cwd: '/test/path' })
-  expect(mockExeca).toHaveBeenCalledTimes(1)
+  expect(mockExec).toHaveBeenCalledWith('nice', ['-n', '10', 'npm', 'ci'], { cwd: '/test/path' })
+  expect(mockExec).toHaveBeenCalledTimes(1)
 })
 
-test('installDependencies - throws VError when execa fails without nice', async () => {
+test('installDependencies - throws VError when exec fails without nice', async () => {
   const error = new Error('npm ci failed')
-  mockExeca.mockImplementation(() => Promise.reject(error))
+  mockExec.mockImplementation(() => Promise.reject(error))
 
   const { installDependencies } = await import('../src/parts/InstallDependencies/InstallDependencies.js')
 
@@ -42,9 +42,9 @@ test('installDependencies - throws VError when execa fails without nice', async 
   await expect(installDependencies('/test/path', false)).rejects.toThrow("Failed to install dependencies in directory '/test/path'")
 })
 
-test('installDependencies - throws VError when execa fails with nice', async () => {
+test('installDependencies - throws VError when exec fails with nice', async () => {
   const error = new Error('nice command failed')
-  mockExeca.mockImplementation(() => Promise.reject(error))
+  mockExec.mockImplementation(() => Promise.reject(error))
 
   const { installDependencies } = await import('../src/parts/InstallDependencies/InstallDependencies.js')
 
