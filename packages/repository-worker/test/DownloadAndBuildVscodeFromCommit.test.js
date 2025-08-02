@@ -1,12 +1,11 @@
-import { test, expect } from '@jest/globals'
-import { join } from 'node:path'
-import { access, mkdir, writeFile, rm } from 'node:fs/promises'
+import { expect, test } from '@jest/globals'
+import { access, mkdir, rm, writeFile } from 'node:fs/promises'
 import { platform } from 'node:os'
+import { join } from 'node:path'
 import { downloadAndBuildVscodeFromCommit } from '../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js'
-import * as DownloadVscodeCommit from '../src/parts/DownloadVscodeCommit/DownloadVscodeCommit.js'
 import * as InstallDependencies from '../src/parts/InstallDependencies/InstallDependencies.js'
-import * as RunCompile from '../src/parts/RunCompile/RunCompile.js'
 import * as Root from '../src/parts/Root/Root.js'
+import * as RunCompile from '../src/parts/RunCompile/RunCompile.js'
 
 /**
  * Checks if a file or directory exists
@@ -34,15 +33,6 @@ test('downloadAndBuildVscodeFromCommit - function signature is correct', async (
 test('downloadAndBuildVscodeFromCommit handles errors gracefully', async () => {
   // Should throw with invalid commit reference
   await expect(downloadAndBuildVscodeFromCommit('invalid-commit-ref')).rejects.toThrow()
-})
-
-test('downloadVscodeCommit - function exists and is callable', () => {
-  expect(typeof DownloadVscodeCommit.downloadVscodeCommit).toBe('function')
-})
-
-test('downloadVscodeCommit - function signature is correct', () => {
-  const fn = DownloadVscodeCommit.downloadVscodeCommit
-  expect(fn.length).toBe(3) // Should accept three parameters (repoUrl, commit, outFolder)
 })
 
 test('installDependencies - function exists and is callable', () => {
