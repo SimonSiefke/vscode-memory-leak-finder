@@ -88,8 +88,9 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, repos
   // Clean up node_modules to save disk space
   await cleanupNodeModules(repoPath)
 
-  // Return the path to the code.sh script
-  const codeScriptPath = join(repoPath, 'scripts', 'code.sh')
+  // Return the path to the code script (code.sh on Unix, code.bat on Windows)
+  const scriptExtension = platform() === 'win32' ? 'bat' : 'sh'
+  const codeScriptPath = join(repoPath, 'scripts', `code.${scriptExtension}`)
   if (!(await pathExists(codeScriptPath))) {
     throw new Error(`VS Code script not found at ${codeScriptPath}`)
   }
