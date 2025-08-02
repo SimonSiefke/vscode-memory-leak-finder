@@ -16,7 +16,7 @@ test('findPackageLockFiles - returns empty array when no package-lock.json files
   mockGlob.mockReturnValue((async function* () {})())
 
   const { findPackageLockFiles } = await import('../src/parts/FindPackageLockFiles/FindPackageLockFiles.js')
-  const result = await findPackageLockFiles(pathToFileURL('/test/path').href)
+  const result = await findPackageLockFiles('/test/path')
 
   expect(result).toEqual([])
   expect(mockGlob).toHaveBeenCalledTimes(1)
@@ -38,7 +38,7 @@ test('findPackageLockFiles - returns file URIs when package-lock.json files foun
   )
 
   const { findPackageLockFiles } = await import('../src/parts/FindPackageLockFiles/FindPackageLockFiles.js')
-  const result = await findPackageLockFiles(pathToFileURL('/test/path').href)
+  const result = await findPackageLockFiles('/test/path')
 
   expect(result).toEqual(['test/path/package-lock.json', 'test/path/subdir/package-lock.json'])
   expect(mockGlob).toHaveBeenCalledTimes(1)
@@ -61,10 +61,10 @@ test('findPackageLockFiles - excludes node_modules package-lock.json files', asy
   )
 
   const { findPackageLockFiles } = await import('../src/parts/FindPackageLockFiles/FindPackageLockFiles.js')
-  const result = await findPackageLockFiles(pathToFileURL('/test/path').href)
+  const result = await findPackageLockFiles('/test/path')
 
   // Should only return package-lock.json files not in node_modules
-  expect(result).toEqual(['test/path/package-lock.json', 'test/path/subdir/package-lock.json'])
+  expect(result).toEqual(['/test/path/package-lock.json', '/test/path/subdir/package-lock.json'])
   expect(mockGlob).toHaveBeenCalledTimes(1)
   expect(mockGlob).toHaveBeenCalledWith('**/package-lock.json', {
     cwd: '/test/path',
@@ -79,9 +79,7 @@ test('findPackageLockFiles - throws VError when glob fails', async () => {
   })
 
   const { findPackageLockFiles } = await import('../src/parts/FindPackageLockFiles/FindPackageLockFiles.js')
-  await expect(findPackageLockFiles(pathToFileURL('/test/path').href)).rejects.toThrow(
-    'Failed to find package-lock.json files in directory',
-  )
+  await expect(findPackageLockFiles('/test/path')).rejects.toThrow('Failed to find package-lock.json files in directory')
 
   expect(mockGlob).toHaveBeenCalledTimes(1)
   expect(mockGlob).toHaveBeenCalledWith('**/package-lock.json', {
