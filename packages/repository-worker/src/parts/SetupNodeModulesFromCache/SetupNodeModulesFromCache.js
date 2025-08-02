@@ -38,12 +38,7 @@ export const setupNodeModulesFromCache = async (repoPath, commitHash, cacheDir) 
       cachedNodeModulesPaths,
     )
 
-    if (fileOperations.length > 0) {
-      await ApplyFileOperations.applyFileOperations(fileOperations)
-      return true
-    } else {
-      return false
-    }
+    await ApplyFileOperations.applyFileOperations(fileOperations)
   } catch (error) {
     throw new VError(error, `Failed to setup node_modules from cache`)
   }
