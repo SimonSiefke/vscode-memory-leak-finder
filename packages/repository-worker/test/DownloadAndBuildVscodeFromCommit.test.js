@@ -50,7 +50,7 @@ test('downloadVscodeCommit - returns expected path structure', async () => {
   const repoPath = join(reposDir, testCommitHash)
 
   // Ensure clean state
-  if (await exists(repoPath)) {
+  if (await pathExists(repoPath)) {
     await rm(repoPath, { recursive: true, force: true })
   }
 
@@ -65,7 +65,7 @@ test('downloadVscodeCommit - returns expected path structure', async () => {
     expect(expectedPath).toBe(repoPath)
   } finally {
     // Cleanup
-    if (await exists(repoPath)) {
+    if (await pathExists(repoPath)) {
       await rm(repoPath, { recursive: true, force: true })
     }
   }
@@ -78,7 +78,7 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missi
   const repoPath = join(reposDir, testCommitHash)
 
   // Ensure clean state
-  if (await exists(repoPath)) {
+  if (await pathExists(repoPath)) {
     await rm(repoPath, { recursive: true, force: true })
   }
 
@@ -100,7 +100,7 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missi
     await expect(downloadAndBuildVscodeFromCommit(testCommitHash)).rejects.toThrow()
   } finally {
     // Cleanup
-    if (await exists(repoPath)) {
+    if (await pathExists(repoPath)) {
       await rm(repoPath, { recursive: true, force: true })
     }
   }
@@ -113,7 +113,7 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
   const repoPath = join(reposDir, testCommitHash)
 
   // Ensure clean state
-  if (await exists(repoPath)) {
+  if (await pathExists(repoPath)) {
     await rm(repoPath, { recursive: true, force: true })
   }
 
@@ -139,7 +139,7 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
     await expect(downloadAndBuildVscodeFromCommit(testCommitHash)).rejects.toThrow()
   } finally {
     // Cleanup
-    if (await exists(repoPath)) {
+    if (await pathExists(repoPath)) {
       await rm(repoPath, { recursive: true, force: true })
     }
   }
@@ -152,7 +152,7 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
   const repoPath = join(reposDir, testCommitHash)
 
   // Ensure clean state
-  if (await exists(repoPath)) {
+  if (await pathExists(repoPath)) {
     await rm(repoPath, { recursive: true, force: true })
   }
 
@@ -179,7 +179,7 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
     await expect(downloadAndBuildVscodeFromCommit(testCommitHash)).rejects.toThrow()
   } finally {
     // Cleanup
-    if (await exists(repoPath)) {
+    if (await pathExists(repoPath)) {
       await rm(repoPath, { recursive: true, force: true })
     }
   }
