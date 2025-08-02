@@ -1,6 +1,7 @@
 import { join } from 'node:path'
 import { glob } from 'node:fs/promises'
 import { pathToFileURL } from 'node:url'
+import { VError } from '@lvce-editor/verror'
 import * as GetCacheFileOperations from '../GetCacheFileOperations/GetCacheFileOperations.js'
 import * as ApplyFileOperations from '../ApplyFileOperations/ApplyFileOperations.js'
 import * as ComputeVscodeNodeModulesCacheKey from '../ComputeVscodeNodeModulesCacheKey/ComputeVscodeNodeModulesCacheKey.js'
@@ -35,7 +36,6 @@ export const addNodeModulesToCache = async (repoPath) => {
     )
     await ApplyFileOperations.applyFileOperations(fileOperations)
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    console.warn(`Failed to cache node_modules: ${errorMessage}`)
+    throw new VError(error, `Failed to cache node_modules`)
   }
 }

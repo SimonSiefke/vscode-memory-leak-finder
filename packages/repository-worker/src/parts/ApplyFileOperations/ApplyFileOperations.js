@@ -1,5 +1,6 @@
 import { cp, rm, mkdir } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
+import { VError } from '@lvce-editor/verror'
 
 /**
  * @typedef {Object} CopyOperation
@@ -51,9 +52,7 @@ export const applyFileOperations = async (fileOperations) => {
         console.log(`Created directory: ${operation.path}`)
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
-      console.warn(`Failed to apply file operation ${operation.type}: ${errorMessage}`)
-      throw error
+      throw new VError(error, `Failed to apply file operation ${operation.type}`)
     }
   }
 }

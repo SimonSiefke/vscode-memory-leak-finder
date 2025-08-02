@@ -1,6 +1,7 @@
 import { join } from 'node:path'
 import { pathToFileURL, fileURLToPath } from 'node:url'
 import { pathExists } from 'path-exists'
+import { VError } from '@lvce-editor/verror'
 
 /**
  * @typedef {Object} CopyOperation
@@ -80,8 +81,6 @@ export const getRestoreNodeModulesFileOperations = async (repoPathUri, cacheKey,
 
     return fileOperations
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    console.warn(`Failed to get restore file operations: ${errorMessage}`)
-    return []
+    throw new VError(error, `Failed to get restore file operations`)
   }
 }

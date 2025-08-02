@@ -15,14 +15,11 @@ test('cleanupNodeModules - function exists and is callable', async () => {
   expect(typeof cleanupNodeModules).toBe('function')
 })
 
-test('functions handle errors gracefully', async () => {
-  // These should not throw errors even with invalid paths
-  const result1 = await setupNodeModulesFromCache('/nonexistent/path')
-  expect(typeof result1).toBe('boolean')
+test('functions throw VError on errors', async () => {
+  // These should throw VError with invalid paths
+  await expect(setupNodeModulesFromCache('/nonexistent/path')).rejects.toThrow('Failed to setup node_modules from cache')
 
-  await addNodeModulesToCache('/nonexistent/path')
-  // Should not throw
+  await expect(addNodeModulesToCache('/nonexistent/path')).rejects.toThrow('Failed to cache node_modules')
 
-  cleanupNodeModules('/nonexistent/path')
-  // Should not throw
+  await expect(cleanupNodeModules('/nonexistent/path')).rejects.toThrow('Failed to cleanup node_modules')
 })

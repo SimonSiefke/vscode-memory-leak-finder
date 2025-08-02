@@ -1,4 +1,5 @@
 import { pathToFileURL } from 'node:url'
+import { VError } from '@lvce-editor/verror'
 import * as GetCleanupFileOperations from '../GetCleanupFileOperations/GetCleanupFileOperations.js'
 import * as ApplyFileOperations from '../ApplyFileOperations/ApplyFileOperations.js'
 
@@ -11,7 +12,6 @@ export const cleanupNodeModules = async (repoPath) => {
     const fileOperations = await GetCleanupFileOperations.getCleanupFileOperations(repoPathUri)
     await ApplyFileOperations.applyFileOperations(fileOperations)
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    console.warn(`Failed to cleanup node_modules: ${errorMessage}`)
+    throw new VError(error, `Failed to cleanup node_modules`)
   }
 }
