@@ -84,7 +84,7 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, repos
   }
 
   // Clean up node_modules to save disk space
-  cleanupNodeModules(repoPath)
+  await cleanupNodeModules(repoPath)
 
   // Return the path to the code.sh script
   const codeScriptPath = join(repoPath, 'scripts', 'code.sh')
