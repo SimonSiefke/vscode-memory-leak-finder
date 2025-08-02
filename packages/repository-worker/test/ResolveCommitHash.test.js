@@ -22,7 +22,7 @@ test('resolveCommitHash - returns commitRef when it is already a full commit has
 
 test('resolveCommitHash - resolves branch name to commit hash', async () => {
   const mockStdout = 'a1b2c3d4e5f6789012345678901234567890abcd\trefs/heads/main\n'
-  mockExec.mockImplementation(() => Promise.resolve({ stdout: mockStdout, stderr: '', exitCode: 0 }))
+  mockExec.mockImplementation(() => Promise.resolve({ stdout: mockStdout, stderr: '' }))
 
   const { resolveCommitHash } = await import('../src/parts/ResolveCommitHash/ResolveCommitHash.js')
   const result = await resolveCommitHash('https://github.com/test/repo.git', 'main')
@@ -33,7 +33,7 @@ test('resolveCommitHash - resolves branch name to commit hash', async () => {
 })
 
 test('resolveCommitHash - throws error when no commit found', async () => {
-  mockExec.mockImplementation(() => Promise.resolve({ stdout: '', stderr: '', exitCode: 0 }))
+  mockExec.mockImplementation(() => Promise.resolve({ stdout: '', stderr: '' }))
 
   const { resolveCommitHash } = await import('../src/parts/ResolveCommitHash/ResolveCommitHash.js')
 
@@ -56,7 +56,7 @@ test('resolveCommitHash - throws error when git ls-remote fails', async () => {
 
 test('resolveCommitHash - resolves tag to commit hash', async () => {
   const mockStdout = 'b2c3d4e5f6789012345678901234567890abcde1\trefs/tags/v1.0.0\n'
-  mockExec.mockImplementation(() => Promise.resolve({ stdout: mockStdout, stderr: '', exitCode: 0 }))
+  mockExec.mockImplementation(() => Promise.resolve({ stdout: mockStdout, stderr: '' }))
 
   const { resolveCommitHash } = await import('../src/parts/ResolveCommitHash/ResolveCommitHash.js')
   const result = await resolveCommitHash('https://github.com/test/repo.git', 'v1.0.0')
@@ -68,7 +68,7 @@ test('resolveCommitHash - resolves tag to commit hash', async () => {
 
 test('resolveCommitHash - throws error when invalid commit hash returned', async () => {
   const mockStdout = 'invalid-hash\trefs/heads/main\n'
-  mockExec.mockImplementation(() => Promise.resolve({ stdout: mockStdout, stderr: '', exitCode: 0 }))
+  mockExec.mockImplementation(() => Promise.resolve({ stdout: mockStdout, stderr: '' }))
 
   const { resolveCommitHash } = await import('../src/parts/ResolveCommitHash/ResolveCommitHash.js')
 
@@ -81,7 +81,7 @@ test('resolveCommitHash - throws error when invalid commit hash returned', async
 test('resolveCommitHash - handles multiple lines and takes first result', async () => {
   const mockStdout =
     'a1b2c3d4e5f6789012345678901234567890abcd\trefs/heads/main\nb2c3d4e5f6789012345678901234567890abcde1\trefs/heads/develop\n'
-  mockExec.mockImplementation(() => Promise.resolve({ stdout: mockStdout, stderr: '', exitCode: 0 }))
+  mockExec.mockImplementation(() => Promise.resolve({ stdout: mockStdout, stderr: '' }))
 
   const { resolveCommitHash } = await import('../src/parts/ResolveCommitHash/ResolveCommitHash.js')
   const result = await resolveCommitHash('https://github.com/test/repo.git', 'main')
@@ -93,7 +93,7 @@ test('resolveCommitHash - handles multiple lines and takes first result', async 
 
 test('resolveCommitHash - handles different repository URLs', async () => {
   const mockStdout = 'c3d4e5f6789012345678901234567890abcdef12\trefs/heads/feature\n'
-  mockExec.mockImplementation(() => Promise.resolve({ stdout: mockStdout, stderr: '', exitCode: 0 }))
+  mockExec.mockImplementation(() => Promise.resolve({ stdout: mockStdout, stderr: '' }))
 
   const { resolveCommitHash } = await import('../src/parts/ResolveCommitHash/ResolveCommitHash.js')
   const result = await resolveCommitHash('https://gitlab.com/test/repo.git', 'feature')
