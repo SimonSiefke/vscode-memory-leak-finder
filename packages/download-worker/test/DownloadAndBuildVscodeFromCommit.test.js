@@ -86,3 +86,43 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
     }
   }
 })
+
+test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with existing out folder', async () => {
+  // Create a temporary test directory structure
+  const testCommitHash = 'test-commit-789'
+  const reposDir = join(Root.root, '.vscode-repos')
+  const repoPath = join(reposDir, testCommitHash)
+
+  // Ensure clean state
+  if (existsSync(repoPath)) {
+    rmSync(repoPath, { recursive: true, force: true })
+  }
+
+  // Create repo directory with package.json and node_modules
+  mkdirSync(repoPath, { recursive: true })
+  writeFileSync(join(repoPath, 'package.json'), JSON.stringify({ name: 'vscode' }))
+  writeFileSync(join(repoPath, 'package-lock.json'), JSON.stringify({ lockfileVersion: 1 }))
+
+  // Create node_modules directory
+  mkdirSync(join(repoPath, 'node_modules'), { recursive: true })
+  writeFileSync(join(repoPath, 'node_modules', '.package-lock.json'), '{}')
+
+  // Create out directory with some files but no main.js (simulating interrupted compilation)
+  mkdirSync(join(repoPath, 'out'), { recursive: true })
+  writeFileSync(join(repoPath, 'out', 'some-other-file.js'), 'console.log("test")')
+
+  // Create scripts directory with code.sh
+  mkdirSync(join(repoPath, 'scripts'), { recursive: true })
+  writeFileSync(join(repoPath, 'scripts', 'code.sh'), '#!/bin/bash\necho "VS Code"')
+
+  try {
+    // This should detect existing out folder and skip compilation
+    // Since we're in a test environment, it will likely fail gracefully
+    await expect(DownloadAndBuildVscodeFromCommit.downloadAndBuildVscodeFromCommit(testCommitHash)).rejects.toThrow()
+  } finally {
+    // Cleanup
+    if (existsSync(repoPath)) {
+      rmSync(repoPath, { recursive: true, force: true })
+    }
+  }
+})

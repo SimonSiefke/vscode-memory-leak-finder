@@ -40,6 +40,7 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
     // Check if out/main.js exists (build was successful)
     const mainJsPath = join(repoPath, 'out', 'main.js')
     const nodeModulesPath = join(repoPath, 'node_modules')
+    const outPath = join(repoPath, 'out')
 
     if (!existsSync(mainJsPath)) {
       console.log(`Building VS Code for commit ${commitHash}...`)
@@ -65,9 +66,14 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
         console.log(`node_modules already exists in repo for commit ${commitHash}, skipping npm ci...`)
       }
 
-      console.log(`Running npm run compile for commit ${commitHash}...`)
-      // Run npm run compile
-      await execa('npm', ['run', 'compile'], { cwd: repoPath })
+      // Check if out folder exists before attempting to compile
+      if (!existsSync(outPath)) {
+        console.log(`out folder not found, running npm run compile for commit ${commitHash}...`)
+        // Run npm run compile
+        await execa('npm', ['run', 'compile'], { cwd: repoPath })
+      } else {
+        console.log(`out folder already exists for commit ${commitHash}, skipping compilation...`)
+      }
 
       // Verify build was successful
       if (!existsSync(mainJsPath)) {
