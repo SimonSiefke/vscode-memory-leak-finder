@@ -11,7 +11,7 @@ const VSCODE_NODE_MODULES_CACHE_DIR = '.vscode-node-modules'
 /**
  * @param {string} repoPath
  */
-export const cacheNodeModules = async (repoPath) => {
+export const addNodeModulesToCache = async (repoPath) => {
   try {
     const cacheKey = await ComputeVscodeNodeModulesCacheKey.computeVscodeNodeModulesCacheKey(repoPath)
     const cacheDir = join(Root.root, VSCODE_NODE_MODULES_CACHE_DIR)

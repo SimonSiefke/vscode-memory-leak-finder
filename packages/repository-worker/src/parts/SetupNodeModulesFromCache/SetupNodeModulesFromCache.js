@@ -41,8 +41,6 @@ export const setupNodeModulesFromCache = async (repoPath) => {
       return false
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    console.warn(`Failed to setup node_modules from cache: ${errorMessage}`)
-    return false
+    throw new VError(error, `Failed to setup node_modules from cache`)
   }
 }
