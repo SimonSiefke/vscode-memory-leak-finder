@@ -1,5 +1,4 @@
 import { mkdir } from 'node:fs/promises'
-import { platform } from 'node:os'
 import { join } from 'node:path'
 import { pathExists } from 'path-exists'
 import { addNodeModulesToCache } from '../CacheNodeModules/CacheNodeModules.js'
@@ -65,13 +64,6 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, repos
   // Compile if needed
   if (needsCompile) {
     console.log(`Compiling VS Code for commit ${commitHash}...`)
-    // Run compilation with resource management (use nice on Linux)
-    const useNice = platform() === 'linux'
-    await RunCompile.runCompile(repoPath, useNice)
-  }
-
-  // Verify build was successful
-  if (!(await pathExists(mainJsPath))) {
-    throw new Error(`Build failed: out/main.js not found after compilation`)
+    await RunCompile.runCompile(repoPath, useNice, mainJsPath)
   }
 }
