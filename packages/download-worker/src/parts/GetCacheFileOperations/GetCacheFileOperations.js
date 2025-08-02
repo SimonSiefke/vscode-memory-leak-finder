@@ -10,50 +10,44 @@ import { existsSync } from 'node:fs'
  * @returns {Promise<any[]>}
  */
 export const getCacheFileOperations = async (repoPath, cacheKey, cacheDir, cachedNodeModulesPath, nodeModulesPaths) => {
-  try {
-    console.log(`Preparing to cache node_modules tree with cache key: ${cacheKey}`)
+  console.log(`Preparing to cache node_modules tree with cache key: ${cacheKey}`)
 
-    /**
-     * @type {any[]}
-     */
-    const fileOperations = []
+  /**
+   * @type {any[]}
+   */
+  const fileOperations = []
 
-    // Add directory creation operations
+  // Add directory creation operations
+  fileOperations.push({
+    type: 'mkdir',
+    path: cacheDir,
+  })
+  fileOperations.push({
+    type: 'mkdir',
+    path: cachedNodeModulesPath,
+  })
+
+  // Convert relative paths to absolute paths
+  const absoluteNodeModulesPaths = nodeModulesPaths.map((path) => join(repoPath, path))
+
+  for (const nodeModulesPath of absoluteNodeModulesPaths) {
+    // Calculate relative path from repo root to maintain directory structure
+    const relativePath = nodeModulesPath.replace(repoPath, '').replace(/^\/+/, '')
+    const cacheTargetPath = join(cachedNodeModulesPath, relativePath)
+
+    // Add parent directory creation operation
+    const parentDir = join(cacheTargetPath, '..')
     fileOperations.push({
       type: 'mkdir',
-      path: cacheDir,
+      path: parentDir,
     })
+
     fileOperations.push({
-      type: 'mkdir',
-      path: cachedNodeModulesPath,
+      type: 'copy',
+      from: nodeModulesPath,
+      to: cacheTargetPath,
     })
-
-    // Convert relative paths to absolute paths
-    const absoluteNodeModulesPaths = nodeModulesPaths.map((path) => join(repoPath, path))
-
-    for (const nodeModulesPath of absoluteNodeModulesPaths) {
-      // Calculate relative path from repo root to maintain directory structure
-      const relativePath = nodeModulesPath.replace(repoPath, '').replace(/^\/+/, '')
-      const cacheTargetPath = join(cachedNodeModulesPath, relativePath)
-
-      // Add parent directory creation operation
-      const parentDir = join(cacheTargetPath, '..')
-      fileOperations.push({
-        type: 'mkdir',
-        path: parentDir,
-      })
-
-      fileOperations.push({
-        type: 'copy',
-        from: nodeModulesPath,
-        to: cacheTargetPath,
-      })
-    }
-
-    return fileOperations
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    console.warn(`Failed to get cache file operations: ${errorMessage}`)
-    return []
   }
+
+  return fileOperations
 }
