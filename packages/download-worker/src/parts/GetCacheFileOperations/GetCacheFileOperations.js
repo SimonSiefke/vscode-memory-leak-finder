@@ -1,5 +1,4 @@
 import { join } from 'node:path'
-import { existsSync } from 'node:fs'
 
 /**
  * @param {string} repoPath
