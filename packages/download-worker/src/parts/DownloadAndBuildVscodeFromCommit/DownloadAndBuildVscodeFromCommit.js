@@ -39,21 +39,30 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
 
     // Check if out/main.js exists (build was successful)
     const mainJsPath = join(repoPath, 'out', 'main.js')
+    const nodeModulesPath = join(repoPath, 'node_modules')
+
     if (!existsSync(mainJsPath)) {
       console.log(`Building VS Code for commit ${commitHash}...`)
 
-      // Try to use cached node_modules first
-      const cacheHit = await VscodeNodeModulesCache.setupNodeModulesFromCache(repoPath)
+      // Check if node_modules exists in the repo
+      if (!existsSync(nodeModulesPath)) {
+        console.log(`node_modules not found in repo, attempting to restore from cache...`)
 
-      if (!cacheHit) {
-        console.log(`Running npm ci for commit ${commitHash}...`)
-        // Run npm ci
-        await execa('npm', ['ci'], { cwd: repoPath })
+        // Try to use cached node_modules first
+        const cacheHit = await VscodeNodeModulesCache.setupNodeModulesFromCache(repoPath)
 
-        // Cache the node_modules for future use
-        await VscodeNodeModulesCache.cacheNodeModules(repoPath)
+        if (!cacheHit) {
+          console.log(`No cached node_modules found, running npm ci for commit ${commitHash}...`)
+          // Run npm ci
+          await execa('npm', ['ci'], { cwd: repoPath })
+
+          // Cache the node_modules for future use
+          await VscodeNodeModulesCache.cacheNodeModules(repoPath)
+        } else {
+          console.log(`Successfully restored node_modules from cache for commit ${commitHash}`)
+        }
       } else {
-        console.log(`Using cached node_modules for commit ${commitHash}`)
+        console.log(`node_modules already exists in repo for commit ${commitHash}, skipping npm ci...`)
       }
 
       console.log(`Running npm run compile for commit ${commitHash}...`)
