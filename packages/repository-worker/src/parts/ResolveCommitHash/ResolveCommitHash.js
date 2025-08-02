@@ -1,14 +1,6 @@
 import { execa } from 'execa'
 import { VError } from '@lvce-editor/verror'
-
-/**
- * Checks if a string is a full 40-character commit hash
- * @param {string} commitRef - The commit reference to check
- * @returns {boolean} True if it's a full commit hash, false otherwise
- */
-export const isFullCommitHash = (commitRef) => {
-  return /^[a-f0-9]{40}$/i.test(commitRef)
-}
+import { isFullCommitHash } from '../IsFullCommitHash/IsFullCommitHash.js'
 
 /**
  * Resolves a commit reference (branch name, tag, or commit hash) to an actual commit hash
@@ -22,8 +14,6 @@ export const resolveCommitHash = async (repoUrl, commitRef) => {
     if (isFullCommitHash(commitRef)) {
       return commitRef
     }
-
-    console.log(`Resolving commit reference '${commitRef}' to actual commit hash...`)
 
     // Use git ls-remote to get the commit hash for the reference
     const { stdout } = await execa('git', ['ls-remote', repoUrl, commitRef])
@@ -42,7 +32,6 @@ export const resolveCommitHash = async (repoUrl, commitRef) => {
       throw new Error(`Invalid commit hash resolved: ${commitHash}`)
     }
 
-    console.log(`Resolved '${commitRef}' to commit hash: ${commitHash}`)
     return commitHash
   } catch (error) {
     throw new VError(error, `Failed to resolve commit reference '${commitRef}'`)
