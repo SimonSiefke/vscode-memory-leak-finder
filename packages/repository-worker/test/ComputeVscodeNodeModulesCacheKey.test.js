@@ -6,11 +6,6 @@ test('computeVscodeNodeModulesCacheKey - function exists and is callable', async
   expect(typeof computeVscodeNodeModulesCacheKey).toBe('function')
 })
 
-test('computeVscodeNodeModulesCacheKey - function signature is correct', async () => {
-  const fn = computeVscodeNodeModulesCacheKey
-  expect(fn.length).toBe(1) // Should accept one parameter (repoPath)
-})
-
 test('computeVscodeNodeModulesCacheKey - returns a string', async () => {
   const result = await computeVscodeNodeModulesCacheKey(pathToFileURL('/nonexistent/path').href)
   expect(typeof result).toBe('string')

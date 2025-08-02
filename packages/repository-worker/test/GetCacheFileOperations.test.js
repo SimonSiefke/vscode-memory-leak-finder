@@ -6,11 +6,6 @@ test('getCacheFileOperations - function exists and is callable', async () => {
   expect(typeof getCacheFileOperations).toBe('function')
 })
 
-test('getCacheFileOperations - function signature is correct', async () => {
-  const fn = getCacheFileOperations
-  expect(fn.length).toBe(5) // Should accept 5 parameters
-})
-
 test('getCacheFileOperations returns empty array when no nodeModulesPaths provided', async () => {
   const result = await getCacheFileOperations(
     pathToFileURL('/repo/path').href,

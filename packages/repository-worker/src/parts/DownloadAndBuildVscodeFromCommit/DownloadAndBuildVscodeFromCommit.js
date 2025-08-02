@@ -1,4 +1,5 @@
 import { join } from 'node:path'
+import { mkdir } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { VError } from '@lvce-editor/verror'
 import { pathExists } from 'path-exists'
@@ -24,6 +25,11 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
   try {
     const reposDir = join(Root.root, VSCODE_REPOS_DIR)
     const repoPath = join(reposDir, commitHash)
+
+    // Create parent directory if it doesn't exist
+    if (!(await pathExists(reposDir))) {
+      await mkdir(reposDir, { recursive: true })
+    }
 
     // Clone the repository
     await cloneRepository(VSCODE_REPO_URL, repoPath)

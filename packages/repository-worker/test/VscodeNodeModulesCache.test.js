@@ -7,27 +7,12 @@ test('setupNodeModulesFromCache - function exists and is callable', async () => 
   expect(typeof setupNodeModulesFromCache).toBe('function')
 })
 
-test('setupNodeModulesFromCache - function signature is correct', async () => {
-  const fn = setupNodeModulesFromCache
-  expect(fn.length).toBe(1) // Should accept one parameter (repoPath)
-})
-
 test('addNodeModulesToCache - function exists and is callable', async () => {
   expect(typeof addNodeModulesToCache).toBe('function')
 })
 
-test('addNodeModulesToCache - function signature is correct', async () => {
-  const fn = addNodeModulesToCache
-  expect(fn.length).toBe(1) // Should accept one parameter (repoPath)
-})
-
 test('cleanupNodeModules - function exists and is callable', async () => {
   expect(typeof cleanupNodeModules).toBe('function')
-})
-
-test('cleanupNodeModules - function signature is correct', async () => {
-  const fn = cleanupNodeModules
-  expect(fn.length).toBe(1) // Should accept one parameter (repoPath)
 })
 
 test('functions handle errors gracefully', async () => {

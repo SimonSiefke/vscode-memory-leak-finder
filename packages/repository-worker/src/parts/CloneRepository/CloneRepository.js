@@ -1,5 +1,3 @@
-import { join } from 'node:path'
-import { mkdir } from 'node:fs/promises'
 import { execa } from 'execa'
 import { pathExists } from 'path-exists'
 import { VError } from '@lvce-editor/verror'
@@ -12,12 +10,6 @@ import { VError } from '@lvce-editor/verror'
  */
 export const cloneRepository = async (repoUrl, repoPath) => {
   try {
-    // Create parent directory if it doesn't exist
-    const parentDir = join(repoPath, '..')
-    if (!(await pathExists(parentDir))) {
-      await mkdir(parentDir, { recursive: true })
-    }
-
     // Check if repo already exists
     if (await pathExists(repoPath)) {
       console.log(`Repository already exists at ${repoPath}, skipping clone...`)
