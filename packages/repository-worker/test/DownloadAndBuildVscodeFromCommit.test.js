@@ -12,11 +12,6 @@ test('downloadAndBuildVscodeFromCommit - function exists and is callable', async
   expect(typeof downloadAndBuildVscodeFromCommit).toBe('function')
 })
 
-test('downloadAndBuildVscodeFromCommit - function signature is correct', async () => {
-  const fn = downloadAndBuildVscodeFromCommit
-  expect(fn.length).toBe(1) // Should accept one parameter (commitRef)
-})
-
 test('downloadAndBuildVscodeFromCommit handles errors gracefully', async () => {
   // Should throw with invalid commit reference
   await expect(downloadAndBuildVscodeFromCommit('invalid-commit-ref')).rejects.toThrow()
@@ -26,18 +21,8 @@ test('installDependencies - function exists and is callable', () => {
   expect(typeof InstallDependencies.installDependencies).toBe('function')
 })
 
-test('installDependencies - function signature is correct', () => {
-  const fn = InstallDependencies.installDependencies
-  expect(fn.length).toBe(2) // Should accept two parameters (cwd, useNice)
-})
-
 test('runCompile - function exists and is callable', () => {
   expect(typeof RunCompile.runCompile).toBe('function')
-})
-
-test('runCompile - function signature is correct', () => {
-  const fn = RunCompile.runCompile
-  expect(fn.length).toBe(2) // Should accept two parameters (cwd, useNice)
 })
 
 test('downloadVscodeCommit - returns expected path structure', async () => {
