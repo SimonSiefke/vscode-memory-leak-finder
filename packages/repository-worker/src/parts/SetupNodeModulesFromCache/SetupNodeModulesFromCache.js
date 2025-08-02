@@ -21,23 +21,15 @@ const findCachedNodeModulesPaths = async (cachedNodeModulesPath) => {
  */
 export const setupNodeModulesFromCache = async (repoPath, commitHash, cacheDir) => {
   try {
-    const repoPathUri = pathToFileURL(repoPath).href
     const cachedNodeModulesPath = join(cacheDir, commitHash)
-
-    // Convert paths to file URIs
-    const cacheDirUri = pathToFileURL(cacheDir).href
-    const cachedNodeModulesPathUri = pathToFileURL(cachedNodeModulesPath).href
-
     const cachedNodeModulesPaths = await findCachedNodeModulesPaths(cachedNodeModulesPath)
-
     const fileOperations = await GetRestoreFileOperations.getRestoreNodeModulesFileOperations(
-      repoPathUri,
+      repoPath,
       commitHash,
-      cacheDirUri,
-      cachedNodeModulesPathUri,
+      cacheDir,
+      cachedNodeModulesPath,
       cachedNodeModulesPaths,
     )
-
     await ApplyFileOperations.applyFileOperations(fileOperations)
   } catch (error) {
     throw new VError(error, `Failed to setup node_modules from cache`)
