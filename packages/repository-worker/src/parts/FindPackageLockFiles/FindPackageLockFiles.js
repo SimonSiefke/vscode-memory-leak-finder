@@ -9,13 +9,10 @@ import { VError } from '@lvce-editor/verror'
  */
 export const findPackageLockFiles = async (dir) => {
   try {
-    // Find all package-lock.json files in the repository using glob
-    const allPackageLockPaths = await Array.fromAsync(glob('**/package-lock.json', { cwd: dir }))
-
-    // Filter out package-lock.json files that are inside node_modules directories
-    const packageLockPaths = allPackageLockPaths.filter((path) => !path.includes('node_modules/'))
-
-    // Convert relative paths to absolute paths
+    const packageLockPaths = await Array.fromAsync(glob('**/package-lock.json', {
+      cwd: dir,
+      exclude: ['**/node_modules/**']
+    }))
     const absolutePaths = packageLockPaths.map((path) => join(dir, path))
 
     return absolutePaths
