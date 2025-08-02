@@ -1,18 +1,15 @@
-import { readFile } from 'node:fs/promises'
-import { getHash } from '../GetHash/GetHash.js'
 import { findPackageLockFiles } from '../FindPackageLockFiles/FindPackageLockFiles.js'
+import { getFilesHash } from '../GetFilesHash/GetFilesHash.js'
+import { VError } from '@lvce-editor/verror'
 
 /**
- * @param {string} repoPath
+ * @param {string} repositoryFileUri
  */
-export const computeVscodeNodeModulesCacheKey = async (repoPath) => {
+export const computeVscodeNodeModulesCacheKey = async (repositoryFileUri) => {
   try {
-    const packageLockFiles = await findPackageLockFiles(repoPath)
-    const contents = await Promise.all(packageLockFiles.map((file) => readFile(file, 'utf8')))
-
-    return getHash(contents)
+    const packageLockFiles = await findPackageLockFiles(repositoryFileUri)
+    return getFilesHash(packageLockFiles)
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    throw new Error(`Failed to compute VS Code node_modules cache key: ${errorMessage}`)
+    throw new VError(error, `Failed to compute VS Code node_modules cache key`)
   }
 }
