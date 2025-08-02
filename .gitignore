@@ -1,7 +1,7 @@
 # playground
 benchmark-results
 .vscode-sources
-.vscode-node_modules
+.vscode-node-modules
 .vscode-repos
 .vscode-heapsnapshots
 .cursor-test-workspace
