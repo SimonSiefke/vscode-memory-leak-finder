@@ -3,6 +3,7 @@ import * as DownloadAndUnzipVscode from '../DownloadAndUnzipVscode/DownloadAndUn
 import * as DownloadAndBuildVscodeFromCommit from '../DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js'
 import * as DownloadFfmpeg from '../DownloadFfmpeg/DownloadFfmpeg.js'
 import * as DownloadFfmpegMaybe from '../DownloadFfmpegMaybe/DownloadFfmpegMaybe.js'
+import * as VscodeNodeModulesCache from '../VscodeNodeModulesCache/VscodeNodeModulesCache.js'
 
 export const commandMap = {
   'Download.downloadAndUnzipCursor': DownloadAndUnzipCursor.downloadAndUnzipCursor,
@@ -10,4 +11,7 @@ export const commandMap = {
   'Download.downloadAndBuildVscodeFromCommit': DownloadAndBuildVscodeFromCommit.downloadAndBuildVscodeFromCommit,
   'Download.downloadFfmpeg': DownloadFfmpeg.downloadFfmpeg,
   'Download.downloadFfmpegMaybe': DownloadFfmpegMaybe.downloadFfmpegMaybe,
+  'VscodeNodeModulesCache.setupNodeModulesFromCache': VscodeNodeModulesCache.setupNodeModulesFromCache,
+  'VscodeNodeModulesCache.cacheNodeModules': VscodeNodeModulesCache.cacheNodeModules,
+  'VscodeNodeModulesCache.cleanupNodeModules': VscodeNodeModulesCache.cleanupNodeModules,
 }
