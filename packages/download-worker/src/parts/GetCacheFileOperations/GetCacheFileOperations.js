@@ -2,7 +2,6 @@ import { join } from 'node:path'
 import { existsSync, mkdirSync } from 'node:fs'
 import { glob } from 'node:fs/promises'
 import * as Root from '../Root/Root.js'
-import * as ComputeVscodeNodeModulesCacheKey from '../ComputeVscodeNodeModulesCacheKey/ComputeVscodeNodeModulesCacheKey.js'
 
 const VSCODE_NODE_MODULES_CACHE_DIR = '.vscode-node-modules'
 
@@ -15,11 +14,11 @@ const VSCODE_NODE_MODULES_CACHE_DIR = '.vscode-node-modules'
 
 /**
  * @param {string} repoPath
+ * @param {string} cacheKey
  * @returns {Promise<FileOperation[]>}
  */
-export const getCacheFileOperations = async (repoPath) => {
+export const getCacheFileOperations = async (repoPath, cacheKey) => {
   try {
-    const cacheKey = await ComputeVscodeNodeModulesCacheKey.computeVscodeNodeModulesCacheKey(repoPath)
     const cacheDir = join(Root.root, VSCODE_NODE_MODULES_CACHE_DIR)
     const cachedNodeModulesPath = join(cacheDir, cacheKey)
 
