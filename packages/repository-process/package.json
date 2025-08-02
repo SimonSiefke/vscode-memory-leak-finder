@@ -1,0 +1,17 @@
+{
+  "name": "@vscode-memory-leak-finder/repository-process",
+  "version": "0.0.0-dev",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
+    "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
+  },
+  "dependencies": {
+    "@lvce-editor/verror": "^0.0.0-dev"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "jest": "^29.7.0"
+  }
+}
