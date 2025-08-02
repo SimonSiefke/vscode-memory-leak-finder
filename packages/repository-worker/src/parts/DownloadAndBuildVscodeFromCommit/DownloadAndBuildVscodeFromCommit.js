@@ -1,7 +1,6 @@
 import { join } from 'node:path'
 import { mkdir } from 'node:fs/promises'
 import { platform } from 'node:os'
-import { VError } from '@lvce-editor/verror'
 import { pathExists } from 'path-exists'
 import * as ResolveCommitHash from '../ResolveCommitHash/ResolveCommitHash.js'
 import { setupNodeModulesFromCache } from '../SetupNodeModulesFromCache/SetupNodeModulesFromCache.js'
@@ -35,9 +34,14 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
   const nodeModulesPath = join(repoPath, 'node_modules')
   const outPath = join(repoPath, 'out')
 
-  const needsClone = !(await pathExists(repoPath))
-  const needsInstall = !(await pathExists(mainJsPath)) && !(await pathExists(nodeModulesPath))
-  const needsCompile = !(await pathExists(mainJsPath)) && !(await pathExists(outPath))
+  const existsRepoPath = await pathExists(repoPath)
+  const existsMainJsPath = await pathExists(mainJsPath)
+  const existsNodeModulesPath = await pathExists(nodeModulesPath)
+  const existsOutPath = await pathExists(outPath)
+
+  const needsClone = !existsRepoPath
+  const needsInstall = !existsMainJsPath && !existsNodeModulesPath
+  const needsCompile = !existsMainJsPath && !existsOutPath
 
   // Clone the repository if needed
   if (needsClone) {
@@ -63,7 +67,7 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
     } else {
       console.log(`Successfully restored node_modules from cache for commit ${commitHash}`)
     }
-  } else if (!(await pathExists(mainJsPath))) {
+  } else if (!existsMainJsPath) {
     console.log(`node_modules already exists in repo for commit ${commitHash}, skipping npm ci...`)
   }
 

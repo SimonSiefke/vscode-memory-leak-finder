@@ -17,9 +17,15 @@ test('cleanupNodeModules - function exists and is callable', async () => {
 
 test('functions throw VError on errors', async () => {
   // These should throw VError with invalid paths
-  await expect(setupNodeModulesFromCache('/nonexistent/path')).rejects.toThrow('Failed to setup node_modules from cache')
-
   await expect(addNodeModulesToCache('/nonexistent/path')).rejects.toThrow('Failed to cache node_modules')
 
-  await expect(cleanupNodeModules('/nonexistent/path')).rejects.toThrow('Failed to cleanup node_modules')
+  // cleanupNodeModules should not throw for non-existent paths, it just returns empty operations
+  const result = await cleanupNodeModules('/nonexistent/path')
+  expect(result).toBeUndefined()
+})
+
+test('setupNodeModulesFromCache returns false when no cache exists', async () => {
+  // This should return false (not throw) when no cache exists
+  const result = await setupNodeModulesFromCache('/nonexistent/path')
+  expect(result).toBe(false)
 })

@@ -34,7 +34,13 @@ import { VError } from '@lvce-editor/verror'
  * @param {string[]} cachedNodeModulesPaths - Relative paths within the cache
  * @returns {Promise<FileOperation[]>}
  */
-export const getRestoreNodeModulesFileOperations = async (repoPathUri, cacheKey, cacheDirUri, cachedNodeModulesPathUri, cachedNodeModulesPaths) => {
+export const getRestoreNodeModulesFileOperations = async (
+  repoPathUri,
+  cacheKey,
+  cacheDirUri,
+  cachedNodeModulesPathUri,
+  cachedNodeModulesPaths,
+) => {
   try {
     // Convert URIs to paths for file system operations
     const repoPath = fileURLToPath(repoPathUri)
