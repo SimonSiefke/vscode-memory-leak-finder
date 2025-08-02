@@ -1,10 +1,11 @@
-import { cpSync, rmSync } from 'node:fs'
+import { cp, rm, mkdir } from 'node:fs/promises'
 
 /**
  * @typedef {Object} FileOperation
- * @property {'copy' | 'remove'} type
+ * @property {'copy' | 'remove' | 'mkdir'} type
  * @property {string} from
  * @property {string} to
+ * @property {string} path
  */
 
 /**
@@ -15,23 +16,24 @@ export const applyFileOperations = async (fileOperations) => {
     return
   }
 
-  console.log(`Applying ${fileOperations.length} file operation(s) in parallel`)
+  console.log(`Applying ${fileOperations.length} file operation(s) in order`)
 
-  const operations = fileOperations.map(async (operation) => {
+  for (const operation of fileOperations) {
     try {
       if (operation.type === 'copy') {
-        cpSync(operation.from, operation.to, { recursive: true, force: true })
+        await cp(operation.from, operation.to, { recursive: true, force: true })
         console.log(`Copied: ${operation.from} -> ${operation.to}`)
       } else if (operation.type === 'remove') {
-        rmSync(operation.from, { recursive: true, force: true })
+        await rm(operation.from, { recursive: true, force: true })
         console.log(`Removed: ${operation.from}`)
+      } else if (operation.type === 'mkdir') {
+        await mkdir(operation.path, { recursive: true })
+        console.log(`Created directory: ${operation.path}`)
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)
       console.warn(`Failed to apply file operation ${operation.type}: ${errorMessage}`)
       throw error
     }
-  })
-
-  await Promise.all(operations)
+  }
 }

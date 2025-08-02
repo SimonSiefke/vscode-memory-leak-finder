@@ -1,12 +1,13 @@
 import { join } from 'node:path'
-import { existsSync, mkdirSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { glob } from 'node:fs/promises'
 
 /**
  * @typedef {Object} FileOperation
- * @property {'copy' | 'remove'} type
+ * @property {'copy' | 'remove' | 'mkdir'} type
  * @property {string} from
  * @property {string} to
+ * @property {string} path
  */
 
 /**
@@ -46,11 +47,12 @@ export const getRestoreFileOperations = async (repoPath, cacheKey, cacheDir, cac
         const relativePath = cachedNodeModulesPath.replace(join(cacheDir, cacheKey), '').replace(/^\/+/, '')
         const targetPath = join(repoPath, relativePath)
 
-        // Create parent directory if it doesn't exist
+        // Add parent directory creation operation
         const parentDir = join(targetPath, '..')
-        if (!existsSync(parentDir)) {
-          mkdirSync(parentDir, { recursive: true })
-        }
+        fileOperations.push({
+          type: 'mkdir',
+          path: parentDir,
+        })
 
         fileOperations.push({
           type: 'copy',
