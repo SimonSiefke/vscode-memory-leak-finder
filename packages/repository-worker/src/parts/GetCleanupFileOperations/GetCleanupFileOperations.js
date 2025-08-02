@@ -1,5 +1,5 @@
-import { existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { pathExists } from 'path-exists'
 
 /**
  * @typedef {Object} RemoveOperation
@@ -13,14 +13,14 @@ import { fileURLToPath } from 'node:url'
 
 /**
  * @param {string} repoPathUri - File URI of the repository path
- * @returns {FileOperation[]}
+ * @returns {Promise<FileOperation[]>}
  */
-export const getCleanupFileOperations = (repoPathUri) => {
+export const getCleanupFileOperations = async (repoPathUri) => {
   try {
     const repoPath = fileURLToPath(repoPathUri)
     const nodeModulesPath = new URL('node_modules', repoPathUri).href
 
-    if (existsSync(repoPath + '/node_modules')) {
+    if (await pathExists(repoPath + '/node_modules')) {
       console.log('Preparing to cleanup node_modules to save disk space')
 
       return [

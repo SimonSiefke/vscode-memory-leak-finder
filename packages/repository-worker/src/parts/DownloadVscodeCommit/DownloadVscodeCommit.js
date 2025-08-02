@@ -1,23 +1,12 @@
 import { join } from 'node:path'
-import { access, mkdir } from 'node:fs/promises'
+import { mkdir } from 'node:fs/promises'
 import { execa } from 'execa'
+import { pathExists } from 'path-exists'
 import * as Root from '../Root/Root.js'
 
 const VSCODE_REPOS_DIR = '.vscode-repos'
 
-/**
- * Checks if a file or directory exists
- * @param {string} path - The path to check
- * @returns {Promise<boolean>} True if the path exists, false otherwise
- */
-const exists = async (path) => {
-  try {
-    await access(path)
-    return true
-  } catch {
-    return false
-  }
-}
+
 
 /**
  * Downloads and checks out a specific VS Code commit

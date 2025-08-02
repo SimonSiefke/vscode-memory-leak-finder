@@ -1,6 +1,6 @@
 import { join } from 'node:path'
-import { existsSync } from 'node:fs'
 import { pathToFileURL, fileURLToPath } from 'node:url'
+import { pathExists } from 'path-exists'
 
 /**
  * @typedef {Object} CopyOperation
@@ -41,7 +41,7 @@ export const getRestoreFileOperations = async (repoPathUri, cacheKey, cacheDirUr
     const cachedNodeModulesPath = fileURLToPath(cachedNodeModulesPathUri)
 
     // Check if cached node_modules exists
-    if (!existsSync(cachedNodeModulesPath)) {
+    if (!(await pathExists(cachedNodeModulesPath))) {
       console.log(`No cached node_modules found for cache key: ${cacheKey}`)
       return []
     }
@@ -54,7 +54,7 @@ export const getRestoreFileOperations = async (repoPathUri, cacheKey, cacheDirUr
     const absoluteCachedNodeModulesPaths = cachedNodeModulesPaths.map(path => join(cachedNodeModulesPath, path))
 
     for (const cachedNodeModulesPathItem of absoluteCachedNodeModulesPaths) {
-      if (existsSync(cachedNodeModulesPathItem)) {
+      if (await pathExists(cachedNodeModulesPathItem)) {
         // Calculate the target path in the repo by removing the cache prefix
         const relativePath = cachedNodeModulesPathItem.replace(join(cacheDir, cacheKey), '').replace(/^\/+/, '')
         const targetPath = join(repoPath, relativePath)
