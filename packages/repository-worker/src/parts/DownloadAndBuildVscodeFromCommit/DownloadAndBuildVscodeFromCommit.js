@@ -17,7 +17,7 @@ import { setupNodeModulesFromCache } from '../SetupNodeModulesFromCache/SetupNod
  * @param {string} reposDir - The directory name for storing repositories
  * @param {string} cacheDir - The cache directory path
  */
-export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, reposDir, cacheDir) => {
+export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, reposDir, cacheDir, useNice) => {
   // Resolve the commit reference to an actual commit hash
   const commitHash = await ResolveCommitHash.resolveCommitHash(repoUrl, commitRef)
   const repoPath = join(reposDir, commitHash)
@@ -40,7 +40,7 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, repos
   const needsCompile = !existsMainJsPath && !existsOutPath
 
   if (!existsReposDir) {
-    await mkdir(reposDirPath, { recursive: true })
+    await mkdir(reposDir, { recursive: true })
   }
 
   // Clone the repository if needed
@@ -49,35 +49,13 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, repos
     await checkoutCommit(repoPath, commitHash)
   }
 
-  // Install dependencies if needed
   if (needsInstall) {
     console.log(`Installing dependencies for commit ${commitHash}...`)
-
-    // Check if cache exists for this commit hash
     const cacheExists = await checkCacheExists(commitHash, cacheDir)
-
     if (cacheExists) {
-      console.log(`Found cached node_modules for commit ${commitHash}, restoring from cache...`)
-      const cacheHit = await setupNodeModulesFromCache(repoPath, commitHash, cacheDir)
-
-      if (!cacheHit) {
-        console.log(`Failed to restore from cache, running npm ci for commit ${commitHash}...`)
-        // Install dependencies with resource management (use nice on Linux)
-        const useNice = platform() === 'linux'
-        await InstallDependencies.installDependencies(repoPath, useNice)
-
-        // Cache the node_modules for future use
-        await addNodeModulesToCache(repoPath, commitHash, cacheDir)
-      } else {
-        console.log(`Successfully restored node_modules from cache for commit ${commitHash}`)
-      }
+      await setupNodeModulesFromCache(repoPath, commitHash, cacheDir)
     } else {
-      console.log(`No cached node_modules found for commit ${commitHash}, running npm ci...`)
-      // Install dependencies with resource management (use nice on Linux)
-      const useNice = platform() === 'linux'
       await InstallDependencies.installDependencies(repoPath, useNice)
-
-      // Cache the node_modules for future use
       await addNodeModulesToCache(repoPath, commitHash, cacheDir)
     }
   } else if (!existsMainJsPath) {
