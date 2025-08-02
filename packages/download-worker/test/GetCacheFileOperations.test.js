@@ -12,7 +12,13 @@ test('getCacheFileOperations - function signature is correct', async () => {
 })
 
 test('getCacheFileOperations returns empty array when no nodeModulesPaths provided', async () => {
-  const result = await getCacheFileOperations('/repo/path', 'cache-key', '/cache/dir', '/cache/dir/cache-key', [])
+  const result = await getCacheFileOperations(
+    pathToFileURL('/repo/path').href,
+    'cache-key',
+    pathToFileURL('/cache/dir').href,
+    pathToFileURL('/cache/dir/cache-key').href,
+    []
+  )
 
   expect(Array.isArray(result)).toBe(true)
   expect(result).toHaveLength(2) // Only mkdir operations for cacheDir and cachedNodeModulesPath
@@ -28,10 +34,10 @@ test('getCacheFileOperations returns empty array when no nodeModulesPaths provid
 
 test('getCacheFileOperations creates correct file operations for single node_modules path', async () => {
   const result = await getCacheFileOperations(
-    '/repo/path',
+    pathToFileURL('/repo/path').href,
     'cache-key',
-    '/cache/dir',
-    '/cache/dir/cache-key',
+    pathToFileURL('/cache/dir').href,
+    pathToFileURL('/cache/dir/cache-key').href,
     ['node_modules']
   )
 
@@ -64,10 +70,10 @@ test('getCacheFileOperations creates correct file operations for single node_mod
 
 test('getCacheFileOperations handles multiple node_modules paths', async () => {
   const result = await getCacheFileOperations(
-    '/repo/path',
+    pathToFileURL('/repo/path').href,
     'cache-key',
-    '/cache/dir',
-    '/cache/dir/cache-key',
+    pathToFileURL('/cache/dir').href,
+    pathToFileURL('/cache/dir/cache-key').href,
     ['node_modules', 'packages/a/node_modules', 'packages/b/node_modules']
   )
 
@@ -109,10 +115,10 @@ test('getCacheFileOperations handles multiple node_modules paths', async () => {
 
 test('getCacheFileOperations handles paths with leading slashes correctly', async () => {
   const result = await getCacheFileOperations(
-    '/repo/path',
+    pathToFileURL('/repo/path').href,
     'cache-key',
-    '/cache/dir',
-    '/cache/dir/cache-key',
+    pathToFileURL('/cache/dir').href,
+    pathToFileURL('/cache/dir/cache-key').href,
     ['/node_modules', '/packages/a/node_modules']
   )
 
@@ -134,10 +140,10 @@ test('getCacheFileOperations handles paths with leading slashes correctly', asyn
 
 test('getCacheFileOperations handles nested paths correctly', async () => {
   const result = await getCacheFileOperations(
-    '/repo/path',
+    pathToFileURL('/repo/path').href,
     'cache-key',
-    '/cache/dir',
-    '/cache/dir/cache-key',
+    pathToFileURL('/cache/dir').href,
+    pathToFileURL('/cache/dir/cache-key').href,
     ['packages/deeply/nested/module/node_modules']
   )
 
@@ -153,10 +159,10 @@ test('getCacheFileOperations handles nested paths correctly', async () => {
 
 test('getCacheFileOperations handles Windows-style paths', async () => {
   const result = await getCacheFileOperations(
-    'C:\\repo\\path',
+    pathToFileURL('C:\\repo\\path').href,
     'cache-key',
-    'C:\\cache\\dir',
-    'C:\\cache\\dir\\cache-key',
+    pathToFileURL('C:\\cache\\dir').href,
+    pathToFileURL('C:\\cache\\dir\\cache-key').href,
     ['node_modules', 'packages\\a\\node_modules']
   )
 
@@ -176,10 +182,10 @@ test('getCacheFileOperations handles Windows-style paths', async () => {
 
 test('getCacheFileOperations handles special characters in paths', async () => {
   const result = await getCacheFileOperations(
-    '/repo/path with spaces',
+    pathToFileURL('/repo/path with spaces').href,
     'cache-key-with-dashes',
-    '/cache/dir with spaces',
-    '/cache/dir with spaces/cache-key-with-dashes',
+    pathToFileURL('/cache/dir with spaces').href,
+    pathToFileURL('/cache/dir with spaces/cache-key-with-dashes').href,
     ['node_modules', 'packages/my-package/node_modules']
   )
 

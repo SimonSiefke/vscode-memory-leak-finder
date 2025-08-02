@@ -1,11 +1,27 @@
 import { cp, rm, mkdir } from 'node:fs/promises'
+import { fileURLToPath } from 'node:url'
 
 /**
- * @typedef {Object} FileOperation
- * @property {'copy' | 'remove' | 'mkdir'} type
+ * @typedef {Object} CopyOperation
+ * @property {'copy'} type
  * @property {string} from
  * @property {string} to
+ */
+
+/**
+ * @typedef {Object} MkdirOperation
+ * @property {'mkdir'} type
  * @property {string} path
+ */
+
+/**
+ * @typedef {Object} RemoveOperation
+ * @property {'remove'} type
+ * @property {string} from
+ */
+
+/**
+ * @typedef {CopyOperation | MkdirOperation | RemoveOperation} FileOperation
  */
 
 /**
@@ -21,13 +37,17 @@ export const applyFileOperations = async (fileOperations) => {
   for (const operation of fileOperations) {
     try {
       if (operation.type === 'copy') {
-        await cp(operation.from, operation.to, { recursive: true, force: true })
+        const fromPath = fileURLToPath(operation.from)
+        const toPath = fileURLToPath(operation.to)
+        await cp(fromPath, toPath, { recursive: true, force: true })
         console.log(`Copied: ${operation.from} -> ${operation.to}`)
       } else if (operation.type === 'remove') {
-        await rm(operation.from, { recursive: true, force: true })
+        const fromPath = fileURLToPath(operation.from)
+        await rm(fromPath, { recursive: true, force: true })
         console.log(`Removed: ${operation.from}`)
       } else if (operation.type === 'mkdir') {
-        await mkdir(operation.path, { recursive: true })
+        const path = fileURLToPath(operation.path)
+        await mkdir(path, { recursive: true })
         console.log(`Created directory: ${operation.path}`)
       }
     } catch (error) {

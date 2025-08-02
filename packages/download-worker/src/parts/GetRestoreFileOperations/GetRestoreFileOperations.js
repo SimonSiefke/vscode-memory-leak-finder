@@ -1,25 +1,45 @@
 import { join } from 'node:path'
 import { existsSync } from 'node:fs'
-import { pathToFileURL } from 'node:url'
+import { pathToFileURL, fileURLToPath } from 'node:url'
 
 /**
- * @typedef {Object} FileOperation
- * @property {'copy' | 'remove' | 'mkdir'} type
+ * @typedef {Object} CopyOperation
+ * @property {'copy'} type
  * @property {string} from
  * @property {string} to
+ */
+
+/**
+ * @typedef {Object} MkdirOperation
+ * @property {'mkdir'} type
  * @property {string} path
  */
 
 /**
- * @param {string} repoPath
+ * @typedef {Object} RemoveOperation
+ * @property {'remove'} type
+ * @property {string} from
+ */
+
+/**
+ * @typedef {CopyOperation | MkdirOperation | RemoveOperation} FileOperation
+ */
+
+/**
+ * @param {string} repoPathUri - File URI of the repository path
  * @param {string} cacheKey
- * @param {string} cacheDir
- * @param {string} cachedNodeModulesPath
- * @param {string[]} cachedNodeModulesPaths
+ * @param {string} cacheDirUri - File URI of the cache directory
+ * @param {string} cachedNodeModulesPathUri - File URI of the cached node_modules path
+ * @param {string[]} cachedNodeModulesPaths - Relative paths within the cache
  * @returns {Promise<FileOperation[]>}
  */
-export const getRestoreFileOperations = async (repoPath, cacheKey, cacheDir, cachedNodeModulesPath, cachedNodeModulesPaths) => {
+export const getRestoreFileOperations = async (repoPathUri, cacheKey, cacheDirUri, cachedNodeModulesPathUri, cachedNodeModulesPaths) => {
   try {
+    // Convert URIs to paths for file system operations
+    const repoPath = fileURLToPath(repoPathUri)
+    const cacheDir = fileURLToPath(cacheDirUri)
+    const cachedNodeModulesPath = fileURLToPath(cachedNodeModulesPathUri)
+
     // Check if cached node_modules exists
     if (!existsSync(cachedNodeModulesPath)) {
       console.log(`No cached node_modules found for cache key: ${cacheKey}`)
@@ -43,14 +63,14 @@ export const getRestoreFileOperations = async (repoPath, cacheKey, cacheDir, cac
         const parentDir = join(targetPath, '..')
         const parentDirUri = pathToFileURL(parentDir).href
         fileOperations.push({
-          type: 'mkdir',
+          type: /** @type {'mkdir'} */ ('mkdir'),
           path: parentDirUri,
         })
 
         const cachedNodeModulesPathUri = pathToFileURL(cachedNodeModulesPath).href
         const targetPathUri = pathToFileURL(targetPath).href
         fileOperations.push({
-          type: 'copy',
+          type: /** @type {'copy'} */ ('copy'),
           from: cachedNodeModulesPathUri,
           to: targetPathUri,
         })

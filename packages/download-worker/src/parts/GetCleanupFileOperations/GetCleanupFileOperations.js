@@ -1,29 +1,34 @@
 import { join } from 'node:path'
 import { existsSync } from 'node:fs'
+import { pathToFileURL, fileURLToPath } from 'node:url'
 
 /**
- * @typedef {Object} FileOperation
- * @property {'copy' | 'remove'} type
+ * @typedef {Object} RemoveOperation
+ * @property {'remove'} type
  * @property {string} from
- * @property {string} to
  */
 
 /**
- * @param {string} repoPath
+ * @typedef {RemoveOperation} FileOperation
+ */
+
+/**
+ * @param {string} repoPathUri - File URI of the repository path
  * @returns {FileOperation[]}
  */
-export const getCleanupFileOperations = (repoPath) => {
+export const getCleanupFileOperations = (repoPathUri) => {
   try {
+    const repoPath = fileURLToPath(repoPathUri)
     const nodeModulesPath = join(repoPath, 'node_modules')
 
     if (existsSync(nodeModulesPath)) {
       console.log('Preparing to cleanup node_modules to save disk space')
 
+      const nodeModulesPathUri = pathToFileURL(nodeModulesPath).href
       return [
         {
-          type: 'remove',
-          from: nodeModulesPath,
-          to: '', // Not used for remove operations
+          type: /** @type {'remove'} */ ('remove'),
+          from: nodeModulesPathUri,
         },
       ]
     }
