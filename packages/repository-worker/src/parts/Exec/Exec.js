@@ -10,7 +10,8 @@ import { execa } from 'execa'
 export const exec = async (command, args, options = {}) => {
   const result = await execa(command, args, options)
   return {
-    stdout: result.stdout,
-    stderr: result.stderr
+    stdout: result.stdout || '',
+    stderr: result.stderr || '',
+    exitCode: result.exitCode,
   }
-} 
+}
