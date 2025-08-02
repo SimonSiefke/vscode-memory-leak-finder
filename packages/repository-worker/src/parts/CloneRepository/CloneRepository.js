@@ -18,10 +18,10 @@ export const cloneRepository = async (repoUrl, repoPath) => {
   }
 
   // Check if repo already exists
-  if (!(await pathExists(repoPath))) {
+  if (await pathExists(repoPath)) {
+    console.log(`Repository already exists at ${repoPath}, skipping clone...`)
+  } else {
     console.log(`Cloning repository from ${repoUrl}...`)
     await execa('git', ['clone', '--depth', '1', repoUrl, repoPath])
-  } else {
-    console.log(`Repository already exists at ${repoPath}, skipping clone...`)
   }
 }

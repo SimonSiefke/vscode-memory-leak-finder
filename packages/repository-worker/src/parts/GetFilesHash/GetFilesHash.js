@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import { getHash } from '../GetHash/GetHash.js'
+import { VError } from '@lvce-editor/verror'
 
 /**
  * Reads multiple files and returns their combined hash
@@ -11,7 +12,6 @@ export const getFilesHash = async (fileUris) => {
     const contents = await Promise.all(fileUris.map((file) => readFile(file, 'utf8')))
     return getHash(contents)
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    throw new Error(`Failed to get files hash: ${errorMessage}`)
+    throw new VError(error, `Failed to get files hash`)
   }
 }

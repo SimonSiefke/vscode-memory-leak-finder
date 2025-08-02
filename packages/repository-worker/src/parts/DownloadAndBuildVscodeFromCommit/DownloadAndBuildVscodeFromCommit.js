@@ -6,7 +6,9 @@ import * as ResolveCommitHash from '../ResolveCommitHash/ResolveCommitHash.js'
 import { setupNodeModulesFromCache } from '../SetupNodeModulesFromCache/SetupNodeModulesFromCache.js'
 import { cacheNodeModules } from '../CacheNodeModules/CacheNodeModules.js'
 import { cleanupNodeModules } from '../CleanupNodeModules/CleanupNodeModules.js'
-import { downloadRepository } from '../DownloadRepository/DownloadRepository.js'
+import { cloneRepository } from '../CloneRepository/CloneRepository.js'
+import { checkoutCommit } from '../CheckoutCommit/CheckoutCommit.js'
+import * as Root from '../Root/Root.js'
 import * as InstallDependencies from '../InstallDependencies/InstallDependencies.js'
 import * as RunCompile from '../RunCompile/RunCompile.js'
 
@@ -22,7 +24,14 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
   // Resolve the commit reference to an actual commit hash
   const commitHash = await ResolveCommitHash.resolveCommitHash(VSCODE_REPO_URL, commitRef)
   try {
-    const repoPath = await downloadRepository(VSCODE_REPO_URL, commitHash, VSCODE_REPOS_DIR)
+    const reposDir = join(Root.root, VSCODE_REPOS_DIR)
+    const repoPath = join(reposDir, commitHash)
+
+    // Clone the repository
+    await cloneRepository(VSCODE_REPO_URL, repoPath)
+
+    // Checkout the specific commit
+    await checkoutCommit(repoPath, commitHash)
 
     // Check if out/main.js exists (build was successful)
     const mainJsPath = join(repoPath, 'out', 'main.js')
