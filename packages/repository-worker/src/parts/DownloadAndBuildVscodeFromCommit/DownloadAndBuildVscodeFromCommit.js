@@ -5,7 +5,6 @@ import { pathExists } from 'path-exists'
 import * as ResolveCommitHash from '../ResolveCommitHash/ResolveCommitHash.js'
 import { setupNodeModulesFromCache } from '../SetupNodeModulesFromCache/SetupNodeModulesFromCache.js'
 import { addNodeModulesToCache } from '../CacheNodeModules/CacheNodeModules.js'
-import { cleanupNodeModules } from '../CleanupNodeModules/CleanupNodeModules.js'
 import { cloneRepository } from '../CloneRepository/CloneRepository.js'
 import { checkoutCommit } from '../CheckoutCommit/CheckoutCommit.js'
 import * as Root from '../Root/Root.js'
@@ -84,7 +83,4 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, repos
   if (!(await pathExists(mainJsPath))) {
     throw new Error(`Build failed: out/main.js not found after compilation`)
   }
-
-  // Clean up node_modules to save disk space
-  await cleanupNodeModules(repoPath)
 }
