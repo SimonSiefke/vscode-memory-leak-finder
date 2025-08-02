@@ -1,23 +1,79 @@
-import { test, expect } from '@jest/globals'
-import { findPackageLockFiles } from '../src/parts/FindPackageLockFiles/FindPackageLockFiles.js'
+import { test, expect, jest } from '@jest/globals'
 import { pathToFileURL } from 'node:url'
 
-test('findPackageLockFiles - returns an array of file URIs', async () => {
-  const result = await findPackageLockFiles(pathToFileURL('/nonexistent/path').href)
-  expect(Array.isArray(result)).toBe(true)
+// Mock the glob function
+const mockGlob = jest.fn()
+jest.unstable_mockModule('node:fs/promises', () => ({
+  glob: mockGlob
+}))
+
+test('findPackageLockFiles - returns empty array when no package-lock.json files found', async () => {
+  // Mock glob to return empty results
+  mockGlob.mockReturnValue((async function* () {})())
+
+  const { findPackageLockFiles } = await import('../src/parts/FindPackageLockFiles/FindPackageLockFiles.js')
+  const result = await findPackageLockFiles(pathToFileURL('/test/path').href)
+
+  expect(result).toEqual([])
+  expect(mockGlob).toHaveBeenCalledWith('**/package-lock.json', {
+    cwd: '/test/path',
+    exclude: ['**/node_modules/**']
+  })
 })
 
-test('findPackageLockFiles - handles errors gracefully', async () => {
-  // Should throw VError with invalid path
-  await expect(findPackageLockFiles(pathToFileURL('/nonexistent/path').href)).rejects.toThrow()
+test('findPackageLockFiles - returns file URIs when package-lock.json files found', async () => {
+  // Mock glob to return some package-lock.json files
+  const mockPaths = ['package-lock.json', 'subdir/package-lock.json']
+  mockGlob.mockReturnValue((async function* () {
+    for (const path of mockPaths) {
+      yield path
+    }
+  })())
+
+  const { findPackageLockFiles } = await import('../src/parts/FindPackageLockFiles/FindPackageLockFiles.js')
+  const result = await findPackageLockFiles(pathToFileURL('/test/path').href)
+
+  expect(result).toEqual([
+    'file:///test/path/package-lock.json',
+    'file:///test/path/subdir/package-lock.json'
+  ])
+  expect(mockGlob).toHaveBeenCalledWith('**/package-lock.json', {
+    cwd: '/test/path',
+    exclude: ['**/node_modules/**']
+  })
 })
 
-test('findPackageLockFiles - returns file URIs', async () => {
-  const result = await findPackageLockFiles(pathToFileURL('/nonexistent/path').href)
-  // If the function returns any results, they should be file URIs
-  if (result.length > 0) {
-    result.forEach(uri => {
-      expect(uri).toMatch(/^file:\/\//)
-    })
-  }
+test('findPackageLockFiles - excludes node_modules package-lock.json files', async () => {
+  // Mock glob to return package-lock.json files including some in node_modules
+  const mockPaths = ['package-lock.json', 'node_modules/some-package/package-lock.json', 'subdir/package-lock.json']
+  mockGlob.mockReturnValue((async function* () {
+    for (const path of mockPaths) {
+      yield path
+    }
+  })())
+
+  const { findPackageLockFiles } = await import('../src/parts/FindPackageLockFiles/FindPackageLockFiles.js')
+  const result = await findPackageLockFiles(pathToFileURL('/test/path').href)
+
+  // Should only return package-lock.json files not in node_modules
+  expect(result).toEqual([
+    'file:///test/path/package-lock.json',
+    'file:///test/path/subdir/package-lock.json'
+  ])
+})
+
+test('findPackageLockFiles - throws VError when glob fails', async () => {
+  // Mock glob to throw an error
+  mockGlob.mockImplementation(() => {
+    throw new Error('Permission denied')
+  })
+
+  const { findPackageLockFiles } = await import('../src/parts/FindPackageLockFiles/FindPackageLockFiles.js')
+  await expect(findPackageLockFiles(pathToFileURL('/test/path').href))
+    .rejects.toThrow('Failed to find package-lock.json files in directory')
+
+  expect(mockGlob).toHaveBeenCalledWith('**/package-lock.json', {
+    cwd: '/test/path',
+    exclude: ['**/node_modules/**']
+  })
 })
