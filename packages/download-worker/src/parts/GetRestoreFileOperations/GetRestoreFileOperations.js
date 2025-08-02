@@ -1,9 +1,6 @@
 import { join } from 'node:path'
 import { existsSync, mkdirSync } from 'node:fs'
 import { glob } from 'node:fs/promises'
-import * as Root from '../Root/Root.js'
-
-const VSCODE_NODE_MODULES_CACHE_DIR = '.vscode-node-modules'
 
 /**
  * @typedef {Object} FileOperation
@@ -15,13 +12,12 @@ const VSCODE_NODE_MODULES_CACHE_DIR = '.vscode-node-modules'
 /**
  * @param {string} repoPath
  * @param {string} cacheKey
+ * @param {string} cacheDir
+ * @param {string} cachedNodeModulesPath
  * @returns {Promise<FileOperation[]>}
  */
-export const getRestoreFileOperations = async (repoPath, cacheKey) => {
+export const getRestoreFileOperations = async (repoPath, cacheKey, cacheDir, cachedNodeModulesPath) => {
   try {
-    const cacheDir = join(Root.root, VSCODE_NODE_MODULES_CACHE_DIR)
-    const cachedNodeModulesPath = join(cacheDir, cacheKey)
-
     // Check if cached node_modules exists
     if (!existsSync(cachedNodeModulesPath)) {
       console.log(`No cached node_modules found for cache key: ${cacheKey}`)
@@ -33,13 +29,12 @@ export const getRestoreFileOperations = async (repoPath, cacheKey) => {
     const fileOperations = []
 
     // Find all cached node_modules directories using glob
-    const cachedNodeModulesPaths = []
-    for await (const path of glob('**/node_modules', { cwd: cachedNodeModulesPath })) {
-      // Skip nested node_modules
-      if (!path.includes('node_modules/node_modules')) {
-        cachedNodeModulesPaths.push(path)
-      }
-    }
+    const cachedNodeModulesPaths = await Array.fromAsync(
+      glob('**/node_modules', { cwd: cachedNodeModulesPath }),
+      path => path
+    ).then(paths => paths.filter(path =>
+      !path.includes('node_modules/node_modules')
+    ))
 
     // Convert relative paths to absolute paths
     const absoluteCachedNodeModulesPaths = cachedNodeModulesPaths.map(path => join(cachedNodeModulesPath, path))

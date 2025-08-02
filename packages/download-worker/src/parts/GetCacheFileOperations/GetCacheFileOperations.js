@@ -1,9 +1,6 @@
 import { join } from 'node:path'
 import { existsSync, mkdirSync } from 'node:fs'
 import { glob } from 'node:fs/promises'
-import * as Root from '../Root/Root.js'
-
-const VSCODE_NODE_MODULES_CACHE_DIR = '.vscode-node-modules'
 
 /**
  * @typedef {Object} FileOperation
@@ -15,13 +12,12 @@ const VSCODE_NODE_MODULES_CACHE_DIR = '.vscode-node-modules'
 /**
  * @param {string} repoPath
  * @param {string} cacheKey
+ * @param {string} cacheDir
+ * @param {string} cachedNodeModulesPath
  * @returns {Promise<FileOperation[]>}
  */
-export const getCacheFileOperations = async (repoPath, cacheKey) => {
+export const getCacheFileOperations = async (repoPath, cacheKey, cacheDir, cachedNodeModulesPath) => {
   try {
-    const cacheDir = join(Root.root, VSCODE_NODE_MODULES_CACHE_DIR)
-    const cachedNodeModulesPath = join(cacheDir, cacheKey)
-
     // Create cache directory if it doesn't exist
     if (!existsSync(cacheDir)) {
       mkdirSync(cacheDir, { recursive: true })
@@ -37,13 +33,12 @@ export const getCacheFileOperations = async (repoPath, cacheKey) => {
     const fileOperations = []
 
     // Find all node_modules directories in the repository using glob
-    const nodeModulesPaths = []
-    for await (const path of glob('**/node_modules', { cwd: repoPath })) {
-      // Skip nested node_modules and .git directories
-      if (!path.includes('node_modules/node_modules') && !path.includes('.git')) {
-        nodeModulesPaths.push(path)
-      }
-    }
+    const nodeModulesPaths = await Array.fromAsync(
+      glob('**/node_modules', { cwd: repoPath }),
+      path => path
+    ).then(paths => paths.filter(path =>
+      !path.includes('node_modules/node_modules') && !path.includes('.git')
+    ))
 
     // Convert relative paths to absolute paths
     const absoluteNodeModulesPaths = nodeModulesPaths.map(path => join(repoPath, path))
