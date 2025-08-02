@@ -66,7 +66,6 @@ test('runCompile - function signature is correct', () => {
 test('downloadVscodeCommit - returns expected path structure', async () => {
   // Test that the function returns the expected path structure
   const testCommitHash = 'test-commit-download'
-  const testRepoUrl = 'https://github.com/test/repo.git'
   const testOutFolder = '.test-repos'
 
   // Mock the git operations by creating the directory structure manually

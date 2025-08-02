@@ -137,7 +137,7 @@ test('resolveCommitHash - handles short commit hash input', async () => {
   const shortHash = 'a1b2c3d4'
 
   const { resolveCommitHash } = await import('../src/parts/ResolveCommitHash/ResolveCommitHash.js')
-  const result = await resolveCommitHash('https://github.com/test/repo.git', shortHash)
+  await resolveCommitHash('https://github.com/test/repo.git', shortHash)
 
   // Should call execa since it's not a full 40-character hash
   expect(mockExeca).toHaveBeenCalledTimes(1)
