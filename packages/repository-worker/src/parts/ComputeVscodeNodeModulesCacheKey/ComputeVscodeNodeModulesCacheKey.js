@@ -1,6 +1,6 @@
-import { createHash } from 'node:crypto'
-import { readFile, readdir } from 'node:fs/promises'
-import { join } from 'node:path'
+import { readFile } from 'node:fs/promises'
+import { getHash } from '../GetHash/GetHash.js'
+import { findPackageLockFiles } from '../FindPackageLockFiles/FindPackageLockFiles.js'
 
 /**
  * @param {string} repoPath
@@ -10,12 +10,7 @@ export const computeVscodeNodeModulesCacheKey = async (repoPath) => {
     const packageLockFiles = await findPackageLockFiles(repoPath)
     const contents = await Promise.all(packageLockFiles.map((file) => readFile(file, 'utf8')))
 
-    const hash = createHash('sha1')
-    for (const content of contents) {
-      hash.update(content)
-    }
-
-    return hash.digest('hex')
+    return getHash(contents)
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     throw new Error(`Failed to compute VS Code node_modules cache key: ${errorMessage}`)

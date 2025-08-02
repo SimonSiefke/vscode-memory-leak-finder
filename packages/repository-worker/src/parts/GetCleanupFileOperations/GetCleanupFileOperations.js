@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs'
-import { pathToFileURL, fileURLToPath } from 'node:url'
+import { fileURLToPath } from 'node:url'
 
 /**
  * @typedef {Object} RemoveOperation
