@@ -26,7 +26,13 @@ export const addNodeModulesToCache = async (repoPath) => {
     const allNodeModulesPaths = await Array.fromAsync(glob('**/node_modules', { cwd: repoPath }))
     const nodeModulesPaths = allNodeModulesPaths.filter((path) => !path.includes('node_modules/node_modules') && !path.includes('.git'))
 
-    const fileOperations = await GetCacheFileOperations.getCacheFileOperations(repoPathUri, cacheKey, cacheDirUri, cachedNodeModulesPathUri, nodeModulesPaths)
+    const fileOperations = await GetCacheFileOperations.getCacheFileOperations(
+      repoPathUri,
+      cacheKey,
+      cacheDirUri,
+      cachedNodeModulesPathUri,
+      nodeModulesPaths,
+    )
     await ApplyFileOperations.applyFileOperations(fileOperations)
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)

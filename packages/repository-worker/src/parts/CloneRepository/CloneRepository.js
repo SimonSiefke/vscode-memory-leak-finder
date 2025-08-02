@@ -2,6 +2,7 @@ import { join } from 'node:path'
 import { mkdir } from 'node:fs/promises'
 import { execa } from 'execa'
 import { pathExists } from 'path-exists'
+import { VError } from '@lvce-editor/verror'
 import * as Root from '../Root/Root.js'
 
 /**
@@ -11,17 +12,21 @@ import * as Root from '../Root/Root.js'
  * @returns {Promise<void>}
  */
 export const cloneRepository = async (repoUrl, repoPath) => {
-  // Create parent directory if it doesn't exist
-  const parentDir = join(repoPath, '..')
-  if (!(await pathExists(parentDir))) {
-    await mkdir(parentDir, { recursive: true })
-  }
+  try {
+    // Create parent directory if it doesn't exist
+    const parentDir = join(repoPath, '..')
+    if (!(await pathExists(parentDir))) {
+      await mkdir(parentDir, { recursive: true })
+    }
 
-  // Check if repo already exists
-  if (await pathExists(repoPath)) {
-    console.log(`Repository already exists at ${repoPath}, skipping clone...`)
-  } else {
-    console.log(`Cloning repository from ${repoUrl}...`)
-    await execa('git', ['clone', '--depth', '1', repoUrl, repoPath])
+    // Check if repo already exists
+    if (await pathExists(repoPath)) {
+      console.log(`Repository already exists at ${repoPath}, skipping clone...`)
+    } else {
+      console.log(`Cloning repository from ${repoUrl}...`)
+      await execa('git', ['clone', '--depth', '1', repoUrl, repoPath])
+    }
+  } catch (error) {
+    throw new VError(error, `Failed to clone repository from '${repoUrl}' to '${repoPath}'`)
   }
 }

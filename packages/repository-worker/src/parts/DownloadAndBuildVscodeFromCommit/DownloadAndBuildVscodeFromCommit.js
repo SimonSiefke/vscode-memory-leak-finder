@@ -15,8 +15,6 @@ import * as RunCompile from '../RunCompile/RunCompile.js'
 const VSCODE_REPO_URL = 'https://github.com/microsoft/vscode.git'
 const VSCODE_REPOS_DIR = '.vscode-repos'
 
-
-
 /**
  * @param {string} commitRef - The commit reference (branch name, tag, or commit hash)
  */
@@ -55,7 +53,7 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
           await InstallDependencies.installDependencies(repoPath, useNice)
 
           // Cache the node_modules for future use
-          await cacheNodeModules(repoPath)
+          await addNodeModulesToCache(repoPath)
         } else {
           console.log(`Successfully restored node_modules from cache for commit ${commitHash}`)
         }

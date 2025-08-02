@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { setupNodeModulesFromCache } from '../src/parts/SetupNodeModulesFromCache/SetupNodeModulesFromCache.js'
-import { cacheNodeModules } from '../src/parts/CacheNodeModules/CacheNodeModules.js'
+import { addNodeModulesToCache } from '../src/parts/CacheNodeModules/CacheNodeModules.js'
 import { cleanupNodeModules } from '../src/parts/CleanupNodeModules/CleanupNodeModules.js'
 
 test('setupNodeModulesFromCache - function exists and is callable', async () => {
@@ -12,12 +12,12 @@ test('setupNodeModulesFromCache - function signature is correct', async () => {
   expect(fn.length).toBe(1) // Should accept one parameter (repoPath)
 })
 
-test('cacheNodeModules - function exists and is callable', async () => {
-  expect(typeof cacheNodeModules).toBe('function')
+test('addNodeModulesToCache - function exists and is callable', async () => {
+  expect(typeof addNodeModulesToCache).toBe('function')
 })
 
-test('cacheNodeModules - function signature is correct', async () => {
-  const fn = cacheNodeModules
+test('addNodeModulesToCache - function signature is correct', async () => {
+  const fn = addNodeModulesToCache
   expect(fn.length).toBe(1) // Should accept one parameter (repoPath)
 })
 
@@ -35,7 +35,7 @@ test('functions handle errors gracefully', async () => {
   const result1 = await setupNodeModulesFromCache('/nonexistent/path')
   expect(typeof result1).toBe('boolean')
 
-  await cacheNodeModules('/nonexistent/path')
+  await addNodeModulesToCache('/nonexistent/path')
   // Should not throw
 
   cleanupNodeModules('/nonexistent/path')

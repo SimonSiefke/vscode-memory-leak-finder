@@ -1,5 +1,6 @@
 import { fileURLToPath } from 'node:url'
 import { pathExists } from 'path-exists'
+import { VError } from '@lvce-editor/verror'
 
 /**
  * @typedef {Object} RemoveOperation
@@ -33,8 +34,6 @@ export const getCleanupFileOperations = async (repoPathUri) => {
 
     return []
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    console.warn(`Failed to get cleanup file operations: ${errorMessage}`)
-    return []
+    throw new VError(error, `Failed to get cleanup file operations for repository '${repoPathUri}'`)
   }
 }
