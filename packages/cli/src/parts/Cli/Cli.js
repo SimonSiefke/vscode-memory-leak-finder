@@ -22,6 +22,7 @@ export const run = async () => {
     ide: options.ide,
     ideVersion: options.ideVersion,
     vscodePath: options.vscodePath,
+    commit: options.commit,
   })
   return InitialStart.initialStart(options)
 }

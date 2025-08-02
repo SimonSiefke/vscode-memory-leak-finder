@@ -50,6 +50,7 @@ export const runTests = async (
   ide,
   ideVersion,
   vscodePath,
+  commit,
   callback,
 ) => {
   try {
@@ -94,6 +95,7 @@ export const runTests = async (
       ide,
       ideVersion,
       vscodePath,
+      commit,
     )
     let memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()
     let targetId = ''
@@ -179,6 +181,8 @@ export const runTests = async (
               runMode,
               ide,
               ideVersion,
+              vscodePath,
+              commit,
             )
             if (checkLeaks) {
               memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()
