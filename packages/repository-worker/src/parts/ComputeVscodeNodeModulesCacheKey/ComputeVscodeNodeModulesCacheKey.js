@@ -3,11 +3,11 @@ import { getFilesHash } from '../GetFilesHash/GetFilesHash.js'
 import { VError } from '@lvce-editor/verror'
 
 /**
- * @param {string} repositoryFileUri
+ * @param {string} folder
  */
-export const computeVscodeNodeModulesCacheKey = async (repositoryFileUri) => {
+export const computeVscodeNodeModulesCacheKey = async (folder) => {
   try {
-    const packageLockFiles = await findPackageLockFiles(repositoryFileUri)
+    const packageLockFiles = await findPackageLockFiles(folder)
     return getFilesHash(packageLockFiles)
   } catch (error) {
     throw new VError(error, `Failed to compute VS Code node_modules cache key`)
