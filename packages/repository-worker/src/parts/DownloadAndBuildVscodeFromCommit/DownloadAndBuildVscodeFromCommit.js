@@ -16,8 +16,9 @@ import * as RunCompile from '../RunCompile/RunCompile.js'
  * @param {string} commitRef - The commit reference (branch name, tag, or commit hash)
  * @param {string} repoUrl - The repository URL to clone
  * @param {string} reposDir - The directory name for storing repositories
+ * @param {string} cacheDir - The cache directory path
  */
-export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, reposDir) => {
+export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, reposDir, cacheDir) => {
   // Resolve the commit reference to an actual commit hash
   const commitHash = await ResolveCommitHash.resolveCommitHash(repoUrl, commitRef)
   const reposDirPath = join(Root.root, reposDir)
@@ -55,11 +56,11 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, repos
     console.log(`Installing dependencies for commit ${commitHash}...`)
 
     // Check if cache exists for this commit hash
-    const cacheExists = await checkCacheExists(commitHash)
+    const cacheExists = await checkCacheExists(commitHash, cacheDir)
 
     if (cacheExists) {
       console.log(`Found cached node_modules for commit ${commitHash}, restoring from cache...`)
-      const cacheHit = await setupNodeModulesFromCache(repoPath, commitHash)
+      const cacheHit = await setupNodeModulesFromCache(repoPath, commitHash, cacheDir)
 
       if (!cacheHit) {
         console.log(`Failed to restore from cache, running npm ci for commit ${commitHash}...`)
@@ -68,7 +69,7 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, repos
         await InstallDependencies.installDependencies(repoPath, useNice)
 
         // Cache the node_modules for future use
-        await addNodeModulesToCache(repoPath, commitHash)
+        await addNodeModulesToCache(repoPath, commitHash, cacheDir)
       } else {
         console.log(`Successfully restored node_modules from cache for commit ${commitHash}`)
       }
@@ -79,7 +80,7 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, repos
       await InstallDependencies.installDependencies(repoPath, useNice)
 
       // Cache the node_modules for future use
-      await addNodeModulesToCache(repoPath, commitHash)
+      await addNodeModulesToCache(repoPath, commitHash, cacheDir)
     }
   } else if (!existsMainJsPath) {
     console.log(`node_modules already exists in repo for commit ${commitHash}, skipping npm ci...`)

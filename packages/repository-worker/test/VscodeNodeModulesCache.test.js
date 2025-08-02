@@ -12,6 +12,6 @@ test('addNodeModulesToCache - function exists and is callable', async () => {
 
 test('setupNodeModulesFromCache returns false when no cache exists', async () => {
   // This should return false (not throw) when no cache exists
-  const result = await setupNodeModulesFromCache('/nonexistent/path')
+  const result = await setupNodeModulesFromCache('/nonexistent/path', 'test-commit', '/test/cache')
   expect(result).toBe(false)
 })

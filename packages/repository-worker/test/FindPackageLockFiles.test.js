@@ -40,7 +40,7 @@ test('findPackageLockFiles - returns file URIs when package-lock.json files foun
   const { findPackageLockFiles } = await import('../src/parts/FindPackageLockFiles/FindPackageLockFiles.js')
   const result = await findPackageLockFiles('/test/path')
 
-  expect(result).toEqual(['test/path/package-lock.json', 'test/path/subdir/package-lock.json'])
+  expect(result).toEqual(['/test/path/package-lock.json', '/test/path/subdir/package-lock.json'])
   expect(mockGlob).toHaveBeenCalledTimes(1)
   expect(mockGlob).toHaveBeenCalledWith('**/package-lock.json', {
     cwd: '/test/path',
