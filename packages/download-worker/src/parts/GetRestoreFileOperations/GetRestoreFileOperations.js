@@ -1,5 +1,6 @@
 import { join } from 'node:path'
 import { existsSync } from 'node:fs'
+import { pathToFileURL } from 'node:url'
 
 /**
  * @typedef {Object} FileOperation
@@ -40,15 +41,18 @@ export const getRestoreFileOperations = async (repoPath, cacheKey, cacheDir, cac
 
         // Add parent directory creation operation
         const parentDir = join(targetPath, '..')
+        const parentDirUri = pathToFileURL(parentDir).href
         fileOperations.push({
           type: 'mkdir',
-          path: parentDir,
+          path: parentDirUri,
         })
 
+        const cachedNodeModulesPathUri = pathToFileURL(cachedNodeModulesPath).href
+        const targetPathUri = pathToFileURL(targetPath).href
         fileOperations.push({
           type: 'copy',
-          from: cachedNodeModulesPath,
-          to: targetPath,
+          from: cachedNodeModulesPathUri,
+          to: targetPathUri,
         })
       }
     }
