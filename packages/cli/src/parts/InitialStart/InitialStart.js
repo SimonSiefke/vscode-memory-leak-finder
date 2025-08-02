@@ -29,5 +29,6 @@ export const initialStart = async (options) => {
     options.ideVersion,
     options.vscodePath,
     options.commit,
+    options.setupOnly,
   )
 }

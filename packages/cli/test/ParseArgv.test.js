@@ -83,3 +83,15 @@ test('parseArgv - commit flag not present', () => {
   const options = ParseArgv.parseArgv(argv)
   expect(options.commit).toBe('')
 })
+
+test('parseArgv - setup-only flag', () => {
+  const argv = ['--setup-only']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.setupOnly).toBe(true)
+})
+
+test('parseArgv - setup-only flag not present', () => {
+  const argv = []
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.setupOnly).toBe(false)
+})

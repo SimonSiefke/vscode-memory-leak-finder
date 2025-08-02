@@ -1,8 +1,8 @@
-import { expect, test } from '@jest/globals'
+import { test, expect } from '@jest/globals'
 import { join } from 'node:path'
 import { access, mkdir, writeFile, rm } from 'node:fs/promises'
 import { platform } from 'node:os'
-import * as DownloadAndBuildVscodeFromCommit from '../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js'
+import { downloadAndBuildVscodeFromCommit } from '../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js'
 import * as DownloadVscodeCommit from '../src/parts/DownloadVscodeCommit/DownloadVscodeCommit.js'
 import * as InstallDependencies from '../src/parts/InstallDependencies/InstallDependencies.js'
 import * as RunCompile from '../src/parts/RunCompile/RunCompile.js'
@@ -22,13 +22,18 @@ const exists = async (path) => {
   }
 }
 
-test('downloadAndBuildVscodeFromCommit - function exists and is callable', () => {
-  expect(typeof DownloadAndBuildVscodeFromCommit.downloadAndBuildVscodeFromCommit).toBe('function')
+test('downloadAndBuildVscodeFromCommit - function exists and is callable', async () => {
+  expect(typeof downloadAndBuildVscodeFromCommit).toBe('function')
 })
 
-test('downloadAndBuildVscodeFromCommit - function signature is correct', () => {
-  const fn = DownloadAndBuildVscodeFromCommit.downloadAndBuildVscodeFromCommit
+test('downloadAndBuildVscodeFromCommit - function signature is correct', async () => {
+  const fn = downloadAndBuildVscodeFromCommit
   expect(fn.length).toBe(1) // Should accept one parameter (commitRef)
+})
+
+test('downloadAndBuildVscodeFromCommit handles errors gracefully', async () => {
+  // Should throw with invalid commit reference
+  await expect(downloadAndBuildVscodeFromCommit('invalid-commit-ref')).rejects.toThrow()
 })
 
 test('downloadVscodeCommit - function exists and is callable', () => {
@@ -116,7 +121,7 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missi
   try {
     // This should detect missing node_modules and attempt to restore from cache
     // Since we're in a test environment, it will likely fail gracefully
-    await expect(DownloadAndBuildVscodeFromCommit.downloadAndBuildVscodeFromCommit(testCommitHash)).rejects.toThrow()
+    await expect(downloadAndBuildVscodeFromCommit(testCommitHash)).rejects.toThrow()
   } finally {
     // Cleanup
     if (await exists(repoPath)) {
@@ -155,7 +160,7 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
   try {
     // This should detect existing node_modules and skip npm ci
     // Since we're in a test environment, it will likely fail gracefully
-    await expect(DownloadAndBuildVscodeFromCommit.downloadAndBuildVscodeFromCommit(testCommitHash)).rejects.toThrow()
+    await expect(downloadAndBuildVscodeFromCommit(testCommitHash)).rejects.toThrow()
   } finally {
     // Cleanup
     if (await exists(repoPath)) {
@@ -195,7 +200,7 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
   try {
     // This should detect existing out folder and skip compilation
     // Since we're in a test environment, it will likely fail gracefully
-    await expect(DownloadAndBuildVscodeFromCommit.downloadAndBuildVscodeFromCommit(testCommitHash)).rejects.toThrow()
+    await expect(downloadAndBuildVscodeFromCommit(testCommitHash)).rejects.toThrow()
   } finally {
     // Cleanup
     if (await exists(repoPath)) {
