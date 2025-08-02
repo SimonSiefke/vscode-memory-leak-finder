@@ -4,6 +4,7 @@ import * as DownloadAndBuildVscodeFromCommit from '../DownloadAndBuildVscodeFrom
 import * as DownloadFfmpeg from '../DownloadFfmpeg/DownloadFfmpeg.js'
 import * as DownloadFfmpegMaybe from '../DownloadFfmpegMaybe/DownloadFfmpegMaybe.js'
 import * as VscodeNodeModulesCache from '../VscodeNodeModulesCache/VscodeNodeModulesCache.js'
+import * as ResolveCommitHash from '../ResolveCommitHash/ResolveCommitHash.js'
 
 export const commandMap = {
   'Download.downloadAndUnzipCursor': DownloadAndUnzipCursor.downloadAndUnzipCursor,
@@ -14,4 +15,5 @@ export const commandMap = {
   'VscodeNodeModulesCache.setupNodeModulesFromCache': VscodeNodeModulesCache.setupNodeModulesFromCache,
   'VscodeNodeModulesCache.cacheNodeModules': VscodeNodeModulesCache.cacheNodeModules,
   'VscodeNodeModulesCache.cleanupNodeModules': VscodeNodeModulesCache.cleanupNodeModules,
+  'ResolveCommitHash.resolveCommitHash': ResolveCommitHash.resolveCommitHash,
 }

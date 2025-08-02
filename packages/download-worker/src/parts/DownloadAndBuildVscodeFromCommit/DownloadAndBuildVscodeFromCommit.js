@@ -4,14 +4,17 @@ import { execa } from 'execa'
 import { VError } from '@lvce-editor/verror'
 import * as Root from '../Root/Root.js'
 import * as VscodeNodeModulesCache from '../VscodeNodeModulesCache/VscodeNodeModulesCache.js'
+import * as ResolveCommitHash from '../ResolveCommitHash/ResolveCommitHash.js'
 
 const VSCODE_REPO_URL = 'https://github.com/microsoft/vscode.git'
 const VSCODE_REPOS_DIR = '.vscode-repos'
 
 /**
- * @param {string} commitHash
+ * @param {string} commitRef - The commit reference (branch name, tag, or commit hash)
  */
-export const downloadAndBuildVscodeFromCommit = async (commitHash) => {
+export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
+  // Resolve the commit reference to an actual commit hash
+  const commitHash = await ResolveCommitHash.resolveCommitHash(commitRef)
   try {
     const reposDir = join(Root.root, VSCODE_REPOS_DIR)
     const repoPath = join(reposDir, commitHash)
@@ -25,8 +28,11 @@ export const downloadAndBuildVscodeFromCommit = async (commitHash) => {
     if (!existsSync(repoPath)) {
       console.log(`Cloning VS Code repository for commit ${commitHash}...`)
 
-      // Clone the repository with depth 1 and fetch tags
-      await execa('git', ['clone', '--depth', '1', '--branch', commitHash, VSCODE_REPO_URL, repoPath])
+      // Clone the repository first
+      await execa('git', ['clone', '--depth', '1', VSCODE_REPO_URL, repoPath])
+
+      // Then checkout the specific commit
+      await execa('git', ['checkout', commitHash], { cwd: repoPath })
     } else {
       console.log(`VS Code repository for commit ${commitHash} already exists, skipping clone...`)
     }
