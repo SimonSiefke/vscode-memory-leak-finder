@@ -1,64 +1,65 @@
-import { existsSync, mkdirSync, rmSync, readdirSync, statSync } from 'node:fs'
-import { cpSync } from 'node:fs'
 import { join } from 'node:path'
+import { existsSync, mkdirSync, cpSync, rmSync } from 'node:fs'
 import * as Root from '../Root/Root.js'
 import * as ComputeVscodeNodeModulesCacheKey from '../ComputeVscodeNodeModulesCacheKey/ComputeVscodeNodeModulesCacheKey.js'
 
 const VSCODE_NODE_MODULES_CACHE_DIR = '.vscode-node-modules'
 
 /**
- * Recursively finds all node_modules directories in the given path
- * @param {string} rootPath - The root path to search in
- * @param {string} currentPath - The current path being searched
- * @returns {string[]} Array of paths to node_modules directories
+ * @typedef {Object} FileOperation
+ * @property {'copy' | 'remove'} type
+ * @property {string} from
+ * @property {string} to
  */
-export const findAllNodeModulesDirs = (rootPath, currentPath = '') => {
-  const nodeModulesDirs = []
-  const fullPath = join(rootPath, currentPath)
 
+/**
+ * @param {string} repoPath
+ * @returns {Promise<FileOperation[]>}
+ */
+export const getCacheFileOperations = async (repoPath) => {
   try {
-    const entries = readdirSync(fullPath)
+    const cacheKey = await ComputeVscodeNodeModulesCacheKey.computeVscodeNodeModulesCacheKey(repoPath)
+    const cacheDir = join(Root.root, VSCODE_NODE_MODULES_CACHE_DIR)
+    const cachedNodeModulesPath = join(cacheDir, cacheKey)
+    const sourceNodeModulesPath = join(repoPath, 'node_modules')
 
-    for (const entry of entries) {
-      const entryPath = join(fullPath, entry)
-      const relativePath = join(currentPath, entry)
-
-      // Skip .git and other system directories
-      if (entry === '.git' || entry === '.vscode-repos' || entry === '.vscode-node-modules') {
-        continue
-      }
-
-      const stat = statSync(entryPath)
-
-      if (stat.isDirectory()) {
-        // Check if this is a node_modules directory
-        if (entry === 'node_modules') {
-          nodeModulesDirs.push(relativePath)
-        } else {
-          // Skip if we're already inside a node_modules directory to avoid caching individual packages
-          const pathParts = relativePath.split('/')
-          const hasNodeModules = pathParts.some(part => part === 'node_modules')
-          if (hasNodeModules) {
-            continue
-          }
-          // Recursively search subdirectories
-          nodeModulesDirs.push(...findAllNodeModulesDirs(rootPath, relativePath))
-        }
-      }
+    // Check if top-level node_modules exists
+    if (!existsSync(sourceNodeModulesPath)) {
+      console.log('No top-level node_modules found to cache')
+      return []
     }
-  } catch (error) {
-    // Skip directories that can't be read
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    console.warn(`Could not read directory ${fullPath}: ${errorMessage}`)
-  }
 
-  return nodeModulesDirs
+    // Create cache directory if it doesn't exist
+    if (!existsSync(cacheDir)) {
+      mkdirSync(cacheDir, { recursive: true })
+    }
+
+    // Create the cache directory for this specific cache key
+    if (!existsSync(cachedNodeModulesPath)) {
+      mkdirSync(cachedNodeModulesPath, { recursive: true })
+    }
+
+    console.log(`Preparing to cache node_modules tree with cache key: ${cacheKey}`)
+
+    return [
+      {
+        type: 'copy',
+        from: sourceNodeModulesPath,
+        to: join(cachedNodeModulesPath, 'node_modules'),
+      },
+    ]
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.warn(`Failed to get cache file operations: ${errorMessage}`)
+    return []
+  }
 }
 
 /**
  * @param {string} repoPath
+ * @returns {Promise<FileOperation[]>}
  */
-export const setupNodeModulesFromCache = async (repoPath) => {
+export const getRestoreFileOperations = async (repoPath) => {
   try {
     const cacheKey = await ComputeVscodeNodeModulesCacheKey.computeVscodeNodeModulesCacheKey(repoPath)
     const cacheDir = join(Root.root, VSCODE_NODE_MODULES_CACHE_DIR)
@@ -72,16 +73,94 @@ export const setupNodeModulesFromCache = async (repoPath) => {
     // Check if cached node_modules exists
     const cachedNodeModulesTreePath = join(cachedNodeModulesPath, 'node_modules')
     if (existsSync(cachedNodeModulesTreePath)) {
-      console.log(`Using cached node_modules for cache key: ${cacheKey}`)
+      console.log(`Found cached node_modules for cache key: ${cacheKey}`)
 
-      // Restore the entire node_modules tree
-      const targetNodeModulesPath = join(repoPath, 'node_modules')
-      console.log('Restoring cached node_modules tree')
-      cpSync(cachedNodeModulesTreePath, targetNodeModulesPath, { recursive: true, force: true })
-
-      return true
+      return [
+        {
+          type: 'copy',
+          from: cachedNodeModulesTreePath,
+          to: join(repoPath, 'node_modules'),
+        },
+      ]
     } else {
       console.log(`No cached node_modules found for cache key: ${cacheKey}`)
+      return []
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.warn(`Failed to get restore file operations: ${errorMessage}`)
+    return []
+  }
+}
+
+/**
+ * @param {string} repoPath
+ * @returns {FileOperation[]}
+ */
+export const getCleanupFileOperations = (repoPath) => {
+  try {
+    const nodeModulesPath = join(repoPath, 'node_modules')
+
+    if (existsSync(nodeModulesPath)) {
+      console.log('Preparing to cleanup node_modules to save disk space')
+
+      return [
+        {
+          type: 'remove',
+          from: nodeModulesPath,
+          to: '', // Not used for remove operations
+        },
+      ]
+    }
+
+    return []
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.warn(`Failed to get cleanup file operations: ${errorMessage}`)
+    return []
+  }
+}
+
+/**
+ * @param {FileOperation[]} fileOperations
+ */
+export const applyFileOperations = async (fileOperations) => {
+  if (fileOperations.length === 0) {
+    return
+  }
+
+  console.log(`Applying ${fileOperations.length} file operation(s) in parallel`)
+
+  const operations = fileOperations.map(async (operation) => {
+    try {
+      if (operation.type === 'copy') {
+        cpSync(operation.from, operation.to, { recursive: true, force: true })
+        console.log(`Copied: ${operation.from} -> ${operation.to}`)
+      } else if (operation.type === 'remove') {
+        rmSync(operation.from, { recursive: true, force: true })
+        console.log(`Removed: ${operation.from}`)
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      console.warn(`Failed to apply file operation ${operation.type}: ${errorMessage}`)
+      throw error
+    }
+  })
+
+  await Promise.all(operations)
+}
+
+/**
+ * @param {string} repoPath
+ */
+export const setupNodeModulesFromCache = async (repoPath) => {
+  try {
+    const fileOperations = await getRestoreFileOperations(repoPath)
+
+    if (fileOperations.length > 0) {
+      await applyFileOperations(fileOperations)
+      return true
+    } else {
       return false
     }
   } catch (error) {
@@ -96,30 +175,8 @@ export const setupNodeModulesFromCache = async (repoPath) => {
  */
 export const cacheNodeModules = async (repoPath) => {
   try {
-    const cacheKey = await ComputeVscodeNodeModulesCacheKey.computeVscodeNodeModulesCacheKey(repoPath)
-    const cacheDir = join(Root.root, VSCODE_NODE_MODULES_CACHE_DIR)
-    const cachedNodeModulesPath = join(cacheDir, cacheKey)
-    const sourceNodeModulesPath = join(repoPath, 'node_modules')
-
-    // Check if top-level node_modules exists
-    if (!existsSync(sourceNodeModulesPath)) {
-      console.log('No top-level node_modules found to cache')
-      return
-    }
-
-    // Create cache directory if it doesn't exist
-    if (!existsSync(cacheDir)) {
-      mkdirSync(cacheDir, { recursive: true })
-    }
-
-    // Create the cache directory for this specific cache key
-    if (!existsSync(cachedNodeModulesPath)) {
-      mkdirSync(cachedNodeModulesPath, { recursive: true })
-    }
-
-    // Copy the entire node_modules tree to cache
-    console.log(`Caching node_modules tree with cache key: ${cacheKey}`)
-    cpSync(sourceNodeModulesPath, join(cachedNodeModulesPath, 'node_modules'), { recursive: true })
+    const fileOperations = await getCacheFileOperations(repoPath)
+    await applyFileOperations(fileOperations)
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     console.warn(`Failed to cache node_modules: ${errorMessage}`)
@@ -129,14 +186,10 @@ export const cacheNodeModules = async (repoPath) => {
 /**
  * @param {string} repoPath
  */
-export const cleanupNodeModules = (repoPath) => {
+export const cleanupNodeModules = async (repoPath) => {
   try {
-    const nodeModulesPath = join(repoPath, 'node_modules')
-
-    if (existsSync(nodeModulesPath)) {
-      console.log('Cleaning up node_modules to save disk space')
-      rmSync(nodeModulesPath, { recursive: true, force: true })
-    }
+    const fileOperations = getCleanupFileOperations(repoPath)
+    await applyFileOperations(fileOperations)
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     console.warn(`Failed to cleanup node_modules: ${errorMessage}`)
