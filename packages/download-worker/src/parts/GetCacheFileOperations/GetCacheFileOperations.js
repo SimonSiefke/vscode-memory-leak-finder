@@ -33,15 +33,11 @@ export const getCacheFileOperations = async (repoPath, cacheKey, cacheDir, cache
     const fileOperations = []
 
     // Find all node_modules directories in the repository using glob
-    const nodeModulesPaths = await Array.fromAsync(
-      glob('**/node_modules', { cwd: repoPath }),
-      path => path
-    ).then(paths => paths.filter(path =>
-      !path.includes('node_modules/node_modules') && !path.includes('.git')
-    ))
+    const allNodeModulesPaths = await Array.fromAsync(glob('**/node_modules', { cwd: repoPath }))
+    const nodeModulesPaths = allNodeModulesPaths.filter((path) => !path.includes('node_modules/node_modules') && !path.includes('.git'))
 
     // Convert relative paths to absolute paths
-    const absoluteNodeModulesPaths = nodeModulesPaths.map(path => join(repoPath, path))
+    const absoluteNodeModulesPaths = nodeModulesPaths.map((path) => join(repoPath, path))
 
     for (const nodeModulesPath of absoluteNodeModulesPaths) {
       if (existsSync(nodeModulesPath)) {

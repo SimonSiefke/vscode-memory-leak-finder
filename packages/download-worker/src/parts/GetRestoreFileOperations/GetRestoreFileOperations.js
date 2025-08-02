@@ -29,12 +29,13 @@ export const getRestoreFileOperations = async (repoPath, cacheKey, cacheDir, cac
     const fileOperations = []
 
     // Find all cached node_modules directories using glob
-    const cachedNodeModulesPaths = await Array.fromAsync(
+    const allCachedNodeModulesPaths = await Array.fromAsync(
       glob('**/node_modules', { cwd: cachedNodeModulesPath }),
       path => path
-    ).then(paths => paths.filter(path =>
+    )
+    const cachedNodeModulesPaths = allCachedNodeModulesPaths.filter(path =>
       !path.includes('node_modules/node_modules')
-    ))
+    )
 
     // Convert relative paths to absolute paths
     const absoluteCachedNodeModulesPaths = cachedNodeModulesPaths.map(path => join(cachedNodeModulesPath, path))
