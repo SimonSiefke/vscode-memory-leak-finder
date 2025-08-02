@@ -24,7 +24,8 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, repos
   const repoPath = join(reposDirPath, commitHash)
 
   // Create parent directory if it doesn't exist
-  if (!(await pathExists(reposDirPath))) {
+  const existsReposDir = await pathExists(reposDirPath)
+  if (!existsReposDir) {
     await mkdir(reposDirPath, { recursive: true })
   }
 
