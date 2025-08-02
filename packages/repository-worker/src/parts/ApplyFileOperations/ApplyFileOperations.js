@@ -1,6 +1,5 @@
-import { cp, rm, mkdir } from 'node:fs/promises'
-import { fileURLToPath } from 'node:url'
 import { VError } from '@lvce-editor/verror'
+import { cp, mkdir, rm } from 'node:fs/promises'
 
 /**
  * @typedef {Object} CopyOperation
@@ -26,33 +25,37 @@ import { VError } from '@lvce-editor/verror'
  */
 
 /**
+ * @param {FileOperation} operation
+ */
+const applyFileOperation = async (operation) => {
+  try {
+    if (operation.type === 'copy') {
+      const fromPath = operation.from
+      const toPath = operation.to
+      await cp(fromPath, toPath, { recursive: true, force: true })
+      console.log(`Copied: ${operation.from} -> ${operation.to}`)
+    } else if (operation.type === 'remove') {
+      const fromPath = operation.from
+      await rm(fromPath, { recursive: true, force: true })
+      console.log(`Removed: ${operation.from}`)
+    } else if (operation.type === 'mkdir') {
+      const path = operation.path
+      await mkdir(path, { recursive: true })
+      console.log(`Created directory: ${operation.path}`)
+    }
+  } catch (error) {
+    throw new VError(error, `Failed to apply file operation ${operation.type}`)
+  }
+}
+
+/**
  * @param {FileOperation[]} fileOperations
  */
 export const applyFileOperations = async (fileOperations) => {
   if (fileOperations.length === 0) {
     return
   }
-
-  console.log(`Applying ${fileOperations.length} file operation(s) in order`)
-
   for (const operation of fileOperations) {
-    try {
-      if (operation.type === 'copy') {
-        const fromPath = fileURLToPath(operation.from)
-        const toPath = fileURLToPath(operation.to)
-        await cp(fromPath, toPath, { recursive: true, force: true })
-        console.log(`Copied: ${operation.from} -> ${operation.to}`)
-      } else if (operation.type === 'remove') {
-        const fromPath = fileURLToPath(operation.from)
-        await rm(fromPath, { recursive: true, force: true })
-        console.log(`Removed: ${operation.from}`)
-      } else if (operation.type === 'mkdir') {
-        const path = fileURLToPath(operation.path)
-        await mkdir(path, { recursive: true })
-        console.log(`Created directory: ${operation.path}`)
-      }
-    } catch (error) {
-      throw new VError(error, `Failed to apply file operation ${operation.type}`)
-    }
+    await applyFileOperation(operation)
   }
 }
