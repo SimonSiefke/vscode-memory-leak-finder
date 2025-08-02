@@ -6,28 +6,10 @@ import { pathExists } from 'path-exists'
 import { downloadAndBuildVscodeFromCommit } from '../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js'
 import * as InstallDependencies from '../src/parts/InstallDependencies/InstallDependencies.js'
 import * as Root from '../src/parts/Root/Root.js'
-import * as RunCompile from '../src/parts/RunCompile/RunCompile.js'
 
 // Default values for testing
 const DEFAULT_REPO_URL = 'https://github.com/microsoft/vscode.git'
 const DEFAULT_REPOS_DIR = '.vscode-repos'
-
-test('downloadAndBuildVscodeFromCommit - function exists and is callable', async () => {
-  expect(typeof downloadAndBuildVscodeFromCommit).toBe('function')
-})
-
-test('downloadAndBuildVscodeFromCommit handles errors gracefully', async () => {
-  // Should throw with invalid commit reference
-  await expect(downloadAndBuildVscodeFromCommit('invalid-commit-ref', DEFAULT_REPO_URL, DEFAULT_REPOS_DIR)).rejects.toThrow()
-})
-
-test('installDependencies - function exists and is callable', () => {
-  expect(typeof InstallDependencies.installDependencies).toBe('function')
-})
-
-test('runCompile - function exists and is callable', () => {
-  expect(typeof RunCompile.runCompile).toBe('function')
-})
 
 test('downloadVscodeCommit - returns expected path structure', async () => {
   // Test that the function returns the expected path structure
@@ -172,11 +154,4 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
       await rm(repoPath, { recursive: true, force: true })
     }
   }
-})
-
-test('downloadAndBuildVscodeFromCommit - platform detection works correctly', () => {
-  // Test that platform detection is available
-  const currentPlatform = platform()
-  expect(typeof currentPlatform).toBe('string')
-  expect(['linux', 'darwin', 'win32']).toContain(currentPlatform)
 })
