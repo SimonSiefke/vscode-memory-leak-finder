@@ -14,7 +14,7 @@
     { "path": "./packages/memory-leak-finder" },
     { "path": "./packages/memory-leak-worker" },
     { "path": "./packages/page-object" },
-    { "path": "./packages/repository-process" },
+    { "path": "./packages/repository-worker" },
     { "path": "./packages/source-map-worker" },
     { "path": "./packages/storage-worker" },
     { "path": "./packages/test-coordinator" },
