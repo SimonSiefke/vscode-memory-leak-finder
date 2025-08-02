@@ -1,6 +1,5 @@
 import { join } from 'node:path'
 import { existsSync } from 'node:fs'
-import { glob } from 'node:fs/promises'
 
 /**
  * @typedef {Object} FileOperation
@@ -15,9 +14,10 @@ import { glob } from 'node:fs/promises'
  * @param {string} cacheKey
  * @param {string} cacheDir
  * @param {string} cachedNodeModulesPath
+ * @param {string[]} cachedNodeModulesPaths
  * @returns {Promise<FileOperation[]>}
  */
-export const getRestoreFileOperations = async (repoPath, cacheKey, cacheDir, cachedNodeModulesPath) => {
+export const getRestoreFileOperations = async (repoPath, cacheKey, cacheDir, cachedNodeModulesPath, cachedNodeModulesPaths) => {
   try {
     // Check if cached node_modules exists
     if (!existsSync(cachedNodeModulesPath)) {
@@ -28,15 +28,6 @@ export const getRestoreFileOperations = async (repoPath, cacheKey, cacheDir, cac
     console.log(`Found cached node_modules for cache key: ${cacheKey}`)
 
     const fileOperations = []
-
-    // Find all cached node_modules directories using glob
-    const allCachedNodeModulesPaths = await Array.fromAsync(
-      glob('**/node_modules', { cwd: cachedNodeModulesPath }),
-      path => path
-    )
-    const cachedNodeModulesPaths = allCachedNodeModulesPaths.filter(path =>
-      !path.includes('node_modules/node_modules')
-    )
 
     // Convert relative paths to absolute paths
     const absoluteCachedNodeModulesPaths = cachedNodeModulesPaths.map(path => join(cachedNodeModulesPath, path))
