@@ -15,6 +15,7 @@ test('findPackageLockFiles - returns empty array when no package-lock.json files
   const result = await findPackageLockFiles(pathToFileURL('/test/path').href)
 
   expect(result).toEqual([])
+  expect(mockGlob).toHaveBeenCalledTimes(1)
   expect(mockGlob).toHaveBeenCalledWith('**/package-lock.json', {
     cwd: '/test/path',
     exclude: ['**/node_modules/**']
@@ -37,6 +38,7 @@ test('findPackageLockFiles - returns file URIs when package-lock.json files foun
     'file:///test/path/package-lock.json',
     'file:///test/path/subdir/package-lock.json'
   ])
+  expect(mockGlob).toHaveBeenCalledTimes(1)
   expect(mockGlob).toHaveBeenCalledWith('**/package-lock.json', {
     cwd: '/test/path',
     exclude: ['**/node_modules/**']
