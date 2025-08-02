@@ -1,6 +1,5 @@
-import { execa } from 'execa'
-import { pathExists } from 'path-exists'
 import { VError } from '@lvce-editor/verror'
+import { execa } from 'execa'
 
 /**
  * Clones a repository to a local directory
@@ -10,13 +9,7 @@ import { VError } from '@lvce-editor/verror'
  */
 export const cloneRepository = async (repoUrl, repoPath) => {
   try {
-    // Check if repo already exists
-    if (await pathExists(repoPath)) {
-      console.log(`Repository already exists at ${repoPath}, skipping clone...`)
-    } else {
-      console.log(`Cloning repository from ${repoUrl}...`)
-      await execa('git', ['clone', '--depth', '1', repoUrl, repoPath])
-    }
+    await execa('git', ['clone', '--depth', '1', repoUrl, repoPath])
   } catch (error) {
     throw new VError(error, `Failed to clone repository from '${repoUrl}' to '${repoPath}'`)
   }

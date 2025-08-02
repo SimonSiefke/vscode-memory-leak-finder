@@ -86,7 +86,7 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missi
   try {
     // This should detect missing node_modules and attempt to restore from cache
     // Since we're in a test environment, it will likely fail gracefully
-    await expect(downloadAndBuildVscodeFromCommit(testCommitHash)).rejects.toThrow()
+    await expect(downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, DEFAULT_REPOS_DIR)).rejects.toThrow()
   } finally {
     // Cleanup
     if (await pathExists(repoPath)) {
@@ -125,7 +125,7 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
   try {
     // This should detect existing node_modules and skip npm ci
     // Since we're in a test environment, it will likely fail gracefully
-    await expect(downloadAndBuildVscodeFromCommit(testCommitHash)).rejects.toThrow()
+    await expect(downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, DEFAULT_REPOS_DIR)).rejects.toThrow()
   } finally {
     // Cleanup
     if (await pathExists(repoPath)) {
@@ -165,7 +165,7 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
   try {
     // This should detect existing out folder and skip compilation
     // Since we're in a test environment, it will likely fail gracefully
-    await expect(downloadAndBuildVscodeFromCommit(testCommitHash)).rejects.toThrow()
+    await expect(downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, DEFAULT_REPOS_DIR)).rejects.toThrow()
   } finally {
     // Cleanup
     if (await pathExists(repoPath)) {
