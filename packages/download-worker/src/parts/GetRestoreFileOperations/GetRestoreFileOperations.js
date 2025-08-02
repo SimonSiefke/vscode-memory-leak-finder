@@ -53,10 +53,10 @@ export const getRestoreFileOperations = async (repoPathUri, cacheKey, cacheDirUr
     // Convert relative paths to absolute paths
     const absoluteCachedNodeModulesPaths = cachedNodeModulesPaths.map(path => join(cachedNodeModulesPath, path))
 
-    for (const cachedNodeModulesPath of absoluteCachedNodeModulesPaths) {
-      if (existsSync(cachedNodeModulesPath)) {
+    for (const cachedNodeModulesPathItem of absoluteCachedNodeModulesPaths) {
+      if (existsSync(cachedNodeModulesPathItem)) {
         // Calculate the target path in the repo by removing the cache prefix
-        const relativePath = cachedNodeModulesPath.replace(join(cacheDir, cacheKey), '').replace(/^\/+/, '')
+        const relativePath = cachedNodeModulesPathItem.replace(join(cacheDir, cacheKey), '').replace(/^\/+/, '')
         const targetPath = join(repoPath, relativePath)
 
         // Add parent directory creation operation
@@ -67,8 +67,9 @@ export const getRestoreFileOperations = async (repoPathUri, cacheKey, cacheDirUr
           path: parentDirUri,
         })
 
-        const cachedNodeModulesPathUri = pathToFileURL(cachedNodeModulesPath).href
-        const targetPathUri = pathToFileURL(targetPath).href
+        // Use URL join for the file URIs
+        const sourceNodeModulesPathUri = new URL(relativePath, cachedNodeModulesPathUri).href
+        const targetPathUri = new URL(relativePath, repoPathUri).href
         fileOperations.push({
           type: /** @type {'copy'} */ ('copy'),
           from: cachedNodeModulesPathUri,

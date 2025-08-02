@@ -1,3 +1,4 @@
+import { pathToFileURL } from 'node:url'
 import * as GetCleanupFileOperations from '../GetCleanupFileOperations/GetCleanupFileOperations.js'
 import * as ApplyFileOperations from '../ApplyFileOperations/ApplyFileOperations.js'
 
@@ -6,7 +7,8 @@ import * as ApplyFileOperations from '../ApplyFileOperations/ApplyFileOperations
  */
 export const cleanupNodeModules = async (repoPath) => {
   try {
-    const fileOperations = GetCleanupFileOperations.getCleanupFileOperations(repoPath)
+    const repoPathUri = pathToFileURL(repoPath).href
+    const fileOperations = GetCleanupFileOperations.getCleanupFileOperations(repoPathUri)
     await ApplyFileOperations.applyFileOperations(fileOperations)
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)

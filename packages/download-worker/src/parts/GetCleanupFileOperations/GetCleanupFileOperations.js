@@ -1,4 +1,3 @@
-import { join } from 'node:path'
 import { existsSync } from 'node:fs'
 import { pathToFileURL, fileURLToPath } from 'node:url'
 
@@ -19,16 +18,15 @@ import { pathToFileURL, fileURLToPath } from 'node:url'
 export const getCleanupFileOperations = (repoPathUri) => {
   try {
     const repoPath = fileURLToPath(repoPathUri)
-    const nodeModulesPath = join(repoPath, 'node_modules')
+    const nodeModulesPath = new URL('node_modules', repoPathUri).href
 
-    if (existsSync(nodeModulesPath)) {
+    if (existsSync(repoPath + '/node_modules')) {
       console.log('Preparing to cleanup node_modules to save disk space')
 
-      const nodeModulesPathUri = pathToFileURL(nodeModulesPath).href
       return [
         {
           type: /** @type {'remove'} */ ('remove'),
-          from: nodeModulesPathUri,
+          from: nodeModulesPath,
         },
       ]
     }

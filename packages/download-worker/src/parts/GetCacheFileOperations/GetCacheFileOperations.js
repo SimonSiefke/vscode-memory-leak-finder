@@ -57,9 +57,9 @@ export const getCacheFileOperations = async (repoPathUri, cacheKey, cacheDirUri,
     const relativePath = nodeModulesPath.replace(repoPath, '').replace(/^\/+/, '')
     const cacheTargetPath = join(cachedNodeModulesPath, relativePath)
 
-    // Convert to file URIs
-    const nodeModulesPathUri = pathToFileURL(nodeModulesPath).href
-    const cacheTargetPathUri = pathToFileURL(cacheTargetPath).href
+    // Convert to file URIs using URL join
+    const nodeModulesPathUri = new URL(relativePath, repoPathUri).href
+    const cacheTargetPathUri = new URL(relativePath, cachedNodeModulesPathUri).href
 
     // Add parent directory creation operation
     const parentDir = join(cacheTargetPath, '..')
