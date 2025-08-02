@@ -8,13 +8,17 @@ import * as InstallDependencies from '../src/parts/InstallDependencies/InstallDe
 import * as Root from '../src/parts/Root/Root.js'
 import * as RunCompile from '../src/parts/RunCompile/RunCompile.js'
 
+// Default values for testing
+const DEFAULT_REPO_URL = 'https://github.com/microsoft/vscode.git'
+const DEFAULT_REPOS_DIR = '.vscode-repos'
+
 test('downloadAndBuildVscodeFromCommit - function exists and is callable', async () => {
   expect(typeof downloadAndBuildVscodeFromCommit).toBe('function')
 })
 
 test('downloadAndBuildVscodeFromCommit handles errors gracefully', async () => {
   // Should throw with invalid commit reference
-  await expect(downloadAndBuildVscodeFromCommit('invalid-commit-ref')).rejects.toThrow()
+  await expect(downloadAndBuildVscodeFromCommit('invalid-commit-ref', DEFAULT_REPO_URL, DEFAULT_REPOS_DIR)).rejects.toThrow()
 })
 
 test('installDependencies - function exists and is callable', () => {

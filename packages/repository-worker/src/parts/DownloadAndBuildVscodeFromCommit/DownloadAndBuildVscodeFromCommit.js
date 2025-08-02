@@ -12,21 +12,20 @@ import * as Root from '../Root/Root.js'
 import * as InstallDependencies from '../InstallDependencies/InstallDependencies.js'
 import * as RunCompile from '../RunCompile/RunCompile.js'
 
-const VSCODE_REPO_URL = 'https://github.com/microsoft/vscode.git'
-const VSCODE_REPOS_DIR = '.vscode-repos'
-
 /**
  * @param {string} commitRef - The commit reference (branch name, tag, or commit hash)
+ * @param {string} repoUrl - The repository URL to clone
+ * @param {string} reposDir - The directory name for storing repositories
  */
-export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
+export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, reposDir) => {
   // Resolve the commit reference to an actual commit hash
-  const commitHash = await ResolveCommitHash.resolveCommitHash(VSCODE_REPO_URL, commitRef)
-  const reposDir = join(Root.root, VSCODE_REPOS_DIR)
-  const repoPath = join(reposDir, commitHash)
+  const commitHash = await ResolveCommitHash.resolveCommitHash(repoUrl, commitRef)
+  const reposDirPath = join(Root.root, reposDir)
+  const repoPath = join(reposDirPath, commitHash)
 
   // Create parent directory if it doesn't exist
-  if (!(await pathExists(reposDir))) {
-    await mkdir(reposDir, { recursive: true })
+  if (!(await pathExists(reposDirPath))) {
+    await mkdir(reposDirPath, { recursive: true })
   }
 
   // Check what's needed at the start
@@ -45,7 +44,7 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef) => {
 
   // Clone the repository if needed
   if (needsClone) {
-    await cloneRepository(VSCODE_REPO_URL, repoPath)
+    await cloneRepository(repoUrl, repoPath)
     await checkoutCommit(repoPath, commitHash)
   }
 
