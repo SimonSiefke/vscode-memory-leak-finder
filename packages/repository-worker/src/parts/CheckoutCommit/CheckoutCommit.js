@@ -1,5 +1,5 @@
-import { execa } from 'execa'
+import { exec } from '../Exec/Exec.js'
 
 export const checkoutCommit = async (repoPath, commit) => {
-  await execa('git', ['checkout', commit], { cwd: repoPath })
+  await exec('git', ['checkout', commit], { cwd: repoPath })
 }

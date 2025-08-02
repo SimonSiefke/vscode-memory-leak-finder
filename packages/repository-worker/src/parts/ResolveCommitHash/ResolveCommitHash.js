@@ -1,4 +1,4 @@
-import { execa } from 'execa'
+import { execStdout } from '../Exec/Exec.js'
 import { VError } from '@lvce-editor/verror'
 import { isFullCommitHash } from '../IsFullCommitHash/IsFullCommitHash.js'
 import { parseCommitHash } from '../ParseCommitHash/ParseCommitHash.js'
@@ -9,7 +9,7 @@ export const resolveCommitHash = async (repoUrl, commitRef) => {
       return commitRef
     }
 
-    const { stdout } = await execa('git', ['ls-remote', repoUrl, commitRef])
+    const stdout = await execStdout('git', ['ls-remote', repoUrl, commitRef])
 
     return parseCommitHash(stdout, commitRef)
   } catch (error) {

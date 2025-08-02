@@ -1,5 +1,5 @@
 import { VError } from '@lvce-editor/verror'
-import { execa } from 'execa'
+import { exec } from '../Exec/Exec.js'
 
 /**
  * Clones a repository to a local directory
@@ -9,7 +9,7 @@ import { execa } from 'execa'
  */
 export const cloneRepository = async (repoUrl, repoPath) => {
   try {
-    await execa('git', ['clone', '--depth', '1', repoUrl, repoPath])
+    await exec('git', ['clone', '--depth', '1', repoUrl, repoPath])
   } catch (error) {
     throw new VError(error, `Failed to clone repository from '${repoUrl}' to '${repoPath}'`)
   }

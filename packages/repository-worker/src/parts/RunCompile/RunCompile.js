@@ -1,4 +1,4 @@
-import { execa } from 'execa'
+import { exec } from '../Exec/Exec.js'
 
 /**
  * Runs the compilation process using npm run compile
@@ -8,8 +8,8 @@ import { execa } from 'execa'
 export const runCompile = async (cwd, useNice) => {
   if (useNice) {
     console.log(`Using nice to reduce system resource usage...`)
-    await execa('nice', ['-n', '10', 'npm', 'run', 'compile'], { cwd })
+    await exec('nice', ['-n', '10', 'npm', 'run', 'compile'], { cwd })
   } else {
-    await execa('npm', ['run', 'compile'], { cwd })
+    await exec('npm', ['run', 'compile'], { cwd })
   }
 }
