@@ -1,6 +1,7 @@
 # playground
 benchmark-results
 .vscode-sources
+.vscode-repos
 .vscode-heapsnapshots
 .cursor-test-workspace
 out.txt

@@ -8,7 +8,7 @@ import * as PageObject from '../PageObject/PageObject.js'
 import * as VideoRecording from '../VideoRecording/VideoRecording.js'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.js'
 
-export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connectionId, timeouts, ide, ideVersion, vscodePath) => {
+export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connectionId, timeouts, ide, ideVersion, vscodePath, commit) => {
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
@@ -17,6 +17,7 @@ export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connecti
     cwd,
     ide,
     vscodePath,
+    commit,
   })
   const devtoolsWebSocketUrlPromise = WaitForDevtoolsListening.waitForDevtoolsListening(child.stderr)
   const { monkeyPatchedElectron, electronObjectId, callFrameId } = await ConnectElectron.connectElectron(

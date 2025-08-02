@@ -65,3 +65,21 @@ test('parseArgv - vscode-path flag not present', () => {
   const options = ParseArgv.parseArgv(argv)
   expect(options.vscodePath).toBe('')
 })
+
+test('parseArgv - commit flag', () => {
+  const argv = ['--commit', 'abc123']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.commit).toBe('abc123')
+})
+
+test('parseArgv - commit flag empty', () => {
+  const argv = ['--commit', '']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.commit).toBe('')
+})
+
+test('parseArgv - commit flag not present', () => {
+  const argv = []
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.commit).toBe('')
+})

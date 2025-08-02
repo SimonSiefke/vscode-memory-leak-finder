@@ -23,6 +23,7 @@ export const runTests = (
   ide,
   ideVersion,
   vscodePath,
+  commit,
 ) => {
   return RunTestsWithCallback.runTests(
     root,
@@ -42,6 +43,7 @@ export const runTests = (
     ide,
     ideVersion,
     vscodePath,
+    commit,
     callback,
   )
 }

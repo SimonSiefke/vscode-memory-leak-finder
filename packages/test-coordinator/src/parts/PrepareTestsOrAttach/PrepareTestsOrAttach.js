@@ -27,6 +27,7 @@ export const prepareTestsOrAttach = async (
   ide,
   ideVersion,
   vscodePath,
+  commit,
 ) => {
   const testWorkerIpc = await TestWorker.launch(runMode)
   const isFirst = state.promise === undefined
@@ -41,6 +42,7 @@ export const prepareTestsOrAttach = async (
       ide,
       ideVersion,
       vscodePath,
+      commit,
     )
     await state.promise
     return testWorkerIpc

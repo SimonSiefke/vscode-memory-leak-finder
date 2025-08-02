@@ -41,6 +41,7 @@ export const parseArgv = (argv) => {
     ide: Ide.VsCode,
     ideVersion: '', // TODO
     vscodePath: '',
+    commit: '',
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -89,6 +90,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--vscode-path')) {
     options.vscodePath = parseArgvString(argv, '--vscode-path')
+  }
+  if (argv.includes('--commit')) {
+    options.commit = parseArgvString(argv, '--commit')
   }
   return options
 }
