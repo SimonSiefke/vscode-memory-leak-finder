@@ -45,11 +45,11 @@ export const getRestoreNodeModulesFileOperations = async (repoPath, cacheKey, ca
       if (await pathExists(cachedNodeModulesPathItem)) {
         // TODO what is this
         const relativePath = cachedNodeModulesPathItem.replace(join(cacheDir, cacheKey), '').replace(/^\/+/, '')
-        const sourceNodeModulesPathUri = new URL(relativePath, cachedNodeModulesPath).href
+        const sourceNodeModulesPath = join(cachedNodeModulesPath, relativePath)
         const targetPath = join(repoPath, relativePath)
         fileOperations.push({
           type: /** @type {'copy'} */ ('copy'),
-          from: sourceNodeModulesPathUri,
+          from: sourceNodeModulesPath,
           to: targetPath,
         })
       }
