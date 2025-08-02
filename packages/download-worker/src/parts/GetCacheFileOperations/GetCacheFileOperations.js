@@ -1,5 +1,6 @@
 import { join } from 'node:path'
 import { existsSync, mkdirSync } from 'node:fs'
+import { glob } from 'node:fs/promises'
 import * as Root from '../Root/Root.js'
 import * as ComputeVscodeNodeModulesCacheKey from '../ComputeVscodeNodeModulesCacheKey/ComputeVscodeNodeModulesCacheKey.js'
 
@@ -21,13 +22,6 @@ export const getCacheFileOperations = async (repoPath) => {
     const cacheKey = await ComputeVscodeNodeModulesCacheKey.computeVscodeNodeModulesCacheKey(repoPath)
     const cacheDir = join(Root.root, VSCODE_NODE_MODULES_CACHE_DIR)
     const cachedNodeModulesPath = join(cacheDir, cacheKey)
-    const sourceNodeModulesPath = join(repoPath, 'node_modules')
-
-    // Check if top-level node_modules exists
-    if (!existsSync(sourceNodeModulesPath)) {
-      console.log('No top-level node_modules found to cache')
-      return []
-    }
 
     // Create cache directory if it doesn't exist
     if (!existsSync(cacheDir)) {
@@ -41,13 +35,41 @@ export const getCacheFileOperations = async (repoPath) => {
 
     console.log(`Preparing to cache node_modules tree with cache key: ${cacheKey}`)
 
-    return [
-      {
-        type: 'copy',
-        from: sourceNodeModulesPath,
-        to: join(cachedNodeModulesPath, 'node_modules'),
-      },
-    ]
+    const fileOperations = []
+
+    // Find all node_modules directories in the repository using glob
+    const nodeModulesPaths = []
+    for await (const path of glob('**/node_modules', { cwd: repoPath })) {
+      // Skip nested node_modules and .git directories
+      if (!path.includes('node_modules/node_modules') && !path.includes('.git')) {
+        nodeModulesPaths.push(path)
+      }
+    }
+
+    // Convert relative paths to absolute paths
+    const absoluteNodeModulesPaths = nodeModulesPaths.map(path => join(repoPath, path))
+
+    for (const nodeModulesPath of absoluteNodeModulesPaths) {
+      if (existsSync(nodeModulesPath)) {
+        // Calculate relative path from repo root to maintain directory structure
+        const relativePath = nodeModulesPath.replace(repoPath, '').replace(/^\/+/, '')
+        const cacheTargetPath = join(cachedNodeModulesPath, relativePath)
+
+        // Create parent directory if it doesn't exist
+        const parentDir = join(cacheTargetPath, '..')
+        if (!existsSync(parentDir)) {
+          mkdirSync(parentDir, { recursive: true })
+        }
+
+        fileOperations.push({
+          type: 'copy',
+          from: nodeModulesPath,
+          to: cacheTargetPath,
+        })
+      }
+    }
+
+    return fileOperations
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     console.warn(`Failed to get cache file operations: ${errorMessage}`)
