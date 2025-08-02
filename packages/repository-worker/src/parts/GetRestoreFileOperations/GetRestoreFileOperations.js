@@ -51,7 +51,7 @@ export const getRestoreFileOperations = async (repoPathUri, cacheKey, cacheDirUr
     const fileOperations = []
 
     // Convert relative paths to absolute paths
-    const absoluteCachedNodeModulesPaths = cachedNodeModulesPaths.map(path => join(cachedNodeModulesPath, path))
+    const absoluteCachedNodeModulesPaths = cachedNodeModulesPaths.map((path) => join(cachedNodeModulesPath, path))
 
     for (const cachedNodeModulesPathItem of absoluteCachedNodeModulesPaths) {
       if (await pathExists(cachedNodeModulesPathItem)) {

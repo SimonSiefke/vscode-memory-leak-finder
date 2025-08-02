@@ -45,8 +45,6 @@ test('isFullCommitHash - returns false for empty string', () => {
   expect(isFullCommitHash('')).toBe(false)
 })
 
-
-
 test('isFullCommitHash - returns false for branch names', () => {
   expect(isFullCommitHash('main')).toBe(false)
   expect(isFullCommitHash('develop')).toBe(false)
@@ -69,10 +67,10 @@ test('isFullCommitHash - returns true for real commit hashes', () => {
   const realHashes = [
     'a94a8fe5ccb19ba61c4c0873d391e987982fbbd3',
     '2aae6c35c94fcfb415dbe95f408b9ce91ee846ed',
-    'da39a3ee5e6b4b0d3255bfef95601890afd80709'
+    'da39a3ee5e6b4b0d3255bfef95601890afd80709',
   ]
 
-  realHashes.forEach(hash => {
+  realHashes.forEach((hash) => {
     expect(isFullCommitHash(hash)).toBe(true)
   })
 })

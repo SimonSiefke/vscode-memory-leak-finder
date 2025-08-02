@@ -23,12 +23,12 @@ const findCachedNodeModulesPaths = async (cachedNodeModulesPath) => {
  */
 export const setupNodeModulesFromCache = async (repoPath) => {
   try {
-    const cacheKey = await ComputeVscodeNodeModulesCacheKey.computeVscodeNodeModulesCacheKey(repoPath)
+    const repoPathUri = pathToFileURL(repoPath).href
+    const cacheKey = await ComputeVscodeNodeModulesCacheKey.computeVscodeNodeModulesCacheKey(repoPathUri)
     const cacheDir = join(Root.root, VSCODE_NODE_MODULES_CACHE_DIR)
     const cachedNodeModulesPath = join(cacheDir, cacheKey)
 
     // Convert paths to file URIs
-    const repoPathUri = pathToFileURL(repoPath).href
     const cacheDirUri = pathToFileURL(cacheDir).href
     const cachedNodeModulesPathUri = pathToFileURL(cachedNodeModulesPath).href
 

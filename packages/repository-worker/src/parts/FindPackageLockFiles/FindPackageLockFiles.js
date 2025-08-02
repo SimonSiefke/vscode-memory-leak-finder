@@ -13,7 +13,7 @@ export const findPackageLockFiles = async (dirUri) => {
     const dir = fileURLToPath(dirUri)
     const globIterator = glob('**/package-lock.json', {
       cwd: dir,
-      exclude: ['**/node_modules/**']
+      exclude: ['**/node_modules/**'],
     })
     const packageLockPaths = await Array.fromAsync(globIterator)
     const absolutePaths = packageLockPaths.map((path) => join(dir, path))

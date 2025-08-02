@@ -1,4 +1,5 @@
 import { test, expect } from '@jest/globals'
+import { pathToFileURL } from 'node:url'
 import { computeVscodeNodeModulesCacheKey } from '../src/parts/ComputeVscodeNodeModulesCacheKey/ComputeVscodeNodeModulesCacheKey.js'
 
 test('computeVscodeNodeModulesCacheKey - function exists and is callable', async () => {
@@ -11,12 +12,12 @@ test('computeVscodeNodeModulesCacheKey - function signature is correct', async (
 })
 
 test('computeVscodeNodeModulesCacheKey - returns a string', async () => {
-  const result = await computeVscodeNodeModulesCacheKey('/nonexistent/path')
+  const result = await computeVscodeNodeModulesCacheKey(pathToFileURL('/nonexistent/path').href)
   expect(typeof result).toBe('string')
   expect(result.length).toBeGreaterThan(0)
 })
 
 test('computeVscodeNodeModulesCacheKey - handles errors gracefully', async () => {
   // Should not throw with invalid path
-  await computeVscodeNodeModulesCacheKey('/nonexistent/path')
+  await computeVscodeNodeModulesCacheKey(pathToFileURL('/nonexistent/path').href)
 })

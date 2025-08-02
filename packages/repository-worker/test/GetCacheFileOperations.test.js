@@ -17,18 +17,18 @@ test('getCacheFileOperations returns empty array when no nodeModulesPaths provid
     'cache-key',
     pathToFileURL('/cache/dir').href,
     pathToFileURL('/cache/dir/cache-key').href,
-    []
+    [],
   )
 
   expect(Array.isArray(result)).toBe(true)
   expect(result).toHaveLength(2) // Only mkdir operations for cacheDir and cachedNodeModulesPath
   expect(result[0]).toEqual({
     type: 'mkdir',
-    path: pathToFileURL('/cache/dir').href
+    path: pathToFileURL('/cache/dir').href,
   })
   expect(result[1]).toEqual({
     type: 'mkdir',
-    path: pathToFileURL('/cache/dir/cache-key').href
+    path: pathToFileURL('/cache/dir/cache-key').href,
   })
 })
 
@@ -38,7 +38,7 @@ test('getCacheFileOperations creates correct file operations for single node_mod
     'cache-key',
     pathToFileURL('/cache/dir').href,
     pathToFileURL('/cache/dir/cache-key').href,
-    ['node_modules']
+    ['node_modules'],
   )
 
   expect(Array.isArray(result)).toBe(true)
@@ -47,24 +47,24 @@ test('getCacheFileOperations creates correct file operations for single node_mod
   // Check directory creation operations
   expect(result[0]).toEqual({
     type: 'mkdir',
-    path: pathToFileURL('/cache/dir').href
+    path: pathToFileURL('/cache/dir').href,
   })
   expect(result[1]).toEqual({
     type: 'mkdir',
-    path: pathToFileURL('/cache/dir/cache-key').href
+    path: pathToFileURL('/cache/dir/cache-key').href,
   })
 
   // Check parent directory creation
   expect(result[2]).toEqual({
     type: 'mkdir',
-    path: pathToFileURL('/cache/dir/cache-key').href
+    path: pathToFileURL('/cache/dir/cache-key').href,
   })
 
   // Check copy operation
   expect(result[3]).toEqual({
     type: 'copy',
     from: pathToFileURL('/repo/path/node_modules').href,
-    to: pathToFileURL('/cache/dir/cache-key/node_modules').href
+    to: pathToFileURL('/cache/dir/cache-key/node_modules').href,
   })
 })
 
@@ -74,7 +74,7 @@ test('getCacheFileOperations handles multiple node_modules paths', async () => {
     'cache-key',
     pathToFileURL('/cache/dir').href,
     pathToFileURL('/cache/dir/cache-key').href,
-    ['node_modules', 'packages/a/node_modules', 'packages/b/node_modules']
+    ['node_modules', 'packages/a/node_modules', 'packages/b/node_modules'],
   )
 
   expect(Array.isArray(result)).toBe(true)
@@ -83,33 +83,33 @@ test('getCacheFileOperations handles multiple node_modules paths', async () => {
   // Check directory creation operations
   expect(result[0]).toEqual({
     type: 'mkdir',
-    path: pathToFileURL('/cache/dir').href
+    path: pathToFileURL('/cache/dir').href,
   })
   expect(result[1]).toEqual({
     type: 'mkdir',
-    path: pathToFileURL('/cache/dir/cache-key').href
+    path: pathToFileURL('/cache/dir/cache-key').href,
   })
 
   // Check copy operations
-  const copyOperations = result.filter(op => op.type === 'copy')
+  const copyOperations = result.filter((op) => op.type === 'copy')
   expect(copyOperations).toHaveLength(3)
 
   expect(copyOperations[0]).toEqual({
     type: 'copy',
     from: pathToFileURL('/repo/path/node_modules').href,
-    to: pathToFileURL('/cache/dir/cache-key/node_modules').href
+    to: pathToFileURL('/cache/dir/cache-key/node_modules').href,
   })
 
   expect(copyOperations[1]).toEqual({
     type: 'copy',
     from: pathToFileURL('/repo/path/packages/a/node_modules').href,
-    to: pathToFileURL('/cache/dir/cache-key/packages/a/node_modules').href
+    to: pathToFileURL('/cache/dir/cache-key/packages/a/node_modules').href,
   })
 
   expect(copyOperations[2]).toEqual({
     type: 'copy',
     from: pathToFileURL('/repo/path/packages/b/node_modules').href,
-    to: pathToFileURL('/cache/dir/cache-key/packages/b/node_modules').href
+    to: pathToFileURL('/cache/dir/cache-key/packages/b/node_modules').href,
   })
 })
 
@@ -119,22 +119,22 @@ test('getCacheFileOperations handles paths with leading slashes correctly', asyn
     'cache-key',
     pathToFileURL('/cache/dir').href,
     pathToFileURL('/cache/dir/cache-key').href,
-    ['/node_modules', '/packages/a/node_modules']
+    ['/node_modules', '/packages/a/node_modules'],
   )
 
-  const copyOperations = result.filter(op => op.type === 'copy')
+  const copyOperations = result.filter((op) => op.type === 'copy')
   expect(copyOperations).toHaveLength(2)
 
   expect(copyOperations[0]).toEqual({
     type: 'copy',
     from: pathToFileURL('/repo/path/node_modules').href,
-    to: pathToFileURL('/cache/dir/cache-key/node_modules').href
+    to: pathToFileURL('/cache/dir/cache-key/node_modules').href,
   })
 
   expect(copyOperations[1]).toEqual({
     type: 'copy',
     from: pathToFileURL('/repo/path/packages/a/node_modules').href,
-    to: pathToFileURL('/cache/dir/cache-key/packages/a/node_modules').href
+    to: pathToFileURL('/cache/dir/cache-key/packages/a/node_modules').href,
   })
 })
 
@@ -144,16 +144,16 @@ test('getCacheFileOperations handles nested paths correctly', async () => {
     'cache-key',
     pathToFileURL('/cache/dir').href,
     pathToFileURL('/cache/dir/cache-key').href,
-    ['packages/deeply/nested/module/node_modules']
+    ['packages/deeply/nested/module/node_modules'],
   )
 
-  const copyOperations = result.filter(op => op.type === 'copy')
+  const copyOperations = result.filter((op) => op.type === 'copy')
   expect(copyOperations).toHaveLength(1)
 
   expect(copyOperations[0]).toEqual({
     type: 'copy',
     from: pathToFileURL('/repo/path/packages/deeply/nested/module/node_modules').href,
-    to: pathToFileURL('/cache/dir/cache-key/packages/deeply/nested/module/node_modules').href
+    to: pathToFileURL('/cache/dir/cache-key/packages/deeply/nested/module/node_modules').href,
   })
 })
 
@@ -163,10 +163,10 @@ test('getCacheFileOperations handles Windows-style paths', async () => {
     'cache-key',
     pathToFileURL('C:\\cache\\dir').href,
     pathToFileURL('C:\\cache\\dir\\cache-key').href,
-    ['node_modules', 'packages\\a\\node_modules']
+    ['node_modules', 'packages\\a\\node_modules'],
   )
 
-  const copyOperations = result.filter(op => op.type === 'copy')
+  const copyOperations = result.filter((op) => op.type === 'copy')
   expect(copyOperations).toHaveLength(2)
 
   // The actual result will have the Windows paths converted to file URIs
@@ -186,21 +186,21 @@ test('getCacheFileOperations handles special characters in paths', async () => {
     'cache-key-with-dashes',
     pathToFileURL('/cache/dir with spaces').href,
     pathToFileURL('/cache/dir with spaces/cache-key-with-dashes').href,
-    ['node_modules', 'packages/my-package/node_modules']
+    ['node_modules', 'packages/my-package/node_modules'],
   )
 
-  const copyOperations = result.filter(op => op.type === 'copy')
+  const copyOperations = result.filter((op) => op.type === 'copy')
   expect(copyOperations).toHaveLength(2)
 
   expect(copyOperations[0]).toEqual({
     type: 'copy',
     from: pathToFileURL('/repo/path with spaces/node_modules').href,
-    to: pathToFileURL('/cache/dir with spaces/cache-key-with-dashes/node_modules').href
+    to: pathToFileURL('/cache/dir with spaces/cache-key-with-dashes/node_modules').href,
   })
 
   expect(copyOperations[1]).toEqual({
     type: 'copy',
     from: pathToFileURL('/repo/path with spaces/packages/my-package/node_modules').href,
-    to: pathToFileURL('/cache/dir with spaces/cache-key-with-dashes/packages/my-package/node_modules').href
+    to: pathToFileURL('/cache/dir with spaces/cache-key-with-dashes/packages/my-package/node_modules').href,
   })
 })
