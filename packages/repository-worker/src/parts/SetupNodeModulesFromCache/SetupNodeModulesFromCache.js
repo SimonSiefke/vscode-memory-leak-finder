@@ -34,7 +34,7 @@ export const setupNodeModulesFromCache = async (repoPath) => {
 
     const cachedNodeModulesPaths = await findCachedNodeModulesPaths(cachedNodeModulesPath)
 
-    const fileOperations = await GetRestoreFileOperations.getRestoreFileOperations(
+    const fileOperations = await GetRestoreFileOperations.getRestoreNodeModulesFileOperations(
       repoPathUri,
       cacheKey,
       cacheDirUri,

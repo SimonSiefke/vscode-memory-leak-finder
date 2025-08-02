@@ -1,25 +1,12 @@
 import { expect, test } from '@jest/globals'
-import { access, mkdir, rm, writeFile } from 'node:fs/promises'
+import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { join } from 'node:path'
+import { pathExists } from 'path-exists'
 import { downloadAndBuildVscodeFromCommit } from '../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js'
 import * as InstallDependencies from '../src/parts/InstallDependencies/InstallDependencies.js'
 import * as Root from '../src/parts/Root/Root.js'
 import * as RunCompile from '../src/parts/RunCompile/RunCompile.js'
-
-/**
- * Checks if a file or directory exists
- * @param {string} path - The path to check
- * @returns {Promise<boolean>} True if the path exists, false otherwise
- */
-const exists = async (path) => {
-  try {
-    await access(path)
-    return true
-  } catch {
-    return false
-  }
-}
 
 test('downloadAndBuildVscodeFromCommit - function exists and is callable', async () => {
   expect(typeof downloadAndBuildVscodeFromCommit).toBe('function')

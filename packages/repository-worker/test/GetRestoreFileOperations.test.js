@@ -1,9 +1,9 @@
 import { expect, test } from '@jest/globals'
-import { getRestoreFileOperations } from '../src/parts/GetRestoreFileOperations/GetRestoreFileOperations.js'
+import { getRestoreNodeModulesFileOperations } from '../src/parts/GetRestoreFileOperations/GetRestoreFileOperations.js'
 
-test('getRestoreFileOperations handles errors gracefully', async () => {
+test('getRestoreNodeModulesFileOperations handles errors gracefully', async () => {
   // Should not throw with invalid path
-  const result = await getRestoreFileOperations(
+  const result = await getRestoreNodeModulesFileOperations(
     'test:///nonexistent/path',
     'cache-key',
     'test:///cache/dir',
