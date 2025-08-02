@@ -18,7 +18,6 @@ export const findPackageLockFiles = async (dirUri) => {
     const packageLockPaths = await Array.fromAsync(globIterator)
     const absolutePaths = packageLockPaths.map((path) => join(dir, path))
     const fileUris = absolutePaths.map((path) => pathToFileURL(path).href)
-
     return fileUris
   } catch (error) {
     throw new VError(error, `Failed to find package-lock.json files in directory '${dirUri}'`)
