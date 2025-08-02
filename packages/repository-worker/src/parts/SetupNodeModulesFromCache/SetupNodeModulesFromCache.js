@@ -4,7 +4,6 @@ import { pathToFileURL } from 'node:url'
 import { VError } from '@lvce-editor/verror'
 import * as GetRestoreFileOperations from '../GetRestoreFileOperations/GetRestoreFileOperations.js'
 import * as ApplyFileOperations from '../ApplyFileOperations/ApplyFileOperations.js'
-import * as ComputeVscodeNodeModulesCacheKey from '../ComputeVscodeNodeModulesCacheKey/ComputeVscodeNodeModulesCacheKey.js'
 import * as Root from '../Root/Root.js'
 
 const VSCODE_NODE_MODULES_CACHE_DIR = '.vscode-node-modules'
@@ -20,13 +19,13 @@ const findCachedNodeModulesPaths = async (cachedNodeModulesPath) => {
 
 /**
  * @param {string} repoPath
+ * @param {string} commitHash
  */
-export const setupNodeModulesFromCache = async (repoPath) => {
+export const setupNodeModulesFromCache = async (repoPath, commitHash) => {
   try {
     const repoPathUri = pathToFileURL(repoPath).href
-    const cacheKey = await ComputeVscodeNodeModulesCacheKey.computeVscodeNodeModulesCacheKey(repoPathUri)
     const cacheDir = join(Root.root, VSCODE_NODE_MODULES_CACHE_DIR)
-    const cachedNodeModulesPath = join(cacheDir, cacheKey)
+    const cachedNodeModulesPath = join(cacheDir, commitHash)
 
     // Convert paths to file URIs
     const cacheDirUri = pathToFileURL(cacheDir).href
@@ -36,7 +35,7 @@ export const setupNodeModulesFromCache = async (repoPath) => {
 
     const fileOperations = await GetRestoreFileOperations.getRestoreNodeModulesFileOperations(
       repoPathUri,
-      cacheKey,
+      commitHash,
       cacheDirUri,
       cachedNodeModulesPathUri,
       cachedNodeModulesPaths,
