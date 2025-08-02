@@ -2,25 +2,20 @@ import { join } from 'node:path'
 import { existsSync } from 'node:fs'
 
 /**
- * @typedef {Object} FileOperation
- * @property {'copy' | 'remove' | 'mkdir'} type
- * @property {string} from
- * @property {string} to
- * @property {string} path
- */
-
-/**
  * @param {string} repoPath
  * @param {string} cacheKey
  * @param {string} cacheDir
  * @param {string} cachedNodeModulesPath
  * @param {string[]} nodeModulesPaths
- * @returns {Promise<FileOperation[]>}
+ * @returns {Promise<any[]>}
  */
 export const getCacheFileOperations = async (repoPath, cacheKey, cacheDir, cachedNodeModulesPath, nodeModulesPaths) => {
   try {
     console.log(`Preparing to cache node_modules tree with cache key: ${cacheKey}`)
 
+    /**
+     * @type {any[]}
+     */
     const fileOperations = []
 
     // Add directory creation operations
