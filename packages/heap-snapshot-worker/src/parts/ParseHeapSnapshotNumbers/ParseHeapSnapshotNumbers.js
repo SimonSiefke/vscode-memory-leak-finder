@@ -38,13 +38,13 @@ export const parseHeapSnapshotNumbers = async (path) => {
         name: '(heap number)',
         type: 'number',
         selfSize: nodes[i + selfSizeFieldIndex],
-        edgeCount: nodes[i + edgeCountFieldIndex],
+        edgeCount: nodes[i + edgeCountFieldIndex]
       })
     }
   }
 
   return {
     count: heapNumbers.length,
-    heapNumbers: heapNumbers,
+    heapNumbers: heapNumbers
   }
 }
