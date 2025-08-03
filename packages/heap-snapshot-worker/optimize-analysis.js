@@ -27,7 +27,7 @@ const testWorkerStartup = async () => {
     const end = performance.now()
 
     times.push(end - start)
-    console.log(`  Worker ${i+1}: ${(end - start).toFixed(2)}ms`)
+    console.log(`  Worker ${i + 1}: ${(end - start).toFixed(2)}ms`)
   }
 
   const avg = times.reduce((a, b) => a + b) / times.length
@@ -60,18 +60,18 @@ const testParallelCreation = async () => {
   const parStart = performance.now()
 
   const [w1, w2] = await Promise.all([
-    new Promise(resolve => {
+    new Promise((resolve) => {
       const start = performance.now()
       const w = new Worker(getHeapSnapshotWorkerPath())
       w.on('spawn', () => console.log(`  Worker A spawned: ${(performance.now() - start).toFixed(2)}ms`))
       resolve(w)
     }),
-    new Promise(resolve => {
+    new Promise((resolve) => {
       const start = performance.now()
       const w = new Worker(getHeapSnapshotWorkerPath())
       w.on('spawn', () => console.log(`  Worker B spawned: ${(performance.now() - start).toFixed(2)}ms`))
       resolve(w)
-    })
+    }),
   ])
 
   const parEnd = performance.now()
@@ -94,7 +94,7 @@ const analyzeOptimizations = () => {
   console.log('')
 
   console.log('B. REDUCE I/O CONTENTION:')
-  console.log('   - Stream processing (don\'t load full file)')
+  console.log("   - Stream processing (don't load full file)")
   console.log('   - Memory-mapped files')
   console.log('   - Different disk/partition for snapshots')
   console.log('')
@@ -134,7 +134,6 @@ const main = async () => {
     console.log('   - 3 snapshots: ~50% improvement')
     console.log('   - 4 snapshots: ~67% improvement')
     console.log('   - More snapshots: approaching theoretical maximum')
-
   } catch (error) {
     console.error('Test failed:', error.message)
   }

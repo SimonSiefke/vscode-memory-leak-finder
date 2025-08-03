@@ -3,21 +3,21 @@
 console.log('=== FINAL OVERHEAD ANALYSIS ===\n')
 
 const workerA = {
-  pureParsingTime: 1394.99,     // Actual parsing work
-  postParseOverhead: 1.14,      // Logging + transfer list + postMessage
-  totalWorkerTime: 1396.13,    // Total time in worker
-  mainThreadTotal: 1528.39,    // Total time seen by main thread
+  pureParsingTime: 1394.99, // Actual parsing work
+  postParseOverhead: 1.14, // Logging + transfer list + postMessage
+  totalWorkerTime: 1396.13, // Total time in worker
+  mainThreadTotal: 1528.39, // Total time seen by main thread
 }
 
 const workerB = {
-  pureParsingTime: 1427.08,     // Actual parsing work
-  postParseOverhead: 1.14,      // Logging + transfer list + postMessage
-  totalWorkerTime: 1428.22,    // Total time in worker
-  mainThreadTotal: 1682.19,    // Total time seen by main thread
+  pureParsingTime: 1427.08, // Actual parsing work
+  postParseOverhead: 1.14, // Logging + transfer list + postMessage
+  totalWorkerTime: 1428.22, // Total time in worker
+  mainThreadTotal: 1682.19, // Total time seen by main thread
 }
 
 const parallel = {
-  totalParsingTime: 1825.91,   // Both snapshots parsed in parallel
+  totalParsingTime: 1825.91, // Both snapshots parsed in parallel
   sequentialEstimate: workerA.pureParsingTime + workerB.pureParsingTime,
 }
 
@@ -42,7 +42,9 @@ console.log('🚀 PERFORMANCE ANALYSIS:')
 console.log(`Sequential estimate:     ${parallel.sequentialEstimate.toFixed(2)}ms`)
 console.log(`Parallel actual:         ${parallel.totalParsingTime.toFixed(2)}ms`)
 console.log(`Speedup:                 ${(parallel.sequentialEstimate / parallel.totalParsingTime).toFixed(2)}x`)
-console.log(`Improvement:             ${((parallel.sequentialEstimate - parallel.totalParsingTime) / parallel.sequentialEstimate * 100).toFixed(1)}%`)
+console.log(
+  `Improvement:             ${(((parallel.sequentialEstimate - parallel.totalParsingTime) / parallel.sequentialEstimate) * 100).toFixed(1)}%`,
+)
 console.log('')
 
 console.log('✅ OVERHEAD FINDINGS:')

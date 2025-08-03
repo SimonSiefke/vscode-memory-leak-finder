@@ -47,7 +47,7 @@ workerPort.on('message', async (message) => {
     const parseTime = performance.now()
 
     console.log(`[ParseWorker] Parsing completed in ${(parseTime - startTime).toFixed(2)}ms`)
-    
+
     const loggingStart = performance.now()
     console.log(`[ParseWorker] Result data sizes:`)
     console.log(`  - nodes: ${result.nodes?.length || 0} elements (${(result.nodes?.byteLength || 0) / 1024 / 1024}MB)`)

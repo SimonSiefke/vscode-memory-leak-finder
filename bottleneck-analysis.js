@@ -3,11 +3,11 @@
 console.log('=== BOTTLENECK INVESTIGATION ===\n')
 
 const data = {
-  workerA: 1395,     // ms
-  workerB: 1427,     // ms
-  parallel: 1826,    // ms
-  overhead: 26,      // ms
-  fileSize: 95,      // MB each
+  workerA: 1395, // ms
+  workerB: 1427, // ms
+  parallel: 1826, // ms
+  overhead: 26, // ms
+  fileSize: 95, // MB each
   cpuThreads: 8,
 }
 
@@ -26,7 +26,7 @@ console.log(`Actual parallel:         ${data.parallel}ms`)
 console.log(`Performance gap:         ${data.parallel - Math.max(data.workerA, data.workerB) - data.overhead}ms`)
 console.log('')
 
-const efficiency = Math.max(data.workerA, data.workerB) / data.parallel * 100
+const efficiency = (Math.max(data.workerA, data.workerB) / data.parallel) * 100
 console.log(`Parallel efficiency:     ${efficiency.toFixed(1)}% (should be ~100% with 8 threads)`)
 console.log('')
 
@@ -44,7 +44,7 @@ console.log('2. 🧠 MEMORY BANDWIDTH SATURATION:')
 console.log('   - Both workers allocating massive Uint32Arrays')
 console.log('   - Memory controller contention')
 console.log('   - RAM bandwidth limits (~25-50 GB/s typical)')
-console.log(`   - Processing rate: ${(data.fileSize * 2 / (data.parallel / 1000)).toFixed(1)} MB/s`)
+console.log(`   - Processing rate: ${((data.fileSize * 2) / (data.parallel / 1000)).toFixed(1)} MB/s`)
 console.log('')
 
 console.log('3. 🗂️  FILE SYSTEM OVERHEAD:')
@@ -60,7 +60,7 @@ console.log('')
 
 console.log('💡 LIKELY CULPRIT: DISK I/O')
 console.log('Reading two 95MB files simultaneously is probably the bottleneck!')
-console.log(`Processing rate: ${(data.fileSize * 2 / (data.parallel / 1000)).toFixed(1)} MB/s`)
+console.log(`Processing rate: ${((data.fileSize * 2) / (data.parallel / 1000)).toFixed(1)} MB/s`)
 console.log('Modern SSDs: ~500 MB/s, HDDs: ~100 MB/s')
 console.log('')
 

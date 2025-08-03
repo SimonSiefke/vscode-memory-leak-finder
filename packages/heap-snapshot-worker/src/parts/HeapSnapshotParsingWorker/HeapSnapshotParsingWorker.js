@@ -23,7 +23,7 @@ export class HeapSnapshotParsingWorker {
     this.worker.on('message', (message) => {
       const messageReceiveTime = performance.now()
       console.log(`[HeapSnapshotParsingWorker] Received message from worker at ${messageReceiveTime.toFixed(2)}ms`)
-      
+
       if (message.id && this.callbacks.has(message.id)) {
         const { resolve, reject } = this.callbacks.get(message.id)
         this.callbacks.delete(message.id)
@@ -47,7 +47,7 @@ export class HeapSnapshotParsingWorker {
     })
   }
 
-    /**
+  /**
    * Parses a heap snapshot file using the parsing worker
    * @param {string} path - The file path to the heap snapshot
    * @returns {Promise<{metaData: any, nodes: Uint32Array, edges: Uint32Array, locations: Uint32Array}>}
@@ -68,10 +68,12 @@ export class HeapSnapshotParsingWorker {
         const endTime = performance.now()
         const duration = endTime - startTime
         console.log(`[HeapSnapshotParsingWorker] Parse completed in ${duration.toFixed(2)}ms`)
-        console.log(`[HeapSnapshotParsingWorker] Result sizes - nodes: ${result.nodes?.length || 0}, edges: ${result.edges?.length || 0}, locations: ${result.locations?.length || 0}`)
+        console.log(
+          `[HeapSnapshotParsingWorker] Result sizes - nodes: ${result.nodes?.length || 0}, edges: ${result.edges?.length || 0}, locations: ${result.locations?.length || 0}`,
+        )
         resolve(result)
       },
-      reject
+      reject,
     })
 
     console.log(`[HeapSnapshotParsingWorker] Sending parse request to worker (id: ${id})`)

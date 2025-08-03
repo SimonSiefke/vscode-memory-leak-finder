@@ -4,12 +4,12 @@ console.log('=== WORKER COORDINATION TIMING ANALYSIS ===\n')
 
 // From the actual logs:
 const workerA = {
-  mainThreadSends: 177.74,        // Main thread sends message
-  workerReceives: 298.85,         // Worker receives message
-  workerCompletes: 1394.99,       // Worker finishes parsing (relative to worker start)
-  workerSends: 1396.13,          // Worker sends result back (1.14ms later)
-  mainThreadReceives: 1698.00,   // Main thread receives result
-  mainThreadTotal: 1528.39       // Total time main thread reports
+  mainThreadSends: 177.74, // Main thread sends message
+  workerReceives: 298.85, // Worker receives message
+  workerCompletes: 1394.99, // Worker finishes parsing (relative to worker start)
+  workerSends: 1396.13, // Worker sends result back (1.14ms later)
+  mainThreadReceives: 1698.0, // Main thread receives result
+  mainThreadTotal: 1528.39, // Total time main thread reports
 }
 
 console.log('WORKER A TIMING SEQUENCE:')
@@ -51,5 +51,5 @@ console.log('')
 
 console.log('🎯 BOTTOM LINE:')
 console.log('~123ms of overhead is just normal Node.js worker thread coordination')
-console.log('This is NOT a bug - it\'s the inherent cost of inter-thread communication')
+console.log("This is NOT a bug - it's the inherent cost of inter-thread communication")
 console.log('Your zero-copy transfer is working perfectly!')

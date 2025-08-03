@@ -4,13 +4,13 @@ console.log('=== DETAILED OVERHEAD ANALYSIS ===\n')
 
 // Real timing data from debug logs (Worker A from latest run)
 const realTimings = {
-  workerStarted: 7.97,              // Worker startup time
-  pureParsingTime: 1336.47,         // Actual parsing work  
-  workerParseCompleted: 1523.23,    // When worker reports completion
-  mainThreadCompleted: 1526.45,    // When main thread gets result
-  transferTime: 0.46,               // Zero-copy transfer
-  workerTerminated: 18.69,          // Worker cleanup
-  totalTime: 1545.42                // Total end-to-end
+  workerStarted: 7.97, // Worker startup time
+  pureParsingTime: 1336.47, // Actual parsing work
+  workerParseCompleted: 1523.23, // When worker reports completion
+  mainThreadCompleted: 1526.45, // When main thread gets result
+  transferTime: 0.46, // Zero-copy transfer
+  workerTerminated: 18.69, // Worker cleanup
+  totalTime: 1545.42, // Total end-to-end
 }
 
 console.log('TIMING BREAKDOWN:')
@@ -27,7 +27,9 @@ const workerSideOverhead = realTimings.workerParseCompleted - realTimings.purePa
 
 console.log('OVERHEAD ANALYSIS:')
 console.log(`Total overhead:              ${totalOverhead.toFixed(2)}ms`)
-console.log(`Worker-side overhead:        ${workerSideOverhead.toFixed(2)}ms (${(workerSideOverhead/totalOverhead*100).toFixed(1)}% of total!)`)
+console.log(
+  `Worker-side overhead:        ${workerSideOverhead.toFixed(2)}ms (${((workerSideOverhead / totalOverhead) * 100).toFixed(1)}% of total!)`,
+)
 console.log(`Infrastructure overhead:     ${(totalOverhead - workerSideOverhead).toFixed(2)}ms`)
 console.log('')
 
@@ -51,16 +53,22 @@ console.log('✅ Zero-copy is working perfectly!')
 console.log('')
 
 console.log('BREAKDOWN BY COMPONENT:')
-console.log(`├─ Worker startup:           ${realTimings.workerStarted.toFixed(1)}ms (${(realTimings.workerStarted/totalOverhead*100).toFixed(1)}%)`)
-console.log(`├─ Worker-side mystery:      ${workerSideOverhead.toFixed(1)}ms (${(workerSideOverhead/totalOverhead*100).toFixed(1)}%)`)
-console.log(`├─ Transfer (zero-copy):     ${realTimings.transferTime.toFixed(1)}ms (${(realTimings.transferTime/totalOverhead*100).toFixed(1)}%)`)
+console.log(
+  `├─ Worker startup:           ${realTimings.workerStarted.toFixed(1)}ms (${((realTimings.workerStarted / totalOverhead) * 100).toFixed(1)}%)`,
+)
+console.log(`├─ Worker-side mystery:      ${workerSideOverhead.toFixed(1)}ms (${((workerSideOverhead / totalOverhead) * 100).toFixed(1)}%)`)
+console.log(
+  `├─ Transfer (zero-copy):     ${realTimings.transferTime.toFixed(1)}ms (${((realTimings.transferTime / totalOverhead) * 100).toFixed(1)}%)`,
+)
 console.log(`├─ Main thread coordination: ${(realTimings.mainThreadCompleted - realTimings.workerParseCompleted).toFixed(1)}ms`)
-console.log(`└─ Worker termination:       ${realTimings.workerTerminated.toFixed(1)}ms (${(realTimings.workerTerminated/totalOverhead*100).toFixed(1)}%)`)
+console.log(
+  `└─ Worker termination:       ${realTimings.workerTerminated.toFixed(1)}ms (${((realTimings.workerTerminated / totalOverhead) * 100).toFixed(1)}%)`,
+)
 console.log('')
 
 console.log('🎯 CONCLUSION:')
 console.log('- Worker startup is NOT the bottleneck (only 8ms)')
-console.log('- Argument passing is NOT the bottleneck (near instant)')  
+console.log('- Argument passing is NOT the bottleneck (near instant)')
 console.log('- Zero-copy transfer is NOT the bottleneck (0.46ms for 80MB!)')
 console.log('- The real bottleneck is 187ms of mystery worker-side overhead')
 console.log('')

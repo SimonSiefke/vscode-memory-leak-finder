@@ -5,25 +5,25 @@ console.log('=== PERFORMANCE ANALYSIS ===\n')
 
 // Real timing data from debug logs
 const realData = {
-  workerA: 1336.47,  // ms - faster worker
-  workerB: 1428.91,  // ms - slower worker
-  totalParallel: 1861.40,  // ms - actual parallel time
+  workerA: 1336.47, // ms - faster worker
+  workerB: 1428.91, // ms - slower worker
+  totalParallel: 1861.4, // ms - actual parallel time
 
   // From different runs for verification
   runs: [
-    { workerA: 1183.60, workerB: 1270.40, total: 1651.00 },
+    { workerA: 1183.6, workerB: 1270.4, total: 1651.0 },
     { workerA: 1309.29, workerB: 1377.12, total: 1795.34 },
-    { workerA: 1336.47, workerB: 1428.91, total: 1861.40 }
-  ]
+    { workerA: 1336.47, workerB: 1428.91, total: 1861.4 },
+  ],
 }
 
 console.log('Real-world timing data:')
 realData.runs.forEach((run, i) => {
   const sequential = run.workerA + run.workerB
-  const improvement = ((sequential - run.total) / sequential * 100)
-  const efficiency = (improvement / 50 * 100) // 50% is theoretical max
+  const improvement = ((sequential - run.total) / sequential) * 100
+  const efficiency = (improvement / 50) * 100 // 50% is theoretical max
 
-  console.log(`Run ${i+1}:`)
+  console.log(`Run ${i + 1}:`)
   console.log(`  Worker A: ${run.workerA.toFixed(1)}ms`)
   console.log(`  Worker B: ${run.workerB.toFixed(1)}ms`)
   console.log(`  Sequential total: ${sequential.toFixed(1)}ms`)
@@ -35,19 +35,21 @@ realData.runs.forEach((run, i) => {
 })
 
 // Calculate averages
-const avgImprovement = realData.runs.reduce((sum, run) => {
-  const sequential = run.workerA + run.workerB
-  return sum + ((sequential - run.total) / sequential * 100)
-}, 0) / realData.runs.length
+const avgImprovement =
+  realData.runs.reduce((sum, run) => {
+    const sequential = run.workerA + run.workerB
+    return sum + ((sequential - run.total) / sequential) * 100
+  }, 0) / realData.runs.length
 
-const avgOverhead = realData.runs.reduce((sum, run) => {
-  return sum + (run.total - Math.max(run.workerA, run.workerB))
-}, 0) / realData.runs.length
+const avgOverhead =
+  realData.runs.reduce((sum, run) => {
+    return sum + (run.total - Math.max(run.workerA, run.workerB))
+  }, 0) / realData.runs.length
 
 console.log('=== ANALYSIS SUMMARY ===')
 console.log(`Average improvement: ${avgImprovement.toFixed(1)}%`)
 console.log(`Average overhead: ${avgOverhead.toFixed(1)}ms`)
-console.log(`Efficiency: ${(avgImprovement / 50 * 100).toFixed(1)}% of theoretical maximum`)
+console.log(`Efficiency: ${((avgImprovement / 50) * 100).toFixed(1)}% of theoretical maximum`)
 
 console.log('\n=== WHY NOT 50% IMPROVEMENT? ===')
 console.log('1. **Unequal task times**: Workers take different amounts of time')

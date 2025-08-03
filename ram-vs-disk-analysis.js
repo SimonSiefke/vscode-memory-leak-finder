@@ -6,14 +6,14 @@ const disk = {
   workerA: 1395,
   workerB: 1427,
   parallel: 1826,
-  sequential: 1395 + 1427
+  sequential: 1395 + 1427,
 }
 
 const ram = {
   workerA: 1270,
   workerB: 1276,
   parallel: 1696,
-  sequential: 1270 + 1276
+  sequential: 1270 + 1276,
 }
 
 console.log('📊 PERFORMANCE COMPARISON:')
@@ -31,8 +31,8 @@ console.log(`├─ Parallel total:     ${ram.parallel}ms`)
 console.log(`└─ Sequential est:     ${ram.sequential}ms`)
 console.log('')
 
-const singleWorkerImprovement = ((disk.workerA - ram.workerA) / disk.workerA * 100)
-const parallelImprovement = ((disk.parallel - ram.parallel) / disk.parallel * 100)
+const singleWorkerImprovement = ((disk.workerA - ram.workerA) / disk.workerA) * 100
+const parallelImprovement = ((disk.parallel - ram.parallel) / disk.parallel) * 100
 const workerBalance = Math.abs(ram.workerA - ram.workerB)
 
 console.log('🚀 IMPROVEMENTS:')
@@ -41,8 +41,8 @@ console.log(`Parallel speedup:      ${parallelImprovement.toFixed(1)}% faster`)
 console.log(`Worker balance:        ${workerBalance}ms difference (excellent!)`)
 console.log('')
 
-const diskEfficiency = Math.max(disk.workerA, disk.workerB) / disk.parallel * 100
-const ramEfficiency = Math.max(ram.workerA, ram.workerB) / ram.parallel * 100
+const diskEfficiency = (Math.max(disk.workerA, disk.workerB) / disk.parallel) * 100
+const ramEfficiency = (Math.max(ram.workerA, ram.workerB) / ram.parallel) * 100
 
 console.log('📈 PARALLEL EFFICIENCY:')
 console.log(`Disk efficiency:       ${diskEfficiency.toFixed(1)}%`)

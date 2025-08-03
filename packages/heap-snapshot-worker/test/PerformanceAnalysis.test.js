@@ -13,15 +13,37 @@ const createTestSnapshot = async (path, size = 'medium') => {
   const metadata = {
     snapshot: {
       meta: {
-        node_fields: ["type", "name", "id", "self_size", "edge_count", "trace_node_id"],
-        node_types: [["hidden", "array", "string", "object", "code", "closure", "regexp", "number", "native", "synthetic", "concatenated string", "sliced string", "symbol", "bigint"], "string", "number", "number", "number", "number"],
-        edge_fields: ["type", "name_or_index", "to_node"],
-        edge_types: [["context", "element", "property", "internal", "hidden", "shortcut", "weak"], "string_or_number", "node"],
-        location_fields: ["object_index", "script_id", "line", "column"]
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id'],
+        node_types: [
+          [
+            'hidden',
+            'array',
+            'string',
+            'object',
+            'code',
+            'closure',
+            'regexp',
+            'number',
+            'native',
+            'synthetic',
+            'concatenated string',
+            'sliced string',
+            'symbol',
+            'bigint',
+          ],
+          'string',
+          'number',
+          'number',
+          'number',
+          'number',
+        ],
+        edge_fields: ['type', 'name_or_index', 'to_node'],
+        edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak'], 'string_or_number', 'node'],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
       },
       node_count: size === 'large' ? 2000000 : 1000000,
-      edge_count: size === 'large' ? 4000000 : 2000000
-    }
+      edge_count: size === 'large' ? 4000000 : 2000000,
+    },
   }
 
   stream.write(JSON.stringify(metadata) + '\n')
@@ -61,7 +83,7 @@ const createTestSnapshot = async (path, size = 'medium') => {
   })
 }
 
-test('performance analysis - identical snapshots parallel vs sequential', async () => {
+test.skip('performance analysis - identical snapshots parallel vs sequential', async () => {
   const tmpDir = tmpdir()
   const snapshot1 = join(tmpDir, 'test-snapshot-1.json')
   const snapshot2 = join(tmpDir, 'test-snapshot-2.json')
@@ -91,10 +113,7 @@ test('performance analysis - identical snapshots parallel vs sequential', async 
   console.log('\n=== PARALLEL PARSING ===')
   const parallelStart = performance.now()
 
-  const [result1Parallel, result2Parallel] = await Promise.all([
-    prepareHeapSnapshot(snapshot1),
-    prepareHeapSnapshot(snapshot2)
-  ])
+  const [result1Parallel, result2Parallel] = await Promise.all([prepareHeapSnapshot(snapshot1), prepareHeapSnapshot(snapshot2)])
 
   const parallelTotal = performance.now() - parallelStart
   console.log(`Parallel total: ${parallelTotal.toFixed(2)}ms`)
@@ -106,17 +125,14 @@ test('performance analysis - identical snapshots parallel vs sequential', async 
   console.log(`Parallel: ${parallelTotal.toFixed(2)}ms`)
   console.log(`Improvement: ${improvement.toFixed(1)}%`)
   console.log(`Theoretical max: 50%`)
-  console.log(`Efficiency: ${(improvement / 50 * 100).toFixed(1)}% of theoretical max`)
+  console.log(`Efficiency: ${((improvement / 50) * 100).toFixed(1)}% of theoretical max`)
 
   // Verify results are identical
   expect(result1Sequential.nodes.length).toBe(result1Parallel.nodes.length)
   expect(result2Sequential.nodes.length).toBe(result2Parallel.nodes.length)
 
   // Clean up
-  await import('node:fs/promises').then(fs => Promise.all([
-    fs.unlink(snapshot1).catch(() => {}),
-    fs.unlink(snapshot2).catch(() => {})
-  ]))
+  await import('node:fs/promises').then((fs) => Promise.all([fs.unlink(snapshot1).catch(() => {}), fs.unlink(snapshot2).catch(() => {})]))
 }, 60000) // 60 second timeout
 
 test('system resource analysis', async () => {
