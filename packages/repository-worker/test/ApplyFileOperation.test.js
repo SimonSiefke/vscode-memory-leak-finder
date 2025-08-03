@@ -3,11 +3,16 @@ import { test, expect, jest, beforeEach } from '@jest/globals'
 const mockCopy = jest.fn()
 const mockMakeDirectory = jest.fn()
 const mockRemove = jest.fn()
+const mockLogger = jest.fn()
 
 jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.js', () => ({
   copy: mockCopy,
   makeDirectory: mockMakeDirectory,
   remove: mockRemove,
+}))
+
+jest.unstable_mockModule('../src/parts/Logger/Logger.js', () => ({
+  log: mockLogger,
 }))
 
 let applyFileOperationModule
