@@ -1,6 +1,5 @@
 import { VError } from '@lvce-editor/verror'
 import { copy, makeDirectory, remove } from '../Filesystem/Filesystem.js'
-import * as Logger from '../Logger/Logger.js'
 
 /**
  * @typedef {Object} CopyOperation
