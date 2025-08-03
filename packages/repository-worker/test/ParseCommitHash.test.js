@@ -1,23 +1,13 @@
-import { expect, test, jest } from '@jest/globals'
-
-const mockIsFullCommitHash = jest.fn()
-
-jest.unstable_mockModule('../src/parts/IsFullCommitHash/IsFullCommitHash.js', () => ({
-  isFullCommitHash: mockIsFullCommitHash,
-}))
-
-const { parseCommitHash } = await import('../src/parts/ParseCommitHash/ParseCommitHash.js')
+import { expect, test } from '@jest/globals'
+import { parseCommitHash } from '../src/parts/ParseCommitHash/ParseCommitHash.js'
 
 test('parseCommitHash returns valid commit hash', () => {
-  const stdout = 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0\n'
+  const stdout = 'a1b2c3d4e5f6789012345678901234567890abcd\n'
   const commitRef = 'main'
-
-  mockIsFullCommitHash.mockReturnValue(true)
 
   const result = parseCommitHash(stdout, commitRef)
 
-  expect(result).toBe('a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0')
-  expect(mockIsFullCommitHash).toHaveBeenCalledWith('a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0')
+  expect(result).toBe('a1b2c3d4e5f6789012345678901234567890abcd')
 })
 
 test('parseCommitHash throws error when no commit found', () => {
@@ -38,19 +28,14 @@ test('parseCommitHash throws error when commit hash is invalid', () => {
   const stdout = 'invalid-hash\n'
   const commitRef = 'main'
 
-  mockIsFullCommitHash.mockReturnValue(false)
-
   expect(() => parseCommitHash(stdout, commitRef)).toThrow('Invalid commit hash resolved: invalid-hash')
 })
 
 test('parseCommitHash handles multiple lines and takes first line', () => {
-  const stdout = 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0\nsecond-line\nthird-line'
+  const stdout = 'a1b2c3d4e5f6789012345678901234567890abcd\nsecond-line\nthird-line'
   const commitRef = 'main'
-
-  mockIsFullCommitHash.mockReturnValue(true)
 
   const result = parseCommitHash(stdout, commitRef)
 
-  expect(result).toBe('a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0')
-  expect(mockIsFullCommitHash).toHaveBeenCalledWith('a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0')
+  expect(result).toBe('a1b2c3d4e5f6789012345678901234567890abcd')
 })
