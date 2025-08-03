@@ -1,4 +1,3 @@
-import {Buffer} from 'node:buffer';
 import {
 	test, expect, jest, beforeEach,
 } from '@jest/globals';

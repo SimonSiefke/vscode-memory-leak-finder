@@ -44,7 +44,7 @@ export const remove = async (path, options = { recursive: true, force: true }) =
  * @returns {Promise<string>}
  */
 export const readFileContent = async (path, encoding = 'utf8') => {
-  return await readFile(path, { encoding })
+  return await readFile(path, { encoding: /** @type {BufferEncoding} */ (encoding) })
 }
 
 /**

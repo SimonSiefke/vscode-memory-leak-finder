@@ -29,7 +29,9 @@ test('addNodeModulesToCache - function exists and is callable', async () => {
 
 test('setupNodeModulesFromCache throws VError when no cache exists', async () => {
   // Mock findFiles to throw an error
-  mockFindFiles.mockRejectedValue(new Error('ENOENT: no such file or directory'))
+  mockFindFiles.mockImplementation(() => {
+    return Promise.reject(new Error('ENOENT: no such file or directory'))
+  })
 
   const { setupNodeModulesFromCache } = await import('../src/parts/SetupNodeModulesFromCache/SetupNodeModulesFromCache.js')
 
