@@ -56,6 +56,7 @@ test('getRegexpObjectsFromHeapSnapshot - single regexp object', async () => {
       {
         id: 200,
         name: '/test/gi',
+        pattern: '/test/gi',
         selfSize: 32,
         edgeCount: 0,
         traceNodeId: 0,
@@ -98,6 +99,7 @@ test('getRegexpObjectsFromHeapSnapshot - multiple regexp objects', async () => {
       {
         id: 200,
         name: '/test/gi',
+        pattern: '/test/gi',
         selfSize: 32,
         edgeCount: 1,
         traceNodeId: 0,
@@ -106,6 +108,7 @@ test('getRegexpObjectsFromHeapSnapshot - multiple regexp objects', async () => {
       {
         id: 202,
         name: '/hello/i',
+        pattern: '/hello/i',
         selfSize: 28,
         edgeCount: 0,
         traceNodeId: 0,
@@ -114,6 +117,7 @@ test('getRegexpObjectsFromHeapSnapshot - multiple regexp objects', async () => {
       {
         id: 203,
         name: '/world/g',
+        pattern: '/world/g',
         selfSize: 24,
         edgeCount: 2,
         traceNodeId: 0,
