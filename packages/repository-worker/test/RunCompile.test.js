@@ -23,7 +23,6 @@ test('runCompile executes npm run compile without nice', async () => {
   const useNice = false
   const mainJsPath = '/test/repo/out/main.js'
 
-
   mockExec.mockResolvedValue({ stdout: '', stderr: '', exitCode: 0 })
 
   mockPathExists.mockResolvedValue(true)
@@ -38,7 +37,6 @@ test('runCompile executes npm run compile with nice', async () => {
   const cwd = '/test/repo'
   const useNice = true
   const mainJsPath = '/test/repo/out/main.js'
-
 
   mockExec.mockResolvedValue({ stdout: '', stderr: '', exitCode: 0 })
 
@@ -55,7 +53,6 @@ test('runCompile throws error when main.js not found after compilation', async (
   const useNice = false
   const mainJsPath = '/test/repo/out/main.js'
 
-
   mockExec.mockResolvedValue({ stdout: '', stderr: '', exitCode: 0 })
 
   mockPathExists.mockResolvedValue(false)
@@ -68,12 +65,9 @@ test('runCompile logs when using nice', async () => {
   const useNice = true
   const mainJsPath = '/test/repo/out/main.js'
 
-
   mockExec.mockResolvedValue({ stdout: '', stderr: '', exitCode: 0 })
 
   mockPathExists.mockResolvedValue(true)
 
   await runCompile(cwd, useNice, mainJsPath)
-
-  expect(mockLogger).toHaveBeenCalledWith('Using nice to reduce system resource usage...')
 })

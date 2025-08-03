@@ -1,6 +1,5 @@
 import { pathExists } from 'path-exists'
 import { exec } from '../Exec/Exec.js'
-import * as Logger from '../Logger/Logger.js'
 
 /**
  * Runs the compilation process using npm run compile
@@ -9,7 +8,6 @@ import * as Logger from '../Logger/Logger.js'
  */
 export const runCompile = async (cwd, useNice, mainJsPath) => {
   if (useNice) {
-    Logger.log('Using nice to reduce system resource usage...')
     await exec('nice', ['-n', '10', 'npm', 'run', 'compile'], { cwd })
   } else {
     await exec('npm', ['run', 'compile'], { cwd })
