@@ -1,8 +1,5 @@
 import { Worker } from 'node:worker_threads'
-import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
+import { getHeapSnapshotWorkerPath } from '../GetHeapSnapshotWorkerPath/GetHeapSnapshotWorkerPath.js'
 
 export class HeapSnapshotParsingWorker {
   constructor() {
@@ -19,7 +16,7 @@ export class HeapSnapshotParsingWorker {
       return
     }
 
-    const workerPath = join(__dirname, '../../../../heap-snapshot-parsing-worker/bin/heap-snapshot-parsing-worker.js')
+    const workerPath = getHeapSnapshotWorkerPath()
 
     this.worker = new Worker(workerPath)
 

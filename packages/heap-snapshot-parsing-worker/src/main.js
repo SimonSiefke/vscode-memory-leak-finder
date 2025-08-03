@@ -1,6 +1,14 @@
 import { parentPort } from 'node:worker_threads'
 import { commandMap } from './parts/CommandMap/CommandMap.js'
 
+// Ensure we're running in a worker thread context
+if (!parentPort) {
+  throw new Error('This script must be run in a worker thread')
+}
+
+// Create a reference that TypeScript knows is not null
+const workerPort = parentPort
+
 // Helper function to get transferrable objects for zero-copy transfer
 const getTransferList = (result) => {
   const transferList = []
@@ -18,7 +26,7 @@ const getTransferList = (result) => {
   return transferList
 }
 
-parentPort.on('message', async (message) => {
+workerPort.on('message', async (message) => {
   const { id, method, params } = message
 
   try {
@@ -46,7 +54,7 @@ parentPort.on('message', async (message) => {
     const transferList = getTransferList(result)
     console.log(`[ParseWorker] Transferring ${transferList.length} ArrayBuffers with zero-copy`)
 
-    parentPort.postMessage({ id, result }, transferList)
+    workerPort.postMessage({ id, result }, transferList)
     const transferTime = performance.now()
 
     console.log(`[ParseWorker] Transfer completed in ${(transferTime - parseTime).toFixed(2)}ms`)
@@ -54,6 +62,6 @@ parentPort.on('message', async (message) => {
   } catch (error) {
     console.error(`[ParseWorker] Error during parsing:`, error)
     // Send error back
-    parentPort.postMessage({ id, error: error.message })
+    workerPort.postMessage({ id, error: error.message })
   }
 })

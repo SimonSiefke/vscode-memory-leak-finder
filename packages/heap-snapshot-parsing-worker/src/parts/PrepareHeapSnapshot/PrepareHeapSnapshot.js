@@ -1,6 +1,6 @@
 import { createReadStream } from 'node:fs'
 import { pipeline } from 'node:stream/promises'
-import { HeapSnapshotWriteStream } from '../HeapSnapshotWriteStream/HeapSnapshotWriteStream.js'
+import { HeapSnapshotWriteStream } from '@vscode-memory-leak-finder/heap-snapshot-worker/src/parts/HeapSnapshotWriteStream/HeapSnapshotWriteStream.js'
 
 /**
  * Parses a heap snapshot file and returns the parsed data with transferable arrays
