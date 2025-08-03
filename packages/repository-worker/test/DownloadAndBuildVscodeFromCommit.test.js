@@ -1,5 +1,5 @@
-import { join } from 'node:path'
 import { afterEach, beforeEach, expect, jest, test } from '@jest/globals'
+import * as Path from '../src/parts/Path/Path.js'
 
 const DEFAULT_REPO_URL = 'https://github.com/microsoft/vscode.git'
 
@@ -143,11 +143,11 @@ const { downloadAndBuildVscodeFromCommit } = await import(
 
 test('downloadVscodeCommit - tests git clone operations with mocked execa', async () => {
   const testCommitHash = 'a1b2c3d4e5f6789012345678901234567890abcd'
-  const testReposDir = join('/test', '.test-repos')
+  const testReposDir = Path.join('/test', '.test-repos')
   const testRepoUrl = 'https://github.com/microsoft/vscode.git'
 
   const reposDir = testReposDir
-  const repoPath = join(reposDir, testCommitHash)
+  const repoPath = Path.join(reposDir, testCommitHash)
 
   mockPathExists.mockImplementation((path) => {
     if (path === reposDir) {
@@ -181,11 +181,11 @@ test('downloadVscodeCommit - tests git clone operations with mocked execa', asyn
 
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missing node_modules', async () => {
   const testCommitHash = 'test-commit-123'
-  const reposDir = join('/test', '.vscode-repos')
-  const repoPath = join(reposDir, testCommitHash)
-  const mainJsPath = join(repoPath, 'out', 'main.js')
-  const nodeModulesPath = join(repoPath, 'node_modules')
-  const outPath = join(repoPath, 'out')
+  const reposDir = Path.join('/test', '.vscode-repos')
+  const repoPath = Path.join(reposDir, testCommitHash)
+  const mainJsPath = Path.join(repoPath, 'out', 'main.js')
+  const nodeModulesPath = Path.join(repoPath, 'node_modules')
+  const outPath = Path.join(repoPath, 'out')
 
   mockPathExists.mockImplementation((path) => {
     if (path === reposDir) {
@@ -224,11 +224,11 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missi
 
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with existing node_modules', async () => {
   const testCommitHash = 'test-commit-456'
-  const reposDir = join('/test', '.vscode-repos')
-  const repoPath = join(reposDir, testCommitHash)
-  const mainJsPath = join(repoPath, 'out', 'main.js')
-  const nodeModulesPath = join(repoPath, 'node_modules')
-  const outPath = join(repoPath, 'out')
+  const reposDir = Path.join('/test', '.vscode-repos')
+  const repoPath = Path.join(reposDir, testCommitHash)
+  const mainJsPath = Path.join(repoPath, 'out', 'main.js')
+  const nodeModulesPath = Path.join(repoPath, 'node_modules')
+  const outPath = Path.join(repoPath, 'out')
 
   mockPathExists.mockImplementation((path) => {
     if (path === reposDir) {
@@ -271,11 +271,11 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
 
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with existing out folder', async () => {
   const testCommitHash = 'test-commit-789'
-  const reposDir = join('/test', '.vscode-repos')
-  const repoPath = join(reposDir, testCommitHash)
-  const mainJsPath = join(repoPath, 'out', 'main.js')
-  const nodeModulesPath = join(repoPath, 'node_modules')
-  const outPath = join(repoPath, 'out')
+  const reposDir = Path.join('/test', '.vscode-repos')
+  const repoPath = Path.join(reposDir, testCommitHash)
+  const mainJsPath = Path.join(repoPath, 'out', 'main.js')
+  const nodeModulesPath = Path.join(repoPath, 'node_modules')
+  const outPath = Path.join(repoPath, 'out')
 
   mockPathExists.mockImplementation((path) => {
     if (path === reposDir) {

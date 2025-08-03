@@ -1,4 +1,4 @@
-import { join } from 'node:path'
+import * as Path from '../Path/Path.js'
 import * as Filesystem from '../Filesystem/Filesystem.js'
 // import { pathExists } from 'path-exists' (removed)
 import * as CacheNodeModules from '../CacheNodeModules/CacheNodeModules.js'
@@ -20,15 +20,15 @@ import * as Logger from '../Logger/Logger.js'
 export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, reposDir, cacheDir, useNice) => {
   // Resolve the commit reference to an actual commit hash
   const commitHash = await ResolveCommitHash.resolveCommitHash(repoUrl, commitRef)
-  const repoPath = join(reposDir, commitHash)
+  const repoPath = Path.join(reposDir, commitHash)
 
   // Create parent directory if it doesn't exist
   const existsReposDir = await Filesystem.pathExists(reposDir)
 
   // Check what's needed at the start
-  const mainJsPath = join(repoPath, 'out', 'main.js')
-  const nodeModulesPath = join(repoPath, 'node_modules')
-  const outPath = join(repoPath, 'out')
+  const mainJsPath = Path.join(repoPath, 'out', 'main.js')
+  const nodeModulesPath = Path.join(repoPath, 'node_modules')
+  const outPath = Path.join(repoPath, 'out')
 
   const existsRepoPath = await Filesystem.pathExists(repoPath)
   const existsMainJsPath = await Filesystem.pathExists(mainJsPath)

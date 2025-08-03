@@ -1,5 +1,5 @@
-import { join } from 'node:path'
 import { VError } from '@lvce-editor/verror'
+import * as Path from '../Path/Path.js'
 import { findFiles } from '../Filesystem/Filesystem.js'
 
 /**
@@ -13,7 +13,7 @@ export const findPackageLockFiles = async (folder) => {
       cwd: folder,
       exclude: ['**/node_modules/**'],
     })
-    const absolutePaths = packageLockPaths.map((path) => join(folder, path))
+    const absolutePaths = packageLockPaths.map((path) => Path.join(folder, path))
     return absolutePaths
   } catch (error) {
     throw new VError(error, `Failed to find package-lock.json files in directory '${folder}'`)

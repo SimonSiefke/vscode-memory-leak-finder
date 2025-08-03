@@ -1,5 +1,5 @@
-import { join } from 'node:path'
 import { VError } from '@lvce-editor/verror'
+import * as Path from '../Path/Path.js'
 
 /**
  * @typedef {Object} CopyOperation
@@ -37,13 +37,13 @@ export const getRestoreNodeModulesFileOperations = async (repoPath, cacheKey, ca
     const fileOperations = []
 
     // Convert relative paths to absolute paths
-    const absoluteCachedNodeModulesPaths = cachedNodeModulesPaths.map((path) => join(cachedNodeModulesPath, path))
+    const absoluteCachedNodeModulesPaths = cachedNodeModulesPaths.map((path) => Path.join(cachedNodeModulesPath, path))
 
     for (const cachedNodeModulesPathItem of absoluteCachedNodeModulesPaths) {
       // TODO what is this
-      const relativePath = cachedNodeModulesPathItem.replace(join(cacheDir, cacheKey), '').replace(/^\/+/, '')
-      const sourceNodeModulesPath = join(cachedNodeModulesPath, relativePath)
-      const targetPath = join(repoPath, relativePath)
+      const relativePath = cachedNodeModulesPathItem.replace(Path.join(cacheDir, cacheKey), '').replace(/^\/+/, '')
+      const sourceNodeModulesPath = Path.join(cachedNodeModulesPath, relativePath)
+      const targetPath = Path.join(repoPath, relativePath)
       fileOperations.push({
         type: /** @type {'copy'} */ ('copy'),
         from: sourceNodeModulesPath,
