@@ -146,11 +146,9 @@ test('downloadVscodeCommit - tests git clone operations with mocked execa', asyn
   const testReposDir = join('/test', '.test-repos')
   const testRepoUrl = 'https://github.com/microsoft/vscode.git'
 
-  // Mock path structure using /test directory instead of root
   const reposDir = testReposDir
   const repoPath = join(reposDir, testCommitHash)
 
-  // Mock filesystem responses - repo doesn't exist initially
   mockPathExists.mockImplementation((path) => {
     if (path === reposDir) {
       return false
@@ -163,10 +161,8 @@ test('downloadVscodeCommit - tests git clone operations with mocked execa', asyn
     return false
   })
 
-  // Mock successful directory creation
   mockMkdir.mockReturnValue(undefined)
 
-  // Call the function - it should now work with mocked execa
   await downloadAndBuildVscodeFromCommit(testCommitHash, testRepoUrl, testReposDir, '/test/cache', false)
 
   // Verify that makeDirectory was called to create the repos directory
@@ -184,7 +180,6 @@ test('downloadVscodeCommit - tests git clone operations with mocked execa', asyn
 })
 
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missing node_modules', async () => {
-  // Create a temporary test directory structure
   const testCommitHash = 'test-commit-123'
   const reposDir = join('/test', '.vscode-repos')
   const repoPath = join(reposDir, testCommitHash)
@@ -192,7 +187,6 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missi
   const nodeModulesPath = join(repoPath, 'node_modules')
   const outPath = join(repoPath, 'out')
 
-  // Mock filesystem responses for missing node_modules scenario
   mockPathExists.mockImplementation((path) => {
     if (path === reposDir) {
       return false
@@ -217,10 +211,8 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missi
     return false
   })
 
-  // Mock successful directory creation
   mockMkdir.mockReturnValue(undefined)
 
-  // This should detect missing node_modules and attempt to restore from cache
   await downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, reposDir, '/test/cache', false)
 
   // Verify that installDependencies was called since cache doesn't exist
@@ -231,7 +223,6 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missi
 })
 
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with existing node_modules', async () => {
-  // Create a temporary test directory structure
   const testCommitHash = 'test-commit-456'
   const reposDir = join('/test', '.vscode-repos')
   const repoPath = join(reposDir, testCommitHash)
@@ -239,7 +230,6 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
   const nodeModulesPath = join(repoPath, 'node_modules')
   const outPath = join(repoPath, 'out')
 
-  // Mock filesystem responses for existing node_modules scenario
   mockPathExists.mockImplementation((path) => {
     if (path === reposDir) {
       return false
@@ -264,10 +254,8 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
     return false
   })
 
-  // Mock successful directory creation
   mockMkdir.mockReturnValue(undefined)
 
-  // This should detect existing node_modules and skip npm ci
   await downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, reposDir, '/test/cache', false)
 
   // Since main.js doesn't exist but node_modules does, it should still call installDependencies
