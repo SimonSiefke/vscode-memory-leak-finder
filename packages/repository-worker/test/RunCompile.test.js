@@ -2,6 +2,7 @@ import { expect, test, jest } from '@jest/globals'
 
 const mockExec = jest.fn()
 const mockPathExists = jest.fn()
+const mockLogger = jest.fn()
 
 jest.unstable_mockModule('../src/parts/Exec/Exec.js', () => ({
   exec: mockExec,
@@ -11,6 +12,10 @@ jest.unstable_mockModule('path-exists', () => ({
   pathExists: mockPathExists,
 }))
 
+jest.unstable_mockModule('../src/parts/Logger/Logger.js', () => ({
+  log: mockLogger,
+}))
+
 const { runCompile } = await import('../src/parts/RunCompile/RunCompile.js')
 
 test('runCompile executes npm run compile without nice', async () => {
@@ -18,7 +23,9 @@ test('runCompile executes npm run compile without nice', async () => {
   const useNice = false
   const mainJsPath = '/test/repo/out/main.js'
 
+  // @ts-ignore
   mockExec.mockResolvedValue({ stdout: '', stderr: '', exitCode: 0 })
+  // @ts-ignore
   mockPathExists.mockResolvedValue(true)
 
   await runCompile(cwd, useNice, mainJsPath)
@@ -32,7 +39,9 @@ test('runCompile executes npm run compile with nice', async () => {
   const useNice = true
   const mainJsPath = '/test/repo/out/main.js'
 
+  // @ts-ignore
   mockExec.mockResolvedValue({ stdout: '', stderr: '', exitCode: 0 })
+  // @ts-ignore
   mockPathExists.mockResolvedValue(true)
 
   await runCompile(cwd, useNice, mainJsPath)
@@ -46,23 +55,25 @@ test('runCompile throws error when main.js not found after compilation', async (
   const useNice = false
   const mainJsPath = '/test/repo/out/main.js'
 
+  // @ts-ignore
   mockExec.mockResolvedValue({ stdout: '', stderr: '', exitCode: 0 })
+  // @ts-ignore
   mockPathExists.mockResolvedValue(false)
 
   await expect(runCompile(cwd, useNice, mainJsPath)).rejects.toThrow('Build failed: out/main.js not found after compilation')
 })
 
 test('runCompile logs when using nice', async () => {
-  const consoleSpy = jest.spyOn(console, 'log').mockImplementation()
   const cwd = '/test/repo'
   const useNice = true
   const mainJsPath = '/test/repo/out/main.js'
 
+  // @ts-ignore
   mockExec.mockResolvedValue({ stdout: '', stderr: '', exitCode: 0 })
+  // @ts-ignore
   mockPathExists.mockResolvedValue(true)
 
   await runCompile(cwd, useNice, mainJsPath)
 
-  expect(consoleSpy).toHaveBeenCalledWith('Using nice to reduce system resource usage...')
-  consoleSpy.mockRestore()
+  expect(mockLogger).toHaveBeenCalledWith('Using nice to reduce system resource usage...')
 })
