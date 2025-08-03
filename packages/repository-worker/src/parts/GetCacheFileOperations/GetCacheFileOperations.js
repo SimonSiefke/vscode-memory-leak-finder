@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { pathToFileURL } from 'node:url'
 
 /**
  * @typedef {Object} CopyOperation
@@ -19,14 +19,14 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
  */
 
 /**
- * @param {string} repoPathUri - File URI of the repository path
+ * @param {string} repoPath - File URI of the repository path
  * @param {string} cacheKey
- * @param {string} cacheDirUri - File URI of the cache directory
- * @param {string} cachedNodeModulesPathUri - File URI of the cached node_modules path
+ * @param {string} cacheDir - File URI of the cache directory
+ * @param {string} cachedNodeModulesPath - File URI of the cached node_modules path
  * @param {string[]} nodeModulesPaths - Relative paths within the repo
  * @returns {Promise<FileOperation[]>}
  */
-export const getCacheFileOperations = async (repoPathUri, cacheKey, cacheDirUri, cachedNodeModulesPathUri, nodeModulesPaths) => {
+export const getCacheFileOperations = async (repoPath, cacheKey, cacheDir, cachedNodeModulesPath, nodeModulesPaths) => {
   console.log(`Preparing to cache node_modules tree with cache key: ${cacheKey}`)
 
   /**
@@ -34,19 +34,15 @@ export const getCacheFileOperations = async (repoPathUri, cacheKey, cacheDirUri,
    */
   const fileOperations = []
 
-  // Convert URIs to paths for path manipulation
-  const repoPath = fileURLToPath(repoPathUri)
-  const cachedNodeModulesPath = fileURLToPath(cachedNodeModulesPathUri)
-
   // Add directory creation operations
   fileOperations.push(
     {
       type: /** @type {'mkdir'} */ ('mkdir'),
-      path: cacheDirUri,
+      path: cacheDir,
     },
     {
       type: /** @type {'mkdir'} */ ('mkdir'),
-      path: cachedNodeModulesPathUri,
+      path: cachedNodeModulesPath,
     },
   )
 
