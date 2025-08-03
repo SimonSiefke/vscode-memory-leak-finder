@@ -138,11 +138,11 @@ afterEach(() => {
 test('downloadVscodeCommit - tests git clone operations with mocked execa', async () => {
   // Test that the function properly calls git clone and checkout
   const testCommitHash = 'a1b2c3d4e5f6789012345678901234567890abcd'
-  const testOutFolder = '.test-repos'
+  const testReposDir = join('/test', '.test-repos')
   const testRepoUrl = 'https://github.com/microsoft/vscode.git'
 
   // Mock path structure using /test directory instead of root
-  const reposDir = join('/test', testOutFolder)
+  const reposDir = testReposDir
   const repoPath = join(reposDir, testCommitHash)
 
   // Mock filesystem responses - repo doesn't exist initially
@@ -159,16 +159,16 @@ test('downloadVscodeCommit - tests git clone operations with mocked execa', asyn
   const { downloadAndBuildVscodeFromCommit } = await import('../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js')
 
   // Call the function - it should now work with mocked execa
-  await downloadAndBuildVscodeFromCommit(testCommitHash, testRepoUrl, testOutFolder, '/test/cache', false)
+  await downloadAndBuildVscodeFromCommit(testCommitHash, testRepoUrl, testReposDir, '/test/cache', false)
 
   // Verify that mkdir was called to create the repos directory
   expect(mockMkdir).toHaveBeenCalledWith(reposDir, { recursive: true })
 
-  // Verify that execa was called for git clone
-  expect(mockExeca).toHaveBeenCalledWith('git', ['clone', testRepoUrl, repoPath])
+  // Verify that cloneRepository was called
+  expect(mockCloneRepository).toHaveBeenCalledWith(testRepoUrl, repoPath)
 
-  // Verify that execa was called for git checkout
-  expect(mockExeca).toHaveBeenCalledWith('git', ['checkout', testCommitHash], { cwd: repoPath })
+  // Verify that checkoutCommit was called
+  expect(mockCheckoutCommit).toHaveBeenCalledWith(repoPath, testCommitHash)
 })
 
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missing node_modules', async () => {
@@ -197,10 +197,10 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missi
   const { downloadAndBuildVscodeFromCommit } = await import('../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js')
 
   // This should detect missing node_modules and attempt to restore from cache
-  // Since we're in a test environment, it will likely fail gracefully
-  await expect(
-    downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, DEFAULT_REPOS_DIR, '/test/cache', false),
-  ).rejects.toThrow()
+  await downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, reposDir, '/test/cache', false)
+
+  // Verify that installDependencies was called since cache doesn't exist
+  expect(mockInstallDependencies).toHaveBeenCalled()
 })
 
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with existing node_modules', async () => {
@@ -229,10 +229,10 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
   const { downloadAndBuildVscodeFromCommit } = await import('../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js')
 
   // This should detect existing node_modules and skip npm ci
-  // Since we're in a test environment, it will likely fail gracefully
-  await expect(
-    downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, DEFAULT_REPOS_DIR, '/test/cache', false),
-  ).rejects.toThrow()
+  await downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, reposDir, '/test/cache', false)
+
+  // Verify that installDependencies was NOT called since node_modules exists
+  expect(mockInstallDependencies).not.toHaveBeenCalled()
 })
 
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with existing out folder', async () => {
@@ -257,9 +257,12 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
   // Mock successful directory creation
   mockMkdir.mockResolvedValue(undefined)
 
+  // Import the function dynamically after mocks are set up
+  const { downloadAndBuildVscodeFromCommit } = await import('../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js')
+
   // This should detect existing out folder and skip compilation
-  // Since we're in a test environment, it will likely fail gracefully
-  await expect(
-    downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, DEFAULT_REPOS_DIR, '/test/cache', false),
-  ).rejects.toThrow()
+  await downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, reposDir, '/test/cache', false)
+
+  // Verify that runCompile was NOT called since out folder exists
+  expect(mockRunCompile).not.toHaveBeenCalled()
 })
