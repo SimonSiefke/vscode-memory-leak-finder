@@ -5,7 +5,9 @@ import * as MemoryLeakFinderStart from '../MemoryLeakFinderStart/MemoryLeakFinde
 import * as MemoryLeakFinderStop from '../MemoryLeakFinderStop/MemoryLeakFinderStop.js'
 import * as MemoryLeakWorkerCommandType from '../MemoryLeakWorkerCommandType/MemoryLeakWorkerCommandType.js'
 
-export const commandMap: Record<string, (...args: any[]) => any> = {
+import type { CommandFunction } from '../Types/Types.js'
+
+export const commandMap: Record<string, CommandFunction> = {
   [MemoryLeakWorkerCommandType.ConnectDevtools]: ConnectDevtools.connectDevtools,
   [MemoryLeakWorkerCommandType.MemoryLeakFinderCompare]: MemoryLeakFinderCompare.compare,
   [MemoryLeakWorkerCommandType.MemoryLeakFinderSetup]: MemoryLeakFinderSetup.setup,

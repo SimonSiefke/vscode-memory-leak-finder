@@ -8,9 +8,10 @@
     "moduleResolution": "NodeNext",
     "isolatedModules": true,
     "strict": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "skipLibCheck": true,
-    "noEmit": true,
+    "noEmit": false,
+    "outDir": "dist",
     "allowSyntheticDefaultImports": true,
     "assumeChangesOnlyAffectDirectDependencies": true,
     "resolveJsonModule": true,
@@ -20,5 +21,6 @@
     "noUnusedLocals": false,
     "composite": true
   },
-  "include": ["src", "test"]
+  "include": ["src"],
+  "exclude": ["test"]
 }

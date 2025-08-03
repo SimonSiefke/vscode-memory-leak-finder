@@ -1,4 +1,4 @@
-type CommandFunction = (...args: any[]) => any
+import type { CommandFunction } from '../Types/Types.js'
 
 interface State {
   commands: Record<string, CommandFunction>
