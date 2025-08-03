@@ -1,5 +1,6 @@
 import { VError } from '@lvce-editor/verror'
 import { copy, makeDirectory, remove } from '../Filesystem/Filesystem.js'
+import * as Logger from '../Logger/Logger.js'
 
 /**
  * @typedef {Object} CopyOperation
@@ -34,7 +35,7 @@ export const applyFileOperation = async (operation) => {
         const fromPath = operation.from
         const toPath = operation.to
         await copy(fromPath, toPath)
-        console.log(`Copied: ${operation.from} -> ${operation.to}`)
+        Logger.log(`Copied: ${operation.from} -> ${operation.to}`)
 
         break
       }
@@ -42,7 +43,7 @@ export const applyFileOperation = async (operation) => {
       case 'remove': {
         const fromPath = operation.from
         await remove(fromPath)
-        console.log(`Removed: ${operation.from}`)
+        Logger.log(`Removed: ${operation.from}`)
 
         break
       }
@@ -50,7 +51,7 @@ export const applyFileOperation = async (operation) => {
       case 'mkdir': {
         const { path } = operation
         await makeDirectory(path)
-        console.log(`Created directory: ${operation.path}`)
+        Logger.log(`Created directory: ${operation.path}`)
 
         break
       }
