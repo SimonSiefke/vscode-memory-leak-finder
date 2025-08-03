@@ -1,5 +1,5 @@
 import { VError } from '@lvce-editor/verror'
-import { findFiles } from '../Filesystem/Filesystem.js'
+import * as Filesystem from '../Filesystem/Filesystem.js'
 import { join } from 'node:path'
 import * as ApplyFileOperations from '../ApplyFileOperations/ApplyFileOperations.js'
 import * as GetRestoreFileOperations from '../GetRestoreFileOperations/GetRestoreFileOperations.js'
@@ -8,7 +8,7 @@ import * as GetRestoreFileOperations from '../GetRestoreFileOperations/GetRestor
  * @param {string} cachedNodeModulesPath
  */
 const findCachedNodeModulesPaths = async (cachedNodeModulesPath) => {
-  const allCachedNodeModulesPaths = await findFiles('**/node_modules', { cwd: cachedNodeModulesPath })
+  const allCachedNodeModulesPaths = await Filesystem.findFiles('**/node_modules', { cwd: cachedNodeModulesPath })
   const cachedNodeModulesPaths = allCachedNodeModulesPaths.filter((path) => !path.includes('node_modules/node_modules'))
   return cachedNodeModulesPaths
 }

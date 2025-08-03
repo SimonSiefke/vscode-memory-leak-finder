@@ -12,6 +12,7 @@ beforeEach(() => {
 
 test('findPackageLockFiles - returns empty array when no package-lock.json files found', async () => {
   // Mock findFiles to return empty results
+  // @ts-ignore
   mockFindFiles.mockResolvedValue([])
 
   const { findPackageLockFiles } = await import('../src/parts/FindPackageLockFiles/FindPackageLockFiles.js')
@@ -28,6 +29,7 @@ test('findPackageLockFiles - returns empty array when no package-lock.json files
 test('findPackageLockFiles - returns file URIs when package-lock.json files found', async () => {
   // Mock findFiles to return some package-lock.json files
   const mockPaths = ['package-lock.json', 'subdir/package-lock.json']
+  // @ts-ignore
   mockFindFiles.mockResolvedValue(mockPaths)
 
   const { findPackageLockFiles } = await import('../src/parts/FindPackageLockFiles/FindPackageLockFiles.js')
@@ -45,6 +47,7 @@ test('findPackageLockFiles - excludes node_modules package-lock.json files', asy
   // Mock findFiles to return package-lock.json files including some in node_modules
   // Since we're using the exclude option, findFiles should not return node_modules paths
   const mockPaths = ['package-lock.json', 'subdir/package-lock.json']
+  // @ts-ignore
   mockFindFiles.mockResolvedValue(mockPaths)
 
   const { findPackageLockFiles } = await import('../src/parts/FindPackageLockFiles/FindPackageLockFiles.js')
@@ -61,6 +64,7 @@ test('findPackageLockFiles - excludes node_modules package-lock.json files', asy
 
 test('findPackageLockFiles - throws VError when findFiles fails', async () => {
   // Mock findFiles to throw an error
+  // @ts-ignore
   mockFindFiles.mockRejectedValue(new Error('Permission denied'))
 
   const { findPackageLockFiles } = await import('../src/parts/FindPackageLockFiles/FindPackageLockFiles.js')

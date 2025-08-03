@@ -1,6 +1,6 @@
 import * as Filesystem from '../Filesystem/Filesystem.js'
 import { join } from 'node:path'
-import { pathExists } from 'path-exists'
+// import { pathExists } from 'path-exists' (removed)
 import * as CacheNodeModules from '../CacheNodeModules/CacheNodeModules.js'
 import * as CheckCacheExists from '../CheckCacheExists/CheckCacheExists.js'
 import * as CheckoutCommit from '../CheckoutCommit/CheckoutCommit.js'
@@ -23,17 +23,17 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, repos
   const repoPath = join(reposDir, commitHash)
 
   // Create parent directory if it doesn't exist
-  const existsReposDir = await pathExists(reposDir)
+  const existsReposDir = await Filesystem.pathExists(reposDir)
 
   // Check what's needed at the start
   const mainJsPath = join(repoPath, 'out', 'main.js')
   const nodeModulesPath = join(repoPath, 'node_modules')
   const outPath = join(repoPath, 'out')
 
-  const existsRepoPath = await pathExists(repoPath)
-  const existsMainJsPath = await pathExists(mainJsPath)
-  const existsNodeModulesPath = await pathExists(nodeModulesPath)
-  const existsOutPath = await pathExists(outPath)
+  const existsRepoPath = await Filesystem.pathExists(repoPath)
+  const existsMainJsPath = await Filesystem.pathExists(mainJsPath)
+  const existsNodeModulesPath = await Filesystem.pathExists(nodeModulesPath)
+  const existsOutPath = await Filesystem.pathExists(outPath)
 
   const needsClone = !existsRepoPath
   const needsInstall = !existsMainJsPath && !existsNodeModulesPath

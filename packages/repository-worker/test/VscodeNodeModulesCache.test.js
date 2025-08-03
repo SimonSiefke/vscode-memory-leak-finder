@@ -1,7 +1,7 @@
 import { expect, test, jest } from '@jest/globals'
 
 // Mock the filesystem functions
-const mockFindFiles = jest.fn()
+const mockFindFiles = jest.fn<Promise<string[]>, any[]>()
 const mockCopy = jest.fn()
 const mockMakeDirectory = jest.fn()
 const mockRemove = jest.fn()
