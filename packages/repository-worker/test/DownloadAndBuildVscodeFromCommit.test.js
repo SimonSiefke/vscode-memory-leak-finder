@@ -83,54 +83,54 @@ beforeEach(() => {
   jest.clearAllMocks()
   
   // Set up default mock implementations
-  mockPathExists.mockResolvedValue(false)
-  mockMkdir.mockResolvedValue(undefined)
-  mockWriteFile.mockResolvedValue(undefined)
-  mockRm.mockResolvedValue(undefined)
+  mockPathExists.mockReturnValue(false)
+  mockMkdir.mockReturnValue(undefined)
+  mockWriteFile.mockReturnValue(undefined)
+  mockRm.mockReturnValue(undefined)
   
   mockExec.mockImplementation((command, args, options) => {
     if (command === 'git' && args.includes('ls-remote')) {
       // Mock git ls-remote for resolving commit hash
-      return Promise.resolve({ 
+      return { 
         stdout: 'a1b2c3d4e5f6789012345678901234567890abcd', 
         stderr: '', 
         exitCode: 0 
-      })
+      }
     }
     if (command === 'git' && args.includes('clone')) {
       // Mock git clone
-      return Promise.resolve({ stdout: '', stderr: '', exitCode: 0 })
+      return { stdout: '', stderr: '', exitCode: 0 }
     }
     if (command === 'git' && args.includes('checkout')) {
       // Mock git checkout
-      return Promise.resolve({ stdout: '', stderr: '', exitCode: 0 })
+      return { stdout: '', stderr: '', exitCode: 0 }
     }
     // Default mock for other commands
-    return Promise.resolve({ stdout: '', stderr: '', exitCode: 0 })
+    return { stdout: '', stderr: '', exitCode: 0 }
   })
 
   mockExeca.mockImplementation((command, args, options) => {
     if (command === 'git' && args.includes('clone')) {
       // Mock git clone
-      return Promise.resolve({ stdout: '', stderr: '' })
+      return { stdout: '', stderr: '' }
     }
     if (command === 'git' && args.includes('checkout')) {
       // Mock git checkout
-      return Promise.resolve({ stdout: '', stderr: '' })
+      return { stdout: '', stderr: '' }
     }
     // Default mock for other commands
-    return Promise.resolve({ stdout: '', stderr: '' })
+    return { stdout: '', stderr: '' }
   })
 
   // Mock all dependency functions
-  mockResolveCommitHash.mockResolvedValue('a1b2c3d4e5f6789012345678901234567890abcd')
-  mockCloneRepository.mockResolvedValue(undefined)
-  mockCheckoutCommit.mockResolvedValue(undefined)
-  mockCheckCacheExists.mockResolvedValue(false)
-  mockSetupNodeModulesFromCache.mockResolvedValue(true)
-  mockInstallDependencies.mockResolvedValue(undefined)
-  mockAddNodeModulesToCache.mockResolvedValue(undefined)
-  mockRunCompile.mockResolvedValue(undefined)
+  mockResolveCommitHash.mockReturnValue('a1b2c3d4e5f6789012345678901234567890abcd')
+  mockCloneRepository.mockReturnValue(undefined)
+  mockCheckoutCommit.mockReturnValue(undefined)
+  mockCheckCacheExists.mockReturnValue(false)
+  mockSetupNodeModulesFromCache.mockReturnValue(true)
+  mockInstallDependencies.mockReturnValue(undefined)
+  mockAddNodeModulesToCache.mockReturnValue(undefined)
+  mockRunCompile.mockReturnValue(undefined)
 })
 
 afterEach(() => {
