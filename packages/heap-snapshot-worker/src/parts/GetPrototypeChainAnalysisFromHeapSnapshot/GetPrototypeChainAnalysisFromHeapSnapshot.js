@@ -1,5 +1,7 @@
 import * as Assert from '../Assert/Assert.js'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
+import * as ParseHeapSnapshotInternalNodes from '../ParseHeapSnapshotInternalNodes/ParseHeapSnapshotInternalNodes.js'
+import * as ParseHeapSnapshotInternalEdges from '../ParseHeapSnapshotInternalEdges/ParseHeapSnapshotInternalEdges.js'
 import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
 
 const MAX_EXPECTED_CHAIN_LENGTH = 10
@@ -14,10 +16,22 @@ export const getPrototypeChainAnalysisFromHeapSnapshot = async (id) => {
   const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
 
-  const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
+  // Parse the heap snapshot to get both nodes and properly typed edges
+  const { snapshot, nodes, edges, strings } = heapsnapshot
+  const { meta } = snapshot
+  const { node_types, node_fields, edge_types, edge_fields } = meta
+
+  const parsedNodes = ParseHeapSnapshotInternalNodes.parseHeapSnapshotInternalNodes(nodes, node_fields, node_types[0], strings)
+  const parsedEdges = ParseHeapSnapshotInternalEdges.parseHeapSnapshotInternalEdges(
+    edges,
+    edge_fields,
+    edge_types[0],
+    node_fields.length,
+    strings,
+  )
 
   // Find all objects and their prototype chains
-  const prototypeAnalysis = analyzePrototypeChains(parsedNodes, graph)
+  const prototypeAnalysis = analyzePrototypeChains(parsedNodes, parsedEdges)
 
   return {
     longPrototypeChains: prototypeAnalysis.longChains,
@@ -31,25 +45,26 @@ export const getPrototypeChainAnalysisFromHeapSnapshot = async (id) => {
 /**
  * Analyzes prototype chains for various issues
  */
-const analyzePrototypeChains = (parsedNodes, graph) => {
+const analyzePrototypeChains = (parsedNodes, parsedEdges) => {
   const nodeMap = createNodeMap(parsedNodes)
+  const edgeMap = createEdgeMap(parsedNodes, parsedEdges)
   const longChains = []
   const pollutionCandidates = new Map()
   const chainLengths = []
   const prototypeProperties = new Map()
   const detailedResults = [] // Store detailed info for each object
 
-    // Analyze each object's prototype chain
+  // Analyze each object's prototype chain
   // For performance, limit analysis to a sample of objects for very large heaps
   const maxObjectsToAnalyze = 1000
   const allObjectsWithPrototype = parsedNodes.filter(isObjectWithPrototype)
 
-    // Take first objects (user objects tend to be early in heap snapshot)
+  // Take first objects (user objects tend to be early in heap snapshot)
   const objectsToAnalyze = allObjectsWithPrototype.slice(0, maxObjectsToAnalyze)
 
-    for (let i = 0; i < objectsToAnalyze.length; i++) {
+  for (let i = 0; i < objectsToAnalyze.length; i++) {
     const node = objectsToAnalyze[i]
-    const chainAnalysis = analyzeNodePrototypeChain(node, graph, nodeMap)
+    const chainAnalysis = analyzeNodePrototypeChain(node, edgeMap, nodeMap)
 
     chainLengths.push(chainAnalysis.length)
 
@@ -125,7 +140,7 @@ const analyzePrototypeChains = (parsedNodes, graph) => {
 /**
  * Analyzes a single node's prototype chain
  */
-const analyzeNodePrototypeChain = (node, graph, nodeMap) => {
+const analyzeNodePrototypeChain = (node, edgeMap, nodeMap) => {
   const chain = []
   const prototypeProperties = []
   const suspiciousProperties = []
@@ -151,30 +166,33 @@ const analyzeNodePrototypeChain = (node, graph, nodeMap) => {
       nodeType: currentNode.type
     })
 
-    // Find prototype edge
-    const edges = graph[currentNode.id] || []
-    const prototypeEdge = edges.find(edge => edge.name === '__proto__' || edge.name === 'prototype')
+    // Find prototype edge - ONLY follow 'property' type edges with __proto__ name
+    const edges = edgeMap.get(currentNode.id) || []
+    const prototypeEdge = edges.find(edge =>
+      edge.type === 'property' &&
+      edge.nameOrIndex === '__proto__'
+    )
 
-            if (prototypeEdge) {
-      // The actual field is 'index', not 'to_node'
-      const targetNodeId = prototypeEdge.index || prototypeEdge.to_node
+    if (prototypeEdge) {
+      const targetNodeId = prototypeEdge.toNode
       const prototypeNode = nodeMap.get(targetNodeId)
       if (prototypeNode) {
         // Check for unusual properties on this prototype
-        const prototypeEdges = graph[prototypeNode.id] || []
+        const prototypeEdges = edgeMap.get(prototypeNode.id) || []
         for (const edge of prototypeEdges) {
-          if (isUnusualPrototypeProperty(edge.name)) {
+          // Only check property-type edges for suspicious properties
+          if (edge.type === 'property' && isUnusualPrototypeProperty(edge.nameOrIndex)) {
             prototypeProperties.push({
               prototypeName: prototypeNode.name,
-              propertyName: edge.name,
+              propertyName: edge.nameOrIndex,
               prototypeId: prototypeNode.id
             })
 
             suspiciousProperties.push({
               type: 'unusual_prototype_property',
-              propertyName: edge.name,
+              propertyName: edge.nameOrIndex,
               prototypeName: prototypeNode.name,
-              message: `Unusual property "${edge.name}" found on prototype "${prototypeNode.name}"`
+              message: `Unusual property "${edge.nameOrIndex}" found on prototype "${prototypeNode.name}"`
             })
           }
         }
@@ -206,6 +224,33 @@ const createNodeMap = (parsedNodes) => {
     nodeMap.set(node.id, node)
   }
   return nodeMap
+}
+
+/**
+ * Creates a map of node IDs to their properly typed edges
+ */
+const createEdgeMap = (parsedNodes, parsedEdges) => {
+  const edgeMap = new Map()
+
+  // Initialize empty arrays for all nodes
+  for (const node of parsedNodes) {
+    edgeMap.set(node.id, [])
+  }
+
+  // Group edges by their source node
+  let edgeIndex = 0
+  for (const node of parsedNodes) {
+    const nodeEdges = []
+    for (let i = 0; i < node.edgeCount; i++) {
+      const edge = parsedEdges[edgeIndex++]
+      if (edge) {
+        nodeEdges.push(edge)
+      }
+    }
+    edgeMap.set(node.id, nodeEdges)
+  }
+
+  return edgeMap
 }
 
 /**
