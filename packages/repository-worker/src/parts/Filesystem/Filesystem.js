@@ -1,12 +1,12 @@
 import { cp, mkdir, rm, readFile, glob } from 'node:fs/promises'
-import { pathExists } from 'path-exists'
+import { pathExists as pathExistsImport } from 'path-exists'
 
 /**
  * Checks if a path exists
  * @param {string} path
  * @returns {Promise<boolean>}
  */
-export { pathExists }
+export const pathExists = pathExistsImport
 
 /**
  * Copies a file or directory
@@ -15,7 +15,7 @@ export { pathExists }
  * @param {{recursive?: boolean, force?: boolean}} options - Copy options
  * @returns {Promise<void>}
  */
-export const copy = async (from, to, options = { recursive: true, force: true }): Promise<void> => {
+export const copy = async (from, to, options = { recursive: true, force: true }) => {
   await cp(from, to, options)
 }
 
@@ -25,7 +25,7 @@ export const copy = async (from, to, options = { recursive: true, force: true })
  * @param {{recursive?: boolean}} options - Directory creation options
  * @returns {Promise<void>}
  */
-export const makeDirectory = async (path: string, options = { recursive: true }): Promise<void> => {
+export const makeDirectory = async (path, options = { recursive: true }) => {
   await mkdir(path, options)
 }
 
@@ -35,7 +35,7 @@ export const makeDirectory = async (path: string, options = { recursive: true })
  * @param {{recursive?: boolean, force?: boolean}} options - Remove options
  * @returns {Promise<void>}
  */
-export const remove = async (path: string, options = { recursive: true, force: true }): Promise<void> => {
+export const remove = async (path, options = { recursive: true, force: true }) => {
   await rm(path, options)
 }
 
@@ -45,7 +45,7 @@ export const remove = async (path: string, options = { recursive: true, force: t
  * @param {string} encoding - File encoding (default: 'utf8')
  * @returns {Promise<string>}
  */
-export const readFileContent = async (path: string, encoding: BufferEncoding = 'utf8'): Promise<string> => {
+export const readFileContent = async (path, encoding = 'utf8') => {
   return await readFile(path, { encoding })
 }
 
@@ -55,7 +55,7 @@ export const readFileContent = async (path: string, encoding: BufferEncoding = '
  * @param {{cwd?: string, exclude?: string[]}} options - Glob options
  * @returns {Promise<string[]>}
  */
-export const findFiles = async (pattern: string, options: {cwd?: string, exclude?: string[]} = {}): Promise<string[]> => {
+export const findFiles = async (pattern, options = {}) => {
   const globIterator = glob(pattern, options)
   return await Array.fromAsync(globIterator)
 }
