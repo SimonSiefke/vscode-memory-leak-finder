@@ -16,8 +16,9 @@ jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.js', () => ({
   pathExists: mockPathExists,
 }))
 
+const { setupNodeModulesFromCache } = await import('../src/parts/SetupNodeModulesFromCache/SetupNodeModulesFromCache.js')
+
 test('setupNodeModulesFromCache - function exists and is callable', async () => {
-  const { setupNodeModulesFromCache } = await import('../src/parts/SetupNodeModulesFromCache/SetupNodeModulesFromCache.js')
   expect(typeof setupNodeModulesFromCache).toBe('function')
 })
 
@@ -25,8 +26,6 @@ test('setupNodeModulesFromCache throws VError when no cache exists', async () =>
   mockFindFiles.mockImplementation(() => {
     return Promise.reject(new Error('ENOENT: no such file or directory'))
   })
-
-  const { setupNodeModulesFromCache } = await import('../src/parts/SetupNodeModulesFromCache/SetupNodeModulesFromCache.js')
 
   await expect(setupNodeModulesFromCache('/nonexistent/path', 'test-commit', '/test/cache')).rejects.toThrow(
     'Failed to setup node_modules from cache',
