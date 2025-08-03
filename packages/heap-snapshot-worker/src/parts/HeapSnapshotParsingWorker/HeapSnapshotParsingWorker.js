@@ -81,7 +81,7 @@ export class HeapSnapshotParsingWorker {
     console.log(`[HeapSnapshotParsingWorker] Sending message at: ${sendTime.toFixed(2)}ms`)
     this.worker.postMessage({
       id,
-      method: 'HeapSnapshotParsing.parse',
+      method: 'HeapSnapshot.parse',
       params: [path],
     })
 
