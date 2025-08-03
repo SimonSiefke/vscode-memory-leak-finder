@@ -19,6 +19,16 @@ const mockExeca = jest.fn()
 // Mock exec function
 const mockExec = jest.fn()
 
+// Mock all the dependencies
+const mockAddNodeModulesToCache = jest.fn()
+const mockCheckCacheExists = jest.fn()
+const mockCheckoutCommit = jest.fn()
+const mockCloneRepository = jest.fn()
+const mockInstallDependencies = jest.fn()
+const mockResolveCommitHash = jest.fn()
+const mockRunCompile = jest.fn()
+const mockSetupNodeModulesFromCache = jest.fn()
+
 jest.unstable_mockModule('path-exists', () => ({
   pathExists: mockPathExists,
 }))
@@ -37,8 +47,90 @@ jest.unstable_mockModule('../src/parts/Exec/Exec.js', () => ({
   exec: mockExec,
 }))
 
+jest.unstable_mockModule('../src/parts/CacheNodeModules/CacheNodeModules.js', () => ({
+  addNodeModulesToCache: mockAddNodeModulesToCache,
+}))
+
+jest.unstable_mockModule('../src/parts/CheckCacheExists/CheckCacheExists.js', () => ({
+  checkCacheExists: mockCheckCacheExists,
+}))
+
+jest.unstable_mockModule('../src/parts/CheckoutCommit/CheckoutCommit.js', () => ({
+  checkoutCommit: mockCheckoutCommit,
+}))
+
+jest.unstable_mockModule('../src/parts/CloneRepository/CloneRepository.js', () => ({
+  cloneRepository: mockCloneRepository,
+}))
+
+jest.unstable_mockModule('../src/parts/InstallDependencies/InstallDependencies.js', () => ({
+  installDependencies: mockInstallDependencies,
+}))
+
+jest.unstable_mockModule('../src/parts/ResolveCommitHash/ResolveCommitHash.js', () => ({
+  resolveCommitHash: mockResolveCommitHash,
+}))
+
+jest.unstable_mockModule('../src/parts/RunCompile/RunCompile.js', () => ({
+  runCompile: mockRunCompile,
+}))
+
+jest.unstable_mockModule('../src/parts/SetupNodeModulesFromCache/SetupNodeModulesFromCache.js', () => ({
+  setupNodeModulesFromCache: mockSetupNodeModulesFromCache,
+}))
+
 beforeEach(() => {
   jest.clearAllMocks()
+  
+  // Set up default mock implementations
+  mockPathExists.mockResolvedValue(false)
+  mockMkdir.mockResolvedValue(undefined)
+  mockWriteFile.mockResolvedValue(undefined)
+  mockRm.mockResolvedValue(undefined)
+  
+  mockExec.mockImplementation((command, args, options) => {
+    if (command === 'git' && args.includes('ls-remote')) {
+      // Mock git ls-remote for resolving commit hash
+      return Promise.resolve({ 
+        stdout: 'a1b2c3d4e5f6789012345678901234567890abcd', 
+        stderr: '', 
+        exitCode: 0 
+      })
+    }
+    if (command === 'git' && args.includes('clone')) {
+      // Mock git clone
+      return Promise.resolve({ stdout: '', stderr: '', exitCode: 0 })
+    }
+    if (command === 'git' && args.includes('checkout')) {
+      // Mock git checkout
+      return Promise.resolve({ stdout: '', stderr: '', exitCode: 0 })
+    }
+    // Default mock for other commands
+    return Promise.resolve({ stdout: '', stderr: '', exitCode: 0 })
+  })
+
+  mockExeca.mockImplementation((command, args, options) => {
+    if (command === 'git' && args.includes('clone')) {
+      // Mock git clone
+      return Promise.resolve({ stdout: '', stderr: '' })
+    }
+    if (command === 'git' && args.includes('checkout')) {
+      // Mock git checkout
+      return Promise.resolve({ stdout: '', stderr: '' })
+    }
+    // Default mock for other commands
+    return Promise.resolve({ stdout: '', stderr: '' })
+  })
+
+  // Mock all dependency functions
+  mockResolveCommitHash.mockResolvedValue('a1b2c3d4e5f6789012345678901234567890abcd')
+  mockCloneRepository.mockResolvedValue(undefined)
+  mockCheckoutCommit.mockResolvedValue(undefined)
+  mockCheckCacheExists.mockResolvedValue(false)
+  mockSetupNodeModulesFromCache.mockResolvedValue(true)
+  mockInstallDependencies.mockResolvedValue(undefined)
+  mockAddNodeModulesToCache.mockResolvedValue(undefined)
+  mockRunCompile.mockResolvedValue(undefined)
 })
 
 afterEach(() => {
@@ -47,7 +139,7 @@ afterEach(() => {
 
 test('downloadVscodeCommit - tests git clone operations with mocked execa', async () => {
   // Test that the function properly calls git clone and checkout
-  const testCommitHash = 'test-commit-download'
+  const testCommitHash = 'a1b2c3d4e5f6789012345678901234567890abcd'
   const testOutFolder = '.test-repos'
   const testRepoUrl = 'https://github.com/microsoft/vscode.git'
 
@@ -64,24 +156,6 @@ test('downloadVscodeCommit - tests git clone operations with mocked execa', asyn
 
   // Mock successful directory creation
   mockMkdir.mockResolvedValue(undefined)
-
-  // Mock successful git operations
-  mockExeca.mockImplementation((command, args, options) => {
-    if (command === 'git' && args.includes('rev-parse')) {
-      // Mock git rev-parse for resolving commit hash
-      return Promise.resolve({ stdout: 'a1b2c3d4e5f6789012345678901234567890abcd', stderr: '' })
-    }
-    if (command === 'git' && args.includes('clone')) {
-      // Mock git clone
-      return Promise.resolve({ stdout: '', stderr: '' })
-    }
-    if (command === 'git' && args.includes('checkout')) {
-      // Mock git checkout
-      return Promise.resolve({ stdout: '', stderr: '' })
-    }
-    // Default mock for other commands
-    return Promise.resolve({ stdout: '', stderr: '' })
-  })
 
   // Call the function - it should now work with mocked execa
   await downloadAndBuildVscodeFromCommit(testCommitHash, testRepoUrl, testOutFolder, '/test/cache', false)
@@ -118,24 +192,6 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missi
   // Mock successful directory creation
   mockMkdir.mockResolvedValue(undefined)
 
-  // Mock successful git operations
-  mockExeca.mockImplementation((command, args, options) => {
-    if (command === 'git' && args.includes('rev-parse')) {
-      // Mock git rev-parse for resolving commit hash
-      return Promise.resolve({ stdout: 'a1b2c3d4e5f6789012345678901234567890abcd', stderr: '' })
-    }
-    if (command === 'git' && args.includes('clone')) {
-      // Mock git clone
-      return Promise.resolve({ stdout: '', stderr: '' })
-    }
-    if (command === 'git' && args.includes('checkout')) {
-      // Mock git checkout
-      return Promise.resolve({ stdout: '', stderr: '' })
-    }
-    // Default mock for other commands
-    return Promise.resolve({ stdout: '', stderr: '' })
-  })
-
   // This should detect missing node_modules and attempt to restore from cache
   // Since we're in a test environment, it will likely fail gracefully
   await expect(
@@ -165,24 +221,6 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
   // Mock successful directory creation
   mockMkdir.mockResolvedValue(undefined)
 
-  // Mock successful git operations
-  mockExeca.mockImplementation((command, args, options) => {
-    if (command === 'git' && args.includes('rev-parse')) {
-      // Mock git rev-parse for resolving commit hash
-      return Promise.resolve({ stdout: 'a1b2c3d4e5f6789012345678901234567890abcd', stderr: '' })
-    }
-    if (command === 'git' && args.includes('clone')) {
-      // Mock git clone
-      return Promise.resolve({ stdout: '', stderr: '' })
-    }
-    if (command === 'git' && args.includes('checkout')) {
-      // Mock git checkout
-      return Promise.resolve({ stdout: '', stderr: '' })
-    }
-    // Default mock for other commands
-    return Promise.resolve({ stdout: '', stderr: '' })
-  })
-
   // This should detect existing node_modules and skip npm ci
   // Since we're in a test environment, it will likely fail gracefully
   await expect(
@@ -211,24 +249,6 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
 
   // Mock successful directory creation
   mockMkdir.mockResolvedValue(undefined)
-
-  // Mock successful git operations
-  mockExeca.mockImplementation((command, args, options) => {
-    if (command === 'git' && args.includes('rev-parse')) {
-      // Mock git rev-parse for resolving commit hash
-      return Promise.resolve({ stdout: 'a1b2c3d4e5f6789012345678901234567890abcd', stderr: '' })
-    }
-    if (command === 'git' && args.includes('clone')) {
-      // Mock git clone
-      return Promise.resolve({ stdout: '', stderr: '' })
-    }
-    if (command === 'git' && args.includes('checkout')) {
-      // Mock git checkout
-      return Promise.resolve({ stdout: '', stderr: '' })
-    }
-    // Default mock for other commands
-    return Promise.resolve({ stdout: '', stderr: '' })
-  })
 
   // This should detect existing out folder and skip compilation
   // Since we're in a test environment, it will likely fail gracefully
