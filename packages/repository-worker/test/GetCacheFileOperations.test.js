@@ -19,31 +19,27 @@ test('getCacheFileOperations returns empty array when no nodeModulesPaths provid
 test('getCacheFileOperations creates correct file operations for single node_modules path', async () => {
   const result = await getCacheFileOperations('/repo/path', 'cache-key', '/cache/dir', '/cache/dir/cache-key', ['node_modules'])
 
-  expect(Array.isArray(result)).toBe(true)
-  expect(result).toHaveLength(4) // 2 mkdir + 1 mkdir for parent + 1 copy
+  const expected = [
+    {
+      type: 'mkdir',
+      path: '/cache/dir',
+    },
+    {
+      type: 'mkdir',
+      path: '/cache/dir/cache-key',
+    },
+    {
+      type: 'mkdir',
+      path: '/cache/dir/cache-key',
+    },
+    {
+      type: 'copy',
+      from: '/repo/path/node_modules',
+      to: '/cache/dir/cache-key/node_modules',
+    },
+  ]
 
-  // Check directory creation operations
-  expect(result[0]).toEqual({
-    type: 'mkdir',
-    path: '/cache/dir',
-  })
-  expect(result[1]).toEqual({
-    type: 'mkdir',
-    path: '/cache/dir/cache-key',
-  })
-
-  // Check parent directory creation
-  expect(result[2]).toEqual({
-    type: 'mkdir',
-    path: '/cache/dir/cache-key',
-  })
-
-  // Check copy operation
-  expect(result[3]).toEqual({
-    type: 'copy',
-    from: '/repo/path/node_modules',
-    to: '/cache/dir/cache-key/node_modules',
-  })
+  expect(result).toEqual(expected)
 })
 
 test('getCacheFileOperations handles multiple node_modules paths', async () => {
