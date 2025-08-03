@@ -1,17 +1,25 @@
-import { expect, test } from '@jest/globals'
-import { setupNodeModulesFromCache } from '../src/parts/SetupNodeModulesFromCache/SetupNodeModulesFromCache.js'
-import { addNodeModulesToCache } from '../src/parts/CacheNodeModules/CacheNodeModules.js'
+import { expect, test, jest } from '@jest/globals'
+
+// Mock the findFiles function to throw an error
+const mockFindFiles = jest.fn()
+jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.js', () => ({
+  findFiles: mockFindFiles,
+}))
 
 test('setupNodeModulesFromCache - function exists and is callable', async () => {
+  const { setupNodeModulesFromCache } = await import('../src/parts/SetupNodeModulesFromCache/SetupNodeModulesFromCache.js')
   expect(typeof setupNodeModulesFromCache).toBe('function')
 })
 
 test('addNodeModulesToCache - function exists and is callable', async () => {
+  const { addNodeModulesToCache } = await import('../src/parts/CacheNodeModules/CacheNodeModules.js')
   expect(typeof addNodeModulesToCache).toBe('function')
 })
 
-test('setupNodeModulesFromCache returns false when no cache exists', async () => {
-  // This should return false (not throw) when no cache exists
-  const result = await setupNodeModulesFromCache('/nonexistent/path', 'test-commit', '/test/cache')
-  expect(result).toBe(false)
+test('setupNodeModulesFromCache throws VError when no cache exists', async () => {
+  // Mock findFiles to throw an error
+  mockFindFiles.mockRejectedValue(new Error('ENOENT: no such file or directory'))
+  
+  // This should throw VError when no cache exists
+  await expect(setupNodeModulesFromCache('/nonexistent/path', 'test-commit', '/test/cache')).rejects.toThrow('Failed to setup node_modules from cache')
 })

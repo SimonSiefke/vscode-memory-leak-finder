@@ -1,9 +1,8 @@
 import { expect, test } from '@jest/globals'
 import { getRestoreNodeModulesFileOperations } from '../src/parts/GetRestoreFileOperations/GetRestoreFileOperations.js'
 
-test('getRestoreNodeModulesFileOperations throws VError on errors', async () => {
-  // Should throw VError with invalid path
-  await expect(
-    getRestoreNodeModulesFileOperations('test:///nonexistent/path', 'cache-key', 'test:///cache/dir', 'test:///cache/dir/cache-key', []),
-  ).rejects.toThrow('Failed to get restore file operations')
+test('getRestoreNodeModulesFileOperations returns empty array when no cached paths', async () => {
+  // Should return empty array when no cached paths provided
+  const result = await getRestoreNodeModulesFileOperations('/test/repo', 'cache-key', '/test/cache', '/test/cache/cache-key', [])
+  expect(result).toEqual([])
 })

@@ -31,10 +31,10 @@ jest.unstable_mockModule('path-exists', () => ({
   pathExists: mockPathExists,
 }))
 
-jest.unstable_mockModule('node:fs/promises', () => ({
-  mkdir: mockMkdir,
+jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.js', () => ({
+  makeDirectory: mockMkdir,
   writeFile: mockWriteFile,
-  rm: mockRm,
+  remove: mockRm,
 }))
 
 jest.unstable_mockModule('execa', () => ({
@@ -169,8 +169,8 @@ test('downloadVscodeCommit - tests git clone operations with mocked execa', asyn
   // Call the function - it should now work with mocked execa
   await downloadAndBuildVscodeFromCommit(testCommitHash, testRepoUrl, testReposDir, '/test/cache', false)
 
-  // Verify that mkdir was called to create the repos directory
-  expect(mockMkdir).toHaveBeenCalledWith(reposDir, { recursive: true })
+  // Verify that makeDirectory was called to create the repos directory
+  expect(mockMkdir).toHaveBeenCalledWith(reposDir)
 
   // Verify that cloneRepository was called
   expect(mockCloneRepository).toHaveBeenCalledWith(testRepoUrl, repoPath)
