@@ -1,5 +1,4 @@
 import { join } from 'node:path'
-import { pathToFileURL } from 'node:url'
 
 /**
  * @typedef {Object} CopyOperation
@@ -53,23 +52,17 @@ export const getCacheFileOperations = async (repoPath, cacheKey, cacheDir, cache
     // Calculate relative path from repo root to maintain directory structure
     const relativePath = nodeModulesPath.replace(repoPath, '').replace(/^\/+/, '')
     const cacheTargetPath = join(cachedNodeModulesPath, relativePath)
-
-    // Convert to file URIs using pathToFileURL for absolute paths
-    const nodeModulesPathUri = pathToFileURL(nodeModulesPath).href
-    const cacheTargetPathUri = pathToFileURL(cacheTargetPath).href
-
     // Add parent directory creation operation
     const parentDir = join(cacheTargetPath, '..')
-    const parentDirUri = pathToFileURL(parentDir).href
     fileOperations.push(
       {
         type: /** @type {'mkdir'} */ ('mkdir'),
-        path: parentDirUri,
+        path: parentDir,
       },
       {
         type: /** @type {'copy'} */ ('copy'),
-        from: nodeModulesPathUri,
-        to: cacheTargetPathUri,
+        from: nodeModulesPath,
+        to: cacheTargetPath,
       },
     )
   }
