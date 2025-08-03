@@ -171,16 +171,36 @@ test('getCacheFileOperations handles Windows-style paths', async () => {
   // We need to check what the actual output is
   expect(result).toHaveLength(6) // 2 mkdir + 2 mkdir for parents + 2 copy operations
 
-  expect(result[0].type).toBe('mkdir')
-  expect(result[1].type).toBe('mkdir')
-  expect(result[2].type).toBe('mkdir')
-  expect(result[3].type).toBe('copy')
-  expect(result[3].from).toMatch(/file:\/\/.*node_modules$/)
-  expect(result[3].to).toMatch(/file:\/\/.*node_modules$/)
-  expect(result[4].type).toBe('mkdir')
-  expect(result[5].type).toBe('copy')
-  expect(result[5].from).toMatch(/file:\/\/.*packages.*node_modules$/)
-  expect(result[5].to).toMatch(/file:\/\/.*packages.*node_modules$/)
+  const expected = [
+    {
+      type: 'mkdir',
+      path: expect.stringMatching(/file:\/\/.*cache.*dir$/),
+    },
+    {
+      type: 'mkdir',
+      path: expect.stringMatching(/file:\/\/.*cache.*dir.*cache-key$/),
+    },
+    {
+      type: 'mkdir',
+      path: expect.stringMatching(/file:\/\/.*cache.*dir.*cache-key$/),
+    },
+    {
+      type: 'copy',
+      from: expect.stringMatching(/file:\/\/.*node_modules$/),
+      to: expect.stringMatching(/file:\/\/.*node_modules$/),
+    },
+    {
+      type: 'mkdir',
+      path: expect.stringMatching(/file:\/\/.*packages.*a$/),
+    },
+    {
+      type: 'copy',
+      from: expect.stringMatching(/file:\/\/.*packages.*node_modules$/),
+      to: expect.stringMatching(/file:\/\/.*packages.*node_modules$/),
+    },
+  ]
+
+  expect(result).toEqual(expected)
 })
 
 test('getCacheFileOperations handles special characters in paths', async () => {
