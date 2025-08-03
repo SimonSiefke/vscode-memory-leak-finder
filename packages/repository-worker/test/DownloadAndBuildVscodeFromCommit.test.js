@@ -141,8 +141,8 @@ test('downloadVscodeCommit - tests git clone operations with mocked execa', asyn
   const testOutFolder = '.test-repos'
   const testRepoUrl = 'https://github.com/microsoft/vscode.git'
 
-  // Mock path structure
-  const reposDir = join(Root.root, testOutFolder)
+  // Mock path structure using /test directory instead of root
+  const reposDir = join('/test', testOutFolder)
   const repoPath = join(reposDir, testCommitHash)
 
   // Mock filesystem responses - repo doesn't exist initially
@@ -157,7 +157,7 @@ test('downloadVscodeCommit - tests git clone operations with mocked execa', asyn
 
   // Import the function dynamically after mocks are set up
   const { downloadAndBuildVscodeFromCommit } = await import('../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js')
-  
+
   // Call the function - it should now work with mocked execa
   await downloadAndBuildVscodeFromCommit(testCommitHash, testRepoUrl, testOutFolder, '/test/cache', false)
 
@@ -174,7 +174,7 @@ test('downloadVscodeCommit - tests git clone operations with mocked execa', asyn
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missing node_modules', async () => {
   // Create a temporary test directory structure
   const testCommitHash = 'test-commit-123'
-  const reposDir = join(Root.root, '.vscode-repos')
+  const reposDir = join('/test', '.vscode-repos')
   const repoPath = join(reposDir, testCommitHash)
   const mainJsPath = join(repoPath, 'out', 'main.js')
   const nodeModulesPath = join(repoPath, 'node_modules')
@@ -195,7 +195,7 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missi
 
   // Import the function dynamically after mocks are set up
   const { downloadAndBuildVscodeFromCommit } = await import('../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js')
-  
+
   // This should detect missing node_modules and attempt to restore from cache
   // Since we're in a test environment, it will likely fail gracefully
   await expect(
@@ -206,7 +206,7 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missi
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with existing node_modules', async () => {
   // Create a temporary test directory structure
   const testCommitHash = 'test-commit-456'
-  const reposDir = join(Root.root, '.vscode-repos')
+  const reposDir = join('/test', '.vscode-repos')
   const repoPath = join(reposDir, testCommitHash)
   const mainJsPath = join(repoPath, 'out', 'main.js')
   const nodeModulesPath = join(repoPath, 'node_modules')
@@ -227,7 +227,7 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
 
   // Import the function dynamically after mocks are set up
   const { downloadAndBuildVscodeFromCommit } = await import('../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js')
-  
+
   // This should detect existing node_modules and skip npm ci
   // Since we're in a test environment, it will likely fail gracefully
   await expect(
@@ -238,7 +238,7 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with existing out folder', async () => {
   // Create a temporary test directory structure
   const testCommitHash = 'test-commit-789'
-  const reposDir = join(Root.root, '.vscode-repos')
+  const reposDir = join('/test', '.vscode-repos')
   const repoPath = join(reposDir, testCommitHash)
   const mainJsPath = join(repoPath, 'out', 'main.js')
   const nodeModulesPath = join(repoPath, 'node_modules')
