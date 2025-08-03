@@ -22,9 +22,6 @@ export const getRegexpObjectsFromHeapSnapshot = async (pathUri) => {
   const typeFieldIndex = node_fields.indexOf('type')
   const nameFieldIndex = node_fields.indexOf('name')
   const idFieldIndex = node_fields.indexOf('id')
-  const selfSizeFieldIndex = node_fields.indexOf('self_size')
-  const edgeCountFieldIndex = node_fields.indexOf('edge_count')
-  const detachedFieldIndex = node_fields.indexOf('detachedness')
 
   if (regexpTypeIndex === -1) {
     return []
@@ -37,20 +34,11 @@ export const getRegexpObjectsFromHeapSnapshot = async (pathUri) => {
     if (typeIndex === regexpTypeIndex) {
       const nameIndex = nodes[i + nameFieldIndex]
       const id = nodes[i + idFieldIndex]
-      const selfSize = nodes[i + selfSizeFieldIndex]
-      const edgeCount = nodes[i + edgeCountFieldIndex]
-      const detachedness = nodes[i + detachedFieldIndex]
-
       const pattern = strings[nameIndex] || ''
 
       regexpObjects.push({
         id,
-        name: pattern,
         pattern,
-        selfSize,
-        edgeCount,
-        traceNodeId: 0, // Not available in this heap snapshot format
-        detachedness,
       })
     }
   }
