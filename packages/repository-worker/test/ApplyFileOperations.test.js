@@ -1,5 +1,4 @@
-import { Buffer } from 'node:buffer'
-import { test, expect, jest, beforeEach } from '@jest/globals'
+import { beforeEach, expect, jest, test } from '@jest/globals'
 
 // Mock the filesystem functions
 const mockCopy = jest.fn()
