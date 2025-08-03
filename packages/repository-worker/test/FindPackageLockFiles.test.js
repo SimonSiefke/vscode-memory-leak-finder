@@ -1,5 +1,4 @@
 import { test, expect, jest, beforeEach } from '@jest/globals'
-import { pathToFileURL } from 'node:url'
 
 // Mock the glob function
 const mockGlob = jest.fn()
