@@ -18,10 +18,10 @@ import { join } from 'node:path'
  */
 
 /**
- * @param {string} repoPath - File URI of the repository path
+ * @param {string} repoPath - File path of the repository
  * @param {string} cacheKey
- * @param {string} cacheDir - File URI of the cache directory
- * @param {string} cachedNodeModulesPath - File URI of the cached node_modules path
+ * @param {string} cacheDir - File path of the cache directory
+ * @param {string} cachedNodeModulesPath - File path of the cached node_modules path
  * @param {string[]} nodeModulesPaths - Relative paths within the repo
  * @returns {Promise<FileOperation[]>}
  */

@@ -167,36 +167,32 @@ test('getCacheFileOperations handles Windows-style paths', async () => {
     ['node_modules', String.raw`packages\a\node_modules`],
   )
 
-  // The actual result will have the Windows paths converted to file URIs
-  // We need to check what the actual output is
-  expect(result).toHaveLength(6) // 2 mkdir + 2 mkdir for parents + 2 copy operations
-
   const expected = [
     {
       type: 'mkdir',
-      path: expect.stringMatching(/file:\/\/.*cache.*dir$/),
+      path: 'C:\\cache\\dir',
     },
     {
       type: 'mkdir',
-      path: expect.stringMatching(/file:\/\/.*cache.*dir.*cache-key$/),
+      path: 'C:\\cache\\dir\\cache-key',
     },
     {
       type: 'mkdir',
-      path: expect.stringMatching(/file:\/\/.*cache.*dir.*cache-key$/),
+      path: 'C:\\cache\\dir\\cache-key',
     },
     {
       type: 'copy',
-      from: expect.stringMatching(/file:\/\/.*node_modules$/),
-      to: expect.stringMatching(/file:\/\/.*node_modules$/),
+      from: 'C:\\repo\\path/node_modules',
+      to: 'C:\\cache\\dir\\cache-key/node_modules',
     },
     {
       type: 'mkdir',
-      path: expect.stringMatching(/file:\/\/.*packages.*a$/),
+      path: 'C:\\cache\\dir\\cache-key',
     },
     {
       type: 'copy',
-      from: expect.stringMatching(/file:\/\/.*packages.*node_modules$/),
-      to: expect.stringMatching(/file:\/\/.*packages.*node_modules$/),
+      from: 'C:\\repo\\path/packages\\a\\node_modules',
+      to: 'C:\\cache\\dir\\cache-key/packages\\a\\node_modules',
     },
   ]
 
