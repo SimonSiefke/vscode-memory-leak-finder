@@ -142,12 +142,9 @@ afterEach(() => {
   jest.resetModules()
 })
 
-// Import the function once after all mocks are set up
-let downloadAndBuildVscodeFromCommit
-beforeAll(async () => {
-  const module = await import('../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js')
-  downloadAndBuildVscodeFromCommit = module.downloadAndBuildVscodeFromCommit
-})
+const { downloadAndBuildVscodeFromCommit } = await import(
+  '../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js'
+)
 
 test('downloadVscodeCommit - tests git clone operations with mocked execa', async () => {
   // Test that the function properly calls git clone and checkout
