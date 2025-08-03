@@ -30,16 +30,16 @@ test('prepareHeapSnapshot - parses simple heap snapshot', async () => {
 
   try {
     const result = await prepareHeapSnapshot(tmpFile)
-    
+
     expect(result).toHaveProperty('metaData')
     expect(result).toHaveProperty('nodes')
     expect(result).toHaveProperty('edges')
     expect(result).toHaveProperty('locations')
-    
+
     expect(result.nodes).toBeInstanceOf(Uint32Array)
     expect(result.edges).toBeInstanceOf(Uint32Array)
     expect(result.locations).toBeInstanceOf(Uint32Array)
-    
+
     expect(result.nodes.length).toBe(7) // 1 node * 7 fields
     expect(result.edges.length).toBe(0) // 0 edges
     expect(result.locations.length).toBe(0) // 0 locations

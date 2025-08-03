@@ -7,7 +7,7 @@ import { HeapSnapshotParsingWorker } from '../HeapSnapshotParsingWorker/HeapSnap
  */
 export const prepareHeapSnapshot = async (path) => {
   const parsingWorker = new HeapSnapshotParsingWorker()
-  
+
   try {
     await parsingWorker.start()
     const result = await parsingWorker.parseHeapSnapshot(path)

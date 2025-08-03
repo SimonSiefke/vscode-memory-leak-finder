@@ -12,7 +12,7 @@ export const prepareHeapSnapshot = async (path) => {
   const writeStream = new HeapSnapshotWriteStream()
   await pipeline(readStream, writeStream)
   const { edges, metaData, nodes, locations } = writeStream.getResult()
-  
+
   return {
     metaData,
     nodes,

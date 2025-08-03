@@ -20,14 +20,14 @@ export class HeapSnapshotParsingWorker {
     }
 
     const workerPath = join(__dirname, '../../../../heap-snapshot-parsing-worker/bin/heap-snapshot-parsing-worker.js')
-    
+
     this.worker = new Worker(workerPath)
-    
+
     this.worker.on('message', (message) => {
       if (message.id && this.callbacks.has(message.id)) {
         const { resolve, reject } = this.callbacks.get(message.id)
         this.callbacks.delete(message.id)
-        
+
         if (message.error) {
           reject(new Error(message.error))
         } else {
@@ -56,11 +56,11 @@ export class HeapSnapshotParsingWorker {
     if (!this.worker) {
       throw new Error('Worker not started')
     }
-    
+
     return new Promise((resolve, reject) => {
       const id = ++this.messageId
       this.callbacks.set(id, { resolve, reject })
-      
+
       this.worker.postMessage({
         id,
         method: 'HeapSnapshotParsing.parse',

@@ -31,23 +31,23 @@ test('prepareHeapSnapshot - integration test with parsing worker', async () => {
   try {
     // Test using the parsing worker
     const result = await prepareHeapSnapshot(tmpFile)
-    
+
     // Verify the structure
     expect(result).toHaveProperty('metaData')
     expect(result).toHaveProperty('nodes')
     expect(result).toHaveProperty('edges')
     expect(result).toHaveProperty('locations')
-    
+
     // Verify types (zero-copy transfer should preserve typed arrays)
     expect(result.nodes.constructor.name).toBe('Uint32Array')
     expect(result.edges.constructor.name).toBe('Uint32Array')
     expect(result.locations.constructor.name).toBe('Uint32Array')
-    
+
     // Verify data integrity
     expect(result.nodes.length).toBe(14) // 2 nodes * 7 fields
     expect(result.edges.length).toBe(3) // 1 edge * 3 fields
     expect(result.locations.length).toBe(4) // 1 location * 4 fields
-    
+
     // Verify metadata
     expect(result.metaData.data.node_count).toBe(2)
     expect(result.metaData.data.edge_count).toBe(1)

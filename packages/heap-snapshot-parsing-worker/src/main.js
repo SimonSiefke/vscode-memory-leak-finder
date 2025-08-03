@@ -20,17 +20,17 @@ const getTransferList = (result) => {
 
 parentPort.on('message', async (message) => {
   const { id, method, params } = message
-  
+
   try {
     // Find the command handler
     const handler = commandMap[method]
     if (!handler) {
       throw new Error(`Unknown method: ${method}`)
     }
-    
+
     // Execute the command
     const result = await handler(...params)
-    
+
     // Send the result back with transfer list for zero-copy
     const transferList = getTransferList(result)
     parentPort.postMessage({ id, result }, transferList)
