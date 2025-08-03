@@ -1,14 +1,14 @@
-import { makeDirectory } from '../Filesystem/Filesystem.js'
+import * as Filesystem from '../Filesystem/Filesystem.js'
 import { join } from 'node:path'
 import { pathExists } from 'path-exists'
-import { addNodeModulesToCache } from '../CacheNodeModules/CacheNodeModules.js'
-import { checkCacheExists } from '../CheckCacheExists/CheckCacheExists.js'
-import { checkoutCommit } from '../CheckoutCommit/CheckoutCommit.js'
-import { cloneRepository } from '../CloneRepository/CloneRepository.js'
+import * as CacheNodeModules from '../CacheNodeModules/CacheNodeModules.js'
+import * as CheckCacheExists from '../CheckCacheExists/CheckCacheExists.js'
+import * as CheckoutCommit from '../CheckoutCommit/CheckoutCommit.js'
+import * as CloneRepository from '../CloneRepository/CloneRepository.js'
 import * as InstallDependencies from '../InstallDependencies/InstallDependencies.js'
 import * as ResolveCommitHash from '../ResolveCommitHash/ResolveCommitHash.js'
 import * as RunCompile from '../RunCompile/RunCompile.js'
-import { setupNodeModulesFromCache } from '../SetupNodeModulesFromCache/SetupNodeModulesFromCache.js'
+import * as SetupNodeModulesFromCache from '../SetupNodeModulesFromCache/SetupNodeModulesFromCache.js'
 import * as Logger from '../Logger/Logger.js'
 
 /**
@@ -40,23 +40,23 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, repos
   const needsCompile = !existsMainJsPath && !existsOutPath
 
   if (!existsReposDir) {
-    await makeDirectory(reposDir)
+    await Filesystem.makeDirectory(reposDir)
   }
 
   // Clone the repository if needed
   if (needsClone) {
-    await cloneRepository(repoUrl, repoPath)
-    await checkoutCommit(repoPath, commitHash)
+    await CloneRepository.cloneRepository(repoUrl, repoPath)
+    await CheckoutCommit.checkoutCommit(repoPath, commitHash)
   }
 
   if (needsInstall) {
     Logger.log(`Installing dependencies for commit ${commitHash}...`)
-    const cacheExists = await checkCacheExists(commitHash, cacheDir)
+    const cacheExists = await CheckCacheExists.checkCacheExists(commitHash, cacheDir)
     if (cacheExists) {
-      await setupNodeModulesFromCache(repoPath, commitHash, cacheDir)
+      await SetupNodeModulesFromCache.setupNodeModulesFromCache(repoPath, commitHash, cacheDir)
     } else {
       await InstallDependencies.installDependencies(repoPath, useNice)
-      await addNodeModulesToCache(repoPath, commitHash, cacheDir)
+      await CacheNodeModules.addNodeModulesToCache(repoPath, commitHash, cacheDir)
     }
   } else if (!existsMainJsPath) {
     Logger.log(`node_modules already exists in repo for commit ${commitHash}, skipping npm ci...`)
