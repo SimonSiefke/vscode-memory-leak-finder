@@ -1,4 +1,4 @@
-import { mkdir } from 'node:fs/promises'
+import { makeDirectory } from '../Filesystem/Filesystem.js'
 import { join } from 'node:path'
 import { pathExists } from 'path-exists'
 import { addNodeModulesToCache } from '../CacheNodeModules/CacheNodeModules.js'
@@ -40,7 +40,7 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, repos
   const needsCompile = !existsMainJsPath && !existsOutPath
 
   if (!existsReposDir) {
-    await mkdir(reposDir, { recursive: true })
+    await makeDirectory(reposDir)
   }
 
   // Clone the repository if needed

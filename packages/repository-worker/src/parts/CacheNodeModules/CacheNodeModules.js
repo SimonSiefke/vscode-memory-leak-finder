@@ -1,5 +1,5 @@
 import { VError } from '@lvce-editor/verror'
-import { glob } from 'node:fs/promises'
+import { findFiles } from '../Filesystem/Filesystem.js'
 import { join } from 'node:path'
 import * as ApplyFileOperations from '../ApplyFileOperations/ApplyFileOperations.js'
 import * as GetCacheFileOperations from '../GetCacheFileOperations/GetCacheFileOperations.js'
@@ -12,7 +12,7 @@ import * as GetCacheFileOperations from '../GetCacheFileOperations/GetCacheFileO
 export const addNodeModulesToCache = async (repoPath, commitHash, cacheDir) => {
   try {
     const cachedNodeModulesPath = join(cacheDir, commitHash)
-    const allNodeModulesPaths = await Array.fromAsync(glob('**/node_modules', { cwd: repoPath }))
+    const allNodeModulesPaths = await findFiles('**/node_modules', { cwd: repoPath })
     const nodeModulesPaths = allNodeModulesPaths.filter((path) => !path.includes('node_modules/node_modules') && !path.includes('.git'))
     const fileOperations = await GetCacheFileOperations.getCacheFileOperations(
       repoPath,

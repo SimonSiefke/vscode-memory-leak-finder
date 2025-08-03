@@ -1,5 +1,5 @@
 import { VError } from '@lvce-editor/verror'
-import { cp, mkdir, rm } from 'node:fs/promises'
+import { copy, makeDirectory, remove } from '../Filesystem/Filesystem.js'
 
 /**
  * @typedef {Object} CopyOperation
@@ -32,15 +32,15 @@ const applyFileOperation = async (operation) => {
     if (operation.type === 'copy') {
       const fromPath = operation.from
       const toPath = operation.to
-      await cp(fromPath, toPath, { recursive: true, force: true })
+      await copy(fromPath, toPath)
       console.log(`Copied: ${operation.from} -> ${operation.to}`)
     } else if (operation.type === 'remove') {
       const fromPath = operation.from
-      await rm(fromPath, { recursive: true, force: true })
+      await remove(fromPath)
       console.log(`Removed: ${operation.from}`)
     } else if (operation.type === 'mkdir') {
       const path = operation.path
-      await mkdir(path, { recursive: true })
+      await makeDirectory(path)
       console.log(`Created directory: ${operation.path}`)
     }
   } catch (error) {

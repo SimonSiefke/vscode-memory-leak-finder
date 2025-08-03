@@ -1,5 +1,5 @@
 import { VError } from '@lvce-editor/verror'
-import { glob } from 'node:fs/promises'
+import { findFiles } from '../Filesystem/Filesystem.js'
 import { join } from 'node:path'
 
 /**
@@ -9,11 +9,10 @@ import { join } from 'node:path'
  */
 export const findPackageLockFiles = async (folder) => {
   try {
-    const globIterator = glob('**/package-lock.json', {
+    const packageLockPaths = await findFiles('**/package-lock.json', {
       cwd: folder,
       exclude: ['**/node_modules/**'],
     })
-    const packageLockPaths = await Array.fromAsync(globIterator)
     const absolutePaths = packageLockPaths.map((path) => join(folder, path))
     return absolutePaths
   } catch (error) {
