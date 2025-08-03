@@ -8,46 +8,60 @@ const ITEMS_PER_NODE = 7
  * @returns {Promise<Array>}
  */
 export const getRegexpObjectsFromHeapSnapshot = async (pathUri) => {
-  // Read and parse the heap snapshot file to get strings
+  // Read and parse the heap snapshot file
   const content = await readFile(pathUri, 'utf8')
   const heapSnapshot = JSON.parse(content)
   const strings = heapSnapshot.strings || []
 
-  // Use prepareHeapSnapshot for fast node parsing
-  const { metaData, nodes } = await prepareHeapSnapshot(pathUri)
+  // Use the proper parsing function to get parsed nodes and graph
+  const { snapshot, nodes, edges, locations } = heapSnapshot
+  const { meta } = snapshot
+  const { node_types, node_fields, edge_types, edge_fields, location_fields } = meta
+  
+  // Import the proper parser
+  const ParseHeapSnapshotInternal = await import('../ParseHeapSnapshotInternal/ParseHeapSnapshotInternal.js')
+  const { parsedNodes, graph } = ParseHeapSnapshotInternal.parseHeapSnapshotInternal(
+    nodes,
+    node_fields,
+    node_types[0],
+    edges,
+    edge_fields,
+    edge_types[0],
+    strings,
+    locations,
+    location_fields,
+  )
 
-  const { node_types, node_fields } = metaData.data.meta
-  const regexpTypeIndex = node_types[0].indexOf('regexp')
-
-  if (regexpTypeIndex === -1) {
-    return []
-  }
-
-  const regexpObjects = []
-
-  for (let i = 0; i < nodes.length; i += ITEMS_PER_NODE) {
-    const typeIndex = nodes[i]
-    if (typeIndex === regexpTypeIndex) {
-      const nameIndex = nodes[i + 1]
-      const id = nodes[i + 2]
-      const selfSize = nodes[i + 3]
-      const edgeCount = nodes[i + 4]
-      const traceNodeId = nodes[i + 5]
-      const detachedness = nodes[i + 6]
-
-      const regexPattern = strings[nameIndex] || ''
-
-      regexpObjects.push({
-        id,
-        name: regexPattern,
-        pattern: regexPattern,
-        selfSize,
-        edgeCount,
-        traceNodeId,
-        detachedness,
-      })
-    }
-  }
+  // Filter for regexp objects
+  const regexpObjects = parsedNodes
+    .filter(node => node.type === 'regexp')
+    .map(node => {
+      // Try to find the actual regex pattern
+      let actualPattern = node.name || '<dummy>'
+      
+      // Look through edges for 'source' property
+      const nodeEdges = graph[node.id] || []
+      for (const edge of nodeEdges) {
+        if (edge.name === 'source') {
+          // Find the target node
+          const targetNode = parsedNodes.find(n => n.id === edge.index)
+          if (targetNode && targetNode.name && targetNode.name !== '<dummy>') {
+            actualPattern = targetNode.name
+            break
+          }
+        }
+      }
+      
+      return {
+        id: node.id,
+        name: actualPattern,
+        pattern: actualPattern,
+        selfSize: node.self_size || node.selfSize,
+        edgeCount: node.edge_count || node.edgeCount,
+        traceNodeId: node.trace_node_id || node.traceNodeId,
+        detachedness: node.detachedness,
+      }
+    })
 
   return regexpObjects
 }
