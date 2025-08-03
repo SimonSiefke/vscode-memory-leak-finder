@@ -41,17 +41,15 @@ export const getRestoreNodeModulesFileOperations = async (repoPath, cacheKey, ca
     const absoluteCachedNodeModulesPaths = cachedNodeModulesPaths.map((path) => join(cachedNodeModulesPath, path))
 
     for (const cachedNodeModulesPathItem of absoluteCachedNodeModulesPaths) {
-      if (await pathExists(cachedNodeModulesPathItem)) {
-        // TODO what is this
-        const relativePath = cachedNodeModulesPathItem.replace(join(cacheDir, cacheKey), '').replace(/^\/+/, '')
-        const sourceNodeModulesPath = join(cachedNodeModulesPath, relativePath)
-        const targetPath = join(repoPath, relativePath)
-        fileOperations.push({
-          type: /** @type {'copy'} */ ('copy'),
-          from: sourceNodeModulesPath,
-          to: targetPath,
-        })
-      }
+      // TODO what is this
+      const relativePath = cachedNodeModulesPathItem.replace(join(cacheDir, cacheKey), '').replace(/^\/+/, '')
+      const sourceNodeModulesPath = join(cachedNodeModulesPath, relativePath)
+      const targetPath = join(repoPath, relativePath)
+      fileOperations.push({
+        type: /** @type {'copy'} */ ('copy'),
+        from: sourceNodeModulesPath,
+        to: targetPath,
+      })
     }
 
     return fileOperations
