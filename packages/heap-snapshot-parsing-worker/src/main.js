@@ -27,10 +27,12 @@ const getTransferList = (result) => {
 }
 
 workerPort.on('message', async (message) => {
+  const messageReceiveTime = performance.now()
   const { id, method, params } = message
 
   try {
     console.log(`[ParseWorker] Received request: ${method} (id: ${id}) with params: ${params?.[0] ? 'file path provided' : 'no params'}`)
+    console.log(`[ParseWorker] Message received at: ${messageReceiveTime.toFixed(2)}ms`)
     const startTime = performance.now()
 
     // Find the command handler
@@ -45,20 +47,29 @@ workerPort.on('message', async (message) => {
     const parseTime = performance.now()
 
     console.log(`[ParseWorker] Parsing completed in ${(parseTime - startTime).toFixed(2)}ms`)
+    
+    const loggingStart = performance.now()
     console.log(`[ParseWorker] Result data sizes:`)
     console.log(`  - nodes: ${result.nodes?.length || 0} elements (${(result.nodes?.byteLength || 0) / 1024 / 1024}MB)`)
     console.log(`  - edges: ${result.edges?.length || 0} elements (${(result.edges?.byteLength || 0) / 1024 / 1024}MB)`)
     console.log(`  - locations: ${result.locations?.length || 0} elements (${(result.locations?.byteLength || 0) / 1024 / 1024}MB)`)
+    const loggingTime = performance.now()
+    console.log(`[ParseWorker] Logging took: ${(loggingTime - loggingStart).toFixed(2)}ms`)
 
     // Send the result back with transfer list for zero-copy
+    const transferListStart = performance.now()
     const transferList = getTransferList(result)
+    const transferListTime = performance.now()
+    console.log(`[ParseWorker] Transfer list creation took: ${(transferListTime - transferListStart).toFixed(2)}ms`)
     console.log(`[ParseWorker] Transferring ${transferList.length} ArrayBuffers with zero-copy`)
 
+    const postMessageStart = performance.now()
     workerPort.postMessage({ id, result }, transferList)
-    const transferTime = performance.now()
+    const postMessageTime = performance.now()
+    console.log(`[ParseWorker] postMessage call took: ${(postMessageTime - postMessageStart).toFixed(2)}ms`)
 
-    console.log(`[ParseWorker] Transfer completed in ${(transferTime - parseTime).toFixed(2)}ms`)
-    console.log(`[ParseWorker] Total time: ${(transferTime - startTime).toFixed(2)}ms`)
+    console.log(`[ParseWorker] Total post-parse overhead: ${(postMessageTime - parseTime).toFixed(2)}ms`)
+    console.log(`[ParseWorker] Total time: ${(postMessageTime - startTime).toFixed(2)}ms`)
   } catch (error) {
     console.error(`[ParseWorker] Error during parsing:`, error)
     // Send error back

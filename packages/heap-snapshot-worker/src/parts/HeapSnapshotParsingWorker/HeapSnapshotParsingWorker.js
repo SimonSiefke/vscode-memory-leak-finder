@@ -21,6 +21,9 @@ export class HeapSnapshotParsingWorker {
     this.worker = new Worker(workerPath)
 
     this.worker.on('message', (message) => {
+      const messageReceiveTime = performance.now()
+      console.log(`[HeapSnapshotParsingWorker] Received message from worker at ${messageReceiveTime.toFixed(2)}ms`)
+      
       if (message.id && this.callbacks.has(message.id)) {
         const { resolve, reject } = this.callbacks.get(message.id)
         this.callbacks.delete(message.id)
@@ -72,6 +75,8 @@ export class HeapSnapshotParsingWorker {
     })
 
     console.log(`[HeapSnapshotParsingWorker] Sending parse request to worker (id: ${id})`)
+    const sendTime = performance.now()
+    console.log(`[HeapSnapshotParsingWorker] Sending message at: ${sendTime.toFixed(2)}ms`)
     this.worker.postMessage({
       id,
       method: 'HeapSnapshotParsing.parse',
