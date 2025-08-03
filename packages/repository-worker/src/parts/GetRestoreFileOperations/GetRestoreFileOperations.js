@@ -1,6 +1,5 @@
-import { join } from 'node:path'
-import { pathExists } from 'path-exists'
 import { VError } from '@lvce-editor/verror'
+import { join } from 'node:path'
 
 /**
  * @typedef {Object} CopyOperation
