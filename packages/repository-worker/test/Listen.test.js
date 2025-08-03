@@ -1,7 +1,7 @@
 import { expect, test, jest } from '@jest/globals'
 
 const mockNodeWorkerRpcClient = {
-  create: jest.fn(),
+  create: jest.fn(async () => ({ rpc: {} })),
 }
 
 jest.unstable_mockModule('@lvce-editor/rpc', () => ({
@@ -19,7 +19,8 @@ jest.unstable_mockModule('../src/parts/CommandMap/CommandMap.js', () => ({
 const { listen } = await import('../src/parts/Listen/Listen.js')
 
 test('listen creates NodeWorkerRpcClient with commandMap', async () => {
-  mockNodeWorkerRpcClient.create.mockResolvedValue()
+
+  mockNodeWorkerRpcClient.create.mockResolvedValue({ rpc: {} })
 
   await listen()
 
@@ -30,6 +31,7 @@ test('listen creates NodeWorkerRpcClient with commandMap', async () => {
 
 test('listen handles RPC client creation error', async () => {
   const error = new Error('RPC client creation failed')
+
   mockNodeWorkerRpcClient.create.mockRejectedValue(error)
 
   await expect(listen()).rejects.toThrow('RPC client creation failed')
