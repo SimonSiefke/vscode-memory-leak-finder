@@ -42,7 +42,6 @@ export const parseArgv = (argv) => {
     ideVersion: '', // TODO
     vscodePath: '',
     commit: '',
-    setupOnly: false,
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -94,9 +93,6 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--commit')) {
     options.commit = parseArgvString(argv, '--commit')
-  }
-  if (argv.includes('--setup-only')) {
-    options.setupOnly = true
   }
   return options
 }
