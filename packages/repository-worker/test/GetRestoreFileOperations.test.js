@@ -46,6 +46,9 @@ test('getRestoreNodeModulesFileOperations handles paths with leading slashes', a
 })
 
 test('getRestoreNodeModulesFileOperations throws VError when error occurs', async () => {
+  // Reset the module cache to ensure our mock is used
+  jest.resetModules()
+
   const mockPathJoin = jest.fn(() => {
     throw new Error('Path join error')
   })
@@ -56,5 +59,7 @@ test('getRestoreNodeModulesFileOperations throws VError when error occurs', asyn
 
   const { getRestoreNodeModulesFileOperations } = await import('../src/parts/GetRestoreFileOperations/GetRestoreFileOperations.js')
 
-  await expect(getRestoreNodeModulesFileOperations('/test/repo', 'cache-key', '/test/cache', '/test/cache/cache-key', ['node_modules/package'])).rejects.toThrow('Failed to get restore file operations')
+  await expect(
+    getRestoreNodeModulesFileOperations('/test/repo', 'cache-key', '/test/cache', '/test/cache/cache-key', ['node_modules/package']),
+  ).rejects.toThrow('Failed to get restore file operations')
 })

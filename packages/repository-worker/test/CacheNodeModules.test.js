@@ -1,12 +1,12 @@
 import { expect, test, jest, beforeEach } from '@jest/globals'
 import { VError } from '@lvce-editor/verror'
 
-const mockFindFiles = jest.fn()
-const mockCopy = jest.fn()
-const mockMakeDirectory = jest.fn()
-const mockRemove = jest.fn()
-const mockReadFileContent = jest.fn()
-const mockPathExists = jest.fn()
+const mockFindFiles = jest.fn(async () => [''])
+const mockCopy = jest.fn(async () => undefined)
+const mockMakeDirectory = jest.fn(async () => undefined)
+const mockRemove = jest.fn(async () => undefined)
+const mockReadFileContent = jest.fn(async () => '')
+const mockPathExists = jest.fn(async () => false)
 
 jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.js', () => ({
   findFiles: mockFindFiles,
@@ -18,7 +18,7 @@ jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.js', () => ({
 }))
 
 const mockGetCacheFileOperations = jest.fn()
-const mockApplyFileOperations = jest.fn()
+const mockApplyFileOperations = jest.fn(async () => undefined)
 
 jest.unstable_mockModule('../src/parts/GetCacheFileOperations/GetCacheFileOperations.js', () => ({
   getCacheFileOperations: mockGetCacheFileOperations,
@@ -32,6 +32,8 @@ const { addNodeModulesToCache } = await import('../src/parts/CacheNodeModules/Ca
 
 beforeEach(() => {
   jest.clearAllMocks()
+  // Set default return values to help TypeScript inference
+  mockGetCacheFileOperations.mockReturnValue([])
 })
 
 test('addNodeModulesToCache - successfully caches node_modules', async () => {
@@ -41,11 +43,12 @@ test('addNodeModulesToCache - successfully caches node_modules', async () => {
     { type: 'copy', from: '/repo/path/node_modules', to: '/cache/dir/commit-hash/node_modules' },
   ]
 
-  // @ts-ignore
+
   mockFindFiles.mockResolvedValue(mockNodeModulesPaths)
-  // @ts-ignore
+
+  // @ts-ignore - Complex mock return type
   mockGetCacheFileOperations.mockResolvedValue(mockFileOperations)
-  // @ts-ignore
+
   mockApplyFileOperations.mockResolvedValue(undefined)
 
   await addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')
@@ -73,11 +76,12 @@ test('addNodeModulesToCache - filters out nested node_modules and .git directori
   const expectedFilteredPaths = ['node_modules', 'packages/a/node_modules', 'packages/b/node_modules', 'packages/c/node_modules']
   const mockFileOperations = []
 
-  // @ts-ignore
+
   mockFindFiles.mockResolvedValue(allNodeModulesPaths)
-  // @ts-ignore
+
+  // @ts-ignore - Complex mock return type
   mockGetCacheFileOperations.mockResolvedValue(mockFileOperations)
-  // @ts-ignore
+
   mockApplyFileOperations.mockResolvedValue(undefined)
 
   await addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')
@@ -94,11 +98,12 @@ test('addNodeModulesToCache - filters out nested node_modules and .git directori
 test('addNodeModulesToCache - handles empty node_modules list', async () => {
   const mockFileOperations = [{ type: 'mkdir', path: '/cache/dir' }]
 
-  // @ts-ignore
+
   mockFindFiles.mockResolvedValue([])
-  // @ts-ignore
+
+  // @ts-ignore - Complex mock return type
   mockGetCacheFileOperations.mockResolvedValue(mockFileOperations)
-  // @ts-ignore
+
   mockApplyFileOperations.mockResolvedValue(undefined)
 
   await addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')
@@ -109,7 +114,7 @@ test('addNodeModulesToCache - handles empty node_modules list', async () => {
 
 test('addNodeModulesToCache - throws VError when findFiles fails', async () => {
   const error = new Error('Permission denied')
-  // @ts-ignore
+
   mockFindFiles.mockRejectedValue(error)
 
   await expect(addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow(VError)
@@ -121,9 +126,10 @@ test('addNodeModulesToCache - throws VError when findFiles fails', async () => {
 
 test('addNodeModulesToCache - throws VError when getCacheFileOperations fails', async () => {
   const error = new Error('Invalid path')
-  // @ts-ignore
+
   mockFindFiles.mockResolvedValue(['node_modules'])
-  // @ts-ignore
+
+  // @ts-ignore - Complex mock error type
   mockGetCacheFileOperations.mockRejectedValue(error)
 
   await expect(addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow(VError)
@@ -136,11 +142,12 @@ test('addNodeModulesToCache - throws VError when applyFileOperations fails', asy
   const error = new Error('Copy failed')
   const mockFileOperations = [{ type: 'copy', from: '/source', to: '/dest' }]
 
-  // @ts-ignore
+
   mockFindFiles.mockResolvedValue(['node_modules'])
-  // @ts-ignore
+
+  // @ts-ignore - Complex mock return type
   mockGetCacheFileOperations.mockResolvedValue(mockFileOperations)
-  // @ts-ignore
+
   mockApplyFileOperations.mockRejectedValue(error)
 
   await expect(addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow(VError)
@@ -161,11 +168,12 @@ test('addNodeModulesToCache - handles complex nested directory structure', async
     { type: 'copy', from: '/repo/path/node_modules', to: '/cache/dir/commit-hash/node_modules' },
   ]
 
-  // @ts-ignore
+
   mockFindFiles.mockResolvedValue(complexNodeModulesPaths)
-  // @ts-ignore
+
+  // @ts-ignore - Complex mock return type
   mockGetCacheFileOperations.mockResolvedValue(mockFileOperations)
-  // @ts-ignore
+
   mockApplyFileOperations.mockResolvedValue(undefined)
 
   await addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')

@@ -121,7 +121,7 @@ beforeEach(() => {
   })
 
   mockResolveCommitHash.mockImplementation((repoUrl, commitRef) => {
-    return Promise.resolve(commitRef)
+    return commitRef
   })
   mockCloneRepository.mockReturnValue(undefined)
   mockCheckoutCommit.mockReturnValue(undefined)

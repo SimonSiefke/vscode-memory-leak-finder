@@ -1,7 +1,7 @@
 import { expect, test, jest } from '@jest/globals'
 
-const mockPathJoin = jest.fn()
-const mockPathExists = jest.fn()
+const mockPathJoin = jest.fn(() => '')
+const mockPathExists = jest.fn(async () => false)
 
 jest.unstable_mockModule('../src/parts/Path/Path.js', () => ({
   join: mockPathJoin,

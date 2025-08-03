@@ -1,6 +1,6 @@
 import { test, expect, jest, beforeEach } from '@jest/globals'
 
-const mockFindFiles = jest.fn()
+const mockFindFiles = jest.fn(async () => [''])
 jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.js', () => ({
   findFiles: mockFindFiles,
 }))
@@ -12,7 +12,7 @@ beforeEach(() => {
 })
 
 test('findPackageLockFiles - returns empty array when no package-lock.json files found', async () => {
-  // @ts-ignore
+
   mockFindFiles.mockResolvedValue([])
 
   const result = await findPackageLockFiles('/test/path')
@@ -27,7 +27,7 @@ test('findPackageLockFiles - returns empty array when no package-lock.json files
 
 test('findPackageLockFiles - returns file URIs when package-lock.json files found', async () => {
   const mockPaths = ['package-lock.json', 'subdir/package-lock.json']
-  // @ts-ignore
+
   mockFindFiles.mockResolvedValue(mockPaths)
 
   const result = await findPackageLockFiles('/test/path')
@@ -42,7 +42,7 @@ test('findPackageLockFiles - returns file URIs when package-lock.json files foun
 
 test('findPackageLockFiles - excludes node_modules package-lock.json files', async () => {
   const mockPaths = ['package-lock.json', 'subdir/package-lock.json']
-  // @ts-ignore
+
   mockFindFiles.mockResolvedValue(mockPaths)
 
   const result = await findPackageLockFiles('/test/path')
@@ -57,7 +57,7 @@ test('findPackageLockFiles - excludes node_modules package-lock.json files', asy
 })
 
 test('findPackageLockFiles - throws VError when findFiles fails', async () => {
-  // @ts-ignore
+
   mockFindFiles.mockRejectedValue(new Error('Permission denied'))
 
   await expect(findPackageLockFiles('/test/path')).rejects.toThrow('Failed to find package-lock.json files in directory')

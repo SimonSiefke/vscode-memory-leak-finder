@@ -1,7 +1,7 @@
 import { expect, test, jest } from '@jest/globals'
 
-const mockReadFileContent = jest.fn()
-const mockGetHash = jest.fn()
+const mockReadFileContent = jest.fn(async () => '')
+const mockGetHash = jest.fn(() => '')
 
 jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.js', () => ({
   readFileContent: mockReadFileContent,

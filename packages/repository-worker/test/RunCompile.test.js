@@ -1,7 +1,7 @@
 import { expect, test, jest } from '@jest/globals'
 
-const mockExec = jest.fn()
-const mockPathExists = jest.fn()
+const mockExec = jest.fn(async () => ({ stdout: '', stderr: '', exitCode: 0 }))
+const mockPathExists = jest.fn(async () => true)
 const mockLogger = jest.fn()
 
 jest.unstable_mockModule('../src/parts/Exec/Exec.js', () => ({
@@ -23,9 +23,9 @@ test('runCompile executes npm run compile without nice', async () => {
   const useNice = false
   const mainJsPath = '/test/repo/out/main.js'
 
-  // @ts-ignore
+
   mockExec.mockResolvedValue({ stdout: '', stderr: '', exitCode: 0 })
-  // @ts-ignore
+
   mockPathExists.mockResolvedValue(true)
 
   await runCompile(cwd, useNice, mainJsPath)
@@ -39,9 +39,9 @@ test('runCompile executes npm run compile with nice', async () => {
   const useNice = true
   const mainJsPath = '/test/repo/out/main.js'
 
-  // @ts-ignore
+
   mockExec.mockResolvedValue({ stdout: '', stderr: '', exitCode: 0 })
-  // @ts-ignore
+
   mockPathExists.mockResolvedValue(true)
 
   await runCompile(cwd, useNice, mainJsPath)
@@ -55,9 +55,9 @@ test('runCompile throws error when main.js not found after compilation', async (
   const useNice = false
   const mainJsPath = '/test/repo/out/main.js'
 
-  // @ts-ignore
+
   mockExec.mockResolvedValue({ stdout: '', stderr: '', exitCode: 0 })
-  // @ts-ignore
+
   mockPathExists.mockResolvedValue(false)
 
   await expect(runCompile(cwd, useNice, mainJsPath)).rejects.toThrow('Build failed: out/main.js not found after compilation')
@@ -68,9 +68,9 @@ test('runCompile logs when using nice', async () => {
   const useNice = true
   const mainJsPath = '/test/repo/out/main.js'
 
-  // @ts-ignore
+
   mockExec.mockResolvedValue({ stdout: '', stderr: '', exitCode: 0 })
-  // @ts-ignore
+
   mockPathExists.mockResolvedValue(true)
 
   await runCompile(cwd, useNice, mainJsPath)

@@ -13,7 +13,7 @@ beforeEach(() => {
 })
 
 test('installDependencies - runs npm ci without nice', async () => {
-  mockExec.mockImplementation(() => Promise.resolve({ stdout: '', stderr: '' }))
+  mockExec.mockImplementation(() => ({ stdout: '', stderr: '' }))
 
   await installDependencies('/test/path', false)
 
@@ -22,7 +22,7 @@ test('installDependencies - runs npm ci without nice', async () => {
 })
 
 test('installDependencies - runs npm ci with nice', async () => {
-  mockExec.mockImplementation(() => Promise.resolve({ stdout: '', stderr: '' }))
+  mockExec.mockImplementation(() => ({ stdout: '', stderr: '' }))
 
   await installDependencies('/test/path', true)
 

@@ -1,6 +1,6 @@
 import { expect, test, jest } from '@jest/globals'
 
-const mockExeca = jest.fn()
+const mockExeca = jest.fn(async () => ({ stdout: '', stderr: '', exitCode: 0 }))
 
 jest.unstable_mockModule('execa', () => ({
   execa: mockExeca,
@@ -34,8 +34,8 @@ test('exec handles empty stdout and stderr', async () => {
   const command = 'test'
   const args = []
   const mockResult = {
-    stdout: null,
-    stderr: null,
+    stdout: '',
+    stderr: '',
     exitCode: 1,
   }
 
