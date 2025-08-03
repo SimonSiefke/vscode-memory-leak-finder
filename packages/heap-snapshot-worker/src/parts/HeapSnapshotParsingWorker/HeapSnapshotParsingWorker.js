@@ -60,26 +60,28 @@ export class HeapSnapshotParsingWorker {
     const startTime = performance.now()
     console.log(`[HeapSnapshotParsingWorker] Starting to parse: ${path}`)
 
-    return new Promise((resolve, reject) => {
-      const id = ++this.messageId
-      this.callbacks.set(id, {
-        resolve: (result) => {
-          const endTime = performance.now()
-          const duration = endTime - startTime
-          console.log(`[HeapSnapshotParsingWorker] Parse completed in ${duration.toFixed(2)}ms`)
-          console.log(`[HeapSnapshotParsingWorker] Result sizes - nodes: ${result.nodes?.length || 0}, edges: ${result.edges?.length || 0}, locations: ${result.locations?.length || 0}`)
-          resolve(result)
-        },
-        reject
-      })
+    const { promise, resolve, reject } = Promise.withResolvers()
 
-      console.log(`[HeapSnapshotParsingWorker] Sending parse request to worker (id: ${id})`)
-      this.worker.postMessage({
-        id,
-        method: 'HeapSnapshotParsing.parse',
-        params: [path],
-      })
+    const id = ++this.messageId
+    this.callbacks.set(id, {
+      resolve: (result) => {
+        const endTime = performance.now()
+        const duration = endTime - startTime
+        console.log(`[HeapSnapshotParsingWorker] Parse completed in ${duration.toFixed(2)}ms`)
+        console.log(`[HeapSnapshotParsingWorker] Result sizes - nodes: ${result.nodes?.length || 0}, edges: ${result.edges?.length || 0}, locations: ${result.locations?.length || 0}`)
+        resolve(result)
+      },
+      reject
     })
+
+    console.log(`[HeapSnapshotParsingWorker] Sending parse request to worker (id: ${id})`)
+    this.worker.postMessage({
+      id,
+      method: 'HeapSnapshotParsing.parse',
+      params: [path],
+    })
+
+    return promise
   }
 
   /**
