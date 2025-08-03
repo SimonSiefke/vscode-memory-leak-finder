@@ -1,7 +1,5 @@
 import { expect, test, jest, beforeEach, afterEach } from '@jest/globals'
 import { join } from 'node:path'
-import { downloadAndBuildVscodeFromCommit } from '../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js'
-import * as Root from '../src/parts/Root/Root.js'
 
 // Default values for testing
 const DEFAULT_REPO_URL = 'https://github.com/microsoft/vscode.git'
@@ -81,20 +79,20 @@ jest.unstable_mockModule('../src/parts/SetupNodeModulesFromCache/SetupNodeModule
 
 beforeEach(() => {
   jest.clearAllMocks()
-  
+
   // Set up default mock implementations
   mockPathExists.mockReturnValue(false)
   mockMkdir.mockReturnValue(undefined)
   mockWriteFile.mockReturnValue(undefined)
   mockRm.mockReturnValue(undefined)
-  
+
   mockExec.mockImplementation((command, args, options) => {
     if (command === 'git' && args.includes('ls-remote')) {
       // Mock git ls-remote for resolving commit hash
-      return { 
-        stdout: 'a1b2c3d4e5f6789012345678901234567890abcd', 
-        stderr: '', 
-        exitCode: 0 
+      return {
+        stdout: 'a1b2c3d4e5f6789012345678901234567890abcd',
+        stderr: '',
+        exitCode: 0,
       }
     }
     if (command === 'git' && args.includes('clone')) {
@@ -157,6 +155,9 @@ test('downloadVscodeCommit - tests git clone operations with mocked execa', asyn
   // Mock successful directory creation
   mockMkdir.mockResolvedValue(undefined)
 
+  // Import the function dynamically after mocks are set up
+  const { downloadAndBuildVscodeFromCommit } = await import('../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js')
+  
   // Call the function - it should now work with mocked execa
   await downloadAndBuildVscodeFromCommit(testCommitHash, testRepoUrl, testOutFolder, '/test/cache', false)
 
@@ -192,6 +193,9 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missi
   // Mock successful directory creation
   mockMkdir.mockResolvedValue(undefined)
 
+  // Import the function dynamically after mocks are set up
+  const { downloadAndBuildVscodeFromCommit } = await import('../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js')
+  
   // This should detect missing node_modules and attempt to restore from cache
   // Since we're in a test environment, it will likely fail gracefully
   await expect(
@@ -221,6 +225,9 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
   // Mock successful directory creation
   mockMkdir.mockResolvedValue(undefined)
 
+  // Import the function dynamically after mocks are set up
+  const { downloadAndBuildVscodeFromCommit } = await import('../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js')
+  
   // This should detect existing node_modules and skip npm ci
   // Since we're in a test environment, it will likely fail gracefully
   await expect(
