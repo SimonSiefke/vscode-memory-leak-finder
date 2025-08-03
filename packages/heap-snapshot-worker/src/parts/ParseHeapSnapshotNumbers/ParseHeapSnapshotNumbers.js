@@ -35,7 +35,7 @@ export const parseHeapSnapshotNumbers = async (path) => {
     if (typeIndex === numberTypeIndex && nameIndex === heapNumberStringIndex) {
       heapNumbers.push({
         id: nodes[i + idFieldIndex],
-        name: '(heap number)',
+        name: 'heap number',
         type: 'number',
         selfSize: nodes[i + selfSizeFieldIndex],
         edgeCount: nodes[i + edgeCountFieldIndex],
