@@ -25,6 +25,7 @@ const mockInstallDependencies = jest.fn()
 const mockResolveCommitHash = jest.fn()
 const mockRunCompile = jest.fn()
 const mockSetupNodeModulesFromCache = jest.fn()
+const mockLog = jest.fn()
 
 jest.unstable_mockModule('path-exists', () => ({
   pathExists: mockPathExists,
@@ -74,6 +75,10 @@ jest.unstable_mockModule('../src/parts/RunCompile/RunCompile.js', () => ({
 
 jest.unstable_mockModule('../src/parts/SetupNodeModulesFromCache/SetupNodeModulesFromCache.js', () => ({
   setupNodeModulesFromCache: mockSetupNodeModulesFromCache,
+}))
+
+jest.unstable_mockModule('../src/parts/Logger/Logger.js', () => ({
+  log: mockLog,
 }))
 
 beforeEach(() => {
@@ -130,6 +135,7 @@ beforeEach(() => {
   mockInstallDependencies.mockReturnValue(undefined)
   mockAddNodeModulesToCache.mockReturnValue(undefined)
   mockRunCompile.mockReturnValue(undefined)
+  mockLog.mockReturnValue(undefined)
 })
 
 afterEach(() => {
@@ -170,6 +176,10 @@ test('downloadVscodeCommit - tests git clone operations with mocked execa', asyn
 
   // Verify that checkoutCommit was called
   expect(mockCheckoutCommit).toHaveBeenCalledWith(repoPath, testCommitHash)
+
+  // Verify that logger was called for installation and compilation
+  expect(mockLog).toHaveBeenCalledWith(`Installing dependencies for commit ${testCommitHash}...`)
+  expect(mockLog).toHaveBeenCalledWith(`Compiling VS Code for commit ${testCommitHash}...`)
 })
 
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missing node_modules', async () => {
