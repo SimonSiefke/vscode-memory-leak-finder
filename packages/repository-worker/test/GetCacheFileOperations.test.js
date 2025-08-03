@@ -2,10 +2,6 @@ import { pathToFileURL } from 'node:url'
 import { test, expect } from '@jest/globals'
 import { getCacheFileOperations } from '../src/parts/GetCacheFileOperations/GetCacheFileOperations.js'
 
-test('getCacheFileOperations - function exists and is callable', async () => {
-  expect(typeof getCacheFileOperations).toBe('function')
-})
-
 test('getCacheFileOperations returns empty array when no nodeModulesPaths provided', async () => {
   const result = await getCacheFileOperations(
     pathToFileURL('/repo/path').href,
