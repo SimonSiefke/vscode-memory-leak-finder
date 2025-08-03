@@ -8,7 +8,8 @@ import { VError } from '@lvce-editor/verror'
 export const computeVscodeNodeModulesCacheKey = async (folder) => {
   try {
     const packageLockFiles = await findPackageLockFiles(folder)
-    return getFilesHash(packageLockFiles)
+    const hash = getFilesHash(packageLockFiles)
+    return hash
   } catch (error) {
     throw new VError(error, `Failed to compute VS Code node_modules cache key`)
   }

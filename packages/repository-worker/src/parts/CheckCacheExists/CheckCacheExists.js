@@ -1,6 +1,5 @@
 import { join } from 'node:path'
 import { pathExists } from 'path-exists'
-import { pathToFileURL } from 'node:url'
 import { VError } from '@lvce-editor/verror'
 
 /**
