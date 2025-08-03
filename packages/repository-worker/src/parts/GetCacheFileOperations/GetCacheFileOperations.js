@@ -26,11 +26,6 @@ import * as Path from '../Path/Path.js'
  * @returns {Promise<FileOperation[]>}
  */
 export const getCacheFileOperations = async (repoPath, cacheKey, cacheDir, cachedNodeModulesPath, nodeModulesPaths) => {
-  console.log(`Preparing to cache node_modules tree with cache key: ${cacheKey}`)
-
-  /**
-   * @type {FileOperation[]}
-   */
   const fileOperations = []
 
   // Add directory creation operations
