@@ -20,10 +20,6 @@ beforeEach(async () => {
   applyFileOperationModule = await import('../src/parts/ApplyFileOperation/ApplyFileOperation.js')
 })
 
-test('applyFileOperation - function exists and is callable', async () => {
-  expect(typeof applyFileOperationModule.applyFileOperation).toBe('function')
-})
-
 test('applyFileOperation - applies copy operation', async () => {
   mockCopy.mockReturnValue(undefined)
 

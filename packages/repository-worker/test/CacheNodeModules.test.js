@@ -16,7 +16,4 @@ jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.js', () => ({
   pathExists: mockPathExists,
 }))
 
-test('addNodeModulesToCache - function exists and is callable', async () => {
-  const { addNodeModulesToCache } = await import('../src/parts/CacheNodeModules/CacheNodeModules.js')
-  expect(typeof addNodeModulesToCache).toBe('function')
-})
+const { addNodeModulesToCache } = await import('../src/parts/CacheNodeModules/CacheNodeModules.js')

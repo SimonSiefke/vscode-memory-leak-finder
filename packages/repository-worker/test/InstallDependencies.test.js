@@ -6,14 +6,14 @@ jest.unstable_mockModule('../src/parts/Exec/Exec.js', () => ({
   exec: mockExec,
 }))
 
+const { installDependencies } = await import('../src/parts/InstallDependencies/InstallDependencies.js')
+
 beforeEach(() => {
   mockExec.mockClear()
 })
 
 test('installDependencies - runs npm ci without nice', async () => {
   mockExec.mockImplementation(() => Promise.resolve({ stdout: '', stderr: '' }))
-
-  const { installDependencies } = await import('../src/parts/InstallDependencies/InstallDependencies.js')
 
   await installDependencies('/test/path', false)
 
@@ -23,8 +23,6 @@ test('installDependencies - runs npm ci without nice', async () => {
 
 test('installDependencies - runs npm ci with nice', async () => {
   mockExec.mockImplementation(() => Promise.resolve({ stdout: '', stderr: '' }))
-
-  const { installDependencies } = await import('../src/parts/InstallDependencies/InstallDependencies.js')
 
   await installDependencies('/test/path', true)
 
@@ -36,8 +34,6 @@ test('installDependencies - throws VError when exec fails without nice', async (
   const error = new Error('npm ci failed')
   mockExec.mockImplementation(() => Promise.reject(error))
 
-  const { installDependencies } = await import('../src/parts/InstallDependencies/InstallDependencies.js')
-
   await expect(installDependencies('/test/path', false)).rejects.toThrow(VError)
   await expect(installDependencies('/test/path', false)).rejects.toThrow("Failed to install dependencies in directory '/test/path'")
 })
@@ -45,8 +41,6 @@ test('installDependencies - throws VError when exec fails without nice', async (
 test('installDependencies - throws VError when exec fails with nice', async () => {
   const error = new Error('nice command failed')
   mockExec.mockImplementation(() => Promise.reject(error))
-
-  const { installDependencies } = await import('../src/parts/InstallDependencies/InstallDependencies.js')
 
   await expect(installDependencies('/test/path', true)).rejects.toThrow(VError)
   await expect(installDependencies('/test/path', true)).rejects.toThrow("Failed to install dependencies in directory '/test/path'")

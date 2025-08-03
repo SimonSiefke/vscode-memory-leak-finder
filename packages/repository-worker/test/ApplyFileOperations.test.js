@@ -20,10 +20,6 @@ beforeEach(async () => {
   applyFileOperationsModule = await import('../src/parts/ApplyFileOperations/ApplyFileOperations.js')
 })
 
-test('applyFileOperations - function exists and is callable', async () => {
-  expect(typeof applyFileOperationsModule.applyFileOperations).toBe('function')
-})
-
 test('applyFileOperations handles empty array gracefully', async () => {
   // Should not throw with empty array
   await applyFileOperationsModule.applyFileOperations([])
