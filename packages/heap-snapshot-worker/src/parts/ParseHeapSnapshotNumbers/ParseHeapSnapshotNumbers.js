@@ -15,7 +15,7 @@ export const parseHeapSnapshotNumbers = async (path) => {
   const nodeFieldCount = node_fields.length
   const nodeTypesList = node_types[0]
   const numberTypeIndex = nodeTypesList.indexOf('number')
-  const heapNumberStringIndex = strings.indexOf('(heap number)')
+  const heapNumberStringIndex = strings.indexOf('heap number')
 
   // Find field indices
   const typeFieldIndex = node_fields.indexOf('type')
@@ -38,13 +38,13 @@ export const parseHeapSnapshotNumbers = async (path) => {
         name: '(heap number)',
         type: 'number',
         selfSize: nodes[i + selfSizeFieldIndex],
-        edgeCount: nodes[i + edgeCountFieldIndex]
+        edgeCount: nodes[i + edgeCountFieldIndex],
       })
     }
   }
 
   return {
     count: heapNumbers.length,
-    heapNumbers: heapNumbers
+    heapNumbers: heapNumbers,
   }
 }
