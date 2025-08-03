@@ -9,7 +9,7 @@ export const getRegexpObjectsFromHeapSnapshotInternal = (strings, nodes, node_ty
   const regexpTypeIndex = node_types[0].indexOf('regexp')
   const ITEMS_PER_NODE = node_fields.length
 
-  // Calculate field indices once  
+  // Calculate field indices once
   const typeFieldIndex = node_fields.indexOf('type')
   const nameFieldIndex = node_fields.indexOf('name')
   const idFieldIndex = node_fields.indexOf('id')
