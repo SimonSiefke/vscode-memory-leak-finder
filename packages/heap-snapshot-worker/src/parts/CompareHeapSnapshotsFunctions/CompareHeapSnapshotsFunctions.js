@@ -16,24 +16,34 @@ const prepareFunctions = async (path) => {
   }
 }
 
-export const compareHeapSnapshotFunctions = async (pathA, pathB) => {
+export const compareHeapSnapshotFunctions = async (pathA, pathB, useParallel = true) => {
   console.log(`[CompareHeapSnapshotFunctions] Starting comparison between:`)
   console.log(`  - Path A: ${pathA}`)
   console.log(`  - Path B: ${pathB}`)
+  console.log(`  - Parallel processing: ${useParallel}`)
 
   console.time('parse')
   const startTime = performance.now()
 
-  // Parse both snapshots - these will now run in separate workers and can potentially run in parallel
-  console.log(`[CompareHeapSnapshotFunctions] Starting to parse snapshot A...`)
-  const resultAPromise = prepareFunctions(pathA)
+  let resultA, resultB
 
-  console.log(`[CompareHeapSnapshotFunctions] Starting to parse snapshot B...`)
-  const resultBPromise = prepareFunctions(pathB)
+  if (useParallel) {
+    // Parse both snapshots in parallel for better performance
+    console.log(`[CompareHeapSnapshotFunctions] Starting to parse snapshots in parallel...`)
+    const resultAPromise = prepareFunctions(pathA)
+    const resultBPromise = prepareFunctions(pathB)
 
-  // Wait for both to complete
-  const resultA = await resultAPromise
-  const resultB = await resultBPromise
+    // Wait for both to complete
+    resultA = await resultAPromise
+    resultB = await resultBPromise
+  } else {
+    // Parse snapshots sequentially to reduce CPU usage
+    console.log(`[CompareHeapSnapshotFunctions] Starting to parse snapshot A (sequential mode)...`)
+    resultA = await prepareFunctions(pathA)
+
+    console.log(`[CompareHeapSnapshotFunctions] Starting to parse snapshot B (sequential mode)...`)
+    resultB = await prepareFunctions(pathB)
+  }
 
   console.timeEnd('parse')
   const parseEndTime = performance.now()
