@@ -51,7 +51,6 @@ export const runTests = async (
   ideVersion,
   vscodePath,
   commit,
-  setupOnly,
   callback,
 ) => {
   try {
@@ -71,28 +70,6 @@ export const runTests = async (
     Assert.boolean(restartBetween)
     Assert.string(ide)
     Assert.string(ideVersion)
-    Assert.boolean(setupOnly)
-
-    // If setup-only mode is enabled and a commit is provided, only set up VS Code
-    if (setupOnly && commit) {
-      console.log(`Setting up VS Code for commit: ${commit}`)
-      const connectionId = Id.create()
-      await PrepareTestsOrAttach.prepareTestsOrAttach(
-        cwd,
-        headlessMode,
-        recordVideo,
-        connectionId,
-        timeouts,
-        runMode,
-        ide,
-        ideVersion,
-        vscodePath,
-        commit,
-      )
-      console.log('VS Code setup completed successfully')
-      return callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, 0, 0, filterValue)
-    }
-
     let passed = 0
     let failed = 0
     let skipped = 0
