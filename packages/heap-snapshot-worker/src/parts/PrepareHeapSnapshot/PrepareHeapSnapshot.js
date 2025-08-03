@@ -26,7 +26,7 @@ export const prepareHeapSnapshot = async (path) => {
     return result
   } finally {
     const terminateStart = performance.now()
-    await parsingWorker.terminate()
+    await parsingWorker[Symbol.asyncDispose]()
     const terminateEnd = performance.now()
     console.log(`[PrepareHeapSnapshot] Worker terminated in ${(terminateEnd - terminateStart).toFixed(2)}ms`)
 

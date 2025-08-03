@@ -91,7 +91,7 @@ export class HeapSnapshotParsingWorker {
   /**
    * Terminates the parsing worker
    */
-  async terminate() {
+  async [Symbol.asyncDispose]() {
     if (this.worker) {
       await this.worker.terminate()
       this.worker = null
