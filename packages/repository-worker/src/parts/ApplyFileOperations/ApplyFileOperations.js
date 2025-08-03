@@ -29,19 +29,32 @@ import { copy, makeDirectory, remove } from '../Filesystem/Filesystem.js'
  */
 const applyFileOperation = async (operation) => {
   try {
-    if (operation.type === 'copy') {
-      const fromPath = operation.from
-      const toPath = operation.to
-      await copy(fromPath, toPath)
-      console.log(`Copied: ${operation.from} -> ${operation.to}`)
-    } else if (operation.type === 'remove') {
-      const fromPath = operation.from
-      await remove(fromPath)
-      console.log(`Removed: ${operation.from}`)
-    } else if (operation.type === 'mkdir') {
-      const path = operation.path
-      await makeDirectory(path)
-      console.log(`Created directory: ${operation.path}`)
+    switch (operation.type) {
+      case 'copy': {
+        const fromPath = operation.from
+        const toPath = operation.to
+        await copy(fromPath, toPath)
+        console.log(`Copied: ${operation.from} -> ${operation.to}`)
+
+        break
+      }
+
+      case 'remove': {
+        const fromPath = operation.from
+        await remove(fromPath)
+        console.log(`Removed: ${operation.from}`)
+
+        break
+      }
+
+      case 'mkdir': {
+        const { path } = operation
+        await makeDirectory(path)
+        console.log(`Created directory: ${operation.path}`)
+
+        break
+      }
+      // No default
     }
   } catch (error) {
     throw new VError(error, `Failed to apply file operation ${operation.type}`)
@@ -55,6 +68,7 @@ export const applyFileOperations = async (fileOperations) => {
   if (fileOperations.length === 0) {
     return
   }
+
   for (const operation of fileOperations) {
     await applyFileOperation(operation)
   }

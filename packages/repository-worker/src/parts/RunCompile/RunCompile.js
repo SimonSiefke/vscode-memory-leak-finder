@@ -8,13 +8,14 @@ import { exec } from '../Exec/Exec.js'
  */
 export const runCompile = async (cwd, useNice, mainJsPath) => {
   if (useNice) {
-    console.log(`Using nice to reduce system resource usage...`)
+    console.log('Using nice to reduce system resource usage...')
     await exec('nice', ['-n', '10', 'npm', 'run', 'compile'], { cwd })
   } else {
     await exec('npm', ['run', 'compile'], { cwd })
   }
+
   // Verify build was successful
   if (!(await pathExists(mainJsPath))) {
-    throw new Error(`Build failed: out/main.js not found after compilation`)
+    throw new Error('Build failed: out/main.js not found after compilation')
   }
 }

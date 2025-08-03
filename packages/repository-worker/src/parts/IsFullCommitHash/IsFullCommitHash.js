@@ -4,5 +4,5 @@
  * @returns {boolean} True if it's a full commit hash, false otherwise
  */
 export const isFullCommitHash = (commitRef) => {
-  return /^[a-f0-9]{40}$/i.test(commitRef)
+  return /^[a-f\d]{40}$/i.test(commitRef)
 }

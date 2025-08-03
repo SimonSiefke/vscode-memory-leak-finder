@@ -1,12 +1,10 @@
 import { cp, mkdir, rm, readFile, glob } from 'node:fs/promises'
-import { pathExists as pathExistsImport } from 'path-exists'
 
 /**
  * Checks if a path exists
  * @param {string} path
  * @returns {Promise<boolean>}
  */
-export const pathExists = pathExistsImport
 
 /**
  * Copies a file or directory
@@ -59,3 +57,5 @@ export const findFiles = async (pattern, options = {}) => {
   const globIterator = glob(pattern, options)
   return await Array.fromAsync(globIterator)
 }
+
+export { pathExists } from 'path-exists'

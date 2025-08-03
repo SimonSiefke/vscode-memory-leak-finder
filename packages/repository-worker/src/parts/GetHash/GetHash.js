@@ -10,5 +10,6 @@ export const getHash = (contents) => {
   for (const content of contents) {
     hash.update(content)
   }
+
   return hash.digest('hex')
 }

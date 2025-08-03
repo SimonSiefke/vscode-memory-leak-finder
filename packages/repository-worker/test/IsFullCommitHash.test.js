@@ -70,9 +70,9 @@ test('isFullCommitHash - returns true for real commit hashes', () => {
     'da39a3ee5e6b4b0d3255bfef95601890afd80709',
   ]
 
-  realHashes.forEach((hash) => {
+  for (const hash of realHashes) {
     expect(isFullCommitHash(hash)).toBe(true)
-  })
+  }
 })
 
 test('isFullCommitHash - returns false for SHA256 hashes', () => {

@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, expect, jest, test } from '@jest/globals'
 import { join } from 'node:path'
+import { afterEach, beforeEach, expect, jest, test } from '@jest/globals'
 
 // Default values for testing
 const DEFAULT_REPO_URL = 'https://github.com/microsoft/vscode.git'
@@ -35,6 +35,7 @@ jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.js', () => ({
   makeDirectory: mockMkdir,
   writeFile: mockWriteFile,
   remove: mockRm,
+  pathExists: mockPathExists,
 }))
 
 jest.unstable_mockModule('execa', () => ({
@@ -99,14 +100,17 @@ beforeEach(() => {
         exitCode: 0,
       }
     }
+
     if (command === 'git' && Array.isArray(args) && args.includes('clone')) {
       // Mock git clone
       return { stdout: '', stderr: '', exitCode: 0 }
     }
+
     if (command === 'git' && Array.isArray(args) && args.includes('checkout')) {
       // Mock git checkout
       return { stdout: '', stderr: '', exitCode: 0 }
     }
+
     // Default mock for other commands
     return { stdout: '', stderr: '', exitCode: 0 }
   })
@@ -116,10 +120,12 @@ beforeEach(() => {
       // Mock git clone
       return { stdout: '', stderr: '' }
     }
+
     if (command === 'git' && Array.isArray(args) && args.includes('checkout')) {
       // Mock git checkout
       return { stdout: '', stderr: '' }
     }
+
     // Default mock for other commands
     return { stdout: '', stderr: '' }
   })
@@ -158,8 +164,14 @@ test('downloadVscodeCommit - tests git clone operations with mocked execa', asyn
 
   // Mock filesystem responses - repo doesn't exist initially
   mockPathExists.mockImplementation((path) => {
-    if (path === reposDir) return false
-    if (path === repoPath) return false
+    if (path === reposDir) {
+      return false
+    }
+
+    if (path === repoPath) {
+      return false
+    }
+
     return false
   })
 
@@ -194,11 +206,26 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missi
 
   // Mock filesystem responses for missing node_modules scenario
   mockPathExists.mockImplementation((path) => {
-    if (path === reposDir) return false
-    if (path === repoPath) return true
-    if (path === mainJsPath) return false
-    if (path === nodeModulesPath) return false
-    if (path === outPath) return true
+    if (path === reposDir) {
+      return false
+    }
+
+    if (path === repoPath) {
+      return true
+    }
+
+    if (path === mainJsPath) {
+      return false
+    }
+
+    if (path === nodeModulesPath) {
+      return false
+    }
+
+    if (path === outPath) {
+      return true
+    }
+
     return false
   })
 
@@ -226,11 +253,26 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
 
   // Mock filesystem responses for existing node_modules scenario
   mockPathExists.mockImplementation((path) => {
-    if (path === reposDir) return false
-    if (path === repoPath) return true
-    if (path === mainJsPath) return false
-    if (path === nodeModulesPath) return true
-    if (path === outPath) return true
+    if (path === reposDir) {
+      return false
+    }
+
+    if (path === repoPath) {
+      return true
+    }
+
+    if (path === mainJsPath) {
+      return false
+    }
+
+    if (path === nodeModulesPath) {
+      return true
+    }
+
+    if (path === outPath) {
+      return true
+    }
+
     return false
   })
 
@@ -262,11 +304,26 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
 
   // Mock filesystem responses for existing out folder scenario
   mockPathExists.mockImplementation((path) => {
-    if (path === reposDir) return false
-    if (path === repoPath) return true
-    if (path === mainJsPath) return false
-    if (path === nodeModulesPath) return true
-    if (path === outPath) return true
+    if (path === reposDir) {
+      return false
+    }
+
+    if (path === repoPath) {
+      return true
+    }
+
+    if (path === mainJsPath) {
+      return false
+    }
+
+    if (path === nodeModulesPath) {
+      return true
+    }
+
+    if (path === outPath) {
+      return true
+    }
+
     return false
   })
 

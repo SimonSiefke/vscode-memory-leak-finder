@@ -1,6 +1,6 @@
+import { join } from 'node:path'
 import { VError } from '@lvce-editor/verror'
 import * as Filesystem from '../Filesystem/Filesystem.js'
-import { join } from 'node:path'
 import * as ApplyFileOperations from '../ApplyFileOperations/ApplyFileOperations.js'
 import * as GetCacheFileOperations from '../GetCacheFileOperations/GetCacheFileOperations.js'
 
@@ -23,6 +23,6 @@ export const addNodeModulesToCache = async (repoPath, commitHash, cacheDir) => {
     )
     await ApplyFileOperations.applyFileOperations(fileOperations)
   } catch (error) {
-    throw new VError(error, `Failed to cache node_modules`)
+    throw new VError(error, 'Failed to cache node_modules')
   }
 }

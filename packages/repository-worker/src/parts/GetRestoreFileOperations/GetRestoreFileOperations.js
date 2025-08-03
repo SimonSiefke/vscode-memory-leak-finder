@@ -1,5 +1,5 @@
-import { VError } from '@lvce-editor/verror'
 import { join } from 'node:path'
+import { VError } from '@lvce-editor/verror'
 
 /**
  * @typedef {Object} CopyOperation
@@ -53,6 +53,6 @@ export const getRestoreNodeModulesFileOperations = async (repoPath, cacheKey, ca
 
     return fileOperations
   } catch (error) {
-    throw new VError(error, `Failed to get restore file operations`)
+    throw new VError(error, 'Failed to get restore file operations')
   }
 }

@@ -1,6 +1,6 @@
+import { join } from 'node:path'
 import { VError } from '@lvce-editor/verror'
 import { findFiles } from '../Filesystem/Filesystem.js'
-import { join } from 'node:path'
 
 /**
  * Finds all package-lock.json files in a directory using glob

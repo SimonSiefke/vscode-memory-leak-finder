@@ -39,14 +39,16 @@ export const getCacheFileOperations = async (repoPathUri, cacheKey, cacheDirUri,
   const cachedNodeModulesPath = fileURLToPath(cachedNodeModulesPathUri)
 
   // Add directory creation operations
-  fileOperations.push({
-    type: /** @type {'mkdir'} */ ('mkdir'),
-    path: cacheDirUri,
-  })
-  fileOperations.push({
-    type: /** @type {'mkdir'} */ ('mkdir'),
-    path: cachedNodeModulesPathUri,
-  })
+  fileOperations.push(
+    {
+      type: /** @type {'mkdir'} */ ('mkdir'),
+      path: cacheDirUri,
+    },
+    {
+      type: /** @type {'mkdir'} */ ('mkdir'),
+      path: cachedNodeModulesPathUri,
+    },
+  )
 
   // Convert relative paths to absolute paths
   const absoluteNodeModulesPaths = nodeModulesPaths.map((path) => join(repoPath, path))
@@ -63,16 +65,17 @@ export const getCacheFileOperations = async (repoPathUri, cacheKey, cacheDirUri,
     // Add parent directory creation operation
     const parentDir = join(cacheTargetPath, '..')
     const parentDirUri = pathToFileURL(parentDir).href
-    fileOperations.push({
-      type: /** @type {'mkdir'} */ ('mkdir'),
-      path: parentDirUri,
-    })
-
-    fileOperations.push({
-      type: /** @type {'copy'} */ ('copy'),
-      from: nodeModulesPathUri,
-      to: cacheTargetPathUri,
-    })
+    fileOperations.push(
+      {
+        type: /** @type {'mkdir'} */ ('mkdir'),
+        path: parentDirUri,
+      },
+      {
+        type: /** @type {'copy'} */ ('copy'),
+        from: nodeModulesPathUri,
+        to: cacheTargetPathUri,
+      },
+    )
   }
 
   return fileOperations

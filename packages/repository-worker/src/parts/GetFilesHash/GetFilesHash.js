@@ -1,6 +1,6 @@
+import { VError } from '@lvce-editor/verror'
 import { readFileContent } from '../Filesystem/Filesystem.js'
 import { getHash } from '../GetHash/GetHash.js'
-import { VError } from '@lvce-editor/verror'
 
 export const getFilesHash = async (absolutePaths) => {
   try {
@@ -8,6 +8,6 @@ export const getFilesHash = async (absolutePaths) => {
     const hash = getHash(contents)
     return hash
   } catch (error) {
-    throw new VError(error, `Failed to get files hash`)
+    throw new VError(error, 'Failed to get files hash')
   }
 }

@@ -1,5 +1,5 @@
-import { VError } from '@lvce-editor/verror'
 import { join } from 'node:path'
+import { VError } from '@lvce-editor/verror'
 import * as ApplyFileOperations from '../ApplyFileOperations/ApplyFileOperations.js'
 import * as Filesystem from '../Filesystem/Filesystem.js'
 import * as GetRestoreFileOperations from '../GetRestoreFileOperations/GetRestoreFileOperations.js'
@@ -23,6 +23,6 @@ export const setupNodeModulesFromCache = async (repoPath, commitHash, cacheDir) 
     )
     await ApplyFileOperations.applyFileOperations(fileOperations)
   } catch (error) {
-    throw new VError(error, `Failed to setup node_modules from cache`)
+    throw new VError(error, 'Failed to setup node_modules from cache')
   }
 }

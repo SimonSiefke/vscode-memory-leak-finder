@@ -1,5 +1,5 @@
-import { test, expect } from '@jest/globals'
 import { pathToFileURL } from 'node:url'
+import { test, expect } from '@jest/globals'
 import { computeVscodeNodeModulesCacheKey } from '../src/parts/ComputeVscodeNodeModulesCacheKey/ComputeVscodeNodeModulesCacheKey.js'
 
 test('computeVscodeNodeModulesCacheKey - function exists and is callable', async () => {

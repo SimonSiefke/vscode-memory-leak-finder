@@ -5,7 +5,7 @@ test('getHash - generates hash from single string', () => {
   const result = getHash(['hello world'])
 
   expect(typeof result).toBe('string')
-  expect(result).toMatch(/^[a-f0-9]{40}$/i)
+  expect(result).toMatch(/^[a-f\d]{40}$/i)
   expect(result.length).toBe(40)
 })
 
@@ -13,7 +13,7 @@ test('getHash - generates hash from multiple strings', () => {
   const result = getHash(['hello', 'world', 'test'])
 
   expect(typeof result).toBe('string')
-  expect(result).toMatch(/^[a-f0-9]{40}$/i)
+  expect(result).toMatch(/^[a-f\d]{40}$/i)
   expect(result.length).toBe(40)
 })
 
@@ -21,7 +21,7 @@ test('getHash - generates hash from empty array', () => {
   const result = getHash([])
 
   expect(typeof result).toBe('string')
-  expect(result).toMatch(/^[a-f0-9]{40}$/i)
+  expect(result).toMatch(/^[a-f\d]{40}$/i)
   expect(result.length).toBe(40)
 })
 
@@ -30,7 +30,7 @@ test('getHash - generates hash from Buffer', () => {
   const result = getHash([buffer])
 
   expect(typeof result).toBe('string')
-  expect(result).toMatch(/^[a-f0-9]{40}$/i)
+  expect(result).toMatch(/^[a-f\d]{40}$/i)
   expect(result.length).toBe(40)
 })
 
@@ -39,7 +39,7 @@ test('getHash - generates hash from mixed strings and buffers', () => {
   const result = getHash([buffer, 'world', 'test'])
 
   expect(typeof result).toBe('string')
-  expect(result).toMatch(/^[a-f0-9]{40}$/i)
+  expect(result).toMatch(/^[a-f\d]{40}$/i)
   expect(result.length).toBe(40)
 })
 
@@ -73,7 +73,7 @@ test('getHash - handles empty strings', () => {
   const result = getHash(['', 'hello', ''])
 
   expect(typeof result).toBe('string')
-  expect(result).toMatch(/^[a-f0-9]{40}$/i)
+  expect(result).toMatch(/^[a-f\d]{40}$/i)
   expect(result.length).toBe(40)
 })
 
@@ -82,7 +82,7 @@ test('getHash - handles large content', () => {
   const result = getHash([largeString])
 
   expect(typeof result).toBe('string')
-  expect(result).toMatch(/^[a-f0-9]{40}$/i)
+  expect(result).toMatch(/^[a-f\d]{40}$/i)
   expect(result.length).toBe(40)
 })
 

@@ -1,6 +1,6 @@
+import { pathToFileURL } from 'node:url'
 import { test, expect } from '@jest/globals'
 import { getCacheFileOperations } from '../src/parts/GetCacheFileOperations/GetCacheFileOperations.js'
-import { pathToFileURL } from 'node:url'
 
 test('getCacheFileOperations - function exists and is callable', async () => {
   expect(typeof getCacheFileOperations).toBe('function')
@@ -154,11 +154,11 @@ test('getCacheFileOperations handles nested paths correctly', async () => {
 
 test('getCacheFileOperations handles Windows-style paths', async () => {
   const result = await getCacheFileOperations(
-    pathToFileURL('C:\\repo\\path').href,
+    pathToFileURL(String.raw`C:\repo\path`).href,
     'cache-key',
-    pathToFileURL('C:\\cache\\dir').href,
-    pathToFileURL('C:\\cache\\dir\\cache-key').href,
-    ['node_modules', 'packages\\a\\node_modules'],
+    pathToFileURL(String.raw`C:\cache\dir`).href,
+    pathToFileURL(String.raw`C:\cache\dir\cache-key`).href,
+    ['node_modules', String.raw`packages\a\node_modules`],
   )
 
   const copyOperations = result.filter((op) => op.type === 'copy')
