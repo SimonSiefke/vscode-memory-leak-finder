@@ -9,7 +9,7 @@ import * as InstallDependencies from '../InstallDependencies/InstallDependencies
 import * as ResolveCommitHash from '../ResolveCommitHash/ResolveCommitHash.js'
 import * as RunCompile from '../RunCompile/RunCompile.js'
 import { setupNodeModulesFromCache } from '../SetupNodeModulesFromCache/SetupNodeModulesFromCache.js'
-import { log } from '../Logger/Logger.js'
+import * as Logger from '../Logger/Logger.js'
 
 /**
  * @param {string} commitRef - The commit reference (branch name, tag, or commit hash)
@@ -50,7 +50,7 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, repos
   }
 
   if (needsInstall) {
-    log(`Installing dependencies for commit ${commitHash}...`)
+    Logger.log(`Installing dependencies for commit ${commitHash}...`)
     const cacheExists = await checkCacheExists(commitHash, cacheDir)
     if (cacheExists) {
       await setupNodeModulesFromCache(repoPath, commitHash, cacheDir)
@@ -59,12 +59,12 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, repos
       await addNodeModulesToCache(repoPath, commitHash, cacheDir)
     }
   } else if (!existsMainJsPath) {
-    log(`node_modules already exists in repo for commit ${commitHash}, skipping npm ci...`)
+    Logger.log(`node_modules already exists in repo for commit ${commitHash}, skipping npm ci...`)
   }
 
   // Compile if needed
   if (needsCompile) {
-    log(`Compiling VS Code for commit ${commitHash}...`)
+    Logger.log(`Compiling VS Code for commit ${commitHash}...`)
     await RunCompile.runCompile(repoPath, useNice, mainJsPath)
   }
 }
