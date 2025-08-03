@@ -1,113 +1,111 @@
-import {
-	test, expect, jest, beforeEach,
-} from '@jest/globals';
+import { test, expect, jest, beforeEach } from '@jest/globals'
 
-const mockCopy = jest.fn();
-const mockMakeDirectory = jest.fn();
-const mockRemove = jest.fn();
+const mockCopy = jest.fn()
+const mockMakeDirectory = jest.fn()
+const mockRemove = jest.fn()
 
 jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.js', () => ({
-	copy: mockCopy,
-	makeDirectory: mockMakeDirectory,
-	remove: mockRemove,
-}));
+  copy: mockCopy,
+  makeDirectory: mockMakeDirectory,
+  remove: mockRemove,
+}))
 
-let applyFileOperationModule;
+let applyFileOperationModule
 
 beforeEach(async () => {
-	// Reset all mocks
-	jest.clearAllMocks();
+  // Reset all mocks
+  jest.clearAllMocks()
 
-	// Import the module after mocking
-	applyFileOperationModule = await import('../src/parts/ApplyFileOperation/ApplyFileOperation.js');
-});
+  // Import the module after mocking
+  applyFileOperationModule = await import('../src/parts/ApplyFileOperation/ApplyFileOperation.js')
+})
 
 test('applyFileOperation - function exists and is callable', async () => {
-	expect(typeof applyFileOperationModule.applyFileOperation).toBe('function');
-});
+  expect(typeof applyFileOperationModule.applyFileOperation).toBe('function')
+})
 
 test('applyFileOperation - applies copy operation', async () => {
-	mockCopy.mockReturnValue(undefined);
+  mockCopy.mockReturnValue(undefined)
 
-	const operation = {
-		type: 'copy',
-		from: '/source/file.txt',
-		to: '/dest/file.txt',
-	};
+  const operation = {
+    type: 'copy',
+    from: '/source/file.txt',
+    to: '/dest/file.txt',
+  }
 
-	await applyFileOperationModule.applyFileOperation(operation);
+  await applyFileOperationModule.applyFileOperation(operation)
 
-	expect(mockCopy).toHaveBeenCalledWith('/source/file.txt', '/dest/file.txt');
-	expect(mockCopy).toHaveBeenCalledTimes(1);
-});
+  expect(mockCopy).toHaveBeenCalledWith('/source/file.txt', '/dest/file.txt')
+  expect(mockCopy).toHaveBeenCalledTimes(1)
+})
 
 test('applyFileOperation - applies mkdir operation', async () => {
-	mockMakeDirectory.mockReturnValue(undefined);
+  mockMakeDirectory.mockReturnValue(undefined)
 
-	const operation = {
-		type: 'mkdir',
-		path: '/path/to/directory',
-	};
+  const operation = {
+    type: 'mkdir',
+    path: '/path/to/directory',
+  }
 
-	await applyFileOperationModule.applyFileOperation(operation);
+  await applyFileOperationModule.applyFileOperation(operation)
 
-	expect(mockMakeDirectory).toHaveBeenCalledWith('/path/to/directory');
-	expect(mockMakeDirectory).toHaveBeenCalledTimes(1);
-});
+  expect(mockMakeDirectory).toHaveBeenCalledWith('/path/to/directory')
+  expect(mockMakeDirectory).toHaveBeenCalledTimes(1)
+})
 
 test('applyFileOperation - applies remove operation', async () => {
-	mockRemove.mockReturnValue(undefined);
+  mockRemove.mockReturnValue(undefined)
 
-	const operation = {
-		type: 'remove',
-		from: '/path/to/file.txt',
-	};
+  const operation = {
+    type: 'remove',
+    from: '/path/to/file.txt',
+  }
 
-	await applyFileOperationModule.applyFileOperation(operation);
+  await applyFileOperationModule.applyFileOperation(operation)
 
-	expect(mockRemove).toHaveBeenCalledWith('/path/to/file.txt');
-	expect(mockRemove).toHaveBeenCalledTimes(1);
-});
+  expect(mockRemove).toHaveBeenCalledWith('/path/to/file.txt')
+  expect(mockRemove).toHaveBeenCalledTimes(1)
+})
 
 test('applyFileOperation - handles copy operation error', async () => {
-	const error = new Error('Copy failed');
-	mockCopy.mockImplementation(() => {
-		throw error;
-	});
+  const error = new Error('Copy failed')
+  mockCopy.mockImplementation(() => {
+    throw error
+  })
 
-	const operation = {
-		type: 'copy',
-		from: '/source/file.txt',
-		to: '/dest/file.txt',
-	};
+  const operation = {
+    type: 'copy',
+    from: '/source/file.txt',
+    to: '/dest/file.txt',
+  }
 
-	await expect(applyFileOperationModule.applyFileOperation(operation)).rejects.toThrow('Failed to apply file operation copy');
-});
+  await expect(applyFileOperationModule.applyFileOperation(operation)).rejects.toThrow('Failed to apply file operation copy')
+})
 
 test('applyFileOperation - handles mkdir operation error', async () => {
-	const error = new Error('Directory creation failed');
-	mockMakeDirectory.mockImplementation(() => {
-		throw error;
-	});
+  const error = new Error('Directory creation failed')
+  mockMakeDirectory.mockImplementation(() => {
+    throw error
+  })
 
-	const operation = {
-		type: 'mkdir',
-		path: '/path/to/directory',
-	};
+  const operation = {
+    type: 'mkdir',
+    path: '/path/to/directory',
+  }
 
-	await expect(applyFileOperationModule.applyFileOperation(operation)).rejects.toThrow('Failed to apply file operation mkdir');
-});
+  await expect(applyFileOperationModule.applyFileOperation(operation)).rejects.toThrow('Failed to apply file operation mkdir')
+})
 
 test('applyFileOperation - handles remove operation error', async () => {
-	const error = new Error('Remove failed');
-	mockRemove.mockImplementation(() => {
-		throw error;
-	});
+  const error = new Error('Remove failed')
+  mockRemove.mockImplementation(() => {
+    throw error
+  })
 
-	const operation = {
-		type: 'remove',
-		from: '/path/to/file.txt',
-	};
+  const operation = {
+    type: 'remove',
+    from: '/path/to/file.txt',
+  }
 
-	await expect(applyFileOperationModule.applyFileOperation(operation)).rejects.toThrow('Failed to apply file operation remove');
-});
+  await expect(applyFileOperationModule.applyFileOperation(operation)).rejects.toThrow('Failed to apply file operation remove')
+})

@@ -59,4 +59,4 @@ export const applyFileOperation = async (operation) => {
   } catch (error) {
     throw new VError(error, `Failed to apply file operation ${operation.type}`)
   }
-} 
+}

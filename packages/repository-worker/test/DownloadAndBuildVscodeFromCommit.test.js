@@ -270,7 +270,6 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
 })
 
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with existing out folder', async () => {
-  // Create a temporary test directory structure
   const testCommitHash = 'test-commit-789'
   const reposDir = join('/test', '.vscode-repos')
   const repoPath = join(reposDir, testCommitHash)
@@ -278,7 +277,6 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
   const nodeModulesPath = join(repoPath, 'node_modules')
   const outPath = join(repoPath, 'out')
 
-  // Mock filesystem responses for existing out folder scenario
   mockPathExists.mockImplementation((path) => {
     if (path === reposDir) {
       return false
@@ -303,10 +301,8 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
     return false
   })
 
-  // Mock successful directory creation
   mockMkdir.mockReturnValue(undefined)
 
-  // This should detect existing out folder and skip compilation
   await downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, reposDir, '/test/cache', false)
 
   // Since main.js doesn't exist but out folder does, it should still call runCompile

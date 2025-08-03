@@ -21,11 +21,6 @@ test('setupNodeModulesFromCache - function exists and is callable', async () => 
   expect(typeof setupNodeModulesFromCache).toBe('function')
 })
 
-test('addNodeModulesToCache - function exists and is callable', async () => {
-  const { addNodeModulesToCache } = await import('../src/parts/CacheNodeModules/CacheNodeModules.js')
-  expect(typeof addNodeModulesToCache).toBe('function')
-})
-
 test('setupNodeModulesFromCache throws VError when no cache exists', async () => {
   mockFindFiles.mockImplementation(() => {
     return Promise.reject(new Error('ENOENT: no such file or directory'))
@@ -33,7 +28,6 @@ test('setupNodeModulesFromCache throws VError when no cache exists', async () =>
 
   const { setupNodeModulesFromCache } = await import('../src/parts/SetupNodeModulesFromCache/SetupNodeModulesFromCache.js')
 
-  // This should throw VError when no cache exists
   await expect(setupNodeModulesFromCache('/nonexistent/path', 'test-commit', '/test/cache')).rejects.toThrow(
     'Failed to setup node_modules from cache',
   )
