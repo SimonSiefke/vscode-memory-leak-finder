@@ -27,8 +27,6 @@ import * as Path from '../Path/Path.js'
  */
 export const getCacheFileOperations = async (repoPath, cacheKey, cacheDir, cachedNodeModulesPath, nodeModulesPaths) => {
   const fileOperations = []
-
-  // Add directory creation operations
   fileOperations.push(
     {
       type: /** @type {'mkdir'} */ ('mkdir'),
@@ -39,15 +37,10 @@ export const getCacheFileOperations = async (repoPath, cacheKey, cacheDir, cache
       path: cachedNodeModulesPath,
     },
   )
-
-  // Convert relative paths to absolute paths
   const absoluteNodeModulesPaths = nodeModulesPaths.map((path) => Path.join(repoPath, path))
-
   for (const nodeModulesPath of absoluteNodeModulesPaths) {
-    // Calculate relative path from repo root to maintain directory structure
     const relativePath = nodeModulesPath.replace(repoPath, '').replace(/^\/+/, '')
     const cacheTargetPath = Path.join(cachedNodeModulesPath, relativePath)
-    // Add parent directory creation operation
     const parentDir = Path.join(cacheTargetPath, '..')
     fileOperations.push(
       {
