@@ -1,45 +1,99 @@
-import { expect, test } from '@jest/globals'
-import { mkdir, rm, writeFile } from 'node:fs/promises'
-import { platform } from 'node:os'
+import { expect, test, jest, beforeEach, afterEach } from '@jest/globals'
 import { join } from 'node:path'
-import { pathExists } from 'path-exists'
 import { downloadAndBuildVscodeFromCommit } from '../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js'
-import * as InstallDependencies from '../src/parts/InstallDependencies/InstallDependencies.js'
 import * as Root from '../src/parts/Root/Root.js'
 
 // Default values for testing
 const DEFAULT_REPO_URL = 'https://github.com/microsoft/vscode.git'
 const DEFAULT_REPOS_DIR = '.vscode-repos'
 
-test('downloadVscodeCommit - returns expected path structure', async () => {
-  // Test that the function returns the expected path structure
+// Mock filesystem operations
+const mockPathExists = jest.fn()
+const mockMkdir = jest.fn()
+const mockWriteFile = jest.fn()
+const mockRm = jest.fn()
+
+// Mock execa
+const mockExeca = jest.fn()
+
+// Mock exec function
+const mockExec = jest.fn()
+
+jest.unstable_mockModule('path-exists', () => ({
+  pathExists: mockPathExists,
+}))
+
+jest.unstable_mockModule('node:fs/promises', () => ({
+  mkdir: mockMkdir,
+  writeFile: mockWriteFile,
+  rm: mockRm,
+}))
+
+jest.unstable_mockModule('execa', () => ({
+  execa: mockExeca,
+}))
+
+jest.unstable_mockModule('../src/parts/Exec/Exec.js', () => ({
+  exec: mockExec,
+}))
+
+beforeEach(() => {
+  jest.clearAllMocks()
+})
+
+afterEach(() => {
+  jest.resetModules()
+})
+
+test('downloadVscodeCommit - tests git clone operations with mocked execa', async () => {
+  // Test that the function properly calls git clone and checkout
   const testCommitHash = 'test-commit-download'
   const testOutFolder = '.test-repos'
+  const testRepoUrl = 'https://github.com/microsoft/vscode.git'
 
-  // Mock the git operations by creating the directory structure manually
+  // Mock path structure
   const reposDir = join(Root.root, testOutFolder)
   const repoPath = join(reposDir, testCommitHash)
 
-  // Ensure clean state
-  if (await pathExists(repoPath)) {
-    await rm(repoPath, { recursive: true, force: true })
-  }
+  // Mock filesystem responses - repo doesn't exist initially
+  mockPathExists.mockImplementation((path) => {
+    if (path === reposDir) return false
+    if (path === repoPath) return false
+    return false
+  })
 
-  // Create the directory structure that would be created by the function
-  await mkdir(repoPath, { recursive: true })
+  // Mock successful directory creation
+  mockMkdir.mockResolvedValue(undefined)
 
-  try {
-    // Since we can't actually test git clone without a real repo,
-    // we'll test that the function structure is correct by checking
-    // that it would return the expected path
-    const expectedPath = join(Root.root, testOutFolder, testCommitHash)
-    expect(expectedPath).toBe(repoPath)
-  } finally {
-    // Cleanup
-    if (await pathExists(repoPath)) {
-      await rm(repoPath, { recursive: true, force: true })
+  // Mock successful git operations
+  mockExeca.mockImplementation((command, args, options) => {
+    if (command === 'git' && args.includes('rev-parse')) {
+      // Mock git rev-parse for resolving commit hash
+      return Promise.resolve({ stdout: 'a1b2c3d4e5f6789012345678901234567890abcd', stderr: '' })
     }
-  }
+    if (command === 'git' && args.includes('clone')) {
+      // Mock git clone
+      return Promise.resolve({ stdout: '', stderr: '' })
+    }
+    if (command === 'git' && args.includes('checkout')) {
+      // Mock git checkout
+      return Promise.resolve({ stdout: '', stderr: '' })
+    }
+    // Default mock for other commands
+    return Promise.resolve({ stdout: '', stderr: '' })
+  })
+
+  // Call the function - it should now work with mocked execa
+  await downloadAndBuildVscodeFromCommit(testCommitHash, testRepoUrl, testOutFolder, '/test/cache', false)
+
+  // Verify that mkdir was called to create the repos directory
+  expect(mockMkdir).toHaveBeenCalledWith(reposDir, { recursive: true })
+
+  // Verify that execa was called for git clone
+  expect(mockExeca).toHaveBeenCalledWith('git', ['clone', testRepoUrl, repoPath])
+
+  // Verify that execa was called for git checkout
+  expect(mockExeca).toHaveBeenCalledWith('git', ['checkout', testCommitHash], { cwd: repoPath })
 })
 
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missing node_modules', async () => {
@@ -47,34 +101,46 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missi
   const testCommitHash = 'test-commit-123'
   const reposDir = join(Root.root, '.vscode-repos')
   const repoPath = join(reposDir, testCommitHash)
+  const mainJsPath = join(repoPath, 'out', 'main.js')
+  const nodeModulesPath = join(repoPath, 'node_modules')
+  const outPath = join(repoPath, 'out')
 
-  // Ensure clean state
-  if (await pathExists(repoPath)) {
-    await rm(repoPath, { recursive: true, force: true })
-  }
+  // Mock filesystem responses for missing node_modules scenario
+  mockPathExists.mockImplementation((path) => {
+    if (path === reposDir) return false
+    if (path === repoPath) return true
+    if (path === mainJsPath) return false
+    if (path === nodeModulesPath) return false
+    if (path === outPath) return true
+    return false
+  })
 
-  // Create repo directory with package.json but no node_modules
-  await mkdir(repoPath, { recursive: true })
-  await writeFile(join(repoPath, 'package.json'), JSON.stringify({ name: 'vscode' }))
-  await writeFile(join(repoPath, 'package-lock.json'), JSON.stringify({ lockfileVersion: 1 }))
+  // Mock successful directory creation
+  mockMkdir.mockResolvedValue(undefined)
 
-  // Create out directory but no main.js (simulating interrupted build)
-  await mkdir(join(repoPath, 'out'), { recursive: true })
-
-  // Create scripts directory with code.sh
-  await mkdir(join(repoPath, 'scripts'), { recursive: true })
-  await writeFile(join(repoPath, 'scripts', 'code.sh'), '#!/bin/bash\necho "VS Code"')
-
-  try {
-    // This should detect missing node_modules and attempt to restore from cache
-    // Since we're in a test environment, it will likely fail gracefully
-    await expect(downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, DEFAULT_REPOS_DIR)).rejects.toThrow()
-  } finally {
-    // Cleanup
-    if (await pathExists(repoPath)) {
-      await rm(repoPath, { recursive: true, force: true })
+  // Mock successful git operations
+  mockExeca.mockImplementation((command, args, options) => {
+    if (command === 'git' && args.includes('rev-parse')) {
+      // Mock git rev-parse for resolving commit hash
+      return Promise.resolve({ stdout: 'a1b2c3d4e5f6789012345678901234567890abcd', stderr: '' })
     }
-  }
+    if (command === 'git' && args.includes('clone')) {
+      // Mock git clone
+      return Promise.resolve({ stdout: '', stderr: '' })
+    }
+    if (command === 'git' && args.includes('checkout')) {
+      // Mock git checkout
+      return Promise.resolve({ stdout: '', stderr: '' })
+    }
+    // Default mock for other commands
+    return Promise.resolve({ stdout: '', stderr: '' })
+  })
+
+  // This should detect missing node_modules and attempt to restore from cache
+  // Since we're in a test environment, it will likely fail gracefully
+  await expect(
+    downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, DEFAULT_REPOS_DIR, '/test/cache', false),
+  ).rejects.toThrow()
 })
 
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with existing node_modules', async () => {
@@ -82,38 +148,46 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
   const testCommitHash = 'test-commit-456'
   const reposDir = join(Root.root, '.vscode-repos')
   const repoPath = join(reposDir, testCommitHash)
+  const mainJsPath = join(repoPath, 'out', 'main.js')
+  const nodeModulesPath = join(repoPath, 'node_modules')
+  const outPath = join(repoPath, 'out')
 
-  // Ensure clean state
-  if (await pathExists(repoPath)) {
-    await rm(repoPath, { recursive: true, force: true })
-  }
+  // Mock filesystem responses for existing node_modules scenario
+  mockPathExists.mockImplementation((path) => {
+    if (path === reposDir) return false
+    if (path === repoPath) return true
+    if (path === mainJsPath) return false
+    if (path === nodeModulesPath) return true
+    if (path === outPath) return true
+    return false
+  })
 
-  // Create repo directory with package.json and node_modules
-  await mkdir(repoPath, { recursive: true })
-  await writeFile(join(repoPath, 'package.json'), JSON.stringify({ name: 'vscode' }))
-  await writeFile(join(repoPath, 'package-lock.json'), JSON.stringify({ lockfileVersion: 1 }))
+  // Mock successful directory creation
+  mockMkdir.mockResolvedValue(undefined)
 
-  // Create node_modules directory (simulating interrupted workflow with existing deps)
-  await mkdir(join(repoPath, 'node_modules'), { recursive: true })
-  await writeFile(join(repoPath, 'node_modules', '.package-lock.json'), '{}')
-
-  // Create out directory but no main.js (simulating interrupted build)
-  await mkdir(join(repoPath, 'out'), { recursive: true })
-
-  // Create scripts directory with code.sh
-  await mkdir(join(repoPath, 'scripts'), { recursive: true })
-  await writeFile(join(repoPath, 'scripts', 'code.sh'), '#!/bin/bash\necho "VS Code"')
-
-  try {
-    // This should detect existing node_modules and skip npm ci
-    // Since we're in a test environment, it will likely fail gracefully
-    await expect(downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, DEFAULT_REPOS_DIR)).rejects.toThrow()
-  } finally {
-    // Cleanup
-    if (await pathExists(repoPath)) {
-      await rm(repoPath, { recursive: true, force: true })
+  // Mock successful git operations
+  mockExeca.mockImplementation((command, args, options) => {
+    if (command === 'git' && args.includes('rev-parse')) {
+      // Mock git rev-parse for resolving commit hash
+      return Promise.resolve({ stdout: 'a1b2c3d4e5f6789012345678901234567890abcd', stderr: '' })
     }
-  }
+    if (command === 'git' && args.includes('clone')) {
+      // Mock git clone
+      return Promise.resolve({ stdout: '', stderr: '' })
+    }
+    if (command === 'git' && args.includes('checkout')) {
+      // Mock git checkout
+      return Promise.resolve({ stdout: '', stderr: '' })
+    }
+    // Default mock for other commands
+    return Promise.resolve({ stdout: '', stderr: '' })
+  })
+
+  // This should detect existing node_modules and skip npm ci
+  // Since we're in a test environment, it will likely fail gracefully
+  await expect(
+    downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, DEFAULT_REPOS_DIR, '/test/cache', false),
+  ).rejects.toThrow()
 })
 
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with existing out folder', async () => {
@@ -121,37 +195,44 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
   const testCommitHash = 'test-commit-789'
   const reposDir = join(Root.root, '.vscode-repos')
   const repoPath = join(reposDir, testCommitHash)
+  const mainJsPath = join(repoPath, 'out', 'main.js')
+  const nodeModulesPath = join(repoPath, 'node_modules')
+  const outPath = join(repoPath, 'out')
 
-  // Ensure clean state
-  if (await pathExists(repoPath)) {
-    await rm(repoPath, { recursive: true, force: true })
-  }
+  // Mock filesystem responses for existing out folder scenario
+  mockPathExists.mockImplementation((path) => {
+    if (path === reposDir) return false
+    if (path === repoPath) return true
+    if (path === mainJsPath) return false
+    if (path === nodeModulesPath) return true
+    if (path === outPath) return true
+    return false
+  })
 
-  // Create repo directory with package.json and node_modules
-  await mkdir(repoPath, { recursive: true })
-  await writeFile(join(repoPath, 'package.json'), JSON.stringify({ name: 'vscode' }))
-  await writeFile(join(repoPath, 'package-lock.json'), JSON.stringify({ lockfileVersion: 1 }))
+  // Mock successful directory creation
+  mockMkdir.mockResolvedValue(undefined)
 
-  // Create node_modules directory
-  await mkdir(join(repoPath, 'node_modules'), { recursive: true })
-  await writeFile(join(repoPath, 'node_modules', '.package-lock.json'), '{}')
-
-  // Create out directory with some files but no main.js (simulating interrupted compilation)
-  await mkdir(join(repoPath, 'out'), { recursive: true })
-  await writeFile(join(repoPath, 'out', 'some-other-file.js'), 'console.log("test")')
-
-  // Create scripts directory with code.sh
-  await mkdir(join(repoPath, 'scripts'), { recursive: true })
-  await writeFile(join(repoPath, 'scripts', 'code.sh'), '#!/bin/bash\necho "VS Code"')
-
-  try {
-    // This should detect existing out folder and skip compilation
-    // Since we're in a test environment, it will likely fail gracefully
-    await expect(downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, DEFAULT_REPOS_DIR)).rejects.toThrow()
-  } finally {
-    // Cleanup
-    if (await pathExists(repoPath)) {
-      await rm(repoPath, { recursive: true, force: true })
+  // Mock successful git operations
+  mockExeca.mockImplementation((command, args, options) => {
+    if (command === 'git' && args.includes('rev-parse')) {
+      // Mock git rev-parse for resolving commit hash
+      return Promise.resolve({ stdout: 'a1b2c3d4e5f6789012345678901234567890abcd', stderr: '' })
     }
-  }
+    if (command === 'git' && args.includes('clone')) {
+      // Mock git clone
+      return Promise.resolve({ stdout: '', stderr: '' })
+    }
+    if (command === 'git' && args.includes('checkout')) {
+      // Mock git checkout
+      return Promise.resolve({ stdout: '', stderr: '' })
+    }
+    // Default mock for other commands
+    return Promise.resolve({ stdout: '', stderr: '' })
+  })
+
+  // This should detect existing out folder and skip compilation
+  // Since we're in a test environment, it will likely fail gracefully
+  await expect(
+    downloadAndBuildVscodeFromCommit(testCommitHash, DEFAULT_REPO_URL, DEFAULT_REPOS_DIR, '/test/cache', false),
+  ).rejects.toThrow()
 })
