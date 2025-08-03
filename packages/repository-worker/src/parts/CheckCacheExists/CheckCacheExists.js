@@ -10,7 +10,6 @@ import * as Filesystem from '../Filesystem/Filesystem.js'
 export const checkCacheExists = async (commitHash, cacheDir) => {
   try {
     const cachedNodeModulesPath = Path.join(cacheDir, commitHash)
-
     return await Filesystem.pathExists(cachedNodeModulesPath)
   } catch (error) {
     throw new VError(error, `Failed to check if cache exists for commit hash: ${commitHash}`)
