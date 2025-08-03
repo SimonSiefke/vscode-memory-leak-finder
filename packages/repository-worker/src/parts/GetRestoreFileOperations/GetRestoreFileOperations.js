@@ -1,5 +1,4 @@
 import { join } from 'node:path'
-import { pathToFileURL, fileURLToPath } from 'node:url'
 import { pathExists } from 'path-exists'
 import { VError } from '@lvce-editor/verror'
 
@@ -27,9 +26,9 @@ import { VError } from '@lvce-editor/verror'
  */
 
 /**
- * @param {string} repoPathUri - File URI of the repository path
+ * @param {string} repoPath - File URI of the repository path
  * @param {string} cacheKey
- * @param {string} cacheDirUri - File URI of the cache directory
+ * @param {string} cacheDir - File URI of the cache directory
  * @param {string} cachedNodeModulesPath - File URI of the cached node_modules path
  * @param {string[]} cachedNodeModulesPaths - Relative paths within the cache
  * @returns {Promise<FileOperation[]>}
