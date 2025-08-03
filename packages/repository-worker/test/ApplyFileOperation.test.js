@@ -2,7 +2,6 @@ import {
 	test, expect, jest, beforeEach,
 } from '@jest/globals';
 
-// Mock the filesystem functions
 const mockCopy = jest.fn();
 const mockMakeDirectory = jest.fn();
 const mockRemove = jest.fn();

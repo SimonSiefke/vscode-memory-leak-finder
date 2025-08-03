@@ -1,6 +1,5 @@
 import { test, expect, jest, beforeEach } from '@jest/globals'
 
-// Mock the Exec module
 const mockExec = jest.fn()
 jest.unstable_mockModule('../src/parts/Exec/Exec.js', () => ({
   exec: mockExec,

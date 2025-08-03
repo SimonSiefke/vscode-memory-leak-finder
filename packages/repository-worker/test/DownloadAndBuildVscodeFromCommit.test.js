@@ -1,22 +1,17 @@
 import { join } from 'node:path'
 import { afterEach, beforeEach, expect, jest, test } from '@jest/globals'
 
-// Default values for testing
 const DEFAULT_REPO_URL = 'https://github.com/microsoft/vscode.git'
 
-// Mock filesystem operations
 const mockPathExists = jest.fn()
 const mockMkdir = jest.fn()
 const mockWriteFile = jest.fn()
 const mockRm = jest.fn()
 
-// Mock execa
 const mockExeca = jest.fn()
 
-// Mock exec function
 const mockExec = jest.fn()
 
-// Mock all the dependencies
 const mockAddNodeModulesToCache = jest.fn()
 const mockCheckCacheExists = jest.fn()
 const mockCheckoutCommit = jest.fn()
@@ -93,7 +88,6 @@ beforeEach(() => {
 
   mockExec.mockImplementation((command, args, options) => {
     if (command === 'git' && Array.isArray(args) && args.includes('ls-remote')) {
-      // Mock git ls-remote for resolving commit hash
       return {
         stdout: 'a1b2c3d4e5f6789012345678901234567890abcd',
         stderr: '',
@@ -102,12 +96,10 @@ beforeEach(() => {
     }
 
     if (command === 'git' && Array.isArray(args) && args.includes('clone')) {
-      // Mock git clone
       return { stdout: '', stderr: '', exitCode: 0 }
     }
 
     if (command === 'git' && Array.isArray(args) && args.includes('checkout')) {
-      // Mock git checkout
       return { stdout: '', stderr: '', exitCode: 0 }
     }
 
@@ -117,12 +109,10 @@ beforeEach(() => {
 
   mockExeca.mockImplementation((command, args, options) => {
     if (command === 'git' && Array.isArray(args) && args.includes('clone')) {
-      // Mock git clone
       return { stdout: '', stderr: '' }
     }
 
     if (command === 'git' && Array.isArray(args) && args.includes('checkout')) {
-      // Mock git checkout
       return { stdout: '', stderr: '' }
     }
 
@@ -130,7 +120,6 @@ beforeEach(() => {
     return { stdout: '', stderr: '' }
   })
 
-  // Mock all dependency functions
   mockResolveCommitHash.mockImplementation((repoUrl, commitRef) => {
     return Promise.resolve(commitRef)
   })
@@ -153,7 +142,6 @@ const { downloadAndBuildVscodeFromCommit } = await import(
 )
 
 test('downloadVscodeCommit - tests git clone operations with mocked execa', async () => {
-  // Test that the function properly calls git clone and checkout
   const testCommitHash = 'a1b2c3d4e5f6789012345678901234567890abcd'
   const testReposDir = join('/test', '.test-repos')
   const testRepoUrl = 'https://github.com/microsoft/vscode.git'

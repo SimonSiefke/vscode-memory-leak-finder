@@ -1,14 +1,12 @@
 import { Buffer } from 'node:buffer'
 import { test, expect, jest, beforeEach } from '@jest/globals'
 
-// Mock the fs/promises module
 const mockCp = jest.fn()
 const mockMkdir = jest.fn()
 const mockRm = jest.fn()
 const mockReadFile = jest.fn()
 const mockGlob = jest.fn()
 
-// Mock path-exists module
 const mockPathExists = jest.fn()
 
 jest.unstable_mockModule('node:fs/promises', () => ({
