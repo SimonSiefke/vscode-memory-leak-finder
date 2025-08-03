@@ -39,4 +39,4 @@ test('checkoutCommit handles short commit hash', async () => {
   await checkoutCommit(repoPath, commit)
 
   expect(mockExec).toHaveBeenCalledWith('git', ['checkout', commit], { cwd: repoPath })
-}) 
+})

@@ -65,4 +65,4 @@ test('runCompile logs when using nice', async () => {
 
   expect(consoleSpy).toHaveBeenCalledWith('Using nice to reduce system resource usage...')
   consoleSpy.mockRestore()
-}) 
+})

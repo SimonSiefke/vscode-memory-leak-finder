@@ -18,9 +18,7 @@ test('getFilesHash returns hash of file contents', async () => {
   const fileContents = ['content1', 'content2']
   const expectedHash = 'test-hash'
 
-  mockReadFileContent
-    .mockResolvedValueOnce(fileContents[0])
-    .mockResolvedValueOnce(fileContents[1])
+  mockReadFileContent.mockResolvedValueOnce(fileContents[0]).mockResolvedValueOnce(fileContents[1])
   mockGetHash.mockReturnValue(expectedHash)
 
   const result = await getFilesHash(absolutePaths)
@@ -51,4 +49,4 @@ test('getFilesHash throws VError when getHash fails', async () => {
   })
 
   await expect(getFilesHash(absolutePaths)).rejects.toThrow('Failed to get files hash')
-}) 
+})

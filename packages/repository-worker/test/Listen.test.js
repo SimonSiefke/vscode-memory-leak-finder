@@ -33,4 +33,4 @@ test('listen handles RPC client creation error', async () => {
   mockNodeWorkerRpcClient.create.mockRejectedValue(error)
 
   await expect(listen()).rejects.toThrow('RPC client creation failed')
-}) 
+})

@@ -49,4 +49,4 @@ test('cloneRepository handles different local paths', async () => {
   await cloneRepository(repoUrl, repoPath)
 
   expect(mockExec).toHaveBeenCalledWith('git', ['clone', '--depth', '1', repoUrl, repoPath])
-}) 
+})

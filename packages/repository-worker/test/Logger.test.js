@@ -29,4 +29,4 @@ test('log handles complex objects', () => {
 
   expect(consoleSpy).toHaveBeenCalledWith(message)
   consoleSpy.mockRestore()
-}) 
+})

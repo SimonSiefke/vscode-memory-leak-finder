@@ -34,4 +34,4 @@ test('join handles path with dots', () => {
 test('join handles path with parent directory', () => {
   const result = join('path', '..', 'file')
   expect(result).toBe('file')
-}) 
+})

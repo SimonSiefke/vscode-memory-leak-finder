@@ -53,4 +53,4 @@ test('checkCacheExists throws VError when pathExists fails', async () => {
   mockPathExists.mockRejectedValue(error)
 
   await expect(checkCacheExists(commitHash, cacheDir)).rejects.toThrow(`Failed to check if cache exists for commit hash: ${commitHash}`)
-}) 
+})

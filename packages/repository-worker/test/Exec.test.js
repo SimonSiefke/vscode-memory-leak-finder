@@ -84,4 +84,4 @@ test('exec handles non-zero exit code', async () => {
     stderr: 'Command failed',
     exitCode: 1,
   })
-}) 
+})
