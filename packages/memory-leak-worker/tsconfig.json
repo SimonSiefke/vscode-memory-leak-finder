@@ -10,7 +10,7 @@
     "strict": true,
     "noImplicitAny": true,
     "skipLibCheck": true,
-    "noEmit": false,
+    "noEmit": true,
     "outDir": "dist",
     "allowSyntheticDefaultImports": true,
     "assumeChangesOnlyAffectDirectDependencies": true,

@@ -28,13 +28,15 @@ export const handleScriptParsed = (x: unknown): void => {
 }
 
 const getExecutionContextType = (message: DevToolsMessage): string => {
-  if (message.params?.context?.auxData) {
-    const auxData = message.params.context.auxData as any
-    if (auxData.type) {
-      return auxData.type
-    }
-    if (auxData.isDefault) {
-      return 'default'
+  if (message.params?.context) {
+    const context = message.params.context as any
+    if (context.auxData) {
+      if (context.auxData.type) {
+        return context.auxData.type
+      }
+      if (context.auxData.isDefault) {
+        return 'default'
+      }
     }
   }
   return ''
