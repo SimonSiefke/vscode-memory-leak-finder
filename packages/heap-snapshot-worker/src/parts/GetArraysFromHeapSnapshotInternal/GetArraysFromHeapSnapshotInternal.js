@@ -142,7 +142,17 @@ export const getArraysFromHeapSnapshotInternal = (strings, nodes, node_types, no
   const result = arrayObjects
     .map((obj) => {
       const nameObject = nameMap[obj.id]
-      const displayName = nameObject ? (nameObject.edgeName || nameObject.nodeName) : obj.name
+
+      // If we have variable names from property edges, use them as an array
+      // Otherwise fall back to the single name from nameMap or obj.name
+      let displayName
+      if (obj.variableNames && obj.variableNames.length > 0) {
+        // Extract unique variable names and sort them for consistent ordering
+        const uniqueNames = [...new Set(obj.variableNames.map(v => v.name))].sort()
+        displayName = uniqueNames
+      } else {
+        displayName = nameObject ? (nameObject.edgeName || nameObject.nodeName) : obj.name
+      }
 
       return {
         id: obj.id,
