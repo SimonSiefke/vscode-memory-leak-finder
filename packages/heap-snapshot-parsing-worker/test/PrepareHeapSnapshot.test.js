@@ -1,8 +1,8 @@
-import { test, expect } from '@jest/globals'
-import { prepareHeapSnapshot } from '../src/parts/PrepareHeapSnapshot/PrepareHeapSnapshot.js'
-import { writeFileSync, unlinkSync } from 'node:fs'
-import { join } from 'node:path'
+import { expect, test } from '@jest/globals'
+import { unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { parseFromFile } from '../src/parts/ParseFromFile/ParseFromFile.js'
 
 test('prepareHeapSnapshot - parses simple heap snapshot', async () => {
   // Create a minimal heap snapshot file
@@ -29,7 +29,7 @@ test('prepareHeapSnapshot - parses simple heap snapshot', async () => {
   writeFileSync(tmpFile, JSON.stringify(heapSnapshotData))
 
   try {
-    const result = await prepareHeapSnapshot(tmpFile)
+    const result = await parseFromFile(tmpFile)
 
     expect(result).toHaveProperty('metaData')
     expect(result).toHaveProperty('nodes')
