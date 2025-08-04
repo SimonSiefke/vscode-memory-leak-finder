@@ -1,6 +1,7 @@
 import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.js'
+import * as CreateNameMap from '../CreateNameMap/CreateNameMap.js'
 
-export const getArraysFromHeapSnapshotInternal = (strings, nodes, node_types, node_fields, edges, edge_types, edge_fields) => {
+export const getArraysFromHeapSnapshotInternal = (strings, nodes, node_types, node_fields, edges, edge_types, edge_fields, parsedNodes, graph) => {
   const {
     objectTypeIndex,
     ITEMS_PER_NODE,
@@ -134,18 +135,26 @@ export const getArraysFromHeapSnapshotInternal = (strings, nodes, node_types, no
     currentEdgeOffset += edgeCount
   }
 
-  // Sort by length (longest first) and return
+  // Create name map to get real display names
+  const nameMap = CreateNameMap.createNameMap(parsedNodes, graph)
+
+  // Sort by length (longest first) and return with real display names
   const result = arrayObjects
-    .map((obj) => ({
-      id: obj.id,
-      name: obj.name,
-      length: obj.length,
-      type: obj.type,
-      selfSize: obj.selfSize,
-      edgeCount: obj.edgeCount,
-      detachedness: obj.detachedness,
-      variableNames: obj.variableNames,
-    }))
+    .map((obj) => {
+      const nameObject = nameMap[obj.id]
+      const displayName = nameObject ? (nameObject.edgeName || nameObject.nodeName) : obj.name
+
+      return {
+        id: obj.id,
+        name: displayName,
+        length: obj.length,
+        type: obj.type,
+        selfSize: obj.selfSize,
+        edgeCount: obj.edgeCount,
+        detachedness: obj.detachedness,
+        variableNames: obj.variableNames,
+      }
+    })
     .sort((a, b) => b.length - a.length)
 
   return result

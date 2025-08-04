@@ -1,6 +1,7 @@
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.js'
 import { readFile } from 'node:fs/promises'
 import { getArraysFromHeapSnapshotInternal } from '../GetArraysFromHeapSnapshotInternal/GetArraysFromHeapSnapshotInternal.js'
+import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
 
 export const getArraysFromHeapSnapshot = async (pathUri) => {
   // Read strings and edges from the original JSON file
@@ -13,5 +14,8 @@ export const getArraysFromHeapSnapshot = async (pathUri) => {
   const { metaData, nodes } = await prepareHeapSnapshot(pathUri)
   const { node_types, node_fields, edge_types, edge_fields } = metaData.data.meta
 
-  return getArraysFromHeapSnapshotInternal(strings, nodes, node_types, node_fields, edges, edge_types, edge_fields)
+  // Also get parsed nodes and graph for name mapping
+  const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapSnapshot)
+
+  return getArraysFromHeapSnapshotInternal(strings, nodes, node_types, node_fields, edges, edge_types, edge_fields, parsedNodes, graph)
 }
