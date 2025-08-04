@@ -76,8 +76,6 @@ test('parseHeapSnapshotMetaData - handles snapshot with arrays in metadata', () 
   expect(result.data.meta.edge_types).toHaveLength(2)
 })
 
-
-
 test('parseHeapSnapshotMetaData - handles snapshot with empty metadata', () => {
   const data = '{"snapshot":{"meta":{},"node_count":0,"edge_count":0}}'
 
@@ -102,8 +100,6 @@ test('parseHeapSnapshotMetaData - handles snapshot with missing metadata fields'
   expect(result.data.meta).toHaveProperty('node_fields')
   expect(result.data.meta.node_fields).toEqual(['type', 'name', 'id'])
 })
-
-
 
 test('parseHeapSnapshotMetaData - handles snapshot with numeric values in metadata', () => {
   const data =
