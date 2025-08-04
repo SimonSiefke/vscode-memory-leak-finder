@@ -19,7 +19,7 @@ const getFullMessage = (message) => {
   return fullMessage
 }
 
-export const handleTestStateChange = (message) => {
+export const handleTestStateChange = async (message) => {
   const fullMessage = getFullMessage(message)
-  Stdout.write(fullMessage)
+  await Stdout.write(fullMessage)
 }

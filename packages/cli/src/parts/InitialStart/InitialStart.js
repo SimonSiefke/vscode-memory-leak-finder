@@ -8,7 +8,7 @@ export const initialStart = async (options) => {
     SpecialStdin.start()
   }
   if (options.watch && !options.filter) {
-    Stdout.write(WatchUsage.print())
+    await Stdout.write(WatchUsage.print())
     return
   }
   await StartRunning.startRunning(

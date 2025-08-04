@@ -6,11 +6,11 @@ import * as StdinDataState from '../StdinDataState/StdinDataState.js'
 import * as Stdout from '../Stdout/Stdout.js'
 import * as TestStateOutput from '../TestStateOutput/TestStateOutput.js'
 
-export const handleTestsUnexpectedError = (prettyError) => {
+export const handleTestsUnexpectedError = async (prettyError) => {
   const isWatchMode = StdinDataState.isWatchMode()
   const message = GetTestsUnexpectedErrorMessage.getTestsUnexpectedErrorMessage(prettyError)
   const fullMessage = TestStateOutput.clearPending() + message
-  Stdout.write(fullMessage)
+  await Stdout.write(fullMessage)
   StdinDataState.setState({
     ...StdinDataState.getState(),
     mode: ModeType.FinishedRunning,
