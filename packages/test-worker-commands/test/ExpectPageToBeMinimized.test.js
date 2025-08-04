@@ -21,6 +21,7 @@ test('execute', async () => {
   }
   await ExpectPageToBeMinimized.toBeMinimized(page)
   expect(page.electronRpc.invoke).toHaveBeenCalledTimes(1)
+  // @ts-ignore
   expect(page.electronRpc.invoke).toHaveBeenCalledWith(DevtoolsCommandType.RuntimeCallFunctionOn, {
     arguments: [
       {

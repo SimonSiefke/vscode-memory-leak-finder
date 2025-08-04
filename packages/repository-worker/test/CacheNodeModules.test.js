@@ -52,6 +52,7 @@ test('addNodeModulesToCache - successfully caches node_modules', async () => {
 
   await addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')
 
+  // @ts-ignore
   expect(mockFindFiles).toHaveBeenCalledWith('**/node_modules', { cwd: '/repo/path' })
   expect(mockGetCacheFileOperations).toHaveBeenCalledWith(
     '/repo/path',
@@ -60,6 +61,7 @@ test('addNodeModulesToCache - successfully caches node_modules', async () => {
     '/cache/dir/commit-hash',
     mockNodeModulesPaths,
   )
+  // @ts-ignore
   expect(mockApplyFileOperations).toHaveBeenCalledWith(mockFileOperations)
 })
 
@@ -106,6 +108,7 @@ test('addNodeModulesToCache - handles empty node_modules list', async () => {
   await addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')
 
   expect(mockGetCacheFileOperations).toHaveBeenCalledWith('/repo/path', 'commit-hash', '/cache/dir', '/cache/dir/commit-hash', [])
+  // @ts-ignore
   expect(mockApplyFileOperations).toHaveBeenCalledWith(mockFileOperations)
 })
 

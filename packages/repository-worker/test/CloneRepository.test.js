@@ -16,6 +16,7 @@ test('cloneRepository executes git clone command', async () => {
 
   await cloneRepository(repoUrl, repoPath)
 
+  // @ts-ignore
   expect(mockExec).toHaveBeenCalledWith('git', ['clone', '--depth', '1', repoUrl, repoPath])
 })
 
@@ -37,6 +38,7 @@ test('cloneRepository handles different repository URLs', async () => {
 
   await cloneRepository(repoUrl, repoPath)
 
+  // @ts-ignore
   expect(mockExec).toHaveBeenCalledWith('git', ['clone', '--depth', '1', repoUrl, repoPath])
 })
 
@@ -48,5 +50,6 @@ test('cloneRepository handles different local paths', async () => {
 
   await cloneRepository(repoUrl, repoPath)
 
+  // @ts-ignore
   expect(mockExec).toHaveBeenCalledWith('git', ['clone', '--depth', '1', repoUrl, repoPath])
 })
