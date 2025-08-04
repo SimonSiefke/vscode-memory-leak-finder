@@ -1,3 +1,5 @@
+import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.js'
+
 /**
  * @param {Array} strings
  * @param {Uint32Array} nodes
@@ -9,21 +11,22 @@
  * @returns {Array}
  */
 export const getBigintObjectsFromHeapSnapshotInternal = (strings, nodes, node_types, node_fields, edges, edge_types, edge_fields) => {
-  const bigintTypeIndex = node_types[0].indexOf('bigint')
-  const ITEMS_PER_NODE = node_fields.length
-  const ITEMS_PER_EDGE = edge_fields.length
-
-  // Calculate field indices once
-  const typeFieldIndex = node_fields.indexOf('type')
-  const nameFieldIndex = node_fields.indexOf('name')
-  const idFieldIndex = node_fields.indexOf('id')
-  const selfSizeFieldIndex = node_fields.indexOf('self_size')
-  const edgeCountFieldIndex = node_fields.indexOf('edge_count')
-  const detachednessFieldIndex = node_fields.indexOf('detachedness')
-
-  const edgeTypeFieldIndex = edge_fields.indexOf('type')
-  const edgeNameFieldIndex = edge_fields.indexOf('name_or_index')
-  const edgeToNodeFieldIndex = edge_fields.indexOf('to_node')
+  const {
+    bigintTypeIndex,
+    ITEMS_PER_NODE,
+    ITEMS_PER_EDGE,
+    typeFieldIndex,
+    nameFieldIndex,
+    idFieldIndex,
+    selfSizeFieldIndex,
+    edgeCountFieldIndex,
+    detachednessFieldIndex,
+    edgeTypeFieldIndex,
+    edgeNameFieldIndex,
+    edgeToNodeFieldIndex,
+    edgeTypes,
+    nodeTypes,
+  } = computeHeapSnapshotIndices(node_types, node_fields, edge_types, edge_fields)
 
   if (bigintTypeIndex === -1) {
     return []
@@ -75,7 +78,7 @@ export const getBigintObjectsFromHeapSnapshotInternal = (strings, nodes, node_ty
       if (bigintObj) {
         const edgeType = edges[edgeIndex + edgeTypeFieldIndex]
         const edgeNameOrIndex = edges[edgeIndex + edgeNameFieldIndex]
-        const edgeTypeName = edge_types[0][edgeType] || `type_${edgeType}`
+        const edgeTypeName = edgeTypes[edgeType] || `type_${edgeType}`
 
         let edgeName = ''
         if (edgeTypeName === 'element') {
@@ -87,7 +90,7 @@ export const getBigintObjectsFromHeapSnapshotInternal = (strings, nodes, node_ty
         // Get source node info
         const sourceTypeIndex = nodes[nodeIndex + typeFieldIndex]
         const sourceNameIndex = nodes[nodeIndex + nameFieldIndex]
-        const sourceTypeName = node_types[0][sourceTypeIndex] || `type_${sourceTypeIndex}`
+        const sourceTypeName = nodeTypes[sourceTypeIndex] || `type_${sourceTypeIndex}`
         const sourceName = strings[sourceNameIndex] || `<string_${sourceNameIndex}>`
 
         // Collect variable names from property edges
