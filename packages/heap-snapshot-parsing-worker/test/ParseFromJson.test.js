@@ -1,18 +1,5 @@
-import { expect, jest, test } from '@jest/globals'
-import { Readable } from 'node:stream'
-
-const mockCreateReadStream = jest.fn()
-
-// Mock the fs module
-const mockFs = {
-  createReadStream: mockCreateReadStream,
-}
-
-// Use jest.unstable_mockModule to mock the fs module
-jest.unstable_mockModule('node:fs', () => mockFs)
-
-// Re-import the function to get the mocked version
-const { parseFromFile } = await import('../src/parts/ParseFromFile/ParseFromFile.js')
+import { expect, test } from '@jest/globals'
+import { parseFromJson } from '../src/parts/ParseFromJson/ParseFromJson.js'
 
 test('prepareHeapSnapshot - parses simple heap snapshot', async () => {
   // Create a minimal heap snapshot data
@@ -33,17 +20,7 @@ test('prepareHeapSnapshot - parses simple heap snapshot', async () => {
     locations: [],
     strings: ['', 'root'],
   }
-
-  // Create mock read stream
-  const mockReadStream = new Readable({
-    read() {
-      this.push(JSON.stringify(heapSnapshotData))
-      this.push(null) // End the stream
-    },
-  })
-  mockCreateReadStream.mockReturnValue(mockReadStream)
-
-  const result = await parseFromFile('/test/mock-file-path.json')
+  const result = await parseFromJson(heapSnapshotData)
 
   expect(result).toHaveProperty('metaData')
   expect(result).toHaveProperty('nodes')
@@ -79,31 +56,23 @@ test('prepareHeapSnapshot - parses strings when parseStrings is true', async () 
     strings: ['', 'root', 'test', 'hello world'],
   }
 
-  // Write to a temporary file
-  const tmpFile = join(tmpdir(), `test-heap-snapshot-strings-${Date.now()}.json`)
-  writeFileSync(tmpFile, JSON.stringify(heapSnapshotData))
+  const result = await parseFromJson(heapSnapshotData, true)
 
-  try {
-    const result = await prepareHeapSnapshot(tmpFile, true)
+  expect(result).toHaveProperty('metaData')
+  expect(result).toHaveProperty('nodes')
+  expect(result).toHaveProperty('edges')
+  expect(result).toHaveProperty('locations')
+  expect(result).toHaveProperty('strings')
 
-    expect(result).toHaveProperty('metaData')
-    expect(result).toHaveProperty('nodes')
-    expect(result).toHaveProperty('edges')
-    expect(result).toHaveProperty('locations')
-    expect(result).toHaveProperty('strings')
+  expect(result.nodes).toBeInstanceOf(Uint32Array)
+  expect(result.edges).toBeInstanceOf(Uint32Array)
+  expect(result.locations).toBeInstanceOf(Uint32Array)
+  expect(Array.isArray(result.strings)).toBe(true)
 
-    expect(result.nodes).toBeInstanceOf(Uint32Array)
-    expect(result.edges).toBeInstanceOf(Uint32Array)
-    expect(result.locations).toBeInstanceOf(Uint32Array)
-    expect(Array.isArray(result.strings)).toBe(true)
-
-    expect(result.nodes.length).toBe(7) // 1 node * 7 fields
-    expect(result.edges.length).toBe(0) // 0 edges
-    expect(result.locations.length).toBe(0) // 0 locations
-    expect(result.strings).toEqual(['', 'root', 'test', 'hello world'])
-  } finally {
-    unlinkSync(tmpFile)
-  }
+  expect(result.nodes.length).toBe(7) // 1 node * 7 fields
+  expect(result.edges.length).toBe(0) // 0 edges
+  expect(result.locations.length).toBe(0) // 0 locations
+  expect(result.strings).toEqual(['', 'root', 'test', 'hello world'])
 })
 
 test('prepareHeapSnapshot - does not parse strings when parseStrings is false', async () => {
@@ -126,27 +95,19 @@ test('prepareHeapSnapshot - does not parse strings when parseStrings is false', 
     strings: ['', 'root', 'test'],
   }
 
-  // Write to a temporary file
-  const tmpFile = join(tmpdir(), `test-heap-snapshot-no-strings-${Date.now()}.json`)
-  writeFileSync(tmpFile, JSON.stringify(heapSnapshotData))
+  const result = await parseFromJson(heapSnapshotData, false)
 
-  try {
-    const result = await prepareHeapSnapshot(tmpFile, false)
+  expect(result).toHaveProperty('metaData')
+  expect(result).toHaveProperty('nodes')
+  expect(result).toHaveProperty('edges')
+  expect(result).toHaveProperty('locations')
+  expect(result).not.toHaveProperty('strings')
 
-    expect(result).toHaveProperty('metaData')
-    expect(result).toHaveProperty('nodes')
-    expect(result).toHaveProperty('edges')
-    expect(result).toHaveProperty('locations')
-    expect(result).not.toHaveProperty('strings')
+  expect(result.nodes).toBeInstanceOf(Uint32Array)
+  expect(result.edges).toBeInstanceOf(Uint32Array)
+  expect(result.locations).toBeInstanceOf(Uint32Array)
 
-    expect(result.nodes).toBeInstanceOf(Uint32Array)
-    expect(result.edges).toBeInstanceOf(Uint32Array)
-    expect(result.locations).toBeInstanceOf(Uint32Array)
-
-    expect(result.nodes.length).toBe(7) // 1 node * 7 fields
-    expect(result.edges.length).toBe(0) // 0 edges
-    expect(result.locations.length).toBe(0) // 0 locations
-  } finally {
-    unlinkSync(tmpFile)
-  }
+  expect(result.nodes.length).toBe(7) // 1 node * 7 fields
+  expect(result.edges.length).toBe(0) // 0 edges
+  expect(result.locations.length).toBe(0) // 0 locations
 })
