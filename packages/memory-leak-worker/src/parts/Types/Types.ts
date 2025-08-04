@@ -18,6 +18,7 @@ export interface IpcMessage {
   readonly params?: unknown[]
   readonly result?: unknown
   readonly error?: unknown
+  readonly jsonrpc?: string
 }
 
 export interface RpcConnection {
@@ -60,7 +61,7 @@ export interface ExecuteFunction {
 }
 
 export interface CommandFunction {
-  (...args: unknown[]): unknown
+  (...args: unknown[]): Promise<unknown> | unknown
 }
 
 export interface ErrorObject {
@@ -69,4 +70,12 @@ export interface ErrorObject {
   readonly stack?: string
   readonly code?: string | number
   readonly codeFrame?: string
+  readonly cause?: () => ErrorObject
+}
+
+export interface StackFrame {
+  readonly file: string
+  readonly line: number
+  readonly column: number
+  readonly path?: string
 }
