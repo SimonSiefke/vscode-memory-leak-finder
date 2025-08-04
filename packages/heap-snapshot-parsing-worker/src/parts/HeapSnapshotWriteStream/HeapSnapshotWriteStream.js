@@ -25,7 +25,7 @@ export class HeapSnapshotWriteStream extends Writable {
     this.metaData = {}
     this.nodes = new Uint32Array()
     this.parseStrings = parseStrings
-    this.strings = parseStrings ? [] : null
+    this.strings = parseStrings ? /** @type {string[]} */ ([]) : null
     this.state = HeapSnapshotParsingState.SearchingSnapshotMetaData
   }
 
@@ -223,7 +223,7 @@ export class HeapSnapshotWriteStream extends Writable {
       const strings = JSON.parse(stringsJson)
 
       if (Array.isArray(strings)) {
-        this.strings = strings
+        this.strings = /** @type {string[]} */ (strings)
       }
 
       this.resetParsingState()
@@ -260,6 +260,12 @@ export class HeapSnapshotWriteStream extends Writable {
       case HeapSnapshotParsingState.ParsingLocations:
         this.writeParsingLocations(chunk)
         break
+      case HeapSnapshotParsingState.ParsingStringsMetaData:
+        this.writeParsingStringsMetaData(chunk)
+        break
+      case HeapSnapshotParsingState.ParsingStrings:
+        this.writeParsingStrings(chunk)
+        break
       case HeapSnapshotParsingState.Done:
         break
       default:
@@ -275,12 +281,17 @@ export class HeapSnapshotWriteStream extends Writable {
   start() {}
 
   getResult() {
-    return {
+    const result = {
       metaData: this.metaData,
       edges: this.edges,
       nodes: this.nodes,
       locations: this.locations,
-      // TODO parse strings?
     }
+
+    if (this.parseStrings && this.strings) {
+      result.strings = this.strings
+    }
+
+    return result
   }
 }

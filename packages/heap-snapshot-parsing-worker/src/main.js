@@ -22,6 +22,7 @@ const getTransferList = (result) => {
     if (result.locations && result.locations.buffer) {
       transferList.push(result.locations.buffer)
     }
+    // Note: strings are not transferable (they're regular arrays), so we don't add them to transferList
   }
   return transferList
 }
@@ -53,6 +54,9 @@ workerPort.on('message', async (message) => {
     console.log(`  - nodes: ${result.nodes?.length || 0} elements (${(result.nodes?.byteLength || 0) / 1024 / 1024}MB)`)
     console.log(`  - edges: ${result.edges?.length || 0} elements (${(result.edges?.byteLength || 0) / 1024 / 1024}MB)`)
     console.log(`  - locations: ${result.locations?.length || 0} elements (${(result.locations?.byteLength || 0) / 1024 / 1024}MB)`)
+    if (result.strings) {
+      console.log(`  - strings: ${result.strings.length} elements`)
+    }
     const loggingTime = performance.now()
     console.log(`[ParseWorker] Logging took: ${(loggingTime - loggingStart).toFixed(2)}ms`)
 
