@@ -1,3 +1,4 @@
+import { jest, test, expect } from '@jest/globals'
 import * as Command from '../src/parts/Command/Command.js'
 import * as CommandState from '../src/parts/CommandState/CommandState.js'
 
