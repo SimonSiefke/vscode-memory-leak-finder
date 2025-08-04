@@ -24,8 +24,11 @@ test('getFilesHash returns hash of file contents', async () => {
   const result = await getFilesHash(absolutePaths)
 
   expect(result).toBe(expectedHash)
+  // @ts-ignore
   expect(mockReadFileContent).toHaveBeenCalledWith('/path/to/file1.txt')
+  // @ts-ignore
   expect(mockReadFileContent).toHaveBeenCalledWith('/path/to/file2.txt')
+  // @ts-ignore
   expect(mockGetHash).toHaveBeenCalledWith(fileContents)
 })
 
