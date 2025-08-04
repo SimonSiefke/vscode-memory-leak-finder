@@ -43,7 +43,7 @@ test('should get arrays by closure location', async () => {
     const result = await getArraysByClosureLocationFromHeapSnapshotCommand(snapshotId, scriptMap)
 
     expect(result).toHaveLength(2)
-    
+
     // First group should be location 2 with 1 array (larger size, sorted first)
     const firstGroup = result[0]
     expect(firstGroup.locationKey).toBe('2:15:8')
@@ -73,4 +73,4 @@ test('should get arrays by closure location', async () => {
     // Clean up
     HeapSnapshotState.dispose(snapshotId)
   }
-}) 
+})

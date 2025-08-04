@@ -22,4 +22,4 @@ export const getArraysByClosureLocationFromHeapSnapshot = async (id, scriptMap) 
     location_fields,
     scriptMap,
   )
-} 
+}
