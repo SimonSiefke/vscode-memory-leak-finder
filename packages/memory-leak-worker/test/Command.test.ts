@@ -1,10 +1,4 @@
-declare global {
-  const test: typeof import('@jest/globals')['test']
-  const expect: typeof import('@jest/globals')['expect']
-  const jest: typeof import('@jest/globals')['jest']
-}
-
-export {}
+import { test, expect, jest } from '@jest/globals'
 
 import * as Command from '../src/parts/Command/Command.js'
 import * as CommandState from '../src/parts/CommandState/CommandState.js'
