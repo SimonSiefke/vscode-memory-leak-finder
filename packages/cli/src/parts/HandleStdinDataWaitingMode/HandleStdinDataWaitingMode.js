@@ -6,7 +6,7 @@ import * as ModeType from '../ModeType/ModeType.js'
 import * as PatternUsage from '../PatternUsage/PatternUsage.js'
 import * as Stdout from '../Stdout/Stdout.js'
 
-export const handleStdinDataWaitingMode = (state, key) => {
+export const handleStdinDataWaitingMode = async (state, key) => {
   switch (key) {
     case AnsiKeys.ControlC:
     case AnsiKeys.ControlD:
@@ -15,7 +15,7 @@ export const handleStdinDataWaitingMode = (state, key) => {
         mode: ModeType.Exit,
       }
     case AnsiKeys.Enter:
-      Stdout.write(AnsiEscapes.eraseLine + AnsiEscapes.cursorLeft)
+      await Stdout.write(AnsiEscapes.eraseLine + AnsiEscapes.cursorLeft)
       return {
         ...state,
         mode: ModeType.Running,
@@ -25,7 +25,7 @@ export const handleStdinDataWaitingMode = (state, key) => {
       return state
     case AnsiKeys.AltBackspace:
     case AnsiKeys.ControlBackspace:
-      Stdout.write(AnsiEscapes.eraseLine + AnsiEscapes.cursorLeft)
+      await Stdout.write(AnsiEscapes.eraseLine + AnsiEscapes.cursorLeft)
       return {
         ...state,
         value: Character.EmptyString,
@@ -45,7 +45,7 @@ export const handleStdinDataWaitingMode = (state, key) => {
         mode: ModeType.Running,
       }
     case CliKeys.FilterMode:
-      Stdout.write(AnsiEscapes.clear + PatternUsage.print())
+      await Stdout.write(AnsiEscapes.clear + PatternUsage.print())
       return {
         ...state,
         value: Character.EmptyString,

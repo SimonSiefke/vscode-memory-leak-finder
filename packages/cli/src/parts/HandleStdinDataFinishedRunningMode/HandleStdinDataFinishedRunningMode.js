@@ -7,7 +7,7 @@ import * as Stdout from '../Stdout/Stdout.js'
 import * as WatchUsage from '../WatchUsage/WatchUsage.js'
 import * as Character from '../Character/Character.js'
 
-export const handleStdinDataFinishedRunningMode = (state, key) => {
+export const handleStdinDataFinishedRunningMode = async (state, key) => {
   switch (key) {
     case AnsiKeys.ControlC:
     case AnsiKeys.ControlD:
@@ -16,13 +16,13 @@ export const handleStdinDataFinishedRunningMode = (state, key) => {
         mode: ModeType.Exit,
       }
     case CliKeys.WatchMode:
-      Stdout.write(AnsiEscapes.cursorUp() + AnsiEscapes.eraseDown + WatchUsage.print())
+      await Stdout.write(AnsiEscapes.cursorUp() + AnsiEscapes.eraseDown + WatchUsage.print())
       return {
         ...state,
         mode: ModeType.Waiting,
       }
     case CliKeys.FilterMode:
-      Stdout.write(AnsiEscapes.clear + PatternUsage.print())
+      await Stdout.write(AnsiEscapes.clear + PatternUsage.print())
       return {
         ...state,
         value: Character.EmptyString,

@@ -22,8 +22,9 @@ export class HeapSnapshotWriteStream extends Writable {
     this.locations = new Uint32Array()
     this.metaData = {}
     this.nodes = new Uint32Array()
-    this.strings = []
+    this.options = options
     this.state = HeapSnapshotParsingState.SearchingSnapshotMetaData
+    this.strings = []
   }
 
   /**
@@ -80,17 +81,17 @@ export class HeapSnapshotWriteStream extends Writable {
       this.currentNumber,
       this.hasDigits,
     )
-    
+
     // If parsing failed, we need more data
     if (dataIndex === -1) {
       return
     }
-    
+
     // Check array bounds
     if (arrayIndex > array.length) {
       throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${array.length}`)
     }
-    
+
     this.arrayIndex = arrayIndex
 
     // Update parsing state for next chunk
@@ -135,7 +136,7 @@ export class HeapSnapshotWriteStream extends Writable {
       this.currentNumber,
       this.hasDigits,
     )
-    
+
     // If parsing failed, we need more data
     if (dataIndex === -1) {
       return
