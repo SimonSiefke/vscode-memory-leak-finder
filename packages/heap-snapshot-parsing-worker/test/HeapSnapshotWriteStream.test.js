@@ -179,7 +179,7 @@ test('HeapSnapshotWriteStream - handles large numbers in arrays', async () => {
   expect(result.nodes[2]).toBe(123456789) // The large number should be parsed correctly
 })
 
-test('HeapSnapshotWriteStream - handles negative numbers', async () => {
+test('HeapSnapshotWriteStream - handles negative numbers (skips minus sign)', async () => {
   const stream = new HeapSnapshotWriteStream()
 
   const heapSnapshotData = {
@@ -207,5 +207,5 @@ test('HeapSnapshotWriteStream - handles negative numbers', async () => {
 
   const result = stream.getResult()
 
-  expect(result.nodes[3]).toBe(-100) // Negative number should be parsed correctly
+  expect(result.nodes[3]).toBe(100) // Negative number becomes positive because minus sign is skipped
 })

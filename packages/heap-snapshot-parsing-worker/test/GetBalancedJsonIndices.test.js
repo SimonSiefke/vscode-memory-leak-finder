@@ -119,3 +119,17 @@ test('getBalancedJsonIndices - handles mixed brackets in strings', () => {
 
   expect(result).toBe(data.length)
 })
+
+test('getBalancedJsonIndices - handles object starting with curly brace', () => {
+  const data = '{"key": "value"}'
+  const result = getBalancedJsonIndices(data, 0)
+
+  expect(result).toBe(data.length)
+})
+
+test('getBalancedJsonIndices - handles object with complex nested structure', () => {
+  const data = '{"key1": {"key2": [{"key3": "value1"}, {"key4": "value2"}]}, "key5": "value3"}'
+  const result = getBalancedJsonIndices(data, 0)
+
+  expect(result).toBe(data.length)
+})
