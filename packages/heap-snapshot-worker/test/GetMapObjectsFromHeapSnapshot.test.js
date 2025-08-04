@@ -101,7 +101,7 @@ test('getMapObjectsFromHeapSnapshot - map with variable name', async () => {
     expect(result).toEqual([
       {
         id: 200,
-        variableNames: ['myMap'],
+        name: 'myMap',
         keys: [],
         note: 'Map object found in heap snapshot',
       },
@@ -168,13 +168,13 @@ test('getMapObjectsFromHeapSnapshot - multiple map objects with variables', asyn
     expect(result).toEqual([
       {
         id: 200,
-        variableNames: ['cache'],
+        name: 'cache',
         keys: [],
         note: 'Map object found in heap snapshot',
       },
       {
         id: 300,
-        variableNames: ['userCache'],
+        name: 'userCache',
         keys: [],
         note: 'Map object found in heap snapshot',
       },

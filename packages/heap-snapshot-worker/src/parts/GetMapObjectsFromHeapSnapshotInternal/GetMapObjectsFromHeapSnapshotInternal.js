@@ -216,11 +216,22 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
 
   // Remove internal fields from output
   return namedMapObjects
-    .map((obj) => ({
-      id: obj.id,
-      variableNames: obj.variableNames.map((v) => v.name),
-      keys: obj.keys,
-      note: obj.keys.length > 0 ? `Map object with ${obj.keys.length} keys (values not accessible)` : 'Map object found in heap snapshot',
-    }))
+    .map((obj) => {
+      const names = obj.variableNames.map((v) => v.name)
+      let nameField
+      
+      if (names.length === 1) {
+        nameField = names[0]
+      } else {
+        nameField = names
+      }
+      
+      return {
+        id: obj.id,
+        name: nameField,
+        keys: obj.keys,
+        note: obj.keys.length > 0 ? `Map object with ${obj.keys.length} keys (values not accessible)` : 'Map object found in heap snapshot',
+      }
+    })
     .sort((a, b) => a.id - b.id)
 }
