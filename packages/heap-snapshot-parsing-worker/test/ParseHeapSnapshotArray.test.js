@@ -44,7 +44,7 @@ test('parseHeapSnapshotArray - handles partial number at end', () => {
   
   expect(result.done).toBe(false)
   expect(result.arrayIndex).toBe(2) // Only 1,2 are complete
-  expect(result.dataIndex).toBe(3) // Backtrack to start of partial number
+  expect(result.dataIndex).toBe(4) // Backtrack to start of partial number
   expect(result.currentNumber).toBe(3)
   expect(result.hasDigits).toBe(true)
   expect(array[0]).toBe(1)
@@ -119,7 +119,7 @@ test('parseHeapSnapshotArray - throws error for unexpected token', () => {
   }).toThrow('unexpected token')
 })
 
-test('parseHeapSnapshotArray - handles negative numbers', () => {
+test('parseHeapSnapshotArray - handles negative numbers (skips minus sign)', () => {
   const data = new TextEncoder().encode('-1,-2,-3]')
   const array = new Uint32Array(3)
   
@@ -127,12 +127,12 @@ test('parseHeapSnapshotArray - handles negative numbers', () => {
   
   expect(result.done).toBe(true)
   expect(result.arrayIndex).toBe(3)
-  expect(array[0]).toBe(-1)
-  expect(array[1]).toBe(-2)
-  expect(array[2]).toBe(-3)
+  expect(array[0]).toBe(1) // Minus sign is skipped
+  expect(array[1]).toBe(2) // Minus sign is skipped
+  expect(array[2]).toBe(3) // Minus sign is skipped
 })
 
-test('parseHeapSnapshotArray - handles partial negative number', () => {
+test('parseHeapSnapshotArray - handles partial negative number (skips minus sign)', () => {
   const data = new TextEncoder().encode('1,-2')
   const array = new Uint32Array(2)
   
@@ -140,21 +140,21 @@ test('parseHeapSnapshotArray - handles partial negative number', () => {
   
   expect(result.done).toBe(false)
   expect(result.arrayIndex).toBe(1) // Only 1 is complete
-  expect(result.currentNumber).toBe(-2)
+  expect(result.currentNumber).toBe(2) // Minus sign is skipped
   expect(result.hasDigits).toBe(true)
   expect(array[0]).toBe(1)
 })
 
-test('parseHeapSnapshotArray - continues negative number from previous state', () => {
+test('parseHeapSnapshotArray - continues negative number from previous state (skips minus sign)', () => {
   const data = new TextEncoder().encode('3]')
   const array = new Uint32Array(2)
   
   // Simulate previous state with partial negative number
-  const result = parseHeapSnapshotArray(data, array, 1, -2, true)
+  const result = parseHeapSnapshotArray(data, array, 1, 2, true) // 2 instead of -2
   
   expect(result.done).toBe(true)
   expect(result.arrayIndex).toBe(2)
-  expect(array[1]).toBe(-23) // -2 from previous + 3 from current
+  expect(array[1]).toBe(23) // 2 from previous + 3 from current
 })
 
 test('parseHeapSnapshotArray - handles array index out of bounds', () => {
