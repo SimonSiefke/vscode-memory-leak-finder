@@ -29,7 +29,7 @@
     "typescript": "^5.9.2"
   },
   "jest": {
-    "preset": "ts-jest",
+    "preset": "ts-jest/presets/default-esm",
     "testEnvironment": "node",
     "testMatch": [
       "**/test/**/*.test.ts"
@@ -39,7 +39,15 @@
       "js"
     ],
     "transform": {
-      "^.+\\.ts$": "ts-jest"
+      "^.+\\.ts$": ["ts-jest", {
+        "useESM": true
+      }]
+    },
+    "extensionsToTreatAsEsm": [".ts"],
+    "globals": {
+      "ts-jest": {
+        "useESM": true
+      }
     }
   },
   "xo": {
