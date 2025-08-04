@@ -186,7 +186,7 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
       tableEdgeOffset += nodes[nodeIndex + edgeCountFieldIndex]
     }
 
-        // Collect keys from table array
+    // Collect keys from table array
     // Map stores key-value pairs, but we need to identify which entries are keys vs values
     // Based on analysis, it appears the table may not be stored in strict alternating pattern
     // We need a different approach to distinguish keys from values
