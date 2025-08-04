@@ -401,3 +401,114 @@ test('HeapSnapshotWriteStream - handles partial data where array header is incom
   expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7) // Array is initialized with expected size but not filled
 })
+
+test('HeapSnapshotWriteStream - processes heap snapshot with strings when parseStrings is true', async () => {
+  const stream = new HeapSnapshotWriteStream({ parseStrings: true })
+
+  const heapSnapshotData = {
+    snapshot: {
+      meta: {
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
+        edge_fields: ['type', 'name_or_index', 'to_node'],
+        edge_types: [['context', 'element', 'property', 'internal']],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
+      },
+      node_count: 1,
+      edge_count: 0,
+    },
+    nodes: [0, 0, 1, 0, 0, 0, 0],
+    edges: [],
+    locations: [0, 0, 1, 2],
+    strings: ['', 'root', 'child', 'grandchild'],
+  }
+
+  const jsonData = JSON.stringify(heapSnapshotData)
+  const buffer = new TextEncoder().encode(jsonData)
+
+  stream.write(buffer)
+
+  const result = stream.getResult()
+
+  expect(result.metaData).toHaveProperty('data')
+  expect(result.metaData.data).toHaveProperty('node_count', 1)
+  expect(result.nodes.length).toBe(7) // 1 node * 7 fields
+  expect(result.edges.length).toBe(0)
+  expect(result.locations.length).toBe(4) // 1 location * 4 fields
+  expect(result.strings).toEqual(['', 'root', 'child', 'grandchild'])
+})
+
+test('HeapSnapshotWriteStream - skips strings when parseStrings is false', async () => {
+  const stream = new HeapSnapshotWriteStream({ parseStrings: false })
+
+  const heapSnapshotData = {
+    snapshot: {
+      meta: {
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
+        edge_fields: ['type', 'name_or_index', 'to_node'],
+        edge_types: [['context', 'element', 'property', 'internal']],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
+      },
+      node_count: 1,
+      edge_count: 0,
+    },
+    nodes: [0, 0, 1, 0, 0, 0, 0],
+    edges: [],
+    locations: [0, 0, 1, 2],
+    strings: ['', 'root', 'child'],
+  }
+
+  const jsonData = JSON.stringify(heapSnapshotData)
+  const buffer = new TextEncoder().encode(jsonData)
+
+  stream.write(buffer)
+
+  const result = stream.getResult()
+
+  expect(result.metaData).toHaveProperty('data')
+  expect(result.nodes.length).toBe(7)
+  expect(result.edges.length).toBe(0)
+  expect(result.locations.length).toBe(4)
+  expect(result.strings).toEqual([]) // Should be empty when parseStrings is false
+})
+
+test('HeapSnapshotWriteStream - handles partial string data', async () => {
+  const stream = new HeapSnapshotWriteStream({ parseStrings: true })
+
+  const heapSnapshotData = {
+    snapshot: {
+      meta: {
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
+        edge_fields: ['type', 'name_or_index', 'to_node'],
+        edge_types: [['context', 'element', 'property', 'internal']],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
+      },
+      node_count: 1,
+      edge_count: 0,
+    },
+    nodes: [0, 0, 1, 0, 0, 0, 0],
+    edges: [],
+    locations: [0, 0, 1, 2],
+    strings: ['', 'root', 'child'],
+  }
+
+  const jsonData = JSON.stringify(heapSnapshotData)
+  const buffer = new TextEncoder().encode(jsonData)
+
+  // Split the data into chunks
+  const chunk1 = buffer.slice(0, Math.floor(buffer.length * 0.7))
+  const chunk2 = buffer.slice(Math.floor(buffer.length * 0.7))
+
+  stream.write(chunk1)
+  stream.write(chunk2)
+
+  const result = stream.getResult()
+
+  expect(result.metaData).toHaveProperty('data')
+  expect(result.nodes.length).toBe(7)
+  expect(result.edges.length).toBe(0)
+  expect(result.locations.length).toBe(4)
+  expect(result.strings).toEqual(['', 'root', 'child'])
+})
