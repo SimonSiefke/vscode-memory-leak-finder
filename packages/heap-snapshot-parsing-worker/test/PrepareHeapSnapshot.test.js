@@ -1,11 +1,21 @@
-import { expect, test } from '@jest/globals'
-import { unlinkSync, writeFileSync } from 'node:fs'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
-import { parseFromFile } from '../src/parts/ParseFromFile/ParseFromFile.js'
+import { expect, jest, test } from '@jest/globals'
+import { Readable } from 'node:stream'
+
+const mockCreateReadStream = jest.fn()
+
+// Mock the fs module
+const mockFs = {
+  createReadStream: mockCreateReadStream,
+}
+
+// Use jest.unstable_mockModule to mock the fs module
+jest.unstable_mockModule('node:fs', () => mockFs)
+
+// Re-import the function to get the mocked version
+const { parseFromFile } = await import('../src/parts/ParseFromFile/ParseFromFile.js')
 
 test('prepareHeapSnapshot - parses simple heap snapshot', async () => {
-  // Create a minimal heap snapshot file
+  // Create a minimal heap snapshot data
   const heapSnapshotData = {
     snapshot: {
       meta: {
@@ -24,26 +34,27 @@ test('prepareHeapSnapshot - parses simple heap snapshot', async () => {
     strings: ['', 'root'],
   }
 
-  // Write to a temporary file
-  const tmpFile = join(tmpdir(), `test-heap-snapshot-${Date.now()}.json`)
-  writeFileSync(tmpFile, JSON.stringify(heapSnapshotData))
+  // Create mock read stream
+  const mockReadStream = new Readable({
+    read() {
+      this.push(JSON.stringify(heapSnapshotData))
+      this.push(null) // End the stream
+    },
+  })
+  mockCreateReadStream.mockReturnValue(mockReadStream)
 
-  try {
-    const result = await parseFromFile(tmpFile)
+  const result = await parseFromFile('/test/mock-file-path.json')
 
-    expect(result).toHaveProperty('metaData')
-    expect(result).toHaveProperty('nodes')
-    expect(result).toHaveProperty('edges')
-    expect(result).toHaveProperty('locations')
+  expect(result).toHaveProperty('metaData')
+  expect(result).toHaveProperty('nodes')
+  expect(result).toHaveProperty('edges')
+  expect(result).toHaveProperty('locations')
 
-    expect(result.nodes).toBeInstanceOf(Uint32Array)
-    expect(result.edges).toBeInstanceOf(Uint32Array)
-    expect(result.locations).toBeInstanceOf(Uint32Array)
+  expect(result.nodes).toBeInstanceOf(Uint32Array)
+  expect(result.edges).toBeInstanceOf(Uint32Array)
+  expect(result.locations).toBeInstanceOf(Uint32Array)
 
-    expect(result.nodes.length).toBe(7) // 1 node * 7 fields
-    expect(result.edges.length).toBe(0) // 0 edges
-    expect(result.locations.length).toBe(0) // 0 locations
-  } finally {
-    unlinkSync(tmpFile)
-  }
+  expect(result.nodes.length).toBe(7) // 1 node * 7 fields
+  expect(result.edges.length).toBe(0) // 0 edges
+  expect(result.locations.length).toBe(0) // 0 locations
 })
