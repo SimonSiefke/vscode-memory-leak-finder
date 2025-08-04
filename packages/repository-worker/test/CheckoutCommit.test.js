@@ -17,6 +17,7 @@ test('checkoutCommit executes git checkout command', async () => {
 
   await checkoutCommit(repoPath, commit)
 
+  // @ts-ignore
   expect(mockExec).toHaveBeenCalledWith('git', ['checkout', commit], { cwd: repoPath })
 })
 
@@ -29,6 +30,7 @@ test('checkoutCommit handles different commit formats', async () => {
 
   await checkoutCommit(repoPath, commit)
 
+  // @ts-ignore
   expect(mockExec).toHaveBeenCalledWith('git', ['checkout', commit], { cwd: repoPath })
 })
 
@@ -41,5 +43,6 @@ test('checkoutCommit handles short commit hash', async () => {
 
   await checkoutCommit(repoPath, commit)
 
+  // @ts-ignore
   expect(mockExec).toHaveBeenCalledWith('git', ['checkout', commit], { cwd: repoPath })
 })

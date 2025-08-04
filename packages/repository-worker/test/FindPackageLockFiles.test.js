@@ -19,6 +19,7 @@ test('findPackageLockFiles - returns empty array when no package-lock.json files
 
   expect(result).toEqual([])
   expect(mockFindFiles).toHaveBeenCalledTimes(1)
+  // @ts-ignore
   expect(mockFindFiles).toHaveBeenCalledWith('**/package-lock.json', {
     cwd: '/test/path',
     exclude: ['**/node_modules/**'],
@@ -34,6 +35,7 @@ test('findPackageLockFiles - returns file URIs when package-lock.json files foun
 
   expect(result).toEqual(['/test/path/package-lock.json', '/test/path/subdir/package-lock.json'])
   expect(mockFindFiles).toHaveBeenCalledTimes(1)
+  // @ts-ignore
   expect(mockFindFiles).toHaveBeenCalledWith('**/package-lock.json', {
     cwd: '/test/path',
     exclude: ['**/node_modules/**'],
@@ -50,6 +52,7 @@ test('findPackageLockFiles - excludes node_modules package-lock.json files', asy
   // Should only return package-lock.json files not in node_modules
   expect(result).toEqual(['/test/path/package-lock.json', '/test/path/subdir/package-lock.json'])
   expect(mockFindFiles).toHaveBeenCalledTimes(1)
+  // @ts-ignore
   expect(mockFindFiles).toHaveBeenCalledWith('**/package-lock.json', {
     cwd: '/test/path',
     exclude: ['**/node_modules/**'],
@@ -63,6 +66,7 @@ test('findPackageLockFiles - throws VError when findFiles fails', async () => {
   await expect(findPackageLockFiles('/test/path')).rejects.toThrow('Failed to find package-lock.json files in directory')
 
   expect(mockFindFiles).toHaveBeenCalledTimes(1)
+  // @ts-ignore
   expect(mockFindFiles).toHaveBeenCalledWith('**/package-lock.json', {
     cwd: '/test/path',
     exclude: ['**/node_modules/**'],
