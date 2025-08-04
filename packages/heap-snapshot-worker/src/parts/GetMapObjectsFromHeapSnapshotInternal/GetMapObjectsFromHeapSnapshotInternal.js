@@ -243,11 +243,6 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
   return namedMapObjects
     .map((obj) => ({
       id: obj.id,
-      name: obj.name,
-      type: obj.type,
-      selfSize: obj.selfSize,
-      edgeCount: obj.edgeCount,
-      detachedness: obj.detachedness,
       variableNames: obj.variableNames,
       entries: obj.entries,
       size: obj.size,

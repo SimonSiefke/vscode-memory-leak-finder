@@ -101,11 +101,6 @@ test('getMapObjectsFromHeapSnapshot - map with variable name', async () => {
     expect(result).toEqual([
       {
         id: 200,
-        name: 'Map',
-        type: 'map',
-        selfSize: 28,
-        edgeCount: 0,
-        detachedness: 0,
         variableNames: [
           {
             name: 'myMap',
@@ -180,11 +175,6 @@ test('getMapObjectsFromHeapSnapshot - multiple map objects with variables', asyn
     expect(result).toEqual([
       {
         id: 200,
-        name: 'Map',
-        type: 'map',
-        selfSize: 28,
-        edgeCount: 0,
-        detachedness: 0,
         variableNames: [
           {
             name: 'cache',
@@ -198,11 +188,6 @@ test('getMapObjectsFromHeapSnapshot - multiple map objects with variables', asyn
       },
       {
         id: 300,
-        name: 'Map',
-        type: 'map',
-        selfSize: 28,
-        edgeCount: 0,
-        detachedness: 0,
         variableNames: [
           {
             name: 'userCache',
