@@ -262,9 +262,9 @@ class HeapSnapshotWriteStream extends Writable {
 /**
  * Creates a new HeapSnapshotWriteStream instance
  * @param {Object} options - Options for the write stream
- * @param {boolean} options.parseStrings - Whether to parse and return strings
+ * @param {boolean} [options.parseStrings=false] - Whether to parse and return strings
  * @returns {HeapSnapshotWriteStream} A new HeapSnapshotWriteStream instance
  */
-export const createHeapSnapshotWriteStream = (options = {}) => {
+export const createHeapSnapshotWriteStream = (options = { parseStrings: false }) => {
   return new HeapSnapshotWriteStream(options)
 }
