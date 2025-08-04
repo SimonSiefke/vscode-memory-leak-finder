@@ -156,7 +156,7 @@ export class HeapSnapshotWriteStream extends Writable {
 
   writeParsingLocations(chunk) {
     if (this.parseStrings) {
-      this.writeResizableArrayData(chunk, HeapSnapshotParsingState.ParsingStrings)
+      this.writeResizableArrayData(chunk, HeapSnapshotParsingState.ParsingStringsMetaData)
     } else {
       this.writeResizableArrayData(chunk, HeapSnapshotParsingState.Done)
     }
@@ -174,6 +174,8 @@ export class HeapSnapshotWriteStream extends Writable {
     // For strings, we need to parse JSON string values, not numbers
     this.data = concatArray(this.data, chunk)
     const dataString = decodeArray(this.data)
+    console.log('[HeapSnapshotWriteStream] Parsing strings, data length:', dataString.length)
+    console.log('[HeapSnapshotWriteStream] Data preview:', dataString.slice(0, 100))
 
     // Try to parse the strings array as JSON
     try {
@@ -220,10 +222,12 @@ export class HeapSnapshotWriteStream extends Writable {
 
       // Extract the strings array JSON
       const stringsJson = dataString.slice(0, endIndex)
+      console.log('[HeapSnapshotWriteStream] Extracted JSON:', stringsJson)
       const strings = JSON.parse(stringsJson)
 
       if (Array.isArray(strings)) {
         this.strings = /** @type {string[]} */ (strings)
+        console.log('[HeapSnapshotWriteStream] Parsed strings:', this.strings)
       }
 
       this.resetParsingState()
