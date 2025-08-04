@@ -44,9 +44,6 @@ workerPort.on('message', async (message) => {
     const parseTime = performance.now()
 
     const loggingStart = performance.now()
-    console.log(`  - nodes: ${result.nodes?.length || 0} elements (${(result.nodes?.byteLength || 0) / 1024 / 1024}MB)`)
-    console.log(`  - edges: ${result.edges?.length || 0} elements (${(result.edges?.byteLength || 0) / 1024 / 1024}MB)`)
-    console.log(`  - locations: ${result.locations?.length || 0} elements (${(result.locations?.byteLength || 0) / 1024 / 1024}MB)`)
     const loggingTime = performance.now()
 
     // Send the result back with transfer list for zero-copy
