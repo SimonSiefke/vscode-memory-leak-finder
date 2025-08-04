@@ -233,13 +233,12 @@ export class HeapSnapshotWriteStream extends Writable {
   start() {}
 
   getResult() {
-    const result = {
+    return {
       metaData: this.metaData,
       edges: this.edges,
       nodes: this.nodes,
       locations: this.locations,
       strings: this.strings,
     }
-    return result
   }
 }
