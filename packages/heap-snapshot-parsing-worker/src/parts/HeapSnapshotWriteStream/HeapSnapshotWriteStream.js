@@ -9,7 +9,7 @@ import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/Pa
 import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.js'
 
 export class HeapSnapshotWriteStream extends Writable {
-  constructor() {
+  constructor(options) {
     super()
     this.arrayIndex = 0
     this.currentNumber = 0
@@ -20,7 +20,9 @@ export class HeapSnapshotWriteStream extends Writable {
     this.locations = new Uint32Array()
     this.metaData = {}
     this.nodes = new Uint32Array()
+    this.options = options
     this.state = HeapSnapshotParsingState.SearchingSnapshotMetaData
+    this.strings = []
   }
 
   /**
@@ -195,7 +197,7 @@ export class HeapSnapshotWriteStream extends Writable {
       edges: this.edges,
       nodes: this.nodes,
       locations: this.locations,
-      // TODO parse strings?
+      strings: this.strings,
     }
   }
 }
