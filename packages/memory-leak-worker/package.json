@@ -8,7 +8,8 @@
     "memory-leak-worker": "bin/memory-leak-worker.ts"
   },
   "scripts": {
-    "test": "jest",
+    "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
+    "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch",
     "build": "tsc",
     "type-check": "tsc --noEmit"
   },

@@ -19,5 +19,5 @@ test('execute - should call registered command with arguments', () => {
 test('execute - should throw CommandNotFoundError for unknown command', () => {
   expect(() => {
     Command.execute('unknown.command')
-  }).toThrow('command not found: unknown.command')
+  }).toThrow('command unknown.command not found')
 })
