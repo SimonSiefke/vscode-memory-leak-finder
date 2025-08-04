@@ -28,14 +28,14 @@ const addSourceLocations = async (functionObjects, scriptMap) => {
   return normalized
 }
 
-export const compareNamedFunctionCount2 = async (beforePath, after) => {
+export const compareNamedFunctionCount2 = async (beforePath, after, useParallel = true) => {
   // TODO ask heapsnapshot worker to compare functions
   // TODO then for the leaked functions, add sourcemap info
   const afterPath = after.heapSnapshotPath
   const scriptMap = after.scriptMap
   console.log({ scriptMap })
   console.time('check')
-  const leaked = await HeapSnapshotFunctions.compareHeapSnapshotFunctions(beforePath, afterPath)
+  const leaked = await HeapSnapshotFunctions.compareHeapSnapshotFunctions(beforePath, afterPath, useParallel)
   console.timeEnd('check')
   console.time('sourcemap')
   const withSourceLocations = await addSourceLocations(leaked, scriptMap)
