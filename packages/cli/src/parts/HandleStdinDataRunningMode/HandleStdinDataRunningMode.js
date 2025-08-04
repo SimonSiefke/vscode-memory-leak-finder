@@ -4,7 +4,7 @@ import * as ModeType from '../ModeType/ModeType.js'
 import * as Stdout from '../Stdout/Stdout.js'
 import * as WatchUsage from '../WatchUsage/WatchUsage.js'
 
-export const handleStdinDataRunningMode = (state, key) => {
+export const handleStdinDataRunningMode = async (state, key) => {
   switch (key) {
     case AnsiKeys.ControlC:
     case AnsiKeys.ControlD:
@@ -21,7 +21,7 @@ export const handleStdinDataRunningMode = (state, key) => {
     case AnsiKeys.ArrowRight:
       return state
     default:
-      Stdout.write(InterruptedMessage.print() + '\n' + WatchUsage.print())
+      await Stdout.write(InterruptedMessage.print() + '\n' + WatchUsage.print())
       return {
         ...state,
         mode: ModeType.Interrupted,

@@ -5,7 +5,7 @@ import * as ModeType from '../ModeType/ModeType.js'
 import * as StdinDataState from '../StdinDataState/StdinDataState.js'
 import * as Stdout from '../Stdout/Stdout.js'
 
-export const handleTestsFinished = (passed, failed, skipped, leaked, total, duration, filterValue) => {
+export const handleTestsFinished = async (passed, failed, skipped, leaked, total, duration, filterValue) => {
   Assert.number(passed)
   Assert.number(failed)
   Assert.number(skipped)
@@ -24,7 +24,7 @@ export const handleTestsFinished = (passed, failed, skipped, leaked, total, dura
     filterValue,
     isWatchMode,
   )
-  Stdout.write(message)
+  await Stdout.write(message)
   StdinDataState.setState({
     ...StdinDataState.getState(),
     mode: ModeType.FinishedRunning,

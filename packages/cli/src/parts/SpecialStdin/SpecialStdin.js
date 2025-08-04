@@ -11,7 +11,8 @@ export const start = () => {
   Stdin.on('data', HandleStdinData.handleStdinData)
 }
 
-export const stop = () => {
+export const stop = async () => {
+  // TODO use worker for stdin
   Stdin.pause()
-  Stdout.write(Character.NewLine)
+  await Stdout.write(Character.NewLine)
 }
