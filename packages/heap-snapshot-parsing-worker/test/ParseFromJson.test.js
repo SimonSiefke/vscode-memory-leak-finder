@@ -95,13 +95,13 @@ test('prepareHeapSnapshot - does not parse strings when parseStrings is false', 
     strings: ['', 'root', 'test'],
   }
 
-  const result = await parseFromJson(heapSnapshotData, false)
+  const result = await parseFromJson(heapSnapshotData, { parseStrings: false })
 
   expect(result).toHaveProperty('metaData')
   expect(result).toHaveProperty('nodes')
   expect(result).toHaveProperty('edges')
   expect(result).toHaveProperty('locations')
-  expect(result).not.toHaveProperty('strings')
+  expect(result).toHaveProperty('strings')
 
   expect(result.nodes).toBeInstanceOf(Uint32Array)
   expect(result.edges).toBeInstanceOf(Uint32Array)
@@ -110,4 +110,5 @@ test('prepareHeapSnapshot - does not parse strings when parseStrings is false', 
   expect(result.nodes.length).toBe(7) // 1 node * 7 fields
   expect(result.edges.length).toBe(0) // 0 edges
   expect(result.locations.length).toBe(0) // 0 locations
+  expect(result.strings).toEqual([])
 })
