@@ -6,6 +6,8 @@ import * as ErrorCodes from '../ErrorCodes/ErrorCodes.js'
 import * as FileSystem from '../FileSystem/FileSystem.js'
 import * as SplitLines from '../SplitLines/SplitLines.js'
 
+import type { ErrorObject, StackFrame } from '../Types/Types.js'
+
 const getActualPath = (fileUri: string): string => {
   if (fileUri.startsWith('file://')) {
     return fileURLToPath(fileUri)
@@ -15,10 +17,15 @@ const getActualPath = (fileUri: string): string => {
 
 const RE_MODULE_NOT_FOUND_STACK = /Cannot find package '([^']+)' imported from (.+)$/
 
-import type { ErrorObject } from '../Types/Types.js'
-
 const prepareModuleNotFoundError = (error: ErrorObject): ErrorObject => {
   const message = error.message
+  if (!message) {
+    return {
+      message: 'Unknown error',
+      stack: error.stack,
+      codeFrame: '',
+    }
+  }
   const match = message.match(RE_MODULE_NOT_FOUND_STACK)
   if (!match) {
     return {
@@ -49,7 +56,7 @@ const prepareModuleNotFoundError = (error: ErrorObject): ErrorObject => {
     },
   }
   const codeFrame = codeFrameColumns(rawLines, location, { highlightCode: false })
-  const stackLines = SplitLines.splitLines(error.stack)
+  const stackLines = SplitLines.splitLines(error.stack || '')
   const newStackLines = [stackLines[0], `    at ${importedFrom}:${line}:${column}`, ...stackLines.slice(1)]
   const newStack = newStackLines.join('\n')
   return {
@@ -59,7 +66,7 @@ const prepareModuleNotFoundError = (error: ErrorObject): ErrorObject => {
   }
 }
 
-const getPathDetails = (lines: readonly string[]): { file: string; line: number; column: number } | undefined => {
+const getPathDetails = (lines: readonly string[]): StackFrame | undefined => {
   for (let i = 0; i < lines.length; i++) {
     const file = lines[i]
     if (file) {
@@ -74,6 +81,7 @@ const getPathDetails = (lines: readonly string[]): { file: string; line: number;
         }
         const actualPath = getActualPath(path)
         return {
+          file: path,
           line: Number.parseInt(line),
           column: Number.parseInt(column),
           path: actualPath,
@@ -92,6 +100,9 @@ const getCodeFrame = (cleanedStack: string, { color }: { readonly color: boolean
       return ''
     }
     const { path, line, column } = pathDetails
+    if (!path) {
+      return ''
+    }
     const actualPath = getActualPath(path)
     const rawLines = FileSystem.readFileSync(actualPath, 'utf8')
     const location = {
@@ -123,14 +134,14 @@ export const prepare = async (error: ErrorObject, { color = true, root = '' }: {
       codeFrame: error.codeFrame,
     }
   }
-  const message = error.message
+  const message = error.message || 'Unknown error'
   if (error && error.cause) {
     const cause = error.cause()
     if (cause) {
       error = cause
     }
   }
-  const cleanedStack = CleanStack.cleanStack(error.stack, { root })
+  const cleanedStack = CleanStack.cleanStack(error.stack || '', { root })
   const lines = SplitLines.splitLines(cleanedStack)
   const codeFrame = getCodeFrame(cleanedStack, { color })
   const relevantStack = lines.join('\n')

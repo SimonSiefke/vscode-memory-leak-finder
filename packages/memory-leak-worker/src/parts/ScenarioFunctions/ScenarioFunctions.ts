@@ -28,11 +28,12 @@ export const handleScriptParsed = (x: unknown): void => {
 }
 
 const getExecutionContextType = (message: DevToolsMessage): string => {
-  if (message.params.context.auxData) {
-    if (message.params.context.auxData.type) {
-      return message.params.context.auxData.type
+  if (message.params?.context?.auxData) {
+    const auxData = message.params.context.auxData as any
+    if (auxData.type) {
+      return auxData.type
     }
-    if (message.params.context.auxData.isDefault) {
+    if (auxData.isDefault) {
       return 'default'
     }
   }
@@ -55,7 +56,10 @@ const handlePageFrameDetached = (event: DevToolsMessage): void => {
 }
 
 const handleConsoleApiCalled = (event: DevToolsMessage): void => {
-  console.log(`page:`, event.params.args[0].value)
+  const args = event.params?.args as any[]
+  if (args && args[0]?.value) {
+    console.log(`page:`, args[0].value)
+  }
 }
 
 export const getSessions = (): readonly Session[] => {
@@ -71,7 +75,10 @@ const handleAttachedToBrowser = (message: DevToolsMessage): void => {
 }
 
 const handleAttachedToJs = async (message: DevToolsMessage, type: string): Promise<void> => {
-  const sessionId = message.params.sessionId
+  const sessionId = message.params?.sessionId as string
+  if (!sessionId) {
+    return
+  }
   const browserSession = SessionState.getSession('browser')
   if (!browserSession) {
     return
@@ -79,20 +86,25 @@ const handleAttachedToJs = async (message: DevToolsMessage, type: string): Promi
   const browserRpc = (browserSession as any).rpc
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
 
+  const targetInfo = message.params?.targetInfo as any
+  if (!targetInfo) {
+    return
+  }
+
   SessionState.addSession(sessionId, {
-    type: message.params.targetInfo.type,
-    url: message.params.targetInfo.url,
+    type: targetInfo.type,
+    url: targetInfo.url,
     sessionId,
     rpc: sessionRpc,
   } as any)
 
-  TargetState.addTarget(message.params.targetInfo.targetId, {
+  TargetState.addTarget(targetInfo.targetId, {
     type,
-    targetId: message.params.targetInfo.targetId,
-    title: message.params.targetInfo.title,
-    url: message.params.targetInfo.url,
-    sessionId: message.params.sessionId,
-    browserContextId: message.params.browserContextId,
+    targetId: targetInfo.targetId,
+    title: targetInfo.title,
+    url: targetInfo.url,
+    sessionId: message.params?.sessionId,
+    browserContextId: message.params?.browserContextId,
   } as any)
 
   await Promise.all([
@@ -111,8 +123,10 @@ const handleAttachedToWorker = async (message: DevToolsMessage): Promise<void> =
 }
 
 export const handleTargetDestroyed = (message: DevToolsMessage): void => {
-  const targetId = message.params.targetId
-  TargetState.removeTarget(targetId)
+  const targetId = message.params?.targetId as string
+  if (targetId) {
+    TargetState.removeTarget(targetId)
+  }
 }
 
 export const handleTargetInfoChanged = (message: DevToolsMessage): void => {
@@ -121,19 +135,32 @@ export const handleTargetInfoChanged = (message: DevToolsMessage): void => {
 
 export const handleTargetCrashed = (message: DevToolsMessage): void => {
   console.log('target crashed', message)
-  ExecutionContextState.executeCrashListener(message.params.targetId)
+  const targetId = message.params?.targetId as string
+  if (targetId) {
+    ExecutionContextState.executeCrashListener(targetId)
+  }
 }
 
 const handleAttachedToPage = async (message: DevToolsMessage): Promise<void> => {
   try {
-    const sessionId = message.params.sessionId
+    const sessionId = message.params?.sessionId as string
+    if (!sessionId) {
+      return
+    }
     const browserSession = SessionState.getSession('browser')
     const browserRpc = (browserSession as any)?.rpc
     const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
-    const targetId = message.params.targetInfo.targetId
-    const type = message.params.targetInfo.type
-    const url = message.params.targetInfo.url
-    const browserContextId = message.params.targetInfo.browserContextId
+    
+    const targetInfo = message.params?.targetInfo as any
+    if (!targetInfo) {
+      return
+    }
+    
+    const targetId = targetInfo.targetId
+    const type = targetInfo.type
+    const url = targetInfo.url
+    const browserContextId = targetInfo.browserContextId
+    
     SessionState.addSession(sessionId, {
       type,
       url,
@@ -172,7 +199,10 @@ const handleAttachedToPage = async (message: DevToolsMessage): Promise<void> => 
     if (error && error.name === 'TestFinishedError') {
       return
     }
-    console.error(`Failed to attach to page ${message.params.targetInfo.targetId} ${message.params.targetInfo.browserContextId}: ${error}`)
+    const targetInfo = message.params?.targetInfo as any
+    const targetId = targetInfo?.targetId || 'unknown'
+    const browserContextId = targetInfo?.browserContextId || 'unknown'
+    console.error(`Failed to attach to page ${targetId} ${browserContextId}: ${error}`)
   }
 }
 
@@ -185,7 +215,11 @@ const handleAttachedToServiceWorker = async (message: DevToolsMessage): Promise<
 }
 
 export const handleAttachedToTarget = (message: DevToolsMessage): void | Promise<void> => {
-  const type = message.params.targetInfo.type
+  const targetInfo = message.params?.targetInfo as any
+  if (!targetInfo?.type) {
+    return
+  }
+  const type = targetInfo.type
   switch (type) {
     case DevtoolsTargetType.Page:
       return handleAttachedToPage(message)
@@ -203,7 +237,10 @@ export const handleAttachedToTarget = (message: DevToolsMessage): void | Promise
 }
 
 export const handleDetachedFromTarget = (message: DevToolsMessage): void => {
-  SessionState.removeSession(message.params.sessionId)
+  const sessionId = message.params?.sessionId as string
+  if (sessionId) {
+    SessionState.removeSession(sessionId)
+  }
 }
 
 export const handleTargetCreated = async (message: DevToolsMessage): Promise<void> => {}

@@ -14,7 +14,7 @@ export const getErrorResponse = async (message: IpcMessage, error: ErrorObject):
         message: error.message,
         data: error.stack,
       },
-    }
+    } as IpcMessage
   }
   const PrettyError = await import('../PrettyError/PrettyError.js')
   const prettyError = await PrettyError.prepare(error) as any
@@ -32,5 +32,5 @@ export const getErrorResponse = async (message: IpcMessage, error: ErrorObject):
         code: prettyError.code,
       },
     },
-  }
+  } as IpcMessage
 }

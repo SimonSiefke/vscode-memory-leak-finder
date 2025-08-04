@@ -4,7 +4,10 @@ import type { IpcMessage } from '../Types/Types.js'
 
 export const getSuccessResponse = (message: IpcMessage, result: unknown): IpcMessage => {
   if (!message.id) {
-    return undefined
+    return {
+      jsonrpc: JsonRpcVersion.Two,
+      result: result ?? null,
+    }
   }
   return {
     jsonrpc: JsonRpcVersion.Two,
