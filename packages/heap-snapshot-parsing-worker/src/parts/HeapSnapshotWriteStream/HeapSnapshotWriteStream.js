@@ -232,10 +232,7 @@ export class HeapSnapshotWriteStream extends Writable {
       edges: this.edges,
       nodes: this.nodes,
       locations: this.locations,
-    }
-
-    if (this.parseStrings && this.strings && this.strings.length > 0) {
-      result.strings = this.strings
+      strings: this.strings,
     }
 
     return result
