@@ -10,7 +10,7 @@ beforeEach(() => {
 
 jest.unstable_mockModule('../src/parts/Stdout/Stdout.js', () => {
   return {
-    write: jest.fn(),
+    write: jest.fn().mockImplementation(() => Promise.resolve()),
   }
 })
 
@@ -23,24 +23,24 @@ jest.unstable_mockModule('../src/parts/IsWindows/IsWindows.js', () => {
 const Stdout = await import('../src/parts/Stdout/Stdout.js')
 const HandleStdinDataInterruptedMode = await import('../src/parts/HandleStdinDataInterruptedMode/HandleStdinDataInterruptedMode.js')
 
-test('HandleStdinDataInterruptedMode - watch mode key', () => {
+test('HandleStdinDataInterruptedMode - watch mode key', async () => {
   const state = {
     value: '',
     mode: ModeType.Interrupted,
   }
   const key = CliKeys.WatchMode
-  const newState = HandleStdinDataInterruptedMode.handleStdinDataInterruptedMode(state, key)
+  const newState = await HandleStdinDataInterruptedMode.handleStdinDataInterruptedMode(state, key)
   expect(newState).toBe(state)
   expect(Stdout.write).not.toHaveBeenCalled()
 })
 
-test('HandleStdinDataInterruptedMode - go to filter mode', () => {
+test('HandleStdinDataInterruptedMode - go to filter mode', async () => {
   const state = {
     value: '',
     mode: ModeType.Interrupted,
   }
   const key = CliKeys.FilterMode
-  const newState = HandleStdinDataInterruptedMode.handleStdinDataInterruptedMode(state, key)
+  const newState = await HandleStdinDataInterruptedMode.handleStdinDataInterruptedMode(state, key)
   expect(newState.mode).toBe(ModeType.FilterWaiting)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
@@ -53,24 +53,24 @@ test('HandleStdinDataInterruptedMode - go to filter mode', () => {
   )
 })
 
-test('HandleStdinDataInterruptedMode - quit', () => {
+test('HandleStdinDataInterruptedMode - quit', async () => {
   const state = {
     value: '',
     mode: ModeType.Interrupted,
   }
   const key = CliKeys.Quit
-  const newState = HandleStdinDataInterruptedMode.handleStdinDataInterruptedMode(state, key)
+  const newState = await HandleStdinDataInterruptedMode.handleStdinDataInterruptedMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
   expect(Stdout.write).not.toHaveBeenCalled()
 })
 
-test('HandleStdinDataInterruptedMode - run again', () => {
+test('HandleStdinDataInterruptedMode - run again', async () => {
   const state = {
     value: '',
     mode: ModeType.Interrupted,
   }
   const key = AnsiKeys.Enter
-  const newState = HandleStdinDataInterruptedMode.handleStdinDataInterruptedMode(state, key)
+  const newState = await HandleStdinDataInterruptedMode.handleStdinDataInterruptedMode(state, key)
   expect(newState.mode).toBe(ModeType.Running)
   expect(Stdout.write).not.toHaveBeenCalled()
 })
