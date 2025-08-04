@@ -3,7 +3,7 @@ import { HeapSnapshotWriteStream } from '../src/parts/HeapSnapshotWriteStream/He
 
 test('HeapSnapshotWriteStream - constructor initializes correctly', () => {
   const stream = new HeapSnapshotWriteStream()
-  
+
   expect(stream.arrayIndex).toBe(0)
   expect(stream.currentNumber).toBe(0)
   expect(stream.data).toBeInstanceOf(Uint8Array)
@@ -19,9 +19,9 @@ test('HeapSnapshotWriteStream - resetParsingState resets parsing state', () => {
   const stream = new HeapSnapshotWriteStream()
   stream.currentNumber = 123
   stream.hasDigits = true
-  
+
   stream.resetParsingState()
-  
+
   expect(stream.currentNumber).toBe(0)
   expect(stream.hasDigits).toBe(false)
 })
@@ -29,7 +29,7 @@ test('HeapSnapshotWriteStream - resetParsingState resets parsing state', () => {
 test('HeapSnapshotWriteStream - getResult returns correct structure', () => {
   const stream = new HeapSnapshotWriteStream()
   const result = stream.getResult()
-  
+
   expect(result).toHaveProperty('metaData')
   expect(result).toHaveProperty('edges')
   expect(result).toHaveProperty('nodes')
@@ -38,7 +38,7 @@ test('HeapSnapshotWriteStream - getResult returns correct structure', () => {
 
 test('HeapSnapshotWriteStream - processes complete heap snapshot data', async () => {
   const stream = new HeapSnapshotWriteStream()
-  
+
   const heapSnapshotData = {
     snapshot: {
       meta: {
@@ -56,14 +56,14 @@ test('HeapSnapshotWriteStream - processes complete heap snapshot data', async ()
     locations: [0, 0, 1, 2],
     strings: ['', 'root', 'child'],
   }
-  
+
   const jsonData = JSON.stringify(heapSnapshotData)
   const buffer = new TextEncoder().encode(jsonData)
-  
+
   stream.write(buffer)
-  
+
   const result = stream.getResult()
-  
+
   expect(result.metaData).toHaveProperty('data')
   expect(result.metaData.data).toHaveProperty('node_count', 2)
   expect(result.metaData.data).toHaveProperty('edge_count', 1)
@@ -74,7 +74,7 @@ test('HeapSnapshotWriteStream - processes complete heap snapshot data', async ()
 
 test('HeapSnapshotWriteStream - handles empty heap snapshot', async () => {
   const stream = new HeapSnapshotWriteStream()
-  
+
   const heapSnapshotData = {
     snapshot: {
       meta: {
@@ -92,14 +92,14 @@ test('HeapSnapshotWriteStream - handles empty heap snapshot', async () => {
     locations: [],
     strings: [''],
   }
-  
+
   const jsonData = JSON.stringify(heapSnapshotData)
   const buffer = new TextEncoder().encode(jsonData)
-  
+
   stream.write(buffer)
-  
+
   const result = stream.getResult()
-  
+
   expect(result.metaData).toHaveProperty('data')
   expect(result.metaData.data).toHaveProperty('node_count', 0)
   expect(result.metaData.data).toHaveProperty('edge_count', 0)
@@ -110,7 +110,7 @@ test('HeapSnapshotWriteStream - handles empty heap snapshot', async () => {
 
 test('HeapSnapshotWriteStream - handles partial data chunks', async () => {
   const stream = new HeapSnapshotWriteStream()
-  
+
   const heapSnapshotData = {
     snapshot: {
       meta: {
@@ -128,19 +128,19 @@ test('HeapSnapshotWriteStream - handles partial data chunks', async () => {
     locations: [],
     strings: ['', 'root'],
   }
-  
+
   const jsonData = JSON.stringify(heapSnapshotData)
   const buffer = new TextEncoder().encode(jsonData)
-  
+
   // Split the data into chunks
   const chunk1 = buffer.slice(0, Math.floor(buffer.length / 2))
   const chunk2 = buffer.slice(Math.floor(buffer.length / 2))
-  
+
   stream.write(chunk1)
   stream.write(chunk2)
-  
+
   const result = stream.getResult()
-  
+
   expect(result.metaData).toHaveProperty('data')
   expect(result.metaData.data).toHaveProperty('node_count', 1)
   expect(result.nodes.length).toBe(7) // 1 node * 7 fields
@@ -150,7 +150,7 @@ test('HeapSnapshotWriteStream - handles partial data chunks', async () => {
 
 test('HeapSnapshotWriteStream - handles large numbers in arrays', async () => {
   const stream = new HeapSnapshotWriteStream()
-  
+
   const heapSnapshotData = {
     snapshot: {
       meta: {
@@ -168,20 +168,20 @@ test('HeapSnapshotWriteStream - handles large numbers in arrays', async () => {
     locations: [],
     strings: ['', 'root'],
   }
-  
+
   const jsonData = JSON.stringify(heapSnapshotData)
   const buffer = new TextEncoder().encode(jsonData)
-  
+
   stream.write(buffer)
-  
+
   const result = stream.getResult()
-  
+
   expect(result.nodes[2]).toBe(123456789) // The large number should be parsed correctly
 })
 
 test('HeapSnapshotWriteStream - handles negative numbers', async () => {
   const stream = new HeapSnapshotWriteStream()
-  
+
   const heapSnapshotData = {
     snapshot: {
       meta: {
@@ -199,13 +199,13 @@ test('HeapSnapshotWriteStream - handles negative numbers', async () => {
     locations: [],
     strings: ['', 'root'],
   }
-  
+
   const jsonData = JSON.stringify(heapSnapshotData)
   const buffer = new TextEncoder().encode(jsonData)
-  
+
   stream.write(buffer)
-  
+
   const result = stream.getResult()
-  
+
   expect(result.nodes[3]).toBe(-100) // Negative number should be parsed correctly
-}) 
+})
