@@ -1,3 +1,5 @@
+export * as AbortControllerCount from '../CreateAbortControllerCountChart/CreateAbortControllerCountChart.js'
+export * as AbortSignalCount from '../CreateAbortSignalCountChart/CreateAbortSignalCountChart.js'
 export * as AttachedDomNodeCount from '../CreateAttachedDomNodeCountChart/CreateAttachedDomNodeCountChart.js'
 export * as CanvasCount from '../CreateCanvasCountChart/CreateCanvasCountChart.js'
 export * as CssRuleCount from '../CreateCssRuleCountChart/CreateCssRuleCountChart.js'
