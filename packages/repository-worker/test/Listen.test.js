@@ -23,6 +23,7 @@ test('listen creates NodeWorkerRpcClient with commandMap', async () => {
 
   await listen()
 
+  // @ts-ignore
   expect(mockNodeWorkerRpcClient.create).toHaveBeenCalledWith({
     commandMap: mockCommandMap,
   })

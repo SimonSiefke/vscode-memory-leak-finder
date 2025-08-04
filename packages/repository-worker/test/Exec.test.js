@@ -27,6 +27,7 @@ test('exec returns stdout, stderr, and exitCode', async () => {
     stderr: '',
     exitCode: 0,
   })
+  // @ts-ignore
   expect(mockExeca).toHaveBeenCalledWith(command, args, options)
 })
 
@@ -63,6 +64,7 @@ test('exec uses default options when not provided', async () => {
 
   await exec(command, args)
 
+  // @ts-ignore
   expect(mockExeca).toHaveBeenCalledWith(command, args, {})
 })
 
