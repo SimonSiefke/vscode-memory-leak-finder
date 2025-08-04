@@ -5,7 +5,7 @@ import * as WatchUsage from '../WatchUsage/WatchUsage.js'
 
 export const initialStart = async (options) => {
   if (options.watch) {
-    SpecialStdin.start()
+    SpecialStdin.start() // TODO worker
   }
   if (options.watch && !options.filter) {
     await Stdout.write(WatchUsage.print())
