@@ -1,20 +1,36 @@
-import { createReadStream } from 'node:fs'
-import { pipeline } from 'node:stream/promises'
-import { HeapSnapshotWriteStream } from '../HeapSnapshotWriteStream/HeapSnapshotWriteStream.js'
+import { HeapSnapshotParsingWorker } from '../HeapSnapshotParsingWorker/HeapSnapshotParsingWorker.js'
 
 /**
- *
- * @param {string } path
+ * Prepares a heap snapshot by parsing it in a separate worker for better performance
+ * @param {string} path - The file path to the heap snapshot
+ * @returns {Promise<{metaData: any, nodes: Uint32Array, edges: Uint32Array, locations: Uint32Array}>}
  */
 export const prepareHeapSnapshot = async (path) => {
-  const readStream = createReadStream(path)
-  const writeStream = new HeapSnapshotWriteStream()
-  await pipeline(readStream, writeStream)
-  const { edges, metaData, nodes, locations } = writeStream.getResult()
-  return {
-    metaData,
-    nodes,
-    edges,
-    locations,
+  const overallStartTime = performance.now()
+  console.log(`[PrepareHeapSnapshot] Starting heap snapshot preparation for: ${path}`)
+
+  const parsingWorker = new HeapSnapshotParsingWorker()
+
+  try {
+    const workerStartTime = performance.now()
+    console.log(`[PrepareHeapSnapshot] Starting parsing worker...`)
+    await parsingWorker.start()
+    const workerStarted = performance.now()
+    console.log(`[PrepareHeapSnapshot] Worker started in ${(workerStarted - workerStartTime).toFixed(2)}ms`)
+
+    const result = await parsingWorker.parseHeapSnapshot(path)
+
+    const parseCompleted = performance.now()
+    console.log(`[PrepareHeapSnapshot] Total parsing workflow completed in ${(parseCompleted - overallStartTime).toFixed(2)}ms`)
+
+    return result
+  } finally {
+    const terminateStart = performance.now()
+    await parsingWorker[Symbol.asyncDispose]()
+    const terminateEnd = performance.now()
+    console.log(`[PrepareHeapSnapshot] Worker terminated in ${(terminateEnd - terminateStart).toFixed(2)}ms`)
+
+    const totalTime = performance.now() - overallStartTime
+    console.log(`[PrepareHeapSnapshot] Total time including cleanup: ${totalTime.toFixed(2)}ms`)
   }
 }
