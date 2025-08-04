@@ -45,7 +45,7 @@ test('getArraysFromHeapSnapshot - handles multiple names correctly', async () =>
   const result = await GetArraysFromHeapSnapshot.getArraysFromHeapSnapshot(heapSnapshotPath)
 
   // Find arrays with multiple names (array instead of string)
-  const arraysWithMultipleNames = result.filter(array => Array.isArray(array.name))
+  const arraysWithMultipleNames = result.filter((array) => Array.isArray(array.name))
 
   console.log(`Found ${arraysWithMultipleNames.length} arrays with multiple names`)
 
@@ -54,7 +54,7 @@ test('getArraysFromHeapSnapshot - handles multiple names correctly', async () =>
     console.log('Sample array with multiple names:', {
       id: arrayWithMultipleNames.id,
       name: arrayWithMultipleNames.name,
-      length: arrayWithMultipleNames.length
+      length: arrayWithMultipleNames.length,
     })
 
     expect(Array.isArray(arrayWithMultipleNames.name)).toBe(true)

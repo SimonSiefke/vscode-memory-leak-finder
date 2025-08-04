@@ -2,7 +2,17 @@ import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/Comput
 import * as CreateNameMap from '../CreateNameMap/CreateNameMap.js'
 import { isInternalArray } from '../IsInternalArray/IsInternalArray.js'
 
-export const getArraysFromHeapSnapshotInternal = (strings, nodes, node_types, node_fields, edges, edge_types, edge_fields, parsedNodes, graph) => {
+export const getArraysFromHeapSnapshotInternal = (
+  strings,
+  nodes,
+  node_types,
+  node_fields,
+  edges,
+  edge_types,
+  edge_fields,
+  parsedNodes,
+  graph,
+) => {
   const {
     objectTypeIndex,
     ITEMS_PER_NODE,
@@ -139,7 +149,7 @@ export const getArraysFromHeapSnapshotInternal = (strings, nodes, node_types, no
   // Create name map to get real display names
   const nameMap = CreateNameMap.createNameMap(parsedNodes, graph)
 
-      // Sort by length (longest first) and return with real display names
+  // Sort by length (longest first) and return with real display names
   const result = arrayObjects
     .map((obj) => {
       const nameObject = nameMap[obj.id]
@@ -150,11 +160,11 @@ export const getArraysFromHeapSnapshotInternal = (strings, nodes, node_types, no
       if (obj.variableNames && obj.variableNames.length > 0) {
         // Extract unique variable names and sort them for consistent ordering
         // @ts-ignore
-        const uniqueNames = [...new Set(obj.variableNames.map(v => v.name))].sort()
+        const uniqueNames = [...new Set(obj.variableNames.map((v) => v.name))].sort()
         // If only one name, use string; if multiple, use array
         displayName = uniqueNames.length === 1 ? uniqueNames[0] : uniqueNames
       } else {
-        displayName = nameObject ? (nameObject.edgeName || nameObject.nodeName) : obj.name
+        displayName = nameObject ? nameObject.edgeName || nameObject.nodeName : obj.name
       }
 
       return {

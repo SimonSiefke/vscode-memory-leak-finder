@@ -30,46 +30,76 @@ test('getArraysFromHeapSnapshotInternal - returns array of names when multiple v
   // Node indices will be: globalThis at 0, Array at 7
   const nodes = [
     // globalThis node at index 0
-    7, 5, 1, 100, 2, 0, 0, // type=object(7), name=globalThis(5), id=1, selfSize=100, edgeCount=2
+    7,
+    5,
+    1,
+    100,
+    2,
+    0,
+    0, // type=object(7), name=globalThis(5), id=1, selfSize=100, edgeCount=2
     // Array node at index 7
-    7, 2, 2, 64, 3, 0, 0,  // type=object(7), name=Array(2), id=2, selfSize=64, edgeCount=3
+    7,
+    2,
+    2,
+    64,
+    3,
+    0,
+    0, // type=object(7), name=Array(2), id=2, selfSize=64, edgeCount=3
   ]
 
   // Mock edges array: [type, name_or_index, to_node]
   // Edges from globalThis to Array via 'taka' and 'tecino' properties
   const edges = [
     // globalThis -> Array via 'taka' property
-    2, 3, 7, // type=property(2), name_or_index=3 ('taka'), to_node=7 (Array node at index 7)
+    2,
+    3,
+    7, // type=property(2), name_or_index=3 ('taka'), to_node=7 (Array node at index 7)
     // globalThis -> Array via 'tecino' property
-    2, 4, 7, // type=property(2), name_or_index=4 ('tecino'), to_node=7 (Array node at index 7)
+    2,
+    4,
+    7, // type=property(2), name_or_index=4 ('tecino'), to_node=7 (Array node at index 7)
     // Array internal edges (element edges for array elements)
-    1, 0, 14, // type=element(1), name_or_index=0, to_node=14 (some number node)
-    1, 1, 21, // type=element(1), name_or_index=1, to_node=21 (some number node)
-    1, 2, 28, // type=element(1), name_or_index=2, to_node=28 (some number node)
+    1,
+    0,
+    14, // type=element(1), name_or_index=0, to_node=14 (some number node)
+    1,
+    1,
+    21, // type=element(1), name_or_index=1, to_node=21 (some number node)
+    1,
+    2,
+    28, // type=element(1), name_or_index=2, to_node=28 (some number node)
   ]
 
   // Mock parsed nodes and graph (simplified)
   const parsedNodes = [
     { id: 1, name: 'globalThis', type: 'object' },
-    { id: 2, name: 'Array', type: 'object' }
+    { id: 2, name: 'Array', type: 'object' },
   ]
 
   const graph = {
     1: [
       { name: 'taka', index: 1 }, // globalThis.taka -> Array
-      { name: 'tecino', index: 1 } // globalThis.tecino -> Array
+      { name: 'tecino', index: 1 }, // globalThis.tecino -> Array
     ],
-    2: []
+    2: [],
   }
 
   const result = GetArraysFromHeapSnapshotInternal.getArraysFromHeapSnapshotInternal(
-    strings, nodes, node_types, node_fields, edges, edge_types, edge_fields, parsedNodes, graph
+    strings,
+    nodes,
+    node_types,
+    node_fields,
+    edges,
+    edge_types,
+    edge_fields,
+    parsedNodes,
+    graph,
   )
 
   expect(Array.isArray(result)).toBe(true)
   expect(result.length).toBe(1) // Should find one array
 
-    const arrayResult = result[0]
+  const arrayResult = result[0]
   expect(arrayResult.id).toBe(2)
   expect(arrayResult.length).toBe(3) // Array has 3 elements
   expect(arrayResult.type).toBe('array')
@@ -99,29 +129,57 @@ test('getArraysFromHeapSnapshotInternal - falls back to single name when only on
   const edge_fields = ['type', 'name_or_index', 'to_node']
 
   const nodes = [
-    7, 4, 1, 100, 1, 0, 0, // globalThis
-    7, 2, 2, 64, 3, 0, 0,  // Array
+    7,
+    4,
+    1,
+    100,
+    1,
+    0,
+    0, // globalThis
+    7,
+    2,
+    2,
+    64,
+    3,
+    0,
+    0, // Array
   ]
 
   const edges = [
-    2, 3, 7, // globalThis -> Array via 'singleArray'
-    1, 0, 14, // Array element 0
-    1, 1, 21, // Array element 1
-    1, 2, 28, // Array element 2
+    2,
+    3,
+    7, // globalThis -> Array via 'singleArray'
+    1,
+    0,
+    14, // Array element 0
+    1,
+    1,
+    21, // Array element 1
+    1,
+    2,
+    28, // Array element 2
   ]
 
   const parsedNodes = [
     { id: 1, name: 'globalThis', type: 'object' },
-    { id: 2, name: 'Array', type: 'object' }
+    { id: 2, name: 'Array', type: 'object' },
   ]
 
   const graph = {
     1: [{ name: 'singleArray', index: 1 }],
-    2: []
+    2: [],
   }
 
   const result = GetArraysFromHeapSnapshotInternal.getArraysFromHeapSnapshotInternal(
-    strings, nodes, node_types, node_fields, edges, edge_types, edge_fields, parsedNodes, graph
+    strings,
+    nodes,
+    node_types,
+    node_fields,
+    edges,
+    edge_types,
+    edge_fields,
+    parsedNodes,
+    graph,
   )
 
   expect(Array.isArray(result)).toBe(true)

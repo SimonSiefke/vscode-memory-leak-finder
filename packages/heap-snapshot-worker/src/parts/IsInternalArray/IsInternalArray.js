@@ -8,7 +8,7 @@ const internalNames = [
   '(Code flusher)',
   '(Compilation cache)',
   '(Debugger)',
-  '(Extensions)'
+  '(Extensions)',
 ]
 
 /**
