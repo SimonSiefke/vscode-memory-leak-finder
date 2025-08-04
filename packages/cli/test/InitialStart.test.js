@@ -7,7 +7,7 @@ beforeEach(() => {
 
 jest.unstable_mockModule('../src/parts/Stdout/Stdout.js', () => {
   return {
-    write: jest.fn().mockResolvedValue(undefined),
+    write: jest.fn().mockImplementation(() => Promise.resolve()),
   }
 })
 jest.unstable_mockModule('../src/parts/WatchUsage/WatchUsage.js', () => {
