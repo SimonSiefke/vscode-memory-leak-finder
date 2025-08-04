@@ -97,4 +97,25 @@ test('getBalancedJsonIndices - handles object with only whitespace', () => {
   const result = getBalancedJsonIndices(data, 0)
   
   expect(result).toBe(data.length)
+})
+
+test('getBalancedJsonIndices - handles square brackets in strings', () => {
+  const data = '{"key": "value with [brackets]"}'
+  const result = getBalancedJsonIndices(data, 0)
+  
+  expect(result).toBe(data.length)
+})
+
+test('getBalancedJsonIndices - handles curly braces in strings', () => {
+  const data = '{"key": "value with {braces}"}'
+  const result = getBalancedJsonIndices(data, 0)
+  
+  expect(result).toBe(data.length)
+})
+
+test('getBalancedJsonIndices - handles mixed brackets in strings', () => {
+  const data = '{"key": "value with {braces} and [brackets]"}'
+  const result = getBalancedJsonIndices(data, 0)
+  
+  expect(result).toBe(data.length)
 }) 
