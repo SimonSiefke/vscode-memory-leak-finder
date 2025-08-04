@@ -3,6 +3,8 @@ declare global {
   const expect: typeof import('@jest/globals')['expect']
 }
 
+export {}
+
 import * as CommandState from '../src/parts/CommandState/CommandState.js'
 
 test('registerCommand - should register a command function', () => {

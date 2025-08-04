@@ -4,6 +4,8 @@ declare global {
   const jest: typeof import('@jest/globals')['jest']
 }
 
+export {}
+
 import * as Command from '../src/parts/Command/Command.js'
 import * as CommandState from '../src/parts/CommandState/CommandState.js'
 
