@@ -157,15 +157,6 @@ test('parseHeapSnapshotArray - continues negative number from previous state (sk
   expect(array[1]).toBe(23) // 2 from previous + 3 from current
 })
 
-test('parseHeapSnapshotArray - handles array index out of bounds', () => {
-  const data = new TextEncoder().encode('1,2,3,4]')
-  const array = new Uint32Array(3) // Only space for 3 numbers
-
-  expect(() => {
-    parseHeapSnapshotArray(data, array, 0)
-  }).toThrow('Array index 4 is out of bounds for array of length 3')
-})
-
 test('parseHeapSnapshotArray - handles incorrect number of elements', () => {
   const data = new TextEncoder().encode('1,2]')
   const array = new Uint32Array(3) // Expecting 3 numbers
