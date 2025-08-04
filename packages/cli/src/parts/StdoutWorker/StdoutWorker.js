@@ -1,10 +1,18 @@
 import * as LaunchStdoutWorker from '../LaunchStdoutWorker/LaunchStdoutWorker.js'
+import * as JsonRpc from '../JsonRpc/JsonRpc.js'
 
 export const state = {
   /**
    * @type {any}
    */
   ipc: undefined,
+}
+
+export const invoke = async (method, ...params) => {
+  if (!state.ipc) {
+    return
+  }
+  JsonRpc.send(state.ipc, method, ...params)
 }
 
 export const cleanup = () => {
