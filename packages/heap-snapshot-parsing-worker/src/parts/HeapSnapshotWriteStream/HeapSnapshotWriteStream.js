@@ -12,8 +12,9 @@ const decodeArray = (data) => {
 }
 
 export class HeapSnapshotWriteStream extends Writable {
-  constructor() {
+  constructor(options = {}) {
     super()
+    const { parseStrings = false } = options
     this.arrayIndex = 0
     this.currentNumber = 0
     this.data = new Uint8Array()
@@ -23,6 +24,8 @@ export class HeapSnapshotWriteStream extends Writable {
     this.locations = new Uint32Array()
     this.metaData = {}
     this.nodes = new Uint32Array()
+    this.parseStrings = parseStrings
+    this.strings = parseStrings ? [] : null
     this.state = HeapSnapshotParsingState.SearchingSnapshotMetaData
   }
 
@@ -152,7 +155,86 @@ export class HeapSnapshotWriteStream extends Writable {
   }
 
   writeParsingLocations(chunk) {
-    this.writeResizableArrayData(chunk, HeapSnapshotParsingState.Done)
+    if (this.parseStrings) {
+      this.writeResizableArrayData(chunk, HeapSnapshotParsingState.ParsingStrings)
+    } else {
+      this.writeResizableArrayData(chunk, HeapSnapshotParsingState.Done)
+    }
+  }
+
+  writeParsingStringsMetaData(chunk) {
+    this.writeParsingArrayMetaData(chunk, 'strings', HeapSnapshotParsingState.ParsingStrings)
+  }
+
+  writeParsingStrings(chunk) {
+    this.writeStringArrayData(chunk, HeapSnapshotParsingState.Done)
+  }
+
+  writeStringArrayData(chunk, nextState) {
+    // For strings, we need to parse JSON string values, not numbers
+    this.data = concatArray(this.data, chunk)
+    const dataString = decodeArray(this.data)
+
+    // Try to parse the strings array as JSON
+    try {
+      // Look for the end of the strings array
+      let bracketCount = 0
+      let inString = false
+      let escapeNext = false
+      let endIndex = -1
+
+      for (let i = 0; i < dataString.length; i++) {
+        const char = dataString[i]
+
+        if (escapeNext) {
+          escapeNext = false
+          continue
+        }
+
+        if (char === '\\') {
+          escapeNext = true
+          continue
+        }
+
+        if (char === '"' && !escapeNext) {
+          inString = !inString
+          continue
+        }
+
+        if (!inString) {
+          if (char === '[') {
+            bracketCount++
+          } else if (char === ']') {
+            bracketCount--
+            if (bracketCount === 0) {
+              endIndex = i + 1
+              break
+            }
+          }
+        }
+      }
+
+      if (endIndex === -1) {
+        return // Not enough data yet
+      }
+
+      // Extract the strings array JSON
+      const stringsJson = dataString.slice(0, endIndex)
+      const strings = JSON.parse(stringsJson)
+
+      if (Array.isArray(strings)) {
+        this.strings = strings
+      }
+
+      this.resetParsingState()
+      this.state = nextState
+      const rest = this.data.slice(endIndex)
+      this.data = new Uint8Array()
+      this.handleChunk(rest)
+    } catch (error) {
+      // Not enough data yet or invalid JSON, continue accumulating
+      return
+    }
   }
 
   handleChunk(chunk) {
