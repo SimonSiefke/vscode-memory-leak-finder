@@ -241,7 +241,6 @@ export class HeapSnapshotWriteStream extends Writable {
       locations: this.locations,
       strings: this.strings,
     }
-
     return result
   }
 }
