@@ -2,12 +2,12 @@
 
 import { Writable } from 'node:stream'
 import { concatArray, concatUint32Array } from '../ConcatArray/ConcatArray.js'
+import { decodeArray } from '../DecodeArray/DecodeArray.js'
 import * as HeapSnapshotParsingState from '../HeapSnapshotParsingState/HeapSnapshotParsingState.js'
 import { parseHeapSnapshotArray } from '../ParseHeapSnapshotArray/ParseHeapSnapshotArray.js'
 import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.js'
 import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.js'
 import { writeStringArrayData } from '../WriteStringArrayData/WriteStringArrayData.js'
-import { decodeArray } from '../DecodeArray/DecodeArray.js'
 
 export class HeapSnapshotWriteStream extends Writable {
   constructor(options = {}) {
@@ -23,7 +23,7 @@ export class HeapSnapshotWriteStream extends Writable {
     this.metaData = {}
     this.nodes = new Uint32Array()
     this.parseStrings = parseStrings
-    this.strings = parseStrings ? /** @type {string[]} */ ([]) : null
+    this.strings = []
     this.state = HeapSnapshotParsingState.SearchingSnapshotMetaData
   }
 
@@ -170,10 +170,14 @@ export class HeapSnapshotWriteStream extends Writable {
       this.data,
       this.strings,
       () => this.resetParsingState(),
-      () => { this.state = HeapSnapshotParsingState.Done },
-      (newData) => { this.data = newData }
+      () => {
+        this.state = HeapSnapshotParsingState.Done
+      },
+      (newData) => {
+        this.data = newData
+      },
     )
-    
+
     if (!success) {
       this.data = concatArray(this.data, chunk)
     }
