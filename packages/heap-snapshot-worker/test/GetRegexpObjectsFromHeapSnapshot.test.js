@@ -55,12 +55,7 @@ test('getRegexpObjectsFromHeapSnapshot - single regexp object', async () => {
     expect(result).toEqual([
       {
         id: 200,
-        name: '/test/gi',
         pattern: '/test/gi',
-        selfSize: 32,
-        edgeCount: 0,
-        traceNodeId: 0,
-        detachedness: 0,
       },
     ])
   } finally {
@@ -81,10 +76,34 @@ test('getRegexpObjectsFromHeapSnapshot - multiple regexp objects', async () => {
       edge_count: 0,
     },
     nodes: [
-      4, 1, 200, 32, 1, 0, 0, // first regexp
-      0, 0, 201, 16, 0, 0, 0, // hidden object
-      4, 2, 202, 28, 0, 0, 0, // second regexp
-      4, 3, 203, 24, 2, 0, 0, // third regexp
+      4,
+      1,
+      200,
+      32,
+      1,
+      0,
+      0, // first regexp
+      0,
+      0,
+      201,
+      16,
+      0,
+      0,
+      0, // hidden object
+      4,
+      2,
+      202,
+      28,
+      0,
+      0,
+      0, // second regexp
+      4,
+      3,
+      203,
+      24,
+      2,
+      0,
+      0, // third regexp
     ],
     edges: [],
     strings: ['', '/test/gi', '/hello/i', '/world/g'],
@@ -98,30 +117,15 @@ test('getRegexpObjectsFromHeapSnapshot - multiple regexp objects', async () => {
     expect(result).toEqual([
       {
         id: 200,
-        name: '/test/gi',
         pattern: '/test/gi',
-        selfSize: 32,
-        edgeCount: 1,
-        traceNodeId: 0,
-        detachedness: 0,
       },
       {
         id: 202,
-        name: '/hello/i',
         pattern: '/hello/i',
-        selfSize: 28,
-        edgeCount: 0,
-        traceNodeId: 0,
-        detachedness: 0,
       },
       {
         id: 203,
-        name: '/world/g',
         pattern: '/world/g',
-        selfSize: 24,
-        edgeCount: 2,
-        traceNodeId: 0,
-        detachedness: 0,
       },
     ])
   } finally {
