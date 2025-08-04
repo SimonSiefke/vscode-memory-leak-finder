@@ -138,11 +138,11 @@ export const getArraysFromHeapSnapshotInternal = (strings, nodes, node_types, no
   // Create name map to get real display names
   const nameMap = CreateNameMap.createNameMap(parsedNodes, graph)
 
-    // Sort by length (longest first) and return with real display names
+      // Sort by length (longest first) and return with real display names
   const result = arrayObjects
     .map((obj) => {
       const nameObject = nameMap[obj.id]
-
+      
       // If we have variable names from property edges, use them as an array
       // Otherwise fall back to the single name from nameMap or obj.name
       let displayName
@@ -161,6 +161,11 @@ export const getArraysFromHeapSnapshotInternal = (strings, nodes, node_types, no
         length: obj.length,
         type: obj.type,
       }
+    })
+    .filter((obj) => {
+      // Filter out Chrome internal arrays that are not relevant for measurement
+      const name = Array.isArray(obj.name) ? obj.name.join(',') : obj.name
+      return name !== 'initial_array_prototype'
     })
     .sort((a, b) => b.length - a.length)
 
