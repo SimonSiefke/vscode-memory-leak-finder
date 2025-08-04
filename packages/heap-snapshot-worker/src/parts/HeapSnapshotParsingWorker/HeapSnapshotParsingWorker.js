@@ -40,7 +40,8 @@ export class HeapSnapshotParsingWorker {
     })
 
     this.worker.on('exit', (code) => {
-      if (code !== 0) {
+      // Only log if it's an unexpected exit (not during normal termination)
+      if (code !== 0 && this.worker && code !== 1) {
         console.error(`Worker stopped with exit code ${code}`)
       }
     })
@@ -82,9 +83,10 @@ export class HeapSnapshotParsingWorker {
    */
   async [Symbol.asyncDispose]() {
     if (this.worker) {
-      await this.worker.terminate()
+      const worker = this.worker
       this.worker = null
       this.callbacks.clear()
+      await worker.terminate()
     }
   }
 }
