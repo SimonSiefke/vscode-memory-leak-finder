@@ -1,5 +1,15 @@
 // List of Chrome internal array names that should be filtered out
-const internalNames = ['initial_array_prototype', '(GC roots)', '(Bootstrapper)']
+const internalNames = [
+  'initial_array_prototype',
+  '(GC roots)',
+  '(Bootstrapper)',
+  '(Builtins)',
+  '(Client heap)',
+  '(Code flusher)',
+  '(Compilation cache)',
+  '(Debugger)',
+  '(Extensions)'
+]
 
 /**
  * Checks if an array name indicates it's a Chrome internal array that should be filtered out

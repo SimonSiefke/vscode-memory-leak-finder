@@ -6,6 +6,12 @@ test('isInternalArray - returns true for Chrome internal array names', () => {
   expect(isInternalArray('initial_array_prototype')).toBe(true)
   expect(isInternalArray('(GC roots)')).toBe(true)
   expect(isInternalArray('(Bootstrapper)')).toBe(true)
+  expect(isInternalArray('(Builtins)')).toBe(true)
+  expect(isInternalArray('(Client heap)')).toBe(true)
+  expect(isInternalArray('(Code flusher)')).toBe(true)
+  expect(isInternalArray('(Compilation cache)')).toBe(true)
+  expect(isInternalArray('(Debugger)')).toBe(true)
+  expect(isInternalArray('(Extensions)')).toBe(true)
 })
 
 test('isInternalArray - returns false for user array names', () => {
@@ -30,6 +36,12 @@ test('isInternalArray - handles array of names correctly', () => {
   expect(isInternalArray(['initial_array_prototype'])).toBe(true)
   expect(isInternalArray(['(GC roots)'])).toBe(true)
   expect(isInternalArray(['(Bootstrapper)'])).toBe(true)
+  expect(isInternalArray(['(Builtins)'])).toBe(true)
+  expect(isInternalArray(['(Client heap)'])).toBe(true)
+  expect(isInternalArray(['(Code flusher)'])).toBe(true)
+  expect(isInternalArray(['(Compilation cache)'])).toBe(true)
+  expect(isInternalArray(['(Debugger)'])).toBe(true)
+  expect(isInternalArray(['(Extensions)'])).toBe(true)
 })
 
 test('isInternalArray - handles edge cases', () => {
