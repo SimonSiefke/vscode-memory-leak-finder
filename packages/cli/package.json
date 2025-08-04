@@ -18,7 +18,7 @@
     "@lvce-editor/assert": "^1.4.0",
     "@lvce-editor/verror": "^1.7.0",
     "ansi-escapes": "^7.0.0",
-    "chalk": "^5.4.1"
+    "chalk": "^5.5.0"
   },
   "devDependencies": {
     "@types/node": "^24.1.0"
