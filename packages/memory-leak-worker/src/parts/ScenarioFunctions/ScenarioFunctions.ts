@@ -151,17 +151,17 @@ const handleAttachedToPage = async (message: DevToolsMessage): Promise<void> => 
     const browserSession = SessionState.getSession('browser')
     const browserRpc = (browserSession as any)?.rpc
     const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
-    
+
     const targetInfo = message.params?.targetInfo as any
     if (!targetInfo) {
       return
     }
-    
+
     const targetId = targetInfo.targetId
     const type = targetInfo.type
     const url = targetInfo.url
     const browserContextId = targetInfo.browserContextId
-    
+
     SessionState.addSession(sessionId, {
       type,
       url,

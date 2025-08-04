@@ -120,7 +120,10 @@ const getCodeFrame = (cleanedStack: string, { color }: { readonly color: boolean
   }
 }
 
-export const prepare = async (error: ErrorObject, { color = true, root = '' }: { readonly color?: boolean; readonly root?: string } = {}): Promise<ErrorObject> => {
+export const prepare = async (
+  error: ErrorObject,
+  { color = true, root = '' }: { readonly color?: boolean; readonly root?: string } = {},
+): Promise<ErrorObject> => {
   if (error && error.code === ErrorCodes.ERR_MODULE_NOT_FOUND) {
     return prepareModuleNotFoundError(error)
   }

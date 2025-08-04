@@ -17,7 +17,7 @@ export const getErrorResponse = async (message: IpcMessage, error: ErrorObject):
     } as IpcMessage
   }
   const PrettyError = await import('../PrettyError/PrettyError.js')
-  const prettyError = await PrettyError.prepare(error) as any
+  const prettyError = (await PrettyError.prepare(error)) as any
   return {
     jsonrpc: JsonRpcVersion.Two,
     id: message.id,
