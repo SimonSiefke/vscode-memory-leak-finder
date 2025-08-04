@@ -5,20 +5,16 @@ import { IpcError } from '../IpcError/IpcError.js'
 
 export const create = async ({ url, stdio, name, ref }) => {
   const ignoreStdio = stdio === 'inherit' ? undefined : true
-  console.time('worker')
   const worker = new Worker(url, {
     stdout: ignoreStdio,
     stderr: ignoreStdio,
     argv: ['--ipc-type=worker-thread'],
     name,
   })
-  console.timeEnd('worker')
   if (ref === false) {
     worker.unref()
   }
-  console.time('event')
   const { type, event } = await GetFirstNodeWorkerEvent.getFirstNodeWorkerEvent(worker)
-  console.timeEnd('event')
   if (type === FirstNodeWorkerEventType.Error) {
     throw new IpcError(`Failed to start node worker: ${event}`)
   }
