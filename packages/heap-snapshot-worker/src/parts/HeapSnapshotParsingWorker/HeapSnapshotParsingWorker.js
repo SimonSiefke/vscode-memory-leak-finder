@@ -51,7 +51,7 @@ export class HeapSnapshotParsingWorker {
    * Parses a heap snapshot file using the parsing worker
    * @param {string} path - The file path to the heap snapshot
    * @param {boolean} parseStrings - Whether to parse and return strings
-   * @returns {Promise<{metaData: any, nodes: Uint32Array, edges: Uint32Array, locations: Uint32Array, strings?: string[]}>}
+   * @returns {Promise<{metaData: any, nodes: Uint32Array<ArrayBuffer>, edges: Uint32Array<ArrayBuffer>, locations: Uint32Array, strings: string[]}>}
    */
   async parseHeapSnapshot(path, parseStrings = false) {
     if (!this.worker) {
