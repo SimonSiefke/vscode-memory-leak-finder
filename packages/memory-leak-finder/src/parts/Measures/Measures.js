@@ -1,3 +1,5 @@
+export * as MeasureAbortControllerCount from '../MeasureAbortControllerCount/MeasureAbortControllerCount.js'
+export * as MeasureAbortSignalCount from '../MeasureAbortSignalCount/MeasureAbortSignalCount.js'
 export * as MeasureArrayCount from '../MeasureArrayCount/MeasureArrayCount.js'
 export * as MeasureArrayElementCount from '../MeasureArrayElementCount/MeasureArrayElementCount.js'
 export * as MeasureAttachedDomNodeCount from '../MeasureAttachedDomNodeCount/MeasureAttachedDomNodeCount.js'
