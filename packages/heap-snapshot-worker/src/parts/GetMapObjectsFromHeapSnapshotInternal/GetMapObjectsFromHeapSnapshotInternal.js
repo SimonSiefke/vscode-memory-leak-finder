@@ -58,8 +58,7 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
           detachedness,
           nodeDataIndex: i, // Store node data index for later use
           variableNames: [], // Will be populated by scanning edges
-          entries: [], // Will be populated by extracting from table array
-          size: null, // Will try to extract from internal structure
+          keys: [], // Will be populated by extracting from table array
           note: 'Map object found in heap snapshot',
         }
 
@@ -154,7 +153,7 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
     currentEdgeOffset += edgeCount
   }
 
-  // Third pass: extract Map entries from table arrays
+  // Third pass: extract Map keys from table arrays
   for (const mapObj of mapObjects) {
     // Find the table array for this Map
     let mapEdgeOffset = 0
@@ -184,7 +183,7 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
       continue // Skip if no table array found
     }
 
-    // Extract entries from table array
+    // Extract keys from table array
     const tableEdgeCount = nodes[tableArrayNodeIndex + edgeCountFieldIndex]
 
     let tableEdgeOffset = 0
@@ -192,9 +191,7 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
       tableEdgeOffset += nodes[nodeIndex + edgeCountFieldIndex]
     }
 
-    const entries = []
-
-    // Collect data entries from table array
+    // Collect keys from table array
     for (let j = 0; j < tableEdgeCount; j++) {
       const edgeIndex = (tableEdgeOffset + j) * ITEMS_PER_EDGE
       const edgeType = edges[edgeIndex + edgeTypeFieldIndex]
@@ -207,32 +204,10 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
       const targetName = strings[nodes[edgeToNode + nameFieldIndex]] || ''
       const targetTypeName = nodeTypes[targetType] || `type_${targetType}`
 
-      // Only collect meaningful entries (strings and numbers, not system objects)
-      if (edgeTypeName === 'internal' && (targetTypeName === 'string' || targetTypeName === 'number') && targetName) {
-        entries.push({
-          type: targetTypeName,
-          value: targetName,
-        })
+      // Only collect string keys (not system objects)
+      if (edgeTypeName === 'internal' && targetTypeName === 'string' && targetName && targetName !== 'system / Map') {
+        mapObj.keys.push(targetName)
       }
-    }
-
-    // Pair entries as key-value pairs (even indices = keys, odd indices = values)
-    for (let i = 0; i < entries.length - 1; i += 2) {
-      const key = entries[i]
-      const value = entries[i + 1]
-      if (key && value) {
-        mapObj.entries.push({
-          key: key.value,
-          value: value.value,
-          keyType: key.type,
-          valueType: value.type,
-        })
-      }
-    }
-
-    // Update size based on number of entries
-    if (mapObj.entries.length > 0) {
-      mapObj.size = mapObj.entries.length
     }
   }
 
@@ -244,8 +219,8 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
     .map((obj) => ({
       id: obj.id,
       variableNames: obj.variableNames.map((v) => v.name),
-      entries: obj.entries,
-      size: obj.size,
+      keys: obj.keys,
+      note: obj.keys.length > 0 ? `Map object with ${obj.keys.length} keys (values not accessible)` : 'Map object found in heap snapshot',
     }))
     .sort((a, b) => a.id - b.id)
 }
