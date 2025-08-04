@@ -97,12 +97,12 @@ test.skip('performance analysis - identical snapshots parallel vs sequential', a
   const sequentialStart = performance.now()
 
   const seq1Start = performance.now()
-      const result1Sequential = await prepareHeapSnapshot(snapshot1, {})
+  const result1Sequential = await prepareHeapSnapshot(snapshot1, {})
   const seq1End = performance.now()
   console.log(`Sequential snapshot 1: ${(seq1End - seq1Start).toFixed(2)}ms`)
 
   const seq2Start = performance.now()
-  const result2Sequential = await prepareHeapSnapshot(snapshot2)
+  const result2Sequential = await prepareHeapSnapshot(snapshot2, {})
   const seq2End = performance.now()
   console.log(`Sequential snapshot 2: ${(seq2End - seq2Start).toFixed(2)}ms`)
 
@@ -113,7 +113,7 @@ test.skip('performance analysis - identical snapshots parallel vs sequential', a
   console.log('\n=== PARALLEL PARSING ===')
   const parallelStart = performance.now()
 
-  const [result1Parallel, result2Parallel] = await Promise.all([prepareHeapSnapshot(snapshot1), prepareHeapSnapshot(snapshot2)])
+  const [result1Parallel, result2Parallel] = await Promise.all([prepareHeapSnapshot(snapshot1, {}), prepareHeapSnapshot(snapshot2, {})])
 
   const parallelTotal = performance.now() - parallelStart
   console.log(`Parallel total: ${parallelTotal.toFixed(2)}ms`)

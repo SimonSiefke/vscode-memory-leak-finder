@@ -56,7 +56,7 @@ test('prepareHeapSnapshot - parses strings when parseStrings is true', async () 
     strings: ['', 'root', 'test', 'hello world'],
   }
 
-  const result = await parseFromJson(heapSnapshotData, true)
+  const result = await parseFromJson(heapSnapshotData, { parseStrings: true })
 
   expect(result).toHaveProperty('metaData')
   expect(result).toHaveProperty('nodes')
