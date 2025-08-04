@@ -97,7 +97,7 @@ test.skip('performance analysis - identical snapshots parallel vs sequential', a
   const sequentialStart = performance.now()
 
   const seq1Start = performance.now()
-  const result1Sequential = await prepareHeapSnapshot(snapshot1)
+      const result1Sequential = await prepareHeapSnapshot(snapshot1, {})
   const seq1End = performance.now()
   console.log(`Sequential snapshot 1: ${(seq1End - seq1Start).toFixed(2)}ms`)
 
