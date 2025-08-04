@@ -16,7 +16,7 @@ test('registerCommands - should register multiple commands', () => {
   const mockFn2 = () => 'test2'
   const commandMap = {
     'test.multiple1': mockFn1,
-    'test.multiple2': mockFn2
+    'test.multiple2': mockFn2,
   }
 
   CommandState.registerCommands(commandMap)
