@@ -1,4 +1,5 @@
 import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.js'
+import { isInternalMap } from '../IsInternalMap/IsInternalMap.js'
 
 /**
  * @param {Array} strings
@@ -100,13 +101,7 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
         const sourceName = strings[sourceNameIndex] || `<string_${sourceNameIndex}>`
 
         // Collect variable names from property edges, excluding prototypes and internal properties
-        if (
-          edgeTypeName === 'property' &&
-          edgeName !== 'constructor' &&
-          edgeName !== '__proto__' &&
-          edgeName !== 'prototype' &&
-          !edgeName.startsWith('<symbol')
-        ) {
+        if (isInternalMap(edgeTypeName, edgeName)) {
           mapObj.variableNames.push({
             name: edgeName,
             sourceType: sourceTypeName,
