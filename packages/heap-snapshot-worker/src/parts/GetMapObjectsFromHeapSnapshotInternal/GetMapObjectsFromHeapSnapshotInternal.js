@@ -204,8 +204,8 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
       const targetName = strings[nodes[edgeToNode + nameFieldIndex]] || ''
       const targetTypeName = nodeTypes[targetType] || `type_${targetType}`
 
-      // Only collect string keys (not system objects)
-      if (edgeTypeName === 'internal' && targetTypeName === 'string' && targetName && targetName !== 'system / Map') {
+      // Collect string and numeric keys (not system objects)
+      if (edgeTypeName === 'internal' && (targetTypeName === 'string' || targetTypeName === 'number') && targetName && targetName !== 'system / Map') {
         mapObj.keys.push(targetName)
       }
     }
@@ -219,13 +219,13 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
     .map((obj) => {
       const names = obj.variableNames.map((v) => v.name)
       let nameField
-      
+
       if (names.length === 1) {
         nameField = names[0]
       } else {
         nameField = names
       }
-      
+
       return {
         id: obj.id,
         name: nameField,
