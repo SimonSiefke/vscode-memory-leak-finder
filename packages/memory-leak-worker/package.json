@@ -29,21 +29,17 @@
     "typescript": "^5.9.2"
   },
   "jest": {
-    "preset": "ts-jest/presets/default-esm",
+    "preset": "ts-jest",
     "testEnvironment": "node",
     "testMatch": [
       "**/test/**/*.test.ts"
     ],
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
     "transform": {
-      "^.+\\.ts$": ["ts-jest", {
-        "useESM": true
-      }]
+      "^.+\\.ts$": "ts-jest"
     },
-    "extensionsToTreatAsEsm": [".ts"]
+    "moduleNameMapping": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    }
   },
   "xo": {
     "rules": {
