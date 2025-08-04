@@ -1,8 +1,7 @@
 import * as Assert from '../Assert/Assert.js'
-import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
-import * as ParseHeapSnapshotInternalNodes from '../ParseHeapSnapshotInternalNodes/ParseHeapSnapshotInternalNodes.js'
-import * as ParseHeapSnapshotInternalEdges from '../ParseHeapSnapshotInternalEdges/ParseHeapSnapshotInternalEdges.js'
 import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
+import * as ParseHeapSnapshotInternalEdges from '../ParseHeapSnapshotInternalEdges/ParseHeapSnapshotInternalEdges.js'
+import * as ParseHeapSnapshotInternalNodes from '../ParseHeapSnapshotInternalNodes/ParseHeapSnapshotInternalNodes.js'
 
 const MAX_EXPECTED_CHAIN_LENGTH = 10
 const PROTOTYPE_POLLUTION_THRESHOLD = 1000 // If this many objects share unusual properties
@@ -38,7 +37,7 @@ export const getPrototypeChainAnalysisFromHeapSnapshot = async (id) => {
     prototypePollution: prototypeAnalysis.pollution,
     prototypeStatistics: prototypeAnalysis.statistics,
     suspiciousPatterns: prototypeAnalysis.suspicious,
-    detailedResults: prototypeAnalysis.detailedResults
+    detailedResults: prototypeAnalysis.detailedResults,
   }
 }
 
@@ -74,10 +73,10 @@ const analyzePrototypeChains = (parsedNodes, parsedEdges) => {
       nodeName: node.name,
       nodeType: node.type,
       prototypeChainLength: chainAnalysis.length,
-      prototypeChain: chainAnalysis.chain.map(p => ({
+      prototypeChain: chainAnalysis.chain.map((p) => ({
         nodeName: p.nodeName,
-        nodeType: p.nodeType
-      }))
+        nodeType: p.nodeType,
+      })),
     })
 
     // Detect unusually long chains
@@ -88,7 +87,7 @@ const analyzePrototypeChains = (parsedNodes, parsedEdges) => {
         nodeType: node.type,
         chainLength: chainAnalysis.length,
         prototypeChain: chainAnalysis.chain,
-        suspiciousProperties: chainAnalysis.suspiciousProperties
+        suspiciousProperties: chainAnalysis.suspiciousProperties,
       })
     }
 
@@ -100,7 +99,7 @@ const analyzePrototypeChains = (parsedNodes, parsedEdges) => {
           prototypeName: protoProperty.prototypeName,
           propertyName: protoProperty.propertyName,
           affectedObjects: [],
-          isLikelyPollution: false
+          isLikelyPollution: false,
         })
       }
       pollutionCandidates.get(key).affectedObjects.push(node.id)
@@ -120,7 +119,7 @@ const analyzePrototypeChains = (parsedNodes, parsedEdges) => {
         ...candidate,
         affectedObjectCount: candidate.affectedObjects.length,
         isLikelyPollution: true,
-        severity: calculatePollutionSeverity(candidate)
+        severity: calculatePollutionSeverity(candidate),
       })
     }
   }
@@ -133,7 +132,7 @@ const analyzePrototypeChains = (parsedNodes, parsedEdges) => {
     pollution,
     statistics,
     suspicious,
-    detailedResults
+    detailedResults,
   }
 }
 
@@ -148,13 +147,14 @@ const analyzeNodePrototypeChain = (node, edgeMap, nodeMap) => {
   let chainLength = 0
   const visited = new Set()
 
-  while (currentNode && chainLength < 50) { // Prevent infinite loops
+  while (currentNode && chainLength < 50) {
+    // Prevent infinite loops
     if (visited.has(currentNode.id)) {
       // Circular reference detected!
       suspiciousProperties.push({
         type: 'circular_reference',
         nodeId: currentNode.id,
-        message: 'Circular prototype reference detected'
+        message: 'Circular prototype reference detected',
       })
       break
     }
@@ -163,15 +163,12 @@ const analyzeNodePrototypeChain = (node, edgeMap, nodeMap) => {
     chain.push({
       nodeId: currentNode.id,
       nodeName: currentNode.name,
-      nodeType: currentNode.type
+      nodeType: currentNode.type,
     })
 
     // Find prototype edge - ONLY follow 'property' type edges with __proto__ name
     const edges = edgeMap.get(currentNode.id) || []
-    const prototypeEdge = edges.find(edge =>
-      edge.type === 'property' &&
-      edge.nameOrIndex === '__proto__'
-    )
+    const prototypeEdge = edges.find((edge) => edge.type === 'property' && edge.nameOrIndex === '__proto__')
 
     if (prototypeEdge) {
       const targetNodeId = prototypeEdge.toNode
@@ -185,14 +182,14 @@ const analyzeNodePrototypeChain = (node, edgeMap, nodeMap) => {
             prototypeProperties.push({
               prototypeName: prototypeNode.name,
               propertyName: edge.nameOrIndex,
-              prototypeId: prototypeNode.id
+              prototypeId: prototypeNode.id,
             })
 
             suspiciousProperties.push({
               type: 'unusual_prototype_property',
               propertyName: edge.nameOrIndex,
               prototypeName: prototypeNode.name,
-              message: `Unusual property "${edge.nameOrIndex}" found on prototype "${prototypeNode.name}"`
+              message: `Unusual property "${edge.nameOrIndex}" found on prototype "${prototypeNode.name}"`,
             })
           }
         }
@@ -211,7 +208,7 @@ const analyzeNodePrototypeChain = (node, edgeMap, nodeMap) => {
     length: chainLength,
     chain,
     prototypeProperties,
-    suspiciousProperties
+    suspiciousProperties,
   }
 }
 
@@ -271,11 +268,11 @@ const isObjectWithPrototype = (node) => {
     'system',
     'hidden',
     'native',
-    'builtin'
+    'builtin',
   ]
 
   // Skip V8 internal objects
-  if (internalPrefixes.some(prefix => node.name.startsWith(prefix))) {
+  if (internalPrefixes.some((prefix) => node.name.startsWith(prefix))) {
     return false
   }
 
@@ -288,22 +285,44 @@ const isObjectWithPrototype = (node) => {
  */
 const isUnusualPrototypeProperty = (propertyName) => {
   const normalProperties = new Set([
-    'constructor', 'toString', 'valueOf', 'hasOwnProperty',
-    'isPrototypeOf', 'propertyIsEnumerable', '__defineGetter__',
-    '__defineSetter__', '__lookupGetter__', '__lookupSetter__',
-    'length', 'push', 'pop', 'slice', 'splice', 'indexOf', 'forEach'
+    'constructor',
+    'toString',
+    'valueOf',
+    'hasOwnProperty',
+    'isPrototypeOf',
+    'propertyIsEnumerable',
+    '__defineGetter__',
+    '__defineSetter__',
+    '__lookupGetter__',
+    '__lookupSetter__',
+    'length',
+    'push',
+    'pop',
+    'slice',
+    'splice',
+    'indexOf',
+    'forEach',
   ])
 
   // Properties that might indicate pollution
   const suspiciousPatterns = [
-    'isAdmin', 'isAuthenticated', 'isLoggedIn', 'user', 'session',
-    'polluted', 'hacked', 'exploit', 'payload', 'eval', 'script'
+    'isAdmin',
+    'isAuthenticated',
+    'isLoggedIn',
+    'user',
+    'session',
+    'polluted',
+    'hacked',
+    'exploit',
+    'payload',
+    'eval',
+    'script',
   ]
 
-  return !normalProperties.has(propertyName) &&
-         (suspiciousPatterns.some(pattern => propertyName.includes(pattern)) ||
-          propertyName.includes('__') ||
-          propertyName.includes('_'))
+  return (
+    !normalProperties.has(propertyName) &&
+    (suspiciousPatterns.some((pattern) => propertyName.includes(pattern)) || propertyName.includes('__') || propertyName.includes('_'))
+  )
 }
 
 /**
@@ -326,7 +345,7 @@ const calculateChainStatistics = (chainLengths) => {
     median: sorted[Math.floor(sorted.length / 2)],
     max,
     min,
-    percentile95: sorted[Math.floor(sorted.length * 0.95)]
+    percentile95: sorted[Math.floor(sorted.length * 0.95)],
   }
 }
 
@@ -338,8 +357,12 @@ const calculatePollutionSeverity = (candidate) => {
   const propertyName = candidate.propertyName.toLowerCase()
 
   // Security-related properties are high severity
-  if (propertyName.includes('admin') || propertyName.includes('auth') ||
-      propertyName.includes('user') || propertyName.includes('session')) {
+  if (
+    propertyName.includes('admin') ||
+    propertyName.includes('auth') ||
+    propertyName.includes('user') ||
+    propertyName.includes('session')
+  ) {
     return 'critical'
   }
 
@@ -353,12 +376,12 @@ const calculatePollutionSeverity = (candidate) => {
  */
 const detectSuspiciousPatterns = (longChains, pollution) => {
   const patterns = {
-    deepInheritance: longChains.filter(chain => chain.chainLength > 15),
-    possibleFrameworkIssue: longChains.filter(chain =>
-      chain.prototypeChain.some(p => p.nodeName.includes('Component') || p.nodeName.includes('Mixin'))
+    deepInheritance: longChains.filter((chain) => chain.chainLength > 15),
+    possibleFrameworkIssue: longChains.filter((chain) =>
+      chain.prototypeChain.some((p) => p.nodeName.includes('Component') || p.nodeName.includes('Mixin')),
     ),
-    securityIssues: pollution.filter(p => p.severity === 'critical'),
-    performanceIssues: longChains.filter(chain => chain.chainLength > 20)
+    securityIssues: pollution.filter((p) => p.severity === 'critical'),
+    performanceIssues: longChains.filter((chain) => chain.chainLength > 20),
   }
 
   return patterns
