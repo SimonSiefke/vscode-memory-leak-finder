@@ -9,10 +9,12 @@ import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWe
 export const createConnection = async (wsUrl: string): Promise<any> => {
   try {
     const webSocket = new WebSocket(wsUrl)
+
+    // TODO remove error listener and message listener when ipc is disposed
     webSocket.on('error', (error: Error) => {
       throw new Error(`memory leak worker websocket error: ${error}`)
     })
-    await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket)
+    await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket as any)
     return {
       /**
        *

@@ -1,5 +1,6 @@
 import * as IsWindows from '../IsWindows/IsWindows.js'
 
+// TODO pass as arguments from parent process
 export const AttachToPage = IsWindows.IsWindows ? 5000 : 1000
 export const DefaultExecutionContext = 500
 export const PageEvent = 2000
