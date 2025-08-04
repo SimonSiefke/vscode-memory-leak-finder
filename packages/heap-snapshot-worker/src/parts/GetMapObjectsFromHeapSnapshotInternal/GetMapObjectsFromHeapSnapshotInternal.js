@@ -57,8 +57,8 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
           edgeCount,
           detachedness,
           nodeDataIndex: i, // Store node data index for later use
-          variableNames: [], // Will be populated by scanning edges
-          keys: [], // Will be populated by extracting from table array
+          variableNames: /** @type {Array<{name: string, sourceType: string, sourceName: string}>} */ ([]), // Will be populated by scanning edges
+          keys: /** @type {string[]} */ ([]), // Will be populated by extracting from table array
           note: 'Map object found in heap snapshot',
         }
 
@@ -191,8 +191,11 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
       tableEdgeOffset += nodes[nodeIndex + edgeCountFieldIndex]
     }
 
-    // Collect keys from table array
-    for (let j = 0; j < tableEdgeCount; j++) {
+    // Collect keys from table array - Map entries are stored as key-value pairs
+    // Skip the last edge which is usually system/Map related
+    const actualKeyEdges = Math.max(0, tableEdgeCount - 1)
+    
+    for (let j = 0; j < actualKeyEdges; j++) {
       const edgeIndex = (tableEdgeOffset + j) * ITEMS_PER_EDGE
       const edgeType = edges[edgeIndex + edgeTypeFieldIndex]
       const edgeToNode = edges[edgeIndex + edgeToNodeFieldIndex]
@@ -204,8 +207,8 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
       const targetName = strings[nodes[edgeToNode + nameFieldIndex]] || ''
       const targetTypeName = nodeTypes[targetType] || `type_${targetType}`
 
-      // Collect string and numeric keys (not system objects)
-      if (edgeTypeName === 'internal' && (targetTypeName === 'string' || targetTypeName === 'number') && targetName && targetName !== 'system / Map') {
+      // Collect all keys (string, number, etc.) - exclude system objects
+      if (edgeTypeName === 'internal' && targetName && targetName !== 'system / Map' && !targetName.startsWith('system')) {
         mapObj.keys.push(targetName)
       }
     }
