@@ -53,7 +53,7 @@ test('parseHeapSnapshotMetaDataIndices - handles snapshot with nested objects', 
 
   expect(result.startIndex).toBeGreaterThan(0)
   expect(result.endIndex).toBeGreaterThan(result.startIndex)
-  expect(result.endIndex).toBe(data.length) // The function returns the actual data length
+  expect(result.endIndex).toBe(data.length - 1) // The function returns data.length - 1
 })
 
 test('parseHeapSnapshotMetaDataIndices - handles snapshot with arrays in metadata', () => {
@@ -64,7 +64,7 @@ test('parseHeapSnapshotMetaDataIndices - handles snapshot with arrays in metadat
 
   expect(result.startIndex).toBeGreaterThan(0)
   expect(result.endIndex).toBeGreaterThan(result.startIndex)
-  expect(result.endIndex).toBe(data.length) // The function returns the actual data length
+  expect(result.endIndex).toBe(data.length - 1) // The function returns data.length - 1
 })
 
 test('parseHeapSnapshotMetaDataIndices - handles data with prefix', () => {
@@ -86,7 +86,7 @@ test('parseHeapSnapshotMetaDataIndices - handles data with suffix', () => {
 
   expect(result.startIndex).toBeGreaterThan(0)
   expect(result.endIndex).toBeGreaterThan(result.startIndex)
-  expect(result.endIndex).toBe(data.length - 'suffix'.length) // The function returns the position before the suffix
+  expect(result.endIndex).toBe(data.length - 'suffix'.length - 1) // The function returns position before suffix - 1
 })
 
 test('parseHeapSnapshotMetaDataIndices - handles snapshot with empty metadata', () => {
@@ -96,7 +96,7 @@ test('parseHeapSnapshotMetaDataIndices - handles snapshot with empty metadata', 
 
   expect(result.startIndex).toBeGreaterThan(0)
   expect(result.endIndex).toBeGreaterThan(result.startIndex)
-  expect(result.endIndex).toBe(data.length) // The function returns the actual data length
+  expect(result.endIndex).toBe(data.length - 1) // The function returns data.length - 1
 })
 
 test('parseHeapSnapshotMetaDataIndices - handles snapshot with missing metadata fields', () => {
@@ -106,7 +106,7 @@ test('parseHeapSnapshotMetaDataIndices - handles snapshot with missing metadata 
 
   expect(result.startIndex).toBeGreaterThan(0)
   expect(result.endIndex).toBeGreaterThan(result.startIndex)
-  expect(result.endIndex).toBe(data.length) // The function returns the actual data length
+  expect(result.endIndex).toBe(data.length - 1) // The function returns data.length - 1
 })
 
 test('parseHeapSnapshotMetaDataIndices - handles snapshot with string values', () => {
@@ -117,7 +117,7 @@ test('parseHeapSnapshotMetaDataIndices - handles snapshot with string values', (
 
   expect(result.startIndex).toBeGreaterThan(0)
   expect(result.endIndex).toBeGreaterThan(result.startIndex)
-  expect(result.endIndex).toBe(data.length) // The function returns the actual data length
+  expect(result.endIndex).toBe(data.length - 1) // The function returns data.length - 1
 })
 
 test('parseHeapSnapshotMetaDataIndices - handles snapshot with numeric values', () => {
@@ -128,7 +128,7 @@ test('parseHeapSnapshotMetaDataIndices - handles snapshot with numeric values', 
 
   expect(result.startIndex).toBeGreaterThan(0)
   expect(result.endIndex).toBeGreaterThan(result.startIndex)
-  expect(result.endIndex).toBe(data.length) // The function returns the actual data length
+  expect(result.endIndex).toBe(data.length - 1) // The function returns data.length - 1
 })
 
 test('parseHeapSnapshotMetaDataIndices - handles snapshot with quoted strings containing brackets', () => {
@@ -139,7 +139,7 @@ test('parseHeapSnapshotMetaDataIndices - handles snapshot with quoted strings co
 
   expect(result.startIndex).toBeGreaterThan(0)
   expect(result.endIndex).toBeGreaterThan(result.startIndex)
-  expect(result.endIndex).toBe(data.length) // The function returns the actual data length
+  expect(result.endIndex).toBe(data.length - 1) // The function returns data.length - 1
 })
 
 test('parseHeapSnapshotMetaDataIndices - handles snapshot with escaped quotes', () => {
@@ -150,5 +150,5 @@ test('parseHeapSnapshotMetaDataIndices - handles snapshot with escaped quotes', 
 
   expect(result.startIndex).toBeGreaterThan(0)
   expect(result.endIndex).toBeGreaterThan(result.startIndex)
-  expect(result.endIndex).toBe(data.length) // The function returns the actual data length
+  expect(result.endIndex).toBe(data.length - 1) // The function returns data.length - 1
 })

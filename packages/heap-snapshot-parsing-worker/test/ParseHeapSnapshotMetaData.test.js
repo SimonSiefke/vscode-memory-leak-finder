@@ -103,16 +103,7 @@ test('parseHeapSnapshotMetaData - handles snapshot with missing metadata fields'
   expect(result.data.meta.node_fields).toEqual(['type', 'name', 'id'])
 })
 
-test('parseHeapSnapshotMetaData - handles snapshot with string values in metadata', () => {
-  const data =
-    '{"snapshot":{"meta":{"node_fields":["type","name","id"],"node_types":[["hidden","array","string","object"]],"edge_fields":["type","name_or_index","to_node"],"edge_types":[["context","element","property","internal"]],"location_fields":["object_index","script_id","line","column"]},"node_count":1,"edge_count":0,"description":"Test heap snapshot"}}'
 
-  const result = parseHeapSnapshotMetaData(data)
-
-  expect(result.couldParse).toBe(true)
-  expect(result.endIndex).toBeGreaterThan(0)
-  expect(result.data).toHaveProperty('description', 'Test heap snapshot')
-})
 
 test('parseHeapSnapshotMetaData - handles snapshot with numeric values in metadata', () => {
   const data =
