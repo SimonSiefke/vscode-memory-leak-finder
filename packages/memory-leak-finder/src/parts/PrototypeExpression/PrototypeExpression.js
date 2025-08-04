@@ -1,3 +1,5 @@
+export const AbortController = 'AbortController.prototype'
+export const AbortSignal = 'AbortSignal.prototype'
 export const Array = 'Array.prototype'
 export const Blob = 'Blob.prototype'
 export const Canvas = 'HTMLCanvasElement.prototype'
