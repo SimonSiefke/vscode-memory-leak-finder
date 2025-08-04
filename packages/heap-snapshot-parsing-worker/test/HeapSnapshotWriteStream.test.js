@@ -209,3 +209,195 @@ test('HeapSnapshotWriteStream - handles negative numbers (skips minus sign)', as
 
   expect(result.nodes[3]).toBe(100) // Negative number becomes positive because minus sign is skipped
 })
+
+test('HeapSnapshotWriteStream - handles missing nodes array header', async () => {
+  const stream = new HeapSnapshotWriteStream()
+
+  // Create data without the "nodes": token
+  const heapSnapshotData = {
+    snapshot: {
+      meta: {
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
+        edge_fields: ['type', 'name_or_index', 'to_node'],
+        edge_types: [['context', 'element', 'property', 'internal']],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
+      },
+      node_count: 1,
+      edge_count: 0,
+    },
+    // Missing "nodes": array
+    edges: [],
+    locations: [],
+    strings: ['', 'root'],
+  }
+
+  const jsonData = JSON.stringify(heapSnapshotData)
+  const buffer = new TextEncoder().encode(jsonData)
+
+  stream.write(buffer)
+
+  const result = stream.getResult()
+
+  // Should still have metadata but no nodes data since parsing stops at nodes metadata stage
+  expect(result.metaData).toHaveProperty('data')
+  expect(result.nodes.length).toBe(7) // Array is initialized with expected size but not filled
+})
+
+test('HeapSnapshotWriteStream - handles missing edges array header', async () => {
+  const stream = new HeapSnapshotWriteStream()
+
+  // Create data without the "edges": token
+  const heapSnapshotData = {
+    snapshot: {
+      meta: {
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
+        edge_fields: ['type', 'name_or_index', 'to_node'],
+        edge_types: [['context', 'element', 'property', 'internal']],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
+      },
+      node_count: 1,
+      edge_count: 0,
+    },
+    nodes: [0, 0, 1, 0, 0, 0, 0],
+    // Missing "edges": array
+    locations: [],
+    strings: ['', 'root'],
+  }
+
+  const jsonData = JSON.stringify(heapSnapshotData)
+  const buffer = new TextEncoder().encode(jsonData)
+
+  stream.write(buffer)
+
+  const result = stream.getResult()
+
+  // Should still have metadata and nodes but no edges data since parsing stops at edges metadata stage
+  expect(result.metaData).toHaveProperty('data')
+  expect(result.nodes.length).toBe(7)
+  expect(result.edges.length).toBe(0)
+})
+
+test('HeapSnapshotWriteStream - handles missing locations array header', async () => {
+  const stream = new HeapSnapshotWriteStream()
+
+  // Create data without the "locations": token
+  const heapSnapshotData = {
+    snapshot: {
+      meta: {
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
+        edge_fields: ['type', 'name_or_index', 'to_node'],
+        edge_types: [['context', 'element', 'property', 'internal']],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
+      },
+      node_count: 1,
+      edge_count: 0,
+    },
+    nodes: [0, 0, 1, 0, 0, 0, 0],
+    edges: [],
+    // Missing "locations": array
+    strings: ['', 'root'],
+  }
+
+  const jsonData = JSON.stringify(heapSnapshotData)
+  const buffer = new TextEncoder().encode(jsonData)
+
+  stream.write(buffer)
+
+  const result = stream.getResult()
+
+  // Should still have metadata, nodes, and edges but no locations data since parsing stops at locations metadata stage
+  expect(result.metaData).toHaveProperty('data')
+  expect(result.nodes.length).toBe(7)
+  expect(result.edges.length).toBe(0)
+  expect(result.locations.length).toBe(0)
+})
+
+test('HeapSnapshotWriteStream - handles malformed nodes array (missing opening bracket)', async () => {
+  const stream = new HeapSnapshotWriteStream()
+
+  // Manually construct data where "nodes": is present but no opening bracket follows
+  const partialData = 
+    '{"snapshot":{"meta":{"node_fields":["type","name","id","self_size","edge_count","trace_node_id","detachedness"],' +
+    '"node_types":[["hidden","array","string","object"]],"edge_fields":["type","name_or_index","to_node"],' +
+    '"edge_types":[["context","element","property","internal"]],"location_fields":["object_index","script_id","line","column"]},' +
+    '"node_count":1,"edge_count":0},"nodes":'
+  
+  const buffer = new TextEncoder().encode(partialData)
+
+  stream.write(buffer)
+
+  const result = stream.getResult()
+
+  // Should still have metadata but no nodes data since parsing stops at nodes metadata stage
+  expect(result.metaData).toHaveProperty('data')
+  expect(result.nodes.length).toBe(7) // Array is initialized with expected size but not filled
+})
+
+test('HeapSnapshotWriteStream - handles malformed edges array (missing opening bracket)', async () => {
+  const stream = new HeapSnapshotWriteStream()
+
+  // Manually construct data where "edges": is present but no opening bracket follows
+  const partialData = 
+    '{"snapshot":{"meta":{"node_fields":["type","name","id","self_size","edge_count","trace_node_id","detachedness"],' +
+    '"node_types":[["hidden","array","string","object"]],"edge_fields":["type","name_or_index","to_node"],' +
+    '"edge_types":[["context","element","property","internal"]],"location_fields":["object_index","script_id","line","column"]},' +
+    '"node_count":1,"edge_count":0},"nodes":[0,0,1,0,0,0,0],"edges":'
+  
+  const buffer = new TextEncoder().encode(partialData)
+
+  stream.write(buffer)
+
+  const result = stream.getResult()
+
+  // Should still have metadata and nodes but no edges data since parsing stops at edges metadata stage
+  expect(result.metaData).toHaveProperty('data')
+  expect(result.nodes.length).toBe(7)
+  expect(result.edges.length).toBe(0)
+})
+
+test('HeapSnapshotWriteStream - handles malformed locations array (missing opening bracket)', async () => {
+  const stream = new HeapSnapshotWriteStream()
+
+  // Manually construct data where "locations": is present but no opening bracket follows
+  const partialData = 
+    '{"snapshot":{"meta":{"node_fields":["type","name","id","self_size","edge_count","trace_node_id","detachedness"],' +
+    '"node_types":[["hidden","array","string","object"]],"edge_fields":["type","name_or_index","to_node"],' +
+    '"edge_types":[["context","element","property","internal"]],"location_fields":["object_index","script_id","line","column"]},' +
+    '"node_count":1,"edge_count":0},"nodes":[0,0,1,0,0,0,0],"edges":[],"locations":'
+  
+  const buffer = new TextEncoder().encode(partialData)
+
+  stream.write(buffer)
+
+  const result = stream.getResult()
+
+  // Should still have metadata, nodes, and edges but no locations data since parsing stops at locations metadata stage
+  expect(result.metaData).toHaveProperty('data')
+  expect(result.nodes.length).toBe(7)
+  expect(result.edges.length).toBe(0)
+  expect(result.locations.length).toBe(0)
+})
+
+test('HeapSnapshotWriteStream - handles partial data where array header is incomplete', async () => {
+  const stream = new HeapSnapshotWriteStream()
+
+  // Create data that ends before the array header is complete
+  const partialData = 
+    '{"snapshot":{"meta":{"node_fields":["type","name","id","self_size","edge_count","trace_node_id","detachedness"],' +
+    '"node_types":[["hidden","array","string","object"]],"edge_fields":["type","name_or_index","to_node"],' +
+    '"edge_types":[["context","element","property","internal"]],"location_fields":["object_index","script_id","line","column"]},' +
+    '"node_count":1,"edge_count":0},"nodes":'
+  
+  const buffer = new TextEncoder().encode(partialData)
+
+  stream.write(buffer)
+
+  const result = stream.getResult()
+
+  // Should have metadata but no nodes data since the array header is incomplete
+  expect(result.metaData).toHaveProperty('data')
+  expect(result.nodes.length).toBe(7) // Array is initialized with expected size but not filled
+})
