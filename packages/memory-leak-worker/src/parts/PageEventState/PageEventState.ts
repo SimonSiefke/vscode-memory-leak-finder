@@ -1,5 +1,4 @@
 import * as PTimeout from '../PTimeout/PTimeout.js'
-import * as Promises from '../Promises/Promises.js'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
 import { VError } from '../VError/VError.js'
 
@@ -44,7 +43,7 @@ export const waitForEvent = async ({ frameId, name }: { readonly frameId: string
         return
       }
     }
-    const { resolve, reject, promise } = Promises.withResolvers()
+    const { resolve, reject, promise } = Promise.withResolvers()
     const eventCallback: EventCallback = { frameId, name, resolve: () => resolve(undefined), reject }
     state.callbacks.push(eventCallback)
     return await PTimeout.pTimeout(promise, { milliseconds: TimeoutConstants.PageEvent })
