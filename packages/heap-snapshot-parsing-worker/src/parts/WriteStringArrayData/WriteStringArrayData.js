@@ -18,14 +18,45 @@ export const writeStringArrayData = (chunk, data, strings, onReset, onDone, onDa
 
   // Look for the "strings": pattern first
   const stringsStartIndex = dataString.indexOf('"strings":')
-  if (stringsStartIndex === -1) {
-    // No strings section found, need more data
-    onDataUpdate(combinedData)
-    return false
+  let openingBracketIndex = -1
+
+  if (stringsStartIndex !== -1) {
+    // Found "strings": pattern, find the opening bracket after it
+    openingBracketIndex = dataString.indexOf('[', stringsStartIndex)
+  } else {
+    // No "strings": pattern found, check if the data starts with an array or quoted string
+    const trimmedData = dataString.trim()
+    if (trimmedData.startsWith('[')) {
+      openingBracketIndex = dataString.indexOf('[')
+    } else if (trimmedData.startsWith('"')) {
+      // Data starts with a quoted string, this is the array content
+      // We need to wrap it in brackets to make it a valid JSON array
+      const wrappedData = '[' + dataString
+      const closingBracketIndex = wrappedData.lastIndexOf(']')
+      if (closingBracketIndex !== -1) {
+        const stringsContent = wrappedData.substring(0, closingBracketIndex + 1)
+        try {
+          const parsedStrings = JSON.parse(stringsContent)
+          if (Array.isArray(parsedStrings)) {
+            strings.push(...parsedStrings)
+            onReset()
+            onDone()
+            const remainingData = combinedData.slice(closingBracketIndex - 1) // -1 because we added a bracket
+            onDataUpdate(remainingData)
+            return true
+          }
+        } catch (error) {
+          // If JSON parsing fails, we might have incomplete data
+          onDataUpdate(combinedData)
+          return false
+        }
+      }
+      // If we can't find a closing bracket, need more data
+      onDataUpdate(combinedData)
+      return false
+    }
   }
 
-  // Find the opening bracket after "strings":
-  const openingBracketIndex = dataString.indexOf('[', stringsStartIndex)
   if (openingBracketIndex === -1) {
     // No opening bracket found, need more data
     onDataUpdate(combinedData)
