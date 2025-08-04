@@ -16,13 +16,13 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.js', () => {
 const Stdout = await import('../src/parts/Stdout/Stdout.js')
 const HandleStdinDataRunningMode = await import('../src/parts/HandleStdinDataRunningMode/HandleStdinDataRunningMode.js')
 
-test('handleStdinDataRunningMode - show watch mode details', () => {
+test('handleStdinDataRunningMode - show watch mode details', async () => {
   const state = {
     value: '',
     mode: ModeType.Running,
   }
   const key = 'Enter'
-  const newState = HandleStdinDataRunningMode.handleStdinDataRunningMode(state, key)
+  const newState = await HandleStdinDataRunningMode.handleStdinDataRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.Interrupted)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
@@ -37,13 +37,13 @@ test('handleStdinDataRunningMode - show watch mode details', () => {
   )
 })
 
-test('handleStdinDataRunningMode - quit', () => {
+test('handleStdinDataRunningMode - quit', async () => {
   const state = {
     value: '',
     mode: ModeType.Running,
   }
   const key = AnsiKeys.ControlC
-  const newState = HandleStdinDataRunningMode.handleStdinDataRunningMode(state, key)
+  const newState = await HandleStdinDataRunningMode.handleStdinDataRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
   expect(Stdout.write).not.toHaveBeenCalled()
 })

@@ -12,61 +12,61 @@ beforeEach(() => {
 
 jest.unstable_mockModule('../src/parts/Stdout/Stdout.js', () => {
   return {
-    write: jest.fn(),
+    write: jest.fn().mockResolvedValue(undefined),
   }
 })
 
 const Stdout = await import('../src/parts/Stdout/Stdout.js')
 const HandleStdinDataWaitingMode = await import('../src/parts/HandleStdinDataWaitingMode/HandleStdinDataWaitingMode.js')
 
-test('handleStdinDataWaitingMode - ctrl + c', () => {
+test('handleStdinDataWaitingMode - ctrl + c', async () => {
   const state = {
     value: 'abc',
   }
   const key = AnsiKeys.ControlC
-  const newState = HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
+  const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
   expect(Stdout.write).not.toHaveBeenCalled()
 })
 
-test('handleStdinDataWaitingMode - ctrl + d', () => {
+test('handleStdinDataWaitingMode - ctrl + d', async () => {
   const state = {
     value: 'abc',
   }
   const key = AnsiKeys.ControlD
-  const newState = HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
+  const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
   expect(Stdout.write).not.toHaveBeenCalled()
 })
 
-test('handleStdinDataWaitingMode - enter', () => {
+test('handleStdinDataWaitingMode - enter', async () => {
   const state = {
     value: 'abc',
   }
   const key = AnsiKeys.Enter
-  const newState = HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
+  const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Running)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith('\u001B[2K\u001B[G')
 })
 
-test('handleStdinDataWaitingMode - escape', () => {
+test('handleStdinDataWaitingMode - escape', async () => {
   const state = {
     value: 'abc',
   }
   const key = AnsiKeys.Escape
-  const newState = HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
+  const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toBe(state)
   expect(Stdout.write).not.toHaveBeenCalled()
 })
 
-test('handleStdinDataWaitingMode - toggle headless mode', () => {
+test('handleStdinDataWaitingMode - toggle headless mode', async () => {
   const state = {
     value: 'abc',
     headless: false,
   }
   const key = 'h'
-  const newState = HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
+  const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toEqual({
     value: 'abc',
     headless: true,
@@ -75,53 +75,53 @@ test('handleStdinDataWaitingMode - toggle headless mode', () => {
   expect(Stdout.write).not.toHaveBeenCalled()
 })
 
-test('handleStdinDataWaitingMode - other key', () => {
+test('handleStdinDataWaitingMode - other key', async () => {
   const state = {
     value: 'abc',
   }
   const key = 'd'
-  const newState = HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
+  const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toBe(state)
   expect(Stdout.write).not.toHaveBeenCalled()
 })
 
-test('handleStdinDataWaitingMode - ctrl + backspace', () => {
+test('handleStdinDataWaitingMode - ctrl + backspace', async () => {
   const state = {
     value: 'abc',
   }
   const key = AnsiKeys.ControlBackspace
-  const newState = HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
+  const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.value).toBe('')
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(AnsiEscapes.eraseLine + AnsiEscapes.cursorLeft)
 })
 
-test('handleStdinDataWaitingMode - backspace', () => {
+test('handleStdinDataWaitingMode - backspace', async () => {
   const state = {
     value: 'abc',
   }
   const key = AnsiKeys.Backspace
-  const newState = HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
+  const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.value).toBe('ab')
   expect(Stdout.write).not.toHaveBeenCalled()
 })
 
-test('handleStdinDataWaitingMode - arrow left', () => {
+test('handleStdinDataWaitingMode - arrow left', async () => {
   const state = {
     value: 'abc',
   }
   const key = AnsiKeys.ArrowLeft
-  const newState = HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
+  const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toBe(state)
   expect(Stdout.write).not.toHaveBeenCalled()
 })
 
-test('handleStdinDataWaitingMode - run all tests', () => {
+test('handleStdinDataWaitingMode - run all tests', async () => {
   const state = {
     value: 'abc',
   }
   const key = CliKeys.All
-  const newState = HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
+  const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toEqual({
     value: '',
     mode: ModeType.Running,
@@ -129,12 +129,12 @@ test('handleStdinDataWaitingMode - run all tests', () => {
   expect(Stdout.write).not.toHaveBeenCalled()
 })
 
-test('handleStdinDataWaitingMode - filter mode', () => {
+test('handleStdinDataWaitingMode - filter mode', async () => {
   const state = {
     value: 'abc',
   }
   const key = CliKeys.FilterMode
-  const newState = HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
+  const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toEqual({
     value: '',
     mode: ModeType.FilterWaiting,
