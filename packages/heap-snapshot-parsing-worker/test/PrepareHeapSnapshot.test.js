@@ -1,4 +1,4 @@
-import { test, expect, jest } from '@jest/globals'
+import { expect, jest, test } from '@jest/globals'
 import { Readable } from 'node:stream'
 
 const mockCreateReadStream = jest.fn()
@@ -12,7 +12,7 @@ const mockFs = {
 jest.unstable_mockModule('node:fs', () => mockFs)
 
 // Re-import the function to get the mocked version
-const { prepareHeapSnapshot } = await import('../src/parts/PrepareHeapSnapshot/PrepareHeapSnapshot.js')
+const { parseFromFile } = await import('../src/parts/ParseFromFile/ParseFromFile.js')
 
 test('prepareHeapSnapshot - parses simple heap snapshot', async () => {
   // Create a minimal heap snapshot data
@@ -43,7 +43,7 @@ test('prepareHeapSnapshot - parses simple heap snapshot', async () => {
   })
   mockCreateReadStream.mockReturnValue(mockReadStream)
 
-  const result = await prepareHeapSnapshot('/test/mock-file-path.json')
+  const result = await parseFromFile('/test/mock-file-path.json')
 
   expect(result).toHaveProperty('metaData')
   expect(result).toHaveProperty('nodes')

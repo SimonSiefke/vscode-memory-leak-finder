@@ -6,32 +6,13 @@ import { HeapSnapshotParsingWorker } from '../HeapSnapshotParsingWorker/HeapSnap
  * @param {boolean} parseStrings - Whether to parse and return strings
  * @returns {Promise<{metaData: any, nodes: Uint32Array<ArrayBuffer>, edges: Uint32Array<ArrayBuffer>, locations: Uint32Array<ArrayBuffer>, strings: string[]}>}
  */
-export const prepareHeapSnapshot = async (path, parseStrings = false) => {
-  const overallStartTime = performance.now()
-  console.log(`[PrepareHeapSnapshot] Starting heap snapshot preparation for: ${path} (parseStrings: ${parseStrings})`)
-
+export const prepareHeapSnapshot = async (path, parseStrings) => {
   const parsingWorker = new HeapSnapshotParsingWorker()
-
   try {
-    const workerStartTime = performance.now()
-    console.log(`[PrepareHeapSnapshot] Starting parsing worker...`)
     await parsingWorker.start()
-    const workerStarted = performance.now()
-    console.log(`[PrepareHeapSnapshot] Worker started in ${(workerStarted - workerStartTime).toFixed(2)}ms`)
-
     const result = await parsingWorker.parseHeapSnapshot(path, parseStrings)
-
-    const parseCompleted = performance.now()
-    console.log(`[PrepareHeapSnapshot] Total parsing workflow completed in ${(parseCompleted - overallStartTime).toFixed(2)}ms`)
-
     return result
   } finally {
-    const terminateStart = performance.now()
     await parsingWorker[Symbol.asyncDispose]()
-    const terminateEnd = performance.now()
-    console.log(`[PrepareHeapSnapshot] Worker terminated in ${(terminateEnd - terminateStart).toFixed(2)}ms`)
-
-    const totalTime = performance.now() - overallStartTime
-    console.log(`[PrepareHeapSnapshot] Total time including cleanup: ${totalTime.toFixed(2)}ms`)
   }
 }
