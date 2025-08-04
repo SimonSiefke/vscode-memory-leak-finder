@@ -12,7 +12,6 @@ beforeEach(() => {
 })
 
 test('findPackageLockFiles - returns empty array when no package-lock.json files found', async () => {
-
   mockFindFiles.mockResolvedValue([])
 
   const result = await findPackageLockFiles('/test/path')
@@ -57,7 +56,6 @@ test('findPackageLockFiles - excludes node_modules package-lock.json files', asy
 })
 
 test('findPackageLockFiles - throws VError when findFiles fails', async () => {
-
   mockFindFiles.mockRejectedValue(new Error('Permission denied'))
 
   await expect(findPackageLockFiles('/test/path')).rejects.toThrow('Failed to find package-lock.json files in directory')

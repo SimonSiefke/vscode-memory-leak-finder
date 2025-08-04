@@ -12,7 +12,7 @@ import { writeStringArrayData } from '../WriteStringArrayData/WriteStringArrayDa
 export class HeapSnapshotWriteStream extends Writable {
   constructor(options = {}) {
     super()
-    const { parseStrings = false } = options
+    this.options = options
     this.arrayIndex = 0
     this.currentNumber = 0
     this.data = new Uint8Array()
@@ -22,7 +22,6 @@ export class HeapSnapshotWriteStream extends Writable {
     this.locations = new Uint32Array()
     this.metaData = {}
     this.nodes = new Uint32Array()
-    this.parseStrings = parseStrings
     this.strings = []
     this.state = HeapSnapshotParsingState.SearchingSnapshotMetaData
   }
@@ -153,7 +152,7 @@ export class HeapSnapshotWriteStream extends Writable {
   }
 
   writeParsingLocations(chunk) {
-    if (this.parseStrings) {
+    if (this.options.parseStrings) {
       this.writeResizableArrayData(chunk, HeapSnapshotParsingState.ParsingStringsMetaData)
     } else {
       this.writeResizableArrayData(chunk, HeapSnapshotParsingState.Done)
