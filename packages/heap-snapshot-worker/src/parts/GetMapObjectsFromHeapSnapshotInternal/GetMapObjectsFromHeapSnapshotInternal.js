@@ -211,7 +211,7 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
       if (edgeTypeName === 'internal' && (targetTypeName === 'string' || targetTypeName === 'number') && targetName) {
         entries.push({
           type: targetTypeName,
-          value: targetName
+          value: targetName,
         })
       }
     }
@@ -225,7 +225,7 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
           key: key.value,
           value: value.value,
           keyType: key.type,
-          valueType: value.type
+          valueType: value.type,
         })
       }
     }
@@ -238,18 +238,20 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
 
   // Filter out prototypes and system objects (only return Map objects with variable names)
   const namedMapObjects = mapObjects.filter((obj) => obj.variableNames.length > 0)
-  
+
   // Remove internal fields from output
-  return namedMapObjects.map(obj => ({
-    id: obj.id,
-    name: obj.name,
-    type: obj.type,
-    selfSize: obj.selfSize,
-    edgeCount: obj.edgeCount,
-    detachedness: obj.detachedness,
-    variableNames: obj.variableNames,
-    entries: obj.entries,
-    size: obj.size,
-    note: obj.note
-  })).sort((a, b) => a.id - b.id)
+  return namedMapObjects
+    .map((obj) => ({
+      id: obj.id,
+      name: obj.name,
+      type: obj.type,
+      selfSize: obj.selfSize,
+      edgeCount: obj.edgeCount,
+      detachedness: obj.detachedness,
+      variableNames: obj.variableNames,
+      entries: obj.entries,
+      size: obj.size,
+      note: obj.note,
+    }))
+    .sort((a, b) => a.id - b.id)
 }
