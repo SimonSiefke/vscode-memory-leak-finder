@@ -1,4 +1,5 @@
 import * as Assert from '../Assert/Assert.js'
+import * as ExitCode from '../ExitCode/ExitCode.js'
 import * as GetAllTestsFinishedMessage from '../GetAllTestsFinishedMessage/GetAllTestsFinishedMessage.js'
 import * as HandleExit from '../HandleExit/HandleExit.js'
 import * as ModeType from '../ModeType/ModeType.js'
@@ -31,7 +32,7 @@ export const handleTestsFinished = async (passed, failed, skipped, leaked, total
   })
   if (!isWatchMode) {
     if (failed) {
-      process.exitCode = 1
+      process.exitCode = ExitCode.Error
     }
     HandleExit.handleExit()
   }

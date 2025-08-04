@@ -10,6 +10,7 @@ export const launchStdoutWorker = async () => {
     url,
     name: 'Stdout Worker',
     ref: false,
+    stdio: 'inherit',
   })
   HandleIpc.handleIpc(worker)
   return worker
