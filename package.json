@@ -29,7 +29,7 @@
     "@lerna/legacy-package-management": "^8.2.4",
     "@types/node": "^24.2.0",
     "execa": "^9.6.0",
-    "jest": "^30.0.5",
+    "jest": "^29.7.0",
     "jest-environment-jsdom": "^30.0.5",
     "lerna": "^8.2.3",
     "prettier": "^3.6.2",
