@@ -6,9 +6,9 @@ import { getArraysByClosureLocationFromHeapSnapshotInternal } from './GetArraysB
 export const getArraysByClosureLocationFromHeapSnapshot = async (id, scriptMap) => {
   const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
-  const { parsedNodes, locations, metaData } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
-  const { node_types, node_fields, edge_types, edge_fields, location_fields } = metaData.data.meta
-  const { nodes, edges, strings } = heapsnapshot
+  const { parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
+  const { node_types, node_fields, edge_types, edge_fields, location_fields } = heapsnapshot.snapshot.meta
+  const { nodes, edges, strings, locations } = heapsnapshot
   return getArraysByClosureLocationFromHeapSnapshotInternal(
     strings,
     nodes,

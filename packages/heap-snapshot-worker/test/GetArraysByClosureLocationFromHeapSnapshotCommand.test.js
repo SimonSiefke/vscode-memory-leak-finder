@@ -7,15 +7,11 @@ test('should get arrays by closure location', async () => {
   const mockHeapSnapshot = {
     snapshot: {
       meta: {
-        data: {
-          meta: {
-            node_types: [['object', 'string', 'number']],
-            node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-            edge_types: [['property', 'element']],
-            edge_fields: ['type', 'name_or_index', 'to_node'],
-            location_fields: ['object_index', 'script_id', 'line', 'column'],
-          },
-        },
+        node_types: [['object', 'string', 'number']],
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        edge_types: [['property', 'element']],
+        edge_fields: ['type', 'name_or_index', 'to_node'],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
       },
     },
     nodes: new Uint32Array([
@@ -48,29 +44,29 @@ test('should get arrays by closure location', async () => {
 
     expect(result).toHaveLength(2)
     
-    // First group should be location 1 with 1 array
+    // First group should be location 2 with 1 array (larger size, sorted first)
     const firstGroup = result[0]
-    expect(firstGroup.locationKey).toBe('1:10:5')
+    expect(firstGroup.locationKey).toBe('2:15:8')
     expect(firstGroup.count).toBe(1)
-    expect(firstGroup.totalSize).toBe(100)
+    expect(firstGroup.totalSize).toBe(200)
     expect(firstGroup.locationInfo).toEqual({
-      scriptId: 1,
-      line: 10,
-      column: 5,
-      url: 'file:///test1.js',
-      sourceMapUrl: '',
-    })
-
-    // Second group should be location 2 with 1 array
-    const secondGroup = result[1]
-    expect(secondGroup.locationKey).toBe('2:15:8')
-    expect(secondGroup.count).toBe(1)
-    expect(secondGroup.totalSize).toBe(200)
-    expect(secondGroup.locationInfo).toEqual({
       scriptId: 2,
       line: 15,
       column: 8,
       url: 'file:///test2.js',
+      sourceMapUrl: '',
+    })
+
+    // Second group should be location 1 with 1 array (smaller size, sorted second)
+    const secondGroup = result[1]
+    expect(secondGroup.locationKey).toBe('1:10:5')
+    expect(secondGroup.count).toBe(1)
+    expect(secondGroup.totalSize).toBe(100)
+    expect(secondGroup.locationInfo).toEqual({
+      scriptId: 1,
+      line: 10,
+      column: 5,
+      url: 'file:///test1.js',
       sourceMapUrl: '',
     })
   } finally {
