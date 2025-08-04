@@ -1,6 +1,6 @@
 import { createReadStream } from 'node:fs'
 import { pipeline } from 'node:stream/promises'
-import { HeapSnapshotWriteStream } from '../HeapSnapshotWriteStream/HeapSnapshotWriteStream.js'
+import { createHeapSnapshotWriteStream } from '../HeapSnapshotWriteStream/HeapSnapshotWriteStream.js'
 
 /**
  * Parses a heap snapshot file and returns the parsed data with transferable arrays
@@ -11,7 +11,7 @@ import { HeapSnapshotWriteStream } from '../HeapSnapshotWriteStream/HeapSnapshot
  */
 export const parseFromFile = async (path, options = {}) => {
   const readStream = createReadStream(path)
-  const writeStream = new HeapSnapshotWriteStream(options)
+  const writeStream = createHeapSnapshotWriteStream(options)
   await pipeline(readStream, writeStream)
   const result = writeStream.getResult()
 

@@ -9,7 +9,7 @@ import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/Pa
 import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.js'
 import { writeStringArrayData } from '../WriteStringArrayData/WriteStringArrayData.js'
 
-export class HeapSnapshotWriteStream extends Writable {
+class HeapSnapshotWriteStream extends Writable {
   constructor(options = {}) {
     super()
     this.arrayIndex = 0
@@ -241,4 +241,14 @@ export class HeapSnapshotWriteStream extends Writable {
       strings: this.strings,
     }
   }
+}
+
+/**
+ * Creates a new HeapSnapshotWriteStream instance
+ * @param {Object} options - Options for the write stream
+ * @param {boolean} options.parseStrings - Whether to parse and return strings
+ * @returns {HeapSnapshotWriteStream} A new HeapSnapshotWriteStream instance
+ */
+export const createHeapSnapshotWriteStream = (options = {}) => {
+  return new HeapSnapshotWriteStream(options)
 }
