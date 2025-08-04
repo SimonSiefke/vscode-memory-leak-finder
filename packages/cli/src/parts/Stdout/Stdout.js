@@ -1,6 +1,7 @@
-import * as Process from '../Process/Process.js'
+import * as JsonRpc from '../JsonRpc/JsonRpc.js'
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.js'
 
 export const write = async (data) => {
-  // TODO use worker for stdout
-  Process.stdout.write(data)
+  // TODO use invoke
+  JsonRpc.send(StdoutWorker.state.ipc, 'Stdout.write', data)
 }
