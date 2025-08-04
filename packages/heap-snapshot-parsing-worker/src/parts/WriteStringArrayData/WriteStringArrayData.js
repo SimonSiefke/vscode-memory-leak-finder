@@ -15,37 +15,67 @@ export const writeStringArrayData = (chunk, data, strings, onReset, onDone, onDa
   // Concatenate the new chunk with existing data
   const combinedData = concatArray(data, chunk)
   const dataString = decodeArray(combinedData)
-  
-  // Look for the closing bracket of the strings array
-  const closingBracketIndex = dataString.indexOf(']')
-  
-  if (closingBracketIndex === -1) {
-    // No closing bracket found, need more data
+
+  // Look for the "strings": pattern first
+  const stringsStartIndex = dataString.indexOf('"strings":')
+  if (stringsStartIndex === -1) {
+    // No strings section found, need more data
     onDataUpdate(combinedData)
     return false
   }
-  
+
+  // Find the opening bracket after "strings":
+  const openingBracketIndex = dataString.indexOf('[', stringsStartIndex)
+  if (openingBracketIndex === -1) {
+    // No opening bracket found, need more data
+    onDataUpdate(combinedData)
+    return false
+  }
+
+  // Find the matching closing bracket
+  let bracketCount = 0
+  let closingBracketIndex = -1
+
+  for (let i = openingBracketIndex; i < dataString.length; i++) {
+    const char = dataString[i]
+    if (char === '[') {
+      bracketCount++
+    } else if (char === ']') {
+      bracketCount--
+      if (bracketCount === 0) {
+        closingBracketIndex = i
+        break
+      }
+    }
+  }
+
+  if (closingBracketIndex === -1) {
+    // No matching closing bracket found, need more data
+    onDataUpdate(combinedData)
+    return false
+  }
+
   // Extract the strings array content
-  const stringsContent = dataString.substring(0, closingBracketIndex + 1)
-  
+  const stringsContent = dataString.substring(openingBracketIndex, closingBracketIndex + 1)
+
   try {
     // Parse the strings array as JSON
     const parsedStrings = JSON.parse(stringsContent)
-    
+
     if (Array.isArray(parsedStrings)) {
       // Add all strings to the strings array
       strings.push(...parsedStrings)
-      
+
       // Reset parsing state
       onReset()
-      
+
       // Mark as done
       onDone()
-      
+
       // Return the remaining data after the strings array
       const remainingData = combinedData.slice(closingBracketIndex + 1)
       onDataUpdate(remainingData)
-      
+
       return true
     } else {
       // If it's not an array, we might have incomplete data
@@ -57,4 +87,4 @@ export const writeStringArrayData = (chunk, data, strings, onReset, onDone, onDa
     onDataUpdate(combinedData)
     return false
   }
-} 
+}
