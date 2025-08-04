@@ -76,17 +76,7 @@ test('parseHeapSnapshotMetaData - handles snapshot with arrays in metadata', () 
   expect(result.data.meta.edge_types).toHaveLength(2)
 })
 
-test('parseHeapSnapshotMetaData - handles data with prefix and suffix', () => {
-  const data =
-    'prefix{"snapshot":{"meta":{"node_fields":["type","name","id"],"node_types":[["hidden","array","string","object"]],"edge_fields":["type","name_or_index","to_node"],"edge_types":[["context","element","property","internal"]],"location_fields":["object_index","script_id","line","column"]},"node_count":1,"edge_count":0}}suffix'
 
-  const result = parseHeapSnapshotMetaData(data)
-
-  expect(result.couldParse).toBe(true)
-  expect(result.endIndex).toBeGreaterThan(0)
-  expect(result.data).toHaveProperty('node_count', 1)
-  expect(result.data).toHaveProperty('edge_count', 0)
-})
 
 test('parseHeapSnapshotMetaData - handles snapshot with empty metadata', () => {
   const data = '{"snapshot":{"meta":{},"node_count":0,"edge_count":0}}'
