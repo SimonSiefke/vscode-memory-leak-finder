@@ -12,7 +12,6 @@ import { writeStringArrayData } from '../WriteStringArrayData/WriteStringArrayDa
 export class HeapSnapshotWriteStream extends Writable {
   constructor(options = {}) {
     super()
-    this.options = options
     this.arrayIndex = 0
     this.currentNumber = 0
     this.data = new Uint8Array()
