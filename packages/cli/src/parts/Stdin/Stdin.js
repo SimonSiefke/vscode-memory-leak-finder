@@ -22,5 +22,5 @@ export const on = (event, listener) => {
 }
 
 export const off = (event, listener) => {
-  Process.stdin.off(event, listener)
+  process.stdin.off(event, listener)
 }
