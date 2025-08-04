@@ -12,7 +12,7 @@ export const getRegexpObjectsFromHeapSnapshot = async (pathUri) => {
   const heapSnapshot = JSON.parse(content)
   const strings = heapSnapshot.strings || []
 
-    // Use fast prepareHeapSnapshot
+  // Use fast prepareHeapSnapshot
   const { metaData, nodes } = await prepareHeapSnapshot(pathUri)
   const { node_types, node_fields } = metaData.data.meta
 
