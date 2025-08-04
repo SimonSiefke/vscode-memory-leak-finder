@@ -1,6 +1,8 @@
 import * as CreateChart from '../CreateChart/CreateChart.js'
 import * as GetAbortControllerCountData from '../GetAbortControllerCountData/GetAbortControllerCountData.js'
 
+export const name = 'abort-controller-count'
+
 export const getData = GetAbortControllerCountData.getAbortControllerCountData
 
 export const createChart = (data) => {
