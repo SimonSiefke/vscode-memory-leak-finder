@@ -1,7 +1,5 @@
-import * as Promises from '../Promises/Promises.js'
-
 export const getFirstEvent = async (eventEmitter, eventMap) => {
-  const { resolve, promise } = Promises.withResolvers()
+  const { resolve, promise } = Promise.withResolvers()
   const listenerMap = Object.create(null)
   const cleanup = (value) => {
     for (const event of Object.keys(eventMap)) {
