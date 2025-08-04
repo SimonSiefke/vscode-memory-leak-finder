@@ -27,36 +27,16 @@ const getTransferList = (result) => {
 }
 
 workerPort.on('message', async (message) => {
-  const messageReceiveTime = performance.now()
   const { id, method, params } = message
-
   try {
-    const startTime = performance.now()
-
-    // Find the command handler
     const handler = commandMap[method]
     if (!handler) {
       throw new Error(`Unknown method: ${method}`)
     }
-
-    // Execute the command
     const result = await handler(...params)
-    const parseTime = performance.now()
-
-    const loggingStart = performance.now()
-    const loggingTime = performance.now()
-
-    // Send the result back with transfer list for zero-copy
-    const transferListStart = performance.now()
     const transferList = getTransferList(result)
-    const transferListTime = performance.now()
-
-    const postMessageStart = performance.now()
     workerPort.postMessage({ id, result }, transferList)
-    const postMessageTime = performance.now()
   } catch (error) {
-    console.error(`[ParseWorker] Error during parsing:`, error)
-    // Send error back
     workerPort.postMessage({ id, error: error.message })
   }
 })
