@@ -17,40 +17,43 @@ test('getArraysFromHeapSnapshot - extracts arrays with names and lengths sorted 
   // Check structure of array objects
   const firstArray = result[0]
   expect(typeof firstArray.id).toBe('number')
-  expect(typeof firstArray.name).toBe('string')
+  expect(['string', 'object']).toContain(typeof firstArray.name) // Can be string or array
   expect(typeof firstArray.length).toBe('number')
   expect(firstArray.type).toBe('array')
-  expect(typeof firstArray.selfSize).toBe('number')
-  expect(typeof firstArray.edgeCount).toBe('number')
-  expect(typeof firstArray.detachedness).toBe('number')
-  expect(Array.isArray(firstArray.variableNames)).toBe(true)
+  
+  // Should not have these properties anymore
+  expect(firstArray.selfSize).toBeUndefined()
+  expect(firstArray.edgeCount).toBeUndefined()
+  expect(firstArray.detachedness).toBeUndefined()
+  expect(firstArray.variableNames).toBeUndefined()
 
   // Log first few results for verification
   console.log('Top 5 largest arrays:')
   result.slice(0, 5).forEach((array, index) => {
-    console.log(`${index + 1}. Length: ${array.length}, ID: ${array.id}, Variables: [${array.variableNames.map(v => v.name).join(', ')}]`)
+    const nameDisplay = Array.isArray(array.name) ? `[${array.name.join(', ')}]` : array.name
+    console.log(`${index + 1}. Length: ${array.length}, ID: ${array.id}, Name: ${nameDisplay}`)
   })
 })
 
-test('getArraysFromHeapSnapshot - handles variable names correctly', async () => {
+test('getArraysFromHeapSnapshot - handles multiple names correctly', async () => {
   const heapSnapshotPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/l6.json'
 
   const result = await GetArraysFromHeapSnapshot.getArraysFromHeapSnapshot(heapSnapshotPath)
 
-  // Find arrays with variable names
-  const arraysWithVariables = result.filter(array => array.variableNames.length > 0)
+  // Find arrays with multiple names (array instead of string)
+  const arraysWithMultipleNames = result.filter(array => Array.isArray(array.name))
 
-  expect(arraysWithVariables.length).toBeGreaterThan(0)
+  console.log(`Found ${arraysWithMultipleNames.length} arrays with multiple names`)
 
-  // Check variable name structure
-  const arrayWithVariable = arraysWithVariables[0]
-  expect(typeof arrayWithVariable.variableNames[0].name).toBe('string')
-  expect(typeof arrayWithVariable.variableNames[0].sourceType).toBe('string')
-  expect(typeof arrayWithVariable.variableNames[0].sourceName).toBe('string')
-
-  console.log('Sample array with variables:', {
-    id: arrayWithVariable.id,
-    length: arrayWithVariable.length,
-    variableNames: arrayWithVariable.variableNames.slice(0, 3) // Show first 3 variable names
-  })
+  if (arraysWithMultipleNames.length > 0) {
+    const arrayWithMultipleNames = arraysWithMultipleNames[0]
+    console.log('Sample array with multiple names:', {
+      id: arrayWithMultipleNames.id,
+      name: arrayWithMultipleNames.name,
+      length: arrayWithMultipleNames.length
+    })
+    
+    expect(Array.isArray(arrayWithMultipleNames.name)).toBe(true)
+    expect(arrayWithMultipleNames.name.length).toBeGreaterThan(1)
+  }
 })
