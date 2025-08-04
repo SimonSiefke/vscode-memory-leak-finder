@@ -6,10 +6,8 @@ import * as HeapSnapshotParsingState from '../HeapSnapshotParsingState/HeapSnaps
 import { parseHeapSnapshotArray } from '../ParseHeapSnapshotArray/ParseHeapSnapshotArray.js'
 import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.js'
 import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.js'
-
-const decodeArray = (data) => {
-  return new TextDecoder().decode(data)
-}
+import { writeStringArrayData } from '../WriteStringArrayData/WriteStringArrayData.js'
+import { decodeArray } from '../DecodeArray/DecodeArray.js'
 
 export class HeapSnapshotWriteStream extends Writable {
   constructor(options = {}) {
@@ -25,7 +23,7 @@ export class HeapSnapshotWriteStream extends Writable {
     this.metaData = {}
     this.nodes = new Uint32Array()
     this.parseStrings = parseStrings
-    this.strings = []
+    this.strings = parseStrings ? /** @type {string[]} */ ([]) : null
     this.state = HeapSnapshotParsingState.SearchingSnapshotMetaData
   }
 
@@ -155,58 +153,29 @@ export class HeapSnapshotWriteStream extends Writable {
   }
 
   writeParsingLocations(chunk) {
-    console.log('[HeapSnapshotWriteStream] writeParsingLocations - parseStrings:', this.parseStrings)
     if (this.parseStrings) {
-      console.log('[HeapSnapshotWriteStream] Transitioning to ParsingStringsMetaData')
       this.writeResizableArrayData(chunk, HeapSnapshotParsingState.ParsingStringsMetaData)
     } else {
-      console.log('[HeapSnapshotWriteStream] Transitioning to Done')
       this.writeResizableArrayData(chunk, HeapSnapshotParsingState.Done)
     }
   }
 
   writeParsingStringsMetaData(chunk) {
-    console.log('[HeapSnapshotWriteStream] writeParsingStringsMetaData called')
     this.writeParsingArrayMetaData(chunk, 'strings', HeapSnapshotParsingState.ParsingStrings)
   }
 
   writeParsingStrings(chunk) {
-    this.writeStringArrayData(chunk, HeapSnapshotParsingState.Done)
-  }
-
-  writeStringArrayData(chunk, nextState) {
-    // For strings, we need to parse JSON string values, not numbers
-    this.data = concatArray(this.data, chunk)
-    const dataString = decodeArray(this.data)
-
-    // Try to parse the strings array as JSON
-    try {
-      // The data we receive is the content of the strings array, so we need to wrap it in brackets
-      // and remove any trailing characters that are not part of the array
-      let cleanData = dataString
-
-      // Remove trailing characters that are not part of the JSON array
-      while (cleanData.length > 0 && !cleanData.endsWith(']')) {
-        cleanData = cleanData.slice(0, -1)
-      }
-
-      if (cleanData.length === 0) {
-        return // Not enough data yet
-      }
-
-      const wrappedData = '[' + cleanData
-      const strings = JSON.parse(wrappedData)
-
-      if (Array.isArray(strings)) {
-        this.strings = /** @type {string[]} */ (strings)
-      }
-
-      this.resetParsingState()
-      this.state = nextState
-      this.data = new Uint8Array()
-    } catch (error) {
-      // Not enough data yet or invalid JSON, continue accumulating
-      return
+    const success = writeStringArrayData(
+      chunk,
+      this.data,
+      this.strings,
+      () => this.resetParsingState(),
+      () => { this.state = HeapSnapshotParsingState.Done },
+      (newData) => { this.data = newData }
+    )
+    
+    if (!success) {
+      this.data = concatArray(this.data, chunk)
     }
   }
 
