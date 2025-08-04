@@ -83,7 +83,7 @@ export const runTests = async (
     const initialStart = Time.now()
     const first = formattedPaths[0]
     callback(TestWorkerEventType.TestsStarting, total)
-    callback(TestWorkerEventType.TestSetup)
+    callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
     const connectionId = Id.create()
     let testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
       cwd,
@@ -103,13 +103,12 @@ export const runTests = async (
       const info = await MemoryLeakFinder.setup(memoryLeakWorkerIpc, connectionId, measure)
       targetId = info.targetId
     }
-    callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
       const { absolutePath, relativeDirname, dirent, relativePath } = formattedPath
       const forceRun = dirent === `${filterValue}.js`
       if (i !== 0) {
-        callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, /* isFirst */ false)
+        callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, /* isFirst */ true)
       }
 
       try {
