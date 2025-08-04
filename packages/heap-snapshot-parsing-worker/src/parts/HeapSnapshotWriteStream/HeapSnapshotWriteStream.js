@@ -155,14 +155,18 @@ export class HeapSnapshotWriteStream extends Writable {
   }
 
   writeParsingLocations(chunk) {
+    console.log('[HeapSnapshotWriteStream] writeParsingLocations - parseStrings:', this.parseStrings)
     if (this.parseStrings) {
+      console.log('[HeapSnapshotWriteStream] Transitioning to ParsingStringsMetaData')
       this.writeResizableArrayData(chunk, HeapSnapshotParsingState.ParsingStringsMetaData)
     } else {
+      console.log('[HeapSnapshotWriteStream] Transitioning to Done')
       this.writeResizableArrayData(chunk, HeapSnapshotParsingState.Done)
     }
   }
 
   writeParsingStringsMetaData(chunk) {
+    console.log('[HeapSnapshotWriteStream] writeParsingStringsMetaData called')
     this.writeParsingArrayMetaData(chunk, 'strings', HeapSnapshotParsingState.ParsingStrings)
   }
 
@@ -174,67 +178,32 @@ export class HeapSnapshotWriteStream extends Writable {
     // For strings, we need to parse JSON string values, not numbers
     this.data = concatArray(this.data, chunk)
     const dataString = decodeArray(this.data)
-    console.log('[HeapSnapshotWriteStream] Parsing strings, data length:', dataString.length)
-    console.log('[HeapSnapshotWriteStream] Data preview:', dataString.slice(0, 100))
 
     // Try to parse the strings array as JSON
     try {
-      // Look for the end of the strings array
-      let bracketCount = 0
-      let inString = false
-      let escapeNext = false
-      let endIndex = -1
+      // The data we receive is the content of the strings array, so we need to wrap it in brackets
+      // and remove any trailing characters that are not part of the array
+      let cleanData = dataString
 
-      for (let i = 0; i < dataString.length; i++) {
-        const char = dataString[i]
-
-        if (escapeNext) {
-          escapeNext = false
-          continue
-        }
-
-        if (char === '\\') {
-          escapeNext = true
-          continue
-        }
-
-        if (char === '"' && !escapeNext) {
-          inString = !inString
-          continue
-        }
-
-        if (!inString) {
-          if (char === '[') {
-            bracketCount++
-          } else if (char === ']') {
-            bracketCount--
-            if (bracketCount === 0) {
-              endIndex = i + 1
-              break
-            }
-          }
-        }
+      // Remove trailing characters that are not part of the JSON array
+      while (cleanData.length > 0 && !cleanData.endsWith(']')) {
+        cleanData = cleanData.slice(0, -1)
       }
 
-      if (endIndex === -1) {
+      if (cleanData.length === 0) {
         return // Not enough data yet
       }
 
-      // Extract the strings array JSON
-      const stringsJson = dataString.slice(0, endIndex)
-      console.log('[HeapSnapshotWriteStream] Extracted JSON:', stringsJson)
-      const strings = JSON.parse(stringsJson)
+      const wrappedData = '[' + cleanData
+      const strings = JSON.parse(wrappedData)
 
       if (Array.isArray(strings)) {
         this.strings = /** @type {string[]} */ (strings)
-        console.log('[HeapSnapshotWriteStream] Parsed strings:', this.strings)
       }
 
       this.resetParsingState()
       this.state = nextState
-      const rest = this.data.slice(endIndex)
       this.data = new Uint8Array()
-      this.handleChunk(rest)
     } catch (error) {
       // Not enough data yet or invalid JSON, continue accumulating
       return
@@ -292,7 +261,7 @@ export class HeapSnapshotWriteStream extends Writable {
       locations: this.locations,
     }
 
-    if (this.parseStrings && this.strings) {
+    if (this.parseStrings && this.strings && this.strings.length > 0) {
       result.strings = this.strings
     }
 

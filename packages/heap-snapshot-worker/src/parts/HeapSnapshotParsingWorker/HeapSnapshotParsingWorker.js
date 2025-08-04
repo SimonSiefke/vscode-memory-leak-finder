@@ -50,15 +50,16 @@ export class HeapSnapshotParsingWorker {
   /**
    * Parses a heap snapshot file using the parsing worker
    * @param {string} path - The file path to the heap snapshot
-   * @returns {Promise<{metaData: any, nodes: Uint32Array, edges: Uint32Array, locations: Uint32Array}>}
+   * @param {boolean} parseStrings - Whether to parse and return strings
+   * @returns {Promise<{metaData: any, nodes: Uint32Array, edges: Uint32Array, locations: Uint32Array, strings?: string[]}>}
    */
-  async parseHeapSnapshot(path) {
+  async parseHeapSnapshot(path, parseStrings = false) {
     if (!this.worker) {
       throw new Error('Worker not started')
     }
 
     const startTime = performance.now()
-    console.log(`[HeapSnapshotParsingWorker] Starting to parse: ${path}`)
+    console.log(`[HeapSnapshotParsingWorker] Starting to parse: ${path} (parseStrings: ${parseStrings})`)
 
     const { promise, resolve, reject } = Promise.withResolvers()
 
@@ -69,7 +70,7 @@ export class HeapSnapshotParsingWorker {
         const duration = endTime - startTime
         console.log(`[HeapSnapshotParsingWorker] Parse completed in ${duration.toFixed(2)}ms`)
         console.log(
-          `[HeapSnapshotParsingWorker] Result sizes - nodes: ${result.nodes?.length || 0}, edges: ${result.edges?.length || 0}, locations: ${result.locations?.length || 0}`,
+          `[HeapSnapshotParsingWorker] Result sizes - nodes: ${result.nodes?.length || 0}, edges: ${result.edges?.length || 0}, locations: ${result.locations?.length || 0}, strings: ${result.strings?.length || 0}`,
         )
         resolve(result)
       },
@@ -82,7 +83,7 @@ export class HeapSnapshotParsingWorker {
     this.worker.postMessage({
       id,
       method: 'HeapSnapshot.parse',
-      params: [path],
+      params: [path, parseStrings],
     })
 
     return promise

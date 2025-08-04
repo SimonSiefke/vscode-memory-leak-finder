@@ -3,11 +3,12 @@ import { HeapSnapshotParsingWorker } from '../HeapSnapshotParsingWorker/HeapSnap
 /**
  * Prepares a heap snapshot by parsing it in a separate worker for better performance
  * @param {string} path - The file path to the heap snapshot
- * @returns {Promise<{metaData: any, nodes: Uint32Array, edges: Uint32Array, locations: Uint32Array}>}
+ * @param {boolean} parseStrings - Whether to parse and return strings
+ * @returns {Promise<{metaData: any, nodes: Uint32Array, edges: Uint32Array, locations: Uint32Array, strings?: string[]}>}
  */
-export const prepareHeapSnapshot = async (path) => {
+export const prepareHeapSnapshot = async (path, parseStrings = false) => {
   const overallStartTime = performance.now()
-  console.log(`[PrepareHeapSnapshot] Starting heap snapshot preparation for: ${path}`)
+  console.log(`[PrepareHeapSnapshot] Starting heap snapshot preparation for: ${path} (parseStrings: ${parseStrings})`)
 
   const parsingWorker = new HeapSnapshotParsingWorker()
 
@@ -18,7 +19,7 @@ export const prepareHeapSnapshot = async (path) => {
     const workerStarted = performance.now()
     console.log(`[PrepareHeapSnapshot] Worker started in ${(workerStarted - workerStartTime).toFixed(2)}ms`)
 
-    const result = await parsingWorker.parseHeapSnapshot(path)
+    const result = await parsingWorker.parseHeapSnapshot(path, parseStrings)
 
     const parseCompleted = performance.now()
     console.log(`[PrepareHeapSnapshot] Total parsing workflow completed in ${(parseCompleted - overallStartTime).toFixed(2)}ms`)
