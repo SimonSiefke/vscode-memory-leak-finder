@@ -183,3 +183,58 @@ test('getMapObjectsFromHeapSnapshot - multiple map objects with variables', asyn
     unlinkSync(testFile)
   }
 })
+
+test('getMapObjectsFromHeapSnapshot - map with multiple variable names', async () => {
+  const testData = {
+    snapshot: {
+      meta: {
+        node_types: [['hidden', 'array', 'string', 'object']],
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
+        edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+        edge_fields: ['type', 'name_or_index', 'to_node'],
+      },
+      node_count: 2,
+      edge_count: 2,
+    },
+    nodes: [
+      3,
+      1,
+      100,
+      64,
+      2,
+      0, // object (Window) - has 2 edges
+      3,
+      2,
+      200,
+      28,
+      0,
+      0, // Map
+    ],
+    edges: [
+      2,
+      3,
+      6, // property:"cache" -> Map (node data index 6)
+      2,
+      4,
+      6, // property:"storage" -> Map (node data index 6, same Map)
+    ],
+    strings: ['', 'Window', 'Map', 'cache', 'storage'],
+  }
+
+  const testFile = 'test-map-multiple-variables.heapsnapshot'
+  writeFileSync(testFile, JSON.stringify(testData))
+
+  try {
+    const result = await GetMapObjectsFromHeapSnapshot.getMapObjectsFromHeapSnapshot(testFile)
+    expect(result).toEqual([
+      {
+        id: 200,
+        name: ['cache', 'storage'],
+        keys: [],
+        note: 'Map object found in heap snapshot',
+      },
+    ])
+  } finally {
+    unlinkSync(testFile)
+  }
+})
