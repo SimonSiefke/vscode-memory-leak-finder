@@ -1,6 +1,5 @@
 import * as Assert from '../Assert/Assert.js'
 import * as PTimeout from '../PTimeout/PTimeout.js'
-import * as Promises from '../Promises/Promises.js'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
 import { VError } from '../VError/VError.js'
 
@@ -68,7 +67,7 @@ export const waitForTarget = async ({ type, index }) => {
         currentIndex++
       }
     }
-    const { resolve, reject, promise } = Promises.withResolvers()
+    const { resolve, reject, promise } = Promise.withResolvers()
     state.callbacks.push({
       type,
       index,
@@ -86,7 +85,7 @@ export const waitForTargetToBeClosed = async (targetId) => {
   if (!(targetId in state.targets)) {
     return
   }
-  const { resolve, promise } = Promises.withResolvers()
+  const { resolve, promise } = Promise.withResolvers()
   state.destroyedCallbacks.push({
     targetId,
     resolve,
