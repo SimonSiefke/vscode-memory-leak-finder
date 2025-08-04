@@ -191,8 +191,14 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
       tableEdgeOffset += nodes[nodeIndex + edgeCountFieldIndex]
     }
 
-    // Collect keys from table array - Map entries are stored as key-value pairs
-    // Skip the last edge which is usually system/Map related
+        // Collect keys from table array 
+    // Map stores key-value pairs, but we need to identify which entries are keys vs values
+    // Based on analysis, it appears the table may not be stored in strict alternating pattern
+    // We need a different approach to distinguish keys from values
+    
+    // For now, let's use a heuristic: collect unique string values and known large numbers
+    // that are likely to be keys rather than common small values
+    const extractedValues = []
     const actualKeyEdges = Math.max(0, tableEdgeCount - 1)
     
     for (let j = 0; j < actualKeyEdges; j++) {
@@ -210,10 +216,10 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
 
       if (edgeTypeName === 'internal' && targetName && targetName !== 'system / Map' && !targetName.startsWith('system')) {
         if (targetTypeName === 'string') {
-          // Direct string key
-          mapObj.keys.push(targetName)
+          // String values - these could be keys or values
+          extractedValues.push({ value: targetName, type: 'string', isLikelyKey: true })
         } else if (targetTypeName === 'number' && targetName === 'heap number') {
-          // Numeric key - follow the first edge to get the actual string representation
+          // Numeric value - follow the first edge to get the actual string representation
           const numEdgeCount = nodes[edgeToNode + edgeCountFieldIndex]
           if (numEdgeCount > 0) {
             let numEdgeOffset = 0
@@ -227,10 +233,20 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
             const actualNumericValue = strings[nodes[firstEdgeToNode + nameFieldIndex]] || ''
             
             if (actualNumericValue && actualNumericValue !== 'system / Map') {
-              mapObj.keys.push(actualNumericValue)
+              // Heuristic: large numbers (>1000) are more likely to be keys than small values
+              const numValue = parseInt(actualNumericValue, 10)
+              const isLikelyKey = isNaN(numValue) || numValue > 1000 || actualNumericValue.length > 3
+              extractedValues.push({ value: actualNumericValue, type: 'number', isLikelyKey })
             }
           }
         }
+      }
+    }
+    
+    // Add likely keys to the keys array
+    for (const item of extractedValues) {
+      if (item.isLikelyKey) {
+        mapObj.keys.push(item.value)
       }
     }
   }
