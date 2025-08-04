@@ -6,10 +6,7 @@ import * as HeapSnapshotParsingState from '../HeapSnapshotParsingState/HeapSnaps
 import { parseHeapSnapshotArray } from '../ParseHeapSnapshotArray/ParseHeapSnapshotArray.js'
 import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.js'
 import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.js'
-
-const decodeArray = (data) => {
-  return new TextDecoder().decode(data)
-}
+import { decodeArray } from '../DecodeArray.js'
 
 export class HeapSnapshotWriteStream extends Writable {
   constructor() {
