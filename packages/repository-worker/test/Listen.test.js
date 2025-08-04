@@ -19,7 +19,6 @@ jest.unstable_mockModule('../src/parts/CommandMap/CommandMap.js', () => ({
 const { listen } = await import('../src/parts/Listen/Listen.js')
 
 test('listen creates NodeWorkerRpcClient with commandMap', async () => {
-
   mockNodeWorkerRpcClient.create.mockResolvedValue({ rpc: {} })
 
   await listen()
