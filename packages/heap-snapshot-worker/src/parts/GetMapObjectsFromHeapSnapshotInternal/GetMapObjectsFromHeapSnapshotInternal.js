@@ -1,4 +1,5 @@
 import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.js'
+import { isInternalMap } from '../IsInternalMap/IsInternalMap.js'
 
 /**
  * @param {Array} strings
@@ -100,13 +101,7 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
         const sourceName = strings[sourceNameIndex] || `<string_${sourceNameIndex}>`
 
         // Collect variable names from property edges, excluding prototypes and internal properties
-        if (
-          edgeTypeName === 'property' &&
-          edgeName !== 'constructor' &&
-          edgeName !== '__proto__' &&
-          edgeName !== 'prototype' &&
-          !edgeName.startsWith('<symbol')
-        ) {
+        if (isInternalMap(edgeTypeName, edgeName)) {
           mapObj.variableNames.push({
             name: edgeName,
             sourceType: sourceTypeName,
@@ -191,16 +186,16 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
       tableEdgeOffset += nodes[nodeIndex + edgeCountFieldIndex]
     }
 
-        // Collect keys from table array 
+        // Collect keys from table array
     // Map stores key-value pairs, but we need to identify which entries are keys vs values
     // Based on analysis, it appears the table may not be stored in strict alternating pattern
     // We need a different approach to distinguish keys from values
-    
+
     // For now, let's use a heuristic: collect unique string values and known large numbers
     // that are likely to be keys rather than common small values
     const extractedValues = []
     const actualKeyEdges = Math.max(0, tableEdgeCount - 1)
-    
+
     for (let j = 0; j < actualKeyEdges; j++) {
       const edgeIndex = (tableEdgeOffset + j) * ITEMS_PER_EDGE
       const edgeType = edges[edgeIndex + edgeTypeFieldIndex]
@@ -226,12 +221,12 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
             for (let nodeIndex = 0; nodeIndex < edgeToNode; nodeIndex += ITEMS_PER_NODE) {
               numEdgeOffset += nodes[nodeIndex + edgeCountFieldIndex]
             }
-            
+
             // Get the first edge (should point to the string representation)
             const firstEdgeIndex = numEdgeOffset * ITEMS_PER_EDGE
             const firstEdgeToNode = edges[firstEdgeIndex + edgeToNodeFieldIndex]
             const actualNumericValue = strings[nodes[firstEdgeToNode + nameFieldIndex]] || ''
-            
+
             if (actualNumericValue && actualNumericValue !== 'system / Map') {
               // Heuristic: large numbers (>1000) are more likely to be keys than small values
               const numValue = parseInt(actualNumericValue, 10)
@@ -242,7 +237,7 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
         }
       }
     }
-    
+
     // Add likely keys to the keys array
     for (const item of extractedValues) {
       if (item.isLikelyKey) {
