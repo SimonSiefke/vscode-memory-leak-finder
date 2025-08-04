@@ -204,12 +204,33 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
 
       // Get target info
       const targetType = nodes[edgeToNode + typeFieldIndex]
-      const targetName = strings[nodes[edgeToNode + nameFieldIndex]] || ''
+      const targetNameIndex = nodes[edgeToNode + nameFieldIndex]
+      const targetName = strings[targetNameIndex] || ''
       const targetTypeName = nodeTypes[targetType] || `type_${targetType}`
 
-      // Collect all keys (string, number, etc.) - exclude system objects
       if (edgeTypeName === 'internal' && targetName && targetName !== 'system / Map' && !targetName.startsWith('system')) {
-        mapObj.keys.push(targetName)
+        if (targetTypeName === 'string') {
+          // Direct string key
+          mapObj.keys.push(targetName)
+        } else if (targetTypeName === 'number' && targetName === 'heap number') {
+          // Numeric key - follow the first edge to get the actual string representation
+          const numEdgeCount = nodes[edgeToNode + edgeCountFieldIndex]
+          if (numEdgeCount > 0) {
+            let numEdgeOffset = 0
+            for (let nodeIndex = 0; nodeIndex < edgeToNode; nodeIndex += ITEMS_PER_NODE) {
+              numEdgeOffset += nodes[nodeIndex + edgeCountFieldIndex]
+            }
+            
+            // Get the first edge (should point to the string representation)
+            const firstEdgeIndex = numEdgeOffset * ITEMS_PER_EDGE
+            const firstEdgeToNode = edges[firstEdgeIndex + edgeToNodeFieldIndex]
+            const actualNumericValue = strings[nodes[firstEdgeToNode + nameFieldIndex]] || ''
+            
+            if (actualNumericValue && actualNumericValue !== 'system / Map') {
+              mapObj.keys.push(actualNumericValue)
+            }
+          }
+        }
       }
     }
   }
