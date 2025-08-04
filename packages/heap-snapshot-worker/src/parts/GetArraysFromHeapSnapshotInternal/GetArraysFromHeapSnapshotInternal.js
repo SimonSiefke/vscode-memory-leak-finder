@@ -1,5 +1,6 @@
 import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.js'
 import * as CreateNameMap from '../CreateNameMap/CreateNameMap.js'
+import { isInternalArray } from '../IsInternalArray/IsInternalArray.js'
 
 export const getArraysFromHeapSnapshotInternal = (strings, nodes, node_types, node_fields, edges, edge_types, edge_fields, parsedNodes, graph) => {
   const {
@@ -142,7 +143,7 @@ export const getArraysFromHeapSnapshotInternal = (strings, nodes, node_types, no
   const result = arrayObjects
     .map((obj) => {
       const nameObject = nameMap[obj.id]
-      
+
       // If we have variable names from property edges, use them as an array
       // Otherwise fall back to the single name from nameMap or obj.name
       let displayName
@@ -164,8 +165,7 @@ export const getArraysFromHeapSnapshotInternal = (strings, nodes, node_types, no
     })
     .filter((obj) => {
       // Filter out Chrome internal arrays that are not relevant for measurement
-      const name = Array.isArray(obj.name) ? obj.name.join(',') : obj.name
-      return name !== 'initial_array_prototype'
+      return !isInternalArray(obj.name)
     })
     .sort((a, b) => b.length - a.length)
 
