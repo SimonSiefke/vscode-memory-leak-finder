@@ -20,7 +20,7 @@ test('getArraysFromHeapSnapshot - extracts arrays with names and lengths sorted 
   expect(['string', 'object']).toContain(typeof firstArray.name) // Can be string or array
   expect(typeof firstArray.length).toBe('number')
   expect(firstArray.type).toBe('array')
-  
+
   // Should not have these properties anymore
   expect(firstArray.selfSize).toBeUndefined()
   expect(firstArray.edgeCount).toBeUndefined()
@@ -52,7 +52,7 @@ test('getArraysFromHeapSnapshot - handles multiple names correctly', async () =>
       name: arrayWithMultipleNames.name,
       length: arrayWithMultipleNames.length
     })
-    
+
     expect(Array.isArray(arrayWithMultipleNames.name)).toBe(true)
     expect(arrayWithMultipleNames.name.length).toBeGreaterThan(1)
   }

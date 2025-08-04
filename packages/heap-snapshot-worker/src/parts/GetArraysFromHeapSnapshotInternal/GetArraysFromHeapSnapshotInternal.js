@@ -142,7 +142,7 @@ export const getArraysFromHeapSnapshotInternal = (strings, nodes, node_types, no
   const result = arrayObjects
     .map((obj) => {
       const nameObject = nameMap[obj.id]
-      
+
       // If we have variable names from property edges, use them as an array
       // Otherwise fall back to the single name from nameMap or obj.name
       let displayName
