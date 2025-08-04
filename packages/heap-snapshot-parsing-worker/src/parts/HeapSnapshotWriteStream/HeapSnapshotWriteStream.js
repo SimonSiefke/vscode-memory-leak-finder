@@ -8,7 +8,7 @@ import { parseHeapSnapshotArray } from '../ParseHeapSnapshotArray/ParseHeapSnaps
 import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.js'
 import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.js'
 import { writeStringArrayData } from '../WriteStringArrayData/WriteStringArrayData.js'
-import { HeapSnapshotParserError } from '../ParserError/ParserError.js'
+import { HeapSnapshotParserError } from '../HeapSnapshotParserError/HeapSnapshotParserError.js'
 
 class HeapSnapshotWriteStream extends Writable {
   constructor(options = {}) {

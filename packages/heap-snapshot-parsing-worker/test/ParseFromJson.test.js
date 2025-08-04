@@ -263,7 +263,7 @@ test('parseFromJson - allows empty locations array', async () => {
   expect(result.locations.length).toBe(0)
 })
 
-test('parseFromJson - throws ParserError when snapshot metadata is completely missing', async () => {
+test('parseFromJson - throws HeapSnapshotParserError when snapshot metadata is completely missing', async () => {
   const heapSnapshotData = {
     // Missing snapshot property entirely
     nodes: [0, 0, 1, 0, 0, 0, 0],
