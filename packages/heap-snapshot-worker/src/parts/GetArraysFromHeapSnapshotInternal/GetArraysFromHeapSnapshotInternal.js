@@ -138,18 +138,19 @@ export const getArraysFromHeapSnapshotInternal = (strings, nodes, node_types, no
   // Create name map to get real display names
   const nameMap = CreateNameMap.createNameMap(parsedNodes, graph)
 
-  // Sort by length (longest first) and return with real display names
+    // Sort by length (longest first) and return with real display names
   const result = arrayObjects
     .map((obj) => {
       const nameObject = nameMap[obj.id]
-
+      
       // If we have variable names from property edges, use them as an array
       // Otherwise fall back to the single name from nameMap or obj.name
       let displayName
       if (obj.variableNames && obj.variableNames.length > 0) {
         // Extract unique variable names and sort them for consistent ordering
         const uniqueNames = [...new Set(obj.variableNames.map(v => v.name))].sort()
-        displayName = uniqueNames
+        // If only one name, use string; if multiple, use array
+        displayName = uniqueNames.length === 1 ? uniqueNames[0] : uniqueNames
       } else {
         displayName = nameObject ? (nameObject.edgeName || nameObject.nodeName) : obj.name
       }
@@ -159,10 +160,6 @@ export const getArraysFromHeapSnapshotInternal = (strings, nodes, node_types, no
         name: displayName,
         length: obj.length,
         type: obj.type,
-        selfSize: obj.selfSize,
-        edgeCount: obj.edgeCount,
-        detachedness: obj.detachedness,
-        variableNames: obj.variableNames,
       }
     })
     .sort((a, b) => b.length - a.length)

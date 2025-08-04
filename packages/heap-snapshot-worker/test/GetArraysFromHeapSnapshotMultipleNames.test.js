@@ -69,19 +69,20 @@ test('getArraysFromHeapSnapshotInternal - returns array of names when multiple v
   expect(Array.isArray(result)).toBe(true)
   expect(result.length).toBe(1) // Should find one array
 
-  const arrayResult = result[0]
+    const arrayResult = result[0]
   expect(arrayResult.id).toBe(2)
   expect(arrayResult.length).toBe(3) // Array has 3 elements
   expect(arrayResult.type).toBe('array')
-
+  
   // Most importantly: name should be an array containing both variable names
   expect(Array.isArray(arrayResult.name)).toBe(true)
   expect(arrayResult.name).toEqual(['taka', 'tecino']) // Should be sorted alphabetically
-
-  // Variable names should contain both references
-  expect(arrayResult.variableNames.length).toBe(2)
-  const variableNames = arrayResult.variableNames.map(v => v.name).sort()
-  expect(variableNames).toEqual(['taka', 'tecino'])
+  
+  // Should not have selfSize, edgeCount, detachedness, or variableNames
+  expect(arrayResult.selfSize).toBeUndefined()
+  expect(arrayResult.edgeCount).toBeUndefined()
+  expect(arrayResult.detachedness).toBeUndefined()
+  expect(arrayResult.variableNames).toBeUndefined()
 })
 
 test('getArraysFromHeapSnapshotInternal - falls back to single name when only one variable references array', () => {
@@ -123,7 +124,12 @@ test('getArraysFromHeapSnapshotInternal - falls back to single name when only on
   expect(result.length).toBe(1)
 
   const arrayResult = result[0]
-  expect(arrayResult.name).toEqual(['singleArray']) // Should still be an array but with one element
-  expect(arrayResult.variableNames.length).toBe(1)
-  expect(arrayResult.variableNames[0].name).toBe('singleArray')
+  expect(arrayResult.name).toBe('singleArray') // Should be a string when only one name
+  expect(typeof arrayResult.name).toBe('string')
+  
+  // Should not have removed properties
+  expect(arrayResult.selfSize).toBeUndefined()
+  expect(arrayResult.edgeCount).toBeUndefined()
+  expect(arrayResult.detachedness).toBeUndefined()
+  expect(arrayResult.variableNames).toBeUndefined()
 })
