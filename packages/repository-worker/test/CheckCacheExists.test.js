@@ -24,7 +24,9 @@ test('checkCacheExists returns true when cache exists', async () => {
   const result = await checkCacheExists(commitHash, cacheDir)
 
   expect(result).toBe(true)
+  // @ts-ignore
   expect(mockPathJoin).toHaveBeenCalledWith(cacheDir, commitHash)
+  // @ts-ignore
   expect(mockPathExists).toHaveBeenCalledWith(cachedNodeModulesPath)
 })
 
@@ -39,7 +41,9 @@ test('checkCacheExists returns false when cache does not exist', async () => {
   const result = await checkCacheExists(commitHash, cacheDir)
 
   expect(result).toBe(false)
+  // @ts-ignore
   expect(mockPathJoin).toHaveBeenCalledWith(cacheDir, commitHash)
+  // @ts-ignore
   expect(mockPathExists).toHaveBeenCalledWith(cachedNodeModulesPath)
 })
 
