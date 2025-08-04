@@ -1,11 +1,10 @@
 import { expect, test } from '@jest/globals'
-
-const GetHandleTestSetupMessage = await import('../src/parts/GetHandleTestSetupMessage/GetHandleTestSetupMessage.js')
+import * as GetHandleTestSetupMessage from '../src/parts/GetHandleTestSetupMessage/GetHandleTestSetupMessage.js'
 
 test('getHandleTestSetupMessage - should return formatted setup message', () => {
   const result = GetHandleTestSetupMessage.getHandleTestSetupMessage()
   expect(result).toBe(
-    '\n\u001B[0m\u001B[7m\u001B[33m SETUP \u001B[39m\u001B[27m\u001B[0m \u001B[2mLaunching IDE and connecting to devtools...\u001B[22m\n',
+    '\n\u001b[0m\u001b[7m\u001b[33m SETUP \u001b[39m\u001b[27m\u001b[0m\n',
   )
 })
 
