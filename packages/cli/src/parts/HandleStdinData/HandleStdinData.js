@@ -7,7 +7,7 @@ import * as StdinDataState from '../StdinDataState/StdinDataState.js'
 
 export const handleStdinData = async (key) => {
   const state = StdinDataState.getState()
-  const newState = GetNewStdinState.getNewStdinState(state, key)
+  const newState = await GetNewStdinState.getNewStdinState(state, key)
   if (newState === state) {
     return
   }
