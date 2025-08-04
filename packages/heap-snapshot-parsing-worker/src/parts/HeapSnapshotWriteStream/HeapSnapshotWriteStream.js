@@ -80,12 +80,17 @@ export class HeapSnapshotWriteStream extends Writable {
       this.currentNumber,
       this.hasDigits,
     )
+    
+    // If parsing failed, we need more data
     if (dataIndex === -1) {
       return
     }
+    
+    // Check array bounds
     if (arrayIndex > array.length) {
       throw new RangeError(`Array index ${arrayIndex} is out of bounds for array of length ${array.length}`)
     }
+    
     this.arrayIndex = arrayIndex
 
     // Update parsing state for next chunk
@@ -95,7 +100,7 @@ export class HeapSnapshotWriteStream extends Writable {
     // Only store leftover data when we're done with this section
     if (done) {
       if (arrayIndex !== array.length) {
-        throw new RangeError(`Incorrect number of nodes in heapsnapshot, expected ${array.length}, but got ${arrayIndex}`)
+        throw new RangeError(`Incorrect number of elements in heapsnapshot, expected ${array.length}, but got ${arrayIndex}`)
       }
       this.resetParsingState()
       this.state = nextState
@@ -130,6 +135,8 @@ export class HeapSnapshotWriteStream extends Writable {
       this.currentNumber,
       this.hasDigits,
     )
+    
+    // If parsing failed, we need more data
     if (dataIndex === -1) {
       return
     }
