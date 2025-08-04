@@ -49,7 +49,9 @@ test('isInternalArray - handles edge cases', () => {
   expect(isInternalArray('')).toBe(false)
   expect(isInternalArray([])).toBe(false)
   expect(isInternalArray([''])).toBe(false)
+  // @ts-ignore
   expect(isInternalArray(null)).toBe(false)
+  // @ts-ignore
   expect(isInternalArray(undefined)).toBe(false)
 })
 

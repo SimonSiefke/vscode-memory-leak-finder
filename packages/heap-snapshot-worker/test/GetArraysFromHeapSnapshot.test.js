@@ -22,9 +22,13 @@ test('getArraysFromHeapSnapshot - extracts arrays with names and lengths sorted 
   expect(firstArray.type).toBe('array')
 
   // Should not have these properties anymore
+  // @ts-ignore
   expect(firstArray.selfSize).toBeUndefined()
+  // @ts-ignore
   expect(firstArray.edgeCount).toBeUndefined()
+  // @ts-ignore
   expect(firstArray.detachedness).toBeUndefined()
+  // @ts-ignore
   expect(firstArray.variableNames).toBeUndefined()
 
   // Log first few results for verification

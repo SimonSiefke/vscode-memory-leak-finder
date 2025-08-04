@@ -79,9 +79,13 @@ test('getArraysFromHeapSnapshotInternal - returns array of names when multiple v
   expect(arrayResult.name).toEqual(['taka', 'tecino']) // Should be sorted alphabetically
 
   // Should not have selfSize, edgeCount, detachedness, or variableNames
+  // @ts-ignore
   expect(arrayResult.selfSize).toBeUndefined()
+  // @ts-ignore
   expect(arrayResult.edgeCount).toBeUndefined()
+  // @ts-ignore
   expect(arrayResult.detachedness).toBeUndefined()
+  // @ts-ignore
   expect(arrayResult.variableNames).toBeUndefined()
 })
 
@@ -128,8 +132,12 @@ test('getArraysFromHeapSnapshotInternal - falls back to single name when only on
   expect(typeof arrayResult.name).toBe('string')
 
   // Should not have removed properties
+  // @ts-ignore
   expect(arrayResult.selfSize).toBeUndefined()
+  // @ts-ignore
   expect(arrayResult.edgeCount).toBeUndefined()
+  // @ts-ignore
   expect(arrayResult.detachedness).toBeUndefined()
+  // @ts-ignore
   expect(arrayResult.variableNames).toBeUndefined()
 })

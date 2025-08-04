@@ -149,6 +149,7 @@ export const getArraysFromHeapSnapshotInternal = (strings, nodes, node_types, no
       let displayName
       if (obj.variableNames && obj.variableNames.length > 0) {
         // Extract unique variable names and sort them for consistent ordering
+        // @ts-ignore
         const uniqueNames = [...new Set(obj.variableNames.map(v => v.name))].sort()
         // If only one name, use string; if multiple, use array
         displayName = uniqueNames.length === 1 ? uniqueNames[0] : uniqueNames
