@@ -16,7 +16,7 @@ test('HeapSnapshotWriteStream - constructor initializes correctly', () => {
 })
 
 test('HeapSnapshotWriteStream - resetParsingState resets parsing state', () => {
-  const stream = new HeapSnapshotWriteStream()
+  const stream = createHeapSnapshotWriteStream()
   stream.currentNumber = 123
   stream.hasDigits = true
 
@@ -27,7 +27,7 @@ test('HeapSnapshotWriteStream - resetParsingState resets parsing state', () => {
 })
 
 test('HeapSnapshotWriteStream - getResult returns correct structure', () => {
-  const stream = new HeapSnapshotWriteStream()
+  const stream = createHeapSnapshotWriteStream()
   const result = stream.getResult()
 
   expect(result).toHaveProperty('metaData')
