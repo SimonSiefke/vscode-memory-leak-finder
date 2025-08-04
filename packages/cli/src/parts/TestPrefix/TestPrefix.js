@@ -7,6 +7,8 @@ export const Leak = chalk.reset.inverse.blue(TestPrefixText.Leak)
 
 export const Runs = chalk.reset.inverse.yellow.bold(TestPrefixText.Runs)
 
+export const Setup = chalk.reset.inverse.yellow(TestPrefixText.Setup)
+
 export const Fail = chalk.reset.inverse.bold.red(TestPrefixText.Fail)
 
 export const UnexpectedError = chalk.reset.inverse.bold.red(TestPrefixText.UnexpectedError)

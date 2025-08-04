@@ -42,6 +42,7 @@ test('HandleStdinDataInterruptedMode - go to filter mode', () => {
   const key = CliKeys.FilterMode
   const newState = HandleStdinDataInterruptedMode.handleStdinDataInterruptedMode(state, key)
   expect(newState.mode).toBe(ModeType.FilterWaiting)
+  expect(newState.value).toBe('')
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
     '\u001B[2J\u001B[3J\u001B[H\n' +
@@ -72,5 +73,40 @@ test('HandleStdinDataInterruptedMode - run again', () => {
   const key = AnsiKeys.Enter
   const newState = HandleStdinDataInterruptedMode.handleStdinDataInterruptedMode(state, key)
   expect(newState.mode).toBe(ModeType.Running)
+  expect(Stdout.write).not.toHaveBeenCalled()
+})
+
+test('HandleStdinDataInterruptedMode - control c', () => {
+  const state = {
+    value: '',
+    mode: ModeType.Interrupted,
+  }
+  const key = AnsiKeys.ControlC
+  const newState = HandleStdinDataInterruptedMode.handleStdinDataInterruptedMode(state, key)
+  expect(newState.mode).toBe(ModeType.Exit)
+  expect(Stdout.write).not.toHaveBeenCalled()
+})
+
+test('HandleStdinDataInterruptedMode - control d', () => {
+  const state = {
+    value: '',
+    mode: ModeType.Interrupted,
+  }
+  const key = AnsiKeys.ControlD
+  const newState = HandleStdinDataInterruptedMode.handleStdinDataInterruptedMode(state, key)
+  expect(newState.mode).toBe(ModeType.Exit)
+  expect(Stdout.write).not.toHaveBeenCalled()
+})
+
+test('HandleStdinDataInterruptedMode - toggle headless mode', () => {
+  const state = {
+    value: '',
+    mode: ModeType.Interrupted,
+    headless: false,
+  }
+  const key = CliKeys.ToggleHeadlessMode
+  const newState = HandleStdinDataInterruptedMode.handleStdinDataInterruptedMode(state, key)
+  expect(newState.mode).toBe(ModeType.Running)
+  expect(newState.headless).toBe(true)
   expect(Stdout.write).not.toHaveBeenCalled()
 })

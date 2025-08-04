@@ -2,6 +2,7 @@ import * as Assert from '../Assert/Assert.js'
 import * as HandleTestFailed from '../HandleTestFailed/HandleTestFailed.js'
 import * as HandleTestPassed from '../HandleTestPassed/HandleTestPassed.js'
 import * as HandleTestRunning from '../HandleTestRunning/HandleTestRunning.js'
+import * as HandleTestSetup from '../HandleTestSetup/HandleTestSetup.js'
 import * as HandleTestSkipped from '../HandleTestSkipped/HandleTestSkipped.js'
 import * as HandleTestsFinished from '../HandleTestsFinished/HandleTestsFinished.js'
 import * as HandleTestsStarting from '../HandleTestsStarting/HandleTestsStarting.js'
@@ -15,6 +16,8 @@ export const getFn = (method) => {
       return HandleTestPassed.handleTestPassed
     case TestWorkerEventType.TestRunning:
       return HandleTestRunning.handleTestRunning
+    case TestWorkerEventType.TestSetup:
+      return HandleTestSetup.handleTestSetup
     case TestWorkerEventType.TestFailed:
       return HandleTestFailed.handleTestFailed
     case TestWorkerEventType.AllTestsFinished:
