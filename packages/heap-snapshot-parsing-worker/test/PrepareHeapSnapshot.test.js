@@ -14,8 +14,6 @@ jest.unstable_mockModule('node:fs', () => mockFs)
 // Re-import the function to get the mocked version
 const { prepareHeapSnapshot } = await import('../src/parts/PrepareHeapSnapshot/PrepareHeapSnapshot.js')
 
-const result = await prepareHeapSnapshot('/test/mock-file-path.json')
-
 test('prepareHeapSnapshot - parses simple heap snapshot', async () => {
   // Create a minimal heap snapshot data
   const heapSnapshotData = {
@@ -44,6 +42,8 @@ test('prepareHeapSnapshot - parses simple heap snapshot', async () => {
     },
   })
   mockCreateReadStream.mockReturnValue(mockReadStream)
+
+  const result = await prepareHeapSnapshot('/test/mock-file-path.json')
 
   expect(result).toHaveProperty('metaData')
   expect(result).toHaveProperty('nodes')
