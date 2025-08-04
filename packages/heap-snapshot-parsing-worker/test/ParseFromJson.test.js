@@ -113,7 +113,7 @@ test('prepareHeapSnapshot - does not parse strings when parseStrings is false', 
   expect(result.strings).toEqual([])
 })
 
-test('parseFromJson - throws ParserError when metadata is missing', async () => {
+test('parseFromJson - throws HeapSnapshotParserError when metadata is missing', async () => {
   const heapSnapshotData = {
     // Missing snapshot metadata
     nodes: [0, 0, 1, 0, 0, 0, 0],
@@ -125,7 +125,7 @@ test('parseFromJson - throws ParserError when metadata is missing', async () => 
   await expect(parseFromJson(heapSnapshotData)).rejects.toThrow('Missing required metadata in heap snapshot')
 })
 
-test('parseFromJson - throws ParserError when nodes are missing', async () => {
+test('parseFromJson - throws HeapSnapshotParserError when nodes are missing', async () => {
   const heapSnapshotData = {
     snapshot: {
       meta: {
@@ -147,7 +147,7 @@ test('parseFromJson - throws ParserError when nodes are missing', async () => {
   await expect(parseFromJson(heapSnapshotData)).rejects.toThrow('Heap snapshot parsing did not complete successfully')
 })
 
-test('parseFromJson - throws ParserError when edges are missing', async () => {
+test('parseFromJson - throws HeapSnapshotParserError when edges are missing', async () => {
   const heapSnapshotData = {
     snapshot: {
       meta: {
@@ -169,7 +169,7 @@ test('parseFromJson - throws ParserError when edges are missing', async () => {
   await expect(parseFromJson(heapSnapshotData)).rejects.toThrow('Heap snapshot parsing did not complete successfully')
 })
 
-test('parseFromJson - throws ParserError when locations are missing', async () => {
+test('parseFromJson - throws HeapSnapshotParserError when locations are missing', async () => {
   const heapSnapshotData = {
     snapshot: {
       meta: {

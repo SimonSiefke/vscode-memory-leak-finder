@@ -210,7 +210,7 @@ test('HeapSnapshotWriteStream - handles negative numbers (skips minus sign)', as
   expect(result.nodes[3]).toBe(100) // Negative number becomes positive because minus sign is skipped
 })
 
-test('HeapSnapshotWriteStream - handles missing nodes array header', async () => {
+test('HeapSnapshotWriteStream - handles missing nodes array header gracefully', async () => {
   const stream = createHeapSnapshotWriteStream()
 
   // Create data without the "nodes": token
@@ -236,15 +236,15 @@ test('HeapSnapshotWriteStream - handles missing nodes array header', async () =>
   const buffer = new TextEncoder().encode(jsonData)
 
   stream.write(buffer)
+  // Don't call end() to avoid triggering validation at this level
+  // Validation should be tested at the parseFromJson level instead
 
   const result = stream.getResult()
-
-  // Should still have metadata but no nodes data since parsing stops at nodes metadata stage
   expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7) // Array is initialized with expected size but not filled
 })
 
-test('HeapSnapshotWriteStream - handles missing edges array header', async () => {
+test('HeapSnapshotWriteStream - handles missing edges array header gracefully', async () => {
   const stream = createHeapSnapshotWriteStream()
 
   // Create data without the "edges": token
@@ -270,16 +270,16 @@ test('HeapSnapshotWriteStream - handles missing edges array header', async () =>
   const buffer = new TextEncoder().encode(jsonData)
 
   stream.write(buffer)
+  // Don't call end() to avoid triggering validation at this level
+  // Validation should be tested at the parseFromJson level instead
 
   const result = stream.getResult()
-
-  // Should still have metadata and nodes but no edges data since parsing stops at edges metadata stage
   expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7)
   expect(result.edges.length).toBe(0)
 })
 
-test('HeapSnapshotWriteStream - handles missing locations array header', async () => {
+test('HeapSnapshotWriteStream - handles missing locations array header gracefully', async () => {
   const stream = createHeapSnapshotWriteStream()
 
   // Create data without the "locations": token
@@ -305,17 +305,17 @@ test('HeapSnapshotWriteStream - handles missing locations array header', async (
   const buffer = new TextEncoder().encode(jsonData)
 
   stream.write(buffer)
+  // Don't call end() to avoid triggering validation at this level
+  // Validation should be tested at the parseFromJson level instead
 
   const result = stream.getResult()
-
-  // Should still have metadata, nodes, and edges but no locations data since parsing stops at locations metadata stage
   expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7)
   expect(result.edges.length).toBe(0)
   expect(result.locations.length).toBe(0)
 })
 
-test('HeapSnapshotWriteStream - handles malformed nodes array (missing opening bracket)', async () => {
+test('HeapSnapshotWriteStream - handles malformed nodes array gracefully', async () => {
   const stream = createHeapSnapshotWriteStream()
 
   // Manually construct data where "nodes": is present but no opening bracket follows
@@ -328,15 +328,15 @@ test('HeapSnapshotWriteStream - handles malformed nodes array (missing opening b
   const buffer = new TextEncoder().encode(partialData)
 
   stream.write(buffer)
+  // Don't call end() to avoid triggering validation at this level
+  // Validation should be tested at the parseFromJson level instead
 
   const result = stream.getResult()
-
-  // Should still have metadata but no nodes data since parsing stops at nodes metadata stage
   expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7) // Array is initialized with expected size but not filled
 })
 
-test('HeapSnapshotWriteStream - handles malformed edges array (missing opening bracket)', async () => {
+test('HeapSnapshotWriteStream - handles malformed edges array gracefully', async () => {
   const stream = createHeapSnapshotWriteStream()
 
   // Manually construct data where "edges": is present but no opening bracket follows
@@ -349,16 +349,16 @@ test('HeapSnapshotWriteStream - handles malformed edges array (missing opening b
   const buffer = new TextEncoder().encode(partialData)
 
   stream.write(buffer)
+  // Don't call end() to avoid triggering validation at this level
+  // Validation should be tested at the parseFromJson level instead
 
   const result = stream.getResult()
-
-  // Should still have metadata and nodes but no edges data since parsing stops at edges metadata stage
   expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7)
   expect(result.edges.length).toBe(0)
 })
 
-test('HeapSnapshotWriteStream - handles malformed locations array (missing opening bracket)', async () => {
+test('HeapSnapshotWriteStream - handles malformed locations array gracefully', async () => {
   const stream = createHeapSnapshotWriteStream()
 
   // Manually construct data where "locations": is present but no opening bracket follows
@@ -371,10 +371,10 @@ test('HeapSnapshotWriteStream - handles malformed locations array (missing openi
   const buffer = new TextEncoder().encode(partialData)
 
   stream.write(buffer)
+  // Don't call end() to avoid triggering validation at this level
+  // Validation should be tested at the parseFromJson level instead
 
   const result = stream.getResult()
-
-  // Should still have metadata, nodes, and edges but no locations data since parsing stops at locations metadata stage
   expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7)
   expect(result.edges.length).toBe(0)

@@ -8,6 +8,7 @@ import { parseHeapSnapshotArray } from '../ParseHeapSnapshotArray/ParseHeapSnaps
 import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.js'
 import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.js'
 import { writeStringArrayData } from '../WriteStringArrayData/WriteStringArrayData.js'
+import { HeapSnapshotParserError } from '../ParserError/ParserError.js'
 
 class HeapSnapshotWriteStream extends Writable {
   constructor(options = {}) {
@@ -231,6 +232,21 @@ class HeapSnapshotWriteStream extends Writable {
   }
 
   start() {}
+
+  validateRequiredMetadata() {
+    if (!this.metaData || !this.metaData.data) {
+      throw new HeapSnapshotParserError('Missing required metadata in heap snapshot')
+    }
+
+    if (this.state !== HeapSnapshotParsingState.Done) {
+      throw new HeapSnapshotParserError('Heap snapshot parsing did not complete successfully')
+    }
+  }
+
+  _final(callback) {
+    this.validateRequiredMetadata()
+    callback()
+  }
 
   getResult() {
     return {

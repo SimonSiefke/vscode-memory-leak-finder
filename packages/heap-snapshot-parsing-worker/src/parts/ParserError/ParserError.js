@@ -1,6 +1,6 @@
-export class ParserError extends Error {
+export class HeapSnapshotParserError extends Error {
   constructor(message) {
     super(message)
-    this.name = 'ParserError'
+    this.name = 'HeapSnapshotParserError'
   }
-} 
+}
