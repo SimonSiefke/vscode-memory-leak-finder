@@ -14,6 +14,5 @@ export const parseFromFile = async (path, options = {}) => {
   const writeStream = createHeapSnapshotWriteStream(options)
   await pipeline(readStream, writeStream)
   const result = writeStream.getResult()
-
   return result
 }
