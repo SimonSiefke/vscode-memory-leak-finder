@@ -246,7 +246,6 @@ export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types
       variableNames: obj.variableNames.map((v) => v.name),
       entries: obj.entries,
       size: obj.size,
-      note: obj.note,
     }))
     .sort((a, b) => a.id - b.id)
 }

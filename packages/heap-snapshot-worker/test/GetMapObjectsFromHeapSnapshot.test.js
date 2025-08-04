@@ -104,7 +104,6 @@ test('getMapObjectsFromHeapSnapshot - map with variable name', async () => {
         variableNames: ['myMap'],
         entries: [],
         size: null,
-        note: 'Map object found in heap snapshot',
       },
     ])
   } finally {
@@ -172,14 +171,12 @@ test('getMapObjectsFromHeapSnapshot - multiple map objects with variables', asyn
         variableNames: ['cache'],
         entries: [],
         size: null,
-        note: 'Map object found in heap snapshot',
       },
       {
         id: 300,
         variableNames: ['userCache'],
         entries: [],
         size: null,
-        note: 'Map object found in heap snapshot',
       },
     ])
   } finally {
