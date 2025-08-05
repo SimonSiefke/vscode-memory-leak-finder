@@ -14,7 +14,7 @@ const invoke = (method, ...params) => {
   return state.rpc.invoke(method, ...params)
 }
 
-export const findFiles = () => {
+export const findFiles = (path, options) => {
   return invoke('FileSystem.findFiles')
 }
 
