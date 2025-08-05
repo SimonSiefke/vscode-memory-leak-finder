@@ -15,7 +15,7 @@ export const getBalancedJsonIndices = (data, startIndex) => {
         if (endIndex === -1) {
           return -1
         }
-        i = endIndex + 1
+        i = endIndex
         break
       case Character.CurlyOpen:
         balance++

@@ -1,9 +1,12 @@
-import * as GetOptions from '../GetOptions/GetOptions.js'
+import * as Argv from '../Argv/Argv.js'
 import * as InitialStart from '../InitialStart/InitialStart.js'
+import * as ParseArgv from '../ParseArgv/ParseArgv.js'
 import * as StdinDataState from '../StdinDataState/StdinDataState.js'
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.js'
 
 export const run = async () => {
-  const options = GetOptions.getOptions()
+  await StdoutWorker.prepare()
+  const options = ParseArgv.parseArgv(Argv.argv)
   StdinDataState.setState({
     ...StdinDataState.getState(),
     watch: options.watch,

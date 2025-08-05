@@ -10,7 +10,7 @@ beforeEach(() => {
 
 jest.unstable_mockModule('../src/parts/Stdout/Stdout.js', () => {
   return {
-    write: jest.fn(),
+    write: jest.fn().mockImplementation(() => Promise.resolve()),
   }
 })
 
@@ -25,13 +25,13 @@ const HandleStdinDataFinishedRunningMode = await import(
   '../src/parts/HandleStdinDataFinishedRunningMode/HandleStdinDataFinishedRunningMode.js'
 )
 
-test('handleStdinDataFinishedRunningMode - show watch mode details', () => {
+test('handleStdinDataFinishedRunningMode - show watch mode details', async () => {
   const state = {
     value: '',
     mode: ModeType.FinishedRunning,
   }
   const key = CliKeys.WatchMode
-  const newState = HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
+  const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.Waiting)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
@@ -46,13 +46,13 @@ test('handleStdinDataFinishedRunningMode - show watch mode details', () => {
   )
 })
 
-test('handleStdinDataFinishedRunningMode - go to filter mode', () => {
+test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
   const state = {
     value: '',
     mode: ModeType.FinishedRunning,
   }
   const key = CliKeys.FilterMode
-  const newState = HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
+  const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.FilterWaiting)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
@@ -65,24 +65,24 @@ test('handleStdinDataFinishedRunningMode - go to filter mode', () => {
   )
 })
 
-test('handleStdinDataFinishedRunningMode - quit', () => {
+test('handleStdinDataFinishedRunningMode - quit', async () => {
   const state = {
     value: '',
     mode: ModeType.FinishedRunning,
   }
   const key = CliKeys.Quit
-  const newState = HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
+  const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
   expect(Stdout.write).not.toHaveBeenCalled()
 })
 
-test('handleStdinDataFinishedRunningMode - run again', () => {
+test('handleStdinDataFinishedRunningMode - run again', async () => {
   const state = {
     value: '',
     mode: ModeType.FinishedRunning,
   }
   const key = AnsiKeys.Enter
-  const newState = HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
+  const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.Running)
   expect(Stdout.write).not.toHaveBeenCalled()
 })
