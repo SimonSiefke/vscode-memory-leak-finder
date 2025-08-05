@@ -1,5 +1,5 @@
 import { parseFromStream } from '../ParseFromStream/ParseFromStream.js'
-import { ReadableString } from '../ReadableString/ReadableString.js'
+import { createReadableString } from '../ReadableString/ReadableString.js'
 
 /**
  * Parses a heap snapshot from JSON data and returns the parsed data with transferable arrays
@@ -10,7 +10,7 @@ import { ReadableString } from '../ReadableString/ReadableString.js'
  */
 export const parseFromJson = async (json, options = { parseStrings: false }) => {
   const string = JSON.stringify(json)
-  const stream = new ReadableString(string)
+  const stream = createReadableString(string)
   const result = await parseFromStream(stream, options)
   return result
 }

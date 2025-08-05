@@ -56,7 +56,6 @@ test('prepareHeapSnapshot - parses strings when parseStrings is true', async () 
     strings: ['', 'root', 'test', 'hello world'],
   }
 
-  /** @type {{metaData: any, nodes: Uint32Array, edges: Uint32Array, locations: Uint32Array, strings: string[]}} */
   const result = await parseFromJson(heapSnapshotData, { parseStrings: true })
 
   expect(result).toHaveProperty('metaData')
@@ -96,7 +95,6 @@ test('prepareHeapSnapshot - does not parse strings when parseStrings is false', 
     strings: ['', 'root', 'test'],
   }
 
-  /** @type {{metaData: any, nodes: Uint32Array, edges: Uint32Array, locations: Uint32Array, strings: string[]}} */
   const result = await parseFromJson(heapSnapshotData, { parseStrings: false })
 
   expect(result).toHaveProperty('metaData')
