@@ -6,10 +6,6 @@ import { addNodeModulesToCache } from '../src/parts/CacheNodeModules/CacheNodeMo
 
 test('addNodeModulesToCache - successfully caches node_modules', async () => {
   const mockNodeModulesPaths = ['node_modules', 'packages/a/node_modules', 'packages/b/node_modules']
-  const mockFileOperations = [
-    { type: 'mkdir', path: '/cache/dir' },
-    { type: 'copy', from: '/repo/path/node_modules', to: '/cache/dir/commit-hash/node_modules' },
-  ]
 
   const mockRpc = MockRpc.create({
     commandMap: {},
@@ -37,7 +33,6 @@ test('addNodeModulesToCache - filters out nested node_modules and .git directori
     '.git/node_modules', // Should be filtered out
     'packages/c/node_modules',
   ]
-  const expectedFilteredPaths = ['node_modules', 'packages/a/node_modules', 'packages/b/node_modules', 'packages/c/node_modules']
 
   const mockRpc = MockRpc.create({
     commandMap: {},
