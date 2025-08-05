@@ -9,6 +9,7 @@ import { parseHeapSnapshotArray } from '../ParseHeapSnapshotArray/ParseHeapSnaps
 import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.js'
 import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.js'
 import * as TokenType from '../TokenType/TokenType.js'
+import { findTokenInBuffer, findCharInBuffer } from '../FindTokenInBuffer/FindTokenInBuffer.js'
 
 class HeapSnapshotWriteStream extends Writable {
   constructor(options) {
@@ -54,14 +55,22 @@ class HeapSnapshotWriteStream extends Writable {
     this.handleChunk(rest)
   }
 
-  writeParsingArrayMetaData(chunk, nodeName, nextState) {
+  writeParsingArrayMetaData(chunk, tokenBytes, nextState) {
     this.data = concatArray(this.data, chunk)
-    const dataString = decodeArray(this.data)
-    const endIndex = parseHeapSnapshotArrayHeader(dataString, nodeName)
-    if (endIndex === -1) {
+
+    const tokenEndIndex = findTokenInBuffer(this.data, tokenBytes)
+
+    if (tokenEndIndex === -1) {
       return
     }
-    const rest = this.data.slice(endIndex)
+
+    // Find the opening bracket after the token
+    const bracketIndex = findCharInBuffer(this.data, tokenEndIndex, '['.charCodeAt(0))
+    if (bracketIndex === -1) {
+      return
+    }
+
+    const rest = this.data.slice(bracketIndex + 1)
     this.data = new Uint8Array()
     this.arrayIndex = 0
     this.resetParsingState()
@@ -70,7 +79,15 @@ class HeapSnapshotWriteStream extends Writable {
   }
 
   writeParsingNodesMetaData(chunk) {
-    this.writeParsingArrayMetaData(chunk, TokenType.Nodes, HeapSnapshotParsingState.ParsingNodes)
+    this.writeParsingArrayMetaData(chunk, TokenType.TOKENS.NODES, HeapSnapshotParsingState.ParsingNodes)
+  }
+
+  writeParsingEdgesMetaData(chunk) {
+    this.writeParsingArrayMetaData(chunk, TokenType.TOKENS.EDGES, HeapSnapshotParsingState.ParsingEdges)
+  }
+
+  writeParsingLocationsMetaData(chunk) {
+    this.writeParsingArrayMetaData(chunk, TokenType.TOKENS.LOCATIONS, HeapSnapshotParsingState.ParsingLocations)
   }
 
   writeArrayData(chunk, array, nextState) {
@@ -111,16 +128,12 @@ class HeapSnapshotWriteStream extends Writable {
     this.writeArrayData(chunk, this.nodes, HeapSnapshotParsingState.ParsingEdgesMetaData)
   }
 
-  writeParsingEdgesMetaData(chunk) {
-    this.writeParsingArrayMetaData(chunk, TokenType.Edges, HeapSnapshotParsingState.ParsingEdges)
-  }
-
   writeParsingEdges(chunk) {
     this.writeArrayData(chunk, this.edges, HeapSnapshotParsingState.ParsingLocationsMetaData)
   }
 
-  writeParsingLocationsMetaData(chunk) {
-    this.writeParsingArrayMetaData(chunk, TokenType.Locations, HeapSnapshotParsingState.ParsingLocations)
+  writeParsingLocations(chunk) {
+    this.writeResizableArrayData(chunk, HeapSnapshotParsingState.Done)
   }
 
   writeResizableArrayData(chunk, nextState) {
@@ -151,10 +164,6 @@ class HeapSnapshotWriteStream extends Writable {
       this.handleChunk(rest)
     }
     // When not done, we don't need to store leftover data - the parsing state handles it
-  }
-
-  writeParsingLocations(chunk) {
-    this.writeResizableArrayData(chunk, HeapSnapshotParsingState.Done)
   }
 
   handleChunk(chunk) {
@@ -226,6 +235,7 @@ class HeapSnapshotWriteStream extends Writable {
  * Creates a new HeapSnapshotWriteStream instance
  * @param {Object} options - Options for the write stream
  * @param {boolean} [options.parseStrings=false] - Whether to parse and return strings
+ * @param {number} [options.highWaterMark=64*1024] - High water mark for the stream buffer
  * @returns {HeapSnapshotWriteStream} A new HeapSnapshotWriteStream instance
  */
 export const createHeapSnapshotWriteStream = (options = { parseStrings: false }) => {

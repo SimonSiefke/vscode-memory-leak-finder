@@ -5,9 +5,11 @@ import { waitForResult } from '../WaitForResult/WaitForResult.js'
 /**
  * Prepares a heap snapshot by parsing it in a separate worker for better performance
  * @param {string} path - The file path to the heap snapshot
+ * @param {Object} options - Options for parsing
+ * @param {number} [options.highWaterMark] - High water mark for the stream buffer
  * @returns {Promise<{metaData: any, nodes: Uint32Array, edges: Uint32Array, locations: Uint32Array}>}
  */
-export const prepareHeapSnapshot = async (path) => {
+export const prepareHeapSnapshot = async (path, options = {}) => {
   const workerPath = getHeapSnapshotWorkerPath()
   const worker = new Worker(workerPath)
 
@@ -18,7 +20,7 @@ export const prepareHeapSnapshot = async (path) => {
     // Send the parsing command
     worker.postMessage({
       method: 'HeapSnapshot.parse',
-      params: [path],
+      params: [path, options],
     })
 
     // Wait for the result
