@@ -89,7 +89,6 @@ test('getMapObjectsFromHeapSnapshot - map with variable name', async () => {
       edge_count: 1,
     },
     nodes: [
-      // prettier-ignore
       3,
       1,
       100,

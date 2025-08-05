@@ -74,6 +74,7 @@ test('getRegexpObjectsFromHeapSnapshot - single regexp object', async () => {
 })
 
 test('getRegexpObjectsFromHeapSnapshot - multiple regexp objects', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {

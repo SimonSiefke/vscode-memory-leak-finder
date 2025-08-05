@@ -51,6 +51,7 @@ test('getBigintObjectsFromHeapSnapshot - single bigint object without variable n
       edge_count: 0,
     },
     nodes: [
+      // prettier-ignore
       4, 1, 200, 32, 0, 0,
     ],
     edges: [],
@@ -71,6 +72,7 @@ test('getBigintObjectsFromHeapSnapshot - single bigint object without variable n
 })
 
 test('getBigintObjectsFromHeapSnapshot - multiple bigint objects (embedded constants filtered out)', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {
@@ -128,6 +130,7 @@ test('getBigintObjectsFromHeapSnapshot - multiple bigint objects (embedded const
 })
 
 test('getBigintObjectsFromHeapSnapshot - bigint with variable name', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {
