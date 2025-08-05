@@ -35,3 +35,18 @@ test('getBinaryPath - prioritizes vscodePath over commit', async () => {
   expect(result).toBe('/custom/path')
   expect(consoleSpy).not.toHaveBeenCalled()
 })
+
+test('getBinaryPath - uses commit when no vscodePath provided', async () => {
+  const mockDownloadAndBuildVscodeFromCommit = jest.fn().mockResolvedValue('/path/to/built/vscode')
+  
+  jest.unstable_mockModule('../DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js', () => ({
+    downloadAndBuildVscodeFromCommit: mockDownloadAndBuildVscodeFromCommit,
+  }))
+
+  const { getBinaryPath } = await import('../src/parts/GetBinaryPath/GetBinaryPath.js')
+  const result = await getBinaryPath('1.100.0', '', 'abc123')
+
+  expect(result).toBe('/path/to/built/vscode')
+  expect(mockDownloadAndBuildVscodeFromCommit).toHaveBeenCalledWith('abc123')
+  expect(consoleSpy).not.toHaveBeenCalled()
+})
