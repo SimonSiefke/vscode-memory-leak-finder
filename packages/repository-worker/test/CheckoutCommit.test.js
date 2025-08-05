@@ -1,4 +1,4 @@
-import { expect, test } from '@jest/globals'
+import { test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.js'
 import { checkoutCommit } from '../src/parts/CheckoutCommit/CheckoutCommit.js'
