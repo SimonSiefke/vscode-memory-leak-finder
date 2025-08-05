@@ -3,12 +3,14 @@
 import { Writable } from 'node:stream'
 import { concatArray, concatUint32Array } from '../ConcatArray/ConcatArray.js'
 import { decodeArray } from '../DecodeArray/DecodeArray.js'
+import { HeapSnapshotParserError } from '../HeapSnapshotParserError/HeapSnapshotParserError.js'
 import * as HeapSnapshotParsingState from '../HeapSnapshotParsingState/HeapSnapshotParsingState.js'
 import { parseHeapSnapshotArray } from '../ParseHeapSnapshotArray/ParseHeapSnapshotArray.js'
 import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.js'
 import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.js'
+import * as TokenType from '../TokenType/TokenType.js'
 
-export class HeapSnapshotWriteStream extends Writable {
+class HeapSnapshotWriteStream extends Writable {
   constructor(options) {
     super()
     this.arrayIndex = 0
@@ -23,7 +25,7 @@ export class HeapSnapshotWriteStream extends Writable {
     this.options = options
     this.state = HeapSnapshotParsingState.SearchingSnapshotMetaData
     this.strings = []
-    this.validate = false // TODO
+    this.validate = options.validate ?? true
   }
 
   /**
@@ -68,7 +70,7 @@ export class HeapSnapshotWriteStream extends Writable {
   }
 
   writeParsingNodesMetaData(chunk) {
-    this.writeParsingArrayMetaData(chunk, 'nodes', HeapSnapshotParsingState.ParsingNodes)
+    this.writeParsingArrayMetaData(chunk, TokenType.Nodes, HeapSnapshotParsingState.ParsingNodes)
   }
 
   writeArrayData(chunk, array, nextState) {
@@ -110,7 +112,7 @@ export class HeapSnapshotWriteStream extends Writable {
   }
 
   writeParsingEdgesMetaData(chunk) {
-    this.writeParsingArrayMetaData(chunk, 'edges', HeapSnapshotParsingState.ParsingEdges)
+    this.writeParsingArrayMetaData(chunk, TokenType.Edges, HeapSnapshotParsingState.ParsingEdges)
   }
 
   writeParsingEdges(chunk) {
@@ -118,7 +120,7 @@ export class HeapSnapshotWriteStream extends Writable {
   }
 
   writeParsingLocationsMetaData(chunk) {
-    this.writeParsingArrayMetaData(chunk, 'locations', HeapSnapshotParsingState.ParsingLocations)
+    this.writeParsingArrayMetaData(chunk, TokenType.Locations, HeapSnapshotParsingState.ParsingLocations)
   }
 
   writeResizableArrayData(chunk, nextState) {
@@ -193,22 +195,19 @@ export class HeapSnapshotWriteStream extends Writable {
   start() {}
 
   validateRequiredMetadata() {
-    // TODO make validation required
-    if (!this.validate) {
-      return
-    }
-
     if (!this.metaData || !this.metaData.data) {
-      throw new Error('Missing required metadata in heap snapshot')
+      throw new HeapSnapshotParserError('Missing required metadata in heap snapshot')
     }
 
     if (this.state !== HeapSnapshotParsingState.Done) {
-      throw new Error('Heap snapshot parsing did not complete successfully')
+      throw new HeapSnapshotParserError('Heap snapshot parsing did not complete successfully')
     }
   }
 
   _final(callback) {
-    this.validateRequiredMetadata()
+    if (this.validate) {
+      this.validateRequiredMetadata()
+    }
     callback()
   }
 
@@ -221,4 +220,14 @@ export class HeapSnapshotWriteStream extends Writable {
       strings: this.strings,
     }
   }
+}
+
+/**
+ * Creates a new HeapSnapshotWriteStream instance
+ * @param {Object} options - Options for the write stream
+ * @param {boolean} [options.parseStrings=false] - Whether to parse and return strings
+ * @returns {HeapSnapshotWriteStream} A new HeapSnapshotWriteStream instance
+ */
+export const createHeapSnapshotWriteStream = (options = { parseStrings: false }) => {
+  return new HeapSnapshotWriteStream(options)
 }

@@ -1,5 +1,5 @@
 import { expect, jest, test } from '@jest/globals'
-import { Readable } from 'node:stream'
+import { createReadableString } from '../src/parts/ReadableString/ReadableString.js'
 
 const mockCreateReadStream = jest.fn()
 
@@ -35,15 +35,10 @@ test('prepareHeapSnapshot - parses simple heap snapshot', async () => {
   }
 
   // Create mock read stream
-  const mockReadStream = new Readable({
-    read() {
-      this.push(JSON.stringify(heapSnapshotData))
-      this.push(null) // End the stream
-    },
-  })
+  const mockReadStream = createReadableString(JSON.stringify(heapSnapshotData))
   mockCreateReadStream.mockReturnValue(mockReadStream)
 
-  const result = await parseFromFile('/test/mock-file-path.json')
+  const result = await parseFromFile('/test/mock-file-path.json', {})
 
   expect(result).toHaveProperty('metaData')
   expect(result).toHaveProperty('nodes')

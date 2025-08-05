@@ -3,6 +3,7 @@ import { writeFileSync, unlinkSync } from 'node:fs'
 import * as GetMapObjectsFromHeapSnapshot from '../src/parts/GetMapObjectsFromHeapSnapshot/GetMapObjectsFromHeapSnapshot.js'
 
 test('getMapObjectsFromHeapSnapshot - no map objects', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {
@@ -10,12 +11,16 @@ test('getMapObjectsFromHeapSnapshot - no map objects', async () => {
         node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
         edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
       },
       node_count: 1,
       edge_count: 0,
     },
-    nodes: [0, 1, 100, 64, 0, 0],
+    nodes: [
+      0, 1, 100, 64, 0, 0, // hidden object
+    ],
     edges: [],
+    locations: [],
     strings: ['', 'test'],
   }
 
@@ -31,6 +36,7 @@ test('getMapObjectsFromHeapSnapshot - no map objects', async () => {
 })
 
 test('getMapObjectsFromHeapSnapshot - map without variable name (filtered out)', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {
@@ -38,12 +44,21 @@ test('getMapObjectsFromHeapSnapshot - map without variable name (filtered out)',
         node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
         edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
       },
       node_count: 1,
       edge_count: 0,
     },
-    nodes: [3, 1, 200, 28, 0, 0], // object type, Map
+    nodes: [
+      3,
+      1,
+      200,
+      28,
+      0,
+      0, // object type, Map
+    ],
     edges: [],
+    locations: [],
     strings: ['', 'Map'],
   }
 
@@ -60,6 +75,7 @@ test('getMapObjectsFromHeapSnapshot - map without variable name (filtered out)',
 })
 
 test('getMapObjectsFromHeapSnapshot - map with variable name', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {
@@ -67,6 +83,7 @@ test('getMapObjectsFromHeapSnapshot - map with variable name', async () => {
         node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
         edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
       },
       node_count: 2,
       edge_count: 1,
@@ -90,6 +107,7 @@ test('getMapObjectsFromHeapSnapshot - map with variable name', async () => {
       3,
       6, // property:"myMap" -> Map (node data index 6)
     ],
+    locations: [],
     strings: ['', 'Window', 'Map', 'myMap'],
   }
 
@@ -112,6 +130,7 @@ test('getMapObjectsFromHeapSnapshot - map with variable name', async () => {
 })
 
 test('getMapObjectsFromHeapSnapshot - multiple map objects with variables', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {
@@ -119,6 +138,7 @@ test('getMapObjectsFromHeapSnapshot - multiple map objects with variables', asyn
         node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
         edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
       },
       node_count: 4,
       edge_count: 2,
@@ -157,6 +177,7 @@ test('getMapObjectsFromHeapSnapshot - multiple map objects with variables', asyn
       6,
       12, // property:"userCache" -> Map (node data index 12)
     ],
+    locations: [],
     strings: ['', 'App', 'Map', 'Set', 'WeakMap', 'cache', 'userCache', 'refs'],
   }
 
@@ -185,6 +206,7 @@ test('getMapObjectsFromHeapSnapshot - multiple map objects with variables', asyn
 })
 
 test('getMapObjectsFromHeapSnapshot - map with multiple variable names', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {
@@ -192,6 +214,7 @@ test('getMapObjectsFromHeapSnapshot - map with multiple variable names', async (
         node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
         edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
       },
       node_count: 2,
       edge_count: 2,
@@ -218,6 +241,7 @@ test('getMapObjectsFromHeapSnapshot - map with multiple variable names', async (
       4,
       6, // property:"storage" -> Map (node data index 6, same Map)
     ],
+    locations: [],
     strings: ['', 'Window', 'Map', 'cache', 'storage'],
   }
 

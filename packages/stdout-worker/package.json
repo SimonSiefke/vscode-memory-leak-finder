@@ -1,11 +1,11 @@
 {
   "name": "@vscode-memory-leak-finder/stdout-worker",
   "version": "0.0.0-dev",
-  "description": "Write Data to stdout",
+  "description": "Write data to stdout",
   "main": "src/main.js",
   "type": "module",
   "bin": {
-    "test-electron": "./bin/stdout-worker.js"
+    "stdout-worker": "./bin/stdout-worker.js"
   },
   "scripts": {
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
@@ -15,7 +15,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@lvce-editor/rpc": "^4.11.0"
+    "@lvce-editor/rpc": "^4.13.0"
   },
   "devDependencies": {
     "@types/node": "^24.1.0"
