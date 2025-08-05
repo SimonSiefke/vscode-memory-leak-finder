@@ -4,7 +4,7 @@ import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.js'
 
 const prepareFunctions = async (path) => {
-  const snapshot = await prepareHeapSnapshot(path)
+  const snapshot = await prepareHeapSnapshot(path, {})
   const { itemsPerLocation, scriptIdOffset, lineOffset, columnOffset } = getLocationFieldOffsets(
     snapshot.metaData.data.meta.location_fields,
   )

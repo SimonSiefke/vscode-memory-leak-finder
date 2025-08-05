@@ -210,7 +210,7 @@ test('HeapSnapshotWriteStream - handles negative numbers (skips minus sign)', as
   expect(result.nodes[3]).toBe(100) // Negative number becomes positive because minus sign is skipped
 })
 
-test('HeapSnapshotWriteStream - handles missing nodes array header', async () => {
+test('HeapSnapshotWriteStream - handles missing nodes array header gracefully', async () => {
   const stream = createHeapSnapshotWriteStream()
 
   // Create data without the "nodes": token
@@ -236,15 +236,15 @@ test('HeapSnapshotWriteStream - handles missing nodes array header', async () =>
   const buffer = new TextEncoder().encode(jsonData)
 
   stream.write(buffer)
+  // Don't call end() to avoid triggering validation at this level
+  // Validation should be tested at the parseFromJson level instead
 
   const result = stream.getResult()
-
-  // Should still have metadata but no nodes data since parsing stops at nodes metadata stage
   expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7) // Array is initialized with expected size but not filled
 })
 
-test('HeapSnapshotWriteStream - handles missing edges array header', async () => {
+test('HeapSnapshotWriteStream - handles missing edges array header gracefully', async () => {
   const stream = createHeapSnapshotWriteStream()
 
   // Create data without the "edges": token
@@ -270,16 +270,16 @@ test('HeapSnapshotWriteStream - handles missing edges array header', async () =>
   const buffer = new TextEncoder().encode(jsonData)
 
   stream.write(buffer)
+  // Don't call end() to avoid triggering validation at this level
+  // Validation should be tested at the parseFromJson level instead
 
   const result = stream.getResult()
-
-  // Should still have metadata and nodes but no edges data since parsing stops at edges metadata stage
   expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7)
   expect(result.edges.length).toBe(0)
 })
 
-test('HeapSnapshotWriteStream - handles missing locations array header', async () => {
+test('HeapSnapshotWriteStream - handles missing locations array header gracefully', async () => {
   const stream = createHeapSnapshotWriteStream()
 
   // Create data without the "locations": token
@@ -305,17 +305,17 @@ test('HeapSnapshotWriteStream - handles missing locations array header', async (
   const buffer = new TextEncoder().encode(jsonData)
 
   stream.write(buffer)
+  // Don't call end() to avoid triggering validation at this level
+  // Validation should be tested at the parseFromJson level instead
 
   const result = stream.getResult()
-
-  // Should still have metadata, nodes, and edges but no locations data since parsing stops at locations metadata stage
   expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7)
   expect(result.edges.length).toBe(0)
   expect(result.locations.length).toBe(0)
 })
 
-test('HeapSnapshotWriteStream - handles malformed nodes array (missing opening bracket)', async () => {
+test('HeapSnapshotWriteStream - handles malformed nodes array gracefully', async () => {
   const stream = createHeapSnapshotWriteStream()
 
   // Manually construct data where "nodes": is present but no opening bracket follows
@@ -328,15 +328,15 @@ test('HeapSnapshotWriteStream - handles malformed nodes array (missing opening b
   const buffer = new TextEncoder().encode(partialData)
 
   stream.write(buffer)
+  // Don't call end() to avoid triggering validation at this level
+  // Validation should be tested at the parseFromJson level instead
 
   const result = stream.getResult()
-
-  // Should still have metadata but no nodes data since parsing stops at nodes metadata stage
   expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7) // Array is initialized with expected size but not filled
 })
 
-test('HeapSnapshotWriteStream - handles malformed edges array (missing opening bracket)', async () => {
+test('HeapSnapshotWriteStream - handles malformed edges array gracefully', async () => {
   const stream = createHeapSnapshotWriteStream()
 
   // Manually construct data where "edges": is present but no opening bracket follows
@@ -349,16 +349,16 @@ test('HeapSnapshotWriteStream - handles malformed edges array (missing opening b
   const buffer = new TextEncoder().encode(partialData)
 
   stream.write(buffer)
+  // Don't call end() to avoid triggering validation at this level
+  // Validation should be tested at the parseFromJson level instead
 
   const result = stream.getResult()
-
-  // Should still have metadata and nodes but no edges data since parsing stops at edges metadata stage
   expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7)
   expect(result.edges.length).toBe(0)
 })
 
-test('HeapSnapshotWriteStream - handles malformed locations array (missing opening bracket)', async () => {
+test('HeapSnapshotWriteStream - handles malformed locations array gracefully', async () => {
   const stream = createHeapSnapshotWriteStream()
 
   // Manually construct data where "locations": is present but no opening bracket follows
@@ -371,10 +371,10 @@ test('HeapSnapshotWriteStream - handles malformed locations array (missing openi
   const buffer = new TextEncoder().encode(partialData)
 
   stream.write(buffer)
+  // Don't call end() to avoid triggering validation at this level
+  // Validation should be tested at the parseFromJson level instead
 
   const result = stream.getResult()
-
-  // Should still have metadata, nodes, and edges but no locations data since parsing stops at locations metadata stage
   expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7)
   expect(result.edges.length).toBe(0)
@@ -400,4 +400,115 @@ test('HeapSnapshotWriteStream - handles partial data where array header is incom
   // Should have metadata but no nodes data since the array header is incomplete
   expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7) // Array is initialized with expected size but not filled
+})
+
+test('HeapSnapshotWriteStream - processes heap snapshot with strings when parseStrings is true', async () => {
+  const stream = createHeapSnapshotWriteStream({ parseStrings: true })
+
+  const heapSnapshotData = {
+    snapshot: {
+      meta: {
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
+        edge_fields: ['type', 'name_or_index', 'to_node'],
+        edge_types: [['context', 'element', 'property', 'internal']],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
+      },
+      node_count: 1,
+      edge_count: 0,
+    },
+    nodes: [0, 0, 1, 0, 0, 0, 0],
+    edges: [],
+    locations: [0, 0, 1, 2],
+    strings: ['', 'root', 'child', 'grandchild'],
+  }
+
+  const jsonData = JSON.stringify(heapSnapshotData)
+  const buffer = new TextEncoder().encode(jsonData)
+
+  stream.write(buffer)
+
+  const result = stream.getResult()
+
+  expect(result.metaData).toHaveProperty('data')
+  expect(result.metaData.data).toHaveProperty('node_count', 1)
+  expect(result.nodes.length).toBe(7) // 1 node * 7 fields
+  expect(result.edges.length).toBe(0)
+  expect(result.locations.length).toBe(4) // 1 location * 4 fields
+  expect(result.strings).toEqual(['', 'root', 'child', 'grandchild'])
+})
+
+test('HeapSnapshotWriteStream - skips strings when parseStrings is false', async () => {
+  const stream = createHeapSnapshotWriteStream({ parseStrings: false })
+
+  const heapSnapshotData = {
+    snapshot: {
+      meta: {
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
+        edge_fields: ['type', 'name_or_index', 'to_node'],
+        edge_types: [['context', 'element', 'property', 'internal']],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
+      },
+      node_count: 1,
+      edge_count: 0,
+    },
+    nodes: [0, 0, 1, 0, 0, 0, 0],
+    edges: [],
+    locations: [0, 0, 1, 2],
+    strings: ['', 'root', 'child'],
+  }
+
+  const jsonData = JSON.stringify(heapSnapshotData)
+  const buffer = new TextEncoder().encode(jsonData)
+
+  stream.write(buffer)
+
+  const result = stream.getResult()
+
+  expect(result.metaData).toHaveProperty('data')
+  expect(result.nodes.length).toBe(7)
+  expect(result.edges.length).toBe(0)
+  expect(result.locations.length).toBe(4)
+  expect(result.strings).toEqual([]) // Should be empty when parseStrings is false
+})
+
+test('HeapSnapshotWriteStream - handles partial string data', async () => {
+  const stream = createHeapSnapshotWriteStream({ parseStrings: true })
+
+  const heapSnapshotData = {
+    snapshot: {
+      meta: {
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
+        edge_fields: ['type', 'name_or_index', 'to_node'],
+        edge_types: [['context', 'element', 'property', 'internal']],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
+      },
+      node_count: 1,
+      edge_count: 0,
+    },
+    nodes: [0, 0, 1, 0, 0, 0, 0],
+    edges: [],
+    locations: [0, 0, 1, 2],
+    strings: ['', 'root', 'child'],
+  }
+
+  const jsonData = JSON.stringify(heapSnapshotData)
+  const buffer = new TextEncoder().encode(jsonData)
+
+  // Split the data into chunks
+  const chunk1 = buffer.slice(0, Math.floor(buffer.length * 0.7))
+  const chunk2 = buffer.slice(Math.floor(buffer.length * 0.7))
+
+  stream.write(chunk1)
+  stream.write(chunk2)
+
+  const result = stream.getResult()
+
+  expect(result.metaData).toHaveProperty('data')
+  expect(result.nodes.length).toBe(7)
+  expect(result.edges.length).toBe(0)
+  expect(result.locations.length).toBe(4)
+  expect(result.strings).toEqual(['', 'root', 'child'])
 })
