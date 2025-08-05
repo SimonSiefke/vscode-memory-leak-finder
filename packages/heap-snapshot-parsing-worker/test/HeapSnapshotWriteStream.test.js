@@ -1,8 +1,8 @@
-import { test, expect } from '@jest/globals'
-import { HeapSnapshotWriteStream } from '../src/parts/HeapSnapshotWriteStream/HeapSnapshotWriteStream.js'
+import { expect, test } from '@jest/globals'
+import { createHeapSnapshotWriteStream } from '../src/parts/HeapSnapshotWriteStream/HeapSnapshotWriteStream.js'
 
 test('HeapSnapshotWriteStream - constructor initializes correctly', () => {
-  const stream = new HeapSnapshotWriteStream()
+  const stream = createHeapSnapshotWriteStream()
 
   expect(stream.arrayIndex).toBe(0)
   expect(stream.currentNumber).toBe(0)
@@ -16,7 +16,7 @@ test('HeapSnapshotWriteStream - constructor initializes correctly', () => {
 })
 
 test('HeapSnapshotWriteStream - resetParsingState resets parsing state', () => {
-  const stream = new HeapSnapshotWriteStream()
+  const stream = createHeapSnapshotWriteStream()
   stream.currentNumber = 123
   stream.hasDigits = true
 
@@ -27,7 +27,7 @@ test('HeapSnapshotWriteStream - resetParsingState resets parsing state', () => {
 })
 
 test('HeapSnapshotWriteStream - getResult returns correct structure', () => {
-  const stream = new HeapSnapshotWriteStream()
+  const stream = createHeapSnapshotWriteStream()
   const result = stream.getResult()
 
   expect(result).toHaveProperty('metaData')
@@ -37,7 +37,7 @@ test('HeapSnapshotWriteStream - getResult returns correct structure', () => {
 })
 
 test('HeapSnapshotWriteStream - processes complete heap snapshot data', async () => {
-  const stream = new HeapSnapshotWriteStream()
+  const stream = createHeapSnapshotWriteStream()
 
   const heapSnapshotData = {
     snapshot: {
@@ -73,7 +73,7 @@ test('HeapSnapshotWriteStream - processes complete heap snapshot data', async ()
 })
 
 test('HeapSnapshotWriteStream - handles empty heap snapshot', async () => {
-  const stream = new HeapSnapshotWriteStream()
+  const stream = createHeapSnapshotWriteStream()
 
   const heapSnapshotData = {
     snapshot: {
@@ -109,7 +109,7 @@ test('HeapSnapshotWriteStream - handles empty heap snapshot', async () => {
 })
 
 test('HeapSnapshotWriteStream - handles partial data chunks', async () => {
-  const stream = new HeapSnapshotWriteStream()
+  const stream = createHeapSnapshotWriteStream()
 
   const heapSnapshotData = {
     snapshot: {
@@ -149,7 +149,7 @@ test('HeapSnapshotWriteStream - handles partial data chunks', async () => {
 })
 
 test('HeapSnapshotWriteStream - handles large numbers in arrays', async () => {
-  const stream = new HeapSnapshotWriteStream()
+  const stream = createHeapSnapshotWriteStream()
 
   const heapSnapshotData = {
     snapshot: {
@@ -180,7 +180,7 @@ test('HeapSnapshotWriteStream - handles large numbers in arrays', async () => {
 })
 
 test('HeapSnapshotWriteStream - handles negative numbers (skips minus sign)', async () => {
-  const stream = new HeapSnapshotWriteStream()
+  const stream = createHeapSnapshotWriteStream()
 
   const heapSnapshotData = {
     snapshot: {
@@ -211,7 +211,7 @@ test('HeapSnapshotWriteStream - handles negative numbers (skips minus sign)', as
 })
 
 test('HeapSnapshotWriteStream - handles missing nodes array header', async () => {
-  const stream = new HeapSnapshotWriteStream()
+  const stream = createHeapSnapshotWriteStream()
 
   // Create data without the "nodes": token
   const heapSnapshotData = {
@@ -245,7 +245,7 @@ test('HeapSnapshotWriteStream - handles missing nodes array header', async () =>
 })
 
 test('HeapSnapshotWriteStream - handles missing edges array header', async () => {
-  const stream = new HeapSnapshotWriteStream()
+  const stream = createHeapSnapshotWriteStream()
 
   // Create data without the "edges": token
   const heapSnapshotData = {
@@ -280,7 +280,7 @@ test('HeapSnapshotWriteStream - handles missing edges array header', async () =>
 })
 
 test('HeapSnapshotWriteStream - handles missing locations array header', async () => {
-  const stream = new HeapSnapshotWriteStream()
+  const stream = createHeapSnapshotWriteStream()
 
   // Create data without the "locations": token
   const heapSnapshotData = {
@@ -316,7 +316,7 @@ test('HeapSnapshotWriteStream - handles missing locations array header', async (
 })
 
 test('HeapSnapshotWriteStream - handles malformed nodes array (missing opening bracket)', async () => {
-  const stream = new HeapSnapshotWriteStream()
+  const stream = createHeapSnapshotWriteStream()
 
   // Manually construct data where "nodes": is present but no opening bracket follows
   const partialData =
@@ -337,7 +337,7 @@ test('HeapSnapshotWriteStream - handles malformed nodes array (missing opening b
 })
 
 test('HeapSnapshotWriteStream - handles malformed edges array (missing opening bracket)', async () => {
-  const stream = new HeapSnapshotWriteStream()
+  const stream = createHeapSnapshotWriteStream()
 
   // Manually construct data where "edges": is present but no opening bracket follows
   const partialData =
@@ -359,7 +359,7 @@ test('HeapSnapshotWriteStream - handles malformed edges array (missing opening b
 })
 
 test('HeapSnapshotWriteStream - handles malformed locations array (missing opening bracket)', async () => {
-  const stream = new HeapSnapshotWriteStream()
+  const stream = createHeapSnapshotWriteStream()
 
   // Manually construct data where "locations": is present but no opening bracket follows
   const partialData =
@@ -382,7 +382,7 @@ test('HeapSnapshotWriteStream - handles malformed locations array (missing openi
 })
 
 test('HeapSnapshotWriteStream - handles partial data where array header is incomplete', async () => {
-  const stream = new HeapSnapshotWriteStream()
+  const stream = createHeapSnapshotWriteStream()
 
   // Create data that ends before the array header is complete
   const partialData =
