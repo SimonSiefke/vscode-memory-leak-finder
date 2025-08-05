@@ -48,7 +48,10 @@ test('getBigintObjectsFromHeapSnapshot - single bigint object without variable n
       node_count: 1,
       edge_count: 0,
     },
-    nodes: [4, 1, 200, 32, 0, 0],
+    nodes: [
+      // prettier-ignore
+      4, 1, 200, 32, 0, 0,
+    ],
     edges: [],
     locations: [],
     strings: ['', 'bigint'],
@@ -80,30 +83,11 @@ test('getBigintObjectsFromHeapSnapshot - multiple bigint objects (embedded const
       edge_count: 0,
     },
     nodes: [
-      4,
-      1,
-      200,
-      32,
-      1,
-      0, // first bigint (embedded constant)
-      0,
-      0,
-      201,
-      16,
-      0,
-      0, // hidden object
-      4,
-      1,
-      202,
-      28,
-      0,
-      0, // second bigint (embedded constant)
-      4,
-      1,
-      203,
-      24,
-      2,
-      0, // third bigint (embedded constant)
+      // prettier-ignore
+      4, 1, 200, 32, 1, 0, // first bigint (embedded constant)
+      0, 0, 201, 16, 0, 0, // hidden object
+      4, 1, 202, 28, 0, 0, // second bigint (embedded constant)
+      4, 1, 203, 24, 2, 0, // third bigint (embedded constant)
     ],
     edges: [],
     locations: [],
