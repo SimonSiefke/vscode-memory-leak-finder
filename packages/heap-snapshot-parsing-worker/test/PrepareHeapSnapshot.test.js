@@ -43,7 +43,7 @@ test('prepareHeapSnapshot - parses simple heap snapshot', async () => {
   })
   mockCreateReadStream.mockReturnValue(mockReadStream)
 
-  const result = await parseFromFile('/test/mock-file-path.json')
+  const result = await parseFromFile('/test/mock-file-path.json', {})
 
   expect(result).toHaveProperty('metaData')
   expect(result).toHaveProperty('nodes')
