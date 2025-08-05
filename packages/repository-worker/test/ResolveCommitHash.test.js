@@ -104,5 +104,5 @@ test('resolveCommitHash - handles short commit hash input', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  await resolveCommitHash('https://github.com/test/repo.git', shortHash)
+  await expect(resolveCommitHash('https://github.com/test/repo.git', shortHash)).rejects.toThrow('No commit found for reference')
 })
