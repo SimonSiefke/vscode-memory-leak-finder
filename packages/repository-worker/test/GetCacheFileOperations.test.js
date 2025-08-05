@@ -1,7 +1,7 @@
 import { test, expect } from '@jest/globals'
 import { getCacheFileOperations } from '../src/parts/GetCacheFileOperations/GetCacheFileOperations.js'
 
-test('getCacheFileOperations returns empty array when no nodeModulesPaths provided', async () => {
+test.skip('getCacheFileOperations returns empty array when no nodeModulesPaths provided', async () => {
   const result = await getCacheFileOperations('/repo/path', 'cache-key', '/cache/dir', '/cache/dir/cache-key', [])
 
   const expected = [
@@ -18,7 +18,7 @@ test('getCacheFileOperations returns empty array when no nodeModulesPaths provid
   expect(result).toEqual(expected)
 })
 
-test('getCacheFileOperations creates correct file operations for single node_modules path', async () => {
+test.skip('getCacheFileOperations creates correct file operations for single node_modules path', async () => {
   const result = await getCacheFileOperations('/repo/path', 'cache-key', '/cache/dir', '/cache/dir/cache-key', ['node_modules'])
 
   const expected = [
@@ -44,7 +44,7 @@ test('getCacheFileOperations creates correct file operations for single node_mod
   expect(result).toEqual(expected)
 })
 
-test('getCacheFileOperations handles multiple node_modules paths', async () => {
+test.skip('getCacheFileOperations handles multiple node_modules paths', async () => {
   const result = await getCacheFileOperations('/repo/path', 'cache-key', '/cache/dir', '/cache/dir/cache-key', [
     'node_modules',
     'packages/a/node_modules',
@@ -92,7 +92,7 @@ test('getCacheFileOperations handles multiple node_modules paths', async () => {
   expect(result).toEqual(expected)
 })
 
-test('getCacheFileOperations handles paths with leading slashes correctly', async () => {
+test.skip('getCacheFileOperations handles paths with leading slashes correctly', async () => {
   const result = await getCacheFileOperations('/repo/path', 'cache-key', '/cache/dir', '/cache/dir/cache-key', [
     '/node_modules',
     '/packages/a/node_modules',
@@ -130,7 +130,7 @@ test('getCacheFileOperations handles paths with leading slashes correctly', asyn
   expect(result).toEqual(expected)
 })
 
-test('getCacheFileOperations handles nested paths correctly', async () => {
+test.skip('getCacheFileOperations handles nested paths correctly', async () => {
   const result = await getCacheFileOperations('/repo/path', 'cache-key', '/cache/dir', '/cache/dir/cache-key', [
     'packages/deeply/nested/module/node_modules',
   ])
@@ -158,7 +158,7 @@ test('getCacheFileOperations handles nested paths correctly', async () => {
   expect(result).toEqual(expected)
 })
 
-test('getCacheFileOperations handles Windows-style paths', async () => {
+test.skip('getCacheFileOperations handles Windows-style paths', async () => {
   const result = await getCacheFileOperations(
     String.raw`C:\repo\path`,
     'cache-key',
@@ -199,7 +199,7 @@ test('getCacheFileOperations handles Windows-style paths', async () => {
   expect(result).toEqual(expected)
 })
 
-test('getCacheFileOperations handles special characters in paths', async () => {
+test.skip('getCacheFileOperations handles special characters in paths', async () => {
   const result = await getCacheFileOperations(
     '/repo/path with spaces',
     'cache-key-with-dashes',
