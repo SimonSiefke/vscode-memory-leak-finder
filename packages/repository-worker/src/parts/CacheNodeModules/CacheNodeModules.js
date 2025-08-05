@@ -3,6 +3,7 @@ import * as Path from '../Path/Path.js'
 import * as Filesystem from '../Filesystem/Filesystem.js'
 import * as ApplyFileOperations from '../ApplyFileOperations/ApplyFileOperations.js'
 import * as GetCacheFileOperations from '../GetCacheFileOperations/GetCacheFileOperations.js'
+import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.js'
 
 /**
  * @param {string} repoPath
@@ -21,7 +22,7 @@ export const addNodeModulesToCache = async (repoPath, commitHash, cacheDir) => {
       cachedNodeModulesPath,
       nodeModulesPaths,
     )
-    await ApplyFileOperations.applyFileOperations(fileOperations)
+    await FileSystemWorker.applyFileOperations(fileOperations)
   } catch (error) {
     throw new VError(error, 'Failed to cache node_modules')
   }

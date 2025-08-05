@@ -25,3 +25,7 @@ export const readFileContent = () => {
 export const exec = () => {
   return invoke('FileSystem.exec')
 }
+
+export const applyFileOperations = (operations) => {
+  return invoke('FileSystem.applyFileOperations', operations)
+}
