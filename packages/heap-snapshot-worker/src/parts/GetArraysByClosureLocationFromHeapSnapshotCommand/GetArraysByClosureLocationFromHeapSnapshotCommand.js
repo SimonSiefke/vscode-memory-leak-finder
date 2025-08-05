@@ -6,4 +6,4 @@ export const getArraysByClosureLocationFromHeapSnapshotCommand = async (id, scri
   Assert.object(scriptMap)
   const result = await getArraysByClosureLocationFromHeapSnapshot(id, scriptMap)
   return result
-} 
+}

@@ -10,17 +10,43 @@ test('should group arrays by closure location', () => {
 
   // Mock nodes: [type, name, id, self_size, edge_count, trace_node_id, detachedness]
   const nodes = [
-    0, 0, 1, 100, 2, 1, 0, // Array 1 - trace_node_id = 1
-    0, 0, 2, 200, 1, 1, 0, // Array 2 - trace_node_id = 1 (same location)
-    0, 0, 3, 150, 1, 2, 0, // Array 3 - trace_node_id = 2 (different location)
+    0,
+    0,
+    1,
+    100,
+    2,
+    1,
+    0, // Array 1 - trace_node_id = 1
+    0,
+    0,
+    2,
+    200,
+    1,
+    1,
+    0, // Array 2 - trace_node_id = 1 (same location)
+    0,
+    0,
+    3,
+    150,
+    1,
+    2,
+    0, // Array 3 - trace_node_id = 2 (different location)
   ]
 
   // Mock edges: [type, name_or_index, to_node]
   const edges = [
-    0, 1, 0, // property edge to Array 1
-    0, 2, 0, // property edge to Array 1
-    0, 1, 1, // property edge to Array 2
-    0, 1, 2, // property edge to Array 3
+    0,
+    1,
+    0, // property edge to Array 1
+    0,
+    2,
+    0, // property edge to Array 1
+    0,
+    1,
+    1, // property edge to Array 2
+    0,
+    1,
+    2, // property edge to Array 3
   ]
 
   const parsedNodes = [
@@ -31,8 +57,14 @@ test('should group arrays by closure location', () => {
 
   // Mock locations: [object_index, script_id, line, column]
   const locations = [
-    7, 1, 10, 5, // object_index = 1 (7/7), script_id = 1, line = 10, column = 5
-    14, 2, 15, 8, // object_index = 2 (14/7), script_id = 2, line = 15, column = 8
+    7,
+    1,
+    10,
+    5, // object_index = 1 (7/7), script_id = 1, line = 10, column = 5
+    14,
+    2,
+    15,
+    8, // object_index = 2 (14/7), script_id = 2, line = 15, column = 8
   ]
 
   const scriptMap = {
@@ -95,13 +127,17 @@ test('should handle arrays without trace_node_id', () => {
 
   // Mock nodes: [type, name, id, self_size, edge_count, trace_node_id, detachedness]
   const nodes = [
-    0, 0, 1, 100, 0, 0, 0, // Array with trace_node_id = 0 (no location)
+    0,
+    0,
+    1,
+    100,
+    0,
+    0,
+    0, // Array with trace_node_id = 0 (no location)
   ]
 
   const edges = []
-  const parsedNodes = [
-    { type: 'object', name: 'Array', id: 1, selfSize: 100, edgeCount: 0, traceNodeId: 0, detachedness: 0 },
-  ]
+  const parsedNodes = [{ type: 'object', name: 'Array', id: 1, selfSize: 100, edgeCount: 0, traceNodeId: 0, detachedness: 0 }]
 
   const locations = []
   const scriptMap = {}
@@ -136,14 +172,30 @@ test('should filter out internal arrays', () => {
 
   // Mock nodes: [type, name, id, self_size, edge_count, trace_node_id, detachedness]
   const nodes = [
-    0, 0, 1, 100, 1, 1, 0, // Regular Array
-    0, 1, 2, 200, 1, 1, 0, // Internal Array (initial_array_prototype)
+    0,
+    0,
+    1,
+    100,
+    1,
+    1,
+    0, // Regular Array
+    0,
+    1,
+    2,
+    200,
+    1,
+    1,
+    0, // Internal Array (initial_array_prototype)
   ]
 
   // Mock edges: [type, name_or_index, to_node]
   const edges = [
-    0, 0, 0, // property edge to regular Array
-    0, 0, 1, // property edge to internal Array
+    0,
+    0,
+    0, // property edge to regular Array
+    0,
+    0,
+    1, // property edge to internal Array
   ]
 
   const parsedNodes = [
@@ -153,7 +205,10 @@ test('should filter out internal arrays', () => {
 
   // Mock locations: [object_index, script_id, line, column]
   const locations = [
-    7, 1, 10, 5, // object_index = 1 (7/7), script_id = 1, line = 10, column = 5
+    7,
+    1,
+    10,
+    5, // object_index = 1 (7/7), script_id = 1, line = 10, column = 5
   ]
 
   const scriptMap = {

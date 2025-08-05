@@ -69,7 +69,7 @@ export const getArraysByClosureLocationFromHeapSnapshotInternal = (
               const line = locations[locIndex + lineOffset]
               const column = locations[locIndex + columnOffset]
               locationKey = getLocationKey(scriptId, line, column)
-              
+
               const script = scriptMap[scriptId]
               locationInfo = {
                 scriptId,
@@ -207,7 +207,7 @@ export const getArraysByClosureLocationFromHeapSnapshotInternal = (
       // Filter out internal arrays
       const nonInternalArrays = closureGroup.arrays.filter((arr) => {
         if (arr.variableNames && arr.variableNames.length > 0) {
-          const uniqueNames = [...new Set(arr.variableNames.map(v => v.name))]
+          const uniqueNames = [...new Set(arr.variableNames.map((v) => v.name))]
           return !isInternalArray(uniqueNames.length === 1 ? uniqueNames[0] : uniqueNames)
         }
         return !isInternalArray(arr.name)
@@ -223,9 +223,7 @@ export const getArraysByClosureLocationFromHeapSnapshotInternal = (
         avgLength,
         arrays: nonInternalArrays.map((arr) => ({
           id: arr.id,
-          name: arr.variableNames && arr.variableNames.length > 0 
-            ? [...new Set(arr.variableNames.map(v => v.name))].sort()
-            : arr.name,
+          name: arr.variableNames && arr.variableNames.length > 0 ? [...new Set(arr.variableNames.map((v) => v.name))].sort() : arr.name,
           length: arr.length,
           selfSize: arr.selfSize,
         })),
@@ -247,4 +245,4 @@ export const getArraysByClosureLocationFromHeapSnapshotInternal = (
     })
 
   return result
-} 
+}

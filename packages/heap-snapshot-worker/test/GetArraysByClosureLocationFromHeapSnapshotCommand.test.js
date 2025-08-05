@@ -15,17 +15,39 @@ test('should get arrays by closure location', async () => {
       },
     },
     nodes: new Uint32Array([
-      0, 0, 1, 100, 1, 1, 0, // Array 1
-      0, 0, 2, 200, 1, 2, 0, // Array 2
+      0,
+      0,
+      1,
+      100,
+      1,
+      1,
+      0, // Array 1
+      0,
+      0,
+      2,
+      200,
+      1,
+      2,
+      0, // Array 2
     ]),
     edges: new Uint32Array([
-      0, 0, 0, // property edge to Array 1
-      0, 0, 1, // property edge to Array 2
+      0,
+      0,
+      0, // property edge to Array 1
+      0,
+      0,
+      1, // property edge to Array 2
     ]),
     strings: ['Array', 'items'],
     locations: new Uint32Array([
-      7, 1, 10, 5, // object_index = 1, script_id = 1, line = 10, column = 5
-      14, 2, 15, 8, // object_index = 2, script_id = 2, line = 15, column = 8
+      7,
+      1,
+      10,
+      5, // object_index = 1, script_id = 1, line = 10, column = 5
+      14,
+      2,
+      15,
+      8, // object_index = 2, script_id = 2, line = 15, column = 8
     ]),
   }
 

@@ -15,7 +15,8 @@ import * as ParseHeapSnapshotStrings from '../ParseHeapSnapshotStrings/ParseHeap
 export const commandMap = {
   'HeapSnapshot.compareFunctions': CompareHeapSnapshotsFunctions.compareHeapSnapshotFunctions,
   'HeapSnapshot.dispose': HeapSnapshotState.dispose,
-  'HeapSnapshot.getArraysByClosureLocation': GetArraysByClosureLocationFromHeapSnapshotCommand.getArraysByClosureLocationFromHeapSnapshotCommand,
+  'HeapSnapshot.getArraysByClosureLocation':
+    GetArraysByClosureLocationFromHeapSnapshotCommand.getArraysByClosureLocationFromHeapSnapshotCommand,
   'HeapSnapshot.getLargestArraysFromHeapSnapshot': GetLargestArraysFromHeapSnapshot.getLargestArraysFromHeapSnapshot,
   'HeapSnapshot.getRegexpObjects': GetRegexpObjectsFromHeapSnapshot.getRegexpObjectsFromHeapSnapshot,
   'HeapSnapshot.load': LoadHeapSnapshot.loadHeapSnapshot,
