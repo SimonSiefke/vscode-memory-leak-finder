@@ -3,12 +3,12 @@
 import { Writable } from 'node:stream'
 import { concatArray, concatUint32Array } from '../ConcatArray/ConcatArray.js'
 import { decodeArray } from '../DecodeArray/DecodeArray.js'
+import { HeapSnapshotParserError } from '../HeapSnapshotParserError/HeapSnapshotParserError.js'
 import * as HeapSnapshotParsingState from '../HeapSnapshotParsingState/HeapSnapshotParsingState.js'
 import { parseHeapSnapshotArray } from '../ParseHeapSnapshotArray/ParseHeapSnapshotArray.js'
 import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.js'
 import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.js'
 import { writeStringArrayData } from '../WriteStringArrayData/WriteStringArrayData.js'
-import { HeapSnapshotParserError } from '../HeapSnapshotParserError/HeapSnapshotParserError.js'
 
 class HeapSnapshotWriteStream extends Writable {
   constructor(options = {}) {
