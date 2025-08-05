@@ -18,8 +18,8 @@ export const findFiles = () => {
   return invoke('FileSystem.findFiles')
 }
 
-export const readFileContent = () => {
-  return invoke('FileSystem.readFileContent')
+export const readFileContent = (path) => {
+  return invoke('FileSystem.readFileContent', path)
 }
 
 export const exec = () => {
