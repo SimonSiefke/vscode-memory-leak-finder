@@ -3,7 +3,7 @@ import * as Character from '../Character/Character.js'
 import * as Ide from '../Ide/Ide.js'
 import * as TestRunMode from '../TestRunMode/TestRunMode.js'
 
-const state = {
+export const state = {
   buffering: false,
   checkLeaks: false,
   cwd: Character.EmptyString,
@@ -43,23 +43,23 @@ export const setState = (newState) => {
   state.ideVersion = newState.ideVersion
 }
 
-const setBuffering = (value) => {
+export const setBuffering = (value) => {
   state.buffering = value
 }
 
-const isBuffering = () => {
+export const isBuffering = () => {
   return state.buffering
 }
 
-const isWatchMode = () => {
+export const isWatchMode = () => {
   return state.watch
 }
 
-const shouldCheckLeaks = () => {
+export const shouldCheckLeaks = () => {
   return state.checkLeaks
 }
 
-const getRuns = () => {
+export const getRuns = () => {
   return state.runs
 }
 
