@@ -1,12 +1,12 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { codeFrameColumns } from '@babel/code-frame'
-import * as CleanStack from '../CleanStack/CleanStack.js'
-import * as ErrorCodes from '../ErrorCodes/ErrorCodes.js'
-import * as FileSystem from '../FileSystem/FileSystem.js'
-import * as SplitLines from '../SplitLines/SplitLines.js'
+import * as CleanStack from '../CleanStack/CleanStack.ts'
+import * as ErrorCodes from '../ErrorCodes/ErrorCodes.ts'
+import * as FileSystem from '../FileSystem/FileSystem.ts'
+import * as SplitLines from '../SplitLines/SplitLines.ts'
 
-import type { ErrorObject, StackFrame } from '../Types/Types.js'
+import type { ErrorObject, StackFrame } from '../Types/Types.ts'
 
 const getActualPath = (fileUri: string): string => {
   if (fileUri.startsWith('file://')) {

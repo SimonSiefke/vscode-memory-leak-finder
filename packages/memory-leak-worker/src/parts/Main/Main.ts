@@ -1,10 +1,10 @@
-import * as Callback from '../Callback/Callback.js'
-import * as Command from '../Command/Command.js'
-import * as CommandMap from '../CommandMap/CommandMap.js'
-import * as CommandState from '../CommandState/CommandState.js'
-import * as HandleIpc from '../HandleIpc/HandleIpc.js'
-import * as IpcChild from '../IpcChild/IpcChild.js'
-import * as IpcChildType from '../IpcChildType/IpcChildType.js'
+import * as Callback from '../Callback/Callback.ts'
+import * as Command from '../Command/Command.ts'
+import * as CommandMap from '../CommandMap/CommandMap.ts'
+import * as CommandState from '../CommandState/CommandState.ts'
+import * as HandleIpc from '../HandleIpc/HandleIpc.ts'
+import * as IpcChild from '../IpcChild/IpcChild.ts'
+import * as IpcChildType from '../IpcChildType/IpcChildType.ts'
 
 const handleUncaughtExceptionMonitor = (error: Error): void => {
   console.error(error)

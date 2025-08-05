@@ -1,7 +1,7 @@
 import { test, expect, jest } from '@jest/globals'
 
-import * as Command from '../src/parts/Command/Command.js'
-import * as CommandState from '../src/parts/CommandState/CommandState.js'
+import * as Command from '../src/parts/Command/Command.ts'
+import * as CommandState from '../src/parts/CommandState/CommandState.ts'
 
 test('execute - should call registered command with arguments', () => {
   // Setup

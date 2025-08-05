@@ -1,5 +1,5 @@
-import * as PTimeout from '../PTimeout/PTimeout.js'
-import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
+import * as PTimeout from '../PTimeout/PTimeout.ts'
+import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 
 export interface Session {
   readonly type: string

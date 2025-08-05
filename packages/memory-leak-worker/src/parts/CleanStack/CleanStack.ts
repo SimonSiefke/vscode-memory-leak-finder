@@ -72,8 +72,8 @@ const getRelevantLines = (lines: readonly string[], stack: string): readonly str
     stack.includes('Target was not created page') ||
     lines[1].includes('at Module.test') ||
     stack.includes('expected') ||
-    (stack.includes('at Object.evaluate ') && stack.includes('PageEvaluate/PageEvaluate.js')) ||
-    (stack.includes('at Module.evaluate ') && stack.includes('PageEvaluate/PageEvaluate.js'))
+    (stack.includes('at Object.evaluate ') && stack.includes('PageEvaluate/PageEvaluate.ts')) ||
+    (stack.includes('at Module.evaluate ') && stack.includes('PageEvaluate/PageEvaluate.ts'))
   const relevantLines: string[] = []
   for (const line of lines) {
     if (isInternal(line)) {

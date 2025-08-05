@@ -1,7 +1,7 @@
-import * as GetCombinedMeasure from '../GetCombinedMeasure/GetCombinedMeasure.js'
-import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinderState.js'
-import { VError } from '../VError/VError.js'
-import * as WaitForPage from '../WaitForPage/WaitForPage.js'
+import * as GetCombinedMeasure from '../GetCombinedMeasure/GetCombinedMeasure.ts'
+import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinderState.ts'
+import { VError } from '../VError/VError.ts'
+import * as WaitForPage from '../WaitForPage/WaitForPage.ts'
 
 export const setup = async (connectionId: string, instanceId: string, measureId: string): Promise<any> => {
   try {

@@ -1,7 +1,7 @@
-import * as Assert from '../Assert/Assert.js'
-import * as PTimeout from '../PTimeout/PTimeout.js'
-import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
-import { VError } from '../VError/VError.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as PTimeout from '../PTimeout/PTimeout.ts'
+import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
+import { VError } from '../VError/VError.ts'
 
 export interface ExecutionContext {
   readonly sessionId: string

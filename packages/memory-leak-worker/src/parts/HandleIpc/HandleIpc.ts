@@ -1,4 +1,4 @@
-import * as HandleJsonRpcMessage from '../HandleJsonRpcMessage/HandleJsonRpcMessage.js'
+import * as HandleJsonRpcMessage from '../HandleJsonRpcMessage/HandleJsonRpcMessage.ts'
 
 export const handleIpc = (ipc: any, execute: any, resolve: any): void => {
   const handleMessage = (message: any): void => {

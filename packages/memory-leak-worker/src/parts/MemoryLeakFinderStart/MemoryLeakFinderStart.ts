@@ -1,5 +1,5 @@
-import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinderState.js'
-import * as WaitForCrash from '../WaitForCrash/WaitForCrash.js'
+import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinderState.ts'
+import * as WaitForCrash from '../WaitForCrash/WaitForCrash.ts'
 
 const doStart = async (instanceId: string): Promise<any> => {
   const measure = MemoryLeakFinderState.get(instanceId)

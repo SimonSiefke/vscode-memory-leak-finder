@@ -1,5 +1,5 @@
 import { parentPort } from 'node:worker_threads'
-import { IpcError } from '../IpcError/IpcError.js'
+import { IpcError } from '../IpcError/IpcError.ts'
 
 export const create = () => {
   if (!parentPort) {

@@ -1,6 +1,6 @@
 import { test, expect } from '@jest/globals'
 
-import * as CommandState from '../src/parts/CommandState/CommandState.js'
+import * as CommandState from '../src/parts/CommandState/CommandState.ts'
 
 test('registerCommand - should register a command function', () => {
   const mockFn = () => 'test'

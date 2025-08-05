@@ -1,4 +1,4 @@
-import * as GetResponse from '../GetResponse/GetResponse.js'
+import * as GetResponse from '../GetResponse/GetResponse.ts'
 
 export const handleJsonRpcMessage = async (ipc: any, message: any, execute: any, resolve: any): Promise<void> => {
   if ('result' in message || 'error' in message) {

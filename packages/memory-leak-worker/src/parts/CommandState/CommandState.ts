@@ -1,4 +1,4 @@
-import type { CommandFunction } from '../Types/Types.js'
+import type { CommandFunction } from '../Types/Types.ts'
 
 interface State {
   commands: Record<string, CommandFunction>

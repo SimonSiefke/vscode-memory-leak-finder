@@ -1,7 +1,7 @@
-import { CommandNotFoundError } from '../CommandNotFoundError/CommandNotFoundError.js'
-import * as CommandState from '../CommandState/CommandState.js'
+import { CommandNotFoundError } from '../CommandNotFoundError/CommandNotFoundError.ts'
+import * as CommandState from '../CommandState/CommandState.ts'
 
-import type { ExecuteFunction } from '../Types/Types.js'
+import type { ExecuteFunction } from '../Types/Types.ts'
 
 export const execute: ExecuteFunction = (command: string, ...args: unknown[]): unknown => {
   const fn = CommandState.getCommand(command)

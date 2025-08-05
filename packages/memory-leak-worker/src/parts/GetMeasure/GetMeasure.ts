@@ -1,4 +1,4 @@
-import * as CamelCase from '../CamelCase/CamelCase.js'
+import * as CamelCase from '../CamelCase/CamelCase.ts'
 
 interface Measure {
   readonly id: string

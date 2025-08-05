@@ -1,5 +1,5 @@
-import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.js'
-import * as Assert from '../Assert/Assert.js'
+import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.ts'
+import * as Assert from '../Assert/Assert.ts'
 
 export const crashInfo = { crashed: true }
 

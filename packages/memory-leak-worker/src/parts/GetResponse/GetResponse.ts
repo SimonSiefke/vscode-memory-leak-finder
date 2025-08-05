@@ -1,7 +1,7 @@
-import * as GetErrorResponse from '../GetErrorResponse/GetErrorResponse.js'
-import * as GetSuccessResponse from '../GetSuccessResponse/GetSuccessResponse.js'
+import * as GetErrorResponse from '../GetErrorResponse/GetErrorResponse.ts'
+import * as GetSuccessResponse from '../GetSuccessResponse/GetSuccessResponse.ts'
 
-import type { IpcMessage, ExecuteFunction } from '../Types/Types.js'
+import type { IpcMessage, ExecuteFunction } from '../Types/Types.ts'
 
 export const getResponse = async (message: IpcMessage, execute: ExecuteFunction): Promise<IpcMessage> => {
   try {

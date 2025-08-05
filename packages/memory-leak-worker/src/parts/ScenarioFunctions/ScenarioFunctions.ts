@@ -1,21 +1,21 @@
-import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.js'
+import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
 import {
   DevtoolsProtocolHeapProfiler,
   DevtoolsProtocolPage,
   DevtoolsProtocolRuntime,
   DevtoolsProtocolTarget,
-} from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.js'
-import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.js'
-import * as PTimeout from '../PTimeout/PTimeout.js'
-import * as SessionState from '../SessionState/SessionState.js'
-import * as TargetState from '../TargetState/TargetState.js'
-import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
-import * as UtilityScript from '../UtilityScript/UtilityScript.js'
-import { VError } from '../VError/VError.js'
-import type { Session } from '../SessionState/SessionState.js'
-import type { ExecutionContext } from '../ExecutionContextState/ExecutionContextState.js'
-import type { DevToolsMessage } from '../Types/Types.js'
+} from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.ts'
+import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.ts'
+import * as PTimeout from '../PTimeout/PTimeout.ts'
+import * as SessionState from '../SessionState/SessionState.ts'
+import * as TargetState from '../TargetState/TargetState.ts'
+import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
+import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
+import { VError } from '../VError/VError.ts'
+import type { Session } from '../SessionState/SessionState.ts'
+import type { ExecutionContext } from '../ExecutionContextState/ExecutionContextState.ts'
+import type { DevToolsMessage } from '../Types/Types.ts'
 
 export const Locator = (selector: string): { selector: string } => {
   return {
