@@ -1,6 +1,7 @@
-import { test, expect, beforeEach } from '@jest/globals'
+import { test, expect } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.js'
+import { findPackageLockFiles } from '../src/parts/FindPackageLockFiles/FindPackageLockFiles.js'
 
 test('findPackageLockFiles - returns empty array when no package-lock.json files found', async () => {
   const mockRpc = MockRpc.create({
@@ -14,7 +15,6 @@ test('findPackageLockFiles - returns empty array when no package-lock.json files
   })
   FileSystemWorker.set(mockRpc)
 
-  const { findPackageLockFiles } = await import('../src/parts/FindPackageLockFiles/FindPackageLockFiles.js')
   const result = await findPackageLockFiles('/test/path')
 
   expect(result).toEqual([])
@@ -34,7 +34,6 @@ test('findPackageLockFiles - returns file URIs when package-lock.json files foun
   })
   FileSystemWorker.set(mockRpc)
 
-  const { findPackageLockFiles } = await import('../src/parts/FindPackageLockFiles/FindPackageLockFiles.js')
   const result = await findPackageLockFiles('/test/path')
 
   expect(result).toEqual(['/test/path/package-lock.json', '/test/path/subdir/package-lock.json'])
@@ -54,7 +53,6 @@ test('findPackageLockFiles - excludes node_modules package-lock.json files', asy
   })
   FileSystemWorker.set(mockRpc)
 
-  const { findPackageLockFiles } = await import('../src/parts/FindPackageLockFiles/FindPackageLockFiles.js')
   const result = await findPackageLockFiles('/test/path')
 
   // Should only return package-lock.json files not in node_modules
@@ -73,6 +71,5 @@ test('findPackageLockFiles - throws VError when findFiles fails', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  const { findPackageLockFiles } = await import('../src/parts/FindPackageLockFiles/FindPackageLockFiles.js')
   await expect(findPackageLockFiles('/test/path')).rejects.toThrow('Failed to find package-lock.json files in directory')
 })

@@ -1,6 +1,7 @@
 import { expect, test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.js'
+import { runCompile } from '../src/parts/RunCompile/RunCompile.js'
 
 test('runCompile executes npm run compile without nice', async () => {
   const cwd = '/test/repo'
@@ -21,7 +22,6 @@ test('runCompile executes npm run compile without nice', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  const { runCompile } = await import('../src/parts/RunCompile/RunCompile.js')
   await runCompile(cwd, useNice, mainJsPath)
 })
 
@@ -44,7 +44,6 @@ test('runCompile executes npm run compile with nice', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  const { runCompile } = await import('../src/parts/RunCompile/RunCompile.js')
   await runCompile(cwd, useNice, mainJsPath)
 })
 
@@ -67,7 +66,6 @@ test('runCompile throws error when main.js not found after compilation', async (
   })
   FileSystemWorker.set(mockRpc)
 
-  const { runCompile } = await import('../src/parts/RunCompile/RunCompile.js')
   await expect(runCompile(cwd, useNice, mainJsPath)).rejects.toThrow('Build failed: out/main.js not found after compilation')
 })
 
@@ -90,6 +88,5 @@ test('runCompile logs when using nice', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  const { runCompile } = await import('../src/parts/RunCompile/RunCompile.js')
   await runCompile(cwd, useNice, mainJsPath)
 })

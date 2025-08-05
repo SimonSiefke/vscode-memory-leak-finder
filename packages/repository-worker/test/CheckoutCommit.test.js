@@ -1,6 +1,7 @@
 import { expect, test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.js'
+import { checkoutCommit } from '../src/parts/CheckoutCommit/CheckoutCommit.js'
 
 test('checkoutCommit executes git checkout command', async () => {
   const repoPath = '/test/repo'
@@ -17,7 +18,6 @@ test('checkoutCommit executes git checkout command', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  const { checkoutCommit } = await import('../src/parts/CheckoutCommit/CheckoutCommit.js')
   await checkoutCommit(repoPath, commit)
 })
 
@@ -36,7 +36,6 @@ test('checkoutCommit handles different commit formats', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  const { checkoutCommit } = await import('../src/parts/CheckoutCommit/CheckoutCommit.js')
   await checkoutCommit(repoPath, commit)
 })
 
@@ -55,6 +54,5 @@ test('checkoutCommit handles short commit hash', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  const { checkoutCommit } = await import('../src/parts/CheckoutCommit/CheckoutCommit.js')
   await checkoutCommit(repoPath, commit)
 })

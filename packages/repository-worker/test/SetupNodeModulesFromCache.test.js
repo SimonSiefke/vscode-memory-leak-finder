@@ -1,6 +1,7 @@
 import { expect, test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.js'
+import { setupNodeModulesFromCache } from '../src/parts/SetupNodeModulesFromCache/SetupNodeModulesFromCache.js'
 
 test('setupNodeModulesFromCache throws VError when no cache exists', async () => {
   const mockRpc = MockRpc.create({
@@ -14,7 +15,6 @@ test('setupNodeModulesFromCache throws VError when no cache exists', async () =>
   })
   FileSystemWorker.set(mockRpc)
 
-  const { setupNodeModulesFromCache } = await import('../src/parts/SetupNodeModulesFromCache/SetupNodeModulesFromCache.js')
   await expect(setupNodeModulesFromCache('/nonexistent/path', 'test-commit', '/test/cache')).rejects.toThrow(
     'Failed to setup node_modules from cache',
   )

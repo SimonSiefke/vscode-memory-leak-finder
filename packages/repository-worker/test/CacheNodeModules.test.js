@@ -2,6 +2,7 @@ import { expect, test, beforeEach } from '@jest/globals'
 import { VError } from '@lvce-editor/verror'
 import { MockRpc } from '@lvce-editor/rpc'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.js'
+import { addNodeModulesToCache } from '../src/parts/CacheNodeModules/CacheNodeModules.js'
 
 test('addNodeModulesToCache - successfully caches node_modules', async () => {
   const mockNodeModulesPaths = ['node_modules', 'packages/a/node_modules', 'packages/b/node_modules']
@@ -24,7 +25,6 @@ test('addNodeModulesToCache - successfully caches node_modules', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  const { addNodeModulesToCache } = await import('../src/parts/CacheNodeModules/CacheNodeModules.js')
   await addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')
 })
 
@@ -53,7 +53,6 @@ test('addNodeModulesToCache - filters out nested node_modules and .git directori
   })
   FileSystemWorker.set(mockRpc)
 
-  const { addNodeModulesToCache } = await import('../src/parts/CacheNodeModules/CacheNodeModules.js')
   await addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')
 })
 
@@ -72,7 +71,6 @@ test('addNodeModulesToCache - handles empty node_modules list', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  const { addNodeModulesToCache } = await import('../src/parts/CacheNodeModules/CacheNodeModules.js')
   await addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')
 })
 
@@ -88,7 +86,6 @@ test('addNodeModulesToCache - throws VError when findFiles fails', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  const { addNodeModulesToCache } = await import('../src/parts/CacheNodeModules/CacheNodeModules.js')
   await expect(addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow(VError)
   await expect(addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow('Failed to cache node_modules')
 })
@@ -108,7 +105,6 @@ test('addNodeModulesToCache - throws VError when getCacheFileOperations fails', 
   })
   FileSystemWorker.set(mockRpc)
 
-  const { addNodeModulesToCache } = await import('../src/parts/CacheNodeModules/CacheNodeModules.js')
   await expect(addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow(VError)
   await expect(addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow('Failed to cache node_modules')
 })
@@ -128,7 +124,6 @@ test('addNodeModulesToCache - throws VError when applyFileOperations fails', asy
   })
   FileSystemWorker.set(mockRpc)
 
-  const { addNodeModulesToCache } = await import('../src/parts/CacheNodeModules/CacheNodeModules.js')
   await expect(addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow(VError)
   await expect(addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow('Failed to cache node_modules')
 })
@@ -157,6 +152,5 @@ test('addNodeModulesToCache - handles complex nested directory structure', async
   })
   FileSystemWorker.set(mockRpc)
 
-  const { addNodeModulesToCache } = await import('../src/parts/CacheNodeModules/CacheNodeModules.js')
   await addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')
 })

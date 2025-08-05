@@ -1,6 +1,7 @@
 import { expect, test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.js'
+import { getFilesHash } from '../src/parts/GetFilesHash/GetFilesHash.js'
 
 test('getFilesHash returns hash of file contents', async () => {
   const absolutePaths = ['/path/to/file1.txt', '/path/to/file2.txt']
@@ -24,7 +25,6 @@ test('getFilesHash returns hash of file contents', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  const { getFilesHash } = await import('../src/parts/GetFilesHash/GetFilesHash.js')
   const result = await getFilesHash(absolutePaths)
 
   expect(result).toBe(expectedHash)
@@ -44,7 +44,6 @@ test('getFilesHash throws VError when readFileContent fails', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  const { getFilesHash } = await import('../src/parts/GetFilesHash/GetFilesHash.js')
   await expect(getFilesHash(absolutePaths)).rejects.toThrow('Failed to get files hash')
 })
 
@@ -63,6 +62,5 @@ test('getFilesHash throws VError when getHash fails', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  const { getFilesHash } = await import('../src/parts/GetFilesHash/GetFilesHash.js')
   await expect(getFilesHash(absolutePaths)).rejects.toThrow('Failed to get files hash')
 })
