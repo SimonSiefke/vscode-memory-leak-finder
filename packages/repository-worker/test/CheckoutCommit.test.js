@@ -9,7 +9,7 @@ test('checkoutCommit executes git checkout command', async () => {
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.exec') {
         return { stdout: '', stderr: '', exitCode: 0 }
       }
@@ -27,7 +27,7 @@ test('checkoutCommit handles different commit formats', async () => {
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.exec') {
         return { stdout: '', stderr: '', exitCode: 0 }
       }
@@ -45,7 +45,7 @@ test('checkoutCommit handles short commit hash', async () => {
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.exec') {
         return { stdout: '', stderr: '', exitCode: 0 }
       }

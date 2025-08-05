@@ -10,7 +10,7 @@ test('runCompile executes npm run compile without nice', async () => {
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.exec') {
         return { stdout: '', stderr: '', exitCode: 0 }
       }
@@ -32,7 +32,7 @@ test('runCompile executes npm run compile with nice', async () => {
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.exec') {
         return { stdout: '', stderr: '', exitCode: 0 }
       }
@@ -54,7 +54,7 @@ test('runCompile throws error when main.js not found after compilation', async (
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.exec') {
         return { stdout: '', stderr: '', exitCode: 0 }
       }
@@ -76,7 +76,7 @@ test('runCompile logs when using nice', async () => {
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.exec') {
         return { stdout: '', stderr: '', exitCode: 0 }
       }
