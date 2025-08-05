@@ -8,7 +8,7 @@ export const set = (rpc) => {
 
 const invoke = (method, ...params) => {
   if (!state.rpc) {
-    return
+    throw new Error('must intiialize filesystem worker')
   }
   // @ts-ignore
   return state.rpc.invoke(method, ...params)
