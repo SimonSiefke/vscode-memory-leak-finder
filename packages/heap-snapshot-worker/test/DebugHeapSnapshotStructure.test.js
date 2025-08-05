@@ -25,14 +25,16 @@ test('debugHeapSnapshotStructure', async () => {
 
   // Analyze node types
   const nodeTypeCounts = {}
-  parsedNodes.slice(0, 1000).forEach(node => {
+  parsedNodes.slice(0, 1000).forEach((node) => {
     nodeTypeCounts[node.type] = (nodeTypeCounts[node.type] || 0) + 1
   })
 
   console.log('\n=== NODE TYPE DISTRIBUTION (first 1000) ===')
-  Object.entries(nodeTypeCounts).sort((a, b) => b[1] - a[1]).forEach(([type, count]) => {
-    console.log(`${type}: ${count}`)
-  })
+  Object.entries(nodeTypeCounts)
+    .sort((a, b) => b[1] - a[1])
+    .forEach(([type, count]) => {
+      console.log(`${type}: ${count}`)
+    })
 
   // Analyze edge types for a few nodes
   console.log('\n=== SAMPLE EDGE ANALYSIS ===')
@@ -41,18 +43,21 @@ test('debugHeapSnapshotStructure', async () => {
     const edges = graph[node.id] || []
 
     console.log(`Node ${i}: ${node.type} "${node.name}" (ID: ${node.id})`)
-    console.log(`  Edges (${edges.length}):`, edges.slice(0, 5).map(e => `${e.type}:${e.name}`))
+    console.log(
+      `  Edges (${edges.length}):`,
+      edges.slice(0, 5).map((e) => `${e.type}:${e.name}`),
+    )
 
     if (edges.length > 0) {
       // Look for prototype-related edges
-      const prototypeEdges = edges.filter(e =>
-        e.name === '__proto__' ||
-        e.name === 'prototype' ||
-        e.type === 'internal' ||
-        e.name.includes('proto')
+      const prototypeEdges = edges.filter(
+        (e) => e.name === '__proto__' || e.name === 'prototype' || e.type === 'internal' || e.name.includes('proto'),
       )
       if (prototypeEdges.length > 0) {
-        console.log(`  Prototype-related edges:`, prototypeEdges.map(e => `${e.type}:${e.name}`))
+        console.log(
+          `  Prototype-related edges:`,
+          prototypeEdges.map((e) => `${e.type}:${e.name}`),
+        )
       }
     }
   }
@@ -66,7 +71,7 @@ test('debugHeapSnapshotStructure', async () => {
   for (let i = 0; i < 100 && i < parsedNodes.length; i++) {
     const node = parsedNodes[i]
     const edges = graph[node.id] || []
-    edges.forEach(edge => {
+    edges.forEach((edge) => {
       edgeNames.add(edge.name)
       edgeTypes.add(edge.type)
     })
@@ -77,14 +82,14 @@ test('debugHeapSnapshotStructure', async () => {
 
   // Look specifically for objects and their prototype chains
   console.log('\n=== OBJECT PROTOTYPE ANALYSIS ===')
-  const objects = parsedNodes.filter(n => n.type === 'object').slice(0, 10)
+  const objects = parsedNodes.filter((n) => n.type === 'object').slice(0, 10)
   objects.forEach((obj, i) => {
     const edges = graph[obj.id] || []
     console.log(`Object ${i}: "${obj.name}"`)
-    console.log(`  All edges: ${edges.map(e => `${e.type}:${e.name}`).join(', ')}`)
+    console.log(`  All edges: ${edges.map((e) => `${e.type}:${e.name}`).join(', ')}`)
 
     // Try to find prototype chain
-    const protoEdge = edges.find(e => e.name === '__proto__' || e.name === 'prototype')
+    const protoEdge = edges.find((e) => e.name === '__proto__' || e.name === 'prototype')
     if (protoEdge) {
       console.log(`  → Found prototype edge: ${protoEdge.type}:${protoEdge.name} → ${protoEdge.to_node}`)
     } else {

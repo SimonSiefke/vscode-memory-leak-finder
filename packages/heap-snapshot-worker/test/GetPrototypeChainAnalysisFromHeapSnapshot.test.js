@@ -65,7 +65,7 @@ test('detectsLongPrototypeChains', async () => {
       // Node 14: ComponentN
       3, 14, 14, 80, 1, 0, 0,
       // Node 15: Object.prototype (end of chain)
-      3, 15, 15, 50, 0, 0, 0
+      3, 15, 15, 50, 0, 0, 0,
     ],
     edges: [
       // Instance -> ComponentA
@@ -97,26 +97,26 @@ test('detectsLongPrototypeChains', async () => {
       // ComponentM -> ComponentN
       2, 16, 14,
       // ComponentN -> Object.prototype
-      2, 16, 15
+      2, 16, 15,
     ],
     strings: [
-      'MyInstance',          // 0
-      'ComponentA',          // 1
-      'ComponentB',          // 2
-      'ComponentC',          // 3
-      'ComponentD',          // 4
-      'ComponentE',          // 5
-      'ComponentF',          // 6
-      'ComponentG',          // 7
-      'ComponentH',          // 8
-      'ComponentI',          // 9
-      'ComponentJ',          // 10
-      'ComponentK',          // 11
-      'ComponentL',          // 12
-      'ComponentM',          // 13
-      'ComponentN',          // 14
-      'Object',              // 15
-      '__proto__'            // 16
+      'MyInstance', // 0
+      'ComponentA', // 1
+      'ComponentB', // 2
+      'ComponentC', // 3
+      'ComponentD', // 4
+      'ComponentE', // 5
+      'ComponentF', // 6
+      'ComponentG', // 7
+      'ComponentH', // 8
+      'ComponentI', // 9
+      'ComponentJ', // 10
+      'ComponentK', // 11
+      'ComponentL', // 12
+      'ComponentM', // 13
+      'ComponentN', // 14
+      'Object', // 15
+      '__proto__', // 16
     ],
     locations: [],
   }
@@ -178,21 +178,31 @@ test('detectsPrototypePollution', async () => {
       // 1000 user objects
       ...Array.from({ length: 1000 }, (_, i) => [3, 0, i, 50, 1, 0, 0]).flat(),
       // Object.prototype with pollution
-      3, 1, 1000, 100, 2, 0, 0
+      3,
+      1,
+      1000,
+      100,
+      2,
+      0,
+      0,
     ],
     edges: [
       // All user objects point to polluted Object.prototype
       ...Array.from({ length: 1000 }, (_, i) => [2, 2, 1000]).flat(),
       // Object.prototype has polluted properties
-      2, 3, 1001, // isAdmin property
-      2, 4, 1002  // secret property
+      2,
+      3,
+      1001, // isAdmin property
+      2,
+      4,
+      1002, // secret property
     ],
     strings: [
-      'UserObject',     // 0
-      'Object',         // 1
-      '__proto__',      // 2
-      'isAdmin',        // 3 - POLLUTION!
-      'secretData'      // 4 - POLLUTION!
+      'UserObject', // 0
+      'Object', // 1
+      '__proto__', // 2
+      'isAdmin', // 3 - POLLUTION!
+      'secretData', // 4 - POLLUTION!
     ],
     locations: [],
   }
@@ -205,7 +215,7 @@ test('detectsPrototypePollution', async () => {
   // Should detect prototype pollution
   expect(analysis.prototypePollution.length).toBeGreaterThan(0)
 
-  const pollution = analysis.prototypePollution.find(p => p.propertyName === 'isAdmin')
+  const pollution = analysis.prototypePollution.find((p) => p.propertyName === 'isAdmin')
   expect(pollution).toBeDefined()
   expect(pollution.affectedObjectCount).toBe(1000)
   expect(pollution.severity).toBe('critical') // Because 'isAdmin' is security-related
@@ -254,19 +264,19 @@ test('handlesNormalPrototypeChains', async () => {
       // Custom prototype
       3, 1, 1, 30, 1, 0, 0,
       // Object.prototype
-      3, 2, 2, 20, 0, 0, 0
+      3, 2, 2, 20, 0, 0, 0,
     ],
     edges: [
       // Instance -> Custom prototype
       2, 3, 1,
       // Custom prototype -> Object.prototype
-      2, 3, 2
+      2, 3, 2,
     ],
     strings: [
-      'MyObject',    // 0
+      'MyObject', // 0
       'MyPrototype', // 1
-      'Object',      // 2
-      '__proto__'    // 3
+      'Object', // 2
+      '__proto__', // 3
     ],
     locations: [],
   }

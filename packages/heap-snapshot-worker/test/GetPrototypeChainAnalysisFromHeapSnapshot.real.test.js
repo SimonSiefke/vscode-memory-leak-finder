@@ -24,7 +24,7 @@ test('analyzesRealHeapSnapshot', async () => {
       console.log(`Chain ${i + 1}:`)
       console.log(`  Node: ${chain.nodeName} (ID: ${chain.nodeId})`)
       console.log(`  Length: ${chain.chainLength}`)
-      console.log(`  Chain: ${chain.prototypeChain.map(p => p.nodeName).join(' -> ')}`)
+      console.log(`  Chain: ${chain.prototypeChain.map((p) => p.nodeName).join(' -> ')}`)
       if (chain.suspiciousProperties.length > 0) {
         console.log(`  Suspicious properties: ${chain.suspiciousProperties.length}`)
       }
@@ -45,7 +45,7 @@ test('analyzesRealHeapSnapshot', async () => {
   if (analysis.suspiciousPatterns.securityIssues.length > 0) {
     console.log('\n=== SECURITY ISSUES ===')
     console.log('Critical security-related prototype pollution detected!')
-    analysis.suspiciousPatterns.securityIssues.forEach(issue => {
+    analysis.suspiciousPatterns.securityIssues.forEach((issue) => {
       console.log(`  - ${issue.propertyName} affects ${issue.affectedObjectCount} objects`)
     })
   }
@@ -53,7 +53,7 @@ test('analyzesRealHeapSnapshot', async () => {
   if (analysis.suspiciousPatterns.performanceIssues.length > 0) {
     console.log('\n=== PERFORMANCE ISSUES ===')
     console.log('Very long prototype chains detected (20+ levels):')
-    analysis.suspiciousPatterns.performanceIssues.forEach(issue => {
+    analysis.suspiciousPatterns.performanceIssues.forEach((issue) => {
       console.log(`  - ${issue.nodeName}: ${issue.chainLength} levels`)
     })
   }
@@ -61,7 +61,7 @@ test('analyzesRealHeapSnapshot', async () => {
   if (analysis.suspiciousPatterns.possibleFrameworkIssue.length > 0) {
     console.log('\n=== POSSIBLE FRAMEWORK ISSUES ===')
     console.log('Component/Mixin inheritance chains:')
-    analysis.suspiciousPatterns.possibleFrameworkIssue.forEach(issue => {
+    analysis.suspiciousPatterns.possibleFrameworkIssue.forEach((issue) => {
       console.log(`  - ${issue.nodeName}: ${issue.chainLength} levels`)
     })
   }

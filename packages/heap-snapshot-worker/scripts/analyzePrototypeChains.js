@@ -21,19 +21,19 @@ const analyzeHeapSnapshotPrototypeChains = async () => {
     metadata: {
       timestamp: new Date().toISOString(),
       heapSnapshotPath,
-      analysisType: 'prototype-chain-analysis'
+      analysisType: 'prototype-chain-analysis',
     },
     summary: {
       totalObjectsAnalyzed: analysis.prototypeStatistics.count,
       longPrototypeChainsFound: analysis.longPrototypeChains.length,
       prototypePollutionFound: analysis.prototypePollution.length,
-      statisticalOverview: analysis.prototypeStatistics
+      statisticalOverview: analysis.prototypeStatistics,
     },
     longPrototypeChains: analysis.longPrototypeChains,
     prototypePollution: analysis.prototypePollution,
     suspiciousPatterns: analysis.suspiciousPatterns,
     detailedStatistics: analysis.prototypeStatistics,
-    objectDetails: analysis.detailedResults
+    objectDetails: analysis.detailedResults,
   }
 
   await writeFile(outputPath, JSON.stringify(report, null, 2), 'utf8')
