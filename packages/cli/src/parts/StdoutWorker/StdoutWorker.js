@@ -14,7 +14,7 @@ export const invoke = async (method, ...params) => {
   state.rpc.invoke(method, ...params)
 }
 
-export const cleanup = () => {
+const cleanup = () => {
   if (state.rpc) {
     state.rpc.dispose()
     state.rpc = undefined
