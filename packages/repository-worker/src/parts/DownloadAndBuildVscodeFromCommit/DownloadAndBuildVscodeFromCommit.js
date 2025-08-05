@@ -16,6 +16,8 @@ import * as Logger from '../Logger/Logger.js'
  * @param {string} repoUrl - The repository URL to clone
  * @param {string} reposDir - The directory name for storing repositories
  * @param {string} cacheDir - The cache directory path
+ * @param {boolean} useNice - Whether to use nice command for resource management
+ * @returns {Promise<string>} The path to the built VS Code binary
  */
 export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, reposDir, cacheDir, useNice) => {
   // Resolve the commit reference to an actual commit hash
@@ -67,4 +69,8 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, repos
     Logger.log(`Compiling VS Code for commit ${commitHash}...`)
     await RunCompile.runCompile(repoPath, useNice, mainJsPath)
   }
+
+  // Return the path to the built VS Code binary
+  const codeScriptPath = Path.join(repoPath, 'scripts', 'code.sh')
+  return codeScriptPath
 }
