@@ -1,6 +1,5 @@
 import * as Path from '../Path/Path.js'
 import * as Filesystem from '../Filesystem/Filesystem.js'
-// import { pathExists } from 'path-exists' (removed)
 import * as CacheNodeModules from '../CacheNodeModules/CacheNodeModules.js'
 import * as CheckCacheExists from '../CheckCacheExists/CheckCacheExists.js'
 import * as CheckoutCommit from '../CheckoutCommit/CheckoutCommit.js'
