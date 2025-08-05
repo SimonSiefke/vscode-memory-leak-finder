@@ -1,4 +1,4 @@
-import * as Process from '../Process/Process.js'
+import * as Process from '../Process/Process.ts'
 
 export const setRawMode = (value) => {
   Process.stdin.setRawMode(value)
