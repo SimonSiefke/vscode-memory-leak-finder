@@ -37,6 +37,7 @@ test('getBinaryPath - prioritizes vscodePath over commit', async () => {
 })
 
 test('getBinaryPath - uses commit when no vscodePath provided', async () => {
+  // @ts-ignore
   const mockDownloadAndBuildVscodeFromCommit = jest.fn().mockResolvedValue('/path/to/built/vscode')
 
   jest.unstable_mockModule('../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js', () => ({

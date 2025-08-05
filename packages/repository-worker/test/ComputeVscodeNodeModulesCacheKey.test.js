@@ -40,7 +40,7 @@ test('computeVscodeNodeModulesCacheKey - handles errors gracefully', async () =>
   })
   FileSystemWorker.set(mockRpc)
 
-  // Should not throw with invalid path
-  await computeVscodeNodeModulesCacheKey(pathToFileURL('/nonexistent/path').href)
+  // Should throw a VError with proper error message
+  await expect(computeVscodeNodeModulesCacheKey(pathToFileURL('/nonexistent/path').href)).rejects.toThrow('Failed to compute VS Code node_modules cache key')
   expect(mockInvoke).toHaveBeenCalled()
 })

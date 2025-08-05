@@ -14,7 +14,9 @@ test('downloadAndBuildVscodeFromCommit - launches repository worker and calls co
     dispose: mockDispose,
   }
 
+  // @ts-ignore
   mockLaunch.mockResolvedValue(mockIpc)
+  // @ts-ignore
   mockInvoke.mockResolvedValue('/path/to/built/vscode')
 
   jest.unstable_mockModule('../src/parts/RepositoryWorker/RepositoryWorker.js', () => ({
@@ -52,7 +54,9 @@ test('downloadAndBuildVscodeFromCommit - disposes worker even if invoke fails', 
     dispose: mockDispose,
   }
 
+  // @ts-ignore
   mockLaunch.mockResolvedValue(mockIpc)
+  // @ts-ignore
   mockInvoke.mockRejectedValue(new Error('Test error'))
 
   jest.unstable_mockModule('../src/parts/RepositoryWorker/RepositoryWorker.js', () => ({
