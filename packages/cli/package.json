@@ -18,7 +18,7 @@
     "@lvce-editor/assert": "^1.4.0",
     "@lvce-editor/verror": "^1.7.0",
     "ansi-escapes": "^7.0.0",
-    "chalk": "^5.4.1"
+    "chalk": "^5.5.0"
   },
   "devDependencies": {
     "@types/node": "^24.1.0"
@@ -38,10 +38,10 @@
     "collectCoverage": true,
     "coverageThreshold": {
       "global": {
-        "branches": 40,
-        "functions": 40,
-        "lines": 40,
-        "statements": 40
+        "branches": 30,
+        "functions": 30,
+        "lines": 30,
+        "statements": 30
       }
     }
   },

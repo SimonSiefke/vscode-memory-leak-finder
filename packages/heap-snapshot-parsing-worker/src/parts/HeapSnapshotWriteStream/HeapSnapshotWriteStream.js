@@ -2,17 +2,14 @@
 
 import { Writable } from 'node:stream'
 import { concatArray, concatUint32Array } from '../ConcatArray/ConcatArray.js'
+import { decodeArray } from '../DecodeArray/DecodeArray.js'
 import * as HeapSnapshotParsingState from '../HeapSnapshotParsingState/HeapSnapshotParsingState.js'
 import { parseHeapSnapshotArray } from '../ParseHeapSnapshotArray/ParseHeapSnapshotArray.js'
 import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.js'
 import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.js'
 
-const decodeArray = (data) => {
-  return new TextDecoder().decode(data)
-}
-
 export class HeapSnapshotWriteStream extends Writable {
-  constructor() {
+  constructor(options) {
     super()
     this.arrayIndex = 0
     this.currentNumber = 0
@@ -23,7 +20,10 @@ export class HeapSnapshotWriteStream extends Writable {
     this.locations = new Uint32Array()
     this.metaData = {}
     this.nodes = new Uint32Array()
+    this.options = options
     this.state = HeapSnapshotParsingState.SearchingSnapshotMetaData
+    this.strings = []
+    this.validate = false // TODO
   }
 
   /**
@@ -192,13 +192,33 @@ export class HeapSnapshotWriteStream extends Writable {
 
   start() {}
 
+  validateRequiredMetadata() {
+    // TODO make validation required
+    if (!this.validate) {
+      return
+    }
+
+    if (!this.metaData || !this.metaData.data) {
+      throw new Error('Missing required metadata in heap snapshot')
+    }
+
+    if (this.state !== HeapSnapshotParsingState.Done) {
+      throw new Error('Heap snapshot parsing did not complete successfully')
+    }
+  }
+
+  _final(callback) {
+    this.validateRequiredMetadata()
+    callback()
+  }
+
   getResult() {
     return {
       metaData: this.metaData,
       edges: this.edges,
       nodes: this.nodes,
       locations: this.locations,
-      // TODO parse strings?
+      strings: this.strings,
     }
   }
 }

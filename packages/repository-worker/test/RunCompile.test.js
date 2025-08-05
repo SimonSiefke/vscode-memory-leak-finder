@@ -29,7 +29,9 @@ test('runCompile executes npm run compile without nice', async () => {
 
   await runCompile(cwd, useNice, mainJsPath)
 
+  // @ts-ignore
   expect(mockExec).toHaveBeenCalledWith('npm', ['run', 'compile'], { cwd })
+  // @ts-ignore
   expect(mockPathExists).toHaveBeenCalledWith(mainJsPath)
 })
 
@@ -44,7 +46,9 @@ test('runCompile executes npm run compile with nice', async () => {
 
   await runCompile(cwd, useNice, mainJsPath)
 
+  // @ts-ignore
   expect(mockExec).toHaveBeenCalledWith('nice', ['-n', '10', 'npm', 'run', 'compile'], { cwd })
+  // @ts-ignore
   expect(mockPathExists).toHaveBeenCalledWith(mainJsPath)
 })
 
