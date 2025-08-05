@@ -1,12 +1,12 @@
 import { expect, test, jest } from '@jest/globals'
 import { getRestoreNodeModulesFileOperations } from '../src/parts/GetRestoreFileOperations/GetRestoreFileOperations.js'
 
-test.skip('getRestoreNodeModulesFileOperations returns empty array when no cached paths', async () => {
+test('getRestoreNodeModulesFileOperations returns empty array when no cached paths', async () => {
   const result = await getRestoreNodeModulesFileOperations('/test/repo', 'cache-key', '/test/cache', '/test/cache/cache-key', [])
   expect(result).toEqual([])
 })
 
-test.skip('getRestoreNodeModulesFileOperations returns copy operations for cached paths', async () => {
+test('getRestoreNodeModulesFileOperations returns copy operations for cached paths', async () => {
   const repoPath = '/test/repo'
   const cacheKey = 'cache-key'
   const cacheDir = '/test/cache'
@@ -28,7 +28,7 @@ test.skip('getRestoreNodeModulesFileOperations returns copy operations for cache
   })
 })
 
-test.skip('getRestoreNodeModulesFileOperations handles paths with leading slashes', async () => {
+test('getRestoreNodeModulesFileOperations handles paths with leading slashes', async () => {
   const repoPath = '/test/repo'
   const cacheKey = 'cache-key'
   const cacheDir = '/test/cache'
@@ -45,7 +45,7 @@ test.skip('getRestoreNodeModulesFileOperations handles paths with leading slashe
   })
 })
 
-test.skip('getRestoreNodeModulesFileOperations throws VError when error occurs', async () => {
+test('getRestoreNodeModulesFileOperations throws VError when error occurs', async () => {
   // Reset the module cache to ensure our mock is used
   jest.resetModules()
 
