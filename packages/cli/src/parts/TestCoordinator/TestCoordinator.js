@@ -1,3 +1,4 @@
+import * as CommandMapRef from '../CommandMapRef/CommandMapRef.js'
 import * as GetTestCoordinatorUrl from '../GetTestCoordinatorUrl/GetTestCoordinatorUrl.js'
 import * as IpcParent from '../IpcParent/IpcParent.js'
 
@@ -9,6 +10,7 @@ export const listen = async (method) => {
     name: 'Test Coordinator',
     ref: false,
     argv: ['--ipc-type=worker-thread'],
+    commandMap: CommandMapRef.commandMapRef,
   })
   return rpc
 }
