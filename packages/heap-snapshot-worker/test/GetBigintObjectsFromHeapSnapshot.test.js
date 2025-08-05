@@ -10,12 +10,14 @@ test('getBigintObjectsFromHeapSnapshot - no bigint objects', async () => {
         node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
         edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
       },
       node_count: 1,
       edge_count: 0,
     },
     nodes: [0, 1, 100, 64, 0, 0],
     edges: [],
+    locations: [],
     strings: ['', 'test'],
   }
 
@@ -38,12 +40,14 @@ test('getBigintObjectsFromHeapSnapshot - single bigint object without variable n
         node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
         edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
       },
       node_count: 1,
       edge_count: 0,
     },
     nodes: [4, 1, 200, 32, 0, 0],
     edges: [],
+    locations: [],
     strings: ['', 'bigint'],
   }
 
@@ -67,6 +71,7 @@ test('getBigintObjectsFromHeapSnapshot - multiple bigint objects (embedded const
         node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
         edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
       },
       node_count: 4,
       edge_count: 0,
@@ -98,6 +103,7 @@ test('getBigintObjectsFromHeapSnapshot - multiple bigint objects (embedded const
       0, // third bigint (embedded constant)
     ],
     edges: [],
+    locations: [],
     strings: ['', 'bigint'],
   }
 
@@ -121,6 +127,7 @@ test('getBigintObjectsFromHeapSnapshot - bigint with variable name', async () =>
         node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
         edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
       },
       node_count: 2,
       edge_count: 1,
@@ -144,6 +151,7 @@ test('getBigintObjectsFromHeapSnapshot - bigint with variable name', async () =>
       3,
       6, // property:"abc" -> bigint (node data index 6)
     ],
+    locations: [],
     strings: ['', 'Window', 'bigint', 'abc'],
   }
 
