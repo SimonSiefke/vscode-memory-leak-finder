@@ -7,7 +7,7 @@ export const state = {
   testCoordinator: undefined,
 }
 
-const cleanup = () => {
+export const cleanup = () => {
   if (state.testCoordinator) {
     state.testCoordinator.dispose()
     state.testCoordinator = undefined
