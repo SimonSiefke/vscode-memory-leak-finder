@@ -11,7 +11,7 @@ export const getArraysFromHeapSnapshot = async (pathUri) => {
   const edges = new Uint32Array(heapSnapshot.edges || [])
 
   // Use fast prepareHeapSnapshot
-  const { metaData, nodes } = await prepareHeapSnapshot(pathUri)
+  const { metaData, nodes } = await prepareHeapSnapshot(pathUri, {})
   const { node_types, node_fields, edge_types, edge_fields } = metaData.data.meta
 
   // Also get parsed nodes and graph for name mapping
