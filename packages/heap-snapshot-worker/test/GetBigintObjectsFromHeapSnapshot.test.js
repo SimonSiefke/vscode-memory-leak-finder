@@ -3,6 +3,7 @@ import { writeFileSync, unlinkSync } from 'node:fs'
 import * as GetBigintObjectsFromHeapSnapshot from '../src/parts/GetBigintObjectsFromHeapSnapshot/GetBigintObjectsFromHeapSnapshot.js'
 
 test('getBigintObjectsFromHeapSnapshot - no bigint objects', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {
@@ -36,6 +37,7 @@ test('getBigintObjectsFromHeapSnapshot - no bigint objects', async () => {
 })
 
 test('getBigintObjectsFromHeapSnapshot - single bigint object without variable name (filtered out)', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {
@@ -49,7 +51,6 @@ test('getBigintObjectsFromHeapSnapshot - single bigint object without variable n
       edge_count: 0,
     },
     nodes: [
-      // prettier-ignore
       4, 1, 200, 32, 0, 0,
     ],
     edges: [],
@@ -84,10 +85,30 @@ test('getBigintObjectsFromHeapSnapshot - multiple bigint objects (embedded const
     },
     nodes: [
       // prettier-ignore
-      4, 1, 200, 32, 1, 0, // first bigint (embedded constant)
-      0, 0, 201, 16, 0, 0, // hidden object
-      4, 1, 202, 28, 0, 0, // second bigint (embedded constant)
-      4, 1, 203, 24, 2, 0, // third bigint (embedded constant)
+      4,
+      1,
+      200,
+      32,
+      1,
+      0, // first bigint (embedded constant)
+      0,
+      0,
+      201,
+      16,
+      0,
+      0, // hidden object
+      4,
+      1,
+      202,
+      28,
+      0,
+      0, // second bigint (embedded constant)
+      4,
+      1,
+      203,
+      24,
+      2,
+      0, // third bigint (embedded constant)
     ],
     edges: [],
     locations: [],
@@ -121,8 +142,18 @@ test('getBigintObjectsFromHeapSnapshot - bigint with variable name', async () =>
     },
     nodes: [
       // prettier-ignore
-      3, 1, 100, 64, 1, 0, // object (Window)
-      4, 2, 200, 32, 0, 0, // bigint
+      3,
+      1,
+      100,
+      64,
+      1,
+      0, // object (Window)
+      4,
+      2,
+      200,
+      32,
+      0,
+      0, // bigint
     ],
     edges: [
       2,
