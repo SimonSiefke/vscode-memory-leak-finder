@@ -3,12 +3,12 @@ import * as IpcParent from '../IpcParent/IpcParent.js'
 
 export const listen = async (method) => {
   const url = GetTestCoordinatorUrl.getTestCoordinatorUrl()
-  const ipc = await IpcParent.create({
+  const rpc = await IpcParent.create({
     method,
     path: url,
     name: 'Test Coordinator',
     ref: false,
     argv: ['--ipc-type=worker-thread'],
   })
-  return ipc
+  return rpc
 }
