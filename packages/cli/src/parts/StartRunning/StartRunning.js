@@ -24,8 +24,9 @@ export const startRunning = async (
   commit,
   setupOnly,
 ) => {
-  Stdout.write(AnsiEscapes.clear)
+  await Stdout.write(AnsiEscapes.clear)
   const worker = await RunTest.prepare()
+  // TODO use invoke
   JsonRpc.send(
     worker,
     TestWorkerCommandType.RunTests,

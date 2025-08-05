@@ -22,7 +22,6 @@ export class HeapSnapshotParsingWorker {
 
     this.worker.on('message', (message) => {
       const messageReceiveTime = performance.now()
-      console.log(`[HeapSnapshotParsingWorker] Received message from worker at ${messageReceiveTime.toFixed(2)}ms`)
 
       if (message.id && this.callbacks.has(message.id)) {
         const { resolve, reject } = this.callbacks.get(message.id)
@@ -58,7 +57,6 @@ export class HeapSnapshotParsingWorker {
     }
 
     const startTime = performance.now()
-    console.log(`[HeapSnapshotParsingWorker] Starting to parse: ${path}`)
 
     const { promise, resolve, reject } = Promise.withResolvers()
 
@@ -67,18 +65,12 @@ export class HeapSnapshotParsingWorker {
       resolve: (result) => {
         const endTime = performance.now()
         const duration = endTime - startTime
-        console.log(`[HeapSnapshotParsingWorker] Parse completed in ${duration.toFixed(2)}ms`)
-        console.log(
-          `[HeapSnapshotParsingWorker] Result sizes - nodes: ${result.nodes?.length || 0}, edges: ${result.edges?.length || 0}, locations: ${result.locations?.length || 0}`,
-        )
         resolve(result)
       },
       reject,
     })
 
-    console.log(`[HeapSnapshotParsingWorker] Sending parse request to worker (id: ${id})`)
     const sendTime = performance.now()
-    console.log(`[HeapSnapshotParsingWorker] Sending message at: ${sendTime.toFixed(2)}ms`)
     this.worker.postMessage({
       id,
       method: 'HeapSnapshot.parse',
