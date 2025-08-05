@@ -1,3 +1,5 @@
+import { Worker } from 'node:worker_threads'
+
 /**
  * Waits for a result from the worker, either a message or exit event
  * @param {Worker} worker - The worker to wait for
