@@ -7,7 +7,7 @@ import { installDependencies } from '../src/parts/InstallDependencies/InstallDep
 test('installDependencies - runs npm ci without nice', async () => {
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.exec') {
         return { stdout: '', stderr: '' }
       }
@@ -22,7 +22,7 @@ test('installDependencies - runs npm ci without nice', async () => {
 test('installDependencies - runs npm ci with nice', async () => {
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.exec') {
         return { stdout: '', stderr: '' }
       }
@@ -37,7 +37,7 @@ test('installDependencies - runs npm ci with nice', async () => {
 test('installDependencies - throws VError when exec fails without nice', async () => {
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.exec') {
         throw new Error('npm ci failed')
       }
@@ -53,7 +53,7 @@ test('installDependencies - throws VError when exec fails without nice', async (
 test('installDependencies - throws VError when exec fails with nice', async () => {
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.exec') {
         throw new Error('nice command failed')
       }

@@ -9,7 +9,7 @@ test('cloneRepository executes git clone command', async () => {
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.exec') {
         return { stdout: '', stderr: '', exitCode: 0 }
       }
@@ -27,7 +27,7 @@ test('cloneRepository throws VError when git clone fails', async () => {
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.exec') {
         throw new Error('Repository not found')
       }
@@ -45,7 +45,7 @@ test('cloneRepository handles different repository URLs', async () => {
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.exec') {
         return { stdout: '', stderr: '', exitCode: 0 }
       }
@@ -63,7 +63,7 @@ test('cloneRepository handles different local paths', async () => {
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.exec') {
         return { stdout: '', stderr: '', exitCode: 0 }
       }
