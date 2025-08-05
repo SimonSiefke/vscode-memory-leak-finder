@@ -25,6 +25,7 @@ class HeapSnapshotWriteStream extends Writable {
     this.options = options
     this.state = HeapSnapshotParsingState.SearchingSnapshotMetaData
     this.strings = []
+    this.validate = false // TODO
   }
 
   /**
@@ -234,6 +235,9 @@ class HeapSnapshotWriteStream extends Writable {
   start() {}
 
   validateRequiredMetadata() {
+    if (!this.validate) {
+      return
+    }
     if (!this.metaData || !this.metaData.data) {
       throw new HeapSnapshotParserError('Missing required metadata in heap snapshot')
     }

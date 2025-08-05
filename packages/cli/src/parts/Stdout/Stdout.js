@@ -1,6 +1,5 @@
-import * as Process from '../Process/Process.js'
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.js'
 
 export const write = async (data) => {
-  // TODO use worker for stdout
-  Process.stdout.write(data)
+  await StdoutWorker.invoke('Stdout.write', data)
 }
