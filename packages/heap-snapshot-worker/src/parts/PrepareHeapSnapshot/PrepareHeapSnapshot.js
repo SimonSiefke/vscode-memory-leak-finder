@@ -1,6 +1,4 @@
-import { Worker } from 'node:worker_threads'
-import { getHeapSnapshotWorkerPath } from '../GetHeapSnapshotWorkerPath/GetHeapSnapshotWorkerPath.js'
-import { waitForResult } from '../WaitForResult/WaitForResult.js'
+import { HeapSnapshotParsingWorker } from '../HeapSnapshotParsingWorker/HeapSnapshotParsingWorker.js'
 
 /**
  * Prepares a heap snapshot by parsing it in a separate worker for better performance
@@ -8,23 +6,12 @@ import { waitForResult } from '../WaitForResult/WaitForResult.js'
  * @returns {Promise<{metaData: any, nodes: Uint32Array, edges: Uint32Array, locations: Uint32Array}>}
  */
 export const prepareHeapSnapshot = async (path) => {
-  const workerPath = getHeapSnapshotWorkerPath()
-  const worker = new Worker(workerPath)
-
+  const parsingWorker = new HeapSnapshotParsingWorker()
   try {
-    // Create the result promise (sets up event listeners)
-    const resultPromise = waitForResult(worker)
-
-    // Send the parsing command
-    worker.postMessage({
-      method: 'HeapSnapshot.parse',
-      params: [path],
-    })
-
-    // Wait for the result
-    return await resultPromise
+    await parsingWorker.start()
+    const result = await parsingWorker.parseHeapSnapshot(path)
+    return result
   } finally {
-    // Always terminate the worker
-    await worker.terminate()
+    await parsingWorker[Symbol.asyncDispose]()
   }
 }
