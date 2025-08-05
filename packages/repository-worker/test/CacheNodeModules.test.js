@@ -1,4 +1,4 @@
-import { expect, test, beforeEach } from '@jest/globals'
+import { expect, test } from '@jest/globals'
 import { VError } from '@lvce-editor/verror'
 import { MockRpc } from '@lvce-editor/rpc'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.js'
@@ -13,7 +13,7 @@ test('addNodeModulesToCache - successfully caches node_modules', async () => {
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.findFiles') {
         return mockNodeModulesPaths
       }
@@ -41,7 +41,7 @@ test('addNodeModulesToCache - filters out nested node_modules and .git directori
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.findFiles') {
         return allNodeModulesPaths
       }
@@ -59,7 +59,7 @@ test('addNodeModulesToCache - filters out nested node_modules and .git directori
 test('addNodeModulesToCache - handles empty node_modules list', async () => {
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.findFiles') {
         return []
       }
@@ -77,7 +77,7 @@ test('addNodeModulesToCache - handles empty node_modules list', async () => {
 test('addNodeModulesToCache - throws VError when findFiles fails', async () => {
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.findFiles') {
         throw new Error('Permission denied')
       }
@@ -93,7 +93,7 @@ test('addNodeModulesToCache - throws VError when findFiles fails', async () => {
 test('addNodeModulesToCache - throws VError when getCacheFileOperations fails', async () => {
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.findFiles') {
         return ['node_modules']
       }
@@ -112,7 +112,7 @@ test('addNodeModulesToCache - throws VError when getCacheFileOperations fails', 
 test('addNodeModulesToCache - throws VError when applyFileOperations fails', async () => {
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.findFiles') {
         return ['node_modules']
       }
@@ -140,7 +140,7 @@ test('addNodeModulesToCache - handles complex nested directory structure', async
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.findFiles') {
         return complexNodeModulesPaths
       }

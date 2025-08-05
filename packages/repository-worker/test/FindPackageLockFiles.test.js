@@ -25,7 +25,7 @@ test('findPackageLockFiles - returns file URIs when package-lock.json files foun
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.findFiles') {
         return mockPaths
       }
@@ -44,7 +44,7 @@ test('findPackageLockFiles - excludes node_modules package-lock.json files', asy
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.findFiles') {
         return mockPaths
       }
@@ -62,7 +62,7 @@ test('findPackageLockFiles - excludes node_modules package-lock.json files', asy
 test('findPackageLockFiles - throws VError when findFiles fails', async () => {
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.findFiles') {
         throw new Error('Permission denied')
       }

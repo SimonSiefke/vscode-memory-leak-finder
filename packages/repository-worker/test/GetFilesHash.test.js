@@ -11,7 +11,7 @@ test('getFilesHash returns hash of file contents', async () => {
   let callCount = 0
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string, path?: string) => {
+    invoke: (method, path) => {
       if (method === 'FileSystem.readFileContent') {
         callCount++
         if (callCount === 1) {
@@ -35,7 +35,7 @@ test('getFilesHash throws VError when readFileContent fails', async () => {
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.readFileContent') {
         throw new Error('File not found')
       }
@@ -53,7 +53,7 @@ test('getFilesHash throws VError when getHash fails', async () => {
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.readFileContent') {
         return fileContent
       }

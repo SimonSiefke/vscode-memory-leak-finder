@@ -6,7 +6,7 @@ import { setupNodeModulesFromCache } from '../src/parts/SetupNodeModulesFromCach
 test('setupNodeModulesFromCache throws VError when no cache exists', async () => {
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.findFiles') {
         throw new Error('ENOENT: no such file or directory')
       }
