@@ -23,6 +23,7 @@ export class HeapSnapshotWriteStream extends Writable {
     this.options = options
     this.state = HeapSnapshotParsingState.SearchingSnapshotMetaData
     this.strings = []
+    this.validate = false // TODO
   }
 
   /**
@@ -190,6 +191,26 @@ export class HeapSnapshotWriteStream extends Writable {
   }
 
   start() {}
+
+  validateRequiredMetadata() {
+    // TODO make validation required
+    if (!this.validate) {
+      return
+    }
+
+    if (!this.metaData || !this.metaData.data) {
+      throw new Error('Missing required metadata in heap snapshot')
+    }
+
+    if (this.state !== HeapSnapshotParsingState.Done) {
+      throw new Error('Heap snapshot parsing did not complete successfully')
+    }
+  }
+
+  _final(callback) {
+    this.validateRequiredMetadata()
+    callback()
+  }
 
   getResult() {
     return {
