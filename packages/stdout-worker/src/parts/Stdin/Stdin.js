@@ -15,3 +15,7 @@ export const pause = () => {
 export const setEncoding = (value) => {
   Process.stdin.setEncoding(value)
 }
+
+export const on = (event, listener) => {
+  Process.stdin.on(event, listener)
+}
