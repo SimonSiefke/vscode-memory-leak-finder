@@ -1,9 +1,8 @@
 import { VError } from '@lvce-editor/verror'
-import * as Path from '../Path/Path.js'
 import * as Filesystem from '../Filesystem/Filesystem.js'
-import * as ApplyFileOperations from '../ApplyFileOperations/ApplyFileOperations.js'
-import * as GetCacheFileOperations from '../GetCacheFileOperations/GetCacheFileOperations.js'
 import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.js'
+import * as GetCacheFileOperations from '../GetCacheFileOperations/GetCacheFileOperations.js'
+import * as Path from '../Path/Path.js'
 
 /**
  * @param {string} repoPath
