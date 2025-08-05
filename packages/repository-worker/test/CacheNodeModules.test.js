@@ -36,7 +36,7 @@ beforeEach(() => {
   mockGetCacheFileOperations.mockReturnValue([])
 })
 
-test.skip('addNodeModulesToCache - successfully caches node_modules', async () => {
+test('addNodeModulesToCache - successfully caches node_modules', async () => {
   const mockNodeModulesPaths = ['node_modules', 'packages/a/node_modules', 'packages/b/node_modules']
   const mockFileOperations = [
     { type: 'mkdir', path: '/cache/dir' },
@@ -65,7 +65,7 @@ test.skip('addNodeModulesToCache - successfully caches node_modules', async () =
   expect(mockApplyFileOperations).toHaveBeenCalledWith(mockFileOperations)
 })
 
-test.skip('addNodeModulesToCache - filters out nested node_modules and .git directories', async () => {
+test('addNodeModulesToCache - filters out nested node_modules and .git directories', async () => {
   const allNodeModulesPaths = [
     'node_modules',
     'packages/a/node_modules',
@@ -95,7 +95,7 @@ test.skip('addNodeModulesToCache - filters out nested node_modules and .git dire
   )
 })
 
-test.skip('addNodeModulesToCache - handles empty node_modules list', async () => {
+test('addNodeModulesToCache - handles empty node_modules list', async () => {
   const mockFileOperations = [{ type: 'mkdir', path: '/cache/dir' }]
 
   mockFindFiles.mockResolvedValue([])
@@ -112,7 +112,7 @@ test.skip('addNodeModulesToCache - handles empty node_modules list', async () =>
   expect(mockApplyFileOperations).toHaveBeenCalledWith(mockFileOperations)
 })
 
-test.skip('addNodeModulesToCache - throws VError when findFiles fails', async () => {
+test('addNodeModulesToCache - throws VError when findFiles fails', async () => {
   const error = new Error('Permission denied')
 
   mockFindFiles.mockRejectedValue(error)
@@ -124,7 +124,7 @@ test.skip('addNodeModulesToCache - throws VError when findFiles fails', async ()
   expect(mockApplyFileOperations).not.toHaveBeenCalled()
 })
 
-test.skip('addNodeModulesToCache - throws VError when getCacheFileOperations fails', async () => {
+test('addNodeModulesToCache - throws VError when getCacheFileOperations fails', async () => {
   const error = new Error('Invalid path')
 
   mockFindFiles.mockResolvedValue(['node_modules'])
@@ -138,7 +138,7 @@ test.skip('addNodeModulesToCache - throws VError when getCacheFileOperations fai
   expect(mockApplyFileOperations).not.toHaveBeenCalled()
 })
 
-test.skip('addNodeModulesToCache - throws VError when applyFileOperations fails', async () => {
+test('addNodeModulesToCache - throws VError when applyFileOperations fails', async () => {
   const error = new Error('Copy failed')
   const mockFileOperations = [{ type: 'copy', from: '/source', to: '/dest' }]
 
@@ -153,7 +153,7 @@ test.skip('addNodeModulesToCache - throws VError when applyFileOperations fails'
   await expect(addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow('Failed to cache node_modules')
 })
 
-test.skip('addNodeModulesToCache - handles complex nested directory structure', async () => {
+test('addNodeModulesToCache - handles complex nested directory structure', async () => {
   const complexNodeModulesPaths = [
     'node_modules',
     'packages/package-a/node_modules',
