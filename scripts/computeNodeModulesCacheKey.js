@@ -17,6 +17,7 @@ const locations = [
   'packages/download-worker/package-lock.json',
   'packages/download-worker/package.json',
   'packages/e2e/package-lock.json',
+  'packages/file-system-worker/package-lock.json',
   'packages/file-watcher-worker/package-lock.json',
   'packages/heap-snapshot-worker/package-lock.json',
   'packages/injected-code/package-lock.json',
