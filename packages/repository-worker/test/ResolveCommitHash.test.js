@@ -33,7 +33,7 @@ test('resolveCommitHash - resolves branch name to commit hash', async () => {
 
   const result = await resolveCommitHash('https://github.com/test/repo.git', 'main')
   expect(result).toBe('a1b2c3d4e5f6789012345678901234567890abcd')
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec')
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/test/repo.git', 'main'], {})
 })
 
 test('resolveCommitHash - throws error when no commit found', async () => {
@@ -47,7 +47,7 @@ test('resolveCommitHash - throws error when no commit found', async () => {
   FileSystemWorker.set(mockRpc)
 
   await expect(resolveCommitHash('https://github.com/test/repo.git', 'nonexistent-branch')).rejects.toThrow('No commit found for reference')
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec')
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/test/repo.git', 'nonexistent-branch'], {})
 })
 
 test('resolveCommitHash - throws error when git ls-remote fails', async () => {
@@ -61,7 +61,7 @@ test('resolveCommitHash - throws error when git ls-remote fails', async () => {
   FileSystemWorker.set(mockRpc)
 
   await expect(resolveCommitHash('https://github.com/test/repo.git', 'main')).rejects.toThrow('Failed to resolve commit reference')
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec')
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/test/repo.git', 'main'], {})
 })
 
 test('resolveCommitHash - resolves tag to commit hash', async () => {
@@ -77,7 +77,7 @@ test('resolveCommitHash - resolves tag to commit hash', async () => {
 
   const result = await resolveCommitHash('https://github.com/test/repo.git', 'v1.0.0')
   expect(result).toBe('b2c3d4e5f6789012345678901234567890abcde1')
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec')
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/test/repo.git', 'v1.0.0'], {})
 })
 
 test('resolveCommitHash - throws error when invalid commit hash returned', async () => {
@@ -92,7 +92,7 @@ test('resolveCommitHash - throws error when invalid commit hash returned', async
   FileSystemWorker.set(mockRpc)
 
   await expect(resolveCommitHash('https://github.com/test/repo.git', 'main')).rejects.toThrow('Invalid commit hash resolved')
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec')
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/test/repo.git', 'main'], {})
 })
 
 test('resolveCommitHash - handles multiple lines and takes first result', async () => {
@@ -109,7 +109,7 @@ test('resolveCommitHash - handles multiple lines and takes first result', async 
 
   const result = await resolveCommitHash('https://github.com/test/repo.git', 'main')
   expect(result).toBe('a1b2c3d4e5f6789012345678901234567890abcd')
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec')
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/test/repo.git', 'main'], {})
 })
 
 test('resolveCommitHash - handles different repository URLs', async () => {
@@ -125,7 +125,7 @@ test('resolveCommitHash - handles different repository URLs', async () => {
 
   const result = await resolveCommitHash('https://gitlab.com/test/repo.git', 'feature')
   expect(result).toBe('c3d4e5f6789012345678901234567890abcdef12')
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec')
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://gitlab.com/test/repo.git', 'feature'], {})
 })
 
 test('resolveCommitHash - handles short commit hash input', async () => {
@@ -140,5 +140,5 @@ test('resolveCommitHash - handles short commit hash input', async () => {
   FileSystemWorker.set(mockRpc)
 
   await expect(resolveCommitHash('https://github.com/test/repo.git', shortHash)).rejects.toThrow('No commit found for reference')
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec')
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/test/repo.git', 'a1b2c3d4'], {})
 })

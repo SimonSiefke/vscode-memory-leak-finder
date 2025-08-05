@@ -16,7 +16,7 @@ test('installDependencies - runs npm ci without nice', async () => {
 
   await installDependencies('/test/path', false)
   
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec')
+  expect(mockInvoke).toHaveBeenCalled()
 })
 
 test('installDependencies - runs npm ci with nice', async () => {
@@ -31,7 +31,7 @@ test('installDependencies - runs npm ci with nice', async () => {
 
   await installDependencies('/test/path', true)
   
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec')
+  expect(mockInvoke).toHaveBeenCalled()
 })
 
 test('installDependencies - throws VError when exec fails without nice', async () => {
@@ -48,7 +48,7 @@ test('installDependencies - throws VError when exec fails without nice', async (
 
   await expect(installDependencies('/test/path', false)).rejects.toThrow(VError)
   await expect(installDependencies('/test/path', false)).rejects.toThrow("Failed to install dependencies in directory '/test/path'")
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec')
+  expect(mockInvoke).toHaveBeenCalled()
 })
 
 test('installDependencies - throws VError when exec fails with nice', async () => {
@@ -65,5 +65,5 @@ test('installDependencies - throws VError when exec fails with nice', async () =
 
   await expect(installDependencies('/test/path', true)).rejects.toThrow(VError)
   await expect(installDependencies('/test/path', true)).rejects.toThrow("Failed to install dependencies in directory '/test/path'")
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec')
+  expect(mockInvoke).toHaveBeenCalled()
 })

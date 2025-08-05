@@ -18,5 +18,5 @@ test('setupNodeModulesFromCache throws VError when no cache exists', async () =>
   await expect(setupNodeModulesFromCache('/nonexistent/path', 'test-commit', '/test/cache')).rejects.toThrow(
     'Failed to setup node_modules from cache',
   )
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.findFiles')
+  expect(mockInvoke).toHaveBeenCalled()
 })

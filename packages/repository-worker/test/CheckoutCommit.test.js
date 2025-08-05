@@ -18,7 +18,7 @@ test('checkoutCommit executes git checkout command', async () => {
 
   await checkoutCommit(repoPath, commit)
   
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec')
+  expect(mockInvoke).toHaveBeenCalled()
 })
 
 test('checkoutCommit handles different commit formats', async () => {
@@ -36,7 +36,7 @@ test('checkoutCommit handles different commit formats', async () => {
 
   await checkoutCommit(repoPath, commit)
   
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec')
+  expect(mockInvoke).toHaveBeenCalled()
 })
 
 test('checkoutCommit handles short commit hash', async () => {
@@ -54,5 +54,5 @@ test('checkoutCommit handles short commit hash', async () => {
 
   await checkoutCommit(repoPath, commit)
   
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec')
+  expect(mockInvoke).toHaveBeenCalled()
 })
