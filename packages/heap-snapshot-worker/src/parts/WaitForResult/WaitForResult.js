@@ -8,26 +8,28 @@ import { Worker } from 'node:worker_threads'
 export const waitForResult = (worker) => {
   const { promise, resolve, reject } = Promise.withResolvers()
 
-  const messageHandler = (message) => {
-    if (message.error) {
-      reject(new Error(message.error))
-    } else {
-      resolve(message.result)
-    }
+  const cleanup = () => {
     // Clean up listeners
     worker.off('message', messageHandler)
     worker.off('exit', exitHandler)
   }
 
+  const messageHandler = (message) => {
+    cleanup()
+    if (message.error) {
+      reject(new Error(message.error))
+    } else {
+      resolve(message.result)
+    }
+  }
+
   const exitHandler = (code) => {
+    cleanup()
     if (code !== 0) {
       reject(new Error(`Worker stopped with exit code ${code}`))
     } else {
       reject(new Error('Worker exited unexpectedly'))
     }
-    // Clean up listeners
-    worker.off('message', messageHandler)
-    worker.off('exit', exitHandler)
   }
 
   // Set up event listeners
