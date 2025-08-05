@@ -120,18 +120,9 @@ test('getBigintObjectsFromHeapSnapshot - bigint with variable name', async () =>
       edge_count: 1,
     },
     nodes: [
-      3,
-      1,
-      100,
-      64,
-      1,
-      0, // object (Window)
-      4,
-      2,
-      200,
-      32,
-      0,
-      0, // bigint
+      // prettier-ignore
+      3, 1, 100, 64, 1, 0, // object (Window)
+      4, 2, 200, 32, 0, 0, // bigint
     ],
     edges: [
       2,

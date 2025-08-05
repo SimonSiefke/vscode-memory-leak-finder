@@ -205,7 +205,9 @@ class HeapSnapshotWriteStream extends Writable {
   }
 
   _final(callback) {
-    this.validateRequiredMetadata()
+    if (this.validate) {
+      this.validateRequiredMetadata()
+    }
     callback()
   }
 
