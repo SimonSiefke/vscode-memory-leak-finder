@@ -12,8 +12,8 @@ export const prepareHeapSnapshot = async (path) => {
   const worker = new Worker(workerPath)
 
   try {
-    // Set up event listeners and get the promise
-    const result = waitForResult(worker)
+    // Create the result promise (sets up event listeners)
+    const resultPromise = waitForResult(worker)
 
     // Send the parsing command
     worker.postMessage({
@@ -22,7 +22,7 @@ export const prepareHeapSnapshot = async (path) => {
     })
 
     // Wait for the result
-    return await result
+    return await resultPromise
   } finally {
     // Always terminate the worker
     await worker.terminate()

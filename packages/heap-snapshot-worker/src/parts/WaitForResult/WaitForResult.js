@@ -33,4 +33,4 @@ export const waitForResult = (worker) => {
   worker.on('exit', exitHandler)
 
   return promise
-} 
+}
