@@ -3,7 +3,7 @@ const { test, expect } = pkg
 import * as GetPrototypeChainAnalysisFromHeapSnapshot from '../packages/heap-snapshot-worker/src/parts/GetPrototypeChainAnalysisFromHeapSnapshot/GetPrototypeChainAnalysisFromHeapSnapshot.js'
 import * as HeapSnapshotState from '../packages/heap-snapshot-worker/src/parts/HeapSnapshotState/HeapSnapshotState.js'
 
-test('detectsLongPrototypeChains', async () => {
+test.only('detectsLongPrototypeChains', async () => {
   // Mock a heap snapshot with long prototype chains
   const heapsnapshot = {
     snapshot: {
@@ -122,10 +122,14 @@ test('detectsLongPrototypeChains', async () => {
     locations: [],
   }
 
+  console.log('Mock heap snapshot:', JSON.stringify(heapsnapshot, null, 2))
+
   // Store the mock snapshot
   HeapSnapshotState.set('test-long-chain', heapsnapshot)
 
   const analysis = await GetPrototypeChainAnalysisFromHeapSnapshot.getPrototypeChainAnalysisFromHeapSnapshot('test-long-chain')
+
+  console.log('Analysis result:', JSON.stringify(analysis, null, 2))
 
   // Should detect the long chain
   expect(analysis.longPrototypeChains).toHaveLength(1)
