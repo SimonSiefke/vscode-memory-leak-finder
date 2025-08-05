@@ -3,6 +3,7 @@ import { writeFileSync, unlinkSync } from 'node:fs'
 import * as GetRegexpObjectsFromHeapSnapshot from '../src/parts/GetRegexpObjectsFromHeapSnapshot/GetRegexpObjectsFromHeapSnapshot.js'
 
 test('getRegexpObjectsFromHeapSnapshot - no regexp objects', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {
@@ -15,7 +16,9 @@ test('getRegexpObjectsFromHeapSnapshot - no regexp objects', async () => {
       node_count: 1,
       edge_count: 0,
     },
-    nodes: [0, 1, 100, 64, 0, 0, 0],
+    nodes: [
+      0, 1, 100, 64, 0, 0, 0,
+    ],
     edges: [],
     locations: [],
     strings: ['', 'test'],
@@ -33,6 +36,7 @@ test('getRegexpObjectsFromHeapSnapshot - no regexp objects', async () => {
 })
 
 test('getRegexpObjectsFromHeapSnapshot - single regexp object', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {
@@ -45,7 +49,9 @@ test('getRegexpObjectsFromHeapSnapshot - single regexp object', async () => {
       node_count: 1,
       edge_count: 0,
     },
-    nodes: [4, 1, 200, 32, 0, 0, 0],
+    nodes: [
+      4, 1, 200, 32, 0, 0, 0,
+    ],
     edges: [],
     locations: [],
     strings: ['', '/test/gi'],

@@ -75,6 +75,7 @@ test('getMapObjectsFromHeapSnapshot - map without variable name (filtered out)',
 })
 
 test('getMapObjectsFromHeapSnapshot - map with variable name', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {
@@ -130,6 +131,7 @@ test('getMapObjectsFromHeapSnapshot - map with variable name', async () => {
 })
 
 test('getMapObjectsFromHeapSnapshot - multiple map objects with variables', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {
@@ -205,6 +207,7 @@ test('getMapObjectsFromHeapSnapshot - multiple map objects with variables', asyn
 })
 
 test('getMapObjectsFromHeapSnapshot - map with multiple variable names', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {
