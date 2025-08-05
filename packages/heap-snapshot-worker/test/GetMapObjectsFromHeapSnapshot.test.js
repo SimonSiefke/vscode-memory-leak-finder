@@ -17,7 +17,7 @@ test('getMapObjectsFromHeapSnapshot - no map objects', async () => {
       edge_count: 0,
     },
     nodes: [
-      0, 1, 100, 64, 0, 0,
+      0, 1, 100, 64, 0, 0, // hidden object
     ],
     edges: [],
     locations: [],
