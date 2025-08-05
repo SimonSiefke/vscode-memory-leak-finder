@@ -36,7 +36,7 @@ test('prepareHeapSnapshot - parses simple heap snapshot', async () => {
   expect(result.locations.length).toBe(0) // 0 locations
 })
 
-test.skip('prepareHeapSnapshot - parses strings when parseStrings is true', async () => {
+test('prepareHeapSnapshot - parses strings when parseStrings is true', async () => {
   // Create a minimal heap snapshot file with strings
   const heapSnapshotData = {
     snapshot: {
