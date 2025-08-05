@@ -3,6 +3,7 @@ import { writeFileSync, unlinkSync } from 'node:fs'
 import * as GetBigintObjectsFromHeapSnapshot from '../src/parts/GetBigintObjectsFromHeapSnapshot/GetBigintObjectsFromHeapSnapshot.js'
 
 test('getBigintObjectsFromHeapSnapshot - no bigint objects', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {
@@ -10,12 +11,16 @@ test('getBigintObjectsFromHeapSnapshot - no bigint objects', async () => {
         node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
         edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
       },
       node_count: 1,
       edge_count: 0,
     },
-    nodes: [0, 1, 100, 64, 0, 0],
+    nodes: [
+      0, 1, 100, 64, 0, 0, // hidden object
+    ],
     edges: [],
+    locations: [],
     strings: ['', 'test'],
   }
 
@@ -31,6 +36,7 @@ test('getBigintObjectsFromHeapSnapshot - no bigint objects', async () => {
 })
 
 test('getBigintObjectsFromHeapSnapshot - single bigint object without variable name (filtered out)', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {
@@ -38,12 +44,16 @@ test('getBigintObjectsFromHeapSnapshot - single bigint object without variable n
         node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
         edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
       },
       node_count: 1,
       edge_count: 0,
     },
-    nodes: [4, 1, 200, 32, 0, 0],
+    nodes: [
+      4, 1, 200, 32, 0, 0, // bigint object
+    ],
     edges: [],
+    locations: [],
     strings: ['', 'bigint'],
   }
 
@@ -60,6 +70,7 @@ test('getBigintObjectsFromHeapSnapshot - single bigint object without variable n
 })
 
 test('getBigintObjectsFromHeapSnapshot - multiple bigint objects (embedded constants filtered out)', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {
@@ -67,37 +78,19 @@ test('getBigintObjectsFromHeapSnapshot - multiple bigint objects (embedded const
         node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
         edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
       },
       node_count: 4,
       edge_count: 0,
     },
     nodes: [
-      4,
-      1,
-      200,
-      32,
-      1,
-      0, // first bigint (embedded constant)
-      0,
-      0,
-      201,
-      16,
-      0,
-      0, // hidden object
-      4,
-      1,
-      202,
-      28,
-      0,
-      0, // second bigint (embedded constant)
-      4,
-      1,
-      203,
-      24,
-      2,
-      0, // third bigint (embedded constant)
+      4, 1, 200, 32, 1, 0, // first bigint (embedded constant)
+      0, 0, 201, 16, 0, 0, // hidden object
+      4, 1, 202, 28, 0, 0, // second bigint (embedded constant)
+      4, 1, 203, 24, 2, 0, // third bigint (embedded constant)
     ],
     edges: [],
+    locations: [],
     strings: ['', 'bigint'],
   }
 
@@ -114,6 +107,7 @@ test('getBigintObjectsFromHeapSnapshot - multiple bigint objects (embedded const
 })
 
 test('getBigintObjectsFromHeapSnapshot - bigint with variable name', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {
@@ -121,29 +115,21 @@ test('getBigintObjectsFromHeapSnapshot - bigint with variable name', async () =>
         node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
         edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
       },
       node_count: 2,
       edge_count: 1,
     },
     nodes: [
-      3,
-      1,
-      100,
-      64,
-      1,
-      0, // object (Window)
-      4,
-      2,
-      200,
-      32,
-      0,
-      0, // bigint
+      3, 1, 100, 64, 1, 0, // object (Window)
+      4, 2, 200, 32, 0, 0, // bigint
     ],
     edges: [
       2,
       3,
       6, // property:"abc" -> bigint (node data index 6)
     ],
+    locations: [],
     strings: ['', 'Window', 'bigint', 'abc'],
   }
 
