@@ -35,70 +35,70 @@ test('detectsLongPrototypeChains', async () => {
     },
     // Create a chain: instance -> ComponentA -> ComponentB -> ComponentC -> ... -> Object (15 levels deep)
     nodes: [
-      // Node 0: Instance object
+      // Node 0: Instance object (type=3=object, name=0=MyInstance, id=0, self_size=100, edge_count=1, trace_node_id=0, detachedness=0)
       3, 0, 0, 100, 1, 0, 0,
-      // Node 1: ComponentA
+      // Node 1: ComponentA (type=3=object, name=1=ComponentA, id=1, self_size=80, edge_count=1, trace_node_id=0, detachedness=0)
       3, 1, 1, 80, 1, 0, 0,
-      // Node 2: ComponentB
+      // Node 2: ComponentB (type=3=object, name=2=ComponentB, id=2, self_size=80, edge_count=1, trace_node_id=0, detachedness=0)
       3, 2, 2, 80, 1, 0, 0,
-      // Node 3: ComponentC
+      // Node 3: ComponentC (type=3=object, name=3=ComponentC, id=3, self_size=80, edge_count=1, trace_node_id=0, detachedness=0)
       3, 3, 3, 80, 1, 0, 0,
-      // Node 4: ComponentD
+      // Node 4: ComponentD (type=3=object, name=4=ComponentD, id=4, self_size=80, edge_count=1, trace_node_id=0, detachedness=0)
       3, 4, 4, 80, 1, 0, 0,
-      // Node 5: ComponentE
+      // Node 5: ComponentE (type=3=object, name=5=ComponentE, id=5, self_size=80, edge_count=1, trace_node_id=0, detachedness=0)
       3, 5, 5, 80, 1, 0, 0,
-      // Node 6: ComponentF
+      // Node 6: ComponentF (type=3=object, name=6=ComponentF, id=6, self_size=80, edge_count=1, trace_node_id=0, detachedness=0)
       3, 6, 6, 80, 1, 0, 0,
-      // Node 7: ComponentG
+      // Node 7: ComponentG (type=3=object, name=7=ComponentG, id=7, self_size=80, edge_count=1, trace_node_id=0, detachedness=0)
       3, 7, 7, 80, 1, 0, 0,
-      // Node 8: ComponentH
+      // Node 8: ComponentH (type=3=object, name=8=ComponentH, id=8, self_size=80, edge_count=1, trace_node_id=0, detachedness=0)
       3, 8, 8, 80, 1, 0, 0,
-      // Node 9: ComponentI
+      // Node 9: ComponentI (type=3=object, name=9=ComponentI, id=9, self_size=80, edge_count=1, trace_node_id=0, detachedness=0)
       3, 9, 9, 80, 1, 0, 0,
-      // Node 10: ComponentJ
+      // Node 10: ComponentJ (type=3=object, name=10=ComponentJ, id=10, self_size=80, edge_count=1, trace_node_id=0, detachedness=0)
       3, 10, 10, 80, 1, 0, 0,
-      // Node 11: ComponentK
+      // Node 11: ComponentK (type=3=object, name=11=ComponentK, id=11, self_size=80, edge_count=1, trace_node_id=0, detachedness=0)
       3, 11, 11, 80, 1, 0, 0,
-      // Node 12: ComponentL
+      // Node 12: ComponentL (type=3=object, name=12=ComponentL, id=12, self_size=80, edge_count=1, trace_node_id=0, detachedness=0)
       3, 12, 12, 80, 1, 0, 0,
-      // Node 13: ComponentM
+      // Node 13: ComponentM (type=3=object, name=13=ComponentM, id=13, self_size=80, edge_count=1, trace_node_id=0, detachedness=0)
       3, 13, 13, 80, 1, 0, 0,
-      // Node 14: ComponentN
+      // Node 14: ComponentN (type=3=object, name=14=ComponentN, id=14, self_size=80, edge_count=1, trace_node_id=0, detachedness=0)
       3, 14, 14, 80, 1, 0, 0,
-      // Node 15: Object.prototype (end of chain)
+      // Node 15: Object.prototype (end of chain) (type=3=object, name=15=Object, id=15, self_size=50, edge_count=0, trace_node_id=0, detachedness=0)
       3, 15, 15, 50, 0, 0, 0,
     ],
     edges: [
-      // Instance -> ComponentA
-      2, 16, 1,
-      // ComponentA -> ComponentB
-      2, 16, 2,
-      // ComponentB -> ComponentC
-      2, 16, 3,
-      // ComponentC -> ComponentD
-      2, 16, 4,
-      // ComponentD -> ComponentE
-      2, 16, 5,
-      // ComponentE -> ComponentF
-      2, 16, 6,
-      // ComponentF -> ComponentG
+      // Instance -> ComponentA (type=2=property, name_or_index=16=__proto__, to_node=1*7=7)
       2, 16, 7,
-      // ComponentG -> ComponentH
-      2, 16, 8,
-      // ComponentH -> ComponentI
-      2, 16, 9,
-      // ComponentI -> ComponentJ
-      2, 16, 10,
-      // ComponentJ -> ComponentK
-      2, 16, 11,
-      // ComponentK -> ComponentL
-      2, 16, 12,
-      // ComponentL -> ComponentM
-      2, 16, 13,
-      // ComponentM -> ComponentN
+      // ComponentA -> ComponentB (type=2=property, name_or_index=16=__proto__, to_node=2*7=14)
       2, 16, 14,
-      // ComponentN -> Object.prototype
-      2, 16, 15,
+      // ComponentB -> ComponentC (type=2=property, name_or_index=16=__proto__, to_node=3*7=21)
+      2, 16, 21,
+      // ComponentC -> ComponentD (type=2=property, name_or_index=16=__proto__, to_node=4*7=28)
+      2, 16, 28,
+      // ComponentD -> ComponentE (type=2=property, name_or_index=16=__proto__, to_node=5*7=35)
+      2, 16, 35,
+      // ComponentE -> ComponentF (type=2=property, name_or_index=16=__proto__, to_node=6*7=42)
+      2, 16, 42,
+      // ComponentF -> ComponentG (type=2=property, name_or_index=16=__proto__, to_node=7*7=49)
+      2, 16, 49,
+      // ComponentG -> ComponentH (type=2=property, name_or_index=16=__proto__, to_node=8*7=56)
+      2, 16, 56,
+      // ComponentH -> ComponentI (type=2=property, name_or_index=16=__proto__, to_node=9*7=63)
+      2, 16, 63,
+      // ComponentI -> ComponentJ (type=2=property, name_or_index=16=__proto__, to_node=10*7=70)
+      2, 16, 70,
+      // ComponentJ -> ComponentK (type=2=property, name_or_index=16=__proto__, to_node=11*7=77)
+      2, 16, 77,
+      // ComponentK -> ComponentL (type=2=property, name_or_index=16=__proto__, to_node=12*7=84)
+      2, 16, 84,
+      // ComponentL -> ComponentM (type=2=property, name_or_index=16=__proto__, to_node=13*7=91)
+      2, 16, 91,
+      // ComponentM -> ComponentN (type=2=property, name_or_index=16=__proto__, to_node=14*7=98)
+      2, 16, 98,
+      // ComponentN -> Object.prototype (type=2=property, name_or_index=16=__proto__, to_node=15*7=105)
+      2, 16, 105,
     ],
     strings: [
       'MyInstance', // 0
@@ -179,24 +179,14 @@ test('detectsPrototypePollution', async () => {
       // 1000 user objects
       ...Array.from({ length: 1000 }, (_, i) => [3, 0, i, 50, 1, 0, 0]).flat(),
       // Object.prototype with pollution
-      3,
-      1,
-      1000,
-      100,
-      2,
-      0,
-      0,
+      3, 1, 1000, 100, 2, 0, 0,
     ],
     edges: [
       // All user objects point to polluted Object.prototype
-      ...Array.from({ length: 1000 }, (_, i) => [2, 2, 1000]).flat(),
+      ...Array.from({ length: 1000 }, (_, i) => [2, 2, 7000]).flat(), // 1000 * 7 = 7000
       // Object.prototype has polluted properties
-      2,
-      3,
-      1001, // isAdmin property
-      2,
-      4,
-      1002, // secret property
+      2, 3, 7001, // isAdmin property
+      2, 4, 7002, // secret property
     ],
     strings: [
       'UserObject', // 0
@@ -260,18 +250,18 @@ test('handlesNormalPrototypeChains', async () => {
     },
     // Normal objects with short chains: instance -> prototype -> Object.prototype
     nodes: [
-      // Instance
+      // Instance (type=3=object, name=0=MyObject, id=0, self_size=50, edge_count=1, trace_node_id=0, detachedness=0)
       3, 0, 0, 50, 1, 0, 0,
-      // Custom prototype
+      // Custom prototype (type=3=object, name=1=MyPrototype, id=1, self_size=30, edge_count=1, trace_node_id=0, detachedness=0)
       3, 1, 1, 30, 1, 0, 0,
-      // Object.prototype
+      // Object.prototype (type=3=object, name=2=Object, id=2, self_size=20, edge_count=0, trace_node_id=0, detachedness=0)
       3, 2, 2, 20, 0, 0, 0,
     ],
     edges: [
-      // Instance -> Custom prototype
-      2, 3, 1,
-      // Custom prototype -> Object.prototype
-      2, 3, 2,
+      // Instance -> Custom prototype (type=2=property, name_or_index=3=__proto__, to_node=1*7=7)
+      2, 3, 7,
+      // Custom prototype -> Object.prototype (type=2=property, name_or_index=3=__proto__, to_node=2*7=14)
+      2, 3, 14,
     ],
     strings: [
       'MyObject', // 0
