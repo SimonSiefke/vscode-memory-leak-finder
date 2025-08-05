@@ -2,7 +2,7 @@ import * as CreateTestCoordinatorAndListen from '../CreateTestCoordinatorAndList
 
 export const state = {
   /**
-   * @type {any}
+   * @type {import('@lvce-editor/rpc').Rpc|undefined}
    */
   testCoordinator: undefined,
 }

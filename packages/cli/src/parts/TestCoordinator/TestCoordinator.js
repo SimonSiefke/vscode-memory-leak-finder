@@ -5,9 +5,10 @@ export const listen = async (method) => {
   const url = GetTestCoordinatorUrl.getTestCoordinatorUrl()
   const ipc = await IpcParent.create({
     method,
-    url,
+    path: url,
     name: 'Test Coordinator',
     ref: false,
+    argv: ['--ipc-type=worker-thread'],
   })
   return ipc
 }

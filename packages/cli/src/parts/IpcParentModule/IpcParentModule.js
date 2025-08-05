@@ -1,13 +1,12 @@
+import { NodeForkedProcessRpcParent, NodeWorkerRpcParent } from '@lvce-editor/rpc'
 import * as IpcParentType from '../IpcParentType/IpcParentType.js'
-import * as IpcParentWithNodeWorkerThread from '../IpcParentWithNodeWorkerThread/IpcParentWithNodeWorkerThread.js'
-import * as IpcParentWithNodeForkedProcess from '../IpcParentWithNodeForkedProcess/IpcParentWithNodeForkedProcess.js'
 
 export const getModule = (method) => {
   switch (method) {
     case IpcParentType.NodeWorkerThread:
-      return IpcParentWithNodeWorkerThread
+      return NodeWorkerRpcParent
     case IpcParentType.NodeForkedProcess:
-      return IpcParentWithNodeForkedProcess
+      return NodeForkedProcessRpcParent
     default:
       throw new Error('unexpected ipc type')
   }
