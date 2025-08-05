@@ -8,10 +8,11 @@ import * as HeapSnapshotParsingState from '../HeapSnapshotParsingState/HeapSnaps
 import { parseHeapSnapshotArray } from '../ParseHeapSnapshotArray/ParseHeapSnapshotArray.js'
 import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.js'
 import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.js'
+import * as TokenType from '../TokenType/TokenType.js'
 import { writeStringArrayData } from '../WriteStringArrayData/WriteStringArrayData.js'
 
 class HeapSnapshotWriteStream extends Writable {
-  constructor(options = {}) {
+  constructor(options) {
     super()
     this.arrayIndex = 0
     this.currentNumber = 0
@@ -70,7 +71,7 @@ class HeapSnapshotWriteStream extends Writable {
   }
 
   writeParsingNodesMetaData(chunk) {
-    this.writeParsingArrayMetaData(chunk, 'nodes', HeapSnapshotParsingState.ParsingNodes)
+    this.writeParsingArrayMetaData(chunk, TokenType.Nodes, HeapSnapshotParsingState.ParsingNodes)
   }
 
   writeArrayData(chunk, array, nextState) {
@@ -117,7 +118,7 @@ class HeapSnapshotWriteStream extends Writable {
   }
 
   writeParsingEdgesMetaData(chunk) {
-    this.writeParsingArrayMetaData(chunk, 'edges', HeapSnapshotParsingState.ParsingEdges)
+    this.writeParsingArrayMetaData(chunk, TokenType.Edges, HeapSnapshotParsingState.ParsingEdges)
   }
 
   writeParsingEdges(chunk) {
@@ -125,7 +126,7 @@ class HeapSnapshotWriteStream extends Writable {
   }
 
   writeParsingLocationsMetaData(chunk) {
-    this.writeParsingArrayMetaData(chunk, 'locations', HeapSnapshotParsingState.ParsingLocations)
+    this.writeParsingArrayMetaData(chunk, TokenType.Locations, HeapSnapshotParsingState.ParsingLocations)
   }
 
   writeResizableArrayData(chunk, nextState) {
