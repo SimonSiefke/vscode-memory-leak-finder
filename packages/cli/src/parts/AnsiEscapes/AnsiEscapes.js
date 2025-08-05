@@ -7,7 +7,7 @@ export const eraseLine = ansiEscapes.eraseLine
 
 export const cursorLeft = ansiEscapes.cursorLeft
 
-const eraseScreen = ansiEscapes.eraseScreen
+export const eraseScreen = ansiEscapes.eraseScreen
 
 export const eraseDown = ansiEscapes.eraseDown
 
