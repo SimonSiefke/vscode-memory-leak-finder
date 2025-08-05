@@ -18,25 +18,13 @@
     "@lvce-editor/rpc": "^4.13.0"
   },
   "devDependencies": {
-    "@types/node": "^24.1.0"
-  },
-  "jest": {
-    "testMatch": [
-      "<rootDir>/test/**/*.js"
-    ],
-    "modulePathIgnorePatterns": [
-      "<rootDir>/.vscode-test/"
-    ],
-    "injectGlobals": false,
-    "collectCoverage": true,
-    "coverageThreshold": {
-      "global": {
-        "branches": 40,
-        "functions": 40,
-        "lines": 40,
-        "statements": 40
-      }
-    }
+    "@types/node": "^24.2.0",
+    "@jest/globals": "^30.0.5",
+    "@types/babel__code-frame": "^7.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/ws": "^8.18.1",
+    "ts-jest": "^29.4.1",
+    "typescript": "^5.9.2"
   },
   "xo": {
     "rules": {

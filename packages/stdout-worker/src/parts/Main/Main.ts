@@ -1,4 +1,4 @@
-import { listen } from '../Listen/Listen.js'
+import { listen } from '../Listen/Listen.ts'
 
 export const main = async () => {
   await listen()
