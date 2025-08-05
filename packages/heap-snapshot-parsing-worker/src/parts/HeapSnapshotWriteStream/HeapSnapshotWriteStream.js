@@ -25,7 +25,7 @@ class HeapSnapshotWriteStream extends Writable {
     this.options = options
     this.state = HeapSnapshotParsingState.SearchingSnapshotMetaData
     this.strings = []
-    this.validate = options.validate ?? true
+    this.validate = options.validate || true
   }
 
   /**

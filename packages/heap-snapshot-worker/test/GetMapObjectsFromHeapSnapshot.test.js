@@ -3,6 +3,7 @@ import { writeFileSync, unlinkSync } from 'node:fs'
 import * as GetMapObjectsFromHeapSnapshot from '../src/parts/GetMapObjectsFromHeapSnapshot/GetMapObjectsFromHeapSnapshot.js'
 
 test('getMapObjectsFromHeapSnapshot - no map objects', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {
@@ -15,7 +16,9 @@ test('getMapObjectsFromHeapSnapshot - no map objects', async () => {
       node_count: 1,
       edge_count: 0,
     },
-    nodes: [0, 1, 100, 64, 0, 0],
+    nodes: [
+      0, 1, 100, 64, 0, 0,
+    ],
     edges: [],
     locations: [],
     strings: ['', 'test'],
@@ -33,6 +36,7 @@ test('getMapObjectsFromHeapSnapshot - no map objects', async () => {
 })
 
 test('getMapObjectsFromHeapSnapshot - map without variable name (filtered out)', async () => {
+  // prettier-ignore
   const testData = {
     snapshot: {
       meta: {
@@ -45,7 +49,14 @@ test('getMapObjectsFromHeapSnapshot - map without variable name (filtered out)',
       node_count: 1,
       edge_count: 0,
     },
-    nodes: [3, 1, 200, 28, 0, 0], // object type, Map
+    nodes: [
+      3,
+      1,
+      200,
+      28,
+      0,
+      0, // object type, Map
+    ],
     edges: [],
     locations: [],
     strings: ['', 'Map'],
@@ -77,6 +88,7 @@ test('getMapObjectsFromHeapSnapshot - map with variable name', async () => {
       edge_count: 1,
     },
     nodes: [
+      // prettier-ignore
       3,
       1,
       100,

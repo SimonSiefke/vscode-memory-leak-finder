@@ -15,7 +15,10 @@ test('getBigintObjectsFromHeapSnapshot - no bigint objects', async () => {
       node_count: 1,
       edge_count: 0,
     },
-    nodes: [0, 1, 100, 64, 0, 0],
+    nodes: [
+      // prettier-ignore
+      0, 1, 100, 64, 0, 0,
+    ],
     edges: [],
     locations: [],
     strings: ['', 'test'],
