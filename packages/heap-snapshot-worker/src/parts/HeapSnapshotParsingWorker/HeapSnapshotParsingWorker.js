@@ -6,6 +6,7 @@ export class HeapSnapshotParsingWorker {
     this.worker = null
     this.messageId = 0
     this.callbacks = new Map()
+    this.isTerminating = false
   }
 
   /**
@@ -40,7 +41,7 @@ export class HeapSnapshotParsingWorker {
     })
 
     this.worker.on('exit', (code) => {
-      if (code !== 0) {
+      if (code !== 0 && !this.isTerminating) {
         console.error(`Worker stopped with exit code ${code}`)
       }
     })
@@ -85,6 +86,7 @@ export class HeapSnapshotParsingWorker {
    */
   async [Symbol.asyncDispose]() {
     if (this.worker) {
+      this.isTerminating = true
       await this.worker.terminate()
       this.worker = null
       this.callbacks.clear()
