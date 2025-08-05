@@ -6,7 +6,7 @@ import { findPackageLockFiles } from '../src/parts/FindPackageLockFiles/FindPack
 test('findPackageLockFiles - returns empty array when no package-lock.json files found', async () => {
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: (method: string) => {
+    invoke: (method) => {
       if (method === 'FileSystem.findFiles') {
         return []
       }
