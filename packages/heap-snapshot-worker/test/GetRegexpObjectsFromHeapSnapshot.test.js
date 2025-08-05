@@ -88,34 +88,10 @@ test('getRegexpObjectsFromHeapSnapshot - multiple regexp objects', async () => {
       edge_count: 0,
     },
     nodes: [
-      4,
-      1,
-      200,
-      32,
-      1,
-      0,
-      0, // first regexp
-      0,
-      0,
-      201,
-      16,
-      0,
-      0,
-      0, // hidden object
-      4,
-      2,
-      202,
-      28,
-      0,
-      0,
-      0, // second regexp
-      4,
-      3,
-      203,
-      24,
-      2,
-      0,
-      0, // third regexp
+      4, 1, 200, 32, 1, 0, 0, // first regexp
+      0, 0, 201, 16, 0, 0, 0, // hidden object
+      4, 2, 202, 28, 0, 0, 0, // second regexp
+      4, 3, 203, 24, 2, 0, 0, // third regexp
     ],
     edges: [],
     locations: [],
