@@ -6,7 +6,7 @@ import * as PatternUsage from '../PatternUsage/PatternUsage.js'
 import * as Stdout from '../Stdout/Stdout.js'
 import * as Character from '../Character/Character.js'
 
-export const handleStdinDataInterruptedMode = (state, key) => {
+export const handleStdinDataInterruptedMode = async (state, key) => {
   switch (key) {
     case AnsiKeys.ControlC:
     case AnsiKeys.ControlD:
@@ -15,7 +15,7 @@ export const handleStdinDataInterruptedMode = (state, key) => {
         mode: ModeType.Exit,
       }
     case CliKeys.FilterMode:
-      Stdout.write(AnsiEscapes.clear + PatternUsage.print())
+      await Stdout.write(AnsiEscapes.clear + PatternUsage.print())
       return {
         ...state,
         value: Character.EmptyString,

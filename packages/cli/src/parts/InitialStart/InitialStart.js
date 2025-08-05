@@ -5,10 +5,10 @@ import * as WatchUsage from '../WatchUsage/WatchUsage.js'
 
 export const initialStart = async (options) => {
   if (options.watch) {
-    SpecialStdin.start()
+    await SpecialStdin.start()
   }
   if (options.watch && !options.filter) {
-    Stdout.write(WatchUsage.print())
+    await Stdout.write(WatchUsage.print())
     return
   }
   await StartRunning.startRunning(

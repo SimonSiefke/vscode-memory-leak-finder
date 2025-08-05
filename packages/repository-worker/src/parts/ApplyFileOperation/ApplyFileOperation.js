@@ -35,27 +35,20 @@ export const applyFileOperation = async (operation) => {
         const fromPath = operation.from
         const toPath = operation.to
         await copy(fromPath, toPath)
-        Logger.log(`Copied: ${operation.from} -> ${operation.to}`)
-
         break
       }
 
       case 'remove': {
         const fromPath = operation.from
         await remove(fromPath)
-        Logger.log(`Removed: ${operation.from}`)
-
         break
       }
 
       case 'mkdir': {
         const { path } = operation
         await makeDirectory(path)
-        Logger.log(`Created directory: ${operation.path}`)
-
         break
       }
-      // No default
     }
   } catch (error) {
     throw new VError(error, `Failed to apply file operation ${operation.type}`)

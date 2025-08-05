@@ -6,7 +6,7 @@ import * as PreviousFilters from '../PreviousFilters/PreviousFilters.js'
 import * as Stdout from '../Stdout/Stdout.js'
 import * as WatchUsage from '../WatchUsage/WatchUsage.js'
 
-export const handleStdinDataFilterWaitingMode = (state, key) => {
+export const handleStdinDataFilterWaitingMode = async (state, key) => {
   switch (key) {
     case AnsiKeys.ControlC:
     case AnsiKeys.ControlD:
@@ -18,7 +18,7 @@ export const handleStdinDataFilterWaitingMode = (state, key) => {
       if (state.value) {
         PreviousFilters.add(state.value)
       }
-      Stdout.write(AnsiEscapes.eraseLine + AnsiEscapes.cursorLeft)
+      await Stdout.write(AnsiEscapes.eraseLine + AnsiEscapes.cursorLeft)
       return {
         ...state,
         mode: ModeType.Running,
@@ -29,7 +29,7 @@ export const handleStdinDataFilterWaitingMode = (state, key) => {
       if (!state.value) {
         return state
       }
-      Stdout.write(AnsiEscapes.cursorBackward(state.value.length) + AnsiEscapes.eraseEndLine)
+      await Stdout.write(AnsiEscapes.cursorBackward(state.value.length) + AnsiEscapes.eraseEndLine)
       return {
         ...state,
         value: Character.EmptyString,
@@ -38,7 +38,7 @@ export const handleStdinDataFilterWaitingMode = (state, key) => {
       if (state.value === Character.EmptyString) {
         return state
       }
-      Stdout.write(AnsiEscapes.backspace)
+      await Stdout.write(AnsiEscapes.backspace)
       return {
         ...state,
         value: state.value.slice(0, -1),
@@ -49,7 +49,7 @@ export const handleStdinDataFilterWaitingMode = (state, key) => {
     case AnsiKeys.End:
       return state
     case AnsiKeys.Escape:
-      Stdout.write(AnsiEscapes.clear + WatchUsage.print())
+      await Stdout.write(AnsiEscapes.clear + WatchUsage.print())
       return {
         ...state,
         mode: ModeType.Waiting,
@@ -61,7 +61,7 @@ export const handleStdinDataFilterWaitingMode = (state, key) => {
       }
       const top = previousFilters[0]
       const prefix = state.value ? AnsiEscapes.cursorBackward(state.value.length) + AnsiEscapes.eraseEndLine : ''
-      Stdout.write(prefix + top)
+      await Stdout.write(prefix + top)
       return {
         ...state,
         value: top,
@@ -70,7 +70,7 @@ export const handleStdinDataFilterWaitingMode = (state, key) => {
     case AnsiKeys.ArrowDown:
       return state
     default:
-      Stdout.write(key)
+      await Stdout.write(key)
       return {
         ...state,
         value: state.value + key,

@@ -43,7 +43,6 @@ test('addNodeModulesToCache - successfully caches node_modules', async () => {
     { type: 'copy', from: '/repo/path/node_modules', to: '/cache/dir/commit-hash/node_modules' },
   ]
 
-
   mockFindFiles.mockResolvedValue(mockNodeModulesPaths)
 
   // @ts-ignore - Complex mock return type
@@ -53,6 +52,7 @@ test('addNodeModulesToCache - successfully caches node_modules', async () => {
 
   await addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')
 
+  // @ts-ignore
   expect(mockFindFiles).toHaveBeenCalledWith('**/node_modules', { cwd: '/repo/path' })
   expect(mockGetCacheFileOperations).toHaveBeenCalledWith(
     '/repo/path',
@@ -61,6 +61,7 @@ test('addNodeModulesToCache - successfully caches node_modules', async () => {
     '/cache/dir/commit-hash',
     mockNodeModulesPaths,
   )
+  // @ts-ignore
   expect(mockApplyFileOperations).toHaveBeenCalledWith(mockFileOperations)
 })
 
@@ -75,7 +76,6 @@ test('addNodeModulesToCache - filters out nested node_modules and .git directori
   ]
   const expectedFilteredPaths = ['node_modules', 'packages/a/node_modules', 'packages/b/node_modules', 'packages/c/node_modules']
   const mockFileOperations = []
-
 
   mockFindFiles.mockResolvedValue(allNodeModulesPaths)
 
@@ -98,7 +98,6 @@ test('addNodeModulesToCache - filters out nested node_modules and .git directori
 test('addNodeModulesToCache - handles empty node_modules list', async () => {
   const mockFileOperations = [{ type: 'mkdir', path: '/cache/dir' }]
 
-
   mockFindFiles.mockResolvedValue([])
 
   // @ts-ignore - Complex mock return type
@@ -109,6 +108,7 @@ test('addNodeModulesToCache - handles empty node_modules list', async () => {
   await addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')
 
   expect(mockGetCacheFileOperations).toHaveBeenCalledWith('/repo/path', 'commit-hash', '/cache/dir', '/cache/dir/commit-hash', [])
+  // @ts-ignore
   expect(mockApplyFileOperations).toHaveBeenCalledWith(mockFileOperations)
 })
 
@@ -142,7 +142,6 @@ test('addNodeModulesToCache - throws VError when applyFileOperations fails', asy
   const error = new Error('Copy failed')
   const mockFileOperations = [{ type: 'copy', from: '/source', to: '/dest' }]
 
-
   mockFindFiles.mockResolvedValue(['node_modules'])
 
   // @ts-ignore - Complex mock return type
@@ -167,7 +166,6 @@ test('addNodeModulesToCache - handles complex nested directory structure', async
     { type: 'mkdir', path: '/cache/dir' },
     { type: 'copy', from: '/repo/path/node_modules', to: '/cache/dir/commit-hash/node_modules' },
   ]
-
 
   mockFindFiles.mockResolvedValue(complexNodeModulesPaths)
 
