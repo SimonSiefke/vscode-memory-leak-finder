@@ -17,7 +17,7 @@ test('getRegexpObjectsFromHeapSnapshot - no regexp objects', async () => {
       edge_count: 0,
     },
     nodes: [
-      0, 1, 100, 64, 0, 0, 0,
+      0, 1, 100, 64, 0, 0, 0, // hidden object
     ],
     edges: [],
     locations: [],
@@ -50,7 +50,7 @@ test('getRegexpObjectsFromHeapSnapshot - single regexp object', async () => {
       edge_count: 0,
     },
     nodes: [
-      4, 1, 200, 32, 0, 0, 0,
+      4, 1, 200, 32, 0, 0, 0, // regexp object
     ],
     edges: [],
     locations: [],
