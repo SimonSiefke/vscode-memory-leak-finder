@@ -1,44 +1,41 @@
 import { createHash } from 'node:crypto'
+import { readdirSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
+import { join } from 'node:path'
+
+import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = join(__dirname, '..')
 
+const getPackageLocations = () => {
+  const packageLocations = []
+  const packagesFolder = join(root, 'packages')
+  const dirents = readdirSync(packagesFolder)
+  for (const dirent of dirents) {
+    packageLocations.push(`packages/${dirent}/package-lock.json`)
+  }
+  packageLocations.push('package-lock.json')
+  return packageLocations
+}
+
 const locations = [
   '.nvmrc',
   'lerna.json',
-  'package-lock.json',
-  'packages/chart-worker/package-lock.json',
-  'packages/charts/package-lock.json',
-  'packages/cli/package-lock.json',
-  'packages/cursor-e2e/package-lock.json',
-  'packages/devtools-protocol/package-lock.json',
-  'packages/download-worker/package-lock.json',
-  'packages/download-worker/package.json',
-  'packages/e2e/package-lock.json',
-  'packages/file-watcher-worker/package-lock.json',
-  'packages/heap-snapshot-worker/package-lock.json',
-  'packages/injected-code/package-lock.json',
-  'packages/load-source-map-worker/package-lock.json',
-  'packages/memory-leak-finder/package-lock.json',
-  'packages/memory-leak-worker/package-lock.json',
-  'packages/page-object/package-lock.json',
-  'packages/postinstall-tools/package-lock.json',
-  'packages/repository-worker/package-lock.json',
-  'packages/stdout-worker/package-lock.json',
-  'packages/storage-worker/package-lock.json',
-  'packages/test-coordinator/package-lock.json',
-  'packages/test-coordinator/src/parts/VsCodeVersion/VsCodeVersion.js',
-  'packages/test-worker-commands/package-lock.json',
-  'packages/test-worker/package-lock.json',
-  'packages/video-recording-worker/package-lock.json',
-  '.github/workflows/ci.yml',
+  ...getPackageLocations(),
   '.github/workflows/pr.yml',
+  '.github/workflows/ci.yml',
   '.github/workflows/release.yml',
   'scripts/computeNodeModulesCacheKey.js',
 ]
+
+const packagesFolder = join(root, 'packages')
+
+const dirents = readdirSync(packagesFolder)
+for (const dirent of dirents) {
+  locations.push(`packages/${dirent}/package-lock.json`)
+}
 
 const getAbsolutePath = (relativePath) => {
   return join(root, relativePath)
