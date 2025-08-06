@@ -22,6 +22,7 @@ export const computeHeapSnapshotIndices = (node_types, node_fields, edge_types, 
   const selfSizeFieldIndex = node_fields.indexOf('self_size')
   const edgeCountFieldIndex = node_fields.indexOf('edge_count')
   const detachednessFieldIndex = node_fields.indexOf('detachedness')
+  const traceNodeIdFieldIndex = node_fields.indexOf('trace_node_id')
 
   // Edge field indices
   const edgeTypeFieldIndex = edge_fields.indexOf('type')
@@ -45,6 +46,7 @@ export const computeHeapSnapshotIndices = (node_types, node_fields, edge_types, 
     selfSizeFieldIndex,
     edgeCountFieldIndex,
     detachednessFieldIndex,
+    traceNodeIdFieldIndex,
 
     // Edge field indices
     edgeTypeFieldIndex,
