@@ -9,23 +9,22 @@ import * as MemoryLeakWorkerUrl from '../MemoryLeakWorkerUrl/MemoryLeakWorkerUrl
 
 export const state = {
   /**
-   * @type {any}
+   * @type {import('@lvce-editor/rpc').Rpc|undefined}
    */
-  ipc: undefined,
+  rpc: undefined,
 }
 
 export const startWorker = async (devtoolsWebsocketUrl) => {
   Assert.string(devtoolsWebsocketUrl)
-  const ipc = await IpcParent.create({
+  const rpc = await IpcParent.create({
     method: IpcParentType.NodeWorkerThread,
     url: MemoryLeakWorkerUrl.memoryLeakWorkerUrl,
     stdio: 'inherit',
   })
-  state.ipc = ipc
-  HandleIpc.handleIpc(ipc, Command.execute, Callback.resolve)
-  await JsonRpc.invoke(ipc, 'ConnectDevtools.connectDevtools', devtoolsWebsocketUrl)
+  state.rpc = rpc
+  await rpc.invoke('ConnectDevtools.connectDevtools', devtoolsWebsocketUrl)
 }
 
-export const getIpc = () => {
-  return state.ipc
+export const getRpc = () => {
+  return state.rpc
 }
