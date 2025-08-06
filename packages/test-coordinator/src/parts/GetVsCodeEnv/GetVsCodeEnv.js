@@ -11,5 +11,6 @@ export const getVsCodeEnv = ({ runtimeDir, processEnv }) => {
   delete env.VSCODE_GIT_IPC_HANDLE
   delete env.VSCODE_GIT_ASKPASS_NODE
   delete env.NODE_OPTIONS
+  delete env.ELECTRON_RUN_AS_NODE
   return env
 }
