@@ -1,12 +1,15 @@
+// @ts-nocheck
 import { fixHtmlNamespace } from '../FixXmlNamespace/FixXmlNamespace.js'
 import * as GetNamedFunctionCountData from '../GetNamedFunctionCountData/GetNamedFunctionCountData.js'
-import * as Plot from '../Plot/Plot.js'
 
 export const name = 'named-function-count'
 
 export const getData = GetNamedFunctionCountData.getNamedFunctionCountData
 
+export const skip = 1
+
 export const createChart = (data) => {
+  // TODO
   const baseHtml = Plot.plot({
     style: 'overflow: visible;background:white',
     marginLeft: 150,
