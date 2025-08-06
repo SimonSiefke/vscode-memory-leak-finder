@@ -1,6 +1,6 @@
 import { Readable } from 'node:stream'
 
-export class ReadableString extends Readable {
+class ReadableString extends Readable {
   constructor(str) {
     super()
     this.str = str
@@ -15,4 +15,8 @@ export class ReadableString extends Readable {
       this.push(null)
     }
   }
+}
+
+export const createReadableString = (string) => {
+  return new ReadableString(string)
 }

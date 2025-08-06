@@ -13,7 +13,7 @@ export const getRegexpObjectsFromHeapSnapshot = async (pathUri) => {
   const strings = heapSnapshot.strings || []
 
   // Use fast prepareHeapSnapshot
-  const { metaData, nodes } = await prepareHeapSnapshot(pathUri)
+  const { metaData, nodes } = await prepareHeapSnapshot(pathUri, {})
   const { node_types, node_fields } = metaData.data.meta
 
   return getRegexpObjectsFromHeapSnapshotInternal(strings, nodes, node_types, node_fields)

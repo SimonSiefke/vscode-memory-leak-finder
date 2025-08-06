@@ -8,9 +8,10 @@
     "moduleResolution": "NodeNext",
     "isolatedModules": true,
     "strict": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "skipLibCheck": true,
     "noEmit": true,
+    "outDir": "dist",
     "allowSyntheticDefaultImports": true,
     "assumeChangesOnlyAffectDirectDependencies": true,
     "resolveJsonModule": true,
@@ -18,7 +19,9 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noUnusedLocals": false,
-    "composite": true
+    "composite": true,
+    "allowImportingTsExtensions": true
   },
-  "include": ["src", "test"]
+  "include": ["src"],
+  "exclude": ["test"]
 }

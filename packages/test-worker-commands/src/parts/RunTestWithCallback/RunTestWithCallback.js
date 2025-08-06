@@ -5,13 +5,13 @@ import * as TestRunMode from '../TestRunMode/TestRunMode.js'
 const getModule = (runMode) => {
   switch (runMode) {
     case TestRunMode.Vm:
-      return RunTestWithCallbackVm
+      return RunTestWithCallbackVm.runTest
     default:
-      return RunTestWithCallbackImport
+      return RunTestWithCallbackImport.runTest
   }
 }
 
 export const runTestWithCallback = async (pageObject, file, forceRun, runMode) => {
-  const module = getModule(runMode)
-  await module.runTest(pageObject, file, forceRun)
+  const fn = getModule(runMode)
+  await fn(pageObject, file, forceRun)
 }
