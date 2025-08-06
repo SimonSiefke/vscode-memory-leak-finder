@@ -9,7 +9,6 @@ export const listen = async () => {
     // @ts-ignore
     name: 'Test Coordinator',
     ref: false,
-    argv: ['--ipc-type=worker-thread'],
     commandMap: CommandMapRef.commandMapRef,
   })
   return rpc
