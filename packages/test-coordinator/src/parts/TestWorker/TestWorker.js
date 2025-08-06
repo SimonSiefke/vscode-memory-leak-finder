@@ -1,8 +1,5 @@
 import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
-import * as Callback from '../Callback/Callback.js'
-import * as Command from '../Command/Command.js'
 import * as GetTestWorkerUrl from '../GetTestWorkerUrl/GetTestWorkerUrl.js'
-import * as HandleIpc from '../HandleIpc/HandleIpc.js'
 import * as TestRunMode from '../TestRunMode/TestRunMode.js'
 
 const getExecArgv = (runMode) => {
@@ -23,6 +20,5 @@ export const launch = async (runMode) => {
     execArgv: getExecArgv(runMode),
     commandMap: {},
   })
-  HandleIpc.handleIpc(rpc, Command.execute, Callback.resolve)
   return rpc
 }
