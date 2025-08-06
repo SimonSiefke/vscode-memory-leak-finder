@@ -1,4 +1,3 @@
-import * as Assert from '../Assert/Assert.js'
 import * as HandleTestFailed from '../HandleTestFailed/HandleTestFailed.js'
 import * as HandleTestPassed from '../HandleTestPassed/HandleTestPassed.js'
 import * as HandleTestRunning from '../HandleTestRunning/HandleTestRunning.js'
@@ -9,26 +8,13 @@ import * as HandleTestsStarting from '../HandleTestsStarting/HandleTestsStarting
 import * as HandleTestsUnexpectedError from '../HandleTestsUnexpectedError/HandleTestsUnexpectedError.js'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
 
-export const getFn = (method) => {
-  Assert.string(method)
-  switch (method) {
-    case TestWorkerEventType.TestPassed:
-      return HandleTestPassed.handleTestPassed
-    case TestWorkerEventType.TestRunning:
-      return HandleTestRunning.handleTestRunning
-    case TestWorkerEventType.TestSetup:
-      return HandleTestSetup.handleTestSetup
-    case TestWorkerEventType.TestFailed:
-      return HandleTestFailed.handleTestFailed
-    case TestWorkerEventType.AllTestsFinished:
-      return HandleTestsFinished.handleTestsFinished
-    case TestWorkerEventType.TestsStarting:
-      return HandleTestsStarting.handleTestsStarting
-    case TestWorkerEventType.TestSkipped:
-      return HandleTestSkipped.handleTestSkipped
-    case TestWorkerEventType.UnexpectedTestError:
-      return HandleTestsUnexpectedError.handleTestsUnexpectedError
-    default:
-      throw new Error(`method not found ${method}`)
-  }
+export const commandMap = {
+  [TestWorkerEventType.TestPassed]: HandleTestPassed.handleTestPassed,
+  [TestWorkerEventType.TestRunning]: HandleTestRunning.handleTestRunning,
+  [TestWorkerEventType.TestSetup]: HandleTestSetup.handleTestSetup,
+  [TestWorkerEventType.TestFailed]: HandleTestFailed.handleTestFailed,
+  [TestWorkerEventType.AllTestsFinished]: HandleTestsFinished.handleTestsFinished,
+  [TestWorkerEventType.TestsStarting]: HandleTestsStarting.handleTestsStarting,
+  [TestWorkerEventType.TestSkipped]: HandleTestSkipped.handleTestSkipped,
+  [TestWorkerEventType.UnexpectedTestError]: HandleTestsUnexpectedError.handleTestsUnexpectedError,
 }

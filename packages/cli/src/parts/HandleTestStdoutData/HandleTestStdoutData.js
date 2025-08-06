@@ -8,7 +8,7 @@ export const handleStdoutData = async (data) => {
     return
   }
   if (!StdinDataState.isBuffering()) {
-    await Stdout.write(data)
+    await Stdout.write(data.toString())
   }
   TestStateOutput.addStdout(data)
 }

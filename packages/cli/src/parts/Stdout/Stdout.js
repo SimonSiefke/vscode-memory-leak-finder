@@ -1,5 +1,6 @@
-import * as StdoutWorker from '../StdoutWorker/StdoutWorker.js'
+import { string } from '@lvce-editor/assert'
 
 export const write = async (data) => {
-  await StdoutWorker.invoke('Stdout.write', data)
+  string(data)
+  process.stdout.write(data)
 }

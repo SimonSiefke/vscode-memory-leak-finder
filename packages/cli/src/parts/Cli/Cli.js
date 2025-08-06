@@ -3,8 +3,11 @@ import * as InitialStart from '../InitialStart/InitialStart.js'
 import * as ParseArgv from '../ParseArgv/ParseArgv.js'
 import * as StdinDataState from '../StdinDataState/StdinDataState.js'
 import * as StdoutWorker from '../StdoutWorker/StdoutWorker.js'
+import * as CommandMap from '../CommandMap/CommandMap.js'
+import * as CommandMapRef from '../CommandMapRef/CommandMapRef.js'
 
 export const run = async () => {
+  Object.assign(CommandMapRef.commandMapRef, CommandMap.commandMap)
   await StdoutWorker.prepare()
   const options = ParseArgv.parseArgv(Argv.argv)
   StdinDataState.setState({
