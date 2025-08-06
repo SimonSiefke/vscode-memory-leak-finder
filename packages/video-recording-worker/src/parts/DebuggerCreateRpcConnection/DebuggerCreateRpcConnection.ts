@@ -1,4 +1,4 @@
-import * as ObjectType from '../ObjectType/ObjectType.js'
+import * as ObjectType from '../ObjectType/ObjectType.ts'
 
 /**
  *

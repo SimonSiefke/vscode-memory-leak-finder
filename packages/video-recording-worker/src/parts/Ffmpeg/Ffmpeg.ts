@@ -1,8 +1,8 @@
 import { spawn } from 'child_process'
-import * as Assert from '../Assert/Assert.js'
-import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.js'
-import * as GetFfmpegOptions from '../GetFfmpegOptions/GetFfmpegOptions.js'
-import * as GetFfmpegPath from '../GetFfmpegPath/GetFfmpegPath.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.ts'
+import * as GetFfmpegOptions from '../GetFfmpegOptions/GetFfmpegOptions.ts'
+import * as GetFfmpegPath from '../GetFfmpegPath/GetFfmpegPath.ts'
 
 const handleStdinError = () => {
   console.log('ffmpeg error')
