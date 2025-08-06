@@ -3,6 +3,7 @@ import * as Assert from '../Assert/Assert.ts'
 import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.ts'
 import * as GetFfmpegOptions from '../GetFfmpegOptions/GetFfmpegOptions.ts'
 import * as GetFfmpegPath from '../GetFfmpegPath/GetFfmpegPath.ts'
+import { existsSync } from 'fs'
 
 const handleStdinError = () => {
   console.log('ffmpeg error')
@@ -16,9 +17,13 @@ const handleExit = () => {
   console.log('ffmpeg exit')
 }
 
-export const start = async (outFile) => {
+export const start = async (outFile: string): Promise<void> => {
   Assert.string(outFile)
+  // TODO make ffmpegPath an argument
   const ffmpegPath = GetFfmpegPath.getFfmpegPath()
+  if (!existsSync(ffmpegPath)) {
+    throw new Error(`ffmpeg binary not found at ${ffmpegPath}`)
+  }
   const fps = 25
   const width = 1024
   const height = 768
