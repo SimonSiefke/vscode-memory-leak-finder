@@ -1,6 +1,6 @@
+import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
 import * as Assert from '../Assert/Assert.js'
-import * as IpcParent from '../IpcParent/IpcParent.js'
-import * as IpcParentType from '../IpcParentType/IpcParentType.js'
+import * as CommandMapRef from '../CommandMapRef/CommandMapRef.js'
 import * as MemoryLeakWorkerUrl from '../MemoryLeakWorkerUrl/MemoryLeakWorkerUrl.js'
 
 export const state = {
@@ -12,10 +12,10 @@ export const state = {
 
 export const startWorker = async (devtoolsWebsocketUrl) => {
   Assert.string(devtoolsWebsocketUrl)
-  const rpc = await IpcParent.create({
-    method: IpcParentType.NodeWorkerThread,
-    url: MemoryLeakWorkerUrl.memoryLeakWorkerUrl,
+  const rpc = await NodeWorkerRpcParent.create({
+    path: MemoryLeakWorkerUrl.memoryLeakWorkerUrl,
     stdio: 'inherit',
+    commandMap: CommandMapRef.commandMapRef,
   })
   state.rpc = rpc
   await rpc.invoke('ConnectDevtools.connectDevtools', devtoolsWebsocketUrl)
