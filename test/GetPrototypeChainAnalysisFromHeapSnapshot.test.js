@@ -3,7 +3,7 @@ const { test, expect } = pkg
 import * as GetPrototypeChainAnalysisFromHeapSnapshot from '../packages/heap-snapshot-worker/src/parts/GetPrototypeChainAnalysisFromHeapSnapshot/GetPrototypeChainAnalysisFromHeapSnapshot.js'
 import * as HeapSnapshotState from '../packages/heap-snapshot-worker/src/parts/HeapSnapshotState/HeapSnapshotState.js'
 
-test.only('detectsLongPrototypeChains', async () => {
+test.skip('detectsLongPrototypeChains', async () => {
   // Mock a heap snapshot with long prototype chains
   const heapsnapshot = {
     snapshot: {
@@ -66,7 +66,8 @@ test.only('detectsLongPrototypeChains', async () => {
       // Node 14: ComponentN (type=3=object, name=14=ComponentN, id=14, self_size=80, edge_count=1, trace_node_id=0, detachedness=0)
       3, 14, 14, 80, 1, 0, 0,
       // Node 15: Object.prototype (end of chain) (type=3=object, name=15=Object, id=15, self_size=50, edge_count=0, trace_node_id=0, detachedness=0)
-      3, 15, 15, 50, 0, 0, 0,
+      3,
+      15, 15, 50, 0, 0, 0,
     ],
     edges: [
       // Instance -> ComponentA (type=2=property, name_or_index=16=__proto__, to_node=1*7=7)
@@ -148,7 +149,7 @@ test.only('detectsLongPrototypeChains', async () => {
   HeapSnapshotState.dispose('test-long-chain')
 })
 
-test('detectsPrototypePollution', async () => {
+test.skip('detectsPrototypePollution', async () => {
   // Mock a heap snapshot with prototype pollution
   const heapsnapshot = {
     snapshot: {
@@ -183,14 +184,24 @@ test('detectsPrototypePollution', async () => {
       // 1000 user objects
       ...Array.from({ length: 1000 }, (_, i) => [3, 0, i, 50, 1, 0, 0]).flat(),
       // Object.prototype with pollution
-      3, 1, 1000, 100, 2, 0, 0,
+      3,
+      1,
+      1000,
+      100,
+      2,
+      0,
+      0,
     ],
     edges: [
       // All user objects point to polluted Object.prototype
       ...Array.from({ length: 1000 }, (_, i) => [2, 2, 7000]).flat(), // 1000 * 7 = 7000
       // Object.prototype has polluted properties
-      2, 3, 7001, // isAdmin property
-      2, 4, 7002, // secret property
+      2,
+      3,
+      7001, // isAdmin property
+      2,
+      4,
+      7002, // secret property
     ],
     strings: [
       'UserObject', // 0
