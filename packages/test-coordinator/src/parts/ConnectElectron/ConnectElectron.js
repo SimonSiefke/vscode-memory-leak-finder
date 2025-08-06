@@ -1,21 +1,12 @@
 import * as Assert from '../Assert/Assert.js'
-import * as JsonRpc from '../JsonRpc/JsonRpc.js'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.js'
 
-export const connectElectron = (ipc, connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback) => {
-  Assert.object(ipc)
+export const connectElectron = (rpc, connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback) => {
+  Assert.object(rpc)
   Assert.number(connectionId)
   Assert.boolean(headlessMode)
   Assert.string(webSocketUrl)
   Assert.boolean(isFirstConnection)
   Assert.boolean(canUseIdleCallback)
-  return JsonRpc.invoke(
-    ipc,
-    TestWorkerCommandType.ConnectElectron,
-    connectionId,
-    headlessMode,
-    webSocketUrl,
-    isFirstConnection,
-    canUseIdleCallback,
-  )
+  return rpc.invoke(TestWorkerCommandType.ConnectElectron, connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback)
 }
