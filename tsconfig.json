@@ -3,6 +3,7 @@
   "include": [],
   "references": [
     { "path": "./packages/charts" },
+    { "path": "./packages/chart-worker" },
     { "path": "./packages/cli" },
     { "path": "./packages/cursor-e2e" },
     { "path": "./packages/devtools-protocol" },
