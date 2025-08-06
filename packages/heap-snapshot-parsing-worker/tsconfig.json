@@ -19,7 +19,8 @@
     "noImplicitReturns": true,
     "noUnusedLocals": false,
     "composite": true,
-    "useUnknownInCatchVariables": false
+    "useUnknownInCatchVariables": false,
+    "allowImportingTsExtensions": true
   },
   "include": ["src", "test", "benchmark"]
 }

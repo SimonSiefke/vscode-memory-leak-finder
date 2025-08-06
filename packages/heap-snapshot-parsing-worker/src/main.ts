@@ -11,7 +11,7 @@ const workerPort = parentPort
 
 // Helper function to get transferrable objects for zero-copy transfer
 const getTransferList = (result) => {
-  const transferList = []
+  const transferList: any[] = []
   if (result && typeof result === 'object') {
     if (result.nodes && result.nodes.buffer) {
       transferList.push(result.nodes.buffer)
