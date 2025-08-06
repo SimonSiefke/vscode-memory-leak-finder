@@ -1,4 +1,4 @@
-import { getBalancedJsonIndices } from '../GetBalancedJsonIndices/GetBalancedJsonIndices.js'
+import { getBalancedJsonIndices } from '../GetBalancedJsonIndices/GetBalancedJsonIndices.ts'
 
 export const EMPTY_DATA = {
   startIndex: -1,

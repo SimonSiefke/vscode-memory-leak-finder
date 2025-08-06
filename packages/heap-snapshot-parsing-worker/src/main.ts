@@ -1,5 +1,5 @@
 import { parentPort } from 'node:worker_threads'
-import { commandMap } from './parts/CommandMap/CommandMap.js'
+import { commandMap } from './parts/CommandMap/CommandMap.ts'
 
 // Ensure we're running in a worker thread context
 if (!parentPort) {

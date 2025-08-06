@@ -2,7 +2,7 @@ import { test, expect } from '@jest/globals'
 import {
   parseHeapSnapshotMetaDataIndices,
   EMPTY_DATA,
-} from '../src/parts/ParseHeapSnapshotMetaDataIndices/ParseHeapSnapshotMetaDataIndices.js'
+} from '../src/parts/ParseHeapSnapshotMetaDataIndices/ParseHeapSnapshotMetaDataIndices.ts'
 
 test('parseHeapSnapshotMetaDataIndices - finds snapshot metadata indices', () => {
   const data =

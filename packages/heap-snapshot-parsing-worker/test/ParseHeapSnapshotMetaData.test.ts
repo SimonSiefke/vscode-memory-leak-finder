@@ -1,5 +1,5 @@
 import { test, expect } from '@jest/globals'
-import { parseHeapSnapshotMetaData, EMPTY_DATA } from '../src/parts/ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.js'
+import { parseHeapSnapshotMetaData, EMPTY_DATA } from '../src/parts/ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.ts'
 
 test('parseHeapSnapshotMetaData - parses valid snapshot metadata', () => {
   const data =

@@ -1,5 +1,5 @@
-import { parseFromStream } from '../ParseFromStream/ParseFromStream.js'
-import { createReadableString } from '../ReadableString/ReadableString.js'
+import { parseFromStream } from '../ParseFromStream/ParseFromStream.ts'
+import { createReadableString } from '../ReadableString/ReadableString.ts'
 
 /**
  * Parses a heap snapshot from JSON data and returns the parsed data with transferable arrays

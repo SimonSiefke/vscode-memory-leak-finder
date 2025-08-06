@@ -1,4 +1,4 @@
-import { charTypes } from '../CreateCharTypesLookupTable/CreateCharTypesLookupTable.js'
+import { charTypes } from '../CreateCharTypesLookupTable/CreateCharTypesLookupTable.ts'
 
 const DIGIT = 1
 const SEPARATOR = 2

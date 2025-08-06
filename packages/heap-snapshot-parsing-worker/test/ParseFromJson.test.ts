@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import { parseFromJson } from '../src/parts/ParseFromJson/ParseFromJson.js'
+import { parseFromJson } from '../src/parts/ParseFromJson/ParseFromJson.ts'
 
 test('prepareHeapSnapshot - parses simple heap snapshot', async () => {
   // Create a minimal heap snapshot data
