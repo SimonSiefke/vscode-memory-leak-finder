@@ -5,11 +5,10 @@ export const launchStdoutWorker = async () => {
   const url = GetStdoutWorkerUrl.getStdoutWorkerUrl()
   const rpc = await NodeWorkerRpcParent.create({
     path: url,
-    // name: 'Stdout Worker',
+    name: 'Stdout Worker',
     // ref: false,
     stdio: 'inherit',
     commandMap: {},
-    argv: ['--ipc-type=worker-thread'],
   })
   return rpc
 }
