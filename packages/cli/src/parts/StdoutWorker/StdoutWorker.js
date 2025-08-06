@@ -11,7 +11,8 @@ export const invoke = async (method, ...params) => {
   if (!state.rpc) {
     return
   }
-  state.rpc.invoke(method, ...params)
+  // TODO use invoke
+  state.rpc.send(method, ...params)
 }
 
 export const cleanup = () => {
