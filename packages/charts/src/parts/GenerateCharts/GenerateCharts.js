@@ -7,6 +7,8 @@ import * as Root from '../Root/Root.js'
 const visitors = Object.values(Charts).map((value) => {
   return {
     name: value.name,
+    // @ts-ignore
+    skip: value.skip,
     fn: value.createChart,
     getData: value.getData,
   }
@@ -15,8 +17,11 @@ const visitors = Object.values(Charts).map((value) => {
 export const generateCharts = async () => {
   const rpc = await launchChartWorker()
   for (const visitor of visitors) {
+    if (visitor.skip) {
+      continue
+    }
     const data = await visitor.getData()
-    const chartMetaData = await visitor.fn()
+    const chartMetaData = visitor.fn()
     const svg = await rpc.invoke('Chart.create', data, chartMetaData)
     const outPath = join(Root.root, '.vscode-charts', `${visitor.name}.svg`)
     await mkdir(dirname(outPath), { recursive: true })

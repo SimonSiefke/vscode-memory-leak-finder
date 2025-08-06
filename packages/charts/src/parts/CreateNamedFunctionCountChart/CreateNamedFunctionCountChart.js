@@ -6,6 +6,8 @@ export const name = 'named-function-count'
 
 export const getData = GetNamedFunctionCountData.getNamedFunctionCountData
 
+export const skip = 1
+
 export const createChart = (data) => {
   // TODO
   const baseHtml = Plot.plot({
