@@ -1,19 +1,20 @@
+import { NodeForkedProcessRpcClient, NodeWorkerRpcClient } from '@lvce-editor/rpc'
 import * as IpcChildType from '../IpcChildType/IpcChildType.js'
 
 const getModule = (method) => {
   switch (method) {
     case IpcChildType.NodeForkedProcess:
-      return import('../IpcChildWithNodeForkedProcess/IpcChildWithNodeForkedProcess.js')
+      return NodeForkedProcessRpcClient.create
     case IpcChildType.NodeWorkerThread:
-      return import('../IpcChildWithNodeWorkerThread/IpcChildWithNodeWorkerThread.js')
+      return NodeWorkerRpcClient.create
     default:
       throw new Error('unexpected ipc type')
   }
 }
 
-export const listen = async ({ method }) => {
-  const module = await getModule(method)
-  const rawIpc = module.create()
-  const ipc = module.wrap(rawIpc)
-  return ipc
+export const listen = async ({ method, ...options }) => {
+  const fn = getModule(method)
+  // @ts-ignore
+  const rpc = fn(options)
+  return rpc
 }

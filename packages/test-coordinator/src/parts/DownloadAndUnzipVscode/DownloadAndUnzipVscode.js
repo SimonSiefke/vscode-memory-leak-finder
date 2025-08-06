@@ -1,12 +1,11 @@
 import * as DownloadWorker from '../DownloadWorker/DownloadWorker.js'
-import * as JsonRpc from '../JsonRpc/JsonRpc.js'
 
 /**
  * @param {string} vscodeVersion
  */
 export const downloadAndUnzipVscode = async (vscodeVersion) => {
-  const ipc = await DownloadWorker.launch()
-  const path = await JsonRpc.invoke(ipc, 'Download.downloadAndUnzipVscode', vscodeVersion)
-  ipc.dispose()
+  const rpc = await DownloadWorker.launch()
+  const path = await rpc.invoke('Download.downloadAndUnzipVscode', vscodeVersion)
+  await rpc.dispose()
   return path
 }

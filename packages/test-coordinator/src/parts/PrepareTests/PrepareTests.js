@@ -8,7 +8,7 @@ import * as PageObject from '../PageObject/PageObject.js'
 import * as VideoRecording from '../VideoRecording/VideoRecording.js'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.js'
 
-export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connectionId, timeouts, ide, ideVersion, vscodePath, commit) => {
+export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connectionId, timeouts, ide, ideVersion, vscodePath, commit) => {
   // TODO move whole ide launch into separate worker
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
@@ -22,7 +22,7 @@ export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connecti
   })
   const devtoolsWebSocketUrlPromise = WaitForDevtoolsListening.waitForDevtoolsListening(child.stderr)
   const { monkeyPatchedElectron, electronObjectId, callFrameId } = await ConnectElectron.connectElectron(
-    ipc,
+    rpc,
     connectionId,
     headlessMode,
     webSocketUrl,
@@ -35,7 +35,7 @@ export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connecti
   }
   await MemoryLeakWorker.startWorker(devtoolsWebSocketUrl)
   await ConnectDevtools.connectDevtools(
-    ipc,
+    rpc,
     connectionId,
     devtoolsWebSocketUrl,
     monkeyPatchedElectron,
@@ -43,9 +43,9 @@ export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connecti
     callFrameId,
     isFirstConnection,
   )
-  await PageObject.create(ipc, connectionId, isFirstConnection, headlessMode, timeouts, ideVersion)
+  await PageObject.create(rpc, connectionId, isFirstConnection, headlessMode, timeouts, ideVersion)
   return {
-    ipc,
+    rpc,
     webSocketUrl,
     devtoolsWebSocketUrl,
     electronObjectId,
