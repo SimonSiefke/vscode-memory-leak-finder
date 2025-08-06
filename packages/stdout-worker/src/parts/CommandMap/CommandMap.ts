@@ -1,6 +1,6 @@
-import * as SpecialStdin from '../SpecialStdin/SpecialStdin.js'
-import * as Stdin from '../Stdin/Stdin.js'
-import * as Stdout from '../Stdout/Stdout.js'
+import * as SpecialStdin from '../SpecialStdin/SpecialStdin.ts'
+import * as Stdin from '../Stdin/Stdin.ts'
+import * as Stdout from '../Stdout/Stdout.ts'
 
 export const commandMap = {
   'SpecialStdin.start': SpecialStdin.start,
