@@ -1,4 +1,3 @@
-import * as CreateChart from '../CreateChart/CreateChart.js'
 import * as GetSetSizeData from '../GetSetSizeData/GetSetSizeData.js'
 
 export const name = 'map-size'
