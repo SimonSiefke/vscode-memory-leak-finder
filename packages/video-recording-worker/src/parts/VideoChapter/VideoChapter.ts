@@ -1,9 +1,10 @@
 import * as Assert from '../Assert/Assert.ts'
 
-export const state = {
-  /**
-   * @type {any[]}
-   */
+interface State {
+  chapters: any[]
+}
+
+export const state: State = {
   chapters: [],
 }
 
