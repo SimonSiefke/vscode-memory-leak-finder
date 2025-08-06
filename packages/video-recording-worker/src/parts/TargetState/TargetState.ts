@@ -1,17 +1,17 @@
-import * as Assert from '../Assert/Assert.js'
-import * as PTimeout from '../PTimeout/PTimeout.js'
-import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
-import { VError } from '../VError/VError.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as PTimeout from '../PTimeout/PTimeout.ts'
+import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
+import { VError } from '../VError/VError.ts'
 
-export const state = {
+interface State {
+  targets: Record<any, any>
+  callbacks: any[]
+  destroyedCallbacks: any[]
+}
+
+export const state: State = {
   targets: Object.create(null),
-  /**
-   * @type {any[]}
-   */
   callbacks: [],
-  /**
-   * @type {any[]}
-   */
   destroyedCallbacks: [],
 }
 
@@ -40,14 +40,14 @@ export const addTarget = (targetId, target) => {
 export const removeTarget = (targetId) => {
   Assert.string(targetId)
   delete state.targets[targetId]
-  const toRemove = []
+  const toRemove: any[] = []
   for (const callback of state.destroyedCallbacks) {
     if (callback.targetId === targetId) {
       callback.resolve()
       toRemove.push(callback)
     }
   }
-  const newCallbacks = []
+  const newCallbacks: any[] = []
   for (const callback of state.destroyedCallbacks) {
     if (!toRemove.includes(callback)) {
       newCallbacks.push(callback)

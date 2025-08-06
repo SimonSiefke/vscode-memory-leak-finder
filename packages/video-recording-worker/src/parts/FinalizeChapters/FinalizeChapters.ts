@@ -1,9 +1,9 @@
 import { existsSync } from 'fs'
 import { readFile, writeFile } from 'fs/promises'
 import { basename, dirname, join } from 'path'
-import * as Exec from '../Exec/Exec.js'
-import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.js'
-import * as VideoChapter from '../VideoChapter/VideoChapter.js'
+import * as Exec from '../Exec/Exec.ts'
+import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.ts'
+import * as VideoChapter from '../VideoChapter/VideoChapter.ts'
 
 const getMetaDataInputOptions = (baseName) => {
   return ['-i', baseName, '-y', 'meta.ffmeta']

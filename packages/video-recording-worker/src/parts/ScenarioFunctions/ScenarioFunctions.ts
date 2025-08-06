@@ -1,13 +1,13 @@
-import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.js'
-import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
-import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.js'
-import * as HandleFrame from '../HandleFrame/HandleFrame.js'
-import * as PTimeout from '../PTimeout/PTimeout.js'
-import * as ScreencastQuality from '../ScreencastQuality/ScreencastQuality.js'
-import * as SessionState from '../SessionState/SessionState.js'
-import * as TargetState from '../TargetState/TargetState.js'
-import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
+import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
+import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
+import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.ts'
+import * as HandleFrame from '../HandleFrame/HandleFrame.ts'
+import * as PTimeout from '../PTimeout/PTimeout.ts'
+import * as ScreencastQuality from '../ScreencastQuality/ScreencastQuality.ts'
+import * as SessionState from '../SessionState/SessionState.ts'
+import * as TargetState from '../TargetState/TargetState.ts'
+import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 
 const handleAttachedToBrowser = (message) => {
   console.log('attached to browser', message)

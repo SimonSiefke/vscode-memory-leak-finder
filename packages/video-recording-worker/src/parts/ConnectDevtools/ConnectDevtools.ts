@@ -1,11 +1,11 @@
-import * as Assert from '../Assert/Assert.js'
-import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.js'
-import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.js'
-import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
-import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as ObjectType from '../ObjectType/ObjectType.js'
-import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
-import * as SessionState from '../SessionState/SessionState.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
+import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
+import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
+import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as ObjectType from '../ObjectType/ObjectType.ts'
+import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.ts'
+import * as SessionState from '../SessionState/SessionState.ts'
 
 export const connectDevtools = async (devtoolsWebSocketUrl) => {
   Assert.string(devtoolsWebSocketUrl)

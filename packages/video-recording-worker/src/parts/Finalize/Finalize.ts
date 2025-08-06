@@ -1,5 +1,5 @@
-import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.js'
-import * as FinalizeChapters from '../FinalizeChapters/FinalizeChapters.js'
+import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.ts'
+import * as FinalizeChapters from '../FinalizeChapters/FinalizeChapters.ts'
 
 export const finalize = async () => {
   const ffmpegProcess = FfmpegProcessState.get()

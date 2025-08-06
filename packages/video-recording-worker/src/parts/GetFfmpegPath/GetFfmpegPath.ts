@@ -1,6 +1,6 @@
 import { join } from 'path'
-import * as GetExecutablePath from '../GetExecutablePath/GetExecutablePath.js'
-import * as Root from '../Root/Root.js'
+import * as GetExecutablePath from '../GetExecutablePath/GetExecutablePath.ts'
+import * as Root from '../Root/Root.ts'
 
 export const getFfmpegPath = () => {
   const executablePath = GetExecutablePath.getExecutablePath('ffmpeg')

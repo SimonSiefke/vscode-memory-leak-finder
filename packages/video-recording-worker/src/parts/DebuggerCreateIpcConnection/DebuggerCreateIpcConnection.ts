@@ -1,7 +1,7 @@
-import { VError } from '../VError/VError.js'
+import { VError } from '../VError/VError.ts'
 import { WebSocket } from 'ws'
-import * as Json from '../Json/Json.js'
-import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWebSocketToBeOpen.js'
+import * as Json from '../Json/Json.ts'
+import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWebSocketToBeOpen.ts'
 
 /**
  * @param {string} wsUrl

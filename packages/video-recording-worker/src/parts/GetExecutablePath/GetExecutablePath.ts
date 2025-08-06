@@ -1,6 +1,6 @@
 // based on microsoft/playwright/packages/playwright-core/src/server/registry/index.ts (License Apache 2.0)
-import * as ExecutablePaths from '../ExecutablePaths/ExecutablePaths.js'
-import * as GetExecutablePathKey from '../GetExecutablePathKey/GetExecutablePathKey.js'
+import * as ExecutablePaths from '../ExecutablePaths/ExecutablePaths.ts'
+import * as GetExecutablePathKey from '../GetExecutablePathKey/GetExecutablePathKey.ts'
 
 export const getExecutablePath = (name) => {
   const osPaths = ExecutablePaths[name]
