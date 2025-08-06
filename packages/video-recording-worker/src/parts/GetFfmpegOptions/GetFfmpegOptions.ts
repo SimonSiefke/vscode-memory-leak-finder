@@ -1,6 +1,7 @@
-import * as Assert from '../Assert/Assert.js'
+import * as Assert from '../Assert/Assert.ts'
 
-export const getFfmpegOptions = (fps, width, height, outFile) => {
+// TODO add test
+export const getFfmpegOptions = (fps: number, width: number, height: number, outFile: string): readonly string[] => {
   Assert.number(fps)
   Assert.number(width)
   Assert.number(height)

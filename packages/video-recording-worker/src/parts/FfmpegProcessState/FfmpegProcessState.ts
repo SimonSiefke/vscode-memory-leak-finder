@@ -1,6 +1,11 @@
 import { ChildProcess } from 'child_process'
 
-export const state = {
+interface State {
+  process: ChildProcess | undefined
+  outFile: string
+}
+
+export const state: State = {
   /**
    * @type {ChildProcess|undefined}
    */
@@ -12,7 +17,7 @@ export const set = (value) => {
   state.process = value
 }
 
-export const get = () => {
+export const get = (): any => {
   return state.process
 }
 
