@@ -4,7 +4,7 @@ import * as TestStateOutput from '../TestStateOutput/TestStateOutput.js'
 
 export const handleStderrData = async (data) => {
   if (!StdinDataState.isBuffering()) {
-    await Stdout.write(data) // TODO use stderr
+    await Stdout.write(data.toString()) // TODO use stderr
   }
   TestStateOutput.addStdErr(data)
 }
