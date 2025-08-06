@@ -10,6 +10,7 @@ const locations = [
   '.nvmrc',
   'lerna.json',
   'package-lock.json',
+  'packages/chart-worker/package-lock.json',
   'packages/charts/package-lock.json',
   'packages/cli/package-lock.json',
   'packages/cursor-e2e/package-lock.json',
