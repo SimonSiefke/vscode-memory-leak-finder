@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import { createHeapSnapshotWriteStream } from '../src/parts/HeapSnapshotWriteStream/HeapSnapshotWriteStream.js'
+import { createHeapSnapshotWriteStream } from '../src/parts/HeapSnapshotWriteStream/HeapSnapshotWriteStream.ts'
 
 test('HeapSnapshotWriteStream - constructor initializes correctly', () => {
   const stream = createHeapSnapshotWriteStream()

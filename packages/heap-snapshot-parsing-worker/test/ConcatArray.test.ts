@@ -1,5 +1,5 @@
 import { test, expect } from '@jest/globals'
-import { concatArray, concatUint32Array } from '../src/parts/ConcatArray/ConcatArray.js'
+import { concatArray, concatUint32Array } from '../src/parts/ConcatArray/ConcatArray.ts'
 
 test('concatArray - concatenates two non-empty arrays', () => {
   const array1 = new Uint8Array([1, 2, 3])

@@ -1,17 +1,31 @@
 // based on chrome devtools HeapSnapshotLoader.ts (https://github.com/ChromeDevTools/devtools-frontend/blob/main/front_end/entrypoints/heap_snapshot_worker/HeapSnapshotLoader.ts), BSD-3-Clause license
 
 import { Writable } from 'node:stream'
-import { concatArray, concatUint32Array } from '../ConcatArray/ConcatArray.js'
-import { decodeArray } from '../DecodeArray/DecodeArray.js'
-import { HeapSnapshotParserError } from '../HeapSnapshotParserError/HeapSnapshotParserError.js'
-import * as HeapSnapshotParsingState from '../HeapSnapshotParsingState/HeapSnapshotParsingState.js'
-import { parseHeapSnapshotArray } from '../ParseHeapSnapshotArray/ParseHeapSnapshotArray.js'
-import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.js'
-import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.js'
-import * as TokenType from '../TokenType/TokenType.js'
-import { writeStringArrayData } from '../WriteStringArrayData/WriteStringArrayData.js'
+import { concatArray, concatUint32Array } from '../ConcatArray/ConcatArray.ts'
+import { decodeArray } from '../DecodeArray/DecodeArray.ts'
+import { HeapSnapshotParserError } from '../HeapSnapshotParserError/HeapSnapshotParserError.ts'
+import * as HeapSnapshotParsingState from '../HeapSnapshotParsingState/HeapSnapshotParsingState.ts'
+import { parseHeapSnapshotArray } from '../ParseHeapSnapshotArray/ParseHeapSnapshotArray.ts'
+import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.ts'
+import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.ts'
+import * as TokenType from '../TokenType/TokenType.ts'
+import { writeStringArrayData } from '../WriteStringArrayData/WriteStringArrayData.ts'
 
 class HeapSnapshotWriteStream extends Writable {
+  arrayIndex: number
+  currentNumber: number
+  data: Uint8Array<ArrayBuffer>
+  edges: Uint32Array<ArrayBuffer>
+  hasDigits: boolean
+  intermediateArray: Uint32Array<ArrayBuffer>
+  locations: Uint32Array<ArrayBuffer>
+  metaData: any
+  nodes: Uint32Array<ArrayBuffer>
+  options: any
+  state: number
+  strings: string[]
+  validate: any
+
   constructor(options) {
     super()
     this.arrayIndex = 0

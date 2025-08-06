@@ -1,6 +1,6 @@
 import { Readable } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
-import { createHeapSnapshotWriteStream } from '../HeapSnapshotWriteStream/HeapSnapshotWriteStream.js'
+import { createHeapSnapshotWriteStream } from '../HeapSnapshotWriteStream/HeapSnapshotWriteStream.ts'
 
 /**
  * Parses a heap snapshot file and returns the parsed data with transferable arrays

@@ -1,6 +1,9 @@
 import { Readable } from 'node:stream'
 
 class ReadableString extends Readable {
+  str: any
+  sent: boolean
+
   constructor(str) {
     super()
     this.str = str

@@ -1,5 +1,5 @@
 import { test, expect } from '@jest/globals'
-import { parseHeapSnapshotArrayHeader } from '../src/parts/ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.js'
+import { parseHeapSnapshotArrayHeader } from '../src/parts/ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.ts'
 
 test('parseHeapSnapshotArrayHeader - finds nodes array header', () => {
   const data = '"nodes":[1,2,3]'

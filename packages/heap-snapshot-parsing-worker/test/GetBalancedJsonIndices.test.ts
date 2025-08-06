@@ -1,5 +1,5 @@
 import { test, expect } from '@jest/globals'
-import { getBalancedJsonIndices } from '../src/parts/GetBalancedJsonIndices/GetBalancedJsonIndices.js'
+import { getBalancedJsonIndices } from '../src/parts/GetBalancedJsonIndices/GetBalancedJsonIndices.ts'
 
 test('getBalancedJsonIndices - finds balanced object with simple content', () => {
   const data = '{"key":"value"}'

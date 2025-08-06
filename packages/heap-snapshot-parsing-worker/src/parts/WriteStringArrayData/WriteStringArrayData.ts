@@ -1,5 +1,5 @@
-import { decodeArray } from '../DecodeArray/DecodeArray.js'
-import { concatArray } from '../ConcatArray/ConcatArray.js'
+import { decodeArray } from '../DecodeArray/DecodeArray.ts'
+import { concatArray } from '../ConcatArray/ConcatArray.ts'
 
 /**
  * Parses string array data from heap snapshot chunks

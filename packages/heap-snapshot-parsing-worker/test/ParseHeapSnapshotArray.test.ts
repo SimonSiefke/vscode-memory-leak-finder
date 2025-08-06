@@ -1,5 +1,5 @@
 import { test, expect } from '@jest/globals'
-import { parseHeapSnapshotArray } from '../src/parts/ParseHeapSnapshotArray/ParseHeapSnapshotArray.js'
+import { parseHeapSnapshotArray } from '../src/parts/ParseHeapSnapshotArray/ParseHeapSnapshotArray.ts'
 
 test('parseHeapSnapshotArray - parses simple comma-separated numbers', () => {
   const data = new TextEncoder().encode('1,2,3]')
