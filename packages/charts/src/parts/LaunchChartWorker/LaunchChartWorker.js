@@ -8,6 +8,7 @@ export const launchChartWorker = async () => {
     // @ts-ignore
     name: 'Chart Worker',
     commandMap: {},
+    stdio: 'inherit',
   })
   return {
     invoke: rpc.invoke,
