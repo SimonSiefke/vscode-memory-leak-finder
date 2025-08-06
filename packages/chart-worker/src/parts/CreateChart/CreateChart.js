@@ -14,6 +14,7 @@ export const createChart = (data, { x, y, xLabel, yLabel }) => {
     },
     marks: [Plot.lineY(data, { x, y })],
   }).outerHTML
+
   const finalHtml = fixHtmlNamespace(baseHtml)
   return finalHtml
 }
