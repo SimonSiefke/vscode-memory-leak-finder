@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import * as CommandMap from '../src/parts/CommandMap/CommandMap.js'
+import * as CommandMap from '../src/parts/CommandMap/CommandMap.ts'
 
 test('commandMap contains Stdout.write function', () => {
   expect(CommandMap.commandMap).toBeDefined()

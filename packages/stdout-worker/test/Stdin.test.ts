@@ -7,11 +7,11 @@ const mockStdin = {
   setEncoding: jest.fn(),
 }
 
-jest.unstable_mockModule('../src/parts/Process/Process.js', () => ({
+jest.unstable_mockModule('../src/parts/Process/Process.ts', () => ({
   stdin: mockStdin,
 }))
 
-const Stdin = await import('../src/parts/Stdin/Stdin.js')
+const Stdin = await import('../src/parts/Stdin/Stdin.ts')
 
 beforeEach(() => {
   jest.clearAllMocks()
