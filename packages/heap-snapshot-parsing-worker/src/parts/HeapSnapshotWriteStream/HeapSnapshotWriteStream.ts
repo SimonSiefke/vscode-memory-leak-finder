@@ -12,6 +12,20 @@ import * as TokenType from '../TokenType/TokenType.ts'
 import { writeStringArrayData } from '../WriteStringArrayData/WriteStringArrayData.ts'
 
 class HeapSnapshotWriteStream extends Writable {
+  arrayIndex: number
+  currentNumber: number
+  data: Uint8Array<ArrayBuffer>
+  edges: Uint32Array<ArrayBuffer>
+  hasDigits: boolean
+  intermediateArray: Uint32Array<ArrayBuffer>
+  locations: Uint32Array<ArrayBuffer>
+  metaData: any
+  nodes: Uint32Array<ArrayBuffer>
+  options: any
+  state: number
+  strings: string[]
+  validate: any
+
   constructor(options) {
     super()
     this.arrayIndex = 0
