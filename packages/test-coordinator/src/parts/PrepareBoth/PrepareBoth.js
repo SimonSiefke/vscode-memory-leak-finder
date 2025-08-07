@@ -7,7 +7,6 @@ import * as MakeElectronAvailableGlobally from '../MakeElectronAvailableGlobally
 import * as MakeRequireAvailableGlobally from '../MakeRequireAvailableGlobally/MakeRequireAvailableGlobally.js'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.js'
 import { VError } from '../VError/VError.js'
-import * as WaitForDebuggerToBePaused from '../WaitForDebuggerToBePaused/WaitForDebuggerToBePaused.js'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.js'
 
 export const waitForDebuggerToBePaused = async (rpc) => {
@@ -22,7 +21,7 @@ export const waitForDebuggerToBePaused = async (rpc) => {
 const connectElectron = async (electronRpc) => {
   console.log('test worker command')
 
-  let debuggerPausedPromise = WaitForDebuggerToBePaused.waitForDebuggerToBePaused(electronRpc)
+  let debuggerPausedPromise = waitForDebuggerToBePaused(electronRpc)
   await Promise.all([
     DevtoolsProtocolDebugger.enable(electronRpc),
     DevtoolsProtocolRuntime.enable(electronRpc),
