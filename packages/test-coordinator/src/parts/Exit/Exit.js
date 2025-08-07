@@ -1,9 +1,11 @@
 import * as Process from '../Process/Process.js'
 import * as Time from '../Time/Time.js'
 import * as ExitCode from '../ExitCode/ExitCode.js'
+import * as Disposables from '../Disposables/Disposables.js'
 
-export const exit = () => {
+export const exit = async () => {
   const s = Time.now()
+  await Disposables.disposeAll()
   // LaunchElectron.cleanup()
   const e = Time.now()
   // process.exit(0)
@@ -13,10 +15,4 @@ export const exit = () => {
   setTimeout(() => {
     Process.exit(ExitCode.Success)
   }, 0)
-  // console.log(process._activeHandles)
-
-  // console.log({
-  //   handles: process._getActiveHandles(),
-  //   requests: process._getActiveRequests(),
-  // })
 }
