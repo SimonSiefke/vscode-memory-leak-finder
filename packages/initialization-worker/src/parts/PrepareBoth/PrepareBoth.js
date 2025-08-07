@@ -19,8 +19,6 @@ const waitForDebuggerToBePaused = async (rpc) => {
 }
 
 const connectElectron = async (electronRpc) => {
-  console.log('test worker command')
-
   let debuggerPausedPromise = waitForDebuggerToBePaused(electronRpc)
   await Promise.all([
     DevtoolsProtocolDebugger.enable(electronRpc),
@@ -100,5 +98,6 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
     devtoolsWebSocketUrl,
     monkeyPatchedElectronId,
     electronObjectId,
+    childPid: child.pid,
   }
 }
