@@ -189,7 +189,7 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to copy explorer item ${dirent}`)
       }
     },
-    async openContextMenu(dirent, select) {
+    async openContextMenu(dirent, select = undefined) {
       try {
         await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
