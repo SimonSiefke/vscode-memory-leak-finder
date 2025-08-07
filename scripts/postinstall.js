@@ -13,6 +13,7 @@ const applyLernaBugWorkaround =async  () => {
   // workaround for https://github.com/lerna/lerna/issues/2352
   await exec(`cd packages/page-object && npm ci --prefer-offline && cd ../../`);
   await exec(`cd packages/e2e && npm ci --prefer-offline && cd ../../`);
+  await exec(`npm run build`);
 }
 
 const main = async () => {
@@ -20,4 +21,3 @@ const main = async () => {
 }
 
 main()
-//
