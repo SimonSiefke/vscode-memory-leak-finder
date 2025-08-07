@@ -17,10 +17,13 @@ export const writeStringArrayData = (chunk, data, strings, onReset, onDone, onDa
   // Concatenate the new chunk with existing data
   const combinedData = concatArray(data, chunk)
   
+  console.log('writeStringArrayData called with chunk length:', chunk.length, 'data length:', data.length)
+  console.log('writeStringArrayData combined data as string:', new TextDecoder().decode(combinedData))
+  
   // Parse strings from the combined data
   const result = parseStringArray(combinedData, strings)
   
-  console.log('parseStringArray result:', result, 'strings:', strings)
+  console.log('writeStringArrayData result:', result, 'strings:', strings)
   
   if (result.done) {
     // Parsing is complete
@@ -55,14 +58,9 @@ const parseStringArray = (data, strings) => {
   
   const textDecoder = new TextDecoder()
   
-  console.log('parseStringArray input data length:', data.length)
-  console.log('parseStringArray input data as string:', textDecoder.decode(data))
-  
   while (dataIndex < data.length) {
     const byte = data[dataIndex]
     const char = String.fromCharCode(byte)
-    
-    console.log('dataIndex:', dataIndex, 'char:', char, 'state:', state)
     
     switch (state) {
       case 'outside':
@@ -70,25 +68,32 @@ const parseStringArray = (data, strings) => {
           // Start of a string
           state = 'inside_string'
           stringStart = dataIndex + 1 // Skip the opening quote
-          console.log('Found opening quote, stringStart:', stringStart)
+          dataIndex++
         } else if (char === ']') {
           // End of array
           done = true
           dataIndex++
-          console.log('Found closing bracket, done')
           break
+        } else if (char === '}') {
+          // End of JSON object (this can happen when parsing from JSON.stringify)
+          // If we've parsed at least one string, consider it done
+          if (strings.length > 0) {
+            done = true
+            dataIndex++
+            break
+          }
+          // Otherwise, this might be incomplete data
+          return { dataIndex, done: false }
         } else if (char === '[') {
           // Opening bracket, ignore it
           dataIndex++
-          console.log('Found opening bracket, ignoring')
         } else if (char === ',' || char === ' ' || char === '\n' || char === '\r' || char === '\t') {
           // Ignore whitespace and commas
           dataIndex++
-          console.log('Ignoring whitespace/comma')
         } else {
           // Unexpected character, might be incomplete data
-          console.log('Unexpected character in outside state:', char)
-          return { dataIndex: 0, done: false }
+          // Return the data we've processed so far
+          return { dataIndex, done: false }
         }
         break
         
@@ -97,15 +102,15 @@ const parseStringArray = (data, strings) => {
           // Escape character, next character is literal
           state = 'after_backslash'
           dataIndex++
-          console.log('Found backslash, switching to after_backslash state')
         } else if (char === '"') {
           // End of string
           const stringEnd = dataIndex
-          if (stringStart < stringEnd) {
+          if (stringStart <= stringEnd) {
             const stringBytes = data.slice(stringStart, stringEnd)
             const string = textDecoder.decode(stringBytes)
-            strings.push(string)
-            console.log('Found closing quote, parsed string:', string)
+            // Process escaped characters in the string
+            const processedString = string.replace(/\\"/g, '"').replace(/\\\\/g, '\\')
+            strings.push(processedString)
           }
           state = 'outside'
           dataIndex++
@@ -116,14 +121,18 @@ const parseStringArray = (data, strings) => {
         break
         
       case 'after_backslash':
-        // Skip the escaped character
+        // Skip the escaped character (it's already included in the string)
         dataIndex++
         state = 'inside_string'
-        console.log('Skipped escaped character, back to inside_string state')
         break
     }
   }
   
-  console.log('parseStringArray final result:', { dataIndex, done, strings })
+  // If we reach the end of data while inside a string, we need more data
+  if (state === 'inside_string' || state === 'after_backslash') {
+    // Return the data we've processed so far (up to the start of the incomplete string)
+    return { dataIndex: stringStart - 1, done: false }
+  }
+  
   return { dataIndex, done }
 }
