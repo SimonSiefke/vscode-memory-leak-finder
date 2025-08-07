@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import { VError } from '../VError/VError.js'
 
