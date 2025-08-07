@@ -1,5 +1,7 @@
 import * as Assert from '../Assert/Assert.js'
+import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.js'
 import * as CreateNameMap from '../CreateNameMap/CreateNameMap.js'
+import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.js'
 import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.js'
@@ -43,8 +45,29 @@ export const getNamedArrayCountFromHeapSnapshot = async (path) => {
   const snapshot = await prepareHeapSnapshot(path, {
     parseStrings: true,
   })
-  const { nodes, edges, strings } = snapshot
-  console.log({ snapshot })
+  const { nodes, edges, strings, metaData } = snapshot
+  const { itemsPerLocation, scriptIdOffset, lineOffset, columnOffset } = getLocationFieldOffsets(metaData.data.meta.location_fields)
+  const { node_types, node_fields, edge_types, edge_fields, location_fields } = metaData.data.meta
+  const {
+    objectTypeIndex,
+    ITEMS_PER_NODE,
+    ITEMS_PER_EDGE,
+    typeFieldIndex,
+    nameFieldIndex,
+    idFieldIndex,
+    selfSizeFieldIndex,
+    edgeCountFieldIndex,
+    detachednessFieldIndex,
+    traceNodeIdFieldIndex,
+    edgeTypeFieldIndex,
+    edgeNameFieldIndex,
+    edgeToNodeFieldIndex,
+    edgeTypes,
+    nodeTypes,
+  } = computeHeapSnapshotIndices(node_types, node_fields, edge_types, edge_fields)
+
+  console.log({ ITEMS_PER_EDGE, ITEMS_PER_NODE, nameFieldIndex })
+  // console.log({ snapshot })
   // const heapsnapshot = HeapSnapshotState.get(id)
 
   // Assert.object(heapsnapshot)
