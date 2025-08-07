@@ -39,7 +39,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to type ${value}`)
       }
     },
-    async select(text, stayVisible) {
+    async select(text, stayVisible = false) {
       try {
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
