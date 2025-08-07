@@ -8,6 +8,7 @@ import * as MakeRequireAvailableGlobally from '../MakeRequireAvailableGlobally/M
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.js'
 import { VError } from '../VError/VError.js'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.js'
+import * as Disposables from '../Disposables/Disposables.js'
 
 const waitForDebuggerToBePaused = async (rpc) => {
   try {
@@ -71,6 +72,7 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
     ide,
     vscodePath,
     commit,
+    addDisposable: Disposables.add,
   })
   const devtoolsWebSocketUrlPromise = WaitForDevtoolsListening.waitForDevtoolsListening(child.stderr)
 

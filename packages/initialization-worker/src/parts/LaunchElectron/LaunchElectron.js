@@ -1,17 +1,7 @@
-import { ChildProcess } from 'node:child_process'
-import exitHook from 'exit-hook'
-import { VError } from '../VError/VError.js'
 import * as GetElectronArgs from '../GetElectronArgs/GetElectronArgs.js'
-import * as Logger from '../Logger/Logger.js'
 import * as Spawn from '../Spawn/Spawn.js'
+import { VError } from '../VError/VError.js'
 import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.js'
-
-const state = {
-  /**
-   * @type {ChildProcess[]}
-   */
-  processes: [],
-}
 
 // const logFile = '/tmp/lvce-manual-tests-log.txt'
 // const logStream = createWriteStream(logFile)
@@ -30,14 +20,16 @@ const handleStdErr = (data) => {
   // logStream.write(data)
 }
 
-export const launchElectron = async ({ cliPath, args, headlessMode, cwd, env }) => {
+export const launchElectron = async ({ cliPath, args, headlessMode, cwd, env, addDisposable }) => {
   try {
     const allArgs = GetElectronArgs.getElectronArgs({ headlessMode, args })
     const child = Spawn.spawn(cliPath, allArgs, {
       cwd,
       env,
     })
-    state.processes.push(child)
+    addDisposable(() => {
+      child.kill('SIGKILL')
+    })
     if (child.stdout) {
       child.stdout.setEncoding('utf-8')
       child.stdout.on('data', handleStdout)
@@ -47,10 +39,6 @@ export const launchElectron = async ({ cliPath, args, headlessMode, cwd, env }) 
       child.stderr.on('data', handleStdErr)
     }
     const webSocketUrl = await WaitForDebuggerListening.waitForDebuggerListening(child.stderr)
-    const handleExit = () => {
-      child.kill()
-    }
-    exitHook(handleExit)
     return {
       child,
       webSocketUrl,
@@ -58,12 +46,4 @@ export const launchElectron = async ({ cliPath, args, headlessMode, cwd, env }) 
   } catch (error) {
     throw new VError(error, `Failed to launch electron`)
   }
-}
-
-export const cleanup = () => {
-  Logger.log(`[test-worker] cleanup ${state.processes.length} child process`)
-  for (const childProcess of state.processes) {
-    childProcess.kill('SIGKILL')
-  }
-  state.processes = []
 }
