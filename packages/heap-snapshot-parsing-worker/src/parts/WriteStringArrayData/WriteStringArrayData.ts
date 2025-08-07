@@ -16,15 +16,10 @@ import { concatArray } from '../ConcatArray/ConcatArray.ts'
 export const writeStringArrayData = (chunk, data, strings, onReset, onDone, onDataUpdate) => {
   // Concatenate the new chunk with existing data
   const combinedData = concatArray(data, chunk)
-  
-  console.log('writeStringArrayData called with chunk length:', chunk.length, 'data length:', data.length)
-  console.log('writeStringArrayData combined data as string:', new TextDecoder().decode(combinedData))
-  
+
   // Parse strings from the combined data
   const result = parseStringArray(combinedData, strings)
-  
-  console.log('writeStringArrayData result:', result, 'strings:', strings)
-  
+
   if (result.done) {
     // Parsing is complete
     onReset()
@@ -55,13 +50,13 @@ const parseStringArray = (data, strings) => {
   let state = 'outside' // 'outside', 'inside_string', 'after_backslash'
   let stringStart = -1
   let done = false
-  
+
   const textDecoder = new TextDecoder()
-  
+
   while (dataIndex < data.length) {
     const byte = data[dataIndex]
     const char = String.fromCharCode(byte)
-    
+
     switch (state) {
       case 'outside':
         if (char === '"') {
@@ -96,7 +91,7 @@ const parseStringArray = (data, strings) => {
           return { dataIndex, done: false }
         }
         break
-        
+
       case 'inside_string':
         if (char === '\\') {
           // Escape character, next character is literal
@@ -119,7 +114,7 @@ const parseStringArray = (data, strings) => {
           dataIndex++
         }
         break
-        
+
       case 'after_backslash':
         // Skip the escaped character (it's already included in the string)
         dataIndex++
@@ -127,12 +122,12 @@ const parseStringArray = (data, strings) => {
         break
     }
   }
-  
+
   // If we reach the end of data while inside a string, we need more data
   if (state === 'inside_string' || state === 'after_backslash') {
     // Return the data we've processed so far (up to the start of the incomplete string)
     return { dataIndex: stringStart - 1, done: false }
   }
-  
+
   return { dataIndex, done }
 }
