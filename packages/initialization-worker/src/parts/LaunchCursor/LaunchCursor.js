@@ -13,7 +13,7 @@ import { join } from '../Path/Path.js'
 import * as Root from '../Root/Root.js'
 import { VError } from '../VError/VError.js'
 
-export const launchCursor = async ({ headlessMode, cwd, cursorVersion, vscodePath }) => {
+export const launchCursor = async ({ headlessMode, cwd, cursorVersion, vscodePath, addDisposable }) => {
   try {
     const testWorkspacePath = join(Root.root, '.cursor-test-workspace')
     await CreateTestWorkspace.createTestWorkspace(testWorkspacePath)
@@ -45,6 +45,7 @@ export const launchCursor = async ({ headlessMode, cwd, cursorVersion, vscodePat
       headlessMode,
       cwd,
       env,
+      addDisposable,
     })
     return {
       child,
