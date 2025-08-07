@@ -17,6 +17,7 @@ export const create = async (connectionId, isFirstConnection, isHeadless, timeou
     const pageObjectPath = GetPageObjectPath.getPageObjectPath()
     const pageObjectModule = await ImportScript.importScript(pageObjectPath)
     const electronApp = ElectronAppState.get(connectionId)
+    console.log({ electronApp })
     ElectronAppState.remove(connectionId)
     const firstWindow = await WaitForVsCodeToBeReady.waitForVsCodeToBeReady({
       electronApp,

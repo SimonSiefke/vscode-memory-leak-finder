@@ -22,7 +22,10 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl, 
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc, canUseIdleCallback)
   IntermediateConnectionState.set(connectionId, electronRpc)
 
+  console.log('test worker command')
+
   const handleIntermediatePaused = async (x) => {
+    console.log('intermediate paused')
     electronRpc.off(DevtoolsEventType.DebuggerPaused, handleIntermediatePaused)
     // since electron 29, electron cause pause again during connecting
     if (IsPausedOnStartEvent.isPausedOnStartEvent(x)) {
