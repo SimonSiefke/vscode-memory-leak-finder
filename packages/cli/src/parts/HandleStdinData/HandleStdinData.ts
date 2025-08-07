@@ -38,6 +38,6 @@ export const handleStdinData = async (key) => {
     )
   }
   if (newState.mode === ModeType.Interrupted) {
-    KillWorkers.killWorkers()
+    await KillWorkers.killWorkers()
   }
 }

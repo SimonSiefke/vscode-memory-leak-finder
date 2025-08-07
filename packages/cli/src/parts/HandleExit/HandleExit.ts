@@ -3,5 +3,5 @@ import * as SpecialStdin from '../SpecialStdin/SpecialStdin.ts'
 
 export const handleExit = async () => {
   await SpecialStdin.stop()
-  KillWorkers.killWorkers()
+  await KillWorkers.killWorkers()
 }
