@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import * as Assert from '../Assert/Assert.js'
 import * as FileSystem from '../FileSystem/FileSystem.js'
 import * as FormatPaths from '../FormatPaths/FormatPaths.js'
@@ -11,6 +12,9 @@ export const getTestsToRun = async (root, cwd, filterValue) => {
     Assert.string(cwd)
     Assert.string(filterValue)
     const testsPath = Path.join(root, 'src')
+    if (!existsSync(testsPath)) {
+      throw new Error(`test folder not found: ${testsPath}`)
+    }
     const testDirents = await FileSystem.readDir(testsPath)
     const matchingDirents = GetMatchingFiles.getMatchingFiles(testDirents, filterValue)
     const formattedPaths = FormatPaths.formatPaths(cwd, testsPath, matchingDirents)
