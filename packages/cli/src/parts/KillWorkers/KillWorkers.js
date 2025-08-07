@@ -1,14 +1,15 @@
 import * as RunTest from '../RunTest/RunTest.js'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.js'
-import * as JsonRpc from '../JsonRpc/JsonRpc.js'
 import * as StdoutWorker from '../StdoutWorker/StdoutWorker.js'
 
 export const killWorkers = async () => {
   if (RunTest.state.testCoordinator) {
-    JsonRpc.send(RunTest.state.testCoordinator, TestWorkerCommandType.Exit)
-
+    // TODO decide whether it is better to dispose the worker from here or let the worker dispose itself
+    RunTest.state.testCoordinator.send(TestWorkerCommandType.Exit)
     RunTest.state.testCoordinator = undefined
   }
-  await StdoutWorker.state.ipc.dispose()
-  StdoutWorker.state.ipc = undefined
+  if (StdoutWorker.state.rpc) {
+    await StdoutWorker.state.rpc.dispose()
+  }
+  StdoutWorker.state.rpc = undefined
 }

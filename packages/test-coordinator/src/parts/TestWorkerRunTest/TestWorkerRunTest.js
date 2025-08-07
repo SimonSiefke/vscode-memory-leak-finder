@@ -1,10 +1,9 @@
 import * as Assert from '../Assert/Assert.js'
-import * as JsonRpc from '../JsonRpc/JsonRpc.js'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.js'
 
-export const testWorkerRunTest = (ipc, connectionId, absolutePath, forceRun, runMode) => {
-  Assert.object(ipc)
+export const testWorkerRunTest = (rpc, connectionId, absolutePath, forceRun, runMode) => {
+  Assert.object(rpc)
   Assert.string(absolutePath)
   Assert.boolean(forceRun)
-  return JsonRpc.invoke(ipc, TestWorkerCommandType.RunTest, connectionId, absolutePath, forceRun, runMode)
+  return rpc.invoke(TestWorkerCommandType.RunTest, connectionId, absolutePath, forceRun, runMode)
 }

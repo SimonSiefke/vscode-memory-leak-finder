@@ -1,9 +1,8 @@
 import * as Assert from '../Assert/Assert.js'
-import * as JsonRpc from '../JsonRpc/JsonRpc.js'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.js'
 
-export const testWorkerTearDownTest = (ipc, connectionId, absolutePath) => {
-  Assert.object(ipc)
+export const testWorkerTearDownTest = (rpc, connectionId, absolutePath) => {
+  Assert.object(rpc)
   Assert.string(absolutePath)
-  return JsonRpc.invoke(ipc, TestWorkerCommandType.TearDownTest, connectionId, absolutePath)
+  return rpc.invoke(TestWorkerCommandType.TearDownTest, connectionId, absolutePath)
 }

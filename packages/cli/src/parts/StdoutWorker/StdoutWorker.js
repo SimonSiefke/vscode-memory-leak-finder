@@ -1,31 +1,30 @@
 import * as LaunchStdoutWorker from '../LaunchStdoutWorker/LaunchStdoutWorker.js'
-import * as JsonRpc from '../JsonRpc/JsonRpc.js'
 
 export const state = {
   /**
-   * @type {any}
+   * @type {import('@lvce-editor/rpc').Rpc|undefined}
    */
-  ipc: undefined,
+  rpc: undefined,
 }
 
 export const invoke = async (method, ...params) => {
-  if (!state.ipc) {
+  if (!state.rpc) {
     return
   }
-  JsonRpc.send(state.ipc, method, ...params)
+  state.rpc.invoke(method, ...params)
 }
 
 export const cleanup = () => {
-  if (state.ipc) {
-    state.ipc.dispose()
-    state.ipc = undefined
+  if (state.rpc) {
+    state.rpc.dispose()
+    state.rpc = undefined
   }
 }
 
 export const prepare = async () => {
   // TODO possible race condition
-  if (!state.ipc) {
-    state.ipc = await LaunchStdoutWorker.launchStdoutWorker()
+  if (!state.rpc) {
+    state.rpc = await LaunchStdoutWorker.launchStdoutWorker()
   }
-  return state.ipc
+  return state.rpc
 }

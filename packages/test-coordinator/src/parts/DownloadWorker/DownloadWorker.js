@@ -1,19 +1,15 @@
-import * as Callback from '../Callback/Callback.js'
-import * as Command from '../Command/Command.js'
+import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
+import * as CommandMapRef from '../CommandMapRef/CommandMapRef.js'
 import * as GetDownloadWorkerUrl from '../GetDownloadWorkerUrl/GetDownloadWorkerUrl.js'
-import * as HandleIpc from '../HandleIpc/HandleIpc.js'
-import * as IpcParent from '../IpcParent/IpcParent.js'
-import * as IpcParentType from '../IpcParentType/IpcParentType.js'
 
 // TODO dispose worker on next test run
 export const launch = async () => {
   const url = GetDownloadWorkerUrl.getDownloadWorkerUrl()
-  const ipc = await IpcParent.create({
-    method: IpcParentType.NodeWorkerThread,
-    url,
+  const rpc = await NodeWorkerRpcParent.create({
+    path: url,
     stdio: 'inherit',
     execArgv: [],
+    commandMap: CommandMapRef.commandMapRef,
   })
-  HandleIpc.handleIpc(ipc, Command.execute, Callback.resolve)
-  return ipc
+  return rpc
 }

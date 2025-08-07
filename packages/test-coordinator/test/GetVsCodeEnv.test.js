@@ -10,3 +10,13 @@ test('getVsCodeEnv - remove node options', () => {
     XDG_RUNTIME_DIR: '/test',
   })
 })
+
+test('getVsCodeEnv - remove electron run as node', () => {
+  const runtimeDir = '/test'
+  const processEnv = {
+    ELECTRON_RUN_AS_NODE: 'true',
+  }
+  expect(GetVsCodeEnv.getVsCodeEnv({ runtimeDir, processEnv })).toEqual({
+    XDG_RUNTIME_DIR: '/test',
+  })
+})

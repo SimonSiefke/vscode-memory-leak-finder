@@ -1,9 +1,8 @@
 import * as Assert from '../Assert/Assert.js'
-import * as JsonRpc from '../JsonRpc/JsonRpc.js'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.js'
 
-export const compare = (ipc, connectionId, before, after) => {
-  Assert.object(ipc)
+export const compare = (rpc, connectionId, before, after) => {
+  Assert.object(rpc)
   Assert.number(connectionId)
-  return JsonRpc.invoke(ipc, TestWorkerCommandType.MemoryLeakFinderCompare, connectionId, before, after)
+  return rpc.invoke(TestWorkerCommandType.MemoryLeakFinderCompare, connectionId, before, after)
 }
