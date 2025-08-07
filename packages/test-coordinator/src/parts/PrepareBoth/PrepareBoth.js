@@ -54,9 +54,13 @@ const connectElectron = async (electronRpc) => {
     functionDeclaration: MonkeyPatchElectronScript.monkeyPatchElectronScript,
     objectId: electronObjectId,
   })
+  console.log('patched it')
 
-  await MakeElectronAvailableGlobally.makeElectronAvailableGlobally(electronRpc, electronObjectId)
-  await MakeRequireAvailableGlobally.makeRequireAvailableGlobally(electronRpc, requireObjectId)
+  await Promise.all([
+    MakeElectronAvailableGlobally.makeElectronAvailableGlobally(electronRpc, electronObjectId),
+    MakeRequireAvailableGlobally.makeRequireAvailableGlobally(electronRpc, requireObjectId),
+  ])
+  console.log('done it')
 }
 
 export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, connectionId, isFirstConnection, canUseIdleCallback) => {
