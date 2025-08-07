@@ -1,17 +1,11 @@
 import { charTypes } from '../CreateCharTypesLookupTable/CreateCharTypesLookupTable.ts'
+import { getDigitCount } from '../GetDigitCount/GetDigitCount.ts'
 
 const DIGIT = 1
 const SEPARATOR = 2
 const CLOSING_BRACKET = 3
 const MINUS = 4
 const CHAR_0 = '0'.charCodeAt(0)
-
-const getDigitCount = (number) => {
-  if (number === 0) {
-    return 1
-  }
-  return Math.floor(Math.log10(Math.abs(number))) + 1
-}
 
 /**
  * Parses comma-separated numbers from a Uint8Array buffer into a number array
