@@ -36,7 +36,7 @@ test('parseFromStream - reproduces string parsing issue with multiple chunks', a
 
   const writeStream = createHeapSnapshotWriteStream({
     parseStrings: true,
-    validate: false
+    validate: false,
   } as any)
 
   // Write the first chunk
@@ -91,7 +91,7 @@ test('parseFromStream - reproduces issue with locations array ending in middle o
 
   const writeStream = createHeapSnapshotWriteStream({
     parseStrings: true,
-    validate: false
+    validate: false,
   } as any)
 
   // Write the first chunk
@@ -145,25 +145,21 @@ test('parseFromStream - reproduces actual heap snapshot format issue', async () 
   const chunk1 = heapSnapshotData.substring(0, locationsEndIndex + 2) // Include the "],"
   const chunk2 = heapSnapshotData.substring(locationsEndIndex + 2)
 
-
   const writeStream = createHeapSnapshotWriteStream({
     parseStrings: true,
-    validate: false
+    validate: false,
   } as any)
 
   // Write the first chunk
   writeStream.write(Buffer.from(chunk1))
 
-
   // Write the second chunk
   writeStream.write(Buffer.from(chunk2))
-
 
   // End the stream
   writeStream.end()
 
   const result = writeStream.getResult()
-
 
   // The test should show that strings are parsed correctly
   expect(result.strings).toContain('<dummy>')
@@ -211,25 +207,21 @@ test('parseFromStream - reproduces issue with multiple opening brackets before s
   const chunk1 = largeDataWithBrackets.substring(0, locationsEndIndex + 2) // Include the "],"
   const chunk2 = largeDataWithBrackets.substring(locationsEndIndex + 2)
 
-
   const writeStream = createHeapSnapshotWriteStream({
     parseStrings: true,
-    validate: false
+    validate: false,
   } as any)
 
   // Write the first chunk
   writeStream.write(Buffer.from(chunk1))
 
-
   // Write the second chunk
   writeStream.write(Buffer.from(chunk2))
-
 
   // End the stream
   writeStream.end()
 
   const result = writeStream.getResult()
-
 
   // The test should show that strings are parsed correctly despite multiple brackets
   expect(result.strings).toContain('<dummy>')
