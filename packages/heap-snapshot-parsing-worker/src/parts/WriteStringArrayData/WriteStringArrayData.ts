@@ -16,25 +16,31 @@ export const writeStringArrayData = (chunk, data, strings, onReset, onDone, onDa
   const combinedData = concatArray(data, chunk)
   const dataString = decodeArray(combinedData)
 
-  console.log('WriteStringArrayData - dataString length:', dataString.length)
-  console.log('WriteStringArrayData - dataString start:', dataString.substring(0, 200))
-  console.log('WriteStringArrayData - dataString end:', dataString.substring(dataString.length - 200))
-  console.log('WriteStringArrayData - dataString contains "strings":', dataString.includes('"strings":'))
-
   // Look for the "strings": pattern first
   const stringsStartIndex = dataString.indexOf('"strings":')
   let openingBracketIndex = -1
 
   if (stringsStartIndex !== -1) {
     // Found "strings": pattern, find the opening bracket after it
-    openingBracketIndex = dataString.indexOf('[', stringsStartIndex)
-    console.log('WriteStringArrayData - found strings pattern at:', stringsStartIndex, 'opening bracket at:', openingBracketIndex)
+    // We need to find the opening bracket that's immediately after "strings":
+    // Skip any whitespace and find the first '[' after the colon
+    const afterColon = dataString.substring(stringsStartIndex + 9) // length of '"strings":'
+    const trimmedAfterColon = afterColon.trim()
+    if (trimmedAfterColon.startsWith('[')) {
+      // The opening bracket is right after the colon
+      openingBracketIndex = stringsStartIndex + 9 + afterColon.indexOf('[')
+    } else {
+      // Look for the first '[' after the colon
+      const bracketIndex = afterColon.indexOf('[')
+      if (bracketIndex !== -1) {
+        openingBracketIndex = stringsStartIndex + 9 + bracketIndex
+      }
+    }
   } else {
     // No "strings": pattern found, check if the data starts with an array or quoted string
     const trimmedData = dataString.trim()
     if (trimmedData.startsWith('[')) {
       openingBracketIndex = dataString.indexOf('[')
-      console.log('WriteStringArrayData - data starts with array, opening bracket at:', openingBracketIndex)
     } else if (trimmedData.startsWith('"')) {
       // Data starts with a quoted string, this is the array content
       // We need to find the end of the strings array by looking for the closing bracket
@@ -63,7 +69,6 @@ export const writeStringArrayData = (chunk, data, strings, onReset, onDone, onDa
           const parsedStrings = JSON.parse(stringsContent)
           if (Array.isArray(parsedStrings)) {
             strings.push(...parsedStrings)
-            console.log('WriteStringArrayData - successfully parsed', parsedStrings.length, 'strings')
             onReset()
             onDone()
             const remainingData = combinedData.slice(closingBracketIndex + 1)
@@ -71,13 +76,35 @@ export const writeStringArrayData = (chunk, data, strings, onReset, onDone, onDa
             return true
           }
         } catch (error) {
-          console.log('WriteStringArrayData - JSON parsing failed:', error.message)
+          onDataUpdate(combinedData)
+          return false
+        }
+      } else {
+        // No closing bracket found, but we have quoted strings
+        // Try to parse as a comma-separated list of quoted strings
+        try {
+          // Find the last closing bracket in the data
+          const lastClosingBracketIndex = dataString.lastIndexOf(']')
+          if (lastClosingBracketIndex !== -1) {
+            // Wrap everything up to the last closing bracket
+            const stringsContent = '[' + dataString.substring(0, lastClosingBracketIndex + 1)
+            const parsedStrings = JSON.parse(stringsContent)
+            if (Array.isArray(parsedStrings)) {
+              strings.push(...parsedStrings)
+              onReset()
+              onDone()
+              const remainingData = combinedData.slice(lastClosingBracketIndex + 1)
+              onDataUpdate(remainingData)
+              return true
+            }
+          }
+        } catch (error) {
+          // If parsing fails, need more data
           onDataUpdate(combinedData)
           return false
         }
       }
       // If we can't find a closing bracket, need more data
-      console.log('WriteStringArrayData - no closing bracket found in wrapped data')
       onDataUpdate(combinedData)
       return false
     }
@@ -85,12 +112,13 @@ export const writeStringArrayData = (chunk, data, strings, onReset, onDone, onDa
 
   if (openingBracketIndex === -1) {
     // No opening bracket found, need more data
-    console.log('WriteStringArrayData - no opening bracket found, need more data')
     onDataUpdate(combinedData)
     return false
   }
 
   // Find the matching closing bracket for the strings array
+  // Since we found the "strings": pattern, we need to find the closing bracket
+  // that matches the opening bracket right after "strings":
   let bracketCount = 0
   let closingBracketIndex = -1
 
@@ -109,15 +137,12 @@ export const writeStringArrayData = (chunk, data, strings, onReset, onDone, onDa
 
   if (closingBracketIndex === -1) {
     // No matching closing bracket found, need more data
-    console.log('WriteStringArrayData - no matching closing bracket found, need more data')
     onDataUpdate(combinedData)
     return false
   }
 
   // Extract the strings array content
   const stringsContent = dataString.substring(openingBracketIndex, closingBracketIndex + 1)
-  console.log('WriteStringArrayData - stringsContent length:', stringsContent.length)
-  console.log('WriteStringArrayData - stringsContent start:', stringsContent.substring(0, 100))
 
   try {
     // Parse the strings array as JSON
@@ -126,7 +151,6 @@ export const writeStringArrayData = (chunk, data, strings, onReset, onDone, onDa
     if (Array.isArray(parsedStrings)) {
       // Add all strings to the strings array
       strings.push(...parsedStrings)
-      console.log('WriteStringArrayData - successfully parsed', parsedStrings.length, 'strings')
 
       // Reset parsing state
       onReset()
@@ -141,13 +165,11 @@ export const writeStringArrayData = (chunk, data, strings, onReset, onDone, onDa
       return true
     } else {
       // If it's not an array, we might have incomplete data
-      console.log('WriteStringArrayData - parsed content is not an array')
       onDataUpdate(combinedData)
       return false
     }
   } catch (error) {
     // If JSON parsing fails, we might have incomplete data
-    console.log('WriteStringArrayData - JSON parsing failed:', error.message)
     onDataUpdate(combinedData)
     return false
   }

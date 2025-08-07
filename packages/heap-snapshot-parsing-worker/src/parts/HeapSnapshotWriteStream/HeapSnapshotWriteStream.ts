@@ -144,7 +144,6 @@ class HeapSnapshotWriteStream extends Writable {
   }
 
   writeResizableArrayData(chunk, nextState) {
-    console.log('writeResizableArrayData - called with nextState:', nextState)
     // Parse the chunk directly - no concatenation needed due to stateful parsing
     const { dataIndex, arrayIndex, done, currentNumber, hasDigits } = parseHeapSnapshotArray(
       chunk,
@@ -154,11 +153,8 @@ class HeapSnapshotWriteStream extends Writable {
       this.hasDigits,
     )
 
-    console.log('writeResizableArrayData - parseHeapSnapshotArray result:', { dataIndex, arrayIndex, done, currentNumber, hasDigits })
-
     // If parsing failed, we need more data
     if (dataIndex === -1) {
-      console.log('writeResizableArrayData - parsing failed, need more data')
       return
     }
 
@@ -171,13 +167,10 @@ class HeapSnapshotWriteStream extends Writable {
     this.hasDigits = hasDigits
 
     if (done) {
-      console.log('writeResizableArrayData - done, transitioning to state:', nextState)
       this.resetParsingState()
       this.state = nextState
       const rest = chunk.slice(dataIndex)
       this.handleChunk(rest)
-    } else {
-      console.log('writeResizableArrayData - not done yet')
     }
     // When not done, we don't need to store leftover data - the parsing state handles it
   }

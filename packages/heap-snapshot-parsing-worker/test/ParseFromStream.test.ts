@@ -34,9 +34,6 @@ test('parseFromStream - reproduces string parsing issue with multiple chunks', a
   const chunk1 = heapSnapshotData.substring(0, heapSnapshotData.indexOf('"strings":'))
   const chunk2 = heapSnapshotData.substring(heapSnapshotData.indexOf('"strings":'))
 
-  console.log('Chunk 1 ends with:', chunk1.substring(chunk1.length - 50))
-  console.log('Chunk 2 starts with:', chunk2.substring(0, 50))
-
   const writeStream = createHeapSnapshotWriteStream({
     parseStrings: true,
     validate: false
@@ -45,25 +42,13 @@ test('parseFromStream - reproduces string parsing issue with multiple chunks', a
   // Write the first chunk
   writeStream.write(Buffer.from(chunk1))
 
-  // Check state after first chunk
-  console.log('State after chunk 1:', writeStream.state)
-  console.log('Strings count after chunk 1:', writeStream.strings.length)
-
   // Write the second chunk
   writeStream.write(Buffer.from(chunk2))
-
-  // Check state after second chunk
-  console.log('State after chunk 2:', writeStream.state)
-  console.log('Strings count after chunk 2:', writeStream.strings.length)
 
   // End the stream
   writeStream.end()
 
   const result = writeStream.getResult()
-
-  console.log('Final state:', writeStream.state)
-  console.log('Final strings count:', result.strings.length)
-  console.log('Strings:', result.strings)
 
   // The test should show that strings are parsed correctly
   expect(result.strings).toContain('<dummy>')
@@ -104,9 +89,6 @@ test('parseFromStream - reproduces issue with locations array ending in middle o
   const chunk1 = heapSnapshotData.substring(0, locationsEndIndex + 2) // Include the "],"
   const chunk2 = heapSnapshotData.substring(locationsEndIndex + 2)
 
-  console.log('Chunk 1 ends with:', chunk1.substring(chunk1.length - 50))
-  console.log('Chunk 2 starts with:', chunk2.substring(0, 50))
-
   const writeStream = createHeapSnapshotWriteStream({
     parseStrings: true,
     validate: false
@@ -115,23 +97,13 @@ test('parseFromStream - reproduces issue with locations array ending in middle o
   // Write the first chunk
   writeStream.write(Buffer.from(chunk1))
 
-  console.log('State after chunk 1:', writeStream.state)
-  console.log('Strings count after chunk 1:', writeStream.strings.length)
-
   // Write the second chunk
   writeStream.write(Buffer.from(chunk2))
-
-  console.log('State after chunk 2:', writeStream.state)
-  console.log('Strings count after chunk 2:', writeStream.strings.length)
 
   // End the stream
   writeStream.end()
 
   const result = writeStream.getResult()
-
-  console.log('Final state:', writeStream.state)
-  console.log('Final strings count:', result.strings.length)
-  console.log('Strings:', result.strings)
 
   // The test should show that strings are parsed correctly
   expect(result.strings).toContain('<dummy>')
@@ -173,8 +145,6 @@ test('parseFromStream - reproduces actual heap snapshot format issue', async () 
   const chunk1 = heapSnapshotData.substring(0, locationsEndIndex + 2) // Include the "],"
   const chunk2 = heapSnapshotData.substring(locationsEndIndex + 2)
 
-  console.log('Chunk 1 ends with:', chunk1.substring(chunk1.length - 50))
-  console.log('Chunk 2 starts with:', chunk2.substring(0, 50))
 
   const writeStream = createHeapSnapshotWriteStream({
     parseStrings: true,
@@ -184,23 +154,16 @@ test('parseFromStream - reproduces actual heap snapshot format issue', async () 
   // Write the first chunk
   writeStream.write(Buffer.from(chunk1))
 
-  console.log('State after chunk 1:', writeStream.state)
-  console.log('Strings count after chunk 1:', writeStream.strings.length)
 
   // Write the second chunk
   writeStream.write(Buffer.from(chunk2))
 
-  console.log('State after chunk 2:', writeStream.state)
-  console.log('Strings count after chunk 2:', writeStream.strings.length)
 
   // End the stream
   writeStream.end()
 
   const result = writeStream.getResult()
 
-  console.log('Final state:', writeStream.state)
-  console.log('Final strings count:', result.strings.length)
-  console.log('Strings:', result.strings)
 
   // The test should show that strings are parsed correctly
   expect(result.strings).toContain('<dummy>')
@@ -248,8 +211,6 @@ test('parseFromStream - reproduces issue with multiple opening brackets before s
   const chunk1 = largeDataWithBrackets.substring(0, locationsEndIndex + 2) // Include the "],"
   const chunk2 = largeDataWithBrackets.substring(locationsEndIndex + 2)
 
-  console.log('Chunk 1 ends with:', chunk1.substring(chunk1.length - 50))
-  console.log('Chunk 2 starts with:', chunk2.substring(0, 50))
 
   const writeStream = createHeapSnapshotWriteStream({
     parseStrings: true,
@@ -259,23 +220,16 @@ test('parseFromStream - reproduces issue with multiple opening brackets before s
   // Write the first chunk
   writeStream.write(Buffer.from(chunk1))
 
-  console.log('State after chunk 1:', writeStream.state)
-  console.log('Strings count after chunk 1:', writeStream.strings.length)
 
   // Write the second chunk
   writeStream.write(Buffer.from(chunk2))
 
-  console.log('State after chunk 2:', writeStream.state)
-  console.log('Strings count after chunk 2:', writeStream.strings.length)
 
   // End the stream
   writeStream.end()
 
   const result = writeStream.getResult()
 
-  console.log('Final state:', writeStream.state)
-  console.log('Final strings count:', result.strings.length)
-  console.log('Strings:', result.strings)
 
   // The test should show that strings are parsed correctly despite multiple brackets
   expect(result.strings).toContain('<dummy>')
