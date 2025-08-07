@@ -6,9 +6,7 @@ import * as Disposables from '../Disposables/Disposables.js'
 export const exit = async () => {
   const s = Time.now()
   await Disposables.disposeAll()
-  // LaunchElectron.cleanup()
   const e = Time.now()
-  // process.exit(0)
   console.log(`finished worker cleanup in ${e - s}ms`)
   const used = process.memoryUsage().heapUsed / 1024 / 1024
   console.log(`worker uses approximately ${Math.round(used * 100) / 100} MB`)
