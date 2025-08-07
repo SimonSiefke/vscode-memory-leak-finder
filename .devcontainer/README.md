@@ -11,24 +11,9 @@ This directory contains the configuration for running the VSCode Memory Leak Fin
 The dev container includes:
 
 - **Node.js 22.18.0** - Matches the version specified in `.nvmrc`
-- **TypeScript** - For type checking and development
-- **Jest** - For running tests
-- **Prettier** - For code formatting
 - **VNC Server** - For running GUI applications (Electron)
 - **JWM Window Manager** - Lightweight window manager for VNC
-- **Electron Dependencies** - All required libraries for Electron apps
-- **Native Keymap Dependencies** - For keyboard mapping functionality
-
-## VS Code Extensions
-
-The following extensions are automatically installed:
-
-- TypeScript support
-- Prettier for formatting
-- Jest for testing
-- ESLint for linting
-- JSON support
-- Tailwind CSS support
+- **Electron Dependencies** - Basic libraries for Electron apps
 
 ## Getting Started
 
@@ -44,14 +29,13 @@ The following extensions are automatically installed:
 
 The container automatically runs:
 - `npm ci` - Install dependencies
-- `npm run build` - Build the project
 
 ## Development Workflow
 
-1. The container will automatically install dependencies and build the project
+1. The container will automatically install dependencies
 2. Use `npm test` to run tests
 3. Use `npm run e2e` to run end-to-end tests
-4. Use `npm run format` to format code with Prettier
+4. Use `npm run build` to build the project
 
 ## Troubleshooting
 
@@ -59,4 +43,4 @@ If you encounter issues:
 
 1. **VNC Connection**: The VNC server runs on port 6080 with password "vscode"
 2. **Node Version**: The container uses Node.js 22.18.0 as specified in `.nvmrc`
-3. **Dependencies**: All system dependencies for Electron and native modules are pre-installed
+3. **Dependencies**: Basic system dependencies for Electron are pre-installed
