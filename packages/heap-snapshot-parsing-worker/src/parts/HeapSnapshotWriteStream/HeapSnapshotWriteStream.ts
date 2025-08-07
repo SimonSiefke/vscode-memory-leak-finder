@@ -9,7 +9,7 @@ import { parseHeapSnapshotArray } from '../ParseHeapSnapshotArray/ParseHeapSnaps
 import { parseHeapSnapshotArrayHeader } from '../ParseHeapSnapshotArrayHeader/ParseHeapSnapshotArrayHeader.ts'
 import { EMPTY_DATA, parseHeapSnapshotMetaData } from '../ParseHeapSnapshotMetaData/ParseHeapSnapshotMetaData.ts'
 import * as TokenType from '../TokenType/TokenType.ts'
-import { writeStringArrayData } from '../WriteStringArrayData/WriteStringArrayData.ts'
+import { parseStringArray } from '../WriteStringArrayData/WriteStringArrayData.ts'
 
 class HeapSnapshotWriteStream extends Writable {
   arrayIndex: number
@@ -58,6 +58,7 @@ class HeapSnapshotWriteStream extends Writable {
     if (metaData === EMPTY_DATA) {
       return
     }
+
     const nodeCount = metaData.data.node_count * metaData.data.meta.node_fields.length
     const edgeCount = metaData.data.edge_count * metaData.data.meta.edge_fields.length
     this.edges = new Uint32Array(edgeCount)
@@ -76,6 +77,7 @@ class HeapSnapshotWriteStream extends Writable {
     if (endIndex === -1) {
       return
     }
+
     const rest = this.data.slice(endIndex)
     this.data = new Uint8Array()
     this.arrayIndex = 0
@@ -119,6 +121,7 @@ class HeapSnapshotWriteStream extends Writable {
       if (arrayIndex !== array.length) {
         throw new RangeError(`Incorrect number of elements in heapsnapshot, expected ${array.length}, but got ${arrayIndex}`)
       }
+
       this.resetParsingState()
       this.state = nextState
       const rest = chunk.slice(dataIndex)
@@ -188,22 +191,17 @@ class HeapSnapshotWriteStream extends Writable {
   }
 
   writeParsingStrings(chunk) {
-    const success = writeStringArrayData(
-      chunk,
-      this.data,
-      this.strings,
-      () => this.resetParsingState(),
-      () => {
-        this.state = HeapSnapshotParsingState.Done
-      },
-      (newData) => {
-        this.data = newData
-      },
-    )
+    // Parse the chunk directly - no concatenation needed due to stateful parsing
+    const { dataIndex, done } = parseStringArray(chunk, this.strings)
 
-    if (!success) {
-      this.data = concatArray(this.data, chunk)
+    // Only store leftover data when we're done with this section
+    if (done) {
+      this.resetParsingState()
+      this.state = HeapSnapshotParsingState.Done
+      const rest = chunk.slice(dataIndex)
+      this.handleChunk(rest)
     }
+    // When not done, we don't need to store leftover data - the parsing state handles it
   }
 
   handleChunk(chunk) {
@@ -250,7 +248,7 @@ class HeapSnapshotWriteStream extends Writable {
   start() {}
 
   validateRequiredMetadata() {
-    if (!this.metaData || !this.metaData.data) {
+    if (!this.metaData?.data) {
       throw new HeapSnapshotParserError('Heapsnapshot is missing metadata')
     }
 
@@ -263,6 +261,7 @@ class HeapSnapshotWriteStream extends Writable {
     if (this.validate) {
       this.validateRequiredMetadata()
     }
+
     callback()
   }
 
