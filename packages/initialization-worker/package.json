@@ -1,0 +1,25 @@
+{
+  "name": "@vscode-memory-leak-finder/initialization-worker",
+  "version": "0.0.0-dev",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
+    "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "@lvce-editor/rpc": "^4.14.0",
+    "@lvce-editor/verror": "^1.7.0",
+    "exit-hook": "^4.0.0",
+    "strip-ansi": "^7.1.0",
+    "@babel/code-frame": "^7.27.1",
+    "@lvce-editor/assert": "^1.4.0",
+    "@vscode/test-electron": "^2.5.2",
+    "execa": "^9.6.0"
+  },
+  "devDependencies": {}
+}

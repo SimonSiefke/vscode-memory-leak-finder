@@ -12,6 +12,7 @@
     { "path": "./packages/e2e" },
     { "path": "./packages/file-watcher-worker" },
     { "path": "./packages/heap-snapshot-worker" },
+    { "path": "./packages/initialization-worker" },
     { "path": "./packages/injected-code" },
     { "path": "./packages/memory-leak-finder" },
     { "path": "./packages/memory-leak-worker" },
