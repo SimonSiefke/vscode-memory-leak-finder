@@ -3,7 +3,7 @@ import * as Assert from '../Assert/Assert.js'
 import * as Root from '../Root/Root.js'
 import * as VideoRecordingWorker from '../VideoRecordingWorker/VideoRecordingWorker.js'
 
-export const state = {
+const state = {
   /**
    * @type {import('@lvce-editor/rpc').Rpc|undefined}
    */
