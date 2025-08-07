@@ -1,121 +1,136 @@
-import { decodeArray } from '../DecodeArray/DecodeArray.ts'
-import { concatArray } from '../ConcatArray/ConcatArray.ts'
+/**
+ * Parses a string array from a buffer
+ * @param {Uint8Array} data - The data buffer to parse
+ * @param {string[]} strings - Array to store parsed strings
+ * @returns {{dataIndex: number, done: boolean}} How much data was consumed and whether parsing is complete
+ */
+export const parseStringArray = (data: Uint8Array, strings: string[]) => {
+  let dataIndex = 0
+  let state = 'outside' // 'outside', 'inside_string', 'after_backslash'
+  let stringStart = -1
+  let done = false
+
+  const textDecoder = new TextDecoder()
+
+  while (dataIndex < data.length) {
+    const byte = data[dataIndex]
+    const char = String.fromCharCode(byte)
+
+    switch (state) {
+      case 'outside':
+        if (char === '"') {
+          // Start of a string
+          state = 'inside_string'
+          stringStart = dataIndex + 1 // Skip the opening quote
+          dataIndex++
+        } else if (char === ']') {
+          // End of array
+          done = true
+          dataIndex++
+          break
+        } else if (char === '}') {
+          // End of JSON object (this can happen when parsing from JSON.stringify)
+          // If we've parsed at least one string, consider it done
+          if (strings.length > 0) {
+            done = true
+            dataIndex++
+            break
+          }
+
+          // Otherwise, this might be incomplete data
+          return { dataIndex, done: false }
+        } else if (char === '[') {
+          // Opening bracket, ignore it
+          dataIndex++
+        } else if (char === ',' || char === ' ' || char === '\n' || char === '\r' || char === '\t') {
+          // Ignore whitespace and commas
+          dataIndex++
+        } else {
+          // Unexpected character, might be incomplete data
+          // Return the data we've processed so far
+          return { dataIndex, done: false }
+        }
+
+        break
+
+      case 'inside_string':
+        if (char === '\\') {
+          // Escape character, next character is literal
+          state = 'after_backslash'
+          dataIndex++
+        } else if (char === '"') {
+          // End of string
+          const stringEnd = dataIndex
+          if (stringStart <= stringEnd) {
+            const stringBytes = data.slice(stringStart, stringEnd)
+            const string = textDecoder.decode(stringBytes)
+            // Process escaped characters in the string
+            const processedString = string.replaceAll(String.raw`\"`, '"').replaceAll('\\\\', '\\')
+            strings.push(processedString)
+          }
+
+          state = 'outside'
+          dataIndex++
+        } else {
+          // Regular character inside string
+          dataIndex++
+        }
+
+        break
+
+      case 'after_backslash':
+        // Skip the escaped character (it's already included in the string)
+        dataIndex++
+        state = 'inside_string'
+        break
+    }
+  }
+
+  // If we reach the end of data while inside a string, we need more data
+  if (state === 'inside_string' || state === 'after_backslash') {
+    // Return the data we've processed so far (up to the start of the incomplete string)
+    return { dataIndex: stringStart - 1, done: false }
+  }
+
+  return { dataIndex, done }
+}
 
 /**
- * Parses string array data from heap snapshot chunks
- * @param {Uint8Array<ArrayBuffer>} chunk - The current chunk of data
- * @param {Uint8Array<ArrayBuffer>} data - Accumulated data buffer
+ * Writes string array data to the strings array using the parseStringArray function
+ * @param {Uint8Array} chunk - The current chunk of data
+ * @param {Uint8Array} data - Accumulated data from previous chunks
  * @param {string[]} strings - Array to store parsed strings
  * @param {Function} onReset - Callback to reset parsing state
  * @param {Function} onDone - Callback when parsing is complete
- * @param {Function} onDataUpdate - Callback to update data buffer
- * @returns {boolean} Whether the chunk was successfully processed
+ * @param {Function} onDataUpdate - Callback to update accumulated data
+ * @returns {boolean} Whether parsing is complete
  */
-export const writeStringArrayData = (chunk, data, strings, onReset, onDone, onDataUpdate) => {
-  // Concatenate the new chunk with existing data
-  const combinedData = concatArray(data, chunk)
-  const dataString = decodeArray(combinedData)
+export const writeStringArrayData = (
+  chunk: Uint8Array,
+  data: Uint8Array,
+  strings: string[],
+  onReset: () => void,
+  onDone: () => void,
+  onDataUpdate: (newData: Uint8Array) => void,
+) => {
+  // Combine accumulated data with new chunk
+  const combinedData = new Uint8Array(data.length + chunk.length)
+  combinedData.set(data)
+  combinedData.set(chunk, data.length)
 
-  // Look for the "strings": pattern first
-  const stringsStartIndex = dataString.indexOf('"strings":')
-  let openingBracketIndex = -1
+  // Parse the combined data
+  const { dataIndex, done } = parseStringArray(combinedData, strings)
 
-  if (stringsStartIndex !== -1) {
-    // Found "strings": pattern, find the opening bracket after it
-    openingBracketIndex = dataString.indexOf('[', stringsStartIndex)
-  } else {
-    // No "strings": pattern found, check if the data starts with an array or quoted string
-    const trimmedData = dataString.trim()
-    if (trimmedData.startsWith('[')) {
-      openingBracketIndex = dataString.indexOf('[')
-    } else if (trimmedData.startsWith('"')) {
-      // Data starts with a quoted string, this is the array content
-      // We need to wrap it in brackets to make it a valid JSON array
-      const wrappedData = '[' + dataString
-      const closingBracketIndex = wrappedData.lastIndexOf(']')
-      if (closingBracketIndex !== -1) {
-        const stringsContent = wrappedData.substring(0, closingBracketIndex + 1)
-        try {
-          const parsedStrings = JSON.parse(stringsContent)
-          if (Array.isArray(parsedStrings)) {
-            strings.push(...parsedStrings)
-            onReset()
-            onDone()
-            const remainingData = combinedData.slice(closingBracketIndex - 1) // -1 because we added a bracket
-            onDataUpdate(remainingData)
-            return true
-          }
-        } catch (error) {
-          // If JSON parsing fails, we might have incomplete data
-          onDataUpdate(combinedData)
-          return false
-        }
-      }
-      // If we can't find a closing bracket, need more data
-      onDataUpdate(combinedData)
-      return false
-    }
+  if (done) {
+    // Parsing is complete
+    onReset()
+    onDone()
+    onDataUpdate(new Uint8Array())
+    return true
   }
 
-  if (openingBracketIndex === -1) {
-    // No opening bracket found, need more data
-    onDataUpdate(combinedData)
-    return false
-  }
-
-  // Find the matching closing bracket
-  let bracketCount = 0
-  let closingBracketIndex = -1
-
-  for (let i = openingBracketIndex; i < dataString.length; i++) {
-    const char = dataString[i]
-    if (char === '[') {
-      bracketCount++
-    } else if (char === ']') {
-      bracketCount--
-      if (bracketCount === 0) {
-        closingBracketIndex = i
-        break
-      }
-    }
-  }
-
-  if (closingBracketIndex === -1) {
-    // No matching closing bracket found, need more data
-    onDataUpdate(combinedData)
-    return false
-  }
-
-  // Extract the strings array content
-  const stringsContent = dataString.substring(openingBracketIndex, closingBracketIndex + 1)
-
-  try {
-    // Parse the strings array as JSON
-    const parsedStrings = JSON.parse(stringsContent)
-
-    if (Array.isArray(parsedStrings)) {
-      // Add all strings to the strings array
-      strings.push(...parsedStrings)
-
-      // Reset parsing state
-      onReset()
-
-      // Mark as done
-      onDone()
-
-      // Return the remaining data after the strings array
-      const remainingData = combinedData.slice(closingBracketIndex + 1)
-      onDataUpdate(remainingData)
-
-      return true
-    } else {
-      // If it's not an array, we might have incomplete data
-      onDataUpdate(combinedData)
-      return false
-    }
-  } catch (error) {
-    // If JSON parsing fails, we might have incomplete data
-    onDataUpdate(combinedData)
-    return false
-  }
+  // More data needed, store the remaining data
+  const remainingData = combinedData.slice(dataIndex)
+  onDataUpdate(remainingData)
+  return false
 }
