@@ -13,6 +13,10 @@ export const parseHeapSnapshotStrings = async (id) => {
   return HeapSnapshotWorker.invoke('HeapSnapshot.parseStrings', id)
 }
 
+export const parsedNamedArrays = async (id) => {
+  return HeapSnapshotWorker.invoke('HeapSnapshot.parseNamedArrays', id)
+}
+
 export const getStringCount = async (id) => {
   return HeapSnapshotWorker.invoke('HeapSnapshot.parseStringCount', id)
 }
