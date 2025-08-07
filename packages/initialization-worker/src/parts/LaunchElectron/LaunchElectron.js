@@ -60,7 +60,7 @@ export const launchElectron = async ({ cliPath, args, headlessMode, cwd, env }) 
   }
 }
 
-const cleanup = () => {
+export const cleanup = () => {
   Logger.log(`[test-worker] cleanup ${state.processes.length} child process`)
   for (const childProcess of state.processes) {
     childProcess.kill('SIGKILL')

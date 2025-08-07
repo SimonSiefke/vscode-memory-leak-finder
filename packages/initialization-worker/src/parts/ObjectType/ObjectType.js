@@ -1,5 +1,1 @@
-const ElectronApp = 'electronApp'
 export const Rpc = 'rpc'
-const Browser = 'browser'
-const Locator = 'locator'
-const Page = 'page'
