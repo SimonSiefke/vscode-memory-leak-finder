@@ -22,6 +22,7 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
     isFirstConnection,
     canUseIdleCallback,
   )
+  await undoMonkeyPatch(electronRpc, monkeyPatchedElectronId)
 
   const callFrameId = '' // probbaly not needed and can be rmoved
 
@@ -49,8 +50,6 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
   // 4. await promise
 
   const pageObjectPromise = PageObject.create(rpc, connectionId, isFirstConnection, headlessMode, timeouts, ideVersion)
-
-  await undoMonkeyPatch(electronRpc, monkeyPatchedElectronId)
 
   await pageObjectPromise
   return {
