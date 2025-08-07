@@ -79,15 +79,6 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
   console.log({ electronRpc })
 
   await connectElectron(electronRpc)
-  // TODO do it here
-  // const { monkeyPatchedElectron, electronObjectId, callFrameId } = await ConnectElectron.connectElectron(
-  //   rpc,
-  //   connectionId,
-  //   headlessMode,
-  //   webSocketUrl,
-  //   isFirstConnection,
-  //   canUseIdleCallback,
-  // )
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
   return {
     webSocketUrl,
