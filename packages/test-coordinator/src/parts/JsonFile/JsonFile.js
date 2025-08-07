@@ -12,7 +12,7 @@ export const writeJson = async (path, json) => {
   }
 }
 
-export const readJson = async (path) => {
+const readJson = async (path) => {
   try {
     const content = await readFile(path, 'utf8')
     return JSON.parse(content)
