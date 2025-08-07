@@ -1,26 +1,25 @@
-import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
+import * as Process from '../Process/Process.ts'
 
 export const setRawMode = async (value) => {
-  await StdoutWorker.invoke('Stdin.setRawMode', value)
+  Process.stdin.setRawMode(value)
 }
 
 export const resume = async () => {
-  await StdoutWorker.invoke('Stdin.resume')
+  Process.stdin.resume()
 }
 
 export const pause = async () => {
-  await StdoutWorker.invoke('Stdin.pause')
+  Process.stdin.pause()
 }
 
 export const setEncoding = async (value) => {
-  await StdoutWorker.invoke('Stdin.setEncoding', value)
+  Process.stdin.setEncoding(value)
 }
 
 export const on = (event, listener) => {
-  // TODO use worker for stdin event handling
-  process.stdin.on(event, listener)
+  Process.stdin.on(event, listener)
 }
 
 export const off = (event, listener) => {
-  process.stdin.off(event, listener)
+  Process.stdin.off(event, listener)
 }
