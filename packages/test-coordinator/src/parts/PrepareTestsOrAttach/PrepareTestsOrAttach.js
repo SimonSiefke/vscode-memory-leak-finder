@@ -3,7 +3,7 @@ import * as ConnectElectron from '../ConnectElectron/ConnectElectron.js'
 import * as PageObject from '../PageObject/PageObject.js'
 import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.js'
 import * as PrepareTests from '../PrepareTests/PrepareTests.js'
-import * as TestWorker from '../TestWorker/TestWorker.js'
+import * as TestWorker from '../LaunchTestWorker/LaunchTestWorker.js'
 
 export const state = {
   firstLaunch: false,
@@ -29,7 +29,7 @@ export const prepareTestsOrAttach = async (
   vscodePath,
   commit,
 ) => {
-  const testWorkerRpc = await TestWorker.launch(runMode)
+  const testWorkerRpc = await TestWorker.launchTestWorker(runMode)
   const isFirst = state.promise === undefined
   if (isFirst) {
     state.promise = PrepareTests.prepareTests(
