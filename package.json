@@ -11,7 +11,8 @@
     "format": "prettier --write .",
     "postinstall": "lerna bootstrap --ci && node scripts/postinstall.js",
     "test": "lerna run test",
-    "type-check": "tsc -b"
+    "type-check": "tsc -b",
+    "build-charts": "node packages/charts/src/main.ts"
   },
   "repository": {
     "type": "git",
