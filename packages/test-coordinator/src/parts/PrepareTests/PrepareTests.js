@@ -40,11 +40,19 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
     callFrameId,
     isFirstConnection,
   )
-  console.log('got devtools')
-  await PageObject.create(rpc, connectionId, isFirstConnection, headlessMode, timeouts, ideVersion)
 
-  console.log('got page object')
-  await undoMonkeyPatch(electronRpc)
+  // TODO race condition,
+  // need to
+  // 1. import page object
+  // 2. create promise waiting for first window
+  // 3. undo monkeypatch, creating window
+  // 4. await promise
+
+  const pageObjectPromise = PageObject.create(rpc, connectionId, isFirstConnection, headlessMode, timeouts, ideVersion)
+
+  await undoMonkeyPatch(electronRpc, monkeyPatchedElectronId)
+
+  await pageObjectPromise
   return {
     rpc,
     webSocketUrl,
