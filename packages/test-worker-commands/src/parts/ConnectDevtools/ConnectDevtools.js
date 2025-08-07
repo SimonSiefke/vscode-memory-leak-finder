@@ -10,14 +10,7 @@ import * as ObjectType from '../ObjectType/ObjectType.js'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
 import * as SessionState from '../SessionState/SessionState.js'
 
-export const connectDevtools = async (
-  connectionId,
-  devtoolsWebSocketUrl,
-  monkeyPatchedElectronId,
-  electronObjectId,
-  callFrameId,
-  isFirstConnection,
-) => {
+export const connectDevtools = async (connectionId, devtoolsWebSocketUrl, monkeyPatchedElectronId, electronObjectId, isFirstConnection) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
   Assert.string(monkeyPatchedElectronId)
@@ -71,7 +64,6 @@ export const connectDevtools = async (
   const electronApp = ElectronApp.create({
     electronRpc,
     electronObjectId,
-    callFrameId,
   })
   ElectronAppState.set(connectionId, electronApp)
 }

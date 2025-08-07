@@ -23,8 +23,6 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
     canUseIdleCallback,
   )
 
-  const callFrameId = '' // probbaly not needed and can be rmoved
-
   // TODO connect workers in parallel
   const {} = await ConnectElectron.connectElectron(rpc, connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback)
   if (recordVideo) {
@@ -37,7 +35,6 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
     devtoolsWebSocketUrl,
     monkeyPatchedElectronId,
     electronObjectId,
-    callFrameId,
     isFirstConnection,
   )
 
@@ -48,7 +45,6 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
     webSocketUrl,
     devtoolsWebSocketUrl,
     electronObjectId,
-    callFrameId,
     monkeyPatchedElectronId,
   }
 }
