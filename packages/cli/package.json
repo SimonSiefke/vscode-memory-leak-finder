@@ -22,29 +22,13 @@
     "chalk": "^5.5.0"
   },
   "devDependencies": {
-    "@types/node": "^24.2.0"
-  },
-  "jest": {
-    "moduleNameMapper": {
-      "#ansi-styles": "ansi-styles/index.js",
-      "#supports-color": "supports-color/index.js"
-    },
-    "testMatch": [
-      "<rootDir>/test/**/*.js"
-    ],
-    "modulePathIgnorePatterns": [
-      "<rootDir>/.vscode-test/"
-    ],
-    "injectGlobals": false,
-    "collectCoverage": true,
-    "coverageThreshold": {
-      "global": {
-        "branches": 30,
-        "functions": 30,
-        "lines": 30,
-        "statements": 30
-      }
-    }
+    "@jest/globals": "^30.0.5",
+    "@types/babel__code-frame": "^7.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.1.0",
+    "@types/ws": "^8.18.1",
+    "ts-jest": "^29.4.1",
+    "typescript": "^5.9.2"
   },
   "xo": {
     "rules": {
