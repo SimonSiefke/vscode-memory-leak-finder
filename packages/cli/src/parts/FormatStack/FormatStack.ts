@@ -25,7 +25,7 @@ const formatStackLine = (line, relativeFilePath) => {
 }
 
 export const formatStack = (stack, relativeFilePath) => {
-  const formattedLines = []
+  const formattedLines: string[] = []
   const lines = stack.split('\n')
   for (const line of lines) {
     formattedLines.push(formatStackLine(line, relativeFilePath))
