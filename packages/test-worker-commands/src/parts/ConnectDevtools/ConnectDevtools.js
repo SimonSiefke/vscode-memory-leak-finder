@@ -19,6 +19,7 @@ export const connectDevtools = async (
   callFrameId,
   isFirstConnection,
 ) => {
+  console.log({ electronObjectId, monkeyPatchedElectronId })
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
   Assert.string(monkeyPatchedElectronId)
@@ -64,12 +65,12 @@ export const connectDevtools = async (
     }),
   ])
 
-  if (isFirstConnection) {
-    await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-      functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
-      objectId: monkeyPatchedElectronId,
-    })
-  }
+  // if (isFirstConnection) {
+  //   await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+  //     functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
+  //     objectId: monkeyPatchedElectronId,
+  //   })
+  // }
   const electronApp = ElectronApp.create({
     electronRpc,
     electronObjectId,

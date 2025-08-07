@@ -3,7 +3,7 @@ import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.js'
 import * as KillExistingIdeInstances from '../KillExistingIdeInstances/KillExistingIdeInstances.js'
 import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
 import * as PageObject from '../PageObject/PageObject.js'
-import { prepareBoth } from '../PrepareBoth/PrepareBoth.js'
+import { prepareBoth, undoMonkeyPatch } from '../PrepareBoth/PrepareBoth.js'
 import * as VideoRecording from '../VideoRecording/VideoRecording.js'
 import * as ConnectElectron from '../ConnectElectron/ConnectElectron.js'
 
@@ -12,7 +12,7 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
-  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, monkeyPatchedElectronId } = await prepareBoth(
+  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, monkeyPatchedElectronId, electronRpc } = await prepareBoth(
     headlessMode,
     cwd,
     ide,
@@ -41,6 +41,8 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
     isFirstConnection,
   )
   await PageObject.create(rpc, connectionId, isFirstConnection, headlessMode, timeouts, ideVersion)
+
+  await undoMonkeyPatch(electronRpc)
   return {
     rpc,
     webSocketUrl,

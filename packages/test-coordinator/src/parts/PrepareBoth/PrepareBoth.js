@@ -95,5 +95,13 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
     devtoolsWebSocketUrl,
     monkeyPatchedElectronId,
     electronObjectId,
+    electronRpc,
   }
+}
+
+export const undoMonkeyPatch = async (electronRpc, monkeyPatchedElectronId) => {
+  await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+    functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
+    objectId: monkeyPatchedElectronId,
+  })
 }
