@@ -248,7 +248,7 @@ class HeapSnapshotWriteStream extends Writable {
   start() {}
 
   validateRequiredMetadata() {
-    if (!this.metaData?.data) {
+    if (!this.metaData || !this.metaData.data) {
       throw new HeapSnapshotParserError('Heapsnapshot is missing metadata')
     }
 
