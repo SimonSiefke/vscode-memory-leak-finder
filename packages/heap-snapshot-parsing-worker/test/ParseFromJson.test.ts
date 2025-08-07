@@ -161,7 +161,7 @@ test('parseFromJson - throws HeapSnapshotParserError when metadata is missing', 
     strings: ['', 'root'],
   }
 
-  await expect(parseFromJson(heapSnapshotData)).rejects.toThrow('Missing required metadata in heap snapshot')
+  await expect(parseFromJson(heapSnapshotData)).rejects.toThrow('Heapsnapshot is missing metadata')
 })
 
 test('parseFromJson - throws HeapSnapshotParserError when nodes are missing', async () => {
@@ -311,5 +311,5 @@ test('parseFromJson - throws HeapSnapshotParserError when snapshot metadata is c
     strings: ['', 'root'],
   }
 
-  await expect(parseFromJson(heapSnapshotData)).rejects.toThrow('Missing required metadata in heap snapshot')
+  await expect(parseFromJson(heapSnapshotData)).rejects.toThrow('Heapsnapshot is missing metadata')
 })
