@@ -1,7 +1,7 @@
 import { dirname, join } from 'node:path'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import * as Root from '../Root/Root.js'
-import { VError } from '../VError/VError.js'
+import * as Root from '../Root/Root.ts'
+import { VError } from '../VError/VError.ts'
 
 const getPreviousFilterPath = () => {
   return join(Root.root, '.vscode-previous-filters', 'filters.json')

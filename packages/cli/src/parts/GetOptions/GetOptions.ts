@@ -1,5 +1,5 @@
-import * as Argv from '../Argv/Argv.js'
-import * as ParseArgv from '../ParseArgv/ParseArgv.js'
+import * as Argv from '../Argv/Argv.ts'
+import * as ParseArgv from '../ParseArgv/ParseArgv.ts'
 
 export const getOptions = () => {
   return ParseArgv.parseArgv(Argv.argv)

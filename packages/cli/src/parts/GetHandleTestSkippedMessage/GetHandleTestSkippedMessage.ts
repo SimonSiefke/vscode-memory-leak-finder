@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import * as FormatAsSeconds from '../FormatAsSeconds/FormatAsSeconds.js'
+import * as FormatAsSeconds from '../FormatAsSeconds/FormatAsSeconds.ts'
 
 const SKIP_TEXT = ' SKIP '
 

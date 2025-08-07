@@ -1,4 +1,4 @@
-import * as IsWindows from '../IsWindows/IsWindows.js'
+import * as IsWindows from '../IsWindows/IsWindows.ts'
 
 export const ArrowDown = '\u001B[B'
 export const ArrowLeft = '\u001B[D'

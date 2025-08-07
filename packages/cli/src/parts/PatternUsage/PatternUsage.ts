@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import * as CliKeys from '../CliKeys/CliKeys.js'
+import * as CliKeys from '../CliKeys/CliKeys.ts'
 
 const patternModeUsage = chalk.bold('Pattern Mode Usage')
 const press = chalk.dim('\u203A Press')

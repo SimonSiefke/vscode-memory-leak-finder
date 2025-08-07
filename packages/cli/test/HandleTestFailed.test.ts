@@ -4,19 +4,19 @@ beforeEach(() => {
   jest.resetModules()
 })
 
-jest.unstable_mockModule('../src/parts/Stdout/Stdout.js', () => {
+jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   return {
     write: jest.fn().mockImplementation(() => Promise.resolve()),
   }
 })
 
-jest.unstable_mockModule('../src/parts/IsGithubActions/IsGithubActions.js', () => {
+jest.unstable_mockModule('../src/parts/IsGithubActions/IsGithubActions.ts', () => {
   return {
     isGithubActions: false,
   }
 })
 
-jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.js', () => {
+jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => {
   return {
     isBuffering() {
       return true
@@ -24,7 +24,7 @@ jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.js', () => 
   }
 })
 
-jest.unstable_mockModule('../src/parts/TestStateOutput/TestStateOutput.js', () => {
+jest.unstable_mockModule('../src/parts/TestStateOutput/TestStateOutput.ts', () => {
   return {
     clearPending: jest.fn(() => {
       return ''
@@ -32,15 +32,15 @@ jest.unstable_mockModule('../src/parts/TestStateOutput/TestStateOutput.js', () =
   }
 })
 
-const Stdout = await import('../src/parts/Stdout/Stdout.js')
-const TestStateOutput = await import('../src/parts/TestStateOutput/TestStateOutput.js')
-const HandleTestFailed = await import('../src/parts/HandleTestFailed/HandleTestFailed.js')
+const Stdout = await import('../src/parts/Stdout/Stdout.ts')
+const TestStateOutput = await import('../src/parts/TestStateOutput/TestStateOutput.ts')
+const HandleTestFailed = await import('../src/parts/HandleTestFailed/HandleTestFailed.ts')
 
 test('handleTestFailed', () => {
-  const file = '/test/e2e/src/sample.close-window.js'
+  const file = '/test/e2e/src/sample.close-window.ts'
   const relativeDirName = 'src'
   const releativeFilePath = `src/sample.close-window.js`
-  const fileName = 'sample.close-window.js'
+  const fileName = 'sample.close-window.ts'
   const error = {
     type: 'Error',
     message: 'expected window count to be 0 but was 1',

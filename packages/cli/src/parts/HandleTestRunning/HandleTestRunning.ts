@@ -1,6 +1,6 @@
-import * as GetHandleTestRunningMessage from '../GetHandleTestRunningMessage/GetHandleTestRunningMessage.js'
-import * as Stdout from '../Stdout/Stdout.js'
-import * as IsGithubActions from '../IsGithubActions/IsGithubActions.js'
+import * as GetHandleTestRunningMessage from '../GetHandleTestRunningMessage/GetHandleTestRunningMessage.ts'
+import * as Stdout from '../Stdout/Stdout.ts'
+import * as IsGithubActions from '../IsGithubActions/IsGithubActions.ts'
 
 export const handleTestRunning = async (file, relativeDirName, fileName, isFirst) => {
   if (IsGithubActions.isGithubActions) {

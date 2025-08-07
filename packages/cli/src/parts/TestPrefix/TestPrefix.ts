@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import * as TestPrefixText from '../TestPrefixText/TestPrefixText.js'
+import * as TestPrefixText from '../TestPrefixText/TestPrefixText.ts'
 
 export const Pass = chalk.reset.inverse.bold.green(TestPrefixText.Pass)
 

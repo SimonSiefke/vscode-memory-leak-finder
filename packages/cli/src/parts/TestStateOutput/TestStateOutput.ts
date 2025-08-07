@@ -1,6 +1,6 @@
-import * as TestOutputState from '../TestOutputState/TestOutputState.js'
-import * as TestOutputType from '../TestOutputType/TestOutputType.js'
-import * as Character from '../Character/Character.js'
+import * as TestOutputState from '../TestOutputState/TestOutputState.ts'
+import * as TestOutputType from '../TestOutputType/TestOutputType.ts'
+import * as Character from '../Character/Character.ts'
 
 export const addStdout = (data) => {
   TestOutputState.add({ type: TestOutputType.Stdout, data })

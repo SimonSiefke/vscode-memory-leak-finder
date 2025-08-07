@@ -1,5 +1,5 @@
-import * as KillWorkers from '../KillWorkers/KillWorkers.js'
-import * as SpecialStdin from '../SpecialStdin/SpecialStdin.js'
+import * as KillWorkers from '../KillWorkers/KillWorkers.ts'
+import * as SpecialStdin from '../SpecialStdin/SpecialStdin.ts'
 
 export const handleExit = async () => {
   await SpecialStdin.stop()

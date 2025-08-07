@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import * as WatchUsage from '../src/parts/WatchUsage/WatchUsage.js'
+import * as WatchUsage from '../src/parts/WatchUsage/WatchUsage.ts'
 
 test('print', () => {
   expect(WatchUsage.print()).toBe(

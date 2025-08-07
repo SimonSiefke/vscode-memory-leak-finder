@@ -1,9 +1,9 @@
-import * as HandleStdinDataFilterWaitingMode from '../HandleStdinDataFilterWaitingMode/HandleStdinDataFilterWaitingMode.js'
-import * as HandleStdinDataFinishedRunningMode from '../HandleStdinDataFinishedRunningMode/HandleStdinDataFinishedRunningMode.js'
-import * as HandleStdinDataInterruptedMode from '../HandleStdinDataInterruptedMode/HandleStdinDataInterruptedMode.js'
-import * as HandleStdinDataRunningMode from '../HandleStdinDataRunningMode/HandleStdinDataRunningMode.js'
-import * as HandleStdinDataWaitingMode from '../HandleStdinDataWaitingMode/HandleStdinDataWaitingMode.js'
-import * as ModeType from '../ModeType/ModeType.js'
+import * as HandleStdinDataFilterWaitingMode from '../HandleStdinDataFilterWaitingMode/HandleStdinDataFilterWaitingMode.ts'
+import * as HandleStdinDataFinishedRunningMode from '../HandleStdinDataFinishedRunningMode/HandleStdinDataFinishedRunningMode.ts'
+import * as HandleStdinDataInterruptedMode from '../HandleStdinDataInterruptedMode/HandleStdinDataInterruptedMode.ts'
+import * as HandleStdinDataRunningMode from '../HandleStdinDataRunningMode/HandleStdinDataRunningMode.ts'
+import * as HandleStdinDataWaitingMode from '../HandleStdinDataWaitingMode/HandleStdinDataWaitingMode.ts'
+import * as ModeType from '../ModeType/ModeType.ts'
 
 export const getFn = (mode) => {
   switch (mode) {

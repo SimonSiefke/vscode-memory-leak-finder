@@ -1,6 +1,6 @@
-import * as StdinDataState from '../StdinDataState/StdinDataState.js'
-import * as Stdout from '../Stdout/Stdout.js'
-import * as TestStateOutput from '../TestStateOutput/TestStateOutput.js'
+import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
+import * as Stdout from '../Stdout/Stdout.ts'
+import * as TestStateOutput from '../TestStateOutput/TestStateOutput.ts'
 
 export const handleStderrData = async (data) => {
   if (!StdinDataState.isBuffering()) {

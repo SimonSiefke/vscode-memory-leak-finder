@@ -5,34 +5,34 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-jest.unstable_mockModule('../src/parts/Stdout/Stdout.js', () => {
+jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   return {
     write: jest.fn().mockImplementation(() => Promise.resolve()),
   }
 })
-jest.unstable_mockModule('../src/parts/WatchUsage/WatchUsage.js', () => {
+jest.unstable_mockModule('../src/parts/WatchUsage/WatchUsage.ts', () => {
   return {
     print: jest.fn(() => 'watch usage'),
   }
 })
 
-jest.unstable_mockModule('../src/parts/SpecialStdin/SpecialStdin.js', () => {
+jest.unstable_mockModule('../src/parts/SpecialStdin/SpecialStdin.ts', () => {
   return {
     start: jest.fn(),
   }
 })
 
-jest.unstable_mockModule('../src/parts/StartRunning/StartRunning.js', () => {
+jest.unstable_mockModule('../src/parts/StartRunning/StartRunning.ts', () => {
   return {
     startRunning: jest.fn(),
   }
 })
 
-const Stdout = await import('../src/parts/Stdout/Stdout.js')
-const InitialStart = await import('../src/parts/InitialStart/InitialStart.js')
-const SpecialStdin = await import('../src/parts/SpecialStdin/SpecialStdin.js')
-const StartRunning = await import('../src/parts/StartRunning/StartRunning.js')
-const WatchUsage = await import('../src/parts/WatchUsage/WatchUsage.js')
+const Stdout = await import('../src/parts/Stdout/Stdout.ts')
+const InitialStart = await import('../src/parts/InitialStart/InitialStart.ts')
+const SpecialStdin = await import('../src/parts/SpecialStdin/SpecialStdin.ts')
+const StartRunning = await import('../src/parts/StartRunning/StartRunning.ts')
+const WatchUsage = await import('../src/parts/WatchUsage/WatchUsage.ts')
 
 test('initialStart - watch mode - show details', async () => {
   const options = {

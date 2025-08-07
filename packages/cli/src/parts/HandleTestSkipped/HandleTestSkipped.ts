@@ -1,5 +1,5 @@
-import * as GetHandleTestSkippedMessage from '../GetHandleTestSkippedMessage/GetHandleTestSkippedMessage.js'
-import * as HandleTestStateChange from '../HandleTestStateChange/HandleTestStateChange.js'
+import * as GetHandleTestSkippedMessage from '../GetHandleTestSkippedMessage/GetHandleTestSkippedMessage.ts'
+import * as HandleTestStateChange from '../HandleTestStateChange/HandleTestStateChange.ts'
 
 export const handleTestSkipped = (file, relativeDirName, fileName, duration) => {
   const message = GetHandleTestSkippedMessage.getHandleTestSkippedMessage(file, relativeDirName, fileName, duration)

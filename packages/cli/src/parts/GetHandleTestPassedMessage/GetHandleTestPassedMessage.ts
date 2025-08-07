@@ -1,6 +1,6 @@
 import chalk from 'chalk'
-import * as FormatAsSeconds from '../FormatAsSeconds/FormatAsSeconds.js'
-import * as TestPrefix from '../TestPrefix/TestPrefix.js'
+import * as FormatAsSeconds from '../FormatAsSeconds/FormatAsSeconds.ts'
+import * as TestPrefix from '../TestPrefix/TestPrefix.ts'
 
 const formatDuration = (duration) => {
   return `(${FormatAsSeconds.formatAsSeconds(duration)})`

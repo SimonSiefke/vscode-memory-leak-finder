@@ -1,5 +1,5 @@
 import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
-import * as GetStdoutWorkerUrl from '../GetStdoutWorkerUrl/GetStdoutWorkerUrl.js'
+import * as GetStdoutWorkerUrl from '../GetStdoutWorkerUrl/GetStdoutWorkerUrl.ts'
 
 export const launchStdoutWorker = async () => {
   const url = GetStdoutWorkerUrl.getStdoutWorkerUrl()

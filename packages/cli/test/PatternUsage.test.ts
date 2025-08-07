@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import * as PatternUsage from '../src/parts/PatternUsage/PatternUsage.js'
+import * as PatternUsage from '../src/parts/PatternUsage/PatternUsage.ts'
 
 test('print', () => {
   expect(PatternUsage.print()).toBe(

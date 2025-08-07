@@ -1,9 +1,9 @@
-import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.js'
-import * as GetTestClearMessage from '../GetTestClearMessage/GetTestClearMessage.js'
-import * as IsGithubActions from '../IsGithubActions/IsGithubActions.js'
-import * as StdinDataState from '../StdinDataState/StdinDataState.js'
-import * as Stdout from '../Stdout/Stdout.js'
-import * as TestStateOutput from '../TestStateOutput/TestStateOutput.js'
+import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
+import * as GetTestClearMessage from '../GetTestClearMessage/GetTestClearMessage.ts'
+import * as IsGithubActions from '../IsGithubActions/IsGithubActions.ts'
+import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
+import * as Stdout from '../Stdout/Stdout.ts'
+import * as TestStateOutput from '../TestStateOutput/TestStateOutput.ts'
 
 const getFullMessage = (message) => {
   const clearMessage = GetTestClearMessage.getTestClearMessage()

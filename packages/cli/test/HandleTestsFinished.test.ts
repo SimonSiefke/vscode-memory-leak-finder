@@ -5,19 +5,19 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-jest.unstable_mockModule('../src/parts/IsGithubActions/IsGithubActions.js', () => {
+jest.unstable_mockModule('../src/parts/IsGithubActions/IsGithubActions.ts', () => {
   return {
     isGithubActions: false,
   }
 })
 
-jest.unstable_mockModule('../src/parts/Stdout/Stdout.js', () => {
+jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   return {
     write: jest.fn().mockImplementation(() => Promise.resolve()),
   }
 })
 
-jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.js', () => {
+jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => {
   return {
     isWatchMode() {
       return true
@@ -27,8 +27,8 @@ jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.js', () => 
   }
 })
 
-const Stdout = await import('../src/parts/Stdout/Stdout.js')
-const HandleTestsFinished = await import('../src/parts/HandleTestsFinished/HandleTestsFinished.js')
+const Stdout = await import('../src/parts/Stdout/Stdout.ts')
+const HandleTestsFinished = await import('../src/parts/HandleTestsFinished/HandleTestsFinished.ts')
 
 test('handleTestsFinished - no filter value', () => {
   HandleTestsFinished.handleTestsFinished(2, 1, 0, 0, 3, 3000, '')

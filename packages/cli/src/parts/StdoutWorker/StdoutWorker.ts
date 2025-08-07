@@ -1,4 +1,4 @@
-import * as LaunchStdoutWorker from '../LaunchStdoutWorker/LaunchStdoutWorker.js'
+import * as LaunchStdoutWorker from '../LaunchStdoutWorker/LaunchStdoutWorker.ts'
 
 export const state = {
   /**

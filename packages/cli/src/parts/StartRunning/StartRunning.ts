@@ -1,7 +1,7 @@
-import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.js'
-import * as RunTest from '../RunTest/RunTest.js'
-import * as Stdout from '../Stdout/Stdout.js'
-import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.js'
+import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
+import * as RunTest from '../RunTest/RunTest.ts'
+import * as Stdout from '../Stdout/Stdout.ts'
+import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
 
 export const startRunning = async (
   filterValue,

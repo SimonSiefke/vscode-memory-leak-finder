@@ -1,23 +1,23 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
-import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.js'
-import * as AnsiEscapes from '../src/parts/AnsiEscapes/AnsiEscapes.js'
-import * as CliKeys from '../src/parts/CliKeys/CliKeys.js'
-import * as ModeType from '../src/parts/ModeType/ModeType.js'
-import * as PatternUsage from '../src/parts/PatternUsage/PatternUsage.js'
+import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
+import * as AnsiEscapes from '../src/parts/AnsiEscapes/AnsiEscapes.ts'
+import * as CliKeys from '../src/parts/CliKeys/CliKeys.ts'
+import * as ModeType from '../src/parts/ModeType/ModeType.ts'
+import * as PatternUsage from '../src/parts/PatternUsage/PatternUsage.ts'
 
 beforeEach(() => {
   jest.resetModules()
   jest.resetAllMocks()
 })
 
-jest.unstable_mockModule('../src/parts/Stdout/Stdout.js', () => {
+jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   return {
     write: jest.fn().mockImplementation(() => Promise.resolve()),
   }
 })
 
-const Stdout = await import('../src/parts/Stdout/Stdout.js')
-const HandleStdinDataWaitingMode = await import('../src/parts/HandleStdinDataWaitingMode/HandleStdinDataWaitingMode.js')
+const Stdout = await import('../src/parts/Stdout/Stdout.ts')
+const HandleStdinDataWaitingMode = await import('../src/parts/HandleStdinDataWaitingMode/HandleStdinDataWaitingMode.ts')
 
 test('handleStdinDataWaitingMode - ctrl + c', async () => {
   const state = {

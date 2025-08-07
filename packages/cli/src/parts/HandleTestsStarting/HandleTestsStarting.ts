@@ -1,4 +1,4 @@
-import * as StdinDataState from '../StdinDataState/StdinDataState.js'
+import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 
 export const handleTestsStarting = (total) => {
   const isBuffering = total !== 1

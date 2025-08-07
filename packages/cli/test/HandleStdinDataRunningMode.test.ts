@@ -1,20 +1,20 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
-import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.js'
-import * as ModeType from '../src/parts/ModeType/ModeType.js'
+import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
+import * as ModeType from '../src/parts/ModeType/ModeType.ts'
 
 beforeEach(() => {
   jest.resetModules()
   jest.resetAllMocks()
 })
 
-jest.unstable_mockModule('../src/parts/Stdout/Stdout.js', () => {
+jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   return {
     write: jest.fn().mockImplementation(() => Promise.resolve()),
   }
 })
 
-const Stdout = await import('../src/parts/Stdout/Stdout.js')
-const HandleStdinDataRunningMode = await import('../src/parts/HandleStdinDataRunningMode/HandleStdinDataRunningMode.js')
+const Stdout = await import('../src/parts/Stdout/Stdout.ts')
+const HandleStdinDataRunningMode = await import('../src/parts/HandleStdinDataRunningMode/HandleStdinDataRunningMode.ts')
 
 test('handleStdinDataRunningMode - show watch mode details', async () => {
   const state = {

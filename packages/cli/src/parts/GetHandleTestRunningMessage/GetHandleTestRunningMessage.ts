@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import * as TestPrefix from '../TestPrefix/TestPrefix.js'
+import * as TestPrefix from '../TestPrefix/TestPrefix.ts'
 
 export const getHandleTestRunningMessage = (file, relativeDirName, fileName, isFirst) => {
   const messageRelativeDirName = chalk.dim(relativeDirName + '/')

@@ -1,5 +1,5 @@
 import ansiEscapes from 'ansi-escapes'
-import * as IsWindows from '../IsWindows/IsWindows.js'
+import * as IsWindows from '../IsWindows/IsWindows.ts'
 
 export const cursorUp = ansiEscapes.cursorUp
 

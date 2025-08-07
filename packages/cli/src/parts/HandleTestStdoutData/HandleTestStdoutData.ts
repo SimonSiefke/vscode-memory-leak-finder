@@ -1,7 +1,7 @@
-import * as IsUnimportantStdoutMessage from '../IsUnimportantStdoutMessage/IsUnimportantStdoutMessage.js'
-import * as StdinDataState from '../StdinDataState/StdinDataState.js'
-import * as Stdout from '../Stdout/Stdout.js'
-import * as TestStateOutput from '../TestStateOutput/TestStateOutput.js'
+import * as IsUnimportantStdoutMessage from '../IsUnimportantStdoutMessage/IsUnimportantStdoutMessage.ts'
+import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
+import * as Stdout from '../Stdout/Stdout.ts'
+import * as TestStateOutput from '../TestStateOutput/TestStateOutput.ts'
 
 export const handleStdoutData = async (data) => {
   if (IsUnimportantStdoutMessage.isUnimportantStdoutMessage(data.toString())) {

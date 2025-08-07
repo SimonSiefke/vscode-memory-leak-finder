@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import * as GetHandleTestSetupMessage from '../src/parts/GetHandleTestSetupMessage/GetHandleTestSetupMessage.js'
+import * as GetHandleTestSetupMessage from '../src/parts/GetHandleTestSetupMessage/GetHandleTestSetupMessage.ts'
 
 test('getHandleTestSetupMessage - should return formatted setup message', () => {
   const result = GetHandleTestSetupMessage.getHandleTestSetupMessage()

@@ -1,10 +1,10 @@
-import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.js'
-import * as AnsiKeys from '../AnsiKeys/AnsiKeys.js'
-import * as Character from '../Character/Character.js'
-import * as CliKeys from '../CliKeys/CliKeys.js'
-import * as ModeType from '../ModeType/ModeType.js'
-import * as PatternUsage from '../PatternUsage/PatternUsage.js'
-import * as Stdout from '../Stdout/Stdout.js'
+import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
+import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
+import * as Character from '../Character/Character.ts'
+import * as CliKeys from '../CliKeys/CliKeys.ts'
+import * as ModeType from '../ModeType/ModeType.ts'
+import * as PatternUsage from '../PatternUsage/PatternUsage.ts'
+import * as Stdout from '../Stdout/Stdout.ts'
 
 export const handleStdinDataWaitingMode = async (state, key) => {
   switch (key) {

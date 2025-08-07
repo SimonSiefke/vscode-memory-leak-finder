@@ -1,6 +1,6 @@
-import * as HandleTestStderrData from '../HandleTestStderrData/HandleTestStderrData.js'
-import * as HandleTestStdoutData from '../HandleTestStdoutData/HandleTestStdoutData.js'
-import * as TestCoordinator from '../TestCoordinator/TestCoordinator.js'
+import * as HandleTestStderrData from '../HandleTestStderrData/HandleTestStderrData.ts'
+import * as HandleTestStdoutData from '../HandleTestStdoutData/HandleTestStdoutData.ts'
+import * as TestCoordinator from '../TestCoordinator/TestCoordinator.ts'
 
 export const createTestCoordinatorAndListen = async () => {
   const rpc = await TestCoordinator.listen()

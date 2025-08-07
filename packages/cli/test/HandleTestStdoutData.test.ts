@@ -4,13 +4,13 @@ beforeEach(() => {
   jest.resetModules()
 })
 
-jest.unstable_mockModule('../src/parts/TestStateOutput/TestStateOutput.js', () => {
+jest.unstable_mockModule('../src/parts/TestStateOutput/TestStateOutput.ts', () => {
   return {
     addStdout: jest.fn(),
   }
 })
 
-jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.js', () => {
+jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => {
   return {
     isBuffering() {
       return true
@@ -18,8 +18,8 @@ jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.js', () => 
   }
 })
 
-const TestStateOutput = await import('../src/parts/TestStateOutput/TestStateOutput.js')
-const HandleTestStdoutData = await import('../src/parts/HandleTestStdoutData/HandleTestStdoutData.js')
+const TestStateOutput = await import('../src/parts/TestStateOutput/TestStateOutput.ts')
+const HandleTestStdoutData = await import('../src/parts/HandleTestStdoutData/HandleTestStdoutData.ts')
 
 test('handleStdoutData', () => {
   HandleTestStdoutData.handleStdoutData(Buffer.from('test'))

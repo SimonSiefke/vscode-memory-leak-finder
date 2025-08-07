@@ -1,8 +1,8 @@
-import * as AnsiKeys from '../AnsiKeys/AnsiKeys.js'
-import * as InterruptedMessage from '../InterruptedMessage/InterruptedMessage.js'
-import * as ModeType from '../ModeType/ModeType.js'
-import * as Stdout from '../Stdout/Stdout.js'
-import * as WatchUsage from '../WatchUsage/WatchUsage.js'
+import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
+import * as InterruptedMessage from '../InterruptedMessage/InterruptedMessage.ts'
+import * as ModeType from '../ModeType/ModeType.ts'
+import * as Stdout from '../Stdout/Stdout.ts'
+import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
 
 export const handleStdinDataRunningMode = async (state, key) => {
   switch (key) {

@@ -1,10 +1,10 @@
-import * as ExitCode from '../ExitCode/ExitCode.js'
-import * as GetTestsUnexpectedErrorMessage from '../GetTestsUnexpectedErrorMessage/GetTestsUnexpectedErrorMessage.js'
-import * as ModeType from '../ModeType/ModeType.js'
-import * as Process from '../Process/Process.js'
-import * as StdinDataState from '../StdinDataState/StdinDataState.js'
-import * as Stdout from '../Stdout/Stdout.js'
-import * as TestStateOutput from '../TestStateOutput/TestStateOutput.js'
+import * as ExitCode from '../ExitCode/ExitCode.ts'
+import * as GetTestsUnexpectedErrorMessage from '../GetTestsUnexpectedErrorMessage/GetTestsUnexpectedErrorMessage.ts'
+import * as ModeType from '../ModeType/ModeType.ts'
+import * as Process from '../Process/Process.ts'
+import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
+import * as Stdout from '../Stdout/Stdout.ts'
+import * as TestStateOutput from '../TestStateOutput/TestStateOutput.ts'
 
 export const handleTestsUnexpectedError = async (prettyError) => {
   const isWatchMode = StdinDataState.isWatchMode()

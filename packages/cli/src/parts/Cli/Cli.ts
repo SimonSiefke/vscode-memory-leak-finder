@@ -1,10 +1,10 @@
-import * as Argv from '../Argv/Argv.js'
-import * as InitialStart from '../InitialStart/InitialStart.js'
-import * as ParseArgv from '../ParseArgv/ParseArgv.js'
-import * as StdinDataState from '../StdinDataState/StdinDataState.js'
-import * as StdoutWorker from '../StdoutWorker/StdoutWorker.js'
-import * as CommandMap from '../CommandMap/CommandMap.js'
-import * as CommandMapRef from '../CommandMapRef/CommandMapRef.js'
+import * as Argv from '../Argv/Argv.ts'
+import * as InitialStart from '../InitialStart/InitialStart.ts'
+import * as ParseArgv from '../ParseArgv/ParseArgv.ts'
+import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
+import * as CommandMap from '../CommandMap/CommandMap.ts'
+import * as CommandMapRef from '../CommandMapRef/CommandMapRef.ts'
 
 export const run = async () => {
   Object.assign(CommandMapRef.commandMapRef, CommandMap.commandMap)

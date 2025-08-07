@@ -1,6 +1,6 @@
 import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
-import * as CommandMapRef from '../CommandMapRef/CommandMapRef.js'
-import * as GetTestCoordinatorUrl from '../GetTestCoordinatorUrl/GetTestCoordinatorUrl.js'
+import * as CommandMapRef from '../CommandMapRef/CommandMapRef.ts'
+import * as GetTestCoordinatorUrl from '../GetTestCoordinatorUrl/GetTestCoordinatorUrl.ts'
 
 export const listen = async () => {
   const url = GetTestCoordinatorUrl.getTestCoordinatorUrl()

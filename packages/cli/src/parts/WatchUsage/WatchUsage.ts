@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import * as CliKeys from '../CliKeys/CliKeys.js'
+import * as CliKeys from '../CliKeys/CliKeys.ts'
 
 const watchUsage = chalk.bold('Watch Usage')
 const press = chalk.dim(' \u203A Press ')

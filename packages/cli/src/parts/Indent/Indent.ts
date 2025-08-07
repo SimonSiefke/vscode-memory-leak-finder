@@ -1,4 +1,4 @@
-import * as Character from '../Character/Character.js'
+import * as Character from '../Character/Character.ts'
 
 const indentLine = (line) => {
   return '    ' + line

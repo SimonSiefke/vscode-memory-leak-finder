@@ -1,27 +1,27 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
-import * as CliKeys from '../src/parts/CliKeys/CliKeys.js'
-import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.js'
-import * as ModeType from '../src/parts/ModeType/ModeType.js'
+import * as CliKeys from '../src/parts/CliKeys/CliKeys.ts'
+import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
+import * as ModeType from '../src/parts/ModeType/ModeType.ts'
 
 beforeEach(() => {
   jest.resetModules()
   jest.resetAllMocks()
 })
 
-jest.unstable_mockModule('../src/parts/Stdout/Stdout.js', () => {
+jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   return {
     write: jest.fn().mockImplementation(() => Promise.resolve()),
   }
 })
 
-jest.unstable_mockModule('../src/parts/IsWindows/IsWindows.js', () => {
+jest.unstable_mockModule('../src/parts/IsWindows/IsWindows.ts', () => {
   return {
     isWindows: false,
   }
 })
 
-const Stdout = await import('../src/parts/Stdout/Stdout.js')
-const HandleStdinDataInterruptedMode = await import('../src/parts/HandleStdinDataInterruptedMode/HandleStdinDataInterruptedMode.js')
+const Stdout = await import('../src/parts/Stdout/Stdout.ts')
+const HandleStdinDataInterruptedMode = await import('../src/parts/HandleStdinDataInterruptedMode/HandleStdinDataInterruptedMode.ts')
 
 test('HandleStdinDataInterruptedMode - watch mode key', async () => {
   const state = {

@@ -1,10 +1,10 @@
-import * as Assert from '../Assert/Assert.js'
-import * as ExitCode from '../ExitCode/ExitCode.js'
-import * as GetAllTestsFinishedMessage from '../GetAllTestsFinishedMessage/GetAllTestsFinishedMessage.js'
-import * as HandleExit from '../HandleExit/HandleExit.js'
-import * as ModeType from '../ModeType/ModeType.js'
-import * as StdinDataState from '../StdinDataState/StdinDataState.js'
-import * as Stdout from '../Stdout/Stdout.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as ExitCode from '../ExitCode/ExitCode.ts'
+import * as GetAllTestsFinishedMessage from '../GetAllTestsFinishedMessage/GetAllTestsFinishedMessage.ts'
+import * as HandleExit from '../HandleExit/HandleExit.ts'
+import * as ModeType from '../ModeType/ModeType.ts'
+import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
+import * as Stdout from '../Stdout/Stdout.ts'
 
 export const handleTestsFinished = async (passed, failed, skipped, leaked, total, duration, filterValue) => {
   Assert.number(passed)

@@ -1,4 +1,4 @@
-import * as StdoutWorker from '../StdoutWorker/StdoutWorker.js'
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
 export const setRawMode = async (value) => {
   await StdoutWorker.invoke('Stdin.setRawMode', value)

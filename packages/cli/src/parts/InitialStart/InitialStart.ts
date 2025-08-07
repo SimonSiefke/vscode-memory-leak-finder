@@ -1,7 +1,7 @@
-import * as SpecialStdin from '../SpecialStdin/SpecialStdin.js'
-import * as StartRunning from '../StartRunning/StartRunning.js'
-import * as Stdout from '../Stdout/Stdout.js'
-import * as WatchUsage from '../WatchUsage/WatchUsage.js'
+import * as SpecialStdin from '../SpecialStdin/SpecialStdin.ts'
+import * as StartRunning from '../StartRunning/StartRunning.ts'
+import * as Stdout from '../Stdout/Stdout.ts'
+import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
 
 export const initialStart = async (options) => {
   if (options.watch) {

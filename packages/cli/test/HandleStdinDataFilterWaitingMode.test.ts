@@ -1,26 +1,26 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
-import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.js'
-import * as ModeType from '../src/parts/ModeType/ModeType.js'
+import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
+import * as ModeType from '../src/parts/ModeType/ModeType.ts'
 
 beforeEach(() => {
   jest.resetModules()
   jest.resetAllMocks()
 })
 
-jest.unstable_mockModule('../src/parts/Stdout/Stdout.js', () => {
+jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   return {
     write: jest.fn().mockImplementation(() => Promise.resolve()),
   }
 })
 
-jest.unstable_mockModule('../src/parts/IsWindows/IsWindows.js', () => {
+jest.unstable_mockModule('../src/parts/IsWindows/IsWindows.ts', () => {
   return {
     isWindows: false,
   }
 })
 
-const Stdout = await import('../src/parts/Stdout/Stdout.js')
-const HandleStdinDataFilterWaitingMode = await import('../src/parts/HandleStdinDataFilterWaitingMode/HandleStdinDataFilterWaitingMode.js')
+const Stdout = await import('../src/parts/Stdout/Stdout.ts')
+const HandleStdinDataFilterWaitingMode = await import('../src/parts/HandleStdinDataFilterWaitingMode/HandleStdinDataFilterWaitingMode.ts')
 
 test('handleStdinDataFilterWaitingMode - alt + backspace', async () => {
   const state = {

@@ -1,9 +1,9 @@
-import * as GetNewStdinState from '../GetNewStdinState/GetNewStdinState.js'
-import * as HandleExit from '../HandleExit/HandleExit.js'
-import * as KillWorkers from '../KillWorkers/KillWorkers.js'
-import * as ModeType from '../ModeType/ModeType.js'
-import * as StartRunning from '../StartRunning/StartRunning.js'
-import * as StdinDataState from '../StdinDataState/StdinDataState.js'
+import * as GetNewStdinState from '../GetNewStdinState/GetNewStdinState.ts'
+import * as HandleExit from '../HandleExit/HandleExit.ts'
+import * as KillWorkers from '../KillWorkers/KillWorkers.ts'
+import * as ModeType from '../ModeType/ModeType.ts'
+import * as StartRunning from '../StartRunning/StartRunning.ts'
+import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 
 export const handleStdinData = async (key) => {
   const state = StdinDataState.getState()

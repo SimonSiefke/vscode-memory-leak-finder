@@ -1,6 +1,6 @@
-import * as RunTest from '../RunTest/RunTest.js'
-import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.js'
-import * as StdoutWorker from '../StdoutWorker/StdoutWorker.js'
+import * as RunTest from '../RunTest/RunTest.ts'
+import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
 export const killWorkers = async () => {
   if (RunTest.state.testCoordinator) {

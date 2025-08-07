@@ -1,5 +1,5 @@
-import * as GetHandleTestFailedMessage from '../GetHandleTestFailedMessage/GetHandleTestFailedMessage.js'
-import * as HandleTestStateChange from '../HandleTestStateChange/HandleTestStateChange.js'
+import * as GetHandleTestFailedMessage from '../GetHandleTestFailedMessage/GetHandleTestFailedMessage.ts'
+import * as HandleTestStateChange from '../HandleTestStateChange/HandleTestStateChange.ts'
 
 export const handleTestFailed = (file, relativeDirName, relativeFilePath, fileName, error) => {
   const message = GetHandleTestFailedMessage.getHandleTestFailedMessage(file, relativeDirName, relativeFilePath, fileName, error)

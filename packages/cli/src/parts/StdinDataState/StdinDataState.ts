@@ -1,7 +1,7 @@
-import * as ModeType from '../ModeType/ModeType.js'
-import * as Character from '../Character/Character.js'
-import * as Ide from '../Ide/Ide.js'
-import * as TestRunMode from '../TestRunMode/TestRunMode.js'
+import * as ModeType from '../ModeType/ModeType.ts'
+import * as Character from '../Character/Character.ts'
+import * as Ide from '../Ide/Ide.ts'
+import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 
 export const state = {
   buffering: false,

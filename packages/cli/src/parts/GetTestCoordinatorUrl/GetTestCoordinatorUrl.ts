@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import * as Root from '../Root/Root.js'
+import * as Root from '../Root/Root.ts'
 
 export const getTestCoordinatorUrl = () => {
   const url = join(Root.root, 'packages/test-coordinator/bin/test-coordinator.js')

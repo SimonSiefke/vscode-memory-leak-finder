@@ -1,6 +1,6 @@
-import * as GetHandleTestSetupMessage from '../GetHandleTestSetupMessage/GetHandleTestSetupMessage.js'
-import * as Stdout from '../Stdout/Stdout.js'
-import * as IsGithubActions from '../IsGithubActions/IsGithubActions.js'
+import * as GetHandleTestSetupMessage from '../GetHandleTestSetupMessage/GetHandleTestSetupMessage.ts'
+import * as Stdout from '../Stdout/Stdout.ts'
+import * as IsGithubActions from '../IsGithubActions/IsGithubActions.ts'
 
 export const handleTestSetup = async () => {
   if (IsGithubActions.isGithubActions) {
