@@ -13,6 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "@lvce-editor/assert": "^1.4.0",
+    "@lvce-editor/rpc": "^4.14.0",
     "@lvce-editor/verror": "^1.7.0",
     "got": "^14.4.7",
     "source-map": "^0.7.6"
