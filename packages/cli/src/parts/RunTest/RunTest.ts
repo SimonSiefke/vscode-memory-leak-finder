@@ -1,9 +1,11 @@
+import { Rpc } from '@lvce-editor/rpc'
 import * as CreateTestCoordinatorAndListen from '../CreateTestCoordinatorAndListen/CreateTestCoordinatorAndListen.ts'
 
-export const state = {
-  /**
-   * @type {import('@lvce-editor/rpc').Rpc|undefined}
-   */
+interface State {
+  testCoordinator: Rpc | undefined
+}
+
+export const state: State = {
   testCoordinator: undefined,
 }
 

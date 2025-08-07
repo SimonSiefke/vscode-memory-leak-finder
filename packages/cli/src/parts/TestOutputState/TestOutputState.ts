@@ -1,7 +1,8 @@
-export const state = {
-  /**
-   * @type {any[]}
-   */
+interface State {
+  pending: any[]
+}
+
+export const state: State = {
   pending: [],
 }
 

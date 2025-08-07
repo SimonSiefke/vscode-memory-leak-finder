@@ -1,9 +1,11 @@
+import { Rpc } from '@lvce-editor/rpc'
 import * as LaunchStdoutWorker from '../LaunchStdoutWorker/LaunchStdoutWorker.ts'
 
-export const state = {
-  /**
-   * @type {import('@lvce-editor/rpc').Rpc|undefined}
-   */
+interface State {
+  rpc: Rpc | undefined
+}
+
+export const state: State = {
   rpc: undefined,
 }
 
