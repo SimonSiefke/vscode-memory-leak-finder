@@ -27,6 +27,7 @@ function updateDependencies {
 }
 
 updateDependencies &&
+cd packages/build && updateDependencies && cd ../../ &&
 cd packages/cli && updateDependencies && cd ../../ &&
 cd packages/charts && updateDependencies && cd ../../ &&
 cd packages/chart-worker && updateDependencies && cd ../../ &&

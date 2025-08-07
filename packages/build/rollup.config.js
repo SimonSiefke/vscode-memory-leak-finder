@@ -1,10 +1,10 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 
 export default {
-  input: 'src/main.js',
+  input: '../injected-code/src/main.js',
   output: [
     {
-      file: 'dist/injectedCode.js',
+      file: '../injected-code/dist/injectedCode.js',
       format: 'es',
       sourcemap: true,
     },

@@ -2,8 +2,9 @@
   "files": [],
   "include": [],
   "references": [
-    { "path": "./packages/charts" },
+    { "path": "./packages/build" },
     { "path": "./packages/chart-worker" },
+    { "path": "./packages/charts" },
     { "path": "./packages/cli" },
     { "path": "./packages/cursor-e2e" },
     { "path": "./packages/devtools-protocol" },
