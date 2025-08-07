@@ -3,7 +3,7 @@ import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.js'
 import * as KillExistingIdeInstances from '../KillExistingIdeInstances/KillExistingIdeInstances.js'
 import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
 import * as PageObject from '../PageObject/PageObject.js'
-import { prepareBoth, undoMonkeyPatch } from '../PrepareBoth/PrepareBoth.js'
+import { prepareBoth } from '../PrepareBoth/PrepareBoth.js'
 import * as VideoRecording from '../VideoRecording/VideoRecording.js'
 import * as ConnectElectron from '../ConnectElectron/ConnectElectron.js'
 
@@ -22,7 +22,6 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
     isFirstConnection,
     canUseIdleCallback,
   )
-  await undoMonkeyPatch(electronRpc, monkeyPatchedElectronId)
 
   const callFrameId = '' // probbaly not needed and can be rmoved
 
