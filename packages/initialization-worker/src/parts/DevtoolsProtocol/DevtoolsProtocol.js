@@ -12,11 +12,11 @@ const {
 } = module
 
 export {
-  DevtoolsProtocolHeapProfiler,
-  DevtoolsProtocolPage,
+  
+  
   DevtoolsProtocolRuntime,
-  DevtoolsProtocolTarget,
-  DevtoolsProtocolMemory,
+  
+  
   DevtoolsProtocolDebugger,
-  DevtoolsProtocolDomDebugger,
+  
 }

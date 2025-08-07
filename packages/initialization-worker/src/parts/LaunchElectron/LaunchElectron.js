@@ -6,7 +6,7 @@ import * as Logger from '../Logger/Logger.js'
 import * as Spawn from '../Spawn/Spawn.js'
 import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.js'
 
-export const state = {
+const state = {
   /**
    * @type {ChildProcess[]}
    */
@@ -60,7 +60,7 @@ export const launchElectron = async ({ cliPath, args, headlessMode, cwd, env }) 
   }
 }
 
-export const cleanup = () => {
+const cleanup = () => {
   Logger.log(`[test-worker] cleanup ${state.processes.length} child process`)
   for (const childProcess of state.processes) {
     childProcess.kill('SIGKILL')

@@ -9,7 +9,7 @@ import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyP
 import { VError } from '../VError/VError.js'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.js'
 
-export const waitForDebuggerToBePaused = async (rpc) => {
+const waitForDebuggerToBePaused = async (rpc) => {
   try {
     const msg = await rpc.once(DevtoolsEventType.DebuggerPaused)
     return msg
