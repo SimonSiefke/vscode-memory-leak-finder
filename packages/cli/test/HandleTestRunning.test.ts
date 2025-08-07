@@ -21,7 +21,7 @@ const Stdout = await import('../src/parts/Stdout/Stdout.ts')
 const HandleTestRunning = await import('../src/parts/HandleTestRunning/HandleTestRunning.ts')
 
 test.skip('handleTestRunning - first', () => {
-  HandleTestRunning.handleTestRunning('/test/app.test.ts', '/test', 'app.test.ts', /* isFirst */ true)
+  HandleTestRunning.handleTestRunning('/test/app.test.js', '/test', 'app.test.js', /* isFirst */ true)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
     '\u001B[0m\u001B[7m\u001B[33m\u001B[1m RUNS \u001B[22m\u001B[39m\u001B[27m\u001B[0m \u001B[2m/test/\u001B[22m\u001B[1mapp.test.js\u001B[22m\n',
@@ -29,7 +29,7 @@ test.skip('handleTestRunning - first', () => {
 })
 
 test('handleTestRunning - second', () => {
-  HandleTestRunning.handleTestRunning('/test/app.test.ts', '/test', 'app.test.ts', /* isFirst */ false)
+  HandleTestRunning.handleTestRunning('/test/app.test.js', '/test', 'app.test.js', /* isFirst */ false)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
     '\n' +

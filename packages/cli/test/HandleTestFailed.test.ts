@@ -37,10 +37,10 @@ const TestStateOutput = await import('../src/parts/TestStateOutput/TestStateOutp
 const HandleTestFailed = await import('../src/parts/HandleTestFailed/HandleTestFailed.ts')
 
 test('handleTestFailed', () => {
-  const file = '/test/e2e/src/sample.close-window.ts'
+  const file = '/test/e2e/src/sample.close-window.js'
   const relativeDirName = 'src'
   const releativeFilePath = `src/sample.close-window.js`
-  const fileName = 'sample.close-window.ts'
+  const fileName = 'sample.close-window.js'
   const error = {
     type: 'Error',
     message: 'expected window count to be 0 but was 1',
