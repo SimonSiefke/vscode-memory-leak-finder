@@ -11,6 +11,7 @@ import * as MakeRequireAvailableGlobally from '../MakeRequireAvailableGlobally/M
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.js'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
 import * as WaitForDebuggerToBePaused from '../WaitForDebuggerToBePaused/WaitForDebuggerToBePaused.js'
+import { VError } from '../VError/VError.js'
 
 export const connectElectron = async (connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback) => {
   Assert.number(connectionId)
