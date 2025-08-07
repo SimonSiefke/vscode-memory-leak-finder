@@ -191,9 +191,16 @@ class HeapSnapshotWriteStream extends Writable {
   }
 
   writeParsingStrings(chunk) {
+    this.data = concatArray(this.data, chunk)
     // Parse the chunk directly - no concatenation needed due to stateful parsing
-    const { dataIndex, done } = parseStringArray(chunk, this.strings)
+    const { dataIndex, done } = parseStringArray(this.data, this.strings)
 
+    // If parsing failed, we need more data
+    if (dataIndex === -1) {
+      return
+    }
+
+    this.data = this.data.slice(dataIndex)
     // Only store leftover data when we're done with this section
     if (done) {
       this.resetParsingState()

@@ -1,6 +1,7 @@
 import { join } from 'node:path'
 import { performance } from 'node:perf_hooks'
 import { parseHeapSnapshotStringsCount } from '../src/parts/ParseHeapSnapshotStringsCount/ParseHeapSnapshotStringsCount.js'
+import { readFile } from 'node:fs/promises'
 
 const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
 
@@ -14,8 +15,10 @@ const testOptimized = async () => {
   const startTime = performance.now()
 
   try {
+    const real = await readFile(filePath1, 'utf8')
+    const p = JSON.parse(real)
+    const s = p.strings.length
     const count = await parseHeapSnapshotStringsCount(filePath1)
-    console.log({ count })
     const endTime = performance.now()
     const duration = endTime - startTime
 
