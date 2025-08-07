@@ -9,7 +9,7 @@ export const getCountData = async (name, key) => {
     return []
   }
   const dirents = await readdir(resultsPath)
-  const allData = []
+  const allData: any[] = []
   let index = 0
   for (const dirent of dirents) {
     const absolutePath = join(resultsPath, dirent)

@@ -9,9 +9,9 @@ export const getNamedFunctionCountData = async () => {
     console.log('no result')
     return []
   }
-  const allData = []
+  const allData: any[] = []
   const file = join(resultsPath, '0.json')
-  const text = await await readFile(file, 'utf8')
+  const text = await readFile(file, 'utf8')
   const data = JSON.parse(text)
   // const instance = data.namedFunctionCount2.find((item) => item.name === 'FocusTracker')
   // const initial = instance.count - instance.delta
