@@ -14,16 +14,15 @@ import * as SessionState from '../SessionState/SessionState.js'
 export const connectDevtools = async (
   connectionId,
   devtoolsWebSocketUrl,
-  monkeyPatchedElectron,
+  monkeyPatchedElectronId,
   electronObjectId,
   callFrameId,
   isFirstConnection,
 ) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
-  Assert.object(monkeyPatchedElectron)
+  Assert.string(monkeyPatchedElectronId)
   Assert.string(electronObjectId)
-  Assert.string(callFrameId)
   Assert.boolean(isFirstConnection)
   const electronRpc = IntermediateConnectionState.get(connectionId)
   IntermediateConnectionState.remove(connectionId)
@@ -68,7 +67,7 @@ export const connectDevtools = async (
   if (isFirstConnection) {
     await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
       functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
-      objectId: monkeyPatchedElectron.objectId,
+      objectId: monkeyPatchedElectronId,
     })
   }
   const electronApp = ElectronApp.create({

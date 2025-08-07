@@ -5,13 +5,14 @@ import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
 import * as PageObject from '../PageObject/PageObject.js'
 import { prepareBoth } from '../PrepareBoth/PrepareBoth.js'
 import * as VideoRecording from '../VideoRecording/VideoRecording.js'
+import * as ConnectElectron from '../ConnectElectron/ConnectElectron.js'
 
 export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connectionId, timeouts, ide, ideVersion, vscodePath, commit) => {
   // TODO move whole ide launch into separate worker
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
-  const { webSocketUrl, devtoolsWebSocketUrl } = await prepareBoth(
+  const { webSocketUrl, devtoolsWebSocketUrl, monkeyPatchedElectronId } = await prepareBoth(
     headlessMode,
     cwd,
     ide,
@@ -21,20 +22,16 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
     isFirstConnection,
     canUseIdleCallback,
   )
-  if (Math) {
-    return
-  }
-  // const devtoolsWebSocketUrlPromise = WaitForDevtoolsListening.waitForDevtoolsListening(child.stderr)
-  // const { monkeyPatchedElectron, electronObjectId, callFrameId } = await ConnectElectron.connectElectron(
-  //   rpc,
-  //   connectionId,
-  //   headlessMode,
-  //   webSocketUrl,
-  //   isFirstConnection,
-  //   canUseIdleCallback,
-  // )
-  // const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
-  console.log({ devtoolsWebSocketUrl })
+
+  // TODO connect workers in parallel
+  const { electronObjectId, callFrameId } = await ConnectElectron.connectElectron(
+    rpc,
+    connectionId,
+    headlessMode,
+    webSocketUrl,
+    isFirstConnection,
+    canUseIdleCallback,
+  )
   if (recordVideo) {
     await VideoRecording.start(devtoolsWebSocketUrl)
   }
@@ -43,7 +40,7 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
     rpc,
     connectionId,
     devtoolsWebSocketUrl,
-    monkeyPatchedElectron,
+    monkeyPatchedElectronId,
     electronObjectId,
     callFrameId,
     isFirstConnection,
@@ -55,6 +52,6 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
     devtoolsWebSocketUrl,
     electronObjectId,
     callFrameId,
-    monkeyPatchedElectron,
+    monkeyPatchedElectronId,
   }
 }

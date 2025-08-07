@@ -50,15 +50,20 @@ const connectElectron = async (electronRpc) => {
 
   // TODO headlessmode
 
-  await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+  const monkeyPatchedElectron = await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
     functionDeclaration: MonkeyPatchElectronScript.monkeyPatchElectronScript,
     objectId: electronObjectId,
   })
+  console.log({ monkeyPatchedElectron })
 
   await Promise.all([
     MakeElectronAvailableGlobally.makeElectronAvailableGlobally(electronRpc, electronObjectId),
     MakeRequireAvailableGlobally.makeRequireAvailableGlobally(electronRpc, requireObjectId),
   ])
+
+  return {
+    monkeyPatchedElectronId: monkeyPatchedElectron.objectId,
+  }
 }
 
 export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, connectionId, isFirstConnection, canUseIdleCallback) => {
@@ -74,11 +79,13 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc, canUseIdleCallback)
 
-  await connectElectron(electronRpc)
+  const { monkeyPatchedElectronId } = await connectElectron(electronRpc)
 
   await DevtoolsProtocolDebugger.resume(electronRpc)
 
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
+
+  // TODO can probably dispose this electron rpc at this point
 
   // TODO start workers before connecting
   // TODO connect workers in parallel
@@ -86,5 +93,6 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
   return {
     webSocketUrl,
     devtoolsWebSocketUrl,
+    monkeyPatchedElectronId,
   }
 }
