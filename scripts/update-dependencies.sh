@@ -45,7 +45,6 @@ cd packages/page-object && updateDependencies && cd ../../ &&
 cd packages/source-map-worker && updateDependencies && cd ../../ &&
 cd packages/test-coordinator && updateDependencies && cd ../../ &&
 cd packages/test-worker && updateDependencies && cd ../../ &&
-cd packages/stdout-worker && updateDependencies && cd ../../ &&
 cd packages/test-worker-commands && updateDependencies && cd ../../ &&
 cd packages/video-recording-worker && updateDependencies && cd ../../ &&
 

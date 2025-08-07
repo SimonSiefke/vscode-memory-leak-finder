@@ -1,6 +1,5 @@
 import * as RunTest from '../RunTest/RunTest.ts'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
-import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
 export const killWorkers = async () => {
   if (RunTest.state.testCoordinator) {
@@ -8,8 +7,4 @@ export const killWorkers = async () => {
     RunTest.state.testCoordinator.send(TestWorkerCommandType.Exit)
     RunTest.state.testCoordinator = undefined
   }
-  if (StdoutWorker.state.rpc) {
-    await StdoutWorker.state.rpc.dispose()
-  }
-  StdoutWorker.state.rpc = undefined
 }
