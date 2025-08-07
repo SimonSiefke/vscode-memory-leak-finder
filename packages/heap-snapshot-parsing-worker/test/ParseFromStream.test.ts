@@ -44,14 +44,14 @@ test('parseFromStream - reproduces string parsing issue with multiple chunks', a
 
   // Write the first chunk
   writeStream.write(Buffer.from(chunk1))
-  
+
   // Check state after first chunk
   console.log('State after chunk 1:', writeStream.state)
   console.log('Strings count after chunk 1:', writeStream.strings.length)
 
   // Write the second chunk
   writeStream.write(Buffer.from(chunk2))
-  
+
   // Check state after second chunk
   console.log('State after chunk 2:', writeStream.state)
   console.log('Strings count after chunk 2:', writeStream.strings.length)
@@ -114,13 +114,13 @@ test('parseFromStream - reproduces issue with locations array ending in middle o
 
   // Write the first chunk
   writeStream.write(Buffer.from(chunk1))
-  
+
   console.log('State after chunk 1:', writeStream.state)
   console.log('Strings count after chunk 1:', writeStream.strings.length)
 
   // Write the second chunk
   writeStream.write(Buffer.from(chunk2))
-  
+
   console.log('State after chunk 2:', writeStream.state)
   console.log('Strings count after chunk 2:', writeStream.strings.length)
 
@@ -183,13 +183,13 @@ test('parseFromStream - reproduces actual heap snapshot format issue', async () 
 
   // Write the first chunk
   writeStream.write(Buffer.from(chunk1))
-  
+
   console.log('State after chunk 1:', writeStream.state)
   console.log('Strings count after chunk 1:', writeStream.strings.length)
 
   // Write the second chunk
   writeStream.write(Buffer.from(chunk2))
-  
+
   console.log('State after chunk 2:', writeStream.state)
   console.log('Strings count after chunk 2:', writeStream.strings.length)
 
@@ -242,7 +242,7 @@ test('parseFromStream - reproduces issue with multiple opening brackets before s
   // Create a scenario where there are multiple opening brackets in the data
   // This simulates the real heap snapshot where there are many nested arrays
   const largeDataWithBrackets = '['.repeat(1000) + heapSnapshotData + ']'.repeat(1000)
-  
+
   // Split the data so that the locations array ends and strings begin in the middle
   const locationsEndIndex = largeDataWithBrackets.indexOf('],')
   const chunk1 = largeDataWithBrackets.substring(0, locationsEndIndex + 2) // Include the "],"
@@ -258,13 +258,13 @@ test('parseFromStream - reproduces issue with multiple opening brackets before s
 
   // Write the first chunk
   writeStream.write(Buffer.from(chunk1))
-  
+
   console.log('State after chunk 1:', writeStream.state)
   console.log('Strings count after chunk 1:', writeStream.strings.length)
 
   // Write the second chunk
   writeStream.write(Buffer.from(chunk2))
-  
+
   console.log('State after chunk 2:', writeStream.state)
   console.log('Strings count after chunk 2:', writeStream.strings.length)
 
