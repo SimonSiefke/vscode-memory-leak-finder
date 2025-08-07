@@ -22,7 +22,7 @@ export const connectDevtools = async (
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
   Assert.string(monkeyPatchedElectronId)
-  Assert.string(electronObjectId)
+  // Assert.string(electronObjectId)
   Assert.boolean(isFirstConnection)
   const electronRpc = IntermediateConnectionState.get(connectionId)
   IntermediateConnectionState.remove(connectionId)

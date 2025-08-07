@@ -12,7 +12,7 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
-  const { webSocketUrl, devtoolsWebSocketUrl, monkeyPatchedElectronId } = await prepareBoth(
+  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, monkeyPatchedElectronId } = await prepareBoth(
     headlessMode,
     cwd,
     ide,
@@ -23,15 +23,10 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
     canUseIdleCallback,
   )
 
+  const callFrameId = '' // probbaly not needed and can be rmoved
+
   // TODO connect workers in parallel
-  const { electronObjectId, callFrameId } = await ConnectElectron.connectElectron(
-    rpc,
-    connectionId,
-    headlessMode,
-    webSocketUrl,
-    isFirstConnection,
-    canUseIdleCallback,
-  )
+  const {} = await ConnectElectron.connectElectron(rpc, connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback)
   if (recordVideo) {
     await VideoRecording.start(devtoolsWebSocketUrl)
   }

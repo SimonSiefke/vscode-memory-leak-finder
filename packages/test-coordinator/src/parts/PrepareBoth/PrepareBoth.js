@@ -54,7 +54,6 @@ const connectElectron = async (electronRpc) => {
     functionDeclaration: MonkeyPatchElectronScript.monkeyPatchElectronScript,
     objectId: electronObjectId,
   })
-  console.log({ monkeyPatchedElectron })
 
   await Promise.all([
     MakeElectronAvailableGlobally.makeElectronAvailableGlobally(electronRpc, electronObjectId),
@@ -63,6 +62,7 @@ const connectElectron = async (electronRpc) => {
 
   return {
     monkeyPatchedElectronId: monkeyPatchedElectron.objectId,
+    electronObjectId,
   }
 }
 
@@ -79,7 +79,7 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc, canUseIdleCallback)
 
-  const { monkeyPatchedElectronId } = await connectElectron(electronRpc)
+  const { monkeyPatchedElectronId, electronObjectId } = await connectElectron(electronRpc)
 
   await DevtoolsProtocolDebugger.resume(electronRpc)
 
@@ -94,5 +94,6 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
     webSocketUrl,
     devtoolsWebSocketUrl,
     monkeyPatchedElectronId,
+    electronObjectId,
   }
 }
