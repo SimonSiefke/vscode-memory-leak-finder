@@ -1,5 +1,5 @@
-import { fixHtmlNamespace } from '../FixXmlNamespace/FixXmlNamespace.js'
-import * as Plot from '../Plot/Plot.js'
+import { fixHtmlNamespace } from '../FixXmlNamespace/FixXmlNamespace.ts'
+import * as Plot from '../Plot/Plot.ts'
 
 export const createChart = (data, { x, y, xLabel, yLabel }) => {
   const baseHtml = Plot.plot({

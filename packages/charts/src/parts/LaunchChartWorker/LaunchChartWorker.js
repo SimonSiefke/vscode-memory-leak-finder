@@ -3,8 +3,9 @@ import { join } from 'path'
 import * as Root from '../Root/Root.js'
 
 export const launchChartWorker = async () => {
+  const chartWorkerPath = join(Root.root, 'packages', 'chart-worker', 'src', 'main.ts')
   const rpc = await NodeWorkerRpcParent.create({
-    path: join(Root.root, 'packages', 'chart-worker', 'src', 'main.js'),
+    path: chartWorkerPath,
     // @ts-ignore
     name: 'Chart Worker',
     commandMap: {},
