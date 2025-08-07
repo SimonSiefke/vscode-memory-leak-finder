@@ -100,6 +100,5 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
     devtoolsWebSocketUrl,
     monkeyPatchedElectronId,
     electronObjectId,
-    electronRpc,
   }
 }
