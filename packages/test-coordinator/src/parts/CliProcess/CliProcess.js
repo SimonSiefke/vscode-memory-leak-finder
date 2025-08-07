@@ -16,7 +16,7 @@ export const send = (method, ...params) => {
   state.rpc.send(method, ...params)
 }
 
-const invoke = (method, ...params) => {
+export const invoke = (method, ...params) => {
   if (!state.rpc) {
     return
   }

@@ -11,12 +11,3 @@ export const writeJson = async (path, json) => {
     throw new VError(error, `Failed to write json`)
   }
 }
-
-const readJson = async (path) => {
-  try {
-    const content = await readFile(path, 'utf8')
-    return JSON.parse(content)
-  } catch (error) {
-    throw new VError(error, `Failed to read json`)
-  }
-}

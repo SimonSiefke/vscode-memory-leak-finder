@@ -1,2 +1,2 @@
 export const Vm = 1
-const Import = 2
+export const Import = 2
