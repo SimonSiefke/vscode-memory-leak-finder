@@ -1,8 +1,8 @@
 import { launchInitializationWorker } from '../LaunchInitializationWorker/LaunchInitializationWorker.js'
 
 export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, connectionId, isFirstConnection, canUseIdleCallback) => {
-  const rpc = await launchInitializationWorker()
-  const { webSocketUrl, devtoolsWebSocketUrl, monkeyPatchedElectronId, electronObjectId } = await rpc.invoke(
+  const initializationWorkerRpc = await launchInitializationWorker()
+  const { webSocketUrl, devtoolsWebSocketUrl, monkeyPatchedElectronId, electronObjectId } = await initializationWorkerRpc.invoke(
     'Initialize.prepare',
     headlessMode,
     cwd,
@@ -18,5 +18,6 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
     devtoolsWebSocketUrl,
     monkeyPatchedElectronId,
     electronObjectId,
+    initializationWorkerRpc,
   }
 }

@@ -20,6 +20,7 @@ const waitForDebuggerToBePaused = async (rpc) => {
 }
 
 const connectElectron = async (electronRpc) => {
+  globalThis.electronRpc = electronRpc
   let debuggerPausedPromise = waitForDebuggerToBePaused(electronRpc)
   await Promise.all([
     DevtoolsProtocolDebugger.enable(electronRpc),
@@ -59,6 +60,8 @@ const connectElectron = async (electronRpc) => {
     MakeRequireAvailableGlobally.makeRequireAvailableGlobally(electronRpc, requireObjectId),
   ])
 
+  globalThis.monkeyPatchedElectronId = monkeyPatchedElectron.objectId
+
   return {
     monkeyPatchedElectronId: monkeyPatchedElectron.objectId,
     electronObjectId,
@@ -85,10 +88,10 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
 
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
 
-  await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-    functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
-    objectId: monkeyPatchedElectronId,
-  })
+  // await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+  //   functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
+  //   objectId: monkeyPatchedElectronId,
+  // })
 
   // TODO can probably dispose this electron rpc at this point
 
@@ -102,4 +105,13 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
     electronObjectId,
     childPid: child.pid,
   }
+}
+
+export const undoMonkeyPatch = async () => {
+  const electronRpc = globalThis.electronRpc
+  const monkeyPatchedElectronId = globalThis.monkeyPatchedElectronId
+  await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+    functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
+    objectId: monkeyPatchedElectronId,
+  })
 }

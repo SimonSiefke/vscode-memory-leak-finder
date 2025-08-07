@@ -12,7 +12,7 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
-  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, monkeyPatchedElectronId } = await prepareBoth(
+  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, monkeyPatchedElectronId, initializationWorkerRpc } = await prepareBoth(
     headlessMode,
     cwd,
     ide,
@@ -38,6 +38,7 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
     isFirstConnection,
   )
 
+  await initializationWorkerRpc.invoke('Initialize.undoMonkeyPatch')
   await PageObject.create(rpc, connectionId, isFirstConnection, headlessMode, timeouts, ideVersion)
 
   return {
