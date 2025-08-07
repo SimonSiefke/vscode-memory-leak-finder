@@ -12,7 +12,7 @@ const parseVersion = (version) => {
 // TODO pass this as argument
 const getIdeVersion = async () => {
   const moduleUri = new URL(
-    '../../../../../packages/initialize-worker/src/parts/VsCodeVersion/VsCodeVersion.js',
+    '../../../../../packages/initialization-worker/src/parts/VsCodeVersion/VsCodeVersion.js',
     import.meta.url,
   ).toString()
   const module = await import(moduleUri)
