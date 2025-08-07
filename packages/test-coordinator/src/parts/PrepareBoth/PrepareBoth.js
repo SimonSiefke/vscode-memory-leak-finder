@@ -54,13 +54,11 @@ const connectElectron = async (electronRpc) => {
     functionDeclaration: MonkeyPatchElectronScript.monkeyPatchElectronScript,
     objectId: electronObjectId,
   })
-  console.log('patched it')
 
   await Promise.all([
     MakeElectronAvailableGlobally.makeElectronAvailableGlobally(electronRpc, electronObjectId),
     MakeRequireAvailableGlobally.makeRequireAvailableGlobally(electronRpc, requireObjectId),
   ])
-  console.log('done it')
 }
 
 export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, connectionId, isFirstConnection, canUseIdleCallback) => {
@@ -71,15 +69,20 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
     vscodePath,
     commit,
   })
-  console.log({ webSocketUrl })
   const devtoolsWebSocketUrlPromise = WaitForDevtoolsListening.waitForDevtoolsListening(child.stderr)
 
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc, canUseIdleCallback)
-  console.log({ electronRpc })
 
   await connectElectron(electronRpc)
+
+  await DevtoolsProtocolDebugger.resume(electronRpc)
+
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
+
+  // TODO start workers before connecting
+  // TODO connect workers in parallel
+  // TODO maybe pause again at this point, ensuring workers can connect correctly
   return {
     webSocketUrl,
     devtoolsWebSocketUrl,
