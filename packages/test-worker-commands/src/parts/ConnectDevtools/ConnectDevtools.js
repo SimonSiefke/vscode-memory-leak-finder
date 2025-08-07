@@ -19,11 +19,9 @@ export const connectDevtools = async (
   callFrameId,
   isFirstConnection,
 ) => {
-  console.log({ electronObjectId, monkeyPatchedElectronId })
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
   Assert.string(monkeyPatchedElectronId)
-  // Assert.string(electronObjectId)
   Assert.boolean(isFirstConnection)
   const electronRpc = IntermediateConnectionState.get(connectionId)
   IntermediateConnectionState.remove(connectionId)
