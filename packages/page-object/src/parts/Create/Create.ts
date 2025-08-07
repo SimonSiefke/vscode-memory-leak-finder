@@ -11,7 +11,10 @@ const parseVersion = (version) => {
 
 // TODO pass this as argument
 const getIdeVersion = async () => {
-  const moduleUri = new URL('../../../../../packages/test-coordinator/src/parts/VsCodeVersion/VsCodeVersion.js', import.meta.url).toString()
+  const moduleUri = new URL(
+    '../../../../../packages/initialization-worker/src/parts/VsCodeVersion/VsCodeVersion.js',
+    import.meta.url,
+  ).toString()
   const module = await import(moduleUri)
   const version = module.vscodeVersion
   return parseVersion(version)
