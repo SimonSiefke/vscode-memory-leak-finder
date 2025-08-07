@@ -85,6 +85,11 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
 
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
 
+  await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+    functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
+    objectId: monkeyPatchedElectronId,
+  })
+
   // TODO can probably dispose this electron rpc at this point
 
   // TODO start workers before connecting
@@ -97,11 +102,4 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
     electronObjectId,
     electronRpc,
   }
-}
-
-export const undoMonkeyPatch = async (electronRpc, monkeyPatchedElectronId) => {
-  await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-    functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
-    objectId: monkeyPatchedElectronId,
-  })
 }
