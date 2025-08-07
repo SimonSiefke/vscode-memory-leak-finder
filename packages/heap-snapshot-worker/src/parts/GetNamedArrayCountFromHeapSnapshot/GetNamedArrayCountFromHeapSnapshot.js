@@ -64,19 +64,19 @@ export const getNamedArrayCountFromHeapSnapshot = async (path) => {
     edgeToNodeFieldIndex,
     edgeTypes,
     nodeTypes,
+    arrayTypeIndex,
   } = computeHeapSnapshotIndices(node_types, node_fields, edge_types, edge_fields)
 
-  console.log({ ITEMS_PER_EDGE, ITEMS_PER_NODE, nameFieldIndex })
-  // console.log({ snapshot })
-  // const heapsnapshot = HeapSnapshotState.get(id)
-
-  // Assert.object(heapsnapshot)
-  // const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
-  // const nameMap = CreateNameMap.createNameMap(parsedNodes, graph)
-  // const arrayNames = getArrayNames(nameMap)
-  // const countMap = createCountMap(arrayNames)
-  // const arrayNamesWithCount = getArrayNamesWithCount(countMap)
-  // const sortedArrayNamesWithCount = SortCountMap.sortCountMap(arrayNamesWithCount)
+  const map = Object.create(null)
+  for (let i = 0; i < nodes.length; i += ITEMS_PER_NODE) {
+    const nodeType = nodes[i + typeFieldIndex]
+    if (nodeType === arrayTypeIndex) {
+      const name = nodes[i + nameFieldIndex]
+      map[name] ||= 0
+      map[name]++
+    }
+  }
+  console.log({ map })
   return []
 }
 

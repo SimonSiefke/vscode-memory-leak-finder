@@ -3,13 +3,13 @@
  * @param {Array} node_fields
  * @param {Array} edge_types
  * @param {Array} edge_fields
- * @returns {Object}
  */
 export const computeHeapSnapshotIndices = (node_types, node_fields, edge_types, edge_fields) => {
   // Type indices
   const objectTypeIndex = node_types[0].indexOf('object')
   const bigintTypeIndex = node_types[0].indexOf('bigint')
   const regexpTypeIndex = node_types[0].indexOf('regexp')
+  const arrayTypeIndex = node_types[0].indexOf('array')
 
   // Items per record
   const ITEMS_PER_NODE = node_fields.length
@@ -34,6 +34,7 @@ export const computeHeapSnapshotIndices = (node_types, node_fields, edge_types, 
     objectTypeIndex,
     bigintTypeIndex,
     regexpTypeIndex,
+    arrayTypeIndex,
 
     // Items per record
     ITEMS_PER_NODE,
