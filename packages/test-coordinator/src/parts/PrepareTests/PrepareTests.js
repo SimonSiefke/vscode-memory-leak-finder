@@ -40,8 +40,10 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
     callFrameId,
     isFirstConnection,
   )
+  console.log('got devtools')
   await PageObject.create(rpc, connectionId, isFirstConnection, headlessMode, timeouts, ideVersion)
 
+  console.log('got page object')
   await undoMonkeyPatch(electronRpc)
   return {
     rpc,
