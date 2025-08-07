@@ -12,7 +12,7 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
-  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, monkeyPatchedElectronId, electronRpc } = await prepareBoth(
+  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, monkeyPatchedElectronId } = await prepareBoth(
     headlessMode,
     cwd,
     ide,

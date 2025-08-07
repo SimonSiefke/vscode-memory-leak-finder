@@ -1,11 +1,10 @@
-import * as LaunchElectron from '../LaunchElectron/LaunchElectron.js'
 import * as Process from '../Process/Process.js'
 import * as Time from '../Time/Time.js'
 import * as ExitCode from '../ExitCode/ExitCode.js'
 
 export const exit = () => {
   const s = Time.now()
-  LaunchElectron.cleanup()
+  // LaunchElectron.cleanup()
   const e = Time.now()
   // process.exit(0)
   console.log(`finished worker cleanup in ${e - s}ms`)
