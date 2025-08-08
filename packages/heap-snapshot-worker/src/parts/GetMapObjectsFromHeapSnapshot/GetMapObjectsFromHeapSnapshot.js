@@ -7,7 +7,6 @@ import { getMapObjectsFromHeapSnapshotInternal } from '../GetMapObjectsFromHeapS
  */
 export const getMapObjectsFromHeapSnapshot = async (pathUri) => {
   // Use fast prepareHeapSnapshot with string parsing
-  const { metaData, nodes, edges, strings } = await prepareHeapSnapshot(pathUri, { parseStrings: true })
-  const { node_types, node_fields, edge_types, edge_fields } = metaData.data.meta
+  const snapshot = await prepareHeapSnapshot(pathUri, { parseStrings: true })
   return getMapObjectsFromHeapSnapshotInternal(strings, nodes, node_types, node_fields, edges, edge_types, edge_fields)
 }

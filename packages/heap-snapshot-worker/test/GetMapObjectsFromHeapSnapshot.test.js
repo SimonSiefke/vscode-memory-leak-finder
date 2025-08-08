@@ -1,8 +1,7 @@
-import { test, expect } from '@jest/globals'
-import { writeFileSync, unlinkSync } from 'node:fs'
-import * as GetMapObjectsFromHeapSnapshot from '../src/parts/GetMapObjectsFromHeapSnapshot/GetMapObjectsFromHeapSnapshot.js'
+import { expect, test } from '@jest/globals'
+import { getMapObjectsFromHeapSnapshotInternal } from '../src/parts/GetMapObjectsFromHeapSnapshotInternal/GetMapObjectsFromHeapSnapshotInternal.js'
 
-test('getMapObjectsFromHeapSnapshot - no map objects', async () => {
+test('getMapObjectsFromHeapSnapshot - no map objects', () => {
   // prettier-ignore
   const testData = {
     snapshot: {
@@ -24,18 +23,11 @@ test('getMapObjectsFromHeapSnapshot - no map objects', async () => {
     strings: ['', 'test'],
   }
 
-  const testFile = 'test-no-maps.heapsnapshot'
-  writeFileSync(testFile, JSON.stringify(testData))
-
-  try {
-    const result = await GetMapObjectsFromHeapSnapshot.getMapObjectsFromHeapSnapshot(testFile)
-    expect(result).toEqual([])
-  } finally {
-    unlinkSync(testFile)
-  }
+  const result = getMapObjectsFromHeapSnapshotInternal(testData)
+  expect(result).toEqual([])
 })
 
-test('getMapObjectsFromHeapSnapshot - map without variable name (filtered out)', async () => {
+test('getMapObjectsFromHeapSnapshot - map without variable name (filtered out)', () => {
   // prettier-ignore
   const testData = {
     snapshot: {
@@ -62,19 +54,12 @@ test('getMapObjectsFromHeapSnapshot - map without variable name (filtered out)',
     strings: ['', 'Map'],
   }
 
-  const testFile = 'test-map-no-variable.heapsnapshot'
-  writeFileSync(testFile, JSON.stringify(testData))
-
-  try {
-    const result = await GetMapObjectsFromHeapSnapshot.getMapObjectsFromHeapSnapshot(testFile)
-    // Should return empty array since Map has no variable names (prototype or system object)
-    expect(result).toEqual([])
-  } finally {
-    unlinkSync(testFile)
-  }
+  const result = getMapObjectsFromHeapSnapshotInternal(testData)
+  // Should return empty array since Map has no variable names (prototype or system object)
+  expect(result).toEqual([])
 })
 
-test('getMapObjectsFromHeapSnapshot - map with variable name', async () => {
+test('getMapObjectsFromHeapSnapshot - map with variable name', () => {
   // prettier-ignore
   const testData = {
     snapshot: {
@@ -111,25 +96,18 @@ test('getMapObjectsFromHeapSnapshot - map with variable name', async () => {
     strings: ['', 'Window', 'Map', 'myMap'],
   }
 
-  const testFile = 'test-map-with-variable.heapsnapshot'
-  writeFileSync(testFile, JSON.stringify(testData))
-
-  try {
-    const result = await GetMapObjectsFromHeapSnapshot.getMapObjectsFromHeapSnapshot(testFile)
-    expect(result).toEqual([
-      {
-        id: 200,
-        name: 'myMap',
-        keys: [],
-        note: 'Map object found in heap snapshot',
-      },
-    ])
-  } finally {
-    unlinkSync(testFile)
-  }
+  const result = getMapObjectsFromHeapSnapshotInternal(testData)
+  expect(result).toEqual([
+    {
+      id: 200,
+      name: 'myMap',
+      keys: [],
+      note: 'Map object found in heap snapshot',
+    },
+  ])
 })
 
-test('getMapObjectsFromHeapSnapshot - multiple map objects with variables', async () => {
+test('getMapObjectsFromHeapSnapshot - multiple map objects with variables', () => {
   // prettier-ignore
   const testData = {
     snapshot: {
@@ -181,31 +159,24 @@ test('getMapObjectsFromHeapSnapshot - multiple map objects with variables', asyn
     strings: ['', 'App', 'Map', 'Set', 'WeakMap', 'cache', 'userCache', 'refs'],
   }
 
-  const testFile = 'test-multiple-maps.heapsnapshot'
-  writeFileSync(testFile, JSON.stringify(testData))
-
-  try {
-    const result = await GetMapObjectsFromHeapSnapshot.getMapObjectsFromHeapSnapshot(testFile)
-    expect(result).toEqual([
-      {
-        id: 200,
-        name: 'cache',
-        keys: [],
-        note: 'Map object found in heap snapshot',
-      },
-      {
-        id: 300,
-        name: 'userCache',
-        keys: [],
-        note: 'Map object found in heap snapshot',
-      },
-    ])
-  } finally {
-    unlinkSync(testFile)
-  }
+  const result = getMapObjectsFromHeapSnapshotInternal(testData)
+  expect(result).toEqual([
+    {
+      id: 200,
+      name: 'cache',
+      keys: [],
+      note: 'Map object found in heap snapshot',
+    },
+    {
+      id: 300,
+      name: 'userCache',
+      keys: [],
+      note: 'Map object found in heap snapshot',
+    },
+  ])
 })
 
-test('getMapObjectsFromHeapSnapshot - map with multiple variable names', async () => {
+test('getMapObjectsFromHeapSnapshot - map with multiple variable names', () => {
   // prettier-ignore
   const testData = {
     snapshot: {
@@ -245,20 +216,13 @@ test('getMapObjectsFromHeapSnapshot - map with multiple variable names', async (
     strings: ['', 'Window', 'Map', 'cache', 'storage'],
   }
 
-  const testFile = 'test-map-multiple-variables.heapsnapshot'
-  writeFileSync(testFile, JSON.stringify(testData))
-
-  try {
-    const result = await GetMapObjectsFromHeapSnapshot.getMapObjectsFromHeapSnapshot(testFile)
-    expect(result).toEqual([
-      {
-        id: 200,
-        name: ['cache', 'storage'],
-        keys: [],
-        note: 'Map object found in heap snapshot',
-      },
-    ])
-  } finally {
-    unlinkSync(testFile)
-  }
+  const result = getMapObjectsFromHeapSnapshotInternal(testData)
+  expect(result).toEqual([
+    {
+      id: 200,
+      name: ['cache', 'storage'],
+      keys: [],
+      note: 'Map object found in heap snapshot',
+    },
+  ])
 })
