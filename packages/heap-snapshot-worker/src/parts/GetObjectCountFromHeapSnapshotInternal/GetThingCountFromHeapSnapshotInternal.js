@@ -1,4 +1,4 @@
-export const getThingCountFromHeapSnapshotInternal = async (
+export const getThingCountFromHeapSnapshotInternal = (
   nodes,
   strings,
   itemsPerNode,
