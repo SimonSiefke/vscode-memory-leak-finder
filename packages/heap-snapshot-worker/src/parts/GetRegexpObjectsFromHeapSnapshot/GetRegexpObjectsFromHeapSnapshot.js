@@ -10,5 +10,6 @@ export const getRegexpObjectsFromHeapSnapshot = async (pathUri) => {
     parseStrings: true,
   })
 
+  console.log({ snapshot: snapshot.snapshot })
   return getRegexpObjectsFromHeapSnapshotInternal(snapshot)
 }
