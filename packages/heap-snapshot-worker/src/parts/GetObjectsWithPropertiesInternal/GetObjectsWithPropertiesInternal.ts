@@ -1,4 +1,6 @@
 import type { Snapshot } from '../Snapshot/Snapshot.js'
+import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
+import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
 
 export interface ObjectWithProperty {
   id: number
@@ -34,6 +36,10 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
   }
 
   // Get field indices
+  const typeFieldIndex = nodeFields.indexOf('type')
+  const nameFieldIndex = nodeFields.indexOf('name')
+  const idFieldIndex = nodeFields.indexOf('id')
+  const selfSizeFieldIndex = nodeFields.indexOf('self_size')
   const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
 
   const edgeTypeFieldIndex = edgeFields.indexOf('type')
@@ -42,6 +48,9 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
 
   const ITEMS_PER_NODE = nodeFields.length
   const ITEMS_PER_EDGE = edgeFields.length
+
+  // Create edge map for fast lookups
+  const edgeMap = createEdgeMap(nodes, nodeFields)
 
   // Helper function to parse a node from the flat array
   const parseNode = (nodeIndex: number): any => {
@@ -62,7 +71,7 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
 
   // Helper function to get node name as string
   const getNodeName = (node: any): string | null => {
-    if (node.name !== undefined && strings[node.name]) {
+    if (node && node.name !== undefined && strings[node.name]) {
       return strings[node.name]
     }
     return null
@@ -76,25 +85,128 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
     return null
   }
 
-  // Iterate through each node and scan its edges
-  let currentEdgeOffset = 0
+  // Helper function to follow references and get actual value
+  const getActualValue = (targetNode: any, visited: Set<number> = new Set()): string => {
+    if (!targetNode || visited.has(targetNode.id)) {
+      return `[Circular ${targetNode?.id || 'Unknown'}]`
+    }
+    visited.add(targetNode.id)
 
+    const nodeType = targetNode.type
+    const nodeTypeName = getNodeTypeName(targetNode)
+
+    // For strings, return the actual string value
+    if (nodeType === 2) {
+      const stringValue = getNodeName(targetNode)
+      return stringValue || `[String ${targetNode.id}]`
+    }
+
+    // For numbers, return the actual number value
+    if (nodeType === 7) {
+      const numberValue = targetNode.name?.toString()
+      return numberValue || `[Number ${targetNode.id}]`
+    }
+
+    // For code objects, try to follow internal references to find string/number values
+    if (nodeTypeName === 'code') {
+      // Find the node index for this target node
+      let targetNodeIndex = -1
+      for (let i = 0; i < nodes.length; i += ITEMS_PER_NODE) {
+        if (nodes[i + idFieldIndex] === targetNode.id) {
+          targetNodeIndex = i / ITEMS_PER_NODE
+          break
+        }
+      }
+
+      if (targetNodeIndex !== -1) {
+        // Get edges using the edge map for fast lookup
+        const nodeEdges = getNodeEdges(targetNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
+
+        // Collect all string/number values from internal edges
+        const stringValues: string[] = []
+        const numberValues: string[] = []
+
+        // Check edges from this code object
+        for (const edge of nodeEdges) {
+          // Follow internal edges to find string/number values
+          if (edge.type === 3) {
+            // internal edge
+            const referencedNode = parseNode(edge.toNode)
+            if (referencedNode) {
+              const referencedType = referencedNode.type
+              if (referencedType === 2) {
+                // string
+                const stringValue = getNodeName(referencedNode)
+                if (stringValue) {
+                  stringValues.push(stringValue)
+                }
+              } else if (referencedType === 7) {
+                // number
+                const numberValue = referencedNode.name?.toString()
+                if (numberValue) {
+                  numberValues.push(numberValue)
+                }
+              }
+            }
+          }
+        }
+
+        // Also check incoming references to see if any have string names
+        let currentEdgeOffset = 0
+        for (let sourceNodeIndex = 0; sourceNodeIndex < nodes.length; sourceNodeIndex += ITEMS_PER_NODE) {
+          const sourceEdgeCount = nodes[sourceNodeIndex + edgeCountFieldIndex]
+
+          for (let j = 0; j < sourceEdgeCount; j++) {
+            const edgeIndex = (currentEdgeOffset + j) * ITEMS_PER_EDGE
+            const edgeToNode = edges[edgeIndex + edgeToNodeFieldIndex]
+
+            if (edgeToNode === targetNodeIndex) {
+              const edgeType = edges[edgeIndex + edgeTypeFieldIndex]
+              const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
+
+              // If this is an internal edge with a string name, that might be the value
+              if (edgeType === 3 && edgeNameIndex < strings.length) {
+                const edgeName = strings[edgeNameIndex]
+                if (edgeName && edgeName !== '') {
+                  stringValues.push(edgeName)
+                }
+              }
+            }
+          }
+          currentEdgeOffset += sourceEdgeCount
+        }
+
+        // Return the first string value found, or first number value if no strings
+        if (stringValues.length > 0) {
+          return `"${stringValues[0]}"`
+        } else if (numberValues.length > 0) {
+          return numberValues[0]
+        }
+      }
+    }
+
+    // For other types, return the standard format
+    if (nodeType === 3) {
+      return `[Object ${targetNode.id}]`
+    } else if (nodeType === 1) {
+      return `[Array ${targetNode.id}]`
+    } else {
+      return `[${nodeTypeName || 'Unknown'} ${targetNode.id}]`
+    }
+  }
+
+  // Iterate through each node and scan its edges
   for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex += ITEMS_PER_NODE) {
-    const edgeCount = nodes[nodeIndex + edgeCountFieldIndex]
+    const nodeEdges = getNodeEdges(nodeIndex / ITEMS_PER_NODE, edgeMap, nodes, edges, nodeFields, edgeFields)
 
     // Scan this node's edges
-    for (let j = 0; j < edgeCount; j++) {
-      const edgeIndex = (currentEdgeOffset + j) * ITEMS_PER_EDGE
-      const edgeType = edges[edgeIndex + edgeTypeFieldIndex]
-      const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
-      const edgeToNode = edges[edgeIndex + edgeToNodeFieldIndex]
-
+    for (const edge of nodeEdges) {
       // Check if it's a property edge (type 2) with the target property name
-      if (edgeType === 2 && edgeNameIndex === propertyNameIndex) {
+      if (edge.type === 2 && edge.nameIndex === propertyNameIndex) {
         // Parse the source node (the object that has the property)
         const sourceNode = parseNode(nodeIndex / ITEMS_PER_NODE)
         // Parse the target node (the property value)
-        const targetNode = parseNode(edgeToNode)
+        const targetNode = parseNode(edge.toNode)
 
         if (sourceNode && targetNode) {
           const result: ObjectWithProperty = {
@@ -106,30 +218,13 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
             edgeCount: sourceNode.edge_count,
           }
 
-          // Try to get the property value based on the target node type
-          if (targetNode.type === 2) {
-            // string
-            result.propertyValue = getNodeName(targetNode)
-          } else if (targetNode.type === 7) {
-            // number
-            result.propertyValue = targetNode.name?.toString() || null // name field contains the number value
-          } else if (targetNode.type === 3) {
-            // object
-            result.propertyValue = `[Object ${targetNode.id}]`
-          } else if (targetNode.type === 1) {
-            // array
-            result.propertyValue = `[Array ${targetNode.id}]`
-          } else {
-            const typeName = getNodeTypeName(targetNode)
-            result.propertyValue = `[${typeName || 'Unknown'} ${targetNode.id}]`
-          }
+          // Get the actual value by following references
+          result.propertyValue = getActualValue(targetNode)
 
           results.push(result)
         }
       }
     }
-
-    currentEdgeOffset += edgeCount
   }
 
   return results
