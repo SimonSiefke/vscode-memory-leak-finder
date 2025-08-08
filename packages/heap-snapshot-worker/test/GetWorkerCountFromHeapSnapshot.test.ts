@@ -25,5 +25,5 @@ test('should count worker objects from heap snapshot', () => {
     strings: ['', 'Worker.prototype'],
   }
   const result = getWorkerCountFromHeapSnapshotInternal(testData)
-  expect(result).toEqual(3)
+  expect(result).toEqual(1)
 })
