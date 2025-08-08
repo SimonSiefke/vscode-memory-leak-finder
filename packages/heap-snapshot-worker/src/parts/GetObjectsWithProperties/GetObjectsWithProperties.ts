@@ -1,4 +1,7 @@
-import { getObjectsWithPropertiesInternal, ObjectWithProperty } from '../GetObjectsWithPropertiesInternal/GetObjectsWithPropertiesInternal.ts'
+import {
+  getObjectsWithPropertiesInternal,
+  ObjectWithProperty,
+} from '../GetObjectsWithPropertiesInternal/GetObjectsWithPropertiesInternal.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.js'
 
 /**

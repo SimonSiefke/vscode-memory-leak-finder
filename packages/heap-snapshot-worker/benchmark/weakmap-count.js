@@ -9,7 +9,6 @@ const testWeakMapCount = async () => {
   try {
     const count = await getWeakMapCountFromHeapSnapshot(filePath1)
     console.log({ count })
-
   } catch (error) {
     console.error('Error:', error.message)
   }

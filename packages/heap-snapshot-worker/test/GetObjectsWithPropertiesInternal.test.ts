@@ -41,7 +41,7 @@ test('should find objects with specified property', () => {
     propertyValue: '[Object 4]',
     type: 'object',
     selfSize: 32,
-    edgeCount: 0
+    edgeCount: 0,
   })
   expect(result[1]).toEqual({
     id: 5,
@@ -49,7 +49,7 @@ test('should find objects with specified property', () => {
     propertyValue: '[Object 5]',
     type: 'object',
     selfSize: 32,
-    edgeCount: 0
+    edgeCount: 0,
   })
 })
 
@@ -118,11 +118,12 @@ test('should handle string property values', () => {
     propertyValue: 'hello',
     type: 'string',
     selfSize: 50,
-    edgeCount: 0
+    edgeCount: 0,
   })
 })
 
 test('should handle number property values', () => {
+  // prettier-ignore
   const snapshot: Snapshot = {
     node_count: 2,
     edge_count: 1,
@@ -134,13 +135,11 @@ test('should handle number property values', () => {
       edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
       location_fields: ['object_index', 'script_id', 'line', 'column']
     },
-    // prettier-ignore
     nodes: new Uint32Array([
       // type, name, id, self_size, edge_count, trace_node_id, detachedness
       3, 2, 1, 100, 1, 0, 0,  // Object1
-      8, 3, 2, 50, 0, 0, 0,  // Number value 42
+      8, 42, 2, 50, 0, 0, 0,  // Number value 42
     ]),
-    // prettier-ignore
     edges: new Uint32Array([
       // type, name_or_index, to_node
       2, 1, 1,  // property edge from Object1 to number value
@@ -158,11 +157,12 @@ test('should handle number property values', () => {
     propertyValue: '42',
     type: 'number',
     selfSize: 50,
-    edgeCount: 0
+    edgeCount: 0,
   })
 })
 
 test('should handle empty metadata', () => {
+  // prettier-ignore
   const snapshot: Snapshot = {
     node_count: 0,
     edge_count: 0,

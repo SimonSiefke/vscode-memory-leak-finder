@@ -15,10 +15,7 @@ export interface ObjectWithProperty {
  * @param propertyName - The property name to search for
  * @returns Array of objects with the specified property
  */
-export const getObjectsWithPropertiesInternal = (
-  snapshot: Snapshot,
-  propertyName: string
-): ObjectWithProperty[] => {
+export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyName: string): ObjectWithProperty[] => {
   const { nodes, edges, strings, meta } = snapshot
   const results: ObjectWithProperty[] = []
 
@@ -31,7 +28,7 @@ export const getObjectsWithPropertiesInternal = (
   }
 
   // Find the property name in the strings array
-  const propertyNameIndex = strings.findIndex(str => str === propertyName)
+  const propertyNameIndex = strings.findIndex((str) => str === propertyName)
   if (propertyNameIndex === -1) {
     return results
   }
@@ -90,17 +87,21 @@ export const getObjectsWithPropertiesInternal = (
           propertyValue: null,
           type: getNodeTypeName(targetNode),
           selfSize: targetNode.self_size,
-          edgeCount: targetNode.edge_count
+          edgeCount: targetNode.edge_count,
         }
 
         // Try to get the property value based on the node type
-        if (targetNode.type === 2) { // string
+        if (targetNode.type === 2) {
+          // string
           result.propertyValue = getNodeName(targetNode)
-        } else if (targetNode.type === 8) { // number
+        } else if (targetNode.type === 8) {
+          // number
           result.propertyValue = targetNode.name?.toString() || null // name field contains the number value
-        } else if (targetNode.type === 3) { // object
+        } else if (targetNode.type === 3) {
+          // object
           result.propertyValue = `[Object ${targetNode.id}]`
-        } else if (targetNode.type === 1) { // array
+        } else if (targetNode.type === 1) {
+          // array
           result.propertyValue = `[Array ${targetNode.id}]`
         } else {
           const typeName = getNodeTypeName(targetNode)

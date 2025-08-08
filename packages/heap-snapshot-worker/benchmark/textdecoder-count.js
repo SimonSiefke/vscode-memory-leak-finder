@@ -10,7 +10,6 @@ const testTextDecoderCount = async () => {
     const count = await getTextDecoderCountFromHeapSnapshot(filePath1)
     console.log({ count })
     console.log('Expected: 7')
-
   } catch (error) {
     console.error('Error:', error.message)
   }
