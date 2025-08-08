@@ -1,4 +1,4 @@
-export const skip = true
+// export const skip = true
 
 export const setup = async ({ Editor, Workspace, Explorer }) => {
   await Workspace.setFiles([

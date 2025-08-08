@@ -1,8 +1,9 @@
 export interface Session {
-  readonly type: string
   readonly id?: string
-  readonly rpc?: any
-  readonly url?: string
-  readonly sessionId?: string
   readonly objectType?: string
+  readonly rpc?: any
+  readonly sessionId?: string
+  readonly title?: string
+  readonly type: string
+  readonly url?: string
 }

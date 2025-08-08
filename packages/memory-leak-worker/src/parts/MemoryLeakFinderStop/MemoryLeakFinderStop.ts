@@ -1,8 +1,11 @@
 import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinderState.ts'
 import * as WaitForCrash from '../WaitForCrash/WaitForCrash.ts'
+import * as SessionState from '../SessionState/SessionState.ts'
 
 const doStop = async (instanceId: string): Promise<any> => {
   const measure = MemoryLeakFinderState.get(instanceId)
+  const session = SessionState.getAllSessions()
+  console.log({ session })
   if (!measure) {
     throw new Error(`no measure found`)
   }

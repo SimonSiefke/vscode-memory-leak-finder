@@ -79,17 +79,20 @@ const handleAttachedToBrowser = (message: DevToolsMessage): void => {
 const handleAttachedToJs = async (message: AttachedToTargetMessage, type: string): Promise<void> => {
   const sessionId = message.params?.sessionId as string
   if (!sessionId) {
+    console.log('return1')
     return
   }
   const browserSession = SessionState.getSession('browser')
   if (!browserSession) {
+    console.log('return2')
     return
   }
   const browserRpc = (browserSession as any).rpc
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
 
-  const targetInfo = message.params?.targetInfo as any
+  const targetInfo = message.params?.targetInfo
   if (!targetInfo) {
+    console.log('return3')
     return
   }
 
@@ -98,6 +101,7 @@ const handleAttachedToJs = async (message: AttachedToTargetMessage, type: string
     url: targetInfo.url,
     sessionId,
     rpc: sessionRpc,
+    title: targetInfo.title,
   })
 
   TargetState.addTarget(targetInfo.targetId, {
@@ -118,6 +122,7 @@ const handleAttachedToJs = async (message: AttachedToTargetMessage, type: string
 
 const handleAttachedToWorker = async (message: AttachedToTargetMessage): Promise<void> => {
   try {
+    console.log('attached to worker', message)
     await handleAttachedToJs(message, DevtoolsTargetType.Worker)
   } catch (error) {
     console.warn(new VError(error, `Failed to attach to worker`))
