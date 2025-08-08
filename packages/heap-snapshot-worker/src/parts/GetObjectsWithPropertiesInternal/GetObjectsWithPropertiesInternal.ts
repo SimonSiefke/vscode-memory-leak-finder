@@ -1,3 +1,5 @@
+import { Snapshot } from '../Snapshot/Snapshot.ts'
+
 export interface ObjectWithProperty {
   id: number
   name: string | null
@@ -7,50 +9,31 @@ export interface ObjectWithProperty {
   edgeCount: number
 }
 
-/**
- * Internal function that finds objects in a parsed heap snapshot that have a specific property
- * @param nodes - The nodes array from the heap snapshot
- * @param edges - The edges array from the heap snapshot
- * @param strings - The strings array from the heap snapshot
- * @param meta - The metadata from the heap snapshot
- * @param propertyName - The property name to search for
- * @returns Array of objects with the specified property
- */
-export const getObjectsWithPropertiesInternal = (
-  nodes: Uint32Array,
-  edges: Uint32Array,
-  strings: readonly string[],
-  meta: {
-    node_fields: readonly string[]
-    node_types: readonly (readonly string[])[]
-    edge_fields: readonly string[]
-    edge_types: readonly (readonly string[])[]
-  },
-  propertyName: string
-): ObjectWithProperty[] => {
+export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyName: string): ObjectWithProperty[] => {
   const results: ObjectWithProperty[] = []
-  
+
+  const { meta } = snapshot
   const nodeFields = meta.node_fields
   const nodeTypes = meta.node_types
   const edgeFields = meta.edge_fields
-  
+
   if (!nodeFields.length || !edgeFields.length) {
     return results
   }
-  
+
   // Find the property name in the strings array
-  const propertyNameIndex = strings.findIndex(str => str === propertyName)
+  const propertyNameIndex = strings.findIndex((str) => str === propertyName)
   if (propertyNameIndex === -1) {
     return results
   }
-  
+
   // Helper function to parse a node from the flat array
   const parseNode = (nodeIndex: number): any => {
     const nodeStart = nodeIndex * nodeFields.length
     if (nodeStart >= nodes.length) {
       return null
     }
-    
+
     const node: any = {}
     for (let i = 0; i < nodeFields.length; i++) {
       const fieldIndex = nodeStart + i
@@ -60,7 +43,7 @@ export const getObjectsWithPropertiesInternal = (
     }
     return node
   }
-  
+
   // Helper function to get node name as string
   const getNodeName = (node: any): string | null => {
     if (node.name !== undefined && strings[node.name]) {
@@ -68,7 +51,7 @@ export const getObjectsWithPropertiesInternal = (
     }
     return null
   }
-  
+
   // Helper function to get node type name
   const getNodeTypeName = (node: any): string | null => {
     if (nodeTypes[0] && Array.isArray(nodeTypes[0]) && node.type !== undefined) {
@@ -76,17 +59,17 @@ export const getObjectsWithPropertiesInternal = (
     }
     return null
   }
-  
+
   // Search for property edges with the specified property name
   for (let i = 0; i < edges.length; i += edgeFields.length) {
     if (i + 1 >= edges.length) {
       continue
     }
-    
+
     const edgeType = edges[i]
     const edgeNameIndex = edges[i + 1]
     const edgeToNode = edges[i + 2]
-    
+
     // Check if it's a property edge (type 2) with the target property name
     if (edgeType === 2 && edgeNameIndex === propertyNameIndex) {
       // Parse the target node (the property value)
@@ -98,27 +81,31 @@ export const getObjectsWithPropertiesInternal = (
           propertyValue: null,
           type: getNodeTypeName(targetNode),
           selfSize: targetNode.self_size,
-          edgeCount: targetNode.edge_count
+          edgeCount: targetNode.edge_count,
         }
-        
+
         // Try to get the property value based on the node type
-        if (targetNode.type === 2) { // string
+        if (targetNode.type === 2) {
+          // string
           result.propertyValue = getNodeName(targetNode)
-        } else if (targetNode.type === 8) { // number
+        } else if (targetNode.type === 8) {
+          // number
           result.propertyValue = targetNode.name?.toString() || null // name field contains the number value
-        } else if (targetNode.type === 3) { // object
+        } else if (targetNode.type === 3) {
+          // object
           result.propertyValue = `[Object ${targetNode.id}]`
-        } else if (targetNode.type === 1) { // array
+        } else if (targetNode.type === 1) {
+          // array
           result.propertyValue = `[Array ${targetNode.id}]`
         } else {
           const typeName = getNodeTypeName(targetNode)
           result.propertyValue = `[${typeName || 'Unknown'} ${targetNode.id}]`
         }
-        
+
         results.push(result)
       }
     }
   }
-  
+
   return results
 }
