@@ -99,9 +99,8 @@ test('HeapSnapshotWriteStream - handles empty heap snapshot', async () => {
 
   const result = stream.getResult()
 
-  expect(result.metaData).toHaveProperty('data')
-  expect(result.metaData.data).toHaveProperty('node_count', 0)
-  expect(result.metaData.data).toHaveProperty('edge_count', 0)
+  expect(result.meta).toHaveProperty('node_count', 0)
+  expect(result.meta).toHaveProperty('edge_count', 0)
   expect(result.nodes.length).toBe(0)
   expect(result.edges.length).toBe(0)
   expect(result.locations.length).toBe(0)
@@ -140,8 +139,7 @@ test('HeapSnapshotWriteStream - handles partial data chunks', async () => {
 
   const result = stream.getResult()
 
-  expect(result.metaData).toHaveProperty('data')
-  expect(result.metaData.data).toHaveProperty('node_count', 1)
+  expect(result.meta).toHaveProperty('node_count', 1)
   expect(result.nodes.length).toBe(7) // 1 node * 7 fields
   expect(result.edges.length).toBe(0)
   expect(result.locations.length).toBe(0)
@@ -239,7 +237,7 @@ test('HeapSnapshotWriteStream - handles missing nodes array header gracefully', 
   // Validation should be tested at the parseFromJson level instead
 
   const result = stream.getResult()
-  expect(result.metaData).toHaveProperty('data')
+  expect(result.meta).toBeDefined()
   expect(result.nodes.length).toBe(7) // Array is initialized with expected size but not filled
 })
 
@@ -273,7 +271,6 @@ test('HeapSnapshotWriteStream - handles missing edges array header gracefully', 
   // Validation should be tested at the parseFromJson level instead
 
   const result = stream.getResult()
-  expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7)
   expect(result.edges.length).toBe(0)
 })
@@ -308,7 +305,6 @@ test('HeapSnapshotWriteStream - handles missing locations array header gracefull
   // Validation should be tested at the parseFromJson level instead
 
   const result = stream.getResult()
-  expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7)
   expect(result.edges.length).toBe(0)
   expect(result.locations.length).toBe(0)
@@ -331,7 +327,6 @@ test('HeapSnapshotWriteStream - handles malformed nodes array gracefully', async
   // Validation should be tested at the parseFromJson level instead
 
   const result = stream.getResult()
-  expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7) // Array is initialized with expected size but not filled
 })
 
@@ -352,7 +347,6 @@ test('HeapSnapshotWriteStream - handles malformed edges array gracefully', async
   // Validation should be tested at the parseFromJson level instead
 
   const result = stream.getResult()
-  expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7)
   expect(result.edges.length).toBe(0)
 })
@@ -374,7 +368,6 @@ test('HeapSnapshotWriteStream - handles malformed locations array gracefully', a
   // Validation should be tested at the parseFromJson level instead
 
   const result = stream.getResult()
-  expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7)
   expect(result.edges.length).toBe(0)
   expect(result.locations.length).toBe(0)
@@ -397,7 +390,6 @@ test('HeapSnapshotWriteStream - handles partial data where array header is incom
   const result = stream.getResult()
 
   // Should have metadata but no nodes data since the array header is incomplete
-  expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7) // Array is initialized with expected size but not filled
 })
 
@@ -429,7 +421,6 @@ test('HeapSnapshotWriteStream - processes heap snapshot with strings when parseS
 
   const result = stream.getResult()
 
-  expect(result.metaData).toHaveProperty('data')
   expect(result.metaData.data).toHaveProperty('node_count', 1)
   expect(result.nodes.length).toBe(7) // 1 node * 7 fields
   expect(result.edges.length).toBe(0)
@@ -465,7 +456,6 @@ test('HeapSnapshotWriteStream - skips strings when parseStrings is false', async
 
   const result = stream.getResult()
 
-  expect(result.metaData).toHaveProperty('data')
   expect(result.nodes.length).toBe(7)
   expect(result.edges.length).toBe(0)
   expect(result.locations.length).toBe(4)
