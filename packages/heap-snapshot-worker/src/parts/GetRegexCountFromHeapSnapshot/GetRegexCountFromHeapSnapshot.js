@@ -1,5 +1,5 @@
-import { getThingCountFromHeapSnapshot } from '../GetThingCountFromHeapSnapshot/GetThingCountFromHeapSnapshot.js'
+import { getTypeCount } from '../GetTypeCount/GetTypeCount.js'
 
 export const getRegexCountFromHeapSnapshot = async (path) => {
-  return getThingCountFromHeapSnapshot(path, 'regexp', 'RegExp')
+  return getTypeCount(path, 'regexp')
 }
