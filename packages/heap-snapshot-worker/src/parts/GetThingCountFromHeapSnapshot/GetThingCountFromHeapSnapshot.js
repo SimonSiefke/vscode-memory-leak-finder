@@ -2,10 +2,7 @@ import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/Comput
 import { getThingCountFromHeapSnapshotInternal } from '../GetObjectCountFromHeapSnapshotInternal/GetThingCountFromHeapSnapshotInternal.js'
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.js'
 
-export const getThingCountFromHeapSnapshot = async (path, typeName, objectName) => {
-  const snapshot = await prepareHeapSnapshot(path, {
-    parseStrings: true,
-  })
+export const getThingCountFromHeapSnapshot = (snapshot, typeName, objectName) => {
   const { nodes, strings, metaData } = snapshot
   const { node_types, node_fields, edge_types, edge_fields } = metaData.data.meta
   const typeIndex = node_types[0].indexOf(typeName)
