@@ -1,5 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { getMapObjectsFromHeapSnapshotInternal } from '../src/parts/GetMapObjectsFromHeapSnapshotInternal/GetMapObjectsFromHeapSnapshotInternal.js'
+import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('getMapObjectsFromHeapSnapshot - no map objects', () => {
   // prettier-ignore
@@ -61,8 +62,7 @@ test('getMapObjectsFromHeapSnapshot - map without variable name (filtered out)',
 
 test('getMapObjectsFromHeapSnapshot - map with variable name', () => {
   // prettier-ignore
-  const testData = {
-    snapshot: {
+  const testData :Snapshot= {
       meta: {
         node_types: [['hidden', 'array', 'string', 'object']],
         node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
@@ -72,8 +72,8 @@ test('getMapObjectsFromHeapSnapshot - map with variable name', () => {
       },
       node_count: 2,
       edge_count: 1,
-    },
-    nodes: [
+      extra_native_bytes:0,
+    nodes: new Uint32Array([
       3,
       1,
       100,
@@ -86,13 +86,13 @@ test('getMapObjectsFromHeapSnapshot - map with variable name', () => {
       28,
       0,
       0, // Map
-    ],
-    edges: [
+    ]),
+    edges: new Uint32Array([
       2,
       3,
       6, // property:"myMap" -> Map (node data index 6)
-    ],
-    locations: [],
+    ]),
+    locations: new Uint32Array([]),
     strings: ['', 'Window', 'Map', 'myMap'],
   }
 
