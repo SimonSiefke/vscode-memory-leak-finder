@@ -1,5 +1,10 @@
 import { getTypeCount } from '../GetTypeCount/GetTypeCount.js'
 
-export const getRegexCountFromHeapSnapshotInternal = async (snapshot) => {
+/**
+ *
+ * @param {any} snapshot
+ * @returns {number}
+ */
+export const getRegexCountFromHeapSnapshotInternal = (snapshot) => {
   return getTypeCount(snapshot, 'regexp')
 }

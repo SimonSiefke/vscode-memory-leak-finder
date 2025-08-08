@@ -1,3 +1,9 @@
+/**
+ *
+ * @param {any} snapshot
+ * @param {string} typeName
+ * @returns {number}
+ */
 export const getTypeCount = (snapshot, typeName) => {
   const { nodes, metaData } = snapshot
   const { node_types, node_fields } = metaData.data.meta
