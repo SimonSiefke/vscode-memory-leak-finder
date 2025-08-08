@@ -1,7 +1,7 @@
 import { expect, test } from '@jest/globals'
 import { getMapCountFromHeapSnapshotInternal } from '../src/parts/GetMapCountFromHeapSnapshotInternal/GetMapCountFromHeapSnapshotInternal.js'
 
-test('getMapCountFromHeapSnapshot should return zero for no maps', async () => {
+test('getMapCountFromHeapSnapshot should return zero for no maps', () => {
   // prettier-ignore
   const testData = {
      snapshot: {

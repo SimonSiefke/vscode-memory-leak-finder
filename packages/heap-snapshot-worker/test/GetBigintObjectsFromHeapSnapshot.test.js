@@ -1,8 +1,7 @@
-import { test, expect } from '@jest/globals'
-import { writeFileSync, unlinkSync } from 'node:fs'
+import { expect, test } from '@jest/globals'
 import { getBigintObjectsFromHeapSnapshotInternal } from '../src/parts/GetBigintObjectsFromHeapSnapshotInternal/GetBigintObjectsFromHeapSnapshotInternal.js'
 
-test('getBigintObjectsFromHeapSnapshot - no bigint objects', async () => {
+test('getBigintObjectsFromHeapSnapshot - no bigint objects', () => {
   // prettier-ignore
   const testData = {
     snapshot: {
@@ -28,7 +27,7 @@ test('getBigintObjectsFromHeapSnapshot - no bigint objects', async () => {
   expect(result).toEqual([])
 })
 
-test('getBigintObjectsFromHeapSnapshot - single bigint object without variable name (filtered out)', async () => {
+test('getBigintObjectsFromHeapSnapshot - single bigint object without variable name (filtered out)', () => {
   // prettier-ignore
   const testData = {
     snapshot: {
@@ -55,7 +54,7 @@ test('getBigintObjectsFromHeapSnapshot - single bigint object without variable n
   expect(result).toEqual([])
 })
 
-test('getBigintObjectsFromHeapSnapshot - multiple bigint objects (embedded constants filtered out)', async () => {
+test('getBigintObjectsFromHeapSnapshot - multiple bigint objects (embedded constants filtered out)', () => {
   // prettier-ignore
   const testData = {
     snapshot: {
@@ -85,7 +84,7 @@ test('getBigintObjectsFromHeapSnapshot - multiple bigint objects (embedded const
   expect(result).toEqual([])
 })
 
-test('getBigintObjectsFromHeapSnapshot - bigint with variable name', async () => {
+test('getBigintObjectsFromHeapSnapshot - bigint with variable name', () => {
   // prettier-ignore
   const testData = {
     snapshot: {
