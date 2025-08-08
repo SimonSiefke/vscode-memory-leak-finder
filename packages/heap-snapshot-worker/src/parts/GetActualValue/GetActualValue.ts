@@ -9,12 +9,7 @@ import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
  * @param visited - Set of visited node IDs to prevent circular references
  * @returns The actual value as a string
  */
-export const getActualValue = (
-  targetNode: any,
-  snapshot: Snapshot,
-  edgeMap: Uint32Array,
-  visited: Set<number> = new Set(),
-): string => {
+export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uint32Array, visited: Set<number> = new Set()): string => {
   if (!targetNode || visited.has(targetNode.id)) {
     return `[Circular ${targetNode?.id || 'Unknown'}]`
   }
@@ -29,8 +24,6 @@ export const getActualValue = (
   const ITEMS_PER_EDGE = edgeFields.length
 
   // Get field indices
-  const typeFieldIndex = nodeFields.indexOf('type')
-  const nameFieldIndex = nodeFields.indexOf('name')
   const idFieldIndex = nodeFields.indexOf('id')
   const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
 
@@ -40,7 +33,6 @@ export const getActualValue = (
 
   // Get edge type names
   const edgeTypes = meta.edge_types[0] || []
-  const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
   const EDGE_TYPE_INTERNAL = edgeTypes.indexOf('internal')
 
   // Get node type names
