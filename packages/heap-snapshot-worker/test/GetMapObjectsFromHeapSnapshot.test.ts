@@ -109,7 +109,7 @@ test('getMapObjectsFromHeapSnapshot - map with variable name', () => {
 
 test('getMapObjectsFromHeapSnapshot - multiple map objects with variables', () => {
   // prettier-ignore
-  const testData = {
+  const testData :Snapshot= {
     snapshot: {
       meta: {
         node_types: [['hidden', 'array', 'string', 'object']],
@@ -121,7 +121,7 @@ test('getMapObjectsFromHeapSnapshot - multiple map objects with variables', () =
       node_count: 4,
       edge_count: 2,
     },
-    nodes: [
+    nodes:new Uint32Array([
       3,
       1,
       100,
@@ -146,16 +146,16 @@ test('getMapObjectsFromHeapSnapshot - multiple map objects with variables', () =
       28,
       0,
       0, // Set (will be ignored)
-    ],
-    edges: [
+    ]),
+    edges: new Uint32Array([
       2,
       5,
       6, // property:"cache" -> Map (node data index 6)
       2,
       6,
       12, // property:"userCache" -> Map (node data index 12)
-    ],
-    locations: [],
+    ]),
+    locations: new Uint32Array([]),
     strings: ['', 'App', 'Map', 'Set', 'WeakMap', 'cache', 'userCache', 'refs'],
   }
 
@@ -178,8 +178,7 @@ test('getMapObjectsFromHeapSnapshot - multiple map objects with variables', () =
 
 test('getMapObjectsFromHeapSnapshot - map with multiple variable names', () => {
   // prettier-ignore
-  const testData = {
-    snapshot: {
+  const testData:Snapshot = {
       meta: {
         node_types: [['hidden', 'array', 'string', 'object']],
         node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
@@ -189,8 +188,8 @@ test('getMapObjectsFromHeapSnapshot - map with multiple variable names', () => {
       },
       node_count: 2,
       edge_count: 2,
-    },
-    nodes: [
+      extra_native_bytes:0,
+    nodes: new Uint32Array([
       3,
       1,
       100,
@@ -203,16 +202,16 @@ test('getMapObjectsFromHeapSnapshot - map with multiple variable names', () => {
       28,
       0,
       0, // Map
-    ],
-    edges: [
+    ]),
+    edges:new Uint32Array( [
       2,
       3,
       6, // property:"cache" -> Map (node data index 6)
       2,
       4,
       6, // property:"storage" -> Map (node data index 6, same Map)
-    ],
-    locations: [],
+    ]),
+    locations: new Uint32Array([]),
     strings: ['', 'Window', 'Map', 'cache', 'storage'],
   }
 
