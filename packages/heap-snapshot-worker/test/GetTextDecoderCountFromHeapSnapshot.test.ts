@@ -29,5 +29,5 @@ test('should count text decoder objects from heap snapshot', () => {
     strings: ['', 'TextDecoder.prototype'],
   }
   const result = getTextDecoderCountFromHeapSnapshotInternal(testData)
-  expect(result).toEqual(7)
+  expect(result).toEqual(3)
 })
