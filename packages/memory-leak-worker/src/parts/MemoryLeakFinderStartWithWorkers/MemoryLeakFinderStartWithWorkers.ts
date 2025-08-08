@@ -9,19 +9,19 @@ const doStartWithWorkers = async (instanceId: string): Promise<Record<string, an
   if (!measure) {
     throw new Error(`no measure found`)
   }
-  
+
   const results: Record<string, any> = {}
-  
+
   // Measure main page
   const pageSession = SessionState.getPageSession()
   if (pageSession) {
     results.main = await measure.start()
   }
-  
+
   // Measure all worker targets
   const allSessions = SessionState.getAllSessions()
   const workerSessions = allSessions.filter(session => session.type === 'worker')
-  
+
   for (const workerSession of workerSessions) {
     const target = Object.values(TargetState.state.targets).find(t => t.sessionId === workerSession.sessionId)
     if (target) {
@@ -36,7 +36,7 @@ const doStartWithWorkers = async (instanceId: string): Promise<Record<string, an
       }
     }
   }
-  
+
   return results
 }
 

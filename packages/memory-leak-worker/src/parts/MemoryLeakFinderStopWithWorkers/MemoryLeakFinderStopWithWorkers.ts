@@ -4,24 +4,24 @@ import * as TargetState from '../TargetState/TargetState.ts'
 import * as WaitForCrash from '../WaitForCrash/WaitForCrash.ts'
 import * as LoadMemoryLeakFinder from '../LoadMemoryLeakFinder/LoadMemoryLeakFinder.ts'
 
-const doStopWithWorkers = async (instanceId: string): Promise<any> => {
+const doStopWithWorkers = async (instanceId: string): Promise<Record<string, any>> => {
   const measure = MemoryLeakFinderState.get(instanceId)
   if (!measure) {
     throw new Error(`no measure found`)
   }
-  
-  const results = {}
-  
+
+  const results: Record<string, any> = {}
+
   // Measure main page
   const pageSession = SessionState.getPageSession()
   if (pageSession) {
     results.main = await measure.stop()
   }
-  
+
   // Measure all worker targets
   const allSessions = SessionState.getAllSessions()
   const workerSessions = allSessions.filter(session => session.type === 'worker')
-  
+
   for (const workerSession of workerSessions) {
     const target = Object.values(TargetState.state.targets).find(t => t.sessionId === workerSession.sessionId)
     if (target) {
@@ -36,7 +36,7 @@ const doStopWithWorkers = async (instanceId: string): Promise<any> => {
       }
     }
   }
-  
+
   await measure.releaseResources()
   return results
 }

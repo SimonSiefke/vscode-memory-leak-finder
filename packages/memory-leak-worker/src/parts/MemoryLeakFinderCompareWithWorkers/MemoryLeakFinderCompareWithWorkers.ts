@@ -1,14 +1,14 @@
 import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinderState.ts'
 
-const doCompareWithWorkers = async (instanceId: string, before: any, after: any): Promise<any> => {
+const doCompareWithWorkers = async (instanceId: string, before: Record<string, any>, after: Record<string, any>): Promise<Record<string, any>> => {
   const measure = MemoryLeakFinderState.get(instanceId)
   if (!measure) {
     throw new Error(`no measure found`)
   }
-  
-  const resultMap = {}
+
+  const resultMap: Record<string, any> = {}
   let hasLeak = false
-  
+
   // Compare main page
   if (before.main !== undefined && after.main !== undefined) {
     const delta = after.main - before.main
@@ -21,13 +21,13 @@ const doCompareWithWorkers = async (instanceId: string, before: any, after: any)
       isLeak,
     }
   }
-  
+
   // Compare workers
   const allWorkerNames = new Set([
     ...Object.keys(before).filter(key => key !== 'main'),
     ...Object.keys(after).filter(key => key !== 'main')
   ])
-  
+
   for (const workerName of allWorkerNames) {
     const beforeCount = before[workerName] || 0
     const afterCount = after[workerName] || 0
@@ -41,7 +41,7 @@ const doCompareWithWorkers = async (instanceId: string, before: any, after: any)
       isLeak,
     }
   }
-  
+
   return {
     ...resultMap,
     isLeak: hasLeak,
