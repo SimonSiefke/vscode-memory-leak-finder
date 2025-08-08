@@ -10,6 +10,7 @@ export const create = (session) => {
 }
 
 export const start = (session) => {
+  console.log({ session })
   return GetEventListenerCount.getEventListenerCount(session)
 }
 
