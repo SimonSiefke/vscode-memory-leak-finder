@@ -41,7 +41,7 @@ test('should find objects with specified property', () => {
     propertyValue: '[Object 4]',
     type: 'object',
     selfSize: 100,
-    edgeCount: 1
+    edgeCount: 1,
   })
   expect(result[1]).toEqual({
     id: 2,
@@ -49,7 +49,7 @@ test('should find objects with specified property', () => {
     propertyValue: '[Object 5]',
     type: 'object',
     selfSize: 50,
-    edgeCount: 1
+    edgeCount: 1,
   })
 })
 
@@ -118,7 +118,7 @@ test('should handle string property values', () => {
     propertyValue: 'hello',
     type: 'object',
     selfSize: 100,
-    edgeCount: 1
+    edgeCount: 1,
   })
 })
 
@@ -157,7 +157,7 @@ test('should handle number property values', () => {
     propertyValue: '42',
     type: 'object',
     selfSize: 100,
-    edgeCount: 1
+    edgeCount: 1,
   })
 })
 

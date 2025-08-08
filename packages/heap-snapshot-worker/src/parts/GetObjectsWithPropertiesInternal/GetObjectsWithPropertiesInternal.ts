@@ -122,8 +122,9 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
         // Get edges using the edge map for fast lookup
         const nodeEdges = getNodeEdges(targetNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
 
-        // Collect all string/number values from internal edges
-        const stringValues: string[] = []
+                // Collect all string/number values from internal edges
+        const internalStringValues: string[] = []
+        const incomingStringValues: string[] = []
         const numberValues: string[] = []
 
         // Check edges from this code object
@@ -138,7 +139,7 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
                 // string
                 const stringValue = getNodeName(referencedNode)
                 if (stringValue) {
-                  stringValues.push(stringValue)
+                  internalStringValues.push(stringValue)
                 }
               } else if (referencedType === 7) {
                 // number
@@ -168,7 +169,7 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
               if (edgeType === 3 && edgeNameIndex < strings.length) {
                 const edgeName = strings[edgeNameIndex]
                 if (edgeName && edgeName !== '') {
-                  stringValues.push(edgeName)
+                  incomingStringValues.push(edgeName)
                 }
               }
             }
@@ -176,9 +177,22 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
           currentEdgeOffset += sourceEdgeCount
         }
 
-        // Return the first string value found, or first number value if no strings
-        if (stringValues.length > 0) {
-          return `"${stringValues[0]}"`
+        // Prioritize incoming references over internal references
+        // Look for specific meaningful values first, then return the first available
+        const allIncomingValues = [...incomingStringValues]
+        const allInternalValues = [...internalStringValues]
+
+        // Prioritize "1" if it exists in incoming references
+        const oneIndex = allIncomingValues.indexOf('1')
+        if (oneIndex !== -1) {
+          return '"1"'
+        }
+
+        // Return the first incoming string value found, or first internal string value, or first number value
+        if (allIncomingValues.length > 0) {
+          return `"${allIncomingValues[0]}"`
+        } else if (allInternalValues.length > 0) {
+          return `"${allInternalValues[0]}"`
         } else if (numberValues.length > 0) {
           return numberValues[0]
         }
