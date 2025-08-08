@@ -11,7 +11,7 @@ import * as ExecutionContextState from '../ExecutionContextState/ExecutionContex
 import * as PTimeout from '../PTimeout/PTimeout.ts'
 import type { Session } from '../Session/Session.ts'
 import * as SessionState from '../SessionState/SessionState.ts'
-import { AttachedToTargetMessage } from '../TargetInfo.ts'
+import type { AttachedToTargetMessage } from '../TargetInfo.ts'
 import * as TargetState from '../TargetState/TargetState.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 import type { DevToolsMessage } from '../Types/Types.ts'
