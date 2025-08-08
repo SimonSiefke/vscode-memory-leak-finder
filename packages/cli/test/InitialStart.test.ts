@@ -76,6 +76,7 @@ test('initialStart - watch mode - start running', async () => {
     undefined,
     undefined,
     undefined,
+    undefined,
   )
 })
 
