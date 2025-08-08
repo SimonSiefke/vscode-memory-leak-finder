@@ -15,7 +15,6 @@ const testOptimized = async (): Promise<void> => {
     } else {
       console.log(`❌ Expected count of 7, but got ${count}`)
     }
-
   } catch (error) {
     console.error('Error:', (error as Error).message)
   }

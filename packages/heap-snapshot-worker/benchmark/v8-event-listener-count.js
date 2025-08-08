@@ -9,7 +9,6 @@ const testV8EventListenerCount = async () => {
   try {
     const count = await getV8EventListenerCountFromHeapSnapshot(filePath1)
     console.log({ count })
-
   } catch (error) {
     console.error('Error:', error.message)
   }
