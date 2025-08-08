@@ -15,12 +15,7 @@
     "@babel/code-frame": "^7.27.1",
     "@lvce-editor/assert": "^1.4.0",
     "@lvce-editor/rpc": "^4.14.0",
-    "@lvce-editor/verror": "^1.7.0",
-    "@vscode/test-electron": "^2.5.2",
-    "execa": "^9.6.0",
-    "exit-hook": "^4.0.0",
-    "got": "^14.4.7",
-    "strip-ansi": "^7.1.0"
+    "@lvce-editor/verror": "^1.7.0"
   },
   "devDependencies": {
     "@types/babel__code-frame": "^7.0.6"

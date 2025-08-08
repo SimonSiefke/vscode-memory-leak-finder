@@ -3,7 +3,7 @@ import * as Assert from '../Assert/Assert.js'
 import * as CommandMapRef from '../CommandMapRef/CommandMapRef.js'
 import * as MemoryLeakWorkerUrl from '../MemoryLeakWorkerUrl/MemoryLeakWorkerUrl.js'
 
-export const state = {
+const state = {
   /**
    * @type {import('@lvce-editor/rpc').Rpc|undefined}
    */

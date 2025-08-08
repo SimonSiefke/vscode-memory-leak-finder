@@ -41,10 +41,9 @@ test('launch - error - address already in use', async () => {
     }
   })
   // TODO mock WaitForDebuggerlistening module instead of mocking spawn
-  // @ts-ignore
-  await expect(LaunchElectron.launchElectron({ cliPath: '', args: [], headlessMode: true })).rejects.toThrow(
-    new Error(`Failed to launch electron: Starting inspector on 127.0.0.1:4444 failed: address already in use`),
-  )
+  await expect(
+    LaunchElectron.launchElectron({ cliPath: '', args: [], headlessMode: true, addDisposable() {}, cwd: '', env: {} }),
+  ).rejects.toThrow(new Error(`Failed to launch electron: Starting inspector on 127.0.0.1:4444 failed: address already in use`))
 })
 
 test('launch - error - unexpected first message', async () => {
@@ -65,10 +64,9 @@ test('launch - error - unexpected first message', async () => {
       stderr,
     }
   })
-  // @ts-ignore
-  await expect(LaunchElectron.launchElectron({ cliPath: '', args: [], headlessMode: true })).rejects.toThrow(
-    new Error('Failed to launch electron: Failed to connect to debugger: Unexpected first message: abc'),
-  )
+  await expect(
+    LaunchElectron.launchElectron({ cliPath: '', args: [], headlessMode: true, addDisposable() {}, cwd: '', env: {} }),
+  ).rejects.toThrow(new Error('Failed to launch electron: Failed to connect to debugger: Unexpected first message: abc'))
 })
 
 test('launch - error - empty cli path', async () => {
@@ -76,10 +74,9 @@ test('launch - error - empty cli path', async () => {
   Spawn.spawn.mockImplementation(() => {
     throw new Error("The argument 'file' cannot be empty. Received ''")
   })
-  // @ts-ignore
-  await expect(LaunchElectron.launchElectron({ cliPath: '', args: [], headlessMode: true })).rejects.toThrow(
-    new Error(`Failed to launch electron: The argument 'file' cannot be empty. Received ''`),
-  )
+  await expect(
+    LaunchElectron.launchElectron({ cliPath: '', args: [], headlessMode: true, cwd: '', env: {}, addDisposable() {} }),
+  ).rejects.toThrow(new Error(`Failed to launch electron: The argument 'file' cannot be empty. Received ''`))
 })
 
 test('launch - error - yarn is not installed', async () => {
@@ -112,8 +109,7 @@ test('launch - error - yarn is not installed', async () => {
       stderr,
     }
   })
-  // @ts-ignore
-  await expect(LaunchElectron.launchElectron({ cliPath: '', args: [], headlessMode: true })).rejects.toThrow(
-    new Error(`Failed to launch electron: yarn not installed in this node version (test-node-version)`),
-  )
+  await expect(
+    LaunchElectron.launchElectron({ cliPath: '', args: [], headlessMode: true, addDisposable() {}, cwd: '', env: {} }),
+  ).rejects.toThrow(new Error(`Failed to launch electron: yarn not installed in this node version (test-node-version)`))
 })
