@@ -1,6 +1,4 @@
-import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { performance } from 'node:perf_hooks'
 import { getRegexpObjectsFromHeapSnapshot } from '../src/parts/GetRegexpObjectsFromHeapSnapshot/GetRegexpObjectsFromHeapSnapshot.js'
 
 const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
@@ -8,20 +6,11 @@ const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapsho
 const testOptimized = async () => {
   // console.log(`\n=== Testing Optimized Named Function Count for: ${filePath} ===`)
 
-  const minCount = 1
-
   console.log('Testing Optimized Approach (getNamedFunctionCountFromHeapSnapshot2):')
 
-  const startTime = performance.now()
-
   try {
-    const real = await readFile(filePath1, 'utf8')
-    const p = JSON.parse(real)
-    const s = p.strings.length
     const count = await getRegexpObjectsFromHeapSnapshot(filePath1)
     console.log({ count: count })
-    const endTime = performance.now()
-    const duration = endTime - startTime
 
     // console.log(`  Duration: ${duration.toFixed(2)}ms`)
     // console.log(`  Functions found: ${result.length / 5}`)
