@@ -23,7 +23,7 @@ test('getMapCountFromHeapSnapshot should return zero for no maps', () => {
     strings: ['', 'test'],
   }
   const result = getMapCountFromHeapSnapshotInternal(testData)
-  expect(result).toEqual([])
+  expect(result).toEqual(0)
 })
 
 // TODO add more tests
