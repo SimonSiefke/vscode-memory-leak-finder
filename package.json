@@ -26,7 +26,6 @@
   },
   "homepage": "https://github.com/SimonSiefke/vscode-memory-leak-finder#readme",
   "devDependencies": {
-    "@jest/globals": "^30.0.5",
     "@lerna/legacy-package-management": "^8.2.4",
     "@types/node": "^24.2.0",
     "execa": "^9.6.0",
@@ -34,7 +33,6 @@
     "jest-environment-jsdom": "^30.0.5",
     "lerna": "^8.2.3",
     "prettier": "^3.6.2",
-    "ts-jest": "^29.4.1",
     "typescript": "^5.9.2"
   },
   "jest": {
