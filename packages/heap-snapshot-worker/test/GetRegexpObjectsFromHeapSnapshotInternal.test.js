@@ -1,5 +1,4 @@
 import { expect, test } from '@jest/globals'
-import * as GetRegexpObjectsFromHeapSnapshot from '../src/parts/GetRegexpObjectsFromHeapSnapshot/GetRegexpObjectsFromHeapSnapshot.js'
 import { getRegexpObjectsFromHeapSnapshotInternal } from '../src/parts/GetRegexpObjectsFromHeapSnapshotInternal/GetRegexpObjectsFromHeapSnapshotInternal.js'
 
 test('getRegexpObjectsFromHeapSnapshot - no regexp objects', async () => {
