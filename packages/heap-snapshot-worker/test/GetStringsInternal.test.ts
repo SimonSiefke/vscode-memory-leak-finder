@@ -8,7 +8,7 @@ test('getStrings - extracts strings array from heap snapshot file', async () => 
       node_types: [['hidden', 'array', 'string', 'object']],
       node_fields: ['type', 'name', 'id'],
       edge_fields: [],
-      edge_types: [],
+      edge_types: [[]],
       location_fields: [],
     },
     node_count: 1,
