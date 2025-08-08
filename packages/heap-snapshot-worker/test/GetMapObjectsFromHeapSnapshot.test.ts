@@ -4,7 +4,7 @@ import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('getMapObjectsFromHeapSnapshot - no map objects', () => {
   // prettier-ignore
-  const testData = {
+  const testData:Snapshot = {
     snapshot: {
       meta: {
         node_types: [['hidden', 'array', 'string', 'object']],
@@ -16,11 +16,11 @@ test('getMapObjectsFromHeapSnapshot - no map objects', () => {
       node_count: 1,
       edge_count: 0,
     },
-    nodes: [
+    nodes: new Uint32Array([
       0, 1, 100, 64, 0, 0, // hidden object
-    ],
-    edges: [],
-    locations: [],
+    ]),
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
     strings: ['', 'test'],
   }
 
@@ -30,7 +30,7 @@ test('getMapObjectsFromHeapSnapshot - no map objects', () => {
 
 test('getMapObjectsFromHeapSnapshot - map without variable name (filtered out)', () => {
   // prettier-ignore
-  const testData = {
+  const testData :Snapshot= {
     snapshot: {
       meta: {
         node_types: [['hidden', 'array', 'string', 'object']],
@@ -42,16 +42,16 @@ test('getMapObjectsFromHeapSnapshot - map without variable name (filtered out)',
       node_count: 1,
       edge_count: 0,
     },
-    nodes: [
+    nodes: new Uint32Array([
       3,
       1,
       200,
       28,
       0,
       0, // object type, Map
-    ],
-    edges: [],
-    locations: [],
+    ]),
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
     strings: ['', 'Map'],
   }
 
