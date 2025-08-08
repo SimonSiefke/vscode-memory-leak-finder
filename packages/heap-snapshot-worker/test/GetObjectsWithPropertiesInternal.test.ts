@@ -4,51 +4,53 @@ import type { Snapshot } from '../src/parts/Snapshot/Snapshot.js'
 
 test('should find objects with specified property', () => {
   const snapshot: Snapshot = {
-    node_count: 3,
+    node_count: 5,
     edge_count: 2,
     extra_native_bytes: 0,
-    // prettier-ignore
-    nodes: new Uint32Array([
-      // id, name, self_size, edge_count, trace_node_id, detachedness
-      1, 1, 100, 2, 0, 0,  // Object1 with property "test"
-      2, 2, 50, 1, 0, 0,   // Object2 with property "test"
-      3, 3, 75, 0, 0, 0,   // Object3 without property "test"
-    ]),
-    // prettier-ignore
-    edges: new Uint32Array([
-      // type, name_or_index, to_node
-      2, 1, 0,  // property edge from Object1 to "test" property
-      2, 1, 1,  // property edge from Object2 to "test" property
-    ]),
-    strings: ['', 'test', 'Object1', 'Object2', 'Object3'],
-    locations: new Uint32Array([]),
     meta: {
-      node_fields: ['id', 'name', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
       node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
       edge_fields: ['type', 'name_or_index', 'to_node'],
       edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
       location_fields: ['object_index', 'script_id', 'line', 'column']
-    }
+    },
+    // prettier-ignore
+    nodes: new Uint32Array([
+      // type, name, id, self_size, edge_count, trace_node_id, detachedness
+      3, 2, 1, 100, 2, 0, 0,  // Object1 with property "test"
+      3, 3, 2, 50, 1, 0, 0,   // Object2 with property "test"
+      3, 4, 3, 75, 0, 0, 0,   // Object3 without property "test"
+      3, 5, 4, 32, 0, 0, 0,   // Property value object for Object1
+      3, 6, 5, 32, 0, 0, 0,   // Property value object for Object2
+    ]),
+    // prettier-ignore
+    edges: new Uint32Array([
+      // type, name_or_index, to_node
+      2, 1, 3,  // property edge from Object1 to property value object
+      2, 1, 4,  // property edge from Object2 to property value object
+    ]),
+    strings: ['', 'test', 'Object1', 'Object2', 'Object3', 'PropertyValue1', 'PropertyValue2'],
+    locations: new Uint32Array([])
   }
 
   const result = getObjectsWithPropertiesInternal(snapshot, 'test')
 
   expect(result).toHaveLength(2)
   expect(result[0]).toEqual({
-    id: 1,
-    name: 'Object1',
-    propertyValue: '[Object 1]',
+    id: 4,
+    name: 'PropertyValue1',
+    propertyValue: '[Object 4]',
     type: 'object',
-    selfSize: 100,
-    edgeCount: 2
+    selfSize: 32,
+    edgeCount: 0
   })
   expect(result[1]).toEqual({
-    id: 2,
-    name: 'Object2',
-    propertyValue: '[Object 2]',
+    id: 5,
+    name: 'PropertyValue2',
+    propertyValue: '[Object 5]',
     type: 'object',
-    selfSize: 50,
-    edgeCount: 1
+    selfSize: 32,
+    edgeCount: 0
   })
 })
 
@@ -58,7 +60,7 @@ test('should return empty array when property not found', () => {
     edge_count: 1,
     extra_native_bytes: 0,
     meta: {
-      node_fields: ['id', 'name', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
       node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
       edge_fields: ['type', 'name_or_index', 'to_node'],
       edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
@@ -66,8 +68,8 @@ test('should return empty array when property not found', () => {
     },
     // prettier-ignore
     nodes: new Uint32Array([
-      // id, name, self_size, edge_count, trace_node_id, detachedness
-      1, 1, 100, 1, 0, 0,  // Object1 with property "test"
+      // type, name, id, self_size, edge_count, trace_node_id, detachedness
+      3, 1, 1, 100, 1, 0, 0,  // Object1 with property "test"
     ]),
     // prettier-ignore
     edges: new Uint32Array([
@@ -89,7 +91,7 @@ test('should handle string property values', () => {
     edge_count: 1,
     extra_native_bytes: 0,
     meta: {
-      node_fields: ['id', 'name', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
       node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
       edge_fields: ['type', 'name_or_index', 'to_node'],
       edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
@@ -97,9 +99,9 @@ test('should handle string property values', () => {
     },
     // prettier-ignore
     nodes: new Uint32Array([
-      // id, name, self_size, edge_count, trace_node_id, detachedness
-      1, 1, 100, 1, 0, 0,  // Object1
-      2, 2, 50, 0, 0, 0,   // String value "hello"
+      // type, name, id, self_size, edge_count, trace_node_id, detachedness
+      3, 1, 1, 100, 1, 0, 0,  // Object1
+      2, 2, 2, 50, 0, 0, 0,   // String value "hello"
     ]),
     // prettier-ignore
     edges: new Uint32Array([
@@ -129,7 +131,7 @@ test('should handle number property values', () => {
     edge_count: 1,
     extra_native_bytes: 0,
     meta: {
-      node_fields: ['id', 'name', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
       node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
       edge_fields: ['type', 'name_or_index', 'to_node'],
       edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
@@ -137,16 +139,16 @@ test('should handle number property values', () => {
     },
     // prettier-ignore
     nodes: new Uint32Array([
-      // id, name, self_size, edge_count, trace_node_id, detachedness
-      1, 1, 100, 1, 0, 0,  // Object1
-      2, 42, 50, 0, 0, 0,  // Number value 42
+      // type, name, id, self_size, edge_count, trace_node_id, detachedness
+      3, 1, 1, 100, 1, 0, 0,  // Object1
+      8, 2, 2, 50, 0, 0, 0,  // Number value 42
     ]),
     // prettier-ignore
     edges: new Uint32Array([
       // type, name_or_index, to_node
       2, 1, 1,  // property edge from Object1 to number value
     ]),
-    strings: ['', 'test', 'Object1'],
+    strings: ['', 'test', 'Object1', '42'],
     locations: new Uint32Array([])
   }
 
