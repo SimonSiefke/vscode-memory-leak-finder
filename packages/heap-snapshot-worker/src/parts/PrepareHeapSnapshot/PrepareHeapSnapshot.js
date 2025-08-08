@@ -6,7 +6,7 @@ import { waitForResult } from '../WaitForResult/WaitForResult.js'
  * Prepares a heap snapshot by parsing it in a separate worker for better performance
  * @param {string} path - The file path to the heap snapshot
  * @param {{parseStrings?:boolean}} options - Options for parsing
- * @returns {Promise<{metaData: any, nodes: Uint32Array<ArrayBuffer>, edges: Uint32Array<ArrayBuffer>, locations: Uint32Array<ArrayBuffer>, strings: string[]}>}
+ * @returns {Promise<import('../Snapshot/Snapshot.ts').Snapshot>}>}
  */
 export const prepareHeapSnapshot = async (path, options) => {
   const workerPath = getHeapSnapshotWorkerPath()
