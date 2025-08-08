@@ -122,7 +122,7 @@ const handleAttachedToJs = async (message: AttachedToTargetMessage, type: string
 
 const handleAttachedToWorker = async (message: AttachedToTargetMessage): Promise<void> => {
   try {
-    console.log('attached to worker', message)
+    // console.log('attached to worker', message)
     await handleAttachedToJs(message, DevtoolsTargetType.Worker)
   } catch (error) {
     console.warn(new VError(error, `Failed to attach to worker`))

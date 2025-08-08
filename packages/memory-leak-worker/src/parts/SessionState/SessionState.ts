@@ -26,7 +26,7 @@ export const addSession = (sessionId: string, session: Session): void => {
 }
 
 export const removeSession = (sessionId: string): void => {
-  console.log('remove', sessionId)
+  // console.log('remove', sessionId)
   delete state.sessionMap[sessionId]
 }
 
