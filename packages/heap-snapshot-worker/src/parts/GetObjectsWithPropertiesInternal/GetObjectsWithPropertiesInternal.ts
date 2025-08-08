@@ -1,3 +1,5 @@
+import type { Snapshot } from '../Snapshot/Snapshot.js'
+
 export interface ObjectWithProperty {
   id: number
   name: string | null
@@ -9,25 +11,15 @@ export interface ObjectWithProperty {
 
 /**
  * Internal function that finds objects in a parsed heap snapshot that have a specific property
- * @param nodes - The nodes array from the heap snapshot
- * @param edges - The edges array from the heap snapshot
- * @param strings - The strings array from the heap snapshot
- * @param meta - The metadata from the heap snapshot
+ * @param snapshot - The parsed heap snapshot object
  * @param propertyName - The property name to search for
  * @returns Array of objects with the specified property
  */
 export const getObjectsWithPropertiesInternal = (
-  nodes: Uint32Array,
-  edges: Uint32Array,
-  strings: readonly string[],
-  meta: {
-    node_fields: readonly string[]
-    node_types: readonly (readonly string[])[]
-    edge_fields: readonly string[]
-    edge_types: readonly (readonly string[])[]
-  },
+  snapshot: Snapshot,
   propertyName: string
 ): ObjectWithProperty[] => {
+  const { nodes, edges, strings, meta } = snapshot
   const results: ObjectWithProperty[] = []
 
   const nodeFields = meta.node_fields
