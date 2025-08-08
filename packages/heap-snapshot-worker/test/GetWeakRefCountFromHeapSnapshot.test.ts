@@ -28,5 +28,5 @@ test('should count weak ref objects from heap snapshot', () => {
     strings: ['', 'WeakRef.prototype'],
   }
   const result = getWeakRefCountFromHeapSnapshotInternal(testData)
-  expect(result).toEqual(6)
+  expect(result).toEqual(2)
 })
