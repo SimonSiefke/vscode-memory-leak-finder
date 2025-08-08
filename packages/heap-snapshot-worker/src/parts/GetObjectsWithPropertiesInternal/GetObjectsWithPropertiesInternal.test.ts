@@ -34,8 +34,7 @@ const mockHeapSnapshotData: Snapshot = {
 }
 
 test('getObjectsWithPropertiesInternal should find objects with existing property', () => {
-  const { nodes, edges, strings, meta } = createMockHeapSnapshotData()
-  const results = getObjectsWithPropertiesInternal(nodes, edges, strings, meta, 'test')
+  const results = getObjectsWithPropertiesInternal(mockHeapSnapshotData, 'test')
 
   expect(results).toHaveLength(1)
   expect(results[0]).toEqual({
@@ -84,7 +83,7 @@ test('getObjectsWithPropertiesInternal should find objects with existing propert
     expect(results).toHaveLength(0)
   })
 
-  it('should handle object type property values', () => {
+  test('should handle object type property values', () => {
     const nodes = new Uint32Array([
       // Node 0: object with id 1
       3, 0, 1, 16, 1, 0,
