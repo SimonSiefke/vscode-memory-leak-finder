@@ -4,6 +4,9 @@ import type { Snapshot } from '../src/parts/Snapshot/Snapshot.js'
 
 test('should find objects with specified property', () => {
   const snapshot: Snapshot = {
+    node_count: 3,
+    edge_count: 2,
+    extra_native_bytes: 0,
     // prettier-ignore
     nodes: new Uint32Array([
       // id, name, self_size, edge_count, trace_node_id, detachedness
@@ -18,11 +21,13 @@ test('should find objects with specified property', () => {
       2, 1, 1,  // property edge from Object2 to "test" property
     ]),
     strings: ['', 'test', 'Object1', 'Object2', 'Object3'],
+    locations: new Uint32Array([]),
     meta: {
       node_fields: ['id', 'name', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
       node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
       edge_fields: ['type', 'name_or_index', 'to_node'],
-      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']]
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      location_fields: ['object_index', 'script_id', 'line', 'column']
     }
   }
 
@@ -49,6 +54,16 @@ test('should find objects with specified property', () => {
 
 test('should return empty array when property not found', () => {
   const snapshot: Snapshot = {
+    node_count: 1,
+    edge_count: 1,
+    extra_native_bytes: 0,
+    meta: {
+      node_fields: ['id', 'name', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      location_fields: ['object_index', 'script_id', 'line', 'column']
+    },
     // prettier-ignore
     nodes: new Uint32Array([
       // id, name, self_size, edge_count, trace_node_id, detachedness
@@ -60,12 +75,7 @@ test('should return empty array when property not found', () => {
       2, 1, 0,  // property edge from Object1 to "test" property
     ]),
     strings: ['', 'test', 'Object1'],
-    meta: {
-      node_fields: ['id', 'name', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
-      edge_fields: ['type', 'name_or_index', 'to_node'],
-      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']]
-    }
+    locations: new Uint32Array([])
   }
 
   const result = getObjectsWithPropertiesInternal(snapshot, 'nonexistent')
@@ -75,6 +85,16 @@ test('should return empty array when property not found', () => {
 
 test('should handle string property values', () => {
   const snapshot: Snapshot = {
+    node_count: 2,
+    edge_count: 1,
+    extra_native_bytes: 0,
+    meta: {
+      node_fields: ['id', 'name', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      location_fields: ['object_index', 'script_id', 'line', 'column']
+    },
     // prettier-ignore
     nodes: new Uint32Array([
       // id, name, self_size, edge_count, trace_node_id, detachedness
@@ -87,12 +107,7 @@ test('should handle string property values', () => {
       2, 1, 1,  // property edge from Object1 to string value
     ]),
     strings: ['', 'test', 'Object1', 'hello'],
-    meta: {
-      node_fields: ['id', 'name', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
-      edge_fields: ['type', 'name_or_index', 'to_node'],
-      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']]
-    }
+    locations: new Uint32Array([])
   }
 
   const result = getObjectsWithPropertiesInternal(snapshot, 'test')
@@ -110,6 +125,16 @@ test('should handle string property values', () => {
 
 test('should handle number property values', () => {
   const snapshot: Snapshot = {
+    node_count: 2,
+    edge_count: 1,
+    extra_native_bytes: 0,
+    meta: {
+      node_fields: ['id', 'name', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      location_fields: ['object_index', 'script_id', 'line', 'column']
+    },
     // prettier-ignore
     nodes: new Uint32Array([
       // id, name, self_size, edge_count, trace_node_id, detachedness
@@ -122,12 +147,7 @@ test('should handle number property values', () => {
       2, 1, 1,  // property edge from Object1 to number value
     ]),
     strings: ['', 'test', 'Object1'],
-    meta: {
-      node_fields: ['id', 'name', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
-      edge_fields: ['type', 'name_or_index', 'to_node'],
-      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']]
-    }
+    locations: new Uint32Array([])
   }
 
   const result = getObjectsWithPropertiesInternal(snapshot, 'test')
@@ -145,15 +165,20 @@ test('should handle number property values', () => {
 
 test('should handle empty metadata', () => {
   const snapshot: Snapshot = {
-    nodes: new Uint32Array([]),
-    edges: new Uint32Array([]),
-    strings: [],
+    node_count: 0,
+    edge_count: 0,
+    extra_native_bytes: 0,
     meta: {
       node_fields: [],
       node_types: [[]],
       edge_fields: [],
-      edge_types: [[]]
-    }
+      edge_types: [[]],
+      location_fields: []
+    },
+    nodes: new Uint32Array([]),
+    edges: new Uint32Array([]),
+    strings: [],
+    locations: new Uint32Array([])
   }
 
   const result = getObjectsWithPropertiesInternal(snapshot, 'test')
