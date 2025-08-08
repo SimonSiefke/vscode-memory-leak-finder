@@ -150,9 +150,9 @@ test('getObjectsWithPropertiesInternal should return empty array for non-existen
 test('getObjectsWithPropertiesInternal should handle heap snapshot without metadata', () => {
   const snapshot: Snapshot = {
     meta: {
-      node_types: [],
+      node_types: [[]],
       node_fields: [],
-      edge_types: [],
+      edge_types: [[]],
       edge_fields: [],
       location_fields: []
     },
