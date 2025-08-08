@@ -129,12 +129,13 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
 
         // Check edges from this code object
         for (const edge of nodeEdges) {
-          // Follow internal edges to find string/number values
+          // Follow internal edges to find string/number/object/array values
           if (edge.type === 3) {
             // internal edge
             const referencedNode = parseNode(edge.toNode)
             if (referencedNode) {
               const referencedType = referencedNode.type
+
               if (referencedType === 2) {
                 // string
                 const stringValue = getNodeName(referencedNode)
@@ -147,6 +148,12 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
                 if (numberValue) {
                   numberValues.push(numberValue)
                 }
+              } else if (referencedType === 3) {
+                // object
+                return `[Object ${referencedNode.id}]`
+              } else if (referencedType === 1) {
+                // array
+                return `[Array ${referencedNode.id}]`
               }
             }
           }
