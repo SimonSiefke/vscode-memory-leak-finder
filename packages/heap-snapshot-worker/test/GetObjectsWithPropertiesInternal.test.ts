@@ -41,7 +41,7 @@ test('should find objects with specified property', () => {
     propertyValue: '[Object 4]',
     type: 'object',
     selfSize: 100,
-    edgeCount: 1
+    edgeCount: 1,
   })
   expect(result[1]).toEqual({
     id: 2,
@@ -49,7 +49,7 @@ test('should find objects with specified property', () => {
     propertyValue: '[Object 5]',
     type: 'object',
     selfSize: 50,
-    edgeCount: 1
+    edgeCount: 1,
   })
 })
 
@@ -118,7 +118,7 @@ test('should handle string property values', () => {
     propertyValue: 'hello',
     type: 'object',
     selfSize: 100,
-    edgeCount: 1
+    edgeCount: 1,
   })
 })
 
@@ -157,7 +157,7 @@ test('should handle number property values', () => {
     propertyValue: '42',
     type: 'object',
     selfSize: 100,
-    edgeCount: 1
+    edgeCount: 1,
   })
 })
 
@@ -183,4 +183,380 @@ test('should handle empty metadata', () => {
   const result = getObjectsWithPropertiesInternal(snapshot, 'test')
 
   expect(result).toHaveLength(0)
+})
+
+test('should handle code object with internal string reference', () => {
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 3,
+    edge_count: 2,
+    extra_native_bytes: 0,
+    meta: {
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      location_fields: ['object_index', 'script_id', 'line', 'column']
+    },
+    nodes: new Uint32Array([
+      // type, name, id, self_size, edge_count, trace_node_id, detachedness
+      3, 2, 1, 100, 1, 0, 0,  // Object1 with property "test"
+      4, 3, 2, 0, 1, 0, 0,    // Code object with internal string reference
+      2, 4, 3, 0, 0, 0, 0,    // String value "hello"
+    ]),
+    edges: new Uint32Array([
+      // type, name_or_index, to_node
+      2, 1, 1,  // property edge from Object1 to code object
+      3, 0, 2,  // internal edge from code object to string "hello"
+    ]),
+    strings: ['', 'test', 'Object1', 'CodeObject', 'hello'],
+    locations: new Uint32Array([])
+  }
+
+  const result = getObjectsWithPropertiesInternal(snapshot, 'test')
+
+  expect(result).toHaveLength(1)
+  expect(result[0]).toEqual({
+    id: 1,
+    name: 'Object1',
+    propertyValue: '"hello"',
+    type: 'object',
+    selfSize: 100,
+    edgeCount: 1,
+  })
+})
+
+test('should handle code object with internal number reference', () => {
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 3,
+    edge_count: 2,
+    extra_native_bytes: 0,
+    meta: {
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      location_fields: ['object_index', 'script_id', 'line', 'column']
+    },
+    nodes: new Uint32Array([
+      // type, name, id, self_size, edge_count, trace_node_id, detachedness
+      3, 2, 1, 100, 1, 0, 0,  // Object1 with property "test"
+      4, 3, 2, 0, 1, 0, 0,    // Code object with internal number reference
+      7, 42, 3, 0, 0, 0, 0,   // Number value 42
+    ]),
+    edges: new Uint32Array([
+      // type, name_or_index, to_node
+      2, 1, 1,  // property edge from Object1 to code object
+      3, 0, 2,  // internal edge from code object to number 42
+    ]),
+    strings: ['', 'test', 'Object1', 'CodeObject'],
+    locations: new Uint32Array([])
+  }
+
+  const result = getObjectsWithPropertiesInternal(snapshot, 'test')
+
+  expect(result).toHaveLength(1)
+  expect(result[0]).toEqual({
+    id: 1,
+    name: 'Object1',
+    propertyValue: '42',
+    type: 'object',
+    selfSize: 100,
+    edgeCount: 1,
+  })
+})
+
+test('should handle code object with internal object reference', () => {
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 3,
+    edge_count: 2,
+    extra_native_bytes: 0,
+    meta: {
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      location_fields: ['object_index', 'script_id', 'line', 'column']
+    },
+    nodes: new Uint32Array([
+      // type, name, id, self_size, edge_count, trace_node_id, detachedness
+      3, 2, 1, 100, 1, 0, 0,  // Object1 with property "test"
+      4, 3, 2, 0, 1, 0, 0,    // Code object with internal object reference
+      3, 4, 3, 50, 0, 0, 0,   // Object value
+    ]),
+    edges: new Uint32Array([
+      // type, name_or_index, to_node
+      2, 1, 1,  // property edge from Object1 to code object
+      3, 0, 2,  // internal edge from code object to object
+    ]),
+    strings: ['', 'test', 'Object1', 'CodeObject', 'InternalObject'],
+    locations: new Uint32Array([])
+  }
+
+  const result = getObjectsWithPropertiesInternal(snapshot, 'test')
+
+  expect(result).toHaveLength(1)
+  expect(result[0]).toEqual({
+    id: 1,
+    name: 'Object1',
+    propertyValue: '[Object 3]',
+    type: 'object',
+    selfSize: 100,
+    edgeCount: 1,
+  })
+})
+
+test('should handle code object with internal array reference', () => {
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 3,
+    edge_count: 2,
+    extra_native_bytes: 0,
+    meta: {
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      location_fields: ['object_index', 'script_id', 'line', 'column']
+    },
+    nodes: new Uint32Array([
+      // type, name, id, self_size, edge_count, trace_node_id, detachedness
+      3, 2, 1, 100, 1, 0, 0,  // Object1 with property "test"
+      4, 3, 2, 0, 1, 0, 0,    // Code object with internal array reference
+      1, 4, 3, 50, 0, 0, 0,   // Array value
+    ]),
+    edges: new Uint32Array([
+      // type, name_or_index, to_node
+      2, 1, 1,  // property edge from Object1 to code object
+      3, 0, 2,  // internal edge from code object to array
+    ]),
+    strings: ['', 'test', 'Object1', 'CodeObject', 'InternalArray'],
+    locations: new Uint32Array([])
+  }
+
+  const result = getObjectsWithPropertiesInternal(snapshot, 'test')
+
+  expect(result).toHaveLength(1)
+  expect(result[0]).toEqual({
+    id: 1,
+    name: 'Object1',
+    propertyValue: '[Array 3]',
+    type: 'object',
+    selfSize: 100,
+    edgeCount: 1,
+  })
+})
+
+test('should handle code object with incoming string reference (like the real case)', () => {
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 4,
+    edge_count: 3,
+    extra_native_bytes: 0,
+    meta: {
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      location_fields: ['object_index', 'script_id', 'line', 'column']
+    },
+    nodes: new Uint32Array([
+      // type, name, id, self_size, edge_count, trace_node_id, detachedness
+      3, 2, 1, 100, 1, 0, 0,  // Object1 with property "test"
+      4, 3, 2, 0, 1, 0, 0,    // Code object with internal string reference
+      2, 4, 3, 0, 0, 0, 0,    // String value "hello"
+      1, 5, 4, 0, 1, 0, 0,    // Array that references code object with name "1"
+    ]),
+    edges: new Uint32Array([
+      // type, name_or_index, to_node
+      2, 1, 1,  // property edge from Object1 to code object
+      3, 0, 2,  // internal edge from code object to string "hello"
+      3, 6, 1,  // incoming edge from array to code object with name "1"
+    ]),
+    strings: ['', 'test', 'Object1', 'CodeObject', 'hello', 'Array', '1'],
+    locations: new Uint32Array([])
+  }
+
+  const result = getObjectsWithPropertiesInternal(snapshot, 'test')
+
+  expect(result).toHaveLength(1)
+  expect(result[0]).toEqual({
+    id: 1,
+    name: 'Object1',
+    propertyValue: '"1"',
+    type: 'object',
+    selfSize: 100,
+    edgeCount: 1,
+  })
+})
+
+test('should handle code object with multiple incoming references (prioritize "1")', () => {
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 5,
+    edge_count: 4,
+    extra_native_bytes: 0,
+    meta: {
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      location_fields: ['object_index', 'script_id', 'line', 'column']
+    },
+    nodes: new Uint32Array([
+      // type, name, id, self_size, edge_count, trace_node_id, detachedness
+      3, 2, 1, 100, 1, 0, 0,  // Object1 with property "test"
+      4, 3, 2, 0, 1, 0, 0,    // Code object with internal string reference
+      2, 4, 3, 0, 0, 0, 0,    // String value "hello"
+      1, 5, 4, 0, 2, 0, 0,    // Array that references code object with names "other" and "1"
+      3, 6, 5, 0, 1, 0, 0,    // Object that references code object with name "another"
+    ]),
+    edges: new Uint32Array([
+      // type, name_or_index, to_node
+      2, 1, 1,  // property edge from Object1 to code object
+      3, 0, 2,  // internal edge from code object to string "hello"
+      3, 7, 1,  // incoming edge from array to code object with name "other"
+      3, 8, 1,  // incoming edge from array to code object with name "1"
+      3, 9, 1,  // incoming edge from object to code object with name "another"
+    ]),
+    strings: ['', 'test', 'Object1', 'CodeObject', 'hello', 'Array', 'Object2', 'other', '1', 'another'],
+    locations: new Uint32Array([])
+  }
+
+  const result = getObjectsWithPropertiesInternal(snapshot, 'test')
+
+  expect(result).toHaveLength(1)
+  expect(result[0]).toEqual({
+    id: 1,
+    name: 'Object1',
+    propertyValue: '"1"',
+    type: 'object',
+    selfSize: 100,
+    edgeCount: 1,
+  })
+})
+
+test('should handle code object with no internal references but incoming references', () => {
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 3,
+    edge_count: 2,
+    extra_native_bytes: 0,
+    meta: {
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      location_fields: ['object_index', 'script_id', 'line', 'column']
+    },
+    nodes: new Uint32Array([
+      // type, name, id, self_size, edge_count, trace_node_id, detachedness
+      3, 2, 1, 100, 1, 0, 0,  // Object1 with property "test"
+      4, 3, 2, 0, 0, 0, 0,    // Code object with no internal references
+      1, 4, 3, 0, 1, 0, 0,    // Array that references code object with name "hello"
+    ]),
+    edges: new Uint32Array([
+      // type, name_or_index, to_node
+      2, 1, 1,  // property edge from Object1 to code object
+      3, 5, 1,  // incoming edge from array to code object with name "hello"
+    ]),
+    strings: ['', 'test', 'Object1', 'CodeObject', 'Array', 'hello'],
+    locations: new Uint32Array([])
+  }
+
+  const result = getObjectsWithPropertiesInternal(snapshot, 'test')
+
+  expect(result).toHaveLength(1)
+  expect(result[0]).toEqual({
+    id: 1,
+    name: 'Object1',
+    propertyValue: '"hello"',
+    type: 'object',
+    selfSize: 100,
+    edgeCount: 1,
+  })
+})
+
+test('should handle code object with both internal and incoming references (prioritize incoming)', () => {
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 4,
+    edge_count: 3,
+    extra_native_bytes: 0,
+    meta: {
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      location_fields: ['object_index', 'script_id', 'line', 'column']
+    },
+    nodes: new Uint32Array([
+      // type, name, id, self_size, edge_count, trace_node_id, detachedness
+      3, 2, 1, 100, 1, 0, 0,  // Object1 with property "test"
+      4, 3, 2, 0, 1, 0, 0,    // Code object with internal string reference
+      2, 4, 3, 0, 0, 0, 0,    // String value "internal"
+      1, 5, 4, 0, 1, 0, 0,    // Array that references code object with name "incoming"
+    ]),
+    edges: new Uint32Array([
+      // type, name_or_index, to_node
+      2, 1, 1,  // property edge from Object1 to code object
+      3, 0, 2,  // internal edge from code object to string "internal"
+      3, 6, 1,  // incoming edge from array to code object with name "incoming"
+    ]),
+    strings: ['', 'test', 'Object1', 'CodeObject', 'internal', 'Array', 'incoming'],
+    locations: new Uint32Array([])
+  }
+
+  const result = getObjectsWithPropertiesInternal(snapshot, 'test')
+
+  expect(result).toHaveLength(1)
+  expect(result[0]).toEqual({
+    id: 1,
+    name: 'Object1',
+    propertyValue: '"incoming"',
+    type: 'object',
+    selfSize: 100,
+    edgeCount: 1,
+  })
+})
+
+test('should handle code object with no references at all', () => {
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 2,
+    edge_count: 1,
+    extra_native_bytes: 0,
+    meta: {
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      location_fields: ['object_index', 'script_id', 'line', 'column']
+    },
+    nodes: new Uint32Array([
+      // type, name, id, self_size, edge_count, trace_node_id, detachedness
+      3, 2, 1, 100, 1, 0, 0,  // Object1 with property "test"
+      4, 3, 2, 0, 0, 0, 0,    // Code object with no references
+    ]),
+    edges: new Uint32Array([
+      // type, name_or_index, to_node
+      2, 1, 1,  // property edge from Object1 to code object
+    ]),
+    strings: ['', 'test', 'Object1', 'CodeObject'],
+    locations: new Uint32Array([])
+  }
+
+  const result = getObjectsWithPropertiesInternal(snapshot, 'test')
+
+  expect(result).toHaveLength(1)
+  expect(result[0]).toEqual({
+    id: 1,
+    name: 'Object1',
+    propertyValue: '[code 2]',
+    type: 'object',
+    selfSize: 100,
+    edgeCount: 1,
+  })
 })
