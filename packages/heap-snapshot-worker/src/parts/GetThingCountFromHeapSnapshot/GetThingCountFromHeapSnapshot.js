@@ -6,7 +6,7 @@ import { getThingCountFromHeapSnapshotInternal } from '../GetObjectCountFromHeap
  * @param {import('../Snapshot/Snapshot.ts').Snapshot} snapshot
  * @param {*} typeName
  * @param {*} objectName
- * @returns
+ * @returns {number}
  */
 export const getThingCountFromHeapSnapshot = (snapshot, typeName, objectName) => {
   const { nodes, strings, meta } = snapshot

@@ -2,11 +2,11 @@ import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/Comput
 import { isInternalMap } from '../IsInternalMap/IsInternalMap.js'
 
 /**
- * @param {any} snapshot
+ * @param {import('../Snapshot/Snapshot.ts').Snapshot} snapshot
  * @returns {Array}
  */
 export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
-  const { node_types, node_fields, edge_types, edge_fields } = metaData.data.meta
+  const { node_types, node_fields, edge_types, edge_fields } = snapshot.meta
 
   const {
     objectTypeIndex,
