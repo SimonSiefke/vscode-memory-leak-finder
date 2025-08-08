@@ -33,9 +33,23 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
     return results
   }
 
+  // Get field indices
+  const typeFieldIndex = nodeFields.indexOf('type')
+  const nameFieldIndex = nodeFields.indexOf('name')
+  const idFieldIndex = nodeFields.indexOf('id')
+  const selfSizeFieldIndex = nodeFields.indexOf('self_size')
+  const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
+
+  const edgeTypeFieldIndex = edgeFields.indexOf('type')
+  const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
+  const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
+
+  const ITEMS_PER_NODE = nodeFields.length
+  const ITEMS_PER_EDGE = edgeFields.length
+
   // Helper function to parse a node from the flat array
   const parseNode = (nodeIndex: number): any => {
-    const nodeStart = nodeIndex * nodeFields.length
+    const nodeStart = nodeIndex * ITEMS_PER_NODE
     if (nodeStart >= nodes.length) {
       return null
     }
@@ -66,51 +80,60 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
     return null
   }
 
-  // Search for property edges with the specified property name
-  for (let i = 0; i < edges.length; i += edgeFields.length) {
-    if (i + 1 >= edges.length) {
-      continue
-    }
+  // Iterate through each node and scan its edges
+  let currentEdgeOffset = 0
 
-    const edgeType = edges[i]
-    const edgeNameIndex = edges[i + 1]
-    const edgeToNode = edges[i + 2]
+  for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex += ITEMS_PER_NODE) {
+    const edgeCount = nodes[nodeIndex + edgeCountFieldIndex]
 
-    // Check if it's a property edge (type 2) with the target property name
-    if (edgeType === 2 && edgeNameIndex === propertyNameIndex) {
-      // Parse the target node (the property value)
-      const targetNode = parseNode(edgeToNode)
-      if (targetNode) {
-        const result: ObjectWithProperty = {
-          id: targetNode.id,
-          name: getNodeName(targetNode),
-          propertyValue: null,
-          type: getNodeTypeName(targetNode),
-          selfSize: targetNode.self_size,
-          edgeCount: targetNode.edge_count,
+    // Scan this node's edges
+    for (let j = 0; j < edgeCount; j++) {
+      const edgeIndex = (currentEdgeOffset + j) * ITEMS_PER_EDGE
+      const edgeType = edges[edgeIndex + edgeTypeFieldIndex]
+      const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
+      const edgeToNode = edges[edgeIndex + edgeToNodeFieldIndex]
+
+      // Check if it's a property edge (type 2) with the target property name
+      if (edgeType === 2 && edgeNameIndex === propertyNameIndex) {
+        // Parse the source node (the object that has the property)
+        const sourceNode = parseNode(nodeIndex / ITEMS_PER_NODE)
+        // Parse the target node (the property value)
+        const targetNode = parseNode(edgeToNode)
+
+        if (sourceNode && targetNode) {
+          const result: ObjectWithProperty = {
+            id: sourceNode.id,
+            name: getNodeName(sourceNode),
+            propertyValue: null,
+            type: getNodeTypeName(sourceNode),
+            selfSize: sourceNode.self_size,
+            edgeCount: sourceNode.edge_count,
+          }
+
+          // Try to get the property value based on the target node type
+          if (targetNode.type === 2) {
+            // string
+            result.propertyValue = getNodeName(targetNode)
+          } else if (targetNode.type === 7) {
+            // number
+            result.propertyValue = targetNode.name?.toString() || null // name field contains the number value
+          } else if (targetNode.type === 3) {
+            // object
+            result.propertyValue = `[Object ${targetNode.id}]`
+          } else if (targetNode.type === 1) {
+            // array
+            result.propertyValue = `[Array ${targetNode.id}]`
+          } else {
+            const typeName = getNodeTypeName(targetNode)
+            result.propertyValue = `[${typeName || 'Unknown'} ${targetNode.id}]`
+          }
+
+          results.push(result)
         }
-
-        // Try to get the property value based on the node type
-        if (targetNode.type === 2) {
-          // string
-          result.propertyValue = getNodeName(targetNode)
-        } else if (targetNode.type === 7) {
-          // number
-          result.propertyValue = targetNode.name?.toString() || null // name field contains the number value
-        } else if (targetNode.type === 3) {
-          // object
-          result.propertyValue = `[Object ${targetNode.id}]`
-        } else if (targetNode.type === 1) {
-          // array
-          result.propertyValue = `[Array ${targetNode.id}]`
-        } else {
-          const typeName = getNodeTypeName(targetNode)
-          result.propertyValue = `[${typeName || 'Unknown'} ${targetNode.id}]`
-        }
-
-        results.push(result)
       }
     }
+
+    currentEdgeOffset += edgeCount
   }
 
   return results

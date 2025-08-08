@@ -17,7 +17,7 @@ test('should find objects with specified property', () => {
     },
     nodes: new Uint32Array([
       // type, name, id, self_size, edge_count, trace_node_id, detachedness
-      3, 2, 1, 100, 2, 0, 0,  // Object1 with property "test"
+      3, 2, 1, 100, 1, 0, 0,  // Object1 with property "test"
       3, 3, 2, 50, 1, 0, 0,   // Object2 with property "test"
       3, 4, 3, 75, 0, 0, 0,   // Object3 without property "test"
       3, 5, 4, 32, 0, 0, 0,   // Property value object for Object1
@@ -25,8 +25,8 @@ test('should find objects with specified property', () => {
     ]),
     edges: new Uint32Array([
       // type, name_or_index, to_node
-      2, 1, 3,  // property edge from Object1 to property value object
-      2, 1, 4,  // property edge from Object2 to property value object
+      2, 1, 3,  // property edge from Object1 to property value object (node index 3, which has id 4)
+      2, 1, 4,  // property edge from Object2 to property value object (node index 4, which has id 5)
     ]),
     strings: ['', 'test', 'Object1', 'Object2', 'Object3', 'PropertyValue1', 'PropertyValue2'],
     locations: new Uint32Array([])
@@ -36,20 +36,20 @@ test('should find objects with specified property', () => {
 
   expect(result).toHaveLength(2)
   expect(result[0]).toEqual({
-    id: 4,
-    name: 'PropertyValue1',
+    id: 1,
+    name: 'Object1',
     propertyValue: '[Object 4]',
     type: 'object',
-    selfSize: 32,
-    edgeCount: 0
+    selfSize: 100,
+    edgeCount: 1
   })
   expect(result[1]).toEqual({
-    id: 5,
-    name: 'PropertyValue2',
+    id: 2,
+    name: 'Object2',
     propertyValue: '[Object 5]',
     type: 'object',
-    selfSize: 32,
-    edgeCount: 0
+    selfSize: 50,
+    edgeCount: 1
   })
 })
 
@@ -113,12 +113,12 @@ test('should handle string property values', () => {
 
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
-    id: 2,
-    name: 'hello',
+    id: 1,
+    name: 'Object1',
     propertyValue: 'hello',
-    type: 'string',
-    selfSize: 50,
-    edgeCount: 0
+    type: 'object',
+    selfSize: 100,
+    edgeCount: 1
   })
 })
 
@@ -152,12 +152,12 @@ test('should handle number property values', () => {
 
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
-    id: 2,
-    name: null,
+    id: 1,
+    name: 'Object1',
     propertyValue: '42',
-    type: 'number',
-    selfSize: 50,
-    edgeCount: 0
+    type: 'object',
+    selfSize: 100,
+    edgeCount: 1
   })
 })
 
