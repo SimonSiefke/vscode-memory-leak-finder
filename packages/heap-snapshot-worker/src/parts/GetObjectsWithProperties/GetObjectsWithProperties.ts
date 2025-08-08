@@ -9,6 +9,6 @@ import { Snapshot } from '../Snapshot/Snapshot.js'
  */
 export const getObjectsWithProperties = (heapSnapshot: Snapshot, propertyName: string): ObjectWithProperty[] => {
   const { nodes, edges, strings, meta } = heapSnapshot
-  
+
   return getObjectsWithPropertiesInternal(nodes, edges, strings, meta, propertyName)
 }
