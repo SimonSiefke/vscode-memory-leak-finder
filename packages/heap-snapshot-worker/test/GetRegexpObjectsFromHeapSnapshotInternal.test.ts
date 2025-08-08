@@ -57,7 +57,7 @@ test('getRegexpObjectsFromHeapSnapshot - single regexp object', async () => {
 
 test('getRegexpObjectsFromHeapSnapshot - multiple regexp objects', async () => {
   // prettier-ignore
-  const testData :Snapshot= {
+  const testData: Snapshot= {
     meta: {
       node_types: [['hidden', 'array', 'string', 'object', 'regexp']],
       node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
@@ -79,7 +79,7 @@ test('getRegexpObjectsFromHeapSnapshot - multiple regexp objects', async () => {
     strings: ['', '/test/gi', '/hello/i', '/world/g'],
   }
 
-  const result = await getRegexpObjectsFromHeapSnapshotInternal(testData)
+  const result = getRegexpObjectsFromHeapSnapshotInternal(testData)
   expect(result).toEqual([
     {
       id: 200,

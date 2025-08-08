@@ -1,10 +1,10 @@
 /**
- * @param {any} snapshot
+ * @param {import('../Snapshot/Snapshot.ts').Snapshot} snapshot
  * @returns {Array}
  */
 export const getRegexpObjectsFromHeapSnapshotInternal = (snapshot) => {
-  const { nodes, strings, metaData } = snapshot
-  const { node_types, node_fields } = metaData.data.meta
+  const { nodes, strings, meta } = snapshot
+  const { node_types, node_fields } = meta
 
   const regexpTypeIndex = node_types[0].indexOf('regexp')
   const ITEMS_PER_NODE = node_fields.length
