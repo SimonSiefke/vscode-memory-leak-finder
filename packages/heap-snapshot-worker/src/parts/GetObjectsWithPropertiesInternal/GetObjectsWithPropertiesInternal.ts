@@ -122,7 +122,7 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
         // Get edges using the edge map for fast lookup
         const nodeEdges = getNodeEdges(targetNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
 
-                // Collect all string/number values from internal edges
+        // Collect all string/number values from internal edges
         const internalStringValues: string[] = []
         const incomingStringValues: string[] = []
         const numberValues: string[] = []
