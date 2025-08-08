@@ -99,8 +99,8 @@ test('HeapSnapshotWriteStream - handles empty heap snapshot', async () => {
 
   const result = stream.getResult()
 
-  expect(result.meta).toHaveProperty('node_count', 0)
-  expect(result.meta).toHaveProperty('edge_count', 0)
+  expect(result).toHaveProperty('node_count', 0)
+  expect(result).toHaveProperty('edge_count', 0)
   expect(result.nodes.length).toBe(0)
   expect(result.edges.length).toBe(0)
   expect(result.locations.length).toBe(0)
@@ -139,7 +139,7 @@ test('HeapSnapshotWriteStream - handles partial data chunks', async () => {
 
   const result = stream.getResult()
 
-  expect(result.meta).toHaveProperty('node_count', 1)
+  expect(result).toHaveProperty('node_count', 1)
   expect(result.nodes.length).toBe(7) // 1 node * 7 fields
   expect(result.edges.length).toBe(0)
   expect(result.locations.length).toBe(0)
