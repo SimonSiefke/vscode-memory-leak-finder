@@ -7,8 +7,6 @@ export interface SnapshotMetaData {
   readonly edge_fields: readonly string[]
   readonly edge_types: EdgeTypes
   readonly location_fields: readonly string[]
-
-  readonly extra_native_bytes: number
 }
 
 export interface Snapshot {
@@ -19,4 +17,5 @@ export interface Snapshot {
   readonly meta: SnapshotMetaData
   readonly node_count: number
   readonly edge_count: number
+  readonly extra_native_bytes: number
 }
