@@ -22,7 +22,13 @@ test('getStrings - handles empty strings array', async () => {
     meta: {
       node_types: [['hidden']],
       node_fields: ['type', 'name', 'id'],
+      edge_fields: [],
+      edge_types: [[]],
+      location_fields: [],
     },
+    extra_native_bytes: 0,
+    node_count: 1,
+    edge_count: 0,
     nodes: new Uint32Array([0, 0, 0]),
     edges: new Uint32Array([]),
     strings: [],
