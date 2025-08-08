@@ -6,6 +6,7 @@ import { isInternalMap } from '../IsInternalMap/IsInternalMap.js'
  * @returns {Array}
  */
 export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
+  const { nodes, edges, strings } = snapshot
   const { node_types, node_fields, edge_types, edge_fields } = snapshot.meta
 
   const {
