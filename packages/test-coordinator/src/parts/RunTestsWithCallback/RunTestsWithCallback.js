@@ -137,15 +137,15 @@ export const runTests = async (
             let before, after, result
             if (workers) {
               // Use worker commands to detect and measure workers
-              before = await MemoryLeakFinder.startWithWorkers(memoryLeakWorkerRpc, connectionId, targetId)
+              before = await MemoryLeakFinder.start(memoryLeakWorkerRpc, connectionId, targetId)
               for (let i = 0; i < runs; i++) {
                 await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun, runMode)
               }
               if (timeoutBetween) {
                 await Timeout.setTimeout(timeoutBetween)
               }
-              after = await MemoryLeakFinder.stopWithWorkers(memoryLeakWorkerRpc, connectionId, targetId)
-              result = await MemoryLeakFinder.compareWithWorkers(memoryLeakWorkerRpc, connectionId, before, after)
+              after = await MemoryLeakFinder.stop(memoryLeakWorkerRpc, connectionId, targetId)
+              result = await MemoryLeakFinder.compare(memoryLeakWorkerRpc, connectionId, before, after)
 
               // Save main result
               const fileName = dirent.replace('.js', '.json')
@@ -156,7 +156,12 @@ export const runTests = async (
               for (const [workerName, workerResult] of Object.entries(result)) {
                 if (workerName !== 'main' && workerName !== 'isLeak') {
                   const workerFileName = `${workerName}.json`
-                  const workerResultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, dirent.replace('.js', ''), workerFileName)
+                  const workerResultPath = join(
+                    MemoryLeakResultsPath.memoryLeakResultsPath,
+                    measure,
+                    dirent.replace('.js', ''),
+                    workerFileName,
+                  )
                   await JsonFile.writeJson(workerResultPath, workerResult)
                 }
               }
