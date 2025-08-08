@@ -134,6 +134,7 @@ export const runTests = async (
                 await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun, runMode)
               }
             }
+            let before, after, result
             if (workers) {
               // Use worker commands to detect and measure workers
               before = await MemoryLeakFinder.startWithWorkers(memoryLeakWorkerRpc, connectionId, targetId)
