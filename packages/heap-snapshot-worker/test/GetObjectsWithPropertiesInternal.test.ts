@@ -7,7 +7,7 @@ test('getObjectsWithPropertiesInternal should find objects with existing propert
     nodes: new Uint32Array([
       // Node 0: object with id 1
       3, 0, 1, 16, 1, 0,
-      // Node 1: string with id 2  
+      // Node 1: string with id 2
       2, 1, 2, 8, 0, 0,
       // Node 2: number with id 3
       8, 2, 3, 8, 0, 0
@@ -46,7 +46,7 @@ test('getObjectsWithPropertiesInternal should find objects with existing propert
 
   const { nodes, edges, strings, meta } = createMockHeapSnapshotData()
   const results = getObjectsWithPropertiesInternal(nodes, edges, strings, meta, 'test')
-  
+
   expect(results).toHaveLength(1)
   expect(results[0]).toEqual({
     id: 2,
@@ -61,7 +61,7 @@ test('getObjectsWithPropertiesInternal should find objects with existing propert
 test('getObjectsWithPropertiesInternal should find objects with numeric property value', () => {
     const { nodes, edges, strings, meta } = createMockHeapSnapshotData()
     const results = getObjectsWithPropertiesInternal(nodes, edges, strings, meta, 'value')
-    
+
     expect(results).toHaveLength(1)
     expect(results[0]).toEqual({
       id: 3,
@@ -75,7 +75,7 @@ test('getObjectsWithPropertiesInternal should find objects with numeric property
 
   const { nodes, edges, strings, meta } = createMockHeapSnapshotData()
   const results = getObjectsWithPropertiesInternal(nodes, edges, strings, meta, 'nonexistent')
-  
+
   expect(results).toHaveLength(0)
 })
 
@@ -89,7 +89,7 @@ test('getObjectsWithPropertiesInternal should handle heap snapshot without metad
       edge_fields: [] as const,
       edge_types: [] as const
     }
-    
+
     const results = getObjectsWithPropertiesInternal(nodes, edges, strings, meta, 'test')
     expect(results).toHaveLength(0)
   })
@@ -126,15 +126,14 @@ test('getObjectsWithPropertiesInternal should handle heap snapshot without metad
         'node'
       ] as const
     }
-    
+
     const results = getObjectsWithPropertiesInternal(nodes, edges, strings, meta, 'obj')
     expect(results).toHaveLength(1)
     expect(results[0].propertyValue).toBe('[Object 2]')
     expect(results[0].type).toBe('object')
   })
 
-  it('should handle array type property values', () => {
-    const nodes = new Uint32Array([
+  const nodes = new Uint32Array([
       // Node 0: object with id 1
       3, 0, 1, 16, 1, 0,
       // Node 1: array with id 2
@@ -166,7 +165,7 @@ test('getObjectsWithPropertiesInternal should handle heap snapshot without metad
         'node'
       ] as const
     }
-    
+
     const results = getObjectsWithPropertiesInternal(nodes, edges, strings, meta, 'arr')
     expect(results).toHaveLength(1)
     expect(results[0].propertyValue).toBe('[Array 2]')
@@ -206,7 +205,7 @@ test('getObjectsWithPropertiesInternal should handle heap snapshot without metad
         'node'
       ] as const
     }
-    
+
     const results = getObjectsWithPropertiesInternal(nodes, edges, strings, meta, 'func')
     expect(results).toHaveLength(1)
     expect(results[0].propertyValue).toBe('[code 2]')
