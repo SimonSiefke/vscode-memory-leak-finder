@@ -5,4 +5,5 @@ import * as Exit from '../Exit/Exit.js'
 export const commandMap = {
   [TestCoordinatorCommandType.RunTests]: RunTests.runTests,
   [TestCoordinatorCommandType.Exit]: Exit.exit,
+  [TestCoordinatorCommandType.PrepareExit]: Exit.prepare,
 }

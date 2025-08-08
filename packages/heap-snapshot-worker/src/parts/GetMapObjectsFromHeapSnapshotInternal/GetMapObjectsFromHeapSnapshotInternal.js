@@ -2,16 +2,13 @@ import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/Comput
 import { isInternalMap } from '../IsInternalMap/IsInternalMap.js'
 
 /**
- * @param {Array} strings
- * @param {Uint32Array} nodes
- * @param {Array} node_types
- * @param {Array} node_fields
- * @param {Uint32Array} edges
- * @param {Array} edge_types
- * @param {Array} edge_fields
+ * @param {import('../Snapshot/Snapshot.ts').Snapshot} snapshot
  * @returns {Array}
  */
-export const getMapObjectsFromHeapSnapshotInternal = (strings, nodes, node_types, node_fields, edges, edge_types, edge_fields) => {
+export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
+  const { nodes, edges, strings } = snapshot
+  const { node_types, node_fields, edge_types, edge_fields } = snapshot.meta
+
   const {
     objectTypeIndex,
     ITEMS_PER_NODE,

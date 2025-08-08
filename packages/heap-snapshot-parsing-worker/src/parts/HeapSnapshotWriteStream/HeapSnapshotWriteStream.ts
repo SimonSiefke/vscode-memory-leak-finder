@@ -191,9 +191,16 @@ class HeapSnapshotWriteStream extends Writable {
   }
 
   writeParsingStrings(chunk) {
+    this.data = concatArray(this.data, chunk)
     // Parse the chunk directly - no concatenation needed due to stateful parsing
-    const { dataIndex, done } = parseStringArray(chunk, this.strings)
+    const { dataIndex, done } = parseStringArray(this.data, this.strings)
 
+    // If parsing failed, we need more data
+    if (dataIndex === -1) {
+      return
+    }
+
+    this.data = this.data.slice(dataIndex)
     // Only store leftover data when we're done with this section
     if (done) {
       this.resetParsingState()
@@ -248,7 +255,7 @@ class HeapSnapshotWriteStream extends Writable {
   start() {}
 
   validateRequiredMetadata() {
-    if (!this.metaData?.data) {
+    if (!this.metaData || !this.metaData.data) {
       throw new HeapSnapshotParserError('Heapsnapshot is missing metadata')
     }
 
@@ -266,8 +273,11 @@ class HeapSnapshotWriteStream extends Writable {
   }
 
   getResult() {
+    const data = this.metaData.data
     return {
-      metaData: this.metaData,
+      node_count: data.node_count,
+      edge_count: data.edge_count,
+      meta: data.meta,
       edges: this.edges,
       nodes: this.nodes,
       locations: this.locations,

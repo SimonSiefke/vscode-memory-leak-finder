@@ -1,5 +1,5 @@
-import * as CompareCount from '../CompareCount/CompareCount.js'
-import * as GetStringCount from '../GetStringCount/GetStringCount.js'
+import { getHeapSnapshot } from '../GetHeapSnapshot/GetHeapSnapshot.js'
+import * as HeapSnapshotFunctions from '../HeapSnapshotFunctions/HeapSnapshotFunctions.js'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
@@ -13,14 +13,25 @@ export const create = (session) => {
 
 export const start = (session, objectGroup) => {
   const id = 0
-  return GetStringCount.getStringCount(session, objectGroup, id)
+  return getHeapSnapshot(session, id)
 }
 
 export const stop = (session, objectGroup) => {
   const id = 1
-  return GetStringCount.getStringCount(session, objectGroup, id)
+  return getHeapSnapshot(session, id)
 }
 
-export const compare = CompareCount.compareCount
+const compareHeapSnapshotStringCount = async (before, after) => {
+  const [beforeCount, afterCount] = await Promise.all([
+    HeapSnapshotFunctions.getStringCount(before),
+    HeapSnapshotFunctions.getStringCount(after),
+  ])
+  return {
+    before: beforeCount,
+    after: afterCount,
+  }
+}
+
+export const compare = compareHeapSnapshotStringCount
 
 export const isLeak = IsLeakCount.isLeakCount
