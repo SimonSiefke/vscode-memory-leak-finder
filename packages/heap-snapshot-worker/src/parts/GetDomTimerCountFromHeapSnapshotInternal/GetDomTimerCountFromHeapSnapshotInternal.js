@@ -6,15 +6,14 @@ import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/Comput
  * @returns {number}
  */
 export const getDomTimerCountFromHeapSnapshotInternal = (snapshot) => {
-  const { nodes, strings, edges, meta } = snapshot
+  const { nodes, strings, meta } = snapshot
   const { node_types, node_fields, edge_types, edge_fields } = meta
-  const {
-    objectTypeIndex,
-    nativeTypeIndex,
-    ITEMS_PER_NODE,
-    typeFieldIndex,
-    nameFieldIndex,
-  } = computeHeapSnapshotIndices(node_types, node_fields, edge_types, edge_fields)
+  const { objectTypeIndex, nativeTypeIndex, ITEMS_PER_NODE, typeFieldIndex, nameFieldIndex } = computeHeapSnapshotIndices(
+    node_types,
+    node_fields,
+    edge_types,
+    edge_fields,
+  )
 
   let timerCount = 0
 
