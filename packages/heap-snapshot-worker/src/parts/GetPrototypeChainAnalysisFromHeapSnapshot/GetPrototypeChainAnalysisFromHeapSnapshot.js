@@ -50,7 +50,6 @@ const analyzePrototypeChains = (parsedNodes, parsedEdges) => {
   const longChains = []
   const pollutionCandidates = new Map()
   const chainLengths = []
-  const prototypeProperties = new Map()
   const detailedResults = [] // Store detailed info for each object
 
   // Analyze each object's prototype chain
@@ -113,7 +112,7 @@ const analyzePrototypeChains = (parsedNodes, parsedEdges) => {
 
   // Identify prototype pollution
   const pollution = []
-  for (const [key, candidate] of pollutionCandidates) {
+  for (const [_, candidate] of pollutionCandidates) {
     if (candidate.affectedObjects.length > PROTOTYPE_POLLUTION_THRESHOLD) {
       pollution.push({
         ...candidate,

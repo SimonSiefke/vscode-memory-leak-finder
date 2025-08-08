@@ -1,8 +1,7 @@
 import { join } from 'node:path'
-import { compareHeapSnapshotFunctions } from '../src/parts/CompareHeapSnapshotsFunctions/CompareHeapSnapshotsFunctions.js'
+import { getRegexpObjectsFromHeapSnapshot } from '../src/parts/GetRegexpObjectsFromHeapSnapshot/GetRegexpObjectsFromHeapSnapshot.js'
 
 const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
-const filePath2 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/1.json')
 
 const testOptimized = async () => {
   // console.log(`\n=== Testing Optimized Named Function Count for: ${filePath} ===`)
@@ -10,7 +9,8 @@ const testOptimized = async () => {
   console.log('Testing Optimized Approach (getNamedFunctionCountFromHeapSnapshot2):')
 
   try {
-    await compareHeapSnapshotFunctions(filePath1, filePath2)
+    const count = await getRegexpObjectsFromHeapSnapshot(filePath1)
+    console.log({ count: count })
 
     // console.log(`  Duration: ${duration.toFixed(2)}ms`)
     // console.log(`  Functions found: ${result.length / 5}`)
@@ -44,6 +44,4 @@ const main = async () => {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main()
-}
+main()

@@ -1,8 +1,8 @@
 /**
- * @param {Array} node_types
- * @param {Array} node_fields
- * @param {Array} edge_types
- * @param {Array} edge_fields
+ * @param {readonly any[]} node_types
+ * @param {readonly any[]} node_fields
+ * @param {readonly any[]} edge_types
+ * @param {readonly any[]} edge_fields
  * @returns {Object}
  */
 export const computeHeapSnapshotIndices = (node_types, node_fields, edge_types, edge_fields) => {

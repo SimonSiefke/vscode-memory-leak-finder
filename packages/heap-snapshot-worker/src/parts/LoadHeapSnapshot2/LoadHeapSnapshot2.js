@@ -6,7 +6,7 @@ import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.
  * @returns {Promise<void>}
  */
 export const loadHeapSnapshot2 = async (path) => {
-  const { metaData, nodes, edges, locations } = await prepareHeapSnapshot(path, {})
+  const { locations } = await prepareHeapSnapshot(path, {})
 
   console.log({ locations: locations.length })
 
