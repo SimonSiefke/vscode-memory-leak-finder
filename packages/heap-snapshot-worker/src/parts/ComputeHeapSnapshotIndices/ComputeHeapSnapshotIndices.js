@@ -8,6 +8,7 @@
 export const computeHeapSnapshotIndices = (node_types, node_fields, edge_types, edge_fields) => {
   // Type indices
   const objectTypeIndex = node_types[0].indexOf('object')
+  const nativeTypeIndex = node_types[0].indexOf('native')
   const bigintTypeIndex = node_types[0].indexOf('bigint')
   const regexpTypeIndex = node_types[0].indexOf('regexp')
 
@@ -32,6 +33,7 @@ export const computeHeapSnapshotIndices = (node_types, node_fields, edge_types, 
   return {
     // Type indices
     objectTypeIndex,
+    nativeTypeIndex,
     bigintTypeIndex,
     regexpTypeIndex,
 
