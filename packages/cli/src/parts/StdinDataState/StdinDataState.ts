@@ -22,6 +22,7 @@ export const state = {
   runMode: TestRunMode.Auto,
   ide: Ide.VsCode,
   ideVersion: Ide.VsCode,
+  workers: false,
 }
 
 export const setState = (newState) => {
@@ -41,13 +42,14 @@ export const setState = (newState) => {
   state.runMode = newState.runMode
   state.ide = newState.ide
   state.ideVersion = newState.ideVersion
+  state.workers = newState.workers
 }
 
-export const setBuffering = (value) => {
+export const setBuffering = (value: boolean) => {
   state.buffering = value
 }
 
-export const isBuffering = () => {
+export const isBuffering = (): boolean => {
   return state.buffering
 }
 

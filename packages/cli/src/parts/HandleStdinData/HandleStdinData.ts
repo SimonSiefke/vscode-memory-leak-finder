@@ -35,6 +35,7 @@ export const handleStdinData = async (key) => {
       '',
       '',
       false,
+      state.workers,
     )
   }
   if (newState.mode === ModeType.Interrupted) {
