@@ -64,8 +64,8 @@ test('HeapSnapshotWriteStream - processes complete heap snapshot data', async ()
 
   const result = stream.getResult()
 
-  expect(result.meta).toHaveProperty('node_count', 2)
-  expect(result.meta).toHaveProperty('edge_count', 1)
+  expect(result).toHaveProperty('node_count', 2)
+  expect(result).toHaveProperty('edge_count', 1)
   expect(result.nodes.length).toBe(14) // 2 nodes * 7 fields
   expect(result.edges.length).toBe(3) // 1 edge * 3 fields
   expect(result.locations.length).toBe(4) // 1 location * 4 fields
