@@ -1,10 +1,10 @@
-import * as GetResponse from '../GetResponse/GetResponse.js'
+import * as GetResponse from '../GetResponse/GetResponse.ts'
 
 export const handleJsonRpcMessage = async (
   ipc: any,
   message: any,
   execute: (command: string, ...args: any[]) => any,
-  resolve: (id: string, value: any) => void
+  resolve: (id: string, value: any) => void,
 ): Promise<void> => {
   if ('result' in message || 'error' in message) {
     resolve(message.id, message)
@@ -15,4 +15,3 @@ export const handleJsonRpcMessage = async (
     ipc.send(response)
   }
 }
-

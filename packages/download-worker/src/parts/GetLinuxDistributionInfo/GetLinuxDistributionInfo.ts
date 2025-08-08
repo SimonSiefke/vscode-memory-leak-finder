@@ -1,12 +1,15 @@
 // based on microsoft/playwright/packages/playwright-core/src/utils/hostPlatform.ts (License Apache 2.0)
 
 import * as fs from 'node:fs/promises'
-import * as ParseOsReleaseText from '../ParseOsReleaseText/ParseOsReleaseText.js'
+import * as ParseOsReleaseText from '../ParseOsReleaseText/ParseOsReleaseText.ts'
 
-export const getLinuxDistributionInfo = async (): Promise<{
-  id: string
-  version: string
-} | undefined> => {
+export const getLinuxDistributionInfo = async (): Promise<
+  | {
+      id: string
+      version: string
+    }
+  | undefined
+> => {
   if (process.platform !== 'linux') {
     return undefined
   }

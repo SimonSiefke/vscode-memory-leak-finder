@@ -1,10 +1,10 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { codeFrameColumns } from '@babel/code-frame'
-import * as CleanStack from '../CleanStack/CleanStack.js'
-import * as ErrorCodes from '../ErrorCodes/ErrorCodes.js'
-import * as FileSystem from '../FileSystem/FileSystem.js'
-import * as SplitLines from '../SplitLines/SplitLines.js'
+import * as CleanStack from '../CleanStack/CleanStack.ts'
+import * as ErrorCodes from '../ErrorCodes/ErrorCodes.ts'
+import * as FileSystem from '../FileSystem/FileSystem.ts'
+import * as SplitLines from '../SplitLines/SplitLines.ts'
 
 const getActualPath = (fileUri: string): string => {
   if (fileUri.startsWith('file://')) {
@@ -15,7 +15,9 @@ const getActualPath = (fileUri: string): string => {
 
 const RE_MODULE_NOT_FOUND_STACK = /Cannot find package '([^']+)' imported from (.+)$/
 
-const prepareModuleNotFoundError = (error: any): {
+const prepareModuleNotFoundError = (
+  error: any,
+): {
   message: string
   stack: string
   codeFrame: string
@@ -61,11 +63,15 @@ const prepareModuleNotFoundError = (error: any): {
   }
 }
 
-const getPathDetails = (lines: string[]): {
-  line: number
-  column: number
-  path: string
-} | undefined => {
+const getPathDetails = (
+  lines: string[],
+):
+  | {
+      line: number
+      column: number
+      path: string
+    }
+  | undefined => {
   for (let i = 0; i < lines.length; i++) {
     const file = lines[i]
     if (file) {
@@ -116,7 +122,7 @@ const getCodeFrame = (cleanedStack: string, { color }: { color: boolean }): stri
 
 export const prepare = async (
   error: any,
-  { color = true, root = '' } = {}
+  { color = true, root = '' } = {},
 ): Promise<{
   message: string
   stack: string

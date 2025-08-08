@@ -89,8 +89,8 @@ const getRelevantLines = (lines: string[], stack: string): string[] => {
     stack.includes('Target was not created page') ||
     lines[1].includes('at Module.test') ||
     stack.includes('expected') ||
-    (stack.includes('at Object.evaluate ') && stack.includes('PageEvaluate/PageEvaluate.js')) ||
-    (stack.includes('at Module.evaluate ') && stack.includes('PageEvaluate/PageEvaluate.js'))
+    (stack.includes('at Object.evaluate ') && stack.includes('PageEvaluate/PageEvaluate.ts')) ||
+    (stack.includes('at Module.evaluate ') && stack.includes('PageEvaluate/PageEvaluate.ts'))
   const relevantLines: string[] = []
   for (const line of lines) {
     if (isInternal(line)) {
@@ -117,4 +117,3 @@ export const cleanStack = (stack: string, { root = '' } = {}): string => {
   }
   return cleanLines.slice(1).join('\n')
 }
-

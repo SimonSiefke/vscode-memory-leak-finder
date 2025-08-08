@@ -1,4 +1,4 @@
-import * as JsonRpcVersion from '../JsonRpcVersion/JsonRpcVersion.js'
+import * as JsonRpcVersion from '../JsonRpcVersion/JsonRpcVersion.ts'
 
 export const getSuccessResponse = (message: any, result: any): any => {
   if (!message.id) {
@@ -10,4 +10,3 @@ export const getSuccessResponse = (message: any, result: any): any => {
     result: result ?? null,
   }
 }
-

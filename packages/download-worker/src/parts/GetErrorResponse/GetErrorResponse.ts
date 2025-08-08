@@ -1,6 +1,6 @@
-import { CommandNotFoundError } from '../CommandNotFoundError/CommandNotFoundError.js'
-import * as JsonRpcErrorCode from '../JsonRpcErrorCode/JsonRpcErrorCode.js'
-import * as JsonRpcVersion from '../JsonRpcVersion/JsonRpcVersion.js'
+import { CommandNotFoundError } from '../CommandNotFoundError/CommandNotFoundError.ts'
+import * as JsonRpcErrorCode from '../JsonRpcErrorCode/JsonRpcErrorCode.ts'
+import * as JsonRpcVersion from '../JsonRpcVersion/JsonRpcVersion.ts'
 
 export const getErrorResponse = async (message: any, error: any): Promise<any> => {
   if (error && error instanceof CommandNotFoundError) {
@@ -14,7 +14,7 @@ export const getErrorResponse = async (message: any, error: any): Promise<any> =
       },
     }
   }
-  const PrettyError = await import('../PrettyError/PrettyError.js')
+  const PrettyError = await import('../PrettyError/PrettyError.ts')
   const prettyError = await PrettyError.prepare(error)
   return {
     jsonrpc: JsonRpcVersion.Two,
@@ -31,4 +31,3 @@ export const getErrorResponse = async (message: any, error: any): Promise<any> =
     },
   }
 }
-

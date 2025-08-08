@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import * as IsFfmpeg from '../src/parts/IsFfmpeg/IsFfmpeg.js'
+import * as IsFfmpeg from '../src/parts/IsFfmpeg/IsFfmpeg.ts'
 
 test('isFfmpeg - false', () => {
   const tool = {

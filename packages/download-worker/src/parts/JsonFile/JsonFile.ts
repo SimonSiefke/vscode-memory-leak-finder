@@ -1,6 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname } from 'node:path'
-import { VError } from '../VError/VError.js'
+import { VError } from '../VError/VError.ts'
 
 export const writeJson = async (path: string, json: any): Promise<void> => {
   try {
@@ -20,4 +20,3 @@ export const readJson = async (path: string): Promise<any> => {
     throw new VError(error, `Failed to read json`)
   }
 }
-

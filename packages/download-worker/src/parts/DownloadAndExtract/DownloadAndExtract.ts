@@ -1,8 +1,8 @@
 import { rm } from 'fs/promises'
 import { join } from 'path'
-import * as Download from '../Download/Download.js'
-import * as Root from '../Root/Root.js'
-import * as Unzip from '../Unzip/Unzip.js'
+import * as Download from '../Download/Download.ts'
+import * as Root from '../Root/Root.ts'
+import * as Unzip from '../Unzip/Unzip.ts'
 
 export const downloadAndExtract = async (name: string, urls: string[], outDir: string): Promise<void> => {
   await rm(outDir, { recursive: true, force: true })

@@ -1,4 +1,4 @@
-import { IpcError } from '../IpcError/IpcError.js'
+import { IpcError } from '../IpcError/IpcError.ts'
 
 export const create = (): any => {
   if (!process.send) {

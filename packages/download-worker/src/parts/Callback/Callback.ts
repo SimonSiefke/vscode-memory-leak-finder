@@ -1,4 +1,4 @@
-import * as Id from '../Id/Id.js'
+import * as Id from '../Id/Id.ts'
 
 export const state: {
   callbacks: Record<string, (value: any) => void>
@@ -25,4 +25,3 @@ export const resolve = (id: string, value: any): void => {
   delete state.callbacks[id]
   callback(value)
 }
-

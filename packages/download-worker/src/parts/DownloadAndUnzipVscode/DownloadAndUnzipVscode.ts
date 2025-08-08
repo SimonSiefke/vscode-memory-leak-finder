@@ -1,9 +1,9 @@
 import { resolve } from 'node:path'
 import { VError } from '@lvce-editor/verror'
-import * as AdjustVscodeProductJson from '../AdjustVscodeProductJson/AdjustVscodeProductJson.js'
-import * as Env from '../Env/Env.js'
-import * as JsonFile from '../JsonFile/JsonFile.js'
-import * as VscodeTestCachePath from '../VscodeTestCachePath/VscodeTestCachePath.js'
+import * as AdjustVscodeProductJson from '../AdjustVscodeProductJson/AdjustVscodeProductJson.ts'
+import * as Env from '../Env/Env.ts'
+import * as JsonFile from '../JsonFile/JsonFile.ts'
+import * as VscodeTestCachePath from '../VscodeTestCachePath/VscodeTestCachePath.ts'
 
 const getProductJsonPath = (path: string): string => {
   if (process.platform === 'darwin') {

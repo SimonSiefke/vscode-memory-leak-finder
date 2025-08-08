@@ -1,4 +1,4 @@
-import * as ErrorCodes from '../ErrorCodes/ErrorCodes.js'
+import * as ErrorCodes from '../ErrorCodes/ErrorCodes.ts'
 
 export class CommandNotFoundError extends Error {
   public code: string
@@ -9,4 +9,3 @@ export class CommandNotFoundError extends Error {
     this.code = ErrorCodes.E_COMMAND_NOT_FOUND
   }
 }
-

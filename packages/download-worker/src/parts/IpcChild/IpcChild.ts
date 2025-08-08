@@ -1,11 +1,11 @@
-import * as IpcChildType from '../IpcChildType/IpcChildType.js'
+import * as IpcChildType from '../IpcChildType/IpcChildType.ts'
 
 const getModule = (method: string): Promise<any> => {
   switch (method) {
     case IpcChildType.NodeForkedProcess:
-      return import('../IpcChildWithNodeForkedProcess/IpcChildWithNodeForkedProcess.js')
+      return import('../IpcChildWithNodeForkedProcess/IpcChildWithNodeForkedProcess.ts')
     case IpcChildType.NodeWorkerThread:
-      return import('../IpcChildWithNodeWorkerThread/IpcChildWithNodeWorkerThread.js')
+      return import('../IpcChildWithNodeWorkerThread/IpcChildWithNodeWorkerThread.ts')
     default:
       throw new Error('unexpected ipc type')
   }
@@ -17,4 +17,3 @@ export const listen = async ({ method }: { method: string }): Promise<any> => {
   const ipc = module.wrap(rawIpc)
   return ipc
 }
-

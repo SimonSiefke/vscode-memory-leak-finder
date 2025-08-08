@@ -1,5 +1,5 @@
-import { CommandNotFoundError } from '../CommandNotFoundError/CommandNotFoundError.js'
-import * as CommandState from '../CommandState/CommandState.js'
+import { CommandNotFoundError } from '../CommandNotFoundError/CommandNotFoundError.ts'
+import * as CommandState from '../CommandState/CommandState.ts'
 
 export const execute = (command: string, ...args: any[]): any => {
   const fn = CommandState.getCommand(command)
@@ -8,4 +8,3 @@ export const execute = (command: string, ...args: any[]): any => {
   }
   return fn(...args)
 }
-

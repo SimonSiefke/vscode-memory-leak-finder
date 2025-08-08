@@ -2,10 +2,10 @@ import { VError } from '@lvce-editor/verror'
 import { existsSync } from 'fs'
 import { rm } from 'fs/promises'
 import { join } from 'path'
-import * as Download from '../Download/Download.js'
-import * as ExtractAppImage from '../ExtractAppImage/ExtractAppImage.js'
-import * as MakeExecutable from '../MakeExecutable/MakeExecutable.js'
-import * as Root from '../Root/Root.js'
+import * as Download from '../Download/Download.ts'
+import * as ExtractAppImage from '../ExtractAppImage/ExtractAppImage.ts'
+import * as MakeExecutable from '../MakeExecutable/MakeExecutable.ts'
+import * as Root from '../Root/Root.ts'
 
 // TODO support macos and windows also and different architecture
 const getDownloadUrl = (version: string): string => {
