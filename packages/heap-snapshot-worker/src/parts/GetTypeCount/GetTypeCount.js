@@ -5,7 +5,6 @@
  * @returns {number}
  */
 export const getTypeCount = (snapshot, typeName) => {
-  console.log({ snapshot })
   const { nodes, meta } = snapshot
   const { node_types, node_fields } = meta
 
