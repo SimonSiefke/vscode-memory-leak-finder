@@ -1,5 +1,9 @@
-import { getTypeCount } from '../GetTypeCount/GetTypeCount.js'
+import { getRegexCountFromHeapSnapshotInternal } from '../GetRegexCountFromHeapSnapshotInternal/GetRegexCountFromHeapSnapshotInternal.js'
+import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.js'
 
 export const getRegexCountFromHeapSnapshot = async (path) => {
-  return getTypeCount(path, 'regexp')
+  const snapshot = await prepareHeapSnapshot(path, {
+    parseStrings: true,
+  })
+  return getRegexCountFromHeapSnapshotInternal(snapshot)
 }
