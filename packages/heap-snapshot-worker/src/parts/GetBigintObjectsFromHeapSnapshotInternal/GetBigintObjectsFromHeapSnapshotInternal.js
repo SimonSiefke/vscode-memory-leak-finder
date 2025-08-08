@@ -1,12 +1,12 @@
 import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.js'
 
 /**
- * @param {any} snapshot
+ * @param {import('../Snapshot/Snapshot.ts').Snapshot} snapshot
  * @returns {Array}
  */
 export const getBigintObjectsFromHeapSnapshotInternal = (snapshot) => {
-  const { nodes, strings, edges, metaData } = snapshot
-  const { node_types, node_fields, edge_types, edge_fields } = metaData.data.meta
+  const { nodes, strings, edges, meta } = snapshot
+  const { node_types, node_fields, edge_types, edge_fields } = meta
   const {
     bigintTypeIndex,
     ITEMS_PER_NODE,

@@ -84,7 +84,7 @@ test('getBigintObjectsFromHeapSnapshot - multiple bigint objects (embedded const
 
 test('getBigintObjectsFromHeapSnapshot - bigint with variable name', () => {
   // prettier-ignore
-  const testData :Snapshot= {
+  const testData: Snapshot = {
     meta: {
       node_types: [['hidden', 'array', 'string', 'object', 'bigint']],
       node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
