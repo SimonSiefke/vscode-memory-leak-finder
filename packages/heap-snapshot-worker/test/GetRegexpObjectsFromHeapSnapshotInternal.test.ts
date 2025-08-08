@@ -1,10 +1,10 @@
 import { expect, test } from '@jest/globals'
 import { getRegexpObjectsFromHeapSnapshotInternal } from '../src/parts/GetRegexpObjectsFromHeapSnapshotInternal/GetRegexpObjectsFromHeapSnapshotInternal.js'
+import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('getRegexpObjectsFromHeapSnapshot - no regexp objects', async () => {
   // prettier-ignore
-  const testData = {
-    snapshot: {
+  const testData :Snapshot= {
       meta: {
         node_types: [['hidden', 'array', 'string', 'object']],
         node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
@@ -14,12 +14,12 @@ test('getRegexpObjectsFromHeapSnapshot - no regexp objects', async () => {
       },
       node_count: 1,
       edge_count: 0,
-    },
-    nodes: [
+      extra_native_bytes:0,
+    nodes: new Uint32Array([
       0, 1, 100, 64, 0, 0, 0, // hidden object
-    ],
-    edges: [],
-    locations: [],
+    ]),
+    edges:new Uint32Array([]),
+    locations: new Uint32Array([]),
     strings: ['', 'test'],
   }
   const result = getRegexpObjectsFromHeapSnapshotInternal(testData)
@@ -28,8 +28,7 @@ test('getRegexpObjectsFromHeapSnapshot - no regexp objects', async () => {
 
 test('getRegexpObjectsFromHeapSnapshot - single regexp object', async () => {
   // prettier-ignore
-  const testData = {
-    snapshot: {
+  const testData :Snapshot= {
       meta: {
         node_types: [['hidden', 'array', 'string', 'object', 'regexp']],
         node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
@@ -39,12 +38,12 @@ test('getRegexpObjectsFromHeapSnapshot - single regexp object', async () => {
       },
       node_count: 1,
       edge_count: 0,
-    },
-    nodes: [
+      extra_native_bytes:0,
+    nodes: new Uint32Array([
       4, 1, 200, 32, 0, 0, 0, // regexp object
-    ],
-    edges: [],
-    locations: [],
+    ]),
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
     strings: ['', '/test/gi'],
   }
   const result = getRegexpObjectsFromHeapSnapshotInternal(testData)
