@@ -1,9 +1,10 @@
 import { expect, test } from '@jest/globals'
 import { getRegexCountFromHeapSnapshotInternal } from '../src/parts/GetRegexCountFromHeapSnapshotInternal/GetRegexCountFromHeapSnapshotInternal.js'
+import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('should count regexp objects from heap snapshot', () => {
   // prettier-ignore
-  const testData = {
+  const testData:Snapshot = {
     meta: {
       node_types: [['hidden', 'array', 'string', 'object', 'regexp']],
       node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
@@ -13,11 +14,12 @@ test('should count regexp objects from heap snapshot', () => {
     },
     node_count: 1,
     edge_count: 0,
-    nodes: [
+    extra_native_bytes:0,
+    nodes: new Uint32Array([
       4, 1, 200, 32, 0, 0, 0, // regexp object
-    ],
-    edges: [],
-    locations: [],
+    ]),
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
     strings: ['', '/test/gi'],
   }
   const result = getRegexCountFromHeapSnapshotInternal(testData)
