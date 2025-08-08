@@ -1,25 +1,24 @@
 import { expect, test } from '@jest/globals'
 import { getBigintObjectsFromHeapSnapshotInternal } from '../src/parts/GetBigintObjectsFromHeapSnapshotInternal/GetBigintObjectsFromHeapSnapshotInternal.js'
+import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('getBigintObjectsFromHeapSnapshot - no bigint objects', () => {
   // prettier-ignore
-  const testData = {
-    snapshot: {
-      meta: {
-        node_types: [['hidden', 'array', 'string', 'object']],
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
-        edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
-        edge_fields: ['type', 'name_or_index', 'to_node'],
-        location_fields: ['object_index', 'script_id', 'line', 'column'],
-      },
-      node_count: 1,
-      edge_count: 0,
+  const testData:Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
     },
-    nodes: [
+    node_count: 1,
+    edge_count: 0,
+    nodes: new Uint32Array([
       0, 1, 100, 64, 0, 0, // hidden object
-    ],
-    edges: [],
-    locations: [],
+    ]),
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
     strings: ['', 'test'],
   }
 
