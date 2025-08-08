@@ -34,10 +34,6 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
   }
 
   // Get field indices
-  const typeFieldIndex = nodeFields.indexOf('type')
-  const nameFieldIndex = nodeFields.indexOf('name')
-  const idFieldIndex = nodeFields.indexOf('id')
-  const selfSizeFieldIndex = nodeFields.indexOf('self_size')
   const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
 
   const edgeTypeFieldIndex = edgeFields.indexOf('type')
