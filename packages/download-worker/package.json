@@ -22,6 +22,26 @@
     "got": "^14.4.7"
   },
   "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.ts$": [
+        "ts-jest",
+        {
+          "useESM": true
+        }
+      ]
+    },
+    "extensionsToTreatAsEsm": [
+      ".ts"
+    ],
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    },
+    "testMatch": [
+      "<rootDir>/test/**/*.ts",
+      "<rootDir>/test/**/*.js"
+    ],
     "injectGlobals": false,
     "collectCoverage": true,
     "coverageThreshold": {
