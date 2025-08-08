@@ -274,6 +274,7 @@ class HeapSnapshotWriteStream extends Writable {
 
   getResult() {
     return {
+      snapshot: this.metaData,
       metaData: this.metaData,
       edges: this.edges,
       nodes: this.nodes,
