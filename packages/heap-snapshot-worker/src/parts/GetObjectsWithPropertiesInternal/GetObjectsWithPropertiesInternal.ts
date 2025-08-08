@@ -37,18 +37,8 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
   }
 
   // Get field indices
-  const typeFieldIndex = nodeFields.indexOf('type')
-  const nameFieldIndex = nodeFields.indexOf('name')
-  const idFieldIndex = nodeFields.indexOf('id')
-  const selfSizeFieldIndex = nodeFields.indexOf('self_size')
-  const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
-
-  const edgeTypeFieldIndex = edgeFields.indexOf('type')
-  const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
-  const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
 
   const ITEMS_PER_NODE = nodeFields.length
-  const ITEMS_PER_EDGE = edgeFields.length
 
   // Get edge type names
   const edgeTypes = meta.edge_types[0] || []
