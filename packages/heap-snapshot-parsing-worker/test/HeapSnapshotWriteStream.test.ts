@@ -421,7 +421,7 @@ test('HeapSnapshotWriteStream - processes heap snapshot with strings when parseS
 
   const result = stream.getResult()
 
-  expect(result.meta).toHaveProperty('node_count', 1)
+  expect(result).toHaveProperty('node_count', 1)
   expect(result.nodes.length).toBe(7) // 1 node * 7 fields
   expect(result.edges.length).toBe(0)
   expect(result.locations.length).toBe(4) // 1 location * 4 fields
