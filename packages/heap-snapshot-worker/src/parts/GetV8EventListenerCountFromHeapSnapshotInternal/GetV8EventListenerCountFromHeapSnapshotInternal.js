@@ -6,5 +6,5 @@ import { getThingCountFromHeapSnapshot } from '../GetThingCountFromHeapSnapshot/
  * @returns {number}
  */
 export const getV8EventListenerCountFromHeapSnapshotInternal = (snapshot) => {
-  return getThingCountFromHeapSnapshot(snapshot, 'object', 'V8EventListener')
+  return getThingCountFromHeapSnapshot(snapshot, 'native', 'V8EventListener')
 }
