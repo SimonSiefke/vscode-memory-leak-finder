@@ -1,5 +1,4 @@
 import { join } from 'node:path'
-import { performance } from 'node:perf_hooks'
 import { compareHeapSnapshotFunctions } from '../src/parts/CompareHeapSnapshotsFunctions/CompareHeapSnapshotsFunctions.js'
 
 const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
