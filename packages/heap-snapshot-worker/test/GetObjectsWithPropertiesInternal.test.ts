@@ -1,6 +1,6 @@
 import { test, expect } from '@jest/globals'
 import { getObjectsWithPropertiesInternal } from '../src/parts/GetObjectsWithPropertiesInternal/GetObjectsWithPropertiesInternal.js'
-import { Snapshot } from '../src/parts/Snapshot/Snapshot.js'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.js'
 
 test('getObjectsWithPropertiesInternal should find objects with existing property', () => {
   const snapshot: Snapshot = {

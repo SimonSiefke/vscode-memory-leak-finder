@@ -1,5 +1,5 @@
-import { getObjectsWithPropertiesInternal, ObjectWithProperty } from '../GetObjectsWithPropertiesInternal/GetObjectsWithPropertiesInternal.js'
-import { Snapshot } from '../Snapshot/Snapshot.js'
+import { getObjectsWithPropertiesInternal, ObjectWithProperty } from '../GetObjectsWithPropertiesInternal/GetObjectsWithPropertiesInternal.ts'
+import type { Snapshot } from '../Snapshot/Snapshot.js'
 
 /**
  * Finds objects in a heap snapshot that have a specific property
