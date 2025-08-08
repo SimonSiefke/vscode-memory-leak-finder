@@ -1,5 +1,5 @@
 import { test } from '@jest/globals'
-import { getObjectsWithPropertiesInternal, ObjectWithProperty } from './GetObjectsWithPropertiesInternal'
+import { getObjectsWithPropertiesInternal, ObjectWithProperty } from '../getmo'
 import { Snapshot } from '../Snapshot/Snapshot.ts'
 
 const mockHeapSnapshotData: Snapshot = {
