@@ -1,9 +1,6 @@
+import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { performance } from 'node:perf_hooks'
-import { parseHeapSnapshotStringsCount } from '../src/parts/ParseHeapSnapshotStringsCount/ParseHeapSnapshotStringsCount.js'
-import { readFile } from 'node:fs/promises'
-import { getRegexCountFromHeapSnapshot } from '../src/parts/GetRegexCountFromHeapSnapshot/GetRegexCountFromHeapSnapshot.js'
-import { getRegexObjectsFromHeapSnapshot } from '../src/parts/GetRegexpObjectsFromHeapSnapshot2/GetRegexpObjectsFromHeapSnapshot2.js'
 import { getRegexpObjectsFromHeapSnapshot } from '../src/parts/GetRegexpObjectsFromHeapSnapshot/GetRegexpObjectsFromHeapSnapshot.js'
 
 const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
