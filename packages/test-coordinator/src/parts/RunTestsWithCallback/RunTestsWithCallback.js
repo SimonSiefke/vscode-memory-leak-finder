@@ -132,19 +132,30 @@ export const runTests = async (
                 await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun, runMode)
               }
             }
-            const before = await MemoryLeakFinder.start(memoryLeakWorkerRpc, connectionId, targetId)
+            // Always use worker commands to automatically detect and measure workers
+            before = await MemoryLeakFinder.startWithWorkers(memoryLeakWorkerRpc, connectionId, targetId)
             for (let i = 0; i < runs; i++) {
               await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun, runMode)
             }
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
             }
-            const after = await MemoryLeakFinder.stop(memoryLeakWorkerRpc, connectionId, targetId)
-
-            const result = await MemoryLeakFinder.compare(memoryLeakWorkerRpc, connectionId, before, after)
+            after = await MemoryLeakFinder.stopWithWorkers(memoryLeakWorkerRpc, connectionId, targetId)
+            result = await MemoryLeakFinder.compareWithWorkers(memoryLeakWorkerRpc, connectionId, before, after)
+            
+            // Save main result
             const fileName = dirent.replace('.js', '.json')
             const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
             await JsonFile.writeJson(resultPath, result)
+            
+            // Save individual worker results if any workers were detected
+            for (const [workerName, workerResult] of Object.entries(result)) {
+              if (workerName !== 'main' && workerName !== 'isLeak') {
+                const workerFileName = `${workerName}.json`
+                const workerResultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, dirent.replace('.js', ''), workerFileName)
+                await JsonFile.writeJson(workerResultPath, workerResult)
+              }
+            }
             if (result.isLeak) {
               isLeak = true
               leaking++
