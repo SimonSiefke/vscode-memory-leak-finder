@@ -12,7 +12,7 @@ export interface ObjectWithProperty {
 export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyName: string): ObjectWithProperty[] => {
   const results: ObjectWithProperty[] = []
 
-  const { meta } = snapshot
+  const { meta, strings, nodes, edges } = snapshot
   const nodeFields = meta.node_fields
   const nodeTypes = meta.node_types
   const edgeFields = meta.edge_fields
