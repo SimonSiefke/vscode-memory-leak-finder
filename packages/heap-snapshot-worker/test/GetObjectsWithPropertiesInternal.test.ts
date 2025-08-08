@@ -100,8 +100,8 @@ test('should handle string property values', () => {
     // prettier-ignore
     nodes: new Uint32Array([
       // type, name, id, self_size, edge_count, trace_node_id, detachedness
-      3, 1, 1, 100, 1, 0, 0,  // Object1
-      2, 2, 2, 50, 0, 0, 0,   // String value "hello"
+      3, 2, 1, 100, 1, 0, 0,  // Object1
+      2, 3, 2, 50, 0, 0, 0,   // String value "hello"
     ]),
     // prettier-ignore
     edges: new Uint32Array([
@@ -140,8 +140,8 @@ test('should handle number property values', () => {
     // prettier-ignore
     nodes: new Uint32Array([
       // type, name, id, self_size, edge_count, trace_node_id, detachedness
-      3, 1, 1, 100, 1, 0, 0,  // Object1
-      8, 2, 2, 50, 0, 0, 0,  // Number value 42
+      3, 2, 1, 100, 1, 0, 0,  // Object1
+      8, 3, 2, 50, 0, 0, 0,  // Number value 42
     ]),
     // prettier-ignore
     edges: new Uint32Array([
