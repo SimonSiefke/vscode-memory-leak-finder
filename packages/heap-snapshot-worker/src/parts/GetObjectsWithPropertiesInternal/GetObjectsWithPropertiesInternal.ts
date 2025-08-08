@@ -1,5 +1,3 @@
-import { Snapshot } from '../Snapshot/Snapshot.ts'
-
 export interface ObjectWithProperty {
   id: number
   name: string | null
@@ -9,10 +7,29 @@ export interface ObjectWithProperty {
   edgeCount: number
 }
 
-export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyName: string): ObjectWithProperty[] => {
+/**
+ * Internal function that finds objects in a parsed heap snapshot that have a specific property
+ * @param nodes - The nodes array from the heap snapshot
+ * @param edges - The edges array from the heap snapshot
+ * @param strings - The strings array from the heap snapshot
+ * @param meta - The metadata from the heap snapshot
+ * @param propertyName - The property name to search for
+ * @returns Array of objects with the specified property
+ */
+export const getObjectsWithPropertiesInternal = (
+  nodes: Uint32Array,
+  edges: Uint32Array,
+  strings: readonly string[],
+  meta: {
+    node_fields: readonly string[]
+    node_types: readonly (readonly string[])[]
+    edge_fields: readonly string[]
+    edge_types: readonly (readonly string[])[]
+  },
+  propertyName: string
+): ObjectWithProperty[] => {
   const results: ObjectWithProperty[] = []
 
-  const { meta, strings, nodes, edges } = snapshot
   const nodeFields = meta.node_fields
   const nodeTypes = meta.node_types
   const edgeFields = meta.edge_fields
@@ -22,7 +39,7 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
   }
 
   // Find the property name in the strings array
-  const propertyNameIndex = strings.findIndex((str) => str === propertyName)
+  const propertyNameIndex = strings.findIndex(str => str === propertyName)
   if (propertyNameIndex === -1) {
     return results
   }
@@ -81,21 +98,17 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
           propertyValue: null,
           type: getNodeTypeName(targetNode),
           selfSize: targetNode.self_size,
-          edgeCount: targetNode.edge_count,
+          edgeCount: targetNode.edge_count
         }
 
         // Try to get the property value based on the node type
-        if (targetNode.type === 2) {
-          // string
+        if (targetNode.type === 2) { // string
           result.propertyValue = getNodeName(targetNode)
-        } else if (targetNode.type === 8) {
-          // number
+        } else if (targetNode.type === 8) { // number
           result.propertyValue = targetNode.name?.toString() || null // name field contains the number value
-        } else if (targetNode.type === 3) {
-          // object
+        } else if (targetNode.type === 3) { // object
           result.propertyValue = `[Object ${targetNode.id}]`
-        } else if (targetNode.type === 1) {
-          // array
+        } else if (targetNode.type === 1) { // array
           result.propertyValue = `[Array ${targetNode.id}]`
         } else {
           const typeName = getNodeTypeName(targetNode)
