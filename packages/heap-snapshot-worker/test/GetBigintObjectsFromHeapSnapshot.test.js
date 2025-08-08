@@ -1,6 +1,6 @@
 import { test, expect } from '@jest/globals'
 import { writeFileSync, unlinkSync } from 'node:fs'
-import * as GetBigintObjectsFromHeapSnapshot from '../src/parts/GetBigintObjectsFromHeapSnapshot/GetBigintObjectsFromHeapSnapshot.js'
+import { getBigintObjectsFromHeapSnapshotInternal } from '../src/parts/GetBigintObjectsFromHeapSnapshotInternal/GetBigintObjectsFromHeapSnapshotInternal.js'
 
 test('getBigintObjectsFromHeapSnapshot - no bigint objects', async () => {
   // prettier-ignore
@@ -24,15 +24,8 @@ test('getBigintObjectsFromHeapSnapshot - no bigint objects', async () => {
     strings: ['', 'test'],
   }
 
-  const testFile = 'test-no-bigint.heapsnapshot'
-  writeFileSync(testFile, JSON.stringify(testData))
-
-  try {
-    const result = await GetBigintObjectsFromHeapSnapshot.getBigintObjectsFromHeapSnapshot(testFile)
-    expect(result).toEqual([])
-  } finally {
-    unlinkSync(testFile)
-  }
+  const result = getBigintObjectsFromHeapSnapshotInternal(testData)
+  expect(result).toEqual([])
 })
 
 test('getBigintObjectsFromHeapSnapshot - single bigint object without variable name (filtered out)', async () => {
@@ -57,16 +50,9 @@ test('getBigintObjectsFromHeapSnapshot - single bigint object without variable n
     strings: ['', 'bigint'],
   }
 
-  const testFile = 'test-single-bigint.heapsnapshot'
-  writeFileSync(testFile, JSON.stringify(testData))
-
-  try {
-    const result = await GetBigintObjectsFromHeapSnapshot.getBigintObjectsFromHeapSnapshot(testFile)
-    // Should return empty array since bigint has no variable names (embedded constant)
-    expect(result).toEqual([])
-  } finally {
-    unlinkSync(testFile)
-  }
+  const result = getBigintObjectsFromHeapSnapshotInternal(testData)
+  // Should return empty array since bigint has no variable names (embedded constant)
+  expect(result).toEqual([])
 })
 
 test('getBigintObjectsFromHeapSnapshot - multiple bigint objects (embedded constants filtered out)', async () => {
@@ -94,16 +80,9 @@ test('getBigintObjectsFromHeapSnapshot - multiple bigint objects (embedded const
     strings: ['', 'bigint'],
   }
 
-  const testFile = 'test-multiple-bigint.heapsnapshot'
-  writeFileSync(testFile, JSON.stringify(testData))
-
-  try {
-    const result = await GetBigintObjectsFromHeapSnapshot.getBigintObjectsFromHeapSnapshot(testFile)
-    // Should return empty array since all bigints have no variable names (embedded constants)
-    expect(result).toEqual([])
-  } finally {
-    unlinkSync(testFile)
-  }
+  const result = getBigintObjectsFromHeapSnapshotInternal(testData)
+  // Should return empty array since all bigints have no variable names (embedded constants)
+  expect(result).toEqual([])
 })
 
 test('getBigintObjectsFromHeapSnapshot - bigint with variable name', async () => {
@@ -133,30 +112,23 @@ test('getBigintObjectsFromHeapSnapshot - bigint with variable name', async () =>
     strings: ['', 'Window', 'bigint', 'abc'],
   }
 
-  const testFile = 'test-bigint-with-variable.heapsnapshot'
-  writeFileSync(testFile, JSON.stringify(testData))
-
-  try {
-    const result = await GetBigintObjectsFromHeapSnapshot.getBigintObjectsFromHeapSnapshot(testFile)
-    expect(result).toEqual([
-      {
-        id: 200,
-        name: 'bigint',
-        value: 'bigint',
-        selfSize: 32,
-        edgeCount: 0,
-        detachedness: 0,
-        variableNames: [
-          {
-            name: 'abc',
-            sourceType: 'object',
-            sourceName: 'Window',
-          },
-        ],
-        note: 'Actual bigint numeric value not accessible via heap snapshot format',
-      },
-    ])
-  } finally {
-    unlinkSync(testFile)
-  }
+  const result = getBigintObjectsFromHeapSnapshotInternal(testData)
+  expect(result).toEqual([
+    {
+      id: 200,
+      name: 'bigint',
+      value: 'bigint',
+      selfSize: 32,
+      edgeCount: 0,
+      detachedness: 0,
+      variableNames: [
+        {
+          name: 'abc',
+          sourceType: 'object',
+          sourceName: 'Window',
+        },
+      ],
+      note: 'Actual bigint numeric value not accessible via heap snapshot format',
+    },
+  ])
 })
