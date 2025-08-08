@@ -5,7 +5,6 @@ import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 test('getMapObjectsFromHeapSnapshot - no map objects', () => {
   // prettier-ignore
   const testData:Snapshot = {
-    snapshot: {
       meta: {
         node_types: [['hidden', 'array', 'string', 'object']],
         node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
@@ -15,7 +14,7 @@ test('getMapObjectsFromHeapSnapshot - no map objects', () => {
       },
       node_count: 1,
       edge_count: 0,
-    },
+      extra_native_bytes:0,
     nodes: new Uint32Array([
       0, 1, 100, 64, 0, 0, // hidden object
     ]),
