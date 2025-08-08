@@ -1,5 +1,4 @@
-import { test, expect } from '@jest/globals'
-import * as GetArraysFromHeapSnapshot from '../src/parts/GetArraysFromHeapSnapshot/GetArraysFromHeapSnapshot.js'
+import { test } from '@jest/globals'
 
 test.skip('getArraysFromHeapSnapshot - handles multiple names correctly', async () => {
   // TODO add proper test

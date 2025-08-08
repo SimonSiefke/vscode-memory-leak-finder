@@ -4,7 +4,7 @@ import { waitForResult } from '../WaitForResult/WaitForResult.js'
 
 /**
  * Prepares a heap snapshot by parsing it in a separate worker for better performance
- * @param {string} path - The file path to the heap snapshot
+ * @param {string} json - The file path to the heap snapshot
  * @param {{parseStrings?:boolean}} options - Options for parsing
  * @returns {Promise<{metaData: any, nodes: Uint32Array<ArrayBuffer>, edges: Uint32Array<ArrayBuffer>, locations: Uint32Array<ArrayBuffer>, strings: string[]}>}
  */
@@ -19,7 +19,7 @@ export const prepareHeapSnapshotFromJson = async (json, options) => {
     // Send the parsing command
     worker.postMessage({
       method: 'HeapSnapshot.parse',
-      params: [path, options],
+      params: [json, options],
     })
 
     // Wait for the result
