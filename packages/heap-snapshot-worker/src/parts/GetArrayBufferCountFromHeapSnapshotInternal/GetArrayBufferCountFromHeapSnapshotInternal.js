@@ -1,4 +1,4 @@
-import { getThingCountFromHeapSnapshotInternal } from '../GetObjectCountFromHeapSnapshotInternal/GetThingCountFromHeapSnapshotInternal.js'
+import { getThingCountFromHeapSnapshot } from '../GetThingCountFromHeapSnapshot/GetThingCountFromHeapSnapshot.js'
 
 /**
  *
@@ -6,5 +6,8 @@ import { getThingCountFromHeapSnapshotInternal } from '../GetObjectCountFromHeap
  * @returns {number}
  */
 export const getArrayBufferCountFromHeapSnapshotInternal = (snapshot) => {
-  return getThingCountFromHeapSnapshotInternal(snapshot, 'object', 'ArrayBuffer')
+  const arrayBufferCount = getThingCountFromHeapSnapshot(snapshot, 'object', 'ArrayBuffer')
+  const float32ArrayCount = getThingCountFromHeapSnapshot(snapshot, 'object', 'Float32Array')
+  
+  return arrayBufferCount + float32ArrayCount
 }
