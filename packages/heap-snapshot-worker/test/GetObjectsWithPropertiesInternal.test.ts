@@ -41,7 +41,7 @@ test('should find objects with specified property', () => {
     propertyValue: '[Object 4]',
     type: 'object',
     selfSize: 32,
-    edgeCount: 0,
+    edgeCount: 0
   })
   expect(result[1]).toEqual({
     id: 5,
@@ -49,7 +49,7 @@ test('should find objects with specified property', () => {
     propertyValue: '[Object 5]',
     type: 'object',
     selfSize: 32,
-    edgeCount: 0,
+    edgeCount: 0
   })
 })
 
@@ -118,7 +118,7 @@ test('should handle string property values', () => {
     propertyValue: 'hello',
     type: 'string',
     selfSize: 50,
-    edgeCount: 0,
+    edgeCount: 0
   })
 })
 
@@ -138,7 +138,7 @@ test('should handle number property values', () => {
     nodes: new Uint32Array([
       // type, name, id, self_size, edge_count, trace_node_id, detachedness
       3, 2, 1, 100, 1, 0, 0,  // Object1
-      8, 42, 2, 50, 0, 0, 0,  // Number value 42
+      7, 42, 2, 50, 0, 0, 0,  // Number value 42
     ]),
     edges: new Uint32Array([
       // type, name_or_index, to_node
@@ -157,7 +157,7 @@ test('should handle number property values', () => {
     propertyValue: '42',
     type: 'number',
     selfSize: 50,
-    edgeCount: 0,
+    edgeCount: 0
   })
 })
 

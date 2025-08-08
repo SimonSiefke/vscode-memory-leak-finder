@@ -94,7 +94,7 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
         if (targetNode.type === 2) {
           // string
           result.propertyValue = getNodeName(targetNode)
-        } else if (targetNode.type === 8) {
+        } else if (targetNode.type === 7) {
           // number
           result.propertyValue = targetNode.name?.toString() || null // name field contains the number value
         } else if (targetNode.type === 3) {
