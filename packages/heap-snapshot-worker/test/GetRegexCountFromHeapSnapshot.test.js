@@ -1,9 +1,27 @@
 import { expect, test } from '@jest/globals'
-import { getRegexCountFromHeapSnapshot } from '../src/parts/GetRegexCountFromHeapSnapshot/GetRegexCountFromHeapSnapshot.js'
-import { join } from 'path'
+import { getRegexCountFromHeapSnapshotInternal } from '../src/parts/GetRegexCountFromHeapSnapshotInternal/GetRegexCountFromHeapSnapshotInternal.js'
 
-test.skip('should count regexp objects from heap snapshot', async () => {
-  const path = join(process.cwd(), '.vscode-heapsnapshots', '0.json')
-  const count = await getRegexCountFromHeapSnapshot(path)
-  expect(count).toBe(435)
+test('should count regexp objects from heap snapshot', () => {
+  // prettier-ignore
+  const testData = {
+      snapshot: {
+        meta: {
+          node_types: [['hidden', 'array', 'string', 'object', 'regexp']],
+          node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+          edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+          edge_fields: ['type', 'name_or_index', 'to_node'],
+          location_fields: ['object_index', 'script_id', 'line', 'column'],
+        },
+        node_count: 1,
+        edge_count: 0,
+      },
+      nodes: [
+        4, 1, 200, 32, 0, 0, 0, // regexp object
+      ],
+      edges: [],
+      locations: [],
+      strings: ['', '/test/gi'],
+    }
+  const result = getRegexCountFromHeapSnapshotInternal(testData)
+  expect(result).toEqual(1)
 })
