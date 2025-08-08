@@ -10,7 +10,6 @@ const testWorkerCount = async () => {
     const count = await getWorkerCountFromHeapSnapshot(filePath1)
     console.log({ count })
     console.log('Expected: 3')
-
   } catch (error) {
     console.error('Error:', error.message)
   }
