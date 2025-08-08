@@ -146,12 +146,12 @@ export const runTests = async (
               }
               after = await MemoryLeakFinder.stopWithWorkers(memoryLeakWorkerRpc, connectionId, targetId)
               result = await MemoryLeakFinder.compareWithWorkers(memoryLeakWorkerRpc, connectionId, before, after)
-              
+
               // Save main result
               const fileName = dirent.replace('.js', '.json')
               const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
               await JsonFile.writeJson(resultPath, result)
-              
+
               // Save individual worker results if any workers were detected
               for (const [workerName, workerResult] of Object.entries(result)) {
                 if (workerName !== 'main' && workerName !== 'isLeak') {

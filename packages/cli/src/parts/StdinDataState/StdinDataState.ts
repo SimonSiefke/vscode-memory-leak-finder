@@ -45,23 +45,23 @@ export const setState = (newState) => {
   state.workers = newState.workers
 }
 
-export const setBuffering = (value: boolean): void => {
+export const setBuffering = (value) => {
   state.buffering = value
 }
 
-export const isBuffering = (): boolean => {
+export const isBuffering = () => {
   return state.buffering
 }
 
-export const isWatchMode = (): boolean => {
+export const isWatchMode = () => {
   return state.watch
 }
 
-export const shouldCheckLeaks = (): boolean => {
+export const shouldCheckLeaks = () => {
   return state.checkLeaks
 }
 
-export const getRuns = (): number => {
+export const getRuns = () => {
   return state.runs
 }
 
