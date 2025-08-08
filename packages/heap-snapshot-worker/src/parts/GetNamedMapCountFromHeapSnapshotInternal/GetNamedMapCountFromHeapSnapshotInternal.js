@@ -42,7 +42,6 @@ export const getNamedMapCountFromHeapSnapshotInternal = (snapshot) => {
 
     // Find edges that point to this Map object
     for (let i = 0; i < edges.length; i += ITEMS_PER_EDGE) {
-      const edgeType = edges[i]
       const edgeNameOrIndex = edges[i + 1]
       const edgeToNode = edges[i + 2]
 
