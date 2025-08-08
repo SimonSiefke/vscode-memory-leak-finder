@@ -3,6 +3,7 @@ import { getObjectsWithPropertiesInternal } from '../src/parts/GetObjectsWithPro
 import type { Snapshot } from '../src/parts/Snapshot/Snapshot.js'
 
 test('should find objects with specified property', () => {
+  // prettier-ignore
   const snapshot: Snapshot = {
     node_count: 5,
     edge_count: 2,
@@ -14,7 +15,6 @@ test('should find objects with specified property', () => {
       edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
       location_fields: ['object_index', 'script_id', 'line', 'column']
     },
-    // prettier-ignore
     nodes: new Uint32Array([
       // type, name, id, self_size, edge_count, trace_node_id, detachedness
       3, 2, 1, 100, 2, 0, 0,  // Object1 with property "test"
@@ -23,7 +23,6 @@ test('should find objects with specified property', () => {
       3, 5, 4, 32, 0, 0, 0,   // Property value object for Object1
       3, 6, 5, 32, 0, 0, 0,   // Property value object for Object2
     ]),
-    // prettier-ignore
     edges: new Uint32Array([
       // type, name_or_index, to_node
       2, 1, 3,  // property edge from Object1 to property value object
@@ -55,6 +54,7 @@ test('should find objects with specified property', () => {
 })
 
 test('should return empty array when property not found', () => {
+  // prettier-ignore
   const snapshot: Snapshot = {
     node_count: 1,
     edge_count: 1,
@@ -66,12 +66,10 @@ test('should return empty array when property not found', () => {
       edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
       location_fields: ['object_index', 'script_id', 'line', 'column']
     },
-    // prettier-ignore
     nodes: new Uint32Array([
       // type, name, id, self_size, edge_count, trace_node_id, detachedness
       3, 1, 1, 100, 1, 0, 0,  // Object1 with property "test"
     ]),
-    // prettier-ignore
     edges: new Uint32Array([
       // type, name_or_index, to_node
       2, 1, 0,  // property edge from Object1 to "test" property
@@ -86,6 +84,7 @@ test('should return empty array when property not found', () => {
 })
 
 test('should handle string property values', () => {
+  // prettier-ignore
   const snapshot: Snapshot = {
     node_count: 2,
     edge_count: 1,
@@ -97,13 +96,11 @@ test('should handle string property values', () => {
       edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
       location_fields: ['object_index', 'script_id', 'line', 'column']
     },
-    // prettier-ignore
     nodes: new Uint32Array([
       // type, name, id, self_size, edge_count, trace_node_id, detachedness
       3, 2, 1, 100, 1, 0, 0,  // Object1
       2, 3, 2, 50, 0, 0, 0,   // String value "hello"
     ]),
-    // prettier-ignore
     edges: new Uint32Array([
       // type, name_or_index, to_node
       2, 1, 1,  // property edge from Object1 to string value
