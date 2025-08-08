@@ -1,5 +1,5 @@
-import { getObjectCountFromHeapSnapshot } from '../GetObjectCountFromHeapSnapshot/GetObjectCountFromHeapSnapshot.js'
+import { getThingCountFromHeapSnapshot } from '../GetThingCountFromHeapSnapshot/GetThingCountFromHeapSnapshot.js'
 
 export const getMapCountFromHeapSnapshot = async (path) => {
-  return getObjectCountFromHeapSnapshot(path, 'Map')
+  return getThingCountFromHeapSnapshot(path, 'object', 'Map')
 }
