@@ -409,7 +409,7 @@ test('should handle code object with incoming string reference (like the real ca
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '[Object 1]',
+    propertyValue: '"1"',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
@@ -458,7 +458,7 @@ test('should handle code object with multiple incoming references (prioritize "1
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '[Object 1]',
+    propertyValue: '"1"',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
@@ -502,7 +502,7 @@ test('should handle code object with no internal references but incoming referen
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '[Object 1]',
+    propertyValue: '"hello"',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
@@ -548,7 +548,7 @@ test('should handle code object with both internal and incoming references (prio
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '[Object 1]',
+    propertyValue: '"incoming"',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
@@ -590,12 +590,12 @@ test('should handle code object with no references at all', () => {
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '[Object 1]',
+    propertyValue: '[code 2]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '[Object 1]',
+      test: '[code 2]',
     },
   })
 })
