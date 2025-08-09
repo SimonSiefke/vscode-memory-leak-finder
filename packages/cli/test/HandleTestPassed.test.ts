@@ -5,7 +5,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-const mockInvoke = jest.fn()
+const mockInvoke = jest.fn<Promise<string>, [string, ...any[]]>()
 
 jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   return {
