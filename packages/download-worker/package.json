@@ -16,6 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "@lvce-editor/assert": "^1.4.0",
+    "@lvce-editor/rpc": "^4.14.0",
     "@lvce-editor/verror": "^1.7.0",
     "@vscode/test-electron": "^2.5.2",
     "extract-zip": "^2.0.1",

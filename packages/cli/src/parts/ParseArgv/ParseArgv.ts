@@ -43,6 +43,7 @@ export const parseArgv = (argv) => {
     vscodePath: '',
     commit: '',
     setupOnly: false,
+    workers: false,
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -97,6 +98,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--setup-only')) {
     options.setupOnly = true
+  }
+  if (argv.includes('--workers')) {
+    options.workers = true
   }
   return options
 }
