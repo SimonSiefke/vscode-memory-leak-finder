@@ -99,13 +99,13 @@ test('should detect boolean false values from hidden nodes', () => {
   expect(result[0]).toEqual({
     id: 1,
     name: 'TestObject',
-    propertyValue: 'false',
+    propertyValue: false,
     type: 'object',
     selfSize: 100,
     edgeCount: 2,
     preview: {
-      isExpanded: 'true',
-      isCollapsed: 'false',
+      isExpanded: true,
+      isCollapsed: false,
     },
   })
 })
@@ -142,12 +142,12 @@ test('should handle explicit boolean node names', () => {
   expect(result[0]).toEqual({
     id: 1,
     name: 'TestObject',
-    propertyValue: 'true',
+    propertyValue: true,
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      enabled: 'true',
+      enabled: true,
     },
   })
 })
