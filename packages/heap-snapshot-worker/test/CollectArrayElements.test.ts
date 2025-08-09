@@ -1,6 +1,5 @@
 import { test, expect } from '@jest/globals'
 import { collectArrayElements } from '../src/parts/CollectArrayElements/CollectArrayElements.ts'
-import { createDefaultState } from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 import { createEdgeMap } from '../src/parts/CreateEdgeMap/CreateEdgeMap.ts'
 
