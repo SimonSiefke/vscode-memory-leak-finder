@@ -595,7 +595,7 @@ test('should handle code object with no references at all', () => {
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '[code 2]',
+      test: '[Object 1]',
     },
   })
 })
