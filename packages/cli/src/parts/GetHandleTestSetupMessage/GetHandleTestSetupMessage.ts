@@ -1,5 +1,5 @@
-import * as TestPrefix from '../TestPrefix/TestPrefix.ts'
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
-export const getHandleTestSetupMessage = (): string => {
-  return `\n${TestPrefix.Setup}\n`
+export const getHandleTestSetupMessage = async (): Promise<string> => {
+  return StdoutWorker.invoke('Stdout.getHandleTestSetupMessage')
 }
