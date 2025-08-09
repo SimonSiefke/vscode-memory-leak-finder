@@ -1,11 +1,11 @@
 import { test, expect } from '@jest/globals'
 import { getUndefinedValue, getUndefinedStructure } from '../src/parts/GetUndefinedValue/GetUndefinedValue.ts'
 import { createEdgeMap } from '../src/parts/CreateEdgeMap/CreateEdgeMap.ts'
-import { createTestSnapshot } from './helpers/createTestSnapshot.ts'
+import { createTestSnapshot } from './createTestSnapshot.ts'
 
 test('getUndefinedValue - should detect undefined value by name and type', () => {
   const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
-  const nodeTypes = [['hidden', 'string', 'object']]
+  const nodeTypes: [readonly string[]] = [['hidden', 'string', 'object']]
   const strings = ['undefined', 'test']
 
   // Create a hidden node with name "undefined"
@@ -35,7 +35,7 @@ test('getUndefinedValue - should detect undefined value by name and type', () =>
 
 test('getUndefinedValue - should return null for non-undefined nodes', () => {
   const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
-  const nodeTypes = [['hidden', 'string', 'object']]
+  const nodeTypes: [readonly string[]] = [['hidden', 'string', 'object']]
   const strings = ['test', 'other']
 
   const testNode = {

@@ -3,7 +3,7 @@ import { getNodeName } from '../src/parts/GetNodeName/GetNodeName.ts'
 import { getActualValue } from '../src/parts/GetActualValue/GetActualValue.ts'
 import { examineNodeByIndex } from '../src/parts/ExamineNode/ExamineNode.ts'
 import { createEdgeMap } from '../src/parts/CreateEdgeMap/CreateEdgeMap.ts'
-import { createTestSnapshot } from './helpers/createTestSnapshot.ts'
+import { createTestSnapshot } from './createTestSnapshot.ts'
 
 test('getNodeName - should handle empty strings correctly', () => {
   const strings = ['', 'hello', 'world']

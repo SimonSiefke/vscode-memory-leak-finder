@@ -1,6 +1,6 @@
 import { test, expect } from '@jest/globals'
 import { examineNodeByIndex } from '../src/parts/ExamineNode/ExamineNode.ts'
-import { createTestSnapshot } from './helpers/createTestSnapshot.ts'
+import { createTestSnapshot } from './createTestSnapshot.ts'
 
 test('demonstrate improved undefined property detection', () => {
   // Create a mock snapshot that represents an object with undefined properties
