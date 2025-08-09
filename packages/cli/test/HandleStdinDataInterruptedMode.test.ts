@@ -14,6 +14,20 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   }
 })
 
+jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
+  return {
+    invoke: jest.fn().mockImplementation((method: string) => {
+      if (method === 'Stdout.getClear') {
+        return Promise.resolve('\u001B[2J\u001B[3J\u001B[H')
+      }
+      if (method === 'Stdout.getPatternUsageMessage') {
+        return Promise.resolve('\n\u001B[1mPattern Mode Usage\u001B[22m\n \u001B[2m› Press\u001B[22m Esc \u001B[2mto exit pattern mode.\u001B[22m\n \u001B[2m› Press\u001B[22m Enter \u001B[2mto filter by a regex pattern.\u001B[22m\n\n\u001B[2m pattern ›\u001B[22m ')
+      }
+      throw new Error(`unexpected method ${method}`)
+    }),
+  }
+})
+
 jest.unstable_mockModule('../src/parts/IsWindows/IsWindows.ts', () => {
   return {
     isWindows: false,

@@ -17,6 +17,22 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   }
 })
 
+jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
+  return {
+    invoke: jest.fn().mockImplementation((method: string, ...args: any[]) => {
+      if (method === 'Stdout.getHandleTestRunningMessage') {
+        const [file, relativeDirName, fileName, isFirst] = args
+        if (isFirst) {
+          return Promise.resolve('\n\u001B[0m\u001B[7m\u001B[33m\u001B[1m RUNS \u001B[22m\u001B[39m\u001B[27m\u001B[0m \u001B[2m/test/\u001B[22m\u001B[1mapp.test.js\u001B[22m\n')
+        } else {
+          return Promise.resolve('\n\u001B[0m\u001B[7m\u001B[33m\u001B[1m RUNS \u001B[22m\u001B[39m\u001B[27m\u001B[0m \u001B[2m/test/\u001B[22m\u001B[1mapp.test.js\u001B[22m\n')
+        }
+      }
+      throw new Error(`unexpected method ${method}`)
+    }),
+  }
+})
+
 const Stdout = await import('../src/parts/Stdout/Stdout.ts')
 const HandleTestRunning = await import('../src/parts/HandleTestRunning/HandleTestRunning.ts')
 
@@ -28,8 +44,8 @@ test.skip('handleTestRunning - first', () => {
   )
 })
 
-test('handleTestRunning - second', () => {
-  HandleTestRunning.handleTestRunning('/test/app.test.js', '/test', 'app.test.js', /* isFirst */ false)
+test('handleTestRunning - second', async () => {
+  await HandleTestRunning.handleTestRunning('/test/app.test.js', '/test', 'app.test.js', /* isFirst */ false)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
     '\n' +

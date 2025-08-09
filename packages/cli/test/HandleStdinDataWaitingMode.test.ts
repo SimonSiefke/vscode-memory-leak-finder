@@ -16,6 +16,23 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   }
 })
 
+jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
+  return {
+    invoke: jest.fn().mockImplementation((method: string) => {
+      if (method === 'Stdout.getEraseLine') {
+        return Promise.resolve('\u001B[2K')
+      }
+      if (method === 'Stdout.getCursorLeft') {
+        return Promise.resolve('\u001B[G')
+      }
+      if (method === 'Stdout.getClear') {
+        return Promise.resolve('\u001B[2J\u001B[3J\u001B[H')
+      }
+      throw new Error(`unexpected method ${method}`)
+    }),
+  }
+})
+
 const Stdout = await import('../src/parts/Stdout/Stdout.ts')
 const HandleStdinDataWaitingMode = await import('../src/parts/HandleStdinDataWaitingMode/HandleStdinDataWaitingMode.ts')
 

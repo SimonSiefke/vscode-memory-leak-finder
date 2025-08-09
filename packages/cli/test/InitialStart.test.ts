@@ -10,6 +10,17 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
     write: jest.fn().mockImplementation(() => Promise.resolve()),
   }
 })
+
+jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
+  return {
+    invoke: jest.fn().mockImplementation((method: string) => {
+      if (method === 'Stdout.getWatchUsageMessage') {
+        return Promise.resolve('watch usage')
+      }
+      throw new Error(`unexpected method ${method}`)
+    }),
+  }
+})
 jest.unstable_mockModule('../src/parts/WatchUsage/WatchUsage.ts', () => {
   return {
     print: jest.fn(() => 'watch usage'),
