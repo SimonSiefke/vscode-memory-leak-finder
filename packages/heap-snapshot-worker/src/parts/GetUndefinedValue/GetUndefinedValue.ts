@@ -27,7 +27,7 @@ const analyzeUndefinedNodes = (snapshot: Snapshot): { undefinedNodeId: number | 
   const idFieldIndex = nodeFields.indexOf('id')
 
   // Find the string index for "undefined"
-  const undefinedStringIndex = strings.findIndex(str => str === 'undefined')
+  const undefinedStringIndex = strings.findIndex((str) => str === 'undefined')
 
   let undefinedNodeId: number | null = null
 

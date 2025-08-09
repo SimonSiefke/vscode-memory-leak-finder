@@ -64,10 +64,10 @@ test('analyze node ID 67 from abc2.heapsnapshot', async () => {
 
     // Additional analysis for object properties
     console.log('\n=== DETAILED EDGE ANALYSIS ===')
-    const propertyEdges = result.edges.filter(edge => edge.typeName === 'property')
-    const internalEdges = result.edges.filter(edge => edge.typeName === 'internal')
-    const contextEdges = result.edges.filter(edge => edge.typeName === 'context')
-    const elementEdges = result.edges.filter(edge => edge.typeName === 'element')
+    const propertyEdges = result.edges.filter((edge) => edge.typeName === 'property')
+    const internalEdges = result.edges.filter((edge) => edge.typeName === 'internal')
+    const contextEdges = result.edges.filter((edge) => edge.typeName === 'context')
+    const elementEdges = result.edges.filter((edge) => edge.typeName === 'element')
 
     console.log(`Property edges: ${propertyEdges.length}`)
     console.log(`Internal edges: ${internalEdges.length}`)
@@ -76,7 +76,6 @@ test('analyze node ID 67 from abc2.heapsnapshot', async () => {
 
     expect(result).toBeDefined()
     expect(result.nodeId).toBe(67)
-
   } catch (error) {
     console.error('Error analyzing node 67:', error)
     throw error
@@ -108,39 +107,38 @@ test('search for undefined nodes in abc2.heapsnapshot', async () => {
     const idFieldIndex = node_fields.indexOf('id')
 
     // Find the string index for "undefined"
-    const undefinedStringIndex = strings.findIndex(str => str === 'undefined')
+    const undefinedStringIndex = strings.findIndex((str) => str === 'undefined')
     console.log(`"undefined" string index: ${undefinedStringIndex}`)
 
     if (undefinedStringIndex !== -1) {
-          // Find all nodes with name "undefined"
-    const undefinedNodes: Array<{nodeIndex: number, id: number, typeName: string}> = []
-    for (let i = 0; i < nodes.length; i += ITEMS_PER_NODE) {
-      const nameIndex = nodes[i + nameFieldIndex]
-      const nodeId = nodes[i + idFieldIndex]
-      const typeIndex = nodes[i + typeFieldIndex]
-      
-      if (nameIndex === undefinedStringIndex) {
-        const typeName = node_types[0] ? node_types[0][typeIndex] : 'unknown'
-        undefinedNodes.push({
-          nodeIndex: i / ITEMS_PER_NODE,
-          id: nodeId,
-          typeName
-        })
+      // Find all nodes with name "undefined"
+      const undefinedNodes: Array<{ nodeIndex: number; id: number; typeName: string }> = []
+      for (let i = 0; i < nodes.length; i += ITEMS_PER_NODE) {
+        const nameIndex = nodes[i + nameFieldIndex]
+        const nodeId = nodes[i + idFieldIndex]
+        const typeIndex = nodes[i + typeFieldIndex]
+
+        if (nameIndex === undefinedStringIndex) {
+          const typeName = node_types[0] ? node_types[0][typeIndex] : 'unknown'
+          undefinedNodes.push({
+            nodeIndex: i / ITEMS_PER_NODE,
+            id: nodeId,
+            typeName,
+          })
+        }
       }
-    }
 
       console.log(`Found ${undefinedNodes.length} nodes with name "undefined":`)
-      undefinedNodes.forEach(node => {
+      undefinedNodes.forEach((node) => {
         console.log(`  Node ID ${node.id} (index ${node.nodeIndex}): ${node.typeName}`)
       })
 
       // Check if node 67 is among them
-      const node67 = undefinedNodes.find(node => node.id === 67)
+      const node67 = undefinedNodes.find((node) => node.id === 67)
       if (node67) {
         console.log('\n*** NODE 67 IS AN UNDEFINED VALUE! ***')
       }
     }
-
   } catch (error) {
     console.error('Error searching for undefined nodes:', error)
     throw error

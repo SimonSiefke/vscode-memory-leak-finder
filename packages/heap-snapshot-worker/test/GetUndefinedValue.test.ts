@@ -14,7 +14,7 @@ test('getUndefinedValue - should detect undefined value by name and type', () =>
     name: 0, // "undefined"
     id: 67,
     self_size: 0,
-    edge_count: 0
+    edge_count: 0,
   }
 
   const snapshot = createTestSnapshot(
@@ -24,7 +24,7 @@ test('getUndefinedValue - should detect undefined value by name and type', () =>
     nodeFields,
     ['type', 'name_or_index', 'to_node'],
     nodeTypes,
-    [['property', 'internal']]
+    [['property', 'internal']],
   )
 
   const edgeMap = createEdgeMap(snapshot.nodes, nodeFields)
@@ -43,7 +43,7 @@ test('getUndefinedValue - should return null for non-undefined nodes', () => {
     name: 0, // "test"
     id: 1,
     self_size: 10,
-    edge_count: 0
+    edge_count: 0,
   }
 
   const snapshot = createTestSnapshot(
@@ -53,7 +53,7 @@ test('getUndefinedValue - should return null for non-undefined nodes', () => {
     nodeFields,
     ['type', 'name_or_index', 'to_node'],
     nodeTypes,
-    [['property', 'internal']]
+    [['property', 'internal']],
   )
 
   const edgeMap = createEdgeMap(snapshot.nodes, nodeFields)
@@ -72,32 +72,34 @@ test('getUndefinedStructure - should detect undefined property structure', () =>
   // Create nodes: object with undefined property
   const nodes = new Uint32Array([
     // Object node at index 0
-    0, 0, 1, 100, 1, // type=object, name=Object, id=1, size=100, edges=1
+    0,
+    0,
+    1,
+    100,
+    1, // type=object, name=Object, id=1, size=100, edges=1
     // Undefined node at index 1
-    1, 1, 67, 0, 0   // type=hidden, name=undefined, id=67, size=0, edges=0
+    1,
+    1,
+    67,
+    0,
+    0, // type=hidden, name=undefined, id=67, size=0, edges=0
   ])
 
   // Create edge: property edge from object to undefined
   const edges = new Uint32Array([
-    0, 2, 5 // type=property, name=testProp, to_node=5 (index 1 * 5 fields)
+    0,
+    2,
+    5, // type=property, name=testProp, to_node=5 (index 1 * 5 fields)
   ])
 
-  const snapshot = createTestSnapshot(
-    nodes,
-    edges,
-    strings,
-    nodeFields,
-    edgeFields,
-    nodeTypes,
-    edgeTypes
-  )
+  const snapshot = createTestSnapshot(nodes, edges, strings, nodeFields, edgeFields, nodeTypes, edgeTypes)
 
   const sourceNode = {
     type: 0,
     name: 0,
     id: 1,
     self_size: 100,
-    edge_count: 1
+    edge_count: 1,
   }
 
   const edgeMap = createEdgeMap(nodes, nodeFields)

@@ -2,6 +2,7 @@ import * as ParseHeapSnapshot from '../src/parts/ParseHeapSnapshot/ParseHeapSnap
 import { test, expect } from '@jest/globals'
 
 test('single node', () => {
+  // prettier-ignore
   const heapsnapshot = {
     snapshot: {
       meta: {

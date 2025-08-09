@@ -18,12 +18,12 @@ test('analyze object with string properties including empty strings', async () =
 
     const snapshot = await prepareHeapSnapshot(heapSnapshotPath, { parseStrings: true })
 
-        console.log('\n=== SEARCHING FOR OBJECTS WITH STRING PROPERTIES ===')
+    console.log('\n=== SEARCHING FOR OBJECTS WITH STRING PROPERTIES ===')
     const { nodes, edges, strings, meta } = snapshot
     const { node_fields, node_types, edge_fields, edge_types } = meta
     const ITEMS_PER_NODE = node_fields.length
     const ITEMS_PER_EDGE = edge_fields.length
-    
+
     const typeFieldIndex = node_fields.indexOf('type')
     const idFieldIndex = node_fields.indexOf('id')
     const edgeCountFieldIndex = node_fields.indexOf('edge_count')
@@ -41,18 +41,22 @@ test('analyze object with string properties including empty strings', async () =
       return
     }
 
-        // Find objects that have string properties
-    const objectsWithStringProps: Array<{nodeId: number, nodeIndex: number, stringProperties: Array<{propertyName: string, targetNodeId: number, targetNodeIndex: number}>}> = []
+    // Find objects that have string properties
+    const objectsWithStringProps: Array<{
+      nodeId: number
+      nodeIndex: number
+      stringProperties: Array<{ propertyName: string; targetNodeId: number; targetNodeIndex: number }>
+    }> = []
     let currentEdgeOffset = 0
-    
+
     for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex += ITEMS_PER_NODE) {
       const typeIndex = nodes[nodeIndex + typeFieldIndex]
       const nodeId = nodes[nodeIndex + idFieldIndex]
       const edgeCount = nodes[nodeIndex + edgeCountFieldIndex]
-      
+
       if (typeIndex === objectTypeIndex) {
         // Check this object's edges for string properties
-        const stringProperties: Array<{propertyName: string, targetNodeId: number, targetNodeIndex: number}> = []
+        const stringProperties: Array<{ propertyName: string; targetNodeId: number; targetNodeIndex: number }> = []
 
         for (let j = 0; j < edgeCount; j++) {
           const edgeIndex = (currentEdgeOffset + j) * ITEMS_PER_EDGE
@@ -72,7 +76,7 @@ test('analyze object with string properties including empty strings', async () =
                 stringProperties.push({
                   propertyName,
                   targetNodeId,
-                  targetNodeIndex
+                  targetNodeIndex,
                 })
               }
             }
@@ -83,7 +87,7 @@ test('analyze object with string properties including empty strings', async () =
           objectsWithStringProps.push({
             nodeId,
             nodeIndex: nodeIndex / ITEMS_PER_NODE,
-            stringProperties
+            stringProperties,
           })
         }
       }
@@ -104,10 +108,10 @@ test('analyze object with string properties including empty strings', async () =
         console.log(`Properties (${result.properties.length} total):`)
 
         // Show string properties specifically
-        const stringProps = result.properties.filter(p => p.targetType === 'string')
+        const stringProps = result.properties.filter((p) => p.targetType === 'string')
         if (stringProps.length > 0) {
           console.log('String properties:')
-          stringProps.forEach(prop => {
+          stringProps.forEach((prop) => {
             let valueDisplay = prop.value
             if (prop.value === '""') {
               valueDisplay = '🔴 "" (empty string)'
@@ -121,10 +125,10 @@ test('analyze object with string properties including empty strings', async () =
         }
 
         // Show a few non-string properties for context
-        const otherProps = result.properties.filter(p => p.targetType !== 'string').slice(0, 3)
+        const otherProps = result.properties.filter((p) => p.targetType !== 'string').slice(0, 3)
         if (otherProps.length > 0) {
           console.log('Other properties (sample):')
-          otherProps.forEach(prop => {
+          otherProps.forEach((prop) => {
             console.log(`  ${prop.name}: ${prop.value} (${prop.targetType})`)
           })
         }
@@ -142,10 +146,10 @@ test('analyze object with string properties including empty strings', async () =
     for (const obj of objectsWithStringProps.slice(0, 10)) {
       const result = examineNodeById(obj.nodeId, snapshot)
       if (result) {
-        const emptyStringProps = result.properties.filter(p => p.value === '""')
+        const emptyStringProps = result.properties.filter((p) => p.value === '""')
         if (emptyStringProps.length > 0) {
           console.log(`Object ${obj.nodeId} has empty string properties:`)
-          emptyStringProps.forEach(prop => {
+          emptyStringProps.forEach((prop) => {
             console.log(`  ${prop.name}: ${prop.value}`)
           })
           foundEmptyStrings = true
@@ -157,7 +161,6 @@ test('analyze object with string properties including empty strings', async () =
       console.log('No empty string properties found in the first 10 objects checked.')
       console.log('This is normal - empty strings are relatively rare in most applications.')
     }
-
   } catch (error) {
     console.error('Error analyzing objects with strings:', error)
     throw error

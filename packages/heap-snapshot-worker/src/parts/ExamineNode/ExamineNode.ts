@@ -98,10 +98,12 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
     // Get target node information
     const targetNodeIndex = Math.floor(edge.toNode / node_fields.length)
     const targetNode = parseNode(targetNodeIndex, nodes, node_fields)
-    const targetNodeInfo = targetNode ? {
-      name: getNodeName(targetNode, strings),
-      type: getNodeTypeName(targetNode, node_types)
-    } : undefined
+    const targetNodeInfo = targetNode
+      ? {
+          name: getNodeName(targetNode, strings),
+          type: getNodeTypeName(targetNode, node_types),
+        }
+      : undefined
 
     return {
       type: edge.type,
@@ -109,14 +111,14 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
       nameIndex: edge.nameIndex,
       edgeName,
       toNode: edge.toNode,
-      targetNodeInfo
+      targetNodeInfo,
     }
   })
 
   // Extract properties (property-type edges) with improved value detection
   const properties = processedEdges
-    .filter(edge => edge.typeName === 'property')
-    .map(edge => {
+    .filter((edge) => edge.typeName === 'property')
+    .map((edge) => {
       let actualValue = edge.targetNodeInfo?.name || null
 
       // Try to get the actual value using improved detection for booleans, undefined, etc.
@@ -142,11 +144,11 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
         // Quote string values for display, handle empty strings properly
         displayValue = `"${actualValue}"`
       }
-      
+
       return {
         name: edge.edgeName,
         value: displayValue,
-        targetType: edge.targetNodeInfo?.type || null
+        targetType: edge.targetNodeInfo?.type || null,
       }
     })
 
@@ -157,7 +159,7 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
     nodeName,
     nodeType,
     edges: processedEdges,
-    properties
+    properties,
   }
 }
 
