@@ -4,6 +4,6 @@ const interruptedText = 'Test run was interrupted.'
 
 const interruptedMessage = chalk.bold.red(interruptedText)
 
-export const print = () => {
+export const print = (): string => {
   return interruptedMessage
 }
