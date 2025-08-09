@@ -25,10 +25,10 @@ export default {
   coverageDirectory: 'coverage',
   coverageThreshold: {
     global: {
-      branches: 37,
-      functions: 43,
-      lines: 51,
-      statements: 51,
+      branches: 67,
+      functions: 56,
+      lines: 64,
+      statements: 64,
     },
   },
   coveragePathIgnorePatterns: [
