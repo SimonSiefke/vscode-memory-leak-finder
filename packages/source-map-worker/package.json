@@ -18,6 +18,15 @@
     "source-map": "^0.7.6"
   },
   "jest": {
+    "extensionsToTreatAsEsm": [".ts"],
+    "transform": {
+      "^.+\\.ts$": ["ts-jest", {
+        "useESM": true
+      }]
+    },
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    },
     "injectGlobals": false,
     "collectCoverage": true,
     "coverageThreshold": {

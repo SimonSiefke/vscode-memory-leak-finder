@@ -1,11 +1,14 @@
 import { readFile } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { SourceMapConsumer } from 'source-map'
-import * as Assert from '../Assert/Assert.js'
-import * as GetOriginalClassName from '../GetOriginalClassName/GetOriginalClassName.js'
-import { root } from '../Root/Root.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as GetOriginalClassName from '../GetOriginalClassName/GetOriginalClassName.ts'
+import { root } from '../Root/Root.ts'
 
-import type { RawSourceMap } from 'source-map'
+interface SourceMapData {
+  sources: string[]
+  [key: string]: any
+}
 
 interface OriginalPosition {
   source: string | null
@@ -14,7 +17,7 @@ interface OriginalPosition {
   name: string | null
 }
 
-export const getOriginalPosition = async (sourceMap: RawSourceMap, line: number, column: number): Promise<OriginalPosition> => {
+export const getOriginalPosition = async (sourceMap: SourceMapData, line: number, column: number): Promise<OriginalPosition> => {
   Assert.object(sourceMap)
   Assert.number(line)
   Assert.number(column)
@@ -32,7 +35,7 @@ export const getOriginalPosition = async (sourceMap: RawSourceMap, line: number,
   }
 }
 
-export const getOriginalPositions = async (sourceMap: RawSourceMap, positions: number[], classNames: boolean, hash: string): Promise<OriginalPosition[]> => {
+export const getOriginalPositions = async (sourceMap: SourceMapData, positions: number[], classNames: boolean, hash: string): Promise<OriginalPosition[]> => {
   Assert.object(sourceMap)
   Assert.array(positions)
   const originalPositions = await SourceMapConsumer.with(sourceMap, null, async (consumer) => {
@@ -44,7 +47,7 @@ export const getOriginalPositions = async (sourceMap: RawSourceMap, positions: n
         line: line + 1,
         column: column + 1,
       })
-      if (classNames && originalPosition.source && originalPosition.line !== null && originalPosition.column !== null) {
+      if (classNames && originalPosition.source) {
         const index: number = sourceMap.sources.indexOf(originalPosition.source)
         if (index !== -1) {
           // TODO maybe compute this separately

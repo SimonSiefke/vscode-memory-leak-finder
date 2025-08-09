@@ -1,4 +1,4 @@
-export const cleanSource = (source: string | undefined | null): string => {
+export const cleanSource = (source: string | undefined): string => {
   if (!source) {
     return ''
   }

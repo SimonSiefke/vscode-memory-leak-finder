@@ -1,10 +1,10 @@
-import * as CleanSource from '../CleanSource/CleanSource.js'
+import * as CleanSource from '../CleanSource/CleanSource.ts'
 
 interface Position {
-  source?: string | null
-  line?: number | null
-  column?: number | null
-  name?: string | null
+  source?: string
+  line?: number
+  column?: number
+  name?: string
 }
 
 export const getCleanPosition = (position: Position | null | undefined): Position | undefined => {
