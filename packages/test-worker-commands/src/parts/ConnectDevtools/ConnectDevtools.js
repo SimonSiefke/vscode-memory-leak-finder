@@ -63,13 +63,6 @@ export const connectDevtools = async (
       discover: true,
     }),
   ])
-
-  // if (isFirstConnection) {
-  //   await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-  //     functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
-  //     objectId: monkeyPatchedElectronId,
-  //   })
-  // }
   const electronApp = ElectronApp.create({
     electronRpc,
     electronObjectId,
