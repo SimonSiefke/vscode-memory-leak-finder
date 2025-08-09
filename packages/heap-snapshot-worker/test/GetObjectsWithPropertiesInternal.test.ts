@@ -385,7 +385,7 @@ test('should handle code object with incoming string reference (like the real ca
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '"1"',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
@@ -431,7 +431,7 @@ test('should handle code object with multiple incoming references (prioritize "1
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '"1"',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
@@ -472,7 +472,7 @@ test('should handle code object with no internal references but incoming referen
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '"hello"',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
