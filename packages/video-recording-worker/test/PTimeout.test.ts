@@ -8,8 +8,8 @@ test('pTimeout should resolve when promise resolves before timeout', async () =>
 })
 
 test('pTimeout should throw when timeout is reached', async () => {
-  const slowPromise = new Promise((resolve) => setTimeout(resolve, 200))
-  await expect(PTimeout.pTimeout(slowPromise, { milliseconds: 50 })).rejects.toThrow('timeout of 50ms reached')
+  const slowPromise = new Promise((resolve) => setTimeout(resolve, 1000))
+  await expect(PTimeout.pTimeout(slowPromise, { milliseconds: 100 })).rejects.toThrow('timeout of 100ms reached')
 })
 
 test('pTimeout should handle rejected promises', async () => {

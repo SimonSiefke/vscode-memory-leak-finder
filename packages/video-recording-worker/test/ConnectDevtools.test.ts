@@ -1,6 +1,5 @@
 import { test, expect } from '@jest/globals'
 import * as ConnectDevtools from '../src/parts/ConnectDevtools/ConnectDevtools.ts'
-import * as SessionState from '../src/parts/SessionState/SessionState.ts'
 
 test('ConnectDevtools - connectDevtools should throw with invalid URL', async () => {
   await expect(ConnectDevtools.connectDevtools('invalid-url')).rejects.toThrow()
