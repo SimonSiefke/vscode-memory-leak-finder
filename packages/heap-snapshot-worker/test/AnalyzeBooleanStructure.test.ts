@@ -336,5 +336,6 @@ test('enhanced boolean detection in GetObjectsWithPropertiesInternal', async ():
 
   expect(results).toHaveLength(1)
   expect(results[0].id).toBe(75)
-  expect(results[0].propertyValue).toBe('false (typed)') // Should detect the typed boolean pattern
+  expect(results[0].propertyValue).toBe(false) // Should detect the typed boolean pattern and return actual boolean
+  expect(results[0].preview?.breakpointsExpanded).toBe(false) // Preview should also show actual boolean
 })

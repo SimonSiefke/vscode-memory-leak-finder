@@ -40,25 +40,25 @@ test('should detect boolean values from hidden nodes with boolean-like property 
   expect(result[0]).toEqual({
     id: 1,
     name: 'TestObject1',
-    propertyValue: 'true',
+    propertyValue: true,
     type: 'object',
     selfSize: 100,
     edgeCount: 2,
     preview: {
-      isExpanded: 'true',
-      isVisible: 'false',
+      isExpanded: true,
+      isVisible: false,
     },
   })
 
   expect(result[1]).toEqual({
     id: 2,
     name: 'TestObject2',
-    propertyValue: 'true',
+    propertyValue: true,
     type: 'object',
     selfSize: 50,
     edgeCount: 1,
     preview: {
-      isExpanded: 'true',
+      isExpanded: true,
     },
   })
 })
