@@ -7,7 +7,7 @@ const toExitPatternMode = chalk.dim('to exit pattern mode.')
 const toFilterByARegexPattern = chalk.dim(`to filter by a regex pattern.`)
 const pattern = chalk.dim(' pattern \u203A')
 
-export const print = () => {
+export const print = (): string => {
   return `
 ${patternModeUsage}
  ${press} ${CliKeys.Escape} ${toExitPatternMode}
