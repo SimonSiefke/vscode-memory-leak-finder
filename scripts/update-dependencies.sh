@@ -38,7 +38,7 @@ cd packages/e2e && updateDependencies && cd ../../ &&
 cd packages/file-watcher-worker && updateDependencies && cd ../../ &&
 cd packages/file-system-worker && updateDependencies && cd ../../ &&
 cd packages/heap-snapshot-worker && updateDependencies && cd ../../ &&
-cd packages/heap-parsing-worker && updateDependencies && cd ../../ &&
+cd packages/heap-snapshot-parsing-worker && updateDependencies && cd ../../ &&
 cd packages/initialization-worker && updateDependencies && cd ../../ &&
 cd packages/injected-code && updateDependencies && cd ../../ &&
 cd packages/load-source-map-worker && updateDependencies && cd ../../ &&
