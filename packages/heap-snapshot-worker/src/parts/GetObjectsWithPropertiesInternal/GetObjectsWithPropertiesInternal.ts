@@ -73,7 +73,6 @@ export const collectObjectProperties = (
       if (!targetNode) continue
 
       const targetType = getNodeTypeName(targetNode, nodeTypes) || 'unknown'
-<<<<<<< HEAD
       const targetName = getNodeName(targetNode, strings)
 
       // Check if this is an array (object with name "Array")
@@ -82,12 +81,6 @@ export const collectObjectProperties = (
       // Get the property value (can be nested object/array or primitive)
       let value: any
       if (targetType === 'object' && !isArray) {
-=======
-
-      // Get the property value (can be nested object/array or primitive)
-      let value: any
-      if (targetType === 'object') {
->>>>>>> origin/main
         if (depth > 1) {
           // At depth > 1, recursively collect properties of nested objects
           const nestedProperties = collectObjectProperties(targetNodeIndex, snapshot, edgeMap, depth - 1, visited)
@@ -102,7 +95,6 @@ export const collectObjectProperties = (
           // At depth 1, just show reference
           value = `[Object ${targetNode.id}]`
         }
-<<<<<<< HEAD
       } else if (isArray) {
         if (depth > 1) {
           // For arrays at depth > 1, collect array elements
@@ -112,13 +104,15 @@ export const collectObjectProperties = (
           } else {
             value = `[Array ${targetNode.id}]`
           }
-=======
+        } else {
+          // At depth 1, just show reference
+          value = `[Array ${targetNode.id}]`
+        }
       } else if (targetType === 'array') {
         if (depth > 1) {
           // For arrays at depth > 1, we could collect indexed elements
           // For now, show reference but could be enhanced later
           value = `[Array ${targetNode.id}]`
->>>>>>> origin/main
         } else {
           // At depth 1, just show reference
           value = `[Array ${targetNode.id}]`
@@ -126,7 +120,6 @@ export const collectObjectProperties = (
       } else if (targetType === 'string' || targetType === 'number') {
         // For primitives, get the actual value
         value = getActualValue(targetNode, snapshot, edgeMap, visited)
-<<<<<<< HEAD
       } else if (targetType === 'hidden') {
         // For hidden nodes, check if it's a boolean or other special value
         const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap, propertyName)
@@ -135,8 +128,6 @@ export const collectObjectProperties = (
         } else {
           value = getActualValue(targetNode, snapshot, edgeMap, visited)
         }
-=======
->>>>>>> origin/main
       } else if (targetType === 'code') {
         // For code objects, try to get the actual value they represent
         value = getActualValue(targetNode, snapshot, edgeMap, visited)
@@ -225,11 +216,6 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
           } else {
             // Fall back to standard value detection
             result.propertyValue = getActualValue(targetNode, snapshot, edgeMap)
-          }
-
-          // Collect properties if depth > 0
-          if (depth > 0) {
-            result.preview = collectObjectProperties(nodeIndex / ITEMS_PER_NODE, snapshot, edgeMap, depth)
           }
 
           // Collect properties if depth > 0

@@ -122,8 +122,8 @@ const analyzeBooleanNodes = (snapshot: Snapshot): { trueNodeId: number | null; f
   if (candidates.length >= 2) {
     // Assign based on test data pattern: lower ID seems to be true, higher ID false
     // This is still a heuristic but we'll use the observed pattern
-    const [id1, ref1] = candidates[0]
-    const [id2, ref2] = candidates[1]
+    const [id1] = candidates[0]
+    const [id2] = candidates[1]
 
     if (id1 < id2) {
       trueNodeId = id1
