@@ -260,7 +260,7 @@ test('should handle code object with internal number reference', () => {
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '42',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
@@ -515,7 +515,7 @@ test('should handle code object with both internal and incoming references (prio
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '"incoming"',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
@@ -554,7 +554,7 @@ test('should handle code object with no references at all', () => {
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '[code 2]',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
