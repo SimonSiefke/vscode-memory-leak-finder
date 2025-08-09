@@ -3,11 +3,11 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import * as Root from '../Root/Root.ts'
 import { VError } from '../VError/VError.ts'
 
-const getPreviousFilterPath = () => {
+const getPreviousFilterPath = (): string => {
   return join(Root.root, '.vscode-previous-filters', 'filters.json')
 }
 
-export const get = () => {
+export const get = (): string[] => {
   try {
     const previousFilterPath = getPreviousFilterPath()
     const content = readFileSync(previousFilterPath, 'utf8')
@@ -18,7 +18,7 @@ export const get = () => {
   }
 }
 
-export const add = (value) => {
+export const add = (value: string): void => {
   try {
     const previousFilterPath = getPreviousFilterPath()
     const current = get()
