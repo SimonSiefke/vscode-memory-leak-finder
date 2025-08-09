@@ -8,7 +8,7 @@ beforeEach(() => {
 const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
 
 test('getBinaryPath - uses CLI flag when provided', async () => {
-  const { getBinaryPath } = await import('../src/parts/GetBinaryPath/GetBinaryPath.js')
+  const { getBinaryPath } = await import('../src/parts/GetBinaryPath/GetBinaryPath.ts')
   const result = await getBinaryPath('1.100.0', '/custom/path', '')
   expect(result).toBe('/custom/path')
   expect(consoleSpy).not.toHaveBeenCalled()
@@ -18,7 +18,7 @@ test('getBinaryPath - uses environment variable with deprecation warning', async
   const originalEnv = process.env.VSCODE_PATH
   process.env.VSCODE_PATH = '/env/path'
 
-  const { getBinaryPath } = await import('../src/parts/GetBinaryPath/GetBinaryPath.js')
+  const { getBinaryPath } = await import('../src/parts/GetBinaryPath/GetBinaryPath.ts')
   const result = await getBinaryPath('1.100.0', '', '')
 
   expect(result).toBe('/env/path')
@@ -30,7 +30,7 @@ test('getBinaryPath - uses environment variable with deprecation warning', async
 })
 
 test('getBinaryPath - prioritizes vscodePath over commit', async () => {
-  const { getBinaryPath } = await import('../src/parts/GetBinaryPath/GetBinaryPath.js')
+  const { getBinaryPath } = await import('../src/parts/GetBinaryPath/GetBinaryPath.ts')
   const result = await getBinaryPath('1.100.0', '/custom/path', 'abc123')
   expect(result).toBe('/custom/path')
   expect(consoleSpy).not.toHaveBeenCalled()
