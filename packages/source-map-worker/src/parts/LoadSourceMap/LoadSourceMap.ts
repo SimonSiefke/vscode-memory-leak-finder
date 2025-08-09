@@ -1,6 +1,6 @@
 import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
-import { loadSourceMapWorkerPath } from '../LoadSourceMapWorkerPath/LoadSourceMapWorkerPath.ts'
-import { VError } from '../VError/VError.ts'
+import { loadSourceMapWorkerPath } from '../LoadSourceMapWorkerPath/LoadSourceMapWorkerPath.js'
+import { VError } from '../VError/VError.js'
 
 export const loadSourceMap = async (url: string, hash: string): Promise<any> => {
   try {
