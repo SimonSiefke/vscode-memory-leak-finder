@@ -5,6 +5,6 @@ test('main function exists', () => {
   expect(typeof Main.main).toBe('function')
 })
 
-test('main should not throw when called', async () => {
-  await expect(Main.main()).resolves.toBeUndefined()
+test('main should throw IpcError when parentPort not available', async () => {
+  await expect(Main.main()).rejects.toThrow('parentPort is required for node worker threads ipc')
 })
