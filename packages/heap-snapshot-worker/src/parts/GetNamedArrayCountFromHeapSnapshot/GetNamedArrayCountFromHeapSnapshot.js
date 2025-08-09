@@ -79,5 +79,3 @@ export const getNamedArrayCountFromHeapSnapshot = async (path) => {
   console.log({ map })
   return []
 }
-
-getNamedArrayCountFromHeapSnapshot('/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/0.json')
