@@ -1,5 +1,5 @@
 export const getElectronArgs = ({ headlessMode, args = [] }) => {
-  const allArgs = [...args]
+  const allArgs: string[] = [...args]
   if (headlessMode) {
     allArgs.unshift('--headless')
   }
