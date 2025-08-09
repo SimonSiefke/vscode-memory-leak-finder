@@ -5,6 +5,7 @@ import { getActualValue } from '../GetActualValue/GetActualValue.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
+import { collectArrayElements } from '../CollectArrayElements/CollectArrayElements.ts'
 
 export interface ObjectWithProperty {
   id: number
@@ -25,7 +26,7 @@ export interface ObjectWithProperty {
  * @param visited - Set of visited node IDs to prevent circular references
  * @returns Record of property name to value (can be nested objects/arrays)
  */
-const collectObjectProperties = (
+export const collectObjectProperties = (
   nodeIndex: number,
   snapshot: Snapshot,
   edgeMap: Uint32Array,
@@ -71,10 +72,14 @@ const collectObjectProperties = (
       if (!targetNode) continue
 
       const targetType = getNodeTypeName(targetNode, nodeTypes) || 'unknown'
+      const targetName = getNodeName(targetNode, strings)
+
+      // Check if this is an array (object with name "Array")
+      const isArray = targetType === 'object' && targetName === 'Array'
 
       // Get the property value (can be nested object/array or primitive)
       let value: any
-      if (targetType === 'object') {
+      if (targetType === 'object' && !isArray) {
         if (depth > 1) {
           // At depth > 1, recursively collect properties of nested objects
           const nestedProperties = collectObjectProperties(targetNodeIndex, snapshot, edgeMap, depth - 1, visited)
@@ -89,11 +94,15 @@ const collectObjectProperties = (
           // At depth 1, just show reference
           value = `[Object ${targetNode.id}]`
         }
-      } else if (targetType === 'array') {
+      } else if (isArray) {
         if (depth > 1) {
-          // For arrays at depth > 1, we could collect indexed elements
-          // For now, show reference but could be enhanced later
-          value = `[Array ${targetNode.id}]`
+          // For arrays at depth > 1, collect array elements
+          const arrayElements = collectArrayElements(targetNodeIndex, snapshot, edgeMap, depth - 1, visited)
+          if (arrayElements.length > 0) {
+            value = arrayElements
+          } else {
+            value = `[Array ${targetNode.id}]`
+          }
         } else {
           // At depth 1, just show reference
           value = `[Array ${targetNode.id}]`
