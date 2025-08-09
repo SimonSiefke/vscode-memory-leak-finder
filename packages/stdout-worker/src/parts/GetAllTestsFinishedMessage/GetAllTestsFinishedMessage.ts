@@ -29,7 +29,7 @@ ${testSuites} ${failedMessage}${skippedMessage}${passedMessage}${leakedMessage}$
 ${time}        ${durationMessage}
 ${ranAllTestSuitesMessage}\n`
   if (isWatchMode) {
-    message += `${WatchUsageShort.print()}`
+    message += `${WatchUsageShort.getWatchUsageMessageShort()}`
   }
   return message
 }
