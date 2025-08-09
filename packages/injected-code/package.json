@@ -16,8 +16,7 @@
     "@types/babel__code-frame": "^7.0.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.1.0",
-    "ts-jest": "^29.4.1",
-    "typescript": "^5.9.2"
+    "ts-jest": "^29.4.1"
   },
   "dependencies": {
     "@lvce-editor/assert": "^1.4.0"
