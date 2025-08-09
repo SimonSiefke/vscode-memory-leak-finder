@@ -19,7 +19,7 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
 
 jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
   return {
-    invoke: jest.fn().mockImplementation((method: string) => {
+    invoke: jest.fn().mockImplementation((method: string, ...args: any[]) => {
       if (method === 'Stdout.getHandleTestSetupMessage') {
         return Promise.resolve('\n\u001b[0m\u001b[7m\u001b[33m SETUP \u001b[39m\u001b[27m\u001b[0m\n')
       }
@@ -54,7 +54,7 @@ test('handleTestSetup - should not write anything when in GitHub Actions', async
 
   jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
     return {
-      invoke: jest.fn().mockImplementation((method: string) => {
+      invoke: jest.fn().mockImplementation((method: string, ...args: any[]) => {
         if (method === 'Stdout.getHandleTestSetupMessage') {
           return Promise.resolve('\n\u001b[0m\u001b[7m\u001b[33m SETUP \u001b[39m\u001b[27m\u001b[0m\n')
         }

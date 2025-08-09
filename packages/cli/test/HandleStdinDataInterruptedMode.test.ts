@@ -16,7 +16,7 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
 
 jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
   return {
-    invoke: jest.fn().mockImplementation((method: string) => {
+    invoke: jest.fn().mockImplementation((method: string, ...args: any[]) => {
       if (method === 'Stdout.getClear') {
         return Promise.resolve('\u001B[2J\u001B[3J\u001B[H')
       }
