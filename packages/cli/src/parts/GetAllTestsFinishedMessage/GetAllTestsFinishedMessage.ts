@@ -10,14 +10,14 @@ const time = chalk.bold(`Time:`)
 
 const testSuites = chalk.bold(`Test Suites:`)
 
-const getRanAllTestSuitesMessage = (filterValue) => {
+const getRanAllTestSuitesMessage = (filterValue: string): string => {
   if (filterValue === Character.EmptyString) {
     return ranAllTestSuits
   }
   return `${ranAllTestSuitsMatching} /${filterValue}/i${dot}`
 }
 
-export const getAllTestsFinishedMessage = (passed, failed, skipped, leaked, total, duration, filterValue, isWatchMode) => {
+export const getAllTestsFinishedMessage = (passed: number, failed: number, skipped: number, leaked: number, total: number, duration: number, filterValue: string, isWatchMode: boolean): string => {
   const failedMessage = failed ? `${chalk.bold.red(`${failed} failed`)}, ` : Character.EmptyString
   const skippedMessage = skipped ? `${chalk.bold.yellow(`${skipped} skipped`)}, ` : Character.EmptyString
   const passedMessage = passed ? `${chalk.bold.green(`${passed} passed`)}, ` : Character.EmptyString
