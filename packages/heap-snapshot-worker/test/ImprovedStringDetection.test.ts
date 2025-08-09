@@ -3,6 +3,7 @@ import { getNodeName } from '../src/parts/GetNodeName/GetNodeName.ts'
 import { getActualValue } from '../src/parts/GetActualValue/GetActualValue.ts'
 import { examineNodeByIndex } from '../src/parts/ExamineNode/ExamineNode.ts'
 import { createEdgeMap } from '../src/parts/CreateEdgeMap/CreateEdgeMap.ts'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('getNodeName - should handle empty strings correctly', () => {
   const strings = ['', 'hello', 'world']
@@ -21,21 +22,27 @@ test('getNodeName - should handle empty strings correctly', () => {
 })
 
 test('getActualValue - should properly display string values', () => {
-  const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
-  const nodeTypes: [readonly string[]] = [['string', 'object']]
   const strings = ['', 'hello', 'world', 'test value']
-
-  const snapshot = createTestSnapshot(
-    new Uint32Array([]),
-    new Uint32Array([]),
+  
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 0,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([]),
+    edges: new Uint32Array([]),
     strings,
-    nodeFields,
-    ['type', 'name_or_index', 'to_node'],
-    nodeTypes,
-    [['property']],
-  )
+    locations: new Uint32Array([]),
+    meta: {
+      node_types: [['string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count'],
+      edge_types: [['property']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+  }
 
-  const edgeMap = createEdgeMap(snapshot.nodes, nodeFields)
+  const edgeMap = createEdgeMap(snapshot.nodes, snapshot.meta.node_fields)
 
   // Test empty string
   const emptyStringNode = { type: 0, name: 0, id: 1 }
@@ -51,61 +58,51 @@ test('getActualValue - should properly display string values', () => {
 })
 
 test('examineNode - should show improved string property values', () => {
-  const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
-  const edgeFields = ['type', 'name_or_index', 'to_node']
-  const nodeTypes: [readonly string[]] = [['object', 'string']]
-  const edgeTypes: [readonly string[]] = [['property']]
-  const strings = ['Object', '', 'hello', 'emptyProp', 'helloProp', 'longText']
-
-  // Create nodes:
-  // 0: Object with 3 properties
-  // 1: empty string
-  // 2: hello string
-  // 3: long text string
-  const nodes = new Uint32Array([
-    // Node 0: Object
-    0,
-    0,
-    1,
-    100,
-    3, // type=object, name=Object, id=1, size=100, edges=3
-    // Node 1: empty string
-    1,
-    1,
-    77,
-    0,
-    0, // type=string, name='', id=77, size=0, edges=0
-    // Node 2: hello string
-    1,
-    2,
-    78,
-    10,
-    0, // type=string, name=hello, id=78, size=10, edges=0
-    // Node 3: long text string
-    1,
-    5,
-    79,
-    20,
-    0, // type=string, name=longText, id=79, size=20, edges=0
-  ])
-
-  // Create edges: Object has 3 property edges
-  const edges = new Uint32Array([
-    // Edge 0: emptyProp -> empty string (node 1)
-    0,
-    3,
-    5, // type=property, name=emptyProp, to_node=5 (node 1)
-    // Edge 1: helloProp -> hello string (node 2)
-    0,
-    4,
-    10, // type=property, name=helloProp, to_node=10 (node 2)
-    // Edge 2: textProp -> long text string (node 3)
-    0,
-    5,
-    15, // type=property, name=textProp, to_node=15 (node 3)
-  ])
-
-  const snapshot = createTestSnapshot(nodes, edges, strings, nodeFields, edgeFields, nodeTypes, edgeTypes)
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 4,
+    edge_count: 3,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Node 0: Object with 3 properties
+      // [type, name, id, self_size, edge_count]
+      0, 0, 1, 100, 3,   // object "Object" id=1 size=100 edges=3
+      
+      // Node 1: empty string
+      // [type, name, id, self_size, edge_count]
+      1, 1, 77, 0, 0,    // string "" id=77 size=0 edges=0
+      
+      // Node 2: hello string
+      // [type, name, id, self_size, edge_count]
+      1, 2, 78, 10, 0,   // string "hello" id=78 size=10 edges=0
+      
+      // Node 3: long text string
+      // [type, name, id, self_size, edge_count]
+      1, 5, 79, 20, 0,   // string "longText" id=79 size=20 edges=0
+    ]),
+    edges: new Uint32Array([
+      // Edge 0: Object["emptyProp"] -> empty string
+      // [type, name_or_index, to_node]
+      0, 3, 5,   // property "emptyProp" -> "" (offset 5)
+      
+      // Edge 1: Object["helloProp"] -> hello string
+      // [type, name_or_index, to_node]
+      0, 4, 10,  // property "helloProp" -> "hello" (offset 10)
+      
+      // Edge 2: Object["textProp"] -> long text string  
+      // [type, name_or_index, to_node]
+      0, 5, 15,  // property "textProp" -> "longText" (offset 15)
+    ]),
+    strings: ['Object', '', 'hello', 'emptyProp', 'helloProp', 'longText'],
+    locations: new Uint32Array([]),
+    meta: {
+      node_types: [['object', 'string']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count'],
+      edge_types: [['property']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+  }
 
   // Examine the object (node index 0)
   const result = examineNodeByIndex(0, snapshot)

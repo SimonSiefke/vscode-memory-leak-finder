@@ -1,10 +1,9 @@
 import { test, expect } from '@jest/globals'
 import { getUndefinedValue, getUndefinedStructure } from '../src/parts/GetUndefinedValue/GetUndefinedValue.ts'
 import { createEdgeMap } from '../src/parts/CreateEdgeMap/CreateEdgeMap.ts'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('getUndefinedValue - should detect undefined value by name and type', () => {
-  const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
-  const nodeTypes: [readonly string[]] = [['hidden', 'string', 'object']]
   const strings = ['undefined', 'test']
 
   // Create a hidden node with name "undefined"
@@ -16,25 +15,35 @@ test('getUndefinedValue - should detect undefined value by name and type', () =>
     edge_count: 0,
   }
 
-  const snapshot = createTestSnapshot(
-    new Uint32Array([0, 0, 67, 0, 0]), // hidden, name=0(undefined), id=67, size=0, edges=0
-    new Uint32Array([]),
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 1,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Node 0: undefined value
+      // [type, name, id, self_size, edge_count]
+      0, 0, 67, 0, 0,   // hidden "undefined" id=67 size=0 edges=0
+    ]),
+    edges: new Uint32Array([]),
     strings,
-    nodeFields,
-    ['type', 'name_or_index', 'to_node'],
-    nodeTypes,
-    [['property', 'internal']],
-  )
+    locations: new Uint32Array([]),
+    meta: {
+      node_types: [['hidden', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count'],
+      edge_types: [['property', 'internal']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+  }
 
-  const edgeMap = createEdgeMap(snapshot.nodes, nodeFields)
+  const edgeMap = createEdgeMap(snapshot.nodes, snapshot.meta.node_fields)
 
   const result = getUndefinedValue(undefinedNode, snapshot, edgeMap)
   expect(result).toBe('[undefined 67]')
 })
 
 test('getUndefinedValue - should return null for non-undefined nodes', () => {
-  const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
-  const nodeTypes: [readonly string[]] = [['hidden', 'string', 'object']]
   const strings = ['test', 'other']
 
   const testNode = {
@@ -45,17 +54,29 @@ test('getUndefinedValue - should return null for non-undefined nodes', () => {
     edge_count: 0,
   }
 
-  const snapshot = createTestSnapshot(
-    new Uint32Array([1, 0, 1, 10, 0]),
-    new Uint32Array([]),
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 1,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Node 0: regular string
+      // [type, name, id, self_size, edge_count]
+      1, 0, 1, 10, 0,   // string "test" id=1 size=10 edges=0
+    ]),
+    edges: new Uint32Array([]),
     strings,
-    nodeFields,
-    ['type', 'name_or_index', 'to_node'],
-    nodeTypes,
-    [['property', 'internal']],
-  )
+    locations: new Uint32Array([]),
+    meta: {
+      node_types: [['hidden', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count'],
+      edge_types: [['property', 'internal']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+  }
 
-  const edgeMap = createEdgeMap(snapshot.nodes, nodeFields)
+  const edgeMap = createEdgeMap(snapshot.nodes, snapshot.meta.node_fields)
 
   const result = getUndefinedValue(testNode, snapshot, edgeMap)
   expect(result).toBeNull()
