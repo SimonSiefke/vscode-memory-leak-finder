@@ -28,8 +28,6 @@ export const connectWorkers = async (
   monkeyPatchedElectronId,
   electronObjectId,
 ) => {
-  // TODO connect workers in parallel
-  const {} = await ConnectElectron.connectElectron(rpc, connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback)
   if (recordVideo) {
     await VideoRecording.start(devtoolsWebSocketUrl)
   }
