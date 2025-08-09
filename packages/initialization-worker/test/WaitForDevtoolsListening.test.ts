@@ -7,9 +7,9 @@ class NoErrorThrownError extends Error {}
 /**
  *
  * @param {any} fn
- * @returns {Promise<Error>}
+ * @returns {Promise<any>}
  *  */
-const getError = async (fn) => {
+const getError = async (fn: any): Promise<any> => {
   try {
     await fn()
     throw new NoErrorThrownError()
