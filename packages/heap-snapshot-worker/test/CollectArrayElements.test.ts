@@ -6,6 +6,9 @@ import { createEdgeMap } from '../src/parts/CreateEdgeMap/CreateEdgeMap.ts'
 test('collectArrayElements - should collect elements from a simple array', () => {
   // Create a mock snapshot with an array containing primitive elements
   const snapshot: Snapshot = {
+    node_count: 3,
+    edge_count: 2,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Node 0: Array object
       0,
@@ -43,11 +46,13 @@ test('collectArrayElements - should collect elements from a simple array', () =>
       14, // type=1 (element), nameOrIndex=1 (array index), toNode=14 (node 2 * 7)
     ]),
     strings: ['Array', 'hello', '42'],
+    locations: new Uint32Array([]),
     meta: {
       node_types: [['object', 'native', 'code', 'string', 'number']],
       node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
       edge_types: [['context', 'element', 'property', 'internal']],
       edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
     },
   }
 
@@ -60,6 +65,9 @@ test('collectArrayElements - should collect elements from a simple array', () =>
 test('collectArrayElements - should handle empty array', () => {
   // Create a mock snapshot with an empty array
   const snapshot: Snapshot = {
+    node_count: 1,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Node 0: Empty Array object
       0,
@@ -72,11 +80,13 @@ test('collectArrayElements - should handle empty array', () => {
     ]),
     edges: new Uint32Array([]),
     strings: ['Array'],
+    locations: new Uint32Array([]),
     meta: {
       node_types: [['object', 'native', 'code', 'string', 'number']],
       node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
       edge_types: [['context', 'element', 'property', 'internal']],
       edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
     },
   }
 
