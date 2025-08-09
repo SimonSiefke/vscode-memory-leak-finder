@@ -1,0 +1,14 @@
+{
+  "name": "VSCode Memory Leak Finder",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "postCreateCommand": "npm ci",
+  "forwardPorts": [6080],
+  "portsAttributes": {
+    "6080": {
+      "label": "VNC Server",
+      "onAutoForward": "notify"
+    }
+  }
+}

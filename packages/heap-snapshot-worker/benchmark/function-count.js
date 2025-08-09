@@ -9,7 +9,6 @@ const testFunctionCount = async () => {
   try {
     const count = await getFunctionCountFromHeapSnapshot(filePath1)
     console.log({ count })
-
   } catch (error) {
     console.error('Error:', error.message)
   }

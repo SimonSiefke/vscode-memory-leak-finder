@@ -9,7 +9,6 @@ const testSetCount = async () => {
   try {
     const count = await getSetCountFromHeapSnapshot(filePath1)
     console.log({ count })
-
   } catch (error) {
     console.error('Error:', error.message)
   }

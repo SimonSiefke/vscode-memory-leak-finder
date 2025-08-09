@@ -10,7 +10,6 @@ const testWeakRefCount = async () => {
     const count = await getWeakRefCountFromHeapSnapshot(filePath1)
     console.log({ count })
     console.log('Expected: 6')
-
   } catch (error) {
     console.error('Error:', error.message)
   }

@@ -14,6 +14,7 @@ test('computeHeapSnapshotIndices - basic functionality', () => {
     objectTypeIndex: 3,
     bigintTypeIndex: 4,
     regexpTypeIndex: 5,
+    nativeTypeIndex: -1,
 
     traceNodeIdFieldIndex: -1,
     // Items per record
