@@ -5,7 +5,7 @@ import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 import * as CommandMap from '../CommandMap/CommandMap.ts'
 import * as CommandMapRef from '../CommandMapRef/CommandMapRef.ts'
 
-export const run = async () => {
+export const run = async (): Promise<void> => {
   Object.assign(CommandMapRef.commandMapRef, CommandMap.commandMap)
   const options = ParseArgv.parseArgv(Argv.argv)
   StdinDataState.setState({
