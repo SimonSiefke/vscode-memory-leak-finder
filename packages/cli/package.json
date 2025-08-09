@@ -22,8 +22,7 @@
   "devDependencies": {
     "@jest/globals": "^30.0.5",
     "@types/node": "^24.1.0",
-    "ts-jest": "^29.4.1",
-    "typescript": "^5.9.2"
+    "ts-jest": "^29.4.1"
   },
   "xo": {
     "rules": {
