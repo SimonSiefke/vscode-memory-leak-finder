@@ -172,57 +172,42 @@ test('analyze boolean structure with type and value edges', (): void => {
       location_fields: ['object_index', 'script_id', 'line', 'column'],
     },
     nodes: new Uint32Array([
-      // type, name, id, self_size, edge_count, trace_node_id, detachedness
-      3,
-      1,
-      75,
-      100,
-      2,
-      0,
-      0, // Node 75: Object with 2 edges for breakpointsExpanded
-      0,
-      2,
-      1403,
-      20,
-      0,
-      0,
-      0, // Node 1403: Hidden node "false" (the VALUE)
-      0,
-      3,
-      1271,
-      20,
-      0,
-      0,
-      0, // Node 1271: Hidden node "boolean" (the TYPE)
-      3,
-      4,
-      50,
-      50,
-      1,
-      0,
-      0, // Node 50: Another object for comparison
-      0,
-      5,
-      999,
-      20,
-      0,
-      0,
-      0, // Node 999: Hidden node "true" for comparison
+      // Node 75: Object with breakpointsExpanded property
+      // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
+      3, 1, 75, 100, 2, 0, 0,    // object "MainObject" id=75 size=100 edges=2
+
+      // Node 1403: Boolean VALUE "false"
+      // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
+      0, 2, 1403, 20, 0, 0, 0,   // hidden "false" id=1403 size=20 edges=0
+
+      // Node 1271: Boolean TYPE "boolean"
+      // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
+      0, 3, 1271, 20, 0, 0, 0,   // hidden "boolean" id=1271 size=20 edges=0
+
+      // Node 50: Another object for comparison
+      // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
+      3, 4, 50, 50, 1, 0, 0,     // object "Object50" id=50 size=50 edges=1
+
+      // Node 999: Boolean VALUE "true" for comparison
+      // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
+      0, 5, 999, 20, 0, 0, 0,    // hidden "true" id=999 size=20 edges=0
     ]),
     edges: new Uint32Array([
-      // type, name_or_index, to_node
-      2,
-      6,
-      7, // property edge "breakpointsExpanded" from Node 75 to Node 1403 (false VALUE)
-      3,
-      0,
-      14, // internal edge from Node 75 to Node 1271 (boolean TYPE)
-      2,
-      7,
-      28, // property edge "someFlag" from Node 50 to Node 999 (true VALUE)
-      3,
-      0,
-      14, // internal edge from Node 50 to Node 1271 (boolean TYPE - shared)
+      // Edge 0: breakpointsExpanded property -> false VALUE
+      // [type, name_or_index, to_node]
+      2, 6, 7,   // property "breakpointsExpanded" -> Node_1403 (offset 7)
+
+      // Edge 1: internal edge -> boolean TYPE
+      // [type, name_or_index, to_node]
+      3, 0, 14,  // internal -> Node_1271 "boolean" (offset 14)
+
+      // Edge 2: someFlag property -> true VALUE
+      // [type, name_or_index, to_node]
+      2, 7, 28,  // property "someFlag" -> Node_999 (offset 28)
+
+      // Edge 3: internal edge -> boolean TYPE (shared)
+      // [type, name_or_index, to_node]
+      3, 0, 14,  // internal -> Node_1271 "boolean" (offset 14, shared type)
     ]),
     strings: ['', 'MainObject', 'false', 'boolean', 'Object50', 'true', 'breakpointsExpanded', 'someFlag'],
     locations: new Uint32Array([]),
@@ -295,37 +280,26 @@ test('enhanced boolean detection in GetObjectsWithPropertiesInternal', async ():
       location_fields: ['object_index', 'script_id', 'line', 'column'],
     },
     nodes: new Uint32Array([
-      // type, name, id, self_size, edge_count, trace_node_id, detachedness
-      3,
-      1,
-      75,
-      100,
-      2,
-      0,
-      0, // Node 75: Object with breakpointsExpanded (both property and internal edges)
-      0,
-      2,
-      1403,
-      20,
-      0,
-      0,
-      0, // Node 1403: Hidden node "false" (the VALUE)
-      0,
-      3,
-      1271,
-      20,
-      0,
-      0,
-      0, // Node 1271: Hidden node "boolean" (the TYPE)
+      // Node 75: Object with breakpointsExpanded property
+      // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
+      3, 1, 75, 100, 2, 0, 0,    // object "MainObject" id=75 size=100 edges=2
+
+      // Node 1403: Boolean VALUE "false"
+      // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
+      0, 2, 1403, 20, 0, 0, 0,   // hidden "false" id=1403 size=20 edges=0
+
+      // Node 1271: Boolean TYPE "boolean"
+      // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
+      0, 3, 1271, 20, 0, 0, 0,   // hidden "boolean" id=1271 size=20 edges=0
     ]),
     edges: new Uint32Array([
-      // type, name_or_index, to_node
-      2,
-      4,
-      7, // property edge "breakpointsExpanded" from Node 75 to Node 1403 (false VALUE)
-      3,
-      0,
-      14, // internal edge from Node 75 to Node 1271 (boolean TYPE)
+      // Edge 0: breakpointsExpanded property -> false VALUE
+      // [type, name_or_index, to_node]
+      2, 4, 7,   // property "breakpointsExpanded" -> Node_1403 (offset 7)
+
+      // Edge 1: internal edge -> boolean TYPE
+      // [type, name_or_index, to_node]
+      3, 0, 14,  // internal -> Node_1271 "boolean" (offset 14)
     ]),
     strings: ['', 'MainObject', 'false', 'boolean', 'breakpointsExpanded'],
     locations: new Uint32Array([]),
