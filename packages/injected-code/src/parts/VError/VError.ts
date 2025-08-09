@@ -47,7 +47,7 @@ export class VError extends Error {
       this.stack = mergeStacks(this.stack, errorStack)
     }
     if ((error as any).codeFrame) {
-      ;(this as any).codeFrame = (error as any).codeFrame
+      (this as any).codeFrame = (error as any).codeFrame
     }
     this.cause = error
   }
