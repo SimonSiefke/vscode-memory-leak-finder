@@ -1,6 +1,7 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as GetMeasure from '../GetMeasure/GetMeasure.ts'
 import * as LoadMemoryLeakFinder from '../LoadMemoryLeakFinder/LoadMemoryLeakFinder.ts'
+import * as SessionState from '../SessionState/SessionState.ts'
 
 export const getCombinedMeasure = async (session: any, measureId: string): Promise<any> => {
   Assert.object(session)

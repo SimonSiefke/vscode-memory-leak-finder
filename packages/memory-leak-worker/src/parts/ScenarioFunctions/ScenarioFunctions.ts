@@ -6,16 +6,17 @@ import {
   DevtoolsProtocolTarget,
 } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.ts'
+import type { ExecutionContext } from '../ExecutionContextState/ExecutionContextState.ts'
 import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.ts'
 import * as PTimeout from '../PTimeout/PTimeout.ts'
+import type { Session } from '../Session/Session.ts'
 import * as SessionState from '../SessionState/SessionState.ts'
+import type { AttachedToTargetMessage } from '../TargetInfo.ts'
 import * as TargetState from '../TargetState/TargetState.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
+import type { DevToolsMessage } from '../Types/Types.ts'
 import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
 import { VError } from '../VError/VError.ts'
-import type { Session } from '../SessionState/SessionState.ts'
-import type { ExecutionContext } from '../ExecutionContextState/ExecutionContextState.ts'
-import type { DevToolsMessage } from '../Types/Types.ts'
 
 export const Locator = (selector: string): { selector: string } => {
   return {
@@ -75,20 +76,23 @@ const handleAttachedToBrowser = (message: DevToolsMessage): void => {
   console.log('attached to browser', message)
 }
 
-const handleAttachedToJs = async (message: DevToolsMessage, type: string): Promise<void> => {
+const handleAttachedToJs = async (message: AttachedToTargetMessage, type: string): Promise<void> => {
   const sessionId = message.params?.sessionId as string
   if (!sessionId) {
+    console.log('return1')
     return
   }
   const browserSession = SessionState.getSession('browser')
   if (!browserSession) {
+    console.log('return2')
     return
   }
   const browserRpc = (browserSession as any).rpc
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
 
-  const targetInfo = message.params?.targetInfo as any
+  const targetInfo = message.params?.targetInfo
   if (!targetInfo) {
+    console.log('return3')
     return
   }
 
@@ -97,7 +101,8 @@ const handleAttachedToJs = async (message: DevToolsMessage, type: string): Promi
     url: targetInfo.url,
     sessionId,
     rpc: sessionRpc,
-  } as any)
+    title: targetInfo.title,
+  })
 
   TargetState.addTarget(targetInfo.targetId, {
     type,
@@ -105,7 +110,7 @@ const handleAttachedToJs = async (message: DevToolsMessage, type: string): Promi
     title: targetInfo.title,
     url: targetInfo.url,
     sessionId: message.params?.sessionId,
-    browserContextId: message.params?.browserContextId,
+    browserContextId: message.params?.targetInfo?.browserContextId,
   } as any)
 
   await Promise.all([
@@ -115,8 +120,9 @@ const handleAttachedToJs = async (message: DevToolsMessage, type: string): Promi
   ])
 }
 
-const handleAttachedToWorker = async (message: DevToolsMessage): Promise<void> => {
+const handleAttachedToWorker = async (message: AttachedToTargetMessage): Promise<void> => {
   try {
+    // console.log('attached to worker', message)
     await handleAttachedToJs(message, DevtoolsTargetType.Worker)
   } catch (error) {
     console.warn(new VError(error, `Failed to attach to worker`))
@@ -207,15 +213,15 @@ const handleAttachedToPage = async (message: DevToolsMessage): Promise<void> => 
   }
 }
 
-const handleAttachedToIframe = async (message: DevToolsMessage): Promise<void> => {
+const handleAttachedToIframe = async (message: AttachedToTargetMessage): Promise<void> => {
   await handleAttachedToPage(message)
 }
 
-const handleAttachedToServiceWorker = async (message: DevToolsMessage): Promise<void> => {
+const handleAttachedToServiceWorker = async (message: AttachedToTargetMessage): Promise<void> => {
   await handleAttachedToJs(message, DevtoolsTargetType.ServiceWorker)
 }
 
-export const handleAttachedToTarget = (message: DevToolsMessage): void | Promise<void> => {
+export const handleAttachedToTarget = (message: AttachedToTargetMessage): void | Promise<void> => {
   const targetInfo = message.params?.targetInfo as any
   if (!targetInfo?.type) {
     return
@@ -245,21 +251,3 @@ export const handleDetachedFromTarget = (message: DevToolsMessage): void => {
 }
 
 export const handleTargetCreated = async (message: DevToolsMessage): Promise<void> => {}
-
-export const waitForDevtoolsListening = async (stderr: NodeJS.ReadableStream): Promise<string> => {
-  const devtoolsData = await new Promise((resolve) => {
-    const cleanup = () => {
-      stderr.off('data', handleData)
-    }
-    const handleData = (data: Buffer | string): void => {
-      if (data.includes('DevTools listening on')) {
-        cleanup()
-        resolve(data)
-      }
-    }
-    stderr.on('data', handleData)
-  })
-  const devtoolsMatch = (devtoolsData as string).match(/DevTools listening on (ws:\/\/.*)/)
-  const devtoolsUrl = devtoolsMatch![1]
-  return devtoolsUrl
-}

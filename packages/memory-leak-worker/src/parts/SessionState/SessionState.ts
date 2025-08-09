@@ -1,14 +1,6 @@
 import * as PTimeout from '../PTimeout/PTimeout.ts'
+import type { Session } from '../Session/Session.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
-
-export interface Session {
-  readonly type: string
-  readonly id?: string
-  rpc?: any
-  readonly url?: string
-  readonly sessionId?: string
-  readonly objectType?: string
-}
 
 interface State {
   sessionMap: Record<string, Session>
@@ -34,6 +26,7 @@ export const addSession = (sessionId: string, session: Session): void => {
 }
 
 export const removeSession = (sessionId: string): void => {
+  // console.log('remove', sessionId)
   delete state.sessionMap[sessionId]
 }
 
@@ -84,3 +77,5 @@ export const getPageSession = (): Session | undefined => {
   }
   return undefined
 }
+
+export const getWorkerSessions = () => {}
