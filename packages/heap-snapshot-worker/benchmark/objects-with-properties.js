@@ -20,7 +20,7 @@ async function testGetObjectsWithProperties() {
     const oldStateObjects = getObjectsWithPropertiesInternal(snapshot, 'oldState', 2)
     console.log(`Refactored function found ${oldStateObjects.length} objects with "oldState" property`)
 
-    console.log({ oldStateObjects })
+    console.log(JSON.stringify(oldStateObjects, null, 2))
   } catch (error) {
     console.error('Error testing getObjectsWithProperties:', error)
   }
