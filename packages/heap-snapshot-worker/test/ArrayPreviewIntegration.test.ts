@@ -11,66 +11,41 @@ test('should show array contents in property preview at depth > 1', () => {
     extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Node 0: Object with property "filteredItems"
-      3,
-      0,
-      1,
-      100,
-      1,
-      0,
-      0, // type=3 (object), name=0 ("BenchmarkObject"), id=1, selfSize=100, edgeCount=1, trace_node_id=0, detachedness=0
+      // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
+      3, 0, 1, 100, 1, 0, 0,   // object "BenchmarkObject" id=1 size=100 edges=1
+      
       // Node 1: Array object
-      3,
-      1,
-      2,
-      80,
-      1,
-      0,
-      0, // type=3 (object), name=1 ("Array"), id=2, selfSize=80, edgeCount=1, trace_node_id=0, detachedness=0
+      // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
+      3, 1, 2, 80, 1, 0, 0,    // object "Array" id=2 size=80 edges=1
+      
       // Node 2: First array element (object)
-      3,
-      3,
-      3,
-      50,
-      2,
-      0,
-      0, // type=3 (object), name=3 ("Object"), id=3, selfSize=50, edgeCount=2, trace_node_id=0, detachedness=0
-      // Node 3: String "editor.fontsize"
-      2,
-      4,
-      4,
-      30,
-      0,
-      0,
-      0, // type=2 (string), name=4 ("editor.fontsize"), id=4, selfSize=30, edgeCount=0, trace_node_id=0, detachedness=0
+      // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
+      3, 3, 3, 50, 2, 0, 0,    // object "Object" id=3 size=50 edges=2
+      
+      // Node 3: String "editor.fontsize"  
+      // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
+      2, 4, 4, 30, 0, 0, 0,    // string "editor.fontsize" id=4 size=30 edges=0
+      
       // Node 4: String "the fontsize of the editor"
-      2,
-      5,
-      5,
-      40,
-      0,
-      0,
-      0, // type=2 (string), name=5 ("the fontsize of the editor"), id=5, selfSize=40, edgeCount=0, trace_node_id=0, detachedness=0
+      // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
+      2, 5, 5, 40, 0, 0, 0,    // string "the fontsize of the editor" id=5 size=40 edges=0
     ]),
     edges: new Uint32Array([
-      // Node 0's edges (BenchmarkObject has 1 edge)
-      2,
-      2,
-      7, // Edge 0: BenchmarkObject["filteredItems"] -> Array (toNode=7 = node 1 * 7)
+      // Edge 0: BenchmarkObject["filteredItems"] -> Array
+      // [type, name_or_index, to_node]
+      2, 2, 7,   // property "filteredItems" -> Array (offset 7)
 
-      // Node 1's edges (Array has 1 edge)
-      1,
-      0,
-      14, // Edge 1: Array[0] -> Object (toNode=14 = node 2 * 7)
+      // Edge 1: Array[0] -> Object  
+      // [type, name_or_index, to_node]
+      1, 0, 14,  // element index=0 -> Object (offset 14)
 
-      // Node 2's edges (Object has 2 edges)
-      2,
-      6,
-      21, // Edge 2: Object["id"] -> String "editor.fontsize" (toNode=21 = node 3 * 7)
-      2,
-      7,
-      28, // Edge 3: Object["description"] -> String "the fontsize of the editor" (toNode=28 = node 4 * 7)
-
-      // Node 3 and 4 have no edges (strings)
+      // Edge 2: Object["id"] -> String "editor.fontsize"
+      // [type, name_or_index, to_node]
+      2, 6, 21,  // property "id" -> "editor.fontsize" (offset 21)
+      
+      // Edge 3: Object["description"] -> String "the fontsize of the editor"  
+      // [type, name_or_index, to_node]
+      2, 7, 28,  // property "description" -> "the fontsize of the editor" (offset 28)
     ]),
     strings: [
       'BenchmarkObject', // 0
@@ -116,6 +91,7 @@ test('should show array contents in property preview at depth > 1', () => {
 
 test('should show simple array contents with primitive values', () => {
   // Create a snapshot where an object has a property that points to an array of strings
+  // prettier-ignore
   const snapshot: Snapshot = {
     node_count: 4,
     edge_count: 3,
