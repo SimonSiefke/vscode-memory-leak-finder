@@ -220,6 +220,9 @@ test('collectArrayElements - should handle nested arrays at depth > 1', () => {
 
 test('collectArrayElements - should prevent circular references', () => {
   const snapshot: Snapshot = {
+    node_count: 1,
+    edge_count: 1,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Node 0: Array that references itself
       0,
@@ -237,11 +240,13 @@ test('collectArrayElements - should prevent circular references', () => {
       0, // element edge pointing back to the same array
     ]),
     strings: ['Array'],
+    locations: new Uint32Array([]),
     meta: {
       node_types: [['object', 'native', 'code', 'string', 'number']],
       node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
       edge_types: [['context', 'element', 'property', 'internal']],
       edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
     },
   }
 

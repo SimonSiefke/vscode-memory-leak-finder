@@ -5,6 +5,9 @@ import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 test('should show array contents in property preview at depth > 1', () => {
   // Create a snapshot where an object has a property "filteredItems" that points to an array
   const snapshot: Snapshot = {
+    node_count: 5,
+    edge_count: 4,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Node 0: Object with property "filteredItems"
       3,
@@ -78,11 +81,13 @@ test('should show array contents in property preview at depth > 1', () => {
       'id', // 6
       'description', // 7
     ],
+    locations: new Uint32Array([]),
     meta: {
       node_types: [['hidden', 'array', 'string', 'object', 'code']],
       node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
       edge_types: [['context', 'element', 'property', 'internal']],
       edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
     },
   }
 
@@ -111,6 +116,9 @@ test('should show array contents in property preview at depth > 1', () => {
 test('should show simple array contents with primitive values', () => {
   // Create a snapshot where an object has a property that points to an array of strings
   const snapshot: Snapshot = {
+    node_count: 4,
+    edge_count: 3,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Node 0: Object with property "items"
       3,
@@ -168,11 +176,13 @@ test('should show simple array contents with primitive values', () => {
       'hello', // 3
       'world', // 4
     ],
+    locations: new Uint32Array([]),
     meta: {
       node_types: [['hidden', 'array', 'string', 'object', 'code']],
       node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
       edge_types: [['context', 'element', 'property', 'internal']],
       edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
     },
   }
 

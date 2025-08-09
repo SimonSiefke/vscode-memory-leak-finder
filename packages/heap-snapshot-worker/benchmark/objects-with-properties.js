@@ -17,7 +17,9 @@ async function testGetObjectsWithProperties() {
     console.log(`Snapshot has ${snapshot.node_count} nodes and ${snapshot.edge_count} edges`)
 
     console.log('\n=== Testing Refactored Function ===')
+    console.time('check')
     const oldStateObjects = getObjectsWithPropertiesInternal(snapshot, 'oldState', 2)
+    console.timeEnd('check')
     console.log(`Refactored function found ${oldStateObjects.length} objects with "oldState" property`)
 
     console.log(JSON.stringify({ oldStateObjects }, null, 2))
