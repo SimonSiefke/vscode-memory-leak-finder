@@ -171,5 +171,3 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
     return `[${nodeTypeName || 'Unknown'} ${targetNode.id}]`
   }
 }
-
-
