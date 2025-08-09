@@ -3,11 +3,11 @@ import chalk from 'chalk'
 const RE_STACK_PATH_1 = /(^\s*at .*?\(?)([^()]+)(:\d+:\d+\)?.*$)/
 const RE_STACK_PATH_2 = /(^\s*at .*?)([^()]+)(:\d+$)/
 
-const stackTraceColor = (string) => {
+const stackTraceColor = (string: string): string => {
   return chalk.dim(string)
 }
 
-const formatStackLine = (line, relativeFilePath) => {
+const formatStackLine = (line: string, relativeFilePath: string): string => {
   const stackMatch1 = line.match(RE_STACK_PATH_1)
   if (stackMatch1) {
     let filePath = stackMatch1[2]
@@ -24,7 +24,7 @@ const formatStackLine = (line, relativeFilePath) => {
   return line
 }
 
-export const formatStack = (stack, relativeFilePath) => {
+export const formatStack = (stack: string, relativeFilePath: string): string => {
   const formattedLines: string[] = []
   const lines = stack.split('\n')
   for (const line of lines) {
