@@ -7,7 +7,10 @@
   "bin": {
     "video-recording-worker": "bin/video-recording-worker.js"
   },
-  "scripts": {},
+  "scripts": {
+    "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
+    "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
+  },
   "keywords": [],
   "author": "",
   "license": "MIT",
@@ -17,5 +20,7 @@
     "@lvce-editor/verror": "^1.7.0",
     "execa": "^9.6.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "ts-jest": "^29.4.1"
+  }
 }
