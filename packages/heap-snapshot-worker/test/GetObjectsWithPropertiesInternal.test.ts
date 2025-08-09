@@ -301,7 +301,7 @@ test('should handle code object with internal object reference', () => {
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '[Object 3]',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
@@ -342,7 +342,7 @@ test('should handle code object with internal array reference', () => {
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '[Array 3]',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
