@@ -1,6 +1,5 @@
 import { test, expect } from '@jest/globals'
 import { examineNodeById, examineNodeByIndex } from '../src/parts/ExamineNode/ExamineNode.ts'
-import { createTestSnapshot } from './createTestSnapshot.ts'
 
 test('examineNode - should examine node with edges and properties', () => {
   const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']

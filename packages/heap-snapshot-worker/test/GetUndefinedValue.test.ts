@@ -1,7 +1,6 @@
 import { test, expect } from '@jest/globals'
 import { getUndefinedValue, getUndefinedStructure } from '../src/parts/GetUndefinedValue/GetUndefinedValue.ts'
 import { createEdgeMap } from '../src/parts/CreateEdgeMap/CreateEdgeMap.ts'
-import { createTestSnapshot } from './createTestSnapshot.ts'
 
 test('getUndefinedValue - should detect undefined value by name and type', () => {
   const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']

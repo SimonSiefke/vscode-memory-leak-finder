@@ -4,6 +4,7 @@ import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('should show array contents in property preview at depth > 1', () => {
   // Create a snapshot where an object has a property "filteredItems" that points to an array
+  // prettier-ignore
   const snapshot: Snapshot = {
     node_count: 5,
     edge_count: 4,
