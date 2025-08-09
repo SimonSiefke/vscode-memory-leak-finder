@@ -1,5 +1,5 @@
-import * as PrepareBoth from '../PrepareBoth/PrepareBoth.js'
-import * as Exit from '../Exit/Exit.js'
+import * as PrepareBoth from '../PrepareBoth/PrepareBoth.ts'
+import * as Exit from '../Exit/Exit.ts'
 
 export const commandMap = {
   'Initialize.prepare': PrepareBoth.prepareBoth,

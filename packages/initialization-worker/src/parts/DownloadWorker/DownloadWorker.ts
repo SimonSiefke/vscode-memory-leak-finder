@@ -1,6 +1,6 @@
 import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
-import * as CommandMapRef from '../CommandMapRef/CommandMapRef.js'
-import * as GetDownloadWorkerUrl from '../GetDownloadWorkerUrl/GetDownloadWorkerUrl.js'
+import * as CommandMapRef from '../CommandMapRef/CommandMapRef.ts'
+import * as GetDownloadWorkerUrl from '../GetDownloadWorkerUrl/GetDownloadWorkerUrl.ts'
 
 // TODO dispose worker on next test run
 export const launch = async () => {

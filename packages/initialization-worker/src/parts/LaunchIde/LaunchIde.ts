@@ -1,7 +1,7 @@
-import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.js'
-import * as LaunchCursor from '../LaunchCursor/LaunchCursor.js'
-import * as Ide from '../Ide/Ide.js'
-import * as VscodeVersion from '../VsCodeVersion/VsCodeVersion.js'
+import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.ts'
+import * as LaunchCursor from '../LaunchCursor/LaunchCursor.ts'
+import * as Ide from '../Ide/Ide.ts'
+import * as VscodeVersion from '../VsCodeVersion/VsCodeVersion.ts'
 
 export const launchIde = async ({ headlessMode, cwd, ide, vscodePath, commit, addDisposable }) => {
   if (ide === Ide.Cursor) {

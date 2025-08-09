@@ -1,5 +1,5 @@
-import * as NodeVersion from '../NodeVersion/NodeVersion.js'
-import * as WaitForData from '../WaitForData/WaitForData.js'
+import * as NodeVersion from '../NodeVersion/NodeVersion.ts'
+import * as WaitForData from '../WaitForData/WaitForData.ts'
 
 const RE_STARTING_INSPECTOR_FAILED = /Starting inspector on .* failed/s
 const RE_LISTENING_ON = /Debugger listening on (.*)/

@@ -1,5 +1,5 @@
-import * as DisableCursorWelcome from '../DisableCursorWelcome/DisableCursorWelcome.js'
-import * as DownloadWorker from '../DownloadWorker/DownloadWorker.js'
+import * as DisableCursorWelcome from '../DisableCursorWelcome/DisableCursorWelcome.ts'
+import * as DownloadWorker from '../DownloadWorker/DownloadWorker.ts'
 
 export const downloadAndUnzipCursor = async (cursorVersion) => {
   const rpc = await DownloadWorker.launch()

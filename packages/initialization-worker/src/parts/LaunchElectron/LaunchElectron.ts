@@ -1,7 +1,7 @@
-import * as GetElectronArgs from '../GetElectronArgs/GetElectronArgs.js'
-import * as Spawn from '../Spawn/Spawn.js'
-import { VError } from '../VError/VError.js'
-import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.js'
+import * as GetElectronArgs from '../GetElectronArgs/GetElectronArgs.ts'
+import * as Spawn from '../Spawn/Spawn.ts'
+import { VError } from '../VError/VError.ts'
+import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.ts'
 
 // const logFile = '/tmp/lvce-manual-tests-log.txt'
 // const logStream = createWriteStream(logFile)

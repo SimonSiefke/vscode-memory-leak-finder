@@ -12,7 +12,7 @@ jest.unstable_mockModule('../src/parts/NodeVersion/NodeVersion.ts', () => {
   }
 })
 
-const WaitForDebuggerListening = await import('../src/parts/WaitForDebuggerListening/WaitForDebuggerListening.js')
+const WaitForDebuggerListening = await import('../src/parts/WaitForDebuggerListening/WaitForDebuggerListening.ts')
 
 test('waitForDebuggerListening - error - address already in use', async () => {
   // @ts-ignore

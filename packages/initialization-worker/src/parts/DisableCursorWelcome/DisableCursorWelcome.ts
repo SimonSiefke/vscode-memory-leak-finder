@@ -1,6 +1,6 @@
 import { join } from 'path'
-import * as Root from '../Root/Root.js'
-import * as StorageWorker from '../StorageWorker/StorageWorker.js'
+import * as Root from '../Root/Root.ts'
+import * as StorageWorker from '../StorageWorker/StorageWorker.ts'
 
 export const disableCursorWelcome = async () => {
   const storagePath = join(Root.root, '.vscode-global-storage', 'state.vscedb')

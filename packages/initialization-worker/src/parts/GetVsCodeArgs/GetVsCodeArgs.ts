@@ -1,4 +1,4 @@
-import * as ChromiumSwitches from '../ChromiumSwitches/ChromiumSwitches.js'
+import * as ChromiumSwitches from '../ChromiumSwitches/ChromiumSwitches.ts'
 
 export const getVscodeArgs = ({ extensionsDir, userDataDir, extraLaunchArgs }) => {
   return [

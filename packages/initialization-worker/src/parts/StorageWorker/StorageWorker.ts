@@ -1,6 +1,6 @@
 import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
-import * as CommandMapRef from '../CommandMapRef/CommandMapRef.js'
-import * as GetStorageWorkerUrl from '../GetStorageWorkerUrl/GetStorageWorkerUrl.js'
+import * as CommandMapRef from '../CommandMapRef/CommandMapRef.ts'
+import * as GetStorageWorkerUrl from '../GetStorageWorkerUrl/GetStorageWorkerUrl.ts'
 
 export const launch = async () => {
   const url = GetStorageWorkerUrl.getStorageWorkerUrl()

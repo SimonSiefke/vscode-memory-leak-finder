@@ -1,6 +1,6 @@
-import * as GetElectronErrorMessage from '../GetElectronErrorMessage/GetElectronErrorMessage.js'
-import * as IsImportantErrorMessage from '../IsImportantErrorMessage/IsImportantErrorMessage.js'
-import * as WaitForData from '../WaitForData/WaitForData.js'
+import * as GetElectronErrorMessage from '../GetElectronErrorMessage/GetElectronErrorMessage.ts'
+import * as IsImportantErrorMessage from '../IsImportantErrorMessage/IsImportantErrorMessage.ts'
+import * as WaitForData from '../WaitForData/WaitForData.ts'
 
 const RE_LISTENING_ON = /DevTools listening on (ws:\/\/.*)/
 

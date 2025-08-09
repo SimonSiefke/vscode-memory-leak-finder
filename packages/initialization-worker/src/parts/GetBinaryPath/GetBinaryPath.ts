@@ -1,6 +1,6 @@
-import * as DownloadAndUnzipVscode from '../DownloadAndUnzipVscode/DownloadAndUnzipVscode.js'
-import * as DownloadAndBuildVscodeFromCommit from '../DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js'
-import * as Env from '../Env/Env.js'
+import * as DownloadAndUnzipVscode from '../DownloadAndUnzipVscode/DownloadAndUnzipVscode.ts'
+import * as DownloadAndBuildVscodeFromCommit from '../DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.ts'
+import * as Env from '../Env/Env.ts'
 
 export const getBinaryPath = async (vscodeVersion, vscodePath, commit) => {
   if (vscodePath) {

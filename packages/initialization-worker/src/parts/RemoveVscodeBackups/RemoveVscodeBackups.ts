@@ -1,6 +1,6 @@
 import { join } from 'node:path'
 import { rm } from 'node:fs/promises'
-import * as Root from '../Root/Root.js'
+import * as Root from '../Root/Root.ts'
 
 export const removeVscodeBackups = async () => {
   const backupsPath = join(Root.root, '.vscode-user-data-dir', 'Backups')

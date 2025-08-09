@@ -1,4 +1,4 @@
-import * as DownloadWorker from '../DownloadWorker/DownloadWorker.js'
+import * as DownloadWorker from '../DownloadWorker/DownloadWorker.ts'
 
 /**
  * @param {string} vscodeVersion
