@@ -21,9 +21,9 @@ test('handleAttachedToTarget handles browser type', () => {
       targetInfo: {
         type: DevtoolsTargetType.Browser,
         targetId: 'browser-123',
-        url: 'about:blank'
-      }
-    }
+        url: 'about:blank',
+      },
+    },
   }
 
   // Should not throw for browser type
@@ -39,9 +39,9 @@ test('handleAttachedToTarget handles unknown type', () => {
       targetInfo: {
         type: 'unknown-type',
         targetId: 'unknown-123',
-        url: 'about:blank'
-      }
-    }
+        url: 'about:blank',
+      },
+    },
   }
 
   // Should not throw for unknown type (falls through default case)
@@ -57,7 +57,7 @@ test('handleDetachedFromTarget removes session', () => {
   SessionState.addSession(sessionId, {
     type: 'page',
     sessionId,
-    rpc: {}
+    rpc: {},
   })
 
   expect(SessionState.hasSession(sessionId)).toBe(true)
@@ -65,8 +65,8 @@ test('handleDetachedFromTarget removes session', () => {
   // Handle detached from target
   const mockMessage = {
     params: {
-      sessionId
-    }
+      sessionId,
+    },
   }
 
   ScenarioFunctions.handleDetachedFromTarget(mockMessage)
@@ -91,9 +91,9 @@ test('handleAttachedToTarget with page type should setup session but fail withou
         type: DevtoolsTargetType.Page,
         targetId: 'page-target-123',
         url: 'https://example.com',
-        browserContextId: 'context-123'
-      }
-    }
+        browserContextId: 'context-123',
+      },
+    },
   }
 
   // This should not throw even if browser session doesn't exist

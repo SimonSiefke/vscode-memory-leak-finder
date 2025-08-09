@@ -6,6 +6,6 @@ export const handleTestRunning = async (file: string, relativeDirName: string, f
   if (IsGithubActions.isGithubActions) {
     return
   }
-  const message = GetHandleTestRunningMessage.getHandleTestRunningMessage(file, relativeDirName, fileName, isFirst)
+  const message = await GetHandleTestRunningMessage.getHandleTestRunningMessage(file, relativeDirName, fileName, isFirst)
   await Stdout.write(message)
 }

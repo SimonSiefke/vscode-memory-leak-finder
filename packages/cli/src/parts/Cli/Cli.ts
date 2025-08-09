@@ -2,10 +2,12 @@ import * as Argv from '../Argv/Argv.ts'
 import * as InitialStart from '../InitialStart/InitialStart.ts'
 import * as ParseArgv from '../ParseArgv/ParseArgv.ts'
 import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 import * as CommandMap from '../CommandMap/CommandMap.ts'
 import * as CommandMapRef from '../CommandMapRef/CommandMapRef.ts'
 
 export const run = async (): Promise<void> => {
+  await StdoutWorker.initialize()
   Object.assign(CommandMapRef.commandMapRef, CommandMap.commandMap)
   const options = ParseArgv.parseArgv(Argv.argv)
   StdinDataState.setState({
