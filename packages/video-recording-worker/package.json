@@ -8,7 +8,8 @@
     "video-recording-worker": "bin/video-recording-worker.js"
   },
   "scripts": {
-    "test": "NODE_OPTIONS=\"--experimental-vm-modules\" jest"
+    "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
+    "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
   },
   "keywords": [],
   "author": "",
