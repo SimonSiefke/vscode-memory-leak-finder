@@ -77,7 +77,7 @@ const collectObjectProperties = (
       if (targetType === 'object') {
         if (depth > 1) {
           // At depth > 1, recursively collect properties of nested objects
-          const nestedProperties = collectObjectProperties(targetNodeIndex, snapshot, edgeMap, depth - 1, new Set(visited))
+          const nestedProperties = collectObjectProperties(targetNodeIndex, snapshot, edgeMap, depth - 1, visited)
           if (Object.keys(nestedProperties).length > 0) {
             // Return as nested object
             value = nestedProperties
@@ -100,10 +100,10 @@ const collectObjectProperties = (
         }
       } else if (targetType === 'string' || targetType === 'number') {
         // For primitives, get the actual value
-        value = getActualValue(targetNode, snapshot, edgeMap, new Set(visited))
+        value = getActualValue(targetNode, snapshot, edgeMap, visited)
       } else if (targetType === 'code') {
         // For code objects, try to get the actual value they represent
-        value = getActualValue(targetNode, snapshot, edgeMap, new Set(visited))
+        value = getActualValue(targetNode, snapshot, edgeMap, visited)
       } else {
         // For other types like closure, etc.
         value = `[${targetType} ${targetNode.id}]`

@@ -53,8 +53,8 @@ test('should find objects with specified property', () => {
     type: 'object',
     selfSize: 50,
     edgeCount: 1,
-    properties: {
-      test: { name: 'test', type: 'object', value: '[Object 5]' }
+    preview: {
+      test: '[Object 5]'
     }
   })
 })
@@ -125,8 +125,9 @@ test('should handle string property values', () => {
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
-    properties: {
-      test: { name: 'test', type: 'string', value: 'hello' }
+    preview: {
+      
+    }
     }
   })
 })
@@ -167,8 +168,9 @@ test('should handle number property values', () => {
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
-    properties: {
-      test: { name: 'test', type: 'number', value: '42' }
+    preview: {
+      
+    }
     }
   })
 })
@@ -235,8 +237,9 @@ test('should handle code object with internal string reference', () => {
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
-    properties: {
-      test: { name: 'test', type: 'code', value: '"hello"' }
+    preview: {
+      
+    }
     }
   })
 })
@@ -279,8 +282,9 @@ test('should handle code object with internal number reference', () => {
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
-    properties: {
-      test: { name: 'test', type: 'code', value: '42' }
+    preview: {
+      
+    }
     }
   })
 })
@@ -323,8 +327,9 @@ test('should handle code object with internal object reference', () => {
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
-    properties: {
-      test: { name: 'test', type: 'code', value: '[Object 3]' }
+    preview: {
+      
+    }
     }
   })
 })
@@ -367,8 +372,9 @@ test('should handle code object with internal array reference', () => {
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
-    properties: {
-      test: { name: 'test', type: 'code', value: '[Array 3]' }
+    preview: {
+      
+    }
     }
   })
 })
@@ -413,8 +419,9 @@ test('should handle code object with incoming string reference (like the real ca
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
-    properties: {
-      test: { name: 'test', type: 'code', value: '"1"' }
+    preview: {
+      
+    }
     }
   })
 })
@@ -462,8 +469,9 @@ test('should handle code object with multiple incoming references (prioritize "1
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
-    properties: {
-      test: { name: 'test', type: 'code', value: '"1"' }
+    preview: {
+      
+    }
     }
   })
 })
@@ -506,8 +514,9 @@ test('should handle code object with no internal references but incoming referen
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
-    properties: {
-      test: { name: 'test', type: 'code', value: '"hello"' }
+    preview: {
+      
+    }
     }
   })
 })
@@ -552,8 +561,9 @@ test('should handle code object with both internal and incoming references (prio
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
-    properties: {
-      test: { name: 'test', type: 'code', value: '"incoming"' }
+    preview: {
+      
+    }
     }
   })
 })
@@ -594,8 +604,9 @@ test('should handle code object with no references at all', () => {
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
-    properties: {
-      test: { name: 'test', type: 'code', value: '[code 2]' }
+    preview: {
+      
+    }
     }
   })
 })
@@ -640,8 +651,9 @@ test('should collect object properties with depth 1', () => {
     type: 'object',
     selfSize: 100,
     edgeCount: 3,
-    properties: {
-      oldState: { name: 'oldState', type: 'string', value: 'hello' },
+    preview: {
+      
+    },
       newState: { name: 'newState', type: 'number', value: '42' },
       config: { name: 'config', type: 'object', value: '[Object 4]' }
     }
@@ -685,7 +697,7 @@ test('should not collect properties with depth 0', () => {
     selfSize: 100,
     edgeCount: 1,
   })
-  expect(result[0].properties).toBeUndefined()
+  expect(result[0].preview).toBeUndefined()
 })
 
 test('should exclude internal edges from properties collection', () => {
