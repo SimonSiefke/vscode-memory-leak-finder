@@ -14,8 +14,8 @@ test('handleDetachedFromTarget function exists', () => {
 
 test('handleAttachedToTarget handles browser type', () => {
   // Mock console methods to suppress output during test
-  const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation()
-  
+  const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+
   const mockMessage = {
     params: {
       targetInfo: {
@@ -28,7 +28,7 @@ test('handleAttachedToTarget handles browser type', () => {
 
   // Should not throw for browser type
   expect(() => ScenarioFunctions.handleAttachedToTarget(mockMessage)).not.toThrow()
-  
+
   // Restore console method
   consoleLogSpy.mockRestore()
 })
@@ -80,6 +80,10 @@ test('handleAttachedToTarget with page type should setup session but fail withou
   SessionState.reset()
   TargetState.reset()
 
+  // Mock console methods to suppress output during test
+  const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+  const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+
   const mockMessage = {
     params: {
       sessionId: 'page-session-123',
@@ -95,4 +99,8 @@ test('handleAttachedToTarget with page type should setup session but fail withou
   // This should not throw even if browser session doesn't exist
   // (the function handles errors internally)
   await expect(ScenarioFunctions.handleAttachedToTarget(mockMessage)).resolves.toBeUndefined()
+
+  // Restore console methods
+  consoleLogSpy.mockRestore()
+  consoleErrorSpy.mockRestore()
 })

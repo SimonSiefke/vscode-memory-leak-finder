@@ -14,21 +14,21 @@ test('error function exists', () => {
 })
 
 test('log should not throw', () => {
-  const consoleSpy = jest.spyOn(console, 'log').mockImplementation()
+  const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
   expect(() => Logger.log('test message')).not.toThrow()
   expect(consoleSpy).toHaveBeenCalledWith('test message')
   consoleSpy.mockRestore()
 })
 
 test('warn should not throw', () => {
-  const consoleSpy = jest.spyOn(console, 'warn').mockImplementation()
+  const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
   expect(() => Logger.warn('test warning')).not.toThrow()
   expect(consoleSpy).toHaveBeenCalledWith('test warning')
   consoleSpy.mockRestore()
 })
 
 test('error should not throw', () => {
-  const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
+  const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
   expect(() => Logger.error('test error')).not.toThrow()
   expect(consoleSpy).toHaveBeenCalledWith('test error')
   consoleSpy.mockRestore()
