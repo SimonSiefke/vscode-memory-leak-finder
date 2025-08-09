@@ -28,7 +28,6 @@ export const connectDevtools = (
   Assert.object(rpc)
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
-  console.log('before invoke')
   return rpc.invoke(
     TestWorkerCommandType.ConnectDevtools,
     connectionId,
