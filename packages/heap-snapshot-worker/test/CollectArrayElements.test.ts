@@ -121,14 +121,19 @@ test('collectArrayElements - should limit number of elements', () => {
   }
 
   const snapshot: Snapshot = {
+    node_count: nodeCount,
+    edge_count: edgeCount,
+    extra_native_bytes: 0,
     nodes,
     edges,
     strings,
+    locations: new Uint32Array([]),
     meta: {
       node_types: [['object', 'native', 'code', 'string', 'number']],
       node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
       edge_types: [['context', 'element', 'property', 'internal']],
       edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
     },
   }
 
@@ -143,6 +148,9 @@ test('collectArrayElements - should limit number of elements', () => {
 
 test('collectArrayElements - should handle nested arrays at depth > 1', () => {
   const snapshot: Snapshot = {
+    node_count: 4,
+    edge_count: 3,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Node 0: Outer Array
       0,
@@ -192,11 +200,13 @@ test('collectArrayElements - should handle nested arrays at depth > 1', () => {
       21, // element edge to string
     ]),
     strings: ['Array', 'inner1', 'inner2'],
+    locations: new Uint32Array([]),
     meta: {
       node_types: [['object', 'native', 'code', 'string', 'number']],
       node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
       edge_types: [['context', 'element', 'property', 'internal']],
       edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
     },
   }
 
