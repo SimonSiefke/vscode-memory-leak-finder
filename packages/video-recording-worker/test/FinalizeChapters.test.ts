@@ -31,7 +31,9 @@ test('FinalizeChapters - should handle case when ffmpeg is available', async () 
 
   jest.unstable_mockModule('../src/parts/VideoChapter/VideoChapter.ts', () => ({
     state: {
-      chapters: [{ name: 'Chapter 1', time: 5000 }],
+      chapters: [
+        { name: 'Chapter 1', time: 5000 },
+      ],
     },
   }))
 
