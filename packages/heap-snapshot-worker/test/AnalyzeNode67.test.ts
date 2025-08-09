@@ -112,22 +112,22 @@ test('search for undefined nodes in abc2.heapsnapshot', async () => {
     console.log(`"undefined" string index: ${undefinedStringIndex}`)
 
     if (undefinedStringIndex !== -1) {
-      // Find all nodes with name "undefined"
-      const undefinedNodes = []
-      for (let i = 0; i < nodes.length; i += ITEMS_PER_NODE) {
-        const nameIndex = nodes[i + nameFieldIndex]
-        const nodeId = nodes[i + idFieldIndex]
-        const typeIndex = nodes[i + typeFieldIndex]
-
-        if (nameIndex === undefinedStringIndex) {
-          const typeName = node_types[0] ? node_types[0][typeIndex] : 'unknown'
-          undefinedNodes.push({
-            nodeIndex: i / ITEMS_PER_NODE,
-            id: nodeId,
-            typeName
-          })
-        }
+          // Find all nodes with name "undefined"
+    const undefinedNodes: Array<{nodeIndex: number, id: number, typeName: string}> = []
+    for (let i = 0; i < nodes.length; i += ITEMS_PER_NODE) {
+      const nameIndex = nodes[i + nameFieldIndex]
+      const nodeId = nodes[i + idFieldIndex]
+      const typeIndex = nodes[i + typeFieldIndex]
+      
+      if (nameIndex === undefinedStringIndex) {
+        const typeName = node_types[0] ? node_types[0][typeIndex] : 'unknown'
+        undefinedNodes.push({
+          nodeIndex: i / ITEMS_PER_NODE,
+          id: nodeId,
+          typeName
+        })
       }
+    }
 
       console.log(`Found ${undefinedNodes.length} nodes with name "undefined":`)
       undefinedNodes.forEach(node => {

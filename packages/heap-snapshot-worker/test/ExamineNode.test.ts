@@ -1,5 +1,6 @@
 import { test, expect } from '@jest/globals'
 import { examineNodeById, examineNodeByIndex } from '../src/parts/ExamineNode/ExamineNode.ts'
+import { createTestSnapshot } from './helpers/createTestSnapshot.ts'
 
 test('examineNode - should examine node with edges and properties', () => {
   const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
@@ -31,17 +32,15 @@ test('examineNode - should examine node with edges and properties', () => {
 
   const strings = ['Object', 'hello', 'world', 'prop1', 'prop2']
 
-  const snapshot = {
+  const snapshot = createTestSnapshot(
     nodes,
     edges,
     strings,
-    meta: {
-      node_fields: nodeFields,
-      edge_fields: edgeFields,
-      node_types: nodeTypes,
-      edge_types: edgeTypes
-    }
-  }
+    nodeFields,
+    edgeFields,
+    nodeTypes,
+    edgeTypes
+  )
 
   // Examine Node 0
   const result = examineNodeByIndex(0, snapshot)
@@ -106,17 +105,15 @@ test('examineNode - should handle node with no edges', () => {
   const edges = new Uint32Array([])
   const strings = ['test']
 
-  const snapshot = {
+  const snapshot = createTestSnapshot(
     nodes,
     edges,
     strings,
-    meta: {
-      node_fields: nodeFields,
-      edge_fields: edgeFields,
-      node_types: nodeTypes,
-      edge_types: edgeTypes
-    }
-  }
+    nodeFields,
+    edgeFields,
+    nodeTypes,
+    edgeTypes
+  )
 
   const result = examineNodeByIndex(0, snapshot)
 
@@ -178,17 +175,15 @@ test('examineNodeById - should find and examine node by ID 67', () => {
 
   const strings = ['node_0', 'node_1', 'Object', 'node_3', 'prop1', 'prop2']
 
-  const snapshot = {
+  const snapshot = createTestSnapshot(
     nodes,
     edges,
     strings,
-    meta: {
-      node_fields: nodeFields,
-      edge_fields: edgeFields,
-      node_types: nodeTypes,
-      edge_types: edgeTypes
-    }
-  }
+    nodeFields,
+    edgeFields,
+    nodeTypes,
+    edgeTypes
+  )
 
   // Examine Node with ID 67
   const result = examineNodeById(67, snapshot)

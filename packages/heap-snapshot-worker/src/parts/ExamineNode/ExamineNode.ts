@@ -37,7 +37,7 @@ export interface NodeExaminationResult {
  * @returns Detailed examination result of the node or null if not found
  */
 export const examineNodeById = (nodeId: number, snapshot: Snapshot): NodeExaminationResult | null => {
-  const { nodes, node_fields } = snapshot.meta
+  const { node_fields } = snapshot.meta
   const ITEMS_PER_NODE = node_fields.length
   const idFieldIndex = node_fields.indexOf('id')
 

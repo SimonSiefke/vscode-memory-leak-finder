@@ -1,6 +1,7 @@
 import { test, expect } from '@jest/globals'
 import { getUndefinedValue, getUndefinedStructure } from '../src/parts/GetUndefinedValue/GetUndefinedValue.ts'
 import { createEdgeMap } from '../src/parts/CreateEdgeMap/CreateEdgeMap.ts'
+import { createTestSnapshot } from './helpers/createTestSnapshot.ts'
 
 test('getUndefinedValue - should detect undefined value by name and type', () => {
   const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
@@ -16,17 +17,15 @@ test('getUndefinedValue - should detect undefined value by name and type', () =>
     edge_count: 0
   }
 
-  const snapshot = {
-    nodes: new Uint32Array([0, 0, 67, 0, 0]), // hidden, name=0(undefined), id=67, size=0, edges=0
-    edges: new Uint32Array([]),
+  const snapshot = createTestSnapshot(
+    new Uint32Array([0, 0, 67, 0, 0]), // hidden, name=0(undefined), id=67, size=0, edges=0
+    new Uint32Array([]),
     strings,
-    meta: {
-      node_fields: nodeFields,
-      edge_fields: ['type', 'name_or_index', 'to_node'],
-      node_types: nodeTypes,
-      edge_types: [['property', 'internal']]
-    }
-  }
+    nodeFields,
+    ['type', 'name_or_index', 'to_node'],
+    nodeTypes,
+    [['property', 'internal']]
+  )
 
   const edgeMap = createEdgeMap(snapshot.nodes, nodeFields)
 
@@ -47,17 +46,15 @@ test('getUndefinedValue - should return null for non-undefined nodes', () => {
     edge_count: 0
   }
 
-  const snapshot = {
-    nodes: new Uint32Array([1, 0, 1, 10, 0]),
-    edges: new Uint32Array([]),
+  const snapshot = createTestSnapshot(
+    new Uint32Array([1, 0, 1, 10, 0]),
+    new Uint32Array([]),
     strings,
-    meta: {
-      node_fields: nodeFields,
-      edge_fields: ['type', 'name_or_index', 'to_node'],
-      node_types: nodeTypes,
-      edge_types: [['property', 'internal']]
-    }
-  }
+    nodeFields,
+    ['type', 'name_or_index', 'to_node'],
+    nodeTypes,
+    [['property', 'internal']]
+  )
 
   const edgeMap = createEdgeMap(snapshot.nodes, nodeFields)
 
@@ -85,17 +82,15 @@ test('getUndefinedStructure - should detect undefined property structure', () =>
     0, 2, 5 // type=property, name=testProp, to_node=5 (index 1 * 5 fields)
   ])
 
-  const snapshot = {
+  const snapshot = createTestSnapshot(
     nodes,
     edges,
     strings,
-    meta: {
-      node_fields: nodeFields,
-      edge_fields: edgeFields,
-      node_types: nodeTypes,
-      edge_types: edgeTypes
-    }
-  }
+    nodeFields,
+    edgeFields,
+    nodeTypes,
+    edgeTypes
+  )
 
   const sourceNode = {
     type: 0,

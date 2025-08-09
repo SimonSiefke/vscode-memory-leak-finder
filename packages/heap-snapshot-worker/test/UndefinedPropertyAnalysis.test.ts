@@ -1,5 +1,6 @@
 import { test, expect } from '@jest/globals'
 import { examineNodeByIndex } from '../src/parts/ExamineNode/ExamineNode.ts'
+import { createTestSnapshot } from './helpers/createTestSnapshot.ts'
 
 test('demonstrate improved undefined property detection', () => {
   // Create a mock snapshot that represents an object with undefined properties
@@ -30,17 +31,15 @@ test('demonstrate improved undefined property detection', () => {
     0, 3, 10    // type=property, name=anotherProp, to_node=10 (node 2)
   ])
 
-  const snapshot = {
+  const snapshot = createTestSnapshot(
     nodes,
     edges,
     strings,
-    meta: {
-      node_fields: nodeFields,
-      edge_fields: edgeFields,
-      node_types: nodeTypes,
-      edge_types: edgeTypes
-    }
-  }
+    nodeFields,
+    edgeFields,
+    nodeTypes,
+    edgeTypes
+  )
 
   // Examine the object (node index 0)
   const result = examineNodeByIndex(0, snapshot)
@@ -93,17 +92,15 @@ test('demonstrate undefined vs string undefined differences', () => {
     0, 3, 10    // type=property, name=stringProp, to_node=10 (node 2)
   ])
 
-  const snapshot = {
+  const snapshot = createTestSnapshot(
     nodes,
     edges,
     strings,
-    meta: {
-      node_fields: nodeFields,
-      edge_fields: edgeFields,
-      node_types: nodeTypes,
-      edge_types: edgeTypes
-    }
-  }
+    nodeFields,
+    edgeFields,
+    nodeTypes,
+    edgeTypes
+  )
 
   const result = examineNodeByIndex(0, snapshot)
 

@@ -3,6 +3,7 @@ import { getNodeName } from '../src/parts/GetNodeName/GetNodeName.ts'
 import { getActualValue } from '../src/parts/GetActualValue/GetActualValue.ts'
 import { examineNodeByIndex } from '../src/parts/ExamineNode/ExamineNode.ts'
 import { createEdgeMap } from '../src/parts/CreateEdgeMap/CreateEdgeMap.ts'
+import { createTestSnapshot } from './helpers/createTestSnapshot.ts'
 
 test('getNodeName - should handle empty strings correctly', () => {
   const strings = ['', 'hello', 'world']
@@ -25,17 +26,15 @@ test('getActualValue - should properly display string values', () => {
   const nodeTypes = [['string', 'object']]
   const strings = ['', 'hello', 'world', 'test value']
 
-  const snapshot = {
-    nodes: new Uint32Array([]),
-    edges: new Uint32Array([]),
+  const snapshot = createTestSnapshot(
+    new Uint32Array([]),
+    new Uint32Array([]),
     strings,
-    meta: {
-      node_fields: nodeFields,
-      edge_fields: ['type', 'name_or_index', 'to_node'],
-      node_types: nodeTypes,
-      edge_types: [['property']]
-    }
-  }
+    nodeFields,
+    ['type', 'name_or_index', 'to_node'],
+    nodeTypes,
+    [['property']]
+  )
 
   const edgeMap = createEdgeMap(snapshot.nodes, nodeFields)
 
@@ -85,17 +84,15 @@ test('examineNode - should show improved string property values', () => {
     0, 5, 15    // type=property, name=textProp, to_node=15 (node 3)
   ])
 
-  const snapshot = {
+  const snapshot = createTestSnapshot(
     nodes,
     edges,
     strings,
-    meta: {
-      node_fields: nodeFields,
-      edge_fields: edgeFields,
-      node_types: nodeTypes,
-      edge_types: edgeTypes
-    }
-  }
+    nodeFields,
+    edgeFields,
+    nodeTypes,
+    edgeTypes
+  )
 
   // Examine the object (node index 0)
   const result = examineNodeByIndex(0, snapshot)

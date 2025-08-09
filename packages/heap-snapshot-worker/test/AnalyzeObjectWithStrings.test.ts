@@ -1,4 +1,4 @@
-import { test, expect } from '@jest/globals'
+import { test } from '@jest/globals'
 import { examineNodeById } from '../src/parts/ExamineNode/ExamineNode.ts'
 import { prepareHeapSnapshot } from '../src/parts/PrepareHeapSnapshot/PrepareHeapSnapshot.js'
 
@@ -18,14 +18,13 @@ test('analyze object with string properties including empty strings', async () =
 
     const snapshot = await prepareHeapSnapshot(heapSnapshotPath, { parseStrings: true })
 
-    console.log('\n=== SEARCHING FOR OBJECTS WITH STRING PROPERTIES ===')
-    const { nodes, strings, meta } = snapshot
+        console.log('\n=== SEARCHING FOR OBJECTS WITH STRING PROPERTIES ===')
+    const { nodes, edges, strings, meta } = snapshot
     const { node_fields, node_types, edge_fields, edge_types } = meta
     const ITEMS_PER_NODE = node_fields.length
     const ITEMS_PER_EDGE = edge_fields.length
-
+    
     const typeFieldIndex = node_fields.indexOf('type')
-    const nameFieldIndex = node_fields.indexOf('name')
     const idFieldIndex = node_fields.indexOf('id')
     const edgeCountFieldIndex = node_fields.indexOf('edge_count')
 
@@ -42,18 +41,18 @@ test('analyze object with string properties including empty strings', async () =
       return
     }
 
-    // Find objects that have string properties
-    const objectsWithStringProps = []
+        // Find objects that have string properties
+    const objectsWithStringProps: Array<{nodeId: number, nodeIndex: number, stringProperties: Array<{propertyName: string, targetNodeId: number, targetNodeIndex: number}>}> = []
     let currentEdgeOffset = 0
-
+    
     for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex += ITEMS_PER_NODE) {
       const typeIndex = nodes[nodeIndex + typeFieldIndex]
       const nodeId = nodes[nodeIndex + idFieldIndex]
       const edgeCount = nodes[nodeIndex + edgeCountFieldIndex]
-
+      
       if (typeIndex === objectTypeIndex) {
         // Check this object's edges for string properties
-        const stringProperties = []
+        const stringProperties: Array<{propertyName: string, targetNodeId: number, targetNodeIndex: number}> = []
 
         for (let j = 0; j < edgeCount; j++) {
           const edgeIndex = (currentEdgeOffset + j) * ITEMS_PER_EDGE
