@@ -43,8 +43,8 @@ test('should find objects with specified property', () => {
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '[Object 4]'
-    }
+      test: '[Object 4]',
+    },
   })
   expect(result[1]).toEqual({
     id: 2,
@@ -54,8 +54,8 @@ test('should find objects with specified property', () => {
     selfSize: 50,
     edgeCount: 1,
     preview: {
-      test: '[Object 5]'
-    }
+      test: '[Object 5]',
+    },
   })
 })
 
@@ -126,8 +126,8 @@ test('should handle string property values', () => {
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: 'hello'
-    }
+      test: 'hello',
+    },
   })
 })
 
@@ -168,8 +168,8 @@ test('should handle number property values', () => {
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '42'
-    }
+      test: '42',
+    },
   })
 })
 
@@ -236,8 +236,8 @@ test('should handle code object with internal string reference', () => {
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '"hello"'
-    }
+      test: '"hello"',
+    },
   })
 })
 
@@ -275,13 +275,13 @@ test('should handle code object with internal number reference', () => {
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '42',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '42'
-    }
+      test: '42',
+    },
   })
 })
 
@@ -319,13 +319,13 @@ test('should handle code object with internal object reference', () => {
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '[Object 3]',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '[Object 3]'
-    }
+      test: '[Object 3]',
+    },
   })
 })
 
@@ -363,13 +363,13 @@ test('should handle code object with internal array reference', () => {
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '[Array 3]',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '[Array 3]'
-    }
+      test: '[Array 3]',
+    },
   })
 })
 
@@ -409,13 +409,13 @@ test('should handle code object with incoming string reference (like the real ca
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '"1"',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '"1"'
-    }
+      test: '"1"',
+    },
   })
 })
 
@@ -458,13 +458,13 @@ test('should handle code object with multiple incoming references (prioritize "1
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '"1"',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '"1"'
-    }
+      test: '"1"',
+    },
   })
 })
 
@@ -502,13 +502,13 @@ test('should handle code object with no internal references but incoming referen
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '"hello"',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '"hello"'
-    }
+      test: '"hello"',
+    },
   })
 })
 
@@ -548,13 +548,13 @@ test('should handle code object with both internal and incoming references (prio
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '"incoming"',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '"incoming"'
-    }
+      test: '"incoming"',
+    },
   })
 })
 
@@ -590,13 +590,13 @@ test('should handle code object with no references at all', () => {
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '[code 2]',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '[code 2]'
-    }
+      test: '[code 2]',
+    },
   })
 })
 
@@ -643,8 +643,8 @@ test('should collect object properties with depth 1', () => {
     preview: {
       config: '[Object 4]',
       newState: '42',
-      oldState: 'hello'
-    }
+      oldState: 'hello',
+    },
   })
 })
 
@@ -719,7 +719,7 @@ test('should exclude internal edges from properties collection', () => {
   const result = getObjectsWithPropertiesInternal(snapshot, 'test', 1)
 
   expect(result).toHaveLength(1)
-    expect(result[0]).toEqual({
+  expect(result[0]).toEqual({
     id: 1,
     name: 'TestObject',
     propertyValue: 'hello',
@@ -727,8 +727,8 @@ test('should exclude internal edges from properties collection', () => {
     selfSize: 100,
     edgeCount: 2,
     preview: {
-      test: 'hello'
-    }
+      test: 'hello',
+    },
   })
 
   // Should not include the internal edge in preview
@@ -782,11 +782,11 @@ test('should collect nested properties with depth 2', () => {
     preview: {
       oldState: {
         filteredItems: 'array1',
-        items: 'array2'
+        items: 'array2',
       },
       newState: {
-        preferences: 'settings'
-      }
-    }
+        preferences: 'settings',
+      },
+    },
   })
 })

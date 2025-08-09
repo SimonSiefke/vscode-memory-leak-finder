@@ -2,7 +2,7 @@ import * as GetHandleTestSetupMessage from '../GetHandleTestSetupMessage/GetHand
 import * as Stdout from '../Stdout/Stdout.ts'
 import * as IsGithubActions from '../IsGithubActions/IsGithubActions.ts'
 
-export const handleTestSetup = async () => {
+export const handleTestSetup = async (): Promise<void> => {
   if (IsGithubActions.isGithubActions) {
     return
   }
