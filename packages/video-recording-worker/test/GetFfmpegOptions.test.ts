@@ -5,7 +5,7 @@ test('getFfmpegOptions returns array of strings', () => {
   const result = GetFfmpegOptions.getFfmpegOptions(25, 1024, 768, '/tmp/test.webm')
   expect(Array.isArray(result)).toBe(true)
   expect(result.length).toBeGreaterThan(0)
-  result.forEach((arg) => {
+  result.forEach(arg => {
     expect(typeof arg).toBe('string')
   })
 })
@@ -26,7 +26,7 @@ test('getFfmpegOptions includes video filter with dimensions', () => {
   const width = 1920
   const height = 1080
   const result = GetFfmpegOptions.getFfmpegOptions(25, width, height, '/tmp/test.webm')
-  const filterArg = result.find((arg) => arg.includes('pad=') && arg.includes('crop='))
+  const filterArg = result.find(arg => arg.includes('pad=') && arg.includes('crop='))
   expect(filterArg).toBeDefined()
   expect(filterArg).toContain(`pad=${width}:${height}`)
   expect(filterArg).toContain(`crop=${width}:${height}`)
