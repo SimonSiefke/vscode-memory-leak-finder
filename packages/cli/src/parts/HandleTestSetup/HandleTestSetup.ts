@@ -1,11 +1,11 @@
-import * as IsGithubActions from '../IsGithubActions/IsGithubActions.ts'
+import * as GetHandleTestSetupMessage from '../GetHandleTestSetupMessage/GetHandleTestSetupMessage.ts'
 import * as Stdout from '../Stdout/Stdout.ts'
-import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
+import * as IsGithubActions from '../IsGithubActions/IsGithubActions.ts'
 
 export const handleTestSetup = async (): Promise<void> => {
   if (IsGithubActions.isGithubActions) {
     return
   }
-  const message = await StdoutWorker.invoke('Stdout.getHandleTestSetupMessage')
+  const message = GetHandleTestSetupMessage.getHandleTestSetupMessage()
   await Stdout.write(message)
 }
