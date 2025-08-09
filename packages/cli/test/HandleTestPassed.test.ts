@@ -46,7 +46,8 @@ const TestStateOutput = await import('../src/parts/TestStateOutput/TestStateOutp
 const HandleTestPassed = await import('../src/parts/HandleTestPassed/HandleTestPassed.ts')
 
 test('handleTestPassed', async () => {
-  const expectedMessage = '\r\u001B[K\r\u001B[1A\r\u001B[K\r\u001B[1A\u001B[0m\u001B[7m\u001B[1m\u001B[32m PASS \u001B[39m\u001B[22m\u001B[27m\u001B[0m \u001B[2m/test/\u001B[22m\u001B[1mapp.test.js\u001B[22m (0.100 s)\n'
+  const expectedMessage =
+    '\r\u001B[K\r\u001B[1A\r\u001B[K\r\u001B[1A\u001B[0m\u001B[7m\u001B[1m\u001B[32m PASS \u001B[39m\u001B[22m\u001B[27m\u001B[0m \u001B[2m/test/\u001B[22m\u001B[1mapp.test.js\u001B[22m (0.100 s)\n'
 
   mockInvoke.mockResolvedValue(expectedMessage)
 
