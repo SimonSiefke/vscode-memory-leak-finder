@@ -7,6 +7,6 @@ const toShowMore = chalk.dim(' to show more.')
 
 const watchUsageShortMessage = `\n${watchUsage}${press}${CliKeys.WatchMode}${toShowMore}`
 
-export const print = () => {
+export const getWatchUsageMessageShort = () => {
   return watchUsageShortMessage
 }
