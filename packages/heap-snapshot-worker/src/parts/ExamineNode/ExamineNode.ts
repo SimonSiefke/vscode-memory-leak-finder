@@ -87,7 +87,7 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
   const processedEdges = nodeEdges.map((edge) => {
     const typeName = edgeTypeNames[edge.type] || `type_${edge.type}`
     let edgeName = ''
-    
+
     if (typeName === 'element') {
       edgeName = `[${edge.nameIndex}]`
     } else {
@@ -129,5 +129,23 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
     nodeType,
     edges: processedEdges,
     properties
+  }
+}
+
+/**
+ * Analyzes a heap snapshot file and examines a specific node by ID
+ * @param filePath - Path to the heap snapshot file
+ * @param nodeId - The ID of the node to examine
+ * @returns Promise that resolves to the examination result or null if not found
+ */
+export const analyzeNodeFromFile = async (filePath: string, nodeId: number): Promise<NodeExaminationResult | null> => {
+  const { prepareHeapSnapshot } = await import('../PrepareHeapSnapshot/PrepareHeapSnapshot.js')
+
+  try {
+    const snapshot = await prepareHeapSnapshot(filePath, { parseStrings: true })
+    return examineNodeById(nodeId, snapshot)
+  } catch (error) {
+    console.error(`Error loading heap snapshot from ${filePath}:`, error)
+    return null
   }
 }
