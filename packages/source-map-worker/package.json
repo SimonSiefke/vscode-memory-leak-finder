@@ -3,7 +3,7 @@
   "version": "0.0.0-dev",
   "description": "",
   "type": "module",
-  "main": "src/sourceMapWorkerMain.js",
+  "main": "src/sourceMapWorkerMain.ts",
   "scripts": {
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
