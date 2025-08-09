@@ -20,6 +20,6 @@ ${press}${CliKeys.Quit}${toQuitWatchMode}
 ${press}${CliKeys.Enter}${toTriggerATestRun}
 `
 
-export const print = (): string => {
+export const getWatchUsageMessage = (): string => {
   return watchUsageMessage
 }
