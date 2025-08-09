@@ -6,15 +6,15 @@ import { createEdgeMap } from '../src/parts/CreateEdgeMap/CreateEdgeMap.ts'
 
 test('getNodeName - should handle empty strings correctly', () => {
   const strings = ['', 'hello', 'world']
-  
+
   // Test empty string at index 0
   const emptyStringNode = { name: 0 }
   expect(getNodeName(emptyStringNode, strings)).toBe('')
-  
+
   // Test regular strings
   const helloNode = { name: 1 }
   expect(getNodeName(helloNode, strings)).toBe('hello')
-  
+
   // Test invalid index
   const invalidNode = { name: 10 }
   expect(getNodeName(invalidNode, strings)).toBeNull()
@@ -41,7 +41,7 @@ test('getActualValue - should properly display string values', () => {
 
   // Test empty string
   const emptyStringNode = { type: 0, name: 0, id: 1 }
-  expect(getActualValue(emptyStringNode, snapshot, edgeMap)).toBe('[empty string]')
+  expect(getActualValue(emptyStringNode, snapshot, edgeMap)).toBe('""')
 
   // Test regular string
   const helloNode = { type: 0, name: 1, id: 2 }
@@ -107,7 +107,7 @@ test('examineNode - should show improved string property values', () => {
   // Check the empty string property
   const emptyProp = result!.properties.find(p => p.name === 'emptyProp')
   expect(emptyProp).toBeDefined()
-  expect(emptyProp!.value).toBe('[empty string]')
+  expect(emptyProp!.value).toBe('""')
   expect(emptyProp!.targetType).toBe('string')
 
   // Check the hello string property
