@@ -30,5 +30,6 @@ export const initialStart = async (options) => {
     options.vscodePath,
     options.commit,
     options.setupOnly,
+    options.workers,
   )
 }

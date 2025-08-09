@@ -1,5 +1,8 @@
 import type { Snapshot } from '../Snapshot/Snapshot.js'
 import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
+import { parseNode } from '../ParseNode/ParseNode.ts'
+import { getNodeName } from '../GetNodeName/GetNodeName.ts'
+import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 
 /**
  * Gets the actual value of a node by following references for strings and numbers
@@ -81,7 +84,9 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
       for (const edge of nodeEdges) {
         // Follow internal edges to find string/number/object/array values
         if (edge.type === EDGE_TYPE_INTERNAL) {
-          const referencedNode = parseNode(edge.toNode, nodes, nodeFields)
+          // Convert edge toNode from array index to node index
+          const referencedNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
+          const referencedNode = parseNode(referencedNodeIndex, nodes, nodeFields)
           if (referencedNode) {
             const referencedType = referencedNode.type
 
@@ -116,8 +121,10 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
         for (let j = 0; j < sourceEdgeCount; j++) {
           const edgeIndex = (currentEdgeOffset + j) * ITEMS_PER_EDGE
           const edgeToNode = edges[edgeIndex + edgeToNodeFieldIndex]
+          // Convert edge toNode from array index to node index
+          const edgeToNodeIndex = Math.floor(edgeToNode / ITEMS_PER_NODE)
 
-          if (edgeToNode === targetNodeIndex) {
+          if (edgeToNodeIndex === targetNodeIndex) {
             const edgeType = edges[edgeIndex + edgeTypeFieldIndex]
             const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
 
@@ -163,38 +170,4 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
   } else {
     return `[${nodeTypeName || 'Unknown'} ${targetNode.id}]`
   }
-}
-
-// Helper function to parse a node from the flat array
-const parseNode = (nodeIndex: number, nodes: Uint32Array, nodeFields: readonly string[]): any => {
-  const ITEMS_PER_NODE = nodeFields.length
-  const nodeStart = nodeIndex * ITEMS_PER_NODE
-  if (nodeStart >= nodes.length) {
-    return null
-  }
-
-  const node: any = {}
-  for (let i = 0; i < nodeFields.length; i++) {
-    const fieldIndex = nodeStart + i
-    if (fieldIndex < nodes.length) {
-      node[nodeFields[i]] = nodes[fieldIndex]
-    }
-  }
-  return node
-}
-
-// Helper function to get node name as string
-const getNodeName = (node: any, strings: readonly string[]): string | null => {
-  if (node && node.name !== undefined && strings[node.name]) {
-    return strings[node.name]
-  }
-  return null
-}
-
-// Helper function to get node type name
-const getNodeTypeName = (node: any, nodeTypes: readonly (readonly string[])[]): string | null => {
-  if (nodeTypes[0] && Array.isArray(nodeTypes[0]) && node.type !== undefined) {
-    return (nodeTypes[0] as readonly string[])[node.type]
-  }
-  return null
 }
