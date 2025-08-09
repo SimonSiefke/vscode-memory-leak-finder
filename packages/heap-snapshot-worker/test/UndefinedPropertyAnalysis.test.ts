@@ -1,53 +1,46 @@
 import { test, expect } from '@jest/globals'
 import { examineNodeByIndex } from '../src/parts/ExamineNode/ExamineNode.ts'
-import { createTestSnapshot } from './createTestSnapshot.ts'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('demonstrate improved undefined property detection', () => {
   // Create a mock snapshot that represents an object with undefined properties
-  const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
-  const edgeFields = ['type', 'name_or_index', 'to_node']
-  const nodeTypes: [readonly string[]] = [['object', 'hidden', 'string']]
-  const edgeTypes: [readonly string[]] = [['property', 'internal', 'hidden']]
-  const strings = ['Object', 'undefined', 'myProperty', 'anotherProp', 'normalString']
-
-  // Create nodes:
-  // 0: Object with 2 properties
-  // 1: undefined value (hidden type)
-  // 2: normal string
-  const nodes = new Uint32Array([
-    // Node 0: Object
-    0,
-    0,
-    1,
-    100,
-    2, // type=object, name=Object, id=1, size=100, edges=2
-    // Node 1: undefined value
-    1,
-    1,
-    67,
-    0,
-    0, // type=hidden, name=undefined, id=67, size=0, edges=0
-    // Node 2: normal string
-    2,
-    4,
-    3,
-    20,
-    0, // type=string, name=normalString, id=3, size=20, edges=0
-  ])
-
-  // Create edges: Object has 2 property edges
-  const edges = new Uint32Array([
-    // Edge 0: myProperty -> undefined
-    0,
-    2,
-    5, // type=property, name=myProperty, to_node=5 (node 1)
-    // Edge 1: anotherProp -> normalString
-    0,
-    3,
-    10, // type=property, name=anotherProp, to_node=10 (node 2)
-  ])
-
-  const snapshot = createTestSnapshot(nodes, edges, strings, nodeFields, edgeFields, nodeTypes, edgeTypes)
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 3,
+    edge_count: 2, 
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Node 0: Object with 2 properties
+      // [type, name, id, self_size, edge_count]
+      0, 0, 1, 100, 2,   // object "Object" id=1 size=100 edges=2
+      
+      // Node 1: undefined value (hidden type)
+      // [type, name, id, self_size, edge_count]
+      1, 1, 67, 0, 0,    // hidden "undefined" id=67 size=0 edges=0
+      
+      // Node 2: normal string
+      // [type, name, id, self_size, edge_count] 
+      2, 4, 3, 20, 0,    // string "normalString" id=3 size=20 edges=0
+    ]),
+    edges: new Uint32Array([
+      // Edge 0: myProperty -> undefined
+      // [type, name_or_index, to_node]
+      0, 2, 5,   // property "myProperty" -> undefined (offset 5)
+      
+      // Edge 1: anotherProp -> normalString
+      // [type, name_or_index, to_node]
+      0, 3, 10,  // property "anotherProp" -> normalString (offset 10)
+    ]),
+    strings: ['Object', 'undefined', 'myProperty', 'anotherProp', 'normalString'],
+    locations: new Uint32Array([]),
+    meta: {
+      node_types: [['object', 'hidden', 'string']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count'],
+      edge_types: [['property', 'internal', 'hidden']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+  }
 
   // Examine the object (node index 0)
   const result = examineNodeByIndex(0, snapshot)
@@ -78,45 +71,43 @@ test('demonstrate improved undefined property detection', () => {
 
 test('demonstrate undefined vs string undefined differences', () => {
   // This test shows the difference between the undefined value and a string containing "undefined"
-  const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
-  const edgeFields = ['type', 'name_or_index', 'to_node']
-  const nodeTypes: [readonly string[]] = [['object', 'hidden', 'string']]
-  const edgeTypes: [readonly string[]] = [['property']]
-  const strings = ['Object', 'undefined', 'undefinedProp', 'stringProp']
-
-  const nodes = new Uint32Array([
-    // Node 0: Object
-    0,
-    0,
-    1,
-    100,
-    2, // type=object, name=Object, id=1, size=100, edges=2
-    // Node 1: undefined value (hidden type)
-    1,
-    1,
-    67,
-    0,
-    0, // type=hidden, name=undefined, id=67, size=0, edges=0
-    // Node 2: string with value "undefined"
-    2,
-    1,
-    99,
-    20,
-    0, // type=string, name=undefined, id=99, size=20, edges=0
-  ])
-
-  const edges = new Uint32Array([
-    // Edge 0: undefinedProp -> undefined value (hidden)
-    0,
-    2,
-    5, // type=property, name=undefinedProp, to_node=5 (node 1)
-    // Edge 1: stringProp -> string "undefined"
-    0,
-    3,
-    10, // type=property, name=stringProp, to_node=10 (node 2)
-  ])
-
-  const snapshot = createTestSnapshot(nodes, edges, strings, nodeFields, edgeFields, nodeTypes, edgeTypes)
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 3,
+    edge_count: 2,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Node 0: Object with 2 properties
+      // [type, name, id, self_size, edge_count]
+      0, 0, 1, 100, 2,   // object "Object" id=1 size=100 edges=2
+      
+      // Node 1: undefined value (hidden type)
+      // [type, name, id, self_size, edge_count]
+      1, 1, 67, 0, 0,    // hidden "undefined" id=67 size=0 edges=0
+      
+      // Node 2: string with value "undefined"
+      // [type, name, id, self_size, edge_count]
+      2, 1, 99, 20, 0,   // string "undefined" id=99 size=20 edges=0
+    ]),
+    edges: new Uint32Array([
+      // Edge 0: undefinedProp -> undefined value (hidden)
+      // [type, name_or_index, to_node]
+      0, 2, 5,   // property "undefinedProp" -> undefined (offset 5)
+      
+      // Edge 1: stringProp -> string "undefined"
+      // [type, name_or_index, to_node]
+      0, 3, 10,  // property "stringProp" -> string "undefined" (offset 10)
+    ]),
+    strings: ['Object', 'undefined', 'undefinedProp', 'stringProp'],
+    locations: new Uint32Array([]),
+    meta: {
+      node_types: [['object', 'hidden', 'string']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count'],
+      edge_types: [['property']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+  }
 
   const result = examineNodeByIndex(0, snapshot)
 
