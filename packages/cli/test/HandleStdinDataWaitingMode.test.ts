@@ -31,6 +31,9 @@ jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
       if (method === 'Stdout.getWatchUsageMessage') {
         return Promise.resolve('watch-usage')
       }
+      if (method === 'Stdout.getPatternUsageMessage') {
+        return Promise.resolve('pattern-usage')
+      }
       throw new Error(`unexpected method ${method}`)
     }),
   }
@@ -160,5 +163,5 @@ test('handleStdinDataWaitingMode - filter mode', async () => {
     mode: ModeType.FilterWaiting,
   })
   expect(Stdout.write).toHaveBeenCalledTimes(1)
-  expect(Stdout.write).toHaveBeenCalledWith(AnsiEscapes.clear + (await PatternUsage.print()))
+  expect(Stdout.write).toHaveBeenCalledWith('clearpattern-usage')
 })

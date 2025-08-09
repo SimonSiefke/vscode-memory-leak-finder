@@ -17,6 +17,20 @@ jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
   return {
     invoke: jest.fn().mockImplementation((method: any, ...args: any[]) => {
       if (method === 'Stdout.getInterruptedMessage') {
+        return Promise.resolve('interrupted-message')
+      }
+      if (method === 'Stdout.getWatchUsageMessage') {
+        return Promise.resolve('watch-usage')
+      }
+      throw new Error(`unexpected method ${method}`)
+    }),
+  }
+})
+
+jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
+  return {
+    invoke: jest.fn().mockImplementation((method: any, ...args: any[]) => {
+      if (method === 'Stdout.getInterruptedMessage') {
         return Promise.resolve('\u001B[1m\u001B[31mTest run was interrupted.\u001B[39m\u001B[22m\n')
       }
       if (method === 'Stdout.getWatchUsageMessage') {
