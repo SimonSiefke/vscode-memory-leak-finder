@@ -262,7 +262,7 @@ test('should handle code object with internal number reference', () => {
     ]),
     edges: new Uint32Array([
       // type, name_or_index, to_node
-      2, 1, 1,  // property edge from Object1 to code object
+      2, 1, 7,  // property edge from Object1 to code object (array index 7 = node index 1 * 7 fields)
       3, 0, 14, // internal edge from code object to number 42 (array index 14 = node index 2 * 7 fields)
     ]),
     strings: ['', 'test', 'Object1', 'CodeObject'],
