@@ -17,7 +17,7 @@ test('checkoutCommit executes git checkout command', async () => {
   FileSystemWorker.set(mockRpc)
 
   await checkoutCommit(repoPath, commit)
-  
+
   expect(mockInvoke).toHaveBeenCalled()
 })
 
@@ -35,7 +35,7 @@ test('checkoutCommit handles different commit formats', async () => {
   FileSystemWorker.set(mockRpc)
 
   await checkoutCommit(repoPath, commit)
-  
+
   expect(mockInvoke).toHaveBeenCalled()
 })
 
@@ -53,6 +53,6 @@ test('checkoutCommit handles short commit hash', async () => {
   FileSystemWorker.set(mockRpc)
 
   await checkoutCommit(repoPath, commit)
-  
+
   expect(mockInvoke).toHaveBeenCalled()
 })

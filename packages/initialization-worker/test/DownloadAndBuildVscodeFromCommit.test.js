@@ -27,7 +27,9 @@ test('downloadAndBuildVscodeFromCommit - launches repository worker and calls co
     invoke: mockInvoke,
   }))
 
-  const { downloadAndBuildVscodeFromCommit } = await import('../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js')
+  const { downloadAndBuildVscodeFromCommit } = await import(
+    '../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js'
+  )
 
   const result = await downloadAndBuildVscodeFromCommit('abc123')
 
@@ -39,7 +41,7 @@ test('downloadAndBuildVscodeFromCommit - launches repository worker and calls co
     'https://github.com/microsoft/vscode.git',
     expect.stringContaining('.vscode-repos'),
     expect.stringContaining('.vscode-node-modules'),
-    false
+    false,
   )
   expect(mockDispose).toHaveBeenCalled()
   expect(result).toBe('/path/to/built/vscode')
@@ -67,7 +69,9 @@ test('downloadAndBuildVscodeFromCommit - disposes worker even if invoke fails', 
     invoke: mockInvoke,
   }))
 
-  const { downloadAndBuildVscodeFromCommit } = await import('../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js')
+  const { downloadAndBuildVscodeFromCommit } = await import(
+    '../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js'
+  )
 
   await expect(downloadAndBuildVscodeFromCommit('abc123')).rejects.toThrow('Test error')
   expect(mockDispose).toHaveBeenCalled()

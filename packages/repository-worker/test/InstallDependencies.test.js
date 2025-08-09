@@ -15,7 +15,7 @@ test('installDependencies - runs npm ci without nice', async () => {
   FileSystemWorker.set(mockRpc)
 
   await installDependencies('/test/path', false)
-  
+
   expect(mockInvoke).toHaveBeenCalled()
 })
 
@@ -30,7 +30,7 @@ test('installDependencies - runs npm ci with nice', async () => {
   FileSystemWorker.set(mockRpc)
 
   await installDependencies('/test/path', true)
-  
+
   expect(mockInvoke).toHaveBeenCalled()
 })
 

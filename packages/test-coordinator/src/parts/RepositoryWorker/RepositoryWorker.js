@@ -15,4 +15,4 @@ export const launch = async () => {
   })
   HandleIpc.handleIpc(ipc, Command.execute, Callback.resolve)
   return ipc
-} 
+}

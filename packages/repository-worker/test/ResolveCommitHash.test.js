@@ -7,7 +7,9 @@ test('resolveCommitHash - returns commitRef when it is already a full commit has
   const fullCommitHash = 'a1b2c3d4e5f6789012345678901234567890abcd'
 
   const mockInvoke = jest.fn()
-  mockInvoke.mockImplementation(() => { throw new Error('should not be called') })
+  mockInvoke.mockImplementation(() => {
+    throw new Error('should not be called')
+  })
 
   const mockRpc = MockRpc.create({
     commandMap: {},
@@ -47,12 +49,19 @@ test('resolveCommitHash - throws error when no commit found', async () => {
   FileSystemWorker.set(mockRpc)
 
   await expect(resolveCommitHash('https://github.com/test/repo.git', 'nonexistent-branch')).rejects.toThrow('No commit found for reference')
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/test/repo.git', 'nonexistent-branch'], {})
+  expect(mockInvoke).toHaveBeenCalledWith(
+    'FileSystem.exec',
+    'git',
+    ['ls-remote', 'https://github.com/test/repo.git', 'nonexistent-branch'],
+    {},
+  )
 })
 
 test('resolveCommitHash - throws error when git ls-remote fails', async () => {
   const mockInvoke = jest.fn()
-  mockInvoke.mockImplementation(() => { throw new Error('Repository not found') })
+  mockInvoke.mockImplementation(() => {
+    throw new Error('Repository not found')
+  })
 
   const mockRpc = MockRpc.create({
     commandMap: {},
