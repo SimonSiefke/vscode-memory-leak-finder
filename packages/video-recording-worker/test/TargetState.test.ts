@@ -30,7 +30,7 @@ test('addTarget adds target to state', () => {
   const target = {
     type: 'page',
     url: 'https://example.com',
-    sessionId: 'session-123'
+    sessionId: 'session-123',
   }
 
   TargetState.addTarget(targetId, target)
@@ -82,14 +82,18 @@ test('removeTarget resolves destroyed callbacks for matching targetId', () => {
   let callbackResolved = false
   TargetState.state.destroyedCallbacks.push({
     targetId,
-    resolve: () => { callbackResolved = true }
+    resolve: () => {
+      callbackResolved = true
+    },
   })
 
   // Add another callback for different target (should not be resolved)
   let otherCallbackResolved = false
   TargetState.state.destroyedCallbacks.push({
     targetId: 'other-target',
-    resolve: () => { otherCallbackResolved = true }
+    resolve: () => {
+      otherCallbackResolved = true
+    },
   })
 
   expect(TargetState.state.destroyedCallbacks.length).toBe(2)
@@ -114,7 +118,7 @@ test('addTarget resolves waiting callbacks when matching target is added', () =>
     resolve: (target) => {
       callbackResolved = true
       resolvedTarget = target
-    }
+    },
   })
 
   const target = { type: 'page', url: 'https://example.com' }
@@ -140,7 +144,7 @@ test('addTarget resolves callback for correct index', () => {
     resolve: (target) => {
       callbackResolved = true
       resolvedTarget = target
-    }
+    },
   })
 
   // Add second target - this should resolve the callback

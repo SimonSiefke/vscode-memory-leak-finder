@@ -6,6 +6,7 @@ const mockNodeWorkerRpcClient = {
 
 jest.unstable_mockModule('@lvce-editor/rpc', () => ({
   NodeWorkerRpcClient: mockNodeWorkerRpcClient,
+  NodeWorkerRpcParent: mockNodeWorkerRpcClient,
 }))
 
 const mockCommandMap = {
