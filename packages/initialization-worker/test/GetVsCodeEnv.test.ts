@@ -1,4 +1,4 @@
-import * as GetVsCodeEnv from '../src/parts/GetVsCodeEnv/GetVsCodeEnv.js'
+import * as GetVsCodeEnv from '../src/parts/GetVsCodeEnv/GetVsCodeEnv.ts'
 import { test, expect } from '@jest/globals'
 
 test('getVsCodeEnv - remove node options', () => {

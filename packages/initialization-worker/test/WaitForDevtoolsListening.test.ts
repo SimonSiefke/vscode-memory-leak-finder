@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import EventEmitter from 'node:events'
-import * as WaitForDevtoolsListening from '../src/parts/WaitForDevtoolsListening/WaitForDevtoolsListening.js'
+import * as WaitForDevtoolsListening from '../src/parts/WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
 
 class NoErrorThrownError extends Error {}
 

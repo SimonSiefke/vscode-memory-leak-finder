@@ -1,4 +1,4 @@
-import * as GetElectronErrorMessage from '../src/parts/GetElectronErrorMessage/GetElectronErrorMessage.js'
+import * as GetElectronErrorMessage from '../src/parts/GetElectronErrorMessage/GetElectronErrorMessage.ts'
 import { test, expect } from '@jest/globals'
 
 test('error - electron app not found', async () => {

@@ -1,4 +1,4 @@
-import * as IsImportantError from '../src/parts/IsImportantErrorMessage/IsImportantErrorMessage.js'
+import * as IsImportantError from '../src/parts/IsImportantErrorMessage/IsImportantErrorMessage.ts'
 import { test, expect } from '@jest/globals'
 
 test('libgiolibproxy error', () => {

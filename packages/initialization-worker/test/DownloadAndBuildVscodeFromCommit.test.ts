@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import * as DownloadAndBuildVscodeFromCommit from '../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.js'
+import * as DownloadAndBuildVscodeFromCommit from '../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.ts'
 
 test('downloadAndBuildVscodeFromCommit - function exists and is callable', () => {
   expect(typeof DownloadAndBuildVscodeFromCommit.downloadAndBuildVscodeFromCommit).toBe('function')

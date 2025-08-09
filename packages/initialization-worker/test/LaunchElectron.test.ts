@@ -5,7 +5,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-jest.unstable_mockModule('../src/parts/Spawn/Spawn.js', () => {
+jest.unstable_mockModule('../src/parts/Spawn/Spawn.ts', () => {
   return {
     spawn: jest.fn(() => {
       throw new Error('not implemented')
@@ -13,14 +13,14 @@ jest.unstable_mockModule('../src/parts/Spawn/Spawn.js', () => {
   }
 })
 
-jest.unstable_mockModule('../src/parts/NodeVersion/NodeVersion.js', () => {
+jest.unstable_mockModule('../src/parts/NodeVersion/NodeVersion.ts', () => {
   return {
     nodeVersion: 'test-node-version',
   }
 })
 
-const LaunchElectron = await import('../src/parts/LaunchElectron/LaunchElectron.js')
-const Spawn = await import('../src/parts/Spawn/Spawn.js')
+const LaunchElectron = await import('../src/parts/LaunchElectron/LaunchElectron.ts')
+const Spawn = await import('../src/parts/Spawn/Spawn.ts')
 
 test('launch - error - address already in use', async () => {
   // @ts-ignore

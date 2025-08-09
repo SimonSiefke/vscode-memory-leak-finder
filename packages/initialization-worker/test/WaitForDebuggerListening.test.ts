@@ -6,7 +6,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-jest.unstable_mockModule('../src/parts/NodeVersion/NodeVersion.js', () => {
+jest.unstable_mockModule('../src/parts/NodeVersion/NodeVersion.ts', () => {
   return {
     nodeVersion: 'test-node-version',
   }
