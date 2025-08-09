@@ -1,5 +1,4 @@
 import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.js'
-import * as ConnectElectron from '../ConnectElectron/ConnectElectron.js'
 import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
 import * as VideoRecording from '../VideoRecording/VideoRecording.js'
 
@@ -28,8 +27,6 @@ export const connectWorkers = async (
   monkeyPatchedElectronId,
   electronObjectId,
 ) => {
-  // TODO connect workers in parallel
-  const {} = await ConnectElectron.connectElectron(rpc, connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback)
   if (recordVideo) {
     await VideoRecording.start(devtoolsWebSocketUrl)
   }
@@ -41,5 +38,8 @@ export const connectWorkers = async (
     monkeyPatchedElectronId,
     electronObjectId,
     isFirstConnection,
+    headlessMode,
+    webSocketUrl,
+    canUseIdleCallback,
   )
 }
