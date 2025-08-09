@@ -1,5 +1,4 @@
 import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.js'
-import * as ConnectElectron from '../ConnectElectron/ConnectElectron.js'
 import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
 import * as VideoRecording from '../VideoRecording/VideoRecording.js'
 
