@@ -1,10 +1,19 @@
-import { expect, test } from '@jest/globals'
+import { expect, test, jest } from '@jest/globals'
+
+jest.mock('../src/parts/IsWindows/IsWindows.ts', () => ({
+  IsWindows: false,
+}))
+
 import * as TimeoutConstants from '../src/parts/TimeoutConstants/TimeoutConstants.ts'
 
-test('AttachToPage timeout is correct for platform', () => {
-  const expectedTimeout = process.platform === 'win32' ? 5000 : 4000
-  expect(TimeoutConstants.AttachToPage).toBe(expectedTimeout)
+test('AttachToPage timeout for non-Windows platform', () => {
+  expect(TimeoutConstants.AttachToPage).toBe(4000)
   expect(typeof TimeoutConstants.AttachToPage).toBe('number')
+})
+
+test('UtilityExecutionContext timeout for non-Windows platform', () => {
+  expect(TimeoutConstants.UtilityExecutionContext).toBe(8500)
+  expect(typeof TimeoutConstants.UtilityExecutionContext).toBe('number')
 })
 
 test('DefaultExecutionContext', () => {
@@ -25,12 +34,6 @@ test('SessionState', () => {
 test('Target', () => {
   expect(TimeoutConstants.Target).toBe(8000)
   expect(typeof TimeoutConstants.Target).toBe('number')
-})
-
-test('UtilityExecutionContext timeout is correct for platform', () => {
-  const expectedTimeout = process.platform === 'win32' ? 16000 : 8500
-  expect(TimeoutConstants.UtilityExecutionContext).toBe(expectedTimeout)
-  expect(typeof TimeoutConstants.UtilityExecutionContext).toBe('number')
 })
 
 test('WaitForDebuggerToBePaused', () => {

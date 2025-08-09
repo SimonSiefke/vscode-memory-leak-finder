@@ -1,4 +1,4 @@
-import { test, expect } from '@jest/globals'
+import { test, expect, jest } from '@jest/globals'
 import * as DebuggerCreateRpcConnection from '../src/parts/DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import * as ObjectType from '../src/parts/ObjectType/ObjectType.ts'
 

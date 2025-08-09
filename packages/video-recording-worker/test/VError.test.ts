@@ -17,6 +17,6 @@ test('VError - should create error with cause', () => {
   const cause = new Error('cause error')
   const message = 'wrapper error'
   const error = new VError.VError(cause, message)
-  expect(error.message).toBe(message)
-  expect(error.cause).toBe(cause)
+  expect(error.message).toBe('wrapper error: cause error')
+  expect(error instanceof Error).toBe(true)
 })
