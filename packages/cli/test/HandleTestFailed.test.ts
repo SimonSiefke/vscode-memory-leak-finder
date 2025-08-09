@@ -34,7 +34,7 @@ jest.unstable_mockModule('../src/parts/TestStateOutput/TestStateOutput.ts', () =
 
 jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
   return {
-    invoke: jest.fn().mockImplementation((method: string, ...args: any[]) => {
+    invoke: jest.fn().mockImplementation((method: any, ...args: any[]) => {
       if (method === 'Stdout.getHandleTestFailedMessage') {
         // Args are: [file, relativeDirName, relativeFilePath, fileName, error]
         return Promise.resolve(

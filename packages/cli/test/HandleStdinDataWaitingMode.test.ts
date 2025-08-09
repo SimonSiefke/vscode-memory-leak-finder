@@ -18,7 +18,7 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
 
 jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
   return {
-    invoke: jest.fn().mockImplementation((method: string, ...args: any[]) => {
+    invoke: jest.fn().mockImplementation((method: any, ...args: any[]) => {
       if (method === 'Stdout.getEraseLine') {
         return Promise.resolve('\u001B[2K')
       }

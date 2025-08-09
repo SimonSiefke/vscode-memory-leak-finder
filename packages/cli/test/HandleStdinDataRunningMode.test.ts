@@ -15,7 +15,7 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
 
 jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
   return {
-    invoke: jest.fn().mockImplementation((method: string, ...args: any[]) => {
+    invoke: jest.fn().mockImplementation((method: any, ...args: any[]) => {
       if (method === 'Stdout.getInterruptedMessage') {
         return Promise.resolve('\u001B[1m\u001B[31mTest run was interrupted.\u001B[39m\u001B[22m\n')
       }

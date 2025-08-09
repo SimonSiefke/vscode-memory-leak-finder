@@ -19,7 +19,7 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
 
 jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
   return {
-    invoke: jest.fn().mockImplementation((method: string, ...args: any[]) => {
+    invoke: jest.fn().mockImplementation((method: any, ...args: any[]) => {
       if (method === 'Stdout.getHandleTestRunningMessage') {
         // Args are: [file, relativeDirName, fileName, isFirst]
         const isFirst = args[3]
