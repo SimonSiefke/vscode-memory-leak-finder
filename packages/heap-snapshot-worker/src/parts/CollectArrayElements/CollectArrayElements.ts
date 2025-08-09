@@ -4,6 +4,7 @@ import { parseNode } from '../ParseNode/ParseNode.ts'
 import { getActualValue } from '../GetActualValue/GetActualValue.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
+import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
 
 /**
  * Collects elements from an array node, returning preview data
@@ -100,6 +101,14 @@ export const collectArrayElements = (
       } else if (targetType === 'string' || targetType === 'number') {
         // For primitives, get the actual value
         value = getActualValue(targetNode, snapshot, edgeMap, visited)
+      } else if (targetType === 'hidden') {
+        // For hidden nodes, check if it's a boolean or other special value
+        const booleanValue = getBooleanValue(targetNode, nodeTypes, strings)
+        if (booleanValue) {
+          value = booleanValue
+        } else {
+          value = getActualValue(targetNode, snapshot, edgeMap, visited)
+        }
       } else if (targetType === 'code') {
         // For code objects, try to get the actual value they represent
         value = getActualValue(targetNode, snapshot, edgeMap, visited)
@@ -187,6 +196,14 @@ const collectObjectPropertiesInline = (
         }
       } else if (targetType === 'string' || targetType === 'number') {
         value = getActualValue(targetNode, snapshot, edgeMap, visited)
+      } else if (targetType === 'hidden') {
+        // For hidden nodes, check if it's a boolean or other special value
+        const booleanValue = getBooleanValue(targetNode, nodeTypes, strings)
+        if (booleanValue) {
+          value = booleanValue
+        } else {
+          value = getActualValue(targetNode, snapshot, edgeMap, visited)
+        }
       } else if (targetType === 'code') {
         value = getActualValue(targetNode, snapshot, edgeMap, visited)
       } else {
