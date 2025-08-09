@@ -36,7 +36,7 @@ cd packages/devtools-protocol && updateDependencies && cd ../../ &&
 cd packages/download-worker && updateDependencies && cd ../../ &&
 cd packages/e2e && updateDependencies && cd ../../ &&
 cd packages/file-watcher-worker && updateDependencies && cd ../../ &&
-cd packages/file-sysem-worker && updateDependencies && cd ../../ &&
+cd packages/file-system-worker && updateDependencies && cd ../../ &&
 cd packages/heap-snapshot-worker && updateDependencies && cd ../../ &&
 cd packages/heap-parsing-worker && updateDependencies && cd ../../ &&
 cd packages/initialization-worker && updateDependencies && cd ../../ &&

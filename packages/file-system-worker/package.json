@@ -2,13 +2,13 @@
   "name": "@vscode-memory-leak-finder/file-system-worker",
   "version": "0.0.0-dev",
   "type": "module",
-  "main": "src/main.js",
+  "main": "src/main.ts",
   "scripts": {
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
   },
   "dependencies": {
-    "@lvce-editor/rpc": "^4.11.0",
+    "@lvce-editor/rpc": "^4.14.0",
     "@lvce-editor/verror": "^1.7.0",
     "path-exists": "^5.0.0"
   },
@@ -60,6 +60,15 @@
     ]
   },
   "jest": {
+    "extensionsToTreatAsEsm": [".ts"],
+    "transform": {
+      "^.+\\.ts$": ["ts-jest", {
+        "useESM": true
+      }]
+    },
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    },
     "injectGlobals": false,
     "collectCoverage": true,
     "coverageThreshold": {
