@@ -1,6 +1,6 @@
 import { test, expect } from '@jest/globals'
 import { examineNodeById, examineNodeByIndex } from '../src/parts/ExamineNode/ExamineNode.ts'
-import { createTestSnapshot } from './helpers/createTestSnapshot.ts'
+import { createTestSnapshot } from './createTestSnapshot.ts'
 
 test('examineNode - should examine node with edges and properties', () => {
   const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
@@ -81,12 +81,12 @@ test('examineNode - should examine node with edges and properties', () => {
   expect(result!.properties).toHaveLength(2)
   expect(result!.properties[0]).toEqual({
     name: 'prop1',
-    value: 'hello',
+    value: '"hello"',
     targetType: 'string'
   })
   expect(result!.properties[1]).toEqual({
     name: 'prop2',
-    value: 'world',
+    value: '"world"',
     targetType: 'string'
   })
 })

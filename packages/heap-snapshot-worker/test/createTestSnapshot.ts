@@ -1,4 +1,4 @@
-import type { Snapshot } from '../../src/parts/Snapshot/Snapshot.ts'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 export const createTestSnapshot = (
   nodes: Uint32Array,
