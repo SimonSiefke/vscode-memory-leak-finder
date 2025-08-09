@@ -19,7 +19,18 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
     isFirstConnection,
     canUseIdleCallback,
   )
-  await connectWorkers(rpc, connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback)
+  await connectWorkers(
+    rpc,
+    headlessMode,
+    recordVideo,
+    connectionId,
+    devtoolsWebSocketUrl,
+    webSocketUrl,
+    isFirstConnection,
+    canUseIdleCallback,
+    monkeyPatchedElectronId,
+    electronObjectId,
+  )
   await initializationWorkerRpc.invoke('Initialize.undoMonkeyPatch')
   await PageObject.create(rpc, connectionId, isFirstConnection, headlessMode, timeouts, ideVersion)
   return {
