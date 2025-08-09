@@ -142,6 +142,7 @@ test('analyze boolean structure with type and value edges', (): void => {
   // Node 75 has breakpointsExpanded property that requires BOTH:
   // 1. A connection to the boolean TYPE (node 1271 "boolean")
   // 2. A connection to the boolean VALUE (node 1403 "false")
+  // prettier-ignore
   const snapshot: any = {
     node_count: 5,
     edge_count: 4,
@@ -264,6 +265,7 @@ test('enhanced boolean detection in GetObjectsWithPropertiesInternal', async ():
     '../src/parts/GetObjectsWithPropertiesInternal/GetObjectsWithPropertiesInternal.ts'
   )
 
+  // prettier-ignore
   const snapshot: any = {
     node_count: 3,
     edge_count: 2,
