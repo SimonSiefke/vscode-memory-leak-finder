@@ -1,7 +1,7 @@
 import * as RunTest from '../RunTest/RunTest.ts'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
 
-export const killWorkers = async () => {
+export const killWorkers = async (): Promise<void> => {
   if (RunTest.state.testCoordinator) {
     await RunTest.state.testCoordinator.invoke(TestWorkerCommandType.PrepareExit)
     // TODO decide whether it is better to dispose the worker from here or let the worker dispose itself

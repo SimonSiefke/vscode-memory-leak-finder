@@ -5,7 +5,7 @@ import * as ModeType from '../ModeType/ModeType.ts'
 import * as StartRunning from '../StartRunning/StartRunning.ts'
 import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 
-export const handleStdinData = async (key) => {
+export const handleStdinData = async (key: string): Promise<void> => {
   const state = StdinDataState.getState()
   const newState = await GetNewStdinState.getNewStdinState(state, key)
   if (newState === state) {
@@ -35,6 +35,7 @@ export const handleStdinData = async (key) => {
       '',
       '',
       false,
+      state.workers,
     )
   }
   if (newState.mode === ModeType.Interrupted) {

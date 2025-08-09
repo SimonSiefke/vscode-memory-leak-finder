@@ -1,11 +1,11 @@
-export const Pass = ' PASS '
+export const Pass: string = ' PASS '
 
-export const Leak = ' LEAK '
+export const Leak: string = ' LEAK '
 
-export const Runs = ' RUNS '
+export const Runs: string = ' RUNS '
 
-export const Setup = ' SETUP '
+export const Setup: string = ' SETUP '
 
-export const Fail = ' FAIL '
+export const Fail: string = ' FAIL '
 
-export const UnexpectedError = ' Unexpected Error '
+export const UnexpectedError: string = ' Unexpected Error '
