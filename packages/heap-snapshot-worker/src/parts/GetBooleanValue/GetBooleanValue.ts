@@ -91,9 +91,10 @@ const analyzeBooleanNodes = (snapshot: Snapshot): { trueNodeId: number | null; f
       'collapsed',
     ]
 
-    const isBooleanLike = booleanIndicators.some((indicator) => lowerPropName.includes(indicator)) ||
-                         lowerPropName.startsWith('is') ||
-                         lowerPropName.startsWith('has')
+    const isBooleanLike =
+      booleanIndicators.some((indicator) => lowerPropName.includes(indicator)) ||
+      lowerPropName.startsWith('is') ||
+      lowerPropName.startsWith('has')
 
     // Track references to this hidden node
     if (!hiddenNodeRefs.has(targetNode.id)) {
@@ -204,7 +205,12 @@ export const getBooleanValue = (targetNode: any, snapshot: Snapshot, edgeMap: Ui
  * @param propertyName - The property name to analyze
  * @returns Object with boolean value and type information, or null if not a boolean
  */
-export const getBooleanStructure = (sourceNode: any, snapshot: Snapshot, edgeMap: Uint32Array, propertyName: string): { value: string; hasTypeReference: boolean } | null => {
+export const getBooleanStructure = (
+  sourceNode: any,
+  snapshot: Snapshot,
+  edgeMap: Uint32Array,
+  propertyName: string,
+): { value: string; hasTypeReference: boolean } | null => {
   if (!sourceNode) return null
 
   const { nodes, edges, strings, meta } = snapshot
@@ -228,7 +234,7 @@ export const getBooleanStructure = (sourceNode: any, snapshot: Snapshot, edgeMap
   const nodeEdges = getNodeEdges(sourceNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
 
   // Find property name index
-  const propertyNameIndex = strings.findIndex(str => str === propertyName)
+  const propertyNameIndex = strings.findIndex((str) => str === propertyName)
   if (propertyNameIndex === -1) return null
 
   // Get edge type indices
@@ -264,7 +270,7 @@ export const getBooleanStructure = (sourceNode: any, snapshot: Snapshot, edgeMap
   if (booleanValue) {
     return {
       value: booleanValue,
-      hasTypeReference: hasTypeReference
+      hasTypeReference: hasTypeReference,
     }
   }
 

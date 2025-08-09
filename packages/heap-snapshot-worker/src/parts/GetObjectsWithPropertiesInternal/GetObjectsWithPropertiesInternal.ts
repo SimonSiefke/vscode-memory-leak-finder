@@ -11,7 +11,7 @@ import { getBooleanValue, getBooleanStructure } from '../GetBooleanValue/GetBool
 export interface ObjectWithProperty {
   id: number
   name: string | null
-  propertyValue: string | null
+  propertyValue: string | boolean | null
   type: string | null
   selfSize: number
   edgeCount: number
@@ -124,7 +124,14 @@ export const collectObjectProperties = (
         // For hidden nodes, check if it's a boolean or other special value
         const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap, propertyName)
         if (booleanValue) {
-          value = booleanValue
+          // Convert boolean strings to actual boolean values for preview
+          if (booleanValue === 'true') {
+            value = true
+          } else if (booleanValue === 'false') {
+            value = false
+          } else {
+            value = booleanValue
+          }
         } else {
           value = getActualValue(targetNode, snapshot, edgeMap, visited)
         }
@@ -207,15 +214,25 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
           // Try enhanced boolean detection first
           const booleanStructure = getBooleanStructure(sourceNode, snapshot, edgeMap, propertyName)
           if (booleanStructure) {
-            // This is a boolean with the dual-reference pattern
-            if (booleanStructure.hasTypeReference) {
-              result.propertyValue = `${booleanStructure.value} (typed)`
+            // This is a boolean with the dual-reference pattern - return actual boolean value
+            if (booleanStructure.value === 'true') {
+              result.propertyValue = true
+            } else if (booleanStructure.value === 'false') {
+              result.propertyValue = false
             } else {
               result.propertyValue = booleanStructure.value
             }
           } else {
             // Fall back to standard value detection
-            result.propertyValue = getActualValue(targetNode, snapshot, edgeMap)
+            const actualValue = getActualValue(targetNode, snapshot, edgeMap)
+            // Check if the actual value is a boolean string and convert it
+            if (actualValue === 'true') {
+              result.propertyValue = true
+            } else if (actualValue === 'false') {
+              result.propertyValue = false
+            } else {
+              result.propertyValue = actualValue
+            }
           }
 
           // Collect properties if depth > 0
