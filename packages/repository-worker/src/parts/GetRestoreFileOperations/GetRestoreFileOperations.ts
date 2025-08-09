@@ -27,13 +27,7 @@ type FileOperation = CopyOperation | MkdirOperation | RemoveOperation
  * @param {string[]} cachedNodeModulesPaths - Relative paths within the cache
  * @returns {Promise<FileOperation[]>}
  */
-export const getRestoreNodeModulesFileOperations = async (
-  repoPath: string,
-  cacheKey: string,
-  cacheDir: string,
-  cachedNodeModulesPath: string,
-  cachedNodeModulesPaths: string[],
-): Promise<FileOperation[]> => {
+export const getRestoreNodeModulesFileOperations = async (repoPath: string, cacheKey: string, cacheDir: string, cachedNodeModulesPath: string, cachedNodeModulesPaths: string[]): Promise<FileOperation[]> => {
   try {
     const fileOperations: FileOperation[] = []
 
