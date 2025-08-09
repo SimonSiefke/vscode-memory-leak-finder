@@ -50,7 +50,7 @@ jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
             '    \u001B[0m \u001B[90m 17 |\u001B[39m\u001B[0m\n' +
             '\n' +
             '   \u001B[2m    at Module.test (\u001B[22m/test/e2e/src/sample.close-window.js\u001B[2m:15:29)\u001B[22m\n' +
-            '\n'
+            '\n',
         )
       }
       throw new Error(`unexpected method ${method}`)

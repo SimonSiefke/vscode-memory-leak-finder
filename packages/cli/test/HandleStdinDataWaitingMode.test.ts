@@ -20,13 +20,16 @@ jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
   return {
     invoke: jest.fn().mockImplementation((method: any, ...args: any[]) => {
       if (method === 'Stdout.getEraseLine') {
-        return Promise.resolve('\u001B[2K')
+        return Promise.resolve('erase-line')
       }
       if (method === 'Stdout.getCursorLeft') {
-        return Promise.resolve('\u001B[G')
+        return Promise.resolve('cursor-left')
       }
       if (method === 'Stdout.getClear') {
-        return Promise.resolve('\u001B[2J\u001B[3J\u001B[H')
+        return Promise.resolve('clear')
+      }
+      if (method === 'Stdout.getWatchUsageMessage') {
+        return Promise.resolve('watch-usage')
       }
       throw new Error(`unexpected method ${method}`)
     }),
@@ -64,7 +67,7 @@ test('handleStdinDataWaitingMode - enter', async () => {
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Running)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
-  expect(Stdout.write).toHaveBeenCalledWith('\u001B[2K\u001B[G')
+  expect(Stdout.write).toHaveBeenCalledWith('erase-linecursor-left')
 })
 
 test('handleStdinDataWaitingMode - escape', async () => {
@@ -110,7 +113,7 @@ test('handleStdinDataWaitingMode - ctrl + backspace', async () => {
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.value).toBe('')
   expect(Stdout.write).toHaveBeenCalledTimes(1)
-  expect(Stdout.write).toHaveBeenCalledWith(AnsiEscapes.eraseLine + AnsiEscapes.cursorLeft)
+  expect(Stdout.write).toHaveBeenCalledWith('erase-linecursor-left')
 })
 
 test('handleStdinDataWaitingMode - backspace', async () => {
