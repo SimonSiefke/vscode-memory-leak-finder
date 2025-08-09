@@ -7,7 +7,7 @@ jest.unstable_mockModule('node:os', () => {
   }
 })
 
-const GetHostPlatformDarwin = await import('../src/parts/GetHostPlatformDarwin/GetHostPlatformDarwin.js')
+const GetHostPlatformDarwin = await import('../src/parts/GetHostPlatformDarwin/GetHostPlatformDarwin.ts')
 const os = await import('node:os')
 
 test.skip('mac10.13', () => {

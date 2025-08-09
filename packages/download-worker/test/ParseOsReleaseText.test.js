@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import * as ParseOsReleaseText from '../src/parts/ParseOsReleaseText/ParseOsReleaseText.js'
+import * as ParseOsReleaseText from '../src/parts/ParseOsReleaseText/ParseOsReleaseText.ts'
 
 test('parseOsReleaseText', () => {
   const releaseText = `ID=ubuntu

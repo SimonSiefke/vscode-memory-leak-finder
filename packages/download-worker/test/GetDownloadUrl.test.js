@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import * as GetDownloadUrl from '../src/parts/GetDownloadUrl/GetDownloadUrl.js'
+import * as GetDownloadUrl from '../src/parts/GetDownloadUrl/GetDownloadUrl.ts'
 
 test('chromium - ubuntu 24.04 - x64', () => {
   const name = 'chromium'

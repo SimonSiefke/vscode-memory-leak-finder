@@ -4,7 +4,7 @@ const getLinuxDistributionInfo = jest.fn(async () => {
   return { id: '', version: '' }
 })
 
-jest.unstable_mockModule('../src/parts/GetLinuxDistributionInfo/GetLinuxDistributionInfo.js', () => {
+jest.unstable_mockModule('../src/parts/GetLinuxDistributionInfo/GetLinuxDistributionInfo.ts', () => {
   return {
     getLinuxDistributionInfo: jest.fn(),
   }
@@ -18,7 +18,7 @@ jest.unstable_mockModule('node:os', () => {
   }
 })
 
-const GetHostPlatformLinux = await import('../src/parts/GetHostPlatformLinux/GetHostPlatformLinux.js')
+const GetHostPlatformLinux = await import('../src/parts/GetHostPlatformLinux/GetHostPlatformLinux.ts')
 
 test.skip('ubuntu 18.04 - x64', async () => {
   getLinuxDistributionInfo.mockResolvedValue({

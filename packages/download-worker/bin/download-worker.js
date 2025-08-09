@@ -1,3 +1,3 @@
 #!/usr/bin/env node
 
-import '../src/main.js'
+import '../src/main.ts'

@@ -18,7 +18,8 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
-    "composite": true
+    "composite": true,
+    "allowImportingTsExtensions": true
   },
   "include": ["src", "test"]
 }
