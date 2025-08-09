@@ -5,7 +5,7 @@
  * @returns The node name as a string or null if not found
  */
 export const getNodeName = (node: any, strings: readonly string[]): string | null => {
-  if (node && node.name !== undefined && strings[node.name]) {
+  if (node && node.name !== undefined && node.name >= 0 && node.name < strings.length) {
     return strings[node.name]
   }
   return null
