@@ -25,8 +25,8 @@ test('should find objects with specified property', () => {
     ]),
     edges: new Uint32Array([
       // type, name_or_index, to_node
-      2, 1, 3,  // property edge from Object1 to property value object (node index 3, which has id 4)
-      2, 1, 4,  // property edge from Object2 to property value object (node index 4, which has id 5)
+      2, 1, 21, // property edge from Object1 to property value object (array index 21 = node index 3 * 7 fields)
+      2, 1, 28, // property edge from Object2 to property value object (array index 28 = node index 4 * 7 fields)
     ]),
     strings: ['', 'test', 'Object1', 'Object2', 'Object3', 'PropertyValue1', 'PropertyValue2'],
     locations: new Uint32Array([])
@@ -72,7 +72,7 @@ test('should return empty array when property not found', () => {
     ]),
     edges: new Uint32Array([
       // type, name_or_index, to_node
-      2, 1, 0,  // property edge from Object1 to "test" property
+      2, 1, 0,  // property edge from Object1 to "test" property (already 0)
     ]),
     strings: ['', 'test', 'Object1'],
     locations: new Uint32Array([])
@@ -103,7 +103,7 @@ test('should handle string property values', () => {
     ]),
     edges: new Uint32Array([
       // type, name_or_index, to_node
-      2, 1, 1,  // property edge from Object1 to string value
+      2, 1, 7,  // property edge from Object1 to string value (array index 7 = node index 1 * 7 fields)
     ]),
     strings: ['', 'test', 'Object1', 'hello'],
     locations: new Uint32Array([])
@@ -142,7 +142,7 @@ test('should handle number property values', () => {
     ]),
     edges: new Uint32Array([
       // type, name_or_index, to_node
-      2, 1, 1,  // property edge from Object1 to number value
+      2, 1, 7,  // property edge from Object1 to number value (array index 7 = node index 1 * 7 fields)
     ]),
     strings: ['', 'test', 'Object1', '42'],
     locations: new Uint32Array([])
