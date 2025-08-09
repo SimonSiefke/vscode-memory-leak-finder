@@ -11,5 +11,8 @@
     "@lvce-editor/rpc": "^4.11.0",
     "@lvce-editor/verror": "^1.7.0",
     "path-exists": "^5.0.0"
+  },
+  "devDependencies": {
+    "ts-jest": "^29.4.1"
   }
 }
