@@ -1,4 +1,4 @@
-import * as GetOriginalClassName from '../src/parts/GetOriginalClassName/GetOriginalClassName.js'
+import * as GetOriginalClassName from '../src/parts/GetOriginalClassName/GetOriginalClassName.ts'
 import { test, expect } from '@jest/globals'
 
 test('getOriginalClassName', () => {
