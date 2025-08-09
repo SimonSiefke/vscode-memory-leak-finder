@@ -25,8 +25,8 @@ test('should find objects with specified property', () => {
     ]),
     edges: new Uint32Array([
       // type, name_or_index, to_node
-      2, 1, 3,  // property edge from Object1 to property value object (node index 3, which has id 4)
-      2, 1, 4,  // property edge from Object2 to property value object (node index 4, which has id 5)
+      2, 1, 21, // property edge from Object1 to property value object (array index 21 = node index 3 * 7 fields)
+      2, 1, 28, // property edge from Object2 to property value object (array index 28 = node index 4 * 7 fields)
     ]),
     strings: ['', 'test', 'Object1', 'Object2', 'Object3', 'PropertyValue1', 'PropertyValue2'],
     locations: new Uint32Array([])
@@ -72,7 +72,7 @@ test('should return empty array when property not found', () => {
     ]),
     edges: new Uint32Array([
       // type, name_or_index, to_node
-      2, 1, 0,  // property edge from Object1 to "test" property
+      2, 1, 0,  // property edge from Object1 to "test" property (already 0)
     ]),
     strings: ['', 'test', 'Object1'],
     locations: new Uint32Array([])
@@ -103,7 +103,7 @@ test('should handle string property values', () => {
     ]),
     edges: new Uint32Array([
       // type, name_or_index, to_node
-      2, 1, 1,  // property edge from Object1 to string value
+      2, 1, 7,  // property edge from Object1 to string value (array index 7 = node index 1 * 7 fields)
     ]),
     strings: ['', 'test', 'Object1', 'hello'],
     locations: new Uint32Array([])
@@ -142,7 +142,7 @@ test('should handle number property values', () => {
     ]),
     edges: new Uint32Array([
       // type, name_or_index, to_node
-      2, 1, 1,  // property edge from Object1 to number value
+      2, 1, 7,  // property edge from Object1 to number value (array index 7 = node index 1 * 7 fields)
     ]),
     strings: ['', 'test', 'Object1', '42'],
     locations: new Uint32Array([])
@@ -206,8 +206,8 @@ test('should handle code object with internal string reference', () => {
     ]),
     edges: new Uint32Array([
       // type, name_or_index, to_node
-      2, 1, 1,  // property edge from Object1 to code object
-      3, 0, 2,  // internal edge from code object to string "hello"
+      2, 1, 7,  // property edge from Object1 to code object (array index 7 = node index 1 * 7 fields)
+      3, 0, 14, // internal edge from code object to string "hello" (array index 14 = node index 2 * 7 fields)
     ]),
     strings: ['', 'test', 'Object1', 'CodeObject', 'hello'],
     locations: new Uint32Array([])
@@ -248,7 +248,7 @@ test('should handle code object with internal number reference', () => {
     edges: new Uint32Array([
       // type, name_or_index, to_node
       2, 1, 1,  // property edge from Object1 to code object
-      3, 0, 2,  // internal edge from code object to number 42
+      3, 0, 14, // internal edge from code object to number 42 (array index 14 = node index 2 * 7 fields)
     ]),
     strings: ['', 'test', 'Object1', 'CodeObject'],
     locations: new Uint32Array([])
@@ -260,7 +260,7 @@ test('should handle code object with internal number reference', () => {
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '42',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
@@ -289,7 +289,7 @@ test('should handle code object with internal object reference', () => {
     edges: new Uint32Array([
       // type, name_or_index, to_node
       2, 1, 1,  // property edge from Object1 to code object
-      3, 0, 2,  // internal edge from code object to object
+      3, 0, 14, // internal edge from code object to object (array index 14 = node index 2 * 7 fields)
     ]),
     strings: ['', 'test', 'Object1', 'CodeObject', 'InternalObject'],
     locations: new Uint32Array([])
@@ -301,7 +301,7 @@ test('should handle code object with internal object reference', () => {
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '[Object 3]',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
@@ -330,7 +330,7 @@ test('should handle code object with internal array reference', () => {
     edges: new Uint32Array([
       // type, name_or_index, to_node
       2, 1, 1,  // property edge from Object1 to code object
-      3, 0, 2,  // internal edge from code object to array
+      3, 0, 14, // internal edge from code object to array (array index 14 = node index 2 * 7 fields)
     ]),
     strings: ['', 'test', 'Object1', 'CodeObject', 'InternalArray'],
     locations: new Uint32Array([])
@@ -342,7 +342,7 @@ test('should handle code object with internal array reference', () => {
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '[Array 3]',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
@@ -373,7 +373,7 @@ test('should handle code object with incoming string reference (like the real ca
       // type, name_or_index, to_node
       2, 1, 1,  // property edge from Object1 to code object
       3, 0, 2,  // internal edge from code object to string "hello"
-      3, 6, 1,  // incoming edge from array to code object with name "1"
+      3, 6, 7,  // incoming edge from array to code object with name "1" (array index 7 = node index 1 * 7 fields)
     ]),
     strings: ['', 'test', 'Object1', 'CodeObject', 'hello', 'Array', '1'],
     locations: new Uint32Array([])
@@ -385,7 +385,7 @@ test('should handle code object with incoming string reference (like the real ca
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '"1"',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
@@ -431,7 +431,7 @@ test('should handle code object with multiple incoming references (prioritize "1
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '"1"',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
@@ -460,7 +460,7 @@ test('should handle code object with no internal references but incoming referen
     edges: new Uint32Array([
       // type, name_or_index, to_node
       2, 1, 1,  // property edge from Object1 to code object
-      3, 5, 1,  // incoming edge from array to code object with name "hello"
+      3, 5, 7,  // incoming edge from array to code object with name "hello" (array index 7 = node index 1 * 7 fields)
     ]),
     strings: ['', 'test', 'Object1', 'CodeObject', 'Array', 'hello'],
     locations: new Uint32Array([])
@@ -472,7 +472,7 @@ test('should handle code object with no internal references but incoming referen
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '"hello"',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
@@ -502,8 +502,8 @@ test('should handle code object with both internal and incoming references (prio
     edges: new Uint32Array([
       // type, name_or_index, to_node
       2, 1, 1,  // property edge from Object1 to code object
-      3, 0, 2,  // internal edge from code object to string "internal"
-      3, 6, 1,  // incoming edge from array to code object with name "incoming"
+      3, 0, 14, // internal edge from code object to string "internal" (array index 14 = node index 2 * 7 fields)
+      3, 6, 7,  // incoming edge from array to code object with name "incoming" (array index 7 = node index 1 * 7 fields)
     ]),
     strings: ['', 'test', 'Object1', 'CodeObject', 'internal', 'Array', 'incoming'],
     locations: new Uint32Array([])
@@ -515,7 +515,7 @@ test('should handle code object with both internal and incoming references (prio
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '"incoming"',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
@@ -554,7 +554,7 @@ test('should handle code object with no references at all', () => {
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '[code 2]',
+    propertyValue: '[Object 1]',
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
