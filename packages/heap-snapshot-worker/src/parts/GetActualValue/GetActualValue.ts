@@ -63,7 +63,7 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
 
   // For hidden nodes, check if it's a boolean value
   if (nodeTypeName === 'hidden') {
-    const booleanValue = getBooleanValue(targetNode, nodeTypes, strings)
+    const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap)
     if (booleanValue) {
       return booleanValue
     }

@@ -6,6 +6,7 @@ import { parseNode } from '../ParseNode/ParseNode.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { collectArrayElements } from '../CollectArrayElements/CollectArrayElements.ts'
+import { getBooleanValue, getBooleanStructure } from '../GetBooleanValue/GetBooleanValue.ts'
 
 export interface ObjectWithProperty {
   id: number
@@ -110,6 +111,14 @@ export const collectObjectProperties = (
       } else if (targetType === 'string' || targetType === 'number') {
         // For primitives, get the actual value
         value = getActualValue(targetNode, snapshot, edgeMap, visited)
+      } else if (targetType === 'hidden') {
+        // For hidden nodes, check if it's a boolean or other special value
+        const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap, propertyName)
+        if (booleanValue) {
+          value = booleanValue
+        } else {
+          value = getActualValue(targetNode, snapshot, edgeMap, visited)
+        }
       } else if (targetType === 'code') {
         // For code objects, try to get the actual value they represent
         value = getActualValue(targetNode, snapshot, edgeMap, visited)
@@ -186,8 +195,19 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
             edgeCount: sourceNode.edge_count,
           }
 
-          // Get the actual value by following references
-          result.propertyValue = getActualValue(targetNode, snapshot, edgeMap)
+          // Try enhanced boolean detection first
+          const booleanStructure = getBooleanStructure(sourceNode, snapshot, edgeMap, propertyName)
+          if (booleanStructure) {
+            // This is a boolean with the dual-reference pattern
+            if (booleanStructure.hasTypeReference) {
+              result.propertyValue = `${booleanStructure.value} (typed)`
+            } else {
+              result.propertyValue = booleanStructure.value
+            }
+          } else {
+            // Fall back to standard value detection
+            result.propertyValue = getActualValue(targetNode, snapshot, edgeMap)
+          }
 
           // Collect properties if depth > 0
           if (depth > 0) {
