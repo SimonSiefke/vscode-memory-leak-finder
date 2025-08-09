@@ -22,6 +22,7 @@ export const startRunning = async (
   vscodePath,
   commit,
   setupOnly,
+  workers,
 ) => {
   await Stdout.write(AnsiEscapes.clear)
   const rpc = await RunTest.prepare()
@@ -46,5 +47,6 @@ export const startRunning = async (
     vscodePath,
     commit,
     setupOnly,
+    workers,
   )
 }
