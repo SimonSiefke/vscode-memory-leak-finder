@@ -1,4 +1,7 @@
 import type { Snapshot } from '../Snapshot/Snapshot.js'
+import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
+import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
+import { getActualValue } from '../GetActualValue/GetActualValue.ts'
 
 export interface ObjectWithProperty {
   id: number
@@ -34,14 +37,15 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
   }
 
   // Get field indices
-  const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
-
-  const edgeTypeFieldIndex = edgeFields.indexOf('type')
-  const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
-  const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
 
   const ITEMS_PER_NODE = nodeFields.length
-  const ITEMS_PER_EDGE = edgeFields.length
+
+  // Get edge type names
+  const edgeTypes = meta.edge_types[0] || []
+  const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
+
+  // Create edge map for fast lookups
+  const edgeMap = createEdgeMap(nodes, nodeFields)
 
   // Helper function to parse a node from the flat array
   const parseNode = (nodeIndex: number): any => {
@@ -62,7 +66,7 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
 
   // Helper function to get node name as string
   const getNodeName = (node: any): string | null => {
-    if (node.name !== undefined && strings[node.name]) {
+    if (node && node.name !== undefined && strings[node.name]) {
       return strings[node.name]
     }
     return null
@@ -77,24 +81,17 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
   }
 
   // Iterate through each node and scan its edges
-  let currentEdgeOffset = 0
-
   for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex += ITEMS_PER_NODE) {
-    const edgeCount = nodes[nodeIndex + edgeCountFieldIndex]
+    const nodeEdges = getNodeEdges(nodeIndex / ITEMS_PER_NODE, edgeMap, nodes, edges, nodeFields, edgeFields)
 
     // Scan this node's edges
-    for (let j = 0; j < edgeCount; j++) {
-      const edgeIndex = (currentEdgeOffset + j) * ITEMS_PER_EDGE
-      const edgeType = edges[edgeIndex + edgeTypeFieldIndex]
-      const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
-      const edgeToNode = edges[edgeIndex + edgeToNodeFieldIndex]
-
-      // Check if it's a property edge (type 2) with the target property name
-      if (edgeType === 2 && edgeNameIndex === propertyNameIndex) {
+    for (const edge of nodeEdges) {
+      // Check if it's a property edge with the target property name
+      if (edge.type === EDGE_TYPE_PROPERTY && edge.nameIndex === propertyNameIndex) {
         // Parse the source node (the object that has the property)
         const sourceNode = parseNode(nodeIndex / ITEMS_PER_NODE)
         // Parse the target node (the property value)
-        const targetNode = parseNode(edgeToNode)
+        const targetNode = parseNode(edge.toNode)
 
         if (sourceNode && targetNode) {
           const result: ObjectWithProperty = {
@@ -106,30 +103,13 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
             edgeCount: sourceNode.edge_count,
           }
 
-          // Try to get the property value based on the target node type
-          if (targetNode.type === 2) {
-            // string
-            result.propertyValue = getNodeName(targetNode)
-          } else if (targetNode.type === 7) {
-            // number
-            result.propertyValue = targetNode.name?.toString() || null // name field contains the number value
-          } else if (targetNode.type === 3) {
-            // object
-            result.propertyValue = `[Object ${targetNode.id}]`
-          } else if (targetNode.type === 1) {
-            // array
-            result.propertyValue = `[Array ${targetNode.id}]`
-          } else {
-            const typeName = getNodeTypeName(targetNode)
-            result.propertyValue = `[${typeName || 'Unknown'} ${targetNode.id}]`
-          }
+          // Get the actual value by following references
+          result.propertyValue = getActualValue(targetNode, snapshot, edgeMap)
 
           results.push(result)
         }
       }
     }
-
-    currentEdgeOffset += edgeCount
   }
 
   return results

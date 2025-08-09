@@ -1,2 +1,2 @@
-export const NewLine = '\n'
-export const EmptyString = ''
+export const NewLine: string = '\n'
+export const EmptyString: string = ''

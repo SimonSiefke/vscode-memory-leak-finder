@@ -1,5 +1,4 @@
 import { VError } from '../VError/VError.ts'
-import { WebSocket } from 'ws'
 import * as Json from '../Json/Json.ts'
 import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWebSocketToBeOpen.ts'
 

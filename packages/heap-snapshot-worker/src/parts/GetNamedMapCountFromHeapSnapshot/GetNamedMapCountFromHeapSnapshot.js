@@ -7,4 +7,3 @@ export const getNamedMapCountFromHeapSnapshot = async (path) => {
   })
   return getNamedMapCountFromHeapSnapshotInternal(snapshot)
 }
-

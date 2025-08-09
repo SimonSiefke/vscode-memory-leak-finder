@@ -28,6 +28,7 @@ The dev container includes:
 ## Commands
 
 The container automatically runs:
+
 - `npm ci` - Install dependencies
 
 ## Development Workflow
