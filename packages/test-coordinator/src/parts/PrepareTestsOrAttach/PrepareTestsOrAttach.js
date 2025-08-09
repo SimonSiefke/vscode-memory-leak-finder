@@ -60,6 +60,9 @@ export const prepareTestsOrAttach = async (
     monkeyPatchedElectron,
     electronObjectId,
     isFirstConnection,
+    headlessMode,
+    webSocketUrl,
+    canUseIdleCallback,
   )
   await PageObject.create(testWorkerRpc, connectionId, isFirstConnection, headlessMode, timeouts, ideVersion, pageObjectPath)
   return testWorkerRpc
