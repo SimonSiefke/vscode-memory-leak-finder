@@ -1,4 +1,4 @@
-import { expect, test } from '@jest/globals'
+import { expect, test, jest } from '@jest/globals'
 import * as ScenarioFunctions from '../src/parts/ScenarioFunctions/ScenarioFunctions.ts'
 import * as SessionState from '../src/parts/SessionState/SessionState.ts'
 import * as TargetState from '../src/parts/TargetState/TargetState.ts'
@@ -13,6 +13,9 @@ test('handleDetachedFromTarget function exists', () => {
 })
 
 test('handleAttachedToTarget handles browser type', () => {
+  // Mock console methods to suppress output during test
+  const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation()
+  
   const mockMessage = {
     params: {
       targetInfo: {
@@ -25,6 +28,9 @@ test('handleAttachedToTarget handles browser type', () => {
 
   // Should not throw for browser type
   expect(() => ScenarioFunctions.handleAttachedToTarget(mockMessage)).not.toThrow()
+  
+  // Restore console method
+  consoleLogSpy.mockRestore()
 })
 
 test('handleAttachedToTarget handles unknown type', () => {
