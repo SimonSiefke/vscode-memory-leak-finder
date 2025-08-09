@@ -1,7 +1,5 @@
 import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.js'
 import { connectWorkers } from '../ConnectWorkers/ConnectWorkers.js'
-import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.js'
-import * as ConnectElectron from '../ConnectElectron/ConnectElectron.js'
 import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.js'
 import * as KillExistingIdeInstances from '../KillExistingIdeInstances/KillExistingIdeInstances.js'
 import * as PageObject from '../PageObject/PageObject.js'
