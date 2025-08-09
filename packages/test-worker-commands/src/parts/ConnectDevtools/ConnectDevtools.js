@@ -1,24 +1,32 @@
 import * as Assert from '../Assert/Assert.js'
+import { connectElectron } from '../ConnectElectron/ConnectElectron.js'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.js'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.js'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
 import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as ElectronApp from '../ElectronApp/ElectronApp.js'
 import * as ElectronAppState from '../ElectronAppState/ElectronAppState.js'
-import * as IntermediateConnectionState from '../IntermediateConnectionState/IntermediateConnectionState.js'
 import * as ObjectType from '../ObjectType/ObjectType.js'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
 import * as SessionState from '../SessionState/SessionState.js'
 
-export const connectDevtools = async (connectionId, devtoolsWebSocketUrl, monkeyPatchedElectronId, electronObjectId, isFirstConnection) => {
+export const connectDevtools = async (
+  connectionId,
+  devtoolsWebSocketUrl,
+  monkeyPatchedElectronId,
+  electronObjectId,
+  isFirstConnection,
+  headlessMode,
+  webSocketUrl,
+  canUseIdleCallback,
+) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
   // Assert.string(monkeyPatchedElectronId)
   Assert.boolean(isFirstConnection)
 
   // TODO create electron rpc here
-  const electronRpc = IntermediateConnectionState.get(connectionId)
-  IntermediateConnectionState.remove(connectionId)
+  const electronRpc = connectElectron(connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback)
   const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   // @ts-ignore
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)

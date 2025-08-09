@@ -1,7 +1,17 @@
 import * as Assert from '../Assert/Assert.js'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.js'
 
-export const connectDevtools = (rpc, connectionId, devtoolsWebSocketUrl, monkeyPatchedElectronId, electronObjectId, isFirstConnection) => {
+export const connectDevtools = (
+  rpc,
+  connectionId,
+  devtoolsWebSocketUrl,
+  monkeyPatchedElectronId,
+  electronObjectId,
+  isFirstConnection,
+  headlessMode,
+  webSocketUrl,
+  canUseIdleCallback,
+) => {
   Assert.object(rpc)
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
@@ -12,5 +22,8 @@ export const connectDevtools = (rpc, connectionId, devtoolsWebSocketUrl, monkeyP
     monkeyPatchedElectronId,
     electronObjectId,
     isFirstConnection,
+    headlessMode,
+    webSocketUrl,
+    canUseIdleCallback,
   )
 }
