@@ -641,10 +641,9 @@ test('should collect object properties with depth 1', () => {
     selfSize: 100,
     edgeCount: 3,
     preview: {
-
-    },
-      newState: { name: 'newState', type: 'number', value: '42' },
-      config: { name: 'config', type: 'object', value: '[Object 4]' }
+      config: '[Object 4]',
+      newState: '42',
+      oldState: 'hello'
     }
   })
 })
