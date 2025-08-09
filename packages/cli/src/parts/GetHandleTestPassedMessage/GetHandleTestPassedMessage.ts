@@ -1,15 +1,17 @@
 import chalk from 'chalk'
-import * as FormatAsSeconds from '../FormatAsSeconds/FormatAsSeconds.ts'
+import * as FormatDuration from '../FormatDuration/FormatDuration.ts'
 import * as TestPrefix from '../TestPrefix/TestPrefix.ts'
 
-const formatDuration = (duration) => {
-  return `(${FormatAsSeconds.formatAsSeconds(duration)})`
-}
-
-export const getHandleTestPassedMessage = (file, relativeDirName, fileName, duration, isLeak) => {
+export const getHandleTestPassedMessage = (
+  file: string,
+  relativeDirName: string,
+  fileName: string,
+  duration: number,
+  isLeak: boolean,
+): string => {
   const messageRelativeDirName = chalk.dim(relativeDirName + '/')
   const messageFileName = chalk.bold(fileName)
-  const messageDuration = formatDuration(duration)
+  const messageDuration = FormatDuration.formatDuration(duration)
   const prefix = isLeak ? TestPrefix.Leak : TestPrefix.Pass
   return `${prefix} ${messageRelativeDirName}${messageFileName} ${messageDuration}\n`
 }
