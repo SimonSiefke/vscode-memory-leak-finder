@@ -74,10 +74,21 @@ const collectObjectProperties = (
 
       // Get a simple string representation of the property value
       let value: string
-      if (targetType === 'object') {
-        value = `[Object ${targetNode.id}]`
-      } else if (targetType === 'array') {
-        value = `[Array ${targetNode.id}]`
+      if (targetType === 'object' || targetType === 'array') {
+        if (depth > 1) {
+          // At depth > 1, recursively collect properties of nested objects/arrays
+          const nestedProperties = collectObjectProperties(targetNodeIndex, snapshot, edgeMap, depth - 1, new Set(visited))
+          if (Object.keys(nestedProperties).length > 0) {
+            // Show the nested properties
+            value = `{${Object.entries(nestedProperties).map(([k, v]) => `${k}: ${v}`).join(', ')}}`
+          } else {
+            // No properties found, show reference
+            value = targetType === 'object' ? `[Object ${targetNode.id}]` : `[Array ${targetNode.id}]`
+          }
+        } else {
+          // At depth 1, just show reference
+          value = targetType === 'object' ? `[Object ${targetNode.id}]` : `[Array ${targetNode.id}]`
+        }
       } else if (targetType === 'string' || targetType === 'number') {
         // For primitives, get the actual value
         value = getActualValue(targetNode, snapshot, edgeMap, new Set(visited))
