@@ -2,6 +2,9 @@ import type { Snapshot } from '../Snapshot/Snapshot.js'
 import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
 import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
 import { getActualValue } from '../GetActualValue/GetActualValue.ts'
+import { parseNode } from '../ParseNode/ParseNode.ts'
+import { getNodeName } from '../GetNodeName/GetNodeName.ts'
+import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 
 export interface ObjectWithProperty {
   id: number
@@ -47,38 +50,7 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
   // Create edge map for fast lookups
   const edgeMap = createEdgeMap(nodes, nodeFields)
 
-  // Helper function to parse a node from the flat array
-  const parseNode = (nodeIndex: number): any => {
-    const nodeStart = nodeIndex * ITEMS_PER_NODE
-    if (nodeStart >= nodes.length) {
-      return null
-    }
 
-    const node: any = {}
-    for (let i = 0; i < nodeFields.length; i++) {
-      const fieldIndex = nodeStart + i
-      if (fieldIndex < nodes.length) {
-        node[nodeFields[i]] = nodes[fieldIndex]
-      }
-    }
-    return node
-  }
-
-  // Helper function to get node name as string
-  const getNodeName = (node: any): string | null => {
-    if (node && node.name !== undefined && strings[node.name]) {
-      return strings[node.name]
-    }
-    return null
-  }
-
-  // Helper function to get node type name
-  const getNodeTypeName = (node: any): string | null => {
-    if (nodeTypes[0] && Array.isArray(nodeTypes[0]) && node.type !== undefined) {
-      return (nodeTypes[0] as readonly string[])[node.type]
-    }
-    return null
-  }
 
   // Iterate through each node and scan its edges
   for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex += ITEMS_PER_NODE) {
@@ -89,16 +61,16 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
       // Check if it's a property edge with the target property name
       if (edge.type === EDGE_TYPE_PROPERTY && edge.nameIndex === propertyNameIndex) {
         // Parse the source node (the object that has the property)
-        const sourceNode = parseNode(nodeIndex / ITEMS_PER_NODE)
+        const sourceNode = parseNode(nodeIndex / ITEMS_PER_NODE, nodes, nodeFields)
         // Parse the target node (the property value)
-        const targetNode = parseNode(edge.toNode)
+        const targetNode = parseNode(edge.toNode, nodes, nodeFields)
 
         if (sourceNode && targetNode) {
           const result: ObjectWithProperty = {
             id: sourceNode.id,
-            name: getNodeName(sourceNode),
+            name: getNodeName(sourceNode, strings),
             propertyValue: null,
-            type: getNodeTypeName(sourceNode),
+            type: getNodeTypeName(sourceNode, nodeTypes),
             selfSize: sourceNode.self_size,
             edgeCount: sourceNode.edge_count,
           }
