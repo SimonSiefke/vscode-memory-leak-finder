@@ -1,8 +1,8 @@
-import { test, expect } from '@jest/globals'
-import { getNodeName } from '../src/parts/GetNodeName/GetNodeName.ts'
-import { getActualValue } from '../src/parts/GetActualValue/GetActualValue.ts'
-import { examineNodeByIndex } from '../src/parts/ExamineNode/ExamineNode.ts'
+import { expect, test } from '@jest/globals'
 import { createEdgeMap } from '../src/parts/CreateEdgeMap/CreateEdgeMap.ts'
+import { examineNodeByIndex } from '../src/parts/ExamineNode/ExamineNode.ts'
+import { getActualValue } from '../src/parts/GetActualValue/GetActualValue.ts'
+import { getNodeName } from '../src/parts/GetNodeName/GetNodeName.ts'
 import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('getNodeName - should handle empty strings correctly', () => {
@@ -67,15 +67,15 @@ test('examineNode - should show improved string property values', () => {
       // Node 0: Object with 3 properties
       // [type, name, id, self_size, edge_count]
       0, 0, 1, 100, 3,   // object "Object" id=1 size=100 edges=3
-      
+
       // Node 1: empty string
       // [type, name, id, self_size, edge_count]
       1, 1, 77, 0, 0,    // string "" id=77 size=0 edges=0
-      
+
       // Node 2: hello string
       // [type, name, id, self_size, edge_count]
       1, 2, 78, 10, 0,   // string "hello" id=78 size=10 edges=0
-      
+
       // Node 3: long text string
       // [type, name, id, self_size, edge_count]
       1, 5, 79, 20, 0,   // string "longText" id=79 size=20 edges=0
@@ -84,12 +84,12 @@ test('examineNode - should show improved string property values', () => {
       // Edge 0: Object["emptyProp"] -> empty string
       // [type, name_or_index, to_node]
       0, 3, 5,   // property "emptyProp" -> "" (offset 5)
-      
+
       // Edge 1: Object["helloProp"] -> hello string
       // [type, name_or_index, to_node]
       0, 4, 10,  // property "helloProp" -> "hello" (offset 10)
-      
-      // Edge 2: Object["textProp"] -> long text string  
+
+      // Edge 2: Object["textProp"] -> long text string
       // [type, name_or_index, to_node]
       0, 5, 15,  // property "textProp" -> "longText" (offset 15)
     ]),
