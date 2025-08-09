@@ -69,7 +69,36 @@ test('getPageSession returns undefined when no page session exists', () => {
   SessionState.reset()
   const browserSession = { type: 'browser', sessionId: 'browser1', rpc: {} }
   SessionState.addSession('browser1', browserSession)
-
+  
   const result = SessionState.getPageSession()
   expect(result).toBeUndefined()
+})
+
+test('addSession triggers callback when type exists in targetCallbackMap', () => {
+  SessionState.reset()
+  const sessionId = 'test-session'
+  const session = { type: 'page', sessionId, rpc: {} }
+  
+  // Set up a callback in targetCallbackMap
+  SessionState.state.targetCallbackMap['page'] = () => {}
+  
+  SessionState.addSession(sessionId, session)
+  expect(SessionState.hasSession(sessionId)).toBe(true)
+  expect(SessionState.state.targetCallbackMap['page']).toBeUndefined()
+})
+
+test('waitForTarget returns existing session if found', () => {
+  SessionState.reset()
+  const session = { type: 'page', sessionId: 'page1', rpc: {} }
+  SessionState.addSession('page1', session)
+  
+  const result = SessionState.waitForTarget('page')
+  expect(result).toBe(session)
+})
+
+test('waitForTarget creates promise when session not found', () => {
+  SessionState.reset()
+  const result = SessionState.waitForTarget('worker')
+  expect(result).toBeDefined()
+  expect(typeof result.then).toBe('function')
 })
