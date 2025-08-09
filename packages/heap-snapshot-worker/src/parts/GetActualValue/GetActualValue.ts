@@ -81,7 +81,9 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
       for (const edge of nodeEdges) {
         // Follow internal edges to find string/number/object/array values
         if (edge.type === EDGE_TYPE_INTERNAL) {
-          const referencedNode = parseNode(edge.toNode, nodes, nodeFields)
+          // Convert edge toNode from array index to node index
+          const referencedNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
+          const referencedNode = parseNode(referencedNodeIndex, nodes, nodeFields)
           if (referencedNode) {
             const referencedType = referencedNode.type
 
@@ -116,8 +118,10 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
         for (let j = 0; j < sourceEdgeCount; j++) {
           const edgeIndex = (currentEdgeOffset + j) * ITEMS_PER_EDGE
           const edgeToNode = edges[edgeIndex + edgeToNodeFieldIndex]
+          // Convert edge toNode from array index to node index
+          const edgeToNodeIndex = Math.floor(edgeToNode / ITEMS_PER_NODE)
 
-          if (edgeToNode === targetNodeIndex) {
+          if (edgeToNodeIndex === targetNodeIndex) {
             const edgeType = edges[edgeIndex + edgeTypeFieldIndex]
             const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
 
