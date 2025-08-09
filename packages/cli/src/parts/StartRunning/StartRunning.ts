@@ -1,6 +1,6 @@
-import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
 import * as RunTest from '../RunTest/RunTest.ts'
 import * as Stdout from '../Stdout/Stdout.ts'
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
 
 export const startRunning = async (
@@ -24,7 +24,8 @@ export const startRunning = async (
   setupOnly,
   workers,
 ) => {
-  await Stdout.write(AnsiEscapes.clear)
+  const clear = await StdoutWorker.invoke('Stdout.getClear')
+  await Stdout.write(clear)
   const rpc = await RunTest.prepare()
   await rpc.invoke(
     TestWorkerCommandType.RunTests,

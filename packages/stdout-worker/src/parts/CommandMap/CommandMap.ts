@@ -1,9 +1,13 @@
 import * as GetAllTestsFinishedMessage from '../GetAllTestsFinishedMessage/GetAllTestsFinishedMessage.ts'
+import * as GetAnsiEscapes from '../GetAnsiEscapes/GetAnsiEscapes.ts'
 import * as GetHandleTestFailedMessage from '../GetHandleTestFailedMessage/GetHandleTestFailedMessage.ts'
 import * as GetHandleTestPassedMessage from '../GetHandleTestPassedMessage/GetHandleTestPassedMessage.ts'
 import * as GetHandleTestRunningMessage from '../GetHandleTestRunningMessage/GetHandleTestRunningMessage.ts'
 import * as GetHandleTestSetupMessage from '../GetHandleTestSetupMessage/GetHandleTestSetupMessage.ts'
 import * as GetHandleTestSkippedMessage from '../GetHandleTestSkippedMessage/GetHandleTestSkippedMessage.ts'
+import * as GetInterruptedMessage from '../GetInterruptedMessage/GetInterruptedMessage.ts'
+import * as GetTestClearMessage from '../GetTestClearMessage/GetTestClearMessage.ts'
+import * as GetWatchUsageMessage from '../GetWatchUsageMessage/GetWatchUsageMessage.ts'
 
 export const commandMap: Record<string, (...args: any[]) => any> = {
   'Stdout.getHandleTestFailedMessage': GetHandleTestFailedMessage.getHandleTestFailedMessage,
@@ -12,4 +16,16 @@ export const commandMap: Record<string, (...args: any[]) => any> = {
   'Stdout.getHandleTestRunningMessage': GetHandleTestRunningMessage.getHandleTestRunningMessage,
   'Stdout.getHandleTestSetupMessage': GetHandleTestSetupMessage.getHandleTestSetupMessage,
   'Stdout.gethandleTestSkippedMessage': GetHandleTestSkippedMessage.getHandleTestSkippedMessage,
+  'Stdout.getInterruptedMessage': GetInterruptedMessage.getInterruptedMessage,
+  'Stdout.getTestClearMessage': GetTestClearMessage.getTestClearMessage,
+  'Stdout.getWatchUsageMessage': GetWatchUsageMessage.getWatchUsageMessage,
+  'Stdout.getCursorUp': GetAnsiEscapes.getCursorUp,
+  'Stdout.getEraseLine': GetAnsiEscapes.getEraseLine,
+  'Stdout.getCursorLeft': GetAnsiEscapes.getCursorLeft,
+  'Stdout.getEraseScreen': GetAnsiEscapes.getEraseScreen,
+  'Stdout.getEraseDown': GetAnsiEscapes.getEraseDown,
+  'Stdout.getBackspace': GetAnsiEscapes.getBackspace,
+  'Stdout.getCursorBackward': GetAnsiEscapes.getCursorBackward,
+  'Stdout.getEraseEndLine': GetAnsiEscapes.getEraseEndLine,
+  'Stdout.getClear': GetAnsiEscapes.getClear,
 }
