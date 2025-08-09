@@ -1,7 +1,7 @@
 {
   "name": "@vscode-memory-leak-finder/initialization-worker",
   "version": "0.0.0-dev",
-  "main": "src/main.js",
+  "main": "src/main.ts",
   "type": "module",
   "scripts": {
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
@@ -16,5 +16,11 @@
     "@lvce-editor/verror": "^1.7.0",
     "strip-ansi": "^7.1.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/node": "^18.15.13",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.1.6"
+  }
 }
