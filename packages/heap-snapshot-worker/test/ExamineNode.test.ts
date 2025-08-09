@@ -1,33 +1,45 @@
 import { test, expect } from '@jest/globals'
 import { examineNodeById, examineNodeByIndex } from '../src/parts/ExamineNode/ExamineNode.ts'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('examineNode - should examine node with edges and properties', () => {
-  const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
-  const edgeFields = ['type', 'name_or_index', 'to_node']
-  const nodeTypes: [readonly string[]] = [['hidden', 'array', 'string', 'object', 'code', 'closure']]
-  const edgeTypes: [readonly string[]] = [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']]
-
-  // Create nodes array: 3 nodes
-  const nodes = new Uint32Array([
-    // Node 0: type=3(object), name=0, id=1, self_size=100, edge_count=2
-    3, 0, 1, 100, 2,
-    // Node 1: type=2(string), name=1, id=2, self_size=50, edge_count=0
-    2, 1, 2, 50, 0,
-    // Node 2: type=2(string), name=2, id=3, self_size=30, edge_count=0
-    2, 2, 3, 30, 0,
-  ])
-
-  // Create edges array: 2 edges from Node 0
-  const edges = new Uint32Array([
-    // Edge 0: type=2(property), name_or_index=3, to_node=5 (Node 1)
-    2, 3, 5,
-    // Edge 1: type=2(property), name_or_index=4, to_node=10 (Node 2)
-    2, 4, 10,
-  ])
-
-  const strings = ['Object', 'hello', 'world', 'prop1', 'prop2']
-
-  const snapshot = createTestSnapshot(nodes, edges, strings, nodeFields, edgeFields, nodeTypes, edgeTypes)
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 3,
+    edge_count: 2,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Node 0: Object with 2 properties
+      // [type, name, id, self_size, edge_count]
+      3, 0, 1, 100, 2,   // object "Object" id=1 size=100 edges=2
+      
+      // Node 1: String "hello"
+      // [type, name, id, self_size, edge_count]  
+      2, 1, 2, 50, 0,    // string "hello" id=2 size=50 edges=0
+      
+      // Node 2: String "world"
+      // [type, name, id, self_size, edge_count]
+      2, 2, 3, 30, 0,    // string "world" id=3 size=30 edges=0
+    ]),
+    edges: new Uint32Array([
+      // Edge 0: Object["prop1"] -> "hello"
+      // [type, name_or_index, to_node]
+      2, 3, 5,   // property "prop1" -> "hello" (offset 5)
+      
+      // Edge 1: Object["prop2"] -> "world"
+      // [type, name_or_index, to_node]  
+      2, 4, 10,  // property "prop2" -> "world" (offset 10)
+    ]),
+    strings: ['Object', 'hello', 'world', 'prop1', 'prop2'],
+    locations: new Uint32Array([]),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+  }
 
   // Examine Node 0
   const result = examineNodeByIndex(0, snapshot)
@@ -79,20 +91,27 @@ test('examineNode - should examine node with edges and properties', () => {
 })
 
 test('examineNode - should handle node with no edges', () => {
-  const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
-  const edgeFields = ['type', 'name_or_index', 'to_node']
-  const nodeTypes: [readonly string[]] = [['string']]
-  const edgeTypes: [readonly string[]] = [['property']]
-
-  const nodes = new Uint32Array([
-    // Node 0: type=0(string), name=0, id=1, self_size=50, edge_count=0
-    0, 0, 1, 50, 0,
-  ])
-
-  const edges = new Uint32Array([])
-  const strings = ['test']
-
-  const snapshot = createTestSnapshot(nodes, edges, strings, nodeFields, edgeFields, nodeTypes, edgeTypes)
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 1,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Node 0: String with no edges
+      // [type, name, id, self_size, edge_count]
+      0, 0, 1, 50, 0,   // string "test" id=1 size=50 edges=0
+    ]),
+    edges: new Uint32Array([]),
+    strings: ['test'],
+    locations: new Uint32Array([]),
+    meta: {
+      node_types: [['string']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count'],
+      edge_types: [['property']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+  }
 
   const result = examineNodeByIndex(0, snapshot)
 
@@ -105,15 +124,23 @@ test('examineNode - should handle node with no edges', () => {
 })
 
 test('examineNode - should return null for invalid node index', () => {
-  const snapshot = createTestSnapshot(
-    new Uint32Array([]),
-    new Uint32Array([]),
-    [],
-    ['type', 'name', 'id', 'self_size', 'edge_count'],
-    ['type', 'name_or_index', 'to_node'],
-    [[]],
-    [[]],
-  )
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 0,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([]),
+    edges: new Uint32Array([]),
+    strings: [],
+    locations: new Uint32Array([]),
+    meta: {
+      node_types: [[]],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count'],
+      edge_types: [[]],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+  }
 
   const result = examineNodeByIndex(0, snapshot)
   expect(result).toBeNull()
@@ -121,52 +148,47 @@ test('examineNode - should return null for invalid node index', () => {
 
 test('examineNodeById - should find and examine node by ID 67', () => {
   // Create a test snapshot where we have a node with ID 67
-  const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
-  const edgeFields = ['type', 'name_or_index', 'to_node']
-  const nodeTypes: [readonly string[]] = [
-    [
-      'hidden',
-      'array',
-      'string',
-      'object',
-      'code',
-      'closure',
-      'regexp',
-      'number',
-      'native',
-      'synthetic',
-      'concatenated string',
-      'sliced string',
-      'symbol',
-      'bigint',
-      'object shape',
-    ],
-  ]
-  const edgeTypes: [readonly string[]] = [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']]
-
-  // Create some test nodes, including one with ID 67
-  const nodes = new Uint32Array([
-    // Node 0: type=2(string), name=0, id=1, self_size=50, edge_count=0
-    2, 0, 1, 50, 0,
-    // Node 1: type=2(string), name=1, id=2, self_size=50, edge_count=0
-    2, 1, 2, 50, 0,
-    // Node 2: type=3(object), name=2, id=67, self_size=100, edge_count=2
-    3, 2, 67, 100, 2,
-    // Node 3: type=2(string), name=3, id=68, self_size=50, edge_count=0
-    2, 3, 68, 50, 0,
-  ])
-
-  // Create edges for the node with ID 67 (which is at index 2)
-  const edges = new Uint32Array([
-    // Edge 0: property edge from node 2 pointing to node 0
-    2, 4, 0,
-    // Edge 1: property edge from node 2 pointing to node 1
-    2, 5, 5,
-  ])
-
-  const strings = ['node_0', 'node_1', 'Object', 'node_3', 'prop1', 'prop2']
-
-  const snapshot = createTestSnapshot(nodes, edges, strings, nodeFields, edgeFields, nodeTypes, edgeTypes)
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 4,
+    edge_count: 2,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Node 0: String "node_0"
+      // [type, name, id, self_size, edge_count]
+      2, 0, 1, 50, 0,     // string "node_0" id=1 size=50 edges=0
+      
+      // Node 1: String "node_1"  
+      // [type, name, id, self_size, edge_count]
+      2, 1, 2, 50, 0,     // string "node_1" id=2 size=50 edges=0
+      
+      // Node 2: Object with ID 67 (target node)
+      // [type, name, id, self_size, edge_count]
+      3, 2, 67, 100, 2,   // object "Object" id=67 size=100 edges=2
+      
+      // Node 3: String "node_3"
+      // [type, name, id, self_size, edge_count]
+      2, 3, 68, 50, 0,    // string "node_3" id=68 size=50 edges=0
+    ]),
+    edges: new Uint32Array([
+      // Edge 0: Object["prop1"] -> "node_0"
+      // [type, name_or_index, to_node]
+      2, 4, 0,   // property "prop1" -> node_0 (offset 0)
+      
+      // Edge 1: Object["prop2"] -> "node_1"
+      // [type, name_or_index, to_node]
+      2, 5, 5,   // property "prop2" -> node_1 (offset 5)
+    ]),
+    strings: ['node_0', 'node_1', 'Object', 'node_3', 'prop1', 'prop2'],
+    locations: new Uint32Array([]),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint', 'object shape']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+  }
 
   // Examine Node with ID 67
   const result = examineNodeById(67, snapshot)
