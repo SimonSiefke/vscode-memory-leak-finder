@@ -17,25 +17,7 @@
     "@lvce-editor/verror": "^1.7.0",
     "source-map": "^0.7.6"
   },
-  "jest": {
-    "extensionsToTreatAsEsm": [".ts"],
-    "transform": {
-      "^.+\\.ts$": ["ts-jest", {
-        "useESM": true
-      }]
-    },
-    "moduleNameMapper": {
-      "^(\\.{1,2}/.*)\\.js$": "$1"
-    },
-    "injectGlobals": false,
-    "collectCoverage": true,
-    "coverageThreshold": {
-      "global": {
-        "branches": 0,
-        "functions": 0,
-        "lines": 0,
-        "statements": 0
-      }
-    }
+  "devDependencies": {
+    "ts-jest": "^29.4.1"
   }
 }
