@@ -730,7 +730,7 @@ test('should exclude internal edges from properties collection', () => {
       test: 'hello'
     }
   })
-  
+
   // Should not include the internal edge in preview
   expect(result[0].preview?.internalProp).toBeUndefined()
 })
@@ -753,7 +753,7 @@ test('should collect nested properties with depth 2', () => {
       3, 1, 1, 100, 2, 0, 0,  // Main object with oldState property
       3, 2, 2, 50, 2, 0, 0,   // oldState object with filteredItems and items
       2, 3, 3, 20, 0, 0, 0,   // filteredItems string value
-      2, 4, 4, 20, 0, 0, 0,   // items string value  
+      2, 4, 4, 20, 0, 0, 0,   // items string value
       3, 5, 5, 30, 1, 0, 0,   // newState object with preferences
       2, 6, 6, 15, 0, 0, 0,   // preferences string value
     ]),
