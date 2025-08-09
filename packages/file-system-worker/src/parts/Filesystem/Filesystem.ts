@@ -3,22 +3,22 @@ import { cp, mkdir, rm, readFile, glob } from 'node:fs/promises'
 // TODO maybe move this to filesystem worker to make testing easier
 
 interface CopyOptions {
-  recursive?: boolean
-  force?: boolean
+  readonly recursive?: boolean
+  readonly force?: boolean
 }
 
 interface MkdirOptions {
-  recursive?: boolean
+  readonly recursive?: boolean
 }
 
 interface RemoveOptions {
-  recursive?: boolean
-  force?: boolean
+  readonly recursive?: boolean
+  readonly force?: boolean
 }
 
 interface GlobOptions {
-  cwd?: string
-  exclude?: string[]
+  readonly cwd?: string
+  readonly exclude?: readonly string[]
 }
 
 export const copy = async (from: string, to: string, options: CopyOptions = { recursive: true, force: true }): Promise<void> => {
@@ -37,7 +37,7 @@ export const readFileContent = async (path: string, encoding: BufferEncoding = '
   return await readFile(path, { encoding })
 }
 
-export const findFiles = async (pattern: string, options: GlobOptions = {}): Promise<string[]> => {
+export const findFiles = async (pattern: string, options: GlobOptions = {}): Promise<readonly string[]> => {
   const globIterator = glob(pattern, options)
   return await Array.fromAsync(globIterator)
 }

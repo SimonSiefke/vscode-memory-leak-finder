@@ -1,16 +1,16 @@
 import { execa } from 'execa'
 
 interface ExecOptions {
-  cwd?: string
+  readonly cwd?: string
 }
 
 interface ExecResult {
-  stdout: string
-  stderr: string
-  exitCode: number
+  readonly stdout: string
+  readonly stderr: string
+  readonly exitCode: number
 }
 
-export const exec = async (command: string, args: string[], options: ExecOptions = {}): Promise<ExecResult> => {
+export const exec = async (command: string, args: readonly string[], options: ExecOptions = {}): Promise<ExecResult> => {
   const result = await execa(command, args, options)
   return {
     stdout: result.stdout || '',

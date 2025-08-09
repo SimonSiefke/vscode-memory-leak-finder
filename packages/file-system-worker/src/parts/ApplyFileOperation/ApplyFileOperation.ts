@@ -2,19 +2,19 @@ import { VError } from '@lvce-editor/verror'
 import { copy, makeDirectory, remove } from '../Filesystem/Filesystem.js'
 
 export interface CopyOperation {
-  type: 'copy'
-  from: string
-  to: string
+  readonly type: 'copy'
+  readonly from: string
+  readonly to: string
 }
 
 export interface MkdirOperation {
-  type: 'mkdir'
-  path: string
+  readonly type: 'mkdir'
+  readonly path: string
 }
 
 export interface RemoveOperation {
-  type: 'remove'
-  from: string
+  readonly type: 'remove'
+  readonly from: string
 }
 
 export type FileOperation = CopyOperation | MkdirOperation | RemoveOperation
