@@ -16,7 +16,7 @@ fi
 
 function updateDependencies {
   echo "updating dependencies..."
-  OUTPUT=`ncu -u -x @types/node -x @types/jest -x rollup -x jest -x @jest/globals`
+  OUTPUT=`ncu -u `
   SUB='All dependencies match the latest package versions'
   if [[ "$OUTPUT" == *"$SUB"* ]]; then
     echo "$OUTPUT"
@@ -36,14 +36,20 @@ cd packages/devtools-protocol && updateDependencies && cd ../../ &&
 cd packages/download-worker && updateDependencies && cd ../../ &&
 cd packages/e2e && updateDependencies && cd ../../ &&
 cd packages/file-watcher-worker && updateDependencies && cd ../../ &&
+cd packages/file-system-worker && updateDependencies && cd ../../ &&
 cd packages/heap-snapshot-worker && updateDependencies && cd ../../ &&
+cd packages/heap-snapshot-parsing-worker && updateDependencies && cd ../../ &&
+cd packages/initialization-worker && updateDependencies && cd ../../ &&
 cd packages/injected-code && updateDependencies && cd ../../ &&
 cd packages/load-source-map-worker && updateDependencies && cd ../../ &&
 cd packages/memory-leak-finder && updateDependencies && cd ../../ &&
 cd packages/memory-leak-worker && updateDependencies && cd ../../ &&
 cd packages/page-object && updateDependencies && cd ../../ &&
+cd packages/postinstall-tools && updateDependencies && cd ../../ &&
+cd packages/repository-worker && updateDependencies && cd ../../ &&
 cd packages/source-map-worker && updateDependencies && cd ../../ &&
 cd packages/stdout-worker && updateDependencies && cd ../../ &&
+cd packages/storage-worker && updateDependencies && cd ../../ &&
 cd packages/test-coordinator && updateDependencies && cd ../../ &&
 cd packages/test-worker && updateDependencies && cd ../../ &&
 cd packages/test-worker-commands && updateDependencies && cd ../../ &&
