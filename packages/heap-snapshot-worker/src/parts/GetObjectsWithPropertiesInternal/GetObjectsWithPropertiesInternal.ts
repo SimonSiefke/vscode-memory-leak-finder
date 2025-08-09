@@ -5,11 +5,13 @@ import { getActualValue } from '../GetActualValue/GetActualValue.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
+import { collectArrayElements } from '../CollectArrayElements/CollectArrayElements.ts'
+import { getBooleanValue, getBooleanStructure } from '../GetBooleanValue/GetBooleanValue.ts'
 
 export interface ObjectWithProperty {
   id: number
   name: string | null
-  propertyValue: string | null
+  propertyValue: string | boolean | null
   type: string | null
   selfSize: number
   edgeCount: number
@@ -25,7 +27,7 @@ export interface ObjectWithProperty {
  * @param visited - Set of visited node IDs to prevent circular references
  * @returns Record of property name to value (can be nested objects/arrays)
  */
-const collectObjectProperties = (
+export const collectObjectProperties = (
   nodeIndex: number,
   snapshot: Snapshot,
   edgeMap: Uint32Array,
@@ -71,10 +73,14 @@ const collectObjectProperties = (
       if (!targetNode) continue
 
       const targetType = getNodeTypeName(targetNode, nodeTypes) || 'unknown'
+      const targetName = getNodeName(targetNode, strings)
+
+      // Check if this is an array (object with name "Array")
+      const isArray = targetType === 'object' && targetName === 'Array'
 
       // Get the property value (can be nested object/array or primitive)
       let value: any
-      if (targetType === 'object') {
+      if (targetType === 'object' && !isArray) {
         if (depth > 1) {
           // At depth > 1, recursively collect properties of nested objects
           const nestedProperties = collectObjectProperties(targetNodeIndex, snapshot, edgeMap, depth - 1, visited)
@@ -89,6 +95,19 @@ const collectObjectProperties = (
           // At depth 1, just show reference
           value = `[Object ${targetNode.id}]`
         }
+      } else if (isArray) {
+        if (depth > 1) {
+          // For arrays at depth > 1, collect array elements
+          const arrayElements = collectArrayElements(targetNodeIndex, snapshot, edgeMap, depth - 1, visited)
+          if (arrayElements.length > 0) {
+            value = arrayElements
+          } else {
+            value = `[Array ${targetNode.id}]`
+          }
+        } else {
+          // At depth 1, just show reference
+          value = `[Array ${targetNode.id}]`
+        }
       } else if (targetType === 'array') {
         if (depth > 1) {
           // For arrays at depth > 1, we could collect indexed elements
@@ -101,6 +120,21 @@ const collectObjectProperties = (
       } else if (targetType === 'string' || targetType === 'number') {
         // For primitives, get the actual value
         value = getActualValue(targetNode, snapshot, edgeMap, visited)
+      } else if (targetType === 'hidden') {
+        // For hidden nodes, check if it's a boolean or other special value
+        const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap, propertyName)
+        if (booleanValue) {
+          // Convert boolean strings to actual boolean values for preview
+          if (booleanValue === 'true') {
+            value = true
+          } else if (booleanValue === 'false') {
+            value = false
+          } else {
+            value = booleanValue
+          }
+        } else {
+          value = getActualValue(targetNode, snapshot, edgeMap, visited)
+        }
       } else if (targetType === 'code') {
         // For code objects, try to get the actual value they represent
         value = getActualValue(targetNode, snapshot, edgeMap, visited)
@@ -177,8 +211,29 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
             edgeCount: sourceNode.edge_count,
           }
 
-          // Get the actual value by following references
-          result.propertyValue = getActualValue(targetNode, snapshot, edgeMap)
+          // Try enhanced boolean detection first
+          const booleanStructure = getBooleanStructure(sourceNode, snapshot, edgeMap, propertyName)
+          if (booleanStructure) {
+            // This is a boolean with the dual-reference pattern - return actual boolean value
+            if (booleanStructure.value === 'true') {
+              result.propertyValue = true
+            } else if (booleanStructure.value === 'false') {
+              result.propertyValue = false
+            } else {
+              result.propertyValue = booleanStructure.value
+            }
+          } else {
+            // Fall back to standard value detection
+            const actualValue = getActualValue(targetNode, snapshot, edgeMap)
+            // Check if the actual value is a boolean string and convert it
+            if (actualValue === 'true') {
+              result.propertyValue = true
+            } else if (actualValue === 'false') {
+              result.propertyValue = false
+            } else {
+              result.propertyValue = actualValue
+            }
+          }
 
           // Collect properties if depth > 0
           if (depth > 0) {
