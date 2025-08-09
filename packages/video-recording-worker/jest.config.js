@@ -1,6 +1,7 @@
 export default {
-  preset: 'ts-jest',
+  preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
+  extensionsToTreatAsEsm: ['.ts'],
   transform: {
     '^.+\\.ts$': [
       'ts-jest',
@@ -9,13 +10,19 @@ export default {
       },
     ],
   },
-  extensionsToTreatAsEsm: ['.ts'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
   testMatch: ['<rootDir>/test/**/*.ts', '<rootDir>/test/**/*.js'],
   injectGlobals: false,
   collectCoverage: true,
+  collectCoverageFrom: [
+    'src/**/*.ts',
+    '!src/**/*.d.ts',
+    '!src/**/index.ts',
+  ],
+  coverageReporters: ['text', 'lcov', 'html'],
+  coverageDirectory: 'coverage',
   coverageThreshold: {
     global: {
       branches: 70,
@@ -24,4 +31,9 @@ export default {
       statements: 70,
     },
   },
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '/test/',
+    '/bin/',
+  ],
 }
