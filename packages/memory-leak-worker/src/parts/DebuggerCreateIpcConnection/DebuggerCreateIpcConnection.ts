@@ -1,4 +1,3 @@
-import { WebSocket } from 'ws'
 import { VError } from '../VError/VError.ts'
 import * as Json from '../Json/Json.ts'
 import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWebSocketToBeOpen.ts'
@@ -11,7 +10,7 @@ export const createConnection = async (wsUrl: string): Promise<any> => {
     const webSocket = new WebSocket(wsUrl)
 
     // TODO remove error listener and message listener when ipc is disposed
-    webSocket.on('error', (error: Error) => {
+    webSocket.addEventListener('error', (error: any) => {
       throw new Error(`memory leak worker websocket error: ${error}`)
     })
     await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket as any)

@@ -24,7 +24,6 @@
     "@types/babel__code-frame": "^7.0.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.1.0",
-    "@types/ws": "^8.18.1",
     "ts-jest": "^29.4.1"
   },
   "xo": {
