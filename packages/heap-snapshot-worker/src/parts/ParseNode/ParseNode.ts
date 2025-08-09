@@ -8,7 +8,7 @@
 export const parseNode = (nodeIndex: number, nodes: Uint32Array, nodeFields: readonly string[]): any => {
   const ITEMS_PER_NODE = nodeFields.length
   const nodeStart = nodeIndex * ITEMS_PER_NODE
-  
+
   if (nodeStart >= nodes.length) {
     return null
   }

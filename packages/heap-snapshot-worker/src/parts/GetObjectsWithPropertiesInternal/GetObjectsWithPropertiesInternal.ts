@@ -63,7 +63,9 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
         // Parse the source node (the object that has the property)
         const sourceNode = parseNode(nodeIndex / ITEMS_PER_NODE, nodes, nodeFields)
         // Parse the target node (the property value)
-        const targetNode = parseNode(edge.toNode, nodes, nodeFields)
+        // Edge toNode values are array indices, need to convert to node index by dividing by ITEMS_PER_NODE
+        const targetNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
+        const targetNode = parseNode(targetNodeIndex, nodes, nodeFields)
 
         if (sourceNode && targetNode) {
           const result: ObjectWithProperty = {
