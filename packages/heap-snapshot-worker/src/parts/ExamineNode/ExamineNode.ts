@@ -4,6 +4,7 @@ import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
 import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
+import { getActualValue } from '../GetActualValue/GetActualValue.ts'
 
 export interface NodeExaminationResult {
   nodeIndex: number
@@ -112,14 +113,35 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
     }
   })
 
-  // Extract properties (property-type edges)
+  // Extract properties (property-type edges) with improved value detection
   const properties = processedEdges
     .filter(edge => edge.typeName === 'property')
-    .map(edge => ({
-      name: edge.edgeName,
-      value: edge.targetNodeInfo?.name || null,
-      targetType: edge.targetNodeInfo?.type || null
-    }))
+    .map(edge => {
+      let actualValue = edge.targetNodeInfo?.name || null
+
+      // Try to get the actual value using improved detection for booleans, undefined, etc.
+      if (edge.targetNodeInfo) {
+        const targetNodeIndex = Math.floor(edge.toNode / node_fields.length)
+        const targetNode = parseNode(targetNodeIndex, nodes, node_fields)
+        if (targetNode) {
+          try {
+            const detectedValue = getActualValue(targetNode, snapshot, edgeMap)
+            // Only use detected value if it's different from the basic name
+            if (detectedValue && detectedValue !== edge.targetNodeInfo.name) {
+              actualValue = detectedValue
+            }
+          } catch (error) {
+            // Fall back to basic name if detection fails
+          }
+        }
+      }
+
+      return {
+        name: edge.edgeName,
+        value: actualValue,
+        targetType: edge.targetNodeInfo?.type || null
+      }
+    })
 
   return {
     nodeIndex,

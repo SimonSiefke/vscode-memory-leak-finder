@@ -4,6 +4,7 @@ import { parseNode } from '../ParseNode/ParseNode.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
+import { getUndefinedValue } from '../GetUndefinedValue/GetUndefinedValue.ts'
 
 /**
  * Gets the actual value of a node by following references for strings and numbers
@@ -61,11 +62,16 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
     return numberValue || `[Number ${targetNode.id}]`
   }
 
-  // For hidden nodes, check if it's a boolean value
+  // For hidden nodes, check if it's a boolean or undefined value
   if (nodeTypeName === 'hidden') {
     const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap)
     if (booleanValue) {
       return booleanValue
+    }
+
+    const undefinedValue = getUndefinedValue(targetNode, snapshot, edgeMap)
+    if (undefinedValue) {
+      return undefinedValue
     }
   }
 

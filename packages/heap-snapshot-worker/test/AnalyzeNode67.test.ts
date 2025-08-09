@@ -52,7 +52,8 @@ test('analyze node ID 67 from abc2.heapsnapshot', async () => {
       console.log('No properties found')
     } else {
       result.properties.forEach((prop, index) => {
-        console.log(`Property ${index}: ${prop.name} = ${prop.value} (${prop.targetType})`)
+        const valueDisplay = prop.value?.startsWith('[undefined ') ? `**${prop.value}**` : prop.value
+        console.log(`Property ${index}: ${prop.name} = ${valueDisplay} (${prop.targetType})`)
       })
     }
 

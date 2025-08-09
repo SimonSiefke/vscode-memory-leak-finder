@@ -61,7 +61,8 @@ async function main() {
     console.log('No properties found')
   } else {
     result.properties.forEach((prop, index) => {
-      console.log(`${prop.name} = ${prop.value} (${prop.targetType})`)
+      const valueDisplay = prop.value?.startsWith('[undefined ') ? `**${prop.value}**` : prop.value
+      console.log(`${prop.name} = ${valueDisplay} (${prop.targetType})`)
     })
   }
 
