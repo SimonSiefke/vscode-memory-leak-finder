@@ -50,8 +50,6 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
   // Create edge map for fast lookups
   const edgeMap = createEdgeMap(nodes, nodeFields)
 
-
-
   // Iterate through each node and scan its edges
   for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex += ITEMS_PER_NODE) {
     const nodeEdges = getNodeEdges(nodeIndex / ITEMS_PER_NODE, edgeMap, nodes, edges, nodeFields, edgeFields)
