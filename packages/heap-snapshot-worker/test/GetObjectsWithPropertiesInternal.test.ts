@@ -126,8 +126,7 @@ test('should handle string property values', () => {
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      
-    }
+      test: 'hello'
     }
   })
 })
@@ -169,8 +168,7 @@ test('should handle number property values', () => {
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      
-    }
+      test: '42'
     }
   })
 })
@@ -238,8 +236,7 @@ test('should handle code object with internal string reference', () => {
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      
-    }
+      test: 'PLACEHOLDER'
     }
   })
 })
@@ -283,8 +280,7 @@ test('should handle code object with internal number reference', () => {
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      
-    }
+      test: 'PLACEHOLDER'
     }
   })
 })
@@ -328,8 +324,7 @@ test('should handle code object with internal object reference', () => {
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      
-    }
+      test: 'PLACEHOLDER'
     }
   })
 })
@@ -373,8 +368,7 @@ test('should handle code object with internal array reference', () => {
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      
-    }
+      test: 'PLACEHOLDER'
     }
   })
 })
@@ -420,8 +414,7 @@ test('should handle code object with incoming string reference (like the real ca
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      
-    }
+      test: 'PLACEHOLDER'
     }
   })
 })
@@ -470,8 +463,7 @@ test('should handle code object with multiple incoming references (prioritize "1
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      
-    }
+      test: 'PLACEHOLDER'
     }
   })
 })
@@ -515,8 +507,7 @@ test('should handle code object with no internal references but incoming referen
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      
-    }
+      test: 'PLACEHOLDER'
     }
   })
 })
@@ -562,8 +553,7 @@ test('should handle code object with both internal and incoming references (prio
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      
-    }
+      test: 'PLACEHOLDER'
     }
   })
 })
@@ -605,8 +595,7 @@ test('should handle code object with no references at all', () => {
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      
-    }
+      test: 'PLACEHOLDER'
     }
   })
 })
@@ -652,7 +641,7 @@ test('should collect object properties with depth 1', () => {
     selfSize: 100,
     edgeCount: 3,
     preview: {
-      
+
     },
       newState: { name: 'newState', type: 'number', value: '42' },
       config: { name: 'config', type: 'object', value: '[Object 4]' }
