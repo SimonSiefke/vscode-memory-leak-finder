@@ -21,13 +21,7 @@ type FileOperation = CopyOperation | MkdirOperation
  * @param {string[]} nodeModulesPaths - Relative paths within the repo
  * @returns {Promise<FileOperation[]>}
  */
-export const getCacheFileOperations = async (
-  repoPath: string,
-  cacheKey: string,
-  cacheDir: string,
-  cachedNodeModulesPath: string,
-  nodeModulesPaths: string[],
-): Promise<FileOperation[]> => {
+export const getCacheFileOperations = async (repoPath: string, cacheKey: string, cacheDir: string, cachedNodeModulesPath: string, nodeModulesPaths: string[]): Promise<FileOperation[]> => {
   const fileOperations: FileOperation[] = []
   fileOperations.push(
     {
