@@ -42,8 +42,8 @@ test('should find objects with specified property', () => {
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
-    properties: {
-      test: { name: 'test', type: 'object', value: '[Object 4]' }
+    preview: {
+      test: '[Object 4]'
     }
   })
   expect(result[1]).toEqual({
@@ -617,7 +617,7 @@ test('should collect object properties with depth 1', () => {
       // type, name, id, self_size, edge_count, trace_node_id, detachedness
       3, 1, 1, 100, 3, 0, 0,  // Object with properties
       2, 2, 2, 20, 0, 0, 0,   // String property value
-      7, 42, 3, 8, 0, 0, 0,   // Number property value  
+      7, 42, 3, 8, 0, 0, 0,   // Number property value
       3, 3, 4, 50, 0, 0, 0,   // Object property value
     ]),
     edges: new Uint32Array([
@@ -730,7 +730,7 @@ test('should exclude internal edges from properties collection', () => {
       test: { name: 'test', type: 'string', value: 'hello' }
     }
   })
-  
+
   // Should not include the internal edge in properties
   expect(result[0].properties?.internalProp).toBeUndefined()
 })

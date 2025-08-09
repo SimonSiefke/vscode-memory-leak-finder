@@ -6,12 +6,6 @@ import { parseNode } from '../ParseNode/ParseNode.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 
-export interface PropertyInfo {
-  name: string
-  type: string
-  value?: string
-}
-
 export interface ObjectWithProperty {
   id: number
   name: string | null
@@ -19,7 +13,7 @@ export interface ObjectWithProperty {
   type: string | null
   selfSize: number
   edgeCount: number
-  properties?: Record<string, PropertyInfo>
+  preview?: Record<string, string>
 }
 
 /**
@@ -29,7 +23,7 @@ export interface ObjectWithProperty {
  * @param edgeMap - The edge map for fast lookups
  * @param depth - Maximum depth to traverse (0 = no properties, 1 = direct properties only)
  * @param visited - Set of visited node IDs to prevent circular references
- * @returns Record of property name to PropertyInfo
+ * @returns Record of property name to simple string representation
  */
 const collectObjectProperties = (
   nodeIndex: number,
@@ -37,7 +31,7 @@ const collectObjectProperties = (
   edgeMap: Uint32Array,
   depth: number = 1,
   visited: Set<number> = new Set(),
-): Record<string, PropertyInfo> => {
+): Record<string, string> => {
   if (depth <= 0) {
     return {}
   }
@@ -58,9 +52,8 @@ const collectObjectProperties = (
   // Get edge type names
   const edgeTypes = meta.edge_types[0] || []
   const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
-  const EDGE_TYPE_INTERNAL = edgeTypes.indexOf('internal')
 
-  const properties: Record<string, PropertyInfo> = {}
+  const properties: Record<string, string> = {}
 
   // Get edges for this node
   const nodeEdges = getNodeEdges(nodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
@@ -79,27 +72,24 @@ const collectObjectProperties = (
 
       const targetType = getNodeTypeName(targetNode, nodeTypes) || 'unknown'
 
-      const propertyInfo: PropertyInfo = {
-        name: propertyName,
-        type: targetType,
-      }
-
-      // If depth > 1, we can add the value representation
-      if (depth > 1) {
-        propertyInfo.value = getActualValue(targetNode, snapshot, edgeMap, new Set(visited))
+      // Get a simple string representation of the property value
+      let value: string
+      if (targetType === 'object') {
+        value = `[Object ${targetNode.id}]`
+      } else if (targetType === 'array') {
+        value = `[Array ${targetNode.id}]`
+      } else if (targetType === 'string' || targetType === 'number') {
+        // For primitives, get the actual value
+        value = getActualValue(targetNode, snapshot, edgeMap, new Set(visited))
+      } else if (targetType === 'code') {
+        // For code objects, try to get the actual value they represent
+        value = getActualValue(targetNode, snapshot, edgeMap, new Set(visited))
       } else {
-        // For objects/arrays at depth 1, show a simple reference
-        if (targetType === 'object') {
-          propertyInfo.value = `[Object ${targetNode.id}]`
-        } else if (targetType === 'array') {
-          propertyInfo.value = `[Array ${targetNode.id}]`
-        } else {
-          // For primitives, always show the value regardless of depth
-          propertyInfo.value = getActualValue(targetNode, snapshot, edgeMap, new Set(visited))
-        }
+        // For other types like closure, etc.
+        value = `[${targetType} ${targetNode.id}]`
       }
 
-      properties[propertyName] = propertyInfo
+      properties[propertyName] = value
     }
   }
 
@@ -172,7 +162,7 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
 
           // Collect properties if depth > 0
           if (depth > 0) {
-            result.properties = collectObjectProperties(nodeIndex / ITEMS_PER_NODE, snapshot, edgeMap, depth)
+            result.preview = collectObjectProperties(nodeIndex / ITEMS_PER_NODE, snapshot, edgeMap, depth)
           }
 
           results.push(result)
