@@ -23,7 +23,7 @@ test('getNodeName - should handle empty strings correctly', () => {
 
 test('getActualValue - should properly display string values', () => {
   const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
-  const nodeTypes = [['string', 'object']]
+  const nodeTypes: [readonly string[]] = [['string', 'object']]
   const strings = ['', 'hello', 'world', 'test value']
 
   const snapshot = createTestSnapshot(
@@ -40,22 +40,22 @@ test('getActualValue - should properly display string values', () => {
 
   // Test empty string
   const emptyStringNode = { type: 0, name: 0, id: 1 }
-  expect(getActualValue(emptyStringNode, snapshot, edgeMap)).toBe('""')
+  expect(getActualValue(emptyStringNode, snapshot, edgeMap)).toBe('')
 
   // Test regular string
   const helloNode = { type: 0, name: 1, id: 2 }
-  expect(getActualValue(helloNode, snapshot, edgeMap)).toBe('"hello"')
+  expect(getActualValue(helloNode, snapshot, edgeMap)).toBe('hello')
 
   // Test string with spaces
   const testValueNode = { type: 0, name: 3, id: 3 }
-  expect(getActualValue(testValueNode, snapshot, edgeMap)).toBe('"test value"')
+  expect(getActualValue(testValueNode, snapshot, edgeMap)).toBe('test value')
 })
 
 test('examineNode - should show improved string property values', () => {
   const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
   const edgeFields = ['type', 'name_or_index', 'to_node']
-  const nodeTypes = [['object', 'string']]
-  const edgeTypes = [['property']]
+  const nodeTypes: [readonly string[]] = [['object', 'string']]
+  const edgeTypes: [readonly string[]] = [['property']]
   const strings = ['Object', '', 'hello', 'emptyProp', 'helloProp', 'longText']
 
   // Create nodes:

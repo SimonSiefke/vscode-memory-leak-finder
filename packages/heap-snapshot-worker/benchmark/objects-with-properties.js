@@ -18,7 +18,7 @@ async function testGetObjectsWithProperties() {
 
     console.log('\n=== Testing Refactored Function ===')
     console.time('check')
-    const oldStateObjects = getObjectsWithPropertiesInternal(snapshot, 'oldState', 3)
+    const oldStateObjects = getObjectsWithPropertiesInternal(snapshot, 'oldState', 4)
     console.timeEnd('check')
     console.log(`Refactored function found ${oldStateObjects.length} objects with "oldState" property`)
 

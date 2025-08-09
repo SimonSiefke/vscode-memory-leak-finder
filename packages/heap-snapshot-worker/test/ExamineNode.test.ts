@@ -5,10 +5,10 @@ import { createTestSnapshot } from './helpers/createTestSnapshot.ts'
 test('examineNode - should examine node with edges and properties', () => {
   const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
   const edgeFields = ['type', 'name_or_index', 'to_node']
-  const nodeTypes = [
+  const nodeTypes: [readonly string[]] = [
     ['hidden', 'array', 'string', 'object', 'code', 'closure']
   ]
-  const edgeTypes = [
+  const edgeTypes: [readonly string[]] = [
     ['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']
   ]
 
@@ -94,8 +94,8 @@ test('examineNode - should examine node with edges and properties', () => {
 test('examineNode - should handle node with no edges', () => {
   const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
   const edgeFields = ['type', 'name_or_index', 'to_node']
-  const nodeTypes = [['string']]
-  const edgeTypes = [['property']]
+  const nodeTypes: [readonly string[]] = [['string']]
+  const edgeTypes: [readonly string[]] = [['property']]
 
   const nodes = new Uint32Array([
     // Node 0: type=0(string), name=0, id=1, self_size=50, edge_count=0
@@ -126,17 +126,15 @@ test('examineNode - should handle node with no edges', () => {
 })
 
 test('examineNode - should return null for invalid node index', () => {
-  const snapshot = {
-    nodes: new Uint32Array([]),
-    edges: new Uint32Array([]),
-    strings: [],
-    meta: {
-      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count'],
-      edge_fields: ['type', 'name_or_index', 'to_node'],
-      node_types: [[]],
-      edge_types: [[]]
-    }
-  }
+  const snapshot = createTestSnapshot(
+    new Uint32Array([]),
+    new Uint32Array([]),
+    [],
+    ['type', 'name', 'id', 'self_size', 'edge_count'],
+    ['type', 'name_or_index', 'to_node'],
+    [[]],
+    [[]]
+  )
 
   const result = examineNodeByIndex(0, snapshot)
   expect(result).toBeNull()
@@ -146,10 +144,10 @@ test('examineNodeById - should find and examine node by ID 67', () => {
   // Create a test snapshot where we have a node with ID 67
   const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
   const edgeFields = ['type', 'name_or_index', 'to_node']
-  const nodeTypes = [
+  const nodeTypes: [readonly string[]] = [
     ['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint', 'object shape']
   ]
-  const edgeTypes = [
+  const edgeTypes: [readonly string[]] = [
     ['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']
   ]
 

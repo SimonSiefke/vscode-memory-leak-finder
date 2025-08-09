@@ -6,8 +6,8 @@ export const createTestSnapshot = (
   strings: string[],
   nodeFields: string[] = ['type', 'name', 'id', 'self_size', 'edge_count'],
   edgeFields: string[] = ['type', 'name_or_index', 'to_node'],
-  nodeTypes: string[][] = [['object', 'string', 'hidden']],
-  edgeTypes: string[][] = [['property', 'internal']]
+  nodeTypes: [readonly string[]] = [['object', 'string', 'hidden']],
+  edgeTypes: [readonly string[]] = [['property', 'internal']]
 ): Snapshot => ({
   nodes,
   edges,
@@ -19,8 +19,8 @@ export const createTestSnapshot = (
   meta: {
     node_fields: nodeFields,
     edge_fields: edgeFields,
-    node_types: nodeTypes as [readonly string[]],
-    edge_types: edgeTypes as [readonly string[]],
+    node_types: nodeTypes,
+    edge_types: edgeTypes,
     location_fields: []
   }
 })

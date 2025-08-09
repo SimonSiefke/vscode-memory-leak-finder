@@ -126,8 +126,8 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
         if (targetNode) {
           try {
             const detectedValue = getActualValue(targetNode, snapshot, edgeMap)
-            // Only use detected value if it's different from the basic name
-            if (detectedValue && detectedValue !== edge.targetNodeInfo.name) {
+            // Use detected value if it's not null and different from basic name, or if it's an empty string
+            if (detectedValue !== null && (detectedValue !== edge.targetNodeInfo.name || detectedValue === '')) {
               actualValue = detectedValue
             }
           } catch (error) {
@@ -136,9 +136,16 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
         }
       }
 
+      // Format the value for display
+      let displayValue = actualValue
+      if (edge.targetNodeInfo?.type === 'string' && actualValue !== null && !actualValue.startsWith('[')) {
+        // Quote string values for display, handle empty strings properly
+        displayValue = `"${actualValue}"`
+      }
+      
       return {
         name: edge.edgeName,
-        value: actualValue,
+        value: displayValue,
         targetType: edge.targetNodeInfo?.type || null
       }
     })

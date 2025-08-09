@@ -54,8 +54,8 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
   if (nodeType === NODE_TYPE_STRING) {
     const stringValue = getNodeName(targetNode, strings)
     if (stringValue !== null) {
-      // Return string with quotes, including empty strings
-      return `"${stringValue}"`
+      // Return the raw string value, let the display layer handle quoting
+      return stringValue
     }
     return `[String ${targetNode.id}]`
   }

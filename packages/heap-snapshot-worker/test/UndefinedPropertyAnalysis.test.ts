@@ -6,8 +6,8 @@ test('demonstrate improved undefined property detection', () => {
   // Create a mock snapshot that represents an object with undefined properties
   const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
   const edgeFields = ['type', 'name_or_index', 'to_node']
-  const nodeTypes = [['object', 'hidden', 'string']]
-  const edgeTypes = [['property', 'internal', 'hidden']]
+  const nodeTypes: [readonly string[]] = [['object', 'hidden', 'string']]
+  const edgeTypes: [readonly string[]] = [['property', 'internal', 'hidden']]
   const strings = ['Object', 'undefined', 'myProperty', 'anotherProp', 'normalString']
 
   // Create nodes:
@@ -57,13 +57,13 @@ test('demonstrate improved undefined property detection', () => {
   // Check the normal string property
   const stringProp = result!.properties.find(p => p.name === 'anotherProp')
   expect(stringProp).toBeDefined()
-  expect(stringProp!.value).toBe('normalString')
+  expect(stringProp!.value).toBe('"normalString"')
   expect(stringProp!.targetType).toBe('string')
 
   console.log('\n=== OBJECT PROPERTY ANALYSIS ===')
   console.log('Properties found:')
   result!.properties.forEach(prop => {
-    const valueDisplay = prop.value?.startsWith('[undefined ') ? `**${prop.value}**` : `"${prop.value}"`
+    const valueDisplay = prop.value?.startsWith('[undefined ') ? `**${prop.value}**` : prop.value
     console.log(`  ${prop.name}: ${valueDisplay} (${prop.targetType})`)
   })
 })
@@ -72,8 +72,8 @@ test('demonstrate undefined vs string undefined differences', () => {
   // This test shows the difference between the undefined value and a string containing "undefined"
   const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
   const edgeFields = ['type', 'name_or_index', 'to_node']
-  const nodeTypes = [['object', 'hidden', 'string']]
-  const edgeTypes = [['property']]
+  const nodeTypes: [readonly string[]] = [['object', 'hidden', 'string']]
+  const edgeTypes: [readonly string[]] = [['property']]
   const strings = ['Object', 'undefined', 'undefinedProp', 'stringProp']
 
   const nodes = new Uint32Array([
@@ -116,14 +116,14 @@ test('demonstrate undefined vs string undefined differences', () => {
   expect(undefinedValueProp!.targetType).toBe('hidden')
 
   expect(stringValueProp).toBeDefined()
-  expect(stringValueProp!.value).toBe('undefined')
+  expect(stringValueProp!.value).toBe('"undefined"')
   expect(stringValueProp!.targetType).toBe('string')
 
   console.log('\n=== UNDEFINED vs STRING "undefined" ===')
   console.log('Now you can clearly see the difference:')
   result!.properties.forEach(prop => {
     const typeIndicator = prop.targetType === 'hidden' ? ' (TRUE undefined value)' : ' (string containing "undefined")'
-    const valueDisplay = prop.value?.startsWith('[undefined ') ? prop.value : `"${prop.value}"`
+    const valueDisplay = prop.value?.startsWith('[undefined ') ? prop.value : prop.value
     console.log(`  ${prop.name}: ${valueDisplay} (${prop.targetType})${typeIndicator}`)
   })
 })
