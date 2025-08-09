@@ -2,7 +2,7 @@ import * as GetHandleTestRunningMessage from '../GetHandleTestRunningMessage/Get
 import * as Stdout from '../Stdout/Stdout.ts'
 import * as IsGithubActions from '../IsGithubActions/IsGithubActions.ts'
 
-export const handleTestRunning = async (file, relativeDirName, fileName, isFirst) => {
+export const handleTestRunning = async (file: string, relativeDirName: string, fileName: string, isFirst: boolean): Promise<void> => {
   if (IsGithubActions.isGithubActions) {
     return
   }

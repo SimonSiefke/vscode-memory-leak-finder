@@ -5,7 +5,7 @@ import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 import * as Stdout from '../Stdout/Stdout.ts'
 import * as TestStateOutput from '../TestStateOutput/TestStateOutput.ts'
 
-const getFullMessage = (message) => {
+const getFullMessage = (message: string): string => {
   const clearMessage = GetTestClearMessage.getTestClearMessage()
   let fullMessage = ''
   if (!IsGithubActions.isGithubActions) {
@@ -19,7 +19,7 @@ const getFullMessage = (message) => {
   return fullMessage
 }
 
-export const handleTestStateChange = async (message) => {
+export const handleTestStateChange = async (message: string): Promise<void> => {
   const fullMessage = getFullMessage(message)
   await Stdout.write(fullMessage)
 }
