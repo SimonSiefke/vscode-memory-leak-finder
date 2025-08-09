@@ -23,7 +23,7 @@ test('getNodeName - should handle empty strings correctly', () => {
 
 test('getActualValue - should properly display string values', () => {
   const strings = ['', 'hello', 'world', 'test value']
-  
+
   // prettier-ignore
   const snapshot: Snapshot = {
     node_count: 0,
