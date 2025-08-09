@@ -1,4 +1,4 @@
-export const querySelectorAll = (roots, body, selector) => {
+export const querySelectorAll = (roots: any[], body: string, selector: string): any[] => {
   if (roots.length === 0) {
     return []
   }

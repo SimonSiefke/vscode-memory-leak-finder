@@ -45,8 +45,8 @@ const Timeout = {
   async short() {
     await new Promise((resolve) => setTimeout(resolve, 1000))
   },
-  async waitForMutation(element, maxDelay) {
-    const disposables = []
+  async waitForMutation(element: any, maxDelay: number) {
+    const disposables: (() => void)[] = []
     await Promise.race([
       new Promise((resolve) => {
         const timeout = setTimeout(resolve, maxDelay)
@@ -209,7 +209,7 @@ export const pressKeyExponential = async ({ key, waitFor, timeout = maxTimeout }
   while (currentTime < endTime) {
     KeyBoardActions.press(keyboardEventOptions)
     const element = QuerySelector.querySelector(locator.selector)
-    if (element && toBeVisible(element)) {
+    if (element && toBeVisible(element, {} as any)) {
       return
     }
     current *= exponentialFactor
@@ -233,7 +233,7 @@ export const typeAndWaitFor = async ({ locator, text, waitFor, timeout = maxTime
   const fn = ElementAction['setValue']
   while (currentTime < endTime) {
     const waitForElement = QuerySelector.querySelector(waitFor.selector)
-    if (waitForElement && toBeVisible(waitForElement)) {
+    if (waitForElement && toBeVisible(waitForElement, {} as any)) {
       return
     }
     const element = QuerySelector.querySelector(locator.selector)
@@ -266,12 +266,12 @@ export const clickExponential = async ({ locator, waitFor, waitForHidden, timeou
     }
     if (waitFor) {
       const visibleElement = QuerySelector.querySelector(waitFor.selector)
-      if (visibleElement && toBeVisible(visibleElement)) {
+      if (visibleElement && toBeVisible(visibleElement, {} as any)) {
         return
       }
     } else if (waitForHidden) {
       const hiddenElement = QuerySelector.querySelector(waitForHidden.selector)
-      if (!hiddenElement || toBeHidden(hiddenElement)) {
+      if (!hiddenElement || toBeHidden(hiddenElement, {} as any)) {
         return
       }
     }
@@ -326,7 +326,7 @@ export const getTextContent = async (locator) => {
     throw new Error(`element not found ${locator.selector}`)
   }
   const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
-  if (!toBeVisible(element)) {
+  if (!toBeVisible(element, {} as any)) {
     throw new Error(`must be visible`)
   }
   const text = element.textContent
@@ -340,7 +340,7 @@ export const getAttribute = async (locator, attributeName) => {
     throw new Error(`element not found ${locator.selector}`)
   }
   const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
-  if (!toBeVisible(element)) {
+  if (!toBeVisible(element, {} as any)) {
     throw new Error(`must be visible`)
   }
   const attributeValue = element.getAttribute(attributeName)
@@ -354,7 +354,7 @@ export const isVisible = async (locator) => {
     return false
   }
   const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
-  return toBeVisible(element)
+  return toBeVisible(element, {} as any)
 }
 
 export const count = (locator) => {
