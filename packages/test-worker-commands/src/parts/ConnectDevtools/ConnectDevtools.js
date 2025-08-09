@@ -15,6 +15,8 @@ export const connectDevtools = async (connectionId, devtoolsWebSocketUrl, monkey
   Assert.string(devtoolsWebSocketUrl)
   // Assert.string(monkeyPatchedElectronId)
   Assert.boolean(isFirstConnection)
+
+  // TODO create electron rpc here
   const electronRpc = IntermediateConnectionState.get(connectionId)
   IntermediateConnectionState.remove(connectionId)
   const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
