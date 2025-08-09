@@ -3,12 +3,11 @@ import * as WaitForPage from '../WaitForPage/WaitForPage.js'
 import * as WaitForIframe from '../WaitForIframe/WaitForIframe.js'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 
-export const create = ({ electronRpc, electronObjectId, callFrameId }) => {
+export const create = ({ electronRpc, electronObjectId }) => {
   return {
     objectType: ObjectType.ElectronApp,
     rpc: electronRpc,
     electronObjectId,
-    callFrameId,
     windows: [],
     firstWindow() {
       return WaitForPage.waitForPage({ index: 0, electronRpc, electronObjectId })

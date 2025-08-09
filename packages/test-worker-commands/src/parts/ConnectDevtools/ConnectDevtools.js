@@ -2,29 +2,21 @@ import * as Assert from '../Assert/Assert.js'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.js'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.js'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
-import { DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.js'
 import * as ElectronApp from '../ElectronApp/ElectronApp.js'
 import * as ElectronAppState from '../ElectronAppState/ElectronAppState.js'
 import * as IntermediateConnectionState from '../IntermediateConnectionState/IntermediateConnectionState.js'
-import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.js'
 import * as ObjectType from '../ObjectType/ObjectType.js'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
 import * as SessionState from '../SessionState/SessionState.js'
 
-export const connectDevtools = async (
-  connectionId,
-  devtoolsWebSocketUrl,
-  monkeyPatchedElectron,
-  electronObjectId,
-  callFrameId,
-  isFirstConnection,
-) => {
+export const connectDevtools = async (connectionId, devtoolsWebSocketUrl, monkeyPatchedElectronId, electronObjectId, isFirstConnection) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
-  Assert.object(monkeyPatchedElectron)
-  Assert.string(electronObjectId)
-  Assert.string(callFrameId)
+  // Assert.string(monkeyPatchedElectronId)
   Assert.boolean(isFirstConnection)
+
+  // TODO create electron rpc here
   const electronRpc = IntermediateConnectionState.get(connectionId)
   IntermediateConnectionState.remove(connectionId)
   const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
@@ -65,16 +57,15 @@ export const connectDevtools = async (
     }),
   ])
 
-  if (isFirstConnection) {
-    await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-      functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
-      objectId: monkeyPatchedElectron.objectId,
-    })
-  }
+  // if (isFirstConnection) {
+  //   await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+  //     functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
+  //     objectId: monkeyPatchedElectronId,
+  //   })
+  // }
   const electronApp = ElectronApp.create({
     electronRpc,
     electronObjectId,
-    callFrameId,
   })
   ElectronAppState.set(connectionId, electronApp)
 }

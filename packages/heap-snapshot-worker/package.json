@@ -2,7 +2,7 @@
   "name": "@vscode-memory-leak-finder/heap-snapshot-worker",
   "version": "0.0.0-dev",
   "description": "",
-  "main": "src/main.js",
+  "main": "src/main.ts",
   "type": "module",
   "bin": {
     "memory-leak-worker": "bin/heap-snapshot-worker.js"
@@ -16,68 +16,16 @@
   "license": "MIT",
   "dependencies": {
     "@lvce-editor/assert": "^1.4.0",
+    "@lvce-editor/rpc": "^4.14.0",
     "@lvce-editor/verror": "^1.7.0"
   },
-  "xo": {
-    "rules": {
-      "unicorn/filename-case": "off",
-      "indent": "off",
-      "semi": "off",
-      "no-unused-vars": "off",
-      "unicorn/numeric-separators-style": "off",
-      "no-extra-semi": "off",
-      "arrow-body-style": "off",
-      "padded-blocks": "off",
-      "capitalized-comments": "off",
-      "padding-line-between-statements": "off",
-      "arrow-parens": "off",
-      "no-warning-comments": "off",
-      "array-bracket-spacing": "off",
-      "comma-spacing": "off",
-      "unicorn/no-array-callback-reference": "off",
-      "comma-dangle": "off",
-      "operator-linebreak": "off",
-      "no-case-declarations": "off",
-      "no-undef": "off",
-      "object-curly-spacing": "off",
-      "object-shorthand": "off",
-      "complexity": "off",
-      "no-labels": "off",
-      "no-multi-assign": "off",
-      "max-params": "off",
-      "no-bitwise": "off",
-      "unicorn/prefer-math-trunc": "off",
-      "no-await-in-loop": "off",
-      "unicorn/prefer-add-event-listener": "off",
-      "no-unused-expressions": "off",
-      "node/prefer-global/process": "off",
-      "unicorn/prevent-abbreviations": "off",
-      "unicorn/no-process-exit": "off",
-      "quotes": "off",
-      "unicorn/switch-case-braces": "off",
-      "unicorn/no-for-loop": "off",
-      "n/prefer-global/process": [
-        "error",
-        "always"
-      ]
-    },
-    "ignores": [
-      "distmin"
-    ]
-  },
-  "jest": {
-    "injectGlobals": false,
-    "collectCoverage": true,
-    "coverageThreshold": {
-      "global": {
-        "branches": 30,
-        "functions": 20,
-        "lines": 40,
-        "statements": 40
-      }
-    }
-  },
   "devDependencies": {
-    "@types/node": "^24.1.0"
+    "@types/node": "^24.2.0",
+    "@jest/globals": "^30.0.5",
+    "@types/babel__code-frame": "^7.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/ws": "^8.18.1",
+    "ts-jest": "^29.4.1",
+    "typescript": "^5.9.2"
   }
 }

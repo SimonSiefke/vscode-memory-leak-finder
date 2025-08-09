@@ -2,12 +2,9 @@
   "name": "@vscode-memory-leak-finder/injected-code",
   "version": "0.0.0-dev",
   "description": "",
-  "main": "src/main.js",
+  "main": "src/main.ts",
   "type": "module",
   "scripts": {
-    "build": "rollup -c rollup.config.js",
-    "build:watch": "rollup -c rollup.config.js -w",
-    "postinstall": "npm run build",
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
   },
@@ -15,22 +12,14 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^16.0.1",
-    "rollup": "^4.46.2"
+    "@jest/globals": "^30.0.5",
+    "@types/babel__code-frame": "^7.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.1.0",
+    "ts-jest": "^29.4.1",
+    "typescript": "^5.9.2"
   },
   "dependencies": {
     "@lvce-editor/assert": "^1.4.0"
-  },
-  "jest": {
-    "injectGlobals": false,
-    "collectCoverage": true,
-    "coverageThreshold": {
-      "global": {
-        "branches": 50,
-        "functions": 80,
-        "lines": 80,
-        "statements": 80
-      }
-    }
   }
 }

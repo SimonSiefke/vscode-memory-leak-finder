@@ -2,6 +2,7 @@ import * as RunTestsWithCallback from '../RunTestsWithCallback/RunTestsWithCallb
 import * as CliProcess from '../CliProcess/CliProcess.js'
 
 const callback = (method, ...params) => {
+  // TODO use invoke
   CliProcess.send(method, ...params)
 }
 

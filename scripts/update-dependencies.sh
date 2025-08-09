@@ -27,8 +27,10 @@ function updateDependencies {
 }
 
 updateDependencies &&
+cd packages/build && updateDependencies && cd ../../ &&
 cd packages/cli && updateDependencies && cd ../../ &&
 cd packages/charts && updateDependencies && cd ../../ &&
+cd packages/chart-worker && updateDependencies && cd ../../ &&
 cd packages/cursor-e2e && updateDependencies && cd ../../ &&
 cd packages/devtools-protocol && updateDependencies && cd ../../ &&
 cd packages/download-worker && updateDependencies && cd ../../ &&
@@ -41,9 +43,9 @@ cd packages/memory-leak-finder && updateDependencies && cd ../../ &&
 cd packages/memory-leak-worker && updateDependencies && cd ../../ &&
 cd packages/page-object && updateDependencies && cd ../../ &&
 cd packages/source-map-worker && updateDependencies && cd ../../ &&
+cd packages/stdout-worker && updateDependencies && cd ../../ &&
 cd packages/test-coordinator && updateDependencies && cd ../../ &&
 cd packages/test-worker && updateDependencies && cd ../../ &&
-cd packages/stdout-worker && updateDependencies && cd ../../ &&
 cd packages/test-worker-commands && updateDependencies && cd ../../ &&
 cd packages/video-recording-worker && updateDependencies && cd ../../ &&
 

@@ -1,55 +1,45 @@
 import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.js'
-import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.js'
-import * as ConnectElectron from '../ConnectElectron/ConnectElectron.js'
+import { connectWorkers } from '../ConnectWorkers/ConnectWorkers.js'
+import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.js'
 import * as KillExistingIdeInstances from '../KillExistingIdeInstances/KillExistingIdeInstances.js'
-import * as LaunchIde from '../LaunchIde/LaunchIde.js'
-import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
 import * as PageObject from '../PageObject/PageObject.js'
-import * as VideoRecording from '../VideoRecording/VideoRecording.js'
-import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.js'
+import { prepareBoth } from '../PrepareBoth/PrepareBoth.js'
 
-export const prepareTests = async (ipc, cwd, headlessMode, recordVideo, connectionId, timeouts, ide, ideVersion, vscodePath, commit) => {
-  // TODO move whole ide launch into separate worker
+export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connectionId, timeouts, ide, ideVersion, vscodePath, commit) => {
+  const pageObjectPath = GetPageObjectPath.getPageObjectPath()
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
-  const { child, webSocketUrl } = await LaunchIde.launchIde({
+  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, monkeyPatchedElectronId, initializationWorkerRpc } = await prepareBoth(
     headlessMode,
     cwd,
     ide,
     vscodePath,
     commit,
-  })
-  const devtoolsWebSocketUrlPromise = WaitForDevtoolsListening.waitForDevtoolsListening(child.stderr)
-  const { monkeyPatchedElectron, electronObjectId, callFrameId } = await ConnectElectron.connectElectron(
-    ipc,
     connectionId,
-    headlessMode,
-    webSocketUrl,
     isFirstConnection,
     canUseIdleCallback,
   )
-  const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
-  if (recordVideo) {
-    await VideoRecording.start(devtoolsWebSocketUrl)
-  }
-  await MemoryLeakWorker.startWorker(devtoolsWebSocketUrl)
-  await ConnectDevtools.connectDevtools(
-    ipc,
+  await connectWorkers(
+    rpc,
+    headlessMode,
+    recordVideo,
     connectionId,
     devtoolsWebSocketUrl,
-    monkeyPatchedElectron,
-    electronObjectId,
-    callFrameId,
+    webSocketUrl,
     isFirstConnection,
+    canUseIdleCallback,
+    monkeyPatchedElectronId,
+    electronObjectId,
   )
-  await PageObject.create(ipc, connectionId, isFirstConnection, headlessMode, timeouts, ideVersion)
+  await initializationWorkerRpc.invoke('Initialize.undoMonkeyPatch')
+  await PageObject.create(rpc, connectionId, isFirstConnection, headlessMode, timeouts, ideVersion, pageObjectPath)
+
   return {
-    ipc,
+    rpc,
     webSocketUrl,
     devtoolsWebSocketUrl,
     electronObjectId,
-    callFrameId,
-    monkeyPatchedElectron,
+    monkeyPatchedElectronId,
   }
 }

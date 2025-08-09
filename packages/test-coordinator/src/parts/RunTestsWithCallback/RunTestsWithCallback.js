@@ -120,10 +120,10 @@ export const runTests = async (
       vscodePath,
       commit,
     )
-    let memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()
+    let memoryLeakWorkerRpc = MemoryLeakWorker.getRpc()
     let targetId = ''
     if (checkLeaks) {
-      const info = await MemoryLeakFinder.setup(memoryLeakWorkerIpc, connectionId, measure)
+      const info = await MemoryLeakFinder.setup(memoryLeakWorkerRpc, connectionId, measure)
       targetId = info.targetId
     }
     for (let i = 0; i < formattedPaths.length; i++) {
@@ -155,16 +155,16 @@ export const runTests = async (
                 await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun, runMode)
               }
             }
-            const before = await MemoryLeakFinder.start(memoryLeakWorkerIpc, connectionId, targetId)
+            const before = await MemoryLeakFinder.start(memoryLeakWorkerRpc, connectionId, targetId)
             for (let i = 0; i < runs; i++) {
               await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun, runMode)
             }
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
             }
-            const after = await MemoryLeakFinder.stop(memoryLeakWorkerIpc, connectionId, targetId)
+            const after = await MemoryLeakFinder.stop(memoryLeakWorkerRpc, connectionId, targetId)
 
-            const result = await MemoryLeakFinder.compare(memoryLeakWorkerIpc, connectionId, before, after)
+            const result = await MemoryLeakFinder.compare(memoryLeakWorkerRpc, connectionId, before, after)
             const fileName = dirent.replace('.js', '.json')
             const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
             await JsonFile.writeJson(resultPath, result)
@@ -187,9 +187,9 @@ export const runTests = async (
             passed++
           }
           if (restartBetween) {
-            if (memoryLeakWorkerIpc) {
-              memoryLeakWorkerIpc.dispose()
-              memoryLeakWorkerIpc = undefined
+            if (memoryLeakWorkerRpc) {
+              memoryLeakWorkerRpc.dispose()
+              memoryLeakWorkerRpc = undefined
             }
             if (testWorkerIpc) {
               testWorkerIpc.dispose()
@@ -208,8 +208,8 @@ export const runTests = async (
               commit,
             )
             if (checkLeaks) {
-              memoryLeakWorkerIpc = MemoryLeakWorker.getIpc()
-              await MemoryLeakFinder.setup(memoryLeakWorkerIpc, connectionId, measure)
+              memoryLeakWorkerRpc = MemoryLeakWorker.getRpc()
+              await MemoryLeakFinder.setup(memoryLeakWorkerRpc, connectionId, measure)
             }
           }
         }

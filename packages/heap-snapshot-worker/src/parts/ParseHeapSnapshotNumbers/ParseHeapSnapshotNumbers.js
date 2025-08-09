@@ -3,9 +3,7 @@ import * as GetStrings from '../GetStrings/GetStrings.js'
 
 export const parseHeapSnapshotNumbers = async (path) => {
   // Use the fast parsing function with Uint32Array for nodes
-  const { metaData, nodes } = await PrepareHeapSnapshot.prepareHeapSnapshot(path)
-  const { data } = metaData
-  const { meta } = data
+  const { meta, nodes } = await PrepareHeapSnapshot.prepareHeapSnapshot(path, {})
   const { node_types, node_fields } = meta
 
   // Extract strings from the original JSON file since the fast parser doesn't include them

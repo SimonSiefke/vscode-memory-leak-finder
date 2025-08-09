@@ -1,11 +1,11 @@
 {
   "name": "@vscode-memory-leak-finder/stdout-worker",
   "version": "0.0.0-dev",
-  "description": "Write Data to stdout",
+  "description": "Write data to stdout",
   "main": "src/main.js",
   "type": "module",
   "bin": {
-    "test-electron": "./bin/stdout-worker.js"
+    "stdout-worker": "./bin/stdout-worker.js"
   },
   "scripts": {
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
@@ -15,28 +15,18 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@lvce-editor/rpc": "^4.13.0"
+    "@lvce-editor/rpc": "^4.14.0",
+    "ansi-escapes": "^7.0.0",
+    "chalk": "^5.5.0"
   },
   "devDependencies": {
-    "@types/node": "^24.1.0"
-  },
-  "jest": {
-    "testMatch": [
-      "<rootDir>/test/**/*.js"
-    ],
-    "modulePathIgnorePatterns": [
-      "<rootDir>/.vscode-test/"
-    ],
-    "injectGlobals": false,
-    "collectCoverage": true,
-    "coverageThreshold": {
-      "global": {
-        "branches": 40,
-        "functions": 40,
-        "lines": 40,
-        "statements": 40
-      }
-    }
+    "@types/node": "^24.2.1",
+    "@jest/globals": "^30.0.5",
+    "@types/babel__code-frame": "^7.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/ws": "^8.18.1",
+    "ts-jest": "^29.4.1",
+    "typescript": "^5.9.2"
   },
   "xo": {
     "rules": {

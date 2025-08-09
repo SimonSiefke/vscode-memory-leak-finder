@@ -4,14 +4,12 @@ import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.js'
 
 const prepareFunctions = async (path) => {
-  const snapshot = await prepareHeapSnapshot(path)
-  const { itemsPerLocation, scriptIdOffset, lineOffset, columnOffset } = getLocationFieldOffsets(
-    snapshot.metaData.data.meta.location_fields,
-  )
+  const snapshot = await prepareHeapSnapshot(path, {})
+  const { itemsPerLocation, scriptIdOffset, lineOffset, columnOffset } = getLocationFieldOffsets(snapshot.meta.location_fields)
   const map = getUniqueLocationMap(snapshot.locations, itemsPerLocation, scriptIdOffset, lineOffset, columnOffset)
   return {
     locations: snapshot.locations,
-    metaData: snapshot.metaData,
+    meta: snapshot.meta,
     map,
   }
 }
@@ -51,7 +49,7 @@ export const compareHeapSnapshotFunctions = async (pathA, pathB, useParallel = t
 
   console.time('compare')
   const compareStartTime = performance.now()
-  const result = compareHeapSnapshotFunctionsInternal(resultA, resultB, resultA.metaData.data.meta.location_fields)
+  const result = compareHeapSnapshotFunctionsInternal(resultA, resultB, resultA.meta.location_fields)
   console.timeEnd('compare')
   const compareEndTime = performance.now()
   console.log(`[CompareHeapSnapshotFunctions] Comparison completed in ${(compareEndTime - compareStartTime).toFixed(2)}ms`)

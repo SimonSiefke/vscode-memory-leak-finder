@@ -1,31 +1,26 @@
+import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
 import * as Assert from '../Assert/Assert.js'
-import * as Callback from '../Callback/Callback.js'
-import * as Command from '../Command/Command.js'
-import * as HandleIpc from '../HandleIpc/HandleIpc.js'
-import * as IpcParent from '../IpcParent/IpcParent.js'
-import * as IpcParentType from '../IpcParentType/IpcParentType.js'
-import * as JsonRpc from '../JsonRpc/JsonRpc.js'
+import * as CommandMapRef from '../CommandMapRef/CommandMapRef.js'
 import * as MemoryLeakWorkerUrl from '../MemoryLeakWorkerUrl/MemoryLeakWorkerUrl.js'
 
-export const state = {
+const state = {
   /**
-   * @type {any}
+   * @type {import('@lvce-editor/rpc').Rpc|undefined}
    */
-  ipc: undefined,
+  rpc: undefined,
 }
 
 export const startWorker = async (devtoolsWebsocketUrl) => {
   Assert.string(devtoolsWebsocketUrl)
-  const ipc = await IpcParent.create({
-    method: IpcParentType.NodeWorkerThread,
-    url: MemoryLeakWorkerUrl.memoryLeakWorkerUrl,
+  const rpc = await NodeWorkerRpcParent.create({
+    path: MemoryLeakWorkerUrl.memoryLeakWorkerUrl,
     stdio: 'inherit',
+    commandMap: CommandMapRef.commandMapRef,
   })
-  state.ipc = ipc
-  HandleIpc.handleIpc(ipc, Command.execute, Callback.resolve)
-  await JsonRpc.invoke(ipc, 'ConnectDevtools.connectDevtools', devtoolsWebsocketUrl)
+  state.rpc = rpc
+  await rpc.invoke('ConnectDevtools.connectDevtools', devtoolsWebsocketUrl)
 }
 
-export const getIpc = () => {
-  return state.ipc
+export const getRpc = () => {
+  return state.rpc
 }

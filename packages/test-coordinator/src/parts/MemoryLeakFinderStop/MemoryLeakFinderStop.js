@@ -1,10 +1,9 @@
 import * as Assert from '../Assert/Assert.js'
-import * as JsonRpc from '../JsonRpc/JsonRpc.js'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.js'
 
-export const stop = (ipc, connectionId, targetId) => {
-  Assert.object(ipc)
+export const stop = (rpc, connectionId, targetId) => {
+  Assert.object(rpc)
   Assert.number(connectionId)
   Assert.string(targetId)
-  return JsonRpc.invoke(ipc, TestWorkerCommandType.MemoryLeakFinderStop, connectionId, targetId)
+  return rpc.invoke(TestWorkerCommandType.MemoryLeakFinderStop, connectionId, targetId)
 }

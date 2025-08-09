@@ -3,7 +3,8 @@ import * as ConnectElectron from '../ConnectElectron/ConnectElectron.js'
 import * as PageObject from '../PageObject/PageObject.js'
 import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.js'
 import * as PrepareTests from '../PrepareTests/PrepareTests.js'
-import * as TestWorker from '../TestWorker/TestWorker.js'
+import * as LaunchTestWorker from '../LaunchTestWorker/LaunchTestWorker.js'
+import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.js'
 
 export const state = {
   firstLaunch: false,
@@ -29,11 +30,12 @@ export const prepareTestsOrAttach = async (
   vscodePath,
   commit,
 ) => {
-  const testWorkerIpc = await TestWorker.launch(runMode)
+  const pageObjectPath = GetPageObjectPath.getPageObjectPath()
+  const testWorkerRpc = await LaunchTestWorker.launchTestWorker(runMode)
   const isFirst = state.promise === undefined
   if (isFirst) {
     state.promise = PrepareTests.prepareTests(
-      testWorkerIpc,
+      testWorkerRpc,
       cwd,
       headlessMode,
       recordVideo,
@@ -45,21 +47,20 @@ export const prepareTestsOrAttach = async (
       commit,
     )
     await state.promise
-    return testWorkerIpc
+    return testWorkerRpc
   }
-  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, callFrameId, monkeyPatchedElectron } = await state.promise
+  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, monkeyPatchedElectron } = await state.promise
   const isFirstConnection = false
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
-  await ConnectElectron.connectElectron(testWorkerIpc, connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback)
+  await ConnectElectron.connectElectron(testWorkerRpc, connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback)
   await ConnectDevtools.connectDevtools(
-    testWorkerIpc,
+    testWorkerRpc,
     connectionId,
     devtoolsWebSocketUrl,
     monkeyPatchedElectron,
     electronObjectId,
-    callFrameId,
     isFirstConnection,
   )
-  await PageObject.create(testWorkerIpc, connectionId, isFirstConnection, headlessMode, timeouts, ideVersion)
-  return testWorkerIpc
+  await PageObject.create(testWorkerRpc, connectionId, isFirstConnection, headlessMode, timeouts, ideVersion, pageObjectPath)
+  return testWorkerRpc
 }

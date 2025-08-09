@@ -1,0 +1,10 @@
+export const SearchingSnapshotMetaData = 0
+export const ParsingNodesMetaData = 2
+export const ParsingNodes = 3
+export const ParsingEdgesMetaData = 4
+export const ParsingEdges = 5
+export const ParsingLocationsMetaData = 6
+export const ParsingLocations = 7
+export const ParsingStringsMetaData = 8
+export const ParsingStrings = 9
+export const Done = 10

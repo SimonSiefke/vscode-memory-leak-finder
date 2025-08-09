@@ -1,24 +1,16 @@
 import { join } from 'node:path'
-import { performance } from 'node:perf_hooks'
 import { compareHeapSnapshotFunctions } from '../src/parts/CompareHeapSnapshotsFunctions/CompareHeapSnapshotsFunctions.js'
 
 const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
 const filePath2 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/1.json')
-const outPath = join(import.meta.dirname, '../benchmark-results/named-function-count.json')
 
 const testOptimized = async () => {
   // console.log(`\n=== Testing Optimized Named Function Count for: ${filePath} ===`)
 
-  const minCount = 1
-
   console.log('Testing Optimized Approach (getNamedFunctionCountFromHeapSnapshot2):')
 
-  const startTime = performance.now()
-
   try {
-    const result = await compareHeapSnapshotFunctions(filePath1, filePath2)
-    const endTime = performance.now()
-    const duration = endTime - startTime
+    await compareHeapSnapshotFunctions(filePath1, filePath2)
 
     // console.log(`  Duration: ${duration.toFixed(2)}ms`)
     // console.log(`  Functions found: ${result.length / 5}`)

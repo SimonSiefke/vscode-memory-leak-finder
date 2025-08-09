@@ -1,13 +1,14 @@
 /**
- * @param {Array} node_types
- * @param {Array} node_fields
- * @param {Array} edge_types
- * @param {Array} edge_fields
+ * @param {readonly any[]} node_types
+ * @param {readonly any[]} node_fields
+ * @param {readonly any[]} edge_types
+ * @param {readonly any[]} edge_fields
  * @returns {Object}
  */
 export const computeHeapSnapshotIndices = (node_types, node_fields, edge_types, edge_fields) => {
   // Type indices
   const objectTypeIndex = node_types[0].indexOf('object')
+  const nativeTypeIndex = node_types[0].indexOf('native')
   const bigintTypeIndex = node_types[0].indexOf('bigint')
   const regexpTypeIndex = node_types[0].indexOf('regexp')
 
@@ -22,6 +23,7 @@ export const computeHeapSnapshotIndices = (node_types, node_fields, edge_types, 
   const selfSizeFieldIndex = node_fields.indexOf('self_size')
   const edgeCountFieldIndex = node_fields.indexOf('edge_count')
   const detachednessFieldIndex = node_fields.indexOf('detachedness')
+  const traceNodeIdFieldIndex = node_fields.indexOf('trace_node_id')
 
   // Edge field indices
   const edgeTypeFieldIndex = edge_fields.indexOf('type')
@@ -31,6 +33,7 @@ export const computeHeapSnapshotIndices = (node_types, node_fields, edge_types, 
   return {
     // Type indices
     objectTypeIndex,
+    nativeTypeIndex,
     bigintTypeIndex,
     regexpTypeIndex,
 
@@ -45,6 +48,7 @@ export const computeHeapSnapshotIndices = (node_types, node_fields, edge_types, 
     selfSizeFieldIndex,
     edgeCountFieldIndex,
     detachednessFieldIndex,
+    traceNodeIdFieldIndex,
 
     // Edge field indices
     edgeTypeFieldIndex,

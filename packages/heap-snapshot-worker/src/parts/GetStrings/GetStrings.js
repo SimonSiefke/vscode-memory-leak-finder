@@ -1,12 +1,13 @@
-import { readFile } from 'node:fs/promises'
+import { getStringsInternal } from '../GetStringsInternal/GetStringsInternal.js'
+import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.js'
 
 /**
  * @param {string} path
- * @returns {Promise<string[]>}
+ * @returns {Promise<readonly string[]>}
  */
 export const getStrings = async (path) => {
-  const content = await readFile(path, 'utf8')
-  const originalData = JSON.parse(content)
-  const { strings } = originalData
-  return strings
+  const snapshot = await prepareHeapSnapshot(path, {
+    parseStrings: true,
+  })
+  return getStringsInternal(snapshot)
 }
