@@ -4,17 +4,20 @@ import { prepareHeapSnapshot } from '../src/parts/PrepareHeapSnapshot/PrepareHea
 
 test('analyze node ID 67 from abc2.heapsnapshot', async () => {
   try {
+    const heapSnapshotPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/abc2.heapsnapshot'
+
     // Check if file exists first
     const fs = await import('node:fs/promises')
     try {
-      await fs.access('abc2.heapsnapshot')
+      await fs.access(heapSnapshotPath)
     } catch {
-      console.log('abc2.heapsnapshot file not found - please provide the heap snapshot file in the current directory')
+      console.log(`Heap snapshot file not found at: ${heapSnapshotPath}`)
+      console.log('Please ensure the file exists at that location')
       return
     }
 
     // Load the heap snapshot
-    const snapshot = await prepareHeapSnapshot('abc2.heapsnapshot', { parseStrings: true })
+    const snapshot = await prepareHeapSnapshot(heapSnapshotPath, { parseStrings: true })
 
     // Examine node with ID 67
     const result = examineNodeById(67, snapshot)
@@ -81,16 +84,19 @@ test('analyze node ID 67 from abc2.heapsnapshot', async () => {
 
 test('search for undefined nodes in abc2.heapsnapshot', async () => {
   try {
+    const heapSnapshotPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/abc2.heapsnapshot'
+
     // Check if file exists first
     const fs = await import('node:fs/promises')
     try {
-      await fs.access('abc2.heapsnapshot')
+      await fs.access(heapSnapshotPath)
     } catch {
-      console.log('abc2.heapsnapshot file not found - skipping undefined nodes search')
+      console.log(`Heap snapshot file not found at: ${heapSnapshotPath}`)
+      console.log('Skipping undefined nodes search')
       return
     }
 
-    const snapshot = await prepareHeapSnapshot('abc2.heapsnapshot', { parseStrings: true })
+    const snapshot = await prepareHeapSnapshot(heapSnapshotPath, { parseStrings: true })
 
     console.log('\n=== SEARCHING FOR UNDEFINED NODES ===')
     const { nodes, strings, meta } = snapshot
