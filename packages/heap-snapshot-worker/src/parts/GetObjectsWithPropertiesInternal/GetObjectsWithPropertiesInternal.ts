@@ -49,7 +49,7 @@ const collectObjectProperties = (
 
   const ITEMS_PER_NODE = nodeFields.length
   const node = parseNode(nodeIndex, nodes, nodeFields)
-  
+
   if (!node || visited.has(node.id)) {
     return {}
   }

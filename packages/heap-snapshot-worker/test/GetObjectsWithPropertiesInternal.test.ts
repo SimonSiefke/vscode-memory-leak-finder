@@ -167,6 +167,9 @@ test('should handle number property values', () => {
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
+    properties: {
+      test: { name: 'test', type: 'number', value: '42' }
+    }
   })
 })
 
@@ -232,6 +235,9 @@ test('should handle code object with internal string reference', () => {
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
+    properties: {
+      test: { name: 'test', type: 'code', value: '"hello"' }
+    }
   })
 })
 
@@ -273,6 +279,9 @@ test('should handle code object with internal number reference', () => {
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
+    properties: {
+      test: { name: 'test', type: 'code', value: '42' }
+    }
   })
 })
 
@@ -314,6 +323,9 @@ test('should handle code object with internal object reference', () => {
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
+    properties: {
+      test: { name: 'test', type: 'code', value: '[Object 3]' }
+    }
   })
 })
 
@@ -355,6 +367,9 @@ test('should handle code object with internal array reference', () => {
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
+    properties: {
+      test: { name: 'test', type: 'code', value: '[Array 3]' }
+    }
   })
 })
 
@@ -398,6 +413,9 @@ test('should handle code object with incoming string reference (like the real ca
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
+    properties: {
+      test: { name: 'test', type: 'code', value: '"1"' }
+    }
   })
 })
 
@@ -425,10 +443,10 @@ test('should handle code object with multiple incoming references (prioritize "1
     edges: new Uint32Array([
       // type, name_or_index, to_node
       2, 1, 7,  // property edge from Object1 to code object
-      3, 0, 2,  // internal edge from code object to string "hello"
-      3, 7, 1,  // incoming edge from array to code object with name "other"
-      3, 8, 1,  // incoming edge from array to code object with name "1"
-      3, 9, 1,  // incoming edge from object to code object with name "another"
+      3, 0, 14, // internal edge from code object to string "hello"
+      3, 7, 7,  // incoming edge from array to code object with name "other"
+      3, 8, 7,  // incoming edge from array to code object with name "1"
+      3, 9, 7,  // incoming edge from object to code object with name "another"
     ]),
     strings: ['', 'test', 'Object1', 'CodeObject', 'hello', 'Array', 'Object2', 'other', '1', 'another'],
     locations: new Uint32Array([])
@@ -444,6 +462,9 @@ test('should handle code object with multiple incoming references (prioritize "1
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
+    properties: {
+      test: { name: 'test', type: 'code', value: '"1"' }
+    }
   })
 })
 
@@ -485,6 +506,9 @@ test('should handle code object with no internal references but incoming referen
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
+    properties: {
+      test: { name: 'test', type: 'code', value: '"hello"' }
+    }
   })
 })
 
@@ -528,6 +552,9 @@ test('should handle code object with both internal and incoming references (prio
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
+    properties: {
+      test: { name: 'test', type: 'code', value: '"incoming"' }
+    }
   })
 })
 
@@ -567,7 +594,9 @@ test('should handle code object with no references at all', () => {
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
-    properties: {}
+    properties: {
+      test: { name: 'test', type: 'code', value: '[code 2]' }
+    }
   })
 })
 
