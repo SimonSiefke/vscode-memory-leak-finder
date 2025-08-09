@@ -25,8 +25,7 @@ export const connectDevtools = async (
   // Assert.string(monkeyPatchedElectronId)
   Assert.boolean(isFirstConnection)
 
-  // TODO create electron rpc here
-  const electronRpc = connectElectron(connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback)
+  const electronRpc = await connectElectron(connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback)
   const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   // @ts-ignore
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
