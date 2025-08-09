@@ -1,4 +1,4 @@
-const disposables = []
+const disposables: any[] = []
 
 export const add = (fn) => {
   disposables.push(fn)

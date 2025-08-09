@@ -28,7 +28,7 @@ const isStackLine = (line) => {
   return line.startsWith('    at ')
 }
 
-export const getElectronErrorMessage = async (firstData, stream) => {
+export const getElectronErrorMessage = async (firstData: string, stream?: any) => {
   if (firstData.includes('Error launching app')) {
     const normalData = stripAnsi(firstData)
     const lines = normalData.split('\n')
