@@ -5,7 +5,7 @@ async function testGetObjectsWithProperties() {
   console.log('Testing getObjectsWithProperties function...')
 
   // Load the actual heap snapshot file
-  const heapSnapshotPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/abc2.json'
+  const heapSnapshotPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/abc2.heapsnapshot'
 
   try {
     // Prepare the heap snapshot
@@ -16,15 +16,11 @@ async function testGetObjectsWithProperties() {
     console.log('Heap snapshot loaded successfully')
     console.log(`Snapshot has ${snapshot.node_count} nodes and ${snapshot.edge_count} edges`)
 
-        console.log('\n=== Testing Original Function ===')
+    console.log('\n=== Testing Refactored Function ===')
     const oldStateObjects = getObjectsWithPropertiesInternal(snapshot, 'oldState')
-    console.log(`Original function found ${oldStateObjects.length} objects with "oldState" property`)
+    console.log(`Refactored function found ${oldStateObjects.length} objects with "oldState" property`)
 
-    console.log('\n=== Testing Fixed Function ===')
-    const oldStateObjectsFixed = getObjectsWithPropertiesInternalFixed(snapshot, 'oldState')
-    console.log(`Fixed function found ${oldStateObjectsFixed.length} objects with "oldState" property:`)
-
-    oldStateObjectsFixed.forEach((obj, index) => {
+    oldStateObjects.forEach((obj, index) => {
       console.log(`  Object ${index + 1}:`)
       console.log(`    ID: ${obj.id}`)
       console.log(`    Name: ${obj.name}`)
@@ -32,32 +28,25 @@ async function testGetObjectsWithProperties() {
       console.log(`    Type: ${obj.type}`)
       console.log(`    Self Size: ${obj.selfSize}`)
       console.log(`    Edge Count: ${obj.edgeCount}`)
-      if (obj.isCorrupted) {
-        console.log(`    *** CORRUPTED: points to invalid node ${obj.corruptedNodeIndex} ***`)
-      }
     })
 
-    // Look specifically for object 37129 in the fixed results
+    // Look specifically for object 37129
     console.log('\n=== Looking for Object 37129 ===')
-    const targetObjectFixed = oldStateObjectsFixed.find(obj => obj.id === 37129)
-    if (targetObjectFixed) {
-      console.log('✅ Found object 37129 in fixed results:')
-      console.log(`  ID: ${targetObjectFixed.id}`)
-      console.log(`  Name: ${targetObjectFixed.name}`)
-      console.log(`  Property Value: ${targetObjectFixed.propertyValue}`)
-      console.log(`  Type: ${targetObjectFixed.type}`)
-      console.log(`  Self Size: ${targetObjectFixed.selfSize}`)
-      console.log(`  Edge Count: ${targetObjectFixed.edgeCount}`)
-      if (targetObjectFixed.isCorrupted) {
-        console.log(`  *** CORRUPTED: points to invalid node ${targetObjectFixed.corruptedNodeIndex} ***`)
-      }
+    const targetObject = oldStateObjects.find((obj) => obj.id === 37129)
+    if (targetObject) {
+      console.log('✅ Found object 37129:')
+      console.log(`  ID: ${targetObject.id}`)
+      console.log(`  Name: ${targetObject.name}`)
+      console.log(`  Property Value: ${targetObject.propertyValue}`)
+      console.log(`  Type: ${targetObject.type}`)
+      console.log(`  Self Size: ${targetObject.selfSize}`)
+      console.log(`  Edge Count: ${targetObject.edgeCount}`)
     } else {
-      console.log('❌ Object 37129 still not found in fixed results')
+      console.log('❌ Object 37129 not found (due to corrupted edge data)')
     }
 
     // Additional debugging (keeping for reference)
     console.log('\n=== Additional Analysis ===')
-    const targetObject = oldStateObjects.find(obj => obj.id === 37129)
     if (targetObject) {
       console.log('Found object 37129:')
       console.log(`  ID: ${targetObject.id}`)
@@ -95,7 +84,14 @@ async function testGetObjectsWithProperties() {
         console.log(`Object 37129 found at node index: ${object37129NodeIndex}`)
         console.log(`Edge map for this node: ${edgeMap[object37129NodeIndex]}`)
 
-        const nodeEdges = getNodeEdges(object37129NodeIndex, edgeMap, snapshot.nodes, snapshot.edges, snapshot.meta.node_fields, snapshot.meta.edge_fields)
+        const nodeEdges = getNodeEdges(
+          object37129NodeIndex,
+          edgeMap,
+          snapshot.nodes,
+          snapshot.edges,
+          snapshot.meta.node_fields,
+          snapshot.meta.edge_fields,
+        )
         console.log(`getNodeEdges returned ${nodeEdges.length} edges:`)
         nodeEdges.forEach((edge, i) => {
           const edgeTypeName = snapshot.meta.edge_types[0][edge.type] || 'unknown'
@@ -105,7 +101,9 @@ async function testGetObjectsWithProperties() {
           if (edge.type === 2 && snapshot.strings[edge.nameIndex] === 'oldState') {
             console.log(`    This is the oldState edge! toNode=${edge.toNode}`)
             if (edge.toNode >= snapshot.nodes.length / nodeFieldLength) {
-              console.log(`    ERROR: toNode ${edge.toNode} is out of bounds (max: ${Math.floor(snapshot.nodes.length / nodeFieldLength) - 1})`)
+              console.log(
+                `    ERROR: toNode ${edge.toNode} is out of bounds (max: ${Math.floor(snapshot.nodes.length / nodeFieldLength) - 1})`,
+              )
             }
           }
         })
@@ -179,13 +177,16 @@ async function testGetObjectsWithProperties() {
             const edgeTypeName = snapshot.meta.edge_types[0][edgeType] || 'unknown'
             let propertyName = ''
 
-            if (edgeType === 2) { // property edge
+            if (edgeType === 2) {
+              // property edge
               propertyName = snapshot.strings[nameOrIndex] || 'unknown'
             } else {
               propertyName = nameOrIndex.toString()
             }
 
-            console.log(`  Edge ${i + 1}: index=${edgeIndex}, type=${edgeTypeName}(${edgeType}), name="${propertyName}"(${nameOrIndex}), to_node=${toNode}`)
+            console.log(
+              `  Edge ${i + 1}: index=${edgeIndex}, type=${edgeTypeName}(${edgeType}), name="${propertyName}"(${nameOrIndex}), to_node=${toNode}`,
+            )
 
             // Check if this is an oldState property
             if (edgeType === 2 && snapshot.strings[nameOrIndex] === 'oldState') {
@@ -211,7 +212,9 @@ async function testGetObjectsWithProperties() {
                     const nodeType = snapshot.nodes[i + 0]
                     const nodeName = snapshot.nodes[i + 1]
                     const selfSize = snapshot.nodes[i + 3]
-                    console.log(`    Node 41727 details: type=${nodeType}, name=${nodeName}("${snapshot.strings[nodeName]}"), size=${selfSize}`)
+                    console.log(
+                      `    Node 41727 details: type=${nodeType}, name=${nodeName}("${snapshot.strings[nodeName]}"), size=${selfSize}`,
+                    )
                     break
                   }
                 }
