@@ -83,36 +83,37 @@ test('getUndefinedValue - should return null for non-undefined nodes', () => {
 })
 
 test('getUndefinedStructure - should detect undefined property structure', () => {
-  const nodeFields = ['type', 'name', 'id', 'self_size', 'edge_count']
-  const edgeFields = ['type', 'name_or_index', 'to_node']
-  const nodeTypes = [['object', 'hidden', 'string']]
-  const edgeTypes = [['property', 'internal']]
   const strings = ['Object', 'undefined', 'testProp']
 
-  // Create nodes: object with undefined property
-  const nodes = new Uint32Array([
-    // Object node at index 0
-    0,
-    0,
-    1,
-    100,
-    1, // type=object, name=Object, id=1, size=100, edges=1
-    // Undefined node at index 1
-    1,
-    1,
-    67,
-    0,
-    0, // type=hidden, name=undefined, id=67, size=0, edges=0
-  ])
-
-  // Create edge: property edge from object to undefined
-  const edges = new Uint32Array([
-    0,
-    2,
-    5, // type=property, name=testProp, to_node=5 (index 1 * 5 fields)
-  ])
-
-  const snapshot = createTestSnapshot(nodes, edges, strings, nodeFields, edgeFields, nodeTypes, edgeTypes)
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 2,
+    edge_count: 1,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Node 0: Object with undefined property
+      // [type, name, id, self_size, edge_count]
+      0, 0, 1, 100, 1,   // object "Object" id=1 size=100 edges=1
+      
+      // Node 1: undefined value
+      // [type, name, id, self_size, edge_count]
+      1, 1, 67, 0, 0,    // hidden "undefined" id=67 size=0 edges=0
+    ]),
+    edges: new Uint32Array([
+      // Edge 0: Object["testProp"] -> undefined
+      // [type, name_or_index, to_node]
+      0, 2, 5,   // property "testProp" -> undefined (offset 5)
+    ]),
+    strings,
+    locations: new Uint32Array([]),
+    meta: {
+      node_types: [['object', 'hidden', 'string']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count'],
+      edge_types: [['property', 'internal']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+  }
 
   const sourceNode = {
     type: 0,
@@ -122,7 +123,7 @@ test('getUndefinedStructure - should detect undefined property structure', () =>
     edge_count: 1,
   }
 
-  const edgeMap = createEdgeMap(nodes, nodeFields)
+  const edgeMap = createEdgeMap(snapshot.nodes, snapshot.meta.node_fields)
 
   const result = getUndefinedStructure(sourceNode, snapshot, edgeMap, 'testProp')
   expect(result).not.toBeNull()
