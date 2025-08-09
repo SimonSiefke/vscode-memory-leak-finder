@@ -59,7 +59,7 @@ const analyzeBooleanNodes = (snapshot: Snapshot): { trueNodeId: number | null; f
     // Check if target is a hidden node with no outgoing edges (singleton pattern)
     const nodeTypeName = getNodeTypeName(targetNode, meta.node_types)
     if (nodeTypeName !== 'hidden') continue
-    
+
     // Boolean singletons have no outgoing edges
     if (targetNode.edge_count !== 0) continue
 
@@ -91,8 +91,8 @@ const analyzeBooleanNodes = (snapshot: Snapshot): { trueNodeId: number | null; f
       'collapsed',
     ]
 
-    const isBooleanLike = booleanIndicators.some((indicator) => lowerPropName.includes(indicator)) || 
-                         lowerPropName.startsWith('is') || 
+    const isBooleanLike = booleanIndicators.some((indicator) => lowerPropName.includes(indicator)) ||
+                         lowerPropName.startsWith('is') ||
                          lowerPropName.startsWith('has')
 
     // Track references to this hidden node

@@ -203,3 +203,43 @@ test('analyze boolean structure with type and value edges', (): void => {
   expect(typeEdge?.isInternal).toBe(true)
   expect(typeEdge?.targetNodeName).toBe('boolean')
 })
+
+test('enhanced boolean detection in GetObjectsWithPropertiesInternal', async (): Promise<void> => {
+  const { getBooleanStructure } = await import('../src/parts/GetBooleanValue/GetBooleanValue.ts')
+  const { getObjectsWithPropertiesInternal } = await import('../src/parts/GetObjectsWithPropertiesInternal/GetObjectsWithPropertiesInternal.ts')
+
+  const snapshot: any = {
+    node_count: 3,
+    edge_count: 2,
+    extra_native_bytes: 0,
+    meta: {
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      location_fields: ['object_index', 'script_id', 'line', 'column']
+    },
+    nodes: new Uint32Array([
+      // type, name, id, self_size, edge_count, trace_node_id, detachedness
+      3, 1, 75, 100, 2, 0, 0,   // Node 75: Object with breakpointsExpanded (both property and internal edges)
+      0, 2, 1403, 20, 0, 0, 0,  // Node 1403: Hidden node "false" (the VALUE)
+      0, 3, 1271, 20, 0, 0, 0,  // Node 1271: Hidden node "boolean" (the TYPE)
+    ]),
+    edges: new Uint32Array([
+      // type, name_or_index, to_node  
+      2, 4, 7,   // property edge "breakpointsExpanded" from Node 75 to Node 1403 (false VALUE)
+      3, 0, 14,  // internal edge from Node 75 to Node 1271 (boolean TYPE)
+    ]),
+    strings: ['', 'MainObject', 'false', 'boolean', 'breakpointsExpanded'],
+    locations: new Uint32Array([])
+  }
+
+  console.log('\n=== Testing Enhanced Boolean Detection ===')
+  
+  const results = getObjectsWithPropertiesInternal(snapshot, 'breakpointsExpanded')
+  console.log('Results:', JSON.stringify(results, null, 2))
+
+  expect(results).toHaveLength(1)
+  expect(results[0].id).toBe(75)
+  expect(results[0].propertyValue).toBe('false (typed)') // Should detect the typed boolean pattern
+})
