@@ -368,7 +368,7 @@ test('should handle code object with internal array reference', () => {
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '42'
+      test: '[Array 3]'
     }
   })
 })
@@ -414,7 +414,7 @@ test('should handle code object with incoming string reference (like the real ca
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '42'
+      test: '"1"'
     }
   })
 })
@@ -463,7 +463,7 @@ test('should handle code object with multiple incoming references (prioritize "1
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '42'
+      test: '"1"'
     }
   })
 })
@@ -507,7 +507,7 @@ test('should handle code object with no internal references but incoming referen
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '42'
+      test: '"hello"'
     }
   })
 })
@@ -553,7 +553,7 @@ test('should handle code object with both internal and incoming references (prio
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '42'
+      test: '"incoming"'
     }
   })
 })
@@ -595,7 +595,7 @@ test('should handle code object with no references at all', () => {
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '42'
+      test: '[code 2]'
     }
   })
 })
