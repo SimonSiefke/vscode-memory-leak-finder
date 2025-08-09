@@ -3,7 +3,8 @@ import * as ConnectElectron from '../ConnectElectron/ConnectElectron.js'
 import * as PageObject from '../PageObject/PageObject.js'
 import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.js'
 import * as PrepareTests from '../PrepareTests/PrepareTests.js'
-import * as TestWorker from '../LaunchTestWorker/LaunchTestWorker.js'
+import * as LaunchTestWorker from '../LaunchTestWorker/LaunchTestWorker.js'
+import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.js'
 
 export const state = {
   firstLaunch: false,
@@ -29,7 +30,8 @@ export const prepareTestsOrAttach = async (
   vscodePath,
   commit,
 ) => {
-  const testWorkerRpc = await TestWorker.launchTestWorker(runMode)
+  const pageObjectPath = GetPageObjectPath.getPageObjectPath()
+  const testWorkerRpc = await LaunchTestWorker.launchTestWorker(runMode)
   const isFirst = state.promise === undefined
   if (isFirst) {
     state.promise = PrepareTests.prepareTests(
@@ -59,6 +61,6 @@ export const prepareTestsOrAttach = async (
     electronObjectId,
     isFirstConnection,
   )
-  await PageObject.create(testWorkerRpc, connectionId, isFirstConnection, headlessMode, timeouts, ideVersion)
+  await PageObject.create(testWorkerRpc, connectionId, isFirstConnection, headlessMode, timeouts, ideVersion, pageObjectPath)
   return testWorkerRpc
 }
