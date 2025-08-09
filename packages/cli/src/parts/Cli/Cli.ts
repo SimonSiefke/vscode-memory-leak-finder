@@ -28,6 +28,7 @@ export const run = async () => {
     vscodePath: options.vscodePath,
     commit: options.commit,
     setupOnly: options.setupOnly,
+    workers: options.workers,
   })
   return InitialStart.initialStart(options)
 }
