@@ -719,18 +719,74 @@ test('should exclude internal edges from properties collection', () => {
   const result = getObjectsWithPropertiesInternal(snapshot, 'test', 1)
 
   expect(result).toHaveLength(1)
-  expect(result[0]).toEqual({
+    expect(result[0]).toEqual({
     id: 1,
     name: 'TestObject',
     propertyValue: 'hello',
     type: 'object',
     selfSize: 100,
     edgeCount: 2,
-    properties: {
-      test: { name: 'test', type: 'string', value: 'hello' }
+    preview: {
+      test: 'hello'
     }
   })
+  
+  // Should not include the internal edge in preview
+  expect(result[0].preview?.internalProp).toBeUndefined()
+})
 
-  // Should not include the internal edge in properties
-  expect(result[0].properties?.internalProp).toBeUndefined()
+test('should collect nested properties with depth 2', () => {
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 6,
+    edge_count: 5,
+    extra_native_bytes: 0,
+    meta: {
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      location_fields: ['object_index', 'script_id', 'line', 'column']
+    },
+    nodes: new Uint32Array([
+      // type, name, id, self_size, edge_count, trace_node_id, detachedness
+      3, 1, 1, 100, 2, 0, 0,  // Main object with oldState property
+      3, 2, 2, 50, 2, 0, 0,   // oldState object with filteredItems and items
+      2, 3, 3, 20, 0, 0, 0,   // filteredItems string value
+      2, 4, 4, 20, 0, 0, 0,   // items string value  
+      3, 5, 5, 30, 1, 0, 0,   // newState object with preferences
+      2, 6, 6, 15, 0, 0, 0,   // preferences string value
+    ]),
+    edges: new Uint32Array([
+      // type, name_or_index, to_node
+      2, 7, 7,   // property edge "oldState" from main to oldState object
+      2, 8, 28,  // property edge "newState" from main to newState object
+      2, 9, 14,  // property edge "filteredItems" from oldState to string
+      2, 10, 21, // property edge "items" from oldState to string
+      2, 11, 35, // property edge "preferences" from newState to string
+    ]),
+    strings: ['', 'MainObject', 'OldStateObject', 'array1', 'array2', 'NewStateObject', 'settings', 'oldState', 'newState', 'filteredItems', 'items', 'preferences'],
+    locations: new Uint32Array([])
+  }
+
+  const result = getObjectsWithPropertiesInternal(snapshot, 'oldState', 2)
+
+  expect(result).toHaveLength(1)
+  expect(result[0]).toEqual({
+    id: 1,
+    name: 'MainObject',
+    propertyValue: '[Object 2]',
+    type: 'object',
+    selfSize: 100,
+    edgeCount: 2,
+    preview: {
+      oldState: {
+        filteredItems: 'array1',
+        items: 'array2'
+      },
+      newState: {
+        preferences: 'settings'
+      }
+    }
+  })
 })

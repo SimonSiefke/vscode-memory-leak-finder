@@ -13,7 +13,7 @@ export interface ObjectWithProperty {
   type: string | null
   selfSize: number
   edgeCount: number
-  preview?: Record<string, string>
+  preview?: Record<string, any>
 }
 
 /**
@@ -23,7 +23,7 @@ export interface ObjectWithProperty {
  * @param edgeMap - The edge map for fast lookups
  * @param depth - Maximum depth to traverse (0 = no properties, 1 = direct properties only)
  * @param visited - Set of visited node IDs to prevent circular references
- * @returns Record of property name to simple string representation
+ * @returns Record of property name to value (can be nested objects/arrays)
  */
 const collectObjectProperties = (
   nodeIndex: number,
@@ -31,7 +31,7 @@ const collectObjectProperties = (
   edgeMap: Uint32Array,
   depth: number = 1,
   visited: Set<number> = new Set(),
-): Record<string, string> => {
+): Record<string, any> => {
   if (depth <= 0) {
     return {}
   }
@@ -53,7 +53,7 @@ const collectObjectProperties = (
   const edgeTypes = meta.edge_types[0] || []
   const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
 
-  const properties: Record<string, string> = {}
+  const properties: Record<string, any> = {}
 
   // Get edges for this node
   const nodeEdges = getNodeEdges(nodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
@@ -72,22 +72,31 @@ const collectObjectProperties = (
 
       const targetType = getNodeTypeName(targetNode, nodeTypes) || 'unknown'
 
-      // Get a simple string representation of the property value
-      let value: string
-      if (targetType === 'object' || targetType === 'array') {
+      // Get the property value (can be nested object/array or primitive)
+      let value: any
+      if (targetType === 'object') {
         if (depth > 1) {
-          // At depth > 1, recursively collect properties of nested objects/arrays
+          // At depth > 1, recursively collect properties of nested objects
           const nestedProperties = collectObjectProperties(targetNodeIndex, snapshot, edgeMap, depth - 1, new Set(visited))
           if (Object.keys(nestedProperties).length > 0) {
-            // Show the nested properties
-            value = `{${Object.entries(nestedProperties).map(([k, v]) => `${k}: ${v}`).join(', ')}}`
+            // Return as nested object
+            value = nestedProperties
           } else {
             // No properties found, show reference
-            value = targetType === 'object' ? `[Object ${targetNode.id}]` : `[Array ${targetNode.id}]`
+            value = `[Object ${targetNode.id}]`
           }
         } else {
           // At depth 1, just show reference
-          value = targetType === 'object' ? `[Object ${targetNode.id}]` : `[Array ${targetNode.id}]`
+          value = `[Object ${targetNode.id}]`
+        }
+      } else if (targetType === 'array') {
+        if (depth > 1) {
+          // For arrays at depth > 1, we could collect indexed elements
+          // For now, show reference but could be enhanced later
+          value = `[Array ${targetNode.id}]`
+        } else {
+          // At depth 1, just show reference
+          value = `[Array ${targetNode.id}]`
         }
       } else if (targetType === 'string' || targetType === 'number') {
         // For primitives, get the actual value
