@@ -8,8 +8,11 @@ const doStart = async (instanceId: string): Promise<any> => {
     throw new Error(`no measure found`)
   }
   const sessions = SessionState.getAllSessions()
-  console.log({ sessions })
-  const result = await measure.start()
+  // for(const )
+  // console.log({ sessions, measure })
+  const workerSessions = sessions.filter((session) => session.type === 'worker')
+  console.log({ workerSessions })
+  const result = await measure.start(workerSessions)
   return result
 }
 

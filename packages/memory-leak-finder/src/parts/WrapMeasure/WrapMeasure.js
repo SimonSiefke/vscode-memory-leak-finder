@@ -4,6 +4,7 @@ export const wrapMeasure = (measure) => {
     create(session) {
       const args = measure.create(session)
       return {
+        args,
         ...measure,
         start() {
           return measure.start(...args)
