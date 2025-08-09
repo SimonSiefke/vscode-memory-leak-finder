@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 import * as Character from '../Character/Character.ts'
 import * as FormatAsSeconds from '../FormatAsSeconds/FormatAsSeconds.ts'
-import * as WatchUsageShort from '../WatchUsageShort/WatchUsageShort.ts'
+import * as WatchUsageShort from '../GetWatchUsageMessageShort/GetWatchUsageMessageShort.ts'
 
 const ranAllTestSuits: string = chalk.dim('Ran all test suites.')
 const ranAllTestSuitsMatching: string = chalk.dim('Ran all test suites matching')
@@ -38,7 +38,7 @@ ${testSuites} ${failedMessage}${skippedMessage}${passedMessage}${leakedMessage}$
 ${time}        ${durationMessage}
 ${ranAllTestSuitesMessage}\n`
   if (isWatchMode) {
-    message += `${WatchUsageShort.print()}`
+    message += `${WatchUsageShort.getWatchUsageMessageShort()}`
   }
   return message
 }
