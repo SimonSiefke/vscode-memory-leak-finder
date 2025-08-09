@@ -3,7 +3,6 @@ import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/Deb
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.js'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
 import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as IntermediateConnectionState from '../IntermediateConnectionState/IntermediateConnectionState.js'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
 
 export const connectElectron = async (connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback) => {
@@ -14,7 +13,6 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl, 
   Assert.boolean(canUseIdleCallback)
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc, canUseIdleCallback)
-  IntermediateConnectionState.set(connectionId, electronRpc)
 
   electronRpc.on(DevtoolsEventType.DebuggerResumed, ScenarioFunctions.handleResumed)
   electronRpc.on(DevtoolsEventType.DebuggerScriptParsed, ScenarioFunctions.handleScriptParsed)
@@ -22,14 +20,10 @@ export const connectElectron = async (connectionId, headlessMode, webSocketUrl, 
   electronRpc.on(DevtoolsEventType.RuntimeExecutionContextDestroyed, ScenarioFunctions.handleRuntimeExecutionContextDestroyed)
 
   await Promise.all([
-    DevtoolsProtocolDebugger.enable(electronRpc),
+    DevtoolsProtocolDebugger.enable(electronRpc), // TODO debugger might not be needed
     DevtoolsProtocolRuntime.enable(electronRpc),
     DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc),
   ])
 
-  return {
-    // monkeyPatchedElectron,
-    // electronObjectId,
-    // callFrameId,
-  }
+  return electronRpc
 }
