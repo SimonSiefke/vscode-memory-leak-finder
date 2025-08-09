@@ -8,6 +8,7 @@ import * as GetHandleTestSkippedMessage from '../GetHandleTestSkippedMessage/Get
 import * as GetInterruptedMessage from '../GetInterruptedMessage/GetInterruptedMessage.ts'
 import * as GetTestClearMessage from '../GetTestClearMessage/GetTestClearMessage.ts'
 import * as GetWatchUsageMessage from '../GetWatchUsageMessage/GetWatchUsageMessage.ts'
+import * as GetPatternUsageMessage from '../GetPatternUsageMessage/GetPatternUsageMessage.ts'
 
 export const commandMap: Record<string, (...args: any[]) => any> = {
   'Stdout.getHandleTestFailedMessage': GetHandleTestFailedMessage.getHandleTestFailedMessage,
@@ -28,4 +29,5 @@ export const commandMap: Record<string, (...args: any[]) => any> = {
   'Stdout.getCursorBackward': GetAnsiEscapes.getCursorBackward,
   'Stdout.getEraseEndLine': GetAnsiEscapes.getEraseEndLine,
   'Stdout.getClear': GetAnsiEscapes.getClear,
+  'Stdout.getPatternUsageMessage': GetPatternUsageMessage.getPatternUsageMessage,
 }
