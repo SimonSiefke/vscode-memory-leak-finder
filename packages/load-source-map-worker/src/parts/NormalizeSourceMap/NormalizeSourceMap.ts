@@ -3,7 +3,7 @@ import path, { basename, dirname, join, resolve } from 'path'
 import { cleanSource } from '../CleanSource/CleanSource.js'
 import { readJson } from '../ReadJson/ReadJson.js'
 
-export const normalizeSourceMap = async (originalPath, outFilePath) => {
+export const normalizeSourceMap = async (originalPath: string, outFilePath: string): Promise<void> => {
   const data = await readJson(originalPath)
   const cleanSources = data.sources.map(cleanSource)
   const outDirName = path.dirname(path.dirname(originalPath))

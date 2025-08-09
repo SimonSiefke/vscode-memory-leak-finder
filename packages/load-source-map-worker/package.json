@@ -18,16 +18,7 @@
     "got": "^14.4.7",
     "source-map": "^0.7.6"
   },
-  "jest": {
-    "injectGlobals": false,
-    "collectCoverage": true,
-    "coverageThreshold": {
-      "global": {
-        "branches": 0,
-        "functions": 0,
-        "lines": 0,
-        "statements": 0
-      }
-    }
+  "devDependencies": {
+    "ts-jest": "^29.4.1"
   }
 }

@@ -7,7 +7,7 @@ import { readJson } from '../ReadJson/ReadJson.js'
 
 const prefix = 'data:application/json;base64,'
 
-export const loadSourceMap = async (dataUrl, hash) => {
+export const loadSourceMap = async (dataUrl: string, hash: string): Promise<any> => {
   if (!dataUrl.startsWith(prefix)) {
     throw new Error(`only json data urls are supported`)
   }

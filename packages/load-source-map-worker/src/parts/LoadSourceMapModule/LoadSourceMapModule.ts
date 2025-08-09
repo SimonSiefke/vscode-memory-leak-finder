@@ -1,4 +1,4 @@
-export const getModule = (protocol) => {
+export const getModule = (protocol: string): Promise<any> | any => {
   switch (protocol) {
     case 'data':
       return import('../LoadSourceMapFromDataUrl/LoadSourceMapFromData.js')

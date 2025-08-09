@@ -11,7 +11,9 @@ test('no elements found', () => {
 
 test('too many elements found', () => {
   const roots = [document.createElement('div'), document.createElement('div')]
-  expect(() => QuerySelectorAllInternalEnterFrame.querySelectorAll(roots, '', '')).toThrow(new Error('too many matching iframe elements found'))
+  expect(() => QuerySelectorAllInternalEnterFrame.querySelectorAll(roots, '', '')).toThrow(
+    new Error('too many matching iframe elements found'),
+  )
 })
 
 test('element is not of type iframe', () => {

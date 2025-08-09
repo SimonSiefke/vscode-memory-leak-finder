@@ -1,7 +1,7 @@
 import { VError } from '../VError/VError.js'
 import * as LoadSourceMapModule from '../LoadSourceMapModule/LoadSourceMapModule.js'
 
-const getProtocol = (url) => {
+const getProtocol = (url: string): string => {
   const colonIndex = url.indexOf(':')
   if (colonIndex === -1) {
     console.warn(`Unsupported source map url ${url}`)
@@ -10,7 +10,7 @@ const getProtocol = (url) => {
   return url.slice(0, colonIndex)
 }
 
-export const loadSourceMap = async (url, hash) => {
+export const loadSourceMap = async (url: string, hash: string): Promise<any> => {
   try {
     const protocol = getProtocol(url)
     const module = await LoadSourceMapModule.getModule(protocol)

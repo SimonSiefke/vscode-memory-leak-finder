@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 
-export const loadSourceMap = async (url) => {
+export const loadSourceMap = async (url: string): Promise<any> => {
   if (!url.startsWith('vscode-file://vscode-app')) {
     throw new Error('unsupported source map url')
   }

@@ -1,6 +1,6 @@
 const RE_VS = /^vs\//
 
-export const cleanSource = (source) => {
+export const cleanSource = (source: string): string => {
   if (!source) {
     return ''
   }
