@@ -1,8 +1,8 @@
 import { expect, test } from '@jest/globals'
-import * as PatternUsage from '../src/parts/PatternUsage/PatternUsage.ts'
+import * as PatternUsage from '../src/parts/GetPatternUsageMessage/GetPatternUsageMessage.ts'
 
 test('print', () => {
-  expect(PatternUsage.print()).toBe(
+  expect(PatternUsage.getPatternUsageMessage()).toBe(
     '\n' +
       '\u001B[1mPattern Mode Usage\u001B[22m\n' +
       ' \u001B[2m› Press\u001B[22m Esc \u001B[2mto exit pattern mode.\u001B[22m\n' +
