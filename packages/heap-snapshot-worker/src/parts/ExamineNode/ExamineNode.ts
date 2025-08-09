@@ -1,0 +1,133 @@
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
+import { parseNode } from '../ParseNode/ParseNode.ts'
+import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
+import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
+import { getNodeName } from '../GetNodeName/GetNodeName.ts'
+import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
+
+export interface NodeExaminationResult {
+  nodeIndex: number
+  nodeId: number
+  node: any
+  nodeName: string | null
+  nodeType: string | null
+  edges: Array<{
+    type: number
+    typeName: string
+    nameIndex: number
+    edgeName: string
+    toNode: number
+    targetNodeInfo?: {
+      name: string | null
+      type: string | null
+    }
+  }>
+  properties: Array<{
+    name: string
+    value: string | null
+    targetType: string | null
+  }>
+}
+
+/**
+ * Finds a node by its ID and returns detailed information about it
+ * @param nodeId - The ID of the node to find and examine
+ * @param snapshot - The heap snapshot data
+ * @returns Detailed examination result of the node or null if not found
+ */
+export const examineNodeById = (nodeId: number, snapshot: Snapshot): NodeExaminationResult | null => {
+  const { nodes, node_fields } = snapshot.meta
+  const ITEMS_PER_NODE = node_fields.length
+  const idFieldIndex = node_fields.indexOf('id')
+
+  // Find the node with the given ID
+  let nodeIndex = -1
+  for (let i = 0; i < snapshot.nodes.length; i += ITEMS_PER_NODE) {
+    if (snapshot.nodes[i + idFieldIndex] === nodeId) {
+      nodeIndex = i / ITEMS_PER_NODE
+      break
+    }
+  }
+
+  if (nodeIndex === -1) {
+    return null
+  }
+
+  return examineNodeByIndex(nodeIndex, snapshot)
+}
+
+/**
+ * Examines a specific node by index and returns detailed information about it
+ * @param nodeIndex - The index of the node to examine (0-based)
+ * @param snapshot - The heap snapshot data
+ * @returns Detailed examination result of the node
+ */
+export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeExaminationResult | null => {
+  const { nodes, edges, strings, meta } = snapshot
+  const { node_fields, edge_fields, node_types, edge_types } = meta
+
+  // Parse the target node
+  const node = parseNode(nodeIndex, nodes, node_fields)
+  if (!node) {
+    return null
+  }
+
+  // Get node name and type
+  const nodeName = getNodeName(node, strings)
+  const nodeType = getNodeTypeName(node, node_types)
+
+  // Create edge map for fast lookups
+  const edgeMap = createEdgeMap(nodes, node_fields)
+
+  // Get all edges for this node
+  const nodeEdges = getNodeEdges(nodeIndex, edgeMap, nodes, edges, node_fields, edge_fields)
+
+  // Process edges to get detailed information
+  const edgeTypeNames = edge_types[0] || []
+  const processedEdges = nodeEdges.map((edge) => {
+    const typeName = edgeTypeNames[edge.type] || `type_${edge.type}`
+    let edgeName = ''
+    
+    if (typeName === 'element') {
+      edgeName = `[${edge.nameIndex}]`
+    } else {
+      edgeName = strings[edge.nameIndex] || `<string_${edge.nameIndex}>`
+    }
+
+    // Get target node information
+    const targetNodeIndex = Math.floor(edge.toNode / node_fields.length)
+    const targetNode = parseNode(targetNodeIndex, nodes, node_fields)
+    const targetNodeInfo = targetNode ? {
+      name: getNodeName(targetNode, strings),
+      type: getNodeTypeName(targetNode, node_types)
+    } : undefined
+
+    return {
+      type: edge.type,
+      typeName,
+      nameIndex: edge.nameIndex,
+      edgeName,
+      toNode: edge.toNode,
+      targetNodeInfo
+    }
+  })
+
+  // Extract properties (property-type edges)
+  const properties = processedEdges
+    .filter(edge => edge.typeName === 'property')
+    .map(edge => ({
+      name: edge.edgeName,
+      value: edge.targetNodeInfo?.name || null,
+      targetType: edge.targetNodeInfo?.type || null
+    }))
+
+  return {
+    nodeIndex,
+    nodeId: node.id,
+    node,
+    nodeName,
+    nodeType,
+    edges: processedEdges,
+    properties
+  }
+}
