@@ -22,7 +22,7 @@ export const handleStdinDataFinishedRunningMode = async (state, key) => {
         mode: ModeType.Waiting,
       }
     case CliKeys.FilterMode:
-      await Stdout.write(AnsiEscapes.clear + PatternUsage.print())
+      await Stdout.write(AnsiEscapes.clear + (await PatternUsage.print()))
       return {
         ...state,
         value: Character.EmptyString,

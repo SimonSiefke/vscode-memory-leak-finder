@@ -157,5 +157,5 @@ test('handleStdinDataWaitingMode - filter mode', async () => {
     mode: ModeType.FilterWaiting,
   })
   expect(Stdout.write).toHaveBeenCalledTimes(1)
-  expect(Stdout.write).toHaveBeenCalledWith(AnsiEscapes.clear + PatternUsage.print())
+  expect(Stdout.write).toHaveBeenCalledWith(AnsiEscapes.clear + (await PatternUsage.print()))
 })

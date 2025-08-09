@@ -50,7 +50,7 @@ export const handleStdinDataWaitingMode = async (state, key) => {
       }
     case CliKeys.FilterMode:
       const clear = await StdoutWorker.invoke('Stdout.getClear')
-      await Stdout.write(clear + PatternUsage.print())
+      await Stdout.write(clear + (await PatternUsage.print()))
       return {
         ...state,
         value: Character.EmptyString,

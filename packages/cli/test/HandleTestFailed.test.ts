@@ -82,7 +82,7 @@ test('handleTestFailed', async () => {
   await HandleTestFailed.handleTestFailed(file, relativeDirName, releativeFilePath, fileName, error)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
-    '\r\u001B[K\r\u001B[1A\r\u001B[K\r\u001B[1A\u001B[0m\u001B[7m\u001B[1m\u001B[31m FAIL \u001B[39m\u001B[22m\u001B[27m\u001B[0m \u001B[2msrc/\u001B[22m\u001B[1msample.close-window.js\u001B[22m\n' +
+    '\r\u001B[K\r\u001B[1A\r\u001B[K\r\u001B[1A\r\u001B[K\r\u001B[1A\r\u001B[K\r\u001B[1A\u001B[0m\u001B[7m\u001B[1m\u001B[31m FAIL \u001B[39m\u001B[22m\u001B[27m\u001B[0m \u001B[2msrc/\u001B[22m\u001B[1msample.close-window.js\u001B[22m\n' +
       '\n' +
       '      Error: expected window count to be 0 but was 1\n' +
       '\n' +
