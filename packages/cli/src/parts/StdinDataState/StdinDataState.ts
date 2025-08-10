@@ -3,7 +3,31 @@ import * as Character from '../Character/Character.ts'
 import * as Ide from '../Ide/Ide.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 
-export const state = {
+export interface StdinDataState {
+  buffering: boolean
+  checkLeaks: boolean
+  cwd: string
+  filter: string
+  headless: boolean
+  isGithubActions: boolean
+  measure: string
+  mode: number
+  recordVideo: boolean
+  runs: number
+  value: string
+  watch: boolean
+  measureAfter: boolean
+  timeouts: boolean
+  timeoutBetween: number
+  restartBetween: boolean
+  runMode: number
+  ide: string
+  ideVersion: string
+  workers: boolean
+  stdout: string[]
+}
+
+export const state: StdinDataState = {
   buffering: false,
   checkLeaks: false,
   cwd: Character.EmptyString,
@@ -24,27 +48,29 @@ export const state = {
   ide: Ide.VsCode,
   ideVersion: Ide.VsCode,
   workers: false,
+  stdout: [],
 }
 
-export const setState = (newState) => {
-  state.checkLeaks = newState.checkLeaks
-  state.cwd = newState.cwd
-  state.headless = newState.headless
-  state.isGithubActions = newState.isGithubActions
-  state.measure = newState.measure
-  state.mode = newState.mode
-  state.recordVideo = newState.recordVideo
-  state.runs = newState.runs
-  state.value = newState.value
-  state.watch = newState.watch
-  state.measureAfter = newState.measureAfter
-  state.timeouts = newState.timeouts
-  state.timeoutBetween = newState.timeoutBetween
-  state.restartBetween = newState.restartBetween
-  state.runMode = newState.runMode
-  state.ide = newState.ide
-  state.ideVersion = newState.ideVersion
-  state.workers = newState.workers
+export const setState = (newState: Partial<StdinDataState>): void => {
+  if (newState.checkLeaks !== undefined) state.checkLeaks = newState.checkLeaks
+  if (newState.cwd !== undefined) state.cwd = newState.cwd
+  if (newState.headless !== undefined) state.headless = newState.headless
+  if (newState.isGithubActions !== undefined) state.isGithubActions = newState.isGithubActions
+  if (newState.measure !== undefined) state.measure = newState.measure
+  if (newState.mode !== undefined) state.mode = newState.mode
+  if (newState.recordVideo !== undefined) state.recordVideo = newState.recordVideo
+  if (newState.runs !== undefined) state.runs = newState.runs
+  if (newState.value !== undefined) state.value = newState.value
+  if (newState.watch !== undefined) state.watch = newState.watch
+  if (newState.measureAfter !== undefined) state.measureAfter = newState.measureAfter
+  if (newState.timeouts !== undefined) state.timeouts = newState.timeouts
+  if (newState.timeoutBetween !== undefined) state.timeoutBetween = newState.timeoutBetween
+  if (newState.restartBetween !== undefined) state.restartBetween = newState.restartBetween
+  if (newState.runMode !== undefined) state.runMode = newState.runMode
+  if (newState.ide !== undefined) state.ide = newState.ide
+  if (newState.ideVersion !== undefined) state.ideVersion = newState.ideVersion
+  if (newState.workers !== undefined) state.workers = newState.workers
+  if (newState.stdout !== undefined) state.stdout = newState.stdout
 }
 
 export const setBuffering = (value: boolean): void => {
