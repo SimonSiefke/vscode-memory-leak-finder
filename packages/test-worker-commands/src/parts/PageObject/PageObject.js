@@ -21,25 +21,27 @@ export const create = async (connectionId, isFirstConnection, isHeadless, timeou
     const electronApp = ElectronAppState.get(connectionId)
     ElectronAppState.remove(connectionId)
 
-    const firstWindow = await pageObjectModule.create({
-      electronApp,
-      isFirstConnection,
-      isHeadless,
-      expect: Expect.expect,
-      pageEventState: PageEventState,
-      pageEventType: PageEventType,
-      timeoutConstants: TimeoutConstants,
-      isDevtoolsCannotFindContextError: IsDevtoolsCannotFindContextError.isDevtoolsCannotFindContextError,
-    }).WaitForVsCodeToBeReady.waitForVsCodeToBeReady({
-      electronApp,
-      isFirstConnection,
-      isHeadless,
-      expect: Expect.expect,
-      pageEventState: PageEventState,
-      pageEventType: PageEventType,
-      timeoutConstants: TimeoutConstants,
-      isDevtoolsCannotFindContextError: IsDevtoolsCannotFindContextError.isDevtoolsCannotFindContextError,
-    })
+    const firstWindow = await pageObjectModule
+      .create({
+        electronApp,
+        isFirstConnection,
+        isHeadless,
+        expect: Expect.expect,
+        pageEventState: PageEventState,
+        pageEventType: PageEventType,
+        timeoutConstants: TimeoutConstants,
+        isDevtoolsCannotFindContextError: IsDevtoolsCannotFindContextError.isDevtoolsCannotFindContextError,
+      })
+      .WaitForVsCodeToBeReady.waitForVsCodeToBeReady({
+        electronApp,
+        isFirstConnection,
+        isHeadless,
+        expect: Expect.expect,
+        pageEventState: PageEventState,
+        pageEventType: PageEventType,
+        timeoutConstants: TimeoutConstants,
+        isDevtoolsCannotFindContextError: IsDevtoolsCannotFindContextError.isDevtoolsCannotFindContextError,
+      })
 
     const pageObjectContext = {
       page: firstWindow,
