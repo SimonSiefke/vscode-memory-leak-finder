@@ -1,48 +1,4 @@
-export interface WaitForApplicationToBeReadyOptions {
-  electronApp: {
-    firstWindow: () => Promise<any>
-  }
-  isHeadless: boolean
-  isFirstConnection: boolean
-  expect: any
-  selectors: {
-    mainContent: string
-    readyNotification?: string
-  }
-  eventHandlers?: {
-    waitForEvent?: (options: { frameId: string; name: string; timeout: number }) => Promise<void>
-    eventTypes?: {
-      interactiveTime: string
-      networkIdle: string
-    }
-    timeoutConstants?: {
-      interactiveTime: number
-    }
-  }
-  errorHandlers?: {
-    isRetryableError?: (error: any) => boolean
-  }
-}
-
-export const waitForApplicationToBeReady = async (options: WaitForApplicationToBeReadyOptions) => {
-  const { electronApp, isHeadless, isFirstConnection, expect, selectors, eventHandlers, errorHandlers } = options
-
-  const firstWindow = await electronApp.firstWindow()
-
-  if (isFirstConnection && eventHandlers?.waitForEvent) {
-    const eventName = isHeadless
-      ? eventHandlers.eventTypes?.networkIdle || 'networkIdle'
-      : eventHandlers.eventTypes?.interactiveTime || 'InteractiveTime'
-
-    const timeout = eventHandlers.timeoutConstants?.interactiveTime || 20_000
-
-    await eventHandlers.waitForEvent({
-      frameId: firstWindow.targetId,
-      name: eventName,
-      timeout,
-    })
-  }
-
+export const waitForApplicationToBeReadyInternal = async ({ page }) => {
   try {
     const main = firstWindow.locator(selectors.mainContent)
     await expect(main).toBeVisible({
@@ -69,4 +25,30 @@ export const waitForApplicationToBeReady = async (options: WaitForApplicationToB
   }
 
   return firstWindow
+}
+
+export const waitForApplicationToBeReady = async ({ page, expect, VError }) => {
+  return await waitForApplicationToBeReadyInternal({
+    electronApp,
+    isHeadless,
+    isFirstConnection,
+    expect,
+    selectors: {
+      mainContent: '[role="main"]',
+      readyNotification: 'text=All installed extensions are temporarily disabled.',
+    },
+    eventHandlers: {
+      waitForEvent: pageEventState?.waitForEvent,
+      eventTypes: {
+        interactiveTime: pageEventType?.InteractiveTime || 'InteractiveTime',
+        networkIdle: pageEventType?.NetworkIdle || 'networkIdle',
+      },
+      timeoutConstants: {
+        interactiveTime: timeoutConstants?.InteractiveTime || 20_000,
+      },
+    },
+    errorHandlers: {
+      isRetryableError: isDevtoolsCannotFindContextError,
+    },
+  })
 }
