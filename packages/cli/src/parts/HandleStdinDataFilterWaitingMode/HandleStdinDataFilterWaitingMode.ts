@@ -49,7 +49,7 @@ export const handleStdinDataFilterWaitingMode = async (state, key) => {
     case AnsiKeys.End:
       return state
     case AnsiKeys.Escape:
-      await Stdout.write(AnsiEscapes.clear + (await WatchUsage.print()))
+      await Stdout.write(AnsiEscapes.clear + '\n' + (await WatchUsage.print()))
       return {
         ...state,
         mode: ModeType.Waiting,

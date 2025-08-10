@@ -6,11 +6,9 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-const mockWrite: (data: string) => Promise<void> = jest.fn(async (_data: string): Promise<void> => {})
-
 jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   return {
-    write: mockWrite,
+    write: jest.fn(),
   }
 })
 
@@ -48,12 +46,14 @@ jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
 const Stdout = await import('../src/parts/Stdout/Stdout.ts')
 const TestStateOutput = await import('../src/parts/TestStateOutput/TestStateOutput.ts')
 const HandleTestPassed = await import('../src/parts/HandleTestPassed/HandleTestPassed.ts')
-const GetHandleTestPassedMessage = await import('../src/parts/GetHandleTestPassedMessage/GetHandleTestPassedMessage.ts')
 const GetTestClearMessage = await import('../src/parts/GetTestClearMessage/GetTestClearMessage.ts')
 const AnsiEscapes = await import('../src/parts/AnsiEscapes/AnsiEscapes.ts')
 
 test('handleTestPassed', async () => {
+  const clearMessage = await GetTestClearMessage.getTestClearMessage()
   const expectedMessage =
+    AnsiEscapes.clear +
+    clearMessage +
     '\r\u001B[K\r\u001B[1A\r\u001B[K\r\u001B[1A\u001B[0m\u001B[7m\u001B[1m\u001B[32m PASS \u001B[39m\u001B[22m\u001B[27m\u001B[0m \u001B[2m/test/\u001B[22m\u001B[1mapp.test.js\u001B[22m (0.100 s)\n'
 
   await HandleTestPassed.handleTestPassed('/test/app.test.js', '/test', 'app.test.js', 100, false)
