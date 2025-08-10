@@ -85,6 +85,19 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
     }
   }
 
+  // For hidden nodes, check if it's a boolean or undefined value
+  if (nodeTypeName === 'hidden') {
+    const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap)
+    if (booleanValue) {
+      return booleanValue
+    }
+
+    const undefinedValue = getUndefinedValue(targetNode, snapshot, edgeMap)
+    if (undefinedValue) {
+      return undefinedValue
+    }
+  }
+
   // For code objects, try to follow internal references to find string/number values
   if (nodeTypeName === 'code') {
     // Find the node index for this target node
