@@ -9,6 +9,7 @@ import * as PageEventState from '../PageEventState/PageEventState.js'
 import * as PageEventType from '../PageEventType/PageEventType.js'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
 import * as IsDevtoolsCannotFindContextError from '../IsDevtoolsCannotFindContextError/IsDevtoolsCannotFindContextError.js'
+import * as WaitForFirstWindow from '../WaitForFirstWindow/WaitForFirstWindow.js'
 
 export const create = async (connectionId, isFirstConnection, isHeadless, timeouts, parsedIdeVersion, pageObjectPath) => {
   try {
@@ -21,28 +22,12 @@ export const create = async (connectionId, isFirstConnection, isHeadless, timeou
     const electronApp = ElectronAppState.get(connectionId)
     ElectronAppState.remove(connectionId)
 
-    const firstWindow = await pageObjectModule
-      .create({
-        electronApp,
-        isFirstConnection,
-        isHeadless,
-        expect: Expect.expect,
-        pageEventState: PageEventState,
-        pageEventType: PageEventType,
-        timeoutConstants: TimeoutConstants,
-        isDevtoolsCannotFindContextError: IsDevtoolsCannotFindContextError.isDevtoolsCannotFindContextError,
-      })
-      .WaitForVsCodeToBeReady.waitForVsCodeToBeReady({
-        electronApp,
-        isFirstConnection,
-        isHeadless,
-        expect: Expect.expect,
-        pageEventState: PageEventState,
-        pageEventType: PageEventType,
-        timeoutConstants: TimeoutConstants,
-        isDevtoolsCannotFindContextError: IsDevtoolsCannotFindContextError.isDevtoolsCannotFindContextError,
-      })
-
+    const firstWindow = await WaitForFirstWindow.waitForFirstWindow({
+      electronApp,
+      isFirstConnection,
+      isHeadless,
+      expect: Expect.expect,
+    })
     const pageObjectContext = {
       page: firstWindow,
       expect: Expect.expect,
