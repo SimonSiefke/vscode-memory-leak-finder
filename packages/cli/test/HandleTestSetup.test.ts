@@ -28,9 +28,10 @@ test('handleTestSetup - should write setup message when not in GitHub Actions', 
 test('handleTestSetup - should not write anything when in GitHub Actions', async () => {
   jest.resetModules()
 
-  jest.unstable_mockModule('../src/parts/IsGithubActions/IsGithubActions.ts', () => {
+  jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => {
     return {
-      isGithubActions: true,
+      isGithubActions: () => true,
+      setTestSetup: () => {},
     }
   })
 
