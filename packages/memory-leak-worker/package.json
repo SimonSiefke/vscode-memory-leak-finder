@@ -25,8 +25,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^24.1.0",
     "@types/ws": "^8.18.1",
-    "ts-jest": "^29.4.1",
-    "typescript": "^5.9.2"
+    "ts-jest": "^29.4.1"
   },
   "xo": {
     "rules": {
