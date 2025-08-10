@@ -63,7 +63,9 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
 
   // For numbers, use the dedicated number parsing function
   if (nodeType === NODE_TYPE_NUMBER) {
-    const numberValue = getNumberValue(targetNode, snapshot, edgeMap, visited)
+    // Create a fresh visited set for number parsing to avoid conflicts
+    const numberVisited = new Set<number>()
+    const numberValue = getNumberValue(targetNode, snapshot, edgeMap, numberVisited)
     if (numberValue !== null) {
       return numberValue
     }
@@ -98,99 +100,36 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
       // Get edges using the edge map for fast lookup
       const nodeEdges = getNodeEdges(targetNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
 
-      // Collect all string/number values from internal edges
-      const internalStringValues: string[] = []
-      const incomingStringValues: string[] = []
-      const numberValues: string[] = []
-
-      // Check edges from this code object
+      // Look for internal edges that might contain the actual value
       for (const edge of nodeEdges) {
-        // Follow internal edges to find string/number/object/array values
         if (edge.type === EDGE_TYPE_INTERNAL) {
           // Convert edge toNode from array index to node index
           const referencedNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
           const referencedNode = parseNode(referencedNodeIndex, nodes, nodeFields)
           if (referencedNode) {
             const referencedType = referencedNode.type
+            const referencedName = getNodeName(referencedNode, strings)
 
-            if (referencedType === NODE_TYPE_STRING) {
-              // string
-              const stringValue = getNodeName(referencedNode, strings)
-              if (stringValue) {
-                internalStringValues.push(stringValue)
-              }
-            } else if (referencedType === NODE_TYPE_NUMBER) {
-              // number - use improved number parsing
-              const numberValue = getNumberValue(referencedNode, snapshot, edgeMap, new Set(visited))
-              if (numberValue && !numberValue.startsWith('[')) {
-                numberValues.push(numberValue)
-              }
-            } else if (referencedType === NODE_TYPE_OBJECT) {
-              // object
-              return `[Object ${referencedNode.id}]`
-            } else if (referencedType === NODE_TYPE_ARRAY) {
-              // array
-              return `[Array ${referencedNode.id}]`
+            // If we find a string, that's the actual value
+            if (referencedType === NODE_TYPE_STRING && referencedName) {
+              return referencedName
             }
-          }
-        }
-      }
 
-      // Also check incoming references to see if any have string names
-      let currentEdgeOffset = 0
-      for (let sourceNodeIndex = 0; sourceNodeIndex < nodes.length; sourceNodeIndex += ITEMS_PER_NODE) {
-        const sourceEdgeCount = nodes[sourceNodeIndex + edgeCountFieldIndex]
-
-        for (let j = 0; j < sourceEdgeCount; j++) {
-          const edgeIndex = (currentEdgeOffset + j) * ITEMS_PER_EDGE
-          const edgeToNode = edges[edgeIndex + edgeToNodeFieldIndex]
-          // Convert edge toNode from array index to node index
-          const edgeToNodeIndex = Math.floor(edgeToNode / ITEMS_PER_NODE)
-
-          if (edgeToNodeIndex === targetNodeIndex) {
-            const edgeType = edges[edgeIndex + edgeTypeFieldIndex]
-            const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
-
-            // If this is an internal edge with a string name, that might be the value
-            if (edgeType === EDGE_TYPE_INTERNAL && edgeNameIndex < strings.length) {
-              const edgeName = strings[edgeNameIndex]
-              if (edgeName && edgeName !== '') {
-                incomingStringValues.push(edgeName)
+            // If we find a number, get its actual value
+            if (referencedType === NODE_TYPE_NUMBER) {
+              // Create a fresh visited set for nested number parsing
+              const nestedNumberVisited = new Set<number>()
+              const nestedNumberValue = getNumberValue(referencedNode, snapshot, edgeMap, nestedNumberVisited)
+              if (nestedNumberValue !== null) {
+                return nestedNumberValue
               }
             }
           }
         }
-        currentEdgeOffset += sourceEdgeCount
-      }
-
-      // Prioritize incoming references over internal references
-      // Look for specific meaningful values first, then return the first available
-      const allIncomingValues = [...incomingStringValues]
-      const allInternalValues = [...internalStringValues]
-
-      // Prioritize "1" if it exists in incoming references
-      const oneIndex = allIncomingValues.indexOf('1')
-      if (oneIndex !== -1) {
-        return '"1"'
-      }
-
-      // Return the first incoming string value found, or first internal string value, or first number value
-      if (allIncomingValues.length > 0) {
-        return `"${allIncomingValues[0]}"`
-      } else if (allInternalValues.length > 0) {
-        return `"${allInternalValues[0]}"`
-      } else if (numberValues.length > 0) {
-        return numberValues[0]
       }
     }
   }
 
-  // For other types, return the standard format
-  if (nodeType === NODE_TYPE_OBJECT) {
-    return `[Object ${targetNode.id}]`
-  } else if (nodeType === NODE_TYPE_ARRAY) {
-    return `[Array ${targetNode.id}]`
-  } else {
-    return `[${nodeTypeName || 'Unknown'} ${targetNode.id}]`
-  }
+  // For other types, return a descriptive reference
+  return `[${nodeTypeName || 'Unknown'} ${targetNode.id}]`
 }
