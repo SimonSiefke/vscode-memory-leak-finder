@@ -7,12 +7,6 @@ beforeEach(() => {
 
 const mockInvoke = jest.fn() as jest.MockedFunction<(...args: any[]) => Promise<string>>
 
-jest.unstable_mockModule('../src/parts/IsGithubActions/IsGithubActions.ts', () => {
-  return {
-    isGithubActions: false,
-  }
-})
-
 jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   return {
     write: jest.fn().mockImplementation(() => Promise.resolve()),

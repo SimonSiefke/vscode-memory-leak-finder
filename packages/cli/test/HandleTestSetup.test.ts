@@ -13,12 +13,7 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   }
 })
 
-// Mock the IsGithubActions module
-jest.unstable_mockModule('../src/parts/IsGithubActions/IsGithubActions.ts', () => {
-  return {
-    isGithubActions: false,
-  }
-})
+// Note: github actions flag is read via StdinDataState in source; no separate module exists
 
 // Mock the StdoutWorker module
 jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
