@@ -2,13 +2,10 @@ export const DebuggerPaused = 'Debugger.paused'
 export const DebuggerResumed = 'Debugger.resumed'
 export const DebuggerScriptParsed = 'Debugger.scriptParsed'
 
-export const PageFrameAttached = 'Page.frameAttached'
-export const PageFrameDetached = 'Page.frameDetached'
 export const PageFrameNavigated = 'Page.frameNavigated'
 export const PageLifeCycleEvent = 'Page.lifecycleEvent'
 export const PageLoadEventFired = 'Page.loadEventFired'
 
-export const RuntimeConsoleApiCalled = 'Runtime.consoleAPICalled'
 export const RuntimeExecutionContextCreated = 'Runtime.executionContextCreated'
 export const RuntimeExecutionContextDestroyed = 'Runtime.executionContextDestroyed'
 export const RuntimeExecutionContextsCleared = 'Runtime.executionContextsCleared'
