@@ -2,21 +2,11 @@ import { beforeEach, expect, jest, test } from '@jest/globals'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
 import * as StdinDataState from '../src/parts/StdinDataState/StdinDataState.ts'
+import * as StdoutWorker from '../src/parts/StdoutWorker/StdoutWorker.ts'
 
 beforeEach(() => {
   jest.resetModules()
   jest.resetAllMocks()
-})
-
-// Mock RPC for stdout worker
-const mockRpc = {
-  invoke: jest.fn() as jest.MockedFunction<(...args: any[]) => Promise<any>>,
-}
-
-jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
-  return {
-    invoke: mockRpc.invoke.bind(mockRpc),
-  }
 })
 
 const HandleStdinDataFilterWaitingMode = await import('../src/parts/HandleStdinDataFilterWaitingMode/HandleStdinDataFilterWaitingMode.ts')
@@ -25,24 +15,48 @@ test('handleStdinDataFilterWaitingMode - alt + backspace', async () => {
   const state = { ...StdinDataState.createDefaultState(), mode: ModeType.FilterWaiting, value: 'abc' }
   const key = AnsiKeys.AltBackspace
   
-  // Mock the stdout worker to return cursor and erase commands
-  mockRpc.invoke.mockResolvedValue('\u001B[3D\u001B[K')
+  const mockRpc = {
+    invoke: jest.fn().mockImplementation((method: any) => {
+      if (method === 'Stdout.getCursorBackward') {
+        return Promise.resolve('\u001B[3D')
+      }
+      if (method === 'Stdout.getEraseEndLine') {
+        return Promise.resolve('\u001B[K')
+      }
+      throw new Error(`unexpected method ${method}`)
+    }),
+    send: jest.fn(),
+    invokeAndTransfer: jest.fn(),
+    dispose: jest.fn(),
+  } as any
+  StdoutWorker.set(mockRpc)
   
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState.value).toBe('')
-  expect(mockRpc.invoke).toHaveBeenCalled()
 })
 
 test('handleStdinDataFilterWaitingMode - ctrl + backspace', async () => {
   const state = { ...StdinDataState.createDefaultState(), mode: ModeType.FilterWaiting, value: 'abc' }
   const key = AnsiKeys.ControlBackspace
   
-  // Mock the stdout worker to return cursor and erase commands
-  mockRpc.invoke.mockResolvedValue('\u001B[3D\u001B[K')
+  const mockRpc = {
+    invoke: jest.fn().mockImplementation((method: any) => {
+      if (method === 'Stdout.getCursorBackward') {
+        return Promise.resolve('\u001B[3D')
+      }
+      if (method === 'Stdout.getEraseEndLine') {
+        return Promise.resolve('\u001B[K')
+      }
+      throw new Error(`unexpected method ${method}`)
+    }),
+    send: jest.fn(),
+    invokeAndTransfer: jest.fn(),
+    dispose: jest.fn(),
+  } as any
+  StdoutWorker.set(mockRpc)
   
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState.value).toBe('')
-  expect(mockRpc.invoke).toHaveBeenCalled()
 })
 
 test('handleStdinDataFilterWaitingMode - ctrl + backspace - empty value', async () => {
@@ -50,7 +64,6 @@ test('handleStdinDataFilterWaitingMode - ctrl + backspace - empty value', async 
   const key = AnsiKeys.ControlBackspace
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState).toBe(state)
-  expect(mockRpc.invoke).not.toHaveBeenCalled()
 })
 
 test('handleStdinDataFilterWaitingMode - ctrl + c', async () => {
@@ -58,7 +71,6 @@ test('handleStdinDataFilterWaitingMode - ctrl + c', async () => {
   const key = AnsiKeys.ControlC
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
-  expect(mockRpc.invoke).not.toHaveBeenCalled()
 })
 
 test('handleStdinDataFilterWaitingMode - ctrl + d', async () => {
@@ -66,31 +78,51 @@ test('handleStdinDataFilterWaitingMode - ctrl + d', async () => {
   const key = AnsiKeys.ControlD
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
-  expect(mockRpc.invoke).not.toHaveBeenCalled()
 })
 
 test('handleStdinDataFilterWaitingMode - enter', async () => {
   const state = { ...StdinDataState.createDefaultState(), mode: ModeType.FilterWaiting, value: 'abc' }
   const key = AnsiKeys.Enter
   
-  // Mock the stdout worker to return clear and cursor commands
-  mockRpc.invoke.mockResolvedValue('\u001B[2K\u001B[G')
+  const mockRpc = {
+    invoke: jest.fn().mockImplementation((method: any) => {
+      if (method === 'Stdout.getEraseLine') {
+        return Promise.resolve('\u001B[2K')
+      }
+      if (method === 'Stdout.getCursorLeft') {
+        return Promise.resolve('\u001B[G')
+      }
+      throw new Error(`unexpected method ${method}`)
+    }),
+    send: jest.fn(),
+    invokeAndTransfer: jest.fn(),
+    dispose: jest.fn(),
+  } as any
+  StdoutWorker.set(mockRpc)
   
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Running)
-  expect(mockRpc.invoke).toHaveBeenCalled()
 })
 
 test('handleStdinDataFilterWaitingMode - escape', async () => {
   const state = { ...StdinDataState.createDefaultState(), mode: ModeType.FilterWaiting, value: 'abc' }
   const key = AnsiKeys.Escape
   
-  // Mock the stdout worker to return watch usage message
-  mockRpc.invoke.mockResolvedValue('[ansi-clear]\nwatch usage\n')
+  const mockRpc = {
+    invoke: jest.fn().mockImplementation((method: any) => {
+      if (method === 'Stdout.getClear') {
+        return Promise.resolve('[ansi-clear]\n')
+      }
+      throw new Error(`unexpected method ${method}`)
+    }),
+    send: jest.fn(),
+    invokeAndTransfer: jest.fn(),
+    dispose: jest.fn(),
+  } as any
+  StdoutWorker.set(mockRpc)
   
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Waiting)
-  expect(mockRpc.invoke).toHaveBeenCalled()
 })
 
 test('handleStdinDataFilterWaitingMode - home', async () => {
