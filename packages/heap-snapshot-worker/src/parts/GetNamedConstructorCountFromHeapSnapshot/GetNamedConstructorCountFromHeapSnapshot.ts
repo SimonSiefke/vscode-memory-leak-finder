@@ -4,7 +4,16 @@ import * as GetConstructorScope from '../GetConstructorScope/GetConstructorScope
 import * as GetConstructorScopeMap from '../GetConstructorScopeMap/GetConstructorScopeMap.js'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
 
-const createCounts = (constructorNodesWithInfo) => {
+interface ConstructorNodeWithInfo {
+  name: string
+}
+
+interface ConstructorCount {
+  name: string
+  count: number
+}
+
+const createCounts = (constructorNodesWithInfo: ConstructorNodeWithInfo[]): ConstructorCount[] => {
   const map = Object.create(null)
   for (const node of constructorNodesWithInfo) {
     map[node.name] ||= 0
@@ -19,7 +28,7 @@ const createCounts = (constructorNodesWithInfo) => {
   return array
 }
 
-const isImportantScopeName = (name) => {
+const isImportantScopeName = (name: string): boolean => {
   switch (name) {
     case '':
     case 'Set':
@@ -32,7 +41,7 @@ const isImportantScopeName = (name) => {
   }
 }
 
-const getDetailedNodeInfo = (parsedNodes, scopeMap, edgeMap, node) => {
+const getDetailedNodeInfo = (parsedNodes: any[], scopeMap: any, edgeMap: any, node: any): ConstructorNodeWithInfo => {
   const { scopeNode, scopeEdge } = GetConstructorScope.getConstructorScope(parsedNodes, scopeMap, edgeMap, node)
   const parentScope = GetConstructorScope.getConstructorScope(parsedNodes, scopeMap, edgeMap, scopeNode)
   if (isImportantScopeName(parentScope.scopeNode.name)) {
@@ -47,7 +56,7 @@ const getDetailedNodeInfo = (parsedNodes, scopeMap, edgeMap, node) => {
   }
 }
 
-export const getNamedConstructorCountFromHeapSnapshot = async (heapsnapshot, constructorName) => {
+export const getNamedConstructorCountFromHeapSnapshot = async (heapsnapshot: any, constructorName: string): Promise<ConstructorCount[]> => {
   Assert.object(heapsnapshot)
   const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
   const constructorNodes = GetConstructorNodes.getConstructorNodes(parsedNodes, constructorName)
