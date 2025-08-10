@@ -12,6 +12,7 @@ export const state = {
   webSocketUrl: '',
   connectionId: 0,
   headlessMode: false,
+  parsedVersion: null,
   /**
    * @type {Promise|undefined}
    */
@@ -46,7 +47,8 @@ export const prepareTestsOrAttach = async (
       vscodePath,
       commit,
     )
-    await state.promise
+    const result = await state.promise
+    state.parsedVersion = result.parsedVersion
     return testWorkerRpc
   }
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, monkeyPatchedElectron } = await state.promise
@@ -64,6 +66,6 @@ export const prepareTestsOrAttach = async (
     webSocketUrl,
     canUseIdleCallback,
   )
-  await PageObject.create(testWorkerRpc, connectionId, isFirstConnection, headlessMode, timeouts, ideVersion, pageObjectPath)
+  await PageObject.create(testWorkerRpc, connectionId, isFirstConnection, headlessMode, timeouts, state.parsedVersion, pageObjectPath)
   return testWorkerRpc
 }
