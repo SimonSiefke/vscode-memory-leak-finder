@@ -1,21 +1,23 @@
-import * as Path from '../Path/Path.ts'
-import * as Filesystem from '../Filesystem/Filesystem.ts'
-// import { pathExists } from 'path-exists' (removed)
 import * as CacheNodeModules from '../CacheNodeModules/CacheNodeModules.ts'
 import * as CheckCacheExists from '../CheckCacheExists/CheckCacheExists.ts'
 import * as CheckoutCommit from '../CheckoutCommit/CheckoutCommit.ts'
 import * as CloneRepository from '../CloneRepository/CloneRepository.ts'
+import * as Filesystem from '../Filesystem/Filesystem.ts'
 import * as InstallDependencies from '../InstallDependencies/InstallDependencies.ts'
+import * as Logger from '../Logger/Logger.ts'
+import * as Path from '../Path/Path.ts'
 import * as ResolveCommitHash from '../ResolveCommitHash/ResolveCommitHash.ts'
 import * as RunCompile from '../RunCompile/RunCompile.ts'
 import * as SetupNodeModulesFromCache from '../SetupNodeModulesFromCache/SetupNodeModulesFromCache.ts'
-import * as Logger from '../Logger/Logger.ts'
+// import { pathExists } from 'path-exists' (removed)
 
 /**
  * @param {string} commitRef - The commit reference (branch name, tag, or commit hash)
  * @param {string} repoUrl - The repository URL to clone
  * @param {string} reposDir - The directory name for storing repositories
  * @param {string} cacheDir - The cache directory path
+ * @param {boolean} useNice - Whether to use nice command for resource management
+ * @returns {Promise<string>} The path to the built VS Code binary
  */
 export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, reposDir, cacheDir, useNice) => {
   // Resolve the commit reference to an actual commit hash
@@ -67,4 +69,8 @@ export const downloadAndBuildVscodeFromCommit = async (commitRef, repoUrl, repos
     Logger.log(`Compiling VS Code for commit ${commitHash}...`)
     await RunCompile.runCompile(repoPath, useNice, mainJsPath)
   }
+
+  // Return the path to the built VS Code binary
+  const codeScriptPath = Path.join(repoPath, 'scripts', 'code.sh')
+  return codeScriptPath
 }
