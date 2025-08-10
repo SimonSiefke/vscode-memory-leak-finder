@@ -26,11 +26,26 @@ jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
       if (method === 'Stdout.getWatchUsageMessage') {
         return Promise.resolve('watch usage\n')
       }
+      if (method === 'Stdout.getWatchUsageMessageFull') {
+        return Promise.resolve('\u001B[2J\u001B[3J\u001B[H\nwatch usage\n')
+      }
       if (method === 'Stdout.getPatternUsageMessage') {
         return Promise.resolve('pattern usage\n')
       }
+      if (method === 'Stdout.getPatternUsageMessageFull') {
+        return Promise.resolve('\u001B[2J\u001B[3J\u001B[H\npattern usage\n')
+      }
       throw new Error(`unexpected method ${method}`)
     }),
+  }
+})
+
+// Neutralize terminal control sequences for simpler assertions
+jest.unstable_mockModule('../src/parts/AnsiEscapes/AnsiEscapes.ts', () => {
+  return {
+    cursorUp: () => '',
+    eraseDown: '',
+    clear: '',
   }
 })
 
@@ -48,7 +63,7 @@ test('handleStdinDataFinishedRunningMode - show watch mode details', async () =>
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.Waiting)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
-  expect(Stdout.write).toHaveBeenCalledWith(expect.stringContaining('watch usage'))
+  expect(Stdout.write).toHaveBeenCalledWith('\u001B[2J\u001B[3J\u001B[H\nwatch usage\n')
 })
 
 test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
@@ -60,7 +75,7 @@ test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.FilterWaiting)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
-  expect(Stdout.write).toHaveBeenCalledWith(expect.stringContaining('pattern usage'))
+  expect(Stdout.write).toHaveBeenCalledWith('\u001B[2J\u001B[3J\u001B[H\npattern usage\n')
 })
 
 test('handleStdinDataFinishedRunningMode - quit', async () => {

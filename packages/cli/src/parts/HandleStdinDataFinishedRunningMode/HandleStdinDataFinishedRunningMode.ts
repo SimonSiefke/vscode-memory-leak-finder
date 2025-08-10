@@ -1,4 +1,3 @@
-import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
 import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
 import * as CliKeys from '../CliKeys/CliKeys.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
@@ -16,13 +15,13 @@ export const handleStdinDataFinishedRunningMode = async (state, key) => {
         mode: ModeType.Exit,
       }
     case CliKeys.WatchMode:
-      await Stdout.write(AnsiEscapes.cursorUp() + AnsiEscapes.eraseDown + (await WatchUsage.print()))
+      await Stdout.write(await WatchUsage.clearAndPrint())
       return {
         ...state,
         mode: ModeType.Waiting,
       }
     case CliKeys.FilterMode:
-      await Stdout.write(AnsiEscapes.clear + (await PatternUsage.print()))
+      await Stdout.write(await PatternUsage.clearAndPrint())
       return {
         ...state,
         value: Character.EmptyString,

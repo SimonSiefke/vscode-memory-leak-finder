@@ -25,6 +25,9 @@ jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
       if (method === 'Stdout.getWatchUsageMessage') {
         return Promise.resolve('watch usage\n')
       }
+      if (method === 'Stdout.getWatchUsageMessageFull') {
+        return Promise.resolve('\u001B[2J\u001B[3J\u001B[H\nwatch usage\n')
+      }
       if (method === 'Stdout.getPatternUsageMessage') {
         return Promise.resolve('pattern usage\n')
       }
@@ -32,6 +35,9 @@ jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
     }),
   }
 })
+
+// Neutralize terminal control sequences for simpler assertions
+// keep real escapes for micro-behaviors like eraseLine/cursorLeft
 
 const Stdout = await import('../src/parts/Stdout/Stdout.ts')
 const HandleStdinDataFilterWaitingMode = await import('../src/parts/HandleStdinDataFilterWaitingMode/HandleStdinDataFilterWaitingMode.ts')
@@ -107,7 +113,7 @@ test('handleStdinDataFilterWaitingMode - escape', async () => {
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Waiting)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
-  expect(Stdout.write).toHaveBeenCalledWith(expect.stringContaining('watch usage'))
+  expect(Stdout.write).toHaveBeenCalledWith('\u001B[2J\u001B[3J\u001B[H\nwatch usage\n')
 })
 
 test('handleStdinDataFilterWaitingMode - home', async () => {
