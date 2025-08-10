@@ -23,7 +23,7 @@ export const handleTestsFinished = async (
   Assert.number(duration)
   Assert.string(filterValue)
   const isWatchMode = StdinDataState.isWatchMode()
-  const message = GetAllTestsFinishedMessage.getAllTestsFinishedMessage(
+  const message = await GetAllTestsFinishedMessage.getAllTestsFinishedMessage(
     passed,
     failed,
     skipped,
