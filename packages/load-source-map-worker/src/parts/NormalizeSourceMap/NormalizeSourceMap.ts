@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from 'fs/promises'
 import path, { basename, dirname, join, resolve } from 'path'
-import { cleanSource } from '../CleanSource/CleanSource.js'
-import { readJson } from '../ReadJson/ReadJson.js'
+import { cleanSource } from '../CleanSource/CleanSource.ts'
+import { readJson } from '../ReadJson/ReadJson.ts'
 
 export const normalizeSourceMap = async (originalPath: string, outFilePath: string): Promise<void> => {
   const data = await readJson(originalPath)

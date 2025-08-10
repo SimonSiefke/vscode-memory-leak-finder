@@ -1,9 +1,9 @@
 import { existsSync } from 'node:fs'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
-import { normalizeSourceMap } from '../NormalizeSourceMap/NormalizeSourceMap.js'
-import * as Root from '../Root/Root.js'
-import { readJson } from '../ReadJson/ReadJson.js'
+import { normalizeSourceMap } from '../NormalizeSourceMap/NormalizeSourceMap.ts'
+import * as Root from '../Root/Root.ts'
+import { readJson } from '../ReadJson/ReadJson.ts'
 
 const prefix = 'data:application/json;base64,'
 
