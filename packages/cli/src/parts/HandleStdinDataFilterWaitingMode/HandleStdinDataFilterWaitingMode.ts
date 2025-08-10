@@ -61,15 +61,14 @@ export const handleStdinDataFilterWaitingMode = async (state: FilterWaitingState
     case AnsiKeys.Home:
     case AnsiKeys.End:
       return state
-    case AnsiKeys.Escape:
-      {
-        const message: string = await WatchUsage.clearAndPrint()
-        return {
-          ...state,
-          mode: ModeType.Waiting,
-          stdout: [...state.stdout, message],
-        }
+    case AnsiKeys.Escape: {
+      const message: string = await WatchUsage.clearAndPrint()
+      return {
+        ...state,
+        mode: ModeType.Waiting,
+        stdout: [...state.stdout, message],
       }
+    }
     case AnsiKeys.ArrowUp:
       const previousFilters = PreviousFilters.get()
       if (previousFilters.length === 0) {
