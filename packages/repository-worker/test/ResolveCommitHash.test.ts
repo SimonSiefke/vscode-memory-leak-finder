@@ -1,7 +1,7 @@
 import { test, expect, jest } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
-import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.js'
-import { resolveCommitHash } from '../src/parts/ResolveCommitHash/ResolveCommitHash.js'
+import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
+import { resolveCommitHash } from '../src/parts/ResolveCommitHash/ResolveCommitHash.ts'
 
 test('resolveCommitHash - returns commitRef when it is already a full commit hash', async () => {
   const fullCommitHash = 'a1b2c3d4e5f6789012345678901234567890abcd'

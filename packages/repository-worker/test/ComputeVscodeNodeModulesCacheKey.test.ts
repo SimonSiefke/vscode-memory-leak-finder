@@ -1,8 +1,8 @@
 import { pathToFileURL } from 'node:url'
 import { test, expect, jest } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
-import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.js'
-import { computeVscodeNodeModulesCacheKey } from '../src/parts/ComputeVscodeNodeModulesCacheKey/ComputeVscodeNodeModulesCacheKey.js'
+import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
+import { computeVscodeNodeModulesCacheKey } from '../src/parts/ComputeVscodeNodeModulesCacheKey/ComputeVscodeNodeModulesCacheKey.ts'
 
 test('computeVscodeNodeModulesCacheKey - returns a string', async () => {
   const mockInvoke = jest.fn()
