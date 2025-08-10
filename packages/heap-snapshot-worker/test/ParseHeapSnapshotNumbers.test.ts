@@ -70,6 +70,7 @@ test.skip('parseHeapSnapshotNumbers - no heap numbers', async () => {
 })
 
 test.skip('parseHeapSnapshotNumbers - with heap numbers', async () => {
+  // prettier-ignore
   const heapsnapshot = {
     snapshot: {
       meta: {

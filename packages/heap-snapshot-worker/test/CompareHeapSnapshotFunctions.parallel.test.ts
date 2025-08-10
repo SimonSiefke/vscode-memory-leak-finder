@@ -5,6 +5,7 @@ import { writeFileSync } from 'node:fs'
 import { compareHeapSnapshotFunctions } from '../src/parts/CompareHeapSnapshotsFunctions/CompareHeapSnapshotsFunctions.js'
 
 const createTestSnapshot = (path, size = 'small') => {
+  // prettier-ignore
   const smallSnapshot = {
     snapshot: {
       meta: {
