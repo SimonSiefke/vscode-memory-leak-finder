@@ -1,8 +1,8 @@
 import { expect, test } from '@jest/globals'
 import * as WatchUsage from '../src/parts/WatchUsage/WatchUsage.ts'
 
-test('print', () => {
-  expect(WatchUsage.print()).toBe(
+test('print', async () => {
+  expect(await WatchUsage.print()).toBe(
     '\n' +
       '\u001B[1mWatch Usage\u001B[22m\n' +
       '\u001B[2m › Press \u001B[22ma\u001B[2m to run all tests.\u001B[22m\n' +
