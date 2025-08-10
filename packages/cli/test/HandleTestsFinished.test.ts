@@ -33,12 +33,7 @@ const Stdout = await import('../src/parts/Stdout/Stdout.ts')
 const HandleTestsFinished = await import('../src/parts/HandleTestsFinished/HandleTestsFinished.ts')
 
 test('handleTestsFinished - no filter value', async () => {
-  const expectedMessage =
-    '\n\u001B[1mTest Suites:\u001B[22m \u001B[1m\u001B[31m1 failed\u001B[39m\u001B[22m, \u001B[1m\u001B[32m2 passed\u001B[39m\u001B[22m, 3 total\n' +
-    '\u001B[1mTime:\u001B[22m        3.000 s\n' +
-    '\u001B[2mRan all test suites.\u001B[22m\n' +
-    '\n' +
-    '\u001B[1mWatch Usage: \u001B[22m\u001B[2mPress \u001B[22mw\u001B[2m to show more.\u001B[22m'
+  const expectedMessage = 'tests finished\n'
 
   mockInvoke.mockResolvedValue(expectedMessage)
 
@@ -48,12 +43,7 @@ test('handleTestsFinished - no filter value', async () => {
 })
 
 test('handleTestsFinished - with filter value', async () => {
-  const expectedMessage =
-    '\n\u001B[1mTest Suites:\u001B[22m \u001B[1m\u001B[31m1 failed\u001B[39m\u001B[22m, \u001B[1m\u001B[32m2 passed\u001B[39m\u001B[22m, 3 total\n' +
-    '\u001B[1mTime:\u001B[22m        3.000 s\n' +
-    '\u001B[2mRan all test suites matching\u001B[22m /abc/i\u001B[2m.\u001B[22m\n' +
-    '\n' +
-    '\u001B[1mWatch Usage: \u001B[22m\u001B[2mPress \u001B[22mw\u001B[2m to show more.\u001B[22m'
+  const expectedMessage = 'tests finished with filter\n'
 
   mockInvoke.mockResolvedValue(expectedMessage)
 
@@ -63,13 +53,7 @@ test('handleTestsFinished - with filter value', async () => {
 })
 
 test('handleTestsFinished - with leak', async () => {
-  const expectedMessage =
-    '\n' +
-    '\u001B[1mTest Suites:\u001B[22m \u001B[1m\u001B[31m1 failed\u001B[39m\u001B[22m, \u001B[1m\u001B[32m2 passed\u001B[39m\u001B[22m, \u001B[1m\u001B[34m1 leaked\u001B[39m\u001B[22m, 4 total\n' +
-    '\u001B[1mTime:\u001B[22m        3.000 s\n' +
-    '\u001B[2mRan all test suites.\u001B[22m\n' +
-    '\n' +
-    '\u001B[1mWatch Usage: \u001B[22m\u001B[2mPress \u001B[22mw\u001B[2m to show more.\u001B[22m'
+  const expectedMessage = 'tests finished with leak\n'
 
   mockInvoke.mockResolvedValue(expectedMessage)
 
