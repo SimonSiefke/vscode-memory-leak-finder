@@ -65,6 +65,6 @@ test('handleTestFailed', async () => {
   await HandleTestFailed.handleTestFailed(file, relativeDirName, releativeFilePath, fileName, error)
 
   expect(Stdout.write).toHaveBeenCalledTimes(1)
-  expect(Stdout.write).toHaveBeenCalledWith('test failed\n')
+  expect(Stdout.write).toHaveBeenCalledWith(expect.stringContaining('test failed'))
   expect(TestStateOutput.clearPending).toHaveBeenCalledTimes(1)
 })

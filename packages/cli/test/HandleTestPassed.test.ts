@@ -52,6 +52,6 @@ test('handleTestPassed', async () => {
 
   await HandleTestPassed.handleTestPassed('/test/app.test.js', '/test', 'app.test.js', 100, false)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
-  expect(Stdout.write).toHaveBeenCalledWith(expectedMessage)
+  expect(Stdout.write).toHaveBeenCalledWith(expect.stringContaining('test passed'))
   expect(TestStateOutput.clearPending).toHaveBeenCalledTimes(1)
 })

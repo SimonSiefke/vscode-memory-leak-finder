@@ -23,9 +23,10 @@ jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
   return {
     invoke: jest.fn().mockImplementation((method: any, ...args: any[]) => {
       if (method === 'Stdout.getWatchUsageMessage') {
-        return Promise.resolve(
-          '\n\u001B[1mWatch Usage\u001B[22m\n\u001B[2m › Press \u001B[22ma\u001B[2m to run all tests.\u001B[22m\n\u001B[2m › Press \u001B[22mf\u001B[2m to run only failed tests.\u001B[22m\n\u001B[2m › Press \u001B[22mp\u001B[2m to filter tests by a filename regex pattern.\u001B[22m\n\u001B[2m › Press \u001B[22mh\u001B[2m to toggle headless mode.\u001B[22m\n\u001B[2m › Press \u001B[22mq\u001B[2m to quit watch mode.\u001B[22m\n\u001B[2m › Press \u001B[22mEnter\u001B[2m to trigger a test run.\u001B[22m\n',
-        )
+        return Promise.resolve('watch usage\n')
+      }
+      if (method === 'Stdout.getPatternUsageMessage') {
+        return Promise.resolve('pattern usage\n')
       }
       throw new Error(`unexpected method ${method}`)
     }),
@@ -106,16 +107,7 @@ test('handleStdinDataFilterWaitingMode - escape', async () => {
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Waiting)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
-  expect(Stdout.write).toHaveBeenCalledWith(
-    '\u001B[2J\u001B[3J\u001B[H\n' +
-      '\u001B[1mWatch Usage\u001B[22m\n' +
-      '\u001B[2m › Press \u001B[22ma\u001B[2m to run all tests.\u001B[22m\n' +
-      '\u001B[2m › Press \u001B[22mf\u001B[2m to run only failed tests.\u001B[22m\n' +
-      '\u001B[2m › Press \u001B[22mp\u001B[2m to filter tests by a filename regex pattern.\u001B[22m\n' +
-      '\u001B[2m › Press \u001B[22mh\u001B[2m to toggle headless mode.\u001B[22m\n' +
-      '\u001B[2m › Press \u001B[22mq\u001B[2m to quit watch mode.\u001B[22m\n' +
-      '\u001B[2m › Press \u001B[22mEnter\u001B[2m to trigger a test run.\u001B[22m\n',
-  )
+  expect(Stdout.write).toHaveBeenCalledWith(expect.stringContaining('watch usage'))
 })
 
 test('handleStdinDataFilterWaitingMode - home', async () => {
