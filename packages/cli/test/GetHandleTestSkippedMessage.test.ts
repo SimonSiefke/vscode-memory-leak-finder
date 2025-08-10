@@ -29,13 +29,13 @@ test('getHandleTestSkippedMessage - different duration', async () => {
   expect(result).toContain('1.500 s')
 })
 
-test('getHandleTestSkippedMessage - zero duration', () => {
+test('getHandleTestSkippedMessage - zero duration', async () => {
   const file = '/test/util.test.js'
   const relativeDirName = '/test'
   const fileName = 'util.test.js'
   const duration = 0
 
-  const result = GetHandleTestSkippedMessage.getHandleTestSkippedMessage(file, relativeDirName, fileName, duration)
+  const result = await GetHandleTestSkippedMessage.getHandleTestSkippedMessage(file, relativeDirName, fileName, duration)
 
   expect(result).toContain('util.test.js')
   expect(result).toContain('0.000 s')
