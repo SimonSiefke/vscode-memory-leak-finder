@@ -1,13 +1,13 @@
 import { expect, test, jest } from '@jest/globals'
 
 // Mock the LaunchFileSystemWorker module
-const mockLaunchFileSystemWorker = jest.fn()
+const mockLaunchFileSystemWorker = jest.fn() as any
 jest.unstable_mockModule('../src/parts/LaunchFileSystemWorker/LaunchFileSystemWorker.js', () => ({
   launchFileSystemWorker: mockLaunchFileSystemWorker,
 }))
 
 // Mock the NodeWorkerRpcClient
-const mockCreate = jest.fn()
+const mockCreate = jest.fn() as any
 jest.unstable_mockModule('@lvce-editor/rpc', () => ({
   NodeWorkerRpcClient: {
     create: mockCreate,
