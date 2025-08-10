@@ -2,7 +2,7 @@
   "name": "@vscode-memory-leak-finder/injected-code",
   "version": "0.0.0-dev",
   "description": "",
-  "main": "src/main.js",
+  "main": "src/main.ts",
   "type": "module",
   "scripts": {
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
@@ -11,20 +11,14 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "devDependencies": {},
+  "devDependencies": {
+    "@jest/globals": "^30.0.5",
+    "@types/babel__code-frame": "^7.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.1.0",
+    "ts-jest": "^29.4.1"
+  },
   "dependencies": {
     "@lvce-editor/assert": "^1.4.0"
-  },
-  "jest": {
-    "injectGlobals": false,
-    "collectCoverage": true,
-    "coverageThreshold": {
-      "global": {
-        "branches": 50,
-        "functions": 80,
-        "lines": 80,
-        "statements": 80
-      }
-    }
   }
 }

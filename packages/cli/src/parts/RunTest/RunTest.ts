@@ -9,14 +9,14 @@ export const state: State = {
   testCoordinator: undefined,
 }
 
-export const cleanup = () => {
+export const cleanup = (): void => {
   if (state.testCoordinator) {
     state.testCoordinator.dispose()
     state.testCoordinator = undefined
   }
 }
 
-export const prepare = async () => {
+export const prepare = async (): Promise<Rpc> => {
   // TODO race condition
   if (!state.testCoordinator) {
     state.testCoordinator = await CreateTestCoordinatorAndListen.createTestCoordinatorAndListen()

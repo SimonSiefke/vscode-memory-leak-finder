@@ -9,6 +9,7 @@ test('should count DOM timers from heap snapshot file', async () => {
   const tempDir = tmpdir()
   const tempFile = join(tempDir, 'test-heap-snapshot.json')
 
+  // prettier-ignore
   const heapSnapshotData = {
     snapshot: {
       meta: {

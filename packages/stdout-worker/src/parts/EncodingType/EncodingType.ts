@@ -1,1 +1,1 @@
-export const Utf8 = 'utf8'
+export const Utf8: string = 'utf8'
