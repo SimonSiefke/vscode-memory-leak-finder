@@ -168,13 +168,17 @@ async function debugNumberNodes() {
               console.log(`  Edge ${i}: type=${edgeTypeName}(${edgeType}), name="${edgeName}", toNode=${edgeToNodeIndex}`)
 
               // If this is an internal edge, check what it points to
-              if (edgeType === 0) {
-                // internal edge type
+              if (edgeType === 3) { // internal edge type (3 in this snapshot)
                 const referencedNode = parseNode(edgeToNodeIndex, nodes, nodeFields)
                 if (referencedNode) {
                   const referencedTypeName = nodeTypeNames[referencedNode.type] || 'unknown'
                   const referencedName = strings[referencedNode.name] || 'undefined'
                   console.log(`    → References ${referencedTypeName} node: ${referencedName}`)
+                  
+                  // If this is a string node with a numeric value, that's what we want!
+                  if (referencedTypeName === 'string' && !isNaN(Number(referencedName))) {
+                    console.log(`    ✓ Found numeric string value: ${referencedName}`)
+                  }
                 }
               }
             }

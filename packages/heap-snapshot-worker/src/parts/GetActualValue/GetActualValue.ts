@@ -27,15 +27,8 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
   const edgeFields = meta.edge_fields
 
   const ITEMS_PER_NODE = nodeFields.length
-  const ITEMS_PER_EDGE = edgeFields.length
-
   // Get field indices
   const idFieldIndex = nodeFields.indexOf('id')
-  const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
-
-  const edgeTypeFieldIndex = edgeFields.indexOf('type')
-  const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
-  const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
 
   // Get edge type names
   const edgeTypes = meta.edge_types[0] || []
@@ -45,8 +38,6 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
   const nodeTypeNames = nodeTypes[0] || []
   const NODE_TYPE_STRING = nodeTypeNames.indexOf('string')
   const NODE_TYPE_NUMBER = nodeTypeNames.indexOf('number')
-  const NODE_TYPE_OBJECT = nodeTypeNames.indexOf('object')
-  const NODE_TYPE_ARRAY = nodeTypeNames.indexOf('array')
 
   const nodeType = targetNode.type
   const nodeTypeName = getNodeTypeName(targetNode, nodeTypes)
@@ -67,7 +58,7 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
     const numberVisited = new Set<number>()
     const numberValue = getNumberValue(targetNode, snapshot, edgeMap, numberVisited)
     if (numberValue !== null) {
-      return numberValue
+      return String(numberValue)
     }
 
     // If we can't get the actual value, provide more context about the node
@@ -140,7 +131,7 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
               const nestedNumberVisited = new Set<number>()
               const nestedNumberValue = getNumberValue(referencedNode, snapshot, edgeMap, nestedNumberVisited)
               if (nestedNumberValue !== null) {
-                return nestedNumberValue
+                return String(nestedNumberValue)
               }
             }
           }

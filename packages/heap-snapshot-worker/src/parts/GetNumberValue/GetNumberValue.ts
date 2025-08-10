@@ -10,14 +10,14 @@ import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
  * @param snapshot - The heap snapshot data
  * @param edgeMap - The edge map for fast lookups
  * @param visited - Set of visited node IDs to prevent circular references
- * @returns The actual numeric value as a string, or null if not found
+ * @returns The actual numeric value as a number, or null if not found
  */
 export const getNumberValue = (
   targetNode: any,
   snapshot: Snapshot,
   edgeMap: Uint32Array,
   visited: Set<number> = new Set(),
-): string | null => {
+): number | null => {
   if (!targetNode || visited.has(targetNode.id)) {
     return null
   }
@@ -62,7 +62,7 @@ export const getNumberValue = (
 
   // Check if the name is a valid number (SMI case)
   if (nodeName && nodeName !== '(heap number)' && !isNaN(Number(nodeName))) {
-    return nodeName
+    return Number(nodeName)
   }
 
   // For heap numbers and smi numbers, try to find the actual value through edges
@@ -93,15 +93,15 @@ export const getNumberValue = (
               const referencedType = referencedNode.type
               const referencedName = getNodeName(referencedNode, strings)
 
-              // If we find a string that looks like a number, that's likely the actual value
-              if (referencedType === NODE_TYPE_STRING && referencedName && !isNaN(Number(referencedName))) {
-                return referencedName
-              }
+                          // If we find a string that looks like a number, that's likely the actual value
+            if (referencedType === NODE_TYPE_STRING && referencedName && !isNaN(Number(referencedName))) {
+              return Number(referencedName)
+            }
 
               // If we find another number node, recursively get its value
               if (referencedType === NODE_TYPE_NUMBER && referencedName && referencedName !== '(heap number)') {
                 if (!isNaN(Number(referencedName))) {
-                  return referencedName
+                  return Number(referencedName)
                 }
               }
             }
@@ -116,13 +116,13 @@ export const getNumberValue = (
 
             // If we find a string that looks like a number, that's likely the actual value
             if (referencedType === NODE_TYPE_STRING && referencedName && !isNaN(Number(referencedName))) {
-              return referencedName
+              return Number(referencedName)
             }
 
             // If we find another number node, recursively get its value
             if (referencedType === NODE_TYPE_NUMBER && referencedName && referencedName !== '(heap number)') {
               if (!isNaN(Number(referencedName))) {
-                return referencedName
+                return Number(referencedName)
               }
             }
           }
@@ -148,7 +148,7 @@ export const getNumberValue = (
             if (edgeType === EDGE_TYPE_INTERNAL && edgeNameIndex < strings.length) {
               const edgeName = strings[edgeNameIndex]
               if (edgeName && edgeName !== '' && !isNaN(Number(edgeName))) {
-                return edgeName
+                return Number(edgeName)
               }
             }
           }
@@ -164,7 +164,7 @@ export const getNumberValue = (
 
           // Check if the edge name itself is a number
           if (edgeName && !isNaN(Number(edgeName))) {
-            return edgeName
+            return Number(edgeName)
           }
 
           // Follow the edge to see if it points to a string with the numeric value
@@ -175,7 +175,7 @@ export const getNumberValue = (
             const referencedName = getNodeName(referencedNode, strings)
 
             if (referencedType === NODE_TYPE_STRING && referencedName && !isNaN(Number(referencedName))) {
-              return referencedName
+              return Number(referencedName)
             }
           }
         }
@@ -185,7 +185,7 @@ export const getNumberValue = (
       for (const edge of nodeEdges) {
         const edgeName = strings[edge.nameIndex] || ''
         if (edgeName && !isNaN(Number(edgeName))) {
-          return edgeName
+          return Number(edgeName)
         }
       }
 
@@ -194,7 +194,7 @@ export const getNumberValue = (
         if (edge.nameIndex < strings.length) {
           const edgeName = strings[edge.nameIndex]
           if (edgeName && !isNaN(Number(edgeName))) {
-            return edgeName
+            return Number(edgeName)
           }
         }
       }
@@ -203,7 +203,7 @@ export const getNumberValue = (
 
   // Fallback: return the name if it's a valid number
   if (nodeName && !isNaN(Number(nodeName))) {
-    return nodeName
+    return Number(nodeName)
   }
 
   return null
