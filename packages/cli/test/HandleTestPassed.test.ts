@@ -13,7 +13,7 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
 })
 
 jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => ({
-  isGithubActions: () => false,
+  isGithubActions: () => true,
   setTestStateChange: () => {},
   isBuffering: () => false,
   setBuffering: () => {},
@@ -31,8 +31,11 @@ jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
   const mockRpc = MockRpc.create({
     commandMap: {},
     invoke: (method: string) => {
+      if (method === 'Stdout.getClear') {
+        return '\u001B[2J\u001B[3J\u001B[H'
+      }
       if (method === 'Stdout.getHandleTestPassedMessage') {
-        return '\r\u001B[K\r\u001B[1A\r\u001B[K\r\u001B[1A\u001B[0m\u001B[7m\u001B[1m\u001B[32m PASS \u001B[39m\u001B[22m\u001B[27m\u001B[0m \u001B[2m/test/\u001B[22m\u001B[1mapp.test.js\u001B[22m (0.100 s)\n'
+        return '[ansi-clear] test passed'
       }
       throw new Error(`unexpected method ${method}`)
     },

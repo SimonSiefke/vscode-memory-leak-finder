@@ -26,7 +26,7 @@ jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
         return Promise.resolve('watch usage\n')
       }
       if (method === 'Stdout.getWatchUsageMessageFull') {
-        return Promise.resolve('\u001B[2J\u001B[3J\u001B[H\nwatch usage\n')
+        return Promise.resolve('[ansi-clear]\nwatch usage\n')
       }
       if (method === 'Stdout.getPatternUsageMessage') {
         return Promise.resolve('pattern usage\n')
@@ -113,7 +113,7 @@ test('handleStdinDataFilterWaitingMode - escape', async () => {
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Waiting)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
-  expect(Stdout.write).toHaveBeenCalledWith('\u001B[2J\u001B[3J\u001B[H\nwatch usage\n')
+  expect(Stdout.write).toHaveBeenCalledWith('[ansi-clear]\nwatch usage\n')
 })
 
 test('handleStdinDataFilterWaitingMode - home', async () => {

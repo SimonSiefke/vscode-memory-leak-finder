@@ -30,6 +30,9 @@ jest.unstable_mockModule('../src/parts/TestStateOutput/TestStateOutput.ts', () =
 jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
   return {
     invoke: jest.fn().mockImplementation((method: any, ...args: any[]) => {
+      if (method === 'Stdout.getClear') {
+        return '[ansi-clear]'
+      }
       if (method === 'Stdout.getHandleTestFailedMessage') {
         return Promise.resolve('test failed\n')
       }

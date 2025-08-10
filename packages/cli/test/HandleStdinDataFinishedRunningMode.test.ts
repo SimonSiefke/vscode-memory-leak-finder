@@ -27,27 +27,20 @@ jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
         return Promise.resolve('watch usage\n')
       }
       if (method === 'Stdout.getWatchUsageMessageFull') {
-        return Promise.resolve('\u001B[2J\u001B[3J\u001B[H\nwatch usage\n')
+        return Promise.resolve('[ansi-clear]\nwatch usage\n')
       }
       if (method === 'Stdout.getPatternUsageMessage') {
         return Promise.resolve('pattern usage\n')
       }
       if (method === 'Stdout.getPatternUsageMessageFull') {
-        return Promise.resolve('\u001B[2J\u001B[3J\u001B[H\npattern usage\n')
+        return Promise.resolve('[ansi-clear]\npattern usage\n')
       }
       throw new Error(`unexpected method ${method}`)
     }),
   }
 })
 
-// Neutralize terminal control sequences for simpler assertions
-jest.unstable_mockModule('../src/parts/AnsiEscapes/AnsiEscapes.ts', () => {
-  return {
-    cursorUp: () => '',
-    eraseDown: '',
-    clear: '',
-  }
-})
+// no ansi module mocking needed; worker returns placeholders
 
 const Stdout = await import('../src/parts/Stdout/Stdout.ts')
 const HandleStdinDataFinishedRunningMode = await import(
@@ -63,7 +56,7 @@ test('handleStdinDataFinishedRunningMode - show watch mode details', async () =>
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.Waiting)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
-  expect(Stdout.write).toHaveBeenCalledWith('\u001B[2J\u001B[3J\u001B[H\nwatch usage\n')
+  expect(Stdout.write).toHaveBeenCalledWith('[ansi-clear]\nwatch usage\n')
 })
 
 test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
@@ -75,7 +68,7 @@ test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.FilterWaiting)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
-  expect(Stdout.write).toHaveBeenCalledWith('\u001B[2J\u001B[3J\u001B[H\npattern usage\n')
+  expect(Stdout.write).toHaveBeenCalledWith('[ansi-clear]\npattern usage\n')
 })
 
 test('handleStdinDataFinishedRunningMode - quit', async () => {
