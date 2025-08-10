@@ -2,7 +2,7 @@
   "name": "@vscode-memory-leak-finder/download-worker",
   "version": "0.0.0-dev",
   "description": "",
-  "main": "src/main.js",
+  "main": "src/main.ts",
   "type": "module",
   "bin": {
     "download-worker": "bin/download-worker.js"
@@ -23,7 +23,31 @@
     "extract-zip": "^2.0.1",
     "got": "^14.4.7"
   },
+  "devDependencies": {
+    "ts-jest": "^29.4.1",
+    "@jest/globals": "^30.0.5"
+  },
   "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.ts$": [
+        "ts-jest",
+        {
+          "useESM": true
+        }
+      ]
+    },
+    "extensionsToTreatAsEsm": [
+      ".ts"
+    ],
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    },
+    "testMatch": [
+      "<rootDir>/test/**/*.ts",
+      "<rootDir>/test/**/*.js"
+    ],
     "injectGlobals": false,
     "collectCoverage": true,
     "coverageThreshold": {
