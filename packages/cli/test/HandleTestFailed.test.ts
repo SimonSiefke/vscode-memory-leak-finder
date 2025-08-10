@@ -41,9 +41,6 @@ jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
 const Stdout = await import('../src/parts/Stdout/Stdout.ts')
 const TestStateOutput = await import('../src/parts/TestStateOutput/TestStateOutput.ts')
 const HandleTestFailed = await import('../src/parts/HandleTestFailed/HandleTestFailed.ts')
-const GetHandleTestFailedMessage = await import('../src/parts/GetHandleTestFailedMessage/GetHandleTestFailedMessage.ts')
-const GetTestClearMessage = await import('../src/parts/GetTestClearMessage/GetTestClearMessage.ts')
-const AnsiEscapes = await import('../src/parts/AnsiEscapes/AnsiEscapes.ts')
 
 test('handleTestFailed', async () => {
   const file: string = '/test/e2e/src/sample.close-window.js'
