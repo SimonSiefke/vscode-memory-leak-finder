@@ -1,20 +1,25 @@
 import { Worker } from 'node:worker_threads'
 
+interface WorkerMessage {
+  error?: string
+  result?: any
+}
+
 /**
  * Waits for a result from the worker, either a message or exit event
- * @param {Worker} worker - The worker to wait for
- * @returns {Promise<any>} - The result from the worker
+ * @param worker - The worker to wait for
+ * @returns The result from the worker
  */
-export const waitForResult = (worker) => {
-  const { promise, resolve, reject } = Promise.withResolvers()
+export const waitForResult = (worker: Worker): Promise<any> => {
+  const { promise, resolve, reject } = Promise.withResolvers<any>()
 
-  const cleanup = () => {
+  const cleanup = (): void => {
     // Clean up listeners
     worker.off('message', messageHandler)
     worker.off('exit', exitHandler)
   }
 
-  const messageHandler = (message) => {
+  const messageHandler = (message: WorkerMessage): void => {
     cleanup()
     if (message.error) {
       reject(new Error(message.error))
@@ -23,7 +28,7 @@ export const waitForResult = (worker) => {
     }
   }
 
-  const exitHandler = (code) => {
+  const exitHandler = (code: number): void => {
     cleanup()
     if (code !== 0) {
       reject(new Error(`Worker stopped with exit code ${code}`))

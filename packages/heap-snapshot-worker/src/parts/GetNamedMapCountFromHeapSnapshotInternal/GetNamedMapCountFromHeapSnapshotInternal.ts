@@ -1,9 +1,17 @@
+import type { Snapshot } from '../Snapshot/Snapshot.js'
+
+interface NamedMapResult {
+  id: number
+  name: string | string[]
+  size: number
+}
+
 /**
  *
- * @param {any} snapshot
- * @returns {Array<{id: number, name: string|string[], size: number}>}
+ * @param snapshot
+ * @returns Array of named map results with id, name, and size
  */
-export const getNamedMapCountFromHeapSnapshotInternal = (snapshot) => {
+export const getNamedMapCountFromHeapSnapshotInternal = (snapshot: Snapshot): NamedMapResult[] => {
   const { nodes, strings, edges, meta } = snapshot
   const { node_fields, edge_fields } = meta
 
@@ -17,7 +25,7 @@ export const getNamedMapCountFromHeapSnapshotInternal = (snapshot) => {
   }
 
   // Find all Map objects
-  const mapNodes = []
+  const mapNodes: Array<{ nodeIndex: number; id: number; edgeCount: number }> = []
   for (let i = 0; i < nodes.length; i += ITEMS_PER_NODE) {
     const nodeType = nodes[i]
     const nodeNameIndex = nodes[i + 1]
@@ -34,10 +42,10 @@ export const getNamedMapCountFromHeapSnapshotInternal = (snapshot) => {
   }
 
   // For each Map object, find its names and size
-  const result = []
+  const result: NamedMapResult[] = []
 
   for (const mapNode of mapNodes) {
-    const names = new Set()
+    const names = new Set<string>()
     let size = 0
 
     // Find edges that point to this Map object

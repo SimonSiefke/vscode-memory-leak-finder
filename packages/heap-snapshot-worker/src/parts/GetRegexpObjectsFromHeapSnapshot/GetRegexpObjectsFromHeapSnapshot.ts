@@ -1,11 +1,12 @@
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.js'
 import { getRegexpObjectsFromHeapSnapshotInternal } from '../GetRegexpObjectsFromHeapSnapshotInternal/GetRegexpObjectsFromHeapSnapshotInternal.js'
+import type { Snapshot } from '../Snapshot/Snapshot.js'
 
 /**
- * @param {string} pathUri
- * @returns {Promise<Array>}
+ * @param pathUri
+ * @returns Promise<Array>
  */
-export const getRegexpObjectsFromHeapSnapshot = async (pathUri) => {
+export const getRegexpObjectsFromHeapSnapshot = async (pathUri: string): Promise<any[]> => {
   const snapshot = await prepareHeapSnapshot(pathUri, {
     parseStrings: true,
   })
