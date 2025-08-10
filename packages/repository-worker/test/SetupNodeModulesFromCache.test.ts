@@ -1,6 +1,6 @@
 import { expect, test, jest } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
-import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
+import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.s'
 import { setupNodeModulesFromCache } from '../src/parts/SetupNodeModulesFromCache/SetupNodeModulesFromCache.ts'
 
 test('setupNodeModulesFromCache throws VError when no cache exists', async () => {

@@ -1,6 +1,6 @@
 import { expect, test, jest } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
-import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
+import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.s'
 import { getFilesHash } from '../src/parts/GetFilesHash/GetFilesHash.ts'
 
 test('getFilesHash returns hash of file contents', async () => {

@@ -1,5 +1,5 @@
 import { VError } from '@lvce-editor/verror'
-import { readFileContent } from '../FileSystemWorker/FileSystemWorker.ts'
+import { readFileContent } from '../FileSystemWorker/FileSystemWorker.s'
 import { getHash } from '../GetHash/GetHash.ts'
 
 export const getFilesHash = async (absolutePaths) => {
