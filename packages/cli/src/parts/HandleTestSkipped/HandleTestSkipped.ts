@@ -3,5 +3,5 @@ import * as HandleTestStateChange from '../HandleTestStateChange/HandleTestState
 
 export const handleTestSkipped = async (file: string, relativeDirName: string, fileName: string, duration: number): Promise<void> => {
   const message = await GetHandleTestSkippedMessage.getHandleTestSkippedMessage(file, relativeDirName, fileName, duration)
-  HandleTestStateChange.handleTestStateChange(message)
+  await HandleTestStateChange.handleTestStateChange(message)
 }
