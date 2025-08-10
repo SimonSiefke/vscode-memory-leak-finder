@@ -1,3 +1,11 @@
+export interface HeapSnapshotNode {
+  id: number
+  type: string
+  name: string
+  edgeCount: number
+  [key: string]: any
+}
+
 export const createHeapSnapshotNode = (
   array: any[],
   startIndex: number,
@@ -8,8 +16,8 @@ export const createHeapSnapshotNode = (
   indexMultiplierKey: string,
   indexMultiplier: number,
   strings: string[],
-): Record<string, any> => {
-  const node: Record<string, any> = Object.create(null)
+): HeapSnapshotNode => {
+  const node: HeapSnapshotNode = Object.create(null)
   const nodeFieldCount = nodeFields.length
   for (let j = 0; j < nodeFieldCount; j++) {
     const key = nodeFields[j]

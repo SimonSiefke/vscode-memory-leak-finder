@@ -1,6 +1,5 @@
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.js'
 import { getRegexpObjectsFromHeapSnapshotInternal } from '../GetRegexpObjectsFromHeapSnapshotInternal/GetRegexpObjectsFromHeapSnapshotInternal.js'
-import type { Snapshot } from '../Snapshot/Snapshot.js'
 
 /**
  * @param pathUri

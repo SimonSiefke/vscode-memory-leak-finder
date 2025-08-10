@@ -30,7 +30,11 @@ const emptyItem: EmptyItem = {
   count: 0,
 }
 
-export const compareHeapSnapshotFunctionsInternal = (result1: Result, result2: Result, locationFields: LocationFields): ComparisonResult[] => {
+export const compareHeapSnapshotFunctionsInternal = (
+  result1: Result,
+  result2: Result,
+  locationFields: LocationFields,
+): ComparisonResult[] => {
   const { itemsPerLocation, scriptIdOffset, lineOffset, columnOffset } = getLocationFieldOffsets(locationFields)
   const map1 = result1.map
   const map2 = result2.map

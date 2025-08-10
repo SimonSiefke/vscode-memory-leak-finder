@@ -32,7 +32,7 @@ export const computeHeapSnapshotIndices = (
   node_types: readonly any[],
   node_fields: readonly any[],
   edge_types: readonly any[],
-  edge_fields: readonly any[]
+  edge_fields: readonly any[],
 ): HeapSnapshotIndices => {
   // Type indices
   const objectTypeIndex = node_types[0].indexOf('object')

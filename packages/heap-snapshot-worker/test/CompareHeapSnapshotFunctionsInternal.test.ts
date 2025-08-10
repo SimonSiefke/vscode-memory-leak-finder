@@ -9,6 +9,7 @@ test('compareHeapSnapshots - no leaks', () => {
         index: 0,
       },
     },
+    locations: new Uint32Array([1, 0, 0, 0]),
   }
   const result2 = {
     map: {
@@ -33,6 +34,7 @@ test('compareHeapSnapshots - one function count increased', () => {
         index: 0,
       },
     },
+    locations: new Uint32Array([1, 0, 0, 0]),
   }
   const result2 = {
     map: {
