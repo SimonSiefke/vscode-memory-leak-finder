@@ -1,20 +1,15 @@
 import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
 import * as CliKeys from '../CliKeys/CliKeys.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
-import * as PatternUsage from '../PatternUsage/PatternUsage.ts'
-import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
 import * as Character from '../Character/Character.ts'
+import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
+import * as PatternUsage from '../PatternUsage/PatternUsage.ts'
+import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 
-export interface FinishedRunningState {
-  value: string
-  mode: number
-  stdout: string[]
-  headless?: boolean
-  // Allow additional properties carried through state
-  [key: string]: any
-}
-
-export const handleStdinDataFinishedRunningMode = async (state: FinishedRunningState, key: string): Promise<FinishedRunningState> => {
+export const handleStdinDataFinishedRunningMode = async (
+  state: StdinDataState.StdinDataState,
+  key: string,
+): Promise<StdinDataState.StdinDataState> => {
   const currentStdout = state.stdout
 
   switch (key) {
@@ -23,6 +18,7 @@ export const handleStdinDataFinishedRunningMode = async (state: FinishedRunningS
       return {
         ...state,
         mode: ModeType.Exit,
+        stdout: currentStdout,
       }
     case CliKeys.WatchMode: {
       const message = await WatchUsage.clearAndPrint()
@@ -45,19 +41,22 @@ export const handleStdinDataFinishedRunningMode = async (state: FinishedRunningS
       return {
         ...state,
         mode: ModeType.Exit,
+        stdout: currentStdout,
       }
     case CliKeys.ToggleHeadlessMode:
       return {
         ...state,
         headless: !state.headless,
         mode: ModeType.Running,
+        stdout: currentStdout,
       }
     case AnsiKeys.Enter:
       return {
         ...state,
         mode: ModeType.Running,
+        stdout: currentStdout,
       }
     default:
-      return { ...state }
+      return { ...state, stdout: currentStdout }
   }
 }
