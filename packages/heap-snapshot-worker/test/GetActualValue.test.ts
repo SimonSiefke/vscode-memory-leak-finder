@@ -259,7 +259,7 @@ test('getActualValue - should handle unknown node types', () => {
 
   // Test unknown node type
   const unknownNode = { type: 0, name: 0, id: 1 }
-  expect(getActualValue(unknownNode, snapshot, edgeMap)).toBe('[unknown 1]')
+  expect(getActualValue(unknownNode, snapshot, edgeMap)).toBe('[Unknown 1]')
 
   // Test custom node type
   const customNode = { type: 1, name: 1, id: 2 }
