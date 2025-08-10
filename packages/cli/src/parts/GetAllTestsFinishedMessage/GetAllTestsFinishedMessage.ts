@@ -17,7 +17,16 @@ const getRanAllTestSuitesMessage = (filterValue: string): string => {
   return `${ranAllTestSuitsMatching} /${filterValue}/i${dot}`
 }
 
-export const getAllTestsFinishedMessage = (passed: number, failed: number, skipped: number, leaked: number, total: number, duration: number, filterValue: string, isWatchMode: boolean): string => {
+export const getAllTestsFinishedMessage = (
+  passed: number,
+  failed: number,
+  skipped: number,
+  leaked: number,
+  total: number,
+  duration: number,
+  filterValue: string,
+  isWatchMode: boolean,
+): string => {
   const failedMessage = failed ? `${chalk.bold.red(`${failed} failed`)}, ` : Character.EmptyString
   const skippedMessage = skipped ? `${chalk.bold.yellow(`${skipped} skipped`)}, ` : Character.EmptyString
   const passedMessage = passed ? `${chalk.bold.green(`${passed} passed`)}, ` : Character.EmptyString
