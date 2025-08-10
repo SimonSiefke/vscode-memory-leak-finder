@@ -9,6 +9,7 @@ export const state = {
   cwd: Character.EmptyString,
   filter: Character.EmptyString,
   headless: false,
+  isGithubActions: false,
   measure: Character.EmptyString,
   mode: ModeType.Waiting,
   recordVideo: false,
@@ -29,6 +30,7 @@ export const setState = (newState) => {
   state.checkLeaks = newState.checkLeaks
   state.cwd = newState.cwd
   state.headless = newState.headless
+  state.isGithubActions = newState.isGithubActions
   state.measure = newState.measure
   state.mode = newState.mode
   state.recordVideo = newState.recordVideo
@@ -45,8 +47,20 @@ export const setState = (newState) => {
   state.workers = newState.workers
 }
 
-export const setBuffering = (value) => {
+export const setBuffering = (value: boolean) => {
   state.buffering = value
+}
+
+export const setTestSetup = () => {
+  state.mode = ModeType.Waiting
+}
+
+export const setTestRunning = () => {
+  state.mode = ModeType.Running
+}
+
+export const setTestStateChange = () => {
+  state.mode = ModeType.Waiting
 }
 
 export const isBuffering = () => {
@@ -55,6 +69,10 @@ export const isBuffering = () => {
 
 export const isWatchMode = () => {
   return state.watch
+}
+
+export const isGithubActions = () => {
+  return state.isGithubActions
 }
 
 export const shouldCheckLeaks = () => {
