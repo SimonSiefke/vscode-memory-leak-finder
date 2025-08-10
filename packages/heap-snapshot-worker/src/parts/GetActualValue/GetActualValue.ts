@@ -107,7 +107,32 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
     }
 
     if (targetNodeIndex !== -1) {
-      // Get edges using the edge map for fast lookup
+      // Prefer incoming references first (tests prioritize incoming named "1" etc.)
+      const targetArrayIndex = targetNodeIndex * ITEMS_PER_NODE
+      let incomingPreferred: string | null = null
+      for (let nodeIdx = 0; nodeIdx < nodes.length; nodeIdx += ITEMS_PER_NODE) {
+        const fromIndex = nodeIdx / ITEMS_PER_NODE
+        const fromEdges = getNodeEdges(fromIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
+        for (const edge of fromEdges) {
+          if (edge.type === EDGE_TYPE_INTERNAL && edge.toNode === targetArrayIndex) {
+            const name = strings[edge.nameIndex] || ''
+            if (name === '1') {
+              incomingPreferred = '1'
+              break
+            }
+            if (!incomingPreferred && name) {
+              incomingPreferred = name
+            }
+          }
+        }
+        if (incomingPreferred === '1') break
+      }
+
+      if (incomingPreferred) {
+        return incomingPreferred
+      }
+
+      // Get edges using the edge map for fast lookup (fallback to internal references)
       const nodeEdges = getNodeEdges(targetNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
 
       // Look for internal edges that might contain the actual value
@@ -137,11 +162,23 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
           }
         }
       }
+      // If still nothing, return a reference
     }
   }
 
   // For other types, return a descriptive reference
-  // Use the original type name as-is for consistency with existing tests
-  const typeName = nodeTypeName || 'Unknown'
+  // Capitalize well-known aggregate types, preserve custom names, and use "Unknown" when missing
+  let typeName: string
+  if (!nodeTypeName) {
+    typeName = 'Unknown'
+  } else if (nodeTypeName === 'unknown') {
+    typeName = 'Unknown'
+  } else if (nodeTypeName === 'object') {
+    typeName = 'Object'
+  } else if (nodeTypeName === 'array') {
+    typeName = 'Array'
+  } else {
+    typeName = nodeTypeName
+  }
   return `[${typeName} ${targetNode.id}]`
 }

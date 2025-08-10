@@ -147,11 +147,11 @@ test('should handle number property values', () => {
     nodes: new Uint32Array([
       // type, name, id, self_size, edge_count, trace_node_id, detachedness
       3, 2, 1, 100, 1, 0, 0,  // Object1
-      6, 3, 2, 50, 0, 0, 0,  // Number value 42 (type 6 = 'number')
+      7, 3, 2, 50, 0, 0, 0,  // Number value 42 (type 7 = 'number')
     ]),
     edges: new Uint32Array([
       // type, name_or_index, to_node
-      2, 1, 1,  // property edge from Object1 to number value (node index 1)
+      2, 1, 7,  // property edge from Object1 to number value (array index 7 = node index 1 * 7 fields)
     ]),
     strings: ['', 'test', 'Object1', '42'],
     locations: new Uint32Array([])

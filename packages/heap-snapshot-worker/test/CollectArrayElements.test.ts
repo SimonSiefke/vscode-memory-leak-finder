@@ -46,7 +46,7 @@ test('collectArrayElements - should collect elements from a simple array', () =>
   const edgeMap = createEdgeMap(snapshot.nodes, snapshot.meta.node_fields)
   const result = collectArrayElements(0, snapshot, edgeMap, 1)
 
-  expect(result).toEqual(['hello', '2'])
+  expect(result).toEqual(['hello', '42'])
 })
 
 test('collectArrayElements - should handle empty array', () => {

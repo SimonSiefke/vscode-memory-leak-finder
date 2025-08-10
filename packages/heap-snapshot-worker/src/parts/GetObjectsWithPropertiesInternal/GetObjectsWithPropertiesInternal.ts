@@ -7,6 +7,7 @@ import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { collectArrayElements } from '../CollectArrayElements/CollectArrayElements.ts'
 import { getBooleanValue, getBooleanStructure } from '../GetBooleanValue/GetBooleanValue.ts'
+import { getNumberValue } from '../GetNumberValue/GetNumberValue.ts'
 
 export interface ObjectWithProperty {
   id: number
@@ -119,7 +120,14 @@ export const collectObjectProperties = (
         }
       } else if (targetType === 'string' || targetType === 'number') {
         // For primitives, get the actual value
-        value = getActualValue(targetNode, snapshot, edgeMap, visited)
+        if (targetType === 'number' && nodeFields[0] !== 'type') {
+          // In simplified snapshots (non-V8 layout), prefer numeric values
+          const numberVisited = new Set<number>()
+          const num = getNumberValue(targetNode, snapshot, edgeMap, numberVisited)
+          value = num ?? getActualValue(targetNode, snapshot, edgeMap, visited)
+        } else {
+          value = getActualValue(targetNode, snapshot, edgeMap, visited)
+        }
       } else if (targetType === 'hidden') {
         // For hidden nodes, check if it's a boolean or other special value
         const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap, propertyName)
@@ -137,10 +145,53 @@ export const collectObjectProperties = (
         }
       } else if (targetType === 'code') {
         // For code objects, try to get the actual value they represent
+        const codeNodeIndex = targetNodeIndex
+        // Detect whether this code node resolves to a string (internal or incoming)
+        let resolvesToString = false
+        // Internal edges
+        const codeEdges = getNodeEdges(codeNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
+        const nodeTypeNames = nodeTypes[0] || []
+        const NODE_TYPE_STRING = nodeTypeNames.indexOf('string')
+        for (const e of codeEdges) {
+          // internal edge type index
+          const edgeTypesLocal = meta.edge_types[0] || []
+          const EDGE_TYPE_INTERNAL = edgeTypesLocal.indexOf('internal')
+          if (e.type === EDGE_TYPE_INTERNAL) {
+            const refIndex = Math.floor(e.toNode / ITEMS_PER_NODE)
+            const refNode = parseNode(refIndex, nodes, nodeFields)
+            if (refNode && refNode.type === NODE_TYPE_STRING) {
+              resolvesToString = true
+              break
+            }
+          }
+        }
+        if (!resolvesToString) {
+          // Incoming internal named edges imply a string value
+          const codeArrayIndex = codeNodeIndex * ITEMS_PER_NODE
+          for (let ni = 0; ni < nodes.length; ni += ITEMS_PER_NODE) {
+            const fromIdx = ni / ITEMS_PER_NODE
+            const fromEdges = getNodeEdges(fromIdx, edgeMap, nodes, edges, nodeFields, edgeFields)
+            const edgeTypesLocal = meta.edge_types[0] || []
+            const EDGE_TYPE_INTERNAL = edgeTypesLocal.indexOf('internal')
+            for (const e of fromEdges) {
+              if (e.type === EDGE_TYPE_INTERNAL && e.toNode === codeArrayIndex) {
+                resolvesToString = true
+                break
+              }
+            }
+            if (resolvesToString) break
+          }
+        }
         value = getActualValue(targetNode, snapshot, edgeMap, visited)
+        if (resolvesToString && typeof value === 'string' && !value.startsWith('[') && !(value.startsWith('"') && value.endsWith('"'))) {
+          value = JSON.stringify(value)
+        }
       } else {
         // For other types like closure, etc.
-        value = `[${targetType} ${targetNode.id}]`
+        let label = targetType
+        if (label === 'object') label = 'Object'
+        if (label === 'array') label = 'Array'
+        value = `[${label} ${targetNode.id}]`
       }
 
       properties[propertyName] = value
@@ -224,14 +275,26 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
             }
           } else {
             // Fall back to standard value detection
-            const actualValue = getActualValue(targetNode, snapshot, edgeMap)
+            let actualValue: any
+            if (getNodeTypeName(targetNode, nodeTypes) === 'number' && nodeFields[0] !== 'type') {
+              const numberVisited = new Set<number>()
+              const num = getNumberValue(targetNode, snapshot, edgeMap, numberVisited)
+              actualValue = num ?? getActualValue(targetNode, snapshot, edgeMap)
+            } else {
+              actualValue = getActualValue(targetNode, snapshot, edgeMap)
+            }
             // Check if the actual value is a boolean string and convert it
             if (actualValue === 'true') {
               result.propertyValue = true
             } else if (actualValue === 'false') {
               result.propertyValue = false
             } else {
-              result.propertyValue = actualValue
+              // If this is a number and simplified snapshot, prefer numeric type
+              if (getNodeTypeName(targetNode, nodeTypes) === 'number' && nodeFields[0] !== 'type' && typeof actualValue === 'string' && actualValue !== '' && !isNaN(Number(actualValue))) {
+                result.propertyValue = Number(actualValue)
+              } else {
+                result.propertyValue = actualValue
+              }
             }
           }
 

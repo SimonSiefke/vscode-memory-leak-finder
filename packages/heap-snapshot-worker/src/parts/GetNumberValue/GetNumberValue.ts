@@ -60,6 +60,14 @@ export const getNumberValue = (
 
   const nodeName = getNodeName(targetNode, strings)
 
+  // Handle snapshots where the numeric value is stored directly in the name field as a number
+  if ((nodeName === null || nodeName === undefined) && typeof targetNode.name === 'number') {
+    const raw = targetNode.name
+    if (Number.isFinite(raw) && raw >= 0 && raw >= strings.length) {
+      return raw
+    }
+  }
+
   // Check if the name is a valid number (SMI case)
   if (nodeName && nodeName !== '(heap number)' && !isNaN(Number(nodeName))) {
     return Number(nodeName)
