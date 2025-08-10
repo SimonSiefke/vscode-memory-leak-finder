@@ -39,7 +39,7 @@ export const create = async (connectionId, isFirstConnection, isHeadless, timeou
       ideVersion: parsedIdeVersion,
     }
     const pageObject = await pageObjectModule.create(pageObjectContext)
-    await pageObject.waitForApplicationToBeReady()
+    await pageObject.WaitForApplicationToBeReady.waitForApplicationToBeReady()
     PageObjectState.set(connectionId, { pageObject, firstWindow })
     if (timeouts === false) {
       await DisableTimeouts.disableTimeouts(firstWindow)
