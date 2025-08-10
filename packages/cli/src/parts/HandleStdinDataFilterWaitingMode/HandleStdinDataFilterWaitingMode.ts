@@ -1,4 +1,4 @@
-import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
 import * as Character from '../Character/Character.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
@@ -18,7 +18,9 @@ export const handleStdinDataFilterWaitingMode = async (state, key) => {
       if (state.value) {
         PreviousFilters.add(state.value)
       }
-      await Stdout.write(AnsiEscapes.eraseLine + AnsiEscapes.cursorLeft)
+      const eraseLine = await StdoutWorker.invoke('Stdout.getEraseLine')
+      const cursorLeft = await StdoutWorker.invoke('Stdout.getCursorLeft')
+      await Stdout.write(eraseLine + cursorLeft)
       return {
         ...state,
         mode: ModeType.Running,
@@ -29,7 +31,9 @@ export const handleStdinDataFilterWaitingMode = async (state, key) => {
       if (!state.value) {
         return state
       }
-      await Stdout.write(AnsiEscapes.cursorBackward(state.value.length) + AnsiEscapes.eraseEndLine)
+      const cursorBackward = await StdoutWorker.invoke('Stdout.getCursorBackward')
+      const eraseEndLine = await StdoutWorker.invoke('Stdout.getEraseEndLine')
+      await Stdout.write(cursorBackward.repeat(state.value.length) + eraseEndLine)
       return {
         ...state,
         value: Character.EmptyString,
@@ -38,7 +42,8 @@ export const handleStdinDataFilterWaitingMode = async (state, key) => {
       if (state.value === Character.EmptyString) {
         return state
       }
-      await Stdout.write(AnsiEscapes.backspace)
+      const backspace = await StdoutWorker.invoke('Stdout.getBackspace')
+      await Stdout.write(backspace)
       return {
         ...state,
         value: state.value.slice(0, -1),
@@ -49,7 +54,7 @@ export const handleStdinDataFilterWaitingMode = async (state, key) => {
     case AnsiKeys.End:
       return state
     case AnsiKeys.Escape:
-      await Stdout.write(AnsiEscapes.clear + '\n' + (await WatchUsage.print()))
+      await Stdout.write(await WatchUsage.clearAndPrint())
       return {
         ...state,
         mode: ModeType.Waiting,
@@ -60,7 +65,9 @@ export const handleStdinDataFilterWaitingMode = async (state, key) => {
         return state
       }
       const top = previousFilters[0]
-      const prefix = state.value ? AnsiEscapes.cursorBackward(state.value.length) + AnsiEscapes.eraseEndLine : ''
+      const cb = await StdoutWorker.invoke('Stdout.getCursorBackward')
+      const eel = await StdoutWorker.invoke('Stdout.getEraseEndLine')
+      const prefix = state.value ? cb.repeat(state.value.length) + eel : ''
       await Stdout.write(prefix + top)
       return {
         ...state,
