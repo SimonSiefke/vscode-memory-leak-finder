@@ -51,7 +51,7 @@ test('initialStart - watch mode - show details', async () => {
     filter: '',
   }
   // @ts-ignore
-  WatchUsage.print.mockImplementation(() => 'watch usage')
+  WatchUsage.print.mockImplementation(async () => 'watch usage')
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledTimes(1)

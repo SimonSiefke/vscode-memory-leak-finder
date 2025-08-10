@@ -3,5 +3,5 @@ import * as HandleTestStateChange from '../HandleTestStateChange/HandleTestState
 
 export const handleTestFailed = async (file, relativeDirName, relativeFilePath, fileName, error) => {
   const message = await GetHandleTestFailedMessage.getHandleTestFailedMessage(file, relativeDirName, relativeFilePath, fileName, error)
-  HandleTestStateChange.handleTestStateChange(message)
+  await HandleTestStateChange.handleTestStateChange(message)
 }

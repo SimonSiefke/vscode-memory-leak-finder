@@ -16,7 +16,7 @@ export const handleStdinDataFinishedRunningMode = async (state, key) => {
         mode: ModeType.Exit,
       }
     case CliKeys.WatchMode:
-      await Stdout.write(AnsiEscapes.cursorUp() + AnsiEscapes.eraseDown + WatchUsage.print())
+      await Stdout.write(AnsiEscapes.cursorUp() + AnsiEscapes.eraseDown + (await WatchUsage.print()))
       return {
         ...state,
         mode: ModeType.Waiting,

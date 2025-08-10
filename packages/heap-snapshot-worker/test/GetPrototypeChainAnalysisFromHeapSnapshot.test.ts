@@ -4,6 +4,7 @@ import * as HeapSnapshotState from '../src/parts/HeapSnapshotState/HeapSnapshotS
 
 test.skip('detectsLongPrototypeChains', async () => {
   // Mock a heap snapshot with long prototype chains
+  // prettier-ignore
   const heapsnapshot = {
     snapshot: {
       meta: {
@@ -145,6 +146,7 @@ test.skip('detectsLongPrototypeChains', async () => {
 
 test.skip('detectsPrototypePollution', async () => {
   // Mock a heap snapshot with prototype pollution
+  // prettier-ignore
   const heapsnapshot = {
     snapshot: {
       meta: {
@@ -229,6 +231,7 @@ test.skip('detectsPrototypePollution', async () => {
 
 test.skip('handlesNormalPrototypeChains', async () => {
   // Mock a heap snapshot with normal, short prototype chains
+  // prettier-ignore
   const heapsnapshot = {
     snapshot: {
       meta: {
