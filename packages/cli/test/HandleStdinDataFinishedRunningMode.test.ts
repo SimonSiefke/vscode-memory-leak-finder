@@ -2,6 +2,7 @@ import { beforeEach, expect, jest, test } from '@jest/globals'
 import * as CliKeys from '../src/parts/CliKeys/CliKeys.ts'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
+import * as StdinDataState from '../src/parts/StdinDataState/StdinDataState.ts'
 
 beforeEach(() => {
   jest.resetModules()
@@ -20,23 +21,15 @@ jest.unstable_mockModule('../src/parts/IsWindows/IsWindows.ts', () => {
   }
 })
 
-jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
+jest.unstable_mockModule('../src/parts/WatchUsage/WatchUsage.ts', () => {
   return {
-    invoke: jest.fn().mockImplementation((method: any, ...args: any[]) => {
-      if (method === 'Stdout.getWatchUsageMessage') {
-        return Promise.resolve('watch usage\n')
-      }
-      if (method === 'Stdout.getWatchUsageMessageFull') {
-        return Promise.resolve('[ansi-clear]\nwatch usage\n')
-      }
-      if (method === 'Stdout.getPatternUsageMessage') {
-        return Promise.resolve('pattern usage\n')
-      }
-      if (method === 'Stdout.getPatternUsageMessageFull') {
-        return Promise.resolve('[ansi-clear]\npattern usage\n')
-      }
-      throw new Error(`unexpected method ${method}`)
-    }),
+    clearAndPrint: jest.fn(),
+  }
+})
+
+jest.unstable_mockModule('../src/parts/PatternUsage/PatternUsage.ts', () => {
+  return {
+    clearAndPrint: jest.fn(),
   }
 })
 
@@ -46,36 +39,45 @@ const Stdout = await import('../src/parts/Stdout/Stdout.ts')
 const HandleStdinDataFinishedRunningMode = await import(
   '../src/parts/HandleStdinDataFinishedRunningMode/HandleStdinDataFinishedRunningMode.ts'
 )
+const WatchUsage = await import('../src/parts/WatchUsage/WatchUsage.ts')
+const PatternUsage = await import('../src/parts/PatternUsage/PatternUsage.ts')
+
+// Remove the local createTestState function - we'll use StdinDataState.createDefaultState instead
 
 test('handleStdinDataFinishedRunningMode - show watch mode details', async () => {
-  const state = {
-    value: '',
-    mode: ModeType.FinishedRunning,
-  }
+  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.FinishedRunning }
   const key = CliKeys.WatchMode
+
+  // Set up the mock implementation after import
+  // @ts-ignore
+  WatchUsage.clearAndPrint.mockResolvedValue('[ansi-clear]\nwatch usage\n')
+
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
+
   expect(newState.mode).toBe(ModeType.Waiting)
-  expect(Stdout.write).toHaveBeenCalledTimes(1)
-  expect(Stdout.write).toHaveBeenCalledWith('[ansi-clear]\nwatch usage\n')
+  expect(newState.stdout?.at(-1)).toBe('[ansi-clear]\nwatch usage\n')
+  // @ts-ignore
+  expect(WatchUsage.clearAndPrint).toHaveBeenCalled()
 })
 
 test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
-  const state = {
-    value: '',
-    mode: ModeType.FinishedRunning,
-  }
+  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.FinishedRunning }
   const key = CliKeys.FilterMode
+
+  // Set up the mock implementation after import
+  // @ts-ignore
+  PatternUsage.clearAndPrint.mockResolvedValue('[ansi-clear]\npattern usage\n')
+
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.FilterWaiting)
-  expect(Stdout.write).toHaveBeenCalledTimes(1)
-  expect(Stdout.write).toHaveBeenCalledWith('[ansi-clear]\npattern usage\n')
+  expect(newState.value).toBe('')
+  expect(newState.stdout?.at(-1)).toBe('[ansi-clear]\npattern usage\n')
+  // @ts-ignore
+  expect(PatternUsage.clearAndPrint).toHaveBeenCalled()
 })
 
 test('handleStdinDataFinishedRunningMode - quit', async () => {
-  const state = {
-    value: '',
-    mode: ModeType.FinishedRunning,
-  }
+  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.FinishedRunning }
   const key = CliKeys.Quit
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
@@ -83,10 +85,7 @@ test('handleStdinDataFinishedRunningMode - quit', async () => {
 })
 
 test('handleStdinDataFinishedRunningMode - run again', async () => {
-  const state = {
-    value: '',
-    mode: ModeType.FinishedRunning,
-  }
+  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.FinishedRunning }
   const key = AnsiKeys.Enter
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.Running)

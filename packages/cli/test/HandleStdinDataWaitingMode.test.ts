@@ -3,16 +3,12 @@ import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
 import * as CliKeys from '../src/parts/CliKeys/CliKeys.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
 
-
-
-
 // TODO: Fix StdoutWorker mocking - these tests are temporarily skipped
 // because the module mocking approach is not working correctly
 
 const HandleStdinDataWaitingMode = await import('../src/parts/HandleStdinDataWaitingMode/HandleStdinDataWaitingMode.ts')
 // Mock Stdout for the skipped tests
 const Stdout = { write: () => {} }
-
 
 test.skip('handleStdinDataWaitingMode - ctrl + c', async () => {
   const state = {
