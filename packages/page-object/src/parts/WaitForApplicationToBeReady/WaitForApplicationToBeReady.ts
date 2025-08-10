@@ -1,5 +1,3 @@
-import { VError } from '../VError/VError.ts'
-
 export interface WaitForApplicationToBeReadyOptions {
   electronApp: {
     firstWindow: () => Promise<any>
@@ -27,15 +25,7 @@ export interface WaitForApplicationToBeReadyOptions {
 }
 
 export const waitForApplicationToBeReady = async (options: WaitForApplicationToBeReadyOptions) => {
-  const {
-    electronApp,
-    isHeadless,
-    isFirstConnection,
-    expect,
-    selectors,
-    eventHandlers,
-    errorHandlers,
-  } = options
+  const { electronApp, isHeadless, isFirstConnection, expect, selectors, eventHandlers, errorHandlers } = options
 
   const firstWindow = await electronApp.firstWindow()
 
