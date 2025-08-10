@@ -51,7 +51,7 @@ export const getNumberValue = (
   const NODE_TYPE_NUMBER = nodeTypeNames.indexOf('number')
 
   const nodeType = targetNode.type
-  const nodeTypeName = getNodeTypeName(targetNode, nodeTypes)
+
 
   // Only process number nodes
   if (nodeType !== NODE_TYPE_NUMBER) {
