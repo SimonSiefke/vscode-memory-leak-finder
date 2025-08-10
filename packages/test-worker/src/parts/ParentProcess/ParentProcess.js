@@ -2,21 +2,21 @@ export const state = {
   /**
    * @type {any}
    */
-  ipc: undefined,
+  rpc: undefined,
 }
 
-export const setIpc = (ipc) => {
-  state.ipc = ipc
+export const setRpc = (ipc) => {
+  state.rpc = ipc
 }
 
 export const send = (message) => {
   // @ts-ignore
-  state.ipc.send(message)
+  state.rpc.send(message)
 }
 
 export const dispose = () => {
-  if (state.ipc) {
-    state.ipc.dispose()
-    state.ipc = undefined
+  if (state.rpc) {
+    state.rpc.dispose()
+    state.rpc = undefined
   }
 }
