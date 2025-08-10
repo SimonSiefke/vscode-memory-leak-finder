@@ -11,7 +11,7 @@ jest.unstable_mockModule('node:fs/promises', () => {
   }
 })
 
-const MakeExecutable = await import('../src/parts/MakeExecutable/MakeExecutable.js')
+const MakeExecutable = await import('../src/parts/MakeExecutable/MakeExecutable.ts')
 const fs = await import('node:fs/promises')
 
 test.skip('makeExecutable - error', async () => {
