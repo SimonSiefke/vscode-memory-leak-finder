@@ -6,4 +6,3 @@ export const hash = (object: any): string => {
   hash.update(string)
   return hash.digest('hex')
 }
-
