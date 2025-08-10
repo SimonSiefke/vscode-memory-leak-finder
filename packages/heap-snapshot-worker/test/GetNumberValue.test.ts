@@ -46,15 +46,15 @@ test('getNumberValue - should handle SMI numbers correctly', () => {
 
   // Test SMI number (direct value)
   const smiNode = { type: 0, name: 0, id: 1 }
-  expect(getNumberValue(smiNode, snapshot, edgeMap)).toBe('42')
+  expect(getNumberValue(smiNode, snapshot, edgeMap)).toBe(42)
 
   // Test decimal number
   const decimalNode = { type: 0, name: 1, id: 2 }
-  expect(getNumberValue(decimalNode, snapshot, edgeMap)).toBe('3.14')
+  expect(getNumberValue(decimalNode, snapshot, edgeMap)).toBe(3.14)
 
   // Test integer
   const intNode = { type: 0, name: 2, id: 3 }
-  expect(getNumberValue(intNode, snapshot, edgeMap)).toBe('123')
+  expect(getNumberValue(intNode, snapshot, edgeMap)).toBe(123)
 })
 
 test('getNumberValue - should handle heap numbers with internal edges', () => {
@@ -115,7 +115,7 @@ test('getNumberValue - should handle heap numbers with internal edges', () => {
 
   // Test heap number that references a string value
   const heapNumberNode = { type: 0, name: 0, id: 1 }
-  expect(getNumberValue(heapNumberNode, snapshot, edgeMap)).toBe('42')
+  expect(getNumberValue(heapNumberNode, snapshot, edgeMap)).toBe(42)
 })
 
 test('getNumberValue - should handle heap numbers with property edges', () => {
@@ -166,7 +166,7 @@ test('getNumberValue - should handle heap numbers with property edges', () => {
 
   // Test heap number that references a string value through property edge
   const heapNumberNode = { type: 0, name: 0, id: 1 }
-  expect(getNumberValue(heapNumberNode, snapshot, edgeMap)).toBe('42')
+  expect(getNumberValue(heapNumberNode, snapshot, edgeMap)).toBe(42)
 })
 
 test('getNumberValue - should handle edge names that are numbers', () => {
@@ -211,7 +211,7 @@ test('getNumberValue - should handle edge names that are numbers', () => {
 
   // Test heap number with edge name that is a number
   const heapNumberNode = { type: 0, name: 0, id: 1 }
-  expect(getNumberValue(heapNumberNode, snapshot, edgeMap)).toBe('42')
+  expect(getNumberValue(heapNumberNode, snapshot, edgeMap)).toBe(42)
 })
 
 test('getNumberValue - should handle non-number nodes', () => {
@@ -361,5 +361,5 @@ test('getNumberValue - should handle smi number nodes with value edges', () => {
 
   // Test SMI number node with internal edge named "value" pointing to string "200"
   const smiNumberNode = { type: 0, name: 0, id: 1 }
-  expect(getNumberValue(smiNumberNode, snapshot, edgeMap)).toBe('200')
+  expect(getNumberValue(smiNumberNode, snapshot, edgeMap)).toBe(200)
 })

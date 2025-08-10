@@ -2,7 +2,7 @@ import type { Snapshot } from '../Snapshot/Snapshot.js'
 import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
-import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
+
 
 /**
  * Gets the actual numeric value from a number node in a heap snapshot
@@ -84,7 +84,7 @@ export const getNumberValue = (
       for (const edge of nodeEdges) {
         if (edge.type === EDGE_TYPE_INTERNAL) {
           const edgeName = strings[edge.nameIndex] || ''
-          
+
           // Special handling for "smi number" nodes: look for internal edges named "value"
           if (nodeName === 'smi number' && edgeName === 'value') {
             const referencedNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
@@ -106,7 +106,7 @@ export const getNumberValue = (
               }
             }
           }
-          
+
           // General case: Convert edge toNode from array index to node index
           const referencedNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
           const referencedNode = parseNode(referencedNodeIndex, nodes, nodeFields)
