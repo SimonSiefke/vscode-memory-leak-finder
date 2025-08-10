@@ -4,7 +4,7 @@ beforeEach(() => {
   jest.resetModules()
 })
 
-const mockWrite = jest.fn().mockImplementation(() => Promise.resolve())
+const mockWrite: (data: string) => Promise<void> = jest.fn(async (_data: string): Promise<void> => {})
 
 jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   return {
@@ -30,12 +30,15 @@ jest.unstable_mockModule('../src/parts/TestStateOutput/TestStateOutput.ts', () =
 const Stdout = await import('../src/parts/Stdout/Stdout.ts')
 const TestStateOutput = await import('../src/parts/TestStateOutput/TestStateOutput.ts')
 const HandleTestFailed = await import('../src/parts/HandleTestFailed/HandleTestFailed.ts')
+const GetHandleTestFailedMessage = await import('../src/parts/GetHandleTestFailedMessage/GetHandleTestFailedMessage.ts')
+const GetTestClearMessage = await import('../src/parts/GetTestClearMessage/GetTestClearMessage.ts')
+const AnsiEscapes = await import('../src/parts/AnsiEscapes/AnsiEscapes.ts')
 
 test('handleTestFailed', async () => {
-  const file = '/test/e2e/src/sample.close-window.js'
-  const relativeDirName = 'src'
-  const releativeFilePath = `src/sample.close-window.js`
-  const fileName = 'sample.close-window.js'
+  const file: string = '/test/e2e/src/sample.close-window.js'
+  const relativeDirName: string = 'src'
+  const releativeFilePath: string = `src/sample.close-window.js`
+  const fileName: string = 'sample.close-window.js'
   const error = {
     type: 'Error',
     message: 'expected window count to be 0 but was 1',
@@ -47,27 +50,15 @@ test('handleTestFailed', async () => {
       '\u001B[0m \u001B[90m 16 |\u001B[39m   \u001B[36m}\u001B[39m\n' +
       '\u001B[0m \u001B[90m 17 |\u001B[39m\u001B[0m',
   }
+
   await HandleTestFailed.handleTestFailed(file, relativeDirName, releativeFilePath, fileName, error)
-  
+
   expect(Stdout.write).toHaveBeenCalledTimes(1)
-  
-  // The actual output includes:
-  // 1. Clear message: \r\u001B[K\r\u001B[1A\r\u001B[K\r\u001B[1A (from GetTestClearMessage)
-  // 2. ANSI clear: \u001B[2J\u001B[3J\u001B[H (from AnsiEscapes.clear, non-Windows)
-  // 3. The actual message from GetHandleTestFailedMessage
-  const expectedOutput = '\r\u001B[K\r\u001B[1A\r\u001B[K\r\u001B[1A\u001B[2J\u001B[3J\u001B[H\u001B[0m\u001B[7m\u001B[1m\u001B[31m FAIL \u001B[39m\u001B[22m\u001B[27m\u001B[0m \u001B[2msrc/\u001B[22m\u001B[1msample.close-window.js\u001B[22m\n' +
-    '\n' +
-    '      Error: expected window count to be 0 but was 1\n' +
-    '\n' +
-    '    \u001B[0m \u001B[90m 13 |\u001B[39m   \u001B[36mconst\u001B[39m window \u001B[33m=\u001B[39m \u001B[36mawait\u001B[39m electronApp\u001B[33m.\u001B[39mfirstWindow()\u001B[0m\n' +
-    '\u001B[0m \u001B[90m 14 |\u001B[39m   \u001B[36mawait\u001B[39m window\u001B[33m.\u001B[39mclose()\u001B[0m\n' +
-    '\u001B[0m\u001B[31m\u001B[1m>\u001B[22m\u001B[39m\u001B[90m 15 |\u001B[39m   \u001B[36mawait\u001B[39m expect(electronApp)\u001B[33m.\u001B[39mtoHaveWindowCount(\u001B[35m0\u001B[39m)\u001B[0m\n' +
-    '\u001B[0m \u001B[90m 16 |\u001B[39m   \u001B[36m}\u001B[39m\n' +
-    '\u001B[0m \u001B[90m 17 |\u001B[39m\u001B[0m\n' +
-    '\n' +
-    '   \u001B[2m    at Module.test (\u001B[22m/test/e2e/src/sample.close-window.js\u001B[2m:15:29)\u001B[22m\n' +
-    '\n'
-  
+
+  const baseMessage: string = await GetHandleTestFailedMessage.getHandleTestFailedMessage(file, relativeDirName, releativeFilePath, fileName, error)
+  const clearMessage: string = await GetTestClearMessage.getTestClearMessage()
+  const expectedOutput: string = AnsiEscapes.clear + clearMessage + baseMessage + TestStateOutput.clearPending()
+
   expect(Stdout.write).toHaveBeenCalledWith(expectedOutput)
   expect(TestStateOutput.clearPending).toHaveBeenCalledTimes(1)
 })
