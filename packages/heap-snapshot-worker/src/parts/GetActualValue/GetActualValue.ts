@@ -141,7 +141,7 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
   }
 
   // For other types, return a descriptive reference
-  // Capitalize the first letter of the type name for consistency
-  const capitalizedType = nodeTypeName ? nodeTypeName.charAt(0).toUpperCase() + nodeTypeName.slice(1) : 'Unknown'
-  return `[${capitalizedType} ${targetNode.id}]`
+  // Use the original type name as-is for consistency with existing tests
+  const typeName = nodeTypeName || 'Unknown'
+  return `[${typeName} ${targetNode.id}]`
 }
