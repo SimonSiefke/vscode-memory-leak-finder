@@ -17,4 +17,3 @@ export const registerCommands = (commandMap: Record<string, (...args: any[]) => 
 export const getCommand = (key: string): ((...args: any[]) => any) | undefined => {
   return state.commands[key]
 }
-
