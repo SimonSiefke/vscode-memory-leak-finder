@@ -9,71 +9,49 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
-  return {
-    write: jest.fn().mockImplementation(() => Promise.resolve()),
-  }
-})
+// Mock RPC for stdout worker
+const mockRpc = {
+  invoke: jest.fn() as jest.MockedFunction<(...args: any[]) => Promise<any>>,
+}
 
-jest.unstable_mockModule('../src/parts/IsWindows/IsWindows.ts', () => {
+jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
   return {
-    isWindows: false,
-  }
-})
-
-jest.unstable_mockModule('../src/parts/WatchUsage/WatchUsage.ts', () => {
-  return {
-    clearAndPrint: jest.fn(),
-  }
-})
-
-jest.unstable_mockModule('../src/parts/PatternUsage/PatternUsage.ts', () => {
-  return {
-    clearAndPrint: jest.fn(),
+    invoke: mockRpc.invoke.bind(mockRpc),
   }
 })
 
 // no ansi module mocking needed; worker returns placeholders
 
-const Stdout = await import('../src/parts/Stdout/Stdout.ts')
 const HandleStdinDataFinishedRunningMode = await import(
   '../src/parts/HandleStdinDataFinishedRunningMode/HandleStdinDataFinishedRunningMode.ts'
 )
-const WatchUsage = await import('../src/parts/WatchUsage/WatchUsage.ts')
-const PatternUsage = await import('../src/parts/PatternUsage/PatternUsage.ts')
-
-// Remove the local createTestState function - we'll use StdinDataState.createDefaultState instead
 
 test('handleStdinDataFinishedRunningMode - show watch mode details', async () => {
   const state = { ...StdinDataState.createDefaultState(), mode: ModeType.FinishedRunning }
   const key = CliKeys.WatchMode
 
-  // Set up the mock implementation after import
-  // @ts-ignore
-  WatchUsage.clearAndPrint.mockResolvedValue('[ansi-clear]\nwatch usage\n')
+  // Mock the stdout worker to return watch usage message
+  mockRpc.invoke.mockResolvedValue('[ansi-clear]\nwatch usage\n')
 
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
 
   expect(newState.mode).toBe(ModeType.Waiting)
   expect(newState.stdout?.at(-1)).toBe('[ansi-clear]\nwatch usage\n')
-  // @ts-ignore
-  expect(WatchUsage.clearAndPrint).toHaveBeenCalled()
+  expect(mockRpc.invoke).toHaveBeenCalled()
 })
 
 test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
   const state = { ...StdinDataState.createDefaultState(), mode: ModeType.FinishedRunning }
   const key = CliKeys.FilterMode
 
-  // Set up the mock implementation after import
-  // @ts-ignore
-  PatternUsage.clearAndPrint.mockResolvedValue('[ansi-clear]\npattern usage\n')
+  // Mock the stdout worker to return pattern usage message
+  mockRpc.invoke.mockResolvedValue('[ansi-clear]\npattern usage\n')
 
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.FilterWaiting)
   expect(newState.value).toBe('')
   expect(newState.stdout?.at(-1)).toBe('[ansi-clear]\npattern usage\n')
-  // @ts-ignore
-  expect(PatternUsage.clearAndPrint).toHaveBeenCalled()
+  expect(mockRpc.invoke).toHaveBeenCalled()
 })
 
 test('handleStdinDataFinishedRunningMode - quit', async () => {
@@ -81,7 +59,6 @@ test('handleStdinDataFinishedRunningMode - quit', async () => {
   const key = CliKeys.Quit
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
-  expect(Stdout.write).not.toHaveBeenCalled()
 })
 
 test('handleStdinDataFinishedRunningMode - run again', async () => {
@@ -89,5 +66,4 @@ test('handleStdinDataFinishedRunningMode - run again', async () => {
   const key = AnsiKeys.Enter
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.Running)
-  expect(Stdout.write).not.toHaveBeenCalled()
 })

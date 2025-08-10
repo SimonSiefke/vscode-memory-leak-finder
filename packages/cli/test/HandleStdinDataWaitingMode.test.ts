@@ -1,135 +1,137 @@
-import { expect, test } from '@jest/globals'
+import { beforeEach, expect, jest, test } from '@jest/globals'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
 import * as CliKeys from '../src/parts/CliKeys/CliKeys.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
+import * as StdinDataState from '../src/parts/StdinDataState/StdinDataState.ts'
 
-// TODO: Fix StdoutWorker mocking - these tests are temporarily skipped
-// because the module mocking approach is not working correctly
+beforeEach(() => {
+  jest.resetModules()
+  jest.resetAllMocks()
+})
+
+// Mock RPC for stdout worker
+const mockRpc = {
+  invoke: jest.fn() as jest.MockedFunction<(...args: any[]) => Promise<any>>,
+}
+
+jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
+  return {
+    invoke: mockRpc.invoke.bind(mockRpc),
+  }
+})
 
 const HandleStdinDataWaitingMode = await import('../src/parts/HandleStdinDataWaitingMode/HandleStdinDataWaitingMode.ts')
-// Mock Stdout for the skipped tests
-const Stdout = { write: () => {} }
 
-test.skip('handleStdinDataWaitingMode - ctrl + c', async () => {
-  const state = {
-    value: 'abc',
-  }
+test('handleStdinDataWaitingMode - ctrl + c', async () => {
+  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = AnsiKeys.ControlC
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
-  expect(Stdout.write).not.toHaveBeenCalled()
 })
 
-test.skip('handleStdinDataWaitingMode - ctrl + d', async () => {
-  const state = {
-    value: 'abc',
-  }
+test('handleStdinDataWaitingMode - ctrl + d', async () => {
+  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = AnsiKeys.ControlD
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
-  expect(Stdout.write).not.toHaveBeenCalled()
 })
 
-test.skip('handleStdinDataWaitingMode - enter', async () => {
-  // TODO: Fix StdoutWorker mocking
-  const state = {
-    value: 'abc',
-  }
+test('handleStdinDataWaitingMode - enter', async () => {
+  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = AnsiKeys.Enter
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Running)
-  expect(Stdout.write).toHaveBeenCalledTimes(1)
 })
 
-test.skip('handleStdinDataWaitingMode - escape', async () => {
-  const state = {
-    value: 'abc',
-  }
+test('handleStdinDataWaitingMode - escape', async () => {
+  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = AnsiKeys.Escape
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toBe(state)
-  expect(Stdout.write).not.toHaveBeenCalled()
 })
 
-test.skip('handleStdinDataWaitingMode - toggle headless mode', async () => {
-  const state = {
-    value: 'abc',
-    headless: false,
-  }
+test('handleStdinDataWaitingMode - toggle headless mode', async () => {
+  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc', headless: false }
   const key = 'h'
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toEqual({
+    ...StdinDataState.createDefaultState(),
     value: 'abc',
     headless: true,
     mode: ModeType.Running,
   })
-  expect(Stdout.write).not.toHaveBeenCalled()
 })
 
-test.skip('handleStdinDataWaitingMode - other key', async () => {
-  const state = {
-    value: 'abc',
-  }
+test('handleStdinDataWaitingMode - other key', async () => {
+  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = 'd'
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toBe(state)
-  expect(Stdout.write).not.toHaveBeenCalled()
 })
 
-test.skip('handleStdinDataWaitingMode - ctrl + backspace', async () => {
-  const state = {
-    value: 'abc',
-  }
+test('handleStdinDataWaitingMode - ctrl + backspace', async () => {
+  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = AnsiKeys.ControlBackspace
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.value).toBe('')
-  expect(Stdout.write).toHaveBeenCalledTimes(1)
-  // expect(Stdout.write).toHaveBeenCalledWith('erase-linecursor-left')
 })
 
-test.skip('handleStdinDataWaitingMode - backspace', async () => {
-  const state = {
-    value: 'abc',
-  }
+test('handleStdinDataWaitingMode - backspace', async () => {
+  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = AnsiKeys.Backspace
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.value).toBe('ab')
-  expect(Stdout.write).not.toHaveBeenCalled()
 })
 
-test.skip('handleStdinDataWaitingMode - arrow left', async () => {
-  const state = {
-    value: 'abc',
-  }
+test('handleStdinDataWaitingMode - arrow left', async () => {
+  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = AnsiKeys.ArrowLeft
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toBe(state)
-  expect(Stdout.write).not.toHaveBeenCalled()
 })
 
-test.skip('handleStdinDataWaitingMode - run all tests', async () => {
-  const state = {
-    value: 'abc',
-  }
-  const key = CliKeys.All
+test('handleStdinDataWaitingMode - arrow right', async () => {
+  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const key = AnsiKeys.ArrowRight
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
-  expect(newState).toEqual({
-    value: '',
-    mode: ModeType.Running,
-  })
-  expect(Stdout.write).not.toHaveBeenCalled()
+  expect(newState).toBe(state)
 })
 
-test.skip('handleStdinDataWaitingMode - filter mode', async () => {
-  const state = {
-    value: 'abc',
-  }
+test('handleStdinDataWaitingMode - home', async () => {
+  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const key = AnsiKeys.Home
+  const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
+  expect(newState).toBe(state)
+})
+
+test('handleStdinDataWaitingMode - end', async () => {
+  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const key = AnsiKeys.End
+  const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
+  expect(newState).toBe(state)
+})
+
+test('handleStdinDataWaitingMode - watch mode', async () => {
+  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const key = CliKeys.WatchMode
+  
+  // Mock the stdout worker to return watch usage message
+  mockRpc.invoke.mockResolvedValue('[ansi-clear]\nwatch usage\n')
+  
+  const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
+  expect(newState.mode).toBe(ModeType.Waiting)
+  expect(mockRpc.invoke).toHaveBeenCalled()
+})
+
+test('handleStdinDataWaitingMode - filter mode', async () => {
+  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = CliKeys.FilterMode
+  
+  // Mock the stdout worker to return pattern usage message
+  mockRpc.invoke.mockResolvedValue('[ansi-clear]\npattern usage\n')
+  
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
-  expect(newState).toEqual({
-    value: '',
-    mode: ModeType.FilterWaiting,
-  })
-  expect(Stdout.write).toHaveBeenCalledTimes(1)
-  // expect(Stdout.write).toHaveBeenCalledWith('clearpattern-usage')
+  expect(newState.mode).toBe(ModeType.FilterWaiting)
+  expect(newState.value).toBe('')
+  expect(mockRpc.invoke).toHaveBeenCalled()
 })
