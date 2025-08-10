@@ -28,7 +28,7 @@ interface ResultObject {
 }
 
 export const getArraysFromHeapSnapshotInternal = (
-  strings: string[],
+  strings: readonly string[],
   nodes: any[],
   node_types: any[],
   node_fields: any[],

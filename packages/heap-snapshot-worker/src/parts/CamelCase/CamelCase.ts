@@ -1,7 +1,7 @@
 const RE_DASH = /(-|_)([a-z])/g
 
-const replacer = (g: RegExpMatchArray): string => {
-  return g[1].toUpperCase()
+const replacer = (substring: string, ...args: any[]): string => {
+  return args[0].toUpperCase()
 }
 
 export const camelCase = (value: string): string => {

@@ -102,7 +102,7 @@ export const getArraysByClosureLocationFromHeapSnapshotInternal = (
 
         // Find the location for this array
         let locationKey = 'unknown'
-        let locationInfo = null
+        let locationInfo: any = null
 
         if (traceNodeId !== undefined && traceNodeId !== 0) {
           // Find the location in the locations array

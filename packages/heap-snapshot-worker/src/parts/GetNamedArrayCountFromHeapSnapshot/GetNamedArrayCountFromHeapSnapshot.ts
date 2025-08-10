@@ -4,7 +4,12 @@ import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
 import * as SortCountMap from '../SortCountMap/SortCountMap.js'
 
-const createCountMap = (names) => {
+interface ArrayNameWithCount {
+  name: string
+  count: number
+}
+
+const createCountMap = (names: string[]): Record<string, number> => {
   const map = Object.create(null)
   for (const name of names) {
     map[name] ||= 0
@@ -13,22 +18,22 @@ const createCountMap = (names) => {
   return map
 }
 
-const filterByArray = (value) => {
+const filterByArray = (value: any): boolean => {
   return value.nodeName === 'Array'
 }
 
-const getValueName = (value) => {
+const getValueName = (value: any): string => {
   return value.edgeName || value.nodeName
 }
 
-const getArrayNames = (nameMap) => {
+const getArrayNames = (nameMap: any): string[] => {
   const values = Object.values(nameMap)
   const filtered = values.filter(filterByArray)
   const mapped = filtered.map(getValueName)
   return mapped
 }
 
-const getArrayNamesWithCount = (countMap) => {
+const getArrayNamesWithCount = (countMap: Record<string, number>): ArrayNameWithCount[] => {
   const arrayNamesWithCount = Object.entries(countMap).map(([key, value]) => {
     return {
       name: key,
@@ -38,7 +43,7 @@ const getArrayNamesWithCount = (countMap) => {
   return arrayNamesWithCount
 }
 
-export const getNamedArrayCountFromHeapSnapshot = async (id) => {
+export const getNamedArrayCountFromHeapSnapshot = async (id: string): Promise<ArrayNameWithCount[]> => {
   const heapsnapshot = HeapSnapshotState.get(id)
 
   Assert.object(heapsnapshot)
