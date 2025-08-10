@@ -1,5 +1,5 @@
 import { VError } from '@lvce-editor/verror'
-import { findFiles } from '../FileSystemWorker/FileSystemWorker.s'
+import { findFiles } from '../FileSystemWorker/FileSystemWorker.ts'
 import * as Path from '../Path/Path.ts'
 
 /**
