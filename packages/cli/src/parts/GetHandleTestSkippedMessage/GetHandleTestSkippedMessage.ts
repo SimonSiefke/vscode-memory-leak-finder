@@ -5,7 +5,12 @@ const SKIP_TEXT = ' SKIP '
 
 const SKIP = chalk.reset.inverse.bold.yellow(SKIP_TEXT)
 
-export const getHandleTestSkippedMessage = (file: string, relativeDirName: string, fileName: string, duration: number): string => {
+export const getHandleTestSkippedMessage = async (
+  file: string,
+  relativeDirName: string,
+  fileName: string,
+  duration: number,
+): Promise<string> => {
   const messageRelativeDirName = chalk.dim(relativeDirName + '/')
   const messageFileName = chalk.bold(fileName)
   const messageDuration = FormatDuration.formatDuration(duration)

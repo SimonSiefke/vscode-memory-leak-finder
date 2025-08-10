@@ -1,13 +1,13 @@
 import { expect, test } from '@jest/globals'
 import * as GetHandleTestSkippedMessage from '../src/parts/GetHandleTestSkippedMessage/GetHandleTestSkippedMessage.ts'
 
-test('getHandleTestSkippedMessage - basic functionality', () => {
+test('getHandleTestSkippedMessage - basic functionality', async () => {
   const file = '/test/app.test.js'
   const relativeDirName = '/test'
   const fileName = 'app.test.js'
   const duration = 100
 
-  const result = GetHandleTestSkippedMessage.getHandleTestSkippedMessage(file, relativeDirName, fileName, duration)
+  const result = await GetHandleTestSkippedMessage.getHandleTestSkippedMessage(file, relativeDirName, fileName, duration)
 
   expect(typeof result).toBe('string')
   expect(result).toContain('SKIP')
@@ -17,62 +17,62 @@ test('getHandleTestSkippedMessage - basic functionality', () => {
   expect(result.endsWith('\n')).toBe(true)
 })
 
-test('getHandleTestSkippedMessage - different duration', () => {
+test('getHandleTestSkippedMessage - different duration', async () => {
   const file = '/test/component.test.js'
   const relativeDirName = '/test'
   const fileName = 'component.test.js'
   const duration = 1500
 
-  const result = GetHandleTestSkippedMessage.getHandleTestSkippedMessage(file, relativeDirName, fileName, duration)
+  const result = await GetHandleTestSkippedMessage.getHandleTestSkippedMessage(file, relativeDirName, fileName, duration)
 
   expect(result).toContain('component.test.js')
   expect(result).toContain('1.500 s')
 })
 
-test('getHandleTestSkippedMessage - zero duration', () => {
+test('getHandleTestSkippedMessage - zero duration', async () => {
   const file = '/test/util.test.js'
   const relativeDirName = '/test'
   const fileName = 'util.test.js'
   const duration = 0
 
-  const result = GetHandleTestSkippedMessage.getHandleTestSkippedMessage(file, relativeDirName, fileName, duration)
+  const result = await GetHandleTestSkippedMessage.getHandleTestSkippedMessage(file, relativeDirName, fileName, duration)
 
   expect(result).toContain('util.test.js')
   expect(result).toContain('0.000 s')
 })
 
-test('getHandleTestSkippedMessage - nested directory path', () => {
+test('getHandleTestSkippedMessage - nested directory path', async () => {
   const file = '/test/components/button/button.test.js'
   const relativeDirName = '/test/components/button'
   const fileName = 'button.test.js'
   const duration = 250
 
-  const result = GetHandleTestSkippedMessage.getHandleTestSkippedMessage(file, relativeDirName, fileName, duration)
+  const result = await GetHandleTestSkippedMessage.getHandleTestSkippedMessage(file, relativeDirName, fileName, duration)
 
   expect(result).toContain('button.test.js')
   expect(result).toContain('/test/components/button/')
   expect(result).toContain('0.250 s')
 })
 
-test('getHandleTestSkippedMessage - very long duration', () => {
+test('getHandleTestSkippedMessage - very long duration', async () => {
   const file = '/test/slow.test.js'
   const relativeDirName = '/test'
   const fileName = 'slow.test.js'
   const duration = 10000
 
-  const result = GetHandleTestSkippedMessage.getHandleTestSkippedMessage(file, relativeDirName, fileName, duration)
+  const result = await GetHandleTestSkippedMessage.getHandleTestSkippedMessage(file, relativeDirName, fileName, duration)
 
   expect(result).toContain('slow.test.js')
   expect(result).toContain('10.000 s')
 })
 
-test('getHandleTestSkippedMessage - empty relative directory', () => {
+test('getHandleTestSkippedMessage - empty relative directory', async () => {
   const file = 'root.test.js'
   const relativeDirName = ''
   const fileName = 'root.test.js'
   const duration = 50
 
-  const result = GetHandleTestSkippedMessage.getHandleTestSkippedMessage(file, relativeDirName, fileName, duration)
+  const result = await GetHandleTestSkippedMessage.getHandleTestSkippedMessage(file, relativeDirName, fileName, duration)
 
   expect(result).toContain('root.test.js')
   expect(result).toContain('/')

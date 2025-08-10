@@ -6,6 +6,6 @@ export const handleTestSetup = async (): Promise<void> => {
   if (IsGithubActions.isGithubActions) {
     return
   }
-  const message = GetHandleTestSetupMessage.getHandleTestSetupMessage()
+  const message = await GetHandleTestSetupMessage.getHandleTestSetupMessage()
   await Stdout.write(message)
 }
