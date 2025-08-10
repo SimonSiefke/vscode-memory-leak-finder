@@ -3,6 +3,8 @@ import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
+import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
+import { getUndefinedValue } from '../GetUndefinedValue/GetUndefinedValue.ts'
 
 /**
  * Gets the actual value of a node by following references for strings and numbers
@@ -51,13 +53,30 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
   // For strings, return the actual string value
   if (nodeType === NODE_TYPE_STRING) {
     const stringValue = getNodeName(targetNode, strings)
-    return stringValue || `[String ${targetNode.id}]`
+    if (stringValue !== null) {
+      // Return the raw string value, let the display layer handle quoting
+      return stringValue
+    }
+    return `[String ${targetNode.id}]`
   }
 
   // For numbers, return the actual number value
   if (nodeType === NODE_TYPE_NUMBER) {
     const numberValue = targetNode.name?.toString()
     return numberValue || `[Number ${targetNode.id}]`
+  }
+
+  // For hidden nodes, check if it's a boolean or undefined value
+  if (nodeTypeName === 'hidden') {
+    const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap)
+    if (booleanValue) {
+      return booleanValue
+    }
+
+    const undefinedValue = getUndefinedValue(targetNode, snapshot, edgeMap)
+    if (undefinedValue) {
+      return undefinedValue
+    }
   }
 
   // For code objects, try to follow internal references to find string/number values
