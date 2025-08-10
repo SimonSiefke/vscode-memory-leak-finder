@@ -36,7 +36,7 @@ const Stdout = await import('../src/parts/Stdout/Stdout.ts')
 const TestStateOutput = await import('../src/parts/TestStateOutput/TestStateOutput.ts')
 const HandleTestFailed = await import('../src/parts/HandleTestFailed/HandleTestFailed.ts')
 
-test('handleTestFailed', () => {
+test('handleTestFailed', async () => {
   const file = '/test/e2e/src/sample.close-window.js'
   const relativeDirName = 'src'
   const releativeFilePath = `src/sample.close-window.js`
@@ -53,7 +53,7 @@ test('handleTestFailed', () => {
       '\u001B[0m \u001B[90m 16 |\u001B[39m }\u001B[0m\n' +
       '\u001B[0m \u001B[90m 17 |\u001B[39m\u001B[0m',
   }
-  HandleTestFailed.handleTestFailed(file, relativeDirName, releativeFilePath, fileName, error)
+  await HandleTestFailed.handleTestFailed(file, relativeDirName, releativeFilePath, fileName, error)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
     '\r\u001B[K\r\u001B[1A\r\u001B[K\r\u001B[1A\u001B[0m\u001B[7m\u001B[1m\u001B[31m FAIL \u001B[39m\u001B[22m\u001B[27m\u001B[0m \u001B[2msrc/\u001B[22m\u001B[1msample.close-window.js\u001B[22m\n' +
