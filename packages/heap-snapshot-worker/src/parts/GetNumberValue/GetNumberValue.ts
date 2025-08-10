@@ -12,7 +12,12 @@ import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
  * @param visited - Set of visited node IDs to prevent circular references
  * @returns The actual numeric value as a string, or null if not found
  */
-export const getNumberValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uint32Array, visited: Set<number> = new Set()): string | null => {
+export const getNumberValue = (
+  targetNode: any,
+  snapshot: Snapshot,
+  edgeMap: Uint32Array,
+  visited: Set<number> = new Set(),
+): string | null => {
   if (!targetNode || visited.has(targetNode.id)) {
     return null
   }

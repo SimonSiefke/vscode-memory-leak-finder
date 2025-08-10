@@ -57,7 +57,7 @@ async function debugNumberNodes() {
           id: node.id,
           type: node.type,
           name: node.name,
-          edgeCount: node.edge_count
+          edgeCount: node.edge_count,
         })
 
         // Check if this is actually a number node
@@ -101,7 +101,8 @@ async function debugNumberNodes() {
               console.log(`  Edge ${i}: type=${edgeTypeName}(${edgeType}), name="${edgeName}", toNode=${edgeToNodeIndex}`)
 
               // If this is an internal edge, check what it points to
-              if (edgeType === 0) { // internal edge type
+              if (edgeType === 0) {
+                // internal edge type
                 const referencedNode = parseNode(edgeToNodeIndex, nodes, nodeFields)
                 if (referencedNode) {
                   const referencedTypeName = nodeTypeNames[referencedNode.type] || 'unknown'
@@ -118,7 +119,6 @@ async function debugNumberNodes() {
         console.log('Node not found')
       }
     }
-
   } catch (error) {
     console.error('Error debugging number nodes:', error)
   }
