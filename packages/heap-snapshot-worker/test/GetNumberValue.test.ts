@@ -303,11 +303,7 @@ test('getNumberValue - should handle null/undefined nodes', () => {
     extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Number node
-      0,
-      0,
-      1,
-      8,
-      0, // type=0 (number), name=0 ("(heap number)"), id=1, size=8, edges=0
+      0, 0, 1, 8, 0, // type=0 (number), name=0 ("(heap number)"), id=1, size=8, edges=0
     ]),
     edges: new Uint32Array([]),
     strings,
@@ -328,4 +324,42 @@ test('getNumberValue - should handle null/undefined nodes', () => {
 
   // Test undefined node
   expect(getNumberValue(undefined, snapshot, edgeMap)).toBeNull()
+})
+
+test('getNumberValue - should handle smi number nodes with value edges', () => {
+  const strings = ['smi number', 'value', '200', '300']
+
+  const snapshot: Snapshot = {
+    node_count: 3,
+    edge_count: 1,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // SMI number node with 1 edge
+      0, 0, 1, 8, 1, // type=0 (number), name=0 ("smi number"), id=1, size=8, edges=1
+      // String node with actual value "200"
+      1, 2, 2, 10, 0, // type=1 (string), name=2 ("200"), id=2, size=10, edges=0
+      // String node with actual value "300"
+      1, 3, 3, 10, 0, // type=1 (string), name=3 ("300"), id=3, size=10, edges=0
+    ]),
+    edges: new Uint32Array([
+      // Edge from smi number to string "200" with name "value"
+      // type=0 (internal), name=1 ("value"), toNode=5 (string node "200" at index 1)
+      0, 1, 5,
+    ]),
+    strings,
+    locations: new Uint32Array([]),
+    meta: {
+      node_types: [['number', 'string']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count'],
+      edge_types: [['internal', 'property']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+  }
+
+  const edgeMap = createEdgeMap(snapshot.nodes, snapshot.meta.node_fields)
+
+  // Test SMI number node with internal edge named "value" pointing to string "200"
+  const smiNumberNode = { type: 0, name: 0, id: 1 }
+  expect(getNumberValue(smiNumberNode, snapshot, edgeMap)).toBe('200')
 })

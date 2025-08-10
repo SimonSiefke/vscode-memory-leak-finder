@@ -65,8 +65,8 @@ export const getNumberValue = (
     return nodeName
   }
 
-  // For heap numbers, try to find the actual value through edges
-  if (nodeName === '(heap number)' || !nodeName) {
+  // For heap numbers and smi numbers, try to find the actual value through edges
+  if (nodeName === '(heap number)' || nodeName === 'smi number' || !nodeName) {
     // Find the node index for this target node
     let targetNodeIndex = -1
     for (let i = 0; i < nodes.length; i += ITEMS_PER_NODE) {
@@ -83,7 +83,31 @@ export const getNumberValue = (
       // Look for internal edges that might contain the actual numeric value
       for (const edge of nodeEdges) {
         if (edge.type === EDGE_TYPE_INTERNAL) {
-          // Convert edge toNode from array index to node index
+          const edgeName = strings[edge.nameIndex] || ''
+          
+          // Special handling for "smi number" nodes: look for internal edges named "value"
+          if (nodeName === 'smi number' && edgeName === 'value') {
+            const referencedNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
+            const referencedNode = parseNode(referencedNodeIndex, nodes, nodeFields)
+            if (referencedNode) {
+              const referencedType = referencedNode.type
+              const referencedName = getNodeName(referencedNode, strings)
+
+              // If we find a string that looks like a number, that's likely the actual value
+              if (referencedType === NODE_TYPE_STRING && referencedName && !isNaN(Number(referencedName))) {
+                return referencedName
+              }
+
+              // If we find another number node, recursively get its value
+              if (referencedType === NODE_TYPE_NUMBER && referencedName && referencedName !== '(heap number)') {
+                if (!isNaN(Number(referencedName))) {
+                  return referencedName
+                }
+              }
+            }
+          }
+          
+          // General case: Convert edge toNode from array index to node index
           const referencedNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
           const referencedNode = parseNode(referencedNodeIndex, nodes, nodeFields)
           if (referencedNode) {

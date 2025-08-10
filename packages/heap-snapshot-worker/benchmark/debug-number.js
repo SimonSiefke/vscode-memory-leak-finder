@@ -1,5 +1,7 @@
 import { prepareHeapSnapshot } from '../src/parts/PrepareHeapSnapshot/PrepareHeapSnapshot.js'
 import { parseNode } from '../src/parts/ParseNode/ParseNode.ts'
+import { getActualValue } from '../src/parts/GetActualValue/GetActualValue.ts'
+import { createEdgeMap } from '../src/parts/CreateEdgeMap/CreateEdgeMap.ts'
 
 async function debugNumberNodes() {
   console.log('Debugging number nodes...')
@@ -38,6 +40,71 @@ async function debugNumberNodes() {
     const NODE_TYPE_NUMBER = nodeTypeNames.indexOf('number')
 
     console.log('NODE_TYPE_NUMBER index:', NODE_TYPE_NUMBER)
+
+    // Create edge map for fast lookups
+    const edgeMap = createEdgeMap(nodes, nodeFields)
+    console.log('Edge map created for fast lookups')
+
+    // Test the actual parsing by looking for the oldState object
+    console.log('\n=== Testing actual parsing ===')
+    let oldStateFound = false
+    
+    for (let i = 0; i < nodes.length; i += ITEMS_PER_NODE) {
+      const node = parseNode(i, nodes, nodeFields)
+      if (node && node.edge_count > 0) {
+        // Look for edges that might lead to an oldState object
+        let edgeOffset = 0
+        for (let j = 0; j < i / ITEMS_PER_NODE; j++) {
+          edgeOffset += nodes[j * ITEMS_PER_NODE + edgeCountFieldIndex]
+        }
+        
+        for (let j = 0; j < Math.min(node.edge_count, 3); j++) {
+          const edgeIndex = (edgeOffset + j) * ITEMS_PER_EDGE
+          const edgeNameIndex = edges[edgeIndex + 1]
+          const edgeName = strings[edgeNameIndex] || ''
+          
+          if (edgeName === 'oldState') {
+            console.log(`Found oldState edge at node ${node.id}`)
+            oldStateFound = true
+            
+            // Follow this edge to see the oldState object
+            const edgeToNode = edges[edgeIndex + 2]
+            const edgeToNodeIndex = Math.floor(edgeToNode / ITEMS_PER_NODE)
+            const oldStateNode = parseNode(edgeToNodeIndex, nodes, nodeFields)
+            
+            if (oldStateNode && oldStateNode.edge_count > 0) {
+              console.log('oldState object found, examining its properties...')
+              
+              // Get edges of oldState object
+              let oldStateEdgeOffset = 0
+              for (let k = 0; k < edgeToNodeIndex; k++) {
+                oldStateEdgeOffset += nodes[k * ITEMS_PER_NODE + edgeCountFieldIndex]
+              }
+              
+              const oldStateProps = {}
+              for (let k = 0; k < Math.min(oldStateNode.edge_count, 10); k++) {
+                const propEdgeIndex = (oldStateEdgeOffset + k) * ITEMS_PER_EDGE
+                const propEdgeNameIndex = edges[propEdgeIndex + 1]
+                const propEdgeToNode = edges[propEdgeIndex + 2]
+                
+                const propName = strings[propEdgeNameIndex] || 'unknown'
+                const propNodeIndex = Math.floor(propEdgeToNode / ITEMS_PER_NODE)
+                const propNode = parseNode(propNodeIndex, nodes, nodeFields)
+                
+                if (propNode) {
+                  const actualValue = getActualValue(propNode, snapshot, edgeMap)
+                  oldStateProps[propName] = actualValue
+                }
+              }
+              
+              console.log('Parsed oldState:', JSON.stringify(oldStateProps, null, 2))
+              break
+            }
+          }
+        }
+        if (oldStateFound) break
+      }
+    }
 
     for (const nodeId of numberNodeIds) {
       console.log(`\n=== Examining node ${nodeId} ===`)
