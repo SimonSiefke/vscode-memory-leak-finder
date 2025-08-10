@@ -1,8 +1,4 @@
-export interface ParsedVersion {
-  major: number
-  minor: number
-  patch: number
-}
+import type { ParsedVersion } from '../ParsedVersion/ParsedVersion.ts'
 
 export const parseVersion = (version: string): ParsedVersion => {
   const parts = version.split('.')
