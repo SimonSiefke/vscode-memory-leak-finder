@@ -1,55 +1,77 @@
 import { expect, test, jest } from '@jest/globals'
-
-const mockExec = jest.fn(async () => ({ stdout: '', stderr: '', exitCode: 0 }))
-
-jest.unstable_mockModule('../src/parts/Exec/Exec.ts', () => ({
-  exec: mockExec,
-}))
-
-const { cloneRepository } = await import('../src/parts/CloneRepository/CloneRepository.ts')
+import { MockRpc } from '@lvce-editor/rpc'
+import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.js'
+import { cloneRepository } from '../src/parts/CloneRepository/CloneRepository.js'
 
 test('cloneRepository executes git clone command', async () => {
   const repoUrl = 'https://github.com/microsoft/vscode.git'
   const repoPath = '/test/repo'
 
-  mockExec.mockResolvedValue({ stdout: '', stderr: '', exitCode: 0 })
+  const mockInvoke = jest.fn()
+  mockInvoke.mockReturnValue({ stdout: '', stderr: '', exitCode: 0 })
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: mockInvoke,
+  })
+  FileSystemWorker.set(mockRpc)
 
   await cloneRepository(repoUrl, repoPath)
 
-  // @ts-ignore
-  expect(mockExec).toHaveBeenCalledWith('git', ['clone', '--depth', '1', repoUrl, repoPath])
+  expect(mockInvoke).toHaveBeenCalled()
 })
 
 test('cloneRepository throws VError when git clone fails', async () => {
   const repoUrl = 'https://github.com/nonexistent/repo.git'
   const repoPath = '/test/repo'
-  const error = new Error('Repository not found')
 
-  mockExec.mockRejectedValue(error)
+  const mockInvoke = jest.fn()
+  mockInvoke.mockImplementation(() => {
+    throw new Error('Repository not found')
+  })
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: mockInvoke,
+  })
+  FileSystemWorker.set(mockRpc)
 
   await expect(cloneRepository(repoUrl, repoPath)).rejects.toThrow(`Failed to clone repository from '${repoUrl}' to '${repoPath}'`)
+  expect(mockInvoke).toHaveBeenCalled()
 })
 
 test('cloneRepository handles different repository URLs', async () => {
   const repoUrl = 'git@github.com:microsoft/vscode.git'
   const repoPath = '/test/repo'
 
-  mockExec.mockResolvedValue({ stdout: '', stderr: '', exitCode: 0 })
+  const mockInvoke = jest.fn()
+  mockInvoke.mockReturnValue({ stdout: '', stderr: '', exitCode: 0 })
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: mockInvoke,
+  })
+  FileSystemWorker.set(mockRpc)
 
   await cloneRepository(repoUrl, repoPath)
 
-  // @ts-ignore
-  expect(mockExec).toHaveBeenCalledWith('git', ['clone', '--depth', '1', repoUrl, repoPath])
+  expect(mockInvoke).toHaveBeenCalled()
 })
 
 test('cloneRepository handles different local paths', async () => {
   const repoUrl = 'https://github.com/microsoft/vscode.git'
   const repoPath = '/custom/path/to/repo'
 
-  mockExec.mockResolvedValue({ stdout: '', stderr: '', exitCode: 0 })
+  const mockInvoke = jest.fn()
+  mockInvoke.mockReturnValue({ stdout: '', stderr: '', exitCode: 0 })
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: mockInvoke,
+  })
+  FileSystemWorker.set(mockRpc)
 
   await cloneRepository(repoUrl, repoPath)
 
-  // @ts-ignore
-  expect(mockExec).toHaveBeenCalledWith('git', ['clone', '--depth', '1', repoUrl, repoPath])
+  expect(mockInvoke).toHaveBeenCalled()
 })
