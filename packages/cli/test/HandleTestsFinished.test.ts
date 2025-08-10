@@ -5,11 +5,11 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-jest.unstable_mockModule('../src/parts/IsGithubActions/IsGithubActions.ts', () => {
-  return {
-    isGithubActions: false,
-  }
-})
+jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => ({
+  isGithubActions: () => false,
+  setState: () => {},
+  getState: () => ({}),
+}))
 
 jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   return {

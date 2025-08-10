@@ -10,19 +10,12 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   }
 })
 
-jest.unstable_mockModule('../src/parts/IsGithubActions/IsGithubActions.ts', () => {
-  return {
-    isGithubActions: false,
-  }
-})
-
-jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => {
-  return {
-    isBuffering() {
-      return true
-    },
-  }
-})
+jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => ({
+  isGithubActions: () => false,
+  setTestStateChange: () => {},
+  isBuffering: () => false,
+  setBuffering: () => {},
+}))
 
 jest.unstable_mockModule('../src/parts/TestStateOutput/TestStateOutput.ts', () => {
   return {
