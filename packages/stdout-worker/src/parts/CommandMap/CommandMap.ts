@@ -9,6 +9,8 @@ import * as GetInterruptedMessage from '../GetInterruptedMessage/GetInterruptedM
 import * as GetTestClearMessage from '../GetTestClearMessage/GetTestClearMessage.ts'
 import * as GetWatchUsageMessage from '../GetWatchUsageMessage/GetWatchUsageMessage.ts'
 import * as GetPatternUsageMessage from '../GetPatternUsageMessage/GetPatternUsageMessage.ts'
+import * as GetWatchUsageMessageFull from '../GetWatchUsageMessageFull/GetWatchUsageMessageFull.ts'
+import * as GetPatternUsageMessageFull from '../GetPatternUsageMessageFull/GetPatternUsageMessageFull.ts'
 
 export const commandMap: Record<string, (...args: any[]) => any> = {
   'Stdout.getHandleTestFailedMessage': GetHandleTestFailedMessage.getHandleTestFailedMessage,
@@ -30,4 +32,6 @@ export const commandMap: Record<string, (...args: any[]) => any> = {
   'Stdout.getEraseEndLine': GetAnsiEscapes.getEraseEndLine,
   'Stdout.getClear': GetAnsiEscapes.getClear,
   'Stdout.getPatternUsageMessage': GetPatternUsageMessage.getPatternUsageMessage,
+  'Stdout.getWatchUsageMessageFull': GetWatchUsageMessageFull.getWatchUsageMessageFull,
+  'Stdout.getPatternUsageMessageFull': GetPatternUsageMessageFull.getPatternUsageMessageFull,
 }
