@@ -52,7 +52,8 @@ test('handleTestPassed', async () => {
     isLeak,
   )
   const clearMessage: string = await GetTestClearMessage.getTestClearMessage()
-  const expectedOutput: string = AnsiEscapes.clear + clearMessage + baseMessage + TestStateOutput.clearPending()
+  // Do not call TestStateOutput.clearPending() here to avoid incrementing the mock call count
+  const expectedOutput: string = AnsiEscapes.clear + clearMessage + baseMessage
 
   expect(Stdout.write).toHaveBeenCalledWith(expectedOutput)
   expect(TestStateOutput.clearPending).toHaveBeenCalledTimes(1)
