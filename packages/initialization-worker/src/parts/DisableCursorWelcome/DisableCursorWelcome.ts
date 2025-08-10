@@ -1,0 +1,13 @@
+import { join } from 'path'
+import * as Root from '../Root/Root.ts'
+import * as StorageWorker from '../StorageWorker/StorageWorker.ts'
+
+export const disableCursorWelcome = async () => {
+  const storagePath = join(Root.root, '.vscode-global-storage', 'state.vscedb')
+  // TODO this would need to happen in multiple steps
+  // 1. launch cursor initially, creating the global storage file
+  // 2. close cursor
+  // 3. using sql, insert the rows to skip welcome
+  const storageRpc = await StorageWorker.launch()
+  await storageRpc.invoke('Storage.skipCursorWelcome', storagePath)
+}
