@@ -7,6 +7,14 @@ import * as PageObjectState from '../PageObjectState/PageObjectState.js'
 import { VError } from '../VError/VError.js'
 import * as WaitForFirstWindow from '../WaitForFirstWindow/WaitForFirstWindow.js'
 
+// TODO move this into 3 separate functions
+// 1. import pageobject module
+// 2. wait for first window
+// 3. create pageObject
+// 4. ask pageObject to check that window is ready
+//
+// steps and and 2 can be done in parallel
+
 export const create = async (connectionId, isFirstConnection, isHeadless, timeouts, parsedIdeVersion, pageObjectPath) => {
   try {
     Assert.number(connectionId)
