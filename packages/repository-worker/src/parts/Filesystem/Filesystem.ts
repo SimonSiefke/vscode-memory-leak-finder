@@ -1,5 +1,7 @@
 import { cp, mkdir, rm, readFile, glob } from 'node:fs/promises'
 
+// TODO maybe move this to filesystem worker to make testing easier
+
 /**
  * Checks if a path exists
  * @param {string} path
@@ -18,6 +20,7 @@ export const copy = async (from, to, options = { recursive: true, force: true })
 }
 
 /**
+ *
  * Creates a directory
  * @param {string} path - Directory path to create
  * @param {{recursive?: boolean}} options - Directory creation options

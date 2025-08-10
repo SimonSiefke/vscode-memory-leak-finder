@@ -1,8 +1,8 @@
 import { VError } from '@lvce-editor/verror'
-import * as Path from '../Path/Path.ts'
-import * as ApplyFileOperations from '../ApplyFileOperations/ApplyFileOperations.ts'
 import * as Filesystem from '../Filesystem/Filesystem.ts'
+import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 import * as GetRestoreFileOperations from '../GetRestoreFileOperations/GetRestoreFileOperations.ts'
+import * as Path from '../Path/Path.ts'
 
 /**
  * @param {string} repoPath
@@ -21,7 +21,7 @@ export const setupNodeModulesFromCache = async (repoPath, commitHash, cacheDir) 
       cachedNodeModulesPath,
       cachedNodeModulesPaths,
     )
-    await ApplyFileOperations.applyFileOperations(fileOperations)
+    await FileSystemWorker.applyFileOperations(fileOperations)
   } catch (error) {
     throw new VError(error, 'Failed to setup node_modules from cache')
   }

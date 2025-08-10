@@ -1,15 +1,18 @@
-import * as Argv from '../Argv/Argv.ts'
+import * as CommandMap from '../CommandMap/CommandMap.ts'
+import * as CommandMapRef from '../CommandMapRef/CommandMapRef.ts'
 import * as InitialStart from '../InitialStart/InitialStart.ts'
 import * as ParseArgv from '../ParseArgv/ParseArgv.ts'
 import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
-import * as CommandMap from '../CommandMap/CommandMap.ts'
-import * as CommandMapRef from '../CommandMapRef/CommandMapRef.ts'
 
-export const run = async (): Promise<void> => {
+export const run = async (argv: readonly string[], env: NodeJS.ProcessEnv): Promise<void> => {
   await StdoutWorker.initialize()
   Object.assign(CommandMapRef.commandMapRef, CommandMap.commandMap)
-  const options = ParseArgv.parseArgv(Argv.argv)
+  const options = ParseArgv.parseArgv(argv)
+
+  // Parse isGithubActions once at startup
+  const isGithubActions = Boolean(env.GITHUB_ACTIONS)
+
   StdinDataState.setState({
     ...StdinDataState.getState(),
     watch: options.watch,
@@ -18,6 +21,7 @@ export const run = async (): Promise<void> => {
     recordVideo: options.recordVideo,
     cwd: options.cwd,
     headless: options.headless,
+    isGithubActions,
     measure: options.measure,
     value: options.filter,
     measureAfter: options.measureAfter,
