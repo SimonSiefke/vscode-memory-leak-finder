@@ -3,10 +3,10 @@ import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
 import * as Character from '../Character/Character.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
 import * as PreviousFilters from '../PreviousFilters/PreviousFilters.ts'
-import * as Stdout from '../Stdout/Stdout.ts'
 import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
+import type { FilterWaitingState } from '../FilterWaitingState/FilterWaitingState.ts'
 
-export const handleStdinDataFilterWaitingMode = async (state, key) => {
+export const handleStdinDataFilterWaitingMode = async (state: FilterWaitingState, key: string): Promise<FilterWaitingState> => {
   switch (key) {
     case AnsiKeys.ControlC:
     case AnsiKeys.ControlD:
@@ -18,12 +18,15 @@ export const handleStdinDataFilterWaitingMode = async (state, key) => {
       if (state.value) {
         PreviousFilters.add(state.value)
       }
-      const eraseLine = await StdoutWorker.invoke('Stdout.getEraseLine')
-      const cursorLeft = await StdoutWorker.invoke('Stdout.getCursorLeft')
-      await Stdout.write(eraseLine + cursorLeft)
-      return {
-        ...state,
-        mode: ModeType.Running,
+      {
+        const eraseLine = await StdoutWorker.invoke('Stdout.getEraseLine')
+        const cursorLeft = await StdoutWorker.invoke('Stdout.getCursorLeft')
+        const message: string = eraseLine + cursorLeft
+        return {
+          ...state,
+          mode: ModeType.Running,
+          stdout: [...state.stdout, message],
+        }
       }
 
     case AnsiKeys.AltBackspace:
@@ -31,22 +34,27 @@ export const handleStdinDataFilterWaitingMode = async (state, key) => {
       if (!state.value) {
         return state
       }
-      const cursorBackward = await StdoutWorker.invoke('Stdout.getCursorBackward')
-      const eraseEndLine = await StdoutWorker.invoke('Stdout.getEraseEndLine')
-      await Stdout.write(cursorBackward.repeat(state.value.length) + eraseEndLine)
-      return {
-        ...state,
-        value: Character.EmptyString,
+      {
+        const cursorBackward: string = await StdoutWorker.invoke('Stdout.getCursorBackward')
+        const eraseEndLine: string = await StdoutWorker.invoke('Stdout.getEraseEndLine')
+        const message: string = cursorBackward.repeat(state.value.length) + eraseEndLine
+        return {
+          ...state,
+          value: Character.EmptyString,
+          stdout: [...state.stdout, message],
+        }
       }
     case AnsiKeys.Backspace:
       if (state.value === Character.EmptyString) {
         return state
       }
-      const backspace = await StdoutWorker.invoke('Stdout.getBackspace')
-      await Stdout.write(backspace)
-      return {
-        ...state,
-        value: state.value.slice(0, -1),
+      {
+        const backspace: string = await StdoutWorker.invoke('Stdout.getBackspace')
+        return {
+          ...state,
+          value: state.value.slice(0, -1),
+          stdout: [...state.stdout, backspace],
+        }
       }
     case AnsiKeys.ArrowLeft:
     case AnsiKeys.ArrowRight:
@@ -54,10 +62,13 @@ export const handleStdinDataFilterWaitingMode = async (state, key) => {
     case AnsiKeys.End:
       return state
     case AnsiKeys.Escape:
-      await Stdout.write(await WatchUsage.clearAndPrint())
-      return {
-        ...state,
-        mode: ModeType.Waiting,
+      {
+        const message: string = await WatchUsage.clearAndPrint()
+        return {
+          ...state,
+          mode: ModeType.Waiting,
+          stdout: [...state.stdout, message],
+        }
       }
     case AnsiKeys.ArrowUp:
       const previousFilters = PreviousFilters.get()
@@ -65,22 +76,24 @@ export const handleStdinDataFilterWaitingMode = async (state, key) => {
         return state
       }
       const top = previousFilters[0]
-      const cb = await StdoutWorker.invoke('Stdout.getCursorBackward')
-      const eel = await StdoutWorker.invoke('Stdout.getEraseEndLine')
-      const prefix = state.value ? cb.repeat(state.value.length) + eel : ''
-      await Stdout.write(prefix + top)
-      return {
-        ...state,
-        value: top,
+      {
+        const cb: string = await StdoutWorker.invoke('Stdout.getCursorBackward')
+        const eel: string = await StdoutWorker.invoke('Stdout.getEraseEndLine')
+        const prefix = state.value ? cb.repeat(state.value.length) + eel : ''
+        const message = prefix + top
+        return {
+          ...state,
+          value: top,
+          stdout: [...state.stdout, message],
+        }
       }
-    case AnsiKeys.ArrowUp:
     case AnsiKeys.ArrowDown:
       return state
     default:
-      await Stdout.write(key)
       return {
         ...state,
         value: state.value + key,
+        stdout: [...state.stdout, key],
       }
   }
 }
