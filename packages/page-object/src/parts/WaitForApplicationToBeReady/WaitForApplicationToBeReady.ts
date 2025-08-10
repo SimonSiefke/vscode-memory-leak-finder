@@ -5,7 +5,7 @@ const isDevtoolsCannotFindContextError = (error) => {
   )
 }
 
-export const waitForApplicationToBeReady = async ({ page, expect, VError }): Promise<void> => {
+export const waitForApplicationToBeReady = async ({ page, expect }): Promise<void> => {
   try {
     const main = page.locator('[role="main"]')
     await expect(main).toBeVisible({
