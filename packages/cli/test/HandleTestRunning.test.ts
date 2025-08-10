@@ -1,4 +1,5 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
+import { MockRpc } from '@lvce-editor/rpc'
 
 beforeEach(() => {
   jest.resetModules()
@@ -18,23 +19,24 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
 })
 
 jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
-  return {
-    invoke: jest.fn().mockImplementation((method: any, ...args: any[]) => {
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string, ...args: any[]) => {
       if (method === 'Stdout.getHandleTestRunningMessage') {
         // Args are: [file, relativeDirName, fileName, isFirst]
         const isFirst = args[3]
         if (isFirst) {
-          return Promise.resolve(
-            '\n\u001B[0m\u001B[7m\u001B[33m\u001B[1m RUNS \u001B[22m\u001B[39m\u001B[27m\u001B[0m \u001B[2m/test/\u001B[22m\u001B[1mapp.test.js\u001B[22m\n',
-          )
+          return '\u001B[0m\u001B[7m\u001B[33m\u001B[1m RUNS \u001B[22m\u001B[39m\u001B[27m\u001B[0m \u001B[2m/test/\u001B[22m\u001B[1mapp.test.js\u001B[22m\n'
         } else {
-          return Promise.resolve(
-            '\n\u001B[0m\u001B[7m\u001B[33m\u001B[1m RUNS \u001B[22m\u001B[39m\u001B[27m\u001B[0m \u001B[2m/test/\u001B[22m\u001B[1mapp.test.js\u001B[22m\n',
-          )
+          return '\n\u001B[0m\u001B[7m\u001B[33m\u001B[1m RUNS \u001B[22m\u001B[39m\u001B[27m\u001B[0m \u001B[2m/test/\u001B[22m\u001B[1mapp.test.js\u001B[22m\n'
         }
       }
       throw new Error(`unexpected method ${method}`)
-    }),
+    },
+  })
+
+  return {
+    invoke: mockRpc.invoke.bind(mockRpc),
   }
 })
 

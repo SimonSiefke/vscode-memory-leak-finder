@@ -1,4 +1,5 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
+import { MockRpc } from '@lvce-editor/rpc'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
 
@@ -14,20 +15,23 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
 })
 
 jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
-  return {
-    invoke: jest.fn().mockImplementation((method: any, ...args: any[]) => {
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string) => {
       if (method === 'Stdout.getInterruptedMessage') {
-        return Promise.resolve('interrupted-message')
+        return 'interrupted-message'
       }
       if (method === 'Stdout.getWatchUsageMessage') {
-        return Promise.resolve('watch-usage')
+        return 'watch-usage'
       }
       throw new Error(`unexpected method ${method}`)
-    }),
+    },
+  })
+
+  return {
+    invoke: mockRpc.invoke.bind(mockRpc),
   }
 })
-
-
 
 const Stdout = await import('../src/parts/Stdout/Stdout.ts')
 const HandleStdinDataRunningMode = await import('../src/parts/HandleStdinDataRunningMode/HandleStdinDataRunningMode.ts')
