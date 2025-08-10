@@ -5,10 +5,6 @@ import * as Expect from '../Expect/Expect.js'
 import * as ImportScript from '../ImportScript/ImportScript.js'
 import * as PageObjectState from '../PageObjectState/PageObjectState.js'
 import { VError } from '../VError/VError.js'
-import * as PageEventState from '../PageEventState/PageEventState.js'
-import * as PageEventType from '../PageEventType/PageEventType.js'
-import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
-import * as IsDevtoolsCannotFindContextError from '../IsDevtoolsCannotFindContextError/IsDevtoolsCannotFindContextError.js'
 import * as WaitForFirstWindow from '../WaitForFirstWindow/WaitForFirstWindow.js'
 
 export const create = async (connectionId, isFirstConnection, isHeadless, timeouts, parsedIdeVersion, pageObjectPath) => {
