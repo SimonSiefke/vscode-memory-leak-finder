@@ -5,7 +5,10 @@ import * as Expect from '../Expect/Expect.js'
 import * as ImportScript from '../ImportScript/ImportScript.js'
 import * as PageObjectState from '../PageObjectState/PageObjectState.js'
 import { VError } from '../VError/VError.js'
-import * as WaitForVsCodeToBeReady from '../WaitForVsCodeToBeReady/WaitForVsCodeToBeReady.js'
+import * as PageEventState from '../PageEventState/PageEventState.js'
+import * as PageEventType from '../PageEventType/PageEventType.js'
+import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
+import * as IsDevtoolsCannotFindContextError from '../IsDevtoolsCannotFindContextError/IsDevtoolsCannotFindContextError.js'
 
 export const create = async (connectionId, isFirstConnection, isHeadless, timeouts, parsedIdeVersion, pageObjectPath) => {
   try {
@@ -17,12 +20,27 @@ export const create = async (connectionId, isFirstConnection, isHeadless, timeou
     const pageObjectModule = await ImportScript.importScript(pageObjectPath)
     const electronApp = ElectronAppState.get(connectionId)
     ElectronAppState.remove(connectionId)
-    const firstWindow = await WaitForVsCodeToBeReady.waitForVsCodeToBeReady({
+
+    const firstWindow = await pageObjectModule.create({
       electronApp,
       isFirstConnection,
       isHeadless,
       expect: Expect.expect,
+      pageEventState: PageEventState,
+      pageEventType: PageEventType,
+      timeoutConstants: TimeoutConstants,
+      isDevtoolsCannotFindContextError: IsDevtoolsCannotFindContextError.isDevtoolsCannotFindContextError,
+    }).WaitForVsCodeToBeReady.waitForVsCodeToBeReady({
+      electronApp,
+      isFirstConnection,
+      isHeadless,
+      expect: Expect.expect,
+      pageEventState: PageEventState,
+      pageEventType: PageEventType,
+      timeoutConstants: TimeoutConstants,
+      isDevtoolsCannotFindContextError: IsDevtoolsCannotFindContextError.isDevtoolsCannotFindContextError,
     })
+
     const pageObjectContext = {
       page: firstWindow,
       expect: Expect.expect,
