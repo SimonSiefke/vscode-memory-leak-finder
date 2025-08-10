@@ -1,9 +1,9 @@
 import { readFile } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { SourceMapConsumer } from 'source-map'
-import * as Assert from '../Assert/Assert.js'
-import * as GetOriginalClassName from '../GetOriginalClassName/GetOriginalClassName.js'
-import { root } from '../Root/Root.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as GetOriginalClassName from '../GetOriginalClassName/GetOriginalClassName.ts'
+import { root } from '../Root/Root.ts'
 
 import type { RawSourceMap } from 'source-map'
 
@@ -32,7 +32,12 @@ export const getOriginalPosition = async (sourceMap: RawSourceMap, line: number,
   }
 }
 
-export const getOriginalPositions = async (sourceMap: RawSourceMap, positions: number[], classNames: boolean, hash: string): Promise<OriginalPosition[]> => {
+export const getOriginalPositions = async (
+  sourceMap: RawSourceMap,
+  positions: number[],
+  classNames: boolean,
+  hash: string,
+): Promise<OriginalPosition[]> => {
   Assert.object(sourceMap)
   Assert.array(positions)
   const originalPositions = await SourceMapConsumer.with(sourceMap, null, async (consumer) => {
@@ -51,7 +56,11 @@ export const getOriginalPositions = async (sourceMap: RawSourceMap, positions: n
           const sourceFileRelativePath: string = sourceMap.sources[index]
           const originalCodePath: string = resolve(join(root, '.vscode-sources', hash, sourceFileRelativePath))
           const originalCode: string = await readFile(originalCodePath, 'utf8')
-          const originalClassName: string = GetOriginalClassName.getOriginalClassName(originalCode, originalPosition.line, originalPosition.column)
+          const originalClassName: string = GetOriginalClassName.getOriginalClassName(
+            originalCode,
+            originalPosition.line,
+            originalPosition.column,
+          )
           originalPosition.name = originalClassName
         }
       }

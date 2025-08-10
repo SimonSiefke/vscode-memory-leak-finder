@@ -1,5 +1,5 @@
-import * as GetCleanPositionsMap from '../GetCleanPositionsMap/GetCleanPositionsMap.js'
-import * as SourceMapWorkerCommandType from '../SourceMapWorkerCommandType/SourceMapWorkerCommandType.js'
+import * as GetCleanPositionsMap from '../GetCleanPositionsMap/GetCleanPositionsMap.ts'
+import * as SourceMapWorkerCommandType from '../SourceMapWorkerCommandType/SourceMapWorkerCommandType.ts'
 
 export const commandMap: Record<string, (...args: any[]) => any> = {
   [SourceMapWorkerCommandType.GetCleanPositionsMap]: GetCleanPositionsMap.getCleanPositionsMap,

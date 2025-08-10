@@ -1,7 +1,7 @@
-import * as GetCleanPosition from '../GetCleanPosition/GetCleanPosition.js'
-import * as Hash from '../Hash/Hash.js'
-import * as LoadSourceMap from '../LoadSourceMap/LoadSourceMap.js'
-import * as SourceMap from '../SourceMap/SourceMap.js'
+import * as GetCleanPosition from '../GetCleanPosition/GetCleanPosition.ts'
+import * as Hash from '../Hash/Hash.ts'
+import * as LoadSourceMap from '../LoadSourceMap/LoadSourceMap.ts'
+import * as SourceMap from '../SourceMap/SourceMap.ts'
 
 interface SourceMapUrlMap {
   [key: string]: number[]
@@ -11,7 +11,11 @@ interface CleanPositionMap {
   [key: string]: any[]
 }
 
-export const getCleanPositionsMap = async (sourceMapUrlMap: SourceMapUrlMap, classNames: boolean, hash: string): Promise<CleanPositionMap> => {
+export const getCleanPositionsMap = async (
+  sourceMapUrlMap: SourceMapUrlMap,
+  classNames: boolean,
+  hash: string,
+): Promise<CleanPositionMap> => {
   const cleanPositionMap: CleanPositionMap = Object.create(null)
   for (const [key, value] of Object.entries(sourceMapUrlMap)) {
     if (!key) {

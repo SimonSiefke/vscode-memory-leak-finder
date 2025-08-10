@@ -1,4 +1,4 @@
-import * as CleanSource from '../CleanSource/CleanSource.js'
+import * as CleanSource from '../CleanSource/CleanSource.ts'
 
 interface Position {
   source?: string | null
