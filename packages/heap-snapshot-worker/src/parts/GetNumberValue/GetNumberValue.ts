@@ -42,6 +42,8 @@ export const getNumberValue = (
   // Get edge type names
   const edgeTypes = meta.edge_types[0] || []
   const EDGE_TYPE_INTERNAL = edgeTypes.indexOf('internal')
+  const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
+  const EDGE_TYPE_ELEMENT = edgeTypes.indexOf('element')
 
   // Get node type names
   const nodeTypeNames = nodeTypes[0] || []
@@ -128,6 +130,49 @@ export const getNumberValue = (
           }
         }
         currentEdgeOffset += sourceEdgeCount
+      }
+
+      // Enhanced search: look for property edges that might contain the numeric value
+      // This is common in V8 where numbers are stored as properties
+      for (const edge of nodeEdges) {
+        if (edge.type === EDGE_TYPE_PROPERTY || edge.type === EDGE_TYPE_ELEMENT) {
+          const edgeName = strings[edge.nameIndex] || ''
+
+          // Check if the edge name itself is a number
+          if (edgeName && !isNaN(Number(edgeName))) {
+            return edgeName
+          }
+
+          // Follow the edge to see if it points to a string with the numeric value
+          const referencedNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
+          const referencedNode = parseNode(referencedNodeIndex, nodes, nodeFields)
+          if (referencedNode) {
+            const referencedType = referencedNode.type
+            const referencedName = getNodeName(referencedNode, strings)
+
+            if (referencedType === NODE_TYPE_STRING && referencedName && !isNaN(Number(referencedName))) {
+              return referencedName
+            }
+          }
+        }
+      }
+
+      // Look for edges with numeric names in the edge name field
+      for (const edge of nodeEdges) {
+        const edgeName = strings[edge.nameIndex] || ''
+        if (edgeName && !isNaN(Number(edgeName))) {
+          return edgeName
+        }
+      }
+
+      // Also check all edges for numeric names, regardless of type
+      for (const edge of nodeEdges) {
+        if (edge.nameIndex < strings.length) {
+          const edgeName = strings[edge.nameIndex]
+          if (edgeName && !isNaN(Number(edgeName))) {
+            return edgeName
+          }
+        }
       }
     }
   }

@@ -69,6 +69,12 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
     if (numberValue !== null) {
       return numberValue
     }
+
+    // If we can't get the actual value, provide more context about the node
+    const nodeName = getNodeName(targetNode, strings)
+    if (nodeName && nodeName !== '(heap number)') {
+      return `[Number ${nodeName}]`
+    }
     return `[Number ${targetNode.id}]`
   }
 
