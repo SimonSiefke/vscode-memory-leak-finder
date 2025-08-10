@@ -47,39 +47,39 @@ export const setState = (newState) => {
   state.workers = newState.workers
 }
 
-export const setBuffering = (value: boolean) => {
+export const setBuffering = (value: boolean): void => {
   state.buffering = value
 }
 
-export const setTestSetup = () => {
+export const setTestSetup = (): void => {
   state.mode = ModeType.Waiting
 }
 
-export const setTestRunning = () => {
+export const setTestRunning = (): void => {
   state.mode = ModeType.Running
 }
 
-export const setTestStateChange = () => {
+export const setTestStateChange = (): void => {
   state.mode = ModeType.Waiting
 }
 
-export const isBuffering = () => {
+export const isBuffering = (): boolean => {
   return state.buffering
 }
 
-export const isWatchMode = () => {
+export const isWatchMode = (): boolean => {
   return state.watch
 }
 
-export const isGithubActions = () => {
+export const isGithubActions = (): boolean => {
   return state.isGithubActions
 }
 
-export const shouldCheckLeaks = () => {
+export const shouldCheckLeaks = (): boolean => {
   return state.checkLeaks
 }
 
-export const getRuns = () => {
+export const getRuns = (): number => {
   return state.runs
 }
 
