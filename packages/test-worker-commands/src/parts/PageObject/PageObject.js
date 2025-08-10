@@ -22,7 +22,6 @@ export const create = async (connectionId, isFirstConnection, isHeadless, timeou
       electronApp,
       isFirstConnection,
       isHeadless,
-      expect: Expect.expect,
     })
     const pageObjectContext = {
       page: firstWindow,
