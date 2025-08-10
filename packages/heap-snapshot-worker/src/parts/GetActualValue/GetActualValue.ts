@@ -1,11 +1,11 @@
-import type { Snapshot } from '../Snapshot/Snapshot.js'
+import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
 import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
-import { parseNode } from '../ParseNode/ParseNode.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
-import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
-import { getUndefinedValue } from '../GetUndefinedValue/GetUndefinedValue.ts'
 import { getNumberValue } from '../GetNumberValue/GetNumberValue.ts'
+import { getUndefinedValue } from '../GetUndefinedValue/GetUndefinedValue.ts'
+import { parseNode } from '../ParseNode/ParseNode.ts'
+import type { Snapshot } from '../Snapshot/Snapshot.js'
 
 /**
  * Gets the actual value of a node by following references for strings and numbers
