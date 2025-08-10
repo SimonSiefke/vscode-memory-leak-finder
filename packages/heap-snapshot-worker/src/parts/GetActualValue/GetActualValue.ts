@@ -5,6 +5,7 @@ import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
 import { getUndefinedValue } from '../GetUndefinedValue/GetUndefinedValue.ts'
+import { getNumberValue } from '../GetNumberValue/GetNumberValue.ts'
 
 /**
  * Gets the actual value of a node by following references for strings and numbers
@@ -60,10 +61,13 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
     return `[String ${targetNode.id}]`
   }
 
-  // For numbers, return the actual number value
+  // For numbers, use the dedicated number parsing function
   if (nodeType === NODE_TYPE_NUMBER) {
-    const numberValue = targetNode.name?.toString()
-    return numberValue || `[Number ${targetNode.id}]`
+    const numberValue = getNumberValue(targetNode, snapshot, edgeMap, visited)
+    if (numberValue !== null) {
+      return numberValue
+    }
+    return `[Number ${targetNode.id}]`
   }
 
   // For hidden nodes, check if it's a boolean or undefined value
@@ -116,9 +120,9 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
                 internalStringValues.push(stringValue)
               }
             } else if (referencedType === NODE_TYPE_NUMBER) {
-              // number
-              const numberValue = referencedNode.name?.toString()
-              if (numberValue) {
+              // number - use improved number parsing
+              const numberValue = getNumberValue(referencedNode, snapshot, edgeMap, new Set(visited))
+              if (numberValue && !numberValue.startsWith('[')) {
                 numberValues.push(numberValue)
               }
             } else if (referencedType === NODE_TYPE_OBJECT) {
