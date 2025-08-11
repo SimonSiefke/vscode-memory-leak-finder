@@ -1,4 +1,4 @@
-const url = new URL('../../../../devtools-protocol/src/index.ts', import.meta.url).toString()
+const url = new URL('../../../../devtools-protocol/src/index.js', import.meta.url).toString()
 const module = await import(url)
 
 const { DevtoolsProtocolPage, DevtoolsProtocolRuntime, DevtoolsProtocolTarget, DevtoolsProtocolDebugger } = module
