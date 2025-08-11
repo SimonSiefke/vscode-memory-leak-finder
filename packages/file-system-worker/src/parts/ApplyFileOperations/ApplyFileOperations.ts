@@ -1,5 +1,5 @@
-import { applyFileOperation } from '../ApplyFileOperation/ApplyFileOperation.js'
-import type { FileOperation } from '../ApplyFileOperation/ApplyFileOperation.js'
+import { applyFileOperation } from '../ApplyFileOperation/ApplyFileOperation.ts'
+import type { FileOperation } from '../ApplyFileOperation/ApplyFileOperation.ts'
 
 export const applyFileOperations = async (fileOperations: readonly FileOperation[]): Promise<void> => {
   for (const operation of fileOperations) {

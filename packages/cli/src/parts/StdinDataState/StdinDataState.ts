@@ -24,9 +24,11 @@ export const state = {
   ide: Ide.VsCode,
   ideVersion: Ide.VsCode,
   workers: false,
+  stdout: [],
+  previousFilters: [],
 }
 
-export const setState = (newState) => {
+export const setState = (newState): void => {
   state.checkLeaks = newState.checkLeaks
   state.cwd = newState.cwd
   state.headless = newState.headless
@@ -45,6 +47,8 @@ export const setState = (newState) => {
   state.ide = newState.ide
   state.ideVersion = newState.ideVersion
   state.workers = newState.workers
+  state.stdout = newState.stdout
+  state.previousFilters = newState.previousFilters
 }
 
 export const setBuffering = (value: boolean): void => {

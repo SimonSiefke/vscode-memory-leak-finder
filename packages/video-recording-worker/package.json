@@ -20,7 +20,5 @@
     "@lvce-editor/verror": "^1.7.0",
     "execa": "^9.6.0"
   },
-  "devDependencies": {
-    "ts-jest": "^29.4.1"
-  }
+  "devDependencies": {}
 }
