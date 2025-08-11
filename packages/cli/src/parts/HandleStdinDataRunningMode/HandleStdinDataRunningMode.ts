@@ -1,6 +1,8 @@
 import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
 import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
+import * as InterruptedMessage from '../InterruptedMessage/InterruptedMessage.ts'
+import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
 
 export const handleStdinDataRunningMode = async (state, key) => {
   switch (key) {
@@ -18,13 +20,14 @@ export const handleStdinDataRunningMode = async (state, key) => {
     case AnsiKeys.ArrowLeft:
     case AnsiKeys.ArrowRight:
       return state
-    default:
-      const interruptedMessage = await StdoutWorker.invoke('Stdout.getInterruptedMessage')
-      const watchUsageMessage = await StdoutWorker.invoke('Stdout.getWatchUsageMessage')
+    default: {
+      const interruptedMessage = await InterruptedMessage.print()
+      const watchUsageMessage = await WatchUsage.print()
       return {
         ...state,
         mode: ModeType.Interrupted,
         stdout: [...state.stdout, interruptedMessage + '\n' + watchUsageMessage],
       }
+    }
   }
 }
