@@ -5,12 +5,6 @@ export const readDir = (path) => {
   return NodeFs.readdir(path)
 }
 
-/**
- *
- * @param {string} path
- * @param {BufferEncoding} encoding
- * @returns {string}
- */
-export const readFileSync = (path, encoding): string => {
+export const readFileSync = (path: string, encoding: BufferEncoding): string => {
   return NodeFsSync.readFileSync(path, encoding)
 }
