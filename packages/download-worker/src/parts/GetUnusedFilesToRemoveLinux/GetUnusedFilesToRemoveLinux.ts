@@ -1,7 +1,7 @@
 import { join, resolve } from 'node:path'
 import { readdir } from 'node:fs/promises'
 
-export const getUnusedFilesYoRemoveLinux = async (binaryPath: string): Promise<string[]> => {
+export const getUnusedFilesYoRemoveLinux = async (binaryPath: string): Promise<readonly string[]> => {
   const files: string[] = []
   const installDir = resolve(binaryPath, '..')
   const appRoot = join(installDir, 'resources', 'app')
