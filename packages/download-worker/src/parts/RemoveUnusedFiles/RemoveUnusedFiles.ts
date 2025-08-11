@@ -1,6 +1,6 @@
 import * as RemoveUnusedFilesLinux from '../RemoveUnusedFilesLinux/RemoveUnusedFilesLinux.ts'
 
-export const removeunusedfiles = async (binaryPath: string): Promise<void> => {
+export const removeUnusedFiles = async (binaryPath: string): Promise<void> => {
   if (process.platform !== 'linux') {
     return
   }
