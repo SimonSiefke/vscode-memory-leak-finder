@@ -54,6 +54,7 @@ test('handleTestPassed', async () => {
   )
   const clearMessage: string = await GetTestClearMessage.getTestClearMessage()
   const expectedOutput: string = AnsiEscapes.clear(false) + clearMessage + baseMessage
+
   expect(Stdout.write).toHaveBeenCalledWith(expectedOutput)
   expect(TestStateOutput.clearPending).toHaveBeenCalledTimes(1)
 })
