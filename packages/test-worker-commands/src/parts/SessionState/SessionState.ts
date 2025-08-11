@@ -1,7 +1,12 @@
 import * as PTimeout from '../PTimeout/PTimeout.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 
-export const state = {
+interface State {
+  sessionMap: Record<string, any>
+  targetCallbackMap: Record<string, any>
+}
+
+export const state: State = {
   sessionMap: Object.create(null),
   targetCallbackMap: Object.create(null),
 }
