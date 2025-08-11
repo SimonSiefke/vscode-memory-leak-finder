@@ -26,19 +26,18 @@ export const handleStdinDataFilterWaitingMode = async (state: FilterWaitingState
     }
 
     case AnsiKeys.AltBackspace:
-    case AnsiKeys.ControlBackspace:
+    case AnsiKeys.ControlBackspace: {
       if (!state.value) {
         return state
       }
-      {
-        const cursorBackward: string = await StdoutWorker.invoke('Stdout.getCursorBackward')
-        const eraseEndLine: string = await StdoutWorker.invoke('Stdout.getEraseEndLine')
-        return {
-          ...state,
-          value: Character.EmptyString,
-          stdout: [...state.stdout, cursorBackward + eraseEndLine],
-        }
+      const cursorBackward: string = await StdoutWorker.invoke('Stdout.getCursorBackward', state.value.length)
+      const eraseEndLine: string = await StdoutWorker.invoke('Stdout.getEraseEndLine')
+      return {
+        ...state,
+        value: Character.EmptyString,
+        stdout: [...state.stdout, cursorBackward + eraseEndLine],
       }
+    }
     case AnsiKeys.Backspace(state.isWindows):
       if (state.value === Character.EmptyString) {
         return state
