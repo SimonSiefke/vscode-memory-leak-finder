@@ -5,7 +5,10 @@ async function testGetObjectsWithProperties() {
   console.log('Testing getObjectsWithProperties function...')
 
   // Load the actual heap snapshot file
-  const heapSnapshotPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/abc2.heapsnapshot'
+  // const heapSnapshotPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/abc2.heapsnapshot'
+  const heapSnapshotPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/0.heapsnapshot'
+  const property = 'dispose'
+  const depth = 1
 
   try {
     // Prepare the heap snapshot
@@ -20,7 +23,7 @@ async function testGetObjectsWithProperties() {
 
     console.log('\n=== Testing Refactored Function ===')
     console.time('check')
-    const oldStateObjects = getObjectsWithPropertiesInternal(snapshot, 'oldState', 3)
+    const oldStateObjects = getObjectsWithPropertiesInternal(snapshot, property, depth)
     console.timeEnd('check')
     console.log(`Refactored function found ${oldStateObjects.length} objects with "oldState" property`)
 
