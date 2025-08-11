@@ -1,4 +1,4 @@
-import type { Snapshot } from '../Snapshot/Snapshot.js'
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
