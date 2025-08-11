@@ -2,6 +2,8 @@ import { expect, test, jest } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.js'
 import { cloneRepository } from '../src/parts/CloneRepository/CloneRepository.js'
+import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
+import { cloneRepository } from '../src/parts/CloneRepository/CloneRepository.ts'
 
 test('cloneRepository executes git clone command', async () => {
   const repoUrl = 'https://github.com/microsoft/vscode.git'

@@ -2,6 +2,8 @@ import { test, expect, jest } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.js'
 import { findPackageLockFiles } from '../src/parts/FindPackageLockFiles/FindPackageLockFiles.js'
+import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
+import { findPackageLockFiles } from '../src/parts/FindPackageLockFiles/FindPackageLockFiles.ts'
 
 test('findPackageLockFiles - returns empty array when no package-lock.json files found', async () => {
   const mockInvoke = jest.fn()

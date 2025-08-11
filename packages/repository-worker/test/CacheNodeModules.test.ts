@@ -3,6 +3,8 @@ import { VError } from '@lvce-editor/verror'
 import { MockRpc } from '@lvce-editor/rpc'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.js'
 import { addNodeModulesToCache } from '../src/parts/CacheNodeModules/CacheNodeModules.js'
+import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
+import { addNodeModulesToCache } from '../src/parts/CacheNodeModules/CacheNodeModules.ts'
 
 test.skip('addNodeModulesToCache - successfully caches node_modules', async () => {
   const mockNodeModulesPaths = ['node_modules', 'packages/a/node_modules', 'packages/b/node_modules']

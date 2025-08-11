@@ -3,6 +3,10 @@ import * as Filesystem from '../Filesystem/Filesystem.js'
 import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.js'
 import * as GetRestoreFileOperations from '../GetRestoreFileOperations/GetRestoreFileOperations.js'
 import * as Path from '../Path/Path.js'
+import * as Filesystem from '../Filesystem/Filesystem.ts'
+import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
+import * as GetRestoreFileOperations from '../GetRestoreFileOperations/GetRestoreFileOperations.ts'
+import * as Path from '../Path/Path.ts'
 
 /**
  * @param {string} repoPath

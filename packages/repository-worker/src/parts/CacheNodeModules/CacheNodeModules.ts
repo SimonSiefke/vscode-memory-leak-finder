@@ -3,6 +3,10 @@ import * as Filesystem from '../Filesystem/Filesystem.js'
 import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.js'
 import * as GetCacheFileOperations from '../GetCacheFileOperations/GetCacheFileOperations.js'
 import * as Path from '../Path/Path.js'
+import * as Filesystem from '../Filesystem/Filesystem.ts'
+import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
+import * as GetCacheFileOperations from '../GetCacheFileOperations/GetCacheFileOperations.ts'
+import * as Path from '../Path/Path.ts'
 
 /**
  * @param {string} repoPath

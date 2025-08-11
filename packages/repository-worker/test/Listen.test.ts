@@ -3,6 +3,7 @@ import { expect, test, jest } from '@jest/globals'
 // Mock the LaunchFileSystemWorker module
 const mockLaunchFileSystemWorker = jest.fn() as any
 jest.unstable_mockModule('../src/parts/LaunchFileSystemWorker/LaunchFileSystemWorker.js', () => ({
+jest.unstable_mockModule('../src/parts/LaunchFileSystemWorker/LaunchFileSystemWorker.ts', () => ({
   launchFileSystemWorker: mockLaunchFileSystemWorker,
 }))
 

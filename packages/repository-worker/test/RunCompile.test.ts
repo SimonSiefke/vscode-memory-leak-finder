@@ -2,6 +2,8 @@ import { expect, test, jest } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.js'
 import { runCompile } from '../src/parts/RunCompile/RunCompile.js'
+import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
+import { runCompile } from '../src/parts/RunCompile/RunCompile.ts'
 
 test('runCompile throws error when main.js not found after compilation', async () => {
   const cwd = '/test/repo'

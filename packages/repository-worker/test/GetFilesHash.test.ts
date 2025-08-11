@@ -2,6 +2,8 @@ import { expect, test, jest } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.js'
 import { getFilesHash } from '../src/parts/GetFilesHash/GetFilesHash.js'
+import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
+import { getFilesHash } from '../src/parts/GetFilesHash/GetFilesHash.ts'
 
 test('getFilesHash returns hash of file contents', async () => {
   const absolutePaths = ['/path/to/file1.txt', '/path/to/file2.txt']
