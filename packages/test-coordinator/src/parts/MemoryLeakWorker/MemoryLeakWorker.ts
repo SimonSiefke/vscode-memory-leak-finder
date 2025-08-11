@@ -1,4 +1,4 @@
-import { NodeWorkerRpcParent, Rpc } from '@lvce-editor/rpc'
+import { NodeWorkerRpcParent, type Rpc } from '@lvce-editor/rpc'
 import * as Assert from '../Assert/Assert.ts'
 import * as CommandMapRef from '../CommandMapRef/CommandMapRef.ts'
 import * as MemoryLeakWorkerUrl from '../MemoryLeakWorkerUrl/MemoryLeakWorkerUrl.ts'
