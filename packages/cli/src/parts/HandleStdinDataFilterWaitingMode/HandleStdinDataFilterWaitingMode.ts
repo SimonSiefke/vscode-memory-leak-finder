@@ -31,8 +31,8 @@ export const handleStdinDataFilterWaitingMode = async (state: StdinDataState, ke
       if (!state.value) {
         return state
       }
-      const cursorBackward: string = await StdoutWorker.invoke('Stdout.getCursorBackward', state.value.length)
-      const eraseEndLine: string = await StdoutWorker.invoke('Stdout.getEraseEndLine')
+      const cursorBackward: string = await AnsiEscapes.cursorBackward(state.value.length)
+      const eraseEndLine: string = await AnsiEscapes.eraseEndLine()
       return {
         ...state,
         value: Character.EmptyString,

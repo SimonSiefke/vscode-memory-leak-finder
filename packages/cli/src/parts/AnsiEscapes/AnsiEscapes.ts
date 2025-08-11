@@ -24,8 +24,8 @@ export const backspace = async (): Promise<string> => {
   return StdoutWorker.invoke('Stdout.backspace')
 }
 
-export const cursorBackward = async (): Promise<string> => {
-  return StdoutWorker.invoke('Stdout.cursorBackward')
+export const cursorBackward = async (length: number): Promise<string> => {
+  return StdoutWorker.invoke('Stdout.cursorBackward', length)
 }
 
 export const eraseEndLine = async (): Promise<string> => {
