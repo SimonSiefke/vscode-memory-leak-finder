@@ -17,7 +17,7 @@ const getRanAllTestSuitesMessage = (filterValue: string): string => {
   return `${ranAllTestSuitsMatching} /${filterValue}/i${dot}`
 }
 
-export const getAllTestsFinishedMessage = (
+export const getAllTestsFinishedMessage = async (
   passed: number,
   failed: number,
   skipped: number,
@@ -26,7 +26,7 @@ export const getAllTestsFinishedMessage = (
   duration: number,
   filterValue: string,
   isWatchMode: boolean,
-): string => {
+): Promise<string> => {
   const failedMessage = failed ? `${chalk.bold.red(`${failed} failed`)}, ` : Character.EmptyString
   const skippedMessage = skipped ? `${chalk.bold.yellow(`${skipped} skipped`)}, ` : Character.EmptyString
   const passedMessage = passed ? `${chalk.bold.green(`${passed} passed`)}, ` : Character.EmptyString
@@ -38,7 +38,7 @@ ${testSuites} ${failedMessage}${skippedMessage}${passedMessage}${leakedMessage}$
 ${time}        ${durationMessage}
 ${ranAllTestSuitesMessage}\n`
   if (isWatchMode) {
-    message += `${WatchUsageShort.print()}`
+    message += `${await WatchUsageShort.print()}`
   }
   return message
 }

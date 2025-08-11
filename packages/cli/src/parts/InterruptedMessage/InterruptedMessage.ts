@@ -4,6 +4,6 @@ const interruptedText = 'Test run was interrupted.'
 
 const interruptedMessage = chalk.bold.red(interruptedText)
 
-export const print = (): string => {
+export const print = async (): Promise<string> => {
   return interruptedMessage
 }

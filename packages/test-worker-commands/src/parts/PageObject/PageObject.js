@@ -5,32 +5,41 @@ import * as Expect from '../Expect/Expect.js'
 import * as ImportScript from '../ImportScript/ImportScript.js'
 import * as PageObjectState from '../PageObjectState/PageObjectState.js'
 import { VError } from '../VError/VError.js'
-import * as WaitForVsCodeToBeReady from '../WaitForVsCodeToBeReady/WaitForVsCodeToBeReady.js'
+import * as WaitForFirstWindow from '../WaitForFirstWindow/WaitForFirstWindow.js'
 
-export const create = async (connectionId, isFirstConnection, isHeadless, timeouts, ideVersion, pageObjectPath) => {
+// TODO move this into 3 separate functions
+// 1. import pageobject module
+// 2. wait for first window
+// 3. create pageObject
+// 4. ask pageObject to check that window is ready
+//
+// steps and and 2 can be done in parallel
+
+export const create = async (connectionId, isFirstConnection, isHeadless, timeouts, parsedIdeVersion, pageObjectPath) => {
   try {
     Assert.number(connectionId)
     Assert.boolean(isFirstConnection)
     Assert.boolean(timeouts)
-    Assert.string(ideVersion)
+    Assert.object(parsedIdeVersion)
     Assert.string(pageObjectPath)
     const pageObjectModule = await ImportScript.importScript(pageObjectPath)
     const electronApp = ElectronAppState.get(connectionId)
     ElectronAppState.remove(connectionId)
-    const firstWindow = await WaitForVsCodeToBeReady.waitForVsCodeToBeReady({
+
+    const firstWindow = await WaitForFirstWindow.waitForFirstWindow({
       electronApp,
       isFirstConnection,
       isHeadless,
-      expect: Expect.expect,
     })
     const pageObjectContext = {
       page: firstWindow,
       expect: Expect.expect,
       VError,
       electronApp,
-      vscodeVersion: ideVersion,
+      ideVersion: parsedIdeVersion,
     }
     const pageObject = await pageObjectModule.create(pageObjectContext)
+    await pageObject.WaitForApplicationToBeReady.waitForApplicationToBeReady()
     PageObjectState.set(connectionId, { pageObject, firstWindow })
     if (timeouts === false) {
       await DisableTimeouts.disableTimeouts(firstWindow)

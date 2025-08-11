@@ -9,6 +9,7 @@ export const state = {
   cwd: Character.EmptyString,
   filter: Character.EmptyString,
   headless: false,
+  isGithubActions: false,
   measure: Character.EmptyString,
   mode: ModeType.Waiting,
   recordVideo: false,
@@ -29,6 +30,7 @@ export const setState = (newState) => {
   state.checkLeaks = newState.checkLeaks
   state.cwd = newState.cwd
   state.headless = newState.headless
+  state.isGithubActions = newState.isGithubActions
   state.measure = newState.measure
   state.mode = newState.mode
   state.recordVideo = newState.recordVideo
@@ -45,23 +47,39 @@ export const setState = (newState) => {
   state.workers = newState.workers
 }
 
-export const setBuffering = (value) => {
+export const setBuffering = (value: boolean): void => {
   state.buffering = value
 }
 
-export const isBuffering = () => {
+export const setTestSetup = (): void => {
+  state.mode = ModeType.Waiting
+}
+
+export const setTestRunning = (): void => {
+  state.mode = ModeType.Running
+}
+
+export const setTestStateChange = (): void => {
+  state.mode = ModeType.Waiting
+}
+
+export const isBuffering = (): boolean => {
   return state.buffering
 }
 
-export const isWatchMode = () => {
+export const isWatchMode = (): boolean => {
   return state.watch
 }
 
-export const shouldCheckLeaks = () => {
+export const isGithubActions = (): boolean => {
+  return state.isGithubActions
+}
+
+export const shouldCheckLeaks = (): boolean => {
   return state.checkLeaks
 }
 
-export const getRuns = () => {
+export const getRuns = (): number => {
   return state.runs
 }
 

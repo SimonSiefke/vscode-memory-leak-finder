@@ -2,7 +2,7 @@ import { VError } from '../VError/VError.js'
 import * as PTimeout from '../PTimeout/PTimeout.js'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
 
-export const state = {
+const state = {
   /**
    * @type {any}
    */

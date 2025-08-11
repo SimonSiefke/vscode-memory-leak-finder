@@ -8,7 +8,7 @@ import * as TestStateOutput from '../TestStateOutput/TestStateOutput.ts'
 
 export const handleTestsUnexpectedError = async (prettyError) => {
   const isWatchMode = StdinDataState.isWatchMode()
-  const message = GetTestsUnexpectedErrorMessage.getTestsUnexpectedErrorMessage(prettyError)
+  const message = await GetTestsUnexpectedErrorMessage.getTestsUnexpectedErrorMessage(prettyError)
   const fullMessage = TestStateOutput.clearPending() + message
   await Stdout.write(fullMessage)
   StdinDataState.setState({

@@ -1,4 +1,4 @@
-export const state = {
+const state = {
   pageObjects: Object.create(null),
 }
 
@@ -8,14 +8,6 @@ export const getPageObject = (pageObjectId) => {
     throw new Error(`no page object found`)
   }
   return value.pageObject
-}
-
-export const getFirstWindow = (pageObjectId) => {
-  const value = state.pageObjects[pageObjectId]
-  if (!value) {
-    throw new Error(`no page object found`)
-  }
-  return value.firstWindow
 }
 
 export const set = (pageObjectId, pageObject) => {
