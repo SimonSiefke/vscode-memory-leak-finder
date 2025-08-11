@@ -5,18 +5,9 @@ import { getBooleanStructure } from '../GetBooleanValue/GetBooleanValue.ts'
 import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
+import { ObjectWithProperty } from '../ObjectWithProperty/ObjectWithProperty.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
-
-export interface ObjectWithProperty {
-  id: number
-  name: string | null
-  propertyValue: string | boolean | number | null
-  type: string | null
-  selfSize: number
-  edgeCount: number
-  preview?: Record<string, any>
-}
 
 /**
  * Internal function that finds objects in a parsed heap snapshot that have a specific property

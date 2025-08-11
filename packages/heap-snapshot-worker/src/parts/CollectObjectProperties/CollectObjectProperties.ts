@@ -7,16 +7,6 @@ import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
-export interface ObjectWithProperty {
-  id: number
-  name: string | null
-  propertyValue: string | boolean | number | null
-  type: string | null
-  selfSize: number
-  edgeCount: number
-  preview?: Record<string, any>
-}
-
 const tryResolveNestedNumeric = (
   containerNodeIndex: number,
   snapshot: Snapshot,
