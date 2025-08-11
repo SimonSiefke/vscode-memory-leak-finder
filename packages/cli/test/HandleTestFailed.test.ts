@@ -65,7 +65,7 @@ test('handleTestFailed', async () => {
   )
   const clearMessage: string = await GetTestClearMessage.getTestClearMessage()
   // Do not call TestStateOutput.clearPending() here to avoid incrementing the mock call count
-  const expectedOutput: string = AnsiEscapes.clear(false) + clearMessage + baseMessage
+  const expectedOutput: string = (await AnsiEscapes.clear(false)) + clearMessage + baseMessage
 
   expect(Stdout.write).toHaveBeenCalledWith(expectedOutput)
   expect(TestStateOutput.clearPending).toHaveBeenCalledTimes(1)
