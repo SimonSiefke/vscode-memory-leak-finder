@@ -2,7 +2,7 @@ import { join } from 'node:path'
 import * as Assert from '../Assert/Assert.ts'
 import * as Root from '../Root/Root.ts'
 import * as VideoRecordingWorker from '../VideoRecordingWorker/VideoRecordingWorker.ts'
-import { Rpc } from '@lvce-editor/rpc'
+import type { Rpc } from '@lvce-editor/rpc'
 
 interface State {
   rpc: Rpc | undefined
