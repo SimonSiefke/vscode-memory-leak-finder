@@ -145,18 +145,17 @@ export const collectObjectProperties = (
         const locations = snapshot.locations
         if (locationFields && locationFields.length > 0 && locations && locations.length > 0) {
           const { itemsPerLocation, objectIndexOffset, scriptIdOffset, lineOffset, columnOffset } = getLocationFieldOffsets(locationFields)
-          const ITEMS_PER_NODE_LOCAL = ITEMS_PER_NODE
           const traceNodeId = (targetNode as any)['trace_node_id']
-          if (typeof traceNodeId === 'number' && traceNodeId !== 0) {
-            for (let locIndex = 0; locIndex < locations.length; locIndex += itemsPerLocation) {
-              const objectIndex = locations[locIndex + objectIndexOffset] / ITEMS_PER_NODE_LOCAL
-              if (objectIndex === traceNodeId) {
-                const scriptId = locations[locIndex + scriptIdOffset]
-                const line = locations[locIndex + lineOffset]
-                const column = locations[locIndex + columnOffset]
-                value = `[function: ${scriptId}:${line}:${column}]`
-                break
-              }
+          for (let locIndex = 0; locIndex < locations.length; locIndex += itemsPerLocation) {
+            const objectIndex = locations[locIndex + objectIndexOffset] / ITEMS_PER_NODE
+            const isMatchByTrace = typeof traceNodeId === 'number' && traceNodeId !== 0 && objectIndex === traceNodeId
+            const isMatchByNodeIndex = objectIndex === targetNodeIndex
+            if (isMatchByTrace || isMatchByNodeIndex) {
+              const scriptId = locations[locIndex + scriptIdOffset]
+              const line = locations[locIndex + lineOffset]
+              const column = locations[locIndex + columnOffset]
+              value = `[function: ${scriptId}:${line}:${column}]`
+              break
             }
           }
         }
