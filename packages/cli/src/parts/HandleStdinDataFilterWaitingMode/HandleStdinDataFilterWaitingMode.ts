@@ -56,7 +56,7 @@ export const handleStdinDataFilterWaitingMode = async (state: StdinDataState, ke
     case AnsiKeys.End:
       return state
     case AnsiKeys.Escape: {
-      const clear = await AnsiEscapes.clear()
+      const clear = await AnsiEscapes.clear(state.isWindows)
       const watchUsage = await WatchUsage.print()
       return {
         ...state,
