@@ -3,8 +3,9 @@ import { getUniqueLocationMap } from '../GetUniqueLocationMap/GetUniqueLocationM
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
 
-const prepareFunctions = async (path) => {
-  const snapshot = await prepareHeapSnapshot(path, {})
+const prepareFunctions = async (path: string): Promise<any> => {
+  // @ts-ignore minimal typing for migration
+  const snapshot: any = await prepareHeapSnapshot(path, {})
   const { itemsPerLocation, scriptIdOffset, lineOffset, columnOffset } = getLocationFieldOffsets(snapshot.meta.location_fields)
   const map = getUniqueLocationMap(snapshot.locations, itemsPerLocation, scriptIdOffset, lineOffset, columnOffset)
   return {
@@ -14,7 +15,7 @@ const prepareFunctions = async (path) => {
   }
 }
 
-export const compareHeapSnapshotFunctions = async (pathA, pathB, useParallel = true) => {
+export const compareHeapSnapshotFunctions = async (pathA: string, pathB: string, useParallel: boolean = true): Promise<any[]> => {
   console.log(`[CompareHeapSnapshotFunctions] Starting comparison between:`)
   console.log(`  - Path A: ${pathA}`)
   console.log(`  - Path B: ${pathB}`)
