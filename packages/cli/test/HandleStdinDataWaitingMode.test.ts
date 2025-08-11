@@ -1,19 +1,13 @@
-import { beforeEach, expect, jest, test } from '@jest/globals'
+import { expect, jest, test } from '@jest/globals'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
 import * as CliKeys from '../src/parts/CliKeys/CliKeys.ts'
+import { createDefaultState } from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
+import * as HandleStdinDataWaitingMode from '../src/parts/HandleStdinDataWaitingMode/HandleStdinDataWaitingMode.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
-import * as StdinDataState from '../src/parts/StdinDataState/StdinDataState.ts'
 import * as StdoutWorker from '../src/parts/StdoutWorker/StdoutWorker.ts'
 
-beforeEach(() => {
-  jest.resetModules()
-  jest.resetAllMocks()
-})
-
-const HandleStdinDataWaitingMode = await import('../src/parts/HandleStdinDataWaitingMode/HandleStdinDataWaitingMode.ts')
-
 test('handleStdinDataWaitingMode - ctrl + c', async () => {
-  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = AnsiKeys.ControlC
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
@@ -21,7 +15,7 @@ test('handleStdinDataWaitingMode - ctrl + c', async () => {
 })
 
 test('handleStdinDataWaitingMode - ctrl + d', async () => {
-  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = AnsiKeys.ControlD
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
@@ -29,7 +23,7 @@ test('handleStdinDataWaitingMode - ctrl + d', async () => {
 })
 
 test('handleStdinDataWaitingMode - enter', async () => {
-  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = AnsiKeys.Enter
 
   const mockRpc = {
@@ -53,18 +47,18 @@ test('handleStdinDataWaitingMode - enter', async () => {
 })
 
 test('handleStdinDataWaitingMode - escape', async () => {
-  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = AnsiKeys.Escape
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toBe(state)
 })
 
 test('handleStdinDataWaitingMode - toggle headless mode', async () => {
-  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc', headless: false }
+  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc', headless: false }
   const key = 'h'
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toEqual({
-    ...StdinDataState.createDefaultState(),
+    ...createDefaultState(),
     value: 'abc',
     headless: true,
     mode: ModeType.Running,
@@ -72,14 +66,14 @@ test('handleStdinDataWaitingMode - toggle headless mode', async () => {
 })
 
 test('handleStdinDataWaitingMode - other key', async () => {
-  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = 'd'
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toBe(state)
 })
 
 test('handleStdinDataWaitingMode - ctrl + backspace', async () => {
-  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = AnsiKeys.ControlBackspace
 
   const mockRpc = {
@@ -103,42 +97,42 @@ test('handleStdinDataWaitingMode - ctrl + backspace', async () => {
 })
 
 test('handleStdinDataWaitingMode - backspace', async () => {
-  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = AnsiKeys.Backspace
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.value).toBe('ab')
 })
 
 test('handleStdinDataWaitingMode - arrow left', async () => {
-  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = AnsiKeys.ArrowLeft
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toBe(state)
 })
 
 test('handleStdinDataWaitingMode - arrow right', async () => {
-  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = AnsiKeys.ArrowRight
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toBe(state)
 })
 
 test('handleStdinDataWaitingMode - home', async () => {
-  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = AnsiKeys.Home
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toBe(state)
 })
 
 test('handleStdinDataWaitingMode - end', async () => {
-  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = AnsiKeys.End
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toBe(state)
 })
 
 test('handleStdinDataWaitingMode - watch mode', async () => {
-  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = CliKeys.WatchMode
 
   const mockRpc = {
@@ -159,7 +153,7 @@ test('handleStdinDataWaitingMode - watch mode', async () => {
 })
 
 test('handleStdinDataWaitingMode - filter mode', async () => {
-  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = CliKeys.FilterMode
 
   const mockRpc = {
