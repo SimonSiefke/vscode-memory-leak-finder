@@ -5,58 +5,56 @@ import * as ModeType from '../ModeType/ModeType.ts'
 import * as PatternUsage from '../PatternUsage/PatternUsage.ts'
 import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
 export const handleStdinDataFinishedRunningMode = async (
   state: StdinDataState.StdinDataState,
   key: string,
 ): Promise<StdinDataState.StdinDataState> => {
-  const currentStdout = state.stdout
-
   switch (key) {
     case AnsiKeys.ControlC:
     case AnsiKeys.ControlD:
       return {
         ...state,
         mode: ModeType.Exit,
-        stdout: currentStdout,
       }
     case CliKeys.WatchMode: {
-      const message = await WatchUsage.clearAndPrint()
+      const cursorUp = await StdoutWorker.invoke('Stdout.cursorUp')
+      const eraseDown = await StdoutWorker.invoke('Stdout.eraseDown')
+      const watchUsage = await WatchUsage.print()
       return {
         ...state,
         mode: ModeType.Waiting,
-        stdout: [...currentStdout, message],
+        stdout: [...state.stdout, cursorUp + eraseDown + watchUsage],
       }
     }
     case CliKeys.FilterMode: {
-      const message = await PatternUsage.clearAndPrint()
+      const clear = await StdoutWorker.invoke('Stdout.clear')
+      const patternUsage = await PatternUsage.print()
       return {
         ...state,
         value: Character.EmptyString,
         mode: ModeType.FilterWaiting,
-        stdout: [...currentStdout, message],
+        stdout: [...state.stdout, clear + patternUsage],
       }
     }
     case CliKeys.Quit:
       return {
         ...state,
         mode: ModeType.Exit,
-        stdout: currentStdout,
       }
     case CliKeys.ToggleHeadlessMode:
       return {
         ...state,
         headless: !state.headless,
         mode: ModeType.Running,
-        stdout: currentStdout,
       }
     case AnsiKeys.Enter:
       return {
         ...state,
         mode: ModeType.Running,
-        stdout: currentStdout,
       }
     default:
-      return { ...state, stdout: currentStdout }
+      return state
   }
 }
