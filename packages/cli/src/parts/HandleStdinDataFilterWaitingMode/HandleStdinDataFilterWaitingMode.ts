@@ -38,18 +38,17 @@ export const handleStdinDataFilterWaitingMode = async (state: FilterWaitingState
         stdout: [...state.stdout, cursorBackward + eraseEndLine],
       }
     }
-    case AnsiKeys.Backspace(state.isWindows):
+    case AnsiKeys.Backspace(state.isWindows): {
       if (state.value === Character.EmptyString) {
         return state
       }
-      {
-        const backspace: string = await StdoutWorker.invoke('Stdout.getBackspace')
-        return {
-          ...state,
-          value: state.value.slice(0, -1),
-          stdout: [...state.stdout, backspace],
-        }
+      const backspace: string = await StdoutWorker.invoke('Stdout.getBackspace')
+      return {
+        ...state,
+        value: state.value.slice(0, -1),
+        stdout: [...state.stdout, backspace],
       }
+    }
     case AnsiKeys.ArrowLeft:
     case AnsiKeys.ArrowRight:
     case AnsiKeys.Home:
