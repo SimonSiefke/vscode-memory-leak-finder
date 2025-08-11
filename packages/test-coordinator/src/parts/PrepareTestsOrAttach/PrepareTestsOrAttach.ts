@@ -64,7 +64,6 @@ export const prepareTestsOrAttach = async (
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, monkeyPatchedElectron } = await state.promise
   const isFirstConnection = false
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
-  await ConnectElectron.connectElectron(testWorkerRpc, connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback)
   await ConnectDevtools.connectDevtools(
     testWorkerRpc,
     connectionId,
