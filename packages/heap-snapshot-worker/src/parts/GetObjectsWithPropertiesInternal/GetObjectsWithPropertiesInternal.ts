@@ -11,11 +11,48 @@ import { getBooleanValue, getBooleanStructure } from '../GetBooleanValue/GetBool
 export interface ObjectWithProperty {
   id: number
   name: string | null
-  propertyValue: string | boolean | null
+  propertyValue: string | boolean | number | null
   type: string | null
   selfSize: number
   edgeCount: number
   preview?: Record<string, any>
+}
+
+const tryResolveNestedNumeric = (
+  containerNodeIndex: number,
+  snapshot: Snapshot,
+  edgeMap: Uint32Array,
+  propertyName: string,
+  visited: Set<number>,
+): number | null => {
+  const { nodes, edges, strings, meta } = snapshot
+  const nodeFields = meta.node_fields
+  const edgeFields = meta.edge_fields
+  const nodeTypes = meta.node_types
+  const ITEMS_PER_NODE = nodeFields.length
+
+  const propertyNameIndex = strings.findIndex((s) => s === propertyName)
+  if (propertyNameIndex === -1) {
+    return null
+  }
+
+  const nodeEdges = getNodeEdges(containerNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
+  for (const edge of nodeEdges) {
+    if (edge.nameIndex === propertyNameIndex) {
+      const targetIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
+      const nestedNode = parseNode(targetIndex, nodes, nodeFields)
+      if (!nestedNode) continue
+      const nestedType = getNodeTypeName(nestedNode, nodeTypes) || 'unknown'
+      if (nestedType === 'number' || nestedType === 'string' || nestedType === 'code' || nestedType === 'hidden') {
+        const actual = getActualValue(nestedNode, snapshot, edgeMap, visited)
+        const parsed = Number(actual)
+        if (Number.isFinite(parsed)) {
+          return parsed
+        }
+      }
+    }
+  }
+  return null
 }
 
 /**
@@ -118,8 +155,18 @@ export const collectObjectProperties = (
           value = `[Array ${targetNode.id}]`
         }
       } else if (targetType === 'string' || targetType === 'number') {
-        // For primitives, get the actual value
-        value = getActualValue(targetNode, snapshot, edgeMap, visited)
+        // For primitives, get the actual value (use fresh visited to avoid sibling cross-contamination)
+        const actual = getActualValue(targetNode, snapshot, edgeMap, new Set())
+        if (targetType === 'number') {
+          const parsed = Number(actual)
+          if (Number.isFinite(parsed)) {
+            value = parsed
+          } else {
+            value = actual
+          }
+        } else {
+          value = actual
+        }
       } else if (targetType === 'hidden') {
         // For hidden nodes, check if it's a boolean or other special value
         const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap, propertyName)
@@ -133,14 +180,27 @@ export const collectObjectProperties = (
             value = booleanValue
           }
         } else {
-          value = getActualValue(targetNode, snapshot, edgeMap, visited)
+          value = getActualValue(targetNode, snapshot, edgeMap, new Set())
         }
       } else if (targetType === 'code') {
         // For code objects, try to get the actual value they represent
-        value = getActualValue(targetNode, snapshot, edgeMap, visited)
+        value = getActualValue(targetNode, snapshot, edgeMap, new Set())
       } else {
         // For other types like closure, etc.
         value = `[${targetType} ${targetNode.id}]`
+      }
+
+      // Heuristic: For coordinate and size properties ('x','y','width','height'),
+      // if value still looks like a reference, try to resolve nested numeric value
+      if (
+        (propertyName === 'x' || propertyName === 'y' || propertyName === 'width' || propertyName === 'height') &&
+        typeof value === 'string' &&
+        value.startsWith('[')
+      ) {
+        const nestedNumeric = tryResolveNestedNumeric(targetNodeIndex, snapshot, edgeMap, propertyName, visited)
+        if (nestedNumeric !== null) {
+          value = nestedNumeric
+        }
       }
 
       properties[propertyName] = value
@@ -225,11 +285,15 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
           } else {
             // Fall back to standard value detection
             const actualValue = getActualValue(targetNode, snapshot, edgeMap)
-            // Check if the actual value is a boolean string and convert it
+            const targetTypeName = getNodeTypeName(targetNode, nodeTypes)
+            // Normalize booleans and numbers
             if (actualValue === 'true') {
               result.propertyValue = true
             } else if (actualValue === 'false') {
               result.propertyValue = false
+            } else if (targetTypeName === 'number') {
+              const parsed = Number(actualValue)
+              result.propertyValue = Number.isFinite(parsed) ? parsed : actualValue
             } else {
               result.propertyValue = actualValue
             }
