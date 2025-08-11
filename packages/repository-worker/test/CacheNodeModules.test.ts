@@ -1,8 +1,8 @@
-import { expect, jest, test } from '@jest/globals'
-import { MockRpc } from '@lvce-editor/rpc'
+import { expect, test, jest } from '@jest/globals'
 import { VError } from '@lvce-editor/verror'
-import { addNodeModulesToCache } from '../src/parts/CacheNodeModules/CacheNodeModules.ts'
+import { MockRpc } from '@lvce-editor/rpc'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
+import { addNodeModulesToCache } from '../src/parts/CacheNodeModules/CacheNodeModules.ts'
 
 test.skip('addNodeModulesToCache - successfully caches node_modules', async () => {
   const mockNodeModulesPaths = ['node_modules', 'packages/a/node_modules', 'packages/b/node_modules']
