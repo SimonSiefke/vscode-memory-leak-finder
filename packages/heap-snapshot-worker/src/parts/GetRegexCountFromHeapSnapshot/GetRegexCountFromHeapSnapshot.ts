@@ -1,5 +1,5 @@
-import { getRegexCountFromHeapSnapshotInternal } from '../GetRegexCountFromHeapSnapshotInternal/GetRegexCountFromHeapSnapshotInternal.js'
-import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.js'
+import { getRegexCountFromHeapSnapshotInternal } from '../GetRegexCountFromHeapSnapshotInternal/GetRegexCountFromHeapSnapshotInternal.ts'
+import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 
 export const getRegexCountFromHeapSnapshot = async (path) => {
   const snapshot = await prepareHeapSnapshot(path, {

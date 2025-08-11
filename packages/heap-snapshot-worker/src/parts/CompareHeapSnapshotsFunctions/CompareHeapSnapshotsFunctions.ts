@@ -1,7 +1,7 @@
-import { compareHeapSnapshotFunctionsInternal } from '../CompareHeapSnapshotsFunctionsInternal/CompareHeapSnapshotsFunctionsInternal.js'
-import { getUniqueLocationMap } from '../GetUniqueLocationMap/GetUniqueLocationMap.js'
-import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.js'
-import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.js'
+import { compareHeapSnapshotFunctionsInternal } from '../CompareHeapSnapshotsFunctionsInternal/CompareHeapSnapshotsFunctionsInternal.ts'
+import { getUniqueLocationMap } from '../GetUniqueLocationMap/GetUniqueLocationMap.ts'
+import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
+import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
 
 const prepareFunctions = async (path) => {
   const snapshot = await prepareHeapSnapshot(path, {})

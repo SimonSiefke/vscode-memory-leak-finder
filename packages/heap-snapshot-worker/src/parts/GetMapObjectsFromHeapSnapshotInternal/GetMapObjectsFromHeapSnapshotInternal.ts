@@ -1,5 +1,5 @@
-import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.js'
-import { isInternalMap } from '../IsInternalMap/IsInternalMap.js'
+import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.ts'
+import { isInternalMap } from '../IsInternalMap/IsInternalMap.ts'
 
 /**
  * @param {import('../Snapshot/Snapshot.ts').Snapshot} snapshot
@@ -55,8 +55,8 @@ export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
           edgeCount,
           detachedness,
           nodeDataIndex: i, // Store node data index for later use
-          variableNames: /** @type {Array<{name: string, sourceType: string, sourceName: string}>} */ ([]), // Will be populated by scanning edges
-          keys: /** @type {string[]} */ ([]), // Will be populated by extracting from table array
+          variableNames: /** @type {Array<{name: string, sourceType: string, sourceName: string}>} */ [], // Will be populated by scanning edges
+          keys: /** @type {string[]} */ [], // Will be populated by extracting from table array
           note: 'Map object found in heap snapshot',
         }
 

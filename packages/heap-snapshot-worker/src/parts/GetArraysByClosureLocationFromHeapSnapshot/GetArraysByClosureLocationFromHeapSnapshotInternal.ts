@@ -1,7 +1,7 @@
-import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.js'
-import { isInternalArray } from '../IsInternalArray/IsInternalArray.js'
-import { getLocationKey } from '../GetLocationKey/GetLocationKey.js'
-import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.js'
+import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.ts'
+import { isInternalArray } from '../IsInternalArray/IsInternalArray.ts'
+import { getLocationKey } from '../GetLocationKey/GetLocationKey.ts'
+import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
 
 export const getArraysByClosureLocationFromHeapSnapshotInternal = (
   strings,

@@ -1,4 +1,4 @@
-import * as ParseHeapSnapshotInternal from '../ParseHeapSnapshotInternal/ParseHeapSnapshotInternal.js'
+import * as ParseHeapSnapshotInternal from '../ParseHeapSnapshotInternal/ParseHeapSnapshotInternal.ts'
 
 export const parseHeapSnapshot = (heapsnapshot) => {
   const { snapshot, nodes, edges, strings, locations } = heapsnapshot

@@ -1,8 +1,8 @@
-import * as Assert from '../Assert/Assert.js'
-import * as CreateNameMap from '../CreateNameMap/CreateNameMap.js'
-import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
-import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
-import * as SortCountMap from '../SortCountMap/SortCountMap.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as CreateNameMap from '../CreateNameMap/CreateNameMap.ts'
+import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
+import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
+import * as SortCountMap from '../SortCountMap/SortCountMap.ts'
 
 const createCountMap = (names) => {
   const map = Object.create(null)

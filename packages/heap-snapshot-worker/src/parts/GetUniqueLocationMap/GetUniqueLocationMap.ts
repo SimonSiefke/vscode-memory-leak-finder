@@ -1,4 +1,4 @@
-import { getLocationKey } from '../GetLocationKey/GetLocationKey.js'
+import { getLocationKey } from '../GetLocationKey/GetLocationKey.ts'
 
 export const getUniqueLocationMap = (locations, itemsPerLocation, scriptIdOffset, lineOffset, columnOffset) => {
   const locationMap = Object.create(null)

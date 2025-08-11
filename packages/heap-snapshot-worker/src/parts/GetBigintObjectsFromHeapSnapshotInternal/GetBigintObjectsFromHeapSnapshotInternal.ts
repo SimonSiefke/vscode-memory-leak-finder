@@ -1,4 +1,4 @@
-import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.js'
+import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.ts'
 
 /**
  * @param {import('../Snapshot/Snapshot.ts').Snapshot} snapshot

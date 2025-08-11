@@ -1,5 +1,5 @@
 import { NodeForkedProcessRpcClient } from '@lvce-editor/rpc'
-import * as CommandMap from '../CommandMap/CommandMap.js'
+import * as CommandMap from '../CommandMap/CommandMap.ts'
 
 const handleUncaughtExceptionMonitor = (error) => {
   console.error(error)

@@ -1,6 +1,6 @@
-import { getArraysFromHeapSnapshotInternal } from '../GetArraysFromHeapSnapshotInternal/GetArraysFromHeapSnapshotInternal.js'
-import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
-import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.js'
+import { getArraysFromHeapSnapshotInternal } from '../GetArraysFromHeapSnapshotInternal/GetArraysFromHeapSnapshotInternal.ts'
+import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
+import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 
 export const getArraysFromHeapSnapshot = async (pathUri) => {
   const snapshot = await prepareHeapSnapshot(pathUri, {

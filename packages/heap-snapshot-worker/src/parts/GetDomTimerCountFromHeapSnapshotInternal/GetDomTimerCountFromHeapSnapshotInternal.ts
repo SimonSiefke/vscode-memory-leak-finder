@@ -1,4 +1,4 @@
-import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.js'
+import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.ts'
 
 /**
  * Counts DOM timers (setTimeout/setInterval) from heap snapshot

@@ -1,5 +1,5 @@
-import { getBigintObjectsFromHeapSnapshotInternal } from '../GetBigintObjectsFromHeapSnapshotInternal/GetBigintObjectsFromHeapSnapshotInternal.js'
-import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.js'
+import { getBigintObjectsFromHeapSnapshotInternal } from '../GetBigintObjectsFromHeapSnapshotInternal/GetBigintObjectsFromHeapSnapshotInternal.ts'
+import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 
 /**
  * @param {string} pathUri

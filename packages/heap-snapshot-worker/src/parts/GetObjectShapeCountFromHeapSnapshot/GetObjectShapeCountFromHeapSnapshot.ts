@@ -1,5 +1,5 @@
-import * as Assert from '../Assert/Assert.js'
-import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 
 const ITEMS_PER_NODE = 7
 

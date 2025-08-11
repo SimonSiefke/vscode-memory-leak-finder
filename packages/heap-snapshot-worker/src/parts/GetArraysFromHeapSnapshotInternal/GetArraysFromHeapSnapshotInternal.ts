@@ -1,6 +1,6 @@
-import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.js'
-import * as CreateNameMap from '../CreateNameMap/CreateNameMap.js'
-import { isInternalArray } from '../IsInternalArray/IsInternalArray.js'
+import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.ts'
+import * as CreateNameMap from '../CreateNameMap/CreateNameMap.ts'
+import { isInternalArray } from '../IsInternalArray/IsInternalArray.ts'
 
 export const getArraysFromHeapSnapshotInternal = (
   strings,

@@ -1,5 +1,5 @@
-import * as PrepareHeapSnapshot from '../PrepareHeapSnapshot/PrepareHeapSnapshot.js'
-import * as GetStrings from '../GetStrings/GetStrings.js'
+import * as PrepareHeapSnapshot from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
+import * as GetStrings from '../GetStrings/GetStrings.ts'
 
 export const parseHeapSnapshotNumbers = async (path) => {
   // Use the fast parsing function with Uint32Array for nodes

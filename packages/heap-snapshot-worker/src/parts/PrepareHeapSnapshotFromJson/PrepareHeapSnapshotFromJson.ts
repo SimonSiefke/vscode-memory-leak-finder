@@ -1,6 +1,6 @@
 import { Worker } from 'node:worker_threads'
-import { getHeapSnapshotWorkerPath } from '../GetHeapSnapshotWorkerPath/GetHeapSnapshotWorkerPath.js'
-import { waitForResult } from '../WaitForResult/WaitForResult.js'
+import { getHeapSnapshotWorkerPath } from '../GetHeapSnapshotWorkerPath/GetHeapSnapshotWorkerPath.ts'
+import { waitForResult } from '../WaitForResult/WaitForResult.ts'
 
 /**
  * Prepares a heap snapshot by parsing it in a separate worker for better performance

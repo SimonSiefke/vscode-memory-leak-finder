@@ -1,5 +1,5 @@
-import { getStringsInternal } from '../GetStringsInternal/GetStringsInternal.js'
-import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.js'
+import { getStringsInternal } from '../GetStringsInternal/GetStringsInternal.ts'
+import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 
 /**
  * @param {string} path

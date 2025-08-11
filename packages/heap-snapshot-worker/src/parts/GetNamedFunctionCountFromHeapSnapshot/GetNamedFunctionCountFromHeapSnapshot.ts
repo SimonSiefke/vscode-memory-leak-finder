@@ -1,9 +1,9 @@
-import * as Assert from '../Assert/Assert.js'
-import { getFunctionsWithLocations } from '../GetFunctionsWithLocations/GetFunctionsWithLocations.js'
-import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
-import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
-import { normalizeFunctionObjects } from '../NormalizeFunctionObjects/NormalizeFunctionObjects.js'
-import { aggregateFunctionObjects } from '../AggregateFunctionObjects/AggregateFunctionObjects.js'
+import * as Assert from '../Assert/Assert.ts'
+import { getFunctionsWithLocations } from '../GetFunctionsWithLocations/GetFunctionsWithLocations.ts'
+import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
+import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
+import { normalizeFunctionObjects } from '../NormalizeFunctionObjects/NormalizeFunctionObjects.ts'
+import { aggregateFunctionObjects } from '../AggregateFunctionObjects/AggregateFunctionObjects.ts'
 
 export const getNamedFunctionCountFromHeapSnapshot = async (id, scriptMap, minCount) => {
   const heapsnapshot = HeapSnapshotState.get(id)

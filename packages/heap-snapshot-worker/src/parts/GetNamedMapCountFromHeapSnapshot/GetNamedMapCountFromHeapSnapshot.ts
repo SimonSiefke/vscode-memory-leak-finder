@@ -1,5 +1,5 @@
-import { getNamedMapCountFromHeapSnapshotInternal } from '../GetNamedMapCountFromHeapSnapshotInternal/GetNamedMapCountFromHeapSnapshotInternal.js'
-import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.js'
+import { getNamedMapCountFromHeapSnapshotInternal } from '../GetNamedMapCountFromHeapSnapshotInternal/GetNamedMapCountFromHeapSnapshotInternal.ts'
+import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 
 export const getNamedMapCountFromHeapSnapshot = async (path) => {
   const snapshot = await prepareHeapSnapshot(path, {

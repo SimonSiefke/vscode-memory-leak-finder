@@ -1,7 +1,7 @@
-import * as Assert from '../Assert/Assert.js'
-import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
-import * as IsImportantEdge from '../IsImportantEdge/IsImportantEdge.js'
-import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
+import * as IsImportantEdge from '../IsImportantEdge/IsImportantEdge.ts'
+import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 
 const isClosure = (node) => {
   return node.type === 'closure'

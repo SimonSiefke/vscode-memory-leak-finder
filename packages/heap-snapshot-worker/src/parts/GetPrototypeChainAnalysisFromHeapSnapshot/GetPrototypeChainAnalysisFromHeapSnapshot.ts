@@ -1,7 +1,7 @@
-import * as Assert from '../Assert/Assert.js'
-import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
-import * as ParseHeapSnapshotInternalEdges from '../ParseHeapSnapshotInternalEdges/ParseHeapSnapshotInternalEdges.js'
-import * as ParseHeapSnapshotInternalNodes from '../ParseHeapSnapshotInternalNodes/ParseHeapSnapshotInternalNodes.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
+import * as ParseHeapSnapshotInternalEdges from '../ParseHeapSnapshotInternalEdges/ParseHeapSnapshotInternalEdges.ts'
+import * as ParseHeapSnapshotInternalNodes from '../ParseHeapSnapshotInternalNodes/ParseHeapSnapshotInternalNodes.ts'
 
 const MAX_EXPECTED_CHAIN_LENGTH = 10
 const PROTOTYPE_POLLUTION_THRESHOLD = 1000 // If this many objects share unusual properties

@@ -7,5 +7,5 @@ import { fileURLToPath } from 'node:url'
  */
 export const getHeapSnapshotWorkerPath = () => {
   const __dirname = dirname(fileURLToPath(import.meta.url))
-  return join(__dirname, '../../../../heap-snapshot-parsing-worker/bin/heap-snapshot-parsing-worker.js')
+  return join(__dirname, '../../../../heap-snapshot-parsing-worker/bin/heap-snapshot-parsing-worker.ts')
 }

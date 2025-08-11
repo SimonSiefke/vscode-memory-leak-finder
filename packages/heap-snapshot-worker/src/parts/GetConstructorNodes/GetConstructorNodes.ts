@@ -1,4 +1,4 @@
-import * as Assert from '../Assert/Assert.js'
+import * as Assert from '../Assert/Assert.ts'
 
 export const getConstructorNodes = (parsedNodes, constructorName) => {
   Assert.array(parsedNodes)

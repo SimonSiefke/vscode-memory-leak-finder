@@ -1,5 +1,5 @@
-import { getFunctionCountFromHeapSnapshotInternal } from '../GetFunctionCountFromHeapSnapshotInternal/GetFunctionCountFromHeapSnapshotInternal.js'
-import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.js'
+import { getFunctionCountFromHeapSnapshotInternal } from '../GetFunctionCountFromHeapSnapshotInternal/GetFunctionCountFromHeapSnapshotInternal.ts'
+import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 
 export const getFunctionCountFromHeapSnapshot = async (path) => {
   const snapshot = await prepareHeapSnapshot(path, {

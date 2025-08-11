@@ -1,4 +1,4 @@
-import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
+import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 
 export const parseHeapSnapshotStrings = (id) => {
   const heapsnapshot = HeapSnapshotState.get(id)

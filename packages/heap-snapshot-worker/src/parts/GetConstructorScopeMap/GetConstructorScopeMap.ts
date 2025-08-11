@@ -1,4 +1,4 @@
-import * as IsIgnoredConstructorScopeEdge from '../IsIgnoredConstructorScopeEdge/IsIgnoredConstructorScopeEdge.js'
+import * as IsIgnoredConstructorScopeEdge from '../IsIgnoredConstructorScopeEdge/IsIgnoredConstructorScopeEdge.ts'
 
 export const getConstructorScopeMap = (parsedNodes, graph) => {
   const scopeMap = new Uint32Array(parsedNodes.length)

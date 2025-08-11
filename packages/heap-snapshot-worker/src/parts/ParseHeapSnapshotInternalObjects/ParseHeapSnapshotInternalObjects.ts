@@ -1,6 +1,6 @@
-import * as Assert from '../Assert/Assert.js'
-import * as CamelCase from '../CamelCase/CamelCase.js'
-import * as CreateHeapSnapshotNode from '../CreateHeapSnapshotNode/CreateHeapSnapshotNode.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as CamelCase from '../CamelCase/CamelCase.ts'
+import * as CreateHeapSnapshotNode from '../CreateHeapSnapshotNode/CreateHeapSnapshotNode.ts'
 
 export const parseHeapSnapshotObjects = (
   values,

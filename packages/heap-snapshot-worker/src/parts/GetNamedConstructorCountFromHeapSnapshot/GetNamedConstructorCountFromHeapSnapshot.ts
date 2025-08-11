@@ -1,8 +1,8 @@
-import * as Assert from '../Assert/Assert.js'
-import * as GetConstructorNodes from '../GetConstructorNodes/GetConstructorNodes.js'
-import * as GetConstructorScope from '../GetConstructorScope/GetConstructorScope.js'
-import * as GetConstructorScopeMap from '../GetConstructorScopeMap/GetConstructorScopeMap.js'
-import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as GetConstructorNodes from '../GetConstructorNodes/GetConstructorNodes.ts'
+import * as GetConstructorScope from '../GetConstructorScope/GetConstructorScope.ts'
+import * as GetConstructorScopeMap from '../GetConstructorScopeMap/GetConstructorScopeMap.ts'
+import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 
 const createCounts = (constructorNodesWithInfo) => {
   const map = Object.create(null)

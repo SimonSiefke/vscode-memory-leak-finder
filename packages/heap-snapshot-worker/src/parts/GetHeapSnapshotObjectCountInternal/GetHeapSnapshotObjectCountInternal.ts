@@ -1,4 +1,4 @@
-import { getTypeCount } from '../GetTypeCount/GetTypeCount.js'
+import { getTypeCount } from '../GetTypeCount/GetTypeCount.ts'
 
 /**
  *

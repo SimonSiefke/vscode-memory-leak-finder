@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises'
-import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
+import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 
 /**
  * @param {string} path

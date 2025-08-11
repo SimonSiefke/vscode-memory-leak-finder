@@ -1,4 +1,4 @@
-import * as Id from '../Id/Id.js'
+import * as Id from '../Id/Id.ts'
 
 export const state = {
   callbacks: Object.create(null),

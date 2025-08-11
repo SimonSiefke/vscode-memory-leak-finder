@@ -1,6 +1,6 @@
-import * as Assert from '../Assert/Assert.js'
-import * as GetNamedConstructorCountFromHeapSnapshot from '../GetNamedConstructorCountFromHeapSnapshot/GetNamedConstructorCountFromHeapSnapshot.js'
-import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as GetNamedConstructorCountFromHeapSnapshot from '../GetNamedConstructorCountFromHeapSnapshot/GetNamedConstructorCountFromHeapSnapshot.ts'
+import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 
 export const getNamedEmitterCountFromHeapSnapshot = async (id) => {
   const heapsnapshot = HeapSnapshotState.get(id)

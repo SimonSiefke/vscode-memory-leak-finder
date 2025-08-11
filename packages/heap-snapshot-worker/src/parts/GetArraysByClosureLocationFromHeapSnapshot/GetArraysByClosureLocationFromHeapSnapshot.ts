@@ -1,7 +1,7 @@
-import * as Assert from '../Assert/Assert.js'
-import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.js'
-import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.js'
-import { getArraysByClosureLocationFromHeapSnapshotInternal } from './GetArraysByClosureLocationFromHeapSnapshotInternal.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
+import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
+import { getArraysByClosureLocationFromHeapSnapshotInternal } from './GetArraysByClosureLocationFromHeapSnapshotInternal.ts'
 
 export const getArraysByClosureLocationFromHeapSnapshot = async (id, scriptMap) => {
   const heapsnapshot = HeapSnapshotState.get(id)
