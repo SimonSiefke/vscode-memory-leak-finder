@@ -2,7 +2,12 @@ import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
 import * as GetTestClearMessage from '../GetTestClearMessage/GetTestClearMessage.ts'
 import * as TestStateOutput from '../TestStateOutput/TestStateOutput.ts'
 
-export const getFullMessage = async (message: string, isGithubAcions: boolean, isBuffering: boolean): Promise<string> => {
+export const getFullMessage = async (
+  message: string,
+  isGithubAcions: boolean,
+  isBuffering: boolean,
+  isWindows: boolean,
+): Promise<string> => {
   const clearMessage = await GetTestClearMessage.getTestClearMessage()
   let fullMessage = ''
   if (!isGithubAcions) {
@@ -10,7 +15,7 @@ export const getFullMessage = async (message: string, isGithubAcions: boolean, i
   }
   fullMessage += message
   if (!isGithubAcions && !isBuffering) {
-    fullMessage = AnsiEscapes.clear + fullMessage
+    fullMessage = AnsiEscapes.clear(isWindows) + fullMessage
   }
   fullMessage += TestStateOutput.clearPending()
   return fullMessage

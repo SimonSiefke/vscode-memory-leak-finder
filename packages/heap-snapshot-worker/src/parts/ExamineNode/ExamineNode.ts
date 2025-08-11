@@ -140,9 +140,17 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
 
       // Format the value for display
       let displayValue = actualValue
-      if (edge.targetNodeInfo?.type === 'string' && actualValue !== null && !actualValue.startsWith('[')) {
+      if (edge.targetNodeInfo?.type === 'string' && typeof actualValue === 'string' && !actualValue.startsWith('[')) {
         // Quote string values for display, handle empty strings properly
         displayValue = `"${actualValue}"`
+      } else if (edge.targetNodeInfo?.type === 'number') {
+        const parsed = Number(actualValue)
+        if (Number.isFinite(parsed)) {
+          // keep as number for display in examination output
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          displayValue = parsed
+        }
       }
 
       return {
@@ -170,11 +178,13 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
  * @returns Promise that resolves to the examination result or null if not found
  */
 export const analyzeNodeFromFile = async (filePath: string, nodeId: number): Promise<NodeExaminationResult | null> => {
-  const { prepareHeapSnapshot } = await import('../PrepareHeapSnapshot/PrepareHeapSnapshot.js')
+  const { prepareHeapSnapshot } = await import('../PrepareHeapSnapshot/PrepareHeapSnapshot.ts')
 
   try {
-    const snapshot = await prepareHeapSnapshot(filePath, { parseStrings: true })
-    return examineNodeById(nodeId, snapshot)
+    // @ts-ignore minimal typing for migration
+    const snapshot: any = await prepareHeapSnapshot(filePath, { parseStrings: true })
+    // @ts-ignore minimal typing for migration
+    return examineNodeById(nodeId, snapshot as any)
   } catch (error) {
     console.error(`Error loading heap snapshot from ${filePath}:`, error)
     return null

@@ -1,22 +1,10 @@
-import { beforeEach, expect, jest, test } from '@jest/globals'
+import { expect, test } from '@jest/globals'
 import * as CliKeys from '../src/parts/CliKeys/CliKeys.ts'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
+import * as HandleStdinDataFinishedRunningMode from '../src/parts/HandleStdinDataFinishedRunningMode/HandleStdinDataFinishedRunningMode.ts'
 
-beforeEach(() => {
-  jest.resetModules()
-  jest.resetAllMocks()
-})
-
-jest.unstable_mockModule('../src/parts/IsWindows/IsWindows.ts', () => {
-  return {
-    isWindows: false,
-  }
-})
-
-const HandleStdinDataFinishedRunningMode = await import(
-  '../src/parts/HandleStdinDataFinishedRunningMode/HandleStdinDataFinishedRunningMode.ts'
-)
+// no mocks required
 
 test('handleStdinDataFinishedRunningMode - show watch mode details', async () => {
   const state = {

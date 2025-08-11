@@ -22,10 +22,9 @@ export const create = async (connectionId, isFirstConnection, isHeadless, timeou
     Assert.boolean(timeouts)
     Assert.object(parsedIdeVersion)
     Assert.string(pageObjectPath)
-    const pageObjectModule = await ImportScript.importScript(pageObjectPath)
+    const { pageObjectModule } = PageObjectState.get(connectionId)
     const electronApp = ElectronAppState.get(connectionId)
     ElectronAppState.remove(connectionId)
-
     const firstWindow = await WaitForFirstWindow.waitForFirstWindow({
       electronApp,
       isFirstConnection,

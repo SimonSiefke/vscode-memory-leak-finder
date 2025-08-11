@@ -16,5 +16,3 @@ export default {
   testMatch: ['**/test/**/*.test.ts'],
   injectGlobals: false,
 }
-
-

@@ -1,4 +1,4 @@
-import type { Snapshot } from '../Snapshot/Snapshot.js'
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 import { getActualValue } from '../GetActualValue/GetActualValue.ts'
@@ -100,7 +100,17 @@ export const collectArrayElements = (
         }
       } else if (targetType === 'string' || targetType === 'number') {
         // For primitives, get the actual value
-        value = getActualValue(targetNode, snapshot, edgeMap, visited)
+        const actual = getActualValue(targetNode, snapshot, edgeMap, visited)
+        if (targetType === 'number') {
+          const parsed = Number(actual)
+          if (Number.isFinite(parsed)) {
+            value = parsed
+          } else {
+            value = actual
+          }
+        } else {
+          value = actual
+        }
       } else if (targetType === 'hidden') {
         // For hidden nodes, check if it's a boolean or other special value
         const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap)
