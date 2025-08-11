@@ -1,13 +1,11 @@
 import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
 import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
+import * as FileSystemWorkerPath from '../FileSystemWorkerPath/FileSystemWorkerPath.ts'
 
-export const launchFileSystemWorker = () => {
-  const path = '' // TODO
-  const rpc = NodeWorkerRpcParent.create({
+export const launchFileSystemWorker = async (): Promise<void> => {
+  const rpc = await NodeWorkerRpcParent.create({
     commandMap: {},
-    path,
-    execArgv: ['--ipc-type="worker-thread"'],
+    path: FileSystemWorkerPath.fileSystemWorkerPath,
   })
   FileSystemWorker.set(rpc)
-  return
 }

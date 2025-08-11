@@ -1,3 +1,3 @@
-import { main } from './parts/Main/Main.js'
+import { main } from './parts/Main/Main.ts'
 
 main()

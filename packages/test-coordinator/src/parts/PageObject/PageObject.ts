@@ -1,7 +1,7 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
 
-export const create = (rpc, connectionId, isFirstConnection, headlessMode, timeouts, parsedIdeVersion, pageObjectPath) => {
+export const create = async (rpc, connectionId, isFirstConnection, headlessMode, timeouts, parsedIdeVersion, pageObjectPath) => {
   Assert.object(rpc)
   Assert.number(connectionId)
   Assert.boolean(isFirstConnection)
@@ -9,7 +9,8 @@ export const create = (rpc, connectionId, isFirstConnection, headlessMode, timeo
   Assert.boolean(timeouts)
   Assert.object(parsedIdeVersion)
   Assert.string(pageObjectPath)
-  return rpc.invoke(
+  await rpc.invoke(TestWorkerCommandType.ImportPageObject, connectionId, pageObjectPath)
+  await rpc.invoke(
     TestWorkerCommandType.PageObjectCreate,
     connectionId,
     isFirstConnection,
