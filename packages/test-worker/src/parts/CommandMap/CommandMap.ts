@@ -1,10 +1,10 @@
 import { join } from 'path'
-import * as ImportScript from '../ImportScript/ImportScript.js'
-import * as Root from '../Root/Root.js'
+import * as ImportScript from '../ImportScript/ImportScript.ts'
+import * as Root from '../Root/Root.ts'
 
 export const load = async () => {
   const testWorkerCommandsPath = join(Root.root, '..', '..', 'test-worker-commands', 'src', 'main.js')
   const module = await ImportScript.importScript(testWorkerCommandsPath)
-  const { commandMap } = module
+  const { commandMap } = module as any
   return commandMap
 }
