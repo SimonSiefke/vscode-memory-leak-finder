@@ -99,8 +99,9 @@ test('handleStdinDataWaitingMode - backspace', async () => {
   const state = {
     value: 'abc',
     stdout: [],
+    isWindows: false,
   }
-  const key = AnsiKeys.Backspace
+  const key = AnsiKeys.Backspace(false)
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.value).toBe('ab')
   expect(newState.stdout).toEqual([])
