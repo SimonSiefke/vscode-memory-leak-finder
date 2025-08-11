@@ -1,7 +1,7 @@
 import { join, resolve } from 'node:path'
 import { readdir } from 'node:fs/promises'
 
-export const getunusedfilestoremovelinux = async (binaryPath: string): Promise<string[]> => {
+export const getUnusedFilesYoRemoveLinux = async (binaryPath: string): Promise<string[]> => {
   const files: string[] = []
   const installDir = resolve(binaryPath, '..')
   const appRoot = join(installDir, 'resources', 'app')
@@ -27,10 +27,7 @@ export const getunusedfilestoremovelinux = async (binaryPath: string): Promise<s
   files.push(join(installDir, 'LICENSES.chromium.html'))
 
   // vsce-sign artifacts
-  const possibleVsceBases = [
-    join(appRoot, 'node_modules', '@vscode'),
-    join(appRoot, 'node_modules.asar.unpacked', '@vscode'),
-  ]
+  const possibleVsceBases = [join(appRoot, 'node_modules', '@vscode'), join(appRoot, 'node_modules.asar.unpacked', '@vscode')]
   for (const base of possibleVsceBases) {
     try {
       const entries = await readdir(base, { withFileTypes: true })
@@ -44,5 +41,3 @@ export const getunusedfilestoremovelinux = async (binaryPath: string): Promise<s
 
   return files
 }
-
-
