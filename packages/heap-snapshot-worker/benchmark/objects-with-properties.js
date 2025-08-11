@@ -1,3 +1,4 @@
+import { writeFile } from 'fs/promises'
 import { getObjectsWithPropertiesInternal } from '../src/parts/GetObjectsWithPropertiesInternal/GetObjectsWithPropertiesInternal.ts'
 import { prepareHeapSnapshot } from '../src/parts/PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 
@@ -7,6 +8,7 @@ async function testGetObjectsWithProperties() {
   // Load the actual heap snapshot file
   // const heapSnapshotPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/abc2.heapsnapshot'
   const heapSnapshotPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/0.heapsnapshot'
+  const resultPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-memory-leak-finder-results/objects-with-properties.json'
   const property = 'dispose'
   const depth = 1
 
@@ -28,6 +30,7 @@ async function testGetObjectsWithProperties() {
     console.log(`Refactored function found ${oldStateObjects.length} objects with "oldState" property`)
 
     console.log(JSON.stringify({ oldStateObjects }, null, 2))
+    await writeFile(resultPath, JSON.stringify(oldStateObjects, null, 2) + '\n')
   } catch (error) {
     console.error('Error testing getObjectsWithProperties:', error)
   }
