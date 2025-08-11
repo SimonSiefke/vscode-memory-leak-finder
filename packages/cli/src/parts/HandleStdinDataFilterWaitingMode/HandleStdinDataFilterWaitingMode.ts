@@ -78,6 +78,7 @@ export const handleStdinDataFilterWaitingMode = async (state: FilterWaitingState
         stdout: [...state.stdout, prefix + top],
       }
     }
+    case AnsiKeys.ArrowUp:
     case AnsiKeys.ArrowDown:
       return state
     default:
