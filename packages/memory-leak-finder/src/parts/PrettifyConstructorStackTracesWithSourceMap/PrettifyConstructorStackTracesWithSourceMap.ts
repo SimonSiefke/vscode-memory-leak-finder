@@ -4,10 +4,7 @@ import * as GetEventListenersQuery from '../GetEventListenersQuery/GetEventListe
 
 const sortOriginal = (cleanInstances) => {
   const cleaned = []
-  const sorted = Arrays.toSorted(
-    cleanInstances,
-    (a: any, b: any) => (a.originalIndex || 0) - (b.originalIndex || 0),
-  )
+  const sorted = Arrays.toSorted(cleanInstances, (a: any, b: any) => (a.originalIndex || 0) - (b.originalIndex || 0))
   let current = []
   let currentIndex = -1
   for (const value of sorted) {

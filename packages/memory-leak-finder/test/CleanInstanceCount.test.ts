@@ -9,7 +9,7 @@ test('cleanInstanceCount', () => {
     columnNumber: 2776,
   }
   const scriptMap = {
-    16: { url: 'index.ts', sourceMapUrl: 'index.js.map' },
+    16: { url: 'index.js', sourceMapUrl: 'index.js.map' },
   }
   expect(CleanInstanceCount.cleanInstanceCount(instance, constructorLocation, scriptMap)).toEqual({
     columnNumber: 2776,
