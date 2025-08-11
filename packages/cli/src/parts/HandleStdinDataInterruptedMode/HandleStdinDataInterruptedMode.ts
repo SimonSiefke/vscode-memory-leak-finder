@@ -1,11 +1,12 @@
+import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
 import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
 import * as Character from '../Character/Character.ts'
 import * as CliKeys from '../CliKeys/CliKeys.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
 import * as PatternUsage from '../PatternUsage/PatternUsage.ts'
-import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
+import { StdinDataState } from '../StdinDataState/StdinDataState.ts'
 
-export const handleStdinDataInterruptedMode = async (state, key) => {
+export const handleStdinDataInterruptedMode = async (state: StdinDataState, key: string): Promise<StdinDataState> => {
   switch (key) {
     case AnsiKeys.ControlC:
     case AnsiKeys.ControlD:
@@ -14,7 +15,7 @@ export const handleStdinDataInterruptedMode = async (state, key) => {
         mode: ModeType.Exit,
       }
     case CliKeys.FilterMode: {
-      const clear = await StdoutWorker.invoke('Stdout.getClear')
+      const clear = await AnsiEscapes.clear(state.isWindows)
       const patternUsage = await PatternUsage.print()
       return {
         ...state,
