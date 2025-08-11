@@ -42,16 +42,11 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
   const edgeTypes = meta.edge_types[0] || []
   const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
 
-  console.time('edgemap')
   // Create edge map for fast lookups
   const edgeMap = createEdgeMap(nodes, nodeFields)
-  console.timeEnd('edgemap')
 
   // Iterate through each node and scan its edges
   for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex += ITEMS_PER_NODE) {
-    if (nodeIndex % 10000 === 0) {
-      console.log('node' + nodeIndex + ' of ' + nodes.length, 'edge', edgeMap[nodeIndex / ITEMS_PER_NODE], 'of', edges.length)
-    }
     const nodeEdges = getNodeEdges(nodeIndex / ITEMS_PER_NODE, edgeMap, nodes, edges, nodeFields, edgeFields)
 
     // Scan this node's edges
