@@ -78,8 +78,5 @@
         "statements": 60
       }
     }
-  },
-  "devDependencies": {
-    "ts-jest": "^29.4.1"
   }
 }
