@@ -13,7 +13,14 @@ export const launchIde = async ({ headlessMode, cwd, ide, vscodePath, commit, ad
       parsedVersion: ParseVersion.parseVersion(cursorVersion),
     }
   }
-  const result = await LaunchVsCode.launchVsCode({ headlessMode, cwd, vscodeVersion: VscodeVersion.vscodeVersion, vscodePath, commit, addDisposable })
+  const result = await LaunchVsCode.launchVsCode({
+    headlessMode,
+    cwd,
+    vscodeVersion: VscodeVersion.vscodeVersion,
+    vscodePath,
+    commit,
+    addDisposable,
+  })
   return {
     ...result,
     parsedVersion: ParseVersion.parseVersion(VscodeVersion.vscodeVersion),
