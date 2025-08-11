@@ -5,6 +5,7 @@ import { createDefaultState } from '../src/parts/CreateDefaultState/CreateDefaul
 import * as HandleStdinDataWaitingMode from '../src/parts/HandleStdinDataWaitingMode/HandleStdinDataWaitingMode.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
 import * as StdoutWorker from '../src/parts/StdoutWorker/StdoutWorker.ts'
+import { MockRpc } from '@lvce-editor/rpc'
 
 test('handleStdinDataWaitingMode - ctrl + c', async () => {
   const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
@@ -23,10 +24,14 @@ test('handleStdinDataWaitingMode - ctrl + d', async () => {
 })
 
 test('handleStdinDataWaitingMode - enter', async () => {
-  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const state = {
+    ...createDefaultState(),
+    mode: ModeType.Waiting,
+    value: 'abc',
+  }
   const key = AnsiKeys.Enter
 
-  const mockRpc = {
+  const mockRpc = MockRpc.create({
     invoke: jest.fn().mockImplementation((method: any) => {
       if (method === 'Stdout.getEraseLine') {
         return Promise.resolve('\u001B[2K')
@@ -36,10 +41,7 @@ test('handleStdinDataWaitingMode - enter', async () => {
       }
       throw new Error(`unexpected method ${method}`)
     }),
-    send: jest.fn(),
-    invokeAndTransfer: jest.fn(),
-    dispose: jest.fn(),
-  } as any
+  })
   StdoutWorker.set(mockRpc)
 
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)

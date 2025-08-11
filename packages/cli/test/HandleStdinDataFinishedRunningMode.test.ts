@@ -43,7 +43,7 @@ test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.FilterWaiting)
   expect(newState.value).toBe('')
-  expect(newState.stdout?.at(-1)).toBe('[ansi-clear]\npattern usage\n')
+  expect(newState.stdout).toEqual(['[ansi-clear]\npattern usage\n'])
   expect(mockRpc.invoke).toHaveBeenCalled()
 })
 
