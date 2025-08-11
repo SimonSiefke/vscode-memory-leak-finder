@@ -22,6 +22,7 @@ export const getUnusedFilesToRemoveLinux = async (binaryPath: string): Promise<r
 
   // bin folder
   files.push(join(installDir, 'bin'))
+  files.push(join(installDir, 'licenses'))
 
   // Chromium licenses
   files.push(join(installDir, 'LICENSES.chromium.html'))
