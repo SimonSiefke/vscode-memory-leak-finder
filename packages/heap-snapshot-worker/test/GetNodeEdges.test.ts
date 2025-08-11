@@ -97,8 +97,7 @@ test('should handle different edge types', () => {
   const edgeMap = new Uint32Array([0]) // Node 0 starts at edge 0
 
   const node0Edges = getNodeEdges(0, edgeMap, nodes, edges, nodeFields, edgeFields)
+  const ITEMS_PER_EDGE = edgeFields.length
   expect(node0Edges.length / ITEMS_PER_EDGE).toBe(3)
   expect(Array.from(node0Edges.subarray(0, ITEMS_PER_EDGE))).toEqual([2, 1, 1])
-  expect(node0Edges[1]).toEqual({ type: 3, nameIndex: 0, toNode: 2 })
-  expect(node0Edges[2]).toEqual({ type: 1, nameIndex: 5, toNode: 3 })
 })

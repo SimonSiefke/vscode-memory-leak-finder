@@ -230,7 +230,7 @@ export const getBooleanStructure = (
 
   if (sourceNodeIndex === -1) return null
 
-  // Get edges for this node
+  // Get edges for this node (as subarray)
   const nodeEdges = getNodeEdges(sourceNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
 
   // Find property name index
@@ -246,15 +246,24 @@ export const getBooleanStructure = (
   let hasTypeReference = false
 
   // Analyze edges to find boolean pattern
-  for (const edge of nodeEdges) {
-    const targetNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
+  const ITEMS_PER_EDGE = edgeFields.length
+  const edgeTypeFieldIndex = edgeFields.indexOf('type')
+  const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
+  const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
+  for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
+    const type = nodeEdges[i + edgeTypeFieldIndex]
+    const nameIndex = nodeEdges[i + edgeNameFieldIndex]
+    const toNode = nodeEdges[i + edgeToNodeFieldIndex]
+    const targetNodeIndex = Math.floor(toNode / ITEMS_PER_NODE)
     const targetNode = parseNode(targetNodeIndex, nodes, nodeFields)
-    if (!targetNode) continue
+    if (!targetNode) {
+      continue
+    }
 
     const targetNodeName = getNodeName(targetNode, strings)
 
     // Check for property edge to boolean value
-    if (edge.type === EDGE_TYPE_PROPERTY && edge.nameIndex === propertyNameIndex) {
+    if (type === EDGE_TYPE_PROPERTY && nameIndex === propertyNameIndex) {
       const valueCheck = getBooleanValue(targetNode, snapshot, edgeMap, propertyName)
       if (valueCheck) {
         booleanValue = valueCheck
@@ -262,7 +271,7 @@ export const getBooleanStructure = (
     }
 
     // Check for internal edge to boolean type
-    if (edge.type === EDGE_TYPE_INTERNAL && targetNodeName === 'boolean') {
+    if (type === EDGE_TYPE_INTERNAL && targetNodeName === 'boolean') {
       hasTypeReference = true
     }
   }

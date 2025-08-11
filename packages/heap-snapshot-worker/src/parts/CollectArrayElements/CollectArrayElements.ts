@@ -173,13 +173,20 @@ const collectObjectPropertiesInline = (
   const nodeEdges = getNodeEdges(nodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
 
   // Scan edges for properties
-  for (const edge of nodeEdges) {
-    if (edge.type === EDGE_TYPE_PROPERTY) {
-      const propertyName = strings[edge.nameIndex]
+  const ITEMS_PER_EDGE = edgeFields.length
+  const edgeTypeFieldIndex = edgeFields.indexOf('type')
+  const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
+  const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
+  for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
+    const type = nodeEdges[i + edgeTypeFieldIndex]
+    if (type === EDGE_TYPE_PROPERTY) {
+      const nameIndex = nodeEdges[i + edgeNameFieldIndex]
+      const toNode = nodeEdges[i + edgeToNodeFieldIndex]
+      const propertyName = strings[nameIndex]
       if (!propertyName) continue
 
       // Get the target node
-      const targetNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
+      const targetNodeIndex = Math.floor(toNode / ITEMS_PER_NODE)
       const targetNode = parseNode(targetNodeIndex, nodes, nodeFields)
       if (!targetNode) continue
 
