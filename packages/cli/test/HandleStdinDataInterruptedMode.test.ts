@@ -3,11 +3,13 @@ import * as CliKeys from '../src/parts/CliKeys/CliKeys.ts'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
 import * as HandleStdinDataInterruptedMode from '../src/parts/HandleStdinDataInterruptedMode/HandleStdinDataInterruptedMode.ts'
+import { createDefaultState } from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 
 // no mocks required
 
 test('HandleStdinDataInterruptedMode - watch mode key', async () => {
   const state = {
+    ...createDefaultState(),
     value: '',
     mode: ModeType.Interrupted,
     stdout: [],
@@ -20,6 +22,7 @@ test('HandleStdinDataInterruptedMode - watch mode key', async () => {
 
 test('HandleStdinDataInterruptedMode - go to filter mode', async () => {
   const state = {
+    ...createDefaultState(),
     value: '',
     mode: ModeType.Interrupted,
     stdout: [],
@@ -39,6 +42,7 @@ test('HandleStdinDataInterruptedMode - go to filter mode', async () => {
 
 test('HandleStdinDataInterruptedMode - quit', async () => {
   const state = {
+    ...createDefaultState(),
     value: '',
     mode: ModeType.Interrupted,
     stdout: [],
@@ -51,6 +55,7 @@ test('HandleStdinDataInterruptedMode - quit', async () => {
 
 test('HandleStdinDataInterruptedMode - run again', async () => {
   const state = {
+    ...createDefaultState(),
     value: '',
     mode: ModeType.Interrupted,
     stdout: [],
