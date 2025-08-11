@@ -4,8 +4,8 @@ import * as CliKeys from '../CliKeys/CliKeys.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
 import * as PatternUsage from '../PatternUsage/PatternUsage.ts'
 import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
+import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
 import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
-import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
 export const handleStdinDataFinishedRunningMode = async (
   state: StdinDataState.StdinDataState,
@@ -19,8 +19,8 @@ export const handleStdinDataFinishedRunningMode = async (
         mode: ModeType.Exit,
       }
     case CliKeys.WatchMode: {
-      const cursorUp = await StdoutWorker.invoke('Stdout.cursorUp')
-      const eraseDown = await StdoutWorker.invoke('Stdout.eraseDown')
+      const cursorUp = await AnsiEscapes.cursorUp(1)
+      const eraseDown = await AnsiEscapes.eraseDown()
       const watchUsage = await WatchUsage.print()
       return {
         ...state,
@@ -29,7 +29,7 @@ export const handleStdinDataFinishedRunningMode = async (
       }
     }
     case CliKeys.FilterMode: {
-      const clear = await StdoutWorker.invoke('Stdout.clear')
+      const clear = await AnsiEscapes.clear(state.isWindows)
       const patternUsage = await PatternUsage.print()
       return {
         ...state,
