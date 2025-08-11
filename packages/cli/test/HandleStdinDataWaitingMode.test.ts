@@ -120,7 +120,7 @@ test('handleStdinDataWaitingMode - ctrl + backspace', async () => {
 
 test('handleStdinDataWaitingMode - backspace', async () => {
   const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
-  const key = AnsiKeys.Backspace
+  const key = AnsiKeys.Backspace(false)
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.value).toBe('ab')
 })
