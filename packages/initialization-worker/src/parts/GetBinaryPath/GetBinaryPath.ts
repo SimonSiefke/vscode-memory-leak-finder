@@ -2,7 +2,7 @@ import * as DownloadAndUnzipVscode from '../DownloadAndUnzipVscode/DownloadAndUn
 import * as DownloadAndBuildVscodeFromCommit from '../DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.ts'
 import * as Env from '../Env/Env.ts'
 
-export const getBinaryPath = async (vscodeVersion, vscodePath, commit) => {
+export const getBinaryPath = async (vscodeVersion: string, vscodePath: string, commit: string): Promise<string> => {
   if (vscodePath) {
     return vscodePath
   }
