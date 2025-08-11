@@ -29,7 +29,7 @@ export const handleStdinDataWaitingMode = async (state, key) => {
         value: Character.EmptyString,
         stdout: [...state.stdout, AnsiEscapes.eraseLine + AnsiEscapes.cursorLeft],
       }
-    case AnsiKeys.Backspace:
+    case AnsiKeys.Backspace(state.isWindows):
       return {
         ...state,
         value: state.value.slice(0, -1),

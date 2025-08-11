@@ -26,6 +26,7 @@ export const state = {
   workers: false,
   stdout: [],
   previousFilters: [],
+  isWindows: false,
 }
 
 export const setState = (newState): void => {
@@ -49,6 +50,7 @@ export const setState = (newState): void => {
   state.workers = newState.workers
   state.stdout = newState.stdout
   state.previousFilters = newState.previousFilters
+  state.isWindows = newState.isWindows
 }
 
 export const setBuffering = (value: boolean): void => {
