@@ -1,20 +1,10 @@
-import { beforeEach, expect, jest, test } from '@jest/globals'
+import { expect, test } from '@jest/globals'
 import * as CliKeys from '../src/parts/CliKeys/CliKeys.ts'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
+import * as HandleStdinDataInterruptedMode from '../src/parts/HandleStdinDataInterruptedMode/HandleStdinDataInterruptedMode.ts'
 
-beforeEach(() => {
-  jest.resetModules()
-  jest.resetAllMocks()
-})
-
-jest.unstable_mockModule('../src/parts/IsWindows/IsWindows.ts', () => {
-  return {
-    isWindows: false,
-  }
-})
-
-const HandleStdinDataInterruptedMode = await import('../src/parts/HandleStdinDataInterruptedMode/HandleStdinDataInterruptedMode.ts')
+// no mocks required
 
 test('HandleStdinDataInterruptedMode - watch mode key', async () => {
   const state = {
