@@ -11,6 +11,6 @@ export const readDir = (path) => {
  * @param {BufferEncoding} encoding
  * @returns {string}
  */
-export const readFileSync = (path, encoding) => {
+export const readFileSync = (path, encoding): string => {
   return NodeFsSync.readFileSync(path, encoding)
 }

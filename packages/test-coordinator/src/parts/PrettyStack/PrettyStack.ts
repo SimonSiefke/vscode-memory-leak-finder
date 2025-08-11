@@ -37,7 +37,7 @@ const formatLine = (line, root) => {
 export const prettyStack = (lines, root) => {
   Assert.array(lines)
   Assert.string(root)
-  const newLines = []
+  const newLines: string[] = []
   for (const line of lines) {
     newLines.push(formatLine(line, root))
   }
