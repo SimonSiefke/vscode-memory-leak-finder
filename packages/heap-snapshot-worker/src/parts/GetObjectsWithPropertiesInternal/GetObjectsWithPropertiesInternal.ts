@@ -5,7 +5,7 @@ import { getBooleanStructure } from '../GetBooleanValue/GetBooleanValue.ts'
 import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
-import { ObjectWithProperty } from '../ObjectWithProperty/ObjectWithProperty.ts'
+import type { ObjectWithProperty } from '../ObjectWithProperty/ObjectWithProperty.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
