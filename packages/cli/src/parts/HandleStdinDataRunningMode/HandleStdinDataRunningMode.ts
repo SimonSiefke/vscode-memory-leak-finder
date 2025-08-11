@@ -1,7 +1,6 @@
 import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
 import * as InterruptedMessage from '../InterruptedMessage/InterruptedMessage.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
-import * as Stdout from '../Stdout/Stdout.ts'
 import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
 
 export const handleStdinDataRunningMode = async (state, key) => {
