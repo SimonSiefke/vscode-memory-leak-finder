@@ -1,9 +1,10 @@
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 
-export const parseHeapSnapshotStringsCount = async (path) => {
-  const snapshot = await prepareHeapSnapshot(path, {
+export const parseHeapSnapshotStringsCount = async (path: string): Promise<number> => {
+  // @ts-ignore minimal typing for migration
+  const snapshot: any = await prepareHeapSnapshot(path, {
     parseStrings: true,
   })
-  const { strings } = snapshot
+  const { strings } = snapshot as any
   return strings.length
 }

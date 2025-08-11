@@ -5,8 +5,9 @@ import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.
  * @param {string} path
  * @returns {Promise<void>}
  */
-export const loadHeapSnapshot2 = async (path) => {
-  const { locations } = await prepareHeapSnapshot(path, {})
+export const loadHeapSnapshot2 = async (path: string): Promise<void> => {
+  // @ts-ignore minimal typing for migration
+  const { locations } = (await prepareHeapSnapshot(path, {})) as any
 
   console.log({ locations: locations.length })
 
