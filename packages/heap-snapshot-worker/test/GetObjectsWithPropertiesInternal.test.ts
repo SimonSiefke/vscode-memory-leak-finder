@@ -163,12 +163,12 @@ test('should handle number property values', () => {
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '42',
+    propertyValue: 42,
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '42',
+      test: 42,
     },
   })
 })
@@ -642,7 +642,7 @@ test('should collect object properties with depth 1', () => {
     edgeCount: 3,
     preview: {
       config: '[Object 4]',
-      newState: '42',
+      newState: 42,
       oldState: 'hello',
     },
   })

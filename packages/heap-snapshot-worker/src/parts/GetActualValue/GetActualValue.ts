@@ -62,8 +62,46 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
 
   // For numbers, return the actual number value
   if (nodeType === NODE_TYPE_NUMBER) {
-    const numberValue = targetNode.name?.toString()
-    return numberValue || `[Number ${targetNode.id}]`
+    // If node name is directly a numeric string, use it
+    const directName = getNodeName(targetNode, strings)
+    if (directName && directName !== 'heap number') {
+      return directName
+    }
+
+    // Some synthetic or simplified snapshots encode the numeric value directly
+    // in the name field as a number that is NOT an index into strings.
+    if (typeof targetNode.name === 'number' && Number.isFinite(targetNode.name)) {
+      return targetNode.name.toString()
+    }
+
+    // Otherwise, follow internal edges to a string node that contains the numeric representation
+    // Find the node index for this target node
+    const idFieldIndex = nodeFields.indexOf('id')
+    let targetNodeIndex = -1
+    for (let i = 0; i < nodes.length; i += ITEMS_PER_NODE) {
+      if (nodes[i + idFieldIndex] === targetNode.id) {
+        targetNodeIndex = i / ITEMS_PER_NODE
+        break
+      }
+    }
+
+    if (targetNodeIndex !== -1) {
+      const nodeEdges = getNodeEdges(targetNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
+      for (const edge of nodeEdges) {
+        if (edge.type === EDGE_TYPE_INTERNAL) {
+          const referencedNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
+          const referencedNode = parseNode(referencedNodeIndex, nodes, nodeFields)
+          if (referencedNode && referencedNode.type === NODE_TYPE_STRING) {
+            const numericString = getNodeName(referencedNode, strings)
+            if (numericString !== null) {
+              return numericString
+            }
+          }
+        }
+      }
+    }
+
+    return `[Number ${targetNode.id}]`
   }
 
   // For hidden nodes, check if it's a boolean or undefined value

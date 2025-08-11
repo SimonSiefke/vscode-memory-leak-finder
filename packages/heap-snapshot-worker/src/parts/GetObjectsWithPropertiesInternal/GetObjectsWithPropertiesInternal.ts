@@ -11,7 +11,7 @@ import { getBooleanValue, getBooleanStructure } from '../GetBooleanValue/GetBool
 export interface ObjectWithProperty {
   id: number
   name: string | null
-  propertyValue: string | boolean | null
+  propertyValue: string | boolean | number | null
   type: string | null
   selfSize: number
   edgeCount: number
@@ -119,7 +119,17 @@ export const collectObjectProperties = (
         }
       } else if (targetType === 'string' || targetType === 'number') {
         // For primitives, get the actual value
-        value = getActualValue(targetNode, snapshot, edgeMap, visited)
+        const actual = getActualValue(targetNode, snapshot, edgeMap, visited)
+        if (targetType === 'number') {
+          const parsed = Number(actual)
+          if (Number.isFinite(parsed)) {
+            value = parsed
+          } else {
+            value = actual
+          }
+        } else {
+          value = actual
+        }
       } else if (targetType === 'hidden') {
         // For hidden nodes, check if it's a boolean or other special value
         const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap, propertyName)
@@ -225,11 +235,15 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
           } else {
             // Fall back to standard value detection
             const actualValue = getActualValue(targetNode, snapshot, edgeMap)
-            // Check if the actual value is a boolean string and convert it
+            const targetTypeName = getNodeTypeName(targetNode, nodeTypes)
+            // Normalize booleans and numbers
             if (actualValue === 'true') {
               result.propertyValue = true
             } else if (actualValue === 'false') {
               result.propertyValue = false
+            } else if (targetTypeName === 'number') {
+              const parsed = Number(actualValue)
+              result.propertyValue = Number.isFinite(parsed) ? parsed : actualValue
             } else {
               result.propertyValue = actualValue
             }
