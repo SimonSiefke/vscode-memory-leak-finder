@@ -16,17 +16,17 @@ export const handleStdinDataFinishedRunningMode = async (state, key) => {
         mode: ModeType.Exit,
       }
     case CliKeys.WatchMode:
-      await Stdout.write(AnsiEscapes.cursorUp() + AnsiEscapes.eraseDown + (await WatchUsage.print()))
       return {
         ...state,
         mode: ModeType.Waiting,
+        stdout: [...state.stdout, AnsiEscapes.cursorUp() + AnsiEscapes.eraseDown + (await WatchUsage.print())],
       }
     case CliKeys.FilterMode:
-      await Stdout.write(AnsiEscapes.clear + PatternUsage.print())
       return {
         ...state,
         value: Character.EmptyString,
         mode: ModeType.FilterWaiting,
+        stdout: [...state.stdout, AnsiEscapes.clear + PatternUsage.print()],
       }
     case CliKeys.Quit:
       return {

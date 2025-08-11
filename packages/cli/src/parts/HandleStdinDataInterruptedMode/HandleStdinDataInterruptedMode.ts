@@ -15,11 +15,11 @@ export const handleStdinDataInterruptedMode = async (state, key) => {
         mode: ModeType.Exit,
       }
     case CliKeys.FilterMode:
-      await Stdout.write(AnsiEscapes.clear + PatternUsage.print())
       return {
         ...state,
         value: Character.EmptyString,
         mode: ModeType.FilterWaiting,
+        stdout: [...state.stdout, AnsiEscapes.clear + PatternUsage.print()],
       }
     case CliKeys.Quit:
       return {
