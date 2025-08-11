@@ -1,51 +1,30 @@
-import { beforeEach, expect, jest, test } from '@jest/globals'
+import { expect, test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
-import * as CliKeys from '../src/parts/CliKeys/CliKeys.ts'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
-import * as ModeType from '../src/parts/ModeType/ModeType.ts'
+import * as CliKeys from '../src/parts/CliKeys/CliKeys.ts'
+import { createDefaultState } from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as HandleStdinDataInterruptedMode from '../src/parts/HandleStdinDataInterruptedMode/HandleStdinDataInterruptedMode.ts'
+import * as ModeType from '../src/parts/ModeType/ModeType.ts'
+import * as StdoutWorker from '../src/parts/StdoutWorker/StdoutWorker.ts'
 
-beforeEach(() => {
-  jest.resetModules()
-  jest.resetAllMocks()
+const mockRpc = MockRpc.create({
+  commandMap: {},
+  invoke: (method: string) => {
+    if (method === 'Stdout.getClear') {
+      return '\u001B[2J\u001B[3J\u001B[H'
+    }
+    if (method === 'Stdout.getPatternUsageMessage') {
+      return '\n\u001B[1mPattern Mode Usage\u001B[22m\n \u001B[2m› Press\u001B[22m Esc \u001B[2mto exit pattern mode.\u001B[22m\n \u001B[2m› Press\u001B[22m Enter \u001B[2mto filter by a regex pattern.\u001B[22m\n\n\u001B[2m pattern ›\u001B[22m '
+    }
+    throw new Error(`unexpected method ${method}`)
+  },
 })
 
-jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
-  return {
-    write: jest.fn().mockImplementation(() => Promise.resolve()),
-  }
-})
-
-jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
-  const mockRpc = MockRpc.create({
-    commandMap: {},
-    invoke: (method: string) => {
-      if (method === 'Stdout.getClear') {
-        return '\u001B[2J\u001B[3J\u001B[H'
-      }
-      if (method === 'Stdout.getPatternUsageMessage') {
-        return '\n\u001B[1mPattern Mode Usage\u001B[22m\n \u001B[2m› Press\u001B[22m Esc \u001B[2mto exit pattern mode.\u001B[22m\n \u001B[2m› Press\u001B[22m Enter \u001B[2mto filter by a regex pattern.\u001B[22m\n\n\u001B[2m pattern ›\u001B[22m '
-      }
-      throw new Error(`unexpected method ${method}`)
-    },
-  })
-
-  return {
-    invoke: mockRpc.invoke.bind(mockRpc),
-  }
-})
-
-jest.unstable_mockModule('../src/parts/IsWindows/IsWindows.ts', () => {
-  return {
-    isWindows: false,
-  }
-})
-
-const Stdout = await import('../src/parts/Stdout/Stdout.ts')
-const HandleStdinDataInterruptedMode = await import('../src/parts/HandleStdinDataInterruptedMode/HandleStdinDataInterruptedMode.ts')
+StdoutWorker.set(mockRpc)
 
 test('HandleStdinDataInterruptedMode - watch mode key', async () => {
   const state = {
+    ...createDefaultState(),
     value: '',
     mode: ModeType.Interrupted,
     stdout: [],
@@ -58,6 +37,7 @@ test('HandleStdinDataInterruptedMode - watch mode key', async () => {
 
 test('HandleStdinDataInterruptedMode - go to filter mode', async () => {
   const state = {
+    ...createDefaultState(),
     value: '',
     mode: ModeType.Interrupted,
     stdout: [],
@@ -77,6 +57,7 @@ test('HandleStdinDataInterruptedMode - go to filter mode', async () => {
 
 test('HandleStdinDataInterruptedMode - quit', async () => {
   const state = {
+    ...createDefaultState(),
     value: '',
     mode: ModeType.Interrupted,
     stdout: [],
@@ -89,6 +70,8 @@ test('HandleStdinDataInterruptedMode - quit', async () => {
 
 test('HandleStdinDataInterruptedMode - run again', async () => {
   const state = {
+    ...createDefaultState(),
+
     value: '',
     mode: ModeType.Interrupted,
     stdout: [],
