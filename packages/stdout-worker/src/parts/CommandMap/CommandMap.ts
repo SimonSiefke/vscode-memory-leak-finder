@@ -11,6 +11,7 @@ import * as GetHandleTestSkippedMessage from '../GetHandleTestSkippedMessage/Get
 import * as GetInterruptedMessage from '../GetInterruptedMessage/GetInterruptedMessage.ts'
 import * as GetPatternUsageMessage from '../GetPatternUsageMessage/GetPatternUsageMessage.ts'
 import * as GetTestClearMessage from '../GetTestClearMessage/GetTestClearMessage.ts'
+import * as GetTestsUnexpectedErrorMessage from '../GetTestsUnexpectedErrorMessage/GetTestsUnexpectedErrorMessage.ts'
 import * as GetWatchUsageMessage from '../GetWatchUsageMessage/GetWatchUsageMessage.ts'
 
 export const commandMap: Record<string, (...args: any[]) => any> = {
@@ -35,5 +36,6 @@ export const commandMap: Record<string, (...args: any[]) => any> = {
   'Stdout.getInterruptedMessage': GetInterruptedMessage.getInterruptedMessage,
   'Stdout.getPatternUsageMessage': GetPatternUsageMessage.getPatternUsageMessage,
   'Stdout.getTestClearMessage': GetTestClearMessage.getTestClearMessage,
+  'Stdout.getTestsUnexpectedErrorMessage': GetTestsUnexpectedErrorMessage.getTestsUnexpectedErrorMessage,
   'Stdout.getWatchUsageMessage': GetWatchUsageMessage.getWatchUsageMessage,
 }
