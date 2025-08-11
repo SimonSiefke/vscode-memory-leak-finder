@@ -21,7 +21,7 @@ export default {
   collectCoverage: true,
   coverageThreshold: {
     global: {
-      branches: 34,
+      branches: 45,
       functions: 45,
       lines: 45,
       statements: 45,
