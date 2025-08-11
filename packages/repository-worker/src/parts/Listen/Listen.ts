@@ -1,6 +1,6 @@
 import { NodeWorkerRpcClient } from '@lvce-editor/rpc'
-import * as CommandMap from '../CommandMap/CommandMap.js'
-import { launchFileSystemWorker } from '../LaunchFileSystemWorker/LaunchFileSystemWorker.js'
+import * as CommandMap from '../CommandMap/CommandMap.ts'
+import { launchFileSystemWorker } from '../LaunchFileSystemWorker/LaunchFileSystemWorker.ts'
 import * as CommandMap from '../CommandMap/CommandMap.ts'
 import { launchFileSystemWorker } from '../LaunchFileSystemWorker/LaunchFileSystemWorker.ts'
 

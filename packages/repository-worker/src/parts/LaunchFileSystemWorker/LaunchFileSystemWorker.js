@@ -1,5 +1,5 @@
 import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
-import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.js'
+import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 
 export const launchFileSystemWorker = () => {
   const path = '' // TODO

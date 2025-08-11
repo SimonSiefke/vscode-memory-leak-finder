@@ -1,4 +1,4 @@
-import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.js'
+import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 
 /**

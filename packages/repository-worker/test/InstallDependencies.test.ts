@@ -1,8 +1,8 @@
 import { expect, jest, test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
 import { VError } from '@lvce-editor/verror'
-import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.js'
-import { installDependencies } from '../src/parts/InstallDependencies/InstallDependencies.js'
+import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
+import { installDependencies } from '../src/parts/InstallDependencies/InstallDependencies.ts'
 
 test('installDependencies - runs npm ci without nice', async () => {
   const mockInvoke = jest.fn()
