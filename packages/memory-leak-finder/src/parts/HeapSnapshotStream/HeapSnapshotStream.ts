@@ -3,6 +3,9 @@ import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 import { DevtoolsProtocolHeapProfiler } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 class CustomStream extends Readable {
+  rpc: any
+  options: any
+
   constructor(rpc, options) {
     super()
     this.rpc = rpc
