@@ -69,14 +69,13 @@ export const handleStdinDataFilterWaitingMode = async (state: FilterWaitingState
         return state
       }
       const top = previousFilters[0]
-      const cb: string = await StdoutWorker.invoke('Stdout.getCursorBackward')
-      const eel: string = await StdoutWorker.invoke('Stdout.getEraseEndLine')
-      const prefix = state.value ? cb.repeat(state.value.length) + eel : ''
-      const message = prefix + top
+      const cursorBackward: string = await StdoutWorker.invoke('Stdout.getCursorBackward', state.value.length)
+      const eraseEndOfLine: string = await StdoutWorker.invoke('Stdout.getEraseEndLine')
+      const prefix = state.value ? cursorBackward + eraseEndOfLine : ''
       return {
         ...state,
         value: top,
-        stdout: [...state.stdout, message],
+        stdout: [...state.stdout, prefix + top],
       }
     }
     case AnsiKeys.ArrowDown:
