@@ -55,7 +55,13 @@ test('handleTestFailed', async () => {
 
   expect(Stdout.write).toHaveBeenCalledTimes(1)
 
-  const baseMessage: string = await GetHandleTestFailedMessage.getHandleTestFailedMessage(file, relativeDirName, releativeFilePath, fileName, error)
+  const baseMessage: string = await GetHandleTestFailedMessage.getHandleTestFailedMessage(
+    file,
+    relativeDirName,
+    releativeFilePath,
+    fileName,
+    error,
+  )
   const clearMessage: string = await GetTestClearMessage.getTestClearMessage()
   // Do not call TestStateOutput.clearPending() here to avoid incrementing the mock call count
   const expectedOutput: string = AnsiEscapes.clear + clearMessage + baseMessage
