@@ -63,23 +63,22 @@ export const handleStdinDataFilterWaitingMode = async (state: FilterWaitingState
         stdout: [...state.stdout, clear + watchUsage],
       }
     }
-    case AnsiKeys.ArrowUp:
+    case AnsiKeys.ArrowUp: {
       const previousFilters = PreviousFilters.get()
       if (previousFilters.length === 0) {
         return state
       }
       const top = previousFilters[0]
-      {
-        const cb: string = await StdoutWorker.invoke('Stdout.getCursorBackward')
-        const eel: string = await StdoutWorker.invoke('Stdout.getEraseEndLine')
-        const prefix = state.value ? cb.repeat(state.value.length) + eel : ''
-        const message = prefix + top
-        return {
-          ...state,
-          value: top,
-          stdout: [...state.stdout, message],
-        }
+      const cb: string = await StdoutWorker.invoke('Stdout.getCursorBackward')
+      const eel: string = await StdoutWorker.invoke('Stdout.getEraseEndLine')
+      const prefix = state.value ? cb.repeat(state.value.length) + eel : ''
+      const message = prefix + top
+      return {
+        ...state,
+        value: top,
+        stdout: [...state.stdout, message],
       }
+    }
     case AnsiKeys.ArrowDown:
       return state
     default:
