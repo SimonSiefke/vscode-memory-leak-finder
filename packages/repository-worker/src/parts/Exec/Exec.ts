@@ -1,5 +1,4 @@
 import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
-import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 
 /**
  * Executes a command with arguments and returns stdout and stderr
