@@ -2,6 +2,7 @@ import * as ExpectLocatorSingleElementCondition from '../ExpectLocatorSingleElem
 
 export const toHaveAttribute = (locator, key, value, options = {}) => {
   if (value instanceof RegExp) {
+    // @ts-ignore
     options.isRegex = true
     value = value.toString()
   }

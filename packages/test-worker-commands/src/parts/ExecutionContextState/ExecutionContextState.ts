@@ -52,7 +52,9 @@ export const removeBySessionId = (sessionId) => {
   Assert.string(sessionId)
   const toDelete = []
   for (const executionContext of Object.values(state.executionContexts)) {
+    // @ts-ignore
     if (executionContext.sessionId === sessionId) {
+      // @ts-ignore
       toDelete.push(executionContext.uniqueId)
     }
   }
@@ -116,6 +118,7 @@ export const addExecutionContextStateCallback = (fn) => {}
 
 export const getDefaultExecutionContext = (sessionId) => {
   for (const executionContext of Object.values(state.executionContexts)) {
+    // @ts-ignore
     if (executionContext.sessionId === sessionId) {
       return executionContext
     }
@@ -125,6 +128,7 @@ export const getDefaultExecutionContext = (sessionId) => {
 
 export const getUtilityExecutionContext = (sessionId) => {
   for (const executionContext of Object.values(state.executionContexts)) {
+    // @ts-ignore
     if (executionContext.name === 'utility' && executionContext.sessionId === sessionId) {
       return executionContext
     }

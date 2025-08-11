@@ -5,6 +5,7 @@ export const toHaveCss = (locator, key, value, options = {}) => {
     value = value.trim()
   }
   if (value instanceof RegExp) {
+    // @ts-ignore
     options.isRegex = true
     value = value.toString()
   }

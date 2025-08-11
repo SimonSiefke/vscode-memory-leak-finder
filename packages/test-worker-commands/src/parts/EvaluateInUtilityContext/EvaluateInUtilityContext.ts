@@ -2,7 +2,7 @@ import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts
 import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.ts'
 import * as SessionState from '../SessionState/SessionState.ts'
 
-export const evaluateInUtilityContext = async (options, sessionId = '') => {
+export const evaluateInUtilityContext = async (options: any, sessionId: any = ''): Promise<any> => {
   if (!sessionId) {
     // TODO remove this code and make sessionId a required argument
     const pageSession = SessionState.getPageSession()
@@ -11,8 +11,8 @@ export const evaluateInUtilityContext = async (options, sessionId = '') => {
     }
     sessionId = pageSession.sessionId
   }
-  const pageSession = SessionState.getPageSessionById(sessionId)
-  const utilityExecutionContext = await ExecutionContextState.waitForUtilityExecutionContext(sessionId)
+  const pageSession: any = SessionState.getPageSessionById(sessionId)
+  const utilityExecutionContext: any = await ExecutionContextState.waitForUtilityExecutionContext(sessionId)
   if (!utilityExecutionContext) {
     throw new Error(`no utility execution context found`)
   }
@@ -23,7 +23,7 @@ export const evaluateInUtilityContext = async (options, sessionId = '') => {
   return result
 }
 
-export const evaluateInDefaultContext = async (options, sessionId = '') => {
+export const evaluateInDefaultContext = async (options: any, sessionId: any = ''): Promise<any> => {
   if (!sessionId) {
     // TODO remove this code and make sessionId a required argument
     const pageSession = SessionState.getPageSession()
@@ -32,8 +32,8 @@ export const evaluateInDefaultContext = async (options, sessionId = '') => {
     }
     sessionId = pageSession.sessionId
   }
-  const pageSession = SessionState.getPageSessionById(sessionId)
-  const executionContext = await ExecutionContextState.waitForDefaultExecutionContext(sessionId)
+  const pageSession: any = SessionState.getPageSessionById(sessionId)
+  const executionContext: any = await ExecutionContextState.waitForDefaultExecutionContext(sessionId)
   if (!executionContext) {
     throw new Error(`no default execution context found`)
   }
