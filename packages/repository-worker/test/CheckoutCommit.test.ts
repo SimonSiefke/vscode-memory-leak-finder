@@ -1,7 +1,7 @@
-import { expect, jest, test } from '@jest/globals'
+import { test, expect, jest } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
-import { checkoutCommit } from '../src/parts/CheckoutCommit/CheckoutCommit.ts'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
+import { checkoutCommit } from '../src/parts/CheckoutCommit/CheckoutCommit.ts'
 
 test('checkoutCommit executes git checkout command', async () => {
   const repoPath = '/test/repo'
