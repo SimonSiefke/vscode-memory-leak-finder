@@ -1,33 +1,12 @@
 import { expect, test } from '@jest/globals'
-import * as CliKeys from '../src/parts/CliKeys/CliKeys.ts'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
+import * as CliKeys from '../src/parts/CliKeys/CliKeys.ts'
+import { createDefaultState } from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
+import * as HandleStdinDataFinishedRunningMode from '../src/parts/HandleStdinDataFinishedRunningMode/HandleStdinDataFinishedRunningMode.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
-import * as StdinDataState from '../src/parts/StdinDataState/StdinDataState.ts'
-
-beforeEach(() => {
-  jest.resetModules()
-  jest.resetAllMocks()
-})
-
-// Mock RPC for stdout worker
-const mockRpc = {
-  invoke: jest.fn() as jest.MockedFunction<(...args: any[]) => Promise<any>>,
-}
-
-jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
-  return {
-    invoke: mockRpc.invoke.bind(mockRpc),
-  }
-})
-
-// no ansi module mocking needed; worker returns placeholders
-
-const HandleStdinDataFinishedRunningMode = await import(
-  '../src/parts/HandleStdinDataFinishedRunningMode/HandleStdinDataFinishedRunningMode.ts'
-)
 
 test('handleStdinDataFinishedRunningMode - show watch mode details', async () => {
-  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.FinishedRunning }
+  const state = { ...createDefaultState(), mode: ModeType.FinishedRunning }
   const key = CliKeys.WatchMode
 
   // Mock the stdout worker to return watch usage message
@@ -41,7 +20,7 @@ test('handleStdinDataFinishedRunningMode - show watch mode details', async () =>
 })
 
 test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
-  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.FinishedRunning }
+  const state = { ...createDefaultState(), mode: ModeType.FinishedRunning }
   const key = CliKeys.FilterMode
 
   // Mock the stdout worker to return pattern usage message
@@ -55,14 +34,14 @@ test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
 })
 
 test('handleStdinDataFinishedRunningMode - quit', async () => {
-  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.FinishedRunning }
+  const state = { ...createDefaultState(), mode: ModeType.FinishedRunning }
   const key = CliKeys.Quit
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
 })
 
 test('handleStdinDataFinishedRunningMode - run again', async () => {
-  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.FinishedRunning }
+  const state = { ...createDefaultState(), mode: ModeType.FinishedRunning }
   const key = AnsiKeys.Enter
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.Running)
