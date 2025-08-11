@@ -72,6 +72,26 @@ export const runTests = async (
     Assert.string(ide)
     Assert.string(ideVersion)
     Assert.boolean(setupOnly)
+
+    const connectionId = Id.create()
+
+    if (setupOnly && commit) {
+      const testWorkerRpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
+        cwd,
+        headlessMode,
+        recordVideo,
+        connectionId,
+        timeouts,
+        runMode,
+        ide,
+        ideVersion,
+        vscodePath,
+        commit,
+      )
+      await testWorkerRpc.dispose()
+      return callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, 0, 0, filterValue)
+    }
+
     let passed = 0
     let failed = 0
     let skipped = 0
@@ -86,7 +106,6 @@ export const runTests = async (
     const first = formattedPaths[0]
     await callback(TestWorkerEventType.TestsStarting, total)
     await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
-    const connectionId = Id.create()
     let testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
       cwd,
       headlessMode,
@@ -99,9 +118,7 @@ export const runTests = async (
       vscodePath,
       commit,
     )
-    if (setupOnly && commit) {
-      return callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, 0, 0, filterValue)
-    }
+
     let memoryLeakWorkerRpc = MemoryLeakWorker.getRpc()
     let targetId = ''
     if (checkLeaks) {
