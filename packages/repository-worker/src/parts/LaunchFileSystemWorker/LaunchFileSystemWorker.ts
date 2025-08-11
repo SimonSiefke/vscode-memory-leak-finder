@@ -6,8 +6,6 @@ export const launchFileSystemWorker = () => {
   const rpc = NodeWorkerRpcParent.create({
     commandMap: {},
     path: FileSystemWorkerPath.fileSystemWorkerPath,
-    execArgv: ['--ipc-type="worker-thread"'],
   })
   FileSystemWorker.set(rpc)
-  return
 }
