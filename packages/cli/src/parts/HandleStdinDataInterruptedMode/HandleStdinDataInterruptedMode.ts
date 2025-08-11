@@ -3,7 +3,6 @@ import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
 import * as CliKeys from '../CliKeys/CliKeys.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
 import * as PatternUsage from '../PatternUsage/PatternUsage.ts'
-import * as Stdout from '../Stdout/Stdout.ts'
 import * as Character from '../Character/Character.ts'
 
 export const handleStdinDataInterruptedMode = async (state, key) => {
@@ -15,11 +14,11 @@ export const handleStdinDataInterruptedMode = async (state, key) => {
         mode: ModeType.Exit,
       }
     case CliKeys.FilterMode:
-      await Stdout.write(AnsiEscapes.clear + PatternUsage.print())
       return {
         ...state,
         value: Character.EmptyString,
         mode: ModeType.FilterWaiting,
+        stdout: [...state.stdout, AnsiEscapes.clear + PatternUsage.print()],
       }
     case CliKeys.Quit:
       return {
