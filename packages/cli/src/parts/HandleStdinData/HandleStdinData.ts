@@ -17,10 +17,7 @@ export const handleStdinData = async (key: string): Promise<void> => {
     await Stdout.write(newState.stdout.join(''))
   }
   if (newState.previousFilters.length > 0) {
-    // persist only the newly added item(s) at the head
-    for (const value of newState.previousFilters) {
-      PreviousFilters.add(value)
-    }
+    await PreviousFilters.addAll(newState.previousFilters)
   }
   if (newState.mode === ModeType.Exit) {
     return HandleExit.handleExit()

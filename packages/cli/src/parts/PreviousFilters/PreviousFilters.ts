@@ -18,7 +18,7 @@ export const get = (): string[] => {
   }
 }
 
-export const add = (value: string): void => {
+export const add = async (value: string): Promise<void> => {
   try {
     const previousFilterPath = getPreviousFilterPath()
     const current = get()
@@ -29,5 +29,11 @@ export const add = (value: string): void => {
     return content
   } catch (error) {
     throw new VError(error, `Failed to add filter`)
+  }
+}
+
+export const addAll = async (values: readonly string[]): Promise<void> => {
+  for (const value of values) {
+    await add(value)
   }
 }
