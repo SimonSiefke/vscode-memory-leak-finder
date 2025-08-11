@@ -9,6 +9,9 @@ import * as GetInterruptedMessage from '../GetInterruptedMessage/GetInterruptedM
 import * as GetTestClearMessage from '../GetTestClearMessage/GetTestClearMessage.ts'
 import * as GetWatchUsageMessage from '../GetWatchUsageMessage/GetWatchUsageMessage.ts'
 import * as GetPatternUsageMessage from '../GetPatternUsageMessage/GetPatternUsageMessage.ts'
+import * as GetGitHubGroupStartMessage from '../GetGitHubGroupStartMessage/GetGitHubGroupStartMessage.ts'
+import * as GetGitHubGroupEndMessage from '../GetGitHubGroupEndMessage/GetGitHubGroupEndMessage.ts'
+import * as GetGitHubFileErrorMessage from '../GetGitHubFileErrorMessage/GetGitHubFileErrorMessage.ts'
 
 export const commandMap: Record<string, (...args: any[]) => any> = {
   'Stdout.getHandleTestFailedMessage': GetHandleTestFailedMessage.getHandleTestFailedMessage,
@@ -30,4 +33,7 @@ export const commandMap: Record<string, (...args: any[]) => any> = {
   'Stdout.getEraseEndLine': GetAnsiEscapes.getEraseEndLine,
   'Stdout.getClear': GetAnsiEscapes.getClear,
   'Stdout.getPatternUsageMessage': GetPatternUsageMessage.getPatternUsageMessage,
+  'Stdout.getGitHubGroupStartMessage': GetGitHubGroupStartMessage.getGitHubGroupStartMessage,
+  'Stdout.getGitHubGroupEndMessage': GetGitHubGroupEndMessage.getGitHubGroupEndMessage,
+  'Stdout.getGitHubFileErrorMessage': GetGitHubFileErrorMessage.getGitHubFileErrorMessage,
 }

@@ -21,8 +21,6 @@
   },
   "devDependencies": {
     "@types/node": "^24.2.0",
-    "@types/babel__code-frame": "^7.0.6",
-    "@types/jest": "^30.0.0",
-    "ts-jest": "^29.4.1"
+    "@types/babel__code-frame": "^7.0.6"
   }
 }
