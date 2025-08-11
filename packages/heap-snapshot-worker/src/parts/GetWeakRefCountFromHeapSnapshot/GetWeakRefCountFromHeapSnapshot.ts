@@ -2,7 +2,8 @@ import { getWeakRefCountFromHeapSnapshotInternal } from '../GetWeakRefCountFromH
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 
 export const getWeakRefCountFromHeapSnapshot = async (path: string): Promise<number> => {
-  const snapshot = await prepareHeapSnapshot(path, {
+  // @ts-ignore minimal typing for migration
+  const snapshot: any = await prepareHeapSnapshot(path, {
     parseStrings: true,
   })
   return getWeakRefCountFromHeapSnapshotInternal(snapshot)

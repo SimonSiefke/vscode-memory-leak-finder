@@ -3,16 +3,16 @@ import * as CreateNameMap from '../CreateNameMap/CreateNameMap.ts'
 import { isInternalArray } from '../IsInternalArray/IsInternalArray.ts'
 
 export const getArraysFromHeapSnapshotInternal = (
-  strings,
-  nodes,
-  node_types,
-  node_fields,
-  edges,
-  edge_types,
-  edge_fields,
-  parsedNodes,
-  graph,
-) => {
+  strings: any,
+  nodes: any,
+  node_types: any,
+  node_fields: any,
+  edges: any,
+  edge_types: any,
+  edge_fields: any,
+  parsedNodes: any,
+  graph: any,
+): any[] => {
   const {
     objectTypeIndex,
     ITEMS_PER_NODE,
@@ -30,8 +30,8 @@ export const getArraysFromHeapSnapshotInternal = (
     nodeTypes,
   } = computeHeapSnapshotIndices(node_types, node_fields, edge_types, edge_fields)
 
-  const arrayObjects = []
-  const arrayNodeMap = new Map() // nodeDataIndex -> array object
+  const arrayObjects: any[] = []
+  const arrayNodeMap = new Map<number, any>() // nodeDataIndex -> array object
 
   // First pass: find all array objects
   for (let i = 0; i < nodes.length; i += ITEMS_PER_NODE) {

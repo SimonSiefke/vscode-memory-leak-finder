@@ -4,12 +4,12 @@ const emptyItem = {
   count: 0,
 }
 
-export const compareHeapSnapshotFunctionsInternal = (result1, result2, locationFields) => {
+export const compareHeapSnapshotFunctionsInternal = (result1: any, result2: any, locationFields: readonly string[]): any[] => {
   const { itemsPerLocation, scriptIdOffset, lineOffset, columnOffset } = getLocationFieldOffsets(locationFields)
   const map1 = result1.map
   const map2 = result2.map
   const locations2 = result2.locations
-  const array = []
+  const array: any[] = []
   for (const key of Object.keys(map2)) {
     const oldItem = map1[key] || emptyItem
     const newItem = map2[key]
