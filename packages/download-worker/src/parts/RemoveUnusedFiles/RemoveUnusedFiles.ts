@@ -4,5 +4,5 @@ export const removeUnusedFiles = async (binaryPath: string): Promise<void> => {
   if (process.platform !== 'linux') {
     return
   }
-  await RemoveUnusedFilesLinux.removeunusedfileslinux(binaryPath)
+  await RemoveUnusedFilesLinux.removeUnusedFilesLinux(binaryPath)
 }
