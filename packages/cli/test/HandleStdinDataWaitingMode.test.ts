@@ -1,11 +1,11 @@
 import { expect, jest, test } from '@jest/globals'
+import { MockRpc } from '@lvce-editor/rpc'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
 import * as CliKeys from '../src/parts/CliKeys/CliKeys.ts'
 import { createDefaultState } from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as HandleStdinDataWaitingMode from '../src/parts/HandleStdinDataWaitingMode/HandleStdinDataWaitingMode.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
 import * as StdoutWorker from '../src/parts/StdoutWorker/StdoutWorker.ts'
-import { MockRpc } from '@lvce-editor/rpc'
 
 test('handleStdinDataWaitingMode - ctrl + c', async () => {
   const state = {
@@ -46,6 +46,9 @@ test('handleStdinDataWaitingMode - enter', async () => {
       }
       if (method === 'Stdout.getCursorLeft') {
         return Promise.resolve('\u001B[G')
+      }
+      if (method === 'Stdout.getEraseEndLine') {
+        return Promise.resolve('[erase-end-line]')
       }
       throw new Error(`unexpected method ${method}`)
     }),
@@ -110,6 +113,9 @@ test('handleStdinDataWaitingMode - ctrl + backspace', async () => {
       if (method === 'Stdout.getCursorLeft') {
         return Promise.resolve('\u001B[G')
       }
+      if (method === 'Stdout.getEraseEndLine') {
+        return Promise.resolve('[erase-end-line]')
+      }
       throw new Error(`unexpected method ${method}`)
     }),
   })
@@ -157,38 +163,35 @@ test('handleStdinDataWaitingMode - watch mode', async () => {
   const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = CliKeys.WatchMode
 
-  const mockRpc = {
+  const mockRpc = MockRpc.create({
     invoke: jest.fn().mockImplementation((method: any) => {
       if (method === 'Stdout.getClear') {
         return Promise.resolve('[ansi-clear]\n')
       }
       throw new Error(`unexpected method ${method}`)
     }),
-    send: jest.fn(),
-    invokeAndTransfer: jest.fn(),
-    dispose: jest.fn(),
-  } as any
+  })
   StdoutWorker.set(mockRpc)
-
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Waiting)
 })
 
 test('handleStdinDataWaitingMode - filter mode', async () => {
-  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const state = {
+    ...createDefaultState(),
+    mode: ModeType.Waiting,
+    value: 'abc',
+  }
   const key = CliKeys.FilterMode
 
-  const mockRpc = {
+  const mockRpc = MockRpc.create({
     invoke: jest.fn().mockImplementation((method: any) => {
       if (method === 'Stdout.getClear') {
         return Promise.resolve('[ansi-clear]\n')
       }
       throw new Error(`unexpected method ${method}`)
     }),
-    send: jest.fn(),
-    invokeAndTransfer: jest.fn(),
-    dispose: jest.fn(),
-  } as any
+  })
   StdoutWorker.set(mockRpc)
 
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
