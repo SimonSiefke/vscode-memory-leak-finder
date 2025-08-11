@@ -10,9 +10,15 @@ export default {
     ],
   },
   extensionsToTreatAsEsm: ['.ts'],
-  moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1',
-  },
-  testMatch: ['**/test/**/*.test.ts'],
+  testMatch: ['<rootDir>/test/**/*.ts', '<rootDir>/test/**/*.js'],
   injectGlobals: false,
+  collectCoverage: true,
+  coverageThreshold: {
+    global: {
+      branches: 50,
+      functions: 60,
+      lines: 60,
+      statements: 60,
+    },
+  },
 }
