@@ -1,15 +1,14 @@
 import * as SpecialStdin from '../SpecialStdin/SpecialStdin.ts'
 import * as StartRunning from '../StartRunning/StartRunning.ts'
 import * as Stdout from '../Stdout/Stdout.ts'
-import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
+import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
 
 export const initialStart = async (options) => {
   if (options.watch) {
     await SpecialStdin.start()
   }
   if (options.watch && !options.filter) {
-    const watchUsageMessage = await StdoutWorker.invoke('Stdout.getWatchUsageMessage')
-    await Stdout.write(watchUsageMessage)
+    await Stdout.write(await WatchUsage.print())
     return
   }
   await StartRunning.startRunning(
