@@ -67,7 +67,6 @@
     ]
   },
   "devDependencies": {
-    "@types/node": "^24.1.0",
-    "ts-jest": "^29.4.1"
+    "@types/node": "^24.1.0"
   }
 }

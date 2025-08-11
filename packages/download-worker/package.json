@@ -23,9 +23,7 @@
     "extract-zip": "^2.0.1",
     "got": "^14.4.7"
   },
-  "devDependencies": {
-    "ts-jest": "^29.4.1"
-  },
+  "devDependencies": {},
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",

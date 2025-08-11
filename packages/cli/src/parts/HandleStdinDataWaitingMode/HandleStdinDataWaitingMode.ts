@@ -4,7 +4,6 @@ import * as Character from '../Character/Character.ts'
 import * as CliKeys from '../CliKeys/CliKeys.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
 import * as PatternUsage from '../PatternUsage/PatternUsage.ts'
-import * as Stdout from '../Stdout/Stdout.ts'
 
 export const handleStdinDataWaitingMode = async (state, key) => {
   switch (key) {
@@ -15,20 +14,20 @@ export const handleStdinDataWaitingMode = async (state, key) => {
         mode: ModeType.Exit,
       }
     case AnsiKeys.Enter:
-      await Stdout.write(AnsiEscapes.eraseLine + AnsiEscapes.cursorLeft)
       return {
         ...state,
         mode: ModeType.Running,
+        stdout: [...state.stdout, AnsiEscapes.eraseLine + AnsiEscapes.cursorLeft],
       }
     case AnsiKeys.ArrowUp:
     case AnsiKeys.ArrowDown:
       return state
     case AnsiKeys.AltBackspace:
     case AnsiKeys.ControlBackspace:
-      await Stdout.write(AnsiEscapes.eraseLine + AnsiEscapes.cursorLeft)
       return {
         ...state,
         value: Character.EmptyString,
+        stdout: [...state.stdout, AnsiEscapes.eraseLine + AnsiEscapes.cursorLeft],
       }
     case AnsiKeys.Backspace:
       return {
@@ -45,11 +44,11 @@ export const handleStdinDataWaitingMode = async (state, key) => {
         mode: ModeType.Running,
       }
     case CliKeys.FilterMode:
-      await Stdout.write(AnsiEscapes.clear + PatternUsage.print())
       return {
         ...state,
         value: Character.EmptyString,
         mode: ModeType.FilterWaiting,
+        stdout: [...state.stdout, AnsiEscapes.clear + PatternUsage.print()],
       }
     case CliKeys.Quit:
       return {

@@ -13,7 +13,5 @@
     "execa": "^9.6.0",
     "path-exists": "^5.0.0"
   },
-  "devDependencies": {
-    "ts-jest": "^29.4.1"
-  }
+  "devDependencies": {}
 }
