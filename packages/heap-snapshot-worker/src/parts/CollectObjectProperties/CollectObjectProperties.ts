@@ -6,43 +6,8 @@ import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
-
-const tryResolveNestedNumeric = (
-  containerNodeIndex: number,
-  snapshot: Snapshot,
-  edgeMap: Uint32Array,
-  propertyName: string,
-  visited: Set<number>,
-): number | null => {
-  const { nodes, edges, strings, meta } = snapshot
-  const nodeFields = meta.node_fields
-  const edgeFields = meta.edge_fields
-  const nodeTypes = meta.node_types
-  const ITEMS_PER_NODE = nodeFields.length
-
-  const propertyNameIndex = strings.findIndex((s) => s === propertyName)
-  if (propertyNameIndex === -1) {
-    return null
-  }
-
-  const nodeEdges = getNodeEdges(containerNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
-  for (const edge of nodeEdges) {
-    if (edge.nameIndex === propertyNameIndex) {
-      const targetIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
-      const nestedNode = parseNode(targetIndex, nodes, nodeFields)
-      if (!nestedNode) continue
-      const nestedType = getNodeTypeName(nestedNode, nodeTypes) || 'unknown'
-      if (nestedType === 'number' || nestedType === 'string' || nestedType === 'code' || nestedType === 'hidden') {
-        const actual = getActualValue(nestedNode, snapshot, edgeMap, visited)
-        const parsed = Number(actual)
-        if (Number.isFinite(parsed)) {
-          return parsed
-        }
-      }
-    }
-  }
-  return null
-}
+import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
+import { tryResolveNestedNumeric } from '../TryResolveNestedNumeric/TryResolveNestedNumeric.ts'
 
 /**
  * Collects properties of an object with optional depth control
@@ -174,8 +139,32 @@ export const collectObjectProperties = (
       } else if (targetType === 'code') {
         // For code objects, try to get the actual value they represent
         value = getActualValue(targetNode, snapshot, edgeMap, new Set())
+      } else if (targetType === 'closure') {
+        // Prefer showing function location if available
+        const locationFields = snapshot.meta.location_fields
+        const locations = snapshot.locations
+        if (locationFields && locationFields.length > 0 && locations && locations.length > 0) {
+          const { itemsPerLocation, objectIndexOffset, scriptIdOffset, lineOffset, columnOffset } = getLocationFieldOffsets(locationFields)
+          const ITEMS_PER_NODE_LOCAL = ITEMS_PER_NODE
+          const traceNodeId = (targetNode as any)['trace_node_id']
+          if (typeof traceNodeId === 'number' && traceNodeId !== 0) {
+            for (let locIndex = 0; locIndex < locations.length; locIndex += itemsPerLocation) {
+              const objectIndex = locations[locIndex + objectIndexOffset] / ITEMS_PER_NODE_LOCAL
+              if (objectIndex === traceNodeId) {
+                const scriptId = locations[locIndex + scriptIdOffset]
+                const line = locations[locIndex + lineOffset]
+                const column = locations[locIndex + columnOffset]
+                value = `[function: ${scriptId}:${line}:${column}]`
+                break
+              }
+            }
+          }
+        }
+        if (value === undefined) {
+          value = `[${targetType} ${targetNode.id}]`
+        }
       } else {
-        // For other types like closure, etc.
+        // For other types
         value = `[${targetType} ${targetNode.id}]`
       }
 
