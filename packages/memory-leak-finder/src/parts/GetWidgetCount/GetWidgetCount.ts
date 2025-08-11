@@ -1,4 +1,4 @@
-import * as GetConstructorInstanceCount from '../GetConstructorInstanceCount/GetConstructorInstanceCount.js'
+import * as GetConstructorInstanceCount from '../GetConstructorInstanceCount/GetConstructorInstanceCount.ts'
 
 /**
  *

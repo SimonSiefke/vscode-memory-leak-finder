@@ -1,4 +1,4 @@
-import * as PrettifyInstanceCountsWithSourceMap from '../PrettifyInstanceCountsWithSourceMap/PrettifyInstanceCountsWithSourceMap.js'
+import * as PrettifyInstanceCountsWithSourceMap from '../PrettifyInstanceCountsWithSourceMap/PrettifyInstanceCountsWithSourceMap.ts'
 
 const getKey = (element) => {
   return `${element.scriptId}:${element.lineNumber}:${element.columnNumber}`

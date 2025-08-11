@@ -1,7 +1,7 @@
-import * as Assert from '../Assert/Assert.js'
-import * as GetInstanceCountArray from '../GetInstanceCountArray/GetInstanceCountArray.js'
-import * as GetInstanceCountMap from '../GetInstanceCountMap/GetInstanceCountMap.js'
-import * as GetInstances from '../GetInstances/GetInstances.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as GetInstanceCountArray from '../GetInstanceCountArray/GetInstanceCountArray.ts'
+import * as GetInstanceCountMap from '../GetInstanceCountMap/GetInstanceCountMap.ts'
+import * as GetInstances from '../GetInstances/GetInstances.ts'
 
 export const getInstanceCounts = async (session, objectGroup) => {
   Assert.object(session)

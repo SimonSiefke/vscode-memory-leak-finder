@@ -1,4 +1,4 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 export const startTrackingTimeouts = async (session, objectGroup) => {
   // object group is required for function preview to work

@@ -1,6 +1,6 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as GetDescriptors from '../GetDescriptorValues/GetDescriptorValues.js'
-import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as GetDescriptors from '../GetDescriptorValues/GetDescriptorValues.ts'
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
 /**
  *

@@ -1,6 +1,6 @@
 import { VError } from '@lvce-editor/verror'
-import * as GetObjectCount from '../GetObjectCount/GetObjectCount.js'
-import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
+import * as GetObjectCount from '../GetObjectCount/GetObjectCount.ts'
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
 /**
  *

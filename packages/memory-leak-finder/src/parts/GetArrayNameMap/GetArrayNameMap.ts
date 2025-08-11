@@ -1,9 +1,9 @@
-import * as Assert from '../Assert/Assert.js'
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as GetAllFunctions from '../GetAllFunctions/GetAllFunctions.js'
-import * as GetAllScopePropertiesInternal from '../GetAllScopePropertiesInternal/GetAllScopePropertiesInternal.js'
-import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.js'
-import * as IsEnumerable from '../IsEnumerable/IsEnumerable.js'
+import * as Assert from '../Assert/Assert.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as GetAllFunctions from '../GetAllFunctions/GetAllFunctions.ts'
+import * as GetAllScopePropertiesInternal from '../GetAllScopePropertiesInternal/GetAllScopePropertiesInternal.ts'
+import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
+import * as IsEnumerable from '../IsEnumerable/IsEnumerable.ts'
 
 const parseChildScopeValue = (rawScopeValue) => {
   return {

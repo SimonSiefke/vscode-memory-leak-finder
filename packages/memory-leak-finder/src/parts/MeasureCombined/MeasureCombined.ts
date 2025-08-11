@@ -1,4 +1,4 @@
-import * as MeasureId from '../MeasureId/MeasureId.js'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
 
 // TODO for large data and multiple measures, it might be bad to store much data in memory
 export const combine = (...measures) => {

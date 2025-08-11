@@ -1,6 +1,6 @@
-import * as Assert from '../Assert/Assert.js'
-import * as CompareFunctionDifference from '../CompareFunctionDifference/CompareFunctionDifference.js'
-import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as CompareFunctionDifference from '../CompareFunctionDifference/CompareFunctionDifference.ts'
+import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.ts'
 
 const prepareBaseDifferenceItem = (baseDifferenceItem) => {
   const { url, sourceMapUrl, count, beforeCount, name } = baseDifferenceItem

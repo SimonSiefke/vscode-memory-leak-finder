@@ -1,9 +1,9 @@
-import * as CleanEventListeners from '../CleanEventListeners/CleanEventListeners.js'
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.js'
-import * as GetEventListenersFromMap from '../GetEventListenersFromMap/GetEventListenersFromMap.js'
-import * as GetEventListenersOfTargets from '../GetEventListenersOfTargets/GetEventListenersOfTargets.js'
-import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
+import * as CleanEventListeners from '../CleanEventListeners/CleanEventListeners.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
+import * as GetEventListenersFromMap from '../GetEventListenersFromMap/GetEventListenersFromMap.ts'
+import * as GetEventListenersOfTargets from '../GetEventListenersOfTargets/GetEventListenersOfTargets.ts'
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
 /**
  *

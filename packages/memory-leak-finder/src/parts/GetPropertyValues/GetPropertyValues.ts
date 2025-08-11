@@ -1,5 +1,5 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as IsEnumerable from '../IsEnumerable/IsEnumerable.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as IsEnumerable from '../IsEnumerable/IsEnumerable.ts'
 
 /**
  *

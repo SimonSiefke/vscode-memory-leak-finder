@@ -1,4 +1,4 @@
-import * as FormatUrl from '../FormatUrl/FormatUrl.js'
+import * as FormatUrl from '../FormatUrl/FormatUrl.ts'
 
 const RE_URL = /(.*)\((.*):(\d+):(\d+)\)/s
 

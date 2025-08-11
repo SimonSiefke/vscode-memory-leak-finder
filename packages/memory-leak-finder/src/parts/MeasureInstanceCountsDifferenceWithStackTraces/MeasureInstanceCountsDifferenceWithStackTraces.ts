@@ -1,8 +1,8 @@
-import * as CompareInstanceCountsDifference from '../CompareInstanceCountsDifference/CompareInstanceCountsDifference.js'
-import * as GetInstanceCounts from '../GetInstanceCounts/GetInstanceCounts.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
-import * as StartTrackingInstanceCounts from '../StartTrackingInstanceCounts/StartTrackingInstanceCounts.js'
+import * as CompareInstanceCountsDifference from '../CompareInstanceCountsDifference/CompareInstanceCountsDifference.ts'
+import * as GetInstanceCounts from '../GetInstanceCounts/GetInstanceCounts.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import * as StartTrackingInstanceCounts from '../StartTrackingInstanceCounts/StartTrackingInstanceCounts.ts'
 
 export const id = MeasureId.InstanceCountsDifferenceWithStackTraces
 

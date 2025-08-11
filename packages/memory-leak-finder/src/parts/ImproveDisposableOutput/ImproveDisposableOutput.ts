@@ -1,5 +1,5 @@
-import * as FormatUrl from '../FormatUrl/FormatUrl.js'
-import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
+import * as FormatUrl from '../FormatUrl/FormatUrl.ts'
+import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.ts'
 
 const prepareDisposable = (disposable, scriptMap) => {
   const { lineNumber, columnNumber, count, scriptId, name } = disposable

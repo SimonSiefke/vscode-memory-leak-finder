@@ -1,9 +1,9 @@
-import * as CompareCount from '../CompareCount/CompareCount.js'
-import * as GetStrings from '../GetStrings/GetStrings.js'
-import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
-import * as CompareStrings from '../CompareStrings/CompareStrings.js'
+import * as CompareCount from '../CompareCount/CompareCount.ts'
+import * as GetStrings from '../GetStrings/GetStrings.ts'
+import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import * as CompareStrings from '../CompareStrings/CompareStrings.ts'
 
 export const id = MeasureId.StringDifference
 

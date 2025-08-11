@@ -1,4 +1,4 @@
-import * as FormatMemory from '../FormatMemory/FormatMemory.js'
+import * as FormatMemory from '../FormatMemory/FormatMemory.ts'
 
 export const compareHeapUsage = async (before, after) => {
   const usedBefore = await FormatMemory.formatMemory(before.usedSize)

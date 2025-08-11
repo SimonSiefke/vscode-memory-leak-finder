@@ -1,4 +1,4 @@
-import * as SortCountMap from '../SortCountMap/SortCountMap.js'
+import * as SortCountMap from '../SortCountMap/SortCountMap.ts'
 
 export const compareNumbers = (before, after) => {
   const beforeMap = Object.create(null)

@@ -1,5 +1,5 @@
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 
 export const id = MeasureId.InstanceCounts
 

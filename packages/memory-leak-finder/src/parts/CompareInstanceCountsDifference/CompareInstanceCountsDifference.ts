@@ -1,5 +1,5 @@
-import * as CreateCountMap from '../CreateCountMap/CreateCountMap.js'
-import * as PrettifyInstanceCounts from '../PrettifyInstanceCounts/PrettifyInstanceCounts.js'
+import * as CreateCountMap from '../CreateCountMap/CreateCountMap.ts'
+import * as PrettifyInstanceCounts from '../PrettifyInstanceCounts/PrettifyInstanceCounts.ts'
 
 export const compareInstanceCountsDifference = async (before, after) => {
   const beforeMap = CreateCountMap.createCountMap(before, 'name')

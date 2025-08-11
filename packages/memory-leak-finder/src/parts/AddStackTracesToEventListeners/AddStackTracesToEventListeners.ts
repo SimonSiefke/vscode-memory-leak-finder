@@ -1,4 +1,4 @@
-import * as AddStackTraceToEventListener from '../AddStackTraceToEventListener/AddStackTraceToEventListener.js'
+import * as AddStackTraceToEventListener from '../AddStackTraceToEventListener/AddStackTraceToEventListener.ts'
 
 export const addStackTracesToEventListeners = async (session, leakingEventListeners) => {
   const promises = []

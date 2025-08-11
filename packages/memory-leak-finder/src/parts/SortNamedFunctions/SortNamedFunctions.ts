@@ -1,6 +1,6 @@
-import * as Arrays from '../Arrays/Arrays.js'
-import * as Assert from '../Assert/Assert.js'
-import * as FormatUrl from '../FormatUrl/FormatUrl.js'
+import * as Arrays from '../Arrays/Arrays.ts'
+import * as Assert from '../Assert/Assert.ts'
+import * as FormatUrl from '../FormatUrl/FormatUrl.ts'
 
 const getKey = (element) => {
   return `${element.scriptId}:${element.lineNumber}:${element.columnNumber}`

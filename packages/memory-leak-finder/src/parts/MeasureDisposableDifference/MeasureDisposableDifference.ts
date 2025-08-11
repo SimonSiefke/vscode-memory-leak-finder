@@ -1,10 +1,10 @@
-import * as CompareDisposablesWithLocationDifference from '../CompareDisposablesWithLocationDifference/CompareDisposablesWithLocationDifference.js'
-import * as GetDisposablesWithLocation from '../GetDisposablesWithLocation/GetDisposablesWithLocation.js'
-import * as IsLeakDisposables from '../IsLeakDisposables/IsLeakDisposables.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
-import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
-import * as ScriptHandler from '../ScriptHandler/ScriptHandler.js'
+import * as CompareDisposablesWithLocationDifference from '../CompareDisposablesWithLocationDifference/CompareDisposablesWithLocationDifference.ts'
+import * as GetDisposablesWithLocation from '../GetDisposablesWithLocation/GetDisposablesWithLocation.ts'
+import * as IsLeakDisposables from '../IsLeakDisposables/IsLeakDisposables.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
+import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 
 export const id = MeasureId.DisposableDifference
 

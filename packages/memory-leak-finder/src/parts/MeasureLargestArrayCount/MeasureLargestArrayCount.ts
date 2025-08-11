@@ -1,7 +1,7 @@
-import * as CompareLargestArrayCount from '../CompareLargestArrayCount/CompareLargestArrayCount.js'
-import * as GetLargestArrayCount from '../GetLargestArrayCount/GetLargestArrayCount.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as CompareLargestArrayCount from '../CompareLargestArrayCount/CompareLargestArrayCount.ts'
+import * as GetLargestArrayCount from '../GetLargestArrayCount/GetLargestArrayCount.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 
 export const id = MeasureId.LargestArrayCount
 

@@ -1,6 +1,6 @@
-import * as FilterBySubType from '../FilterBySubType/FilterBySubType.js'
-import * as GetObjects from '../GetObjects/GetObjects.js'
-import * as GetPropertyValues from '../GetPropertyValues/GetPropertyValues.js'
+import * as FilterBySubType from '../FilterBySubType/FilterBySubType.ts'
+import * as GetObjects from '../GetObjects/GetObjects.ts'
+import * as GetPropertyValues from '../GetPropertyValues/GetPropertyValues.ts'
 
 /**
  *

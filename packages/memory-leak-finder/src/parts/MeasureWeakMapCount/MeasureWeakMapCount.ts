@@ -1,9 +1,9 @@
-import * as CompareCount from '../CompareCount/CompareCount.js'
-import * as GetWeakMapCount from '../GetWeakMapCount/GetWeakMapCount.js'
-import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
-import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
+import * as CompareCount from '../CompareCount/CompareCount.ts'
+import * as GetWeakMapCount from '../GetWeakMapCount/GetWeakMapCount.ts'
+import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
 
 export const id = MeasureId.WeakMapCount
 

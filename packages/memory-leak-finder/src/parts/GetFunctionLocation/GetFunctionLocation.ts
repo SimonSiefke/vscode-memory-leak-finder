@@ -1,7 +1,7 @@
-import * as Assert from '../Assert/Assert.js'
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as EmptyFunctionLocation from '../EmptyFunctionLocation/EmptyFunctionLocation.js'
-import * as IsFunctionLocation from '../IsFunctionLocation/IsFunctionLocation.js'
+import * as Assert from '../Assert/Assert.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as EmptyFunctionLocation from '../EmptyFunctionLocation/EmptyFunctionLocation.ts'
+import * as IsFunctionLocation from '../IsFunctionLocation/IsFunctionLocation.ts'
 
 export const getFunctionLocation = async (session, objectId) => {
   Assert.object(session)

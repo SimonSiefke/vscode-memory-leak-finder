@@ -1,5 +1,5 @@
-import * as Assert from '../Assert/Assert.js'
-import * as GetFunctionLocation from '../GetFunctionLocation/GetFunctionLocation.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as GetFunctionLocation from '../GetFunctionLocation/GetFunctionLocation.ts'
 
 const BATCH_SIZE = 50
 

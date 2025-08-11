@@ -1,6 +1,6 @@
-import * as GetConstructors from '../GetConstructors/GetConstructors.js'
-import * as GetInstances from '../GetInstances/GetInstances.js'
-import * as SpyOnConstructors from '../SpyOnConstructors/SpyOnConstructors.js'
+import * as GetConstructors from '../GetConstructors/GetConstructors.ts'
+import * as GetInstances from '../GetInstances/GetInstances.ts'
+import * as SpyOnConstructors from '../SpyOnConstructors/SpyOnConstructors.ts'
 
 // TODO
 // 1. find all instances

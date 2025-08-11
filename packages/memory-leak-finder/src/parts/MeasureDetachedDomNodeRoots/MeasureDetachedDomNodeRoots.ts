@@ -1,9 +1,9 @@
-import * as Arrays from '../Arrays/Arrays.js'
-import * as CompareDetachedDomNodes from '../CompareDetachedDomNodes/CompareDetachedDomNodes.js'
-import * as GetDetachedDomNodes from '../GetDetachedDomNodes/GetDetachedDomNodes.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
-import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
+import * as Arrays from '../Arrays/Arrays.ts'
+import * as CompareDetachedDomNodes from '../CompareDetachedDomNodes/CompareDetachedDomNodes.ts'
+import * as GetDetachedDomNodes from '../GetDetachedDomNodes/GetDetachedDomNodes.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
 
 export const id = MeasureId.DetachedDomNodeRoots
 

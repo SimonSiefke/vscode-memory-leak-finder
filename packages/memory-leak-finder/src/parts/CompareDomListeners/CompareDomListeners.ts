@@ -1,4 +1,4 @@
-import * as Arrays from '../Arrays/Arrays.js'
+import * as Arrays from '../Arrays/Arrays.ts'
 
 const getHash = (node) => {
   return `${node.type}:${node.disposed}:${node.handlerName}:${node.nodeDescription}`

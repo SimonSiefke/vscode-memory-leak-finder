@@ -1,11 +1,11 @@
-import * as IpcParentType from '../IpcParentType/IpcParentType.js'
+import * as IpcParentType from '../IpcParentType/IpcParentType.ts'
 
 export const getModule = (method) => {
   switch (method) {
     case IpcParentType.NodeWorkerThread:
-      return import('../IpcParentWithNodeWorkerThread/IpcParentWithNodeWorkerThread.js')
+      return import('../IpcParentWithNodeWorkerThread/IpcParentWithNodeWorkerThread.ts')
     case IpcParentType.NodeForkedProcess:
-      return import('../IpcParentWithNodeForkedProcess/IpcParentWithNodeForkedProcess.js')
+      return import('../IpcParentWithNodeForkedProcess/IpcParentWithNodeForkedProcess.ts')
     default:
       throw new Error('unexpected ipc type')
   }

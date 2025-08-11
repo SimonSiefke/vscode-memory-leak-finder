@@ -1,5 +1,5 @@
 import { NodeForkedProcessRpcParent } from '@lvce-editor/rpc'
-import * as HeapSnapshotWorkerPath from '../HeapSnapshotWorkerPath/HeapSnapshotWorkerPath.js'
+import * as HeapSnapshotWorkerPath from '../HeapSnapshotWorkerPath/HeapSnapshotWorkerPath.ts'
 
 export const launchHeapSnapshotWorker = async () => {
   const rpc = await NodeForkedProcessRpcParent.create({

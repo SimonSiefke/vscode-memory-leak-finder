@@ -1,5 +1,5 @@
-import * as Assert from '../Assert/Assert.js'
-import * as GetObjectId from '../GetObjectId/GetObjectId.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as GetObjectId from '../GetObjectId/GetObjectId.ts'
 
 export const getFunctionObjectIds = (descriptors) => {
   Assert.array(descriptors)

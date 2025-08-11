@@ -1,5 +1,5 @@
-import * as GetGlobalLexicalScopeNames from '../GetGlobalLexicalScopeNames/GetGlobalLexicalScopeNames.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
+import * as GetGlobalLexicalScopeNames from '../GetGlobalLexicalScopeNames/GetGlobalLexicalScopeNames.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
 
 export const id = MeasureId.GlobalLexicalScopeNames
 

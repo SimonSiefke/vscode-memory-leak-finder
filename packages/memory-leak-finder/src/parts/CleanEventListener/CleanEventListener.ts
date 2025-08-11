@@ -1,8 +1,8 @@
-import * as Assert from '../Assert/Assert.js'
-import { cleanEventListenerDescription } from '../CleanEventListenerDescription/CleanEventListenerDescription.js'
-import * as FormatUrl from '../FormatUrl/FormatUrl.js'
-import * as GetPrettyEventListenerUrl from '../GetPrettyEventListenerUrl/GetPrettyEventListenerUrl.js'
-import * as GetSourceMapUrlFromScriptMap from '../GetSourceMapUrlFromScriptMap/GetSourceMapUrlFromScriptMap.js'
+import * as Assert from '../Assert/Assert.ts'
+import { cleanEventListenerDescription } from '../CleanEventListenerDescription/CleanEventListenerDescription.ts'
+import * as FormatUrl from '../FormatUrl/FormatUrl.ts'
+import * as GetPrettyEventListenerUrl from '../GetPrettyEventListenerUrl/GetPrettyEventListenerUrl.ts'
+import * as GetSourceMapUrlFromScriptMap from '../GetSourceMapUrlFromScriptMap/GetSourceMapUrlFromScriptMap.ts'
 
 export const cleanEventListener = (eventListener, scriptMap) => {
   Assert.object(eventListener)

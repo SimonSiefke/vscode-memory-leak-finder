@@ -1,5 +1,5 @@
 import { dirname, sep } from 'node:path'
-import * as ParseLineAndColumn from '../ParseLineAndColumn/ParseLineAndColumn.js'
+import * as ParseLineAndColumn from '../ParseLineAndColumn/ParseLineAndColumn.ts'
 
 const emptySourceMapUrl = {
   sourceMapUrl: '',

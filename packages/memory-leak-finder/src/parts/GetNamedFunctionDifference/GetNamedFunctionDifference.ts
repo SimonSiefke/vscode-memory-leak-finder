@@ -1,5 +1,5 @@
-import * as Assert from '../Assert/Assert.js'
-import * as CreateCountMap from '../CreateCountMap/CreateCountMap.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as CreateCountMap from '../CreateCountMap/CreateCountMap.ts'
 
 export const getDifference = (sortedBefore, sortedAfter) => {
   Assert.array(sortedBefore)

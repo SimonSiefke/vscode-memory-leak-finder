@@ -1,6 +1,6 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.js'
-import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
 export const getPromises = async (session, objectGroup) => {
   // TODO get promises array with [[PromiseState]] and [[PromiseResult]]

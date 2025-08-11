@@ -1,5 +1,5 @@
-import * as Arrays from '../Arrays/Arrays.js'
-import * as GetSourceMapUrl from '../GetSourceMapUrl/GetSourceMapUrl.js'
+import * as Arrays from '../Arrays/Arrays.ts'
+import * as GetSourceMapUrl from '../GetSourceMapUrl/GetSourceMapUrl.ts'
 
 const compareEventListener = (a, b) => {
   const sourceA = GetSourceMapUrl.getSourceMapUrl(a)

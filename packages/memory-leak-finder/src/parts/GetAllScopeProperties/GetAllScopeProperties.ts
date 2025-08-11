@@ -1,5 +1,5 @@
-import * as Assert from '../Assert/Assert.js'
-import * as GetAllScopePropertiesInternal from '../GetAllScopePropertiesInternal/GetAllScopePropertiesInternal.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as GetAllScopePropertiesInternal from '../GetAllScopePropertiesInternal/GetAllScopePropertiesInternal.ts'
 
 const getNewRemaining = (seen, newObjectIds) => {
   const newRemaining = []

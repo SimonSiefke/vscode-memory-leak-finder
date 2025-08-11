@@ -1,9 +1,9 @@
-import * as Arrays from '../Arrays/Arrays.js'
-import * as CompareInstanceCountsWithSourceMap from '../CompareInstanceCountsWithSourceMap/CompareInstanceCountsWithSourceMap.js'
-import * as GetInstanceCountsWithSourceMap from '../GetInstanceCountsWithSourceMap/GetInstanceCountsWithSourceMap.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
-import * as ScriptHandler from '../ScriptHandler/ScriptHandler.js'
+import * as Arrays from '../Arrays/Arrays.ts'
+import * as CompareInstanceCountsWithSourceMap from '../CompareInstanceCountsWithSourceMap/CompareInstanceCountsWithSourceMap.ts'
+import * as GetInstanceCountsWithSourceMap from '../GetInstanceCountsWithSourceMap/GetInstanceCountsWithSourceMap.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 
 export const id = MeasureId.InstanceCountsWithSourceMap
 

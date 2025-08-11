@@ -1,8 +1,8 @@
-import { compareNamedFunctionCount2 } from '../CompareNamedFunctionCount2/CompareNamedFunctionCount2.js'
-import { getHeapSnapshot } from '../GetHeapSnapshot/GetHeapSnapshot.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
-import * as ScriptHandler from '../ScriptHandler/ScriptHandler.js'
+import { compareNamedFunctionCount2 } from '../CompareNamedFunctionCount2/CompareNamedFunctionCount2.ts'
+import { getHeapSnapshot } from '../GetHeapSnapshot/GetHeapSnapshot.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 
 export const id = MeasureId.NamedFunctionCount2
 

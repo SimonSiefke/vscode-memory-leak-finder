@@ -1,5 +1,5 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
 export const getSetSize = async (session) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {

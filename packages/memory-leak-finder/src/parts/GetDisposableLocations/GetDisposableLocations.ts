@@ -1,8 +1,8 @@
-import * as CleanFunctionLocations from '../CleanFunctionLocations/CleanFunctionLocations.js'
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.js'
-import * as GetFunctionLocations from '../GetFunctionLocations/GetFunctionLocations.js'
-import * as GetFunctionObjectIds from '../GetFunctionObjectIds/GetFunctionObjectIds.js'
+import * as CleanFunctionLocations from '../CleanFunctionLocations/CleanFunctionLocations.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
+import * as GetFunctionLocations from '../GetFunctionLocations/GetFunctionLocations.ts'
+import * as GetFunctionObjectIds from '../GetFunctionObjectIds/GetFunctionObjectIds.ts'
 
 export const getDisposableLocations = async (session, objectGroup, disposables) => {
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {

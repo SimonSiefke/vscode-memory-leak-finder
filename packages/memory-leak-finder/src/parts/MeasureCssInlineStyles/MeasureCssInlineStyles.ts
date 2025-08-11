@@ -1,8 +1,8 @@
-import * as CompareCssInlineStyles from '../CompareCssInlineStyles/CompareCssInlineStyles.js'
-import * as GetCssInlineStyles from '../GetCssInlineStyles/GetCssInlineStyles.js'
-import * as IsLeakCssInlineStyles from '../IsLeakCssInlineStyles/IsLeakCssInlineStyles.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as CompareCssInlineStyles from '../CompareCssInlineStyles/CompareCssInlineStyles.ts'
+import * as GetCssInlineStyles from '../GetCssInlineStyles/GetCssInlineStyles.ts'
+import * as IsLeakCssInlineStyles from '../IsLeakCssInlineStyles/IsLeakCssInlineStyles.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 
 export const id = MeasureId.CssInlineStyles
 

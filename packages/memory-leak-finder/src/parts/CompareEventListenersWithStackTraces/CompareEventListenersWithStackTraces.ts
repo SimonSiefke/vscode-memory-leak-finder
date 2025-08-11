@@ -1,6 +1,6 @@
-import * as DeduplicateEventListeners from '../DeduplicateEventListeners/DeduplicateEventListeners.js'
-import * as GetEventListenerKey from '../GetEventListenerKey/GetEventListenerKey.js'
-import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
+import * as DeduplicateEventListeners from '../DeduplicateEventListeners/DeduplicateEventListeners.ts'
+import * as GetEventListenerKey from '../GetEventListenerKey/GetEventListenerKey.ts'
+import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.ts'
 
 export const compareEventListenersWithStackTraces = async (before, after) => {
   const map = Object.create(null)

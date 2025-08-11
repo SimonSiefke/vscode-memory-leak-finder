@@ -1,7 +1,7 @@
-import * as Arrays from '../Arrays/Arrays.js'
-import * as Assert from '../Assert/Assert.js'
-import * as CompareInstance from '../CompareInstance/CompareInstance.js'
-import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
+import * as Arrays from '../Arrays/Arrays.ts'
+import * as Assert from '../Assert/Assert.ts'
+import * as CompareInstance from '../CompareInstance/CompareInstance.ts'
+import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.ts'
 
 const cleanInstance = (instance) => {
   const { name, originalName, count, originalStack, stack, beforeCount } = instance

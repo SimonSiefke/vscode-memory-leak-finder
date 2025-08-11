@@ -1,8 +1,8 @@
-import * as CompareCount from '../CompareCount/CompareCount.js'
-import * as GetScopeCount2 from '../GetScopeCount2/GetScopeCount2.js'
-import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as CompareCount from '../CompareCount/CompareCount.ts'
+import * as GetScopeCount2 from '../GetScopeCount2/GetScopeCount2.ts'
+import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 
 // TODO
 // 1. use queryObjects to query all functions

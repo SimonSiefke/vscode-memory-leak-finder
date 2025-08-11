@@ -1,11 +1,11 @@
-import * as CombineEventListenersWithSourceMapResults from '../CombineEventListenersWithSourceMapResults/CombineEventListenersWithSourceMapResults.js'
-import * as Exists from '../Exists/Exists.js'
-import * as GetCleanPositionsMap from '../GetCleanPositionsMap/GetCleanPositionsMap.js'
-import * as GetResolvedSourceMapCachePath from '../GetResolvedSourceMapCachePath/GetResolvedSourceMapCachePath.js'
-import * as GetSourceMapUrlMap from '../GetSourceMapUrlMap/GetSourceMapUrlMap.js'
-import * as Hash from '../Hash/Hash.js'
-import * as JsonFile from '../JsonFile/JsonFile.js'
-import * as SortEventListenersBySourceMap from '../SortEventListenersBySourceMap/SortEventListenersBySourceMap.js'
+import * as CombineEventListenersWithSourceMapResults from '../CombineEventListenersWithSourceMapResults/CombineEventListenersWithSourceMapResults.ts'
+import * as Exists from '../Exists/Exists.ts'
+import * as GetCleanPositionsMap from '../GetCleanPositionsMap/GetCleanPositionsMap.ts'
+import * as GetResolvedSourceMapCachePath from '../GetResolvedSourceMapCachePath/GetResolvedSourceMapCachePath.ts'
+import * as GetSourceMapUrlMap from '../GetSourceMapUrlMap/GetSourceMapUrlMap.ts'
+import * as Hash from '../Hash/Hash.ts'
+import * as JsonFile from '../JsonFile/JsonFile.ts'
+import * as SortEventListenersBySourceMap from '../SortEventListenersBySourceMap/SortEventListenersBySourceMap.ts'
 
 export const getEventListenerOriginalSourcesCached = async (eventListeners, classNames) => {
   const sorted = SortEventListenersBySourceMap.sortEventListenersBySourceMap(eventListeners)

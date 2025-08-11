@@ -1,4 +1,4 @@
-import * as CompareDisposablesWithLocation from '../CompareDisposablesWithLocation/CompareDisposablesWithLocation.js'
+import * as CompareDisposablesWithLocation from '../CompareDisposablesWithLocation/CompareDisposablesWithLocation.ts'
 
 const hasDifference = (item) => {
   return item.delta > 0

@@ -1,5 +1,5 @@
-import * as ConstructorKey from '../ConstructorKey/ConstructorKey.js'
-import * as StopTrackingConstructorStackTraces from '../StopTrackingConstructorStackTraces/StopTrackingConstructorStackTraces.js'
+import * as ConstructorKey from '../ConstructorKey/ConstructorKey.ts'
+import * as StopTrackingConstructorStackTraces from '../StopTrackingConstructorStackTraces/StopTrackingConstructorStackTraces.ts'
 
 /**
  * @param {any} session

@@ -1,4 +1,4 @@
-import * as Assert from '../Assert/Assert.js'
+import * as Assert from '../Assert/Assert.ts'
 
 const sortEntries = (entries) => {
   return entries.sort((a, b) => {

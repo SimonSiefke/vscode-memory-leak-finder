@@ -1,5 +1,5 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as Assert from '../Assert/Assert.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as Assert from '../Assert/Assert.ts'
 
 export const partitionArray = async (session, objectGroup, objectId, chunkSize) => {
   Assert.object(session)

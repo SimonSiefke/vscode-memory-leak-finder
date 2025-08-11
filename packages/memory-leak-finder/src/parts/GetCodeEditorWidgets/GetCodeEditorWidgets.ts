@@ -1,4 +1,4 @@
-import * as GetConstructorInstances from '../GetConstructorInstances/GetConstructorInstances.js'
+import * as GetConstructorInstances from '../GetConstructorInstances/GetConstructorInstances.ts'
 
 /**
  *

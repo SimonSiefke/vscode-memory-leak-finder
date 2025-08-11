@@ -1,10 +1,10 @@
 import { join } from 'node:path'
-import * as Callback from '../Callback/Callback.js'
-import * as HandleIpc from '../HandleIpc/HandleIpc.js'
-import * as IpcParent from '../IpcParent/IpcParent.js'
-import * as IpcParentType from '../IpcParentType/IpcParentType.js'
-import * as JsonRpc from '../JsonRpc/JsonRpc.js'
-import * as Root from '../Root/Root.js'
+import * as Callback from '../Callback/Callback.ts'
+import * as HandleIpc from '../HandleIpc/HandleIpc.ts'
+import * as IpcParent from '../IpcParent/IpcParent.ts'
+import * as IpcParentType from '../IpcParentType/IpcParentType.ts'
+import * as JsonRpc from '../JsonRpc/JsonRpc.ts'
+import * as Root from '../Root/Root.ts'
 
 const execute = () => {}
 

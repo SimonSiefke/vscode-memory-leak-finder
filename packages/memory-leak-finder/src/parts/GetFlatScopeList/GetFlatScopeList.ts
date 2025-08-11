@@ -1,6 +1,6 @@
-import * as GetFunctionScopeProperties from '../GetFunctionScopeProperties/GetFunctionScopeProperties.js'
-import * as GetScopeListProperties from '../GetScopeListProperties/GetScopeListProperties.js'
-import * as PrettifyFlatScopeList from '../PrettifyFlatScopeList/PrettifyFlatScopeList.js'
+import * as GetFunctionScopeProperties from '../GetFunctionScopeProperties/GetFunctionScopeProperties.ts'
+import * as GetScopeListProperties from '../GetScopeListProperties/GetScopeListProperties.ts'
+import * as PrettifyFlatScopeList from '../PrettifyFlatScopeList/PrettifyFlatScopeList.ts'
 
 export const getFlatScopeList = async (session, objectGroup) => {
   const scopeListsObjectIds = await GetFunctionScopeProperties.getFunctionScopeProperties(session, objectGroup)

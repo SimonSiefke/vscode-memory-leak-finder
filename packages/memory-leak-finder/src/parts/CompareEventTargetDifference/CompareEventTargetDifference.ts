@@ -1,6 +1,6 @@
-import * as Arrays from '../Arrays/Arrays.js'
-import * as Assert from '../Assert/Assert.js'
-import * as CompareEventTargets from '../CompareEventTargets/CompareEventTargets.js'
+import * as Arrays from '../Arrays/Arrays.ts'
+import * as Assert from '../Assert/Assert.ts'
+import * as CompareEventTargets from '../CompareEventTargets/CompareEventTargets.ts'
 
 const compareCount = (a, b) => {
   return b.count - a.count

@@ -1,6 +1,6 @@
-import * as GetDomCounters from '../GetDomCounters/GetDomCounters.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as IsLeakDomCounters from '../IsLeakDomCounters/IsLeakDomCounters.js'
+import * as GetDomCounters from '../GetDomCounters/GetDomCounters.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as IsLeakDomCounters from '../IsLeakDomCounters/IsLeakDomCounters.ts'
 
 export const id = MeasureId.DomCounters
 

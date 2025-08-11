@@ -2,8 +2,8 @@ import { createWriteStream } from 'node:fs'
 import { mkdir } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import { pipeline } from 'node:stream/promises'
-import * as Assert from '../Assert/Assert.js'
-import * as HeapSnapshotStream from '../HeapSnapshotStream/HeapSnapshotStream.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as HeapSnapshotStream from '../HeapSnapshotStream/HeapSnapshotStream.ts'
 
 export const takeHeapSnapshot = async (session, outFile, options = {}) => {
   Assert.object(session)

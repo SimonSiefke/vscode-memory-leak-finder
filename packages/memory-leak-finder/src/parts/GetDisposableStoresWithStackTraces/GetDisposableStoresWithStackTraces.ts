@@ -1,5 +1,5 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as GetDisposableStores from '../GetDisposableStores/GetDisposableStores.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as GetDisposableStores from '../GetDisposableStores/GetDisposableStores.ts'
 
 export const getDisposableStoresWithStackTraces = async (session, objectGroup) => {
   const fnResult1 = await GetDisposableStores.getDisposableStores(session, objectGroup)

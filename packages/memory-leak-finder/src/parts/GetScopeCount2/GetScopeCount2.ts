@@ -1,5 +1,5 @@
-import * as Assert from '../Assert/Assert.js'
-import * as GetAllFunctions from '../GetAllFunctions/GetAllFunctions.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as GetAllFunctions from '../GetAllFunctions/GetAllFunctions.ts'
 
 export const getScopeCount2 = async (session, objectGroup) => {
   Assert.object(session)

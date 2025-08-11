@@ -1,6 +1,6 @@
-import * as Arrays from '../Arrays/Arrays.js'
-import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
-import * as GetEventListenersQuery from '../GetEventListenersQuery/GetEventListenersQuery.js'
+import * as Arrays from '../Arrays/Arrays.ts'
+import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.ts'
+import * as GetEventListenersQuery from '../GetEventListenersQuery/GetEventListenersQuery.ts'
 
 const sortOriginal = (cleanInstances) => {
   const cleaned = []

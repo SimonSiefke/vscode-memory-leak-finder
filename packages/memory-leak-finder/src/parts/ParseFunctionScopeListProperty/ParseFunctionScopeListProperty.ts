@@ -1,4 +1,4 @@
-import * as IsInternalScopeList from '../IsInternalScopeList/IsInternalScopeList.js'
+import * as IsInternalScopeList from '../IsInternalScopeList/IsInternalScopeList.ts'
 
 export const parseFunctionScopeListProperty = (result) => {
   const { internalProperties } = result

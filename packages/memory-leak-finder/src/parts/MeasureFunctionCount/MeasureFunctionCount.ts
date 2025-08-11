@@ -1,8 +1,8 @@
-import * as CompareCount from '../CompareCount/CompareCount.js'
-import * as GetFunctionCount from '../GetFunctionCount/GetFunctionCount.js'
-import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as CompareCount from '../CompareCount/CompareCount.ts'
+import * as GetFunctionCount from '../GetFunctionCount/GetFunctionCount.ts'
+import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 
 export const id = MeasureId.FunctionCount
 

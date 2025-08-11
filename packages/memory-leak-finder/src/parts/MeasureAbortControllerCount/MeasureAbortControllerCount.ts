@@ -1,8 +1,8 @@
-import * as CompareCount from '../CompareCount/CompareCount.js'
-import * as GetAbortControllerCount from '../GetAbortControllerCount/GetAbortControllerCount.js'
-import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as CompareCount from '../CompareCount/CompareCount.ts'
+import * as GetAbortControllerCount from '../GetAbortControllerCount/GetAbortControllerCount.ts'
+import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 
 export const id = MeasureId.AbortControllerCount
 

@@ -1,9 +1,9 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import { filterNamedFunctions } from '../FilterNamedFunctions/FilterNamedFunctions.js'
-import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.js'
-import * as GetFunctionObjectIds from '../GetFunctionObjectIds/GetFunctionObjectIds.js'
-import * as GetNamedFunctionLocations from '../GetNamedFunctionLocations/GetNamedFunctionLocations.js'
-import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { filterNamedFunctions } from '../FilterNamedFunctions/FilterNamedFunctions.ts'
+import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
+import * as GetFunctionObjectIds from '../GetFunctionObjectIds/GetFunctionObjectIds.ts'
+import * as GetNamedFunctionLocations from '../GetNamedFunctionLocations/GetNamedFunctionLocations.ts'
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
 /**
  * @param {any} session

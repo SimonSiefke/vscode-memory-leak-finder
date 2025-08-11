@@ -1,7 +1,7 @@
 import { VError } from '@lvce-editor/verror'
-import * as GetObjects from '../GetObjects/GetObjects.js'
-import * as GetPropertyValues from '../GetPropertyValues/GetPropertyValues.js'
-import * as IsProxy from '../IsProxy/IsProxy.js'
+import * as GetObjects from '../GetObjects/GetObjects.ts'
+import * as GetPropertyValues from '../GetPropertyValues/GetPropertyValues.ts'
+import * as IsProxy from '../IsProxy/IsProxy.ts'
 
 /**
  *

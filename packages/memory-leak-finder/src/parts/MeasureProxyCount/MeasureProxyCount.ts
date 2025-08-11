@@ -1,7 +1,7 @@
-import * as CompareCount from '../CompareCount/CompareCount.js'
-import * as GetProxyCount from '../GetProxyCount/GetProxyCount.js'
-import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
+import * as CompareCount from '../CompareCount/CompareCount.ts'
+import * as GetProxyCount from '../GetProxyCount/GetProxyCount.ts'
+import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
 
 export const id = MeasureId.ProxyCount
 

@@ -1,7 +1,7 @@
-import * as CompareDomListeners from '../CompareDomListeners/CompareDomListeners.js'
-import * as GetDomListeners from '../GetDomListeners/GetDomListeners.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as CompareDomListeners from '../CompareDomListeners/CompareDomListeners.ts'
+import * as GetDomListeners from '../GetDomListeners/GetDomListeners.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 
 export const id = MeasureId.DomListeners
 

@@ -1,6 +1,6 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as RemoveServerUrlPrefix from '../RemoveServerUrlPrefix/RemoveServerUrlPrefix.js'
-import * as SplitLines from '../SplitLines/SplitLines.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as RemoveServerUrlPrefix from '../RemoveServerUrlPrefix/RemoveServerUrlPrefix.ts'
+import * as SplitLines from '../SplitLines/SplitLines.ts'
 
 export const addStackTraceToEventListener = async (session, eventListener) => {
   if (!eventListener.objectId) {

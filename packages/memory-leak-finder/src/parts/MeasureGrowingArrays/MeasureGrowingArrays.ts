@@ -1,8 +1,8 @@
-import * as GetArrays from '../GetArrays/GetArrays.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
-import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
-import * as StartTrackingArrays from '../StartTrackingArrays/StartTrackingArrays.js'
+import * as GetArrays from '../GetArrays/GetArrays.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
+import * as StartTrackingArrays from '../StartTrackingArrays/StartTrackingArrays.ts'
 
 export const id = MeasureId.GrowingArrays
 

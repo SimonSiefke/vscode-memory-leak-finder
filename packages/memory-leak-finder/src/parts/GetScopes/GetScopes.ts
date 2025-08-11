@@ -1,4 +1,4 @@
-import * as GetFlatScopeList from '../GetFlatScopeList/GetFlatScopeList.js'
+import * as GetFlatScopeList from '../GetFlatScopeList/GetFlatScopeList.ts'
 
 const getScopeMap = (flatScopeMap) => {
   const counts = Object.create(null)

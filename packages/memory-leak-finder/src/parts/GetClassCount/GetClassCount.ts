@@ -1,6 +1,6 @@
-import * as GetConstructors from '../GetConstructors/GetConstructors.js'
-import * as GetInstances from '../GetInstances/GetInstances.js'
-import * as GetRemoteObjectLength from '../GetRemoteObjectLength/GetRemoteObjectLength.js'
+import * as GetConstructors from '../GetConstructors/GetConstructors.ts'
+import * as GetInstances from '../GetInstances/GetInstances.ts'
+import * as GetRemoteObjectLength from '../GetRemoteObjectLength/GetRemoteObjectLength.ts'
 
 export const getClassCount = async (session, objectGroup) => {
   const instances = await GetInstances.getInstances(session, objectGroup)

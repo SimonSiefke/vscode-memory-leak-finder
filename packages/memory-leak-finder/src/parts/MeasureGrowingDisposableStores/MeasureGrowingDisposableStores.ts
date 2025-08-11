@@ -1,10 +1,10 @@
-import * as CompareDisposableStores from '../CompareDisposableStores/CompareDisposableStores.js'
-import * as GetDisposableStoresWithStackTraces from '../GetDisposableStoresWithStackTraces/GetDisposableStoresWithStackTraces.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
-import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
-import * as StartTrackingDisposableStores from '../StartTrackingDisposableStores/StartTrackingDisposableStores.js'
-import * as StopTrackingDisposableStores from '../StopTrackingDisposableStores/StopTrackingDisposableStores.js'
+import * as CompareDisposableStores from '../CompareDisposableStores/CompareDisposableStores.ts'
+import * as GetDisposableStoresWithStackTraces from '../GetDisposableStoresWithStackTraces/GetDisposableStoresWithStackTraces.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
+import * as StartTrackingDisposableStores from '../StartTrackingDisposableStores/StartTrackingDisposableStores.ts'
+import * as StopTrackingDisposableStores from '../StopTrackingDisposableStores/StopTrackingDisposableStores.ts'
 
 // TODO
 // 1. find the DisposableStore constructor

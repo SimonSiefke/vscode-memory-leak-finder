@@ -1,7 +1,7 @@
-import * as ComparePromises from '../ComparePromises/ComparePromises.js'
-import * as GetPromises from '../GetPromises/GetPromises.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as ComparePromises from '../ComparePromises/ComparePromises.ts'
+import * as GetPromises from '../GetPromises/GetPromises.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 
 export const id = MeasureId.Promises
 

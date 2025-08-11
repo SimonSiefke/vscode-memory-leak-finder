@@ -1,7 +1,7 @@
-import * as CompareNamedEmitterCount from '../CompareNamedEmitterCount/CompareNamedEmitterCount.js'
-import * as GetNamedEmitterCount from '../GetNamedEmitterCount/GetNamedEmitterCount.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as CompareNamedEmitterCount from '../CompareNamedEmitterCount/CompareNamedEmitterCount.ts'
+import * as GetNamedEmitterCount from '../GetNamedEmitterCount/GetNamedEmitterCount.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 
 export const id = MeasureId.NamedEmitterCount
 

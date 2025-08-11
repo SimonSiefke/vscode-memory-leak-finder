@@ -1,4 +1,4 @@
-import * as Arrays from '../Arrays/Arrays.js'
+import * as Arrays from '../Arrays/Arrays.ts'
 
 const compareFunction = (a, b) => {
   return b.count - a.count || a.name.localeCompare(b.name)

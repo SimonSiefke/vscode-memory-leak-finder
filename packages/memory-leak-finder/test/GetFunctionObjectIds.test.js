@@ -1,4 +1,4 @@
-import * as GetFunctionObjectIds from '../src/parts/GetFunctionObjectIds/GetFunctionObjectIds.js'
+import * as GetFunctionObjectIds from '../src/parts/GetFunctionObjectIds/GetFunctionObjectIds.ts'
 import { test, expect } from '@jest/globals'
 
 test('getFunctionObjectIds', () => {

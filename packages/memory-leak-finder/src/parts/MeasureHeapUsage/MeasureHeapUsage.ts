@@ -1,6 +1,6 @@
-import * as CompareHeapUsage from '../CompareHeapUsage/CompareHeapUsage.js'
-import * as GetHeapUsage from '../GetHeapUsage/GetHeapUsage.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
+import * as CompareHeapUsage from '../CompareHeapUsage/CompareHeapUsage.ts'
+import * as GetHeapUsage from '../GetHeapUsage/GetHeapUsage.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
 
 export const id = MeasureId.HeapUsage
 

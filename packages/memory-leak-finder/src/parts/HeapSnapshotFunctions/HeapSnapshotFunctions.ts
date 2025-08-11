@@ -1,4 +1,4 @@
-import * as HeapSnapshotWorker from '../HeapSnapshotWorker/HeapSnapshotWorker.js'
+import * as HeapSnapshotWorker from '../HeapSnapshotWorker/HeapSnapshotWorker.ts'
 
 // TODO move these functions to heapsnapshot worker,
 // process the whole heapsnapshot in worker

@@ -1,7 +1,7 @@
-import * as CompareEventTargets from '../CompareEventTargets/CompareEventTargets.js'
-import * as GetEventTargets from '../GetEventTargets/GetEventTargets.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as CompareEventTargets from '../CompareEventTargets/CompareEventTargets.ts'
+import * as GetEventTargets from '../GetEventTargets/GetEventTargets.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 
 export const id = MeasureId.EventTargets
 

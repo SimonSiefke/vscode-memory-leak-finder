@@ -1,9 +1,9 @@
-import * as Assert from '../Assert/Assert.js'
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as EmptyFunctionLocation from '../EmptyFunctionLocation/EmptyFunctionLocation.js'
-import * as GetFunctionNameProperty from '../GetFunctionNameProperty/GetFunctionNameProperty.js'
-import * as GetFunctionUrl from '../GetFunctionUrl/GetFunctionUrl.js'
-import * as GetNamedFunctionLocationProperty from '../GetNamedFunctionLocationProperty/GetNamedFunctionLocationProperty.js'
+import * as Assert from '../Assert/Assert.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as EmptyFunctionLocation from '../EmptyFunctionLocation/EmptyFunctionLocation.ts'
+import * as GetFunctionNameProperty from '../GetFunctionNameProperty/GetFunctionNameProperty.ts'
+import * as GetFunctionUrl from '../GetFunctionUrl/GetFunctionUrl.ts'
+import * as GetNamedFunctionLocationProperty from '../GetNamedFunctionLocationProperty/GetNamedFunctionLocationProperty.ts'
 
 export const getFunctionSourceMapUrl = (functionLocation, scriptMap) => {
   const match = scriptMap[functionLocation.scriptId]

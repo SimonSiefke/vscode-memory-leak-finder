@@ -1,4 +1,4 @@
-import * as DescriptionString from '../DescriptionString/DescriptionString.js'
+import * as DescriptionString from '../DescriptionString/DescriptionString.ts'
 
 export const descriptionConversions = [
   {

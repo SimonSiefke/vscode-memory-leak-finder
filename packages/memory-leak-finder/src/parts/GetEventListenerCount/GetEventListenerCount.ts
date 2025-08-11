@@ -1,6 +1,6 @@
-import { VError } from '../VError/VError.js'
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
+import { VError } from '../VError/VError.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 /**
  *
  * @param {any} session

@@ -1,5 +1,5 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as GetRemoteObjectLength from '../GetRemoteObjectLength/GetRemoteObjectLength.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as GetRemoteObjectLength from '../GetRemoteObjectLength/GetRemoteObjectLength.ts'
 
 /**
  *

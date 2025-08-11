@@ -1,9 +1,9 @@
-import * as Arrays from '../Arrays/Arrays.js'
-import * as CompareInstanceCounts from '../CompareInstanceCounts/CompareInstanceCounts.js'
-import * as GetInstanceCounts from '../GetInstanceCounts/GetInstanceCounts.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
-import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
+import * as Arrays from '../Arrays/Arrays.ts'
+import * as CompareInstanceCounts from '../CompareInstanceCounts/CompareInstanceCounts.ts'
+import * as GetInstanceCounts from '../GetInstanceCounts/GetInstanceCounts.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
 
 export const id = MeasureId.InstanceCounts
 

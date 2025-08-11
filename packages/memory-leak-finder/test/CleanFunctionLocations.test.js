@@ -1,4 +1,4 @@
-import * as CleanFunctionLocations from '../src/parts/CleanFunctionLocations/CleanFunctionLocations.js'
+import * as CleanFunctionLocations from '../src/parts/CleanFunctionLocations/CleanFunctionLocations.ts'
 import { test, expect } from '@jest/globals'
 
 test('cleanFunctionLocations', () => {

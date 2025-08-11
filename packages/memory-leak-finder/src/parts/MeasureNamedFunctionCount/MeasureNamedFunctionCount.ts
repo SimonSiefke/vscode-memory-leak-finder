@@ -1,10 +1,10 @@
 // deprecated in favor of namedFunctionCount2, which works with heapsnapshot
 // whereas this queries chrome for all function locations individually, crashing chrome
-import * as CompareNamedFunctionCount from '../CompareNamedFunctionCount/CompareNamedFunctionCount.js'
-import * as GetNamedFunctionCount from '../GetNamedFunctionCount/GetNamedFunctionCount.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
-import * as ScriptHandler from '../ScriptHandler/ScriptHandler.js'
+import * as CompareNamedFunctionCount from '../CompareNamedFunctionCount/CompareNamedFunctionCount.ts'
+import * as GetNamedFunctionCount from '../GetNamedFunctionCount/GetNamedFunctionCount.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 
 export const id = MeasureId.NamedFunctionCount
 

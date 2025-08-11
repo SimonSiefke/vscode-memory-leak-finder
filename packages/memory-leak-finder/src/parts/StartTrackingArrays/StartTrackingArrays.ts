@@ -1,6 +1,6 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as PartitionArray from '../PartitionArray/PartitionArray.js'
-import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as PartitionArray from '../PartitionArray/PartitionArray.ts'
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
 const ArrayChunkSize = 100_000
 

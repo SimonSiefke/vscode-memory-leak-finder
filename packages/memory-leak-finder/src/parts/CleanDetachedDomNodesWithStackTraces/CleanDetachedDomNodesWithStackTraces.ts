@@ -1,5 +1,5 @@
-import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
-import * as GetEventListenersQuery from '../GetEventListenersQuery/GetEventListenersQuery.js'
+import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.ts'
+import * as GetEventListenersQuery from '../GetEventListenersQuery/GetEventListenersQuery.ts'
 
 const mergeOriginal = (nodes, cleanInstances) => {
   const reverseMap = Object.create(null)

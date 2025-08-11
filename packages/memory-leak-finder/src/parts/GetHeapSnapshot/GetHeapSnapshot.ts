@@ -1,6 +1,6 @@
 import { join } from 'node:path'
-import * as HeapSnapshot from '../HeapSnapshot/HeapSnapshot.js'
-import * as Root from '../Root/Root.js'
+import * as HeapSnapshot from '../HeapSnapshot/HeapSnapshot.ts'
+import * as Root from '../Root/Root.ts'
 
 /**
  * @param {any} session

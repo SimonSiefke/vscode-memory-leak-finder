@@ -1,5 +1,5 @@
-import * as PrettifyInstanceCountsWithSourceMap from '../PrettifyInstanceCountsWithSourceMap/PrettifyInstanceCountsWithSourceMap.js'
-import * as Assert from '../Assert/Assert.js'
+import * as PrettifyInstanceCountsWithSourceMap from '../PrettifyInstanceCountsWithSourceMap/PrettifyInstanceCountsWithSourceMap.ts'
+import * as Assert from '../Assert/Assert.ts'
 
 export const compareInstanceCountsWithSourceMap = async (before, after) => {
   Assert.array(before)

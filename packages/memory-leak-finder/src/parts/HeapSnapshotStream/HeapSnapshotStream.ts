@@ -1,6 +1,6 @@
 import { Readable } from 'node:stream'
-import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
-import { DevtoolsProtocolHeapProfiler } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
+import { DevtoolsProtocolHeapProfiler } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 class CustomStream extends Readable {
   constructor(rpc, options) {

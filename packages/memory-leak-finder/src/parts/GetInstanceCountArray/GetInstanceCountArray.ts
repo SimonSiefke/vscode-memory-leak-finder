@@ -1,4 +1,4 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 export const getInstanceCountArray = async (session, objectGroup, map) => {
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {

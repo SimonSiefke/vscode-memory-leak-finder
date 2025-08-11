@@ -1,5 +1,5 @@
-import * as GetDisposableLocations from '../GetDisposableLocations/GetDisposableLocations.js'
-import * as GetDisposedDisposables from '../GetDisposedDisposables/GetDisposedDisposables.js'
+import * as GetDisposableLocations from '../GetDisposableLocations/GetDisposableLocations.ts'
+import * as GetDisposedDisposables from '../GetDisposedDisposables/GetDisposedDisposables.ts'
 
 export const getDisposedDisposablesWithLocation = async (session, objectGroup, scriptMap) => {
   const disposables = await GetDisposedDisposables.getDisposedDisposables(session, objectGroup)

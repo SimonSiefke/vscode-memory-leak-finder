@@ -1,4 +1,4 @@
-import * as PrettifyInstanceCounts from '../PrettifyInstanceCounts/PrettifyInstanceCounts.js'
+import * as PrettifyInstanceCounts from '../PrettifyInstanceCounts/PrettifyInstanceCounts.ts'
 
 export const compareInstanceCounts = (before, after) => {
   const prettyBefore = PrettifyInstanceCounts.prettifyInstanceCounts(before)

@@ -1,6 +1,6 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
-import * as Arrays from '../Arrays/Arrays.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
+import * as Arrays from '../Arrays/Arrays.ts'
 
 const compareNumber = (a, b) => {
   return b - a

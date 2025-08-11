@@ -1,5 +1,5 @@
-import * as GetConstructorInstances from '../GetConstructorInstances/GetConstructorInstances.js'
-import * as GetRemoteObjectLength from '../GetRemoteObjectLength/GetRemoteObjectLength.js'
+import * as GetConstructorInstances from '../GetConstructorInstances/GetConstructorInstances.ts'
+import * as GetRemoteObjectLength from '../GetRemoteObjectLength/GetRemoteObjectLength.ts'
 
 /**
  *

@@ -1,4 +1,4 @@
-import * as CompareDetachedDomNodes from '../CompareDetachedDomNodes/CompareDetachedDomNodes.js'
+import * as CompareDetachedDomNodes from '../CompareDetachedDomNodes/CompareDetachedDomNodes.ts'
 
 export const compareDetachedDomNodesWithStackTraces = (before, after) => {
   const result = CompareDetachedDomNodes.compareDetachedDomNodes(before, after)

@@ -1,4 +1,4 @@
-import * as CompareInstance from '../src/parts/CompareInstance/CompareInstance.js'
+import * as CompareInstance from '../src/parts/CompareInstance/CompareInstance.ts'
 import { test, expect } from '@jest/globals'
 
 test('compareInstance - by name', () => {

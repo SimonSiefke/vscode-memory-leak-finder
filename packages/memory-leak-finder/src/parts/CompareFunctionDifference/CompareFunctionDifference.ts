@@ -1,6 +1,6 @@
-import * as Assert from '../Assert/Assert.js'
-import * as GetNamedFunctionDifference from '../GetNamedFunctionDifference/GetNamedFunctionDifference.js'
-import * as SortNamedFunctions from '../SortNamedFunctions/SortNamedFunctions.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as GetNamedFunctionDifference from '../GetNamedFunctionDifference/GetNamedFunctionDifference.ts'
+import * as SortNamedFunctions from '../SortNamedFunctions/SortNamedFunctions.ts'
 
 export const compareFunctionDifference = (before, after) => {
   Assert.array(before)

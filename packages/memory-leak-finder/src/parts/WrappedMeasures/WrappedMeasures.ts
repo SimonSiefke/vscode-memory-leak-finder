@@ -1,5 +1,5 @@
-import * as RawMeasures from '../Measures/Measures.js'
-import * as WrapMeasure from '../WrapMeasure/WrapMeasure.js'
+import * as RawMeasures from '../Measures/Measures.ts'
+import * as WrapMeasure from '../WrapMeasure/WrapMeasure.ts'
 
 export const Measures = Object.create(null)
 

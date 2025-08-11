@@ -1,7 +1,7 @@
-import * as GetArrayElementCount from '../GetArrayElementCount/GetArrayElementCount.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
+import * as GetArrayElementCount from '../GetArrayElementCount/GetArrayElementCount.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 
 export const id = MeasureId.ArrayElementCount
 

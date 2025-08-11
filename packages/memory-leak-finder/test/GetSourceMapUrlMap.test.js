@@ -1,4 +1,4 @@
-import * as GetSourceMapUrlMap from '../src/parts/GetSourceMapUrlMap/GetSourceMapUrlMap.js'
+import * as GetSourceMapUrlMap from '../src/parts/GetSourceMapUrlMap/GetSourceMapUrlMap.ts'
 import { test, expect } from '@jest/globals'
 
 test('getSourceMapUrlMap', () => {

@@ -1,7 +1,7 @@
-import * as CompareMapLeak from '../CompareMapLeak/CompareMapLeak.js'
-import * as DeduplicateEventListeners from '../DeduplicateEventListeners/DeduplicateEventListeners.js'
-import * as GetEventListenerKey from '../GetEventListenerKey/GetEventListenerKey.js'
-import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.js'
+import * as CompareMapLeak from '../CompareMapLeak/CompareMapLeak.ts'
+import * as DeduplicateEventListeners from '../DeduplicateEventListeners/DeduplicateEventListeners.ts'
+import * as GetEventListenerKey from '../GetEventListenerKey/GetEventListenerKey.ts'
+import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.ts'
 
 export const compareEventListeners = async (before, after) => {
   const leaked = CompareMapLeak.compareMapLeak(before, after, GetEventListenerKey.getEventListenerKey)

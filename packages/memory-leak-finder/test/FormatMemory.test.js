@@ -1,4 +1,4 @@
-import * as FormatMemory from '../src/parts/FormatMemory/FormatMemory.js'
+import * as FormatMemory from '../src/parts/FormatMemory/FormatMemory.ts'
 import { test, expect } from '@jest/globals'
 
 test('formatMemory', async () => {

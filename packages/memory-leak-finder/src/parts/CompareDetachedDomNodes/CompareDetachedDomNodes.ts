@@ -1,4 +1,4 @@
-import * as DeduplicateDetachedDomNodes from '../DeduplicateDetachedDomNodes/DeduplicateDetachedDomNodes.js'
+import * as DeduplicateDetachedDomNodes from '../DeduplicateDetachedDomNodes/DeduplicateDetachedDomNodes.ts'
 
 export const compareDetachedDomNodes = (before, after) => {
   const prettyBefore = DeduplicateDetachedDomNodes.deduplicatedDetachedDomNodes(before)

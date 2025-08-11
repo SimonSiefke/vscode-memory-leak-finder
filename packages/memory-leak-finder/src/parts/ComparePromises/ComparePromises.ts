@@ -1,4 +1,4 @@
-import * as Assert from '../Assert/Assert.js'
+import * as Assert from '../Assert/Assert.ts'
 
 const isPropertyPromiseState = (property) => {
   return property.name === '[[PromiseState]]'

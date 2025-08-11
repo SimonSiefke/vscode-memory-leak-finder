@@ -1,4 +1,4 @@
-import * as GetArrayNameMap from '../GetArrayNameMap/GetArrayNameMap.js'
+import * as GetArrayNameMap from '../GetArrayNameMap/GetArrayNameMap.ts'
 
 const getAllScopes = async (session, objectGroup) => {
   // const scopes = await GetAllScopePropertiesInternal.getAllScopePropertiesInternal(session, objectGroup, functionObjectIds)

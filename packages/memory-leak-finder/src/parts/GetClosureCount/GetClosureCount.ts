@@ -1,5 +1,5 @@
-import * as GetFlatScopeList from '../GetFlatScopeList/GetFlatScopeList.js'
-import * as IsClosure from '../IsClosure/IsClosure.js'
+import * as GetFlatScopeList from '../GetFlatScopeList/GetFlatScopeList.ts'
+import * as IsClosure from '../IsClosure/IsClosure.ts'
 
 export const getClosureCount = async (session, objectGroup) => {
   const flatScopeList = await GetFlatScopeList.getFlatScopeList(session, objectGroup)

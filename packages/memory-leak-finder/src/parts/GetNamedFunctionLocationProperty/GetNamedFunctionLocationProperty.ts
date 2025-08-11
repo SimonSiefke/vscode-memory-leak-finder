@@ -1,6 +1,6 @@
-import * as EmptyFunctionLocation from '../EmptyFunctionLocation/EmptyFunctionLocation.js'
-import * as GetBoundFunctionValue from '../GetBoundFunctionValue/GetBoundFunctionValue.js'
-import * as IsFunctionLocation from '../IsFunctionLocation/IsFunctionLocation.js'
+import * as EmptyFunctionLocation from '../EmptyFunctionLocation/EmptyFunctionLocation.ts'
+import * as GetBoundFunctionValue from '../GetBoundFunctionValue/GetBoundFunctionValue.ts'
+import * as IsFunctionLocation from '../IsFunctionLocation/IsFunctionLocation.ts'
 
 export const getNamedFunctionLocationProperty = (session, fnResult, scriptMap, includeSourceMap, getNamedFunctionLocation) => {
   const functionLocation = fnResult.internalProperties.find(IsFunctionLocation.isFunctionLocation)

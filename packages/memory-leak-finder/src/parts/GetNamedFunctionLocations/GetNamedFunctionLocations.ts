@@ -1,6 +1,6 @@
-import * as Arrays from '../Arrays/Arrays.js'
-import * as Assert from '../Assert/Assert.js'
-import * as GetNamedFunctionLocation from '../GetNamedFunctionLocation/GetNamedFunctionLocation.js'
+import * as Arrays from '../Arrays/Arrays.ts'
+import * as Assert from '../Assert/Assert.ts'
+import * as GetNamedFunctionLocation from '../GetNamedFunctionLocation/GetNamedFunctionLocation.ts'
 
 export const getNamedFunctionLocations = async (session, objectIds, scriptMap, includeSourceMap) => {
   Assert.object(session)

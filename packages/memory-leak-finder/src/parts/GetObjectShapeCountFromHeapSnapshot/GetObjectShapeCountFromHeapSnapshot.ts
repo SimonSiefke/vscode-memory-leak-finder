@@ -1,4 +1,4 @@
-import * as Assert from '../Assert/Assert.js'
+import * as Assert from '../Assert/Assert.ts'
 
 const ITEMS_PER_NODE = 7
 

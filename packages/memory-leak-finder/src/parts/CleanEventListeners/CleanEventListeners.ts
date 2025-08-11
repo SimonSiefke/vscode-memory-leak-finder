@@ -1,4 +1,4 @@
-import * as CleanEventListener from '../CleanEventListener/CleanEventListener.js'
+import * as CleanEventListener from '../CleanEventListener/CleanEventListener.ts'
 
 export const cleanEventListeners = (eventListeners, scriptMap) => {
   const cleanListeners = []

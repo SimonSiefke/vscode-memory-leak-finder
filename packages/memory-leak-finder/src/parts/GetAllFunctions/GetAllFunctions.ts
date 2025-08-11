@@ -1,8 +1,8 @@
-import * as Assert from '../Assert/Assert.js'
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.js'
-import * as GetObjectIds from '../GetObjectIds/GetObjectIds.js'
-import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.js'
+import * as Assert from '../Assert/Assert.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
+import * as GetObjectIds from '../GetObjectIds/GetObjectIds.ts'
+import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
 export const getAllFunctions = async (session, objectGroup) => {
   Assert.object(session)

@@ -1,7 +1,7 @@
-import * as Assert from '../Assert/Assert.js'
-import * as GetAllFunctions from '../GetAllFunctions/GetAllFunctions.js'
-import * as GetFunctionScopeProperty from '../GetFunctionScopeProperty/GetFunctionScopeProperty.js'
-import * as IsDefined from '../IsDefined/IsDefined.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as GetAllFunctions from '../GetAllFunctions/GetAllFunctions.ts'
+import * as GetFunctionScopeProperty from '../GetFunctionScopeProperty/GetFunctionScopeProperty.ts'
+import * as IsDefined from '../IsDefined/IsDefined.ts'
 
 export const getFunctionScopeProperties = async (session, objectGroup) => {
   Assert.object(session)

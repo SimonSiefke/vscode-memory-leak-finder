@@ -1,9 +1,9 @@
-import * as CompareCount from '../CompareCount/CompareCount.js'
-import * as GetSlowArrayCount from '../GetSlowArrayCount/GetSlowArrayCount.js'
-import * as IsLeakCount from '../IsLeakCount/IsLeakCount.js'
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
-import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
+import * as CompareCount from '../CompareCount/CompareCount.ts'
+import * as GetSlowArrayCount from '../GetSlowArrayCount/GetSlowArrayCount.ts'
+import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
 
 export const id = MeasureId.SlowArrayCount
 

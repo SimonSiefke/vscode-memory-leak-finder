@@ -1,6 +1,6 @@
-import * as MeasureId from '../MeasureId/MeasureId.js'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
-import * as TimeoutCount from '../TimeoutCount/TimeoutCount.js'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import * as TimeoutCount from '../TimeoutCount/TimeoutCount.ts'
 
 export const id = MeasureId.SetTimeout
 

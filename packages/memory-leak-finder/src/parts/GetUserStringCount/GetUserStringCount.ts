@@ -1,4 +1,4 @@
-import * as GetUserStrings from '../GetUserStrings/GetUserStrings.js'
+import * as GetUserStrings from '../GetUserStrings/GetUserStrings.ts'
 /**
  *
  * @param {any} session

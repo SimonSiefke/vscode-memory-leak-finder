@@ -1,5 +1,5 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as SplitLines from '../SplitLines/SplitLines.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as SplitLines from '../SplitLines/SplitLines.ts'
 
 export const getConstructorStackTraces = async (session, objectGroup, key) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {

@@ -1,5 +1,5 @@
-import * as GetDomNodeHash from '../GetDomNodeHash/GetDomNodeHash.js'
-import * as Arrays from '../Arrays/Arrays.js'
+import * as GetDomNodeHash from '../GetDomNodeHash/GetDomNodeHash.ts'
+import * as Arrays from '../Arrays/Arrays.ts'
 
 const compareNode = (a, b) => {
   return b.count - a.count

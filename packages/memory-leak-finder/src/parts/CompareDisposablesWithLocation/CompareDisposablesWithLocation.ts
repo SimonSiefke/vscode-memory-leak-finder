@@ -1,5 +1,5 @@
-import * as Assert from '../Assert/Assert.js'
-import * as ImproveDisposableOutput from '../ImproveDisposableOutput/ImproveDisposableOutput.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as ImproveDisposableOutput from '../ImproveDisposableOutput/ImproveDisposableOutput.ts'
 
 const addDeltas = (prettyBefore, prettyAfter) => {
   const newItems = []

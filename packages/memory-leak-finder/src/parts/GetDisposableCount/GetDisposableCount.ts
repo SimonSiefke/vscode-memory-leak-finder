@@ -1,5 +1,5 @@
-import * as GetDisposables from '../GetDisposables/GetDisposables.js'
-import * as GetRemoteObjectLength from '../GetRemoteObjectLength/GetRemoteObjectLength.js'
+import * as GetDisposables from '../GetDisposables/GetDisposables.ts'
+import * as GetRemoteObjectLength from '../GetRemoteObjectLength/GetRemoteObjectLength.ts'
 
 /**
  *

@@ -1,4 +1,4 @@
-import * as GetEventListenerKey from '../GetEventListenerKey/GetEventListenerKey.js'
+import * as GetEventListenerKey from '../GetEventListenerKey/GetEventListenerKey.ts'
 
 export const deduplicateEventListeners = (eventListeners) => {
   const countMap = Object.create(null)

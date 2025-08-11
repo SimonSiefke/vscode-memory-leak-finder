@@ -1,9 +1,9 @@
-import * as Assert from '../Assert/Assert.js'
-import * as CleanInstanceCounts from '../CleanInstanceCounts/CleanInstanceCounts.js'
-import * as GetConstructorLocations from '../GetConstructorLocations/GetConstructorLocations.js'
-import * as GetInstanceCountArray from '../GetInstanceCountArray/GetInstanceCountArray.js'
-import * as GetInstanceCountMap from '../GetInstanceCountMap/GetInstanceCountMap.js'
-import * as GetInstances from '../GetInstances/GetInstances.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as CleanInstanceCounts from '../CleanInstanceCounts/CleanInstanceCounts.ts'
+import * as GetConstructorLocations from '../GetConstructorLocations/GetConstructorLocations.ts'
+import * as GetInstanceCountArray from '../GetInstanceCountArray/GetInstanceCountArray.ts'
+import * as GetInstanceCountMap from '../GetInstanceCountMap/GetInstanceCountMap.ts'
+import * as GetInstances from '../GetInstances/GetInstances.ts'
 
 export const getInstanceCountsWithSourceMap = async (session, objectGroup, scriptMap) => {
   Assert.object(session)

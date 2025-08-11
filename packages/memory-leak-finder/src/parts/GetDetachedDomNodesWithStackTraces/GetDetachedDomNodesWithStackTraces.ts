@@ -1,8 +1,8 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.js'
-import * as GetDetachedDomNodeRoots from '../GetDetachedDomNodeRoots/GetDetachedDomNodeRoots.js'
-import * as SplitLines from '../SplitLines/SplitLines.js'
-import * as CleanDetachedDomNodesWithStackTraces from '../CleanDetachedDomNodesWithStackTraces/CleanDetachedDomNodesWithStackTraces.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
+import * as GetDetachedDomNodeRoots from '../GetDetachedDomNodeRoots/GetDetachedDomNodeRoots.ts'
+import * as SplitLines from '../SplitLines/SplitLines.ts'
+import * as CleanDetachedDomNodesWithStackTraces from '../CleanDetachedDomNodesWithStackTraces/CleanDetachedDomNodesWithStackTraces.ts'
 
 export const getDetachedDomNodesWithStackTraces = async (session, objectGroup, scriptMap) => {
   const fnResult1 = await GetDetachedDomNodeRoots.getDetachedDomNodeRoots(session, objectGroup)
