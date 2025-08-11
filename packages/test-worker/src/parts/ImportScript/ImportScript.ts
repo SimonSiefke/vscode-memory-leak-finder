@@ -1,7 +1,7 @@
 import { pathToFileURL } from 'url'
-import { VError } from '../VError/VError.js'
+import { VError } from '../VError/VError.ts'
 
-export const importScript = async (path) => {
+export const importScript = async (path: string) => {
   try {
     const url = pathToFileURL(path).toString()
     return await import(url)
@@ -9,3 +9,4 @@ export const importScript = async (path) => {
     throw new VError(error, `Failed to import ${path}`)
   }
 }
+
