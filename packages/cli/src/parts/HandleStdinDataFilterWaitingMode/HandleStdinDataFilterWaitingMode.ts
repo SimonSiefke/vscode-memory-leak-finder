@@ -43,7 +43,7 @@ export const handleStdinDataFilterWaitingMode = async (state: StdinDataState, ke
       if (state.value === Character.EmptyString) {
         return state
       }
-      const backspace: string = await StdoutWorker.invoke('Stdout.getBackspace')
+      const backspace: string = await AnsiEscapes.backspace()
       return {
         ...state,
         value: state.value.slice(0, -1),
@@ -56,7 +56,7 @@ export const handleStdinDataFilterWaitingMode = async (state: StdinDataState, ke
     case AnsiKeys.End:
       return state
     case AnsiKeys.Escape: {
-      const clear = await StdoutWorker.invoke('Stdout.getClear')
+      const clear = await AnsiEscapes.clear()
       const watchUsage = await WatchUsage.print()
       return {
         ...state,
@@ -70,8 +70,8 @@ export const handleStdinDataFilterWaitingMode = async (state: StdinDataState, ke
         return state
       }
       const top = previousFilters[0]
-      const cursorBackward: string = await StdoutWorker.invoke('Stdout.getCursorBackward', state.value.length)
-      const eraseEndOfLine: string = await StdoutWorker.invoke('Stdout.getEraseEndLine')
+      const cursorBackward: string = await AnsiEscapes.cursorBackward(state.value.length)
+      const eraseEndOfLine: string = await AnsiEscapes.eraseEndLine()
       const prefix = state.value ? cursorBackward + eraseEndOfLine : ''
       return {
         ...state,
