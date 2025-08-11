@@ -33,5 +33,5 @@ export const eraseEndLine = async (): Promise<string> => {
 }
 
 export const clear = async (isWindows: boolean): Promise<string> => {
-  return StdoutWorker.invoke('Stdout.clear', isWindows)
+  return StdoutWorker.invoke('Stdout.getClear', isWindows)
 }
