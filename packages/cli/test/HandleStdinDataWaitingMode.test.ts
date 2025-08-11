@@ -77,8 +77,7 @@ test('handleStdinDataWaitingMode - other key', async () => {
 test('handleStdinDataWaitingMode - ctrl + backspace', async () => {
   const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = AnsiKeys.ControlBackspace
-
-  const mockRpc = {
+  const mockRpc = MockRpc.create({
     invoke: jest.fn().mockImplementation((method: any) => {
       if (method === 'Stdout.getEraseLine') {
         return Promise.resolve('\u001B[2K')
@@ -88,12 +87,8 @@ test('handleStdinDataWaitingMode - ctrl + backspace', async () => {
       }
       throw new Error(`unexpected method ${method}`)
     }),
-    send: jest.fn(),
-    invokeAndTransfer: jest.fn(),
-    dispose: jest.fn(),
-  } as any
+  })
   StdoutWorker.set(mockRpc)
-
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.value).toBe('')
 })
