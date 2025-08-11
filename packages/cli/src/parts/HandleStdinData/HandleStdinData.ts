@@ -44,6 +44,7 @@ export const handleStdinData = async (key: string): Promise<void> => {
       '',
       false,
       state.workers,
+      state.isWindows,
     )
   }
   if (newState.mode === ModeType.Interrupted) {

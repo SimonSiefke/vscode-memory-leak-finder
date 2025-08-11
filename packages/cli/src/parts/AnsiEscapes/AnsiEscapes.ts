@@ -1,5 +1,4 @@
 import ansiEscapes from 'ansi-escapes'
-import * as IsWindows from '../IsWindows/IsWindows.ts'
 
 export const cursorUp = ansiEscapes.cursorUp
 
@@ -17,4 +16,4 @@ export const cursorBackward = ansiEscapes.cursorBackward
 
 export const eraseEndLine = ansiEscapes.eraseEndLine
 
-export const clear = IsWindows.isWindows ? '\u001B[2J\u001B[0f' : '\u001B[2J\u001B[3J\u001B[H'
+export const clear = (isWindows: boolean) => (isWindows ? '\u001B[2J\u001B[0f' : '\u001B[2J\u001B[3J\u001B[H')

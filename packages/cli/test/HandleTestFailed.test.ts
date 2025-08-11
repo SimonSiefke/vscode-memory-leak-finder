@@ -16,6 +16,7 @@ jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => 
   isGithubActions: () => false,
   setTestStateChange: () => {},
   isBuffering: () => false,
+  isWindows: () => false,
   setBuffering: () => {},
 }))
 
@@ -64,7 +65,7 @@ test('handleTestFailed', async () => {
   )
   const clearMessage: string = await GetTestClearMessage.getTestClearMessage()
   // Do not call TestStateOutput.clearPending() here to avoid incrementing the mock call count
-  const expectedOutput: string = AnsiEscapes.clear + clearMessage + baseMessage
+  const expectedOutput: string = AnsiEscapes.clear(false) + clearMessage + baseMessage
 
   expect(Stdout.write).toHaveBeenCalledWith(expectedOutput)
   expect(TestStateOutput.clearPending).toHaveBeenCalledTimes(1)

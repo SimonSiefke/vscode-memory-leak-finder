@@ -1,19 +1,9 @@
-import { beforeEach, expect, jest, test } from '@jest/globals'
+import { expect, test } from '@jest/globals'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
+import * as HandleStdinDataFilterWaitingMode from '../src/parts/HandleStdinDataFilterWaitingMode/HandleStdinDataFilterWaitingMode.ts'
 
-beforeEach(() => {
-  jest.resetModules()
-  jest.resetAllMocks()
-})
-
-jest.unstable_mockModule('../src/parts/IsWindows/IsWindows.ts', () => {
-  return {
-    isWindows: false,
-  }
-})
-
-const HandleStdinDataFilterWaitingMode = await import('../src/parts/HandleStdinDataFilterWaitingMode/HandleStdinDataFilterWaitingMode.ts')
+// no mocks required
 
 test('handleStdinDataFilterWaitingMode - alt + backspace', async () => {
   const state = {

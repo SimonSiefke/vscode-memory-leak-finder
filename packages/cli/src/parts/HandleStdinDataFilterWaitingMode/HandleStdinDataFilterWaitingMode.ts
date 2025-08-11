@@ -31,7 +31,7 @@ export const handleStdinDataFilterWaitingMode = async (state, key) => {
         value: Character.EmptyString,
         stdout: [...state.stdout, AnsiEscapes.cursorBackward(state.value.length) + AnsiEscapes.eraseEndLine],
       }
-    case AnsiKeys.Backspace:
+    case AnsiKeys.Backspace(state.isWindows):
       if (state.value === Character.EmptyString) {
         return state
       }
@@ -49,7 +49,7 @@ export const handleStdinDataFilterWaitingMode = async (state, key) => {
       return {
         ...state,
         mode: ModeType.Waiting,
-        stdout: [...state.stdout, AnsiEscapes.clear + (await WatchUsage.print())],
+        stdout: [...state.stdout, AnsiEscapes.clear(state.isWindows) + (await WatchUsage.print())],
       }
     case AnsiKeys.ArrowUp:
       const previousFilters = PreviousFilters.get()
