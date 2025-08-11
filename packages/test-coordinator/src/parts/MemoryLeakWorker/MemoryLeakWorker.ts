@@ -1,12 +1,13 @@
-import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
+import { NodeWorkerRpcParent, Rpc } from '@lvce-editor/rpc'
 import * as Assert from '../Assert/Assert.js'
 import * as CommandMapRef from '../CommandMapRef/CommandMapRef.js'
 import * as MemoryLeakWorkerUrl from '../MemoryLeakWorkerUrl/MemoryLeakWorkerUrl.js'
 
-const state = {
-  /**
-   * @type {import('@lvce-editor/rpc').Rpc|undefined}
-   */
+interface State {
+  rpc: Rpc | undefined
+}
+
+const state: State = {
   rpc: undefined,
 }
 
