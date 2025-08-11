@@ -13,3 +13,11 @@ export const getPageObject = (pageObjectId) => {
 export const set = (pageObjectId, pageObject) => {
   state.pageObjects[pageObjectId] = pageObject
 }
+
+export const get = (pageObjectId) => {
+  const item = state.pageObjects[pageObjectId]
+  if (!item) {
+    throw new Error(`no page object item with id ${pageObjectId} found`)
+  }
+  return item
+}
