@@ -53,6 +53,7 @@ export const test = async ({ electronApp, expect }) => {
     '    at async Module.runTest (/test/test-worker/src/parts/RunTest/RunTest.js:23:5)\n' +
     '    at async runTests (/test/test-worker/src/parts/RunTests/RunTests.js:30:5)'
   const prettyError = await PrettyError.prepare(error, { color: false })
+  // @ts-ignore
   expect(prettyError.type).toBe('ExpectError')
   expect(prettyError.message).toBe(`expected window count to be 0 but was 1`)
   expect(prettyError.codeFrame).toBe(`  13 |   const window = await electronApp.firstWindow()
@@ -99,6 +100,7 @@ abc
     at Module._compile (node:internal/modules/cjs/loader:1137:14)
     at Module._extensions..js (node:internal/modules/cjs/loader:1196:10)`
   const prettyError = await PrettyError.prepare(error, { color: false, root: '/test/e2e' })
+  // @ts-ignore
   expect(prettyError.type).toBe('ReferenceError')
   expect(prettyError.message).toBe(`abc is not defined`)
   expect(prettyError.codeFrame).toBe(`  14 | })
@@ -194,6 +196,7 @@ export const boolean = (value) => {
     at async Module.getResponse (/test/e2e/vscode-memory-leak-finder/packages/test-coordinator/src/parts/GetResponse/GetResponse.js:6:20)
     at async Module.handleJsonRpcMessage (/test/e2e/vscode-memory-leak-finder/packages/test-coordinator/src/parts/HandleJsonRpcMessage/HandleJsonRpcMessage.js:8:20),`
   const prettyError = await PrettyError.prepare(error, { color: false, root: '/test/e2e' })
+  // @ts-ignore
   expect(prettyError.type).toBe('AssertionError')
   expect(prettyError.message).toBe(`expected value to be of type boolean`)
   expect(prettyError.codeFrame).toBe(`  55 |   const type = getType(value)
