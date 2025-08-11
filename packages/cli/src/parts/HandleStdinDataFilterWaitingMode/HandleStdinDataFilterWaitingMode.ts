@@ -14,16 +14,16 @@ export const handleStdinDataFilterWaitingMode = async (state: FilterWaitingState
         ...state,
         mode: ModeType.Exit,
       }
-    case AnsiKeys.Enter:
-      if (state.value) {
-        PreviousFilters.add(state.value)
-      }
+    case AnsiKeys.Enter: {
+      const eraseLine = await StdoutWorker.invoke('Stdout.getEraseLine')
+      const cursorLeft = await StdoutWorker.invoke('Stdout.getCursorLeft')
       return {
         ...state,
         mode: ModeType.Running,
         stdout: [...state.stdout, eraseLine + cursorLeft],
         previousFilters: state.value ? [state.value, ...state.previousFilters] : state.previousFilters,
       }
+    }
 
     case AnsiKeys.AltBackspace:
     case AnsiKeys.ControlBackspace:
