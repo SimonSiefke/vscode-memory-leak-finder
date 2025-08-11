@@ -1,2 +1,1 @@
-export * from './parts/MeasureCombined/MeasureCombined.ts'
-export * from './parts/WrappedMeasures/WrappedMeasures.ts'
+export * from './parts/Main/Main.ts'
