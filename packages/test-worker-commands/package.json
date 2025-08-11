@@ -2,7 +2,7 @@
   "name": "@vscode-memory-leak-finder/test-worker-commands",
   "version": "0.0.0-dev",
   "description": "",
-  "main": "src/main.js",
+  "main": "src/main.ts",
   "type": "module",
   "bin": {
     "test-worker": "bin/test-worker.js"
@@ -24,11 +24,25 @@
   },
   "devDependencies": {
     "@babel/code-frame": "^7.27.1",
-    "clean-stack": "^5.2.0"
+    "clean-stack": "^5.2.0",
+    "ts-jest": "^29.4.1"
   },
   "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.ts$": [
+        "ts-jest",
+        {
+          "useESM": true
+        }
+      ]
+    },
+    "extensionsToTreatAsEsm": [
+      ".ts"
+    ],
     "testMatch": [
-      "<rootDir>/test/**/*.js"
+      "<rootDir>/test/**/*.ts"
     ],
     "injectGlobals": false,
     "collectCoverage": true,
