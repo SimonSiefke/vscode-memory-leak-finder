@@ -2,39 +2,23 @@ import { beforeEach, expect, jest, test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
+import * as StdoutWorker from '../src/parts/StdoutWorker/StdoutWorker.ts'
+import * as HandleStdinDataRunningMode from '../src/parts/HandleStdinDataRunningMode/HandleStdinDataRunningMode.ts'
 
-beforeEach(() => {
-  jest.resetModules()
-  jest.resetAllMocks()
+const mockRpc = MockRpc.create({
+  commandMap: {},
+  invoke: (method: string) => {
+    if (method === 'Stdout.getInterruptedMessage') {
+      return 'interrupted-message'
+    }
+    if (method === 'Stdout.getWatchUsageMessage') {
+      return 'watch-usage'
+    }
+    throw new Error(`unexpected method ${method}`)
+  },
 })
 
-jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
-  return {
-    write: jest.fn().mockImplementation(() => Promise.resolve()),
-  }
-})
-
-jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
-  const mockRpc = MockRpc.create({
-    commandMap: {},
-    invoke: (method: string) => {
-      if (method === 'Stdout.getInterruptedMessage') {
-        return 'interrupted-message'
-      }
-      if (method === 'Stdout.getWatchUsageMessage') {
-        return 'watch-usage'
-      }
-      throw new Error(`unexpected method ${method}`)
-    },
-  })
-
-  return {
-    invoke: mockRpc.invoke.bind(mockRpc),
-  }
-})
-
-const Stdout = await import('../src/parts/Stdout/Stdout.ts')
-const HandleStdinDataRunningMode = await import('../src/parts/HandleStdinDataRunningMode/HandleStdinDataRunningMode.ts')
+StdoutWorker.set(mockRpc)
 
 test('handleStdinDataRunningMode - show watch mode details', async () => {
   const state = {
