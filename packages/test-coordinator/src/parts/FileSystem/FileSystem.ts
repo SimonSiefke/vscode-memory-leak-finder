@@ -1,7 +1,7 @@
 import * as NodeFs from 'node:fs/promises'
 import * as NodeFsSync from 'node:fs'
 
-export const readDir = (path) => {
+export const readDir = (path: string) => {
   return NodeFs.readdir(path)
 }
 
