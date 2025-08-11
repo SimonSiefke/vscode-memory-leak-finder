@@ -4,6 +4,7 @@ import * as KillWorkers from '../KillWorkers/KillWorkers.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
 import * as StartRunning from '../StartRunning/StartRunning.ts'
 import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
+import * as Stdout from '../Stdout/Stdout.ts'
 
 export const handleStdinData = async (key: string): Promise<void> => {
   const state = StdinDataState.getState()
@@ -11,10 +12,13 @@ export const handleStdinData = async (key: string): Promise<void> => {
   if (newState === state) {
     return
   }
+  if (newState.stdout && newState.stdout.length > 0) {
+    await Stdout.write(newState.stdout.join(''))
+  }
   if (newState.mode === ModeType.Exit) {
     return HandleExit.handleExit()
   }
-  StdinDataState.setState(newState)
+  StdinDataState.setState({ ...newState, stdout: [] })
   if (newState.mode === ModeType.Running) {
     await StartRunning.startRunning(
       state.value,
