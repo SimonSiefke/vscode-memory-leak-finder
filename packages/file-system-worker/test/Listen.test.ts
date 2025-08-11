@@ -12,11 +12,11 @@ const mockCommandMap = {
   'Repository.downloadAndBuildVscodeFromCommit': jest.fn(),
 }
 
-jest.unstable_mockModule('../src/parts/CommandMap/CommandMap.js', () => ({
+jest.unstable_mockModule('../src/parts/CommandMap/CommandMap.ts', () => ({
   commandMap: mockCommandMap,
 }))
 
-const { listen } = await import('../src/parts/Listen/Listen.js')
+const { listen } = await import('../src/parts/Listen/Listen.ts')
 
 test('listen creates NodeWorkerRpcClient with commandMap', async () => {
   mockNodeWorkerRpcClient.create.mockResolvedValue({ rpc: {} })
