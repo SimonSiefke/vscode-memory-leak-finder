@@ -2,11 +2,13 @@ import { join } from 'node:path'
 import * as Assert from '../Assert/Assert.js'
 import * as Root from '../Root/Root.js'
 import * as VideoRecordingWorker from '../VideoRecordingWorker/VideoRecordingWorker.js'
+import { Rpc } from '@lvce-editor/rpc'
 
-const state = {
-  /**
-   * @type {import('@lvce-editor/rpc').Rpc|undefined}
-   */
+interface State {
+  rpc: Rpc | undefined
+}
+
+const state: State = {
   rpc: undefined,
 }
 

@@ -1,7 +1,10 @@
-const state = {
-  /**
-   * @type {import('@lvce-editor/rpc').Rpc|undefined}
-   */
+import { Rpc } from '@lvce-editor/rpc'
+
+interface State {
+  rpc: Rpc | undefined
+}
+
+const state: State = {
   rpc: undefined,
 }
 

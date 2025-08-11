@@ -64,7 +64,7 @@ const getRelevantLines = (lines, stack) => {
     stack.includes('expected') ||
     (stack.includes('at Object.evaluate ') && stack.includes('PageEvaluate/PageEvaluate.js')) ||
     (stack.includes('at Module.evaluate ') && stack.includes('PageEvaluate/PageEvaluate.js'))
-  const relevantLines = []
+  const relevantLines: string[] = []
   for (const line of lines) {
     if (isInternal(line)) {
       continue
