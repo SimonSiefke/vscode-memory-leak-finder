@@ -1,10 +1,9 @@
-import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
-import * as ConnectElectron from '../ConnectElectron/ConnectElectron.ts'
-import * as PageObject from '../PageObject/PageObject.ts'
 import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.ts'
-import * as PrepareTests from '../PrepareTests/PrepareTests.ts'
-import * as LaunchTestWorker from '../LaunchTestWorker/LaunchTestWorker.ts'
+import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
 import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
+import * as LaunchTestWorker from '../LaunchTestWorker/LaunchTestWorker.ts'
+import * as PageObject from '../PageObject/PageObject.ts'
+import * as PrepareTests from '../PrepareTests/PrepareTests.ts'
 
 interface State {
   firstLaunch: boolean
