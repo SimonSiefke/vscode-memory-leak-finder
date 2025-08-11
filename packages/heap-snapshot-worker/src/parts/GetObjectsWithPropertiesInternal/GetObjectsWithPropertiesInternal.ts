@@ -185,16 +185,17 @@ export const collectObjectProperties = (
       } else if (targetType === 'code') {
         // For code objects, try to get the actual value they represent
         value = getActualValue(targetNode, snapshot, edgeMap, new Set())
-       } else {
-         // For other types like closure, etc.
-         value = `[${targetType} ${targetNode.id}]`
-       }
+      } else {
+        // For other types like closure, etc.
+        value = `[${targetType} ${targetNode.id}]`
+      }
 
       // Heuristic: For coordinate and size properties ('x','y','width','height'),
       // if value still looks like a reference, try to resolve nested numeric value
       if (
         (propertyName === 'x' || propertyName === 'y' || propertyName === 'width' || propertyName === 'height') &&
-        (typeof value === 'string' && value.startsWith('['))
+        typeof value === 'string' &&
+        value.startsWith('[')
       ) {
         const nestedNumeric = tryResolveNestedNumeric(targetNodeIndex, snapshot, edgeMap, propertyName, visited)
         if (nestedNumeric !== null) {
