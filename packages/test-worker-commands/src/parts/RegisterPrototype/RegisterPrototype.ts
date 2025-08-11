@@ -5,6 +5,7 @@ export const registerPrototype = (constructor, object) => {
     constructor.prototype[key] = function (...args) {
       const { context } = this
       Assert.object(context)
+      // @ts-ignore
       return value(context, ...args)
     }
   }

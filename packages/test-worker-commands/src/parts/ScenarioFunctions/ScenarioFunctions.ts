@@ -1,4 +1,3 @@
-import { VError } from '../VError/VError.ts'
 import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
 import { DevtoolsProtocolPage, DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.ts'
@@ -9,6 +8,7 @@ import * as SessionState from '../SessionState/SessionState.ts'
 import * as TargetState from '../TargetState/TargetState.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
+import { VError } from '../VError/VError.ts'
 
 export const Locator = (selector) => {
   return {
@@ -236,24 +236,6 @@ export const handleDetachedFromTarget = (message) => {
 }
 
 export const handleTargetCreated = async (message) => {}
-
-export const waitForDevtoolsListening = async (stderr) => {
-  const devtoolsData = await new Promise((resolve) => {
-    const cleanup = () => {
-      stderr.off('data', handleData)
-    }
-    const handleData = (data) => {
-      if (data.includes('DevTools listening on')) {
-        cleanup()
-        resolve(data)
-      }
-    }
-    stderr.on('data', handleData)
-  })
-  const devtoolsMatch = devtoolsData.match(/DevTools listening on (ws:\/\/.*)/)
-  const devtoolsUrl = devtoolsMatch[1]
-  return devtoolsUrl
-}
 
 export const handlePageLoadEventFired = (message) => {
   // console.log('load event fired', message)
