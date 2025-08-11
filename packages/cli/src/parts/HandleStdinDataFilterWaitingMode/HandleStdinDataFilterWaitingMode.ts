@@ -1,12 +1,13 @@
 import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
 import * as Character from '../Character/Character.ts'
-import type { FilterWaitingState } from '../FilterWaitingState/FilterWaitingState.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
 import * as PreviousFilters from '../PreviousFilters/PreviousFilters.ts'
+import { StdinDataState } from '../StdinDataState/StdinDataState.ts'
 import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
+import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
 
-export const handleStdinDataFilterWaitingMode = async (state: FilterWaitingState, key: string): Promise<FilterWaitingState> => {
+export const handleStdinDataFilterWaitingMode = async (state: StdinDataState, key: string): Promise<StdinDataState> => {
   switch (key) {
     case AnsiKeys.ControlC:
     case AnsiKeys.ControlD:
@@ -15,8 +16,8 @@ export const handleStdinDataFilterWaitingMode = async (state: FilterWaitingState
         mode: ModeType.Exit,
       }
     case AnsiKeys.Enter: {
-      const eraseLine = await StdoutWorker.invoke('Stdout.getEraseLine')
-      const cursorLeft = await StdoutWorker.invoke('Stdout.getCursorLeft')
+      const eraseLine = await AnsiEscapes.eraseLine()
+      const cursorLeft = await AnsiEscapes.cursorLeft()
       return {
         ...state,
         mode: ModeType.Running,
