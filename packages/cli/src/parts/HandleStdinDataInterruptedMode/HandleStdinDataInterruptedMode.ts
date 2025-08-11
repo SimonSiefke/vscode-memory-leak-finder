@@ -4,7 +4,7 @@ import * as Character from '../Character/Character.ts'
 import * as CliKeys from '../CliKeys/CliKeys.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
 import * as PatternUsage from '../PatternUsage/PatternUsage.ts'
-import { StdinDataState } from '../StdinDataState/StdinDataState.ts'
+import type { StdinDataState } from '../StdinDataState/StdinDataState.ts'
 
 export const handleStdinDataInterruptedMode = async (state: StdinDataState, key: string): Promise<StdinDataState> => {
   switch (key) {
