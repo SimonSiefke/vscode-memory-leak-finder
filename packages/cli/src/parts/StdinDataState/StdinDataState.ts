@@ -28,7 +28,7 @@ export const state = {
   previousFilters: [],
 }
 
-export const setState = (newState: typeof state): void => {
+export const setState = (newState): void => {
   state.checkLeaks = newState.checkLeaks
   state.cwd = newState.cwd
   state.headless = newState.headless
