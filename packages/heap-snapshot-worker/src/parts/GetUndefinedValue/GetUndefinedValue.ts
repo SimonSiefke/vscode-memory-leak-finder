@@ -125,7 +125,7 @@ export const getUndefinedStructure = (
 
   if (sourceNodeIndex === -1) return null
 
-  // Get edges for this node
+  // Get edges for this node (as subarray)
   const nodeEdges = getNodeEdges(sourceNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
 
   // Find property name index
@@ -141,23 +141,30 @@ export const getUndefinedStructure = (
   let hasTypeReference = false
 
   // Analyze edges to find undefined pattern
-  for (const edge of nodeEdges) {
-    const targetNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
+  const ITEMS_PER_EDGE = edgeFields.length
+  const edgeTypeFieldIndex = edgeFields.indexOf('type')
+  const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
+  const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
+  for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
+    const type = nodeEdges[i + edgeTypeFieldIndex]
+    const nameIndex = nodeEdges[i + edgeNameFieldIndex]
+    const toNode = nodeEdges[i + edgeToNodeFieldIndex]
+    const targetNodeIndex = Math.floor(toNode / ITEMS_PER_NODE)
     const targetNode = parseNode(targetNodeIndex, nodes, nodeFields)
-    if (!targetNode) continue
+    if (!targetNode) {
+      continue
+    }
 
     const targetNodeName = getNodeName(targetNode, strings)
 
-    // Check for property edge to undefined value
-    if (edge.type === EDGE_TYPE_PROPERTY && edge.nameIndex === propertyNameIndex) {
+    if (type === EDGE_TYPE_PROPERTY && nameIndex === propertyNameIndex) {
       const valueCheck = getUndefinedValue(targetNode, snapshot, edgeMap, propertyName)
       if (valueCheck) {
         undefinedValue = valueCheck
       }
     }
 
-    // Check for internal edge to undefined type (this might not exist for undefined)
-    if (edge.type === EDGE_TYPE_INTERNAL && targetNodeName === 'undefined') {
+    if (type === EDGE_TYPE_INTERNAL && targetNodeName === 'undefined') {
       hasTypeReference = true
     }
   }

@@ -43,19 +43,23 @@ export const collectArrayElements = (
   visited.add(arrayNode.id)
 
   try {
-    // Get edges for this array node
+    // Get edges for this array node as subarray
     const nodeEdges = getNodeEdges(nodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
 
     // Collect element edges and sort by index
     const elementEdges: Array<{ index: number; toNode: number }> = []
 
-    for (const edge of nodeEdges) {
-      if (edge.type === EDGE_TYPE_ELEMENT) {
-        const elementIndex = edge.nameIndex // For element edges, nameIndex is the array index
-        elementEdges.push({
-          index: elementIndex,
-          toNode: edge.toNode,
-        })
+    const ITEMS_PER_EDGE = edgeFields.length
+    const edgeTypeFieldIndex = edgeFields.indexOf('type')
+    const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
+    const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
+
+    for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
+      const edgeType = nodeEdges[i + edgeTypeFieldIndex]
+      if (edgeType === EDGE_TYPE_ELEMENT) {
+        const elementIndex = nodeEdges[i + edgeNameFieldIndex]
+        const toNode = nodeEdges[i + edgeToNodeFieldIndex]
+        elementEdges.push({ index: elementIndex, toNode })
       }
     }
 

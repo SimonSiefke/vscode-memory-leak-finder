@@ -23,11 +23,18 @@ export const tryResolveNestedNumeric = (
   }
 
   const nodeEdges = getNodeEdges(containerNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
-  for (const edge of nodeEdges) {
-    if (edge.nameIndex === propertyNameIndex) {
-      const targetIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
+  const ITEMS_PER_EDGE = edgeFields.length
+  const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
+  const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
+  for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
+    const nameIndex = nodeEdges[i + edgeNameFieldIndex]
+    if (nameIndex === propertyNameIndex) {
+      const toNode = nodeEdges[i + edgeToNodeFieldIndex]
+      const targetIndex = Math.floor(toNode / ITEMS_PER_NODE)
       const nestedNode = parseNode(targetIndex, nodes, nodeFields)
-      if (!nestedNode) continue
+      if (!nestedNode) {
+        continue
+      }
       const nestedType = getNodeTypeName(nestedNode, nodeTypes) || 'unknown'
       if (nestedType === 'number' || nestedType === 'string' || nestedType === 'code' || nestedType === 'hidden') {
         const actual = getActualValue(nestedNode, snapshot, edgeMap, visited)

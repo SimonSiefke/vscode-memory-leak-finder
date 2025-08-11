@@ -41,23 +41,30 @@ const analyzeBooleanStructure = (snapshot: any, sourceNodeId: number, propertyNa
   const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
   const EDGE_TYPE_INTERNAL = edgeTypes.indexOf('internal')
 
-  for (const edge of nodeEdges) {
-    const edgeTypeName = edgeTypes[edge.type] || `type_${edge.type}`
-    const targetNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
+  const ITEMS_PER_EDGE = edgeFields.length
+  const edgeTypeFieldIndex = edgeFields.indexOf('type')
+  const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
+  const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
+
+  for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
+    const type = nodeEdges[i + edgeTypeFieldIndex]
+    const nameIndex = nodeEdges[i + edgeNameFieldIndex]
+    const toNode = nodeEdges[i + edgeToNodeFieldIndex]
+    const edgeTypeName = edgeTypes[type] || `type_${type}`
+    const targetNodeIndex = Math.floor(toNode / ITEMS_PER_NODE)
     const targetNode = parseNode(targetNodeIndex, nodes, nodeFields)
 
     if (!targetNode) continue
 
     let edgeName = ''
     if (edgeTypeName === 'element') {
-      edgeName = `[${edge.nameIndex}]`
+      edgeName = `[${nameIndex}]`
     } else {
-      edgeName = strings[edge.nameIndex] || `<string_${edge.nameIndex}>`
+      edgeName = strings[nameIndex] || `<string_${nameIndex}>`
     }
 
-    // Check if this edge is related to our property
-    const isDirectProperty = edge.type === EDGE_TYPE_PROPERTY && edge.nameIndex === propertyNameIndex
-    const isInternalEdge = edge.type === EDGE_TYPE_INTERNAL
+    const isDirectProperty = type === EDGE_TYPE_PROPERTY && nameIndex === propertyNameIndex
+    const isInternalEdge = type === EDGE_TYPE_INTERNAL
 
     if (isDirectProperty || isInternalEdge) {
       const targetTypeName = getNodeTypeName(targetNode, meta.node_types)
@@ -74,8 +81,8 @@ const analyzeBooleanStructure = (snapshot: any, sourceNodeId: number, propertyNa
         targetNodeName: targetName,
         targetBooleanValue: booleanValue,
         targetEdgeCount: targetNode.edge_count,
-        nameIndex: edge.nameIndex,
-        toNode: edge.toNode,
+        nameIndex: nameIndex,
+        toNode: toNode,
       })
     }
   }

@@ -46,18 +46,23 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
   const edgeMap = createEdgeMap(nodes, nodeFields)
 
   // Iterate through each node and scan its edges
+  const ITEMS_PER_EDGE = edgeFields.length
+  const edgeTypeFieldIndex = edgeFields.indexOf('type')
+  const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
+  const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
+
   for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex += ITEMS_PER_NODE) {
     const nodeEdges = getNodeEdges(nodeIndex / ITEMS_PER_NODE, edgeMap, nodes, edges, nodeFields, edgeFields)
 
     // Scan this node's edges
-    for (const edge of nodeEdges) {
+    for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
+      const edgeType = nodeEdges[i + edgeTypeFieldIndex]
+      const nameIndex = nodeEdges[i + edgeNameFieldIndex]
+      const toNode = nodeEdges[i + edgeToNodeFieldIndex]
       // Check if it's a property edge with the target property name
-      if (edge.type === EDGE_TYPE_PROPERTY && edge.nameIndex === propertyNameIndex) {
-        // Parse the source node (the object that has the property)
+      if (edgeType === EDGE_TYPE_PROPERTY && nameIndex === propertyNameIndex) {
         const sourceNode = parseNode(nodeIndex / ITEMS_PER_NODE, nodes, nodeFields)
-        // Parse the target node (the property value)
-        // Edge toNode values are array indices, need to convert to node index by dividing by ITEMS_PER_NODE
-        const targetNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
+        const targetNodeIndex = Math.floor(toNode / ITEMS_PER_NODE)
         const targetNode = parseNode(targetNodeIndex, nodes, nodeFields)
 
         if (sourceNode && targetNode) {
@@ -70,10 +75,8 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
             edgeCount: sourceNode.edge_count,
           }
 
-          // Try enhanced boolean detection first
           const booleanStructure = getBooleanStructure(sourceNode, snapshot, edgeMap, propertyName)
           if (booleanStructure) {
-            // This is a boolean with the dual-reference pattern - return actual boolean value
             if (booleanStructure.value === 'true') {
               result.propertyValue = true
             } else if (booleanStructure.value === 'false') {
@@ -82,10 +85,8 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
               result.propertyValue = booleanStructure.value
             }
           } else {
-            // Fall back to standard value detection
             const actualValue = getActualValue(targetNode, snapshot, edgeMap)
             const targetTypeName = getNodeTypeName(targetNode, nodeTypes)
-            // Normalize booleans and numbers
             if (actualValue === 'true') {
               result.propertyValue = true
             } else if (actualValue === 'false') {
@@ -98,7 +99,6 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
             }
           }
 
-          // Collect properties if depth > 0
           if (depth > 0) {
             result.preview = collectObjectProperties(nodeIndex / ITEMS_PER_NODE, snapshot, edgeMap, depth)
           }

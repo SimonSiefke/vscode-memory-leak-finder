@@ -80,23 +80,36 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
   // Create edge map for fast lookups
   const edgeMap = createEdgeMap(nodes, node_fields)
 
-  // Get all edges for this node
+  // Get all edges for this node as a subarray
   const nodeEdges = getNodeEdges(nodeIndex, edgeMap, nodes, edges, node_fields, edge_fields)
 
   // Process edges to get detailed information
   const edgeTypeNames = edge_types[0] || []
-  const processedEdges = nodeEdges.map((edge) => {
-    const typeName = edgeTypeNames[edge.type] || `type_${edge.type}`
+  const ITEMS_PER_EDGE = edge_fields.length
+  const edgeTypeFieldIndex = edge_fields.indexOf('type')
+  const edgeNameFieldIndex = edge_fields.indexOf('name_or_index')
+  const edgeToNodeFieldIndex = edge_fields.indexOf('to_node')
+
+  const processedEdges = [] as Array<{
+    type: number
+    typeName: string
+    nameIndex: number
+    edgeName: string
+    toNode: number
+    targetNodeInfo?: { name: string | null; type: string | null }
+  }>
+  for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
+    const type = nodeEdges[i + edgeTypeFieldIndex]
+    const nameIndex = nodeEdges[i + edgeNameFieldIndex]
+    const toNode = nodeEdges[i + edgeToNodeFieldIndex]
+    const typeName = edgeTypeNames[type] || `type_${type}`
     let edgeName = ''
-
     if (typeName === 'element') {
-      edgeName = `[${edge.nameIndex}]`
+      edgeName = `[${nameIndex}]`
     } else {
-      edgeName = strings[edge.nameIndex] || `<string_${edge.nameIndex}>`
+      edgeName = strings[nameIndex] || `<string_${nameIndex}>`
     }
-
-    // Get target node information
-    const targetNodeIndex = Math.floor(edge.toNode / node_fields.length)
+    const targetNodeIndex = Math.floor(toNode / node_fields.length)
     const targetNode = parseNode(targetNodeIndex, nodes, node_fields)
     const targetNodeInfo = targetNode
       ? {
@@ -104,16 +117,8 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
           type: getNodeTypeName(targetNode, node_types),
         }
       : undefined
-
-    return {
-      type: edge.type,
-      typeName,
-      nameIndex: edge.nameIndex,
-      edgeName,
-      toNode: edge.toNode,
-      targetNodeInfo,
-    }
-  })
+    processedEdges.push({ type, typeName, nameIndex, edgeName, toNode, targetNodeInfo })
+  }
 
   // Extract properties (property-type edges) with improved value detection
   const properties = processedEdges

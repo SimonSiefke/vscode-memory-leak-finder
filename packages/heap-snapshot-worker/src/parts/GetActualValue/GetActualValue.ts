@@ -86,9 +86,12 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
 
     if (targetNodeIndex !== -1) {
       const nodeEdges = getNodeEdges(targetNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
+      const ITEMS_PER_EDGE_LOCAL = edgeFields.length
+      const edgeToNodeFieldIndexLocal = edgeFields.indexOf('to_node')
       // Prefer any outgoing edge that leads to a string node (not just internal)
-      for (const edge of nodeEdges) {
-        const referencedNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
+      for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE_LOCAL) {
+        const toNode = nodeEdges[i + edgeToNodeFieldIndexLocal]
+        const referencedNodeIndex = Math.floor(toNode / ITEMS_PER_NODE)
         const referencedNode = parseNode(referencedNodeIndex, nodes, nodeFields)
         if (referencedNode && referencedNode.type === NODE_TYPE_STRING) {
           const numericString = getNodeName(referencedNode, strings)
@@ -159,6 +162,9 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
     if (targetNodeIndex !== -1) {
       // Get edges using the edge map for fast lookup
       const nodeEdges = getNodeEdges(targetNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
+      const ITEMS_PER_EDGE_LOCAL = edgeFields.length
+      const edgeTypeFieldIndexLocal = edgeFields.indexOf('type')
+      const edgeToNodeFieldIndexLocal = edgeFields.indexOf('to_node')
 
       // Collect all string/number values from internal edges
       const internalStringValues: string[] = []
@@ -166,32 +172,30 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
       const numberValues: string[] = []
 
       // Check edges from this code object
-      for (const edge of nodeEdges) {
+      for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE_LOCAL) {
+        const edgeType = nodeEdges[i + edgeTypeFieldIndexLocal]
         // Follow internal edges to find string/number/object/array values
-        if (edge.type === EDGE_TYPE_INTERNAL) {
+        if (edgeType === EDGE_TYPE_INTERNAL) {
+          const toNode = nodeEdges[i + edgeToNodeFieldIndexLocal]
           // Convert edge toNode from array index to node index
-          const referencedNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
+          const referencedNodeIndex = Math.floor(toNode / ITEMS_PER_NODE)
           const referencedNode = parseNode(referencedNodeIndex, nodes, nodeFields)
           if (referencedNode) {
             const referencedType = referencedNode.type
 
             if (referencedType === NODE_TYPE_STRING) {
-              // string
               const stringValue = getNodeName(referencedNode, strings)
               if (stringValue) {
                 internalStringValues.push(stringValue)
               }
             } else if (referencedType === NODE_TYPE_NUMBER) {
-              // number
               const numberValue = referencedNode.name?.toString()
               if (numberValue) {
                 numberValues.push(numberValue)
               }
             } else if (referencedType === NODE_TYPE_OBJECT) {
-              // object
               return `[Object ${referencedNode.id}]`
             } else if (referencedType === NODE_TYPE_ARRAY) {
-              // array
               return `[Array ${referencedNode.id}]`
             }
           }
