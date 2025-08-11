@@ -26,7 +26,7 @@ export const compareNamedClosureCount = (before, after) => {
   for (const [key, value] of Object.entries(afterMap)) {
     const beforeCount = beforeMap[key] || 0
     const afterCount = value
-    const delta = afterCount - beforeCount
+    const delta = Number(afterCount) - Number(beforeCount)
     if (!delta || delta < 0) {
       continue
     }

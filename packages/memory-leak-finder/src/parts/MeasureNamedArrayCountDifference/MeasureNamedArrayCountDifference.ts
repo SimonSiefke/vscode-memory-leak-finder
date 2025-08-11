@@ -11,11 +11,11 @@ export const create = (session) => {
 }
 
 export const start = async (session, objectGroup) => {
-  return GetNamedArrayCount.getNamedArrayCount(session, objectGroup)
+  return GetNamedArrayCount.getNamedArrayCount(session, objectGroup, 0 as any)
 }
 
 export const stop = async (session, objectGroup) => {
-  return GetNamedArrayCount.getNamedArrayCount(session, objectGroup)
+  return GetNamedArrayCount.getNamedArrayCount(session, objectGroup, 1 as any)
 }
 
 export const compare = CompareNamedArrayCountDifference.compareNamedArrayCountDifference

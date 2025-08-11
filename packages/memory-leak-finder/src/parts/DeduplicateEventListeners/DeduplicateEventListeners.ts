@@ -13,7 +13,8 @@ export const deduplicateEventListeners = (eventListeners) => {
   for (const [key, value] of Object.entries(eventListenerMap)) {
     const count = countMap[key]
     deduplicated.push({
-      ...value,
+      // @ts-ignore
+      ...(value as any),
       count,
     })
   }

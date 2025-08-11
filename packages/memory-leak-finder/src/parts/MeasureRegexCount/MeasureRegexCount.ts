@@ -12,11 +12,11 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  return GetRegexCount.getRegexCount(session)
+  return GetRegexCount.getRegexCount(session, objectGroup)
 }
 
 export const stop = (session, objectGroup) => {
-  return GetRegexCount.getRegexCount(session)
+  return GetRegexCount.getRegexCount(session, objectGroup)
 }
 
 export const compare = CompareCount.compareCount

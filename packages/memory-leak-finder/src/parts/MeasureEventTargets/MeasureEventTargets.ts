@@ -11,11 +11,11 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  return GetEventTargets.getEventTargets(session, objectGroup)
+  return GetEventTargets.getEventTargets(session, objectGroup, undefined)
 }
 
 export const stop = (session, objectGroup) => {
-  return GetEventTargets.getEventTargets(session, objectGroup)
+  return GetEventTargets.getEventTargets(session, objectGroup, undefined)
 }
 
 export const compare = CompareEventTargets.compareEventTargets

@@ -7,6 +7,6 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
  * @returns {Promise<number>}
  */
 export const getRegexCount = async (session, objectGroup) => {
-  const count = await GetObjectCount.getObjectCount(session, PrototypeExpression.Regex)
+  const count = await GetObjectCount.getObjectCount(session, PrototypeExpression.Regex, objectGroup)
   return count
 }

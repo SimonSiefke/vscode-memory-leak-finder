@@ -18,7 +18,8 @@ export const deduplicatedDetachedDomNodes = (detachedDomNodes) => {
   const deduplicated = []
   for (const [key, value] of Object.entries(detachedDomNodeMap)) {
     const count = countMap[key]
-    const { objectId, type, subtype, ...rest } = value
+    // @ts-ignore
+    const { objectId, type, subtype, ...rest } = /** @type {any} */ (value)
     deduplicated.push({
       ...rest,
       count,

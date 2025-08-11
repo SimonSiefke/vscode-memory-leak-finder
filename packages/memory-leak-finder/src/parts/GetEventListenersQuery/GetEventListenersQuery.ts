@@ -22,7 +22,8 @@ const parseUrl = (stackLine) => {
 export const getEventListenerQuery = (stacks, scriptMap) => {
   const reverseScriptMap = Object.create(null)
   for (const value of Object.values(scriptMap)) {
-    reverseScriptMap[value.url] = value.sourceMapUrl
+    const v: any = value as any
+    reverseScriptMap[v.url] = v.sourceMapUrl
   }
   let originalIndex = 0
   const allQueries = []

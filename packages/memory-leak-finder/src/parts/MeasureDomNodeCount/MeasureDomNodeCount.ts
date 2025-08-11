@@ -10,11 +10,11 @@ export const create = (session) => {
 }
 
 export const start = (session) => {
-  return GetDomNodeCount.getDomNodeCount(session)
+  return GetDomNodeCount.getDomNodeCount(session, undefined)
 }
 
 export const stop = (session) => {
-  return GetDomNodeCount.getDomNodeCount(session)
+  return GetDomNodeCount.getDomNodeCount(session, undefined)
 }
 
 export const compare = CompareCount.compareCount

@@ -10,11 +10,11 @@ export const create = (session) => {
 }
 
 export const start = (session) => {
-  return GetEditContextCount.getEditContextCount(session)
+  return GetEditContextCount.getEditContextCount(session, undefined)
 }
 
 export const stop = (session) => {
-  return GetEditContextCount.getEditContextCount(session)
+  return GetEditContextCount.getEditContextCount(session, undefined)
 }
 
 export const compare = CompareCount.compareCount

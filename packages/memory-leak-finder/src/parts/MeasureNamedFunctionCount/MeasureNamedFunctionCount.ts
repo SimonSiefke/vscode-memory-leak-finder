@@ -16,12 +16,12 @@ export const create = (session) => {
 
 export const start = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.start(session)
-  return GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap)
+  return GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap, false as any)
 }
 
 export const stop = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.stop(session)
-  return GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap)
+  return GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap, false as any)
 }
 
 export const compare = CompareNamedFunctionCount.compareNamedFunctionCount
