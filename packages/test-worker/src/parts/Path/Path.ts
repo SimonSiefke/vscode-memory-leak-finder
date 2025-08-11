@@ -11,4 +11,3 @@ export const relative = (a: string, b: string): string => {
 export const dirname = (path: string): string => {
   return NodePath.dirname(path)
 }
-

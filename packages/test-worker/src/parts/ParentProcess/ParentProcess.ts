@@ -20,4 +20,3 @@ export const dispose = (): void => {
     state.rpc = undefined
   }
 }
-

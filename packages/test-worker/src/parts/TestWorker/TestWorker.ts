@@ -9,4 +9,3 @@ export const listen = async (): Promise<void> => {
   })
   ParentProcess.setRpc(rpc)
 }
-

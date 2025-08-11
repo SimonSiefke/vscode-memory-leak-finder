@@ -9,4 +9,3 @@ export const exit = (code?: number): never => {
 export const on = (event: string, listener: (...args: any[]) => void): NodeJS.Process => {
   return process.on(event as any, listener)
 }
-

@@ -8,4 +8,3 @@ export const load = async () => {
   const { commandMap } = module as any
   return commandMap
 }
-

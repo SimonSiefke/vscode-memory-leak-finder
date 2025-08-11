@@ -9,4 +9,3 @@ export const importScript = async (path: string) => {
     throw new VError(error, `Failed to import ${path}`)
   }
 }
-
