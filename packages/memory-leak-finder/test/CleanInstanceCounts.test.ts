@@ -11,7 +11,7 @@ test('cleanInstanceCounts', () => {
     },
   ]
   const scriptMap = {
-    16: { url: 'index.ts', sourceMapUrl: 'index.js.map' },
+    16: { url: 'index.js', sourceMapUrl: 'index.js.map' },
   }
   expect(CleanInstanceCounts.cleanInstanceCounts(instances, constructorLocations, scriptMap)).toEqual([
     {
