@@ -140,9 +140,17 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
 
       // Format the value for display
       let displayValue = actualValue
-      if (edge.targetNodeInfo?.type === 'string' && actualValue !== null && !actualValue.startsWith('[')) {
+      if (edge.targetNodeInfo?.type === 'string' && typeof actualValue === 'string' && !actualValue.startsWith('[')) {
         // Quote string values for display, handle empty strings properly
         displayValue = `"${actualValue}"`
+      } else if (edge.targetNodeInfo?.type === 'number') {
+        const parsed = Number(actualValue)
+        if (Number.isFinite(parsed)) {
+          // keep as number for display in examination output
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          displayValue = parsed
+        }
       }
 
       return {
