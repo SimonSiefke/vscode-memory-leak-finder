@@ -4,7 +4,7 @@ const mockCopy = jest.fn()
 const mockMakeDirectory = jest.fn()
 const mockRemove = jest.fn()
 
-jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.js', () => ({
+jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.ts', () => ({
   copy: mockCopy,
   makeDirectory: mockMakeDirectory,
   remove: mockRemove,
@@ -17,7 +17,7 @@ beforeEach(async () => {
   jest.clearAllMocks()
 
   // Import the module after mocking
-  applyFileOperationModule = await import('../src/parts/ApplyFileOperation/ApplyFileOperation.js')
+  applyFileOperationModule = await import('../src/parts/ApplyFileOperation/ApplyFileOperation.ts')
 })
 
 test('applyFileOperation - applies copy operation', async () => {

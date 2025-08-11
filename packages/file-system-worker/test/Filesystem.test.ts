@@ -28,7 +28,7 @@ beforeEach(async () => {
   jest.clearAllMocks()
 
   // Import the module after mocking
-  filesystemModule = await import('../src/parts/Filesystem/Filesystem.js')
+  filesystemModule = await import('../src/parts/Filesystem/Filesystem.ts')
 })
 
 test('copy - copies file with default options', async () => {

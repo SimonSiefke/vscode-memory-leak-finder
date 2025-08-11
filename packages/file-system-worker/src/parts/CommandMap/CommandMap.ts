@@ -1,6 +1,6 @@
-import { applyFileOperations } from '../ApplyFileOperations/ApplyFileOperations.js'
-import { exec } from '../Exec/Exec.js'
-import { findFiles, pathExists, readFileContent } from '../Filesystem/Filesystem.js'
+import { applyFileOperations } from '../ApplyFileOperations/ApplyFileOperations.ts'
+import { exec } from '../Exec/Exec.ts'
+import { findFiles, pathExists, readFileContent } from '../Filesystem/Filesystem.ts'
 
 export const commandMap: Record<string, (...args: any[]) => any> = {
   'FileSystem.applyFileOperations': applyFileOperations,

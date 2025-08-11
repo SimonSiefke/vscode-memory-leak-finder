@@ -1,5 +1,5 @@
 import { VError } from '@lvce-editor/verror'
-import { copy, makeDirectory, remove } from '../Filesystem/Filesystem.js'
+import { copy, makeDirectory, remove } from '../Filesystem/Filesystem.ts'
 
 export interface CopyOperation {
   readonly type: 'copy'
