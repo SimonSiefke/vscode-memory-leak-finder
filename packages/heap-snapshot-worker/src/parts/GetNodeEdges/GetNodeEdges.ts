@@ -1,3 +1,5 @@
+import * as Assert from '../Assert/Assert.ts'
+
 /**
  * Gets the edges for a specific node using the edge map
  * @param nodeIndex - The node index
@@ -24,6 +26,7 @@ export const getNodeEdges = (
   const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
 
   const startEdgeIndex = edgeMap[nodeIndex]
+  Assert.number(startEdgeIndex)
   const edgeCount = nodes[nodeIndex * ITEMS_PER_NODE + edgeCountFieldIndex]
   const nodeEdges: Array<{ type: number; nameIndex: number; toNode: number }> = []
 

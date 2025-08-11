@@ -9,10 +9,7 @@ const escape = (value: string): string => {
   return value.replaceAll('\n', '%0A').replaceAll('\r', '%0D')
 }
 
-export const getGitHubFileErrorMessage = (
-  message: string,
-  options: GitHubFileErrorOptions,
-): string => {
+export const getGitHubFileErrorMessage = (message: string, options: GitHubFileErrorOptions): string => {
   const parts: string[] = []
   parts.push('::error')
   const annotations: string[] = []
@@ -32,5 +29,3 @@ export const getGitHubFileErrorMessage = (
   const text = escape(message)
   return `${parts.join('')}${annotationPrefix}::${text}\n`
 }
-
-

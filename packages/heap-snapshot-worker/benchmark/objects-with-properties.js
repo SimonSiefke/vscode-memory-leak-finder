@@ -9,9 +9,11 @@ async function testGetObjectsWithProperties() {
 
   try {
     // Prepare the heap snapshot
+    console.time('prepare')
     const snapshot = await prepareHeapSnapshot(heapSnapshotPath, {
       parseStrings: true,
     })
+    console.timeEnd('prepare')
 
     console.log('Heap snapshot loaded successfully')
     console.log(`Snapshot has ${snapshot.node_count} nodes and ${snapshot.edge_count} edges`)
