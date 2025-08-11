@@ -110,7 +110,6 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
         if (edgeToNodeIndex === targetNodeIndex) {
           // Only consider edges where name_or_index refers to a string (i.e. property/internal),
           // not element edges where name_or_index is an array index number.
-          const edgeType = edges[edgeIndex + edgeTypeFieldIndex]
           const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
           const isNameIndexInStrings = edgeNameIndex >= 0 && edgeNameIndex < strings.length
           if (isNameIndexInStrings) {
