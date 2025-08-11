@@ -1,10 +1,8 @@
-import * as IsWindows from '../IsWindows/IsWindows.ts'
-
 export const ArrowDown = '\u001B[B'
 export const ArrowLeft = '\u001B[D'
 export const ArrowRight = '\u001B[C'
 export const ArrowUp = '\u001B[A'
-export const Backspace = Buffer.from(IsWindows.isWindows ? '08' : '7f', 'hex').toString()
+export const Backspace = (isWindows: boolean) => Buffer.from(isWindows ? '08' : '7f', 'hex').toString()
 export const ControlC = '\u0003'
 export const ControlD = '\u0004'
 export const ControlU = '\u0015'

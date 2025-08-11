@@ -15,7 +15,7 @@ export const handleStdinDataRunningMode = async (state, key) => {
     case AnsiKeys.ArrowDown:
     case AnsiKeys.AltBackspace:
     case AnsiKeys.ControlBackspace:
-    case AnsiKeys.Backspace:
+    case AnsiKeys.Backspace(state.isWindows):
     case AnsiKeys.ArrowLeft:
     case AnsiKeys.ArrowRight:
       return state

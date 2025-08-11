@@ -31,5 +31,6 @@ export const initialStart = async (options) => {
     options.commit,
     options.setupOnly,
     options.workers,
+    options.isWindows,
   )
 }
