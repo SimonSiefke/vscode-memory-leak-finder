@@ -6,7 +6,7 @@ jest.unstable_mockModule('execa', () => ({
   execa: mockExeca,
 }))
 
-const { exec } = await import('../src/parts/Exec/Exec.js')
+const { exec } = await import('../src/parts/Exec/Exec.ts')
 
 test('exec returns stdout, stderr, and exitCode', async () => {
   const command = 'echo'
