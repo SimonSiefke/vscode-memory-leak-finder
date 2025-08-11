@@ -6,7 +6,17 @@ import * as PrepareTests from '../PrepareTests/PrepareTests.js'
 import * as LaunchTestWorker from '../LaunchTestWorker/LaunchTestWorker.js'
 import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.js'
 
-export const state = {
+interface State {
+  firstLaunch: boolean
+  devtoolsWebSocketUrl: string
+  webSocketUrl: string
+  connectionId: number
+  headlessMode: boolean
+  parsedVersion: any
+  promise: Promise<any> | undefined
+}
+
+export const state: State = {
   firstLaunch: false,
   devtoolsWebSocketUrl: '',
   webSocketUrl: '',
