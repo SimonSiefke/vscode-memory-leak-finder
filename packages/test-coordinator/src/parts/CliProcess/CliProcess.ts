@@ -12,16 +12,9 @@ export const set = (rpc) => {
   state.rpc = rpc
 }
 
-export const send = (method, ...params) => {
+export const invoke = async (method, ...params) => {
   if (!state.rpc) {
-    return
+    throw new Error(`cli process rpc is not available`)
   }
-  state.rpc.send(method, ...params)
-}
-
-export const invoke = (method, ...params) => {
-  if (!state.rpc) {
-    return
-  }
-  state.rpc.invoke(method, ...params)
+  await state.rpc.invoke(method, ...params)
 }
