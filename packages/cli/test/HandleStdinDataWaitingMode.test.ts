@@ -4,6 +4,7 @@ import * as AnsiEscapes from '../src/parts/AnsiEscapes/AnsiEscapes.ts'
 import * as CliKeys from '../src/parts/CliKeys/CliKeys.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
 import * as PatternUsage from '../src/parts/PatternUsage/PatternUsage.ts'
+import { state } from '../src/parts/TestOutputState/TestOutputState.ts'
 
 beforeEach(() => {
   jest.resetModules()
@@ -125,6 +126,7 @@ test('handleStdinDataWaitingMode - run all tests', async () => {
   const key = CliKeys.All
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toEqual({
+    ...state,
     value: '',
     mode: ModeType.Running,
   })
@@ -139,6 +141,7 @@ test('handleStdinDataWaitingMode - filter mode', async () => {
   const key = CliKeys.FilterMode
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toEqual({
+    ...state,
     value: '',
     mode: ModeType.FilterWaiting,
   })
