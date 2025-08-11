@@ -1,5 +1,5 @@
 import { VError } from '@lvce-editor/verror'
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 // TODO emulate a focused page?
 const script = `(async function () {

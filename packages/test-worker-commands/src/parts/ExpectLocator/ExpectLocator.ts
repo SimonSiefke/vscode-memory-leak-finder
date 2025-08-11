@@ -1,5 +1,5 @@
-import * as ExpectLocatorIndex from '../ExpectLocatorIndex/ExpectLocatorIndex.js'
-import * as RegisterPrototype from '../RegisterPrototype/RegisterPrototype.js'
+import * as ExpectLocatorIndex from '../ExpectLocatorIndex/ExpectLocatorIndex.ts'
+import * as RegisterPrototype from '../RegisterPrototype/RegisterPrototype.ts'
 
 function ExpectLocator(args) {
   this.context = args

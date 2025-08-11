@@ -1,4 +1,4 @@
-import * as ExpectLocatorSingleElementCondition from '../ExpectLocatorSingleElementCondition/ExpectLocatorSingleElementCondition.js'
+import * as ExpectLocatorSingleElementCondition from '../ExpectLocatorSingleElementCondition/ExpectLocatorSingleElementCondition.ts'
 
 export const toHaveAttribute = (locator, key, value, options = {}) => {
   if (value instanceof RegExp) {

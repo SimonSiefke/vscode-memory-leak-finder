@@ -1,9 +1,9 @@
-import * as Assert from '../Assert/Assert.js'
+import * as Assert from '../Assert/Assert.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
-import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.js'
-import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
-import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.js'
+import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
+import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
+import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.ts'
 
 export const connectElectron = async (connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback) => {
   Assert.number(connectionId)

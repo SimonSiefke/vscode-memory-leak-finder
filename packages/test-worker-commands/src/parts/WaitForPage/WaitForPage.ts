@@ -1,7 +1,7 @@
-import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.js'
-import * as Page from '../Page/Page.js'
-import * as SessionState from '../SessionState/SessionState.js'
-import * as TargetState from '../TargetState/TargetState.js'
+import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.ts'
+import * as Page from '../Page/Page.ts'
+import * as SessionState from '../SessionState/SessionState.ts'
+import * as TargetState from '../TargetState/TargetState.ts'
 
 export const waitForPage = async ({ index, electronRpc, electronObjectId }) => {
   const target = await TargetState.waitForTarget({ type: DevtoolsTargetType.Page, index })

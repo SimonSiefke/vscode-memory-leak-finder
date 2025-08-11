@@ -1,5 +1,5 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as FunctionExpectElectronWindowTitle from '../FunctionExpectElectronWindowTitle/FunctionExpectElectronWindowTitle.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as FunctionExpectElectronWindowTitle from '../FunctionExpectElectronWindowTitle/FunctionExpectElectronWindowTitle.ts'
 
 export const toHaveBounds = async (page, x, y, width, height) => {
   // TODO pass expected bounds as arguments

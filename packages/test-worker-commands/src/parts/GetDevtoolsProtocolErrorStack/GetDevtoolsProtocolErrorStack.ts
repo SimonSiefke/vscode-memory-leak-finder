@@ -1,5 +1,5 @@
 const cleanLine = (line) => {
-  return line.replace('<anonymous>', 'dist/injectedCode.js')
+  return line.replace('<anonymous>', 'dist/injectedCode.ts')
 }
 
 export const getDevtoolsProtocolErrorStack = (rawStack) => {

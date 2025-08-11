@@ -1,5 +1,5 @@
-import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateInUtilityContext.js'
-import { ExpectError } from '../ExpectError/ExpectError.js'
+import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateInUtilityContext.ts'
+import { ExpectError } from '../ExpectError/ExpectError.ts'
 
 /**
  * @param {string} expectedTitle

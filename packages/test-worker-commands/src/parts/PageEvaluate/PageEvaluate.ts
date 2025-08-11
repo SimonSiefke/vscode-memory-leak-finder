@@ -1,7 +1,7 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.js'
-import { ExpectError } from '../ExpectError/ExpectError.js'
-import * as PTimeout from '../PTimeout/PTimeout.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.ts'
+import { ExpectError } from '../ExpectError/ExpectError.ts'
+import * as PTimeout from '../PTimeout/PTimeout.ts'
 
 export const evaluate = async (rpc, { expression, awaitPromise = false, replMode = false }) => {
   try {

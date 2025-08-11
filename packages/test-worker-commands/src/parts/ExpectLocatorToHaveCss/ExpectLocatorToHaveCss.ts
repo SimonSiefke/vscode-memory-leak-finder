@@ -1,4 +1,4 @@
-import * as ExpectLocatorSingleElementCondition from '../ExpectLocatorSingleElementCondition/ExpectLocatorSingleElementCondition.js'
+import * as ExpectLocatorSingleElementCondition from '../ExpectLocatorSingleElementCondition/ExpectLocatorSingleElementCondition.ts'
 
 export const toHaveCss = (locator, key, value, options = {}) => {
   if (typeof value === 'string') {

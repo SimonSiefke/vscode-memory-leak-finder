@@ -1,6 +1,6 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.js'
-import * as SessionState from '../SessionState/SessionState.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.ts'
+import * as SessionState from '../SessionState/SessionState.ts'
 
 export const evaluateInUtilityContext = async (options, sessionId = '') => {
   if (!sessionId) {

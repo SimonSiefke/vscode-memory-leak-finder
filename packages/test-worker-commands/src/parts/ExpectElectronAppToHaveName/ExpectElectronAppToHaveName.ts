@@ -1,6 +1,6 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import { ExpectError } from '../ExpectError/ExpectError.js'
-import * as FunctionGetElectronAppName from '../FunctionGetElectronAppName/FunctionGetElectronAppName.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { ExpectError } from '../ExpectError/ExpectError.ts'
+import * as FunctionGetElectronAppName from '../FunctionGetElectronAppName/FunctionGetElectronAppName.ts'
 
 export const toHaveName = async (electronApp, expectedName) => {
   const result = await DevtoolsProtocolRuntime.callFunctionOn(electronApp.rpc, {

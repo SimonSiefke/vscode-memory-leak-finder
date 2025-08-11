@@ -1,6 +1,6 @@
-import { VError } from '../VError/VError.js'
-import * as PTimeout from '../PTimeout/PTimeout.js'
-import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
+import { VError } from '../VError/VError.ts'
+import * as PTimeout from '../PTimeout/PTimeout.ts'
+import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 
 const state = {
   /**

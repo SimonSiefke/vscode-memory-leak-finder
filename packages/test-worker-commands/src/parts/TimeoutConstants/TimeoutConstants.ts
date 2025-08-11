@@ -1,4 +1,4 @@
-import * as IsWindows from '../IsWindows/IsWindows.js'
+import * as IsWindows from '../IsWindows/IsWindows.ts'
 
 export const AttachToPage = IsWindows.IsWindows ? 5000 : 1000
 export const DefaultExecutionContext = 500

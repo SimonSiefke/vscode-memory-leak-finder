@@ -1,5 +1,5 @@
-import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as PTimeout from '../PTimeout/PTimeout.js'
+import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as PTimeout from '../PTimeout/PTimeout.ts'
 
 export const close = async (rpc) => {
   const result = await PTimeout.pTimeout(DevtoolsProtocolPage.close(rpc, {}), {

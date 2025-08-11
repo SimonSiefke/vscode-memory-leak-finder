@@ -1,6 +1,6 @@
-import * as ImportTest from '../ImportTest/ImportTest.js'
-import * as TestStage from '../TestStage/TestStage.js'
-import * as Assert from '../Assert/Assert.js'
+import * as ImportTest from '../ImportTest/ImportTest.ts'
+import * as TestStage from '../TestStage/TestStage.ts'
+import * as Assert from '../Assert/Assert.ts'
 
 // @ts-ignore
 export const setupTestWithCallback = async (pageObject, file, forceRun) => {

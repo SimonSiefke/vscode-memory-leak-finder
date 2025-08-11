@@ -1,6 +1,6 @@
-import * as PageEventState from '../PageEventState/PageEventState.js'
-import * as PageEventType from '../PageEventType/PageEventType.js'
-import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.js'
+import * as PageEventState from '../PageEventState/PageEventState.ts'
+import * as PageEventType from '../PageEventType/PageEventType.ts'
+import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 
 export const waitForFirstWindow = async ({ electronApp, isHeadless, isFirstConnection }) => {
   const firstWindow = await electronApp.firstWindow()

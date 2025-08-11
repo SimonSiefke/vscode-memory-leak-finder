@@ -1,5 +1,5 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.ts'
 
 export const toHaveTitle = async (page, expectedTitle) => {
   const utilityExecutionContext = await ExecutionContextState.waitForUtilityExecutionContext(page.sessionId)

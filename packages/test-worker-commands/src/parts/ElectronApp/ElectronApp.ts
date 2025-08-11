@@ -1,7 +1,7 @@
-import * as ObjectType from '../ObjectType/ObjectType.js'
-import * as WaitForPage from '../WaitForPage/WaitForPage.js'
-import * as WaitForIframe from '../WaitForIframe/WaitForIframe.js'
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import * as ObjectType from '../ObjectType/ObjectType.ts'
+import * as WaitForPage from '../WaitForPage/WaitForPage.ts'
+import * as WaitForIframe from '../WaitForIframe/WaitForIframe.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 export const create = ({ electronRpc, electronObjectId }) => {
   return {

@@ -1,7 +1,7 @@
-import * as Assert from '../Assert/Assert.js'
-import * as ImportTest from '../ImportTest/ImportTest.js'
-import * as PageObjectState from '../PageObjectState/PageObjectState.js'
-import * as TestStage from '../TestStage/TestStage.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as ImportTest from '../ImportTest/ImportTest.ts'
+import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
+import * as TestStage from '../TestStage/TestStage.ts'
 
 export const tearDownTest = async (connectionId, file) => {
   Assert.number(connectionId)

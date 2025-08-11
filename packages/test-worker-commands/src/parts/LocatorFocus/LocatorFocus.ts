@@ -1,5 +1,5 @@
-import * as Assert from '../Assert/Assert.js'
-import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateInUtilityContext.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateInUtilityContext.ts'
 
 export const focus = async (locator) => {
   Assert.object(locator)

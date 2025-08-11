@@ -1,5 +1,5 @@
-import * as ExpectElectronAppIndex from '../ExpectElectronAppIndex/ExpectElectronAppIndex.js'
-import * as RegisterPrototype from '../RegisterPrototype/RegisterPrototype.js'
+import * as ExpectElectronAppIndex from '../ExpectElectronAppIndex/ExpectElectronAppIndex.ts'
+import * as RegisterPrototype from '../RegisterPrototype/RegisterPrototype.ts'
 
 function ExpectElectronApp(args) {
   this.context = args

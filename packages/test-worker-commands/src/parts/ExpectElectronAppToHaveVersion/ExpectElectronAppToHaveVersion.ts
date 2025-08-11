@@ -1,6 +1,6 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
-import { ExpectError } from '../ExpectError/ExpectError.js'
-import * as FunctionGetElectronAppVersion from '../FunctionGetElectronAppVersion/FunctionGetElectronAppVersion.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { ExpectError } from '../ExpectError/ExpectError.ts'
+import * as FunctionGetElectronAppVersion from '../FunctionGetElectronAppVersion/FunctionGetElectronAppVersion.ts'
 
 export const toHaveVersion = async (electronApp, expectedVersion) => {
   const result = await DevtoolsProtocolRuntime.callFunctionOn(electronApp.rpc, {

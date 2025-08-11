@@ -1,5 +1,5 @@
-import * as ExpectDefaultToBe from '../ExpectDefaultToBe/ExpectDefaultToBe.js'
-import * as ExpectDefaultToEqual from '../ExpectDefaultToEqual/ExpectDefaultToEqual.js'
+import * as ExpectDefaultToBe from '../ExpectDefaultToBe/ExpectDefaultToBe.ts'
+import * as ExpectDefaultToEqual from '../ExpectDefaultToEqual/ExpectDefaultToEqual.ts'
 
 export const expect = (args) => {
   return {

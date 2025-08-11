@@ -1,7 +1,7 @@
-import * as Page from '../Page/Page.js'
-import * as SessionState from '../SessionState/SessionState.js'
-import * as TargetState from '../TargetState/TargetState.js'
-import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.js'
+import * as Page from '../Page/Page.ts'
+import * as SessionState from '../SessionState/SessionState.ts'
+import * as TargetState from '../TargetState/TargetState.ts'
+import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.ts'
 
 export const waitForIframe = async ({ electronRpc, url, electronObjectId }) => {
   const target = await TargetState.waitForTarget({

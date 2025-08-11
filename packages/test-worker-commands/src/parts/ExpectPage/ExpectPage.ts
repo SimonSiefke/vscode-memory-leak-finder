@@ -1,5 +1,5 @@
-import * as ExpectPageIndex from '../ExpectPageIndex/ExpectPageIndex.js'
-import * as RegisterPrototype from '../RegisterPrototype/RegisterPrototype.js'
+import * as ExpectPageIndex from '../ExpectPageIndex/ExpectPageIndex.ts'
+import * as RegisterPrototype from '../RegisterPrototype/RegisterPrototype.ts'
 
 function ExpectPage(page) {
   this.context = page

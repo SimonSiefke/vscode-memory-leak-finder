@@ -1,4 +1,4 @@
-import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateInUtilityContext.js'
+import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateInUtilityContext.ts'
 
 export const toBeHidden = async (locator, options = {}) => {
   await EvaluateInUtilityContext.evaluateInUtilityContext(

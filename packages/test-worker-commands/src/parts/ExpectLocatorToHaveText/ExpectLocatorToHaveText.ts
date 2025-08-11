@@ -1,4 +1,4 @@
-import * as ExpectLocatorSingleElementCondition from '../ExpectLocatorSingleElementCondition/ExpectLocatorSingleElementCondition.js'
+import * as ExpectLocatorSingleElementCondition from '../ExpectLocatorSingleElementCondition/ExpectLocatorSingleElementCondition.ts'
 
 const getFullOptions = (text, options) => {
   if (text instanceof RegExp) {

@@ -1,6 +1,6 @@
-import * as Assert from '../Assert/Assert.js'
-import * as PageObjectState from '../PageObjectState/PageObjectState.js'
-import * as SetupTestWithCallback from '../SetupTestWithCallback/SetupTestWithCallback.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
+import * as SetupTestWithCallback from '../SetupTestWithCallback/SetupTestWithCallback.ts'
 
 export const setupTest = async (connectionId, absolutePath, forceRun) => {
   Assert.number(connectionId)

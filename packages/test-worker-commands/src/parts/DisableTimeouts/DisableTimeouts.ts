@@ -1,4 +1,4 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.js'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 export const disableTimeouts = async (firstWindow) => {
   await DevtoolsProtocolRuntime.evaluate(firstWindow.rpc, {

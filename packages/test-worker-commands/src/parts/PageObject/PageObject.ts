@@ -1,11 +1,11 @@
-import * as Assert from '../Assert/Assert.js'
-import * as DisableTimeouts from '../DisableTimeouts/DisableTimeouts.js'
-import * as ElectronAppState from '../ElectronAppState/ElectronAppState.js'
-import * as Expect from '../Expect/Expect.js'
-import * as ImportScript from '../ImportScript/ImportScript.js'
-import * as PageObjectState from '../PageObjectState/PageObjectState.js'
-import { VError } from '../VError/VError.js'
-import * as WaitForFirstWindow from '../WaitForFirstWindow/WaitForFirstWindow.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as DisableTimeouts from '../DisableTimeouts/DisableTimeouts.ts'
+import * as ElectronAppState from '../ElectronAppState/ElectronAppState.ts'
+import * as Expect from '../Expect/Expect.ts'
+import * as ImportScript from '../ImportScript/ImportScript.ts'
+import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
+import { VError } from '../VError/VError.ts'
+import * as WaitForFirstWindow from '../WaitForFirstWindow/WaitForFirstWindow.ts'
 
 // TODO move this into 3 separate functions
 // 1. import pageobject module

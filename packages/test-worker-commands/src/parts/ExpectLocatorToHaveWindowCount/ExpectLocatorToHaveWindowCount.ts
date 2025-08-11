@@ -1,5 +1,5 @@
-import { ExpectError } from '../ExpectError/ExpectError.js'
-import * as SessionState from '../SessionState/SessionState.js'
+import { ExpectError } from '../ExpectError/ExpectError.ts'
+import * as SessionState from '../SessionState/SessionState.ts'
 
 const isWindow = (session) => {
   return session.type === 'page'

@@ -1,6 +1,6 @@
-import * as RunTestWithCallbackImport from '../RunTestWithCallbackImport/RunTestWithCallbackImport.js'
-import * as RunTestWithCallbackVm from '../RunTestWithCallbackVm/RunTestWithCallbackVm.js'
-import * as TestRunMode from '../TestRunMode/TestRunMode.js'
+import * as RunTestWithCallbackImport from '../RunTestWithCallbackImport/RunTestWithCallbackImport.ts'
+import * as RunTestWithCallbackVm from '../RunTestWithCallbackVm/RunTestWithCallbackVm.ts'
+import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 
 const getModule = (runMode) => {
   switch (runMode) {

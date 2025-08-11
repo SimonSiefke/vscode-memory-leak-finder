@@ -1,9 +1,9 @@
-import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.js'
-import * as PageObject from '../PageObject/PageObject.js'
-import * as RunTest from '../RunTest/RunTest.js'
-import * as SetupTest from '../SetupTest/SetupTest.js'
-import * as TearDownTest from '../TearDownTest/TearDownTest.js'
-import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.js'
+import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
+import * as PageObject from '../PageObject/PageObject.ts'
+import * as RunTest from '../RunTest/RunTest.ts'
+import * as SetupTest from '../SetupTest/SetupTest.ts'
+import * as TearDownTest from '../TearDownTest/TearDownTest.ts'
+import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
 
 export const commandMap = {
   [TestWorkerCommandType.ConnectDevtools]: ConnectDevtools.connectDevtools,
