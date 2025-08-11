@@ -92,7 +92,7 @@ test('handleStdinDataWaitingMode - ctrl + backspace', async () => {
   const key = AnsiKeys.ControlBackspace
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.value).toBe('')
-  expect(newState.stdout).toEqual([AnsiEscapes.eraseLine + AnsiEscapes.cursorLeft])
+  expect(newState.stdout).toEqual([(await AnsiEscapes.eraseLine()) + (await AnsiEscapes.cursorLeft())])
 })
 
 test('handleStdinDataWaitingMode - backspace', async () => {
