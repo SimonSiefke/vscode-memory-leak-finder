@@ -1,5 +1,4 @@
-import { join, resolve } from 'node:path'
-import { readdir, rm } from 'node:fs/promises'
+import { rm } from 'node:fs/promises'
 import * as GetUnusedFilesToRemoveLinux from '../GetUnusedFilesToRemoveLinux/GetUnusedFilesToRemoveLinux.ts'
 
 export const removeunusedfileslinux = async (binaryPath: string): Promise<void> => {
@@ -10,5 +9,3 @@ export const removeunusedfileslinux = async (binaryPath: string): Promise<void> 
     } catch {}
   }
 }
-
-
