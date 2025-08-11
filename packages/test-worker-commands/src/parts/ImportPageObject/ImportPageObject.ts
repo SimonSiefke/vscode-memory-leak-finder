@@ -8,7 +8,7 @@ export const importPageObject = async (connectionId, pageObjectPath) => {
     Assert.string(pageObjectPath)
     const pageObjectModule = await ImportScript.importScript(pageObjectPath)
     PageObjectState.set(connectionId, {
-      module: pageObjectModule,
+      pageObjectModule,
     })
   } catch (error) {
     throw new VError(error, `Failed to import page object`)

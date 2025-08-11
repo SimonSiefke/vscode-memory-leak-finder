@@ -1,4 +1,4 @@
-import { getThingCountFromHeapSnapshot } from '../GetThingCountFromHeapSnapshot/GetThingCountFromHeapSnapshot.js'
+import { getThingCountFromHeapSnapshot } from '../GetThingCountFromHeapSnapshot/GetThingCountFromHeapSnapshot.ts'
 import { Snapshot } from '../Snapshot/Snapshot.ts'
 
 export const getWeakRefCountFromHeapSnapshotInternal = (snapshot: Snapshot): number => {
