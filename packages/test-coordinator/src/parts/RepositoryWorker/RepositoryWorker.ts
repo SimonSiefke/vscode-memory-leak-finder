@@ -1,4 +1,4 @@
-import { NodeWorkerRpcParent, Rpc } from '@lvce-editor/rpc'
+import { NodeWorkerRpcParent, type Rpc } from '@lvce-editor/rpc'
 import * as GetRepositoryWorkerUrl from '../GetRepositoryWorkerUrl/GetRepositoryWorkerUrl.ts'
 
 export const launch = async (): Promise<Rpc> => {
