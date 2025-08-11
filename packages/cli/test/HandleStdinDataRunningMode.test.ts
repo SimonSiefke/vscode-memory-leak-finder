@@ -1,9 +1,9 @@
-import { beforeEach, expect, jest, test } from '@jest/globals'
+import { expect, test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
+import * as HandleStdinDataRunningMode from '../src/parts/HandleStdinDataRunningMode/HandleStdinDataRunningMode.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
 import * as StdoutWorker from '../src/parts/StdoutWorker/StdoutWorker.ts'
-import * as HandleStdinDataRunningMode from '../src/parts/HandleStdinDataRunningMode/HandleStdinDataRunningMode.ts'
 
 const mockRpc = MockRpc.create({
   commandMap: {},

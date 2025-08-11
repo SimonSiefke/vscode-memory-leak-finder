@@ -17,7 +17,10 @@ const mockRpc = MockRpc.create({
 StdoutWorker.set(mockRpc)
 
 test('handleStdinDataFinishedRunningMode - show watch mode details', async () => {
-  const state = { ...createDefaultState(), mode: ModeType.FinishedRunning }
+  const state = {
+    ...createDefaultState(),
+    mode: ModeType.FinishedRunning,
+  }
   const key = CliKeys.WatchMode
 
   // Mock the stdout worker to return watch usage message
@@ -26,7 +29,7 @@ test('handleStdinDataFinishedRunningMode - show watch mode details', async () =>
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
 
   expect(newState.mode).toBe(ModeType.Waiting)
-  expect(newState.stdout?.at(-1)).toBe('[ansi-clear]\nwatch usage\n')
+  expect(newState.stdout).toEqual(['[ansi-clear]\nwatch usage\n'])
   expect(mockRpc.invoke).toHaveBeenCalled()
 })
 
