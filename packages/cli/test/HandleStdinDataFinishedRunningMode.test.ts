@@ -5,6 +5,7 @@ import * as CliKeys from '../src/parts/CliKeys/CliKeys.ts'
 import { createDefaultState } from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as HandleStdinDataFinishedRunningMode from '../src/parts/HandleStdinDataFinishedRunningMode/HandleStdinDataFinishedRunningMode.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
+import * as StdoutWorker from '../src/parts/StdoutWorker/StdoutWorker.ts'
 
 const mockInvoke = jest.fn(async () => 'not implemented')
 
@@ -12,6 +13,8 @@ const mockRpc = MockRpc.create({
   commandMap: {},
   invoke: mockInvoke,
 })
+
+StdoutWorker.set(mockRpc)
 
 test('handleStdinDataFinishedRunningMode - show watch mode details', async () => {
   const state = { ...createDefaultState(), mode: ModeType.FinishedRunning }

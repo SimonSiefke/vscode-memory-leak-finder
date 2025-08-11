@@ -98,11 +98,13 @@ test('handleStdinDataFilterWaitingMode - escape', async () => {
       if (method === 'Stdout.getClear') {
         return Promise.resolve('[ansi-clear]\n')
       }
+      if (method === 'Stdout.getWatchUsageMessage') {
+        return Promise.resolve('[watch usage]')
+      }
       throw new Error(`unexpected method ${method}`)
     },
   })
   StdoutWorker.set(mockRpc)
-
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Waiting)
 })
