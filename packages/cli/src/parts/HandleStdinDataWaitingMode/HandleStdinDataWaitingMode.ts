@@ -3,7 +3,6 @@ import * as Character from '../Character/Character.ts'
 import * as CliKeys from '../CliKeys/CliKeys.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
 import * as PatternUsage from '../PatternUsage/PatternUsage.ts'
-import * as Stdout from '../Stdout/Stdout.ts'
 import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
 export const handleStdinDataWaitingMode = async (state, key) => {
@@ -14,7 +13,7 @@ export const handleStdinDataWaitingMode = async (state, key) => {
         ...state,
         mode: ModeType.Exit,
       }
-    case AnsiKeys.Enter:
+    case AnsiKeys.Enter: {
       const eraseLine = await StdoutWorker.invoke('Stdout.getEraseLine')
       const cursorLeft = await StdoutWorker.invoke('Stdout.getCursorLeft')
       return {
@@ -22,18 +21,20 @@ export const handleStdinDataWaitingMode = async (state, key) => {
         mode: ModeType.Running,
         stdout: [...state.stdout, eraseLine + cursorLeft],
       }
+    }
     case AnsiKeys.ArrowUp:
     case AnsiKeys.ArrowDown:
       return state
     case AnsiKeys.AltBackspace:
-    case AnsiKeys.ControlBackspace:
-      const eraseLine2 = await StdoutWorker.invoke('Stdout.getEraseLine')
-      const cursorLeft2 = await StdoutWorker.invoke('Stdout.getCursorLeft')
+    case AnsiKeys.ControlBackspace: {
+      const eraseLine = await StdoutWorker.invoke('Stdout.getEraseLine')
+      const cursorLeft = await StdoutWorker.invoke('Stdout.getCursorLeft')
       return {
         ...state,
         value: Character.EmptyString,
         stdout: [...state.stdout, eraseLine + cursorLeft],
       }
+    }
     case AnsiKeys.Backspace(state.isWindows):
       return {
         ...state,
