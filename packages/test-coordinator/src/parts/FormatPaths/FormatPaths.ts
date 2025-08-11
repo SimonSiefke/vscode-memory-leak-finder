@@ -1,4 +1,4 @@
-import * as FormatPath from '../FormatPath/FormatPath.js'
+import * as FormatPath from '../FormatPath/FormatPath.ts'
 
 export const formatPaths = (cwd, testsPath, dirents) => {
   const formattedPaths: any[] = []

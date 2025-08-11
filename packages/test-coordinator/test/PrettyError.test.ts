@@ -5,7 +5,7 @@ beforeEach(() => {
   jest.resetModules()
 })
 
-jest.unstable_mockModule('../src/parts/FileSystem/FileSystem.js', () => {
+jest.unstable_mockModule('../src/parts/FileSystem/FileSystem.ts', () => {
   return {
     readFileSync: jest.fn(() => {
       throw new Error('not implemented')
@@ -13,8 +13,8 @@ jest.unstable_mockModule('../src/parts/FileSystem/FileSystem.js', () => {
   }
 })
 
-const FileSystem = await import('../src/parts/FileSystem/FileSystem.js')
-const PrettyError = await import('../src/parts/PrettyError/PrettyError.js')
+const FileSystem = await import('../src/parts/FileSystem/FileSystem.ts')
+const PrettyError = await import('../src/parts/PrettyError/PrettyError.ts')
 
 class ExpectError extends Error {
   constructor(message) {
@@ -120,7 +120,7 @@ abc
 test('prepare - assertion error', async () => {
   // @ts-ignore
   FileSystem.readFileSync.mockImplementation(() => {
-    return `import { AssertionError } from '../AssertionError/AssertionError.js'
+    return `import { AssertionError } from '../AssertionError/AssertionError.ts'
 
 const getType = (value) => {
   switch (typeof value) {

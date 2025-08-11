@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname } from 'node:path'
-import { VError } from '../VError/VError.js'
+import { VError } from '../VError/VError.ts'
 
 export const writeJson = async (path, json) => {
   try {

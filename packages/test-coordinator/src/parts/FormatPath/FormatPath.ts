@@ -1,4 +1,4 @@
-import * as Path from '../Path/Path.js'
+import * as Path from '../Path/Path.ts'
 
 export const formatPath = (cwd, testsPath, dirent) => {
   const absolutePath = Path.join(testsPath, dirent)

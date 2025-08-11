@@ -1,4 +1,4 @@
-import * as Listen from '../Listen/Listen.js'
+import * as Listen from '../Listen/Listen.ts'
 
 const handleUncaughtExceptionMonitor = (error) => {
   console.error(`[test-coordinator]: Unhandled Error: ${error}`)

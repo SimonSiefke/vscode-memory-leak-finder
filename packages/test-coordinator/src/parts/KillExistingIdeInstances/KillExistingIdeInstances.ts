@@ -1,5 +1,5 @@
-import * as Ide from '../Ide/Ide.js'
-import * as KillExistingVscodeInstances from '../KillExistingVscodeInstances/KillExistingVscodeInstances.js'
+import * as Ide from '../Ide/Ide.ts'
+import * as KillExistingVscodeInstances from '../KillExistingVscodeInstances/KillExistingVscodeInstances.ts'
 
 export const killExisingIdeInstances = async (ide) => {
   if (ide === Ide.VsCode) {

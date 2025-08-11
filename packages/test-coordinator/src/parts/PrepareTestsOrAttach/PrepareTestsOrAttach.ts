@@ -1,10 +1,10 @@
-import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.js'
-import * as ConnectElectron from '../ConnectElectron/ConnectElectron.js'
-import * as PageObject from '../PageObject/PageObject.js'
-import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.js'
-import * as PrepareTests from '../PrepareTests/PrepareTests.js'
-import * as LaunchTestWorker from '../LaunchTestWorker/LaunchTestWorker.js'
-import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.js'
+import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
+import * as ConnectElectron from '../ConnectElectron/ConnectElectron.ts'
+import * as PageObject from '../PageObject/PageObject.ts'
+import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.ts'
+import * as PrepareTests from '../PrepareTests/PrepareTests.ts'
+import * as LaunchTestWorker from '../LaunchTestWorker/LaunchTestWorker.ts'
+import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
 
 interface State {
   firstLaunch: boolean

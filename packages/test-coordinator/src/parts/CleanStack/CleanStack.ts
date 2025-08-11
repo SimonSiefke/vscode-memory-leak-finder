@@ -27,7 +27,7 @@ const isInternal = (line) => {
   if (line.includes('at async handleJsonRpcMessage')) {
     return true
   }
-  if (line.includes('at invoke ') && line.includes('JsonRpc/JsonRpc.js')) {
+  if (line.includes('at invoke ') && line.includes('JsonRpc/JsonRpc.ts')) {
     return true
   }
   return false
@@ -62,8 +62,8 @@ const getRelevantLines = (lines, stack) => {
     stack.includes('Target was not created page') ||
     (lines[1] && lines[1].includes('at Module.test')) ||
     stack.includes('expected') ||
-    (stack.includes('at Object.evaluate ') && stack.includes('PageEvaluate/PageEvaluate.js')) ||
-    (stack.includes('at Module.evaluate ') && stack.includes('PageEvaluate/PageEvaluate.js'))
+    (stack.includes('at Object.evaluate ') && stack.includes('PageEvaluate/PageEvaluate.ts')) ||
+    (stack.includes('at Module.evaluate ') && stack.includes('PageEvaluate/PageEvaluate.ts'))
   const relevantLines: string[] = []
   for (const line of lines) {
     if (isInternal(line)) {

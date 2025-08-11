@@ -1,19 +1,19 @@
 import { join } from 'node:path'
-import * as Assert from '../Assert/Assert.js'
-import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.js'
-import * as Id from '../Id/Id.js'
-import * as JsonFile from '../JsonFile/JsonFile.js'
-import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.js'
-import * as MemoryLeakResultsPath from '../MemoryLeakResultsPath/MemoryLeakResultsPath.js'
-import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
-import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.js'
-import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.js'
-import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.js'
-import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.js'
-import * as Time from '../Time/Time.js'
-import * as Timeout from '../Timeout/Timeout.js'
-import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTearDownTest.js'
-import * as VideoRecording from '../VideoRecording/VideoRecording.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.ts'
+import * as Id from '../Id/Id.ts'
+import * as JsonFile from '../JsonFile/JsonFile.ts'
+import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.ts'
+import * as MemoryLeakResultsPath from '../MemoryLeakResultsPath/MemoryLeakResultsPath.ts'
+import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.ts'
+import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
+import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.ts'
+import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.ts'
+import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.ts'
+import * as Time from '../Time/Time.ts'
+import * as Timeout from '../Timeout/Timeout.ts'
+import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTearDownTest.ts'
+import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
 
 // 1. get matching files
 // 2. launch vscode
@@ -142,7 +142,7 @@ export const runTests = async (
             const after = await MemoryLeakFinder.stop(memoryLeakWorkerRpc, connectionId, targetId)
 
             const result = await MemoryLeakFinder.compare(memoryLeakWorkerRpc, connectionId, before, after)
-            const fileName = dirent.replace('.js', '.json')
+            const fileName = dirent.replace('.ts', '.json')
             const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
             await JsonFile.writeJson(resultPath, result)
             if (result.isLeak) {
@@ -192,7 +192,7 @@ export const runTests = async (
         }
       } catch (error) {
         failed++
-        const PrettyError = await import('../PrettyError/PrettyError.js')
+        const PrettyError = await import('../PrettyError/PrettyError.ts')
         const prettyError = await PrettyError.prepare(error, { color, root })
         callback(TestWorkerEventType.TestFailed, absolutePath, relativeDirname, relativePath, dirent, prettyError)
       }
@@ -204,7 +204,7 @@ export const runTests = async (
     }
     callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, leaking, total, duration, filterValue)
   } catch (error) {
-    const PrettyError = await import('../PrettyError/PrettyError.js')
+    const PrettyError = await import('../PrettyError/PrettyError.ts')
     const prettyError = await PrettyError.prepare(error, { color, root })
     callback(TestWorkerEventType.UnexpectedTestError, prettyError)
   }

@@ -1,9 +1,9 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import * as ErrorCodes from '../ErrorCodes/ErrorCodes.js'
-import * as KillProcess from '../KillProcess/KillProcess.js'
-import * as Root from '../Root/Root.js'
-import { VError } from '../VError/VError.js'
+import * as ErrorCodes from '../ErrorCodes/ErrorCodes.ts'
+import * as KillProcess from '../KillProcess/KillProcess.ts'
+import * as Root from '../Root/Root.ts'
+import { VError } from '../VError/VError.ts'
 
 // in some cases it can happen that after running tests
 // vscode is not closed properly and when trying to re-run

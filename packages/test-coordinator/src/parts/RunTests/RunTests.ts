@@ -1,5 +1,5 @@
-import * as RunTestsWithCallback from '../RunTestsWithCallback/RunTestsWithCallback.js'
-import * as CliProcess from '../CliProcess/CliProcess.js'
+import * as RunTestsWithCallback from '../RunTestsWithCallback/RunTestsWithCallback.ts'
+import * as CliProcess from '../CliProcess/CliProcess.ts'
 
 const callback = (method, ...params) => {
   // TODO use invoke

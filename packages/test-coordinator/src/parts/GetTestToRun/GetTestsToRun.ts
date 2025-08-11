@@ -1,10 +1,10 @@
 import { existsSync } from 'node:fs'
-import * as Assert from '../Assert/Assert.js'
-import * as FileSystem from '../FileSystem/FileSystem.js'
-import * as FormatPaths from '../FormatPaths/FormatPaths.js'
-import * as GetMatchingFiles from '../GetMatchingFiles/GetMatchingFiles.js'
-import * as Path from '../Path/Path.js'
-import { VError } from '../VError/VError.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as FileSystem from '../FileSystem/FileSystem.ts'
+import * as FormatPaths from '../FormatPaths/FormatPaths.ts'
+import * as GetMatchingFiles from '../GetMatchingFiles/GetMatchingFiles.ts'
+import * as Path from '../Path/Path.ts'
+import { VError } from '../VError/VError.ts'
 
 export const getTestsToRun = async (root, cwd, filterValue) => {
   try {

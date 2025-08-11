@@ -1,6 +1,6 @@
-import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.js'
-import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.js'
-import * as VideoRecording from '../VideoRecording/VideoRecording.js'
+import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
+import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.ts'
+import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
 
 /**
  *

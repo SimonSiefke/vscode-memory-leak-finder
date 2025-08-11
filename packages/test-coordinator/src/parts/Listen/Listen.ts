@@ -1,7 +1,7 @@
 import { NodeWorkerRpcClient } from '@lvce-editor/rpc'
-import * as CliProcess from '../CliProcess/CliProcess.js'
-import * as CommandMap from '../CommandMap/CommandMap.js'
-import * as CommandMapRef from '../CommandMapRef/CommandMapRef.js'
+import * as CliProcess from '../CliProcess/CliProcess.ts'
+import * as CommandMap from '../CommandMap/CommandMap.ts'
+import * as CommandMapRef from '../CommandMapRef/CommandMapRef.ts'
 
 export const listen = async () => {
   Object.assign(CommandMapRef.commandMapRef, CommandMap.commandMap)

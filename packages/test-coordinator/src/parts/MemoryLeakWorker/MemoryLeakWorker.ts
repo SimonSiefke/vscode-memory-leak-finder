@@ -1,7 +1,7 @@
 import { NodeWorkerRpcParent, Rpc } from '@lvce-editor/rpc'
-import * as Assert from '../Assert/Assert.js'
-import * as CommandMapRef from '../CommandMapRef/CommandMapRef.js'
-import * as MemoryLeakWorkerUrl from '../MemoryLeakWorkerUrl/MemoryLeakWorkerUrl.js'
+import * as Assert from '../Assert/Assert.ts'
+import * as CommandMapRef from '../CommandMapRef/CommandMapRef.ts'
+import * as MemoryLeakWorkerUrl from '../MemoryLeakWorkerUrl/MemoryLeakWorkerUrl.ts'
 
 interface State {
   rpc: Rpc | undefined

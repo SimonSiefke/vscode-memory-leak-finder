@@ -1,6 +1,6 @@
 import { relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import * as Assert from '../Assert/Assert.js'
+import * as Assert from '../Assert/Assert.ts'
 
 const RE_STACK_PATH_1 = /(^\s*at .*?\(?)([^()]+)(:\d+:\d+\)?.*$)/
 const RE_STACK_PATH_2 = /(^\s*at .*?)([^()]+)(:\d+$)/

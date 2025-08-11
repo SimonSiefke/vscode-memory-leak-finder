@@ -1,4 +1,4 @@
-import { launchInitializationWorker } from '../LaunchInitializationWorker/LaunchInitializationWorker.js'
+import { launchInitializationWorker } from '../LaunchInitializationWorker/LaunchInitializationWorker.ts'
 
 export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, connectionId, isFirstConnection, canUseIdleCallback) => {
   const initializationWorkerRpc = await launchInitializationWorker()

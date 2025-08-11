@@ -1,4 +1,4 @@
 import { join } from 'node:path'
-import * as Root from '../Root/Root.js'
+import * as Root from '../Root/Root.ts'
 
 export const memoryLeakWorkerUrl = join(Root.root, 'packages/memory-leak-worker/bin/memory-leak-worker.ts')

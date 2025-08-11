@@ -1,6 +1,6 @@
 import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
-import * as GetTestWorkerUrl from '../GetTestWorkerUrl/GetTestWorkerUrl.js'
-import * as TestRunMode from '../TestRunMode/TestRunMode.js'
+import * as GetTestWorkerUrl from '../GetTestWorkerUrl/GetTestWorkerUrl.ts'
+import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 import { VError } from '@lvce-editor/verror'
 
 const getExecArgv = (runMode) => {

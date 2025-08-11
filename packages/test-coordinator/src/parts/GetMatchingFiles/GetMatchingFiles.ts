@@ -1,4 +1,4 @@
-import * as MatchesFilterValue from '../MatchesFilterValue/MatchesFilterValue.js'
+import * as MatchesFilterValue from '../MatchesFilterValue/MatchesFilterValue.ts'
 
 export const getMatchingFiles = (dirents, filterValue) => {
   const matchingFiles: any[] = []
