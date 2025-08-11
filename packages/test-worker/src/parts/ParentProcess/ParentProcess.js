@@ -5,8 +5,8 @@ export const state = {
   rpc: undefined,
 }
 
-export const setRpc = (ipc) => {
-  state.rpc = ipc
+export const setRpc = (rpc) => {
+  state.rpc = rpc
 }
 
 export const send = (message) => {
