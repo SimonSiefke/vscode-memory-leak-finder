@@ -4,13 +4,15 @@ import * as HandleStdinDataFilterWaitingMode from '../src/parts/HandleStdinDataF
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
 import * as StdinDataState from '../src/parts/StdinDataState/StdinDataState.ts'
 import * as StdoutWorker from '../src/parts/StdoutWorker/StdoutWorker.ts'
+import { createDefaultState } from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
+import { MockRpc } from '@lvce-editor/rpc'
 
 test('handleStdinDataFilterWaitingMode - alt + backspace', async () => {
-  const state = { ...StdinDataState.createDefaultState(), mode: ModeType.FilterWaiting, value: 'abc' }
+  const state = { ...createDefaultState(), mode: ModeType.FilterWaiting, value: 'abc' }
   const key = AnsiKeys.AltBackspace
 
-  const mockRpc = {
-    invoke: jest.fn().mockImplementation((method: any) => {
+  const mockRpc = MockRpc.create({
+    invoke(method: any) {
       if (method === 'Stdout.getCursorBackward') {
         return Promise.resolve('\u001B[3D')
       }
@@ -18,13 +20,9 @@ test('handleStdinDataFilterWaitingMode - alt + backspace', async () => {
         return Promise.resolve('\u001B[K')
       }
       throw new Error(`unexpected method ${method}`)
-    }),
-    send: jest.fn(),
-    invokeAndTransfer: jest.fn(),
-    dispose: jest.fn(),
-  } as any
+    },
+  })
   StdoutWorker.set(mockRpc)
-
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState.value).toBe('')
 })
