@@ -1,7 +1,7 @@
 {
   "name": "@vscode-memory-leak-finder/test-coordinator",
   "version": "0.0.0-dev",
-  "main": "src/main.js",
+  "main": "src/main.ts",
   "type": "module",
   "scripts": {
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
@@ -18,7 +18,8 @@
     "@lvce-editor/verror": "^1.7.0"
   },
   "devDependencies": {
-    "@types/babel__code-frame": "^7.0.6"
+    "@types/babel__code-frame": "^7.0.6",
+    "ts-jest": "^29.4.1"
   },
   "xo": {
     "rules": {

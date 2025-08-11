@@ -25,6 +25,8 @@ export interface StdinDataState {
   ideVersion: string
   workers: boolean
   stdout: string[]
+  previousFilters: string[]
+  isWindows: boolean
 }
 
 export const state: StdinDataState = {
@@ -49,28 +51,32 @@ export const state: StdinDataState = {
   ideVersion: Ide.VsCode,
   workers: false,
   stdout: [],
+  previousFilters: [],
+  isWindows: false,
 }
 
-export const setState = (newState: Partial<StdinDataState>): void => {
-  if (newState.checkLeaks !== undefined) state.checkLeaks = newState.checkLeaks
-  if (newState.cwd !== undefined) state.cwd = newState.cwd
-  if (newState.headless !== undefined) state.headless = newState.headless
-  if (newState.isGithubActions !== undefined) state.isGithubActions = newState.isGithubActions
-  if (newState.measure !== undefined) state.measure = newState.measure
-  if (newState.mode !== undefined) state.mode = newState.mode
-  if (newState.recordVideo !== undefined) state.recordVideo = newState.recordVideo
-  if (newState.runs !== undefined) state.runs = newState.runs
-  if (newState.value !== undefined) state.value = newState.value
-  if (newState.watch !== undefined) state.watch = newState.watch
-  if (newState.measureAfter !== undefined) state.measureAfter = newState.measureAfter
-  if (newState.timeouts !== undefined) state.timeouts = newState.timeouts
-  if (newState.timeoutBetween !== undefined) state.timeoutBetween = newState.timeoutBetween
-  if (newState.restartBetween !== undefined) state.restartBetween = newState.restartBetween
-  if (newState.runMode !== undefined) state.runMode = newState.runMode
-  if (newState.ide !== undefined) state.ide = newState.ide
-  if (newState.ideVersion !== undefined) state.ideVersion = newState.ideVersion
-  if (newState.workers !== undefined) state.workers = newState.workers
-  if (newState.stdout !== undefined) state.stdout = newState.stdout
+export const setState = (newState): void => {
+  state.checkLeaks = newState.checkLeaks
+  state.cwd = newState.cwd
+  state.headless = newState.headless
+  state.isGithubActions = newState.isGithubActions
+  state.measure = newState.measure
+  state.mode = newState.mode
+  state.recordVideo = newState.recordVideo
+  state.runs = newState.runs
+  state.value = newState.value
+  state.watch = newState.watch
+  state.measureAfter = newState.measureAfter
+  state.timeouts = newState.timeouts
+  state.timeoutBetween = newState.timeoutBetween
+  state.restartBetween = newState.restartBetween
+  state.runMode = newState.runMode
+  state.ide = newState.ide
+  state.ideVersion = newState.ideVersion
+  state.workers = newState.workers
+  state.stdout = newState.stdout
+  state.previousFilters = newState.previousFilters
+  state.isWindows = newState.isWindows
 }
 
 export const setBuffering = (value: boolean): void => {
@@ -99,6 +105,10 @@ export const isWatchMode = (): boolean => {
 
 export const isGithubActions = (): boolean => {
   return state.isGithubActions
+}
+
+export const isWindows = (): boolean => {
+  return state.isWindows
 }
 
 export const shouldCheckLeaks = (): boolean => {
@@ -135,4 +145,6 @@ export const createDefaultState = (): StdinDataState => ({
   ideVersion: Ide.VsCode,
   workers: false,
   stdout: [],
+  isWindows: false,
+  previousFilters: [],
 })

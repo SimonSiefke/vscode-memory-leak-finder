@@ -1,4 +1,4 @@
-import { beforeEach, expect, jest, test } from '@jest/globals'
+import { expect, test } from '@jest/globals'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
 import * as StdinDataState from '../src/parts/StdinDataState/StdinDataState.ts'
@@ -14,7 +14,7 @@ const HandleStdinDataFilterWaitingMode = await import('../src/parts/HandleStdinD
 test('handleStdinDataFilterWaitingMode - alt + backspace', async () => {
   const state = { ...StdinDataState.createDefaultState(), mode: ModeType.FilterWaiting, value: 'abc' }
   const key = AnsiKeys.AltBackspace
-  
+
   const mockRpc = {
     invoke: jest.fn().mockImplementation((method: any) => {
       if (method === 'Stdout.getCursorBackward') {
@@ -30,7 +30,7 @@ test('handleStdinDataFilterWaitingMode - alt + backspace', async () => {
     dispose: jest.fn(),
   } as any
   StdoutWorker.set(mockRpc)
-  
+
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState.value).toBe('')
 })
@@ -38,7 +38,7 @@ test('handleStdinDataFilterWaitingMode - alt + backspace', async () => {
 test('handleStdinDataFilterWaitingMode - ctrl + backspace', async () => {
   const state = { ...StdinDataState.createDefaultState(), mode: ModeType.FilterWaiting, value: 'abc' }
   const key = AnsiKeys.ControlBackspace
-  
+
   const mockRpc = {
     invoke: jest.fn().mockImplementation((method: any) => {
       if (method === 'Stdout.getCursorBackward') {
@@ -54,7 +54,7 @@ test('handleStdinDataFilterWaitingMode - ctrl + backspace', async () => {
     dispose: jest.fn(),
   } as any
   StdoutWorker.set(mockRpc)
-  
+
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState.value).toBe('')
 })
@@ -83,7 +83,7 @@ test('handleStdinDataFilterWaitingMode - ctrl + d', async () => {
 test('handleStdinDataFilterWaitingMode - enter', async () => {
   const state = { ...StdinDataState.createDefaultState(), mode: ModeType.FilterWaiting, value: 'abc' }
   const key = AnsiKeys.Enter
-  
+
   const mockRpc = {
     invoke: jest.fn().mockImplementation((method: any) => {
       if (method === 'Stdout.getEraseLine') {
@@ -99,7 +99,7 @@ test('handleStdinDataFilterWaitingMode - enter', async () => {
     dispose: jest.fn(),
   } as any
   StdoutWorker.set(mockRpc)
-  
+
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Running)
 })
@@ -107,7 +107,7 @@ test('handleStdinDataFilterWaitingMode - enter', async () => {
 test('handleStdinDataFilterWaitingMode - escape', async () => {
   const state = { ...StdinDataState.createDefaultState(), mode: ModeType.FilterWaiting, value: 'abc' }
   const key = AnsiKeys.Escape
-  
+
   const mockRpc = {
     invoke: jest.fn().mockImplementation((method: any) => {
       if (method === 'Stdout.getClear') {
@@ -120,7 +120,7 @@ test('handleStdinDataFilterWaitingMode - escape', async () => {
     dispose: jest.fn(),
   } as any
   StdoutWorker.set(mockRpc)
-  
+
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Waiting)
 })

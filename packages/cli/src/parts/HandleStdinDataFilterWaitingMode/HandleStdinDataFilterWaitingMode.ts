@@ -1,10 +1,10 @@
-import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
 import * as Character from '../Character/Character.ts'
+import type { FilterWaitingState } from '../FilterWaitingState/FilterWaitingState.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
 import * as PreviousFilters from '../PreviousFilters/PreviousFilters.ts'
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
-import type { FilterWaitingState } from '../FilterWaitingState/FilterWaitingState.ts'
 
 export const handleStdinDataFilterWaitingMode = async (state: FilterWaitingState, key: string): Promise<FilterWaitingState> => {
   switch (key) {
@@ -18,15 +18,11 @@ export const handleStdinDataFilterWaitingMode = async (state: FilterWaitingState
       if (state.value) {
         PreviousFilters.add(state.value)
       }
-      {
-        const eraseLine = await StdoutWorker.invoke('Stdout.getEraseLine')
-        const cursorLeft = await StdoutWorker.invoke('Stdout.getCursorLeft')
-        const message: string = eraseLine + cursorLeft
-        return {
-          ...state,
-          mode: ModeType.Running,
-          stdout: [...state.stdout, message],
-        }
+      return {
+        ...state,
+        mode: ModeType.Running,
+        stdout: [...state.stdout, eraseLine + cursorLeft],
+        previousFilters: state.value ? [state.value, ...state.previousFilters] : state.previousFilters,
       }
 
     case AnsiKeys.AltBackspace:
@@ -37,14 +33,13 @@ export const handleStdinDataFilterWaitingMode = async (state: FilterWaitingState
       {
         const cursorBackward: string = await StdoutWorker.invoke('Stdout.getCursorBackward')
         const eraseEndLine: string = await StdoutWorker.invoke('Stdout.getEraseEndLine')
-        const message: string = cursorBackward.repeat(state.value.length) + eraseEndLine
         return {
           ...state,
           value: Character.EmptyString,
-          stdout: [...state.stdout, message],
+          stdout: [...state.stdout, cursorBackward + eraseEndLine],
         }
       }
-    case AnsiKeys.Backspace:
+    case AnsiKeys.Backspace(state.isWindows):
       if (state.value === Character.EmptyString) {
         return state
       }

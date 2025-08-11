@@ -40,6 +40,7 @@ test('handleStdinDataRunningMode - show watch mode details', async () => {
   const state = {
     value: '',
     mode: ModeType.Running,
+    stdout: [],
   }
   const key = 'Enter'
   const newState = await HandleStdinDataRunningMode.handleStdinDataRunningMode(state, key)
@@ -52,9 +53,10 @@ test('handleStdinDataRunningMode - quit', async () => {
   const state = {
     value: '',
     mode: ModeType.Running,
+    stdout: [],
   }
   const key = AnsiKeys.ControlC
   const newState = await HandleStdinDataRunningMode.handleStdinDataRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
-  expect(Stdout.write).not.toHaveBeenCalled()
+  expect(newState.stdout).toEqual([])
 })

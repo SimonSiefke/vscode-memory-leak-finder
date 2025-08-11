@@ -1,1 +1,1 @@
-export const isWindows = process.platform === 'win32'
+export const isWindows = (platform) => platform === 'win32'

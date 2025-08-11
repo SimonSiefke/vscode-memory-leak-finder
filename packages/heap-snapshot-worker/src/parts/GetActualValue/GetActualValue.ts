@@ -1,4 +1,4 @@
-import type { Snapshot } from '../Snapshot/Snapshot.js'
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
@@ -62,8 +62,74 @@ export const getActualValue = (targetNode: any, snapshot: Snapshot, edgeMap: Uin
 
   // For numbers, return the actual number value
   if (nodeType === NODE_TYPE_NUMBER) {
-    const numberValue = targetNode.name?.toString()
-    return numberValue || `[Number ${targetNode.id}]`
+    // If node name is directly a numeric string, use it, unless it's a sentinel like 'heap number' or 'smi number'
+    const directName = getNodeName(targetNode, strings)
+    const sentinelNumberNames = new Set(['heap number', 'smi number'])
+    if (directName && !sentinelNumberNames.has(directName)) {
+      return directName
+    }
+
+    // Note: do NOT return targetNode.name here when a sentinel is present,
+    // because in real snapshots name is a strings index. We'll only use the
+    // numeric name as a last resort when there is no directName at all.
+
+    // Otherwise, follow internal edges to a string node that contains the numeric representation
+    // Find the node index for this target node
+    const idFieldIndex = nodeFields.indexOf('id')
+    let targetNodeIndex = -1
+    for (let i = 0; i < nodes.length; i += ITEMS_PER_NODE) {
+      if (nodes[i + idFieldIndex] === targetNode.id) {
+        targetNodeIndex = i / ITEMS_PER_NODE
+        break
+      }
+    }
+
+    if (targetNodeIndex !== -1) {
+      const nodeEdges = getNodeEdges(targetNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
+      // Prefer any outgoing edge that leads to a string node (not just internal)
+      for (const edge of nodeEdges) {
+        const referencedNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
+        const referencedNode = parseNode(referencedNodeIndex, nodes, nodeFields)
+        if (referencedNode && referencedNode.type === NODE_TYPE_STRING) {
+          const numericString = getNodeName(referencedNode, strings)
+          if (numericString !== null) {
+            return numericString
+          }
+        }
+      }
+    }
+
+    // As a fallback, look for incoming references that might carry the value as a string name
+    let currentEdgeOffset = 0
+    for (let sourceNodeIndex = 0; sourceNodeIndex < nodes.length; sourceNodeIndex += ITEMS_PER_NODE) {
+      const sourceEdgeCount = nodes[sourceNodeIndex + edgeCountFieldIndex]
+      for (let j = 0; j < sourceEdgeCount; j++) {
+        const edgeIndex = (currentEdgeOffset + j) * ITEMS_PER_EDGE
+        const edgeToNode = edges[edgeIndex + edgeToNodeFieldIndex]
+        const edgeToNodeIndex = Math.floor(edgeToNode / ITEMS_PER_NODE)
+        if (edgeToNodeIndex === targetNodeIndex) {
+          // Only consider edges where name_or_index refers to a string (i.e. property/internal),
+          // not element edges where name_or_index is an array index number.
+          const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
+          const isNameIndexInStrings = edgeNameIndex >= 0 && edgeNameIndex < strings.length
+          if (isNameIndexInStrings) {
+            const maybeNumeric = strings[edgeNameIndex]
+            if (maybeNumeric && maybeNumeric !== '' && /^-?\d+(?:\.\d+)?$/.test(maybeNumeric)) {
+              return maybeNumeric
+            }
+          }
+        }
+      }
+      currentEdgeOffset += sourceEdgeCount
+    }
+
+    // Final fallback for synthetic tests without strings: if we didn't have a direct string name
+    // and couldn't resolve via edges, but the name field is a finite number, treat it as the value.
+    if (directName === null && typeof targetNode.name === 'number' && Number.isFinite(targetNode.name)) {
+      return targetNode.name.toString()
+    }
+
+    return `[Number ${targetNode.id}]`
   }
 
   // For hidden nodes, check if it's a boolean or undefined value

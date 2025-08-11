@@ -31,7 +31,7 @@ test('handleStdinDataWaitingMode - ctrl + d', async () => {
 test('handleStdinDataWaitingMode - enter', async () => {
   const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = AnsiKeys.Enter
-  
+
   const mockRpc = {
     invoke: jest.fn().mockImplementation((method: any) => {
       if (method === 'Stdout.getEraseLine') {
@@ -47,7 +47,7 @@ test('handleStdinDataWaitingMode - enter', async () => {
     dispose: jest.fn(),
   } as any
   StdoutWorker.set(mockRpc)
-  
+
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Running)
 })
@@ -81,7 +81,7 @@ test('handleStdinDataWaitingMode - other key', async () => {
 test('handleStdinDataWaitingMode - ctrl + backspace', async () => {
   const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = AnsiKeys.ControlBackspace
-  
+
   const mockRpc = {
     invoke: jest.fn().mockImplementation((method: any) => {
       if (method === 'Stdout.getEraseLine') {
@@ -97,7 +97,7 @@ test('handleStdinDataWaitingMode - ctrl + backspace', async () => {
     dispose: jest.fn(),
   } as any
   StdoutWorker.set(mockRpc)
-  
+
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.value).toBe('')
 })
@@ -140,7 +140,7 @@ test('handleStdinDataWaitingMode - end', async () => {
 test('handleStdinDataWaitingMode - watch mode', async () => {
   const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = CliKeys.WatchMode
-  
+
   const mockRpc = {
     invoke: jest.fn().mockImplementation((method: any) => {
       if (method === 'Stdout.getClear') {
@@ -153,7 +153,7 @@ test('handleStdinDataWaitingMode - watch mode', async () => {
     dispose: jest.fn(),
   } as any
   StdoutWorker.set(mockRpc)
-  
+
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Waiting)
 })
@@ -161,7 +161,7 @@ test('handleStdinDataWaitingMode - watch mode', async () => {
 test('handleStdinDataWaitingMode - filter mode', async () => {
   const state = { ...StdinDataState.createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
   const key = CliKeys.FilterMode
-  
+
   const mockRpc = {
     invoke: jest.fn().mockImplementation((method: any) => {
       if (method === 'Stdout.getClear') {
@@ -174,7 +174,7 @@ test('handleStdinDataWaitingMode - filter mode', async () => {
     dispose: jest.fn(),
   } as any
   StdoutWorker.set(mockRpc)
-  
+
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.FilterWaiting)
   expect(newState.value).toBe('')

@@ -1,10 +1,10 @@
 import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
+import * as Character from '../Character/Character.ts'
 import * as CliKeys from '../CliKeys/CliKeys.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
-import * as Character from '../Character/Character.ts'
-import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
 import * as PatternUsage from '../PatternUsage/PatternUsage.ts'
 import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
+import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
 
 export const handleStdinDataFinishedRunningMode = async (
   state: StdinDataState.StdinDataState,

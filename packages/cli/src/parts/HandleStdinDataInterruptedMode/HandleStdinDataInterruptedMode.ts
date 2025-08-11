@@ -1,9 +1,8 @@
 import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
+import * as Character from '../Character/Character.ts'
 import * as CliKeys from '../CliKeys/CliKeys.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
-import * as Stdout from '../Stdout/Stdout.ts'
 import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
-import * as Character from '../Character/Character.ts'
 
 export const handleStdinDataInterruptedMode = async (state, key) => {
   switch (key) {
@@ -16,11 +15,11 @@ export const handleStdinDataInterruptedMode = async (state, key) => {
     case CliKeys.FilterMode:
       const clear = await StdoutWorker.invoke('Stdout.getClear')
       const patternUsage = await StdoutWorker.invoke('Stdout.getPatternUsageMessage')
-      await Stdout.write(clear + patternUsage)
       return {
         ...state,
         value: Character.EmptyString,
         mode: ModeType.FilterWaiting,
+        stdout: [...state.stdout, clear + patternUsage],
       }
     case CliKeys.Quit:
       return {

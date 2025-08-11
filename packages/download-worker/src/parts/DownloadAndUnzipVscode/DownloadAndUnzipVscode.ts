@@ -1,8 +1,9 @@
-import { resolve } from 'node:path'
 import { VError } from '@lvce-editor/verror'
+import { resolve } from 'node:path'
 import * as AdjustVscodeProductJson from '../AdjustVscodeProductJson/AdjustVscodeProductJson.ts'
 import * as Env from '../Env/Env.ts'
 import * as JsonFile from '../JsonFile/JsonFile.ts'
+import * as RemoveUnusedFiles from '../RemoveUnusedFiles/RemoveUnusedFiles.ts'
 import * as VscodeTestCachePath from '../VscodeTestCachePath/VscodeTestCachePath.ts'
 
 const getProductJsonPath = (path: string): string => {
@@ -30,6 +31,7 @@ export const downloadAndUnzipVscode = async (vscodeVersion: string): Promise<str
     const productJson = await JsonFile.readJson(productPath)
     const newProductJson = AdjustVscodeProductJson.adjustVscodeProductJson(productJson)
     await JsonFile.writeJson(productPath, newProductJson)
+    await RemoveUnusedFiles.removeUnusedFiles(path)
     return path
   } catch (error) {
     throw new VError(error, `Failed to download vscode ${vscodeVersion}`)

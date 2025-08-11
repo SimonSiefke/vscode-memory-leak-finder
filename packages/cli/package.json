@@ -20,9 +20,7 @@
     "@lvce-editor/verror": "^1.7.0"
   },
   "devDependencies": {
-    "@jest/globals": "^30.0.5",
-    "@types/node": "^24.1.0",
-    "ts-jest": "^29.4.1"
+    "@types/node": "^24.1.0"
   },
   "xo": {
     "rules": {

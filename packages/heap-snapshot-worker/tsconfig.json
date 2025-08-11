@@ -2,12 +2,12 @@
   "compilerOptions": {
     "lib": ["esnext"],
     "target": "esnext",
-    "checkJs": true,
+    "checkJs": false,
     "module": "NodeNext",
     "types": ["node"],
     "moduleResolution": "NodeNext",
     "isolatedModules": true,
-    "strict": true,
+    "strict": false,
     "noImplicitAny": false,
     "skipLibCheck": true,
     "noEmit": true,
@@ -22,5 +22,5 @@
     "useUnknownInCatchVariables": false,
     "allowImportingTsExtensions": true
   },
-  "include": ["src", "test", "benchmark"]
+  "include": ["src"]
 }

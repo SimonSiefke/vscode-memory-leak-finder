@@ -2,7 +2,12 @@ import * as GetTestClearMessage from '../GetTestClearMessage/GetTestClearMessage
 import * as TestStateOutput from '../TestStateOutput/TestStateOutput.ts'
 import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
-export const getFullMessage = async (message: string, isGithubAcions: boolean, isBuffering: boolean): Promise<string> => {
+export const getFullMessage = async (
+  message: string,
+  isGithubAcions: boolean,
+  isBuffering: boolean,
+  isWindows: boolean,
+): Promise<string> => {
   const clearMessage = await GetTestClearMessage.getTestClearMessage()
   let fullMessage = ''
   if (!isGithubAcions) {

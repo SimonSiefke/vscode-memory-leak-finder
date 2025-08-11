@@ -1,5 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import * as Root from '../Root/Root.ts'
 import { VError } from '../VError/VError.ts'
 
@@ -18,16 +19,22 @@ export const get = (): string[] => {
   }
 }
 
-export const add = (value: string): void => {
+export const add = async (value: string): Promise<void> => {
   try {
     const previousFilterPath = getPreviousFilterPath()
     const current = get()
     const newValues = [value, ...current]
     const newContent = JSON.stringify(newValues, null, 2)
-    mkdirSync(dirname(previousFilterPath), { recursive: true })
-    const content = writeFileSync(previousFilterPath, newContent)
+    await mkdir(dirname(previousFilterPath), { recursive: true })
+    const content = await writeFile(previousFilterPath, newContent)
     return content
   } catch (error) {
     throw new VError(error, `Failed to add filter`)
+  }
+}
+
+export const addAll = async (values: readonly string[]): Promise<void> => {
+  for (const value of values) {
+    await add(value)
   }
 }

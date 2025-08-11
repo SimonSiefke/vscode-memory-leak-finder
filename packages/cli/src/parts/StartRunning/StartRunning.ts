@@ -23,6 +23,7 @@ export const startRunning = async (
   commit,
   setupOnly,
   workers,
+  isWindows,
 ) => {
   const clear = await StdoutWorker.invoke('Stdout.getClear')
   await Stdout.write(clear)

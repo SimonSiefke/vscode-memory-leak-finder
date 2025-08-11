@@ -17,10 +17,10 @@ export const handleStdinDataWaitingMode = async (state, key) => {
     case AnsiKeys.Enter:
       const eraseLine = await StdoutWorker.invoke('Stdout.getEraseLine')
       const cursorLeft = await StdoutWorker.invoke('Stdout.getCursorLeft')
-      await Stdout.write(eraseLine + cursorLeft)
       return {
         ...state,
         mode: ModeType.Running,
+        stdout: [...state.stdout, eraseLine + cursorLeft],
       }
     case AnsiKeys.ArrowUp:
     case AnsiKeys.ArrowDown:
@@ -29,12 +29,12 @@ export const handleStdinDataWaitingMode = async (state, key) => {
     case AnsiKeys.ControlBackspace:
       const eraseLine2 = await StdoutWorker.invoke('Stdout.getEraseLine')
       const cursorLeft2 = await StdoutWorker.invoke('Stdout.getCursorLeft')
-      await Stdout.write(eraseLine2 + cursorLeft2)
       return {
         ...state,
         value: Character.EmptyString,
+        stdout: [...state.stdout, eraseLine + cursorLeft],
       }
-    case AnsiKeys.Backspace:
+    case AnsiKeys.Backspace(state.isWindows):
       return {
         ...state,
         value: state.value.slice(0, -1),
@@ -50,11 +50,11 @@ export const handleStdinDataWaitingMode = async (state, key) => {
       }
     case CliKeys.FilterMode:
       const clear = await StdoutWorker.invoke('Stdout.getClear')
-      await Stdout.write(clear + (await PatternUsage.print()))
       return {
         ...state,
         value: Character.EmptyString,
         mode: ModeType.FilterWaiting,
+        stdout: [...state.stdout, clear + (await PatternUsage.print())],
       }
     case CliKeys.Quit:
       return {
