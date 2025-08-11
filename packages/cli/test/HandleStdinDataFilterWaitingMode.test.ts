@@ -74,6 +74,7 @@ test('handleStdinDataFilterWaitingMode - enter', async () => {
   const state = {
     value: 'abc',
     stdout: [],
+    previousFilters: [],
   }
   const key = AnsiKeys.Enter
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
