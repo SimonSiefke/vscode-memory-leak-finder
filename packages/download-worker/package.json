@@ -24,8 +24,7 @@
     "got": "^14.4.7"
   },
   "devDependencies": {
-    "ts-jest": "^29.4.1",
-    "@jest/globals": "^30.0.5"
+    "ts-jest": "^29.4.1"
   },
   "jest": {
     "preset": "ts-jest",
