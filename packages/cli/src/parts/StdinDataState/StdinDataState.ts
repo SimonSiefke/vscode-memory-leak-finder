@@ -81,6 +81,10 @@ export const isGithubActions = (): boolean => {
   return state.isGithubActions
 }
 
+export const isWindows = (): boolean => {
+  return state.isWindows
+}
+
 export const shouldCheckLeaks = (): boolean => {
   return state.checkLeaks
 }
