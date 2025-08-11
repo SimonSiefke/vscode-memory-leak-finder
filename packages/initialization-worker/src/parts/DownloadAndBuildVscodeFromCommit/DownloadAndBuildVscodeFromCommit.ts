@@ -1,10 +1,10 @@
-import * as DownloadWorker from '../DownloadWorker/DownloadWorker.ts'
+import * as RepositoryWorker from '../RepositoryWorker/RepositoryWorker.ts'
 
 /**
  * @param {string} commitHash
  */
 export const downloadAndBuildVscodeFromCommit = async (commitHash) => {
-  const rpc = await DownloadWorker.launch()
+  const rpc = await RepositoryWorker.launch()
   const path = await rpc.invoke('Download.downloadAndBuildVscodeFromCommit', commitHash)
   await rpc.dispose()
   return path
