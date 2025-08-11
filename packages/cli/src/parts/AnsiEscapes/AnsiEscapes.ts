@@ -1,37 +1,37 @@
 import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
-export const cursorUp = async (count: number) => {
+export const cursorUp = async (count: number): Promise<string> => {
   return StdoutWorker.invoke('Stdout.cursorUp', count)
 }
 
-export const eraseLine = async () => {
+export const eraseLine = async (): Promise<string> => {
   return StdoutWorker.invoke('Stdout.eraseLine')
 }
 
-export const cursorLeft = async () => {
+export const cursorLeft = async (): Promise<string> => {
   return StdoutWorker.invoke('Stdout.cursorLeft')
 }
 
-export const eraseScreen = async () => {
+export const eraseScreen = async (): Promise<string> => {
   return StdoutWorker.invoke('Stdout.eraseScreen')
 }
 
-export const eraseDown = async () => {
+export const eraseDown = async (): Promise<string> => {
   return StdoutWorker.invoke('Stdout.eraseDown')
 }
 
-export const backspace = async () => {
+export const backspace = async (): Promise<string> => {
   return StdoutWorker.invoke('Stdout.backspace')
 }
 
-export const cursorBackward = async () => {
+export const cursorBackward = async (): Promise<string> => {
   return StdoutWorker.invoke('Stdout.cursorBackward')
 }
 
-export const eraseEndLine = async () => {
+export const eraseEndLine = async (): Promise<string> => {
   return StdoutWorker.invoke('Stdout.eraseEndLine')
 }
 
-export const clear = async (isWindows: boolean) => {
+export const clear = async (isWindows: boolean): Promise<string> => {
   return StdoutWorker.invoke('Stdout.clear', isWindows)
 }
