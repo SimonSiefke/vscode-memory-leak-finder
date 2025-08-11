@@ -1,5 +1,5 @@
-import * as CompareNamedArrayCountDifference from '../CompareNamedArrayCountDifference/CompareNamedArrayCountDifference.js'
-import * as GetNamedArrayCount from '../GetNamedArrayCount/GetNamedArrayCount.js'
+import { getHeapSnapshot } from '../GetHeapSnapshot/GetHeapSnapshot.js'
+import * as HeapSnapshotFunctions from '../HeapSnapshotFunctions/HeapSnapshotFunctions.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
@@ -13,19 +13,28 @@ export const create = (session) => {
 
 export const start = async (session, objectGroup) => {
   const id = 0
-  return GetNamedArrayCount.getNamedArrayCount(session, objectGroup, id)
+  return getHeapSnapshot(session, id)
 }
 
 export const stop = async (session, objectGroup) => {
   const id = 1
-  return GetNamedArrayCount.getNamedArrayCount(session, objectGroup, id)
+  return getHeapSnapshot(session, id)
 }
 
 export const releaseResources = async (session, objectGroup) => {
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 
-export const compare = CompareNamedArrayCountDifference.compareNamedArrayCountDifference
+export const compare = async (before, after) => {
+  const [beforeMap, afterMap] = await Promise.all([
+    HeapSnapshotFunctions.getNamedArrayCount(before),
+    HeapSnapshotFunctions.getNamedArrayCount(after),
+  ])
+  return {
+    before: beforeMap,
+    after: afterMap,
+  }
+}
 
 export const isLeak = (leaked) => {
   return leaked.length > 0
