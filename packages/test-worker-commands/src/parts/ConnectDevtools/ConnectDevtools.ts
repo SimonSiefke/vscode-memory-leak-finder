@@ -1,6 +1,6 @@
 import * as Assert from '../Assert/Assert.js'
 import { connectElectron } from '../ConnectElectron/ConnectElectron.js'
-import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.js'
+import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.js'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.js'
 import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.js'

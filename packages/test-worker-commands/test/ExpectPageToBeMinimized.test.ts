@@ -1,6 +1,6 @@
 import { expect, jest, test } from '@jest/globals'
-import * as DevtoolsCommandType from '../src/parts/DevtoolsCommandType/DevtoolsCommandType.js'
-import * as ExpectPageToBeMinimized from '../src/parts/ExpectPageToBeMinimized/ExpectPageToBeMinimized.js'
+import * as DevtoolsCommandType from '../src/parts/DevtoolsCommandType/DevtoolsCommandType.ts'
+import * as ExpectPageToBeMinimized from '../src/parts/ExpectPageToBeMinimized/ExpectPageToBeMinimized.ts'
 
 test('execute', async () => {
   const page = {

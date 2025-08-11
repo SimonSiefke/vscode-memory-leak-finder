@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import * as DebuggerCreateIpcConnection from '../src/parts/DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.js'
+import * as DebuggerCreateIpcConnection from '../src/parts/DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 
 test('createConnection - error - invalid url', async () => {
   await expect(DebuggerCreateIpcConnection.createConnection('abc')).rejects.toThrow(
