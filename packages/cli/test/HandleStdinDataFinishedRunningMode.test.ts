@@ -1,16 +1,24 @@
-import { expect, test } from '@jest/globals'
+import { expect, jest, test } from '@jest/globals'
+import { MockRpc } from '@lvce-editor/rpc'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
 import * as CliKeys from '../src/parts/CliKeys/CliKeys.ts'
 import { createDefaultState } from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as HandleStdinDataFinishedRunningMode from '../src/parts/HandleStdinDataFinishedRunningMode/HandleStdinDataFinishedRunningMode.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
 
+const mockInvoke = jest.fn(async () => 'not implemented')
+
+const mockRpc = MockRpc.create({
+  commandMap: {},
+  invoke: mockInvoke,
+})
+
 test('handleStdinDataFinishedRunningMode - show watch mode details', async () => {
   const state = { ...createDefaultState(), mode: ModeType.FinishedRunning }
   const key = CliKeys.WatchMode
 
   // Mock the stdout worker to return watch usage message
-  mockRpc.invoke.mockResolvedValue('[ansi-clear]\nwatch usage\n')
+  mockInvoke.mockResolvedValue('[ansi-clear]\nwatch usage\n')
 
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
 
@@ -24,7 +32,7 @@ test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
   const key = CliKeys.FilterMode
 
   // Mock the stdout worker to return pattern usage message
-  mockRpc.invoke.mockResolvedValue('[ansi-clear]\npattern usage\n')
+  mockInvoke.mockResolvedValue('[ansi-clear]\npattern usage\n')
 
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.FilterWaiting)
