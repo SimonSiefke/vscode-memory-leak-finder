@@ -22,9 +22,10 @@ export const getUnusedFilesToRemoveLinux = async (binaryPath: string): Promise<r
 
   // bin folder
   files.push(join(installDir, 'bin'))
-  files.push(join(installDir, 'licenses'))
 
-  // Chromium licenses
+  // licenses
+  files.push(join(installDir, 'licenses'))
+  files.push(join(installDir, 'ThirdPartyNotices.txt'))
   files.push(join(installDir, 'LICENSES.chromium.html'))
 
   // vsce-sign artifacts
