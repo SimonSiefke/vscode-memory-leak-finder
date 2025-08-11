@@ -82,8 +82,8 @@ export const runTests = async (
     }
     const initialStart = Time.now()
     const first = formattedPaths[0]
-    callback(TestWorkerEventType.TestsStarting, total)
-    callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
+    await callback(TestWorkerEventType.TestsStarting, total)
+    await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
     const connectionId = Id.create()
     let testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
       cwd,
@@ -108,7 +108,7 @@ export const runTests = async (
       const { absolutePath, relativeDirname, dirent, relativePath } = formattedPath
       const forceRun = dirent === `${filterValue}.js`
       if (i !== 0) {
-        callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, /* isFirst */ true)
+        await callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, /* isFirst */ true)
       }
 
       try {
@@ -123,7 +123,7 @@ export const runTests = async (
           skipped++
           const end = Time.now()
           const duration = end - start
-          callback(TestWorkerEventType.TestSkipped, absolutePath, relativeDirname, dirent, duration)
+          await callback(TestWorkerEventType.TestSkipped, absolutePath, relativeDirname, dirent, duration)
         } else {
           let isLeak = false
           if (checkLeaks) {
@@ -159,7 +159,7 @@ export const runTests = async (
           await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerIpc, connectionId, absolutePath)
           const end = Time.now()
           const duration = end - start
-          callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration, isLeak)
+          await callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration, isLeak)
           if (!isLeak) {
             passed++
           }
@@ -194,7 +194,7 @@ export const runTests = async (
         failed++
         const PrettyError = await import('../PrettyError/PrettyError.js')
         const prettyError = await PrettyError.prepare(error, { color, root })
-        callback(TestWorkerEventType.TestFailed, absolutePath, relativeDirname, relativePath, dirent, prettyError)
+        await callback(TestWorkerEventType.TestFailed, absolutePath, relativeDirname, relativePath, dirent, prettyError)
       }
     }
     const end = Time.now()
@@ -202,10 +202,10 @@ export const runTests = async (
     if (recordVideo) {
       await VideoRecording.finalize()
     }
-    callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, leaking, total, duration, filterValue)
+    await callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, leaking, total, duration, filterValue)
   } catch (error) {
     const PrettyError = await import('../PrettyError/PrettyError.js')
     const prettyError = await PrettyError.prepare(error, { color, root })
-    callback(TestWorkerEventType.UnexpectedTestError, prettyError)
+    await callback(TestWorkerEventType.UnexpectedTestError, prettyError)
   }
 }
