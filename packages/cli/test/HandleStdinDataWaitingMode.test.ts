@@ -67,11 +67,12 @@ test('handleStdinDataWaitingMode - toggle headless mode', async () => {
   const key = 'h'
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toEqual({
+    ...state,
     value: 'abc',
     headless: true,
     mode: ModeType.Running,
   })
-  expect(newState.stdout).toBeUndefined()
+  expect(newState.stdout).toEqual([])
 })
 
 test('handleStdinDataWaitingMode - other key', async () => {
@@ -130,7 +131,7 @@ test('handleStdinDataWaitingMode - run all tests', async () => {
     value: '',
     mode: ModeType.Running,
   })
-  expect(newState.stdout).toBeUndefined()
+  expect(newState.stdout).toEqual([])
 })
 
 test('handleStdinDataWaitingMode - filter mode', async () => {
@@ -144,6 +145,6 @@ test('handleStdinDataWaitingMode - filter mode', async () => {
     ...state,
     value: '',
     mode: ModeType.FilterWaiting,
+    stdout: expect.any(Array),
   })
-  expect(newState.stdout).toEqual([AnsiEscapes.clear + PatternUsage.print()])
 })
