@@ -1,9 +1,8 @@
 import * as RunTestsWithCallback from '../RunTestsWithCallback/RunTestsWithCallback.js'
 import * as CliProcess from '../CliProcess/CliProcess.js'
 
-const callback = (method, ...params) => {
-  // TODO use invoke
-  CliProcess.send(method, ...params)
+const callback = async (method, ...params) => {
+  await CliProcess.invoke(method, ...params)
 }
 
 export const runTests = (
