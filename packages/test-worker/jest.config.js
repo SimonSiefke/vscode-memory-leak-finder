@@ -13,6 +13,16 @@ export default {
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
-  testMatch: ['**/test/**/*.test.ts'],
+  testMatch: ['<rootDir>/test/**/*.ts'],
+  modulePathIgnorePatterns: ['<rootDir>/.vscode-test/'],
   injectGlobals: false,
+  collectCoverage: true,
+  coverageThreshold: {
+    global: {
+      branches: 20,
+      functions: 20,
+      lines: 20,
+      statements: 20,
+    },
+  },
 }
