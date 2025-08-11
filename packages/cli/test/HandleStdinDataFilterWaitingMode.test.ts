@@ -1,15 +1,9 @@
 import { expect, test } from '@jest/globals'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
+import * as HandleStdinDataFilterWaitingMode from '../src/parts/HandleStdinDataFilterWaitingMode/HandleStdinDataFilterWaitingMode.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
 import * as StdinDataState from '../src/parts/StdinDataState/StdinDataState.ts'
 import * as StdoutWorker from '../src/parts/StdoutWorker/StdoutWorker.ts'
-
-beforeEach(() => {
-  jest.resetModules()
-  jest.resetAllMocks()
-})
-
-const HandleStdinDataFilterWaitingMode = await import('../src/parts/HandleStdinDataFilterWaitingMode/HandleStdinDataFilterWaitingMode.ts')
 
 test('handleStdinDataFilterWaitingMode - alt + backspace', async () => {
   const state = { ...StdinDataState.createDefaultState(), mode: ModeType.FilterWaiting, value: 'abc' }
