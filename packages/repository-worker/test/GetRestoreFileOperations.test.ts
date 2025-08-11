@@ -1,4 +1,4 @@
-import { expect, jest, test } from '@jest/globals'
+import { expect, test, jest } from '@jest/globals'
 import { getRestoreNodeModulesFileOperations } from '../src/parts/GetRestoreFileOperations/GetRestoreFileOperations.ts'
 
 test.skip('getRestoreNodeModulesFileOperations returns empty array when no cached paths', async () => {
