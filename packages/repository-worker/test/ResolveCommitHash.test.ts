@@ -1,4 +1,4 @@
-import { expect, jest, test } from '@jest/globals'
+import { test, expect, jest } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
 import { resolveCommitHash } from '../src/parts/ResolveCommitHash/ResolveCommitHash.ts'
