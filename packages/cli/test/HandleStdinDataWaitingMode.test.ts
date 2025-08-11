@@ -8,7 +8,11 @@ import * as StdoutWorker from '../src/parts/StdoutWorker/StdoutWorker.ts'
 import { MockRpc } from '@lvce-editor/rpc'
 
 test('handleStdinDataWaitingMode - ctrl + c', async () => {
-  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const state = {
+    ...createDefaultState(),
+    mode: ModeType.Waiting,
+    value: 'abc',
+  }
   const key = AnsiKeys.ControlC
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
@@ -16,7 +20,11 @@ test('handleStdinDataWaitingMode - ctrl + c', async () => {
 })
 
 test('handleStdinDataWaitingMode - ctrl + d', async () => {
-  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const state = {
+    ...createDefaultState(),
+    mode: ModeType.Waiting,
+    value: 'abc',
+  }
   const key = AnsiKeys.ControlD
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
@@ -49,14 +57,23 @@ test('handleStdinDataWaitingMode - enter', async () => {
 })
 
 test('handleStdinDataWaitingMode - escape', async () => {
-  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const state = {
+    ...createDefaultState(),
+    mode: ModeType.Waiting,
+    value: 'abc',
+  }
   const key = AnsiKeys.Escape
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toBe(state)
 })
 
 test('handleStdinDataWaitingMode - toggle headless mode', async () => {
-  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc', headless: false }
+  const state = {
+    ...createDefaultState(),
+    mode: ModeType.Waiting,
+    value: 'abc',
+    headless: false,
+  }
   const key = 'h'
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toEqual({
@@ -68,14 +85,22 @@ test('handleStdinDataWaitingMode - toggle headless mode', async () => {
 })
 
 test('handleStdinDataWaitingMode - other key', async () => {
-  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const state = {
+    ...createDefaultState(),
+    mode: ModeType.Waiting,
+    value: 'abc',
+  }
   const key = 'd'
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toBe(state)
 })
 
 test('handleStdinDataWaitingMode - ctrl + backspace', async () => {
-  const state = { ...createDefaultState(), mode: ModeType.Waiting, value: 'abc' }
+  const state = {
+    ...createDefaultState(),
+    mode: ModeType.Waiting,
+    value: 'abc',
+  }
   const key = AnsiKeys.ControlBackspace
   const mockRpc = MockRpc.create({
     invoke: jest.fn().mockImplementation((method: any) => {
