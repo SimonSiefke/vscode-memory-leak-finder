@@ -2,8 +2,8 @@ import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
 import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
 import * as Character from '../Character/Character.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
-import * as PreviousFilters from '../PreviousFilters/PreviousFilters.ts'
 import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
+import * as PreviousFilters from '../PreviousFilters/PreviousFilters.ts'
 
 export const handleStdinDataFilterWaitingMode = async (state, key) => {
   switch (key) {
@@ -14,13 +14,11 @@ export const handleStdinDataFilterWaitingMode = async (state, key) => {
         mode: ModeType.Exit,
       }
     case AnsiKeys.Enter:
-      if (state.value) {
-        PreviousFilters.add(state.value)
-      }
       return {
         ...state,
         mode: ModeType.Running,
         stdout: [...state.stdout, AnsiEscapes.eraseLine + AnsiEscapes.cursorLeft],
+        previousFilters: state.value ? [state.value, ...state.previousFilters] : state.previousFilters,
       }
 
     case AnsiKeys.AltBackspace:
