@@ -1,4 +1,7 @@
+import * as Ide from '../Ide/Ide.ts'
+import * as ModeType from '../ModeType/ModeType.ts'
 import type { StdinDataState } from '../StdinDataState/StdinDataState.ts'
+import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 
 export const createDefaultState = (): StdinDataState => ({
   buffering: false,
