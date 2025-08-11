@@ -39,3 +39,5 @@ test('file error escaping', () => {
     }),
   ).toBe('::error file=src/file.ts,line=1,title=Bad%0ATitle::Line1%0ALine2\n')
 })
+
+
