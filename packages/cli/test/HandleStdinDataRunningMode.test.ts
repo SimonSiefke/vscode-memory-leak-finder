@@ -45,8 +45,7 @@ test('handleStdinDataRunningMode - show watch mode details', async () => {
   const key = 'Enter'
   const newState = await HandleStdinDataRunningMode.handleStdinDataRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.Interrupted)
-  expect(Stdout.write).toHaveBeenCalledTimes(1)
-  expect(Stdout.write).toHaveBeenCalledWith('interrupted-message\nwatch-usage')
+  expect(newState.stdout).toEqual(['interrupted-message\nwatch-usage'])
 })
 
 test('handleStdinDataRunningMode - quit', async () => {
