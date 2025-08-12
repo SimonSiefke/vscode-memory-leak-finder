@@ -1,8 +1,6 @@
 import { writeFile } from 'fs/promises'
-import { getObjectsWithPropertiesInternalAst } from '../src/parts/GetObjectsWithPropertiesInternalAst/GetObjectsWithPropertiesInternalAst.ts'
+import { getAddedObjectsWithPropertiesInternalAst } from '../src/parts/GetAddedObjectsWithPropertiesInternalAst/GetAddedObjectsWithPropertiesInternalAst.ts'
 import { prepareHeapSnapshot } from '../src/parts/PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
-import { printAstRoots } from '../src/parts/PrintAst/PrintAst.ts'
-import * as Timing from '../src/parts/Timing/Timing.ts'
 
 async function testGetObjectsWithProperties() {
   console.log('Testing getObjectsWithProperties function...')
@@ -35,18 +33,11 @@ async function testGetObjectsWithProperties() {
     // TODO the preview would only be needed at the end, meaning much less previews needed instead
     // of creating a preview for all objects
 
-    const astObjects1 = getObjectsWithPropertiesInternalAst(snapshot1, property, depth)
-    const astObjects2 = getObjectsWithPropertiesInternalAst(snapshot2, property, depth)
+    const difference = getAddedObjectsWithPropertiesInternalAst(snapshot1, snapshot2, property, depth)
     console.timeEnd('check-ast')
 
     // console.log('count 1', astObjects1.length)
     // console.log('count 2', astObjects2.length)
-    const difference = [
-      {
-        before: astObjects1.length,
-        after: astObjects2.length,
-      },
-    ]
 
     await writeFile(resultPath, JSON.stringify(difference, null, 2) + '\n')
   } catch (error) {
