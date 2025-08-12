@@ -1,10 +1,9 @@
-import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
-import * as ConnectElectron from '../ConnectElectron/ConnectElectron.ts'
-import * as PageObject from '../PageObject/PageObject.ts'
 import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.ts'
-import * as PrepareTests from '../PrepareTests/PrepareTests.ts'
-import * as LaunchTestWorker from '../LaunchTestWorker/LaunchTestWorker.ts'
+import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
 import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
+import * as LaunchTestWorker from '../LaunchTestWorker/LaunchTestWorker.ts'
+import * as PageObject from '../PageObject/PageObject.ts'
+import * as PrepareTests from '../PrepareTests/PrepareTests.ts'
 
 interface State {
   firstLaunch: boolean
@@ -64,7 +63,6 @@ export const prepareTestsOrAttach = async (
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, monkeyPatchedElectron } = await state.promise
   const isFirstConnection = false
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
-  await ConnectElectron.connectElectron(testWorkerRpc, connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback)
   await ConnectDevtools.connectDevtools(
     testWorkerRpc,
     connectionId,

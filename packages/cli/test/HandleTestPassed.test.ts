@@ -53,7 +53,7 @@ test('handleTestPassed', async () => {
     isLeak,
   )
   const clearMessage: string = await GetTestClearMessage.getTestClearMessage()
-  const expectedOutput: string = AnsiEscapes.clear(false) + clearMessage + baseMessage
+  const expectedOutput: string = (await AnsiEscapes.clear(false)) + clearMessage + baseMessage
 
   expect(Stdout.write).toHaveBeenCalledWith(expectedOutput)
   expect(TestStateOutput.clearPending).toHaveBeenCalledTimes(1)
