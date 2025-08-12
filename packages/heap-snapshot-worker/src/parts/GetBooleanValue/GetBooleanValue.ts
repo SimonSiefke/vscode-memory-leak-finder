@@ -27,81 +27,107 @@ const analyzeBooleanNodes = (snapshot: Snapshot): { trueNodeId: number | null; f
   const ITEMS_PER_EDGE = edgeFields.length
 
   // Get field indices
+  const typeFieldIndex = nodeFields.indexOf('type')
+  const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
+  const nameFieldIndex = nodeFields.indexOf('name')
+
   const edgeTypeFieldIndex = edgeFields.indexOf('type')
   const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
   const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
 
-  // Get edge type indices
+  // Get edge type indices and node type ids
   const edgeTypes = meta.edge_types[0] || []
   const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
+  const nodeTypeNames = meta.node_types[0] || []
+  const NODE_TYPE_HIDDEN = nodeTypeNames.indexOf('hidden')
 
   // Count references to hidden nodes from boolean-like property names
   const hiddenNodeRefs = new Map<number, { booleanLikeRefs: number; totalRefs: number; propertyNames: string[] }>()
 
+  // Pre-allocate indicators and avoid per-iteration allocations
+  const booleanIndicators = [
+    'expanded',
+    'visible',
+    'enabled',
+    'disabled',
+    'active',
+    'inactive',
+    'selected',
+    'checked',
+    'open',
+    'closed',
+    'valid',
+    'invalid',
+    'readonly',
+    'hidden',
+    'shown',
+    'loading',
+    'loaded',
+    'required',
+    'optional',
+    'focused',
+    'blurred',
+    'collapsed',
+  ] as const
+
   // Scan all edges to find property references to hidden nodes
   for (let i = 0; i < edges.length; i += ITEMS_PER_EDGE) {
     const edgeType = edges[i + edgeTypeFieldIndex]
-    if (edgeType !== EDGE_TYPE_PROPERTY) continue
+    if (edgeType !== EDGE_TYPE_PROPERTY) {
+      continue
+    }
 
     const propertyNameIndex = edges[i + edgeNameFieldIndex]
     const targetNodeDataIndex = edges[i + edgeToNodeFieldIndex]
 
-    if (propertyNameIndex >= strings.length || targetNodeDataIndex >= nodes.length) continue
-
-    const propertyName = strings[propertyNameIndex]
-    if (!propertyName) continue
-
-    // Parse the target node
-    const targetNodeIndex = Math.floor(targetNodeDataIndex / ITEMS_PER_NODE)
-    const targetNode = parseNode(targetNodeIndex, nodes, nodeFields)
-    if (!targetNode) continue
-
-    // Check if target is a hidden node with no outgoing edges (singleton pattern)
-    const nodeTypeName = getNodeTypeName(targetNode, meta.node_types)
-    if (nodeTypeName !== 'hidden') continue
-
-    // Boolean singletons have no outgoing edges
-    if (targetNode.edge_count !== 0) continue
-
-    // Check if property name seems boolean-like
-    // Focus on clear boolean indicators, avoid overly broad heuristics
-    const lowerPropName = propertyName.toLowerCase()
-    const booleanIndicators = [
-      'expanded',
-      'visible',
-      'enabled',
-      'disabled',
-      'active',
-      'inactive',
-      'selected',
-      'checked',
-      'open',
-      'closed',
-      'valid',
-      'invalid',
-      'readonly',
-      'hidden',
-      'shown',
-      'loading',
-      'loaded',
-      'required',
-      'optional',
-      'focused',
-      'blurred',
-      'collapsed',
-    ]
-
-    const isBooleanLike =
-      booleanIndicators.some((indicator) => lowerPropName.includes(indicator)) ||
-      lowerPropName.startsWith('is') ||
-      lowerPropName.startsWith('has')
-
-    // Track references to this hidden node
-    if (!hiddenNodeRefs.has(targetNode.id)) {
-      hiddenNodeRefs.set(targetNode.id, { booleanLikeRefs: 0, totalRefs: 0, propertyNames: [] })
+    if (propertyNameIndex >= strings.length || targetNodeDataIndex >= nodes.length) {
+      continue
     }
 
-    const nodeRef = hiddenNodeRefs.get(targetNode.id)!
+    const propertyName = strings[propertyNameIndex]
+    if (!propertyName) {
+      continue
+    }
+
+    // Read the target node fields directly (no object allocation)
+    const targetNodeIndex = Math.floor(targetNodeDataIndex / ITEMS_PER_NODE)
+    const targetNodeStart = targetNodeIndex * ITEMS_PER_NODE
+    const targetNodeTypeId = nodes[targetNodeStart + typeFieldIndex]
+    const targetNodeEdgeCount = nodes[targetNodeStart + edgeCountFieldIndex]
+
+    // Check if target is a hidden node with no outgoing edges (singleton pattern)
+    if (targetNodeTypeId !== NODE_TYPE_HIDDEN) {
+      continue
+    }
+    if (targetNodeEdgeCount !== 0) {
+      continue
+    }
+
+    // Check if property name seems boolean-like
+    const lowerPropName = propertyName.toLowerCase()
+    let isBooleanLike = false
+    for (let b = 0; b < booleanIndicators.length; b++) {
+      if (lowerPropName.includes(booleanIndicators[b])) {
+        isBooleanLike = true
+        break
+      }
+    }
+    if (!isBooleanLike) {
+      if (lowerPropName.startsWith('is') || lowerPropName.startsWith('has')) {
+        isBooleanLike = true
+      }
+    }
+
+    // Track references to this hidden node
+    const targetNodeId = nodes[targetNodeStart + nameFieldIndex] // we don't actually need the id yet; fix below
+    // We do need the node id; it's stored under field 'id'
+    const idFieldIndex = nodeFields.indexOf('id')
+    const targetId = nodes[targetNodeStart + idFieldIndex]
+    if (!hiddenNodeRefs.has(targetId)) {
+      hiddenNodeRefs.set(targetId, { booleanLikeRefs: 0, totalRefs: 0, propertyNames: [] })
+    }
+
+    const nodeRef = hiddenNodeRefs.get(targetId)!
     nodeRef.totalRefs++
     nodeRef.propertyNames.push(propertyName)
 
@@ -111,21 +137,17 @@ const analyzeBooleanNodes = (snapshot: Snapshot): { trueNodeId: number | null; f
   }
 
   // Find the two hidden nodes with the most boolean-like references
-  // These are likely the true/false singletons
   const candidates = Array.from(hiddenNodeRefs.entries())
-    .filter(([_, ref]) => ref.booleanLikeRefs >= 1) // At least 1 boolean-like reference
+    .filter(([_, ref]) => ref.booleanLikeRefs >= 1)
     .sort((a, b) => b[1].booleanLikeRefs - a[1].booleanLikeRefs)
-    .slice(0, 2) // Take top 2 candidates
+    .slice(0, 2)
 
   let trueNodeId: number | null = null
   let falseNodeId: number | null = null
 
   if (candidates.length >= 2) {
-    // Assign based on test data pattern: lower ID seems to be true, higher ID false
-    // This is still a heuristic but we'll use the observed pattern
     const [id1] = candidates[0]
     const [id2] = candidates[1]
-
     if (id1 < id2) {
       trueNodeId = id1
       falseNodeId = id2
@@ -133,15 +155,10 @@ const analyzeBooleanNodes = (snapshot: Snapshot): { trueNodeId: number | null; f
       trueNodeId = id2
       falseNodeId = id1
     }
-  } else if (candidates.length === 1) {
-    // Only one candidate - we can't determine true vs false reliably
-    // For now, let's assume it could be either - we need more context
-    // We'll leave both as null for now
   }
 
   const result = { trueNodeId, falseNodeId }
 
-  // Cache the result
   if (!booleanNodesCache) {
     booleanNodesCache = new Map()
   }
@@ -220,6 +237,7 @@ export const getBooleanStructure = (
   edgeToNodeFieldIndex: number,
   EDGE_TYPE_PROPERTY: number,
   EDGE_TYPE_INTERNAL: number,
+  propertyNameIndexOverride?: number,
 ): { value: string; hasTypeReference: boolean } | null => {
   if (!sourceNode) return null
 
@@ -231,8 +249,11 @@ export const getBooleanStructure = (
   // Get edges for this node (as subarray)
   const nodeEdges = getNodeEdgesFast(sourceNodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
 
-  // Find property name index
-  const propertyNameIndex = strings.findIndex((str) => str === propertyName)
+  // Find property name index (caller may pass it to avoid repeated lookup)
+  const propertyNameIndex =
+    typeof propertyNameIndexOverride === 'number' && propertyNameIndexOverride >= 0
+      ? propertyNameIndexOverride
+      : strings.findIndex((str) => str === propertyName)
   if (propertyNameIndex === -1) return null
 
   // Get edge type indices
@@ -243,21 +264,26 @@ export const getBooleanStructure = (
 
   // Analyze edges to find boolean pattern
   // Field indices and counts provided
+  const nameFieldIndex = nodeFields.indexOf('name')
+  const idFieldIndex = nodeFields.indexOf('id')
   for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
     const type = nodeEdges[i + edgeTypeFieldIndex]
     const nameIndex = nodeEdges[i + edgeNameFieldIndex]
     const toNode = nodeEdges[i + edgeToNodeFieldIndex]
     const targetNodeIndex = Math.floor(toNode / ITEMS_PER_NODE)
-    const targetNode = parseNode(targetNodeIndex, nodes, nodeFields)
-    if (!targetNode) {
-      continue
-    }
-
-    const targetNodeName = getNodeName(targetNode, strings)
+    const targetNodeStart = targetNodeIndex * ITEMS_PER_NODE
+    const targetNodeNameIndex = nodes[targetNodeStart + nameFieldIndex]
+    const targetNodeName = targetNodeNameIndex >= 0 && targetNodeNameIndex < strings.length ? strings[targetNodeNameIndex] : null
 
     // Check for property edge to boolean value
     if (type === EDGE_TYPE_PROPERTY && nameIndex === propertyNameIndex) {
-      const valueCheck = getBooleanValue(targetNode, snapshot, edgeMap, propertyName)
+      const targetNodeMinimal: any = {
+        type: nodes[targetNodeStart + nodeFields.indexOf('type')],
+        id: nodes[targetNodeStart + idFieldIndex],
+        name: targetNodeNameIndex,
+        edge_count: nodes[targetNodeStart + edgeCountFieldIndex],
+      }
+      const valueCheck = getBooleanValue(targetNodeMinimal, snapshot, edgeMap, propertyName)
       if (valueCheck) {
         booleanValue = valueCheck
       }

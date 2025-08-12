@@ -46,10 +46,25 @@ export const getNodePreviews = (
   const results: ObjectWithProperty[] = []
 
   const tLoop = Timing.timeStart('GetNodePreviews.loop')
+  // Precompute field indices to avoid repeated lookups
+  const typeFieldIndex = nodeFields.indexOf('type')
+  const nameFieldIndex = nodeFields.indexOf('name')
+  const idFieldIndexLocal = idFieldIndex
+
   for (const sourceNodeIndex of nodeIndices) {
-    const sourceNode = parseNode(sourceNodeIndex, nodes, nodeFields)
-    if (!sourceNode) {
+    const sourceStart = sourceNodeIndex * ITEMS_PER_NODE
+    if (sourceStart >= nodes.length) {
       continue
+    }
+    // Fast parse of necessary fields only
+    const sourceNode: any = {
+      type: nodes[sourceStart + typeFieldIndex],
+      name: nodes[sourceStart + nameFieldIndex],
+      id: nodes[sourceStart + idFieldIndexLocal],
+      self_size: nodes[sourceStart + nodeFields.indexOf('self_size')],
+      edge_count: nodes[sourceStart + edgeCountFieldIndex],
+      trace_node_id: nodes[sourceStart + nodeFields.indexOf('trace_node_id')],
+      detachedness: nodes[sourceStart + nodeFields.indexOf('detachedness')],
     }
 
     const result: ObjectWithProperty = {
@@ -77,6 +92,7 @@ export const getNodePreviews = (
       edgeToNodeFieldIndex,
       EDGE_TYPE_PROPERTY,
       EDGE_TYPE_INTERNAL,
+      propertyNameIndex,
     )
     Timing.timeEnd('GetNodePreviews.booleanStructure', tBoolean)
     if (booleanStructure) {

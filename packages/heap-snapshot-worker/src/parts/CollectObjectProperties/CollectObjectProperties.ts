@@ -50,13 +50,21 @@ export const collectObjectProperties = (
   }
 
   const { nodes, edges } = snapshot
-  const node = parseNode(nodeIndex, nodes, nodeFields)
+  const typeFieldIndex = nodeFields.indexOf('type')
+  const nameFieldIndex = nodeFields.indexOf('name')
+  const idFieldIndexLocal = idFieldIndex
 
-  if (!node || visited.has(node.id)) {
+  const nodeStart = nodeIndex * ITEMS_PER_NODE
+  if (nodeStart >= nodes.length) {
     Timing.timeEnd('CollectObjectProperties.walk', tTotal)
     return {}
   }
-  visited.add(node.id)
+  const nodeId = nodes[nodeStart + idFieldIndexLocal]
+  if (visited.has(nodeId)) {
+    Timing.timeEnd('CollectObjectProperties.walk', tTotal)
+    return {}
+  }
+  visited.add(nodeId)
 
   // Get edge type names
   // EDGE_TYPE_PROPERTY provided
@@ -83,20 +91,22 @@ export const collectObjectProperties = (
       }
 
       const targetNodeIndex = Math.floor(toNode / ITEMS_PER_NODE)
-      const targetNode = parseNode(targetNodeIndex, nodes, nodeFields)
-      if (!targetNode) {
+      const targetStart = targetNodeIndex * ITEMS_PER_NODE
+      if (targetStart >= nodes.length) {
         continue
       }
-
-      const targetType = getNodeTypeName(targetNode, nodeTypes) || 'unknown'
-      const targetName = getNodeName(targetNode, strings)
+      const targetTypeId = nodes[targetStart + typeFieldIndex]
+      const targetId = nodes[targetStart + idFieldIndexLocal]
+      const targetNameIndex = nodes[targetStart + nameFieldIndex]
+      const targetName = targetNameIndex >= 0 && targetNameIndex < strings.length ? strings[targetNameIndex] : null
+      const targetType = nodeTypes[0] && Array.isArray(nodeTypes[0]) ? (nodeTypes[0] as readonly string[])[targetTypeId] : 'unknown'
 
       // Check if this is an array (object with name "Array")
-      const isArray = targetType === 'object' && targetName === 'Array'
+      const isArray = targetTypeId === NODE_TYPE_OBJECT && targetName === 'Array'
 
       // Get the property value (can be nested object/array or primitive)
       let value: any
-      if (targetType === 'object' && !isArray) {
+      if (targetTypeId === NODE_TYPE_OBJECT && !isArray) {
         if (depth > 1) {
           // At depth > 1, recursively collect properties of nested objects
           const nestedProperties = collectObjectProperties(
@@ -128,11 +138,11 @@ export const collectObjectProperties = (
             value = nestedProperties
           } else {
             // No properties found, show reference
-            value = `[Object ${targetNode.id}]`
+            value = `[Object ${targetId}]`
           }
         } else {
           // At depth 1, just show reference
-          value = `[Object ${targetNode.id}]`
+          value = `[Object ${targetId}]`
         }
       } else if (isArray) {
         if (depth > 1) {
@@ -141,25 +151,32 @@ export const collectObjectProperties = (
           if (arrayElements.length > 0) {
             value = arrayElements
           } else {
-            value = `[Array ${targetNode.id}]`
+            value = `[Array ${targetId}]`
           }
         } else {
           // At depth 1, just show reference
-          value = `[Array ${targetNode.id}]`
+          value = `[Array ${targetId}]`
         }
-      } else if (targetType === 'array') {
+      } else if (targetTypeId === NODE_TYPE_ARRAY) {
         if (depth > 1) {
           // For arrays at depth > 1, we could collect indexed elements
           // For now, show reference but could be enhanced later
-          value = `[Array ${targetNode.id}]`
+          value = `[Array ${targetId}]`
         } else {
           // At depth 1, just show reference
-          value = `[Array ${targetNode.id}]`
+          value = `[Array ${targetId}]`
         }
-      } else if (targetType === 'string' || targetType === 'number') {
+      } else if (targetTypeId === NODE_TYPE_STRING || targetTypeId === NODE_TYPE_NUMBER) {
         // For primitives, get the actual value (use fresh visited to avoid sibling cross-contamination)
+        // Build a minimal node object to avoid full parse
+        const minimalTargetNode: any = {
+          type: targetTypeId,
+          id: targetId,
+          name: targetNameIndex,
+          edge_count: nodes[targetStart + edgeCountFieldIndex],
+        }
         const actual = getActualValueFast(
-          targetNode,
+          minimalTargetNode,
           snapshot,
           edgeMap,
           new Set(),
@@ -181,7 +198,7 @@ export const collectObjectProperties = (
           NODE_TYPE_OBJECT,
           NODE_TYPE_ARRAY,
         )
-        if (targetType === 'number') {
+        if (targetTypeId === NODE_TYPE_NUMBER) {
           const parsed = Number(actual)
           if (Number.isFinite(parsed)) {
             value = parsed
@@ -191,9 +208,16 @@ export const collectObjectProperties = (
         } else {
           value = actual
         }
-      } else if (targetType === 'hidden') {
+      } else if (targetTypeId === (nodeTypes[0] as readonly string[]).indexOf('hidden')) {
         // For hidden nodes, check if it's a boolean or other special value
-        const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap, propertyName)
+        // Build minimal node object when needed
+        const minimalHiddenNode: any = {
+          type: targetTypeId,
+          id: targetId,
+          name: targetNameIndex,
+          edge_count: nodes[targetStart + edgeCountFieldIndex],
+        }
+        const booleanValue = getBooleanValue(minimalHiddenNode, snapshot, edgeMap, propertyName)
         if (booleanValue) {
           // Convert boolean strings to actual boolean values for preview
           if (booleanValue === 'true') {
@@ -204,8 +228,14 @@ export const collectObjectProperties = (
             value = booleanValue
           }
         } else {
+          const minimalTargetNode: any = {
+            type: targetTypeId,
+            id: targetId,
+            name: targetNameIndex,
+            edge_count: nodes[targetStart + edgeCountFieldIndex],
+          }
           value = getActualValueFast(
-            targetNode,
+            minimalTargetNode,
             snapshot,
             edgeMap,
             new Set(),
@@ -228,10 +258,16 @@ export const collectObjectProperties = (
             NODE_TYPE_ARRAY,
           )
         }
-      } else if (targetType === 'code') {
+      } else if (targetTypeId === (nodeTypes[0] as readonly string[]).indexOf('code')) {
         // For code objects, try to get the actual value they represent
+        const minimalTargetNode: any = {
+          type: targetTypeId,
+          id: targetId,
+          name: targetNameIndex,
+          edge_count: nodes[targetStart + edgeCountFieldIndex],
+        }
         value = getActualValueFast(
-          targetNode,
+          minimalTargetNode,
           snapshot,
           edgeMap,
           new Set(),
@@ -259,7 +295,7 @@ export const collectObjectProperties = (
         const locations = snapshot.locations
         if (locationFields && locationFields.length > 0 && locations && locations.length > 0) {
           const { itemsPerLocation, objectIndexOffset, scriptIdOffset, lineOffset, columnOffset } = getLocationFieldOffsets(locationFields)
-          const traceNodeId = (targetNode as any)['trace_node_id']
+          const traceNodeId = nodes[targetStart + nodeFields.indexOf('trace_node_id')]
           for (let locIndex = 0; locIndex < locations.length; locIndex += itemsPerLocation) {
             const objectIndex = locations[locIndex + objectIndexOffset] / ITEMS_PER_NODE
             const isMatchByTrace = typeof traceNodeId === 'number' && traceNodeId !== 0 && objectIndex === traceNodeId
@@ -274,11 +310,11 @@ export const collectObjectProperties = (
           }
         }
         if (value === undefined) {
-          value = `[${targetType} ${targetNode.id}]`
+          value = `[${targetType} ${targetId}]`
         }
       } else {
         // For other types
-        value = `[${targetType} ${targetNode.id}]`
+        value = `[${targetType} ${targetId}]`
       }
 
       // Heuristic: For coordinate and size properties ('x','y','width','height'),
