@@ -20,7 +20,6 @@ import { getNodePreviews } from '../GetNodePreviews/GetNodePreviews.ts'
  */
 export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyName: string, depth: number = 1): ObjectWithProperty[] => {
   const { nodes, edges, strings, meta } = snapshot
-  const results: ObjectWithProperty[] = []
 
   const nodeFields = meta.node_fields
   const nodeTypes = meta.node_types
@@ -34,84 +33,7 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
   const edgeMap = createEdgeMap(nodes, nodeFields)
   const matchingNodeIndices = getObjectWithPropertyNodeIndices(snapshot, propertyName)
 
-  const previews = getNodePreviews(matchingNodeIndices, snapshot, edgeMap, depth)
-  const nodeIndexToPreview: Map<number, Record<string, unknown> | undefined> = new Map(
-    previews.map((p) => [p.nodeIndex, p.preview]),
-  )
-
-  for (const sourceNodeIndex of matchingNodeIndices) {
-    const sourceNode = parseNode(sourceNodeIndex, nodes, nodeFields)
-    if (!sourceNode) {
-      continue
-    }
-
-    const result: ObjectWithProperty = {
-      id: sourceNode.id,
-      name: getNodeName(sourceNode, strings),
-      propertyValue: null,
-      type: getNodeTypeName(sourceNode, nodeTypes),
-      selfSize: sourceNode.self_size,
-      edgeCount: sourceNode.edge_count,
-    }
-
-    const booleanStructure = getBooleanStructure(sourceNode, snapshot, edgeMap, propertyName)
-    if (booleanStructure) {
-      if (booleanStructure.value === 'true') {
-        result.propertyValue = true
-      } else if (booleanStructure.value === 'false') {
-        result.propertyValue = false
-      } else {
-        result.propertyValue = booleanStructure.value
-      }
-    } else {
-      // Determine the value by finding the edge for the specific property and resolving its target
-      const edgeFieldsLocal = meta.edge_fields
-      const edgeTypesLocal = meta.edge_types[0] || []
-      const ITEMS_PER_EDGE = edgeFieldsLocal.length
-      const edgeTypeFieldIndex = edgeFieldsLocal.indexOf('type')
-      const edgeNameFieldIndex = edgeFieldsLocal.indexOf('name_or_index')
-      const edgeToNodeFieldIndex = edgeFieldsLocal.indexOf('to_node')
-      const EDGE_TYPE_PROPERTY = edgeTypesLocal.indexOf('property')
-
-      const nodeEdges = getNodeEdges(sourceNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFieldsLocal)
-
-      // Resolve property target node for the exact property name
-      const propertyNameIndex = strings.findIndex((s) => s === propertyName)
-      let targetNodeIndex: number | undefined
-      for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
-        const edgeType = nodeEdges[i + edgeTypeFieldIndex]
-        const nameIndex = nodeEdges[i + edgeNameFieldIndex]
-        if (edgeType === EDGE_TYPE_PROPERTY && nameIndex === propertyNameIndex) {
-          const toNode = nodeEdges[i + edgeToNodeFieldIndex]
-          targetNodeIndex = Math.floor(toNode / ITEMS_PER_NODE)
-          break
-        }
-      }
-
-      if (typeof targetNodeIndex === 'number') {
-        const targetNode = parseNode(targetNodeIndex, nodes, nodeFields)
-        const targetTypeName = getNodeTypeName(targetNode, nodeTypes)
-        const actualValue = getActualValue(targetNode, snapshot, edgeMap)
-        if (actualValue === 'true') {
-          result.propertyValue = true
-        } else if (actualValue === 'false') {
-          result.propertyValue = false
-        } else if (targetTypeName === 'number') {
-          const parsed = Number(actualValue)
-          result.propertyValue = Number.isFinite(parsed) ? parsed : actualValue
-        } else {
-          result.propertyValue = actualValue
-        }
-      }
-    }
-
-    const preview = nodeIndexToPreview.get(sourceNodeIndex)
-    if (preview) {
-      result.preview = preview as Record<string, any>
-    }
-
-    results.push(result)
-  }
+  const results = getNodePreviews(matchingNodeIndices, snapshot, edgeMap, propertyName, depth)
 
   return results
 }
