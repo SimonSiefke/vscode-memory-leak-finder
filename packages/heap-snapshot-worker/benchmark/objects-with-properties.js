@@ -1,6 +1,7 @@
 import { writeFile } from 'fs/promises'
 import { getObjectsWithPropertiesInternal } from '../src/parts/GetObjectsWithPropertiesInternal/GetObjectsWithPropertiesInternal.ts'
 import { prepareHeapSnapshot } from '../src/parts/PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
+import * as Timing from '../src/parts/Timing/Timing.ts'
 
 async function testGetObjectsWithProperties() {
   console.log('Testing getObjectsWithProperties function...')
@@ -28,6 +29,8 @@ async function testGetObjectsWithProperties() {
     const oldStateObjects = getObjectsWithPropertiesInternal(snapshot, property, depth)
     console.timeEnd('check')
     console.log(`Refactored function found ${oldStateObjects.length} objects with "oldState" property`)
+
+    Timing.report('getObjectsWithPropertiesInternal breakdown')
 
     // console.log(JSON.stringify({ oldStateObjects }, null, 2))
     // await writeFile(resultPath, JSON.stringify(oldStateObjects, null, 2) + '\n')
