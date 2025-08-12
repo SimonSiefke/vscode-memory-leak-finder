@@ -1,13 +1,14 @@
 import { collectArrayElements } from '../CollectArrayElements/CollectArrayElements.ts'
-import { getActualValue } from '../GetActualValue/GetActualValue.ts'
+import { getActualValueFast } from '../GetActualValueFast/GetActualValueFast.ts'
 import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
-import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
 import { tryResolveNestedNumeric } from '../TryResolveNestedNumeric/TryResolveNestedNumeric.ts'
+import * as Timing from '../Timing/Timing.ts'
+import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 
 /**
  * Collects properties of an object with optional depth control
@@ -24,44 +25,68 @@ export const collectObjectProperties = (
   edgeMap: Uint32Array,
   depth: number = 1,
   visited: Set<number> = new Set(),
+  nodeFields: readonly string[],
+  nodeTypes: readonly (readonly string[])[],
+  edgeFields: readonly string[],
+  strings: readonly string[],
+  ITEMS_PER_NODE: number,
+  ITEMS_PER_EDGE: number,
+  edgeCountFieldIndex: number,
+  edgeTypeFieldIndex: number,
+  edgeNameFieldIndex: number,
+  edgeToNodeFieldIndex: number,
+  EDGE_TYPE_PROPERTY: number,
+  EDGE_TYPE_INTERNAL: number,
+  NODE_TYPE_STRING: number,
+  NODE_TYPE_NUMBER: number,
+  NODE_TYPE_OBJECT: number,
+  NODE_TYPE_ARRAY: number,
+  idFieldIndex: number,
 ): Record<string, any> => {
+  const tTotal = Timing.timeStart('CollectObjectProperties.walk')
   if (depth <= 0) {
+    Timing.timeEnd('CollectObjectProperties.walk', tTotal)
     return {}
   }
 
-  const { nodes, edges, strings, meta } = snapshot
-  const nodeFields = meta.node_fields
-  const nodeTypes = meta.node_types
-  const edgeFields = meta.edge_fields
-
-  const ITEMS_PER_NODE = nodeFields.length
+  const { nodes, edges } = snapshot
   const node = parseNode(nodeIndex, nodes, nodeFields)
 
   if (!node || visited.has(node.id)) {
+    Timing.timeEnd('CollectObjectProperties.walk', tTotal)
     return {}
   }
   visited.add(node.id)
 
   // Get edge type names
-  const edgeTypes = meta.edge_types[0] || []
-  const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
+  // EDGE_TYPE_PROPERTY provided
 
   const properties: Record<string, any> = {}
 
-  // Get edges for this node
-  const nodeEdges = getNodeEdges(nodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
+  // Get edges for this node as subarray
+  const tEdges = Timing.timeStart('CollectObjectProperties.getNodeEdges')
+  const nodeEdges = getNodeEdgesFast(nodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
+  Timing.timeEnd('CollectObjectProperties.getNodeEdges', tEdges)
 
   // Scan edges for properties (excluding internal edges which don't count toward depth)
-  for (const edge of nodeEdges) {
-    if (edge.type === EDGE_TYPE_PROPERTY) {
-      // This is a property edge
-      const propertyName = strings[edge.nameIndex]
-      if (!propertyName) continue
+  // Indices provided
 
-      // Get the target node
-      const targetNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
+  const tLoop = Timing.timeStart('CollectObjectProperties.loop')
+  for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
+    const type = nodeEdges[i + edgeTypeFieldIndex]
+    if (type === EDGE_TYPE_PROPERTY) {
+      const nameIndex = nodeEdges[i + edgeNameFieldIndex]
+      const toNode = nodeEdges[i + edgeToNodeFieldIndex]
+      const propertyName = strings[nameIndex]
+      if (!propertyName) {
+        continue
+      }
+
+      const targetNodeIndex = Math.floor(toNode / ITEMS_PER_NODE)
       const targetNode = parseNode(targetNodeIndex, nodes, nodeFields)
-      if (!targetNode) continue
+      if (!targetNode) {
+        continue
+      }
 
       const targetType = getNodeTypeName(targetNode, nodeTypes) || 'unknown'
       const targetName = getNodeName(targetNode, strings)
@@ -74,7 +99,30 @@ export const collectObjectProperties = (
       if (targetType === 'object' && !isArray) {
         if (depth > 1) {
           // At depth > 1, recursively collect properties of nested objects
-          const nestedProperties = collectObjectProperties(targetNodeIndex, snapshot, edgeMap, depth - 1, visited)
+          const nestedProperties = collectObjectProperties(
+            targetNodeIndex,
+            snapshot,
+            edgeMap,
+            depth - 1,
+            visited,
+            nodeFields,
+            nodeTypes,
+            edgeFields,
+            strings,
+            ITEMS_PER_NODE,
+            ITEMS_PER_EDGE,
+            edgeCountFieldIndex,
+            edgeTypeFieldIndex,
+            edgeNameFieldIndex,
+            edgeToNodeFieldIndex,
+            EDGE_TYPE_PROPERTY,
+            EDGE_TYPE_INTERNAL,
+            NODE_TYPE_STRING,
+            NODE_TYPE_NUMBER,
+            NODE_TYPE_OBJECT,
+            NODE_TYPE_ARRAY,
+            idFieldIndex,
+          )
           if (Object.keys(nestedProperties).length > 0) {
             // Return as nested object
             value = nestedProperties
@@ -110,7 +158,29 @@ export const collectObjectProperties = (
         }
       } else if (targetType === 'string' || targetType === 'number') {
         // For primitives, get the actual value (use fresh visited to avoid sibling cross-contamination)
-        const actual = getActualValue(targetNode, snapshot, edgeMap, new Set())
+        const actual = getActualValueFast(
+          targetNode,
+          snapshot,
+          edgeMap,
+          new Set(),
+          targetNodeIndex,
+          nodeFields,
+          nodeTypes,
+          edgeFields,
+          strings,
+          ITEMS_PER_NODE,
+          ITEMS_PER_EDGE,
+          idFieldIndex,
+          edgeCountFieldIndex,
+          edgeTypeFieldIndex,
+          edgeNameFieldIndex,
+          edgeToNodeFieldIndex,
+          EDGE_TYPE_INTERNAL,
+          NODE_TYPE_STRING,
+          NODE_TYPE_NUMBER,
+          NODE_TYPE_OBJECT,
+          NODE_TYPE_ARRAY,
+        )
         if (targetType === 'number') {
           const parsed = Number(actual)
           if (Number.isFinite(parsed)) {
@@ -134,11 +204,55 @@ export const collectObjectProperties = (
             value = booleanValue
           }
         } else {
-          value = getActualValue(targetNode, snapshot, edgeMap, new Set())
+          value = getActualValueFast(
+            targetNode,
+            snapshot,
+            edgeMap,
+            new Set(),
+            targetNodeIndex,
+            nodeFields,
+            nodeTypes,
+            edgeFields,
+            strings,
+            ITEMS_PER_NODE,
+            ITEMS_PER_EDGE,
+            idFieldIndex,
+            edgeCountFieldIndex,
+            edgeTypeFieldIndex,
+            edgeNameFieldIndex,
+            edgeToNodeFieldIndex,
+            EDGE_TYPE_INTERNAL,
+            NODE_TYPE_STRING,
+            NODE_TYPE_NUMBER,
+            NODE_TYPE_OBJECT,
+            NODE_TYPE_ARRAY,
+          )
         }
       } else if (targetType === 'code') {
         // For code objects, try to get the actual value they represent
-        value = getActualValue(targetNode, snapshot, edgeMap, new Set())
+        value = getActualValueFast(
+          targetNode,
+          snapshot,
+          edgeMap,
+          new Set(),
+          -1,
+          nodeFields,
+          nodeTypes,
+          edgeFields,
+          strings,
+          ITEMS_PER_NODE,
+          ITEMS_PER_EDGE,
+          idFieldIndex,
+          edgeCountFieldIndex,
+          edgeTypeFieldIndex,
+          edgeNameFieldIndex,
+          edgeToNodeFieldIndex,
+          EDGE_TYPE_INTERNAL,
+          NODE_TYPE_STRING,
+          NODE_TYPE_NUMBER,
+          NODE_TYPE_OBJECT,
+          NODE_TYPE_ARRAY,
+        )
       } else if (targetType === 'closure') {
         // Prefer showing function location if available
         const locationFields = snapshot.meta.location_fields
@@ -183,6 +297,8 @@ export const collectObjectProperties = (
       properties[propertyName] = value
     }
   }
+  Timing.timeEnd('CollectObjectProperties.loop', tLoop)
 
+  Timing.timeEnd('CollectObjectProperties.walk', tTotal)
   return properties
 }

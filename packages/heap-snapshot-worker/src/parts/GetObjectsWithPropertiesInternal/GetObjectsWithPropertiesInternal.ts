@@ -1,12 +1,8 @@
-import { collectObjectProperties } from '../CollectObjectProperties/CollectObjectProperties.ts'
 import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
-import { getActualValue } from '../GetActualValue/GetActualValue.ts'
-import { getBooleanStructure } from '../GetBooleanValue/GetBooleanValue.ts'
-import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
-import { getNodeName } from '../GetNodeName/GetNodeName.ts'
-import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
+import { getNodePreviews } from '../GetNodePreviews/GetNodePreviews.ts'
+import { getObjectWithPropertyNodeIndices } from '../GetObjectWithPropertyNodeIndices/GetObjectWithPropertyNodeIndices.ts'
+import * as Timing from '../Timing/Timing.ts'
 import type { ObjectWithProperty } from '../ObjectWithProperty/ObjectWithProperty.ts'
-import { parseNode } from '../ParseNode/ParseNode.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 /**
@@ -17,97 +13,82 @@ import type { Snapshot } from '../Snapshot/Snapshot.ts'
  * @returns Array of objects with the specified property
  */
 export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyName: string, depth: number = 1): ObjectWithProperty[] => {
-  const { nodes, edges, strings, meta } = snapshot
-  const results: ObjectWithProperty[] = []
+  const tTotal = Timing.timeStart('GetObjectsWithPropertiesInternal.total')
+  const { nodes, meta } = snapshot
 
   const nodeFields = meta.node_fields
-  const nodeTypes = meta.node_types
   const edgeFields = meta.edge_fields
 
   if (!nodeFields.length || !edgeFields.length) {
-    return results
+    return []
   }
 
-  // Find the property name in the strings array
-  const propertyNameIndex = strings.findIndex((str) => str === propertyName)
-  if (propertyNameIndex === -1) {
-    return results
-  }
-
-  // Get field indices
-
-  const ITEMS_PER_NODE = nodeFields.length
-
-  // Get edge type names
-  const edgeTypes = meta.edge_types[0] || []
-  const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
-
-  // Create edge map for fast lookups
+  const tEdgeMap = Timing.timeStart('CreateEdgeMap.total')
   const edgeMap = createEdgeMap(nodes, nodeFields)
+  Timing.timeEnd('CreateEdgeMap.total', tEdgeMap)
 
-  // Iterate through each node and scan its edges
-  for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex += ITEMS_PER_NODE) {
-    const nodeEdges = getNodeEdges(nodeIndex / ITEMS_PER_NODE, edgeMap, nodes, edges, nodeFields, edgeFields)
+  // Precompute traversal indices and constants once
+  const strings = snapshot.strings
+  const nodeTypes = meta.node_types
+  const edgeTypes = meta.edge_types[0] || []
+  const ITEMS_PER_NODE = nodeFields.length
+  const ITEMS_PER_EDGE = meta.edge_fields.length
+  const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
+  const edgeTypeFieldIndex = meta.edge_fields.indexOf('type')
+  const edgeNameFieldIndex = meta.edge_fields.indexOf('name_or_index')
+  const edgeToNodeFieldIndex = meta.edge_fields.indexOf('to_node')
+  const idFieldIndex = nodeFields.indexOf('id')
+  const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
+  const EDGE_TYPE_INTERNAL = edgeTypes.indexOf('internal')
+  const propertyNameIndex = strings.findIndex((s) => s === propertyName)
+  const nodeTypeNames = nodeTypes[0] || []
+  const NODE_TYPE_STRING = nodeTypeNames.indexOf('string')
+  const NODE_TYPE_NUMBER = nodeTypeNames.indexOf('number')
+  const NODE_TYPE_OBJECT = nodeTypeNames.indexOf('object')
+  const NODE_TYPE_ARRAY = nodeTypeNames.indexOf('array')
 
-    // Scan this node's edges
-    for (const edge of nodeEdges) {
-      // Check if it's a property edge with the target property name
-      if (edge.type === EDGE_TYPE_PROPERTY && edge.nameIndex === propertyNameIndex) {
-        // Parse the source node (the object that has the property)
-        const sourceNode = parseNode(nodeIndex / ITEMS_PER_NODE, nodes, nodeFields)
-        // Parse the target node (the property value)
-        // Edge toNode values are array indices, need to convert to node index by dividing by ITEMS_PER_NODE
-        const targetNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
-        const targetNode = parseNode(targetNodeIndex, nodes, nodeFields)
+  const tMatching = Timing.timeStart('GetObjectWithPropertyNodeIndices.total')
+  const matchingNodeIndices = getObjectWithPropertyNodeIndices(
+    snapshot,
+    propertyName,
+    ITEMS_PER_NODE,
+    ITEMS_PER_EDGE,
+    edgeTypeFieldIndex,
+    edgeNameFieldIndex,
+    edgeCountFieldIndex,
+  )
+  Timing.timeEnd('GetObjectWithPropertyNodeIndices.total', tMatching)
 
-        if (sourceNode && targetNode) {
-          const result: ObjectWithProperty = {
-            id: sourceNode.id,
-            name: getNodeName(sourceNode, strings),
-            propertyValue: null,
-            type: getNodeTypeName(sourceNode, nodeTypes),
-            selfSize: sourceNode.self_size,
-            edgeCount: sourceNode.edge_count,
-          }
+  const tPreviews = Timing.timeStart('GetNodePreviews.total')
+  const results = getNodePreviews(
+    matchingNodeIndices,
+    snapshot,
+    edgeMap,
+    propertyName,
+    depth,
+    nodeFields,
+    nodeTypes,
+    meta.edge_fields,
+    strings,
+    ITEMS_PER_NODE,
+    ITEMS_PER_EDGE,
+    edgeCountFieldIndex,
+    edgeTypeFieldIndex,
+    edgeNameFieldIndex,
+    edgeToNodeFieldIndex,
+    EDGE_TYPE_PROPERTY,
+    EDGE_TYPE_INTERNAL,
+    propertyNameIndex,
+    NODE_TYPE_STRING,
+    NODE_TYPE_NUMBER,
+    NODE_TYPE_OBJECT,
+    NODE_TYPE_ARRAY,
+    idFieldIndex,
+    ITEMS_PER_EDGE,
+    edgeCountFieldIndex,
+  )
+  Timing.timeEnd('GetNodePreviews.total', tPreviews)
 
-          // Try enhanced boolean detection first
-          const booleanStructure = getBooleanStructure(sourceNode, snapshot, edgeMap, propertyName)
-          if (booleanStructure) {
-            // This is a boolean with the dual-reference pattern - return actual boolean value
-            if (booleanStructure.value === 'true') {
-              result.propertyValue = true
-            } else if (booleanStructure.value === 'false') {
-              result.propertyValue = false
-            } else {
-              result.propertyValue = booleanStructure.value
-            }
-          } else {
-            // Fall back to standard value detection
-            const actualValue = getActualValue(targetNode, snapshot, edgeMap)
-            const targetTypeName = getNodeTypeName(targetNode, nodeTypes)
-            // Normalize booleans and numbers
-            if (actualValue === 'true') {
-              result.propertyValue = true
-            } else if (actualValue === 'false') {
-              result.propertyValue = false
-            } else if (targetTypeName === 'number') {
-              const parsed = Number(actualValue)
-              result.propertyValue = Number.isFinite(parsed) ? parsed : actualValue
-            } else {
-              result.propertyValue = actualValue
-            }
-          }
-
-          // Collect properties if depth > 0
-          if (depth > 0) {
-            result.preview = collectObjectProperties(nodeIndex / ITEMS_PER_NODE, snapshot, edgeMap, depth)
-          }
-
-          results.push(result)
-        }
-      }
-    }
-  }
-
+  Timing.timeEnd('GetObjectsWithPropertiesInternal.total', tTotal)
   return results
 }
