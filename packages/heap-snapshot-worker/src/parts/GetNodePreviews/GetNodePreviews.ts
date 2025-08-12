@@ -36,6 +36,7 @@ export const getNodePreviews = (
   NODE_TYPE_NUMBER: number,
   NODE_TYPE_OBJECT: number,
   NODE_TYPE_ARRAY: number,
+  idFieldIndex: number,
 ): ObjectWithProperty[] => {
   const tTotal = Timing.timeStart('GetNodePreviews.build')
   const { nodes, edges } = snapshot
@@ -117,7 +118,7 @@ export const getNodePreviews = (
           strings,
           ITEMS_PER_NODE,
           ITEMS_PER_EDGE,
-          /* idFieldIndex */ nodeFields.indexOf('id'),
+          idFieldIndex,
           edgeCountFieldIndex,
           edgeTypeFieldIndex,
           edgeNameFieldIndex,
@@ -166,6 +167,7 @@ export const getNodePreviews = (
         NODE_TYPE_NUMBER,
         NODE_TYPE_OBJECT,
         NODE_TYPE_ARRAY,
+        idFieldIndex,
       )
       Timing.timeEnd('CollectObjectProperties.total', tCollect)
     }

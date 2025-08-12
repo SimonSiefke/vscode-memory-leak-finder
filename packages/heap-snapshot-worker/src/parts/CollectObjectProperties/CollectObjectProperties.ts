@@ -1,7 +1,6 @@
 import { collectArrayElements } from '../CollectArrayElements/CollectArrayElements.ts'
 import { getActualValueFast } from '../GetActualValueFast/GetActualValueFast.ts'
 import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
-import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
@@ -42,6 +41,7 @@ export const collectObjectProperties = (
   NODE_TYPE_NUMBER: number,
   NODE_TYPE_OBJECT: number,
   NODE_TYPE_ARRAY: number,
+  idFieldIndex: number,
 ): Record<string, any> => {
   const tTotal = Timing.timeStart('CollectObjectProperties.walk')
   if (depth <= 0) {
@@ -121,6 +121,7 @@ export const collectObjectProperties = (
             NODE_TYPE_NUMBER,
             NODE_TYPE_OBJECT,
             NODE_TYPE_ARRAY,
+            idFieldIndex,
           )
           if (Object.keys(nestedProperties).length > 0) {
             // Return as nested object
@@ -169,7 +170,7 @@ export const collectObjectProperties = (
           strings,
           ITEMS_PER_NODE,
           ITEMS_PER_EDGE,
-          /* idFieldIndex */ nodeFields.indexOf('id'),
+          idFieldIndex,
           edgeCountFieldIndex,
           edgeTypeFieldIndex,
           edgeNameFieldIndex,
@@ -192,22 +193,7 @@ export const collectObjectProperties = (
         }
       } else if (targetType === 'hidden') {
         // For hidden nodes, check if it's a boolean or other special value
-        const booleanValue = getBooleanValue(
-          targetNode,
-          snapshot,
-          edgeMap,
-          propertyName,
-          targetNodeIndex,
-          nodeFields,
-          edgeFields,
-          ITEMS_PER_NODE,
-          ITEMS_PER_EDGE,
-          edgeTypeFieldIndex,
-          edgeNameFieldIndex,
-          edgeToNodeFieldIndex,
-          EDGE_TYPE_PROPERTY,
-          EDGE_TYPE_INTERNAL,
-        )
+        const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap, propertyName)
         if (booleanValue) {
           // Convert boolean strings to actual boolean values for preview
           if (booleanValue === 'true') {
@@ -230,7 +216,7 @@ export const collectObjectProperties = (
             strings,
             ITEMS_PER_NODE,
             ITEMS_PER_EDGE,
-            /* idFieldIndex */ nodeFields.indexOf('id'),
+            idFieldIndex,
             edgeCountFieldIndex,
             edgeTypeFieldIndex,
             edgeNameFieldIndex,
@@ -256,7 +242,7 @@ export const collectObjectProperties = (
           strings,
           ITEMS_PER_NODE,
           ITEMS_PER_EDGE,
-          /* idFieldIndex */ nodeFields.indexOf('id'),
+          idFieldIndex,
           edgeCountFieldIndex,
           edgeTypeFieldIndex,
           edgeNameFieldIndex,
