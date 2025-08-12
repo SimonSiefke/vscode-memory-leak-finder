@@ -1,45 +1,42 @@
 import { collectObjectProperties } from '../CollectObjectProperties/CollectObjectProperties.ts'
-import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
 import { getActualValue } from '../GetActualValue/GetActualValue.ts'
 import { getBooleanStructure } from '../GetBooleanValue/GetBooleanValue.ts'
+import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import type { ObjectWithProperty } from '../ObjectWithProperty/ObjectWithProperty.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
-import { getObjectWithPropertyNodeIndices } from '../GetObjectWithPropertyNodeIndices/GetObjectWithPropertyNodeIndices.ts'
-import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
-import { getNodePreviews } from '../GetNodePreviews/GetNodePreviews.ts'
 
 /**
- * Internal function that finds objects in a parsed heap snapshot that have a specific property
- * @param snapshot - The parsed heap snapshot object
- * @param propertyName - The property name to search for
- * @param depth - Maximum depth to traverse for property collection (default: 1)
- * @returns Array of objects with the specified property
+ * Builds result objects (including preview) for a list of node indices using the provided edge map and depth.
+ * Also resolves the value for the given property on each node.
  */
-export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyName: string, depth: number = 1): ObjectWithProperty[] => {
+export const getNodePreviews = (
+  nodeIndices: readonly number[],
+  snapshot: Snapshot,
+  edgeMap: Uint32Array,
+  propertyName: string,
+  depth: number,
+): ObjectWithProperty[] => {
   const { nodes, edges, strings, meta } = snapshot
-  const results: ObjectWithProperty[] = []
 
   const nodeFields = meta.node_fields
   const nodeTypes = meta.node_types
   const edgeFields = meta.edge_fields
-
-  if (!nodeFields.length || !edgeFields.length) {
-    return results
-  }
+  const edgeTypes = meta.edge_types[0] || []
 
   const ITEMS_PER_NODE = nodeFields.length
-  const edgeMap = createEdgeMap(nodes, nodeFields)
-  const matchingNodeIndices = getObjectWithPropertyNodeIndices(snapshot, propertyName)
+  const ITEMS_PER_EDGE = edgeFields.length
+  const edgeTypeFieldIndex = edgeFields.indexOf('type')
+  const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
+  const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
+  const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
+  const propertyNameIndex = strings.findIndex((s) => s === propertyName)
 
-  const previews = getNodePreviews(matchingNodeIndices, snapshot, edgeMap, depth)
-  const nodeIndexToPreview: Map<number, Record<string, unknown> | undefined> = new Map(
-    previews.map((p) => [p.nodeIndex, p.preview]),
-  )
+  const results: ObjectWithProperty[] = []
 
-  for (const sourceNodeIndex of matchingNodeIndices) {
+  for (const sourceNodeIndex of nodeIndices) {
     const sourceNode = parseNode(sourceNodeIndex, nodes, nodeFields)
     if (!sourceNode) {
       continue
@@ -63,20 +60,8 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
       } else {
         result.propertyValue = booleanStructure.value
       }
-    } else {
-      // Determine the value by finding the edge for the specific property and resolving its target
-      const edgeFieldsLocal = meta.edge_fields
-      const edgeTypesLocal = meta.edge_types[0] || []
-      const ITEMS_PER_EDGE = edgeFieldsLocal.length
-      const edgeTypeFieldIndex = edgeFieldsLocal.indexOf('type')
-      const edgeNameFieldIndex = edgeFieldsLocal.indexOf('name_or_index')
-      const edgeToNodeFieldIndex = edgeFieldsLocal.indexOf('to_node')
-      const EDGE_TYPE_PROPERTY = edgeTypesLocal.indexOf('property')
-
-      const nodeEdges = getNodeEdges(sourceNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFieldsLocal)
-
-      // Resolve property target node for the exact property name
-      const propertyNameIndex = strings.findIndex((s) => s === propertyName)
+    } else if (propertyNameIndex !== -1) {
+      const nodeEdges = getNodeEdges(sourceNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
       let targetNodeIndex: number | undefined
       for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
         const edgeType = nodeEdges[i + edgeTypeFieldIndex]
@@ -105,9 +90,8 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
       }
     }
 
-    const preview = nodeIndexToPreview.get(sourceNodeIndex)
-    if (preview) {
-      result.preview = preview as Record<string, any>
+    if (depth > 0) {
+      result.preview = collectObjectProperties(sourceNodeIndex, snapshot, edgeMap, depth)
     }
 
     results.push(result)
