@@ -19,11 +19,14 @@ export const handleStdinDataRunningMode = async (state, key) => {
     case AnsiKeys.ArrowLeft:
     case AnsiKeys.ArrowRight:
       return state
-    default:
+    default: {
+      const interruptedMessage = await InterruptedMessage.print()
+      const watchUsageMessage = await WatchUsage.print()
       return {
         ...state,
         mode: ModeType.Interrupted,
-        stdout: [...state.stdout, (await InterruptedMessage.print()) + '\n' + (await WatchUsage.print())],
+        stdout: [...state.stdout, interruptedMessage + '\n' + watchUsageMessage],
       }
+    }
   }
 }

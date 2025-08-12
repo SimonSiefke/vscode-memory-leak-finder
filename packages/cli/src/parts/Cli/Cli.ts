@@ -4,8 +4,10 @@ import * as InitialStart from '../InitialStart/InitialStart.ts'
 import * as IsWindows from '../IsWindows/IsWindows.ts'
 import * as ParseArgv from '../ParseArgv/ParseArgv.ts'
 import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
 export const run = async (platform: string, argv: readonly string[], env: NodeJS.ProcessEnv): Promise<void> => {
+  await StdoutWorker.initialize()
   Object.assign(CommandMapRef.commandMapRef, CommandMap.commandMap)
   const options = ParseArgv.parseArgv(argv)
 

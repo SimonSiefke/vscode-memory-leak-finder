@@ -3,7 +3,33 @@ import * as Character from '../Character/Character.ts'
 import * as Ide from '../Ide/Ide.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 
-export const state = {
+export interface StdinDataState {
+  buffering: boolean
+  checkLeaks: boolean
+  cwd: string
+  filter: string
+  headless: boolean
+  isGithubActions: boolean
+  measure: string
+  mode: number
+  recordVideo: boolean
+  runs: number
+  value: string
+  watch: boolean
+  measureAfter: boolean
+  timeouts: boolean
+  timeoutBetween: number
+  restartBetween: boolean
+  runMode: number
+  ide: string
+  ideVersion: string
+  workers: boolean
+  stdout: string[]
+  previousFilters: string[]
+  isWindows: boolean
+}
+
+export const state: StdinDataState = {
   buffering: false,
   checkLeaks: false,
   cwd: Character.EmptyString,

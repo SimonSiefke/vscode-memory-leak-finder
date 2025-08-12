@@ -1,12 +1,16 @@
-import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
 import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
+import * as Character from '../Character/Character.ts'
 import * as CliKeys from '../CliKeys/CliKeys.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
 import * as PatternUsage from '../PatternUsage/PatternUsage.ts'
+import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
+import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
 import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
-import * as Character from '../Character/Character.ts'
 
-export const handleStdinDataFinishedRunningMode = async (state, key) => {
+export const handleStdinDataFinishedRunningMode = async (
+  state: StdinDataState.StdinDataState,
+  key: string,
+): Promise<StdinDataState.StdinDataState> => {
   switch (key) {
     case AnsiKeys.ControlC:
     case AnsiKeys.ControlD:
@@ -14,19 +18,26 @@ export const handleStdinDataFinishedRunningMode = async (state, key) => {
         ...state,
         mode: ModeType.Exit,
       }
-    case CliKeys.WatchMode:
+    case CliKeys.WatchMode: {
+      const cursorUp = await AnsiEscapes.cursorUp(1)
+      const eraseDown = await AnsiEscapes.eraseDown()
+      const watchUsage = await WatchUsage.print()
       return {
         ...state,
         mode: ModeType.Waiting,
-        stdout: [...state.stdout, AnsiEscapes.cursorUp() + AnsiEscapes.eraseDown + (await WatchUsage.print())],
+        stdout: [...state.stdout, cursorUp + eraseDown + watchUsage],
       }
-    case CliKeys.FilterMode:
+    }
+    case CliKeys.FilterMode: {
+      const clear = await AnsiEscapes.clear(state.isWindows)
+      const patternUsage = await PatternUsage.print()
       return {
         ...state,
         value: Character.EmptyString,
         mode: ModeType.FilterWaiting,
-        stdout: [...state.stdout, AnsiEscapes.clear(state.isWindows) + PatternUsage.print()],
+        stdout: [...state.stdout, clear + patternUsage],
       }
+    }
     case CliKeys.Quit:
       return {
         ...state,

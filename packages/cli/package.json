@@ -17,12 +17,9 @@
   "dependencies": {
     "@lvce-editor/assert": "^1.4.0",
     "@lvce-editor/rpc": "^4.14.0",
-    "@lvce-editor/verror": "^1.7.0",
-    "ansi-escapes": "^7.0.0",
-    "chalk": "^5.5.0"
+    "@lvce-editor/verror": "^1.7.0"
   },
   "devDependencies": {
-    "@types/babel__code-frame": "^7.0.6",
     "@types/node": "^24.1.0"
   },
   "xo": {

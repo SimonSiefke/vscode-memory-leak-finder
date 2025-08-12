@@ -1,5 +1,6 @@
 import * as RunTest from '../RunTest/RunTest.ts'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
 export const killWorkers = async (): Promise<void> => {
   if (RunTest.state.testCoordinator) {
@@ -8,4 +9,5 @@ export const killWorkers = async (): Promise<void> => {
     RunTest.state.testCoordinator.send(TestWorkerCommandType.Exit)
     RunTest.state.testCoordinator = undefined
   }
+  await StdoutWorker.cleanup()
 }
