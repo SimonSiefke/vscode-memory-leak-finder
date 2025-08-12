@@ -35,7 +35,6 @@ test('should get node edges correctly', () => {
   // Create edge map manually for testing
   const edgeMap = new Uint32Array([0, 2]) // Node 0 starts at edge 0, Node 1 starts at edge 2
 
-  const ITEMS_PER_EDGE = edgeFields.length
   // Get edges for Node 0
   const ITEMS_PER_NODE = nodeFields.length
   const ITEMS_PER_EDGE = edgeFields.length
@@ -106,7 +105,6 @@ test('should handle different edge types', () => {
   const ITEMS_PER_EDGE3 = edgeFields.length
   const edgeCountFieldIndex3 = nodeFields.indexOf('edge_count')
   const node0Edges = getNodeEdgesFast(0, edgeMap, nodes, edges, ITEMS_PER_NODE3, ITEMS_PER_EDGE3, edgeCountFieldIndex3)
-  const ITEMS_PER_EDGE = edgeFields.length
-  expect(node0Edges.length / ITEMS_PER_EDGE).toBe(3)
-  expect(Array.from(node0Edges.subarray(0, ITEMS_PER_EDGE))).toEqual([2, 1, 1])
+  expect(node0Edges.length / ITEMS_PER_EDGE3).toBe(3)
+  expect(Array.from(node0Edges.subarray(0, ITEMS_PER_EDGE3))).toEqual([2, 1, 1])
 })

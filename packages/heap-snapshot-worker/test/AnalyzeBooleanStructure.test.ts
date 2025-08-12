@@ -30,7 +30,6 @@ const analyzeBooleanStructure = (snapshot: any, sourceNodeId: number, propertyNa
   }
 
   const edgeMap = createEdgeMap(nodes, nodeFields)
-  const ITEMS_PER_NODE = nodeFields.length
   const ITEMS_PER_EDGE = edgeFields.length
   const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
   const nodeEdges = getNodeEdgesFast(sourceNodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
@@ -44,12 +43,12 @@ const analyzeBooleanStructure = (snapshot: any, sourceNodeId: number, propertyNa
   const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
   const EDGE_TYPE_INTERNAL = edgeTypes.indexOf('internal')
 
-  const ITEMS_PER_EDGE = edgeFields.length
+  const ITEMS_PER_EDGE2 = edgeFields.length
   const edgeTypeFieldIndex = edgeFields.indexOf('type')
   const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
   const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
 
-  for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
+  for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE2) {
     const type = nodeEdges[i + edgeTypeFieldIndex]
     const nameIndex = nodeEdges[i + edgeNameFieldIndex]
     const toNode = nodeEdges[i + edgeToNodeFieldIndex]

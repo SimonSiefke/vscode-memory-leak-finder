@@ -243,6 +243,8 @@ const collectObjectPropertiesInline = (
 
   const ITEMS_PER_NODE = nodeFields.length
   const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
+  const ITEMS_PER_EDGE = edgeFields.length
+  const EDGE_TYPE_INTERNAL = edgeTypes.indexOf('internal')
   const idFieldIndex = nodeFields.indexOf('id')
   const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
   const edgeTypeFieldIndex = edgeFields.indexOf('type')
@@ -306,17 +308,83 @@ const collectObjectPropertiesInline = (
           value = `[Array ${targetNode.id}]`
         }
       } else if (targetType === 'string' || targetType === 'number') {
-        value = getActualValue(targetNode, snapshot, edgeMap, visited)
+        value = getActualValueFast(
+          targetNode,
+          snapshot,
+          edgeMap,
+          visited,
+          targetNodeIndex,
+          nodeFields,
+          nodeTypes,
+          edgeFields,
+          strings,
+          ITEMS_PER_NODE,
+          ITEMS_PER_EDGE,
+          idFieldIndex,
+          edgeCountFieldIndex,
+          edgeTypeFieldIndex,
+          edgeNameFieldIndex,
+          edgeToNodeFieldIndex,
+          EDGE_TYPE_INTERNAL,
+          NODE_TYPE_STRING,
+          NODE_TYPE_NUMBER,
+          NODE_TYPE_OBJECT,
+          NODE_TYPE_ARRAY,
+        )
       } else if (targetType === 'hidden') {
         // For hidden nodes, check if it's a boolean or other special value
         const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap, propertyName)
         if (booleanValue) {
           value = booleanValue
         } else {
-          value = getActualValue(targetNode, snapshot, edgeMap, visited)
+          value = getActualValueFast(
+            targetNode,
+            snapshot,
+            edgeMap,
+            visited,
+            targetNodeIndex,
+            nodeFields,
+            nodeTypes,
+            edgeFields,
+            strings,
+            ITEMS_PER_NODE,
+            ITEMS_PER_EDGE,
+            idFieldIndex,
+            edgeCountFieldIndex,
+            edgeTypeFieldIndex,
+            edgeNameFieldIndex,
+            edgeToNodeFieldIndex,
+            EDGE_TYPE_INTERNAL,
+            NODE_TYPE_STRING,
+            NODE_TYPE_NUMBER,
+            NODE_TYPE_OBJECT,
+            NODE_TYPE_ARRAY,
+          )
         }
       } else if (targetType === 'code') {
-        value = getActualValue(targetNode, snapshot, edgeMap, visited)
+        value = getActualValueFast(
+          targetNode,
+          snapshot,
+          edgeMap,
+          visited,
+          targetNodeIndex,
+          nodeFields,
+          nodeTypes,
+          edgeFields,
+          strings,
+          ITEMS_PER_NODE,
+          ITEMS_PER_EDGE,
+          idFieldIndex,
+          edgeCountFieldIndex,
+          edgeTypeFieldIndex,
+          edgeNameFieldIndex,
+          edgeToNodeFieldIndex,
+          EDGE_TYPE_INTERNAL,
+          NODE_TYPE_STRING,
+          NODE_TYPE_NUMBER,
+          NODE_TYPE_OBJECT,
+          NODE_TYPE_ARRAY,
+        )
       } else {
         value = `[${targetType} ${targetNode.id}]`
       }
