@@ -1,5 +1,5 @@
 import { getObjectsWithPropertiesInternal } from '../GetObjectsWithPropertiesInternal/GetObjectsWithPropertiesInternal.ts'
-import { PrintedValue } from '../PrintAst/PrintAst.ts'
+import type { PrintedValue } from '../PrintedValue/PrintedValue.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 /**
