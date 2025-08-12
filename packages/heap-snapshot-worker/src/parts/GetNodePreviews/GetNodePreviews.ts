@@ -32,6 +32,10 @@ export const getNodePreviews = (
   EDGE_TYPE_PROPERTY: number,
   EDGE_TYPE_INTERNAL: number,
   propertyNameIndex: number,
+  NODE_TYPE_STRING: number,
+  NODE_TYPE_NUMBER: number,
+  NODE_TYPE_OBJECT: number,
+  NODE_TYPE_ARRAY: number,
 ): ObjectWithProperty[] => {
   const tTotal = Timing.timeStart('GetNodePreviews.build')
   const { nodes, edges } = snapshot
@@ -119,10 +123,10 @@ export const getNodePreviews = (
           edgeNameFieldIndex,
           edgeToNodeFieldIndex,
           EDGE_TYPE_INTERNAL,
-          /* NODE_TYPE_STRING */ nodeTypes[0].indexOf('string'),
-          /* NODE_TYPE_NUMBER */ nodeTypes[0].indexOf('number'),
-          /* NODE_TYPE_OBJECT */ nodeTypes[0].indexOf('object'),
-          /* NODE_TYPE_ARRAY */ nodeTypes[0].indexOf('array'),
+          NODE_TYPE_STRING,
+          NODE_TYPE_NUMBER,
+          NODE_TYPE_OBJECT,
+          NODE_TYPE_ARRAY,
         )
         if (actualValue === 'true') {
           result.propertyValue = true
@@ -158,6 +162,10 @@ export const getNodePreviews = (
         edgeToNodeFieldIndex,
         EDGE_TYPE_PROPERTY,
         EDGE_TYPE_INTERNAL,
+        NODE_TYPE_STRING,
+        NODE_TYPE_NUMBER,
+        NODE_TYPE_OBJECT,
+        NODE_TYPE_ARRAY,
       )
       Timing.timeEnd('CollectObjectProperties.total', tCollect)
     }

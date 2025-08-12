@@ -38,6 +38,10 @@ export const collectObjectProperties = (
   edgeToNodeFieldIndex: number,
   EDGE_TYPE_PROPERTY: number,
   EDGE_TYPE_INTERNAL: number,
+  NODE_TYPE_STRING: number,
+  NODE_TYPE_NUMBER: number,
+  NODE_TYPE_OBJECT: number,
+  NODE_TYPE_ARRAY: number,
 ): Record<string, any> => {
   const tTotal = Timing.timeStart('CollectObjectProperties.walk')
   if (depth <= 0) {
@@ -113,6 +117,10 @@ export const collectObjectProperties = (
             edgeToNodeFieldIndex,
             EDGE_TYPE_PROPERTY,
             EDGE_TYPE_INTERNAL,
+            NODE_TYPE_STRING,
+            NODE_TYPE_NUMBER,
+            NODE_TYPE_OBJECT,
+            NODE_TYPE_ARRAY,
           )
           if (Object.keys(nestedProperties).length > 0) {
             // Return as nested object
@@ -167,10 +175,10 @@ export const collectObjectProperties = (
           edgeNameFieldIndex,
           edgeToNodeFieldIndex,
           EDGE_TYPE_INTERNAL,
-          /* NODE_TYPE_STRING */ nodeTypes[0].indexOf('string'),
-          /* NODE_TYPE_NUMBER */ nodeTypes[0].indexOf('number'),
-          /* NODE_TYPE_OBJECT */ nodeTypes[0].indexOf('object'),
-          /* NODE_TYPE_ARRAY */ nodeTypes[0].indexOf('array'),
+          NODE_TYPE_STRING,
+          NODE_TYPE_NUMBER,
+          NODE_TYPE_OBJECT,
+          NODE_TYPE_ARRAY,
         )
         if (targetType === 'number') {
           const parsed = Number(actual)
@@ -228,10 +236,10 @@ export const collectObjectProperties = (
             edgeNameFieldIndex,
             edgeToNodeFieldIndex,
             EDGE_TYPE_INTERNAL,
-            /* NODE_TYPE_STRING */ nodeTypes[0].indexOf('string'),
-            /* NODE_TYPE_NUMBER */ nodeTypes[0].indexOf('number'),
-            /* NODE_TYPE_OBJECT */ nodeTypes[0].indexOf('object'),
-            /* NODE_TYPE_ARRAY */ nodeTypes[0].indexOf('array'),
+            NODE_TYPE_STRING,
+            NODE_TYPE_NUMBER,
+            NODE_TYPE_OBJECT,
+            NODE_TYPE_ARRAY,
           )
         }
       } else if (targetType === 'code') {
@@ -254,10 +262,10 @@ export const collectObjectProperties = (
           edgeNameFieldIndex,
           edgeToNodeFieldIndex,
           EDGE_TYPE_INTERNAL,
-          /* NODE_TYPE_STRING */ nodeTypes[0].indexOf('string'),
-          /* NODE_TYPE_NUMBER */ nodeTypes[0].indexOf('number'),
-          /* NODE_TYPE_OBJECT */ nodeTypes[0].indexOf('object'),
-          /* NODE_TYPE_ARRAY */ nodeTypes[0].indexOf('array'),
+          NODE_TYPE_STRING,
+          NODE_TYPE_NUMBER,
+          NODE_TYPE_OBJECT,
+          NODE_TYPE_ARRAY,
         )
       } else if (targetType === 'closure') {
         // Prefer showing function location if available

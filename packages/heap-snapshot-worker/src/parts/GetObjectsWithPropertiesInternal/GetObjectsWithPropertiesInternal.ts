@@ -40,6 +40,11 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
   const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
   const EDGE_TYPE_INTERNAL = edgeTypes.indexOf('internal')
   const propertyNameIndex = strings.findIndex((s) => s === propertyName)
+  const nodeTypeNames = nodeTypes[0] || []
+  const NODE_TYPE_STRING = nodeTypeNames.indexOf('string')
+  const NODE_TYPE_NUMBER = nodeTypeNames.indexOf('number')
+  const NODE_TYPE_OBJECT = nodeTypeNames.indexOf('object')
+  const NODE_TYPE_ARRAY = nodeTypeNames.indexOf('array')
 
   const tMatching = Timing.timeStart('GetObjectWithPropertyNodeIndices.total')
   const matchingNodeIndices = getObjectWithPropertyNodeIndices(snapshot, propertyName)
@@ -65,6 +70,10 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
     EDGE_TYPE_PROPERTY,
     EDGE_TYPE_INTERNAL,
     propertyNameIndex,
+    NODE_TYPE_STRING,
+    NODE_TYPE_NUMBER,
+    NODE_TYPE_OBJECT,
+    NODE_TYPE_ARRAY,
   )
   Timing.timeEnd('GetNodePreviews.total', tPreviews)
 
