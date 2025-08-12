@@ -1,7 +1,7 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
-import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
+import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 
 // Cache for boolean nodes analysis to avoid re-scanning the entire snapshot
@@ -210,51 +210,53 @@ export const getBooleanStructure = (
   snapshot: Snapshot,
   edgeMap: Uint32Array,
   propertyName: string,
+  sourceNodeIndex: number,
+  nodeFields: readonly string[],
+  ITEMS_PER_NODE: number,
+  ITEMS_PER_EDGE: number,
+  edgeCountFieldIndex: number,
+  edgeTypeFieldIndex: number,
+  edgeNameFieldIndex: number,
+  edgeToNodeFieldIndex: number,
+  EDGE_TYPE_PROPERTY: number,
+  EDGE_TYPE_INTERNAL: number,
 ): { value: string; hasTypeReference: boolean } | null => {
   if (!sourceNode) return null
 
-  const { nodes, edges, strings, meta } = snapshot
-  const nodeFields = meta.node_fields
-  const edgeFields = meta.edge_fields
-  const ITEMS_PER_NODE = nodeFields.length
+  const { nodes, edges, strings } = snapshot
 
-  // Find the source node index
-  const idFieldIndex = nodeFields.indexOf('id')
-  let sourceNodeIndex = -1
-  for (let i = 0; i < nodes.length; i += ITEMS_PER_NODE) {
-    if (nodes[i + idFieldIndex] === sourceNode.id) {
-      sourceNodeIndex = i / ITEMS_PER_NODE
-      break
-    }
-  }
+  // sourceNodeIndex is provided by the caller to avoid a full scan
+  if (sourceNodeIndex < 0) return null
 
-  if (sourceNodeIndex === -1) return null
-
-  // Get edges for this node
-  const nodeEdges = getNodeEdges(sourceNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
+  // Get edges for this node (as subarray)
+  const nodeEdges = getNodeEdgesFast(sourceNodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
 
   // Find property name index
   const propertyNameIndex = strings.findIndex((str) => str === propertyName)
   if (propertyNameIndex === -1) return null
 
   // Get edge type indices
-  const edgeTypes = meta.edge_types[0] || []
-  const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
-  const EDGE_TYPE_INTERNAL = edgeTypes.indexOf('internal')
+  // EDGE_TYPE_* are provided
 
   let booleanValue: string | null = null
   let hasTypeReference = false
 
   // Analyze edges to find boolean pattern
-  for (const edge of nodeEdges) {
-    const targetNodeIndex = Math.floor(edge.toNode / ITEMS_PER_NODE)
+  // Field indices and counts provided
+  for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
+    const type = nodeEdges[i + edgeTypeFieldIndex]
+    const nameIndex = nodeEdges[i + edgeNameFieldIndex]
+    const toNode = nodeEdges[i + edgeToNodeFieldIndex]
+    const targetNodeIndex = Math.floor(toNode / ITEMS_PER_NODE)
     const targetNode = parseNode(targetNodeIndex, nodes, nodeFields)
-    if (!targetNode) continue
+    if (!targetNode) {
+      continue
+    }
 
     const targetNodeName = getNodeName(targetNode, strings)
 
     // Check for property edge to boolean value
-    if (edge.type === EDGE_TYPE_PROPERTY && edge.nameIndex === propertyNameIndex) {
+    if (type === EDGE_TYPE_PROPERTY && nameIndex === propertyNameIndex) {
       const valueCheck = getBooleanValue(targetNode, snapshot, edgeMap, propertyName)
       if (valueCheck) {
         booleanValue = valueCheck
@@ -262,7 +264,7 @@ export const getBooleanStructure = (
     }
 
     // Check for internal edge to boolean type
-    if (edge.type === EDGE_TYPE_INTERNAL && targetNodeName === 'boolean') {
+    if (type === EDGE_TYPE_INTERNAL && targetNodeName === 'boolean') {
       hasTypeReference = true
     }
   }
