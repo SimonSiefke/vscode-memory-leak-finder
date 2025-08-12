@@ -17,12 +17,14 @@ async function testGetObjectsWithProperties() {
   try {
     // Prepare the heap snapshot
     console.time('prepare')
-    const snapshot1 = await prepareHeapSnapshot(beforePath, {
-      parseStrings: true,
-    })
-    const snapshot2 = await prepareHeapSnapshot(afterPath, {
-      parseStrings: true,
-    })
+    const [snapshot1, snapshot2] = await Promise.all([
+      prepareHeapSnapshot(beforePath, {
+        parseStrings: true,
+      }),
+      prepareHeapSnapshot(afterPath, {
+        parseStrings: true,
+      }),
+    ])
     console.timeEnd('prepare')
 
     console.log('Heap snapshot loaded successfully')
