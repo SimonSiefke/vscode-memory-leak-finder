@@ -143,11 +143,11 @@ export const getUndefinedStructure = (
   let hasTypeReference = false
 
   // Analyze edges to find undefined pattern
-  const ITEMS_PER_EDGE = edgeFields.length
+  const ITEMS_PER_EDGE_2 = edgeFields.length
   const edgeTypeFieldIndex = edgeFields.indexOf('type')
   const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
   const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
-  for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
+  for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE_2) {
     const type = nodeEdges[i + edgeTypeFieldIndex]
     const nameIndex = nodeEdges[i + edgeNameFieldIndex]
     const toNode = nodeEdges[i + edgeToNodeFieldIndex]

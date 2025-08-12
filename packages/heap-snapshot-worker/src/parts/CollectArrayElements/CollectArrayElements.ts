@@ -1,7 +1,7 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
-import { getActualValue } from '../GetActualValue/GetActualValue.ts'
+import { getActualValueFast } from '../GetActualValueFast/GetActualValueFast.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
@@ -31,7 +31,19 @@ export const collectArrayElements = (
   const edgeTypes = meta.edge_types[0] || []
 
   const ITEMS_PER_NODE = nodeFields.length
+  const ITEMS_PER_EDGE = edgeFields.length
   const EDGE_TYPE_ELEMENT = edgeTypes.indexOf('element')
+  const EDGE_TYPE_INTERNAL = edgeTypes.indexOf('internal')
+  const edgeTypeFieldIndex = edgeFields.indexOf('type')
+  const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
+  const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
+  const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
+  const idFieldIndex = nodeFields.indexOf('id')
+  const nodeTypeNames = nodeTypes[0] || []
+  const NODE_TYPE_STRING = nodeTypeNames.indexOf('string')
+  const NODE_TYPE_NUMBER = nodeTypeNames.indexOf('number')
+  const NODE_TYPE_OBJECT = nodeTypeNames.indexOf('object')
+  const NODE_TYPE_ARRAY = nodeTypeNames.indexOf('array')
 
   // Parse the array node to get its ID for cycle detection
   const arrayNode = parseNode(nodeIndex, nodes, nodeFields)
@@ -44,11 +56,6 @@ export const collectArrayElements = (
 
   try {
     // Get edges for this array node as subarray
-    const ITEMS_PER_EDGE = edgeFields.length
-    const edgeTypeFieldIndex = edgeFields.indexOf('type')
-    const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
-    const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
-    const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
     const nodeEdges = getNodeEdgesFast(
       nodeIndex,
       edgeMap,
@@ -114,7 +121,29 @@ export const collectArrayElements = (
         }
       } else if (targetType === 'string' || targetType === 'number') {
         // For primitives, get the actual value
-        const actual = getActualValue(targetNode, snapshot, edgeMap, visited)
+        const actual = getActualValueFast(
+          targetNode,
+          snapshot,
+          edgeMap,
+          visited,
+          targetNodeIndex,
+          nodeFields,
+          nodeTypes,
+          edgeFields,
+          strings,
+          ITEMS_PER_NODE,
+          ITEMS_PER_EDGE,
+          idFieldIndex,
+          edgeCountFieldIndex,
+          edgeTypeFieldIndex,
+          edgeNameFieldIndex,
+          edgeToNodeFieldIndex,
+          EDGE_TYPE_INTERNAL,
+          NODE_TYPE_STRING,
+          NODE_TYPE_NUMBER,
+          NODE_TYPE_OBJECT,
+          NODE_TYPE_ARRAY,
+        )
         if (targetType === 'number') {
           const parsed = Number(actual)
           if (Number.isFinite(parsed)) {
@@ -131,11 +160,55 @@ export const collectArrayElements = (
         if (booleanValue) {
           value = booleanValue
         } else {
-          value = getActualValue(targetNode, snapshot, edgeMap, visited)
+          value = getActualValueFast(
+            targetNode,
+            snapshot,
+            edgeMap,
+            visited,
+            targetNodeIndex,
+            nodeFields,
+            nodeTypes,
+            edgeFields,
+            strings,
+            ITEMS_PER_NODE,
+            ITEMS_PER_EDGE,
+            idFieldIndex,
+            edgeCountFieldIndex,
+            edgeTypeFieldIndex,
+            edgeNameFieldIndex,
+            edgeToNodeFieldIndex,
+            EDGE_TYPE_INTERNAL,
+            NODE_TYPE_STRING,
+            NODE_TYPE_NUMBER,
+            NODE_TYPE_OBJECT,
+            NODE_TYPE_ARRAY,
+          )
         }
       } else if (targetType === 'code') {
         // For code objects, try to get the actual value they represent
-        value = getActualValue(targetNode, snapshot, edgeMap, visited)
+        value = getActualValueFast(
+          targetNode,
+          snapshot,
+          edgeMap,
+          visited,
+          targetNodeIndex,
+          nodeFields,
+          nodeTypes,
+          edgeFields,
+          strings,
+          ITEMS_PER_NODE,
+          ITEMS_PER_EDGE,
+          idFieldIndex,
+          edgeCountFieldIndex,
+          edgeTypeFieldIndex,
+          edgeNameFieldIndex,
+          edgeToNodeFieldIndex,
+          EDGE_TYPE_INTERNAL,
+          NODE_TYPE_STRING,
+          NODE_TYPE_NUMBER,
+          NODE_TYPE_OBJECT,
+          NODE_TYPE_ARRAY,
+        )
       } else {
         // For other types
         value = `[${targetType} ${targetNode.id}]`
@@ -170,6 +243,16 @@ const collectObjectPropertiesInline = (
 
   const ITEMS_PER_NODE = nodeFields.length
   const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
+  const idFieldIndex = nodeFields.indexOf('id')
+  const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
+  const edgeTypeFieldIndex = edgeFields.indexOf('type')
+  const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
+  const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
+  const nodeTypeNames = nodeTypes[0] || []
+  const NODE_TYPE_STRING = nodeTypeNames.indexOf('string')
+  const NODE_TYPE_NUMBER = nodeTypeNames.indexOf('number')
+  const NODE_TYPE_OBJECT = nodeTypeNames.indexOf('object')
+  const NODE_TYPE_ARRAY = nodeTypeNames.indexOf('array')
 
   const properties: Record<string, any> = {}
 
@@ -180,11 +263,6 @@ const collectObjectPropertiesInline = (
   }
 
   // Get edges for this node
-  const ITEMS_PER_EDGE = edgeFields.length
-  const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
-  const edgeTypeFieldIndex = edgeFields.indexOf('type')
-  const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
-  const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
   const nodeEdges = getNodeEdgesFast(nodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
 
   // Scan edges for properties

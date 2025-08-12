@@ -4,7 +4,7 @@ import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
-import { getActualValue } from '../GetActualValue/GetActualValue.ts'
+import { getActualValueFast } from '../GetActualValueFast/GetActualValueFast.ts'
 
 export interface NodeExaminationResult {
   nodeIndex: number
@@ -88,7 +88,6 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
 
   // Process edges to get detailed information
   const edgeTypeNames = edge_types[0] || []
-  const ITEMS_PER_EDGE = edge_fields.length
   const edgeTypeFieldIndex = edge_fields.indexOf('type')
   const edgeNameFieldIndex = edge_fields.indexOf('name_or_index')
   const edgeToNodeFieldIndex = edge_fields.indexOf('to_node')
@@ -135,7 +134,39 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
         const targetNode = parseNode(targetNodeIndex, nodes, node_fields)
         if (targetNode) {
           try {
-            const detectedValue = getActualValue(targetNode, snapshot, edgeMap)
+            const edgeTypeFieldIndex = edge_fields.indexOf('type')
+            const edgeNameFieldIndex = edge_fields.indexOf('name_or_index')
+            const edgeToNodeFieldIndex = edge_fields.indexOf('to_node')
+            const idFieldIndex = node_fields.indexOf('id')
+            const nodeTypeNames = node_types[0] || []
+            const NODE_TYPE_STRING = nodeTypeNames.indexOf('string')
+            const NODE_TYPE_NUMBER = nodeTypeNames.indexOf('number')
+            const NODE_TYPE_OBJECT = nodeTypeNames.indexOf('object')
+            const NODE_TYPE_ARRAY = nodeTypeNames.indexOf('array')
+            const EDGE_TYPE_INTERNAL = (edge_types[0] || []).indexOf('internal')
+            const detectedValue = getActualValueFast(
+              targetNode,
+              snapshot,
+              edgeMap,
+              new Set<number>(),
+              targetNodeIndex,
+              node_fields,
+              node_types,
+              edge_fields,
+              strings,
+              ITEMS_PER_NODE,
+              ITEMS_PER_EDGE,
+              idFieldIndex,
+              edgeCountFieldIndex,
+              edgeTypeFieldIndex,
+              edgeNameFieldIndex,
+              edgeToNodeFieldIndex,
+              EDGE_TYPE_INTERNAL,
+              NODE_TYPE_STRING,
+              NODE_TYPE_NUMBER,
+              NODE_TYPE_OBJECT,
+              NODE_TYPE_ARRAY,
+            )
             // Use detected value if it's not null and different from basic name, or if it's an empty string
             if (detectedValue !== null && (detectedValue !== edge.targetNodeInfo.name || detectedValue === '')) {
               actualValue = detectedValue

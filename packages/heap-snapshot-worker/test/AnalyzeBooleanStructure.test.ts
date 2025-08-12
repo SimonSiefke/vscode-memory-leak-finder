@@ -1,7 +1,7 @@
 import { test, expect } from '@jest/globals'
 import { parseNode } from '../src/parts/ParseNode/ParseNode.ts'
 import { createEdgeMap } from '../src/parts/CreateEdgeMap/CreateEdgeMap.ts'
-import { getNodeEdges } from '../src/parts/GetNodeEdges/GetNodeEdges.ts'
+import { getNodeEdgesFast } from '../src/parts/GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { getNodeName } from '../src/parts/GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../src/parts/GetNodeTypeName/GetNodeTypeName.ts'
 import { getBooleanValue } from '../src/parts/GetBooleanValue/GetBooleanValue.ts'
@@ -30,7 +30,10 @@ const analyzeBooleanStructure = (snapshot: any, sourceNodeId: number, propertyNa
   }
 
   const edgeMap = createEdgeMap(nodes, nodeFields)
-  const nodeEdges = getNodeEdges(sourceNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
+  const ITEMS_PER_NODE = nodeFields.length
+  const ITEMS_PER_EDGE = edgeFields.length
+  const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
+  const nodeEdges = getNodeEdgesFast(sourceNodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
 
   // Find all edges related to the property (both direct property and internal edges)
   const propertyNameIndex = strings.findIndex((str) => str === propertyName)
