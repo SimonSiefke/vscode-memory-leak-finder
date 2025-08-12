@@ -33,7 +33,7 @@ async function testGetObjectsWithProperties() {
     Timing.report('getObjectsWithPropertiesInternal breakdown')
 
     // console.log(JSON.stringify({ oldStateObjects }, null, 2))
-    // await writeFile(resultPath, JSON.stringify(oldStateObjects, null, 2) + '\n')
+    await writeFile(resultPath, JSON.stringify(oldStateObjects, null, 2) + '\n')
   } catch (error) {
     console.error('Error testing getObjectsWithProperties:', error)
   }

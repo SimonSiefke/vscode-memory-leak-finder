@@ -97,5 +97,3 @@ export type AstNode =
   | SetNode
   | CodeNode
   | UnknownNode
-
-
