@@ -1,5 +1,5 @@
 import { getActualValue } from '../GetActualValue/GetActualValue.ts'
-import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
+import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
@@ -22,8 +22,9 @@ export const tryResolveNestedNumeric = (
     return null
   }
 
-  const nodeEdges = getNodeEdges(containerNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
   const ITEMS_PER_EDGE = edgeFields.length
+  const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
+  const nodeEdges = getNodeEdgesFast(containerNodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
   const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
   const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
   for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {

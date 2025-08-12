@@ -1,6 +1,6 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
-import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
+import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
@@ -81,7 +81,10 @@ export const examineNodeByIndex = (nodeIndex: number, snapshot: Snapshot): NodeE
   const edgeMap = createEdgeMap(nodes, node_fields)
 
   // Get all edges for this node as a subarray
-  const nodeEdges = getNodeEdges(nodeIndex, edgeMap, nodes, edges, node_fields, edge_fields)
+  const ITEMS_PER_NODE = node_fields.length
+  const ITEMS_PER_EDGE = edge_fields.length
+  const edgeCountFieldIndex = node_fields.indexOf('edge_count')
+  const nodeEdges = getNodeEdgesFast(nodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
 
   // Process edges to get detailed information
   const edgeTypeNames = edge_types[0] || []

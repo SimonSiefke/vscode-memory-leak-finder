@@ -1,7 +1,7 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
-import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
+import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 
 // Cache for undefined nodes analysis to avoid re-scanning the entire snapshot
@@ -126,7 +126,9 @@ export const getUndefinedStructure = (
   if (sourceNodeIndex === -1) return null
 
   // Get edges for this node (as subarray)
-  const nodeEdges = getNodeEdges(sourceNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
+  const ITEMS_PER_EDGE = edgeFields.length
+  const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
+  const nodeEdges = getNodeEdgesFast(sourceNodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
 
   // Find property name index
   const propertyNameIndex = strings.findIndex((str) => str === propertyName)

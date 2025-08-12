@@ -1,7 +1,7 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
-import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
+import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 
 // Cache for boolean nodes analysis to avoid re-scanning the entire snapshot
@@ -212,9 +212,9 @@ export const getBooleanStructure = (
   propertyName: string,
   sourceNodeIndex: number,
   nodeFields: readonly string[],
-  edgeFields: readonly string[],
   ITEMS_PER_NODE: number,
   ITEMS_PER_EDGE: number,
+  edgeCountFieldIndex: number,
   edgeTypeFieldIndex: number,
   edgeNameFieldIndex: number,
   edgeToNodeFieldIndex: number,
@@ -229,7 +229,7 @@ export const getBooleanStructure = (
   if (sourceNodeIndex < 0) return null
 
   // Get edges for this node (as subarray)
-  const nodeEdges = getNodeEdges(sourceNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
+  const nodeEdges = getNodeEdgesFast(sourceNodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
 
   // Find property name index
   const propertyNameIndex = strings.findIndex((str) => str === propertyName)
