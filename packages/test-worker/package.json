@@ -19,8 +19,5 @@
     "@lvce-editor/rpc": "^4.14.0",
     "@lvce-editor/verror": "^1.7.0"
   },
-  "devDependencies": {
-    "@types/jest": "^30.0.0",
-    "ts-jest": "^29.4.1"
-  }
+  "devDependencies": {}
 }
