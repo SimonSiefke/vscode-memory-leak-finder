@@ -78,6 +78,9 @@ export interface SetNode extends BaseAstNode {
 export interface CodeNode extends BaseAstNode {
   type: 'code' | 'closure'
   value?: string
+  scriptId?: number
+  line?: number
+  column?: number
 }
 
 export interface UnknownNode extends BaseAstNode {

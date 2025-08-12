@@ -1,5 +1,6 @@
 import type { ArrayNode, AstNode, ObjectNode, PropertyEntry } from '../AstNode/AstNode.ts'
 import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
+import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
@@ -133,7 +134,27 @@ export const buildAstForNode = (
   }
 
   if (nodeTypeName === 'code' || nodeTypeName === 'closure') {
-    return { type: nodeTypeName as any, id, name }
+    // Include scriptId, line, column on the AST node itself
+    let scriptIdValue: number | undefined
+    let lineValue: number | undefined
+    let columnValue: number | undefined
+    const locationFields = snapshot.meta.location_fields
+    const locations = snapshot.locations
+    if (locationFields && locationFields.length > 0 && locations && locations.length > 0) {
+      const { itemsPerLocation, objectIndexOffset, scriptIdOffset, lineOffset, columnOffset } = getLocationFieldOffsets(locationFields)
+      const objectIndexViaTrace = typeof node.trace_node_id === 'number' && node.trace_node_id !== 0 ? node.trace_node_id : -1
+      const objectIndexViaNode = nodeIndex
+      for (let locIndex = 0; locIndex < locations.length; locIndex += itemsPerLocation) {
+        const objectIndex = locations[locIndex + objectIndexOffset] / ITEMS_PER_NODE
+        if (objectIndex === objectIndexViaTrace || objectIndex === objectIndexViaNode) {
+          scriptIdValue = locations[locIndex + scriptIdOffset]
+          lineValue = locations[locIndex + lineOffset]
+          columnValue = locations[locIndex + columnOffset]
+          break
+        }
+      }
+    }
+    return { type: nodeTypeName as any, id, name, scriptId: scriptIdValue, line: lineValue, column: columnValue }
   }
 
   return createUnknown(id, name, `[${nodeTypeName} ${id}]`)
