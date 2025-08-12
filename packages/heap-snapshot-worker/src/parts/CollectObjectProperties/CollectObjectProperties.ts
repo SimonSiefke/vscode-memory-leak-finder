@@ -9,6 +9,7 @@ import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
 import { tryResolveNestedNumeric } from '../TryResolveNestedNumeric/TryResolveNestedNumeric.ts'
 import * as Timing from '../Timing/Timing.ts'
+import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 
 /**
  * Collects properties of an object with optional depth control
@@ -31,6 +32,7 @@ export const collectObjectProperties = (
   strings: readonly string[],
   ITEMS_PER_NODE: number,
   ITEMS_PER_EDGE: number,
+  edgeCountFieldIndex: number,
   edgeTypeFieldIndex: number,
   edgeNameFieldIndex: number,
   edgeToNodeFieldIndex: number,
@@ -58,7 +60,15 @@ export const collectObjectProperties = (
 
   // Get edges for this node as subarray
   const tEdges = Timing.timeStart('CollectObjectProperties.getNodeEdges')
-  const nodeEdges = getNodeEdges(nodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
+  const nodeEdges = getNodeEdgesFast(
+    nodeIndex,
+    edgeMap,
+    nodes,
+    edges,
+    ITEMS_PER_NODE,
+    ITEMS_PER_EDGE,
+    edgeCountFieldIndex,
+  )
   Timing.timeEnd('CollectObjectProperties.getNodeEdges', tEdges)
 
   // Scan edges for properties (excluding internal edges which don't count toward depth)
