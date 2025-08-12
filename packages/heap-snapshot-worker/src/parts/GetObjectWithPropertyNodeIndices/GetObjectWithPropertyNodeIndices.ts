@@ -1,5 +1,6 @@
 import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
 import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
+import * as Timing from '../Timing/Timing.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 /**
@@ -7,6 +8,7 @@ import type { Snapshot } from '../Snapshot/Snapshot.ts'
  * The returned indices are logical node indices (0-based), not array offsets.
  */
 export const getObjectWithPropertyNodeIndices = (snapshot: Snapshot, propertyName: string): number[] => {
+  const tTotal = Timing.timeStart('GetObjectWithPropertyNodeIndices.scan')
   const { nodes, edges, strings, meta } = snapshot
 
   const nodeFields = meta.node_fields
@@ -29,10 +31,13 @@ export const getObjectWithPropertyNodeIndices = (snapshot: Snapshot, propertyNam
 
   const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
 
+  const tEdgeMap = Timing.timeStart('CreateEdgeMap.total')
   const edgeMap = createEdgeMap(nodes, nodeFields)
+  Timing.timeEnd('CreateEdgeMap.total', tEdgeMap)
 
   const result: number[] = []
 
+  const tLoop = Timing.timeStart('GetObjectWithPropertyNodeIndices.loop')
   for (let nodeOffset = 0; nodeOffset < nodes.length; nodeOffset += ITEMS_PER_NODE) {
     const nodeIndex = nodeOffset / ITEMS_PER_NODE
     const nodeEdges = getNodeEdges(nodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
@@ -46,6 +51,8 @@ export const getObjectWithPropertyNodeIndices = (snapshot: Snapshot, propertyNam
       }
     }
   }
+  Timing.timeEnd('GetObjectWithPropertyNodeIndices.loop', tLoop)
 
+  Timing.timeEnd('GetObjectWithPropertyNodeIndices.scan', tTotal)
   return result
 }
