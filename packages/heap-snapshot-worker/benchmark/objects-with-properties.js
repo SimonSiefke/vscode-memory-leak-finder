@@ -1,8 +1,6 @@
 import { writeFile } from 'fs/promises'
-import {
-  getObjectsWithPropertiesInternal,
-  getObjectsWithPropertiesInternalAst,
-} from '../src/parts/GetObjectsWithPropertiesInternal/GetObjectsWithPropertiesInternal.ts'
+import { getObjectsWithPropertiesInternal } from '../src/parts/GetObjectsWithPropertiesInternal/GetObjectsWithPropertiesInternal.ts'
+import { getObjectsWithPropertiesInternalAst } from '../src/parts/GetObjectsWithPropertiesInternalAst/GetObjectsWithPropertiesInternalAst.ts'
 import { prepareHeapSnapshot } from '../src/parts/PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 import * as Timing from '../src/parts/Timing/Timing.ts'
 
