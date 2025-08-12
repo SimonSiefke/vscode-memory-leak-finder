@@ -36,26 +36,10 @@ test('should find objects with specified property', () => {
 
   expect(result).toHaveLength(2)
   expect(result[0]).toEqual({
-    id: 1,
-    name: 'Object1',
-    propertyValue: '[Object 4]',
-    type: 'object',
-    selfSize: 100,
-    edgeCount: 1,
-    preview: {
-      test: '[Object 4]',
-    },
+    test: '[Object 4]',
   })
   expect(result[1]).toEqual({
-    id: 2,
-    name: 'Object2',
-    propertyValue: '[Object 5]',
-    type: 'object',
-    selfSize: 50,
-    edgeCount: 1,
-    preview: {
-      test: '[Object 5]',
-    },
+    test: '[Object 5]',
   })
 })
 
@@ -119,15 +103,7 @@ test('should handle string property values', () => {
 
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
-    id: 1,
-    name: 'Object1',
-    propertyValue: 'hello',
-    type: 'object',
-    selfSize: 100,
-    edgeCount: 1,
-    preview: {
-      test: 'hello',
-    },
+    test: 'hello',
   })
 })
 
@@ -161,15 +137,7 @@ test('should handle number property values', () => {
 
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
-    id: 1,
-    name: 'Object1',
-    propertyValue: 42,
-    type: 'object',
-    selfSize: 100,
-    edgeCount: 1,
-    preview: {
-      test: 42,
-    },
+    test: 42,
   })
 })
 
@@ -229,15 +197,7 @@ test('should handle code object with internal string reference', () => {
 
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
-    id: 1,
-    name: 'Object1',
-    propertyValue: '"hello"',
-    type: 'object',
-    selfSize: 100,
-    edgeCount: 1,
-    preview: {
-      test: '"hello"',
-    },
+    test: '"hello"',
   })
 })
 
@@ -407,15 +367,7 @@ test('should handle code object with incoming string reference (like the real ca
 
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
-    id: 1,
-    name: 'Object1',
-    propertyValue: '"1"',
-    type: 'object',
-    selfSize: 100,
-    edgeCount: 1,
-    preview: {
-      test: '"1"',
-    },
+    test: '"1"',
   })
 })
 
@@ -546,15 +498,7 @@ test('should handle code object with both internal and incoming references (prio
 
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
-    id: 1,
-    name: 'Object1',
-    propertyValue: '"incoming"',
-    type: 'object',
-    selfSize: 100,
-    edgeCount: 1,
-    preview: {
-      test: '"incoming"',
-    },
+    test: '"incoming"',
   })
 })
 
@@ -634,17 +578,9 @@ test('should collect object properties with depth 1', () => {
 
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
-    id: 1,
-    name: 'TestObject',
-    propertyValue: 'hello',
-    type: 'object',
-    selfSize: 100,
-    edgeCount: 3,
-    preview: {
-      config: '[Object 4]',
-      newState: 42,
-      oldState: 'hello',
-    },
+    config: '[Object 4]',
+    newState: 42,
+    oldState: 'hello',
   })
 })
 
@@ -677,15 +613,7 @@ test('should not collect properties with depth 0', () => {
   const result = getObjectsWithPropertiesInternal(snapshot, 'test', 0)
 
   expect(result).toHaveLength(1)
-  expect(result[0]).toEqual({
-    id: 1,
-    name: 'TestObject',
-    propertyValue: 'hello',
-    type: 'object',
-    selfSize: 100,
-    edgeCount: 1,
-  })
-  expect(result[0].preview).toBeUndefined()
+  expect(result[0]).toEqual({})
 })
 
 test('should exclude internal edges from properties collection', () => {
@@ -720,19 +648,8 @@ test('should exclude internal edges from properties collection', () => {
 
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
-    id: 1,
-    name: 'TestObject',
-    propertyValue: 'hello',
-    type: 'object',
-    selfSize: 100,
-    edgeCount: 2,
-    preview: {
-      test: 'hello',
-    },
+    test: 'hello',
   })
-
-  // Should not include the internal edge in preview
-  expect(result[0].preview?.internalProp).toBeUndefined()
 })
 
 test('should collect nested properties with depth 2', () => {
@@ -773,20 +690,12 @@ test('should collect nested properties with depth 2', () => {
 
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
-    id: 1,
-    name: 'MainObject',
-    propertyValue: '[Object 2]',
-    type: 'object',
-    selfSize: 100,
-    edgeCount: 2,
-    preview: {
-      oldState: {
-        filteredItems: 'array1',
-        items: 'array2',
-      },
-      newState: {
-        preferences: 'settings',
-      },
+    oldState: {
+      filteredItems: 'array1',
+      items: 'array2',
+    },
+    newState: {
+      preferences: 'settings',
     },
   })
 })
@@ -1061,9 +970,8 @@ test('should show closure locations in preview as [function: scriptId:line:colum
   const result = getObjectsWithPropertiesInternal(snapshot, 'send', 1)
 
   expect(result).toHaveLength(1)
-  expect(result[0].id).toBe(1)
-  expect(result[0].preview).toBeDefined()
-  expect(result[0].preview?.send).toBe('[function: 1:201:22]')
+  // Printed format contains the function preview directly under the property name
+  expect((result as any)[0].send).toBe('[function: 1:201:22]')
 })
 
 test('should show simple array contents with primitive values', () => {
@@ -1125,14 +1033,6 @@ test('should show simple array contents with primitive values', () => {
 
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
-    id: 1,
-    name: 'TestObject',
-    propertyValue: '[Object 2]',
-    type: 'object',
-    selfSize: 100,
-    edgeCount: 1,
-    preview: {
-      items: ['hello', 'world'],
-    },
+    items: ['hello', 'world'],
   })
 })
