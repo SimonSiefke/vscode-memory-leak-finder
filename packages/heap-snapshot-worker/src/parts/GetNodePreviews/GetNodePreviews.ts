@@ -55,7 +55,7 @@ export const getNodePreviews = (
     }
 
     const tBoolean = Timing.timeStart('GetNodePreviews.booleanStructure')
-    const booleanStructure = getBooleanStructure(sourceNode, snapshot, edgeMap, propertyName)
+    const booleanStructure = getBooleanStructure(sourceNode, snapshot, edgeMap, propertyName, sourceNodeIndex)
     Timing.timeEnd('GetNodePreviews.booleanStructure', tBoolean)
     if (booleanStructure) {
       if (booleanStructure.value === 'true') {
@@ -86,7 +86,7 @@ export const getNodePreviews = (
         const tResolve = Timing.timeStart('GetNodePreviews.resolveValue')
         const targetNode = parseNode(targetNodeIndex, nodes, nodeFields)
         const targetTypeName = getNodeTypeName(targetNode, nodeTypes)
-        const actualValue = getActualValue(targetNode, snapshot, edgeMap)
+        const actualValue = getActualValue(targetNode, snapshot, edgeMap, new Set(), targetNodeIndex)
         if (actualValue === 'true') {
           result.propertyValue = true
         } else if (actualValue === 'false') {

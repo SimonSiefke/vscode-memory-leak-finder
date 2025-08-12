@@ -210,6 +210,7 @@ export const getBooleanStructure = (
   snapshot: Snapshot,
   edgeMap: Uint32Array,
   propertyName: string,
+  sourceNodeIndex: number,
 ): { value: string; hasTypeReference: boolean } | null => {
   if (!sourceNode) return null
 
@@ -218,17 +219,8 @@ export const getBooleanStructure = (
   const edgeFields = meta.edge_fields
   const ITEMS_PER_NODE = nodeFields.length
 
-  // Find the source node index
-  const idFieldIndex = nodeFields.indexOf('id')
-  let sourceNodeIndex = -1
-  for (let i = 0; i < nodes.length; i += ITEMS_PER_NODE) {
-    if (nodes[i + idFieldIndex] === sourceNode.id) {
-      sourceNodeIndex = i / ITEMS_PER_NODE
-      break
-    }
-  }
-
-  if (sourceNodeIndex === -1) return null
+  // sourceNodeIndex is provided by the caller to avoid a full scan
+  if (sourceNodeIndex < 0) return null
 
   // Get edges for this node (as subarray)
   const nodeEdges = getNodeEdges(sourceNodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)

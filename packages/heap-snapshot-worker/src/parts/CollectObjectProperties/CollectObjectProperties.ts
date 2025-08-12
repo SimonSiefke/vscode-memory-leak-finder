@@ -127,7 +127,7 @@ export const collectObjectProperties = (
         }
       } else if (targetType === 'string' || targetType === 'number') {
         // For primitives, get the actual value (use fresh visited to avoid sibling cross-contamination)
-        const actual = getActualValue(targetNode, snapshot, edgeMap, new Set())
+        const actual = getActualValue(targetNode, snapshot, edgeMap, new Set(), targetNodeIndex)
         if (targetType === 'number') {
           const parsed = Number(actual)
           if (Number.isFinite(parsed)) {
@@ -151,7 +151,7 @@ export const collectObjectProperties = (
             value = booleanValue
           }
         } else {
-          value = getActualValue(targetNode, snapshot, edgeMap, new Set())
+          value = getActualValue(targetNode, snapshot, edgeMap, new Set(), targetNodeIndex)
         }
       } else if (targetType === 'code') {
         // For code objects, try to get the actual value they represent
