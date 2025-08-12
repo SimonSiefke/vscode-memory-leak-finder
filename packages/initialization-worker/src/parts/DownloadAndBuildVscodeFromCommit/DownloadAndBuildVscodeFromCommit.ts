@@ -1,8 +1,14 @@
 import * as RepositoryWorker from '../RepositoryWorker/RepositoryWorker.ts'
 
-export const downloadAndBuildVscodeFromCommit = async (commitHash: string): Promise<string> => {
+export const downloadAndBuildVscodeFromCommit = async (
+  commitHash: string,
+  repoUrl: string,
+  reposDir: string,
+  cacheDir: string,
+  useNice: boolean,
+): Promise<string> => {
   const rpc = await RepositoryWorker.launch()
-  const path = await rpc.invoke('Download.downloadAndBuildVscodeFromCommit', commitHash)
+  const path = await rpc.invoke('Repository.downloadAndBuildVscodeFromCommit', commitHash, repoUrl, reposDir, cacheDir, useNice)
   await rpc.dispose()
   return path
 }
