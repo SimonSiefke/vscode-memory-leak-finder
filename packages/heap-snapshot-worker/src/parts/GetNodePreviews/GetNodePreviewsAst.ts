@@ -103,6 +103,7 @@ export const buildAstForNode = (
       const propNameIndex = nodeEdges[i + edgeNameFieldIndex]
       const propName = strings[propNameIndex]
       if (!propName) continue
+      if (propName === '__proto__') continue
       const toNode = nodeEdges[i + edgeToNodeFieldIndex]
       const childIndex = Math.floor(toNode / ITEMS_PER_NODE)
       const valueAst = buildAstForNode(
