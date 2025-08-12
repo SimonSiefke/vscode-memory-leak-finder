@@ -19,22 +19,21 @@ export const getNodePreviews = (
   edgeMap: Uint32Array,
   propertyName: string,
   depth: number,
+  nodeFields: readonly string[],
+  nodeTypes: readonly (readonly string[])[],
+  edgeFields: readonly string[],
+  strings: readonly string[],
+  ITEMS_PER_NODE: number,
+  ITEMS_PER_EDGE: number,
+  edgeTypeFieldIndex: number,
+  edgeNameFieldIndex: number,
+  edgeToNodeFieldIndex: number,
+  EDGE_TYPE_PROPERTY: number,
+  EDGE_TYPE_INTERNAL: number,
+  propertyNameIndex: number,
 ): ObjectWithProperty[] => {
   const tTotal = Timing.timeStart('GetNodePreviews.build')
-  const { nodes, edges, strings, meta } = snapshot
-
-  const nodeFields = meta.node_fields
-  const nodeTypes = meta.node_types
-  const edgeFields = meta.edge_fields
-  const edgeTypes = meta.edge_types[0] || []
-
-  const ITEMS_PER_NODE = nodeFields.length
-  const ITEMS_PER_EDGE = edgeFields.length
-  const edgeTypeFieldIndex = edgeFields.indexOf('type')
-  const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
-  const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
-  const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
-  const propertyNameIndex = strings.findIndex((s) => s === propertyName)
+  const { nodes, edges } = snapshot
 
   const results: ObjectWithProperty[] = []
 
@@ -55,7 +54,22 @@ export const getNodePreviews = (
     }
 
     const tBoolean = Timing.timeStart('GetNodePreviews.booleanStructure')
-    const booleanStructure = getBooleanStructure(sourceNode, snapshot, edgeMap, propertyName, sourceNodeIndex)
+    const booleanStructure = getBooleanStructure(
+      sourceNode,
+      snapshot,
+      edgeMap,
+      propertyName,
+      sourceNodeIndex,
+      nodeFields,
+      edgeFields,
+      ITEMS_PER_NODE,
+      ITEMS_PER_EDGE,
+      edgeTypeFieldIndex,
+      edgeNameFieldIndex,
+      edgeToNodeFieldIndex,
+      EDGE_TYPE_PROPERTY,
+      EDGE_TYPE_INTERNAL,
+    )
     Timing.timeEnd('GetNodePreviews.booleanStructure', tBoolean)
     if (booleanStructure) {
       if (booleanStructure.value === 'true') {
@@ -103,7 +117,23 @@ export const getNodePreviews = (
 
     if (depth > 0) {
       const tCollect = Timing.timeStart('CollectObjectProperties.total')
-      result.preview = collectObjectProperties(sourceNodeIndex, snapshot, edgeMap, depth)
+      result.preview = collectObjectProperties(
+        sourceNodeIndex,
+        snapshot,
+        edgeMap,
+        depth,
+        new Set(),
+        nodeFields,
+        nodeTypes,
+        edgeFields,
+        strings,
+        ITEMS_PER_NODE,
+        ITEMS_PER_EDGE,
+        edgeTypeFieldIndex,
+        edgeNameFieldIndex,
+        edgeToNodeFieldIndex,
+        EDGE_TYPE_PROPERTY,
+      )
       Timing.timeEnd('CollectObjectProperties.total', tCollect)
     }
 

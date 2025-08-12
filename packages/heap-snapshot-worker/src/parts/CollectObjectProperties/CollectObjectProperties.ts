@@ -25,6 +25,16 @@ export const collectObjectProperties = (
   edgeMap: Uint32Array,
   depth: number = 1,
   visited: Set<number> = new Set(),
+  nodeFields: readonly string[],
+  nodeTypes: readonly (readonly string[])[],
+  edgeFields: readonly string[],
+  strings: readonly string[],
+  ITEMS_PER_NODE: number,
+  ITEMS_PER_EDGE: number,
+  edgeTypeFieldIndex: number,
+  edgeNameFieldIndex: number,
+  edgeToNodeFieldIndex: number,
+  EDGE_TYPE_PROPERTY: number,
 ): Record<string, any> => {
   const tTotal = Timing.timeStart('CollectObjectProperties.walk')
   if (depth <= 0) {
@@ -32,12 +42,7 @@ export const collectObjectProperties = (
     return {}
   }
 
-  const { nodes, edges, strings, meta } = snapshot
-  const nodeFields = meta.node_fields
-  const nodeTypes = meta.node_types
-  const edgeFields = meta.edge_fields
-
-  const ITEMS_PER_NODE = nodeFields.length
+  const { nodes, edges } = snapshot
   const node = parseNode(nodeIndex, nodes, nodeFields)
 
   if (!node || visited.has(node.id)) {
@@ -47,8 +52,7 @@ export const collectObjectProperties = (
   visited.add(node.id)
 
   // Get edge type names
-  const edgeTypes = meta.edge_types[0] || []
-  const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
+  // EDGE_TYPE_PROPERTY provided
 
   const properties: Record<string, any> = {}
 
@@ -58,10 +62,7 @@ export const collectObjectProperties = (
   Timing.timeEnd('CollectObjectProperties.getNodeEdges', tEdges)
 
   // Scan edges for properties (excluding internal edges which don't count toward depth)
-  const ITEMS_PER_EDGE = edgeFields.length
-  const edgeTypeFieldIndex = edgeFields.indexOf('type')
-  const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
-  const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
+  // Indices provided
 
   const tLoop = Timing.timeStart('CollectObjectProperties.loop')
   for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
@@ -91,7 +92,23 @@ export const collectObjectProperties = (
       if (targetType === 'object' && !isArray) {
         if (depth > 1) {
           // At depth > 1, recursively collect properties of nested objects
-          const nestedProperties = collectObjectProperties(targetNodeIndex, snapshot, edgeMap, depth - 1, visited)
+          const nestedProperties = collectObjectProperties(
+            targetNodeIndex,
+            snapshot,
+            edgeMap,
+            depth - 1,
+            visited,
+            nodeFields,
+            nodeTypes,
+            edgeFields,
+            strings,
+            ITEMS_PER_NODE,
+            ITEMS_PER_EDGE,
+            edgeTypeFieldIndex,
+            edgeNameFieldIndex,
+            edgeToNodeFieldIndex,
+            EDGE_TYPE_PROPERTY,
+          )
           if (Object.keys(nestedProperties).length > 0) {
             // Return as nested object
             value = nestedProperties
@@ -140,7 +157,22 @@ export const collectObjectProperties = (
         }
       } else if (targetType === 'hidden') {
         // For hidden nodes, check if it's a boolean or other special value
-        const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap, propertyName)
+        const booleanValue = getBooleanValue(
+          targetNode,
+          snapshot,
+          edgeMap,
+          propertyName,
+          targetNodeIndex,
+          nodeFields,
+          edgeFields,
+          ITEMS_PER_NODE,
+          ITEMS_PER_EDGE,
+          edgeTypeFieldIndex,
+          edgeNameFieldIndex,
+          edgeToNodeFieldIndex,
+          EDGE_TYPE_PROPERTY,
+          /* EDGE_TYPE_INTERNAL not needed */
+        )
         if (booleanValue) {
           // Convert boolean strings to actual boolean values for preview
           if (booleanValue === 'true') {
