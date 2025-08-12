@@ -1,14 +1,13 @@
 import { collectObjectProperties } from '../CollectObjectProperties/CollectObjectProperties.ts'
 import { getActualValue } from '../GetActualValue/GetActualValue.ts'
 import { getBooleanStructure } from '../GetBooleanValue/GetBooleanValue.ts'
-import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
+import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import type { ObjectWithProperty } from '../ObjectWithProperty/ObjectWithProperty.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import * as Timing from '../Timing/Timing.ts'
-import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 
 /**
  * Builds result objects (including preview) for a list of node indices using the provided edge map and depth.
@@ -83,15 +82,7 @@ export const getNodePreviews = (
       }
     } else if (propertyNameIndex !== -1) {
       const tEdges = Timing.timeStart('GetNodePreviews.getNodeEdges')
-      const nodeEdges = getNodeEdgesFast(
-        sourceNodeIndex,
-        edgeMap,
-        nodes,
-        edges,
-        ITEMS_PER_NODE,
-        ITEMS_PER_EDGE,
-        edgeCountFieldIndex,
-      )
+      const nodeEdges = getNodeEdgesFast(sourceNodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
       Timing.timeEnd('GetNodePreviews.getNodeEdges', tEdges)
       let targetNodeIndex: number | undefined
       const tFindEdge = Timing.timeStart('GetNodePreviews.findPropertyEdge')
