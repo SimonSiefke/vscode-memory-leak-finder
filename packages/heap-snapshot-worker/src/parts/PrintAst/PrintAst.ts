@@ -35,11 +35,7 @@ const printUnknown = (node: UnknownNode): PrintedValue => {
 }
 
 const printCodeLike = (node: CodeNode): PrintedValue => {
-  if (
-    typeof node.scriptId === 'number' &&
-    typeof node.line === 'number' &&
-    typeof node.column === 'number'
-  ) {
+  if (typeof node.scriptId === 'number' && typeof node.line === 'number' && typeof node.column === 'number') {
     return `[function: ${node.scriptId}:${node.line}:${node.column}]`
   }
   return `[${node.type} ${node.id}]`
@@ -47,13 +43,6 @@ const printCodeLike = (node: CodeNode): PrintedValue => {
 
 const printArray = (node: ArrayNode): PrintedValue => {
   return node.elements.map((el) => printAst(el))
-}
-
-const tryKeyToString = (value: PrintedValue): string => {
-  const t = typeof value
-  if (t === 'string') return value as string
-  if (t === 'number' || t === 'boolean' || value === null) return String(value)
-  return '[non-primitive key]'
 }
 
 const printMapLike = (node: MapNode): PrintedValue => {
@@ -107,6 +96,6 @@ export const printAst = (node: AstNode): PrintedValue => {
   }
 }
 
-export const printAstRoots = (nodes: readonly AstNode[]): PrintedValue[] => {
+export const printAstRoots = (nodes: readonly AstNode[]): readonly PrintedValue[] => {
   return nodes.map((n) => printAst(n))
 }

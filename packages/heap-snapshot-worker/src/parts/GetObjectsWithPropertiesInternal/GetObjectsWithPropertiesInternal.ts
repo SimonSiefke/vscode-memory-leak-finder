@@ -1,11 +1,7 @@
-import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
-import { getNodePreviews } from '../GetNodePreviews/GetNodePreviews.ts'
 import { getObjectsWithPropertiesInternalAst } from '../GetObjectsWithPropertiesInternalAst/GetObjectsWithPropertiesInternalAst.ts'
-import { printAstRoots } from '../PrintAst/PrintAst.ts'
-import { getObjectWithPropertyNodeIndices } from '../GetObjectWithPropertyNodeIndices/GetObjectWithPropertyNodeIndices.ts'
-import * as Timing from '../Timing/Timing.ts'
-import type { ObjectWithProperty } from '../ObjectWithProperty/ObjectWithProperty.ts'
+import { printAstRoots, PrintedValue } from '../PrintAst/PrintAst.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
+import * as Timing from '../Timing/Timing.ts'
 
 /**
  * Internal function that finds objects in a parsed heap snapshot that have a specific property
@@ -14,7 +10,7 @@ import type { Snapshot } from '../Snapshot/Snapshot.ts'
  * @param depth - Maximum depth to traverse for property collection (default: 1)
  * @returns Array of objects with the specified property
  */
-export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyName: string, depth: number = 1): ObjectWithProperty[] => {
+export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyName: string, depth: number = 1): readonly PrintedValue[] => {
   const tTotal = Timing.timeStart('GetObjectsWithPropertiesInternal.total')
   const { meta } = snapshot
 
