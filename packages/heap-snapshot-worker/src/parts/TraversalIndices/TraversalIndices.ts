@@ -67,5 +67,3 @@ export const createTraversalIndices = (snapshot: Snapshot, propertyName: string)
     propertyNameIndex,
   }
 }
-
-

@@ -60,15 +60,7 @@ export const collectObjectProperties = (
 
   // Get edges for this node as subarray
   const tEdges = Timing.timeStart('CollectObjectProperties.getNodeEdges')
-  const nodeEdges = getNodeEdgesFast(
-    nodeIndex,
-    edgeMap,
-    nodes,
-    edges,
-    ITEMS_PER_NODE,
-    ITEMS_PER_EDGE,
-    edgeCountFieldIndex,
-  )
+  const nodeEdges = getNodeEdgesFast(nodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
   Timing.timeEnd('CollectObjectProperties.getNodeEdges', tEdges)
 
   // Scan edges for properties (excluding internal edges which don't count toward depth)
