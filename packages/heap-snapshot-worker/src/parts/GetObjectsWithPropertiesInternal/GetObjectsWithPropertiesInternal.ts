@@ -1,5 +1,6 @@
 import { getObjectsWithPropertiesInternalAst } from '../GetObjectsWithPropertiesInternalAst/GetObjectsWithPropertiesInternalAst.ts'
-import { printAstRoots, PrintedValue } from '../PrintAst/PrintAst.ts'
+import { printAstRoots } from '../PrintAst/PrintAst.ts'
+import type { PrintedValue } from '../PrintedValue/PrintedValue.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import * as Timing from '../Timing/Timing.ts'
 

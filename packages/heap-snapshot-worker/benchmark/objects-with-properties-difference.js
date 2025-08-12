@@ -39,8 +39,8 @@ async function testGetObjectsWithProperties() {
     const astObjects2 = getObjectsWithPropertiesInternalAst(snapshot2, property, depth)
     console.timeEnd('check-ast')
 
-    console.log('count 1', astObjects1.length)
-    console.log('count 2', astObjects2.length)
+    // console.log('count 1', astObjects1.length)
+    // console.log('count 2', astObjects2.length)
     const difference = [
       {
         before: astObjects1.length,
