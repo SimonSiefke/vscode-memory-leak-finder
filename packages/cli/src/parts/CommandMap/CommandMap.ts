@@ -1,3 +1,5 @@
+import { handleInitialized } from '../HandleInitialized/HandleInitialized.ts'
+import { handleInitializing } from '../HandleInitializing/HandleInitializing.ts'
 import * as HandleTestFailed from '../HandleTestFailed/HandleTestFailed.ts'
 import * as HandleTestPassed from '../HandleTestPassed/HandleTestPassed.ts'
 import * as HandleTestRunning from '../HandleTestRunning/HandleTestRunning.ts'
@@ -9,12 +11,14 @@ import * as HandleTestsUnexpectedError from '../HandleTestsUnexpectedError/Handl
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.ts'
 
 export const commandMap = {
+  [TestWorkerEventType.AllTestsFinished]: HandleTestsFinished.handleTestsFinished,
+  [TestWorkerEventType.HandleInitialized]: handleInitialized,
+  [TestWorkerEventType.HandleInitializing]: handleInitializing,
+  [TestWorkerEventType.TestFailed]: HandleTestFailed.handleTestFailed,
   [TestWorkerEventType.TestPassed]: HandleTestPassed.handleTestPassed,
   [TestWorkerEventType.TestRunning]: HandleTestRunning.handleTestRunning,
   [TestWorkerEventType.TestSetup]: HandleTestSetup.handleTestSetup,
-  [TestWorkerEventType.TestFailed]: HandleTestFailed.handleTestFailed,
-  [TestWorkerEventType.AllTestsFinished]: HandleTestsFinished.handleTestsFinished,
-  [TestWorkerEventType.TestsStarting]: HandleTestsStarting.handleTestsStarting,
   [TestWorkerEventType.TestSkipped]: HandleTestSkipped.handleTestSkipped,
+  [TestWorkerEventType.TestsStarting]: HandleTestsStarting.handleTestsStarting,
   [TestWorkerEventType.UnexpectedTestError]: HandleTestsUnexpectedError.handleTestsUnexpectedError,
 }

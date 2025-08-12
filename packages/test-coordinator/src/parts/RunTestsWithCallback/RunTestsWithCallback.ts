@@ -96,7 +96,6 @@ export const runTests = async (
     let failed = 0
     let skipped = 0
     let leaking = 0
-    const start = Time.now()
     const formattedPaths = await GetTestToRun.getTestsToRun(root, cwd, filterValue)
     const total = formattedPaths.length
     if (total === 0) {
@@ -104,8 +103,7 @@ export const runTests = async (
     }
     const initialStart = Time.now()
     const first = formattedPaths[0]
-    await callback(TestWorkerEventType.TestsStarting, total)
-    await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
+    await callback(TestWorkerEventType.HandleInitializing)
     let testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
       cwd,
       headlessMode,
@@ -118,6 +116,15 @@ export const runTests = async (
       vscodePath,
       commit,
     )
+
+    const intializeEnd = performance.now()
+    const intializeTime = intializeEnd - initialStart
+
+    await callback(TestWorkerEventType.HandleInitialized, intializeTime)
+
+    const testStart = performance.now()
+    await callback(TestWorkerEventType.TestsStarting, total)
+    await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
 
     let memoryLeakWorkerRpc = MemoryLeakWorker.getRpc()
     let targetId = ''
@@ -144,7 +151,7 @@ export const runTests = async (
         if (testSkipped) {
           skipped++
           const end = Time.now()
-          const duration = end - start
+          const duration = end - testStart
           await callback(TestWorkerEventType.TestSkipped, absolutePath, relativeDirname, dirent, duration)
         } else {
           let isLeak = false
@@ -220,7 +227,7 @@ export const runTests = async (
       }
     }
     const end = Time.now()
-    const duration = end - start
+    const duration = end - testStart
     if (recordVideo) {
       await VideoRecording.finalize()
     }
