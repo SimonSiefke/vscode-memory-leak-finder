@@ -84,6 +84,8 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
     NODE_TYPE_OBJECT,
     NODE_TYPE_ARRAY,
     idFieldIndex,
+    ITEMS_PER_EDGE,
+    edgeCountFieldIndex,
   )
   Timing.timeEnd('GetNodePreviews.total', tPreviews)
 

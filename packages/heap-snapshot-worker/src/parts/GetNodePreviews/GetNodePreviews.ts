@@ -37,6 +37,8 @@ export const getNodePreviews = (
   NODE_TYPE_OBJECT: number,
   NODE_TYPE_ARRAY: number,
   idFieldIndex: number,
+  ITEMS_PER_EDGE_OVERRIDE: number,
+  edgeCountFieldIndexOverride: number,
 ): ObjectWithProperty[] => {
   const tTotal = Timing.timeStart('GetNodePreviews.build')
   const { nodes, edges } = snapshot
@@ -87,7 +89,7 @@ export const getNodePreviews = (
       }
     } else if (propertyNameIndex !== -1) {
       const tEdges = Timing.timeStart('GetNodePreviews.getNodeEdges')
-      const nodeEdges = getNodeEdgesFast(sourceNodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
+      const nodeEdges = getNodeEdgesFast(sourceNodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE_OVERRIDE, edgeCountFieldIndexOverride)
       Timing.timeEnd('GetNodePreviews.getNodeEdges', tEdges)
       let targetNodeIndex: number | undefined
       const tFindEdge = Timing.timeStart('GetNodePreviews.findPropertyEdge')
