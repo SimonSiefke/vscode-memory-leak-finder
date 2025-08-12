@@ -5,6 +5,7 @@ import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
+import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
 
 const createUnknown = (id: number, name: string | null, value?: string): AstNode => ({
   type: 'unknown',
@@ -55,6 +56,17 @@ export const buildAstForNode = (
   if (nodeTypeName === 'bigint') {
     const v = name ?? ''
     return { type: 'bigint', id, name, value: v }
+  }
+  if (nodeTypeName === 'hidden') {
+    // Try boolean detection; otherwise unknown/hidden
+    const value = getBooleanValue(node, snapshot, edgeMap)
+    if (value === 'true') {
+      return { type: 'boolean', id, name, value: true } as any
+    }
+    if (value === 'false') {
+      return { type: 'boolean', id, name, value: false } as any
+    }
+    return createUnknown(id, name, `[hidden ${id}]`)
   }
   if (nodeTypeName === 'object' || nodeTypeName === 'array') {
     const nodeEdges = getNodeEdgesFast(nodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)

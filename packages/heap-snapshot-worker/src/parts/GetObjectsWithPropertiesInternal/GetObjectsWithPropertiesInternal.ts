@@ -1,5 +1,7 @@
 import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
 import { getNodePreviews } from '../GetNodePreviews/GetNodePreviews.ts'
+import { getObjectsWithPropertiesInternalAst } from '../GetObjectsWithPropertiesInternalAst/GetObjectsWithPropertiesInternalAst.ts'
+import { printAstRoots } from '../PrintAst/PrintAst.ts'
 import { getObjectWithPropertyNodeIndices } from '../GetObjectWithPropertyNodeIndices/GetObjectWithPropertyNodeIndices.ts'
 import * as Timing from '../Timing/Timing.ts'
 import type { ObjectWithProperty } from '../ObjectWithProperty/ObjectWithProperty.ts'
@@ -58,6 +60,15 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
     edgeCountFieldIndex,
   )
   Timing.timeEnd('GetObjectWithPropertyNodeIndices.total', tMatching)
+
+  // Build AST first, then print (for future use or external consumers)
+  const tAst = Timing.timeStart('GetObjectsWithPropertiesInternal.ast')
+  const astRoots = getObjectsWithPropertiesInternalAst(snapshot, propertyName, depth)
+  Timing.timeEnd('GetObjectsWithPropertiesInternal.ast', tAst)
+  const tPrint = Timing.timeStart('GetObjectsWithPropertiesInternal.print')
+  // Currently not used for the returned structure to keep API compatibility
+  printAstRoots(astRoots)
+  Timing.timeEnd('GetObjectsWithPropertiesInternal.print', tPrint)
 
   const tPreviews = Timing.timeStart('GetNodePreviews.total')
   const results = getNodePreviews(
