@@ -22,7 +22,7 @@ async function testGetObjectsWithProperties() {
     const snapshot1 = await prepareHeapSnapshot(beforePath, {
       parseStrings: true,
     })
-    const snapshot2 = await prepareHeapSnapshot(beforePath, {
+    const snapshot2 = await prepareHeapSnapshot(afterPath, {
       parseStrings: true,
     })
     console.timeEnd('prepare')
