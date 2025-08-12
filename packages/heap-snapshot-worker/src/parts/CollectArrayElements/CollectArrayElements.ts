@@ -1,5 +1,5 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
-import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
+import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 import { getActualValue } from '../GetActualValue/GetActualValue.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
@@ -44,15 +44,25 @@ export const collectArrayElements = (
 
   try {
     // Get edges for this array node as subarray
-    const nodeEdges = getNodeEdges(nodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
-
-    // Collect element edges and sort by index
-    const elementEdges: Array<{ index: number; toNode: number }> = []
-
     const ITEMS_PER_EDGE = edgeFields.length
     const edgeTypeFieldIndex = edgeFields.indexOf('type')
     const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
     const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
+    const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
+    const nodeEdges = getNodeEdgesFast(
+      nodeIndex,
+      edgeMap,
+      nodes,
+      edges,
+      ITEMS_PER_NODE,
+      ITEMS_PER_EDGE,
+      edgeCountFieldIndex,
+    )
+
+    // Collect element edges and sort by index
+    const elementEdges: Array<{ index: number; toNode: number }> = []
+
+
 
     for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
       const edgeType = nodeEdges[i + edgeTypeFieldIndex]
@@ -170,13 +180,15 @@ const collectObjectPropertiesInline = (
   }
 
   // Get edges for this node
-  const nodeEdges = getNodeEdges(nodeIndex, edgeMap, nodes, edges, nodeFields, edgeFields)
-
-  // Scan edges for properties
   const ITEMS_PER_EDGE = edgeFields.length
+  const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
   const edgeTypeFieldIndex = edgeFields.indexOf('type')
   const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
   const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
+  const nodeEdges = getNodeEdgesFast(nodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
+
+  // Scan edges for properties
+
   for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
     const type = nodeEdges[i + edgeTypeFieldIndex]
     if (type === EDGE_TYPE_PROPERTY) {

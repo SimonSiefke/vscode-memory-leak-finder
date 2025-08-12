@@ -48,7 +48,15 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
   const NODE_TYPE_ARRAY = nodeTypeNames.indexOf('array')
 
   const tMatching = Timing.timeStart('GetObjectWithPropertyNodeIndices.total')
-  const matchingNodeIndices = getObjectWithPropertyNodeIndices(snapshot, propertyName)
+  const matchingNodeIndices = getObjectWithPropertyNodeIndices(
+    snapshot,
+    propertyName,
+    ITEMS_PER_NODE,
+    ITEMS_PER_EDGE,
+    edgeTypeFieldIndex,
+    edgeNameFieldIndex,
+    edgeCountFieldIndex,
+  )
   Timing.timeEnd('GetObjectWithPropertyNodeIndices.total', tMatching)
 
   const tPreviews = Timing.timeStart('GetNodePreviews.total')
