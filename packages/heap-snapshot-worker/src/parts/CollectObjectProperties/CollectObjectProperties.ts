@@ -1,5 +1,5 @@
 import { collectArrayElements } from '../CollectArrayElements/CollectArrayElements.ts'
-import { getActualValue } from '../GetActualValue/GetActualValue.ts'
+import { getActualValueFast } from '../GetActualValueFast/GetActualValueFast.ts'
 import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
 import { getNodeEdges } from '../GetNodeEdges/GetNodeEdges.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
@@ -37,6 +37,7 @@ export const collectObjectProperties = (
   edgeNameFieldIndex: number,
   edgeToNodeFieldIndex: number,
   EDGE_TYPE_PROPERTY: number,
+  EDGE_TYPE_INTERNAL: number,
 ): Record<string, any> => {
   const tTotal = Timing.timeStart('CollectObjectProperties.walk')
   if (depth <= 0) {
@@ -111,6 +112,7 @@ export const collectObjectProperties = (
             edgeNameFieldIndex,
             edgeToNodeFieldIndex,
             EDGE_TYPE_PROPERTY,
+            EDGE_TYPE_INTERNAL,
           )
           if (Object.keys(nestedProperties).length > 0) {
             // Return as nested object
@@ -147,7 +149,29 @@ export const collectObjectProperties = (
         }
       } else if (targetType === 'string' || targetType === 'number') {
         // For primitives, get the actual value (use fresh visited to avoid sibling cross-contamination)
-        const actual = getActualValue(targetNode, snapshot, edgeMap, new Set(), targetNodeIndex)
+        const actual = getActualValueFast(
+          targetNode,
+          snapshot,
+          edgeMap,
+          new Set(),
+          targetNodeIndex,
+          nodeFields,
+          nodeTypes,
+          edgeFields,
+          strings,
+          ITEMS_PER_NODE,
+          ITEMS_PER_EDGE,
+          /* idFieldIndex */ nodeFields.indexOf('id'),
+          edgeCountFieldIndex,
+          edgeTypeFieldIndex,
+          edgeNameFieldIndex,
+          edgeToNodeFieldIndex,
+          EDGE_TYPE_INTERNAL,
+          /* NODE_TYPE_STRING */ nodeTypes[0].indexOf('string'),
+          /* NODE_TYPE_NUMBER */ nodeTypes[0].indexOf('number'),
+          /* NODE_TYPE_OBJECT */ nodeTypes[0].indexOf('object'),
+          /* NODE_TYPE_ARRAY */ nodeTypes[0].indexOf('array'),
+        )
         if (targetType === 'number') {
           const parsed = Number(actual)
           if (Number.isFinite(parsed)) {
@@ -174,7 +198,7 @@ export const collectObjectProperties = (
           edgeNameFieldIndex,
           edgeToNodeFieldIndex,
           EDGE_TYPE_PROPERTY,
-          /* EDGE_TYPE_INTERNAL not needed */
+          EDGE_TYPE_INTERNAL,
         )
         if (booleanValue) {
           // Convert boolean strings to actual boolean values for preview
@@ -186,11 +210,55 @@ export const collectObjectProperties = (
             value = booleanValue
           }
         } else {
-          value = getActualValue(targetNode, snapshot, edgeMap, new Set(), targetNodeIndex)
+          value = getActualValueFast(
+            targetNode,
+            snapshot,
+            edgeMap,
+            new Set(),
+            targetNodeIndex,
+            nodeFields,
+            nodeTypes,
+            edgeFields,
+            strings,
+            ITEMS_PER_NODE,
+            ITEMS_PER_EDGE,
+            /* idFieldIndex */ nodeFields.indexOf('id'),
+            edgeCountFieldIndex,
+            edgeTypeFieldIndex,
+            edgeNameFieldIndex,
+            edgeToNodeFieldIndex,
+            EDGE_TYPE_INTERNAL,
+            /* NODE_TYPE_STRING */ nodeTypes[0].indexOf('string'),
+            /* NODE_TYPE_NUMBER */ nodeTypes[0].indexOf('number'),
+            /* NODE_TYPE_OBJECT */ nodeTypes[0].indexOf('object'),
+            /* NODE_TYPE_ARRAY */ nodeTypes[0].indexOf('array'),
+          )
         }
       } else if (targetType === 'code') {
         // For code objects, try to get the actual value they represent
-        value = getActualValue(targetNode, snapshot, edgeMap, new Set())
+        value = getActualValueFast(
+          targetNode,
+          snapshot,
+          edgeMap,
+          new Set(),
+          -1,
+          nodeFields,
+          nodeTypes,
+          edgeFields,
+          strings,
+          ITEMS_PER_NODE,
+          ITEMS_PER_EDGE,
+          /* idFieldIndex */ nodeFields.indexOf('id'),
+          edgeCountFieldIndex,
+          edgeTypeFieldIndex,
+          edgeNameFieldIndex,
+          edgeToNodeFieldIndex,
+          EDGE_TYPE_INTERNAL,
+          /* NODE_TYPE_STRING */ nodeTypes[0].indexOf('string'),
+          /* NODE_TYPE_NUMBER */ nodeTypes[0].indexOf('number'),
+          /* NODE_TYPE_OBJECT */ nodeTypes[0].indexOf('object'),
+          /* NODE_TYPE_ARRAY */ nodeTypes[0].indexOf('array'),
+        )
       } else if (targetType === 'closure') {
         // Prefer showing function location if available
         const locationFields = snapshot.meta.location_fields

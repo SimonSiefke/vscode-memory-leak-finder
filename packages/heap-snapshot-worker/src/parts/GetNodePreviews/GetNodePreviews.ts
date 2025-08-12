@@ -1,5 +1,5 @@
 import { collectObjectProperties } from '../CollectObjectProperties/CollectObjectProperties.ts'
-import { getActualValue } from '../GetActualValue/GetActualValue.ts'
+import { getActualValueFast } from '../GetActualValueFast/GetActualValueFast.ts'
 import { getBooleanStructure } from '../GetBooleanValue/GetBooleanValue.ts'
 import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
@@ -101,7 +101,29 @@ export const getNodePreviews = (
         const tResolve = Timing.timeStart('GetNodePreviews.resolveValue')
         const targetNode = parseNode(targetNodeIndex, nodes, nodeFields)
         const targetTypeName = getNodeTypeName(targetNode, nodeTypes)
-        const actualValue = getActualValue(targetNode, snapshot, edgeMap, new Set(), targetNodeIndex)
+        const actualValue = getActualValueFast(
+          targetNode,
+          snapshot,
+          edgeMap,
+          new Set(),
+          targetNodeIndex,
+          nodeFields,
+          nodeTypes,
+          edgeFields,
+          strings,
+          ITEMS_PER_NODE,
+          ITEMS_PER_EDGE,
+          /* idFieldIndex */ nodeFields.indexOf('id'),
+          edgeCountFieldIndex,
+          edgeTypeFieldIndex,
+          edgeNameFieldIndex,
+          edgeToNodeFieldIndex,
+          EDGE_TYPE_INTERNAL,
+          /* NODE_TYPE_STRING */ nodeTypes[0].indexOf('string'),
+          /* NODE_TYPE_NUMBER */ nodeTypes[0].indexOf('number'),
+          /* NODE_TYPE_OBJECT */ nodeTypes[0].indexOf('object'),
+          /* NODE_TYPE_ARRAY */ nodeTypes[0].indexOf('array'),
+        )
         if (actualValue === 'true') {
           result.propertyValue = true
         } else if (actualValue === 'false') {
@@ -135,6 +157,7 @@ export const getNodePreviews = (
         edgeNameFieldIndex,
         edgeToNodeFieldIndex,
         EDGE_TYPE_PROPERTY,
+        EDGE_TYPE_INTERNAL,
       )
       Timing.timeEnd('CollectObjectProperties.total', tCollect)
     }
