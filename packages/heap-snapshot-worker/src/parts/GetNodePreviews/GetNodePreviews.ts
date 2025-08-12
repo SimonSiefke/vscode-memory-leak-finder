@@ -139,6 +139,7 @@ export const getNodePreviews = (
         strings,
         ITEMS_PER_NODE,
         ITEMS_PER_EDGE,
+        edgeCountFieldIndex,
         edgeTypeFieldIndex,
         edgeNameFieldIndex,
         edgeToNodeFieldIndex,
