@@ -1,6 +1,5 @@
 import type { CodeNode } from '../AstNode/AstNode.ts'
-
-export type PrintedValue = unknown
+import type { PrintedValue } from '../PrintedValue/PrintedValue.ts'
 
 export const printCodeLike = (node: CodeNode): PrintedValue => {
   if (
