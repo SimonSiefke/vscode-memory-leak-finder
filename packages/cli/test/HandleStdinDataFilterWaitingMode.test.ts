@@ -2,11 +2,13 @@ import { expect, test } from '@jest/globals'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
 import * as HandleStdinDataFilterWaitingMode from '../src/parts/HandleStdinDataFilterWaitingMode/HandleStdinDataFilterWaitingMode.ts'
+import { createDefaultState } from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 
 // no mocks required
 
 test('handleStdinDataFilterWaitingMode - alt + backspace', async () => {
   const state = {
+    ...createDefaultState(),
     value: 'abc',
     stdout: [],
   }
@@ -18,6 +20,7 @@ test('handleStdinDataFilterWaitingMode - alt + backspace', async () => {
 
 test('handleStdinDataFilterWaitingMode - ctrl + backspace', async () => {
   const state = {
+    ...createDefaultState(),
     value: 'abc',
     stdout: [],
   }
@@ -29,6 +32,7 @@ test('handleStdinDataFilterWaitingMode - ctrl + backspace', async () => {
 
 test('handleStdinDataFilterWaitingMode - ctrl + backspace - empty value', async () => {
   const state = {
+    ...createDefaultState(),
     value: '',
     stdout: [],
   }
@@ -40,6 +44,7 @@ test('handleStdinDataFilterWaitingMode - ctrl + backspace - empty value', async 
 
 test('handleStdinDataFilterWaitingMode - ctrl + c', async () => {
   const state = {
+    ...createDefaultState(),
     value: 'abc',
     stdout: [],
   }
@@ -51,6 +56,7 @@ test('handleStdinDataFilterWaitingMode - ctrl + c', async () => {
 
 test('handleStdinDataFilterWaitingMode - ctrl + d', async () => {
   const state = {
+    ...createDefaultState(),
     value: 'abc',
     stdout: [],
   }
@@ -62,6 +68,7 @@ test('handleStdinDataFilterWaitingMode - ctrl + d', async () => {
 
 test('handleStdinDataFilterWaitingMode - enter', async () => {
   const state = {
+    ...createDefaultState(),
     value: 'abc',
     stdout: [],
     previousFilters: [],
@@ -74,6 +81,7 @@ test('handleStdinDataFilterWaitingMode - enter', async () => {
 
 test('handleStdinDataFilterWaitingMode - escape', async () => {
   const state = {
+    ...createDefaultState(),
     value: 'abc',
     stdout: [],
   }
@@ -94,6 +102,7 @@ test('handleStdinDataFilterWaitingMode - escape', async () => {
 
 test('handleStdinDataFilterWaitingMode - home', async () => {
   const state = {
+    ...createDefaultState(),
     value: 'abc',
     stdout: [],
   }
@@ -104,6 +113,7 @@ test('handleStdinDataFilterWaitingMode - home', async () => {
 
 test('handleStdinDataFilterWaitingMode - end', async () => {
   const state = {
+    ...createDefaultState(),
     value: 'abc',
     stdout: [],
   }

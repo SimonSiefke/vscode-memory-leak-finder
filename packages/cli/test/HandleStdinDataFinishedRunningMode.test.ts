@@ -3,11 +3,13 @@ import * as CliKeys from '../src/parts/CliKeys/CliKeys.ts'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
 import * as HandleStdinDataFinishedRunningMode from '../src/parts/HandleStdinDataFinishedRunningMode/HandleStdinDataFinishedRunningMode.ts'
+import { createDefaultState } from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 
 // no mocks required
 
 test('handleStdinDataFinishedRunningMode - show watch mode details', async () => {
   const state = {
+    ...createDefaultState(),
     value: '',
     mode: ModeType.FinishedRunning,
     stdout: [],
@@ -29,6 +31,7 @@ test('handleStdinDataFinishedRunningMode - show watch mode details', async () =>
 
 test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
   const state = {
+    ...createDefaultState(),
     value: '',
     mode: ModeType.FinishedRunning,
     stdout: [],
@@ -48,6 +51,7 @@ test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
 
 test('handleStdinDataFinishedRunningMode - quit', async () => {
   const state = {
+    ...createDefaultState(),
     value: '',
     mode: ModeType.FinishedRunning,
     stdout: [],
@@ -60,6 +64,7 @@ test('handleStdinDataFinishedRunningMode - quit', async () => {
 
 test('handleStdinDataFinishedRunningMode - run again', async () => {
   const state = {
+    ...createDefaultState(),
     value: '',
     mode: ModeType.FinishedRunning,
     stdout: [],
