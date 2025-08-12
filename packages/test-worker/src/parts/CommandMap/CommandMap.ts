@@ -1,10 +1,16 @@
-import { join } from 'path'
-import * as ImportScript from '../ImportScript/ImportScript.ts'
-import * as Root from '../Root/Root.ts'
+import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
+import * as ImportPageObject from '../ImportPageObject/ImportPageObject.ts'
+import * as PageObject from '../PageObject/PageObject.ts'
+import * as RunTest from '../RunTest/RunTest.ts'
+import * as SetupTest from '../SetupTest/SetupTest.ts'
+import * as TearDownTest from '../TearDownTest/TearDownTest.ts'
+import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
 
-export const load = async () => {
-  const testWorkerCommandsPath = join(Root.root, '..', '..', 'test-worker-commands', 'src', 'main.ts')
-  const module = await ImportScript.importScript(testWorkerCommandsPath)
-  const { commandMap } = module as any
-  return commandMap
+export const commandMap = {
+  [TestWorkerCommandType.ConnectDevtools]: ConnectDevtools.connectDevtools,
+  [TestWorkerCommandType.ImportPageObjectModule]: ImportPageObject.importPageObject,
+  [TestWorkerCommandType.PageObjectCreate]: PageObject.create,
+  [TestWorkerCommandType.RunTest]: RunTest.runTest,
+  [TestWorkerCommandType.SetupTest]: SetupTest.setupTest,
+  [TestWorkerCommandType.TearDownTest]: TearDownTest.tearDownTest,
 }
