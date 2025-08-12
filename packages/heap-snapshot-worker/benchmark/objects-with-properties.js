@@ -1,5 +1,8 @@
 import { writeFile } from 'fs/promises'
-import { getObjectsWithPropertiesInternal } from '../src/parts/GetObjectsWithPropertiesInternal/GetObjectsWithPropertiesInternal.ts'
+import {
+  getObjectsWithPropertiesInternal,
+  getObjectsWithPropertiesInternalAst,
+} from '../src/parts/GetObjectsWithPropertiesInternal/GetObjectsWithPropertiesInternal.ts'
 import { prepareHeapSnapshot } from '../src/parts/PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 import * as Timing from '../src/parts/Timing/Timing.ts'
 
@@ -10,6 +13,8 @@ async function testGetObjectsWithProperties() {
   // const heapSnapshotPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/abc2.heapsnapshot'
   const heapSnapshotPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/0.heapsnapshot'
   const resultPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-memory-leak-finder-results/objects-with-properties.json'
+  const resultAstPath =
+    '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-memory-leak-finder-results/objects-with-properties-ast.json'
   const property = 'dispose'
   const depth = 1
 
@@ -24,16 +29,22 @@ async function testGetObjectsWithProperties() {
     console.log('Heap snapshot loaded successfully')
     console.log(`Snapshot has ${snapshot.node_count} nodes and ${snapshot.edge_count} edges`)
 
-    console.log('\n=== Testing Refactored Function ===')
-    console.time('check')
+    console.log('\n=== Testing Refactored Function (flat preview) ===')
+    console.time('check-flat')
     const oldStateObjects = getObjectsWithPropertiesInternal(snapshot, property, depth)
-    console.timeEnd('check')
-    console.log(`Refactored function found ${oldStateObjects.length} objects with "oldState" property`)
+    console.timeEnd('check-flat')
+    console.log(`Flat preview found ${oldStateObjects.length} objects with "${property}" property`)
+
+    console.log('\n=== Testing AST Function ===')
+    console.time('check-ast')
+    const astObjects = getObjectsWithPropertiesInternalAst(snapshot, property)
+    console.timeEnd('check-ast')
+    console.log(`AST builder created ${astObjects.length} AST roots for "${property}"`)
 
     Timing.report('getObjectsWithPropertiesInternal breakdown')
 
-    // console.log(JSON.stringify({ oldStateObjects }, null, 2))
     await writeFile(resultPath, JSON.stringify(oldStateObjects, null, 2) + '\n')
+    await writeFile(resultAstPath, JSON.stringify(astObjects, null, 2) + '\n')
   } catch (error) {
     console.error('Error testing getObjectsWithProperties:', error)
   }

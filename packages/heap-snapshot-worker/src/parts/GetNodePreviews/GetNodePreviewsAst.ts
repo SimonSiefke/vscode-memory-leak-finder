@@ -28,6 +28,8 @@ export const buildAstForNode = (
   edgeToNodeFieldIndex: number,
   EDGE_TYPE_PROPERTY: number,
   EDGE_TYPE_INTERNAL: number,
+  depth: number,
+  visited: Set<number>,
 ): AstNode | null => {
   const { nodes, edges } = snapshot
   const node = parseNode(nodeIndex, nodes, nodeFields)
@@ -35,6 +37,11 @@ export const buildAstForNode = (
   const nodeTypeName = getNodeTypeName(node, nodeTypes) || 'unknown'
   const name = getNodeName(node, strings)
   const id = node.id
+
+  if (visited.has(id)) {
+    return createUnknown(id, name, `[Circular ${id}]`)
+  }
+  visited.add(id)
 
   if (nodeTypeName === 'string') {
     return { type: 'string', id, name, value: name ?? '' }
@@ -52,6 +59,10 @@ export const buildAstForNode = (
     const nodeEdges = getNodeEdgesFast(nodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
     if (nodeTypeName === 'array') {
       const elements: AstNode[] = []
+      if (depth <= 0) {
+        const arr: ArrayNode = { type: 'array', id, name, elements }
+        return arr
+      }
       for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
         const toNode = nodeEdges[i + edgeToNodeFieldIndex]
         const childIndex = Math.floor(toNode / ITEMS_PER_NODE)
@@ -71,6 +82,8 @@ export const buildAstForNode = (
           edgeToNodeFieldIndex,
           EDGE_TYPE_PROPERTY,
           EDGE_TYPE_INTERNAL,
+          depth - 1,
+          visited,
         )
         if (childAst) elements.push(childAst)
       }
@@ -80,6 +93,10 @@ export const buildAstForNode = (
 
     // object
     const properties: PropertyEntry[] = []
+    if (depth <= 0) {
+      const obj: ObjectNode = { type: 'object', id, name, properties }
+      return obj
+    }
     for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
       const edgeType = nodeEdges[i + edgeTypeFieldIndex]
       if (edgeType !== EDGE_TYPE_PROPERTY) continue
@@ -104,6 +121,8 @@ export const buildAstForNode = (
         edgeToNodeFieldIndex,
         EDGE_TYPE_PROPERTY,
         EDGE_TYPE_INTERNAL,
+        depth - 1,
+        visited,
       )
       if (!valueAst) continue
       properties.push({ id, name: propName, value: valueAst })

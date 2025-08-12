@@ -95,7 +95,7 @@ export const getObjectsWithPropertiesInternal = (snapshot: Snapshot, propertyNam
   return results
 }
 
-export const getObjectsWithPropertiesInternalAst = (snapshot: Snapshot, propertyName: string): AstNode[] => {
+export const getObjectsWithPropertiesInternalAst = (snapshot: Snapshot, propertyName: string, depth: number = 1): AstNode[] => {
   const { nodes, meta } = snapshot
   const nodeFields = meta.node_fields
   const edgeFields = meta.edge_fields
@@ -144,6 +144,8 @@ export const getObjectsWithPropertiesInternalAst = (snapshot: Snapshot, property
       edgeToNodeFieldIndex,
       EDGE_TYPE_PROPERTY,
       EDGE_TYPE_INTERNAL,
+      depth,
+      new Set(),
     )
     if (ast) {
       result.push(ast)
