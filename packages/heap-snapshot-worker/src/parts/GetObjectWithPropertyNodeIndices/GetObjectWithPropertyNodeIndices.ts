@@ -49,15 +49,7 @@ export const getObjectWithPropertyNodeIndices = (
   const tLoop = Timing.timeStart('GetObjectWithPropertyNodeIndices.loop')
   for (let nodeOffset = 0; nodeOffset < nodes.length; nodeOffset += ITEMS_PER_NODE_LOCAL) {
     const nodeIndex = nodeOffset / ITEMS_PER_NODE_LOCAL
-    const nodeEdges = getNodeEdgesFast(
-      nodeIndex,
-      edgeMap,
-      nodes,
-      edges,
-      ITEMS_PER_NODE_LOCAL,
-      ITEMS_PER_EDGE_LOCAL,
-      edgeCountFieldIndex,
-    )
+    const nodeEdges = getNodeEdgesFast(nodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE_LOCAL, ITEMS_PER_EDGE_LOCAL, edgeCountFieldIndex)
 
     for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE_LOCAL) {
       const edgeType = nodeEdges[i + edgeTypeFieldIndex]

@@ -68,15 +68,7 @@ export const getActualValueFast = (
     }
 
     if (localTargetNodeIndex !== -1) {
-      const nodeEdges = getNodeEdgesFast(
-        localTargetNodeIndex,
-        edgeMap,
-        nodes,
-        edges,
-        ITEMS_PER_NODE,
-        ITEMS_PER_EDGE,
-        edgeCountFieldIndex,
-      )
+      const nodeEdges = getNodeEdgesFast(localTargetNodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
       for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
         const toNode = nodeEdges[i + edgeToNodeFieldIndex]
         const referencedNodeIndex = Math.floor(toNode / ITEMS_PER_NODE)
@@ -144,15 +136,7 @@ export const getActualValueFast = (
     }
 
     if (localTargetNodeIndex !== -1) {
-      const nodeEdges = getNodeEdgesFast(
-        localTargetNodeIndex,
-        edgeMap,
-        nodes,
-        edges,
-        ITEMS_PER_NODE,
-        ITEMS_PER_EDGE,
-        edgeCountFieldIndex,
-      )
+      const nodeEdges = getNodeEdgesFast(localTargetNodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
       const internalStringValues: string[] = []
       const incomingStringValues: string[] = []
       const numberValues: string[] = []
@@ -230,5 +214,3 @@ export const getActualValueFast = (
     return `[${nodeTypeName || 'Unknown'} ${targetNode.id}]`
   }
 }
-
-
