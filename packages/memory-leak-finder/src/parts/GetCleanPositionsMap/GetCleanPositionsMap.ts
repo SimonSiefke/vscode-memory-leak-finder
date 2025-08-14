@@ -1,23 +1,16 @@
+import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
 import { join } from 'node:path'
-import * as Callback from '../Callback/Callback.ts'
-import * as HandleIpc from '../HandleIpc/HandleIpc.ts'
-import * as IpcParent from '../IpcParent/IpcParent.ts'
-import * as IpcParentType from '../IpcParentType/IpcParentType.ts'
-import * as JsonRpc from '../JsonRpc/JsonRpc.ts'
 import * as Root from '../Root/Root.ts'
-
-const execute = () => {}
 
 const sourceMapWorkerPath = join(Root.root, 'packages', 'source-map-worker', 'src', 'sourceMapWorkerMain.ts')
 
 export const getCleanPositionsMap = async (sourceMapUrlMap, classNames) => {
-  // TODO
-  const ipc = await IpcParent.create({
-    method: IpcParentType.NodeWorkerThread,
+  const rpc = await NodeWorkerRpcParent.create({
     stdio: 'inherit',
-    url: sourceMapWorkerPath,
+    path: sourceMapWorkerPath,
+    commandMap: {},
   })
-  HandleIpc.handleIpc(ipc, execute, Callback.resolve)
-  const response = await JsonRpc.invoke(ipc, 'SourceMap.getCleanPositionsMap', sourceMapUrlMap, classNames)
+  const response = await rpc.invoke('SourceMap.getCleanPositionsMap', sourceMapUrlMap, classNames)
+  await rpc.dispose()
   return response
 }
