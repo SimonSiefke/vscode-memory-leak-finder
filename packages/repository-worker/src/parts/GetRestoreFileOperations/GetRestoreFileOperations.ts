@@ -1,4 +1,3 @@
-import { VError } from '@lvce-editor/verror'
 import * as Path from '../Path/Path.ts'
 
 interface CopyOperation {
