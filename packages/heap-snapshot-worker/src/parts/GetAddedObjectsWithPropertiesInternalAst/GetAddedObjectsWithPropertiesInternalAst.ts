@@ -74,16 +74,21 @@ const compareMaps = (beforeMap: HashMap, afterMap: HashMap): readonly HashMapCom
 const formatComparison = (snapshot: Snapshot, compareResult: readonly HashMapCompareResult[]): any => {
   const pretty: any[] = []
   const nameIndex = snapshot.meta.node_fields.indexOf('name')
+  const nodeFieldCount = snapshot.meta.node_fields.length
+  const idIndex = snapshot.meta.node_fields.indexOf('id')
   for (const { key, before, after } of compareResult) {
     for (const index of after) {
       if (before.includes(index)) {
         continue
       }
-      const node = snapshot.nodes[index + nameIndex]
+      const node = snapshot.nodes[index * nodeFieldCount + nameIndex]
       const nodeName = snapshot.strings[node]
+      const nodeId = snapshot.nodes[index * nodeFieldCount + idIndex]
       pretty.push({
         key,
         nodeName,
+        nodeId,
+        index,
         count: after.length,
         beforeCount: before.length,
       })
