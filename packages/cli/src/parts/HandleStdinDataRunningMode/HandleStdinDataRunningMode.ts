@@ -1,7 +1,6 @@
 import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
 import * as InterruptedMessage from '../InterruptedMessage/InterruptedMessage.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
-import * as Stdout from '../Stdout/Stdout.ts'
 import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
 
 export const handleStdinDataRunningMode = async (state, key) => {
@@ -16,15 +15,18 @@ export const handleStdinDataRunningMode = async (state, key) => {
     case AnsiKeys.ArrowDown:
     case AnsiKeys.AltBackspace:
     case AnsiKeys.ControlBackspace:
-    case AnsiKeys.Backspace:
+    case AnsiKeys.Backspace(state.isWindows):
     case AnsiKeys.ArrowLeft:
     case AnsiKeys.ArrowRight:
       return state
-    default:
-      await Stdout.write(InterruptedMessage.print() + '\n' + WatchUsage.print())
+    default: {
+      const interruptedMessage = await InterruptedMessage.print()
+      const watchUsageMessage = await WatchUsage.print()
       return {
         ...state,
         mode: ModeType.Interrupted,
+        stdout: [...state.stdout, interruptedMessage + '\n' + watchUsageMessage],
       }
+    }
   }
 }

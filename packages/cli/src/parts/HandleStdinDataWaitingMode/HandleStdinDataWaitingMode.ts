@@ -4,7 +4,6 @@ import * as Character from '../Character/Character.ts'
 import * as CliKeys from '../CliKeys/CliKeys.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
 import * as PatternUsage from '../PatternUsage/PatternUsage.ts'
-import * as Stdout from '../Stdout/Stdout.ts'
 
 export const handleStdinDataWaitingMode = async (state, key) => {
   switch (key) {
@@ -14,23 +13,29 @@ export const handleStdinDataWaitingMode = async (state, key) => {
         ...state,
         mode: ModeType.Exit,
       }
-    case AnsiKeys.Enter:
-      await Stdout.write(AnsiEscapes.eraseLine + AnsiEscapes.cursorLeft)
+    case AnsiKeys.Enter: {
+      const eraseLine = await AnsiEscapes.eraseLine()
+      const cursorLeft = await AnsiEscapes.cursorLeft()
       return {
         ...state,
         mode: ModeType.Running,
+        stdout: [...state.stdout, eraseLine + cursorLeft],
       }
+    }
     case AnsiKeys.ArrowUp:
     case AnsiKeys.ArrowDown:
       return state
     case AnsiKeys.AltBackspace:
-    case AnsiKeys.ControlBackspace:
-      await Stdout.write(AnsiEscapes.eraseLine + AnsiEscapes.cursorLeft)
+    case AnsiKeys.ControlBackspace: {
+      const eraseLine = await AnsiEscapes.eraseLine()
+      const cursorLeft = await AnsiEscapes.cursorLeft()
       return {
         ...state,
         value: Character.EmptyString,
+        stdout: [...state.stdout, eraseLine + cursorLeft],
       }
-    case AnsiKeys.Backspace:
+    }
+    case AnsiKeys.Backspace(state.isWindows):
       return {
         ...state,
         value: state.value.slice(0, -1),
@@ -45,11 +50,12 @@ export const handleStdinDataWaitingMode = async (state, key) => {
         mode: ModeType.Running,
       }
     case CliKeys.FilterMode:
-      await Stdout.write(AnsiEscapes.clear + PatternUsage.print())
+      const clear = await AnsiEscapes.clear(state.isWindows)
       return {
         ...state,
         value: Character.EmptyString,
         mode: ModeType.FilterWaiting,
+        stdout: [...state.stdout, clear + (await PatternUsage.print())],
       }
     case CliKeys.Quit:
       return {

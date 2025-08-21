@@ -10,6 +10,8 @@
     { "path": "./packages/devtools-protocol" },
     { "path": "./packages/download-worker" },
     { "path": "./packages/e2e" },
+    { "path": "./packages/file-system-worker" },
+    { "path": "./packages/file-system-worker" },
     { "path": "./packages/file-watcher-worker" },
     { "path": "./packages/heap-snapshot-worker" },
     { "path": "./packages/initialization-worker" },
@@ -17,12 +19,12 @@
     { "path": "./packages/memory-leak-finder" },
     { "path": "./packages/memory-leak-worker" },
     { "path": "./packages/page-object" },
+    { "path": "./packages/file-system-worker" },
     { "path": "./packages/repository-worker" },
     { "path": "./packages/source-map-worker" },
-    { "path": "./packages/storage-worker" },
     { "path": "./packages/stdout-worker" },
+    { "path": "./packages/storage-worker" },
     { "path": "./packages/test-coordinator" },
-    { "path": "./packages/test-worker-commands" },
     { "path": "./packages/test-worker" },
     { "path": "./packages/video-recording-worker" }
   ]

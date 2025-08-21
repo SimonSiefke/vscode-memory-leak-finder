@@ -23,8 +23,10 @@ export const startRunning = async (
   commit,
   setupOnly,
   workers,
+  isWindows,
 ) => {
-  await Stdout.write(AnsiEscapes.clear)
+  const clear = await AnsiEscapes.clear(isWindows)
+  await Stdout.write(clear)
   const rpc = await RunTest.prepare()
   await rpc.invoke(
     TestWorkerCommandType.RunTests,

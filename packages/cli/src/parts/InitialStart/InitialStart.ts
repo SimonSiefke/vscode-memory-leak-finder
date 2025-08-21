@@ -8,7 +8,7 @@ export const initialStart = async (options) => {
     await SpecialStdin.start()
   }
   if (options.watch && !options.filter) {
-    await Stdout.write(WatchUsage.print())
+    await Stdout.write(await WatchUsage.print())
     return
   }
   await StartRunning.startRunning(
@@ -31,5 +31,6 @@ export const initialStart = async (options) => {
     options.commit,
     options.setupOnly,
     options.workers,
+    options.isWindows,
   )
 }

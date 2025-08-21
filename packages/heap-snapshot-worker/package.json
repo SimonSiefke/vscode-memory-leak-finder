@@ -20,10 +20,7 @@
     "@lvce-editor/verror": "^1.7.0"
   },
   "devDependencies": {
-    "@types/node": "^24.2.0",
-    "@jest/globals": "^30.0.5",
-    "@types/babel__code-frame": "^7.0.6",
-    "@types/jest": "^30.0.0",
-    "ts-jest": "^29.4.1"
+    "@types/node": "^24.3.0",
+    "@types/babel__code-frame": "^7.0.6"
   }
 }

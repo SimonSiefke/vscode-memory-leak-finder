@@ -69,7 +69,7 @@ const connectElectron = async (electronRpc) => {
 }
 
 export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, connectionId, isFirstConnection, canUseIdleCallback) => {
-  const { child, webSocketUrl } = await LaunchIde.launchIde({
+  const { child, webSocketUrl, parsedVersion } = await LaunchIde.launchIde({
     headlessMode,
     cwd,
     ide,
@@ -104,6 +104,7 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
     monkeyPatchedElectronId,
     electronObjectId,
     childPid: child.pid,
+    parsedVersion,
   }
 }
 

@@ -1,6 +1,6 @@
 import { VError } from '@lvce-editor/verror'
+import { findFiles } from '../FileSystemWorker/FileSystemWorker.ts'
 import * as Path from '../Path/Path.ts'
-import { findFiles } from '../Filesystem/Filesystem.ts'
 
 /**
  * Finds all package-lock.json files in a directory using glob

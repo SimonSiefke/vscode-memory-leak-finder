@@ -1,20 +1,37 @@
 import ansiEscapes from 'ansi-escapes'
-import * as IsWindows from '../IsWindows/IsWindows.ts'
 
-export const cursorUp = ansiEscapes.cursorUp
+export const cursorUp = async (count: number): Promise<string> => {
+  return ansiEscapes.cursorUp(count)
+}
 
-export const eraseLine = ansiEscapes.eraseLine
+export const eraseLine = async (): Promise<string> => {
+  return ansiEscapes.eraseLine
+}
 
-export const cursorLeft = ansiEscapes.cursorLeft
+export const cursorLeft = async (): Promise<string> => {
+  return ansiEscapes.cursorLeft
+}
 
-export const eraseScreen = ansiEscapes.eraseScreen
+export const eraseScreen = async (): Promise<string> => {
+  return ansiEscapes.eraseScreen
+}
 
-export const eraseDown = ansiEscapes.eraseDown
+export const eraseDown = async (): Promise<string> => {
+  return ansiEscapes.eraseDown
+}
 
-export const backspace = ansiEscapes.cursorBackward() + ansiEscapes.eraseEndLine
+export const backspace = async (): Promise<string> => {
+  return ansiEscapes.cursorBackward() + ansiEscapes.eraseEndLine
+}
 
-export const cursorBackward = ansiEscapes.cursorBackward
+export const cursorBackward = async (length: number): Promise<string> => {
+  return ansiEscapes.cursorBackward(length)
+}
 
-export const eraseEndLine = ansiEscapes.eraseEndLine
+export const eraseEndLine = async (): Promise<string> => {
+  return ansiEscapes.eraseEndLine
+}
 
-export const clear = IsWindows.isWindows ? '\u001B[2J\u001B[0f' : '\u001B[2J\u001B[3J\u001B[H'
+export const clear = async (isWindows: boolean): Promise<string> => {
+  return isWindows ? '\u001B[2J\u001B[0f' : '\u001B[2J\u001B[3J\u001B[H'
+}

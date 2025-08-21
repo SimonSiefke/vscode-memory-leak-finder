@@ -1,4 +1,4 @@
-import { execa } from 'execa'
+import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 
 /**
  * Executes a command with arguments and returns stdout and stderr
@@ -8,7 +8,7 @@ import { execa } from 'execa'
  * @returns {Promise<{stdout: string, stderr: string, exitCode: number}>} The stdout, stderr, and exit code from the command
  */
 export const exec = async (command, args, options = {}) => {
-  const result = await execa(command, args, options)
+  const result = await FileSystemWorker.exec(command, args, options)
   return {
     stdout: result.stdout || '',
     stderr: result.stderr || '',

@@ -4,25 +4,21 @@ beforeEach(() => {
   jest.resetModules()
 })
 
+const mockWrite: (data: string) => Promise<void> = jest.fn(async (_data: string): Promise<void> => {})
+
 jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   return {
-    write: jest.fn().mockImplementation(() => Promise.resolve()),
+    write: mockWrite,
   }
 })
 
-jest.unstable_mockModule('../src/parts/IsGithubActions/IsGithubActions.ts', () => {
-  return {
-    isGithubActions: false,
-  }
-})
-
-jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => {
-  return {
-    isBuffering() {
-      return true
-    },
-  }
-})
+jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => ({
+  isGithubActions: () => false,
+  setTestStateChange: () => {},
+  isBuffering: () => false,
+  isWindows: () => false,
+  setBuffering: () => {},
+}))
 
 jest.unstable_mockModule('../src/parts/TestStateOutput/TestStateOutput.ts', () => {
   return {
@@ -35,12 +31,30 @@ jest.unstable_mockModule('../src/parts/TestStateOutput/TestStateOutput.ts', () =
 const Stdout = await import('../src/parts/Stdout/Stdout.ts')
 const TestStateOutput = await import('../src/parts/TestStateOutput/TestStateOutput.ts')
 const HandleTestPassed = await import('../src/parts/HandleTestPassed/HandleTestPassed.ts')
+const GetHandleTestPassedMessage = await import('../src/parts/GetHandleTestPassedMessage/GetHandleTestPassedMessage.ts')
+const GetTestClearMessage = await import('../src/parts/GetTestClearMessage/GetTestClearMessage.ts')
+const AnsiEscapes = await import('../src/parts/AnsiEscapes/AnsiEscapes.ts')
 
-test('handleTestPassed', () => {
-  HandleTestPassed.handleTestPassed('/test/app.test.js', '/test', 'app.test.js', 100, false)
+test('handleTestPassed', async () => {
+  const file: string = '/test/app.test.js'
+  const relativeDirName: string = '/test'
+  const fileName: string = 'app.test.js'
+  const durationMs: number = 100
+  const isLeak: boolean = false
+
+  await HandleTestPassed.handleTestPassed(file, relativeDirName, fileName, durationMs, isLeak)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
-  expect(Stdout.write).toHaveBeenCalledWith(
-    '\r\u001B[K\r\u001B[1A\r\u001B[K\r\u001B[1A\u001B[0m\u001B[7m\u001B[1m\u001B[32m PASS \u001B[39m\u001B[22m\u001B[27m\u001B[0m \u001B[2m/test/\u001B[22m\u001B[1mapp.test.js\u001B[22m (0.100 s)\n',
+
+  const baseMessage: string = await GetHandleTestPassedMessage.getHandleTestPassedMessage(
+    file,
+    relativeDirName,
+    fileName,
+    durationMs,
+    isLeak,
   )
+  const clearMessage: string = await GetTestClearMessage.getTestClearMessage()
+  const expectedOutput: string = (await AnsiEscapes.clear(false)) + clearMessage + baseMessage
+
+  expect(Stdout.write).toHaveBeenCalledWith(expectedOutput)
   expect(TestStateOutput.clearPending).toHaveBeenCalledTimes(1)
 })
