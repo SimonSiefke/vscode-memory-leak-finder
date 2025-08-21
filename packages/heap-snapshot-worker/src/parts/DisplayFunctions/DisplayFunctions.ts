@@ -7,8 +7,6 @@ export const displayHeapSnapshotFunctions = async (snapshot: Snapshot): Promise<
   const { itemsPerLocation, scriptIdOffset, lineOffset, columnOffset } = getLocationFieldOffsets(snapshot.meta.location_fields)
   const toNodeIndex = snapshot.meta.location_fields.indexOf('object_index')
   const nodeNameIndex = snapshot.meta.node_fields.indexOf('name')
-  const nodeFieldCount = snapshot.meta.node_fields.length
-  const nodeTypeIndex = snapshot.meta.node_fields.indexOf('type')
   const map = getUniqueLocationMap(
     snapshot.locations,
     itemsPerLocation,
@@ -17,9 +15,7 @@ export const displayHeapSnapshotFunctions = async (snapshot: Snapshot): Promise<
     columnOffset,
     toNodeIndex,
     nodeNameIndex,
-    nodeFieldCount,
     snapshot.nodes,
-    nodeTypeIndex,
     snapshot.strings,
   )
   return map

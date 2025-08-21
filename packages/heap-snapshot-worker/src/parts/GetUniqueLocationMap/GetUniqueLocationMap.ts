@@ -9,9 +9,7 @@ export const getUniqueLocationMap = (
   columnOffset: number,
   toNodeIndex: number,
   nodeNameIndex: number,
-  nodeFieldCount: number,
   nodes: Uint32Array,
-  nodeTypeIndex: number,
   strings: readonly string[],
 ): UniqueLocationMap => {
   const locationMap = Object.create(null)
