@@ -8,6 +8,10 @@ export const getLocations = (snapshot: Snapshot, indices: readonly number[], loc
   for (let i = 0; i < indices.length; i++) {
     const locationIndex = locations[indices[i]]
     const scriptId = locations[locationIndex + scriptIdOffset]
+    if (scriptId === 0) {
+      console.log('index', i, 'value', indices[i])
+      throw new Error('impossible, index')
+    }
     const line = locations[locationIndex + lineOffset]
     const column = locations[locationIndex + columnOffset]
     numbers[i * 3] = scriptId
