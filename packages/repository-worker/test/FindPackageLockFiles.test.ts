@@ -67,7 +67,7 @@ test('findPackageLockFiles - throws VError when findFiles fails', async () => {
   FileSystemWorker.set(mockRpc)
 
   await expect(findPackageLockFiles('/test/path')).rejects.toThrow('Failed to find package-lock.json files in directory')
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.findFiles', '**/package-locj.json', {
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.findFiles', '**/package-lock.json', {
     cwd: '/test/path',
     exclude: ['**/node_modules/**'],
   })
