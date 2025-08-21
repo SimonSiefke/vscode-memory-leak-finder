@@ -8,4 +8,8 @@ export const Setup: string = ' SETUP '
 
 export const Fail: string = ' FAIL '
 
+export const Initializing: string = ' Initializing '
+
+export const Initialized: string = ' Initialized '
+
 export const UnexpectedError: string = ' Unexpected Error '
