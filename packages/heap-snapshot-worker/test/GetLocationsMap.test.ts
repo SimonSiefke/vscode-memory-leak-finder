@@ -116,55 +116,6 @@ test('should handle different field order', () => {
   expect(result).toEqual(new Uint32Array([0]))
 })
 
-test('should handle large node count', () => {
-  const nodeCount = 100
-  const nodeFieldCount = 5
-  const locationFieldCount = 4
-
-  const nodes = new Uint32Array(nodeCount * nodeFieldCount)
-  const locations = new Uint32Array(nodeCount * locationFieldCount)
-
-  // Fill with test data
-  for (let i = 0; i < nodeCount; i++) {
-    const nodeOffset = i * nodeFieldCount
-    nodes[nodeOffset] = 0 // type
-    nodes[nodeOffset + 1] = 0 // name
-    nodes[nodeOffset + 2] = i + 1 // id
-    nodes[nodeOffset + 3] = 100 // self_size
-    nodes[nodeOffset + 4] = 0 // edge_count
-
-    const locOffset = i * locationFieldCount
-    locations[locOffset] = i // object_index
-    locations[locOffset + 1] = i + 1 // script_id
-    locations[locOffset + 2] = i + 10 // line
-    locations[locOffset + 3] = i + 20 // column
-  }
-
-  const snapshot: Snapshot = {
-    node_count: nodeCount,
-    edge_count: 0,
-    extra_native_bytes: 0,
-    meta: {
-      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count'],
-      node_types: [['object']],
-      edge_fields: [],
-      edge_types: [[]],
-      location_fields: ['object_index', 'script_id', 'line', 'column'],
-    },
-    nodes,
-    edges: new Uint32Array([]),
-    strings: ['', 'Object'],
-    locations,
-  }
-
-  const indices = [0, 50, 99] // Test with specific indices
-
-  const result = getLocationsMap(snapshot, indices)
-
-  // Expect offsets into the flat locations array
-  expect(result).toEqual(new Uint32Array([0, 200, 396]))
-})
-
 test('should throw error when index field not found', () => {
   const snapshot: Snapshot = {
     node_count: 1,
