@@ -15,7 +15,7 @@ export const getObjectWithPropertyNodeIndices = (
   edgeTypeFieldIndexParam?: number,
   edgeNameFieldIndexParam?: number,
   edgeCountFieldIndexParam?: number,
-): number[] => {
+): Uint32Array => {
   const tTotal = Timing.timeStart('GetObjectWithPropertyNodeIndices.scan')
   const { nodes, edges, strings, meta } = snapshot
 
@@ -24,12 +24,12 @@ export const getObjectWithPropertyNodeIndices = (
   const edgeTypes = meta.edge_types[0] || []
 
   if (!nodeFields.length || !edgeFields.length) {
-    return []
+    return new Uint32Array([])
   }
 
   const propertyNameIndex = strings.findIndex((str) => str === propertyName)
   if (propertyNameIndex === -1) {
-    return []
+    return new Uint32Array([])
   }
 
   const ITEMS_PER_NODE_LOCAL = ITEMS_PER_NODE ?? nodeFields.length
@@ -63,5 +63,5 @@ export const getObjectWithPropertyNodeIndices = (
   Timing.timeEnd('GetObjectWithPropertyNodeIndices.loop', tLoop)
 
   Timing.timeEnd('GetObjectWithPropertyNodeIndices.scan', tTotal)
-  return result
+  return new Uint32Array(result)
 }
