@@ -24,6 +24,10 @@ export const getUniqueLocationMap = (
     const name = strings[actualNameIndex]
     if (key in locationMap) {
       locationMap[key].count++
+      if (locationMap[key].name !== name) {
+        locationMap[key].aliases ||= []
+        locationMap[key].aliases.push(name)
+      }
     } else {
       locationMap[key] = {
         count: 1,
