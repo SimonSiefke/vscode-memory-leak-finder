@@ -189,6 +189,9 @@ test('handleStdinDataWaitingMode - filter mode', async () => {
       if (method === 'Stdout.getClear') {
         return Promise.resolve('[ansi-clear]\n')
       }
+      if (method === 'Stdout.getPatternUsageMessage') {
+        return Promise.resolve('[pattern-usage]')
+      }
       throw new Error(`unexpected method ${method}`)
     }),
   })
