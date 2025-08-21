@@ -20,7 +20,8 @@
     "noUnusedLocals": true,
     "composite": true,
     "useUnknownInCatchVariables": false,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "strictNullChecks": true
   },
   "include": ["src", "test", "benchmark"]
 }
