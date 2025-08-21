@@ -19,11 +19,11 @@
     "@lvce-editor/rpc": "^4.14.0",
     "@lvce-editor/verror": "^1.7.0",
     "ansi-escapes": "^7.0.0",
-    "chalk": "^5.5.0"
+    "chalk": "^5.6.0"
   },
   "devDependencies": {
     "@types/babel__code-frame": "^7.0.6",
-    "@types/node": "^24.1.0"
+    "@types/node": "^24.3.0"
   },
   "xo": {
     "rules": {

@@ -17,6 +17,6 @@
     "strip-ansi": "^7.1.0"
   },
   "devDependencies": {
-    "@types/node": "^24.0.0"
+    "@types/node": "^24.3.0"
   }
 }
