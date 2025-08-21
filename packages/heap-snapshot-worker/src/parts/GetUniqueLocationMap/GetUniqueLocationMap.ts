@@ -19,7 +19,6 @@ export const getUniqueLocationMap = (
     const columnIndex = locations[i + columnOffset]
     const nodeIndex = locations[i + toNodeIndex]
     const actualNameIndex = nodes[nodeIndex + nodeNameIndex]
-    // const type = nodes[nodeIndex + nodeTypeIndex]
     const key = getLocationKey(scriptId, lineIndex, columnIndex)
     const name = strings[actualNameIndex]
     if (key in locationMap) {
