@@ -12,7 +12,9 @@ export const getObjectsWithPropertiesInternalAst = (snapshot: Snapshot, property
     return []
   }
 
+  console.time('edgeMap')
   const edgeMap = createEdgeMap(nodes, nodeFields)
+  console.timeEnd('edgeMap')
   const strings = snapshot.strings
   const nodeTypes = meta.node_types
   const edgeTypes = meta.edge_types[0] || []
@@ -25,6 +27,7 @@ export const getObjectsWithPropertiesInternalAst = (snapshot: Snapshot, property
   const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
   const EDGE_TYPE_INTERNAL = edgeTypes.indexOf('internal')
 
+  console.time('indices')
   const matchingNodeIndices = getObjectWithPropertyNodeIndices(
     snapshot,
     propertyName,
@@ -34,6 +37,7 @@ export const getObjectsWithPropertiesInternalAst = (snapshot: Snapshot, property
     edgeNameFieldIndex,
     edgeCountFieldIndex,
   )
+  console.timeEnd('indices')
 
   const result: AstNode[] = []
   for (const nodeIndex of matchingNodeIndices) {
