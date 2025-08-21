@@ -1,6 +1,21 @@
 import { getLocationKey } from '../GetLocationKey/GetLocationKey.ts'
 
-export const getUniqueLocationMap = (locations, itemsPerLocation, scriptIdOffset, lineOffset, columnOffset) => {
+interface UniqueLocation {
+  readonly count: number
+  readonly index: number
+}
+
+interface UniqueLocationMap {
+  [key: string]: UniqueLocation
+}
+
+export const getUniqueLocationMap = (
+  locations: Uint32Array,
+  itemsPerLocation: number,
+  scriptIdOffset: number,
+  lineOffset: number,
+  columnOffset: number,
+): UniqueLocationMap => {
   const locationMap = Object.create(null)
   for (let i = 0; i < locations.length; i += itemsPerLocation) {
     const scriptId = locations[i + scriptIdOffset]
