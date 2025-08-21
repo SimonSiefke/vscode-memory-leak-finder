@@ -4,7 +4,7 @@ import * as Indent from '../Indent/Indent.ts'
 import * as TestPrefix from '../TestPrefix/TestPrefix.ts'
 
 export const getHandleTestFailedMessage = async (file, relativeDirName, relativeFilePath, fileName, error): Promise<string> => {
-  const formattedStack = FormatStack.formatStack(error.stack, relativeFilePath)
+  const formattedStack = await FormatStack.formatStack(error.stack, relativeFilePath)
   const messageRelativeDirName = chalk.dim(relativeDirName + '/')
   const messageFileName = chalk.bold(fileName)
   return `${TestPrefix.Fail} ${messageRelativeDirName}${messageFileName}

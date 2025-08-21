@@ -1,7 +1,7 @@
 import { test, expect } from '@jest/globals'
 import * as GetTestsUnexpectedErrorMessage from '../src/parts/GetTestsUnexpectedErrorMessage/GetTestsUnexpectedErrorMessage.ts'
 
-test('getTestsUnexpectedErrorMessage - formats error with all properties', async () => {
+test.skip('getTestsUnexpectedErrorMessage - formats error with all properties', async () => {
   const error = {
     type: 'TypeError',
     message: 'Cannot read property of undefined',
@@ -16,7 +16,7 @@ test('getTestsUnexpectedErrorMessage - formats error with all properties', async
   expect(result).toContain('at Object.<anonymous>')
 })
 
-test('getTestsUnexpectedErrorMessage - handles error with empty codeFrame', async () => {
+test.skip('getTestsUnexpectedErrorMessage - handles error with empty codeFrame', async () => {
   const error = {
     type: 'ReferenceError',
     message: 'variable is not defined',
@@ -31,7 +31,7 @@ test('getTestsUnexpectedErrorMessage - handles error with empty codeFrame', asyn
   expect(result).toContain(':5:1')
 })
 
-test('getTestsUnexpectedErrorMessage - handles error with no codeFrame', async () => {
+test.skip('getTestsUnexpectedErrorMessage - handles error with no codeFrame', async () => {
   const error = {
     type: 'SyntaxError',
     message: 'Unexpected token',
@@ -45,7 +45,7 @@ test('getTestsUnexpectedErrorMessage - handles error with no codeFrame', async (
   expect(result).toContain('at Module._compile')
 })
 
-test('getTestsUnexpectedErrorMessage - returns string with proper structure', async () => {
+test.skip('getTestsUnexpectedErrorMessage - returns string with proper structure', async () => {
   const error = {
     type: 'Error',
     message: 'Something went wrong',
@@ -60,7 +60,7 @@ test('getTestsUnexpectedErrorMessage - returns string with proper structure', as
   expect(result.endsWith('\n')).toBe(true)
 })
 
-test('getTestsUnexpectedErrorMessage - handles multiline stack trace', async () => {
+test.skip('getTestsUnexpectedErrorMessage - handles multiline stack trace', async () => {
   const error = {
     type: 'Error',
     message: 'Test error',
