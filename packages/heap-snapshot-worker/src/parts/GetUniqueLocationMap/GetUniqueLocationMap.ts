@@ -7,19 +7,25 @@ export const getUniqueLocationMap = (
   scriptIdOffset: number,
   lineOffset: number,
   columnOffset: number,
+  toNodeIndex: number,
+  nodeNameIndex: number,
+  strings: readonly string[],
 ): UniqueLocationMap => {
   const locationMap = Object.create(null)
   for (let i = 0; i < locations.length; i += itemsPerLocation) {
     const scriptId = locations[i + scriptIdOffset]
     const lineIndex = locations[i + lineOffset]
     const columnIndex = locations[i + columnOffset]
+    const nodeIndex = locations[i + toNodeIndex]
     const key = getLocationKey(scriptId, lineIndex, columnIndex)
+    const name = strings[i + nodeIndex + nodeNameIndex]
     if (key in locationMap) {
       locationMap[key].count++
     } else {
       locationMap[key] = {
         count: 1,
         index: i / itemsPerLocation,
+        name,
       }
     }
   }
