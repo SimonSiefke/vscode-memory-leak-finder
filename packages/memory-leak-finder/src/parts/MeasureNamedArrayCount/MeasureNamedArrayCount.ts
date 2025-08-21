@@ -1,16 +1,8 @@
-<<<<<<< HEAD:packages/memory-leak-finder/src/parts/MeasureNamedArrayCount/MeasureNamedArrayCount.js
 import { getHeapSnapshot } from '../GetHeapSnapshot/GetHeapSnapshot.js'
 import * as HeapSnapshotFunctions from '../HeapSnapshotFunctions/HeapSnapshotFunctions.js'
 import * as MeasureId from '../MeasureId/MeasureId.js'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.js'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.js'
-=======
-import * as CompareNamedArrayCountDifference from '../CompareNamedArrayCountDifference/CompareNamedArrayCountDifference.ts'
-import * as GetNamedArrayCount from '../GetNamedArrayCount/GetNamedArrayCount.ts'
-import * as MeasureId from '../MeasureId/MeasureId.ts'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
-import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
->>>>>>> origin/main:packages/memory-leak-finder/src/parts/MeasureNamedArrayCount/MeasureNamedArrayCount.ts
 
 export const id = MeasureId.NamedArrayCount
 
