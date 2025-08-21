@@ -19,9 +19,18 @@ test('should extract locations for given indices', () => {
     edges: new Uint32Array([]),
     strings: ['', 'Object1', 'Object2', 'Object3'],
     locations: new Uint32Array([
-      0, 1, 10, 5,  // object_index=0, script_id=1, line=10, column=5
-      5, 2, 15, 8,  // object_index=5 (1 * nodeFieldCount), script_id=2, line=15, column=8
-      10, 3, 20, 12, // object_index=10 (2 * nodeFieldCount), script_id=3, line=20, column=12
+      0,
+      1,
+      10,
+      5, // object_index=0, script_id=1, line=10, column=5
+      5,
+      2,
+      15,
+      8, // object_index=5 (1 * nodeFieldCount), script_id=2, line=15, column=8
+      10,
+      3,
+      20,
+      12, // object_index=10 (2 * nodeFieldCount), script_id=3, line=20, column=12
     ]),
   }
 
@@ -33,10 +42,16 @@ test('should extract locations for given indices', () => {
 
   const result = getLocations(snapshot, indices, locationMap)
 
-  expect(result).toEqual(new Uint32Array([
-    1, 10, 5,  // script_id=1, line=10, column=5 for object 0
-    3, 20, 12, // script_id=3, line=20, column=12 for object 2
-  ]))
+  expect(result).toEqual(
+    new Uint32Array([
+      1,
+      10,
+      5, // script_id=1, line=10, column=5 for object 0
+      3,
+      20,
+      12, // script_id=3, line=20, column=12 for object 2
+    ]),
+  )
 })
 
 test('should handle single index', () => {
@@ -198,9 +213,18 @@ test('should handle multiple indices in sequence', () => {
     edges: new Uint32Array([]),
     strings: ['', 'Object1', 'Object2', 'Object3'],
     locations: new Uint32Array([
-      0, 1, 10, 5,  // object_index=0, script_id=1, line=10, column=5
-      1, 2, 15, 8,  // object_index=1, script_id=2, line=15, column=8
-      2, 3, 20, 12, // object_index=2, script_id=3, line=20, column=12
+      0,
+      1,
+      10,
+      5, // object_index=0, script_id=1, line=10, column=5
+      1,
+      2,
+      15,
+      8, // object_index=1, script_id=2, line=15, column=8
+      2,
+      3,
+      20,
+      12, // object_index=2, script_id=3, line=20, column=12
     ]),
   }
 
@@ -213,9 +237,17 @@ test('should handle multiple indices in sequence', () => {
 
   const result = getLocations(snapshot, indices, locationMap)
 
-  expect(result).toEqual(new Uint32Array([
-    1, 10, 5,  // script_id=1, line=10, column=5 for object 0
-    2, 15, 8,  // script_id=2, line=15, column=8 for object 1
-    3, 20, 12, // script_id=3, line=20, column=12 for object 2
-  ]))
+  expect(result).toEqual(
+    new Uint32Array([
+      1,
+      10,
+      5, // script_id=1, line=10, column=5 for object 0
+      2,
+      15,
+      8, // script_id=2, line=15, column=8 for object 1
+      3,
+      20,
+      12, // script_id=3, line=20, column=12 for object 2
+    ]),
+  )
 })

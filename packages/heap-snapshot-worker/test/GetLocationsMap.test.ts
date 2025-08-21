@@ -18,9 +18,18 @@ test('should create location map for valid snapshot', () => {
     edges: new Uint32Array([]),
     strings: ['', 'Object1', 'Object2', 'Object3'],
     locations: new Uint32Array([
-      0, 1, 10, 5,  // object_index=0, script_id=1, line=10, column=5
-      1, 2, 15, 8,  // object_index=1, script_id=2, line=15, column=8
-      2, 3, 20, 12, // object_index=2, script_id=3, line=20, column=12
+      0,
+      1,
+      10,
+      5, // object_index=0, script_id=1, line=10, column=5
+      1,
+      2,
+      15,
+      8, // object_index=1, script_id=2, line=15, column=8
+      2,
+      3,
+      20,
+      12, // object_index=2, script_id=3, line=20, column=12
     ]),
   }
 
@@ -111,10 +120,10 @@ test('should handle large node count', () => {
   const nodeCount = 100
   const nodeFieldCount = 5
   const locationFieldCount = 4
-  
+
   const nodes = new Uint32Array(nodeCount * nodeFieldCount)
   const locations = new Uint32Array(nodeCount * locationFieldCount)
-  
+
   // Fill with test data
   for (let i = 0; i < nodeCount; i++) {
     const nodeOffset = i * nodeFieldCount
@@ -123,14 +132,14 @@ test('should handle large node count', () => {
     nodes[nodeOffset + 2] = i + 1 // id
     nodes[nodeOffset + 3] = 100 // self_size
     nodes[nodeOffset + 4] = 0 // edge_count
-    
+
     const locOffset = i * locationFieldCount
     locations[locOffset] = i // object_index
     locations[locOffset + 1] = i + 1 // script_id
     locations[locOffset + 2] = i + 10 // line
     locations[locOffset + 3] = i + 20 // column
   }
-  
+
   const snapshot: Snapshot = {
     node_count: nodeCount,
     edge_count: 0,
@@ -194,9 +203,18 @@ test('should handle sparse object indices', () => {
     edges: new Uint32Array([]),
     strings: ['', 'Object1', 'Object2', 'Object3', 'Object4', 'Object5'],
     locations: new Uint32Array([
-      0, 1, 10, 5,  // object_index=0, script_id=1, line=10, column=5
-      2, 2, 15, 8,  // object_index=2, script_id=2, line=15, column=8
-      4, 3, 20, 12, // object_index=4, script_id=3, line=20, column=12
+      0,
+      1,
+      10,
+      5, // object_index=0, script_id=1, line=10, column=5
+      2,
+      2,
+      15,
+      8, // object_index=2, script_id=2, line=15, column=8
+      4,
+      3,
+      20,
+      12, // object_index=4, script_id=3, line=20, column=12
     ]),
   }
 

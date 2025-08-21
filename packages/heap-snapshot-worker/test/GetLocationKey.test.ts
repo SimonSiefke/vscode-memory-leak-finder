@@ -56,12 +56,12 @@ test('should create unique keys for different combinations', () => {
   const key2 = getLocationKey(1, 10, 6)
   const key3 = getLocationKey(1, 11, 5)
   const key4 = getLocationKey(2, 10, 5)
-  
+
   expect(key1).toBe('1:10:5')
   expect(key2).toBe('1:10:6')
   expect(key3).toBe('1:11:5')
   expect(key4).toBe('2:10:5')
-  
+
   // All keys should be different
   const keys = [key1, key2, key3, key4]
   const uniqueKeys = new Set(keys)

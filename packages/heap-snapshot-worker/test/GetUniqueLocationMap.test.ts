@@ -72,12 +72,30 @@ test('getUniqueLocationMap - different items per location', () => {
 
 test('getUniqueLocationMap - multiple duplicates with different counts', () => {
   const locations = new Uint32Array([
-    1, 2, 3, 4, // location 1: scriptId=2, line=3, column=4
-    1, 2, 3, 4, // location 1 duplicate
-    1, 5, 6, 7, // location 2: scriptId=5, line=6, column=7
-    1, 2, 3, 4, // location 1 duplicate
-    1, 5, 6, 7, // location 2 duplicate
-    1, 5, 6, 7, // location 2 duplicate
+    1,
+    2,
+    3,
+    4, // location 1: scriptId=2, line=3, column=4
+    1,
+    2,
+    3,
+    4, // location 1 duplicate
+    1,
+    5,
+    6,
+    7, // location 2: scriptId=5, line=6, column=7
+    1,
+    2,
+    3,
+    4, // location 1 duplicate
+    1,
+    5,
+    6,
+    7, // location 2 duplicate
+    1,
+    5,
+    6,
+    7, // location 2 duplicate
   ])
   expect(getUniqueLocationMap(locations, 4, 1, 2, 3)).toEqual({
     '2:3:4': {
