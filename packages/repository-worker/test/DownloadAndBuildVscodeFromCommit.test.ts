@@ -19,7 +19,7 @@ const mockCloneRepository = jest.fn()
 const mockInstallDependencies = jest.fn()
 const mockResolveCommitHash = jest.fn()
 const mockRunCompile = jest.fn()
-const mockSetupNodeModulesFromCache = jest.fn()
+const mockCopyNodeModulesFromCacheToRepositoryFolder = jest.fn()
 const mockLog = jest.fn()
 
 jest.unstable_mockModule('path-exists', () => ({
@@ -45,10 +45,6 @@ jest.unstable_mockModule('../src/parts/CacheNodeModules/CacheNodeModules.ts', ()
   addNodeModulesToCache: mockAddNodeModulesToCache,
 }))
 
-jest.unstable_mockModule('../src/parts/CheckCacheExists/CheckCacheExists.ts', () => ({
-  checkCacheExists: mockCheckCacheExists,
-}))
-
 jest.unstable_mockModule('../src/parts/CheckoutCommit/CheckoutCommit.ts', () => ({
   checkoutCommit: mockCheckoutCommit,
 }))
@@ -69,8 +65,8 @@ jest.unstable_mockModule('../src/parts/RunCompile/RunCompile.ts', () => ({
   runCompile: mockRunCompile,
 }))
 
-jest.unstable_mockModule('../src/parts/SetupNodeModulesFromCache/SetupNodeModulesFromCache.ts', () => ({
-  setupNodeModulesFromCache: mockSetupNodeModulesFromCache,
+jest.unstable_mockModule('../src/parts/CopyNodeModulesFromCacheToRepositoryFolder/CopyNodeModulesFromCacheToRepositoryFolder.ts', () => ({
+  copyNodeModulesFromCacheToRepositoryFolder: mockCopyNodeModulesFromCacheToRepositoryFolder,
 }))
 
 jest.unstable_mockModule('../src/parts/Logger/Logger.ts', () => ({
@@ -126,7 +122,7 @@ beforeEach(() => {
   mockCloneRepository.mockReturnValue(undefined)
   mockCheckoutCommit.mockReturnValue(undefined)
   mockCheckCacheExists.mockReturnValue(false)
-  mockSetupNodeModulesFromCache.mockReturnValue(true)
+  mockCopyNodeModulesFromCacheToRepositoryFolder.mockReturnValue(true)
   mockInstallDependencies.mockReturnValue(undefined)
   mockAddNodeModulesToCache.mockReturnValue(undefined)
   mockRunCompile.mockReturnValue(undefined)
