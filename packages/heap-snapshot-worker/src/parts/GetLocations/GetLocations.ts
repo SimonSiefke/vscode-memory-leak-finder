@@ -1,6 +1,6 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
-export const getLocations = (snapshot: Snapshot, indices: readonly number[], locations: Uint32Array): Uint32Array => {
+export const getLocations = (snapshot: Snapshot, indices: Uint32Array, locations: Uint32Array): Uint32Array => {
   const scriptIdOffset = snapshot.meta.location_fields.indexOf('script_id')
   const lineOffset = snapshot.meta.location_fields.indexOf('line')
   const columnOffset = snapshot.meta.location_fields.indexOf('column')
