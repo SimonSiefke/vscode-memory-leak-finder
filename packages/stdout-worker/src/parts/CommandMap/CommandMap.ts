@@ -8,6 +8,8 @@ import * as GetHandleTestPassedMessage from '../GetHandleTestPassedMessage/GetHa
 import * as GetHandleTestRunningMessage from '../GetHandleTestRunningMessage/GetHandleTestRunningMessage.ts'
 import * as GetHandleTestSetupMessage from '../GetHandleTestSetupMessage/GetHandleTestSetupMessage.ts'
 import * as GetHandleTestSkippedMessage from '../GetHandleTestSkippedMessage/GetHandleTestSkippedMessage.ts'
+import * as GetInitializedMessage from '../GetInitializedMessage/GetInitializedMessage.ts'
+import * as GetInitializingMessage from '../GetInitializingMessage/GetInitializingMessage.ts'
 import * as GetInterruptedMessage from '../GetInterruptedMessage/GetInterruptedMessage.ts'
 import * as GetPatternUsageMessage from '../GetPatternUsageMessage/GetPatternUsageMessage.ts'
 import * as GetTestClearMessage from '../GetTestClearMessage/GetTestClearMessage.ts'
@@ -33,6 +35,8 @@ export const commandMap: Record<string, (...args: any[]) => any> = {
   'Stdout.getHandleTestRunningMessage': GetHandleTestRunningMessage.getHandleTestRunningMessage,
   'Stdout.getHandleTestSetupMessage': GetHandleTestSetupMessage.getHandleTestSetupMessage,
   'Stdout.gethandleTestSkippedMessage': GetHandleTestSkippedMessage.getHandleTestSkippedMessage,
+  'Stdout.getInitializedMessage': GetInitializedMessage.getInitializedMessage,
+  'Stdout.getInitializingMessage': GetInitializingMessage.getInitializingMessage,
   'Stdout.getInterruptedMessage': GetInterruptedMessage.getInterruptedMessage,
   'Stdout.getPatternUsageMessage': GetPatternUsageMessage.getPatternUsageMessage,
   'Stdout.getTestClearMessage': GetTestClearMessage.getTestClearMessage,
