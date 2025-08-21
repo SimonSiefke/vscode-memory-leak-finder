@@ -33,7 +33,7 @@ export const applyFileOperation = async (operation: FileOperation): Promise<void
 
       case 'remove': {
         const fromPath: string = operation.from
-        await remove(fromPath)
+        await remove(fromPath, { recursive: true })
         break
       }
 
