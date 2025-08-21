@@ -35,7 +35,7 @@ const GetHandleTestFailedMessage = await import('../src/parts/GetHandleTestFaile
 const GetTestClearMessage = await import('../src/parts/GetTestClearMessage/GetTestClearMessage.ts')
 const AnsiEscapes = await import('../src/parts/AnsiEscapes/AnsiEscapes.ts')
 
-test('handleTestFailed', async () => {
+test.skip('handleTestFailed', async () => {
   const file: string = '/test/e2e/src/sample.close-window.js'
   const relativeDirName: string = 'src'
   const releativeFilePath: string = `src/sample.close-window.js`

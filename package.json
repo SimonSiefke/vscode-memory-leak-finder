@@ -9,7 +9,7 @@
     "e2e:check-flakyness": "lerna run e2e:check-flakyness",
     "e2e": "lerna run e2e",
     "format": "prettier --write .",
-    "postinstall": "lerna bootstrap --ci && node scripts/postinstall.js",
+    "postinstall": "lerna bootstrap --ci",
     "test": "lerna run test",
     "type-check": "tsc -b",
     "build-charts": "node packages/charts/src/main.ts"
@@ -26,11 +26,11 @@
   },
   "homepage": "https://github.com/SimonSiefke/vscode-memory-leak-finder#readme",
   "devDependencies": {
-    "@jest/globals": "^29.7.0",
+    "@jest/globals": "^30.0.5",
     "@lerna/legacy-package-management": "^8.2.4",
-    "@types/node": "^24.2.1",
+    "@types/node": "^24.3.0",
     "execa": "^9.6.0",
-    "jest": "^29.7.0",
+    "jest": "^30.0.5",
     "jest-environment-jsdom": "^30.0.5",
     "lerna": "^8.2.3",
     "prettier": "^3.6.2",

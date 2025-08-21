@@ -1,3 +1,4 @@
+import * as FormatStack from '../FormatStack/FormatStack.ts'
 import * as GetAllTestsFinishedMessage from '../GetAllTestsFinishedMessage/GetAllTestsFinishedMessage.ts'
 import * as GetAnsiEscapes from '../GetAnsiEscapes/GetAnsiEscapes.ts'
 import * as GetGitHubFileErrorMessage from '../GetGitHubFileErrorMessage/GetGitHubFileErrorMessage.ts'
@@ -8,13 +9,16 @@ import * as GetHandleTestPassedMessage from '../GetHandleTestPassedMessage/GetHa
 import * as GetHandleTestRunningMessage from '../GetHandleTestRunningMessage/GetHandleTestRunningMessage.ts'
 import * as GetHandleTestSetupMessage from '../GetHandleTestSetupMessage/GetHandleTestSetupMessage.ts'
 import * as GetHandleTestSkippedMessage from '../GetHandleTestSkippedMessage/GetHandleTestSkippedMessage.ts'
+import * as GetInitializedMessage from '../GetInitializedMessage/GetInitializedMessage.ts'
+import * as GetInitializingMessage from '../GetInitializingMessage/GetInitializingMessage.ts'
 import * as GetInterruptedMessage from '../GetInterruptedMessage/GetInterruptedMessage.ts'
 import * as GetPatternUsageMessage from '../GetPatternUsageMessage/GetPatternUsageMessage.ts'
 import * as GetTestClearMessage from '../GetTestClearMessage/GetTestClearMessage.ts'
 import * as GetTestsUnexpectedErrorMessage from '../GetTestsUnexpectedErrorMessage/GetTestsUnexpectedErrorMessage.ts'
 import * as GetWatchUsageMessage from '../GetWatchUsageMessage/GetWatchUsageMessage.ts'
 
-export const commandMap: Record<string, (...args: any[]) => any> = {
+export const commandMap: Record<string, (...args: readonly any[]) => any> = {
+  'Stdout.formatStack': FormatStack.formatStack,
   'Stdout.getAllTestsFinishedMessage': GetAllTestsFinishedMessage.getAllTestsFinishedMessage,
   'Stdout.getBackspace': GetAnsiEscapes.getBackspace,
   'Stdout.getClear': GetAnsiEscapes.getClear,
@@ -33,6 +37,8 @@ export const commandMap: Record<string, (...args: any[]) => any> = {
   'Stdout.getHandleTestRunningMessage': GetHandleTestRunningMessage.getHandleTestRunningMessage,
   'Stdout.getHandleTestSetupMessage': GetHandleTestSetupMessage.getHandleTestSetupMessage,
   'Stdout.gethandleTestSkippedMessage': GetHandleTestSkippedMessage.getHandleTestSkippedMessage,
+  'Stdout.getInitializedMessage': GetInitializedMessage.getInitializedMessage,
+  'Stdout.getInitializingMessage': GetInitializingMessage.getInitializingMessage,
   'Stdout.getInterruptedMessage': GetInterruptedMessage.getInterruptedMessage,
   'Stdout.getPatternUsageMessage': GetPatternUsageMessage.getPatternUsageMessage,
   'Stdout.getTestClearMessage': GetTestClearMessage.getTestClearMessage,
