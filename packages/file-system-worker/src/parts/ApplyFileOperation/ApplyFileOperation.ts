@@ -39,7 +39,7 @@ export const applyFileOperation = async (operation: FileOperation): Promise<void
 
       case 'mkdir': {
         const { path } = operation
-        await makeDirectory(path)
+        await makeDirectory(path, { recursive: true })
         break
       }
     }
