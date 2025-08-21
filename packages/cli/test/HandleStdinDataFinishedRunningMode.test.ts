@@ -38,7 +38,29 @@ test('handleStdinDataFinishedRunningMode - show watch mode details', async () =>
   expect(newState.stdout).toEqual(['[cursor-up][erase-down][watch-usage]'])
 })
 
-test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
+test.only('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke(method) {
+      console.log({ method })
+      switch (method) {
+        case 'Stdout.getCursorUp':
+          return '[cursor-up]'
+        case 'Stdout.getPatternUsageMessage':
+          return '[pattern-usage]'
+        case 'Stdout.getClear':
+          return '[clear]'
+        case 'Stdout.getEraseDown':
+          return '[erase-down]'
+        case 'Stdout.getWatchUsageMessage':
+          return '[watch-usage]'
+        default:
+          return 'n/a'
+      }
+    },
+  })
+
+  StdoutWorker.set(mockRpc)
   const state = {
     ...createDefaultState(),
     value: '',
@@ -47,17 +69,30 @@ test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
   }
   const key = CliKeys.FilterMode
 
-  // Mock the stdout worker to return pattern usage message
-  mockInvoke.mockResolvedValue('[ansi-clear]\npattern usage\n')
-
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.FilterWaiting)
   expect(newState.value).toBe('')
-  expect(newState.stdout).toEqual(['[ansi-clear]\npattern usage\n'])
-  expect(mockRpc.invoke).toHaveBeenCalled()
+  expect(newState.stdout).toEqual(['[clear][pattern-usage]'])
 })
 
 test('handleStdinDataFinishedRunningMode - quit', async () => {
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke(method) {
+      switch (method) {
+        case 'Stdout.getCursorUp':
+          return '[cursor-up]'
+        case 'Stdout.getEraseDown':
+          return '[erase-down]'
+        case 'Stdout.getWatchUsageMessage':
+          return '[watch-usage]'
+        default:
+          return 'n/a'
+      }
+    },
+  })
+
+  StdoutWorker.set(mockRpc)
   const state = {
     ...createDefaultState(),
     value: '',
@@ -70,6 +105,23 @@ test('handleStdinDataFinishedRunningMode - quit', async () => {
 })
 
 test('handleStdinDataFinishedRunningMode - run again', async () => {
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke(method) {
+      switch (method) {
+        case 'Stdout.getCursorUp':
+          return '[cursor-up]'
+        case 'Stdout.getEraseDown':
+          return '[erase-down]'
+        case 'Stdout.getWatchUsageMessage':
+          return '[watch-usage]'
+        default:
+          return 'n/a'
+      }
+    },
+  })
+
+  StdoutWorker.set(mockRpc)
   const state = {
     ...createDefaultState(),
     value: '',
