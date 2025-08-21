@@ -89,7 +89,15 @@ export const getNodePreviews = (
       }
     } else if (propertyNameIndex !== -1) {
       const tEdges = Timing.timeStart('GetNodePreviews.getNodeEdges')
-      const nodeEdges = getNodeEdgesFast(sourceNodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE_OVERRIDE, edgeCountFieldIndexOverride)
+      const nodeEdges = getNodeEdgesFast(
+        sourceNodeIndex,
+        edgeMap,
+        nodes,
+        edges,
+        ITEMS_PER_NODE,
+        ITEMS_PER_EDGE_OVERRIDE,
+        edgeCountFieldIndexOverride,
+      )
       Timing.timeEnd('GetNodePreviews.getNodeEdges', tEdges)
       let targetNodeIndex: number | undefined
       const tFindEdge = Timing.timeStart('GetNodePreviews.findPropertyEdge')
@@ -116,12 +124,12 @@ export const getNodePreviews = (
           targetNodeIndex,
           nodeFields,
           nodeTypes,
-      edgeFields,
+          edgeFields,
           strings,
           ITEMS_PER_NODE,
           ITEMS_PER_EDGE,
-      idFieldIndex,
-      edgeCountFieldIndex,
+          idFieldIndex,
+          edgeCountFieldIndex,
           edgeTypeFieldIndex,
           edgeNameFieldIndex,
           edgeToNodeFieldIndex,

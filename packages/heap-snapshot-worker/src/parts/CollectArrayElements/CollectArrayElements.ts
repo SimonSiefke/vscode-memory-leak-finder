@@ -56,20 +56,10 @@ export const collectArrayElements = (
 
   try {
     // Get edges for this array node as subarray
-    const nodeEdges = getNodeEdgesFast(
-      nodeIndex,
-      edgeMap,
-      nodes,
-      edges,
-      ITEMS_PER_NODE,
-      ITEMS_PER_EDGE,
-      edgeCountFieldIndex,
-    )
+    const nodeEdges = getNodeEdgesFast(nodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
 
     // Collect element edges and sort by index
     const elementEdges: Array<{ index: number; toNode: number }> = []
-
-
 
     for (let i = 0; i < nodeEdges.length; i += ITEMS_PER_EDGE) {
       const edgeType = nodeEdges[i + edgeTypeFieldIndex]

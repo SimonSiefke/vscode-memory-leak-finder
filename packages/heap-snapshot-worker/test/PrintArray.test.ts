@@ -6,10 +6,7 @@ test('printArray', () => {
   const node: ArrayNode = {
     type: 'array',
     id: 7,
-    elements: [
-      { type: 'number', id: 8, value: 1 } as NumberNode,
-      { type: 'string', id: 9, value: 'a' } as StringNode,
-    ],
+    elements: [{ type: 'number', id: 8, value: 1 } as NumberNode, { type: 'string', id: 9, value: 'a' } as StringNode],
   }
   expect(printArray(node)).toEqual([1, 'a'])
 })

@@ -10,5 +10,3 @@ export const printObject = (node: ObjectNode): PrintedValue => {
   }
   return out
 }
-
-
