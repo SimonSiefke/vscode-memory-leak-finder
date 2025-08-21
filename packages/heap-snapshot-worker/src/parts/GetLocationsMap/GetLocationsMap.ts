@@ -11,8 +11,14 @@ export const getLocationsMap = (snapshot: Snapshot, indices: readonly number[]):
   if (indexOffset === -1) {
     throw new Error('index not found')
   }
+  console.log('nodecount', snapshot.nodes.length)
+  console.log('edgecount', snapshot.edges.length)
   const locationMap = new Uint32Array(snapshot.nodes.length / nodeFieldCount)
   for (let i = 0; i < locations.length; i += locationFieldCount) {
+    if (i > locationMap.length) {
+      throw new Error('imppossible')
+    }
+    // if(locations[i])
     locationMap[locations[i]] = i
   }
   return locationMap

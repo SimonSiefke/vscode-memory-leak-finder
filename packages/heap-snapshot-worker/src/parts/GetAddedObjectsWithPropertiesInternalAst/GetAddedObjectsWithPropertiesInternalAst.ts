@@ -41,9 +41,14 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   // TODO ensure nodes are functions
   const indicesBefore = getObjectWithPropertyNodeIndices(before, propertyName)
   const indicesAfter = getObjectWithPropertyNodeIndices(after, propertyName)
-  console.time('locations')
+  console.time('locationMap')
   const locationMapBefore = getLocationMap(before, indicesBefore)
   const locationMapAfter = getLocationMap(after, indicesAfter)
+  console.timeEnd('locationMap')
+
+  console.time('locations')
+
+  console.log({ locationMapBefore })
 
   const locationsBefore = getLocations(before, indicesBefore, locationMapBefore)
   const locationsAfter = getLocations(after, indicesAfter, locationMapAfter)
@@ -51,7 +56,7 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   const hashesBefore = getLocationHashes(locationsBefore)
   const hashesAfter = getLocationHashes(locationsAfter)
 
-  console.log({ hashesBefore, hashesAfter })
+  // console.log({ hashesBefore, hashesAfter })
   console.timeEnd('locations')
   const added2 = getAdded(before, after, indicesBefore, indicesAfter)
   console.log('field', before.meta.node_fields.length)
