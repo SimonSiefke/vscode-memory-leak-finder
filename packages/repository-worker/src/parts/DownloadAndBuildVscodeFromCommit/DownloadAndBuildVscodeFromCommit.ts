@@ -1,16 +1,15 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as CacheNodeModules from '../CacheNodeModules/CacheNodeModules.ts'
-import * as CheckCacheExists from '../CheckCacheExists/CheckCacheExists.ts'
 import * as CheckoutCommit from '../CheckoutCommit/CheckoutCommit.ts'
 import * as CloneRepository from '../CloneRepository/CloneRepository.ts'
 import { computeVscodeNodeModulesCacheKey } from '../ComputeVscodeNodeModulesCacheKey/ComputeVscodeNodeModulesCacheKey.ts'
+import * as SetupNodeModulesFromCache from '../CopyNodeModulesFromCacheToRepositoryFolder/CopyNodeModulesFromCacheToRepositoryFolder.ts'
 import * as Filesystem from '../Filesystem/Filesystem.ts'
 import * as InstallDependencies from '../InstallDependencies/InstallDependencies.ts'
 import * as Logger from '../Logger/Logger.ts'
 import * as Path from '../Path/Path.ts'
 import * as ResolveCommitHash from '../ResolveCommitHash/ResolveCommitHash.ts'
 import * as RunCompile from '../RunCompile/RunCompile.ts'
-import * as SetupNodeModulesFromCache from '../SetupNodeModulesFromCache/SetupNodeModulesFromCache.ts'
 
 export const downloadAndBuildVscodeFromCommit = async (
   commitRef: string,
@@ -57,10 +56,13 @@ export const downloadAndBuildVscodeFromCommit = async (
 
   if (needsInstall) {
     Logger.log(`[repository] Installing dependencies for commit ${commitHash}...`)
-    const nodeModulesHash=await computeVscodeNodeModulesCacheKey(repoPathWithCommitHash)
-    const cacheExists = await   Filesystem.pathExists(Path.join(nodeModulesCacheDir, nodeModulesHash))
+    const nodeModulesHash = await computeVscodeNodeModulesCacheKey(repoPathWithCommitHash)
+    const cacheExists = await Filesystem.pathExists(Path.join(nodeModulesCacheDir, nodeModulesHash))
     if (cacheExists) {
-      await SetupNodeModulesFromCache.copyNodeModulesFromCacheToFolder(Path.join(nodeModulesCacheDir, nodeModulesHash) ,repoPathWithCommitHash)
+      await SetupNodeModulesFromCache.copyNodeModulesFromCacheToRepositoryFolder(
+        Path.join(nodeModulesCacheDir, nodeModulesHash),
+        repoPathWithCommitHash,
+      )
     } else {
       await InstallDependencies.installDependencies(repoPathWithCommitHash, useNice)
       await CacheNodeModules.addNodeModulesToCache(repoPathWithCommitHash, commitHash, nodeModulesCacheDir)
