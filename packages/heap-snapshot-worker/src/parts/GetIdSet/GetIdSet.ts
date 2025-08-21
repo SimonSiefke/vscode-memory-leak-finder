@@ -8,7 +8,8 @@ export const getIdSet = (snapshot: Snapshot, indices: readonly number[]): Set<nu
   }
   const ids: number[] = []
   for (let i = 0; i < indices.length; i++) {
-    const id = snapshot.nodes[i * nodeFieldCount + idOffset]
+    const actualIndex = indices[i] * nodeFieldCount
+    const id = snapshot.nodes[actualIndex + idOffset]
     ids.push(id)
   }
   const idSet = new Set(ids)
