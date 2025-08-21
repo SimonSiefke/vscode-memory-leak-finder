@@ -1,22 +1,5 @@
+import { FileOperation } from '../FileOperation/FileOperation.ts'
 import * as Path from '../Path/Path.ts'
-
-interface CopyOperation {
-  type: 'copy'
-  from: string
-  to: string
-}
-
-interface MkdirOperation {
-  type: 'mkdir'
-  path: string
-}
-
-interface RemoveOperation {
-  type: 'remove'
-  from: string
-}
-
-type FileOperation = CopyOperation | MkdirOperation | RemoveOperation
 
 export const getRestoreNodeModulesFileOperations = (from: string, to: string, pathsToRestore: string[]): readonly FileOperation[] => {
   return pathsToRestore.map((relativePath) => {
