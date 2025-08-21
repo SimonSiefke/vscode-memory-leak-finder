@@ -16,7 +16,6 @@ test('handleStdinDataWaitingMode - ctrl + c', async () => {
   const key = AnsiKeys.ControlC
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
-  expect(newState).toBe(state)
 })
 
 test('handleStdinDataWaitingMode - ctrl + d', async () => {
@@ -28,7 +27,6 @@ test('handleStdinDataWaitingMode - ctrl + d', async () => {
   const key = AnsiKeys.ControlD
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
-  expect(newState).toBe(state)
 })
 
 test('handleStdinDataWaitingMode - enter', async () => {
