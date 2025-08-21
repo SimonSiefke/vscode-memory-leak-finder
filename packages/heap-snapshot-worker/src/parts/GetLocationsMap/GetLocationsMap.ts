@@ -1,6 +1,6 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
-export const getLocationsMap = (snapshot: Snapshot, indices: readonly number[]): Uint32Array => {
+export const getLocationsMap = (snapshot: Snapshot, indices: Uint32Array): Uint32Array => {
   if (indices.length === 0) {
     return new Uint32Array([])
   }
