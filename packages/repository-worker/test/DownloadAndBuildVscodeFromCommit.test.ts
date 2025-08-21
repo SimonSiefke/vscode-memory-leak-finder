@@ -220,7 +220,7 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missi
   expect(mockInstallDependencies).toHaveBeenCalled()
 
   // Verify that logger was called for installation
-  expect(mockLog).toHaveBeenCalledWith(`Installing dependencies for commit ${testCommitHash}...`)
+  expect(mockLog).toHaveBeenCalledWith(`[repository] Installing dependencies for commit ${testCommitHash}...`)
 })
 
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with existing node_modules', async () => {
