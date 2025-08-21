@@ -11,9 +11,9 @@ export const getBinaryPath = async (vscodeVersion: string, vscodePath: string, c
   if (commit) {
     const repoUrl = 'https://github.com/microsoft/vscode.git'
     const reposDir = join(Root.root, '.vscode-repos')
-    const cacheDir = join(Root.root, '.vscode-node-modules-cache')
+    const nodeModulesCacheDir = join(Root.root, '.vscode-node-modules-cache')
     const useNice = process.platform === 'linux'
-    return await DownloadAndBuildVscodeFromCommit.downloadAndBuildVscodeFromCommit(commit, repoUrl, reposDir, cacheDir, useNice)
+    return await DownloadAndBuildVscodeFromCommit.downloadAndBuildVscodeFromCommit(commit, repoUrl, reposDir, nodeModulesCacheDir, useNice)
   }
   if (Env.env.VSCODE_PATH) {
     console.warn('Warning: Using VSCODE_PATH environment variable is deprecated. Please use --vscode-path CLI flag instead.')
