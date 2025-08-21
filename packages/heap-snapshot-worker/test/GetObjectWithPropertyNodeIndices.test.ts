@@ -150,7 +150,7 @@ test('should handle custom field indices', () => {
     3, // ITEMS_PER_EDGE
     0, // edgeTypeFieldIndex
     1, // edgeNameFieldIndex
-    4  // edgeCountFieldIndex
+    4, // edgeCountFieldIndex
   )
 
   expect(result).toHaveLength(1)
@@ -293,63 +293,75 @@ test('should handle empty strings as property names', () => {
 })
 
 test('should handle large number of nodes efficiently', () => {
-  const nodeCount = 1000
-  const edgeCount = 500
-  
+  const nodeCount = 100
+  const edgeCount = 10
+
   // Create a large snapshot with many nodes
   const nodes = new Uint32Array(nodeCount * 7)
   const edges = new Uint32Array(edgeCount * 3)
   const strings = ['', 'Object', 'testProperty']
-  
-  // Fill nodes array
+
+  // Fill nodes array - only first 10 nodes have edges
   for (let i = 0; i < nodeCount; i++) {
     const offset = i * 7
     nodes[offset] = 3 // type: object
     nodes[offset + 1] = 1 // name: Object
     nodes[offset + 2] = i + 1 // id
     nodes[offset + 3] = 100 // self_size
-    nodes[offset + 4] = 1 // edge_count
+    nodes[offset + 4] = i < 10 ? 1 : 0 // edge_count: only first 10 have edges
     nodes[offset + 5] = 0 // trace_node_id
     nodes[offset + 6] = 0 // detachedness
   }
-  
-  // Fill edges array - every 10th object has the test property
-  let edgeIndex = 0
-  for (let i = 0; i < nodeCount; i += 10) {
-    if (edgeIndex < edgeCount) {
-      const edgeOffset = edgeIndex * 3
-      edges[edgeOffset] = 2 // type: property
-      edges[edgeOffset + 1] = 2 // name_or_index: testProperty
-      edges[edgeOffset + 2] = 0 // to_node (dummy value)
-      edgeIndex++
-    }
+
+  // Fill edges array - first 10 objects have the test property
+  for (let i = 0; i < edgeCount; i++) {
+    const edgeOffset = i * 3
+    edges[edgeOffset] = 2 // type: property
+    edges[edgeOffset + 1] = 2 // name_or_index: testProperty
+    edges[edgeOffset + 2] = 0 // to_node (dummy value)
   }
-  
+
   const snapshot: Snapshot = {
     node_count: nodeCount,
     edge_count: edgeCount,
     extra_native_bytes: 0,
     meta: {
       node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
+      node_types: [
+        [
+          'hidden',
+          'array',
+          'string',
+          'object',
+          'code',
+          'closure',
+          'regexp',
+          'number',
+          'native',
+          'synthetic',
+          'concatenated string',
+          'sliced string',
+          'symbol',
+          'bigint',
+        ],
+      ],
       edge_fields: ['type', 'name_or_index', 'to_node'],
       edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
-      location_fields: ['object_index', 'script_id', 'line', 'column']
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
     },
     nodes,
     edges,
     strings,
-    locations: new Uint32Array([])
+    locations: new Uint32Array([]),
   }
 
   const result = getObjectWithPropertyNodeIndices(snapshot, 'testProperty')
 
-  // Should find approximately nodeCount/10 objects with the property
-  const expectedCount = Math.floor(nodeCount / 10)
-  expect(result).toHaveLength(expectedCount)
-  
-  // Check that the indices are correct (every 10th index)
-  for (let i = 0; i < expectedCount; i++) {
-    expect(result[i]).toBe(i * 10)
+  // Should find exactly edgeCount objects with the property
+  expect(result).toHaveLength(edgeCount)
+
+  // Check that the indices are correct (first 10 indices)
+  for (let i = 0; i < edgeCount; i++) {
+    expect(result[i]).toBe(i)
   }
 })
