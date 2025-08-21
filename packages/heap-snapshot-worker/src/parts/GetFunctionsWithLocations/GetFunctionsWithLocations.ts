@@ -1,5 +1,5 @@
 export const getFunctionsWithLocations = (parsedNodes, locations, scriptMap) => {
-  const functionsWithLocations = []
+  const functionsWithLocations: any[] = []
   for (const location of locations) {
     const script = scriptMap[location.scriptIdIndex]
     const url = script?.url || ''
