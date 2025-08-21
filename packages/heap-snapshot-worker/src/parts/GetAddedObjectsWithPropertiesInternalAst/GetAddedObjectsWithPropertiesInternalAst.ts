@@ -41,8 +41,8 @@ export const getAddedObjectsWithPropertiesInternalAst = (
 ): readonly AstNode[] => {
   console.time('indices')
   // TODO ensure nodes are functions
-  const indicesBefore = getObjectWithPropertyNodeIndices2(before, propertyName)
-  const indicesAfter = getObjectWithPropertyNodeIndices2(after, propertyName)
+  // const indicesBefore = getObjectWithPropertyNodeIndices2(before, propertyName)
+  // const indicesAfter = getObjectWithPropertyNodeIndices2(after, propertyName)
 
   // const edgeMap = createEdgeMap(before.nodes, before.meta.node_fields)
   // const nodeFieldCount = before.meta.node_fields.length
@@ -54,46 +54,46 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   // const edgeCount = before.nodes[16054 * nodeFieldCount + 4]
   // const detachedNess = before.nodes[16054 * nodeFieldCount + 5]
   // const edgeIndex = edgeMap[16054]
-  console.log({
-    indicesBefore,
-    indicesAfter,
-    // type,
-    // name,
-    // id,
-    // size,
-    // edgeCount,
-    // detachedNess,
-    // string: before.strings[676],
-    // disposeIndex: before.strings.indexOf('dispose'),
-    // edgeIndex,
-  })
-  console.log({ indicesBefore, indicesAfter })
+  // console.log({
+  //   indicesBefore,
+  //   indicesAfter,
+  //   // type,
+  //   // name,
+  //   // id,
+  //   // size,
+  //   // edgeCount,
+  //   // detachedNess,
+  //   // string: before.strings[676],
+  //   // disposeIndex: before.strings.indexOf('dispose'),
+  //   // edgeIndex,
+  // })
+  // console.log({ indicesBefore, indicesAfter })
   // console.time('locationMap')
   // const locationMapBefore = getLocationMap(before, indicesBefore)
   // const locationMapAfter = getLocationMap(after, indicesAfter)
   // console.timeEnd('locationMap')
 
-  console.time('locations')
+  // console.time('locations')
 
-  console.log({ locationMapBefore })
+  // console.log({ locationMapBefore })
 
-  const locationsBefore = getLocations(before, indicesBefore, locationMapBefore)
-  const locationsAfter = getLocations(after, indicesAfter, locationMapAfter)
+  // const locationsBefore = getLocations(before, indicesBefore, locationMapBefore)
+  // const locationsAfter = getLocations(after, indicesAfter, locationMapAfter)
 
-  const hashesBefore = getLocationHashes(locationsBefore)
-  const hashesAfter = getLocationHashes(locationsAfter)
+  // const hashesBefore = getLocationHashes(locationsBefore)
+  // const hashesAfter = getLocationHashes(locationsAfter)
 
   // console.log({ hashesBefore, hashesAfter })
-  console.timeEnd('locations')
-  const added2 = getAdded(before, after, indicesBefore, indicesAfter)
-  console.log('field', before.meta.node_fields.length)
-  console.log('locs', before.locations.length)
-  console.log('locs', before.locations[0])
-  console.log('locs', before.locations[4])
-  console.log('lengths', indicesBefore.length, indicesAfter.length)
-  console.log('added2', added2.length)
-  console.timeEnd('indices')
-  console.time('ast-before')
+  // console.timeEnd('locations')
+  // const added2 = getAdded(before, after, indicesBefore, indicesAfter)
+  // console.log('field', before.meta.node_fields.length)
+  // console.log('locs', before.locations.length)
+  // console.log('locs', before.locations[0])
+  // console.log('locs', before.locations[4])
+  // console.log('lengths', indicesBefore.length, indicesAfter.length)
+  // console.log('added2', added2.length)
+  // console.timeEnd('indices')
+  // console.time('ast-before')
   const astBefore = getObjectsWithPropertiesInternalAst(before, propertyName, depth)
   console.timeEnd('ast-before')
   console.time('ast-after')
