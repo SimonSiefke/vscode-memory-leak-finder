@@ -103,7 +103,7 @@ test('applyFileOperations - applies multiple operations in sequence', async () =
   await applyFileOperationsModule.applyFileOperations(operations)
 
   expect(mockMakeDirectory).toHaveBeenCalledWith('/path/to/directory', { recursive: true })
-  expect(mockCopy).toHaveBeenCalledWith('/source/file.txt', '/dest/file.txt')
+  expect(mockCopy).toHaveBeenCalledWith('/source/file.txt', '/dest/file.txt', { recursive: true })
   expect(mockRemove).toHaveBeenCalledWith('/old/file.txt')
 
   expect(mockMakeDirectory).toHaveBeenCalledTimes(1)
