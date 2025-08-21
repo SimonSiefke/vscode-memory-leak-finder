@@ -1,9 +1,9 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
-export const getLocationsMap = (snapshot: Snapshot, indices: Uint32Array): Uint32Array => {
-  if (indices.length === 0) {
-    return new Uint32Array([])
-  }
+/**
+ * Maps locations to node index.
+ */
+export const getLocationsMap = (snapshot: Snapshot): Uint32Array => {
   const locationFieldCount = snapshot.meta.location_fields.length
   const nodeFieldCount = snapshot.meta.node_fields.length
   const locations = snapshot.locations
@@ -11,14 +11,8 @@ export const getLocationsMap = (snapshot: Snapshot, indices: Uint32Array): Uint3
   if (indexOffset === -1) {
     throw new Error('index not found')
   }
-  console.log('nodecount', snapshot.nodes.length)
-  console.log('edgecount', snapshot.edges.length)
   const locationMap = new Uint32Array(snapshot.nodes.length / nodeFieldCount)
   for (let i = 0; i < locations.length; i += locationFieldCount) {
-    if (i > locationMap.length) {
-      throw new Error('imppossible')
-    }
-    // if(locations[i])
     locationMap[locations[i]] = i
   }
   return locationMap

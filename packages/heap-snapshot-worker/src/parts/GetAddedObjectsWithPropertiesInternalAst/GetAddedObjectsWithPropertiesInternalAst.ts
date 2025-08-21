@@ -7,6 +7,7 @@ import { getLocations } from '../GetLocations/GetLocations.ts'
 import { getLocationsMap as getLocationMap } from '../GetLocationsMap/GetLocationsMap.ts'
 import { getObjectsWithPropertiesInternalAst } from '../GetObjectsWithPropertiesInternalAst/GetObjectsWithPropertiesInternalAst.ts'
 import { getObjectWithPropertyNodeIndices } from '../GetObjectWithPropertyNodeIndices/GetObjectWithPropertyNodeIndices.ts'
+import { getObjectWithPropertyNodeIndices2 } from '../GetObjectWithPropertyNodeIndices2/GetObjectWithPropertyNodeIndices2.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 const getAdded = (
@@ -40,8 +41,8 @@ export const getAddedObjectsWithPropertiesInternalAst = (
 ): readonly AstNode[] => {
   console.time('indices')
   // TODO ensure nodes are functions
-  const indicesBefore = getObjectWithPropertyNodeIndices(before, propertyName)
-  const indicesAfter = getObjectWithPropertyNodeIndices(after, propertyName)
+  const indicesBefore = getObjectWithPropertyNodeIndices2(before, propertyName)
+  const indicesAfter = getObjectWithPropertyNodeIndices2(after, propertyName)
 
   const edgeMap = createEdgeMap(before.nodes, before.meta.node_fields)
   const nodeFieldCount = before.meta.node_fields.length
