@@ -120,7 +120,7 @@ beforeEach(() => {
     invoke(method) {
       switch (method) {
         default:
-          throw new Error('not implemented')
+          throw new Error(`not implemented ${method}`)
       }
     },
   })
