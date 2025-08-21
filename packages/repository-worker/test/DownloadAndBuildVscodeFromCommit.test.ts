@@ -22,10 +22,6 @@ const mockRunCompile = jest.fn()
 const mockCopyNodeModulesFromCacheToRepositoryFolder = jest.fn()
 const mockLog = jest.fn()
 
-jest.unstable_mockModule('path-exists', () => ({
-  pathExists: mockPathExists,
-}))
-
 jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.ts', () => ({
   makeDirectory: mockMkdir,
   writeFile: mockWriteFile,
