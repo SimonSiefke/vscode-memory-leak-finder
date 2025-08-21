@@ -1,6 +1,4 @@
-import chalk from 'chalk'
-import * as FormatDuration from '../FormatDuration/FormatDuration.ts'
-import * as TestPrefix from '../TestPrefix/TestPrefix.ts'
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
 export const getHandleTestPassedMessage = async (
   file: string,
@@ -9,9 +7,5 @@ export const getHandleTestPassedMessage = async (
   duration: number,
   isLeak: boolean,
 ): Promise<string> => {
-  const messageRelativeDirName = chalk.dim(relativeDirName + '/')
-  const messageFileName = chalk.bold(fileName)
-  const messageDuration = FormatDuration.formatDuration(duration)
-  const prefix = isLeak ? TestPrefix.Leak : TestPrefix.Pass
-  return `${prefix} ${messageRelativeDirName}${messageFileName} ${messageDuration}\n`
+  return StdoutWorker.invoke('Stdout.getHandleTestPassedMessage', file, relativeDirName, fileName, duration, isLeak)
 }

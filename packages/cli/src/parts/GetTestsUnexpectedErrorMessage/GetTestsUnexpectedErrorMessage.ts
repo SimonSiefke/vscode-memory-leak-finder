@@ -1,16 +1,5 @@
-import * as FormatStack from '../FormatStack/FormatStack.ts'
-import * as Indent from '../Indent/Indent.ts'
-import * as TestPrefix from '../TestPrefix/TestPrefix.ts'
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
-export const getTestsUnexpectedErrorMessage = async (error): Promise<string> => {
-  const formattedStack = await FormatStack.formatStack(error.stack, '')
-  return `${TestPrefix.UnexpectedError}
-
-      ${error.type}: ${error.message}
-
-${Indent.indent(error.codeFrame)}
-
-${formattedStack}
-
-`
+export const getTestsUnexpectedErrorMessage = (error: any): Promise<string> => {
+  return StdoutWorker.invoke('Stdout.getTestsUnexpectedErrorMessage', error)
 }

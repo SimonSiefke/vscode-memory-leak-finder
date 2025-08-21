@@ -1,42 +1,59 @@
-import { beforeEach, expect, jest, test } from '@jest/globals'
+import { expect, test } from '@jest/globals'
+import { MockRpc } from '@lvce-editor/rpc'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
+import * as HandleStdinDataRunningMode from '../src/parts/HandleStdinDataRunningMode/HandleStdinDataRunningMode.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
-
-beforeEach(() => {
-  jest.resetModules()
-  jest.resetAllMocks()
-})
-
-const HandleStdinDataRunningMode = await import('../src/parts/HandleStdinDataRunningMode/HandleStdinDataRunningMode.ts')
+import * as StdoutWorker from '../src/parts/StdoutWorker/StdoutWorker.ts'
 
 test('handleStdinDataRunningMode - show watch mode details', async () => {
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string) => {
+      if (method === 'Stdout.getInterruptedMessage') {
+        return 'interrupted-message'
+      }
+      if (method === 'Stdout.getWatchUsageMessage') {
+        return 'watch-usage'
+      }
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+  StdoutWorker.set(mockRpc)
+
   const state = {
     value: '',
     mode: ModeType.Running,
     stdout: [],
   }
   const key = 'Enter'
+
   const newState = await HandleStdinDataRunningMode.handleStdinDataRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.Interrupted)
-  expect(newState.stdout).toEqual([
-    '\u001B[1m\u001B[31mTest run was interrupted.\u001B[39m\u001B[22m\n\n' +
-      '\u001B[1mWatch Usage\u001B[22m\n' +
-      '\u001B[2m › Press \u001B[22ma\u001B[2m to run all tests.\u001B[22m\n' +
-      '\u001B[2m › Press \u001B[22mf\u001B[2m to run only failed tests.\u001B[22m\n' +
-      '\u001B[2m › Press \u001B[22mp\u001B[2m to filter tests by a filename regex pattern.\u001B[22m\n' +
-      '\u001B[2m › Press \u001B[22mh\u001B[2m to toggle headless mode.\u001B[22m\n' +
-      '\u001B[2m › Press \u001B[22mq\u001B[2m to quit watch mode.\u001B[22m\n' +
-      '\u001B[2m › Press \u001B[22mEnter\u001B[2m to trigger a test run.\u001B[22m\n',
-  ])
+  expect(newState.stdout).toEqual(['interrupted-message\nwatch-usage'])
 })
 
 test('handleStdinDataRunningMode - quit', async () => {
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string) => {
+      if (method === 'Stdout.getInterruptedMessage') {
+        return 'interrupted-message'
+      }
+      if (method === 'Stdout.getWatchUsageMessage') {
+        return 'watch-usage'
+      }
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+  StdoutWorker.set(mockRpc)
+
   const state = {
     value: '',
     mode: ModeType.Running,
     stdout: [],
   }
   const key = AnsiKeys.ControlC
+
   const newState = await HandleStdinDataRunningMode.handleStdinDataRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
   expect(newState.stdout).toEqual([])

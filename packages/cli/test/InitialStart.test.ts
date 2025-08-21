@@ -1,4 +1,6 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
+import { MockRpc } from '@lvce-editor/rpc'
+import * as StdoutWorker from '../src/parts/StdoutWorker/StdoutWorker.ts'
 
 beforeEach(() => {
   jest.resetModules()
@@ -10,6 +12,19 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
     write: jest.fn().mockImplementation(() => Promise.resolve()),
   }
 })
+
+const mockRpc = MockRpc.create({
+  commandMap: {},
+  invoke: (method: string) => {
+    if (method === 'Stdout.getWatchUsageMessage') {
+      return 'watch usage'
+    }
+    throw new Error(`unexpected method ${method}`)
+  },
+})
+
+StdoutWorker.set(mockRpc)
+
 jest.unstable_mockModule('../src/parts/WatchUsage/WatchUsage.ts', () => {
   return {
     print: jest.fn(() => 'watch usage'),

@@ -1,37 +1,37 @@
-import ansiEscapes from 'ansi-escapes'
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
 export const cursorUp = async (count: number): Promise<string> => {
-  return ansiEscapes.cursorUp(count)
+  return StdoutWorker.invoke('Stdout.getCursorUp', count)
 }
 
 export const eraseLine = async (): Promise<string> => {
-  return ansiEscapes.eraseLine
+  return StdoutWorker.invoke('Stdout.getEraseLine')
 }
 
 export const cursorLeft = async (): Promise<string> => {
-  return ansiEscapes.cursorLeft
+  return StdoutWorker.invoke('Stdout.getCursorLeft')
 }
 
 export const eraseScreen = async (): Promise<string> => {
-  return ansiEscapes.eraseScreen
+  return StdoutWorker.invoke('Stdout.getEraseScreen')
 }
 
 export const eraseDown = async (): Promise<string> => {
-  return ansiEscapes.eraseDown
+  return StdoutWorker.invoke('Stdout.getEraseDown')
 }
 
 export const backspace = async (): Promise<string> => {
-  return ansiEscapes.cursorBackward() + ansiEscapes.eraseEndLine
+  return StdoutWorker.invoke('Stdout.getBackspace')
 }
 
 export const cursorBackward = async (length: number): Promise<string> => {
-  return ansiEscapes.cursorBackward(length)
+  return StdoutWorker.invoke('Stdout.getCursorBackward', length)
 }
 
 export const eraseEndLine = async (): Promise<string> => {
-  return ansiEscapes.eraseEndLine
+  return StdoutWorker.invoke('Stdout.getEraseEndLine')
 }
 
 export const clear = async (isWindows: boolean): Promise<string> => {
-  return isWindows ? '\u001B[2J\u001B[0f' : '\u001B[2J\u001B[3J\u001B[H'
+  return StdoutWorker.invoke('Stdout.getClear', isWindows)
 }
