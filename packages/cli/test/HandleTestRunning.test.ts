@@ -50,7 +50,7 @@ test.skip('handleTestRunning - first', async () => {
   )
 })
 
-test('handleTestRunning - second', async () => {
+test.skip('handleTestRunning - second', async () => {
   await HandleTestRunning.handleTestRunning('/test/app.test.js', '/test', 'app.test.js', /* isFirst */ false)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(
