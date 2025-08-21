@@ -12,9 +12,7 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "dependencies": {
-    "@vscode-memory-leak-finder/core": "file:../core"
-  },
+  "dependencies": {},
   "devDependencies": {
     "tree-kill": "^1.2.2",
     "wait-for-expect": "^4.0.0"
