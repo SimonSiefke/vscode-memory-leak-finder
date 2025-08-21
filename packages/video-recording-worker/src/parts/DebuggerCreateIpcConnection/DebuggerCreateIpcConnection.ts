@@ -4,7 +4,9 @@ import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWe
 
 export const createConnection = async (wsUrl: string) => {
   try {
+    // @ts-ignore
     const webSocket = new WebSocket(wsUrl)
+    // @ts-ignore
     await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket)
     return {
       /**
