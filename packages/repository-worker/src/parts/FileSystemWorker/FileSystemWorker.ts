@@ -8,14 +8,14 @@ export const set = (rpc) => {
 
 const invoke = (method, ...params) => {
   if (!state.rpc) {
-    throw new Error('must intiialize filesystem worker')
+    throw new Error('must initialize filesystem worker')
   }
   // @ts-ignore
   return state.rpc.invoke(method, ...params)
 }
 
-export const findFiles = (path, options) => {
-  return invoke('FileSystem.findFiles')
+export const findFiles = (pattern, options) => {
+  return invoke('FileSystem.findFiles', pattern, options)
 }
 
 export const readFileContent = (path) => {
@@ -28,4 +28,12 @@ export const exec = (command, args, options) => {
 
 export const applyFileOperations = (operations) => {
   return invoke('FileSystem.applyFileOperations', operations)
+}
+
+export const pathExists = (uri) => {
+  return invoke('FileSystem.exists', uri)
+}
+
+export const makeDirectory = (uri) => {
+  return invoke('FileSystem.makeDirectory', uri)
 }

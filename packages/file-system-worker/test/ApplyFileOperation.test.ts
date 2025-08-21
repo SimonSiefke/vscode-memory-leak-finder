@@ -31,7 +31,7 @@ test('applyFileOperation - applies copy operation', async () => {
 
   await applyFileOperationModule.applyFileOperation(operation)
 
-  expect(mockCopy).toHaveBeenCalledWith('/source/file.txt', '/dest/file.txt')
+  expect(mockCopy).toHaveBeenCalledWith('/source/file.txt', '/dest/file.txt', { recursive: true })
   expect(mockCopy).toHaveBeenCalledTimes(1)
 })
 
@@ -45,7 +45,7 @@ test('applyFileOperation - applies mkdir operation', async () => {
 
   await applyFileOperationModule.applyFileOperation(operation)
 
-  expect(mockMakeDirectory).toHaveBeenCalledWith('/path/to/directory')
+  expect(mockMakeDirectory).toHaveBeenCalledWith('/path/to/directory', { recursive: true })
   expect(mockMakeDirectory).toHaveBeenCalledTimes(1)
 })
 
@@ -59,7 +59,7 @@ test('applyFileOperation - applies remove operation', async () => {
 
   await applyFileOperationModule.applyFileOperation(operation)
 
-  expect(mockRemove).toHaveBeenCalledWith('/path/to/file.txt')
+  expect(mockRemove).toHaveBeenCalledWith('/path/to/file.txt', { recursive: true })
   expect(mockRemove).toHaveBeenCalledTimes(1)
 })
 

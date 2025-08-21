@@ -1,4 +1,6 @@
 import { afterEach, beforeEach, expect, jest, test } from '@jest/globals'
+import { MockRpc } from '@lvce-editor/rpc'
+import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
 import * as Path from '../src/parts/Path/Path.ts'
 
 const DEFAULT_REPO_URL = 'https://github.com/microsoft/vscode.git'
@@ -19,23 +21,8 @@ const mockCloneRepository = jest.fn()
 const mockInstallDependencies = jest.fn()
 const mockResolveCommitHash = jest.fn()
 const mockRunCompile = jest.fn()
-const mockSetupNodeModulesFromCache = jest.fn()
+const mockCopyNodeModulesFromCacheToRepositoryFolder = jest.fn()
 const mockLog = jest.fn()
-
-jest.unstable_mockModule('path-exists', () => ({
-  pathExists: mockPathExists,
-}))
-
-jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.ts', () => ({
-  makeDirectory: mockMkdir,
-  writeFile: mockWriteFile,
-  remove: mockRm,
-  pathExists: mockPathExists,
-}))
-
-jest.unstable_mockModule('execa', () => ({
-  execa: mockExeca,
-}))
 
 jest.unstable_mockModule('../src/parts/Exec/Exec.ts', () => ({
   exec: mockExec,
@@ -43,10 +30,6 @@ jest.unstable_mockModule('../src/parts/Exec/Exec.ts', () => ({
 
 jest.unstable_mockModule('../src/parts/CacheNodeModules/CacheNodeModules.ts', () => ({
   addNodeModulesToCache: mockAddNodeModulesToCache,
-}))
-
-jest.unstable_mockModule('../src/parts/CheckCacheExists/CheckCacheExists.ts', () => ({
-  checkCacheExists: mockCheckCacheExists,
 }))
 
 jest.unstable_mockModule('../src/parts/CheckoutCommit/CheckoutCommit.ts', () => ({
@@ -69,8 +52,8 @@ jest.unstable_mockModule('../src/parts/RunCompile/RunCompile.ts', () => ({
   runCompile: mockRunCompile,
 }))
 
-jest.unstable_mockModule('../src/parts/SetupNodeModulesFromCache/SetupNodeModulesFromCache.ts', () => ({
-  setupNodeModulesFromCache: mockSetupNodeModulesFromCache,
+jest.unstable_mockModule('../src/parts/CopyNodeModulesFromCacheToRepositoryFolder/CopyNodeModulesFromCacheToRepositoryFolder.ts', () => ({
+  copyNodeModulesFromCacheToRepositoryFolder: mockCopyNodeModulesFromCacheToRepositoryFolder,
 }))
 
 jest.unstable_mockModule('../src/parts/Logger/Logger.ts', () => ({
@@ -126,11 +109,29 @@ beforeEach(() => {
   mockCloneRepository.mockReturnValue(undefined)
   mockCheckoutCommit.mockReturnValue(undefined)
   mockCheckCacheExists.mockReturnValue(false)
-  mockSetupNodeModulesFromCache.mockReturnValue(true)
+  mockCopyNodeModulesFromCacheToRepositoryFolder.mockReturnValue(true)
   mockInstallDependencies.mockReturnValue(undefined)
   mockAddNodeModulesToCache.mockReturnValue(undefined)
   mockRunCompile.mockReturnValue(undefined)
   mockLog.mockReturnValue(undefined)
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke(method, ...params) {
+      switch (method) {
+        case 'FileSystem.exists':
+          return mockPathExists(...params)
+        case 'FileSystem.makeDirectory':
+          return mockMkdir(...params)
+        case 'FileSystem.findFiles':
+          return []
+
+        default:
+          throw new Error(`not implemented ${method}`)
+      }
+    },
+  })
+  FileSystemWorker.set(mockRpc)
 })
 
 afterEach(() => {
@@ -175,8 +176,8 @@ test('downloadVscodeCommit - tests git clone operations with mocked execa', asyn
   expect(mockCheckoutCommit).toHaveBeenCalledWith(repoPath, testCommitHash)
 
   // Verify that logger was called for installation and compilation
-  expect(mockLog).toHaveBeenCalledWith(`Installing dependencies for commit ${testCommitHash}...`)
-  expect(mockLog).toHaveBeenCalledWith(`Compiling VS Code for commit ${testCommitHash}...`)
+  expect(mockLog).toHaveBeenCalledWith(`[repository] Installing dependencies for commit ${testCommitHash}...`)
+  expect(mockLog).toHaveBeenCalledWith(`[repository] Compiling VS Code for commit ${testCommitHash}...`)
 })
 
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missing node_modules', async () => {
@@ -219,7 +220,7 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missi
   expect(mockInstallDependencies).toHaveBeenCalled()
 
   // Verify that logger was called for installation
-  expect(mockLog).toHaveBeenCalledWith(`Installing dependencies for commit ${testCommitHash}...`)
+  expect(mockLog).toHaveBeenCalledWith(`[repository] Installing dependencies for commit ${testCommitHash}...`)
 })
 
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with existing node_modules', async () => {
@@ -266,7 +267,7 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
   expect(mockPathExists).toHaveBeenCalledWith(nodeModulesPath)
 
   // Verify that logger was called for the skip message
-  expect(mockLog).toHaveBeenCalledWith(`node_modules already exists in repo for commit ${testCommitHash}, skipping npm ci...`)
+  expect(mockLog).toHaveBeenCalledWith(`[repository] node_modules already exists in repo for commit ${testCommitHash}, skipping npm ci...`)
 })
 
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with existing out folder', async () => {
@@ -313,5 +314,5 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
   expect(mockPathExists).toHaveBeenCalledWith(outPath)
 
   // Verify that logger was called for the skip message
-  expect(mockLog).toHaveBeenCalledWith(`node_modules already exists in repo for commit ${testCommitHash}, skipping npm ci...`)
+  expect(mockLog).toHaveBeenCalledWith(`[repository] node_modules already exists in repo for commit ${testCommitHash}, skipping npm ci...`)
 })

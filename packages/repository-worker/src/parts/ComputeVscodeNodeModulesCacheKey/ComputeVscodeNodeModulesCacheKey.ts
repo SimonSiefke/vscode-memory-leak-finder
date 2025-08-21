@@ -5,7 +5,7 @@ import { getFilesHash } from '../GetFilesHash/GetFilesHash.ts'
 /**
  * @param {string} folder
  */
-export const computeVscodeNodeModulesCacheKey = async (folder) => {
+export const computeVscodeNodeModulesCacheKey = async (folder:string):Promise<string> => {
   try {
     const packageLockFiles = await findPackageLockFiles(folder)
     const hash = getFilesHash(packageLockFiles)

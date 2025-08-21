@@ -1,4 +1,5 @@
 import * as RunTest from '../RunTest/RunTest.ts'
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
 import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
