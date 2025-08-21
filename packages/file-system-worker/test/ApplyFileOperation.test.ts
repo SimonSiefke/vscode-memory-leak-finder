@@ -59,7 +59,7 @@ test('applyFileOperation - applies remove operation', async () => {
 
   await applyFileOperationModule.applyFileOperation(operation)
 
-  expect(mockRemove).toHaveBeenCalledWith('/path/to/file.txt')
+  expect(mockRemove).toHaveBeenCalledWith('/path/to/file.txt', { recursive: true })
   expect(mockRemove).toHaveBeenCalledTimes(1)
 })
 

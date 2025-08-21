@@ -43,7 +43,7 @@ test('applyFileOperations - applies copy operation', async () => {
 
   await applyFileOperationsModule.applyFileOperations(operations)
 
-  expect(mockCopy).toHaveBeenCalledWith('/source/file.txt', '/dest/file.txt')
+  expect(mockCopy).toHaveBeenCalledWith('/source/file.txt', '/dest/file.txt', { recursive: true })
   expect(mockCopy).toHaveBeenCalledTimes(1)
 })
 
