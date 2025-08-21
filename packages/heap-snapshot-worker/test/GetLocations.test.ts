@@ -40,6 +40,7 @@ test('should extract locations for given indices', () => {
 })
 
 test('should handle single index', () => {
+  const nodeFieldCount = 5
   const snapshot: Snapshot = {
     node_count: 1,
     edge_count: 0,
@@ -68,6 +69,7 @@ test('should handle single index', () => {
 })
 
 test('should handle empty indices array', () => {
+  const nodeFieldCount = 5
   const snapshot: Snapshot = {
     node_count: 1,
     edge_count: 0,
