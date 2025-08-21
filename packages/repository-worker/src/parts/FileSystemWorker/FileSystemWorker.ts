@@ -29,3 +29,11 @@ export const exec = (command, args, options) => {
 export const applyFileOperations = (operations) => {
   return invoke('FileSystem.applyFileOperations', operations)
 }
+
+export const pathExists = (uri) => {
+  return invoke('FileSystem.exists', uri)
+}
+
+export const makeDirectory = (uri) => {
+  return invoke('FileSystem.makeDirectory', uri)
+}

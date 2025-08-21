@@ -4,11 +4,11 @@ import * as CheckoutCommit from '../CheckoutCommit/CheckoutCommit.ts'
 import * as CloneRepository from '../CloneRepository/CloneRepository.ts'
 import { computeVscodeNodeModulesCacheKey } from '../ComputeVscodeNodeModulesCacheKey/ComputeVscodeNodeModulesCacheKey.ts'
 import * as SetupNodeModulesFromCache from '../CopyNodeModulesFromCacheToRepositoryFolder/CopyNodeModulesFromCacheToRepositoryFolder.ts'
-import * as Filesystem from '../Filesystem/Filesystem.ts'
 import * as InstallDependencies from '../InstallDependencies/InstallDependencies.ts'
 import * as Logger from '../Logger/Logger.ts'
 import * as Path from '../Path/Path.ts'
 import * as ResolveCommitHash from '../ResolveCommitHash/ResolveCommitHash.ts'
+import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 import * as RunCompile from '../RunCompile/RunCompile.ts'
 
 export const downloadAndBuildVscodeFromCommit = async (
@@ -28,24 +28,24 @@ export const downloadAndBuildVscodeFromCommit = async (
   const repoPathWithCommitHash = Path.join(reposDir, commitHash)
 
   // Create parent directory if it doesn't exist
-  const existsReposDir = await Filesystem.pathExists(reposDir)
+  const existsReposDir = await FileSystemWorker.pathExists(reposDir)
 
   // Check what's needed at the start
   const mainJsPath = Path.join(repoPathWithCommitHash, 'out', 'main.ts')
   const nodeModulesPath = Path.join(repoPathWithCommitHash, 'node_modules')
   const outPath = Path.join(repoPathWithCommitHash, 'out')
 
-  const existsRepoPath = await Filesystem.pathExists(repoPathWithCommitHash)
-  const existsMainJsPath = await Filesystem.pathExists(mainJsPath)
-  const existsNodeModulesPath = await Filesystem.pathExists(nodeModulesPath)
-  const existsOutPath = await Filesystem.pathExists(outPath)
+  const existsRepoPath = await FileSystemWorker.pathExists(repoPathWithCommitHash)
+  const existsMainJsPath = await FileSystemWorker.pathExists(mainJsPath)
+  const existsNodeModulesPath = await FileSystemWorker.pathExists(nodeModulesPath)
+  const existsOutPath = await FileSystemWorker.pathExists(outPath)
 
   const needsClone = !existsRepoPath
   const needsInstall = !existsMainJsPath && !existsNodeModulesPath
   const needsCompile = !existsMainJsPath && !existsOutPath
 
   if (!existsReposDir) {
-    await Filesystem.makeDirectory(reposDir)
+    await FileSystemWorker.makeDirectory(reposDir)
   }
 
   // Clone the repository if needed
@@ -57,7 +57,7 @@ export const downloadAndBuildVscodeFromCommit = async (
   if (needsInstall) {
     Logger.log(`[repository] Installing dependencies for commit ${commitHash}...`)
     const nodeModulesHash = await computeVscodeNodeModulesCacheKey(repoPathWithCommitHash)
-    const cacheExists = await Filesystem.pathExists(Path.join(nodeModulesCacheDir, nodeModulesHash))
+    const cacheExists = await FileSystemWorker.pathExists(Path.join(nodeModulesCacheDir, nodeModulesHash))
     if (cacheExists) {
       await SetupNodeModulesFromCache.copyNodeModulesFromCacheToRepositoryFolder(
         Path.join(nodeModulesCacheDir, nodeModulesHash),
