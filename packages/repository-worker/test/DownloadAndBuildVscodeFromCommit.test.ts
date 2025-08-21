@@ -22,13 +22,6 @@ const mockRunCompile = jest.fn()
 const mockCopyNodeModulesFromCacheToRepositoryFolder = jest.fn()
 const mockLog = jest.fn()
 
-jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.ts', () => ({
-  makeDirectory: mockMkdir,
-  writeFile: mockWriteFile,
-  remove: mockRm,
-  pathExists: mockPathExists,
-}))
-
 jest.unstable_mockModule('execa', () => ({
   execa: mockExeca,
 }))
