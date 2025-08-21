@@ -16,7 +16,10 @@ test('findPackageLockFiles - returns empty array when no package-lock.json files
   const result = await findPackageLockFiles('/test/path')
 
   expect(result).toEqual([])
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.findFiles')
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.findFiles', '**/package-lock.json', {
+    cwd: '/test/path',
+    exclude: ['**/node_modules/**'],
+  })
 })
 
 test.skip('findPackageLockFiles - returns file URIs when package-lock.json files found', async () => {
