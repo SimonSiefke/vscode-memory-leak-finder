@@ -93,7 +93,7 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   // console.log('lengths', indicesBefore.length, indicesAfter.length)
   // console.log('added2', added2.length)
   // console.timeEnd('indices')
-  // console.time('ast-before')
+  console.time('ast-before')
   const astBefore = getObjectsWithPropertiesInternalAst(before, propertyName, depth)
   console.timeEnd('ast-before')
   console.time('ast-after')
