@@ -38,11 +38,10 @@ test('handleStdinDataFinishedRunningMode - show watch mode details', async () =>
   expect(newState.stdout).toEqual(['[cursor-up][erase-down][watch-usage]'])
 })
 
-test.only('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
+test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
   const mockRpc = MockRpc.create({
     commandMap: {},
     invoke(method) {
-      console.log({ method })
       switch (method) {
         case 'Stdout.getCursorUp':
           return '[cursor-up]'
