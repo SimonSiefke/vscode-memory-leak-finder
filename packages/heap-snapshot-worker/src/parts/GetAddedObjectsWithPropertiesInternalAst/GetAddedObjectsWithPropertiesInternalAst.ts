@@ -58,7 +58,7 @@ interface HashMapCompareResult {
 }
 
 const compareMaps = (beforeMap: HashMap, afterMap: HashMap): readonly HashMapCompareResult[] => {
-  const leaked: any = []
+  const leaked: HashMapCompareResult[] = []
   for (const [key, after] of Object.entries(afterMap)) {
     const before = beforeMap[key] || []
     if (after.length > before.length) {
@@ -132,6 +132,8 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   const hashMapAfter = createHashMap(indicesAfter)
   console.timeEnd('hashmap')
 
+  console.log({ hashMapAfter: hashMapAfter['10:32:16000'] })
+
   console.time('compareMap')
   const leaked = compareMaps(hashMapBefore, hashMapAfter)
   console.timeEnd('compareMap')
@@ -139,11 +141,13 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   console.time('sort')
   const leakedSorted = sortLeaked(leaked)
   console.timeEnd('sort')
-
-  console.log({ leakedSorted })
+  const idIndex = after.meta.node_fields.indexOf('id')
+  // const nodeFieldCount = after.meta.node_fields.length
+  console.log('id', after.nodes[703916 + idIndex])
+  // console.log({ leakedSorted })
 
   const formatted = formatComparison(before, after, leaked)
-  console.log({ formatted })
+  // console.log({ formatted })
 
   // const edgeMap = createEdgeMap(before.nodes, before.meta.node_fields)
   // const nodeFieldCount = before.meta.node_fields.length
