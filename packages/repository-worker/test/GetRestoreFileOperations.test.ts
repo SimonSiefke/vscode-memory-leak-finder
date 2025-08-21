@@ -1,19 +1,19 @@
-import { expect, test, jest } from '@jest/globals'
+import { expect, test } from '@jest/globals'
 import { getRestoreNodeModulesFileOperations } from '../src/parts/GetRestoreFileOperations/GetRestoreFileOperations.ts'
 
-test.skip('getRestoreNodeModulesFileOperations returns empty array when no cached paths', async () => {
-  const result = await getRestoreNodeModulesFileOperations('/test/repo', 'cache-key', '/test/cache', '/test/cache/cache-key', [])
+test('getRestoreNodeModulesFileOperations returns empty array when no cached paths', async () => {
+  const from = '/test/node-modules-cache/1234'
+  const to = '/test/vscode/5678'
+  const pathsToRestore = []
+  const result = await getRestoreNodeModulesFileOperations(from, to, pathsToRestore)
   expect(result).toEqual([])
 })
 
-test.skip('getRestoreNodeModulesFileOperations returns copy operations for cached paths', async () => {
-  const repoPath = '/test/repo'
-  const cacheKey = 'cache-key'
-  const cacheDir = '/test/cache'
-  const cachedNodeModulesPath = '/test/cache/cache-key'
-  const cachedNodeModulesPaths = ['node_modules/package1', 'node_modules/package2']
-
-  const result = await getRestoreNodeModulesFileOperations(repoPath, cacheKey, cacheDir, cachedNodeModulesPath, cachedNodeModulesPaths)
+test('getRestoreNodeModulesFileOperations returns copy operations for cached paths', async () => {
+  const from = '/test/node-modules-cache/1234'
+  const to = '/test/vscode/5678'
+  const pathsToRestore = ['node_modules/package1', 'node_modules/package2']
+  const result = await getRestoreNodeModulesFileOperations(from, to, pathsToRestore)
 
   expect(result).toHaveLength(2)
   expect(result[0]).toEqual({
@@ -26,40 +26,4 @@ test.skip('getRestoreNodeModulesFileOperations returns copy operations for cache
     from: '/test/cache/cache-key/node_modules/package2',
     to: '/test/repo/node_modules/package2',
   })
-})
-
-test.skip('getRestoreNodeModulesFileOperations handles paths with leading slashes', async () => {
-  const repoPath = '/test/repo'
-  const cacheKey = 'cache-key'
-  const cacheDir = '/test/cache'
-  const cachedNodeModulesPath = '/test/cache/cache-key'
-  const cachedNodeModulesPaths = ['/node_modules/package1']
-
-  const result = await getRestoreNodeModulesFileOperations(repoPath, cacheKey, cacheDir, cachedNodeModulesPath, cachedNodeModulesPaths)
-
-  expect(result).toHaveLength(1)
-  expect(result[0]).toEqual({
-    type: 'copy',
-    from: '/test/cache/cache-key/node_modules/package1',
-    to: '/test/repo/node_modules/package1',
-  })
-})
-
-test.skip('getRestoreNodeModulesFileOperations throws VError when error occurs', async () => {
-  // Reset the module cache to ensure our mock is used
-  jest.resetModules()
-
-  const mockPathJoin = jest.fn(() => {
-    throw new Error('Path join error')
-  })
-
-  jest.unstable_mockModule('../src/parts/Path/Path.ts', () => ({
-    join: mockPathJoin,
-  }))
-
-  const { getRestoreNodeModulesFileOperations } = await import('../src/parts/GetRestoreFileOperations/GetRestoreFileOperations.ts')
-
-  await expect(
-    getRestoreNodeModulesFileOperations('/test/repo', 'cache-key', '/test/cache', '/test/cache/cache-key', ['node_modules/package']),
-  ).rejects.toThrow('Failed to get restore file operations')
 })

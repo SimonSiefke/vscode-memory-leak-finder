@@ -19,13 +19,8 @@ interface RemoveOperation {
 
 type FileOperation = CopyOperation | MkdirOperation | RemoveOperation
 
-
-export const getRestoreNodeModulesFileOperations = async (
-  from: string,
-  to: string,
-  pathsToRestore: string[],
-): Promise<readonly FileOperation[]> => {
-  return pathsToRestore.map(relativePath => {
+export const getRestoreNodeModulesFileOperations = (from: string, to: string, pathsToRestore: string[]): readonly FileOperation[] => {
+  return pathsToRestore.map((relativePath) => {
     const sourceNodeModulesPath = Path.join(from, relativePath)
     const targetPath = Path.join(to, relativePath)
     return {
@@ -34,5 +29,4 @@ export const getRestoreNodeModulesFileOperations = async (
       to: targetPath,
     }
   })
-
 }
