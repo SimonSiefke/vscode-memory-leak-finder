@@ -1,5 +1,6 @@
 import type { AstNode } from '../AstNode/AstNode.ts'
 import { compareAsts } from '../CompareAsts/CompareAsts.ts'
+import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
 import { getIdSet } from '../GetIdSet/GetIdSet.ts'
 import { getLocationHashes } from '../GetLocationHashes/GetLocationHashes.ts'
 import { getLocations } from '../GetLocations/GetLocations.ts'
@@ -41,10 +42,33 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   // TODO ensure nodes are functions
   const indicesBefore = getObjectWithPropertyNodeIndices(before, propertyName)
   const indicesAfter = getObjectWithPropertyNodeIndices(after, propertyName)
-  console.time('locationMap')
-  const locationMapBefore = getLocationMap(before, indicesBefore)
-  const locationMapAfter = getLocationMap(after, indicesAfter)
-  console.timeEnd('locationMap')
+
+  const edgeMap = createEdgeMap(before.nodes, before.meta.node_fields)
+  const nodeFieldCount = before.meta.node_fields.length
+  console.log({ nodeFieldCount, nodeFields: before.meta.node_fields, propertyName })
+  const type = before.nodes[16054 * nodeFieldCount + 0]
+  const name = before.nodes[16054 * nodeFieldCount + 1]
+  const id = before.nodes[16054 * nodeFieldCount + 2]
+  const size = before.nodes[16054 * nodeFieldCount + 3]
+  const edgeCount = before.nodes[16054 * nodeFieldCount + 4]
+  const detachedNess = before.nodes[16054 * nodeFieldCount + 5]
+  const edgeIndex = edgeMap[16054]
+  console.log({
+    type,
+    name,
+    id,
+    size,
+    edgeCount,
+    detachedNess,
+    string: before.strings[676],
+    disposeIndex: before.strings.indexOf('dispose'),
+    edgeIndex,
+  })
+  console.log({ indicesBefore, indicesAfter })
+  // console.time('locationMap')
+  // const locationMapBefore = getLocationMap(before, indicesBefore)
+  // const locationMapAfter = getLocationMap(after, indicesAfter)
+  // console.timeEnd('locationMap')
 
   console.time('locations')
 
