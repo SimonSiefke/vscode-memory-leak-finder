@@ -121,6 +121,10 @@ beforeEach(() => {
       switch (method) {
         case 'FileSystem.exists':
           return mockPathExists(...params)
+        case 'FileSystem.makeDirectory':
+          return mockMkdir(...params)
+        case 'FileSystem.findFiles':
+          return []
 
         default:
           throw new Error(`not implemented ${method}`)
