@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, expect, jest, test } from '@jest/globals'
 import * as Path from '../src/parts/Path/Path.ts'
+import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
+import { MockRpc } from '@lvce-editor/rpc'
 
 const DEFAULT_REPO_URL = 'https://github.com/microsoft/vscode.git'
 
@@ -21,10 +23,6 @@ const mockResolveCommitHash = jest.fn()
 const mockRunCompile = jest.fn()
 const mockCopyNodeModulesFromCacheToRepositoryFolder = jest.fn()
 const mockLog = jest.fn()
-
-jest.unstable_mockModule('execa', () => ({
-  execa: mockExeca,
-}))
 
 jest.unstable_mockModule('../src/parts/Exec/Exec.ts', () => ({
   exec: mockExec,
@@ -116,6 +114,17 @@ beforeEach(() => {
   mockAddNodeModulesToCache.mockReturnValue(undefined)
   mockRunCompile.mockReturnValue(undefined)
   mockLog.mockReturnValue(undefined)
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke(method) {
+      switch (method) {
+        default:
+          throw new Error('not implemented')
+      }
+    },
+  })
+  FileSystemWorker.set(mockRpc)
 })
 
 afterEach(() => {
