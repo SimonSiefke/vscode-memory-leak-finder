@@ -40,18 +40,18 @@ test('should extract locations for given indices', () => {
 
   const indices = [0, 2] // Get locations for objects 0 and 2
   // Build a locations argument that acts as map+data per current implementation
-  const locationsArg = new Uint32Array(8)
+  const locationsArg = new Uint32Array(12)
   // For index 0 -> base at 4 (per impl, index array stores base index)
   locationsArg[0] = 4
-  // Data at base 4
-  locationsArg[4 + 0] = 1 // script_id
-  locationsArg[4 + 1] = 10 // line
-  locationsArg[4 + 2] = 5 // column
-  // For index 2 -> base at 4 + 4 = 8
+  // Data at base 4 (script_id at +1, line at +2, column at +3)
+  locationsArg[4 + 1] = 1 // script_id
+  locationsArg[4 + 2] = 10 // line
+  locationsArg[4 + 3] = 5 // column
+  // For index 2 -> base at 8
   locationsArg[2] = 8
-  locationsArg[8 + 0] = 3 // script_id
-  locationsArg[8 + 1] = 20 // line
-  locationsArg[8 + 2] = 12 // column
+  locationsArg[8 + 1] = 3 // script_id
+  locationsArg[8 + 2] = 20 // line
+  locationsArg[8 + 3] = 12 // column
 
   const result = getLocations(snapshot, indices, locationsArg)
 
@@ -390,22 +390,22 @@ test('should handle multiple indices in sequence', () => {
 
   const indices = [0, 1, 2] // Get locations for all objects
   // Build a locations argument for three indices
-  const locationsArg = new Uint32Array(12)
+  const locationsArg = new Uint32Array(16)
   // index 0 -> base 4
   locationsArg[0] = 4
-  locationsArg[4 + 0] = 1
-  locationsArg[4 + 1] = 10
-  locationsArg[4 + 2] = 5
+  locationsArg[4 + 1] = 1
+  locationsArg[4 + 2] = 10
+  locationsArg[4 + 3] = 5
   // index 1 -> base 8
   locationsArg[1] = 8
-  locationsArg[8 + 0] = 2
-  locationsArg[8 + 1] = 15
-  locationsArg[8 + 2] = 8
+  locationsArg[8 + 1] = 2
+  locationsArg[8 + 2] = 15
+  locationsArg[8 + 3] = 8
   // index 2 -> base 12
   locationsArg[2] = 12
-  locationsArg[12 + 0] = 3
-  locationsArg[12 + 1] = 20
-  locationsArg[12 + 2] = 12
+  locationsArg[12 + 1] = 3
+  locationsArg[12 + 2] = 20
+  locationsArg[12 + 3] = 12
 
   const result = getLocations(snapshot, indices, locationsArg)
 
