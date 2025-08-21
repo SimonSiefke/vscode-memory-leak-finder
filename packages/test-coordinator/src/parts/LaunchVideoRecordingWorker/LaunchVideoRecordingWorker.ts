@@ -7,5 +7,6 @@ export const start = async () => {
     stdio: 'inherit',
     commandMap: {},
   })
+  await rpc.invoke('VideoRecording.initialize')
   return rpc
 }
