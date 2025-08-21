@@ -117,8 +117,11 @@ beforeEach(() => {
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke(method) {
+    invoke(method, ...params) {
       switch (method) {
+        case 'FileSystem.exists':
+          return mockPathExists(...params)
+
         default:
           throw new Error(`not implemented ${method}`)
       }
