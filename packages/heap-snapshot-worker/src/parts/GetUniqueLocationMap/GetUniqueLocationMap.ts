@@ -6,7 +6,7 @@ interface UniqueLocation {
 }
 
 interface UniqueLocationMap {
-  [key: string]: UniqueLocation
+  readonly [key: string]: UniqueLocation
 }
 
 export const getUniqueLocationMap = (
