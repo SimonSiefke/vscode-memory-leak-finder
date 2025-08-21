@@ -20,7 +20,7 @@
     "@lvce-editor/verror": "^1.7.0"
   },
   "devDependencies": {
-    "@types/node": "^24.2.0",
+    "@types/node": "^24.3.0",
     "@types/babel__code-frame": "^7.0.6"
   }
 }
