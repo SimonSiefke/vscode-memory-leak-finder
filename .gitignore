@@ -2,6 +2,7 @@
 benchmark-results
 .vscode-sources
 .vscode-node-modules
+.vscode-node-modules-cache
 .vscode-repos
 .vscode-heapsnapshots
 .cursor-test-workspace
