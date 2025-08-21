@@ -9,16 +9,13 @@ import * as Path from '../Path/Path.ts'
  * @param {string} commitHash
  * @param {string} cacheDir
  */
-export const setupNodeModulesFromCache = async (repoPath, commitHash, cacheDir) => {
+export const copyNodeModulesFromCacheToFolder = async (from:string,to:string) => {
   try {
-    const cachedNodeModulesPath = Path.join(cacheDir, commitHash)
-    const allCachedNodeModulesPaths = await Filesystem.findFiles('**/node_modules', { cwd: cachedNodeModulesPath })
+    const allCachedNodeModulesPaths = await Filesystem.findFiles('**/node_modules', { cwd: from  })
     const cachedNodeModulesPaths = allCachedNodeModulesPaths.filter((path) => !path.includes('node_modules/node_modules'))
     const fileOperations = await GetRestoreFileOperations.getRestoreNodeModulesFileOperations(
-      repoPath,
-      commitHash,
-      cacheDir,
-      cachedNodeModulesPath,
+      from ,
+      to,
       cachedNodeModulesPaths,
     )
     await FileSystemWorker.applyFileOperations(fileOperations)

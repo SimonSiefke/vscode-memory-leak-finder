@@ -7,7 +7,7 @@ import * as Filesystem from '../Filesystem/Filesystem.ts'
  * @param {string} cacheDir
  * @returns {Promise<boolean>}
  */
-export const checkCacheExists = async (commitHash, cacheDir) => {
+export const checkCacheExists = async (cacheDir, hash) => {
   try {
     const cachedNodeModulesPath = Path.join(cacheDir, commitHash)
     return await Filesystem.pathExists(cachedNodeModulesPath)

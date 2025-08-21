@@ -1,13 +1,20 @@
 import { exec } from '../Exec/Exec.ts'
 import { VError } from '@lvce-editor/verror'
 
+const doInstallDependencies=async (cwd, useNice)=>{
+   if (useNice) {
+      return exec('nice', ['-n', '10', 'npm', 'ci'], { cwd, 
+        
+       })
+    } 
+      return  exec('npm', ['ci'], { cwd })
+    
+}
+
 export const installDependencies = async (cwd, useNice) => {
   try {
-    if (useNice) {
-      await exec('nice', ['-n', '10', 'npm', 'ci'], { cwd })
-    } else {
-      await exec('npm', ['ci'], { cwd })
-    }
+    const child = doInstallDependencies(cwd, useNice)
+    await child
   } catch (error) {
     throw new VError(error, `Failed to install dependencies in directory '${cwd}'`)
   }
