@@ -1,5 +1,5 @@
-import { pathExists } from 'path-exists'
 import { exec } from '../Exec/Exec.ts'
+import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 
 /**
  * Runs the compilation process using npm run compile
@@ -14,7 +14,7 @@ export const runCompile = async (cwd, useNice, mainJsPath) => {
   }
 
   // Verify build was successful
-  if (!(await pathExists(mainJsPath))) {
+  if (!(await FileSystemWorker.pathExists(mainJsPath))) {
     throw new Error('Build failed: out/main.js not found after compilation')
   }
 }

@@ -25,19 +25,21 @@ export const applyFileOperation = async (operation: FileOperation): Promise<void
       case 'copy': {
         const fromPath: string = operation.from
         const toPath: string = operation.to
-        await copy(fromPath, toPath)
+        await copy(fromPath, toPath, {
+          recursive: true,
+        })
         break
       }
 
       case 'remove': {
         const fromPath: string = operation.from
-        await remove(fromPath)
+        await remove(fromPath, { recursive: true })
         break
       }
 
       case 'mkdir': {
         const { path } = operation
-        await makeDirectory(path)
+        await makeDirectory(path, { recursive: true })
         break
       }
     }

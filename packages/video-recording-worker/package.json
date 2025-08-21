@@ -20,5 +20,7 @@
     "@lvce-editor/verror": "^1.7.0",
     "execa": "^9.6.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/node": "^24.3.0"
+  }
 }
