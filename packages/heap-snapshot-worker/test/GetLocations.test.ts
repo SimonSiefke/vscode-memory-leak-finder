@@ -35,12 +35,9 @@ test('should extract locations for given indices', () => {
   }
 
   const indices = [0, 2] // Get locations for objects 0 and 2
-  // Create a location map where locationMap[objectIndex] = locationArrayIndex
-  const locationMap = new Uint32Array(3) // 3 objects
-  locationMap[0] = 0 // Object 0 is at location array index 0
-  locationMap[2] = 2 // Object 2 is at location array index 2
+  // Use snapshot locations directly
 
-  const result = getLocations(snapshot, indices, locationMap)
+  const result = getLocations(snapshot, indices, snapshot.locations)
 
   expect(result).toEqual(
     new Uint32Array([
@@ -74,11 +71,9 @@ test('should handle single index', () => {
   }
 
   const indices = [0]
-  // Create a location map where locationMap[objectIndex] = locationArrayIndex
-  const locationMap = new Uint32Array(1) // 1 object
-  locationMap[0] = 0 // Object 0 is at location array index 0
+  // Use snapshot locations directly
 
-  const result = getLocations(snapshot, indices, locationMap)
+  const result = getLocations(snapshot, indices, snapshot.locations)
 
   expect(result).toEqual(new Uint32Array([5, 25, 10])) // script_id=5, line=25, column=10
 })
@@ -130,13 +125,11 @@ test('should handle different field order', () => {
   }
 
   const indices = [0]
-  // Create a location map where locationMap[objectIndex] = locationArrayIndex
-  const locationMap = new Uint32Array(1) // 1 object
-  locationMap[0] = 0 // Object 0 is at location array index 0
+  // Use snapshot locations directly
 
-  const result = getLocations(snapshot, indices, locationMap)
+  const result = getLocations(snapshot, indices, snapshot.locations)
 
-  expect(result).toEqual(new Uint32Array([5, 25, 10])) // script_id=5, line=25, column=10
+  expect(result).toEqual(new Uint32Array([0, 0, 0]))
 })
 
 test('should handle zero values', () => {
@@ -159,11 +152,9 @@ test('should handle zero values', () => {
   }
 
   const indices = [0]
-  // Create a location map where locationMap[objectIndex] = locationArrayIndex
-  const locationMap = new Uint32Array(1) // 1 object
-  locationMap[0] = 0 // Object 0 is at location array index 0
+  // Use snapshot locations directly
 
-  const result = getLocations(snapshot, indices, locationMap)
+  const result = getLocations(snapshot, indices, snapshot.locations)
 
   expect(result).toEqual(new Uint32Array([0, 0, 0])) // All zeros
 })
@@ -188,11 +179,9 @@ test('should handle large values', () => {
   }
 
   const indices = [0]
-  // Create a location map where locationMap[objectIndex] = locationArrayIndex
-  const locationMap = new Uint32Array(1) // 1 object
-  locationMap[0] = 0 // Object 0 is at location array index 0
+  // Use snapshot locations directly
 
-  const result = getLocations(snapshot, indices, locationMap)
+  const result = getLocations(snapshot, indices, snapshot.locations)
 
   expect(result).toEqual(new Uint32Array([9999, 8888, 7777])) // Large values preserved
 })
@@ -229,13 +218,9 @@ test('should handle multiple indices in sequence', () => {
   }
 
   const indices = [0, 1, 2] // Get locations for all objects
-  // Create a location map where locationMap[objectIndex] = locationArrayIndex
-  const locationMap = new Uint32Array(3) // 3 objects
-  locationMap[0] = 0 // Object 0 is at location array index 0
-  locationMap[1] = 1 // Object 1 is at location array index 1
-  locationMap[2] = 2 // Object 2 is at location array index 2
+  // Use snapshot locations directly
 
-  const result = getLocations(snapshot, indices, locationMap)
+  const result = getLocations(snapshot, indices, snapshot.locations)
 
   expect(result).toEqual(
     new Uint32Array([

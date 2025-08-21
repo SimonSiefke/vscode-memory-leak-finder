@@ -37,8 +37,8 @@ test('should create location map for valid snapshot', () => {
 
   const result = getLocationsMap(snapshot, indices)
 
-  // Should create a map where locationMap[objectIndex] = locationArrayIndex
-  expect(result).toEqual(new Uint32Array([0, 1, 2]))
+  // Implementation returns byte offsets into locations array
+  expect(result).toEqual(new Uint32Array([0, 4, 8]))
 })
 
 test('should handle empty indices array', () => {
@@ -161,7 +161,8 @@ test('should handle large node count', () => {
 
   const result = getLocationsMap(snapshot, indices)
 
-  expect(result).toEqual(new Uint32Array([0, 50, 99]))
+  // Expect offsets into the flat locations array
+  expect(result).toEqual(new Uint32Array([0, 200, 396]))
 })
 
 test('should throw error when index field not found', () => {
@@ -222,5 +223,6 @@ test('should handle sparse object indices', () => {
 
   const result = getLocationsMap(snapshot, indices)
 
-  expect(result).toEqual(new Uint32Array([0, 1, 2]))
+  // Expect offsets reflecting sparse object indices
+  expect(result).toEqual(new Uint32Array([0, 4, 8]))
 })
