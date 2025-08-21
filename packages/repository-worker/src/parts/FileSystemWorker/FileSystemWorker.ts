@@ -14,8 +14,8 @@ const invoke = (method, ...params) => {
   return state.rpc.invoke(method, ...params)
 }
 
-export const findFiles = (path, options) => {
-  return invoke('FileSystem.findFiles')
+export const findFiles = (pattern, options) => {
+  return invoke('FileSystem.findFiles', pattern, options)
 }
 
 export const readFileContent = (path) => {
