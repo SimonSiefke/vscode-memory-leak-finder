@@ -28,12 +28,23 @@ jest.unstable_mockModule('../src/parts/TestStateOutput/TestStateOutput.ts', () =
   }
 })
 
+jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
+  return {
+    invoke: jest.fn().mockImplementation((method: any, ...args: any[]) => {
+      if (method === 'Stdout.getClear') {
+        return '[ansi-clear]'
+      }
+      if (method === 'Stdout.getHandleTestFailedMessage') {
+        return Promise.resolve('test failed\n')
+      }
+      throw new Error(`unexpected method ${method}`)
+    }),
+  }
+})
+
 const Stdout = await import('../src/parts/Stdout/Stdout.ts')
 const TestStateOutput = await import('../src/parts/TestStateOutput/TestStateOutput.ts')
 const HandleTestFailed = await import('../src/parts/HandleTestFailed/HandleTestFailed.ts')
-const GetHandleTestFailedMessage = await import('../src/parts/GetHandleTestFailedMessage/GetHandleTestFailedMessage.ts')
-const GetTestClearMessage = await import('../src/parts/GetTestClearMessage/GetTestClearMessage.ts')
-const AnsiEscapes = await import('../src/parts/AnsiEscapes/AnsiEscapes.ts')
 
 test.skip('handleTestFailed', async () => {
   const file: string = '/test/e2e/src/sample.close-window.js'
@@ -55,18 +66,6 @@ test.skip('handleTestFailed', async () => {
   await HandleTestFailed.handleTestFailed(file, relativeDirName, releativeFilePath, fileName, error)
 
   expect(Stdout.write).toHaveBeenCalledTimes(1)
-
-  const baseMessage: string = await GetHandleTestFailedMessage.getHandleTestFailedMessage(
-    file,
-    relativeDirName,
-    releativeFilePath,
-    fileName,
-    error,
-  )
-  const clearMessage: string = await GetTestClearMessage.getTestClearMessage()
-  // Do not call TestStateOutput.clearPending() here to avoid incrementing the mock call count
-  const expectedOutput: string = (await AnsiEscapes.clear(false)) + clearMessage + baseMessage
-
-  expect(Stdout.write).toHaveBeenCalledWith(expectedOutput)
+  expect(Stdout.write).toHaveBeenCalledWith(expect.stringContaining('test failed'))
   expect(TestStateOutput.clearPending).toHaveBeenCalledTimes(1)
 })
