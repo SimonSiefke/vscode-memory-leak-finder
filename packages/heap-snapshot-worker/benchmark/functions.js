@@ -8,7 +8,9 @@ const testFunctionCount = async () => {
   console.log('Testing Function Count:')
 
   try {
-    const snapshot = await prepareHeapSnapshot(filePath1, {})
+    const snapshot = await prepareHeapSnapshot(filePath1, {
+      parseStrings: true,
+    })
     const count = await displayHeapSnapshotFunctions(snapshot)
     console.log({ count })
   } catch (error) {
