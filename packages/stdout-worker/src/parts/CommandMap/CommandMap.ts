@@ -1,3 +1,4 @@
+import * as FormatStack from '../FormatStack/FormatStack.ts'
 import * as GetAllTestsFinishedMessage from '../GetAllTestsFinishedMessage/GetAllTestsFinishedMessage.ts'
 import * as GetAnsiEscapes from '../GetAnsiEscapes/GetAnsiEscapes.ts'
 import * as GetGitHubFileErrorMessage from '../GetGitHubFileErrorMessage/GetGitHubFileErrorMessage.ts'
@@ -14,7 +15,8 @@ import * as GetTestClearMessage from '../GetTestClearMessage/GetTestClearMessage
 import * as GetTestsUnexpectedErrorMessage from '../GetTestsUnexpectedErrorMessage/GetTestsUnexpectedErrorMessage.ts'
 import * as GetWatchUsageMessage from '../GetWatchUsageMessage/GetWatchUsageMessage.ts'
 
-export const commandMap: Record<string, (...args: any[]) => any> = {
+export const commandMap: Record<string, (...args: readonly any[]) => any> = {
+  'Stdout.formatStack': FormatStack.formatStack,
   'Stdout.getAllTestsFinishedMessage': GetAllTestsFinishedMessage.getAllTestsFinishedMessage,
   'Stdout.getBackspace': GetAnsiEscapes.getBackspace,
   'Stdout.getClear': GetAnsiEscapes.getClear,
