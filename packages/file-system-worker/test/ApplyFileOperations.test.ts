@@ -204,8 +204,8 @@ test('applyFileOperations - handles multiple copy operations', async () => {
 
   await applyFileOperationsModule.applyFileOperations(operations)
 
-  expect(mockCopy).toHaveBeenCalledWith('/source1/file1.txt', '/dest1/file1.txt')
-  expect(mockCopy).toHaveBeenCalledWith('/source2/file2.txt', '/dest2/file2.txt')
+  expect(mockCopy).toHaveBeenCalledWith('/source1/file1.txt', '/dest1/file1.txt', { recursive: true })
+  expect(mockCopy).toHaveBeenCalledWith('/source2/file2.txt', '/dest2/file2.txt', { recursive: true })
   expect(mockCopy).toHaveBeenCalledTimes(2)
 })
 
