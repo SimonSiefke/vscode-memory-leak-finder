@@ -106,7 +106,7 @@ test('should handle different field order', () => {
   }
 
   const indices = [0]
-  const locationIndices = new Uint32Array([0])
+  const locationIndices = new Uint32Array([0]) // Maps object index 0 to location array index 0
 
   const result = getLocations(snapshot, indices, locationIndices)
 
