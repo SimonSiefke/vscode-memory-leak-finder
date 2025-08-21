@@ -246,8 +246,8 @@ test('applyFileOperations - handles multiple remove operations', async () => {
 
   await applyFileOperationsModule.applyFileOperations(operations)
 
-  expect(mockRemove).toHaveBeenCalledWith('/path1/file1.txt')
-  expect(mockRemove).toHaveBeenCalledWith('/path2/file2.txt')
+  expect(mockRemove).toHaveBeenCalledWith('/path1/file1.txt', { recursive: true })
+  expect(mockRemove).toHaveBeenCalledWith('/path2/file2.txt', { recursive: true })
   expect(mockRemove).toHaveBeenCalledTimes(2)
 })
 
