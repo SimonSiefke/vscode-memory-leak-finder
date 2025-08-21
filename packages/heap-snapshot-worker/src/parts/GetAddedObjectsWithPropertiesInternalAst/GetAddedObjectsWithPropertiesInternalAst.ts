@@ -18,5 +18,6 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   console.time('compare')
   const added = compareAsts(astBefore, astAfter, depth)
   console.timeEnd('compare')
+  console.log('addedCount', added.length)
   return added
 }
