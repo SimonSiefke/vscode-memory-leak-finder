@@ -96,6 +96,7 @@ test('should handle empty indices array', () => {
 })
 
 test('should handle different field order', () => {
+  const nodeFieldCount = 5
   const snapshot: Snapshot = {
     node_count: 1,
     edge_count: 0,
@@ -124,6 +125,7 @@ test('should handle different field order', () => {
 })
 
 test('should handle zero values', () => {
+  const nodeFieldCount = 5
   const snapshot: Snapshot = {
     node_count: 1,
     edge_count: 0,
@@ -152,6 +154,7 @@ test('should handle zero values', () => {
 })
 
 test('should handle large values', () => {
+  const nodeFieldCount = 5
   const snapshot: Snapshot = {
     node_count: 1,
     edge_count: 0,
