@@ -14,7 +14,7 @@ export const getFullMessage = async (
     fullMessage += clearMessage
   }
   fullMessage += message
-  if (!isGithubAcions && !isBuffering) {
+  if (!isGithubActions && !isBuffering) {
     const clear = await AnsiEscapes.clear(isWindows)
     fullMessage = clear + '\n' + fullMessage
   }

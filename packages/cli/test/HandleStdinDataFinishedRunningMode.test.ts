@@ -19,10 +19,7 @@ StdoutWorker.set(mockRpc)
 test('handleStdinDataFinishedRunningMode - show watch mode details', async () => {
   const state = {
     ...createDefaultState(),
-<<<<<<< HEAD
-=======
     value: '',
->>>>>>> origin/main
     mode: ModeType.FinishedRunning,
   }
   const key = CliKeys.WatchMode
@@ -38,16 +35,12 @@ test('handleStdinDataFinishedRunningMode - show watch mode details', async () =>
 })
 
 test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
-<<<<<<< HEAD
-  const state = { ...createDefaultState(), mode: ModeType.FinishedRunning }
-=======
   const state = {
     ...createDefaultState(),
     value: '',
     mode: ModeType.FinishedRunning,
     stdout: [],
   }
->>>>>>> origin/main
   const key = CliKeys.FilterMode
 
   // Mock the stdout worker to return pattern usage message
@@ -61,32 +54,24 @@ test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
 })
 
 test('handleStdinDataFinishedRunningMode - quit', async () => {
-<<<<<<< HEAD
-  const state = { ...createDefaultState(), mode: ModeType.FinishedRunning }
-=======
   const state = {
     ...createDefaultState(),
     value: '',
     mode: ModeType.FinishedRunning,
     stdout: [],
   }
->>>>>>> origin/main
   const key = CliKeys.Quit
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
 })
 
 test('handleStdinDataFinishedRunningMode - run again', async () => {
-<<<<<<< HEAD
-  const state = { ...createDefaultState(), mode: ModeType.FinishedRunning }
-=======
   const state = {
     ...createDefaultState(),
     value: '',
     mode: ModeType.FinishedRunning,
     stdout: [],
   }
->>>>>>> origin/main
   const key = AnsiKeys.Enter
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
   expect(newState.mode).toBe(ModeType.Running)

@@ -71,10 +71,6 @@ test('HandleStdinDataInterruptedMode - quit', async () => {
 test('HandleStdinDataInterruptedMode - run again', async () => {
   const state = {
     ...createDefaultState(),
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
     value: '',
     mode: ModeType.Interrupted,
     stdout: [],

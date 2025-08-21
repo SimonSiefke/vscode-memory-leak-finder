@@ -27,15 +27,11 @@ test('handleStdinDataFilterWaitingMode - alt + backspace', async () => {
 })
 
 test('handleStdinDataFilterWaitingMode - ctrl + backspace', async () => {
-<<<<<<< HEAD
-  const state = { ...createDefaultState(), mode: ModeType.FilterWaiting, value: 'abc' }
-=======
   const state = {
     ...createDefaultState(),
     value: 'abc',
     stdout: [],
   }
->>>>>>> origin/main
   const key = AnsiKeys.ControlBackspace
 
   const mockRpc = MockRpc.create({
@@ -56,61 +52,45 @@ test('handleStdinDataFilterWaitingMode - ctrl + backspace', async () => {
 })
 
 test('handleStdinDataFilterWaitingMode - ctrl + backspace - empty value', async () => {
-<<<<<<< HEAD
-  const state = { ...createDefaultState(), mode: ModeType.FilterWaiting, value: '' }
-=======
   const state = {
     ...createDefaultState(),
     value: '',
     stdout: [],
   }
->>>>>>> origin/main
   const key = AnsiKeys.ControlBackspace
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState).toBe(state)
 })
 
 test('handleStdinDataFilterWaitingMode - ctrl + c', async () => {
-<<<<<<< HEAD
-  const state = { ...createDefaultState(), mode: ModeType.FilterWaiting, value: 'abc' }
-=======
   const state = {
     ...createDefaultState(),
     value: 'abc',
     stdout: [],
   }
->>>>>>> origin/main
   const key = AnsiKeys.ControlC
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
 })
 
 test('handleStdinDataFilterWaitingMode - ctrl + d', async () => {
-<<<<<<< HEAD
-  const state = { ...createDefaultState(), mode: ModeType.FilterWaiting, value: 'abc' }
-=======
   const state = {
     ...createDefaultState(),
     value: 'abc',
     stdout: [],
   }
->>>>>>> origin/main
   const key = AnsiKeys.ControlD
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState.mode).toBe(ModeType.Exit)
 })
 
 test('handleStdinDataFilterWaitingMode - enter', async () => {
-<<<<<<< HEAD
-  const state = { ...createDefaultState(), mode: ModeType.FilterWaiting, value: 'abc' }
-=======
   const state = {
     ...createDefaultState(),
     value: 'abc',
     stdout: [],
     previousFilters: [],
   }
->>>>>>> origin/main
   const key = AnsiKeys.Enter
 
   const mockRpc = MockRpc.create({
@@ -131,15 +111,11 @@ test('handleStdinDataFilterWaitingMode - enter', async () => {
 })
 
 test('handleStdinDataFilterWaitingMode - escape', async () => {
-<<<<<<< HEAD
-  const state = { ...createDefaultState(), mode: ModeType.FilterWaiting, value: 'abc' }
-=======
   const state = {
     ...createDefaultState(),
     value: 'abc',
     stdout: [],
   }
->>>>>>> origin/main
   const key = AnsiKeys.Escape
 
   const mockRpc = MockRpc.create({
@@ -159,30 +135,22 @@ test('handleStdinDataFilterWaitingMode - escape', async () => {
 })
 
 test('handleStdinDataFilterWaitingMode - home', async () => {
-<<<<<<< HEAD
-  const state = { ...createDefaultState(), mode: ModeType.FilterWaiting, value: 'abc' }
-=======
   const state = {
     ...createDefaultState(),
     value: 'abc',
     stdout: [],
   }
->>>>>>> origin/main
   const key = AnsiKeys.Home
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState).toBe(state)
 })
 
 test('handleStdinDataFilterWaitingMode - end', async () => {
-<<<<<<< HEAD
-  const state = { ...createDefaultState(), mode: ModeType.FilterWaiting, value: 'abc' }
-=======
   const state = {
     ...createDefaultState(),
     value: 'abc',
     stdout: [],
   }
->>>>>>> origin/main
   const key = AnsiKeys.End
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
   expect(newState).toBe(state)
