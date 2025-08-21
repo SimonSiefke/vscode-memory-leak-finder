@@ -1,14 +1,11 @@
 import { exec } from '../Exec/Exec.ts'
 import { VError } from '@lvce-editor/verror'
 
-const doInstallDependencies=async (cwd, useNice)=>{
-   if (useNice) {
-      return exec('nice', ['-n', '10', 'npm', 'ci'], { cwd, 
-        
-       })
-    } 
-      return  exec('npm', ['ci'], { cwd })
-    
+const doInstallDependencies = async (cwd, useNice) => {
+  if (useNice) {
+    return exec('nice', ['-n', '10', 'npm', 'ci'], { cwd })
+  }
+  return exec('npm', ['ci'], { cwd })
 }
 
 export const installDependencies = async (cwd, useNice) => {
