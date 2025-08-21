@@ -1,5 +1,5 @@
 export const normalizeFunctionObjects = (functionObjects) => {
-  const normalized = []
+  const normalized: any[] = []
   for (const functionObject of functionObjects) {
     const { url, lineIndex, columnIndex, name, sourceMapUrl } = functionObject
     const displayUrl = `${url}:${lineIndex}:${columnIndex}`

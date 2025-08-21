@@ -5,7 +5,7 @@ export const aggregateFunctionObjects = (functionObjects) => {
     map[url]++
   }
   const seen = Object.create(null)
-  const aggregated = []
+  const aggregated: any[] = []
   for (const { url, sourceMapUrl, name } of functionObjects) {
     if (url in seen) {
       continue
