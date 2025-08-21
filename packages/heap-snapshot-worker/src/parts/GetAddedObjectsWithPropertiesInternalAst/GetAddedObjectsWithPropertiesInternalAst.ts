@@ -54,6 +54,7 @@ interface HashMapCompareResult {
   readonly key: string
   readonly before: readonly number[]
   readonly after: readonly number[]
+  readonly delta: number
 }
 
 const compareMaps = (beforeMap: HashMap, afterMap: HashMap): readonly HashMapCompareResult[] => {
@@ -65,25 +66,30 @@ const compareMaps = (beforeMap: HashMap, afterMap: HashMap): readonly HashMapCom
         key,
         before,
         after,
+        delta: after.length - before.length,
       })
     }
   }
   return leaked
 }
 
-const formatComparison = (snapshot: Snapshot, compareResult: readonly HashMapCompareResult[]): any => {
+const formatComparison = (beforeSnapshot: Snapshot, afterSnapshot: Snapshot, compareResult: readonly HashMapCompareResult[]): any => {
   const pretty: any[] = []
-  const nameIndex = snapshot.meta.node_fields.indexOf('name')
-  const nodeFieldCount = snapshot.meta.node_fields.length
-  const idIndex = snapshot.meta.node_fields.indexOf('id')
+  const nameIndex = afterSnapshot.meta.node_fields.indexOf('name')
+  const nodeFieldCount = afterSnapshot.meta.node_fields.length
+  const idIndex = afterSnapshot.meta.node_fields.indexOf('id')
   for (const { key, before, after } of compareResult) {
+    const beforeIds = before.map((index) => {
+      return beforeSnapshot.nodes[index * nodeFieldCount + idIndex]
+    })
+    // TODO must compare ids
     for (const index of after) {
-      if (before.includes(index)) {
+      const nodeId = afterSnapshot.nodes[index * nodeFieldCount + idIndex]
+      if (beforeIds.includes(nodeId)) {
         continue
       }
-      const node = snapshot.nodes[index * nodeFieldCount + nameIndex]
-      const nodeName = snapshot.strings[node]
-      const nodeId = snapshot.nodes[index * nodeFieldCount + idIndex]
+      const node = afterSnapshot.nodes[index * nodeFieldCount + nameIndex]
+      const nodeName = afterSnapshot.strings[node]
       pretty.push({
         key,
         nodeName,
@@ -94,7 +100,18 @@ const formatComparison = (snapshot: Snapshot, compareResult: readonly HashMapCom
       })
     }
   }
+  pretty.sort((a, b) => {
+    const aDelta = a.count - a.beforeCount
+    const bDelta = b.count - b.beforeCount
+    return bDelta - aDelta
+  })
   return pretty
+}
+
+const sortLeaked = (leaked: readonly HashMapCompareResult[]): readonly HashMapCompareResult[] => {
+  return leaked.toSorted((a, b) => {
+    return b.delta - a.delta
+  })
 }
 
 export const getAddedObjectsWithPropertiesInternalAst = (
@@ -105,15 +122,27 @@ export const getAddedObjectsWithPropertiesInternalAst = (
 ): readonly AstNode[] => {
   console.time('indices')
   // TODO ensure nodes are functions
+  console.time('indices')
   const indicesBefore = getObjectWithPropertyNodeIndices2(before, propertyName)
   const indicesAfter = getObjectWithPropertyNodeIndices2(after, propertyName)
+  console.timeEnd('indices')
 
+  console.time('hashmap')
   const hashMapBefore = createHashMap(indicesBefore)
   const hashMapAfter = createHashMap(indicesAfter)
+  console.timeEnd('hashmap')
 
+  console.time('compareMap')
   const leaked = compareMaps(hashMapBefore, hashMapAfter)
+  console.timeEnd('compareMap')
 
-  const formatted = formatComparison(after, leaked)
+  console.time('sort')
+  const leakedSorted = sortLeaked(leaked)
+  console.timeEnd('sort')
+
+  console.log({ leakedSorted })
+
+  const formatted = formatComparison(before, after, leaked)
   console.log({ formatted })
 
   // const edgeMap = createEdgeMap(before.nodes, before.meta.node_fields)
