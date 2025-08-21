@@ -262,7 +262,7 @@ test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with exist
   expect(mockPathExists).toHaveBeenCalledWith(nodeModulesPath)
 
   // Verify that logger was called for the skip message
-  expect(mockLog).toHaveBeenCalledWith(`node_modules already exists in repo for commit ${testCommitHash}, skipping npm ci...`)
+  expect(mockLog).toHaveBeenCalledWith(`[repository] node_modules already exists in repo for commit ${testCommitHash}, skipping npm ci...`)
 })
 
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with existing out folder', async () => {
