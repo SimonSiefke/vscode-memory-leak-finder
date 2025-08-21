@@ -4,8 +4,7 @@ import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 import * as GetCacheFileOperations from '../GetCacheFileOperations/GetCacheFileOperations.ts'
 import * as Path from '../Path/Path.ts'
 
-
-export const addNodeModulesToCache = async (repoPath:string , commitHash:string , cacheDir:string) => {
+export const addNodeModulesToCache = async (repoPath: string, commitHash: string, cacheDir: string) => {
   try {
     const cachedNodeModulesPath = Path.join(cacheDir, commitHash)
     const allNodeModulesPaths = await Filesystem.findFiles('**/node_modules', { cwd: repoPath })
@@ -22,9 +21,3 @@ export const addNodeModulesToCache = async (repoPath:string , commitHash:string 
     throw new VError(error, 'Failed to cache node_modules')
   }
 }
-
-
-await addNodeModulesToCache('/workspace/vscode-memory-leak-finder/.vscode-repos', 
-'82726892de556077e043909bb91e5a904f773ca1'
-  
-)
