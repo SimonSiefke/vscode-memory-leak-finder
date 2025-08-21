@@ -3,7 +3,10 @@ import type { AstNode, MapEntry } from '../AstNode/AstNode.ts'
 export const signatureFor = (node: AstNode, depth: number): string => {
   switch (node.type) {
     case 'object': {
-      const names = node.properties.map((p) => p.name).sort().join('|')
+      const names = node.properties
+        .map((p) => p.name)
+        .sort()
+        .join('|')
       if (depth <= 0) {
         return `o{${names}}`
       }
@@ -63,5 +66,3 @@ export const signatureFor = (node: AstNode, depth: number): string => {
       return `unk`
   }
 }
-
-
