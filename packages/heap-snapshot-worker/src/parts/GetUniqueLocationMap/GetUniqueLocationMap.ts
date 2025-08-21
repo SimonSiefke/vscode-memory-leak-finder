@@ -1,13 +1,5 @@
 import { getLocationKey } from '../GetLocationKey/GetLocationKey.ts'
-
-interface UniqueLocation {
-  readonly count: number
-  readonly index: number
-}
-
-interface UniqueLocationMap {
-  readonly [key: string]: UniqueLocation
-}
+import type { UniqueLocationMap } from '../UniqueLocationMap/UniqueLocationMap.ts'
 
 export const getUniqueLocationMap = (
   locations: Uint32Array,
