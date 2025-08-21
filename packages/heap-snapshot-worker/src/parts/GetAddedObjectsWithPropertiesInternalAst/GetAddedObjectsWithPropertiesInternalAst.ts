@@ -1,6 +1,7 @@
 import type { AstNode } from '../AstNode/AstNode.ts'
 import { compareAsts } from '../CompareAsts/CompareAsts.ts'
 import { getIdSet } from '../GetIdSet/GetIdSet.ts'
+import { getLocationHashes } from '../GetLocationHashes/GetLocationHashes.ts'
 import { getLocations } from '../GetLocations/GetLocations.ts'
 import { getLocationsMap as getLocationMap } from '../GetLocationsMap/GetLocationsMap.ts'
 import { getObjectsWithPropertiesInternalAst } from '../GetObjectsWithPropertiesInternalAst/GetObjectsWithPropertiesInternalAst.ts'
@@ -47,6 +48,10 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   const locationsBefore = getLocations(before, indicesBefore, locationMapBefore)
   const locationsAfter = getLocations(after, indicesAfter, locationMapAfter)
 
+  const hashesBefore = getLocationHashes(locationsBefore)
+  const hashesAfter = getLocationHashes(locationsAfter)
+
+  console.log({ hashesBefore, hashesAfter })
   console.timeEnd('locations')
   const added2 = getAdded(before, after, indicesBefore, indicesAfter)
   console.log('field', before.meta.node_fields.length)
