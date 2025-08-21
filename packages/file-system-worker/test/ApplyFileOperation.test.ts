@@ -45,7 +45,7 @@ test('applyFileOperation - applies mkdir operation', async () => {
 
   await applyFileOperationModule.applyFileOperation(operation)
 
-  expect(mockMakeDirectory).toHaveBeenCalledWith('/path/to/directory')
+  expect(mockMakeDirectory).toHaveBeenCalledWith('/path/to/directory', { recursive: true })
   expect(mockMakeDirectory).toHaveBeenCalledTimes(1)
 })
 
