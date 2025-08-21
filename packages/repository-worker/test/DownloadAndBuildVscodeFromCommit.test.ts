@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, jest, test } from '@jest/globals'
-import * as Path from '../src/parts/Path/Path.ts'
-import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
 import { MockRpc } from '@lvce-editor/rpc'
+import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
+import * as Path from '../src/parts/Path/Path.ts'
 
 const DEFAULT_REPO_URL = 'https://github.com/microsoft/vscode.git'
 
