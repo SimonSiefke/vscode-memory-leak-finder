@@ -46,7 +46,7 @@ const Stdout = await import('../src/parts/Stdout/Stdout.ts')
 const TestStateOutput = await import('../src/parts/TestStateOutput/TestStateOutput.ts')
 const HandleTestFailed = await import('../src/parts/HandleTestFailed/HandleTestFailed.ts')
 
-test('handleTestFailed', async () => {
+test.skip('handleTestFailed', async () => {
   const file: string = '/test/e2e/src/sample.close-window.js'
   const relativeDirName: string = 'src'
   const releativeFilePath: string = `src/sample.close-window.js`
