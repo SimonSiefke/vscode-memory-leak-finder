@@ -1,12 +1,8 @@
 import type { AstNode } from '../AstNode/AstNode.ts'
 import { compareAsts } from '../CompareAsts/CompareAsts.ts'
-import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
 import { getIdSet } from '../GetIdSet/GetIdSet.ts'
-import { getLocationHashes } from '../GetLocationHashes/GetLocationHashes.ts'
-import { getLocations } from '../GetLocations/GetLocations.ts'
-import { getLocationsMap as getLocationMap } from '../GetLocationsMap/GetLocationsMap.ts'
+import { getLocationKey } from '../GetLocationKey/GetLocationKey.ts'
 import { getObjectsWithPropertiesInternalAst } from '../GetObjectsWithPropertiesInternalAst/GetObjectsWithPropertiesInternalAst.ts'
-import { getObjectWithPropertyNodeIndices } from '../GetObjectWithPropertyNodeIndices/GetObjectWithPropertyNodeIndices.ts'
 import { getObjectWithPropertyNodeIndices2 } from '../GetObjectWithPropertyNodeIndices2/GetObjectWithPropertyNodeIndices2.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
@@ -33,6 +29,38 @@ const getAdded = (
   return added
 }
 
+const createHashMap = (indices: Uint32Array) => {
+  const hashMap = Object.create(null)
+  for (let i = 0; i < indices.length; i += 4) {
+    const index = indices[i]
+    const scriptId = indices[i + 1]
+    const line = indices[i + 2]
+    const column = indices[i + 3]
+    const hash = getLocationKey(scriptId, line, column)
+    if (hash in hashMap) {
+      hashMap[hash].push(index)
+    } else {
+      hashMap[hash] = [index]
+    }
+  }
+  return hashMap
+}
+
+const compareMaps = (beforeMap, afterMap) => {
+  const leaked: any = []
+  for (const [key, after] of afterMap) {
+    const before = beforeMap[key] || []
+    if (after.length > before.length) {
+      leaked.push({
+        key,
+        before,
+        after,
+      })
+    }
+  }
+  return leaked
+}
+
 export const getAddedObjectsWithPropertiesInternalAst = (
   before: Snapshot,
   after: Snapshot,
@@ -41,8 +69,15 @@ export const getAddedObjectsWithPropertiesInternalAst = (
 ): readonly AstNode[] => {
   console.time('indices')
   // TODO ensure nodes are functions
-  // const indicesBefore = getObjectWithPropertyNodeIndices2(before, propertyName)
-  // const indicesAfter = getObjectWithPropertyNodeIndices2(after, propertyName)
+  const indicesBefore = getObjectWithPropertyNodeIndices2(before, propertyName)
+  const indicesAfter = getObjectWithPropertyNodeIndices2(after, propertyName)
+
+  const hashMapBefore = createHashMap(indicesBefore)
+  const hashMapAfter = createHashMap(indicesAfter)
+
+  const leaked = compareMaps(hashMapBefore, hashMapAfter)
+
+  console.log({ leaked })
 
   // const edgeMap = createEdgeMap(before.nodes, before.meta.node_fields)
   // const nodeFieldCount = before.meta.node_fields.length

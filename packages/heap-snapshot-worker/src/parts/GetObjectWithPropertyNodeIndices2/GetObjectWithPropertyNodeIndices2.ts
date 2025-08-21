@@ -50,6 +50,7 @@ export const getObjectWithPropertyNodeIndices2 = (
 
   const result: number[] = []
 
+  // let prev = ``
   for (let nodeOffset = 0; nodeOffset < nodes.length; nodeOffset += ITEMS_PER_NODE_LOCAL) {
     const nodeIndex = nodeOffset / ITEMS_PER_NODE_LOCAL
     const nodeEdges = getNodeEdgesFast(nodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE_LOCAL, ITEMS_PER_EDGE_LOCAL, edgeCountFieldIndex)
@@ -59,10 +60,16 @@ export const getObjectWithPropertyNodeIndices2 = (
       const nameIndex = nodeEdges[i + edgeNameFieldIndex]
       if (edgeType === EDGE_TYPE_PROPERTY && nameIndex === propertyNameIndex) {
         const toNode = nodeEdges[i + toNodeIndex]
+        // console.log({ toNode, nodeFieldCount, index: toNode / nodeFieldCount })
         const locationIndex = locationMap[toNode / nodeFieldCount]
         const scriptId = locations[locationIndex + scriptIdIndex]
         const line = locations[locationIndex + lineIndex]
         const column = locations[locationIndex + columnIndex]
+        // const hash = `${scriptId}:${line}:${column}`
+        // if (prev !== hash) {
+        //   prev = hash
+        //   console.log({ scriptId, line, column })
+        // }
         result.push(nodeIndex, scriptId, line, column)
         break
       }
