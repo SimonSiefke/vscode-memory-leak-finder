@@ -29,7 +29,11 @@ const getAdded = (
   return added
 }
 
-const createHashMap = (indices: Uint32Array) => {
+interface HashMap {
+  readonly [key: string]: readonly number[]
+}
+
+const createHashMap = (indices: Uint32Array): HashMap => {
   const hashMap = Object.create(null)
   for (let i = 0; i < indices.length; i += 4) {
     const index = indices[i]
@@ -46,9 +50,15 @@ const createHashMap = (indices: Uint32Array) => {
   return hashMap
 }
 
-const compareMaps = (beforeMap, afterMap) => {
+interface HashMapCompareResult {
+  readonly key: string
+  readonly before: readonly number[]
+  readonly after: readonly number[]
+}
+
+const compareMaps = (beforeMap: HashMap, afterMap: HashMap): readonly HashMapCompareResult[] => {
   const leaked: any = []
-  for (const [key, after] of afterMap) {
+  for (const [key, after] of Object.entries(afterMap)) {
     const before = beforeMap[key] || []
     if (after.length > before.length) {
       leaked.push({
@@ -59,6 +69,27 @@ const compareMaps = (beforeMap, afterMap) => {
     }
   }
   return leaked
+}
+
+const formatComparison = (snapshot: Snapshot, compareResult: readonly HashMapCompareResult[]): any => {
+  const pretty: any[] = []
+  const nameIndex = snapshot.meta.node_fields.indexOf('name')
+  for (const { key, before, after } of compareResult) {
+    for (const index of after) {
+      if (before.includes(index)) {
+        continue
+      }
+      const node = snapshot.nodes[index + nameIndex]
+      const nodeName = snapshot.strings[node]
+      pretty.push({
+        key,
+        nodeName,
+        count: after.length,
+        beforeCount: before.length,
+      })
+    }
+  }
+  return pretty
 }
 
 export const getAddedObjectsWithPropertiesInternalAst = (
@@ -77,7 +108,8 @@ export const getAddedObjectsWithPropertiesInternalAst = (
 
   const leaked = compareMaps(hashMapBefore, hashMapAfter)
 
-  console.log({ leaked })
+  const formatted = formatComparison(after, leaked)
+  console.log({ formatted })
 
   // const edgeMap = createEdgeMap(before.nodes, before.meta.node_fields)
   // const nodeFieldCount = before.meta.node_fields.length
