@@ -18,13 +18,13 @@ test('getRestoreNodeModulesFileOperations returns copy operations for cached pat
   expect(result).toEqual([
     {
       type: 'copy',
-      from: '/test/cache/cache-key/node_modules/package1',
-      to: '/test/repo/node_modules/package1',
+      from: '/test/node-modules-cache/1234/node_modules/package1',
+      to: '/test/vscode/5678/node_modules/package1',
     },
     {
       type: 'copy',
-      from: '/test/cache/cache-key/node_modules/package2',
-      to: '/test/repo/node_modules/package2',
+      from: '/test/node-modules-cache/1234/node_modules/package2',
+      to: '/test/vscode/5678/node_modules/package2',
     },
   ])
 })

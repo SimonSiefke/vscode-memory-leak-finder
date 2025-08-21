@@ -12,7 +12,7 @@ test('runCompile throws error when main.js not found after compilation', async (
     commandMap: {},
     invoke(method, ...params) {
       switch (method) {
-        case 'FileSytem.exec':
+        case 'FileSystem.exec':
           return { stdout: '', stderr: '', exitCode: 0 }
         default:
           throw new Error(`not implemented: ${method}`)
