@@ -8,15 +8,17 @@ test('runCompile throws error when main.js not found after compilation', async (
   const useNice = false
   const mainJsPath = '/test/repo/out/main.ts'
 
-  const mockInvoke = jest.fn()
-  mockInvoke.mockReturnValue({ stdout: '', stderr: '', exitCode: 0 })
-
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke: mockInvoke,
+    invoke(method, ...params) {
+      switch (method) {
+        case 'FileSytem.exec':
+          return { stdout: '', stderr: '', exitCode: 0 }
+        default:
+          throw new Error(`not implemented: ${method}`)
+      }
+    },
   })
   FileSystemWorker.set(mockRpc)
-
   await expect(runCompile(cwd, useNice, mainJsPath)).rejects.toThrow('Build failed: out/main.js not found after compilation')
-  expect(mockInvoke).toHaveBeenCalled()
 })
