@@ -225,8 +225,8 @@ test('applyFileOperations - handles multiple mkdir operations', async () => {
 
   await applyFileOperationsModule.applyFileOperations(operations)
 
-  expect(mockMakeDirectory).toHaveBeenCalledWith('/path1/directory1')
-  expect(mockMakeDirectory).toHaveBeenCalledWith('/path2/directory2')
+  expect(mockMakeDirectory).toHaveBeenCalledWith('/path1/directory1', { recursive: true })
+  expect(mockMakeDirectory).toHaveBeenCalledWith('/path2/directory2', { recursive: true })
   expect(mockMakeDirectory).toHaveBeenCalledTimes(2)
 })
 
