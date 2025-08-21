@@ -4,13 +4,13 @@ import * as TestStateOutput from '../TestStateOutput/TestStateOutput.ts'
 
 export const getFullMessage = async (
   message: string,
-  isGithubAcions: boolean,
+  isGithubActions: boolean,
   isBuffering: boolean,
   isWindows: boolean,
 ): Promise<string> => {
   const clearMessage = await GetTestClearMessage.getTestClearMessage()
   let fullMessage = ''
-  if (!isGithubAcions) {
+  if (!isGithubActions) {
     fullMessage += clearMessage
   }
   fullMessage += message

@@ -27,7 +27,11 @@ export const handleStdinDataWaitingMode = async (state, key) => {
       return state
     case AnsiKeys.AltBackspace:
     case AnsiKeys.ControlBackspace: {
+<<<<<<< HEAD
       const eraseLine = await AnsiEscapes.eraseEndLine()
+=======
+      const eraseLine = await AnsiEscapes.eraseLine()
+>>>>>>> origin/main
       const cursorLeft = await AnsiEscapes.cursorLeft()
       return {
         ...state,
