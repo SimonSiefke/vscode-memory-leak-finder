@@ -2,6 +2,7 @@ import type { AstNode } from '../AstNode/AstNode.ts'
 import { compareAsts } from '../CompareAsts/CompareAsts.ts'
 import { getIdSet } from '../GetIdSet/GetIdSet.ts'
 import { getLocations } from '../GetLocations/GetLocations.ts'
+import { getLocationsMap as getLocationMap } from '../GetLocationsMap/GetLocationsMap.ts'
 import { getObjectsWithPropertiesInternalAst } from '../GetObjectsWithPropertiesInternalAst/GetObjectsWithPropertiesInternalAst.ts'
 import { getObjectWithPropertyNodeIndices } from '../GetObjectWithPropertyNodeIndices/GetObjectWithPropertyNodeIndices.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
@@ -29,8 +30,6 @@ const getAdded = (
   return added
 }
 
-// const getLocationMap
-
 export const getAddedObjectsWithPropertiesInternalAst = (
   before: Snapshot,
   after: Snapshot,
@@ -42,7 +41,12 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   const indicesBefore = getObjectWithPropertyNodeIndices(before, propertyName)
   const indicesAfter = getObjectWithPropertyNodeIndices(after, propertyName)
   console.time('locations')
-  const locations = getLocations(before, indicesBefore)
+  const locationMapBefore = getLocationMap(before, indicesBefore)
+  const locationMapAfter = getLocationMap(after, indicesAfter)
+
+  const locationsBefore = getLocations(before, indicesBefore, locationMapBefore)
+  const locationsAfter = getLocations(after, indicesAfter, locationMapAfter)
+
   console.timeEnd('locations')
   const added2 = getAdded(before, after, indicesBefore, indicesAfter)
   console.log('field', before.meta.node_fields.length)
