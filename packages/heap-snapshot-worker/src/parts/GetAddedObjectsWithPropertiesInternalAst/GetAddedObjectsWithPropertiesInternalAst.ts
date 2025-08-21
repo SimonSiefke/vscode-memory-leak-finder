@@ -3,15 +3,7 @@ import { getObjectsWithPropertiesInternalAst } from '../GetObjectsWithProperties
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { signatureFor } from '../SignatureForAstNode/SignatureForAstNode.ts'
 
-export const getAddedObjectsWithPropertiesInternalAst = (
-  before: Snapshot,
-  after: Snapshot,
-  propertyName: string,
-  depth: number = 1,
-): readonly AstNode[] => {
-  const astBefore = getObjectsWithPropertiesInternalAst(before, propertyName, depth)
-  const astAfter = getObjectsWithPropertiesInternalAst(after, propertyName, depth)
-
+const compareAsts = (astBefore: readonly AstNode[], astAfter: readonly AstNode[], depth: number): readonly AstNode[] => {
   // Build multiset (signature -> count) for before
   const counts = Object.create(null) as Record<string, number>
   for (const node of astBefore) {
@@ -29,5 +21,21 @@ export const getAddedObjectsWithPropertiesInternalAst = (
     }
     added.push(node)
   }
+  return added
+}
+
+export const getAddedObjectsWithPropertiesInternalAst = (
+  before: Snapshot,
+  after: Snapshot,
+  propertyName: string,
+  depth: number = 1,
+): readonly AstNode[] => {
+  console.time('ast-before')
+  const astBefore = getObjectsWithPropertiesInternalAst(before, propertyName, depth)
+  console.timeEnd('ast-before')
+  console.time('ast-after')
+  const astAfter = getObjectsWithPropertiesInternalAst(after, propertyName, depth)
+  console.timeEnd('ast-after')
+  const added = compareAsts(astBefore, astAfter, depth)
   return added
 }
