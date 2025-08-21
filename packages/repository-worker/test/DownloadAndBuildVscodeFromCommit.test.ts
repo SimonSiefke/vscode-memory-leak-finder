@@ -176,8 +176,8 @@ test('downloadVscodeCommit - tests git clone operations with mocked execa', asyn
   expect(mockCheckoutCommit).toHaveBeenCalledWith(repoPath, testCommitHash)
 
   // Verify that logger was called for installation and compilation
-  expect(mockLog).toHaveBeenCalledWith(`Installing dependencies for commit ${testCommitHash}...`)
-  expect(mockLog).toHaveBeenCalledWith(`Compiling VS Code for commit ${testCommitHash}...`)
+  expect(mockLog).toHaveBeenCalledWith(`[repository] Installing dependencies for commit ${testCommitHash}...`)
+  expect(mockLog).toHaveBeenCalledWith(`[repository] Compiling VS Code for commit ${testCommitHash}...`)
 })
 
 test('downloadAndBuildVscodeFromCommit - handles interrupted workflow with missing node_modules', async () => {
