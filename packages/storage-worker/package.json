@@ -3,7 +3,7 @@
   "version": "0.0.0-dev",
   "description": "",
   "type": "module",
-  "main": "src/storageWorkerMain.js",
+  "main": "src/storageWorkerMain.ts",
   "bin": {
     "storage-worker": "bin/storage-worker.js"
   },
@@ -15,7 +15,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@lvce-editor/assert": "^1.4.0",
     "@lvce-editor/rpc": "^4.14.0",
     "@lvce-editor/verror": "^1.7.0",
     "@vscode/sqlite3": "^5.1.8-vscode"
