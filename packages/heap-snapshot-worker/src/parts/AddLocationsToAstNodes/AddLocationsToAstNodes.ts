@@ -80,20 +80,43 @@ export const addLocationsToAstNodes = (snapshot: Snapshot, nodes: readonly AstNo
   const columnOffset = hasLocations ? location_fields.indexOf('column') : -1
   const itemsPerLocation = hasLocations ? location_fields.length : 0
 
+  // Build result mapping: object id -> array of unique closure locations
+  const result = new Map<number, ClosureLocation[]>()
+  const dedupeById = new Map<number, Set<string>>()
+
   const closureIndexToLocation = new Map<number, ClosureLocation>()
   const traceNodeToLocation = new Map<number, ClosureLocation>()
 
   if (hasLocations && objectIndexOffset !== -1 && scriptIdOffset !== -1 && lineOffset !== -1 && columnOffset !== -1) {
     for (let i = 0; i < locations.length; i += itemsPerLocation) {
-      const objectIndexValue = locations[i + objectIndexOffset] / ITEMS_PER_NODE
+      const objectIndexAbs = locations[i + objectIndexOffset]
+      const objectIndexValue = objectIndexAbs / ITEMS_PER_NODE
       const loc: ClosureLocation = {
         scriptId: locations[i + scriptIdOffset],
         line: locations[i + lineOffset],
         column: locations[i + columnOffset],
       }
-      // objectIndexValue can refer either to a closure node index or to a trace node id
+      // Map closure node index to location for closure-captured analysis
       closureIndexToLocation.set(objectIndexValue, loc)
-      traceNodeToLocation.set(objectIndexValue, loc)
+      // If the location points directly to one of our target object nodes, record it immediately
+      const targetIdFromAbs = absOffsetToTargetId.get(objectIndexAbs)
+      if (targetIdFromAbs !== undefined) {
+        let list = result.get(targetIdFromAbs)
+        if (!list) {
+          list = []
+          result.set(targetIdFromAbs, list)
+        }
+        let seen = dedupeById.get(targetIdFromAbs)
+        if (!seen) {
+          seen = new Set<string>()
+          dedupeById.set(targetIdFromAbs, seen)
+        }
+        const key = `${loc.scriptId}:${loc.line}:${loc.column}`
+        if (!seen.has(key)) {
+          seen.add(key)
+          list.push(loc)
+        }
+      }
     }
   }
 
@@ -118,10 +141,6 @@ export const addLocationsToAstNodes = (snapshot: Snapshot, nodes: readonly AstNo
   }
 
   const edgeMap = createEdgeMap(heapNodes, nodeFields)
-
-  // Build result mapping: object id -> array of unique closure locations
-  const result = new Map<number, ClosureLocation[]>()
-  const dedupeById = new Map<number, Set<string>>()
 
   for (let nodeOffset = 0; nodeOffset < heapNodes.length; nodeOffset += ITEMS_PER_NODE) {
     const typeIndex = heapNodes[nodeOffset + typeFieldIndex]
