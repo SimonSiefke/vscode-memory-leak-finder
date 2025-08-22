@@ -18,8 +18,7 @@
     "@lvce-editor/verror": "^1.7.0"
   },
   "devDependencies": {
-    "@types/babel__code-frame": "^7.0.6",
-    "ts-jest": "^29.4.1"
+    "@types/babel__code-frame": "^7.0.6"
   },
   "xo": {
     "rules": {

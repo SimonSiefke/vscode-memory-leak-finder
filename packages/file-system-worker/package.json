@@ -39,7 +39,5 @@
       }
     }
   },
-  "devDependencies": {
-    "ts-jest": "^29.4.1"
-  }
+  "devDependencies": {}
 }
