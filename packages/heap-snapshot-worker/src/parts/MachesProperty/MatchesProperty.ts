@@ -32,7 +32,8 @@ export const matchesProperty = (
   const nodeEdges = getNodeEdgesFast(nodeIndex, edgeMap, nodes, edges, itemsPerNode, itemsPerEdge, edgeCountFieldIndex)
   const nodeId = nodes[absoluteIndex + nodeIdIndex]
 
-  if (specialNodeIds.includes(nodeId)) {
+  const isSpecial = specialNodeIds.includes(nodeId)
+  if (isSpecial) {
     console.log({ nodeId, nodeEdges: getPrettyEdges(nodes, nodeEdges, strings, nodeIdIndex) })
   }
 
@@ -45,11 +46,20 @@ export const matchesProperty = (
     }
     if (edgeType === edgeTypeInternal && strings[nameIndex] === 'map') {
       const mapEdges = getNodeEdgesFast(toIndex / itemsPerNode, edgeMap, nodes, edges, itemsPerNode, itemsPerEdge, edgeCountFieldIndex)
+      if (isSpecial) {
+        console.log('got map')
+        console.log({
+          mapEdges: getPrettyEdges(nodes, mapEdges, strings, nodeIdIndex),
+        })
+      }
       for (let j = 0; j < mapEdges.length; j += itemsPerEdge) {
         const subEdgeType = nodeEdges[j + edgeTypeFieldIndex]
         const subEdgeNameIndex = nodeEdges[j + edgeNameFieldIndex]
         const subEdgeToIndex = nodeEdges[j + edgeToNodeIndex]
         if (subEdgeType === edgeTypeInternal && strings[subEdgeNameIndex] === 'prototype') {
+          if (isSpecial) {
+            console.log('got proto', nodes[subEdgeToIndex + nodeIdIndex])
+          }
           return matchesProperty(
             nodes,
             subEdgeToIndex,

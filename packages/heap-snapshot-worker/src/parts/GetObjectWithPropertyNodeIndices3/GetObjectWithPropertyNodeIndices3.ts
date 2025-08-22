@@ -13,6 +13,7 @@ export const getObjectWithPropertyNodeIndices3 = (snapshot: Snapshot, propertyNa
   const nodeFields = meta.node_fields
   const edgeFields = meta.edge_fields
   const edgeTypes = meta.edge_types[0] || []
+  const nodeTypes = meta.node_types[0] || []
 
   if (!nodeFields.length || !edgeFields.length) {
     return new Uint32Array([])
@@ -22,6 +23,8 @@ export const getObjectWithPropertyNodeIndices3 = (snapshot: Snapshot, propertyNa
   if (propertyNameIndex === -1) {
     return new Uint32Array([])
   }
+
+  console.log({ nodeTypes, nodeFields })
 
   const idIndex = nodeFields.indexOf('id')
   const ITEMS_PER_NODE_LOCAL = nodeFields.length
@@ -34,6 +37,8 @@ export const getObjectWithPropertyNodeIndices3 = (snapshot: Snapshot, propertyNa
   console.log({ edgeFields, edgeTypes })
   const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
   const EDGE_TYPE_INTERNAL = edgeTypes.indexOf('internal')
+  const nodeTypeObject = nodeTypes.indexOf('object')
+  const nodeTypeIndex = nodeFields.indexOf('type')
 
   const edgeMap = createEdgeMap(nodes, nodeFields)
 
@@ -61,6 +66,7 @@ export const getObjectWithPropertyNodeIndices3 = (snapshot: Snapshot, propertyNa
 
   for (let nodeOffset = 0; nodeOffset < nodes.length; nodeOffset += ITEMS_PER_NODE_LOCAL) {
     if (
+      nodes[nodeOffset + nodeTypeIndex] === nodeTypeObject &&
       matchesProperty(
         nodes,
         nodeOffset,
