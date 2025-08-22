@@ -1,5 +1,6 @@
 import { addLocationsToAstNodes } from '../AddLocationsToAstNodes/AddLocationsToAstNodes.ts'
 import type { AstNode } from '../AstNode/AstNode.ts'
+import { formatAsts } from '../FormatAsts/FormatAsts.ts'
 import { getAsts } from '../GetAsts/GetAsts.ts'
 import { getObjectWithPropertyNodeIndices3 } from '../GetObjectWithPropertyNodeIndices3/GetObjectWithPropertyNodeIndices3.ts'
 import { signatureFor } from '../SignatureForAstNode/SignatureForAstNode.ts'
@@ -54,24 +55,13 @@ const getUniqueAfter = (
   return leaked
 }
 
-const formatAsts = (asts: readonly AstNode[], includeProperties: boolean): readonly AstNode[] => {
-  if (includeProperties) {
-    return asts
-  }
-  return asts.map((item) => {
-    return {
-      ...item,
-      properties: [],
-    }
-  })
-}
-
 export const getAddedObjectsWithPropertiesInternalAst = (
   before: Snapshot,
   after: Snapshot,
   propertyName: string,
   depth: number = 1,
   includeProperties: boolean = true,
+  collapseNodes: boolean = false,
 ): readonly AstNode[] => {
   const indicesBefore = getObjectWithPropertyNodeIndices3(before, propertyName)
   const indicesAfter = getObjectWithPropertyNodeIndices3(after, propertyName)
@@ -90,6 +80,6 @@ export const getAddedObjectsWithPropertiesInternalAst = (
 
   const uniqueAfter = getUniqueAfter(astBefore, astAfter, signaturesBefore, signaturesAfter)
 
-  const formatted = formatAsts(uniqueAfter, includeProperties)
+  const formatted = formatAsts(uniqueAfter, includeProperties, collapseNodes)
   return formatted
 }
