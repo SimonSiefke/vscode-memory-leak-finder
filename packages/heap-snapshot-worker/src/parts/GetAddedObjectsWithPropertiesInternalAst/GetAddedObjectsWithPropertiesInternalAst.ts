@@ -6,6 +6,7 @@ import { getLocationKey } from '../GetLocationKey/GetLocationKey.ts'
 import { getObjectsWithPropertiesInternalAst } from '../GetObjectsWithPropertiesInternalAst/GetObjectsWithPropertiesInternalAst.ts'
 import { getObjectWithPropertyNodeIndices2 } from '../GetObjectWithPropertyNodeIndices2/GetObjectWithPropertyNodeIndices2.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
+import { getLocationsMap } from '../GetLocationsMap/GetLocationsMap.ts'
 
 const getAdded = (
   before: Snapshot,
@@ -36,11 +37,16 @@ interface HashMap {
 
 const createHashMap = (snapshot: Snapshot, indices: Uint32Array): HashMap => {
   const hashMap = Object.create(null)
-  for (let i = 0; i < indices.length; i += 4) {
+  const locationMap = getLocationsMap(snapshot)
+  const scriptIdIndex = snapshot.meta.location_fields.indexOf('script_id')
+  const lineIndex = snapshot.meta.location_fields.indexOf('line')
+  const columnIndex = snapshot.meta.location_fields.indexOf('column')
+  for (let i = 0; i < indices.length; i++) {
     const index = indices[i]
-    const scriptId = indices[i + 1]
-    const line = indices[i + 2]
-    const column = indices[i + 3]
+    const locationIndex = locationMap[index]
+    const scriptId = snapshot.locations[locationIndex + scriptIdIndex]
+    const line = snapshot.locations[locationIndex + lineIndex]
+    const column = snapshot.locations[locationIndex + columnIndex]
     const hash = getLocationKey(scriptId, line, column)
     if (hash in hashMap) {
       hashMap[hash].push(index)
@@ -74,7 +80,11 @@ const compareMaps = (beforeMap: HashMap, afterMap: HashMap): readonly HashMapCom
   return leaked
 }
 
-const formatComparison = (beforeSnapshot: Snapshot, afterSnapshot: Snapshot, compareResult: readonly HashMapCompareResult[]): any => {
+const formatComparison = (
+  beforeSnapshot: Snapshot,
+  afterSnapshot: Snapshot,
+  compareResult: readonly HashMapCompareResult[],
+): readonly any[] => {
   const pretty: any[] = []
   const nameIndex = afterSnapshot.meta.node_fields.indexOf('name')
   const nodeFieldCount = afterSnapshot.meta.node_fields.length
@@ -188,7 +198,7 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   // console.log({ leakedSorted })
 
   const formatted = formatComparison(before, after, leakedSorted)
-  // console.log({ formatted })
+  console.log({ formatted: formatted.length })
 
   console.time('ast-before')
   const astBefore = getObjectsWithPropertiesInternalAst(before, propertyName, depth)

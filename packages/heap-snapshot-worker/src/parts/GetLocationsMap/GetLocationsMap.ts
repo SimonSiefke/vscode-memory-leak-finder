@@ -1,7 +1,7 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 /**
- * Maps locations to node index.
+ * Maps nodes index (not multiplied) to location index (multiplied by location_fields.length).
  */
 export const getLocationsMap = (snapshot: Snapshot): Uint32Array => {
   const locationFieldCount = snapshot.meta.location_fields.length
@@ -13,7 +13,7 @@ export const getLocationsMap = (snapshot: Snapshot): Uint32Array => {
   }
   const locationMap = new Uint32Array(snapshot.nodes.length / nodeFieldCount)
   for (let i = 0; i < locations.length; i += locationFieldCount) {
-    locationMap[locations[i]] = i
+    locationMap[locations[i + indexOffset]] = i
   }
   return locationMap
 }
