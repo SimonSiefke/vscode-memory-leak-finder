@@ -1,7 +1,7 @@
-import * as QuickPick from '../QuickPick/QuickPick.ts'
-import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as IconSelect from '../IconSelect/IconSelect.ts'
+import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ page, expect, VError }) => {
   return {
