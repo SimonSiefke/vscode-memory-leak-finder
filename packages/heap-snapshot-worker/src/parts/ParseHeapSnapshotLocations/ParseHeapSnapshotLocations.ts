@@ -1,10 +1,12 @@
 import * as Assert from '../Assert/Assert.ts'
 
+interface ParsedLocation { objectIndex: number; scriptIdIndex: number; lineIndex: number; columnIndex: number }
+
 export const parseHeapSnapshotLocations = (
   locations: readonly number[],
   locationFields: readonly string[],
   nodeFieldCount: number
-): { objectIndex: number; scriptIdIndex: number; lineIndex: number; columnIndex: number }[] => {
+): ParsedLocation[] => {
   // Assert.array(locations)
   Assert.array(locationFields)
   Assert.number(nodeFieldCount)
@@ -13,7 +15,7 @@ export const parseHeapSnapshotLocations = (
   const lineIndexIndex = locationFields.indexOf('line')
   const columnIndexIndex = locationFields.indexOf('column')
   const fieldCount = locationFields.length
-  const parsedLocations: { objectIndex: number; scriptIdIndex: number; lineIndex: number; columnIndex: number }[] = []
+  const parsedLocations: ParsedLocation[] = []
   for (let i = 0; i < locations.length; i += fieldCount) {
     const objectIndex = locations[i + objectIndexIndex] / nodeFieldCount
     const scriptIdIndex = locations[i + scriptIdIndexIndex]

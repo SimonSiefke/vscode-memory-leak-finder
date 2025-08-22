@@ -4,9 +4,10 @@ import * as CreateNameMap from '../CreateNameMap/CreateNameMap.ts'
 import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 
-type Graph = Record<number, { name: string; index: number }[]>
-type ParsedNode = { id: number; type: string; name: string }
-type ArrayWithCount = { id: number; count: number }
+interface GraphEdge { name: string; index: number }
+interface Graph { [nodeId: number]: GraphEdge[] }
+interface ParsedNode { id: number; type: string; name: string }
+interface ArrayWithCount { id: number; count: number }
 
 const isArray = (node: ParsedNode): boolean => {
   return node.type === 'object' && node.name === 'Array'
@@ -54,9 +55,9 @@ const filterByMinLength = (arrays: readonly ArrayWithCount[], minLength: number)
   return arrays.filter((array) => array.count >= minLength)
 }
 
-type NameMapEntry = { edgeName: string | undefined; nodeName: string | undefined }
-type NameMap = Record<number, NameMapEntry>
-type ArrayWithCountAndName = ArrayWithCount & { name: string | undefined }
+interface NameMapEntry { edgeName: string | undefined; nodeName: string | undefined }
+interface NameMap { [id: number]: NameMapEntry }
+interface ArrayWithCountAndName extends ArrayWithCount { name: string | undefined }
 
 const addNames = (items: readonly ArrayWithCount[], nameMap: NameMap): ArrayWithCountAndName[] => {
   const withNames: ArrayWithCountAndName[] = []

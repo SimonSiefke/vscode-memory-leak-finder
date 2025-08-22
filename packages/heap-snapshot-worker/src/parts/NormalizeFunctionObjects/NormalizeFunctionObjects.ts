@@ -1,4 +1,4 @@
-export type FunctionObject = {
+export interface FunctionObject {
   readonly url: string
   readonly lineIndex: number
   readonly columnIndex: number
@@ -6,7 +6,7 @@ export type FunctionObject = {
   readonly sourceMapUrl: string | null
 }
 
-export type NormalizedFunction = {
+export interface NormalizedFunction {
   readonly url: string
   readonly name: string
   readonly sourceMapUrl: string | null
