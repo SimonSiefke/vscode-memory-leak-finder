@@ -292,6 +292,7 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
           'sliced string',
           'symbol',
           'bigint',
+          'object shape',
         ],
       ],
       edge_fields: ['type', 'name_or_index', 'to_node'],
