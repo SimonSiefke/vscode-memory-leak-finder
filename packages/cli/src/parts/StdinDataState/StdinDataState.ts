@@ -1,6 +1,6 @@
-import * as ModeType from '../ModeType/ModeType.ts'
 import * as Character from '../Character/Character.ts'
 import * as Ide from '../Ide/Ide.ts'
+import * as ModeType from '../ModeType/ModeType.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 
 export interface StdinDataState {

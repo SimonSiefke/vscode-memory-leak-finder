@@ -78,7 +78,7 @@ test('getHash - handles empty strings', () => {
 })
 
 test('getHash - handles large content', () => {
-  const largeString = 'x'.repeat(10000)
+  const largeString = 'x'.repeat(10_000)
   const result = getHash([largeString])
 
   expect(typeof result).toBe('string')

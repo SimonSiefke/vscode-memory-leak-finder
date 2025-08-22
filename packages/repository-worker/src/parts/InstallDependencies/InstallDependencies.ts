@@ -1,5 +1,5 @@
-import { exec } from '../Exec/Exec.ts'
 import { VError } from '@lvce-editor/verror'
+import { exec } from '../Exec/Exec.ts'
 
 const doInstallDependencies = async (cwd, useNice) => {
   if (useNice) {

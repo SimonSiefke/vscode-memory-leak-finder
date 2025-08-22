@@ -12,9 +12,7 @@ export interface NormalizedFunction {
   readonly sourceMapUrl: string | null
 }
 
-export const normalizeFunctionObjects = (
-  functionObjects: readonly FunctionObject[]
-): NormalizedFunction[] => {
+export const normalizeFunctionObjects = (functionObjects: readonly FunctionObject[]): NormalizedFunction[] => {
   const normalized: NormalizedFunction[] = []
   for (const functionObject of functionObjects) {
     const { url, lineIndex, columnIndex, name, sourceMapUrl } = functionObject
