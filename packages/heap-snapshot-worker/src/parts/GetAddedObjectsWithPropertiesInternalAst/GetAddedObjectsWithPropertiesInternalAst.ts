@@ -1,3 +1,4 @@
+import { snapshot } from 'node:test'
 import type { AstNode } from '../AstNode/AstNode.ts'
 import { compareAsts } from '../CompareAsts/CompareAsts.ts'
 import { getIdSet } from '../GetIdSet/GetIdSet.ts'
@@ -114,6 +115,29 @@ const sortLeaked = (leaked: readonly HashMapCompareResult[]): readonly HashMapCo
   })
 }
 
+const getIds = (snapshot: Snapshot, indices: Uint32Array): Uint32Array => {
+  const nodes = snapshot.nodes
+  const nodeFieldCount = snapshot.meta.node_fields.length
+  const nodeIdIndex = snapshot.meta.node_fields.indexOf('id')
+  const ids: number[] = []
+  for (let i = 0; i < indices.length; i++) {
+    const id = nodes[indices[i] * nodeFieldCount + nodeIdIndex]
+    ids.push(id)
+  }
+  return new Uint32Array(ids)
+}
+
+const getAddedIndices = (indices: Uint32Array, ids: Uint32Array, idsOther: Uint32Array): Uint32Array => {
+  const added: number[] = []
+  for (let i = 0; i < indices.length; i++) {
+    const id = ids[i]
+    if (!idsOther.includes(id)) {
+      added.push(indices[i])
+    }
+  }
+  return new Uint32Array(added)
+}
+
 export const getAddedObjectsWithPropertiesInternalAst = (
   before: Snapshot,
   after: Snapshot,
@@ -127,12 +151,20 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   const indicesAfter = getObjectWithPropertyNodeIndices2(after, propertyName)
   console.timeEnd('indices')
 
+  const idsBefore = getIds(before, indicesBefore)
+  const idsAfter = getIds(before, indicesAfter)
+
+  const uniqueIndicesBefore = getAddedIndices(indicesBefore, idsBefore, indicesAfter)
+  const uniqueIndicesAfter = getAddedIndices(indicesAfter, idsAfter, indicesBefore)
+
+  console.log({ uniqueIndicesBefore, uniqueIndicesAfter })
+
   console.time('hashmap')
   const hashMapBefore = createHashMap(indicesBefore)
   const hashMapAfter = createHashMap(indicesAfter)
   console.timeEnd('hashmap')
 
-  console.log({ hashMapAfter: hashMapAfter['10:32:16000'] })
+  // console.log({ hashMapAfter: hashMapAfter['10:32:16000'] })
 
   console.time('compareMap')
   const leaked = compareMaps(hashMapBefore, hashMapAfter)
@@ -141,13 +173,14 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   console.time('sort')
   const leakedSorted = sortLeaked(leaked)
   console.timeEnd('sort')
+
   const idIndex = after.meta.node_fields.indexOf('id')
   // const nodeFieldCount = after.meta.node_fields.length
-  console.log('id', after.nodes[703916 + idIndex])
+  // console.log('id', after.nodes[703916 + idIndex])
   // console.log({ leakedSorted })
 
-  const formatted = formatComparison(before, after, leaked)
-  // console.log({ formatted })
+  const formatted = formatComparison(before, after, leakedSorted)
+  console.log({ formatted })
 
   // const edgeMap = createEdgeMap(before.nodes, before.meta.node_fields)
   // const nodeFieldCount = before.meta.node_fields.length
