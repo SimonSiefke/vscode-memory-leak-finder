@@ -119,6 +119,9 @@ const getIds = (snapshot: Snapshot, indices: Uint32Array): Uint32Array => {
   const nodes = snapshot.nodes
   const nodeFieldCount = snapshot.meta.node_fields.length
   const nodeIdIndex = snapshot.meta.node_fields.indexOf('id')
+  if (nodeIdIndex === -1) {
+    throw new Error('index must be available')
+  }
   const ids: number[] = []
   for (let i = 0; i < indices.length; i++) {
     const id = nodes[indices[i] * nodeFieldCount + nodeIdIndex]
@@ -152,13 +155,37 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   const indicesAfter = getObjectWithPropertyNodeIndices2(after, propertyName)
   console.timeEnd('indices')
 
+  console.log({ indicesBefore: indicesBefore.length, indicesAfter: indicesAfter.length })
+
   const idsBefore = getIds(before, indicesBefore)
-  const idsAfter = getIds(before, indicesAfter)
+  const idsAfter = getIds(after, indicesAfter)
 
-  const uniqueIndicesBefore = getAddedIndices(indicesBefore, idsBefore, indicesAfter)
-  const uniqueIndicesAfter = getAddedIndices(indicesAfter, idsAfter, indicesBefore)
+  console.time('unqiue')
+  const uniqueIndicesBefore = getAddedIndices(indicesBefore, idsBefore, idsAfter)
+  const uniqueIndicesAfter = getAddedIndices(indicesAfter, idsAfter, idsBefore)
+  console.timeEnd('unqiue')
 
-  console.log({ uniqueIndicesBefore, uniqueIndicesAfter })
+  console.log({ uniqueIndicesBefore: uniqueIndicesBefore.length, uniqueIndicesAfter: uniqueIndicesAfter.length })
+
+  // if(idsBefore.includes(uniqueIndicesAfter[]))
+
+  const idOffset = after.meta.node_fields.indexOf('id')
+  const nodeFieldCount = after.meta.node_fields.length
+  const id = after.nodes[uniqueIndicesAfter[0] * nodeFieldCount + idOffset]
+  if (idsBefore.includes(id)) {
+    throw new Error('not pssible')
+  }
+  console.log({
+    item: uniqueIndicesAfter[0],
+    id,
+  })
+  for (let i = 0; i < before.nodes.length; i += nodeFieldCount) {
+    const beforeId = before.nodes[i + idOffset]
+    if (beforeId === id) {
+      throw new Error('not possible')
+    }
+  }
+  console.log('id is not included in before')
 
   console.time('hashmap')
   const hashMapBefore = createHashMap(indicesBefore)
