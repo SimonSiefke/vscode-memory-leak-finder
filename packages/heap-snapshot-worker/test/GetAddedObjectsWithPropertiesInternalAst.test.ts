@@ -211,20 +211,20 @@ test('getAddedObjectsWithPropertiesInternalAst: respects depth (0)', () => {
 
 test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based on prototype', () => {
   // Before:
-  //   LeakThing -> 7093
+  //   LeakThing 1 -> 7093
   //     map -> 58817 -> 58819
   //     proto -> 58819
   //     method -> 59725
   //
   // After:
-  //   LeakThing -> 60081
+  //   LeakThing 2 -> 60081
   //     map -> 58817 -> 58819
   //     proto -> 58819
   //     method -> 59725
 
   // prettier-ignore
   const beforeSnapshot: Snapshot = {
-    node_count: 2,
+    node_count: 5,
     edge_count: 1,
     extra_native_bytes: 0,
     meta: {
@@ -260,11 +260,32 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
       3,  4, 58819, 12, 5, 0, //  -> prototype
       5,  5, 59725, 28, 6, 0, //  -> method
     ]),
-    // [type, name_or_index, to_node]
     edges: new Uint32Array([
-      2,
-      3,
-      7, // property "test" -> nodeIndex 1 * 7 = 7 (string)
+      // LeakThing 1
+      2,  5, 24,     // __proto__
+      3,  7, 18,     // map
+
+      // map
+      3,  6, 24,     // prototype
+      3,  8,  0,     // constructor
+      3, 14,  0,     // dependent_code
+      3,  7,  0,     // map
+      4, 15,  0,     // other
+
+      // prototype
+      2,  8,  0, // constructor
+      2,  4,  0, // method
+      2,  5,  0, // __proto__
+      3,  9,  0, // properties
+      3,  7,  0, // map
+
+      // method
+      2,  5,  0, // __proto__
+      3, 10,  0, // feedback_cell
+      3, 11,  0, // shared
+      3, 12,  0, // context
+      3, 13,  0, // code
+      3,  7,  0, // map
     ]),
     strings: ['gc roots',  'LeakThing', 'system / Map', 'Object', 'leakingMethod'],
     locations: new Uint32Array([]),
