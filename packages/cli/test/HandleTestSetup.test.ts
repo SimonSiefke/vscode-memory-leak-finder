@@ -21,7 +21,7 @@ jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
     commandMap: {},
     invoke: (method: string) => {
       if (method === 'Stdout.getHandleTestSetupMessage') {
-        return '\n\u001b[0m\u001b[7m\u001b[33m SETUP \u001b[39m\u001b[27m\u001b[0m\n'
+        return '\n\u001B[0m\u001B[7m\u001B[33m SETUP \u001B[39m\u001B[27m\u001B[0m\n'
       }
       throw new Error(`unexpected method ${method}`)
     },
@@ -38,7 +38,7 @@ const HandleTestSetup = await import('../src/parts/HandleTestSetup/HandleTestSet
 test('handleTestSetup - should write setup message when not in GitHub Actions', async () => {
   await HandleTestSetup.handleTestSetup()
   expect(Stdout.write).toHaveBeenCalledTimes(1)
-  expect(Stdout.write).toHaveBeenCalledWith('\n\u001b[0m\u001b[7m\u001b[33m SETUP \u001b[39m\u001b[27m\u001b[0m\n')
+  expect(Stdout.write).toHaveBeenCalledWith('\n\u001B[0m\u001B[7m\u001B[33m SETUP \u001B[39m\u001B[27m\u001B[0m\n')
 })
 
 test('handleTestSetup - should not write anything when in GitHub Actions', async () => {
@@ -62,7 +62,7 @@ test('handleTestSetup - should not write anything when in GitHub Actions', async
       commandMap: {},
       invoke: (method: string) => {
         if (method === 'Stdout.getHandleTestSetupMessage') {
-          return '\n\u001b[0m\u001b[7m\u001b[33m SETUP \u001b[39m\u001b[27m\u001b[0m\n'
+          return '\n\u001B[0m\u001B[7m\u001B[33m SETUP \u001B[39m\u001B[27m\u001B[0m\n'
         }
         throw new Error(`unexpected method ${method}`)
       },

@@ -2,6 +2,9 @@
   "name": "@vscode-memory-leak-finder/storage-worker",
   "version": "0.0.0-dev",
   "description": "",
+  "keywords": [],
+  "license": "MIT",
+  "author": "",
   "type": "module",
   "main": "src/storageWorkerMain.ts",
   "bin": {
@@ -10,14 +13,6 @@
   "scripts": {
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
-  "dependencies": {
-    "@lvce-editor/rpc": "^4.14.0",
-    "@lvce-editor/verror": "^1.7.0",
-    "@vscode/sqlite3": "^5.1.8-vscode"
   },
   "jest": {
     "injectGlobals": false,
@@ -30,5 +25,10 @@
         "statements": 0
       }
     }
+  },
+  "dependencies": {
+    "@lvce-editor/rpc": "^4.14.0",
+    "@lvce-editor/verror": "^1.7.0",
+    "@vscode/sqlite3": "^5.1.8-vscode"
   }
 }

@@ -5,10 +5,7 @@ interface NodeLike {
   readonly name: string
 }
 
-export const getConstructorNodes = <T extends NodeLike>(
-  parsedNodes: readonly T[],
-  constructorName: string,
-): T[] => {
+export const getConstructorNodes = <T extends NodeLike>(parsedNodes: readonly T[], constructorName: string): T[] => {
   Assert.array(parsedNodes)
   Assert.string(constructorName)
   const filtered: T[] = []
