@@ -11,6 +11,7 @@ import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
 import { buildAstForNode } from '../GetNodePreviews/GetNodePreviewsAst.ts'
 import { signatureFor } from '../SignatureForAstNode/SignatureForAstNode.ts'
 import { getObjectWithPropertyNodeIndices3 } from '../GetObjectWithPropertyNodeIndices3/GetObjectWithPropertyNodeIndices3.ts'
+import { getAsts } from '../GetAsts/GetAsts.ts'
 
 const getAdded = (
   before: Snapshot,
@@ -152,58 +153,6 @@ const getAddedIndices = (indices: Uint32Array, ids: Uint32Array, idsOther: Uint3
   return new Uint32Array(added)
 }
 
-const getAst = (snapshot: Snapshot, uniqueIndices: Uint32Array, depth: number): readonly any[] => {
-  const { nodes, meta } = snapshot
-  const nodeFields = meta.node_fields
-  const edgeFields = meta.edge_fields
-  if (!nodeFields.length || !edgeFields.length) {
-    return []
-  }
-
-  console.time('edgeMap')
-  const edgeMap = createEdgeMap(nodes, nodeFields)
-  console.timeEnd('edgeMap')
-  const strings = snapshot.strings
-  const nodeTypes = meta.node_types
-  const edgeTypes = meta.edge_types[0] || []
-  const ITEMS_PER_NODE = nodeFields.length
-  const ITEMS_PER_EDGE = edgeFields.length
-  const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
-  const edgeTypeFieldIndex = edgeFields.indexOf('type')
-  const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
-  const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
-  const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
-  const EDGE_TYPE_INTERNAL = edgeTypes.indexOf('internal')
-
-  const asts: AstNode[] = []
-  for (const nodeIndex of uniqueIndices) {
-    const ast = buildAstForNode(
-      nodeIndex,
-      snapshot,
-      edgeMap,
-      nodeFields,
-      nodeTypes,
-      edgeFields,
-      strings,
-      ITEMS_PER_NODE,
-      ITEMS_PER_EDGE,
-      edgeCountFieldIndex,
-      edgeTypeFieldIndex,
-      edgeNameFieldIndex,
-      edgeToNodeFieldIndex,
-      EDGE_TYPE_PROPERTY,
-      EDGE_TYPE_INTERNAL,
-      depth,
-      new Set(),
-    )
-    if (ast) {
-      asts.push(ast)
-    }
-  }
-
-  return asts
-}
-
 const getSignatures = (asts: readonly AstNode[], depth: number): readonly string[] => {
   const signatures: string[] = []
   for (const ast of asts) {
@@ -251,10 +200,14 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   const uniqueIndicesAfter = getAddedIndices(indicesAfter, idsAfter, idsBefore)
   console.timeEnd('unqiue')
 
+  console.log({ uniqueIndicesBefore, uniqueIndicesAfter })
+
   console.time('ast')
-  const astBefore = getAst(before, uniqueIndicesBefore, depth)
-  const astAfter = getAst(after, uniqueIndicesAfter, depth)
+  const astBefore = getAsts(before, uniqueIndicesBefore, depth)
+  const astAfter = getAsts(after, uniqueIndicesAfter, depth)
   console.timeEnd('ast')
+
+  console.log({ astBefore, astAfter })
 
   const signaturesBefore = getSignatures(astBefore, depth)
   const signaturesAfter = getSignatures(astAfter, depth)
