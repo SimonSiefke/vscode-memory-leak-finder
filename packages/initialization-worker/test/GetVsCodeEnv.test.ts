@@ -1,5 +1,5 @@
-import * as GetVsCodeEnv from '../src/parts/GetVsCodeEnv/GetVsCodeEnv.ts'
 import { test, expect } from '@jest/globals'
+import * as GetVsCodeEnv from '../src/parts/GetVsCodeEnv/GetVsCodeEnv.ts'
 
 test('getVsCodeEnv - remove node options', () => {
   const runtimeDir = '/test'

@@ -3,6 +3,7 @@ import { getHeapSnapshot } from '../GetHeapSnapshot/GetHeapSnapshot.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
+import * as WriteScriptMap from '../WriteScriptMap/WriteScriptMap.ts'
 
 export const id = MeasureId.NamedFunctionCount2
 
@@ -15,13 +16,16 @@ export const create = (session) => {
 export const start = async (session, objectGroup, scriptHandler) => {
   await scriptHandler.start(session)
   const id = 0
-  return getHeapSnapshot(session, id)
+  const heapSnapshotPath = await getHeapSnapshot(session, id)
+  await WriteScriptMap.writeScriptMap(scriptHandler.scriptMap, id)
+  return heapSnapshotPath
 }
 
 export const stop = async (session, objectGroup, scriptHandler) => {
-  await scriptHandler.stop(session)
   const id = 1
   const heapSnapshotPath = await getHeapSnapshot(session, id)
+  await WriteScriptMap.writeScriptMap(scriptHandler.scriptMap, id)
+  await scriptHandler.stop(session)
   return {
     heapSnapshotPath,
     scriptMap: scriptHandler.scriptMap,
