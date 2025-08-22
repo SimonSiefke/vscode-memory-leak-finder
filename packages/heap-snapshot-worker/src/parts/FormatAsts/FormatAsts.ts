@@ -13,8 +13,14 @@ const removePropertiesMaybe = (asts: readonly ObjectNode[], includeProperties: b
   })
 }
 
-interface AstNodeWithCount extends ObjectNode {
+interface ObjectNodeExtended extends ObjectNode {
   readonly count: number
+  readonly ids: readonly number[]
+}
+
+interface CountMapItem {
+  count: number
+  ids: number[]
 }
 
 const collapseAstsMaybe = (asts: readonly ObjectNode[], collapse: boolean): readonly ObjectNode[] => {
@@ -22,14 +28,15 @@ const collapseAstsMaybe = (asts: readonly ObjectNode[], collapse: boolean): read
     return asts
   }
   const depth = 1
-  const map = Object.create(null)
+  const map: Record<string, CountMapItem> = Object.create(null)
   for (const item of asts) {
     const hash = signatureFor(item, depth)
     console.log({ item, hash })
-    map[hash] ||= 0
-    map[hash]++
+    map[hash] ||= { count: 0, ids: [] }
+    map[hash].count++
+    map[hash].ids.push(item.id)
   }
-  const result: AstNodeWithCount[] = []
+  const result: ObjectNodeExtended[] = []
   const seen: Record<string, boolean> = Object.create(null)
   for (const item of asts) {
     const hash = signatureFor(item, depth)
@@ -39,7 +46,9 @@ const collapseAstsMaybe = (asts: readonly ObjectNode[], collapse: boolean): read
     seen[hash] = true
     result.push({
       ...item,
-      count: map[hash],
+      count: map[hash].count,
+      id: 0,
+      ids: map[hash].ids,
     })
   }
   const sorted = result.toSorted((a, b) => {
