@@ -8,6 +8,7 @@
     "moduleResolution": "NodeNext",
     "isolatedModules": true,
     "strict": false,
+    "strictNullChecks": true,
     "noImplicitAny": false,
     "skipLibCheck": true,
     "noEmit": true,
