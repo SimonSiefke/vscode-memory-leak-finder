@@ -1,5 +1,5 @@
 import { addLocationsToAstNodes } from '../AddLocationsToAstNodes/AddLocationsToAstNodes.ts'
-import type { AstNode } from '../AstNode/AstNode.ts'
+import type { AstNode, ObjectNode } from '../AstNode/AstNode.ts'
 import { formatAsts } from '../FormatAsts/FormatAsts.ts'
 import { getAsts } from '../GetAsts/GetAsts.ts'
 import { getObjectWithPropertyNodeIndices3 } from '../GetObjectWithPropertyNodeIndices3/GetObjectWithPropertyNodeIndices3.ts'
@@ -41,12 +41,12 @@ const getSignatures = (asts: readonly AstNode[], depth: number): readonly string
 }
 
 const getUniqueAfter = (
-  astBefore: readonly AstNode[],
-  astAfter: readonly AstNode[],
+  astBefore: readonly ObjectNode[],
+  astAfter: readonly ObjectNode[],
   signaturesBefore: readonly string[],
   signaturesAfter: readonly string[],
-): readonly AstNode[] => {
-  const leaked: AstNode[] = []
+): readonly ObjectNode[] => {
+  const leaked: ObjectNode[] = []
   for (let i = 0; i < astAfter.length; i++) {
     if (!signaturesBefore.includes(signaturesAfter[i])) {
       leaked.push(astAfter[i])

@@ -1,6 +1,7 @@
-import type { AstNode } from '../AstNode/AstNode.ts'
+import type { AstNode, ObjectNode } from '../AstNode/AstNode.ts'
+import { signatureFor } from '../SignatureForAstNode/SignatureForAstNode.ts'
 
-const removePropertiesMaybe = (asts: readonly AstNode[], includeProperties: boolean): readonly AstNode[] => {
+const removePropertiesMaybe = (asts: readonly ObjectNode[], includeProperties: boolean): readonly ObjectNode[] => {
   if (includeProperties) {
     return asts
   }
@@ -12,14 +13,39 @@ const removePropertiesMaybe = (asts: readonly AstNode[], includeProperties: bool
   })
 }
 
-const collapseAstsMaybe = (asts: readonly AstNode[], collapse: boolean): readonly AstNode[] => {
+interface AstNodeWithCount extends ObjectNode {
+  readonly count: number
+}
+
+const collapseAstsMaybe = (asts: readonly ObjectNode[], collapse: boolean): readonly ObjectNode[] => {
   if (!collapse) {
     return asts
   }
-  return asts
+  const depth = 1
+  const map = Object.create(null)
+  for (const item of asts) {
+    const hash = signatureFor(item, depth)
+    console.log({ item, hash })
+    map[hash] ||= 0
+    map[hash]++
+  }
+  const result: AstNodeWithCount[] = []
+  const seen: Record<string, boolean> = Object.create(null)
+  for (const item of asts) {
+    const hash = signatureFor(item, depth)
+    if (hash in seen) {
+      continue
+    }
+    seen[hash] = true
+    result.push({
+      ...item,
+      count: map[hash],
+    })
+  }
+  return result
 }
 
-export const formatAsts = (asts: readonly AstNode[], includeProperties: boolean, collapse: boolean): readonly AstNode[] => {
+export const formatAsts = (asts: readonly ObjectNode[], includeProperties: boolean, collapse: boolean): readonly ObjectNode[] => {
   const result1 = removePropertiesMaybe(asts, includeProperties)
   const result2 = collapseAstsMaybe(result1, collapse)
   return result2
