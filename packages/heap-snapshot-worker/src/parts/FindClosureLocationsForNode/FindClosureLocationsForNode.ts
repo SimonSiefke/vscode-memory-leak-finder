@@ -68,11 +68,9 @@ export const findClosureLocationsForObjectId = (snapshot: Snapshot, objectId: nu
   const ITEMS_PER_NODE = nodeFields.length
   const ITEMS_PER_EDGE = edgeFields.length
   const typeFieldIndex = nodeFields.indexOf('type')
-  const idFieldIndex = nodeFields.indexOf('id')
   const traceNodeIdFieldIndex = nodeFields.indexOf('trace_node_id')
   const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
   const edgeTypeFieldIndex = edgeFields.indexOf('type')
-  const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
   const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
 
   const NODE_TYPE_CLOSURE = nodeTypes.indexOf('closure')
@@ -114,15 +112,7 @@ export const findClosureLocationsForObjectId = (snapshot: Snapshot, objectId: nu
     }
 
     // Scan context properties to see if our target is referenced directly
-    const contextEdges = getNodeEdgesFast(
-      contextNodeIndex,
-      edgeMap,
-      nodes,
-      edges,
-      ITEMS_PER_NODE,
-      ITEMS_PER_EDGE,
-      edgeCountFieldIndex,
-    )
+    const contextEdges = getNodeEdgesFast(contextNodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
     let isCaptured = false
     for (let i = 0; i < contextEdges.length; i += ITEMS_PER_EDGE) {
       const eType = contextEdges[i + edgeTypeFieldIndex]
