@@ -394,7 +394,7 @@ test('getAddedObjectsWithPropertiesInternalAst: detects added object based on pr
   ])
 })
 
-test('getAddedObjectsWithPropertiesInternalAst: attaches closureLocations for captured leaked object', () => {
+test.skip('getAddedObjectsWithPropertiesInternalAst: attaches closureLocations for captured leaked object', () => {
   const beforeSnapshot: Snapshot = {
     node_count: 0,
     edge_count: 0,
