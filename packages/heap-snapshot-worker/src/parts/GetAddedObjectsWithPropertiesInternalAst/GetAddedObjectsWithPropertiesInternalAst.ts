@@ -1,4 +1,3 @@
-import { addLocationsToAstNodes } from '../AddLocationsToAstNodes/AddLocationsToAstNodes.ts'
 import type { AstNode, ObjectNode } from '../AstNode/AstNode.ts'
 import { formatAsts } from '../FormatAsts/FormatAsts.ts'
 import { getAsts } from '../GetAsts/GetAsts.ts'

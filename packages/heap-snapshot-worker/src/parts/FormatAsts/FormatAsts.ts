@@ -1,4 +1,4 @@
-import type { AstNode, ObjectNode } from '../AstNode/AstNode.ts'
+import type { ObjectNode } from '../AstNode/AstNode.ts'
 import { signatureFor } from '../SignatureForAstNode/SignatureForAstNode.ts'
 
 const removePropertiesMaybe = (asts: readonly ObjectNode[], includeProperties: boolean): readonly ObjectNode[] => {
