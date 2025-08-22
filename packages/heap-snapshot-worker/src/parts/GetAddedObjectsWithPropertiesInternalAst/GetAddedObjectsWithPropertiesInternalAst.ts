@@ -54,11 +54,24 @@ const getUniqueAfter = (
   return leaked
 }
 
+const formatAsts = (asts: readonly AstNode[], includeProperties: boolean): readonly AstNode[] => {
+  if (includeProperties) {
+    return asts
+  }
+  return asts.map((item) => {
+    return {
+      ...item,
+      properties: [],
+    }
+  })
+}
+
 export const getAddedObjectsWithPropertiesInternalAst = (
   before: Snapshot,
   after: Snapshot,
   propertyName: string,
   depth: number = 1,
+  includeProperties: boolean = true,
 ): readonly AstNode[] => {
   const indicesBefore = getObjectWithPropertyNodeIndices3(before, propertyName)
   const indicesAfter = getObjectWithPropertyNodeIndices3(after, propertyName)
@@ -76,6 +89,7 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   const signaturesAfter = getSignatures(astAfter, depth)
 
   const uniqueAfter = getUniqueAfter(astBefore, astAfter, signaturesBefore, signaturesAfter)
-  const withLocations = addLocationsToAstNodes(after, uniqueAfter)
-  return withLocations
+
+  const formatted = formatAsts(uniqueAfter, includeProperties)
+  return formatted
 }
