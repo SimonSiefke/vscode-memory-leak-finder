@@ -1,10 +1,6 @@
 import { getThingCountFromHeapSnapshot } from '../GetThingCountFromHeapSnapshot/GetThingCountFromHeapSnapshot.ts'
+import { Snapshot } from '../Snapshot/Snapshot.ts'
 
-/**
- *
- * @param {any} snapshot
- * @returns {number}
- */
-export const getWeakMapCountFromHeapSnapshotInternal = (snapshot) => {
+export const getWeakMapCountFromHeapSnapshotInternal = (snapshot: Snapshot): number => {
   return getThingCountFromHeapSnapshot(snapshot, 'object', 'WeakMap')
 }

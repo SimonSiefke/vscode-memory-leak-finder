@@ -1,10 +1,6 @@
-/**
- *
- * @param {any} snapshot
- * @param {string} typeName
- * @returns {number}
- */
-export const getTypeCount = (snapshot, typeName) => {
+import { Snapshot } from '../Snapshot/Snapshot.ts'
+
+export const getTypeCount = (snapshot: Snapshot, typeName: string): number => {
   const { nodes, meta } = snapshot
   const { node_types, node_fields } = meta
 
