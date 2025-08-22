@@ -1,5 +1,5 @@
+import type { ChildProcess } from 'child_process'
 import { expect, test } from '@jest/globals'
-import { ChildProcess } from 'child_process'
 import * as FfmpegProcessState from '../src/parts/FfmpegProcessState/FfmpegProcessState.ts'
 import * as HandleFrame from '../src/parts/HandleFrame/HandleFrame.ts'
 
