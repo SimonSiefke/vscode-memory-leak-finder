@@ -10,3 +10,9 @@ export const start = async (): Promise<void> => {
   await Stdin.setEncoding(EncodingType.Utf8)
   Stdin.on('data', HandleStdinData.handleStdinData)
 }
+
+export const stop = async (): Promise<void> => {
+  // TODO use worker for stdin
+  await Stdin.pause()
+  await Stdout.write(Character.NewLine)
+}
