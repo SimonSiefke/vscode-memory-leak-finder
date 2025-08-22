@@ -254,10 +254,11 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
     },
     // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
     nodes: new Uint32Array([
-     3,  2, 7093, 52, 2, 0,  // LeakThing 1
-     14, 3, 58817, 40, 5, 0, //  -> map
-     3,  4, 58819, 12, 5, 0, //  -> prototype
-     5,  5, 59725, 28, 6, 0, //  -> method
+      0,  0, 0,  0, 0, 0,  // gc roots
+      3,  2, 7093, 52, 2, 0,  // LeakThing 1
+      14, 3, 58817, 40, 5, 0, //  -> map
+      3,  4, 58819, 12, 5, 0, //  -> prototype
+      5,  5, 59725, 28, 6, 0, //  -> method
     ]),
     // [type, name_or_index, to_node]
     edges: new Uint32Array([
@@ -300,14 +301,12 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
       location_fields: ['object_index', 'script_id', 'line', 'column'],
     },
     nodes: new Uint32Array([
-      0,  0, 0,      0, 0, 0,  // gc roots
+      0,  0, 0,      0, 0, 0, // gc roots
       3,  1, 60081, 12, 2, 0, // LeakThing 2
-      3,  1, 7093, 52, 2, 0,  // LeakThing 1
+      3,  1, 7093,  52, 2, 0, // LeakThing 1
       14, 2, 58817, 40, 5, 0, //   -> map
       3,  3, 58819, 12, 5, 0, //   -> prototype
       5,  4, 59725, 28, 6, 0, //   -> method
-
-
     ]),
     edges: new Uint32Array([
       // LeakThing 2
@@ -339,7 +338,6 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
       3, 12,  0, // context
       3, 13,  0, // code
       3,  7,  0, // map
-
     ]),
     strings: ['gc roots',  'LeakThing', 'system / Map', 'Object', 'leakingMethod', '__proto__', 'prototype', 'map', 'constructor', 'properties', 'feedback_cell', 'shared', 'context', 'code', 'dependent_code', 'other'],
     locations: new Uint32Array([]),
