@@ -1,7 +1,7 @@
 import { join } from 'node:path'
-import { getFunctionCountFromHeapSnapshot } from '../src/parts/GetFunctionCountFromHeapSnapshot/GetFunctionCountFromHeapSnapshot.js'
+import { getFunctionCountFromHeapSnapshot } from '../src/parts/GetFunctionCountFromHeapSnapshot/GetFunctionCountFromHeapSnapshot.ts'
 
-const filePath1 = join(import.meta.dirname, '../../../.vscode-heapsnapshots/0.heapsnapshot')
+const filePath1 = join(import.meta.dirname, '../../../.vscode-heapsnapshots/0.json')
 
 const testFunctionCount = async () => {
   console.log('Testing Function Count:')
