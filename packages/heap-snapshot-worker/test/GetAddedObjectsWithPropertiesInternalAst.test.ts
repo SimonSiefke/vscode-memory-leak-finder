@@ -2,7 +2,7 @@ import { expect, test } from '@jest/globals'
 import { getAddedObjectsWithPropertiesInternalAst } from '../src/parts/GetAddedObjectsWithPropertiesInternalAst/GetAddedObjectsWithPropertiesInternalAst.ts'
 import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
-test.skip('getAddedObjectsWithPropertiesInternalAst: detects newly added object with property', () => {
+test('getAddedObjectsWithPropertiesInternalAst: detects newly added object with property', () => {
   // before snapshot: one object with property "test" -> "hello"
   const beforeSnapshot: Snapshot = {
     node_count: 2,
@@ -129,7 +129,7 @@ test.skip('getAddedObjectsWithPropertiesInternalAst: detects newly added object 
   ])
 })
 
-test.skip('getAddedObjectsWithPropertiesInternalAst: respects depth (0)', () => {
+test('getAddedObjectsWithPropertiesInternalAst: respects depth (0)', () => {
   const beforeSnapshot: Snapshot = {
     node_count: 2,
     edge_count: 1,
@@ -209,7 +209,7 @@ test.skip('getAddedObjectsWithPropertiesInternalAst: respects depth (0)', () => 
   ])
 })
 
-test.skip('getAddedObjectsWithPropertiesInternalAst: detects added object based on prototype', () => {
+test('getAddedObjectsWithPropertiesInternalAst: detects added object based on prototype', () => {
   // Before:
   //   LeakThing 1 -> 7093
   //     map -> 58817 -> 58819
@@ -287,7 +287,25 @@ test.skip('getAddedObjectsWithPropertiesInternalAst: detects added object based 
       3, 13,  0, // code
       3,  7,  0, // map
     ]),
-    strings: ['gc roots',  'LeakThing', 'system / Map', 'Object', 'leakingMethod'],
+    // align string indices with edge name_or_index references used above
+    strings: [
+      'gc roots',
+      'LeakThing',
+      'system / Map',
+      'Object',
+      'leakingMethod',
+      '__proto__',
+      'prototype',
+      'map',
+      'constructor',
+      'properties',
+      'feedback_cell',
+      'shared',
+      'context',
+      'code',
+      'dependent_code',
+      'other',
+    ],
     locations: new Uint32Array([]),
   }
 

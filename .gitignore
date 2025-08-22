@@ -24,6 +24,7 @@ ffmpeg-linux
 .vscode-source-maps
 .vscode-resolve-source-map-cache
 .vscode-charts
+.tmp
 
 # Logs
 logs
