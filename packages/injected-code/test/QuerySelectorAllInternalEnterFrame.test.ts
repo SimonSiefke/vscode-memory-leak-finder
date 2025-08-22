@@ -1,8 +1,8 @@
+import { test, expect } from '@jest/globals'
 /**
  * @jest-environment jsdom
  */
 import * as QuerySelectorAllInternalEnterFrame from '../src/parts/QuerySelectorAllInternalEnterFrame/QuerySelectorAllInternalEnterFrame.ts'
-import { test, expect } from '@jest/globals'
 
 test('no elements found', () => {
   const roots = []

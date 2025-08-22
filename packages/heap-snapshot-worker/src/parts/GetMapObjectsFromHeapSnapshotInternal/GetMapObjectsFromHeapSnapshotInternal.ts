@@ -5,7 +5,11 @@ import { isInternalMap } from '../IsInternalMap/IsInternalMap.ts'
  * @param {import('../Snapshot/Snapshot.ts').Snapshot} snapshot
  * @returns {Array}
  */
-interface VariableName { readonly name: string; readonly sourceType: string; readonly sourceName: string }
+interface VariableName {
+  readonly name: string
+  readonly sourceType: string
+  readonly sourceName: string
+}
 interface MapObject {
   id: number
   name: string
@@ -204,7 +208,11 @@ export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
 
     // For now, let's use a heuristic: collect unique string values and known large numbers
     // that are likely to be keys rather than common small values
-    interface ExtractedValue { readonly value: string; readonly type: 'string' | 'number'; readonly isLikelyKey: boolean }
+    interface ExtractedValue {
+      readonly value: string
+      readonly type: 'string' | 'number'
+      readonly isLikelyKey: boolean
+    }
     const extractedValues: ExtractedValue[] = []
     const actualKeyEdges = Math.max(0, tableEdgeCount - 1)
 

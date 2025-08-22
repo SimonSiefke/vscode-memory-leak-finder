@@ -1,8 +1,8 @@
+import { test, expect } from '@jest/globals'
 /**
  * @jest-environment jsdom
  */
 import * as QuerySelectorAllRoot from '../src/parts/QuerySelectorAllRoot/QuerySelectorAllRoot.ts'
-import { test, expect } from '@jest/globals'
 
 test('querySelector - match', () => {
   const root = document.createElement('div')

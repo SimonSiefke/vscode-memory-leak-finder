@@ -1,8 +1,8 @@
 import * as Character from '../Character/Character.ts'
 import * as EncodingType from '../EncodingType/EncodingType.ts'
+import * as HandleStdinData from '../HandleStdinData/HandleStdinData.ts'
 import * as Stdin from '../Stdin/Stdin.ts'
 import * as Stdout from '../Stdout/Stdout.ts'
-import * as HandleStdinData from '../HandleStdinData/HandleStdinData.ts'
 
 export const start = async (): Promise<void> => {
   await Stdin.setRawMode(true)
