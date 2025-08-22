@@ -1,5 +1,4 @@
 import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
-import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { matchesProperty } from '../MachesProperty/MatchesProperty.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
@@ -34,7 +33,6 @@ export const getObjectWithPropertyNodeIndices3 = (snapshot: Snapshot, propertyNa
   const edgeToNodeIndex = edgeFields.indexOf('to_node')
 
   const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
-  console.log({ edgeFields, edgeTypes })
   const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
   const EDGE_TYPE_INTERNAL = edgeTypes.indexOf('internal')
   const nodeTypeObject = nodeTypes.indexOf('object')
@@ -44,15 +42,15 @@ export const getObjectWithPropertyNodeIndices3 = (snapshot: Snapshot, propertyNa
 
   const result: number[] = []
 
-  const specialNodeIds = [
-    7093, // instance before
-    60081, // instance after
+  // const specialNodeIds = [
+  //   7093, // instance before
+  //   60081, // instance after
 
-    58817, // map,
+  //   58817, // map,
 
-    58819, // prototype
-    59725, // function
-  ]
+  //   58819, // prototype
+  //   59725, // function
+  // ]
 
   // TODO
   // for each node
