@@ -62,17 +62,26 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   includeProperties: boolean = true,
   collapseNodes: boolean = false,
 ): readonly AstNode[] => {
+  console.time('indicies')
   const indicesBefore = getObjectWithPropertyNodeIndices3(before, propertyName)
   const indicesAfter = getObjectWithPropertyNodeIndices3(after, propertyName)
+  console.timeEnd('indicies')
 
+  console.time('ids')
   const idsBefore = getIds(before, indicesBefore)
   const idsAfter = getIds(after, indicesAfter)
+  console.timeEnd('ids')
 
+  console.time('unique')
   const uniqueIndicesBefore = getAddedIndices(indicesBefore, idsBefore, idsAfter)
   const uniqueIndicesAfter = getAddedIndices(indicesAfter, idsAfter, idsBefore)
+  console.timeEnd('unique')
 
+  console.log('uniqueCount', uniqueIndicesBefore.length, uniqueIndicesAfter.length, indicesBefore.length, indicesAfter.length)
+  console.time('ast')
   const astBefore = getAsts(before, uniqueIndicesBefore, depth)
   const astAfter = getAsts(after, uniqueIndicesAfter, depth)
+  console.timeEnd('ast')
 
   const signaturesBefore = getSignatures(astBefore, depth)
   const signaturesAfter = getSignatures(astAfter, depth)
