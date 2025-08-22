@@ -63,8 +63,6 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   const indicesBefore = getObjectWithPropertyNodeIndices3(before, propertyName)
   const indicesAfter = getObjectWithPropertyNodeIndices3(after, propertyName)
 
-  console.log({ indicesBefore, indicesAfter })
-
   const idsBefore = getIds(before, indicesBefore)
   const idsAfter = getIds(after, indicesAfter)
 
@@ -78,5 +76,6 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   const signaturesAfter = getSignatures(astAfter, depth)
 
   const uniqueAfter = getUniqueAfter(astBefore, astAfter, signaturesBefore, signaturesAfter)
-  return addLocationsToAstNodes(after, uniqueAfter)
+  const withLocations = addLocationsToAstNodes(after, uniqueAfter)
+  return withLocations
 }
