@@ -393,3 +393,106 @@ test('getAddedObjectsWithPropertiesInternalAst: detects added object based on pr
     },
   ])
 })
+
+test('getAddedObjectsWithPropertiesInternalAst: attaches closureLocations for captured leaked object', () => {
+  const beforeSnapshot: Snapshot = {
+    node_count: 0,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    meta: {
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_types: [
+        [
+          'hidden',
+          'array',
+          'string',
+          'object',
+          'code',
+          'closure',
+          'regexp',
+          'number',
+          'native',
+          'synthetic',
+          'concatenated string',
+          'sliced string',
+          'symbol',
+          'bigint',
+        ],
+      ],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    nodes: new Uint32Array([]),
+    edges: new Uint32Array([]),
+    strings: ['', 'Object', 'leak', 'v', 'Context', 'capturedVar'],
+    locations: new Uint32Array([]),
+  }
+
+  const afterSnapshot: Snapshot = {
+    node_count: 4,
+    edge_count: 3,
+    extra_native_bytes: 0,
+    meta: {
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_types: [
+        [
+          'hidden',
+          'array',
+          'string',
+          'object',
+          'code',
+          'closure',
+          'regexp',
+          'number',
+          'native',
+          'synthetic',
+          'concatenated string',
+          'sliced string',
+          'symbol',
+          'bigint',
+        ],
+      ],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    nodes: new Uint32Array([
+      // node 0: target object with property 'leak' -> string 'v'
+      3, 1, 1, 0, 1, 0, 0,
+      // node 1: string 'v'
+      2, 3, 2, 0, 0, 0, 0,
+      // node 2: closure with one context edge
+      5, 0, 3, 0, 1, 0, 0,
+      // node 3: context object with one property to the target object
+      3, 4, 4, 0, 1, 0, 0,
+    ]),
+    edges: new Uint32Array([
+      // edges for node 0 (object): property 'leak' -> node 1 (string)
+      2, 2, 7,
+      // edges for node 2 (closure): context -> node 3 (context object)
+      0, 0, 21,
+      // edges for node 3 (context object): property 'capturedVar' -> node 0 (object)
+      2, 5, 0,
+    ]),
+    strings: ['', 'Object', 'leak', 'v', 'Context', 'capturedVar'],
+    // location for the closure (nodeIndex 2 -> object_index = 2 * 7 = 14)
+    locations: new Uint32Array([14, 99, 12, 34]),
+  }
+
+  const result = getAddedObjectsWithPropertiesInternalAst(beforeSnapshot, afterSnapshot, 'leak', 1)
+
+  expect(result).toHaveLength(1)
+  const obj = result[0] as any
+  expect(obj.type).toBe('object')
+  expect(obj.id).toBe(1)
+  expect(obj.name).toBe('Object')
+  expect(Array.isArray(obj.closureLocations)).toBe(true)
+  expect(obj.closureLocations).toEqual([
+    {
+      scriptId: 99,
+      line: 12,
+      column: 34,
+    },
+  ])
+})
