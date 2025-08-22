@@ -10,6 +10,7 @@ import { getLocationsMap } from '../GetLocationsMap/GetLocationsMap.ts'
 import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
 import { buildAstForNode } from '../GetNodePreviews/GetNodePreviewsAst.ts'
 import { signatureFor } from '../SignatureForAstNode/SignatureForAstNode.ts'
+import { getObjectWithPropertyNodeIndices3 } from '../GetObjectWithPropertyNodeIndices3/GetObjectWithPropertyNodeIndices3.ts'
 
 const getAdded = (
   before: Snapshot,
@@ -232,11 +233,10 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   propertyName: string,
   depth: number = 1,
 ): readonly AstNode[] => {
-  console.time('indices')
   // TODO ensure nodes are functions
   console.time('indices')
-  const indicesBefore = getObjectWithPropertyNodeIndices2(before, propertyName)
-  const indicesAfter = getObjectWithPropertyNodeIndices2(after, propertyName)
+  const indicesBefore = getObjectWithPropertyNodeIndices3(before, propertyName)
+  const indicesAfter = getObjectWithPropertyNodeIndices3(after, propertyName)
   console.timeEnd('indices')
 
   console.log({ indicesBefore: indicesBefore.length, indicesAfter: indicesAfter.length })
