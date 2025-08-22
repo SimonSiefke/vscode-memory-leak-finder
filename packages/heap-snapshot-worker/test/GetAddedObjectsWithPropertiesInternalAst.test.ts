@@ -299,11 +299,11 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
       location_fields: ['object_index', 'script_id', 'line', 'column'],
     },
     nodes: new Uint32Array([
-      3, 3183, 7093, 52, 2, 0,  // LeakThing 1
-      14, 30, 58817, 40, 5, 0,  //   -> map
-      3, 676,58819, 12, 5, 0,   //   -> prototype
-      5, 4596, 59725, 28, 6, 0, //   -> method
-      3, 3183, 60081, 12, 2, 0, // LeakThing 2
+      3,  1, 7093, 52, 2, 0,  // LeakThing 1
+      14, 2, 58817, 40, 5, 0, //   -> map
+      3,  3, 58819, 12, 5, 0, //   -> prototype
+      5,  4, 59725, 28, 6, 0, //   -> method
+      3,  1, 60081, 12, 2, 0, // LeakThing 2
 
     ]),
     edges: new Uint32Array([
