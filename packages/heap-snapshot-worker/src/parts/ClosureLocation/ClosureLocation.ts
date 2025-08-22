@@ -3,5 +3,3 @@ export interface ClosureLocation {
   readonly line: number
   readonly column: number
 }
-
-

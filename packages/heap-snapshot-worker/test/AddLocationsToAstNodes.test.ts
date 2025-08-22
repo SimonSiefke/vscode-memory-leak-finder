@@ -98,12 +98,8 @@ test('addLocationsToAstNodes - leaves nodes unchanged when no locations found', 
     },
   }
 
-  const nodes: readonly AstNode[] = [
-    { type: 'object', id: 101, properties: [] },
-  ]
+  const nodes: readonly AstNode[] = [{ type: 'object', id: 101, properties: [] }]
 
   const result = addLocationsToAstNodes(snapshot, nodes)
   expect(result).toEqual(nodes)
 })
-
-

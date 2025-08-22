@@ -15,6 +15,7 @@ async function testGetObjectsWithProperties() {
   const depth = 1
   const includeProperties = false
   const collapseNodes = true
+  const outputLocations = true
 
   try {
     // Prepare the heap snapshot
@@ -37,7 +38,15 @@ async function testGetObjectsWithProperties() {
     // TODO the preview would only be needed at the end, meaning much less previews needed instead
     // of creating a preview for all objects
 
-    const difference = getAddedObjectsWithPropertiesInternalAst(snapshot1, snapshot2, property, depth, includeProperties, collapseNodes)
+    const difference = getAddedObjectsWithPropertiesInternalAst(
+      snapshot1,
+      snapshot2,
+      property,
+      depth,
+      includeProperties,
+      collapseNodes,
+      outputLocations,
+    )
     console.timeEnd('diff')
 
     console.log({ difference })

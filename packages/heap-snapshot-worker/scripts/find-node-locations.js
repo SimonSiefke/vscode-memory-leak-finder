@@ -150,31 +150,32 @@ function main() {
       const name = getNodeNameByStartIndex(nodeStartIndex)
       /** @type {Record<string, unknown>} */
       const entry = { nodeStartIndex, nodeOrdinal, scriptId, line, column, name }
-      if (
-        outputLocations &&
-        Number.isFinite(scriptId) &&
-        Number.isFinite(line) &&
-        Number.isFinite(column)
-      ) {
+      if (outputLocations && Number.isFinite(scriptId) && Number.isFinite(line) && Number.isFinite(column)) {
         entry.location = `${scriptId}:${line}:${column}`
       }
       matches.push(entry)
     }
   }
 
-  console.log(JSON.stringify({
-    targetNodeId,
-    outputLocations,
-    occurrences: matches.length,
-    nodesFound: matchingNodeStartIndices.size,
-    nodeOrdinals: Array.from(matchingNodeOrdinals).slice(0, 50),
-    matches: matches.slice(0, 200),
-  }, null, 2))
+  console.log(
+    JSON.stringify(
+      {
+        targetNodeId,
+        outputLocations,
+        occurrences: matches.length,
+        nodesFound: matchingNodeStartIndices.size,
+        nodeOrdinals: Array.from(matchingNodeOrdinals).slice(0, 50),
+        matches: matches.slice(0, 200),
+      },
+      null,
+      2,
+    ),
+  )
 }
 
 try {
   main()
 } catch (error) {
-  console.error(String(error && error.stack || error))
+  console.error(String((error && error.stack) || error))
   process.exit(1)
 }
