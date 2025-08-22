@@ -2,13 +2,13 @@ import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/Deb
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as Disposables from '../Disposables/Disposables.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import * as MakeElectronAvailableGlobally from '../MakeElectronAvailableGlobally/MakeElectronAvailableGlobally.ts'
 import * as MakeRequireAvailableGlobally from '../MakeRequireAvailableGlobally/MakeRequireAvailableGlobally.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
 import { VError } from '../VError/VError.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
-import * as Disposables from '../Disposables/Disposables.ts'
 
 const waitForDebuggerToBePaused = async (rpc) => {
   try {
@@ -21,7 +21,7 @@ const waitForDebuggerToBePaused = async (rpc) => {
 
 const connectElectron = async (electronRpc) => {
   globalThis.electronRpc = electronRpc
-  let debuggerPausedPromise = waitForDebuggerToBePaused(electronRpc)
+  const debuggerPausedPromise = waitForDebuggerToBePaused(electronRpc)
   await Promise.all([
     DevtoolsProtocolDebugger.enable(electronRpc),
     DevtoolsProtocolRuntime.enable(electronRpc),
@@ -29,7 +29,7 @@ const connectElectron = async (electronRpc) => {
   ])
   const msg = await debuggerPausedPromise
   const callFrame = msg.params.callFrames[0]
-  const callFrameId = callFrame.callFrameId
+  const { callFrameId } = callFrame
 
   const electron = await DevtoolsProtocolDebugger.evaluateOnCallFrame(electronRpc, {
     callFrameId,
@@ -109,8 +109,8 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
 }
 
 export const undoMonkeyPatch = async () => {
-  const electronRpc = globalThis.electronRpc
-  const monkeyPatchedElectronId = globalThis.monkeyPatchedElectronId
+  const { electronRpc } = globalThis
+  const { monkeyPatchedElectronId } = globalThis
   await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
     functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
     objectId: monkeyPatchedElectronId,

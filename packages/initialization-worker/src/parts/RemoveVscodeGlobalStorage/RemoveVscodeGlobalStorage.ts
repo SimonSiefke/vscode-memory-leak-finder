@@ -1,5 +1,5 @@
-import { join } from 'node:path'
 import { rm } from 'node:fs/promises'
+import { join } from 'node:path'
 import * as Root from '../Root/Root.ts'
 
 export const removeVsCodeGlobalStorage = async () => {
