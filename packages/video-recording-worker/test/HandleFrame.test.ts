@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
-import * as HandleFrame from '../src/parts/HandleFrame/HandleFrame.ts'
 import * as FfmpegProcessState from '../src/parts/FfmpegProcessState/FfmpegProcessState.ts'
+import * as HandleFrame from '../src/parts/HandleFrame/HandleFrame.ts'
 
 test('handleFrame function exists', () => {
   expect(typeof HandleFrame.handleFrame).toBe('function')
