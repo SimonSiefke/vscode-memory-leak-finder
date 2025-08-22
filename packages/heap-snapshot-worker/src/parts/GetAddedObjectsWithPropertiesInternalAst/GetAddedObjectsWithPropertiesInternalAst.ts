@@ -34,7 +34,7 @@ interface HashMap {
   readonly [key: string]: readonly number[]
 }
 
-const createHashMap = (indices: Uint32Array): HashMap => {
+const createHashMap = (snapshot: Snapshot, indices: Uint32Array): HashMap => {
   const hashMap = Object.create(null)
   for (let i = 0; i < indices.length; i += 4) {
     const index = indices[i]
@@ -165,31 +165,11 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   const uniqueIndicesAfter = getAddedIndices(indicesAfter, idsAfter, idsBefore)
   console.timeEnd('unqiue')
 
-  console.log({ uniqueIndicesBefore: uniqueIndicesBefore.length, uniqueIndicesAfter: uniqueIndicesAfter.length })
-
-  // if(idsBefore.includes(uniqueIndicesAfter[]))
-
-  const idOffset = after.meta.node_fields.indexOf('id')
-  const nodeFieldCount = after.meta.node_fields.length
-  const id = after.nodes[uniqueIndicesAfter[0] * nodeFieldCount + idOffset]
-  if (idsBefore.includes(id)) {
-    throw new Error('not pssible')
-  }
-  console.log({
-    item: uniqueIndicesAfter[0],
-    id,
-  })
-  for (let i = 0; i < before.nodes.length; i += nodeFieldCount) {
-    const beforeId = before.nodes[i + idOffset]
-    if (beforeId === id) {
-      throw new Error('not possible')
-    }
-  }
   console.log('id is not included in before')
 
   console.time('hashmap')
-  const hashMapBefore = createHashMap(indicesBefore)
-  const hashMapAfter = createHashMap(indicesAfter)
+  const hashMapBefore = createHashMap(before, uniqueIndicesBefore)
+  const hashMapAfter = createHashMap(after, uniqueIndicesAfter)
   console.timeEnd('hashmap')
 
   // console.log({ hashMapAfter: hashMapAfter['10:32:16000'] })
@@ -210,55 +190,6 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   const formatted = formatComparison(before, after, leakedSorted)
   // console.log({ formatted })
 
-  // const edgeMap = createEdgeMap(before.nodes, before.meta.node_fields)
-  // const nodeFieldCount = before.meta.node_fields.length
-  // console.log({ nodeFieldCount, nodeFields: before.meta.node_fields, propertyName })
-  // const type = before.nodes[16054 * nodeFieldCount + 0]
-  // const name = before.nodes[16054 * nodeFieldCount + 1]
-  // const id = before.nodes[16054 * nodeFieldCount + 2]
-  // const size = before.nodes[16054 * nodeFieldCount + 3]
-  // const edgeCount = before.nodes[16054 * nodeFieldCount + 4]
-  // const detachedNess = before.nodes[16054 * nodeFieldCount + 5]
-  // const edgeIndex = edgeMap[16054]
-  // console.log({
-  //   indicesBefore,
-  //   indicesAfter,
-  //   // type,
-  //   // name,
-  //   // id,
-  //   // size,
-  //   // edgeCount,
-  //   // detachedNess,
-  //   // string: before.strings[676],
-  //   // disposeIndex: before.strings.indexOf('dispose'),
-  //   // edgeIndex,
-  // })
-  // console.log({ indicesBefore, indicesAfter })
-  // console.time('locationMap')
-  // const locationMapBefore = getLocationMap(before, indicesBefore)
-  // const locationMapAfter = getLocationMap(after, indicesAfter)
-  // console.timeEnd('locationMap')
-
-  // console.time('locations')
-
-  // console.log({ locationMapBefore })
-
-  // const locationsBefore = getLocations(before, indicesBefore, locationMapBefore)
-  // const locationsAfter = getLocations(after, indicesAfter, locationMapAfter)
-
-  // const hashesBefore = getLocationHashes(locationsBefore)
-  // const hashesAfter = getLocationHashes(locationsAfter)
-
-  // console.log({ hashesBefore, hashesAfter })
-  // console.timeEnd('locations')
-  // const added2 = getAdded(before, after, indicesBefore, indicesAfter)
-  // console.log('field', before.meta.node_fields.length)
-  // console.log('locs', before.locations.length)
-  // console.log('locs', before.locations[0])
-  // console.log('locs', before.locations[4])
-  // console.log('lengths', indicesBefore.length, indicesAfter.length)
-  // console.log('added2', added2.length)
-  // console.timeEnd('indices')
   console.time('ast-before')
   const astBefore = getObjectsWithPropertiesInternalAst(before, propertyName, depth)
   console.timeEnd('ast-before')
