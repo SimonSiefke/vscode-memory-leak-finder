@@ -20,6 +20,40 @@ const findNodeIndexById = (snapshot: Snapshot, objectId: number): number => {
   return -1
 }
 
+export const getLocationForClosureIndex = (
+  snapshot: Snapshot,
+  closureNodeIndex: number,
+  ITEMS_PER_NODE: number,
+  traceNodeIdFieldIndex: number,
+): ClosureLocation | null => {
+  const { locations, meta } = snapshot
+  const location_fields = meta.location_fields
+  if (!location_fields?.length || !locations?.length) {
+    return null
+  }
+  const objectIndexOffset = location_fields.indexOf('object_index')
+  const scriptIdOffset = location_fields.indexOf('script_id')
+  const lineOffset = location_fields.indexOf('line')
+  const columnOffset = location_fields.indexOf('column')
+  const itemsPerLocation = location_fields.length
+
+  const traceNodeId = snapshot.nodes[closureNodeIndex * ITEMS_PER_NODE + traceNodeIdFieldIndex]
+
+  for (let i = 0; i < locations.length; i += itemsPerLocation) {
+    const objectIndexValue = locations[i + objectIndexOffset] / ITEMS_PER_NODE
+    const matchesTrace = typeof traceNodeId === 'number' && traceNodeId !== 0 && objectIndexValue === traceNodeId
+    const matchesIndex = objectIndexValue === closureNodeIndex
+    if (matchesTrace || matchesIndex) {
+      return {
+        scriptId: locations[i + scriptIdOffset],
+        line: locations[i + lineOffset],
+        column: locations[i + columnOffset],
+      }
+    }
+  }
+  return null
+}
+
 export const findClosureLocationsForObjectId = (snapshot: Snapshot, objectId: number): readonly ClosureLocation[] => {
   const { nodes, edges, meta, locations } = snapshot
   const nodeFields = meta.node_fields
@@ -53,35 +87,6 @@ export const findClosureLocationsForObjectId = (snapshot: Snapshot, objectId: nu
     return []
   }
   const targetNodeAbsolute = targetNodeIndex * ITEMS_PER_NODE
-
-  // Helper to resolve location for a closure node via locations table
-  const getLocationForClosureIndex = (closureNodeIndex: number): ClosureLocation | null => {
-    const { location_fields } = meta
-    if (!location_fields?.length) {
-      return null
-    }
-    const objectIndexOffset = location_fields.indexOf('object_index')
-    const scriptIdOffset = location_fields.indexOf('script_id')
-    const lineOffset = location_fields.indexOf('line')
-    const columnOffset = location_fields.indexOf('column')
-    const itemsPerLocation = location_fields.length
-
-    const traceNodeId = nodes[closureNodeIndex * ITEMS_PER_NODE + traceNodeIdFieldIndex]
-
-    for (let i = 0; i < locations.length; i += itemsPerLocation) {
-      const objectIndexValue = locations[i + objectIndexOffset] / ITEMS_PER_NODE
-      const matchesTrace = typeof traceNodeId === 'number' && traceNodeId !== 0 && objectIndexValue === traceNodeId
-      const matchesIndex = objectIndexValue === closureNodeIndex
-      if (matchesTrace || matchesIndex) {
-        return {
-          scriptId: locations[i + scriptIdOffset],
-          line: locations[i + lineOffset],
-          column: locations[i + columnOffset],
-        }
-      }
-    }
-    return null
-  }
 
   const results: ClosureLocation[] = []
   const seen = new Set<string>()
@@ -134,7 +139,7 @@ export const findClosureLocationsForObjectId = (snapshot: Snapshot, objectId: nu
       continue
     }
 
-    const loc = getLocationForClosureIndex(nodeIndex)
+    const loc = getLocationForClosureIndex(snapshot, nodeIndex, ITEMS_PER_NODE, traceNodeIdFieldIndex)
     if (loc) {
       const key = `${loc.scriptId}:${loc.line}:${loc.column}`
       if (!seen.has(key)) {
