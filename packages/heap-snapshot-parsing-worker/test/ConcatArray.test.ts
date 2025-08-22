@@ -8,7 +8,7 @@ test('concatArray - concatenates two non-empty arrays', () => {
 
   expect(result).toBeInstanceOf(Uint8Array)
   expect(result.length).toBe(6)
-  expect(Array.from(result)).toEqual([1, 2, 3, 4, 5, 6])
+  expect([...result]).toEqual([1, 2, 3, 4, 5, 6])
 })
 
 test('concatArray - returns other array when first array is empty', () => {
@@ -18,7 +18,7 @@ test('concatArray - returns other array when first array is empty', () => {
 
   expect(result).toBe(array2)
   expect(result.length).toBe(3)
-  expect(Array.from(result)).toEqual([1, 2, 3])
+  expect([...result]).toEqual([1, 2, 3])
 })
 
 test('concatArray - handles empty second array', () => {
@@ -28,7 +28,7 @@ test('concatArray - handles empty second array', () => {
 
   expect(result).toBeInstanceOf(Uint8Array)
   expect(result.length).toBe(3)
-  expect(Array.from(result)).toEqual([1, 2, 3])
+  expect([...result]).toEqual([1, 2, 3])
 })
 
 test('concatArray - handles both arrays empty', () => {
@@ -47,7 +47,7 @@ test('concatUint32Array - concatenates two non-empty arrays', () => {
 
   expect(result).toBeInstanceOf(Uint32Array)
   expect(result.length).toBe(6)
-  expect(Array.from(result)).toEqual([1, 2, 3, 4, 5, 6])
+  expect([...result]).toEqual([1, 2, 3, 4, 5, 6])
 })
 
 test('concatUint32Array - handles empty first array', () => {
@@ -57,7 +57,7 @@ test('concatUint32Array - handles empty first array', () => {
 
   expect(result).toBeInstanceOf(Uint32Array)
   expect(result.length).toBe(3)
-  expect(Array.from(result)).toEqual([1, 2, 3])
+  expect([...result]).toEqual([1, 2, 3])
 })
 
 test('concatUint32Array - handles empty second array', () => {
@@ -67,7 +67,7 @@ test('concatUint32Array - handles empty second array', () => {
 
   expect(result).toBeInstanceOf(Uint32Array)
   expect(result.length).toBe(3)
-  expect(Array.from(result)).toEqual([1, 2, 3])
+  expect([...result]).toEqual([1, 2, 3])
 })
 
 test('concatUint32Array - handles both arrays empty', () => {

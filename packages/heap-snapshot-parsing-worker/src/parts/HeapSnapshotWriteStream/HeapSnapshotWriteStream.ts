@@ -273,7 +273,7 @@ class HeapSnapshotWriteStream extends Writable {
   }
 
   getResult() {
-    const data = this.metaData.data
+    const { data } = this.metaData
     return {
       node_count: data.node_count,
       edge_count: data.edge_count,
