@@ -2,7 +2,10 @@
  * @param {import('../Snapshot/Snapshot.ts').Snapshot} snapshot
  * @returns {Array}
  */
-export interface RegexpObject { readonly id: number; readonly pattern: string }
+export interface RegexpObject {
+  readonly id: number
+  readonly pattern: string
+}
 
 export const getRegexpObjectsFromHeapSnapshotInternal = (snapshot) => {
   const { nodes, strings, meta } = snapshot

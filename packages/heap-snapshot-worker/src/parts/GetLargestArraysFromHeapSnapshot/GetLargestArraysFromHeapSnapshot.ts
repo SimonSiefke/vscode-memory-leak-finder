@@ -4,10 +4,22 @@ import * as CreateNameMap from '../CreateNameMap/CreateNameMap.ts'
 import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 
-interface GraphEdge { name: string; index: number }
-interface Graph { [nodeId: number]: GraphEdge[] }
-interface ParsedNode { id: number; type: string; name: string }
-interface ArrayWithCount { id: number; count: number }
+interface GraphEdge {
+  name: string
+  index: number
+}
+interface Graph {
+  [nodeId: number]: GraphEdge[]
+}
+interface ParsedNode {
+  id: number
+  type: string
+  name: string
+}
+interface ArrayWithCount {
+  id: number
+  count: number
+}
 
 const isArray = (node: ParsedNode): boolean => {
   return node.type === 'object' && node.name === 'Array'
@@ -27,11 +39,7 @@ const getElementCount = (parsedNodes: readonly ParsedNode[], graph: Graph, id: n
   return elementsEdges.length
 }
 
-const getArraysWithCount = (
-  parsedNodes: readonly ParsedNode[],
-  graph: Graph,
-  arrayNodes: readonly ParsedNode[]
-): ArrayWithCount[] => {
+const getArraysWithCount = (parsedNodes: readonly ParsedNode[], graph: Graph, arrayNodes: readonly ParsedNode[]): ArrayWithCount[] => {
   const withCount: ArrayWithCount[] = []
   for (const arrayNode of arrayNodes) {
     const count = getElementCount(parsedNodes, graph, arrayNode.id)
@@ -55,9 +63,16 @@ const filterByMinLength = (arrays: readonly ArrayWithCount[], minLength: number)
   return arrays.filter((array) => array.count >= minLength)
 }
 
-interface NameMapEntry { edgeName: string | undefined; nodeName: string | undefined }
-interface NameMap { [id: number]: NameMapEntry }
-export interface ArrayWithCountAndName extends ArrayWithCount { name: string | undefined }
+interface NameMapEntry {
+  edgeName: string | undefined
+  nodeName: string | undefined
+}
+interface NameMap {
+  [id: number]: NameMapEntry
+}
+export interface ArrayWithCountAndName extends ArrayWithCount {
+  name: string | undefined
+}
 
 const addNames = (items: readonly ArrayWithCount[], nameMap: NameMap): ArrayWithCountAndName[] => {
   const withNames: ArrayWithCountAndName[] = []

@@ -20,11 +20,7 @@ export const unique = <T>(values: readonly T[]): T[] => {
   return seen
 }
 
-export const contextMap = <T, R, C extends unknown[]>(
-  array: readonly T[],
-  fn: (element: T, ...context: C) => R,
-  ...context: C
-): R[] => {
+export const contextMap = <T, R, C extends unknown[]>(array: readonly T[], fn: (element: T, ...context: C) => R, ...context: C): R[] => {
   const result: R[] = []
   for (const element of array) {
     result.push(fn(element, ...context))
