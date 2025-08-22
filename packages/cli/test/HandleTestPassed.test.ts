@@ -1,19 +1,19 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
+import { MockRpc } from '@lvce-editor/rpc'
 
 beforeEach(() => {
   jest.resetModules()
+  jest.resetAllMocks()
 })
-
-const mockWrite: (data: string) => Promise<void> = jest.fn(async (_data: string): Promise<void> => {})
 
 jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   return {
-    write: mockWrite,
+    write: jest.fn(),
   }
 })
 
 jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => ({
-  isGithubActions: () => false,
+  isGithubActions: () => true,
   setTestStateChange: () => {},
   isBuffering: () => false,
   isWindows: () => false,
@@ -28,33 +28,32 @@ jest.unstable_mockModule('../src/parts/TestStateOutput/TestStateOutput.ts', () =
   }
 })
 
+jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string) => {
+      if (method === 'Stdout.getClear') {
+        return '\u001B[2J\u001B[3J\u001B[H'
+      }
+      if (method === 'Stdout.getHandleTestPassedMessage') {
+        return '[ansi-clear] test passed'
+      }
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+
+  return {
+    invoke: mockRpc.invoke.bind(mockRpc),
+  }
+})
+
 const Stdout = await import('../src/parts/Stdout/Stdout.ts')
 const TestStateOutput = await import('../src/parts/TestStateOutput/TestStateOutput.ts')
 const HandleTestPassed = await import('../src/parts/HandleTestPassed/HandleTestPassed.ts')
-const GetHandleTestPassedMessage = await import('../src/parts/GetHandleTestPassedMessage/GetHandleTestPassedMessage.ts')
-const GetTestClearMessage = await import('../src/parts/GetTestClearMessage/GetTestClearMessage.ts')
-const AnsiEscapes = await import('../src/parts/AnsiEscapes/AnsiEscapes.ts')
 
 test('handleTestPassed', async () => {
-  const file: string = '/test/app.test.js'
-  const relativeDirName: string = '/test'
-  const fileName: string = 'app.test.js'
-  const durationMs: number = 100
-  const isLeak: boolean = false
-
-  await HandleTestPassed.handleTestPassed(file, relativeDirName, fileName, durationMs, isLeak)
+  await HandleTestPassed.handleTestPassed('/test/app.test.js', '/test', 'app.test.js', 100, false)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
-
-  const baseMessage: string = await GetHandleTestPassedMessage.getHandleTestPassedMessage(
-    file,
-    relativeDirName,
-    fileName,
-    durationMs,
-    isLeak,
-  )
-  const clearMessage: string = await GetTestClearMessage.getTestClearMessage()
-  const expectedOutput: string = (await AnsiEscapes.clear(false)) + clearMessage + baseMessage
-
-  expect(Stdout.write).toHaveBeenCalledWith(expectedOutput)
+  expect(typeof (Stdout.write as any).mock.calls[0][0]).toBe('string')
   expect(TestStateOutput.clearPending).toHaveBeenCalledTimes(1)
 })

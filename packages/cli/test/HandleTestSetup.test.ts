@@ -1,18 +1,34 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
+import { MockRpc } from '@lvce-editor/rpc'
 
 beforeEach(() => {
   jest.resetModules()
   jest.resetAllMocks()
 })
 
-jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => ({
-  isGithubActions: () => false,
-  setTestSetup: () => {},
-}))
-
+// Mock the Stdout module
 jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   return {
     write: jest.fn(),
+  }
+})
+
+// Note: github actions flag is read via StdinDataState in source; no separate module exists
+
+// Mock the StdoutWorker module
+jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string) => {
+      if (method === 'Stdout.getHandleTestSetupMessage') {
+        return '\n\u001b[0m\u001b[7m\u001b[33m SETUP \u001b[39m\u001b[27m\u001b[0m\n'
+      }
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+
+  return {
+    invoke: mockRpc.invoke.bind(mockRpc),
   }
 })
 
@@ -38,6 +54,22 @@ test('handleTestSetup - should not write anything when in GitHub Actions', async
   jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
     return {
       write: jest.fn(),
+    }
+  })
+
+  jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
+    const mockRpc = MockRpc.create({
+      commandMap: {},
+      invoke: (method: string) => {
+        if (method === 'Stdout.getHandleTestSetupMessage') {
+          return '\n\u001b[0m\u001b[7m\u001b[33m SETUP \u001b[39m\u001b[27m\u001b[0m\n'
+        }
+        throw new Error(`unexpected method ${method}`)
+      },
+    })
+
+    return {
+      invoke: mockRpc.invoke.bind(mockRpc),
     }
   })
 

@@ -36,7 +36,7 @@ export const commandMap: Record<string, (...args: readonly any[]) => any> = {
   'Stdout.getHandleTestPassedMessage': GetHandleTestPassedMessage.getHandleTestPassedMessage,
   'Stdout.getHandleTestRunningMessage': GetHandleTestRunningMessage.getHandleTestRunningMessage,
   'Stdout.getHandleTestSetupMessage': GetHandleTestSetupMessage.getHandleTestSetupMessage,
-  'Stdout.gethandleTestSkippedMessage': GetHandleTestSkippedMessage.getHandleTestSkippedMessage,
+  'Stdout.getHandleTestSkippedMessage': GetHandleTestSkippedMessage.getHandleTestSkippedMessage,
   'Stdout.getInitializedMessage': GetInitializedMessage.getInitializedMessage,
   'Stdout.getInitializingMessage': GetInitializingMessage.getInitializingMessage,
   'Stdout.getInterruptedMessage': GetInterruptedMessage.getInterruptedMessage,
