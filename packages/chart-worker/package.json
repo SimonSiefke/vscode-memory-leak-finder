@@ -2,10 +2,10 @@
   "name": "@vscode-memory-leak-finder/chart-worker",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/main.ts",
   "type": "module",
   "scripts": {
-    "dev": "node src/main.js",
+    "dev": "node src/main.ts",
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
   },
@@ -18,7 +18,6 @@
     "jsdom": "^26.1.0"
   },
   "devDependencies": {
-    "@types/babel__code-frame": "^7.0.6",
     "@types/node": "^24.3.0"
   }
 }

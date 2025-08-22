@@ -14,10 +14,7 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "dependencies": {
-    "@lvce-editor/assert": "^1.4.0",
-    "@lvce-editor/verror": "^1.7.0"
-  },
+  "dependencies": {},
   "xo": {
     "rules": {
       "unicorn/filename-case": "off",
