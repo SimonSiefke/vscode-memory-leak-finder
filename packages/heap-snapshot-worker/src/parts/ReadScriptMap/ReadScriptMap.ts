@@ -1,4 +1,6 @@
+import { join } from 'node:path'
 import { readFileSync } from '../FileSystem/FileSystem.ts'
+import { root } from '../Root/Root.ts'
 
 export interface ScriptInfo {
   readonly url: string
@@ -8,19 +10,21 @@ export interface ScriptInfo {
 export type ScriptMap = Record<number, ScriptInfo>
 
 const getScriptMapPath = (scriptMapId: number): string => {
-  return `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-script-maps/${scriptMapId}.json`
+  return join(root, '.vscode-script-maps', `${scriptMapId}.json`)
 }
+
+const emptyScriptMap = Object.create(null)
 
 export const readScriptMap = (scriptMapId: number): ScriptMap => {
   if (!Number.isFinite(scriptMapId)) {
-    return Object.create(null)
+    return emptyScriptMap
   }
   const path = getScriptMapPath(scriptMapId)
   try {
-    const content = readFileSync(path, 'utf8') as string
+    const content = readFileSync(path, 'utf8')
     const json = JSON.parse(content) as ScriptMap
     return json
   } catch {
-    return Object.create(null)
+    return emptyScriptMap
   }
 }
