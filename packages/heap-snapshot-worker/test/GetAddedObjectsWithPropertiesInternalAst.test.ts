@@ -262,11 +262,11 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
     ]),
     edges: new Uint32Array([
       // LeakThing 1
-      2,  5, 24,     // __proto__
-      3,  7, 18,     // map
+      2,  5, 18,     // __proto__
+      3,  7, 12,     // map
 
       // map
-      3,  6, 24,     // prototype
+      3,  6, 18,     // prototype
       3,  8,  0,     // constructor
       3, 14,  0,     // dependent_code
       3,  7,  0,     // map
@@ -369,14 +369,6 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
   expect(added).toEqual([
     {
       id: 60081,
-      name: 'LeakThing',
-      properties: [],
-      type: 'object',
-    },
-
-    // TODO this should not be found, as it is there before
-    {
-      id: 7093,
       name: 'LeakThing',
       properties: [],
       type: 'object',
