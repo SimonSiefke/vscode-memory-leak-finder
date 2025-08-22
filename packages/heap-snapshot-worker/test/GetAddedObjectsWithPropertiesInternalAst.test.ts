@@ -271,7 +271,7 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
 
   // prettier-ignore
   const afterSnapshot: Snapshot = {
-    node_count: 4,
+    node_count: 5,
     edge_count: 2,
     extra_native_bytes: 0,
     meta: {
@@ -308,12 +308,29 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
 
     ]),
     edges: new Uint32Array([
-      2,
-      3,
-      7, // object A property "test" -> string "hello"
-      2,
-      3,
-      21, // object B property "test" -> string "world" (nodeIndex 3 * 7 = 21)
+      2,694,176454,  // __proto__
+      3,5068,176448, // map
+
+      3,    80, 176454, // prototype
+      3,   790, 174126, // constructor
+      3, 17535,   1080, // dependent_code
+      3,  5068,  94386, // map
+      4,     1,   1086, // other
+
+
+      2,   790, 174126, // constructor
+      2,  4595, 179172, // method
+      2,   694,  94830, // __proto__
+      3, 17543, 179178, // properties
+      3,  5068, 174114, // map
+
+
+      2,   694,   94722, // __proto__
+      3, 17938,  174084, // feedback_cell
+      3,   202,  174024, // shared
+      3,  7433,  179160, // context
+      3,   522,    7524, // code
+      3,  5068,    9549, // map
     ]),
     strings: ['gc roots',  'LeakThing', 'system / Map', 'Object', 'leakingMethod'],
     locations: new Uint32Array([]),
