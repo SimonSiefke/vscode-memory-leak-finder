@@ -5,9 +5,9 @@ import * as ObjectType from '../ObjectType/ObjectType.ts'
  * @param {any} ipc
  * @returns
  */
-export const createRpc = (ipc) => {
+export const createRpc = (ipc: any) => {
   const callbacks = Object.create(null)
-  const handleMessage = (message) => {
+  const handleMessage = (message: any) => {
     if ('id' in message) {
       if ('result' in message) {
         callbacks[message.id].resolve(message)
@@ -37,7 +37,7 @@ export const createRpc = (ipc) => {
     callbacks,
     listeners,
     onceListeners,
-    invoke(method, params) {
+    invoke(method: string, params: any) {
       return new Promise((resolve, reject) => {
         const id = _id++
         callbacks[id] = { resolve, reject }
@@ -48,7 +48,7 @@ export const createRpc = (ipc) => {
         })
       })
     },
-    invokeWithSession(sessionId, method, params) {
+    invokeWithSession(sessionId: string, method: string, params: any) {
       return new Promise((resolve, reject) => {
         const id = _id++
         callbacks[id] = { resolve, reject }
@@ -60,10 +60,10 @@ export const createRpc = (ipc) => {
         })
       })
     },
-    on(event, listener) {
+    on(event: string, listener: any) {
       listeners[event] = listener
     },
-    once(event) {
+    once(event: string) {
       return new Promise((resolve) => {
         onceListeners[event] = resolve
       })

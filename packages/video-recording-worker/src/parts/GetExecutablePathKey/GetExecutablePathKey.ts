@@ -1,4 +1,4 @@
-export const getExecutablePathKey = (platform) => {
+export const getExecutablePathKey = (platform: string): string => {
   switch (platform) {
     case 'linux':
       return 'linux'

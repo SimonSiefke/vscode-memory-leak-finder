@@ -115,7 +115,7 @@ test('addTarget resolves waiting callbacks when matching target is added', () =>
   TargetState.state.callbacks.push({
     type: 'page',
     index: 0,
-    resolve: (target) => {
+    resolve: (target: any) => {
       callbackResolved = true
       resolvedTarget = target
     },
@@ -141,7 +141,7 @@ test('addTarget resolves callback for correct index', () => {
   TargetState.state.callbacks.push({
     type: 'page',
     index: 1,
-    resolve: (target) => {
+    resolve: (target: any) => {
       callbackResolved = true
       resolvedTarget = target
     },

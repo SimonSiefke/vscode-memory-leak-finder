@@ -16,7 +16,7 @@ export const reset = () => {
   state.targetCallbackMap = Object.create(null)
 }
 
-export const addSession = (sessionId, session) => {
+export const addSession = (sessionId: string, session: any) => {
   state.sessionMap[sessionId] = session
   if (session.type in state.targetCallbackMap) {
     state.targetCallbackMap[session.type]
@@ -24,19 +24,19 @@ export const addSession = (sessionId, session) => {
   }
 }
 
-export const removeSession = (sessionId) => {
+export const removeSession = (sessionId: string) => {
   delete state.sessionMap[sessionId]
 }
 
-export const hasSession = (sessionId) => {
+export const hasSession = (sessionId: string) => {
   return sessionId in state.sessionMap
 }
 
-export const getSession = (sessionId) => {
+export const getSession = (sessionId: string) => {
   return state.sessionMap[sessionId]
 }
 
-export const waitForTarget = (type, fn) => {
+export const waitForTarget = (type: any, fn: any) => {
   for (const session of Object.values(state.sessionMap)) {
     if (session.type === type) {
       return session

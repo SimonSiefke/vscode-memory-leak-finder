@@ -9,11 +9,11 @@ import * as SessionState from '../SessionState/SessionState.ts'
 import * as TargetState from '../TargetState/TargetState.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 
-const handleAttachedToBrowser = (message) => {
+const handleAttachedToBrowser = (message: any) => {
   console.log('attached to browser', message)
 }
 
-const handleAttachedToPage = async (message) => {
+const handleAttachedToPage = async (message: any) => {
   try {
     const { sessionId } = message.params
     const browserSession = SessionState.getSession('browser')
@@ -62,7 +62,7 @@ const handleAttachedToPage = async (message) => {
   }
 }
 
-export const handleAttachedToTarget = (message) => {
+export const handleAttachedToTarget = (message: any) => {
   const { type } = message.params.targetInfo
   switch (type) {
     case DevtoolsTargetType.Page:
@@ -73,6 +73,6 @@ export const handleAttachedToTarget = (message) => {
       break
   }
 }
-export const handleDetachedFromTarget = (message) => {
+export const handleDetachedFromTarget = (message: any) => {
   SessionState.removeSession(message.params.sessionId)
 }
