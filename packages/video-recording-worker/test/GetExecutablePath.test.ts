@@ -10,11 +10,22 @@ test('getExecutablePath returns path for ffmpeg', () => {
 test('getExecutablePath returns platform-specific path', () => {
   const result = GetExecutablePath.getExecutablePath('ffmpeg')
 
-  if (process.platform === 'linux') {
-    expect(result[0]).toBe('ffmpeg-linux')
-  } else if (process.platform === 'darwin') {
-    expect(result[0]).toBe('ffmpeg-mac')
-  } else if (process.platform === 'win32') {
-    expect(result[0]).toBe('ffmpeg-win64.exe')
+  switch (process.platform) {
+    case 'linux': {
+      expect(result[0]).toBe('ffmpeg-linux')
+
+      break
+    }
+    case 'darwin': {
+      expect(result[0]).toBe('ffmpeg-mac')
+
+      break
+    }
+    case 'win32': {
+      expect(result[0]).toBe('ffmpeg-win64.exe')
+
+      break
+    }
+    // No default
   }
 })

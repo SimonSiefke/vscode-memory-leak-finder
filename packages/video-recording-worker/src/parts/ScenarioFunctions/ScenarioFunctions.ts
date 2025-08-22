@@ -15,14 +15,14 @@ const handleAttachedToBrowser = (message) => {
 
 const handleAttachedToPage = async (message) => {
   try {
-    const sessionId = message.params.sessionId
+    const { sessionId } = message.params
     const browserSession = SessionState.getSession('browser')
     const browserRpc = browserSession.rpc
     const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
-    const targetId = message.params.targetInfo.targetId
-    const type = message.params.targetInfo.type
-    const url = message.params.targetInfo.url
-    const browserContextId = message.params.targetInfo.browserContextId
+    const { targetId } = message.params.targetInfo
+    const { type } = message.params.targetInfo
+    const { url } = message.params.targetInfo
+    const { browserContextId } = message.params.targetInfo
     SessionState.addSession(sessionId, {
       type,
       url,
@@ -63,7 +63,7 @@ const handleAttachedToPage = async (message) => {
 }
 
 export const handleAttachedToTarget = (message) => {
-  const type = message.params.targetInfo.type
+  const { type } = message.params.targetInfo
   switch (type) {
     case DevtoolsTargetType.Page:
       return handleAttachedToPage(message)

@@ -23,11 +23,9 @@ export const connectDevtools = async (devtoolsWebSocketUrl) => {
   browserRpc.on(DevtoolsEventType.TargetAttachedToTarget, ScenarioFunctions.handleAttachedToTarget)
   browserRpc.on(DevtoolsEventType.TargetDetachedFromTarget, ScenarioFunctions.handleDetachedFromTarget)
 
-  await Promise.all([
-    DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
-      autoAttach: true,
-      waitForDebuggerOnStart: false,
-      flatten: true,
-    }),
-  ])
+  await DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
+    autoAttach: true,
+    waitForDebuggerOnStart: false,
+    flatten: true,
+  })
 }
