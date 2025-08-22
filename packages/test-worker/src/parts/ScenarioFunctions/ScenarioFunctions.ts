@@ -43,12 +43,12 @@ const getSessionId = (message) => {
 }
 
 export const handleRuntimeExecutionContextCreated = (message) => {
-  const uniqueId = message.params.context.uniqueId
-  const id = message.params.context.id
+  const { uniqueId } = message.params.context
+  const { id } = message.params.context
   const type = getExecutionContextType(message)
   const sessionId = getSessionId(message)
-  const name = message.params.context.name
-  const origin = message.params.context.origin
+  const { name } = message.params.context
+  const { origin } = message.params.context
   const context = {
     id,
     uniqueId,
@@ -66,7 +66,7 @@ export const handleRuntimeExecutionContextDestroyed = (message) => {
 }
 
 export const handleRuntimeExecutionContextsCleared = (message) => {
-  const sessionId = message.sessionId
+  const { sessionId } = message
   ExecutionContextState.removeBySessionId(sessionId)
 
   // console.log('execution contexts cleared', message)
@@ -85,7 +85,7 @@ const handleAttachedToBrowser = (message) => {
 }
 
 const handleAttachedToJs = async (message, type) => {
-  const sessionId = message.params.sessionId
+  const { sessionId } = message.params
   const browserSession = SessionState.getSession('browser')
   if (!browserSession) {
     return
@@ -121,7 +121,7 @@ const handleAttachedToWorker = async (message) => {
 }
 
 export const handleTargetDestroyed = (message) => {
-  const targetId = message.params.targetId
+  const { targetId } = message.params
   TargetState.removeTarget(targetId)
 }
 
@@ -135,7 +135,7 @@ const handleTargetInfoChangePage = (message, type) => {
 }
 
 export const handleTargetInfoChanged = (message) => {
-  const type = message.params.targetInfo.type
+  const { type } = message.params.targetInfo
   switch (type) {
     case DevtoolsTargetType.Page:
     case DevtoolsTargetType.Iframe:
@@ -151,14 +151,14 @@ export const handleTargetCrashed = (message) => {
 
 const handleAttachedToPage = async (message) => {
   try {
-    const sessionId = message.params.sessionId
+    const { sessionId } = message.params
     const browserSession = SessionState.getSession('browser')
     const browserRpc = browserSession.rpc
     const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
-    const targetId = message.params.targetInfo.targetId
-    const type = message.params.targetInfo.type
-    const url = message.params.targetInfo.url
-    const browserContextId = message.params.targetInfo.browserContextId
+    const { targetId } = message.params.targetInfo
+    const { type } = message.params.targetInfo
+    const { url } = message.params.targetInfo
+    const { browserContextId } = message.params.targetInfo
     SessionState.addSession(sessionId, {
       type,
       url,
@@ -214,7 +214,7 @@ const handleAttachedToServiceWorker = async (message) => {
 }
 
 export const handleAttachedToTarget = (message) => {
-  const type = message.params.targetInfo.type
+  const { type } = message.params.targetInfo
   switch (type) {
     case DevtoolsTargetType.Page:
       return handleAttachedToPage(message)

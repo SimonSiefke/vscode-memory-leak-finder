@@ -1,5 +1,5 @@
-import * as MergeStacks from '../MergeStacks/MergeStacks.ts'
 import * as GetDevtoolsProtocolErrorStack from '../GetDevtoolsProtocolErrorStack/GetDevtoolsProtocolErrorStack.ts'
+import * as MergeStacks from '../MergeStacks/MergeStacks.ts'
 
 const splitMessageAndStack = (input) => {
   const lines = input.split('\n')

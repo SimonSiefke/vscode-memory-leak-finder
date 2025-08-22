@@ -1,5 +1,5 @@
-import * as MatchesFilterValue from '../src/parts/MatchesFilterValue/MatchesFilterValue.ts'
 import { test, expect } from '@jest/globals'
+import * as MatchesFilterValue from '../src/parts/MatchesFilterValue/MatchesFilterValue.ts'
 
 test('matchesFilterValue - starts with - true', () => {
   expect(MatchesFilterValue.matchesFilterValue('abc', '^abc')).toBe(true)

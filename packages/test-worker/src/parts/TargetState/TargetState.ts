@@ -89,7 +89,7 @@ export const waitForTarget = async ({ type, index = -1, url = new RegExp('') }) 
       }),
       { milliseconds: TimeoutConstants.Target },
     )
-  } catch (error) {
+  } catch {
     throw new VError(`Target was not created ${type}`)
   }
 }

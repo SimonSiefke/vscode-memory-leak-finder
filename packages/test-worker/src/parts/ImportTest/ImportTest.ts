@@ -1,5 +1,5 @@
-import { VError } from '../VError/VError.ts'
 import * as ImportScript from '../ImportScript/ImportScript.ts'
+import { VError } from '../VError/VError.ts'
 
 export const importTest = async (file) => {
   try {

@@ -1,24 +1,15 @@
 {
   "name": "@vscode-memory-leak-finder/test-coordinator",
   "version": "0.0.0-dev",
-  "main": "src/main.ts",
+  "description": "",
+  "keywords": [],
+  "license": "MIT",
+  "author": "",
   "type": "module",
+  "main": "src/main.ts",
   "scripts": {
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
-  "description": "",
-  "dependencies": {
-    "@babel/code-frame": "^7.27.1",
-    "@lvce-editor/assert": "^1.4.0",
-    "@lvce-editor/rpc": "^4.14.0",
-    "@lvce-editor/verror": "^1.7.0"
-  },
-  "devDependencies": {
-    "@types/babel__code-frame": "^7.0.6"
   },
   "xo": {
     "rules": {
@@ -66,5 +57,14 @@
     "ignores": [
       "distmin"
     ]
+  },
+  "dependencies": {
+    "@babel/code-frame": "^7.27.1",
+    "@lvce-editor/assert": "^1.4.0",
+    "@lvce-editor/rpc": "^4.14.0",
+    "@lvce-editor/verror": "^1.7.0"
+  },
+  "devDependencies": {
+    "@types/babel__code-frame": "^7.0.6"
   }
 }

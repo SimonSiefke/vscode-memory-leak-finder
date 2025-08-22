@@ -1,5 +1,5 @@
-import * as RunTestsWithCallback from '../RunTestsWithCallback/RunTestsWithCallback.ts'
 import * as CliProcess from '../CliProcess/CliProcess.ts'
+import * as RunTestsWithCallback from '../RunTestsWithCallback/RunTestsWithCallback.ts'
 
 const callback = async (method, ...params) => {
   await CliProcess.invoke(method, ...params)
