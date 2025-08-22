@@ -1,7 +1,7 @@
 import { expect, test } from '@jest/globals'
-import * as GetGitHubGroupStartMessage from '../src/parts/GetGitHubGroupStartMessage/GetGitHubGroupStartMessage.ts'
-import * as GetGitHubGroupEndMessage from '../src/parts/GetGitHubGroupEndMessage/GetGitHubGroupEndMessage.ts'
 import * as GetGitHubFileErrorMessage from '../src/parts/GetGitHubFileErrorMessage/GetGitHubFileErrorMessage.ts'
+import * as GetGitHubGroupEndMessage from '../src/parts/GetGitHubGroupEndMessage/GetGitHubGroupEndMessage.ts'
+import * as GetGitHubGroupStartMessage from '../src/parts/GetGitHubGroupStartMessage/GetGitHubGroupStartMessage.ts'
 
 test('group start', () => {
   expect(GetGitHubGroupStartMessage.getGitHubGroupStartMessage('Build Logs')).toBe('::group::Build Logs\n')

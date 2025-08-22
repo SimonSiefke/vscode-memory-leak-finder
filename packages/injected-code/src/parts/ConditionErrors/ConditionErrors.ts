@@ -69,7 +69,7 @@ export const toHaveCount = (locator, { count }) => {
 
 export const toBeFocused = (locator) => {
   const locatorString = printLocator(locator)
-  const activeElement = document.activeElement
+  const { activeElement } = document
   const stringifiedActiveElement = StringifyElement.stringifyElement(activeElement)
   return `expected ${locatorString} to be focused but active element is ${stringifiedActiveElement}`
 }
