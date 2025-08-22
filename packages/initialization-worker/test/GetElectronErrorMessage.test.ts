@@ -1,5 +1,5 @@
-import * as GetElectronErrorMessage from '../src/parts/GetElectronErrorMessage/GetElectronErrorMessage.ts'
 import { test, expect } from '@jest/globals'
+import * as GetElectronErrorMessage from '../src/parts/GetElectronErrorMessage/GetElectronErrorMessage.ts'
 
 test('error - electron app not found', async () => {
   const firstData =
