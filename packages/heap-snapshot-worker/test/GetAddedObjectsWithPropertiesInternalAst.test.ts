@@ -300,17 +300,23 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
       location_fields: ['object_index', 'script_id', 'line', 'column'],
     },
     nodes: new Uint32Array([
+      3,  1, 60081, 12, 2, 0, // LeakThing 2
       3,  1, 7093, 52, 2, 0,  // LeakThing 1
       14, 2, 58817, 40, 5, 0, //   -> map
       3,  3, 58819, 12, 5, 0, //   -> prototype
       5,  4, 59725, 28, 6, 0, //   -> method
-      3,  1, 60081, 12, 2, 0, // LeakThing 2
 
     ]),
     edges: new Uint32Array([
-      2,694,176454,  // __proto__
-      3,5068,176448, // map
+      // LeakThing 2
+      2, 694,  165792, // __proto__
+      3, 5070, 165786, // map
 
+      // LeakThing 1
+      2,   694, 176454, // __proto__
+      3,  5068, 176448, // map
+
+      // map
       3,    80, 176454, // prototype
       3,   790, 174126, // constructor
       3, 17535,   1080, // dependent_code
@@ -318,6 +324,7 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
       4,     1,   1086, // other
 
 
+      // prototype
       2,   790, 174126, // constructor
       2,  4595, 179172, // method
       2,   694,  94830, // __proto__
@@ -325,12 +332,15 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
       3,  5068, 174114, // map
 
 
+      // method
       2,   694,   94722, // __proto__
       3, 17938,  174084, // feedback_cell
       3,   202,  174024, // shared
       3,  7433,  179160, // context
       3,   522,    7524, // code
       3,  5068,    9549, // map
+
+      // LeakThing 2
     ]),
     strings: ['gc roots',  'LeakThing', 'system / Map', 'Object', 'leakingMethod'],
     locations: new Uint32Array([]),
