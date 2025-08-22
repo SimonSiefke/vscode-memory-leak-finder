@@ -1,5 +1,5 @@
-import { join, resolve } from 'node:path'
 import { readdir } from 'node:fs/promises'
+import { join, resolve } from 'node:path'
 
 export const getUnusedFilesToRemoveLinux = async (binaryPath: string): Promise<readonly string[]> => {
   const files: string[] = []
