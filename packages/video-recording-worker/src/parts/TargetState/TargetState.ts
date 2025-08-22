@@ -56,7 +56,7 @@ export const removeTarget = (targetId: string) => {
   state.destroyedCallbacks = newCallbacks
 }
 
-export const waitForTarget = async ({ type, index }: { type: number; index: number }) => {
+export const waitForTarget = async ({ type, index }: { type: string; index: number }) => {
   try {
     let currentIndex = 0
     for (const target of Object.values(state.targets)) {

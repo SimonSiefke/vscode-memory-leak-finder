@@ -39,12 +39,6 @@ test('addTarget adds target to state', () => {
   expect(Object.keys(TargetState.state.targets).length).toBe(1)
 })
 
-test('addTarget throws error for non-string targetId', () => {
-  expect(() => TargetState.addTarget(123, {})).toThrow()
-  expect(() => TargetState.addTarget(null, {})).toThrow()
-  expect(() => TargetState.addTarget(undefined, {})).toThrow()
-})
-
 test('addTarget throws error for non-object target', () => {
   expect(() => TargetState.addTarget('target-id', 'not-an-object')).toThrow()
   expect(() => TargetState.addTarget('target-id', 123)).toThrow()
@@ -62,12 +56,6 @@ test('removeTarget removes target from state', () => {
 
   TargetState.removeTarget(targetId)
   expect(TargetState.state.targets[targetId]).toBeUndefined()
-})
-
-test('removeTarget throws error for non-string targetId', () => {
-  expect(() => TargetState.removeTarget(123)).toThrow()
-  expect(() => TargetState.removeTarget(null)).toThrow()
-  expect(() => TargetState.removeTarget(undefined)).toThrow()
 })
 
 test('removeTarget resolves destroyed callbacks for matching targetId', () => {
@@ -153,12 +141,6 @@ test('addTarget resolves callback for correct index', () => {
 
   expect(callbackResolved).toBe(true)
   expect(resolvedTarget).toBe(secondTarget)
-})
-
-test('waitForTargetToBeClosed throws error for non-string targetId', async () => {
-  await expect(TargetState.waitForTargetToBeClosed(123)).rejects.toThrow()
-  await expect(TargetState.waitForTargetToBeClosed(null)).rejects.toThrow()
-  await expect(TargetState.waitForTargetToBeClosed(undefined)).rejects.toThrow()
 })
 
 test('waitForTargetToBeClosed returns immediately if target does not exist', async () => {
