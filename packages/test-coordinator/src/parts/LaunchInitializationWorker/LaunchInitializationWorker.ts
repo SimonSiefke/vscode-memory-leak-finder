@@ -1,6 +1,6 @@
 import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
-import { getInitializationWorkerUrl } from '../GetInitializationWorkerUrl/GetInitializationWorkerUrl.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
+import { getInitializationWorkerUrl } from '../GetInitializationWorkerUrl/GetInitializationWorkerUrl.ts'
 
 export const launchInitializationWorker = async () => {
   const url = getInitializationWorkerUrl()

@@ -1,6 +1,6 @@
-import { VError } from '../VError/VError.ts'
 import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as PTimeout from '../PTimeout/PTimeout.ts'
+import { VError } from '../VError/VError.ts'
 
 export const reload = async (rpc) => {
   try {

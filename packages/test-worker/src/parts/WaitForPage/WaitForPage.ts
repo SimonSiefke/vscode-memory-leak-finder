@@ -6,7 +6,7 @@ import * as TargetState from '../TargetState/TargetState.ts'
 export const waitForPage = async ({ index, electronRpc, electronObjectId }) => {
   const target = await TargetState.waitForTarget({ type: DevtoolsTargetType.Page, index })
   const session = SessionState.getSession(target.sessionId)
-  const rpc = session.rpc
+  const { rpc } = session
   return Page.create({
     electronObjectId,
     electronRpc,

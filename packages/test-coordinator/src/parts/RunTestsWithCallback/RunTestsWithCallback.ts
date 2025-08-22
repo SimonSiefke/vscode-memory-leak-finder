@@ -10,9 +10,9 @@ import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAtt
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.ts'
 import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.ts'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.ts'
+import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTearDownTest.ts'
 import * as Time from '../Time/Time.ts'
 import * as Timeout from '../Timeout/Timeout.ts'
-import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTearDownTest.ts'
 import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
 
 // 1. get matching files

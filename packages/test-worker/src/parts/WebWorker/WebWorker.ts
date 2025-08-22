@@ -9,7 +9,7 @@ export const waitForWebWorker = async ({ sessionId }) => {
   return {
     type: DevtoolsTargetType.Worker,
     async evaluate({ expression }) {
-      const rpc = session.rpc
+      const { rpc } = session
       const result = await DevtoolsProtocolRuntime.evaluate(rpc, {
         expression,
         returnByValue: true,
