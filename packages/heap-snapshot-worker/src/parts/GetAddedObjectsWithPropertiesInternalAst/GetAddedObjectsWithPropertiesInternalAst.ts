@@ -134,7 +134,7 @@ const getIds = (snapshot: Snapshot, indices: Uint32Array): Uint32Array => {
   }
   const ids: number[] = []
   for (let i = 0; i < indices.length; i++) {
-    const id = nodes[indices[i] * nodeFieldCount + nodeIdIndex]
+    const id = nodes[indices[i] + nodeIdIndex]
     ids.push(id)
   }
   return new Uint32Array(ids)
@@ -243,6 +243,8 @@ export const getAddedObjectsWithPropertiesInternalAst = (
 
   const idsBefore = getIds(before, indicesBefore)
   const idsAfter = getIds(after, indicesAfter)
+
+  console.log({ idsBefore, idsAfter })
 
   console.time('unqiue')
   const uniqueIndicesBefore = getAddedIndices(indicesBefore, idsBefore, idsAfter)

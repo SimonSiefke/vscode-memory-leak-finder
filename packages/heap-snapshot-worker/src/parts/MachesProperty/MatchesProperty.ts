@@ -26,7 +26,7 @@ export const matchesProperty = (
       return true
     }
     if (edgeType === edgeTypeInternal && strings[nameIndex] === 'map') {
-      const mapEdges = getNodeEdgesFast(toIndex, edgeMap, nodes, edges, itemsPerNode, itemsPerEdge, edgeCountFieldIndex)
+      const mapEdges = getNodeEdgesFast(toIndex / itemsPerNode, edgeMap, nodes, edges, itemsPerNode, itemsPerEdge, edgeCountFieldIndex)
       for (let j = 0; j < mapEdges.length; j += itemsPerEdge) {
         const subEdgeType = nodeEdges[j + edgeTypeFieldIndex]
         const subEdgeNameIndex = nodeEdges[j + edgeNameFieldIndex]
