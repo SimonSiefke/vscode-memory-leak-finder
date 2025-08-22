@@ -109,7 +109,10 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
 }
 
 export const undoMonkeyPatch = async () => {
+  // TODO avoid global variables
+  // @ts-ignore
   const { electronRpc } = globalThis
+  // @ts-ignore
   const { monkeyPatchedElectronId } = globalThis
   await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
     functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
