@@ -53,6 +53,8 @@ export interface PropertyEntry {
 export interface ObjectNode extends BaseAstNode {
   type: 'object'
   properties: PropertyEntry[]
+  // Optional: approximate closure source locations that capture this object
+  closureLocations?: readonly { scriptId: number; line: number; column: number }[]
 }
 
 export interface ArrayNode extends BaseAstNode {

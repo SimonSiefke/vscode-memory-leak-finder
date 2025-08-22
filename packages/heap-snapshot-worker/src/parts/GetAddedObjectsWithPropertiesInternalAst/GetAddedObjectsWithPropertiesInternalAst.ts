@@ -1,8 +1,9 @@
-import type { AstNode } from '../AstNode/AstNode.ts'
+import type { AstNode, ObjectNode } from '../AstNode/AstNode.ts'
 import { getAsts } from '../GetAsts/GetAsts.ts'
 import { getObjectWithPropertyNodeIndices3 } from '../GetObjectWithPropertyNodeIndices3/GetObjectWithPropertyNodeIndices3.ts'
 import { signatureFor } from '../SignatureForAstNode/SignatureForAstNode.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
+import { findClosureLocationsForObjectId } from '../FindClosureLocationsForNode/FindClosureLocationsForNode.ts'
 
 const getIds = (snapshot: Snapshot, indices: Uint32Array): Uint32Array => {
   const nodes = snapshot.nodes
@@ -62,6 +63,8 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   const indicesBefore = getObjectWithPropertyNodeIndices3(before, propertyName)
   const indicesAfter = getObjectWithPropertyNodeIndices3(after, propertyName)
 
+  console.log({ indicesBefore, indicesAfter })
+
   const idsBefore = getIds(before, indicesBefore)
   const idsAfter = getIds(after, indicesAfter)
 
@@ -75,5 +78,16 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   const signaturesAfter = getSignatures(astAfter, depth)
 
   const uniqueAfter = getUniqueAfter(astBefore, astAfter, signaturesBefore, signaturesAfter)
-  return uniqueAfter
+  // Enhance leaked objects with approximate closure locations
+  const enhanced = uniqueAfter.map((node) => {
+    if (node.type === 'object') {
+      const locations = findClosureLocationsForObjectId(after, node.id)
+      const obj: ObjectNode = locations.length
+        ? { ...(node as ObjectNode), closureLocations: locations }
+        : (node as ObjectNode)
+      return obj
+    }
+    return node
+  })
+  return enhanced
 }
