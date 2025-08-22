@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import { getBigintObjectsFromHeapSnapshot } from '../src/parts/GetBigintObjectsFromHeapSnapshot/GetBigintObjectsFromHeapSnapshot.js'
+import { getBigintObjectsFromHeapSnapshot } from '../src/parts/GetBigintObjectsFromHeapSnapshot/GetBigintObjectsFromHeapSnapshot.ts'
 
 const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
 
@@ -9,8 +9,8 @@ const testOptimized = async () => {
   console.log('Testing Optimized Approach (getNamedFunctionCountFromHeapSnapshot2):')
 
   try {
-    const count = await getBigintObjectsFromHeapSnapshot(filePath1)
-    console.log({ count })
+    const values = await getBigintObjectsFromHeapSnapshot(filePath1)
+    console.log(JSON.stringify(values, null, 2))
 
     // console.log(`  Duration: ${duration.toFixed(2)}ms`)
     // console.log(`  Functions found: ${result.length / 5}`)
