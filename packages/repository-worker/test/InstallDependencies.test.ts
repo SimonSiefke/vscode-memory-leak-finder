@@ -1,6 +1,6 @@
 import { test, expect, jest } from '@jest/globals'
-import { VError } from '@lvce-editor/verror'
 import { MockRpc } from '@lvce-editor/rpc'
+import { VError } from '@lvce-editor/verror'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
 import { installDependencies } from '../src/parts/InstallDependencies/InstallDependencies.ts'
 
