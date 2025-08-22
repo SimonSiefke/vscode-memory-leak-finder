@@ -23,8 +23,6 @@ export const getObjectWithPropertyNodeIndices3 = (snapshot: Snapshot, propertyNa
     return new Uint32Array([])
   }
 
-  console.log({ nodeTypes, nodeFields })
-
   const idIndex = nodeFields.indexOf('id')
   const ITEMS_PER_NODE_LOCAL = nodeFields.length
   const ITEMS_PER_EDGE_LOCAL = edgeFields.length
