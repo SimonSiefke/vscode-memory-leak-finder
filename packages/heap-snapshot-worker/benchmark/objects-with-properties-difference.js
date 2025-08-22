@@ -38,6 +38,7 @@ async function testGetObjectsWithProperties() {
     const difference = getAddedObjectsWithPropertiesInternalAst(snapshot1, snapshot2, property, depth)
     console.timeEnd('diff')
 
+    console.log({ difference })
     // console.log('count 1', astObjects1.length)
     // console.log('count 2', astObjects2.length)
 
