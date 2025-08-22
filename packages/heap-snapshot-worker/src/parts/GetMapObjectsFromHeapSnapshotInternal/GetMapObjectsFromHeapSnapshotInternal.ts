@@ -5,6 +5,21 @@ import { isInternalMap } from '../IsInternalMap/IsInternalMap.ts'
  * @param {import('../Snapshot/Snapshot.ts').Snapshot} snapshot
  * @returns {Array}
  */
+interface VariableName { readonly name: string; readonly sourceType: string; readonly sourceName: string }
+interface MapObject {
+  id: number
+  name: string
+  type: 'map'
+  selfSize: number
+  edgeCount: number
+  detachedness: number
+  nodeDataIndex: number
+  variableNames: VariableName[]
+  keys: string[]
+  note: string
+  size?: string
+}
+
 export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
   const { nodes, edges, strings } = snapshot
   const { node_types, node_fields, edge_types, edge_fields } = snapshot.meta
@@ -28,22 +43,6 @@ export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
 
   if (objectTypeIndex === -1) {
     return []
-  }
-
-  // First pass: collect Map objects
-  interface VariableName { readonly name: string; readonly sourceType: string; readonly sourceName: string }
-  interface MapObject {
-    id: number
-    name: string
-    type: 'map'
-    selfSize: number
-    edgeCount: number
-    detachedness: number
-    nodeDataIndex: number
-    variableNames: VariableName[]
-    keys: string[]
-    note: string
-    size?: string
   }
 
   const mapObjects: MapObject[] = []

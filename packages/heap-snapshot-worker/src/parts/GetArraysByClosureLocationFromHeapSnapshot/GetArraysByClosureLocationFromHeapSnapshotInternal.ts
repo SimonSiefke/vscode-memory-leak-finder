@@ -3,6 +3,60 @@ import { isInternalArray } from '../IsInternalArray/IsInternalArray.ts'
 import { getLocationKey } from '../GetLocationKey/GetLocationKey.ts'
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
 
+interface VariableName {
+  readonly name: string
+  readonly sourceType: string
+  readonly sourceName: string
+}
+
+interface LocationInfo {
+  readonly scriptId: number
+  readonly line: number
+  readonly column: number
+  readonly url: string
+  readonly sourceMapUrl: string
+}
+
+interface ArrayObj {
+  id: number
+  name: string
+  type: 'array'
+  selfSize: number
+  edgeCount: number
+  detachedness: number
+  nodeDataIndex: number
+  locationKey: string
+  locationInfo: LocationInfo | null
+  variableNames: VariableName[]
+  length: number
+}
+
+interface ClosureGroup {
+  locationKey: string
+  locationInfo: LocationInfo | null
+  arrays: ArrayObj[]
+  totalSize: number
+  count: number
+}
+
+interface ResultArrayItem {
+  readonly id: number
+  readonly name: string | readonly string[]
+  readonly length: number
+  readonly selfSize: number
+}
+
+interface ResultGroup {
+  readonly locationKey: string
+  readonly locationInfo: LocationInfo | null
+  readonly count: number
+  readonly totalSize: number
+  readonly avgSize: number
+  readonly totalLength: number
+  readonly avgLength: number
+  readonly arrays: readonly ResultArrayItem[]
+}
+
 export const getArraysByClosureLocationFromHeapSnapshotInternal = (
   strings,
   nodes,
@@ -36,42 +90,6 @@ export const getArraysByClosureLocationFromHeapSnapshotInternal = (
 
   // Get location field offsets
   const { itemsPerLocation, scriptIdOffset, lineOffset, columnOffset } = getLocationFieldOffsets(locationFields)
-
-  interface VariableName {
-    readonly name: string
-    readonly sourceType: string
-    readonly sourceName: string
-  }
-
-  interface LocationInfo {
-    readonly scriptId: number
-    readonly line: number
-    readonly column: number
-    readonly url: string
-    readonly sourceMapUrl: string
-  }
-
-  interface ArrayObj {
-    id: number
-    name: string
-    type: 'array'
-    selfSize: number
-    edgeCount: number
-    detachedness: number
-    nodeDataIndex: number
-    locationKey: string
-    locationInfo: LocationInfo | null
-    variableNames: VariableName[]
-    length: number
-  }
-
-  interface ClosureGroup {
-    locationKey: string
-    locationInfo: LocationInfo | null
-    arrays: ArrayObj[]
-    totalSize: number
-    count: number
-  }
 
   const arrayObjects: ArrayObj[] = []
   const arrayNodeMap = new Map<number, ArrayObj>() // nodeDataIndex -> array object
@@ -233,24 +251,6 @@ export const getArraysByClosureLocationFromHeapSnapshotInternal = (
   }
 
   // Convert closure location map to array and sort by potential memory leak indicators
-  interface ResultArrayItem {
-    readonly id: number
-    readonly name: string | string[]
-    readonly length: number
-    readonly selfSize: number
-  }
-
-  interface ResultGroup {
-    readonly locationKey: string
-    readonly locationInfo: LocationInfo | null
-    readonly count: number
-    readonly totalSize: number
-    readonly avgSize: number
-    readonly totalLength: number
-    readonly avgLength: number
-    readonly arrays: readonly ResultArrayItem[]
-  }
-
   const result: ResultGroup[] = Array.from(closureLocationMap.values())
     .map((closureGroup) => {
       // Calculate additional metrics for memory leak detection

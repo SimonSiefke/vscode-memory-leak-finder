@@ -3,6 +3,76 @@ import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 import * as ParseHeapSnapshotInternalEdges from '../ParseHeapSnapshotInternalEdges/ParseHeapSnapshotInternalEdges.ts'
 import * as ParseHeapSnapshotInternalNodes from '../ParseHeapSnapshotInternalNodes/ParseHeapSnapshotInternalNodes.ts'
 
+interface ParsedNode {
+  readonly id: number
+  readonly name: string
+  readonly type: string
+  readonly edgeCount: number
+}
+
+interface ParsedEdge {
+  readonly type: string
+  readonly nameOrIndex: string
+  readonly toNode: number
+}
+
+interface ChainEntry {
+  readonly nodeId: number
+  readonly nodeName: string
+  readonly nodeType: string
+}
+
+interface PrototypeProperty {
+  readonly prototypeName: string
+  readonly propertyName: string
+  readonly prototypeId: number
+}
+
+interface SuspiciousProperty {
+  readonly type: string
+  readonly message: string
+  readonly nodeId?: number
+  readonly propertyName?: string
+  readonly prototypeName?: string
+}
+
+interface ChainAnalysisResult {
+  readonly length: number
+  readonly chain: readonly ChainEntry[]
+  readonly prototypeProperties: readonly PrototypeProperty[]
+  readonly suspiciousProperties: readonly SuspiciousProperty[]
+}
+
+interface LongChainResult {
+  readonly nodeId: number
+  readonly nodeName: string
+  readonly nodeType: string
+  readonly chainLength: number
+  readonly prototypeChain: readonly ChainEntry[]
+  readonly suspiciousProperties: readonly SuspiciousProperty[]
+}
+
+interface PollutionCandidate {
+  readonly prototypeName: string
+  readonly propertyName: string
+  readonly affectedObjects: number[]
+  readonly isLikelyPollution: boolean
+}
+
+interface PollutionResult extends PollutionCandidate {
+  readonly affectedObjectCount: number
+  readonly severity: string
+}
+
+interface AnalysisStatistics {
+  readonly count: number
+  readonly average: number
+  readonly median: number
+  readonly max: number
+  readonly min: number
+  readonly percentile95: number
+}
+
 const MAX_EXPECTED_CHAIN_LENGTH = 10
 const PROTOTYPE_POLLUTION_THRESHOLD = 1000 // If this many objects share unusual properties
 
@@ -11,7 +81,13 @@ const PROTOTYPE_POLLUTION_THRESHOLD = 1000 // If this many objects share unusual
  * @param {string} id - Heap snapshot ID
  * @returns {Promise<Object>} Analysis results
  */
-export const getPrototypeChainAnalysisFromHeapSnapshot = async (id) => {
+export const getPrototypeChainAnalysisFromHeapSnapshot = async (id: number): Promise<{
+  longPrototypeChains: readonly LongChainResult[]
+  prototypePollution: readonly PollutionResult[]
+  prototypeStatistics: AnalysisStatistics
+  suspiciousPatterns: Record<string, unknown>
+  detailedResults: readonly ChainAnalysisResult[]
+}> => {
   const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
 
@@ -20,14 +96,14 @@ export const getPrototypeChainAnalysisFromHeapSnapshot = async (id) => {
   const { meta } = snapshot
   const { node_types, node_fields, edge_types, edge_fields } = meta
 
-  const parsedNodes = ParseHeapSnapshotInternalNodes.parseHeapSnapshotInternalNodes(nodes, node_fields, node_types[0], strings)
+  const parsedNodes = ParseHeapSnapshotInternalNodes.parseHeapSnapshotInternalNodes(nodes, node_fields, node_types[0], strings) as ParsedNode[]
   const parsedEdges = ParseHeapSnapshotInternalEdges.parseHeapSnapshotInternalEdges(
     edges,
     edge_fields,
     edge_types[0],
     node_fields.length,
     strings,
-  )
+  ) as ParsedEdge[]
 
   // Find all objects and their prototype chains
   const prototypeAnalysis = analyzePrototypeChains(parsedNodes, parsedEdges)
@@ -44,13 +120,13 @@ export const getPrototypeChainAnalysisFromHeapSnapshot = async (id) => {
 /**
  * Analyzes prototype chains for various issues
  */
-const analyzePrototypeChains = (parsedNodes, parsedEdges) => {
+const analyzePrototypeChains = (parsedNodes: readonly ParsedNode[], parsedEdges: readonly ParsedEdge[]) => {
   const nodeMap = createNodeMap(parsedNodes)
   const edgeMap = createEdgeMap(parsedNodes, parsedEdges)
-  const longChains = []
-  const pollutionCandidates = new Map()
-  const chainLengths = []
-  const detailedResults = [] // Store detailed info for each object
+  const longChains: LongChainResult[] = []
+  const pollutionCandidates = new Map<string, PollutionCandidate>()
+  const chainLengths: number[] = []
+  const detailedResults: ChainAnalysisResult[] = [] // Store detailed info for each object
 
   // Analyze each object's prototype chain
   // For performance, limit analysis to a sample of objects for very large heaps
@@ -68,14 +144,10 @@ const analyzePrototypeChains = (parsedNodes, parsedEdges) => {
 
     // Store detailed information for each object
     detailedResults.push({
-      nodeId: node.id,
-      nodeName: node.name,
-      nodeType: node.type,
-      prototypeChainLength: chainAnalysis.length,
-      prototypeChain: chainAnalysis.chain.map((p) => ({
-        nodeName: p.nodeName,
-        nodeType: p.nodeType,
-      })),
+      length: chainAnalysis.length,
+      chain: chainAnalysis.chain,
+      prototypeProperties: chainAnalysis.prototypeProperties,
+      suspiciousProperties: chainAnalysis.suspiciousProperties,
     })
 
     // Detect unusually long chains
@@ -101,7 +173,8 @@ const analyzePrototypeChains = (parsedNodes, parsedEdges) => {
           isLikelyPollution: false,
         })
       }
-      pollutionCandidates.get(key).affectedObjects.push(node.id)
+      const candidate = pollutionCandidates.get(key) as PollutionCandidate
+      candidate.affectedObjects.push(node.id)
     }
 
     // Break early if we've found enough long chains to avoid excessive processing
@@ -111,7 +184,7 @@ const analyzePrototypeChains = (parsedNodes, parsedEdges) => {
   }
 
   // Identify prototype pollution
-  const pollution = []
+  const pollution: PollutionResult[] = []
   for (const [_, candidate] of pollutionCandidates) {
     if (candidate.affectedObjects.length > PROTOTYPE_POLLUTION_THRESHOLD) {
       pollution.push({
@@ -138,13 +211,17 @@ const analyzePrototypeChains = (parsedNodes, parsedEdges) => {
 /**
  * Analyzes a single node's prototype chain
  */
-const analyzeNodePrototypeChain = (node, edgeMap, nodeMap) => {
-  const chain = []
-  const prototypeProperties = []
-  const suspiciousProperties = []
-  let currentNode = node
+const analyzeNodePrototypeChain = (
+  node: ParsedNode,
+  edgeMap: Map<number, readonly ParsedEdge[]>,
+  nodeMap: Map<number, ParsedNode>,
+): ChainAnalysisResult => {
+  const chain: ChainEntry[] = []
+  const prototypeProperties: PrototypeProperty[] = []
+  const suspiciousProperties: SuspiciousProperty[] = []
+  let currentNode: ParsedNode | undefined = node
   let chainLength = 0
-  const visited = new Set()
+  const visited = new Set<number>()
 
   while (currentNode && chainLength < 50) {
     // Prevent infinite loops
@@ -214,8 +291,8 @@ const analyzeNodePrototypeChain = (node, edgeMap, nodeMap) => {
 /**
  * Creates a map for quick node lookups
  */
-const createNodeMap = (parsedNodes) => {
-  const nodeMap = new Map()
+const createNodeMap = (parsedNodes: readonly ParsedNode[]): Map<number, ParsedNode> => {
+  const nodeMap = new Map<number, ParsedNode>()
   for (const node of parsedNodes) {
     nodeMap.set(node.id, node)
   }
@@ -225,8 +302,11 @@ const createNodeMap = (parsedNodes) => {
 /**
  * Creates a map of node IDs to their properly typed edges
  */
-const createEdgeMap = (parsedNodes, parsedEdges) => {
-  const edgeMap = new Map()
+const createEdgeMap = (
+  parsedNodes: readonly ParsedNode[],
+  parsedEdges: readonly ParsedEdge[],
+): Map<number, ParsedEdge[]> => {
+  const edgeMap = new Map<number, ParsedEdge[]>()
 
   // Initialize empty arrays for all nodes
   for (const node of parsedNodes) {
@@ -236,7 +316,7 @@ const createEdgeMap = (parsedNodes, parsedEdges) => {
   // Group edges by their source node
   let edgeIndex = 0
   for (const node of parsedNodes) {
-    const nodeEdges = []
+    const nodeEdges: ParsedEdge[] = []
     for (let i = 0; i < node.edgeCount; i++) {
       const edge = parsedEdges[edgeIndex++]
       if (edge) {
@@ -253,7 +333,7 @@ const createEdgeMap = (parsedNodes, parsedEdges) => {
  * Checks if a node is a JavaScript object that should have a prototype
  * Filters out V8 internal objects that don't have meaningful prototype chains
  */
-const isObjectWithPrototype = (node) => {
+const isObjectWithPrototype = (node: ParsedNode): boolean => {
   // Only analyze actual JavaScript objects
   if (node.type !== 'object') {
     return false
@@ -282,7 +362,7 @@ const isObjectWithPrototype = (node) => {
 /**
  * Identifies properties that shouldn't normally be on prototypes
  */
-const isUnusualPrototypeProperty = (propertyName) => {
+const isUnusualPrototypeProperty = (propertyName: string): boolean => {
   const normalProperties = new Set([
     'constructor',
     'toString',
@@ -327,12 +407,12 @@ const isUnusualPrototypeProperty = (propertyName) => {
 /**
  * Calculates statistics about prototype chain lengths
  */
-const calculateChainStatistics = (chainLengths) => {
+const calculateChainStatistics = (chainLengths: readonly number[]): AnalysisStatistics => {
   if (chainLengths.length === 0) {
-    return { average: 0, median: 0, max: 0, min: 0, count: 0 }
+    return { average: 0, median: 0, max: 0, min: 0, count: 0, percentile95: 0 }
   }
 
-  const sorted = chainLengths.sort((a, b) => a - b)
+  const sorted = [...chainLengths].sort((a, b) => a - b)
 
   // Avoid spread operator for large arrays - use reduce instead
   const max = chainLengths.reduce((max, current) => Math.max(max, current), 0)
@@ -351,7 +431,7 @@ const calculateChainStatistics = (chainLengths) => {
 /**
  * Calculates severity of prototype pollution
  */
-const calculatePollutionSeverity = (candidate) => {
+const calculatePollutionSeverity = (candidate: PollutionCandidate): string => {
   const count = candidate.affectedObjects.length
   const propertyName = candidate.propertyName.toLowerCase()
 
@@ -373,7 +453,10 @@ const calculatePollutionSeverity = (candidate) => {
 /**
  * Detects suspicious patterns in prototype chains
  */
-const detectSuspiciousPatterns = (longChains, pollution) => {
+const detectSuspiciousPatterns = (
+  longChains: readonly LongChainResult[],
+  pollution: readonly PollutionResult[],
+) => {
   const patterns = {
     deepInheritance: longChains.filter((chain) => chain.chainLength > 15),
     possibleFrameworkIssue: longChains.filter((chain) =>

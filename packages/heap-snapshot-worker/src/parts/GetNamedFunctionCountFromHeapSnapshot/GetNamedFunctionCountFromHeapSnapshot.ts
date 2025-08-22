@@ -5,6 +5,7 @@ import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 import { normalizeFunctionObjects } from '../NormalizeFunctionObjects/NormalizeFunctionObjects.ts'
 import { aggregateFunctionObjects } from '../AggregateFunctionObjects/AggregateFunctionObjects.ts'
 import type { AggregatedFunction } from '../AggregateFunctionObjects/AggregateFunctionObjects.ts'
+import type { FunctionObject } from '../NormalizeFunctionObjects/NormalizeFunctionObjects.ts'
 
 export const getNamedFunctionCountFromHeapSnapshot = async (
   id: number,
@@ -15,7 +16,7 @@ export const getNamedFunctionCountFromHeapSnapshot = async (
   Assert.object(heapsnapshot)
   const { parsedNodes, locations } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
   const functionsWithLocations = getFunctionsWithLocations(parsedNodes, locations, scriptMap)
-  const normalized = normalizeFunctionObjects(functionsWithLocations)
+  const normalized = normalizeFunctionObjects(functionsWithLocations as readonly FunctionObject[])
   const aggregated: readonly AggregatedFunction[] = aggregateFunctionObjects(normalized)
   const sorted: readonly AggregatedFunction[] = aggregated.toSorted((a, b) => b.count - a.count)
   const limited: readonly AggregatedFunction[] = sorted.filter((item) => item.count >= minCount)

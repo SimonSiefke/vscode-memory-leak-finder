@@ -1,3 +1,4 @@
+import type { FunctionObject } from '../NormalizeFunctionObjects/NormalizeFunctionObjects.ts'
 interface LocationLike {
   readonly objectIndex: number
   readonly scriptIdIndex: number
@@ -10,32 +11,25 @@ interface ScriptInfo {
   readonly sourceMapUrl?: string
 }
 
-interface FunctionWithLocation extends LocationLike {
-  readonly url: string
-  readonly sourceMapUrl: string
-  readonly name: string
-  readonly [key: string]: unknown
-}
-
 export const getFunctionsWithLocations = (
   parsedNodes: readonly unknown[],
   locations: readonly LocationLike[],
   scriptMap: Record<number, ScriptInfo>,
-): FunctionWithLocation[] => {
-  const functionsWithLocations: FunctionWithLocation[] = []
+): FunctionObject[] => {
+  const functionsWithLocations: FunctionObject[] = []
   for (const location of locations) {
     const script = scriptMap[location.scriptIdIndex]
     const url = script?.url || ''
     const sourceMapUrl = script?.sourceMapUrl || ''
     const node = parsedNodes[location.objectIndex] as Record<string, unknown>
-    const together: FunctionWithLocation = {
-      ...node,
-      ...location,
+    const item: FunctionObject = {
       url,
-      sourceMapUrl,
+      lineIndex: location.lineIndex,
+      columnIndex: location.columnIndex,
       name: typeof node.name === 'string' ? (node.name as string) : '',
+      sourceMapUrl: sourceMapUrl || null,
     }
-    functionsWithLocations.push(together)
+    functionsWithLocations.push(item)
   }
   return functionsWithLocations
 }

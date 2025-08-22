@@ -4,6 +4,18 @@ import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/Comput
  * @param {import('../Snapshot/Snapshot.ts').Snapshot} snapshot
  * @returns {Array}
  */
+interface VariableName { readonly name: string; readonly sourceType: string; readonly sourceName: string }
+interface BigintObject {
+  id: number
+  name: string
+  value: string
+  selfSize: number
+  edgeCount: number
+  detachedness: number
+  variableNames: VariableName[]
+  note: string
+}
+
 export const getBigintObjectsFromHeapSnapshotInternal = (snapshot) => {
   const { nodes, strings, edges, meta } = snapshot
   const { node_types, node_fields, edge_types, edge_fields } = meta
@@ -26,19 +38,6 @@ export const getBigintObjectsFromHeapSnapshotInternal = (snapshot) => {
 
   if (bigintTypeIndex === -1) {
     return []
-  }
-
-  // First pass: collect bigint objects
-  interface VariableName { readonly name: string; readonly sourceType: string; readonly sourceName: string }
-  interface BigintObject {
-    id: number
-    name: string
-    value: string
-    selfSize: number
-    edgeCount: number
-    detachedness: number
-    variableNames: VariableName[]
-    note: string
   }
 
   const bigintObjects: BigintObject[] = []
