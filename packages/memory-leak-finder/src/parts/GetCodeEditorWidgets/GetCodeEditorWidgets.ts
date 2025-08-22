@@ -1,10 +1,6 @@
+import type { Session } from '../Session/Session.ts'
 import * as GetConstructorInstances from '../GetConstructorInstances/GetConstructorInstances.ts'
 
-/**
- *
- * @param {any} session
- * @returns {Promise<any>}
- */
-export const getCodeEditorWidgets = async (session, objectGroup) => {
+export const getCodeEditorWidgets = async (session: Session, objectGroup: string): Promise<any> => {
   return GetConstructorInstances.getConstructorInstances(session, objectGroup, 'CodeEditorWidget')
 }

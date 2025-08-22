@@ -1,10 +1,7 @@
-import { VError } from '../VError/VError.ts'
 import * as Json from '../Json/Json.ts'
+import { VError } from '../VError/VError.ts'
 import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWebSocketToBeOpen.ts'
 
-/**
- * @param {string} wsUrl
- */
 export const createConnection = async (wsUrl: string): Promise<any> => {
   try {
     const webSocket = new WebSocket(wsUrl)
@@ -15,10 +12,6 @@ export const createConnection = async (wsUrl: string): Promise<any> => {
     })
     await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket as any)
     return {
-      /**
-       *
-       * @param {any} message
-       */
       send(message: any): void {
         webSocket.send(Json.stringify(message))
       },

@@ -1,13 +1,8 @@
+import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as GetRemoteObjectLength from '../GetRemoteObjectLength/GetRemoteObjectLength.ts'
 
-/**
- *
- * @param {any} session
- * @param {string} prototype
- * @returns {Promise<number>}
- */
-export const getObjectCount = async (session, prototype, objectGroup = undefined) => {
+export const getObjectCount = async (session: Session, prototype: string, objectGroup: string | undefined = undefined): Promise<number> => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: prototype,
     returnByValue: false,

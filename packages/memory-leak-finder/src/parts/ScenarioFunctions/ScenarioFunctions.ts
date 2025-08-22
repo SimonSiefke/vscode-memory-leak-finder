@@ -1,3 +1,6 @@
+import type { ExecutionContext } from '../ExecutionContextState/ExecutionContextState.ts'
+import type { Session } from '../SessionState/SessionState.ts'
+import type { DevToolsMessage } from '../Types/Types.ts'
 import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
 import {
   DevtoolsProtocolHeapProfiler,
@@ -13,9 +16,6 @@ import * as TargetState from '../TargetState/TargetState.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
 import { VError } from '../VError/VError.ts'
-import type { Session } from '../SessionState/SessionState.ts'
-import type { ExecutionContext } from '../ExecutionContextState/ExecutionContextState.ts'
-import type { DevToolsMessage } from '../Types/Types.ts'
 
 export const Locator = (selector: string): { selector: string } => {
   return {
@@ -260,6 +260,6 @@ export const waitForDevtoolsListening = async (stderr: NodeJS.ReadableStream): P
     stderr.on('data', handleData)
   })
   const devtoolsMatch = (devtoolsData as string).match(/DevTools listening on (ws:\/\/.*)/)
-  const devtoolsUrl = devtoolsMatch![1]
+  const devtoolsUrl = devtoolsMatch[1]
   return devtoolsUrl
 }

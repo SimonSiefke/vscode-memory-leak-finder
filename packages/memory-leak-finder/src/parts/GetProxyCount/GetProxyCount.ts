@@ -1,14 +1,10 @@
 import { VError } from '@lvce-editor/verror'
+import type { Session } from '../Session/Session.ts'
 import * as GetObjects from '../GetObjects/GetObjects.ts'
 import * as GetPropertyValues from '../GetPropertyValues/GetPropertyValues.ts'
 import * as IsProxy from '../IsProxy/IsProxy.ts'
 
-/**
- *
- * @param {any} session
- * @returns {Promise<number>}
- */
-export const getProxyCount = async (session, objectGroup) => {
+export const getProxyCount = async (session: Session, objectGroup: string): Promise<number> => {
   try {
     const objects = await GetObjects.getObjects(session, objectGroup)
     const values = await GetPropertyValues.getPropertyValues(session, objectGroup, objects.objectId)

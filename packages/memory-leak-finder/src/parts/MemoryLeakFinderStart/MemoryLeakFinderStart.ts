@@ -14,7 +14,7 @@ export const start = async (instanceId: string, electronTargetId: string): Promi
   const crashInfo = WaitForCrash.waitForCrash(electronTargetId)
   const resultPromise = doStart(instanceId)
   const intermediateResult = await Promise.race([crashInfo.promise, resultPromise])
-  if (intermediateResult && (intermediateResult as any).crashed) {
+  if (intermediateResult && (intermediateResult).crashed) {
     throw new Error('target crashed')
   }
   crashInfo.cleanup()

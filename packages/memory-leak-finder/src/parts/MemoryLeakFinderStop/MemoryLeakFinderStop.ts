@@ -15,7 +15,7 @@ export const stop = async (instanceId: string, electronTargetId: string): Promis
   const crashInfo = WaitForCrash.waitForCrash(electronTargetId)
   const resultPromise = doStop(instanceId)
   const intermediateResult = await Promise.race([crashInfo.promise, resultPromise])
-  if (intermediateResult && (intermediateResult as any).crashed) {
+  if (intermediateResult && (intermediateResult).crashed) {
     throw new Error('target crashed')
   }
   crashInfo.cleanup()

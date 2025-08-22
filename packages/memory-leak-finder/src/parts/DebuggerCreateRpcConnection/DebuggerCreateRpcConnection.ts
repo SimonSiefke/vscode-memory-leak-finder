@@ -1,10 +1,5 @@
 import * as ObjectType from '../ObjectType/ObjectType.ts'
 
-/**
- *
- * @param {any} ipc
- * @returns
- */
 export const createRpc = (ipc: any): any => {
   const callbacks = Object.create(null)
   const handleMessage = (message: any): void => {
