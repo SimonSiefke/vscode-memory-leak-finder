@@ -108,17 +108,25 @@ test('getAddedObjectsWithPropertiesInternalAst: detects newly added object with 
 
   const added = getAddedObjectsWithPropertiesInternalAst(beforeSnapshot, afterSnapshot, 'test', 1)
 
-  expect(Array.isArray(added)).toBe(true)
-  expect(added.length).toBe(1)
-  const obj = added[0]
-  expect(obj.type).toBe('object')
-  // depth=1 should include the property with its string value
-  const props = (obj as any).properties
-  expect(props).toBeDefined()
-  expect(props.length).toBe(1)
-  expect(props[0].name).toBe('test')
-  expect(props[0].value.type).toBe('string')
-  expect((props[0].value as any).value).toBe('world')
+  expect(added).toEqual([
+    {
+      id: 3,
+      name: '',
+      properties: [
+        {
+          id: 3,
+          name: 'test',
+          value: {
+            id: 4,
+            name: 'world',
+            type: 'string',
+            value: 'world',
+          },
+        },
+      ],
+      type: 'object',
+    },
+  ])
 })
 
 test('getAddedObjectsWithPropertiesInternalAst: respects depth (0)', () => {
@@ -191,11 +199,12 @@ test('getAddedObjectsWithPropertiesInternalAst: respects depth (0)', () => {
 
   const added = getAddedObjectsWithPropertiesInternalAst(beforeSnapshot, afterSnapshot, 'test', 0)
 
-  expect(added.length).toBe(1)
-  const obj = added[0]
-  expect(obj.type).toBe('object')
-  // depth=0 should not include properties
-  const props = (obj as any).properties
-  expect(props).toBeDefined()
-  expect(props.length).toBe(0)
+  expect(added).toEqual([
+    {
+      id: 3,
+      name: 'Object',
+      properties: [],
+      type: 'object',
+    },
+  ])
 })
