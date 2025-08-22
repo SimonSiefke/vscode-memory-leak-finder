@@ -10,9 +10,10 @@ interface ScriptInfo {
   readonly sourceMapUrl?: string
 }
 
-interface Combined extends LocationLike {
+interface FunctionWithLocation extends LocationLike {
   readonly url: string
   readonly sourceMapUrl: string
+  readonly name: string
   readonly [key: string]: unknown
 }
 
@@ -20,18 +21,19 @@ export const getFunctionsWithLocations = (
   parsedNodes: readonly unknown[],
   locations: readonly LocationLike[],
   scriptMap: Record<number, ScriptInfo>,
-): Combined[] => {
-  const functionsWithLocations: Combined[] = []
+): FunctionWithLocation[] => {
+  const functionsWithLocations: FunctionWithLocation[] = []
   for (const location of locations) {
     const script = scriptMap[location.scriptIdIndex]
     const url = script?.url || ''
     const sourceMapUrl = script?.sourceMapUrl || ''
-    const node = parsedNodes[location.objectIndex]
-    const together: Combined = {
-      ...(node as Record<string, unknown>),
+    const node = parsedNodes[location.objectIndex] as Record<string, unknown>
+    const together: FunctionWithLocation = {
+      ...node,
       ...location,
       url,
       sourceMapUrl,
+      name: typeof node.name === 'string' ? (node.name as string) : '',
     }
     functionsWithLocations.push(together)
   }

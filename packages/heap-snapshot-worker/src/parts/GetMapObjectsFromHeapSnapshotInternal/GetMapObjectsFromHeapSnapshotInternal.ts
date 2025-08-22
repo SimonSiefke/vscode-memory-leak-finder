@@ -31,8 +31,23 @@ export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
   }
 
   // First pass: collect Map objects
-  const mapObjects = []
-  const mapNodeMap = new Map() // nodeDataIndex -> map object
+  interface VariableName { readonly name: string; readonly sourceType: string; readonly sourceName: string }
+  interface MapObject {
+    id: number
+    name: string
+    type: 'map'
+    selfSize: number
+    edgeCount: number
+    detachedness: number
+    nodeDataIndex: number
+    variableNames: VariableName[]
+    keys: string[]
+    note: string
+    size?: string
+  }
+
+  const mapObjects: MapObject[] = []
+  const mapNodeMap = new Map<number, MapObject>() // nodeDataIndex -> map object
 
   for (let i = 0; i < nodes.length; i += ITEMS_PER_NODE) {
     const typeIndex = nodes[i + typeFieldIndex]
@@ -47,7 +62,7 @@ export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
         const edgeCount = nodes[i + edgeCountFieldIndex]
         const detachedness = nodes[i + detachednessFieldIndex]
 
-        const mapObj = {
+        const mapObj: MapObject = {
           id,
           name,
           type: 'map', // Only Map objects
@@ -55,8 +70,8 @@ export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
           edgeCount,
           detachedness,
           nodeDataIndex: i, // Store node data index for later use
-          variableNames: /** @type {Array<{name: string, sourceType: string, sourceName: string}>} */ [], // Will be populated by scanning edges
-          keys: /** @type {string[]} */ [], // Will be populated by extracting from table array
+          variableNames: [], // Will be populated by scanning edges
+          keys: [], // Will be populated by extracting from table array
           note: 'Map object found in heap snapshot',
         }
 
@@ -153,7 +168,7 @@ export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
       mapEdgeOffset += nodes[nodeIndex + edgeCountFieldIndex]
     }
 
-    let tableArrayNodeIndex = null
+    let tableArrayNodeIndex: number | null = null
 
     // Look for the "table" internal edge
     for (let j = 0; j < mapObj.edgeCount; j++) {
@@ -190,7 +205,8 @@ export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
 
     // For now, let's use a heuristic: collect unique string values and known large numbers
     // that are likely to be keys rather than common small values
-    const extractedValues = []
+    interface ExtractedValue { readonly value: string; readonly type: 'string' | 'number'; readonly isLikelyKey: boolean }
+    const extractedValues: ExtractedValue[] = []
     const actualKeyEdges = Math.max(0, tableEdgeCount - 1)
 
     for (let j = 0; j < actualKeyEdges; j++) {
@@ -250,7 +266,7 @@ export const getMapObjectsFromHeapSnapshotInternal = (snapshot) => {
   return namedMapObjects
     .map((obj) => {
       const names = obj.variableNames.map((v) => v.name)
-      let nameField
+      let nameField: string | string[]
 
       if (names.length === 1) {
         nameField = names[0]

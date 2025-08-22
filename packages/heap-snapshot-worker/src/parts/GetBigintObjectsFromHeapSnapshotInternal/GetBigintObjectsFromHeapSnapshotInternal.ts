@@ -29,8 +29,20 @@ export const getBigintObjectsFromHeapSnapshotInternal = (snapshot) => {
   }
 
   // First pass: collect bigint objects
-  const bigintObjects = []
-  const bigintNodeMap = new Map() // nodeDataIndex -> bigint object
+  interface VariableName { readonly name: string; readonly sourceType: string; readonly sourceName: string }
+  interface BigintObject {
+    id: number
+    name: string
+    value: string
+    selfSize: number
+    edgeCount: number
+    detachedness: number
+    variableNames: VariableName[]
+    note: string
+  }
+
+  const bigintObjects: BigintObject[] = []
+  const bigintNodeMap = new Map<number, BigintObject>() // nodeDataIndex -> bigint object
 
   for (let i = 0; i < nodes.length; i += ITEMS_PER_NODE) {
     const typeIndex = nodes[i + typeFieldIndex]
@@ -42,7 +54,7 @@ export const getBigintObjectsFromHeapSnapshotInternal = (snapshot) => {
       const edgeCount = nodes[i + edgeCountFieldIndex]
       const detachedness = nodes[i + detachednessFieldIndex]
 
-      const bigintObj = {
+      const bigintObj: BigintObject = {
         id,
         name,
         value: name, // This will be "bigint" - the type identifier
