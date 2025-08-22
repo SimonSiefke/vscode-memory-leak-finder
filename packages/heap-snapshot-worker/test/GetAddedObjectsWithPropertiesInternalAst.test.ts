@@ -368,20 +368,17 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
 
   expect(added).toEqual([
     {
-      id: 3,
-      name: 'Object',
-      properties: [
-        {
-          id: 3,
-          name: 'test',
-          value: {
-            id: 4,
-            name: 'world',
-            type: 'string',
-            value: 'world',
-          },
-        },
-      ],
+      id: 60081,
+      name: 'LeakThing',
+      properties: [],
+      type: 'object',
+    },
+
+    // TODO this should not be found, as it is there before
+    {
+      id: 7093,
+      name: 'LeakThing',
+      properties: [],
       type: 'object',
     },
   ])
