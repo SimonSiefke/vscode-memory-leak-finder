@@ -129,9 +129,10 @@ const getIds = (snapshot: Snapshot, indices: Uint32Array): Uint32Array => {
 
 const getAddedIndices = (indices: Uint32Array, ids: Uint32Array, idsOther: Uint32Array): Uint32Array => {
   const added: number[] = []
+  const set = new Set(idsOther)
   for (let i = 0; i < indices.length; i++) {
     const id = ids[i]
-    if (!idsOther.includes(id)) {
+    if (!set.has(id)) {
       added.push(indices[i])
     }
   }
@@ -180,7 +181,7 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   // console.log({ leakedSorted })
 
   const formatted = formatComparison(before, after, leakedSorted)
-  console.log({ formatted })
+  // console.log({ formatted })
 
   // const edgeMap = createEdgeMap(before.nodes, before.meta.node_fields)
   // const nodeFieldCount = before.meta.node_fields.length
