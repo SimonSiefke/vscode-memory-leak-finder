@@ -209,7 +209,7 @@ test('getAddedObjectsWithPropertiesInternalAst: respects depth (0)', () => {
   ])
 })
 
-test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based on prototype', () => {
+test('getAddedObjectsWithPropertiesInternalAst: detects added object based on prototype', () => {
   // Before:
   //   LeakThing 1 -> 7093
   //     map -> 58817 -> 58819
@@ -287,7 +287,25 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
       3, 13,  0, // code
       3,  7,  0, // map
     ]),
-    strings: ['gc roots',  'LeakThing', 'system / Map', 'Object', 'leakingMethod'],
+    // align string indices with edge name_or_index references used above
+    strings: [
+      'gc roots',
+      'LeakThing',
+      'system / Map',
+      'Object',
+      'leakingMethod',
+      '__proto__',
+      'prototype',
+      'map',
+      'constructor',
+      'properties',
+      'feedback_cell',
+      'shared',
+      'context',
+      'code',
+      'dependent_code',
+      'other',
+    ],
     locations: new Uint32Array([]),
   }
 
