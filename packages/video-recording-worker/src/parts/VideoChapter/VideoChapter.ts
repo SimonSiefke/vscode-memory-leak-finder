@@ -8,7 +8,7 @@ export const state: State = {
   chapters: [],
 }
 
-export const addChapter = (name, time) => {
+export const addChapter = (name: string, time: number): void => {
   Assert.string(name)
   Assert.number(time)
   state.chapters.push({

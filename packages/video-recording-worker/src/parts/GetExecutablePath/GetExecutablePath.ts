@@ -2,9 +2,10 @@
 import * as ExecutablePaths from '../ExecutablePaths/ExecutablePaths.ts'
 import * as GetExecutablePathKey from '../GetExecutablePathKey/GetExecutablePathKey.ts'
 
-export const getExecutablePath = (name) => {
+export const getExecutablePath = (name: 'ffmpeg'): string => {
   const osPaths = ExecutablePaths[name]
   const key = GetExecutablePathKey.getExecutablePathKey(process.platform)
+  // @ts-ignore
   const osPath = osPaths[key]
   return osPath
 }

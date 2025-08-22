@@ -9,18 +9,14 @@ export const createConnection = async (wsUrl: string): Promise<any> => {
     // @ts-ignore
     await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket)
     return {
-      /**
-       *
-       * @param {any} message
-       */
-      send(message) {
+      send(message: any) {
         webSocket.send(Json.stringify(message))
       },
       get onmessage() {
         return webSocket.onmessage
       },
       set onmessage(listener) {
-        const handleMessage = (event) => {
+        const handleMessage = (event: any) => {
           const parsed = JSON.parse(event.data)
           // @ts-ignore
           listener(parsed)
