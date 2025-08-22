@@ -1,6 +1,6 @@
-import * as Settings from '../Settings/Settings.ts'
-import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
+import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as Settings from '../Settings/Settings.ts'
 
 export const create = ({ expect, page, VError }) => {
   return {

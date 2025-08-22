@@ -2,28 +2,17 @@
   "name": "@vscode-memory-leak-finder/cli",
   "version": "0.0.0-dev",
   "description": "",
-  "main": "src/main.js",
+  "keywords": [],
+  "license": "MIT",
+  "author": "",
   "type": "module",
+  "main": "src/main.js",
   "bin": {
     "test-electron": "./bin/test.js"
   },
   "scripts": {
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
-  "dependencies": {
-    "@lvce-editor/assert": "^1.4.0",
-    "@lvce-editor/rpc": "^4.14.0",
-    "@lvce-editor/verror": "^1.7.0",
-    "ansi-escapes": "^7.0.0",
-    "chalk": "^5.6.0"
-  },
-  "devDependencies": {
-    "@types/babel__code-frame": "^7.0.6",
-    "@types/node": "^24.3.0"
   },
   "xo": {
     "rules": {
@@ -71,5 +60,14 @@
     "ignores": [
       "distmin"
     ]
+  },
+  "dependencies": {
+    "@lvce-editor/assert": "^1.4.0",
+    "@lvce-editor/rpc": "^4.14.0",
+    "@lvce-editor/verror": "^1.7.0",
+    "chalk": "^5.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0"
   }
 }

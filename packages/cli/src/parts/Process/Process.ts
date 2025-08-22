@@ -4,9 +4,9 @@ export const exit = (exitCode) => {
   NodeProcess.exit(exitCode)
 }
 
-export const stdin = NodeProcess.stdin
+export const {stdin} = NodeProcess
 
-export const stdout = NodeProcess.stdout
+export const {stdout} = NodeProcess
 
 export const stderr = NodeProcess.stdout
 

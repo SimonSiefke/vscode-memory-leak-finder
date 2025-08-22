@@ -1,9 +1,4 @@
-import chalk from 'chalk'
-import * as FormatDuration from '../FormatDuration/FormatDuration.ts'
-
-const SKIP_TEXT = ' SKIP '
-
-const SKIP = chalk.reset.inverse.bold.yellow(SKIP_TEXT)
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
 export const getHandleTestSkippedMessage = async (
   file: string,
@@ -11,8 +6,5 @@ export const getHandleTestSkippedMessage = async (
   fileName: string,
   duration: number,
 ): Promise<string> => {
-  const messageRelativeDirName = chalk.dim(relativeDirName + '/')
-  const messageFileName = chalk.bold(fileName)
-  const messageDuration = FormatDuration.formatDuration(duration)
-  return `${SKIP} ${messageRelativeDirName}${messageFileName} ${messageDuration}\n`
+  return StdoutWorker.invoke('Stdout.getHandleTestSkippedMessage', file, relativeDirName, fileName, duration)
 }

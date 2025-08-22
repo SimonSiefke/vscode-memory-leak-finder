@@ -1,11 +1,26 @@
 import { expect, test } from '@jest/globals'
-import * as CliKeys from '../src/parts/CliKeys/CliKeys.ts'
+import { MockRpc } from '@lvce-editor/rpc'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
-import * as ModeType from '../src/parts/ModeType/ModeType.ts'
-import * as HandleStdinDataInterruptedMode from '../src/parts/HandleStdinDataInterruptedMode/HandleStdinDataInterruptedMode.ts'
+import * as CliKeys from '../src/parts/CliKeys/CliKeys.ts'
 import { createDefaultState } from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
+import * as HandleStdinDataInterruptedMode from '../src/parts/HandleStdinDataInterruptedMode/HandleStdinDataInterruptedMode.ts'
+import * as ModeType from '../src/parts/ModeType/ModeType.ts'
+import * as StdoutWorker from '../src/parts/StdoutWorker/StdoutWorker.ts'
 
-// no mocks required
+const mockRpc = MockRpc.create({
+  commandMap: {},
+  invoke: (method: string) => {
+    if (method === 'Stdout.getClear') {
+      return '\u001B[2J\u001B[3J\u001B[H'
+    }
+    if (method === 'Stdout.getPatternUsageMessage') {
+      return '\n\u001B[1mPattern Mode Usage\u001B[22m\n \u001B[2m› Press\u001B[22m Esc \u001B[2mto exit pattern mode.\u001B[22m\n \u001B[2m› Press\u001B[22m Enter \u001B[2mto filter by a regex pattern.\u001B[22m\n\n\u001B[2m pattern ›\u001B[22m '
+    }
+    throw new Error(`unexpected method ${method}`)
+  },
+})
+
+StdoutWorker.set(mockRpc)
 
 test('HandleStdinDataInterruptedMode - watch mode key', async () => {
   const state = {

@@ -1,5 +1,5 @@
 import * as NodeProcess from 'node:process'
 
-export const stdin: NodeJS.ReadStream = NodeProcess.stdin
+export const { stdin } = NodeProcess
 
-export const stdout: NodeJS.WriteStream = NodeProcess.stdout
+export const { stdout } = NodeProcess

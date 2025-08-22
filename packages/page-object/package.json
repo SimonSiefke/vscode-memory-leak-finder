@@ -2,15 +2,12 @@
   "name": "@vscode-memory-leak-finder/page-object",
   "version": "0.0.0-dev",
   "description": "",
-  "type": "module",
-  "main": "src/main.js",
-  "scripts": {},
   "keywords": [],
-  "author": "",
   "license": "MIT",
-  "dependencies": {
-    "execa": "^9.6.0"
-  },
+  "author": "",
+  "type": "module",
+  "main": "src/main.ts",
+  "scripts": {},
   "xo": {
     "rules": {
       "unicorn/filename-case": "off",
@@ -57,5 +54,8 @@
     "ignores": [
       "distmin"
     ]
+  },
+  "dependencies": {
+    "execa": "^9.6.0"
   }
 }

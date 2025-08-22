@@ -1,6 +1,7 @@
 # playground
 benchmark-results
 .vscode-sources
+.vscode-script-maps
 .vscode-node-modules
 .vscode-node-modules-cache
 .vscode-repos
@@ -23,6 +24,7 @@ ffmpeg-linux
 .vscode-source-maps
 .vscode-resolve-source-map-cache
 .vscode-charts
+.tmp
 
 # Logs
 logs

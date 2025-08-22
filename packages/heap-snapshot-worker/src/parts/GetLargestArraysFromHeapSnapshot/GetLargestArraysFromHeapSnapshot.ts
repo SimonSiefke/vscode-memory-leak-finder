@@ -4,11 +4,28 @@ import * as CreateNameMap from '../CreateNameMap/CreateNameMap.ts'
 import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 
-const isArray = (node) => {
+interface GraphEdge {
+  name: string
+  index: number
+}
+interface Graph {
+  [nodeId: number]: GraphEdge[]
+}
+interface ParsedNode {
+  id: number
+  type: string
+  name: string
+}
+interface ArrayWithCount {
+  id: number
+  count: number
+}
+
+const isArray = (node: ParsedNode): boolean => {
   return node.type === 'object' && node.name === 'Array'
 }
 
-const getElementCount = (parsedNodes, graph, id) => {
+const getElementCount = (parsedNodes: readonly ParsedNode[], graph: Graph, id: number): number => {
   Assert.array(parsedNodes)
   Assert.object(graph)
   Assert.number(id)
@@ -22,8 +39,8 @@ const getElementCount = (parsedNodes, graph, id) => {
   return elementsEdges.length
 }
 
-const getArraysWithCount = (parsedNodes, graph, arrayNodes) => {
-  const withCount = []
+const getArraysWithCount = (parsedNodes: readonly ParsedNode[], graph: Graph, arrayNodes: readonly ParsedNode[]): ArrayWithCount[] => {
+  const withCount: ArrayWithCount[] = []
   for (const arrayNode of arrayNodes) {
     const count = getElementCount(parsedNodes, graph, arrayNode.id)
     withCount.push({
@@ -34,20 +51,31 @@ const getArraysWithCount = (parsedNodes, graph, arrayNodes) => {
   return withCount
 }
 
-const compareCount = (a, b) => {
+const compareCount = (a: ArrayWithCount, b: ArrayWithCount): number => {
   return b.count - a.count
 }
 
-const sortByLength = (arraysWithLength) => {
+const sortByLength = (arraysWithLength: readonly ArrayWithCount[]): ArrayWithCount[] => {
   return Arrays.toSorted(arraysWithLength, compareCount)
 }
 
-const filterByMinLength = (arrays, minLength) => {
+const filterByMinLength = (arrays: readonly ArrayWithCount[], minLength: number): ArrayWithCount[] => {
   return arrays.filter((array) => array.count >= minLength)
 }
 
-const addNames = (items, nameMap) => {
-  const withNames = []
+interface NameMapEntry {
+  edgeName: string | undefined
+  nodeName: string | undefined
+}
+interface NameMap {
+  [id: number]: NameMapEntry
+}
+export interface ArrayWithCountAndName extends ArrayWithCount {
+  name: string | undefined
+}
+
+const addNames = (items: readonly ArrayWithCount[], nameMap: NameMap): ArrayWithCountAndName[] => {
+  const withNames: ArrayWithCountAndName[] = []
   for (const item of items) {
     const nameObject = nameMap[item.id]
     withNames.push({
@@ -58,7 +86,7 @@ const addNames = (items, nameMap) => {
   return withNames
 }
 
-export const getLargestArraysFromHeapSnapshot = async (id) => {
+export const getLargestArraysFromHeapSnapshot = async (id: number): Promise<ArrayWithCountAndName[]> => {
   const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
   const minLength = 1

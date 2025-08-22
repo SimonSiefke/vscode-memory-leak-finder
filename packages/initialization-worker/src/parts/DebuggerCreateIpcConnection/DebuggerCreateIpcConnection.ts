@@ -1,5 +1,5 @@
-import { VError } from '../VError/VError.ts'
 import * as Json from '../Json/Json.ts'
+import { VError } from '../VError/VError.ts'
 import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWebSocketToBeOpen.ts'
 
 /**

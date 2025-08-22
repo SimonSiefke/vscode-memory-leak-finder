@@ -9,7 +9,7 @@ export const create = ({ expect, page, VError }) => {
         await nameElement.click()
         await expect(nameRow).toHaveAttribute('aria-expanded', 'true')
         const indexString = await nameRow.getAttribute('data-index')
-        const index = parseInt(indexString)
+        const index = Number.parseInt(indexString)
         for (let i = 0; i < childProperties.length; i++) {
           const nextIndex = index + i + 1
           const row = hoverTree.locator(`.monaco-list-row[data-index="${nextIndex}"]`)

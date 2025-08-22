@@ -1,6 +1,6 @@
+import * as Env from '../Env/Env.ts'
 import { join } from '../Path/Path.ts'
 import * as Root from '../Root/Root.ts'
-import * as Env from '../Env/Env.ts'
 
 export const getVscodeRuntimeDir = () => {
   if (Env.env.GITPOD_INSTANCE_ID) {

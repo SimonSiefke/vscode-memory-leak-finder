@@ -5,7 +5,17 @@ const RE_STARTING_INSPECTOR_FAILED = /Starting inspector on .* failed/s
 const RE_LISTENING_ON = /Debugger listening on (.*)/
 const RE_YARN_NOT_INSTALLED = /spawn yarn ENOENT/
 
-const errorChecker = (data) => {
+const isIgnoredError = (data: string): boolean => {
+  if (data.includes('This will stop working in the next major version of npm.')) {
+    return true
+  }
+  return false
+}
+
+const errorChecker = (data: string) => {
+  if (isIgnoredError(data)) {
+    return
+  }
   if (RE_STARTING_INSPECTOR_FAILED.test(data)) {
     throw new Error(data.trim())
   }

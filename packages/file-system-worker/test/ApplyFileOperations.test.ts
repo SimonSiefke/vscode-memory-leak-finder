@@ -43,7 +43,7 @@ test('applyFileOperations - applies copy operation', async () => {
 
   await applyFileOperationsModule.applyFileOperations(operations)
 
-  expect(mockCopy).toHaveBeenCalledWith('/source/file.txt', '/dest/file.txt')
+  expect(mockCopy).toHaveBeenCalledWith('/source/file.txt', '/dest/file.txt', { recursive: true })
   expect(mockCopy).toHaveBeenCalledTimes(1)
 })
 
@@ -59,7 +59,7 @@ test('applyFileOperations - applies mkdir operation', async () => {
 
   await applyFileOperationsModule.applyFileOperations(operations)
 
-  expect(mockMakeDirectory).toHaveBeenCalledWith('/path/to/directory')
+  expect(mockMakeDirectory).toHaveBeenCalledWith('/path/to/directory', { recursive: true })
   expect(mockMakeDirectory).toHaveBeenCalledTimes(1)
 })
 
@@ -75,7 +75,7 @@ test('applyFileOperations - applies remove operation', async () => {
 
   await applyFileOperationsModule.applyFileOperations(operations)
 
-  expect(mockRemove).toHaveBeenCalledWith('/path/to/file.txt')
+  expect(mockRemove).toHaveBeenCalledWith('/path/to/file.txt', { recursive: true })
   expect(mockRemove).toHaveBeenCalledTimes(1)
 })
 
@@ -102,9 +102,9 @@ test('applyFileOperations - applies multiple operations in sequence', async () =
 
   await applyFileOperationsModule.applyFileOperations(operations)
 
-  expect(mockMakeDirectory).toHaveBeenCalledWith('/path/to/directory')
-  expect(mockCopy).toHaveBeenCalledWith('/source/file.txt', '/dest/file.txt')
-  expect(mockRemove).toHaveBeenCalledWith('/old/file.txt')
+  expect(mockMakeDirectory).toHaveBeenCalledWith('/path/to/directory', { recursive: true })
+  expect(mockCopy).toHaveBeenCalledWith('/source/file.txt', '/dest/file.txt', { recursive: true })
+  expect(mockRemove).toHaveBeenCalledWith('/old/file.txt', { recursive: true })
 
   expect(mockMakeDirectory).toHaveBeenCalledTimes(1)
   expect(mockCopy).toHaveBeenCalledTimes(1)
@@ -204,8 +204,8 @@ test('applyFileOperations - handles multiple copy operations', async () => {
 
   await applyFileOperationsModule.applyFileOperations(operations)
 
-  expect(mockCopy).toHaveBeenCalledWith('/source1/file1.txt', '/dest1/file1.txt')
-  expect(mockCopy).toHaveBeenCalledWith('/source2/file2.txt', '/dest2/file2.txt')
+  expect(mockCopy).toHaveBeenCalledWith('/source1/file1.txt', '/dest1/file1.txt', { recursive: true })
+  expect(mockCopy).toHaveBeenCalledWith('/source2/file2.txt', '/dest2/file2.txt', { recursive: true })
   expect(mockCopy).toHaveBeenCalledTimes(2)
 })
 
@@ -225,8 +225,8 @@ test('applyFileOperations - handles multiple mkdir operations', async () => {
 
   await applyFileOperationsModule.applyFileOperations(operations)
 
-  expect(mockMakeDirectory).toHaveBeenCalledWith('/path1/directory1')
-  expect(mockMakeDirectory).toHaveBeenCalledWith('/path2/directory2')
+  expect(mockMakeDirectory).toHaveBeenCalledWith('/path1/directory1', { recursive: true })
+  expect(mockMakeDirectory).toHaveBeenCalledWith('/path2/directory2', { recursive: true })
   expect(mockMakeDirectory).toHaveBeenCalledTimes(2)
 })
 
@@ -246,8 +246,8 @@ test('applyFileOperations - handles multiple remove operations', async () => {
 
   await applyFileOperationsModule.applyFileOperations(operations)
 
-  expect(mockRemove).toHaveBeenCalledWith('/path1/file1.txt')
-  expect(mockRemove).toHaveBeenCalledWith('/path2/file2.txt')
+  expect(mockRemove).toHaveBeenCalledWith('/path1/file1.txt', { recursive: true })
+  expect(mockRemove).toHaveBeenCalledWith('/path2/file2.txt', { recursive: true })
   expect(mockRemove).toHaveBeenCalledTimes(2)
 })
 

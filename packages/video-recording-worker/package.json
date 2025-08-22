@@ -2,8 +2,11 @@
   "name": "@vscode-memory-leak-finder/video-recording-worker",
   "version": "0.0.0-dev",
   "description": "",
-  "main": "src/main.js",
+  "keywords": [],
+  "license": "MIT",
+  "author": "",
   "type": "module",
+  "main": "src/main.js",
   "bin": {
     "video-recording-worker": "bin/video-recording-worker.js"
   },
@@ -11,14 +14,13 @@
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
   },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
   "dependencies": {
     "@lvce-editor/assert": "^1.4.0",
     "@lvce-editor/rpc": "^4.14.0",
     "@lvce-editor/verror": "^1.7.0",
     "execa": "^9.6.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/node": "^24.3.0"
+  }
 }

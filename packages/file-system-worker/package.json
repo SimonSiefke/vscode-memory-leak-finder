@@ -7,12 +7,6 @@
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
   },
-  "dependencies": {
-    "@lvce-editor/rpc": "^4.14.0",
-    "@lvce-editor/verror": "^1.7.0",
-    "execa": "^9.6.0",
-    "path-exists": "^5.0.0"
-  },
   "jest": {
     "extensionsToTreatAsEsm": [
       ".ts"
@@ -39,7 +33,11 @@
       }
     }
   },
-  "devDependencies": {
-    "ts-jest": "^29.4.1"
-  }
+  "dependencies": {
+    "@lvce-editor/rpc": "^4.14.0",
+    "@lvce-editor/verror": "^1.7.0",
+    "execa": "^9.6.0",
+    "path-exists": "^5.0.0"
+  },
+  "devDependencies": {}
 }
