@@ -16,6 +16,7 @@ const removePropertiesMaybe = (asts: readonly ObjectNode[], includeProperties: b
 interface ObjectNodeExtended extends ObjectNode {
   readonly count: number
   readonly ids: readonly number[]
+  readonly location?: string
 }
 
 interface CountMapItem {
@@ -31,7 +32,6 @@ const collapseAstsMaybe = (asts: readonly ObjectNode[], collapse: boolean): read
   const map: Record<string, CountMapItem> = Object.create(null)
   for (const item of asts) {
     const hash = signatureFor(item, depth)
-    console.log({ item, hash })
     map[hash] ||= { count: 0, ids: [] }
     map[hash].count++
     map[hash].ids.push(item.id)
@@ -57,8 +57,30 @@ const collapseAstsMaybe = (asts: readonly ObjectNode[], collapse: boolean): read
   return sorted
 }
 
-export const formatAsts = (asts: readonly ObjectNode[], includeProperties: boolean, collapse: boolean): readonly ObjectNode[] => {
+const addLocationStringMaybe = (asts: readonly ObjectNode[], outputLocations: boolean): readonly ObjectNode[] => {
+  if (!outputLocations) {
+    return asts
+  }
+  return asts.map((item) => {
+    const loc = (item as any).closureLocations?.[0]
+    if (loc && typeof loc.scriptId === 'number' && typeof loc.line === 'number' && typeof loc.column === 'number') {
+      return {
+        ...item,
+        location: `${loc.scriptId}:${loc.line}:${loc.column}`,
+      } as any
+    }
+    return item
+  })
+}
+
+export const formatAsts = (
+  asts: readonly ObjectNode[],
+  includeProperties: boolean,
+  collapse: boolean,
+  outputLocations: boolean = false,
+): readonly ObjectNode[] => {
   const result1 = removePropertiesMaybe(asts, includeProperties)
-  const result2 = collapseAstsMaybe(result1, collapse)
-  return result2
+  const result2 = addLocationStringMaybe(result1, outputLocations)
+  const result3 = collapseAstsMaybe(result2, collapse)
+  return result3
 }

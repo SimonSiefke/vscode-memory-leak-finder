@@ -4,6 +4,7 @@ import { getAsts } from '../GetAsts/GetAsts.ts'
 import { getObjectWithPropertyNodeIndices3 } from '../GetObjectWithPropertyNodeIndices3/GetObjectWithPropertyNodeIndices3.ts'
 import { signatureFor } from '../SignatureForAstNode/SignatureForAstNode.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
+import { addLocationsToAstNodes } from '../AddLocationsToAstNodes/AddLocationsToAstNodes.ts'
 
 const getIds = (snapshot: Snapshot, indices: Uint32Array): Uint32Array => {
   const nodes = snapshot.nodes
@@ -61,6 +62,7 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   depth: number = 1,
   includeProperties: boolean = true,
   collapseNodes: boolean = false,
+  outputLocations: boolean = false,
 ): readonly AstNode[] => {
   const indicesBefore = getObjectWithPropertyNodeIndices3(before, propertyName)
   const indicesAfter = getObjectWithPropertyNodeIndices3(after, propertyName)
@@ -77,8 +79,12 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   const signaturesBefore = getSignatures(astBefore, depth)
   const signaturesAfter = getSignatures(astAfter, depth)
 
-  const uniqueAfter = getUniqueAfter(astBefore, astAfter, signaturesBefore, signaturesAfter)
+  let uniqueAfter = getUniqueAfter(astBefore, astAfter, signaturesBefore, signaturesAfter)
 
-  const formatted = formatAsts(uniqueAfter, includeProperties, collapseNodes)
+  if (outputLocations) {
+    uniqueAfter = addLocationsToAstNodes(after, uniqueAfter) as readonly ObjectNode[]
+  }
+
+  const formatted = formatAsts(uniqueAfter, includeProperties, collapseNodes, outputLocations)
   return formatted
 }
