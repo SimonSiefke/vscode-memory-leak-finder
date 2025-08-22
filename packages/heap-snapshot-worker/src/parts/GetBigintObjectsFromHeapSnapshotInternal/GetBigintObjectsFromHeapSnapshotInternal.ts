@@ -4,7 +4,11 @@ import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/Comput
  * @param {import('../Snapshot/Snapshot.ts').Snapshot} snapshot
  * @returns {Array}
  */
-export interface VariableName { readonly name: string; readonly sourceType: string; readonly sourceName: string }
+export interface VariableName {
+  readonly name: string
+  readonly sourceType: string
+  readonly sourceName: string
+}
 export interface BigintObject {
   id: number
   name: string
