@@ -1,6 +1,7 @@
 # playground
 benchmark-results
 .vscode-sources
+.vscode-script-maps
 .vscode-node-modules
 .vscode-node-modules-cache
 .vscode-repos
