@@ -111,7 +111,7 @@ test('getAddedObjectsWithPropertiesInternalAst: detects newly added object with 
   expect(added).toEqual([
     {
       id: 3,
-      name: '',
+      name: 'Object',
       properties: [
         {
           id: 3,
