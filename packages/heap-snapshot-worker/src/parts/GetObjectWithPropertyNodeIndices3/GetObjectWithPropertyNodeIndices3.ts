@@ -42,26 +42,6 @@ export const getObjectWithPropertyNodeIndices3 = (snapshot: Snapshot, propertyNa
 
   const result: number[] = []
 
-  // const specialNodeIds = [
-  //   7093, // instance before
-  //   60081, // instance after
-
-  //   58817, // map,
-
-  //   58819, // prototype
-  //   59725, // function
-  // ]
-
-  // TODO
-  // for each node
-  // for each property
-  //   if it matches the property name, add it to the list
-  //   if the propertyname is of type map, visit the map
-  //     for all properties of the map
-  //       if the property name is prototype, visit it
-  //
-  // check if has a direct property with that name
-
   for (let nodeOffset = 0; nodeOffset < nodes.length; nodeOffset += ITEMS_PER_NODE_LOCAL) {
     if (
       nodes[nodeOffset + nodeTypeIndex] === nodeTypeObject &&
