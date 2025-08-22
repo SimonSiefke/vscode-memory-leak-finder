@@ -47,7 +47,7 @@ export const finalizeChapters = async () => {
     cwd: folderName,
   })
   const previousMetaData = await readFile(join(folderName, 'meta.ffmeta'))
-  const chapters = VideoChapter.state.chapters
+  const { chapters } = VideoChapter.state
   const data = getChaptersData(previousMetaData, chapters)
   const metaDataPath = join(folderName, 'metadata.txt')
   const metaDataArgs = getMetaDataOutputOptions(baseName)

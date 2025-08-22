@@ -75,7 +75,7 @@ export const waitForTarget = async ({ type, index }) => {
       reject,
     })
     return await PTimeout.pTimeout(promise, { milliseconds: TimeoutConstants.Target })
-  } catch (error) {
+  } catch {
     throw new VError(`Target was not created ${type}`)
   }
 }
