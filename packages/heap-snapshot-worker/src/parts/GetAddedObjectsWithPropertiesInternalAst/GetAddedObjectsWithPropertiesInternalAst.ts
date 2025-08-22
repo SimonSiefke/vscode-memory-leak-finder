@@ -62,32 +62,81 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   includeProperties: boolean = true,
   collapseNodes: boolean = false,
 ): readonly AstNode[] => {
-  console.time('indicies')
+  console.time('indices')
   const indicesBefore = getObjectWithPropertyNodeIndices3(before, propertyName)
   const indicesAfter = getObjectWithPropertyNodeIndices3(after, propertyName)
-  console.timeEnd('indicies')
+  console.timeEnd('indices')
 
-  console.time('ids')
-  const idsBefore = getIds(before, indicesBefore)
-  const idsAfter = getIds(after, indicesAfter)
-  console.timeEnd('ids')
-
-  console.time('unique')
-  const uniqueIndicesBefore = getAddedIndices(indicesBefore, idsBefore, idsAfter)
-  const uniqueIndicesAfter = getAddedIndices(indicesAfter, idsAfter, idsBefore)
-  console.timeEnd('unique')
-
-  console.log('uniqueCount', uniqueIndicesBefore.length, uniqueIndicesAfter.length, indicesBefore.length, indicesAfter.length)
   console.time('ast')
-  const astBefore = getAsts(before, uniqueIndicesBefore, depth)
-  const astAfter = getAsts(after, uniqueIndicesAfter, depth)
+  const astBeforeAll = getAsts(before, indicesBefore, depth)
+  const astAfterAll = getAsts(after, indicesAfter, depth)
   console.timeEnd('ast')
 
-  const signaturesBefore = getSignatures(astBefore, depth)
-  const signaturesAfter = getSignatures(astAfter, depth)
+  // Build id sets to prefer truly new instances when selecting deltas
+  const beforeIds = getIds(before, indicesBefore)
+  const setBeforeIds = new Set(beforeIds)
 
-  const uniqueAfter = getUniqueAfter(astBefore, astAfter, signaturesBefore, signaturesAfter)
+  // Use shallow signatures (depth 0) for stable identity across snapshots
+  const signaturesBefore = getSignatures(astBeforeAll, 0)
+  const signaturesAfter = getSignatures(astAfterAll, 0)
 
-  const formatted = formatAsts(uniqueAfter, includeProperties, collapseNodes)
+  const countMapBefore: Record<string, number> = Object.create(null)
+  for (const sig of signaturesBefore) {
+    if (sig in countMapBefore) {
+      countMapBefore[sig]++
+    } else {
+      countMapBefore[sig] = 1
+    }
+  }
+
+  const groupedAfter: Record<string, ObjectNode[]> = Object.create(null)
+  for (let i = 0; i < signaturesAfter.length; i++) {
+    const sig = signaturesAfter[i]
+    const node = astAfterAll[i]
+    if (sig in groupedAfter) {
+      groupedAfter[sig].push(node)
+    } else {
+      groupedAfter[sig] = [node]
+    }
+  }
+
+  const addedAsts: ObjectNode[] = []
+  for (const sig in groupedAfter) {
+    const afterCount = groupedAfter[sig].length
+    const beforeCount = countMapBefore[sig] || 0
+    if (afterCount > beforeCount) {
+      const delta = afterCount - beforeCount
+      const nodes = groupedAfter[sig]
+      // First prefer nodes whose ids were not seen before
+      const preferred: ObjectNode[] = []
+      const fallback: ObjectNode[] = []
+      for (const n of nodes) {
+        if (setBeforeIds.has(n.id)) {
+          fallback.push(n)
+        } else {
+          preferred.push(n)
+        }
+      }
+      let added = 0
+      for (const n of preferred) {
+        if (added >= delta) {
+          break
+        }
+        addedAsts.push(n)
+        added++
+      }
+      if (added < delta) {
+        for (const n of fallback) {
+          if (added >= delta) {
+            break
+          }
+          addedAsts.push(n)
+          added++
+        }
+      }
+    }
+  }
+
+  const formatted = formatAsts(addedAsts, includeProperties, collapseNodes)
   return formatted
 }
