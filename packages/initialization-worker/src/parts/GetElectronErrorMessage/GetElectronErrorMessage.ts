@@ -1,7 +1,7 @@
 import { once } from 'node:events'
 import stripAnsi from 'strip-ansi'
-import * as MergeStacks from '../MergeStacks/MergeStacks.ts'
 import { LaunchError } from '../LaunchError/LaunchError.ts'
+import * as MergeStacks from '../MergeStacks/MergeStacks.ts'
 
 const RE_ES_MODULES_NOT_SUPPORTED = /require\(\) of ES Module .* not supported/
 const RE_PATH = /^(\/.*\.js:\d+)$/
