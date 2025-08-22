@@ -1,4 +1,5 @@
 import type { ObjectNode } from '../AstNode/AstNode.ts'
+import type { ScriptMap } from '../ReadScriptMap/ReadScriptMap.ts'
 import { signatureFor } from '../SignatureForAstNode/SignatureForAstNode.ts'
 
 const removePropertiesMaybe = (asts: readonly ObjectNode[], includeProperties: boolean): readonly ObjectNode[] => {
@@ -57,16 +58,22 @@ const collapseAstsMaybe = (asts: readonly ObjectNode[], collapse: boolean): read
   return sorted
 }
 
-const addLocationStringMaybe = (asts: readonly ObjectNode[], outputLocations: boolean): readonly ObjectNode[] => {
+const addLocationStringMaybe = (
+  asts: readonly ObjectNode[],
+  outputLocations: boolean,
+  scriptMap?: ScriptMap | null,
+): readonly ObjectNode[] => {
   if (!outputLocations) {
     return asts
   }
   return asts.map((item) => {
     const loc = (item as any).closureLocations?.[0]
     if (loc && typeof loc.scriptId === 'number' && typeof loc.line === 'number' && typeof loc.column === 'number') {
+      const script = scriptMap ? scriptMap[loc.scriptId] : undefined
+      const scriptPart = script && script.url ? script.url : `${loc.scriptId}`
       return {
         ...item,
-        location: `${loc.scriptId}:${loc.line}:${loc.column}`,
+        location: `${scriptPart}:${loc.line}:${loc.column}`,
       } as any
     }
     return item
@@ -78,9 +85,10 @@ export const formatAsts = (
   includeProperties: boolean,
   collapse: boolean,
   outputLocations: boolean = false,
+  scriptMap?: ScriptMap | null,
 ): readonly ObjectNode[] => {
   const result1 = removePropertiesMaybe(asts, includeProperties)
-  const result2 = addLocationStringMaybe(result1, outputLocations)
+  const result2 = addLocationStringMaybe(result1, outputLocations, scriptMap)
   const result3 = collapseAstsMaybe(result2, collapse)
   return result3
 }

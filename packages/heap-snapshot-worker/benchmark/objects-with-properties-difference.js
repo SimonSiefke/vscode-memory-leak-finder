@@ -16,6 +16,7 @@ async function testGetObjectsWithProperties() {
   const includeProperties = false
   const collapseNodes = true
   const outputLocations = true
+  const scriptMapId = 1
 
   try {
     // Prepare the heap snapshot
@@ -46,6 +47,7 @@ async function testGetObjectsWithProperties() {
       includeProperties,
       collapseNodes,
       outputLocations,
+      scriptMapId,
     )
     console.timeEnd('diff')
 

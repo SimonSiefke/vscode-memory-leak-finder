@@ -5,6 +5,7 @@ import { getObjectWithPropertyNodeIndices3 } from '../GetObjectWithPropertyNodeI
 import { signatureFor } from '../SignatureForAstNode/SignatureForAstNode.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { addLocationsToAstNodes } from '../AddLocationsToAstNodes/AddLocationsToAstNodes.ts'
+import { readScriptMap } from '../ReadScriptMap/ReadScriptMap.ts'
 
 const getIds = (snapshot: Snapshot, indices: Uint32Array): Uint32Array => {
   const nodes = snapshot.nodes
@@ -63,6 +64,7 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   includeProperties: boolean = true,
   collapseNodes: boolean = false,
   outputLocations: boolean = false,
+  scriptMapId?: number,
 ): readonly AstNode[] => {
   const indicesBefore = getObjectWithPropertyNodeIndices3(before, propertyName)
   const indicesAfter = getObjectWithPropertyNodeIndices3(after, propertyName)
@@ -85,6 +87,7 @@ export const getAddedObjectsWithPropertiesInternalAst = (
     uniqueAfter = addLocationsToAstNodes(after, uniqueAfter) as readonly ObjectNode[]
   }
 
-  const formatted = formatAsts(uniqueAfter, includeProperties, collapseNodes, outputLocations)
+  const scriptMap = typeof scriptMapId === 'number' ? readScriptMap(scriptMapId) : null
+  const formatted = formatAsts(uniqueAfter, includeProperties, collapseNodes, outputLocations, scriptMap)
   return formatted
 }
