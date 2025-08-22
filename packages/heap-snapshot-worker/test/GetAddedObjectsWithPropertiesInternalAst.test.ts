@@ -364,7 +364,7 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
     locations: new Uint32Array([]),
   }
 
-  const added = getAddedObjectsWithPropertiesInternalAst(beforeSnapshot, afterSnapshot, 'test', 1)
+  const added = getAddedObjectsWithPropertiesInternalAst(beforeSnapshot, afterSnapshot, 'leakingMethod', 1)
 
   expect(added).toEqual([
     {
