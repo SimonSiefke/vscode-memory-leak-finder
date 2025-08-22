@@ -1,23 +1,17 @@
 import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
 import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
-import * as Timing from '../Timing/Timing.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
-import { getLocationsMap } from '../GetLocationsMap/GetLocationsMap.ts'
 
 /**
  * Returns the node indices for all objects that have the given property name.
  * The returned indices are logical node indices (0-based), not array offsets.
  */
 export const getObjectWithPropertyNodeIndices2 = (snapshot: Snapshot, propertyName: string): Uint32Array => {
-  const { nodes, edges, strings, meta, locations } = snapshot
+  const { nodes, edges, strings, meta } = snapshot
 
   const nodeFields = meta.node_fields
-  const nodeFieldCount = nodeFields.length
   const edgeFields = meta.edge_fields
   const edgeTypes = meta.edge_types[0] || []
-  const scriptIdIndex = meta.location_fields.indexOf('script_id')
-  const lineIndex = meta.location_fields.indexOf('line')
-  const columnIndex = meta.location_fields.indexOf('column')
 
   if (!nodeFields.length || !edgeFields.length) {
     return new Uint32Array([])
@@ -38,7 +32,6 @@ export const getObjectWithPropertyNodeIndices2 = (snapshot: Snapshot, propertyNa
   const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
 
   const edgeMap = createEdgeMap(nodes, nodeFields)
-  const locationMap = getLocationsMap(snapshot)
 
   const result: number[] = []
 
@@ -51,17 +44,6 @@ export const getObjectWithPropertyNodeIndices2 = (snapshot: Snapshot, propertyNa
       const edgeType = nodeEdges[i + edgeTypeFieldIndex]
       const nameIndex = nodeEdges[i + edgeNameFieldIndex]
       if (edgeType === EDGE_TYPE_PROPERTY && nameIndex === propertyNameIndex) {
-        const toNode = nodeEdges[i + toNodeIndex]
-        // console.log({ toNode, nodeFieldCount, index: toNode / nodeFieldCount })
-        // const locationIndex = locationMap[toNode / nodeFieldCount]
-        // const scriptId = locations[locationIndex + scriptIdIndex]
-        // const line = locations[locationIndex + lineIndex]
-        // const column = locations[locationIndex + columnIndex]
-        // const hash = `${scriptId}:${line}:${column}`
-        // if (prev !== hash) {
-        //   prev = hash
-        //   console.log({ scriptId, line, column })
-        // }
         result.push(nodeIndex)
         break
       }
