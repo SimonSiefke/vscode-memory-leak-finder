@@ -13,7 +13,7 @@ async function testGetObjectsWithProperties() {
   const depth = 1
 
   try {
-    const id = 12124
+    const id = 302297
     const r = await analyzeNodeFromFile(heapSnapshotPath, id)
 
     console.log(JSON.stringify(r, null, 2))
