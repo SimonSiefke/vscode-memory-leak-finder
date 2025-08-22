@@ -1,5 +1,5 @@
-import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 import * as Ide from '../Ide/Ide.ts'
+import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 
 const parseArgvNumber = (argv, name) => {
   const index = argv.indexOf(name)

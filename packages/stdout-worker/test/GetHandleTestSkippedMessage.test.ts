@@ -58,7 +58,7 @@ test('getHandleTestSkippedMessage - very long duration', () => {
   const file = '/test/slow.test.js'
   const relativeDirName = '/test'
   const fileName = 'slow.test.js'
-  const duration = 10000
+  const duration = 10_000
 
   const result = GetHandleTestSkippedMessage.getHandleTestSkippedMessage(file, relativeDirName, fileName, duration)
 

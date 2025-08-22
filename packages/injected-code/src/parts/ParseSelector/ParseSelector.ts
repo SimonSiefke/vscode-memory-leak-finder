@@ -20,7 +20,7 @@ export const parseSelector = (selector: string): any[] => {
   }
   const parts: any[] = []
   let start = 0
-  const length = selector.length
+  const { length } = selector
   for (let i = 0; i < length; i++) {
     // TODO use indexof colon for faster search
     const char = selector[i]
