@@ -8,10 +8,10 @@ async function testGetObjectsWithProperties() {
 
   // Load the actual heap snapshot file
   // const heapSnapshotPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/abc2.heapsnapshot'
-  const beforePath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/before.heapsnapshot'
-  const afterPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/after.heapsnapshot'
+  const beforePath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/0.json'
+  const afterPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/1.json'
   const resultPath = join(import.meta.dirname, '..', '.tmp', 'difference.json')
-  const property = 'iAmLeaking'
+  const property = 'dispose'
   const depth = 1
 
   try {
