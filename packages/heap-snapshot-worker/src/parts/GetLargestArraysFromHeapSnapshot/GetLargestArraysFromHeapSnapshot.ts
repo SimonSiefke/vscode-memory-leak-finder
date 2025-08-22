@@ -57,7 +57,7 @@ const filterByMinLength = (arrays: readonly ArrayWithCount[], minLength: number)
 
 interface NameMapEntry { edgeName: string | undefined; nodeName: string | undefined }
 interface NameMap { [id: number]: NameMapEntry }
-interface ArrayWithCountAndName extends ArrayWithCount { name: string | undefined }
+export interface ArrayWithCountAndName extends ArrayWithCount { name: string | undefined }
 
 const addNames = (items: readonly ArrayWithCount[], nameMap: NameMap): ArrayWithCountAndName[] => {
   const withNames: ArrayWithCountAndName[] = []

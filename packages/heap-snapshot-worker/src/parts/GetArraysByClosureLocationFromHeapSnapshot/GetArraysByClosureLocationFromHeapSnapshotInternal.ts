@@ -46,7 +46,7 @@ interface ResultArrayItem {
   readonly selfSize: number
 }
 
-interface ResultGroup {
+export interface ResultGroup {
   readonly locationKey: string
   readonly locationInfo: LocationInfo | null
   readonly count: number

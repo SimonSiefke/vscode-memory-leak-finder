@@ -3,32 +3,32 @@ import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 import * as ParseHeapSnapshotInternalEdges from '../ParseHeapSnapshotInternalEdges/ParseHeapSnapshotInternalEdges.ts'
 import * as ParseHeapSnapshotInternalNodes from '../ParseHeapSnapshotInternalNodes/ParseHeapSnapshotInternalNodes.ts'
 
-interface ParsedNode {
+export interface ParsedNode {
   readonly id: number
   readonly name: string
   readonly type: string
   readonly edgeCount: number
 }
 
-interface ParsedEdge {
+export interface ParsedEdge {
   readonly type: string
   readonly nameOrIndex: string
   readonly toNode: number
 }
 
-interface ChainEntry {
+export interface ChainEntry {
   readonly nodeId: number
   readonly nodeName: string
   readonly nodeType: string
 }
 
-interface PrototypeProperty {
+export interface PrototypeProperty {
   readonly prototypeName: string
   readonly propertyName: string
   readonly prototypeId: number
 }
 
-interface SuspiciousProperty {
+export interface SuspiciousProperty {
   readonly type: string
   readonly message: string
   readonly nodeId?: number
@@ -36,14 +36,14 @@ interface SuspiciousProperty {
   readonly prototypeName?: string
 }
 
-interface ChainAnalysisResult {
+export interface ChainAnalysisResult {
   readonly length: number
   readonly chain: readonly ChainEntry[]
   readonly prototypeProperties: readonly PrototypeProperty[]
   readonly suspiciousProperties: readonly SuspiciousProperty[]
 }
 
-interface LongChainResult {
+export interface LongChainResult {
   readonly nodeId: number
   readonly nodeName: string
   readonly nodeType: string
@@ -52,19 +52,19 @@ interface LongChainResult {
   readonly suspiciousProperties: readonly SuspiciousProperty[]
 }
 
-interface PollutionCandidate {
+export interface PollutionCandidate {
   readonly prototypeName: string
   readonly propertyName: string
   readonly affectedObjects: number[]
   readonly isLikelyPollution: boolean
 }
 
-interface PollutionResult extends PollutionCandidate {
+export interface PollutionResult extends PollutionCandidate {
   readonly affectedObjectCount: number
   readonly severity: string
 }
 
-interface AnalysisStatistics {
+export interface AnalysisStatistics {
   readonly count: number
   readonly average: number
   readonly median: number
