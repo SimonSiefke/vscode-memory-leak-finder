@@ -1,11 +1,16 @@
 import * as Assert from '../Assert/Assert.ts'
 
-export interface ParsedLocation { objectIndex: number; scriptIdIndex: number; lineIndex: number; columnIndex: number }
+export interface ParsedLocation {
+  objectIndex: number
+  scriptIdIndex: number
+  lineIndex: number
+  columnIndex: number
+}
 
 export const parseHeapSnapshotLocations = (
   locations: readonly number[],
   locationFields: readonly string[],
-  nodeFieldCount: number
+  nodeFieldCount: number,
 ): ParsedLocation[] => {
   // Assert.array(locations)
   Assert.array(locationFields)

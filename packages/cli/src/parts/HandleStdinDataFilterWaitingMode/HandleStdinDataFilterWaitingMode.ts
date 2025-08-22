@@ -1,9 +1,9 @@
+import type { StdinDataState } from '../StdinDataState/StdinDataState.ts'
 import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
 import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
 import * as Character from '../Character/Character.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
 import * as PreviousFilters from '../PreviousFilters/PreviousFilters.ts'
-import type { StdinDataState } from '../StdinDataState/StdinDataState.ts'
 import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
 
 export const handleStdinDataFilterWaitingMode = async (state: StdinDataState, key: string): Promise<StdinDataState> => {
