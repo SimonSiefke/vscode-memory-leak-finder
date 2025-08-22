@@ -13,8 +13,5 @@
   "author": "",
   "license": "MIT",
   "dependencies": {},
-  "devDependencies": {
-    "tree-kill": "^1.2.2",
-    "wait-for-expect": "^4.0.0"
-  }
+  "devDependencies": {}
 }
