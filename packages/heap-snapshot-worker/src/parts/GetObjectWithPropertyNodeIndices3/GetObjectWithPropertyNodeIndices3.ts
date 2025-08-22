@@ -74,6 +74,7 @@ export const getObjectWithPropertyNodeIndices3 = (snapshot: Snapshot, propertyNa
         EDGE_TYPE_INTERNAL,
         edgeToNodeIndex,
         propertyNameIndex,
+        idIndex,
         strings,
         edgeMap,
       )

@@ -1,4 +1,15 @@
 import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
+import { getPrettyEdges } from '../GetPrettyEdges/GetPrettyEdges.ts'
+
+const specialNodeIds = [
+  7093, // instance before
+  60081, // instance after
+
+  58817, // map,
+
+  58819, // prototype
+  59725, // function
+]
 
 export const matchesProperty = (
   nodes: Uint32Array,
@@ -13,11 +24,18 @@ export const matchesProperty = (
   edgeTypeInternal: number,
   edgeToNodeIndex: number,
   propertyNameIndex: number,
+  nodeIdIndex: number,
   strings: readonly string[],
   edgeMap: Uint32Array,
 ): boolean => {
   const nodeIndex = absoluteIndex / itemsPerNode
   const nodeEdges = getNodeEdgesFast(nodeIndex, edgeMap, nodes, edges, itemsPerNode, itemsPerEdge, edgeCountFieldIndex)
+  const nodeId = nodes[absoluteIndex + nodeIdIndex]
+
+  if (specialNodeIds.includes(nodeId)) {
+    console.log({ nodeId, nodeEdges: getPrettyEdges(nodes, nodeEdges, strings, nodeIdIndex) })
+  }
+
   for (let i = 0; i < nodeEdges.length; i += itemsPerEdge) {
     const edgeType = nodeEdges[i + edgeTypeFieldIndex]
     const nameIndex = nodeEdges[i + edgeNameFieldIndex]
@@ -45,6 +63,7 @@ export const matchesProperty = (
             edgeTypeInternal,
             edgeToNodeIndex,
             propertyNameIndex,
+            nodeIdIndex,
             strings,
             edgeMap,
           )
