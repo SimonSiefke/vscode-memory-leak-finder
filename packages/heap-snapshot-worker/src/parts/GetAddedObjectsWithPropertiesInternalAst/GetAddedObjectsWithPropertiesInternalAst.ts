@@ -7,6 +7,9 @@ import { getObjectsWithPropertiesInternalAst } from '../GetObjectsWithProperties
 import { getObjectWithPropertyNodeIndices2 } from '../GetObjectWithPropertyNodeIndices2/GetObjectWithPropertyNodeIndices2.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { getLocationsMap } from '../GetLocationsMap/GetLocationsMap.ts'
+import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
+import { buildAstForNode } from '../GetNodePreviews/GetNodePreviewsAst.ts'
+import { signatureFor } from '../SignatureForAstNode/SignatureForAstNode.ts'
 
 const getAdded = (
   before: Snapshot,
@@ -43,6 +46,7 @@ const createHashMap = (snapshot: Snapshot, indices: Uint32Array): HashMap => {
   const columnIndex = snapshot.meta.location_fields.indexOf('column')
   for (let i = 0; i < indices.length; i++) {
     const index = indices[i]
+    // TODO location is wrong -> should compare location of property node instead of node location
     const locationIndex = locationMap[index]
     const scriptId = snapshot.locations[locationIndex + scriptIdIndex]
     const line = snapshot.locations[locationIndex + lineIndex]
@@ -111,11 +115,6 @@ const formatComparison = (
       })
     }
   }
-  pretty.sort((a, b) => {
-    const aDelta = a.count - a.beforeCount
-    const bDelta = b.count - b.beforeCount
-    return bDelta - aDelta
-  })
   return pretty
 }
 
@@ -152,6 +151,81 @@ const getAddedIndices = (indices: Uint32Array, ids: Uint32Array, idsOther: Uint3
   return new Uint32Array(added)
 }
 
+const getAst = (snapshot: Snapshot, uniqueIndices: Uint32Array, depth: number): readonly any[] => {
+  const { nodes, meta } = snapshot
+  const nodeFields = meta.node_fields
+  const edgeFields = meta.edge_fields
+  if (!nodeFields.length || !edgeFields.length) {
+    return []
+  }
+
+  console.time('edgeMap')
+  const edgeMap = createEdgeMap(nodes, nodeFields)
+  console.timeEnd('edgeMap')
+  const strings = snapshot.strings
+  const nodeTypes = meta.node_types
+  const edgeTypes = meta.edge_types[0] || []
+  const ITEMS_PER_NODE = nodeFields.length
+  const ITEMS_PER_EDGE = edgeFields.length
+  const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
+  const edgeTypeFieldIndex = edgeFields.indexOf('type')
+  const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
+  const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
+  const EDGE_TYPE_PROPERTY = edgeTypes.indexOf('property')
+  const EDGE_TYPE_INTERNAL = edgeTypes.indexOf('internal')
+
+  const asts: AstNode[] = []
+  for (const nodeIndex of uniqueIndices) {
+    const ast = buildAstForNode(
+      nodeIndex,
+      snapshot,
+      edgeMap,
+      nodeFields,
+      nodeTypes,
+      edgeFields,
+      strings,
+      ITEMS_PER_NODE,
+      ITEMS_PER_EDGE,
+      edgeCountFieldIndex,
+      edgeTypeFieldIndex,
+      edgeNameFieldIndex,
+      edgeToNodeFieldIndex,
+      EDGE_TYPE_PROPERTY,
+      EDGE_TYPE_INTERNAL,
+      depth,
+      new Set(),
+    )
+    if (ast) {
+      asts.push(ast)
+    }
+  }
+
+  return asts
+}
+
+const getSignatures = (asts: readonly AstNode[], depth: number): readonly string[] => {
+  const signatures: string[] = []
+  for (const ast of asts) {
+    signatures.push(signatureFor(ast, depth))
+  }
+  return signatures
+}
+
+const getUniqueAfter = (
+  astBefore: readonly AstNode[],
+  astAfter: readonly AstNode[],
+  signaturesBefore: readonly string[],
+  signaturesAfter: readonly string[],
+): readonly AstNode[] => {
+  const leaked: AstNode[] = []
+  for (let i = 0; i < astAfter.length; i++) {
+    if (!signaturesBefore.includes(signaturesAfter[i])) {
+      leaked.push(astAfter[i])
+    }
+  }
+  return leaked
+}
+
 export const getAddedObjectsWithPropertiesInternalAst = (
   before: Snapshot,
   after: Snapshot,
@@ -175,40 +249,17 @@ export const getAddedObjectsWithPropertiesInternalAst = (
   const uniqueIndicesAfter = getAddedIndices(indicesAfter, idsAfter, idsBefore)
   console.timeEnd('unqiue')
 
+  console.time('ast')
+  const astBefore = getAst(before, uniqueIndicesBefore, depth)
+  const astAfter = getAst(after, uniqueIndicesAfter, depth)
+  console.timeEnd('ast')
+
+  const signaturesBefore = getSignatures(astBefore, depth)
+  const signaturesAfter = getSignatures(astAfter, depth)
+
+  const uniqueAfter = getUniqueAfter(astBefore, astAfter, signaturesBefore, signaturesAfter)
+  console.log({ uniqueAfter: uniqueAfter.length })
   console.log('id is not included in before')
 
-  console.time('hashmap')
-  const hashMapBefore = createHashMap(before, uniqueIndicesBefore)
-  const hashMapAfter = createHashMap(after, uniqueIndicesAfter)
-  console.timeEnd('hashmap')
-
-  // console.log({ hashMapAfter: hashMapAfter['10:32:16000'] })
-
-  console.time('compareMap')
-  const leaked = compareMaps(hashMapBefore, hashMapAfter)
-  console.timeEnd('compareMap')
-
-  console.time('sort')
-  const leakedSorted = sortLeaked(leaked)
-  console.timeEnd('sort')
-
-  const idIndex = after.meta.node_fields.indexOf('id')
-  // const nodeFieldCount = after.meta.node_fields.length
-  // console.log('id', after.nodes[703916 + idIndex])
-  // console.log({ leakedSorted })
-
-  const formatted = formatComparison(before, after, leakedSorted)
-  console.log({ formatted: formatted.length })
-
-  console.time('ast-before')
-  const astBefore = getObjectsWithPropertiesInternalAst(before, propertyName, depth)
-  console.timeEnd('ast-before')
-  console.time('ast-after')
-  const astAfter = getObjectsWithPropertiesInternalAst(after, propertyName, depth)
-  console.timeEnd('ast-after')
-  console.time('compare')
-  const added = compareAsts(astBefore, astAfter, depth)
-  console.timeEnd('compare')
-  console.log('addedCount', added.length)
-  return added
+  return uniqueAfter
 }
