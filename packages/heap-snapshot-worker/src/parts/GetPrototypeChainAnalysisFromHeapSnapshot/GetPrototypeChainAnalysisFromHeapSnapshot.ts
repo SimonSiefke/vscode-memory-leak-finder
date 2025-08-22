@@ -81,7 +81,9 @@ const PROTOTYPE_POLLUTION_THRESHOLD = 1000 // If this many objects share unusual
  * @param {string} id - Heap snapshot ID
  * @returns {Promise<Object>} Analysis results
  */
-export const getPrototypeChainAnalysisFromHeapSnapshot = async (id: number): Promise<{
+export const getPrototypeChainAnalysisFromHeapSnapshot = async (
+  id: number,
+): Promise<{
   longPrototypeChains: readonly LongChainResult[]
   prototypePollution: readonly PollutionResult[]
   prototypeStatistics: AnalysisStatistics
@@ -96,7 +98,12 @@ export const getPrototypeChainAnalysisFromHeapSnapshot = async (id: number): Pro
   const { meta } = snapshot
   const { node_types, node_fields, edge_types, edge_fields } = meta
 
-  const parsedNodes = ParseHeapSnapshotInternalNodes.parseHeapSnapshotInternalNodes(nodes, node_fields, node_types[0], strings) as ParsedNode[]
+  const parsedNodes = ParseHeapSnapshotInternalNodes.parseHeapSnapshotInternalNodes(
+    nodes,
+    node_fields,
+    node_types[0],
+    strings,
+  ) as ParsedNode[]
   const parsedEdges = ParseHeapSnapshotInternalEdges.parseHeapSnapshotInternalEdges(
     edges,
     edge_fields,
@@ -302,10 +309,7 @@ const createNodeMap = (parsedNodes: readonly ParsedNode[]): Map<number, ParsedNo
 /**
  * Creates a map of node IDs to their properly typed edges
  */
-const createEdgeMap = (
-  parsedNodes: readonly ParsedNode[],
-  parsedEdges: readonly ParsedEdge[],
-): Map<number, ParsedEdge[]> => {
+const createEdgeMap = (parsedNodes: readonly ParsedNode[], parsedEdges: readonly ParsedEdge[]): Map<number, ParsedEdge[]> => {
   const edgeMap = new Map<number, ParsedEdge[]>()
 
   // Initialize empty arrays for all nodes
@@ -453,10 +457,7 @@ const calculatePollutionSeverity = (candidate: PollutionCandidate): string => {
 /**
  * Detects suspicious patterns in prototype chains
  */
-const detectSuspiciousPatterns = (
-  longChains: readonly LongChainResult[],
-  pollution: readonly PollutionResult[],
-) => {
+const detectSuspiciousPatterns = (longChains: readonly LongChainResult[], pollution: readonly PollutionResult[]) => {
   const patterns = {
     deepInheritance: longChains.filter((chain) => chain.chainLength > 15),
     possibleFrameworkIssue: longChains.filter((chain) =>
