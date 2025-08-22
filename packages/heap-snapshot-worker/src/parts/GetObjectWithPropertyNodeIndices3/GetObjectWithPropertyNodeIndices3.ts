@@ -40,7 +40,21 @@ export const getObjectWithPropertyNodeIndices3 = (snapshot: Snapshot, propertyNa
 
   const result: number[] = []
 
+  const specialNodes = [7093, 58817, 58819, 59725, 60081]
   for (let nodeOffset = 0; nodeOffset < nodes.length; nodeOffset += ITEMS_PER_NODE_LOCAL) {
+    if (specialNodes.includes(nodes[nodeOffset + idIndex])) {
+      console.log({
+        node: {
+          type: nodes[nodeOffset],
+          name: nodes[nodeOffset + 1],
+          id: nodes[nodeOffset + 2],
+          selfSize: nodes[nodeOffset + 3],
+          edgeCount: nodes[nodeOffset + 4],
+          detachedNess: nodes[nodeOffset + 5],
+          nameSring: strings[nodes[nodeOffset + 1]],
+        },
+      })
+    }
     if (
       nodes[nodeOffset + nodeTypeIndex] === nodeTypeObject &&
       matchesProperty(

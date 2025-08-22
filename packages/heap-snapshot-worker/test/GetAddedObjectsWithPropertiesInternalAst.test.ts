@@ -210,13 +210,25 @@ test('getAddedObjectsWithPropertiesInternalAst: respects depth (0)', () => {
 })
 
 test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based on prototype', () => {
-  // before snapshot: one object with property "test" -> "hello"
+  // Before:
+  //   LeakThing -> 7093
+  //     map -> 58817 -> 58819
+  //     proto -> 58819
+  //     method -> 59725
+  //
+  // After:
+  //   LeakThing -> 60081
+  //     map -> 58817 -> 58819
+  //     proto -> 58819
+  //     method -> 59725
+
+  // prettier-ignore
   const beforeSnapshot: Snapshot = {
     node_count: 2,
     edge_count: 1,
     extra_native_bytes: 0,
     meta: {
-      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
       node_types: [
         [
           'hidden',
@@ -233,6 +245,7 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
           'sliced string',
           'symbol',
           'bigint',
+          'object shape',
         ],
       ],
       edge_fields: ['type', 'name_or_index', 'to_node'],
@@ -241,20 +254,10 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
     },
     // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
     nodes: new Uint32Array([
-      3,
-      1,
-      1,
-      100,
-      1,
-      0,
-      0, // object id=1 with 1 property
-      2,
-      2,
-      2,
-      10,
-      0,
-      0,
-      0, // string "hello" id=2
+     3,  2, 7093, 52, 2, 0,  // LeakThing 1
+     14, 3, 58817, 40, 5, 0, //  -> map
+     3,  4, 58819, 12, 5, 0, //  -> prototype
+     5,  5, 59725, 28, 6, 0, //  -> method
     ]),
     // [type, name_or_index, to_node]
     edges: new Uint32Array([
@@ -262,11 +265,11 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
       3,
       7, // property "test" -> nodeIndex 1 * 7 = 7 (string)
     ]),
-    strings: ['', 'Object', 'hello', 'test'],
+    strings: ['gc roots',  'LeakThing', 'system / Map', 'Object', 'leakingMethod'],
     locations: new Uint32Array([]),
   }
 
-  // after snapshot: two objects with property "test": "hello" and "world"
+  // prettier-ignore
   const afterSnapshot: Snapshot = {
     node_count: 4,
     edge_count: 2,
@@ -296,10 +299,12 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
       location_fields: ['object_index', 'script_id', 'line', 'column'],
     },
     nodes: new Uint32Array([
-      // object A -> "hello"
-      3, 1, 1, 100, 1, 0, 0, 2, 2, 2, 10, 0, 0, 0,
-      // object B -> "world" (new)
-      3, 1, 3, 100, 1, 0, 0, 2, 4, 4, 10, 0, 0, 0,
+      3, 3183, 7093, 52, 2, 0,  // LeakThing 1
+      14, 30, 58817, 40, 5, 0,  //   -> map
+      3, 676,58819, 12, 5, 0,   //   -> prototype
+      5, 4596, 59725, 28, 6, 0, //   -> method
+      3, 3183, 60081, 12, 2, 0, // LeakThing 2
+
     ]),
     edges: new Uint32Array([
       2,
@@ -309,7 +314,7 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
       3,
       21, // object B property "test" -> string "world" (nodeIndex 3 * 7 = 21)
     ]),
-    strings: ['', '__proto__', 'prototype', 'map', 'LeakThing', 'leakingFunction'],
+    strings: ['gc roots',  'LeakThing', 'system / Map', 'Object', 'leakingMethod'],
     locations: new Uint32Array([]),
   }
 
