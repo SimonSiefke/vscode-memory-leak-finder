@@ -311,39 +311,37 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
     ]),
     edges: new Uint32Array([
       // LeakThing 2
-      2, 694,  24,      // __proto__
-      3, 5070, 18,       // map
+      2,  5, 24,     // __proto__
+      3,  7, 18,     // map
 
       // LeakThing 1
-      2,   694, 24,      // __proto__
-      3,  5068, 18,       // map
+      2,  5, 24,     // __proto__
+      3,  7, 18,     // map
 
       // map
-      3,    80, 24,   // prototype
-      3,   790, 0,    // constructor
-      3, 17535,   0,  // dependent_code
-      3,  5068,  0,   // map
-      4,     1,   0,  // other
-
+      3,  6, 24,     // prototype
+      3,  8,  0,     // constructor
+      3, 14,  0,     // dependent_code
+      3,  7,  0,     // map
+      4, 15,  0,     // other
 
       // prototype
-      2,   790, 0, // constructor
-      2,  4595, 0, // method
-      2,   694, 0, // __proto__
-      3, 17543, 0, // properties
-      3,  5068, 0, // map
-
+      2,  8,  0, // constructor
+      2,  4,  0, // method
+      2,  5,  0, // __proto__
+      3,  9,  0, // properties
+      3,  7,  0, // map
 
       // method
-      2,   694,   0, // __proto__
-      3, 17938,  0, // feedback_cell
-      3,   202,  0, // shared
-      3,  7433,  0, // context
-      3,   522,  0, // code
-      3,  5068,  0, // map
+      2,  5,  0, // __proto__
+      3, 10,  0, // feedback_cell
+      3, 11,  0, // shared
+      3, 12,  0, // context
+      3, 13,  0, // code
+      3,  7,  0, // map
 
     ]),
-    strings: ['gc roots',  'LeakThing', 'system / Map', 'Object', 'leakingMethod'],
+    strings: ['gc roots',  'LeakThing', 'system / Map', 'Object', 'leakingMethod', '__proto__', 'prototype', 'map', 'constructor', 'properties', 'feedback_cell', 'shared', 'context', 'code', 'dependent_code', 'other'],
     locations: new Uint32Array([]),
   }
 
