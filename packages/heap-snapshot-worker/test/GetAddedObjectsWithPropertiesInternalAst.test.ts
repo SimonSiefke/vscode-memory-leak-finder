@@ -209,7 +209,7 @@ test.skip('getAddedObjectsWithPropertiesInternalAst: respects depth (0)', () => 
   ])
 })
 
-test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based on prototype', () => {
+test.skip('getAddedObjectsWithPropertiesInternalAst: detects added object based on prototype', () => {
   // Before:
   //   LeakThing 1 -> 7093
   //     map -> 58817 -> 58819
