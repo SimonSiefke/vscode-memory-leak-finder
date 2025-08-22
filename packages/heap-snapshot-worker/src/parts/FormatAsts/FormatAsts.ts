@@ -42,7 +42,10 @@ const collapseAstsMaybe = (asts: readonly ObjectNode[], collapse: boolean): read
       count: map[hash],
     })
   }
-  return result
+  const sorted = result.toSorted((a, b) => {
+    return b.count - a.count
+  })
+  return sorted
 }
 
 export const formatAsts = (asts: readonly ObjectNode[], includeProperties: boolean, collapse: boolean): readonly ObjectNode[] => {
