@@ -1,8 +1,8 @@
 import { expect, test, jest } from '@jest/globals'
+import * as DevtoolsTargetType from '../src/parts/DevtoolsTargetType/DevtoolsTargetType.ts'
 import * as ScenarioFunctions from '../src/parts/ScenarioFunctions/ScenarioFunctions.ts'
 import * as SessionState from '../src/parts/SessionState/SessionState.ts'
 import * as TargetState from '../src/parts/TargetState/TargetState.ts'
-import * as DevtoolsTargetType from '../src/parts/DevtoolsTargetType/DevtoolsTargetType.ts'
 
 test('handleAttachedToTarget function exists', () => {
   expect(typeof ScenarioFunctions.handleAttachedToTarget).toBe('function')

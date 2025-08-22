@@ -1,6 +1,6 @@
 import { existsSync } from 'fs'
-import * as GetFfmpegPath from '../GetFfmpegPath/GetFfmpegPath.ts'
 import * as DownloadWorker from '../DownloadWorker/DownloadWorker.ts'
+import * as GetFfmpegPath from '../GetFfmpegPath/GetFfmpegPath.ts'
 
 export const intialize = async () => {
   const ffmpegPath = GetFfmpegPath.getFfmpegPath()

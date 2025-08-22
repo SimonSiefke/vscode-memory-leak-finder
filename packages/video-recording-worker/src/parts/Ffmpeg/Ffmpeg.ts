@@ -1,9 +1,9 @@
 import { spawn } from 'child_process'
+import { existsSync } from 'fs'
 import * as Assert from '../Assert/Assert.ts'
 import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.ts'
 import * as GetFfmpegOptions from '../GetFfmpegOptions/GetFfmpegOptions.ts'
 import * as GetFfmpegPath from '../GetFfmpegPath/GetFfmpegPath.ts'
-import { existsSync } from 'fs'
 
 const handleStdinError = () => {
   console.log('ffmpeg error')
