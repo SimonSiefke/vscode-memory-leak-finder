@@ -228,7 +228,7 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
     edge_count: 1,
     extra_native_bytes: 0,
     meta: {
-      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'detachedness'],
+      node_fields: ["type","name","id","self_size","edge_count","detachedness"],
       node_types: [
         [
           'hidden',
@@ -297,7 +297,7 @@ test.only('getAddedObjectsWithPropertiesInternalAst: detects added object based 
     edge_count: 2,
     extra_native_bytes: 0,
     meta: {
-      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_fields: ["type","name","id","self_size","edge_count","detachedness"],
       node_types: [
         [
           'hidden',
