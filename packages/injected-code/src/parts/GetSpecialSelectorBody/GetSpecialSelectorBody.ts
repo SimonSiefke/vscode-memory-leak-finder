@@ -17,14 +17,24 @@ export const getSpecialSelectorBody = (selector: string, i: number, specialSelec
     const char = selector[j]
     switch (state) {
       case State.TopLevel:
-        if (char === Character.RoundOpen) {
-          stack.push(state)
-          state = State.Round
-        } else if (char === Character.DoubleQuote) {
-          stack.push(state)
-          state = State.DoubleQuote
-        } else if (char === Character.Colon || char === Character.Space) {
-          return selector.slice(i, j)
+        switch (char) {
+          case Character.RoundOpen: {
+            stack.push(state)
+            state = State.Round
+
+            break
+          }
+          case Character.DoubleQuote: {
+            stack.push(state)
+            state = State.DoubleQuote
+
+            break
+          }
+          case Character.Colon:
+          case Character.Space: {
+            return selector.slice(i, j)
+          }
+          // No default
         }
         break
       case State.Round:
