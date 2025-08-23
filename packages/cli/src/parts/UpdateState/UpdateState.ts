@@ -18,6 +18,9 @@ export const updateState = async (newState: any): Promise<void> => {
     await PreviousFilters.addAll(newState.previousFilters)
   }
   if (newState.mode === ModeType.Exit || newState.mode === ModeType.FinishedRunning) {
+    if (newState.exitCode) {
+      process.exitCode = newState.exitCode
+    }
     return HandleExit.handleExit()
   }
   StdinDataState.setState({ ...newState, stdout: [], previousFilters: [] })

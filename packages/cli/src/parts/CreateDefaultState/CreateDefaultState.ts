@@ -27,4 +27,5 @@ export const createDefaultState = (): StdinDataState => ({
   stdout: [],
   isWindows: false,
   previousFilters: [],
+  exitCode: 0,
 })
