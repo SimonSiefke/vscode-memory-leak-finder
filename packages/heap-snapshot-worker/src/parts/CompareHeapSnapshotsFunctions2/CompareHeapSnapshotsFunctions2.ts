@@ -6,5 +6,8 @@ import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.
 
 export const compareHeapSnapshotFunctions2 = async (pathA: string, pathB: string): Promise<readonly CompareResult[]> => {
   const [snapshotA, snapshotB] = await Promise.all([prepareHeapSnapshot(pathA, {}), prepareHeapSnapshot(pathB, {})])
-  return compareHeapSnapshotFunctionsInternal2(snapshotA, snapshotB)
+  console.time('compare')
+  const result = compareHeapSnapshotFunctionsInternal2(snapshotA, snapshotB)
+  console.timeEnd('compare')
+  return result
 }

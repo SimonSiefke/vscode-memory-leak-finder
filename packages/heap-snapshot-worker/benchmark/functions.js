@@ -9,7 +9,7 @@ const testFunctionCount = async () => {
 
   try {
     const count = await compareHeapSnapshotFunctions2(filePath1, filePath2)
-    console.log({ count })
+    console.log(count.length)
   } catch (error) {
     console.error('Error:', error.message)
   }
