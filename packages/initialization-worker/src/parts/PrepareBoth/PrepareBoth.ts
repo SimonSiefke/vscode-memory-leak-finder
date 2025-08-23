@@ -29,7 +29,7 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
 
   // TODO race condition?
-  void connectDevtools(devtoolsWebSocketUrl)
+  // void connectDevtools(devtoolsWebSocketUrl)
 
   // TODO can probably dispose this electron rpc at this point
 

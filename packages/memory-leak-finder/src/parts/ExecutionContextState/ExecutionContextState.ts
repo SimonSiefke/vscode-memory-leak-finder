@@ -103,27 +103,6 @@ export const waitForDefaultExecutionContext = async (sessionId: string): Promise
   }
 }
 
-export const waitForUtilityExecutionContext = async (sessionId: string): Promise<ExecutionContext> => {
-  try {
-    Assert.string(sessionId)
-    for (const executionContext of Object.values(state.executionContexts)) {
-      if (isUtilityExecutionContext(executionContext, sessionId)) {
-        return executionContext
-      }
-    }
-    return await PTimeout.pTimeout(
-      (() => {
-        const { resolve, promise } = Promise.withResolvers<ExecutionContext>()
-        state.utilityExecutionContextCallbacks[sessionId] = resolve
-        return promise
-      })(),
-      { milliseconds: TimeoutConstants.UtilityExecutionContext },
-    )
-  } catch (error) {
-    throw new VError(`Failed to wait for utility execution context: ${error}`)
-  }
-}
-
 export const get = (id: string): ExecutionContext | undefined => {
   return state.executionContexts[id]
 }
