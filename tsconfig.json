@@ -17,7 +17,6 @@
     { "path": "./packages/initialization-worker" },
     { "path": "./packages/injected-code" },
     { "path": "./packages/memory-leak-finder" },
-    { "path": "./packages/memory-leak-worker" },
     { "path": "./packages/page-object" },
     { "path": "./packages/file-system-worker" },
     { "path": "./packages/repository-worker" },
