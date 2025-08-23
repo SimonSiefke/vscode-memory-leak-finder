@@ -1,3 +1,4 @@
+import { connectDevtools } from '../ConnectDevtools/ConnectDevtools.ts'
 import { connectElectron } from '../ConnectElectron/ConnectElectron.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
@@ -27,6 +28,14 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
 
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
 
+  const connectDevtoolsPromise = connectDevtools(devtoolsWebSocketUrl)
+
+  await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+    functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
+    objectId: monkeyPatchedElectronId,
+  })
+
+  await connectDevtoolsPromise
   // TODO race condition?
   // void connectDevtools(devtoolsWebSocketUrl)
 
@@ -48,11 +57,11 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
 export const undoMonkeyPatch = async () => {
   // TODO avoid global variables
   // @ts-ignore
-  const { electronRpc } = globalThis
-  // @ts-ignore
-  const { monkeyPatchedElectronId } = globalThis
-  await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-    functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
-    objectId: monkeyPatchedElectronId,
-  })
+  // const { electronRpc } = globalThis
+  // // @ts-ignore
+  // const { monkeyPatchedElectronId } = globalThis
+  // await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+  //   functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
+  //   objectId: monkeyPatchedElectronId,
+  // })
 }
