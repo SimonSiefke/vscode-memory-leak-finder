@@ -1,4 +1,4 @@
-import { QuickPick } from '../Parts/Parts.ts'
+import * as QuickPick from '../QuickPick/QuickPick.ts'
 
 export const create = ({ expect, page, VError }) => {
   return {

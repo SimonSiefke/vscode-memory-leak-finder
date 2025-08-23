@@ -39,6 +39,7 @@ jobs:
         run: npm ci --ignore-scripts && npm run postinstall
         if: steps.npm-cache.outputs.cache-hit != 'true'
       - run: npm run type-check
+      - run: npm run lint
       - run: npm run build
       - run: npx lerna run test --since origin/main
       - name: Run headless test (with videos)
