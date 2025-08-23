@@ -67,6 +67,7 @@ export * as MeasureNamedClosureCount from '../MeasureNamedClosureCount/MeasureNa
 export * as MeasureNamedEmitterCount from '../MeasureNamedEmitterCount/MeasureNamedEmitterCount.ts'
 export * as MeasureNamedFunctionCount from '../MeasureNamedFunctionCount/MeasureNamedFunctionCount.ts'
 export * as MeasureNamedFunctionCount2 from '../MeasureNamedFunctionCount2/MeasureNamedFunctionCount2.ts'
+export * as MeasureNamedFunctionCount3 from '../MeasureNamedFunctionCount3/MeasureNamedFunctionCount3.ts'
 export * as MeasureNamedFunctionDifference from '../MeasureNamedFunctionDifference/MeasureNamedFunctionDifference.ts'
 export * as MeasureNamedFunctionDifferenceWithSourceMap from '../MeasureNamedFunctionDifferenceWithSourceMap/MeasureNamedFunctionDifferenceWithSourceMap.ts'
 export * as MeasureNumberCount from '../MeasureNumberCount/MeasureNumberCount.ts'
