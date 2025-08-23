@@ -1,8 +1,5 @@
-/**
- *
- * @param {any} snapshot
- * @returns {Array<{id: number, name: string|string[], size: number}>}
- */
+import { Snapshot } from '../Snapshot/Snapshot.ts'
+
 export interface MapNode {
   readonly nodeIndex: number
   readonly id: number
@@ -14,7 +11,7 @@ export interface ResultItem {
   readonly size: number
 }
 
-export const getNamedMapCountFromHeapSnapshotInternal = (snapshot) => {
+export const getNamedMapCountFromHeapSnapshotInternal = (snapshot: Snapshot): readonly ResultItem[] => {
   const { nodes, strings, edges, meta } = snapshot
   const { node_fields, edge_fields } = meta
 
