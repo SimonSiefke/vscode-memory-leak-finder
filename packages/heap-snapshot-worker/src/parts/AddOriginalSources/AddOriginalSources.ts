@@ -9,50 +9,43 @@ export interface ScriptInfo {
   readonly sourceMapUrl?: string
 }
 
-export interface AddOriginalSourcesOptions {
-  readonly scriptMap?: Record<number, ScriptInfo>
-}
-
 export const addOriginalSources = async (
   items: readonly CompareResult[],
-  options: AddOriginalSourcesOptions,
 ): Promise<readonly CompareResult[]> => {
-  let scriptMap: Record<number, ScriptInfo> | undefined = options.scriptMap
-  // Attempt to load script maps from disk when none provided
-  if (!scriptMap) {
-    try {
-      const thisDir: string = dirname(fileURLToPath(import.meta.url))
-      const packageDir: string = resolve(thisDir, '../../..')
-      const repoRoot: string = resolve(packageDir, '../..')
-      const scriptMapsDir: string = join(repoRoot, '.vscode-script-maps')
-      const entries = await readdir(scriptMapsDir, { withFileTypes: true })
-      const mergedMap: Record<number, ScriptInfo> = Object.create(null)
-      for (const entry of entries) {
-        if (entry.isFile() && entry.name.endsWith('.json')) {
-          const fullPath = join(scriptMapsDir, entry.name)
-          try {
-            const content = await readFile(fullPath, 'utf8')
-            const parsed = JSON.parse(content) as Record<number, ScriptInfo>
-            for (const [key, value] of Object.entries(parsed)) {
-              const numericKey = Number(key)
-              const existing = mergedMap[numericKey]
-              if (!existing) {
+  let scriptMap: Record<number, ScriptInfo> | undefined
+  // Always attempt to load script maps from disk
+  try {
+    const thisDir: string = dirname(fileURLToPath(import.meta.url))
+    const packageDir: string = resolve(thisDir, '../../..')
+    const repoRoot: string = resolve(packageDir, '../..')
+    const scriptMapsDir: string = join(repoRoot, '.vscode-script-maps')
+    const entries = await readdir(scriptMapsDir, { withFileTypes: true })
+    const mergedMap: Record<number, ScriptInfo> = Object.create(null)
+    for (const entry of entries) {
+      if (entry.isFile() && entry.name.endsWith('.json')) {
+        const fullPath = join(scriptMapsDir, entry.name)
+        try {
+          const content = await readFile(fullPath, 'utf8')
+          const parsed = JSON.parse(content) as Record<number, ScriptInfo>
+          for (const [key, value] of Object.entries(parsed)) {
+            const numericKey = Number(key)
+            const existing = mergedMap[numericKey]
+            if (!existing) {
+              mergedMap[numericKey] = value
+            } else {
+              if (!existing.sourceMapUrl && value.sourceMapUrl) {
                 mergedMap[numericKey] = value
-              } else {
-                if (!existing.sourceMapUrl && value.sourceMapUrl) {
-                  mergedMap[numericKey] = value
-                }
               }
             }
-          } catch {
-            // ignore invalid files
           }
+        } catch {
+          // ignore invalid files
         }
       }
-      scriptMap = mergedMap
-    } catch {
-      // ignore if directory not found
     }
+    scriptMap = mergedMap
+  } catch {
+    // ignore if directory not found
   }
 
   const enriched: CompareResult[] = items.slice()
