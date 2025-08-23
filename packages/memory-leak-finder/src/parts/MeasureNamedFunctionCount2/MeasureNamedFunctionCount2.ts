@@ -1,4 +1,3 @@
-
 import { getHeapSnapshot } from '../GetHeapSnapshot/GetHeapSnapshot.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
@@ -32,10 +31,8 @@ export const stop = async (session, objectGroup, scriptHandler) => {
   }
 }
 
-
-
 export const isLeak = (leaked) => {
   return leaked.length > 0
 }
 
-export {compareNamedFunctionCount2 as compare} from '../CompareNamedFunctionCount2/CompareNamedFunctionCount2.ts'
+export { compareNamedFunctionCount2 as compare } from '../CompareNamedFunctionCount2/CompareNamedFunctionCount2.ts'
