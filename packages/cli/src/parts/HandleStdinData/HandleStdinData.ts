@@ -22,30 +22,34 @@ export const handleStdinData = async (key: string): Promise<void> => {
   if (newState.mode === ModeType.Exit) {
     return HandleExit.handleExit()
   }
-  StdinDataState.setState({ ...newState, stdout: [], previousFilters: [] })
+  StdinDataState.setState({
+    ...newState,
+    stdout: [],
+    previousFilters: [],
+  })
   if (newState.mode === ModeType.Running) {
-    await StartRunning.startRunning(
-      state.value,
-      state.headless,
-      /* color */ true,
-      state.checkLeaks,
-      state.recordVideo,
-      state.cwd,
-      state.runs,
-      state.measure,
-      state.measureAfter,
-      state.timeouts,
-      state.timeoutBetween,
-      state.restartBetween,
-      state.runMode,
-      state.ide,
-      state.ideVersion,
-      '',
-      '',
-      false,
-      state.workers,
-      state.isWindows,
-    )
+    await StartRunning.startRunning({
+      filterValue: state.value,
+      headlessMode: state.headless,
+      color: true,
+      checkLeaks: state.checkLeaks,
+      recordVideo: state.recordVideo,
+      cwd: state.cwd,
+      runs: state.runs,
+      measure: state.measure,
+      measureAfter: state.measureAfter,
+      timeouts: state.timeouts,
+      timeoutBetween: state.timeoutBetween,
+      restartBetween: state.restartBetween,
+      runMode: state.runMode,
+      ide: state.ide,
+      ideVersion: state.ideVersion,
+      vscodePath: '',
+      commit: '',
+      setupOnly: false,
+      workers: state.workers,
+      isWindows: state.isWindows,
+    })
   }
   if (newState.mode === ModeType.Interrupted) {
     await KillWorkers.killWorkers()
