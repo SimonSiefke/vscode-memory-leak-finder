@@ -8,7 +8,9 @@ interface Measure {
 export const getMeasure = (MemoryLeakFinder: any, measureId: string): Measure => {
   const camelCaseId = CamelCase.camelCase(measureId)
   for (const measure of Object.values(MemoryLeakFinder.Measures)) {
+    // @ts-ignore
     if (measure.id === camelCaseId) {
+      // @ts-ignore
       return measure
     }
   }
