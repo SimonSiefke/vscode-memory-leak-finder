@@ -1,3 +1,4 @@
+import { connectDevtools } from '../ConnectDevtools/ConnectDevtools.ts'
 import { connectElectron } from '../ConnectElectron/ConnectElectron.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
@@ -5,6 +6,7 @@ import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsPr
 import * as Disposables from '../Disposables/Disposables.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
+import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
 
 export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, connectionId, isFirstConnection, canUseIdleCallback) => {
@@ -27,14 +29,15 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
 
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
 
-  // TODO race condition?
-  // void connectDevtools(devtoolsWebSocketUrl)
+  const connectDevtoolsPromise = connectDevtools(devtoolsWebSocketUrl, TimeoutConstants.AttachToPage)
 
-  // TODO can probably dispose this electron rpc at this point
+  await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+    functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
+    objectId: monkeyPatchedElectronId,
+  })
 
-  // TODO start workers before connecting
-  // TODO connect workers in parallel
-  // TODO maybe pause again at this point, ensuring workers can connect correctly
+  await connectDevtoolsPromise
+
   return {
     webSocketUrl,
     devtoolsWebSocketUrl,
@@ -43,16 +46,4 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
     childPid: child.pid,
     parsedVersion,
   }
-}
-
-export const undoMonkeyPatch = async () => {
-  // TODO avoid global variables
-  // @ts-ignore
-  const { electronRpc } = globalThis
-  // @ts-ignore
-  const { monkeyPatchedElectronId } = globalThis
-  await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-    functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
-    objectId: monkeyPatchedElectronId,
-  })
 }

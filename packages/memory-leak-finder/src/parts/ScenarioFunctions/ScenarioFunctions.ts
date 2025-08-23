@@ -1,6 +1,3 @@
-import type { ExecutionContext } from '../ExecutionContextState/ExecutionContextState.ts'
-import type { Session } from '../SessionState/SessionState.ts'
-import type { DevToolsMessage } from '../Types/Types.ts'
 import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
 import {
   DevtoolsProtocolHeapProfiler,
@@ -9,12 +6,14 @@ import {
   DevtoolsProtocolTarget,
 } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.ts'
+import type { ExecutionContext } from '../ExecutionContextState/ExecutionContextState.ts'
 import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.ts'
 import * as PTimeout from '../PTimeout/PTimeout.ts'
+import type { Session } from '../SessionState/SessionState.ts'
 import * as SessionState from '../SessionState/SessionState.ts'
 import * as TargetState from '../TargetState/TargetState.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
-import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
+import type { DevToolsMessage } from '../Types/Types.ts'
 import { VError } from '../VError/VError.ts'
 
 export const Locator = (selector: string): { selector: string } => {
@@ -181,10 +180,6 @@ const handleAttachedToPage = async (message: DevToolsMessage): Promise<void> => 
       Promise.all([
         DevtoolsProtocolPage.enable(sessionRpc),
         DevtoolsProtocolPage.setLifecycleEventsEnabled(sessionRpc, { enabled: true }),
-        DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(sessionRpc, {
-          source: UtilityScript.utilityScript,
-          worldName: 'utility',
-        }),
         DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
           autoAttach: true,
           waitForDebuggerOnStart: true,

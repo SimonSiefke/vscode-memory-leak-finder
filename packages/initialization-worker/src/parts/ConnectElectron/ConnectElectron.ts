@@ -15,7 +15,6 @@ const waitForDebuggerToBePaused = async (rpc) => {
 }
 
 export const connectElectron = async (electronRpc) => {
-  globalThis.electronRpc = electronRpc
   const debuggerPausedPromise = waitForDebuggerToBePaused(electronRpc)
   await Promise.all([
     DevtoolsProtocolDebugger.enable(electronRpc),
@@ -54,8 +53,6 @@ export const connectElectron = async (electronRpc) => {
     MakeElectronAvailableGlobally.makeElectronAvailableGlobally(electronRpc, electronObjectId),
     MakeRequireAvailableGlobally.makeRequireAvailableGlobally(electronRpc, requireObjectId),
   ])
-
-  globalThis.monkeyPatchedElectronId = monkeyPatchedElectron.objectId
 
   return {
     monkeyPatchedElectronId: monkeyPatchedElectron.objectId,
