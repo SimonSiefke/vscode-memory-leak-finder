@@ -24,6 +24,10 @@ export const connectDevtools = async (devtoolsWebSocketUrl: string, attachedToPa
 
   const event = await eventPromise
 
+  if (!event) {
+    throw new Error(`Failed to attach to page`)
+  }
+
   const sessionId = event.params.sessionId
 
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
