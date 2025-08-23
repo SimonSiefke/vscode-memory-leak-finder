@@ -43,20 +43,25 @@ const maxTimeout = 2000
 
 const Timeout = {
   async short() {
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    const { resolve, promise } = Promise.withResolvers<void>()
+    setTimeout(resolve, 1000)
+    await promise
   },
   async waitForMutation(element: any, maxDelay: number) {
     const disposables: (() => void)[] = []
     await Promise.race([
-      new Promise((resolve) => {
+      (() => {
+        const { resolve, promise } = Promise.withResolvers<void>()
         const timeout = setTimeout(resolve, maxDelay)
         disposables.push(() => {
           clearTimeout(timeout)
         })
-      }),
-      new Promise((resolve) => {
-        const callback = (mutations) => {
-          resolve(undefined)
+        return promise
+      })(),
+      (() => {
+        const { resolve, promise } = Promise.withResolvers<void>()
+        const callback = () => {
+          resolve()
         }
         const observer = new MutationObserver(callback)
         observer.observe(document.body, {
@@ -70,7 +75,8 @@ const Timeout = {
         disposables.push(() => {
           observer.disconnect()
         })
-      }),
+        return promise
+      })(),
     ])
     for (const disposable of disposables) {
       disposable()

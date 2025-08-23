@@ -117,9 +117,11 @@ export const create = ({ expect, page, VError }) => {
         await page.keyboard.press(KeyBindings.Escape)
         await expect(quickPick).toBeHidden()
         await page.waitForIdle()
-        await new Promise((r) => {
-          setTimeout(r, 2000)
-        })
+        await (() => {
+          const { resolve, promise } = Promise.withResolvers<void>()
+          setTimeout(resolve, 2000)
+          return promise
+        })()
       } catch (error) {
         throw new VError(error, `Failed to hide quick pick`)
       }
