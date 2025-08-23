@@ -45,9 +45,11 @@ export const create = ({ expect, page, VError }) => {
     },
     async cancelPortEdit() {
       try {
-        await new Promise((r) => {
-          setTimeout(r, 2100)
-        })
+        await (() => {
+          const { resolve, promise } = Promise.withResolvers<void>()
+          setTimeout(resolve, 2100)
+          return promise
+        })()
         await page.waitForIdle()
         await page.keyboard.press('Escape')
         const forwardPortButton = page.locator('[role="button"]', { hasText: 'Forward a Port' })
