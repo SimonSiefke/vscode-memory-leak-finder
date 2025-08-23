@@ -5,15 +5,15 @@ import * as Exec from '../Exec/Exec.ts'
 import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.ts'
 import * as VideoChapter from '../VideoChapter/VideoChapter.ts'
 
-const getMetaDataInputOptions = (baseName) => {
+const getMetaDataInputOptions = (baseName: string): readonly string[] => {
   return ['-i', baseName, '-y', 'meta.ffmeta']
 }
 
-const getMetaDataOutputOptions = (baseName) => {
+const getMetaDataOutputOptions = (baseName: string): readonly string[] => {
   return ['-i', baseName, '-i', 'metadata.txt', '-map_metadata', '1', '-codec', 'copy', '-y', 'out.webm']
 }
 
-const getChaptersData = (previousMetaData, chapters) => {
+const getChaptersData = (previousMetaData: any, chapters: any): string => {
   let start = 0
   let data = previousMetaData + '\n'
   for (const chapter of chapters) {
@@ -30,7 +30,7 @@ title=${chapter.name}
   return data
 }
 
-const supportsNativeFfmpeg = () => {
+const supportsNativeFfmpeg = (): boolean => {
   return existsSync('/usr/bin/ffmpeg')
 }
 

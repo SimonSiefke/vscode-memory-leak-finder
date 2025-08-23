@@ -4,7 +4,7 @@ import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.ts
 import * as SessionState from '../SessionState/SessionState.ts'
 import * as VideosPath from '../VideosPath/VideosPath.ts'
 
-export const handleFrame = async (message) => {
+export const handleFrame = async (message: any): Promise<void> => {
   const ffmpegProcess = FfmpegProcessState.get()
   if (!ffmpegProcess || !ffmpegProcess.stdin) {
     return

@@ -1,3 +1,4 @@
+import type { ChildProcess } from 'child_process'
 import { expect, test } from '@jest/globals'
 import * as FfmpegProcessState from '../src/parts/FfmpegProcessState/FfmpegProcessState.ts'
 import * as HandleFrame from '../src/parts/HandleFrame/HandleFrame.ts'
@@ -18,7 +19,7 @@ test('handleFrame should return early when no ffmpeg process exists', async () =
 })
 
 test('handleFrame should return early when ffmpeg process has no stdin', async () => {
-  const mockProcess = { stdin: null }
+  const mockProcess = { stdin: null } as ChildProcess
   FfmpegProcessState.set(mockProcess)
 
   const message = {

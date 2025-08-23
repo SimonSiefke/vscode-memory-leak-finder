@@ -9,6 +9,7 @@
     "e2e:check-flakyness": "lerna run e2e:check-flakyness",
     "e2e": "lerna run e2e",
     "format": "prettier --write .",
+    "lint": "prettier --check .",
     "postinstall": "lerna bootstrap --ci",
     "test": "lerna run test",
     "type-check": "tsc -b",
