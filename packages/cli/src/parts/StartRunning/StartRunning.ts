@@ -1,6 +1,6 @@
+import type { StartRunningOptions } from './StartRunningOptions.ts'
 import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
 import * as RunTest from '../RunTest/RunTest.ts'
-import type { StartRunningOptions } from './StartRunningOptions.ts'
 import * as Stdout from '../Stdout/Stdout.ts'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
 

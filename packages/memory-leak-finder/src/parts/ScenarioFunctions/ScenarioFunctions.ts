@@ -1,3 +1,6 @@
+import type { ExecutionContext } from '../ExecutionContextState/ExecutionContextState.ts'
+import type { Session } from '../SessionState/SessionState.ts'
+import type { DevToolsMessage } from '../Types/Types.ts'
 import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
 import {
   DevtoolsProtocolHeapProfiler,
@@ -6,14 +9,11 @@ import {
   DevtoolsProtocolTarget,
 } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.ts'
-import type { ExecutionContext } from '../ExecutionContextState/ExecutionContextState.ts'
 import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.ts'
 import * as PTimeout from '../PTimeout/PTimeout.ts'
-import type { Session } from '../SessionState/SessionState.ts'
 import * as SessionState from '../SessionState/SessionState.ts'
 import * as TargetState from '../TargetState/TargetState.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
-import type { DevToolsMessage } from '../Types/Types.ts'
 import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
 import { VError } from '../VError/VError.ts'
 
