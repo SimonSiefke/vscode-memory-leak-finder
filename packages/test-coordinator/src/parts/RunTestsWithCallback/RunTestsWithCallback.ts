@@ -39,6 +39,7 @@ export const runTests = async (
   headlessMode,
   color,
   checkLeaks,
+  runSkippedTestsAnyway,
   recordVideo,
   runs,
   measure,
@@ -135,7 +136,7 @@ export const runTests = async (
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
       const { absolutePath, relativeDirname, dirent, relativePath } = formattedPath
-      const forceRun = dirent === `${filterValue}.js`
+      const forceRun = runSkippedTestsAnyway || dirent === `${filterValue}.js`
       if (i !== 0) {
         await callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, /* isFirst */ true)
       }

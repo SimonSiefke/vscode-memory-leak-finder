@@ -16,6 +16,7 @@ export const initialStart = async (options): Promise<void> => {
     headlessMode: options.headless,
     color: options.color,
     checkLeaks: options.checkLeaks,
+    runSkippedTestsAnyway: options.runSkippedTestsAnyway,
     recordVideo: options.recordVideo,
     cwd: options.cwd,
     runs: options.runs,
