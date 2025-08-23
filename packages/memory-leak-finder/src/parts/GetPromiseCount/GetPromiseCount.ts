@@ -1,12 +1,8 @@
+import type { Session } from '../Session/Session.ts'
 import * as GetObjectCount from '../GetObjectCount/GetObjectCount.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
-/**
- *
- * @param {any} session
- * @returns {Promise<number>}
- */
-export const getPromiseCount = async (session, objectGroup) => {
+export const getPromiseCount = async (session: Session, objectGroup: string): Promise<number> => {
   const count = await GetObjectCount.getObjectCount(session, PrototypeExpression.Promise)
   return count
 }

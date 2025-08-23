@@ -12,7 +12,7 @@ export const getFlatScopeList = async (session, objectGroup) => {
     promises2.push(GetScopeListProperties.getScopeListProperties(session, objectId))
   }
   const scopeLists = await Promise.all(promises2)
-  const flatScopeList = scopeLists.flat(1)
+  const flatScopeList = scopeLists.flat()
   const prettyFlatScopeList = PrettifyFlatScopeList.prettifyFlatScopeList(flatScopeList)
   return prettyFlatScopeList
 }

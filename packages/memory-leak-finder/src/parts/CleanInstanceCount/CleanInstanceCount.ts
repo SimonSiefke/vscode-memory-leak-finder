@@ -1,6 +1,6 @@
 import * as Assert from '../Assert/Assert.ts'
-import * as GetSourceMapUrlFromScriptMap from '../GetSourceMapUrlFromScriptMap/GetSourceMapUrlFromScriptMap.ts'
 import * as FormatUrl from '../FormatUrl/FormatUrl.ts'
+import * as GetSourceMapUrlFromScriptMap from '../GetSourceMapUrlFromScriptMap/GetSourceMapUrlFromScriptMap.ts'
 
 const getStack = (url, lineNumber, columnNumber) => {
   if (!url) {

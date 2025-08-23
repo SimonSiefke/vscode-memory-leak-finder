@@ -1,5 +1,5 @@
-import * as PrettifyInstanceCounts from '../src/parts/PrettifyInstanceCounts/PrettifyInstanceCounts.ts'
 import { test, expect } from '@jest/globals'
+import * as PrettifyInstanceCounts from '../src/parts/PrettifyInstanceCounts/PrettifyInstanceCounts.ts'
 
 test.skip('prettifyInstanceCounts', () => {
   const instanceCounts = [
@@ -27,7 +27,7 @@ test.skip('prettifyInstanceCounts', () => {
       count: 4416,
       scriptId: '16',
       lineNumber: 19,
-      columnNumber: 27354,
+      columnNumber: 27_354,
       url: '/test/vscode-memory-leak-finder/.vscode-test/vscode-linux-x64-1.84.1/resources/app/out/vs/workbench/workbench.desktop.main.js',
       sourceMapUrl:
         'https://example.com/sourcemaps/2b35e1e6d88f1ce073683991d1eff5284a32690f/core/vs/workbench/workbench.desktop.main.js.map',

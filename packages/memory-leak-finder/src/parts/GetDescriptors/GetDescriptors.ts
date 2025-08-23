@@ -1,13 +1,8 @@
+import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
 
-/**
- *
- * @param {any} session
- * @param {string} prototype
- * @returns {Promise<any>}
- */
-export const getDescriptors = async (session, prototype, objectGroup) => {
+export const getDescriptors = async (session: Session, prototype: string, objectGroup: string): Promise<any> => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: prototype,
     returnByValue: false,

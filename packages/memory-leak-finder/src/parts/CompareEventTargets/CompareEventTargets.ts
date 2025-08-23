@@ -1,5 +1,5 @@
-import * as Assert from '../Assert/Assert.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
+import * as Assert from '../Assert/Assert.ts'
 
 const getDifference = (prettyBefore, prettyAfter) => {
   const beforeMap = Object.create(null)

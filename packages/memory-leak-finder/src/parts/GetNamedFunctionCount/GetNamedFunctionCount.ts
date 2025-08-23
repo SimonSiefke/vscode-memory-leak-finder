@@ -1,3 +1,4 @@
+import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { filterNamedFunctions } from '../FilterNamedFunctions/FilterNamedFunctions.ts'
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
@@ -5,11 +6,12 @@ import * as GetFunctionObjectIds from '../GetFunctionObjectIds/GetFunctionObject
 import * as GetNamedFunctionLocations from '../GetNamedFunctionLocations/GetNamedFunctionLocations.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
-/**
- * @param {any} session
- * @returns {Promise<any[]>}
- */
-export const getNamedFunctionCount = async (session, objectGroup, scriptMap, includeSourceMap) => {
+export const getNamedFunctionCount = async (
+  session: Session,
+  objectGroup: string,
+  scriptMap: any,
+  includeSourceMap: boolean,
+): Promise<readonly any[]> => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Function,
     returnByValue: false,
