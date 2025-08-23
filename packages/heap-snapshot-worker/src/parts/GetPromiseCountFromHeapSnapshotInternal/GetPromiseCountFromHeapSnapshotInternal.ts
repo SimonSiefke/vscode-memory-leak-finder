@@ -1,13 +1,7 @@
 import { getThingCountFromHeapSnapshot } from '../GetThingCountFromHeapSnapshot/GetThingCountFromHeapSnapshot.ts'
+import { Snapshot } from '../Snapshot/Snapshot.ts'
 
-/**
- *
- * @param {any} snapshot
- * @returns {number}
- */
-export const getPromiseCountFromHeapSnapshotInternal = (snapshot) => {
-  console.time('ag')
+export const getPromiseCountFromHeapSnapshotInternal = (snapshot: Snapshot): number => {
   const count = getThingCountFromHeapSnapshot(snapshot, 'object', 'Promise')
-  console.timeEnd('ag')
   return count
 }
