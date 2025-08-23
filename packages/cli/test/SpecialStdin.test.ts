@@ -26,6 +26,7 @@ const SpecialStdin = await import('../src/parts/SpecialStdin/SpecialStdin.ts')
 const Character = await import('../src/parts/Character/Character.ts')
 const EncodingType = await import('../src/parts/EncodingType/EncodingType.ts')
 const HandleStdinData = await import('../src/parts/HandleStdinData/HandleStdinData.ts')
+const { stopSpecialStdin } = await import('../src/parts/StopSpecialStdin/StopSpecialStdin.ts')
 
 test('start - configures stdin properly', async () => {
   await SpecialStdin.start()
@@ -49,7 +50,7 @@ test('start - attaches data event listener', async () => {
 })
 
 test('stop - pauses stdin and writes newline', async () => {
-  await SpecialStdin.stop()
+  await stopSpecialStdin()
 
   expect(Stdin.pause).toHaveBeenCalled()
   expect(Stdout.write).toHaveBeenCalledWith(Character.NewLine)

@@ -39,6 +39,7 @@ jobs:
         run: npm ci --ignore-scripts && npm run postinstall
         if: steps.npm-cache.outputs.cache-hit != 'true'
       - run: npm run type-check
+      - run: npm run lint
       - run: npm run build
       - run: npx lerna run test --since origin/main
       - name: Run headless test (with videos)
@@ -76,4 +77,5 @@ jobs:
         if: always()
         with:
           name: vscode-videos-${{ runner.os }}
-          path: .vscode-videos
+          path: ./.vscode-videos
+          include-hidden-files: true

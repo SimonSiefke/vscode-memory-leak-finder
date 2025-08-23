@@ -1,5 +1,5 @@
-import * as DeduplicateEventListeners from '../src/parts/DeduplicateEventListeners/DeduplicateEventListeners.ts'
 import { test, expect } from '@jest/globals'
+import * as DeduplicateEventListeners from '../src/parts/DeduplicateEventListeners/DeduplicateEventListeners.ts'
 
 test('deduplicateEventListeners', () => {
   const eventListeners = [

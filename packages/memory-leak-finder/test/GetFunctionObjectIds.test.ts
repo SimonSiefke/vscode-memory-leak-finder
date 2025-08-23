@@ -1,5 +1,5 @@
-import * as GetFunctionObjectIds from '../src/parts/GetFunctionObjectIds/GetFunctionObjectIds.ts'
 import { test, expect } from '@jest/globals'
+import * as GetFunctionObjectIds from '../src/parts/GetFunctionObjectIds/GetFunctionObjectIds.ts'
 
 test('getFunctionObjectIds', () => {
   const descriptors = [

@@ -1,10 +1,5 @@
 import * as ObjectType from '../ObjectType/ObjectType.ts'
 
-/**
- *
- * @param {any} ipc
- * @returns
- */
 export const createRpc = (ipc: any): any => {
   const callbacks = Object.create(null)
   const handleMessage = (message: any): void => {
@@ -67,9 +62,9 @@ export const createRpc = (ipc: any): any => {
       delete listeners[event]
     },
     once(event: string): Promise<any> {
-      return new Promise((resolve) => {
-        onceListeners[event] = resolve
-      })
+      const { resolve, promise } = Promise.withResolvers<any>()
+      onceListeners[event] = resolve
+      return promise
     },
   }
 }

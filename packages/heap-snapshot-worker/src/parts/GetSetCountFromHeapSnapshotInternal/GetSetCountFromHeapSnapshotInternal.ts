@@ -1,10 +1,6 @@
 import { getThingCountFromHeapSnapshot } from '../GetThingCountFromHeapSnapshot/GetThingCountFromHeapSnapshot.ts'
+import { Snapshot } from '../Snapshot/Snapshot.ts'
 
-/**
- *
- * @param {any} snapshot
- * @returns {number}
- */
-export const getSetCountFromHeapSnapshotInternal = (snapshot) => {
+export const getSetCountFromHeapSnapshotInternal = (snapshot: Snapshot): number => {
   return getThingCountFromHeapSnapshot(snapshot, 'object', 'Set')
 }

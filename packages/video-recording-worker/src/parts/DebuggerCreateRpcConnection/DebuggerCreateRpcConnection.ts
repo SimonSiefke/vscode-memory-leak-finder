@@ -5,9 +5,9 @@ import * as ObjectType from '../ObjectType/ObjectType.ts'
  * @param {any} ipc
  * @returns
  */
-export const createRpc = (ipc) => {
+export const createRpc = (ipc: any) => {
   const callbacks = Object.create(null)
-  const handleMessage = (message) => {
+  const handleMessage = (message: any) => {
     if ('id' in message) {
       if ('result' in message) {
         callbacks[message.id].resolve(message)
@@ -37,36 +37,36 @@ export const createRpc = (ipc) => {
     callbacks,
     listeners,
     onceListeners,
-    invoke(method, params) {
-      return new Promise((resolve, reject) => {
-        const id = _id++
-        callbacks[id] = { resolve, reject }
-        ipc.send({
-          method,
-          params,
-          id,
-        })
+    invoke(method: string, params: any) {
+      const { resolve, reject, promise } = Promise.withResolvers<any>()
+      const id = _id++
+      callbacks[id] = { resolve, reject }
+      ipc.send({
+        method,
+        params,
+        id,
       })
+      return promise
     },
-    invokeWithSession(sessionId, method, params) {
-      return new Promise((resolve, reject) => {
-        const id = _id++
-        callbacks[id] = { resolve, reject }
-        ipc.send({
-          sessionId,
-          method,
-          params,
-          id,
-        })
+    invokeWithSession(sessionId: string, method: string, params: any) {
+      const { resolve, reject, promise } = Promise.withResolvers<any>()
+      const id = _id++
+      callbacks[id] = { resolve, reject }
+      ipc.send({
+        sessionId,
+        method,
+        params,
+        id,
       })
+      return promise
     },
-    on(event, listener) {
+    on(event: string, listener: any) {
       listeners[event] = listener
     },
-    once(event) {
-      return new Promise((resolve) => {
-        onceListeners[event] = resolve
-      })
+    once(event: string) {
+      const { resolve, promise } = Promise.withResolvers<any>()
+      onceListeners[event] = resolve
+      return promise
     },
   }
 }

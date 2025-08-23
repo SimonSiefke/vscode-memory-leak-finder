@@ -1,11 +1,7 @@
 import { getTypeCount } from '../GetTypeCount/GetTypeCount.ts'
+import { Snapshot } from '../Snapshot/Snapshot.ts'
 
-/**
- *
- * @param {any} snapshot
- * @returns {number}
- */
-export const getHeapSnapshotObjectCountInternal = (snapshot) => {
+export const getHeapSnapshotObjectCountInternal = (snapshot: Snapshot): number => {
   const numberCount = getTypeCount(snapshot, 'number')
   const nativeCount = getTypeCount(snapshot, 'native')
 

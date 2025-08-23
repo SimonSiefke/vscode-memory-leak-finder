@@ -6,14 +6,11 @@ interface State {
 }
 
 export const state: State = {
-  /**
-   * @type {ChildProcess|undefined}
-   */
   process: undefined,
   outFile: '',
 }
 
-export const set = (value) => {
+export const set = (value: ChildProcess | undefined): void => {
   state.process = value
 }
 
@@ -25,6 +22,6 @@ export const getOutFile = () => {
   return state.outFile
 }
 
-export const setOutFile = (outFile) => {
+export const setOutFile = (outFile: string) => {
   state.outFile = outFile
 }

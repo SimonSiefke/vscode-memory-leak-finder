@@ -1,10 +1,6 @@
 import { getThingCountFromHeapSnapshot } from '../GetThingCountFromHeapSnapshot/GetThingCountFromHeapSnapshot.ts'
+import { Snapshot } from '../Snapshot/Snapshot.ts'
 
-/**
- *
- * @param {any} snapshot
- * @returns {number}
- */
-export const getEditContextCountFromHeapSnapshotInternal = (snapshot) => {
+export const getEditContextCountFromHeapSnapshotInternal = (snapshot: Snapshot): number => {
   return getThingCountFromHeapSnapshot(snapshot, 'object', 'EditContext')
 }

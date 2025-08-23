@@ -1,7 +1,7 @@
-import { VError } from '../VError/VError.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as PTimeout from '../PTimeout/PTimeout.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
+import { VError } from '../VError/VError.ts'
 
 interface Target {
   readonly type: string

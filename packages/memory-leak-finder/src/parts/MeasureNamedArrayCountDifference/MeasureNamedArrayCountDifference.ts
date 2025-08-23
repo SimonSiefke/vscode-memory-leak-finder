@@ -1,7 +1,7 @@
+import * as CompareNamedArrayCountDifference from '../CompareNamedArrayCountDifference/CompareNamedArrayCountDifference.ts'
 import * as GetNamedArrayCount from '../GetNamedArrayCount/GetNamedArrayCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
-import * as CompareNamedArrayCountDifference from '../CompareNamedArrayCountDifference/CompareNamedArrayCountDifference.ts'
 
 export const id = MeasureId.NamedArrayCountDifference
 

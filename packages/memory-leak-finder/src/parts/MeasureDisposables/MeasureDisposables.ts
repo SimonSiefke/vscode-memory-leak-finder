@@ -3,8 +3,8 @@ import * as GetDisposablesWithLocation from '../GetDisposablesWithLocation/GetDi
 import * as IsLeakDisposables from '../IsLeakDisposables/IsLeakDisposables.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
-import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
+import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 
 // TODO
 // 1. query all objects

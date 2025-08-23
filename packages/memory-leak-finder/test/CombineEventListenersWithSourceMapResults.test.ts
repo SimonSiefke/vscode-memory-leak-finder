@@ -1,6 +1,6 @@
+import { test, expect } from '@jest/globals'
 import * as CombineEventListenersWithSourceMapResults from '../src/parts/CombineEventListenersWithSourceMapResults/CombineEventListenersWithSourceMapResults.ts'
 import * as GetSourceMapUrlMap from '../src/parts/GetSourceMapUrlMap/GetSourceMapUrlMap.ts'
-import { test, expect } from '@jest/globals'
 
 test('combineEventListenersWithSourceMapResults', () => {
   const eventListeners = [

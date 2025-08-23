@@ -33,9 +33,11 @@ export const waitForEvent = async ({ frameId, name, timeout = TimeoutConstants.P
       }
     }
     return await PTimeout.pTimeout(
-      new Promise((resolve, reject) => {
+      (() => {
+        const { resolve, reject, promise } = Promise.withResolvers<void>()
         state.callbacks.push({ frameId, name, resolve, reject })
-      }),
+        return promise
+      })(),
       { milliseconds: timeout },
     )
   } catch (error) {

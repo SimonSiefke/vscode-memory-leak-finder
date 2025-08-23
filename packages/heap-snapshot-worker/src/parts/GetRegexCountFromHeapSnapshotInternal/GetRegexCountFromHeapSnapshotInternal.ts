@@ -1,10 +1,6 @@
 import { getTypeCount } from '../GetTypeCount/GetTypeCount.ts'
+import { Snapshot } from '../Snapshot/Snapshot.ts'
 
-/**
- *
- * @param {any} snapshot
- * @returns {number}
- */
-export const getRegexCountFromHeapSnapshotInternal = (snapshot) => {
+export const getRegexCountFromHeapSnapshotInternal = (snapshot: Snapshot): number => {
   return getTypeCount(snapshot, 'regexp')
 }

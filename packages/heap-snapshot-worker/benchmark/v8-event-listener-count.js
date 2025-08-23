@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import { getV8EventListenerCountFromHeapSnapshot } from '../src/parts/GetV8EventListenerCountFromHeapSnapshot/GetV8EventListenerCountFromHeapSnapshot.js'
+import { getV8EventListenerCountFromHeapSnapshot } from '../src/parts/GetV8EventListenerCountFromHeapSnapshot/GetV8EventListenerCountFromHeapSnapshot.ts'
 
 const filePath1 = join(import.meta.dirname, '../../../.vscode-heapsnapshots/0.heapsnapshot')
 

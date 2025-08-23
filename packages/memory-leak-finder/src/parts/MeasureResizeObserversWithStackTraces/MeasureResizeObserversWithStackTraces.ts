@@ -1,7 +1,7 @@
-import * as MeasureId from '../MeasureId/MeasureId.ts'
-import * as GetResizeObserverCount from '../GetResizeObserverCount/GetResizeObserverCount.ts'
 import * as CompareCount from '../CompareCount/CompareCount.ts'
+import * as GetResizeObserverCount from '../GetResizeObserverCount/GetResizeObserverCount.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
+import * as MeasureId from '../MeasureId/MeasureId.ts'
 
 export const id = MeasureId.ResizeObserversWithStackTraces
 

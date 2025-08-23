@@ -1,12 +1,8 @@
+import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
-/**
- *
- * @param {any} session
- * @returns {Promise<number>}
- */
-export const getCssInlineStyleCount = async (session, objectGroup) => {
+export const getCssInlineStyleCount = async (session: Session, objectGroup: string): Promise<number> => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Node,
     returnByValue: false,

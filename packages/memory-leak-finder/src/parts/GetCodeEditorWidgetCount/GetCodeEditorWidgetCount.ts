@@ -1,10 +1,6 @@
+import type { Session } from '../Session/Session.ts'
 import * as GetConstructorInstanceCount from '../GetConstructorInstanceCount/GetConstructorInstanceCount.ts'
 
-/**
- *
- * @param {any} session
- * @returns {Promise<number>}
- */
-export const getCodeEditorWidgetCount = async (session, objectGroup) => {
+export const getCodeEditorWidgetCount = async (session: Session, objectGroup: string): Promise<number> => {
   return GetConstructorInstanceCount.getConstructorInstanceCount(session, objectGroup, 'CodeEditorWidget')
 }

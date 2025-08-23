@@ -1,5 +1,5 @@
-import * as CompareDetachedDomNodes from '../src/parts/CompareDetachedDomNodes/CompareDetachedDomNodes.ts'
 import { test, expect } from '@jest/globals'
+import * as CompareDetachedDomNodes from '../src/parts/CompareDetachedDomNodes/CompareDetachedDomNodes.ts'
 
 test('compareDetachedDomNodes', () => {
   const before = [

@@ -16,7 +16,7 @@ export const reset = () => {
   state.targetCallbackMap = Object.create(null)
 }
 
-export const addSession = (sessionId, session) => {
+export const addSession = (sessionId: string, session: any) => {
   state.sessionMap[sessionId] = session
   if (session.type in state.targetCallbackMap) {
     state.targetCallbackMap[session.type]
@@ -24,40 +24,30 @@ export const addSession = (sessionId, session) => {
   }
 }
 
-export const removeSession = (sessionId) => {
+export const removeSession = (sessionId: string) => {
   delete state.sessionMap[sessionId]
 }
 
-export const hasSession = (sessionId) => {
+export const hasSession = (sessionId: string) => {
   return sessionId in state.sessionMap
 }
 
-export const getSession = (sessionId) => {
+export const getSession = (sessionId: string) => {
   return state.sessionMap[sessionId]
 }
 
-export const waitForTarget = (type, fn) => {
+export const waitForTarget = (type: any, fn: any) => {
   for (const session of Object.values(state.sessionMap)) {
     if (session.type === type) {
       return session
     }
   }
   const cdp = PTimeout.pTimeout(
-    new Promise((resolve, reject) => {
-      // const cleanup = () => {
-      //   delete state.targetCallbackMap[type]
-      // }
-      // const handleSuccess = (value) => {
-      //   cleanup()
-      //   resolve(value)
-      // }
-      // const handleTimeout = () => {
-      //   delete state.targetCallbackMap[type]
-      //   reject()
-      // }
+    (() => {
+      const { resolve, promise } = Promise.withResolvers<any>()
       state.targetCallbackMap[type] = resolve
-      // setTimeout(handleTimeout, 500)
-    }),
+      return promise
+    })(),
     { milliseconds: TimeoutConstants.SessionState },
   )
   return cdp
