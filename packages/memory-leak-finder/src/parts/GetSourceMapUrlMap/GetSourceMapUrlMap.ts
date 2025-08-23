@@ -1,5 +1,5 @@
-import * as GetSourceMapUrl from '../GetSourceMapUrl/GetSourceMapUrl.ts'
 import * as FormatUrl from '../FormatUrl/FormatUrl.ts'
+import * as GetSourceMapUrl from '../GetSourceMapUrl/GetSourceMapUrl.ts'
 
 const getUniqueInputs = (inputs) => {
   const seen = Object.create(null)

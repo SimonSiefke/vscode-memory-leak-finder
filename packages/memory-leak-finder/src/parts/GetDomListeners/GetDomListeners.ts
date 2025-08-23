@@ -1,5 +1,5 @@
-import * as GetConstructorInstances from '../GetConstructorInstances/GetConstructorInstances.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as GetConstructorInstances from '../GetConstructorInstances/GetConstructorInstances.ts'
 
 export const getDomListeners = async (session, objectGroup) => {
   const instances = await GetConstructorInstances.getConstructorInstances(session, objectGroup, 'DomListener')

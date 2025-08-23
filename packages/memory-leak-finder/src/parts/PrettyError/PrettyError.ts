@@ -1,6 +1,6 @@
+import { codeFrameColumns } from '@babel/code-frame'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { codeFrameColumns } from '@babel/code-frame'
 import * as CleanStack from '../CleanStack/CleanStack.ts'
 import * as ErrorCodes from '../ErrorCodes/ErrorCodes.ts'
 import * as FileSystem from '../FileSystem/FileSystem.ts'

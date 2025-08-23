@@ -8,15 +8,6 @@
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
   },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
-  "dependencies": {
-    "@lvce-editor/assert": "^1.4.0",
-    "@lvce-editor/rpc": "^4.14.0",
-    "@lvce-editor/verror": "^1.7.0",
-    "pretty-bytes": "^7.0.1"
-  },
   "xo": {
     "rules": {
       "unicorn/filename-case": "off",
@@ -63,5 +54,11 @@
     "ignores": [
       "distmin"
     ]
+  },
+  "dependencies": {
+    "@lvce-editor/assert": "^1.4.0",
+    "@lvce-editor/rpc": "^4.14.0",
+    "@lvce-editor/verror": "^1.7.0",
+    "pretty-bytes": "^7.0.1"
   }
 }
