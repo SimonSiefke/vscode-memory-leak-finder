@@ -78,7 +78,8 @@ export const waitForTarget = async ({ type, index = -1, url = new RegExp('') }) 
       currentIndex++
     }
     return await PTimeout.pTimeout(
-      new Promise((resolve, reject) => {
+      (() => {
+        const { resolve, reject, promise } = Promise.withResolvers<any>()
         state.callbacks.push({
           type,
           url,
@@ -86,7 +87,8 @@ export const waitForTarget = async ({ type, index = -1, url = new RegExp('') }) 
           resolve,
           reject,
         })
-      }),
+        return promise
+      })(),
       { milliseconds: TimeoutConstants.Target },
     )
   } catch {
@@ -100,12 +102,14 @@ export const waitForTargetToBeClosed = async (targetId) => {
     return
   }
   return await PTimeout.pTimeout(
-    new Promise((resolve, reject) => {
+    (() => {
+      const { resolve, promise } = Promise.withResolvers<void>()
       state.destroyedCallbacks.push({
         targetId,
         resolve,
       })
-    }),
+      return promise
+    })(),
     { milliseconds: TimeoutConstants.Target },
   )
 }

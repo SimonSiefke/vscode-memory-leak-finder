@@ -76,9 +76,11 @@ export const waitForDefaultExecutionContext = async (sessionId) => {
       }
     }
     return await PTimeout.pTimeout(
-      new Promise((resolve, reject) => {
+      (() => {
+        const { resolve, promise } = Promise.withResolvers<any>()
         state.defaultExecutionContextCallbacks[sessionId] = resolve
-      }),
+        return promise
+      })(),
       { milliseconds: TimeoutConstants.DefaultExecutionContext },
     )
   } catch (error) {
@@ -96,9 +98,11 @@ export const waitForUtilityExecutionContext = async (sessionId) => {
       }
     }
     return await PTimeout.pTimeout(
-      new Promise((resolve, reject) => {
+      (() => {
+        const { resolve, promise } = Promise.withResolvers<any>()
         state.utilityExecutionContextCallbacks[sessionId] = resolve
-      }),
+        return promise
+      })(),
       { milliseconds: TimeoutConstants.UtilityExecutionContext },
     )
   } catch (error) {
