@@ -201,11 +201,13 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-${{ runner.os }}
           path: ./.vscode-memory-leak-finder-results
+          include-hidden-files: true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: vscode-videos-${{ runner.os }}
           path: ./.vscode-videos
+          include-hidden-files: true
       - name: Upload artifact
         if: matrix.os == 'ubuntu-24.04'
         uses: actions/upload-pages-artifact@v3

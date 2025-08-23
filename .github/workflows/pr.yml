@@ -78,3 +78,4 @@ jobs:
         with:
           name: vscode-videos-${{ runner.os }}
           path: ./.vscode-videos
+          include-hidden-files: true
