@@ -1,7 +1,7 @@
 import * as KillWorkers from '../KillWorkers/KillWorkers.ts'
-import * as SpecialStdin from '../SpecialStdin/SpecialStdin.ts'
+import { stopSpecialStdin } from '../StopSpecialStdin/StopSpecialStdin.ts'
 
 export const handleExit = async (): Promise<void> => {
-  await SpecialStdin.stop()
+  await stopSpecialStdin()
   await KillWorkers.killWorkers()
 }

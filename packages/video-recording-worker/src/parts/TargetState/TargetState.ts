@@ -20,7 +20,7 @@ export const reset = () => {
   state.callbacks = []
 }
 
-export const addTarget = (targetId, target) => {
+export const addTarget = (targetId: string, target: any) => {
   Assert.string(targetId)
   Assert.object(target)
   state.targets[targetId] = target
@@ -37,7 +37,7 @@ export const addTarget = (targetId, target) => {
   }
 }
 
-export const removeTarget = (targetId) => {
+export const removeTarget = (targetId: string) => {
   Assert.string(targetId)
   delete state.targets[targetId]
   const toRemove: any[] = []
@@ -56,7 +56,7 @@ export const removeTarget = (targetId) => {
   state.destroyedCallbacks = newCallbacks
 }
 
-export const waitForTarget = async ({ type, index }) => {
+export const waitForTarget = async ({ type, index }: { type: string; index: number }) => {
   try {
     let currentIndex = 0
     for (const target of Object.values(state.targets)) {
@@ -80,7 +80,7 @@ export const waitForTarget = async ({ type, index }) => {
   }
 }
 
-export const waitForTargetToBeClosed = async (targetId) => {
+export const waitForTargetToBeClosed = async (targetId: string) => {
   Assert.string(targetId)
   if (!(targetId in state.targets)) {
     return
