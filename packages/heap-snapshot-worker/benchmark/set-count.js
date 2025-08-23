@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import { getSetCountFromHeapSnapshot } from '../src/parts/GetSetCountFromHeapSnapshot/GetSetCountFromHeapSnapshot.js'
+import { getSetCountFromHeapSnapshot } from '../src/parts/GetSetCountFromHeapSnapshot/GetSetCountFromHeapSnapshot.ts'
 
 const filePath1 = join(import.meta.dirname, '../../../.vscode-heapsnapshots/0.heapsnapshot')
 

@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import { getWeakMapCountFromHeapSnapshot } from '../src/parts/GetWeakMapCountFromHeapSnapshot/GetWeakMapCountFromHeapSnapshot.js'
+import { getWeakMapCountFromHeapSnapshot } from '../src/parts/GetWeakMapCountFromHeapSnapshot/GetWeakMapCountFromHeapSnapshot.ts'
 
 const filePath1 = join(import.meta.dirname, '../../../.vscode-heapsnapshots/0.heapsnapshot')
 

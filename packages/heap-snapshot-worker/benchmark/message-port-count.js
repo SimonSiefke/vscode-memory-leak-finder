@@ -1,14 +1,15 @@
 import { join } from 'node:path'
-import { getV8EventListenerCountFromHeapSnapshot } from '../src/parts/GetV8EventListenerCountFromHeapSnapshot/GetV8EventListenerCountFromHeapSnapshot.ts'
+import { getMessagePortCountFromHeapSnapshot } from '../src/parts/GetMessagePortCountFromHeapSnapshot/GetMessagePortCountFromHeapSnapshot.ts'
 
 const filePath1 = join(import.meta.dirname, '../../../.vscode-heapsnapshots/0.heapsnapshot')
 
-const testV8EventListenerCount = async () => {
-  console.log('Testing V8EventListener Count:')
+const testWeakRefCount = async () => {
+  console.log('Testing MessagePort Count:')
 
   try {
-    const count = await getV8EventListenerCountFromHeapSnapshot(filePath1)
+    const count = await getMessagePortCountFromHeapSnapshot(filePath1)
     console.log({ count })
+    console.log('Expected: 6')
   } catch (error) {
     console.error('Error:', error.message)
   }
@@ -16,7 +17,7 @@ const testV8EventListenerCount = async () => {
 
 const main = async () => {
   try {
-    await testV8EventListenerCount()
+    await testWeakRefCount()
   } catch (error) {
     console.error('Test failed:', error.message)
     process.exit(1)

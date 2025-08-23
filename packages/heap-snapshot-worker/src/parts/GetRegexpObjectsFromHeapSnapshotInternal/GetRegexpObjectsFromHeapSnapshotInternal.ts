@@ -1,13 +1,11 @@
-/**
- * @param {import('../Snapshot/Snapshot.ts').Snapshot} snapshot
- * @returns {Array}
- */
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
+
 export interface RegexpObject {
   readonly id: number
   readonly pattern: string
 }
 
-export const getRegexpObjectsFromHeapSnapshotInternal = (snapshot) => {
+export const getRegexpObjectsFromHeapSnapshotInternal = (snapshot: Snapshot): readonly RegexpObject[] => {
   const { nodes, strings, meta } = snapshot
   const { node_types, node_fields } = meta
 

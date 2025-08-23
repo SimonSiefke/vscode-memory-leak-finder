@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import { parseHeapSnapshotStringsCount } from '../src/parts/ParseHeapSnapshotStringsCount/ParseHeapSnapshotStringsCount.js'
+import { parseHeapSnapshotStringsCount } from '../src/parts/ParseHeapSnapshotStringsCount/ParseHeapSnapshotStringsCount.ts'
 
 const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
 
