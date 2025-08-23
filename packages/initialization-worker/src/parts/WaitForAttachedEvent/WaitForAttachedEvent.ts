@@ -3,15 +3,15 @@ import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 export const waitForAttachedEvent = (browserRpc: any, timeout: number): Promise<any> => {
   const { resolve, promise } = Promise.withResolvers()
 
-  const cleanup = (result) => {
+  const cleanup = (result: any): void => {
     browserRpc.off(DevtoolsEventType.TargetAttachedToTarget, handleAttached)
     clearTimeout(timeoutRef)
     resolve(result)
   }
-  const handleAttached = (message) => {
+  const handleAttached = (message: any): void => {
     cleanup(message)
   }
-  const handleTimeout = () => {
+  const handleTimeout = (): void => {
     cleanup(null)
   }
   browserRpc.on(DevtoolsEventType.TargetAttachedToTarget, handleAttached)
