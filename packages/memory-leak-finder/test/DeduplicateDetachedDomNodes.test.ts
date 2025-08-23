@@ -1,5 +1,5 @@
-import * as DeduplicateDetachedDomNodes from '../src/parts/DeduplicateDetachedDomNodes/DeduplicateDetachedDomNodes.ts'
 import { test, expect } from '@jest/globals'
+import * as DeduplicateDetachedDomNodes from '../src/parts/DeduplicateDetachedDomNodes/DeduplicateDetachedDomNodes.ts'
 
 test('deduplicateDetachedDomNodes', () => {
   const detachedDomNodes = [

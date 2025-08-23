@@ -1,5 +1,5 @@
-import * as CompareInstanceCountsDifference from '../src/parts/CompareInstanceCountsDifference/CompareInstanceCountsDifference.ts'
 import { test, expect } from '@jest/globals'
+import * as CompareInstanceCountsDifference from '../src/parts/CompareInstanceCountsDifference/CompareInstanceCountsDifference.ts'
 
 test('compareInstanceCountsDifference', async () => {
   const before = [

@@ -2,21 +2,11 @@
   "name": "@vscode-memory-leak-finder/memory-leak-finder",
   "version": "0.0.0-dev",
   "description": "",
-  "main": "src/index.js",
-  "types": "src/index.d.ts",
+  "main": "src/main.ts",
   "type": "module",
   "scripts": {
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
-  "dependencies": {
-    "@lvce-editor/assert": "^1.4.0",
-    "@lvce-editor/rpc": "^4.14.0",
-    "@lvce-editor/verror": "^1.7.0",
-    "pretty-bytes": "^7.0.1"
   },
   "xo": {
     "rules": {
@@ -64,5 +54,11 @@
     "ignores": [
       "distmin"
     ]
+  },
+  "dependencies": {
+    "@lvce-editor/assert": "^1.4.0",
+    "@lvce-editor/rpc": "^4.14.0",
+    "@lvce-editor/verror": "^1.7.0",
+    "pretty-bytes": "^7.0.1"
   }
 }

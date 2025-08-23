@@ -1,12 +1,9 @@
-import { VError } from '../VError/VError.ts'
+import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
-/**
- *
- * @param {any} session
- * @returns {Promise<number>}
- */
-export const getEventListenerCount = async (session) => {
+import { VError } from '../VError/VError.ts'
+
+export const getEventListenerCount = async (session: Session): Promise<number> => {
   try {
     const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
       expression: PrototypeExpression.EventTarget,

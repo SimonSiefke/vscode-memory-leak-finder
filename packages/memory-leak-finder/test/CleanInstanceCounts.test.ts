@@ -1,5 +1,5 @@
-import * as CleanInstanceCounts from '../src/parts/CleanInstanceCounts/CleanInstanceCounts.ts'
 import { test, expect } from '@jest/globals'
+import * as CleanInstanceCounts from '../src/parts/CleanInstanceCounts/CleanInstanceCounts.ts'
 
 test('cleanInstanceCounts', () => {
   const instances = [{}]

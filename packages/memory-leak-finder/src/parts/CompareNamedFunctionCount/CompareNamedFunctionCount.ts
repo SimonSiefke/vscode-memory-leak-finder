@@ -1,5 +1,5 @@
-import * as SortNamedFunctions from '../SortNamedFunctions/SortNamedFunctions.ts'
 import * as CreateCountMap from '../CreateCountMap/CreateCountMap.ts'
+import * as SortNamedFunctions from '../SortNamedFunctions/SortNamedFunctions.ts'
 
 const mergeFunctions = (beforeFunctions, afterFunctions) => {
   const beforeMap = CreateCountMap.createCountMap(beforeFunctions, 'url')

@@ -6,9 +6,9 @@ import * as GetDetachedDomNodesWithStackTraces from '../GetDetachedDomNodesWithS
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
+import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as StartTrackingDomNodeStackTraces from '../StartTrackingDomNodeStackTraces/StartTrackingDomNodeStackTraces.ts'
 import * as StopTrackingDomNodeStackTraces from '../StopTrackingDomNodeStackTraces/StopTrackingDomNodeStackTraces.ts'
-import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 
 export const id = MeasureId.DetachedDomNodesDifferenceWithStackTraces
 

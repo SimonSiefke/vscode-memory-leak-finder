@@ -1,12 +1,8 @@
+import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as GetDisposableStores from '../GetDisposableStores/GetDisposableStores.ts'
 
-/**
- *
- * @param {any} session
- * @returns {Promise<number>}
- */
-export const getDisposableStoreSizes = async (session, objectGroup) => {
+export const getDisposableStoreSizes = async (session: Session, objectGroup: string): Promise<number> => {
   const fnResult1 = await GetDisposableStores.getDisposableStores(session, objectGroup)
   const fnResult2 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){

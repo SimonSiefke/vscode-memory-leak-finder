@@ -1,5 +1,5 @@
-import * as GetSourceMapUrlMap from '../src/parts/GetSourceMapUrlMap/GetSourceMapUrlMap.ts'
 import { test, expect } from '@jest/globals'
+import * as GetSourceMapUrlMap from '../src/parts/GetSourceMapUrlMap/GetSourceMapUrlMap.ts'
 
 test('getSourceMapUrlMap', () => {
   const eventListeners = [

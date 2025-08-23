@@ -1,11 +1,7 @@
+import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
-/**
- *
- * @param {any} session
- * @returns {Promise<number>}
- */
-export const getCssStyleSheetCount = async (session, objectGroup) => {
+export const getCssStyleSheetCount = async (session: Session, objectGroup: string): Promise<number> => {
   const count = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: `function getStyleSheetCount() {
   let totalRules = 0;

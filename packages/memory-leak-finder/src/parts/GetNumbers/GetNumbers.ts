@@ -1,6 +1,7 @@
+import type { Session } from '../Session/Session.ts'
+import * as Arrays from '../Arrays/Arrays.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
-import * as Arrays from '../Arrays/Arrays.ts'
 
 const compareNumber = (a, b) => {
   return b - a
@@ -10,12 +11,7 @@ const sortNumbers = (numbers) => {
   return Arrays.toSorted(numbers, compareNumber)
 }
 
-/**
- *
- * @param {any} session
- * @returns {Promise<number[]>}
- */
-export const getNumbers = async (session, objectGroup) => {
+export const getNumbers = async (session: Session, objectGroup: string): Promise<readonly number[]> => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Object,
     returnByValue: false,
