@@ -66,13 +66,3 @@ export const handleAttachedToTarget = (message) => {
       console.warn(`unsupported attachment type ${type}`)
   }
 }
-
-export const handleDetachedFromTarget = (message) => {
-  SessionState.removeSession(message.params.sessionId)
-}
-
-export const handleTargetCreated = async () => {}
-
-export const handlePageLoadEventFired = () => {
-  // console.log('load event fired', message)
-}
