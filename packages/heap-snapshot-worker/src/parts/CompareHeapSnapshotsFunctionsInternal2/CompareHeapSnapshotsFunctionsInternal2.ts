@@ -76,6 +76,7 @@ const formatUniqueLocations = (
 
 export interface CompareFunctionsOptions {
   readonly minCount?: number
+  readonly excludeOriginalPaths?: readonly string[]
 }
 
 export const compareHeapSnapshotFunctionsInternal2 = async (
@@ -103,7 +104,23 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
     nodeNameOffset,
     after.strings,
   )
-  const enriched = await addOriginalSources(formattedItems)
+  let enriched = await addOriginalSources(formattedItems)
+  const excludes = options.excludeOriginalPaths || []
+  if (excludes.length > 0) {
+    const lowered = excludes.map((e) => e.toLowerCase())
+    enriched = enriched.filter((item) => {
+      const original = (item.originalUrl || item.originalSource || '').toLowerCase()
+      if (!original) {
+        return true
+      }
+      for (const ex of lowered) {
+        if (original.includes(ex)) {
+          return false
+        }
+      }
+      return true
+    })
+  }
   const sorted = enriched.toSorted((a, b) => b.count - a.count)
   return sorted
 }
