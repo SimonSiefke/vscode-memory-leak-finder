@@ -13,9 +13,7 @@ export const monkeyPatchElectronScript = `function () {
   let whenReadyCallback
   let isReady = false
 
-  const whenReadyPromise = new Promise(resolve => {
-    whenReadyCallback = resolve
-  })
+  const whenReadyPromise = (() => { const {resolve, promise} = Promise.withResolvers(); whenReadyCallback = resolve; return promise })()
 
   const patchedAppEmit = (event, ...args) => {
     if (event === 'ready') {

@@ -43,21 +43,11 @@ export const waitForTarget = (type, fn) => {
     }
   }
   const cdp = PTimeout.pTimeout(
-    new Promise((resolve, reject) => {
-      // const cleanup = () => {
-      //   delete state.targetCallbackMap[type]
-      // }
-      // const handleSuccess = (value) => {
-      //   cleanup()
-      //   resolve(value)
-      // }
-      // const handleTimeout = () => {
-      //   delete state.targetCallbackMap[type]
-      //   reject()
-      // }
+    (() => {
+      const { resolve, promise } = Promise.withResolvers<any>()
       state.targetCallbackMap[type] = resolve
-      // setTimeout(handleTimeout, 500)
-    }),
+      return promise
+    })(),
     { milliseconds: TimeoutConstants.SessionState },
   )
   return cdp
