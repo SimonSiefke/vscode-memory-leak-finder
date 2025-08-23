@@ -37,14 +37,7 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
   })
 
   await connectDevtoolsPromise
-  // TODO race condition?
-  // void connectDevtools(devtoolsWebSocketUrl)
 
-  // TODO can probably dispose this electron rpc at this point
-
-  // TODO start workers before connecting
-  // TODO connect workers in parallel
-  // TODO maybe pause again at this point, ensuring workers can connect correctly
   return {
     webSocketUrl,
     devtoolsWebSocketUrl,
@@ -55,14 +48,4 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
   }
 }
 
-export const undoMonkeyPatch = async () => {
-  // TODO avoid global variables
-  // @ts-ignore
-  // const { electronRpc } = globalThis
-  // // @ts-ignore
-  // const { monkeyPatchedElectronId } = globalThis
-  // await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-  //   functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
-  //   objectId: monkeyPatchedElectronId,
-  // })
-}
+export const undoMonkeyPatch = async () => {}
