@@ -17,6 +17,7 @@ import * as ParseHeapSnapshotNumbers from '../ParseHeapSnapshotNumbers/ParseHeap
 import * as ParseHeapSnapshotStrings from '../ParseHeapSnapshotStrings/ParseHeapSnapshotStrings.ts'
 import * as ParseHeapSnapshotStringsCount from '../ParseHeapSnapshotStringsCount/ParseHeapSnapshotStringsCount.ts'
 import * as ParseUserStrings from '../ParseUserStrings/ParseUserStrings.ts'
+import * as CompareHeapSnapshotsFunctions2 from '../CompareHeapSnapshotsFunctions2/CompareHeapSnapshotsFunctions2.ts'
 
 export const commandMap = {
   'HeapSnapshot.compareFunctions': CompareHeapSnapshotsFunctions.compareHeapSnapshotFunctions,
@@ -39,4 +40,5 @@ export const commandMap = {
   'HeapSnapshot.parseStringCount': ParseHeapSnapshotStringsCount.parseHeapSnapshotStringsCount,
   'HeapSnapshot.parseStrings': ParseHeapSnapshotStrings.parseHeapSnapshotStrings,
   'HeapSnapshot.parseUserStrings': ParseUserStrings.parseUserStrings,
+  'HeapSnapshot.compareFunctions2': CompareHeapSnapshotsFunctions2.compareHeapSnapshotFunctions2,
 }

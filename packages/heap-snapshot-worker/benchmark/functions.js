@@ -8,18 +8,13 @@ const resultPath = join(import.meta.dirname, '..', '.tmp', 'functions.json')
 
 const testFunctionCount = async () => {
   console.log('Testing Function Count:')
-
-  try {
-    const count = await compareHeapSnapshotFunctions2(filePath1, filePath2, {
-      minCount: 30,
-      excludeOriginalPaths: ['functional.ts', 'lifecycle.ts', 'event.ts'],
-    })
-    console.log(count.length)
-    await mkdir(dirname(resultPath), { recursive: true })
-    await writeFile(resultPath, JSON.stringify(count, null, 2) + '\n')
-  } catch (error) {
-    console.error('Error:', error.message)
-  }
+  const count = await compareHeapSnapshotFunctions2(filePath1, filePath2, {
+    minCount: 0,
+    excludeOriginalPaths: ['functional.ts', 'lifecycle.ts', 'event.ts'],
+  })
+  console.log(count.length)
+  await mkdir(dirname(resultPath), { recursive: true })
+  await writeFile(resultPath, JSON.stringify(count, null, 2) + '\n')
 }
 
 const main = async () => {
