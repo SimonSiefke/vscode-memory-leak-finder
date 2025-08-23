@@ -27,6 +27,7 @@ export const parseArgv = (argv) => {
     watch: false,
     headless: false,
     checkLeaks: false,
+    runSkippedTestsAnyway: false,
     runs: 1,
     color: true,
     recordVideo: false,
@@ -53,6 +54,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--check-leaks')) {
     options.checkLeaks = true
+  }
+  if (argv.includes('--run-skipped-tests-anyway')) {
+    options.runSkippedTestsAnyway = true
   }
   if (argv.includes('--record-video')) {
     options.recordVideo = true

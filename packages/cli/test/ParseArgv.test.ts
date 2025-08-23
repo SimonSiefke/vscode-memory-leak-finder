@@ -20,6 +20,13 @@ test('parseArgv - headless mode', () => {
   })
 })
 
+test('parseArgv - run skipped tests anyway', () => {
+  const argv = ['--run-skipped-tests-anyway']
+  expect(ParseArgv.parseArgv(argv)).toMatchObject({
+    runSkippedTestsAnyway: true,
+  })
+})
+
 test('parseArgv - runs', () => {
   const argv = ['--runs', '4']
   expect(ParseArgv.parseArgv(argv)).toMatchObject({
