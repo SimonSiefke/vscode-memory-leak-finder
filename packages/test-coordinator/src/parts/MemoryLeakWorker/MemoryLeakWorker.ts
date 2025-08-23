@@ -11,7 +11,7 @@ const state: State = {
   rpc: undefined,
 }
 
-export const startWorker = async (devtoolsWebsocketUrl) => {
+export const startWorker = async (devtoolsWebsocketUrl: string) => {
   Assert.string(devtoolsWebsocketUrl)
   const rpc = await NodeWorkerRpcParent.create({
     path: MemoryLeakWorkerUrl.memoryLeakWorkerUrl,

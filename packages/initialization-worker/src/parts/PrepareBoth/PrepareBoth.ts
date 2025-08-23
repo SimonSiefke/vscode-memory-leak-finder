@@ -1,72 +1,13 @@
+import { connectElectron } from '../ConnectElectron/ConnectElectron.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
-import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
-import * as MakeElectronAvailableGlobally from '../MakeElectronAvailableGlobally/MakeElectronAvailableGlobally.ts'
-import * as MakeRequireAvailableGlobally from '../MakeRequireAvailableGlobally/MakeRequireAvailableGlobally.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
-import { VError } from '../VError/VError.ts'
+import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
-
-const waitForDebuggerToBePaused = async (rpc) => {
-  try {
-    const msg = await rpc.once(DevtoolsEventType.DebuggerPaused)
-    return msg
-  } catch (error) {
-    throw new VError(error, `Failed to wait for debugger`)
-  }
-}
-
-const connectElectron = async (electronRpc) => {
-  globalThis.electronRpc = electronRpc
-  const debuggerPausedPromise = waitForDebuggerToBePaused(electronRpc)
-  await Promise.all([
-    DevtoolsProtocolDebugger.enable(electronRpc),
-    DevtoolsProtocolRuntime.enable(electronRpc),
-    DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc),
-  ])
-  const msg = await debuggerPausedPromise
-  const callFrame = msg.params.callFrames[0]
-  const { callFrameId } = callFrame
-
-  const electron = await DevtoolsProtocolDebugger.evaluateOnCallFrame(electronRpc, {
-    callFrameId,
-    expression: `require('electron')`,
-    generatePreview: true,
-    includeCommandLineAPI: true,
-  })
-  const require = await DevtoolsProtocolDebugger.evaluateOnCallFrame(electronRpc, {
-    callFrameId,
-    expression: `require`,
-    generatePreview: true,
-    includeCommandLineAPI: true,
-  })
-  await DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc)
-
-  const electronObjectId = electron.result.result.objectId
-  const requireObjectId = require.result.result.objectId
-
-  // TODO headlessmode
-
-  const monkeyPatchedElectron = await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-    functionDeclaration: MonkeyPatchElectronScript.monkeyPatchElectronScript,
-    objectId: electronObjectId,
-  })
-
-  await Promise.all([
-    MakeElectronAvailableGlobally.makeElectronAvailableGlobally(electronRpc, electronObjectId),
-    MakeRequireAvailableGlobally.makeRequireAvailableGlobally(electronRpc, requireObjectId),
-  ])
-
-  globalThis.monkeyPatchedElectronId = monkeyPatchedElectron.objectId
-
-  return {
-    monkeyPatchedElectronId: monkeyPatchedElectron.objectId,
-    electronObjectId,
-  }
-}
 
 export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, connectionId, isFirstConnection, canUseIdleCallback) => {
   const { child, webSocketUrl, parsedVersion } = await LaunchIde.launchIde({
@@ -88,6 +29,34 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
 
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
 
+  const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
+  const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc, true)
+
+  browserRpc.on(DevtoolsEventType.DebuggerPaused, ScenarioFunctions.handlePaused)
+  browserRpc.on(DevtoolsEventType.DebuggerResumed, ScenarioFunctions.handleResumed)
+  browserRpc.on(DevtoolsEventType.PageFrameNavigated, ScenarioFunctions.handlePageFrameNavigated)
+  browserRpc.on(DevtoolsEventType.PageLifeCycleEvent, ScenarioFunctions.handlePageLifeCycleEvent)
+  browserRpc.on(DevtoolsEventType.PageLoadEventFired, ScenarioFunctions.handlePageLoadEventFired)
+  browserRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, ScenarioFunctions.handleRuntimeExecutionContextCreated)
+  browserRpc.on(DevtoolsEventType.RuntimeExecutionContextDestroyed, ScenarioFunctions.handleRuntimeExecutionContextDestroyed)
+  browserRpc.on(DevtoolsEventType.RuntimeExecutionContextsCleared, ScenarioFunctions.handleRuntimeExecutionContextsCleared)
+  browserRpc.on(DevtoolsEventType.TargetAttachedToTarget, ScenarioFunctions.handleAttachedToTarget)
+  browserRpc.on(DevtoolsEventType.TargetDetachedFromTarget, ScenarioFunctions.handleDetachedFromTarget)
+  browserRpc.on(DevtoolsEventType.TargetTargetCrashed, ScenarioFunctions.handleTargetCrashed)
+  browserRpc.on(DevtoolsEventType.TargetTargetCreated, ScenarioFunctions.handleTargetCreated)
+  browserRpc.on(DevtoolsEventType.TargetTargetDestroyed, ScenarioFunctions.handleTargetDestroyed)
+  browserRpc.on(DevtoolsEventType.TargetTargetInfoChanged, ScenarioFunctions.handleTargetInfoChanged)
+
+  await Promise.all([
+    DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
+      autoAttach: true,
+      waitForDebuggerOnStart: true,
+      flatten: true,
+    }),
+    DevtoolsProtocolTarget.setDiscoverTargets(browserRpc, {
+      discover: true,
+    }),
+  ])
   // await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
   //   functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
   //   objectId: monkeyPatchedElectronId,
