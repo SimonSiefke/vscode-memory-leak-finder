@@ -1,9 +1,4 @@
-import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
-import { DevtoolsProtocolPage, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.ts'
-import * as PTimeout from '../PTimeout/PTimeout.ts'
-import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
-import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
 
 const handleAttachedToBrowser = (message) => {
   console.log('attached to browser', message)
