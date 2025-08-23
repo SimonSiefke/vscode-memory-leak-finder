@@ -3,6 +3,7 @@ import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { readdir, readFile } from 'node:fs/promises'
+import { getSourceMapWorkerPath } from '../SourceMapWorkerPath/SourceMapWorkerPath.ts'
 
 export interface ScriptInfo {
   readonly url?: string
@@ -78,9 +79,7 @@ export const addOriginalSources = async (
   }
 
   try {
-    const thisDir: string = dirname(fileURLToPath(import.meta.url))
-    const packageDir: string = resolve(thisDir, '../../..')
-    const sourceMapWorkerPath: string = resolve(packageDir, '../source-map-worker/src/sourceMapWorkerMain.ts')
+    const sourceMapWorkerPath: string = getSourceMapWorkerPath()
 
     const rpc = await NodeWorkerRpcParent.create({
       stdio: 'inherit',
