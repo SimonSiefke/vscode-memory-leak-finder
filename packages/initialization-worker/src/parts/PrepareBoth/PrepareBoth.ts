@@ -47,5 +47,3 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
     parsedVersion,
   }
 }
-
-export const undoMonkeyPatch = async () => {}
