@@ -22,6 +22,8 @@ export interface CompareResult {
   readonly originalLine?: number | null
   readonly originalColumn?: number | null
   readonly originalName?: string | null
+  readonly sourceLocation?: string
+  readonly originalLocation?: string
 }
 
 interface UniqueLocationWithDelta extends UniqueLocation {

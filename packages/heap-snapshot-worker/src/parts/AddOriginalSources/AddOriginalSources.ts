@@ -63,6 +63,9 @@ export const addOriginalSources = async (
     if (script) {
       item.url = script.url
       item.sourceMapUrl = script.sourceMapUrl
+      if (item.url) {
+        item.sourceLocation = `${item.url}:${item.line}:${item.column}`
+      }
       if (script.sourceMapUrl) {
         if (!sourceMapUrlToPositions[script.sourceMapUrl]) {
           sourceMapUrlToPositions[script.sourceMapUrl] = []
@@ -102,6 +105,9 @@ export const addOriginalSources = async (
         target.originalLine = original.line ?? null
         target.originalColumn = original.column ?? null
         target.originalName = original.name ?? null
+        if (target.originalUrl && target.originalLine !== null && target.originalColumn !== null) {
+          target.originalLocation = `${target.originalUrl}:${target.originalLine}:${target.originalColumn}`
+        }
       }
     }
   } catch {
