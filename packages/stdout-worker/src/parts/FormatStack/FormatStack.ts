@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+import { chalk } from '../Chalk/Chalk.ts'
 
 const RE_STACK_PATH_1: RegExp = /(^\s*at .*?\(?)([^()]+)(:\d+:\d+\)?.*$)/
 const RE_STACK_PATH_2: RegExp = /(^\s*at .*?)([^()]+)(:\d+$)/

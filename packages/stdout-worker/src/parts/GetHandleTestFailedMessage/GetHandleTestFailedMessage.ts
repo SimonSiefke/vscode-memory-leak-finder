@@ -1,5 +1,4 @@
-import chalk from 'chalk'
-import * as NodeProcess from 'node:process'
+import { chalk } from '../Chalk/Chalk.ts'
 import * as FormatStack from '../FormatStack/FormatStack.ts'
 import * as Indent from '../Indent/Indent.ts'
 import * as TestPrefix from '../TestPrefix/TestPrefix.ts'
@@ -18,7 +17,6 @@ export const getHandleTestFailedMessage = (
   fileName: string,
   error: TestError,
 ): string => {
-  const isGithubActions: boolean = Boolean(NodeProcess.env.GITHUB_ACTIONS)
   const formattedStack: string = FormatStack.formatStack(error.stack, relativeFilePath)
   const messageRelativeDirName: string = chalk.dim(relativeDirName + '/')
   const messageFileName: string = chalk.bold(fileName)
@@ -31,8 +29,5 @@ ${Indent.indent(error.codeFrame)}
 ${formattedStack}
 
 `
-  if (isGithubActions) {
-    return core + '::endgroup::\n'
-  }
   return core
 }

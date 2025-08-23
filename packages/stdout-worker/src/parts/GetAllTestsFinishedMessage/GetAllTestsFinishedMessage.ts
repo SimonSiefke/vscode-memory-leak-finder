@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+import { chalk } from '../Chalk/Chalk.ts'
 import * as Character from '../Character/Character.ts'
 import * as FormatAsSeconds from '../FormatAsSeconds/FormatAsSeconds.ts'
 import * as WatchUsageShort from '../GetWatchUsageMessageShort/GetWatchUsageMessageShort.ts'

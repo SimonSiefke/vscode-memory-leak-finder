@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+import { chalk } from '../Chalk/Chalk.ts'
 
 const patternModeUsage = chalk.bold('Pattern Mode Usage')
 const press = chalk.dim('\u203A Press')

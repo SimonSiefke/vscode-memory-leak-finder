@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+import { chalk } from '../Chalk/Chalk.ts'
 import * as FormatAsSeconds from '../FormatAsSeconds/FormatAsSeconds.ts'
 import * as TestPrefix from '../TestPrefix/TestPrefix.ts'
 
