@@ -1,5 +1,5 @@
-import * as PrettifyInstanceCounts from '../src/parts/PrettifyInstanceCounts/PrettifyInstanceCounts.ts'
 import { test, expect } from '@jest/globals'
+import * as PrettifyInstanceCounts from '../src/parts/PrettifyInstanceCounts/PrettifyInstanceCounts.ts'
 
 test('prettifyInstanceCounts', () => {
   const instances = [

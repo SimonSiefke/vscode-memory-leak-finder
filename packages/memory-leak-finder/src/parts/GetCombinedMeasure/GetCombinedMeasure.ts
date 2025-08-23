@@ -10,6 +10,6 @@ export const getCombinedMeasure = async (session: any, measureId: string): Promi
   if (!measure) {
     throw new Error(`measure not found ${measureId}`)
   }
-  const combinedMeasure = MemoryLeakFinder.combine(measure.create!(session))
+  const combinedMeasure = MemoryLeakFinder.combine(measure.create(session))
   return combinedMeasure
 }

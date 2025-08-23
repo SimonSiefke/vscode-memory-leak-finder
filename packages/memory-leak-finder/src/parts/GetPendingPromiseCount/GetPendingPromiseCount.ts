@@ -1,13 +1,9 @@
+import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
-/**
- *
- * @param {any} session
- * @returns {Promise<number>}
- */
-export const getPendingPromiseCount = async (session, objectGroup) => {
+export const getPendingPromiseCount = async (session: Session, objectGroup: string): Promise<number> => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Promise,
     returnByValue: false,

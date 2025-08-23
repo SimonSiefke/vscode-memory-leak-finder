@@ -1,6 +1,7 @@
+import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
-export const startTrackingTimeouts = async (session, objectGroup) => {
+export const startTrackingTimeouts = async (session: Session, objectGroup: string) => {
   // object group is required for function preview to work
   // see https://github.com/puppeteer/puppeteer/issues/3349#issuecomment-548428762
 
@@ -38,7 +39,7 @@ undefined
   })
 }
 
-export const stopTrackingTimeouts = async (session, objectGroup) => {
+export const stopTrackingTimeouts = async (session: Session, objectGroup: string) => {
   const evaluateResult = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: `(()=>{
 globalThis.___knownIds = Object.create(null)
@@ -51,12 +52,7 @@ undefined
   })
 }
 
-/**
- *
- * @param {any} session
- * @returns {Promise<number>}
- */
-export const getTimeoutCount = async (session) => {
+export const getTimeoutCount = async (session: Session): Promise<number> => {
   const count = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: 'globalThis.___timeouts',
     returnByValue: false,
