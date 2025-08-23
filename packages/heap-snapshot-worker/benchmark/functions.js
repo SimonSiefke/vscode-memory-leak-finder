@@ -10,7 +10,7 @@ const testFunctionCount = async () => {
   console.log('Testing Function Count:')
   const count = await compareHeapSnapshotFunctions2(filePath1, filePath2, {
     minCount: 0,
-    excludeOriginalPaths: ['functional.ts', 'lifecycle.ts', 'event.ts'],
+    excludeOriginalPaths: ['functional.ts', 'lifecycle.ts', 'event.ts', 'numbers.ts'],
   })
   console.log(count.length)
   await mkdir(dirname(resultPath), { recursive: true })
