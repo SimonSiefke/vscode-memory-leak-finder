@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import { getRegexCountFromHeapSnapshot } from '../src/parts/GetRegexCountFromHeapSnapshot/GetRegexCountFromHeapSnapshot.js'
+import { getRegexCountFromHeapSnapshot } from '../src/parts/GetRegexCountFromHeapSnapshot/GetRegexCountFromHeapSnapshot.ts'
 
 const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
 
