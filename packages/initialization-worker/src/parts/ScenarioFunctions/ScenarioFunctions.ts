@@ -9,19 +9,9 @@ const handleAttachedToBrowser = (message) => {
   console.log('attached to browser', message)
 }
 
-export const handleTargetDestroyed = (message) => {
-  const { targetId } = message.params
-  TargetState.removeTarget(targetId)
-}
+export const handleTargetDestroyed = () => {}
 
-const handleTargetInfoChangePage = (message, type) => {
-  TargetState.changeTarget(message.params.targetInfo.targetId, {
-    type,
-    targetId: message.params.targetInfo.targetId,
-    title: message.params.targetInfo.title,
-    url: message.params.targetInfo.url,
-  })
-}
+const handleTargetInfoChangePage = () => {}
 
 export const handleTargetInfoChanged = (message) => {
   const { type } = message.params.targetInfo
@@ -44,33 +34,13 @@ const handleAttachedToPage = async (message) => {
     const browserSession = SessionState.getSession('browser')
     const browserRpc = browserSession.rpc
     const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
-    const { targetId } = message.params.targetInfo
-    const { type } = message.params.targetInfo
-    const { url } = message.params.targetInfo
-    const { browserContextId } = message.params.targetInfo
-    SessionState.addSession(sessionId, {
-      type,
-      url,
-      sessionId,
-      rpc: sessionRpc,
-    })
-
-    const actualType = type === 'iframe' ? 'iframe' : DevtoolsTargetType.Page
-
-    TargetState.addTarget(targetId, {
-      type: actualType,
-      url,
-      browserContextId,
-      sessionId,
-      targetId,
-    })
 
     await PTimeout.pTimeout(
       Promise.all([
         DevtoolsProtocolPage.enable(sessionRpc),
         DevtoolsProtocolPage.setLifecycleEventsEnabled(sessionRpc, { enabled: true }),
         DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(sessionRpc, {
-          source: UtilityScript.utilityScript,
+          source: UtilityScript.getUtilityScript(),
           worldName: 'utility',
         }),
         DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
@@ -116,8 +86,8 @@ export const handleDetachedFromTarget = (message) => {
   SessionState.removeSession(message.params.sessionId)
 }
 
-export const handleTargetCreated = async (message) => {}
+export const handleTargetCreated = async () => {}
 
-export const handlePageLoadEventFired = (message) => {
+export const handlePageLoadEventFired = () => {
   // console.log('load event fired', message)
 }
