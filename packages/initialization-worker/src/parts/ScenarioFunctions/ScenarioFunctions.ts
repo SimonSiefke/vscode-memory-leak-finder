@@ -1,5 +1,5 @@
 import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
-import { DevtoolsProtocolPage, DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { DevtoolsProtocolPage, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.ts'
 import * as PTimeout from '../PTimeout/PTimeout.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
@@ -22,8 +22,6 @@ const handleAttachedToPage = async (message) => {
 
     await PTimeout.pTimeout(
       Promise.all([
-        DevtoolsProtocolPage.enable(sessionRpc),
-        DevtoolsProtocolPage.setLifecycleEventsEnabled(sessionRpc, { enabled: true }),
         DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(sessionRpc, {
           source: UtilityScript.getUtilityScript(),
           worldName: 'utility',
@@ -33,18 +31,12 @@ const handleAttachedToPage = async (message) => {
           waitForDebuggerOnStart: true,
           flatten: true,
         }),
-        DevtoolsProtocolRuntime.enable(sessionRpc),
-        DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc),
       ]),
       { milliseconds: TimeoutConstants.AttachToPage },
     )
   } catch (error) {
-    // @ts-ignore
-    if (error && error.name === 'TestFinishedError') {
-      return
-    }
     console.error(
-      `[test-worker] Failed to attach to page ${message.params.targetInfo.targetId} ${message.params.targetInfo.browserContextId}: ${error}`,
+      `[initialization-worker] Failed to attach to page ${message.params.targetInfo.targetId} ${message.params.targetInfo.browserContextId}: ${error}`,
     )
   }
 }
