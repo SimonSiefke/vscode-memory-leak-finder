@@ -3,7 +3,7 @@ import * as StartRunning from '../StartRunning/StartRunning.ts'
 import * as Stdout from '../Stdout/Stdout.ts'
 import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
 
-export const initialStart = async (options) => {
+export const initialStart = async (options): Promise<void> => {
   if (options.watch) {
     await SpecialStdin.start()
   }
@@ -11,26 +11,26 @@ export const initialStart = async (options) => {
     await Stdout.write(await WatchUsage.print())
     return
   }
-  await StartRunning.startRunning(
-    options.filter,
-    options.headless,
-    options.color,
-    options.checkLeaks,
-    options.recordVideo,
-    options.cwd,
-    options.runs,
-    options.measure,
-    options.measureAfter,
-    options.timeouts,
-    options.timeoutBetween,
-    options.restartBetween,
-    options.runMode,
-    options.ide,
-    options.ideVersion,
-    options.vscodePath,
-    options.commit,
-    options.setupOnly,
-    options.workers,
-    options.isWindows,
-  )
+  await StartRunning.startRunning({
+    filterValue: options.filter,
+    headlessMode: options.headless,
+    color: options.color,
+    checkLeaks: options.checkLeaks,
+    recordVideo: options.recordVideo,
+    cwd: options.cwd,
+    runs: options.runs,
+    measure: options.measure,
+    measureAfter: options.measureAfter,
+    timeouts: options.timeouts,
+    timeoutBetween: options.timeoutBetween,
+    restartBetween: options.restartBetween,
+    runMode: options.runMode,
+    ide: options.ide,
+    ideVersion: options.ideVersion,
+    vscodePath: options.vscodePath,
+    commit: options.commit,
+    setupOnly: options.setupOnly,
+    workers: options.workers,
+    isWindows: options.isWindows,
+  })
 }
