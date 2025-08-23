@@ -9,7 +9,6 @@ export const connectDevtools = async (devtoolsWebSocketUrl: string): Promise<voi
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc, true)
 
   browserRpc.on(DevtoolsEventType.TargetAttachedToTarget, ScenarioFunctions.handleAttachedToTarget)
-  browserRpc.on(DevtoolsEventType.TargetDetachedFromTarget, ScenarioFunctions.handleDetachedFromTarget)
 
   await Promise.all([
     DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
