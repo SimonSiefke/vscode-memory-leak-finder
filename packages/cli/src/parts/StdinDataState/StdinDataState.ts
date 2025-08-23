@@ -6,6 +6,7 @@ import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 export interface StdinDataState {
   buffering: boolean
   checkLeaks: boolean
+  runSkippedTestsAnyway: boolean
   cwd: string
   filter: string
   headless: boolean
@@ -33,6 +34,7 @@ export interface StdinDataState {
 export const state: StdinDataState = {
   buffering: false,
   checkLeaks: false,
+  runSkippedTestsAnyway: false,
   cwd: Character.EmptyString,
   filter: Character.EmptyString,
   headless: false,
@@ -59,6 +61,7 @@ export const state: StdinDataState = {
 
 export const setState = (newState): void => {
   state.checkLeaks = newState.checkLeaks
+  state.runSkippedTestsAnyway = newState.runSkippedTestsAnyway
   state.cwd = newState.cwd
   state.headless = newState.headless
   state.isGithubActions = newState.isGithubActions

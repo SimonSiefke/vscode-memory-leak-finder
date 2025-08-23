@@ -1,8 +1,8 @@
+import type { Session } from '../Session/Session.ts'
 import { getHeapSnapshot } from '../GetHeapSnapshot/GetHeapSnapshot.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
-import type { Session } from '../Session/Session.ts'
 import * as WriteScriptMap from '../WriteScriptMap/WriteScriptMap.ts'
 
 export const id = MeasureId.NamedFunctionCount3
