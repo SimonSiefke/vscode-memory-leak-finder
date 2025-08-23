@@ -1,8 +1,11 @@
-const memoryLeakFinderUrl: string = '../../../../memory-leak-finder/src/index.ts'
+import * as MeasureCombined from '../MeasureCombined/MeasureCombined.ts'
+import * as WrappedMeasures from '../WrappedMeasures/WrappedMeasures.ts'
 
-// TODO move that code here
+const MemoryLeakFinder = {
+  MeasureCombined,
+  WrappedMeasures,
+}
+
 export const loadMemoryLeakFinder = async () => {
-  const MemoryLeakFinder = await import(memoryLeakFinderUrl)
-
   return MemoryLeakFinder
 }
