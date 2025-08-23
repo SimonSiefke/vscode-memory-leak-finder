@@ -10,9 +10,7 @@ export interface ScriptInfo {
   readonly sourceMapUrl?: string
 }
 
-export const addOriginalSources = async (
-  items: readonly CompareResult[],
-): Promise<readonly CompareResult[]> => {
+export const addOriginalSources = async (items: readonly CompareResult[]): Promise<readonly CompareResult[]> => {
   let scriptMap: Record<number, ScriptInfo> | undefined
   // Always attempt to load script maps from disk
   try {

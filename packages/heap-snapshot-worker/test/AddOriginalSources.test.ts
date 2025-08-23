@@ -43,5 +43,3 @@ test('addOriginalSources attaches urls from script maps folder without sourcemap
   // Cleanup: remove temp file
   await rm(mapPath)
 })
-
-

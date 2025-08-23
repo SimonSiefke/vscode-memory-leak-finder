@@ -7,5 +7,3 @@ export const getSourceMapWorkerPath = (): string => {
   const sourceMapWorkerPath: string = resolve(packageDir, '../source-map-worker/src/sourceMapWorkerMain.ts')
   return sourceMapWorkerPath
 }
-
-
