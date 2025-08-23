@@ -12,5 +12,5 @@ export const writeScriptMap = async (
   if (!existsSync(dir)) {
     await mkdir(dir, { recursive: true })
   }
-  await writeFile(outFile, JSON.stringify(scriptMap))
+  await writeFile(outFile, JSON.stringify(scriptMap, null, 2) + '\n')
 }
