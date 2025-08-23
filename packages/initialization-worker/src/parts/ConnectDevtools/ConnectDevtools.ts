@@ -3,14 +3,13 @@ import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/Deb
 import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
 import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
 import { DevtoolsProtocolRuntime, DevtoolsProtocolTarget, DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEvent.ts'
 
-export const connectDevtools = async (devtoolsWebSocketUrl: string): Promise<void> => {
+export const connectDevtools = async (devtoolsWebSocketUrl: string, attachedToPageTimeout: number): Promise<void> => {
   const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc, true)
 
-  const eventPromise = waitForAttachedEvent(browserRpc, TimeoutConstants.AttachToPage)
+  const eventPromise = waitForAttachedEvent(browserRpc, attachedToPageTimeout)
 
   await Promise.all([
     DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
