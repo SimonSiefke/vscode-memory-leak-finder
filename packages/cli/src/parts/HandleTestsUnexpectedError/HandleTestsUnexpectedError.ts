@@ -2,6 +2,7 @@ import * as GetTestsUnexpectedErrorMessage from '../GetTestsUnexpectedErrorMessa
 import * as ModeType from '../ModeType/ModeType.ts'
 import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 import * as TestStateOutput from '../TestStateOutput/TestStateOutput.ts'
+import * as ExitCode from '../ExitCode/ExitCode.ts'
 import { updateState } from '../UpdateState/UpdateState.ts'
 
 export const handleTestsUnexpectedError = async (prettyError) => {
@@ -12,6 +13,7 @@ export const handleTestsUnexpectedError = async (prettyError) => {
     ...state,
     stdout: [...state.stdout, fullMessage],
     mode: ModeType.FinishedRunning,
+    exitCode: ExitCode.UnexpectedTestError,
   }
   await updateState(newState)
 }
