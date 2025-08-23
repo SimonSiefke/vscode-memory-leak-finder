@@ -14,7 +14,8 @@ export const getFullMessage = async (
     fullMessage += clearMessage
   }
   if (isGithubActions) {
-    fullMessage += `::group::Test Update\n`
+    const title: string = message.split('\n')[0]
+    fullMessage += `::group::${title}\n`
   }
   fullMessage += message
   if (!isGithubActions && !isBuffering) {

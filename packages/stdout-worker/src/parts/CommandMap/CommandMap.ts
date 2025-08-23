@@ -2,8 +2,6 @@ import * as FormatStack from '../FormatStack/FormatStack.ts'
 import * as GetAllTestsFinishedMessage from '../GetAllTestsFinishedMessage/GetAllTestsFinishedMessage.ts'
 import * as GetAnsiEscapes from '../GetAnsiEscapes/GetAnsiEscapes.ts'
 import * as GetGitHubFileErrorMessage from '../GetGitHubFileErrorMessage/GetGitHubFileErrorMessage.ts'
-import * as GetGitHubGroupEndMessage from '../GetGitHubGroupEndMessage/GetGitHubGroupEndMessage.ts'
-import * as GetGitHubGroupStartMessage from '../GetGitHubGroupStartMessage/GetGitHubGroupStartMessage.ts'
 import * as GetHandleTestFailedMessage from '../GetHandleTestFailedMessage/GetHandleTestFailedMessage.ts'
 import * as GetHandleTestPassedMessage from '../GetHandleTestPassedMessage/GetHandleTestPassedMessage.ts'
 import * as GetHandleTestRunningMessage from '../GetHandleTestRunningMessage/GetHandleTestRunningMessage.ts'
@@ -30,8 +28,6 @@ export const commandMap: Record<string, (...args: readonly any[]) => any> = {
   'Stdout.getEraseLine': GetAnsiEscapes.getEraseLine,
   'Stdout.getEraseScreen': GetAnsiEscapes.getEraseScreen,
   'Stdout.getGitHubFileErrorMessage': GetGitHubFileErrorMessage.getGitHubFileErrorMessage,
-  'Stdout.getGitHubGroupEndMessage': GetGitHubGroupEndMessage.getGitHubGroupEndMessage,
-  'Stdout.getGitHubGroupStartMessage': GetGitHubGroupStartMessage.getGitHubGroupStartMessage,
   'Stdout.getHandleTestFailedMessage': GetHandleTestFailedMessage.getHandleTestFailedMessage,
   'Stdout.getHandleTestPassedMessage': GetHandleTestPassedMessage.getHandleTestPassedMessage,
   'Stdout.getHandleTestRunningMessage': GetHandleTestRunningMessage.getHandleTestRunningMessage,
