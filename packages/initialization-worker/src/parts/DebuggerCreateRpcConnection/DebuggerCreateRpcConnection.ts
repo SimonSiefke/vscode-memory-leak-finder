@@ -39,27 +39,27 @@ export const createRpc = (ipc, canUseIdleCallback) => {
     onceListeners,
     canUseIdleCallback,
     invoke(method, params) {
-      return new Promise((resolve, reject) => {
-        const id = _id++
-        callbacks[id] = { resolve, reject }
-        ipc.send({
-          method,
-          params,
-          id,
-        })
+      const { resolve, reject, promise } = Promise.withResolvers()
+      const id = _id++
+      callbacks[id] = { resolve, reject }
+      ipc.send({
+        method,
+        params,
+        id,
       })
+      return promise
     },
     invokeWithSession(sessionId, method, params) {
-      return new Promise((resolve, reject) => {
-        const id = _id++
-        callbacks[id] = { resolve, reject }
-        ipc.send({
-          sessionId,
-          method,
-          params,
-          id,
-        })
+      const { resolve, reject, promise } = Promise.withResolvers()
+      const id = _id++
+      callbacks[id] = { resolve, reject }
+      ipc.send({
+        sessionId,
+        method,
+        params,
+        id,
       })
+      return promise
     },
     on(event, listener) {
       listeners[event] = listener
@@ -68,9 +68,9 @@ export const createRpc = (ipc, canUseIdleCallback) => {
       delete listener[event]
     },
     once(event) {
-      return new Promise((resolve) => {
-        onceListeners[event] = resolve
-      })
+      const { resolve, promise } = Promise.withResolvers()
+      onceListeners[event] = resolve
+      return promise
     },
   }
 }

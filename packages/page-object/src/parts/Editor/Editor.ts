@@ -273,7 +273,8 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await startTag.click()
       } catch (error) {
         console.log(error)
-        await new Promise(() => {})
+        const { promise } = Promise.withResolvers<void>()
+        await promise
         // throw new VError(error, `Failed to click ${text}`)
       }
     },
