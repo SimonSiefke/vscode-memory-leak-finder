@@ -6,16 +6,16 @@ import {
   DevtoolsProtocolTarget,
 } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.ts'
+import type { ExecutionContext } from '../ExecutionContextState/ExecutionContextState.ts'
 import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.ts'
 import * as PTimeout from '../PTimeout/PTimeout.ts'
+import type { Session } from '../SessionState/SessionState.ts'
 import * as SessionState from '../SessionState/SessionState.ts'
 import * as TargetState from '../TargetState/TargetState.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
+import type { DevToolsMessage } from '../Types/Types.ts'
 import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
 import { VError } from '../VError/VError.ts'
-import type { Session } from '../SessionState/SessionState.ts'
-import type { ExecutionContext } from '../ExecutionContextState/ExecutionContextState.ts'
-import type { DevToolsMessage } from '../Types/Types.ts'
 
 export const Locator = (selector: string): { selector: string } => {
   return {
@@ -245,21 +245,3 @@ export const handleDetachedFromTarget = (message: DevToolsMessage): void => {
 }
 
 export const handleTargetCreated = async (message: DevToolsMessage): Promise<void> => {}
-
-export const waitForDevtoolsListening = async (stderr: NodeJS.ReadableStream): Promise<string> => {
-  const { resolve, promise } = Promise.withResolvers<any>()
-  const cleanup = (): void => {
-    stderr.off('data', handleData)
-  }
-  const handleData = (data: Buffer | string): void => {
-    if (data.includes('DevTools listening on')) {
-      cleanup()
-      resolve(data)
-    }
-  }
-  stderr.on('data', handleData)
-  const devtoolsData = await promise
-  const devtoolsMatch = (devtoolsData as string).match(/DevTools listening on (ws:\/\/.*)/)
-  const devtoolsUrl = devtoolsMatch![1]
-  return devtoolsUrl
-}

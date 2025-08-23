@@ -245,21 +245,3 @@ export const handleDetachedFromTarget = (message: DevToolsMessage): void => {
 }
 
 export const handleTargetCreated = async (message: DevToolsMessage): Promise<void> => {}
-
-export const waitForDevtoolsListening = async (stderr: NodeJS.ReadableStream): Promise<string> => {
-  const { resolve, promise } = Promise.withResolvers<any>()
-  const cleanup = (): void => {
-    stderr.off('data', handleData)
-  }
-  const handleData = (data: Buffer | string): void => {
-    if (data.includes('DevTools listening on')) {
-      cleanup()
-      resolve(data)
-    }
-  }
-  stderr.on('data', handleData)
-  const devtoolsData = await promise
-  const devtoolsMatch = (devtoolsData as string).match(/DevTools listening on (ws:\/\/.*)/)
-  const devtoolsUrl = devtoolsMatch![1]
-  return devtoolsUrl
-}
