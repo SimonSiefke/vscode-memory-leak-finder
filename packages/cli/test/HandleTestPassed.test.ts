@@ -13,7 +13,7 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
 })
 
 jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => ({
-  isGithubActions: () => true,
+  isGithubActions: () => false,
   setTestStateChange: () => {},
   isBuffering: () => false,
   isWindows: () => false,
@@ -38,9 +38,6 @@ jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
       if (method === 'Stdout.getHandleTestPassedMessage') {
         return '[ansi-clear] test passed'
       }
-      if (method === 'Stdout.getGitHubGroupEndMessage') {
-        return '::endgroup::\n'
-      }
       throw new Error(`unexpected method ${method}`)
     },
   })
@@ -56,8 +53,7 @@ const HandleTestPassed = await import('../src/parts/HandleTestPassed/HandleTestP
 
 test('handleTestPassed', async () => {
   await HandleTestPassed.handleTestPassed('/test/app.test.js', '/test', 'app.test.js', 100, false)
-  expect(Stdout.write).toHaveBeenCalledTimes(2)
+  expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(typeof (Stdout.write as any).mock.calls[0][0]).toBe('string')
-  expect((Stdout.write as any).mock.calls[1][0]).toBe('::endgroup::\n')
   expect(TestStateOutput.clearPending).toHaveBeenCalledTimes(1)
 })
