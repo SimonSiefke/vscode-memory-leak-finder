@@ -26,6 +26,7 @@ export interface StdinDataState {
   workers: boolean
   stdout: string[]
   previousFilters: string[]
+  exitCode: number
   isWindows: boolean
 }
 
@@ -53,6 +54,7 @@ export const state: StdinDataState = {
   stdout: [],
   previousFilters: [],
   isWindows: false,
+  exitCode: 0,
 }
 
 export const setState = (newState): void => {
