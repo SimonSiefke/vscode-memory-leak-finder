@@ -14,31 +14,32 @@ export const handleTargetCrashed = (message) => {
 }
 
 const handleAttachedToPage = async (message) => {
-  try {
-    const { sessionId } = message.params
-    const browserSession = SessionState.getSession('browser')
-    const browserRpc = browserSession.rpc
-    const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
+  console.log('attached to page. need to add utility script')
+  // try {
+  //   const { sessionId } = message.params
+  //   const browserSession = SessionState.getSession('browser')
+  //   const browserRpc = browserSession.rpc
+  //   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
 
-    await PTimeout.pTimeout(
-      Promise.all([
-        DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(sessionRpc, {
-          source: UtilityScript.getUtilityScript(),
-          worldName: 'utility',
-        }),
-        DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
-          autoAttach: true,
-          waitForDebuggerOnStart: true,
-          flatten: true,
-        }),
-      ]),
-      { milliseconds: TimeoutConstants.AttachToPage },
-    )
-  } catch (error) {
-    console.error(
-      `[initialization-worker] Failed to attach to page ${message.params.targetInfo.targetId} ${message.params.targetInfo.browserContextId}: ${error}`,
-    )
-  }
+  //   await PTimeout.pTimeout(
+  //     Promise.all([
+  //       DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(sessionRpc, {
+  //         source: UtilityScript.getUtilityScript(),
+  //         worldName: 'utility',
+  //       }),
+  //       DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
+  //         autoAttach: true,
+  //         waitForDebuggerOnStart: true,
+  //         flatten: true,
+  //       }),
+  //     ]),
+  //     { milliseconds: TimeoutConstants.AttachToPage },
+  //   )
+  // } catch (error) {
+  //   console.error(
+  //     `[initialization-worker] Failed to attach to page ${message.params.targetInfo.targetId} ${message.params.targetInfo.browserContextId}: ${error}`,
+  //   )
+  // }
 }
 
 const handleAttachedToIframe = async (message) => {
