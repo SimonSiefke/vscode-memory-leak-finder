@@ -1,6 +1,3 @@
-import type { ExecutionContext } from '../ExecutionContextState/ExecutionContextState.ts'
-import type { Session } from '../SessionState/SessionState.ts'
-import type { DevToolsMessage } from '../Types/Types.ts'
 import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
 import {
   DevtoolsProtocolHeapProfiler,
@@ -248,24 +245,3 @@ export const handleDetachedFromTarget = (message: DevToolsMessage): void => {
 }
 
 export const handleTargetCreated = async (message: DevToolsMessage): Promise<void> => {}
-<<<<<<< HEAD
-
-export const waitForDevtoolsListening = async (stderr: NodeJS.ReadableStream): Promise<string> => {
-  const devtoolsData = await new Promise((resolve) => {
-    const cleanup = () => {
-      stderr.off('data', handleData)
-    }
-    const handleData = (data: Buffer | string): void => {
-      if (data.includes('DevTools listening on')) {
-        cleanup()
-        resolve(data)
-      }
-    }
-    stderr.on('data', handleData)
-  })
-  const devtoolsMatch = (devtoolsData as string).match(/DevTools listening on (ws:\/\/.*)/)
-  const devtoolsUrl = devtoolsMatch[1]
-  return devtoolsUrl
-}
-=======
->>>>>>> origin/main
