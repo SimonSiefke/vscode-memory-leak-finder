@@ -1,5 +1,6 @@
 import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
 import { getUniqueLocationMap2 } from '../GetUniqueLocationMap2/GetUniqueLocationMap2.ts'
+import { addOriginalSources } from '../AddOriginalSources/AddOriginalSources.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import type { UniqueLocation, UniqueLocationMap } from '../UniqueLocationMap/UniqueLocationMap.ts'
 
@@ -14,6 +15,15 @@ export interface CompareResult {
   readonly line: number
   readonly scriptId: number
   readonly name: string
+  readonly url?: string
+  readonly sourceMapUrl?: string
+  readonly originalSource?: string | null
+  readonly originalUrl?: string | null
+  readonly originalLine?: number | null
+  readonly originalColumn?: number | null
+  readonly originalName?: string | null
+  readonly sourceLocation?: string
+  readonly originalLocation?: string
 }
 
 interface UniqueLocationWithDelta extends UniqueLocation {
@@ -66,13 +76,14 @@ const formatUniqueLocations = (
 
 export interface CompareFunctionsOptions {
   readonly minCount?: number
+  readonly excludeOriginalPaths?: readonly string[]
 }
 
-export const compareHeapSnapshotFunctionsInternal2 = (
+export const compareHeapSnapshotFunctionsInternal2 = async (
   before: Snapshot,
   after: Snapshot,
   options: CompareFunctionsOptions,
-): readonly CompareResult[] => {
+): Promise<readonly CompareResult[]> => {
   const minCount = options.minCount || 0
   const { itemsPerLocation, scriptIdOffset, lineOffset, columnOffset, objectIndexOffset } = getLocationFieldOffsets(
     after.meta.location_fields,
@@ -93,6 +104,23 @@ export const compareHeapSnapshotFunctionsInternal2 = (
     nodeNameOffset,
     after.strings,
   )
-  const sorted = formattedItems.toSorted((a, b) => b.count - a.count)
+  let enriched = await addOriginalSources(formattedItems)
+  const excludes = options.excludeOriginalPaths || []
+  if (excludes.length > 0) {
+    const lowered = excludes.map((e) => e.toLowerCase())
+    enriched = enriched.filter((item) => {
+      const original = (item.originalUrl || item.originalSource || '').toLowerCase()
+      if (!original) {
+        return true
+      }
+      for (const ex of lowered) {
+        if (original.includes(ex)) {
+          return false
+        }
+      }
+      return true
+    })
+  }
+  const sorted = enriched.toSorted((a, b) => b.count - a.count)
   return sorted
 }
