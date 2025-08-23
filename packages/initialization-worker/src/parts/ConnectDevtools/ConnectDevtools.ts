@@ -1,7 +1,8 @@
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
+import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
 import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
-import { DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { DevtoolsProtocolRuntime, DevtoolsProtocolTarget, DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEvent.ts'
 
@@ -28,5 +29,14 @@ export const connectDevtools = async (devtoolsWebSocketUrl: string): Promise<voi
 
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
 
-  await Promise.all([DevtoolsProtocolRuntime.enable(sessionRpc), DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc)])
+  await Promise.all([
+    DevtoolsProtocolPage.enable(sessionRpc),
+    DevtoolsProtocolPage.setLifecycleEventsEnabled(sessionRpc, { enabled: true }),
+    DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(sessionRpc, {
+      source: UtilityScript.getUtilityScript(),
+      worldName: 'utility',
+    }),
+    DevtoolsProtocolRuntime.enable(sessionRpc),
+    DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc),
+  ])
 }
