@@ -14,7 +14,6 @@ import * as SessionState from '../SessionState/SessionState.ts'
 import * as TargetState from '../TargetState/TargetState.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 import type { DevToolsMessage } from '../Types/Types.ts'
-import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
 import { VError } from '../VError/VError.ts'
 
 export const Locator = (selector: string): { selector: string } => {
@@ -181,10 +180,6 @@ const handleAttachedToPage = async (message: DevToolsMessage): Promise<void> => 
       Promise.all([
         DevtoolsProtocolPage.enable(sessionRpc),
         DevtoolsProtocolPage.setLifecycleEventsEnabled(sessionRpc, { enabled: true }),
-        DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(sessionRpc, {
-          source: UtilityScript.utilityScript,
-          worldName: 'utility',
-        }),
         DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
           autoAttach: true,
           waitForDebuggerOnStart: true,
