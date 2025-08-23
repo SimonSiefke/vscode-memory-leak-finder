@@ -6,8 +6,8 @@ import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsPr
 import * as Disposables from '../Disposables/Disposables.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
-import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
+import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
 
 export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, connectionId, isFirstConnection, canUseIdleCallback) => {
   const { child, webSocketUrl, parsedVersion } = await LaunchIde.launchIde({
