@@ -13,5 +13,6 @@ export const getHandleTestSkippedMessage = (file: string, relativeDirName: strin
   const messageRelativeDirName: string = chalk.dim(relativeDirName + '/')
   const messageFileName: string = chalk.bold(fileName)
   const messageDuration: string = formatDuration(duration)
-  return `${SKIP} ${messageRelativeDirName}${messageFileName} ${messageDuration}\n`
+  const core: string = `${SKIP} ${messageRelativeDirName}${messageFileName} ${messageDuration}\n`
+  return core
 }

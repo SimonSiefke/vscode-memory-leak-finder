@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+import { chalk } from '../Chalk/Chalk.ts'
 import * as CliKeys from '../CliKeys/CliKeys.ts'
 
 const watchUsage = chalk.bold('Watch Usage')

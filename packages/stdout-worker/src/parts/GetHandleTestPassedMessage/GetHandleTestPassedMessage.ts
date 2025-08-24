@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+import { chalk } from '../Chalk/Chalk.ts'
 import * as FormatAsSeconds from '../FormatAsSeconds/FormatAsSeconds.ts'
 import * as TestPrefix from '../TestPrefix/TestPrefix.ts'
 
@@ -17,5 +17,6 @@ export const getHandleTestPassedMessage = (
   const messageFileName: string = chalk.bold(fileName)
   const messageDuration: string = formatDuration(duration)
   const prefix: string = isLeak ? TestPrefix.Leak : TestPrefix.Pass
-  return `${prefix} ${messageRelativeDirName}${messageFileName} ${messageDuration}\n`
+  const core: string = `${prefix} ${messageRelativeDirName}${messageFileName} ${messageDuration}\n`
+  return core
 }

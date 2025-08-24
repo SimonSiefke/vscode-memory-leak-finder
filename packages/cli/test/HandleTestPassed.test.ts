@@ -13,7 +13,7 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
 })
 
 jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => ({
-  isGithubActions: () => true,
+  isGithubActions: () => false,
   setTestStateChange: () => {},
   isBuffering: () => false,
   isWindows: () => false,
