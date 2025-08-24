@@ -3,11 +3,12 @@ import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinde
 import { VError } from '../VError/VError.ts'
 import * as WaitForPage from '../WaitForPage/WaitForPage.ts'
 
-export const setup = async (connectionId: string, instanceId: string, measureId: string): Promise<any> => {
+export const setup = async (connectionId: string, instanceId: string, measureId: string, runs: number): Promise<any> => {
   try {
     const page = await WaitForPage.waitForPage({ index: 0 })
     const session = page.rpc
-    const measure = await GetCombinedMeasure.getCombinedMeasure(session, measureId)
+    const context = { runs }
+    const measure = await GetCombinedMeasure.getCombinedMeasure(session, measureId, context)
     MemoryLeakFinderState.set(instanceId, measure)
     return {
       targetId: page.targetId,
