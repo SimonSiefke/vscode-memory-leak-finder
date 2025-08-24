@@ -14,6 +14,7 @@ export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: 
       'undoRedoService.ts',
       'uri.ts',
       'async.ts',
+      'linkedList.ts',
     ],
   }
   const result = await HeapSnapshotWorker.invoke('HeapSnapshot.compareFunctions2', beforePath, afterPath, options)
