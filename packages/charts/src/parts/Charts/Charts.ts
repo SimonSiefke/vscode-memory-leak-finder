@@ -13,6 +13,7 @@ export * as IframeCount from '../CreateIframeCountChart/CreateIframeCountChart.t
 export * as MapSize from '../CreateMapSizeChart/CreateMapSizeChart.ts'
 export * as MessagePortCount from '../CreateMessagePortCountChart/CreateMessagePortCountChart.ts'
 export * as MutationObserverCount from '../CreateMutationObserverCountChart/CreateMutationObserverCountChart.ts'
+export * as NamedFunctionCount3 from '../CreateNamedFunctionCountChart3/CreateNamedFunctionCountChart3.ts'
 export * as NumberCount from '../CreateNumberCountChart/CreateNumberCountChart.ts'
 export * as ObjectCount from '../CreateObjectCountChart/CreateObjectCountChart.ts'
 export * as PromiseCount from '../CreatePromiseCountChart/CreatePromiseCountChart.ts'
