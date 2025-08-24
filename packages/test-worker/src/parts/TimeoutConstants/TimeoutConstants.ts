@@ -6,4 +6,4 @@ export const PageEvent = 2000
 export const SessionState = 500
 export const Target = 8000
 export const UtilityExecutionContext = IsWindows.IsWindows ? 16_000 : 8500
-export const InteractiveTime = 20_000
+export const InteractiveTime = 60_000
