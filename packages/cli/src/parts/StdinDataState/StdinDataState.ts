@@ -12,6 +12,7 @@ export interface StdinDataState {
   headless: boolean
   isGithubActions: boolean
   measure: string
+  measureNode?: boolean
   mode: number
   recordVideo: boolean
   runs: number

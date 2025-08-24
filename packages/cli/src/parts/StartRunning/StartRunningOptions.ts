@@ -9,6 +9,7 @@ export interface StartRunningOptions {
   runs: number
   measure: string
   measureAfter: boolean
+  measureNode: boolean
   timeouts: boolean
   timeoutBetween: number
   restartBetween: boolean

@@ -35,6 +35,7 @@ export const updateState = async (newState: any): Promise<void> => {
       runs: state.runs,
       measure: state.measure,
       measureAfter: state.measureAfter,
+      measureNode: false,
       timeouts: state.timeouts,
       timeoutBetween: state.timeoutBetween,
       restartBetween: state.restartBetween,
