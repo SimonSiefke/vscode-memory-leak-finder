@@ -22,6 +22,7 @@ export const initialStart = async (options): Promise<void> => {
     runs: options.runs,
     measure: options.measure,
     measureAfter: options.measureAfter,
+    measureNode: options.measureNode,
     timeouts: options.timeouts,
     timeoutBetween: options.timeoutBetween,
     restartBetween: options.restartBetween,
