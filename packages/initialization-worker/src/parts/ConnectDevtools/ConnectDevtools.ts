@@ -32,11 +32,13 @@ export const connectDevtools = async (devtoolsWebSocketUrl: string, attachedToPa
 
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
 
+  const script= await
+  UtilityScript.getUtilityScript()
   await Promise.all([
     DevtoolsProtocolPage.enable(sessionRpc),
     DevtoolsProtocolPage.setLifecycleEventsEnabled(sessionRpc, { enabled: true }),
     DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(sessionRpc, {
-      source: UtilityScript.getUtilityScript(),
+      source: script,
       worldName: 'utility',
     }),
     DevtoolsProtocolRuntime.enable(sessionRpc),
