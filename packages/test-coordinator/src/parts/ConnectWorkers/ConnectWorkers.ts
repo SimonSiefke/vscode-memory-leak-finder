@@ -6,7 +6,7 @@ export const connectWorkers = async (
   rpc: any,
   headlessMode: boolean,
   recordVideo: boolean,
-  connectionId: string,
+  connectionId: number,
   devtoolsWebSocketUrl: string,
   webSocketUrl: string,
   isFirstConnection: boolean,

@@ -13,7 +13,7 @@ export const prepareBoth = async (
   ide: string,
   vscodePath: string,
   commit: string,
-  connectionId: string,
+  connectionId: number,
   isFirstConnection: boolean,
   canUseIdleCallback: boolean,
 ): Promise<PrepareBothResult> => {

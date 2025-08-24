@@ -10,7 +10,7 @@ export const prepareTests = async (
   cwd: string,
   headlessMode: boolean,
   recordVideo: boolean,
-  connectionId: string,
+  connectionId: number,
   timeouts: any,
   ide: string,
   ideVersion: string,

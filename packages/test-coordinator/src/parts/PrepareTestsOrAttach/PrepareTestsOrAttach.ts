@@ -32,7 +32,7 @@ export const prepareTestsOrAttach = async (
   cwd: string,
   headlessMode: boolean,
   recordVideo: boolean,
-  connectionId: string,
+  connectionId: number,
   timeouts: any,
   runMode: string,
   ide: string,

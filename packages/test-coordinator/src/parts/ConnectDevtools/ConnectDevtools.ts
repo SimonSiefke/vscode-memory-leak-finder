@@ -3,7 +3,7 @@ import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerComma
 
 export const connectDevtools = (
   rpc: any,
-  connectionId: string,
+  connectionId: number,
   devtoolsWebSocketUrl: string,
   electronObjectId: string,
   isFirstConnection: boolean,
