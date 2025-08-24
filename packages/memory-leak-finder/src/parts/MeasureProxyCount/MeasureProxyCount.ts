@@ -2,10 +2,11 @@ import * as CompareCount from '../CompareCount/CompareCount.ts'
 import * as GetProxyCount from '../GetProxyCount/GetProxyCount.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.ProxyCount
 
-export const targets = ['browser', 'node', 'webworker']
+export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
 export const create = (session) => {
   return [session]

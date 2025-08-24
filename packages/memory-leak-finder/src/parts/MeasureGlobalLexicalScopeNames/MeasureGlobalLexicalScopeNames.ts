@@ -1,9 +1,10 @@
 import * as GetGlobalLexicalScopeNames from '../GetGlobalLexicalScopeNames/GetGlobalLexicalScopeNames.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.GlobalLexicalScopeNames
 
-export const targets = ['browser', 'node', 'webworker']
+export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
 export const create = (session) => {
   return [session]

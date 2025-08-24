@@ -3,10 +3,11 @@ import * as GetDetachedDomNodes from '../GetDetachedDomNodes/GetDetachedDomNodes
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.DetachedDomNodesDifference
 
-export const targets = ['browser']
+export const targets = [TargetId.Browser]
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()

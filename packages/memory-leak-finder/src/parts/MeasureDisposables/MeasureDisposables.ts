@@ -5,6 +5,7 @@ import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
 
 // TODO
 // 1. query all objects
@@ -16,7 +17,7 @@ import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 
 export const id = MeasureId.Disposables
 
-export const targets = ['browser', 'node', 'webworker']
+export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()

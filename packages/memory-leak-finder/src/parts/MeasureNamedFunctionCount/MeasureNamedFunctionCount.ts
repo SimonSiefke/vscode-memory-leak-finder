@@ -1,3 +1,4 @@
+import * as TargetId from '../TargetId/TargetId.ts'
 // deprecated in favor of namedFunctionCount2, which works with heapsnapshot
 // whereas this queries chrome for all function locations individually, crashing chrome
 import * as CompareNamedFunctionCount from '../CompareNamedFunctionCount/CompareNamedFunctionCount.ts'
@@ -8,7 +9,7 @@ import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 
 export const id = MeasureId.NamedFunctionCount
 
-export const targets = ['browser', 'node', 'webworker']
+export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()

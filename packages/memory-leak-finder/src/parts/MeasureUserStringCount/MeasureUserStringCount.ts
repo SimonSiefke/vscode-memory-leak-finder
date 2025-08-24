@@ -5,10 +5,11 @@ import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as WriteScriptMap from '../WriteScriptMap/WriteScriptMap.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.UserStringCount
 
-export const targets = ['browser', 'node', 'webworker']
+export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()

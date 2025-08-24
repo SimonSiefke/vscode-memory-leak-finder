@@ -4,10 +4,11 @@ import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.EventListeners
 
-export const targets = ['browser']
+export const targets = [TargetId.Browser]
 
 /**
  *

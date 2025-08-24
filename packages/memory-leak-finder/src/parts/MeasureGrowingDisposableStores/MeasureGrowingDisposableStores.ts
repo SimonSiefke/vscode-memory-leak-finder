@@ -5,6 +5,7 @@ import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
 import * as StartTrackingDisposableStores from '../StartTrackingDisposableStores/StartTrackingDisposableStores.ts'
 import * as StopTrackingDisposableStores from '../StopTrackingDisposableStores/StopTrackingDisposableStores.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
 
 // TODO
 // 1. find the DisposableStore constructor
@@ -19,7 +20,7 @@ import * as StopTrackingDisposableStores from '../StopTrackingDisposableStores/S
 
 export const id = MeasureId.GrowingDisposableStores
 
-export const targets = ['browser', 'node', 'webworker']
+export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()

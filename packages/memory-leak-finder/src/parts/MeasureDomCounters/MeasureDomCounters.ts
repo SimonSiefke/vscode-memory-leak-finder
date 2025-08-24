@@ -1,10 +1,11 @@
 import * as GetDomCounters from '../GetDomCounters/GetDomCounters.ts'
 import * as IsLeakDomCounters from '../IsLeakDomCounters/IsLeakDomCounters.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.DomCounters
 
-export const targets = ['browser']
+export const targets = [TargetId.Browser]
 
 export const create = (session) => {
   return [session]

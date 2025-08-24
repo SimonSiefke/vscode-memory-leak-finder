@@ -1,8 +1,10 @@
-export type MeasureTarget = readonly ('browser' | 'node' | 'webworker')[]
+import * as TargetId from '../TargetId/TargetId.ts'
 
-const ALL_TARGETS: MeasureTarget = ['browser', 'node', 'webworker']
-const BROWSER_ONLY: MeasureTarget = ['browser']
-const BROWSER_AND_WORKER: MeasureTarget = ['browser', 'webworker']
+export type MeasureTarget = readonly (1 | 2 | 3)[]
+
+const ALL_TARGETS: MeasureTarget = [TargetId.Browser, TargetId.Node, TargetId.Worker]
+const BROWSER_ONLY: MeasureTarget = [TargetId.Browser]
+const BROWSER_AND_WORKER: MeasureTarget = [TargetId.Browser, TargetId.Worker]
 
 export const getDefaultTarget = (measureId: string): MeasureTarget => {
   const id = measureId.toLowerCase()
