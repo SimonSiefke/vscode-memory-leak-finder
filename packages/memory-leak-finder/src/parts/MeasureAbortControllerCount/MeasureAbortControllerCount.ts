@@ -3,8 +3,11 @@ import * as GetAbortControllerCount from '../GetAbortControllerCount/GetAbortCon
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.AbortControllerCount
+
+export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()

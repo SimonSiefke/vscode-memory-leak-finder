@@ -7,8 +7,11 @@ import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as StartTrackEventListenerStackTraces from '../StartTrackEventListenerStackTraces/StartTrackEventListenerStackTraces.ts'
 import * as StopTrackingEventListenerStackTraces from '../StopTrackingEventListenerStackTraces/StopTrackingEventListenerStackTraces.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.EventListenersWithStackTrace
+
+export const targets = [TargetId.Browser]
 
 /**
  *

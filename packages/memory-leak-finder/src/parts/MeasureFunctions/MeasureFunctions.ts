@@ -4,8 +4,11 @@ import * as GetTotalInstanceCounts from '../GetTotalInstanceCounts/GetTotalInsta
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.Functions
+
+export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
