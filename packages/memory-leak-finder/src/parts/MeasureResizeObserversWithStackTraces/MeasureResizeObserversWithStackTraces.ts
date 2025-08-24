@@ -5,6 +5,8 @@ import * as MeasureId from '../MeasureId/MeasureId.ts'
 
 export const id = MeasureId.ResizeObserversWithStackTraces
 
+export const targets = ['browser']
+
 export const create = (session) => {
   return [session]
 }

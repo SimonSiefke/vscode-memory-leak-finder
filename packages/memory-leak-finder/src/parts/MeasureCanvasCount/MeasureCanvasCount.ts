@@ -7,6 +7,8 @@ import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts
 
 export const id = MeasureId.CanvasCount
 
+export const targets = ['browser']
+
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]

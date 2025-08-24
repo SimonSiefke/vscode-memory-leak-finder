@@ -7,6 +7,8 @@ import * as StopTrackingMutationObserverStackTraces from '../StopTrackingMutatio
 
 export const id = MeasureId.MutationObserversWithStackTraces
 
+export const targets = ['browser']
+
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]

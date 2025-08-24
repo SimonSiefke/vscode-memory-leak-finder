@@ -12,6 +12,8 @@ import * as StopTrackingDomNodeStackTraces from '../StopTrackingDomNodeStackTrac
 
 export const id = MeasureId.DetachedDomNodesDifferenceWithStackTraces
 
+export const targets = ['browser']
+
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
   const scriptHandler = ScriptHandler.create()

@@ -6,6 +6,8 @@ import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 
 export const id = MeasureId.InstanceCountsDifferenceWithSourceMap
 
+export const targets = ['browser', 'node', 'webworker']
+
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
   const scriptHandler = ScriptHandler.create()

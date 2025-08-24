@@ -19,6 +19,8 @@ import * as StopTrackingDisposableStores from '../StopTrackingDisposableStores/S
 
 export const id = MeasureId.GrowingDisposableStores
 
+export const targets = ['browser', 'node', 'webworker']
+
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]

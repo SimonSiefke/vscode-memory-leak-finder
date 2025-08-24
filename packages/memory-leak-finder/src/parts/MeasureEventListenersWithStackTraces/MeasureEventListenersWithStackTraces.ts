@@ -10,6 +10,8 @@ import * as StopTrackingEventListenerStackTraces from '../StopTrackingEventListe
 
 export const id = MeasureId.EventListenersWithStackTrace
 
+export const targets = ['browser']
+
 /**
  *
  * @param {any} session

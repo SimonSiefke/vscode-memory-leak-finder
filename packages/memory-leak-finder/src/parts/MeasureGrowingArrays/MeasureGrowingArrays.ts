@@ -6,6 +6,8 @@ import * as StartTrackingArrays from '../StartTrackingArrays/StartTrackingArrays
 
 export const id = MeasureId.GrowingArrays
 
+export const targets = ['browser', 'node', 'webworker']
+
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]

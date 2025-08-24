@@ -5,6 +5,8 @@ import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts
 
 export const id = MeasureId.ArrayElementCount
 
+export const targets = ['browser', 'node', 'webworker']
+
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]

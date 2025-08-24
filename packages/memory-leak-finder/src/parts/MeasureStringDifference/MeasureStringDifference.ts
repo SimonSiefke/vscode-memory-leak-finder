@@ -7,6 +7,8 @@ import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 
 export const id = MeasureId.StringDifference
 
+export const targets = ['browser', 'node', 'webworker']
+
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]

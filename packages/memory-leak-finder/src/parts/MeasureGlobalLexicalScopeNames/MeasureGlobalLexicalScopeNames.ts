@@ -3,6 +3,8 @@ import * as MeasureId from '../MeasureId/MeasureId.ts'
 
 export const id = MeasureId.GlobalLexicalScopeNames
 
+export const targets = ['browser', 'node', 'webworker']
+
 export const create = (session) => {
   return [session]
 }

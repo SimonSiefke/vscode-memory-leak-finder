@@ -6,6 +6,8 @@ import * as WriteScriptMap from '../WriteScriptMap/WriteScriptMap.ts'
 
 export const id = MeasureId.DomTimerCount
 
+export const targets = ['browser']
+
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
   const scriptHandler = ScriptHandler.create()

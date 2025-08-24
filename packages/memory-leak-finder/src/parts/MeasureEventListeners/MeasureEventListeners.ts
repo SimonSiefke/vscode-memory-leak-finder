@@ -7,6 +7,8 @@ import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 
 export const id = MeasureId.EventListeners
 
+export const targets = ['browser']
+
 /**
  *
  * @param {any} session

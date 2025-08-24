@@ -7,6 +7,8 @@ import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts
 
 export const id = MeasureId.WeakMapCount
 
+export const targets = ['browser', 'node', 'webworker']
+
 export const create = (session) => {
   return [session]
 }

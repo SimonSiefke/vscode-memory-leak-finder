@@ -6,6 +6,8 @@ import * as StartTrackingInstanceCounts from '../StartTrackingInstanceCounts/Sta
 
 export const id = MeasureId.InstanceCountsDifferenceWithStackTraces
 
+export const targets = ['browser', 'node', 'webworker']
+
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]

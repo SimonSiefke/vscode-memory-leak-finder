@@ -7,7 +7,12 @@ export const wrapMeasure = (measure) => {
       const args = measure.create(session)
       return {
         ...measure,
-        target: Array.isArray(measure.target) && measure.target.length > 0 ? measure.target : getDefaultTarget(measure.id),
+        targets:
+          Array.isArray(measure.targets) && measure.targets.length > 0
+            ? measure.targets
+            : Array.isArray(measure.target) && measure.target.length > 0
+              ? measure.target
+              : getDefaultTarget(measure.id),
         start() {
           return measure.start(...args)
         },

@@ -9,6 +9,8 @@ import * as StopTrackingMutationObserverStackTraces from '../StopTrackingMutatio
 
 export const id = MeasureId.MutationObserversWithStackTracesWithSourceMaps
 
+export const targets = ['browser']
+
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
   const scriptHandler = ScriptHandler.create()
