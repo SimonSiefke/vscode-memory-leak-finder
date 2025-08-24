@@ -130,7 +130,7 @@ export const runTests = async (
     let memoryLeakWorkerRpc = MemoryLeakWorker.getRpc()
     let targetId = ''
     if (checkLeaks) {
-      const info = await MemoryLeakFinder.setup(memoryLeakWorkerRpc, connectionId, measure)
+      const info = await MemoryLeakFinder.setup(memoryLeakWorkerRpc, connectionId, measure, runs)
       targetId = info.targetId
     }
     for (let i = 0; i < formattedPaths.length; i++) {
@@ -216,7 +216,7 @@ export const runTests = async (
             )
             if (checkLeaks) {
               memoryLeakWorkerRpc = MemoryLeakWorker.getRpc()
-              await MemoryLeakFinder.setup(memoryLeakWorkerRpc, connectionId, measure)
+              await MemoryLeakFinder.setup(memoryLeakWorkerRpc, connectionId, measure, runs)
             }
           }
         }

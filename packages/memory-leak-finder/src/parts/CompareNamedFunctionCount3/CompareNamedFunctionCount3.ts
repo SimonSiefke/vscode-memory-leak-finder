@@ -1,8 +1,10 @@
 import * as HeapSnapshotWorker from '../HeapSnapshotWorker/HeapSnapshotWorker.ts'
+import * as RunThresholdState from '../RunThresholdState/RunThresholdState.ts'
 
 export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: string): Promise<readonly any[]> => {
+  const threshold = RunThresholdState.get()
   const options = {
-    minCount: 2,
+    minCount: threshold || 2,
     excludeOriginalPaths: [
       'editStack.ts',
       'event.ts',
