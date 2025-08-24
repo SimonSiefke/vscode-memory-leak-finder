@@ -44,6 +44,7 @@ export const runTests = async (
   runs,
   measure,
   measureAfter,
+  measureNode,
   timeouts,
   timeoutBetween,
   restartBetween,
@@ -66,6 +67,7 @@ export const runTests = async (
     Assert.number(runs)
     Assert.string(measure)
     Assert.boolean(measureAfter)
+    Assert.boolean(measureNode)
     Assert.boolean(timeouts)
     Assert.number(timeoutBetween)
     Assert.number(runMode)

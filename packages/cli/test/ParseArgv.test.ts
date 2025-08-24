@@ -102,3 +102,9 @@ test('parseArgv - setup-only flag not present', () => {
   const options = ParseArgv.parseArgv(argv)
   expect(options.setupOnly).toBe(false)
 })
+
+test('parseArgv - measure-node flag', () => {
+  const argv = ['--measure-node']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.measureNode).toBe(true)
+})
