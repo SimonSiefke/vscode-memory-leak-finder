@@ -5,12 +5,23 @@ import * as KillExistingIdeInstances from '../KillExistingIdeInstances/KillExist
 import * as PageObject from '../PageObject/PageObject.ts'
 import { prepareBoth } from '../PrepareBoth/PrepareBoth.ts'
 
-export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connectionId, timeouts, ide, ideVersion, vscodePath, commit) => {
+export const prepareTests = async (
+  rpc: any,
+  cwd: string,
+  headlessMode: boolean,
+  recordVideo: boolean,
+  connectionId: string,
+  timeouts: any,
+  ide: string,
+  ideVersion: string,
+  vscodePath: string,
+  commit: string,
+) => {
   const pageObjectPath = GetPageObjectPath.getPageObjectPath()
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
-  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, monkeyPatchedElectronId, parsedVersion } = await prepareBoth(
+  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion } = await prepareBoth(
     headlessMode,
     cwd,
     ide,
@@ -29,7 +40,6 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
     webSocketUrl,
     isFirstConnection,
     canUseIdleCallback,
-    monkeyPatchedElectronId,
     electronObjectId,
   )
   await PageObject.create(rpc, connectionId, isFirstConnection, headlessMode, timeouts, parsedVersion, pageObjectPath)
@@ -39,7 +49,6 @@ export const prepareTests = async (rpc, cwd, headlessMode, recordVideo, connecti
     webSocketUrl,
     devtoolsWebSocketUrl,
     electronObjectId,
-    monkeyPatchedElectronId,
     parsedVersion,
   }
 }

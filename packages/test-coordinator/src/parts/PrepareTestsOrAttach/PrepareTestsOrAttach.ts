@@ -29,16 +29,16 @@ export const state: State = {
 }
 
 export const prepareTestsOrAttach = async (
-  cwd,
-  headlessMode,
-  recordVideo,
-  connectionId,
-  timeouts,
-  runMode,
-  ide,
-  ideVersion,
-  vscodePath,
-  commit,
+  cwd: string,
+  headlessMode: boolean,
+  recordVideo: boolean,
+  connectionId: string,
+  timeouts: any,
+  runMode: string,
+  ide: string,
+  ideVersion: string,
+  vscodePath: string,
+  commit: string,
 ) => {
   const pageObjectPath = GetPageObjectPath.getPageObjectPath()
   const testWorkerRpc = await LaunchTestWorker.launchTestWorker(runMode)
@@ -60,14 +60,13 @@ export const prepareTestsOrAttach = async (
     state.parsedVersion = result.parsedVersion
     return testWorkerRpc
   }
-  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, monkeyPatchedElectron } = await state.promise
+  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId } = await state.promise
   const isFirstConnection = false
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await ConnectDevtools.connectDevtools(
     testWorkerRpc,
     connectionId,
     devtoolsWebSocketUrl,
-    monkeyPatchedElectron,
     electronObjectId,
     isFirstConnection,
     headlessMode,

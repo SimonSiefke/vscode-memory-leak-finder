@@ -11,14 +11,13 @@ import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.ts'
 import * as SessionState from '../SessionState/SessionState.ts'
 
 export const connectDevtools = async (
-  connectionId,
-  devtoolsWebSocketUrl,
-  monkeyPatchedElectronId,
-  electronObjectId,
-  isFirstConnection,
-  headlessMode,
-  webSocketUrl,
-  canUseIdleCallback,
+  connectionId: string,
+  devtoolsWebSocketUrl: string,
+  electronObjectId: string,
+  isFirstConnection: boolean,
+  headlessMode: boolean,
+  webSocketUrl: string,
+  canUseIdleCallback: boolean,
 ) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
