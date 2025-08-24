@@ -1,6 +1,6 @@
+import type { StartRunningOptions } from './StartRunningOptions.ts'
 import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
 import * as RunTest from '../RunTest/RunTest.ts'
-import type { StartRunningOptions } from './StartRunningOptions.ts'
 import * as Stdout from '../Stdout/Stdout.ts'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
 
@@ -10,11 +10,13 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     headlessMode,
     color,
     checkLeaks,
+    runSkippedTestsAnyway,
     recordVideo,
     cwd,
     runs,
     measure,
     measureAfter,
+    measureNode,
     timeouts,
     timeoutBetween,
     restartBetween,
@@ -38,10 +40,12 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     headlessMode,
     color,
     checkLeaks,
+    runSkippedTestsAnyway,
     recordVideo,
     runs,
     measure,
     measureAfter,
+    measureNode,
     timeouts,
     timeoutBetween,
     restartBetween,

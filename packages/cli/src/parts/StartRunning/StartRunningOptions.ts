@@ -3,11 +3,13 @@ export interface StartRunningOptions {
   headlessMode: boolean
   color: boolean
   checkLeaks: boolean
+  runSkippedTestsAnyway: boolean
   recordVideo: boolean
   cwd: string
   runs: number
   measure: string
   measureAfter: boolean
+  measureNode: boolean
   timeouts: boolean
   timeoutBetween: number
   restartBetween: boolean

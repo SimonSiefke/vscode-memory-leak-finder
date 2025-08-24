@@ -6,6 +6,7 @@ import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 export const createDefaultState = (): StdinDataState => ({
   buffering: false,
   checkLeaks: false,
+  runSkippedTestsAnyway: false,
   cwd: '',
   filter: '',
   headless: false,
@@ -27,4 +28,5 @@ export const createDefaultState = (): StdinDataState => ({
   stdout: [],
   isWindows: false,
   previousFilters: [],
+  exitCode: 0,
 })

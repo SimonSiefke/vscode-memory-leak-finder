@@ -27,6 +27,7 @@ export const parseArgv = (argv) => {
     watch: false,
     headless: false,
     checkLeaks: false,
+    runSkippedTestsAnyway: false,
     runs: 1,
     color: true,
     recordVideo: false,
@@ -34,6 +35,7 @@ export const parseArgv = (argv) => {
     filter: '',
     measure: 'event-listener-count',
     measureAfter: false,
+    measureNode: false,
     timeouts: true,
     timeoutBetween: 0,
     restartBetween: false,
@@ -54,6 +56,9 @@ export const parseArgv = (argv) => {
   if (argv.includes('--check-leaks')) {
     options.checkLeaks = true
   }
+  if (argv.includes('--run-skipped-tests-anyway')) {
+    options.runSkippedTestsAnyway = true
+  }
   if (argv.includes('--record-video')) {
     options.recordVideo = true
   }
@@ -71,6 +76,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--measure-after')) {
     options.measureAfter = true
+  }
+  if (argv.includes('--measure-node')) {
+    options.measureNode = true
   }
   if (argv.includes('--disable-timeouts')) {
     options.timeouts = false

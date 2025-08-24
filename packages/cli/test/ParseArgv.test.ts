@@ -20,6 +20,13 @@ test('parseArgv - headless mode', () => {
   })
 })
 
+test('parseArgv - run skipped tests anyway', () => {
+  const argv = ['--run-skipped-tests-anyway']
+  expect(ParseArgv.parseArgv(argv)).toMatchObject({
+    runSkippedTestsAnyway: true,
+  })
+})
+
 test('parseArgv - runs', () => {
   const argv = ['--runs', '4']
   expect(ParseArgv.parseArgv(argv)).toMatchObject({
@@ -94,4 +101,10 @@ test('parseArgv - setup-only flag not present', () => {
   const argv = []
   const options = ParseArgv.parseArgv(argv)
   expect(options.setupOnly).toBe(false)
+})
+
+test('parseArgv - measure-node flag', () => {
+  const argv = ['--measure-node']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.measureNode).toBe(true)
 })

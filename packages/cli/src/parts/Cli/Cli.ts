@@ -18,6 +18,7 @@ export const run = async (platform: string, argv: readonly string[], env: NodeJS
   StdinDataState.setState({
     ...StdinDataState.getState(),
     checkLeaks: options.checkLeaks,
+    runSkippedTestsAnyway: options.runSkippedTestsAnyway,
     commit: options.commit,
     cwd: options.cwd,
     headless: options.headless,
@@ -27,6 +28,7 @@ export const run = async (platform: string, argv: readonly string[], env: NodeJS
     isWindows,
     measure: options.measure,
     measureAfter: options.measureAfter,
+    measureNode: options.measureNode,
     recordVideo: options.recordVideo,
     restartBetween: options.restartBetween,
     runMode: options.runMode,

@@ -18,6 +18,9 @@ export const updateState = async (newState: any): Promise<void> => {
     await PreviousFilters.addAll(newState.previousFilters)
   }
   if (newState.mode === ModeType.Exit || newState.mode === ModeType.FinishedRunning) {
+    if (newState.exitCode) {
+      process.exitCode = newState.exitCode
+    }
     return HandleExit.handleExit()
   }
   StdinDataState.setState({ ...newState, stdout: [], previousFilters: [] })
@@ -32,6 +35,7 @@ export const updateState = async (newState: any): Promise<void> => {
       runs: state.runs,
       measure: state.measure,
       measureAfter: state.measureAfter,
+      measureNode: false,
       timeouts: state.timeouts,
       timeoutBetween: state.timeoutBetween,
       restartBetween: state.restartBetween,
@@ -43,6 +47,7 @@ export const updateState = async (newState: any): Promise<void> => {
       setupOnly: false,
       workers: state.workers,
       isWindows: state.isWindows,
+      runSkippedTestsAnyway: state.runSkippedTestsAnyway,
     })
   }
   if (newState.mode === ModeType.Interrupted) {

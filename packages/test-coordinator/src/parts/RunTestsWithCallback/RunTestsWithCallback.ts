@@ -39,10 +39,12 @@ export const runTests = async (
   headlessMode,
   color,
   checkLeaks,
+  runSkippedTestsAnyway,
   recordVideo,
   runs,
   measure,
   measureAfter,
+  measureNode,
   timeouts,
   timeoutBetween,
   restartBetween,
@@ -65,6 +67,7 @@ export const runTests = async (
     Assert.number(runs)
     Assert.string(measure)
     Assert.boolean(measureAfter)
+    Assert.boolean(measureNode)
     Assert.boolean(timeouts)
     Assert.number(timeoutBetween)
     Assert.number(runMode)
@@ -135,7 +138,7 @@ export const runTests = async (
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
       const { absolutePath, relativeDirname, dirent, relativePath } = formattedPath
-      const forceRun = dirent === `${filterValue}.js`
+      const forceRun = runSkippedTestsAnyway || dirent === `${filterValue}.js`
       if (i !== 0) {
         await callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, /* isFirst */ true)
       }

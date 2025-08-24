@@ -7,7 +7,6 @@ import * as PTimeout from '../PTimeout/PTimeout.ts'
 import * as SessionState from '../SessionState/SessionState.ts'
 import * as TargetState from '../TargetState/TargetState.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
-import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
 import { VError } from '../VError/VError.ts'
 
 export const Locator = (selector) => {
@@ -180,10 +179,6 @@ const handleAttachedToPage = async (message) => {
       Promise.all([
         DevtoolsProtocolPage.enable(sessionRpc),
         DevtoolsProtocolPage.setLifecycleEventsEnabled(sessionRpc, { enabled: true }),
-        DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(sessionRpc, {
-          source: UtilityScript.utilityScript,
-          worldName: 'utility',
-        }),
         DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
           autoAttach: true,
           waitForDebuggerOnStart: true,
