@@ -1,4 +1,4 @@
-import { NodeWorkerRpcParent,type Rpc } from '@lvce-editor/rpc'
+import { NodeWorkerRpcParent, type Rpc } from '@lvce-editor/rpc'
 import * as FileSystemWorkerPath from '../FileSystemWorkerPath/FileSystemWorkerPath.ts'
 
 export const launchFileSystemWorker = async (): Promise<Rpc> => {
@@ -6,5 +6,5 @@ export const launchFileSystemWorker = async (): Promise<Rpc> => {
     commandMap: {},
     path: FileSystemWorkerPath.fileSystemWorkerPath,
   })
-  return rpc 
+  return rpc
 }
