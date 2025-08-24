@@ -1,3 +1,5 @@
+import { getDefaultTarget } from '../MeasureTargetDefaults/MeasureTargetDefaults.ts'
+
 export const wrapMeasure = (measure) => {
   return {
     id: measure.id,
@@ -5,6 +7,7 @@ export const wrapMeasure = (measure) => {
       const args = measure.create(session)
       return {
         ...measure,
+        target: Array.isArray(measure.target) && measure.target.length > 0 ? measure.target : getDefaultTarget(measure.id),
         start() {
           return measure.start(...args)
         },
