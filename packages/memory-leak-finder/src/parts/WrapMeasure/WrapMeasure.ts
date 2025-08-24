@@ -1,8 +1,8 @@
 export const wrapMeasure = (measure) => {
   return {
     id: measure.id,
-    create(session) {
-      const args = measure.create(session)
+    create(session, context?) {
+      const args = measure.create(session, context)
       return {
         ...measure,
         start() {
@@ -10,6 +10,9 @@ export const wrapMeasure = (measure) => {
         },
         stop() {
           return measure.stop(...args)
+        },
+        compare(before, after) {
+          return measure.compare(before, after, ...args)
         },
         async releaseResources() {
           if (measure.releaseResources) {

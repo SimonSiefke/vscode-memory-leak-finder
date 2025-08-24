@@ -7,10 +7,10 @@ import * as WriteScriptMap from '../WriteScriptMap/WriteScriptMap.ts'
 
 export const id = MeasureId.NamedFunctionCount3
 
-export const create = (session) => {
+export const create = (session, context?) => {
   const objectGroup = ObjectGroupId.create()
   const scriptHandler = ScriptHandler.create()
-  return [session, objectGroup, scriptHandler]
+  return [session, objectGroup, scriptHandler, context]
 }
 
 export const start = async (session: Session, objectGroup: string, scriptHandler: any): Promise<string> => {
