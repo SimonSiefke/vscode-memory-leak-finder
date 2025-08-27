@@ -42,8 +42,7 @@ export const getEffects = async (state: any, newState: any): Promise<EffectsResu
       value: null,
     })
   }
-  if (state.mode !== ModeType.Running && newState.mode === ModeType.Running) {
-  }
+  if (state.mode !== ModeType.Running && newState.mode === ModeType.Running) {}
   return {
     newState,
     effects,
