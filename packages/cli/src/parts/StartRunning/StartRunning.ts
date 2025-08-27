@@ -32,9 +32,8 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
   const clear = await AnsiEscapes.clear(isWindows)
   await Stdout.write(clear)
   const rpc = await RunTest.prepare()
-  await rpc.invoke(
-    TestWorkerCommandType.RunTests,
-    cwd,
+  await rpc.invoke(TestWorkerCommandType.RunTests, {
+    root: cwd,
     cwd,
     filterValue,
     headlessMode,
@@ -56,5 +55,5 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     commit,
     setupOnly,
     workers,
-  )
+  })
 }

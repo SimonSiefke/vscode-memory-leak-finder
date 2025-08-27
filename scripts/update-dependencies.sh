@@ -16,7 +16,7 @@ fi
 
 function updateDependencies {
   echo "updating dependencies..."
-  OUTPUT=`ncu -u -x @types/node jest @jest/globals -x rollup`
+  OUTPUT=`ncu -u -x @types/node -x jest -x @jest/globals -x rollup`
   SUB='All dependencies match the latest package versions'
   if [[ "$OUTPUT" == *"$SUB"* ]]; then
     echo "$OUTPUT"
@@ -50,7 +50,6 @@ cd packages/stdout-worker && updateDependencies && cd ../../ &&
 cd packages/storage-worker && updateDependencies && cd ../../ &&
 cd packages/test-coordinator && updateDependencies && cd ../../ &&
 cd packages/test-worker && updateDependencies && cd ../../ &&
-cd packages/test-worker-commands && updateDependencies && cd ../../ &&
 cd packages/video-recording-worker && updateDependencies && cd ../../ &&
 
 echo "Great Success!"
