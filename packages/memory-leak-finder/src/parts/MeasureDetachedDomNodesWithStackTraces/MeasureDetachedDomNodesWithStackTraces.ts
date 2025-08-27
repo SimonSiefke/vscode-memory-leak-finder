@@ -7,8 +7,11 @@ import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as StartTrackingDomNodeStackTraces from '../StartTrackingDomNodeStackTraces/StartTrackingDomNodeStackTraces.ts'
 import * as StopTrackingDomNodeStackTraces from '../StopTrackingDomNodeStackTraces/StopTrackingDomNodeStackTraces.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.DetachedDomNodesWithStackTraces
+
+export const targets = [TargetId.Browser]
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
