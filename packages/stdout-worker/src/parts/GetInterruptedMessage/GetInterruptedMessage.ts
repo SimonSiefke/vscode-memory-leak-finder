@@ -1,4 +1,4 @@
-import { chalk } from '../Chalk/Chalk.ts'
+import chalk from 'chalk'
 
 const interruptedText: string = 'Test run was interrupted.'
 
