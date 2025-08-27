@@ -13,3 +13,5 @@ export const createChart = () => {
     yLabel: 'Function Counts',
   }
 }
+
+export const multiple = true

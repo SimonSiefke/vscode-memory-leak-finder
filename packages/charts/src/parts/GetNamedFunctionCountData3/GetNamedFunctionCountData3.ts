@@ -1,4 +1,5 @@
 import { existsSync } from 'node:fs'
+import { readdir } from 'node:fs/promises'
 import { join } from 'path'
 import { readJson } from '../ReadJson/ReadJson.ts'
 import * as Root from '../Root/Root.ts'
@@ -8,15 +9,18 @@ export const getNamedFunctionCountData3 = async (name: string) => {
   if (!existsSync(resultsPath)) {
     return []
   }
-  const beforePath = join(resultsPath, 'editor.no-autofixes-available.json')
-  const rawData = await readJson(beforePath)
-
-  const data = rawData.namedFunctionCount3.map((item) => {
-    return {
-      name: item.name,
-      value: item.count,
-    }
-  })
-
-  return data
+  const dirents = await readdir(resultsPath)
+  const allData: any[] = []
+  for (const dirent of dirents) {
+    const beforePath = join(resultsPath, dirent)
+    const rawData = await readJson(beforePath)
+    const data = rawData.namedFunctionCount3.map((item) => {
+      return {
+        name: item.name,
+        value: item.count,
+      }
+    })
+    allData.push(data)
+  }
+  return allData
 }
