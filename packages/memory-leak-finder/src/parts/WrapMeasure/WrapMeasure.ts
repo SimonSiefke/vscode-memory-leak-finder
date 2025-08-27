@@ -1,7 +1,9 @@
-export const wrapMeasure = (measure) => {
+import type { Session } from '../Session/Session.ts'
+
+export const wrapMeasure = (measure: any) => {
   return {
     id: measure.id,
-    create(session, context?) {
+    create(session: Session, context: any) {
       const args = measure.create(session, context)
       return {
         ...measure,
