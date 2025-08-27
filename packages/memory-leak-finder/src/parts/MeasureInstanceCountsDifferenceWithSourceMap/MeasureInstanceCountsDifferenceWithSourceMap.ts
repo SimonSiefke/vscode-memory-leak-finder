@@ -1,6 +1,6 @@
+import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import * as CompareInstanceCountsDifferenceWithSourceMap from '../CompareInstanceCountsDifferenceWithSourceMap/CompareInstanceCountsDifferenceWithSourceMap.ts'
 import * as GetInstanceCountsWithSourceMap from '../GetInstanceCountsWithSourceMap/GetInstanceCountsWithSourceMap.ts'
-import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'

@@ -1,6 +1,6 @@
+import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import * as CompareDisposablesWithLocation from '../CompareDisposablesWithLocation/CompareDisposablesWithLocation.ts'
 import * as GetDisposablesWithLocation from '../GetDisposablesWithLocation/GetDisposablesWithLocation.ts'
-import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import * as IsLeakDisposables from '../IsLeakDisposables/IsLeakDisposables.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'

@@ -1,6 +1,6 @@
+import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import * as GetMutationObserverCount from '../GetMutationObserverCount/GetMutationObserverCount.ts'
 import * as GetMutationObserversWithStackTraces from '../GetMutationObserversWithStackTraces/GetMutationObserversWithStackTraces.ts'
-import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as PrettifyConstructorStackTracesWithSourceMap from '../PrettifyConstructorStackTracesWithSourceMap/PrettifyConstructorStackTracesWithSourceMap.ts'

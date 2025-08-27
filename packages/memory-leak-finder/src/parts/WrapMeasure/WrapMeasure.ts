@@ -10,9 +10,9 @@ export const wrapMeasure = (measure) => {
         targets:
           Array.isArray(measure.targets) && measure.targets.length > 0
             ? measure.targets
-            : Array.isArray(measure.target) && measure.target.length > 0
+            : (Array.isArray(measure.target) && measure.target.length > 0
               ? measure.target
-              : getDefaultTarget(measure.id),
+              : getDefaultTarget(measure.id)),
         start() {
           return measure.start(...args)
         },

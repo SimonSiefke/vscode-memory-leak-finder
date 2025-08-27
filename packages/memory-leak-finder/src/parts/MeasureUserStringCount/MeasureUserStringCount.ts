@@ -1,12 +1,12 @@
+import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import * as CompareCount from '../CompareCount/CompareCount.ts'
 import * as GetUserStringCount from '../GetUserStringCount/GetUserStringCount.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
-import * as WriteScriptMap from '../WriteScriptMap/WriteScriptMap.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
-import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
+import * as WriteScriptMap from '../WriteScriptMap/WriteScriptMap.ts'
 
 export const id = MeasureId.UserStringCount
 
