@@ -2,7 +2,6 @@ import { fixHtmlNamespace } from '../FixXmlNamespace/FixXmlNamespace.ts'
 import * as Plot from '../Plot/Plot.ts'
 
 export const createBarChart = (data: any, options: any): string => {
-  console.log({ data })
   const baseHtml = Plot.plot({
     style: 'overflow: visible;background:white',
     marginLeft: 90,
@@ -13,7 +12,6 @@ export const createBarChart = (data: any, options: any): string => {
       Plot.barX(data, {
         x: 'value',
         y: 'name',
-        // sort: { y: 'x', reverse: true },
       }),
 
       Plot.text(data, {
@@ -26,15 +24,6 @@ export const createBarChart = (data: any, options: any): string => {
         strokeWidth: 0.5,
         fontSize: 7,
       }),
-
-      // Plot.text(data, {
-      //   text: (d) => `${Math.floor(d.value / 1000)} B`,
-      //   y: 'name',
-      //   x: 'value',
-      //   textAnchor: 'end',
-      //   dx: -3,
-      //   fill: 'white',
-      // }),
     ],
   }).outerHTML
 
