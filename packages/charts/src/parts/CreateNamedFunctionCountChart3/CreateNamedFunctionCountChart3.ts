@@ -10,6 +10,6 @@ export const createChart = () => {
     x: 'index',
     y: 'count',
     xLabel: 'Index',
-    yLabel: 'CodeLensModel Count',
+    yLabel: 'Function Counts',
   }
 }
