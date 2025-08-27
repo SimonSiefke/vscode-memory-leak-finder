@@ -4,8 +4,9 @@ import * as Plot from '../Plot/Plot.ts'
 export const createBarChart = (data: any, options: any): string => {
   console.log({ data })
   const baseHtml = Plot.plot({
-    style: 'overflow: visible;background:white',
+    style: 'overflow: visible;background:orange',
     marginLeft: 90,
+    marginRight: 90,
     x: { axis: null },
     y: { label: null },
     marks: [
@@ -21,6 +22,7 @@ export const createBarChart = (data: any, options: any): string => {
         x: 'value',
         textAnchor: 'start',
         dx: 3,
+        stroke: 'red',
       }),
 
       // Plot.text(data, {
