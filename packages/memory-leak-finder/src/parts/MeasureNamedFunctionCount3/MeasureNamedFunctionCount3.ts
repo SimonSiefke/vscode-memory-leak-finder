@@ -10,7 +10,7 @@ export const id = MeasureId.NamedFunctionCount3
 
 export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
-export const create = (session: Session) => {
+export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
   const scriptHandler = ScriptHandler.create()
   return [session, objectGroup, scriptHandler]
