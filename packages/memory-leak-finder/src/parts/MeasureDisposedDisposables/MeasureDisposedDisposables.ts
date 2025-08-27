@@ -1,3 +1,4 @@
+import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import * as CompareDisposablesWithLocation from '../CompareDisposablesWithLocation/CompareDisposablesWithLocation.ts'
 import * as GetDisposedDisposablesWithLocation from '../GetDisposedDisposablesWithLocation/GetDisposedDisposablesWithLocation.ts'
 import * as IsLeakDisposables from '../IsLeakDisposables/IsLeakDisposables.ts'
@@ -17,12 +18,12 @@ export const create = (session) => {
   return [session, objectGroup, scriptHandler]
 }
 
-export const start = async (session, objectGroup, scriptHandler) => {
+export const start = async (session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   return GetDisposedDisposablesWithLocation.getDisposedDisposablesWithLocation(session, objectGroup, scriptHandler.scriptMap)
 }
 
-export const stop = async (session, objectGroup, scriptHandler) => {
+export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.stop(session)
   const result = await GetDisposedDisposablesWithLocation.getDisposedDisposablesWithLocation(session, objectGroup, scriptHandler.scriptMap)
   return {
