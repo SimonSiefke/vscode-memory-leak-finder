@@ -16,13 +16,6 @@ import * as Timeout from '../Timeout/Timeout.ts'
 import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
 import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 
-// 1. get matching files
-// 2. launch vscode
-// 3. get websocket url
-// 4. launch test worker
-// 5. pass websocket url to test worker and wait for connection
-// 6. pass matching files to test worker
-
 const getSummary = (result) => {
   if (result && result.eventListeners) {
     return { eventListeners: result.eventListeners }
