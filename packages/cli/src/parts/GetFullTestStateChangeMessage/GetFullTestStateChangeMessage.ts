@@ -14,10 +14,13 @@ export const getFullMessage = async (
     fullMessage += clearMessage
   }
   if (isGithubActions) {
-    const title: string = message.split('\n')[0]
-    fullMessage += `::group::${title}\n`
+    const lines = message.split('\n')
+    const title: string = lines[0]
+    const rest = lines.splice(1).join('\n')
+    fullMessage += `::group::${title}\n${rest}`
+  } else {
+    fullMessage += message
   }
-  fullMessage += message
   if (!isGithubActions && !isBuffering) {
     const clear = await AnsiEscapes.clear(isWindows)
     fullMessage = clear + fullMessage
