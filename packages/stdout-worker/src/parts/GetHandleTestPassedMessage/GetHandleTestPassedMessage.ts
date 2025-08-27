@@ -1,10 +1,6 @@
 import chalk from 'chalk'
-import * as FormatAsSeconds from '../FormatAsSeconds/FormatAsSeconds.ts'
+import { formatDuration } from '../FormatDuration/FormatDuration.ts'
 import * as TestPrefix from '../TestPrefix/TestPrefix.ts'
-
-const formatDuration = (duration: number): string => {
-  return `(${FormatAsSeconds.formatAsSeconds(duration)})`
-}
 
 export const getHandleTestPassedMessage = (
   file: string,
