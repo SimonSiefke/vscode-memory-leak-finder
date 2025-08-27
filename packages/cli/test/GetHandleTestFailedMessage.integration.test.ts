@@ -43,5 +43,3 @@ test('getHandleTestFailedMessage - includes annotation when in GitHub Actions', 
   expect(message).toContain('::error file=src/sample.test.js,line=15,col=29::boom')
   expect(message).toMatch(/BASE\n$/)
 })
-
-

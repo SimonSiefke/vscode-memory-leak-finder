@@ -14,5 +14,3 @@ test('extractLineAndColumnFromStack - miss', () => {
   const pos = Extract.extractLineAndColumnFromStack(stack, relativeFilePath)
   expect(pos).toBeUndefined()
 })
-
-

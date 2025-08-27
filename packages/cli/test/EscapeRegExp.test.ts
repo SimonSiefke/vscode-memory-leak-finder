@@ -6,5 +6,3 @@ test('escapeRegExp', () => {
   const escaped: string = EscapeRegExp.escapeRegExp(input)
   expect(escaped).toBe('a\\.\\*\\+\\?\\^\\$\\{\\}\\(\\)\\|\\[\\]\\\\b')
 })
-
-

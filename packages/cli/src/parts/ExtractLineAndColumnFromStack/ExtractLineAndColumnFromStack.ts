@@ -25,5 +25,3 @@ export const extractLineAndColumnFromStack = (stack: string, relativeFilePath: s
   }
   return { line, col }
 }
-
-
