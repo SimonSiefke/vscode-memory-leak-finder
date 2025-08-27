@@ -1,5 +1,6 @@
 import * as GetMutationObserverCount from '../GetMutationObserverCount/GetMutationObserverCount.ts'
 import * as GetMutationObserversWithStackTraces from '../GetMutationObserversWithStackTraces/GetMutationObserversWithStackTraces.ts'
+import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as PrettifyConstructorStackTracesWithSourceMap from '../PrettifyConstructorStackTracesWithSourceMap/PrettifyConstructorStackTracesWithSourceMap.ts'
@@ -18,14 +19,14 @@ export const create = (session) => {
   return [session, objectGroup, scriptHandler]
 }
 
-export const start = async (session, objectGroup, scriptHandler) => {
-  await scriptHandler.start()
+export const start = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+  await scriptHandler.start(session)
   await StartTrackingMutationObserverStackTraces.startTrackingMutationObserverStackTraces(session, objectGroup)
   return GetMutationObserverCount.getMutationObserverCount(session)
 }
 
-export const stop = async (session, objectGroup, scriptHandler) => {
-  await scriptHandler.stop()
+export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+  await scriptHandler.stop(session)
   const added = await GetMutationObserversWithStackTraces.getMutationObserversWithStackTraces(session, objectGroup)
   await StopTrackingMutationObserverStackTraces.stopTrackingMutationObserverStackTraces(session, objectGroup)
   const pretty = await PrettifyConstructorStackTracesWithSourceMap.prettifyConstructorStackTracesWithSourceMap(

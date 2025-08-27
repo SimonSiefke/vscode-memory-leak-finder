@@ -1,5 +1,6 @@
 import * as CompareNamedFunctionDifferenceWithSourceMap from '../CompareNamedFunctionDifferenceWithSourceMap/CompareNamedFunctionDifferenceWithSourceMap.ts'
 import * as GetNamedFunctionCount from '../GetNamedFunctionCount/GetNamedFunctionCount.ts'
+import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
@@ -18,12 +19,12 @@ export const create = (session) => {
 
 const includeSourceMap = true
 
-export const start = async (session, objectGroup, scriptHandler) => {
+export const start = async (session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   return GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap, includeSourceMap)
 }
 
-export const stop = async (session, objectGroup, scriptHandler) => {
+export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.stop(session)
   const result = await GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap, includeSourceMap)
   // @ts-ignore

@@ -6,6 +6,7 @@ import * as GetNamedFunctionCount from '../GetNamedFunctionCount/GetNamedFunctio
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
+import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 
 export const id = MeasureId.NamedFunctionCount
 
@@ -17,12 +18,12 @@ export const create = (session) => {
   return [session, objectGroup, scriptHandler]
 }
 
-export const start = async (session, objectGroup, scriptHandler) => {
+export const start = async (session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   return GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap, false as any)
 }
 
-export const stop = async (session, objectGroup, scriptHandler) => {
+export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.stop(session)
   return GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap, false as any)
 }

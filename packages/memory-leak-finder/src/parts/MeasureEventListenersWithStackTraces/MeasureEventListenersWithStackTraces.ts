@@ -1,6 +1,7 @@
 import * as AddStackTracesToEventListeners from '../AddStackTracesToEventListeners/AddStackTracesToEventListeners.ts'
 import * as CompareEventListenersWithStackTraces from '../CompareEventListenersWithStackTraces/CompareEventListenersWithStackTraces.ts'
 import * as GetEventListeners from '../GetEventListeners/GetEventListeners.ts'
+import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
@@ -24,14 +25,14 @@ export const create = (session) => {
   return [session, objectGroup, scriptHandler]
 }
 
-export const start = async (session, objectGroup, scriptHandler) => {
+export const start = async (session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   await StartTrackEventListenerStackTraces.startTrackingEventListenerStackTraces(session, objectGroup)
   const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptHandler.scriptMap)
   return result
 }
 
-export const stop = async (session, objectGroup, scriptHandler) => {
+export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.stop(session)
   const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptHandler.scriptMap)
   const resultWithStackTraces = await AddStackTracesToEventListeners.addStackTracesToEventListeners(session, result)
