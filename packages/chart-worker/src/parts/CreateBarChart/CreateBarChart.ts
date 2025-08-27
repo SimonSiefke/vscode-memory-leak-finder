@@ -3,6 +3,7 @@ import * as Plot from '../Plot/Plot.ts'
 
 export const createBarChart = (data: any, options: any): string => {
   const baseHtml = Plot.plot({
+    style: 'overflow: visible;background:white',
     marginLeft: 90,
     x: { axis: null },
     y: { label: null },
