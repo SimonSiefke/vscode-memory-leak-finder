@@ -13,7 +13,7 @@
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
   },
   "dependencies": {
-    "@lvce-editor/rpc": "^4.14.0",
+    "@lvce-editor/rpc": "^4.15.0",
     "@observablehq/plot": "^0.6.17",
     "jsdom": "^26.1.0"
   },
