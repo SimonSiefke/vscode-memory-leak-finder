@@ -1,9 +1,6 @@
 import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
-
-const escapeRegExp = (value: string): string => {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
+import * as ExtractLineAndColumnFromStack from '../ExtractLineAndColumnFromStack/ExtractLineAndColumnFromStack.ts'
 
 export const getHandleTestFailedMessage = async (
   file: string,
@@ -28,11 +25,10 @@ export const getHandleTestFailedMessage = async (
   let line: number | undefined
   let col: number | undefined
   if (error && typeof error.stack === 'string' && typeof relativeFilePath === 'string') {
-    const re = new RegExp(`${escapeRegExp(relativeFilePath)}:(\\d+):(\\d+)`)
-    const m = error.stack.match(re)
-    if (m) {
-      line = Number(m[1])
-      col = Number(m[2])
+    const pos = ExtractLineAndColumnFromStack.extractLineAndColumnFromStack(error.stack, relativeFilePath)
+    if (pos) {
+      line = pos.line
+      col = pos.col
     }
   }
 
