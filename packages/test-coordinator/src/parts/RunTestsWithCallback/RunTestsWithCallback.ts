@@ -14,7 +14,7 @@ import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTea
 import * as Time from '../Time/Time.ts'
 import * as Timeout from '../Timeout/Timeout.ts'
 import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
-import { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
+import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 
 // 1. get matching files
 // 2. launch vscode
