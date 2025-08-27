@@ -1,8 +1,11 @@
 import * as CompareHeapUsage from '../CompareHeapUsage/CompareHeapUsage.ts'
 import * as GetHeapUsage from '../GetHeapUsage/GetHeapUsage.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.HeapUsage
+
+export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
 export const create = (session) => {
   return [session]

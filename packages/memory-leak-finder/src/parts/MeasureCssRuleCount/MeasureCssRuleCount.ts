@@ -3,8 +3,11 @@ import * as GetCssRuleCount from '../GetCssRuleCount/GetCssRuleCount.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.CssRuleCount
+
+export const targets = [TargetId.Browser]
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
