@@ -6,6 +6,7 @@ export const getData = () => GetNamedFunctionCountData3.getNamedFunctionCountDat
 
 export const createChart = () => {
   return {
+    type: 'bar-chart',
     x: 'index',
     y: 'count',
     xLabel: 'Index',
