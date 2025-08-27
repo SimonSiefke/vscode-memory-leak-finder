@@ -57,7 +57,7 @@
   },
   "dependencies": {
     "@lvce-editor/assert": "^1.4.0",
-    "@lvce-editor/rpc": "^4.14.0",
+    "@lvce-editor/rpc": "^4.15.0",
     "@lvce-editor/verror": "^1.7.0",
     "pretty-bytes": "^7.0.1"
   }
