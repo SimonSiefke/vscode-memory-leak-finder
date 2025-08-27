@@ -120,6 +120,10 @@ export const runTests = async (
       commit,
     )
 
+    const context = {
+      runs,
+    }
+
     const intializeEnd = performance.now()
     const intializeTime = intializeEnd - initialStart
 
@@ -173,7 +177,7 @@ export const runTests = async (
             }
             const after = await MemoryLeakFinder.stop(memoryLeakWorkerRpc, connectionId, targetId)
 
-            const result = await MemoryLeakFinder.compare(memoryLeakWorkerRpc, connectionId, before, after)
+            const result = await MemoryLeakFinder.compare(memoryLeakWorkerRpc, connectionId, before, after, context)
             const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
             const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
             await JsonFile.writeJson(resultPath, result)
