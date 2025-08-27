@@ -3,8 +3,8 @@ import type { Session } from '../Session/Session.ts'
 export const wrapMeasure = (measure: any) => {
   return {
     id: measure.id,
-    create(session: Session, context: any) {
-      const args = measure.create(session, context)
+    create(session: Session) {
+      const args = measure.create(session)
       return {
         ...measure,
         targets: measure.targets || [],
@@ -14,8 +14,8 @@ export const wrapMeasure = (measure: any) => {
         stop() {
           return measure.stop(...args)
         },
-        compare(before, after) {
-          return measure.compare(before, after, ...args)
+        compare(before, after, context) {
+          return measure.compare(before, after, context)
         },
         async releaseResources() {
           if (measure.releaseResources) {
