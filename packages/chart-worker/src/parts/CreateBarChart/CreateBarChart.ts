@@ -22,7 +22,9 @@ export const createBarChart = (data: any, options: any): string => {
         x: 'value',
         textAnchor: 'start',
         dx: 3,
-        stroke: 'red',
+        stroke: 'black',
+        strokeWidth: 0.5,
+        fontSize: 7,
       }),
 
       // Plot.text(data, {
