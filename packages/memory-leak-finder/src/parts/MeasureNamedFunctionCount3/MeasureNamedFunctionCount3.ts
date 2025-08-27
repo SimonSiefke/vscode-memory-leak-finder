@@ -5,6 +5,7 @@ import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as WriteScriptMap from '../WriteScriptMap/WriteScriptMap.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
+import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 
 export const id = MeasureId.NamedFunctionCount3
 
@@ -16,7 +17,7 @@ export const create = (session) => {
   return [session, objectGroup, scriptHandler]
 }
 
-export const start = async (session: Session, objectGroup: string, scriptHandler: any): Promise<string> => {
+export const start = async (session: Session, objectGroup: string, scriptHandler: IScriptHandler): Promise<string> => {
   await scriptHandler.start(session)
   const id = 0
   const heapSnapshotPath = await getHeapSnapshot(session, id)
@@ -24,7 +25,7 @@ export const start = async (session: Session, objectGroup: string, scriptHandler
   return heapSnapshotPath
 }
 
-export const stop = async (session: Session, objectGroup: string, scriptHandler: any): Promise<string> => {
+export const stop = async (session: Session, objectGroup: string, scriptHandler: IScriptHandler): Promise<string> => {
   const id = 1
   const heapSnapshotPath = await getHeapSnapshot(session, id)
   await WriteScriptMap.writeScriptMap(scriptHandler.scriptMap, id)
