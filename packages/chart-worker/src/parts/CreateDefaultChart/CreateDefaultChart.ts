@@ -1,7 +1,7 @@
 import { fixHtmlNamespace } from '../FixXmlNamespace/FixXmlNamespace.ts'
 import * as Plot from '../Plot/Plot.ts'
 
-export const createChart = (data, { x, y, xLabel, yLabel }) => {
+export const createDefaultChart = (data, { x, y, xLabel, yLabel }) => {
   const baseHtml = Plot.plot({
     style: 'overflow: visible;background:white',
     marginLeft: 60,

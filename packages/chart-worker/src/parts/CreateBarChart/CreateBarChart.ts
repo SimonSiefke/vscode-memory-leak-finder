@@ -1,7 +1,7 @@
 import { fixHtmlNamespace } from '../FixXmlNamespace/FixXmlNamespace.ts'
 import * as Plot from '../Plot/Plot.ts'
 
-export const createBarChart = (data) => {
+export const createBarChart = (data: any, options: any): string => {
   const baseHtml = Plot.plot({
     marginLeft: 90,
     x: { axis: null },
