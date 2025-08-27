@@ -14,6 +14,7 @@ import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTea
 import * as Time from '../Time/Time.ts'
 import * as Timeout from '../Timeout/Timeout.ts'
 import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
+import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 
 // 1. get matching files
 // 2. launch vscode
@@ -32,7 +33,7 @@ const getSummary = (result) => {
   return { result }
 }
 
-export const runTests = async (
+export const runTestsWithCallback = async ({
   root,
   cwd,
   filterValue,
@@ -55,7 +56,7 @@ export const runTests = async (
   commit,
   setupOnly,
   callback,
-) => {
+}: RunTestsWithCallbackOptions) => {
   try {
     Assert.string(root)
     Assert.string(cwd)
