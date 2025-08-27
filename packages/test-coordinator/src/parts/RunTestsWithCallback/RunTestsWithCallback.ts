@@ -1,5 +1,6 @@
 import { join } from 'node:path'
 import * as Assert from '../Assert/Assert.ts'
+import { getSummary } from '../GetSummary/GetSummary.ts'
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.ts'
 import * as Id from '../Id/Id.ts'
 import * as JsonFile from '../JsonFile/JsonFile.ts'
@@ -7,6 +8,7 @@ import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.ts'
 import * as MemoryLeakResultsPath from '../MemoryLeakResultsPath/MemoryLeakResultsPath.ts'
 import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.ts'
 import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
+import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.ts'
 import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.ts'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.ts'
@@ -14,17 +16,6 @@ import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTea
 import * as Time from '../Time/Time.ts'
 import * as Timeout from '../Timeout/Timeout.ts'
 import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
-import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
-
-const getSummary = (result) => {
-  if (result && result.eventListeners) {
-    return { eventListeners: result.eventListeners }
-  }
-  if (result && result.summary) {
-    return result.summary
-  }
-  return { result }
-}
 
 export const runTestsWithCallback = async ({
   root,
