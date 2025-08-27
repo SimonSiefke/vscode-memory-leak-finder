@@ -3,6 +3,7 @@ import * as GetScopeCount from '../GetScopeCount/GetScopeCount.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
 
 // TODO
 // 1. use queryObjects to query all functions
@@ -12,6 +13,8 @@ import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 // 5. sum up all unique scope lists counts
 
 export const id = MeasureId.ScopeCount
+
+export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()

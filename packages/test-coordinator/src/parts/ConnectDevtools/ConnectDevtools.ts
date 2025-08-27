@@ -1,29 +1,15 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
 
-/**
- *
- * @param {*} rpc
- * @param {*} connectionId
- * @param {string} devtoolsWebSocketUrl
- * @param {string} monkeyPatchedElectronId
- * @param {string} electronObjectId
- * @param {boolean} isFirstConnection
- * @param {boolean} headlessMode
- * @param {string} webSocketUrl
- * @param {boolean} canUseIdleCallback
- * @returns
- */
 export const connectDevtools = (
-  rpc,
-  connectionId,
-  devtoolsWebSocketUrl,
-  monkeyPatchedElectronId,
-  electronObjectId,
-  isFirstConnection,
-  headlessMode,
-  webSocketUrl,
-  canUseIdleCallback,
+  rpc: any,
+  connectionId: number,
+  devtoolsWebSocketUrl: string,
+  electronObjectId: string,
+  isFirstConnection: boolean,
+  headlessMode: boolean,
+  webSocketUrl: string,
+  canUseIdleCallback: boolean,
 ) => {
   Assert.object(rpc)
   Assert.number(connectionId)
@@ -32,7 +18,6 @@ export const connectDevtools = (
     TestWorkerCommandType.ConnectDevtools,
     connectionId,
     devtoolsWebSocketUrl,
-    monkeyPatchedElectronId,
     electronObjectId,
     isFirstConnection,
     headlessMode,

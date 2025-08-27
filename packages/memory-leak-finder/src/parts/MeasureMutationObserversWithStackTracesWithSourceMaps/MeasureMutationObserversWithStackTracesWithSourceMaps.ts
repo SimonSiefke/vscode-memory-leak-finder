@@ -6,8 +6,11 @@ import * as PrettifyConstructorStackTracesWithSourceMap from '../PrettifyConstru
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as StartTrackingMutationObserverStackTraces from '../StartTrackingMutationObserverStackTraces/StartTrackingMutationObserverStackTraces.ts'
 import * as StopTrackingMutationObserverStackTraces from '../StopTrackingMutationObserverStackTraces/StopTrackingMutationObserverStackTraces.ts'
+import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.MutationObserversWithStackTracesWithSourceMaps
+
+export const targets = [TargetId.Browser]
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
