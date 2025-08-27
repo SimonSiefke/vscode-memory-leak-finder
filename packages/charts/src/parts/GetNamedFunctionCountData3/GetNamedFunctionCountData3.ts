@@ -8,7 +8,7 @@ export const getNamedFunctionCountData3 = async (name: string) => {
   if (!existsSync(resultsPath)) {
     return []
   }
-  const beforePath = join(resultsPath, 'editor.no-autofixes-available-after.json')
+  const beforePath = join(resultsPath, 'editor.no-autofixes-available.json')
   const rawData = await readJson(beforePath)
 
   const data = rawData.namedFunctionCount3.map((item) => {

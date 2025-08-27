@@ -4,7 +4,7 @@ import * as Plot from '../Plot/Plot.ts'
 export const createBarChart = (data: any, options: any): string => {
   console.log({ data })
   const baseHtml = Plot.plot({
-    style: 'overflow: visible;background:orange',
+    style: 'overflow: visible;background:white',
     marginLeft: 90,
     marginRight: 90,
     x: { axis: null },
