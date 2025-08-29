@@ -8,7 +8,6 @@ jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
       }
       if (method === 'Stdout.getGitHubFileErrorMessage') {
         const [_message, options] = args
-        const parts: string[] = ['::error']
         const annotations: string[] = []
         if (options.file) annotations.push(`file=${options.file}`)
         if (options.line) annotations.push(`line=${options.line}`)
@@ -28,18 +27,12 @@ jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => 
 const Mod = await import('../src/parts/GetHandleTestFailedMessage/GetHandleTestFailedMessage.ts')
 
 test('getHandleTestFailedMessage - includes annotation when in GitHub Actions', async () => {
-  const message = await Mod.getHandleTestFailedMessage(
-    '/repo/src/sample.test.js',
-    'src',
-    'src/sample.test.js',
-    'sample.test.js',
-    {
-      type: 'Error',
-      message: 'boom',
-      stack: '    at Module.test (/repo/src/sample.test.js:15:29)',
-      codeFrame: '',
-    },
-  )
+  const message = await Mod.getHandleTestFailedMessage('/repo/src/sample.test.js', 'src', 'src/sample.test.js', 'sample.test.js', {
+    type: 'Error',
+    message: 'boom',
+    stack: '    at Module.test (/repo/src/sample.test.js:15:29)',
+    codeFrame: '',
+  })
   expect(message).toContain('::error file=src/sample.test.js,line=15,col=29::boom')
   expect(message).toMatch(/BASE\n$/)
 })
