@@ -28,21 +28,22 @@ function updateDependencies {
 
 updateDependencies &&
 cd packages/build && updateDependencies && cd ../../ &&
-cd packages/cli && updateDependencies && cd ../../ &&
-cd packages/charts && updateDependencies && cd ../../ &&
 cd packages/chart-worker && updateDependencies && cd ../../ &&
+cd packages/charts && updateDependencies && cd ../../ &&
+cd packages/cli && updateDependencies && cd ../../ &&
 cd packages/cursor-e2e && updateDependencies && cd ../../ &&
 cd packages/devtools-protocol && updateDependencies && cd ../../ &&
 cd packages/download-worker && updateDependencies && cd ../../ &&
 cd packages/e2e && updateDependencies && cd ../../ &&
-cd packages/file-watcher-worker && updateDependencies && cd ../../ &&
 cd packages/file-system-worker && updateDependencies && cd ../../ &&
-cd packages/heap-snapshot-worker && updateDependencies && cd ../../ &&
+cd packages/file-watcher-worker && updateDependencies && cd ../../ &&
 cd packages/heap-snapshot-parsing-worker && updateDependencies && cd ../../ &&
+cd packages/heap-snapshot-worker && updateDependencies && cd ../../ &&
 cd packages/initialization-worker && updateDependencies && cd ../../ &&
 cd packages/injected-code && updateDependencies && cd ../../ &&
 cd packages/load-source-map-worker && updateDependencies && cd ../../ &&
 cd packages/memory-leak-finder && updateDependencies && cd ../../ &&
+cd packages/original-name-worker && updateDependencies && cd ../../ &&
 cd packages/page-object && updateDependencies && cd ../../ &&
 cd packages/repository-worker && updateDependencies && cd ../../ &&
 cd packages/source-map-worker && updateDependencies && cd ../../ &&

@@ -21,6 +21,7 @@
     { "path": "./packages/file-system-worker" },
     { "path": "./packages/repository-worker" },
     { "path": "./packages/source-map-worker" },
+    { "path": "./packages/original-name-worker" },
     { "path": "./packages/stdout-worker" },
     { "path": "./packages/storage-worker" },
     { "path": "./packages/test-coordinator" },

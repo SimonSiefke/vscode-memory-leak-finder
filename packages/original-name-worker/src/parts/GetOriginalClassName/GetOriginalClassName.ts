@@ -2,7 +2,7 @@ const RE_CLASSNAME: RegExp = /^[a-zA-Z\d]+/
 const classPrefix: string = 'class '
 const extendsPrefix: string = 'extends'
 
-export const getOriginalClassName = async (sourceContent: string, originalLine: number, originalColumn: number): Promise<string> => {
+export const getOriginalClassName = (sourceContent: string, originalLine: number, originalColumn: number): string => {
   if (!sourceContent) {
     return 'unknown'
   }
