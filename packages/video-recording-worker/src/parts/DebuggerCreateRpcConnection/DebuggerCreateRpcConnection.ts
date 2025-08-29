@@ -63,6 +63,9 @@ export const createRpc = (ipc: any) => {
     on(event: string, listener: any) {
       listeners[event] = listener
     },
+    off(event: string, listener: any) {
+      delete listener[event]
+    },
     once(event: string) {
       const { resolve, promise } = Promise.withResolvers<any>()
       onceListeners[event] = resolve
