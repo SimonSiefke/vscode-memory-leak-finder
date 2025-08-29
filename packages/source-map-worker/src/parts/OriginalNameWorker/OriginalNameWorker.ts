@@ -1,4 +1,4 @@
-import { NodeWorkerRpcParent, Rpc } from '@lvce-editor/rpc'
+import { NodeWorkerRpcParent, type Rpc } from '@lvce-editor/rpc'
 import { getOriginalNameWorkerPath } from '../OriginalNameWorkerPath/OriginalNameWorkerPath.ts'
 
 let rpcPromise: Promise<Rpc> | undefined
