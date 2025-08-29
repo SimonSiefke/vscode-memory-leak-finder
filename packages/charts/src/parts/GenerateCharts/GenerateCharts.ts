@@ -28,10 +28,12 @@ export const generateCharts = async () => {
     if (visitor.multiple) {
       for (let i = 0; i < data.length; i++) {
         const item = data[i]
-        const svg = await rpc.invoke('Chart.create', item, chartMetaData)
-        const outPath = join(Root.root, '.vscode-charts', `${visitor.name}/${i}.svg`)
-        await mkdir(dirname(outPath), { recursive: true })
-        await writeFile(outPath, svg)
+        if (item.length > 0) {
+          const svg = await rpc.invoke('Chart.create', item, chartMetaData)
+          const outPath = join(Root.root, '.vscode-charts', `${visitor.name}/${i}.svg`)
+          await mkdir(dirname(outPath), { recursive: true })
+          await writeFile(outPath, svg)
+        }
       }
     } else {
       const svg = await rpc.invoke('Chart.create', data, chartMetaData)

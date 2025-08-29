@@ -16,10 +16,11 @@ export const getNamedFunctionCountData3 = async (name: string) => {
     const rawData = await readJson(beforePath)
     const data = rawData.namedFunctionCount3.map((item) => {
       return {
-        name: item.name,
+        name: item.originalName || item.name,
         value: item.count,
       }
     })
+    data.sort((a, b) => b.value - a.value)
     allData.push(data)
   }
   return allData
