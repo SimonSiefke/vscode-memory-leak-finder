@@ -1,6 +1,7 @@
 import { test, expect } from '@jest/globals'
 import { parse } from '@babel/parser'
-import traverse, { NodePath } from '@babel/traverse'
+import * as TraverseNS from '@babel/traverse'
+import type { NodePath } from '@babel/traverse'
 import type * as t from '@babel/types'
 import { getEnclosingNames } from '../src/parts/GetEnclosingNames/GetEnclosingNames.ts'
 
@@ -10,8 +11,23 @@ const findBestPathAt = (code: string, line: number, column: number): NodePath =>
     plugins: ['classProperties', 'classPrivateProperties', 'classPrivateMethods', 'decorators-legacy', 'jsx', 'typescript'],
     errorRecovery: true,
   }) as unknown as t.File
+  type TraverseFn = typeof import('@babel/traverse').default
+  const resolveTraverse = (ns: unknown): TraverseFn => {
+    if (typeof ns === 'function') {
+      return ns as TraverseFn
+    }
+    const withDefault = ns as { default?: unknown }
+    if (withDefault && typeof withDefault.default === 'function') {
+      return withDefault.default as TraverseFn
+    }
+    if (withDefault && withDefault.default && typeof (withDefault.default as { default?: unknown }).default === 'function') {
+      return (withDefault.default as { default: unknown }).default as TraverseFn
+    }
+    throw new TypeError('Invalid traverse import shape')
+  }
+  const traverseFn: TraverseFn = resolveTraverse(TraverseNS as unknown)
   let best: NodePath | null = null
-  traverse(ast, {
+  traverseFn(ast, {
     enter(path: NodePath) {
       const node: t.Node = path.node
       if (!node.loc) {
