@@ -4,6 +4,7 @@ import { join, resolve } from 'node:path'
 import { SourceMapConsumer } from 'source-map'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetOriginalClassName from '../GetOriginalClassName/GetOriginalClassName.ts'
+import * as OriginalNameWorker from '../OriginalNameWorker/OriginalNameWorker.ts'
 import { root } from '../Root/Root.ts'
 
 interface OriginalPosition {
@@ -49,5 +50,6 @@ export const getOriginalPositions = async (
     }
     return originalPositions
   })
+  await OriginalNameWorker.dispose()
   return originalPositions
 }
