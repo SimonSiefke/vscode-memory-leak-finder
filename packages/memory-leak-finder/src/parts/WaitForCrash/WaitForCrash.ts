@@ -6,7 +6,7 @@ export const waitForCrash = (targetId: string): { readonly promise: Promise<any>
   // and the application should be closed
 
   // Assert.string(targetId)
-  const { resolve, promise } = Promise.withResolvers()
+  const { promise } = Promise.withResolvers()
   // const crashCallback = () => {
   //   ExecutionContextState.removeCrashListener(targetId)
   //   resolve(crashInfo)
