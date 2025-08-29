@@ -16,6 +16,8 @@ export const prepareTests = async (
   ideVersion: string,
   vscodePath: string,
   commit: string,
+  attachedToPageTimeout: number,
+  measureId: string,
 ) => {
   const pageObjectPath = GetPageObjectPath.getPageObjectPath()
   const isFirstConnection = true
@@ -41,6 +43,8 @@ export const prepareTests = async (
     isFirstConnection,
     canUseIdleCallback,
     electronObjectId,
+    attachedToPageTimeout,
+    measureId,
   )
   await PageObject.create(rpc, connectionId, isFirstConnection, headlessMode, timeouts, parsedVersion, pageObjectPath)
 

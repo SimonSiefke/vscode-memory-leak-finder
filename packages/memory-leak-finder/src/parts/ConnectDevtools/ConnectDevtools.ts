@@ -1,13 +1,22 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
-import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
-import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
+import { DevtoolsProtocolPage, DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as GetCombinedMeasure from '../GetCombinedMeasure/GetCombinedMeasure.ts'
+import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinderState.ts'
 import * as ObjectType from '../ObjectType/ObjectType.ts'
-import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.ts'
+import * as PTimeout from '../PTimeout/PTimeout.ts'
 import * as SessionState from '../SessionState/SessionState.ts'
+import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
+import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEvent.ts'
 
-export const connectDevtools = async (devtoolsWebSocketUrl: string): Promise<void> => {
+export const connectDevtools = async (
+  devtoolsWebSocketUrl: string,
+  connectionId: string,
+  measureId: string,
+  attachedToPageTimeout: number,
+): Promise<void> => {
   Assert.string(devtoolsWebSocketUrl)
   const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
@@ -20,12 +29,7 @@ export const connectDevtools = async (devtoolsWebSocketUrl: string): Promise<voi
     rpc: browserRpc,
   })
 
-  browserRpc.on(DevtoolsEventType.TargetAttachedToTarget, ScenarioFunctions.handleAttachedToTarget)
-  browserRpc.on(DevtoolsEventType.TargetDetachedFromTarget, ScenarioFunctions.handleDetachedFromTarget)
-  browserRpc.on(DevtoolsEventType.TargetTargetCrashed, ScenarioFunctions.handleTargetCrashed)
-  browserRpc.on(DevtoolsEventType.TargetTargetCreated, ScenarioFunctions.handleTargetCreated)
-  browserRpc.on(DevtoolsEventType.TargetTargetDestroyed, ScenarioFunctions.handleTargetDestroyed)
-  browserRpc.on(DevtoolsEventType.TargetTargetInfoChanged, ScenarioFunctions.handleTargetInfoChanged)
+  const eventPromise = waitForAttachedEvent(browserRpc, attachedToPageTimeout)
 
   await Promise.all([
     DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
@@ -37,4 +41,32 @@ export const connectDevtools = async (devtoolsWebSocketUrl: string): Promise<voi
       discover: true,
     }),
   ])
+
+  const event = await eventPromise
+
+  if (!event) {
+    throw new Error(`Failed to attach to page`)
+  }
+
+  const sessionId = event.params.sessionId
+
+  const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
+
+  await PTimeout.pTimeout(
+    Promise.all([
+      DevtoolsProtocolPage.enable(sessionRpc),
+      DevtoolsProtocolPage.setLifecycleEventsEnabled(sessionRpc, { enabled: true }),
+      DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
+        autoAttach: true,
+        waitForDebuggerOnStart: true,
+        flatten: true,
+      }),
+      DevtoolsProtocolRuntime.enable(sessionRpc),
+      DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc),
+    ]),
+    { milliseconds: TimeoutConstants.AttachToPage },
+  )
+
+  const measure = await GetCombinedMeasure.getCombinedMeasure(sessionRpc, measureId)
+  MemoryLeakFinderState.set(connectionId, measure)
 }
