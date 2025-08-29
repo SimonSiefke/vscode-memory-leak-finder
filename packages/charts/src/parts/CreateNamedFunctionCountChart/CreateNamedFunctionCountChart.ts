@@ -1,5 +1,4 @@
 // @ts-nocheck
-import { fixHtmlNamespace } from '../FixXmlNamespace/FixXmlNamespace.ts'
 import * as GetNamedFunctionCountData from '../GetNamedFunctionCountData/GetNamedFunctionCountData.ts'
 
 export const name = 'named-function-count'
