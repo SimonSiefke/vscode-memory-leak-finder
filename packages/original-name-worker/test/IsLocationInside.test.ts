@@ -11,8 +11,7 @@ const getFirstNodePath = (code: string): NodePath => {
     errorRecovery: true,
   }) as unknown as t.File
   let found: NodePath | null = null
-  const trav: any = (traverse as any).default || (traverse as any)
-  trav(ast as any, {
+  traverse(ast, {
     enter(path: NodePath) {
       if (!found && path.node.loc) {
         found = path
