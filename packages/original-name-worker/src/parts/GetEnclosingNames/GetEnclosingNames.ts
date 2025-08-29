@@ -38,7 +38,7 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
         typeof (current as unknown as { isClassProperty?: () => boolean }).isClassProperty === 'function' &&
         (current as unknown as { isClassProperty: () => boolean }).isClassProperty())
     ) {
-      const classFieldNode = current.node as t.PropertyDefinition | t.ClassProperty
+      const classFieldNode = current.node as t.ClassProperty
       if (classFieldNode.key && classFieldNode.key.type === 'Identifier') {
         memberName = memberName || classFieldNode.key.name
       }
