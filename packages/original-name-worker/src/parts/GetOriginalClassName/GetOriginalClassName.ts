@@ -33,21 +33,7 @@ export const getOriginalClassName = (sourceContent: string, originalLine: number
     return LOCATION_UNKNOWN
   }
 
-  type TraverseFn = typeof import('@babel/traverse').default
-  const resolveTraverse = (ns: unknown): TraverseFn => {
-    if (typeof ns === 'function') {
-      return ns as TraverseFn
-    }
-    const withDefault = ns as { default?: unknown }
-    if (withDefault && typeof withDefault.default === 'function') {
-      return withDefault.default as TraverseFn
-    }
-    if (withDefault && withDefault.default && typeof (withDefault.default as { default?: unknown }).default === 'function') {
-      return (withDefault.default as { default: unknown }).default as TraverseFn
-    }
-    throw new TypeError('Invalid traverse import shape')
-  }
-  const traverseFn: TraverseFn = resolveTraverse(TraverseNS as unknown)
+  const traverseFn = TraverseNS.default
 
   let bestPath: NodePath | null = null
   traverseFn(ast, {

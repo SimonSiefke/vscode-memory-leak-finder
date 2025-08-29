@@ -11,21 +11,7 @@ const getFirstNodePath = (code: string): NodePath => {
     plugins: ['classProperties', 'classPrivateProperties', 'classPrivateMethods', 'decorators-legacy', 'jsx', 'typescript'],
     errorRecovery: true,
   }) as unknown as t.File
-  type TraverseFn = typeof import('@babel/traverse').default
-  const resolveTraverse = (ns: unknown): TraverseFn => {
-    if (typeof ns === 'function') {
-      return ns as TraverseFn
-    }
-    const withDefault = ns as { default?: unknown }
-    if (withDefault && typeof withDefault.default === 'function') {
-      return withDefault.default as TraverseFn
-    }
-    if (withDefault && withDefault.default && typeof (withDefault.default as { default?: unknown }).default === 'function') {
-      return (withDefault.default as { default: unknown }).default as TraverseFn
-    }
-    throw new TypeError('Invalid traverse import shape')
-  }
-  const traverseFn: TraverseFn = resolveTraverse(TraverseNS as unknown)
+  const traverseFn = TraverseNS.default
   let found: NodePath | null = null
   traverseFn(ast, {
     enter(path: NodePath) {
