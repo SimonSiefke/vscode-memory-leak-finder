@@ -1,9 +1,9 @@
 import { parse } from '@babel/parser'
 import traverseModule, { NodePath } from '@babel/traverse'
 import type * as t from '@babel/types'
-import { getEnclosingNames } from './GetEnclosingNames.ts'
-import { fallbackScan } from './FallbackScan.ts'
-import { isLocationInside } from './IsLocationInside.ts'
+import { getEnclosingNames } from '../GetEnclosingNames/GetEnclosingNames.ts'
+import { fallbackScan } from '../FallbackScan/FallbackScan.ts'
+import { isLocationInside } from '../IsLocationInside/IsLocationInside.ts'
 
 const LOCATION_UNKNOWN: string = 'unknown'
 

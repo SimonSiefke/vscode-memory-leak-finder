@@ -30,5 +30,3 @@ export const fallbackScan = (sourceContent: string, originalLine: number): strin
   }
   return LOCATION_UNKNOWN
 }
-
-

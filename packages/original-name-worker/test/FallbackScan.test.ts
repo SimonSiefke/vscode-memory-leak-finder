@@ -1,5 +1,5 @@
 import { test, expect } from '@jest/globals'
-import { fallbackScan } from '../src/parts/GetOriginalClassName/FallbackScan.ts'
+import { fallbackScan } from '../src/parts/FallbackScan/FallbackScan.ts'
 
 test('fallbackScan - class extends', () => {
   const code = `class extends Test {\n}`

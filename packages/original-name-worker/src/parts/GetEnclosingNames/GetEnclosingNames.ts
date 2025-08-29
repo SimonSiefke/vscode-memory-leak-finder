@@ -89,5 +89,3 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
   }
   return LOCATION_UNKNOWN
 }
-
-

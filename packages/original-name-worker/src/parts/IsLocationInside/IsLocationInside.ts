@@ -20,5 +20,3 @@ export const isLocationInside = (node: t.Node, line: number, column: number): bo
   }
   return true
 }
-
-

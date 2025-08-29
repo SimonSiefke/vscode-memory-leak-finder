@@ -2,7 +2,7 @@ import { test, expect } from '@jest/globals'
 import { parse } from '@babel/parser'
 import traverse, { NodePath } from '@babel/traverse'
 import type * as t from '@babel/types'
-import { getEnclosingNames } from '../src/parts/GetOriginalClassName/GetEnclosingNames.ts'
+import { getEnclosingNames } from '../src/parts/GetEnclosingNames/GetEnclosingNames.ts'
 
 const findBestPathAt = (code: string, line: number, column: number): NodePath => {
   const ast: t.File = parse(code, {

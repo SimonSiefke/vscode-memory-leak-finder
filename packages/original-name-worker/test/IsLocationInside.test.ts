@@ -2,7 +2,7 @@ import { test, expect } from '@jest/globals'
 import { parse } from '@babel/parser'
 import traverse, { NodePath } from '@babel/traverse'
 import type * as t from '@babel/types'
-import { isLocationInside } from '../src/parts/GetOriginalClassName/IsLocationInside.ts'
+import { isLocationInside } from '../src/parts/IsLocationInside/IsLocationInside.ts'
 
 const getFirstNodePath = (code: string): NodePath => {
   const ast: t.File = parse(code, {
