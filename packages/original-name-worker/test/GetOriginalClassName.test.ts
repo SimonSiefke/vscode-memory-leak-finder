@@ -115,3 +115,96 @@ App.prototype.start = function(){
   const originalColumn = 2
   expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('App.start')
 })
+
+test('getOriginalClassName - private class method (ts)', () => {
+  const sourceContent = `class Service {
+  private compute(value: number): number {
+    return value * 2
+  }
+}`
+  const originalLine = 2
+  const originalColumn = 4
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('Service.compute')
+})
+
+test('getOriginalClassName - protected class method (ts)', () => {
+  const sourceContent = `class Repository {
+  protected save(): void {
+    return
+  }
+}`
+  const originalLine = 2
+  const originalColumn = 2
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('Repository.save')
+})
+
+test('getOriginalClassName - abstract class with abstract method (ts)', () => {
+  const sourceContent = `abstract class Model {
+  abstract compute(x: number): number
+}`
+  const originalLine = 2
+  const originalColumn = 2
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('Model')
+})
+
+test('getOriginalClassName - interface should be unknown (ts)', () => {
+  const sourceContent = `interface IQueue<T> {
+  enqueue(item: T): void
+}`
+  const originalLine = 1
+  const originalColumn = 2
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('unknown')
+})
+
+test('getOriginalClassName - enum should be unknown (ts)', () => {
+  const sourceContent = `enum Kind {
+  A,
+  B,
+}`
+  const originalLine = 1
+  const originalColumn = 2
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('unknown')
+})
+
+test('getOriginalClassName - namespace function returns function name (ts)', () => {
+  const sourceContent = `namespace Utils {
+  export function sum(a: number, b: number): number {
+    return a + b
+  }
+}`
+  const originalLine = 2
+  const originalColumn = 10
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('sum')
+})
+
+test('getOriginalClassName - generic class and method (ts)', () => {
+  const sourceContent = `class Box<T> {
+  get<U>(x: U): U {
+    return x
+  }
+}`
+  const originalLine = 2
+  const originalColumn = 3
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('Box.get')
+})
+
+test('getOriginalClassName - readonly class field with type (ts)', () => {
+  const sourceContent = `class Store {
+  readonly value: number = 1
+}`
+  const originalLine = 2
+  const originalColumn = 3
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('Store.value')
+})
+
+test('getOriginalClassName - decorator on method (ts)', () => {
+  const sourceContent = `class Controller {
+  @dec
+  run(): void {
+    return
+  }
+}`
+  const originalLine = 3
+  const originalColumn = 3
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('Controller.run')
+})
