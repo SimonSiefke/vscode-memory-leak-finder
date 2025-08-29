@@ -9,6 +9,7 @@ const visitors = Object.values(Charts).map((value) => {
     name: value.name,
     // @ts-ignore
     skip: value.skip,
+    multiple: value.multiple,
     fn: value.createChart,
     getData: value.getData,
   }
@@ -27,7 +28,7 @@ export const generateCharts = async () => {
       for (let i = 0; i < data.length; i++) {
         const item = data[i]
         const svg = await rpc.invoke('Chart.create', item, chartMetaData)
-        const outPath = join(Root.root, '.vscode-charts', `${visitor.name}-${i}.svg`)
+        const outPath = join(Root.root, '.vscode-charts', `${visitor.name}/${i}.svg`)
         await mkdir(dirname(outPath), { recursive: true })
         await writeFile(outPath, svg)
       }
