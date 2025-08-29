@@ -41,15 +41,6 @@ const getScopeValues = async (session, objectId) => {
   return childScopeArrays
 }
 
-const getNameMap = (scopeValueArray) => {
-  Assert.array(scopeValueArray)
-  const map = Object.create(null)
-  for (const scopeValue of scopeValueArray) {
-    map[scopeValue.objectId] = scopeValue.name
-  }
-  return map
-}
-
 export const getArrayNameMap = async (session, objectGroup) => {
   Assert.object(session)
   Assert.string(objectGroup)
@@ -59,6 +50,5 @@ export const getArrayNameMap = async (session, objectGroup) => {
   for (const scopeListObjectId of scopeListsObjectIds) {
     scopeArrayPromises.push(getScopeValues(session, scopeListObjectId))
   }
-  const scopeArrayValues = await Promise.all(scopeArrayPromises)
   return {}
 }

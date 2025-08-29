@@ -3,7 +3,7 @@ import * as GetDisposableStores from '../GetDisposableStores/GetDisposableStores
 
 export const stopTrackingDisposableStores = async (session, objectGroup) => {
   const fnResult1 = await GetDisposableStores.getDisposableStores(session, objectGroup)
-  const fnResult2 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
+  await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
   const disposableStores = this
 

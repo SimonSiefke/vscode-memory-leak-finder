@@ -26,42 +26,6 @@ export const handleScriptParsed = (x: unknown): void => {
   // console.log("script parsed", x);
 }
 
-const getExecutionContextType = (message: DevToolsMessage): string => {
-  const params = message.params as any
-  if (params?.context?.auxData) {
-    const auxData = params.context.auxData
-    if (auxData.type) {
-      return auxData.type
-    }
-    if (auxData.isDefault) {
-      return 'default'
-    }
-  }
-  return ''
-}
-
-const getSessionId = (message: DevToolsMessage): string => {
-  if (message.sessionId) {
-    return message.sessionId
-  }
-  return ''
-}
-
-const handlePageFrameAttached = (event: DevToolsMessage): void => {
-  console.log('frame attached', event)
-}
-
-const handlePageFrameDetached = (event: DevToolsMessage): void => {
-  console.log('frame detached', event)
-}
-
-const handleConsoleApiCalled = (event: DevToolsMessage): void => {
-  const args = event.params?.args as any[]
-  if (args && args[0]?.value) {
-    console.log(`page:`, args[0].value)
-  }
-}
-
 export const getSessions = (): readonly Session[] => {
   return SessionState.getAllSessions()
 }

@@ -35,10 +35,6 @@ const isDefaultExecutionContext = (executionContext: ExecutionContext, sessionId
   return executionContext.sessionId === sessionId && executionContext.type === 'default'
 }
 
-const isUtilityExecutionContext = (executionContext: ExecutionContext, sessionId: string): boolean => {
-  return executionContext.sessionId === sessionId && executionContext.name === 'utility'
-}
-
 export const add = (id: string, executionContext: ExecutionContext): void => {
   const { executionContexts, defaultExecutionContextCallbacks, utilityExecutionContextCallbacks } = state
   const { sessionId, type, name } = executionContext
@@ -111,7 +107,7 @@ export const has = (id: string): boolean => {
   return id in state.executionContexts
 }
 
-export const addExecutionContextStateCallback = (fn: any): void => {}
+export const addExecutionContextStateCallback = (): void => {}
 
 export const getDefaultExecutionContext = (sessionId: string): ExecutionContext | undefined => {
   for (const executionContext of Object.values(state.executionContexts)) {

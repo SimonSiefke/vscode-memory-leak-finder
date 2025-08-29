@@ -16,7 +16,7 @@ const addSourceLocations = async (functionObjects, scriptMap) => {
   })
   const withOriginalStack = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(requests, classNames)
   const normalized = withOriginalStack.map((item) => {
-    const { stack, count, originalStack, originalName, name, beforeCount, delta } = item
+    const { stack, count, originalStack, originalName, name, delta } = item
 
     return {
       name: originalName || name,
