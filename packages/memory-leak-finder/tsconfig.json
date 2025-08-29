@@ -17,7 +17,7 @@
     "rootDir": ".",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
-    "noUnusedLocals": false,
+    "noUnusedLocals": true,
     "composite": true,
     "useUnknownInCatchVariables": false,
     "allowImportingTsExtensions": true

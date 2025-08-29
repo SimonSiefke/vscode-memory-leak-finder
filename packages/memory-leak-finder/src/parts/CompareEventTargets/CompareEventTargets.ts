@@ -1,24 +1,6 @@
 import * as Arrays from '../Arrays/Arrays.ts'
 import * as Assert from '../Assert/Assert.ts'
 
-const getDifference = (prettyBefore, prettyAfter) => {
-  const beforeMap = Object.create(null)
-  for (const element of prettyBefore) {
-    beforeMap[element.description] = element.count
-  }
-  const result = []
-  for (const element of prettyAfter) {
-    const beforeCount = beforeMap[element.description] || 0
-    if (element.count > beforeCount) {
-      result.push({
-        ...element,
-        beforeCount,
-      })
-    }
-  }
-  return result
-}
-
 const compareEventTarget = (a, b) => {
   return b.count - a.count || a.description.localeCompare(b.description)
 }
