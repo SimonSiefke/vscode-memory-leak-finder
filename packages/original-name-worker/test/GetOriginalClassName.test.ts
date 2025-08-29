@@ -192,8 +192,8 @@ test('getOriginalClassName - readonly class field with type (ts)', () => {
   const sourceContent = `class Store {
   readonly value: number = 1
 }`
-  const originalLine = 2
-  const originalColumn = 3
+  const originalLine = 1
+  const originalColumn = 11
   expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('Store.value')
 })
 
