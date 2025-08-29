@@ -37,7 +37,7 @@ export const getOriginalPositions = async (
           const sourceFileRelativePath: string = sourceMap.sources[index]
           const originalCodePath: string = resolve(join(root, '.vscode-sources', hash, sourceFileRelativePath))
           const originalCode: string = await readFile(originalCodePath, 'utf8')
-          const originalClassName: string = GetOriginalClassName.getOriginalClassName(
+          const originalClassName: string = await GetOriginalClassName.getOriginalClassName(
             originalCode,
             originalPosition.line,
             originalPosition.column,

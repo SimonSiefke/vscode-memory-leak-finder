@@ -1,11 +1,9 @@
-const RE_CLASSNAME: RegExp = /^[a-zA-Z\d]+/
-const classPrefix: string = 'class '
-const extendsPrefix: string = 'extends'
+const LOCATION_UNKNOWN: string = 'unknown'
 
-export const getOriginalClassName = async (sourceContent: string, originalLine: number, originalColumn: number): Promise<string> => {
-  if (!sourceContent) {
-    return 'unknown'
-  }
+export const fallbackScan = (sourceContent: string, originalLine: number): string => {
+  const RE_CLASSNAME: RegExp = /^[a-zA-Z\d]+/
+  const classPrefix: string = 'class '
+  const extendsPrefix: string = 'extends'
   const lines: string[] = sourceContent.split('\n')
   for (let i = originalLine; i >= 0; i--) {
     const line: string = lines[i]
@@ -26,5 +24,9 @@ export const getOriginalClassName = async (sourceContent: string, originalLine: 
       }
     }
   }
-  return 'unknown'
+  const anyMatch: RegExpMatchArray | null = sourceContent.match(/class\s+extends\s+([A-Za-z\d]+)/)
+  if (anyMatch && anyMatch[1]) {
+    return `class extends ${anyMatch[1]}`
+  }
+  return LOCATION_UNKNOWN
 }
