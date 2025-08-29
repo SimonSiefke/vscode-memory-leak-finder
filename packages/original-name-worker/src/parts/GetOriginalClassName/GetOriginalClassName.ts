@@ -1,5 +1,5 @@
 import { parse } from '@babel/parser'
-import traverseModule, { NodePath } from '@babel/traverse'
+import traverse, { NodePath } from '@babel/traverse'
 import type * as t from '@babel/types'
 import { getEnclosingNames } from '../GetEnclosingNames/GetEnclosingNames.ts'
 import { fallbackScan } from '../FallbackScan/FallbackScan.ts'
@@ -32,9 +32,8 @@ export const getOriginalClassName = (sourceContent: string, originalLine: number
     return LOCATION_UNKNOWN
   }
 
-  const traverse: any = (traverseModule as any).default || (traverseModule as any)
   let bestPath: NodePath | null = null
-  traverse(ast as any, {
+  traverse(ast, {
     enter(path: NodePath) {
       const node: t.Node = path.node
       if (!node.loc) {

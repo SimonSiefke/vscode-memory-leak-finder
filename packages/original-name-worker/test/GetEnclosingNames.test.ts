@@ -10,9 +10,8 @@ const findBestPathAt = (code: string, line: number, column: number): NodePath =>
     plugins: ['classProperties', 'classPrivateProperties', 'classPrivateMethods', 'decorators-legacy', 'jsx', 'typescript'],
     errorRecovery: true,
   }) as unknown as t.File
-  const trav: any = (traverse as any).default || (traverse as any)
   let best: NodePath | null = null
-  trav(ast as any, {
+  traverse(ast, {
     enter(path: NodePath) {
       const node: t.Node = path.node
       if (!node.loc) {

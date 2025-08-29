@@ -18,11 +18,11 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
     }
 
     if (current.isClassMethod() || current.isClassPrivateMethod()) {
-      const nodeAny: any = current.node
-      if ((nodeAny.kind as string) === 'constructor') {
+      const methodNode = current.node as t.ClassMethod | t.ClassPrivateMethod
+      if (methodNode.kind === 'constructor') {
         // ignore constructor
       } else {
-        const key: any = nodeAny.key
+        const key = methodNode.key
         if (key && key.type === 'Identifier') {
           memberName = memberName || key.name
         } else if (key && key.type === 'StringLiteral') {
@@ -30,19 +30,23 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
         }
       }
     } else if (
-      ((current as any).isPropertyDefinition && (current as any).isPropertyDefinition()) ||
-      ((current as any).isClassProperty && (current as any).isClassProperty())
+      // support both modern PropertyDefinition and older ClassProperty nodes
+      (('isPropertyDefinition' in current && typeof (current as unknown as { isPropertyDefinition?: () => boolean }).isPropertyDefinition === 'function' &&
+        (current as unknown as { isPropertyDefinition: () => boolean }).isPropertyDefinition()) ||
+        ('isClassProperty' in current && typeof (current as unknown as { isClassProperty?: () => boolean }).isClassProperty === 'function' &&
+          (current as unknown as { isClassProperty: () => boolean }).isClassProperty()))
     ) {
-      const nodeAny: any = current.node
-      if (nodeAny.key && nodeAny.key.type === 'Identifier') {
-        memberName = memberName || nodeAny.key.name
+      const classFieldNode = current.node as t.PropertyDefinition | t.ClassProperty
+      if (classFieldNode.key && classFieldNode.key.type === 'Identifier') {
+        memberName = memberName || classFieldNode.key.name
       }
     } else if (current.isClassDeclaration() || current.isClassExpression()) {
-      const id: any = (current.node as any).id
+      const cls = current.node as t.ClassDeclaration | t.ClassExpression
+      const id = cls.id
       if (id && id.name) {
         className = className || id.name
-      } else if ((current.node as any).superClass && (current.node as any).id == null) {
-        const superName = ((current.node as any).superClass && ((current.node as any).superClass as any).name) || 'unknown'
+      } else if (cls.superClass && cls.id == null) {
+        const superName: string = cls.superClass && cls.superClass.type === 'Identifier' ? cls.superClass.name : 'unknown'
         className = className || `class extends ${superName}`
       }
     } else if (current.isFunctionDeclaration()) {
@@ -53,19 +57,19 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
     } else if (current.isFunctionExpression() || current.isArrowFunctionExpression()) {
       const parent = current.parentPath
       if (parent && parent.isVariableDeclarator()) {
-        const id: any = parent.node.id
-        if (id && id.type === 'Identifier' && !functionName) {
-          functionName = id.name
+        const idNode = parent.node.id
+        if (idNode && idNode.type === 'Identifier' && !functionName) {
+          functionName = idNode.name
         }
       } else if (parent && parent.isAssignmentExpression()) {
-        const left: any = parent.node.left
-        if (left && left.type === 'MemberExpression') {
-          const object: any = left.object
-          const property: any = left.property
+        const leftNode = parent.node.left
+        if (leftNode && leftNode.type === 'MemberExpression') {
+          const object = leftNode.object
+          const property = leftNode.property
           if (object && object.type === 'MemberExpression') {
-            const objectName: string | undefined = (object.object as any)?.name
-            const propName: string | undefined = property?.type === 'Identifier' ? property.name : undefined
-            const protoProp: any = object.property
+            const objectName: string | undefined = object.object.type === 'Identifier' ? object.object.name : undefined
+            const propName: string | undefined = property && property.type === 'Identifier' ? property.name : undefined
+            const protoProp = object.property
             if (objectName && protoProp && protoProp.type === 'Identifier' && protoProp.name === 'prototype' && propName) {
               className = className || objectName
               memberName = memberName || propName
