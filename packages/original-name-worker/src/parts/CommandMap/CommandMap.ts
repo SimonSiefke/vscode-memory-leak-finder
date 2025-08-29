@@ -1,7 +1,5 @@
 import * as GetOriginalClassName from '../GetOriginalClassName/GetOriginalClassName.ts'
 
-export type CommandHandler = (...args: readonly unknown[]) => unknown
-
-export const commandMap: Record<string, CommandHandler> = {
+export const commandMap: Record<string, any> = {
   'OriginalName.getOriginalName': GetOriginalClassName.getOriginalClassName,
 }

@@ -12,15 +12,16 @@ const getFirstNodePath = (code: string): NodePath => {
     errorRecovery: true,
   }) as unknown as t.File
   const tAny = traverse as unknown as { default?: unknown; traverse?: unknown }
-  const traverseFn = (typeof (traverse as unknown) === 'function'
-    ? (traverse as unknown as (ast: t.File, visitors: unknown) => void)
-    : (typeof tAny.default === 'function'
-      ? (tAny.default as unknown as (ast: t.File, visitors: unknown) => void)
-      : (typeof tAny.traverse === 'function'
-        ? (tAny.traverse as unknown as (ast: t.File, visitors: unknown) => void)
-        : (typeof (tAny.default as unknown as { default?: unknown })?.default === 'function'
-          ? ((tAny.default as unknown as { default?: unknown }).default as unknown as (ast: t.File, visitors: unknown) => void)
-          : (null as unknown as (ast: t.File, visitors: unknown) => void)))))
+  const traverseFn =
+    typeof (traverse as unknown) === 'function'
+      ? (traverse as unknown as (ast: t.File, visitors: unknown) => void)
+      : typeof tAny.default === 'function'
+        ? (tAny.default as unknown as (ast: t.File, visitors: unknown) => void)
+        : typeof tAny.traverse === 'function'
+          ? (tAny.traverse as unknown as (ast: t.File, visitors: unknown) => void)
+          : typeof (tAny.default as unknown as { default?: unknown })?.default === 'function'
+            ? ((tAny.default as unknown as { default?: unknown }).default as unknown as (ast: t.File, visitors: unknown) => void)
+            : (null as unknown as (ast: t.File, visitors: unknown) => void)
   let found: NodePath | null = null
   traverseFn(ast, {
     enter(path: NodePath) {

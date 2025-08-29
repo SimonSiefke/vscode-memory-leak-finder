@@ -34,15 +34,16 @@ export const getOriginalClassName = (sourceContent: string, originalLine: number
   }
 
   const tAny = traverse as unknown as { default?: unknown; traverse?: unknown }
-  const traverseFn = (typeof (traverse as unknown) === 'function'
-    ? (traverse as unknown as (ast: t.File, visitors: unknown) => void)
-    : (typeof tAny.default === 'function'
-      ? (tAny.default as unknown as (ast: t.File, visitors: unknown) => void)
-      : (typeof tAny.traverse === 'function'
-        ? (tAny.traverse as unknown as (ast: t.File, visitors: unknown) => void)
-        : (typeof (tAny.default as unknown as { default?: unknown })?.default === 'function'
-          ? ((tAny.default as unknown as { default?: unknown }).default as unknown as (ast: t.File, visitors: unknown) => void)
-          : (null as unknown as (ast: t.File, visitors: unknown) => void)))))
+  const traverseFn =
+    typeof (traverse as unknown) === 'function'
+      ? (traverse as unknown as (ast: t.File, visitors: unknown) => void)
+      : typeof tAny.default === 'function'
+        ? (tAny.default as unknown as (ast: t.File, visitors: unknown) => void)
+        : typeof tAny.traverse === 'function'
+          ? (tAny.traverse as unknown as (ast: t.File, visitors: unknown) => void)
+          : typeof (tAny.default as unknown as { default?: unknown })?.default === 'function'
+            ? ((tAny.default as unknown as { default?: unknown }).default as unknown as (ast: t.File, visitors: unknown) => void)
+            : (null as unknown as (ast: t.File, visitors: unknown) => void)
 
   let bestPath: NodePath | null = null
   traverseFn(ast, {
