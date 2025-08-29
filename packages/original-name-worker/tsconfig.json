@@ -11,7 +11,7 @@
     "noImplicitAny": false,
     "skipLibCheck": true,
     "noEmit": true,
-    "allowSyntheticDefaultImports": true,
+    "allowSyntheticDefaultImports": false,
     "assumeChangesOnlyAffectDirectDependencies": true,
     "resolveJsonModule": true,
     "rootDir": ".",
