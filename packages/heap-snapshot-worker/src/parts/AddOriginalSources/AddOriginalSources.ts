@@ -108,7 +108,8 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
         }
       }
     }
-  } catch {
+  } catch (error) {
+    console.log({ error })
     // ignore sourcemap resolution errors
   }
 
