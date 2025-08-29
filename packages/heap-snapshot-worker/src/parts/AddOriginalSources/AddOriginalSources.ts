@@ -87,7 +87,8 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
       path: sourceMapWorkerPath,
       commandMap: {},
     })
-    const cleanPositionMap = await rpc.invoke('SourceMap.getCleanPositionsMap', sourceMapUrlToPositions, false)
+    const extendedOriginalNames = true
+    const cleanPositionMap = await rpc.invoke('SourceMap.getCleanPositionsMap', sourceMapUrlToPositions, extendedOriginalNames)
     await rpc.dispose()
 
     const offsetMap: Record<string, number> = Object.create(null)
@@ -108,7 +109,8 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
         }
       }
     }
-  } catch {
+  } catch (error) {
+    console.log({ error })
     // ignore sourcemap resolution errors
   }
 
