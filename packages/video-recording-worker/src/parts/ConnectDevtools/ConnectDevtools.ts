@@ -6,8 +6,9 @@ import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as ObjectType from '../ObjectType/ObjectType.ts'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.ts'
 import * as SessionState from '../SessionState/SessionState.ts'
+import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEvent.ts'
 
-export const connectDevtools = async (devtoolsWebSocketUrl: string): Promise<void> => {
+export const connectDevtools = async (devtoolsWebSocketUrl: string, attachedToPageTimeout: number): Promise<void> => {
   Assert.string(devtoolsWebSocketUrl)
   const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
@@ -20,8 +21,7 @@ export const connectDevtools = async (devtoolsWebSocketUrl: string): Promise<voi
     rpc: browserRpc,
   })
 
-  browserRpc.on(DevtoolsEventType.TargetAttachedToTarget, ScenarioFunctions.handleAttachedToTarget)
-  browserRpc.on(DevtoolsEventType.TargetDetachedFromTarget, ScenarioFunctions.handleDetachedFromTarget)
+  const eventPromise = waitForAttachedEvent(browserRpc, attachedToPageTimeout)
 
   await DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
     autoAttach: true,
