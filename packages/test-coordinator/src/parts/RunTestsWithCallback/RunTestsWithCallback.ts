@@ -6,6 +6,7 @@ import * as JsonFile from '../JsonFile/JsonFile.ts'
 import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.ts'
 import * as MemoryLeakResultsPath from '../MemoryLeakResultsPath/MemoryLeakResultsPath.ts'
 import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.ts'
+import * as Disposables from '../Disposables/Disposables.ts'
 import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.ts'
 import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.ts'
@@ -196,38 +197,41 @@ export const runTestsWithCallback = async ({
           if (!isLeak) {
             passed++
           }
-          if (restartBetween) {
-            if (memoryLeakWorkerRpc) {
-              memoryLeakWorkerRpc.dispose()
-              memoryLeakWorkerRpc = undefined
-            }
-            if (testWorkerIpc) {
-              testWorkerIpc.dispose()
-            }
-            PrepareTestsOrAttach.state.promise = undefined
-            testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
-              cwd,
-              headlessMode,
-              recordVideo,
-              connectionId,
-              timeouts,
-              runMode,
-              ide,
-              ideVersion,
-              vscodePath,
-              commit,
-            )
-            if (checkLeaks) {
-              memoryLeakWorkerRpc = MemoryLeakWorker.getRpc()
-              await MemoryLeakFinder.setup(memoryLeakWorkerRpc, connectionId, measure)
-            }
-          }
         }
       } catch (error) {
         failed++
         const PrettyError = await import('../PrettyError/PrettyError.ts')
         const prettyError = await PrettyError.prepare(error, { color, root })
         await callback(TestWorkerEventType.TestFailed, absolutePath, relativeDirname, relativePath, dirent, prettyError)
+      } finally {
+        if (restartBetween) {
+          if (memoryLeakWorkerRpc) {
+            memoryLeakWorkerRpc.dispose()
+            memoryLeakWorkerRpc = undefined
+          }
+          if (testWorkerIpc) {
+            testWorkerIpc.dispose()
+          }
+          // Dispose initialization worker and any other registered disposables
+          await Disposables.disposeAll()
+          PrepareTestsOrAttach.state.promise = undefined
+          testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
+            cwd,
+            headlessMode,
+            recordVideo,
+            connectionId,
+            timeouts,
+            runMode,
+            ide,
+            ideVersion,
+            vscodePath,
+            commit,
+          )
+          if (checkLeaks) {
+            memoryLeakWorkerRpc = MemoryLeakWorker.getRpc()
+            await MemoryLeakFinder.setup(memoryLeakWorkerRpc, connectionId, measure)
+          }
+        }
       }
     }
     const end = Time.now()

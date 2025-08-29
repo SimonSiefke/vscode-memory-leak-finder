@@ -8,7 +8,7 @@ const utiltyScriptPath = join(Root.root, 'packages', 'injected-code', 'dist', 'i
 const runBuild = async () => {
   const rpc = await LaunchFileSystemWorker.launchFileSystemWorker()
   await rpc.invoke('FileSystem.exec', `npm`, ['run', 'build'], {
-    cwd: Root.root,
+    cwd: join(Root.root, 'packages', 'build'),
   })
   await rpc.dispose()
 }
