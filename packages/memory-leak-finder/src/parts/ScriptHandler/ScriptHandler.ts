@@ -1,4 +1,6 @@
-export const create = () => {
+import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
+
+export const create = (): IScriptHandler => {
   const scriptMap = Object.create(null)
   const handleScriptParsed = (event) => {
     const { url, scriptId, sourceMapURL } = event.params
