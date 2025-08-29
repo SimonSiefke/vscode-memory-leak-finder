@@ -1,12 +1,9 @@
 import * as Assert from '../Assert/Assert.ts'
+import { connectScreenRecording } from '../ConnectScreenRecording/ConnectScreenRecording.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
-import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
-import { DevtoolsProtocolPage, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-import * as HandleFrame from '../HandleFrame/HandleFrame.ts'
-import * as PTimeout from '../PTimeout/PTimeout.ts'
-import * as ScreencastQuality from '../ScreencastQuality/ScreencastQuality.ts'
+import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEvent.ts'
 
 export const connectDevtools = async (devtoolsWebSocketUrl: string, attachedToPageTimeout: number): Promise<void> => {
@@ -32,20 +29,5 @@ export const connectDevtools = async (devtoolsWebSocketUrl: string, attachedToPa
 
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
 
-  sessionRpc.on(DevtoolsEventType.PageScreencastFrame, HandleFrame.handleFrame)
-
-  await PTimeout.pTimeout(
-    Promise.all([
-      DevtoolsProtocolPage.enable(sessionRpc),
-      DevtoolsProtocolPage.startScreencast(sessionRpc, {
-        format: 'jpeg',
-        quality: ScreencastQuality.screencastQuality,
-        maxWidth: 1024,
-        maxHeight: 768,
-      }),
-    ]),
-    {
-      milliseconds: attachedToPageTimeout,
-    },
-  )
+  await connectScreenRecording(sessionRpc, attachedToPageTimeout)
 }
