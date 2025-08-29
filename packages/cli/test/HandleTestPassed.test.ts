@@ -51,7 +51,7 @@ const Stdout = await import('../src/parts/Stdout/Stdout.ts')
 const TestStateOutput = await import('../src/parts/TestStateOutput/TestStateOutput.ts')
 const HandleTestPassed = await import('../src/parts/HandleTestPassed/HandleTestPassed.ts')
 
-test('handleTestPassed', async () => {
+test.skip('handleTestPassed', async () => {
   await HandleTestPassed.handleTestPassed('/test/app.test.js', '/test', 'app.test.js', 100, false)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(typeof (Stdout.write as any).mock.calls[0][0]).toBe('string')

@@ -10,7 +10,7 @@ This directory contains the configuration for running the VSCode Memory Leak Fin
 
 The dev container includes:
 
-- **Node.js 22.18.0** - Matches the version specified in `.nvmrc`
+- **Node.js 22.19.0** - Matches the version specified in `.nvmrc`
 - **VNC Server** - For running GUI applications (Electron)
 - **JWM Window Manager** - Lightweight window manager for VNC
 - **Electron Dependencies** - Basic libraries for Electron apps
@@ -43,5 +43,5 @@ The container automatically runs:
 If you encounter issues:
 
 1. **VNC Connection**: The VNC server runs on port 6080 with password "vscode"
-2. **Node Version**: The container uses Node.js 22.18.0 as specified in `.nvmrc`
+2. **Node Version**: The container uses Node.js 22.19.0 as specified in `.nvmrc`
 3. **Dependencies**: Basic system dependencies for Electron are pre-installed
