@@ -9,7 +9,6 @@ import * as ObjectType from '../ObjectType/ObjectType.ts'
 import * as PTimeout from '../PTimeout/PTimeout.ts'
 import * as ScreencastQuality from '../ScreencastQuality/ScreencastQuality.ts'
 import * as SessionState from '../SessionState/SessionState.ts'
-import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEvent.ts'
 
 export const connectDevtools = async (devtoolsWebSocketUrl: string, attachedToPageTimeout: number): Promise<void> => {
