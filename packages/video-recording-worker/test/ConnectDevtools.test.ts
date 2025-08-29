@@ -2,15 +2,15 @@ import { test, expect } from '@jest/globals'
 import * as ConnectDevtools from '../src/parts/ConnectDevtools/ConnectDevtools.ts'
 
 test('ConnectDevtools - connectDevtools should throw with invalid URL', async () => {
-  await expect(ConnectDevtools.connectDevtools('invalid-url')).rejects.toThrow()
+  await expect(ConnectDevtools.connectDevtools('invalid-url', 1000)).rejects.toThrow()
 })
 
 test('ConnectDevtools - connectDevtools should throw with non-string input', async () => {
-  await expect(ConnectDevtools.connectDevtools(123 as any)).rejects.toThrow()
-  await expect(ConnectDevtools.connectDevtools(null as any)).rejects.toThrow()
-  await expect(ConnectDevtools.connectDevtools(undefined as any)).rejects.toThrow()
+  await expect(ConnectDevtools.connectDevtools(123 as any, 1000)).rejects.toThrow()
+  await expect(ConnectDevtools.connectDevtools(null as any, 1000)).rejects.toThrow()
+  await expect(ConnectDevtools.connectDevtools(undefined as any, 1000)).rejects.toThrow()
 })
 
 test('ConnectDevtools - connectDevtools should throw with empty string', async () => {
-  await expect(ConnectDevtools.connectDevtools('')).rejects.toThrow()
+  await expect(ConnectDevtools.connectDevtools('', 1000)).rejects.toThrow()
 })

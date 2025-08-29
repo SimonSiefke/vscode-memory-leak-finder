@@ -5,9 +5,9 @@ import * as ObjectType from '../ObjectType/ObjectType.ts'
  * @param {any} ipc
  * @returns
  */
-export const createRpc = (ipc, canUseIdleCallback) => {
+export const createRpc = (ipc: any) => {
   const callbacks = Object.create(null)
-  const handleMessage = (message) => {
+  const handleMessage = (message: any) => {
     if ('id' in message) {
       if ('result' in message) {
         callbacks[message.id].resolve(message)
@@ -37,9 +37,8 @@ export const createRpc = (ipc, canUseIdleCallback) => {
     callbacks,
     listeners,
     onceListeners,
-    canUseIdleCallback,
-    invoke(method, params) {
-      const { resolve, reject, promise } = Promise.withResolvers()
+    invoke(method: string, params: any) {
+      const { resolve, reject, promise } = Promise.withResolvers<any>()
       const id = _id++
       callbacks[id] = { resolve, reject }
       ipc.send({
@@ -49,8 +48,8 @@ export const createRpc = (ipc, canUseIdleCallback) => {
       })
       return promise
     },
-    invokeWithSession(sessionId, method, params) {
-      const { resolve, reject, promise } = Promise.withResolvers()
+    invokeWithSession(sessionId: string, method: string, params: any) {
+      const { resolve, reject, promise } = Promise.withResolvers<any>()
       const id = _id++
       callbacks[id] = { resolve, reject }
       ipc.send({
@@ -61,14 +60,14 @@ export const createRpc = (ipc, canUseIdleCallback) => {
       })
       return promise
     },
-    on(event, listener) {
+    on(event: string, listener: any) {
       listeners[event] = listener
     },
-    off(event, listener) {
+    off(event: string, listener: any) {
       delete listener[event]
     },
-    once(event) {
-      const { resolve, promise } = Promise.withResolvers()
+    once(event: string) {
+      const { resolve, promise } = Promise.withResolvers<any>()
       onceListeners[event] = resolve
       return promise
     },

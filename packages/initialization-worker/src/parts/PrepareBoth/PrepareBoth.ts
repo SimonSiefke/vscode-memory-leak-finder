@@ -21,7 +21,7 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
   const devtoolsWebSocketUrlPromise = WaitForDevtoolsListening.waitForDevtoolsListening(child.stderr)
 
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
-  const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc, canUseIdleCallback)
+  const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc)
 
   const { monkeyPatchedElectronId, electronObjectId } = await connectElectron(electronRpc)
 
