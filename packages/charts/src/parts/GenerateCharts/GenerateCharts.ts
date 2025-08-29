@@ -9,6 +9,7 @@ const visitors = Object.values(Charts).map((value) => {
     name: value.name,
     // @ts-ignore
     skip: value.skip,
+    // @ts-ignore
     multiple: value.multiple,
     fn: value.createChart,
     getData: value.getData,
