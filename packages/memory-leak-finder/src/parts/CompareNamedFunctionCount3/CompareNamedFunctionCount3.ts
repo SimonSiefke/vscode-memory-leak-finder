@@ -1,8 +1,10 @@
 import * as HeapSnapshotWorker from '../HeapSnapshotWorker/HeapSnapshotWorker.ts'
 
-export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: string): Promise<readonly any[]> => {
+export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: string, context: any): Promise<readonly any[]> => {
+  const defaultRuns = 2
+  const threshold = context && Number.isFinite(context.runs) ? context.runs : defaultRuns
   const options = {
-    minCount: 2,
+    minCount: threshold,
     excludeOriginalPaths: [
       'async.ts',
       'editStack.ts',

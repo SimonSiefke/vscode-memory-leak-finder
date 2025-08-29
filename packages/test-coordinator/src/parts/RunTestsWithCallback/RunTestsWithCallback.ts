@@ -1,5 +1,6 @@
 import { join } from 'node:path'
 import * as Assert from '../Assert/Assert.ts'
+import { getSummary } from '../GetSummary/GetSummary.ts'
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.ts'
 import * as Id from '../Id/Id.ts'
 import * as JsonFile from '../JsonFile/JsonFile.ts'
@@ -8,6 +9,7 @@ import * as MemoryLeakResultsPath from '../MemoryLeakResultsPath/MemoryLeakResul
 import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
 import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
+import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.ts'
 import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.ts'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.ts'
@@ -15,24 +17,6 @@ import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTea
 import * as Time from '../Time/Time.ts'
 import * as Timeout from '../Timeout/Timeout.ts'
 import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
-import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
-
-// 1. get matching files
-// 2. launch vscode
-// 3. get websocket url
-// 4. launch test worker
-// 5. pass websocket url to test worker and wait for connection
-// 6. pass matching files to test worker
-
-const getSummary = (result) => {
-  if (result && result.eventListeners) {
-    return { eventListeners: result.eventListeners }
-  }
-  if (result && result.summary) {
-    return result.summary
-  }
-  return { result }
-}
 
 export const runTestsWithCallback = async ({
   root,
@@ -122,6 +106,10 @@ export const runTestsWithCallback = async ({
       commit,
     )
 
+    const context = {
+      runs,
+    }
+
     const intializeEnd = performance.now()
     const intializeTime = intializeEnd - initialStart
 
@@ -175,7 +163,7 @@ export const runTestsWithCallback = async ({
             }
             const after = await MemoryLeakFinder.stop(memoryLeakWorkerRpc, connectionId, targetId)
 
-            const result = await MemoryLeakFinder.compare(memoryLeakWorkerRpc, connectionId, before, after)
+            const result = await MemoryLeakFinder.compare(memoryLeakWorkerRpc, connectionId, before, after, context)
             const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
             const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
             await JsonFile.writeJson(resultPath, result)
