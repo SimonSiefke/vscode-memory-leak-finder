@@ -13,24 +13,6 @@ interface OriginalPosition {
   name: string | null
 }
 
-export const getOriginalPosition = async (sourceMap: RawSourceMap, line: number, column: number): Promise<OriginalPosition> => {
-  Assert.object(sourceMap)
-  Assert.number(line)
-  Assert.number(column)
-  const originalPosition = await SourceMapConsumer.with(sourceMap, null, (consumer) => {
-    return consumer.originalPositionFor({
-      line: line + 1,
-      column: column + 1,
-    })
-  })
-  return {
-    source: originalPosition.source,
-    line: originalPosition.line,
-    column: originalPosition.column,
-    name: originalPosition.name,
-  }
-}
-
 export const getOriginalPositions = async (
   sourceMap: RawSourceMap,
   positions: number[],
