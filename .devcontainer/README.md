@@ -45,3 +45,5 @@ If you encounter issues:
 1. **VNC Connection**: The VNC server runs on port 6080 with password "vscode"
 2. **Node Version**: The container uses Node.js 22.19.0 as specified in `.nvmrc`
 3. **Dependencies**: Basic system dependencies for Electron are pre-installed
+
+<!--  -->

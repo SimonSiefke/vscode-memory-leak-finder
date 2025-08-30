@@ -16,6 +16,7 @@ import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest
 import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTearDownTest.ts'
 import * as Time from '../Time/Time.ts'
 import * as Timeout from '../Timeout/Timeout.ts'
+import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
 
 export const runTestsWithCallback = async ({
@@ -63,6 +64,7 @@ export const runTestsWithCallback = async ({
     Assert.boolean(setupOnly)
 
     const connectionId = Id.create()
+    const attachedToPageTimeout = TimeoutConstants.AttachToPage
 
     if (setupOnly && commit) {
       const testWorkerRpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
@@ -76,6 +78,7 @@ export const runTestsWithCallback = async ({
         ideVersion,
         vscodePath,
         commit,
+        attachedToPageTimeout,
       )
       await testWorkerRpc.dispose()
       return callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, 0, 0, filterValue)
@@ -104,6 +107,7 @@ export const runTestsWithCallback = async ({
       ideVersion,
       vscodePath,
       commit,
+      attachedToPageTimeout,
     )
 
     const context = {
@@ -214,6 +218,7 @@ export const runTestsWithCallback = async ({
             ideVersion,
             vscodePath,
             commit,
+            attachedToPageTimeout,
           )
           if (checkLeaks) {
             memoryLeakWorkerRpc = MemoryLeakWorker.getRpc()

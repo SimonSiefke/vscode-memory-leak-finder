@@ -1,8 +1,13 @@
 import * as ObjectType from '../ObjectType/ObjectType.ts'
 
-export const createRpc = (ipc: any): any => {
+/**
+ *
+ * @param {any} ipc
+ * @returns
+ */
+export const createRpc = (ipc: any) => {
   const callbacks = Object.create(null)
-  const handleMessage = (message: any): void => {
+  const handleMessage = (message: any) => {
     if ('id' in message) {
       if ('result' in message) {
         callbacks[message.id].resolve(message)
@@ -32,8 +37,8 @@ export const createRpc = (ipc: any): any => {
     callbacks,
     listeners,
     onceListeners,
-    invoke(method: string, params?: any): Promise<any> {
-      const { resolve, reject, promise } = Promise.withResolvers()
+    invoke(method: string, params: any) {
+      const { resolve, reject, promise } = Promise.withResolvers<any>()
       const id = _id++
       callbacks[id] = { resolve, reject }
       ipc.send({
@@ -43,8 +48,8 @@ export const createRpc = (ipc: any): any => {
       })
       return promise
     },
-    invokeWithSession(sessionId: string, method: string, params?: any): Promise<any> {
-      const { resolve, reject, promise } = Promise.withResolvers()
+    invokeWithSession(sessionId: string, method: string, params: any) {
+      const { resolve, reject, promise } = Promise.withResolvers<any>()
       const id = _id++
       callbacks[id] = { resolve, reject }
       ipc.send({
@@ -55,13 +60,13 @@ export const createRpc = (ipc: any): any => {
       })
       return promise
     },
-    on(event: string, listener: any): void {
+    on(event: string, listener: any) {
       listeners[event] = listener
     },
-    off(event: string, listener: any): void {
-      delete listeners[event]
+    off(event: string, listener: any) {
+      delete listener[event]
     },
-    once(event: string): Promise<any> {
+    once(event: string) {
       const { resolve, promise } = Promise.withResolvers<any>()
       onceListeners[event] = resolve
       return promise
