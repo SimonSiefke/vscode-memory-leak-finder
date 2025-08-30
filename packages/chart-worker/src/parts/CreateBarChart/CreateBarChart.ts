@@ -12,9 +12,9 @@ export const createBarChart = (data: any, options: any): string => {
       Plot.barX(data, {
         x: 'value',
         y: 'name',
-        sort:{
-          y:'-x'
-        }
+        sort: {
+          y: '-x',
+        },
       }),
 
       Plot.text(data, {
