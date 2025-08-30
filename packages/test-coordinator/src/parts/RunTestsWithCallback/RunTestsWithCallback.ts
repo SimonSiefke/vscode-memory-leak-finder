@@ -1,5 +1,6 @@
 import { join } from 'node:path'
 import * as Assert from '../Assert/Assert.ts'
+import * as Disposables from '../Disposables/Disposables.ts'
 import { getSummary } from '../GetSummary/GetSummary.ts'
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.ts'
 import * as Id from '../Id/Id.ts'
@@ -7,7 +8,6 @@ import * as JsonFile from '../JsonFile/JsonFile.ts'
 import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.ts'
 import * as MemoryLeakResultsPath from '../MemoryLeakResultsPath/MemoryLeakResultsPath.ts'
 import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.ts'
-import * as Disposables from '../Disposables/Disposables.ts'
 import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
 import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.ts'
@@ -79,6 +79,7 @@ export const runTestsWithCallback = async ({
         vscodePath,
         commit,
         attachedToPageTimeout,
+        measure,
       )
       await testWorkerRpc.dispose()
       return callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, 0, 0, filterValue)
@@ -96,7 +97,7 @@ export const runTestsWithCallback = async ({
     const initialStart = Time.now()
     const first = formattedPaths[0]
     await callback(TestWorkerEventType.HandleInitializing)
-    let testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
+    let testWorkerRpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
       cwd,
       headlessMode,
       recordVideo,
@@ -108,6 +109,7 @@ export const runTestsWithCallback = async ({
       vscodePath,
       commit,
       attachedToPageTimeout,
+      measure,
     )
 
     const context = {
@@ -124,11 +126,6 @@ export const runTestsWithCallback = async ({
     await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
 
     let memoryLeakWorkerRpc = MemoryLeakWorker.getRpc()
-    let targetId = ''
-    if (checkLeaks) {
-      const info = await MemoryLeakFinder.setup(memoryLeakWorkerRpc, connectionId, measure)
-      targetId = info.targetId
-    }
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
       const { absolutePath, relativeDirname, dirent, relativePath } = formattedPath
@@ -139,7 +136,7 @@ export const runTestsWithCallback = async ({
 
       try {
         const start = i === 0 ? initialStart : Time.now()
-        const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(testWorkerIpc, connectionId, absolutePath, forceRun, timeouts)
+        const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(testWorkerRpc, connectionId, absolutePath, forceRun, timeouts)
 
         if (recordVideo) {
           await VideoRecording.addChapter(dirent, start)
@@ -155,17 +152,17 @@ export const runTestsWithCallback = async ({
           if (checkLeaks) {
             if (measureAfter) {
               for (let i = 0; i < 2; i++) {
-                await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun, runMode)
+                await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
               }
             }
-            const before = await MemoryLeakFinder.start(memoryLeakWorkerRpc, connectionId, targetId)
+            const before = await MemoryLeakFinder.start(memoryLeakWorkerRpc, connectionId)
             for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun, runMode)
+              await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
             }
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
             }
-            const after = await MemoryLeakFinder.stop(memoryLeakWorkerRpc, connectionId, targetId)
+            const after = await MemoryLeakFinder.stop(memoryLeakWorkerRpc, connectionId)
 
             const result = await MemoryLeakFinder.compare(memoryLeakWorkerRpc, connectionId, before, after, context)
             const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
@@ -179,10 +176,10 @@ export const runTestsWithCallback = async ({
             console.log(summary)
           } else {
             for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun, runMode)
+              await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
             }
           }
-          await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerIpc, connectionId, absolutePath)
+          await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerRpc, connectionId, absolutePath)
           const end = Time.now()
           const duration = end - start
           await callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration, isLeak)
@@ -198,16 +195,16 @@ export const runTestsWithCallback = async ({
       } finally {
         if (restartBetween) {
           if (memoryLeakWorkerRpc) {
-            memoryLeakWorkerRpc.dispose()
+            await memoryLeakWorkerRpc.dispose()
             memoryLeakWorkerRpc = undefined
           }
-          if (testWorkerIpc) {
-            testWorkerIpc.dispose()
+          if (testWorkerRpc) {
+            await testWorkerRpc.dispose()
           }
           // Dispose initialization worker and any other registered disposables
           await Disposables.disposeAll()
           PrepareTestsOrAttach.state.promise = undefined
-          testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
+          testWorkerRpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
             cwd,
             headlessMode,
             recordVideo,
@@ -219,10 +216,10 @@ export const runTestsWithCallback = async ({
             vscodePath,
             commit,
             attachedToPageTimeout,
+            measure,
           )
           if (checkLeaks) {
             memoryLeakWorkerRpc = MemoryLeakWorker.getRpc()
-            await MemoryLeakFinder.setup(memoryLeakWorkerRpc, connectionId, measure)
           }
         }
       }

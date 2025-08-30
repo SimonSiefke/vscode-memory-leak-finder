@@ -1,8 +1,8 @@
-import { test, expect } from '@jest/globals'
-import { parse } from '@babel/parser'
-import traverse from '@babel/traverse'
 import type { NodePath } from '@babel/traverse'
 import type * as t from '@babel/types'
+import { parse } from '@babel/parser'
+import traverse from '@babel/traverse'
+import { test, expect } from '@jest/globals'
 import { getEnclosingNames } from '../src/parts/GetEnclosingNames/GetEnclosingNames.ts'
 
 const findBestPathAt = (code: string, line: number, column: number): NodePath => {
@@ -20,13 +20,13 @@ const findBestPathAt = (code: string, line: number, column: number): NodePath =>
         ? (tAny.default as unknown as (ast: t.File, visitors: unknown) => void)
         : typeof tAny.traverse === 'function'
           ? (tAny.traverse as unknown as (ast: t.File, visitors: unknown) => void)
-          : typeof (tAny.default as unknown as { default?: unknown })?.default === 'function'
-            ? ((tAny.default as unknown as { default?: unknown }).default as unknown as (ast: t.File, visitors: unknown) => void)
+          : typeof (tAny.default as { default?: unknown })?.default === 'function'
+            ? ((tAny.default as { default?: unknown }).default as (ast: t.File, visitors: unknown) => void)
             : (null as unknown as (ast: t.File, visitors: unknown) => void)
   let best: NodePath | null = null
   traverseFn(ast, {
     enter(path: NodePath) {
-      const node: t.Node = path.node
+      const { node } = path
       if (!node.loc) {
         return
       }

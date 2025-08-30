@@ -24,7 +24,7 @@ const addDeltas = (prettyBefore, prettyAfter) => {
 export const compareDisposablesWithLocation = async (before, after) => {
   const beforeResult = before
   const afterResult = after.result
-  const scriptMap = after.scriptMap
+  const { scriptMap } = after
   Assert.array(beforeResult)
   Assert.array(afterResult)
   Assert.object(scriptMap)

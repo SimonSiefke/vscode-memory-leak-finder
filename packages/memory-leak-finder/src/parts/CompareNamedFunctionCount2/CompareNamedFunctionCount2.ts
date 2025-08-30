@@ -32,7 +32,7 @@ export const compareNamedFunctionCount2 = async (beforePath, after, useParallel 
   // TODO ask heapsnapshot worker to compare functions
   // TODO then for the leaked functions, add sourcemap info
   const afterPath = after.heapSnapshotPath
-  const scriptMap = after.scriptMap
+  const { scriptMap } = after
   console.log({ scriptMap })
   console.time('check')
   const leaked = await HeapSnapshotFunctions.compareHeapSnapshotFunctions(beforePath, afterPath, useParallel)

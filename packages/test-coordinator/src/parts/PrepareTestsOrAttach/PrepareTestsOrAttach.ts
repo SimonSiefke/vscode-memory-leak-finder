@@ -40,6 +40,7 @@ export const prepareTestsOrAttach = async (
   vscodePath: string,
   commit: string,
   attachedToPageTimeout: number,
+  measureId: string,
 ) => {
   const pageObjectPath = GetPageObjectPath.getPageObjectPath()
   const testWorkerRpc = await LaunchTestWorker.launchTestWorker(runMode)
@@ -57,6 +58,7 @@ export const prepareTestsOrAttach = async (
       vscodePath,
       commit,
       attachedToPageTimeout,
+      measureId,
     )
     const result = await state.promise
     state.parsedVersion = result.parsedVersion

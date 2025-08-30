@@ -11,18 +11,18 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
 
   let current: NodePath | null = path
   while (current) {
-    const node: t.Node = current.node
+    const { node } = current
     if (!isLocationInside(node, position.line, position.column)) {
       current = current.parentPath
       continue
     }
 
     if (current.isClassMethod() || current.isClassPrivateMethod()) {
-      const methodNode = current.node as t.ClassMethod | t.ClassPrivateMethod
+      const methodNode = current.node
       if (methodNode.kind === 'constructor') {
         // ignore constructor
       } else {
-        const key = methodNode.key
+        const { key } = methodNode
         if (key && key.type === 'Identifier') {
           memberName = memberName || key.name
         } else if (key && key.type === 'StringLiteral') {
@@ -43,8 +43,8 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
         memberName = memberName || classFieldNode.key.name
       }
     } else if (current.isClassDeclaration() || current.isClassExpression()) {
-      const cls = current.node as t.ClassDeclaration | t.ClassExpression
-      const id = cls.id
+      const cls = current.node
+      const { id } = cls
       if (id && id.name) {
         className = className || id.name
       } else if (cls.superClass && cls.id == null) {
@@ -52,7 +52,7 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
         className = className || `class extends ${superName}`
       }
     } else if (current.isFunctionDeclaration()) {
-      const id = current.node.id
+      const { id } = current.node
       if (id && id.name && !functionName) {
         functionName = id.name
       }
@@ -66,8 +66,8 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
       } else if (parent && parent.isAssignmentExpression()) {
         const leftNode = parent.node.left
         if (leftNode && leftNode.type === 'MemberExpression') {
-          const object = leftNode.object
-          const property = leftNode.property
+          const { object } = leftNode
+          const { property } = leftNode
           if (object && object.type === 'MemberExpression') {
             const objectName: string | undefined = object.object.type === 'Identifier' ? object.object.name : undefined
             const propName: string | undefined = property && property.type === 'Identifier' ? property.name : undefined
