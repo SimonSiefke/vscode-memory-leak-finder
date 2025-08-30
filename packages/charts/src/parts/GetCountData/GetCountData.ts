@@ -1,8 +1,8 @@
 import { existsSync } from 'node:fs'
 import { readdir } from 'node:fs/promises'
 import { join } from 'path'
-import * as Root from '../Root/Root.ts'
 import * as ReadJson from '../ReadJson/ReadJson.ts'
+import * as Root from '../Root/Root.ts'
 
 export const getCountData = async (name: string, key: string): Promise<any[]> => {
   const resultsPath = join(Root.root, '.vscode-memory-leak-finder-results', name)

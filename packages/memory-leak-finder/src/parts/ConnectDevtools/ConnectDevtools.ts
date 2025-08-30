@@ -48,7 +48,7 @@ export const connectDevtools = async (
     throw new Error(`Failed to attach to page`)
   }
 
-  const sessionId = event.params.sessionId
+  const { sessionId } = event.params
 
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
 

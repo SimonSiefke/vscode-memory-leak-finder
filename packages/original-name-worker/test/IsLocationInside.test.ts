@@ -1,8 +1,8 @@
-import { test, expect } from '@jest/globals'
-import { parse } from '@babel/parser'
-import traverse from '@babel/traverse'
 import type { NodePath } from '@babel/traverse'
 import type * as t from '@babel/types'
+import { parse } from '@babel/parser'
+import traverse from '@babel/traverse'
+import { test, expect } from '@jest/globals'
 import { isLocationInside } from '../src/parts/IsLocationInside/IsLocationInside.ts'
 
 const getFirstNodePath = (code: string): NodePath => {
@@ -19,8 +19,8 @@ const getFirstNodePath = (code: string): NodePath => {
         ? (tAny.default as unknown as (ast: t.File, visitors: unknown) => void)
         : typeof tAny.traverse === 'function'
           ? (tAny.traverse as unknown as (ast: t.File, visitors: unknown) => void)
-          : typeof (tAny.default as unknown as { default?: unknown })?.default === 'function'
-            ? ((tAny.default as unknown as { default?: unknown }).default as unknown as (ast: t.File, visitors: unknown) => void)
+          : typeof (tAny.default as { default?: unknown })?.default === 'function'
+            ? ((tAny.default as { default?: unknown }).default as (ast: t.File, visitors: unknown) => void)
             : (null as unknown as (ast: t.File, visitors: unknown) => void)
   let found: NodePath | null = null
   traverseFn(ast, {
@@ -39,13 +39,13 @@ const getFirstNodePath = (code: string): NodePath => {
 test('isLocationInside - inside function declaration', () => {
   const code = `function demo(){\n  const x = 1\n}`
   const path = getFirstNodePath(code)
-  const node: t.Node = path.node
+  const { node } = path
   expect(isLocationInside(node, 0, 9)).toBe(true)
 })
 
 test('isLocationInside - outside node', () => {
   const code = `function demo(){\n  const x = 1\n}`
   const path = getFirstNodePath(code)
-  const node: t.Node = path.node
+  const { node } = path
   expect(isLocationInside(node, 10, 0)).toBe(false)
 })
