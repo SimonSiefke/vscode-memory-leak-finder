@@ -13,6 +13,7 @@ export const setup = async ({ Workspace, Explorer, Editor }) => {
 export const run = async ({ Editor }) => {
   await Editor.open('file.txt')
   await Editor.closeAll()
+  throw new Error('oops')
 }
 
 export const teardown = async ({ Editor }) => {
