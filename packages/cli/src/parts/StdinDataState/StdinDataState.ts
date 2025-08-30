@@ -32,7 +32,7 @@ export interface StdinDataState {
   isWindows: boolean
 }
 
-export const state: StdinDataState = {
+let state: StdinDataState = {
   buffering: false,
   checkLeaks: false,
   runSkippedTestsAnyway: false,
@@ -61,44 +61,59 @@ export const state: StdinDataState = {
 }
 
 export const setState = (newState): void => {
-  state.checkLeaks = newState.checkLeaks
-  state.runSkippedTestsAnyway = newState.runSkippedTestsAnyway
-  state.cwd = newState.cwd
-  state.headless = newState.headless
-  state.isGithubActions = newState.isGithubActions
-  state.measure = newState.measure
-  state.mode = newState.mode
-  state.recordVideo = newState.recordVideo
-  state.runs = newState.runs
-  state.value = newState.value
-  state.watch = newState.watch
-  state.measureAfter = newState.measureAfter
-  state.timeouts = newState.timeouts
-  state.timeoutBetween = newState.timeoutBetween
-  state.restartBetween = newState.restartBetween
-  state.runMode = newState.runMode
-  state.ide = newState.ide
-  state.ideVersion = newState.ideVersion
-  state.workers = newState.workers
-  state.stdout = newState.stdout
-  state.previousFilters = newState.previousFilters
-  state.isWindows = newState.isWindows
+  state = {
+    ...state,
+    checkLeaks: newState.checkLeaks,
+    runSkippedTestsAnyway: newState.runSkippedTestsAnyway,
+    cwd: newState.cwd,
+    headless: newState.headless,
+    isGithubActions: newState.isGithubActions,
+    measure: newState.measure,
+    mode: newState.mode,
+    recordVideo: newState.recordVideo,
+    runs: newState.runs,
+    value: newState.value,
+    watch: newState.watch,
+    measureAfter: newState.measureAfter,
+    timeouts: newState.timeouts,
+    timeoutBetween: newState.timeoutBetween,
+    restartBetween: newState.restartBetween,
+    runMode: newState.runMode,
+    ide: newState.ide,
+    ideVersion: newState.ideVersion,
+    workers: newState.workers,
+    stdout: newState.stdout,
+    previousFilters: newState.previousFilters,
+    isWindows: newState.isWindows,
+  }
 }
 
 export const setBuffering = (value: boolean): void => {
-  state.buffering = value
+  state = {
+    ...state,
+    buffering: value,
+  }
 }
 
 export const setTestSetup = (): void => {
-  state.mode = ModeType.Waiting
+  state = {
+    ...state,
+    mode: ModeType.Waiting,
+  }
 }
 
 export const setTestRunning = (): void => {
-  state.mode = ModeType.Running
+  state = {
+    ...state,
+    mode: ModeType.Running,
+  }
 }
 
 export const setTestStateChange = (): void => {
-  state.mode = ModeType.Waiting
+  state = {
+    ...state,
+    mode: ModeType.Waiting,
+  }
 }
 
 export const isBuffering = (): boolean => {
