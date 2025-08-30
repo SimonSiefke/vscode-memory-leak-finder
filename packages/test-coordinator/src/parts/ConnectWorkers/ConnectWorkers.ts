@@ -16,7 +16,7 @@ export const connectWorkers = async (
   measureId: string,
 ) => {
   if (recordVideo) {
-    await VideoRecording.start(devtoolsWebSocketUrl)
+    await VideoRecording.start(devtoolsWebSocketUrl, attachedToPageTimeout)
   }
   await MemoryLeakWorker.startWorker(devtoolsWebSocketUrl, connectionId, measureId, attachedToPageTimeout)
   await ConnectDevtools.connectDevtools(

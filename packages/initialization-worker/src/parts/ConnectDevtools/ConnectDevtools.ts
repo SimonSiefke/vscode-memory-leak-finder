@@ -7,7 +7,7 @@ import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEve
 
 export const connectDevtools = async (devtoolsWebSocketUrl: string, attachedToPageTimeout: number): Promise<void> => {
   const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
-  const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc, true)
+  const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
 
   const eventPromise = waitForAttachedEvent(browserRpc, attachedToPageTimeout)
 
