@@ -1,14 +1,18 @@
-import { join } from 'node:path'
-import { downloadAndExtract } from '../DownloadAndExtract/DownloadAndExtract.ts'
-import { root } from '../Root/Root.ts'
+import { downloadExtensions } from '../DownloadExtensions/DownloadExtensions.ts'
 
-const version = '0.31.2025082904'
-const urlPlaceHolder = `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/GitHub/vsextensions/copilot-chat/$VERSION/vspackage`
-const url = urlPlaceHolder.replace('$VERSION', version)
+const extensions = [
+  {
+    id: `GitHub/copilot-chat`,
+    version: '0.31.2025082904',
+  },
+  {
+    id: 'GitHub/copilot',
+    version: '1.364.1768',
+  },
+]
 
 const downloadGithubCopilot = async () => {
-  const outDir = join(root, '.vscode-tool-downloads', 'github-copilot-extracted')
-  await downloadAndExtract(`github-copilot`, [url], outDir)
+  await downloadExtensions(extensions)
 }
 
 await downloadGithubCopilot()
