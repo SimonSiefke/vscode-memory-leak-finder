@@ -6,7 +6,6 @@ const mockMkdir = jest.fn()
 const mockRm = jest.fn()
 const mockReadFile = jest.fn()
 const mockGlob = jest.fn()
-
 const mockPathExists = jest.fn()
 
 jest.unstable_mockModule('node:fs/promises', () => ({
@@ -15,6 +14,7 @@ jest.unstable_mockModule('node:fs/promises', () => ({
   rm: mockRm,
   readFile: mockReadFile,
   glob: mockGlob,
+  writeFile: jest.fn(),
 }))
 
 jest.unstable_mockModule('path-exists', () => ({
