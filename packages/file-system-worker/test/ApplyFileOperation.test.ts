@@ -8,7 +8,7 @@ jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.ts', () => ({
   copy: mockCopy,
   makeDirectory: mockMakeDirectory,
   remove: mockRemove,
-  writeFile: jest.fn(),
+  writeFileContent: jest.fn(),
 }))
 
 let applyFileOperationModule
