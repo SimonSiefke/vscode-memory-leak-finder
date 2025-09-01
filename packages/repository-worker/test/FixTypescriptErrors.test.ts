@@ -6,6 +6,7 @@ test('fixTypescriptErrors - adds ts-ignore operations and applies them', async (
   const { fixTypescriptErrors } = await import('../src/parts/FixTypescriptErrors/FixTypescriptErrors.ts')
 
   const mockInvoke = jest.fn()
+  // @ts-ignore
   mockInvoke.mockImplementation((method: string, ...params: any[]) => {
     switch (method) {
       case 'FileSystem.findFiles':
