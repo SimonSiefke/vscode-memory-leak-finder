@@ -1,14 +1,12 @@
 import { exec } from '../Exec/Exec.ts'
 import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
-import { fixTypescriptErrors } from '../FixTypescriptErrors/FixTypescriptErrors.ts'
 
 /**
  * Runs the compilation process using npm run compile
  * @param {string} cwd - The working directory to run npm run compile in
  * @param {boolean} useNice - Whether to use nice command for resource management
  */
-export const runCompile = async (cwd, useNice, mainJsPath) => {
-  await fixTypescriptErrors(cwd)
+export const runCompile = async (cwd: string, useNice: boolean, mainJsPath: string) => {
   if (useNice) {
     await exec('nice', ['-n', '10', 'npm', 'run', 'compile'], { cwd })
   } else {
