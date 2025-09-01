@@ -30,6 +30,7 @@ jest.unstable_mockModule('../src/parts/Exec/Exec.ts', () => ({
 
 jest.unstable_mockModule('../src/parts/CacheNodeModules/CacheNodeModules.ts', () => ({
   addNodeModulesToCache: mockAddNodeModulesToCache,
+  moveNodeModulesToCache: mockAddNodeModulesToCache,
 }))
 
 jest.unstable_mockModule('../src/parts/CheckoutCommit/CheckoutCommit.ts', () => ({
