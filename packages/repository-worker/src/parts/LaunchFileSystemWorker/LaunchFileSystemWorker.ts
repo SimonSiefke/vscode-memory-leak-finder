@@ -9,3 +9,4 @@ export const launchFileSystemWorker = async (): Promise<void> => {
   })
   FileSystemWorker.set(rpc)
 }
+

@@ -6,6 +6,7 @@ import { runTsc } from '../RunTsc/RunTsc.ts'
 
 export const fixTypescriptErrorsInConfig = async (configPath: string): Promise<void> => {
   const cwd = Path.join(configPath, '..')
+  console.log(`[repository-worker] running tsc in ${configPath}...`)
   const result = await runTsc(cwd)
   if (result.exitCode === 0) {
     return
