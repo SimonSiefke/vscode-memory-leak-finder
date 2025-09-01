@@ -20,7 +20,7 @@ test('fixTypescriptErrors - adds ts-ignore operations and applies them', async (
         expect(ops).toEqual([
           {
             type: 'write',
-            path: '/repo/src/a.ts',
+            path: '/repo/src/src/a.ts',
             content: 'const a = 1\n// @ts-ignore\nconst b: number = "x"\n',
           },
         ])
