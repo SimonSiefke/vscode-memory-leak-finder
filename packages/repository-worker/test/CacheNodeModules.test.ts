@@ -1,7 +1,7 @@
 import { expect, test, jest } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
 import { VError } from '@lvce-editor/verror'
-import { addNodeModulesToCache } from '../src/parts/CacheNodeModules/CacheNodeModules.ts'
+import { moveNodeModulesToCache } from '../src/parts/CacheNodeModules/CacheNodeModules.ts'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
 
 test.skip('addNodeModulesToCache - successfully caches node_modules', async () => {
@@ -24,7 +24,7 @@ test.skip('addNodeModulesToCache - successfully caches node_modules', async () =
   })
   FileSystemWorker.set(mockRpc)
 
-  await addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')
+  await moveNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')
 
   expect(mockInvoke).toHaveBeenCalled()
 })
@@ -56,7 +56,7 @@ test.skip('addNodeModulesToCache - filters out nested node_modules and .git dire
   })
   FileSystemWorker.set(mockRpc)
 
-  await addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')
+  await moveNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')
 
   expect(mockInvoke).toHaveBeenCalled()
 })
@@ -79,7 +79,7 @@ test('addNodeModulesToCache - handles empty node_modules list', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  await addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')
+  await moveNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')
 
   expect(mockInvoke).toHaveBeenCalled()
 })
@@ -99,8 +99,8 @@ test('addNodeModulesToCache - throws VError when findFiles fails', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  await expect(addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow(VError)
-  await expect(addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow('Failed to cache node_modules')
+  await expect(moveNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow(VError)
+  await expect(moveNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow('Failed to cache node_modules')
   expect(mockInvoke).toHaveBeenCalled()
 })
 
@@ -122,8 +122,8 @@ test('addNodeModulesToCache - throws VError when getCacheFileOperations fails', 
   })
   FileSystemWorker.set(mockRpc)
 
-  await expect(addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow(VError)
-  await expect(addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow('Failed to cache node_modules')
+  await expect(moveNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow(VError)
+  await expect(moveNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow('Failed to cache node_modules')
   expect(mockInvoke).toHaveBeenCalled()
 })
 
@@ -145,8 +145,8 @@ test('addNodeModulesToCache - throws VError when applyFileOperations fails', asy
   })
   FileSystemWorker.set(mockRpc)
 
-  await expect(addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow(VError)
-  await expect(addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow('Failed to cache node_modules')
+  await expect(moveNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow(VError)
+  await expect(moveNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')).rejects.toThrow('Failed to cache node_modules')
   expect(mockInvoke).toHaveBeenCalled()
 })
 
@@ -177,7 +177,7 @@ test.skip('addNodeModulesToCache - handles complex nested directory structure', 
   })
   FileSystemWorker.set(mockRpc)
 
-  await addNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')
+  await moveNodeModulesToCache('/repo/path', 'commit-hash', '/cache/dir')
 
   expect(mockInvoke).toHaveBeenCalled()
 })
