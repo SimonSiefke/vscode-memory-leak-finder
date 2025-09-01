@@ -9,6 +9,9 @@ const isIgnoredError = (data: string): boolean => {
   if (data.includes('This will stop working in the next major version of npm.')) {
     return true
   }
+  if (data.includes('DeprecationWarning: fs.Stats constructor is deprecated.')) {
+    return true
+  }
   return false
 }
 
