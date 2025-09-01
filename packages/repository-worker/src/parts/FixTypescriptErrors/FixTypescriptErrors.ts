@@ -7,7 +7,6 @@ import { dispose } from '../FileSystemWorker/FileSystemWorker.ts'
 export const fixTypescriptErrors = async (repoPath: string): Promise<void> => {
   try {
     const configs = await findTsConfigFiles(repoPath)
-    console.log({ configs })
     for (const configPath of configs) {
       await fixTypescriptErrorsInConfig(configPath)
     }
@@ -18,5 +17,4 @@ export const fixTypescriptErrors = async (repoPath: string): Promise<void> => {
 
 await launchFileSystemWorker()
 await fixTypescriptErrors(`/workspace/vscode-memory-leak-finder/.vscode-repos`)
-
 await dispose()
