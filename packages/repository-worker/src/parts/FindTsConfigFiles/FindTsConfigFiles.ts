@@ -4,7 +4,7 @@ import * as Path from '../Path/Path.ts'
 
 export const findTsConfigFiles = async (rootDir: string): Promise<readonly string[]> => {
   try {
-    const relativePaths = await FileSystemWorker.findFiles('**/tsconfig*.json', {
+    const relativePaths = await FileSystemWorker.findFiles('**/tsconfig.json', {
       cwd: rootDir,
       exclude: ['**/node_modules/**', '**/out/**', '**/.git/**'],
     })
