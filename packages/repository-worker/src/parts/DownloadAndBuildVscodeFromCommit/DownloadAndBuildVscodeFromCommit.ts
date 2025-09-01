@@ -65,7 +65,13 @@ export const downloadAndBuildVscodeFromCommit = async (
       )
     } else {
       await InstallDependencies.installDependencies(repoPathWithCommitHash, useNice)
-      await CacheNodeModules.addNodeModulesToCache(repoPathWithCommitHash, commitHash, nodeModulesCacheDir)
+      // const toRemove=['test/mcp/node_modules/npm-run-all/node_modules/which/bin/which']
+      // for(const item of toRemove){
+      //   await rm(join(
+      //     repoPathWithCommitHash, item 
+      //   ), {force:true})
+      // }
+      await CacheNodeModules.moveNodeModulesToCache(repoPathWithCommitHash, commitHash, nodeModulesCacheDir)
     }
   } else if (!existsMainJsPath) {
     Logger.log(`[repository] node_modules already exists in repo for commit ${commitHash}, skipping npm ci...`)

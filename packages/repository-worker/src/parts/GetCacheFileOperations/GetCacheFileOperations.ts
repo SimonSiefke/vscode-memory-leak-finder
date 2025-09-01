@@ -1,14 +1,15 @@
 import * as Path from '../Path/Path.ts'
 
 interface CopyOperation {
-  type: 'copy'
-  from: string
-  to: string
+  readonly type: 'copy'
+  readonly from: string
+  readonly to: string
+  readonly exclude?:readonly string[]
 }
 
 interface MkdirOperation {
-  type: 'mkdir'
-  path: string
+ readonly  type: 'mkdir'
+ readonly  path: string
 }
 
 type FileOperation = CopyOperation | MkdirOperation
@@ -39,10 +40,10 @@ export const getCacheFileOperations = async (
       path: cachedNodeModulesPath,
     },
   )
-  const absoluteNodeModulesPaths = nodeModulesPaths.map((path) => Path.join(repoPath, path))
-  for (const nodeModulesPath of absoluteNodeModulesPaths) {
-    const relativePath = nodeModulesPath.replace(repoPath, '').replace(/^\/+/, '')
-    const cacheTargetPath = Path.join(cachedNodeModulesPath, relativePath)
+
+  for (const nodeModulePath of nodeModulesPaths) {
+    const cacheTargetPath = Path.join(cachedNodeModulesPath, nodeModulePath)
+    const sourcePath = Path.join(repoPath, nodeModulePath)
     const parentDir = Path.join(cacheTargetPath, '..')
     fileOperations.push(
       {
@@ -51,7 +52,7 @@ export const getCacheFileOperations = async (
       },
       {
         type: 'copy',
-        from: nodeModulesPath,
+        from: sourcePath,
         to: cacheTargetPath,
       },
     )
