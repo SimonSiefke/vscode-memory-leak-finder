@@ -11,7 +11,9 @@ export interface ErrorLocationByFile {
   readonly [filePath: string]: readonly number[]
 }
 
-export const computeTsIgnoreOperations = async (locations: readonly { file: string; line: number }[]): Promise<readonly TsIgnoreOperation[]> => {
+export const computeTsIgnoreOperations = async (
+  locations: readonly { file: string; line: number }[],
+): Promise<readonly TsIgnoreOperation[]> => {
   try {
     const byFile = new Map<string, number[]>()
     for (const loc of locations) {
@@ -59,6 +61,3 @@ export const computeTsIgnoreOperations = async (locations: readonly { file: stri
     throw new VError(error, 'Failed to compute ts-ignore operations')
   }
 }
-
-
-

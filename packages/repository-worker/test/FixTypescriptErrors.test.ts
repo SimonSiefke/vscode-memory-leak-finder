@@ -41,6 +41,3 @@ test('fixTypescriptErrors - adds ts-ignore operations and applies them', async (
 
   expect(mockInvoke).toHaveBeenCalled()
 })
-
-
-

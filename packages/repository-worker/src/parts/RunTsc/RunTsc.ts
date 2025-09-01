@@ -15,6 +15,3 @@ export const runTsc = async (cwd: string): Promise<TscResult> => {
     throw new VError(error, `Failed to run tsc in '${cwd}'`)
   }
 }
-
-
-

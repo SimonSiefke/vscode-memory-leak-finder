@@ -13,6 +13,3 @@ export const findTsConfigFiles = async (rootDir: string): Promise<readonly strin
     throw new VError(error, `Failed to find tsconfig files in directory '${rootDir}'`)
   }
 }
-
-
-

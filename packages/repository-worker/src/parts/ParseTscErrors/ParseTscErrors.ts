@@ -9,7 +9,7 @@ const regexes: readonly RegExp[] = [
   // file.ts:10:5 - error TSxxxx: message
   /^(?<file>[^:(\n]+):(\s?)(?<line>\d+):(\d+)\s+-\s+error\s+TS\d+:\s+/,
   // path/file.ts(10,5): error TSxxxx: message
-  /^(?<file>[^:(\n]+)\((?<line>\d+),(\d+)\):\s+error\s+TS\d+:\s+/, 
+  /^(?<file>[^:(\n]+)\((?<line>\d+),(\d+)\):\s+error\s+TS\d+:\s+/,
 ]
 
 export const parseTscErrors = (output: string, baseDir: string): readonly TscErrorLocation[] => {
@@ -39,6 +39,3 @@ export const parseTscErrors = (output: string, baseDir: string): readonly TscErr
   }
   return locations
 }
-
-
-

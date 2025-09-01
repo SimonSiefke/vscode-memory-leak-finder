@@ -6,11 +6,11 @@ export const set = (rpc) => {
   state.rpc = rpc
 }
 
-export const dispose=async ()=>{
-  if(state.rpc){
+export const dispose = async () => {
+  if (state.rpc) {
     // @ts-ignore
     await state.rpc.dispose()
-    state.rpc=undefined
+    state.rpc = undefined
   }
 }
 
