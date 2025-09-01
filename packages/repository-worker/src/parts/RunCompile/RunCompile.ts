@@ -7,14 +7,14 @@ import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
  * @param {boolean} useNice - Whether to use nice command for resource management
  */
 export const runCompile = async (cwd: string, useNice: boolean, mainJsPath: string) => {
-  let result 
+  let result
   if (useNice) {
-    result =  await exec('nice', ['-n', '10', 'npm', 'run', 'compile'], { cwd, reject:false  })
+    result = await exec('nice', ['-n', '10', 'npm', 'run', 'compile'], { cwd, reject: false })
   } else {
-    result=  await exec('npm', ['run', 'compile'], { cwd, reject:false  })
+    result = await exec('npm', ['run', 'compile'], { cwd, reject: false })
   }
 
-  if(result.exitCode){
+  if (result.exitCode) {
     console.log(`[repository] tsc exitCode: ${result.exitCode}`)
     console.log(`[repository] tsc stdout: ${result.stdout}`)
     console.log(`[repository] tsc stderr: ${result.stderr}`)
