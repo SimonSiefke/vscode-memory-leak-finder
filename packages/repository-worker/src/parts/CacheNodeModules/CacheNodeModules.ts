@@ -2,18 +2,17 @@ import { VError } from '@lvce-editor/verror'
 import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 import * as GetCacheFileOperations from '../GetCacheFileOperations/GetCacheFileOperations.ts'
 import * as Path from '../Path/Path.ts'
-import { launchFileSystemWorker } from '../LaunchFileSystemWorker/LaunchFileSystemWorker.ts'
 
-const isNeededNodeModules = (path:string):boolean=>{
-   if(path.includes('.git')){
-    return false 
-   }
-   const nodeModulesIndex=path.indexOf('node_modules')
-   const lastNodeModulesIndex=path.lastIndexOf('node_modules')
-   if(nodeModulesIndex !==lastNodeModulesIndex){
-    return false 
-   }
-   return true  
+const isNeededNodeModules = (path: string): boolean => {
+  if (path.includes('.git')) {
+    return false
+  }
+  const nodeModulesIndex = path.indexOf('node_modules')
+  const lastNodeModulesIndex = path.lastIndexOf('node_modules')
+  if (nodeModulesIndex !== lastNodeModulesIndex) {
+    return false
+  }
+  return true
 }
 
 export const moveNodeModulesToCache = async (repoPath: string, commitHash: string, cacheDir: string) => {

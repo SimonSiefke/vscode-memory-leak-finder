@@ -68,7 +68,7 @@ export const downloadAndBuildVscodeFromCommit = async (
       // const toRemove=['test/mcp/node_modules/npm-run-all/node_modules/which/bin/which']
       // for(const item of toRemove){
       //   await rm(join(
-      //     repoPathWithCommitHash, item 
+      //     repoPathWithCommitHash, item
       //   ), {force:true})
       // }
       await CacheNodeModules.moveNodeModulesToCache(repoPathWithCommitHash, commitHash, nodeModulesCacheDir)

@@ -4,12 +4,12 @@ interface CopyOperation {
   readonly type: 'copy'
   readonly from: string
   readonly to: string
-  readonly exclude?:readonly string[]
+  readonly exclude?: readonly string[]
 }
 
 interface MkdirOperation {
- readonly  type: 'mkdir'
- readonly  path: string
+  readonly type: 'mkdir'
+  readonly path: string
 }
 
 type FileOperation = CopyOperation | MkdirOperation
