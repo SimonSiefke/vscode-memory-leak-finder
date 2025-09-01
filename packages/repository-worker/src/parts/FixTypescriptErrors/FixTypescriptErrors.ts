@@ -1,8 +1,6 @@
 import { VError } from '@lvce-editor/verror'
 import { findTsConfigFiles } from '../FindTsConfigFiles/FindTsConfigFiles.ts'
 import { fixTypescriptErrorsInConfig } from '../FixTypescriptErrorsInConfig/FixTypescriptErrorsInConfig.ts'
-import { launchFileSystemWorker } from '../LaunchFileSystemWorker/LaunchFileSystemWorker.ts'
-import { dispose } from '../FileSystemWorker/FileSystemWorker.ts'
 
 export const fixTypescriptErrors = async (repoPath: string): Promise<void> => {
   try {
@@ -14,7 +12,3 @@ export const fixTypescriptErrors = async (repoPath: string): Promise<void> => {
     throw new VError(error, 'Failed to fix TypeScript errors')
   }
 }
-
-await launchFileSystemWorker()
-await fixTypescriptErrors(`/workspace/vscode-memory-leak-finder/.vscode-repos`)
-await dispose()
