@@ -63,7 +63,7 @@ export const downloadAndBuildVscodeFromCommit = async (
     try {
       await preCacheRipgrep()
     } catch (error) {
-      Logger.log(`[repository] Warning: Failed to pre-cache ripgrep: ${error.message}`)
+      Logger.log(`[repository] Warning: Failed to pre-cache ripgrep: ${error}`)
       Logger.log(`[repository] Continuing with npm ci - may encounter GitHub API issues`)
     }
   }
