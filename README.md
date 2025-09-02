@@ -15,6 +15,18 @@ npm run e2e
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io#https://github.com/SimonSiefke/vscode-memory-leak-finder)
 
+## Known Issues & Workarounds
+
+### Ripgrep Download Issues
+
+When building VSCode from source, `npm ci` may fail to download `ripgrep-prebuilt` due to GitHub API rate limits (403 errors). This project includes a workaround that pre-caches the ripgrep binary:
+
+- **Automatic:** The repository worker automatically pre-caches ripgrep right after cloning the repository but before running `npm ci`
+- **Manual:** Run `./scripts/pre-cache-ripgrep.sh` before `npm ci` in VSCode repositories
+- **Cross-platform:** Works on Linux, macOS, and Windows using Node.js built-in modules
+
+See [docs/ripgrep-workaround.md](docs/ripgrep-workaround.md) for detailed information.
+
 ## Measures
 
 ### ArrayCount

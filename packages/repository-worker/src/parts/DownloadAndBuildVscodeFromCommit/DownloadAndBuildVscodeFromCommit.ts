@@ -9,6 +9,7 @@ import { fixTypescriptErrors } from '../FixTypescriptErrors/FixTypescriptErrors.
 import * as InstallDependencies from '../InstallDependencies/InstallDependencies.ts'
 import * as Logger from '../Logger/Logger.ts'
 import * as Path from '../Path/Path.ts'
+import { preCacheRipgrep } from '../PreCacheRipgrep/PreCacheRipgrep.ts'
 import * as ResolveCommitHash from '../ResolveCommitHash/ResolveCommitHash.ts'
 import * as RunCompile from '../RunCompile/RunCompile.ts'
 
@@ -53,6 +54,18 @@ export const downloadAndBuildVscodeFromCommit = async (
   if (needsClone) {
     await CloneRepository.cloneRepository(repoUrl, repoPathWithCommitHash)
     await CheckoutCommit.checkoutCommit(repoPathWithCommitHash, commitHash)
+  }
+
+  // Pre-cache ripgrep binary after cloning but before installing dependencies
+  // This avoids GitHub API 403 errors during npm ci
+  if (needsInstall) {
+    Logger.log(`[repository] Pre-caching ripgrep binary before installing dependencies...`)
+    try {
+      await preCacheRipgrep()
+    } catch (error) {
+      Logger.log(`[repository] Warning: Failed to pre-cache ripgrep: ${error.message}`)
+      Logger.log(`[repository] Continuing with npm ci - may encounter GitHub API issues`)
+    }
   }
 
   if (needsInstall) {
