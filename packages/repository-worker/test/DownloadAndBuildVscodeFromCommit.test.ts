@@ -171,10 +171,7 @@ test.skip('downloadVscodeCommit - tests git clone operations with mocked execa',
   expect(mockMkdir).toHaveBeenCalledWith(reposDir)
 
   // Verify that cloneRepository was called
-  expect(mockCloneRepository).toHaveBeenCalledWith(testRepoUrl, repoPath)
-
-  // Verify that checkoutCommit was called
-  expect(mockCheckoutCommit).toHaveBeenCalledWith(repoPath, testCommitHash)
+  expect(mockCloneRepository).toHaveBeenCalledWith(testRepoUrl, repoPath, testCommitHash)
 
   // Verify that logger was called for installation and compilation
   expect(mockLog).toHaveBeenCalledWith(`[repository] Installing dependencies for commit ${testCommitHash}...`)

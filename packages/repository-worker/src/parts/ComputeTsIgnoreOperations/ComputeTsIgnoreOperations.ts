@@ -18,12 +18,12 @@ export const computeTsIgnoreOperations = async (
     const byFile = new Map<string, number[]>()
     for (const loc of locations) {
       const list = byFile.get(loc.file)
-      if (!list) {
-        byFile.set(loc.file, [loc.line])
-      } else {
+      if (list) {
         if (!list.includes(loc.line)) {
           list.push(loc.line)
         }
+      } else {
+        byFile.set(loc.file, [loc.line])
       }
     }
 

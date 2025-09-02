@@ -120,10 +120,10 @@ const handleAttachedToPage = async (message: DevToolsMessage): Promise<void> => 
       return
     }
 
-    const targetId = targetInfo.targetId
-    const type = targetInfo.type
-    const url = targetInfo.url
-    const browserContextId = targetInfo.browserContextId
+    const { targetId } = targetInfo
+    const { type } = targetInfo
+    const { url } = targetInfo
+    const { browserContextId } = targetInfo
 
     SessionState.addSession(sessionId, {
       type,
@@ -179,7 +179,7 @@ export const handleAttachedToTarget = (message: DevToolsMessage): void | Promise
   if (!targetInfo?.type) {
     return
   }
-  const type = targetInfo.type
+  const { type } = targetInfo
   switch (type) {
     case DevtoolsTargetType.Page:
       return handleAttachedToPage(message)
