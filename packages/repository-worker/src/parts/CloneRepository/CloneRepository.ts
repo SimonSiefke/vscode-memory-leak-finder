@@ -2,13 +2,8 @@ import { VError } from '@lvce-editor/verror'
 import { mkdir } from 'node:fs/promises'
 import { exec } from '../Exec/Exec.ts'
 
-/**
- * Clones a repository to a local directory
- * @param {string} repoUrl - The repository URL to clone
- * @param {string} repoPath - The local path where to clone the repository
- * @returns {Promise<void>}
- */
-export const cloneRepository = async (repoUrl:string, repoPath:string, commit:string) => {
+
+export const cloneRepository = async (repoUrl:string, repoPath:string, commit:string):Promise<void> => {
   try {
     await mkdir(repoPath, {recursive:true})
     await exec('git', ['init'], {cwd: repoPath})
