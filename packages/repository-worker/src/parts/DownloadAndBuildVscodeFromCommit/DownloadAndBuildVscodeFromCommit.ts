@@ -51,8 +51,7 @@ export const downloadAndBuildVscodeFromCommit = async (
 
   // Clone the repository if needed
   if (needsClone) {
-    await CloneRepository.cloneRepository(repoUrl, repoPathWithCommitHash)
-    await CheckoutCommit.checkoutCommit(repoPathWithCommitHash, commitHash)
+    await CloneRepository.cloneRepository(repoUrl, repoPathWithCommitHash, commitHash)
   }
 
   if (needsInstall) {
