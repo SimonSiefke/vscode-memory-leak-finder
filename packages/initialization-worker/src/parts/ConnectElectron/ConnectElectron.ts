@@ -49,17 +49,17 @@ export const connectElectron = async (electronRpc, headlessMode) => {
     objectId: electronObjectId,
   })
 
+  if (headlessMode) {
+    await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+      functionDeclaration: monkeyPatchElectronHeadlessMode,
+      objectId: electronObjectId,
+    })
+  }
+
   await Promise.all([
     MakeElectronAvailableGlobally.makeElectronAvailableGlobally(electronRpc, electronObjectId),
     MakeRequireAvailableGlobally.makeRequireAvailableGlobally(electronRpc, requireObjectId),
   ])
-
-  if (headlessMode) {
-    await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-      functionDeclaration: monkeyPatchElectronHeadlessMode,
-      objectId: requireObjectId,
-    })
-  }
 
   await DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc)
 
