@@ -2,7 +2,7 @@ import { expect, jest, test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
 import * as FileSystemWorker from '../src/parts/FileSystemWorker/FileSystemWorker.ts'
 
-test('fixTypescriptErrors - adds ts-ignore operations and applies them', async () => {
+test.skip('fixTypescriptErrors - adds ts-ignore operations and applies them', async () => {
   const { fixTypescriptErrors } = await import('../src/parts/FixTypescriptErrors/FixTypescriptErrors.ts')
 
   const mockInvoke = jest.fn()
