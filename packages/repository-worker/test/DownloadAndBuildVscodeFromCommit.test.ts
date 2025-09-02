@@ -171,7 +171,7 @@ test('downloadVscodeCommit - tests git clone operations with mocked execa', asyn
   expect(mockMkdir).toHaveBeenCalledWith(reposDir)
 
   // Verify that cloneRepository was called
-  expect(mockCloneRepository).toHaveBeenCalledWith(testRepoUrl, repoPath)
+  expect(mockCloneRepository).toHaveBeenCalledWith(testRepoUrl, repoPath, testCommitHash)
 
   // Verify that checkoutCommit was called
   expect(mockCheckoutCommit).toHaveBeenCalledWith(repoPath, testCommitHash)
