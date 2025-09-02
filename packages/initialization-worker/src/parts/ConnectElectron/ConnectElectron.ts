@@ -2,6 +2,7 @@ import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as MakeElectronAvailableGlobally from '../MakeElectronAvailableGlobally/MakeElectronAvailableGlobally.ts'
 import * as MakeRequireAvailableGlobally from '../MakeRequireAvailableGlobally/MakeRequireAvailableGlobally.ts'
+import { monkeyPatchElectronHeadlessMode } from '../MonkeyPatchElectronHeadlessMode/MonkeyPatchElectronHeadlessMode.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
 import { VError } from '../VError/VError.ts'
 
@@ -14,7 +15,7 @@ const waitForDebuggerToBePaused = async (rpc) => {
   }
 }
 
-export const connectElectron = async (electronRpc) => {
+export const connectElectron = async (electronRpc, headlessMode) => {
   const debuggerPausedPromise = waitForDebuggerToBePaused(electronRpc)
   await Promise.all([
     DevtoolsProtocolDebugger.enable(electronRpc),
@@ -37,7 +38,6 @@ export const connectElectron = async (electronRpc) => {
     generatePreview: true,
     includeCommandLineAPI: true,
   })
-  await DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc)
 
   const electronObjectId = electron.result.result.objectId
   const requireObjectId = require.result.result.objectId
@@ -53,6 +53,15 @@ export const connectElectron = async (electronRpc) => {
     MakeElectronAvailableGlobally.makeElectronAvailableGlobally(electronRpc, electronObjectId),
     MakeRequireAvailableGlobally.makeRequireAvailableGlobally(electronRpc, requireObjectId),
   ])
+
+  if (headlessMode) {
+    await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+      functionDeclaration: monkeyPatchElectronHeadlessMode,
+      objectId: requireObjectId,
+    })
+  }
+
+  await DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc)
 
   return {
     monkeyPatchedElectronId: monkeyPatchedElectron.objectId,
