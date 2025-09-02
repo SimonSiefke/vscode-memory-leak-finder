@@ -16,7 +16,7 @@ test('cloneRepository executes git clone command', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  await cloneRepository(repoUrl, repoPath)
+  await cloneRepository(repoUrl, repoPath, '')
 
   expect(mockInvoke).toHaveBeenCalled()
 })
@@ -36,7 +36,7 @@ test('cloneRepository throws VError when git clone fails', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  await expect(cloneRepository(repoUrl, repoPath)).rejects.toThrow(`Failed to clone repository from '${repoUrl}' to '${repoPath}'`)
+  await expect(cloneRepository(repoUrl, repoPath, '')).rejects.toThrow(`Failed to clone repository from '${repoUrl}' to '${repoPath}'`)
   expect(mockInvoke).toHaveBeenCalled()
 })
 
@@ -53,7 +53,7 @@ test('cloneRepository handles different repository URLs', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  await cloneRepository(repoUrl, repoPath)
+  await cloneRepository(repoUrl, repoPath, '')
 
   expect(mockInvoke).toHaveBeenCalled()
 })
@@ -71,7 +71,7 @@ test('cloneRepository handles different local paths', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  await cloneRepository(repoUrl, repoPath)
+  await cloneRepository(repoUrl, repoPath, '')
 
   expect(mockInvoke).toHaveBeenCalled()
 })
