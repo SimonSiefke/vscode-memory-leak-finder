@@ -5,7 +5,7 @@ import * as TargetState from '../TargetState/TargetState.ts'
 export const waitForPage = async ({ index }: { readonly index: number }): Promise<any> => {
   const target = await TargetState.waitForTarget({ type: DevtoolsTargetType.Page, index })
   const session = SessionState.getSession(target.sessionId)
-  const rpc = session.rpc
+  const { rpc } = session
   return {
     sessionId: target.sessionId,
     targetId: target.targetId,
