@@ -1,6 +1,5 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as CacheNodeModules from '../CacheNodeModules/CacheNodeModules.ts'
-import * as CheckoutCommit from '../CheckoutCommit/CheckoutCommit.ts'
 import * as CloneRepository from '../CloneRepository/CloneRepository.ts'
 import { computeVscodeNodeModulesCacheKey } from '../ComputeVscodeNodeModulesCacheKey/ComputeVscodeNodeModulesCacheKey.ts'
 import * as SetupNodeModulesFromCache from '../CopyNodeModulesFromCacheToRepositoryFolder/CopyNodeModulesFromCacheToRepositoryFolder.ts'
