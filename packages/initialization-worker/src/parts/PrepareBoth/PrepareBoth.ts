@@ -9,7 +9,16 @@ import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyP
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
 
-export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, connectionId, isFirstConnection, canUseIdleCallback) => {
+export const prepareBoth = async (
+  headlessMode: boolean,
+  cwd: string,
+  ide: string,
+  vscodePath: string,
+  commit: string,
+  connectionId: number,
+  isFirstConnection: boolean,
+  canUseIdleCallback: boolean,
+): Promise<any> => {
   const { child, webSocketUrl, parsedVersion } = await LaunchIde.launchIde({
     headlessMode,
     cwd,
@@ -30,6 +39,10 @@ export const prepareBoth = async (headlessMode, cwd, ide, vscodePath, commit, co
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
 
   const connectDevtoolsPromise = connectDevtools(devtoolsWebSocketUrl, TimeoutConstants.AttachToPage)
+
+  if (headlessMode) {
+    console.log('headldessmode')
+  }
 
   await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
     functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
