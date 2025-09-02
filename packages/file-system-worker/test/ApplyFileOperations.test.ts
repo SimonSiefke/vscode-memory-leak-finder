@@ -3,11 +3,13 @@ import { beforeEach, expect, jest, test } from '@jest/globals'
 const mockCopy = jest.fn()
 const mockMakeDirectory = jest.fn()
 const mockRemove = jest.fn()
+const mockWriteFileContent = jest.fn()
 
 jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.ts', () => ({
   copy: mockCopy,
   makeDirectory: mockMakeDirectory,
   remove: mockRemove,
+  writeFileContent: mockWriteFileContent,
 }))
 
 let applyFileOperationsModule
@@ -28,6 +30,7 @@ test('applyFileOperations handles empty array gracefully', async () => {
   expect(mockCopy).not.toHaveBeenCalled()
   expect(mockMakeDirectory).not.toHaveBeenCalled()
   expect(mockRemove).not.toHaveBeenCalled()
+  expect(mockWriteFileContent).not.toHaveBeenCalled()
 })
 
 test('applyFileOperations - applies copy operation', async () => {
@@ -77,6 +80,23 @@ test('applyFileOperations - applies remove operation', async () => {
 
   expect(mockRemove).toHaveBeenCalledWith('/path/to/file.txt', { recursive: true })
   expect(mockRemove).toHaveBeenCalledTimes(1)
+})
+
+test('applyFileOperations - applies write operation', async () => {
+  mockWriteFileContent.mockReturnValue(undefined)
+
+  const operations = [
+    {
+      type: 'write',
+      path: '/path/to/file.ts',
+      content: 'new content',
+    },
+  ]
+
+  await applyFileOperationsModule.applyFileOperations(operations)
+
+  expect(mockWriteFileContent).toHaveBeenCalledWith('/path/to/file.ts', 'new content', 'utf8')
+  expect(mockWriteFileContent).toHaveBeenCalledTimes(1)
 })
 
 test('applyFileOperations - applies multiple operations in sequence', async () => {
