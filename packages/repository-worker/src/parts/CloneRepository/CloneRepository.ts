@@ -7,7 +7,7 @@ export const cloneRepository = async (repoUrl:string, repoPath:string, commit:st
   try {
     await mkdir(repoPath, {recursive:true})
     await exec('git', ['init'], {cwd: repoPath})
-    await exec('git', ['remote', 'add', 'origin', 'repoUrl'], {cwd:repoPath})
+    await exec('git', ['remote', 'add', 'origin', repoUrl], {cwd:repoPath})
     await exec('git',['fetch', '--depth', '1', 'origin', commit], {cwd:repoPath})
   } catch (error) {
     throw new VError(error, `Failed to clone repository from '${repoUrl}' to '${repoPath}'`)
