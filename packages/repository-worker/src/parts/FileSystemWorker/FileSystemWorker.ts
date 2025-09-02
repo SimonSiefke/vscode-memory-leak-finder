@@ -6,6 +6,14 @@ export const set = (rpc) => {
   state.rpc = rpc
 }
 
+export const dispose = async () => {
+  if (state.rpc) {
+    // @ts-ignore
+    await state.rpc.dispose()
+    state.rpc = undefined
+  }
+}
+
 const invoke = (method, ...params) => {
   if (!state.rpc) {
     throw new Error('must initialize filesystem worker')

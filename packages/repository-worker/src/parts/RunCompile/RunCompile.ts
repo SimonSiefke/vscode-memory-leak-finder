@@ -6,11 +6,18 @@ import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
  * @param {string} cwd - The working directory to run npm run compile in
  * @param {boolean} useNice - Whether to use nice command for resource management
  */
-export const runCompile = async (cwd, useNice, mainJsPath) => {
+export const runCompile = async (cwd: string, useNice: boolean, mainJsPath: string) => {
+  let result
   if (useNice) {
-    await exec('nice', ['-n', '10', 'npm', 'run', 'compile'], { cwd })
+    result = await exec('nice', ['-n', '10', 'npm', 'run', 'compile'], { cwd, reject: false })
   } else {
-    await exec('npm', ['run', 'compile'], { cwd })
+    result = await exec('npm', ['run', 'compile'], { cwd, reject: false })
+  }
+
+  if (result.exitCode) {
+    console.log(`[repository] tsc exitCode: ${result.exitCode}`)
+    console.log(`[repository] tsc stdout: ${result.stdout}`)
+    console.log(`[repository] tsc stderr: ${result.stderr}`)
   }
 
   // Verify build was successful

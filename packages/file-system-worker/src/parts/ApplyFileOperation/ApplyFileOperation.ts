@@ -1,5 +1,5 @@
 import { VError } from '@lvce-editor/verror'
-import { copy, makeDirectory, remove } from '../Filesystem/Filesystem.ts'
+import { copy, makeDirectory, remove, writeFileContent } from '../Filesystem/Filesystem.ts'
 
 export interface CopyOperation {
   readonly type: 'copy'
@@ -17,7 +17,13 @@ export interface RemoveOperation {
   readonly from: string
 }
 
-export type FileOperation = CopyOperation | MkdirOperation | RemoveOperation
+export interface WriteOperation {
+  readonly type: 'write'
+  readonly path: string
+  readonly content: string
+}
+
+export type FileOperation = CopyOperation | MkdirOperation | RemoveOperation | WriteOperation
 
 export const applyFileOperation = async (operation: FileOperation): Promise<void> => {
   try {
@@ -40,6 +46,12 @@ export const applyFileOperation = async (operation: FileOperation): Promise<void
       case 'mkdir': {
         const { path } = operation
         await makeDirectory(path, { recursive: true })
+        break
+      }
+
+      case 'write': {
+        const { path, content } = operation
+        await writeFileContent(path, content, 'utf8')
         break
       }
     }
