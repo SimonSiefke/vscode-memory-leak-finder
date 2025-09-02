@@ -1,8 +1,8 @@
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
-import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
 import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
 import { DevtoolsProtocolRuntime, DevtoolsProtocolTarget, DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
 import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEvent.ts'
 
 export const connectDevtools = async (devtoolsWebSocketUrl: string, attachedToPageTimeout: number): Promise<void> => {
@@ -28,7 +28,7 @@ export const connectDevtools = async (devtoolsWebSocketUrl: string, attachedToPa
     throw new Error(`Failed to attach to page`)
   }
 
-  const sessionId = event.params.sessionId
+  const { sessionId } = event.params
 
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
 

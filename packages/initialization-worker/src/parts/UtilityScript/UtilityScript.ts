@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import * as Root from '../Root/Root.ts'
 import * as LaunchFileSystemWorker from '../LaunchFileSystemWorker/LaunchFileSystemWorker.ts'
+import * as Root from '../Root/Root.ts'
 
 const utiltyScriptPath = join(Root.root, 'packages', 'injected-code', 'dist', 'injectedCode.js')
 
