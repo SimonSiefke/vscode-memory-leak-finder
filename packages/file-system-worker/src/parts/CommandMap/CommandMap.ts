@@ -1,6 +1,6 @@
 import { applyFileOperations } from '../ApplyFileOperations/ApplyFileOperations.ts'
 import { exec } from '../Exec/Exec.ts'
-import { findFiles, pathExists, readFileContent, makeDirectory } from '../Filesystem/Filesystem.ts'
+import { findFiles, pathExists, readFileContent, makeDirectory, writeFileContent } from '../Filesystem/Filesystem.ts'
 
 export const commandMap: Record<string, (...args: any[]) => any> = {
   'FileSystem.applyFileOperations': applyFileOperations,
@@ -9,4 +9,5 @@ export const commandMap: Record<string, (...args: any[]) => any> = {
   'FileSystem.findFiles': findFiles,
   'FileSystem.makeDirectory': makeDirectory,
   'FileSystem.readFileContent': readFileContent,
+  'FileSystem.writeFileContent': writeFileContent,
 }

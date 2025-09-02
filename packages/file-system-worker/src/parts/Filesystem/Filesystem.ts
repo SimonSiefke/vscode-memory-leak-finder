@@ -1,4 +1,4 @@
-import { cp, mkdir, rm, readFile, glob } from 'node:fs/promises'
+import { cp, mkdir, rm, readFile, writeFile, glob } from 'node:fs/promises'
 
 // TODO maybe move this to filesystem worker to make testing easier
 
@@ -35,6 +35,10 @@ export const remove = async (path: string, options: RemoveOptions = { recursive:
 
 export const readFileContent = async (path: string, encoding: BufferEncoding = 'utf8'): Promise<string> => {
   return await readFile(path, { encoding })
+}
+
+export const writeFileContent = async (path: string, content: string, encoding: BufferEncoding = 'utf8'): Promise<void> => {
+  await writeFile(path, content, { encoding })
 }
 
 export const findFiles = async (pattern: string, options: GlobOptions = {}): Promise<readonly string[]> => {
