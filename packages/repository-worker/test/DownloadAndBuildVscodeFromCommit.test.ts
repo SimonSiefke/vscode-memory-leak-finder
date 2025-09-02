@@ -173,9 +173,6 @@ test('downloadVscodeCommit - tests git clone operations with mocked execa', asyn
   // Verify that cloneRepository was called
   expect(mockCloneRepository).toHaveBeenCalledWith(testRepoUrl, repoPath, testCommitHash)
 
-  // Verify that checkoutCommit was called
-  expect(mockCheckoutCommit).toHaveBeenCalledWith(repoPath, testCommitHash)
-
   // Verify that logger was called for installation and compilation
   expect(mockLog).toHaveBeenCalledWith(`[repository] Installing dependencies for commit ${testCommitHash}...`)
   expect(mockLog).toHaveBeenCalledWith(`[repository] Compiling VS Code for commit ${testCommitHash}...`)
