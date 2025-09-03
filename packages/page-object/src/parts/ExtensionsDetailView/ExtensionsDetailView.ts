@@ -65,7 +65,9 @@ export const create = ({ expect, page, VError }) => {
         if (options && options.webView) {
           const webView = page.locator('.webview')
           await expect(webView).toBeVisible()
-          await expect(webView).toHaveClass('ready')
+          await expect(webView).toHaveClass('ready', {
+            timeout: options?.timeout,
+          })
         } else if (options) {
           const webView = page.locator('.webview')
           await expect(webView).toBeHidden()
