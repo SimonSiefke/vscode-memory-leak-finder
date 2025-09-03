@@ -83,7 +83,7 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
   before: Snapshot,
   after: Snapshot,
   options: CompareFunctionsOptions,
-): Promise<readonly CompareResult[]> => {
+): Promise<readonly any[]> => {
   const minCount = options.minCount || 0
   const { itemsPerLocation, scriptIdOffset, lineOffset, columnOffset, objectIndexOffset } = getLocationFieldOffsets(
     after.meta.location_fields,
@@ -91,7 +91,6 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
   const nodeNameOffset = after.meta.node_fields.indexOf('name')
   const map1 = getUniqueLocationMap2(before)
   const map2 = getUniqueLocationMap2(after)
-  console.log('loc1', before.locations.length, after.locations.length)
   const newItems = getNewItems(map1, map2, minCount)
   const formattedItems = formatUniqueLocations(
     newItems,
@@ -123,5 +122,15 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
     })
   }
   const sorted = enriched.toSorted((a, b) => b.count - a.count)
-  return sorted
+  const cleanItems = sorted.map((item) => {
+    return {
+      count: item.count,
+      delta: item.delta,
+      name: item.name,
+      sourceLocation: item.sourceLocation,
+      originalLocation: item.originalLocation,
+      originalName: item.originalName,
+    }
+  })
+  return cleanItems
 }

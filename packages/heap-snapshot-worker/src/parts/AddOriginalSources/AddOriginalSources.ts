@@ -114,15 +114,5 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
     // ignore sourcemap resolution errors
   }
 
-  const cleanItems = enriched.map((item) => {
-    return {
-      count: item.count,
-      delta: item.delta,
-      name: item.name,
-      sourceLocation: item.sourceLocation,
-      originalLocation: item.originalLocation,
-      originalName: item.originalName,
-    }
-  })
-  return cleanItems
+  return enriched
 }
