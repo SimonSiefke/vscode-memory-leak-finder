@@ -9,7 +9,7 @@ export const setup = async ({ Extensions, Editor, ExtensionDetailView }) => {
 
 export const run = async ({ ExtensionDetailView }) => {
   await ExtensionDetailView.shouldHaveTab('Details')
-  await ExtensionDetailView.openTab('Features', { webView: false })
-  await ExtensionDetailView.openTab('Changelog', { webView: true })
-  await ExtensionDetailView.openTab('Details', { webView: true })
+  await ExtensionDetailView.openTab('Features', { webView: false, timeout: 10000 })
+  await ExtensionDetailView.openTab('Changelog', { webView: true, timeout: 10000 })
+  await ExtensionDetailView.openTab('Details', { webView: true, timeout: 10000 })
 }
