@@ -55,15 +55,15 @@ test('resolveCommitHash - handles fork commit format', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  const result = await resolveCommitHash('https://github.com/microsoft/vscode.git', 'SimonSiefke/abcddwhde21')
+  const result = await resolveCommitHash('https://github.com/microsoft/vscode.git', 'testUser/abcddwhde21')
   expect(result).toEqual({
-    owner: 'SimonSiefke',
+    owner: 'testUser',
     commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd',
   })
   expect(mockInvoke).toHaveBeenCalledWith(
     'FileSystem.exec',
     'git',
-    ['ls-remote', 'https://github.com/SimonSiefke/vscode.git', 'abcddwhde21'],
+    ['ls-remote', 'https://github.com/testUser/vscode.git', 'abcddwhde21'],
     {},
   )
 })
@@ -135,15 +135,15 @@ test('resolveCommitHash - handles fork commit format', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  const result = await resolveCommitHash('https://github.com/microsoft/vscode.git', 'SimonSiefke/abcddwhde21')
+  const result = await resolveCommitHash('https://github.com/microsoft/vscode.git', 'testUser/abcddwhde21')
   expect(result).toEqual({
-    owner: 'SimonSiefke',
+    owner: 'testUser',
     commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd',
   })
   expect(mockInvoke).toHaveBeenCalledWith(
     'FileSystem.exec',
     'git',
-    ['ls-remote', 'https://github.com/SimonSiefke/vscode.git', 'abcddwhde21'],
+    ['ls-remote', 'https://github.com/testUser/vscode.git', 'abcddwhde21'],
     {},
   )
 })
@@ -212,15 +212,15 @@ test('resolveCommitHash - handles fork commit format', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  const result = await resolveCommitHash('https://github.com/microsoft/vscode.git', 'SimonSiefke/abcddwhde21')
+  const result = await resolveCommitHash('https://github.com/microsoft/vscode.git', 'testUser/abcddwhde21')
   expect(result).toEqual({
-    owner: 'SimonSiefke',
+    owner: 'testUser',
     commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd',
   })
   expect(mockInvoke).toHaveBeenCalledWith(
     'FileSystem.exec',
     'git',
-    ['ls-remote', 'https://github.com/SimonSiefke/vscode.git', 'abcddwhde21'],
+    ['ls-remote', 'https://github.com/testUser/vscode.git', 'abcddwhde21'],
     {},
   )
 })
@@ -275,15 +275,15 @@ test('resolveCommitHash - handles fork commit format', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  const result = await resolveCommitHash('https://github.com/microsoft/vscode.git', 'SimonSiefke/abcddwhde21')
+  const result = await resolveCommitHash('https://github.com/microsoft/vscode.git', 'testUser/abcddwhde21')
   expect(result).toEqual({
-    owner: 'SimonSiefke',
+    owner: 'testUser',
     commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd',
   })
   expect(mockInvoke).toHaveBeenCalledWith(
     'FileSystem.exec',
     'git',
-    ['ls-remote', 'https://github.com/SimonSiefke/vscode.git', 'abcddwhde21'],
+    ['ls-remote', 'https://github.com/testUser/vscode.git', 'abcddwhde21'],
     {},
   )
 })
