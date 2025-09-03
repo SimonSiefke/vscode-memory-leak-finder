@@ -15,7 +15,7 @@ const isNeededNodeModules = (path: string): boolean => {
   return true
 }
 
-export const moveNodeModulesToCache = async (repoPath: string, commitHash: string, cacheDir: string, nodeModulesHash:string ) => {
+export const moveNodeModulesToCache = async (repoPath: string, commitHash: string, cacheDir: string, nodeModulesHash: string) => {
   try {
     const cachedNodeModulesPath = Path.join(cacheDir, nodeModulesHash)
     const allNodeModulesPaths = await FileSystemWorker.findFiles('**/node_modules', { cwd: repoPath })
