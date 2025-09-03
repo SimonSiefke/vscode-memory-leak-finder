@@ -58,8 +58,10 @@ export const resolveCommitHash = async (baseRepoUrl: string | null, commitRef: s
       }
     }
 
+    const repoUrl = `https://github.com/${owner}/vscode.git`
+
     // Resolve the commit reference to a full hash
-    const result = await exec('git', ['ls-remote', actualRepoUrl, actualCommitRef])
+    const result = await exec('git', ['ls-remote', repoUrl, actualCommitRef])
     const resolvedHash = parseCommitHash(result.stdout, actualCommitRef)
 
     return {

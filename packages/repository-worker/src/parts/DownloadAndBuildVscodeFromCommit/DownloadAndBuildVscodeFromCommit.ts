@@ -14,19 +14,19 @@ import * as RunCompile from '../RunCompile/RunCompile.ts'
 
 export const downloadAndBuildVscodeFromCommit = async (
   commitRef: string,
-  repoUrl: string,
+  _repoUrl: string,
   reposDir: string,
   nodeModulesCacheDir: string,
   useNice: boolean,
 ) => {
   Assert.string(commitRef)
-  Assert.string(repoUrl)
+  // Assert.string(repoUrl)
   Assert.string(reposDir)
   Assert.string(nodeModulesCacheDir)
   Assert.boolean(useNice)
 
   // Resolve the commit reference to get repository URL and commit hash
-  const { owner, commitHash } = await ResolveCommitHash.resolveCommitHash(repoUrl, commitRef)
+  const { owner, commitHash } = await ResolveCommitHash.resolveCommitHash(_repoUrl, commitRef)
 
   const repoPathWithCommitHash = Path.join(reposDir, commitHash)
 
@@ -63,7 +63,9 @@ export const downloadAndBuildVscodeFromCommit = async (
 
   // Clone the repository if needed
   if (needsClone) {
-    await CloneRepository.cloneRepository(actualRepoUrl, repoPathWithCommitHash, commitHash)
+    const repoUrl = `https://github.com/${owner}/vscode.git`
+
+    await CloneRepository.cloneRepository(repoUrl, repoPathWithCommitHash, commitHash)
   }
 
   // Pre-cache ripgrep binary after cloning but before installing dependencies
