@@ -587,6 +587,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await quickPick.executeCommand(WellKnownCommands.SourceAction)
         await expect(overlayMessage).toBeVisible()
         await expect(overlayMessage).toHaveText('No source actions available')
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show empty source action`)
       }
@@ -597,6 +598,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await expect(overlayMessage).toBeVisible()
         await page.waitForIdle()
         await page.keyboard.press('Escape')
+        await page.waitForIdle()
         await expect(overlayMessage).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to hide empty source action`)
