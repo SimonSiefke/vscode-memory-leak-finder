@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { getRegexCountFromHeapSnapshotInternal } from '../src/parts/GetRegexCountFromHeapSnapshotInternal/GetRegexCountFromHeapSnapshotInternal.js'
-import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('should count regexp objects from heap snapshot', () => {
   // prettier-ignore

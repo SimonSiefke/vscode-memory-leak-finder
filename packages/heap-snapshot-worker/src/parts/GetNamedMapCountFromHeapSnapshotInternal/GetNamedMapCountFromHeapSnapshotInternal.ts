@@ -1,4 +1,4 @@
-import { Snapshot } from '../Snapshot/Snapshot.ts'
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 export interface MapNode {
   readonly nodeIndex: number

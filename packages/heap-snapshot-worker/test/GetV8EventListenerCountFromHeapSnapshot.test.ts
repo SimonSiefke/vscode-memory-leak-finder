@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { getV8EventListenerCountFromHeapSnapshotInternal } from '../src/parts/GetV8EventListenerCountFromHeapSnapshotInternal/GetV8EventListenerCountFromHeapSnapshotInternal.js'
-import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('should count V8EventListener objects from heap snapshot', () => {
   // prettier-ignore
