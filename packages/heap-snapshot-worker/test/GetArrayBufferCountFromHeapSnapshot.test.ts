@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { getArrayBufferCountFromHeapSnapshotInternal } from '../src/parts/GetArrayBufferCountFromHeapSnapshotInternal/GetArrayBufferCountFromHeapSnapshotInternal.js'
-import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 // TODO
 test.skip('should count array buffer count objects from heap snapshot', () => {
