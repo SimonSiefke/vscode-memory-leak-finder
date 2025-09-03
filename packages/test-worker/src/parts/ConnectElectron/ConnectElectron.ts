@@ -5,7 +5,13 @@ import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.ts'
 
-export const connectElectron = async (connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback) => {
+export const connectElectron = async (
+  connectionId: number,
+  headlessMode: boolean,
+  webSocketUrl: string,
+  isFirstConnection: boolean,
+  canUseIdleCallback: boolean,
+) => {
   Assert.number(connectionId)
   Assert.boolean(headlessMode)
   Assert.string(webSocketUrl)
