@@ -121,6 +121,7 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
       name: item.name,
       sourceLocation: item.sourceLocation,
       originalLocation: item.originalLocation,
+      originalName: item.originalName,
     }
   })
   return cleanItems
