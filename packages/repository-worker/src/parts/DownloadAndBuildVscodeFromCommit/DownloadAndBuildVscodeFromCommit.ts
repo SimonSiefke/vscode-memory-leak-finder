@@ -14,18 +14,20 @@ import * as RunCompile from '../RunCompile/RunCompile.ts'
 
 export const downloadAndBuildVscodeFromCommit = async (
   commitRef: string,
-  repoUrl: string,
+  _repoUrl: string,
   reposDir: string,
   nodeModulesCacheDir: string,
   useNice: boolean,
 ) => {
   Assert.string(commitRef)
-  Assert.string(repoUrl)
+  // Assert.string(repoUrl)
   Assert.string(reposDir)
   Assert.string(nodeModulesCacheDir)
   Assert.boolean(useNice)
-  // Resolve the commit reference to an actual commit hash
-  const commitHash = await ResolveCommitHash.resolveCommitHash(repoUrl, commitRef)
+
+  // Resolve the commit reference to get repository URL and commit hash
+  const { owner, commitHash } = await ResolveCommitHash.resolveCommitHash(_repoUrl, commitRef)
+
   const repoPathWithCommitHash = Path.join(reposDir, commitHash)
 
   // Create parent directory if it doesn't exist
@@ -49,8 +51,20 @@ export const downloadAndBuildVscodeFromCommit = async (
     await FileSystemWorker.makeDirectory(reposDir)
   }
 
+  // For fork commits, ensure the owner directory exists
+  if (commitRef.includes('/') && !commitRef.startsWith('http')) {
+    const owner = commitRef.split('/')[0]
+    const ownerDir = Path.join(reposDir, owner)
+    const existsOwnerDir = await FileSystemWorker.pathExists(ownerDir)
+    if (!existsOwnerDir) {
+      await FileSystemWorker.makeDirectory(ownerDir)
+    }
+  }
+
   // Clone the repository if needed
   if (needsClone) {
+    const repoUrl = `https://github.com/${owner}/vscode.git`
+
     await CloneRepository.cloneRepository(repoUrl, repoPathWithCommitHash, commitHash)
   }
 
@@ -83,7 +97,7 @@ export const downloadAndBuildVscodeFromCommit = async (
       //     repoPathWithCommitHash, item
       //   ), {force:true})
       // }
-      await CacheNodeModules.moveNodeModulesToCache(repoPathWithCommitHash, commitHash, nodeModulesCacheDir)
+      await CacheNodeModules.moveNodeModulesToCache(repoPathWithCommitHash, commitHash, nodeModulesCacheDir, nodeModulesHash)
     }
   } else if (!existsMainJsPath) {
     Logger.log(`[repository] node_modules already exists in repo for commit ${commitHash}, skipping npm ci...`)
