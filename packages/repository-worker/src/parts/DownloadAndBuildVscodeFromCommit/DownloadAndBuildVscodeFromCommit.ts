@@ -34,7 +34,7 @@ export const downloadAndBuildVscodeFromCommit = async (
   const existsReposDir = await FileSystemWorker.pathExists(reposDir)
 
   // Check what's needed at the start
-  const mainJsPath = Path.join(repoPathWithCommitHash, 'out', 'main.ts')
+  const mainJsPath = Path.join(repoPathWithCommitHash, 'out', 'main.js')
   const nodeModulesPath = Path.join(repoPathWithCommitHash, 'node_modules')
   const outPath = Path.join(repoPathWithCommitHash, 'out')
 
