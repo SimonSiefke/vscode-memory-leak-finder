@@ -11,7 +11,7 @@ import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.ts'
 import * as SessionState from '../SessionState/SessionState.ts'
 
 export const connectDevtools = async (
-  connectionId: string,
+  connectionId: number,
   devtoolsWebSocketUrl: string,
   electronObjectId: string,
   isFirstConnection: boolean,
