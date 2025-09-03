@@ -17,9 +17,9 @@ test('resolveCommitHash - returns commitRef when it is already a full commit has
   })
   FileSystemWorker.set(mockRpc)
 
-  const result = await resolveCommitHash('https://github.com/test/repo.git', fullCommitHash)
+  const result = await resolveCommitHash('https://github.com/microsoft/vscode.git', fullCommitHash)
   expect(result).toEqual({
-    repoUrl: 'https://github.com/test/repo.git',
+    owner: 'microsoft',
     commitHash: fullCommitHash,
   })
   expect(mockInvoke).not.toHaveBeenCalled()
@@ -36,12 +36,12 @@ test('resolveCommitHash - resolves branch name to commit hash', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  const result = await resolveCommitHash('https://github.com/test/repo.git', 'main')
+  const result = await resolveCommitHash('https://github.com/microsoft/vscode.git', 'main')
   expect(result).toEqual({
-    repoUrl: 'https://github.com/test/repo.git',
+    owner: 'microsoft',
     commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd',
   })
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/test/repo.git', 'main'], {})
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/microsoft/vscode.git', 'main'], {})
 })
 
 test('resolveCommitHash - handles fork commit format', async () => {
@@ -57,7 +57,7 @@ test('resolveCommitHash - handles fork commit format', async () => {
 
   const result = await resolveCommitHash('https://github.com/microsoft/vscode.git', 'SimonSiefke/abcddwhde21')
   expect(result).toEqual({
-    repoUrl: 'https://github.com/SimonSiefke/vscode.git',
+    owner: 'SimonSiefke',
     commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd',
   })
   expect(mockInvoke).toHaveBeenCalledWith(
@@ -81,7 +81,7 @@ test('resolveCommitHash - uses default repository when null provided', async () 
 
   const result = await resolveCommitHash(null, 'main')
   expect(result).toEqual({
-    repoUrl: 'https://github.com/microsoft/vscode.git',
+    owner: 'microsoft',
     commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd',
   })
   expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/microsoft/vscode.git', 'main'], {})
@@ -97,11 +97,13 @@ test('resolveCommitHash - throws error when no commit found', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  await expect(resolveCommitHash('https://github.com/test/repo.git', 'nonexistent-branch')).rejects.toThrow('No commit found for reference')
+  await expect(resolveCommitHash('https://github.com/microsoft/vscode.git', 'nonexistent-branch')).rejects.toThrow(
+    'No commit found for reference',
+  )
   expect(mockInvoke).toHaveBeenCalledWith(
     'FileSystem.exec',
     'git',
-    ['ls-remote', 'https://github.com/test/repo.git', 'nonexistent-branch'],
+    ['ls-remote', 'https://github.com/microsoft/vscode.git', 'nonexistent-branch'],
     {},
   )
 })
@@ -118,8 +120,8 @@ test('resolveCommitHash - throws error when git ls-remote fails', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  await expect(resolveCommitHash('https://github.com/test/repo.git', 'main')).rejects.toThrow('Failed to resolve commit reference')
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/test/repo.git', 'main'], {})
+  await expect(resolveCommitHash('https://github.com/microsoft/vscode.git', 'main')).rejects.toThrow('Failed to resolve commit reference')
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/microsoft/vscode.git', 'main'], {})
 })
 
 test('resolveCommitHash - handles fork commit format', async () => {
@@ -159,7 +161,7 @@ test('resolveCommitHash - uses default repository when null provided', async () 
 
   const result = await resolveCommitHash(null, 'main')
   expect(result).toEqual({
-    repoUrl: 'https://github.com/microsoft/vscode.git',
+    owner: 'microsoft',
     commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd',
   })
   expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/microsoft/vscode.git', 'main'], {})
@@ -176,12 +178,12 @@ test('resolveCommitHash - resolves tag to commit hash', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  const result = await resolveCommitHash('https://github.com/test/repo.git', 'v1.0.0')
+  const result = await resolveCommitHash('https://github.com/microsoft/vscode.git', 'v1.0.0')
   expect(result).toEqual({
-    repoUrl: 'https://github.com/test/repo.git',
+    owner: 'microsoft',
     commitHash: 'b2c3d4e5f6789012345678901234567890abcde1',
   })
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/test/repo.git', 'v1.0.0'], {})
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/microsoft/vscode.git', 'v1.0.0'], {})
 })
 
 test('resolveCommitHash - throws error when invalid commit hash returned', async () => {
@@ -195,8 +197,8 @@ test('resolveCommitHash - throws error when invalid commit hash returned', async
   })
   FileSystemWorker.set(mockRpc)
 
-  await expect(resolveCommitHash('https://github.com/test/repo.git', 'main')).rejects.toThrow('Invalid commit hash resolved')
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/test/repo.git', 'main'], {})
+  await expect(resolveCommitHash('https://github.com/microsoft/vscode.git', 'main')).rejects.toThrow('Invalid commit hash resolved')
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/microsoft/vscode.git', 'main'], {})
 })
 
 test('resolveCommitHash - handles fork commit format', async () => {
@@ -236,7 +238,7 @@ test('resolveCommitHash - uses default repository when null provided', async () 
 
   const result = await resolveCommitHash(null, 'main')
   expect(result).toEqual({
-    repoUrl: 'https://github.com/microsoft/vscode.git',
+    owner: 'microsoft',
     commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd',
   })
   expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/microsoft/vscode.git', 'main'], {})
@@ -254,12 +256,12 @@ test('resolveCommitHash - handles multiple lines and takes first result', async 
   })
   FileSystemWorker.set(mockRpc)
 
-  const result = await resolveCommitHash('https://github.com/test/repo.git', 'main')
+  const result = await resolveCommitHash('https://github.com/microsoft/vscode.git', 'main')
   expect(result).toEqual({
-    repoUrl: 'https://github.com/test/repo.git',
+    owner: 'microsoft',
     commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd',
   })
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/test/repo.git', 'main'], {})
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/microsoft/vscode.git', 'main'], {})
 })
 
 test('resolveCommitHash - handles fork commit format', async () => {
@@ -299,7 +301,7 @@ test('resolveCommitHash - uses default repository when null provided', async () 
 
   const result = await resolveCommitHash(null, 'main')
   expect(result).toEqual({
-    repoUrl: 'https://github.com/microsoft/vscode.git',
+    owner: 'microsoft',
     commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd',
   })
   expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/microsoft/vscode.git', 'main'], {})
@@ -335,6 +337,11 @@ test('resolveCommitHash - handles short commit hash input', async () => {
   })
   FileSystemWorker.set(mockRpc)
 
-  await expect(resolveCommitHash('https://github.com/test/repo.git', shortHash)).rejects.toThrow('No commit found for reference')
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/test/repo.git', 'a1b2c3d4'], {})
+  await expect(resolveCommitHash('https://github.com/microsoft/vscode.git', shortHash)).rejects.toThrow('No commit found for reference')
+  expect(mockInvoke).toHaveBeenCalledWith(
+    'FileSystem.exec',
+    'git',
+    ['ls-remote', 'https://github.com/microsoft/vscode.git', 'a1b2c3d4'],
+    {},
+  )
 })
