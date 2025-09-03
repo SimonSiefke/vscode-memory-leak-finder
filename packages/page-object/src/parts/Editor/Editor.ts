@@ -19,8 +19,8 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         const tab = page.locator('.tab', { hasText: fileName })
         await expect(tab).toBeVisible()
         if (isNotebook(fileName)) {
-          const editor = page.locator('.notebook-editor')
-          const list = editor.locator('.monaco-list.element-focused')
+          const notebookEditor = page.locator('.notebook-editor')
+          const list = notebookEditor.locator('.monaco-list')
           await page.waitForIdle()
           await expect(list).toBeFocused()
         } else {
