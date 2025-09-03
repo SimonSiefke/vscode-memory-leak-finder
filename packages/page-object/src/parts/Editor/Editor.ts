@@ -21,6 +21,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         if (isNotebook(fileName)) {
           const editor = page.locator('.notebook-editor')
           const list = editor.locator('.monaco-list.element-focused')
+          await page.waitForIdle()
           await expect(list).toBeFocused()
         } else {
           const editor = page.locator('.editor-instance')
