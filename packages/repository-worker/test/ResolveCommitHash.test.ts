@@ -18,7 +18,10 @@ test('resolveCommitHash - returns commitRef when it is already a full commit has
   FileSystemWorker.set(mockRpc)
 
   const result = await resolveCommitHash('https://github.com/test/repo.git', fullCommitHash)
-  expect(result).toBe(fullCommitHash)
+  expect(result).toEqual({
+    repoUrl: 'https://github.com/test/repo.git',
+    commitHash: fullCommitHash
+  })
   expect(mockInvoke).not.toHaveBeenCalled()
 })
 
@@ -34,8 +37,49 @@ test('resolveCommitHash - resolves branch name to commit hash', async () => {
   FileSystemWorker.set(mockRpc)
 
   const result = await resolveCommitHash('https://github.com/test/repo.git', 'main')
-  expect(result).toBe('a1b2c3d4e5f6789012345678901234567890abcd')
+  expect(result).toEqual({
+    repoUrl: 'https://github.com/test/repo.git',
+    commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd'
+  })
   expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/test/repo.git', 'main'], {})
+})
+
+test('resolveCommitHash - handles fork commit format', async () => {
+  const mockStdout = 'a1b2c3d4e5f6789012345678901234567890abcd\trefs/heads/main\n'
+  const mockInvoke = jest.fn()
+  mockInvoke.mockReturnValue({ stdout: mockStdout, stderr: '' })
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: mockInvoke,
+  })
+  FileSystemWorker.set(mockRpc)
+
+  const result = await resolveCommitHash('https://github.com/microsoft/vscode.git', 'SimonSiefke/abcddwhde21')
+  expect(result).toEqual({
+    repoUrl: 'https://github.com/SimonSiefke/vscode.git',
+    commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd'
+  })
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/SimonSiefke/vscode.git', 'abcddwhde21'], {})
+})
+
+test('resolveCommitHash - uses default repository when null provided', async () => {
+  const mockStdout = 'a1b2c3d4e5f6789012345678901234567890abcd\trefs/heads/main\n'
+  const mockInvoke = jest.fn()
+  mockInvoke.mockReturnValue({ stdout: mockStdout, stderr: '' })
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: mockInvoke,
+  })
+  FileSystemWorker.set(mockRpc)
+
+  const result = await resolveCommitHash(null, 'main')
+  expect(result).toEqual({
+    repoUrl: 'https://github.com/microsoft/vscode.git',
+    commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd'
+  })
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/microsoft/vscode.git', 'main'], {})
 })
 
 test('resolveCommitHash - throws error when no commit found', async () => {
@@ -73,6 +117,44 @@ test('resolveCommitHash - throws error when git ls-remote fails', async () => {
   expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/test/repo.git', 'main'], {})
 })
 
+test('resolveCommitHash - handles fork commit format', async () => {
+  const mockStdout = 'a1b2c3d4e5f6789012345678901234567890abcd\trefs/heads/main\n'
+  const mockInvoke = jest.fn()
+  mockInvoke.mockReturnValue({ stdout: mockStdout, stderr: '' })
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: mockInvoke,
+  })
+  FileSystemWorker.set(mockRpc)
+
+  const result = await resolveCommitHash('https://github.com/microsoft/vscode.git', 'SimonSiefke/abcddwhde21')
+  expect(result).toEqual({
+    repoUrl: 'https://github.com/SimonSiefke/vscode.git',
+    commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd'
+  })
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/SimonSiefke/vscode.git', 'abcddwhde21'], {})
+})
+
+test('resolveCommitHash - uses default repository when null provided', async () => {
+  const mockStdout = 'a1b2c3d4e5f6789012345678901234567890abcd\trefs/heads/main\n'
+  const mockInvoke = jest.fn()
+  mockInvoke.mockReturnValue({ stdout: mockStdout, stderr: '' })
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: mockInvoke,
+  })
+  FileSystemWorker.set(mockRpc)
+
+  const result = await resolveCommitHash(null, 'main')
+  expect(result).toEqual({
+    repoUrl: 'https://github.com/microsoft/vscode.git',
+    commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd'
+  })
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/microsoft/vscode.git', 'main'], {})
+})
+
 test('resolveCommitHash - resolves tag to commit hash', async () => {
   const mockStdout = 'b2c3d4e5f6789012345678901234567890abcde1\trefs/tags/v1.0.0\n'
   const mockInvoke = jest.fn()
@@ -85,7 +167,10 @@ test('resolveCommitHash - resolves tag to commit hash', async () => {
   FileSystemWorker.set(mockRpc)
 
   const result = await resolveCommitHash('https://github.com/test/repo.git', 'v1.0.0')
-  expect(result).toBe('b2c3d4e5f6789012345678901234567890abcde1')
+  expect(result).toEqual({
+    repoUrl: 'https://github.com/test/repo.git',
+    commitHash: 'b2c3d4e5f6789012345678901234567890abcde1'
+  })
   expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/test/repo.git', 'v1.0.0'], {})
 })
 
@@ -104,6 +189,44 @@ test('resolveCommitHash - throws error when invalid commit hash returned', async
   expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/test/repo.git', 'main'], {})
 })
 
+test('resolveCommitHash - handles fork commit format', async () => {
+  const mockStdout = 'a1b2c3d4e5f6789012345678901234567890abcd\trefs/heads/main\n'
+  const mockInvoke = jest.fn()
+  mockInvoke.mockReturnValue({ stdout: mockStdout, stderr: '' })
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: mockInvoke,
+  })
+  FileSystemWorker.set(mockRpc)
+
+  const result = await resolveCommitHash('https://github.com/microsoft/vscode.git', 'SimonSiefke/abcddwhde21')
+  expect(result).toEqual({
+    repoUrl: 'https://github.com/SimonSiefke/vscode.git',
+    commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd'
+  })
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/SimonSiefke/vscode.git', 'abcddwhde21'], {})
+})
+
+test('resolveCommitHash - uses default repository when null provided', async () => {
+  const mockStdout = 'a1b2c3d4e5f6789012345678901234567890abcd\trefs/heads/main\n'
+  const mockInvoke = jest.fn()
+  mockInvoke.mockReturnValue({ stdout: mockStdout, stderr: '' })
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: mockInvoke,
+  })
+  FileSystemWorker.set(mockRpc)
+
+  const result = await resolveCommitHash(null, 'main')
+  expect(result).toEqual({
+    repoUrl: 'https://github.com/microsoft/vscode.git',
+    commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd'
+  })
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/microsoft/vscode.git', 'main'], {})
+})
+
 test('resolveCommitHash - handles multiple lines and takes first result', async () => {
   const mockStdout =
     'a1b2c3d4e5f6789012345678901234567890abcd\trefs/heads/main\nb2c3d4e5f6789012345678901234567890abcde1\trefs/heads/develop\n'
@@ -117,8 +240,49 @@ test('resolveCommitHash - handles multiple lines and takes first result', async 
   FileSystemWorker.set(mockRpc)
 
   const result = await resolveCommitHash('https://github.com/test/repo.git', 'main')
-  expect(result).toBe('a1b2c3d4e5f6789012345678901234567890abcd')
+  expect(result).toEqual({
+    repoUrl: 'https://github.com/test/repo.git',
+    commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd'
+  })
   expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/test/repo.git', 'main'], {})
+})
+
+test('resolveCommitHash - handles fork commit format', async () => {
+  const mockStdout = 'a1b2c3d4e5f6789012345678901234567890abcd\trefs/heads/main\n'
+  const mockInvoke = jest.fn()
+  mockInvoke.mockReturnValue({ stdout: mockStdout, stderr: '' })
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: mockInvoke,
+  })
+  FileSystemWorker.set(mockRpc)
+
+  const result = await resolveCommitHash('https://github.com/microsoft/vscode.git', 'SimonSiefke/abcddwhde21')
+  expect(result).toEqual({
+    repoUrl: 'https://github.com/SimonSiefke/vscode.git',
+    commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd'
+  })
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/SimonSiefke/vscode.git', 'abcddwhde21'], {})
+})
+
+test('resolveCommitHash - uses default repository when null provided', async () => {
+  const mockStdout = 'a1b2c3d4e5f6789012345678901234567890abcd\trefs/heads/main\n'
+  const mockInvoke = jest.fn()
+  mockInvoke.mockReturnValue({ stdout: mockStdout, stderr: '' })
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: mockInvoke,
+  })
+  FileSystemWorker.set(mockRpc)
+
+  const result = await resolveCommitHash(null, 'main')
+  expect(result).toEqual({
+    repoUrl: 'https://github.com/microsoft/vscode.git',
+    commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd'
+  })
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/microsoft/vscode.git', 'main'], {})
 })
 
 test('resolveCommitHash - handles different repository URLs', async () => {
@@ -133,7 +297,10 @@ test('resolveCommitHash - handles different repository URLs', async () => {
   FileSystemWorker.set(mockRpc)
 
   const result = await resolveCommitHash('https://gitlab.com/test/repo.git', 'feature')
-  expect(result).toBe('c3d4e5f6789012345678901234567890abcdef12')
+  expect(result).toEqual({
+    repoUrl: 'https://gitlab.com/test/repo.git',
+    commitHash: 'c3d4e5f6789012345678901234567890abcdef12'
+  })
   expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://gitlab.com/test/repo.git', 'feature'], {})
 })
 

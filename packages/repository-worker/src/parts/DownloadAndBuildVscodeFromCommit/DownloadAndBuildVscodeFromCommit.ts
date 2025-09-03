@@ -24,9 +24,24 @@ export const downloadAndBuildVscodeFromCommit = async (
   Assert.string(reposDir)
   Assert.string(nodeModulesCacheDir)
   Assert.boolean(useNice)
-  // Resolve the commit reference to an actual commit hash
-  const commitHash = await ResolveCommitHash.resolveCommitHash(repoUrl, commitRef)
-  const repoPathWithCommitHash = Path.join(reposDir, commitHash)
+  
+  // Resolve the commit reference to get repository URL and commit hash
+  const resolved = await ResolveCommitHash.resolveCommitHash(repoUrl, commitRef)
+  const { repoUrl: actualRepoUrl, commitHash } = resolved
+  
+  // Determine the repository path structure
+  // For fork commits (owner/commit format), create owner/commit-hash structure
+  // For regular commits, use just the commit hash
+  let repoPathWithCommitHash: string
+  if (commitRef.includes('/') && !commitRef.startsWith('http')) {
+    // Fork commit format: owner/commit -> .vscode-repos/owner/commit-hash
+    const owner = commitRef.split('/')[0]
+    repoPathWithCommitHash = Path.join(reposDir, owner, commitHash)
+    Logger.log(`[repository] Using fork repository: ${actualRepoUrl} with commit ${commitRef} (resolved to ${commitHash})`)
+  } else {
+    // Regular commit: .vscode-repos/commit-hash
+    repoPathWithCommitHash = Path.join(reposDir, commitHash)
+  }
 
   // Create parent directory if it doesn't exist
   const existsReposDir = await FileSystemWorker.pathExists(reposDir)
@@ -49,9 +64,19 @@ export const downloadAndBuildVscodeFromCommit = async (
     await FileSystemWorker.makeDirectory(reposDir)
   }
 
+  // For fork commits, ensure the owner directory exists
+  if (commitRef.includes('/') && !commitRef.startsWith('http')) {
+    const owner = commitRef.split('/')[0]
+    const ownerDir = Path.join(reposDir, owner)
+    const existsOwnerDir = await FileSystemWorker.pathExists(ownerDir)
+    if (!existsOwnerDir) {
+      await FileSystemWorker.makeDirectory(ownerDir)
+    }
+  }
+
   // Clone the repository if needed
   if (needsClone) {
-    await CloneRepository.cloneRepository(repoUrl, repoPathWithCommitHash, commitHash)
+    await CloneRepository.cloneRepository(actualRepoUrl, repoPathWithCommitHash, commitHash)
   }
 
   // Pre-cache ripgrep binary after cloning but before installing dependencies
