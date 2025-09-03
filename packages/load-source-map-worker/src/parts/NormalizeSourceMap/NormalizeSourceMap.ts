@@ -9,8 +9,7 @@ export const normalizeSourceMap = async (originalPath: string, outFilePath: stri
   const outDirName = path.dirname(path.dirname(originalPath))
   const hash = basename(originalPath).replace('.js.map.original', '')
   const sourcesPath = join(outDirName, '.vscode-sources', hash)
-  if(data.sourcesContent){
-
+  if (data.sourcesContent) {
     for (let i = 0; i < data.sourcesContent.length; i++) {
       const source = cleanSources[i]
       const sourcePath = resolve(sourcesPath, source)
