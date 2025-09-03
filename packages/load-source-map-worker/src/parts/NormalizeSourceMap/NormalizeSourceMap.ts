@@ -9,16 +9,19 @@ export const normalizeSourceMap = async (originalPath: string, outFilePath: stri
   const outDirName = path.dirname(path.dirname(originalPath))
   const hash = basename(originalPath).replace('.js.map.original', '')
   const sourcesPath = join(outDirName, '.vscode-sources', hash)
-  for (let i = 0; i < data.sourcesContent.length; i++) {
-    const source = cleanSources[i]
-    const sourcePath = resolve(sourcesPath, source)
-    if (!sourcePath.startsWith(sourcesPath)) {
-      console.log({ sourcesPath, sourcePath })
-      throw new Error(`cannot write to file outside of source: ${sourcePath}`)
+  if (data.sourcesContent) {
+    for (let i = 0; i < data.sourcesContent.length; i++) {
+      const source = cleanSources[i]
+      const sourcePath = resolve(sourcesPath, source)
+      if (!sourcePath.startsWith(sourcesPath)) {
+        console.log({ sourcesPath, sourcePath })
+        throw new Error(`cannot write to file outside of source: ${sourcePath}`)
+      }
+      await mkdir(dirname(sourcePath), { recursive: true })
+      await writeFile(sourcePath, data.sourcesContent[i])
     }
-    await mkdir(dirname(sourcePath), { recursive: true })
-    await writeFile(sourcePath, data.sourcesContent[i])
   }
+
   const newData = {
     ...data,
     sources: cleanSources,
