@@ -3,9 +3,9 @@ import { exec } from '../Exec/Exec.ts'
 
 const doInstallDependencies = async (cwd, useNice) => {
   if (useNice) {
-    return exec('nice', ['-n', '10', 'npm', 'ci'], { cwd })
+    return exec('nice', ['-n', '10', 'npm', 'ci'], { cwd, env: process.env })
   }
-  return exec('npm', ['ci'], { cwd })
+  return exec('npm', ['ci'], { cwd, env: process.env })
 }
 
 export const installDependencies = async (cwd, useNice) => {
