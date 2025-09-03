@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { getEditContextCountFromHeapSnapshotInternal } from '../src/parts/GetEditContextCountFromHeapSnapshotInternal/GetEditContextCountFromHeapSnapshotInternal.js'
-import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('should count EditContext objects from heap snapshot', () => {
   // prettier-ignore

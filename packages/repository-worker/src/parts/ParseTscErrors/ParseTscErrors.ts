@@ -21,7 +21,7 @@ export const parseTscErrors = (output: string, baseDir: string): readonly TscErr
     for (const regex of regexes) {
       const match = line.match(regex)
       if (match && match.groups) {
-        const rawFile = match.groups.file as string
+        const rawFile = match.groups.file
         const lineNumber = Number(match.groups.line)
         const absFile = rawFile.startsWith('/') ? rawFile : Path.join(baseDir, rawFile)
         const key = `${absFile}:${lineNumber}`
