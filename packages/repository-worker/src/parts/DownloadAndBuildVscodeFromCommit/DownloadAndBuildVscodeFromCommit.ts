@@ -83,7 +83,7 @@ export const downloadAndBuildVscodeFromCommit = async (
       //     repoPathWithCommitHash, item
       //   ), {force:true})
       // }
-      await CacheNodeModules.moveNodeModulesToCache(repoPathWithCommitHash, commitHash, nodeModulesCacheDir)
+      await CacheNodeModules.moveNodeModulesToCache(repoPathWithCommitHash, commitHash, nodeModulesCacheDir, nodeModulesHash)
     }
   } else if (!existsMainJsPath) {
     Logger.log(`[repository] node_modules already exists in repo for commit ${commitHash}, skipping npm ci...`)
