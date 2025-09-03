@@ -137,7 +137,7 @@ test('resolveCommitHash - handles fork commit format', async () => {
 
   const result = await resolveCommitHash('https://github.com/microsoft/vscode.git', 'SimonSiefke/abcddwhde21')
   expect(result).toEqual({
-    repoUrl: 'https://github.com/SimonSiefke/vscode.git',
+    owner: 'SimonSiefke',
     commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd',
   })
   expect(mockInvoke).toHaveBeenCalledWith(
@@ -214,7 +214,7 @@ test('resolveCommitHash - handles fork commit format', async () => {
 
   const result = await resolveCommitHash('https://github.com/microsoft/vscode.git', 'SimonSiefke/abcddwhde21')
   expect(result).toEqual({
-    repoUrl: 'https://github.com/SimonSiefke/vscode.git',
+    owner: 'SimonSiefke',
     commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd',
   })
   expect(mockInvoke).toHaveBeenCalledWith(
@@ -277,7 +277,7 @@ test('resolveCommitHash - handles fork commit format', async () => {
 
   const result = await resolveCommitHash('https://github.com/microsoft/vscode.git', 'SimonSiefke/abcddwhde21')
   expect(result).toEqual({
-    repoUrl: 'https://github.com/SimonSiefke/vscode.git',
+    owner: 'SimonSiefke',
     commitHash: 'a1b2c3d4e5f6789012345678901234567890abcd',
   })
   expect(mockInvoke).toHaveBeenCalledWith(
