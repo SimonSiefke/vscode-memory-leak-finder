@@ -7,12 +7,12 @@ import * as Root from '../Root/Root.ts'
 const getUniqueName = (usedNames: Set<string>, currentName: string): string => {
   let uniqueName = currentName
   let counter = 2
-  
+
   while (usedNames.has(uniqueName)) {
     uniqueName = `${currentName} (${counter})`
     counter++
   }
-  
+
   return uniqueName
 }
 
@@ -31,7 +31,7 @@ export const getNamedFunctionCountData3 = async (name: string) => {
       const baseName = item.originalName || item.name
       const uniqueName = getUniqueName(usedNames, baseName)
       usedNames.add(uniqueName)
-      
+
       return {
         name: uniqueName,
         value: item.count,
