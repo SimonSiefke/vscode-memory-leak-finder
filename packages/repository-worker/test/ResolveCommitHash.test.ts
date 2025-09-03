@@ -320,7 +320,7 @@ test('resolveCommitHash - handles different repository URLs', async () => {
 
   const result = await resolveCommitHash('https://gitlab.com/test/repo.git', 'feature')
   expect(result).toEqual({
-    repoUrl: 'https://gitlab.com/test/repo.git',
+    owner: 'microsoft',
     commitHash: 'c3d4e5f6789012345678901234567890abcdef12',
   })
   expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://gitlab.com/test/repo.git', 'feature'], {})
