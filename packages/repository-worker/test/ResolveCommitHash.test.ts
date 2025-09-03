@@ -323,7 +323,7 @@ test('resolveCommitHash - handles different repository URLs', async () => {
     owner: 'microsoft',
     commitHash: 'c3d4e5f6789012345678901234567890abcdef12',
   })
-  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://gitlab.com/microsoft/vscode.git', 'feature'], {})
+  expect(mockInvoke).toHaveBeenCalledWith('FileSystem.exec', 'git', ['ls-remote', 'https://github.com/microsoft/vscode.git', 'feature'], {})
 })
 
 test('resolveCommitHash - handles short commit hash input', async () => {
