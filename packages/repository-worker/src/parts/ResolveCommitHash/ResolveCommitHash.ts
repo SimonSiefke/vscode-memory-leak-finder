@@ -4,11 +4,9 @@ import { isFullCommitHash } from '../IsFullCommitHash/IsFullCommitHash.ts'
 import { parseCommitHash } from '../ParseCommitHash/ParseCommitHash.ts'
 
 export interface ResolvedCommit {
-  repoUrl: string
-  commitHash: string
+  readonly owner: string
+  readonly commitHash: string
 }
-
-const DEFAULT_REPO_URL = 'https://github.com/microsoft/vscode.git'
 
 /**
  * Parse fork commit format: owner/commit
@@ -32,39 +30,31 @@ const parseForkCommit = (commitRef: string): { owner: string; commit: string } |
   return { owner, commit }
 }
 
-/**
- * Construct fork repository URL from owner
- */
-const constructForkRepoUrl = (owner: string): string => {
-  return `https://github.com/${owner}/vscode.git`
-}
-
 export const resolveCommitHash = async (baseRepoUrl: string | null, commitRef: string): Promise<ResolvedCommit> => {
   try {
     // Use default repository if none provided
-    const defaultRepoUrl = baseRepoUrl || DEFAULT_REPO_URL
-    
+
     // Check if this is a fork commit (owner/commit format)
     const forkCommitInfo = parseForkCommit(commitRef)
-    
-    let actualRepoUrl: string
+
+    let owner: string
     let actualCommitRef: string
-    
+
     if (forkCommitInfo) {
       // Fork commit: use fork repository URL
-      actualRepoUrl = constructForkRepoUrl(forkCommitInfo.owner)
+      owner = forkCommitInfo.owner
       actualCommitRef = forkCommitInfo.commit
     } else {
       // Regular commit: use provided or default repository URL
-      actualRepoUrl = defaultRepoUrl
+      owner = 'microsoft'
       actualCommitRef = commitRef
     }
 
     // If it's already a full commit hash, return it directly
     if (isFullCommitHash(actualCommitRef)) {
       return {
-        repoUrl: actualRepoUrl,
-        commitHash: actualCommitRef
+        owner,
+        commitHash: actualCommitRef,
       }
     }
 
@@ -73,8 +63,8 @@ export const resolveCommitHash = async (baseRepoUrl: string | null, commitRef: s
     const resolvedHash = parseCommitHash(result.stdout, actualCommitRef)
 
     return {
-      repoUrl: actualRepoUrl,
-      commitHash: resolvedHash
+      owner,
+      commitHash: resolvedHash,
     }
   } catch (error) {
     throw new VError(error, `Failed to resolve commit reference '${commitRef}'`)

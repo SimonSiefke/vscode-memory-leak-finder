@@ -24,24 +24,11 @@ export const downloadAndBuildVscodeFromCommit = async (
   Assert.string(reposDir)
   Assert.string(nodeModulesCacheDir)
   Assert.boolean(useNice)
-  
+
   // Resolve the commit reference to get repository URL and commit hash
-  const resolved = await ResolveCommitHash.resolveCommitHash(repoUrl, commitRef)
-  const { repoUrl: actualRepoUrl, commitHash } = resolved
-  
-  // Determine the repository path structure
-  // For fork commits (owner/commit format), create owner/commit-hash structure
-  // For regular commits, use just the commit hash
-  let repoPathWithCommitHash: string
-  if (commitRef.includes('/') && !commitRef.startsWith('http')) {
-    // Fork commit format: owner/commit -> .vscode-repos/owner/commit-hash
-    const owner = commitRef.split('/')[0]
-    repoPathWithCommitHash = Path.join(reposDir, owner, commitHash)
-    Logger.log(`[repository] Using fork repository: ${actualRepoUrl} with commit ${commitRef} (resolved to ${commitHash})`)
-  } else {
-    // Regular commit: .vscode-repos/commit-hash
-    repoPathWithCommitHash = Path.join(reposDir, commitHash)
-  }
+  const { repoUrl, commitHash } = await ResolveCommitHash.resolveCommitHash(repoUrl, commitRef)
+
+  const repoPathWithCommitHash = Path.join(reposDir, commitHash)
 
   // Create parent directory if it doesn't exist
   const existsReposDir = await FileSystemWorker.pathExists(reposDir)
