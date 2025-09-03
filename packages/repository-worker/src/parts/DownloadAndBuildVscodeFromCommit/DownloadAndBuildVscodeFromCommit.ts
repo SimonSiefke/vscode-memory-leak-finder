@@ -26,7 +26,7 @@ export const downloadAndBuildVscodeFromCommit = async (
   Assert.boolean(useNice)
 
   // Resolve the commit reference to get repository URL and commit hash
-  const { repoUrl, commitHash } = await ResolveCommitHash.resolveCommitHash(repoUrl, commitRef)
+  const { owner, commitHash } = await ResolveCommitHash.resolveCommitHash(repoUrl, commitRef)
 
   const repoPathWithCommitHash = Path.join(reposDir, commitHash)
 
