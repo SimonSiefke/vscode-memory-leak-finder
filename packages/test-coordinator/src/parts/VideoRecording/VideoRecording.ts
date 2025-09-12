@@ -12,10 +12,10 @@ const state: State = {
   rpc: undefined,
 }
 
-export const start = async (devtoolsWebsocketUrl: string, attachedToPageTimeout: number) => {
+export const start = async (devtoolsWebsocketUrl: string, attachedToPageTimeout: number, idleTimeout: number) => {
   Assert.string(devtoolsWebsocketUrl)
   const rpc = await VideoRecordingWorker.start()
-  await rpc.invoke('ConnectDevtools.connectDevtools', devtoolsWebsocketUrl, attachedToPageTimeout)
+  await rpc.invoke('ConnectDevtools.connectDevtools', devtoolsWebsocketUrl, attachedToPageTimeout, idleTimeout)
   const outFile = join(Root.root, '.vscode-videos', 'video.webm')
   await rpc.invoke('VideoRecording.start', outFile)
   state.rpc = rpc

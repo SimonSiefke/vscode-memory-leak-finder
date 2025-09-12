@@ -65,6 +65,7 @@ export const runTestsWithCallback = async ({
 
     const connectionId = Id.create()
     const attachedToPageTimeout = TimeoutConstants.AttachToPage
+    const idleTimeout = TimeoutConstants.Idle
 
     if (setupOnly && commit) {
       const testWorkerRpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
@@ -79,6 +80,7 @@ export const runTestsWithCallback = async ({
         vscodePath,
         commit,
         attachedToPageTimeout,
+        idleTimeout,
       )
       await testWorkerRpc.dispose()
       return callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, 0, 0, filterValue)
@@ -108,6 +110,7 @@ export const runTestsWithCallback = async ({
       vscodePath,
       commit,
       attachedToPageTimeout,
+      idleTimeout,
     )
 
     const context = {
@@ -219,6 +222,7 @@ export const runTestsWithCallback = async ({
             vscodePath,
             commit,
             attachedToPageTimeout,
+            idleTimeout,
           )
           if (checkLeaks) {
             memoryLeakWorkerRpc = MemoryLeakWorker.getRpc()
