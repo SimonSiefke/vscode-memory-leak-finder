@@ -6,7 +6,6 @@ import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsPr
 import * as Disposables from '../Disposables/Disposables.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
-import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
 
 export const prepareBoth = async (
@@ -18,6 +17,7 @@ export const prepareBoth = async (
   connectionId: number,
   isFirstConnection: boolean,
   canUseIdleCallback: boolean,
+  attachedToPageTimeout: number,
 ): Promise<any> => {
   const { child, webSocketUrl, parsedVersion } = await LaunchIde.launchIde({
     headlessMode,
@@ -38,7 +38,7 @@ export const prepareBoth = async (
 
   const devtoolsWebSocketUrl = await devtoolsWebSocketUrlPromise
 
-  const connectDevtoolsPromise = connectDevtools(devtoolsWebSocketUrl, TimeoutConstants.AttachToPage)
+  const connectDevtoolsPromise = connectDevtools(devtoolsWebSocketUrl, attachedToPageTimeout)
 
   if (headlessMode) {
     console.log('headldessmode')
