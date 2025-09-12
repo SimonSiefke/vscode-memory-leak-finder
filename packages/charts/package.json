@@ -11,7 +11,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@lvce-editor/rpc": "^4.15.0"
+    "@lvce-editor/rpc": "^4.19.0"
   },
   "jest": {
     "testMatch": [
