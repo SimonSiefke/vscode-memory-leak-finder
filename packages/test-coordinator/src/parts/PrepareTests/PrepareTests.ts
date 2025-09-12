@@ -32,6 +32,7 @@ export const prepareTests = async (
     connectionId,
     isFirstConnection,
     canUseIdleCallback,
+    attachedToPageTimeout,
   )
   await connectWorkers(
     rpc,
