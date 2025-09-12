@@ -10,6 +10,7 @@ export const connectDevtools = (
   headlessMode: boolean,
   webSocketUrl: string,
   canUseIdleCallback: boolean,
+  idleTimeout: number,
 ) => {
   Assert.object(rpc)
   Assert.number(connectionId)
@@ -23,5 +24,6 @@ export const connectDevtools = (
     headlessMode,
     webSocketUrl,
     canUseIdleCallback,
+    idleTimeout,
   )
 }

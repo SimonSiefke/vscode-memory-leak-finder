@@ -28,5 +28,6 @@ export const connectWorkers = async (
     headlessMode,
     webSocketUrl,
     canUseIdleCallback,
+    idleTimeout,
   )
 }
