@@ -34,5 +34,6 @@
   "files.saveConflictResolution": "overwriteFileOnDisk",
   "window.commandCenter": false,
   "extensions.ignoreRecommendations": true,
-  "workbench.experimental.enableNewProfilesUI": false
+  "workbench.experimental.enableNewProfilesUI": false,
+  "workbench.secondarySideBar.defaultVisibility": "hidden"
 }
