@@ -29,11 +29,11 @@ const waitRpcIdle = (rpc, uniqueId, canUseIdleCallback) => {
   })
 }
 
-export const waitForIdle = async (rpc, canUseIdleCallback) => {
+export const waitForIdle = async (rpc, canUseIdleCallback, idleTimeout) => {
   try {
     const utilityExecutionContext = await ExecutionContextState.waitForUtilityExecutionContext(rpc.sessionId)
     const result = await PTimeout.pTimeout(waitRpcIdle(rpc, utilityExecutionContext.uniqueId, canUseIdleCallback), {
-      milliseconds: 5000,
+      milliseconds: idleTimeout,
     })
     return result
   } catch (error) {

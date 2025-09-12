@@ -18,6 +18,7 @@ export const connectDevtools = async (
   headlessMode: boolean,
   webSocketUrl: string,
   canUseIdleCallback: boolean,
+  idleTimeout: number,
 ) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
@@ -65,6 +66,7 @@ export const connectDevtools = async (
   const electronApp = ElectronApp.create({
     electronRpc,
     electronObjectId,
+    idleTimeout,
   })
   ElectronAppState.set(connectionId, electronApp)
 }
