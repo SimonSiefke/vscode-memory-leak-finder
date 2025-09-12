@@ -5,7 +5,11 @@ export const create = ({ expect, page, VError }) => {
   return {
     async show(key = KeyBindings.OpenQuickPickFiles) {
       try {
+        await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
+        // TODO there might be a conflict here when pressing the keyboard shortcut
+        // too often, the quickpick opens, making the next statement pass
+        // but then the keyboard shortcut is still processing, making the quickpick close again
         await page.pressKeyExponential({
           key: key,
           waitFor: quickPick,
