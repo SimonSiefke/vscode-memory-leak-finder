@@ -61,7 +61,7 @@
   "dependencies": {
     "@babel/code-frame": "^7.27.1",
     "@lvce-editor/assert": "^1.4.0",
-    "@lvce-editor/rpc": "^4.15.0",
+    "@lvce-editor/rpc": "^4.19.0",
     "@lvce-editor/verror": "^1.7.0"
   },
   "devDependencies": {
