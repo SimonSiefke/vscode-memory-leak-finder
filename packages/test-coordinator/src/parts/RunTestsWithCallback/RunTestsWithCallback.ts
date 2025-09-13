@@ -98,7 +98,7 @@ export const runTestsWithCallback = async ({
     const initialStart = Time.now()
     const first = formattedPaths[0]
     await callback(TestWorkerEventType.HandleInitializing)
-    let testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
+    let testWorkerRpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
       cwd,
       headlessMode,
       recordVideo,
@@ -142,7 +142,7 @@ export const runTestsWithCallback = async ({
 
       try {
         const start = i === 0 ? initialStart : Time.now()
-        const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(testWorkerIpc, connectionId, absolutePath, forceRun, timeouts)
+        const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(testWorkerRpc, connectionId, absolutePath, forceRun, timeouts)
 
         if (recordVideo) {
           await VideoRecording.addChapter(dirent, start)
@@ -158,12 +158,12 @@ export const runTestsWithCallback = async ({
           if (checkLeaks) {
             if (measureAfter) {
               for (let i = 0; i < 2; i++) {
-                await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun, runMode)
+                await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
               }
             }
             const before = await MemoryLeakFinder.start(memoryLeakWorkerRpc, connectionId, targetId)
             for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun, runMode)
+              await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
             }
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
@@ -182,10 +182,10 @@ export const runTestsWithCallback = async ({
             console.log(summary)
           } else {
             for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerIpc, connectionId, absolutePath, forceRun, runMode)
+              await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
             }
           }
-          await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerIpc, connectionId, absolutePath)
+          await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerRpc, connectionId, absolutePath)
           const end = Time.now()
           const duration = end - start
           await callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration, isLeak)
@@ -204,13 +204,13 @@ export const runTestsWithCallback = async ({
             memoryLeakWorkerRpc.dispose()
             memoryLeakWorkerRpc = undefined
           }
-          if (testWorkerIpc) {
-            testWorkerIpc.dispose()
+          if (testWorkerRpc) {
+            testWorkerRpc.dispose()
           }
           // Dispose initialization worker and any other registered disposables
           await Disposables.disposeAll()
           PrepareTestsOrAttach.state.promise = undefined
-          testWorkerIpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
+          testWorkerRpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
             cwd,
             headlessMode,
             recordVideo,
