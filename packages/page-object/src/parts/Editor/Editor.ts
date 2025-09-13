@@ -595,6 +595,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     },
     async hideSourceActionEmpty() {
       try {
+        await page.waitForIdle()
         const overlayMessage = page.locator('.monaco-editor-overlaymessage')
         await expect(overlayMessage).toBeVisible()
         await page.waitForIdle()
@@ -615,6 +616,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
         await expect(sourceAction).toBeVisible()
         await expect(sourceAction).toHaveText(/Source Action/)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show source action`)
       }
