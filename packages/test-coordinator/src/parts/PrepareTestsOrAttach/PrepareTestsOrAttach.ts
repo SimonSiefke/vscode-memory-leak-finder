@@ -40,6 +40,7 @@ export const prepareTestsOrAttach = async (
   vscodePath: string,
   commit: string,
   attachedToPageTimeout: number,
+  measureId: string,
   idleTimeout: number,
 ) => {
   const pageObjectPath = GetPageObjectPath.getPageObjectPath()
@@ -58,6 +59,7 @@ export const prepareTestsOrAttach = async (
       vscodePath,
       commit,
       attachedToPageTimeout,
+      measureId,
       idleTimeout,
     )
     const result = await state.promise
