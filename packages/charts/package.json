@@ -2,13 +2,16 @@
   "name": "@vscode-memory-leak-finder/charts",
   "version": "1.0.0",
   "description": "",
-  "keywords": [],
-  "license": "MIT",
-  "author": "",
-  "type": "module",
   "main": "src/main.ts",
+  "type": "module",
   "scripts": {
     "dev": "node src/main.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@lvce-editor/rpc": "^4.19.0"
   },
   "jest": {
     "testMatch": [
@@ -27,8 +30,5 @@
         "statements": 10
       }
     }
-  },
-  "dependencies": {
-    "@lvce-editor/rpc": "^4.15.0"
   }
 }
