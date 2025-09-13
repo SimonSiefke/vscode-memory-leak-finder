@@ -51,11 +51,15 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: npm run e2e
-      - name: Run headless test (flakyness check)
+      - name: Run headless test (first flakyness check)
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: npm run e2e
+      - name: Run headless test (second flakyness check)
         uses: coactions/setup-xvfb@v1
         with:
           run: npm run e2e:check-flakyness
-      - name: Run headless test (second flakyness check)
+      - name: Run headless test (third flakyness check)
         uses: coactions/setup-xvfb@v1
         with:
           run: npm run e2e:check-flakyness
