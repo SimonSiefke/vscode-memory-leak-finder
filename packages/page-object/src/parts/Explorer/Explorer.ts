@@ -155,6 +155,7 @@ export const create = ({ page, expect, VError }) => {
     },
     async toHaveItem(direntName) {
       try {
+        await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         const dirent = explorer.locator('.monaco-list-row', {
           hasText: direntName,
