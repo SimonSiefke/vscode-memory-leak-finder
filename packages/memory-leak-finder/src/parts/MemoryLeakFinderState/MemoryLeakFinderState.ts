@@ -2,10 +2,10 @@ export const state = {
   instances: Object.create(null),
 }
 
-export const set = (instanceId: string, instance: any): void => {
-  state.instances[instanceId] = instance
+export const set = (connectionId: number, instance: any): void => {
+  state.instances[connectionId] = instance
 }
 
-export const get = (instanceId: string): any => {
-  return state.instances[instanceId]
+export const get = (connectionId: number): any => {
+  return state.instances[connectionId]
 }
