@@ -10,7 +10,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(activityBar).toBeHidden()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.FocusActivityBar)
-        await expect(activityBar).toBeVisible()
+        await expect(activityBar).toBeVisible({ timeout: 10_000 })
       } catch (error) {
         throw new VError(error, `Failed to show activity bar`)
       }

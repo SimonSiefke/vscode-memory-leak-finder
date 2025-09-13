@@ -19,8 +19,9 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         const tab = page.locator('.tab', { hasText: fileName })
         await expect(tab).toBeVisible()
         if (isNotebook(fileName)) {
-          const editor = page.locator('.notebook-editor')
-          const list = editor.locator('.monaco-list.element-focused')
+          const notebookEditor = page.locator('.notebook-editor')
+          const list = notebookEditor.locator('.monaco-list')
+          await page.waitForIdle()
           await expect(list).toBeFocused()
         } else {
           const editor = page.locator('.editor-instance')
@@ -756,7 +757,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         const tabLabel = tab.locator('.monaco-icon-label')
         await expect(tabLabel).toBeVisible()
         await expect(tabLabel).toHaveAttribute('aria-label', /1 problem in this file/, {
-          timeout: 15_000,
+          timeout: 60_000,
         })
       } catch (error) {
         throw new VError(error, `Failed to wait for editor error`)

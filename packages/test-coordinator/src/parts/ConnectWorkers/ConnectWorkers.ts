@@ -14,9 +14,10 @@ export const connectWorkers = async (
   electronObjectId: string,
   attachedToPageTimeout: number,
   measureId: string,
+  idleTimeout: number,
 ) => {
   if (recordVideo) {
-    await VideoRecording.start(devtoolsWebSocketUrl, attachedToPageTimeout)
+    await VideoRecording.start(devtoolsWebSocketUrl, attachedToPageTimeout, idleTimeout)
   }
   await MemoryLeakWorker.startWorker(devtoolsWebSocketUrl, connectionId, measureId, attachedToPageTimeout)
   await ConnectDevtools.connectDevtools(
@@ -28,5 +29,6 @@ export const connectWorkers = async (
     headlessMode,
     webSocketUrl,
     canUseIdleCallback,
+    idleTimeout,
   )
 }

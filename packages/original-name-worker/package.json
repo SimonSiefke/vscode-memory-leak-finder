@@ -12,9 +12,9 @@
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
   },
   "dependencies": {
-    "@babel/parser": "^7.28.3",
-    "@babel/traverse": "^7.28.3",
-    "@lvce-editor/rpc": "^4.15.0"
+    "@babel/parser": "^7.28.4",
+    "@babel/traverse": "^7.28.4",
+    "@lvce-editor/rpc": "^4.19.0"
   },
   "devDependencies": {
     "@types/babel__traverse": "^7.28.0"

@@ -41,6 +41,7 @@ export const prepareTestsOrAttach = async (
   commit: string,
   attachedToPageTimeout: number,
   measureId: string,
+  idleTimeout: number,
 ) => {
   const pageObjectPath = GetPageObjectPath.getPageObjectPath()
   const testWorkerRpc = await LaunchTestWorker.launchTestWorker(runMode)
@@ -59,6 +60,7 @@ export const prepareTestsOrAttach = async (
       commit,
       attachedToPageTimeout,
       measureId,
+      idleTimeout,
     )
     const result = await state.promise
     state.parsedVersion = result.parsedVersion
@@ -76,6 +78,7 @@ export const prepareTestsOrAttach = async (
     headlessMode,
     webSocketUrl,
     canUseIdleCallback,
+    idleTimeout,
   )
   await PageObject.create(testWorkerRpc, connectionId, isFirstConnection, headlessMode, timeouts, state.parsedVersion, pageObjectPath)
   return testWorkerRpc

@@ -46,7 +46,7 @@ const createMouse = (rpc) => {
   }
 }
 
-export const create = async ({ electronRpc, electronObjectId, targetId, sessionId, rpc }) => {
+export const create = async ({ electronRpc, electronObjectId, targetId, sessionId, rpc, idleTimeout }) => {
   return {
     type: DevtoolsTargetType.Page,
     objectType: DevtoolsTargetType.Page,
@@ -63,7 +63,7 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
       })
     },
     async waitForIdle() {
-      return PageWaitForIdle.waitForIdle(this.rpc, this.electronRpc.canUseIdleCallback)
+      return PageWaitForIdle.waitForIdle(this.rpc, this.electronRpc.canUseIdleCallback, idleTimeout)
     },
     async reload() {
       return PageReload.reload(this.rpc)

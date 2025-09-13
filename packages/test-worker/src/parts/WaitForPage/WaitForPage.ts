@@ -3,7 +3,7 @@ import * as Page from '../Page/Page.ts'
 import * as SessionState from '../SessionState/SessionState.ts'
 import * as TargetState from '../TargetState/TargetState.ts'
 
-export const waitForPage = async ({ index, electronRpc, electronObjectId }) => {
+export const waitForPage = async ({ index, electronRpc, electronObjectId, idleTimeout }) => {
   const target = await TargetState.waitForTarget({ type: DevtoolsTargetType.Page, index })
   const session = SessionState.getSession(target.sessionId)
   const { rpc } = session
@@ -13,5 +13,6 @@ export const waitForPage = async ({ index, electronRpc, electronObjectId }) => {
     sessionId: target.sessionId,
     targetId: target.targetId,
     rpc,
+    idleTimeout,
   })
 }

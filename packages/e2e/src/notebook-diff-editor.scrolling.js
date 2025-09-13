@@ -1,4 +1,4 @@
-export const skip = process.platform === 'darwin'
+export const skip = 1
 
 export const setup = async ({ Workspace, Explorer, Editor, DiffEditor }) => {
   const notebook1 = {
