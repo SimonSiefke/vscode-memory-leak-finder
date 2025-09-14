@@ -5,5 +5,5 @@ export const setup = (rpc: any, connectionId: number, measureId: string) => {
   Assert.object(rpc)
   Assert.number(connectionId)
   Assert.string(measureId)
-  return rpc.invoke(TestWorkerCommandType.MemoryLeakFinderSetup, connectionId, connectionId, measureId)
+  return rpc.invoke(TestWorkerCommandType.MemoryLeakFinderSetup, connectionId, measureId)
 }
