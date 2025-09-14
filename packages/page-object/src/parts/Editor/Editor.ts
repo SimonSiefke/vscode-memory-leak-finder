@@ -367,6 +367,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
       await expect(token).toHaveCss('color', color)
     },
     async shouldHaveBreadCrumb(text) {
+      await page.waitForIdle()
       const breadCrumb = page.locator(`.monaco-breadcrumb-item`, {
         hasText: text,
       })
