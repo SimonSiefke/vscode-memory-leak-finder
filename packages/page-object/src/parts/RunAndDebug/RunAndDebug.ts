@@ -73,8 +73,7 @@ export const create = ({ expect, page, VError }) => {
     async waitForPaused({ file, line, callStackSize }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
-      // TODO long timeout here
-      await expect(continueButton).toBeVisible()
+      await expect(continueButton).toBeVisible({ timeout: 20_000 })
       await page.waitForIdle()
       const pausedStackFrame = page.locator('.debug-top-stack-frame-column')
       await expect(pausedStackFrame).toBeVisible()
@@ -108,6 +107,7 @@ export const create = ({ expect, page, VError }) => {
           VError,
         })
         await quickPick.executeCommand(WellKnownCommands.ShowRunAndDebug)
+        await page.waitForIdle()
         await this.startRunAndDebug()
         await this.waitForPaused({ file, line, callStackSize })
       } catch (error) {

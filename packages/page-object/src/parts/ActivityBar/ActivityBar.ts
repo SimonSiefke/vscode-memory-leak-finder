@@ -17,6 +17,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async showView({ ariaLabel, titleLabel = ariaLabel }) {
       try {
+        await page.waitForIdle()
         const activityBar = page.locator('.part.activitybar')
         await expect(activityBar).toBeVisible()
         const activityBarItem = activityBar.locator(`.action-item:has(.action-label[aria-label^="${ariaLabel}"])`)

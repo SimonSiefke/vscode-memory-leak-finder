@@ -17,6 +17,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async type(text) {
       try {
+        await page.waitForIdle()
         const searchView = page.locator('.search-view')
         const searchInput = searchView.locator('textarea[placeholder="Search"]')
         await searchInput.focus()
@@ -75,6 +76,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async shouldHaveNoResults() {
       try {
+        await page.waitForIdle()
         const searchView = page.locator('.search-view')
         const searchInput = searchView.locator('textarea[placeholder="Search"]')
         await expect(searchInput).toBeFocused()
