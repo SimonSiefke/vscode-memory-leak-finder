@@ -403,6 +403,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
         const colorPicker = page.locator('.standalone-colorpicker-body')
         await expect(colorPicker).toBeHidden()
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.ShowOrFocusStandaloneColorPicker)
         await expect(colorPicker).toBeVisible()
