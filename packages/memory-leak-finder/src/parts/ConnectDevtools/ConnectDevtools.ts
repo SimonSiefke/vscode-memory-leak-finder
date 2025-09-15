@@ -13,7 +13,7 @@ import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEve
 
 export const connectDevtools = async (
   devtoolsWebSocketUrl: string,
-  connectionId: string,
+  connectionId: number,
   measureId: string,
   attachedToPageTimeout: number,
 ): Promise<void> => {
