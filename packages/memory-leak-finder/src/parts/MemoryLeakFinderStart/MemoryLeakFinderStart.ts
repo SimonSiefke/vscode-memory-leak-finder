@@ -1,7 +1,7 @@
 import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinderState.ts'
 import * as WaitForCrash from '../WaitForCrash/WaitForCrash.ts'
 
-const doStart = async (connectionId: string): Promise<any> => {
+const doStart = async (connectionId: number): Promise<any> => {
   const measure = MemoryLeakFinderState.get(connectionId)
   if (!measure) {
     throw new Error(`no measure found`)
@@ -10,7 +10,7 @@ const doStart = async (connectionId: string): Promise<any> => {
   return result
 }
 
-export const start = async (connectionId: string, electronTargetId: string): Promise<any> => {
+export const start = async (connectionId: number, electronTargetId: string): Promise<any> => {
   const crashInfo = WaitForCrash.waitForCrash(electronTargetId)
   const resultPromise = doStart(connectionId)
   const intermediateResult = await Promise.race([crashInfo.promise, resultPromise])
