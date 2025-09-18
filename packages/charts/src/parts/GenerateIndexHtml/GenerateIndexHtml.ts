@@ -152,61 +152,61 @@ const baseStructure = `
       const charts = document.querySelectorAll('.Chart');
       const arrowOverlay = document.getElementById('arrowOverlay');
       const arrowPath = document.getElementById('arrowPath');
-      
+
       // Function to calculate and draw arrow
       function drawArrow(activeLink, activeChart) {
         if (!activeLink || !activeChart || !arrowPath) return;
-        
+
         const linkRect = activeLink.getBoundingClientRect();
         const chartRect = activeChart.getBoundingClientRect();
-        
+
         // Start point: right edge of navigation, center of active link
         const startX = linkRect.right + 10;
         const startY = linkRect.top + linkRect.height / 2;
-        
+
         // End point: left edge of chart, center vertically
         const endX = chartRect.left - 10;
         const endY = chartRect.top + chartRect.height / 2;
-        
+
         // Control points for bezier curve
         const controlX1 = startX + (endX - startX) * 0.3;
         const controlY1 = startY;
         const controlX2 = startX + (endX - startX) * 0.7;
         const controlY2 = endY;
-        
+
         // Create bezier curve path
-        const pathData = 'M ' + startX + ',' + startY + 
-                        ' C ' + controlX1 + ',' + controlY1 + 
-                        ' ' + controlX2 + ',' + controlY2 + 
+        const pathData = 'M ' + startX + ',' + startY +
+                        ' C ' + controlX1 + ',' + controlY1 +
+                        ' ' + controlX2 + ',' + controlY2 +
                         ' ' + endX + ',' + endY;
-        
+
         arrowPath.setAttribute('d', pathData);
         arrowPath.style.opacity = '1';
       }
-      
+
       // Function to hide arrow
       function hideArrow() {
         if (arrowPath) {
           arrowPath.style.opacity = '0';
         }
       }
-      
+
       // Function to update active link based on scroll position
       function updateActiveLink() {
         const scrollPosition = window.scrollY + 100; // Offset for better UX
         let activeChart = null;
         let activeLink = null;
-        
+
         charts.forEach(chart => {
           const chartTop = chart.offsetTop;
           const chartBottom = chartTop + chart.offsetHeight;
           const chartId = chart.id;
-          
+
           if (scrollPosition >= chartTop && scrollPosition < chartBottom) {
             activeChart = chart;
             // Remove active class from all links
             chartLinks.forEach(link => link.classList.remove('active'));
-            
+
             // Add active class to current chart's link
             const link = document.querySelector('a[href="#' + chartId + '"]');
             if (link) {
@@ -215,7 +215,7 @@ const baseStructure = `
             }
           }
         });
-        
+
         // Draw or hide arrow
         if (activeChart && activeLink) {
           drawArrow(activeLink, activeChart);
@@ -226,10 +226,10 @@ const baseStructure = `
 
       // Update active link on scroll
       window.addEventListener('scroll', updateActiveLink);
-      
+
       // Update arrow on resize
       window.addEventListener('resize', updateActiveLink);
-      
+
       // Update active link on page load
       updateActiveLink();
 
@@ -289,22 +289,22 @@ const getSingleColumnHtml = (dirents: string[]): string => {
   html += '        <nav class="Navigation">\n'
   html += '          <h3>Charts</h3>\n'
   html += '          <ul class="ChartList">\n'
-  
+
   for (const svgFile of svgFiles) {
     const chartName = svgFile.replace('.svg', '')
     html += `            <li><a href="#chart-${chartName}" class="ChartLink">${chartName}</a></li>\n`
   }
-  
+
   html += '          </ul>\n'
   html += '        </nav>\n'
   html += '        <main class="ChartsContainer">\n'
   html += '          <ul class="Charts SingleColumn">\n'
-  
+
   for (const svgFile of svgFiles) {
     const chartName = svgFile.replace('.svg', '')
     html += `            <li class="Chart" id="chart-${chartName}"><img class="ChartImage" src="./${svgFile}" alt="${svgFile}"></li>\n`
   }
-  
+
   html += '          </ul>\n'
   html += '        </main>\n'
   html += '        <svg class="ArrowOverlay" id="arrowOverlay">\n'
