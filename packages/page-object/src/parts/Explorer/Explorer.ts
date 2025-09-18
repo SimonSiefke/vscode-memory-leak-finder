@@ -266,13 +266,16 @@ export const create = ({ page, expect, VError }) => {
     },
     async refresh() {
       try {
+        await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         await expect(explorer).toBeVisible()
         const header = page.locator(`.pane-header[aria-label^="Explorer Section"]`)
         await expect(header).toBeVisible()
         await header.hover()
+        await page.waitForIdle()
         const button = page.locator(`[role="button"][aria-label="Refresh Explorer"]`)
         await button.click()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to refresh explorer`)
       }
