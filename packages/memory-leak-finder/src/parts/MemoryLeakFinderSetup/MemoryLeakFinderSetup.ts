@@ -5,7 +5,6 @@ import * as WaitForPage from '../WaitForPage/WaitForPage.ts'
 
 export const setup = async (connectionId: number, measureId: string, measureNode: boolean = false): Promise<any> => {
   try {
-    console.log(`MemoryLeakFinderSetup: measureNode = ${measureNode}`)
     const page = await WaitForPage.waitForPage({ index: 0 })
     const session = page.rpc
     const measure = await GetCombinedMeasure.getCombinedMeasure(session, measureId)
