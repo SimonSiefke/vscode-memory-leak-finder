@@ -102,6 +102,11 @@ const baseStructure = `
         color: #333;
       }
 
+      .ChartLink.active {
+        background: black;
+        color: white;
+      }
+
       .ChartsContainer {
         flex: 1;
         padding: 20px 0;
@@ -216,8 +221,8 @@ const baseStructure = `
         }
       }
 
-      // Function to update arrow based on scroll position
-      function updateArrow() {
+      // Function to update active link and arrow based on scroll position
+      function updateActiveLink() {
         const scrollPosition = window.scrollY;
         let activeChart = null;
         let activeLink = null;
@@ -245,6 +250,10 @@ const baseStructure = `
                 if (nextLink) {
                   activeChart = nextChart;
                   activeLink = nextLink;
+
+                  // Update active classes
+                  chartLinks.forEach(link => link.classList.remove('active'));
+                  nextLink.classList.add('active');
                 }
               }
             }
@@ -266,8 +275,13 @@ const baseStructure = `
             if (index === 0) {
               if (scrollPosition >= chartTop && scrollPosition < switchThreshold) {
                 activeChart = chart;
+                // Remove active class from all links
+                chartLinks.forEach(link => link.classList.remove('active'));
+
+                // Add active class to current chart's link
                 const link = document.querySelector('a[href="#' + chartId + '"]');
                 if (link) {
+                  link.classList.add('active');
                   activeLink = link;
                 }
               }
@@ -281,8 +295,13 @@ const baseStructure = `
 
               if (scrollPosition >= prevSwitchThreshold && scrollPosition < chartTop + chartHeight) {
                 activeChart = chart;
+                // Remove active class from all links
+                chartLinks.forEach(link => link.classList.remove('active'));
+
+                // Add active class to current chart's link
                 const link = document.querySelector('a[href="#' + chartId + '"]');
                 if (link) {
+                  link.classList.add('active');
                   activeLink = link;
                 }
               }
@@ -298,14 +317,14 @@ const baseStructure = `
         }
       }
 
-      // Update arrow on scroll
-      window.addEventListener('scroll', updateArrow);
+      // Update active link and arrow on scroll
+      window.addEventListener('scroll', updateActiveLink);
 
-      // Update arrow on resize
-      window.addEventListener('resize', updateArrow);
+      // Update active link and arrow on resize
+      window.addEventListener('resize', updateActiveLink);
 
-      // Update arrow on page load
-      updateArrow();
+      // Update active link and arrow on page load
+      updateActiveLink();
 
       // Smooth scrolling for navigation links
       chartLinks.forEach(link => {
