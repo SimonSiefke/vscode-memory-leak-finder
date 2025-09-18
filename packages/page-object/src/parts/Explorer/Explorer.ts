@@ -56,6 +56,7 @@ export const create = ({ page, expect, VError }) => {
         await page.waitForIdle()
         const inputBox = await page.locator('.monaco-inputbox input')
         await expect(inputBox).toBeVisible()
+        await page.waitForIdle()
         await expect(inputBox).toBeFocused()
         await inputBox.type(name)
         await page.keyboard.press('Enter')
