@@ -58,8 +58,11 @@ export const create = ({ expect, page, VError }) => {
         const tab = page.locator('.extension-editor .action-label', {
           hasText: text,
         })
+        await page.waitForIdle()
         await expect(tab).toBeVisible()
+        await page.waitForIdle()
         await tab.click()
+        await page.waitForIdle()
         await expect(tab).toHaveAttribute('aria-checked', 'true')
         await page.waitForIdle()
         if (options && options.webView) {
