@@ -97,5 +97,5 @@ export const connectDevtools = async (
   if (timeouts === false) {
     await DisableTimeouts.disableTimeouts(firstWindow)
   }
-  PageObjectState.set(connectionId, { pageObject, firstWindow })
+  PageObjectState.set(connectionId, pageObject)
 }
