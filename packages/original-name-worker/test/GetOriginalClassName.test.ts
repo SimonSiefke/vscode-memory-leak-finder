@@ -12,7 +12,7 @@ test('getOriginalClassName', () => {
   expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('Test')
 })
 
-test.skip('getOriginalClassName - typescript constructor', () => {
+test('getOriginalClassName - typescript constructor', () => {
   const sourceContent = `export class FolderConfiguration extends Disposable {
 
 	protected readonly _onDidChange: Emitter<void> = this._register(new Emitter<void>());
@@ -31,7 +31,7 @@ test.skip('getOriginalClassName - typescript constructor', () => {
   }
 }
 `
-  const originalLine = 20
+  const originalLine = 10
   const originalColumn = 2
   expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('FolderConfiguration')
 })
