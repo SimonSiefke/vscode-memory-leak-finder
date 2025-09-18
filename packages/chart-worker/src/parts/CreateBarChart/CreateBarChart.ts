@@ -18,6 +18,7 @@ export const createBarChart = (data: any, options: any): string => {
       Plot.barX(data, {
         x: 'value',
         y: 'name',
+        fill: 'black',
         sort: {
           y: '-x',
         },

@@ -12,7 +12,7 @@ export const createDefaultChart = (data, { x, y, xLabel, yLabel }) => {
     x: {
       label: xLabel,
     },
-    marks: [Plot.lineY(data, { x, y })],
+    marks: [Plot.lineY(data, { x, y, stroke: 'black' })],
   }).outerHTML
 
   const finalHtml = fixHtmlNamespace(baseHtml)

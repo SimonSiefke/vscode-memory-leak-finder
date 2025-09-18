@@ -103,7 +103,7 @@ const baseStructure = `
       }
 
       .ChartLink.active {
-        background: #007acc;
+        background: black;
         color: white;
       }
 
@@ -401,8 +401,8 @@ const getSingleColumnHtml = (dirents: string[]): string => {
   html += '          </ul>\n'
   html += '        </main>\n'
   html += '        <svg class="ArrowOverlay" id="arrowOverlay">\n'
-  html += '          <path id="arrowPath" stroke="#007acc" stroke-width="2" fill="none" opacity="0" />\n'
-  html += '          <polygon id="arrowHead" points="0,0 12,6 0,12" fill="#007acc" opacity="0" />\n'
+  html += '          <path id="arrowPath" stroke="black" stroke-width="2" fill="none" opacity="0" />\n'
+  html += '          <polygon id="arrowHead" points="0,0 12,6 0,12" fill="black" opacity="0" />\n'
   html += '        </svg>\n'
   html += '      </div>'
   return html
