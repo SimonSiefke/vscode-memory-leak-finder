@@ -101,6 +101,7 @@ export const generateApiTypes = async (): Promise<void> => {
           apiProperties.push(`${partName}: ${partName}`)
         }
       } catch (error) {
+        // @ts-ignore
         console.warn(`Warning: Could not process ${partFile}:`, error.message)
       }
     }
