@@ -12,8 +12,10 @@ const doStart = async (connectionId: number): Promise<any> => {
   const result = await measure.start()
 
   if (measureNode) {
+    console.log('measureNode is true, attempting to measure Node processes')
     const browserSession = SessionState.getSession('browser')
     if (browserSession) {
+      console.log('Browser session found, measuring Node processes')
       // Store Node process measurements for later comparison
       const nodeMeasurements = await MeasureNodeProcesses.measureNodeProcesses(
         browserSession.rpc,
@@ -22,7 +24,11 @@ const doStart = async (connectionId: number): Promise<any> => {
         'before'
       )
       result.nodeMeasurements = nodeMeasurements
+    } else {
+      console.log('No browser session found')
     }
+  } else {
+    console.log('measureNode is false')
   }
 
   return result
