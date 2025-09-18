@@ -129,7 +129,7 @@ export const runTestsWithCallback = async ({
     let memoryLeakWorkerRpc = MemoryLeakWorker.getRpc()
     let targetId = ''
     if (checkLeaks) {
-      const info = await MemoryLeakFinder.setup(memoryLeakWorkerRpc, connectionId, measure)
+      const info = await MemoryLeakFinder.setup(memoryLeakWorkerRpc, connectionId, measure, measureNode)
       targetId = info.targetId
     }
     for (let i = 0; i < formattedPaths.length; i++) {

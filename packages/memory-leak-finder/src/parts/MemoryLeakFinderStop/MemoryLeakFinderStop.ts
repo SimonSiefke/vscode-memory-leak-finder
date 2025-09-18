@@ -1,12 +1,25 @@
 import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinderState.ts'
 import * as WaitForCrash from '../WaitForCrash/WaitForCrash.ts'
+import * as SessionState from '../SessionState/SessionState.ts'
+import * as MeasureNodeProcesses from '../MeasureNodeProcesses/MeasureNodeProcesses.ts'
 
 const doStop = async (connectionId: number): Promise<any> => {
-  const measure = MemoryLeakFinderState.get(connectionId)
-  if (!measure) {
+  const state = MemoryLeakFinderState.get(connectionId)
+  if (!state) {
     throw new Error(`no measure found`)
   }
+  const { measure, measureNode } = state
   const result = await measure.stop()
+
+  if (measureNode) {
+    const browserSession = SessionState.getSession('browser')
+    if (browserSession) {
+      // Store Node process measurements for later comparison
+      const nodeMeasurements = await MeasureNodeProcesses.measureNodeProcesses(browserSession.rpc, measure.id, 'after', {})
+      result.nodeMeasurements = nodeMeasurements
+    }
+  }
+
   await measure.releaseResources()
   return result
 }
