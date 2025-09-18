@@ -11,13 +11,7 @@ test('getTestsToRunWithContinue - without continue flag returns all tests', asyn
   const measure = 'event-listener-count'
   const shouldContinueFlag = false
 
-  const result = await GetTestsToRunWithContinue.getTestsToRunWithContinue(
-    root,
-    cwd,
-    filterValue,
-    measure,
-    shouldContinueFlag
-  )
+  const result = await GetTestsToRunWithContinue.getTestsToRunWithContinue(root, cwd, filterValue, measure, shouldContinueFlag)
 
   // Should return all tests when continue is false
   expect(result).toBeDefined()
@@ -40,13 +34,7 @@ test('getTestsToRunWithContinue - with continue flag filters out existing result
   const fakeResult = { test: 'data' }
   writeFileSync(join(resultsPath, 'test1.json'), JSON.stringify(fakeResult))
 
-  const result = await GetTestsToRunWithContinue.getTestsToRunWithContinue(
-    root,
-    cwd,
-    filterValue,
-    measure,
-    shouldContinueFlag
-  )
+  const result = await GetTestsToRunWithContinue.getTestsToRunWithContinue(root, cwd, filterValue, measure, shouldContinueFlag)
 
   // Should return tests that don't have existing results
   expect(result).toBeDefined()

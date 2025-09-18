@@ -9,7 +9,7 @@ export const getTestsToRunWithContinue = async (
   cwd: string,
   filterValue: string,
   measure: string,
-  shouldContinueFlag: boolean
+  shouldContinueFlag: boolean,
 ): Promise<readonly any[]> => {
   // Get all tests that would normally run
   const allTests = await GetTestsToRun.getTestsToRun(root, cwd, filterValue)
