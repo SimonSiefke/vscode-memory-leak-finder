@@ -13,6 +13,7 @@ import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAtt
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.ts'
 import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.ts'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.ts'
+import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
 import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTearDownTest.ts'
 import * as Time from '../Time/Time.ts'
 import * as Timeout from '../Timeout/Timeout.ts'
@@ -66,6 +67,7 @@ export const runTestsWithCallback = async ({
     const connectionId = Id.create()
     const attachedToPageTimeout = TimeoutConstants.AttachToPage
     const idleTimeout = TimeoutConstants.Idle
+    const pageObjectPath = GetPageObjectPath.getPageObjectPath()
 
     if (setupOnly && commit) {
       const testWorkerRpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
@@ -81,6 +83,7 @@ export const runTestsWithCallback = async ({
         commit,
         attachedToPageTimeout,
         idleTimeout,
+        pageObjectPath,
       )
       await testWorkerRpc.dispose()
       return callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, 0, 0, filterValue)
@@ -111,6 +114,7 @@ export const runTestsWithCallback = async ({
       commit,
       attachedToPageTimeout,
       idleTimeout,
+      pageObjectPath,
     )
 
     const context = {
@@ -223,6 +227,7 @@ export const runTestsWithCallback = async ({
             commit,
             attachedToPageTimeout,
             idleTimeout,
+            pageObjectPath,
           )
           if (checkLeaks) {
             memoryLeakWorkerRpc = MemoryLeakWorker.getRpc()
