@@ -12,15 +12,18 @@ export interface NodeProcess {
 
 export const getNodeProcesses = async (browserSession: Session): Promise<readonly NodeProcess[]> => {
   const targets = await DevtoolsProtocolTarget.getTargets(browserSession)
+  console.log(`[NodeProcess] Found ${targets.length} targets total`)
   const nodeProcesses: NodeProcess[] = []
-  
+
   for (const target of targets) {
+    console.log(`[NodeProcess] Target: ${target.type}, attached: ${target.attached}, id: ${target.targetId}, title: ${target.title}`)
     if (target.type === 'node' && target.attached) {
       const sessionId = target.sessionId
       if (sessionId) {
+        console.log(`[NodeProcess] Found Node process: ${target.targetId} - ${target.title}`)
         // Create a session RPC connection for this Node process
         const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserSession, sessionId)
-        
+
         nodeProcesses.push({
           targetId: target.targetId,
           sessionId,
@@ -31,6 +34,7 @@ export const getNodeProcesses = async (browserSession: Session): Promise<readonl
       }
     }
   }
-  
+
+  console.log(`[NodeProcess] Found ${nodeProcesses.length} Node processes`)
   return nodeProcesses
 }
