@@ -17,6 +17,7 @@
     "@babel/preset-typescript": "^7.27.1",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-node-resolve": "^16.0.1",
+    "@types/node": "^24.5.2",
     "dts-bundle-generator": "^9.5.1",
     "rollup": "^4.47.1"
   },

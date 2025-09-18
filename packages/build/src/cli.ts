@@ -1,4 +1,4 @@
-import { generateApiTypes } from './generateApiTypes.js'
+import { generateApiTypes } from './generateApiTypes.ts'
 
 const main = async (): Promise<void> => {
   try {

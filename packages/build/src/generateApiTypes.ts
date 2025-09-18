@@ -1,5 +1,5 @@
-import { writeFileSync, readFileSync, readdirSync } from 'fs'
-import { resolve, dirname, join } from 'path'
+import { readFileSync, writeFileSync } from 'fs'
+import { dirname, join, resolve } from 'path'
 import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -32,7 +32,10 @@ const extractMethodInfo = (content: string): MethodInfo[] => {
       if (paramString) {
         // Only process simple parameters (no destructuring or complex syntax)
         if (!paramString.includes('{') && !paramString.includes('[') && !paramString.includes('=')) {
-          parameters = paramString.split(',').map(p => p.trim()).filter(p => p)
+          parameters = paramString
+            .split(',')
+            .map((p) => p.trim())
+            .filter((p) => p)
         } else {
           // For complex parameters, just use a generic name
           parameters = ['options']
@@ -44,7 +47,7 @@ const extractMethodInfo = (content: string): MethodInfo[] => {
       name: methodName,
       parameters,
       returnType: 'Promise<void>',
-      isAsync: true
+      isAsync: true,
     })
   }
 
@@ -52,15 +55,15 @@ const extractMethodInfo = (content: string): MethodInfo[] => {
 }
 
 const generateInterfaceFromMethods = (methods: MethodInfo[], interfaceName: string): string => {
-  const methodSignatures = methods.map(method => {
-    // For now, just use any for all parameters to avoid syntax issues
-    const params = method.parameters.length > 0 
-      ? method.parameters.map(param => `${param}: any`).join(', ')
-      : ''
-    
-    return `  ${method.name}(${params}): ${method.returnType}`
-  }).join('\n')
-  
+  const methodSignatures = methods
+    .map((method) => {
+      // For now, just use any for all parameters to avoid syntax issues
+      const params = method.parameters.length > 0 ? method.parameters.map((param) => `${param}: any`).join(', ') : ''
+
+      return `  ${method.name}(${params}): ${method.returnType}`
+    })
+    .join('\n')
+
   return `export interface ${interfaceName} {\n${methodSignatures}\n}`
 }
 
@@ -74,8 +77,8 @@ export const generateApiTypes = async (): Promise<void> => {
     const partsContent = readFileSync(partsFile, 'utf8')
     const partNames = partsContent
       .split('\n')
-      .filter(line => line.includes('export * as'))
-      .map(line => {
+      .filter((line) => line.includes('export * as'))
+      .map((line) => {
         const match = line.match(/export \* as (\w+) from/)
         return match ? match[1] : null
       })
@@ -103,7 +106,7 @@ export const generateApiTypes = async (): Promise<void> => {
     }
 
     // Generate the main API interface
-    const mainApiInterface = `export interface PageObjectApi {\n${apiProperties.map(prop => `  readonly ${prop}`).join('\n')}\n}`
+    const mainApiInterface = `export interface PageObjectApi {\n${apiProperties.map((prop) => `  readonly ${prop}`).join('\n')}\n}`
 
     // Generate context interface
     const contextInterface = `export interface PageObjectContext {
@@ -130,7 +133,7 @@ export const generateApiTypes = async (): Promise<void> => {
       '// Export the create function type',
       'export declare const create: (context: PageObjectContext) => Promise<PageObjectApi>',
       '',
-      'export default PageObjectApi'
+      'export default PageObjectApi',
     ].join('\n')
 
     // Ensure the output directory exists
