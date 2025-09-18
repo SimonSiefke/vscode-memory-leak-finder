@@ -11,7 +11,7 @@ const state: State = {
   rpc: undefined,
 }
 
-export const startWorker = async (devtoolsWebsocketUrl: string, connectionId: number, measureId: string, attachedTimeout: number) => {
+export const startWorker = async (devtoolsWebsocketUrl: string, connectionId: number, measureId: string, attachedToPageTimeout: number) => {
   Assert.string(devtoolsWebsocketUrl)
   const rpc = await NodeWorkerRpcParent.create({
     path: MemoryLeakWorkerUrl.memoryLeakWorkerUrl,
@@ -19,7 +19,7 @@ export const startWorker = async (devtoolsWebsocketUrl: string, connectionId: nu
     commandMap: CommandMapRef.commandMapRef,
   })
   state.rpc = rpc
-  await rpc.invoke('ConnectDevtools.connectDevtools', devtoolsWebsocketUrl, connectionId, measureId, attachedTimeout)
+  await rpc.invoke('ConnectDevtools.connectDevtools', devtoolsWebsocketUrl, connectionId, measureId, attachedToPageTimeout)
 }
 
 export const getRpc = () => {
