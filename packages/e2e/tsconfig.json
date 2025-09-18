@@ -2,13 +2,12 @@
   "compilerOptions": {
     "lib": ["esnext"],
     "target": "esnext",
-    "checkJs": true,
     "module": "NodeNext",
-    "types": [],
+    "types": ["node"],
     "moduleResolution": "NodeNext",
     "isolatedModules": true,
     "strict": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "skipLibCheck": true,
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
@@ -18,7 +17,9 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
-    "composite": true
+    "composite": true,
+    "esModuleInterop": true,
+    "allowImportingTsExtensions": true
   },
   "include": ["src", "test", "types.d.ts"]
 }
