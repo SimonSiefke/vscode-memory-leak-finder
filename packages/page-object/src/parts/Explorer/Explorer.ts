@@ -52,9 +52,12 @@ export const create = ({ page, expect, VError }) => {
         await page.waitForIdle()
         const newFileButton = page.locator('.sidebar [aria-label="New File..."]')
         await expect(newFileButton).toBeVisible()
+        await page.waitForIdle()
         await newFileButton.click()
+        await page.waitForIdle()
         const inputBox = await page.locator('.monaco-inputbox input')
         await expect(inputBox).toBeVisible()
+        await page.waitForIdle()
         await expect(inputBox).toBeFocused()
         await inputBox.type(name)
         await page.keyboard.press('Enter')
@@ -263,13 +266,16 @@ export const create = ({ page, expect, VError }) => {
     },
     async refresh() {
       try {
+        await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         await expect(explorer).toBeVisible()
         const header = page.locator(`.pane-header[aria-label^="Explorer Section"]`)
         await expect(header).toBeVisible()
         await header.hover()
+        await page.waitForIdle()
         const button = page.locator(`[role="button"][aria-label="Refresh Explorer"]`)
         await button.click()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to refresh explorer`)
       }
