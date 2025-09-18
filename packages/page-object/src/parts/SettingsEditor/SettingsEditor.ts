@@ -187,10 +187,13 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const block = page.locator(`.setting-item-contents[aria-label="${name}"]`)
         await expect(block).toBeVisible()
+        await page.waitForIdle()
         const keyHeading = block.locator('.setting-list-object-key')
         await expect(keyHeading).toHaveText('Item')
+        await page.waitForIdle()
         const valueHeading = block.locator('.setting-list-object-value')
         await expect(valueHeading).toHaveText('Value')
+        await page.waitForIdle()
         const addButton = block.locator('.monaco-button', {
           hasText: 'Add Item',
         })
