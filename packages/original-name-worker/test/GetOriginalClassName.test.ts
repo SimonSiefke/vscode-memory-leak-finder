@@ -12,6 +12,30 @@ test('getOriginalClassName', () => {
   expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('Test')
 })
 
+test.skip('getOriginalClassName - typescript constructor', () => {
+  const sourceContent = `export class FolderConfiguration extends Disposable {
+
+	protected readonly _onDidChange: Emitter<void> = this._register(new Emitter<void>());
+	readonly onDidChange: Event<void> = this._onDidChange.event;
+
+	private folderConfiguration: CachedFolderConfiguration | FileServiceBasedConfiguration;
+	private readonly scopes: ConfigurationScope[];
+	private readonly configurationFolder: URI;
+	private cachedFolderConfiguration: CachedFolderConfiguration;
+
+	constructor(
+		useCache: boolean,
+		readonly workspaceFolder: IWorkspaceFolder,
+	) {
+		super();
+  }
+}
+`
+  const originalLine = 20
+  const originalColumn = 2
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('FolderConfiguration')
+})
+
 test('getOriginalClassName - extends', () => {
   const sourceContent = `class extends Test {
   constructor(value){
