@@ -52,6 +52,7 @@ export const create = ({ page, expect, VError }) => {
         await page.waitForIdle()
         const newFileButton = page.locator('.sidebar [aria-label="New File..."]')
         await expect(newFileButton).toBeVisible()
+        await page.waitForIdle()
         await newFileButton.click()
         await page.waitForIdle()
         const inputBox = await page.locator('.monaco-inputbox input')
