@@ -1,5 +1,5 @@
 import type { Session } from '../Session/Session.ts'
-import * as DevtoolsProtocolTarget from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
 
 export interface NodeProcess {

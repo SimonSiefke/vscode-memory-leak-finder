@@ -1,12 +1,7 @@
-import { join } from 'node:path'
 import type { Session } from '../Session/Session.ts'
 import * as GetNodeProcesses from '../GetNodeProcesses/GetNodeProcesses.ts'
 import * as GetNodeNamedFunctionCount3 from '../GetNodeNamedFunctionCount3/GetNodeNamedFunctionCount3.ts'
-import * as WriteNodeResult from '../WriteNodeResult/WriteNodeResult.ts'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
-import * as CompareNamedFunctionCount3 from '../CompareNamedFunctionCount3/CompareNamedFunctionCount3.ts'
-import * as Root from '../Root/Root.ts'
 
 export interface NodeProcessMeasurement {
   readonly nodeProcessId: string
@@ -27,7 +22,6 @@ export const measureNodeProcesses = async (
   for (const nodeProcess of nodeProcesses) {
     try {
       // Create script handler for this Node process
-      const objectGroup = ObjectGroupId.create()
       const scriptHandler = ScriptHandler.create()
 
       // Start script handler
