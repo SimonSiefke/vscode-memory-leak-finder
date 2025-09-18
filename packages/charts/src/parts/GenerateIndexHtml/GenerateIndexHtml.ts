@@ -262,25 +262,48 @@ const baseStructure = `
 
         // If no active chart or arrow head is visible, use normal detection
         if (!activeChart) {
-          charts.forEach(chart => {
+          charts.forEach((chart, index) => {
             const chartTop = chart.offsetTop;
-            const chartBottom = chartTop + chart.offsetHeight;
+            const chartHeight = chart.offsetHeight;
+            const chartMiddle = chartTop + (chartHeight / 2);
             const chartId = chart.id;
 
-            // Use earlier switching - when chart is 60% visible instead of 100%
-            const chartHeight = chart.offsetHeight;
-            const visibleThreshold = chartTop + (chartHeight * 0.6);
+            // Switch to next chart when 20px before the middle of current chart
+            const switchThreshold = chartMiddle - 20;
 
-            if (scrollPosition >= chartTop && scrollPosition < visibleThreshold) {
-              activeChart = chart;
-              // Remove active class from all links
-              chartLinks.forEach(link => link.classList.remove('active'));
+            // For the first chart, use normal detection
+            if (index === 0) {
+              if (scrollPosition >= chartTop && scrollPosition < switchThreshold) {
+                activeChart = chart;
+                // Remove active class from all links
+                chartLinks.forEach(link => link.classList.remove('active'));
 
-              // Add active class to current chart's link
-              const link = document.querySelector('a[href="#' + chartId + '"]');
-              if (link) {
-                link.classList.add('active');
-                activeLink = link;
+                // Add active class to current chart's link
+                const link = document.querySelector('a[href="#' + chartId + '"]');
+                if (link) {
+                  link.classList.add('active');
+                  activeLink = link;
+                }
+              }
+            } else {
+              // For subsequent charts, check if we're past the switch threshold of previous chart
+              const prevChart = charts[index - 1];
+              const prevChartTop = prevChart.offsetTop;
+              const prevChartHeight = prevChart.offsetHeight;
+              const prevChartMiddle = prevChartTop + (prevChartHeight / 2);
+              const prevSwitchThreshold = prevChartMiddle - 20;
+
+              if (scrollPosition >= prevSwitchThreshold && scrollPosition < chartTop + chartHeight) {
+                activeChart = chart;
+                // Remove active class from all links
+                chartLinks.forEach(link => link.classList.remove('active'));
+
+                // Add active class to current chart's link
+                const link = document.querySelector('a[href="#' + chartId + '"]');
+                if (link) {
+                  link.classList.add('active');
+                  activeLink = link;
+                }
               }
             }
           });
