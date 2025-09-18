@@ -31,7 +31,6 @@ export const connectDevtools = async (
 ) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
-  // Assert.string(monkeyPatchedElectronId)
   Assert.boolean(isFirstConnection)
 
   const electronRpc = await connectElectron(connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback)
@@ -77,7 +76,6 @@ export const connectDevtools = async (
     electronObjectId,
     idleTimeout,
   })
-
   const pageObjectModule = await ImportScript.importScript(pageObjectPath)
   const firstWindow = await WaitForFirstWindow.waitForFirstWindow({
     electronApp,
@@ -91,7 +89,6 @@ export const connectDevtools = async (
     electronApp,
     ideVersion: parsedIdeVersion,
   }
-
   const pageObject = await pageObjectModule.create(pageObjectContext)
   await pageObject.WaitForApplicationToBeReady.waitForApplicationToBeReady()
   if (timeouts === false) {
