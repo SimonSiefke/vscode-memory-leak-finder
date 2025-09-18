@@ -13,8 +13,7 @@
     "postinstall": "lerna bootstrap --ci",
     "test": "lerna run test",
     "type-check": "tsc -b",
-    "build-charts": "node packages/charts/src/main.ts",
-    "generate-api-types": "cd packages/build && npm run generate-api-types"
+    "build-charts": "node packages/charts/src/main.ts"
   },
   "repository": {
     "type": "git",
