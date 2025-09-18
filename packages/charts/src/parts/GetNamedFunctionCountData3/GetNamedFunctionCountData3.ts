@@ -38,7 +38,12 @@ export const getNamedFunctionCountData3 = async (name: string) => {
       }
     })
     data.sort((a, b) => b.value - a.value)
-    allData.push(data)
+    // Add filename metadata to the data
+    const dataWithFilename = {
+      data,
+      filename: dirent.replace('.json', '')
+    }
+    allData.push(dataWithFilename)
   }
   return allData
 }
