@@ -152,6 +152,7 @@ const baseStructure = `
       const charts = document.querySelectorAll('.Chart');
       const arrowOverlay = document.getElementById('arrowOverlay');
       const arrowPath = document.getElementById('arrowPath');
+      const arrowHead = document.getElementById('arrowHead');
 
       // Function to calculate and draw arrow
       function drawArrow(activeLink, activeChart) {
@@ -198,17 +199,9 @@ const baseStructure = `
         arrowPath.setAttribute('d', pathData);
         
         // Position the arrow head at the target point
-        const marker = document.getElementById('arrowhead');
-        if (marker) {
-          marker.setAttribute('orient', angle);
-          marker.setAttribute('refX', '0');
-          marker.setAttribute('refY', '3.5');
-        }
-        
-        // Update arrow head position
-        const arrowHead = document.querySelector('#arrowhead polygon');
         if (arrowHead) {
           arrowHead.setAttribute('transform', 'translate(' + targetX + ',' + targetY + ') rotate(' + angle + ')');
+          arrowHead.style.opacity = '1';
         }
 
         arrowPath.style.opacity = '1';
@@ -218,6 +211,9 @@ const baseStructure = `
       function hideArrow() {
         if (arrowPath) {
           arrowPath.style.opacity = '0';
+        }
+        if (arrowHead) {
+          arrowHead.style.opacity = '0';
         }
       }
 
@@ -378,12 +374,8 @@ const getSingleColumnHtml = (dirents: string[]): string => {
   html += '          </ul>\n'
   html += '        </main>\n'
   html += '        <svg class="ArrowOverlay" id="arrowOverlay">\n'
-  html += '          <defs>\n'
-  html += '            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">\n'
-  html += '              <polygon points="0 0, 10 3.5, 0 7" fill="#007acc" />\n'
-  html += '            </marker>\n'
-  html += '          </defs>\n'
-  html += '          <path id="arrowPath" stroke="#007acc" stroke-width="2" fill="none" marker-end="url(#arrowhead)" opacity="0" />\n'
+  html += '          <path id="arrowPath" stroke="#007acc" stroke-width="2" fill="none" opacity="0" />\n'
+  html += '          <polygon id="arrowHead" points="0,0 12,6 0,12" fill="#007acc" opacity="0" />\n'
   html += '        </svg>\n'
   html += '      </div>'
   return html
