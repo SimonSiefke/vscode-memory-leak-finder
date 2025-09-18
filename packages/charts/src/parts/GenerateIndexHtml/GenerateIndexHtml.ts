@@ -164,8 +164,8 @@ const baseStructure = `
         const startX = linkRect.right + 10;
         const startY = linkRect.top + linkRect.height / 2;
 
-        // End point: left edge of chart, center vertically
-        const endX = chartRect.left - 10;
+        // End point: 300px more to the right from left edge of chart, center vertically
+        const endX = chartRect.left + 300;
         const endY = chartRect.top + chartRect.height / 2;
 
         // Control points for bezier curve
@@ -283,7 +283,7 @@ const generateIndexHtmlForFolder = async (folderPath: string, folderName: string
 }
 
 const getSingleColumnHtml = (dirents: string[]): string => {
-  const svgFiles = dirents.filter(dirent => dirent.endsWith('.svg'))
+  const svgFiles = dirents.filter((dirent) => dirent.endsWith('.svg'))
 
   let html = '<div class="Layout">\n'
   html += '        <nav class="Navigation">\n'
@@ -333,7 +333,7 @@ export const generateIndexHtml = async (): Promise<void> => {
     const stats = await stat(fullPath)
     if (stats.isDirectory()) {
       const subDirContents = await readdir(fullPath)
-      const hasSvgFiles = subDirContents.some(file => file.endsWith('.svg'))
+      const hasSvgFiles = subDirContents.some((file) => file.endsWith('.svg'))
       if (hasSvgFiles) {
         await generateIndexHtmlForFolder(fullPath, dirent)
       }
