@@ -1,6 +1,3 @@
-# packages/e2e/types.d.ts
-packages/e2e/types/pageobject-api.d.ts
-
 benchmark-results
 .vscode-sources
 .vscode-script-maps
