@@ -10,7 +10,7 @@ const doStart = async (connectionId: number): Promise<any> => {
   }
   const { measure, measureNode } = state
   const result = await measure.start()
-  
+
   if (measureNode) {
     const browserSession = SessionState.getSession('browser')
     if (browserSession) {
@@ -24,7 +24,7 @@ const doStart = async (connectionId: number): Promise<any> => {
       result.nodeMeasurements = nodeMeasurements
     }
   }
-  
+
   return result
 }
 

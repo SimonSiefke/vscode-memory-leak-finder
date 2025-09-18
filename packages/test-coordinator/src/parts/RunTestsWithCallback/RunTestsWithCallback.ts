@@ -171,6 +171,19 @@ export const runTestsWithCallback = async ({
             const after = await MemoryLeakFinder.stop(memoryLeakWorkerRpc, connectionId, targetId)
 
             const result = await MemoryLeakFinder.compare(memoryLeakWorkerRpc, connectionId, before, after, context)
+
+            // Handle Node process measurements if measureNode is enabled
+            if (measureNode && before.nodeMeasurements && after.nodeMeasurements) {
+              const CompareNodeMeasurements = await import('../CompareNodeMeasurements/CompareNodeMeasurements.ts')
+              await CompareNodeMeasurements.compareNodeMeasurements(
+                before.nodeMeasurements,
+                after.nodeMeasurements,
+                measure,
+                dirent,
+                context,
+              )
+            }
+
             const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
             const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
             await JsonFile.writeJson(resultPath, result)

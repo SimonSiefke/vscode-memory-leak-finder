@@ -23,16 +23,16 @@ export const measureNodeProcesses = async (
 ): Promise<readonly NodeProcessMeasurement[]> => {
   const nodeProcesses = await GetNodeProcesses.getNodeProcesses(browserSession)
   const measurements: NodeProcessMeasurement[] = []
-  
+
   for (const nodeProcess of nodeProcesses) {
     try {
       // Create script handler for this Node process
       const objectGroup = ObjectGroupId.create()
       const scriptHandler = ScriptHandler.create()
-      
+
       // Start script handler
       await scriptHandler.start(nodeProcess.session)
-      
+
       // Capture snapshot
       const snapshot = await GetNodeNamedFunctionCount3.getNodeNamedFunctionCount3(
         nodeProcess.session,
@@ -41,10 +41,10 @@ export const measureNodeProcesses = async (
         false,
         phase,
       )
-      
+
       // Stop script handler
       await scriptHandler.stop(nodeProcess.session)
-      
+
       measurements.push({
         nodeProcessId: nodeProcess.targetId,
         before: phase === 'before' ? JSON.stringify(snapshot) : '',
@@ -55,6 +55,6 @@ export const measureNodeProcesses = async (
       console.error(`Failed to measure node process ${nodeProcess.targetId}:`, error)
     }
   }
-  
+
   return measurements
 }
