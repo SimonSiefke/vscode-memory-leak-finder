@@ -13,6 +13,7 @@ import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAtt
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.ts'
 import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.ts'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.ts'
+import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
 import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTearDownTest.ts'
 import * as Time from '../Time/Time.ts'
 import * as Timeout from '../Timeout/Timeout.ts'
@@ -64,6 +65,7 @@ export const runTestsWithCallback = async ({
     Assert.boolean(setupOnly)
 
     const connectionId = Id.create()
+    const pageObjectPath = GetPageObjectPath.getPageObjectPath()
     const attachedToPageTimeout = TimeoutConstants.AttachToPage
     const idleTimeout = TimeoutConstants.Idle
 

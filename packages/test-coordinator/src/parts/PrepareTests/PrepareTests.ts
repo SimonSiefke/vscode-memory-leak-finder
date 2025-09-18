@@ -18,6 +18,7 @@ export const prepareTests = async (
   commit: string,
   attachedToPageTimeout: number,
   idleTimeout: number,
+  parsedIdeVersion: any,
 ) => {
   const pageObjectPath = GetPageObjectPath.getPageObjectPath()
   const isFirstConnection = true
@@ -46,6 +47,10 @@ export const prepareTests = async (
     electronObjectId,
     attachedToPageTimeout,
     idleTimeout,
+    pageObjectPath,
+    headlessMode,
+    parsedIdeVersion,
+    timeouts,
   )
   await PageObject.create(rpc, connectionId, isFirstConnection, headlessMode, timeouts, parsedVersion, pageObjectPath)
 

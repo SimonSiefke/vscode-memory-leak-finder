@@ -4,11 +4,16 @@ import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/Deb
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as DisableTimeouts from '../DisableTimeouts/DisableTimeouts.ts'
 import * as ElectronApp from '../ElectronApp/ElectronApp.ts'
-import * as ElectronAppState from '../ElectronAppState/ElectronAppState.ts'
+import * as Expect from '../Expect/Expect.ts'
+import * as ImportScript from '../ImportScript/ImportScript.ts'
 import * as ObjectType from '../ObjectType/ObjectType.ts'
+import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.ts'
 import * as SessionState from '../SessionState/SessionState.ts'
+import { VError } from '../VError/VError.ts'
+import * as WaitForFirstWindow from '../WaitForFirstWindow/WaitForFirstWindow.ts'
 
 export const connectDevtools = async (
   connectionId: number,
@@ -19,6 +24,10 @@ export const connectDevtools = async (
   webSocketUrl: string,
   canUseIdleCallback: boolean,
   idleTimeout: number,
+  pageObjectPath: string,
+  isHeadless: boolean,
+  parsedIdeVersion: any,
+  timeouts: boolean,
 ) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
@@ -68,5 +77,25 @@ export const connectDevtools = async (
     electronObjectId,
     idleTimeout,
   })
-  ElectronAppState.set(connectionId, electronApp)
+
+  const pageObjectModule = await ImportScript.importScript(pageObjectPath)
+  const firstWindow = await WaitForFirstWindow.waitForFirstWindow({
+    electronApp,
+    isFirstConnection,
+    isHeadless,
+  })
+  const pageObjectContext = {
+    page: firstWindow,
+    expect: Expect.expect,
+    VError,
+    electronApp,
+    ideVersion: parsedIdeVersion,
+  }
+
+  const pageObject = await pageObjectModule.create(pageObjectContext)
+  await pageObject.WaitForApplicationToBeReady.waitForApplicationToBeReady()
+  if (timeouts === false) {
+    await DisableTimeouts.disableTimeouts(firstWindow)
+  }
+  PageObjectState.set(connectionId, { pageObject, firstWindow })
 }

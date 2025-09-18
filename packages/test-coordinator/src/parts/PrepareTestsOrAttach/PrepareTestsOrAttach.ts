@@ -1,6 +1,5 @@
 import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.ts'
 import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
-import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
 import * as LaunchTestWorker from '../LaunchTestWorker/LaunchTestWorker.ts'
 import * as PageObject from '../PageObject/PageObject.ts'
 import * as PrepareTests from '../PrepareTests/PrepareTests.ts'
@@ -41,8 +40,9 @@ export const prepareTestsOrAttach = async (
   commit: string,
   attachedToPageTimeout: number,
   idleTimeout: number,
+  parsedIdeVersion: any,
+  pageObjectPath: string,
 ) => {
-  const pageObjectPath = GetPageObjectPath.getPageObjectPath()
   const testWorkerRpc = await LaunchTestWorker.launchTestWorker(runMode)
   const isFirst = state.promise === undefined
   if (isFirst) {
@@ -59,6 +59,10 @@ export const prepareTestsOrAttach = async (
       commit,
       attachedToPageTimeout,
       idleTimeout,
+      pageObjectPath,
+      headlessMode,
+      parsedIdeVersion,
+      timeouts,
     )
     const result = await state.promise
     state.parsedVersion = result.parsedVersion
@@ -77,6 +81,10 @@ export const prepareTestsOrAttach = async (
     webSocketUrl,
     canUseIdleCallback,
     idleTimeout,
+    pageObjectPath,
+    headlessMode,
+    parsedIdeVersion,
+    timeouts,
   )
   await PageObject.create(testWorkerRpc, connectionId, isFirstConnection, headlessMode, timeouts, state.parsedVersion, pageObjectPath)
   return testWorkerRpc
