@@ -168,39 +168,43 @@ const baseStructure = `
         // Target point: 300px more to the right from left edge of chart, center vertically
         const targetX = chartRect.left + 300;
         const targetY = chartRect.top + chartRect.height / 2;
-        
+
         // Control points for bezier curve
         const controlX1 = startX + (targetX - startX) * 0.3;
         const controlY1 = startY;
         const controlX2 = startX + (targetX - startX) * 0.7;
         const controlY2 = targetY;
-        
+
         // Calculate tangent angle at the target point
         // For a cubic bezier curve, the tangent at t=1 is: 3 * (P3 - P2)
         const tangentX = 3 * (targetX - controlX2);
         const tangentY = 3 * (targetY - controlY2);
         const angle = Math.atan2(tangentY, tangentX) * (180 / Math.PI);
-        
+
         // Calculate arrow head size and position
         const arrowSize = 12; // Size of the arrow head
         const arrowOffsetX = Math.cos(angle * Math.PI / 180) * arrowSize;
         const arrowOffsetY = Math.sin(angle * Math.PI / 180) * arrowSize;
-        
+
         // End point: target point minus arrow offset
         const endX = targetX - arrowOffsetX;
         const endY = targetY - arrowOffsetY;
-        
+
         // Create bezier curve path that ends before the arrow head
-        const pathData = 'M ' + startX + ',' + startY + 
-                        ' C ' + controlX1 + ',' + controlY1 + 
-                        ' ' + controlX2 + ',' + controlY2 + 
+        const pathData = 'M ' + startX + ',' + startY +
+                        ' C ' + controlX1 + ',' + controlY1 +
+                        ' ' + controlX2 + ',' + controlY2 +
                         ' ' + endX + ',' + endY;
-        
+
         arrowPath.setAttribute('d', pathData);
-        
-        // Position the arrow head at the target point
+
+        // Position the arrow head at the end of the line
+        // The triangle points are (0,0), (12,6), (0,12), so the base is at y=6
+        // We need to offset by (0, -6) to position the base at the line end
         if (arrowHead) {
-          arrowHead.setAttribute('transform', 'translate(' + targetX + ',' + targetY + ') rotate(' + angle + ')');
+          const offsetX = Math.cos(angle * Math.PI / 180) * 0 - Math.sin(angle * Math.PI / 180) * 6;
+          const offsetY = Math.sin(angle * Math.PI / 180) * 0 + Math.cos(angle * Math.PI / 180) * 6;
+          arrowHead.setAttribute('transform', 'translate(' + (endX + offsetX) + ',' + (endY + offsetY) + ') rotate(' + angle + ')');
           arrowHead.style.opacity = '1';
         }
 
