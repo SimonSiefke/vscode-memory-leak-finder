@@ -41,7 +41,7 @@ export const getNamedFunctionCountData3 = async (name: string) => {
     // Add filename metadata to the data
     const dataWithFilename = {
       data,
-      filename: dirent.replace('.json', '')
+      filename: dirent.replace('.json', ''),
     }
     allData.push(dataWithFilename)
   }

@@ -31,7 +31,7 @@ export const generateCharts = async () => {
         // Check if item has filename metadata (new structure) or is just data array (old structure)
         const chartData = item.data || item
         const filename = item.filename || i.toString()
-        
+
         if (chartData.length > 0) {
           const svg = await rpc.invoke('Chart.create', chartData, chartMetaData)
           const outPath = join(Root.root, '.vscode-charts', `${visitor.name}/${filename}.svg`)
