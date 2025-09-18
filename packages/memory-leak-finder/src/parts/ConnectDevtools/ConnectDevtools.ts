@@ -7,7 +7,12 @@ import * as ObjectType from '../ObjectType/ObjectType.ts'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.ts'
 import * as SessionState from '../SessionState/SessionState.ts'
 
-export const connectDevtools = async (devtoolsWebSocketUrl: string): Promise<void> => {
+export const connectDevtools = async (
+  devtoolsWebSocketUrl: string,
+  connectionId: number,
+  measureId: string,
+  attachedToPageTimeout: number,
+): Promise<void> => {
   Assert.string(devtoolsWebSocketUrl)
   const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
