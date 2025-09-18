@@ -38,6 +38,7 @@ export const connectDevtools = async (
   // @ts-ignore
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
 
+  // TODO remove session
   SessionState.addSession('browser', {
     type: ObjectType.Browser,
     objectType: ObjectType.Browser,
@@ -45,6 +46,8 @@ export const connectDevtools = async (
     sessionId: '',
     rpc: browserRpc,
   })
+
+  // TODO remove events, instead wait for first window to be created and thats it
 
   browserRpc.on(DevtoolsEventType.DebuggerPaused, ScenarioFunctions.handlePaused)
   browserRpc.on(DevtoolsEventType.DebuggerResumed, ScenarioFunctions.handleResumed)
