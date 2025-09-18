@@ -30,6 +30,7 @@ export interface StdinDataState {
   previousFilters: string[]
   exitCode: number
   isWindows: boolean
+  shouldContinue: boolean
 }
 
 let state: StdinDataState = {
@@ -58,6 +59,7 @@ let state: StdinDataState = {
   previousFilters: [],
   isWindows: false,
   exitCode: 0,
+  shouldContinue: false,
 }
 
 export const setState = (newState): void => {
@@ -85,6 +87,7 @@ export const setState = (newState): void => {
     stdout: newState.stdout,
     previousFilters: newState.previousFilters,
     isWindows: newState.isWindows,
+    shouldContinue: newState.shouldContinue,
   }
 }
 
