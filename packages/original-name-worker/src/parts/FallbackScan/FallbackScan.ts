@@ -6,6 +6,9 @@ export const fallbackScan = (sourceContent: string, originalLine: number): strin
   const extendsPrefix: string = 'extends'
   const lines: string[] = sourceContent.split('\n')
   for (let i = originalLine; i >= 0; i--) {
+    if (i >= lines.length) {
+      continue
+    }
     const line: string = lines[i]
     const classIndex: number = line.indexOf(classPrefix)
     if (classIndex !== -1) {

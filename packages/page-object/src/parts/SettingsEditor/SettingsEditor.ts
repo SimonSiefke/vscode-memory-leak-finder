@@ -34,11 +34,13 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const searchInput = page.locator('.search-container [role="textbox"]')
         await expect(searchInput).toBeFocused()
+        await page.waitForIdle()
         await searchInput.type(value)
         await page.waitForIdle()
         const searchCount = page.locator('.settings-count-widget')
         const word = resultCount === 1 ? 'Setting' : 'Settings'
         await expect(searchCount).toHaveText(`${resultCount} ${word} Found`)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to search for ${value}`)
       }
@@ -193,6 +195,7 @@ export const create = ({ expect, page, VError }) => {
           hasText: 'Add Item',
         })
         await addButton.click()
+        await page.waitForIdle()
         const keyInput = block.locator('.setting-list-object-input-key .input')
         await expect(keyInput).toBeVisible()
         await expect(keyInput).toBeFocused()
