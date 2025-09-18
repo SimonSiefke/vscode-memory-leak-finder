@@ -201,11 +201,11 @@ export const runTestsWithCallback = async ({
       } finally {
         if (restartBetween) {
           if (memoryLeakWorkerRpc) {
-            memoryLeakWorkerRpc.dispose()
+            await memoryLeakWorkerRpc.dispose()
             memoryLeakWorkerRpc = undefined
           }
           if (testWorkerRpc) {
-            testWorkerRpc.dispose()
+            await testWorkerRpc.dispose()
           }
           // Dispose initialization worker and any other registered disposables
           await Disposables.disposeAll()
