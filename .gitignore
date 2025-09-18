@@ -1,4 +1,5 @@
-# playground
+packages/e2e/types.d.ts
+packages/e2e/pageobject-api.d.ts
 benchmark-results
 .vscode-sources
 .vscode-script-maps
