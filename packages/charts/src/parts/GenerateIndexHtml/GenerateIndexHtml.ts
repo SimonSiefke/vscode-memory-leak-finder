@@ -202,8 +202,8 @@ const baseStructure = `
         // The triangle points are (0,0), (12,6), (0,12), so the base is at y=6
         // We need to offset by (0, -6) to position the base at the line end
         if (arrowHead) {
-          const offsetX = Math.cos(angle * Math.PI / 180) * 0 - Math.sin(angle * Math.PI / 180) * 6;
-          const offsetY = Math.sin(angle * Math.PI / 180) * 0 + Math.cos(angle * Math.PI / 180) * 6;
+          const offsetX = Math.cos(angle * Math.PI / 180) * 0 - Math.sin(angle * Math.PI / 180) * (-6);
+          const offsetY = Math.sin(angle * Math.PI / 180) * 0 + Math.cos(angle * Math.PI / 180) * (-6);
           arrowHead.setAttribute('transform', 'translate(' + (endX + offsetX) + ',' + (endY + offsetY) + ') rotate(' + angle + ')');
           arrowHead.style.opacity = '1';
         }
