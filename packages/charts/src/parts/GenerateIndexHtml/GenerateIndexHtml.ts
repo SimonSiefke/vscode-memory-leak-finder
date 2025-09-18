@@ -164,23 +164,53 @@ const baseStructure = `
         const startX = linkRect.right + 10;
         const startY = linkRect.top + linkRect.height / 2;
 
-        // End point: 300px more to the right from left edge of chart, center vertically
-        const endX = chartRect.left + 300;
-        const endY = chartRect.top + chartRect.height / 2;
-
+        // Target point: 300px more to the right from left edge of chart, center vertically
+        const targetX = chartRect.left + 300;
+        const targetY = chartRect.top + chartRect.height / 2;
+        
         // Control points for bezier curve
-        const controlX1 = startX + (endX - startX) * 0.3;
+        const controlX1 = startX + (targetX - startX) * 0.3;
         const controlY1 = startY;
-        const controlX2 = startX + (endX - startX) * 0.7;
-        const controlY2 = endY;
-
-        // Create bezier curve path
-        const pathData = 'M ' + startX + ',' + startY +
-                        ' C ' + controlX1 + ',' + controlY1 +
-                        ' ' + controlX2 + ',' + controlY2 +
+        const controlX2 = startX + (targetX - startX) * 0.7;
+        const controlY2 = targetY;
+        
+        // Calculate tangent angle at the target point
+        // For a cubic bezier curve, the tangent at t=1 is: 3 * (P3 - P2)
+        const tangentX = 3 * (targetX - controlX2);
+        const tangentY = 3 * (targetY - controlY2);
+        const angle = Math.atan2(tangentY, tangentX) * (180 / Math.PI);
+        
+        // Calculate arrow head size and position
+        const arrowSize = 12; // Size of the arrow head
+        const arrowOffsetX = Math.cos(angle * Math.PI / 180) * arrowSize;
+        const arrowOffsetY = Math.sin(angle * Math.PI / 180) * arrowSize;
+        
+        // End point: target point minus arrow offset
+        const endX = targetX - arrowOffsetX;
+        const endY = targetY - arrowOffsetY;
+        
+        // Create bezier curve path that ends before the arrow head
+        const pathData = 'M ' + startX + ',' + startY + 
+                        ' C ' + controlX1 + ',' + controlY1 + 
+                        ' ' + controlX2 + ',' + controlY2 + 
                         ' ' + endX + ',' + endY;
-
+        
         arrowPath.setAttribute('d', pathData);
+        
+        // Position the arrow head at the target point
+        const marker = document.getElementById('arrowhead');
+        if (marker) {
+          marker.setAttribute('orient', angle);
+          marker.setAttribute('refX', '0');
+          marker.setAttribute('refY', '3.5');
+        }
+        
+        // Update arrow head position
+        const arrowHead = document.querySelector('#arrowhead polygon');
+        if (arrowHead) {
+          arrowHead.setAttribute('transform', 'translate(' + targetX + ',' + targetY + ') rotate(' + angle + ')');
+        }
+
         arrowPath.style.opacity = '1';
       }
 
@@ -193,28 +223,68 @@ const baseStructure = `
 
       // Function to update active link based on scroll position
       function updateActiveLink() {
-        const scrollPosition = window.scrollY + 100; // Offset for better UX
+        const scrollPosition = window.scrollY;
         let activeChart = null;
         let activeLink = null;
 
-        charts.forEach(chart => {
-          const chartTop = chart.offsetTop;
-          const chartBottom = chartTop + chart.offsetHeight;
-          const chartId = chart.id;
+        // Check if we have an active chart and if the arrow head is visible
+        const currentActiveLink = document.querySelector('.ChartLink.active');
+        if (currentActiveLink) {
+          const currentChartId = currentActiveLink.getAttribute('href').substring(1);
+          const currentChart = document.getElementById(currentChartId);
 
-          if (scrollPosition >= chartTop && scrollPosition < chartBottom) {
-            activeChart = chart;
-            // Remove active class from all links
-            chartLinks.forEach(link => link.classList.remove('active'));
+          if (currentChart) {
+            const chartRect = currentChart.getBoundingClientRect();
+            const arrowEndX = chartRect.left + 300;
+            const viewportWidth = window.innerWidth;
 
-            // Add active class to current chart's link
-            const link = document.querySelector('a[href="#' + chartId + '"]');
-            if (link) {
-              link.classList.add('active');
-              activeLink = link;
+            // If arrow head would be hidden (beyond viewport), switch to next chart
+            if (arrowEndX > viewportWidth - 50) { // 50px margin from edge
+              // Find next chart
+              const currentIndex = Array.from(charts).indexOf(currentChart);
+              if (currentIndex < charts.length - 1) {
+                const nextChart = charts[currentIndex + 1];
+                const nextChartId = nextChart.id;
+                const nextLink = document.querySelector('a[href="#' + nextChartId + '"]');
+
+                if (nextLink) {
+                  activeChart = nextChart;
+                  activeLink = nextLink;
+
+                  // Update active classes
+                  chartLinks.forEach(link => link.classList.remove('active'));
+                  nextLink.classList.add('active');
+                }
+              }
             }
           }
-        });
+        }
+
+        // If no active chart or arrow head is visible, use normal detection
+        if (!activeChart) {
+          charts.forEach(chart => {
+            const chartTop = chart.offsetTop;
+            const chartBottom = chartTop + chart.offsetHeight;
+            const chartId = chart.id;
+
+            // Use earlier switching - when chart is 60% visible instead of 100%
+            const chartHeight = chart.offsetHeight;
+            const visibleThreshold = chartTop + (chartHeight * 0.6);
+
+            if (scrollPosition >= chartTop && scrollPosition < visibleThreshold) {
+              activeChart = chart;
+              // Remove active class from all links
+              chartLinks.forEach(link => link.classList.remove('active'));
+
+              // Add active class to current chart's link
+              const link = document.querySelector('a[href="#' + chartId + '"]');
+              if (link) {
+                link.classList.add('active');
+                activeLink = link;
+              }
+            }
+          });
+        }
 
         // Draw or hide arrow
         if (activeChart && activeLink) {
