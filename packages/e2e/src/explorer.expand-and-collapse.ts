@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.js'
 
-export const setup = async ({  Workspace, Explorer  }: TestContext): Promise<void> => {
+export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'file-1.txt',
@@ -23,7 +23,7 @@ export const setup = async ({  Workspace, Explorer  }: TestContext): Promise<voi
   await Explorer.shouldHaveItem('file-1.txt')
 }
 
-export const run = async ({  Explorer  }: TestContext): Promise<void> => {
+export const run = async ({ Explorer }: TestContext): Promise<void> => {
   await Explorer.expand('folder')
   await Explorer.toHaveItem('file-3.txt')
   await Explorer.toHaveItem('file-4.txt')

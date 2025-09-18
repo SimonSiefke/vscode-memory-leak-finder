@@ -16,7 +16,7 @@ const extensionPath = join(root, 'packages', 'e2e', 'fixtures', 'sample.show-not
 
 export const extraLaunchArgs = [`--extensionDevelopmentPath=${extensionPath}`]
 
-export const run = async ({  QuickPick  }: TestContext): Promise<void> => {
+export const run = async ({ QuickPick }: TestContext): Promise<void> => {
   await QuickPick.show()
   await QuickPick.select('Hello World')
 }

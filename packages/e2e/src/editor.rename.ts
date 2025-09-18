@@ -2,7 +2,7 @@ import type { TestContext } from '../types.js'
 
 export const skip = true
 
-export const setup = async ({  Editor, Workspace  }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'index.css',
@@ -20,7 +20,7 @@ export const setup = async ({  Editor, Workspace  }: TestContext): Promise<void>
   await Editor.shouldHaveToken('--font-size', 'rgb(156, 220, 254)')
 }
 
-export const run = async ({  Editor  }: TestContext): Promise<void> => {
+export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.click('--font-size')
   await Editor.shouldHaveCursor(/(50px|53px|58px|66px)/)
   await Editor.rename('--abc')
@@ -33,7 +33,7 @@ export const run = async ({  Editor  }: TestContext): Promise<void> => {
 }`)
 }
 
-export const teardown = async ({  Editor  }: TestContext): Promise<void> => {
+export const teardown = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.save({ viaKeyBoard: true })
   await Editor.closeAll()
 }

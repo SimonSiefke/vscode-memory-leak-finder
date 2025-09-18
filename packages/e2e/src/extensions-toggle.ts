@@ -1,12 +1,12 @@
 import type { TestContext } from '../types.js'
 
-export const setup = async ({  Extensions  }: TestContext): Promise<void> => {
+export const setup = async ({ Extensions }: TestContext): Promise<void> => {
   await Extensions.show()
   await Extensions.search('@builtin html ')
   await Extensions.first.shouldBe('HTML Language Basics')
 }
 
-export const run = async ({  Extensions  }: TestContext): Promise<void> => {
+export const run = async ({ Extensions }: TestContext): Promise<void> => {
   await Extensions.show()
   await Extensions.hide()
 }

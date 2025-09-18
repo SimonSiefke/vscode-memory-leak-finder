@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.js'
 
-export const setup = async ({  Editor, Workspace  }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'index.html',
@@ -11,11 +11,11 @@ export const setup = async ({  Editor, Workspace  }: TestContext): Promise<void>
   await Editor.shouldHaveBreadCrumb('h1')
 }
 
-export const run = async ({  Suggest  }: TestContext): Promise<void> => {
+export const run = async ({ Suggest }: TestContext): Promise<void> => {
   await Suggest.open()
   await Suggest.close()
 }
 
-export const teardown = async ({  Editor  }: TestContext): Promise<void> => {
+export const teardown = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.closeAll()
 }

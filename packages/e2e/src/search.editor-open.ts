@@ -2,7 +2,7 @@ import type { TestContext } from '../types.js'
 
 export const skip = true
 
-export const setup = async ({  ActivityBar, Search, Workspace  }: TestContext): Promise<void> => {
+export const setup = async ({ ActivityBar, Search, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'file.txt',
@@ -14,7 +14,7 @@ export const setup = async ({  ActivityBar, Search, Workspace  }: TestContext): 
   await Search.toHaveResults(['file.txt1', 'sample text'])
 }
 
-export const run = async ({  Search, Editor  }: TestContext): Promise<void> => {
+export const run = async ({ Search, Editor }: TestContext): Promise<void> => {
   await Search.openEditor()
   await Editor.close()
 }

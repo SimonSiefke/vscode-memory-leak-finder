@@ -1,10 +1,10 @@
 import type { TestContext } from '../types.js'
 
-export const setup = async ({  Editor  }: TestContext): Promise<void> => {
+export const setup = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.closeAll()
 }
 
-export const run = async ({  Workspace, Editor  }: TestContext): Promise<void> => {
+export const run = async ({ Workspace, Editor }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'file.ts',
@@ -25,6 +25,6 @@ const def = abc + 1`)
   await Editor.closeAll()
 }
 
-export const teardown = async ({  Editor  }: TestContext): Promise<void> => {
+export const teardown = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.closeAll()
 }

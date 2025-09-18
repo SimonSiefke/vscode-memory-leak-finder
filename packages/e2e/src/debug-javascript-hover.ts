@@ -2,7 +2,7 @@ import type { TestContext } from '../types.js'
 
 export const skip = true
 
-export const setup = async ({  Editor, Workspace, Explorer, RunAndDebug  }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace, Explorer, RunAndDebug }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'index.js',
@@ -31,14 +31,14 @@ setInterval(()=>{
   })
 }
 
-export const run = async ({  Editor  }: TestContext): Promise<void> => {
+export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.showDebugHover({
     expectedTitle: /ƒ setInterval\(callback, repeat, arg1, arg2, arg3\)/,
   })
   await Editor.hideDebugHover()
 }
 
-export const teardown = async ({  RunAndDebug, Editor  }: TestContext): Promise<void> => {
+export const teardown = async ({ RunAndDebug, Editor }: TestContext): Promise<void> => {
   await RunAndDebug.stop()
   await RunAndDebug.removeAllBreakpoints()
   await Editor.closeAll()

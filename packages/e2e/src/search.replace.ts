@@ -2,7 +2,7 @@ import type { TestContext } from '../types.js'
 
 export const skip = true
 
-export const setup = async ({  ActivityBar, Electron, Workspace  }: TestContext): Promise<void> => {
+export const setup = async ({ ActivityBar, Electron, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'file.txt',
@@ -13,7 +13,7 @@ export const setup = async ({  ActivityBar, Electron, Workspace  }: TestContext)
   await Electron.mockDialog({ response: 1 })
 }
 
-export const run = async ({  Search  }: TestContext): Promise<void> => {
+export const run = async ({ Search }: TestContext): Promise<void> => {
   await Search.type('sample')
   await Search.toHaveResults(['file.txt1', 'sample text'])
   await Search.typeReplace('other')

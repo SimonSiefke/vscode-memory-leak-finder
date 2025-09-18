@@ -2,7 +2,7 @@ import type { TestContext } from '../types.js'
 
 export const skip = true
 
-export const setup = async ({  Editor, Workspace  }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'file.css',
@@ -18,7 +18,7 @@ h2 {
   await Editor.open('file.css')
 }
 
-export const run = async ({  page, expect  }: TestContext): Promise<void> => {
+export const run = async ({ page, expect }: TestContext): Promise<void> => {
   const inlineFolded = page.locator('.inline-folded')
   await expect(inlineFolded).toBeHidden()
   const collapsedIcon = page.locator('.codicon-folding-collapsed').first()
@@ -34,6 +34,6 @@ export const run = async ({  page, expect  }: TestContext): Promise<void> => {
   await expect(collapsedIcon).toBeHidden()
 }
 
-export const teardown = async ({  Editor  }: TestContext): Promise<void> => {
+export const teardown = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.closeAll()
 }

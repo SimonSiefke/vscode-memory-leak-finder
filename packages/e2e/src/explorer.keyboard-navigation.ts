@@ -11,14 +11,14 @@ const createFiles = () => {
   return files
 }
 
-export const setup = async ({  Workspace, Explorer  }: TestContext): Promise<void> => {
+export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
   const files = createFiles()
   await Workspace.setFiles(files)
   await Explorer.focus()
   await Explorer.shouldHaveItem(`file-9.txt`)
 }
 
-export const run = async ({  Explorer  }: TestContext): Promise<void> => {
+export const run = async ({ Explorer }: TestContext): Promise<void> => {
   await Explorer.focusNext()
   await Explorer.focusNext()
   await Explorer.focusNext()

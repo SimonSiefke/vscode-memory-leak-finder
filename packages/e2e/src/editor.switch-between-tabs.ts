@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.js'
 
-export const setup = async ({  Workspace, Editor  }: TestContext): Promise<void> => {
+export const setup = async ({ Workspace, Editor }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'a.txt',
@@ -16,7 +16,7 @@ export const setup = async ({  Workspace, Editor  }: TestContext): Promise<void>
   await Editor.open('b.txt')
 }
 
-export const run = async ({  Editor  }: TestContext): Promise<void> => {
+export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.switchToTab('a.txt')
   await Editor.shouldHaveText('a')
   await Editor.switchToTab('b.txt')

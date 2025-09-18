@@ -2,7 +2,7 @@ import type { TestContext } from '../types.js'
 
 export const skip = true
 
-export const setup = async ({  Extensions, Editor, ExtensionDetailView  }: TestContext): Promise<void> => {
+export const setup = async ({ Extensions, Editor, ExtensionDetailView }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Extensions.show()
   await Extensions.search('@builtin html')
@@ -12,7 +12,7 @@ export const setup = async ({  Extensions, Editor, ExtensionDetailView  }: TestC
   await ExtensionDetailView.shouldHaveTab('Details')
 }
 
-export const run = async ({  ExtensionDetailView, Extensions  }: TestContext): Promise<void> => {
+export const run = async ({ ExtensionDetailView, Extensions }: TestContext): Promise<void> => {
   await ExtensionDetailView.selectCategory('Programming Languages')
   await Extensions.shouldHaveValue('@category:"Programming Languages"')
   await Extensions.clear()

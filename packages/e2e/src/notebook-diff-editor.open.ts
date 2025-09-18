@@ -2,7 +2,7 @@ import type { TestContext } from '../types.js'
 
 export const skip = 1
 
-export const setup = async ({  Workspace, Explorer, Editor  }: TestContext): Promise<void> => {
+export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promise<void> => {
   const notebook1 = {
     cells: [
       {
@@ -203,7 +203,7 @@ export const setup = async ({  Workspace, Explorer, Editor  }: TestContext): Pro
   await Editor.open('notebook-1.ipynb')
 }
 
-export const run = async ({  DiffEditor, Editor  }: TestContext): Promise<void> => {
+export const run = async ({ DiffEditor, Editor }: TestContext): Promise<void> => {
   await DiffEditor.open('notebook-1.ipynb', 'notebook-2.ipynb')
   await DiffEditor.shouldHaveOriginalEditor('a')
   await DiffEditor.shouldHaveModifiedEditor('aa')

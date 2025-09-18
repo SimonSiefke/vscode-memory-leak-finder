@@ -2,7 +2,7 @@ import type { TestContext } from '../types.js'
 
 export const skip = true
 
-export const setup = async ({  Editor, Workspace, Explorer, ActivityBar  }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace, Explorer, ActivityBar }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'index.html',
@@ -15,7 +15,7 @@ export const setup = async ({  Editor, Workspace, Explorer, ActivityBar  }: Test
   await ActivityBar.showSourceControl()
 }
 
-export const run = async ({  SourceControl  }: TestContext): Promise<void> => {
+export const run = async ({ SourceControl }: TestContext): Promise<void> => {
   await SourceControl.shouldHaveUnstagedFile('index.html')
   await SourceControl.stageFile('index.html')
   await SourceControl.unstageFile('index.html')

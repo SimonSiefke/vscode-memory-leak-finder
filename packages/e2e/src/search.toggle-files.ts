@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.js'
 
-export const setup = async ({  ActivityBar, Workspace, Search  }: TestContext): Promise<void> => {
+export const setup = async ({ ActivityBar, Workspace, Search }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'file.txt',
@@ -11,7 +11,7 @@ export const setup = async ({  ActivityBar, Workspace, Search  }: TestContext): 
   await Search.collapseFiles()
 }
 
-export const run = async ({  Search  }: TestContext): Promise<void> => {
+export const run = async ({ Search }: TestContext): Promise<void> => {
   await Search.expandFiles()
   await Search.collapseFiles()
 }

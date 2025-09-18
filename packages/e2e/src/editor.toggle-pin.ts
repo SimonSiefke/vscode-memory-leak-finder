@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.js'
 
-export const setup = async ({  Workspace, Explorer, Editor  }: TestContext): Promise<void> => {
+export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'file.txt',
@@ -13,7 +13,7 @@ export const setup = async ({  Workspace, Explorer, Editor  }: TestContext): Pro
   await Editor.open('file.txt')
 }
 
-export const run = async ({  Editor  }: TestContext): Promise<void> => {
+export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.pin()
   await Editor.unpin()
 }

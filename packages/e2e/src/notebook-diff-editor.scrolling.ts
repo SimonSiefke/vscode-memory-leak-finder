@@ -2,7 +2,7 @@ import type { TestContext } from '../types.js'
 
 export const skip = 1
 
-export const setup = async ({  Workspace, Explorer, Editor, DiffEditor  }: TestContext): Promise<void> => {
+export const setup = async ({ Workspace, Explorer, Editor, DiffEditor }: TestContext): Promise<void> => {
   const notebook1 = {
     cells: [
       {
@@ -206,7 +206,7 @@ export const setup = async ({  Workspace, Explorer, Editor, DiffEditor  }: TestC
   await DiffEditor.shouldHaveModifiedEditor('aa')
 }
 
-export const run = async ({  DiffEditor  }: TestContext): Promise<void> => {
+export const run = async ({ DiffEditor }: TestContext): Promise<void> => {
   await DiffEditor.scrollDown()
   await DiffEditor.scrollUp()
 }

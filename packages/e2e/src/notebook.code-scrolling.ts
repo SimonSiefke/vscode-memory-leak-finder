@@ -2,7 +2,7 @@ import type { TestContext } from '../types.js'
 
 export const skip = true
 
-export const setup = async ({  Workspace, Explorer, Editor  }: TestContext): Promise<void> => {
+export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promise<void> => {
   const notebook = {
     cells: [
       {
@@ -107,7 +107,7 @@ export const setup = async ({  Workspace, Explorer, Editor  }: TestContext): Pro
   await Editor.open('test.ipynb')
 }
 
-export const run = async ({  Notebook  }: TestContext): Promise<void> => {
+export const run = async ({ Notebook }: TestContext): Promise<void> => {
   await Notebook.scrollDown()
   await Notebook.scrollUp()
 }

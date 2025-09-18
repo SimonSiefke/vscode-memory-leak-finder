@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.js'
 
-export const setup = async ({  Editor, Workspace, Explorer  }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace, Explorer }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'index.html',
@@ -16,11 +16,11 @@ export const setup = async ({  Editor, Workspace, Explorer  }: TestContext): Pro
   await Editor.closeFind()
 }
 
-export const run = async ({  Editor  }: TestContext): Promise<void> => {
+export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.openFind()
   await Editor.closeFind()
 }
 
-export const teardown = async ({  Editor  }: TestContext): Promise<void> => {
+export const teardown = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.closeAll()
 }

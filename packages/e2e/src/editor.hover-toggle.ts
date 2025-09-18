@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.js'
 
-export const setup = async ({  Editor, Workspace, Explorer  }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace, Explorer }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'index.html',
@@ -13,11 +13,11 @@ export const setup = async ({  Editor, Workspace, Explorer  }: TestContext): Pro
   await Editor.open('index.html')
 }
 
-export const run = async ({  Editor, Hover  }: TestContext): Promise<void> => {
+export const run = async ({ Editor, Hover }: TestContext): Promise<void> => {
   await Editor.hover('h1', /The h1 element represents a section heading/)
   await Hover.hide()
 }
 
-export const teardown = async ({  Editor  }: TestContext): Promise<void> => {
+export const teardown = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.closeAll()
 }

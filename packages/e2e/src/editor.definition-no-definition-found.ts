@@ -2,7 +2,7 @@ import type { TestContext } from '../types.js'
 
 export const skip = true
 
-export const setup = async ({  Editor, Workspace  }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'index.html',
@@ -12,12 +12,12 @@ export const setup = async ({  Editor, Workspace  }: TestContext): Promise<void>
   await Editor.open('index.html')
 }
 
-export const run = async ({  Editor  }: TestContext): Promise<void> => {
+export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.click('h1')
   await Editor.goToDefinition()
   await Editor.shouldHaveOverlayMessage(`No definition found for 'h1'`)
 }
 
-export const teardown = async ({  Editor  }: TestContext): Promise<void> => {
+export const teardown = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.closeAll()
 }

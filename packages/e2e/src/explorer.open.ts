@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.js'
 
-export const setup = async ({  Workspace, Editor, Explorer  }: TestContext): Promise<void> => {
+export const setup = async ({ Workspace, Editor, Explorer }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'a.txt',
@@ -17,7 +17,7 @@ export const setup = async ({  Workspace, Editor, Explorer  }: TestContext): Pro
   await Explorer.shouldHaveItem('b.txt')
 }
 
-export const run = async ({  Explorer, SideBar  }: TestContext): Promise<void> => {
+export const run = async ({ Explorer, SideBar }: TestContext): Promise<void> => {
   await Explorer.focus()
   await SideBar.hide()
 }

@@ -2,7 +2,7 @@ import type { TestContext } from '../types.js'
 
 export const skip = true
 
-export const setup = async ({  Editor, Workspace, Explorer  }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace, Explorer }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'index.js',
@@ -21,7 +21,7 @@ setInterval(()=>{
   await Editor.open('index.js')
 }
 
-export const run = async ({  ActivityBar, Explorer, RunAndDebug  }: TestContext): Promise<void> => {
+export const run = async ({ ActivityBar, Explorer, RunAndDebug }: TestContext): Promise<void> => {
   await Explorer.focus()
   await ActivityBar.showRunAndDebug()
   await RunAndDebug.startRunAndDebug()

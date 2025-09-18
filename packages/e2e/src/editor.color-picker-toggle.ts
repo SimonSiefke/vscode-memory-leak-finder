@@ -2,7 +2,7 @@ import type { TestContext } from '../types.js'
 
 export const skip = false
 
-export const setup = async ({  Editor, Workspace, Explorer  }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace, Explorer }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'index.txt',
@@ -16,11 +16,11 @@ export const setup = async ({  Editor, Workspace, Explorer  }: TestContext): Pro
   await Editor.shouldHaveText('hello world')
 }
 
-export const run = async ({  Editor  }: TestContext): Promise<void> => {
+export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.showColorPicker()
   await Editor.hideColorPicker()
 }
 
-export const teardown = async ({  Editor  }: TestContext): Promise<void> => {
+export const teardown = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.closeAll()
 }

@@ -2,7 +2,7 @@ import type { TestContext } from '../types.js'
 
 export const skip = true
 
-export const setup = async ({  Workspace, Explorer, Editor  }: TestContext): Promise<void> => {
+export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'file.ipynb',
@@ -15,7 +15,7 @@ export const setup = async ({  Workspace, Explorer, Editor  }: TestContext): Pro
   await Editor.open('file.ipynb')
 }
 
-export const run = async ({  Notebook  }: TestContext): Promise<void> => {
+export const run = async ({ Notebook }: TestContext): Promise<void> => {
   await Notebook.addMarkdownCell()
   await Notebook.removeMarkdownCell()
 }

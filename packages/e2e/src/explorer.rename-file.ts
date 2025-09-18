@@ -2,7 +2,7 @@ import type { TestContext } from '../types.js'
 
 export const skip = true
 
-export const setup = async ({  Workspace, Explorer  }: TestContext): Promise<void> => {
+export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
   await Explorer.focus()
   await Workspace.setFiles([
     {
@@ -24,7 +24,7 @@ export const setup = async ({  Workspace, Explorer  }: TestContext): Promise<voi
   await Explorer.shouldHaveItem('file-3.txt')
 }
 
-export const run = async ({  Explorer  }: TestContext): Promise<void> => {
+export const run = async ({ Explorer }: TestContext): Promise<void> => {
   await Explorer.rename('file-2.txt', 'renamed.txt')
   await Explorer.rename('renamed.txt', 'file-2.txt')
 }
