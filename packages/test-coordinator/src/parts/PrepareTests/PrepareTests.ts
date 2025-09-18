@@ -1,6 +1,5 @@
 import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.ts'
 import { connectWorkers } from '../ConnectWorkers/ConnectWorkers.ts'
-import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
 import * as KillExistingIdeInstances from '../KillExistingIdeInstances/KillExistingIdeInstances.ts'
 import * as PageObject from '../PageObject/PageObject.ts'
 import { prepareBoth } from '../PrepareBoth/PrepareBoth.ts'
@@ -18,8 +17,8 @@ export const prepareTests = async (
   commit: string,
   attachedToPageTimeout: number,
   idleTimeout: number,
+  pageObjectPath: string,
 ) => {
-  const pageObjectPath = GetPageObjectPath.getPageObjectPath()
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)

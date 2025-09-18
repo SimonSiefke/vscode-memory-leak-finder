@@ -54,9 +54,12 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     },
     async hover(text, hoverText) {
       try {
+        await page.waitForIdle()
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
+        await page.waitForIdle()
         const startTag = editor.locator('[class^="mtk"]', { hasText: text }).first()
+        await expect(startTag).toBeVisible()
         await startTag.click()
         let tries = 0
         const quickPick = QuickPick.create({ expect, page, VError })
