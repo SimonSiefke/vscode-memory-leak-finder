@@ -68,6 +68,7 @@ export const runTestsWithCallback = async ({
     const pageObjectPath = GetPageObjectPath.getPageObjectPath()
     const attachedToPageTimeout = TimeoutConstants.AttachToPage
     const idleTimeout = TimeoutConstants.Idle
+    const pageObjectPath = GetPageObjectPath.getPageObjectPath()
 
     if (setupOnly && commit) {
       const testWorkerRpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
@@ -83,6 +84,7 @@ export const runTestsWithCallback = async ({
         commit,
         attachedToPageTimeout,
         idleTimeout,
+        pageObjectPath,
       )
       await testWorkerRpc.dispose()
       return callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, 0, 0, filterValue)
@@ -113,6 +115,7 @@ export const runTestsWithCallback = async ({
       commit,
       attachedToPageTimeout,
       idleTimeout,
+      pageObjectPath,
     )
 
     const context = {
@@ -203,11 +206,11 @@ export const runTestsWithCallback = async ({
       } finally {
         if (restartBetween) {
           if (memoryLeakWorkerRpc) {
-            memoryLeakWorkerRpc.dispose()
+            await memoryLeakWorkerRpc.dispose()
             memoryLeakWorkerRpc = undefined
           }
           if (testWorkerRpc) {
-            testWorkerRpc.dispose()
+            await testWorkerRpc.dispose()
           }
           // Dispose initialization worker and any other registered disposables
           await Disposables.disposeAll()
@@ -225,6 +228,7 @@ export const runTestsWithCallback = async ({
             commit,
             attachedToPageTimeout,
             idleTimeout,
+            pageObjectPath,
           )
           if (checkLeaks) {
             memoryLeakWorkerRpc = MemoryLeakWorker.getRpc()
