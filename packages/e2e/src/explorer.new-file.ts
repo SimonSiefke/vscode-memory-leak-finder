@@ -1,8 +1,8 @@
 import type { TestContext } from '../types.js'
 
 export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
-  await Explorer.focus()
   await Workspace.setFiles([])
+  await Explorer.focus()
   await Explorer.refresh()
 }
 
