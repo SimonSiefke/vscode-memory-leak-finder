@@ -3,7 +3,7 @@ import { connectElectron } from '../ConnectElectron/ConnectElectron.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
-import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as DisableTimeouts from '../DisableTimeouts/DisableTimeouts.ts'
 import * as ElectronApp from '../ElectronApp/ElectronApp.ts'
 import * as Expect from '../Expect/Expect.ts'
@@ -12,6 +12,7 @@ import * as Page from '../Page/Page.ts'
 import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
 import { VError } from '../VError/VError.ts'
 import { waitForSession } from '../WaitForSession/WaitForSession.ts'
+import { waitForUtilityExecutionContext } from '../WaitForUtilityExecutionContext/WaitForUtilityExecutionContext.ts'
 
 export const connectDevtools = async (
   connectionId: number,
@@ -36,19 +37,13 @@ export const connectDevtools = async (
   // @ts-ignore
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
 
-  electronRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, (x) => {
-    console.log(`excution context created`, x)
-  })
-  browserRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, (x) => {
-    console.log(`excution context created`, x)
-  })
-
   const { sessionRpc, sessionId, targetId } = await waitForSession(browserRpc, 5000)
 
-  sessionRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, (x) => {
-    console.log(`excution context created`, x)
-  })
+  const utilityContext = await waitForUtilityExecutionContext(sessionRpc)
 
+  console.log({ utilityContext })
+
+  // TODO probably not needed
   await Promise.all([
     DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
       autoAttach: true,
