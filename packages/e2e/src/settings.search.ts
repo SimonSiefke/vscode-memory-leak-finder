@@ -1,4 +1,4 @@
-import type { TestContext } from '../types.js'
+import type { TestContext } from '../types.ts'
 
 export const setup = async ({ Editor, SettingsEditor }: TestContext): Promise<void> => {
   await Editor.closeAll()
