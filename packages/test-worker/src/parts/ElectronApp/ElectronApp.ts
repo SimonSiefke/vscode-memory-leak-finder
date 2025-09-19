@@ -12,12 +12,6 @@ export const create = ({ electronRpc, electronObjectId, idleTimeout, firstWindow
     firstWindow() {
       return firstWindow
     },
-    secondWindow() {
-      return WaitForPage.waitForPage({ index: 1, electronRpc, electronObjectId, idleTimeout })
-    },
-    thirdWindow() {
-      return WaitForPage.waitForPage({ index: 2, electronRpc, electronObjectId, idleTimeout })
-    },
     evaluate(expression) {
       return DevtoolsProtocolRuntime.evaluate(this.rpc, {
         expression,
