@@ -1,19 +1,18 @@
 import { join } from 'node:path'
-import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
+import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
 import { getSummary } from '../GetSummary/GetSummary.ts'
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.ts'
 import * as Id from '../Id/Id.ts'
 import * as JsonFile from '../JsonFile/JsonFile.ts'
 import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.ts'
 import * as MemoryLeakResultsPath from '../MemoryLeakResultsPath/MemoryLeakResultsPath.ts'
-import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.ts'
 import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
+import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.ts'
 import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.ts'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.ts'
-import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
 import * as TestWorkerTeardownTest from '../TestWorkerTeardownTest/TestWorkerTearDownTest.ts'
 import * as Time from '../Time/Time.ts'
 import * as Timeout from '../Timeout/Timeout.ts'
@@ -74,7 +73,7 @@ export const runTestsWithCallback = async ({
     // Then recreate the workers, ensuring a clean state
 
     if (setupOnly && commit) {
-      const testWorkerRpc = await PrepareTestsOrAttach.prepareTestsAndAttach(
+      const { testWorkerRpc, memoryRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach(
         cwd,
         headlessMode,
         recordVideo,
@@ -91,6 +90,8 @@ export const runTestsWithCallback = async ({
         pageObjectPath,
       )
       await testWorkerRpc.dispose()
+      await memoryRpc?.dispose()
+      await videoRpc?.dispose()
       return callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, 0, 0, filterValue)
     }
 
@@ -107,11 +108,7 @@ export const runTestsWithCallback = async ({
     const first = formattedPaths[0]
     await callback(TestWorkerEventType.HandleInitializing)
 
-    // TODO
-    // 1. launch workers
-    // 2. initialize (maybe)
-    // 3. connect
-    let testWorkerRpc = await PrepareTestsOrAttach.prepareTestsAndAttach(
+    const { testWorkerRpc, memoryRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach(
       cwd,
       headlessMode,
       recordVideo,
@@ -141,7 +138,9 @@ export const runTestsWithCallback = async ({
     await callback(TestWorkerEventType.TestsStarting, total)
     await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
 
-    let memoryLeakWorkerRpc = MemoryLeakWorker.getRpc()
+    let currentMemoryRpc = memoryRpc
+    let currentTestRpc = testWorkerRpc
+    let currentVideoRpc = videoRpc
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
       const { absolutePath, relativeDirname, dirent, relativePath } = formattedPath
@@ -152,10 +151,10 @@ export const runTestsWithCallback = async ({
 
       try {
         const start = i === 0 ? initialStart : Time.now()
-        const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(testWorkerRpc, connectionId, absolutePath, forceRun, timeouts)
+        const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(currentTestRpc, connectionId, absolutePath, forceRun, timeouts)
 
         if (recordVideo) {
-          await VideoRecording.addChapter(dirent, start)
+          await VideoRecording.addChapter(videoRpc, dirent, start)
         }
 
         if (testSkipped) {
@@ -168,19 +167,20 @@ export const runTestsWithCallback = async ({
           if (checkLeaks) {
             if (measureAfter) {
               for (let i = 0; i < 2; i++) {
-                await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
+                await TestWorkerRunTest.testWorkerRunTest(currentTestRpc, connectionId, absolutePath, forceRun, runMode)
               }
             }
-            await MemoryLeakFinder.start(memoryLeakWorkerRpc, connectionId)
+            await MemoryLeakFinder.start(currentMemoryRpc, connectionId)
             for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
+              await TestWorkerRunTest.testWorkerRunTest(currentTestRpc, connectionId, absolutePath, forceRun, runMode)
             }
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
             }
-            await MemoryLeakFinder.stop(memoryLeakWorkerRpc, connectionId)
+            await MemoryLeakFinder.stop(currentMemoryRpc, connectionId)
 
-            const result = await MemoryLeakFinder.compare(memoryLeakWorkerRpc, connectionId, context)
+            // TODO memory leak finder should write result, to avoid sending large result here
+            const result = await MemoryLeakFinder.compare(currentMemoryRpc, connectionId, context)
             const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
             const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
             await JsonFile.writeJson(resultPath, result)
@@ -192,10 +192,10 @@ export const runTestsWithCallback = async ({
             console.log(summary)
           } else {
             for (let i = 0; i < runs; i++) {
-              await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
+              await TestWorkerRunTest.testWorkerRunTest(currentTestRpc, connectionId, absolutePath, forceRun, runMode)
             }
           }
-          await TestWorkerTeardownTest.testWorkerTearDownTest(testWorkerRpc, connectionId, absolutePath)
+          await TestWorkerTeardownTest.testWorkerTearDownTest(currentTestRpc, connectionId, absolutePath)
           const end = Time.now()
           const duration = end - start
           await callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration, isLeak)
@@ -210,17 +210,22 @@ export const runTestsWithCallback = async ({
         await callback(TestWorkerEventType.TestFailed, absolutePath, relativeDirname, relativePath, dirent, prettyError)
       } finally {
         if (restartBetween) {
-          if (memoryLeakWorkerRpc) {
-            await memoryLeakWorkerRpc.dispose()
-            memoryLeakWorkerRpc = undefined
+          if (currentMemoryRpc) {
+            await currentMemoryRpc.dispose()
+            currentMemoryRpc = undefined
           }
-          if (testWorkerRpc) {
-            await testWorkerRpc.dispose()
+          if (currentTestRpc) {
+            await currentMemoryRpc.dispose()
+            currentTestRpc = undefined
+          }
+          if (currentVideoRpc) {
+            await currentVideoRpc.dispose()
+            currentVideoRpc = undefined
           }
           // Dispose initialization worker and any other registered disposables
           await Disposables.disposeAll()
           PrepareTestsOrAttach.state.promise = undefined
-          testWorkerRpc = await PrepareTestsOrAttach.prepareTestsAndAttach(
+          const { memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach(
             cwd,
             headlessMode,
             recordVideo,
@@ -236,16 +241,16 @@ export const runTestsWithCallback = async ({
             idleTimeout,
             pageObjectPath,
           )
-          if (checkLeaks) {
-            memoryLeakWorkerRpc = MemoryLeakWorker.getRpc()
-          }
+          currentTestRpc = testWorkerRpc
+          currentMemoryRpc = memoryRpc
+          currentVideoRpc = videoRpc
         }
       }
     }
     const end = Time.now()
     const duration = end - testStart
     if (recordVideo) {
-      await VideoRecording.finalize()
+      await VideoRecording.finalize(videoRpc)
     }
     await callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, leaking, total, duration, filterValue)
   } catch (error) {
