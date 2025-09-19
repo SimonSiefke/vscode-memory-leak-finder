@@ -19,8 +19,6 @@ export const connectDevtools = async (
   const browserRpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   const { sessionRpc } = await waitForSession(browserRpc, attachedToPageTimeout)
   Promise.all([
-    DevtoolsProtocolPage.enable(sessionRpc),
-    DevtoolsProtocolPage.setLifecycleEventsEnabled(sessionRpc, { enabled: true }),
     DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
       autoAttach: true,
       waitForDebuggerOnStart: false,
