@@ -1,4 +1,4 @@
-import type { TestContext } from '../types.js'
+import type { TestContext } from '../types.ts'
 
 // @ts-ignore
 export const setup = async ({ Extensions, Editor, ExtensionDetailView }: TestContext): Promise<void> => {
