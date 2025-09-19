@@ -1,3 +1,4 @@
+import { createRpc } from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import * as Json from '../Json/Json.ts'
 import { VError } from '../VError/VError.ts'
 import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWebSocketToBeOpen.ts'
@@ -8,7 +9,7 @@ export const createConnection = async (wsUrl: string): Promise<any> => {
     const webSocket = new WebSocket(wsUrl)
     // @ts-ignore
     await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket)
-    return {
+    const ipc = {
       send(message: any) {
         webSocket.send(Json.stringify(message))
       },
@@ -24,6 +25,8 @@ export const createConnection = async (wsUrl: string): Promise<any> => {
         webSocket.onmessage = handleMessage
       },
     }
+    const rpc = createRpc(ipc)
+    return rpc
   } catch (error) {
     throw new VError(error, `Failed to create websocket connection`)
   }
