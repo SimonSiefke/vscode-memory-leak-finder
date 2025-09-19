@@ -407,6 +407,7 @@ export interface PageObjectApi {
   readonly ActivityBar: ActivityBar
   readonly Colors: any
   readonly ChatEditor: ChatEditor
+  readonly ExtensionDetailView: any
   readonly ContextMenu: ContextMenu
   readonly CursorChat: CursorChat
   readonly DebugConsole: DebugConsole
