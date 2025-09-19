@@ -11,12 +11,10 @@ export const connectDevtools = async (devtoolsWebSocketUrl: string, attachedToPa
   const script = await UtilityScript.getUtilityScript()
   await Promise.all([
     DevtoolsProtocolPage.enable(sessionRpc),
-    DevtoolsProtocolPage.setLifecycleEventsEnabled(sessionRpc, { enabled: true }),
     DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(sessionRpc, {
       source: script,
       worldName: 'utility',
     }),
-    DevtoolsProtocolRuntime.enable(sessionRpc),
     DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc),
   ])
   return {
