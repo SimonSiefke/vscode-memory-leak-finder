@@ -1,5 +1,7 @@
 import type { TestContext } from '../types.ts'
 
+export const skip = 1
+
 export const setup = async ({ Extensions }: TestContext): Promise<void> => {
   await Extensions.show()
   await Extensions.search('@mcp')

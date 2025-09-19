@@ -21,4 +21,5 @@ export interface StartRunningOptions {
   setupOnly: boolean
   workers: boolean
   isWindows: boolean
+  shouldContinue: boolean
 }

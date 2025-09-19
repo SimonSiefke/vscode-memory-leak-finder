@@ -1,8 +1,7 @@
 import * as Assert from '../Assert/Assert.ts'
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.ts'
 import { ExpectError } from '../ExpectError/ExpectError.ts'
 import * as PTimeout from '../PTimeout/PTimeout.ts'
+import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
 import { VError } from '../VError/VError.ts'
 
 const getExpression = (canUseIdleCallback) => {
@@ -17,22 +16,23 @@ const getExpression = (canUseIdleCallback) => {
 })`
 }
 
-const waitRpcIdle = (rpc, uniqueId, canUseIdleCallback) => {
+const waitRpcIdle = (pageObject, canUseIdleCallback) => {
   const expression = getExpression(canUseIdleCallback)
-  return DevtoolsProtocolRuntime.evaluate(rpc, {
+  return pageObject.utilityContext.evaluate({
     awaitPromise: true,
     replMode: true,
     expression,
     returnByValue: true,
     generatePreview: true,
-    uniqueContextId: uniqueId,
   })
 }
 
 export const waitForIdle = async (rpc, canUseIdleCallback, idleTimeout) => {
   try {
-    const utilityExecutionContext = await ExecutionContextState.waitForUtilityExecutionContext(rpc.sessionId)
-    const result = await PTimeout.pTimeout(waitRpcIdle(rpc, utilityExecutionContext.uniqueId, canUseIdleCallback), {
+    const connectionId = 1
+    const pageObject = PageObjectState.getPageObjectContext(connectionId)
+
+    const result = await PTimeout.pTimeout(waitRpcIdle(pageObject, canUseIdleCallback), {
       milliseconds: idleTimeout,
     })
     return result

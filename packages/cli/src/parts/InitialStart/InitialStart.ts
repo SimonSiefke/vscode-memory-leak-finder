@@ -34,5 +34,6 @@ export const initialStart = async (options): Promise<void> => {
     setupOnly: options.setupOnly,
     workers: options.workers,
     isWindows: options.isWindows,
+    shouldContinue: options.shouldContinue,
   })
 }
