@@ -14,7 +14,7 @@ export interface RunTestsOptions {
   readonly timeouts: any
   readonly timeoutBetween: number
   readonly restartBetween: boolean
-  readonly runMode: string
+  readonly runMode: number
   readonly ide: any
   readonly ideVersion: any
   readonly vscodePath: string
