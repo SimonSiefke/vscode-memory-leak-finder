@@ -16,6 +16,7 @@ export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promi
   await Editor.open('index.md')
 }
 
+// @ts-ignore
 export const run = async ({ QuickPick, WellKnownCommands, MarkdownPreview }: TestContext): Promise<void> => {
   await QuickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
   await MarkdownPreview.shouldBeVisible()

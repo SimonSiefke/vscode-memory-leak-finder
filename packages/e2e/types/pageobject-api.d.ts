@@ -238,7 +238,7 @@ export interface Profile {
   export(options: any): Promise<void>
 }
 export interface QuickPick {
-  show(options: any): Promise<void>
+  show(options?: any): Promise<void>
   showCommands(): Promise<void>
   type(value: any): Promise<void>
   select(options: any): Promise<void>
