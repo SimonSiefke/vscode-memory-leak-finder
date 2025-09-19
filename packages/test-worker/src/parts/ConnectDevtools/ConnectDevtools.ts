@@ -3,6 +3,7 @@ import { connectElectron } from '../ConnectElectron/ConnectElectron.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
+import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as DisableTimeouts from '../DisableTimeouts/DisableTimeouts.ts'
 import * as ElectronApp from '../ElectronApp/ElectronApp.ts'
 import * as Expect from '../Expect/Expect.ts'
@@ -43,6 +44,21 @@ export const connectDevtools = async (
   })
 
   const { sessionRpc, sessionId, targetId } = await waitForSession(browserRpc, 5000)
+
+  sessionRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, (x) => {
+    console.log(`excution context created`, x)
+  })
+
+  await Promise.all([
+    DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
+      autoAttach: true,
+      waitForDebuggerOnStart: true,
+      flatten: true,
+    }),
+    DevtoolsProtocolTarget.setDiscoverTargets(browserRpc, {
+      discover: true,
+    }),
+  ])
 
   const firstWindow = Page.create({
     electronObjectId,
