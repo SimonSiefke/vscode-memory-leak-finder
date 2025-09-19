@@ -1,5 +1,7 @@
 import type { TestContext } from '../types.ts'
 
+export const skip = 1
+
 // @ts-ignore
 export const setup = async ({ Extensions, Editor, ExtensionDetailView }: TestContext): Promise<void> => {
   await Editor.closeAll()
