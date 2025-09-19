@@ -3,7 +3,7 @@ import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
 
 const waitForWindowCount = (count) => {
   const connectionId = 1
-  const pageObject = PageObjectState.getPageObject(connectionId)
+  const pageObject = PageObjectState.getPageObjectContext(connectionId)
   const windows = pageObject.getWindows()
   if (windows.length !== count) {
     throw new ExpectError(`expected window count to be ${count} but was ${windows.length}`)

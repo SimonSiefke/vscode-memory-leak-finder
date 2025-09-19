@@ -3,7 +3,7 @@ import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
 // TODO use page object
 export const evaluateInUtilityContext = async (options: any, sessionId: any = ''): Promise<any> => {
   const connectionId = 1
-  const pageObject = PageObjectState.getPageObject(connectionId)
+  const pageObject = PageObjectState.getPageObjectContext(connectionId)
   const result = await pageObject.evaluateInUtilityContext(options)
   return result
 }

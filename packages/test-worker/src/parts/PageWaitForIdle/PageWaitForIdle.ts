@@ -30,7 +30,7 @@ const waitRpcIdle = (pageObject, canUseIdleCallback) => {
 export const waitForIdle = async (rpc, canUseIdleCallback, idleTimeout) => {
   try {
     const connectionId = 1
-    const pageObject = PageObjectState.getPageObject(connectionId)
+    const pageObject = PageObjectState.getPageObjectContext(connectionId)
 
     const result = await PTimeout.pTimeout(waitRpcIdle(pageObject, canUseIdleCallback), {
       milliseconds: idleTimeout,
