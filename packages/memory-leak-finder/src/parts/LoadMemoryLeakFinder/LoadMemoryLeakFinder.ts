@@ -6,6 +6,6 @@ const MemoryLeakFinder = {
   ...WrappedMeasures,
 }
 
-export const loadMemoryLeakFinder = async () => {
+export const loadMemoryLeakFinder = () => {
   return MemoryLeakFinder
 }
