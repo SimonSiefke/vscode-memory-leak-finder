@@ -5,9 +5,17 @@ export const getPageObject = (pageObjectId) => {
   if (!value) {
     throw new Error(`no page object found`)
   }
-  return value
+  return value.pageObject
 }
 
 export const set = (pageObjectId, pageObject) => {
   pageObjects[pageObjectId] = pageObject
+}
+
+export const get = (pageObjectId) => {
+  const item = pageObjects[pageObjectId]
+  if (!item) {
+    throw new Error(`no page object item with id ${pageObjectId} found`)
+  }
+  return item
 }
