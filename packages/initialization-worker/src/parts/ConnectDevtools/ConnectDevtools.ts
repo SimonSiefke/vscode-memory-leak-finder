@@ -4,10 +4,10 @@ import { DevtoolsProtocolPage, DevtoolsProtocolRuntime } from '../DevtoolsProtoc
 import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
 import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 
-export const connectDevtools = async (devtoolsWebSocketUrl: string, attachedToPageTimeout: number): Promise<void> => {
+export const connectDevtools = async (devtoolsWebSocketUrl: string, attachedToPageTimeout: number): Promise<any> => {
   const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
-  const sessionRpc = await waitForSession(browserRpc, attachedToPageTimeout)
+  const { sessionRpc, sessionId, targetId } = await waitForSession(browserRpc, attachedToPageTimeout)
   const script = await UtilityScript.getUtilityScript()
   await Promise.all([
     DevtoolsProtocolPage.enable(sessionRpc),
@@ -19,4 +19,9 @@ export const connectDevtools = async (devtoolsWebSocketUrl: string, attachedToPa
     DevtoolsProtocolRuntime.enable(sessionRpc),
     DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc),
   ])
+  return {
+    sessionRpc,
+    sessionId,
+    targetId,
+  }
 }

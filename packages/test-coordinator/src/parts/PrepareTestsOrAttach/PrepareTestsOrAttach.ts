@@ -11,6 +11,7 @@ interface State {
   headlessMode: boolean
   parsedVersion: any
   promise: Promise<any> | undefined
+  utilityContext: Promise<any> | undefined
 }
 
 export const state: State = {
@@ -24,6 +25,7 @@ export const state: State = {
    * @type {Promise|undefined}
    */
   promise: undefined,
+  utilityContext: undefined,
 }
 
 export const prepareTestsOrAttach = async (
@@ -61,9 +63,10 @@ export const prepareTestsOrAttach = async (
     )
     const result = await state.promise
     state.parsedVersion = result.parsedVersion
+    state.utilityContext = result.utilityContext
     return testWorkerRpc
   }
-  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion } = await state.promise
+  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext } = await state.promise
   const isFirstConnection = false
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await ConnectDevtools.connectDevtools(
@@ -80,6 +83,7 @@ export const prepareTestsOrAttach = async (
     headlessMode,
     parsedVersion,
     timeouts,
+    utilityContext,
   )
   return testWorkerRpc
 }
