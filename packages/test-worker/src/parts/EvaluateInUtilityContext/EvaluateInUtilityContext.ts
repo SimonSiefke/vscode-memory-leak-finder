@@ -4,7 +4,7 @@ import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
 export const evaluateInUtilityContext = async (options: any, sessionId: any = ''): Promise<any> => {
   const connectionId = 1
   const pageObject = PageObjectState.getPageObjectContext(connectionId)
-  const result = await pageObject.evaluateInUtilityContext(options)
+  const result = await pageObject.utilityContext.callFunctionOn(options)
   return result
 }
 

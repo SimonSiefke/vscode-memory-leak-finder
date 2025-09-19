@@ -57,12 +57,23 @@ export const connectDevtools = async (
     VError,
     electronApp,
     ideVersion: parsedIdeVersion,
-    evaluateInUtilityContext(item) {
-      return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
-        ...item,
-        uniqueContextId: utilityContext.uniqueId,
-      })
+    utilityContext: {
+      callFunctionOn(options) {
+        return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
+          ...options,
+          uniqueContextId: utilityContext.uniqueId,
+        })
+      },
     },
+    defaultContext: {
+      callFunctionOn(options) {
+        return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
+          ...options,
+          uniqueContextId: utilityContext.uniqueId,
+        })
+      },
+    },
+    evaluateInUtilityContext(item) {},
     evaluateInDefaultContext(item) {
       throw new Error(`not implemented`)
     },
