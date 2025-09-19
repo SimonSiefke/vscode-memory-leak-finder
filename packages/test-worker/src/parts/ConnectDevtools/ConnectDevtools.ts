@@ -79,6 +79,7 @@ export const connectDevtools = async (
 
   const utilityContext = await waitForUtilityExecutionContext(sessionRpc)
 
+  console.log('got util', utilityContext)
   const firstWindow = Page.create({
     electronObjectId,
     electronRpc,
@@ -109,6 +110,5 @@ export const connectDevtools = async (
     // TODO this should be part of initialization worker
     await DisableTimeouts.disableTimeouts(firstWindow)
   }
-  console.log({ pageObject })
   PageObjectState.set(connectionId, pageObject)
 }
