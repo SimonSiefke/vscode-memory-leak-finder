@@ -129,7 +129,7 @@ export const runTestsWithCallback = async ({
     let memoryLeakWorkerRpc = MemoryLeakWorker.getRpc()
     let targetId = ''
     if (checkLeaks) {
-      const info = await MemoryLeakFinder.setup(memoryLeakWorkerRpc, connectionId, measure, measureNode)
+      const info = await MemoryLeakFinder.setup(memoryLeakWorkerRpc, connectionId, measure)
       targetId = info.targetId
     }
     for (let i = 0; i < formattedPaths.length; i++) {
@@ -171,19 +171,6 @@ export const runTestsWithCallback = async ({
             const after = await MemoryLeakFinder.stop(memoryLeakWorkerRpc, connectionId, targetId)
 
             const result = await MemoryLeakFinder.compare(memoryLeakWorkerRpc, connectionId, before, after, context)
-
-            // Handle Node process measurements if measureNode is enabled
-            if (measureNode && before.nodeMeasurements && after.nodeMeasurements) {
-              const CompareNodeMeasurements = await import('../CompareNodeMeasurements/CompareNodeMeasurements.ts')
-              await CompareNodeMeasurements.compareNodeMeasurements(
-                before.nodeMeasurements,
-                after.nodeMeasurements,
-                measure,
-                dirent,
-                context,
-              )
-            }
-
             const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
             const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
             await JsonFile.writeJson(resultPath, result)
