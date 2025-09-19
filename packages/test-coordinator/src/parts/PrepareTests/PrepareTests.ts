@@ -4,7 +4,6 @@ import * as KillExistingIdeInstances from '../KillExistingIdeInstances/KillExist
 import { prepareBoth } from '../PrepareBoth/PrepareBoth.ts'
 
 export const prepareTests = async (
-  rpc: any,
   cwd: string,
   headlessMode: boolean,
   recordVideo: boolean,
@@ -33,8 +32,7 @@ export const prepareTests = async (
     canUseIdleCallback,
     attachedToPageTimeout,
   )
-  await connectWorkers(
-    rpc,
+  const { memoryRpc, testWorkerRpc, videoRpc } = await connectWorkers(
     headlessMode,
     recordVideo,
     connectionId,
@@ -61,5 +59,8 @@ export const prepareTests = async (
     devtoolsWebSocketUrl,
     electronObjectId,
     parsedVersion,
+    memoryRpc,
+    testWorkerRpc,
+    videoRpc,
   }
 }

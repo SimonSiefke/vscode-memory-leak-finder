@@ -44,11 +44,9 @@ export const prepareTestsOrAttach = async (
   idleTimeout: number,
   pageObjectPath: string,
 ) => {
-  const testWorkerRpc = await LaunchTestWorker.launchTestWorker(runMode)
   const isFirst = state.promise === undefined
   if (isFirst) {
     state.promise = PrepareTests.prepareTests(
-      testWorkerRpc,
       cwd,
       headlessMode,
       recordVideo,
@@ -66,7 +64,11 @@ export const prepareTestsOrAttach = async (
     const result = await state.promise
     state.parsedVersion = result.parsedVersion
     state.utilityContext = result.utilityContext
-    return testWorkerRpc
+    return {
+      testWorkerRpc,
+      memoryRpc: result.memoryRpc,
+      videoRpc: result.videoRpc,
+    }
   }
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, sessionId, targetId } = await state.promise
   const isFirstConnection = false

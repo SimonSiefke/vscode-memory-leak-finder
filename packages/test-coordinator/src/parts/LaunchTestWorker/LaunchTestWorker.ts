@@ -2,6 +2,7 @@ import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
 import { VError } from '@lvce-editor/verror'
 import * as GetTestWorkerUrl from '../GetTestWorkerUrl/GetTestWorkerUrl.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
+import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
 
 const getExecArgv = (runMode) => {
   switch (runMode) {
@@ -13,7 +14,19 @@ const getExecArgv = (runMode) => {
 }
 
 // TODO dispose worker on next test run
-export const launchTestWorker = async (runMode) => {
+export const launchTestWorker = async (
+  runMode: number,
+  connectionId: number,
+  devtoolsWebSocketUrl: string,
+  electronObjectId: string,
+  webSocketUrl: string,
+  idleTimeout: number,
+  pageObjectPath: string,
+  parsedIdeVersion: any,
+  timeouts: boolean,
+  utilityContext: any,
+) => {
+  console.log('launch test worker')
   try {
     const url = GetTestWorkerUrl.getTestWorkerUrl()
     const rpc = await NodeWorkerRpcParent.create({
@@ -22,6 +35,18 @@ export const launchTestWorker = async (runMode) => {
       execArgv: getExecArgv(runMode),
       commandMap: {},
     })
+    await ConnectDevtools.connectDevtools(
+      rpc,
+      connectionId,
+      devtoolsWebSocketUrl,
+      electronObjectId,
+      webSocketUrl,
+      idleTimeout,
+      pageObjectPath,
+      parsedIdeVersion,
+      timeouts,
+      utilityContext,
+    )
     return rpc
   } catch (error) {
     throw new VError(error, `Failed to launch test worker`)

@@ -106,6 +106,11 @@ export const runTestsWithCallback = async ({
     const initialStart = Time.now()
     const first = formattedPaths[0]
     await callback(TestWorkerEventType.HandleInitializing)
+
+    // TODO
+    // 1. launch workers
+    // 2. initialize (maybe)
+    // 3. connect
     let testWorkerRpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
       cwd,
       headlessMode,
