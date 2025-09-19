@@ -66,7 +66,7 @@ export const prepareTestsOrAttach = async (
     state.utilityContext = result.utilityContext
     return testWorkerRpc
   }
-  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext } = await state.promise
+  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, sessionId, targetId } = await state.promise
   const isFirstConnection = false
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await ConnectDevtools.connectDevtools(
@@ -84,6 +84,8 @@ export const prepareTestsOrAttach = async (
     parsedVersion,
     timeouts,
     utilityContext,
+    sessionId,
+    targetId,
   )
   return testWorkerRpc
 }
