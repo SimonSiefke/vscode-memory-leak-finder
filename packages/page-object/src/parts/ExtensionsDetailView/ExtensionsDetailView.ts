@@ -68,6 +68,7 @@ export const create = ({ expect, page, VError }) => {
         if (options && options.webView) {
           const webView = page.locator('.webview')
           await expect(webView).toBeVisible()
+          await page.waitForIdle()
           await expect(webView).toHaveClass('ready', {
             timeout: options?.timeout,
           })

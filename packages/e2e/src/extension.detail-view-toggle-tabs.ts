@@ -1,5 +1,6 @@
-import type { TestContext } from '../types.js'
+import type { TestContext } from '../types.ts'
 
+// @ts-ignore
 export const setup = async ({ Extensions, Editor, ExtensionDetailView }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Extensions.show()
@@ -9,6 +10,7 @@ export const setup = async ({ Extensions, Editor, ExtensionDetailView }: TestCon
   await ExtensionDetailView.shouldHaveHeading('HTML Language Basics')
 }
 
+// @ts-ignore
 export const run = async ({ ExtensionDetailView }: TestContext): Promise<void> => {
   await ExtensionDetailView.shouldHaveTab('Details')
   await ExtensionDetailView.openTab('Features', { webView: false, timeout: 30000 })

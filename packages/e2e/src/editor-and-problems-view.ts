@@ -1,4 +1,4 @@
-import type { TestContext } from '../types.js'
+import type { TestContext } from '../types.ts'
 
 export const skip = true
 
@@ -11,6 +11,7 @@ export const beforeSetup = async ({ tmpDir, writeFile, join }: any) => {
   )
 }
 
+// @ts-ignore
 export const setup = async ({ page, expect, Editor, StatusBar, Problems }: TestContext): Promise<void> => {
   await Editor.open('index.css')
   await Editor.shouldHaveSquigglyError()

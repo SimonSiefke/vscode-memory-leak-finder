@@ -1,4 +1,4 @@
-import type { TestContext } from '../types.js'
+import type { TestContext } from '../types.ts'
 
 export const skip = true
 
@@ -18,6 +18,7 @@ h2 {
   await Editor.open('file.css')
 }
 
+// @ts-ignore
 export const run = async ({ page, expect }: TestContext): Promise<void> => {
   const inlineFolded = page.locator('.inline-folded')
   await expect(inlineFolded).toBeHidden()

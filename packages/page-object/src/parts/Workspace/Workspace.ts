@@ -9,6 +9,7 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 export const create = ({ electronApp, page, expect, VError }) => {
   return {
     async setFiles(files) {
+      await page.waitForIdle()
       const workspace = join(Root.root, '.vscode-test-workspace')
       const dirents = await readdir(workspace)
       for (const dirent of dirents) {
