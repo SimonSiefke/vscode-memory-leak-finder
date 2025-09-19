@@ -22,7 +22,7 @@ export const connectDevtools = async (
     DevtoolsProtocolPage.setLifecycleEventsEnabled(sessionRpc, { enabled: true }),
     DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
       autoAttach: true,
-      waitForDebuggerOnStart: true,
+      waitForDebuggerOnStart: false,
       flatten: true,
     }),
     DevtoolsProtocolRuntime.enable(sessionRpc),
