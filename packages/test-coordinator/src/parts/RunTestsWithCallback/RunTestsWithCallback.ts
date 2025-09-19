@@ -74,7 +74,7 @@ export const runTestsWithCallback = async ({
     // Then recreate the workers, ensuring a clean state
 
     if (setupOnly && commit) {
-      const testWorkerRpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
+      const testWorkerRpc = await PrepareTestsOrAttach.prepareTestsAndAttach(
         cwd,
         headlessMode,
         recordVideo,
@@ -111,7 +111,7 @@ export const runTestsWithCallback = async ({
     // 1. launch workers
     // 2. initialize (maybe)
     // 3. connect
-    let testWorkerRpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
+    let testWorkerRpc = await PrepareTestsOrAttach.prepareTestsAndAttach(
       cwd,
       headlessMode,
       recordVideo,
@@ -220,7 +220,7 @@ export const runTestsWithCallback = async ({
           // Dispose initialization worker and any other registered disposables
           await Disposables.disposeAll()
           PrepareTestsOrAttach.state.promise = undefined
-          testWorkerRpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
+          testWorkerRpc = await PrepareTestsOrAttach.prepareTestsAndAttach(
             cwd,
             headlessMode,
             recordVideo,

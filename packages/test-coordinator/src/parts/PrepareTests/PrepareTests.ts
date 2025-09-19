@@ -33,21 +33,6 @@ export const prepareTests = async (
     canUseIdleCallback,
     attachedToPageTimeout,
   )
-  const { memoryRpc, testWorkerRpc, videoRpc } = await connectWorkers(
-    recordVideo,
-    connectionId,
-    devtoolsWebSocketUrl,
-    webSocketUrl,
-    electronObjectId,
-    attachedToPageTimeout,
-    measureId,
-    idleTimeout,
-    pageObjectPath,
-    parsedVersion,
-    timeouts,
-    utilityContext,
-    runMode,
-  )
 
   return {
     memoryRpc,
