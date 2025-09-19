@@ -10,6 +10,7 @@ import * as PTimeout from '../PTimeout/PTimeout.ts'
 import * as SessionState from '../SessionState/SessionState.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEvent.ts'
+import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 
 export const connectDevtools = async (
   devtoolsWebSocketUrl: string,
@@ -20,53 +21,18 @@ export const connectDevtools = async (
   Assert.string(devtoolsWebSocketUrl)
   const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
-
-  SessionState.addSession('browser', {
-    type: ObjectType.Browser,
-    objectType: ObjectType.Browser,
-    url: '',
-    sessionId: '',
-    rpc: browserRpc,
-  })
-
-  const eventPromise = waitForAttachedEvent(browserRpc, attachedToPageTimeout)
-
-  await Promise.all([
-    DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
+  const { sessionRpc } = await waitForSession(browserRpc, attachedToPageTimeout)
+  Promise.all([
+    DevtoolsProtocolPage.enable(sessionRpc),
+    DevtoolsProtocolPage.setLifecycleEventsEnabled(sessionRpc, { enabled: true }),
+    DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
       autoAttach: true,
       waitForDebuggerOnStart: true,
       flatten: true,
     }),
-    DevtoolsProtocolTarget.setDiscoverTargets(browserRpc, {
-      discover: true,
-    }),
+    DevtoolsProtocolRuntime.enable(sessionRpc),
+    DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc),
   ])
-
-  const event = await eventPromise
-
-  if (!event) {
-    throw new Error(`Failed to attach to page`)
-  }
-
-  const { sessionId } = event.params
-
-  const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
-
-  await PTimeout.pTimeout(
-    Promise.all([
-      DevtoolsProtocolPage.enable(sessionRpc),
-      DevtoolsProtocolPage.setLifecycleEventsEnabled(sessionRpc, { enabled: true }),
-      DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
-        autoAttach: true,
-        waitForDebuggerOnStart: true,
-        flatten: true,
-      }),
-      DevtoolsProtocolRuntime.enable(sessionRpc),
-      DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc),
-    ]),
-    { milliseconds: TimeoutConstants.AttachToPage },
-  )
-
   const measure = await GetCombinedMeasure.getCombinedMeasure(sessionRpc, measureId)
   MemoryLeakFinderState.set(connectionId, measure)
 }
