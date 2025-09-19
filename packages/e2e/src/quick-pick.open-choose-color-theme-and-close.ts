@@ -1,4 +1,4 @@
-import type { TestContext } from '../types.js'
+import type { TestContext } from '../types.ts'
 
 export const run = async ({ QuickPick, Workbench, Colors }: TestContext): Promise<void> => {
   await QuickPick.showColorTheme()
