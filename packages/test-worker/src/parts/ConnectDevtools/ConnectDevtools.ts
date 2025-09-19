@@ -38,9 +38,7 @@ export const connectDevtools = async (
 
   // TODO connect to electron and browser in parallel
   const electronRpc = await connectElectron(connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback)
-  const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
-  // @ts-ignore
-  const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
+  const browserRpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
 
   // TODO pass sessionId, utilityExecutionContextId from initialization worker
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
@@ -69,6 +67,11 @@ export const connectDevtools = async (
     electronApp,
     ideVersion: parsedIdeVersion,
     evaluateInUtilityContext(item) {
+      console.log(`evaluate`, {
+        item,
+        sessionId,
+        sessionRpc,
+      })
       return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
         ...item,
         uniqueContextId: utilityContext.uniqueId,
