@@ -57,6 +57,7 @@ export const connectDevtools = async (
     electronRpc,
     electronObjectId,
     idleTimeout,
+    firstWindow,
   })
   const pageObjectContext = {
     page: firstWindow,

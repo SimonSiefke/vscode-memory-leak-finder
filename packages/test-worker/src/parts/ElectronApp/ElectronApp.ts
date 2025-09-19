@@ -3,14 +3,14 @@ import * as ObjectType from '../ObjectType/ObjectType.ts'
 import * as WaitForIframe from '../WaitForIframe/WaitForIframe.ts'
 import * as WaitForPage from '../WaitForPage/WaitForPage.ts'
 
-export const create = ({ electronRpc, electronObjectId, idleTimeout }) => {
+export const create = ({ electronRpc, electronObjectId, idleTimeout, firstWindow }) => {
   return {
     objectType: ObjectType.ElectronApp,
     rpc: electronRpc,
     electronObjectId,
     windows: [],
     firstWindow() {
-      return WaitForPage.waitForPage({ index: 0, electronRpc, electronObjectId, idleTimeout })
+      return firstWindow
     },
     secondWindow() {
       return WaitForPage.waitForPage({ index: 1, electronRpc, electronObjectId, idleTimeout })
