@@ -23,26 +23,30 @@ export const connectWorkers = async (
   sessionId: string,
   targetId: string,
 ) => {
+  const promises: Promise<void>[] = []
   if (recordVideo) {
-    await VideoRecording.start(devtoolsWebSocketUrl, attachedToPageTimeout, idleTimeout)
+    promises.push(VideoRecording.start(devtoolsWebSocketUrl, attachedToPageTimeout, idleTimeout))
   }
-  await MemoryLeakWorker.startWorker(devtoolsWebSocketUrl, connectionId, measureId, attachedToPageTimeout)
-  await ConnectDevtools.connectDevtools(
-    rpc,
-    connectionId,
-    devtoolsWebSocketUrl,
-    electronObjectId,
-    isFirstConnection,
-    headlessMode,
-    webSocketUrl,
-    canUseIdleCallback,
-    idleTimeout,
-    pageObjectPath,
-    isHeadless,
-    parsedIdeVersion,
-    timeouts,
-    utilityContext,
-    sessionId,
-    targetId,
+  promises.push(MemoryLeakWorker.startWorker(devtoolsWebSocketUrl, connectionId, measureId, attachedToPageTimeout))
+  promises.push(
+    ConnectDevtools.connectDevtools(
+      rpc,
+      connectionId,
+      devtoolsWebSocketUrl,
+      electronObjectId,
+      isFirstConnection,
+      headlessMode,
+      webSocketUrl,
+      canUseIdleCallback,
+      idleTimeout,
+      pageObjectPath,
+      isHeadless,
+      parsedIdeVersion,
+      timeouts,
+      utilityContext,
+      sessionId,
+      targetId,
+    ),
   )
+  await Promise.all(promises)
 }

@@ -29,13 +29,12 @@ export const connectDevtools = async (
   Assert.string(devtoolsWebSocketUrl)
   Assert.boolean(isFirstConnection)
   Assert.object(utilityContext)
+
   const [electronRpc, browserRpc] = await Promise.all([
     DebuggerCreateIpcConnection.createConnection(webSocketUrl),
     DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl),
   ])
-  console.time('session')
   const { sessionRpc, sessionId, targetId } = await waitForSession(browserRpc, 5000)
-  console.timeEnd('session')
   const firstWindow = Page.create({
     electronObjectId,
     electronRpc,
@@ -85,6 +84,7 @@ export const connectDevtools = async (
       throw new Error(`not implemented`)
     },
   }
+
   const pageObjectModule = await ImportScript.importScript(pageObjectPath)
   const pageObject = await pageObjectModule.create(pageObjectContext)
   PageObjectState.set(connectionId, pageObject, pageObjectContext)
