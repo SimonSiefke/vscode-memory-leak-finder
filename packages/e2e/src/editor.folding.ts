@@ -18,6 +18,7 @@ h2 {
   await Editor.open('file.css')
 }
 
+// @ts-ignore
 export const run = async ({ page, expect }: TestContext): Promise<void> => {
   const inlineFolded = page.locator('.inline-folded')
   await expect(inlineFolded).toBeHidden()

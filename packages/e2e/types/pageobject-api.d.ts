@@ -106,7 +106,7 @@ export interface Editor {
   renameCancel(newText: any): Promise<void>
   shouldHaveToken(text: any, color: any): Promise<void>
   shouldHaveBreadCrumb(text: any): Promise<void>
-  save(options: any): Promise<void>
+  save(options?: any): Promise<void>
   switchToTab(name: any): Promise<void>
   showColorPicker(): Promise<void>
   hideColorPicker(): Promise<void>
@@ -171,9 +171,11 @@ export interface Explorer {
   rename(oldDirentName: any, newDirentName: any): Promise<void>
   refresh(): Promise<void>
   toHaveItem(direntName: any): Promise<void>
+  not: any
 }
 export interface Extensions {
   search(value: any): Promise<void>
+  first: any
   clear(): Promise<void>
   shouldHaveValue(value: any): Promise<void>
   show(): Promise<void>
@@ -263,7 +265,7 @@ export interface RunAndDebug {
   waitForPaused(options: any): Promise<void>
   runAndWaitForPaused(options?: any): Promise<void>
   removeAllBreakpoints(): Promise<void>
-  step(expectedFile: any, expectedPauseLine: any, expectedCallStackSize: any): Promise<void>
+  step(expectedFile: any, expectedPauseLine: any, expectedCallStackSize?: any): Promise<void>
   setValue(variableName: any, variableValue: any, newVariableValue: any): Promise<void>
 }
 export interface RunningExtensions {
@@ -398,7 +400,7 @@ export interface Workspace {
   initializeGitRepository(): Promise<void>
   add(file: any): Promise<void>
   remove(file: any): Promise<void>
-  getWorkspaceFilePath(): Promise<any>
+  getWorkspaceFilePath(name: string): Promise<any>
 }
 
 export interface PageObjectApi {

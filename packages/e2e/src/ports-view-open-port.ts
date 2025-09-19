@@ -9,5 +9,5 @@ export const setup = async ({ Panel, PortsView }: TestContext): Promise<void> =>
 
 export const run = async ({ PortsView }: TestContext): Promise<void> => {
   await PortsView.setPortInput(1234)
-  await PortsView.cancelPortEdit(1234)
+  await PortsView.cancelPortEdit()
 }
