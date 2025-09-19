@@ -15,10 +15,7 @@ export const connectDevtools = (
   isHeadless: boolean,
   parsedIdeVersion: any,
   timeouts: boolean,
-<<<<<<< HEAD
   utilityContext: any,
-=======
->>>>>>> origin/main
 ) => {
   Assert.object(rpc)
   Assert.number(connectionId)

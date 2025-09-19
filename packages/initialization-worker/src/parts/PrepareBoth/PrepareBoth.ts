@@ -50,17 +50,19 @@ export const prepareBoth = async (
     objectId: monkeyPatchedElectronId,
   })
 
-  const sessionRpc = await connectDevtoolsPromise
+  const { sessionRpc, sessionId, targetId } = await connectDevtoolsPromise
 
   const utilityContext = await waitForUtilityExecutionContext(sessionRpc)
 
   return {
-    webSocketUrl,
-    devtoolsWebSocketUrl,
-    monkeyPatchedElectronId,
-    electronObjectId,
     childPid: child.pid,
+    devtoolsWebSocketUrl,
+    electronObjectId,
+    monkeyPatchedElectronId,
     parsedVersion,
+    sessionId,
+    targetId,
     utilityContext,
+    webSocketUrl,
   }
 }
