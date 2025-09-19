@@ -46,6 +46,7 @@ export const parseArgv = (argv) => {
     commit: '',
     setupOnly: false,
     workers: false,
+    shouldContinue: false,
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -109,6 +110,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--workers')) {
     options.workers = true
+  }
+  if (argv.includes('--continue')) {
+    options.shouldContinue = true
   }
   return options
 }

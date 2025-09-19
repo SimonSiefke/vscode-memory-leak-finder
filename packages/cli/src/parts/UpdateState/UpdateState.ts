@@ -48,6 +48,7 @@ export const updateState = async (newState: any): Promise<void> => {
       workers: state.workers,
       isWindows: state.isWindows,
       runSkippedTestsAnyway: state.runSkippedTestsAnyway,
+      shouldContinue: state.shouldContinue,
     })
   }
   if (newState.mode === ModeType.Interrupted) {

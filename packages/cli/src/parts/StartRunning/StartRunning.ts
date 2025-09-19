@@ -28,6 +28,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     setupOnly,
     workers,
     isWindows,
+    shouldContinue,
   } = options
   const clear = await AnsiEscapes.clear(isWindows)
   await Stdout.write(clear)
@@ -55,5 +56,6 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     commit,
     setupOnly,
     workers,
+    shouldContinue,
   })
 }
