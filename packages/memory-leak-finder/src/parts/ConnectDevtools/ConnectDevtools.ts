@@ -14,8 +14,7 @@ export const connectDevtools = async (
 ): Promise<void> => {
   // TODO connect to electron and node processes if should measure node
   Assert.string(devtoolsWebSocketUrl)
-  const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
-  const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
+  const browserRpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   const { sessionRpc } = await waitForSession(browserRpc, attachedToPageTimeout)
   Promise.all([
     DevtoolsProtocolPage.enable(sessionRpc),
