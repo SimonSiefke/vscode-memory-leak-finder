@@ -12,6 +12,7 @@ export const create = ({ expect, page, VError, ideVersion }) => {
   return {
     async search(value) {
       try {
+        await page.waitForIdle()
         const extensionsView = page.locator(`.extensions-viewlet`)
         await expect(extensionsView).toBeVisible()
         if (ideVersion && ideVersion.minor <= 100) {
@@ -62,6 +63,7 @@ export const create = ({ expect, page, VError, ideVersion }) => {
     },
     async show() {
       try {
+        await page.waitForIdle()
         const searchItem = page.locator(`.action-item:has([aria-label^="Extensions"])`)
         const selected = await searchItem.getAttribute('aria-selected')
         if (selected !== 'true') {
@@ -73,6 +75,7 @@ export const create = ({ expect, page, VError, ideVersion }) => {
           await quickPick.executeCommand(WellKnownCommands.ShowExtensions)
           const extensionsView = page.locator(`.extensions-viewlet`)
           await expect(extensionsView).toBeVisible()
+          await page.waitForIdle()
         }
         const extensionsView = page.locator(`.extensions-viewlet`)
         const suggestContainer = page.locator(`.suggest-input-container`)
@@ -93,10 +96,14 @@ export const create = ({ expect, page, VError, ideVersion }) => {
           const className = await suggestContainer.getAttribute('class')
           if (!className.includes('synthetic-focus')) {
             await suggestContainer.click()
+            await page.waitForIdle()
             await expect(extensionsInput).toBeVisible()
+            await page.waitForIdle()
             await extensionsInput.click()
+            await page.waitForIdle()
           }
           await extensionsInput.focus()
+          await page.waitForIdle()
           await expect(suggestContainer).toHaveClass('synthetic-focus')
           await expect(extensionsInput).toBeFocused()
           await page.waitForIdle()
