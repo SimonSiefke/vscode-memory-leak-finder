@@ -6,7 +6,7 @@ export const waitForSession = async (browserRpc, attachedToPageTimeout) => {
   const eventPromise = waitForAttachedEvent(browserRpc, attachedToPageTimeout)
   await DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
     autoAttach: true,
-    waitForDebuggerOnStart: false,
+    waitForDebuggerOnStart: true,
     flatten: true,
     filter: [
       {
