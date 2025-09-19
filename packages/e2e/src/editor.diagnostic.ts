@@ -17,6 +17,7 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
 
 export const run = async ({ Editor, Hover }: TestContext): Promise<void> => {
   await Editor.shouldHaveSquigglyError()
+  // @ts-ignore
   await Editor.hover('}')
   await Hover.shouldHaveText('colon expected')
   await Editor.click('abc')

@@ -14,6 +14,10 @@ export const connectWorkers = async (
   electronObjectId: string,
   attachedToPageTimeout: number,
   idleTimeout: number,
+  pageObjectPath: string,
+  isHeadless: boolean,
+  parsedIdeVersion: any,
+  timeouts: boolean,
   utilityContext: any,
 ) => {
   if (recordVideo) {
@@ -31,6 +35,10 @@ export const connectWorkers = async (
     webSocketUrl,
     canUseIdleCallback,
     idleTimeout,
+    pageObjectPath,
+    isHeadless,
+    parsedIdeVersion,
+    timeouts,
     utilityContext,
   )
 }

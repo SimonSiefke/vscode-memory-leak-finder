@@ -45,8 +45,13 @@ export const prepareTests = async (
     electronObjectId,
     attachedToPageTimeout,
     idleTimeout,
+    pageObjectPath,
+    headlessMode,
+    parsedVersion,
+    timeouts,
     utilityContext,
   )
+
   await PageObject.create(rpc, connectionId, isFirstConnection, headlessMode, timeouts, parsedVersion, pageObjectPath)
 
   return {
