@@ -8,5 +8,11 @@ export const compare = async (connectionId: number): Promise<any> => {
     throw new Error(`no measure found`)
   }
   const { before, after } = measure
+  if (!before) {
+    throw new Error(`before missing`)
+  }
+  if (!after) {
+    throw new Error(`after missing`)
+  }
   return measure.compare(before, after)
 }
