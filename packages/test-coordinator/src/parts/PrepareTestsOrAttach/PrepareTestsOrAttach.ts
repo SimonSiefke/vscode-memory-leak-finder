@@ -1,7 +1,6 @@
 import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.ts'
 import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
 import * as LaunchTestWorker from '../LaunchTestWorker/LaunchTestWorker.ts'
-import * as PageObject from '../PageObject/PageObject.ts'
 import * as PrepareTests from '../PrepareTests/PrepareTests.ts'
 
 interface State {
@@ -82,6 +81,5 @@ export const prepareTestsOrAttach = async (
     parsedVersion,
     timeouts,
   )
-  await PageObject.create(testWorkerRpc, connectionId, isFirstConnection, headlessMode, timeouts, state.parsedVersion, pageObjectPath)
   return testWorkerRpc
 }
