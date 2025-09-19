@@ -24,7 +24,7 @@ const waitForEventInternal = (sessionRpc): Promise<any> => {
 
 export const waitForUtilityExecutionContext = async (sessionRpc) => {
   const eventPromise = waitForEventInternal(sessionRpc)
-  await Promise.all([DevtoolsProtocolRuntime.enable(sessionRpc), DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc)])
+  await Promise.all([DevtoolsProtocolRuntime.enable(sessionRpc)])
   const { name, id, uniqueId } = await eventPromise
   // TODO can disable runtime now
   return {
