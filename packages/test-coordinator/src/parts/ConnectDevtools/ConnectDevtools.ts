@@ -16,6 +16,8 @@ export const connectDevtools = (
   parsedIdeVersion: any,
   timeouts: boolean,
   utilityContext: any,
+  sessionId: string,
+  targetId: string,
 ) => {
   Assert.object(rpc)
   Assert.number(connectionId)
@@ -35,5 +37,7 @@ export const connectDevtools = (
     parsedIdeVersion,
     timeouts,
     utilityContext,
+    sessionId,
+    targetId,
   )
 }
