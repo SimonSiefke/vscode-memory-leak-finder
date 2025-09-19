@@ -1,5 +1,6 @@
 export const VideoRecordingStart = 'VideoRecording.start'
 export const VideoRecordingAddChapter = 'VideoRecording.addChapter'
 export const VideoRecordingFinalize = 'VideoRecording.finalize'
+export const VideoRecordingSetTestStatus = 'VideoRecording.setTestStatus'
 export const Initialize = 'VideoRecording.initialize'
 export const ConnectDevtools = 'ConnectDevtools.connectDevtools'

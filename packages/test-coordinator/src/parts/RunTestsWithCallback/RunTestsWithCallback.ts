@@ -149,6 +149,11 @@ export const runTestsWithCallback = async ({
         await callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, /* isFirst */ true)
       }
 
+      // Set test status to running
+      if (recordVideo && currentVideoRpc) {
+        await VideoRecording.setTestStatus(currentVideoRpc, dirent, 'running')
+      }
+
       try {
         const start = i === 0 ? initialStart : Time.now()
         const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(currentTestRpc, connectionId, absolutePath, forceRun, timeouts)
@@ -198,6 +203,12 @@ export const runTestsWithCallback = async ({
           await TestWorkerTeardownTest.testWorkerTearDownTest(currentTestRpc, connectionId, absolutePath)
           const end = Time.now()
           const duration = end - start
+
+          // Set test status to passed
+          if (recordVideo && currentVideoRpc) {
+            await VideoRecording.setTestStatus(currentVideoRpc, dirent, 'passed')
+          }
+
           await callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration, isLeak)
           if (!isLeak) {
             passed++
@@ -205,6 +216,12 @@ export const runTestsWithCallback = async ({
         }
       } catch (error) {
         failed++
+
+        // Set test status to failed
+        if (recordVideo && currentVideoRpc) {
+          await VideoRecording.setTestStatus(currentVideoRpc, dirent, 'failed')
+        }
+
         const PrettyError = await import('../PrettyError/PrettyError.ts')
         const prettyError = await PrettyError.prepare(error, { color, root })
         await callback(TestWorkerEventType.TestFailed, absolutePath, relativeDirname, relativePath, dirent, prettyError)

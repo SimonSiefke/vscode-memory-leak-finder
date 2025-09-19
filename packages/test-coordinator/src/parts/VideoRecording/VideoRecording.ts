@@ -16,6 +16,10 @@ export const addChapter = (rpc, name, time) => {
   return rpc.invoke('VideoRecording.addChapter', name, time)
 }
 
+export const setTestStatus = (rpc, testName, status) => {
+  return rpc.invoke('VideoRecording.setTestStatus', testName, status)
+}
+
 export const finalize = (rpc) => {
   return rpc.invoke('VideoRecording.finalize')
 }
