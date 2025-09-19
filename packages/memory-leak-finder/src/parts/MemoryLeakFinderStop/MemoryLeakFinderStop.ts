@@ -18,6 +18,6 @@ export const stop = async (connectionId: number, electronTargetId: string): Prom
   if (intermediateResult && intermediateResult.crashed) {
     throw new Error('target crashed')
   }
-  crashInfo.cleanup()
+  crashInfo.dispose()
   return intermediateResult
 }

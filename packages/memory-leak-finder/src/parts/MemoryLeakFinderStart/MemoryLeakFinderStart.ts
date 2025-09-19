@@ -17,6 +17,6 @@ export const start = async (connectionId: number, electronTargetId: string): Pro
   if (intermediateResult && intermediateResult.crashed) {
     throw new Error('target crashed')
   }
-  crashInfo.cleanup()
+  crashInfo.dispose()
   return intermediateResult
 }

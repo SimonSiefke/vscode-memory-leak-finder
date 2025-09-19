@@ -1,12 +1,14 @@
 export const crashInfo = { crashed: true }
 
-export const waitForCrash = (targetId: string): { readonly promise: Promise<any>; readonly cleanup: () => void } => {
+export const waitForCrash = (targetId: string): { readonly promise: Promise<any>; readonly dispose: () => void } => {
   // TODO maybe implement this in intilization worker or test worker
   // when a target crashes, the test run should fail and workers should exit
   // and the application should be closed
 
   // Assert.string(targetId)
-  const { promise } = Promise.withResolvers()
+  const { promise, resolve } = Promise.withResolvers()
+
+  resolve(undefined)
   // const crashCallback = () => {
   //   ExecutionContextState.removeCrashListener(targetId)
   //   resolve(crashInfo)
@@ -17,6 +19,6 @@ export const waitForCrash = (targetId: string): { readonly promise: Promise<any>
   // ExecutionContextState.registerCrashListener(targetId, crashCallback)
   return {
     promise,
-    cleanup() {},
+    dispose() {},
   }
 }
