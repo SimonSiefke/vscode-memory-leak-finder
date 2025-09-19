@@ -23,7 +23,7 @@ export const prepareTests = async (
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
-  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext } = await prepareBoth(
+  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, sessionId, targetId } = await prepareBoth(
     headlessMode,
     cwd,
     ide,
@@ -52,6 +52,8 @@ export const prepareTests = async (
     parsedVersion,
     timeouts,
     utilityContext,
+    sessionId,
+    targetId,
   )
 
   await PageObject.create(rpc, connectionId, isFirstConnection, headlessMode, timeouts, parsedVersion, pageObjectPath)
