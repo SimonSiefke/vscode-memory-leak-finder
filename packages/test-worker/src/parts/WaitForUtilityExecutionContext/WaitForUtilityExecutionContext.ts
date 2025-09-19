@@ -1,5 +1,4 @@
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
-import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 const waitForEventInternal = (sessionRpc): Promise<any> => {
