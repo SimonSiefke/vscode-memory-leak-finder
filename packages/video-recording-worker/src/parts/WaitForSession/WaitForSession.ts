@@ -2,7 +2,7 @@ import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpc
 import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEvent.ts'
 
-export const waitForSession = async (browserRpc, attachedToPageTimeout) => {
+export const waitForSession = async (browserRpc: any, attachedToPageTimeout: number) => {
   const eventPromise = waitForAttachedEvent(browserRpc, attachedToPageTimeout)
 
   await DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
