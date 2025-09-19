@@ -15,12 +15,7 @@ const doStop = async (connectionId: number): Promise<any> => {
     const browserSession = SessionState.getSession('browser')
     if (browserSession) {
       // Store Node process measurements for later comparison
-      const nodeMeasurements = await MeasureNodeProcesses.measureNodeProcesses(
-        browserSession.rpc,
-        measure.id,
-        'after',
-        'after'
-      )
+      const nodeMeasurements = await MeasureNodeProcesses.measureNodeProcesses(browserSession.rpc, measure.id, 'after', 'after')
       result.nodeMeasurements = nodeMeasurements
     }
   }
