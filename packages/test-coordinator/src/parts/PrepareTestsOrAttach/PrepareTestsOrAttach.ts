@@ -34,7 +34,7 @@ export const prepareTestsOrAttach = async (
   recordVideo: boolean,
   connectionId: number,
   timeouts: any,
-  runMode: string,
+  runMode: number,
   ide: string,
   ideVersion: string,
   vscodePath: string,
@@ -60,6 +60,7 @@ export const prepareTestsOrAttach = async (
       measureId,
       idleTimeout,
       pageObjectPath,
+      runMode,
     )
     const result = await state.promise
     state.parsedVersion = result.parsedVersion

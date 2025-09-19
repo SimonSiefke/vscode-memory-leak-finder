@@ -4,7 +4,7 @@ import * as GetTestWorkerUrl from '../GetTestWorkerUrl/GetTestWorkerUrl.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
 
-const getExecArgv = (runMode) => {
+const getExecArgv = (runMode: number): readonly string[] => {
   switch (runMode) {
     case TestRunMode.Vm:
       return ['--experimental-vm-modules']
@@ -26,7 +26,6 @@ export const launchTestWorker = async (
   timeouts: boolean,
   utilityContext: any,
 ) => {
-  console.log('launch test worker')
   try {
     const url = GetTestWorkerUrl.getTestWorkerUrl()
     const rpc = await NodeWorkerRpcParent.create({
