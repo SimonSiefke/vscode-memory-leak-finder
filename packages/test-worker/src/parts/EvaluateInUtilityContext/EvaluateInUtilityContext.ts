@@ -1,8 +1,7 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-// import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.ts'
-// import * as SessionState from '../SessionState/SessionState.ts'
+import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.ts'
+import * as SessionState from '../SessionState/SessionState.ts'
 
-// TODO use page object
 export const evaluateInUtilityContext = async (options: any, sessionId: any = ''): Promise<any> => {
   if (!sessionId) {
     // TODO remove this code and make sessionId a required argument
