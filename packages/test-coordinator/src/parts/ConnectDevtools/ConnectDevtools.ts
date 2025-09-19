@@ -15,6 +15,7 @@ export const connectDevtools = (
   isHeadless: boolean,
   parsedIdeVersion: any,
   timeouts: boolean,
+  utilityContext: any,
 ) => {
   Assert.object(rpc)
   Assert.number(connectionId)
@@ -33,5 +34,6 @@ export const connectDevtools = (
     isHeadless,
     parsedIdeVersion,
     timeouts,
+    utilityContext,
   )
 }
