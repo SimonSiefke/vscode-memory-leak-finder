@@ -32,6 +32,7 @@ export const prepareTests = async (
     canUseIdleCallback,
     attachedToPageTimeout,
   )
+  const measureId = ''
   await connectWorkers(
     rpc,
     headlessMode,
@@ -43,6 +44,7 @@ export const prepareTests = async (
     canUseIdleCallback,
     electronObjectId,
     attachedToPageTimeout,
+    measureId,
     idleTimeout,
     pageObjectPath,
     headlessMode,
