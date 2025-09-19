@@ -7,6 +7,7 @@ import * as Disposables from '../Disposables/Disposables.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
+import { waitForUtilityExecutionContext } from '../WaitForUtilityExecutionContext/WaitForUtilityExecutionContext.ts'
 
 export const prepareBoth = async (
   headlessMode: boolean,
@@ -41,7 +42,7 @@ export const prepareBoth = async (
   const connectDevtoolsPromise = connectDevtools(devtoolsWebSocketUrl, attachedToPageTimeout)
 
   if (headlessMode) {
-    console.log('headldessmode')
+    // TODO
   }
 
   await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
@@ -49,14 +50,19 @@ export const prepareBoth = async (
     objectId: monkeyPatchedElectronId,
   })
 
-  await connectDevtoolsPromise
+  const { sessionRpc, sessionId, targetId } = await connectDevtoolsPromise
+
+  const utilityContext = await waitForUtilityExecutionContext(sessionRpc)
 
   return {
-    webSocketUrl,
-    devtoolsWebSocketUrl,
-    monkeyPatchedElectronId,
-    electronObjectId,
     childPid: child.pid,
+    devtoolsWebSocketUrl,
+    electronObjectId,
+    monkeyPatchedElectronId,
     parsedVersion,
+    sessionId,
+    targetId,
+    utilityContext,
+    webSocketUrl,
   }
 }
