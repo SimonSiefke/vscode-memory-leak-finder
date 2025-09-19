@@ -28,7 +28,6 @@ export const runTests = ({
   vscodePath,
   commit,
   setupOnly,
-  shouldContinue,
 }: RunTestsOptions) => {
   return RunTestsWithCallback.runTestsWithCallback({
     root,
@@ -52,7 +51,6 @@ export const runTests = ({
     vscodePath,
     commit,
     setupOnly,
-    shouldContinue,
     callback,
   })
 }
