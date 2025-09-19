@@ -8,7 +8,7 @@ export const waitForCrash = (targetId: string): { readonly promise: Promise<any>
   // Assert.string(targetId)
   const { promise, resolve } = Promise.withResolvers()
 
-  resolve(undefined)
+  // resolve(undefined)
   // const crashCallback = () => {
   //   ExecutionContextState.removeCrashListener(targetId)
   //   resolve(crashInfo)
@@ -19,6 +19,8 @@ export const waitForCrash = (targetId: string): { readonly promise: Promise<any>
   // ExecutionContextState.registerCrashListener(targetId, crashCallback)
   return {
     promise,
-    dispose() {},
+    dispose() {
+      resolve(undefined)
+    },
   }
 }
