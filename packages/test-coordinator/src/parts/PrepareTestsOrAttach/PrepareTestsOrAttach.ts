@@ -40,7 +40,6 @@ export const prepareTestsOrAttach = async (
   commit: string,
   attachedToPageTimeout: number,
   idleTimeout: number,
-  parsedIdeVersion: any,
   pageObjectPath: string,
 ) => {
   const testWorkerRpc = await LaunchTestWorker.launchTestWorker(runMode)
@@ -60,15 +59,12 @@ export const prepareTestsOrAttach = async (
       attachedToPageTimeout,
       idleTimeout,
       pageObjectPath,
-      headlessMode,
-      parsedIdeVersion,
-      timeouts,
     )
     const result = await state.promise
     state.parsedVersion = result.parsedVersion
     return testWorkerRpc
   }
-  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId } = await state.promise
+  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion } = await state.promise
   const isFirstConnection = false
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await ConnectDevtools.connectDevtools(
@@ -83,7 +79,7 @@ export const prepareTestsOrAttach = async (
     idleTimeout,
     pageObjectPath,
     headlessMode,
-    parsedIdeVersion,
+    parsedVersion,
     timeouts,
   )
   await PageObject.create(testWorkerRpc, connectionId, isFirstConnection, headlessMode, timeouts, state.parsedVersion, pageObjectPath)

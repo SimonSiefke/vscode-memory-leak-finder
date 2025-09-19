@@ -68,7 +68,6 @@ export const runTestsWithCallback = async ({
     const pageObjectPath = GetPageObjectPath.getPageObjectPath()
     const attachedToPageTimeout = TimeoutConstants.AttachToPage
     const idleTimeout = TimeoutConstants.Idle
-    const pageObjectPath = GetPageObjectPath.getPageObjectPath()
 
     if (setupOnly && commit) {
       const testWorkerRpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
