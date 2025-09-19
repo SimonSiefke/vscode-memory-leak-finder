@@ -3,3 +3,7 @@ declare const process: {
 }
 
 export * from './types/pageobject-api.d.ts'
+
+import Api from './types/pageobject-api.d.ts'
+
+export { Api as TestContext }
