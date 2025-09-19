@@ -1,8 +1,6 @@
 import * as Assert from '../Assert/Assert.ts'
 import { connectElectron } from '../ConnectElectron/ConnectElectron.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
-import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
-import * as DebuggerCreateSessionRpcConnection from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as DisableTimeouts from '../DisableTimeouts/DisableTimeouts.ts'
 import * as ElectronApp from '../ElectronApp/ElectronApp.ts'
@@ -11,6 +9,7 @@ import * as ImportScript from '../ImportScript/ImportScript.ts'
 import * as Page from '../Page/Page.ts'
 import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
 import { VError } from '../VError/VError.ts'
+import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 
 export const connectDevtools = async (
   connectionId: number,
@@ -26,22 +25,17 @@ export const connectDevtools = async (
   parsedIdeVersion: any,
   timeouts: boolean,
   utilityContext: any,
-  sessionId: string,
-  targetId: string,
 ) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
   Assert.boolean(isFirstConnection)
   Assert.object(utilityContext)
-  Assert.string(sessionId)
-  Assert.string(targetId)
 
   // TODO connect to electron and browser in parallel
   const electronRpc = await connectElectron(connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback)
   const browserRpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
 
-  // TODO pass sessionId, utilityExecutionContextId from initialization worker
-  const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
+  const { sessionRpc, sessionId, targetId } = await waitForSession(browserRpc, 5000)
 
   await DevtoolsProtocolRuntime.evaluate(sessionRpc, {
     expression: '1+1',
