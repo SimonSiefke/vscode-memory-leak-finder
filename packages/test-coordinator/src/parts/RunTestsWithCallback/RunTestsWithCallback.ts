@@ -1,6 +1,5 @@
 import { join } from 'node:path'
 import * as Assert from '../Assert/Assert.ts'
-import * as Disposables from '../Disposables/Disposables.ts'
 import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
 import { getSummary } from '../GetSummary/GetSummary.ts'
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.ts'
@@ -42,6 +41,8 @@ export const runTestsWithCallback = async ({
   commit,
   setupOnly,
   callback,
+  addDisposable,
+  clearDisposables,
 }: RunTestsWithCallbackOptions) => {
   try {
     Assert.string(root)
@@ -125,6 +126,15 @@ export const runTestsWithCallback = async ({
       pageObjectPath,
     )
 
+    addDisposable(async () => {
+      await testWorkerRpc.dispose()
+    })
+    addDisposable(async () => {
+      await memoryRpc.dispose()
+    })
+    addDisposable(async () => {
+      await videoRpc?.dispose()
+    })
     const context = {
       runs,
     }
@@ -210,20 +220,7 @@ export const runTestsWithCallback = async ({
         await callback(TestWorkerEventType.TestFailed, absolutePath, relativeDirname, relativePath, dirent, prettyError)
       } finally {
         if (restartBetween) {
-          if (currentMemoryRpc) {
-            await currentMemoryRpc.dispose()
-            currentMemoryRpc = undefined
-          }
-          if (currentTestRpc) {
-            await currentMemoryRpc.dispose()
-            currentTestRpc = undefined
-          }
-          if (currentVideoRpc) {
-            await currentVideoRpc.dispose()
-            currentVideoRpc = undefined
-          }
-          // Dispose initialization worker and any other registered disposables
-          await Disposables.disposeAll()
+          await clearDisposables()
           PrepareTestsOrAttach.state.promise = undefined
           const { memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach(
             cwd,
@@ -241,6 +238,15 @@ export const runTestsWithCallback = async ({
             idleTimeout,
             pageObjectPath,
           )
+          addDisposable(async () => {
+            await memoryRpc.dispose()
+          })
+          addDisposable(async () => {
+            await videoRpc?.dispose()
+          })
+          addDisposable(async () => {
+            await testWorkerRpc?.dispose()
+          })
           currentTestRpc = testWorkerRpc
           currentMemoryRpc = memoryRpc
           currentVideoRpc = videoRpc
