@@ -4,17 +4,25 @@ import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEve
 
 export const waitForSession = async (browserRpc, attachedToPageTimeout) => {
   const eventPromise = waitForAttachedEvent(browserRpc, attachedToPageTimeout)
-
-  await Promise.all([
-    DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
-      autoAttach: true,
-      waitForDebuggerOnStart: true,
-      flatten: true,
-    }),
-    DevtoolsProtocolTarget.setDiscoverTargets(browserRpc, {
-      discover: true,
-    }),
-  ])
+  await DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
+    autoAttach: true,
+    waitForDebuggerOnStart: true,
+    flatten: true,
+    filter: [
+      {
+        type: 'browser',
+        exclude: true,
+      },
+      {
+        type: 'tab',
+        exclude: true,
+      },
+      {
+        type: 'page',
+        exclude: false,
+      },
+    ],
+  })
 
   const event = await eventPromise
 
@@ -23,6 +31,7 @@ export const waitForSession = async (browserRpc, attachedToPageTimeout) => {
   }
   const { sessionId, targetInfo } = event.params
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
+
   return {
     sessionRpc,
     sessionId,
