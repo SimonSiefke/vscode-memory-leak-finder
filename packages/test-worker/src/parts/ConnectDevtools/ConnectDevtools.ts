@@ -2,6 +2,7 @@ import * as Assert from '../Assert/Assert.ts'
 import { connectElectron } from '../ConnectElectron/ConnectElectron.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
+import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 import * as DisableTimeouts from '../DisableTimeouts/DisableTimeouts.ts'
 import * as ElectronApp from '../ElectronApp/ElectronApp.ts'
 import * as Expect from '../Expect/Expect.ts'
@@ -33,6 +34,13 @@ export const connectDevtools = async (
   const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   // @ts-ignore
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
+
+  electronRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, (x) => {
+    console.log(`excution context created`, x)
+  })
+  browserRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, (x) => {
+    console.log(`excution context created`, x)
+  })
 
   const { sessionRpc, sessionId, targetId } = await waitForSession(browserRpc, 5000)
 
