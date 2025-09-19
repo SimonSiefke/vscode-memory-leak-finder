@@ -63,5 +63,9 @@ export const prepareTestsAndAttach = async (
     utilityContext,
     runMode,
   )
-  return { memoryRpc, testWorkerRpc, videoRpc }
+  return {
+    memoryRpc,
+    testWorkerRpc,
+    videoRpc,
+  }
 }

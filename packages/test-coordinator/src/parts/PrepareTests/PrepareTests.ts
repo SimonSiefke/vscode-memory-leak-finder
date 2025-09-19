@@ -1,5 +1,4 @@
 import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.ts'
-import { connectWorkers } from '../ConnectWorkers/ConnectWorkers.ts'
 import * as KillExistingIdeInstances from '../KillExistingIdeInstances/KillExistingIdeInstances.ts'
 import { prepareBoth } from '../PrepareBoth/PrepareBoth.ts'
 
@@ -35,10 +34,10 @@ export const prepareTests = async (
   )
 
   return {
-    memoryRpc,
     parsedVersion,
-    testWorkerRpc,
     utilityContext,
-    videoRpc,
+    webSocketUrl,
+    devtoolsWebSocketUrl,
+    electronObjectId,
   }
 }
