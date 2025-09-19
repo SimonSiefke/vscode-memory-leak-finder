@@ -18,7 +18,7 @@ const getExpression = (canUseIdleCallback) => {
 
 const waitRpcIdle = (pageObject, canUseIdleCallback) => {
   const expression = getExpression(canUseIdleCallback)
-  return pageObject.evaluateInUtilityContext({
+  return pageObject.utilityContext.evaluate({
     awaitPromise: true,
     replMode: true,
     expression,
