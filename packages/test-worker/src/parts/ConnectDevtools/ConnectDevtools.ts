@@ -44,6 +44,8 @@ export const connectDevtools = async (
     rpc: sessionRpc,
     idleTimeout,
   })
+
+  // TODO wait for utility execution context
   const electronApp = ElectronApp.create({
     electronRpc,
     electronObjectId,
@@ -58,6 +60,7 @@ export const connectDevtools = async (
   }
   const pageObjectModule = await ImportScript.importScript(pageObjectPath)
   const pageObject = await pageObjectModule.create(pageObjectContext)
+
   await pageObject.WaitForApplicationToBeReady.waitForApplicationToBeReady()
   if (timeouts === false) {
     // TODO this should be part of initialization worker
