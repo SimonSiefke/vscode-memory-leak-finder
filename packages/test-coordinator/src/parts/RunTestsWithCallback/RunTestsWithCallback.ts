@@ -162,16 +162,16 @@ export const runTestsWithCallback = async ({
                 await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
               }
             }
-            const before = await MemoryLeakFinder.start(memoryLeakWorkerRpc, connectionId)
+            await MemoryLeakFinder.start(memoryLeakWorkerRpc, connectionId)
             for (let i = 0; i < runs; i++) {
               await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
             }
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
             }
-            const after = await MemoryLeakFinder.stop(memoryLeakWorkerRpc, connectionId)
+            await MemoryLeakFinder.stop(memoryLeakWorkerRpc, connectionId)
 
-            const result = await MemoryLeakFinder.compare(memoryLeakWorkerRpc, connectionId, before, after, context)
+            const result = await MemoryLeakFinder.compare(memoryLeakWorkerRpc, connectionId, context)
             const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
             const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
             await JsonFile.writeJson(resultPath, result)

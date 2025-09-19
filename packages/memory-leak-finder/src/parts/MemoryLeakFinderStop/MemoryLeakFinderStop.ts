@@ -11,7 +11,7 @@ const doStop = async (connectionId: number): Promise<any> => {
   return result
 }
 
-export const stop = async (connectionId: number, electronTargetId: string): Promise<any> => {
+export const stop = async (connectionId: number, electronTargetId: string): Promise<void> => {
   const crashInfo = WaitForCrash.waitForCrash(electronTargetId)
   const resultPromise = doStop(connectionId)
   const intermediateResult = await Promise.race([crashInfo.promise, resultPromise])
@@ -19,5 +19,7 @@ export const stop = async (connectionId: number, electronTargetId: string): Prom
     throw new Error('target crashed')
   }
   crashInfo.dispose()
-  return intermediateResult
+  MemoryLeakFinderState.update(connectionId, {
+    after: intermediateResult,
+  })
 }
