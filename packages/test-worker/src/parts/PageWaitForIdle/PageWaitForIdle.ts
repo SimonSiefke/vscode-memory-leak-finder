@@ -1,5 +1,6 @@
 import * as Assert from '../Assert/Assert.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.ts'
 import { ExpectError } from '../ExpectError/ExpectError.ts'
 import * as PTimeout from '../PTimeout/PTimeout.ts'
 import { VError } from '../VError/VError.ts'
