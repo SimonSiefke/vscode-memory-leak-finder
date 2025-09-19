@@ -46,7 +46,7 @@ const createMouse = (rpc) => {
   }
 }
 
-export const create = async ({ electronRpc, electronObjectId, targetId, sessionId, rpc, idleTimeout }) => {
+export const create = ({ electronRpc, electronObjectId, targetId, sessionId, rpc, idleTimeout }) => {
   return {
     type: DevtoolsTargetType.Page,
     objectType: DevtoolsTargetType.Page,
