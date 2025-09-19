@@ -17,6 +17,11 @@ export interface ActivityBar {
   hide(): Promise<void>
   showTooltipExplorer(): Promise<void>
   hideTooltip(): Promise<void>
+  showSourceControl(): Promise<void>
+  showSearch(): Promise<void>
+  showRunAndDebug(): Promise<void>
+  showExtensions(): Promise<void>
+  showExplorer(): Promise<void>
 }
 export interface ChatEditor {
   open(): Promise<void>
@@ -256,7 +261,7 @@ export interface RunAndDebug {
   pause(): Promise<void>
   stop(): Promise<void>
   waitForPaused(options: any): Promise<void>
-  runAndWaitForPaused(options: any): Promise<void>
+  runAndWaitForPaused(options?: any): Promise<void>
   removeAllBreakpoints(): Promise<void>
   step(expectedFile: any, expectedPauseLine: any, expectedCallStackSize: any): Promise<void>
   setValue(variableName: any, variableValue: any, newVariableValue: any): Promise<void>
@@ -327,7 +332,7 @@ export interface SourceControl {
 }
 export interface StatusBar {
   click(label: any): Promise<void>
-  item(id: any): Promise<void>
+  item(id: any): Promise<any>
   shouldHaveText(text: any): Promise<void>
   click(): Promise<void>
   hide(): Promise<void>
@@ -393,10 +398,12 @@ export interface Workspace {
   initializeGitRepository(): Promise<void>
   add(file: any): Promise<void>
   remove(file: any): Promise<void>
+  getWorkspaceFilePath(): Promise<any>
 }
 
 export interface PageObjectApi {
   readonly ActivityBar: ActivityBar
+  readonly Colors: any
   readonly ChatEditor: ChatEditor
   readonly ContextMenu: ContextMenu
   readonly CursorChat: CursorChat
