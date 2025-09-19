@@ -37,10 +37,6 @@ export const connectDevtools = async (
 
   const { sessionRpc, sessionId, targetId } = await waitForSession(browserRpc, 5000)
 
-  await DevtoolsProtocolRuntime.evaluate(sessionRpc, {
-    expression: '1+1',
-  })
-
   const firstWindow = Page.create({
     electronObjectId,
     electronRpc,
@@ -51,7 +47,6 @@ export const connectDevtools = async (
     utilityContext,
   })
 
-  // TODO wait for utility execution context
   const electronApp = ElectronApp.create({
     electronRpc,
     electronObjectId,
@@ -65,11 +60,6 @@ export const connectDevtools = async (
     electronApp,
     ideVersion: parsedIdeVersion,
     evaluateInUtilityContext(item) {
-      console.log(`evaluate`, {
-        item,
-        sessionId,
-        sessionRpc,
-      })
       return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
         ...item,
         uniqueContextId: utilityContext.uniqueId,
