@@ -69,6 +69,10 @@ export const runTestsWithCallback = async ({
     const idleTimeout = TimeoutConstants.Idle
     const pageObjectPath = GetPageObjectPath.getPageObjectPath()
 
+    // TODO for each connection id, launch all needed workers
+    // when a new connection id comes in, dispose them (even while running)
+    // Then recreate the workers, ensuring a clean state
+
     if (setupOnly && commit) {
       const testWorkerRpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
         cwd,
