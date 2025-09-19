@@ -15,6 +15,7 @@ export const prepareTests = async (
   vscodePath: string,
   commit: string,
   attachedToPageTimeout: number,
+  measureId: string,
   idleTimeout: number,
   pageObjectPath: string,
 ) => {
@@ -43,6 +44,7 @@ export const prepareTests = async (
     canUseIdleCallback,
     electronObjectId,
     attachedToPageTimeout,
+    measureId,
     idleTimeout,
     pageObjectPath,
     headlessMode,

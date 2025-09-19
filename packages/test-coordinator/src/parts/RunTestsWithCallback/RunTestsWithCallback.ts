@@ -69,6 +69,10 @@ export const runTestsWithCallback = async ({
     const idleTimeout = TimeoutConstants.Idle
     const pageObjectPath = GetPageObjectPath.getPageObjectPath()
 
+    // TODO for each connection id, launch all needed workers
+    // when a new connection id comes in, dispose them (even while running)
+    // Then recreate the workers, ensuring a clean state
+
     if (setupOnly && commit) {
       const testWorkerRpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
         cwd,
@@ -82,6 +86,7 @@ export const runTestsWithCallback = async ({
         vscodePath,
         commit,
         attachedToPageTimeout,
+        measure,
         idleTimeout,
         pageObjectPath,
       )
@@ -113,6 +118,7 @@ export const runTestsWithCallback = async ({
       vscodePath,
       commit,
       attachedToPageTimeout,
+      measure,
       idleTimeout,
       pageObjectPath,
     )
@@ -131,11 +137,6 @@ export const runTestsWithCallback = async ({
     await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
 
     let memoryLeakWorkerRpc = MemoryLeakWorker.getRpc()
-    let targetId = ''
-    if (checkLeaks) {
-      const info = await MemoryLeakFinder.setup(memoryLeakWorkerRpc, connectionId, measure)
-      targetId = info.targetId
-    }
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
       const { absolutePath, relativeDirname, dirent, relativePath } = formattedPath
@@ -165,16 +166,16 @@ export const runTestsWithCallback = async ({
                 await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
               }
             }
-            const before = await MemoryLeakFinder.start(memoryLeakWorkerRpc, connectionId, targetId)
+            await MemoryLeakFinder.start(memoryLeakWorkerRpc, connectionId)
             for (let i = 0; i < runs; i++) {
               await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
             }
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
             }
-            const after = await MemoryLeakFinder.stop(memoryLeakWorkerRpc, connectionId, targetId)
+            await MemoryLeakFinder.stop(memoryLeakWorkerRpc, connectionId)
 
-            const result = await MemoryLeakFinder.compare(memoryLeakWorkerRpc, connectionId, before, after, context)
+            const result = await MemoryLeakFinder.compare(memoryLeakWorkerRpc, connectionId, context)
             const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
             const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
             await JsonFile.writeJson(resultPath, result)
@@ -226,12 +227,12 @@ export const runTestsWithCallback = async ({
             vscodePath,
             commit,
             attachedToPageTimeout,
+            measure,
             idleTimeout,
             pageObjectPath,
           )
           if (checkLeaks) {
             memoryLeakWorkerRpc = MemoryLeakWorker.getRpc()
-            await MemoryLeakFinder.setup(memoryLeakWorkerRpc, connectionId, measure)
           }
         }
       }
