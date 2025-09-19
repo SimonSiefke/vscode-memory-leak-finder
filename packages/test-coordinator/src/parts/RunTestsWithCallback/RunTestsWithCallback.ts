@@ -3,7 +3,7 @@ import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOpt
 import * as Assert from '../Assert/Assert.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
 import { getSummary } from '../GetSummary/GetSummary.ts'
-import * as GetTestsToRunWithContinue from '../GetTestsToRunWithContinue/GetTestsToRunWithContinue.ts'
+import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.ts'
 import * as Id from '../Id/Id.ts'
 import * as JsonFile from '../JsonFile/JsonFile.ts'
 import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.ts'
@@ -42,7 +42,6 @@ export const runTestsWithCallback = async ({
   vscodePath,
   commit,
   setupOnly,
-  shouldContinue,
   callback,
 }: RunTestsWithCallbackOptions) => {
   try {
@@ -94,7 +93,7 @@ export const runTestsWithCallback = async ({
     let failed = 0
     let skipped = 0
     let leaking = 0
-    const formattedPaths = await GetTestsToRunWithContinue.getTestsToRunWithContinue(root, cwd, filterValue, measure, shouldContinue)
+    const formattedPaths = await GetTestToRun.getTestsToRun(root, cwd, filterValue)
     const total = formattedPaths.length
     if (total === 0) {
       return callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, leaking, total, 0, filterValue)
