@@ -64,11 +64,14 @@ export const connectDevtools = async (
     VError,
     electronApp,
     ideVersion: parsedIdeVersion,
-    evaluatInExecutionContext(item) {
+    evaluateInExecutionContext(item) {
       return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
         ...item,
         uniqueContextId: utilityContext.uniqueId,
       })
+    },
+    evaluateInDefaultContext(item) {
+      throw new Error(`not implemented`)
     },
   }
   const pageObjectModule = await ImportScript.importScript(pageObjectPath)
