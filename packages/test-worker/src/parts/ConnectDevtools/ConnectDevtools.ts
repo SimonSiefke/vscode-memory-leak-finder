@@ -14,6 +14,7 @@ import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.ts'
 import * as SessionState from '../SessionState/SessionState.ts'
 import { VError } from '../VError/VError.ts'
 import * as WaitForFirstWindow from '../WaitForFirstWindow/WaitForFirstWindow.ts'
+import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 
 export const connectDevtools = async (
   connectionId: number,
@@ -38,42 +39,8 @@ export const connectDevtools = async (
   // @ts-ignore
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
 
-  // TODO remove session
-  SessionState.addSession('browser', {
-    type: ObjectType.Browser,
-    objectType: ObjectType.Browser,
-    url: '',
-    sessionId: '',
-    rpc: browserRpc,
-  })
+  const sessionRpc = await waitForSession(browserRpc, 5000)
 
-  // TODO remove events, instead wait for first window to be created and thats it
-
-  browserRpc.on(DevtoolsEventType.DebuggerPaused, ScenarioFunctions.handlePaused)
-  browserRpc.on(DevtoolsEventType.DebuggerResumed, ScenarioFunctions.handleResumed)
-  browserRpc.on(DevtoolsEventType.PageFrameNavigated, ScenarioFunctions.handlePageFrameNavigated)
-  browserRpc.on(DevtoolsEventType.PageLifeCycleEvent, ScenarioFunctions.handlePageLifeCycleEvent)
-  browserRpc.on(DevtoolsEventType.PageLoadEventFired, ScenarioFunctions.handlePageLoadEventFired)
-  browserRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, ScenarioFunctions.handleRuntimeExecutionContextCreated)
-  browserRpc.on(DevtoolsEventType.RuntimeExecutionContextDestroyed, ScenarioFunctions.handleRuntimeExecutionContextDestroyed)
-  browserRpc.on(DevtoolsEventType.RuntimeExecutionContextsCleared, ScenarioFunctions.handleRuntimeExecutionContextsCleared)
-  browserRpc.on(DevtoolsEventType.TargetAttachedToTarget, ScenarioFunctions.handleAttachedToTarget)
-  browserRpc.on(DevtoolsEventType.TargetDetachedFromTarget, ScenarioFunctions.handleDetachedFromTarget)
-  browserRpc.on(DevtoolsEventType.TargetTargetCrashed, ScenarioFunctions.handleTargetCrashed)
-  browserRpc.on(DevtoolsEventType.TargetTargetCreated, ScenarioFunctions.handleTargetCreated)
-  browserRpc.on(DevtoolsEventType.TargetTargetDestroyed, ScenarioFunctions.handleTargetDestroyed)
-  browserRpc.on(DevtoolsEventType.TargetTargetInfoChanged, ScenarioFunctions.handleTargetInfoChanged)
-
-  await Promise.all([
-    DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
-      autoAttach: true,
-      waitForDebuggerOnStart: true,
-      flatten: true,
-    }),
-    DevtoolsProtocolTarget.setDiscoverTargets(browserRpc, {
-      discover: true,
-    }),
-  ])
   const electronApp = ElectronApp.create({
     electronRpc,
     electronObjectId,
