@@ -43,6 +43,10 @@ export const connectDevtools = async (
   // TODO pass sessionId, utilityExecutionContextId from initialization worker
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
 
+  await DevtoolsProtocolRuntime.evaluate(sessionRpc, {
+    expression: '1+1',
+  })
+
   const firstWindow = Page.create({
     electronObjectId,
     electronRpc,
