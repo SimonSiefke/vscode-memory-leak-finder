@@ -65,9 +65,9 @@ export const runTestsWithCallback = async ({
     Assert.boolean(setupOnly)
 
     const connectionId = Id.create()
-    const pageObjectPath = GetPageObjectPath.getPageObjectPath()
     const attachedToPageTimeout = TimeoutConstants.AttachToPage
     const idleTimeout = TimeoutConstants.Idle
+    const pageObjectPath = GetPageObjectPath.getPageObjectPath()
 
     if (setupOnly && commit) {
       const testWorkerRpc = await PrepareTestsOrAttach.prepareTestsOrAttach(
