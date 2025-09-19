@@ -17,11 +17,12 @@ export const prepareTests = async (
   measureId: string,
   idleTimeout: number,
   pageObjectPath: string,
+  runMode: number,
 ) => {
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
-  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, sessionId, targetId } = await prepareBoth(
+  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext } = await prepareBoth(
     headlessMode,
     cwd,
     ide,
@@ -33,34 +34,26 @@ export const prepareTests = async (
     attachedToPageTimeout,
   )
   const { memoryRpc, testWorkerRpc, videoRpc } = await connectWorkers(
-    headlessMode,
     recordVideo,
     connectionId,
     devtoolsWebSocketUrl,
     webSocketUrl,
-    isFirstConnection,
-    canUseIdleCallback,
     electronObjectId,
     attachedToPageTimeout,
     measureId,
     idleTimeout,
     pageObjectPath,
-    headlessMode,
     parsedVersion,
     timeouts,
     utilityContext,
-    sessionId,
-    targetId,
+    runMode,
   )
 
   return {
-    rpc,
-    webSocketUrl,
-    devtoolsWebSocketUrl,
-    electronObjectId,
-    parsedVersion,
     memoryRpc,
+    parsedVersion,
     testWorkerRpc,
+    utilityContext,
     videoRpc,
   }
 }
