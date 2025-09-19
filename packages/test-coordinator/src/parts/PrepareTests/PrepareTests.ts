@@ -1,10 +1,8 @@
 import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.ts'
-import { connectWorkers } from '../ConnectWorkers/ConnectWorkers.ts'
 import * as KillExistingIdeInstances from '../KillExistingIdeInstances/KillExistingIdeInstances.ts'
 import { prepareBoth } from '../PrepareBoth/PrepareBoth.ts'
 
 export const prepareTests = async (
-  rpc: any,
   cwd: string,
   headlessMode: boolean,
   recordVideo: boolean,
@@ -15,13 +13,15 @@ export const prepareTests = async (
   vscodePath: string,
   commit: string,
   attachedToPageTimeout: number,
+  measureId: string,
   idleTimeout: number,
   pageObjectPath: string,
+  runMode: number,
 ) => {
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
-  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, sessionId, targetId } = await prepareBoth(
+  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext } = await prepareBoth(
     headlessMode,
     cwd,
     ide,
@@ -32,32 +32,12 @@ export const prepareTests = async (
     canUseIdleCallback,
     attachedToPageTimeout,
   )
-  await connectWorkers(
-    rpc,
-    headlessMode,
-    recordVideo,
-    connectionId,
-    devtoolsWebSocketUrl,
-    webSocketUrl,
-    isFirstConnection,
-    canUseIdleCallback,
-    electronObjectId,
-    attachedToPageTimeout,
-    idleTimeout,
-    pageObjectPath,
-    headlessMode,
-    parsedVersion,
-    timeouts,
-    utilityContext,
-    sessionId,
-    targetId,
-  )
 
   return {
-    rpc,
+    parsedVersion,
+    utilityContext,
     webSocketUrl,
     devtoolsWebSocketUrl,
     electronObjectId,
-    parsedVersion,
   }
 }

@@ -1,48 +1,47 @@
-import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
+import * as LaunchTestWorker from '../LaunchTestWorker/LaunchTestWorker.ts'
 import * as MemoryLeakWorker from '../MemoryLeakWorker/MemoryLeakWorker.ts'
 import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
 
 export const connectWorkers = async (
-  rpc: any,
-  headlessMode: boolean,
   recordVideo: boolean,
   connectionId: number,
   devtoolsWebSocketUrl: string,
   webSocketUrl: string,
-  isFirstConnection: boolean,
-  canUseIdleCallback: boolean,
   electronObjectId: string,
   attachedToPageTimeout: number,
+  measureId: string,
   idleTimeout: number,
   pageObjectPath: string,
-  isHeadless: boolean,
   parsedIdeVersion: any,
   timeouts: boolean,
   utilityContext: any,
-  sessionId: string,
-  targetId: string,
+  runMode: number,
 ) => {
+  const promises: Promise<any>[] = []
   if (recordVideo) {
-    await VideoRecording.start(devtoolsWebSocketUrl, attachedToPageTimeout, idleTimeout)
+    promises.push(VideoRecording.start(devtoolsWebSocketUrl, attachedToPageTimeout, idleTimeout))
+  } else {
+    promises.push(Promise.resolve(undefined))
   }
-  const measureId = '' // TODO
-  await MemoryLeakWorker.startWorker(devtoolsWebSocketUrl, connectionId, measureId, attachedToPageTimeout)
-  await ConnectDevtools.connectDevtools(
-    rpc,
-    connectionId,
-    devtoolsWebSocketUrl,
-    electronObjectId,
-    isFirstConnection,
-    headlessMode,
-    webSocketUrl,
-    canUseIdleCallback,
-    idleTimeout,
-    pageObjectPath,
-    isHeadless,
-    parsedIdeVersion,
-    timeouts,
-    utilityContext,
-    sessionId,
-    targetId,
+  promises.push(MemoryLeakWorker.startWorker(devtoolsWebSocketUrl, connectionId, measureId, attachedToPageTimeout))
+  promises.push(
+    LaunchTestWorker.launchTestWorker(
+      runMode,
+      connectionId,
+      devtoolsWebSocketUrl,
+      electronObjectId,
+      webSocketUrl,
+      idleTimeout,
+      pageObjectPath,
+      parsedIdeVersion,
+      timeouts,
+      utilityContext,
+    ),
   )
+  const [videoRpc, memoryRpc, testWorkerRpc] = await Promise.all(promises)
+  return {
+    videoRpc,
+    memoryRpc,
+    testWorkerRpc,
+  }
 }

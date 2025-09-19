@@ -14,20 +14,15 @@ export const connectDevtools = async (
   connectionId: number,
   devtoolsWebSocketUrl: string,
   electronObjectId: string,
-  isFirstConnection: boolean,
-  headlessMode: boolean,
   webSocketUrl: string,
-  canUseIdleCallback: boolean,
   idleTimeout: number,
   pageObjectPath: string,
-  isHeadless: boolean,
   parsedIdeVersion: any,
   timeouts: boolean,
   utilityContext: any,
 ) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
-  Assert.boolean(isFirstConnection)
   Assert.object(utilityContext)
 
   const [electronRpc, browserRpc] = await Promise.all([

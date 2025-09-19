@@ -32,8 +32,6 @@ export const waitForSession = async (browserRpc, attachedToPageTimeout) => {
   }
   const { sessionId, targetInfo } = event.params
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
-
-  // TODO can remove attachment now
   return {
     sessionId,
     targetId: targetInfo.targetId,

@@ -5,7 +5,7 @@ import * as LoadMemoryLeakFinder from '../LoadMemoryLeakFinder/LoadMemoryLeakFin
 export const getCombinedMeasure = async (session: any, measureId: string): Promise<any> => {
   Assert.object(session)
   Assert.string(measureId)
-  const MemoryLeakFinder = await LoadMemoryLeakFinder.loadMemoryLeakFinder()
+  const MemoryLeakFinder = LoadMemoryLeakFinder.loadMemoryLeakFinder()
   const measure = GetMeasure.getMeasure(MemoryLeakFinder, measureId)
   if (!measure) {
     throw new Error(`measure not found ${measureId}`)
