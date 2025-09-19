@@ -22,7 +22,6 @@ export const combine = (...measures) => {
 
   const compare = async (before, after, context) => {
     const resultMap = Object.create(null)
-    console.log({ before, after, context })
     for (const measure of measures) {
       const comparison = await measure.compare(before[measure.id], after[measure.id], context)
       resultMap[measure.id] = comparison
