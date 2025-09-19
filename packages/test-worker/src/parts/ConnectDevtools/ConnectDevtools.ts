@@ -75,13 +75,9 @@ export const connectDevtools = async (
     }),
   ])
 
-  console.log('before session')
   const { sessionRpc, sessionId, targetId } = await waitForSession(browserRpc, 5000)
-  console.log('after session')
 
-  console.log('before util')
   const utilityContext = await waitForUtilityExecutionContext(sessionRpc)
-  console.log('after util')
 
   const firstWindow = Page.create({
     electronObjectId,
