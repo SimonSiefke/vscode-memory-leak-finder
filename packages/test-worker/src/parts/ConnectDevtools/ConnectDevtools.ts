@@ -62,6 +62,7 @@ export const connectDevtools = async (
     targetId: targetId,
     rpc: sessionRpc,
     idleTimeout,
+    utilityContext,
   })
 
   // TODO wait for utility execution context
@@ -79,11 +80,11 @@ export const connectDevtools = async (
   }
   const pageObjectModule = await ImportScript.importScript(pageObjectPath)
   const pageObject = await pageObjectModule.create(pageObjectContext)
-
   await pageObject.WaitForApplicationToBeReady.waitForApplicationToBeReady()
   if (timeouts === false) {
     // TODO this should be part of initialization worker
     await DisableTimeouts.disableTimeouts(firstWindow)
   }
+  console.log({ pageObject })
   PageObjectState.set(connectionId, pageObject)
 }
