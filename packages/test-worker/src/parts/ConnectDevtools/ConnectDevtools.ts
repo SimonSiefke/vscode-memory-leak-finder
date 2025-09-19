@@ -41,6 +41,7 @@ export const connectDevtools = async (
 
   const sessionRpc = await waitForSession(browserRpc, 5000)
 
+  console.log({ sessionRpc })
   const electronApp = ElectronApp.create({
     electronRpc,
     electronObjectId,
