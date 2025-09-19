@@ -8,7 +8,7 @@ export const evaluate = async (rpc, { expression, awaitPromise = false, replMode
     const connectionId = 1
     const pageObject = PageObjectState.getPageObjectContext(connectionId)
     const result = await PTimeout.pTimeout(
-      pageObject.evaluateInUtilityContext.evaluate({
+      pageObject.utilityContext.evaluate({
         expression,
         returnByValue: true,
         generatePreview: true,

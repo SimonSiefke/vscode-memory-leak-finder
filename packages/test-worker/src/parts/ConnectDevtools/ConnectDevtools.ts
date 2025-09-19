@@ -59,6 +59,12 @@ export const connectDevtools = async (
     ideVersion: parsedIdeVersion,
     utilityContext: {
       callFunctionOn(options) {
+        return DevtoolsProtocolRuntime.callFunctionOn(sessionRpc, {
+          ...options,
+          uniqueContextId: utilityContext.uniqueId,
+        })
+      },
+      evaluate(options) {
         return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
           ...options,
           uniqueContextId: utilityContext.uniqueId,
