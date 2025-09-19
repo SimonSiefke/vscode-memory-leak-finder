@@ -1,7 +1,6 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as ObjectType from '../ObjectType/ObjectType.ts'
 import * as WaitForIframe from '../WaitForIframe/WaitForIframe.ts'
-import * as WaitForPage from '../WaitForPage/WaitForPage.ts'
 
 export const create = ({ electronRpc, electronObjectId, idleTimeout, firstWindow }) => {
   return {
