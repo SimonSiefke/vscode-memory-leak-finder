@@ -1,4 +1,4 @@
-import type { TestContext } from '../types.js'
+import type { TestContext } from '../types.ts'
 
 export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promise<void> => {
   await Workspace.setFiles([
