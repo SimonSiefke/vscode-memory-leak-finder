@@ -60,6 +60,7 @@ export const connectDevtools = async (
   const pageObject = await pageObjectModule.create(pageObjectContext)
   await pageObject.WaitForApplicationToBeReady.waitForApplicationToBeReady()
   if (timeouts === false) {
+    // TODO this should be part of initialization worker
     await DisableTimeouts.disableTimeouts(firstWindow)
   }
   PageObjectState.set(connectionId, pageObject)
