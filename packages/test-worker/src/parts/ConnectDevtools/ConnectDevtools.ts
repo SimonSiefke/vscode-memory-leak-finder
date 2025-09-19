@@ -38,8 +38,8 @@ export const connectDevtools = async (
   const firstWindow = Page.create({
     electronObjectId,
     electronRpc,
-    sessionId: sessionId,
-    targetId: targetId,
+    sessionId,
+    targetId,
     rpc: sessionRpc,
     idleTimeout,
     utilityContext,
