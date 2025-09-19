@@ -3,6 +3,8 @@ import { readFile, writeFile } from 'fs/promises'
 import { basename, dirname, join } from 'path'
 import * as Assert from '../Assert/Assert.ts'
 import * as Exec from '../Exec/Exec.ts'
+import * as GetExecutablePath from '../GetExecutablePath/GetExecutablePath.ts'
+import * as Root from '../Root/Root.ts'
 import * as TestStatus from '../TestStatus/TestStatus.ts'
 
 interface TestEvent {
@@ -45,12 +47,19 @@ const supportsNativeFfmpeg = (): boolean => {
   return existsSync('/usr/bin/ffmpeg')
 }
 
+const getPlaywrightFfmpegPath = (): string => {
+  const executablePath = GetExecutablePath.getExecutablePath('ffmpeg')
+  return join(Root.root, '.vscode-ffmpeg', ...executablePath)
+}
+
 export const addTestStatusBanner = async (inputFile: string, outputFile: string, testEvents: TestEvent[]): Promise<void> => {
   Assert.string(inputFile)
   Assert.string(outputFile)
 
-  if (!supportsNativeFfmpeg()) {
-    console.log('ffmpeg not available for post-processing, skipping banner')
+  // Use system ffmpeg for post-processing since Playwright ffmpeg doesn't support drawtext
+  const ffmpegPath = '/usr/bin/ffmpeg'
+  if (!existsSync(ffmpegPath)) {
+    console.log('System ffmpeg not available for post-processing, skipping banner')
     return
   }
 
@@ -59,10 +68,27 @@ export const addTestStatusBanner = async (inputFile: string, outputFile: string,
     return
   }
 
-  // Get video duration first
-  const durationArgs = ['-i', inputFile, '-f', 'null', '-']
-  const durationResult = await Exec.exec('ffprobe', ['-v', 'quiet', '-show_entries', 'format=duration', '-of', 'csv=p=0', inputFile])
-  const duration = parseFloat(durationResult.stdout.trim())
+  // Get video duration by parsing ffmpeg output
+  let duration = 10 // fallback duration
+  try {
+    const durationResult = await Exec.exec(ffmpegPath, ['-i', inputFile, '-f', 'null', '-'])
+    const durationMatch = durationResult.stderr.match(/Duration: (\d+):(\d+):(\d+\.\d+)/)
+    if (durationMatch) {
+      const hours = parseInt(durationMatch[1])
+      const minutes = parseInt(durationMatch[2])
+      const seconds = parseFloat(durationMatch[3])
+      duration = hours * 3600 + minutes * 60 + seconds
+    }
+  } catch (error) {
+    // Parse duration from error output
+    const durationMatch = error.stderr.match(/Duration: (\d+):(\d+):(\d+\.\d+)/)
+    if (durationMatch) {
+      const hours = parseInt(durationMatch[1])
+      const minutes = parseInt(durationMatch[2])
+      const seconds = parseFloat(durationMatch[3])
+      duration = hours * 3600 + minutes * 60 + seconds
+    }
+  }
 
   const filter = getTestStatusOverlayFilter(testEvents, duration)
 
@@ -72,16 +98,16 @@ export const addTestStatusBanner = async (inputFile: string, outputFile: string,
     '-vf',
     filter,
     '-c:v',
-    'libvpx-vp8',
+    'libx264',
+    '-preset',
+    'fast',
     '-crf',
-    '8',
-    '-b:v',
-    '1M',
+    '23',
     '-y',
     outputFile,
   ]
 
-  await Exec.exec('ffmpeg', args)
+  await Exec.exec(ffmpegPath, args)
 }
 
 export const createTestEvent = (testName: string, status: 'running' | 'passed' | 'failed', timestamp: number): TestEvent => {
