@@ -40,10 +40,6 @@ export const connectDevtools = async (
   // @ts-ignore
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
 
-  const { sessionRpc, sessionId, targetId } = await waitForSession(browserRpc, 5000)
-
-  const utilityContext = await waitForUtilityExecutionContext(sessionRpc)
-
   SessionState.addSession('browser', {
     type: ObjectType.Browser,
     objectType: ObjectType.Browser,
@@ -78,6 +74,10 @@ export const connectDevtools = async (
       discover: true,
     }),
   ])
+
+  const { sessionRpc, sessionId, targetId } = await waitForSession(browserRpc, 5000)
+
+  const utilityContext = await waitForUtilityExecutionContext(sessionRpc)
 
   const firstWindow = Page.create({
     electronObjectId,
