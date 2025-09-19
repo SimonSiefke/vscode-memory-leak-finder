@@ -68,7 +68,7 @@ export const connectDevtools = async (
     VError,
     electronApp,
     ideVersion: parsedIdeVersion,
-    evaluateInExecutionContext(item) {
+    evaluateInUtilityContext(item) {
       return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
         ...item,
         uniqueContextId: utilityContext.uniqueId,
