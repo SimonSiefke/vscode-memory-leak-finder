@@ -21,5 +21,8 @@ export const connectDevtools = async (devtoolsWebSocketUrl: string, attachedToPa
     sessionRpc,
     sessionId,
     targetId,
+    async dispose() {
+      await browserRpc.dispose()
+    },
   }
 }

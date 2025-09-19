@@ -50,9 +50,11 @@ export const prepareBoth = async (
     objectId: monkeyPatchedElectronId,
   })
 
-  const { sessionRpc, sessionId, targetId } = await connectDevtoolsPromise
+  const { sessionRpc, sessionId, targetId, dispose } = await connectDevtoolsPromise
 
   const utilityContext = await waitForUtilityExecutionContext(sessionRpc)
+
+  await Promise.all([electronRpc.dispose(), dispose()])
 
   return {
     childPid: child.pid,
