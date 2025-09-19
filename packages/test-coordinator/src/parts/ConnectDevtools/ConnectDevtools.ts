@@ -11,6 +11,13 @@ export const connectDevtools = (
   webSocketUrl: string,
   canUseIdleCallback: boolean,
   idleTimeout: number,
+  pageObjectPath: string,
+  isHeadless: boolean,
+  parsedIdeVersion: any,
+  timeouts: boolean,
+  utilityContext: any,
+  sessionId: string,
+  targetId: string,
 ) => {
   Assert.object(rpc)
   Assert.number(connectionId)
@@ -25,5 +32,12 @@ export const connectDevtools = (
     webSocketUrl,
     canUseIdleCallback,
     idleTimeout,
+    pageObjectPath,
+    isHeadless,
+    parsedIdeVersion,
+    timeouts,
+    utilityContext,
+    sessionId,
+    targetId,
   )
 }

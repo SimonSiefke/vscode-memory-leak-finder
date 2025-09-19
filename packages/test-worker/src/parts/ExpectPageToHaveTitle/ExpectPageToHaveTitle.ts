@@ -1,12 +1,11 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.ts'
+import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
 
 export const toHaveTitle = async (page, expectedTitle) => {
-  const utilityExecutionContext = await ExecutionContextState.waitForUtilityExecutionContext(page.sessionId)
+  const connectionId = 1
+  const pageObject = PageObjectState.getPageObjectContext(connectionId)
   // @ts-ignore
-  const actualTitle = await DevtoolsProtocolRuntime.callFunctionOn(page.rpc, {
+  const actualTitle = await pageObject.utilityContext.callFunctionOn({
     functionDeclaration: '(expectedTitle) => test.checkTitle(expectedTitle)',
-    uniqueContextId: utilityExecutionContext.uniqueId,
     awaitPromise: true,
     returnByValue: true,
     arguments: [

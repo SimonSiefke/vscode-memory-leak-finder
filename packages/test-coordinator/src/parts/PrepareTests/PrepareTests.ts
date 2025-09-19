@@ -1,7 +1,6 @@
 import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.ts'
 import { connectWorkers } from '../ConnectWorkers/ConnectWorkers.ts'
 import * as KillExistingIdeInstances from '../KillExistingIdeInstances/KillExistingIdeInstances.ts'
-import * as PageObject from '../PageObject/PageObject.ts'
 import { prepareBoth } from '../PrepareBoth/PrepareBoth.ts'
 
 export const prepareTests = async (
@@ -22,7 +21,7 @@ export const prepareTests = async (
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
-  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion } = await prepareBoth(
+  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, sessionId, targetId } = await prepareBoth(
     headlessMode,
     cwd,
     ide,
@@ -45,8 +44,14 @@ export const prepareTests = async (
     electronObjectId,
     attachedToPageTimeout,
     idleTimeout,
+    pageObjectPath,
+    headlessMode,
+    parsedVersion,
+    timeouts,
+    utilityContext,
+    sessionId,
+    targetId,
   )
-  await PageObject.create(rpc, connectionId, isFirstConnection, headlessMode, timeouts, parsedVersion, pageObjectPath)
 
   return {
     rpc,

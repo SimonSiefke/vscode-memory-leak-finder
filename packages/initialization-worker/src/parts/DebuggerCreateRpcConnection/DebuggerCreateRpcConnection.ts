@@ -71,5 +71,8 @@ export const createRpc = (ipc: any) => {
       onceListeners[event] = resolve
       return promise
     },
+    async dispose() {
+      await ipc.dispose()
+    },
   }
 }

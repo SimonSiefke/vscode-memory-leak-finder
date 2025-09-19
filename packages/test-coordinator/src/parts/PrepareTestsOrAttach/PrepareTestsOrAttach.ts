@@ -1,7 +1,6 @@
 import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.ts'
 import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
 import * as LaunchTestWorker from '../LaunchTestWorker/LaunchTestWorker.ts'
-import * as PageObject from '../PageObject/PageObject.ts'
 import * as PrepareTests from '../PrepareTests/PrepareTests.ts'
 
 interface State {
@@ -12,6 +11,7 @@ interface State {
   headlessMode: boolean
   parsedVersion: any
   promise: Promise<any> | undefined
+  utilityContext: Promise<any> | undefined
 }
 
 export const state: State = {
@@ -25,6 +25,7 @@ export const state: State = {
    * @type {Promise|undefined}
    */
   promise: undefined,
+  utilityContext: undefined,
 }
 
 export const prepareTestsOrAttach = async (
@@ -62,9 +63,10 @@ export const prepareTestsOrAttach = async (
     )
     const result = await state.promise
     state.parsedVersion = result.parsedVersion
+    state.utilityContext = result.utilityContext
     return testWorkerRpc
   }
-  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId } = await state.promise
+  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, sessionId, targetId } = await state.promise
   const isFirstConnection = false
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await ConnectDevtools.connectDevtools(
@@ -77,7 +79,13 @@ export const prepareTestsOrAttach = async (
     webSocketUrl,
     canUseIdleCallback,
     idleTimeout,
+    pageObjectPath,
+    headlessMode,
+    parsedVersion,
+    timeouts,
+    utilityContext,
+    sessionId,
+    targetId,
   )
-  await PageObject.create(testWorkerRpc, connectionId, isFirstConnection, headlessMode, timeouts, state.parsedVersion, pageObjectPath)
   return testWorkerRpc
 }

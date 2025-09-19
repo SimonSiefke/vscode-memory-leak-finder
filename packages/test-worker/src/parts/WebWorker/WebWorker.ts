@@ -1,21 +1,8 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-import * as DevtoolsTargetType from '../DevtoolsTargetType/DevtoolsTargetType.ts'
-import * as SessionState from '../SessionState/SessionState.ts'
-import * as TargetState from '../TargetState/TargetState.ts'
+import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
 
 export const waitForWebWorker = async ({ sessionId }) => {
-  const worker = await TargetState.waitForTarget({ type: 'worker', index: 0 })
-  const session = SessionState.getSession(worker.sessionId)
-  return {
-    type: DevtoolsTargetType.Worker,
-    async evaluate({ expression }) {
-      const { rpc } = session
-      const result = await DevtoolsProtocolRuntime.evaluate(rpc, {
-        expression,
-        returnByValue: true,
-        generatePreview: true,
-      })
-      return result
-    },
-  }
+  const connectionId = 1
+  const pageObject = PageObjectState.getPageObjectContext(connectionId)
+  const worker = await pageObject.waitForTarget({ type: 'worker', index: 0 })
+  return worker
 }

@@ -46,7 +46,7 @@ const createMouse = (rpc) => {
   }
 }
 
-export const create = async ({ electronRpc, electronObjectId, targetId, sessionId, rpc, idleTimeout }) => {
+export const create = ({ electronRpc, electronObjectId, targetId, sessionId, rpc, idleTimeout, utilityContext }) => {
   return {
     type: DevtoolsTargetType.Page,
     objectType: DevtoolsTargetType.Page,
@@ -96,5 +96,6 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
     frameLocator(selector, options = {}) {
       return Locator.create(this.rpc, this.sessionId, `${selector}:internal-enter-frame()`, options)
     },
+    utilityContext,
   }
 }

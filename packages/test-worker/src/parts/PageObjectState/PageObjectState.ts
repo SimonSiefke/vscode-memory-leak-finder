@@ -3,19 +3,23 @@ const pageObjects = Object.create(null)
 export const getPageObject = (pageObjectId) => {
   const value = pageObjects[pageObjectId]
   if (!value) {
-    throw new Error(`no page object found`)
+    throw new Error(`no page object found with id ${[pageObjectId]}`)
   }
   return value.pageObject
 }
 
-export const set = (pageObjectId, pageObject) => {
-  pageObjects[pageObjectId] = pageObject
+export const getPageObjectContext = (pageObjectId) => {
+  const value = pageObjects[pageObjectId]
+  if (!value) {
+    console.log({ pageObjects })
+    throw new Error(`no page object context found with id ${[pageObjectId]}`)
+  }
+  return value.pageObjectContext
 }
 
-export const get = (pageObjectId) => {
-  const item = pageObjects[pageObjectId]
-  if (!item) {
-    throw new Error(`no page object item with id ${pageObjectId} found`)
+export const set = (pageObjectId, pageObject, pageObjectContext) => {
+  pageObjects[pageObjectId] = {
+    pageObject,
+    pageObjectContext,
   }
-  return item
 }

@@ -28,6 +28,9 @@ export const createConnection = async (wsUrl) => {
         }
         webSocket.onmessage = handleMessage
       },
+      dispose() {
+        webSocket.close()
+      },
     }
   } catch (error) {
     throw new VError(error, `Failed to create websocket connection`)
