@@ -9,6 +9,20 @@ export const waitForSession = async (browserRpc: any, attachedToPageTimeout: num
     autoAttach: true,
     waitForDebuggerOnStart: true,
     flatten: true,
+    filter: [
+      {
+        type: 'browser',
+        exclude: true,
+      },
+      {
+        type: 'tab',
+        exclude: true,
+      },
+      {
+        type: 'page',
+        exclude: false,
+      },
+    ],
   })
 
   const event = await eventPromise
