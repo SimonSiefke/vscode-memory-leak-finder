@@ -5,6 +5,7 @@ export interface PrepareBothResult {
   readonly devtoolsWebSocketUrl: string
   readonly electronObjectId: string
   readonly parsedVersion: string
+  readonly utilityContext: any
 }
 
 export const prepareBoth = async (
@@ -19,7 +20,7 @@ export const prepareBoth = async (
   attachedToPageTimeout: number,
 ): Promise<PrepareBothResult> => {
   const initializationWorkerRpc = await launchInitializationWorker()
-  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion } = await initializationWorkerRpc.invoke(
+  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext } = await initializationWorkerRpc.invoke(
     'Initialize.prepare',
     headlessMode,
     cwd,
@@ -36,5 +37,6 @@ export const prepareBoth = async (
     devtoolsWebSocketUrl,
     electronObjectId,
     parsedVersion,
+    utilityContext,
   }
 }
