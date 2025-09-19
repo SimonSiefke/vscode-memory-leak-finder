@@ -19,6 +19,8 @@ export const connectWorkers = async (
   parsedIdeVersion: any,
   timeouts: boolean,
   utilityContext: any,
+  sessionId: string,
+  targetId: string,
 ) => {
   if (recordVideo) {
     await VideoRecording.start(devtoolsWebSocketUrl, attachedToPageTimeout, idleTimeout)
@@ -40,5 +42,7 @@ export const connectWorkers = async (
     parsedIdeVersion,
     timeouts,
     utilityContext,
+    sessionId,
+    targetId,
   )
 }
