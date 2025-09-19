@@ -14,6 +14,7 @@ export const connectWorkers = async (
   electronObjectId: string,
   attachedToPageTimeout: number,
   idleTimeout: number,
+  utilityContext: any,
 ) => {
   if (recordVideo) {
     await VideoRecording.start(devtoolsWebSocketUrl, attachedToPageTimeout, idleTimeout)
@@ -30,5 +31,6 @@ export const connectWorkers = async (
     webSocketUrl,
     canUseIdleCallback,
     idleTimeout,
+    utilityContext,
   )
 }
