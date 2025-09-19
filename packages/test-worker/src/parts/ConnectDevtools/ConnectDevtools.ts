@@ -32,6 +32,9 @@ export const connectDevtools = async (
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
   Assert.boolean(isFirstConnection)
+  Assert.object(utilityContext)
+  Assert.string(sessionId)
+  Assert.string(targetId)
 
   // TODO connect to electron and browser in parallel
   const electronRpc = await connectElectron(connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback)
