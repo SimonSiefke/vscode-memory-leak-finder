@@ -34,7 +34,9 @@ export const connectDevtools = async (
     connectElectron(connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback),
     DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl),
   ])
+  console.time('session')
   const { sessionRpc, sessionId, targetId } = await waitForSession(browserRpc, 5000)
+  console.timeEnd('session')
   const firstWindow = Page.create({
     electronObjectId,
     electronRpc,
