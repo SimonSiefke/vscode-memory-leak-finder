@@ -1,5 +1,4 @@
 import * as Assert from '../Assert/Assert.ts'
-import { connectElectron } from '../ConnectElectron/ConnectElectron.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as DisableTimeouts from '../DisableTimeouts/DisableTimeouts.ts'
@@ -31,7 +30,7 @@ export const connectDevtools = async (
   Assert.boolean(isFirstConnection)
   Assert.object(utilityContext)
   const [electronRpc, browserRpc] = await Promise.all([
-    connectElectron(connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback),
+    DebuggerCreateIpcConnection.createConnection(webSocketUrl),
     DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl),
   ])
   console.time('session')
