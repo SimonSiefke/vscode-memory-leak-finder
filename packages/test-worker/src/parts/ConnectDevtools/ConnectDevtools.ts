@@ -10,6 +10,7 @@ import * as Expect from '../Expect/Expect.ts'
 import * as ImportScript from '../ImportScript/ImportScript.ts'
 import * as ObjectType from '../ObjectType/ObjectType.ts'
 import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
+import * as Page from '../Page/Page.ts'
 import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.ts'
 import * as SessionState from '../SessionState/SessionState.ts'
 import { VError } from '../VError/VError.ts'
@@ -39,19 +40,20 @@ export const connectDevtools = async (
   // @ts-ignore
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
 
-  const sessionRpc = await waitForSession(browserRpc, 5000)
+  const { sessionRpc, sessionId, targetId } = await waitForSession(browserRpc, 5000)
 
-  console.log({ sessionRpc })
+  const firstWindow = Page.create({
+    electronObjectId,
+    electronRpc,
+    sessionId: sessionId,
+    targetId: targetId,
+    rpc: sessionRpc,
+    idleTimeout,
+  })
   const electronApp = ElectronApp.create({
     electronRpc,
     electronObjectId,
     idleTimeout,
-  })
-  const pageObjectModule = await ImportScript.importScript(pageObjectPath)
-  const firstWindow = await WaitForFirstWindow.waitForFirstWindow({
-    electronApp,
-    isFirstConnection,
-    isHeadless,
   })
   const pageObjectContext = {
     page: firstWindow,
@@ -60,6 +62,7 @@ export const connectDevtools = async (
     electronApp,
     ideVersion: parsedIdeVersion,
   }
+  const pageObjectModule = await ImportScript.importScript(pageObjectPath)
   const pageObject = await pageObjectModule.create(pageObjectContext)
   await pageObject.WaitForApplicationToBeReady.waitForApplicationToBeReady()
   if (timeouts === false) {
