@@ -72,7 +72,6 @@ export const connectDevtools = async (
   const pageObjectModule = await ImportScript.importScript(pageObjectPath)
   const pageObject = await pageObjectModule.create(pageObjectContext)
   PageObjectState.set(connectionId, pageObject, pageObjectContext)
-  console.log({ connectionId })
   await pageObject.WaitForApplicationToBeReady.waitForApplicationToBeReady()
   if (timeouts === false) {
     // TODO this should be part of initialization worker
