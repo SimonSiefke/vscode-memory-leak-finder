@@ -1,6 +1,7 @@
 import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.ts'
 import { connectWorkers } from '../ConnectWorkers/ConnectWorkers.ts'
 import * as KillExistingIdeInstances from '../KillExistingIdeInstances/KillExistingIdeInstances.ts'
+import * as PageObject from '../PageObject/PageObject.ts'
 import { prepareBoth } from '../PrepareBoth/PrepareBoth.ts'
 
 export const prepareTests = async (
@@ -52,6 +53,8 @@ export const prepareTests = async (
     sessionId,
     targetId,
   )
+
+  await PageObject.create(rpc, connectionId, isFirstConnection, headlessMode, timeouts, parsedVersion, pageObjectPath)
 
   return {
     rpc,
