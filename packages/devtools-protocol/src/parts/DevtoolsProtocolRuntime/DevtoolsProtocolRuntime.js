@@ -34,6 +34,10 @@ export const enable = (session) => {
   return Invoke.invoke(session, DevtoolsCommandType.RuntimeEnable, {})
 }
 
+export const disable = (session) => {
+  return Invoke.invoke(session, DevtoolsCommandType.RuntimeDisable, {})
+}
+
 export const runIfWaitingForDebugger = (session) => {
   return Invoke.invoke(session, DevtoolsCommandType.RuntimeRunIfWaitingForDebugger, {})
 }
