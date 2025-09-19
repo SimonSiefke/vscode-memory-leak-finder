@@ -30,13 +30,11 @@ export const connectDevtools = async (
   Assert.string(devtoolsWebSocketUrl)
   Assert.boolean(isFirstConnection)
   Assert.object(utilityContext)
-
-  // TODO connect to electron and browser in parallel
-  const electronRpc = await connectElectron(connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback)
-  const browserRpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
-
+  const [electronRpc, browserRpc] = await Promise.all([
+    connectElectron(connectionId, headlessMode, webSocketUrl, isFirstConnection, canUseIdleCallback),
+    DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl),
+  ])
   const { sessionRpc, sessionId, targetId } = await waitForSession(browserRpc, 5000)
-
   const firstWindow = Page.create({
     electronObjectId,
     electronRpc,
