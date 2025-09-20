@@ -1,6 +1,7 @@
 import type { RunTestsOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import * as CliProcess from '../CliProcess/CliProcess.ts'
 import * as RunTestsWithCallback from '../RunTestsWithCallback/RunTestsWithCallback.ts'
+import * as Disposables from '../Disposables/Disposables.ts'
 
 const callback = async (method, ...params) => {
   await CliProcess.invoke(method, ...params)
@@ -52,5 +53,7 @@ export const runTests = ({
     commit,
     setupOnly,
     callback,
+    addDisposable: Disposables.add,
+    clearDisposables: Disposables.disposeAll,
   })
 }
