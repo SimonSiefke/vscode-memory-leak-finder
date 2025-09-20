@@ -164,7 +164,7 @@ export const runTestsWithCallback = async ({
         const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(currentTestRpc, connectionId, absolutePath, forceRun, timeouts)
 
         if (recordVideo) {
-          await VideoRecording.addChapter(videoRpc, dirent, start)
+          await VideoRecording.addChapter(currentVideoRpc, dirent, start)
         }
 
         if (testSkipped) {
@@ -256,7 +256,7 @@ export const runTestsWithCallback = async ({
     const end = Time.now()
     const duration = end - testStart
     if (recordVideo) {
-      await VideoRecording.finalize(videoRpc)
+      await VideoRecording.finalize(currentVideoRpc)
     }
     await callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, leaking, total, duration, filterValue)
   } catch (error) {
