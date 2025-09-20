@@ -20,6 +20,7 @@ export interface RunTestsOptions {
   readonly vscodePath: string
   readonly commit: string
   readonly setupOnly: boolean
+  readonly shouldContinue: boolean
 }
 
 export interface RunTestsWithCallbackOptions extends RunTestsOptions {
