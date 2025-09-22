@@ -41,16 +41,14 @@ test('getOriginalClassName - typescript constructor', () => {
 })
 
 test('getOriginalClassName - extends', () => {
-  const sourceContent = `class extends Test {
+  const sourceContent = `const A = class extends Test {
   constructor(value){
     this.value = value
   }
 }`
   const originalLine = 1
   const originalColumn = 14
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe(
-    'class extends Test',
-  )
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('A')
 })
 
 test('getOriginalClassName - class method', () => {
@@ -321,4 +319,61 @@ test('getOriginalClassName - class getter', () => {
   const originalLine = 16
   const originalColumn = 19
   expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('Emitter.get event')
+})
+
+test('getOriginalClassName - domListener', () => {
+  const sourceContent = `class DomListener implements IDisposable {
+
+	private _handler: (e: any) => void;
+	private _node: EventTarget;
+	private readonly _type: string;
+	private readonly _options: boolean | AddEventListenerOptions;
+
+	constructor(node: EventTarget, type: string, handler: (e: any) => void, options?: boolean | AddEventListenerOptions) {
+		this._node = node;
+		this._type = type;
+		this._handler = handler;
+		this._options = (options || false);
+		this._node.addEventListener(this._type, this._handler, this._options);
+	}
+}`
+  const originalLine = 7
+  const originalColumn = 13
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('DomListener')
+})
+
+test('getOriginalClassName - nested function', () => {
+  const sourceContent = `export function toDisposable(fn: () => void): IDisposable {
+	const self = trackDisposable({
+		dispose: createSingleCallFunction(() => {
+			markAsDisposed(self);
+			fn();
+		})
+	});
+	return self;
+}`
+  const originalLine = 2
+  const originalColumn = 36
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('toDisposable')
+})
+
+test('getOriginalClassName - context key constructor', () => {
+  const sourceContent = `export class ContextKeyAndExpr implements IContextKeyExpression {
+
+	public static create(_expr: ReadonlyArray<ContextKeyExpression | null | undefined>, negated: ContextKeyExpression | null, extraRedundantCheck: boolean): ContextKeyExpression | undefined {
+		return ContextKeyAndExpr._normalizeArr(_expr, negated, extraRedundantCheck);
+	}
+
+	public readonly type = ContextKeyExprType.And;
+
+	private constructor(
+		public readonly expr: ContextKeyExpression[],
+		private negated: ContextKeyExpression | null
+	) {
+	}
+}
+`
+  const originalLine = 8
+  const originalColumn = 18
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('ContextKeyAndExpr')
 })
