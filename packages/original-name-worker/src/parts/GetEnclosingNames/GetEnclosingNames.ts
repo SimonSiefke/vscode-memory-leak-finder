@@ -16,7 +16,7 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
       current = current.parentPath
       continue
     }
-    
+
 
     if (current.isClassMethod() || current.isClassPrivateMethod()) {
       const methodNode = current.node
@@ -54,7 +54,7 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
     } else if (current.isClassDeclaration() || current.isClassExpression()) {
       const cls = current.node
       const { id } = cls
-      
+
       if (id && id.name) {
         // Handle the special case where we added "AnonymousClass" for "class extends" syntax
         if (id.name === 'AnonymousClass' && cls.superClass) {
@@ -68,7 +68,7 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
         className = className || `class extends ${superName}`
       } else if (current.isClassExpression()) {
         // Look for variable declarator in the parent chain
-        let parent = current.parentPath
+        let parent: NodePath | null = current.parentPath
         while (parent) {
           if (parent.isVariableDeclarator()) {
             const idNode = parent.node.id
