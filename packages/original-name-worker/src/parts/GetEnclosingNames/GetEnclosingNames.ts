@@ -54,10 +54,22 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
       const cls = current.node
       const { id } = cls
       if (id && id.name) {
-        className = className || id.name
+        // Handle the special case where we added "AnonymousClass" for "class extends" syntax
+        if (id.name === 'AnonymousClass' && cls.superClass) {
+          const superName: string = cls.superClass && cls.superClass.type === 'Identifier' ? cls.superClass.name : 'unknown'
+          className = className || `class extends ${superName}`
+        } else {
+          className = className || id.name
+        }
       } else if (cls.superClass && cls.id == null) {
         const superName: string = cls.superClass && cls.superClass.type === 'Identifier' ? cls.superClass.name : 'unknown'
         className = className || `class extends ${superName}`
+      } else if (current.isClassExpression() && current.parentPath && current.parentPath.isVariableDeclarator()) {
+        const parent = current.parentPath
+        const idNode = parent.node.id
+        if (idNode && idNode.type === 'Identifier') {
+          className = className || idNode.name
+        }
       }
     } else if (current.isFunctionDeclaration()) {
       const { id } = current.node

@@ -20,7 +20,13 @@ export const getOriginalClassName = (
 
   let ast: t.File
   try {
-    ast = parse(sourceContent, {
+    // Handle "class extends" case by temporarily adding a class name
+    let processedSource = sourceContent
+    if (sourceContent.includes('class extends ') && !sourceContent.match(/class\s+\w+\s+extends/)) {
+      processedSource = sourceContent.replace(/class\s+extends/g, 'class AnonymousClass extends')
+    }
+    
+    ast = parse(processedSource, {
       sourceType: 'unambiguous',
       plugins: ['classProperties', 'classPrivateProperties', 'classPrivateMethods', 'decorators-legacy', 'jsx', 'typescript'],
       ranges: false,
