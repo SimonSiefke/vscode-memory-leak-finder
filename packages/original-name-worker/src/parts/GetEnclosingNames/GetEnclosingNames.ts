@@ -24,9 +24,17 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
       } else {
         const { key } = methodNode
         if (key && key.type === 'Identifier') {
-          memberName = memberName || key.name
+          if (methodNode.kind === 'get') {
+            memberName = memberName || `get ${key.name}`
+          } else {
+            memberName = memberName || key.name
+          }
         } else if (key && key.type === 'StringLiteral') {
-          memberName = memberName || key.value
+          if (methodNode.kind === 'get') {
+            memberName = memberName || `get ${key.value}`
+          } else {
+            memberName = memberName || key.value
+          }
         }
       }
     } else if (
