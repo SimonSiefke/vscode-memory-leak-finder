@@ -1,5 +1,6 @@
 import { parse } from '@babel/parser'
 import type * as t from '@babel/types'
+import { traverse } from '@babel/traverse'
 
 export const parseAst = (sourceContent: string): t.File => {
   if (!sourceContent) {
@@ -13,6 +14,18 @@ export const parseAst = (sourceContent: string): t.File => {
       ranges: false,
       errorRecovery: true,
       tokens: false,
+    })
+
+    // Handle anonymous classes by adding a name
+    traverse(ast, {
+      ClassDeclaration(path) {
+        if (!path.node.id) {
+          path.node.id = {
+            type: 'Identifier',
+            name: 'AnonymousClass',
+          } as t.Identifier
+        }
+      },
     })
 
     return ast

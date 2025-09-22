@@ -1,5 +1,4 @@
 import type { NodePath } from '@babel/traverse'
-import type * as t from '@babel/types'
 import { isLocationInside } from '../IsLocationInside/IsLocationInside.ts'
 
 const LOCATION_UNKNOWN: string = 'unknown'
@@ -38,7 +37,7 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
         }
       }
     } else if (current.isClassProperty()) {
-      const classFieldNode = current.node as t.ClassProperty
+      const classFieldNode = current.node
       if (classFieldNode.key && classFieldNode.key.type === 'Identifier') {
         memberName = memberName || classFieldNode.key.name
       }
