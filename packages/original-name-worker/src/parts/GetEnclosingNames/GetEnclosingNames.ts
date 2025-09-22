@@ -24,20 +24,20 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
       } else {
         const { key } = methodNode
         if (key && key.type === 'Identifier') {
-          memberName = memberName || key.name
+          if (methodNode.kind === 'get') {
+            memberName = memberName || `get ${key.name}`
+          } else {
+            memberName = memberName || key.name
+          }
         } else if (key && key.type === 'StringLiteral') {
-          memberName = memberName || key.value
+          if (methodNode.kind === 'get') {
+            memberName = memberName || `get ${key.value}`
+          } else {
+            memberName = memberName || key.value
+          }
         }
       }
-    } else if (
-      // support both modern PropertyDefinition and older ClassProperty nodes
-      ('isPropertyDefinition' in current &&
-        typeof (current as unknown as { isPropertyDefinition?: () => boolean }).isPropertyDefinition === 'function' &&
-        (current as unknown as { isPropertyDefinition: () => boolean }).isPropertyDefinition()) ||
-      ('isClassProperty' in current &&
-        typeof (current as unknown as { isClassProperty?: () => boolean }).isClassProperty === 'function' &&
-        (current as unknown as { isClassProperty: () => boolean }).isClassProperty())
-    ) {
+    } else if (current.isClassProperty()) {
       const classFieldNode = current.node as t.ClassProperty
       if (classFieldNode.key && classFieldNode.key.type === 'Identifier') {
         memberName = memberName || classFieldNode.key.name
@@ -45,11 +45,31 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
     } else if (current.isClassDeclaration() || current.isClassExpression()) {
       const cls = current.node
       const { id } = cls
+
       if (id && id.name) {
-        className = className || id.name
+        // Handle the special case where we added "AnonymousClass" for "class extends" syntax
+        if (id.name === 'AnonymousClass' && cls.superClass) {
+          const superName: string = cls.superClass && cls.superClass.type === 'Identifier' ? cls.superClass.name : 'unknown'
+          className = className || `class extends ${superName}`
+        } else {
+          className = className || id.name
+        }
       } else if (cls.superClass && cls.id == null) {
         const superName: string = cls.superClass && cls.superClass.type === 'Identifier' ? cls.superClass.name : 'unknown'
         className = className || `class extends ${superName}`
+      } else if (current.isClassExpression()) {
+        // Look for variable declarator in the parent chain
+        let parent: NodePath | null = current.parentPath
+        while (parent) {
+          if (parent.isVariableDeclarator()) {
+            const idNode = parent.node.id
+            if (idNode && idNode.type === 'Identifier') {
+              className = className || idNode.name
+            }
+            break
+          }
+          parent = parent.parentPath
+        }
       }
     } else if (current.isFunctionDeclaration()) {
       const { id } = current.node
