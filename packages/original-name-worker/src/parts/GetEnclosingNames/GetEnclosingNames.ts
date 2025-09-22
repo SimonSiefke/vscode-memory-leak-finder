@@ -4,11 +4,9 @@ import { isLocationInside } from '../IsLocationInside/IsLocationInside.ts'
 const LOCATION_UNKNOWN: string = 'unknown'
 
 export const getEnclosingNames = (path: NodePath, position: { line: number; column: number }): string => {
-  let className: string | undefined
-  let memberName: string | undefined
-  let functionName: string | undefined
-
   let current: NodePath | null = path
+
+  // Walk up the parent path until we find a relevant enclosing construct
   while (current) {
     const { node } = current
     if (!isLocationInside(node, position.line, position.column)) {
@@ -16,101 +14,150 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
       continue
     }
 
+    // Check for class methods (including constructor)
     if (current.isClassMethod() || current.isClassPrivateMethod()) {
       const methodNode = current.node
-      if (methodNode.kind === 'constructor') {
-        // ignore constructor
-      } else {
-        const { key } = methodNode
-        if (key && key.type === 'Identifier') {
-          if (methodNode.kind === 'get') {
-            memberName = memberName || `get ${key.name}`
-          } else {
-            memberName = memberName || key.name
+      const { key } = methodNode
+
+      if (key && key.type === 'Identifier') {
+        // Special handling for constructor - return just the class name
+        if (methodNode.kind === 'constructor') {
+          let classPath: NodePath | null = current.parentPath
+          while (classPath && !classPath.isClassDeclaration() && !classPath.isClassExpression()) {
+            classPath = classPath.parentPath
           }
-        } else if (key && key.type === 'StringLiteral') {
-          if (methodNode.kind === 'get') {
-            memberName = memberName || `get ${key.value}`
-          } else {
-            memberName = memberName || key.value
+
+          if (classPath) {
+            const className = getClassName(classPath)
+            return className || LOCATION_UNKNOWN
           }
+          return LOCATION_UNKNOWN
         }
+
+        const methodName = methodNode.kind === 'get' ? `get ${key.name}` : key.name
+
+        // Find the enclosing class
+        let classPath: NodePath | null = current.parentPath
+        while (classPath && !classPath.isClassDeclaration() && !classPath.isClassExpression()) {
+          classPath = classPath.parentPath
+        }
+
+        if (classPath) {
+          const className = getClassName(classPath)
+          return className ? `${className}.${methodName}` : methodName
+        }
+        return methodName
       }
-    } else if (current.isClassProperty()) {
+    }
+
+    // Check for class properties/fields
+    if (current.isClassProperty()) {
       const classFieldNode = current.node
       if (classFieldNode.key && classFieldNode.key.type === 'Identifier') {
-        memberName = memberName || classFieldNode.key.name
-      }
-    } else if (current.isClassDeclaration() || current.isClassExpression()) {
-      const cls = current.node
-      const { id } = cls
+        const fieldName = classFieldNode.key.name
 
-      if (id && id.name) {
-        // Handle the special case where we added "AnonymousClass" for "class extends" syntax
-        if (id.name === 'AnonymousClass' && cls.superClass) {
-          const superName: string = cls.superClass && cls.superClass.type === 'Identifier' ? cls.superClass.name : 'unknown'
-          className = className || `class extends ${superName}`
-        } else {
-          className = className || id.name
+        // Find the enclosing class
+        let classPath: NodePath | null = current.parentPath
+        while (classPath && !classPath.isClassDeclaration() && !classPath.isClassExpression()) {
+          classPath = classPath.parentPath
         }
-      } else if (cls.superClass && cls.id == null) {
-        const superName: string = cls.superClass && cls.superClass.type === 'Identifier' ? cls.superClass.name : 'unknown'
-        className = className || `class extends ${superName}`
-      } else if (current.isClassExpression()) {
-        // Look for variable declarator in the parent chain
-        let parent: NodePath | null = current.parentPath
-        while (parent) {
-          if (parent.isVariableDeclarator()) {
-            const idNode = parent.node.id
-            if (idNode && idNode.type === 'Identifier') {
-              className = className || idNode.name
-            }
-            break
-          }
-          parent = parent.parentPath
+
+        if (classPath) {
+          const className = getClassName(classPath)
+          return className ? `${className}.${fieldName}` : fieldName
         }
+        return fieldName
       }
-    } else if (current.isFunctionDeclaration()) {
+    }
+
+    // Check for class declarations/expressions
+    if (current.isClassDeclaration() || current.isClassExpression()) {
+      const className = getClassName(current)
+      if (className) {
+        return className
+      }
+    }
+
+    // Check for function declarations
+    if (current.isFunctionDeclaration()) {
       const { id } = current.node
-      if (id && id.name && !functionName) {
-        functionName = id.name
+      if (id && id.name) {
+        return id.name
       }
-    } else if (current.isFunctionExpression() || current.isArrowFunctionExpression()) {
-      const parent = current.parentPath
-      if (parent && parent.isVariableDeclarator()) {
-        const idNode = parent.node.id
-        if (idNode && idNode.type === 'Identifier' && !functionName) {
-          functionName = idNode.name
-        }
-      } else if (parent && parent.isAssignmentExpression()) {
-        const leftNode = parent.node.left
-        if (leftNode && leftNode.type === 'MemberExpression') {
-          const { object } = leftNode
-          const { property } = leftNode
-          if (object && object.type === 'MemberExpression') {
-            const objectName: string | undefined = object.object.type === 'Identifier' ? object.object.name : undefined
-            const propName: string | undefined = property && property.type === 'Identifier' ? property.name : undefined
-            const protoProp = object.property
-            if (objectName && protoProp && protoProp.type === 'Identifier' && protoProp.name === 'prototype' && propName) {
-              className = className || objectName
-              memberName = memberName || propName
-            }
-          }
-        }
+    }
+
+    // Check for function expressions and arrow functions
+    if (current.isFunctionExpression() || current.isArrowFunctionExpression()) {
+      const functionName = getFunctionName(current)
+      if (functionName) {
+        return functionName
       }
     }
 
     current = current.parentPath
   }
 
-  if (className && memberName) {
-    return `${className}.${memberName}`
-  }
-  if (functionName) {
-    return functionName
-  }
-  if (className) {
-    return className
-  }
   return LOCATION_UNKNOWN
+}
+
+const getClassName = (classPath: NodePath): string | undefined => {
+  const cls = classPath.node
+
+  if (classPath.isClassDeclaration()) {
+    const { id } = cls
+    if (id && id.name) {
+      // Handle the special case where we added "AnonymousClass" for "class extends" syntax
+      if (id.name === 'AnonymousClass' && cls.superClass) {
+        const superName = cls.superClass && cls.superClass.type === 'Identifier' ? cls.superClass.name : 'unknown'
+        return `class extends ${superName}`
+      }
+      return id.name
+    }
+  }
+
+  if (classPath.isClassExpression()) {
+    // Look for variable declarator in the parent chain
+    let parent: NodePath | null = classPath.parentPath
+    while (parent) {
+      if (parent.isVariableDeclarator()) {
+        const idNode = parent.node.id
+        if (idNode && idNode.type === 'Identifier') {
+          return idNode.name
+        }
+        break
+      }
+      parent = parent.parentPath
+    }
+  }
+
+  return undefined
+}
+
+const getFunctionName = (functionPath: NodePath): string | undefined => {
+  const parent = functionPath.parentPath
+
+  if (parent && parent.isVariableDeclarator()) {
+    const idNode = parent.node.id
+    if (idNode && idNode.type === 'Identifier') {
+      return idNode.name
+    }
+  }
+
+  if (parent && parent.isAssignmentExpression()) {
+    const leftNode = parent.node.left
+    if (leftNode && leftNode.type === 'MemberExpression') {
+      const { object } = leftNode
+      const { property } = leftNode
+      if (object && object.type === 'MemberExpression') {
+        const objectName = object.object.type === 'Identifier' ? object.object.name : undefined
+        const propName = property && property.type === 'Identifier' ? property.name : undefined
+        const protoProp = object.property
+        if (objectName && protoProp && protoProp.type === 'Identifier' && protoProp.name === 'prototype' && propName) {
+          return `${objectName}.${propName}`
+        }
+      }
+    }
+  }
+
+  return undefined
 }
