@@ -1,9 +1,9 @@
 import type { NodePath } from '@babel/traverse'
 import type * as t from '@babel/types'
 import { parse } from '@babel/parser'
-import traverse from '@babel/traverse'
 import { test, expect } from '@jest/globals'
 import { isLocationInside } from '../src/parts/IsLocationInside/IsLocationInside.ts'
+import { traverseAst } from '../src/parts/GetTraverse/GetTraverse.ts'
 
 const getFirstNodePath = (code: string): NodePath => {
   const ast: t.File = parse(code, {
@@ -12,7 +12,10 @@ const getFirstNodePath = (code: string): NodePath => {
     errorRecovery: true,
   }) as unknown as t.File
   // Handle different module formats for @babel/traverse
-  const traverseFn = traverse as unknown as typeof import('@babel/traverse').default
+  const traverseFn =
+    typeof traverse === 'function'
+      ? traverse
+      : (traverse as any).default || (traverse as any).traverse
   let found: NodePath | null = null
   traverseFn(ast, {
     enter(path: NodePath) {
