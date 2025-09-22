@@ -104,14 +104,13 @@ const getClassName = (classPath: NodePath): string | undefined => {
   const cls = classPath.node
 
   if (classPath.isClassDeclaration()) {
-    const { id } = cls
-    if (id && id.name) {
+    if ('id' in cls && cls.id && typeof cls.id === 'object' && 'name' in cls.id && typeof cls.id.name === 'string') {
       // Handle the special case where we added "AnonymousClass" for "class extends" syntax
-      if (id.name === 'AnonymousClass' && cls.superClass) {
-        const superName = cls.superClass && cls.superClass.type === 'Identifier' ? cls.superClass.name : 'unknown'
+      if (cls.id.name === 'AnonymousClass' && 'superClass' in cls && cls.superClass) {
+        const superName = cls.superClass && typeof cls.superClass === 'object' && 'type' in cls.superClass && cls.superClass.type === 'Identifier' && 'name' in cls.superClass && typeof cls.superClass.name === 'string' ? cls.superClass.name : 'unknown'
         return `class extends ${superName}`
       }
-      return id.name
+      return cls.id.name
     }
   }
 
