@@ -1,31 +1,24 @@
 import { parse } from '@babel/parser'
 import type * as t from '@babel/types'
-import { traverse } from '@babel/traverse'
+import { traverseAst } from '../GetTraverse/GetTraverse.ts'
 
 export const parseAst = (sourceContent: string): t.File => {
   if (!sourceContent) {
     throw new Error('No source content provided')
   }
 
+  // Preprocess source to handle anonymous classes
+  let processedSource = sourceContent
+  // Match "class extends" pattern and add a name
+  processedSource = processedSource.replace(/^(\s*)class\s+extends\s+/gm, '$1class AnonymousClass extends ')
+
   try {
-    const ast = parse(sourceContent, {
+    const ast = parse(processedSource, {
       sourceType: 'module',
       plugins: ['typescript', 'classProperties', 'decorators-legacy'],
       ranges: false,
       errorRecovery: true,
       tokens: false,
-    })
-
-    // Handle anonymous classes by adding a name
-    traverse(ast, {
-      ClassDeclaration(path) {
-        if (!path.node.id) {
-          path.node.id = {
-            type: 'Identifier',
-            name: 'AnonymousClass',
-          } as t.Identifier
-        }
-      },
     })
 
     return ast
