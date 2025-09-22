@@ -291,7 +291,7 @@ test('getOriginalClassName - method of function', () => {
   const originalLine = 39
   const originalColumn = 38
   expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe(
-    'unknown in test.ts',
+    'MenuRegistry.appendMenuItem',
   )
 })
 
@@ -320,5 +320,5 @@ test('getOriginalClassName - class getter', () => {
 }`
   const originalLine = 16
   const originalColumn = 19
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('Emitter.event')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('Emitter.get event')
 })
