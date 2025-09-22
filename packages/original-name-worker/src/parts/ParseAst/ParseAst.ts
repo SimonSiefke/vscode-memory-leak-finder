@@ -13,7 +13,7 @@ export const parseAst = (sourceContent: string): t.File => {
       ranges: false,
       errorRecovery: true,
       tokens: false,
-    }) as unknown as t.File
+    })
 
     return ast
   } catch (error) {
