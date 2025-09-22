@@ -7,7 +7,7 @@ test('parseAst - simple class', () => {
       return 1
     }
   }`
-  
+
   const ast = parseAst(sourceContent)
   expect(ast.type).toBe('File')
   expect(ast.program.body).toHaveLength(1)
@@ -20,12 +20,12 @@ test('parseAst - anonymous class extends', () => {
       this.value = value
     }
   }`
-  
+
   const ast = parseAst(sourceContent)
   expect(ast.type).toBe('File')
   expect(ast.program.body).toHaveLength(1)
   expect(ast.program.body[0].type).toBe('ClassDeclaration')
-  
+
   // Check that the class name was added
   const classDecl = ast.program.body[0] as any
   expect(classDecl.id.name).toBe('AnonymousClass')
@@ -38,12 +38,12 @@ test('parseAst - class with extends and name', () => {
       return 1
     }
   }`
-  
+
   const ast = parseAst(sourceContent)
   expect(ast.type).toBe('File')
   expect(ast.program.body).toHaveLength(1)
   expect(ast.program.body[0].type).toBe('ClassDeclaration')
-  
+
   // Check that the class name was preserved
   const classDecl = ast.program.body[0] as any
   expect(classDecl.id.name).toBe('MyClass')
@@ -56,7 +56,7 @@ test('parseAst - template literals', () => {
       return \`\${this.key} > \${this.value}\`
     }
   }`
-  
+
   const ast = parseAst(sourceContent)
   expect(ast.type).toBe('File')
   expect(ast.program.body).toHaveLength(1)
@@ -67,7 +67,7 @@ test('parseAst - TypeScript interface', () => {
   const sourceContent = `interface Test {
     method(): string
   }`
-  
+
   const ast = parseAst(sourceContent)
   expect(ast.type).toBe('File')
   expect(ast.program.body).toHaveLength(1)
@@ -84,7 +84,7 @@ test('parseAst - invalid syntax', () => {
       return 1
     }
   } invalid syntax here`
-  
+
   // With errorRecovery: true, Babel will parse what it can and ignore the rest
   // So this should not throw, but the AST will contain extra nodes
   const ast = parseAst(sourceContent)
@@ -130,7 +130,7 @@ test('parseAst - large file with complex syntax', () => {
       return mapFnc.mapGreater(this.key, this.value)
     }
   }`
-  
+
   const ast = parseAst(sourceContent)
   expect(ast.type).toBe('File')
   expect(ast.program.body).toHaveLength(1)
