@@ -17,7 +17,7 @@ export const getCountData = async (name: string, key: string): Promise<any[]> =>
     const data = await ReadJson.readJson(absolutePath)
     allData.push({
       name: dirent,
-      count: data[key].after,
+      count: data[key]?.after || 0,
       index: index++,
     })
   }
