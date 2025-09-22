@@ -76,7 +76,7 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
       if (className) {
         return className
       }
-      
+
       // Handle anonymous class declarations (class extends ...)
       if (current.isClassDeclaration() && !current.node.id) {
         const superClassName = getSuperClassName(current)
@@ -164,7 +164,7 @@ const getFunctionName = (functionPath: NodePath): string | undefined => {
 
 const getSuperClassName = (classPath: NodePath): string | undefined => {
   const cls = classPath.node
-  
+
   if ('superClass' in cls && cls.superClass) {
     if (typeof cls.superClass === 'object' && 'type' in cls.superClass) {
       if (cls.superClass.type === 'Identifier' && 'name' in cls.superClass && typeof cls.superClass.name === 'string') {
@@ -176,7 +176,7 @@ const getSuperClassName = (classPath: NodePath): string | undefined => {
       }
     }
   }
-  
+
   return undefined
 }
 
@@ -184,11 +184,11 @@ const getMemberExpressionName = (memberExpr: any): string | undefined => {
   if (memberExpr.type === 'MemberExpression') {
     const object = memberExpr.object
     const property = memberExpr.property
-    
+
     if (object && object.type === 'Identifier' && property && property.type === 'Identifier') {
       return `${object.name}.${property.name}`
     }
   }
-  
+
   return undefined
 }

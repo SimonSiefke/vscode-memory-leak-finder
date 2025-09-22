@@ -1,6 +1,5 @@
 import { test, expect } from '@jest/globals'
 import * as GetOriginalClassName from '../src/parts/GetOriginalClassName/GetOriginalClassName.ts'
-import { readFileSync } from 'fs'
 
 const originalFileName = 'test.ts'
 
