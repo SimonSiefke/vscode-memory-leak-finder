@@ -1,5 +1,5 @@
 import { parse } from '@babel/parser'
-import * as t from '@babel/types'
+import type * as t from '@babel/types'
 
 export const parseAst = (sourceContent: string): t.File => {
   if (!sourceContent) {
