@@ -10,7 +10,7 @@ const findBestPathAt = (code: string, line: number, column: number): NodePath =>
     sourceType: 'unambiguous',
     plugins: ['classProperties', 'classPrivateProperties', 'classPrivateMethods', 'decorators-legacy', 'jsx', 'typescript'],
     errorRecovery: true,
-  }) as unknown as t.File
+  })
 
   let best: NodePath | null = null
   traverseAst(ast, {
