@@ -1,6 +1,6 @@
 import type { NodePath } from '@babel/traverse'
 import type * as t from '@babel/types'
-import { parse } from '@babel/parser'
+import { parseAst } from '../ParseAst/ParseAst.ts'
 import { fallbackScan } from '../FallbackScan/FallbackScan.ts'
 import { getEnclosingNames } from '../GetEnclosingNames/GetEnclosingNames.ts'
 import { isLocationInside } from '../IsLocationInside/IsLocationInside.ts'
@@ -20,15 +20,7 @@ export const getOriginalClassName = (
 
   let ast: t.File
   try {
-    let processedSource = sourceContent
-
-    ast = parse(processedSource, {
-      sourceType: 'module',
-      plugins: ['typescript', 'classProperties', 'decorators-legacy'],
-      ranges: false,
-      errorRecovery: true,
-      tokens: false,
-    }) as unknown as t.File
+    ast = parseAst(sourceContent)
   } catch {
     return LOCATION_UNKNOWN + ' in ' + originalFileName
   }
