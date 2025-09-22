@@ -1,9 +1,9 @@
 import type { NodePath } from '@babel/traverse'
 import type * as t from '@babel/types'
 import { parse } from '@babel/parser'
-import traverse from '@babel/traverse'
 import { test, expect } from '@jest/globals'
 import { getEnclosingNames } from '../src/parts/GetEnclosingNames/GetEnclosingNames.ts'
+import { traverseAst } from '../src/parts/GetTraverse/GetTraverse.ts'
 
 const findBestPathAt = (code: string, line: number, column: number): NodePath => {
   const ast: t.File = parse(code, {
@@ -12,13 +12,8 @@ const findBestPathAt = (code: string, line: number, column: number): NodePath =>
     errorRecovery: true,
   }) as unknown as t.File
 
-  // Handle different module formats for @babel/traverse
-  const traverseFn =
-    typeof traverse === 'function'
-      ? traverse
-      : (traverse as any).default || (traverse as any).traverse
   let best: NodePath | null = null
-  traverseFn(ast, {
+  traverseAst(ast, {
     enter(path: NodePath) {
       const { node } = path
       if (!node.loc) {
