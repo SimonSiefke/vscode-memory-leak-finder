@@ -15,7 +15,7 @@ test('parseAst - simple class', () => {
 })
 
 test('parseAst - anonymous class extends', () => {
-  const sourceContent = `class extends Test {
+  const sourceContent = `const abc = class extends Test {
     constructor(value) {
       this.value = value
     }
