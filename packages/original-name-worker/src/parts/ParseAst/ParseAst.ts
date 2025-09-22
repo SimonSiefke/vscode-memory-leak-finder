@@ -1,6 +1,5 @@
 import { parse } from '@babel/parser'
 import type * as t from '@babel/types'
-import { traverseAst } from '../GetTraverse/GetTraverse.ts'
 
 export const parseAst = (sourceContent: string): t.File => {
   if (!sourceContent) {
