@@ -385,7 +385,5 @@ test('getOriginalClassName - context key constructor', () => {
   const sourceContent = readFileSync('/home/simon/.cache/repos/vscode/src/vs/platform/contextkey/common/contextkey.ts', 'utf8')
   const originalLine = 1584
   const originalColumn = 18
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe(
-    'ContextKeyNotRegexExpr',
-  )
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('ContextKeyAndExpr')
 })

@@ -85,7 +85,14 @@ test('parseAst - invalid syntax', () => {
     }
   } invalid syntax here`
   
-  expect(() => parseAst(sourceContent)).toThrow('AST parsing failed')
+  // With errorRecovery: true, Babel will parse what it can and ignore the rest
+  // So this should not throw, but the AST will contain extra nodes
+  const ast = parseAst(sourceContent)
+  expect(ast.type).toBe('File')
+  // The class should be the first node
+  expect(ast.program.body[0].type).toBe('ClassDeclaration')
+  // There will be additional nodes from the invalid syntax
+  expect(ast.program.body.length).toBeGreaterThan(1)
 })
 
 test('parseAst - large file with complex syntax', () => {
