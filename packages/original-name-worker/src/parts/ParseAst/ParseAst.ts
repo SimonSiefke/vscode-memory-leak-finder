@@ -6,13 +6,8 @@ export const parseAst = (sourceContent: string): t.File => {
     throw new Error('No source content provided')
   }
 
-  // Preprocess source to handle anonymous classes
-  let processedSource = sourceContent
-  // Match "class extends" pattern and add a name
-  processedSource = processedSource.replace(/^(\s*)class\s+extends\s+/gm, '$1class AnonymousClass extends ')
-
   try {
-    const ast = parse(processedSource, {
+    const ast = parse(sourceContent, {
       sourceType: 'module',
       plugins: ['typescript', 'classProperties', 'decorators-legacy'],
       ranges: false,
