@@ -38,15 +38,7 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
           }
         }
       }
-    } else if (
-      // support both modern PropertyDefinition and older ClassProperty nodes
-      ('isPropertyDefinition' in current &&
-        typeof (current as unknown as { isPropertyDefinition?: () => boolean }).isPropertyDefinition === 'function' &&
-        (current as unknown as { isPropertyDefinition: () => boolean }).isPropertyDefinition()) ||
-      ('isClassProperty' in current &&
-        typeof (current as unknown as { isClassProperty?: () => boolean }).isClassProperty === 'function' &&
-        (current as unknown as { isClassProperty: () => boolean }).isClassProperty())
-    ) {
+    } else if (current.isClassProperty()) {
       const classFieldNode = current.node as t.ClassProperty
       if (classFieldNode.key && classFieldNode.key.type === 'Identifier') {
         memberName = memberName || classFieldNode.key.name
