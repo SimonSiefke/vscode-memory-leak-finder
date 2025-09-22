@@ -1,30 +1,19 @@
 import type { NodePath } from '@babel/traverse'
 import type * as t from '@babel/types'
 import { parse } from '@babel/parser'
-import traverse from '@babel/traverse'
 import { test, expect } from '@jest/globals'
 import { getEnclosingNames } from '../src/parts/GetEnclosingNames/GetEnclosingNames.ts'
+import { traverseAst } from '../src/parts/GetTraverse/GetTraverse.ts'
 
 const findBestPathAt = (code: string, line: number, column: number): NodePath => {
   const ast: t.File = parse(code, {
     sourceType: 'unambiguous',
     plugins: ['classProperties', 'classPrivateProperties', 'classPrivateMethods', 'decorators-legacy', 'jsx', 'typescript'],
     errorRecovery: true,
-  }) as unknown as t.File
+  })
 
-  const tAny = traverse as unknown as { default?: unknown; traverse?: unknown }
-  const traverseFn =
-    typeof (traverse as unknown) === 'function'
-      ? (traverse as unknown as (ast: t.File, visitors: unknown) => void)
-      : typeof tAny.default === 'function'
-        ? (tAny.default as unknown as (ast: t.File, visitors: unknown) => void)
-        : typeof tAny.traverse === 'function'
-          ? (tAny.traverse as unknown as (ast: t.File, visitors: unknown) => void)
-          : typeof (tAny.default as { default?: unknown })?.default === 'function'
-            ? ((tAny.default as { default?: unknown }).default as (ast: t.File, visitors: unknown) => void)
-            : (null as unknown as (ast: t.File, visitors: unknown) => void)
   let best: NodePath | null = null
-  traverseFn(ast, {
+  traverseAst(ast, {
     enter(path: NodePath) {
       const { node } = path
       if (!node.loc) {
