@@ -216,7 +216,7 @@ jobs:
           include-hidden-files: true
       - name: Upload artifact
         if: matrix.os == 'ubuntu-24.04'
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ./.vscode-charts
 
