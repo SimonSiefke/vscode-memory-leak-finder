@@ -18,13 +18,6 @@ export const getOriginalClassName = (
     return LOCATION_UNKNOWN + ' in ' + originalFileName
   }
 
-  // if (sourceContent.includes('class extends ')) {
-  //   const fb: string = fallbackScan(sourceContent, originalLine)
-  //   if (fb !== LOCATION_UNKNOWN) {
-  //     return fb
-  //   }
-  // }
-
   let ast: t.File
   try {
     ast = parse(sourceContent, {
