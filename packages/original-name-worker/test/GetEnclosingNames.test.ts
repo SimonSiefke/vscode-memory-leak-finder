@@ -13,9 +13,9 @@ const findBestPathAt = (code: string, line: number, column: number): NodePath =>
   }) as unknown as t.File
 
   // Handle different module formats for @babel/traverse
-  const traverseFn = 
-    typeof traverse === 'function' 
-      ? traverse 
+  const traverseFn =
+    typeof traverse === 'function'
+      ? traverse
       : (traverse as any).default || (traverse as any).traverse
   let best: NodePath | null = null
   traverseFn(ast, {

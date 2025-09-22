@@ -12,10 +12,7 @@ const getFirstNodePath = (code: string): NodePath => {
     errorRecovery: true,
   }) as unknown as t.File
   // Handle different module formats for @babel/traverse
-  const traverseFn = 
-    typeof traverse === 'function' 
-      ? traverse 
-      : (traverse as any).default || (traverse as any).traverse
+  const traverseFn = traverse as unknown as typeof import('@babel/traverse').default
   let found: NodePath | null = null
   traverseFn(ast, {
     enter(path: NodePath) {

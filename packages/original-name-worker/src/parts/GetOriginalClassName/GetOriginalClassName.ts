@@ -25,7 +25,7 @@ export const getOriginalClassName = (
     if (sourceContent.includes('class extends ') && !sourceContent.match(/class\s+\w+\s+extends/)) {
       processedSource = sourceContent.replace(/class\s+extends/g, 'class AnonymousClass extends')
     }
-    
+
     ast = parse(processedSource, {
       sourceType: 'unambiguous',
       plugins: ['classProperties', 'classPrivateProperties', 'classPrivateMethods', 'decorators-legacy', 'jsx', 'typescript'],
@@ -38,9 +38,9 @@ export const getOriginalClassName = (
   }
 
   // Handle different module formats for @babel/traverse
-  const traverseFn = 
-    typeof traverse === 'function' 
-      ? traverse 
+  const traverseFn =
+    typeof traverse === 'function'
+      ? traverse
       : (traverse as any).default || (traverse as any).traverse
 
   let bestPath: NodePath | null = null
