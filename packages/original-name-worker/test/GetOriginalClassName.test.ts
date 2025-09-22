@@ -240,3 +240,85 @@ test('getOriginalClassName - decorator on method (ts)', () => {
   const originalColumn = 3
   expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('Controller.run')
 })
+
+test('getOriginalClassName - method of function', () => {
+  const sourceContent = `export const MenuRegistry: IMenuRegistry = new class implements IMenuRegistry {
+
+	private readonly _commands = new Map<string, ICommandAction>();
+	private readonly _menuItems = new Map<MenuId, LinkedList<IMenuItem | ISubmenuItem>>();
+	private readonly _onDidChangeMenu = new MicrotaskEmitter<IMenuRegistryChangeEvent>({
+		merge: MenuRegistryChangeEvent.merge
+	});
+
+	readonly onDidChangeMenu: Event<IMenuRegistryChangeEvent> = this._onDidChangeMenu.event;
+
+	addCommand(command: ICommandAction): IDisposable {
+		this._commands.set(command.id, command);
+		this._onDidChangeMenu.fire(MenuRegistryChangeEvent.for(MenuId.CommandPalette));
+
+		return markAsSingleton(toDisposable(() => {
+			if (this._commands.delete(command.id)) {
+				this._onDidChangeMenu.fire(MenuRegistryChangeEvent.for(MenuId.CommandPalette));
+			}
+		}));
+	}
+
+	getCommand(id: string): ICommandAction | undefined {
+		return this._commands.get(id);
+	}
+
+	getCommands(): ICommandsMap {
+		const map = new Map<string, ICommandAction>();
+		this._commands.forEach((value, key) => map.set(key, value));
+		return map;
+	}
+
+	appendMenuItem(id: MenuId, item: IMenuItem | ISubmenuItem): IDisposable {
+		let list = this._menuItems.get(id);
+		if (!list) {
+			list = new LinkedList();
+			this._menuItems.set(id, list);
+		}
+		const rm = list.push(item);
+		this._onDidChangeMenu.fire(MenuRegistryChangeEvent.for(id));
+		return markAsSingleton(toDisposable(() => {
+			rm();
+			this._onDidChangeMenu.fire(MenuRegistryChangeEvent.for(id));
+		}));
+	}
+}
+`
+  const originalLine = 39
+  const originalColumn = 38
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe(
+    'unknown in test.ts',
+  )
+})
+
+test('getOriginalClassName - class getter', () => {
+  const sourceContent = `export class Emitter<T> {
+
+	private readonly _options?: EmitterOptions;
+	private readonly _leakageMon?: LeakageMonitor;
+	private readonly _perfMon?: EventProfiling;
+	private _disposed?: true;
+	private _event?: Event<T>;
+	protected _listeners?: ListenerOrListeners<T>;
+	private _deliveryQueue?: EventDeliveryQueuePrivate;
+	protected _size = 0;
+
+	constructor(options?: EmitterOptions) {}
+
+	dispose() {}
+
+	get event(): Event<T> {
+		this._event ??= (callback: (e: T) => unknown, thisArgs?: any, disposables?: IDisposable[] | DisposableStore) => {
+			return undefined;
+		};
+		return this._event;
+	}
+}`
+  const originalLine = 16
+  const originalColumn = 19
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('Emitter.event')
+})
