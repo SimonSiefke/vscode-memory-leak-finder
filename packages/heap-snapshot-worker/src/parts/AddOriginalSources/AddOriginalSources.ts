@@ -88,7 +88,21 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
       commandMap: {},
     })
     const extendedOriginalNames = true
-    const cleanPositionMap = await rpc.invoke('SourceMap.getCleanPositionsMap', sourceMapUrlToPositions, extendedOriginalNames)
+    console.log('querying sourcemap worker')
+    console.log('items', Object.values(sourceMapUrlToPositions).flat(1).length)
+    const partitioned: any[] = []
+    for (const [key, value] of Object.entries(sourceMapUrlToPositions)) {
+      partitioned.push({
+        [key]: value,
+      })
+    }
+    let cleanPositionMap = Object.create(null)
+    for (const item of partitioned) {
+      const index = partitioned.indexOf(item)
+      console.log(`processing ${index} of ${partitioned.length}`)
+      const currentCleanPositionMap = await rpc.invoke('SourceMap.getCleanPositionsMap', item, extendedOriginalNames)
+      cleanPositionMap = { ...cleanPositionMap, ...currentCleanPositionMap }
+    }
     await rpc.dispose()
 
     const offsetMap: Record<string, number> = Object.create(null)
