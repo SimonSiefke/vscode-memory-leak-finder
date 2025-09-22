@@ -8,9 +8,14 @@ import { isLocationInside } from '../IsLocationInside/IsLocationInside.ts'
 
 const LOCATION_UNKNOWN: string = 'unknown'
 
-export const getOriginalClassName = (sourceContent: string, originalLine: number, originalColumn: number): string => {
+export const getOriginalClassName = (
+  sourceContent: string,
+  originalLine: number,
+  originalColumn: number,
+  originalFileName: string,
+): string => {
   if (!sourceContent) {
-    return LOCATION_UNKNOWN
+    return LOCATION_UNKNOWN + ' in ' + originalFileName
   }
 
   if (sourceContent.includes('class extends ')) {
@@ -30,7 +35,7 @@ export const getOriginalClassName = (sourceContent: string, originalLine: number
       tokens: false,
     }) as unknown as t.File
   } catch {
-    return LOCATION_UNKNOWN
+    return LOCATION_UNKNOWN + ' in ' + originalFileName
   }
 
   const tAny = traverse as unknown as { default?: unknown; traverse?: unknown }
