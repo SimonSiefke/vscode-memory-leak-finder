@@ -126,7 +126,7 @@ test('getOriginalClassName - getter method', () => {
 }`
   const originalLine = 2
   const originalColumn = 4
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('Store.value')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('Store.get value')
 })
 
 test('getOriginalClassName - function expression', () => {
