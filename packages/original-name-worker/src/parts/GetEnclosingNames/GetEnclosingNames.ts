@@ -76,6 +76,12 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
       if (className) {
         return className
       }
+      
+      // Handle anonymous class declarations (class extends ...)
+      if (current.isClassDeclaration() && !current.node.id) {
+        const superClassName = getSuperClassName(current)
+        return superClassName ? `class extends ${superClassName}` : 'class extends unknown'
+      }
     }
 
     // Check for function declarations
@@ -105,11 +111,6 @@ const getClassName = (classPath: NodePath): string | undefined => {
 
   if (classPath.isClassDeclaration()) {
     if ('id' in cls && cls.id && typeof cls.id === 'object' && 'name' in cls.id && typeof cls.id.name === 'string') {
-      // Handle the special case where we added "AnonymousClass" for "class extends" syntax
-      if (cls.id.name === 'AnonymousClass' && 'superClass' in cls && cls.superClass) {
-        const superName = cls.superClass && typeof cls.superClass === 'object' && 'type' in cls.superClass && cls.superClass.type === 'Identifier' && 'name' in cls.superClass && typeof cls.superClass.name === 'string' ? cls.superClass.name : 'unknown'
-        return `class extends ${superName}`
-      }
       return cls.id.name
     }
   }
@@ -158,5 +159,36 @@ const getFunctionName = (functionPath: NodePath): string | undefined => {
     }
   }
 
+  return undefined
+}
+
+const getSuperClassName = (classPath: NodePath): string | undefined => {
+  const cls = classPath.node
+  
+  if ('superClass' in cls && cls.superClass) {
+    if (typeof cls.superClass === 'object' && 'type' in cls.superClass) {
+      if (cls.superClass.type === 'Identifier' && 'name' in cls.superClass && typeof cls.superClass.name === 'string') {
+        return cls.superClass.name
+      }
+      if (cls.superClass.type === 'MemberExpression') {
+        // Handle cases like SomeClass.someProperty
+        return getMemberExpressionName(cls.superClass)
+      }
+    }
+  }
+  
+  return undefined
+}
+
+const getMemberExpressionName = (memberExpr: any): string | undefined => {
+  if (memberExpr.type === 'MemberExpression') {
+    const object = memberExpr.object
+    const property = memberExpr.property
+    
+    if (object && object.type === 'Identifier' && property && property.type === 'Identifier') {
+      return `${object.name}.${property.name}`
+    }
+  }
+  
   return undefined
 }

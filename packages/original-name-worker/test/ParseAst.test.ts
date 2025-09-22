@@ -14,7 +14,7 @@ test('parseAst - simple class', () => {
   expect(ast.program.body[0].type).toBe('ClassDeclaration')
 })
 
-test('parseAst - anonymous class extends', () => {
+test('parseAst - class expression extends', () => {
   const sourceContent = `const abc = class extends Test {
     constructor(value) {
       this.value = value
@@ -24,12 +24,13 @@ test('parseAst - anonymous class extends', () => {
   const ast = parseAst(sourceContent)
   expect(ast.type).toBe('File')
   expect(ast.program.body).toHaveLength(1)
-  expect(ast.program.body[0].type).toBe('ClassDeclaration')
+  expect(ast.program.body[0].type).toBe('VariableDeclaration')
 
-  // Check that the class name was added
-  const classDecl = ast.program.body[0] as any
-  expect(classDecl.id.name).toBe('AnonymousClass')
-  expect(classDecl.superClass.name).toBe('Test')
+  // Check that it's a class expression
+  const varDecl = ast.program.body[0] as any
+  expect(varDecl.declarations[0].id.name).toBe('abc')
+  expect(varDecl.declarations[0].init.type).toBe('ClassExpression')
+  expect(varDecl.declarations[0].init.superClass.name).toBe('Test')
 })
 
 test('parseAst - class with extends and name', () => {

@@ -42,16 +42,14 @@ test('getOriginalClassName - typescript constructor', () => {
 })
 
 test('getOriginalClassName - extends', () => {
-  const sourceContent = `class extends Test {
+  const sourceContent = `const A = class extends Test {
   constructor(value){
     this.value = value
   }
 }`
   const originalLine = 1
   const originalColumn = 14
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe(
-    'class extends Test',
-  )
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('A')
 })
 
 test('getOriginalClassName - class method', () => {
