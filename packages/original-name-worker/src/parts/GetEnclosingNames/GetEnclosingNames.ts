@@ -17,7 +17,6 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
       continue
     }
 
-
     if (current.isClassMethod() || current.isClassPrivateMethod()) {
       const methodNode = current.node
       if (methodNode.kind === 'constructor') {
