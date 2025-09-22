@@ -34,7 +34,9 @@ export const getOriginalClassName = (
       tokens: false,
     }) as unknown as t.File
   } catch {
-    return LOCATION_UNKNOWN + ' in ' + originalFileName
+    // If AST parsing fails, fall back to scanning
+    const fallback: string = fallbackScan(sourceContent, originalLine)
+    return fallback
   }
 
   let bestPath: NodePath | null = null

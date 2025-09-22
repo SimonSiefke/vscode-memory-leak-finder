@@ -2546,7 +2546,9 @@ function getTerminals(node: ContextKeyExpression) {
 	return [node];
 }
 `
-  const originalLine = 1584
+  const originalLine = 1575
   const originalColumn = 18
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('ContextKeyAndExpr')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe(
+    'ContextKeyNotRegexExpr',
+  )
 })
