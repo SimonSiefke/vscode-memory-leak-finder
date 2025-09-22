@@ -23,8 +23,8 @@ export const getOriginalClassName = (
     let processedSource = sourceContent
 
     ast = parse(processedSource, {
-      sourceType: 'unambiguous',
-      plugins: ['classProperties', 'classPrivateProperties', 'classPrivateMethods', 'decorators-legacy', 'jsx', 'typescript'],
+      sourceType: 'module',
+      plugins: ['typescript', 'classProperties', 'decorators-legacy'],
       ranges: false,
       errorRecovery: true,
       tokens: false,
