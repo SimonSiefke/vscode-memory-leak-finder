@@ -23,6 +23,13 @@ export const fallbackScan = (sourceContent: string, originalLine: number): strin
             return `class extends ` + otherMatch[0]
           }
         }
+        if (originalClassName === 'implements') {
+          // For "class implements", look for variable assignment
+          const varMatch: RegExpMatchArray | null = line.match(/(?:const|let|var)\s+(\w+).*=.*class\s+implements/)
+          if (varMatch) {
+            return varMatch[1]
+          }
+        }
         return originalClassName
       }
     }
