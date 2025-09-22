@@ -11,7 +11,11 @@ const getFirstNodePath = (code: string): NodePath => {
     plugins: ['classProperties', 'classPrivateProperties', 'classPrivateMethods', 'decorators-legacy', 'jsx', 'typescript'],
     errorRecovery: true,
   }) as unknown as t.File
-  const traverseFn = traverse
+  // Handle different module formats for @babel/traverse
+  const traverseFn = 
+    typeof traverse === 'function' 
+      ? traverse 
+      : (traverse as any).default || (traverse as any).traverse
   let found: NodePath | null = null
   traverseFn(ast, {
     enter(path: NodePath) {
