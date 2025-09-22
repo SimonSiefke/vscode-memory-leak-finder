@@ -1,7 +1,7 @@
 import type { NodePath } from '@babel/traverse'
 import type * as t from '@babel/types'
 import { parse } from '@babel/parser'
-import traverse from '@babel/traverse'
+import { default as traverse } from '@babel/traverse'
 import { fallbackScan } from '../FallbackScan/FallbackScan.ts'
 import { getEnclosingNames } from '../GetEnclosingNames/GetEnclosingNames.ts'
 import { isLocationInside } from '../IsLocationInside/IsLocationInside.ts'
@@ -37,17 +37,7 @@ export const getOriginalClassName = (
     return LOCATION_UNKNOWN + ' in ' + originalFileName
   }
 
-  const tAny = traverse as unknown as { default?: unknown; traverse?: unknown }
-  const traverseFn =
-    typeof (traverse as unknown) === 'function'
-      ? (traverse as unknown as (ast: t.File, visitors: unknown) => void)
-      : typeof tAny.default === 'function'
-        ? (tAny.default as unknown as (ast: t.File, visitors: unknown) => void)
-        : typeof tAny.traverse === 'function'
-          ? (tAny.traverse as unknown as (ast: t.File, visitors: unknown) => void)
-          : typeof (tAny.default as { default?: unknown })?.default === 'function'
-            ? ((tAny.default as { default?: unknown }).default as (ast: t.File, visitors: unknown) => void)
-            : (null as unknown as (ast: t.File, visitors: unknown) => void)
+  const traverseFn = traverse
 
   let bestPath: NodePath | null = null
   traverseFn(ast, {

@@ -12,17 +12,7 @@ const findBestPathAt = (code: string, line: number, column: number): NodePath =>
     errorRecovery: true,
   }) as unknown as t.File
 
-  const tAny = traverse as unknown as { default?: unknown; traverse?: unknown }
-  const traverseFn =
-    typeof (traverse as unknown) === 'function'
-      ? (traverse as unknown as (ast: t.File, visitors: unknown) => void)
-      : typeof tAny.default === 'function'
-        ? (tAny.default as unknown as (ast: t.File, visitors: unknown) => void)
-        : typeof tAny.traverse === 'function'
-          ? (tAny.traverse as unknown as (ast: t.File, visitors: unknown) => void)
-          : typeof (tAny.default as { default?: unknown })?.default === 'function'
-            ? ((tAny.default as { default?: unknown }).default as (ast: t.File, visitors: unknown) => void)
-            : (null as unknown as (ast: t.File, visitors: unknown) => void)
+  const traverseFn = traverse
   let best: NodePath | null = null
   traverseFn(ast, {
     enter(path: NodePath) {
