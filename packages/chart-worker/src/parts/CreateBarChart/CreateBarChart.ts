@@ -7,9 +7,14 @@ export const createBarChart = (data: any, options: any): string => {
   const fontSize = options.fontSize || 7
   const width = options.width || 640
 
+  const dataCount = data.length
+  const lineHeight = fontSize + 6
+  const height = dataCount * lineHeight
+
   const baseHtml = Plot.plot({
     style: 'overflow: visible;background:white',
-    width: width,
+    width,
+    height,
     marginLeft: marginLeft,
     marginRight: marginRight,
     x: { axis: null },
