@@ -4,6 +4,7 @@
 /workspaces/vscode/src/bootstrap-fork.ts
   120:20  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/base/browser/dom.ts
     31:2   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
     32:2   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -14,12 +15,15 @@
     38:2   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    365:22  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/base/browser/ui/actionbar/actionbar.ts
   577:26  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   581:63  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/base/browser/ui/grid/grid.ts
   311:47  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/base/browser/ui/grid/gridview.ts
    462:54  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -27,12 +31,15 @@
    664:61  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    668:44  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/base/browser/ui/inputbox/inputBox.ts
   180:45  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   181:42  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/base/browser/ui/list/listView.ts
    442:35  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/base/browser/ui/list/listWidget.ts
    506:11   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -42,13 +49,14 @@
    690:23   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    691:25   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    692:22   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
-   696:116  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   1480:61   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   1529:25   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   1530:29   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/base/browser/ui/menu/menubar.ts
   118:61  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/base/browser/ui/selectBox/selectBoxCustom.ts
   772:104  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -62,17 +70,19 @@
   780:102  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   781:208  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/base/browser/ui/splitview/paneview.ts
   533:34  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   544:40  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/base/browser/ui/splitview/splitview.ts
   1174:39  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   1176:41  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   1178:35  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/base/browser/ui/tree/abstractTree.ts
-   363:52  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    364:38  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    395:35  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   1013:32  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -82,32 +92,41 @@
   2663:81  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   2664:76  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/base/browser/ui/tree/asyncDataTree.ts
    629:38  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/base/common/cancellation.ts
   103:67  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/base/common/decorators.ts
   40:8  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/base/common/event.ts
    206:22  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   1697:46  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   1712:36  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/base/common/map.ts
   166:25  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/base/common/objects.ts
   42:25  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/base/common/observableInternal/experimental/reducer.ts
   51:39  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/base/common/observableInternal/logging/consoleObservableLogger.ts
   82:33  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   88:31  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/base/common/path.ts
   1577:45  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -133,8 +152,10 @@
   1587:52  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   1587:77  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/base/common/resources.ts
   211:31  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/base/common/stream.ts
   160:10  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -142,14 +163,18 @@
   160:41  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   160:59  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/base/common/types.ts
   210:24  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/base/parts/ipc/common/ipc.ts
    939:28   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/base/parts/ipc/node/ipc.cp.ts
   159:22  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/base/test/common/event.test.ts
   129:40  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -157,6 +182,7 @@
   265:40  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   837:27  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   855:27  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/base/test/common/path.test.ts
    44:6   error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -170,14 +196,18 @@
   534:5   error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   562:5   error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/base/test/common/timeTravelScheduler.ts
   327:40  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/code/electron-main/main.ts
   149:40  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/browser/editorExtensions.ts
   120:27  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/browser/observableCodeEditor.ts
    81:57   error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -186,47 +216,60 @@
   136:62   error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   369:149  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/browser/services/hoverService/hoverWidget.ts
   109:23  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   174:21  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/browser/viewParts/contentWidgets/contentWidgets.ts
   461:38  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   569:16  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   590:15  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/browser/viewParts/minimap/minimap.ts
   1544:20  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/browser/viewParts/overviewRuler/decorationsOverviewRuler.ts
   367:20  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/browser/viewParts/viewLines/rangeUtil.ts
   53:15  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/browser/widget/diffEditor/components/diffEditorEditors.ts
   69:62  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/browser/widget/multiDiffEditor/multiDiffEditorWidgetImpl.ts
   454:48  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/common/core/edits/stringEdit.ts
   307:34  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/common/core/edits/textEdit.ts
   36:63  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/common/cursor/cursor.ts
   723:24  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   725:19  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/common/cursor/cursorCollection.ts
    78:41  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    85:41  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   179:50  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/common/cursor/cursorTypeEditOperations.ts
   659:33  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/common/cursor/cursorWordOperations.ts
   820:19  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -234,63 +277,80 @@
   840:19  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   850:19  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/common/languageFeatureRegistry.ts
   191:22  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/common/languages/languageConfigurationRegistry.ts
   234:22  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/common/model/bracketPairsTextModelPart/bracketPairsImpl.ts
   178:7  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/common/model/pieceTreeTextBuffer/pieceTreeTextBuffer.ts
   305:19  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   480:19  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/common/model/textModel.ts
   2577:81  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   2584:77  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/common/services/languagesRegistry.ts
   18:24  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/common/services/markerDecorationsService.ts
   41:44  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   42:46  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   43:54  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/common/viewLayout/viewLineRenderer.ts
    94:47  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   851:24  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/common/viewModel.ts
   437:30  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/common/viewModel/overviewZoneManager.ts
   121:20  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   244:22  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/common/viewModel/viewModelImpl.ts
   949:20  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/common/viewModel/viewModelLines.ts
    144:114  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    183:112  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   1019:20   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/bracketMatching/browser/bracketMatching.ts
   247:19  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   369:19  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/codeAction/browser/codeAction.ts
   81:39  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/contrib/codelens/browser/codelensController.ts
    68:79  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/codelens/browser/codelensWidget.ts
   257:31  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   280:31  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/contrib/colorPicker/browser/colorPickerParts/colorPickerBody.ts
   33:50  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -300,102 +360,131 @@
   43:45  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   44:48  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/colorPicker/browser/colorPickerParts/colorPickerHeader.ts
   55:41   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   56:48   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/colorPicker/browser/colorPickerParts/colorPickerSaturationBox.ts
    48:46  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/colorPicker/browser/colorPickerParts/colorPickerStrip.ts
   42:41  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/contrib/documentSymbols/browser/outlineModel.ts
   149:64  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   342:15  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/documentSymbols/test/browser/outlineModel.test.ts
   139:13  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/contrib/dropOrPasteInto/browser/copyPasteController.ts
   492:16  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/find/browser/findController.ts
   998:76  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/contrib/find/test/browser/findModel.test.ts
   83:27  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   84:23  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/format/browser/format.ts
   153:50  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/contrib/format/browser/formatActions.ts
    45:91   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   170:100  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/gotoError/browser/gotoError.ts
   290:74  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/contrib/gotoSymbol/browser/goToCommands.ts
   775:83  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   818:83  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/gotoSymbol/browser/referencesModel.ts
   164:14  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/contrib/gotoSymbol/browser/symbolNavigation.ts
   193:58  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   194:55  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   195:43  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/hover/browser/markdownHoverParticipant.ts
   195:4  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   492:4  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/inlayHints/browser/inlayHintsController.ts
   439:42  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/inlineCompletions/browser/utils.ts
   44:84  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/contrib/linesOperations/browser/linesOperations.ts
    789:23  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    869:23  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    900:19  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/linesOperations/browser/sortLinesCommand.ts
   83:14  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/contrib/linkedEditing/browser/linkedEditing.ts
   441:90  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/message/browser/messageController.ts
   128:76  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/contrib/multicursor/browser/multicursor.ts
    831:33  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   1008:19  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/parameterHints/browser/parameterHints.ts
   103:90  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/contrib/parameterHints/browser/parameterHintsModel.ts
    89:45  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/rename/browser/rename.ts
   402:74  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/contrib/rename/browser/renameWidget.ts
    184:61  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/snippet/browser/snippetController2.ts
   337:74  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/contrib/snippet/browser/snippetParser.ts
   313:24  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   810:34  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   925:31  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/contrib/snippet/browser/snippetSession.ts
    48:60  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -404,33 +493,42 @@
   785:19  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   793:16  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/suggest/browser/completionModel.ts
   43:39  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   72:29  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   74:29  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/suggest/browser/suggestCommitCharacters.ts
   35:43  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   36:42  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/contrib/suggest/browser/suggestController.ts
   214:31  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   856:76  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/suggest/browser/wordDistance.ts
   65:70  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/contrib/wordHighlighter/browser/wordHighlighter.ts
   386:11  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/contrib/wordOperations/test/browser/wordTestUtils.ts
   33:17  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/standalone/browser/quickInput/standaloneQuickInputService.ts
    93:29  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/standalone/browser/standaloneLanguages.ts
   574:22  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/editor/test/common/core/cursorColumns.test.ts
   205:25  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -438,28 +536,35 @@
   242:25  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   243:25  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/editor/test/common/model/textModelWithTokens.test.ts
   168:16  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   170:15  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/platform/actionWidget/browser/actionList.ts
   359:48  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   363:44  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/platform/actions/common/actions.ts
   411:10  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/platform/actions/common/menuService.ts
   247:52  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   314:25  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/platform/contextkey/common/contextkey.ts
     36:24  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/platform/contextview/browser/contextMenuHandler.ts
   86:27  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   88:30  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   91:46  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
   197:3  warning  Member 'options: {
 			readonly type: string;
@@ -469,35 +574,45 @@
    970:13  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   1061:13  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/platform/log/common/bufferLog.ts
   29:63  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/platform/markers/common/markerService.ts
    93:48  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   156:10  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/platform/native/electron-main/auth.ts
   67:26  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/platform/quickinput/browser/quickInputController.ts
   215:127  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/platform/registry/test/common/platform.test.ts
   16:24  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   17:24  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   18:24  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/platform/request/electron-utility/requestService.ts
   15:9  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/platform/terminal/node/ptyHostService.ts
   111:69  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/platform/terminal/node/ptyService.ts
   148:52  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/platform/terminal/node/terminalProfiles.ts
   482:87  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/platform/update/electron-main/updateService.darwin.ts
   61:19  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -505,21 +620,27 @@
   63:30  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   64:32  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/platform/windows/node/windowTracker.ts
   17:59  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   26:24  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/api/browser/mainThreadChatAgents2.ts
   223:13  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/api/browser/mainThreadChatCodeMapper.ts
   67:27  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/api/browser/mainThreadDiagnostics.ts
   32:62  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/api/browser/mainThreadDocuments.ts
   152:56  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/api/browser/mainThreadDocumentsAndEditors.ts
   128:35  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -531,11 +652,14 @@
   377:27  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   378:25  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/api/browser/mainThreadEditor.ts
   348:40  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/api/browser/mainThreadFileSystem.ts
   220:38  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/api/browser/mainThreadLanguageFeatures.ts
    140:17  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -551,33 +675,40 @@
   1091:27  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   1098:25  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/api/browser/mainThreadNotebookDocumentsAndEditors.ts
   117:54  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   118:57  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   187:45  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   188:41  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/api/browser/mainThreadNotebookKernels.ts
   137:55  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   138:48  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   139:51  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/api/browser/mainThreadTesting.ts
   295:63  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/api/browser/mainThreadWindow.ts
   31:5   error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   32:43  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/api/browser/mainThreadWorkspace.ts
    70:52  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    71:50  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    72:58  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/api/common/extHostApiCommands.ts
    55:59  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    65:21  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   586:23  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/api/common/extHostChatAgents2.ts
   139:18  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -597,17 +728,20 @@
   287:18  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   296:18  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/api/common/extHostCommands.ts
   363:66  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/api/common/extHostDiagnostics.ts
    94:28   error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
-  251:119  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/api/common/extHostFileSystemEventService.ts
   248:61  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   251:61  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   254:61  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/api/common/extHostLanguageFeatures.ts
   1734:33   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -615,17 +749,22 @@
   2897:27   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   2909:31   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/api/common/extHostLanguageModelTools.ts
   107:38  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/api/common/extHostNotebookEditor.ts
   49:48  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/api/common/extHostQuickOpen.ts
   158:26  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/api/common/extHostTerminalService.ts
    464:45  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/api/common/extHostTypes.ts
    283:31  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -636,15 +775,19 @@
   2204:87  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   2207:85  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/api/common/extHostTypes/diagnostic.ts
   105:58  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/api/common/extensionHostMain.ts
   190:31  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   210:31  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/api/node/extHostConsoleForwarder.ts
   44:20  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/api/node/extHostSearch.ts
    51:122  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -652,58 +795,73 @@
   100:112  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   101:119  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/api/test/browser/extHostConfiguration.test.ts
   749:41  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/api/test/common/extensionHostMain.test.ts
   96:30  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/browser/parts/compositeBarActions.ts
   179:58  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/browser/parts/dialogs/dialogHandler.ts
   101:21  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/browser/parts/editor/breadcrumbsControl.ts
   293:32  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   294:31  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   295:33  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/browser/parts/editor/breadcrumbsModel.ts
   62:54  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/browser/parts/editor/editorStatus.ts
    104:19  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    104:48  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   1088:22  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/browser/parts/notifications/notificationAccessibleView.ts
   115:26  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/browser/parts/paneCompositePart.ts
   198:47  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/browser/parts/views/viewFilter.ts
   181:87  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   182:85  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/browser/parts/views/viewPane.ts
   174:45  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   176:5   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   479:51  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/browser/window.ts
    58:25  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   112:30  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   115:32  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/authentication/browser/actions/manageTrustedExtensionsForAccountAction.ts
   143:48  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   145:50  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/authentication/browser/actions/manageTrustedMcpServersForAccountAction.ts
   135:45  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   137:47  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/bulkEdit/browser/bulkTextEdits.ts
   101:10  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -711,14 +869,17 @@
   246:20  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   256:24  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/bulkEdit/browser/opaqueEdits.ts
   21:50  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   29:53  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   29:64  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/bulkEdit/browser/preview/bulkEditPane.ts
   147:50  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   196:57  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/bulkEdit/test/browser/bulkEditPreview.test.ts
    57:49  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -727,42 +888,51 @@
   100:49  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   127:49  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
-/workspaces/vscode/src/vs/workbench/contrib/callHierarchy/browser/callHierarchy.contribution.ts
-  128:88  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/callHierarchy/browser/callHierarchyPeek.ts
    99:60  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   243:53  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/chat/browser/chatContentParts/chatElicitationContentPart.ts
   39:11  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/chat/browser/chatContentParts/chatTextEditContentPart.ts
   224:30  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/chat/browser/chatEditing/chatEditingModifiedNotebookEntry.ts
   197:56  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/chat/browser/chatEditing/chatEditingTextModelChangeService.ts
   166:30  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   192:33  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   228:30  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/chat/browser/chatEditing/notebook/chatEditingNotebookEditorIntegration.ts
   254:12  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   255:12  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/chat/browser/codeBlockPart.ts
   966:29  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/chat/browser/tools/toolSetsContribution.ts
   145:4  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/chat/common/chatService.ts
   79:68  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/codeEditor/electron-browser/selectionClipboard.ts
   48:21  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
   74:3   warning  Member '_containerDelegate: {
 			actionRunner: (() => void) | null;
@@ -771,24 +941,30 @@
 /workspaces/vscode/src/vs/workbench/contrib/comments/browser/commentThreadZoneWidget.ts
   160:69  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/comments/browser/comments.contribution.ts
   162:65  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   163:65  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   164:63  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/comments/browser/commentsModel.ts
   143:47  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/comments/browser/commentsView.ts
   262:64  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   263:64  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   264:62  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/debug/browser/breakpointsView.ts
    164:42  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/debug/browser/debugAdapterManager.ts
   290:91  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/debug/browser/debugConfigurationManager.ts
   156:73   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -797,15 +973,19 @@
   217:130  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   274:137  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/debug/browser/debugService.ts
    143:61  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/debug/browser/statusbarColorProvider.ts
   74:38  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   75:49  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/extensions/browser/extensionEditor.ts
   419:26  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/extensions/browser/extensionRecommendationNotificationService.ts
   276:5    error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -813,17 +993,19 @@
   276:72   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   276:106  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
-/workspaces/vscode/src/vs/workbench/contrib/extensions/browser/extensionsViewlet.ts
-  978:211  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/extensions/common/extensions.ts
   220:54  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/extensions/electron-browser/extensionsAutoProfiler.ts
   64:79  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/folding/browser/folding.contribution.ts
   33:64  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/format/browser/formatActionsMultiple.ts
    62:64  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -831,8 +1013,10 @@
    65:87  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    66:92  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/inlineChat/browser/inlineChatController.ts
   1054:42  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/inlineChat/browser/inlineChatSession.ts
   330:36  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -841,14 +1025,17 @@
   482:36  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   483:36  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/inlineChat/browser/inlineChatStrategies.ts
   159:79  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   410:46  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/inlineChat/test/browser/inlineChatController.test.ts
   537:37  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   586:37  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   813:37  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/interactive/browser/interactiveEditor.ts
   178:65   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -856,60 +1043,76 @@
   491:91   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   492:92   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/languageStatus/browser/languageStatus.ts
   115:112  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   119:38   error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   120:42   error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   196:36   error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/limitIndicator/browser/limitIndicator.contribution.ts
   151:3   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   153:3   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/markers/browser/markersModel.ts
    55:69  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/markers/browser/markersTreeViewer.ts
   161:30  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/markers/browser/markersView.ts
   449:56  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   450:63  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/mcp/browser/mcpServerEditor.ts
   293:26  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/mcp/common/discovery/installedMcpServersDiscovery.ts
   85:13  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   85:25  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/mcp/common/mcpServerRequestHandler.ts
   155:3  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   156:3  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/mcp/common/mcpTypes.ts
   718:47  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/mergeEditor/browser/model/modifiedBaseRange.ts
   164:41  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/mergeEditor/browser/view/lineAlignment.ts
   146:43  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/notebook/browser/contrib/cellStatusBar/contributedStatusBarItemController.ts
    28:57  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    31:74  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    32:70  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/notebook/browser/contrib/cellStatusBar/executionStatusBarItemController.ts
    50:57  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/notebook/browser/contrib/cellStatusBar/notebookVisibleCellObserver.ts
   33:64  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   34:56  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/notebook/browser/contrib/format/formatting.ts
   76:76  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/notebook/browser/contrib/saveParticipants/saveParticipants.ts
    87:81  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -917,26 +1120,34 @@
   440:53  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   484:61  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/notebook/browser/controller/chat/notebookChatController.ts
   702:42  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/notebook/browser/diff/inlineDiff/notebookInlineDiffWidget.ts
   93:94  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/notebook/browser/notebook.contribution.ts
   775:5  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/notebook/browser/notebookEditor.ts
   217:97  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/notebook/browser/services/notebookKernelServiceImpl.ts
   136:60  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/notebook/browser/view/cellParts/cellComments.ts
   39:58  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/notebook/browser/viewParts/notebookEditorToolbar.ts
   278:5  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/notebook/browser/viewParts/notebookEditorWidgetContextKeys.ts
   62:50  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -948,6 +1159,7 @@
   68:77  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   69:84  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/notebook/browser/viewParts/notebookKernelView.ts
   161:43  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   162:56  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -957,19 +1169,24 @@
   166:66  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   167:73  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/performance/browser/perfviewEditor.ts
   129:83  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/performance/electron-browser/rendererAutoProfiler.ts
   41:35  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   41:54  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/preferences/browser/settingsWidgets.ts
   1161:44  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   1200:25  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/remote/browser/remoteExplorer.ts
   697:103  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/replNotebook/browser/replEditor.ts
   169:65   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -978,24 +1195,29 @@
   474:92   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   537:84   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/sash/browser/sash.ts
   29:19  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   33:25  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/scm/browser/menus.ts
    44:25  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   207:38  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   336:36  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/scm/browser/quickDiffDecorator.ts
   252:43  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   256:52  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   260:57  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/scm/browser/quickDiffModel.ts
   144:6   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   146:48  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   206:60  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/scm/browser/quickDiffWidget.ts
   171:60  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -1003,11 +1225,13 @@
   628:54  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   634:20  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/scm/browser/scmHistoryViewPane.ts
   1079:37  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   1080:40  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   1896:24  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   1897:28  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/scm/browser/scmRepositoriesViewPane.ts
   231:49  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -1015,6 +1239,7 @@
   233:39  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   234:42  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   235:53  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/scm/browser/scmViewPane.ts
    556:38   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -1030,23 +1255,29 @@
   2413:25   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   2414:117  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/scm/browser/scmViewService.ts
   282:33  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   283:36  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   289:34  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/scm/browser/workingSet.ts
   56:39  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   57:42  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/search/browser/searchView.ts
    556:61  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/snippets/browser/snippetCompletionProvider.ts
   188:20  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/snippets/browser/tabCompletion.ts
   193:88  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/tasks/browser/abstractTaskService.ts
   3274:6   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -1054,9 +1285,11 @@
   3282:6   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   3282:41  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/terminal/browser/terminalEditorService.ts
   183:24  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   184:24  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/terminal/browser/terminalService.ts
    203:68  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -1065,30 +1298,38 @@
    852:47  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   1023:25  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/terminalContrib/chatAgentTools/test/browser/commandLineAutoApprover.test.ts
   836:28  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   837:29  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   879:28  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   880:29  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/terminalContrib/links/browser/terminalExternalLinkDetector.ts
   47:15  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/terminalContrib/quickFix/browser/quickFixAddon.ts
   478:18  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/testing/browser/codeCoverageDecorations.ts
   230:13  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   822:47  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/testing/browser/testCoverageView.ts
   727:51  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/testing/browser/testingExplorerFilter.ts
   58:63  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/testing/browser/testingExplorerView.ts
    577:49  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/testing/browser/testingOutputPeek.ts
   135:44  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -1097,12 +1338,15 @@
   465:44  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   703:60  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/testing/common/testItemCollection.ts
   364:24  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   450:20  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/testing/common/testResultService.ts
   195:27  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/timeline/browser/timelinePane.ts
    292:112  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -1111,55 +1355,68 @@
    295:54   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    888:47   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
-/workspaces/vscode/src/vs/workbench/contrib/typeHierarchy/browser/typeHierarchy.contribution.ts
-  101:88  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/typeHierarchy/browser/typeHierarchyPeek.ts
   100:60  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   244:53  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/update/browser/releaseNotesEditor.ts
   68:65  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   69:74  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/contrib/update/browser/update.ts
   185:46  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/contrib/webview/browser/webviewElement.ts
   499:94  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/electron-browser/parts/titlebar/menubarControl.ts
   135:55  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/electron-browser/window.ts
   455:29  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   512:35  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   512:42  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/services/decorations/browser/decorationsService.ts
   32:20  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/services/dialogs/electron-browser/fileDialogService.ts
   205:106  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/services/extensions/common/extensionHostManager.ts
   641:78  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/services/extensions/common/extensionsRegistry.ts
   532:15  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/services/preferences/common/preferencesModels.ts
    516:69  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/services/remote/common/tunnelModel.ts
    445:67  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/services/search/node/fileSearch.ts
   139:14  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/services/textfile/common/textFileEditorModel.ts
   971:33  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   971:57  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/services/textfile/common/textfiles.ts
   569:22   error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -1169,11 +1426,13 @@
   569:102  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   569:121  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/services/textfile/test/common/textFileService.io.test.ts
   43:10  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   43:18  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   43:24  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   43:34  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/services/textfile/test/node/encoding/encoding.test.ts
   234:9   error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -1181,22 +1440,27 @@
   420:4   error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   449:66  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/services/themes/browser/workbenchThemeService.ts
   118:83  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   125:89  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   132:95  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/services/workingCopy/common/storedFileWorkingCopy.ts
   1112:33  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   1112:57  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
+
 /workspaces/vscode/src/vs/workbench/test/browser/codeeditor.test.ts
   163:24  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 /workspaces/vscode/src/vs/workbench/test/browser/viewlet.test.ts
   51:21  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   52:21  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   53:21  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+
 
 ✖ 5802 problems (1343 errors, 4459 warnings)
   0 errors and 4225 warnings potentially fixable with the `--fix` option.

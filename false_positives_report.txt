@@ -1,0 +1,1138 @@
+FALSE POSITIVE ANALYSIS REPORT
+==================================================
+
+Total issues analyzed: 637
+False positives: 586
+Real issues: 51
+False positive rate: 92.0%
+
+
+/home/simon/.cache/repos/vscode/src/bootstrap-fork.ts:
+  Line 120: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/dom.ts:
+  Line 365: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/actionbar/actionbar.ts:
+  Line 577: Property access, not method call
+  Line 581: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/grid/grid.ts:
+  Line 311: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/grid/gridview.ts:
+  Line 462: Property access, not method call
+  Line 660: Property access, not method call
+  Line 664: Property access, not method call
+  Line 668: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/inputbox/inputBox.ts:
+  Line 180: Property access, not method call
+  Line 181: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/list/listView.ts:
+  Line 442: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/list/listWidget.ts:
+  Line 506: Property access, not method call
+  Line 507: Property access, not method call
+  Line 614: Property access, not method call
+  Line 689: Property access, not method call
+  Line 690: Property access, not method call
+  Line 691: Property access, not method call
+  Line 692: Property access, not method call
+  Line 696: Property access, not method call
+  Line 1480: Property access, not method call
+  Line 1529: Property access, not method call
+  Line 1530: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/menu/menubar.ts:
+  Line 118: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/selectBox/selectBoxCustom.ts:
+  Line 772: Class static method call
+  Line 773: Class static method call
+  Line 774: Class static method call
+  Line 775: Class static method call
+  Line 776: Class static method call
+  Line 777: Class static method call
+  Line 778: Class static method call
+  Line 779: Class static method call
+  Line 780: Class static method call
+  Line 781: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/splitview/paneview.ts:
+  Line 533: Property access, not method call
+  Line 544: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/splitview/splitview.ts:
+  Line 1174: Function declaration, not method call
+  Line 1176: Function declaration, not method call
+  Line 1178: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/tree/abstractTree.ts:
+  Line 363: Class static method call
+  Line 364: Property access, not method call
+  Line 395: Class static method call
+  Line 1013: Property access, not method call
+  Line 1014: Property access, not method call
+  Line 1015: Property access, not method call
+  Line 2662: Class static method call
+  Line 2663: Class static method call
+  Line 2664: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/tree/asyncDataTree.ts:
+  Line 629: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/common/cancellation.ts:
+  Line 103: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/common/decorators.ts:
+  Line 40: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/common/event.ts:
+  Line 206: Property access, not method call
+  Line 1697: Property access, not method call
+  Line 1712: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/common/map.ts:
+  Line 166: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/common/objects.ts:
+  Line 42: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/common/observableInternal/experimental/reducer.ts:
+  Line 51: Constructor call
+
+/home/simon/.cache/repos/vscode/src/vs/base/common/observableInternal/logging/consoleObservableLogger.ts:
+  Line 82: Function declaration, not method call
+  Line 88: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/common/path.ts:
+  Line 1577: Property access, not method call
+  Line 1578: Property access, not method call
+  Line 1579: Property access, not method call
+  Line 1580: Property access, not method call
+  Line 1581: Property access, not method call
+  Line 1582: Property access, not method call
+  Line 1583: Property access, not method call
+  Line 1584: Property access, not method call
+  Line 1585: Property access, not method call
+  Line 1586: Property access, not method call
+  Line 1587: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/common/resources.ts:
+  Line 211: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/common/stream.ts:
+  Line 160: Arrow function (no 'this' binding)
+
+/home/simon/.cache/repos/vscode/src/vs/base/common/types.ts:
+  Line 210: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/parts/ipc/common/ipc.ts:
+  Line 939: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/parts/ipc/node/ipc.cp.ts:
+  Line 159: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/test/common/event.test.ts:
+  Line 129: Function declaration, not method call
+  Line 243: Function declaration, not method call
+  Line 265: Function declaration, not method call
+  Line 837: Property access, not method call
+  Line 855: Arrow function (no 'this' binding)
+
+/home/simon/.cache/repos/vscode/src/vs/base/test/common/path.test.ts:
+  Line 44: Property access, not method call
+  Line 99: Property access, not method call
+  Line 311: Arrow function (no 'this' binding)
+  Line 371: Property access, not method call
+  Line 387: Property access, not method call
+  Line 395: Property access, not method call
+  Line 534: Property access, not method call
+  Line 562: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/base/test/common/timeTravelScheduler.ts:
+  Line 327: Built-in utility method
+
+/home/simon/.cache/repos/vscode/src/vs/code/electron-main/main.ts:
+  Line 149: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/browser/editorExtensions.ts:
+  Line 120: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/browser/observableCodeEditor.ts:
+  Line 81: Property access, not method call
+  Line 86: Property access, not method call
+  Line 135: Arrow function (no 'this' binding)
+  Line 136: Arrow function (no 'this' binding)
+  Line 369: Arrow function (no 'this' binding)
+
+/home/simon/.cache/repos/vscode/src/vs/editor/browser/services/hoverService/hoverWidget.ts:
+  Line 109: Arrow function (no 'this' binding)
+  Line 174: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/browser/viewParts/contentWidgets/contentWidgets.ts:
+  Line 461: Property access, not method call
+  Line 569: Property access, not method call
+  Line 590: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/browser/viewParts/minimap/minimap.ts:
+  Line 1544: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/browser/viewParts/overviewRuler/decorationsOverviewRuler.ts:
+  Line 367: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/browser/viewParts/viewLines/rangeUtil.ts:
+  Line 53: In static context
+
+/home/simon/.cache/repos/vscode/src/vs/editor/browser/widget/diffEditor/components/diffEditorEditors.ts:
+  Line 69: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/browser/widget/multiDiffEditor/multiDiffEditorWidgetImpl.ts:
+  Line 454: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/core/edits/stringEdit.ts:
+  Line 307: In static context
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/core/edits/textEdit.ts:
+  Line 36: Arrow function (no 'this' binding)
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/cursor/cursor.ts:
+  Line 723: Class static method call
+  Line 725: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/cursor/cursorCollection.ts:
+  Line 78: Arrow function (no 'this' binding)
+  Line 85: Arrow function (no 'this' binding)
+  Line 179: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/cursor/cursorTypeEditOperations.ts:
+  Line 659: In static context
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/cursor/cursorWordOperations.ts:
+  Line 820: In static context
+  Line 830: In static context
+  Line 840: In static context
+  Line 850: In static context
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/languageFeatureRegistry.ts:
+  Line 191: In static context
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/languages/languageConfigurationRegistry.ts:
+  Line 234: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/model/bracketPairsTextModelPart/bracketPairsImpl.ts:
+  Line 178: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/model/pieceTreeTextBuffer/pieceTreeTextBuffer.ts:
+  Line 305: Property access, not method call
+  Line 480: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/model/textModel.ts:
+  Line 2577: Property access, not method call
+  Line 2584: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/services/languagesRegistry.ts:
+  Line 18: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/services/markerDecorationsService.ts:
+  Line 41: Class static method call
+  Line 42: Class static method call
+  Line 43: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/viewLayout/viewLineRenderer.ts:
+  Line 94: Class static method call
+  Line 851: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/viewModel.ts:
+  Line 437: In static context
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/viewModel/overviewZoneManager.ts:
+  Line 121: Property access, not method call
+  Line 244: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/viewModel/viewModelImpl.ts:
+  Line 949: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/viewModel/viewModelLines.ts:
+  Line 144: Class static method call
+  Line 183: Class static method call
+  Line 1019: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/bracketMatching/browser/bracketMatching.ts:
+  Line 247: Property access, not method call
+  Line 369: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/codeAction/browser/codeAction.ts:
+  Line 81: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/codelens/browser/codelensController.ts:
+  Line 68: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/codelens/browser/codelensWidget.ts:
+  Line 257: Class static method call
+  Line 280: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/colorPicker/browser/colorPickerParts/colorPickerBody.ts:
+  Line 33: Class static method call
+  Line 34: Class static method call
+  Line 38: Class static method call
+  Line 39: Class static method call
+  Line 43: Class static method call
+  Line 44: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/colorPicker/browser/colorPickerParts/colorPickerHeader.ts:
+  Line 55: Property access, not method call
+  Line 56: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/colorPicker/browser/colorPickerParts/colorPickerSaturationBox.ts:
+  Line 48: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/colorPicker/browser/colorPickerParts/colorPickerStrip.ts:
+  Line 42: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/documentSymbols/browser/outlineModel.ts:
+  Line 149: Function declaration, not method call
+  Line 342: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/documentSymbols/test/browser/outlineModel.test.ts:
+  Line 139: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/dropOrPasteInto/browser/copyPasteController.ts:
+  Line 492: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/find/browser/findController.ts:
+  Line 998: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/find/test/browser/findModel.test.ts:
+  Line 83: Class static method call
+  Line 84: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/format/browser/format.ts:
+  Line 153: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/format/browser/formatActions.ts:
+  Line 45: Class static method call
+  Line 170: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/gotoError/browser/gotoError.ts:
+  Line 290: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/gotoSymbol/browser/goToCommands.ts:
+  Line 775: Property access, not method call
+  Line 818: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/gotoSymbol/browser/referencesModel.ts:
+  Line 164: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/gotoSymbol/browser/symbolNavigation.ts:
+  Line 193: Class static method call
+  Line 194: Class static method call
+  Line 195: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/hover/browser/markdownHoverParticipant.ts:
+  Line 195: Property access, not method call
+  Line 492: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/inlayHints/browser/inlayHintsController.ts:
+  Line 439: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/inlineCompletions/browser/utils.ts:
+  Line 44: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/linesOperations/browser/linesOperations.ts:
+  Line 789: Class static method call
+  Line 869: Class static method call
+  Line 900: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/linesOperations/browser/sortLinesCommand.ts:
+  Line 83: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/linkedEditing/browser/linkedEditing.ts:
+  Line 441: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/message/browser/messageController.ts:
+  Line 128: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/multicursor/browser/multicursor.ts:
+  Line 831: Class static method call
+  Line 1008: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/parameterHints/browser/parameterHints.ts:
+  Line 103: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/parameterHints/browser/parameterHintsModel.ts:
+  Line 89: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/rename/browser/rename.ts:
+  Line 402: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/rename/browser/renameWidget.ts:
+  Line 184: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/snippet/browser/snippetController2.ts:
+  Line 337: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/snippet/browser/snippetParser.ts:
+  Line 313: Property access, not method call
+  Line 810: Property access, not method call
+  Line 925: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/snippet/browser/snippetSession.ts:
+  Line 48: Property access, not method call
+  Line 341: Property access, not method call
+  Line 759: Property access, not method call
+  Line 785: Property access, not method call
+  Line 793: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/suggest/browser/completionModel.ts:
+  Line 43: Property access, not method call
+  Line 72: Property access, not method call
+  Line 74: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/suggest/browser/suggestCommitCharacters.ts:
+  Line 35: Property access, not method call
+  Line 36: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/suggest/browser/suggestController.ts:
+  Line 214: Class static method call
+  Line 856: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/suggest/browser/wordDistance.ts:
+  Line 65: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/wordHighlighter/browser/wordHighlighter.ts:
+  Line 386: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/wordOperations/test/browser/wordTestUtils.ts:
+  Line 33: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/standalone/browser/quickInput/standaloneQuickInputService.ts:
+  Line 93: Arrow function (no 'this' binding)
+
+/home/simon/.cache/repos/vscode/src/vs/editor/standalone/browser/standaloneLanguages.ts:
+  Line 574: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/test/common/core/cursorColumns.test.ts:
+  Line 205: Property access, not method call
+  Line 206: Property access, not method call
+  Line 242: Property access, not method call
+  Line 243: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/editor/test/common/model/textModelWithTokens.test.ts:
+  Line 168: Property access, not method call
+  Line 170: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/platform/actionWidget/browser/actionList.ts:
+  Line 359: Property access, not method call
+  Line 363: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/platform/actions/common/actions.ts:
+  Line 411: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/platform/actions/common/menuService.ts:
+  Line 247: Class static method call
+  Line 314: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/platform/contextkey/common/contextkey.ts:
+  Line 36: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/platform/contextview/browser/contextMenuHandler.ts:
+  Line 86: Class static method call
+  Line 88: Property access, not method call
+  Line 91: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/platform/files/test/node/diskFileService.integrationTest.ts:
+  Line 970: Property access, not method call
+  Line 1061: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/platform/log/common/bufferLog.ts:
+  Line 29: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/platform/markers/common/markerService.ts:
+  Line 93: Property access, not method call
+  Line 156: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/platform/native/electron-main/auth.ts:
+  Line 67: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/platform/quickinput/browser/quickInputController.ts:
+  Line 215: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/platform/registry/test/common/platform.test.ts:
+  Line 16: Property access, not method call
+  Line 17: Property access, not method call
+  Line 18: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/platform/request/electron-utility/requestService.ts:
+  Line 15: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/platform/terminal/node/ptyHostService.ts:
+  Line 111: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/platform/terminal/node/ptyService.ts:
+  Line 148: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/platform/terminal/node/terminalProfiles.ts:
+  Line 482: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/platform/update/electron-main/updateService.darwin.ts:
+  Line 61: Property access, not method call
+  Line 62: Property access, not method call
+  Line 63: Property access, not method call
+  Line 64: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/platform/windows/node/windowTracker.ts:
+  Line 26: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/browser/mainThreadChatAgents2.ts:
+  Line 223: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/browser/mainThreadChatCodeMapper.ts:
+  Line 67: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/browser/mainThreadDiagnostics.ts:
+  Line 32: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/browser/mainThreadDocuments.ts:
+  Line 152: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/browser/mainThreadDocumentsAndEditors.ts:
+  Line 128: Class static method call
+  Line 132: Class static method call
+  Line 133: Class static method call
+  Line 134: Class static method call
+  Line 374: Class static method call
+  Line 375: Class static method call
+  Line 377: Class static method call
+  Line 378: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/browser/mainThreadEditor.ts:
+  Line 348: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/browser/mainThreadFileSystem.ts:
+  Line 220: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/browser/mainThreadLanguageFeatures.ts:
+  Line 140: In static context
+  Line 236: Property access, not method call
+  Line 244: Property access, not method call
+  Line 252: Property access, not method call
+  Line 260: Property access, not method call
+  Line 381: Property access, not method call
+  Line 866: Property access, not method call
+  Line 976: Property access, not method call
+  Line 1028: Class static method call
+  Line 1082: Property access, not method call
+  Line 1091: Property access, not method call
+  Line 1098: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/browser/mainThreadNotebookDocumentsAndEditors.ts:
+  Line 117: Class static method call
+  Line 118: Class static method call
+  Line 187: Class static method call
+  Line 188: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/browser/mainThreadNotebookKernels.ts:
+  Line 137: Class static method call
+  Line 138: Class static method call
+  Line 139: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/browser/mainThreadTesting.ts:
+  Line 295: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/browser/mainThreadWindow.ts:
+  Line 31: Property access, not method call
+  Line 32: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/browser/mainThreadWorkspace.ts:
+  Line 70: Class static method call
+  Line 71: Class static method call
+  Line 72: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostApiCommands.ts:
+  Line 55: In static context
+  Line 65: Property access, not method call
+  Line 586: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostChatAgents2.ts:
+  Line 139: Property access, not method call
+  Line 144: Property access, not method call
+  Line 151: Property access, not method call
+  Line 162: Property access, not method call
+  Line 170: Property access, not method call
+  Line 181: Property access, not method call
+  Line 188: Property access, not method call
+  Line 195: Property access, not method call
+  Line 203: Property access, not method call
+  Line 214: Property access, not method call
+  Line 251: Property access, not method call
+  Line 259: Property access, not method call
+  Line 269: Property access, not method call
+  Line 278: Property access, not method call
+  Line 287: Property access, not method call
+  Line 296: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostCommands.ts:
+  Line 363: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostDiagnostics.ts:
+  Line 94: Property access, not method call
+  Line 251: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostFileSystemEventService.ts:
+  Line 248: Arrow function (no 'this' binding)
+  Line 251: Arrow function (no 'this' binding)
+  Line 254: Arrow function (no 'this' binding)
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostLanguageFeatures.ts:
+  Line 1734: Property access, not method call
+  Line 2407: Class static method call
+  Line 2897: Class static method call
+  Line 2909: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostLanguageModelTools.ts:
+  Line 107: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostNotebookEditor.ts:
+  Line 49: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostQuickOpen.ts:
+  Line 158: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostTerminalService.ts:
+  Line 464: Constructor call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostTypes.ts:
+  Line 283: In static context
+  Line 2192: In static context
+  Line 2195: In static context
+  Line 2198: In static context
+  Line 2201: In static context
+  Line 2204: In static context
+  Line 2207: In static context
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostTypes/diagnostic.ts:
+  Line 105: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extensionHostMain.ts:
+  Line 190: Class static method call
+  Line 210: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/node/extHostConsoleForwarder.ts:
+  Line 44: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/node/extHostSearch.ts:
+  Line 51: Constructor call
+  Line 60: Property access, not method call
+  Line 100: Constructor call
+  Line 101: Constructor call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/test/browser/extHostConfiguration.test.ts:
+  Line 749: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/test/common/extensionHostMain.test.ts:
+  Line 96: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/browser/parts/compositeBarActions.ts:
+  Line 179: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/browser/parts/dialogs/dialogHandler.ts:
+  Line 101: Arrow function (no 'this' binding)
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/browser/parts/editor/breadcrumbsControl.ts:
+  Line 293: Property access, not method call
+  Line 294: Property access, not method call
+  Line 295: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/browser/parts/editor/breadcrumbsModel.ts:
+  Line 62: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/browser/parts/editor/editorStatus.ts:
+  Line 104: Property access, not method call
+  Line 1088: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/browser/parts/notifications/notificationAccessibleView.ts:
+  Line 115: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/browser/parts/paneCompositePart.ts:
+  Line 198: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/browser/parts/views/viewFilter.ts:
+  Line 181: Class static method call
+  Line 182: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/browser/parts/views/viewPane.ts:
+  Line 174: Class static method call
+  Line 176: Property access, not method call
+  Line 479: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/browser/window.ts:
+  Line 58: Function declaration, not method call
+  Line 112: Function declaration, not method call
+  Line 115: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/authentication/browser/actions/manageTrustedExtensionsForAccountAction.ts:
+  Line 143: Class static method call
+  Line 145: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/authentication/browser/actions/manageTrustedMcpServersForAccountAction.ts:
+  Line 135: Class static method call
+  Line 137: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/bulkEdit/browser/bulkTextEdits.ts:
+  Line 101: Property access, not method call
+  Line 166: Property access, not method call
+  Line 246: Property access, not method call
+  Line 256: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/bulkEdit/browser/opaqueEdits.ts:
+  Line 21: In static context
+  Line 29: In static context
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/bulkEdit/browser/preview/bulkEditPane.ts:
+  Line 147: Property access, not method call
+  Line 196: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/bulkEdit/test/browser/bulkEditPreview.test.ts:
+  Line 57: Class static method call
+  Line 71: Class static method call
+  Line 85: Class static method call
+  Line 100: Class static method call
+  Line 127: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/callHierarchy/browser/callHierarchy.contribution.ts:
+  Line 128: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/callHierarchy/browser/callHierarchyPeek.ts:
+  Line 99: Class static method call
+  Line 243: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/chat/browser/chatContentParts/chatElicitationContentPart.ts:
+  Line 39: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/chat/browser/chatContentParts/chatTextEditContentPart.ts:
+  Line 224: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/chat/browser/chatEditing/chatEditingModifiedNotebookEntry.ts:
+  Line 197: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/chat/browser/chatEditing/chatEditingTextModelChangeService.ts:
+  Line 166: Class static method call
+  Line 192: Class static method call
+  Line 228: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/chat/browser/chatEditing/notebook/chatEditingNotebookEditorIntegration.ts:
+  Line 254: Property access, not method call
+  Line 255: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/chat/browser/codeBlockPart.ts:
+  Line 966: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/chat/browser/tools/toolSetsContribution.ts:
+  Line 145: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/chat/common/chatService.ts:
+  Line 79: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/codeEditor/electron-browser/selectionClipboard.ts:
+  Line 48: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/comments/browser/commentThreadZoneWidget.ts:
+  Line 160: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/comments/browser/comments.contribution.ts:
+  Line 162: Class static method call
+  Line 163: Class static method call
+  Line 164: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/comments/browser/commentsModel.ts:
+  Line 143: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/comments/browser/commentsView.ts:
+  Line 262: Class static method call
+  Line 263: Class static method call
+  Line 264: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/debug/browser/breakpointsView.ts:
+  Line 164: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/debug/browser/debugAdapterManager.ts:
+  Line 290: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/debug/browser/debugConfigurationManager.ts:
+  Line 156: Class static method call
+  Line 157: Class static method call
+  Line 172: Class static method call
+  Line 217: Class static method call
+  Line 274: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/debug/browser/debugService.ts:
+  Line 143: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/debug/browser/statusbarColorProvider.ts:
+  Line 74: Class static method call
+  Line 75: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/extensions/browser/extensionEditor.ts:
+  Line 419: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/extensions/browser/extensionsViewlet.ts:
+  Line 978: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/extensions/common/extensions.ts:
+  Line 220: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/extensions/electron-browser/extensionsAutoProfiler.ts:
+  Line 64: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/folding/browser/folding.contribution.ts:
+  Line 33: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/format/browser/formatActionsMultiple.ts:
+  Line 62: Class static method call
+  Line 64: Class static method call
+  Line 65: Class static method call
+  Line 66: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/inlineChat/browser/inlineChatController.ts:
+  Line 1054: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/inlineChat/browser/inlineChatSession.ts:
+  Line 330: Class static method call
+  Line 337: Class static method call
+  Line 390: Property access, not method call
+  Line 482: Class static method call
+  Line 483: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/inlineChat/browser/inlineChatStrategies.ts:
+  Line 159: Class static method call
+  Line 410: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/inlineChat/test/browser/inlineChatController.test.ts:
+  Line 537: Class static method call
+  Line 586: Class static method call
+  Line 813: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/interactive/browser/interactiveEditor.ts:
+  Line 178: Class static method call
+  Line 369: Class static method call
+  Line 491: Class static method call
+  Line 492: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/languageStatus/browser/languageStatus.ts:
+  Line 115: Class static method call
+  Line 119: Class static method call
+  Line 120: Class static method call
+  Line 196: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/limitIndicator/browser/limitIndicator.contribution.ts:
+  Line 151: Property access, not method call
+  Line 153: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/markers/browser/markersModel.ts:
+  Line 55: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/markers/browser/markersTreeViewer.ts:
+  Line 161: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/markers/browser/markersView.ts:
+  Line 449: Class static method call
+  Line 450: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/mcp/browser/mcpServerEditor.ts:
+  Line 293: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/mcp/common/discovery/installedMcpServersDiscovery.ts:
+  Line 85: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/mcp/common/mcpTypes.ts:
+  Line 718: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/mergeEditor/browser/model/modifiedBaseRange.ts:
+  Line 164: Arrow function (no 'this' binding)
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/mergeEditor/browser/view/lineAlignment.ts:
+  Line 146: Arrow function (no 'this' binding)
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/notebook/browser/contrib/cellStatusBar/contributedStatusBarItemController.ts:
+  Line 28: Property access, not method call
+  Line 31: Class static method call
+  Line 32: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/notebook/browser/contrib/cellStatusBar/executionStatusBarItemController.ts:
+  Line 50: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/notebook/browser/contrib/cellStatusBar/notebookVisibleCellObserver.ts:
+  Line 33: Class static method call
+  Line 34: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/notebook/browser/contrib/format/formatting.ts:
+  Line 76: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/notebook/browser/contrib/saveParticipants/saveParticipants.ts:
+  Line 87: Class static method call
+  Line 404: Class static method call
+  Line 440: Class static method call
+  Line 484: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/notebook/browser/controller/chat/notebookChatController.ts:
+  Line 702: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/notebook/browser/diff/inlineDiff/notebookInlineDiffWidget.ts:
+  Line 93: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/notebook/browser/notebook.contribution.ts:
+  Line 775: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/notebook/browser/notebookEditor.ts:
+  Line 217: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/notebook/browser/services/notebookKernelServiceImpl.ts:
+  Line 136: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/notebook/browser/view/cellParts/cellComments.ts:
+  Line 39: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/notebook/browser/viewParts/notebookEditorToolbar.ts:
+  Line 278: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/notebook/browser/viewParts/notebookEditorWidgetContextKeys.ts:
+  Line 62: Property access, not method call
+  Line 63: Class static method call
+  Line 64: Class static method call
+  Line 65: Class static method call
+  Line 66: Class static method call
+  Line 67: Class static method call
+  Line 68: Class static method call
+  Line 69: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/notebook/browser/viewParts/notebookKernelView.ts:
+  Line 161: Property access, not method call
+  Line 162: Class static method call
+  Line 163: Class static method call
+  Line 164: Class static method call
+  Line 165: Class static method call
+  Line 166: Class static method call
+  Line 167: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/performance/browser/perfviewEditor.ts:
+  Line 129: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/performance/electron-browser/rendererAutoProfiler.ts:
+  Line 41: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/remote/browser/remoteExplorer.ts:
+  Line 697: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/replNotebook/browser/replEditor.ts:
+  Line 169: Class static method call
+  Line 359: Class static method call
+  Line 473: Class static method call
+  Line 474: Class static method call
+  Line 537: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/sash/browser/sash.ts:
+  Line 29: Property access, not method call
+  Line 33: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/menus.ts:
+  Line 44: Property access, not method call
+  Line 207: Property access, not method call
+  Line 336: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/quickDiffDecorator.ts:
+  Line 252: Property access, not method call
+  Line 256: Property access, not method call
+  Line 260: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/quickDiffModel.ts:
+  Line 144: Property access, not method call
+  Line 146: Class static method call
+  Line 206: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/quickDiffWidget.ts:
+  Line 171: Class static method call
+  Line 504: Property access, not method call
+  Line 628: Class static method call
+  Line 634: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/scmHistoryViewPane.ts:
+  Line 1079: Class static method call
+  Line 1080: Class static method call
+  Line 1896: Property access, not method call
+  Line 1897: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/scmRepositoriesViewPane.ts:
+  Line 231: Property access, not method call
+  Line 232: Property access, not method call
+  Line 233: Property access, not method call
+  Line 234: Property access, not method call
+  Line 235: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/scmViewPane.ts:
+  Line 556: Class static method call
+  Line 1054: Class static method call
+  Line 1055: Class static method call
+  Line 1056: Class static method call
+  Line 1868: Class static method call
+  Line 2319: Class static method call
+  Line 2320: Class static method call
+  Line 2342: Class static method call
+  Line 2411: Property access, not method call
+  Line 2412: Property access, not method call
+  Line 2413: Property access, not method call
+  Line 2414: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/scmViewService.ts:
+  Line 282: Class static method call
+  Line 283: Class static method call
+  Line 289: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/workingSet.ts:
+  Line 56: Class static method call
+  Line 57: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/search/browser/searchView.ts:
+  Line 556: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/snippets/browser/snippetCompletionProvider.ts:
+  Line 188: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/snippets/browser/tabCompletion.ts:
+  Line 193: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/tasks/browser/abstractTaskService.ts:
+  Line 3274: Property access, not method call
+  Line 3282: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/terminal/browser/terminalEditorService.ts:
+  Line 183: Property access, not method call
+  Line 184: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/terminal/browser/terminalService.ts:
+  Line 203: Class static method call
+  Line 347: Property access, not method call
+  Line 348: Property access, not method call
+  Line 852: Class static method call
+  Line 1023: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/terminalContrib/chatAgentTools/test/browser/commandLineAutoApprover.test.ts:
+  Line 836: Function declaration, not method call
+  Line 837: Function declaration, not method call
+  Line 879: Function declaration, not method call
+  Line 880: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/terminalContrib/links/browser/terminalExternalLinkDetector.ts:
+  Line 47: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/terminalContrib/quickFix/browser/quickFixAddon.ts:
+  Line 478: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/testing/browser/codeCoverageDecorations.ts:
+  Line 230: Function declaration, not method call
+  Line 822: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/testing/browser/testCoverageView.ts:
+  Line 727: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/testing/browser/testingExplorerFilter.ts:
+  Line 58: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/testing/browser/testingExplorerView.ts:
+  Line 577: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/testing/browser/testingOutputPeek.ts:
+  Line 135: Class static method call
+  Line 322: Function declaration, not method call
+  Line 464: Class static method call
+  Line 465: Class static method call
+  Line 703: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/testing/common/testItemCollection.ts:
+  Line 364: Property access, not method call
+  Line 450: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/testing/common/testResultService.ts:
+  Line 195: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/timeline/browser/timelinePane.ts:
+  Line 292: Class static method call
+  Line 293: Class static method call
+  Line 294: Class static method call
+  Line 295: Class static method call
+  Line 888: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/typeHierarchy/browser/typeHierarchy.contribution.ts:
+  Line 101: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/typeHierarchy/browser/typeHierarchyPeek.ts:
+  Line 100: Class static method call
+  Line 244: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/update/browser/releaseNotesEditor.ts:
+  Line 68: Class static method call
+  Line 69: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/update/browser/update.ts:
+  Line 185: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/webview/browser/webviewElement.ts:
+  Line 499: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/electron-browser/parts/titlebar/menubarControl.ts:
+  Line 135: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/services/decorations/browser/decorationsService.ts:
+  Line 32: In static context
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/services/dialogs/electron-browser/fileDialogService.ts:
+  Line 205: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/services/extensions/common/extensionHostManager.ts:
+  Line 641: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/services/extensions/common/extensionsRegistry.ts:
+  Line 532: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/services/preferences/common/preferencesModels.ts:
+  Line 516: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/services/remote/common/tunnelModel.ts:
+  Line 445: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/services/search/node/fileSearch.ts:
+  Line 139: Arrow function (no 'this' binding)
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/services/textfile/common/textFileEditorModel.ts:
+  Line 971: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/services/textfile/common/textfiles.ts:
+  Line 569: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/services/textfile/test/common/textFileService.io.test.ts:
+  Line 43: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/services/textfile/test/node/encoding/encoding.test.ts:
+  Line 234: Property access, not method call
+  Line 405: Property access, not method call
+  Line 420: Property access, not method call
+  Line 449: Function declaration, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/services/themes/browser/workbenchThemeService.ts:
+  Line 118: Constructor call
+  Line 125: Constructor call
+  Line 132: Constructor call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/services/workingCopy/common/storedFileWorkingCopy.ts:
+  Line 1112: Property access, not method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/test/browser/codeeditor.test.ts:
+  Line 163: Class static method call
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/test/browser/viewlet.test.ts:
+  Line 51: Property access, not method call
+  Line 52: Property access, not method call
+  Line 53: Property access, not method call

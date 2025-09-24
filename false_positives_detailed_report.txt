@@ -1,0 +1,32 @@
+FALSE POSITIVES DETAILED REPORT
+==================================================
+
+Total issues analyzed: 637
+False positives: 6
+Real issues: 631
+False positive rate: 0.9%
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/list/listWidget.ts:696
+  Reason: Event.any/map/signal - Event methods handle this binding correctly
+  Content: Event.any<IListMouseEvent<any> | IListGestureEvent<any>>(list.onMouseClick, list.onMouseMiddleClick, list.onTap)(this.onViewPointer, this, this.disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/tree/abstractTree.ts:363
+  Reason: Event.any/map/signal - Event methods handle this binding correctly
+  Content: Event.map(onDidChangeCollapseState, e => e.node)(this.onDidChangeNodeTwistieState, this, this.disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostDiagnostics.ts:251
+  Reason: Event.any/map/signal - Event methods handle this binding correctly
+  Content: readonly onDidChangeDiagnostics: Event<vscode.DiagnosticChangeEvent> = Event.map(this._onDidChangeDiagnostics.event, ExtHostDiagnostics._mapper);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/callHierarchy/browser/callHierarchy.contribution.ts:128
+  Reason: Event.any/map/signal - Event methods handle this binding correctly
+  Content: Event.any<any>(this._editor.onDidChangeModel, this._editor.onDidChangeModelLanguage)(this.endCallHierarchy, this, this._sessionDisposables);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/extensions/browser/extensionsViewlet.ts:978
+  Reason: Event.any/map/signal - Event methods handle this binding correctly
+  Content: this._register(Event.any(Event.debounce(extensionsWorkbenchService.onChange, () => undefined, 100, undefined, undefined, undefined, this._store), extensionsWorkbenchService.onDidChangeExtensionsNotification)(this.onServiceChange, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/typeHierarchy/browser/typeHierarchy.contribution.ts:101
+  Reason: Event.any/map/signal - Event methods handle this binding correctly
+  Content: Event.any<any>(this._editor.onDidChangeModel, this._editor.onDidChangeModelLanguage)(this.endTypeHierarchy, this, this._sessionDisposables);
+
