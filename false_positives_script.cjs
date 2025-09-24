@@ -77,11 +77,30 @@ function isFalsePositive(issue) {
         };
     }
 
+    // Condition 2: Static class method calls (Class.staticMethod patterns)
+    // These are false positives because static methods don't have 'this' context issues
+    const staticMethodPattern = /[A-Z][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_]*\s*\(/;
+    if (staticMethodPattern.test(content)) {
+        return {
+            isFalsePositive: true,
+            reason: 'Static class method call - static methods don\'t have this binding issues'
+        };
+    }
+
+    // Condition 3: Static method definitions
+    // These are false positives because they're method definitions, not calls
+    if (content.includes('static ') && content.includes('(')) {
+        return {
+            isFalsePositive: true,
+            reason: 'Static method definition - not a method call'
+        };
+    }
+
     // TODO: Add more conditions over time as we identify clear false positive patterns
     // Examples of future conditions to consider:
-    // - Static method calls (but need to be more careful about detection)
     // - Arrow functions (but need to verify they don't have this issues)
     // - Built-in utility methods (but need to verify the specific methods)
+    // - Constructor calls (new ClassName())
 
     return {
         isFalsePositive: false
