@@ -63,7 +63,7 @@
   },
   "dependencies": {
     "@lvce-editor/rpc": "^4.19.0",
-    "ansi-escapes": "^7.1.0",
+    "ansi-escapes": "^7.1.1",
     "chalk": "^5.6.2"
   },
   "devDependencies": {
