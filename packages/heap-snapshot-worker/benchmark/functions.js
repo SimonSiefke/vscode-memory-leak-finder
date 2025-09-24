@@ -2,8 +2,8 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { compareHeapSnapshotFunctions2 } from '../src/parts/CompareHeapSnapshotsFunctions2/CompareHeapSnapshotsFunctions2.ts'
 
-const filePath1 = join(import.meta.dirname, '../../../.vscode-heapsnapshots/0.json')
-const filePath2 = join(import.meta.dirname, '../../../.vscode-heapsnapshots/1.json')
+const filePath1 = '/home/simon/.cache/repos/vscode-memory-leak-finder/packages/heap-snapshot-worker/.tmp/.tmp/dummy.json'
+const filePath2 = '/home/simon/before.heapsnapshot'
 const resultPath = join(import.meta.dirname, '..', '.tmp', 'functions.json')
 
 const testFunctionCount = async () => {
@@ -11,14 +11,14 @@ const testFunctionCount = async () => {
   const count = await compareHeapSnapshotFunctions2(filePath1, filePath2, {
     minCount: 0,
     excludeOriginalPaths: [
-      'functional.ts',
-      'lifecycle.ts',
-      'event.ts',
-      'numbers.ts',
-      'ternarySearchTree.ts',
-      'lazy.ts',
-      'undoRedoService.ts',
-      'editStack.ts',
+      // 'functional.ts',
+      // 'lifecycle.ts',
+      // 'event.ts',
+      // 'numbers.ts',
+      // 'ternarySearchTree.ts',
+      // 'lazy.ts',
+      // 'undoRedoService.ts',
+      // 'editStack.ts',
     ],
   })
   console.log(count.length)

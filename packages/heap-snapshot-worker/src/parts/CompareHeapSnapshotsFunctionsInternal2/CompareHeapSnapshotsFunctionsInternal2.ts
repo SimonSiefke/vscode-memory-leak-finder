@@ -36,7 +36,8 @@ const getNewItems = (map1: UniqueLocationMap, map2: UniqueLocationMap, minCount:
     const oldItem = map1[key] || emptyItem
     const newItem = map2[key]
     const delta = newItem.count - oldItem.count
-    if (delta > 0 && newItem.count >= minCount) {
+    console.log({ delta })
+    if (newItem.count > minCount) {
       newitems.push({ ...newItem, delta })
     }
   }
@@ -91,6 +92,9 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
   const nodeNameOffset = after.meta.node_fields.indexOf('name')
   const map1 = getUniqueLocationMap2(before)
   const map2 = getUniqueLocationMap2(after)
+
+  console.log('got maps')
+  // console.log({ map2 })
   const newItems = getNewItems(map1, map2, minCount)
   const formattedItems = formatUniqueLocations(
     newItems,
@@ -104,7 +108,9 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
     nodeNameOffset,
     after.strings,
   )
+  console.log('got formatted items')
   let enriched = await addOriginalSources(formattedItems)
+  console.log('got original sources')
   const excludes = options.excludeOriginalPaths || []
   if (excludes.length > 0) {
     const lowered = excludes.map((e) => e.toLowerCase())
@@ -122,6 +128,7 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
     })
   }
   const sorted = enriched.toSorted((a, b) => b.count - a.count)
+  console.log('sorted them')
   const cleanItems = sorted.map((item) => {
     return {
       count: item.count,

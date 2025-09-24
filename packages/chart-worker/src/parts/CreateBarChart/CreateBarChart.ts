@@ -10,6 +10,7 @@ export const createBarChart = (data: any, options: any): string => {
   const baseHtml = Plot.plot({
     style: 'overflow: visible;background:white',
     width: width,
+    height: 15000 / 10,
     marginLeft: marginLeft,
     marginRight: marginRight,
     x: { axis: null },
