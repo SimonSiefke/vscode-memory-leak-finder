@@ -1,76 +1,44 @@
 FALSE POSITIVES DETAILED REPORT
 ==================================================
 
-Total issues analyzed: 253
-False positives: 17
-Real issues: 236
-False positive rate: 6.7%
+Total issues analyzed: 236
+False positives: 9
+Real issues: 227
+False positive rate: 3.8%
 
-/home/simon/.cache/repos/vscode/src/vs/editor/browser/widget/multiDiffEditor/multiDiffEditorWidgetImpl.ts:454
-  Reason: .map call - array method without this binding issues
-  Content: const selections = viewState.selections?.map(Selection.liftSelection);
+/home/simon/.cache/repos/vscode/src/vs/base/test/common/path.test.ts:311
+  Reason: .forEach call - array method without this binding issues
+  Content: [path.posix.extname, path.win32.extname].forEach((extname) => {
 
-/home/simon/.cache/repos/vscode/src/vs/editor/common/core/edits/stringEdit.ts:307
-  Reason: .map call - array method without this binding issues
-  Content: return new StringEdit(data.map(StringReplacement.fromJson));
+/home/simon/.cache/repos/vscode/src/vs/base/test/common/path.test.ts:311
+  Reason: .forEach call - array method without this binding issues
+  Content: [path.posix.extname, path.win32.extname].forEach((extname) => {
 
-/home/simon/.cache/repos/vscode/src/vs/workbench/api/browser/mainThreadEditor.ts:348
-  Reason: .map call - array method without this binding issues
-  Content: const newSelections = selections.map(Selection.liftSelection);
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/snippet/browser/snippetParser.ts:313
+  Reason: .forEach call - array method without this binding issues
+  Content: this.options.forEach(ret.appendChild, ret);
 
-/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostApiCommands.ts:55
-  Reason: .map call - array method without this binding issues
-  Content: res.children = symbol.children ? symbol.children.map(MergedInfo.to) : [];
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/snippet/browser/snippetParser.ts:810
+  Reason: .forEach call - array method without this binding issues
+  Content: placeholder.children.forEach(parent.appendChild, parent);
 
-/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostApiCommands.ts:65
-  Reason: .map call - array method without this binding issues
-  Content: return value.map(MergedInfo.to);
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/snippet/browser/snippetParser.ts:925
+  Reason: .forEach call - array method without this binding issues
+  Content: variable.children.forEach(parent.appendChild, parent);
 
-/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostFileSystemEventService.ts:248
-  Reason: .map call - array method without this binding issues
-  Content: private _created = new Lazy(() => this._events.created.map(URI.revive) as URI[]);
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/browser/mainThreadLanguageFeatures.ts:140
+  Reason: .forEach call - array method without this binding issues
+  Content: data.forEach(MainThreadLanguageFeatures._reviveWorkspaceSymbolDto);
 
-/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostFileSystemEventService.ts:251
-  Reason: .map call - array method without this binding issues
-  Content: private _changed = new Lazy(() => this._events.changed.map(URI.revive) as URI[]);
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostTypes.ts:283
+  Reason: .forEach call - array method without this binding issues
+  Content: candidate.children?.forEach(DocumentSymbol.validate);
 
-/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostFileSystemEventService.ts:254
-  Reason: .map call - array method without this binding issues
-  Content: private _deleted = new Lazy(() => this._events.deleted.map(URI.revive) as URI[]);
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/bulkEdit/browser/bulkTextEdits.ts:246
+  Reason: .forEach call - array method without this binding issues
+  Content: edits.forEach(task.addEdit, task);
 
-/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostLanguageFeatures.ts:1734
-  Reason: .map call - array method without this binding issues
-  Content: return { links: links.filter(LinkProviderAdapter._validateLink).map(typeConvert.DocumentLink.from) };
-
-/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/chat/browser/chatContentParts/chatTextEditContentPart.ts:224
-  Reason: .map call - array method without this binding issues
-  Content: const edits = group.map(TextEdit.asEditOperation);
-
-/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/chat/browser/codeBlockPart.ts:966
-  Reason: .map call - array method without this binding issues
-  Content: const edits = group.map(TextEdit.asEditOperation);
-
-/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/testing/browser/codeCoverageDecorations.ts:822
-  Reason: .map call - array method without this binding issues
-  Content: const tests = [...coverage.perTestData].map(TestId.fromString);
-
-/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/testing/browser/testCoverageView.ts:727
-  Reason: .map call - array method without this binding issues
-  Content: const tests = [...coverage.allPerTestIDs()].map(TestId.fromString);
-
-/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/testing/browser/testingOutputPeek.ts:322
-  Reason: .map call - array method without this binding issues
-  Content: const controllers = editors.map(TestingOutputPeekController.get);
-
-/home/simon/.cache/repos/vscode/src/vs/workbench/electron-browser/parts/titlebar/menubarControl.ts:135
-  Reason: .map call - array method without this binding issues
-  Content: const actions = this.getOpenRecentActions().map(this.transformOpenRecentAction);
-
-/home/simon/.cache/repos/vscode/src/vs/workbench/services/decorations/browser/decorationsService.ts:32
-  Reason: .map call - array method without this binding issues
-  Content: return data.map(DecorationRule.keyOf).join(',');
-
-/home/simon/.cache/repos/vscode/src/vs/workbench/services/textfile/test/node/encoding/encoding.test.ts:234
-  Reason: .map call - array method without this binding issues
-  Content: .map(VSBuffer.wrap)
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/inlineChat/browser/inlineChatStrategies.ts:410
+  Reason: .forEach call - array method without this binding issues
+  Content: data.lensActionsViewZoneIds?.forEach(viewZoneAccessor.removeZone);
 

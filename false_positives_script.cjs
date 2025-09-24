@@ -170,6 +170,16 @@ function isFalsePositive(issue) {
         };
     }
 
+    // Condition 11: .forEach calls
+    // Pattern: any line containing .forEach
+    // These are false positives because .forEach is an array method that doesn't have this binding issues
+    if (content.includes('.forEach')) {
+        return {
+            isFalsePositive: true,
+            reason: '.forEach call - array method without this binding issues'
+        };
+    }
+
     // TODO: Add more conditions over time as we identify clear false positive patterns
     // Examples of future conditions to consider:
     // - Arrow functions (but need to verify they don't have this issues)

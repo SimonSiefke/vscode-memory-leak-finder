@@ -81,8 +81,6 @@
    44:6   error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    44:23  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    99:4   error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
-  311:5   error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
-  311:25  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   371:5   error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   387:5   error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   395:14  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -142,11 +140,6 @@
 
 /workspaces/vscode/src/vs/editor/contrib/linesOperations/browser/sortLinesCommand.ts
   83:14  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
-
-/workspaces/vscode/src/vs/editor/contrib/snippet/browser/snippetParser.ts
-  313:24  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
-  810:34  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
-  925:31  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
 /workspaces/vscode/src/vs/editor/contrib/snippet/browser/snippetSession.ts
    48:60  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -214,7 +207,6 @@
   67:27  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
 /workspaces/vscode/src/vs/workbench/api/browser/mainThreadLanguageFeatures.ts
-   140:17  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    236:84  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    244:85  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    252:88  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -255,7 +247,6 @@
    464:45  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
 /workspaces/vscode/src/vs/workbench/api/common/extHostTypes.ts
-   283:31  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   2192:84  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   2195:86  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   2198:91  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -297,9 +288,6 @@
   112:30  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   115:32  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
-/workspaces/vscode/src/vs/workbench/contrib/bulkEdit/browser/bulkTextEdits.ts
-  246:20  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
-
 /workspaces/vscode/src/vs/workbench/contrib/bulkEdit/browser/opaqueEdits.ts
   21:50  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   29:53  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
@@ -327,9 +315,6 @@
   276:40   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   276:72   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
   276:106  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
-
-/workspaces/vscode/src/vs/workbench/contrib/inlineChat/browser/inlineChatStrategies.ts
-  410:46  error  Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
 /workspaces/vscode/src/vs/workbench/contrib/limitIndicator/browser/limitIndicator.contribution.ts
   151:3   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.

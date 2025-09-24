@@ -5,9 +5,9 @@ Successfully implemented conservative false positive detection for unbound metho
 
 ## Results
 - **Original issues**: 637
-- **Total false positives identified**: 399 (62.6%)
-- **Real issues remaining**: 238 (37.4%)
-- **File size**: 439 lines (properly formatted, whitespace cleaned)
+- **Total false positives identified**: 408 (64.1%)
+- **Real issues remaining**: 229 (35.9%)
+- **File size**: 424 lines (properly formatted, whitespace cleaned)
 
 ## False Positive Categories Identified
 
@@ -55,6 +55,11 @@ Successfully implemented conservative false positive detection for unbound metho
 - These are false positives because `.map` is an array method that doesn't have `this` binding issues
 - Examples: `selections.map(Selection.liftSelection)`, `data.map(StringReplacement.fromJson)`
 
+### 10. .forEach Calls (9 false positives)
+- Any line containing `.forEach`
+- These are false positives because `.forEach` is an array method that doesn't have `this` binding issues
+- Examples: `options.forEach(ret.appendChild, ret)`, `data.forEach(MainThreadLanguageFeatures._reviveWorkspaceSymbolDto)`
+
 ## Script Features
 - **Extensible design**: Easy to add new false positive conditions
 - **Conservative approach**: Only removes clearly identifiable false positives
@@ -69,9 +74,9 @@ Successfully implemented conservative false positive detection for unbound metho
 - `final_summary.md` - This summary
 
 ## Impact
-Reduced manual review workload from **637 issues to 238 real issues** - a **62.6% reduction** in false positives that can be safely ignored.
+Reduced manual review workload from **637 issues to 229 real issues** - a **64.1% reduction** in false positives that can be safely ignored.
 
 ## Next Steps
-1. Focus on the remaining 238 real issues for manual review
+1. Focus on the remaining 229 real issues for manual review
 2. Add more false positive conditions to the script as patterns are identified
 3. Consider creating ESLint rule exceptions for identified false positive patterns
