@@ -5,9 +5,9 @@ Successfully implemented conservative false positive detection for unbound metho
 
 ## Results
 - **Original issues**: 637
-- **Total false positives identified**: 408 (64.1%)
-- **Real issues remaining**: 229 (35.9%)
-- **File size**: 424 lines (properly formatted, whitespace cleaned)
+- **Total false positives identified**: 412 (64.7%)
+- **Real issues remaining**: 225 (35.3%)
+- **File size**: 418 lines (properly formatted, whitespace cleaned)
 
 ## False Positive Categories Identified
 

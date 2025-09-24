@@ -179,13 +179,23 @@ function isFalsePositive(issue) {
             reason: '.forEach call - array method without this binding issues'
         };
     }
-
+    
+    // Condition 12: .equals calls
+    // Pattern: any line containing .equals
+    // These are false positives because .equals is a comparison method that doesn't have this binding issues
+    if (content.includes('.equals')) {
+        return {
+            isFalsePositive: true,
+            reason: '.equals call - comparison method without this binding issues'
+        };
+    }
+    
     // TODO: Add more conditions over time as we identify clear false positive patterns
     // Examples of future conditions to consider:
     // - Arrow functions (but need to verify they don't have this issues)
     // - Built-in utility methods (but need to verify the specific methods)
     // - Constructor calls (new ClassName())
-
+    
     return {
         isFalsePositive: false
     };

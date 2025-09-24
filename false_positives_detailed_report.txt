@@ -1,44 +1,24 @@
 FALSE POSITIVES DETAILED REPORT
 ==================================================
 
-Total issues analyzed: 236
-False positives: 9
-Real issues: 227
-False positive rate: 3.8%
+Total issues analyzed: 227
+False positives: 4
+Real issues: 223
+False positive rate: 1.8%
 
-/home/simon/.cache/repos/vscode/src/vs/base/test/common/path.test.ts:311
-  Reason: .forEach call - array method without this binding issues
-  Content: [path.posix.extname, path.win32.extname].forEach((extname) => {
+/home/simon/.cache/repos/vscode/src/vs/editor/browser/observableCodeEditor.ts:86
+  Reason: .equals call - comparison method without this binding issues
+  Content: { owner: this, equalsFn: equalsIfDefined(itemsEquals(Position.equals)) },
 
-/home/simon/.cache/repos/vscode/src/vs/base/test/common/path.test.ts:311
-  Reason: .forEach call - array method without this binding issues
-  Content: [path.posix.extname, path.win32.extname].forEach((extname) => {
+/home/simon/.cache/repos/vscode/src/vs/editor/browser/observableCodeEditor.ts:136
+  Reason: .equals call - comparison method without this binding issues
+  Content: this.cursorPosition = derivedOpts({ owner: this, equalsFn: Position.equals }, reader => this.selections.read(reader)?.[0]?.getPosition() ?? null);
 
-/home/simon/.cache/repos/vscode/src/vs/editor/contrib/snippet/browser/snippetParser.ts:313
-  Reason: .forEach call - array method without this binding issues
-  Content: this.options.forEach(ret.appendChild, ret);
+/home/simon/.cache/repos/vscode/src/vs/editor/browser/observableCodeEditor.ts:369
+  Reason: .equals call - comparison method without this binding issues
+  Content: const result = observableValueOpts<Point | null>({ owner: this, debugName: () => `topLeftOfPosition${pos?.toString()}`, equalsFn: equalsIfDefined(Point.equals) }, new Point(0, 0));
 
-/home/simon/.cache/repos/vscode/src/vs/editor/contrib/snippet/browser/snippetParser.ts:810
-  Reason: .forEach call - array method without this binding issues
-  Content: placeholder.children.forEach(parent.appendChild, parent);
-
-/home/simon/.cache/repos/vscode/src/vs/editor/contrib/snippet/browser/snippetParser.ts:925
-  Reason: .forEach call - array method without this binding issues
-  Content: variable.children.forEach(parent.appendChild, parent);
-
-/home/simon/.cache/repos/vscode/src/vs/workbench/api/browser/mainThreadLanguageFeatures.ts:140
-  Reason: .forEach call - array method without this binding issues
-  Content: data.forEach(MainThreadLanguageFeatures._reviveWorkspaceSymbolDto);
-
-/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostTypes.ts:283
-  Reason: .forEach call - array method without this binding issues
-  Content: candidate.children?.forEach(DocumentSymbol.validate);
-
-/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/bulkEdit/browser/bulkTextEdits.ts:246
-  Reason: .forEach call - array method without this binding issues
-  Content: edits.forEach(task.addEdit, task);
-
-/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/inlineChat/browser/inlineChatStrategies.ts:410
-  Reason: .forEach call - array method without this binding issues
-  Content: data.lensActionsViewZoneIds?.forEach(viewZoneAccessor.removeZone);
+/home/simon/.cache/repos/vscode/src/vs/editor/common/viewModel.ts:437
+  Reason: .equals call - comparison method without this binding issues
+  Content: return arrays.equals(a, b, OverviewRulerDecorationsGroup.equals);
 
