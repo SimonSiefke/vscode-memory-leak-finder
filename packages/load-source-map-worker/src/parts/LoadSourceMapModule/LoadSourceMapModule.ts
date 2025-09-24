@@ -1,3 +1,5 @@
+import { emptySourceMap } from '../EmptySourceMap/EmptySourceMap.ts'
+
 export const getModule = (protocol: string): Promise<any> | any => {
   switch (protocol) {
     case 'data':
@@ -12,11 +14,7 @@ export const getModule = (protocol: string): Promise<any> | any => {
     case 'noop':
       return {
         loadSourceMap() {
-          return {
-            version: '3',
-            sources: [],
-            mappings: [],
-          }
+          return emptySourceMap
         },
       }
     default:
