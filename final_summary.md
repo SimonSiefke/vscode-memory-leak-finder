@@ -5,9 +5,9 @@ Successfully implemented conservative false positive detection for unbound metho
 
 ## Results
 - **Original issues**: 637
-- **Total false positives identified**: 290 (45.5%)
-- **Real issues remaining**: 347 (54.5%)
-- **File size**: 674 lines (properly formatted, whitespace cleaned)
+- **Total false positives identified**: 302 (47.4%)
+- **Real issues remaining**: 335 (52.6%)
+- **File size**: 654 lines (properly formatted, whitespace cleaned)
 
 ## False Positive Categories Identified
 
@@ -25,6 +25,16 @@ Successfully implemented conservative false positive detection for unbound metho
 - `this` is passed as `thisArg` for proper context binding
 - Examples: `onStart(this.onSashStart, this)`, `this._register(onAnchoredSelectionChange(this.updateScrollDimensions, this))`
 
+### 4. Method Calls with Context Binding (11 false positives)
+- `methodName(this._someMethod.fire, this._someMethod)` patterns
+- Second argument is the context/object that owns the first method
+- Examples: `onDidSashReset(this._onDidSashReset.fire, this._onDidSashReset)`
+
+### 5. Type Checks (1 false positive)
+- `types.isFunction(object.method)`, `typeof object.method`, etc.
+- These are just type checks, not actual method calls
+- Examples: `if (!types.isFunction(actionViewItem.focus))`
+
 ## Script Features
 - **Extensible design**: Easy to add new false positive conditions
 - **Conservative approach**: Only removes clearly identifiable false positives
@@ -39,9 +49,9 @@ Successfully implemented conservative false positive detection for unbound metho
 - `final_summary.md` - This summary
 
 ## Impact
-Reduced manual review workload from **637 issues to 347 real issues** - a **45.5% reduction** in false positives that can be safely ignored.
+Reduced manual review workload from **637 issues to 335 real issues** - a **47.4% reduction** in false positives that can be safely ignored.
 
 ## Next Steps
-1. Focus on the remaining 347 real issues for manual review
+1. Focus on the remaining 335 real issues for manual review
 2. Add more false positive conditions to the script as patterns are identified
 3. Consider creating ESLint rule exceptions for identified false positive patterns

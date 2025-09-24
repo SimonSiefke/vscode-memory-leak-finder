@@ -1,52 +1,12 @@
 FALSE POSITIVES DETAILED REPORT
 ==================================================
 
-Total issues analyzed: 345
-False positives: 11
-Real issues: 334
-False positive rate: 3.2%
+Total issues analyzed: 334
+False positives: 1
+Real issues: 333
+False positive rate: 0.3%
 
-/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/grid/gridview.ts:462
-  Reason: Method call with context binding - second argument is context of first method
-  Content: this.splitviewSashResetDisposable = onDidSashReset(this._onDidSashReset.fire, this._onDidSashReset);
-
-/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/grid/gridview.ts:660
-  Reason: Method call with context binding - second argument is context of first method
-  Content: this.childrenChangeDisposable = onDidChildrenChange(this._onDidChange.fire, this._onDidChange);
-
-/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/grid/gridview.ts:664
-  Reason: Method call with context binding - second argument is context of first method
-  Content: this.childrenSashResetDisposable = onDidChildrenSashReset(this._onDidSashReset.fire, this._onDidSashReset);
-
-/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/grid/gridview.ts:668
-  Reason: Method call with context binding - second argument is context of first method
-  Content: this.onDidScrollDisposable = onDidScroll(this._onDidScroll.fire, this._onDidScroll);
-
-/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/splitview/paneview.ts:544
-  Reason: Method call with context binding - second argument is context of first method
-  Content: disposables.add(draggable.onDidDrop(this._onDidDrop.fire, this._onDidDrop));
-
-/home/simon/.cache/repos/vscode/src/vs/editor/browser/viewParts/contentWidgets/contentWidgets.ts:461
-  Reason: Method call with context binding - second argument is context of first method
-  Content: preferredDimensions = safeInvoke(this._actual.beforeRender, this._actual);
-
-/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/terminal/browser/terminalEditorService.ts:183
-  Reason: Method call with context binding - second argument is context of first method
-  Content: instance.onDidFocus(this._onDidFocusInstance.fire, this._onDidFocusInstance),
-
-/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/terminal/browser/terminalEditorService.ts:184
-  Reason: Method call with context binding - second argument is context of first method
-  Content: instance.onDisposed(this._onDidDisposeInstance.fire, this._onDidDisposeInstance),
-
-/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/terminal/browser/terminalService.ts:347
-  Reason: Method call with context binding - second argument is context of first method
-  Content: this._register(host.onDidChangeInstances(this._onDidChangeInstances.fire, this._onDidChangeInstances));
-
-/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/terminal/browser/terminalService.ts:348
-  Reason: Method call with context binding - second argument is context of first method
-  Content: this._register(host.onDidDisposeInstance(this._onDidDisposeInstance.fire, this._onDidDisposeInstance));
-
-/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/terminal/browser/terminalService.ts:1023
-  Reason: Method call with context binding - second argument is context of first method
-  Content: instance.onDisposed(this._onDidDisposeInstance.fire, this._onDidDisposeInstance)
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/actionbar/actionbar.ts:577
+  Reason: Type check - not a method call, just checking type
+  Content: if (!types.isFunction(actionViewItem.focus)) {
 

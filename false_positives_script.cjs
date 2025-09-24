@@ -105,7 +105,7 @@ function isFalsePositive(issue) {
             reason: 'Method call with \'this\' as last argument - proper thisArg binding'
         };
     }
-    
+
     // Condition 5: Method calls where second argument is context of first argument
     // Pattern: methodName(this._someMethod.fire, this._someMethod)
     // These are false positives because the context is properly bound
@@ -116,13 +116,24 @@ function isFalsePositive(issue) {
             reason: 'Method call with context binding - second argument is context of first method'
         };
     }
-    
+
+    // Condition 6: Type checks
+    // Pattern: types.isFunction(object.method), typeof object.method, etc.
+    // These are false positives because they're just type checks, not method calls
+    const typeCheckPattern = /(types\.isFunction|typeof|instanceof|Array\.isArray|Object\.prototype\.toString\.call)\s*\([^)]*\.([a-zA-Z_][a-zA-Z0-9_]*)\s*\)/;
+    if (typeCheckPattern.test(content)) {
+        return {
+            isFalsePositive: true,
+            reason: 'Type check - not a method call, just checking type'
+        };
+    }
+
     // TODO: Add more conditions over time as we identify clear false positive patterns
     // Examples of future conditions to consider:
     // - Arrow functions (but need to verify they don't have this issues)
     // - Built-in utility methods (but need to verify the specific methods)
     // - Constructor calls (new ClassName())
-    
+
     return {
         isFalsePositive: false
     };

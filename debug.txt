@@ -13,9 +13,6 @@
     36:2   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
     38:2   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 
-/workspaces/vscode/src/vs/base/browser/ui/actionbar/actionbar.ts
-  577:26  error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
-
 /workspaces/vscode/src/vs/base/browser/ui/list/listWidget.ts
    506:11   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
    507:11   error    Avoid referencing unbound methods which may cause unintentional scoping of `this`.
