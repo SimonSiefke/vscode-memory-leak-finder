@@ -160,6 +160,16 @@ function isFalsePositive(issue) {
         };
     }
 
+    // Condition 10: .map calls
+    // Pattern: any line containing .map
+    // These are false positives because .map is an array method that doesn't have this binding issues
+    if (content.includes('.map')) {
+        return {
+            isFalsePositive: true,
+            reason: '.map call - array method without this binding issues'
+        };
+    }
+
     // TODO: Add more conditions over time as we identify clear false positive patterns
     // Examples of future conditions to consider:
     // - Arrow functions (but need to verify they don't have this issues)
