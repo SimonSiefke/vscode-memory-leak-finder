@@ -128,6 +128,17 @@ function isFalsePositive(issue) {
         };
     }
 
+    // Condition 7: Sort functions with comparison functions
+    // Pattern: array.sort(Class.comparisonMethod)
+    // These are false positives because they're just passing comparison functions
+    const sortFunctionPattern = /\.sort\s*\(\s*[A-Z][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_]*\s*\)/;
+    if (sortFunctionPattern.test(content)) {
+        return {
+            isFalsePositive: true,
+            reason: 'Sort function with comparison method - not an unbound method call'
+        };
+    }
+
     // TODO: Add more conditions over time as we identify clear false positive patterns
     // Examples of future conditions to consider:
     // - Arrow functions (but need to verify they don't have this issues)

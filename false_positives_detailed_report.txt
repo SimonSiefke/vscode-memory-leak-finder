@@ -1,12 +1,144 @@
 FALSE POSITIVES DETAILED REPORT
 ==================================================
 
-Total issues analyzed: 334
-False positives: 1
-Real issues: 333
-False positive rate: 0.3%
+Total issues analyzed: 333
+False positives: 34
+Real issues: 299
+False positive rate: 10.2%
 
-/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/actionbar/actionbar.ts:577
-  Reason: Type check - not a method call, just checking type
-  Content: if (!types.isFunction(actionViewItem.focus)) {
+/home/simon/.cache/repos/vscode/src/vs/editor/browser/viewParts/minimap/minimap.ts:1544
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: selections.sort(Range.compareRangesUsingStarts);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/browser/viewParts/overviewRuler/decorationsOverviewRuler.ts:367
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: decorations.sort(OverviewRulerDecorationsGroup.compareByRenderingProps);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/browser/viewParts/viewLines/rangeUtil.ts:53
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: ranges.sort(FloatHorizontalRange.compare);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/cursor/cursor.ts:725
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: selections.sort(Range.compareRangesUsingStarts);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/cursor/cursorTypeEditOperations.ts:659
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: selections = selections.sort(Range.compareRangesUsingStarts);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/cursor/cursorWordOperations.ts:820
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: candidates.sort(Range.compareRangesUsingEnds);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/cursor/cursorWordOperations.ts:830
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: candidates.sort(Range.compareRangesUsingStarts);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/cursor/cursorWordOperations.ts:840
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: candidates.sort(Position.compare);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/cursor/cursorWordOperations.ts:850
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: candidates.sort(Position.compare);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/languageFeatureRegistry.ts:191
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: this._entries.sort(LanguageFeatureRegistry._compareByScoreAndTime);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/languages/languageConfigurationRegistry.ts:234
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: this._entries.sort(LanguageConfigurationContribution.cmp);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/model/pieceTreeTextBuffer/pieceTreeTextBuffer.ts:305
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: operations.sort(PieceTreeTextBuffer._sortOpsAscending);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/model/pieceTreeTextBuffer/pieceTreeTextBuffer.ts:480
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: operations.sort(PieceTreeTextBuffer._sortOpsDescending);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/common/viewModel/overviewZoneManager.ts:121
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: this._zones.sort(OverviewRulerZone.compare);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/bracketMatching/browser/bracketMatching.ts:247
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: brackets.sort(Range.compareRangesUsingStarts);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/bracketMatching/browser/bracketMatching.ts:369
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: positions.sort(Position.compare);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/codeAction/browser/codeAction.ts:81
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: this.allActions = [...actions].sort(ManagedCodeActionSet.codeActionsComparator);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/documentSymbols/browser/outlineModel.ts:342
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: marker.sort(Range.compareRangesUsingStarts);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/documentSymbols/test/browser/outlineModel.test.ts:139
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: data.sort(Range.compareRangesUsingStarts); // model does this
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/format/browser/format.ts:153
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: for (const range of asArray(rangeOrRanges).sort(Range.compareRangesUsingStarts)) {
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/gotoSymbol/browser/referencesModel.ts:164
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: links.sort(ReferencesModel._compareReferences);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/linesOperations/browser/linesOperations.ts:900
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: selections.sort(Range.compareRangesUsingStarts);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/multicursor/browser/multicursor.ts:1008
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: selections.sort(Range.compareRangesUsingStarts);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/snippet/browser/snippetSession.ts:759
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: ranges.sort(Range.compareRangesUsingStarts);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/snippet/browser/snippetSession.ts:785
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: selections.sort(Range.compareRangesUsingStarts);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/snippet/browser/snippetSession.ts:793
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: ranges.sort(Range.compareRangesUsingStarts);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/wordHighlighter/browser/wordHighlighter.ts:386
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: .sort(Range.compareRangesUsingStarts)
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/wordOperations/test/browser/wordTestUtils.ts:33
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: positions.sort(Position.compare);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/test/common/model/textModelWithTokens.test.ts:168
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: expected.sort(Range.compareRangesUsingStarts);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/test/common/model/textModelWithTokens.test.ts:170
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: actual?.sort(Range.compareRangesUsingStarts);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostDiagnostics.ts:94
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: first = [...first].sort(DiagnosticCollection._compareIndexedTuplesByUri);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/codeEditor/electron-browser/selectionClipboard.ts:48
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: selections.sort(Range.compareRangesUsingStarts);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/inlineChat/browser/inlineChatSession.ts:390
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: ranges0.sort(Range.compareRangesUsingStarts);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/snippets/browser/snippetCompletionProvider.ts:188
+  Reason: Sort function with comparison method - not an unbound method call
+  Content: suggestions.sort(SnippetCompletion.compareByLabel);
 
