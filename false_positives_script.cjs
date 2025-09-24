@@ -190,6 +190,17 @@ function isFalsePositive(issue) {
         };
     }
     
+    // Condition 13: Static functions passed as comparison functions
+    // Pattern: compareBy(..., Class.staticMethod) or similar patterns
+    // These are false positives because static functions don't have this binding issues
+    const staticFunctionAsComparisonPattern = /[A-Z][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_]*\s*\)/;
+    if (staticFunctionAsComparisonPattern.test(content) && (content.includes('compareBy') || content.includes('sort') || content.includes('compare'))) {
+        return {
+            isFalsePositive: true,
+            reason: 'Static function passed as comparison function - no this binding issues'
+        };
+    }
+    
     // TODO: Add more conditions over time as we identify clear false positive patterns
     // Examples of future conditions to consider:
     // - Arrow functions (but need to verify they don't have this issues)

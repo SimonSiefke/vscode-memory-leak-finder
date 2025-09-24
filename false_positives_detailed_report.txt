@@ -1,24 +1,44 @@
 FALSE POSITIVES DETAILED REPORT
 ==================================================
 
-Total issues analyzed: 227
-False positives: 4
-Real issues: 223
-False positive rate: 1.8%
+Total issues analyzed: 223
+False positives: 9
+Real issues: 214
+False positive rate: 4.0%
 
-/home/simon/.cache/repos/vscode/src/vs/editor/browser/observableCodeEditor.ts:86
-  Reason: .equals call - comparison method without this binding issues
-  Content: { owner: this, equalsFn: equalsIfDefined(itemsEquals(Position.equals)) },
+/home/simon/.cache/repos/vscode/src/vs/editor/common/core/edits/textEdit.ts:36
+  Reason: Static function passed as comparison function - no this binding issues
+  Content: const r = replacements.slice().sort(compareBy(i => i.range, Range.compareRangesUsingStarts));
 
-/home/simon/.cache/repos/vscode/src/vs/editor/browser/observableCodeEditor.ts:136
-  Reason: .equals call - comparison method without this binding issues
-  Content: this.cursorPosition = derivedOpts({ owner: this, equalsFn: Position.equals }, reader => this.selections.read(reader)?.[0]?.getPosition() ?? null);
+/home/simon/.cache/repos/vscode/src/vs/editor/common/cursor/cursorCollection.ts:78
+  Reason: Static function passed as comparison function - no this binding issues
+  Content: compareBy(c => c.viewState.position, Position.compare)
 
-/home/simon/.cache/repos/vscode/src/vs/editor/browser/observableCodeEditor.ts:369
-  Reason: .equals call - comparison method without this binding issues
-  Content: const result = observableValueOpts<Point | null>({ owner: this, debugName: () => `topLeftOfPosition${pos?.toString()}`, equalsFn: equalsIfDefined(Point.equals) }, new Point(0, 0));
+/home/simon/.cache/repos/vscode/src/vs/editor/common/cursor/cursorCollection.ts:85
+  Reason: Static function passed as comparison function - no this binding issues
+  Content: compareBy(c => c.viewState.position, Position.compare)
 
-/home/simon/.cache/repos/vscode/src/vs/editor/common/viewModel.ts:437
-  Reason: .equals call - comparison method without this binding issues
-  Content: return arrays.equals(a, b, OverviewRulerDecorationsGroup.equals);
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/documentSymbols/browser/outlineModel.ts:149
+  Reason: Static function passed as comparison function - no this binding issues
+  Content: const idx = binarySearch<IRange>(markers, item.symbol.range, Range.compareRangesUsingStarts);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/snippet/browser/snippetSession.ts:48
+  Reason: Static function passed as comparison function - no this binding issues
+  Content: this._placeholderGroups = groupBy(_snippet.placeholders, Placeholder.compareByIndex);
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/snippet/browser/snippetSession.ts:341
+  Reason: Static function passed as comparison function - no this binding issues
+  Content: this._placeholderGroups = groupBy(this._snippet.placeholders, Placeholder.compareByIndex);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/comments/browser/commentsModel.ts:143
+  Reason: Static function passed as comparison function - no this binding issues
+  Content: for (const group of groupBy(commentThreads, CommentsModel._compareURIs)) {
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/mergeEditor/browser/model/modifiedBaseRange.ts:164
+  Reason: Static function passed as comparison function - no this binding issues
+  Content: compareBy((d) => d.diff.inputRange, Range.compareRangesUsingStarts),
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/mergeEditor/browser/view/lineAlignment.ts:146
+  Reason: Static function passed as comparison function - no this binding issues
+  Content: events.sort(compareBy((m) => m.inputPos, Position.compare));
 
