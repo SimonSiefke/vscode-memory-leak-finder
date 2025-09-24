@@ -1,6 +1,5 @@
+import { join, resolve } from 'node:path'
 import type { RawSourceMap } from 'source-map'
-import { readFile } from 'node:fs/promises'
-import { basename, join, resolve } from 'node:path'
 import { SourceMapConsumer } from 'source-map'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetOriginalClassName from '../GetOriginalClassName/GetOriginalClassName.ts'
