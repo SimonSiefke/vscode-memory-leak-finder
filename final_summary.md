@@ -5,9 +5,9 @@ Successfully implemented conservative false positive detection for unbound metho
 
 ## Results
 - **Original issues**: 637
-- **Total false positives identified**: 245 (38.5%)
-- **Real issues remaining**: 392 (61.5%)
-- **File size reduced**: From 1,202 lines to 1,330 lines
+- **Total false positives identified**: 254 (39.8%)
+- **Real issues remaining**: 383 (60.2%)
+- **File size**: 1,499 lines (properly formatted)
 
 ## False Positive Categories Identified
 
@@ -19,6 +19,11 @@ Successfully implemented conservative false positive detection for unbound metho
 - `Class.staticMethod()` patterns
 - Static methods don't have `this` context issues
 - Examples: `AnimationFrameQueueItem.sort`, `Range.compareRangesUsingStarts`, etc.
+
+### 3. Method Calls with 'this' as Last Argument (9 false positives)
+- `methodName(..., this)` patterns
+- `this` is passed as `thisArg` for proper context binding
+- Examples: `onStart(this.onSashStart, this)`, `parent.onCancellationRequested(this.cancel, this)`
 
 ## Script Features
 - **Extensible design**: Easy to add new false positive conditions
@@ -33,9 +38,9 @@ Successfully implemented conservative false positive detection for unbound metho
 - `final_summary.md` - This summary
 
 ## Impact
-Reduced manual review workload from **637 issues to 392 real issues** - a **38.5% reduction** in false positives that can be safely ignored.
+Reduced manual review workload from **637 issues to 383 real issues** - a **39.8% reduction** in false positives that can be safely ignored.
 
 ## Next Steps
-1. Focus on the remaining 392 real issues for manual review
+1. Focus on the remaining 383 real issues for manual review
 2. Add more false positive conditions to the script as patterns are identified
 3. Consider creating ESLint rule exceptions for identified false positive patterns

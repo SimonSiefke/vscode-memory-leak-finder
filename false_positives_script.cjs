@@ -96,6 +96,16 @@ function isFalsePositive(issue) {
         };
     }
 
+    // Condition 4: Method calls with 'this' as last argument
+    // These are false positives because 'this' is passed as thisArg for proper binding
+    const thisAsLastArgPattern = /\([^)]*,\s*this\s*\)\s*;?\s*$/;
+    if (thisAsLastArgPattern.test(content)) {
+        return {
+            isFalsePositive: true,
+            reason: 'Method call with \'this\' as last argument - proper thisArg binding'
+        };
+    }
+
     // TODO: Add more conditions over time as we identify clear false positive patterns
     // Examples of future conditions to consider:
     // - Arrow functions (but need to verify they don't have this issues)
