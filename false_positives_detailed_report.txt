@@ -1,44 +1,160 @@
 FALSE POSITIVES DETAILED REPORT
 ==================================================
 
-Total issues analyzed: 392
-False positives: 9
-Real issues: 383
-False positive rate: 2.3%
+Total issues analyzed: 383
+False positives: 38
+Real issues: 345
+False positive rate: 9.9%
 
-/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/splitview/splitview.ts:1174
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/grid/grid.ts:311
   Reason: Method call with 'this' as last argument - proper thisArg binding
-  Content: const onStartDisposable = onStart(this.onSashStart, this);
+  Content: this._register(this.gridview.onDidSashReset(this.onDidSashReset, this));
 
-/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/splitview/splitview.ts:1176
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/inputbox/inputBox.ts:180
   Reason: Method call with 'this' as last argument - proper thisArg binding
-  Content: const onChangeDisposable = onChange(this.onSashChange, this);
+  Content: this._register(onAnchoredSelectionChange(this.updateScrollDimensions, this));
 
-/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/splitview/splitview.ts:1178
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/inputbox/inputBox.ts:181
   Reason: Method call with 'this' as last argument - proper thisArg binding
-  Content: const onEndDisposable = onEnd(this.onSashEnd, this);
+  Content: this._register(this.onDidHeightChange(this.updateScrollDimensions, this));
 
-/home/simon/.cache/repos/vscode/src/vs/base/common/cancellation.ts:103
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/colorPicker/browser/colorPickerParts/colorPickerHeader.ts:55
   Reason: Method call with 'this' as last argument - proper thisArg binding
-  Content: this._parentListener = parent && parent.onCancellationRequested(this.cancel, this);
+  Content: this._register(model.onDidChangeColor(this.onDidChangeColor, this));
 
-/home/simon/.cache/repos/vscode/src/vs/platform/log/common/bufferLog.ts:29
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/colorPicker/browser/colorPickerParts/colorPickerHeader.ts:56
   Reason: Method call with 'this' as last argument - proper thisArg binding
-  Content: this._logLevelDisposable.value = logger.onDidChangeLogLevel(this.setLevel, this);
+  Content: this._register(model.onDidChangePresentation(this.onDidChangePresentation, this));
 
-/home/simon/.cache/repos/vscode/src/vs/platform/markers/common/markerService.ts:93
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/colorPicker/browser/colorPickerParts/colorPickerSaturationBox.ts:48
   Reason: Method call with 'this' as last argument - proper thisArg binding
-  Content: this._subscription = service.onMarkerChanged(this._update, this);
+  Content: this._register(this.model.onDidChangeColor(this.onDidChangeColor, this));
 
-/home/simon/.cache/repos/vscode/src/vs/workbench/api/common/extHostCommands.ts:363
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/colorPicker/browser/colorPickerParts/colorPickerStrip.ts:42
   Reason: Method call with 'this' as last argument - proper thisArg binding
-  Content: this._commands.registerCommand(true, this.delegatingCommandId, this._executeConvertedCommand, this);
+  Content: this._register(model.onDidChangeColor(this.onDidChangeColor, this));
 
-/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/quickDiffModel.ts:144
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/parameterHints/browser/parameterHintsModel.ts:89
   Reason: Method call with 'this' as last argument - proper thisArg binding
-  Content: )(this.triggerDiff, this)
+  Content: this._register(this.providers.onDidChange(this.onModelChanged, this));
 
-/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/testing/common/testItemCollection.ts:364
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/suggest/browser/suggestCommitCharacters.ts:35
   Reason: Method call with 'this' as last argument - proper thisArg binding
-  Content: actual.tags.forEach(this.incrementTagRefs, this);
+  Content: this._disposables.add(widget.onDidFocus(this._onItem, this));
+
+/home/simon/.cache/repos/vscode/src/vs/editor/contrib/suggest/browser/suggestCommitCharacters.ts:36
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._disposables.add(widget.onDidHide(this.reset, this));
+
+/home/simon/.cache/repos/vscode/src/vs/platform/native/electron-main/auth.ts:67
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._register(onLogin(this.onLogin, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/browser/parts/paneCompositePart.ts:198
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._register(this.onDidPaneCompositeClose(this.onDidClose, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/browser/parts/views/viewPane.ts:479
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._register(onDidRelevantConfigurationChange(this.updateActionsVisibility, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/bulkEdit/browser/bulkTextEdits.ts:101
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: .map(this._transformSnippetStringToInsertText, this) // no editor -> no snippet mode
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/bulkEdit/browser/bulkTextEdits.ts:166
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: .map(this._transformSnippetStringToInsertText, this) // mixed edits (snippet and normal) -> no snippet mode
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/bulkEdit/browser/preview/bulkEditPane.ts:147
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._disposables.add(this._tree.onContextMenu(this._onContextMenu, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/callHierarchy/browser/callHierarchyPeek.ts:243
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._disposables.add(this._tree.onDidChangeFocus(this._updatePreview, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/debug/browser/breakpointsView.ts:164
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._register(this.list.onContextMenu(this.onListContextMenu, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/extensions/browser/extensionEditor.ts:419
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._register(onError(this.onError, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/mcp/browser/mcpServerEditor.ts:293
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._register(onError(this.onError, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/notebook/browser/contrib/cellStatusBar/contributedStatusBarItemController.ts:28
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._register(this._observer.onDidChangeVisibleCells(this._updateVisibleCells, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/notebook/browser/contrib/cellStatusBar/executionStatusBarItemController.ts:50
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._register(this._observer.onDidChangeVisibleCells(this._updateVisibleCells, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/notebook/browser/notebook.contribution.ts:775
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: )(this._openMissingDirtyNotebookEditors, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/notebook/browser/viewParts/notebookEditorToolbar.ts:278
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: )(this._updatePerEditorChange, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/notebook/browser/viewParts/notebookEditorWidgetContextKeys.ts:62
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._disposables.add(_editor.onDidChangeModel(this._handleDidChangeModel, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/notebook/browser/viewParts/notebookKernelView.ts:161
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._register(_editor.onDidChangeModel(this._update, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/quickDiffDecorator.ts:252
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._register(onDidChangeConfiguration(this.onDidChangeConfiguration, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/quickDiffDecorator.ts:256
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._register(onDidChangeDiffWidthConfiguration(this.onDidChangeDiffWidthConfiguration, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/quickDiffDecorator.ts:260
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._register(onDidChangeDiffVisibilityConfiguration(this.onDidChangeDiffVisibilityConfiguration, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/quickDiffModel.ts:206
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: disposables.add(repository.provider.onDidChangeResources(this.triggerDiff, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/quickDiffWidget.ts:504
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._register(onDidChangeGutterAction(this.onDidChangeGutterAction, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/scmRepositoriesViewPane.ts:231
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._register(this.tree.onDidChangeSelection(this.onTreeSelectionChange, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/scmRepositoriesViewPane.ts:232
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._register(this.tree.onDidChangeFocus(this.onTreeDidChangeFocus, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/scmRepositoriesViewPane.ts:233
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._register(this.tree.onDidFocus(this.onDidTreeFocus, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/scmRepositoriesViewPane.ts:234
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._register(this.tree.onContextMenu(this.onTreeContextMenu, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/scmRepositoriesViewPane.ts:235
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._register(this.tree.onDidChangeContentHeight(this.onTreeContentHeightChange, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/testing/browser/testingExplorerFilter.ts:58
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._register(testService.excluded.onTestExclusionsChanged(this.updateFilterActiveState, this));
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/typeHierarchy/browser/typeHierarchyPeek.ts:244
+  Reason: Method call with 'this' as last argument - proper thisArg binding
+  Content: this._disposables.add(this._tree.onDidChangeFocus(this._updatePreview, this));
 
