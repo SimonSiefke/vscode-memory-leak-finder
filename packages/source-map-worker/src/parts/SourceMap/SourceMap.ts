@@ -1,6 +1,5 @@
+import { join, resolve } from 'node:path'
 import type { RawSourceMap } from 'source-map'
-import { readFile } from 'node:fs/promises'
-import { basename, join, resolve } from 'node:path'
 import { SourceMapConsumer } from 'source-map'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetOriginalClassName from '../GetOriginalClassName/GetOriginalClassName.ts'
@@ -36,14 +35,11 @@ export const getOriginalPositions = async (
         if (index !== -1) {
           // TODO maybe compute this separately
           const sourceFileRelativePath: string = sourceMap.sources[index]
-          const originalFileName = basename(sourceFileRelativePath)
           const originalCodePath: string = resolve(join(root, '.vscode-sources', hash, sourceFileRelativePath))
-          const originalCode: string = await readFile(originalCodePath, 'utf8')
-          const originalClassName: string = await GetOriginalClassName.getOriginalClassName(
-            originalCode,
+          const originalClassName: string = await GetOriginalClassName.getOriginalClassNameFromFile(
+            originalCodePath,
             originalPosition.line,
             originalPosition.column,
-            originalFileName,
           )
           originalPosition.name = originalClassName
         }
