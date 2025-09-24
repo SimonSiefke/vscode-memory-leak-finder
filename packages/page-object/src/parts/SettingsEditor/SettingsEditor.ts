@@ -177,10 +177,13 @@ export const create = ({ expect, page, VError }) => {
       }
     },
     async ensureIdle() {
+      // TODO maybe find a better way
       // create random quickpick to avoid race condition
+      await page.waitForIdle()
       const quickPick = QuickPick.create({ page, expect, VError })
       await quickPick.show()
       await quickPick.hide()
+      await page.waitForIdle()
     },
     async addItem({ name, key, value }) {
       try {
@@ -214,7 +217,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(row).toHaveCount(1)
         await expect(row).toHaveAttribute('aria-label', `The property \`${key}\` is set to \`${value}\`.`)
       } catch (error) {
-        throw new VError(error, `Failed to add item`)
+        throw new VError(error, `Failed to add item to settings editor`)
       }
     },
     async removeItem({ name }) {
