@@ -170,7 +170,7 @@ export const runTestsWithCallback = async ({
         if (testSkipped) {
           skipped++
           const end = Time.now()
-          const duration = end - testStart
+          const duration = end - start
           await callback(TestWorkerEventType.TestSkipped, absolutePath, relativeDirname, dirent, duration)
         } else {
           let isLeak = false
