@@ -139,6 +139,16 @@ function isFalsePositive(issue) {
         };
     }
 
+    // Condition 8: bindToContribution calls
+    // Pattern: any line containing bindToContribution
+    // These are false positives because bindToContribution handles binding correctly
+    if (content.includes('bindToContribution')) {
+        return {
+            isFalsePositive: true,
+            reason: 'bindToContribution call - handles binding correctly'
+        };
+    }
+
     // TODO: Add more conditions over time as we identify clear false positive patterns
     // Examples of future conditions to consider:
     // - Arrow functions (but need to verify they don't have this issues)

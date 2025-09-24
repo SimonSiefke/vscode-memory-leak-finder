@@ -5,9 +5,9 @@ Successfully implemented conservative false positive detection for unbound metho
 
 ## Results
 - **Original issues**: 637
-- **Total false positives identified**: 336 (52.7%)
-- **Real issues remaining**: 301 (47.3%)
-- **File size**: 572 lines (properly formatted, whitespace cleaned)
+- **Total false positives identified**: 345 (54.2%)
+- **Real issues remaining**: 292 (45.8%)
+- **File size**: 545 lines (properly formatted, whitespace cleaned)
 
 ## False Positive Categories Identified
 
@@ -40,6 +40,11 @@ Successfully implemented conservative false positive detection for unbound metho
 - These are just passing comparison functions to sort, not calling unbound methods
 - Examples: `selections.sort(Range.compareRangesUsingStarts)`, `candidates.sort(Position.compare)`
 
+### 7. bindToContribution Calls (9 false positives)
+- Any line containing `bindToContribution`
+- These handle binding correctly and are not unbound method issues
+- Examples: `EditorCommand.bindToContribution<CommonFindController>(CommonFindController.get)`
+
 ## Script Features
 - **Extensible design**: Easy to add new false positive conditions
 - **Conservative approach**: Only removes clearly identifiable false positives
@@ -54,9 +59,9 @@ Successfully implemented conservative false positive detection for unbound metho
 - `final_summary.md` - This summary
 
 ## Impact
-Reduced manual review workload from **637 issues to 301 real issues** - a **52.7% reduction** in false positives that can be safely ignored.
+Reduced manual review workload from **637 issues to 292 real issues** - a **54.2% reduction** in false positives that can be safely ignored.
 
 ## Next Steps
-1. Focus on the remaining 301 real issues for manual review
+1. Focus on the remaining 292 real issues for manual review
 2. Add more false positive conditions to the script as patterns are identified
 3. Consider creating ESLint rule exceptions for identified false positive patterns
