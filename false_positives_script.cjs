@@ -105,13 +105,24 @@ function isFalsePositive(issue) {
             reason: 'Method call with \'this\' as last argument - proper thisArg binding'
         };
     }
-
+    
+    // Condition 5: Method calls where second argument is context of first argument
+    // Pattern: methodName(this._someMethod.fire, this._someMethod)
+    // These are false positives because the context is properly bound
+    const methodWithContextPattern = /\([^,]*\.([a-zA-Z_][a-zA-Z0-9_]*)\s*,\s*this\._\1\)/;
+    if (methodWithContextPattern.test(content)) {
+        return {
+            isFalsePositive: true,
+            reason: 'Method call with context binding - second argument is context of first method'
+        };
+    }
+    
     // TODO: Add more conditions over time as we identify clear false positive patterns
     // Examples of future conditions to consider:
     // - Arrow functions (but need to verify they don't have this issues)
     // - Built-in utility methods (but need to verify the specific methods)
     // - Constructor calls (new ClassName())
-
+    
     return {
         isFalsePositive: false
     };
@@ -186,7 +197,7 @@ function createCleanDebugFile(issues, falsePositives) {
     let k = 0;
     while (k < cleanLines.length) {
         const line = cleanLines[k];
-        
+
         // If this is a blank line
         if (line.trim() === '') {
             // Look ahead to see if there are more blank lines
@@ -194,7 +205,7 @@ function createCleanDebugFile(issues, falsePositives) {
             while (j < cleanLines.length && cleanLines[j].trim() === '') {
                 j++;
             }
-            
+
             // If we found multiple blank lines, keep only one
             if (j > k + 1) {
                 finalCleanLines.push('');
@@ -210,7 +221,7 @@ function createCleanDebugFile(issues, falsePositives) {
             k++;
         }
     }
-    
+
     // Write clean debug file
     fs.writeFileSync('debug_clean.txt', finalCleanLines.join('\n'));
     return finalCleanLines.length;
