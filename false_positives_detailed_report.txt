@@ -1,44 +1,156 @@
 FALSE POSITIVES DETAILED REPORT
 ==================================================
 
-Total issues analyzed: 299
-False positives: 9
-Real issues: 290
-False positive rate: 3.0%
+Total issues analyzed: 290
+False positives: 37
+Real issues: 253
+False positive rate: 12.8%
 
-/home/simon/.cache/repos/vscode/src/vs/editor/contrib/find/browser/findController.ts:998
-  Reason: bindToContribution call - handles binding correctly
-  Content: const FindCommand = EditorCommand.bindToContribution<CommonFindController>(CommonFindController.get);
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/list/listWidget.ts:506
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: onInput(this.onInput, this, this.enabledDisposables);
 
-/home/simon/.cache/repos/vscode/src/vs/editor/contrib/gotoError/browser/gotoError.ts:290
-  Reason: bindToContribution call - handles binding correctly
-  Content: const MarkerCommand = EditorCommand.bindToContribution<MarkerController>(MarkerController.get);
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/list/listWidget.ts:507
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: onClear(this.onClear, this, this.enabledDisposables);
 
-/home/simon/.cache/repos/vscode/src/vs/editor/contrib/linkedEditing/browser/linkedEditing.ts:441
-  Reason: bindToContribution call - handles binding correctly
-  Content: const LinkedEditingCommand = EditorCommand.bindToContribution<LinkedEditingContribution>(LinkedEditingContribution.get);
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/list/listWidget.ts:614
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: onTab(this.onTab, this, this.disposables);
 
-/home/simon/.cache/repos/vscode/src/vs/editor/contrib/message/browser/messageController.ts:128
-  Reason: bindToContribution call - handles binding correctly
-  Content: const MessageCommand = EditorCommand.bindToContribution<MessageController>(MessageController.get);
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/list/listWidget.ts:689
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: list.onMouseDown(this.onMouseDown, this, this.disposables);
 
-/home/simon/.cache/repos/vscode/src/vs/editor/contrib/parameterHints/browser/parameterHints.ts:103
-  Reason: bindToContribution call - handles binding correctly
-  Content: const ParameterHintsCommand = EditorCommand.bindToContribution<ParameterHintsController>(ParameterHintsController.get);
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/list/listWidget.ts:690
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: list.onContextMenu(this.onContextMenu, this, this.disposables);
 
-/home/simon/.cache/repos/vscode/src/vs/editor/contrib/rename/browser/rename.ts:402
-  Reason: bindToContribution call - handles binding correctly
-  Content: const RenameCommand = EditorCommand.bindToContribution<RenameController>(RenameController.get);
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/list/listWidget.ts:691
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: list.onMouseDblClick(this.onDoubleClick, this, this.disposables);
 
-/home/simon/.cache/repos/vscode/src/vs/editor/contrib/snippet/browser/snippetController2.ts:337
-  Reason: bindToContribution call - handles binding correctly
-  Content: const CommandCtor = EditorCommand.bindToContribution<SnippetController2>(SnippetController2.get);
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/list/listWidget.ts:692
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: list.onTouchStart(this.onMouseDown, this, this.disposables);
 
-/home/simon/.cache/repos/vscode/src/vs/editor/contrib/suggest/browser/suggestController.ts:856
-  Reason: bindToContribution call - handles binding correctly
-  Content: const SuggestCommand = EditorCommand.bindToContribution<SuggestController>(SuggestController.get);
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/list/listWidget.ts:1480
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: this.accessibilityProvider.onDidChangeActiveDescendant?.(this.onDidChangeActiveDescendant, this, this.disposables);
 
-/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/snippets/browser/tabCompletion.ts:193
-  Reason: bindToContribution call - handles binding correctly
-  Content: const TabCompletionCommand = EditorCommand.bindToContribution<TabCompletionController>(TabCompletionController.get);
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/list/listWidget.ts:1529
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: this.onDidChangeFocus(this._onFocusChange, this, this.disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/list/listWidget.ts:1530
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: this.onDidChangeSelection(this._onSelectionChange, this, this.disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/splitview/paneview.ts:533
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: pane.onDidChangeExpansionState(this.setupAnimation, this, disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/tree/abstractTree.ts:364
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: renderer.onDidChangeTwistieState?.(this.onDidChangeTwistieState, this, this.disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/tree/abstractTree.ts:1013
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: this.widget.onDidChangeValue(this.onDidChangeValue, this, this.enabledDisposables);
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/tree/abstractTree.ts:1014
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: this.widget.onDidDisable(this.close, this, this.enabledDisposables);
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/tree/abstractTree.ts:1015
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: this.widget.onDidToggleChange(this.onDidToggleChange, this, this.enabledDisposables);
+
+/home/simon/.cache/repos/vscode/src/vs/base/browser/ui/tree/asyncDataTree.ts:629
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: this.tree.onDidChangeCollapseState(this._onDidChangeCollapseState, this, this.disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/platform/update/electron-main/updateService.darwin.ts:61
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: this.onRawError(this.onError, this, this.disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/platform/update/electron-main/updateService.darwin.ts:62
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: this.onRawUpdateAvailable(this.onUpdateAvailable, this, this.disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/platform/update/electron-main/updateService.darwin.ts:63
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: this.onRawUpdateDownloaded(this.onUpdateDownloaded, this, this.disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/platform/update/electron-main/updateService.darwin.ts:64
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: this.onRawUpdateNotAvailable(this.onUpdateNotAvailable, this, this.disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/platform/windows/node/windowTracker.ts:26
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: onActiveWindowChange(this.setActiveWindow, this, this.disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/browser/parts/editor/breadcrumbsControl.ts:293
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: this._widget.onDidSelectItem(this._onSelectEvent, this, this._disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/browser/parts/editor/breadcrumbsControl.ts:294
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: this._widget.onDidFocusItem(this._onFocusEvent, this, this._disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/browser/parts/editor/breadcrumbsControl.ts:295
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: this._widget.onDidChangeFocus(this._updateCkBreadcrumbsActive, this, this._disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/browser/parts/views/viewPane.ts:176
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: (this.onDidChangeViewWelcomeContent, this, this.enabledDisposables);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/languageStatus/browser/languageStatus.ts:196
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: editor?.onDidChangeModelLanguage(this._update, this, this._renderDisposables);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/markers/browser/markersTreeViewer.ts:161
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: onDidChangeRenderNodeCount(this.onDidChangeRenderNodeCount, this, this.disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/sash/browser/sash.ts:29
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: onDidChangeSize(this.onDidChangeSize, this, this._store);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/sash/browser/sash.ts:33
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: onDidChangeHoverDelay(this.onDidChangeHoverDelay, this, this._store);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/menus.ts:44
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: this.menu.onDidChange(this.updateTitleActions, this, this.disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/menus.ts:207
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: provider.onDidChangeResourceGroups(this.onDidChangeResourceGroups, this, this.disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/quickDiffWidget.ts:634
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: onDidModelChange(this.onDidModelChange, this, disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/scmHistoryViewPane.ts:1896
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: this._tree.onDidOpen(this._onDidOpen, this, this._store);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/scmHistoryViewPane.ts:1897
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: this._tree.onContextMenu(this._onContextMenu, this, this._store);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/scmViewPane.ts:2411
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: this.tree.onDidOpen(this.open, this, this.disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/contrib/scm/browser/scmViewPane.ts:2412
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: this.tree.onContextMenu(this.onListContextMenu, this, this.disposables);
+
+/home/simon/.cache/repos/vscode/src/vs/workbench/services/search/node/fileSearch.ts:139
+  Reason: Method call with 'this' as second argument - proper context binding
+  Content: this.call(this.cmdTraversal, this, folderQuery, numThreads, onResult, onMessage, (err?: Error) => {
 

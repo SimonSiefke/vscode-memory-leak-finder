@@ -5,9 +5,9 @@ Successfully implemented conservative false positive detection for unbound metho
 
 ## Results
 - **Original issues**: 637
-- **Total false positives identified**: 345 (54.2%)
-- **Real issues remaining**: 292 (45.8%)
-- **File size**: 545 lines (properly formatted, whitespace cleaned)
+- **Total false positives identified**: 382 (60.0%)
+- **Real issues remaining**: 255 (40.0%)
+- **File size**: 480 lines (properly formatted, whitespace cleaned)
 
 ## False Positive Categories Identified
 
@@ -45,6 +45,11 @@ Successfully implemented conservative false positive detection for unbound metho
 - These handle binding correctly and are not unbound method issues
 - Examples: `EditorCommand.bindToContribution<CommonFindController>(CommonFindController.get)`
 
+### 8. Method Calls with 'this' as Second Argument (37 false positives)
+- `methodName(this.someMethod, this, ...)` patterns
+- These are false positives because `this` is passed as second argument for proper context binding
+- Examples: `onActiveWindowChange(this.setActiveWindow, this, this.disposables)`
+
 ## Script Features
 - **Extensible design**: Easy to add new false positive conditions
 - **Conservative approach**: Only removes clearly identifiable false positives
@@ -59,9 +64,9 @@ Successfully implemented conservative false positive detection for unbound metho
 - `final_summary.md` - This summary
 
 ## Impact
-Reduced manual review workload from **637 issues to 292 real issues** - a **54.2% reduction** in false positives that can be safely ignored.
+Reduced manual review workload from **637 issues to 255 real issues** - a **60.0% reduction** in false positives that can be safely ignored.
 
 ## Next Steps
-1. Focus on the remaining 292 real issues for manual review
+1. Focus on the remaining 255 real issues for manual review
 2. Add more false positive conditions to the script as patterns are identified
 3. Consider creating ESLint rule exceptions for identified false positive patterns

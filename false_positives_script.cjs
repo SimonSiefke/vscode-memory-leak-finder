@@ -149,6 +149,17 @@ function isFalsePositive(issue) {
         };
     }
 
+    // Condition 9: Method calls with 'this' as second argument
+    // Pattern: methodName(this.someMethod, this, ...)
+    // These are false positives because 'this' is passed as second argument for proper context binding
+    const thisAsSecondArgPattern = /\(this\.[a-zA-Z_][a-zA-Z0-9_]*\s*,\s*this\s*,/;
+    if (thisAsSecondArgPattern.test(content)) {
+        return {
+            isFalsePositive: true,
+            reason: 'Method call with \'this\' as second argument - proper context binding'
+        };
+    }
+
     // TODO: Add more conditions over time as we identify clear false positive patterns
     // Examples of future conditions to consider:
     // - Arrow functions (but need to verify they don't have this issues)
