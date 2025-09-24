@@ -181,9 +181,39 @@ function createCleanDebugFile(issues, falsePositives) {
         }
     }
 
+    // Remove superfluous whitespace (multiple consecutive blank lines)
+    const finalCleanLines = [];
+    let k = 0;
+    while (k < cleanLines.length) {
+        const line = cleanLines[k];
+        
+        // If this is a blank line
+        if (line.trim() === '') {
+            // Look ahead to see if there are more blank lines
+            let j = k + 1;
+            while (j < cleanLines.length && cleanLines[j].trim() === '') {
+                j++;
+            }
+            
+            // If we found multiple blank lines, keep only one
+            if (j > k + 1) {
+                finalCleanLines.push('');
+                k = j;
+            } else {
+                // Single blank line, keep it
+                finalCleanLines.push(line);
+                k++;
+            }
+        } else {
+            // Not a blank line, keep it
+            finalCleanLines.push(line);
+            k++;
+        }
+    }
+    
     // Write clean debug file
-    fs.writeFileSync('debug_clean.txt', cleanLines.join('\n'));
-    return cleanLines.length;
+    fs.writeFileSync('debug_clean.txt', finalCleanLines.join('\n'));
+    return finalCleanLines.length;
 }
 
 function main() {
