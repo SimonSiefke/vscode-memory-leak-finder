@@ -109,7 +109,7 @@ function isFalsePositive(issue) {
     // Condition 5: Method calls where second argument is context of first argument
     // Pattern: methodName(this._someMethod.fire, this._someMethod)
     // These are false positives because the context is properly bound
-    const methodWithContextPattern = /\([^,]*\.([a-zA-Z_][a-zA-Z0-9_]*)\s*,\s*this\._\1\)/;
+    const methodWithContextPattern = /\(this\._([a-zA-Z_][a-zA-Z0-9_]*)\.([a-zA-Z_][a-zA-Z0-9_]*)\s*,\s*this\._\1\)/;
     if (methodWithContextPattern.test(content)) {
         return {
             isFalsePositive: true,
