@@ -6,8 +6,8 @@ export const setup = async ({ Editor, SettingsEditor }: TestContext): Promise<vo
   await SettingsEditor.search({
     value: 'Associations',
     resultCount: 2,
+    expectedItems: ['files.associations'],
   })
-  await SettingsEditor.ensureIdle()
 }
 
 export const run = async ({ SettingsEditor }: TestContext): Promise<void> => {

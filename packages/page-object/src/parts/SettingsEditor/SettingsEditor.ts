@@ -29,7 +29,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to scroll up in settings editor`)
       }
     },
-    async search({ value, resultCount }) {
+    async search({ value, resultCount, expectedItems = [] }) {
       try {
         await page.waitForIdle()
         const searchInput = page.locator('.search-container [role="textbox"]')
@@ -41,6 +41,11 @@ export const create = ({ expect, page, VError }) => {
         const word = resultCount === 1 ? 'Setting' : 'Settings'
         await expect(searchCount).toHaveText(`${resultCount} ${word} Found`)
         await page.waitForIdle()
+        for (const item of expectedItems) {
+          const locator = page.locator(`.monaco-list-row [aria-label="${item}"]`)
+          await expect(locator).toBeVisible()
+        }
+        await page.waitForReallyIdle()
       } catch (error) {
         throw new VError(error, `Failed to search for ${value}`)
       }
@@ -187,32 +192,46 @@ export const create = ({ expect, page, VError }) => {
     },
     async addItem({ name, key, value }) {
       try {
-        await page.waitForIdle()
+        await page.waitForReallyIdle()
         const block = page.locator(`.setting-item-contents[aria-label="${name}"]`)
         await expect(block).toBeVisible()
-        await page.waitForIdle()
+        await page.waitForReallyIdle()
         const keyHeading = block.locator('.setting-list-object-key')
+        await expect(keyHeading).toBeVisible()
+        await page.waitForReallyIdle()
         await expect(keyHeading).toHaveText('Item')
-        await page.waitForIdle()
+        await page.waitForReallyIdle()
         const valueHeading = block.locator('.setting-list-object-value')
+        await expect(valueHeading).toBeVisible()
+        await page.waitForReallyIdle()
         await expect(valueHeading).toHaveText('Value')
-        await page.waitForIdle()
+        await page.waitForReallyIdle()
         const addButton = block.locator('.monaco-button', {
           hasText: 'Add Item',
         })
+        await expect(addButton).toBeVisible()
+        await page.waitForReallyIdle()
         await addButton.click()
-        await page.waitForIdle()
+        await page.waitForReallyIdle()
         const keyInput = block.locator('.setting-list-object-input-key .input')
         await expect(keyInput).toBeVisible()
+        await page.waitForReallyIdle()
         await expect(keyInput).toBeFocused()
+        await page.waitForReallyIdle()
         await keyInput.type(key)
+        await page.waitForReallyIdle()
         const valueInput = block.locator('.setting-list-object-input-value .input')
         await expect(valueInput).toBeVisible()
+        await page.waitForReallyIdle()
         await valueInput.focus()
+        await page.waitForReallyIdle()
         await valueInput.type(value)
+        await page.waitForReallyIdle()
         const okButton = block.locator('.setting-list-ok-button')
         await expect(okButton).toBeVisible()
+        await page.waitForReallyIdle()
         await okButton.click()
+        await page.waitForReallyIdle()
         const row = block.locator('.setting-list-object-row')
         await expect(row).toHaveCount(1)
         await expect(row).toHaveAttribute('aria-label', `The property \`${key}\` is set to \`${value}\`.`)

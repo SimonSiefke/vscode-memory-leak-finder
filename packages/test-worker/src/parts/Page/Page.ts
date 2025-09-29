@@ -65,6 +65,9 @@ export const create = ({ electronRpc, electronObjectId, targetId, sessionId, rpc
     async waitForIdle() {
       return PageWaitForIdle.waitForIdle(this.rpc, this.electronRpc.canUseIdleCallback, idleTimeout)
     },
+    async waitForReallyIdle() {
+      return PageWaitForIdle.waitForReallyIdle(this.rpc, this.electronRpc.canUseIdleCallback, idleTimeout)
+    },
     async reload() {
       return PageReload.reload(this.rpc)
     },

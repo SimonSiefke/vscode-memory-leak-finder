@@ -16,8 +16,37 @@ const getExpression = (canUseIdleCallback) => {
 })`
 }
 
+const getExpressionReallyIdle = (canUseIdleCallback) => {
+  Assert.boolean(canUseIdleCallback)
+  if (canUseIdleCallback) {
+    return `await new Promise(resolve => {
+  requestIdleCallback(()=>{
+    requestAnimationFrame(()=>{
+      setTimeout(()=>{
+        resolve()
+      }, 0)
+    })
+  })
+})`
+  }
+  return `await new Promise(resolve => {
+  setTimeout(resolve, 16)
+})`
+}
+
 const waitRpcIdle = (pageObject, canUseIdleCallback) => {
   const expression = getExpression(canUseIdleCallback)
+  return pageObject.utilityContext.evaluate({
+    awaitPromise: true,
+    replMode: true,
+    expression,
+    returnByValue: true,
+    generatePreview: true,
+  })
+}
+
+const waitRpcReallyIdle = (pageObject, canUseIdleCallback) => {
+  const expression = getExpressionReallyIdle(canUseIdleCallback)
   return pageObject.utilityContext.evaluate({
     awaitPromise: true,
     replMode: true,
@@ -33,6 +62,24 @@ export const waitForIdle = async (rpc, canUseIdleCallback, idleTimeout) => {
     const pageObject = PageObjectState.getPageObjectContext(connectionId)
 
     const result = await PTimeout.pTimeout(waitRpcIdle(pageObject, canUseIdleCallback), {
+      milliseconds: idleTimeout,
+    })
+    return result
+  } catch (error) {
+    // @ts-ignore
+    if (error && error.message === 'uniqueContextId not found') {
+      throw new ExpectError(`Please wait for window to be loaded before evaluating, e.g. await expect(window).toBeLoaded()`)
+    }
+    throw new VError(error, `Failed to check that page is idle`)
+  }
+}
+
+export const waitForReallyIdle = async (rpc, canUseIdleCallback, idleTimeout) => {
+  try {
+    const connectionId = 1
+    const pageObject = PageObjectState.getPageObjectContext(connectionId)
+
+    const result = await PTimeout.pTimeout(waitRpcReallyIdle(pageObject, canUseIdleCallback), {
       milliseconds: idleTimeout,
     })
     return result
