@@ -163,8 +163,9 @@ export const runTestsWithCallback = async ({
 
       try {
         const start = i === 0 ? initialStart : Time.now()
-        const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(currentTestRpc, connectionId, absolutePath, forceRun, timeouts)
-        wasOriginallySkipped = testSkipped && forceRun
+        const testResult = await TestWorkerSetupTest.testWorkerSetupTest(currentTestRpc, connectionId, absolutePath, forceRun, timeouts)
+        const testSkipped = testResult.skipped
+        wasOriginallySkipped = testResult.wasOriginallySkipped
 
         if (recordVideo) {
           await VideoRecording.addChapter(currentVideoRpc, dirent, start)
@@ -224,7 +225,7 @@ export const runTestsWithCallback = async ({
         }
         const PrettyError = await import('../PrettyError/PrettyError.ts')
         const prettyError = await PrettyError.prepare(error, { color, root })
-        await callback(TestWorkerEventType.TestFailed, absolutePath, relativeDirname, relativePath, dirent, prettyError)
+        await callback(TestWorkerEventType.TestFailed, absolutePath, relativeDirname, relativePath, dirent, prettyError, wasOriginallySkipped)
       } finally {
         if (restartBetween) {
           await clearDisposables()

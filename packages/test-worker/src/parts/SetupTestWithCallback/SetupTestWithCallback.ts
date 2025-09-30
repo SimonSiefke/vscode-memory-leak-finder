@@ -8,9 +8,11 @@ export const setupTestWithCallback = async (pageObject, file, forceRun) => {
   Assert.string(file)
   Assert.boolean(forceRun)
   const module = await ImportTest.importTest(file)
+  const wasOriginallySkipped = module.skip
   if (module.skip && !forceRun) {
-    return true
+    return { skipped: true, wasOriginallySkipped }
   }
   await TestStage.beforeSetup(module, pageObject)
   await TestStage.setup(module, pageObject)
+  return { skipped: false, wasOriginallySkipped }
 }

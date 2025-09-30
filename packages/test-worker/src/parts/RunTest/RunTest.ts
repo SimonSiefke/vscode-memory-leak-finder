@@ -6,6 +6,6 @@ export const runTest = async (connectionId, absolutePath, forceRun, runMode) => 
   Assert.number(connectionId)
   Assert.string(absolutePath)
   const pageObject = PageObjectState.getPageObject(connectionId)
-  const skipped = await RunTestWithCallback.runTestWithCallback(pageObject, absolutePath, forceRun, runMode)
-  return skipped
+  const result = await RunTestWithCallback.runTestWithCallback(pageObject, absolutePath, forceRun, runMode)
+  return result
 }

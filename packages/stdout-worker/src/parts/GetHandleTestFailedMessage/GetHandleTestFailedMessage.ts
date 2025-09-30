@@ -16,11 +16,13 @@ export const getHandleTestFailedMessage = (
   relativeFilePath: string,
   fileName: string,
   error: TestError,
+  wasOriginallySkipped: boolean,
 ): string => {
   const formattedStack: string = FormatStack.formatStack(error.stack, relativeFilePath)
   const messageRelativeDirName: string = chalk.dim(relativeDirName + '/')
   const messageFileName: string = chalk.bold(fileName)
-  return `${TestPrefix.Fail} ${messageRelativeDirName}${messageFileName}
+  const prefix = wasOriginallySkipped ? TestPrefix.SkipFail : TestPrefix.Fail
+  return `${prefix} ${messageRelativeDirName}${messageFileName}
 
       ${error.type}: ${error.message}
 
