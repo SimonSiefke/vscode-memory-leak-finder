@@ -14,7 +14,7 @@ export const fixSvgHeight = (svgHtml: string, dataCount: number): string => {
       .replace(VIEWBOX_REGEX, (match) => {
         const viewBoxMatch = match.match(VIEWBOX_MATCH_REGEX)
         if (viewBoxMatch) {
-          const [, x, y, width, height] = viewBoxMatch
+          const [, x, y, width] = viewBoxMatch
           return `viewBox="${x} ${y} ${width} ${newHeight}"`
         }
         return match

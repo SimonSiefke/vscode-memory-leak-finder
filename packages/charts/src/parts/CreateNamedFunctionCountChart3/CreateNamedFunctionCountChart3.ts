@@ -12,8 +12,8 @@ export const createChart = () => {
     xLabel: 'Index',
     yLabel: 'Function Counts',
     // width: 1400,
-    // marginLeft: 500,
-    // marginRight: 500,
+    marginLeft: 500,
+    marginRight: 500,
     fontSize: 12,
   }
 }
