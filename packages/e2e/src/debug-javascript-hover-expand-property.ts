@@ -30,7 +30,7 @@ setInterval(()=>{
     column: 0,
   })
   await Editor.showDebugHover({
-    expectedTitle: /ƒ setInterval\(callback, repeat, arg1, arg2, arg3\)/,
+    expectedTitle: /ƒ setInterval\(callback, repeat, ...args\)/,
   })
 }
 
