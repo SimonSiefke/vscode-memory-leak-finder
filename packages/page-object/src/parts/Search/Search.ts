@@ -20,33 +20,42 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const searchView = page.locator('.search-view')
         const searchInput = searchView.locator('textarea[placeholder="Search"]')
+        await expect(searchInput).toBeVisible()
+        await page.waitForIdle()
         await searchInput.focus()
         await expect(searchInput).toBeFocused()
         await searchInput.clear()
         await searchInput.type(text)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to type into search input`)
       }
     },
     async clear() {
       try {
+        await page.waitForIdle()
         const searchView = page.locator('.search-view')
         const searchInput = searchView.locator('textarea[placeholder="Search"]')
         await searchInput.focus()
         await expect(searchInput).toBeFocused()
         await searchInput.clear()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to clear search input`)
       }
     },
     async typeReplace(text) {
       try {
+        await page.waitForIdle()
         const searchView = page.locator('.search-view')
         const replaceInput = searchView.locator('textarea[placeholder="Replace"]')
+        await expect(replaceInput).toBeVisible()
+        await page.waitForIdle()
         await replaceInput.focus()
         await expect(replaceInput).toBeFocused()
         await replaceInput.clear()
         await replaceInput.type(text)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to type into replace input`)
       }

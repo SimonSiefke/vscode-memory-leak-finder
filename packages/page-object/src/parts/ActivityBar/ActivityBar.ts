@@ -28,6 +28,7 @@ export const create = ({ expect, page, VError }) => {
         const sideBar = page.locator('.sidebar')
         const title = sideBar.locator('.composite.title')
         await expect(title).toHaveText(titleLabel)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show ${ariaLabel.toLowerCase()}`)
       }
