@@ -2,7 +2,6 @@ import { existsSync } from 'node:fs'
 import { readdir } from 'node:fs/promises'
 import { join } from 'path'
 import { readJson } from '../ReadJson/ReadJson.ts'
-import * as Root from '../Root/Root.ts'
 
 const getUniqueName = (usedNames: Set<string>, currentName: string): string => {
   let uniqueName = currentName
@@ -16,8 +15,8 @@ const getUniqueName = (usedNames: Set<string>, currentName: string): string => {
   return uniqueName
 }
 
-export const getNamedFunctionCountData3 = async (name: string) => {
-  const resultsPath = join(Root.root, '.vscode-memory-leak-finder-results', 'named-function-count3')
+export const getNamedFunctionCountData3 = async (name: string, basePath: string) => {
+  const resultsPath = join(basePath, 'named-function-count3')
   if (!existsSync(resultsPath)) {
     return []
   }

@@ -1,5 +1,5 @@
 import * as GetCountData from '../GetCountData/GetCountData.ts'
 
-export const getErrorCountData = () => {
-  return GetCountData.getCountData('error-count', 'errorCount')
+export const getErrorCountData = (basePath: string) => {
+  return GetCountData.getCountData('error-count', 'errorCount', basePath)
 }

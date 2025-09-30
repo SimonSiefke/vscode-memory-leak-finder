@@ -2,7 +2,7 @@ import * as GetObjectCountsData from '../GetObjectCountsData/GetObjectCountsData
 
 export const name = 'object-count'
 
-export const getData = GetObjectCountsData.getObjectCountsData
+export const getData = (basePath: string) => GetObjectCountsData.getObjectCountsData(basePath)
 
 export const createChart = () => {
   return {

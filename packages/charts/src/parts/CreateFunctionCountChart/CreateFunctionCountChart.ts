@@ -2,7 +2,7 @@ import * as GetFunctionCountsData from '../GetFunctionCountsData/GetFunctionCoun
 
 export const name = 'function-count'
 
-export const getData = GetFunctionCountsData.getFunctionCountsData
+export const getData = (basePath: string) => GetFunctionCountsData.getFunctionCountsData(basePath)
 
 export const createChart = () => {
   return {

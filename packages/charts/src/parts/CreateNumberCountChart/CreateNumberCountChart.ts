@@ -2,7 +2,7 @@ import * as GetNumberCountData from '../GetNumberCountsData/GetNumberCountsData.
 
 export const name = 'number-count'
 
-export const getData = GetNumberCountData.getNumberCountsData
+export const getData = (basePath: string) => GetNumberCountData.getNumberCountsData(basePath)
 
 export const createChart = () => {
   return {

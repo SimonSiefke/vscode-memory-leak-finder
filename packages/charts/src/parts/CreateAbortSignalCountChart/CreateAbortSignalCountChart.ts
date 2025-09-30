@@ -2,7 +2,7 @@ import * as GetAbortSignalCountData from '../GetAbortSignalCountData/GetAbortSig
 
 export const name = 'abort-signal-count'
 
-export const getData = GetAbortSignalCountData.getAbortSignalCountData
+export const getData = (basePath: string) => GetAbortSignalCountData.getAbortSignalCountData(basePath)
 
 export const createChart = () => {
   return {

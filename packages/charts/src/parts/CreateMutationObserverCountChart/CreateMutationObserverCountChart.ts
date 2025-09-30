@@ -2,7 +2,7 @@ import * as GetMutationObserverCountData from '../GetMutationObserverCountData/G
 
 export const name = 'mutation-observer-count'
 
-export const getData = GetMutationObserverCountData.getObjectCountsData
+export const getData = (basePath: string) => GetMutationObserverCountData.getMutationObserverCountData(basePath)
 
 export const createChart = () => {
   return {
