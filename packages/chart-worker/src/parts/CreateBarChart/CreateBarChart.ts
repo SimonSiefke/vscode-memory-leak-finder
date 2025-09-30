@@ -22,11 +22,6 @@ export const createBarChart = (data: any, options: any): string => {
         x: 'value',
         y: 'name',
         fill: 'black',
-        rx1: 2,
-        rx2: 2,
-        strokeWidth: 2,
-        fillOpacity: 0.75,
-        inset: 0,
         sort: {
           y: '-x',
         },
