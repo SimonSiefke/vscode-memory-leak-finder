@@ -15,8 +15,6 @@ export const setup = async ({ Workspace, Editor }: TestContext): Promise<void> =
   await Editor.shouldHaveText(`:root {
   --font-size: 10px;
 }`)
-  await Editor.type('abc')
-  await Editor.deleteCharactersLeft({ count: 3 })
   await Editor.shouldHaveToken('--font-size', 'rgb(156, 220, 254)')
 }
 

@@ -366,10 +366,12 @@ export const create = ({ page, expect, VError, ideVersion }) => {
       }
     },
     async shouldHaveToken(text, color) {
+      await page.waitForIdle()
       const token = page.locator(`[class^="mtk"]`, {
         hasText: text,
       })
       await expect(token).toHaveCss('color', color)
+      await page.waitForIdle()
     },
     async shouldHaveBreadCrumb(text) {
       await page.waitForIdle()
@@ -641,9 +643,11 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     },
     async shouldHaveCursor(estimate) {
       try {
+        await page.waitForIdle()
         const cursor = page.locator('.cursor')
         await expect(cursor).toBeVisible()
         await expect(cursor).toHaveCss('left', estimate)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed cursor assertion`)
       }
