@@ -34,10 +34,11 @@ export const getNamedFunctionCountData3 = async (name: string) => {
 
       return {
         name: uniqueName,
-        value: item.count,
+        count: item.count,
+        delta: item.delta,
       }
     })
-    data.sort((a, b) => b.value - a.value)
+    data.sort((a, b) => b.count - a.count)
     // Add filename metadata to the data
     const dataWithFilename = {
       data,
