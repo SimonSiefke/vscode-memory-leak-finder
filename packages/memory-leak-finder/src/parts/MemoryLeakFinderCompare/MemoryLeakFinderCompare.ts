@@ -1,7 +1,7 @@
 import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinderState.ts'
 import * as Assert from '../Assert/Assert.ts'
 
-export const compare = async (connectionId: number): Promise<any> => {
+export const compare = async (connectionId: number, context: any): Promise<any> => {
   Assert.number(connectionId)
   const measure = MemoryLeakFinderState.get(connectionId)
   if (!measure) {
@@ -14,5 +14,5 @@ export const compare = async (connectionId: number): Promise<any> => {
   if (!after) {
     throw new Error(`after missing`)
   }
-  return measure.compare(before, after)
+  return measure.compare(before, after, context)
 }
