@@ -37,7 +37,7 @@ test('handleTestsFinished - no filter value', async () => {
 
   mockInvoke.mockResolvedValue(expectedMessage)
 
-  await HandleTestsFinished.handleTestsFinished(2, 1, 0, 0, 3, 3000, '')
+  await HandleTestsFinished.handleTestsFinished(2, 1, 0, 0, 0, 3, 3000, '')
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(expectedMessage)
 })
@@ -47,7 +47,7 @@ test('handleTestsFinished - with filter value', async () => {
 
   mockInvoke.mockResolvedValue(expectedMessage)
 
-  await HandleTestsFinished.handleTestsFinished(2, 1, 0, 0, 3, 3000, 'abc')
+  await HandleTestsFinished.handleTestsFinished(2, 1, 0, 0, 0, 3, 3000, 'abc')
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(expectedMessage)
 })
@@ -57,7 +57,7 @@ test('handleTestsFinished - with leak', async () => {
 
   mockInvoke.mockResolvedValue(expectedMessage)
 
-  await HandleTestsFinished.handleTestsFinished(2, 1, 0, 1, 4, 3000, '')
+  await HandleTestsFinished.handleTestsFinished(2, 1, 0, 0, 1, 4, 3000, '')
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(expectedMessage)
 })

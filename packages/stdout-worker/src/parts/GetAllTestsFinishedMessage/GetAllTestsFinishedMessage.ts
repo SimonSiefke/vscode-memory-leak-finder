@@ -21,6 +21,7 @@ export const getAllTestsFinishedMessage = (
   passed: number,
   failed: number,
   skipped: number,
+  skippedFailed: number,
   leaked: number,
   total: number,
   duration: number,
@@ -29,12 +30,13 @@ export const getAllTestsFinishedMessage = (
 ): string => {
   const failedMessage: string = failed ? `${chalk.bold.red(`${failed} failed`)}, ` : Character.EmptyString
   const skippedMessage: string = skipped ? `${chalk.bold.yellow(`${skipped} skipped`)}, ` : Character.EmptyString
+  const skippedFailedMessage: string = skippedFailed ? `${chalk.bold.magenta(`${skippedFailed} skipped-failed`)}, ` : Character.EmptyString
   const passedMessage: string = passed ? `${chalk.bold.green(`${passed} passed`)}, ` : Character.EmptyString
   const leakedMessage: string = leaked ? `${chalk.bold.blue(`${leaked} leaked`)}, ` : Character.EmptyString
   const durationMessage: string = FormatAsSeconds.formatAsSeconds(duration)
   const ranAllTestSuitesMessage: string = getRanAllTestSuitesMessage(filterValue)
   let message: string = `
-${testSuites} ${failedMessage}${skippedMessage}${passedMessage}${leakedMessage}${total} total
+${testSuites} ${failedMessage}${skippedMessage}${skippedFailedMessage}${passedMessage}${leakedMessage}${total} total
 ${time}        ${durationMessage}
 ${ranAllTestSuitesMessage}\n`
   if (isWatchMode) {
