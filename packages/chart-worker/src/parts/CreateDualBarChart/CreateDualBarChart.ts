@@ -9,7 +9,9 @@ export const createDualBarChart = (data: any, options: any): string => {
 
   const dataCount = data.length
   const lineHeight = fontSize + 6
-  const height = dataCount * lineHeight
+  const marginTop = 50
+  const marginBottom = 50
+  const height = dataCount * lineHeight + marginTop + marginBottom
 
   // Transform data to have separate entries for total and leaked counts
   const transformedData = data.flatMap((item: any) => [
