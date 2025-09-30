@@ -24,6 +24,7 @@ export const prepareTestsAndAttach = async (
   measureId: string,
   idleTimeout: number,
   pageObjectPath: string,
+  measureNode: boolean,
 ) => {
   const isFirst = state.promise === undefined
   if (isFirst) {
@@ -62,6 +63,7 @@ export const prepareTestsAndAttach = async (
     timeouts,
     utilityContext,
     runMode,
+    measureNode,
   )
   return {
     memoryRpc,

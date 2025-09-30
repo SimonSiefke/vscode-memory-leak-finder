@@ -89,6 +89,7 @@ export const runTestsWithCallback = async ({
         measure,
         idleTimeout,
         pageObjectPath,
+        measureNode,
       )
       await testWorkerRpc.dispose()
       await memoryRpc?.dispose()
@@ -125,6 +126,7 @@ export const runTestsWithCallback = async ({
       measure,
       idleTimeout,
       pageObjectPath,
+      measureNode,
     )
 
     addDisposable(async () => {
@@ -253,6 +255,7 @@ export const runTestsWithCallback = async ({
             measure,
             idleTimeout,
             pageObjectPath,
+            measureNode,
           )
           addDisposable(async () => {
             await memoryRpc.dispose()
