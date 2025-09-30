@@ -312,8 +312,65 @@ const baseStructure = `
         // Draw or hide arrow
         if (activeChart && activeLink) {
           drawArrow(activeLink, activeChart);
+
+          // Scroll sidebar to keep active link visible
+          scrollSidebarToActiveLink(activeLink);
         } else {
           hideArrow();
+        }
+      }
+
+      // Track scroll direction for better positioning
+      let lastScrollY = window.scrollY;
+      let scrollDirection = 'down';
+
+      // Function to scroll sidebar so the active link remains visible
+      function scrollSidebarToActiveLink(activeLink) {
+        const navigation = document.querySelector('.Navigation');
+        if (!navigation || !activeLink) return;
+
+        const navigationRect = navigation.getBoundingClientRect();
+        const linkRect = activeLink.getBoundingClientRect();
+        const navigationScrollTop = navigation.scrollTop;
+        const viewportHeight = navigationRect.height;
+        const linkHeight = linkRect.height;
+
+        // Update scroll direction
+        const currentScrollY = window.scrollY;
+        if (currentScrollY > lastScrollY) {
+          scrollDirection = 'down';
+        } else if (currentScrollY < lastScrollY) {
+          scrollDirection = 'up';
+        }
+        lastScrollY = currentScrollY;
+
+        // Define thresholds for proactive scrolling (earlier than edge detection)
+        const topThreshold = navigationRect.top + (viewportHeight * 0.3); // 30% from top
+        const bottomThreshold = navigationRect.bottom - (viewportHeight * 0.3); // 30% from bottom
+
+        // Check if the link is getting close to the top edge or is above it
+        if (linkRect.top < topThreshold) {
+          let targetPosition;
+          if (scrollDirection === 'down') {
+            // When scrolling down, position link in upper third of viewport
+            targetPosition = linkRect.top - navigationRect.top - (viewportHeight * 0.4);
+          } else {
+            // When scrolling up, position link more towards center
+            targetPosition = linkRect.top - navigationRect.top - (viewportHeight * 0.5);
+          }
+          navigation.scrollTop = navigationScrollTop + targetPosition;
+        }
+        // Check if the link is getting close to the bottom edge or is below it
+        else if (linkRect.bottom > bottomThreshold) {
+          let targetPosition;
+          if (scrollDirection === 'down') {
+            // When scrolling down, position link in lower third of viewport
+            targetPosition = linkRect.bottom - navigationRect.bottom + (viewportHeight * 0.4);
+          } else {
+            // When scrolling up, position link more towards center
+            targetPosition = linkRect.bottom - navigationRect.bottom + (viewportHeight * 0.5);
+          }
+          navigation.scrollTop = navigationScrollTop + targetPosition;
         }
       }
 
