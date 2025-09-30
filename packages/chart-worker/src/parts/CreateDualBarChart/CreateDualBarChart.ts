@@ -1,17 +1,14 @@
 import { fixHtmlNamespace } from '../FixXmlNamespace/FixXmlNamespace.ts'
+import { fixSvgHeight } from '../FixSvgHeight/FixSvgHeight.ts'
+import { getCommonBarChartOptions } from '../GetCommonBarChartOptions/GetCommonBarChartOptions.ts'
 import * as Plot from '../Plot/Plot.ts'
 
 export const createDualBarChart = (data: any, options: any): string => {
-  const marginLeft = options.marginLeft || 250
-  const marginRight = options.marginRight || 250
-  const fontSize = options.fontSize || 7
-  const width = options.width || 640
-
   const dataCount = data.length
-  const lineHeight = fontSize + 6
-  const marginTop = 50
-  const marginBottom = 50
-  const height = dataCount * lineHeight + marginTop + marginBottom
+  const chartOptions = getCommonBarChartOptions(dataCount, {
+    ...options,
+    // marginTop: 150, // Override marginTop for dual bar chart
+  })
 
   // Transform data to have separate entries for total and leaked counts
   const transformedData = data.flatMap((item: any) => [
@@ -29,17 +26,23 @@ export const createDualBarChart = (data: any, options: any): string => {
 
   const baseHtml = Plot.plot({
     style: 'overflow: visible;background:white',
-    width,
-    height,
-    marginLeft: marginLeft,
-    marginRight: marginRight,
+    width: chartOptions.width,
+    height: chartOptions.height,
+    marginLeft: chartOptions.marginLeft,
+    marginRight: chartOptions.marginRight,
+    marginTop: 0,
+    // marginBottom: 'auto',
     x: { axis: null },
     y: { label: null },
+
     marks: [
-      Plot.barX(transformedData, {
+      Plot.rectX(transformedData, {
         x: 'value',
         y: 'name',
         fill: (d: any) => (d.type === 'total' ? '#000000' : '#B22222'), // black for total, firebrick red for leaked
+        rx1: 2,
+        rx2: 2,
+        strokeWidth: 2,
         sort: {
           y: '-x',
         },
@@ -56,12 +59,12 @@ export const createDualBarChart = (data: any, options: any): string => {
           dx: 3,
           stroke: 'black',
           strokeWidth: 0.5,
-          fontSize: fontSize,
+          fontSize: chartOptions.fontSize,
         },
       ),
     ],
   }).outerHTML
 
   const finalHtml = fixHtmlNamespace(baseHtml)
-  return finalHtml
+  return fixSvgHeight(finalHtml, dataCount)
 }
