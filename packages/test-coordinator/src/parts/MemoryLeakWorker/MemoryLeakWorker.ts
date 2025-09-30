@@ -9,6 +9,7 @@ export const startWorker = async (
   connectionId: number,
   measureId: string,
   attachedToPageTimeout: number,
+  measureNode: boolean,
 ) => {
   Assert.string(devtoolsWebsocketUrl)
   const rpc = await NodeWorkerRpcParent.create({
@@ -23,6 +24,7 @@ export const startWorker = async (
     connectionId,
     measureId,
     attachedToPageTimeout,
+    measureNode,
   )
   return rpc
 }
