@@ -45,7 +45,7 @@ export const createDualBarChart = (data: any, options: any): string => {
 
       // Add text label for TOTAL count only
       Plot.text(transformedData.filter((d: any) => d.type === 'total'), {
-        text: (d: any) => d.value, // Show the actual total count value
+        text: (d: any) => d.value + (data.find((item: any) => item.name === d.name)?.delta || 0), // Show the actual total count value
         y: 'name',
         x: 'value',
         textAnchor: 'start',
