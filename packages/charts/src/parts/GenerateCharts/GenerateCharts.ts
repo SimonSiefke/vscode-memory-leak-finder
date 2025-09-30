@@ -18,24 +18,24 @@ const visitors = Object.values(Charts).map((value) => {
 
 export const generateCharts = async () => {
   const rpc = await launchChartWorker()
-  
+
   // Generate charts for both regular and Node.js data
   const basePaths = [
     { path: join(Root.root, '.vscode-memory-leak-finder-results'), isNode: false },
-    { path: join(Root.root, '.vscode-memory-leak-finder-results', 'node'), isNode: true }
+    { path: join(Root.root, '.vscode-memory-leak-finder-results', 'node'), isNode: true },
   ]
-  
+
   for (const basePathInfo of basePaths) {
     for (const visitor of visitors) {
       if (visitor.skip) {
         continue
       }
-      
+
       const data = await visitor.getData(basePathInfo.path)
       if (data.length === 0) {
         continue
       }
-      
+
       const chartMetaData = visitor.fn()
       // @ts-ignore
       if (visitor.multiple) {
@@ -74,6 +74,6 @@ export const generateCharts = async () => {
       }
     }
   }
-  
+
   await rpc[Symbol.asyncDispose]()
 }
