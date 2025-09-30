@@ -45,8 +45,10 @@ export const create = ({ expect, page, VError }) => {
     },
     async type(value) {
       try {
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.DebugConsoleFocusOnDebugConsoleView)
+        await page.waitForIdle()
         const replInputWrapper = page.locator('.repl-input-wrapper')
         await expect(replInputWrapper).toBeVisible()
         const viewLine = replInputWrapper.locator('.view-line')
