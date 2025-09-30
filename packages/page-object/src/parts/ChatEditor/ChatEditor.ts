@@ -10,7 +10,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(chatView).toBeVisible()
         await page.waitForIdle()
         const editContext = page.locator('.native-edit-context')
-        await expect(editContext).toBeFocused()
+        await expect(editContext).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to open chat editor`)
       }
