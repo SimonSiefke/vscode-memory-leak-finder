@@ -103,6 +103,38 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to split editor`)
       }
     },
+    async fold() {
+      try {
+        const inlineFolded = page.locator('.inline-folded')
+        await expect(inlineFolded).toBeHidden()
+        const collapsedIcon = page.locator('.codicon-folding-collapsed').first()
+        await expect(collapsedIcon).toBeHidden()
+        const foldingIcon = page.locator('.codicon-folding-expanded').first()
+        await expect(foldingIcon).toBeVisible()
+        const firstIcon = foldingIcon.first()
+        await firstIcon.click()
+        await expect(inlineFolded).toBeVisible()
+        await expect(collapsedIcon).toBeVisible()
+        await collapsedIcon.click()
+      } catch (error) {
+        throw new VError(error, `Failed to fold editor`)
+      }
+    },
+    async unfold() {
+      try {
+        const inlineFolded = page.locator('.inline-folded')
+        await expect(inlineFolded).toBeVisible()
+        const collapsedIcon = page.locator('.codicon-folding-collapsed').first()
+        await expect(collapsedIcon).toBeVisible()
+        const foldingIcon = page.locator('.codicon-folding-expanded').first()
+        await expect(foldingIcon).toBeHidden()
+        await collapsedIcon.click()
+        await expect(inlineFolded).toBeHidden()
+        await expect(collapsedIcon).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to unfold editor`)
+      }
+    },
     async splitDown() {
       return this.split(WellKnownCommands.ViewSplitEditorDown)
     },

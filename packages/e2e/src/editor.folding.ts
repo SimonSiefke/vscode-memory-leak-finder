@@ -18,21 +18,11 @@ h2 {
   await Editor.open('file.css')
 }
 
-// @ts-ignore
-export const run = async ({ page, expect }: TestContext): Promise<void> => {
-  const inlineFolded = page.locator('.inline-folded')
-  await expect(inlineFolded).toBeHidden()
-  const collapsedIcon = page.locator('.codicon-folding-collapsed').first()
-  await expect(collapsedIcon).toBeHidden()
-  const foldingIcon = page.locator('.codicon-folding-expanded').first()
-  await expect(foldingIcon).toBeVisible()
-  const firstIcon = foldingIcon.first()
-  await firstIcon.click()
-  await expect(inlineFolded).toBeVisible()
-  await expect(collapsedIcon).toBeVisible()
-  await collapsedIcon.click()
-  await expect(inlineFolded).toBeHidden()
-  await expect(collapsedIcon).toBeHidden()
+export const run = async ({ Editor }: TestContext): Promise<void> => {
+  // @ts-ignore
+  await Editor.fold()
+  // @ts-ignore
+  await Editor.unfold()
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
