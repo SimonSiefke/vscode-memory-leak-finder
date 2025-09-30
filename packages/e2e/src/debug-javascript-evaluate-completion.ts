@@ -28,7 +28,7 @@ setInterval(()=>{
 
 export const run = async ({ DebugConsole }: TestContext): Promise<void> => {
   await DebugConsole.type('glob')
-  await DebugConsole.shouldHaveCompletions(['global', 'globalThis'])
+  await DebugConsole.shouldHaveCompletions(['global, Property', 'globalThis'])
   await DebugConsole.clearInput()
 }
 
