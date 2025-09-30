@@ -41,7 +41,8 @@ export const createDualBarChart = (data: any, options: any): string => {
         strokeWidth: 2,
         fillOpacity: 0.75,
         inset: 3,
-        height: chartOptions.fixedBarHeight,
+        y1: (d: any, i: number) => chartOptions.marginTop + Math.floor(i / 2) * (chartOptions.fixedBarHeight + 3),
+        y2: (d: any, i: number) => chartOptions.marginTop + Math.floor(i / 2) * (chartOptions.fixedBarHeight + 3) + chartOptions.fixedBarHeight,
         sort: {
           y: '-x',
         },

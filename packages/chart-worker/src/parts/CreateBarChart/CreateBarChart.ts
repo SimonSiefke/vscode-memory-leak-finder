@@ -24,7 +24,8 @@ export const createBarChart = (data: any, options: any): string => {
         strokeWidth: 2,
         fillOpacity: 0.75,
         inset: 3,
-        height: chartOptions.fixedBarHeight,
+        y1: (d: any, i: number) => chartOptions.marginTop + i * (chartOptions.fixedBarHeight + 3),
+        y2: (d: any, i: number) => chartOptions.marginTop + i * (chartOptions.fixedBarHeight + 3) + chartOptions.fixedBarHeight,
         sort: {
           y: '-x',
         },
