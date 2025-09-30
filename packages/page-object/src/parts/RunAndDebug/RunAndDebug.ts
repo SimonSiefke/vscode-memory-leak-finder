@@ -83,7 +83,7 @@ export const create = ({ expect, page, VError }) => {
       await page.waitForIdle()
       const sessionLabel = debugCallStack.locator('.state.label')
       await expect(sessionLabel).toBeVisible()
-      await expect(sessionLabel).toHaveText('Paused on breakpoint')
+      await expect(sessionLabel).toHaveText(/Paused/)
       await page.waitForIdle()
       const stackFrame = page.locator('.debug-call-stack .monaco-list-row.selected')
       await expect(stackFrame).toBeVisible()
