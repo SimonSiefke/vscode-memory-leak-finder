@@ -6,7 +6,7 @@ export const createDualBarChart = (data: any, options: any): string => {
   const dataCount = data.length
   const chartOptions = getCommonBarChartOptions(dataCount, {
     ...options,
-    marginTop: 150, // Override marginTop for dual bar chart
+    // marginTop: 150, // Override marginTop for dual bar chart
   })
 
   // Transform data to have separate entries for total and leaked counts
