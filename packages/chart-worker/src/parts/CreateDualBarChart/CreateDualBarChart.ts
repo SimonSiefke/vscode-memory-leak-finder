@@ -11,6 +11,7 @@ export const createDualBarChart = (data: any, options: any): string => {
   })
 
   // Transform data to have separate entries for total and leaked counts
+  // Add a small gap by adjusting x positioning
   const transformedData = data.flatMap((item: any) => [
     {
       name: item.name,
@@ -36,19 +37,40 @@ export const createDualBarChart = (data: any, options: any): string => {
     y: { label: null },
 
     marks: [
-      Plot.rectX(transformedData, {
-        x: 'value',
-        y: 'name',
-        fill: (d: any) => (d.type === 'total' ? '#000000' : '#B22222'), // black for total, firebrick red for leaked
-        rx1: 2,
-        rx2: 2,
-        strokeWidth: 2,
-        fillOpacity: 0.75,
-        inset: 2,
-        sort: {
-          y: '-x',
-        },
-      }),
+      // Total bars (black)
+      Plot.rectX(
+        transformedData.filter((d: any) => d.type === 'total'),
+        {
+          x: 'value',
+          y: 'name',
+          fill: '#000000',
+          rx1: 2,
+          rx2: 2,
+          strokeWidth: 2,
+          fillOpacity: 0.75,
+          inset: 0,
+          sort: {
+            y: '-x',
+          },
+        }
+      ),
+      // Leaked bars (red) - positioned with a gap
+      Plot.rectX(
+        transformedData.filter((d: any) => d.type === 'leaked'),
+        {
+          x: (d: any) => d.value + 5, // Add 5px gap
+          y: 'name',
+          fill: '#B22222',
+          rx1: 2,
+          rx2: 2,
+          strokeWidth: 2,
+          fillOpacity: 0.75,
+          inset: 0,
+          sort: {
+            y: '-x',
+          },
+        }
+      ),
 
       // Add text label for TOTAL count only at the end of the total bar
       Plot.text(
@@ -56,7 +78,7 @@ export const createDualBarChart = (data: any, options: any): string => {
         {
           text: (d: any) => d.value + (data.find((item: any) => item.name === d.name)?.delta || 0), // Show the actual total count value
           y: 'name',
-          x: (d: any) => d.value + (data.find((item: any) => item.name === d.name)?.delta || 0), // Position at the end of the total bar
+          x: (d: any) => d.value + (data.find((item: any) => item.name === d.name)?.delta || 0) + 5, // Position at the end of the total bar + gap
           textAnchor: 'start',
           dx: 3,
           stroke: 'black',
