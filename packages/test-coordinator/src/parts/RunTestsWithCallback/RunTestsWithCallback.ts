@@ -93,17 +93,18 @@ export const runTestsWithCallback = async ({
       await testWorkerRpc.dispose()
       await memoryRpc?.dispose()
       await videoRpc?.dispose()
-      return callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, 0, 0, filterValue)
+      return callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, 0, 0, 0, filterValue)
     }
 
     let passed = 0
     let failed = 0
     let skipped = 0
+    let skippedFailed = 0
     let leaking = 0
     const formattedPaths = await GetTestToRun.getTestsToRun(root, cwd, filterValue)
     const total = formattedPaths.length
     if (total === 0) {
-      return callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, leaking, total, 0, filterValue)
+      return callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, 0, leaking, total, 0, filterValue)
     }
     const initialStart = Time.now()
     const first = formattedPaths[0]
@@ -155,6 +156,7 @@ export const runTestsWithCallback = async ({
       const formattedPath = formattedPaths[i]
       const { absolutePath, relativeDirname, dirent, relativePath } = formattedPath
       const forceRun = runSkippedTestsAnyway || dirent === `${filterValue}.js`
+      let wasOriginallySkipped = false
       if (i !== 0) {
         await callback(TestWorkerEventType.TestRunning, absolutePath, relativeDirname, dirent, /* isFirst */ true)
       }
@@ -162,6 +164,7 @@ export const runTestsWithCallback = async ({
       try {
         const start = i === 0 ? initialStart : Time.now()
         const testSkipped = await TestWorkerSetupTest.testWorkerSetupTest(currentTestRpc, connectionId, absolutePath, forceRun, timeouts)
+        wasOriginallySkipped = testSkipped && forceRun
 
         if (recordVideo) {
           await VideoRecording.addChapter(currentVideoRpc, dirent, start)
@@ -214,7 +217,11 @@ export const runTestsWithCallback = async ({
           }
         }
       } catch (error) {
-        failed++
+        if (wasOriginallySkipped) {
+          skippedFailed++
+        } else {
+          failed++
+        }
         const PrettyError = await import('../PrettyError/PrettyError.ts')
         const prettyError = await PrettyError.prepare(error, { color, root })
         await callback(TestWorkerEventType.TestFailed, absolutePath, relativeDirname, relativePath, dirent, prettyError)
@@ -258,7 +265,7 @@ export const runTestsWithCallback = async ({
     if (recordVideo) {
       await VideoRecording.finalize(currentVideoRpc)
     }
-    await callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, leaking, total, duration, filterValue)
+    await callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, skippedFailed, leaking, total, duration, filterValue)
   } catch (error) {
     const PrettyError = await import('../PrettyError/PrettyError.ts')
     const prettyError = await PrettyError.prepare(error, { color, root })
