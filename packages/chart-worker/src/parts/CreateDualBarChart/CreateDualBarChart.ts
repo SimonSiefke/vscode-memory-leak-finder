@@ -16,13 +16,13 @@ export const createDualBarChart = (data: any, options: any): string => {
     {
       name: item.name,
       value: item.count, // total count
-      type: 'total'
+      type: 'total',
     },
     {
       name: item.name,
       value: item.delta, // leaked count
-      type: 'leaked'
-    }
+      type: 'leaked',
+    },
   ])
 
   const baseHtml = Plot.plot({
@@ -37,24 +37,26 @@ export const createDualBarChart = (data: any, options: any): string => {
       Plot.barX(transformedData, {
         x: 'value',
         y: 'name',
-        fill: (d: any) => d.type === 'total' ? '#000000' : '#B22222', // black for total, firebrick red for leaked
+        fill: (d: any) => (d.type === 'total' ? '#000000' : '#B22222'), // black for total, firebrick red for leaked
         sort: {
           y: '-x',
         },
       }),
 
       // Add text label for TOTAL count only at the end of the total bar
-      Plot.text(transformedData.filter((d: any) => d.type === 'total'), {
-        text: (d: any) => d.value + (data.find((item: any) => item.name === d.name)?.delta || 0), // Show the actual total count value
-        y: 'name',
-        x: (d: any) => d.value + (data.find((item: any) => item.name === d.name)?.delta || 0), // Position at the end of the total bar
-        textAnchor: 'start',
-        dx: 3,
-        stroke: 'black',
-        strokeWidth: 0.5,
-        fontSize: fontSize,
-      }),
-
+      Plot.text(
+        transformedData.filter((d: any) => d.type === 'total'),
+        {
+          text: (d: any) => d.value + (data.find((item: any) => item.name === d.name)?.delta || 0), // Show the actual total count value
+          y: 'name',
+          x: (d: any) => d.value + (data.find((item: any) => item.name === d.name)?.delta || 0), // Position at the end of the total bar
+          textAnchor: 'start',
+          dx: 3,
+          stroke: 'black',
+          strokeWidth: 0.5,
+          fontSize: fontSize,
+        },
+      ),
     ],
   }).outerHTML
 
