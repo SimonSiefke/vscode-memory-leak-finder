@@ -2,7 +2,7 @@ import * as GetWeakMapCountData from '../GetWeakMapCountData/GetWeakMapCountData
 
 export const name = 'weak-map-count'
 
-export const getData = GetWeakMapCountData.getWeakMapCountData
+export const getData = (basePath: string) => GetWeakMapCountData.getWeakMapCountData(basePath)
 
 export const createChart = () => {
   return {

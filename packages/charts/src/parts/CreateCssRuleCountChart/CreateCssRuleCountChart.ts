@@ -2,7 +2,7 @@ import * as GetCssRuleCountData from '../GetCssRuleCountData/GetCssRuleCountData
 
 export const name = 'css-rule-count'
 
-export const getData = GetCssRuleCountData.getCssRuleCountData
+export const getData = (basePath: string) => GetCssRuleCountData.getCssRuleCountData(basePath)
 
 export const createChart = () => {
   return {

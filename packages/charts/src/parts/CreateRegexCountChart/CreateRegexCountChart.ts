@@ -2,7 +2,7 @@ import * as GetRegexCountData from '../GetRegexCountData/GetRegexCountData.ts'
 
 export const name = 'regex-count'
 
-export const getData = GetRegexCountData.getRegexCountData
+export const getData = (basePath: string) => GetRegexCountData.getRegexCountData(basePath)
 
 export const createChart = () => {
   return {

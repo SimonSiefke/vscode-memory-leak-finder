@@ -2,7 +2,7 @@ import * as GetTypedArrayCountsData from '../GetTypedArrayCountsData/GetTypedArr
 
 export const name = 'typed-array-count'
 
-export const getData = GetTypedArrayCountsData.getTypedArrayCountsData
+export const getData = (basePath: string) => GetTypedArrayCountsData.getTypedArrayCountsData(basePath)
 
 export const createChart = () => {
   return {

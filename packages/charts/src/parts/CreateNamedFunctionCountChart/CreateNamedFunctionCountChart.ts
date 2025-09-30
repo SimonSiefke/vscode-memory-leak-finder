@@ -3,7 +3,7 @@ import * as GetNamedFunctionCountData from '../GetNamedFunctionCountData/GetName
 
 export const name = 'named-function-count'
 
-export const getData = GetNamedFunctionCountData.getNamedFunctionCountData
+export const getData = (basePath: string) => GetNamedFunctionCountData.getNamedFunctionCountData(basePath)
 
 export const skip = 1
 

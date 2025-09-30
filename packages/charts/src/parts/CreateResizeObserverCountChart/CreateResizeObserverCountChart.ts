@@ -2,7 +2,7 @@ import * as GetResizeObserverCountData from '../GetResizeObserverCountData/GetRe
 
 export const name = 'resize-observer-count'
 
-export const getData = GetResizeObserverCountData.getObjectCountsData
+export const getData = (basePath: string) => GetResizeObserverCountData.getResizeObserverCountData(basePath)
 
 export const createChart = () => {
   return {

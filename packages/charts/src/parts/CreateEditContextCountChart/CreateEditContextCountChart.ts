@@ -2,7 +2,7 @@ import * as GetEditContextCountData from '../GetEditContextCountData/GetEditCont
 
 export const name = 'edit-context-count'
 
-export const getData = GetEditContextCountData.getEditContextCountData
+export const getData = (basePath: string) => GetEditContextCountData.getEditContextCountData(basePath)
 
 export const createChart = () => {
   return {

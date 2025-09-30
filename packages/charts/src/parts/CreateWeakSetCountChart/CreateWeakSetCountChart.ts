@@ -2,7 +2,7 @@ import * as GetWeakSetCountData from '../GetWeakSetCountData/GetWeakSetCountData
 
 export const name = 'weak-set-count'
 
-export const getData = GetWeakSetCountData.getWeakSetCountData
+export const getData = (basePath: string) => GetWeakSetCountData.getWeakSetCountData(basePath)
 
 export const createChart = () => {
   return {
