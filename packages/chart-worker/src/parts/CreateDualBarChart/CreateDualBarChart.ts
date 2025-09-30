@@ -37,7 +37,7 @@ export const createDualBarChart = (data: any, options: any): string => {
       Plot.barX(transformedData, {
         x: 'value',
         y: 'name',
-        fill: (d: any) => d.type === 'total' ? '#000000' : '#8B0000', // black for total, dark red for leaked
+        fill: (d: any) => d.type === 'total' ? '#000000' : '#B22222', // black for total, firebrick red for leaked
         sort: {
           y: '-x',
         },
