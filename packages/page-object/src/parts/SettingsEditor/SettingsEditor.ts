@@ -133,13 +133,14 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to disable checkbox "${name}"`)
       }
     },
-    async openSettingsContextMenu(name) {
+    async openSettingsContextMenu(name, { waitForItem }) {
       try {
         await page.waitForIdle()
         const item = page.locator(`.setting-item-category`, {
           hasText: `${name}: `,
         })
         await expect(item).toBeVisible()
+        await page.waitForIdle()
         await item.click()
         await page.waitForIdle()
         const outerItem = page.locator(`.settings-editor-tree .monaco-list-row[aria-label^="${name}"]`)
@@ -148,10 +149,21 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const moreActions = outerItem.locator('[aria-label^="More Actions"]')
         await expect(moreActions).toBeVisible()
+        await page.waitForIdle()
         await moreActions.click()
         await page.waitForIdle()
+        const contextMenu = outerItem.locator('.setting-toolbar-container .shadow-root-host:enter-shadow() .context-view')
+        await expect(contextMenu).toBeVisible()
+        const contextMenuItem = contextMenu.locator(`.action-label[aria-label="${waitForItem}"]`)
+        await expect(contextMenuItem).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to open settings context menu for "${name}"`)
+      }
+    },
+    closeSettingsContextMenu(name) {
+      try {
+      } catch (error) {
+        throw new VError(error, `Failed to close settings conext menu for "${name}"`)
       }
     },
     async expand(groupName) {

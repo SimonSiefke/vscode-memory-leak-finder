@@ -6,6 +6,7 @@ export const create = ({ expect, page, VError }) => {
         const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
         await expect(contextMenu).toBeHidden()
         let tries = 0
+        const maxTries = 11
         while (true) {
           await page.waitForIdle()
           await locator.click({
@@ -16,7 +17,7 @@ export const create = ({ expect, page, VError }) => {
             break
           }
           await page.waitForIdle()
-          if (tries++ === 11) {
+          if (tries++ === maxTries) {
             throw new Error(`failed to open`)
           }
         }
@@ -42,9 +43,9 @@ export const create = ({ expect, page, VError }) => {
     async shouldHaveItem(option) {
       await page.waitForIdle()
       const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
-      await contextMenu.count()
       await expect(contextMenu).toBeVisible()
       await expect(contextMenu).toBeFocused()
+      await contextMenu.count()
       const contextMenuItem = contextMenu.locator('.action-item', {
         hasText: option,
       })
