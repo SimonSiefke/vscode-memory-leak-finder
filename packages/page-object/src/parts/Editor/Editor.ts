@@ -236,6 +236,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     },
     async goToDefinition() {
       try {
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.GoToDefintiion)
       } catch (error) {
@@ -271,6 +272,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     },
     async click(text) {
       try {
+        await page.waitForIdle()
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
         const startTag = editor.locator('[class^="mtk"]', { hasText: text, nth: 0 })

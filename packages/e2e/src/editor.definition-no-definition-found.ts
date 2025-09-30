@@ -10,6 +10,7 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
     },
   ])
   await Editor.open('index.html')
+  await Editor.shouldHaveText('<h1>hello world</h1>')
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
