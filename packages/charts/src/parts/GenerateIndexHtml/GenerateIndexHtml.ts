@@ -469,13 +469,13 @@ const getSingleColumnHtml = (dirents: string[]): string => {
 export const generateIndexHtml = async (): Promise<void> => {
   const outPath = join(Root.root, '.vscode-charts', `index.html`)
   const svgPath = join(Root.root, '.vscode-charts')
-  
+
   // Check if the directory exists before trying to read it
   if (!existsSync(svgPath)) {
     // Create the directory if it doesn't exist
     await mkdir(svgPath, { recursive: true })
   }
-  
+
   const dirents = await readdir(svgPath)
   const middleHtml = getMiddleHtml(dirents)
   const html = baseStructure.replace('CONTENT', middleHtml)
