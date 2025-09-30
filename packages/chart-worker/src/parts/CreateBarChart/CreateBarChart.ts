@@ -17,11 +17,15 @@ export const createBarChart = (data: any, options: any): string => {
     x: { axis: null },
     y: { label: null },
     marks: [
-      Plot.barX(data, {
+      Plot.rectX(data, {
         x: 'value',
         y: 'name',
         fill: 'black',
-        inset: 2,
+        rx1: 2,
+        rx2: 2,
+        strokeWidth: 2,
+        fillOpacity: 0.75,
+        inset: 0,
         sort: {
           y: '-x',
         },
