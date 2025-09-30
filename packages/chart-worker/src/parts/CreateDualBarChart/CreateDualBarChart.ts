@@ -27,12 +27,13 @@ export const createDualBarChart = (data: any, options: any): string => {
     style: 'overflow: visible;background:white',
     width: chartOptions.width,
     height: chartOptions.height,
-    marginLeft: chartOptions.marginLeft,
-    marginRight: chartOptions.marginRight,
-    marginTop: chartOptions.marginTop,
-    marginBottom: chartOptions.marginBottom,
+    // marginLeft: chartOptions.marginLeft,
+    // marginRight: chartOptions.marginRight,
+    marginTop: 0,
+    // marginBottom: 'auto',
     x: { axis: null },
     y: { label: null },
+
     marks: [
       Plot.rectX(transformedData, {
         x: 'value',
