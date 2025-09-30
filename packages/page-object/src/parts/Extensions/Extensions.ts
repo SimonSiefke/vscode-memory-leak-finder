@@ -131,11 +131,19 @@ export const create = ({ expect, page, VError, ideVersion }) => {
     async openSuggest() {
       try {
         const extensionsView = page.locator('.extensions-viewlet')
-        const extensionsInput = extensionsView.locator('.inputarea')
+        const extensionsInput = extensionsView.locator('.native-edit-context')
         await expect(extensionsInput).toBeFocused()
-        await extensionsInput.press('Control+Space')
-        // TODO scope selector to extensions view
         const suggestions = page.locator('[aria-label="Suggest"]')
+        for (let i = 0; i < 5; i++) {
+          await page.waitForIdle()
+          const count = await suggestions.count()
+          if (count > 0) {
+            break
+          }
+          await extensionsInput.press('Control+Space')
+        }
+        await page.waitForIdle()
+        // TODO scope selector to extensions view
         await expect(suggestions).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to open extensions suggestions`)
