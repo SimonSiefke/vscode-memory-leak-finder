@@ -4,8 +4,8 @@ export const getCommonBarChartOptions = (dataCount: number, options: any) => {
   const fontSize = options.fontSize || 7
   const width = options.width || 640
   const fixedBarHeight = 20 // Fixed height for each bar
-  const marginTop = 0
-  const marginBottom = 0
+  const marginTop = 20
+  const marginBottom = 20
   const height = dataCount * fixedBarHeight + marginTop + marginBottom
 
   return {

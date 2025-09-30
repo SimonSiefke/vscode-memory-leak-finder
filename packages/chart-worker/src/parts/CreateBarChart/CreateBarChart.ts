@@ -12,12 +12,13 @@ export const createBarChart = (data: any, options: any): string => {
     height: chartOptions.height,
     marginLeft: chartOptions.marginLeft,
     marginRight: chartOptions.marginRight,
+    marginTop: chartOptions.marginTop,
+    marginBottom: chartOptions.marginBottom,
     x: { axis: null },
     y: { label: null },
     marks: [
       Plot.rectX(data, {
         x: 'value',
-        y: 'name',
         fill: 'black',
         rx1: 2,
         rx2: 2,
