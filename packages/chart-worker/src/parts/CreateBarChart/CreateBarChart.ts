@@ -19,6 +19,7 @@ export const createBarChart = (data: any, options: any): string => {
     marks: [
       Plot.rectX(data, {
         x: 'value',
+        y: 'name',
         fill: 'black',
         rx1: 2,
         rx2: 2,

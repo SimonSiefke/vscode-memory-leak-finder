@@ -29,12 +29,13 @@ export const createDualBarChart = (data: any, options: any): string => {
     height: chartOptions.height,
     marginLeft: chartOptions.marginLeft,
     marginRight: chartOptions.marginRight,
+    marginTop: chartOptions.marginTop,
+    marginBottom: chartOptions.marginBottom,
     x: { axis: null },
     y: { label: null },
     marks: [
       Plot.rectX(transformedData, {
         x: 'value',
-        y: 'name',
         fill: (d: any) => (d.type === 'total' ? '#000000' : '#B22222'), // black for total, firebrick red for leaked
         rx1: 2,
         rx2: 2,
