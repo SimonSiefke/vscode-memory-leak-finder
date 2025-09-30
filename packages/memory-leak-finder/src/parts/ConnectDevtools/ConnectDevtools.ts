@@ -7,16 +7,24 @@ import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 
 export const connectDevtools = async (
   devtoolsWebSocketUrl: string,
+  electronWebSocketUrl: string,
   connectionId: number,
   measureId: string,
   attachedToPageTimeout: number,
 ): Promise<void> => {
   // TODO connect to electron and node processes if should measure node
   Assert.string(devtoolsWebSocketUrl)
+  Assert.string(electronWebSocketUrl)
   Assert.number(connectionId)
   Assert.string(measureId)
   Assert.number(attachedToPageTimeout)
-  const browserRpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
+  const [electronRpc, browserRpc] = await Promise.all([
+    DebuggerCreateIpcConnection.createConnection(electronWebSocketUrl),
+    DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl),
+  ])
+  if (electronRpc) {
+    // TODO
+  }
   const { sessionRpc } = await waitForSession(browserRpc, attachedToPageTimeout)
   Promise.all([
     DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
