@@ -165,6 +165,7 @@ export const create = ({ page, expect, VError }) => {
           hasText: direntName,
         })
         await expect(dirent).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify that explorer has dirent "${direntName}"`)
       }
