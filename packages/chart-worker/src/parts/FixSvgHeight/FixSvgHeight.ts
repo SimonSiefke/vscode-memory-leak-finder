@@ -1,17 +1,25 @@
+const HEIGHT_REGEX = /height="(\d+)"/
+const VIEWBOX_REGEX = /viewBox="[^"]*"/
+const VIEWBOX_MATCH_REGEX = /viewBox="(\d+) (\d+) (\d+) (\d+)"/
+
 export const fixSvgHeight = (svgHtml: string, dataCount: number): string => {
-  // Workaround for single bar charts: adjust SVG height and viewBox
-  if (dataCount === 1) {
+  // Reduce height by 20px for all charts
+  const heightMatch = svgHtml.match(HEIGHT_REGEX)
+  if (heightMatch) {
+    const currentHeight = parseInt(heightMatch[1])
+    const newHeight = Math.max(20, currentHeight - 20) // Ensure minimum height of 20px
+
     return svgHtml
-      .replace(/height="[^"]*"/, 'height="20"')
-      .replace(/viewBox="[^"]*"/, (match) => {
-        const viewBoxMatch = match.match(/viewBox="(\d+) (\d+) (\d+) (\d+)"/)
+      .replace(HEIGHT_REGEX, `height="${newHeight}"`)
+      .replace(VIEWBOX_REGEX, (match) => {
+        const viewBoxMatch = match.match(VIEWBOX_MATCH_REGEX)
         if (viewBoxMatch) {
           const [, x, y, width, height] = viewBoxMatch
-          return `viewBox="${x} ${y} ${width} 20"`
+          return `viewBox="${x} ${y} ${width} ${newHeight}"`
         }
         return match
       })
   }
-  
+
   return svgHtml
 }
