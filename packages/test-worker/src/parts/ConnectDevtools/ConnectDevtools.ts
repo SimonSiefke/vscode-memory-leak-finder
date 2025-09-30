@@ -14,7 +14,7 @@ export const connectDevtools = async (
   connectionId: number,
   devtoolsWebSocketUrl: string,
   electronObjectId: string,
-  webSocketUrl: string,
+  electronWebSocketUrl: string,
   idleTimeout: number,
   pageObjectPath: string,
   parsedIdeVersion: any,
@@ -28,7 +28,7 @@ export const connectDevtools = async (
   // TODO must create separate electron object id since it is a separate connection
 
   const [electronRpc, browserRpc] = await Promise.all([
-    DebuggerCreateIpcConnection.createConnection(webSocketUrl),
+    DebuggerCreateIpcConnection.createConnection(electronWebSocketUrl),
     DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl),
   ])
   const { sessionRpc, sessionId, targetId } = await waitForSession(browserRpc, attachedToPageTimeout)

@@ -23,7 +23,7 @@ export const connectWorkers = async (
   } else {
     promises.push(Promise.resolve(undefined))
   }
-  promises.push(MemoryLeakWorker.startWorker(devtoolsWebSocketUrl, connectionId, measureId, attachedToPageTimeout))
+  promises.push(MemoryLeakWorker.startWorker(devtoolsWebSocketUrl, webSocketUrl, connectionId, measureId, attachedToPageTimeout))
   promises.push(
     LaunchTestWorker.launchTestWorker(
       runMode,
