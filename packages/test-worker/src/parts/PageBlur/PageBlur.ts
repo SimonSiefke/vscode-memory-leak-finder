@@ -12,6 +12,7 @@ const script = `function () {
 }`
 
 export const blur = async ({ electronRpc, electronObjectId }) => {
+  console.log({ electronRpc, electronObjectId })
   await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
     functionDeclaration: script,
     objectId: electronObjectId,

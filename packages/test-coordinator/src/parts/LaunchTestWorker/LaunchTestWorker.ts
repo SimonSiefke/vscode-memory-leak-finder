@@ -25,6 +25,7 @@ export const launchTestWorker = async (
   parsedIdeVersion: any,
   timeouts: boolean,
   utilityContext: any,
+  attachdToPageTimeout: number,
 ) => {
   try {
     const url = GetTestWorkerUrl.getTestWorkerUrl()
@@ -45,6 +46,7 @@ export const launchTestWorker = async (
       parsedIdeVersion,
       timeouts,
       utilityContext,
+      attachdToPageTimeout,
     )
     return rpc
   } catch (error) {
