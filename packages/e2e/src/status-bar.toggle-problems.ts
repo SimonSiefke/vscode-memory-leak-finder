@@ -2,14 +2,14 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-// export const setup = async ({ writeSettings }: TestContext): Promise<void> => {
-//   await writeSettings({
-//     'window.titleBarStyle': 'custom',
-//   })
-// }
+export const setup = async ({ Editor, Panel }: TestContext): Promise<void> => {
+  await Editor.closeAll()
+  await Panel.hide()
+}
 
 export const run = async ({ StatusBar }: TestContext): Promise<void> => {
-  const problems = await StatusBar.item('status.problems')
-  await problems.hide()
-  await problems.show()
+  // @ts-ignore
+  await StatusBar.hideItem('status.problems')
+  // @ts-ignore
+  await StatusBar.showItem('status.problems')
 }
