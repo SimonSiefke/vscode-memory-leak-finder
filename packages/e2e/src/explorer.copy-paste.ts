@@ -27,8 +27,8 @@ export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void>
 
 export const run = async ({ Explorer }: TestContext): Promise<void> => {
   await Explorer.copy('file-1.txt')
-  await Explorer.paste()
-  await Explorer.shouldHaveFocusedItem('file-1 copy.txt')
+  // @ts-ignore
+  await Explorer.paste({ waitForItem: 'file-1 copy.txt' })
   await Explorer.delete('file-1 copy.txt')
   await Explorer.shouldHaveFocusedItem('file-1.txt')
 }

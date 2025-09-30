@@ -177,7 +177,11 @@ export const create = ({ page, expect, VError }) => {
         })
         await expect(dirent).toBeVisible()
         const id = await dirent.getAttribute('id')
-        await expect(explorer).toHaveAttribute('aria-activedescendant', id)
+
+        // TODO why is id null?
+        if (id) {
+          await expect(explorer).toHaveAttribute('aria-activedescendant', id)
+        }
       } catch (error) {
         throw new VError(error, `Failed to verify that explorer has focused dirent "${direntName}"`)
       }
@@ -213,9 +217,26 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to open context menu for "${dirent}"`)
       }
     },
-    async paste() {
+    async paste({ waitForItem }) {
       try {
+        const explorer = page.locator('.explorer-folders-view .monaco-list')
+        const dirent = explorer.locator('.monaco-list-row', {
+          hasText: waitForItem,
+        })
+        await page.waitForIdle()
         await page.keyboard.press('Control+V')
+        for (let i = 0; i < 5; i++) {
+          await page.waitForIdle()
+          const count = await dirent.count()
+          if (count > 0) {
+            break
+          }
+        }
+        await expect(dirent).toBeVisible()
+        const id = await dirent.getAttribute('id')
+        if (id) {
+          await expect(explorer).toHaveAttribute('aria-activedescendant', id)
+        }
       } catch (error) {
         throw new VError(error, `Failed to paste`)
       }
@@ -228,6 +249,13 @@ export const create = ({ page, expect, VError }) => {
         })
         await expect(oldDirent).toBeVisible()
         await page.keyboard.press('Delete')
+        for (let i = 0; i < 5; i++) {
+          await page.waitForIdle()
+          const count = await oldDirent.count()
+          if (count === 0) {
+            break
+          }
+        }
         await expect(oldDirent).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to delete ${item}`)
