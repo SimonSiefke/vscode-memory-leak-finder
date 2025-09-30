@@ -16,14 +16,12 @@ export const createDualBarChart = (data: any, options: any): string => {
     {
       name: item.name,
       value: item.count - item.delta, // before count (total - leaked)
-      type: 'before',
-      label: 'before'
+      type: 'before'
     },
     {
       name: item.name,
       value: item.delta, // leaked count
-      type: 'leaked',
-      label: 'leaked'
+      type: 'leaked'
     }
   ])
 
@@ -56,17 +54,6 @@ export const createDualBarChart = (data: any, options: any): string => {
         fontSize: fontSize,
       }),
 
-      // Add labels for each bar
-      Plot.text(transformedData, {
-        text: 'label',
-        y: 'name',
-        x: (d: any) => d.type === 'before' ? (d.value / 2) : (d.value / 2),
-        textAnchor: 'middle',
-        dy: -fontSize - 2,
-        stroke: 'black',
-        strokeWidth: 0.3,
-        fontSize: fontSize - 1,
-      }),
     ],
   }).outerHTML
 
