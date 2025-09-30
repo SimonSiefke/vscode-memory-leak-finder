@@ -6,10 +6,13 @@ export const create = ({ expect, page, VError, ideVersion }) => {
   return {
     async show() {
       try {
+        await page.waitForIdle()
         const outputView = page.locator('.pane-body.output-view')
         await expect(outputView).toBeHidden()
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.OutputFocusOnOutputView)
+        await page.waitForIdle()
         await expect(outputView).toBeVisible()
         const paneBody = page.locator('.pane-body.output-view')
         await expect(paneBody).toBeVisible()
@@ -38,12 +41,11 @@ export const create = ({ expect, page, VError, ideVersion }) => {
     },
     async select(channelName) {
       try {
+        await page.waitForIdle()
         const outputView = page.locator('.pane-body.output-view')
         await expect(outputView).toBeVisible()
         const select = page.locator('[aria-label="Output actions"] .monaco-select-box')
-        for (let i = 0; i < 50; i++) {
-          await page.waitForIdle()
-        }
+        await page.waitForIdle()
         await select.click()
         const monacoList = page.locator('.select-box-dropdown-list-container .monaco-list')
         await expect(monacoList).toBeVisible()
