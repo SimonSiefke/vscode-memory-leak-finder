@@ -9,7 +9,9 @@ export const createBarChart = (data: any, options: any): string => {
 
   const dataCount = data.length
   const lineHeight = fontSize + 6
-  const height = dataCount * lineHeight
+  const marginTop = 30
+  const marginBottom = 30
+  const height = dataCount * lineHeight + marginTop + marginBottom
 
   const baseHtml = Plot.plot({
     style: 'overflow: visible;background:white',
