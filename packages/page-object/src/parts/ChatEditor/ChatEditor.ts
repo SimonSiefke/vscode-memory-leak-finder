@@ -18,7 +18,10 @@ export const create = ({ expect, page, VError }) => {
     async sendMessage(message) {
       try {
         const editContext = page.locator('.native-edit-context')
-        await expect(editContext).toBeFocused()
+        await expect(editContext).toBeVisible()
+        await page.waitForIdle()
+        await editContext.focus()
+        await page.waitForIdle()
         await editContext.setValue(message)
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
