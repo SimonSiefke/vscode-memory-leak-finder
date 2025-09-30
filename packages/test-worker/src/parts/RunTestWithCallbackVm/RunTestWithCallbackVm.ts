@@ -3,9 +3,10 @@ import * as TestStage from '../TestStage/TestStage.ts'
 
 export const runTest = async (pageObject, file, forceRun) => {
   const module = await ImportUsingVm.importUsingVm(file)
-  if (module.skip) {
-    return true
+  const wasOriginallySkipped = module.skip
+  if (module.skip && !forceRun) {
+    return { skipped: true, wasOriginallySkipped }
   }
   await TestStage.run(module, pageObject)
-  return false
+  return { skipped: false, wasOriginallySkipped }
 }

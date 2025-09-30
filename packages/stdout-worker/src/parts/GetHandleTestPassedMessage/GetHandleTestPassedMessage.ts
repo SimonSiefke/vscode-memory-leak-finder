@@ -12,10 +12,18 @@ export const getHandleTestPassedMessage = (
   fileName: string,
   duration: number,
   isLeak: boolean,
+  wasOriginallySkipped: boolean,
 ): string => {
   const messageRelativeDirName: string = chalk.dim(relativeDirName + '/')
   const messageFileName: string = chalk.bold(fileName)
   const messageDuration: string = formatDuration(duration)
-  const prefix: string = isLeak ? TestPrefix.Leak : TestPrefix.Pass
+  let prefix: string
+  if (isLeak) {
+    prefix = TestPrefix.Leak
+  } else if (wasOriginallySkipped) {
+    prefix = TestPrefix.SkipPass
+  } else {
+    prefix = TestPrefix.Pass
+  }
   return `${prefix} ${messageRelativeDirName}${messageFileName} ${messageDuration}\n`
 }

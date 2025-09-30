@@ -63,7 +63,7 @@ test.skip('handleTestFailed', async () => {
       '\u001B[0m \u001B[90m 17 |\u001B[39m\u001B[0m',
   }
 
-  await HandleTestFailed.handleTestFailed(file, relativeDirName, releativeFilePath, fileName, error)
+  await HandleTestFailed.handleTestFailed(file, relativeDirName, releativeFilePath, fileName, error, false)
 
   expect(Stdout.write).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledWith(expect.stringContaining('test failed'))
