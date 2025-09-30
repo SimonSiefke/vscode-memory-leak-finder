@@ -7,7 +7,8 @@ export const handleTestPassed = async (
   fileName: string,
   duration: number,
   isLeak: boolean,
+  wasOriginallySkipped: boolean,
 ): Promise<void> => {
-  const message = await GetHandleTestPassedMessage.getHandleTestPassedMessage(file, relativeDirName, fileName, duration, isLeak)
+  const message = await GetHandleTestPassedMessage.getHandleTestPassedMessage(file, relativeDirName, fileName, duration, isLeak, wasOriginallySkipped)
   await HandleTestStateChange.handleTestStateChange(message)
 }

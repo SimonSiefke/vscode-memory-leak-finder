@@ -212,7 +212,7 @@ export const runTestsWithCallback = async ({
           await TestWorkerTeardownTest.testWorkerTearDownTest(currentTestRpc, connectionId, absolutePath)
           const end = Time.now()
           const duration = end - start
-          await callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration, isLeak)
+          await callback(TestWorkerEventType.TestPassed, absolutePath, relativeDirname, dirent, duration, isLeak, wasOriginallySkipped)
           if (!isLeak) {
             passed++
           }
