@@ -13,11 +13,8 @@ export const getCommonBarChartOptions = (dataCount: number, options: any) => {
   const calculatedHeight = dataCount * Math.max(fixedBarHeight, minBarHeight) // + marginTop + marginBottom
 
   let height = 0
-  if (calculatedHeight <= 20) {
-    console.log({ dataCount, calculatedHeight })
-    console.warn(`odd height`)
-    console.log('w', dataCount + minBarHeight)
-    height = dataCount * fixedBarHeight + 12
+  if (dataCount === 1) {
+    height = fixedBarHeight * 2
   } else {
     height = Math.max(minHeight, Math.min(maxHeight, calculatedHeight))
   }
