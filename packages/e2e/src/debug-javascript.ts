@@ -22,7 +22,11 @@ setInterval(()=>{
 export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
   await Editor.open('index.js')
   await Editor.setBreakpoint(4)
-  await RunAndDebug.runAndWaitForPaused()
+  await RunAndDebug.runAndWaitForPaused({
+    file: 'index.js',
+    line: 4,
+    callStackSize: 11,
+  })
   await RunAndDebug.stop()
   await RunAndDebug.removeAllBreakpoints()
   await Editor.closeAll()
