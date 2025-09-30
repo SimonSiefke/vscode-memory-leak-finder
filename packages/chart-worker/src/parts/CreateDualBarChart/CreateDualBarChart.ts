@@ -66,6 +66,21 @@ export const createDualBarChart = (data: any, options: any): string => {
     ],
   }).outerHTML
 
-  const finalHtml = fixHtmlNamespace(baseHtml)
+  let finalHtml = fixHtmlNamespace(baseHtml)
+
+  // Workaround for single bar charts: adjust SVG height and viewBox
+  if (dataCount === 1) {
+    finalHtml = finalHtml
+      .replace(/height="[^"]*"/, 'height="20"')
+      .replace(/viewBox="[^"]*"/, (match) => {
+        const viewBoxMatch = match.match(/viewBox="(\d+) (\d+) (\d+) (\d+)"/)
+        if (viewBoxMatch) {
+          const [, x, y, width, height] = viewBoxMatch
+          return `viewBox="${x} ${y} ${width} 20"`
+        }
+        return match
+      })
+  }
+
   return finalHtml
 }

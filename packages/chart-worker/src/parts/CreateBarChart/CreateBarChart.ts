@@ -1,4 +1,5 @@
 import { fixHtmlNamespace } from '../FixXmlNamespace/FixXmlNamespace.ts'
+import { fixSvgHeight } from '../FixSvgHeight/FixSvgHeight.ts'
 import { getCommonBarChartOptions } from '../GetCommonBarChartOptions/GetCommonBarChartOptions.ts'
 import * as Plot from '../Plot/Plot.ts'
 
@@ -45,5 +46,5 @@ export const createBarChart = (data: any, options: any): string => {
   }).outerHTML
 
   const finalHtml = fixHtmlNamespace(baseHtml)
-  return finalHtml
+  return fixSvgHeight(finalHtml, dataCount)
 }
