@@ -9,6 +9,13 @@ export const handleTestFailed = async (
   error: any,
   wasOriginallySkipped: boolean,
 ): Promise<void> => {
-  const message = await GetHandleTestFailedMessage.getHandleTestFailedMessage(file, relativeDirName, relativeFilePath, fileName, error, wasOriginallySkipped)
+  const message = await GetHandleTestFailedMessage.getHandleTestFailedMessage(
+    file,
+    relativeDirName,
+    relativeFilePath,
+    fileName,
+    error,
+    wasOriginallySkipped,
+  )
   await HandleTestStateChange.handleTestStateChange(message)
 }

@@ -225,7 +225,15 @@ export const runTestsWithCallback = async ({
         }
         const PrettyError = await import('../PrettyError/PrettyError.ts')
         const prettyError = await PrettyError.prepare(error, { color, root })
-        await callback(TestWorkerEventType.TestFailed, absolutePath, relativeDirname, relativePath, dirent, prettyError, wasOriginallySkipped)
+        await callback(
+          TestWorkerEventType.TestFailed,
+          absolutePath,
+          relativeDirname,
+          relativePath,
+          dirent,
+          prettyError,
+          wasOriginallySkipped,
+        )
       } finally {
         if (restartBetween) {
           await clearDisposables()
