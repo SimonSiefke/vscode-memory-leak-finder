@@ -10,6 +10,6 @@ export const setup = async ({ Editor, Output, Panel }: TestContext): Promise<voi
 }
 
 export const run = async ({ Output }: TestContext): Promise<void> => {
-  await Output.select('Window')
+  await Output.select('Extension Host')
   await Output.select('Main')
 }
