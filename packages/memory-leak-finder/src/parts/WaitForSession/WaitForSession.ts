@@ -3,6 +3,9 @@ import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEvent.ts'
 
 export const waitForSession = async (browserRpc, attachedToPageTimeout) => {
+  // TODO maybe coult be implemented simpler by using getTargets
+  // since at this point the page is already open and should be available
+  // as a target
   const eventPromise = waitForAttachedEvent(browserRpc, attachedToPageTimeout)
 
   await DevtoolsProtocolTarget.setAutoAttach(browserRpc, {

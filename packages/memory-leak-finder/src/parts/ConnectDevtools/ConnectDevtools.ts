@@ -11,6 +11,7 @@ export const connectDevtools = async (
   connectionId: number,
   measureId: string,
   attachedToPageTimeout: number,
+  measureNode: boolean,
 ): Promise<void> => {
   // TODO connect to electron and node processes if should measure node
   Assert.string(devtoolsWebSocketUrl)
@@ -22,9 +23,6 @@ export const connectDevtools = async (
     DebuggerCreateIpcConnection.createConnection(electronWebSocketUrl),
     DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl),
   ])
-  if (electronRpc) {
-    // TODO
-  }
   const { sessionRpc } = await waitForSession(browserRpc, attachedToPageTimeout)
   Promise.all([
     DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
@@ -35,6 +33,7 @@ export const connectDevtools = async (
     DevtoolsProtocolRuntime.enable(sessionRpc),
     DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc),
   ])
-  const measure = await GetCombinedMeasure.getCombinedMeasure(sessionRpc, measureId)
+  const measureRpc = measureNode ? electronRpc : sessionRpc
+  const measure = await GetCombinedMeasure.getCombinedMeasure(measureRpc, measureId)
   MemoryLeakFinderState.set(connectionId, measure)
 }
