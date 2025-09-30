@@ -6,8 +6,10 @@ export const create = ({ expect, page, VError }) => {
   return {
     async open() {
       try {
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.FocusPortsView)
+        await page.waitForIdle()
         const portsView = page.locator('#\\~remote\\.forwardedPortsContainer')
         await expect(portsView).toBeVisible()
         await page.waitForIdle()
@@ -27,10 +29,12 @@ export const create = ({ expect, page, VError }) => {
     },
     async setPortInput(portId) {
       try {
+        await page.waitForIdle()
         const forwardPortButton = page.locator('[role="button"]', { hasText: 'Forward a Port' })
         await expect(forwardPortButton).toBeVisible()
         await page.waitForIdle()
         await forwardPortButton.click()
+        await page.waitForIdle()
         const tunnelView = page.locator('[aria-label="Tunnel View"]')
         await expect(tunnelView).toBeVisible()
         await page.waitForIdle()
@@ -39,6 +43,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(portInput).toBeFocused()
         await page.waitForIdle()
         await portInput.type(`${portId}`)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to forward port ${portId}`)
       }
