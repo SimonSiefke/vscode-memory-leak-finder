@@ -43,6 +43,7 @@ export const create = ({ page, expect, VError }) => {
         await quickPick.executeCommand(WellKnownCommands.FocusExplorer)
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         await expect(explorer).toBeFocused()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to focus explorer`)
       }

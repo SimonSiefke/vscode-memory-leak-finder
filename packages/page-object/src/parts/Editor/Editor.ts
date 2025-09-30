@@ -18,6 +18,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await quickPick.openFile(fileName)
         const tab = page.locator('.tab', { hasText: fileName })
         await expect(tab).toBeVisible()
+        await page.waitForIdle()
         if (isNotebook(fileName)) {
           const notebookEditor = page.locator('.notebook-editor')
           const list = notebookEditor.locator('.monaco-list')
@@ -149,6 +150,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         const tabs = main.locator('[role="tab"]')
         const currentCount = await tabs.count()
         if (currentCount === 0) {
+          await page.waitForIdle()
           return
         }
         const quickPick = QuickPick.create({ page, expect, VError })
