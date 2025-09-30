@@ -43,16 +43,6 @@ export const createDualBarChart = (data: any, options: any): string => {
         },
       }),
 
-      Plot.text(transformedData, {
-        text: 'value',
-        y: 'name',
-        x: 'value',
-        textAnchor: 'start',
-        dx: 3,
-        stroke: 'black',
-        strokeWidth: 0.5,
-        fontSize: fontSize,
-      }),
 
     ],
   }).outerHTML
