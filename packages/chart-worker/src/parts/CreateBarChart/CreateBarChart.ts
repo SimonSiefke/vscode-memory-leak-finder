@@ -19,16 +19,13 @@ export const createBarChart = (data: any, options: any): string => {
     marks: [
       Plot.rectX(data, {
         x: 'value',
-        y: 'name',
         fill: 'black',
         rx1: 2,
         rx2: 2,
         strokeWidth: 2,
         fillOpacity: 0.75,
-        inset: 0,
-        sort: {
-          y: '-x',
-        },
+        y1: (d: any, i: number) => i * 20,
+        y2: (d: any, i: number) => (i + 1) * 20,
       }),
 
       Plot.text(data, {

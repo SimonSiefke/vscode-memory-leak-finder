@@ -7,7 +7,7 @@ export const getCommonBarChartOptions = (dataCount: number, options: any) => {
   const marginTop = options.marginTop || 0
   const marginBottom = options.marginBottom || 0
   // Use a reasonable height that ensures all bars have consistent minimum height
-  const minHeight = 100 // Minimum height for single bars
+  const minHeight = 50 // Reduced minimum height for single bars
   const maxHeight = 4000 // Increased maximum height for many bars
   const minBarHeight = 12 // Minimum height for each bar to ensure visibility
   const calculatedHeight = dataCount * Math.max(fixedBarHeight, minBarHeight) + marginTop + marginBottom

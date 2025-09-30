@@ -42,7 +42,6 @@ export const createDualBarChart = (data: any, options: any): string => {
         rx2: 2,
         strokeWidth: 2,
         fillOpacity: 0.75,
-        inset: 0,
         sort: {
           y: '-x',
         },
