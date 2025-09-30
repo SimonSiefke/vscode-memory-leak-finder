@@ -197,10 +197,13 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     },
     async select(text) {
       try {
+        await page.waitForIdle()
         const editor = page.locator('.editor-instance')
         const element = editor.locator('[class^="mtk"]', { hasText: text }).first()
         await expect(element).toHaveText(text)
+        await page.waitForIdle()
         await element.dblclick()
+        await page.waitForIdle()
         const selection = page.locator('.selected-text')
         await expect(selection).toBeVisible()
       } catch (error) {
@@ -413,6 +416,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         hasText: text,
       })
       await expect(breadCrumb).toBeVisible()
+      await page.waitForIdle()
     },
     async save(options) {
       try {
