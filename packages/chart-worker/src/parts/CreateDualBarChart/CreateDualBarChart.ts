@@ -15,8 +15,8 @@ export const createDualBarChart = (data: any, options: any): string => {
   const transformedData = data.flatMap((item: any) => [
     {
       name: item.name,
-      value: item.count - item.delta, // before count (total - leaked)
-      type: 'before'
+      value: item.count, // total count
+      type: 'total'
     },
     {
       name: item.name,
@@ -37,7 +37,7 @@ export const createDualBarChart = (data: any, options: any): string => {
       Plot.barX(transformedData, {
         x: 'value',
         y: 'name',
-        fill: (d: any) => d.type === 'before' ? '#4A90E2' : '#E74C3C', // blue for before, red for leaked
+        fill: (d: any) => d.type === 'total' ? '#4A90E2' : '#E74C3C', // blue for total, red for leaked
         sort: {
           y: '-x',
         },
