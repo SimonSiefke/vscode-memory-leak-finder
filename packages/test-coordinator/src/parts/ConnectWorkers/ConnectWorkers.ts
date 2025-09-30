@@ -36,6 +36,7 @@ export const connectWorkers = async (
       parsedIdeVersion,
       timeouts,
       utilityContext,
+      attachedToPageTimeout,
     ),
   )
   const [videoRpc, memoryRpc, testWorkerRpc] = await Promise.all(promises)

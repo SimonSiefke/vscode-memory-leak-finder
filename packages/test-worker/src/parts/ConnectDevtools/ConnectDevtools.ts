@@ -20,16 +20,18 @@ export const connectDevtools = async (
   parsedIdeVersion: any,
   timeouts: boolean,
   utilityContext: any,
+  attachedToPageTimeout: number,
 ) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
   Assert.object(utilityContext)
+  // TODO must create separate electron object id since it is a separate connection
 
   const [electronRpc, browserRpc] = await Promise.all([
     DebuggerCreateIpcConnection.createConnection(webSocketUrl),
     DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl),
   ])
-  const { sessionRpc, sessionId, targetId } = await waitForSession(browserRpc, 5000)
+  const { sessionRpc, sessionId, targetId } = await waitForSession(browserRpc, attachedToPageTimeout)
   const firstWindow = Page.create({
     electronObjectId,
     electronRpc,
