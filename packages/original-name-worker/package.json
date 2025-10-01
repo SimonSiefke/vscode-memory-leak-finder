@@ -14,7 +14,7 @@
   "dependencies": {
     "@babel/parser": "^7.28.4",
     "@babel/traverse": "^7.28.4",
-    "@lvce-editor/rpc": "^4.19.0",
+    "@lvce-editor/rpc": "^4.20.0",
     "@lvce-editor/verror": "^1.7.0"
   },
   "devDependencies": {
