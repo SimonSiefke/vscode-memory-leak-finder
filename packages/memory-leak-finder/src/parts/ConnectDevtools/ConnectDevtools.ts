@@ -1,5 +1,6 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
+import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 import { DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as GetCombinedMeasure from '../GetCombinedMeasure/GetCombinedMeasure.ts'
@@ -9,6 +10,78 @@ import { exec } from 'child_process'
 import { promisify } from 'util'
 
 const execAsync = promisify(exec)
+
+const connectToUtilityProcesses = async (sessionRpc: any, electronRpc: any): Promise<void> => {
+  try {
+    console.log(`[Memory Leak Finder] Attempting to connect to utility processes...`)
+    
+    // Try to get the utility processes from the main process
+    console.log(`[Memory Leak Finder] Checking if globalThis.___utilityProcesses exists...`)
+    const utilityProcessesResult = await DevtoolsProtocolRuntime.evaluate(electronRpc, {
+      expression: `JSON.stringify({
+        hasUtilityProcesses: typeof globalThis.___utilityProcesses !== 'undefined',
+        utilityProcesses: globalThis.___utilityProcesses ? Array.from(globalThis.___utilityProcesses.entries()) : [],
+        globalThisKeys: Object.keys(globalThis).filter(key => key.includes('utility') || key.includes('Utility'))
+      })`,
+      returnByValue: true
+    })
+    
+    console.log(`[Memory Leak Finder] Utility processes result:`, utilityProcessesResult)
+    
+    if (!utilityProcessesResult.result || !utilityProcessesResult.result.value) {
+      console.log(`[Memory Leak Finder] No utility processes found or error accessing globalThis.___utilityProcesses`)
+      return
+    }
+    
+    const result = JSON.parse(utilityProcessesResult.result.value)
+    console.log(`[Memory Leak Finder] Has utility processes:`, result.hasUtilityProcesses)
+    console.log(`[Memory Leak Finder] GlobalThis keys with utility:`, result.globalThisKeys)
+    console.log(`[Memory Leak Finder] Utility processes count:`, result.utilityProcesses.length)
+    
+    const utilityProcesses = result.utilityProcesses
+    console.log(`[Memory Leak Finder] Found ${utilityProcesses.length} utility processes with debug ports:`)
+    
+    for (const [pid, processInfo] of utilityProcesses) {
+      console.log(`[Memory Leak Finder] Utility Process ${pid}:`)
+      console.log(`  Debug Port: ${processInfo.debugPort}`)
+      console.log(`  Module Path: ${processInfo.modulePath}`)
+      console.log(`  Args: ${processInfo.args.join(' ')}`)
+      
+      // Try to connect to the debug port
+      try {
+        const debugUrl = `ws://localhost:${processInfo.debugPort}`
+        console.log(`[Memory Leak Finder] Attempting to connect to ${debugUrl}`)
+        
+        const utilityIpc = await DebuggerCreateIpcConnection.createConnection(debugUrl)
+        const utilityRpc = DebuggerCreateRpcConnection.createRpc(utilityIpc)
+        
+        // Enable runtime and listen for execution contexts
+        await Promise.all([
+          DevtoolsProtocolRuntime.enable(utilityRpc),
+          DevtoolsProtocolRuntime.runIfWaitingForDebugger(utilityRpc)
+        ])
+        
+        // Set up execution context monitoring for utility process
+        utilityRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, (event: any) => {
+          console.log(`[Memory Leak Finder] Utility process execution context created:`, {
+            pid: processInfo.pid,
+            debugPort: processInfo.debugPort,
+            context: event.params.context,
+            timestamp: new Date().toISOString()
+          })
+        })
+        
+        console.log(`[Memory Leak Finder] Successfully connected to utility process ${pid} on port ${processInfo.debugPort}`)
+        
+      } catch (error) {
+        console.log(`[Memory Leak Finder] Failed to connect to utility process ${pid}: ${error.message}`)
+      }
+    }
+    
+  } catch (error) {
+    console.log(`[Memory Leak Finder] Error connecting to utility processes: ${error.message}`)
+  }
+}
 
 const getChildProcesses = async (parentPid: number): Promise<void> => {
   try {
@@ -64,6 +137,8 @@ const getChildProcesses = async (parentPid: number): Promise<void> => {
             processType = 'main-process'
           }
           
+          console.log(`  Process Type: ${processType}`)
+          
           // Check for debugging ports in the arguments
           const debugPortMatch = fullArgs.match(/--inspect-port=(\d+)/)
           const debugBrkMatch = fullArgs.match(/--inspect-brk=(\d+)/)
@@ -113,15 +188,49 @@ const getChildProcesses = async (parentPid: number): Promise<void> => {
               
               // Method 3: Check if we can connect to common debug ports
               const commonDebugPorts = [9229, 9230, 9231, 9232, 9233, 9234, 9235, 9236, 9237, 9238, 9239, 9240]
+              let foundPort = null
               for (const port of commonDebugPorts) {
                 try {
                   const { stdout: curlOutput } = await execAsync(`curl -s http://localhost:${port}/json 2>/dev/null || echo "Port ${port} not available"`)
                   if (!curlOutput.includes('not available') && curlOutput.includes('"id"')) {
                     console.log(`  Found debug port via curl: ${port}`)
+                    foundPort = port
                     break
                   }
                 } catch (curlError) {
                   // Port not available, continue
+                }
+              }
+              
+              // If we found a port, try to connect to it
+              if (foundPort) {
+                try {
+                  const debugUrl = `ws://localhost:${foundPort}`
+                  console.log(`[Memory Leak Finder] 🎯 Attempting to connect to utility process at ${debugUrl}`)
+                  
+                  const utilityIpc = await DebuggerCreateIpcConnection.createConnection(debugUrl)
+                  const utilityRpc = DebuggerCreateRpcConnection.createRpc(utilityIpc)
+                  
+                  // Enable runtime and listen for execution contexts
+                  await Promise.all([
+                    DevtoolsProtocolRuntime.enable(utilityRpc),
+                    DevtoolsProtocolRuntime.runIfWaitingForDebugger(utilityRpc)
+                  ])
+                  
+                  // Set up execution context monitoring for utility process
+                  utilityRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, (event: any) => {
+                    console.log(`[Memory Leak Finder] 🎯 Utility process execution context created:`, {
+                      pid: pid,
+                      debugPort: foundPort,
+                      context: event.params.context,
+                      timestamp: new Date().toISOString()
+                    })
+                  })
+                  
+                  console.log(`[Memory Leak Finder] ✅ Successfully connected to utility process ${pid} on port ${foundPort}`)
+                  
+                } catch (connectionError) {
+                  console.log(`[Memory Leak Finder] ❌ Failed to connect to utility process ${pid}: ${connectionError.message}`)
                 }
               }
               
@@ -352,6 +461,7 @@ export const connectDevtools = async (
         // Wait a bit for child processes to be created, then inspect them
         setTimeout(async () => {
           await getChildProcesses(mainProcessPid!)
+          await connectToUtilityProcesses(sessionRpc, electronRpc)
         }, 2000)
       }
     }

@@ -6,6 +6,7 @@ import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsPr
 import * as Disposables from '../Disposables/Disposables.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
+import * as MonkeyPatchUtilityProcess from '../MonkeyPatchUtilityProcess/MonkeyPatchUtilityProcess.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
 import { waitForUtilityExecutionContext } from '../WaitForUtilityExecutionContext/WaitForUtilityExecutionContext.ts'
 
@@ -33,7 +34,7 @@ export const prepareBoth = async (
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc)
 
-  const { monkeyPatchedElectronId, electronObjectId } = await connectElectron(electronRpc, headlessMode)
+  const { monkeyPatchedElectronId, monkeyPatchedUtilityProcessId, electronObjectId } = await connectElectron(electronRpc, headlessMode)
 
   await DevtoolsProtocolDebugger.resume(electronRpc)
 
@@ -45,10 +46,16 @@ export const prepareBoth = async (
     // TODO
   }
 
-  await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
-    functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
-    objectId: monkeyPatchedElectronId,
-  })
+  await Promise.all([
+    DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+      functionDeclaration: MonkeyPatchElectronScript.undoMonkeyPatch,
+      objectId: monkeyPatchedElectronId,
+    }),
+    DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+      functionDeclaration: MonkeyPatchUtilityProcess.undoMonkeyPatch,
+      objectId: monkeyPatchedUtilityProcessId,
+    })
+  ])
 
   const { sessionRpc, sessionId, targetId, dispose } = await connectDevtoolsPromise
 
@@ -61,6 +68,7 @@ export const prepareBoth = async (
     devtoolsWebSocketUrl,
     electronObjectId,
     monkeyPatchedElectronId,
+    monkeyPatchedUtilityProcessId,
     parsedVersion,
     sessionId,
     targetId,

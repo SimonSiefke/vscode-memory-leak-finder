@@ -4,6 +4,7 @@ import * as MakeElectronAvailableGlobally from '../MakeElectronAvailableGlobally
 import * as MakeRequireAvailableGlobally from '../MakeRequireAvailableGlobally/MakeRequireAvailableGlobally.ts'
 import { monkeyPatchElectronHeadlessMode } from '../MonkeyPatchElectronHeadlessMode/MonkeyPatchElectronHeadlessMode.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
+import * as MonkeyPatchUtilityProcess from '../MonkeyPatchUtilityProcess/MonkeyPatchUtilityProcess.ts'
 import { VError } from '../VError/VError.ts'
 
 const waitForDebuggerToBePaused = async (rpc) => {
@@ -49,6 +50,12 @@ export const connectElectron = async (electronRpc, headlessMode) => {
     objectId: electronObjectId,
   })
 
+  // Apply utility process monkey patch
+  const monkeyPatchedUtilityProcess = await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
+    functionDeclaration: MonkeyPatchUtilityProcess.monkeyPatchUtilityProcessScript,
+    objectId: electronObjectId,
+  })
+
   if (headlessMode) {
     await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
       functionDeclaration: monkeyPatchElectronHeadlessMode,
@@ -65,6 +72,7 @@ export const connectElectron = async (electronRpc, headlessMode) => {
 
   return {
     monkeyPatchedElectronId: monkeyPatchedElectron.objectId,
+    monkeyPatchedUtilityProcessId: monkeyPatchedUtilityProcess.objectId,
     electronObjectId,
   }
 }
