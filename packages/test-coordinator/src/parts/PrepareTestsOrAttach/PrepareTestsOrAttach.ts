@@ -25,6 +25,9 @@ export const prepareTestsAndAttach = async (
   idleTimeout: number,
   pageObjectPath: string,
   measureNode: boolean,
+  inspectSharedProcess: boolean,
+  inspectExtensions: boolean,
+  inspectPtyHost: boolean,
 ) => {
   const isFirst = state.promise === undefined
   if (isFirst) {
@@ -43,6 +46,9 @@ export const prepareTestsAndAttach = async (
       idleTimeout,
       pageObjectPath,
       runMode,
+      inspectSharedProcess,
+      inspectExtensions,
+      inspectPtyHost,
     )
   }
   const result = await state.promise

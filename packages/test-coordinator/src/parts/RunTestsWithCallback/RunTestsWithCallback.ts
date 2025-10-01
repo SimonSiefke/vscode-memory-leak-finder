@@ -40,6 +40,9 @@ export const runTestsWithCallback = async ({
   vscodePath,
   commit,
   setupOnly,
+  inspectSharedProcess,
+  inspectExtensions,
+  inspectPtyHost,
   callback,
   addDisposable,
   clearDisposables,
@@ -90,6 +93,9 @@ export const runTestsWithCallback = async ({
         idleTimeout,
         pageObjectPath,
         measureNode,
+        inspectSharedProcess,
+        inspectExtensions,
+        inspectPtyHost,
       )
       await testWorkerRpc.dispose()
       await memoryRpc?.dispose()
@@ -127,6 +133,9 @@ export const runTestsWithCallback = async ({
       idleTimeout,
       pageObjectPath,
       measureNode,
+      inspectSharedProcess,
+      inspectExtensions,
+      inspectPtyHost,
     )
 
     addDisposable(async () => {
@@ -267,6 +276,9 @@ export const runTestsWithCallback = async ({
             idleTimeout,
             pageObjectPath,
             measureNode,
+            inspectSharedProcess,
+            inspectExtensions,
+            inspectPtyHost,
           )
           addDisposable(async () => {
             await memoryRpc.dispose()
