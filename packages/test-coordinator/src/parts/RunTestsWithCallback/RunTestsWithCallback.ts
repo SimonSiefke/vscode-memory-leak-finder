@@ -294,7 +294,14 @@ export const runTestsWithCallback = async ({
       await VideoRecording.finalize(workers.videoRpc)
     }
     // TODO when in watch mode, dispose all workers except initialization worker to keep the application running
+    console.log({ workers })
     await disposeWorkers(workers)
+    workers = {
+      initializationWorkerRpc: emptyRpc,
+      memoryRpc: emptyRpc,
+      testWorkerRpc: emptyRpc,
+      videoRpc: emptyRpc,
+    }
     await callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, skippedFailed, leaking, total, duration, filterValue)
   } catch (error) {
     const PrettyError = await import('../PrettyError/PrettyError.ts')
