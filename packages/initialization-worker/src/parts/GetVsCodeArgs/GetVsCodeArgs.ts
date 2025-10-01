@@ -16,7 +16,7 @@ export const getVscodeArgs = ({ extensionsDir, userDataDir, extraLaunchArgs, ins
     '--user-data-dir',
     userDataDir,
   ]
-  
+
   if (inspectPtyHost) {
     args.push('--inspect-ptyhost')
   }
@@ -26,7 +26,7 @@ export const getVscodeArgs = ({ extensionsDir, userDataDir, extraLaunchArgs, ins
   if (inspectExtensions) {
     args.push('--inspect-extensions')
   }
-  
+
   args.push(...extraLaunchArgs)
   return args
 }
