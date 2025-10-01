@@ -20,6 +20,9 @@ export const prepareBoth = async (
   isFirstConnection: boolean,
   canUseIdleCallback: boolean,
   attachedToPageTimeout: number,
+  inspectSharedProcess: boolean,
+  inspectExtensions: boolean,
+  inspectPtyHost: boolean,
 ): Promise<PrepareBothResult> => {
   const initializationWorkerRpc = await launchInitializationWorker()
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, sessionId, targetId } =
@@ -34,6 +37,9 @@ export const prepareBoth = async (
       isFirstConnection,
       canUseIdleCallback,
       attachedToPageTimeout,
+      inspectSharedProcess,
+      inspectExtensions,
+      inspectPtyHost,
     )
   return {
     webSocketUrl,

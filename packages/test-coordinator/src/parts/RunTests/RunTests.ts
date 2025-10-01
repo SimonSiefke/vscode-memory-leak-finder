@@ -29,6 +29,9 @@ export const runTests = ({
   vscodePath,
   commit,
   setupOnly,
+  inspectSharedProcess,
+  inspectExtensions,
+  inspectPtyHost,
 }: RunTestsOptions) => {
   return RunTestsWithCallback.runTestsWithCallback({
     root,
@@ -52,6 +55,9 @@ export const runTests = ({
     vscodePath,
     commit,
     setupOnly,
+    inspectSharedProcess,
+    inspectExtensions,
+    inspectPtyHost,
     callback,
     addDisposable: Disposables.add,
     clearDisposables: Disposables.disposeAll,

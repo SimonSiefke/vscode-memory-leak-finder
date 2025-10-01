@@ -4,10 +4,29 @@ import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.ts'
 import * as ParseVersion from '../ParseVersion/ParseVersion.ts'
 import * as VscodeVersion from '../VsCodeVersion/VsCodeVersion.ts'
 
-export const launchIde = async ({ headlessMode, cwd, ide, vscodePath, commit, addDisposable }) => {
+export const launchIde = async ({
+  headlessMode,
+  cwd,
+  ide,
+  vscodePath,
+  commit,
+  addDisposable,
+  inspectSharedProcess,
+  inspectExtensions,
+  inspectPtyHost,
+}) => {
   if (ide === Ide.Cursor) {
     const cursorVersion = '0.45.14' // TODO make it configurable
-    const result = await LaunchCursor.launchCursor({ headlessMode, cwd, cursorVersion, vscodePath, addDisposable })
+    const result = await LaunchCursor.launchCursor({
+      headlessMode,
+      cwd,
+      cursorVersion,
+      vscodePath,
+      addDisposable,
+      inspectSharedProcess,
+      inspectExtensions,
+      inspectPtyHost,
+    })
     return {
       ...result,
       parsedVersion: ParseVersion.parseVersion(cursorVersion),
@@ -20,6 +39,9 @@ export const launchIde = async ({ headlessMode, cwd, ide, vscodePath, commit, ad
     vscodePath,
     commit,
     addDisposable,
+    inspectSharedProcess,
+    inspectExtensions,
+    inspectPtyHost,
   })
   return {
     ...result,

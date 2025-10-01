@@ -19,6 +19,9 @@ export const prepareBoth = async (
   isFirstConnection: boolean,
   canUseIdleCallback: boolean,
   attachedToPageTimeout: number,
+  inspectSharedProcess: boolean,
+  inspectExtensions: boolean,
+  inspectPtyHost: boolean,
 ): Promise<any> => {
   const { child, webSocketUrl, parsedVersion } = await LaunchIde.launchIde({
     headlessMode,
@@ -27,6 +30,9 @@ export const prepareBoth = async (
     vscodePath,
     commit,
     addDisposable: Disposables.add,
+    inspectSharedProcess,
+    inspectExtensions,
+    inspectPtyHost,
   })
   const devtoolsWebSocketUrlPromise = WaitForDevtoolsListening.waitForDevtoolsListening(child.stderr)
 

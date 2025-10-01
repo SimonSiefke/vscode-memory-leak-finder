@@ -17,6 +17,9 @@ export const prepareTests = async (
   idleTimeout: number,
   pageObjectPath: string,
   runMode: number,
+  inspectSharedProcess: boolean,
+  inspectExtensions: boolean,
+  inspectPtyHost: boolean,
 ) => {
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
@@ -31,6 +34,9 @@ export const prepareTests = async (
     isFirstConnection,
     canUseIdleCallback,
     attachedToPageTimeout,
+    inspectSharedProcess,
+    inspectExtensions,
+    inspectPtyHost,
   )
 
   return {

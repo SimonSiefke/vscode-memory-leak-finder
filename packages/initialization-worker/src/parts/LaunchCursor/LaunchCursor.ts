@@ -13,7 +13,16 @@ import { join } from '../Path/Path.ts'
 import * as Root from '../Root/Root.ts'
 import { VError } from '../VError/VError.ts'
 
-export const launchCursor = async ({ headlessMode, cwd, cursorVersion, vscodePath, addDisposable }) => {
+export const launchCursor = async ({
+  headlessMode,
+  cwd,
+  cursorVersion,
+  vscodePath,
+  addDisposable,
+  inspectSharedProcess,
+  inspectExtensions,
+  inspectPtyHost,
+}) => {
   try {
     const testWorkspacePath = join(Root.root, '.cursor-test-workspace')
     await CreateTestWorkspace.createTestWorkspace(testWorkspacePath)
@@ -37,6 +46,9 @@ export const launchCursor = async ({ headlessMode, cwd, cursorVersion, vscodePat
       userDataDir,
       extensionsDir,
       extraLaunchArgs: [testWorkspacePath],
+      inspectSharedProcess,
+      inspectExtensions,
+      inspectPtyHost,
     })
     const env = GetVsCodeEnv.getVsCodeEnv({ runtimeDir, processEnv: process.env })
     const { child, webSocketUrl } = await LaunchElectron.launchElectron({
