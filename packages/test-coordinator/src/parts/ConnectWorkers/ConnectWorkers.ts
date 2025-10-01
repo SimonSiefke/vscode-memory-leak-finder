@@ -17,6 +17,9 @@ export const connectWorkers = async (
   utilityContext: any,
   runMode: number,
   measureNode: boolean,
+  inspectSharedProcess: boolean,
+  inspectExtensions: boolean,
+  inspectPtyHost: boolean,
 ) => {
   const promises: Promise<any>[] = []
   if (recordVideo) {
@@ -25,7 +28,17 @@ export const connectWorkers = async (
     promises.push(Promise.resolve(undefined))
   }
   promises.push(
-    MemoryLeakWorker.startWorker(devtoolsWebSocketUrl, webSocketUrl, connectionId, measureId, attachedToPageTimeout, measureNode),
+    MemoryLeakWorker.startWorker(
+      devtoolsWebSocketUrl,
+      webSocketUrl,
+      connectionId,
+      measureId,
+      attachedToPageTimeout,
+      measureNode,
+      inspectSharedProcess,
+      inspectExtensions,
+      inspectPtyHost,
+    ),
   )
   promises.push(
     LaunchTestWorker.launchTestWorker(
@@ -40,6 +53,9 @@ export const connectWorkers = async (
       timeouts,
       utilityContext,
       attachedToPageTimeout,
+      inspectSharedProcess,
+      inspectExtensions,
+      inspectPtyHost,
     ),
   )
   const [videoRpc, memoryRpc, testWorkerRpc] = await Promise.all(promises)

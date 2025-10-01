@@ -70,6 +70,9 @@ export const prepareTestsAndAttach = async (
     utilityContext,
     runMode,
     measureNode,
+    inspectSharedProcess,
+    inspectExtensions,
+    inspectPtyHost,
   )
   return {
     memoryRpc,

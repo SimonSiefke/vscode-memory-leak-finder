@@ -13,6 +13,9 @@ export const connectDevtools = (
   timeouts: boolean,
   utilityContext: any,
   attachedToPageTimeout: number,
+  inspectSharedProcess: boolean,
+  inspectExtensions: boolean,
+  inspectPtyHost: boolean,
 ) => {
   Assert.object(rpc)
   Assert.number(connectionId)
@@ -29,5 +32,8 @@ export const connectDevtools = (
     timeouts,
     utilityContext,
     attachedToPageTimeout,
+    inspectSharedProcess,
+    inspectExtensions,
+    inspectPtyHost,
   )
 }
