@@ -41,6 +41,9 @@ export const run = async (platform: string, argv: readonly string[], env: NodeJS
     watch: options.watch,
     workers: options.workers,
     shouldContinue: options.shouldContinue,
+    inspectSharedProcess: options.inspectSharedProcess,
+    inspectExtensions: options.inspectExtensions,
+    inspectPtyHost: options.inspectPtyHost,
   })
   return InitialStart.initialStart(options)
 }

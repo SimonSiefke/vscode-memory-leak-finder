@@ -29,6 +29,9 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     workers,
     isWindows,
     shouldContinue,
+    inspectSharedProcess,
+    inspectExtensions,
+    inspectPtyHost,
   } = options
   const clear = await AnsiEscapes.clear(isWindows)
   await Stdout.write(clear)
@@ -57,5 +60,8 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     setupOnly,
     workers,
     shouldContinue,
+    inspectSharedProcess,
+    inspectExtensions,
+    inspectPtyHost,
   })
 }

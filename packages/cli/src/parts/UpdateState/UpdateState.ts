@@ -49,6 +49,9 @@ export const updateState = async (newState: any): Promise<void> => {
       isWindows: state.isWindows,
       runSkippedTestsAnyway: state.runSkippedTestsAnyway,
       shouldContinue: state.shouldContinue,
+      inspectExtensions: state.inspectExtensions,
+      inspectPtyHost: state.inspectPtyHost,
+      inspectSharedProcess: state.inspectSharedProcess,
     })
   }
   if (newState.mode === ModeType.Interrupted) {

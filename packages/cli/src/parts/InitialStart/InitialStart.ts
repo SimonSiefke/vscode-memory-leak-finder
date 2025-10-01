@@ -35,5 +35,8 @@ export const initialStart = async (options): Promise<void> => {
     workers: options.workers,
     isWindows: options.isWindows,
     shouldContinue: options.shouldContinue,
+    inspectSharedProcess: options.inspectSharedProcess,
+    inspectExtensions: options.inspectExtensions,
+    inspectPtyHost: options.inspectPtyHost,
   })
 }
