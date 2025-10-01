@@ -47,6 +47,9 @@ export const parseArgv = (argv) => {
     setupOnly: false,
     workers: false,
     shouldContinue: false,
+    inspectSharedProcess: false,
+    inspectExtensions: false,
+    inspectPtyHost: false,
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -113,6 +116,15 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--continue')) {
     options.shouldContinue = true
+  }
+  if (argv.includes('--inspect-shared-process')) {
+    options.inspectSharedProcess = true
+  }
+  if (argv.includes('--inspect-extensions')) {
+    options.inspectExtensions = true
+  }
+  if (argv.includes('--inspect-ptyhost')) {
+    options.inspectPtyHost = true
   }
   return options
 }
