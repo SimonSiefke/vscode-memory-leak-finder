@@ -3,7 +3,7 @@
 export const monkeyPatchUtilityProcessScript = `function () {
   const electron = this
   const { utilityProcess } = electron
-  
+
   if (!utilityProcess || !utilityProcess.fork) {
     console.log('[Memory Leak Finder] utilityProcess.fork not available, skipping monkey patch')
     return
@@ -27,7 +27,7 @@ export const monkeyPatchUtilityProcessScript = `function () {
 
     // Create a copy of args to avoid modifying the original
     const modifiedArgs = [...args]
-    
+
     // Add debugging port if not already present
     const hasInspectPort = modifiedArgs.some(arg => arg.startsWith('--inspect-port='))
     if (!hasInspectPort) {
@@ -75,7 +75,7 @@ export const monkeyPatchUtilityProcessScript = `function () {
   utilityProcess.fork = patchedFork
 
   console.log('[Memory Leak Finder] Successfully monkey patched utilityProcess.fork')
-  
+
   return () => {
     // Restore original fork method
     utilityProcess.fork = originalFork
