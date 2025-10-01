@@ -169,6 +169,11 @@ export const runTestsWithCallback = async ({
         const testSkipped = testResult.skipped
         wasOriginallySkipped = testResult.wasOriginallySkipped
 
+        // Check if setup failed and we have error information
+        if (testResult.error) {
+          throw testResult.error
+        }
+
         if (recordVideo) {
           await VideoRecording.addChapter(currentVideoRpc, dirent, start)
         }
