@@ -5,6 +5,76 @@ import { DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProt
 import * as GetCombinedMeasure from '../GetCombinedMeasure/GetCombinedMeasure.ts'
 import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinderState.ts'
 import { waitForSession } from '../WaitForSession/WaitForSession.ts'
+import { exec } from 'child_process'
+import { promisify } from 'util'
+
+const execAsync = promisify(exec)
+
+const getChildProcesses = async (parentPid: number): Promise<void> => {
+  try {
+    console.log(`[Memory Leak Finder] Getting child processes for PID ${parentPid}`)
+
+    // Get all child processes using ps command
+    const { stdout } = await execAsync(`ps -eo pid,ppid,cmd --no-headers | grep "^[[:space:]]*[0-9]*[[:space:]]*${parentPid}[[:space:]]"`)
+    const lines = stdout.trim().split('\n').filter(line => line.trim())
+
+    console.log(`[Memory Leak Finder] Found ${lines.length} child processes:`)
+
+    for (const line of lines) {
+      const parts = line.trim().split(/\s+/, 3)
+      if (parts.length >= 3) {
+        const pid = parts[0]
+        const ppid = parts[1]
+        const cmd = parts[2]
+
+        // Try to get more detailed info about the process
+        try {
+          const { stdout: procInfo } = await execAsync(`ps -p ${pid} -o pid,ppid,cmd,args --no-headers 2>/dev/null || echo "Process not found"`)
+          console.log(`[Memory Leak Finder] Child Process ${pid}:`)
+          console.log(`  Command: ${cmd}`)
+          console.log(`  Full args: ${procInfo.trim()}`)
+
+          // Try to identify process type based on command line arguments
+          let processType = 'unknown'
+          const fullArgs = procInfo.trim()
+
+          if (fullArgs.includes('--type=renderer')) {
+            processType = 'renderer-process'
+          } else if (fullArgs.includes('--type=utility')) {
+            if (fullArgs.includes('--utility-sub-type=network.mojom.NetworkService')) {
+              processType = 'network-service-process'
+            } else if (fullArgs.includes('--utility-sub-type=node.mojom.NodeService')) {
+              processType = 'node-service-process'
+            } else {
+              processType = 'utility-process'
+            }
+          } else if (fullArgs.includes('--type=shared')) {
+            processType = 'shared-process'
+          } else if (fullArgs.includes('--type=extensionHost')) {
+            processType = 'extension-host-process'
+          } else if (fullArgs.includes('--type=worker')) {
+            processType = 'worker-process'
+          } else if (fullArgs.includes('--type=node')) {
+            processType = 'node-process'
+          } else if (fullArgs.includes('--type=gpu-process')) {
+            processType = 'gpu-process'
+          } else if (fullArgs.includes('--type=zygote')) {
+            processType = 'zygote-process'
+          } else if (cmd.includes('code') && !fullArgs.includes('--type=')) {
+            processType = 'main-process'
+          }
+
+          console.log(`  Type: ${processType}`)
+          console.log('')
+        } catch (error) {
+          console.log(`[Memory Leak Finder] Could not get details for PID ${pid}: ${error.message}`)
+        }
+      }
+    }
+  } catch (error) {
+    console.log(`[Memory Leak Finder] Error getting child processes: ${error.message}`)
+  }
+}
 
 const getExecutionContextDetails = async (
   sessionRpc: any,
@@ -146,7 +216,7 @@ export const connectDevtools = async (
   const { sessionRpc } = await waitForSession(browserRpc, attachedToPageTimeout)
 
   // Set up event handler for execution context created events
-  const handleExecutionContextCreated = async (event: any, rpcConnection: any): Promise<void> => {
+  const handleExecutionContextCreated = async (event: any, rpcConnection: any): Promise<any> => {
     const { params } = event
     const { context } = params
     const { name, id, uniqueId, origin } = context
@@ -164,6 +234,8 @@ export const connectDevtools = async (
         contextInfo: details.contextInfo,
         timestamp: new Date().toISOString()
       })
+
+      return details
     } catch (error) {
       // If we can't evaluate anything, just log the basic context info
       console.log(`[Memory Leak Finder] Execution context created (evaluation failed):`, {
@@ -174,18 +246,49 @@ export const connectDevtools = async (
         error: error.message,
         timestamp: new Date().toISOString()
       })
+
+      return null
     }
   }
 
   // Set up execution context monitoring for both connections
   console.log(`[Memory Leak Finder] Setting up execution context monitoring for both connections`)
+  let mainProcessPid: number | null = null
+
   sessionRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, (event: any) => {
     console.log(`[Memory Leak Finder] Execution context created on sessionRpc (devtools frontend)`)
     handleExecutionContextCreated(event, sessionRpc)
   })
-  electronRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, (event: any) => {
+  electronRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, async (event: any) => {
     console.log(`[Memory Leak Finder] Execution context created on electronRpc (main process)`)
-    handleExecutionContextCreated(event, electronRpc)
+    const result = await handleExecutionContextCreated(event, electronRpc)
+
+    // If this is the main process, try to extract PID from the name or process info
+    if (result && result.processType === 'main-process' && !mainProcessPid) {
+      let pid: number | null = null
+
+      // Try to get PID from process info first
+      if (result.processInfo && result.processInfo.pid) {
+        pid = result.processInfo.pid
+      } else {
+        // Extract PID from the context name (format: /path/to/code[PID])
+        const name = event.params.context.name
+        const match = name.match(/\[(\d+)\]$/)
+        if (match) {
+          pid = parseInt(match[1], 10)
+        }
+      }
+
+      if (pid) {
+        mainProcessPid = pid
+        console.log(`[Memory Leak Finder] Main process PID detected: ${mainProcessPid}`)
+
+        // Wait a bit for child processes to be created, then inspect them
+        setTimeout(async () => {
+          await getChildProcesses(mainProcessPid!)
+        }, 2000)
+      }
+    }
   })
 
   Promise.all([
