@@ -30,4 +30,8 @@ export const createDefaultState = (): StdinDataState => ({
   previousFilters: [],
   exitCode: 0,
   shouldContinue: false,
+  inspectExtensions: false,
+  inspectPtyHost: false,
+  inspectSharedProcess: false,
+  measureNode: false,
 })
