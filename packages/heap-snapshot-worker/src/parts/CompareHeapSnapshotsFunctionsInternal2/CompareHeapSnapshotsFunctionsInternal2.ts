@@ -84,28 +84,14 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
   after: Snapshot,
   options: CompareFunctionsOptions,
 ): Promise<readonly any[]> => {
-  console.log(`[HeapSnapshotWorker] compareHeapSnapshotFunctionsInternal2 starting`)
-  const startTime = performance.now()
-
   const minCount = options.minCount || 0
   const { itemsPerLocation, scriptIdOffset, lineOffset, columnOffset, objectIndexOffset } = getLocationFieldOffsets(
     after.meta.location_fields,
   )
   const nodeNameOffset = after.meta.node_fields.indexOf('name')
-
-  console.log(`[HeapSnapshotWorker] Creating unique location maps`)
-  const mapTime = performance.now()
   const map1 = getUniqueLocationMap2(before)
   const map2 = getUniqueLocationMap2(after)
-  console.log(`[HeapSnapshotWorker] Unique location maps created in ${(performance.now() - mapTime).toFixed(2)}ms`)
-
-  console.log(`[HeapSnapshotWorker] Getting new items`)
-  const newItemsTime = performance.now()
   const newItems = getNewItems(map1, map2, minCount)
-  console.log(`[HeapSnapshotWorker] New items found in ${(performance.now() - newItemsTime).toFixed(2)}ms: ${newItems.length} items`)
-
-  console.log(`[HeapSnapshotWorker] Formatting unique locations`)
-  const formatTime = performance.now()
   const formattedItems = formatUniqueLocations(
     newItems,
     after.locations,
@@ -118,17 +104,9 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
     nodeNameOffset,
     after.strings,
   )
-  console.log(`[HeapSnapshotWorker] Unique locations formatted in ${(performance.now() - formatTime).toFixed(2)}ms`)
-
-  console.log(`[HeapSnapshotWorker] Adding original sources`)
-  const enrichTime = performance.now()
   let enriched = await addOriginalSources(formattedItems)
-  console.log(`[HeapSnapshotWorker] Original sources added in ${(performance.now() - enrichTime).toFixed(2)}ms`)
-
   const excludes = options.excludeOriginalPaths || []
   if (excludes.length > 0) {
-    console.log(`[HeapSnapshotWorker] Filtering excluded paths: ${excludes.length} exclusions`)
-    const filterTime = performance.now()
     const lowered = excludes.map((e) => e.toLowerCase())
     enriched = enriched.filter((item) => {
       const original = (item.originalUrl || item.originalSource || '').toLowerCase()
@@ -142,11 +120,7 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
       }
       return true
     })
-    console.log(`[HeapSnapshotWorker] Excluded paths filtered in ${(performance.now() - filterTime).toFixed(2)}ms`)
   }
-
-  console.log(`[HeapSnapshotWorker] Sorting and cleaning results`)
-  const sortTime = performance.now()
   const sorted = enriched.toSorted((a, b) => b.count - a.count)
   const cleanItems = sorted.map((item) => {
     return {
@@ -158,9 +132,5 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
       originalName: item.originalName,
     }
   })
-  console.log(`[HeapSnapshotWorker] Results sorted and cleaned in ${(performance.now() - sortTime).toFixed(2)}ms`)
-
-  const totalTime = performance.now() - startTime
-  console.log(`[HeapSnapshotWorker] compareHeapSnapshotFunctionsInternal2 completed in ${totalTime.toFixed(2)}ms, returning ${cleanItems.length} items`)
   return cleanItems
 }
