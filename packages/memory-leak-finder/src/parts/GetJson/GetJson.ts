@@ -7,7 +7,7 @@ export const getJson = async (port: number): Promise<any[]> => {
 
     // Wait for the debug port to be ready
     await waitOn({
-      resources: [`http://localhost:${port}/json/list`],
+      resources: [`http://localhost:${port}`],
       timeout: 30000,
     })
 
@@ -27,7 +27,10 @@ export const getJson = async (port: number): Promise<any[]> => {
     return targets
   } catch (error) {
     if (error.message && error.message.includes('Timed out waiting for')) {
-      throw new VError(error, `Debug port ${port} did not become available within 30 seconds. Make sure the utility process is started with the correct inspect flag (--inspect-sharedprocess=${port}, --inspect-extensions=${port}, or --inspect-ptyhost=${port})`)
+      throw new VError(
+        error,
+        `Debug port ${port} did not become available within 30 seconds. The utility process may not have started yet. Try triggering the utility process by using the relevant feature (e.g., open an extension for --inspect-extensions, or use terminal for --inspect-ptyhost)`,
+      )
     }
     throw new VError(error, `Failed to get JSON from DevTools on port ${port}`)
   }
