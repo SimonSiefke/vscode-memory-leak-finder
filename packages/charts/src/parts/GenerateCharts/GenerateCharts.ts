@@ -53,7 +53,7 @@ export const generateCharts = async () => {
             let outPath
             if (basePathInfo.isNode) {
               if (visitor.name === 'named-function-count-3') {
-                outPath = join(Root.root, '.vscode-charts', 'node', 'named-function-count3', `${filename}.svg`)
+                outPath = join(Root.root, '.vscode-charts', 'node', 'named-function-count-3', `${filename}.svg`)
               } else {
                 outPath = join(Root.root, '.vscode-charts', 'node', visitor.name, `${filename}.svg`)
               }
