@@ -1,15 +1,12 @@
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { getJson } from '../GetJson/GetJson.ts'
 
 export const connectToDevtoolsWithJsonUrl = async (port: number): Promise<any> => {
   // Fetch the JSON list from the HTTP endpoint
-  const response = await fetch(`http://localhost:${port}/json/list`)
-  if (!response.ok) {
-    throw new Error(`Failed to fetch DevTools JSON list from port ${port}: ${response.status} ${response.statusText}`)
-  }
+  const targets = await getJson(port)
 
-  const targets = await response.json()
-  if (!Array.isArray(targets) || targets.length === 0) {
+  if (targets.length === 0) {
     throw new Error(`No DevTools targets found on port ${port}`)
   }
 
@@ -25,10 +22,7 @@ export const connectToDevtoolsWithJsonUrl = async (port: number): Promise<any> =
   const rpc = await DebuggerCreateIpcConnection.createConnection(target.webSocketDebuggerUrl)
 
   // Enable runtime and run if waiting for debugger
-  await Promise.all([
-    DevtoolsProtocolRuntime.enable(rpc),
-    DevtoolsProtocolRuntime.runIfWaitingForDebugger(rpc),
-  ])
+  await Promise.all([DevtoolsProtocolRuntime.enable(rpc), DevtoolsProtocolRuntime.runIfWaitingForDebugger(rpc)])
 
   return rpc
 }
