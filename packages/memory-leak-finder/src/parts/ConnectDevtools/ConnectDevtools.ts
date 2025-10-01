@@ -33,11 +33,11 @@ const getChildProcesses = async (parentPid: number): Promise<void> => {
           console.log(`[Memory Leak Finder] Child Process ${pid}:`)
           console.log(`  Command: ${cmd}`)
           console.log(`  Full args: ${procInfo.trim()}`)
-
+          
           // Try to identify process type based on command line arguments
           let processType = 'unknown'
           const fullArgs = procInfo.trim()
-
+          
           if (fullArgs.includes('--type=renderer')) {
             processType = 'renderer-process'
           } else if (fullArgs.includes('--type=utility')) {
@@ -62,6 +62,72 @@ const getChildProcesses = async (parentPid: number): Promise<void> => {
             processType = 'zygote-process'
           } else if (cmd.includes('code') && !fullArgs.includes('--type=')) {
             processType = 'main-process'
+          }
+          
+          // Check for debugging ports in the arguments
+          const debugPortMatch = fullArgs.match(/--inspect-port=(\d+)/)
+          const debugBrkMatch = fullArgs.match(/--inspect-brk=(\d+)/)
+          const remoteDebuggingMatch = fullArgs.match(/--remote-debugging-port=(\d+)/)
+          
+          if (debugPortMatch) {
+            console.log(`  Debug Port: ${debugPortMatch[1]}`)
+          }
+          if (debugBrkMatch) {
+            console.log(`  Debug Brk Port: ${debugBrkMatch[1]}`)
+          }
+          if (remoteDebuggingMatch) {
+            console.log(`  Remote Debugging Port: ${remoteDebuggingMatch[1]}`)
+          }
+          
+          // If this is a Node.js service process with inspect-port=0, try to find the actual port
+          if (processType === 'node-service-process' && fullArgs.includes('--inspect-port=0')) {
+            try {
+              // Try multiple methods to find the debug port
+              console.log(`  Attempting to find debug port for Node.js service process...`)
+              
+              // Method 1: netstat
+              try {
+                const { stdout: netstatOutput } = await execAsync(`netstat -tlnp 2>/dev/null | grep ${pid} || echo "No netstat results"`)
+                if (!netstatOutput.includes('No netstat results')) {
+                  const portMatch = netstatOutput.match(/:(\d+).*LISTEN.*${pid}/)
+                  if (portMatch) {
+                    console.log(`  Actual Debug Port (netstat): ${portMatch[1]}`)
+                  }
+                }
+              } catch (netstatError) {
+                console.log(`  Netstat failed: ${netstatError.message}`)
+              }
+              
+              // Method 2: lsof
+              try {
+                const { stdout: lsofOutput } = await execAsync(`lsof -p ${pid} 2>/dev/null | grep LISTEN || echo "No lsof results"`)
+                if (!lsofOutput.includes('No lsof results')) {
+                  const portMatch = lsofOutput.match(/:(\d+).*LISTEN/)
+                  if (portMatch) {
+                    console.log(`  Actual Debug Port (lsof): ${portMatch[1]}`)
+                  }
+                }
+              } catch (lsofError) {
+                console.log(`  Lsof failed: ${lsofError.message}`)
+              }
+              
+              // Method 3: Check if we can connect to common debug ports
+              const commonDebugPorts = [9229, 9230, 9231, 9232, 9233, 9234, 9235, 9236, 9237, 9238, 9239, 9240]
+              for (const port of commonDebugPorts) {
+                try {
+                  const { stdout: curlOutput } = await execAsync(`curl -s http://localhost:${port}/json 2>/dev/null || echo "Port ${port} not available"`)
+                  if (!curlOutput.includes('not available') && curlOutput.includes('"id"')) {
+                    console.log(`  Found debug port via curl: ${port}`)
+                    break
+                  }
+                } catch (curlError) {
+                  // Port not available, continue
+                }
+              }
+              
+            } catch (error) {
+              console.log(`  Could not determine actual debug port: ${error.message}`)
+            }
           }
 
           console.log(`  Type: ${processType}`)
