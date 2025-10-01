@@ -16,6 +16,18 @@ export const getMeasureRpc = async (
   const EXTENSIONS_PORT = 5870
   const PTYHOST_PORT = 5877
 
+  const browserRpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
+  const { sessionRpc } = await waitForSession(browserRpc, attachedToPageTimeout)
+  await Promise.all([
+    DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
+      autoAttach: true,
+      waitForDebuggerOnStart: false,
+      flatten: true,
+    }),
+    DevtoolsProtocolRuntime.enable(sessionRpc),
+    DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc),
+  ])
+
   // Connect to the appropriate debug port based on the flags
   if (inspectSharedProcess) {
     console.log(`[Memory Leak Finder] Connecting to shared process debug port ${SHARED_PROCESS_PORT}`)
@@ -39,16 +51,6 @@ export const getMeasureRpc = async (
     const electronRpc = await DebuggerCreateIpcConnection.createConnection(electronWebSocketUrl)
     return electronRpc
   }
-  const browserRpc = DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
-  const { sessionRpc } = await waitForSession(browserRpc, attachedToPageTimeout)
-  await Promise.all([
-    DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
-      autoAttach: true,
-      waitForDebuggerOnStart: false,
-      flatten: true,
-    }),
-    DevtoolsProtocolRuntime.enable(sessionRpc),
-    DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc),
-  ])
+
   return sessionRpc
 }
