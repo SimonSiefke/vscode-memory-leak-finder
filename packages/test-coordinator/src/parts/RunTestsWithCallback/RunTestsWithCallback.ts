@@ -175,6 +175,7 @@ export const runTestsWithCallback = async ({
 
       try {
         const start = i === 0 ? initialStart : Time.now()
+        console.log('setting up...')
         const testResult = await TestWorkerSetupTest.testWorkerSetupTest(currentTestRpc, connectionId, absolutePath, forceRun, timeouts)
         const testSkipped = testResult.skipped
         wasOriginallySkipped = testResult.wasOriginallySkipped
@@ -198,6 +199,7 @@ export const runTestsWithCallback = async ({
           if (checkLeaks) {
             if (measureAfter) {
               for (let i = 0; i < 2; i++) {
+                console.log('running test ...')
                 await TestWorkerRunTest.testWorkerRunTest(currentTestRpc, connectionId, absolutePath, forceRun, runMode)
               }
             }
@@ -207,7 +209,9 @@ export const runTestsWithCallback = async ({
             console.log(`[TestCoordinator] MemoryLeakFinder.start() - ${dirent}`)
             const startTime = performance.now()
             await MemoryLeakFinder.start(currentMemoryRpc, connectionId)
-            console.log(`[TestCoordinator] MemoryLeakFinder.start() completed in ${(performance.now() - startTime).toFixed(2)}ms - ${dirent}`)
+            console.log(
+              `[TestCoordinator] MemoryLeakFinder.start() completed in ${(performance.now() - startTime).toFixed(2)}ms - ${dirent}`,
+            )
 
             for (let i = 0; i < runs; i++) {
               await TestWorkerRunTest.testWorkerRunTest(currentTestRpc, connectionId, absolutePath, forceRun, runMode)
@@ -225,7 +229,9 @@ export const runTestsWithCallback = async ({
             console.log(`[TestCoordinator] MemoryLeakFinder.compare() - ${dirent}`)
             const compareTime = performance.now()
             const result = await MemoryLeakFinder.compare(currentMemoryRpc, connectionId, context)
-            console.log(`[TestCoordinator] MemoryLeakFinder.compare() completed in ${(performance.now() - compareTime).toFixed(2)}ms - ${dirent}`)
+            console.log(
+              `[TestCoordinator] MemoryLeakFinder.compare() completed in ${(performance.now() - compareTime).toFixed(2)}ms - ${dirent}`,
+            )
 
             const totalMemoryLeakTime = performance.now() - memoryLeakStartTime
             console.log(`[TestCoordinator] Total memory leak detection time: ${totalMemoryLeakTime.toFixed(2)}ms - ${dirent}`)
@@ -258,6 +264,7 @@ export const runTestsWithCallback = async ({
           }
         }
       } catch (error) {
+        console.log({ error })
         if (wasOriginallySkipped) {
           skippedFailed++
         } else {
