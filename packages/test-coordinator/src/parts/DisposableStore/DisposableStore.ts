@@ -8,6 +8,9 @@ export class DisposableStore {
   }
 
   add(fn) {
+    if (!fn) {
+      throw new Error(`function must be defined`)
+    }
     if (this.isDisposed) {
       throw new Error(`cannot add to disposed disposable store`)
     }
@@ -20,7 +23,7 @@ export class DisposableStore {
     }
     this.isDisposed = true
     for (const item of this.disposables) {
-      await item.dispose()
+      await item()
     }
   }
 }
