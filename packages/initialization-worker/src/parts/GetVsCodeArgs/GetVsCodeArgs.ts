@@ -1,7 +1,7 @@
 import * as ChromiumSwitches from '../ChromiumSwitches/ChromiumSwitches.ts'
 
-export const getVscodeArgs = ({ extensionsDir, userDataDir, extraLaunchArgs }) => {
-  return [
+export const getVscodeArgs = ({ extensionsDir, userDataDir, extraLaunchArgs, inspectSharedProcess, inspectExtensions, inspectPtyHost }) => {
+  const args = [
     ...ChromiumSwitches.chromiumSwitches,
     '--wait',
     '--new-window',
@@ -15,6 +15,18 @@ export const getVscodeArgs = ({ extensionsDir, userDataDir, extraLaunchArgs }) =
     extensionsDir,
     '--user-data-dir',
     userDataDir,
-    ...extraLaunchArgs,
   ]
+
+  if (inspectPtyHost) {
+    args.push('--inspect-ptyhost')
+  }
+  if (inspectSharedProcess) {
+    args.push('--inspect-sharedprocess')
+  }
+  if (inspectExtensions) {
+    args.push('--inspect-extensions')
+  }
+
+  args.push(...extraLaunchArgs)
+  return args
 }
