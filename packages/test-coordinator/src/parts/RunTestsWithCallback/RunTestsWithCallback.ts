@@ -303,6 +303,7 @@ export const runTestsWithCallback = async ({
       videoRpc: emptyRpc,
     }
     await callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, skippedFailed, leaking, total, duration, filterValue)
+    console.log(process.getActiveResourcesInfo())
   } catch (error) {
     const PrettyError = await import('../PrettyError/PrettyError.ts')
     const prettyError = await PrettyError.prepare(error, { color, root })
