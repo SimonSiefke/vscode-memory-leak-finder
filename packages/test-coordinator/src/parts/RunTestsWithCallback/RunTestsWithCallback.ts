@@ -88,7 +88,7 @@ export const runTestsWithCallback = async ({
         ideVersion,
         vscodePath,
         commit,
-        
+
         attachedToPageTimeout,
         measure,
         idleTimeout,
