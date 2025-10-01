@@ -19,10 +19,13 @@ const visitors = Object.values(Charts).map((value) => {
 export const generateCharts = async () => {
   const rpc = await launchChartWorker()
 
-  // Generate charts for both regular and Node.js data
+  // Generate charts for all process types
   const basePaths = [
-    { path: join(Root.root, '.vscode-memory-leak-finder-results'), isNode: false },
-    { path: join(Root.root, '.vscode-memory-leak-finder-results', 'node'), isNode: true },
+    { path: join(Root.root, '.vscode-memory-leak-finder-results'), isNode: false, processType: 'main' },
+    { path: join(Root.root, '.vscode-memory-leak-finder-results', 'node'), isNode: true, processType: 'node' },
+    { path: join(Root.root, '.vscode-memory-leak-finder-results', 'shared-process'), isNode: false, processType: 'shared-process' },
+    { path: join(Root.root, '.vscode-memory-leak-finder-results', 'extension-host'), isNode: false, processType: 'extension-host' },
+    { path: join(Root.root, '.vscode-memory-leak-finder-results', 'pty-host'), isNode: false, processType: 'pty-host' },
   ]
 
   for (const basePathInfo of basePaths) {
@@ -54,6 +57,8 @@ export const generateCharts = async () => {
               } else {
                 outPath = join(Root.root, '.vscode-charts', 'node', visitor.name, `${filename}.svg`)
               }
+            } else if (basePathInfo.processType !== 'main') {
+              outPath = join(Root.root, '.vscode-charts', basePathInfo.processType, visitor.name, `${filename}.svg`)
             } else {
               outPath = join(Root.root, '.vscode-charts', `${visitor.name}/${filename}.svg`)
             }
@@ -66,6 +71,8 @@ export const generateCharts = async () => {
         let outPath
         if (basePathInfo.isNode) {
           outPath = join(Root.root, '.vscode-charts', 'node', `${visitor.name}.svg`)
+        } else if (basePathInfo.processType !== 'main') {
+          outPath = join(Root.root, '.vscode-charts', basePathInfo.processType, `${visitor.name}.svg`)
         } else {
           outPath = join(Root.root, '.vscode-charts', `${visitor.name}.svg`)
         }
