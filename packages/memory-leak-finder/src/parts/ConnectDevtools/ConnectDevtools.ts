@@ -6,6 +6,117 @@ import * as GetCombinedMeasure from '../GetCombinedMeasure/GetCombinedMeasure.ts
 import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinderState.ts'
 import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 
+const getExecutionContextDetails = async (
+  sessionRpc: any,
+  context: { name: string; id: number; uniqueId: string; origin: string }
+): Promise<{
+  processType: string
+  processInfo: any
+  contextInfo: any
+}> => {
+  const { name, id, uniqueId, origin } = context
+
+  try {
+    // Try to evaluate process information in this execution context
+    let processData = null
+    let contextInfo = {}
+
+    try {
+      const processInfo = await DevtoolsProtocolRuntime.evaluate(sessionRpc, {
+        expression: `JSON.stringify({
+          execPath: process.execPath,
+          argv: process.argv,
+          pid: process.pid,
+          platform: process.platform,
+          version: process.version,
+          versions: process.versions
+        })`,
+        contextId: id,
+        returnByValue: true
+      })
+      processData = JSON.parse(processInfo.result.value)
+    } catch (processError) {
+      // Process not available, try to get other context information
+      try {
+        const contextInfoResult = await DevtoolsProtocolRuntime.evaluate(sessionRpc, {
+          expression: `JSON.stringify({
+            userAgent: navigator.userAgent,
+            location: window.location ? window.location.href : 'no location',
+            isElectron: typeof process !== 'undefined' && process.versions && process.versions.electron,
+            hasNode: typeof process !== 'undefined',
+            hasWindow: typeof window !== 'undefined',
+            hasDocument: typeof document !== 'undefined'
+          })`,
+          contextId: id,
+          returnByValue: true
+        })
+        contextInfo = JSON.parse(contextInfoResult.result.value)
+      } catch (contextError) {
+        // Fallback to basic info
+      }
+    }
+
+    // Determine process type based on available information
+    let processType = 'unknown'
+    if (processData) {
+      if (processData.argv && processData.argv.some((arg: string) => arg.includes('--type=renderer'))) {
+        processType = 'renderer'
+      } else if (processData.argv && processData.argv.some((arg: string) => arg.includes('--type=utility'))) {
+        processType = 'utility'
+      } else if (processData.argv && processData.argv.some((arg: string) => arg.includes('--type=worker'))) {
+        processType = 'worker'
+      } else if (processData.argv && processData.argv.some((arg: string) => arg.includes('--type=node'))) {
+        processType = 'node'
+      } else if (name === 'utility') {
+        processType = 'utility'
+      } else if (name === 'Electron Isolated Context') {
+        processType = 'renderer'
+      } else if (origin && origin.includes('vscode-file://vscode-app')) {
+        processType = 'renderer'
+      } else {
+        processType = 'main'
+      }
+    } else {
+      // Fallback to context name and origin analysis
+      if (name === 'utility') {
+        processType = 'utility-process'
+      } else if (name === 'Electron Isolated Context') {
+        processType = 'renderer-process'
+      } else if (origin && origin.includes('vscode-file://vscode-app')) {
+        processType = 'renderer-process'
+      } else if (contextInfo) {
+        if (contextInfo.isElectron) {
+          processType = 'electron-context'
+        } else if (contextInfo.hasWindow && contextInfo.hasDocument) {
+          processType = 'browser-context'
+        } else if (contextInfo.hasNode) {
+          processType = 'node-context'
+        }
+      } else {
+        processType = 'main-process'
+      }
+    }
+
+    return {
+      processType,
+      processInfo: processData ? {
+        execPath: processData.execPath,
+        argv: processData.argv,
+        pid: processData.pid,
+        platform: processData.platform,
+        version: processData.version
+      } : null,
+      contextInfo: Object.keys(contextInfo).length > 0 ? contextInfo : null
+    }
+  } catch (error) {
+    return {
+      processType: 'unknown',
+      processInfo: null,
+      contextInfo: null
+    }
+  }
+}
+
 export const connectDevtools = async (
   devtoolsWebSocketUrl: string,
   electronWebSocketUrl: string,
@@ -33,100 +144,16 @@ export const connectDevtools = async (
     const { name, id, uniqueId, origin } = context
 
     try {
-      // Try to evaluate process information in this execution context
-      let processData = null
-      let contextInfo = {}
-
-      try {
-        const processInfo = await DevtoolsProtocolRuntime.evaluate(sessionRpc, {
-          expression: `JSON.stringify({
-            execPath: process.execPath,
-            argv: process.argv,
-            pid: process.pid,
-            platform: process.platform,
-            version: process.version,
-            versions: process.versions
-          })`,
-          contextId: id,
-          returnByValue: true
-        })
-        processData = JSON.parse(processInfo.result.value)
-      } catch (processError) {
-        // Process not available, try to get other context information
-        try {
-          const contextInfoResult = await DevtoolsProtocolRuntime.evaluate(sessionRpc, {
-            expression: `JSON.stringify({
-              userAgent: navigator.userAgent,
-              location: window.location ? window.location.href : 'no location',
-              isElectron: typeof process !== 'undefined' && process.versions && process.versions.electron,
-              hasNode: typeof process !== 'undefined',
-              hasWindow: typeof window !== 'undefined',
-              hasDocument: typeof document !== 'undefined'
-            })`,
-            contextId: id,
-            returnByValue: true
-          })
-          contextInfo = JSON.parse(contextInfoResult.result.value)
-        } catch (contextError) {
-          // Fallback to basic info
-        }
-      }
-
-      // Determine process type based on available information
-      let processType = 'unknown'
-      if (processData) {
-        if (processData.argv && processData.argv.some((arg: string) => arg.includes('--type=renderer'))) {
-          processType = 'renderer'
-        } else if (processData.argv && processData.argv.some((arg: string) => arg.includes('--type=utility'))) {
-          processType = 'utility'
-        } else if (processData.argv && processData.argv.some((arg: string) => arg.includes('--type=worker'))) {
-          processType = 'worker'
-        } else if (processData.argv && processData.argv.some((arg: string) => arg.includes('--type=node'))) {
-          processType = 'node'
-        } else if (name === 'utility') {
-          processType = 'utility'
-        } else if (name === 'Electron Isolated Context') {
-          processType = 'renderer'
-        } else if (origin && origin.includes('vscode-file://vscode-app')) {
-          processType = 'renderer'
-        } else {
-          processType = 'main'
-        }
-      } else {
-        // Fallback to context name and origin analysis
-        if (name === 'utility') {
-          processType = 'utility-process'
-        } else if (name === 'Electron Isolated Context') {
-          processType = 'renderer-process'
-        } else if (origin && origin.includes('vscode-file://vscode-app')) {
-          processType = 'renderer-process'
-        } else if (contextInfo) {
-          if (contextInfo.isElectron) {
-            processType = 'electron-context'
-          } else if (contextInfo.hasWindow && contextInfo.hasDocument) {
-            processType = 'browser-context'
-          } else if (contextInfo.hasNode) {
-            processType = 'node-context'
-          }
-        } else {
-          processType = 'main-process'
-        }
-      }
+      const details = await getExecutionContextDetails(sessionRpc, context)
 
       console.log(`[Memory Leak Finder] Execution context created:`, {
         name,
         id,
         uniqueId,
         origin,
-        processType,
-        processInfo: processData ? {
-          execPath: processData.execPath,
-          argv: processData.argv,
-          pid: processData.pid,
-          platform: processData.platform,
-          version: processData.version
-        } : null,
-        contextInfo: Object.keys(contextInfo).length > 0 ? contextInfo : null,
+        processType: details.processType,
+        processInfo: details.processInfo,
+        contextInfo: details.contextInfo,
         timestamp: new Date().toISOString()
       })
     } catch (error) {
