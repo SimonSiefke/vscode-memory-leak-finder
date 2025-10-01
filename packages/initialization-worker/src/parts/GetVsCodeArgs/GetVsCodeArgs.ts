@@ -18,14 +18,16 @@ export const getVscodeArgs = ({ extensionsDir, userDataDir, extraLaunchArgs, ins
   ]
 
   if (inspectPtyHost) {
-    args.push('--inspect-ptyhost')
+    args.push('--inspect-ptyhost=5877')
   }
   if (inspectSharedProcess) {
-    args.push('--inspect-sharedprocess')
+    args.push('--inspect-sharedprocess=5879')
   }
   if (inspectExtensions) {
-    args.push('--inspect-extensions')
+    args.push('--inspect-extensions=5870')
   }
+
+  console.log({ args })
 
   args.push(...extraLaunchArgs)
   return args
