@@ -193,7 +193,7 @@ const getChildProcesses = async (parentPid: number): Promise<void> => {
               }
 
               // Method 3: Check if we can connect to common debug ports
-              const commonDebugPorts = [9229, 9230, 9231, 9232, 9233, 9234, 9235, 9236, 9237, 9238, 9239, 9240, 3017, 3018, 3019, 3020, 3021, 3022, 3023, 3024, 3025, 3026, 9222, 9223, 9224, 9225, 9226, 9227, 9228]
+              const commonDebugPorts = [9229, 9230, 9231, 9232, 9233, 9234, 9235, 9236, 9237, 9238, 9239, 9240, 3017, 3018, 3019, 3020, 3021, 3022, 3023, 3024, 3025, 3026, 9222, 9223, 9224, 9225, 9226, 9227, 9228, 38861, 38862, 38863, 38864, 38865, 38866, 38867, 38868, 38869, 38870, 5870, 5871, 5872, 5873, 5874, 5875, 5876, 5877, 5878, 5879, 5880, 5881, 5882, 5883, 5884, 5885, 5886, 5887, 5888, 5889, 5890]
               let foundPort = null
               console.log(`  Checking ${commonDebugPorts.length} common debug ports...`)
               for (const port of commonDebugPorts) {
@@ -238,6 +238,15 @@ const getChildProcesses = async (parentPid: number): Promise<void> => {
 
                 } catch (connectionError) {
                   console.log(`[Memory Leak Finder] ❌ Failed to connect to utility process ${pid}: ${connectionError.message}`)
+                }
+              } else {
+                console.log(`[Memory Leak Finder] ❌ No debug port found for process ${pid}`)
+                console.log(`[Memory Leak Finder] 🔍 Let's check what ports are actually listening...`)
+                try {
+                  const { stdout: netstatOutput } = await execAsync(`netstat -tlnp 2>/dev/null | grep -E ":(587[0-9]|588[0-9]|589[0-9])" || echo "No ports found in range"`)
+                  console.log(`[Memory Leak Finder] 📊 Netstat output: ${netstatOutput}`)
+                } catch (netstatError) {
+                  console.log(`[Memory Leak Finder] ❌ Netstat failed: ${netstatError.message}`)
                 }
               }
 
