@@ -39,5 +39,8 @@ export const waitForSession = async (browserRpc, attachedToPageTimeout) => {
     sessionId,
     targetId: targetInfo.targetId,
     sessionRpc,
+    dispose() {
+      browserRpc.dispose()
+    },
   }
 }
