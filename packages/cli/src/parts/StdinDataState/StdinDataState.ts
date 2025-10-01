@@ -129,7 +129,7 @@ export const setTestStateChange = (): void => {
 }
 
 export const isBuffering = (): boolean => {
-  return false
+  return state.buffering
 }
 
 export const isWatchMode = (): boolean => {
