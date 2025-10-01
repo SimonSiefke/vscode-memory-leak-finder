@@ -4,16 +4,13 @@ import { getInitializationWorkerUrl } from '../GetInitializationWorkerUrl/GetIni
 
 export const launchInitializationWorker = async () => {
   const url = getInitializationWorkerUrl()
-  console.log(`[TEST-COORDINATOR] launching initialization worker`)
   const rpc = await NodeWorkerRpcParent.create({
     path: url,
     stdio: 'inherit',
     commandMap: {},
   })
   Disposables.add(async () => {
-    console.log(`[TEST-COORDINATOR] disposing initialization worker`)
     await rpc.invoke('Initialize.exit')
-    console.log(`[TEST-COORDINATOR] initialization worker disposed`)
   })
   return rpc
 }
