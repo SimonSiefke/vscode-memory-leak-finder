@@ -2,7 +2,7 @@ import { join } from 'node:path'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
 import { getSummary } from '../GetSummary/GetSummary.ts'
-import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.ts'
+import * as GetTestsToRunWithContinue from '../GetTestsToRunWithContinue/GetTestsToRunWithContinue.ts'
 import * as Id from '../Id/Id.ts'
 import * as JsonFile from '../JsonFile/JsonFile.ts'
 import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.ts'
@@ -40,6 +40,7 @@ export const runTestsWithCallback = async ({
   vscodePath,
   commit,
   setupOnly,
+  shouldContinue,
   callback,
   addDisposable,
   clearDisposables,
@@ -102,7 +103,7 @@ export const runTestsWithCallback = async ({
     let skipped = 0
     let skippedFailed = 0
     let leaking = 0
-    const formattedPaths = await GetTestToRun.getTestsToRun(root, cwd, filterValue)
+    const formattedPaths = await GetTestsToRunWithContinue.getTestsToRunWithContinue(root, cwd, filterValue, measure, shouldContinue)
     const total = formattedPaths.length
     if (total === 0) {
       return callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, 0, leaking, total, 0, filterValue)
