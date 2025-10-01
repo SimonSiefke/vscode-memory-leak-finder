@@ -4,7 +4,6 @@ import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
 import { getSummary } from '../GetSummary/GetSummary.ts'
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.ts'
 import * as Id from '../Id/Id.ts'
-import * as JsonFile from '../JsonFile/JsonFile.ts'
 import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.ts'
 import * as MemoryLeakResultsPath from '../MemoryLeakResultsPath/MemoryLeakResultsPath.ts'
 import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
@@ -212,8 +211,7 @@ export const runTestsWithCallback = async ({
             }
             await MemoryLeakFinder.stop(currentMemoryRpc, connectionId)
 
-            // TODO memory leak finder should write result, to avoid sending large result here
-            const result = await MemoryLeakFinder.compare(currentMemoryRpc, connectionId, context)
+            // Memory leak finder writes result directly to disk to avoid large RPC transfers
             const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
             const testName = fileName.replace('.json', '')
             let resultPath
@@ -228,7 +226,8 @@ export const runTestsWithCallback = async ({
             } else {
               resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
             }
-            await JsonFile.writeJson(resultPath, result)
+            
+            const result = await MemoryLeakFinder.compare(currentMemoryRpc, connectionId, context, resultPath)
             if (result.isLeak) {
               isLeak = true
               leaking++
