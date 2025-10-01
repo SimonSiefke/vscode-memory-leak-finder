@@ -230,8 +230,9 @@ export const runTestsWithCallback = async ({
               isLeak = true
               leaking++
             }
-            const summary = getSummary(result)
-            console.log(summary)
+            if (result.summary) {
+              console.log(result.summary)
+            }
           } else {
             for (let i = 0; i < runs; i++) {
               await TestWorkerRunTest.testWorkerRunTest(currentTestRpc, connectionId, absolutePath, forceRun, runMode)
@@ -285,7 +286,6 @@ export const runTestsWithCallback = async ({
             inspectSharedProcess,
             inspectExtensions,
             inspectPtyHost,
-            true, // forceNewWorkers = true when restartBetween is true
           )
           addDisposable(async () => {
             await memoryRpc.dispose()
