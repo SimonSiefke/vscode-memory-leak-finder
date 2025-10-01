@@ -9,5 +9,8 @@ export const createSessionRpcConnection = (rpc: any, sessionId: string): any => 
     off: rpc.off,
     once: rpc.once,
     sessionId,
+    dispose() {
+      rpc.dispose()
+    },
   }
 }
