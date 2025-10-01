@@ -59,6 +59,7 @@
     "@lvce-editor/assert": "^1.4.0",
     "@lvce-editor/rpc": "^4.19.0",
     "@lvce-editor/verror": "^1.7.0",
-    "pretty-bytes": "^7.1.0"
+    "pretty-bytes": "^7.1.0",
+    "wait-on": "^9.0.1"
   }
 }
