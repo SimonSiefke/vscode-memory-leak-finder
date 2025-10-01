@@ -231,7 +231,6 @@ export const runTestsWithCallback = async ({
           }
         }
       } catch (error) {
-        
         if (wasOriginallySkipped) {
           skippedFailed++
         } else {
