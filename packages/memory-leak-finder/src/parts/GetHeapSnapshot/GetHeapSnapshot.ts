@@ -7,5 +7,6 @@ export const getHeapSnapshot = async (session: Session, id: number): Promise<str
   const outFile = join(Root.root, '.vscode-heapsnapshots', `${id}.json`)
   console.info('taking heapsnapshot')
   await HeapSnapshot.takeHeapSnapshot(session, outFile)
+  console.log('took heapsnapshot')
   return outFile
 }

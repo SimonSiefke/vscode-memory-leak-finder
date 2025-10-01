@@ -1,5 +1,4 @@
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { getJson } from '../GetJson/GetJson.ts'
 
 export const connectToDevtoolsWithJsonUrl = async (port: number): Promise<any> => {
@@ -10,6 +9,10 @@ export const connectToDevtoolsWithJsonUrl = async (port: number): Promise<any> =
     throw new Error(`No DevTools targets found on port ${port}`)
   }
 
+  if (targets.length > 1) {
+    throw new Error(`too many devtools targets found`)
+  }
+
   // Get the first target's WebSocket URL
   const target = targets[0]
   if (!target.webSocketDebuggerUrl) {
@@ -18,9 +21,6 @@ export const connectToDevtoolsWithJsonUrl = async (port: number): Promise<any> =
 
   // Create connection to the WebSocket URL
   const rpc = await DebuggerCreateIpcConnection.createConnection(target.webSocketDebuggerUrl)
-
-  // Enable runtime and run if waiting for debugger
-  await Promise.all([DevtoolsProtocolRuntime.enable(rpc), DevtoolsProtocolRuntime.runIfWaitingForDebugger(rpc)])
 
   return rpc
 }

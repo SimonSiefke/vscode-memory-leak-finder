@@ -27,6 +27,9 @@ export const createConnection = async (wsUrl: string): Promise<any> => {
         }
         webSocket.onmessage = handleMessage
       },
+      dispose() {
+        webSocket.close()
+      },
     }
     const rpc = createRpc(ipc)
     return rpc
