@@ -22,14 +22,16 @@ const getExecutionContextDetails = async (
     let contextInfo = {}
 
     try {
-      const processInfo = await DevtoolsProtocolRuntime.evaluate(sessionRpc, {
+      const processInfo = await DevtoolsProtocolRuntime.evaluate(rpcConnection, {
         expression: `JSON.stringify({
           execPath: process.execPath,
           argv: process.argv,
           pid: process.pid,
           platform: process.platform,
           version: process.version,
-          versions: process.versions
+          versions: process.versions,
+          cwd: process.cwd,
+          title: process.title
         })`,
         contextId: id,
         returnByValue: true
@@ -38,7 +40,7 @@ const getExecutionContextDetails = async (
     } catch (processError) {
       // Process not available, try to get other context information
       try {
-        const contextInfoResult = await DevtoolsProtocolRuntime.evaluate(sessionRpc, {
+        const contextInfoResult = await DevtoolsProtocolRuntime.evaluate(rpcConnection, {
           expression: `JSON.stringify({
             userAgent: navigator.userAgent,
             location: window.location ? window.location.href : 'no location',
@@ -67,6 +69,10 @@ const getExecutionContextDetails = async (
         processType = 'worker'
       } else if (processData.argv && processData.argv.some((arg: string) => arg.includes('--type=node'))) {
         processType = 'node'
+      } else if (processData.argv && processData.argv.some((arg: string) => arg.includes('--type=shared'))) {
+        processType = 'shared-process'
+      } else if (processData.argv && processData.argv.some((arg: string) => arg.includes('--type=extensionHost'))) {
+        processType = 'extension-host'
       } else if (name === 'utility') {
         processType = 'utility'
       } else if (name === 'Electron Isolated Context') {
@@ -172,8 +178,15 @@ export const connectDevtools = async (
   }
 
   // Set up execution context monitoring for both connections
-  sessionRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, (event: any) => handleExecutionContextCreated(event, sessionRpc))
-  electronRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, (event: any) => handleExecutionContextCreated(event, electronRpc))
+  console.log(`[Memory Leak Finder] Setting up execution context monitoring for both connections`)
+  sessionRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, (event: any) => {
+    console.log(`[Memory Leak Finder] Execution context created on sessionRpc (devtools frontend)`)
+    handleExecutionContextCreated(event, sessionRpc)
+  })
+  electronRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, (event: any) => {
+    console.log(`[Memory Leak Finder] Execution context created on electronRpc (main process)`)
+    handleExecutionContextCreated(event, electronRpc)
+  })
 
   Promise.all([
     DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
