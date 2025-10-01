@@ -9,7 +9,7 @@ export const createConnection = async (wsUrl: string): Promise<any> => {
 
     // TODO remove error listener and message listener when ipc is disposed
     webSocket.addEventListener('error', (error: any) => {
-      throw new Error(`memory leak worker websocket error: ${error}`)
+      throw new Error(`memory leak worker websocket error`)
     })
     await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket as any)
     const ipc = {

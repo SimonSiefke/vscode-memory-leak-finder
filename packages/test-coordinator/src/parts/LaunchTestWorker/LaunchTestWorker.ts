@@ -26,6 +26,9 @@ export const launchTestWorker = async (
   timeouts: boolean,
   utilityContext: any,
   attachdToPageTimeout: number,
+  inspectSharedProcess: boolean,
+  inspectExtensions: boolean,
+  inspectPtyHost: boolean,
 ) => {
   try {
     const url = GetTestWorkerUrl.getTestWorkerUrl()
@@ -47,6 +50,9 @@ export const launchTestWorker = async (
       timeouts,
       utilityContext,
       attachdToPageTimeout,
+      inspectSharedProcess,
+      inspectExtensions,
+      inspectPtyHost,
     )
     return rpc
   } catch (error) {
