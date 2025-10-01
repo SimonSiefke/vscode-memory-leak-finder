@@ -60,7 +60,7 @@ export const prepareBoth = async (
     DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
       functionDeclaration: MonkeyPatchUtilityProcess.undoMonkeyPatch,
       objectId: monkeyPatchedUtilityProcessId,
-    })
+    }),
   ])
 
   const { sessionRpc, sessionId, targetId, dispose } = await connectDevtoolsPromise

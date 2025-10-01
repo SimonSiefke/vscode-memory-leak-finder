@@ -17,7 +17,17 @@ import * as RemoveVscodeWorkspaceStorage from '../RemoveVscodeWorkspaceStorage/R
 import * as Root from '../Root/Root.ts'
 import { VError } from '../VError/VError.ts'
 
-export const launchVsCode = async ({ headlessMode, cwd, vscodeVersion, vscodePath, commit, addDisposable, inspectSharedProcess, inspectExtensions, inspectPtyHost }) => {
+export const launchVsCode = async ({
+  headlessMode,
+  cwd,
+  vscodeVersion,
+  vscodePath,
+  commit,
+  addDisposable,
+  inspectSharedProcess,
+  inspectExtensions,
+  inspectPtyHost,
+}) => {
   try {
     const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
     await CreateTestWorkspace.createTestWorkspace(testWorkspacePath)

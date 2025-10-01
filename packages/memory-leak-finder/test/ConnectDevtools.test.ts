@@ -50,18 +50,8 @@ test('connectDevtools sets up execution context created event handler', async ()
   const ConnectDevtoolsModule = await import('../src/parts/ConnectDevtools/ConnectDevtools.ts')
 
   // Call the function
-  await ConnectDevtoolsModule.connectDevtools(
-    'ws://localhost:9222',
-    'ws://localhost:9223',
-    1,
-    'test-measure',
-    5000,
-    false
-  )
+  await ConnectDevtoolsModule.connectDevtools('ws://localhost:9222', 'ws://localhost:9223', 1, 'test-measure', 5000, false)
 
   // Verify that the event handler was set up
-  expect(mockOn).toHaveBeenCalledWith(
-    DevtoolsEventType.RuntimeExecutionContextCreated,
-    expect.any(Function)
-  )
+  expect(mockOn).toHaveBeenCalledWith(DevtoolsEventType.RuntimeExecutionContextCreated, expect.any(Function))
 })
