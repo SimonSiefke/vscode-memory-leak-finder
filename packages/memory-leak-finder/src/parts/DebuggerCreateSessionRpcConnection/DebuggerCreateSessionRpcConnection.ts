@@ -10,6 +10,7 @@ export const createSessionRpcConnection = (rpc: any, sessionId: string): any => 
     once: rpc.once,
     sessionId,
     dispose() {
+      console.log({ rpc })
       rpc.dispose()
     },
   }
