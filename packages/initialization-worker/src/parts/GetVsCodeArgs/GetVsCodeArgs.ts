@@ -26,9 +26,6 @@ export const getVscodeArgs = ({ extensionsDir, userDataDir, extraLaunchArgs, ins
   if (inspectExtensions) {
     args.push('--inspect-extensions=5870')
   }
-
-  console.log({ args })
-
   args.push(...extraLaunchArgs)
   return args
 }
