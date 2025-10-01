@@ -133,6 +133,12 @@ const getChildProcesses = async (parentPid: number): Promise<void> => {
             processType = 'gpu-process'
           } else if (fullArgs.includes('--type=zygote')) {
             processType = 'zygote-process'
+          } else if (fullArgs.includes('--type=ptyhost')) {
+            processType = 'ptyhost-process'
+          } else if (fullArgs.includes('--type=shared-process')) {
+            processType = 'shared-process'
+          } else if (fullArgs.includes('--type=extension-host')) {
+            processType = 'extension-host-process'
           } else if (cmd.includes('code') && !fullArgs.includes('--type=')) {
             processType = 'main-process'
           }
@@ -187,7 +193,7 @@ const getChildProcesses = async (parentPid: number): Promise<void> => {
               }
 
               // Method 3: Check if we can connect to common debug ports
-              const commonDebugPorts = [9229, 9230, 9231, 9232, 9233, 9234, 9235, 9236, 9237, 9238, 9239, 9240, 3017, 3018, 3019, 3020, 3021, 3022, 3023, 3024, 3025, 3026]
+              const commonDebugPorts = [9229, 9230, 9231, 9232, 9233, 9234, 9235, 9236, 9237, 9238, 9239, 9240, 3017, 3018, 3019, 3020, 3021, 3022, 3023, 3024, 3025, 3026, 9222, 9223, 9224, 9225, 9226, 9227, 9228]
               let foundPort = null
               console.log(`  Checking ${commonDebugPorts.length} common debug ports...`)
               for (const port of commonDebugPorts) {

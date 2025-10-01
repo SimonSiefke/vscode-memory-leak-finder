@@ -55,6 +55,7 @@ export const connectElectron = async (electronRpc, headlessMode) => {
     functionDeclaration: MonkeyPatchUtilityProcess.monkeyPatchUtilityProcessScript,
     objectId: electronObjectId,
   })
+  console.log('monkey patched electron')
 
   if (headlessMode) {
     await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {

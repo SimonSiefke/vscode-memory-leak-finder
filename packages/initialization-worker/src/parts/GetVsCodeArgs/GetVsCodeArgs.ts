@@ -15,6 +15,10 @@ export const getVscodeArgs = ({ extensionsDir, userDataDir, extraLaunchArgs }) =
     extensionsDir,
     '--user-data-dir',
     userDataDir,
+    // Enable debugging for utility processes
+    '--inspect-ptyhost',
+    '--inspect-sharedprocess',
+    '--inspect-extensions',
     ...extraLaunchArgs,
   ]
 }
