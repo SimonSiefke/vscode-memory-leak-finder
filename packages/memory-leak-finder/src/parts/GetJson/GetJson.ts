@@ -3,14 +3,12 @@ import { VError } from '../VError/VError.ts'
 
 export const getJson = async (port: number): Promise<any[]> => {
   try {
-    console.log('waiting for port...')
     await waitForLocalhost({
       port,
       signal: AbortSignal.timeout(30_000),
       path: '/json/list',
       useGet: true,
     })
-    console.log('got port...')
 
     const response = await fetch(`http://localhost:${port}/json/list`)
     if (!response.ok) {
