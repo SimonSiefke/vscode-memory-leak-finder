@@ -14,7 +14,7 @@ jobs:
         os: [ubuntu-24.04, macos-26, windows-2025]
     timeout-minutes: 240
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: |
           git fetch --no-tags --prune --depth=1 origin +refs/heads/main:refs/remotes/origin/main
       - uses: actions/setup-node@v4
