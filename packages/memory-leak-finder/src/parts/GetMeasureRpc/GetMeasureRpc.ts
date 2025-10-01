@@ -1,6 +1,7 @@
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import { DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { waitForSession } from '../WaitForSession/WaitForSession.ts'
+import { connectToDevtoolsWithJsonUrl } from '../ConnectToDevtoolsWithJsonUrl/ConnectToDevtoolsWithJsonUrl.ts'
 
 export const getMeasureRpc = async (
   devtoolsWebSocketUrl: string,
@@ -31,20 +32,17 @@ export const getMeasureRpc = async (
   // Connect to the appropriate debug port based on the flags
   if (inspectSharedProcess) {
     console.log(`[Memory Leak Finder] Connecting to shared process debug port ${SHARED_PROCESS_PORT}`)
-    const sharedProcessRpc = await DebuggerCreateIpcConnection.createConnection(`ws://localhost:${SHARED_PROCESS_PORT}`)
-    await Promise.all([DevtoolsProtocolRuntime.enable(sharedProcessRpc), DevtoolsProtocolRuntime.runIfWaitingForDebugger(sharedProcessRpc)])
+    const sharedProcessRpc = await connectToDevtoolsWithJsonUrl(SHARED_PROCESS_PORT)
     return sharedProcessRpc
   }
   if (inspectExtensions) {
     console.log(`[Memory Leak Finder] Connecting to extensions process debug port ${EXTENSIONS_PORT}`)
-    const extensionsRpc = await DebuggerCreateIpcConnection.createConnection(`ws://localhost:${EXTENSIONS_PORT}`)
-    await Promise.all([DevtoolsProtocolRuntime.enable(extensionsRpc), DevtoolsProtocolRuntime.runIfWaitingForDebugger(extensionsRpc)])
+    const extensionsRpc = await connectToDevtoolsWithJsonUrl(EXTENSIONS_PORT)
     return extensionsRpc
   }
   if (inspectPtyHost) {
     console.log(`[Memory Leak Finder] Connecting to ptyhost process debug port ${PTYHOST_PORT}`)
-    const ptyhostRpc = await DebuggerCreateIpcConnection.createConnection(`ws://localhost:${PTYHOST_PORT}`)
-    await Promise.all([DevtoolsProtocolRuntime.enable(ptyhostRpc), DevtoolsProtocolRuntime.runIfWaitingForDebugger(ptyhostRpc)])
+    const ptyhostRpc = await connectToDevtoolsWithJsonUrl(PTYHOST_PORT)
     return ptyhostRpc
   }
   if (measureNode) {
