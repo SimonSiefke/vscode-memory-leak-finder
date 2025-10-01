@@ -3,19 +3,12 @@ import { VError } from '../VError/VError.ts'
 
 export const getJson = async (port: number): Promise<any[]> => {
   try {
-    console.log(`[Memory Leak Finder] Waiting for debug port ${port} to be ready...`)
-
-    // Timeout after 5 seconds
     await waitForLocalhost({
       port,
       signal: AbortSignal.timeout(30_000),
       path: '/json/list',
       useGet: true,
     })
-
-    console.log('port is ready')
-
-    console.log(`[Memory Leak Finder] Debug port ${port} is ready, fetching JSON...`)
 
     const response = await fetch(`http://localhost:${port}/json/list`)
     if (!response.ok) {
