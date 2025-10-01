@@ -201,17 +201,34 @@ export const runTestsWithCallback = async ({
                 await TestWorkerRunTest.testWorkerRunTest(currentTestRpc, connectionId, absolutePath, forceRun, runMode)
               }
             }
+            console.log(`[TestCoordinator] Starting memory leak detection for test: ${dirent}`)
+            const memoryLeakStartTime = performance.now()
+
+            console.log(`[TestCoordinator] MemoryLeakFinder.start() - ${dirent}`)
+            const startTime = performance.now()
             await MemoryLeakFinder.start(currentMemoryRpc, connectionId)
+            console.log(`[TestCoordinator] MemoryLeakFinder.start() completed in ${(performance.now() - startTime).toFixed(2)}ms - ${dirent}`)
+
             for (let i = 0; i < runs; i++) {
               await TestWorkerRunTest.testWorkerRunTest(currentTestRpc, connectionId, absolutePath, forceRun, runMode)
             }
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
             }
+
+            console.log(`[TestCoordinator] MemoryLeakFinder.stop() - ${dirent}`)
+            const stopTime = performance.now()
             await MemoryLeakFinder.stop(currentMemoryRpc, connectionId)
+            console.log(`[TestCoordinator] MemoryLeakFinder.stop() completed in ${(performance.now() - stopTime).toFixed(2)}ms - ${dirent}`)
 
             // TODO memory leak finder should write result, to avoid sending large result here
+            console.log(`[TestCoordinator] MemoryLeakFinder.compare() - ${dirent}`)
+            const compareTime = performance.now()
             const result = await MemoryLeakFinder.compare(currentMemoryRpc, connectionId, context)
+            console.log(`[TestCoordinator] MemoryLeakFinder.compare() completed in ${(performance.now() - compareTime).toFixed(2)}ms - ${dirent}`)
+
+            const totalMemoryLeakTime = performance.now() - memoryLeakStartTime
+            console.log(`[TestCoordinator] Total memory leak detection time: ${totalMemoryLeakTime.toFixed(2)}ms - ${dirent}`)
             const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
             const testName = fileName.replace('.json', '')
             let resultPath
