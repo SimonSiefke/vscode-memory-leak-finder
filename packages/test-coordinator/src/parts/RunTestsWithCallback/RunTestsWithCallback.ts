@@ -217,6 +217,12 @@ export const runTestsWithCallback = async ({
             let resultPath
             if (measureNode) {
               resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'node', measure, testName + '.json')
+            } else if (inspectSharedProcess) {
+              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'shared-process', measure, fileName)
+            } else if (inspectExtensions) {
+              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'extension-host', measure, fileName)
+            } else if (inspectPtyHost) {
+              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'pty-host', measure, fileName)
             } else {
               resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
             }
