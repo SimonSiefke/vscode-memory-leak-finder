@@ -9,7 +9,10 @@ export const getJson = async (port: number): Promise<any[]> => {
     await waitForLocalhost({
       port,
       signal: AbortSignal.timeout(30_000),
+      path: '/json/list',
     })
+
+    console.log('port is ready')
 
     console.log(`[Memory Leak Finder] Debug port ${port} is ready, fetching JSON...`)
 
