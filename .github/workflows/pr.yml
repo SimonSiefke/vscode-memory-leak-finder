@@ -32,9 +32,18 @@ jobs:
             **/.vscode-test
             **/.vscode-user-data-dir
             **/.vscode-ffmpeg
-            **/.vscode-source-maps
             **/.vscode-resolve-source-map-cache
           key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+      - name: Compute source maps cache key
+        id: sourceMapsCacheKey
+        run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/cache@v4
+        id: source-maps-cache
+        with:
+          path: |
+            **/.vscode-source-maps
+          key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
       - name: npm ci
         run: npm ci --ignore-scripts && npm run postinstall
         if: steps.npm-cache.outputs.cache-hit != 'true'
