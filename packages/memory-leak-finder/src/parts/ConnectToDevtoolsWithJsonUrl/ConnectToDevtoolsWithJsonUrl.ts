@@ -19,8 +19,5 @@ export const connectToDevtoolsWithJsonUrl = async (port: number): Promise<any> =
   // Create connection to the WebSocket URL
   const rpc = await DebuggerCreateIpcConnection.createConnection(target.webSocketDebuggerUrl)
 
-  // Enable runtime and run if waiting for debugger
-  await Promise.all([DevtoolsProtocolRuntime.enable(rpc), DevtoolsProtocolRuntime.runIfWaitingForDebugger(rpc)])
-
   return rpc
 }
