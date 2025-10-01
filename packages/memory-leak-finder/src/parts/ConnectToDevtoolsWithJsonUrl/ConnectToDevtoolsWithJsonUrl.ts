@@ -16,8 +16,6 @@ export const connectToDevtoolsWithJsonUrl = async (port: number): Promise<any> =
     throw new Error(`No WebSocket URL found in DevTools target on port ${port}`)
   }
 
-  console.log(`[Memory Leak Finder] Connecting to DevTools WebSocket: ${target.webSocketDebuggerUrl}`)
-
   // Create connection to the WebSocket URL
   const rpc = await DebuggerCreateIpcConnection.createConnection(target.webSocketDebuggerUrl)
 

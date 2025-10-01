@@ -1,14 +1,14 @@
+import waitForLocalhost from 'wait-for-localhost'
 import { VError } from '../VError/VError.ts'
-import waitOn from 'wait-on'
 
 export const getJson = async (port: number): Promise<any[]> => {
   try {
     console.log(`[Memory Leak Finder] Waiting for debug port ${port} to be ready...`)
 
-    // Wait for the debug port to be ready
-    await waitOn({
-      resources: [`http://localhost:${port}`],
-      timeout: 30000,
+    // Timeout after 5 seconds
+    await waitForLocalhost({
+      port,
+      signal: AbortSignal.timeout(30_000),
     })
 
     console.log(`[Memory Leak Finder] Debug port ${port} is ready, fetching JSON...`)

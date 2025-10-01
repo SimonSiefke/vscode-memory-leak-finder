@@ -31,17 +31,14 @@ export const getMeasureRpc = async (
 
   // Connect to the appropriate debug port based on the flags
   if (inspectSharedProcess) {
-    console.log(`[Memory Leak Finder] Connecting to shared process debug port ${SHARED_PROCESS_PORT}`)
     const sharedProcessRpc = await connectToDevtoolsWithJsonUrl(SHARED_PROCESS_PORT)
     return sharedProcessRpc
   }
   if (inspectExtensions) {
-    console.log(`[Memory Leak Finder] Connecting to extensions process debug port ${EXTENSIONS_PORT}`)
     const extensionsRpc = await connectToDevtoolsWithJsonUrl(EXTENSIONS_PORT)
     return extensionsRpc
   }
   if (inspectPtyHost) {
-    console.log(`[Memory Leak Finder] Connecting to ptyhost process debug port ${PTYHOST_PORT}`)
     const ptyhostRpc = await connectToDevtoolsWithJsonUrl(PTYHOST_PORT)
     return ptyhostRpc
   }
