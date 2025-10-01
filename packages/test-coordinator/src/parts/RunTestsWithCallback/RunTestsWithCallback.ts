@@ -97,6 +97,7 @@ export const runTestsWithCallback = async ({
         inspectSharedProcess,
         inspectExtensions,
         inspectPtyHost,
+        false, // forceNewWorkers = false for initial setup
       )
       await testWorkerRpc.dispose()
       await memoryRpc?.dispose()
@@ -137,6 +138,7 @@ export const runTestsWithCallback = async ({
       inspectSharedProcess,
       inspectExtensions,
       inspectPtyHost,
+      false, // forceNewWorkers = false for initial setup
     )
 
     addDisposable(async () => {
@@ -265,7 +267,9 @@ export const runTestsWithCallback = async ({
         )
       } finally {
         if (restartBetween) {
+          console.log(`[TEST-COORDINATOR] clearing disposables before restart`)
           await clearDisposables()
+          console.log(`[TEST-COORDINATOR] cleared disposables, resetting state`)
           PrepareTestsOrAttach.state.promise = undefined
           const { memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach(
             cwd,
@@ -286,6 +290,7 @@ export const runTestsWithCallback = async ({
             inspectSharedProcess,
             inspectExtensions,
             inspectPtyHost,
+            true, // forceNewWorkers = true when restartBetween is true
           )
           addDisposable(async () => {
             await memoryRpc.dispose()

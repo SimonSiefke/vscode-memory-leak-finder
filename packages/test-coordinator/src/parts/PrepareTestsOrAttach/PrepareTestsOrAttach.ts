@@ -28,6 +28,7 @@ export const prepareTestsAndAttach = async (
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
+  forceNewWorkers: boolean = false,
 ) => {
   const isFirst = state.promise === undefined
   if (isFirst) {
@@ -55,6 +56,8 @@ export const prepareTestsAndAttach = async (
 
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext } = await result
 
+  // If forceNewWorkers is true, always create fresh workers
+  // Otherwise, reuse the VSCode instance but create new workers
   const { memoryRpc, testWorkerRpc, videoRpc } = await connectWorkers(
     recordVideo,
     connectionId,

@@ -1,4 +1,5 @@
 import * as Listen from '../Listen/Listen.ts'
+import * as LogMemoryUsage from '../LogMemoryUsage/LogMemoryUsage.ts'
 
 const handleUncaughtExceptionMonitor = (error: Error): void => {
   console.error(error)
@@ -6,6 +7,7 @@ const handleUncaughtExceptionMonitor = (error: Error): void => {
 }
 
 export const main = async (): Promise<void> => {
+  LogMemoryUsage.logMemoryUsage('worker started')
   process.on('uncaughtExceptionMonitor', handleUncaughtExceptionMonitor)
   await Listen.listen()
 }
