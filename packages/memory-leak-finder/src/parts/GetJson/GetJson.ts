@@ -10,6 +10,7 @@ export const getJson = async (port: number): Promise<any[]> => {
       port,
       signal: AbortSignal.timeout(30_000),
       path: '/json/list',
+      useGet: true,
     })
 
     console.log('port is ready')
