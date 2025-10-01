@@ -19,15 +19,7 @@ export const compare = async (connectionId: number, context: any, resultPath: st
   }
   const result = measure.compare(before, after, context)
 
-  // If resultPath is provided, write result to disk and return only essential info
-  if (resultPath) {
-    await JsonFile.writeJson(resultPath, result)
-    return {
-      isLeak: result.isLeak || false,
-      summary: getSummary(result),
-    }
-  }
-
+  await JsonFile.writeJson(resultPath, result)
   return {
     isLeak: result.isLeak || false,
     summary: getSummary(result),
