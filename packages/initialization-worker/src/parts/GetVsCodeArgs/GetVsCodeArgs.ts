@@ -1,7 +1,7 @@
 import * as ChromiumSwitches from '../ChromiumSwitches/ChromiumSwitches.ts'
 
 export const getVscodeArgs = ({ extensionsDir, userDataDir, extraLaunchArgs, inspectSharedProcess, inspectExtensions, inspectPtyHost }) => {
-  return [
+  const args = [
     ...ChromiumSwitches.chromiumSwitches,
     '--wait',
     '--new-window',
@@ -15,10 +15,18 @@ export const getVscodeArgs = ({ extensionsDir, userDataDir, extraLaunchArgs, ins
     extensionsDir,
     '--user-data-dir',
     userDataDir,
-    // Enable debugging for utility processes
-    '--inspect-ptyhost',
-    '--inspect-sharedprocess',
-    '--inspect-extensions',
-    ...extraLaunchArgs,
   ]
+  
+  if (inspectPtyHost) {
+    args.push('--inspect-ptyhost')
+  }
+  if (inspectSharedProcess) {
+    args.push('--inspect-sharedprocess')
+  }
+  if (inspectExtensions) {
+    args.push('--inspect-extensions')
+  }
+  
+  args.push(...extraLaunchArgs)
+  return args
 }
