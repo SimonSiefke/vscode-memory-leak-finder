@@ -127,6 +127,9 @@ export const runTestsWithCallback = async ({
       idleTimeout,
       pageObjectPath,
       measureNode,
+      inspectSharedProcess,
+      inspectExtensions,
+      inspectPtyHost,
     )
 
     addDisposable(async () => {

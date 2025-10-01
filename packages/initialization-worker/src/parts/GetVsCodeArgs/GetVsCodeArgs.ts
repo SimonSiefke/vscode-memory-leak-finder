@@ -1,6 +1,6 @@
 import * as ChromiumSwitches from '../ChromiumSwitches/ChromiumSwitches.ts'
 
-export const getVscodeArgs = ({ extensionsDir, userDataDir, extraLaunchArgs }) => {
+export const getVscodeArgs = ({ extensionsDir, userDataDir, extraLaunchArgs, inspectSharedProcess, inspectExtensions, inspectPtyHost }) => {
   return [
     ...ChromiumSwitches.chromiumSwitches,
     '--wait',
