@@ -203,7 +203,13 @@ export const runTestsWithCallback = async ({
             // TODO memory leak finder should write result, to avoid sending large result here
             const result = await MemoryLeakFinder.compare(currentMemoryRpc, connectionId, context)
             const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
-            const resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
+            const testName = fileName.replace('.json', '')
+            let resultPath
+            if (measureNode) {
+              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, 'node', measure, testName + '.json')
+            } else {
+              resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
+            }
             await JsonFile.writeJson(resultPath, result)
             if (result.isLeak) {
               isLeak = true
