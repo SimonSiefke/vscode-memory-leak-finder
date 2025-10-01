@@ -25,18 +25,18 @@ export const connectDevtools = async (
     DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl),
   ])
   const { sessionRpc } = await waitForSession(browserRpc, attachedToPageTimeout)
-  
+
   // Set up event handler for execution context created events
   const handleExecutionContextCreated = async (event: any): Promise<void> => {
     const { params } = event
     const { context } = params
     const { name, id, uniqueId, origin } = context
-    
+
     try {
       // Try to evaluate process information in this execution context
       let processData = null
       let contextInfo = {}
-      
+
       try {
         const processInfo = await DevtoolsProtocolRuntime.evaluate(sessionRpc, {
           expression: `JSON.stringify({
@@ -71,7 +71,7 @@ export const connectDevtools = async (
           // Fallback to basic info
         }
       }
-      
+
       // Determine process type based on available information
       let processType = 'unknown'
       if (processData) {
@@ -92,16 +92,27 @@ export const connectDevtools = async (
         } else {
           processType = 'main'
         }
-      } else if (contextInfo) {
-        if (contextInfo.isElectron) {
-          processType = 'electron-context'
-        } else if (contextInfo.hasWindow && contextInfo.hasDocument) {
-          processType = 'browser-context'
-        } else if (contextInfo.hasNode) {
-          processType = 'node-context'
+      } else {
+        // Fallback to context name and origin analysis
+        if (name === 'utility') {
+          processType = 'utility-process'
+        } else if (name === 'Electron Isolated Context') {
+          processType = 'renderer-process'
+        } else if (origin && origin.includes('vscode-file://vscode-app')) {
+          processType = 'renderer-process'
+        } else if (contextInfo) {
+          if (contextInfo.isElectron) {
+            processType = 'electron-context'
+          } else if (contextInfo.hasWindow && contextInfo.hasDocument) {
+            processType = 'browser-context'
+          } else if (contextInfo.hasNode) {
+            processType = 'node-context'
+          }
+        } else {
+          processType = 'main-process'
         }
       }
-      
+
       console.log(`[Memory Leak Finder] Execution context created:`, {
         name,
         id,
@@ -130,9 +141,9 @@ export const connectDevtools = async (
       })
     }
   }
-  
+
   sessionRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, handleExecutionContextCreated)
-  
+
   Promise.all([
     DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
       autoAttach: true,
