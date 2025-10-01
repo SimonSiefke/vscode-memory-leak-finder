@@ -84,6 +84,8 @@ const getExecutionContextDetails = async (
         processType = 'renderer-process'
       } else if (origin && origin.includes('vscode-file://vscode-app')) {
         processType = 'renderer-process'
+      } else if (name && name.includes('/code[') && name.includes(']')) {
+        processType = 'main-process'
       } else if (contextInfo) {
         if (contextInfo.isElectron) {
           processType = 'electron-context'
@@ -138,13 +140,13 @@ export const connectDevtools = async (
   const { sessionRpc } = await waitForSession(browserRpc, attachedToPageTimeout)
 
   // Set up event handler for execution context created events
-  const handleExecutionContextCreated = async (event: any): Promise<void> => {
+  const handleExecutionContextCreated = async (event: any, rpcConnection: any): Promise<void> => {
     const { params } = event
     const { context } = params
     const { name, id, uniqueId, origin } = context
 
     try {
-      const details = await getExecutionContextDetails(sessionRpc, context)
+      const details = await getExecutionContextDetails(rpcConnection, context)
 
       console.log(`[Memory Leak Finder] Execution context created:`, {
         name,
@@ -169,7 +171,9 @@ export const connectDevtools = async (
     }
   }
 
-  sessionRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, handleExecutionContextCreated)
+  // Set up execution context monitoring for both connections
+  sessionRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, (event: any) => handleExecutionContextCreated(event, sessionRpc))
+  electronRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, (event: any) => handleExecutionContextCreated(event, electronRpc))
 
   Promise.all([
     DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
@@ -179,6 +183,8 @@ export const connectDevtools = async (
     }),
     DevtoolsProtocolRuntime.enable(sessionRpc),
     DevtoolsProtocolRuntime.runIfWaitingForDebugger(sessionRpc),
+    DevtoolsProtocolRuntime.enable(electronRpc),
+    DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc),
   ])
   const measureRpc = measureNode ? electronRpc : sessionRpc
   const measure = await GetCombinedMeasure.getCombinedMeasure(measureRpc, measureId)
