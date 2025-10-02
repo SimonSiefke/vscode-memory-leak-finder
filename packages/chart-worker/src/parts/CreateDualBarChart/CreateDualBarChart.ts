@@ -57,9 +57,8 @@ export const createDualBarChart = (data: any, options: any): string => {
           x: (d: any) => data.find((item: any) => item.name === d.name)?.count || 0, // Position at the end of the total bar
           textAnchor: 'start',
           dx: 3,
-          stroke: 'black',
-          strokeWidth: 0.5,
-          fontSize: chartOptions.fontSize,
+          fill: 'black',
+          fontSize: chartOptions.fontSize - 3,
         },
       ),
     ],
