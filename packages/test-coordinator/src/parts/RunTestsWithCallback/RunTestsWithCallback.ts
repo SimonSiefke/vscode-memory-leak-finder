@@ -222,14 +222,20 @@ export const runTestsWithCallback = async ({
                 await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
               }
             }
+            console.log('will start measure')
             await MemoryLeakFinder.start(memoryRpc, connectionId)
+            console.log('did start measure')
             for (let i = 0; i < runs; i++) {
+              console.log('will start test run')
               await TestWorkerRunTest.testWorkerRunTest(testWorkerRpc, connectionId, absolutePath, forceRun, runMode)
+              console.log('did start test run')
             }
             if (timeoutBetween) {
               await Timeout.setTimeout(timeoutBetween)
             }
+            console.log('will stop measure')
             await MemoryLeakFinder.stop(memoryRpc, connectionId)
+            console.log('did stop measure')
 
             const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
             const testName = fileName.replace('.json', '')
@@ -302,6 +308,7 @@ export const runTestsWithCallback = async ({
     }
     await callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, skippedFailed, leaking, total, duration, filterValue)
   } catch (error) {
+    console.log({ error })
     const PrettyError = await import('../PrettyError/PrettyError.ts')
     const prettyError = await PrettyError.prepare(error, { color, root })
     await callback(TestWorkerEventType.UnexpectedTestError, prettyError)
