@@ -62,8 +62,7 @@ export const launch = async (
     attachedToPageTimeout,
     port,
   )
-  await rpc.dispose()
-  await dispose()
+  await Promise.all([rpc.dispose(), dispose()])
 
   return {
     devtoolsWebSocketUrl,
