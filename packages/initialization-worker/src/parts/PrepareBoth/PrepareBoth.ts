@@ -43,11 +43,15 @@ export const prepareBoth = async (headlessMode: boolean, attachedToPageTimeout: 
   await Promise.all([electronRpc.dispose(), dispose()])
 
   return {
-    childPid: child.pid,
     devtoolsWebSocketUrl,
     electronObjectId,
     monkeyPatchedElectronId,
-    parsedVersion,
+    parsedVersion: {
+      // TODO
+      major: 1,
+      minor: 105,
+      patch: 0,
+    },
     sessionId,
     targetId,
     utilityContext,
