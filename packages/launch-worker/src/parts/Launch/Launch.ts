@@ -35,7 +35,7 @@ export const launch = async (
     path: getInitializationWorkerUrl(),
     commandMap: {},
   })
-  const promise = rpc.invoke('Initialize.prepare', headlessMode, attachedToPageTimeout, port1)
+  const promise = rpc.invokeAndTransfer('Initialize.prepare', headlessMode, attachedToPageTimeout, port1)
   // @ts-ignore
   const pipelinePromise = pipeline(child.stderr, new PortStream(port2))
   const { devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, webSocketUrl } = await promise
