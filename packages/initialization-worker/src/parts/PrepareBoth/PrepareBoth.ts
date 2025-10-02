@@ -6,6 +6,7 @@ import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsPr
 import * as Disposables from '../Disposables/Disposables.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
+import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
 import { waitForUtilityExecutionContext } from '../WaitForUtilityExecutionContext/WaitForUtilityExecutionContext.ts'
 
@@ -23,7 +24,7 @@ export const prepareBoth = async (
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
 ): Promise<any> => {
-  const { child, webSocketUrl, parsedVersion } = await LaunchIde.launchIde({
+  const { child, parsedVersion } = await LaunchIde.launchIde({
     headlessMode,
     cwd,
     ide,
@@ -34,6 +35,9 @@ export const prepareBoth = async (
     inspectExtensions,
     inspectPtyHost,
   })
+
+  const webSocketUrl = await WaitForDebuggerListening.waitForDebuggerListening(child.stderr)
+
   const devtoolsWebSocketUrlPromise = WaitForDevtoolsListening.waitForDevtoolsListening(child.stderr)
 
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
