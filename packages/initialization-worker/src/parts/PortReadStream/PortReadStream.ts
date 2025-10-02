@@ -8,9 +8,8 @@ export class PortReadStream extends Readable {
     super({ objectMode: true })
     this.port = port
     this.port.start()
-    this.port.on('message', (event) => {
-      console.log('got event')
-      console.log(event)
+    this.port.on('message', (message) => {
+      this.handleMessage(message)
     })
   }
 

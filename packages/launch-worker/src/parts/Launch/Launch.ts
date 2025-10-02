@@ -44,10 +44,6 @@ export const launch = async (
   })
   const promise = rpc.invokeAndTransfer('Initialize.prepare', headlessMode, attachedToPageTimeout, port1)
 
-  child.stderr.on('data', (x) => {
-    console.log('got data', x)
-  })
-
   const { devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, webSocketUrl } = await promise
   await rpc.dispose()
   // TODO close pipeline stream
