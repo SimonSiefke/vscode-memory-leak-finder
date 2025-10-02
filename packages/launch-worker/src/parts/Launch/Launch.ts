@@ -5,6 +5,23 @@ import { getInitializationWorkerUrl } from '../GetInitializationWorkerUrl/GetIni
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import { PortStream } from '../PortStream/PortStream.ts'
 
+const createPipeline = (stream) => {
+  const { port1, port2 } = new MessageChannel()
+
+  const controller = new AbortController()
+  // @ts-ignore
+  const pipelinePromise = pipeline(stream, new PortStream(port2), {
+    signal: controller.signal,
+  })
+
+  return {
+    async dispose() {
+      await Promise.allSettled([pipelinePromise, controller.abort()])
+    },
+    port: port1,
+  }
+}
+
 export const launch = async (
   headlessMode: boolean,
   cwd: string,
@@ -31,22 +48,19 @@ export const launch = async (
     inspectPtyHost,
   })
 
-  // console.log('stderr', child.stderr)
-  const { port1, port2 } = new MessageChannel()
-
-  // @ts-ignore
-  const pipelinePromise = pipeline(child.stderr, new PortStream(port2))
+  const { port, dispose } = createPipeline(child.stderr)
 
   const rpc = await NodeWorkerRpcParent.create({
     path: getInitializationWorkerUrl(),
     commandMap: {},
     stdio: 'inherit',
   })
-  const promise = rpc.invokeAndTransfer('Initialize.prepare', headlessMode, attachedToPageTimeout, port1)
+  const promise = rpc.invokeAndTransfer('Initialize.prepare', headlessMode, attachedToPageTimeout, port)
 
   const { devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, webSocketUrl } = await promise
   await rpc.dispose()
-  // TODO close pipeline stream
+  await dispose()
+
   return {
     devtoolsWebSocketUrl,
     electronObjectId,
