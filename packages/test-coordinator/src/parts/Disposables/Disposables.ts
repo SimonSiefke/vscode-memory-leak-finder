@@ -1,12 +1,12 @@
-const disposables: any[] = []
+import { DisposableStore } from '../DisposableStore/DisposableStore.ts'
+
+let store = new DisposableStore()
 
 export const add = (fn) => {
-  disposables.push(fn)
+  store.add(fn)
 }
 
 export const disposeAll = async () => {
-  for (const fn of disposables) {
-    await fn()
-  }
-  disposables.length = 0
+  await store.dispose()
+  store = new DisposableStore()
 }
