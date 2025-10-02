@@ -24,20 +24,21 @@ export const prepareTests = async (
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
-  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext } = await prepareBoth(
-    headlessMode,
-    cwd,
-    ide,
-    vscodePath,
-    commit,
-    connectionId,
-    isFirstConnection,
-    canUseIdleCallback,
-    attachedToPageTimeout,
-    inspectSharedProcess,
-    inspectExtensions,
-    inspectPtyHost,
-  )
+  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, initializationWorkerRpc } =
+    await prepareBoth(
+      headlessMode,
+      cwd,
+      ide,
+      vscodePath,
+      commit,
+      connectionId,
+      isFirstConnection,
+      canUseIdleCallback,
+      attachedToPageTimeout,
+      inspectSharedProcess,
+      inspectExtensions,
+      inspectPtyHost,
+    )
 
   return {
     parsedVersion,
@@ -45,5 +46,6 @@ export const prepareTests = async (
     webSocketUrl,
     devtoolsWebSocketUrl,
     electronObjectId,
+    initializationWorkerRpc,
   }
 }

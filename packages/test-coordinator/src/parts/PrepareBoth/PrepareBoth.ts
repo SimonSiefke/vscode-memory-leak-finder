@@ -8,6 +8,7 @@ export interface PrepareBothResult {
   readonly utilityContext: any
   readonly sessionId: string
   readonly targetId: string
+  readonly initializationWorkerRpc: any
 }
 
 export const prepareBoth = async (
@@ -27,7 +28,7 @@ export const prepareBoth = async (
   const initializationWorkerRpc = await launchInitializationWorker()
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, sessionId, targetId } =
     await initializationWorkerRpc.invoke(
-      'Initialize.prepare',
+      'Launch.launch',
       headlessMode,
       cwd,
       ide,
@@ -42,6 +43,7 @@ export const prepareBoth = async (
       inspectPtyHost,
     )
   return {
+    initializationWorkerRpc,
     webSocketUrl,
     devtoolsWebSocketUrl,
     electronObjectId,

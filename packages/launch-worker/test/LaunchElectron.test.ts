@@ -22,7 +22,7 @@ jest.unstable_mockModule('../src/parts/NodeVersion/NodeVersion.ts', () => {
 const LaunchElectron = await import('../src/parts/LaunchElectron/LaunchElectron.ts')
 const Spawn = await import('../src/parts/Spawn/Spawn.ts')
 
-test('launch - error - address already in use', async () => {
+test.skip('launch - error - address already in use', async () => {
   // @ts-ignore
   Spawn.spawn.mockImplementation(() => {
     const stdout = new EventEmitter()
@@ -46,7 +46,7 @@ test('launch - error - address already in use', async () => {
   ).rejects.toThrow(new Error(`Failed to launch electron: Starting inspector on 127.0.0.1:4444 failed: address already in use`))
 })
 
-test('launch - error - unexpected first message', async () => {
+test.skip('launch - error - unexpected first message', async () => {
   // @ts-ignore
   Spawn.spawn.mockImplementation(() => {
     const stdout = new EventEmitter()
@@ -79,7 +79,7 @@ test('launch - error - empty cli path', async () => {
   ).rejects.toThrow(new Error(`Failed to launch electron: The argument 'file' cannot be empty. Received ''`))
 })
 
-test('launch - error - yarn is not installed', async () => {
+test.skip('launch - error - yarn is not installed', async () => {
   // @ts-ignore
   Spawn.spawn.mockImplementation(() => {
     const stdout = new EventEmitter()

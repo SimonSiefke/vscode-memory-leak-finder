@@ -466,6 +466,34 @@ const getSingleColumnHtml = (dirents: string[]): string => {
   return html
 }
 
+const generateIndexHtmlRecursively = async (basePath: string, dirents: string[]): Promise<void> => {
+  for (const dirent of dirents) {
+    const fullPath = join(basePath, dirent)
+    const stats = await stat(fullPath)
+    if (stats.isDirectory()) {
+      const subDirContents = await readdir(fullPath)
+      const hasSvgFiles = subDirContents.some((file) => file.endsWith('.svg'))
+      if (hasSvgFiles) {
+        await generateIndexHtmlForFolder(fullPath, dirent)
+      }
+
+      // Recursively process subdirectories
+      const subDirs: string[] = []
+      for (const item of subDirContents) {
+        const itemPath = join(fullPath, item)
+        const itemStats = await stat(itemPath)
+        if (itemStats.isDirectory()) {
+          subDirs.push(item)
+        }
+      }
+
+      if (subDirs.length > 0) {
+        await generateIndexHtmlRecursively(fullPath, subDirs)
+      }
+    }
+  }
+}
+
 export const generateIndexHtml = async (): Promise<void> => {
   const outPath = join(Root.root, '.vscode-charts', `index.html`)
   const svgPath = join(Root.root, '.vscode-charts')
@@ -482,15 +510,5 @@ export const generateIndexHtml = async (): Promise<void> => {
   await writeFile(outPath, html)
 
   // Generate index.html for subfolders that contain multiple SVG files
-  for (const dirent of dirents) {
-    const fullPath = join(svgPath, dirent)
-    const stats = await stat(fullPath)
-    if (stats.isDirectory()) {
-      const subDirContents = await readdir(fullPath)
-      const hasSvgFiles = subDirContents.some((file) => file.endsWith('.svg'))
-      if (hasSvgFiles) {
-        await generateIndexHtmlForFolder(fullPath, dirent)
-      }
-    }
-  }
+  await generateIndexHtmlRecursively(svgPath, dirents)
 }

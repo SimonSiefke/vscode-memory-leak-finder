@@ -22,7 +22,6 @@ export const getJson = async (port: number): Promise<any[]> => {
       throw new Error(`Expected array but got ${typeof targets}`)
     }
 
-    console.log(`[Memory Leak Finder] Successfully fetched ${targets.length} targets from port ${port}`)
     return targets
   } catch (error) {
     if (error.message && error.message.includes('Timed out waiting for')) {

@@ -1,8 +1,8 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
 
-export const compare = (rpc: any, connectionId: number, context: any) => {
+export const compare = (rpc: any, connectionId: number, context: any, resultPath: string) => {
   Assert.object(rpc)
   Assert.number(connectionId)
-  return rpc.invoke(TestWorkerCommandType.MemoryLeakFinderCompare, connectionId, context)
+  return rpc.invoke(TestWorkerCommandType.MemoryLeakFinderCompare, connectionId, context, resultPath)
 }

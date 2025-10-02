@@ -64,6 +64,7 @@ jobs:
         with:
           path: |
             **/.vscode-source-maps
+            **/.vscode-sources
           key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
       - name: npm ci
         run: npm ci --ignore-scripts && npm run postinstall

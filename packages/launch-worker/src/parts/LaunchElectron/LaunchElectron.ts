@@ -1,7 +1,6 @@
 import * as GetElectronArgs from '../GetElectronArgs/GetElectronArgs.ts'
 import * as Spawn from '../Spawn/Spawn.ts'
 import { VError } from '../VError/VError.ts'
-import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.ts'
 
 // const logFile = '/tmp/lvce-manual-tests-log.txt'
 // const logStream = createWriteStream(logFile)
@@ -38,10 +37,8 @@ export const launchElectron = async ({ cliPath, args, headlessMode, cwd, env, ad
       child.stderr.setEncoding('utf-8')
       child.stderr.on('data', handleStdErr)
     }
-    const webSocketUrl = await WaitForDebuggerListening.waitForDebuggerListening(child.stderr)
     return {
       child,
-      webSocketUrl,
     }
   } catch (error) {
     throw new VError(error, `Failed to launch electron`)
