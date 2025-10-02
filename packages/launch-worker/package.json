@@ -1,5 +1,5 @@
 {
-  "name": "@vscode-memory-leak-finder/initialization-worker",
+  "name": "@vscode-memory-leak-finder/launch-worker",
   "version": "0.0.0-dev",
   "description": "",
   "keywords": [],

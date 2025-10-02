@@ -28,7 +28,7 @@ export const prepareBoth = async (
   const initializationWorkerRpc = await launchInitializationWorker()
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, sessionId, targetId } =
     await initializationWorkerRpc.invoke(
-      'Initialize.prepare',
+      'Launch.launch',
       headlessMode,
       cwd,
       ide,
