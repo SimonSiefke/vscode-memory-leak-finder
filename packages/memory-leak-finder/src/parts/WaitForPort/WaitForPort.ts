@@ -7,16 +7,16 @@ const isOpen = async (url: string) => {
   }
 }
 
-export const waitForPort = async (port: number, path: string): Promise<void> => {
+export const waitForPort = async (port: number, path: string): Promise<boolean> => {
   const maxTimeout = 30_000
   const start = performance.now()
   while (true) {
     const now = performance.now()
     if (now - start > maxTimeout) {
-      break
+      return false
     }
     if (await isOpen(`http://localhost:${port}${path}`)) {
-      break
+      return true
     }
   }
 }

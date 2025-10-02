@@ -3,7 +3,10 @@ import { getJson } from '../GetJson/GetJson.ts'
 import { waitForPort } from '../WaitForPort/WaitForPort.ts'
 
 export const connectToDevtoolsWithJsonUrl = async (port: number): Promise<any> => {
-  await waitForPort(port, '/json/list')
+  const isOpen = await waitForPort(port, '/json/list')
+  if (!isOpen) {
+    throw new Error(`timeout exceeded waiting for port ${port}`)
+  }
   // Fetch the JSON list from the HTTP endpoint
   const targets = await getJson(port, '/json/list')
 
