@@ -8,6 +8,7 @@ export interface PrepareBothResult {
   readonly utilityContext: any
   readonly sessionId: string
   readonly targetId: string
+  readonly initializationWorkerRpc: any
 }
 
 export const prepareBoth = async (
@@ -42,6 +43,7 @@ export const prepareBoth = async (
       inspectPtyHost,
     )
   return {
+    initializationWorkerRpc,
     webSocketUrl,
     devtoolsWebSocketUrl,
     electronObjectId,
