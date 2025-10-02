@@ -60,6 +60,6 @@
     "@lvce-editor/rpc": "^4.20.0",
     "@lvce-editor/verror": "^1.7.0",
     "pretty-bytes": "^7.1.0",
-    "wait-for-localhost": "^5.0.0"
+    "wait-for-localhost": "^5.0.1"
   }
 }

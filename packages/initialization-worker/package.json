@@ -16,6 +16,6 @@
     "@lvce-editor/verror": "^1.7.0"
   },
   "devDependencies": {
-    "@types/node": "^24.6.1"
+    "@types/node": "^24.6.2"
   }
 }
