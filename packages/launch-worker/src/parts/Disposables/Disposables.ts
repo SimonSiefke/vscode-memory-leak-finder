@@ -4,7 +4,7 @@ export const add = (fn) => {
   disposables.push(fn)
 }
 
-export const disposeAll = async () => {
+const disposeAll = async () => {
   for (const fn of disposables) {
     await fn()
   }

@@ -13,8 +13,7 @@
   },
   "dependencies": {
     "@lvce-editor/rpc": "^4.20.0",
-    "@lvce-editor/verror": "^1.7.0",
-    "strip-ansi": "^7.1.2"
+    "@lvce-editor/verror": "^1.7.0"
   },
   "devDependencies": {
     "@types/node": "^24.6.1"
