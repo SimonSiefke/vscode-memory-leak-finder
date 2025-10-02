@@ -10,12 +10,12 @@ export const createDualBarChart = (data: any, options: any): string => {
     // marginTop: 150, // Override marginTop for dual bar chart
   })
 
-  // Transform data to have separate entries for total and leaked counts
+  // Transform data to have separate entries for initial and leaked counts
   const transformedData = data.flatMap((item: any) => [
     {
       name: item.name,
-      value: item.count, // total count
-      type: 'total',
+      value: item.count - item.delta, // initial count (total - leaked)
+      type: 'initial',
     },
     {
       name: item.name,
@@ -39,7 +39,7 @@ export const createDualBarChart = (data: any, options: any): string => {
       Plot.rectX(transformedData, {
         x: 'value',
         y: 'name',
-        fill: (d: any) => (d.type === 'total' ? '#000000' : '#B22222'), // black for total, firebrick red for leaked
+        fill: (d: any) => (d.type === 'initial' ? '#000000' : '#B22222'), // black for initial, firebrick red for leaked
         rx1: 2,
         rx2: 2,
         strokeWidth: 2,
@@ -50,11 +50,11 @@ export const createDualBarChart = (data: any, options: any): string => {
 
       // Add text label for TOTAL count only at the end of the total bar
       Plot.text(
-        transformedData.filter((d: any) => d.type === 'total'),
+        transformedData.filter((d: any) => d.type === 'initial'),
         {
-          text: (d: any) => d.value + (data.find((item: any) => item.name === d.name)?.delta || 0), // Show the actual total count value
+          text: (d: any) => data.find((item: any) => item.name === d.name)?.count || 0, // Show the actual total count value
           y: 'name',
-          x: (d: any) => d.value + (data.find((item: any) => item.name === d.name)?.delta || 0), // Position at the end of the total bar
+          x: (d: any) => data.find((item: any) => item.name === d.name)?.count || 0, // Position at the end of the total bar
           textAnchor: 'start',
           dx: 3,
           stroke: 'black',
