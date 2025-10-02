@@ -30,14 +30,24 @@ export const launch = async (
     inspectExtensions,
     inspectPtyHost,
   })
+
+  // console.log('stderr', child.stderr)
   const { port1, port2 } = new MessageChannel()
+
+  // @ts-ignore
+  const pipelinePromise = pipeline(child.stderr, new PortStream(port2))
+
   const rpc = await NodeWorkerRpcParent.create({
     path: getInitializationWorkerUrl(),
     commandMap: {},
+    stdio: 'inherit',
   })
   const promise = rpc.invokeAndTransfer('Initialize.prepare', headlessMode, attachedToPageTimeout, port1)
-  // @ts-ignore
-  const pipelinePromise = pipeline(child.stderr, new PortStream(port2))
+
+  child.stderr.on('data', (x) => {
+    console.log('got data', x)
+  })
+
   const { devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, webSocketUrl } = await promise
   await rpc.dispose()
   // TODO close pipeline stream

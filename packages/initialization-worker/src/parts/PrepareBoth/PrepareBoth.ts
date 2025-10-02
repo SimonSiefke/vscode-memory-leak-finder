@@ -11,9 +11,11 @@ import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDe
 import { waitForUtilityExecutionContext } from '../WaitForUtilityExecutionContext/WaitForUtilityExecutionContext.ts'
 
 export const prepareBoth = async (headlessMode: boolean, attachedToPageTimeout: number, port: MessagePort): Promise<any> => {
+  console.log('preparing...')
   const stream = new PortReadStream(port)
   const webSocketUrl = await WaitForDebuggerListening.waitForDebuggerListening(stream)
 
+  console.log('got ws url')
   const devtoolsWebSocketUrlPromise = WaitForDevtoolsListening.waitForDevtoolsListening(stream)
 
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
