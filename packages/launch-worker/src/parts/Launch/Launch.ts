@@ -1,10 +1,8 @@
 import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
-import { pipeline } from 'node:stream/promises'
+import { createPipeline } from '../CreatePipeline/CreatePipeline.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
 import { getInitializationWorkerUrl } from '../GetInitializationWorkerUrl/GetInitializationWorkerUrl.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
-import { PortStream } from '../PortStream/PortStream.ts'
-import { createPipeline } from '../CreatePipeline/CreatePipeline.ts'
 
 export const launch = async (
   headlessMode: boolean,
