@@ -1,4 +1,3 @@
-import { Readable } from 'node:stream'
 import { MessagePort } from 'node:worker_threads'
 import { connectDevtools } from '../ConnectDevtools/ConnectDevtools.ts'
 import { connectElectron } from '../ConnectElectron/ConnectElectron.ts'
@@ -6,25 +5,10 @@ import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/Deb
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
+import { PortReadStream } from '../PortReadStream/PortReadStream.ts'
 import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
 import { waitForUtilityExecutionContext } from '../WaitForUtilityExecutionContext/WaitForUtilityExecutionContext.ts'
-
-class PortReadStream extends Readable {
-  port: MessagePort
-
-  constructor(port: MessagePort) {
-    super({ objectMode: true })
-    this.port = port
-    this.port.on('message', () => {})
-  }
-
-  _read(size: number): void {}
-
-  handleMessage(event) {
-    this.push(event.data)
-  }
-}
 
 export const prepareBoth = async (headlessMode: boolean, attachedToPageTimeout: number, port: MessagePort): Promise<any> => {
   const stream = new PortReadStream(port)
