@@ -51,7 +51,7 @@ export const launchCursor = async ({
       inspectPtyHost,
     })
     const env = GetVsCodeEnv.getVsCodeEnv({ runtimeDir, processEnv: process.env })
-    const { child, webSocketUrl } = await LaunchElectron.launchElectron({
+    const { child } = await LaunchElectron.launchElectron({
       cliPath: binaryPath,
       args,
       headlessMode,
@@ -61,7 +61,6 @@ export const launchCursor = async ({
     })
     return {
       child,
-      webSocketUrl,
     }
   } catch (error) {
     throw new VError(error, `Failed to launch Cursor`)
