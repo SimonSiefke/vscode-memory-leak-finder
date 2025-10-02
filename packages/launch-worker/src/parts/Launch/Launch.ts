@@ -16,6 +16,7 @@ const createPipeline = (stream) => {
 
   return {
     async dispose() {
+      port2.close()
       await Promise.allSettled([pipelinePromise, controller.abort()])
     },
     port: port1,
