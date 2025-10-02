@@ -4,24 +4,7 @@ import * as Disposables from '../Disposables/Disposables.ts'
 import { getInitializationWorkerUrl } from '../GetInitializationWorkerUrl/GetInitializationWorkerUrl.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import { PortStream } from '../PortStream/PortStream.ts'
-
-const createPipeline = (stream) => {
-  const { port1, port2 } = new MessageChannel()
-
-  const controller = new AbortController()
-  // @ts-ignore
-  const pipelinePromise = pipeline(stream, new PortStream(port2), {
-    signal: controller.signal,
-  })
-
-  return {
-    async dispose() {
-      port2.close()
-      await Promise.allSettled([pipelinePromise, controller.abort()])
-    },
-    port: port1,
-  }
-}
+import { createPipeline } from '../CreatePipeline/CreatePipeline.ts'
 
 export const launch = async (
   headlessMode: boolean,
@@ -48,9 +31,7 @@ export const launch = async (
     inspectExtensions,
     inspectPtyHost,
   })
-
   const { port, dispose } = createPipeline(child.stderr)
-
   const rpc = await NodeWorkerRpcParent.create({
     path: getInitializationWorkerUrl(),
     commandMap: {},
