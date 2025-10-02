@@ -1,5 +1,4 @@
 import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
-import * as Disposables from '../Disposables/Disposables.ts'
 import { getInitializationWorkerUrl } from '../GetInitializationWorkerUrl/GetInitializationWorkerUrl.ts'
 
 export const launchInitializationWorker = async () => {
@@ -9,8 +8,13 @@ export const launchInitializationWorker = async () => {
     stdio: 'inherit',
     commandMap: {},
   })
-  Disposables.add(async () => {
+
+  const originalDispose = rpc.dispose.bind(rpc)
+  const dispose = async () => {
     await rpc.invoke('Initialize.exit')
-  })
+    await originalDispose()
+  }
+  // @ts-ignore
+  rpc.dispose = dispose
   return rpc
 }
