@@ -10,7 +10,6 @@ export class PortStream extends Writable {
   }
 
   _write(chunk: any, encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
-    console.log('write', chunk)
     this.port.postMessage(chunk)
     callback(null)
   }
