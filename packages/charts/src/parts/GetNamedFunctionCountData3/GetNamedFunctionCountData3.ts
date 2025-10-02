@@ -26,7 +26,7 @@ export const getNamedFunctionCountData3 = async (name: string, basePath: string)
     const beforePath = join(resultsPath, dirent)
     const rawData = await readJson(beforePath)
     const usedNames = new Set<string>()
-    const data = rawData.namedFunctionCount3.map((item) => {
+    const data = (rawData.namedFunctionCount3 || []).map((item) => {
       const baseName = item.originalName || item.name
       const uniqueName = getUniqueName(usedNames, baseName)
       usedNames.add(uniqueName)
