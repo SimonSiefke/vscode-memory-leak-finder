@@ -1,9 +1,9 @@
+import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
 import { pipeline } from 'node:stream/promises'
-import { MessagePort } from 'node:worker_threads'
 import * as Disposables from '../Disposables/Disposables.ts'
+import { getInitializationWorkerUrl } from '../GetInitializationWorkerUrl/GetInitializationWorkerUrl.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import { PortStream } from '../PortStream/PortStream.ts'
-import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
 
 export const launch = async (
   headlessMode: boolean,
@@ -28,8 +28,18 @@ export const launch = async (
   })
   const { port1, port2 } = new MessageChannel()
   const rpc = await NodeWorkerRpcParent.create({
-    path: getOriginalNameWorkerPath(),
+    path: getInitializationWorkerUrl(),
     commandMap: {},
   })
-  await pipeline(child.stderr, new PortStream(port1))
+  const promise = rpc.invoke('Initialize.prepare', headlessMode, attachedToPageTimeout, port1)
+  const pipelinePromise = pipeline(child.stderr, new PortStream(port2))
+  const { devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, webSocketUrl } = await promise
+  // TODO close pipeline stream
+  return {
+    devtoolsWebSocketUrl,
+    electronObjectId,
+    parsedVersion,
+    utilityContext,
+    webSocketUrl,
+  }
 }
