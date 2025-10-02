@@ -8,14 +8,17 @@ export class PortReadStream extends Readable {
     super({ objectMode: true })
     this.port = port
     this.port.start()
+    const decoder = new TextDecoder('utf-8')
+
     this.port.on('message', (message) => {
-      this.handleMessage(message)
+      const decoded = decoder.decode(message)
+      this.handleMessage(decoded)
     })
   }
 
   _read(size: number): void {}
 
-  handleMessage(event) {
-    this.push(event.data)
+  handleMessage(message) {
+    this.push(message)
   }
 }
