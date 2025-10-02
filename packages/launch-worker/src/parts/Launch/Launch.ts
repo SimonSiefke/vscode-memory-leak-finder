@@ -56,9 +56,12 @@ export const launch = async (
     commandMap: {},
     stdio: 'inherit',
   })
-  const promise = rpc.invokeAndTransfer('Initialize.prepare', headlessMode, attachedToPageTimeout, port)
-
-  const { devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, webSocketUrl } = await promise
+  const { devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, webSocketUrl } = await rpc.invokeAndTransfer(
+    'Initialize.prepare',
+    headlessMode,
+    attachedToPageTimeout,
+    port,
+  )
   await rpc.dispose()
   await dispose()
 
