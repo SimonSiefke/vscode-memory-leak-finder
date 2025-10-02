@@ -3,6 +3,7 @@ import { MessagePort } from 'node:worker_threads'
 import * as Disposables from '../Disposables/Disposables.ts'
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import { PortStream } from '../PortStream/PortStream.ts'
+import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
 
 export const launch = async (
   headlessMode: boolean,
@@ -13,7 +14,6 @@ export const launch = async (
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
-  port: MessagePort,
 ): Promise<any> => {
   const { child } = await LaunchIde.launchIde({
     headlessMode,
@@ -26,5 +26,10 @@ export const launch = async (
     inspectExtensions,
     inspectPtyHost,
   })
-  await pipeline(child.stderr, new PortStream(port))
+  const { port1, port2 } = new MessageChannel()
+  const rpc = await NodeWorkerRpcParent.create({
+    path: getOriginalNameWorkerPath(),
+    commandMap: {},
+  })
+  await pipeline(child.stderr, new PortStream(port1))
 }
