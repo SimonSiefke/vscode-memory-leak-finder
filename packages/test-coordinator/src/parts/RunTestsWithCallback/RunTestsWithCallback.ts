@@ -246,7 +246,7 @@ export const runTestsWithCallback = async ({
               resultPath = join(MemoryLeakResultsPath.memoryLeakResultsPath, measure, fileName)
             }
 
-            const result = await MemoryLeakFinder.compare(currentMemoryRpc, connectionId, context, resultPath)
+            const result = await MemoryLeakFinder.compare(memoryRpc, connectionId, context, resultPath)
             if (result.isLeak) {
               isLeak = true
               leaking++
