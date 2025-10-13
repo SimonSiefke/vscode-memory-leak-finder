@@ -1,9 +1,10 @@
 import { createServer } from 'http'
 import { URL } from 'url'
 
+const DEFAULT_PORT = 3000
+
 export const create = ({ VError }) => {
   let mockServer: any = null
-  const DEFAULT_PORT = 3000
 
   return {
     async start({ port = DEFAULT_PORT, path = '/mcp' } = {}) {
@@ -13,54 +14,56 @@ export const create = ({ VError }) => {
         }
 
         const serverUrl = `http://localhost:${port}`
-        
+
         mockServer = createServer((req, res) => {
           const parsedUrl = new URL(req.url || '', serverUrl)
-          
+
           // Handle MCP protocol endpoints
           if (parsedUrl.pathname === path) {
-            res.writeHead(200, { 
+            res.writeHead(200, {
               'Content-Type': 'application/json',
               'Access-Control-Allow-Origin': '*',
               'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-              'Access-Control-Allow-Headers': 'Content-Type'
+              'Access-Control-Allow-Headers': 'Content-Type',
             })
-            
+
             // Handle preflight requests
             if (req.method === 'OPTIONS') {
               res.end()
               return
             }
-            
-            res.end(JSON.stringify({
-              jsonrpc: '2.0',
-              id: 1,
-              result: {
-                protocolVersion: '2024-11-05',
-                capabilities: {
-                  tools: {
-                    listChanged: true
+
+            res.end(
+              JSON.stringify({
+                jsonrpc: '2.0',
+                id: 1,
+                result: {
+                  protocolVersion: '2024-11-05',
+                  capabilities: {
+                    tools: {
+                      listChanged: true,
+                    },
+                    resources: {
+                      subscribe: true,
+                      listChanged: true,
+                    },
+                    prompts: {
+                      listChanged: true,
+                    },
                   },
-                  resources: {
-                    subscribe: true,
-                    listChanged: true
+                  serverInfo: {
+                    name: 'mock-mcp-server',
+                    version: '1.0.0',
                   },
-                  prompts: {
-                    listChanged: true
-                  }
                 },
-                serverInfo: {
-                  name: 'mock-mcp-server',
-                  version: '1.0.0'
-                }
-              }
-            }))
+              }),
+            )
           } else {
             res.writeHead(404, { 'Content-Type': 'application/json' })
             res.end(JSON.stringify({ error: 'Not found' }))
           }
         })
-        
+
         return new Promise((resolve, reject) => {
           mockServer.listen(port, (error) => {
             if (error) {
@@ -101,6 +104,6 @@ export const create = ({ VError }) => {
         throw new VError(new Error('Server not running'), 'Cannot get URL of stopped server')
       }
       return `http://localhost:${mockServer.address()?.port || DEFAULT_PORT}`
-    }
+    },
   }
 }
