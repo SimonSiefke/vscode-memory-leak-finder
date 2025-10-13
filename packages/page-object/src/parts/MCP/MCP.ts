@@ -4,7 +4,8 @@ import { URL } from 'url'
 
 export const create = ({ expect, page, VError }) => {
   return {
-    createMCPServer({ path = '/mcp' } = {}): Promise<Server.ServerInfo> {
+    createMCPServer(): Promise<Server.ServerInfo> {
+      const path = '/mcp'
       const server = Server.create({ VError })
       const requestHandler = (req, res) => {
         const parsedUrl = new URL(req.url || '', 'http://localhost')
