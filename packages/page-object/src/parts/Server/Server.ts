@@ -2,7 +2,7 @@ import { createServer } from 'http'
 
 const DEFAULT_PORT = 0
 
-interface ServerInfo {
+export interface ServerInfo {
   readonly url: string
   readonly port: number
   readonly dispose: () => Promise<void>
