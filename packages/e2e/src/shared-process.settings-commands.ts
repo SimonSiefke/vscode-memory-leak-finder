@@ -14,13 +14,13 @@ export const run = async ({ QuickPick }: TestContext): Promise<void> => {
   const hasSettingsCommands = settingsCommands.some((cmd) => cmd.toLowerCase().includes('settings'))
 
   if (hasSettingsCommands) {
-    try {
-      await QuickPick.select('Preferences: Open Settings')
-      // Don't try to close quick pick if it's not open
-    } catch (error) {
-      // Settings might not be available, continue
+    // Select the first available settings-related command
+    const settingsCommand = settingsCommands.find((cmd) => cmd.toLowerCase().includes('settings'))
+    if (settingsCommand) {
+      await QuickPick.select(settingsCommand)
     }
+  } else {
+    // Only close if no command was selected
+    await QuickPick.close()
   }
-
-  // Don't try to close quick pick if it's not open
 }

@@ -16,12 +16,10 @@ export const run = async ({ QuickPick }: TestContext): Promise<void> => {
   )
 
   if (hasAiCommands) {
-    try {
-      await QuickPick.select('Chat: New Chat')
-      // Don't try to close quick pick if it's not open
-    } catch (error) {
-      // AI commands might not be available, continue
-    }
+    await QuickPick.select('Chat: New Chat')
+  } else {
+    // Only close if no command was selected
+    await QuickPick.close()
   }
 
   // Don't try to close quick pick if it's not open

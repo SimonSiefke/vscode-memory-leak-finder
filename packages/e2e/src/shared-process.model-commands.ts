@@ -14,12 +14,10 @@ export const run = async ({ QuickPick }: TestContext): Promise<void> => {
   const hasModelCommands = modelCommands.some((cmd) => cmd.toLowerCase().includes('model') || cmd.toLowerCase().includes('llm'))
 
   if (hasModelCommands) {
-    try {
-      await QuickPick.select('Preferences: Open Settings')
-      // Don't try to close quick pick if it's not open
-    } catch (error) {
-      // Model commands might not be available, continue
-    }
+    await QuickPick.select('Preferences: Open Settings')
+  } else {
+    // Only close if no command was selected
+    await QuickPick.close()
   }
 
   // Don't try to close quick pick if it's not open

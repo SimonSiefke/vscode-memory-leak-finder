@@ -14,12 +14,8 @@ export const run = async ({ QuickPick }: TestContext): Promise<void> => {
   const hasAboutCommands = aboutCommands.some((cmd) => cmd.toLowerCase().includes('about'))
 
   if (hasAboutCommands) {
-    try {
-      await QuickPick.select('Help: About')
-      // Don't try to close quick pick if it's not open
-    } catch (error) {
-      // About commands might not be available, continue
-    }
+    await QuickPick.select('Help: About')
+    await QuickPick.close()
   }
 
   // Don't try to close quick pick if it's not open

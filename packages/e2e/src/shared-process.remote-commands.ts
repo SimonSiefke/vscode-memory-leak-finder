@@ -14,12 +14,8 @@ export const run = async ({ QuickPick }: TestContext): Promise<void> => {
   const hasRemoteCommands = remoteCommands.some((cmd) => cmd.toLowerCase().includes('remote') || cmd.toLowerCase().includes('ssh'))
 
   if (hasRemoteCommands) {
-    try {
-      await QuickPick.select('Remote-SSH: Connect to Host...')
-      // Don't try to close quick pick if it's not open
-    } catch (error) {
-      // Remote commands might not be available, continue
-    }
+    await QuickPick.select('Remote-SSH: Connect to Host...')
+    await QuickPick.close()
   }
 
   // Don't try to close quick pick if it's not open

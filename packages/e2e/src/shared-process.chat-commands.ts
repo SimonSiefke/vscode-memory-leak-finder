@@ -14,12 +14,10 @@ export const run = async ({ QuickPick }: TestContext): Promise<void> => {
   const hasChatCommands = chatCommands.some((cmd) => cmd.toLowerCase().includes('chat') || cmd.toLowerCase().includes('conversation'))
 
   if (hasChatCommands) {
-    try {
-      await QuickPick.select('Chat: New Chat')
-      // Don't try to close quick pick if it's not open
-    } catch (error) {
-      // Chat commands might not be available, continue
-    }
+    await QuickPick.select('Chat: New Chat')
+  } else {
+    // Only close if no command was selected
+    await QuickPick.close()
   }
 
   // Don't try to close quick pick if it's not open

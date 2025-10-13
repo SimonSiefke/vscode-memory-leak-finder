@@ -2,7 +2,6 @@ import type { TestContext } from '../types.ts'
 
 export const setup = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.closeAll()
-  // Don't try to close quick pick if it's not open
 }
 
 export const run = async ({ QuickPick }: TestContext): Promise<void> => {
@@ -16,13 +15,15 @@ export const run = async ({ QuickPick }: TestContext): Promise<void> => {
   )
 
   if (hasMcpCommands) {
-    try {
-      await QuickPick.select('MCP: Manage Servers')
-      // Don't try to close quick pick if it's not open
-    } catch (error) {
-      // MCP commands might not be available, continue
+    // Select the first available MCP-related command
+    const mcpCommand = mcpCommands.find(
+      (cmd) => cmd.toLowerCase().includes('mcp') || cmd.toLowerCase().includes('model') || cmd.toLowerCase().includes('context'),
+    )
+    if (mcpCommand) {
+      await QuickPick.select(mcpCommand)
     }
+  } else {
+    // Only close if no command was selected
+    await QuickPick.close()
   }
-
-  // Don't try to close quick pick if it's not open
 }

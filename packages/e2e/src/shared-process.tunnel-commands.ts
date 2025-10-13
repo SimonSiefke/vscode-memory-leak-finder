@@ -14,12 +14,8 @@ export const run = async ({ QuickPick }: TestContext): Promise<void> => {
   const hasTunnelCommands = tunnelCommands.some((cmd) => cmd.toLowerCase().includes('tunnel') || cmd.toLowerCase().includes('remote'))
 
   if (hasTunnelCommands) {
-    try {
-      await QuickPick.select('Remote-Tunnels: Manage Tunnels')
-      // Don't try to close quick pick if it's not open
-    } catch (error) {
-      // Tunnel commands might not be available, continue
-    }
+    await QuickPick.select('Remote-Tunnels: Manage Tunnels')
+    await QuickPick.close()
   }
 
   // Don't try to close quick pick if it's not open

@@ -4,7 +4,6 @@ export const setup = async ({ Editor, Terminal, Panel }: TestContext): Promise<v
   await Editor.closeAll()
   await Panel.hide()
   await Terminal.killAll()
-  await Terminal.show()
 }
 
 export const run = async ({ Terminal, Editor }: TestContext): Promise<void> => {
@@ -16,14 +15,10 @@ export const run = async ({ Terminal, Editor }: TestContext): Promise<void> => {
   await Terminal.split()
   await Terminal.execute('echo "terminal 2 - shared process test"')
 
-  // Create a third terminal if possible
-  try {
-    await Terminal.split()
-    await Terminal.execute('echo "terminal 3 - shared process test"')
-    await Terminal.killThird()
-  } catch (error) {
-    // Third terminal might not be supported, continue
-  }
+  // Create a third terminal
+  await Terminal.split()
+  await Terminal.execute('echo "terminal 3 - shared process test"')
+  await Terminal.killThird()
 
   // Kill all terminals to clean up
   await Terminal.killAll()

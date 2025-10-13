@@ -16,12 +16,8 @@ export const run = async ({ QuickPick }: TestContext): Promise<void> => {
   )
 
   if (hasTelemetryCommands) {
-    try {
-      await QuickPick.select('Preferences: Open Settings')
-      // Don't try to close quick pick if it's not open
-    } catch (error) {
-      // Telemetry commands might not be available, continue
-    }
+    await QuickPick.select('Preferences: Open Settings')
+    await QuickPick.close()
   }
 
   // Don't try to close quick pick if it's not open

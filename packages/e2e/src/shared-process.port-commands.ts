@@ -14,12 +14,8 @@ export const run = async ({ QuickPick }: TestContext): Promise<void> => {
   const hasPortCommands = portCommands.some((cmd) => cmd.toLowerCase().includes('port') || cmd.toLowerCase().includes('forward'))
 
   if (hasPortCommands) {
-    try {
-      await QuickPick.select('Ports: Focus on Ports View')
-      // Don't try to close quick pick if it's not open
-    } catch (error) {
-      // Port commands might not be available, continue
-    }
+    await QuickPick.select('Ports: Focus on Ports View')
+    await QuickPick.close()
   }
 
   // Don't try to close quick pick if it's not open

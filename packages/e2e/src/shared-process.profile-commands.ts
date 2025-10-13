@@ -14,12 +14,8 @@ export const run = async ({ QuickPick }: TestContext): Promise<void> => {
   const hasProfileCommands = profileCommands.some((cmd) => cmd.toLowerCase().includes('profile'))
 
   if (hasProfileCommands) {
-    try {
-      await QuickPick.select('Profiles: Show All Profiles')
-      // Don't try to close quick pick if it's not open
-    } catch (error) {
-      // Profile commands might not be available, continue
-    }
+    await QuickPick.select('Profiles: Show All Profiles')
+    await QuickPick.close()
   }
 
   // Don't try to close quick pick if it's not open

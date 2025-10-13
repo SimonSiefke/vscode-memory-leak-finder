@@ -14,12 +14,8 @@ export const run = async ({ QuickPick }: TestContext): Promise<void> => {
   const hasWorkspaceCommands = workspaceCommands.some((cmd) => cmd.toLowerCase().includes('workspace'))
 
   if (hasWorkspaceCommands) {
-    try {
-      await QuickPick.select('File: Open Workspace')
-      // Don't try to close quick pick if it's not open
-    } catch (error) {
-      // Workspace commands might not be available, continue
-    }
+    await QuickPick.select('File: Open Workspace')
+    await QuickPick.close()
   }
 
   // Don't try to close quick pick if it's not open
