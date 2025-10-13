@@ -18,7 +18,9 @@ export const getHandleTestPassedMessage = (
   const messageFileName: string = chalk.bold(fileName)
   const messageDuration: string = formatDuration(duration)
   let prefix: string
-  if (isLeak) {
+  if (isLeak && wasOriginallySkipped) {
+    prefix = TestPrefix.SkipLeak
+  } else if (isLeak) {
     prefix = TestPrefix.Leak
   } else if (wasOriginallySkipped) {
     prefix = TestPrefix.SkipPass

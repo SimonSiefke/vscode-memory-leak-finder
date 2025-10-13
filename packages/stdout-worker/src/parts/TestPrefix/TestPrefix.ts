@@ -5,6 +5,8 @@ export const Pass: string = chalk.reset.inverse.bold.green(TestPrefixText.Pass)
 
 export const SkipPass: string = chalk.reset.inverse.bold.magenta(TestPrefixText.SkipPass)
 
+export const SkipLeak: string = chalk.reset.inverse.bold.magenta(TestPrefixText.SkipLeak)
+
 export const Initialized: string = chalk.reset.inverse.bold.green(TestPrefixText.Initialized)
 
 export const Leak: string = chalk.reset.inverse.blue(TestPrefixText.Leak)
