@@ -84,7 +84,8 @@ export const run = async ({ QuickPick, Server }: TestContext): Promise<void> => 
 
         // Step 16: Continue accepting until the process is complete
         let stepCount = 0
-        while (stepCount < 5) { // Safety limit to prevent infinite loop
+        while (stepCount < 5) {
+          // Safety limit to prevent infinite loop
           try {
             const currentStepCommands = await QuickPick.getVisibleCommands()
             if (currentStepCommands.length === 0) {
