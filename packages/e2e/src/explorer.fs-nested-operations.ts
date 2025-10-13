@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ Workspace, Explorer, Terminal }: TestContext): Promise<void> => {
+export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'level1/level2/level3/deep-file.txt',
@@ -22,13 +22,14 @@ export const setup = async ({ Workspace, Explorer, Terminal }: TestContext): Pro
   await Explorer.focus()
   await Explorer.shouldHaveItem('level1')
   await Explorer.shouldHaveItem('another-branch')
-  await Terminal.killAll()
 }
 
-export const run = async ({ Terminal, Explorer }: TestContext): Promise<void> => {
-  // Create complex nested structure via terminal
-  await Terminal.execute('mkdir -p complex/nested/structure/with/many/levels')
-  await Terminal.execute('echo "very deep content" > complex/nested/structure/with/many/levels/very-deep-file.txt')
+export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
+  // Create complex nested structure via file system operation
+  await Workspace.add({
+    name: 'complex/nested/structure/with/many/levels/very-deep-file.txt',
+    content: 'very deep content',
+  })
   
   // Verify the complex structure appears in explorer
   await Explorer.shouldHaveItem('complex')
@@ -51,7 +52,11 @@ export const run = async ({ Terminal, Explorer }: TestContext): Promise<void> =>
   await Explorer.shouldHaveItem('very-deep-file.txt')
   
   // Rename deeply nested folder
-  await Terminal.execute('mv complex/nested/structure/with/many/levels complex/nested/structure/with/many/renamed-levels')
+  await Workspace.remove('complex/nested/structure/with/many/levels/very-deep-file.txt')
+  await Workspace.add({
+    name: 'complex/nested/structure/with/many/renamed-levels/very-deep-file.txt',
+    content: 'very deep content',
+  })
   
   // Verify the rename is reflected in explorer
   await Explorer.collapse('levels')
@@ -59,7 +64,11 @@ export const run = async ({ Terminal, Explorer }: TestContext): Promise<void> =>
   await Explorer.shouldHaveItem('renamed-levels')
   
   // Move entire nested branch to different location
-  await Terminal.execute('mv complex/nested/structure another-branch/moved-structure')
+  await Workspace.remove('complex/nested/structure/with/many/renamed-levels/very-deep-file.txt')
+  await Workspace.add({
+    name: 'another-branch/moved-structure/with/many/renamed-levels/very-deep-file.txt',
+    content: 'very deep content',
+  })
   
   // Verify the move operation
   await Explorer.collapse('renamed-levels')
@@ -74,8 +83,10 @@ export const run = async ({ Terminal, Explorer }: TestContext): Promise<void> =>
   await Explorer.shouldHaveItem('moved-structure')
   
   // Create and delete nested folders in sequence
-  await Terminal.execute('mkdir -p temp/nested/folders')
-  await Terminal.execute('echo "temp content" > temp/nested/folders/temp-file.txt')
+  await Workspace.add({
+    name: 'temp/nested/folders/temp-file.txt',
+    content: 'temp content',
+  })
   
   // Verify creation
   await Explorer.shouldHaveItem('temp')
@@ -87,7 +98,10 @@ export const run = async ({ Terminal, Explorer }: TestContext): Promise<void> =>
   await Explorer.shouldHaveItem('temp-file.txt')
   
   // Delete the entire nested structure
-  await Terminal.execute('rm -rf temp')
+  await Workspace.remove('temp/nested/folders/temp-file.txt')
+  await Workspace.remove('temp/nested/folders/')
+  await Workspace.remove('temp/nested/')
+  await Workspace.remove('temp/')
   
   // Verify deletion
   await Explorer.collapse('folders')
@@ -96,7 +110,16 @@ export const run = async ({ Terminal, Explorer }: TestContext): Promise<void> =>
   await Explorer.not.toHaveItem('temp')
   
   // Test renaming intermediate level folder
-  await Terminal.execute('mv level1/level2 level1/renamed-level2')
+  await Workspace.remove('level1/level2/level3/deep-file.txt')
+  await Workspace.remove('level1/level2/mid-file.txt')
+  await Workspace.add({
+    name: 'level1/renamed-level2/level3/deep-file.txt',
+    content: 'deeply nested content',
+  })
+  await Workspace.add({
+    name: 'level1/renamed-level2/mid-file.txt',
+    content: 'mid level content',
+  })
   
   // Verify the rename affects the entire subtree
   await Explorer.expand('level1')
@@ -109,4 +132,37 @@ export const run = async ({ Terminal, Explorer }: TestContext): Promise<void> =>
   
   await Explorer.expand('level3')
   await Explorer.shouldHaveItem('deep-file.txt')
+  
+  // Clean up: Restore original state to make test idempotent
+  await Workspace.remove('complex/nested/structure/with/many/renamed-levels/very-deep-file.txt')
+  await Workspace.remove('complex/nested/structure/with/many/renamed-levels/')
+  await Workspace.remove('complex/nested/structure/with/many/')
+  await Workspace.remove('complex/nested/structure/with/')
+  await Workspace.remove('complex/nested/structure/')
+  await Workspace.remove('complex/nested/')
+  await Workspace.remove('complex/')
+  
+  await Workspace.remove('another-branch/moved-structure/with/many/renamed-levels/very-deep-file.txt')
+  await Workspace.remove('another-branch/moved-structure/with/many/renamed-levels/')
+  await Workspace.remove('another-branch/moved-structure/with/many/')
+  await Workspace.remove('another-branch/moved-structure/with/')
+  await Workspace.remove('another-branch/moved-structure/')
+  
+  await Workspace.remove('level1/renamed-level2/level3/deep-file.txt')
+  await Workspace.remove('level1/renamed-level2/mid-file.txt')
+  await Workspace.add({
+    name: 'level1/level2/level3/deep-file.txt',
+    content: 'deeply nested content',
+  })
+  await Workspace.add({
+    name: 'level1/level2/mid-file.txt',
+    content: 'mid level content',
+  })
+  
+  // Verify original state is restored
+  await Explorer.collapse('level3')
+  await Explorer.collapse('renamed-level2')
+  await Explorer.collapse('level1')
+  await Explorer.shouldHaveItem('level1')
+  await Explorer.shouldHaveItem('another-branch')
 }
