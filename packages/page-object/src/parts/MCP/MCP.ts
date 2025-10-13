@@ -244,6 +244,81 @@ export const create = ({ expect, page, VError }) => {
       } catch (error) {
         throw new VError(error, `Failed to open MCP configuration`)
       }
+    },
+
+    async removeServer(serverName: string) {
+      try {
+        // Open QuickPick and search for MCP list commands
+        await page.waitForIdle()
+        const quickPick = page.locator('.quick-input-widget')
+        await page.pressKeyExponential({
+          key: KeyBindings.OpenQuickPickCommands,
+          waitFor: quickPick,
+        })
+        await expect(quickPick).toBeVisible({ timeout: 10_000 })
+
+        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
+        await expect(quickPickInput).toBeVisible()
+        await expect(quickPickInput).toBeFocused()
+
+        // Type "mcp" to find MCP commands
+        await quickPickInput.type('mcp')
+
+        // Look for "MCP: List Servers" command
+        const mcpCommands = await this.getVisibleCommands()
+        const listServersCommand = mcpCommands.find((cmd: string) =>
+          cmd.toLowerCase().includes('list servers') ||
+          cmd.toLowerCase().includes('mcp: list')
+        )
+
+        if (!listServersCommand) {
+          throw new VError(new Error('MCP: List Servers command not found'), 'MCP List Servers command not available')
+        }
+
+        // Select the command to open server list
+        await this.selectCommand(listServersCommand, true)
+        console.log('Successfully opened MCP server list')
+
+        // Wait for server list to load
+        await new Promise((resolve) => setTimeout(resolve, 2000))
+
+        // Look for the specific server to remove
+        const serverCommands = await this.getVisibleCommands()
+        const serverToRemove = serverCommands.find((cmd: string) =>
+          cmd.toLowerCase().includes(serverName.toLowerCase())
+        )
+
+        if (serverToRemove) {
+          // Right-click or use context menu to remove the server
+          const serverElement = quickPick.locator('.monaco-list-row .label-name', {
+            hasExactText: serverToRemove,
+          })
+          await serverElement.click({ button: 'right' })
+
+          // Wait for context menu and look for remove/delete option
+          await new Promise((resolve) => setTimeout(resolve, 1000))
+
+          // Look for remove/delete commands in context menu
+          const contextCommands = await this.getVisibleCommands()
+          const removeCommand = contextCommands.find((cmd: string) =>
+            cmd.toLowerCase().includes('remove') ||
+            cmd.toLowerCase().includes('delete') ||
+            cmd.toLowerCase().includes('uninstall')
+          )
+
+          if (removeCommand) {
+            await this.selectCommand(removeCommand)
+            console.log(`Successfully removed MCP server: ${serverName}`)
+          } else {
+            console.log(`Could not find remove option for server: ${serverName}`)
+          }
+        } else {
+          console.log(`Server "${serverName}" not found in the list`)
+        }
+
+      } catch (error) {
+        throw new VError(error, `Failed to remove MCP server "${serverName}"`)
+      }
     }
   }
 }

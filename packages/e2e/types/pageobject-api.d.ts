@@ -199,6 +199,7 @@ export interface KeyBindingsEditor {
 }
 export interface MCP {
   addServer(options: { serverUrl: string; serverName?: string }): Promise<void>
+  removeServer(serverName: string): Promise<void>
   getVisibleCommands(): Promise<string[]>
   selectCommand(text: string, stayVisible?: boolean): Promise<void>
   getInputValue(): Promise<string>
