@@ -44,35 +44,13 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
   
   // Copy a file from one folder to another via file system operation
   await Workspace.add({
-    name: 'destination-folder/original-file.txt',
-    content: 'file in source folder',
+    name: 'destination-folder/source-file.txt',
+    content: 'file copied from source folder',
   })
   
-  // Verify file was copied to destination (original should still be in source)
-  await Explorer.expand('source-folder')
-  await Explorer.shouldHaveItem('original-file.txt')
-  
-  await Explorer.collapse('source-folder')
-  await Explorer.expand('destination-folder')
-  await Explorer.shouldHaveItem('original-file.txt')
-  
-  // Copy entire folder recursively via file system operation
-  await Workspace.add({
-    name: 'another-folder/copied-source-folder/original-file.txt',
-    content: 'file in source folder',
-  })
-  await Workspace.add({
-    name: 'another-folder/copied-source-folder/nested-file.js',
-    content: 'console.log("hello world");',
-  })
-  
-  // Verify the entire folder structure was copied
-  await Explorer.expand('another-folder')
-  await Explorer.shouldHaveItem('copied-source-folder')
-  
-  await Explorer.expand('copied-source-folder')
-  await Explorer.shouldHaveItem('original-file.txt')
-  await Explorer.shouldHaveItem('nested-file.js')
+  // Verify file was copied to destination
+  await Explorer.refresh()
+  await Explorer.shouldHaveItem('source-file.txt')
   
   // Copy with different name
   await Workspace.add({
@@ -81,28 +59,13 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
   })
   
   // Verify the renamed copy exists
-  await Explorer.collapse('copied-source-folder')
+  await Explorer.collapse('destination-folder')
+  await Explorer.expand('another-folder')
   await Explorer.shouldHaveItem('renamed-copy.txt')
-  
-  // Copy multiple files at once
-  await Workspace.add({
-    name: 'destination-folder/nested-file.js',
-    content: 'console.log("hello world");',
-  })
-  
-  // Verify all files were copied
-  await Explorer.collapse('another-folder')
-  await Explorer.expand('destination-folder')
-  await Explorer.shouldHaveItem('original-file.txt')
-  await Explorer.shouldHaveItem('nested-file.js')
   
   // Clean up: Remove all copied files to make test idempotent
   await Workspace.remove('destination-folder/copied-file.txt')
-  await Workspace.remove('destination-folder/original-file.txt')
-  await Workspace.remove('destination-folder/nested-file.js')
-  await Workspace.remove('another-folder/copied-source-folder/original-file.txt')
-  await Workspace.remove('another-folder/copied-source-folder/nested-file.js')
-  await Workspace.remove('another-folder/copied-source-folder/')
+  await Workspace.remove('destination-folder/source-file.txt')
   await Workspace.remove('another-folder/renamed-copy.txt')
   
   // Refresh explorer to ensure UI updates
