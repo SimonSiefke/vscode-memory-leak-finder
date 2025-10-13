@@ -201,6 +201,7 @@ export interface MCP {
   createMCPServer(options?: { path?: string }): (req: any, res: any) => void
   addServer(options: { serverUrl: string; serverName?: string }): Promise<void>
   removeServer(serverName: string): Promise<void>
+  removeAllServers(): Promise<void>
   getVisibleCommands(): Promise<string[]>
   selectCommand(text: string, stayVisible?: boolean): Promise<void>
   getInputValue(): Promise<string>

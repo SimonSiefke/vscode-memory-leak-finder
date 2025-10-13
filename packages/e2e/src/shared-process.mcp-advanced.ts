@@ -11,7 +11,7 @@ export const run = async ({ MCP }: TestContext): Promise<void> => {
     serverName: 'my-advanced-mcp-server',
   })
 
-  await MCP.removeServer(serverName)
+  await MCP.removeAllServers()
 
   await server.dispose()
 }
