@@ -1,23 +1,20 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ Editor, CommandPalette }: TestContext): Promise<void> => {
+export const setup = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.closeAll()
-  await CommandPalette.close()
 }
 
-export const run = async ({ CommandPalette, Editor }: TestContext): Promise<void> => {
+export const run = async ({ Editor }: TestContext): Promise<void> => {
   // Open command palette and search for telemetry-related commands
   await CommandPalette.open()
   await CommandPalette.type('telemetry')
-  
+
   // Look for telemetry commands (these affect shared-process)
   const telemetryCommands = await CommandPalette.getVisibleCommands()
-  const hasTelemetryCommands = telemetryCommands.some(cmd => 
-    cmd.toLowerCase().includes('telemetry') || 
-    cmd.toLowerCase().includes('privacy') ||
-    cmd.toLowerCase().includes('usage')
+  const hasTelemetryCommands = telemetryCommands.some(
+    (cmd) => cmd.toLowerCase().includes('telemetry') || cmd.toLowerCase().includes('privacy') || cmd.toLowerCase().includes('usage'),
   )
-  
+
   if (hasTelemetryCommands) {
     try {
       await CommandPalette.select('Preferences: Open Settings')
@@ -26,15 +23,12 @@ export const run = async ({ CommandPalette, Editor }: TestContext): Promise<void
       // Telemetry commands might not be available, continue
     }
   }
-  
+
   // Search for privacy settings
   await CommandPalette.type('privacy')
   const privacyCommands = await CommandPalette.getVisibleCommands()
-  const hasPrivacyCommands = privacyCommands.some(cmd => 
-    cmd.toLowerCase().includes('privacy') || 
-    cmd.toLowerCase().includes('data')
-  )
-  
+  const hasPrivacyCommands = privacyCommands.some((cmd) => cmd.toLowerCase().includes('privacy') || cmd.toLowerCase().includes('data'))
+
   if (hasPrivacyCommands) {
     try {
       await CommandPalette.select('Preferences: Open Settings')
@@ -43,15 +37,12 @@ export const run = async ({ CommandPalette, Editor }: TestContext): Promise<void
       // Privacy commands might not be available, continue
     }
   }
-  
+
   // Search for usage data commands
   await CommandPalette.type('usage')
   const usageCommands = await CommandPalette.getVisibleCommands()
-  const hasUsageCommands = usageCommands.some(cmd => 
-    cmd.toLowerCase().includes('usage') || 
-    cmd.toLowerCase().includes('analytics')
-  )
-  
+  const hasUsageCommands = usageCommands.some((cmd) => cmd.toLowerCase().includes('usage') || cmd.toLowerCase().includes('analytics'))
+
   if (hasUsageCommands) {
     try {
       await CommandPalette.select('Preferences: Open Settings')
@@ -60,14 +51,12 @@ export const run = async ({ CommandPalette, Editor }: TestContext): Promise<void
       // Usage commands might not be available, continue
     }
   }
-  
+
   // Perform actions that generate telemetry data
   await CommandPalette.type('help')
   const helpCommands = await CommandPalette.getVisibleCommands()
-  const hasHelpCommands = helpCommands.some(cmd => 
-    cmd.toLowerCase().includes('help')
-  )
-  
+  const hasHelpCommands = helpCommands.some((cmd) => cmd.toLowerCase().includes('help'))
+
   if (hasHelpCommands) {
     try {
       await CommandPalette.select('Help: Show All Commands')
@@ -76,14 +65,12 @@ export const run = async ({ CommandPalette, Editor }: TestContext): Promise<void
       // Help commands might not be available, continue
     }
   }
-  
+
   // Search for about commands (these often trigger telemetry)
   await CommandPalette.type('about')
   const aboutCommands = await CommandPalette.getVisibleCommands()
-  const hasAboutCommands = aboutCommands.some(cmd => 
-    cmd.toLowerCase().includes('about')
-  )
-  
+  const hasAboutCommands = aboutCommands.some((cmd) => cmd.toLowerCase().includes('about'))
+
   if (hasAboutCommands) {
     try {
       await CommandPalette.select('Help: About')
@@ -92,10 +79,10 @@ export const run = async ({ CommandPalette, Editor }: TestContext): Promise<void
       // About commands might not be available, continue
     }
   }
-  
+
   // Close command palette
   await CommandPalette.close()
-  
+
   // Reopen command palette to verify state
   await CommandPalette.open()
   await CommandPalette.type('help')
