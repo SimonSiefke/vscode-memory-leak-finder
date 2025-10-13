@@ -1,9 +1,12 @@
+import { join } from 'path'
 import * as KeyBindings from '../KeyBindings/KeyBindings.ts'
 import * as Server from '../Server/Server.ts'
 import { URL } from 'url'
+import { root } from '../Root/Root.ts'
+import { rm } from 'fs/promises'
 
 export const create = ({ expect, page, VError }) => {
-  const servers = Object.create(null)
+  const servers: Record<number, Server.ServerInfo> = Object.create(null)
   return {
     createMCPServer(): Promise<Server.ServerInfo> {
       const path = '/mcp'
@@ -63,6 +66,8 @@ export const create = ({ expect, page, VError }) => {
     async addServer({ serverName }: { serverName: string }) {
       try {
         const server = await this.createMCPServer()
+        const id = Math.random()
+        servers[id] = server
         const serverUrl = server.url
         // Step 1: Open QuickPick and search for MCP commands
         await page.waitForIdle()
@@ -303,73 +308,13 @@ export const create = ({ expect, page, VError }) => {
 
     async removeAllServers() {
       try {
-        // TODO remove the mcp.json file from storage
-
-        // Open QuickPick and search for MCP list commands
-        await page.waitForIdle()
-        const quickPick = page.locator('.quick-input-widget')
-        await page.pressKeyExponential({
-          key: KeyBindings.OpenQuickPickCommands,
-          waitFor: quickPick,
-        })
-        await expect(quickPick).toBeVisible({ timeout: 10_000 })
-
-        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
-        await expect(quickPickInput).toBeVisible()
-        await expect(quickPickInput).toBeFocused()
-
-        // Type "mcp" to find MCP commands
-        await quickPickInput.type('mcp')
-
-        // Look for "MCP: List Servers" command
-        const mcpCommands = await this.getVisibleCommands()
-        const listServersCommand = mcpCommands.find(
-          (cmd: string) => cmd.toLowerCase().includes('list servers') || cmd.toLowerCase().includes('mcp: list'),
-        )
-
-        if (!listServersCommand) {
-          throw new VError(new Error('MCP: List Servers command not found'), 'MCP List Servers command not available')
+        for (const [key, value] of Object.entries(servers)) {
+          await value.dispose()
+          delete servers[key]
         }
-
-        await this.selectCommand(listServersCommand, true)
-
-        await new Promise((resolve) => setTimeout(resolve, 2000))
-
-        // Get all visible server commands and remove them one by one
-        let serverCommands = await this.getVisibleCommands()
-
-        while (serverCommands.length > 0) {
-          // Find the first server command (skip any non-server items)
-          const serverToRemove = serverCommands.find(
-            (cmd: string) =>
-              !cmd.toLowerCase().includes('list servers') && !cmd.toLowerCase().includes('mcp: list') && cmd.trim().length > 0,
-          )
-
-          if (!serverToRemove) {
-            break
-          }
-
-          const serverElement = quickPick.locator('.monaco-list-row .label-name', {
-            hasExactText: serverToRemove,
-          })
-          await serverElement.click({ button: 'right' })
-
-          await new Promise((resolve) => setTimeout(resolve, 1000))
-
-          const contextCommands = await this.getVisibleCommands()
-          const removeCommand = contextCommands.find(
-            (cmd: string) =>
-              cmd.toLowerCase().includes('remove') || cmd.toLowerCase().includes('delete') || cmd.toLowerCase().includes('uninstall'),
-          )
-
-          if (removeCommand) {
-            await this.selectCommand(removeCommand)
-            await new Promise((resolve) => setTimeout(resolve, 2000))
-          }
-
-          // Refresh the list of server commands
-          serverCommands = await this.getVisibleCommands()
-        }
+        const storagePath = join(root, '.vscode-user-data-dir', 'User')
+        const mcpPath = join(storagePath, 'mcp.json')
+        await rm(mcpPath, { recursive: true, force: true })
       } catch (error) {
         throw new VError(error, `Failed to remove all MCP servers`)
       }
