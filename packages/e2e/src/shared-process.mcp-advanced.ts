@@ -73,9 +73,8 @@ export const run = async ({ QuickPick, Server }: TestContext): Promise<void> => 
   // Step 12: Check if the server was added successfully
   // We could look for success messages or check the MCP server list
   console.log('MCP server configuration completed')
-
-  // Step 13: Close any remaining dialogs
-  await QuickPick.close()
+  
+  // Note: QuickPick should close automatically after pressing Enter
 }
 
 // Cleanup function to stop the mock server
