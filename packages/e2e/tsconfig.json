@@ -19,7 +19,8 @@
     "noUnusedLocals": true,
     "composite": true,
     "esModuleInterop": true,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "noUnusedParameters": true
   },
   "include": ["src", "test", "types.d.ts"]
 }

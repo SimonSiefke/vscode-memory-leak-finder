@@ -13,7 +13,7 @@ export const setup = async ({ ActivityBar, Workspace, Explorer }: TestContext): 
   await ActivityBar.showSearch()
 }
 
-export const run = async ({ ActivityBar, SideBar, Explorer }: TestContext): Promise<void> => {
+export const run = async ({ SideBar }: TestContext): Promise<void> => {
   await SideBar.hide()
   await SideBar.show()
 }

@@ -43,6 +43,27 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to type ${value}`)
       }
     },
+    async pressEnter() {
+      try {
+        const quickPick = page.locator('.quick-input-widget')
+        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
+        await expect(quickPickInput).toBeVisible()
+        await expect(quickPickInput).toBeFocused({ timeout: 3000 })
+        await quickPickInput.press('Enter')
+      } catch (error) {
+        throw new VError(error, `Failed to press Enter`)
+      }
+    },
+    async getInputValue() {
+      try {
+        const quickPick = page.locator('.quick-input-widget')
+        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
+        await expect(quickPickInput).toBeVisible()
+        return (await quickPickInput.getAttribute('value')) || ''
+      } catch (error) {
+        throw new VError(error, `Failed to get input value`)
+      }
+    },
     async select(text, stayVisible = false) {
       try {
         const quickPick = page.locator('.quick-input-widget')
@@ -128,6 +149,32 @@ export const create = ({ expect, page, VError }) => {
         })()
       } catch (error) {
         throw new VError(error, `Failed to hide quick pick`)
+      }
+    },
+    async close() {
+      try {
+        await this.hide()
+      } catch (error) {
+        throw new VError(error, `Failed to close quick pick`)
+      }
+    },
+    async getVisibleCommands() {
+      try {
+        const quickPick = page.locator('.quick-input-widget')
+        await expect(quickPick).toBeVisible()
+        const commandElements = quickPick.locator('.monaco-list-row .label-name')
+        const count = await commandElements.count()
+        const commands = []
+        for (let i = 0; i < count; i++) {
+          const text = await commandElements.nth(i).textContent()
+          if (text) {
+            // @ts-ignore
+            commands.push(text)
+          }
+        }
+        return commands
+      } catch (error) {
+        throw new VError(error, `Failed to get visible commands`)
       }
     },
   }

@@ -7,7 +7,7 @@ export const setup = async ({ Editor, ChatEditor }: TestContext): Promise<void> 
   await ChatEditor.open()
 }
 
-export const run = async ({ ChatEditor, Editor }: TestContext): Promise<void> => {
+export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   // TODO send message and clear it
   await ChatEditor.sendMessage('test')
 }

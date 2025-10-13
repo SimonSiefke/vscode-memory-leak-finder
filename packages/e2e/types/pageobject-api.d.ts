@@ -241,13 +241,17 @@ export interface QuickPick {
   show(options?: any): Promise<void>
   showCommands(): Promise<void>
   type(value: any): Promise<void>
-  select(options: any): Promise<void>
+  pressEnter(): Promise<void>
+  getInputValue(): Promise<string>
+  select(text: string, stayVisible?: boolean): Promise<void>
   executeCommand(options: any): Promise<void>
   openFile(fileName: any): Promise<void>
   showColorTheme(): Promise<void>
   focusNext(): Promise<void>
   focusPrevious(): Promise<void>
   hide(): Promise<void>
+  close(): Promise<void>
+  getVisibleCommands(): Promise<string[]>
 }
 export interface References {
   shouldBeVisible(): Promise<void>
@@ -364,6 +368,10 @@ export interface Terminal {
   killFirst(): Promise<void>
   execute(command: any): Promise<void>
   clear(): Promise<void>
+  focusFirst(): Promise<void>
+  focusSecond(): Promise<void>
+  killThird(): Promise<void>
+  shouldNotHaveActiveTerminals(): Promise<void>
 }
 export interface TitleBar {
   showMenu(text: any): Promise<void>
@@ -402,6 +410,17 @@ export interface Workspace {
   remove(file: any): Promise<void>
   getWorkspaceFilePath(name: string): Promise<any>
 }
+export interface ServerInfo {
+  readonly url: string
+  readonly port: number
+}
+
+export interface Server {
+  start(options?: { port?: number; path?: string }): Promise<ServerInfo>
+  stop(): Promise<void>
+  isRunning(): Promise<boolean>
+  getUrl(): string
+}
 
 export interface PageObjectApi {
   readonly ActivityBar: ActivityBar
@@ -434,6 +453,7 @@ export interface PageObjectApi {
   readonly RunAndDebug: RunAndDebug
   readonly RunningExtensions: RunningExtensions
   readonly Search: Search
+  readonly Server: Server
   readonly Settings: Settings
   readonly SettingsEditor: SettingsEditor
   readonly SettingsEditorCompletion: SettingsEditorCompletion
