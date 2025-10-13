@@ -7,6 +7,7 @@ export const create = ({ page, expect, VError }) => {
   return {
     async open() {
       try {
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.ConfigureTask)
         await page.waitForIdle()
