@@ -115,9 +115,9 @@ export const create = ({ expect, page, VError }) => {
         await quickPickInput.press('Enter')
 
         await expect(quickPickInput).toHaveAttribute('aria-label', `Choose where to install the MCP server`)
-
         await this.selectCommand('Global')
 
+        await page.waitForIdle()
         const mcpJsonFile = page.locator('[data-source-name="mcp.json"]')
         await expect(mcpJsonFile).toBeVisible()
         // TODO read the file and check it has the expected contents
