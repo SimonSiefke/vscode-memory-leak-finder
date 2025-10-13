@@ -3,6 +3,7 @@ import * as Server from '../Server/Server.ts'
 import { URL } from 'url'
 
 export const create = ({ expect, page, VError }) => {
+  const servers = Object.create(null)
   return {
     createMCPServer(): Promise<Server.ServerInfo> {
       const path = '/mcp'
@@ -59,8 +60,10 @@ export const create = ({ expect, page, VError }) => {
       })
       return instance
     },
-    async addServer({ serverUrl, serverName }: { serverUrl: string; serverName?: string }) {
+    async addServer({ serverName }: { serverName: string }) {
       try {
+        const server = await this.createMCPServer()
+        const serverUrl = server.url
         // Step 1: Open QuickPick and search for MCP commands
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
