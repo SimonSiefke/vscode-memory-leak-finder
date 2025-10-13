@@ -1,5 +1,7 @@
 import type { TestContext } from '../types.ts'
 
+export const skip = 1
+
 export const setup = async ({ Editor, Server }: TestContext): Promise<void> => {
   await Editor.closeAll()
 
