@@ -354,11 +354,11 @@ export const create = ({ expect, page, VError }) => {
 
         // Get all visible server commands and remove them one by one
         let serverCommands = await this.getVisibleCommands()
-        
+
         while (serverCommands.length > 0) {
           // Find the first server command (skip any non-server items)
-          const serverToRemove = serverCommands.find((cmd: string) => 
-            !cmd.toLowerCase().includes('list servers') && 
+          const serverToRemove = serverCommands.find((cmd: string) =>
+            !cmd.toLowerCase().includes('list servers') &&
             !cmd.toLowerCase().includes('mcp: list') &&
             cmd.trim().length > 0
           )
