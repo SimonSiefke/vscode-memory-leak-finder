@@ -103,46 +103,19 @@ export const create = ({ expect, page, VError }) => {
 
         await this.selectCommand(httpOption, true)
 
+        await expect(quickPickInput).toHaveAttribute('aria-label', `Unique identifier for this server - Enter Server ID`)
+
         await quickPickInput.type(serverUrl)
 
         await quickPickInput.press('Enter')
 
-        await new Promise((resolve) => setTimeout(resolve, 3000))
+        await expect(quickPickInput).toHaveAttribute('aria-label', `Choose where to install the MCP server`)
 
-        try {
-          const currentCommands = await this.getVisibleCommands()
+        await this.selectCommand('Global')
 
-          if (currentCommands.length > 0) {
-            const currentServerName = await this.getInputValue()
-
-            if (currentServerName && serverName && currentServerName !== serverName) {
-              await quickPickInput.type(serverName)
-            }
-
-            await quickPickInput.press('Enter')
-
-            let stepCount = 0
-            while (stepCount < 5) {
-              try {
-                const currentStepCommands = await this.getVisibleCommands()
-                if (currentStepCommands.length === 0) {
-                  break
-                }
-
-                await quickPickInput.press('Enter')
-
-                stepCount++
-                await new Promise((resolve) => setTimeout(resolve, 1000))
-              } catch (error) {
-                break
-              }
-            }
-          }
-        } catch (error) {
-          // QuickPick is no longer visible
-        }
-
-        await new Promise((resolve) => setTimeout(resolve, 5000))
+        const mcpJsonFile = page.locator('[data-source-name="mcp.json"]')
+        await expect(mcpJsonFile).toBeVisible()
+        // TODO read the file and check it has the expected contents
       } catch (error) {
         throw new VError(error, `Failed to add MCP server`)
       }
@@ -322,6 +295,8 @@ export const create = ({ expect, page, VError }) => {
 
     async removeAllServers() {
       try {
+        // TODO remove the mcp.json file from storage
+
         // Open QuickPick and search for MCP list commands
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
@@ -357,10 +332,9 @@ export const create = ({ expect, page, VError }) => {
 
         while (serverCommands.length > 0) {
           // Find the first server command (skip any non-server items)
-          const serverToRemove = serverCommands.find((cmd: string) =>
-            !cmd.toLowerCase().includes('list servers') &&
-            !cmd.toLowerCase().includes('mcp: list') &&
-            cmd.trim().length > 0
+          const serverToRemove = serverCommands.find(
+            (cmd: string) =>
+              !cmd.toLowerCase().includes('list servers') && !cmd.toLowerCase().includes('mcp: list') && cmd.trim().length > 0,
           )
 
           if (!serverToRemove) {

@@ -16,4 +16,6 @@ export const run = async ({ MCP }: TestContext): Promise<void> => {
   await MCP.removeAllServers()
 
   await server.dispose()
+
+  await new Promise((r) => {})
 }
