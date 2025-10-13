@@ -1,7 +1,56 @@
 import * as KeyBindings from '../KeyBindings/KeyBindings.ts'
+import { URL } from 'url'
 
 export const create = ({ expect, page, VError }) => {
   return {
+    createMCPServer({ path = '/mcp' } = {}) {
+      return (req, res) => {
+        const parsedUrl = new URL(req.url || '', 'http://localhost')
+
+        if (parsedUrl.pathname === path) {
+          res.writeHead(200, {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type',
+          })
+
+          if (req.method === 'OPTIONS') {
+            res.end()
+            return
+          }
+
+          const response = {
+            jsonrpc: '2.0',
+            id: 1,
+            result: {
+              protocolVersion: '2024-11-05',
+              capabilities: {
+                tools: {
+                  listChanged: true,
+                },
+                resources: {
+                  subscribe: true,
+                  listChanged: true,
+                },
+                prompts: {
+                  listChanged: true,
+                },
+              },
+              serverInfo: {
+                name: 'mock-mcp-server',
+                version: '1.0.0',
+              },
+            },
+          }
+
+          res.end(JSON.stringify(response))
+        } else {
+          res.writeHead(404, { 'Content-Type': 'application/json' })
+          res.end(JSON.stringify({ error: 'Not found' }))
+        }
+      }
+    },
     async addServer({ serverUrl, serverName }: { serverUrl: string; serverName?: string }) {
       try {
         // Step 1: Open QuickPick and search for MCP commands
@@ -20,9 +69,7 @@ export const create = ({ expect, page, VError }) => {
         // Step 2: Type "mcp" to find MCP commands
         await quickPickInput.type('mcp')
 
-        // Step 3: Get available MCP commands
         const mcpCommands = await this.getVisibleCommands()
-        console.log('Available MCP commands:', mcpCommands)
 
         // Step 4: Look for "MCP: Add Server" command
         const addServerCommand = mcpCommands.find((cmd: string) =>
@@ -34,13 +81,9 @@ export const create = ({ expect, page, VError }) => {
           throw new VError(new Error('MCP: Add Server command not found'), 'MCP Add Server command not available')
         }
 
-        // Step 5: Select the "MCP: Add Server" command
-        await this.selectCommand(addServerCommand, true) // stayVisible = true
-        console.log('Successfully selected MCP: Add Server command')
+        await this.selectCommand(addServerCommand, true)
 
-        // Step 6: Get server type options
         const serverTypeCommands = await this.getVisibleCommands()
-        console.log('Server type options:', serverTypeCommands)
 
         // Step 7: Select HTTP option for our mock server
         const httpOption = serverTypeCommands.find((cmd: string) =>
@@ -52,72 +95,48 @@ export const create = ({ expect, page, VError }) => {
           throw new VError(new Error('HTTP option not found'), 'HTTP server type option not available')
         }
 
-        await this.selectCommand(httpOption, true) // stayVisible = true
-        console.log('Selected HTTP option for MCP server')
+        await this.selectCommand(httpOption, true)
 
-        // Step 8: Type the server URL
         await quickPickInput.type(serverUrl)
-        console.log(`Typed server URL: ${serverUrl}`)
 
-        // Step 9: Press Enter to confirm the server URL
         await quickPickInput.press('Enter')
-        console.log('Pressed Enter to confirm server URL')
 
-        // Step 10: Wait for the next step or completion
         await new Promise((resolve) => setTimeout(resolve, 3000))
 
-        // Step 11: Check if QuickPick is still open for additional steps
         try {
           const currentCommands = await this.getVisibleCommands()
-          console.log('Commands after URL confirmation:', currentCommands)
 
           if (currentCommands.length > 0) {
-            // Step 12: Look for generated server name
             const currentServerName = await this.getInputValue()
-            console.log(`Current server name: ${currentServerName}`)
 
             if (currentServerName && serverName && currentServerName !== serverName) {
-              // Step 13: Type the desired server name
               await quickPickInput.type(serverName)
-              console.log(`Typed desired server name: ${serverName}`)
             }
 
-            // Step 14: Accept the server name
             await quickPickInput.press('Enter')
-            console.log('Accepted server name')
 
-            // Step 15: Continue accepting until the process is complete
             let stepCount = 0
-            while (stepCount < 5) { // Safety limit to prevent infinite loop
+            while (stepCount < 5) {
               try {
                 const currentStepCommands = await this.getVisibleCommands()
                 if (currentStepCommands.length === 0) {
-                  console.log('MCP server configuration process completed')
                   break
                 }
 
-                // Accept the current step
                 await quickPickInput.press('Enter')
-                console.log(`Completed step ${stepCount + 1}`)
 
                 stepCount++
                 await new Promise((resolve) => setTimeout(resolve, 1000))
               } catch (error) {
-                console.log('Configuration process completed or error occurred:', error)
                 break
               }
             }
-          } else {
-            console.log('QuickPick closed after URL confirmation - MCP configuration may be complete')
           }
         } catch (error) {
-          console.log('QuickPick is no longer visible - MCP configuration process completed')
+          // QuickPick is no longer visible
         }
 
-        // Step 16: Wait for any final connection attempts
-        console.log('Waiting for potential MCP server connection attempts...')
         await new Promise((resolve) => setTimeout(resolve, 5000))
-        console.log('MCP server configuration process finished')
 
       } catch (error) {
         throw new VError(error, `Failed to add MCP server`)
@@ -199,9 +218,7 @@ export const create = ({ expect, page, VError }) => {
           throw new VError(new Error('MCP: List Servers command not found'), 'MCP List Servers command not available')
         }
 
-        // Select the command (some commands might keep QuickPick open)
         await this.selectCommand(listServersCommand, true)
-        console.log('Successfully opened MCP server list')
 
       } catch (error) {
         throw new VError(error, `Failed to list MCP servers`)
@@ -237,9 +254,7 @@ export const create = ({ expect, page, VError }) => {
           throw new VError(new Error('MCP configuration command not found'), 'MCP configuration command not available')
         }
 
-        // Select the command (some commands might keep QuickPick open)
         await this.selectCommand(configCommand, true)
-        console.log('Successfully opened MCP configuration')
 
       } catch (error) {
         throw new VError(error, `Failed to open MCP configuration`)
@@ -275,30 +290,23 @@ export const create = ({ expect, page, VError }) => {
           throw new VError(new Error('MCP: List Servers command not found'), 'MCP List Servers command not available')
         }
 
-        // Select the command to open server list
         await this.selectCommand(listServersCommand, true)
-        console.log('Successfully opened MCP server list')
 
-        // Wait for server list to load
         await new Promise((resolve) => setTimeout(resolve, 2000))
 
-        // Look for the specific server to remove
         const serverCommands = await this.getVisibleCommands()
         const serverToRemove = serverCommands.find((cmd: string) =>
           cmd.toLowerCase().includes(serverName.toLowerCase())
         )
 
         if (serverToRemove) {
-          // Right-click or use context menu to remove the server
           const serverElement = quickPick.locator('.monaco-list-row .label-name', {
             hasExactText: serverToRemove,
           })
           await serverElement.click({ button: 'right' })
 
-          // Wait for context menu and look for remove/delete option
           await new Promise((resolve) => setTimeout(resolve, 1000))
 
-          // Look for remove/delete commands in context menu
           const contextCommands = await this.getVisibleCommands()
           const removeCommand = contextCommands.find((cmd: string) =>
             cmd.toLowerCase().includes('remove') ||
@@ -308,12 +316,7 @@ export const create = ({ expect, page, VError }) => {
 
           if (removeCommand) {
             await this.selectCommand(removeCommand)
-            console.log(`Successfully removed MCP server: ${serverName}`)
-          } else {
-            console.log(`Could not find remove option for server: ${serverName}`)
           }
-        } else {
-          console.log(`Server "${serverName}" not found in the list`)
         }
 
       } catch (error) {

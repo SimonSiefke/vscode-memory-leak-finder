@@ -1,5 +1,4 @@
 import { createServer } from 'http'
-import { URL } from 'url'
 
 const DEFAULT_PORT = 0
 
@@ -13,73 +12,13 @@ export const create = ({ VError }) => {
   let serverUrl: string = ''
 
   return {
-    async start({ port = DEFAULT_PORT, path = '/mcp' } = {}): Promise<ServerInfo> {
+    async start({ port = DEFAULT_PORT, requestHandler } = {} as { port?: number; requestHandler?: (req: any, res: any) => void }): Promise<ServerInfo> {
       try {
         if (mockServer) {
           await this.stop()
         }
 
-        mockServer = createServer((req, res) => {
-          const parsedUrl = new URL(req.url || '', serverUrl)
-
-          // Log all incoming requests
-          console.log(`Mock MCP server received ${req.method} request to ${parsedUrl.pathname}`)
-          if (req.method === 'POST') {
-            let body = ''
-            req.on('data', (chunk) => {
-              body += chunk.toString()
-            })
-            req.on('end', () => {
-              console.log('Request body:', body)
-            })
-          }
-
-          // Handle MCP protocol endpoints
-          if (parsedUrl.pathname === path) {
-            res.writeHead(200, {
-              'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*',
-              'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-              'Access-Control-Allow-Headers': 'Content-Type',
-            })
-
-            // Handle preflight requests
-            if (req.method === 'OPTIONS') {
-              res.end()
-              return
-            }
-
-            const response = {
-              jsonrpc: '2.0',
-              id: 1,
-              result: {
-                protocolVersion: '2024-11-05',
-                capabilities: {
-                  tools: {
-                    listChanged: true,
-                  },
-                  resources: {
-                    subscribe: true,
-                    listChanged: true,
-                  },
-                  prompts: {
-                    listChanged: true,
-                  },
-                },
-                serverInfo: {
-                  name: 'mock-mcp-server',
-                  version: '1.0.0',
-                },
-              },
-            }
-
-            console.log('Mock MCP server responding with:', JSON.stringify(response, null, 2))
-            res.end(JSON.stringify(response))
-          } else {
-            res.writeHead(404, { 'Content-Type': 'application/json' })
-            res.end(JSON.stringify({ error: 'Not found' }))
-          }
-        })
+        mockServer = createServer(requestHandler)
 
         const { promise, resolve, reject } = Promise.withResolvers<ServerInfo>()
 
@@ -90,7 +29,6 @@ export const create = ({ VError }) => {
             const address = mockServer.address()
             const actualPort = address?.port || port
             serverUrl = `http://localhost:${actualPort}`
-            console.log(`Mock MCP server running on ${serverUrl}`)
             resolve({ url: serverUrl, port: actualPort })
           }
         })
@@ -107,7 +45,6 @@ export const create = ({ VError }) => {
           const { promise, resolve } = Promise.withResolvers<void>()
 
           mockServer.close(() => {
-            console.log('Mock MCP server stopped')
             mockServer = null
             serverUrl = ''
             resolve()

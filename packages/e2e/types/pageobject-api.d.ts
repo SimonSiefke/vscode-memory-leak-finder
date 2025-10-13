@@ -198,6 +198,7 @@ export interface KeyBindingsEditor {
   setKeyBinding(commandName: any, keyBinding: any): Promise<void>
 }
 export interface MCP {
+  createMCPServer(options?: { path?: string }): (req: any, res: any) => void
   addServer(options: { serverUrl: string; serverName?: string }): Promise<void>
   removeServer(serverName: string): Promise<void>
   getVisibleCommands(): Promise<string[]>
@@ -425,7 +426,7 @@ export interface ServerInfo {
 }
 
 export interface Server {
-  start(options?: { port?: number; path?: string }): Promise<ServerInfo>
+  start(options?: { port?: number; requestHandler?: (req: any, res: any) => void }): Promise<ServerInfo>
   stop(): Promise<void>
   isRunning(): Promise<boolean>
   getUrl(): string
