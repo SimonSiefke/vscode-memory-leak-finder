@@ -14,7 +14,6 @@ export const create = ({ VError }) => {
       { port = DEFAULT_PORT, requestHandler } = {} as { port: number; requestHandler?: (req: any, res: any) => void },
     ): Promise<ServerInfo> {
       try {
-        let serverUrl: string = ''
         const mockServer = createServer(requestHandler)
 
         const { promise, resolve } = Promise.withResolvers<Error | undefined>()
@@ -27,26 +26,20 @@ export const create = ({ VError }) => {
         }
         const address = mockServer.address()
         const actualPort = address?.port || port
-        serverUrl = `http://localhost:${actualPort}`
-
-        const dispose = async (): Promise<void> => {
-          if (mockServer) {
-            const { promise: disposePromise, resolve: disposeResolve } = Promise.withResolvers<void>()
-
-            mockServer.close(() => {
-              mockServer = null
-              serverUrl = ''
-              disposeResolve()
-            })
-
-            return disposePromise
-          }
-        }
+        const serverUrl = `http://localhost:${actualPort}`
 
         return {
           url: serverUrl,
           port: actualPort,
-          dispose,
+          dispose() {
+            const { promise, resolve } = Promise.withResolvers<void>()
+
+            mockServer.close(() => {
+              resolve()
+            })
+
+            return promise
+          },
         }
       } catch (error) {
         throw new VError(error, `Failed to start mock server`)
