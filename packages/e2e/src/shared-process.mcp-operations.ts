@@ -9,15 +9,13 @@ export const run = async ({ CommandPalette, Editor }: TestContext): Promise<void
   // Open command palette and search for MCP-related commands
   await CommandPalette.open()
   await CommandPalette.type('mcp')
-  
+
   // Look for MCP commands (these affect shared-process)
   const mcpCommands = await CommandPalette.getVisibleCommands()
-  const hasMcpCommands = mcpCommands.some(cmd => 
-    cmd.toLowerCase().includes('mcp') || 
-    cmd.toLowerCase().includes('model') ||
-    cmd.toLowerCase().includes('context')
+  const hasMcpCommands = mcpCommands.some(
+    (cmd) => cmd.toLowerCase().includes('mcp') || cmd.toLowerCase().includes('model') || cmd.toLowerCase().includes('context'),
   )
-  
+
   if (hasMcpCommands) {
     try {
       // Try to access MCP management
@@ -27,16 +25,14 @@ export const run = async ({ CommandPalette, Editor }: TestContext): Promise<void
       // MCP commands might not be available, continue
     }
   }
-  
+
   // Search for AI-related commands
   await CommandPalette.type('ai')
   const aiCommands = await CommandPalette.getVisibleCommands()
-  const hasAiCommands = aiCommands.some(cmd => 
-    cmd.toLowerCase().includes('ai') || 
-    cmd.toLowerCase().includes('chat') ||
-    cmd.toLowerCase().includes('copilot')
+  const hasAiCommands = aiCommands.some(
+    (cmd) => cmd.toLowerCase().includes('ai') || cmd.toLowerCase().includes('chat') || cmd.toLowerCase().includes('copilot'),
   )
-  
+
   if (hasAiCommands) {
     try {
       await CommandPalette.select('Chat: New Chat')
@@ -45,15 +41,12 @@ export const run = async ({ CommandPalette, Editor }: TestContext): Promise<void
       // AI commands might not be available, continue
     }
   }
-  
+
   // Search for chat commands
   await CommandPalette.type('chat')
   const chatCommands = await CommandPalette.getVisibleCommands()
-  const hasChatCommands = chatCommands.some(cmd => 
-    cmd.toLowerCase().includes('chat') || 
-    cmd.toLowerCase().includes('conversation')
-  )
-  
+  const hasChatCommands = chatCommands.some((cmd) => cmd.toLowerCase().includes('chat') || cmd.toLowerCase().includes('conversation'))
+
   if (hasChatCommands) {
     try {
       await CommandPalette.select('Chat: New Chat')
@@ -62,15 +55,12 @@ export const run = async ({ CommandPalette, Editor }: TestContext): Promise<void
       // Chat commands might not be available, continue
     }
   }
-  
+
   // Search for model-related commands
   await CommandPalette.type('model')
   const modelCommands = await CommandPalette.getVisibleCommands()
-  const hasModelCommands = modelCommands.some(cmd => 
-    cmd.toLowerCase().includes('model') || 
-    cmd.toLowerCase().includes('llm')
-  )
-  
+  const hasModelCommands = modelCommands.some((cmd) => cmd.toLowerCase().includes('model') || cmd.toLowerCase().includes('llm'))
+
   if (hasModelCommands) {
     try {
       await CommandPalette.select('Preferences: Open Settings')
@@ -79,15 +69,12 @@ export const run = async ({ CommandPalette, Editor }: TestContext): Promise<void
       // Model commands might not be available, continue
     }
   }
-  
+
   // Search for context-related commands
   await CommandPalette.type('context')
   const contextCommands = await CommandPalette.getVisibleCommands()
-  const hasContextCommands = contextCommands.some(cmd => 
-    cmd.toLowerCase().includes('context') || 
-    cmd.toLowerCase().includes('prompt')
-  )
-  
+  const hasContextCommands = contextCommands.some((cmd) => cmd.toLowerCase().includes('context') || cmd.toLowerCase().includes('prompt'))
+
   if (hasContextCommands) {
     try {
       await CommandPalette.select('Preferences: Open Settings')
@@ -96,10 +83,10 @@ export const run = async ({ CommandPalette, Editor }: TestContext): Promise<void
       // Context commands might not be available, continue
     }
   }
-  
+
   // Close command palette
   await CommandPalette.close()
-  
+
   // Reopen command palette to verify state
   await CommandPalette.open()
   await CommandPalette.type('help')

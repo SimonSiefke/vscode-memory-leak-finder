@@ -20,10 +20,7 @@ export const run = async ({ SettingsEditor, CommandPalette, Editor }: TestContex
 
   // Look for sync-related commands (these communicate with shared-process)
   const syncCommands = await CommandPalette.getVisibleCommands()
-  const hasSyncCommands = syncCommands.some(cmd =>
-    cmd.toLowerCase().includes('sync') ||
-    cmd.toLowerCase().includes('settings')
-  )
+  const hasSyncCommands = syncCommands.some((cmd) => cmd.toLowerCase().includes('sync') || cmd.toLowerCase().includes('settings'))
 
   // If sync commands are available, interact with them
   if (hasSyncCommands) {
