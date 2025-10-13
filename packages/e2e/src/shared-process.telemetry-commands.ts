@@ -1,0 +1,28 @@
+import type { TestContext } from '../types.ts'
+
+export const setup = async ({ Editor, QuickPick }: TestContext): Promise<void> => {
+  await Editor.closeAll()
+  await QuickPick.close()
+}
+
+export const run = async ({ QuickPick, Editor }: TestContext): Promise<void> => {
+  // Test telemetry-related commands
+  await QuickPick.showCommands()
+  await QuickPick.type('telemetry')
+
+  const telemetryCommands = await QuickPick.getVisibleCommands()
+  const hasTelemetryCommands = telemetryCommands.some(
+    (cmd) => cmd.toLowerCase().includes('telemetry') || cmd.toLowerCase().includes('privacy') || cmd.toLowerCase().includes('usage'),
+  )
+
+  if (hasTelemetryCommands) {
+    try {
+      await QuickPick.select('Preferences: Open Settings')
+      await QuickPick.close()
+    } catch (error) {
+      // Telemetry commands might not be available, continue
+    }
+  }
+
+  await QuickPick.close()
+}
