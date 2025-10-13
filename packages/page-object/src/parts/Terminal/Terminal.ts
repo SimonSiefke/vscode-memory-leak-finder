@@ -113,50 +113,5 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to clear terminal`)
       }
     },
-    async focusFirst() {
-      try {
-        const terminal = page.locator('.terminal').first()
-        await expect(terminal).toBeVisible()
-        await terminal.click()
-        await expect(terminal).toHaveClass('focus')
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to focus first terminal`)
-      }
-    },
-    async focusSecond() {
-      try {
-        const terminal = page.locator('.terminal').nth(1)
-        await expect(terminal).toBeVisible()
-        await terminal.click()
-        await expect(terminal).toHaveClass('focus')
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to focus second terminal`)
-      }
-    },
-    async killThird() {
-      try {
-        const terminalTabs = page.locator('[aria-label="Terminal tabs"]')
-        await expect(terminalTabs).toBeVisible()
-        const tabsEntry = page.locator('.terminal-tabs-entry')
-        await expect(tabsEntry).toHaveCount(3)
-        const thirdEntry = tabsEntry.nth(2)
-        const deleteAction = thirdEntry.locator('[aria-label^="Kill"]')
-        await deleteAction.click()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to kill third terminal`)
-      }
-    },
-    async shouldNotHaveActiveTerminals() {
-      try {
-        const terminal = page.locator('.terminal')
-        await expect(terminal).toHaveCount(0)
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to verify no active terminals`)
-      }
-    },
   }
 }
