@@ -18,6 +18,7 @@ export const create = ({ VError }) => {
 
         const { promise, resolve } = Promise.withResolvers<Error | undefined>()
 
+        // @ts-ignore
         mockServer.listen(port, (error) => resolve(error))
 
         const error = await promise
@@ -25,6 +26,8 @@ export const create = ({ VError }) => {
           throw new Error(`Failed to start mock server on port ${port}`)
         }
         const address = mockServer.address()
+
+        // @ts-ignore
         const actualPort = address?.port || port
         const serverUrl = `http://localhost:${actualPort}`
 
