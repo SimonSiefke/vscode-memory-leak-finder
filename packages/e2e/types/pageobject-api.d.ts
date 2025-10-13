@@ -241,6 +241,7 @@ export interface QuickPick {
   show(options?: any): Promise<void>
   showCommands(): Promise<void>
   type(value: any): Promise<void>
+  pressEnter(): Promise<void>
   select(text: string, stayVisible?: boolean): Promise<void>
   executeCommand(options: any): Promise<void>
   openFile(fileName: any): Promise<void>

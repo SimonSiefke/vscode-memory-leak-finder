@@ -64,8 +64,7 @@ export const run = async ({ QuickPick, Server }: TestContext): Promise<void> => 
 
   // Step 10: Press Enter to confirm the server URL
   // This should trigger VS Code to try to connect to our mock server
-  // We'll use the type method with a newline character to simulate Enter
-  await QuickPick.type('\n')
+  await QuickPick.pressEnter()
   console.log('Pressed Enter to confirm server URL')
 
   // Step 11: Wait a moment for the connection attempt
