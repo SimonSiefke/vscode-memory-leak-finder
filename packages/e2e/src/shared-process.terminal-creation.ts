@@ -6,7 +6,7 @@ export const setup = async ({ Editor, Terminal, Panel }: TestContext): Promise<v
   await Terminal.killAll()
 }
 
-export const run = async ({ Terminal, Editor }: TestContext): Promise<void> => {
+export const run = async ({ Terminal }: TestContext): Promise<void> => {
   // Test terminal creation and splitting (affects process management in shared-process)
   await Terminal.show()
   await Terminal.execute('echo "terminal 1 - shared process test"')

@@ -2,7 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promise<void> => {
+export const setup = async ({ Workspace, Editor }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'test-file-1.md',
@@ -24,6 +24,6 @@ export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promi
   await Editor.open('test-file-1.md')
 }
 
-export const run = async ({ Editor }: TestContext): Promise<void> => {
+export const run = async (): Promise<void> => {
   // TODO
 }

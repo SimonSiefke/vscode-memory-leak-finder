@@ -63,19 +63,21 @@ export const create = ({ VError }) => {
           }
         })
 
-        return new Promise((resolve, reject) => {
-          mockServer.listen(port, (error) => {
-            if (error) {
-              reject(new VError(error, `Failed to start mock server on port ${port}`))
-            } else {
-              const address = mockServer.address()
-              const actualPort = address?.port || port
-              serverUrl = `http://localhost:${actualPort}`
-              console.log(`Mock MCP server running on ${serverUrl}`)
-              resolve({ url: serverUrl, port: actualPort })
-            }
-          })
+        const { promise, resolve, reject } = Promise.withResolvers<{ url: string; port: number }>()
+
+        mockServer.listen(port, (error) => {
+          if (error) {
+            reject(new VError(error, `Failed to start mock server on port ${port}`))
+          } else {
+            const address = mockServer.address()
+            const actualPort = address?.port || port
+            serverUrl = `http://localhost:${actualPort}`
+            console.log(`Mock MCP server running on ${serverUrl}`)
+            resolve({ url: serverUrl, port: actualPort })
+          }
         })
+
+        return promise
       } catch (error) {
         throw new VError(error, `Failed to start mock server`)
       }
@@ -84,13 +86,16 @@ export const create = ({ VError }) => {
     async stop() {
       try {
         if (mockServer) {
-          return new Promise((resolve) => {
-            mockServer.close(() => {
-              console.log('Mock MCP server stopped')
-              mockServer = null
-              resolve()
-            })
+          const { promise, resolve } = Promise.withResolvers<void>()
+
+          mockServer.close(() => {
+            console.log('Mock MCP server stopped')
+            mockServer = null
+            serverUrl = ''
+            resolve()
           })
+
+          return promise
         }
       } catch (error) {
         throw new VError(error, `Failed to stop mock server`)

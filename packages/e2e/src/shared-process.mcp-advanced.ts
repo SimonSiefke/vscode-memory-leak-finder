@@ -30,7 +30,7 @@ export const run = async ({ QuickPick, Server }: TestContext): Promise<void> => 
 
   // Step 5: Select the "MCP: Add Server" command
   // This might open another input field, so we'll use select with stayVisible
-  await QuickPick.select(addServerCommand, true) // stayVisible = true
+  await QuickPick.select(addServerCommand, true)
 
   // Step 6: Wait for the MCP server configuration dialog/input
   // The quick pick should still be visible with a new input field
@@ -49,7 +49,7 @@ export const run = async ({ QuickPick, Server }: TestContext): Promise<void> => 
     throw new Error('HTTP option not found in MCP server configuration')
   }
 
-  await QuickPick.select(httpOption, true) // stayVisible = true
+  await QuickPick.select(httpOption, true)
   console.log('Selected HTTP option for MCP server')
 
   // Step 8: Now we should be able to enter the server URL
