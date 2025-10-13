@@ -118,7 +118,7 @@ export const create = ({ expect, page, VError }) => {
         await this.selectCommand('Global')
 
         await page.waitForIdle()
-        const mcpJsonFile = page.locator('[data-source-name="mcp.json"]')
+        const mcpJsonFile = page.locator('[data-resource-name="mcp.json"]')
         await expect(mcpJsonFile).toBeVisible()
         // TODO read the file and check it has the expected contents
       } catch (error) {
