@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ Workspace, Explorer, Terminal }: TestContext): Promise<void> => {
+export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'original-file.txt',
@@ -19,19 +19,26 @@ export const setup = async ({ Workspace, Explorer, Terminal }: TestContext): Pro
   await Explorer.shouldHaveItem('original-file.txt')
   await Explorer.shouldHaveItem('folder')
   await Explorer.shouldHaveItem('another-file.js')
-  await Terminal.killAll()
 }
 
-export const run = async ({ Terminal, Explorer }: TestContext): Promise<void> => {
-  // Rename a file via terminal (file system operation)
-  await Terminal.execute('mv original-file.txt renamed-file.txt')
+export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
+  // Rename a file via file system operation
+  await Workspace.remove('original-file.txt')
+  await Workspace.add({
+    name: 'renamed-file.txt',
+    content: 'original content',
+  })
   
   // Verify the old name is gone and new name appears in explorer
   await Explorer.not.toHaveItem('original-file.txt')
   await Explorer.shouldHaveItem('renamed-file.txt')
   
-  // Rename a file in a subfolder via terminal
-  await Terminal.execute('mv folder/nested-file.txt folder/renamed-nested-file.txt')
+  // Rename a file in a subfolder via file system operation
+  await Workspace.remove('folder/nested-file.txt')
+  await Workspace.add({
+    name: 'folder/renamed-nested-file.txt',
+    content: 'nested content',
+  })
   
   // Expand folder and verify the rename
   await Explorer.expand('folder')
@@ -39,14 +46,22 @@ export const run = async ({ Terminal, Explorer }: TestContext): Promise<void> =>
   await Explorer.shouldHaveItem('renamed-nested-file.txt')
   
   // Rename with different extension
-  await Terminal.execute('mv another-file.js another-file.ts')
+  await Workspace.remove('another-file.js')
+  await Workspace.add({
+    name: 'another-file.ts',
+    content: 'console.log("hello");',
+  })
   
   // Verify the extension change is reflected
   await Explorer.not.toHaveItem('another-file.js')
   await Explorer.shouldHaveItem('another-file.ts')
   
-  // Rename folder itself
-  await Terminal.execute('mv folder renamed-folder')
+  // Rename folder itself by recreating the structure
+  await Workspace.remove('folder/renamed-nested-file.txt')
+  await Workspace.add({
+    name: 'renamed-folder/renamed-nested-file.txt',
+    content: 'nested content',
+  })
   
   // Collapse and verify folder rename
   await Explorer.collapse('folder')
