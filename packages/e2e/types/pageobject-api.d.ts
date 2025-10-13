@@ -408,6 +408,12 @@ export interface Workspace {
   remove(file: any): Promise<void>
   getWorkspaceFilePath(name: string): Promise<any>
 }
+export interface Server {
+  start(options?: { port?: number; path?: string }): Promise<{ url: string; port: number }>
+  stop(): Promise<void>
+  isRunning(): Promise<boolean>
+  getUrl(): string
+}
 
 export interface PageObjectApi {
   readonly ActivityBar: ActivityBar
@@ -440,6 +446,7 @@ export interface PageObjectApi {
   readonly RunAndDebug: RunAndDebug
   readonly RunningExtensions: RunningExtensions
   readonly Search: Search
+  readonly Server: Server
   readonly Settings: Settings
   readonly SettingsEditor: SettingsEditor
   readonly SettingsEditorCompletion: SettingsEditorCompletion
