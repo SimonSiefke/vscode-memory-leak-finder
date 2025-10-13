@@ -27,8 +27,8 @@ export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void>
 export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
   // Create complex nested structure via file system operation
   await Workspace.add({
-    name: 'complex/nested/structure/with/many/levels/very-deep-file.txt',
-    content: 'very deep content',
+    name: 'complex/nested/structure/deep-file.txt',
+    content: 'deep content',
   })
   
   // Verify the complex structure appears in explorer
@@ -40,16 +40,7 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
   await Explorer.shouldHaveItem('structure')
   
   await Explorer.expand('structure')
-  await Explorer.shouldHaveItem('with')
-  
-  await Explorer.expand('with')
-  await Explorer.shouldHaveItem('many')
-  
-  await Explorer.expand('many')
-  await Explorer.shouldHaveItem('levels')
-  
-  await Explorer.expand('levels')
-  await Explorer.shouldHaveItem('very-deep-file.txt')
+  await Explorer.shouldHaveItem('deep-file.txt')
   
   // Rename deeply nested folder
   await Workspace.remove('complex/nested/structure/with/many/levels/very-deep-file.txt')

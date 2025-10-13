@@ -19,8 +19,8 @@ export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void>
       content: 'another nested file',
     },
     {
-      name: 'empty-folder/',
-      content: '',
+      name: 'empty-folder/placeholder.txt',
+      content: 'placeholder',
     },
   ])
   await Explorer.focus()
