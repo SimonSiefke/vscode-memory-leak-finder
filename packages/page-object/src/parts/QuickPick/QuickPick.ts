@@ -141,7 +141,15 @@ export const create = ({ expect, page, VError }) => {
       try {
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
-        const commands = await quickPick.locator('.monaco-list-row .label-name').allTextContents()
+        const commandElements = quickPick.locator('.monaco-list-row .label-name')
+        const count = await commandElements.count()
+        const commands = []
+        for (let i = 0; i < count; i++) {
+          const text = await commandElements.nth(i).textContent()
+          if (text) {
+            commands.push(text)
+          }
+        }
         return commands
       } catch (error) {
         throw new VError(error, `Failed to get visible commands`)

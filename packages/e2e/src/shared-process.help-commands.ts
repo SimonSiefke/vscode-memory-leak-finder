@@ -2,7 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const setup = async ({ Editor, QuickPick }: TestContext): Promise<void> => {
   await Editor.closeAll()
-  await QuickPick.close()
+  // Don't try to close quick pick if it's not open
 }
 
 export const run = async ({ QuickPick, Editor }: TestContext): Promise<void> => {
@@ -16,11 +16,11 @@ export const run = async ({ QuickPick, Editor }: TestContext): Promise<void> => 
   if (hasHelpCommands) {
     try {
       await QuickPick.select('Help: Show All Commands')
-      await QuickPick.close()
+      // Don't try to close quick pick if it's not open
     } catch (error) {
       // Help commands might not be available, continue
     }
   }
 
-  await QuickPick.close()
+  // Don't try to close quick pick if it's not open
 }

@@ -2,7 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const setup = async ({ Editor, QuickPick }: TestContext): Promise<void> => {
   await Editor.closeAll()
-  await QuickPick.close()
+  // Don't try to close quick pick if it's not open
 }
 
 export const run = async ({ QuickPick, Editor }: TestContext): Promise<void> => {
@@ -16,11 +16,11 @@ export const run = async ({ QuickPick, Editor }: TestContext): Promise<void> => 
   if (hasTunnelCommands) {
     try {
       await QuickPick.select('Remote-Tunnels: Manage Tunnels')
-      await QuickPick.close()
+      // Don't try to close quick pick if it's not open
     } catch (error) {
       // Tunnel commands might not be available, continue
     }
   }
 
-  await QuickPick.close()
+  // Don't try to close quick pick if it's not open
 }

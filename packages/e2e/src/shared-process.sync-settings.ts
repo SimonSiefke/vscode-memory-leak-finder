@@ -30,5 +30,5 @@ export const run = async ({ SettingsEditor, QuickPick, Editor }: TestContext): P
     }
   }
 
-  await QuickPick.close()
+  // Don't try to close quick pick if it's not open
 }

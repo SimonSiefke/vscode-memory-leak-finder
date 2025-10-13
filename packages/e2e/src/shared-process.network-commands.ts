@@ -2,7 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const setup = async ({ Editor, QuickPick }: TestContext): Promise<void> => {
   await Editor.closeAll()
-  await QuickPick.close()
+  // Don't try to close quick pick if it's not open
 }
 
 export const run = async ({ QuickPick, Editor }: TestContext): Promise<void> => {
@@ -18,11 +18,11 @@ export const run = async ({ QuickPick, Editor }: TestContext): Promise<void> => 
   if (hasNetworkCommands) {
     try {
       await QuickPick.select('Preferences: Open Settings')
-      await QuickPick.close()
+      // Don't try to close quick pick if it's not open
     } catch (error) {
       // Network commands might not be available, continue
     }
   }
 
-  await QuickPick.close()
+  // Don't try to close quick pick if it's not open
 }
