@@ -9,9 +9,9 @@ export const setup = async ({ Editor, SettingsEditor, QuickPick }: TestContext):
 export const run = async ({ SettingsEditor, QuickPick, Editor }: TestContext): Promise<void> => {
   // Test sync-related settings (affects shared-process)
   await SettingsEditor.open()
-  await SettingsEditor.search({ value: 'editor.wordWrap', resultCount: 1 })
-  await SettingsEditor.search({ value: 'workbench.editor.enablePreview', resultCount: 1 })
-  await SettingsEditor.search({ value: 'files.autoSave', resultCount: 1 })
+  await SettingsEditor.search({ value: 'editor.wordWrap', resultCount: 5 })
+  await SettingsEditor.search({ value: 'workbench.editor.enablePreview', resultCount: 5 })
+  await SettingsEditor.search({ value: 'files.autoSave', resultCount: 5 })
 
   await SettingsEditor.clear()
 

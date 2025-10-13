@@ -10,8 +10,8 @@ export const run = async ({ SettingsEditor, Editor }: TestContext): Promise<void
   // Test settings search functionality (affects shared-process)
   await SettingsEditor.open()
   await SettingsEditor.search({ value: 'editor.fontSize', resultCount: 7 })
-  await SettingsEditor.search({ value: 'workbench.colorTheme', resultCount: 1 })
-  await SettingsEditor.search({ value: 'editor.tabSize', resultCount: 1 })
+  await SettingsEditor.search({ value: 'workbench.colorTheme', resultCount: 5 })
+  await SettingsEditor.search({ value: 'editor.tabSize', resultCount: 5 })
   await SettingsEditor.search({ value: 'files.autoSave', resultCount: 5 })
 
   await SettingsEditor.clear()
