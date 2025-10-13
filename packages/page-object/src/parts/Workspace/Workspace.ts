@@ -58,7 +58,7 @@ export const create = ({ electronApp, page, expect, VError }) => {
     async remove(file) {
       const workspace = join(Root.root, '.vscode-test-workspace')
       const absolutePath = join(workspace, file)
-      await rm(absolutePath)
+      await rm(absolutePath, { recursive: true, force: true })
     },
     getWorkspacePath() {
       const workspace = join(Root.root, '.vscode-test-workspace')
