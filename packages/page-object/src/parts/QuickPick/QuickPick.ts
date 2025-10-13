@@ -54,6 +54,16 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to press Enter`)
       }
     },
+    async getInputValue() {
+      try {
+        const quickPick = page.locator('.quick-input-widget')
+        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
+        await expect(quickPickInput).toBeVisible()
+        return await quickPickInput.inputValue()
+      } catch (error) {
+        throw new VError(error, `Failed to get input value`)
+      }
+    },
     async select(text, stayVisible = false) {
       try {
         const quickPick = page.locator('.quick-input-widget')

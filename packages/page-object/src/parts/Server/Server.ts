@@ -21,6 +21,18 @@ export const create = ({ VError }) => {
 
         mockServer = createServer((req, res) => {
           const parsedUrl = new URL(req.url || '', serverUrl)
+          
+          // Log all incoming requests
+          console.log(`Mock MCP server received ${req.method} request to ${parsedUrl.pathname}`)
+          if (req.method === 'POST') {
+            let body = ''
+            req.on('data', (chunk) => {
+              body += chunk.toString()
+            })
+            req.on('end', () => {
+              console.log('Request body:', body)
+            })
+          }
 
           // Handle MCP protocol endpoints
           if (parsedUrl.pathname === path) {
@@ -37,31 +49,32 @@ export const create = ({ VError }) => {
               return
             }
 
-            res.end(
-              JSON.stringify({
-                jsonrpc: '2.0',
-                id: 1,
-                result: {
-                  protocolVersion: '2024-11-05',
-                  capabilities: {
-                    tools: {
-                      listChanged: true,
-                    },
-                    resources: {
-                      subscribe: true,
-                      listChanged: true,
-                    },
-                    prompts: {
-                      listChanged: true,
-                    },
+            const response = {
+              jsonrpc: '2.0',
+              id: 1,
+              result: {
+                protocolVersion: '2024-11-05',
+                capabilities: {
+                  tools: {
+                    listChanged: true,
                   },
-                  serverInfo: {
-                    name: 'mock-mcp-server',
-                    version: '1.0.0',
+                  resources: {
+                    subscribe: true,
+                    listChanged: true,
+                  },
+                  prompts: {
+                    listChanged: true,
                   },
                 },
-              }),
-            )
+                serverInfo: {
+                  name: 'mock-mcp-server',
+                  version: '1.0.0',
+                },
+              },
+            }
+            
+            console.log('Mock MCP server responding with:', JSON.stringify(response, null, 2))
+            res.end(JSON.stringify(response))
           } else {
             res.writeHead(404, { 'Content-Type': 'application/json' })
             res.end(JSON.stringify({ error: 'Not found' }))

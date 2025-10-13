@@ -7,7 +7,8 @@ export const setup = async ({ Editor, Server }: TestContext): Promise<void> => {
   await Server.start({ port: 0, path: '/mcp' })
 }
 
-export const run = async ({ QuickPick, Server }: TestContext): Promise<void> => {
+// @ts-ignore
+export const run = async ({ QuickPick, Server, page }: TestContext): Promise<void> => {
   // Step 1: Open quick pick
   await QuickPick.showCommands()
 
@@ -19,10 +20,7 @@ export const run = async ({ QuickPick, Server }: TestContext): Promise<void> => 
   console.log('Available MCP commands:', mcpCommands)
 
   // Step 4: Look for "MCP: Add Server" command
-  const addServerCommand = mcpCommands.find(cmd =>
-    cmd.toLowerCase().includes('add server') ||
-    cmd.toLowerCase().includes('mcp: add')
-  )
+  const addServerCommand = mcpCommands.find((cmd) => cmd.toLowerCase().includes('add server') || cmd.toLowerCase().includes('mcp: add'))
 
   if (!addServerCommand) {
     throw new Error('MCP: Add Server command not found')
@@ -41,9 +39,7 @@ export const run = async ({ QuickPick, Server }: TestContext): Promise<void> => 
   console.log('Commands after selecting Add Server:', currentCommands)
 
   // Step 7: Select HTTP option for our mock server
-  const httpOption = currentCommands.find(cmd =>
-    cmd.toLowerCase().includes('http') && cmd.toLowerCase().includes('server-sent events')
-  )
+  const httpOption = currentCommands.find((cmd) => cmd.toLowerCase().includes('http') && cmd.toLowerCase().includes('server-sent events'))
 
   if (!httpOption) {
     throw new Error('HTTP option not found in MCP server configuration')
@@ -63,18 +59,59 @@ export const run = async ({ QuickPick, Server }: TestContext): Promise<void> => 
   console.log(`Typed mock server URL: ${serverUrl}`)
 
   // Step 10: Press Enter to confirm the server URL
-  // This should trigger VS Code to try to connect to our mock server
   await QuickPick.pressEnter()
   console.log('Pressed Enter to confirm server URL')
 
-  // Step 11: Wait a moment for the connection attempt
-  await new Promise(resolve => setTimeout(resolve, 2000))
-
-  // Step 12: Check if the server was added successfully
-  // We could look for success messages or check the MCP server list
-  console.log('MCP server configuration completed')
+  // Step 11: Wait for the next step (server name input)
+  await new Promise((resolve) => setTimeout(resolve, 2000))
   
-  // Note: QuickPick should close automatically after pressing Enter
+  // Step 12: Check what's in the QuickPick input now
+  const currentInput = await QuickPick.getVisibleCommands()
+  console.log('Commands after URL confirmation:', currentInput)
+  
+  // Step 13: Look for the generated server name in the input
+  // VS Code should have generated a name like "my-mcp-server-679c801f"
+  const serverName = await QuickPick.getInputValue()
+  console.log(`Generated server name: ${serverName}`)
+  
+  if (serverName) {
+    // Step 14: Accept the generated server name
+    await QuickPick.pressEnter()
+    console.log('Accepted generated server name')
+    
+    // Step 15: Wait for the next step or completion
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+    
+    // Step 16: Check if there are more steps
+    const nextStepCommands = await QuickPick.getVisibleCommands()
+    console.log('Commands after server name:', nextStepCommands)
+    
+    // Step 17: Continue accepting until the process is complete
+    let stepCount = 0
+    while (stepCount < 5) { // Safety limit to prevent infinite loop
+      try {
+        const currentStepCommands = await QuickPick.getVisibleCommands()
+        if (currentStepCommands.length === 0) {
+          console.log('MCP server configuration process completed')
+          break
+        }
+        
+        // Accept the current step
+        await QuickPick.pressEnter()
+        console.log(`Completed step ${stepCount + 1}`)
+        
+        stepCount++
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+      } catch (error) {
+        console.log('Configuration process completed or error occurred:', error)
+        break
+      }
+    }
+  }
+
+  // Step 18: Wait for any final connection attempts
+  await new Promise((resolve) => setTimeout(resolve, 5000))
+  console.log('MCP server configuration process finished')
 }
 
 // Cleanup function to stop the mock server
