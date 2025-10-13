@@ -36,41 +36,41 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
     name: 'destination-folder/copied-file.txt',
     content: 'original content to be copied',
   })
-  
+
   // Verify original file still exists and copy appears in destination
   await Explorer.shouldHaveItem('file-to-copy.txt')
   await Explorer.expand('destination-folder')
   await Explorer.shouldHaveItem('copied-file.txt')
-  
+
   // Copy a file from one folder to another via file system operation
   await Workspace.add({
     name: 'destination-folder/source-file.txt',
     content: 'file copied from source folder',
   })
-  
+
   // Verify file was copied to destination
   await Explorer.refresh()
   await Explorer.shouldHaveItem('source-file.txt')
-  
+
   // Copy with different name
   await Workspace.add({
     name: 'another-folder/renamed-copy.txt',
     content: 'original content to be copied',
   })
-  
+
   // Verify the renamed copy exists
   await Explorer.collapse('destination-folder')
   await Explorer.expand('another-folder')
   await Explorer.shouldHaveItem('renamed-copy.txt')
-  
+
   // Clean up: Remove all copied files to make test idempotent
   await Workspace.remove('destination-folder/copied-file.txt')
   await Workspace.remove('destination-folder/source-file.txt')
   await Workspace.remove('another-folder/renamed-copy.txt')
-  
+
   // Refresh explorer to ensure UI updates
   await Explorer.refresh()
-  
+
   // Verify cleanup - only original files should remain
   await Explorer.collapse('destination-folder')
   await Explorer.collapse('another-folder')
