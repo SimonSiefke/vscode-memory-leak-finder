@@ -1,10 +1,11 @@
 import { createServer } from 'http'
 import { URL } from 'url'
 
-const DEFAULT_PORT = 3000
+const DEFAULT_PORT = 0
 
 export const create = ({ VError }) => {
   let mockServer: any = null
+  let serverUrl: string = ''
 
   return {
     async start({ port = DEFAULT_PORT, path = '/mcp' } = {}) {
@@ -12,8 +13,6 @@ export const create = ({ VError }) => {
         if (mockServer) {
           await this.stop()
         }
-
-        const serverUrl = `http://localhost:${port}`
 
         mockServer = createServer((req, res) => {
           const parsedUrl = new URL(req.url || '', serverUrl)
@@ -69,8 +68,11 @@ export const create = ({ VError }) => {
             if (error) {
               reject(new VError(error, `Failed to start mock server on port ${port}`))
             } else {
+              const address = mockServer.address()
+              const actualPort = address?.port || port
+              serverUrl = `http://localhost:${actualPort}`
               console.log(`Mock MCP server running on ${serverUrl}`)
-              resolve({ url: serverUrl, port })
+              resolve({ url: serverUrl, port: actualPort })
             }
           })
         })
@@ -100,10 +102,10 @@ export const create = ({ VError }) => {
     },
 
     getUrl() {
-      if (!mockServer) {
+      if (!mockServer || !serverUrl) {
         throw new VError(new Error('Server not running'), 'Cannot get URL of stopped server')
       }
-      return `http://localhost:${mockServer.address()?.port || DEFAULT_PORT}`
+      return serverUrl
     },
   }
 }

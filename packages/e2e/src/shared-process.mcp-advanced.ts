@@ -1,55 +1,13 @@
 import type { TestContext } from '../types.ts'
 
-// Mock MCP server setup
-let mockServer: any = null
-const MOCK_SERVER_PORT = 3000
-const MOCK_SERVER_URL = `http://localhost:${MOCK_SERVER_PORT}`
-
-export const setup = async ({ Editor }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Server }: TestContext): Promise<void> => {
   await Editor.closeAll()
 
-  // Start mock MCP server
-  try {
-    const { createServer } = await import('http')
-    const { URL } = await import('url')
-
-    mockServer = createServer((req, res) => {
-      const parsedUrl = new URL(req.url || '', MOCK_SERVER_URL)
-
-      // Handle MCP protocol endpoints
-      if (parsedUrl.pathname === '/mcp') {
-        res.writeHead(200, { 'Content-Type': 'application/json' })
-        res.end(JSON.stringify({
-          jsonrpc: '2.0',
-          id: 1,
-          result: {
-            protocolVersion: '2024-11-05',
-            capabilities: {
-              tools: {},
-              resources: {},
-              prompts: {}
-            },
-            serverInfo: {
-              name: 'mock-mcp-server',
-              version: '1.0.0'
-            }
-          }
-        }))
-      } else {
-        res.writeHead(404, { 'Content-Type': 'application/json' })
-        res.end(JSON.stringify({ error: 'Not found' }))
-      }
-    })
-
-    mockServer.listen(MOCK_SERVER_PORT, () => {
-      console.log(`Mock MCP server running on ${MOCK_SERVER_URL}`)
-    })
-  } catch (error) {
-    console.log('Could not start mock server:', error)
-  }
+  // Start mock MCP server using the Server page object (port 0 = OS assigns available port)
+  await Server.start({ port: 0, path: '/mcp' })
 }
 
-export const run = async ({ QuickPick }: TestContext): Promise<void> => {
+export const run = async ({ QuickPick, Server }: TestContext): Promise<void> => {
   // Step 1: Open quick pick
   await QuickPick.showCommands()
 
@@ -100,8 +58,9 @@ export const run = async ({ QuickPick }: TestContext): Promise<void> => {
   console.log('Commands after selecting HTTP:', urlCommands)
 
   // Step 9: Type the mock server URL
-  await QuickPick.type(MOCK_SERVER_URL)
-  console.log(`Typed mock server URL: ${MOCK_SERVER_URL}`)
+  const serverUrl = Server.getUrl()
+  await QuickPick.type(serverUrl)
+  console.log(`Typed mock server URL: ${serverUrl}`)
 
   // Step 10: Press Enter to confirm the server URL
   // This should trigger VS Code to try to connect to our mock server
@@ -121,9 +80,6 @@ export const run = async ({ QuickPick }: TestContext): Promise<void> => {
 }
 
 // Cleanup function to stop the mock server
-export const cleanup = async (): Promise<void> => {
-  if (mockServer) {
-    mockServer.close()
-    console.log('Mock MCP server stopped')
-  }
+export const cleanup = async ({ Server }: TestContext): Promise<void> => {
+  await Server.stop()
 }
