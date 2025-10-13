@@ -59,7 +59,7 @@ export const create = ({ expect, page, VError }) => {
         const quickPick = page.locator('.quick-input-widget')
         const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
         await expect(quickPickInput).toBeVisible()
-        return await quickPickInput.inputValue()
+        return await quickPickInput.getAttribute('value') || ''
       } catch (error) {
         throw new VError(error, `Failed to get input value`)
       }
