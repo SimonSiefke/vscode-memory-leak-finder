@@ -62,4 +62,27 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
   
   // Verify remaining file is still there
   await Explorer.shouldHaveItem('keep-this-file.txt')
+  
+  // Clean up: Restore original state to make test idempotent
+  await Workspace.add({
+    name: 'file-to-delete.txt',
+    content: 'content to be deleted',
+  })
+  await Workspace.add({
+    name: 'nested-folder/file-in-folder.txt',
+    content: 'nested content',
+  })
+  await Workspace.add({
+    name: 'nested-folder/another-file.txt',
+    content: 'another nested file',
+  })
+  await Workspace.add({
+    name: 'empty-folder/',
+    content: '',
+  })
+  
+  // Verify original state is restored
+  await Explorer.shouldHaveItem('file-to-delete.txt')
+  await Explorer.shouldHaveItem('nested-folder')
+  await Explorer.shouldHaveItem('empty-folder')
 }

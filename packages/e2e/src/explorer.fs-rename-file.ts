@@ -71,4 +71,30 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
   // Expand renamed folder and verify nested file is still there
   await Explorer.expand('renamed-folder')
   await Explorer.shouldHaveItem('renamed-nested-file.txt')
+  
+  // Clean up: Restore original state to make test idempotent
+  await Workspace.remove('renamed-folder/renamed-nested-file.txt')
+  await Workspace.add({
+    name: 'folder/nested-file.txt',
+    content: 'nested content',
+  })
+  
+  await Workspace.remove('renamed-file.txt')
+  await Workspace.add({
+    name: 'original-file.txt',
+    content: 'original content',
+  })
+  
+  await Workspace.remove('another-file.ts')
+  await Workspace.add({
+    name: 'another-file.js',
+    content: 'console.log("hello");',
+  })
+  
+  // Verify original state is restored
+  await Explorer.collapse('renamed-folder')
+  await Explorer.not.toHaveItem('renamed-folder')
+  await Explorer.shouldHaveItem('folder')
+  await Explorer.shouldHaveItem('original-file.txt')
+  await Explorer.shouldHaveItem('another-file.js')
 }

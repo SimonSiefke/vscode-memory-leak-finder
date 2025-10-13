@@ -44,4 +44,16 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
   // Verify the nested structure appears in explorer
   await Explorer.expand('sub-folder')
   await Explorer.shouldHaveItem('deep-file.txt')
+  
+  // Clean up: Remove all created files and folders to make test idempotent
+  await Workspace.remove('new-folder/sub-folder/deep-file.txt')
+  await Workspace.remove('new-folder/sub-folder/')
+  await Workspace.remove('new-folder/nested-file.txt')
+  await Workspace.remove('new-folder/')
+  
+  // Verify cleanup - only original file should remain
+  await Explorer.collapse('sub-folder')
+  await Explorer.collapse('new-folder')
+  await Explorer.not.toHaveItem('new-folder')
+  await Explorer.shouldHaveItem('existing-file.txt')
 }
