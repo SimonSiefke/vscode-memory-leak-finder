@@ -423,13 +423,11 @@ export interface Workspace {
 export interface ServerInfo {
   readonly url: string
   readonly port: number
+  readonly dispose: () => Promise<void>
 }
 
 export interface Server {
   start(options?: { port?: number; requestHandler?: (req: any, res: any) => void }): Promise<ServerInfo>
-  stop(): Promise<void>
-  isRunning(): Promise<boolean>
-  getUrl(): string
 }
 
 export interface PageObjectApi {

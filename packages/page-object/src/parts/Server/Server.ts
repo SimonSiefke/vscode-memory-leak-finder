@@ -5,19 +5,16 @@ const DEFAULT_PORT = 0
 interface ServerInfo {
   readonly url: string
   readonly port: number
+  readonly dispose: () => Promise<void>
 }
 
 export const create = ({ VError }) => {
-  let mockServer: any = null
-  let serverUrl: string = ''
-
   return {
     async start({ port = DEFAULT_PORT, requestHandler } = {} as { port?: number; requestHandler?: (req: any, res: any) => void }): Promise<ServerInfo> {
-      try {
-        if (mockServer) {
-          await this.stop()
-        }
+      let mockServer: any = null
+      let serverUrl: string = ''
 
+      try {
         mockServer = createServer(requestHandler)
 
         const { promise, resolve, reject } = Promise.withResolvers<ServerInfo>()
@@ -29,7 +26,26 @@ export const create = ({ VError }) => {
             const address = mockServer.address()
             const actualPort = address?.port || port
             serverUrl = `http://localhost:${actualPort}`
-            resolve({ url: serverUrl, port: actualPort })
+            
+            const dispose = async (): Promise<void> => {
+              if (mockServer) {
+                const { promise: disposePromise, resolve: disposeResolve } = Promise.withResolvers<void>()
+                
+                mockServer.close(() => {
+                  mockServer = null
+                  serverUrl = ''
+                  disposeResolve()
+                })
+                
+                return disposePromise
+              }
+            }
+            
+            resolve({ 
+              url: serverUrl, 
+              port: actualPort,
+              dispose
+            })
           }
         })
 
@@ -37,35 +53,6 @@ export const create = ({ VError }) => {
       } catch (error) {
         throw new VError(error, `Failed to start mock server`)
       }
-    },
-
-    async stop() {
-      try {
-        if (mockServer) {
-          const { promise, resolve } = Promise.withResolvers<void>()
-
-          mockServer.close(() => {
-            mockServer = null
-            serverUrl = ''
-            resolve()
-          })
-
-          return promise
-        }
-      } catch (error) {
-        throw new VError(error, `Failed to stop mock server`)
-      }
-    },
-
-    async isRunning() {
-      return mockServer !== null
-    },
-
-    getUrl() {
-      if (!mockServer || !serverUrl) {
-        throw new VError(new Error('Server not running'), 'Cannot get URL of stopped server')
-      }
-      return serverUrl
     },
   }
 }
