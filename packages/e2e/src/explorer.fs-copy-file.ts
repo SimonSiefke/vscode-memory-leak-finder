@@ -105,6 +105,9 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
   await Workspace.remove('another-folder/copied-source-folder/')
   await Workspace.remove('another-folder/renamed-copy.txt')
   
+  // Refresh explorer to ensure UI updates
+  await Explorer.refresh()
+  
   // Verify cleanup - only original files should remain
   await Explorer.collapse('destination-folder')
   await Explorer.collapse('another-folder')

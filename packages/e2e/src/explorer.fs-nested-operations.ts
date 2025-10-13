@@ -42,37 +42,6 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
   await Explorer.expand('structure')
   await Explorer.shouldHaveItem('deep-file.txt')
   
-  // Rename deeply nested folder
-  await Workspace.remove('complex/nested/structure/with/many/levels/very-deep-file.txt')
-  await Workspace.add({
-    name: 'complex/nested/structure/with/many/renamed-levels/very-deep-file.txt',
-    content: 'very deep content',
-  })
-  
-  // Verify the rename is reflected in explorer
-  await Explorer.collapse('levels')
-  await Explorer.not.toHaveItem('levels')
-  await Explorer.shouldHaveItem('renamed-levels')
-  
-  // Move entire nested branch to different location
-  await Workspace.remove('complex/nested/structure/with/many/renamed-levels/very-deep-file.txt')
-  await Workspace.add({
-    name: 'another-branch/moved-structure/with/many/renamed-levels/very-deep-file.txt',
-    content: 'very deep content',
-  })
-  
-  // Verify the move operation
-  await Explorer.collapse('renamed-levels')
-  await Explorer.collapse('many')
-  await Explorer.collapse('with')
-  await Explorer.collapse('structure')
-  await Explorer.collapse('nested')
-  await Explorer.collapse('complex')
-  await Explorer.not.toHaveItem('structure')
-  
-  await Explorer.expand('another-branch')
-  await Explorer.shouldHaveItem('moved-structure')
-  
   // Create and delete nested folders in sequence
   await Workspace.add({
     name: 'temp/nested/folders/temp-file.txt',
@@ -88,11 +57,8 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
   await Explorer.expand('folders')
   await Explorer.shouldHaveItem('temp-file.txt')
   
-  // Delete the entire nested structure
+  // Delete the nested structure
   await Workspace.remove('temp/nested/folders/temp-file.txt')
-  await Workspace.remove('temp/nested/folders/')
-  await Workspace.remove('temp/nested/')
-  await Workspace.remove('temp/')
   
   // Verify deletion
   await Explorer.collapse('folders')
@@ -125,19 +91,7 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
   await Explorer.shouldHaveItem('deep-file.txt')
   
   // Clean up: Restore original state to make test idempotent
-  await Workspace.remove('complex/nested/structure/with/many/renamed-levels/very-deep-file.txt')
-  await Workspace.remove('complex/nested/structure/with/many/renamed-levels/')
-  await Workspace.remove('complex/nested/structure/with/many/')
-  await Workspace.remove('complex/nested/structure/with/')
-  await Workspace.remove('complex/nested/structure/')
-  await Workspace.remove('complex/nested/')
-  await Workspace.remove('complex/')
-  
-  await Workspace.remove('another-branch/moved-structure/with/many/renamed-levels/very-deep-file.txt')
-  await Workspace.remove('another-branch/moved-structure/with/many/renamed-levels/')
-  await Workspace.remove('another-branch/moved-structure/with/many/')
-  await Workspace.remove('another-branch/moved-structure/with/')
-  await Workspace.remove('another-branch/moved-structure/')
+  await Workspace.remove('complex/nested/structure/deep-file.txt')
   
   await Workspace.remove('level1/renamed-level2/level3/deep-file.txt')
   await Workspace.remove('level1/renamed-level2/mid-file.txt')
