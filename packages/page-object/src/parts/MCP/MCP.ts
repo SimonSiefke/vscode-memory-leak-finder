@@ -319,5 +319,78 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to remove MCP server "${serverName}"`)
       }
     },
+
+    async removeAllServers() {
+      try {
+        // Open QuickPick and search for MCP list commands
+        await page.waitForIdle()
+        const quickPick = page.locator('.quick-input-widget')
+        await page.pressKeyExponential({
+          key: KeyBindings.OpenQuickPickCommands,
+          waitFor: quickPick,
+        })
+        await expect(quickPick).toBeVisible({ timeout: 10_000 })
+
+        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
+        await expect(quickPickInput).toBeVisible()
+        await expect(quickPickInput).toBeFocused()
+
+        // Type "mcp" to find MCP commands
+        await quickPickInput.type('mcp')
+
+        // Look for "MCP: List Servers" command
+        const mcpCommands = await this.getVisibleCommands()
+        const listServersCommand = mcpCommands.find(
+          (cmd: string) => cmd.toLowerCase().includes('list servers') || cmd.toLowerCase().includes('mcp: list'),
+        )
+
+        if (!listServersCommand) {
+          throw new VError(new Error('MCP: List Servers command not found'), 'MCP List Servers command not available')
+        }
+
+        await this.selectCommand(listServersCommand, true)
+
+        await new Promise((resolve) => setTimeout(resolve, 2000))
+
+        // Get all visible server commands and remove them one by one
+        let serverCommands = await this.getVisibleCommands()
+        
+        while (serverCommands.length > 0) {
+          // Find the first server command (skip any non-server items)
+          const serverToRemove = serverCommands.find((cmd: string) => 
+            !cmd.toLowerCase().includes('list servers') && 
+            !cmd.toLowerCase().includes('mcp: list') &&
+            cmd.trim().length > 0
+          )
+
+          if (!serverToRemove) {
+            break
+          }
+
+          const serverElement = quickPick.locator('.monaco-list-row .label-name', {
+            hasExactText: serverToRemove,
+          })
+          await serverElement.click({ button: 'right' })
+
+          await new Promise((resolve) => setTimeout(resolve, 1000))
+
+          const contextCommands = await this.getVisibleCommands()
+          const removeCommand = contextCommands.find(
+            (cmd: string) =>
+              cmd.toLowerCase().includes('remove') || cmd.toLowerCase().includes('delete') || cmd.toLowerCase().includes('uninstall'),
+          )
+
+          if (removeCommand) {
+            await this.selectCommand(removeCommand)
+            await new Promise((resolve) => setTimeout(resolve, 2000))
+          }
+
+          // Refresh the list of server commands
+          serverCommands = await this.getVisibleCommands()
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to remove all MCP servers`)
+      }
+    },
   }
 }

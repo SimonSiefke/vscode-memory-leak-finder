@@ -198,7 +198,7 @@ export interface KeyBindingsEditor {
   setKeyBinding(commandName: any, keyBinding: any): Promise<void>
 }
 export interface MCP {
-  createMCPServer(options?: { path?: string }): (req: any, res: any) => void
+  createMCPServer(): Promise<any>
   addServer(options: { serverUrl: string; serverName?: string }): Promise<void>
   removeServer(serverName: string): Promise<void>
   removeAllServers(): Promise<void>
