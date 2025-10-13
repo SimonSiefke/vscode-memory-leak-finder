@@ -36,7 +36,7 @@ const getNewItems = (map1: UniqueLocationMap, map2: UniqueLocationMap, minCount:
     const oldItem = map1[key] || emptyItem
     const newItem = map2[key]
     const delta = newItem.count - oldItem.count
-    if (delta > 0 && newItem.count >= minCount) {
+    if (delta >= minCount) {
       newitems.push({ ...newItem, delta })
     }
   }
