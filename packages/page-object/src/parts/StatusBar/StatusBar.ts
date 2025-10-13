@@ -21,9 +21,12 @@ export const create = ({ page, VError, expect }) => {
         await item.click({
           button: 'right',
         })
+        await page.waitForIdle()
         const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
         await expect(contextMenu).toBeVisible()
+        await page.waitForIdle()
         await expect(contextMenu).toBeFocused()
+        await page.waitForIdle()
         const contextMenuItem = contextMenu
           .locator('.action-item', {
             hasText: "Hide 'Problems'",
@@ -33,7 +36,7 @@ export const create = ({ page, VError, expect }) => {
         await page.waitForIdle()
         await contextMenuItem.click({ force: true })
         await page.waitForIdle()
-        await expect(contextMenu).toBeHidden()
+        await expect(contextMenu).toBeHidden({ timeout: 10_000 })
         await expect(item).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to hide status bar item "${id}"`)
