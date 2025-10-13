@@ -197,6 +197,14 @@ export interface KeyBindingsEditor {
   searchFor(searchValue: any): Promise<void>
   setKeyBinding(commandName: any, keyBinding: any): Promise<void>
 }
+export interface MCP {
+  addServer(options: { serverUrl: string; serverName?: string }): Promise<void>
+  getVisibleCommands(): Promise<string[]>
+  selectCommand(text: string, stayVisible?: boolean): Promise<void>
+  getInputValue(): Promise<string>
+  listServers(): Promise<void>
+  openConfiguration(): Promise<void>
+}
 export interface MarkdownPreview {
   shouldHaveHeading(id: any): Promise<void>
   shouldBeVisible(): Promise<void>
@@ -439,6 +447,7 @@ export interface PageObjectApi {
   readonly Extensions: Extensions
   readonly Hover: Hover
   readonly KeyBindingsEditor: KeyBindingsEditor
+  readonly MCP: MCP
   readonly MarkdownPreview: MarkdownPreview
   readonly Notebook: Notebook
   readonly Notification: Notification
