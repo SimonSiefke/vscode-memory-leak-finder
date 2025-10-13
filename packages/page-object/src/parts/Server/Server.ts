@@ -4,8 +4,8 @@ import { URL } from 'url'
 const DEFAULT_PORT = 0
 
 interface ServerInfo {
-  url: string
-  port: number
+  readonly url: string
+  readonly port: number
 }
 
 export const create = ({ VError }) => {

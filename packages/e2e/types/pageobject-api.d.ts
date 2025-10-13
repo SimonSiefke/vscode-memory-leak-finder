@@ -409,8 +409,8 @@ export interface Workspace {
   getWorkspaceFilePath(name: string): Promise<any>
 }
 export interface ServerInfo {
-  url: string
-  port: number
+  readonly url: string
+  readonly port: number
 }
 
 export interface Server {
