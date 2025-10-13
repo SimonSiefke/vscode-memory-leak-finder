@@ -168,6 +168,7 @@ export const create = ({ expect, page, VError }) => {
         for (let i = 0; i < count; i++) {
           const text = await commandElements.nth(i).textContent()
           if (text) {
+            // @ts-ignore
             commands.push(text)
           }
         }
