@@ -63,25 +63,25 @@ export const run = async ({ QuickPick, Server }: TestContext): Promise<void> => 
 
   // Step 11: Wait for the next step or completion
   await new Promise((resolve) => setTimeout(resolve, 3000))
-  
+
   // Step 12: Check if QuickPick is still open
   try {
     const currentInput = await QuickPick.getVisibleCommands()
     console.log('Commands after URL confirmation:', currentInput)
-    
+
     if (currentInput.length > 0) {
       // Step 13: Look for the generated server name in the input
       const serverName = await QuickPick.getInputValue()
       console.log(`Generated server name: ${serverName}`)
-      
+
       if (serverName) {
         // Step 14: Accept the generated server name
         await QuickPick.pressEnter()
         console.log('Accepted generated server name')
-        
+
         // Step 15: Wait for the next step or completion
         await new Promise((resolve) => setTimeout(resolve, 2000))
-        
+
         // Step 16: Continue accepting until the process is complete
         let stepCount = 0
         while (stepCount < 5) { // Safety limit to prevent infinite loop
@@ -91,11 +91,11 @@ export const run = async ({ QuickPick, Server }: TestContext): Promise<void> => 
               console.log('MCP server configuration process completed')
               break
             }
-            
+
             // Accept the current step
             await QuickPick.pressEnter()
             console.log(`Completed step ${stepCount + 1}`)
-            
+
             stepCount++
             await new Promise((resolve) => setTimeout(resolve, 1000))
           } catch (error) {

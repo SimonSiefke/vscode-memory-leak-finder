@@ -21,7 +21,7 @@ export const create = ({ VError }) => {
 
         mockServer = createServer((req, res) => {
           const parsedUrl = new URL(req.url || '', serverUrl)
-          
+
           // Log all incoming requests
           console.log(`Mock MCP server received ${req.method} request to ${parsedUrl.pathname}`)
           if (req.method === 'POST') {
@@ -72,7 +72,7 @@ export const create = ({ VError }) => {
                 },
               },
             }
-            
+
             console.log('Mock MCP server responding with:', JSON.stringify(response, null, 2))
             res.end(JSON.stringify(response))
           } else {
