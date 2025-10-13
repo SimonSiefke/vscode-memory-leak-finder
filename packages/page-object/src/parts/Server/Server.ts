@@ -10,12 +10,12 @@ interface ServerInfo {
 
 export const create = ({ VError }) => {
   return {
-    async start({ port = DEFAULT_PORT, requestHandler } = {} as { port?: number; requestHandler?: (req: any, res: any) => void }): Promise<ServerInfo> {
-      let mockServer: any = null
-      let serverUrl: string = ''
-
+    async start(
+      { port = DEFAULT_PORT, requestHandler } = {} as { port?: number; requestHandler?: (req: any, res: any) => void },
+    ): Promise<ServerInfo> {
       try {
-        mockServer = createServer(requestHandler)
+        let serverUrl: string = ''
+        const mockServer = createServer(requestHandler)
 
         const { promise, resolve, reject } = Promise.withResolvers<ServerInfo>()
 
@@ -26,25 +26,25 @@ export const create = ({ VError }) => {
             const address = mockServer.address()
             const actualPort = address?.port || port
             serverUrl = `http://localhost:${actualPort}`
-            
+
             const dispose = async (): Promise<void> => {
               if (mockServer) {
                 const { promise: disposePromise, resolve: disposeResolve } = Promise.withResolvers<void>()
-                
+
                 mockServer.close(() => {
                   mockServer = null
                   serverUrl = ''
                   disposeResolve()
                 })
-                
+
                 return disposePromise
               }
             }
-            
-            resolve({ 
-              url: serverUrl, 
+
+            resolve({
+              url: serverUrl,
               port: actualPort,
-              dispose
+              dispose,
             })
           }
         })
