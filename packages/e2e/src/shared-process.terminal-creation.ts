@@ -1,8 +1,7 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ Editor, Terminal, Panel, Panel }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Terminal, Panel }: TestContext): Promise<void> => {
   await Editor.closeAll()
-  await Panel.hide()
   await Panel.hide()
   await Terminal.killAll()
   await Terminal.show()

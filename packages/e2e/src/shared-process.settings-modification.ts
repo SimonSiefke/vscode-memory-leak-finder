@@ -6,7 +6,7 @@ export const setup = async ({ Editor, SettingsEditor }: TestContext): Promise<vo
   await SettingsEditor.clear()
 }
 
-export const run = async ({ SettingsEditor, Editor }: TestContext): Promise<void> => {
+export const run = async ({ SettingsEditor }: TestContext): Promise<void> => {
   // Open settings (triggers shared-process communication)
   await SettingsEditor.open()
 

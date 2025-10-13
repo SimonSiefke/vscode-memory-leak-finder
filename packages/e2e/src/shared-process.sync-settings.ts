@@ -1,12 +1,12 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ Editor, SettingsEditor, QuickPick }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, SettingsEditor }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await SettingsEditor.open()
   await SettingsEditor.clear()
 }
 
-export const run = async ({ SettingsEditor, QuickPick, Editor }: TestContext): Promise<void> => {
+export const run = async ({ SettingsEditor, QuickPick }: TestContext): Promise<void> => {
   // Test sync-related settings (affects shared-process)
   await SettingsEditor.open()
   await SettingsEditor.search({ value: 'editor.wordWrap', resultCount: 5 })

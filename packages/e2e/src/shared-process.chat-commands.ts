@@ -1,11 +1,11 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ Editor, QuickPick }: TestContext): Promise<void> => {
+export const setup = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.closeAll()
   // Don't try to close quick pick if it's not open
 }
 
-export const run = async ({ QuickPick, Editor }: TestContext): Promise<void> => {
+export const run = async ({ QuickPick }: TestContext): Promise<void> => {
   // Test chat-related commands
   await QuickPick.showCommands()
   await QuickPick.type('chat')

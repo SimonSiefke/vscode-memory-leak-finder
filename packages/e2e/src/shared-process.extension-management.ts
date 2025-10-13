@@ -5,7 +5,7 @@ export const setup = async ({ Editor, Extensions }: TestContext): Promise<void> 
   await Extensions.show()
 }
 
-export const run = async ({ Extensions, Editor }: TestContext): Promise<void> => {
+export const run = async ({ Extensions }: TestContext): Promise<void> => {
   // Open extensions view (triggers shared-process communication)
   await Extensions.show()
 

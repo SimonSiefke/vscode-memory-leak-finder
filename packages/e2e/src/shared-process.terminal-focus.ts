@@ -7,7 +7,7 @@ export const setup = async ({ Editor, Terminal, Panel }: TestContext): Promise<v
   await Terminal.show()
 }
 
-export const run = async ({ Terminal, Editor }: TestContext): Promise<void> => {
+export const run = async ({ Terminal }: TestContext): Promise<void> => {
   // Test terminal focus switching (affects process management in shared-process)
   await Terminal.show()
   await Terminal.execute('echo "terminal 1 - shared process test"')
