@@ -19,6 +19,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async startDebuggingExtensionHost() {
       try {
+        await page.waitForIdle()
         const actionLabel = page.locator('.action-label[aria-label="Start Debugging Extension Host"]')
         await expect(actionLabel).toBeVisible()
         await actionLabel.click()
