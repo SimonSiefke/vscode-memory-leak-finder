@@ -1,10 +1,12 @@
 import * as KeyBindings from '../KeyBindings/KeyBindings.ts'
+import * as Server from '../Server/Server.ts'
 import { URL } from 'url'
 
 export const create = ({ expect, page, VError }) => {
   return {
     createMCPServer({ path = '/mcp' } = {}) {
-      return (req, res) => {
+      const server = Server.create({ VError })
+      const requestHandler = (req, res) => {
         const parsedUrl = new URL(req.url || '', 'http://localhost')
 
         if (parsedUrl.pathname === path) {
@@ -50,6 +52,11 @@ export const create = ({ expect, page, VError }) => {
           res.end(JSON.stringify({ error: 'Not found' }))
         }
       }
+      const instance = server.start({
+        port: 0,
+        requestHandler,
+      })
+      return instance
     },
     async addServer({ serverUrl, serverName }: { serverUrl: string; serverName?: string }) {
       try {
@@ -72,9 +79,8 @@ export const create = ({ expect, page, VError }) => {
         const mcpCommands = await this.getVisibleCommands()
 
         // Step 4: Look for "MCP: Add Server" command
-        const addServerCommand = mcpCommands.find((cmd: string) =>
-          cmd.toLowerCase().includes('add server') ||
-          cmd.toLowerCase().includes('mcp: add')
+        const addServerCommand = mcpCommands.find(
+          (cmd: string) => cmd.toLowerCase().includes('add server') || cmd.toLowerCase().includes('mcp: add'),
         )
 
         if (!addServerCommand) {
@@ -86,9 +92,8 @@ export const create = ({ expect, page, VError }) => {
         const serverTypeCommands = await this.getVisibleCommands()
 
         // Step 7: Select HTTP option for our mock server
-        const httpOption = serverTypeCommands.find((cmd: string) =>
-          cmd.toLowerCase().includes('http') &&
-          cmd.toLowerCase().includes('server-sent events')
+        const httpOption = serverTypeCommands.find(
+          (cmd: string) => cmd.toLowerCase().includes('http') && cmd.toLowerCase().includes('server-sent events'),
         )
 
         if (!httpOption) {
@@ -137,7 +142,6 @@ export const create = ({ expect, page, VError }) => {
         }
 
         await new Promise((resolve) => setTimeout(resolve, 5000))
-
       } catch (error) {
         throw new VError(error, `Failed to add MCP server`)
       }
@@ -183,7 +187,7 @@ export const create = ({ expect, page, VError }) => {
         const quickPick = page.locator('.quick-input-widget')
         const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
         await expect(quickPickInput).toBeVisible()
-        return await quickPickInput.getAttribute('value') || ''
+        return (await quickPickInput.getAttribute('value')) || ''
       } catch (error) {
         throw new VError(error, `Failed to get input value`)
       }
@@ -209,9 +213,8 @@ export const create = ({ expect, page, VError }) => {
 
         // Look for "MCP: List Servers" command
         const mcpCommands = await this.getVisibleCommands()
-        const listServersCommand = mcpCommands.find((cmd: string) =>
-          cmd.toLowerCase().includes('list servers') ||
-          cmd.toLowerCase().includes('mcp: list')
+        const listServersCommand = mcpCommands.find(
+          (cmd: string) => cmd.toLowerCase().includes('list servers') || cmd.toLowerCase().includes('mcp: list'),
         )
 
         if (!listServersCommand) {
@@ -219,7 +222,6 @@ export const create = ({ expect, page, VError }) => {
         }
 
         await this.selectCommand(listServersCommand, true)
-
       } catch (error) {
         throw new VError(error, `Failed to list MCP servers`)
       }
@@ -245,9 +247,8 @@ export const create = ({ expect, page, VError }) => {
 
         // Look for MCP configuration commands
         const mcpCommands = await this.getVisibleCommands()
-        const configCommand = mcpCommands.find((cmd: string) =>
-          cmd.toLowerCase().includes('open') &&
-          cmd.toLowerCase().includes('configuration')
+        const configCommand = mcpCommands.find(
+          (cmd: string) => cmd.toLowerCase().includes('open') && cmd.toLowerCase().includes('configuration'),
         )
 
         if (!configCommand) {
@@ -255,7 +256,6 @@ export const create = ({ expect, page, VError }) => {
         }
 
         await this.selectCommand(configCommand, true)
-
       } catch (error) {
         throw new VError(error, `Failed to open MCP configuration`)
       }
@@ -281,9 +281,8 @@ export const create = ({ expect, page, VError }) => {
 
         // Look for "MCP: List Servers" command
         const mcpCommands = await this.getVisibleCommands()
-        const listServersCommand = mcpCommands.find((cmd: string) =>
-          cmd.toLowerCase().includes('list servers') ||
-          cmd.toLowerCase().includes('mcp: list')
+        const listServersCommand = mcpCommands.find(
+          (cmd: string) => cmd.toLowerCase().includes('list servers') || cmd.toLowerCase().includes('mcp: list'),
         )
 
         if (!listServersCommand) {
@@ -295,9 +294,7 @@ export const create = ({ expect, page, VError }) => {
         await new Promise((resolve) => setTimeout(resolve, 2000))
 
         const serverCommands = await this.getVisibleCommands()
-        const serverToRemove = serverCommands.find((cmd: string) =>
-          cmd.toLowerCase().includes(serverName.toLowerCase())
-        )
+        const serverToRemove = serverCommands.find((cmd: string) => cmd.toLowerCase().includes(serverName.toLowerCase()))
 
         if (serverToRemove) {
           const serverElement = quickPick.locator('.monaco-list-row .label-name', {
@@ -308,20 +305,18 @@ export const create = ({ expect, page, VError }) => {
           await new Promise((resolve) => setTimeout(resolve, 1000))
 
           const contextCommands = await this.getVisibleCommands()
-          const removeCommand = contextCommands.find((cmd: string) =>
-            cmd.toLowerCase().includes('remove') ||
-            cmd.toLowerCase().includes('delete') ||
-            cmd.toLowerCase().includes('uninstall')
+          const removeCommand = contextCommands.find(
+            (cmd: string) =>
+              cmd.toLowerCase().includes('remove') || cmd.toLowerCase().includes('delete') || cmd.toLowerCase().includes('uninstall'),
           )
 
           if (removeCommand) {
             await this.selectCommand(removeCommand)
           }
         }
-
       } catch (error) {
         throw new VError(error, `Failed to remove MCP server "${serverName}"`)
       }
-    }
+    },
   }
 }
