@@ -8,7 +8,7 @@ test('getHandleTestPassedMessage - skip leak case', () => {
     'app.test.js',
     100,
     true, // isLeak
-    true  // wasOriginallySkipped
+    true, // wasOriginallySkipped
   )
   expect(result).toContain('SKIP (LEAK)')
 })
@@ -20,7 +20,7 @@ test('getHandleTestPassedMessage - skip pass case', () => {
     'app.test.js',
     100,
     false, // isLeak
-    true   // wasOriginallySkipped
+    true, // wasOriginallySkipped
   )
   expect(result).toContain('SKIP (PASS)')
 })
@@ -31,8 +31,8 @@ test('getHandleTestPassedMessage - leak case', () => {
     '/test',
     'app.test.js',
     100,
-    true,  // isLeak
-    false  // wasOriginallySkipped
+    true, // isLeak
+    false, // wasOriginallySkipped
   )
   expect(result).toContain('LEAK')
 })
@@ -44,7 +44,7 @@ test('getHandleTestPassedMessage - pass case', () => {
     'app.test.js',
     100,
     false, // isLeak
-    false  // wasOriginallySkipped
+    false, // wasOriginallySkipped
   )
   expect(result).toContain('PASS')
 })
