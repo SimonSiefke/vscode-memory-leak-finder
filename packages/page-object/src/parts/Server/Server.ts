@@ -10,40 +10,44 @@ interface ServerInfo {
 
 export const create = ({ VError }) => {
   return {
-    async start({ port = DEFAULT_PORT, requestHandler } = {} as { port?: number; requestHandler?: (req: any, res: any) => void }): Promise<ServerInfo> {
-      let mockServer: any = null
-      let serverUrl: string = ''
-
+    async start(
+      { port = DEFAULT_PORT, requestHandler } = {} as { port: number; requestHandler?: (req: any, res: any) => void },
+    ): Promise<ServerInfo> {
       try {
-        mockServer = createServer(requestHandler)
+        let serverUrl: string = ''
+        const mockServer = createServer(requestHandler)
 
-        const { promise, resolve } = Promise.withResolvers<ServerInfo>()
+        const { promise, resolve } = Promise.withResolvers<Error | undefined>()
 
-        mockServer.listen(port, () => {
-          const address = mockServer.address()
-          const actualPort = typeof address === 'object' && address?.port ? address.port : port
-          serverUrl = `http://localhost:${actualPort}`
+        mockServer.listen(port, (error) => resolve(error))
 
-          const dispose = async (): Promise<void> => {
-            if (mockServer) {
-              const { promise: disposePromise, resolve: disposeResolve } = Promise.withResolvers<void>()
+        const error = await promise
+        if (error) {
+          throw new Error(`Failed to start mock server on port ${port}`)
+        }
+        const address = mockServer.address()
+        const actualPort = address?.port || port
+        serverUrl = `http://localhost:${actualPort}`
 
-              mockServer.close(() => {
-                disposeResolve()
-              })
+        const dispose = async (): Promise<void> => {
+          if (mockServer) {
+            const { promise: disposePromise, resolve: disposeResolve } = Promise.withResolvers<void>()
 
-              return disposePromise
-            }
+            mockServer.close(() => {
+              mockServer = null
+              serverUrl = ''
+              disposeResolve()
+            })
+
+            return disposePromise
           }
+        }
 
-          resolve({
-            url: serverUrl,
-            port: actualPort,
-            dispose
-          })
-        })
-
-        return promise
+        return {
+          url: serverUrl,
+          port: actualPort,
+          dispose,
+        }
       } catch (error) {
         throw new VError(error, `Failed to start mock server`)
       }
