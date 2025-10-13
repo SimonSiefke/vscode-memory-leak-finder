@@ -2,6 +2,8 @@ export const Pass: string = ' PASS '
 
 export const SkipPass: string = ' SKIP (PASS) '
 
+export const SkipLeak: string = ' SKIP (LEAK) '
+
 export const Leak: string = ' LEAK '
 
 export const Runs: string = ' RUNS '
