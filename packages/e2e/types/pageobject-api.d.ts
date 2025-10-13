@@ -248,6 +248,8 @@ export interface QuickPick {
   focusNext(): Promise<void>
   focusPrevious(): Promise<void>
   hide(): Promise<void>
+  close(): Promise<void>
+  getVisibleCommands(): Promise<string[]>
 }
 export interface References {
   shouldBeVisible(): Promise<void>
@@ -364,6 +366,10 @@ export interface Terminal {
   killFirst(): Promise<void>
   execute(command: any): Promise<void>
   clear(): Promise<void>
+  focusFirst(): Promise<void>
+  focusSecond(): Promise<void>
+  killThird(): Promise<void>
+  shouldNotHaveActiveTerminals(): Promise<void>
 }
 export interface TitleBar {
   showMenu(text: any): Promise<void>

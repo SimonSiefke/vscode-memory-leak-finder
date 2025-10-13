@@ -130,5 +130,22 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to hide quick pick`)
       }
     },
+    async close() {
+      try {
+        await this.hide()
+      } catch (error) {
+        throw new VError(error, `Failed to close quick pick`)
+      }
+    },
+    async getVisibleCommands() {
+      try {
+        const quickPick = page.locator('.quick-input-widget')
+        await expect(quickPick).toBeVisible()
+        const commands = await quickPick.locator('.monaco-list-row .label-name').allTextContents()
+        return commands
+      } catch (error) {
+        throw new VError(error, `Failed to get visible commands`)
+      }
+    },
   }
 }
