@@ -84,3 +84,4 @@ export const run = async ({ CommandPalette, Editor }: TestContext): Promise<void
   await CommandPalette.type('help')
   await CommandPalette.close()
 }
+

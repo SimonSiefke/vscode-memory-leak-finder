@@ -51,3 +51,4 @@ export const run = async ({ Terminal, Editor }: TestContext): Promise<void> => {
   await Terminal.execute('echo "Clean terminal after shared process operations"')
   await Terminal.killAll()
 }
+
