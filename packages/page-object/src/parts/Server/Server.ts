@@ -3,12 +3,17 @@ import { URL } from 'url'
 
 const DEFAULT_PORT = 0
 
+interface ServerInfo {
+  url: string
+  port: number
+}
+
 export const create = ({ VError }) => {
   let mockServer: any = null
   let serverUrl: string = ''
 
   return {
-    async start({ port = DEFAULT_PORT, path = '/mcp' } = {}) {
+    async start({ port = DEFAULT_PORT, path = '/mcp' } = {}): Promise<ServerInfo> {
       try {
         if (mockServer) {
           await this.stop()
@@ -63,7 +68,7 @@ export const create = ({ VError }) => {
           }
         })
 
-        const { promise, resolve, reject } = Promise.withResolvers<{ url: string; port: number }>()
+        const { promise, resolve, reject } = Promise.withResolvers<ServerInfo>()
 
         mockServer.listen(port, (error) => {
           if (error) {

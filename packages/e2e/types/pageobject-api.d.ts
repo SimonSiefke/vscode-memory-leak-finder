@@ -408,8 +408,13 @@ export interface Workspace {
   remove(file: any): Promise<void>
   getWorkspaceFilePath(name: string): Promise<any>
 }
+export interface ServerInfo {
+  url: string
+  port: number
+}
+
 export interface Server {
-  start(options?: { port?: number; path?: string }): Promise<{ url: string; port: number }>
+  start(options?: { port?: number; path?: string }): Promise<ServerInfo>
   stop(): Promise<void>
   isRunning(): Promise<boolean>
   getUrl(): string
