@@ -4,7 +4,7 @@ export const setup = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.closeAll()
 }
 
-export const run = async ({ MCP, Server }: TestContext): Promise<void> => {
+export const run = async ({ MCP }: TestContext): Promise<void> => {
   const serverName = 'my-advanced-mcp-server'
   const server = await MCP.createMCPServer()
   await MCP.addServer({
