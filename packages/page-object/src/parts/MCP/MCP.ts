@@ -103,10 +103,13 @@ export const create = ({ expect, page, VError }) => {
 
         await this.selectCommand(httpOption, true)
 
-        await expect(quickPickInput).toHaveAttribute('aria-label', `Unique identifier for this server - Enter Server ID`)
+        await expect(quickPickInput).toHaveAttribute('aria-label', `URL of the MCP server (e.g., http://localhost:3000) - Enter Server URL`)
 
         await quickPickInput.type(serverUrl)
+        await quickPickInput.press('Enter')
 
+        await expect(quickPickInput).toHaveAttribute('aria-label', `Unique identifier for this server - Enter Server ID`)
+        await quickPickInput.type(serverName)
         await quickPickInput.press('Enter')
 
         await expect(quickPickInput).toHaveAttribute('aria-label', `Choose where to install the MCP server`)
