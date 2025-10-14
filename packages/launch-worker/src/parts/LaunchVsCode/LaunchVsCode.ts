@@ -37,6 +37,15 @@ export const launchVsCode = async ({
     }
     await RemoveVscodeBackups.removeVscodeBackups()
     const runtimeDir = GetVscodeRuntimeDir.getVscodeRuntimeDir()
+    if (runtimeDir) {
+      await mkdir(runtimeDir, { recursive: true })
+    }
+    const sourceMapDir = join(Root.root, '.vscode-source-maps')
+    await mkdir(sourceMapDir, { recursive: true })
+    const sourceMapCacheDir = join(Root.root, '.vscode-resolve-source-map-cache')
+    await mkdir(sourceMapCacheDir, { recursive: true })
+    const sourcesDir = join(Root.root, '.vscode-sources')
+    await mkdir(sourcesDir, { recursive: true })
     const binaryPath = await GetBinaryPath.getBinaryPath(vscodeVersion, vscodePath, commit)
     const userDataDir = GetUserDataDir.getUserDataDir()
     const extensionsDir = GetExtensionsDir.getExtensionsDir()

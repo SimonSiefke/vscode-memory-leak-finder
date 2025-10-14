@@ -43,23 +43,4 @@ RUN apt-get install -y \
   libxtst6 \
   xauth
 
-ENV NVM_VERSION v0.35.3
-ENV NODE_VERSION v22.19.0
-
-
-# Replace shell with bash so we can source files
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-
-# Install NVM
-RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/${NVM_VERSION}/install.sh | bash
-
-# Install NODE
-RUN source ~/.nvm/nvm.sh; \
-    nvm install $NODE_VERSION; \
-    nvm use --delete-prefix $NODE_VERSION;
-
-RUN echo 'export NVM_DIR="$HOME/.nvm"' >> "$HOME/.zshrc"
-RUN echo '\n' >> "$HOME/.zshrc"
-RUN echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> "$HOME/.zshrc"
-
 COPY . .
