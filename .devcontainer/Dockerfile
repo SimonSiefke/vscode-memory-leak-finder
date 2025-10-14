@@ -58,8 +58,6 @@ RUN source ~/.nvm/nvm.sh; \
     nvm install $NODE_VERSION; \
     nvm use --delete-prefix $NODE_VERSION;
 
-WORKDIR /home/
-
 COPY . .
 
 RUN bash ./setup.sh
