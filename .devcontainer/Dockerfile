@@ -19,6 +19,7 @@ RUN apt-get install -y \
   python3-setuptools \
   fonts-liberation \
   libcairo2 \
+  libasound2t64 \
   libcups2 \
   libdbus-1-3 \
   libdrm2 \

@@ -4,5 +4,8 @@
     "extensions": []
   },
   "dockerFile": "Dockerfile",
-  "postCreateCommand": "npm ci"
+  "postCreateCommand": "npm ci",
+  "remoteEnv": {
+    "DISPLAY": ":0"
+  }
 }
