@@ -37,7 +37,9 @@ export const launchVsCode = async ({
     }
     await RemoveVscodeBackups.removeVscodeBackups()
     const runtimeDir = GetVscodeRuntimeDir.getVscodeRuntimeDir()
-    await mkdir(runtimeDir, { recursive: true })
+    if (runtimeDir) {
+      await mkdir(runtimeDir, { recursive: true })
+    }
     const sourceMapDir = join(Root.root, '.vscode-source-maps')
     await mkdir(sourceMapDir, { recursive: true })
     const sourceMapCacheDir = join(Root.root, '.vscode-resolve-source-map-cache')
