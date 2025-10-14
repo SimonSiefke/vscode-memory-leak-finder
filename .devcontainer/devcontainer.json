@@ -3,5 +3,6 @@
   "customizations": {
     "extensions": []
   },
-  "dockerFile": "Dockerfile"
+  "dockerFile": "Dockerfile",
+  "postCreateCommand": "npm ci"
 }
