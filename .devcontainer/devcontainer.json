@@ -6,13 +6,13 @@
   "features": {
     "ghcr.io/devcontainers/features/desktop-lite:1": {},
     "ghcr.io/devcontainers/features/node:1": {},
-    "ghcr.io/nils-geistmann/devcontainers-features/create-remote-user:0": {}
   },
   "dockerFile": "Dockerfile",
   "postCreateCommand": "./.devcontainer/post-create.sh",
   "containerEnv": {
     "DISPLAY": "" // Allow the Dev Containers extension to set DISPLAY, post-create.sh will add it back in ~/.bashrc and ~/.zshrc if not set.
   },
+  "remoteUser": "ubuntu",
   "forwardPorts": [
     6080,
     5901
