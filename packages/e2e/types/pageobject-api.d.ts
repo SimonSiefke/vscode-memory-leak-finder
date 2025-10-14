@@ -175,6 +175,8 @@ export interface Explorer {
 }
 export interface Extensions {
   search(value: any): Promise<void>
+  shouldHaveMcpItem(value: any): Promise<void>
+  selectMcpItem(value: any): Promise<void>
   first: any
   clear(): Promise<void>
   shouldHaveValue(value: any): Promise<void>
@@ -196,6 +198,17 @@ export interface KeyBindingsEditor {
   show(): Promise<void>
   searchFor(searchValue: any): Promise<void>
   setKeyBinding(commandName: any, keyBinding: any): Promise<void>
+}
+export interface MCP {
+  createMCPServer(): Promise<any>
+  addServer(options: { serverName: string }): Promise<void>
+  removeServer(serverName: string): Promise<void>
+  removeAllServers(): Promise<void>
+  getVisibleCommands(): Promise<string[]>
+  selectCommand(text: string, stayVisible?: boolean): Promise<void>
+  getInputValue(): Promise<string>
+  listServers(): Promise<void>
+  openConfiguration(): Promise<void>
 }
 export interface MarkdownPreview {
   shouldHaveHeading(id: any): Promise<void>
@@ -413,13 +426,11 @@ export interface Workspace {
 export interface ServerInfo {
   readonly url: string
   readonly port: number
+  readonly dispose: () => Promise<void>
 }
 
 export interface Server {
-  start(options?: { port?: number; path?: string }): Promise<ServerInfo>
-  stop(): Promise<void>
-  isRunning(): Promise<boolean>
-  getUrl(): string
+  start(options?: { port?: number; requestHandler?: (req: any, res: any) => void }): Promise<ServerInfo>
 }
 
 export interface PageObjectApi {
@@ -439,6 +450,7 @@ export interface PageObjectApi {
   readonly Extensions: Extensions
   readonly Hover: Hover
   readonly KeyBindingsEditor: KeyBindingsEditor
+  readonly MCP: MCP
   readonly MarkdownPreview: MarkdownPreview
   readonly Notebook: Notebook
   readonly Notification: Notification
