@@ -5,7 +5,7 @@
   },
   "features": {
     "ghcr.io/devcontainers/features/desktop-lite:1": {},
-    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/devcontainers/features/node:1": {}
   },
   "dockerFile": "Dockerfile",
   "postCreateCommand": "./.devcontainer/post-create.sh",
@@ -13,10 +13,7 @@
     "DISPLAY": "" // Allow the Dev Containers extension to set DISPLAY, post-create.sh will add it back in ~/.bashrc and ~/.zshrc if not set.
   },
   "remoteUser": "ubuntu",
-  "forwardPorts": [
-    6080,
-    5901
-  ],
+  "forwardPorts": [6080, 5901],
   "portsAttributes": {
     "6080": {
       "label": "VNC web client (noVNC)",
