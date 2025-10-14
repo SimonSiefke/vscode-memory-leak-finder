@@ -3,15 +3,26 @@
   "customizations": {
     "extensions": []
   },
+  "features": {
+		"ghcr.io/devcontainers/features/desktop-lite:1": {}
+
+  },
   "dockerFile": "Dockerfile",
   "postCreateCommand": "npm ci",
   "remoteEnv": {
     "DISPLAY": ":0"
   },
   "portsAttributes": {
-    "9000": {
-      "label": "vnc",
-      "onAutoForward": "openPreview"
-    }
-  }
+		"6080": {
+			"label": "VNC web client (noVNC)",
+			"onAutoForward": "silent"
+		},
+		"5901": {
+			"label": "VNC TCP port",
+			"onAutoForward": "silent"
+		}
+	},
+	"hostRequirements": {
+		"memory": "9gb"
+	}
 }
