@@ -2,7 +2,7 @@ import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
-export const getConstructorInstances = async (session: Session, objectGroup: string, constructorName: string): Promise<any> => {
+export const getConstructorInstances = async (session: Session, objectGroup: string, constructorName: string, allowFunctions = false): Promise<any> => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Object,
     returnByValue: false,
@@ -17,6 +17,7 @@ export const getConstructorInstances = async (session: Session, objectGroup: str
   const objects = this;
 
   const constructorName = '${constructorName}'
+  const allowFunctions = ${allowFunctions}
 
   const RE_CLASS = /^\s*class\s+/;
 
@@ -34,10 +35,10 @@ export const getConstructorInstances = async (session: Session, objectGroup: str
 
   const functions = objects.filter(isFunction);
   const possibleConstructors = functions.filter(isPossibleWidgetConstructor);
-  const widgetConstructor = possibleConstructors.find(isClass);
+  const widgetConstructor = allowFunctions ? possibleConstructors[0] : possibleConstructors.find(isClass)
 
   if(!widgetConstructor){
-    throw new Error('no \${constructorName} constructor found')
+    throw new Error('no ${constructorName} constructor found')
   }
 
   const isWidget = object => {
