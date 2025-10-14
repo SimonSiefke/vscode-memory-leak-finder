@@ -37,7 +37,7 @@ RUN apt-get install -y \
   libxext6 \
   libxfixes3 \
   libxrandr2 \
-  libxshmfence1 \
+  libxshmfence1
 
 ENV NVM_VERSION v0.35.3
 ENV NODE_VERSION v22.19.0
