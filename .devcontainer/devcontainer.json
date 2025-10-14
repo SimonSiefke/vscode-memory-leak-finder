@@ -8,10 +8,10 @@
 
   },
   "dockerFile": "Dockerfile",
-  "postCreateCommand": "npm ci",
-  "remoteEnv": {
-    "DISPLAY": ":0"
-  },
+	"postCreateCommand": "./.devcontainer/post-create.sh",
+		"containerEnv": {
+		"DISPLAY": "" // Allow the Dev Containers extension to set DISPLAY, post-create.sh will add it back in ~/.bashrc and ~/.zshrc if not set.
+	},
   "portsAttributes": {
 		"6080": {
 			"label": "VNC web client (noVNC)",
