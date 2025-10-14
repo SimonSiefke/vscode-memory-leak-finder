@@ -7,7 +7,7 @@ import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 export const connectDevtools = async (devtoolsWebSocketUrl: string, attachedToPageTimeout: number): Promise<any> => {
   const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
-  const { sessionRpc, sessionId, targetId } = await waitForSession(browserRpc, attachedToPageTimeout)
+  const { sessionRpc, sessionId, targetId } = await waitForSession(browserRpc, 30_000)
   const script = await UtilityScript.getUtilityScript()
   await Promise.all([
     DevtoolsProtocolPage.enable(sessionRpc),
