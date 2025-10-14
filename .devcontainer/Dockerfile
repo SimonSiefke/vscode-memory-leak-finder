@@ -18,7 +18,6 @@ RUN apt-get install -y \
   python-is-python3 \
   python3-setuptools \
   fonts-liberation \
-  libasound2 \
   libcairo2 \
   libcups2 \
   libdbus-1-3 \
