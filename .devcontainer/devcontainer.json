@@ -3,6 +3,27 @@
   "customizations": {
     "extensions": []
   },
+  "features": {
+    "ghcr.io/devcontainers/features/desktop-lite:1": {},
+    "ghcr.io/devcontainers/features/node:1": {}
+  },
   "dockerFile": "Dockerfile",
-  "postCreateCommand": "npm ci"
+  "postCreateCommand": "./.devcontainer/post-create.sh",
+  "containerEnv": {
+    "DISPLAY": "" // Allow the Dev Containers extension to set DISPLAY, post-create.sh will add it back in ~/.bashrc and ~/.zshrc if not set.
+  },
+  "forwardPorts": [6080, 5901],
+  "portsAttributes": {
+    "6080": {
+      "label": "VNC web client (noVNC)",
+      "onAutoForward": "silent"
+    },
+    "5901": {
+      "label": "VNC TCP port",
+      "onAutoForward": "silent"
+    }
+  },
+  "hostRequirements": {
+    "memory": "9gb"
+  }
 }

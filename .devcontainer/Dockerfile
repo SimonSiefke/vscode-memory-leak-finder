@@ -18,8 +18,8 @@ RUN apt-get install -y \
   python-is-python3 \
   python3-setuptools \
   fonts-liberation \
-  libasound2 \
   libcairo2 \
+  libasound2t64 \
   libcups2 \
   libdbus-1-3 \
   libdrm2 \
@@ -39,6 +39,9 @@ RUN apt-get install -y \
   libxfixes3 \
   libxrandr2 \
   libxshmfence1 \
+  xvfb \
+  libxtst6 \
+  xauth
 
 ENV NVM_VERSION v0.35.3
 ENV NODE_VERSION v22.19.0
@@ -55,12 +58,8 @@ RUN source ~/.nvm/nvm.sh; \
     nvm install $NODE_VERSION; \
     nvm use --delete-prefix $NODE_VERSION;
 
-WORKDIR /home/
-
-COPY . .
-
-RUN bash ./setup.sh
-
 RUN echo 'export NVM_DIR="$HOME/.nvm"' >> "$HOME/.zshrc"
 RUN echo '\n' >> "$HOME/.zshrc"
 RUN echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> "$HOME/.zshrc"
+
+COPY . .
