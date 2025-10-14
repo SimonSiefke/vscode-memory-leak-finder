@@ -16,8 +16,29 @@ RUN apt-get install -y \
   libxkbfile-dev \
   libsecret-1-dev \
   python-is-python3 \
-  python3-setuptools
-
+  python3-setuptools \
+  fonts-liberation \
+  libasound2 \
+  libcairo2 \
+  libcups2 \
+  libdbus-1-3 \
+  libdrm2 \
+  libegl1 \
+  libgbm1 \
+  libglib2.0-0 \
+  libgtk-3-0 \
+  libnspr4 \
+  libnss3 \
+  libpango-1.0-0 \
+  libx11-6 \
+  libx11-xcb1 \
+  libxcb1 \
+  libxcomposite1 \
+  libxdamage1 \
+  libxext6 \
+  libxfixes3 \
+  libxrandr2 \
+  libxshmfence1 \
 
 ENV NVM_VERSION v0.35.3
 ENV NODE_VERSION v22.19.0
