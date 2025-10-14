@@ -7,7 +7,15 @@ apt-get install -y \
   jq \
   sudo \
   zsh \
-  python3
+  python3 \
+  build-essential \
+  g++ \
+  libx11-dev \
+  libxkbfile-dev \
+  libsecret-1-dev \
+  python-is-python3 \
+  python3-setuptools
+
 
 # set-up and install yarn
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
