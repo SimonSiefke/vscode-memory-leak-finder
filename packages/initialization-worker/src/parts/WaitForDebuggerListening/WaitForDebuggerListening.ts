@@ -12,7 +12,7 @@ const isIgnoredError = (data: string): boolean => {
   if (data.includes('DeprecationWarning: fs.Stats constructor is deprecated.')) {
     return true
   }
-  if(data.includes('Failed to connect to the bus')){
+  if (data.includes('Failed to connect to the bus')) {
     return true
   }
   return false
