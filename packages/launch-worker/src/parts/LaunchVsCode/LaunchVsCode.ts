@@ -37,7 +37,7 @@ export const launchVsCode = async ({
     }
     await RemoveVscodeBackups.removeVscodeBackups()
     const runtimeDir = GetVscodeRuntimeDir.getVscodeRuntimeDir()
-    await mkdir(runtimeDir, {recursive:true, })
+    await mkdir(runtimeDir, { recursive: true, })
     const binaryPath = await GetBinaryPath.getBinaryPath(vscodeVersion, vscodePath, commit)
     const userDataDir = GetUserDataDir.getUserDataDir()
     const extensionsDir = GetExtensionsDir.getExtensionsDir()
