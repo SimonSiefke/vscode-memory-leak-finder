@@ -16,5 +16,5 @@ export const run = async ({ Extensions, SideBar }: TestContext): Promise<void> =
   await Extensions.show()
   await Extensions.search('')
   await Extensions.shouldHaveMcpItem({ name: 'my-advanced-mcp-server' })
-  await new Promise(() => {})
+  await Extensions.selectMcpItem({ name: 'my-advanced-mcp-server' })
 }

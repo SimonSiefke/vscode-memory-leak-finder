@@ -176,6 +176,7 @@ export interface Explorer {
 export interface Extensions {
   search(value: any): Promise<void>
   shouldHaveMcpItem(value: any): Promise<void>
+  selectMcpItem(value: any): Promise<void>
   first: any
   clear(): Promise<void>
   shouldHaveValue(value: any): Promise<void>
