@@ -8,7 +8,7 @@ import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.MessagePortCount
 
-export const targets = [TargetId.Browser, TargetId.Worker]
+export const targets = [TargetId.Browser, TargetId.Worker, TargetId.Node]
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()

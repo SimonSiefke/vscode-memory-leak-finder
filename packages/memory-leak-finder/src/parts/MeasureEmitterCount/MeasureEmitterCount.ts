@@ -7,7 +7,7 @@ import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.EmitterCount
 
-export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
+export const targets = [TargetId.Node]
 
 export const create = (session) => {
   const objectGroup = ObjectGroupId.create()
