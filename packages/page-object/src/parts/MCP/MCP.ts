@@ -4,14 +4,19 @@ import * as Server from '../Server/Server.ts'
 import { URL } from 'url'
 import { root } from '../Root/Root.ts'
 import { rm } from 'fs/promises'
+import assert from 'assert'
 
 export const create = ({ expect, page, VError }) => {
   const servers: Record<number, Server.ServerInfo> = Object.create(null)
   return {
-    createMCPServer(): Promise<Server.ServerInfo> {
+    async createMCPServer(): Promise<Server.ServerInfo> {
       const path = '/mcp'
       const server = Server.create({ VError })
+      const requests: any[] = []
       const requestHandler = (req, res) => {
+        requests.push({
+          url: req.url,
+        })
         const parsedUrl = new URL(req.url || '', 'http://localhost')
 
         if (parsedUrl.pathname === path) {
@@ -57,10 +62,12 @@ export const create = ({ expect, page, VError }) => {
           res.end(JSON.stringify({ error: 'Not found' }))
         }
       }
-      const instance = server.start({
+      const instance = await server.start({
         port: 0,
         requestHandler,
       })
+      // @ts-ignore
+      instance.requests = requests
       return instance
     },
     async addServer({ serverName }: { serverName: string }) {
@@ -112,7 +119,7 @@ export const create = ({ expect, page, VError }) => {
         await this.selectCommand(httpOption, true)
         await expect(quickPickInput).toHaveAttribute('aria-label', `URL of the MCP server (e.g., http://localhost:3000) - Enter Server URL`)
         await page.waitForIdle()
-        await quickPickInput.type(serverUrl)
+        await quickPickInput.type(`${serverUrl}/mcp`)
         await page.waitForIdle()
         await quickPickInput.press('Enter')
 
@@ -128,7 +135,13 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const mcpJsonFile = page.locator('[data-resource-name="mcp.json"]')
         await expect(mcpJsonFile).toBeVisible()
-        // TODO read the file and check it has the expected contents
+        await page.waitForIdle()
+        const codeLens = page.locator('.codelens-decoration')
+        await expect(codeLens).toBeVisible()
+        const firstButton = codeLens.locator('[role="button"]').nth(0)
+        await expect(firstButton).toBeVisible()
+        await expect(firstButton).toHaveText(` Running`)
+        assert.deepStrictEqual(server.requests, [{ url: '/mcp' }, { url: '/mcp' }, { url: '/mcp' }, { url: '/mcp' }, { url: '/mcp' }])
       } catch (error) {
         throw new VError(error, `Failed to add MCP server`)
       }
