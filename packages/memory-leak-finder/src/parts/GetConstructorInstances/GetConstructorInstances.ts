@@ -2,7 +2,12 @@ import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
-export const getConstructorInstances = async (session: Session, objectGroup: string, constructorName: string, allowFunctions = false): Promise<any> => {
+export const getConstructorInstances = async (
+  session: Session,
+  objectGroup: string,
+  constructorName: string,
+  allowFunctions = false,
+): Promise<any> => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Object,
     returnByValue: false,
