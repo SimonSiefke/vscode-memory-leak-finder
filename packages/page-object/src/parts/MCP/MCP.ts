@@ -112,7 +112,7 @@ export const create = ({ expect, page, VError }) => {
         await this.selectCommand(httpOption, true)
         await expect(quickPickInput).toHaveAttribute('aria-label', `URL of the MCP server (e.g., http://localhost:3000) - Enter Server URL`)
         await page.waitForIdle()
-        await quickPickInput.type(serverUrl)
+        await quickPickInput.type(`${serverUrl}/mcp`)
         await page.waitForIdle()
         await quickPickInput.press('Enter')
 
@@ -128,6 +128,12 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const mcpJsonFile = page.locator('[data-resource-name="mcp.json"]')
         await expect(mcpJsonFile).toBeVisible()
+        await page.waitForIdle()
+        const codeLens = page.locator('.codelens-decoration')
+        await expect(codeLens).toBeVisible()
+        // const firstButton = codeLens.locator('.button').nth(0)
+        // await expect(firstButton).toBeVisible()
+        // await expect(firstButton).toHaveText(`Running`)
         // TODO read the file and check it has the expected contents
       } catch (error) {
         throw new VError(error, `Failed to add MCP server`)
