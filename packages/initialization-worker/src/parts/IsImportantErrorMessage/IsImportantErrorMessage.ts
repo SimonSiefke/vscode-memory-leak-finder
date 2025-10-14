@@ -56,6 +56,5 @@ export const isImportantErrorMessage = (data) => {
   if (RE_LIB_GIO_PROXY_ERROR.test(data)) {
     return false
   }
-  console.log({data})
   return true
 }
