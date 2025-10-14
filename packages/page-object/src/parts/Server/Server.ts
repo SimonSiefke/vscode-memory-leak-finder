@@ -6,6 +6,7 @@ export interface ServerInfo {
   readonly url: string
   readonly port: number
   readonly dispose: () => Promise<void>
+  readonly requests: readonly any[]
 }
 
 export const create = ({ VError }) => {
@@ -43,6 +44,7 @@ export const create = ({ VError }) => {
 
             return promise
           },
+          requests: [],
         }
       } catch (error) {
         throw new VError(error, `Failed to start mock server`)
