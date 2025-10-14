@@ -131,9 +131,9 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const codeLens = page.locator('.codelens-decoration')
         await expect(codeLens).toBeVisible()
-        // const firstButton = codeLens.locator('.button').nth(0)
-        // await expect(firstButton).toBeVisible()
-        // await expect(firstButton).toHaveText(`Running`)
+        const firstButton = codeLens.locator('[role="button"]').nth(0)
+        await expect(firstButton).toBeVisible()
+        await expect(firstButton).toHaveText(` Running`)
         // TODO read the file and check it has the expected contents
       } catch (error) {
         throw new VError(error, `Failed to add MCP server`)
