@@ -8,7 +8,7 @@
 		"ghcr.io/devcontainers/features/node:1": {}
 
   },
-  "dockerFile": "Dockerfile",
+"containerUser": "user-name-goes-here",  "dockerFile": "Dockerfile",
 	"postCreateCommand": "./.devcontainer/post-create.sh",
 	"containerEnv": {
 		"DISPLAY": "" // Allow the Dev Containers extension to set DISPLAY, post-create.sh will add it back in ~/.bashrc and ~/.zshrc if not set.
