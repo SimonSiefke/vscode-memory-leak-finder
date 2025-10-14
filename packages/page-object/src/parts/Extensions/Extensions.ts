@@ -61,6 +61,18 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         throw new VError(error, `Failed to verify that extension input has value ${value}`)
       }
     },
+    async shouldHaveMcpItem({ name }) {
+      try {
+        const paneHeader = page.locator('[aria-label="MCP Servers - Installed Section"]')
+        await expect(paneHeader).toBeVisible()
+        const list = page.locator('.monaco-list[aria-label="MCP Servers"]')
+        await expect(list).toBeVisible()
+        const item = list.locator(`[aria-label="${name}"]`)
+        await expect(item).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that mcp item is visible ${name}`)
+      }
+    },
     async show() {
       try {
         await page.waitForIdle()
