@@ -15,7 +15,7 @@
   "dependencies": {
     "@lvce-editor/rpc": "^4.20.0",
     "@observablehq/plot": "^0.6.17",
-    "jsdom": "^27.0.1"
+    "jsdom": "^27.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.7.2"
