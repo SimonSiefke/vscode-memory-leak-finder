@@ -8,6 +8,7 @@ import * as ObjectType from '../ObjectType/ObjectType.ts'
 export const createRpc = (ipc, canUseIdleCallback) => {
   const callbacks = Object.create(null)
   const handleMessage = (message) => {
+    // console.log(message)
     if ('id' in message) {
       if ('result' in message) {
         callbacks[message.id].resolve(message)

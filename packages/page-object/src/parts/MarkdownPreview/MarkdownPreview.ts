@@ -6,9 +6,15 @@ export const create = ({ expect, page, VError, electronApp }) => {
         const webView = page.locator('.webview')
         await expect(webView).toBeVisible()
         await expect(webView).toHaveClass('ready')
-        const childPage = await electronApp.waitForIframe({
+        const childPage = await page.waitForIframe({
           url: /extensionId=vscode.markdown-language-features/,
         })
+        // TODO double iframe...
+        const subFrame = await childPage.waitForIframe({
+          url: /fake\.html/,
+        })
+        console.log({ subFrame })
+        await new Promise(() => {})
         const frame = childPage.frameLocator('iframe')
         const heading = frame.locator(`#${id}`)
         await expect(heading).toBeVisible()

@@ -1,9 +1,9 @@
 import { createSessionRpcConnection } from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
 import { DevtoolsProtocolPage, DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-import * as Page from '../Page/Page.ts'
 import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
 import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEvent.ts'
 import * as WaitForUtilityExecutionContext from '../WaitForUtilityExecutionContext/WaitForUtilityExecutionContext.ts'
+import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 
 const findMatchingIframe = (targets, expectedUrl) => {
   for (const target of targets) {
@@ -14,7 +14,7 @@ const findMatchingIframe = (targets, expectedUrl) => {
   return undefined
 }
 
-export const waitForIframe = async ({ electronRpc, url, electronObjectId, idleTimeout, browserRpc, sessionRpc }) => {
+export const waitForIframe = async ({ electronRpc, url, electronObjectId, idleTimeout, browserRpc, sessionRpc, createPage }) => {
   // TODO ask browser rpc for targets / add target change listener
   const targets = await DevtoolsProtocolTarget.getTargets(sessionRpc)
   const iframes = targets.filter((target) => target.type === 'iframe')
@@ -49,12 +49,22 @@ export const waitForIframe = async ({ electronRpc, url, electronObjectId, idleTi
     const event = await eventPromise
 
     if (event === null) {
+      const targets1 = await DevtoolsProtocolTarget.getTargets(sessionRpc)
+      const targets2 = await DevtoolsProtocolTarget.getTargets(browserRpc)
+
+      console.log({ targets1, targets2 })
+      await new Promise((r) => {})
+
       throw new Error(`no matching iframe found for ${url}`)
     }
     const targetInfo = event.params.targetInfo
 
-    const targets = await DevtoolsProtocolTarget.getTargets(sessionRpc)
+    const targets1 = await DevtoolsProtocolTarget.getTargets(sessionRpc)
+    const targets2 = await DevtoolsProtocolTarget.getTargets(browserRpc)
 
+    console.log({ targets1, targets2 })
+
+    await new Promise((r) => {})
     throw new Error(`no matching iframe found for ${url}`)
   }
 
@@ -69,8 +79,39 @@ export const waitForIframe = async ({ electronRpc, url, electronObjectId, idleTi
   const script = await UtilityScript.getUtilityScript()
 
   const executionContextPromise = WaitForUtilityExecutionContext.waitForUtilityExecutionContext(iframeRpc)
+
+  const handleAttached = (message: any): void => {
+    console.log(message)
+  }
+  const handleTimeout = (): void => {}
+  iframeRpc.on(DevtoolsEventType.TargetAttachedToTarget, handleAttached)
+  iframeRpc.on(DevtoolsEventType.TargetTargetCreated, handleAttached)
+
+  await DevtoolsProtocolTarget.setDiscoverTargets(iframeRpc, {
+    discover: true,
+  })
+  await DevtoolsProtocolTarget.setAutoAttach(iframeRpc, {
+    autoAttach: true,
+    waitForDebuggerOnStart: false,
+    flatten: true,
+    filter: [
+      {
+        type: 'browser',
+        exclude: true,
+      },
+      {
+        type: 'tab',
+        exclude: true,
+      },
+      {
+        type: 'page',
+        exclude: false,
+      },
+    ],
+  })
+  console.log('did auto attach')
   await Promise.all([
-    DevtoolsProtocolPage.enable(sessionRpc),
+    DevtoolsProtocolPage.enable(iframeRpc),
     DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(iframeRpc, {
       source: script,
       worldName: 'utility',
@@ -79,7 +120,15 @@ export const waitForIframe = async ({ electronRpc, url, electronObjectId, idleTi
   ])
   const iframeUtilityContext = await executionContextPromise
 
-  const iframe = Page.create({
+  // await new Promise((r) => {
+  //   setTimeout(r, 3000)
+  // })
+  // const text = await DevtoolsProtocolRuntime.evaluate(iframeRpc, {
+  //   expression: `document.querySelector('h1')?.textContent||''`,
+  // })
+
+  // console.log({ text })
+  const iframe = createPage({
     electronObjectId,
     electronRpc,
     idleTimeout,
@@ -87,6 +136,8 @@ export const waitForIframe = async ({ electronRpc, url, electronObjectId, idleTi
     sessionId: iframeRpc.sessionId,
     targetId: matchingIframe.targetId,
     utilityContext: iframeUtilityContext,
+    browserRpc,
+    sessionRpc: iframeRpc,
   })
   return iframe
 }

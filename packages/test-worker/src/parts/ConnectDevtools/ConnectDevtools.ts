@@ -40,6 +40,8 @@ export const connectDevtools = async (
     rpc: sessionRpc,
     idleTimeout,
     utilityContext,
+    browserRpc,
+    sessionRpc,
   })
 
   const electronApp = ElectronApp.create({

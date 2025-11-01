@@ -1,6 +1,7 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as ObjectType from '../ObjectType/ObjectType.ts'
 import * as WaitForIframe from '../WaitForIframe/WaitForIframe.ts'
+import * as Page from '../Page/Page.ts'
 
 export const create = ({ electronRpc, electronObjectId, idleTimeout, firstWindow, browserRpc, sessionRpc }) => {
   return {
@@ -24,6 +25,7 @@ export const create = ({ electronRpc, electronObjectId, idleTimeout, firstWindow
         idleTimeout,
         browserRpc,
         sessionRpc,
+        createPage: Page.create,
       })
     },
   }
