@@ -15,6 +15,12 @@ const findMatchingIframe = (targets, expectedUrl) => {
 }
 
 export const waitForIframe = async ({ electronRpc, url, electronObjectId, idleTimeout, browserRpc, sessionRpc, createPage }) => {
+  // TODO
+  // 1. enable page api
+  // 2. add listener to page frame attached, frameStartedNavigating, check if it matches the expected url, take note of the frame id
+  // 3. add listener for runtime execution context created, check if it matches the frame id from above
+  // 4. resolve promise with execution context id and frame Id, clean up listeners
+
   // TODO ask browser rpc for targets / add target change listener
   const targets = await DevtoolsProtocolTarget.getTargets(sessionRpc)
   const iframes = targets.filter((target) => target.type === 'iframe')
