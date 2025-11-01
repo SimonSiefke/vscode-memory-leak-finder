@@ -2,7 +2,7 @@ import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts
 import * as ObjectType from '../ObjectType/ObjectType.ts'
 import * as WaitForIframe from '../WaitForIframe/WaitForIframe.ts'
 
-export const create = ({ electronRpc, electronObjectId, idleTimeout, firstWindow }) => {
+export const create = ({ electronRpc, electronObjectId, idleTimeout, firstWindow, browserRpc, sessionRpc }) => {
   return {
     objectType: ObjectType.ElectronApp,
     rpc: electronRpc,
@@ -22,6 +22,8 @@ export const create = ({ electronRpc, electronObjectId, idleTimeout, firstWindow
         electronRpc,
         url,
         idleTimeout,
+        browserRpc,
+        sessionRpc,
       })
     },
   }
