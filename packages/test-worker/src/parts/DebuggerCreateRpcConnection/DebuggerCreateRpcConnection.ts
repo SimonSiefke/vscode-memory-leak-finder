@@ -8,7 +8,6 @@ import * as ObjectType from '../ObjectType/ObjectType.ts'
 export const createRpc = (ipc, canUseIdleCallback) => {
   const callbacks = Object.create(null)
   const handleMessage = (message) => {
-    console.log({ message })
     if ('id' in message) {
       if ('result' in message) {
         callbacks[message.id].resolve(message)
@@ -44,19 +43,6 @@ export const createRpc = (ipc, canUseIdleCallback) => {
       const id = _id++
       callbacks[id] = { resolve, reject }
       ipc.send({
-        method,
-        params,
-        id,
-      })
-      return promise
-    },
-    invokeWithTarget(targetId, sessionId, method, params) {
-      const { resolve, reject, promise } = Promise.withResolvers()
-      const id = _id++
-      callbacks[id] = { resolve, reject }
-      ipc.send({
-        sessionId,
-        targetId,
         method,
         params,
         id,
