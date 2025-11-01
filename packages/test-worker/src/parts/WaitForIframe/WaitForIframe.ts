@@ -63,6 +63,8 @@ export const waitForIframe = async ({ electronRpc, url, electronObjectId, idleTi
     const targets2 = await DevtoolsProtocolTarget.getTargets(browserRpc)
 
     console.log({ targets1, targets2 })
+    const frames = await DevtoolsProtocolPage.getFrameTree(sessionRpc)
+    console.log({ frames })
 
     await new Promise((r) => {})
     throw new Error(`no matching iframe found for ${url}`)
@@ -80,43 +82,43 @@ export const waitForIframe = async ({ electronRpc, url, electronObjectId, idleTi
 
   const executionContextPromise = WaitForUtilityExecutionContext.waitForUtilityExecutionContext(iframeRpc)
 
-  const handleAttached = (message: any): void => {
-    console.log(message)
-  }
-  const handleTimeout = (): void => {}
-  iframeRpc.on(DevtoolsEventType.TargetAttachedToTarget, handleAttached)
-  iframeRpc.on(DevtoolsEventType.TargetTargetCreated, handleAttached)
-  iframeRpc.on(DevtoolsEventType.TargetTargetInfoChanged, handleAttached)
+  // const handleAttached = (message: any): void => {
+  //   console.log(message)
+  // }
+  // const handleTimeout = (): void => {}
+  // iframeRpc.on(DevtoolsEventType.TargetAttachedToTarget, handleAttached)
+  // iframeRpc.on(DevtoolsEventType.TargetTargetCreated, handleAttached)
+  // iframeRpc.on(DevtoolsEventType.TargetTargetInfoChanged, handleAttached)
 
-  await Promise.all([
-    DevtoolsProtocolTarget.setDiscoverTargets(iframeRpc, {
-      discover: true,
-    }),
-    DevtoolsProtocolTarget.setAutoAttach(iframeRpc, {
-      autoAttach: true,
-      waitForDebuggerOnStart: false,
-      flatten: true,
-      // filter: [
-      //   {
-      //     type: 'browser',
-      //     exclude: true,
-      //   },
-      //   {
-      //     type: 'tab',
-      //     exclude: true,
-      //   },
-      //   {
-      //     type: 'page',
-      //     exclude: false,
-      //   },
-      // ],
-    }),
-  ])
+  // await Promise.all([
+  //   DevtoolsProtocolTarget.setDiscoverTargets(iframeRpc, {
+  //     discover: true,
+  //   }),
+  //   DevtoolsProtocolTarget.setAutoAttach(iframeRpc, {
+  //     autoAttach: true,
+  //     waitForDebuggerOnStart: false,
+  //     flatten: true,
+  //     // filter: [
+  //     //   {
+  //     //     type: 'browser',
+  //     //     exclude: true,
+  //     //   },
+  //     //   {
+  //     //     type: 'tab',
+  //     //     exclude: true,
+  //     //   },
+  //     //   {
+  //     //     type: 'page',
+  //     //     exclude: false,
+  //     //   },
+  //     // ],
+  //   }),
+  // ])
 
-  const handleCreated2 = (event) => {
-    console.log(event.params)
-  }
-  iframeRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, handleCreated2)
+  // const handleCreated2 = (event) => {
+  //   console.log(event.params)
+  // }
+  // iframeRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, handleCreated2)
 
   console.log('did auto attach')
   await Promise.all([
@@ -129,6 +131,8 @@ export const waitForIframe = async ({ electronRpc, url, electronObjectId, idleTi
   ])
   const iframeUtilityContext = await executionContextPromise
 
+  const frames = await DevtoolsProtocolPage.getFrameTree(iframeRpc)
+  console.log({ frames })
   // await new Promise((r) => {
   //   setTimeout(r, 3000)
   // })

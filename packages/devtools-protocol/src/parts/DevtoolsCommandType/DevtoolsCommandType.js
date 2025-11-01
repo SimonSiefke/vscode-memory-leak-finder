@@ -46,6 +46,8 @@ export const DebuggerResumed = 'Debugger.resumed'
 
 export const PageStartScreenCast = 'Page.startScreencast'
 
+export const PageGetFrameTree = 'Page.getFrameTree'
+
 export const PageStopScreenCast = 'Page.stopScreencast'
 
 export const PageEnable = 'Page.enable'
