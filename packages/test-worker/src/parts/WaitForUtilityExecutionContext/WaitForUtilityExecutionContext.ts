@@ -28,6 +28,7 @@ export const waitForUtilityExecutionContext = async (sessionRpc) => {
   await DevtoolsProtocolRuntime.enable(sessionRpc)
   const { name, id, uniqueId } = await eventPromise
   await DevtoolsProtocolRuntime.disable(sessionRpc)
+
   return {
     name,
     id,
