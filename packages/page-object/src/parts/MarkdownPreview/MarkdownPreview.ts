@@ -10,7 +10,7 @@ export const create = ({ expect, page, VError, electronApp }) => {
           url: /extensionId=vscode.markdown-language-features/,
         })
         // TODO double iframe...
-        const subFrame = await childPage.waitForIframe({
+        const subFrame = await childPage.waitForSubIframe({
           url: /fake\.html/,
         })
         console.log({ subFrame })

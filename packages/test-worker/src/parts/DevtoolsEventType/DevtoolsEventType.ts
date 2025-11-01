@@ -3,6 +3,9 @@ export const DebuggerResumed = 'Debugger.resumed'
 export const DebuggerScriptParsed = 'Debugger.scriptParsed'
 
 export const PageFrameNavigated = 'Page.frameNavigated'
+export const PageFrameAttached = 'Page.frameAttached'
+export const PageFrameStartedNavigating = 'Page.frameStartedNavigating'
+export const PageFrameRequestedNavigation = 'Page.frameRequestedNavigation'
 export const PageLifeCycleEvent = 'Page.lifecycleEvent'
 export const PageLoadEventFired = 'Page.loadEventFired'
 
