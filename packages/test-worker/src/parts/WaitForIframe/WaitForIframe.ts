@@ -1,7 +1,8 @@
 import { createSessionRpcConnection } from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
-import { DevtoolsProtocolPage, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { DevtoolsProtocolPage, DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as Page from '../Page/Page.ts'
 import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
+import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEvent.ts'
 import * as WaitForUtilityExecutionContext from '../WaitForUtilityExecutionContext/WaitForUtilityExecutionContext.ts'
 
 const findMatchingIframe = (targets, expectedUrl) => {
@@ -19,8 +20,45 @@ export const waitForIframe = async ({ electronRpc, url, electronObjectId, idleTi
   const iframes = targets.filter((target) => target.type === 'iframe')
   const matchingIframe = findMatchingIframe(iframes, url)
   if (!matchingIframe) {
-    throw new Error(`no matching iframe found`)
+    const eventPromise = waitForAttachedEvent(sessionRpc, 10_000)
+
+    await DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
+      autoAttach: true,
+      waitForDebuggerOnStart: false,
+      flatten: true,
+      filter: [
+        {
+          type: 'browser',
+          exclude: true,
+        },
+        {
+          type: 'tab',
+          exclude: true,
+        },
+        {
+          type: 'page',
+          exclude: false,
+        },
+        {
+          type: 'iframe',
+          exclude: false,
+        },
+      ],
+    })
+
+    const event = await eventPromise
+
+    if (event === null) {
+      throw new Error(`no matching iframe found for ${url}`)
+    }
+    const targetInfo = event.params.targetInfo
+
+    const targets = await DevtoolsProtocolTarget.getTargets(sessionRpc)
+
+    throw new Error(`no matching iframe found for ${url}`)
   }
+
+  // TODO need to wait for that frame
 
   const iframeSessionId = await DevtoolsProtocolTarget.attachToTarget(sessionRpc, {
     targetId: matchingIframe.targetId,
