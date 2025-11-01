@@ -86,29 +86,38 @@ export const waitForIframe = async ({ electronRpc, url, electronObjectId, idleTi
   const handleTimeout = (): void => {}
   iframeRpc.on(DevtoolsEventType.TargetAttachedToTarget, handleAttached)
   iframeRpc.on(DevtoolsEventType.TargetTargetCreated, handleAttached)
+  iframeRpc.on(DevtoolsEventType.TargetTargetInfoChanged, handleAttached)
 
-  await DevtoolsProtocolTarget.setDiscoverTargets(iframeRpc, {
-    discover: true,
-  })
-  await DevtoolsProtocolTarget.setAutoAttach(iframeRpc, {
-    autoAttach: true,
-    waitForDebuggerOnStart: false,
-    flatten: true,
-    filter: [
-      {
-        type: 'browser',
-        exclude: true,
-      },
-      {
-        type: 'tab',
-        exclude: true,
-      },
-      {
-        type: 'page',
-        exclude: false,
-      },
-    ],
-  })
+  await Promise.all([
+    DevtoolsProtocolTarget.setDiscoverTargets(iframeRpc, {
+      discover: true,
+    }),
+    DevtoolsProtocolTarget.setAutoAttach(iframeRpc, {
+      autoAttach: true,
+      waitForDebuggerOnStart: false,
+      flatten: true,
+      // filter: [
+      //   {
+      //     type: 'browser',
+      //     exclude: true,
+      //   },
+      //   {
+      //     type: 'tab',
+      //     exclude: true,
+      //   },
+      //   {
+      //     type: 'page',
+      //     exclude: false,
+      //   },
+      // ],
+    }),
+  ])
+
+  const handleCreated2 = (event) => {
+    console.log(event.params)
+  }
+  iframeRpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, handleCreated2)
+
   console.log('did auto attach')
   await Promise.all([
     DevtoolsProtocolPage.enable(iframeRpc),
