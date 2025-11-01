@@ -49,6 +49,19 @@ export const createRpc = (ipc, canUseIdleCallback) => {
       })
       return promise
     },
+    invokeWithTarget(targetId, sessionId, method, params) {
+      const { resolve, reject, promise } = Promise.withResolvers()
+      const id = _id++
+      callbacks[id] = { resolve, reject }
+      ipc.send({
+        sessionId,
+        targetId,
+        method,
+        params,
+        id,
+      })
+      return promise
+    },
     invokeWithSession(sessionId, method, params) {
       const { resolve, reject, promise } = Promise.withResolvers()
       const id = _id++
