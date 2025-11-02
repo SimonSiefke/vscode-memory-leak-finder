@@ -1,45 +1,39 @@
-import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
+import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { waitForSubFrameContextEvent } from '../WaitForSubFrameContextEvent/WaitForSubFrameContextEvent.ts'
 
-export const waitForSubFrameContext = (rpc, urlRegex, timeout) => {
-  const { resolve, promise } = Promise.withResolvers()
-  const contexts = Object.create(null)
-  const loaded = Object.create(null)
-  let matchingFrameId = ''
-  const cleanupMaybe = () => {
-    if (matchingFrameId && matchingFrameId in contexts && matchingFrameId in loaded) {
-      cleanup({
-        frameId: matchingFrameId,
-        contextId: contexts[matchingFrameId],
-      })
+const getMatchingSubFrame = (frames, url) => {
+  for (const frame of frames) {
+    if (url.test(frame.url)) {
+      return frame
     }
   }
-  const handleExecutionContextCreated = (event) => {
-    contexts[event.params.context.auxData.frameId] = event.params.context.uniqueId
-    cleanupMaybe()
+  return undefined
+}
+
+const getChildFrames = (frameResult) => {
+  return frameResult.frameTree.childFrames.map((item) => item.frame)
+}
+
+export const waitForSubFrame = async (rpc, urlRegex, timeout) => {
+  const controller = new AbortController()
+  const eventPromise = waitForSubFrameContextEvent(rpc, urlRegex, timeout, controller.signal)
+  await DevtoolsProtocolPage.enable(rpc)
+  const frameResult1 = await DevtoolsProtocolPage.getFrameTree(rpc)
+  const childFrames1 = getChildFrames(frameResult1)
+  const matchingFrame1 = getMatchingSubFrame(childFrames1, urlRegex)
+  if (matchingFrame1) {
+    controller.abort()
   }
-  const handleFrameNavigation = (event) => {
-    if (urlRegex.test(event.params.url)) {
-      matchingFrameId = event.params.frameId
-    }
-    cleanupMaybe()
+  const subFrame = await eventPromise
+  if (!subFrame && !matchingFrame1) {
+    throw new Error(`no matching frame found`)
   }
-  const handleFrameStoppedLoading = (event) => {
-    loaded[event.params.frameId] = true
-    cleanupMaybe()
+  const frameResult2 = await DevtoolsProtocolPage.getFrameTree(rpc)
+  const childFrames2 = getChildFrames(frameResult2)
+  const matchingFrame2 = getMatchingSubFrame(childFrames2, urlRegex)
+  await DevtoolsProtocolPage.disable(rpc)
+  if (!matchingFrame2) {
+    throw new Error(`no matching frame found`)
   }
-  const handleTimeout = () => {
-    cleanup(null)
-  }
-  const cleanup = (result) => {
-    rpc.off(DevtoolsEventType.RuntimeExecutionContextCreated, handleExecutionContextCreated)
-    rpc.off(DevtoolsEventType.PageFrameRequestedNavigation, handleFrameNavigation)
-    rpc.off(DevtoolsEventType.PageFrameStoppedLoading, handleFrameStoppedLoading)
-    clearTimeout(timeoutRef)
-    resolve(result)
-  }
-  rpc.on(DevtoolsEventType.RuntimeExecutionContextCreated, handleExecutionContextCreated)
-  rpc.on(DevtoolsEventType.PageFrameRequestedNavigation, handleFrameNavigation)
-  rpc.on(DevtoolsEventType.PageFrameStoppedLoading, handleFrameStoppedLoading)
-  const timeoutRef = setTimeout(handleTimeout, timeout)
-  return promise
+  return matchingFrame2
 }
