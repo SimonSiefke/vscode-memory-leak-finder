@@ -26,53 +26,6 @@ export const waitForIframe = async ({ electronRpc, url, electronObjectId, idleTi
   const iframes = targets.filter((target) => target.type === 'iframe')
   const matchingIframe = findMatchingIframe(iframes, url)
   if (!matchingIframe) {
-    const eventPromise = waitForAttachedEvent(sessionRpc, 10_000)
-
-    await DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
-      autoAttach: true,
-      waitForDebuggerOnStart: false,
-      flatten: true,
-      filter: [
-        {
-          type: 'browser',
-          exclude: true,
-        },
-        {
-          type: 'tab',
-          exclude: true,
-        },
-        {
-          type: 'page',
-          exclude: false,
-        },
-        {
-          type: 'iframe',
-          exclude: false,
-        },
-      ],
-    })
-
-    const event = await eventPromise
-
-    if (event === null) {
-      const targets1 = await DevtoolsProtocolTarget.getTargets(sessionRpc)
-      const targets2 = await DevtoolsProtocolTarget.getTargets(browserRpc)
-
-      console.log({ targets1, targets2 })
-      await new Promise((r) => {})
-
-      throw new Error(`no matching iframe found for ${url}`)
-    }
-    const targetInfo = event.params.targetInfo
-
-    const targets1 = await DevtoolsProtocolTarget.getTargets(sessionRpc)
-    const targets2 = await DevtoolsProtocolTarget.getTargets(browserRpc)
-
-    console.log({ targets1, targets2 })
-    const frames = await DevtoolsProtocolPage.getFrameTree(sessionRpc)
-    console.log({ frames })
-
-    await new Promise((r) => {})
     throw new Error(`no matching iframe found for ${url}`)
   }
 
