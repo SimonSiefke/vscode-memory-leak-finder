@@ -1,7 +1,6 @@
-import { DevtoolsProtocolPage, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
+import { addUtilityExecutionContext } from '../AddUtilityExecutionContext/AddUtilityExecutionContext.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { waitForSubFrame } from '../WaitForSubFrameContext/WaitForSubFrameContext.ts'
-import { waitForUtilityExecutionContext } from '../WaitForUtilityExecutionContext/WaitForUtilityExecutionContext.ts'
 
 export const waitForSubIframe = async ({ electronRpc, url, electronObjectId, idleTimeout, browserRpc, sessionRpc, createPage }) => {
   // TODO
@@ -16,19 +15,7 @@ export const waitForSubIframe = async ({ electronRpc, url, electronObjectId, idl
   }
 
   const utilityExecutionContextName = 'utility-iframe'
-  const executionContextPromise = waitForUtilityExecutionContext(sessionRpc, utilityExecutionContextName)
-
-  await DevtoolsProtocolPage.createIsolatedWorld(sessionRpc, {
-    frameId: subFrame.id,
-    worldName: utilityExecutionContextName,
-  })
-
-  const utilityContext = await executionContextPromise
-  const utilityScript = await UtilityScript.getUtilityScript()
-  await DevtoolsProtocolRuntime.evaluate(sessionRpc, {
-    uniqueContextId: utilityContext.uniqueId,
-    expression: utilityScript,
-  })
+  const utilityContext = await addUtilityExecutionContext(sessionRpc, utilityExecutionContextName, subFrame.id)
 
   const html = await DevtoolsProtocolRuntime.evaluate(sessionRpc, {
     uniqueContextId: utilityContext.uniqueId,
