@@ -51,5 +51,6 @@ export const run = async ({ Workbench, Editor, QuickPick, WellKnownCommands, Mar
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
+  await Editor.save({ viaKeyBoard: true })
   await Editor.closeAll()
 }

@@ -8,7 +8,6 @@ import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyP
 import { PortReadStream } from '../PortReadStream/PortReadStream.ts'
 import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
-import { waitForUtilityExecutionContext } from '../WaitForUtilityExecutionContext/WaitForUtilityExecutionContext.ts'
 
 export const prepareBoth = async (headlessMode: boolean, attachedToPageTimeout: number, port: MessagePort): Promise<any> => {
   const stream = new PortReadStream(port)
@@ -36,9 +35,7 @@ export const prepareBoth = async (headlessMode: boolean, attachedToPageTimeout: 
     objectId: monkeyPatchedElectronId,
   })
 
-  const { sessionRpc, sessionId, targetId, dispose } = await connectDevtoolsPromise
-
-  const utilityContext = await waitForUtilityExecutionContext(sessionRpc)
+  const { sessionId, targetId, dispose } = await connectDevtoolsPromise
 
   await Promise.all([electronRpc.dispose(), dispose()])
 
@@ -54,7 +51,7 @@ export const prepareBoth = async (headlessMode: boolean, attachedToPageTimeout: 
     },
     sessionId,
     targetId,
-    utilityContext,
+    utilityContext: undefined,
     webSocketUrl,
   }
 }
