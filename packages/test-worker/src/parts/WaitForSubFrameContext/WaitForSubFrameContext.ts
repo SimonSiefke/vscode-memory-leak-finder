@@ -11,7 +11,9 @@ const getMatchingSubFrame = (frames, url) => {
 }
 
 const getChildFrames = (frameResult) => {
-  return frameResult.frameTree.childFrames.map((item) => item.frame)
+  const { frameTree } = frameResult
+  const childFrames = frameTree.childFrames || []
+  return childFrames.map((item) => item.frame)
 }
 
 export const waitForSubFrame = async (rpc, urlRegex, timeout) => {
