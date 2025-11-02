@@ -42,6 +42,7 @@ export const waitForSubFrameContext = (rpc, urlRegex, timeout) => {
     cleanupMaybe()
   }
   const handleTimeout = () => {
+    console.log('timeout')
     cleanup(null)
   }
   const cleanup = (result) => {
