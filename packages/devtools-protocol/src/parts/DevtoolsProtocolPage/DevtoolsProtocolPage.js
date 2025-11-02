@@ -9,6 +9,10 @@ export const getFrameTree = (rpc, options) => {
   return Invoke.invoke(rpc, DevtoolsCommandType.PageGetFrameTree, options)
 }
 
+export const createIsolatedWorld = (rpc, options) => {
+  return Invoke.invoke(rpc, DevtoolsCommandType.PageGetIsolatedWorld, options)
+}
+
 export const startScreencast = (rpc, options) => {
   return Invoke.invoke(rpc, DevtoolsCommandType.PageStartScreenCast, options)
 }

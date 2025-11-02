@@ -48,6 +48,8 @@ export const PageStartScreenCast = 'Page.startScreencast'
 
 export const PageGetFrameTree = 'Page.getFrameTree'
 
+export const PageGetIsolatedWorld = 'Page.getIsolatedWorld'
+
 export const PageStopScreenCast = 'Page.stopScreencast'
 
 export const PageEnable = 'Page.enable'

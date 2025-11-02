@@ -27,7 +27,12 @@ export const waitForSubIframe = async ({ electronRpc, url, electronObjectId, idl
     throw new Error(`no matching frame found`)
   }
   console.log({ matchingFrame })
+  const executionContextId = await DevtoolsProtocolPage.createIsolatedWorld(sessionRpc, {
+    frameId: matchingFrame.id,
+    worldName: 'utility',
+  })
 
+  console.log({ executionContextId })
   await new Promise((r) => {})
   // TODO create page with subframe data
 }
