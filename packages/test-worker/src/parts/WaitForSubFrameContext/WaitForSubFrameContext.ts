@@ -26,7 +26,10 @@ export const waitForSubFrameContext = (rpc, urlRegex, timeout) => {
   const handleDocumentOpened = (event) => {
     console.log(event)
     if (urlRegex.test(event.params.frame.url)) {
+      console.log('MATCH')
       matchingFrameId = event.params.id
+    } else {
+      console.log('NO MATCH')
     }
     cleanupMaybe()
   }

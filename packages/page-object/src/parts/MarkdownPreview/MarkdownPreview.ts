@@ -14,7 +14,6 @@ export const create = ({ expect, page, VError, electronApp }) => {
         const subFrame = await childPage.waitForSubIframe({
           url: /extensionId=vscode.markdown-language-features/,
         })
-        console.log({ subFrame })
         const heading = subFrame.locator(`#${id}`)
         await expect(heading).toBeVisible()
       } catch (error) {

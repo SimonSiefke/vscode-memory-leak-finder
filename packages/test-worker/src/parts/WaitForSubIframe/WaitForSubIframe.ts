@@ -21,15 +21,16 @@ export const waitForSubIframe = async ({ electronRpc, url, electronObjectId, idl
 
   const subFramePromise = waitForSubFrameContext(sessionRpc, url, 3_000)
   await DevtoolsProtocolPage.enable(sessionRpc)
-  const subFrame = await subFramePromise
-  await DevtoolsProtocolPage.disable(sessionRpc)
-  console.log({ subFrame })
-
+  console.log('enabled page')
   const { frameTree } = await DevtoolsProtocolPage.getFrameTree(sessionRpc)
   const childFrames = frameTree.childFrames.map((item) => item.frame)
-  const matchingFrame = getMatchingSubFrame(childFrames, url)
-  await new Promise((r) => {})
   console.log({ childFrames })
+
+  const subFrame = await subFramePromise
+  // await DevtoolsProtocolPage.disable(sessionRpc)
+  console.log({ subFrame })
+
+  const matchingFrame = getMatchingSubFrame(childFrames, url)
   if (!matchingFrame) {
     throw new Error(`no matching frame found`)
   }
@@ -43,9 +44,16 @@ export const waitForSubIframe = async ({ electronRpc, url, electronObjectId, idl
   const utilityContext = await executionContextPromise
   const utilityScript = await UtilityScript.getUtilityScript()
   await DevtoolsProtocolRuntime.evaluate(sessionRpc, {
-    contextId: executionContextId,
+    uniqueContextId: utilityContext.uniqueId,
     expression: utilityScript,
   })
+
+  const html = await DevtoolsProtocolRuntime.evaluate(sessionRpc, {
+    uniqueContextId: utilityContext.uniqueId,
+    expression: `document.body.innerHTML`,
+  })
+  console.log({ html })
+  await new Promise((r) => {})
 
   const iframe = createPage({
     electronObjectId,
