@@ -1,4 +1,4 @@
-export const create = ({ expect, page, VError, electronApp }) => {
+export const create = ({ expect, page, VError }) => {
   return {
     async shouldHaveHeading(subFrame, id) {
       try {
