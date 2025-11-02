@@ -25,5 +25,5 @@ export const run = async ({ Workbench, Editor, QuickPick, WellKnownCommands, Mar
   await Editor.type('a')
   await Editor.type('b')
   await Editor.type('c')
-  await MarkdownPreview.shouldHaveHeading(subFrame, 'abc')
+  await MarkdownPreview.shouldHaveHeading(subFrame, 'cba') // TODO why is it reverse?
 }

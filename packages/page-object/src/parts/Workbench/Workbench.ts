@@ -18,8 +18,10 @@ export const create = ({ page, expect, VError }) => {
       await expect(workbench).toBeVisible()
     },
     async focusLeftEditorGroup() {
+      await page.waitForIdle()
       const quickPick = QuickPick.create({ page, expect, VError })
-      quickPick.executeCommand(WellKnownCommands.ViewFocusLeftEditorGroup)
+      await quickPick.executeCommand(WellKnownCommands.ViewFocusLeftEditorGroup)
+      await page.waitForIdle()
     },
   }
 }
