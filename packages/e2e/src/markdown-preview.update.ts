@@ -49,3 +49,7 @@ export const run = async ({ Workbench, Editor, QuickPick, WellKnownCommands, Mar
   // @ts-ignore
   await MarkdownPreview.shouldHaveHeading(subFrame, 'hello-world')
 }
+
+export const teardown = async ({ Editor }: TestContext): Promise<void> => {
+  await Editor.closeAll()
+}
