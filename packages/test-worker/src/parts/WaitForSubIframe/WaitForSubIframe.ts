@@ -1,5 +1,7 @@
-import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { DevtoolsProtocolPage, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { waitForSubFrameContext } from '../WaitForSubFrameContext/WaitForSubFrameContext.ts'
+import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
+import { waitForUtilityExecutionContext } from '../WaitForUtilityExecutionContext/WaitForUtilityExecutionContext.ts'
 
 const getMatchingSubFrame = (frames, url) => {
   for (const frame of frames) {
@@ -26,10 +28,21 @@ export const waitForSubIframe = async ({ electronRpc, url, electronObjectId, idl
   if (!matchingFrame) {
     throw new Error(`no matching frame found`)
   }
+
+  // TODO wait for execution context created to get unique id
+  const executionContextPromise = waitForUtilityExecutionContext(sessionRpc)
   console.log({ matchingFrame })
   const { executionContextId } = await DevtoolsProtocolPage.createIsolatedWorld(sessionRpc, {
     frameId: matchingFrame.id,
     worldName: 'utility',
+  })
+
+  const context = await executionContextPromise
+  console.log({ context })
+  const utilityScript = await UtilityScript.getUtilityScript()
+  await DevtoolsProtocolRuntime.evaluate(sessionRpc, {
+    contextId: executionContextId,
+    expression: utilityScript,
   })
 
   console.log({ executionContextId })

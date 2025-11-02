@@ -8,6 +8,7 @@ export const create = ({ expect, page, VError, electronApp }) => {
         await expect(webView).toHaveClass('ready')
         const childPage = await page.waitForIframe({
           url: /extensionId=vscode.markdown-language-features/,
+          injectUtilityScript: false,
         })
         // TODO double iframe...
         const subFrame = await childPage.waitForSubIframe({

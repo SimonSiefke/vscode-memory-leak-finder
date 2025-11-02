@@ -12,7 +12,16 @@ const findMatchingIframe = (targets, expectedUrl) => {
   return undefined
 }
 
-export const waitForIframe = async ({ electronRpc, url, electronObjectId, idleTimeout, browserRpc, sessionRpc, createPage }) => {
+export const waitForIframe = async ({
+  electronRpc,
+  url,
+  electronObjectId,
+  idleTimeout,
+  browserRpc,
+  sessionRpc,
+  createPage,
+  injectUtilityScript,
+}) => {
   // TODO
   // 1. enable page api
   // 2. add listener to page frame attached, frameStartedNavigating, check if it matches the expected url, take note of the frame id
@@ -35,21 +44,23 @@ export const waitForIframe = async ({ electronRpc, url, electronObjectId, idleTi
   })
   const iframeRpc = createSessionRpcConnection(browserRpc, iframeSessionId)
 
-  const script = await UtilityScript.getUtilityScript()
+  let iframeUtilityContext = undefined
 
-  const executionContextPromise = WaitForUtilityExecutionContext.waitForUtilityExecutionContext(iframeRpc)
+  if (injectUtilityScript) {
+    const script = await UtilityScript.getUtilityScript()
 
-  await Promise.all([
-    DevtoolsProtocolPage.enable(iframeRpc),
-    DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(iframeRpc, {
-      source: script,
-      worldName: 'utility',
-      runImmediately: true,
-    }),
-  ])
-  const iframeUtilityContext = await executionContextPromise
+    const executionContextPromise = WaitForUtilityExecutionContext.waitForUtilityExecutionContext(iframeRpc)
 
-  // const frames = await DevtoolsProtocolPage.getFrameTree(iframeRpc)
+    await Promise.all([
+      DevtoolsProtocolPage.enable(iframeRpc),
+      DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(iframeRpc, {
+        source: script,
+        worldName: 'utility',
+        runImmediately: true,
+      }),
+    ])
+    iframeUtilityContext = await executionContextPromise
+  }
 
   const iframe = createPage({
     electronObjectId,

@@ -111,7 +111,7 @@ export const create = ({
       return Locator.create(this.rpc, this.sessionId, `${selector}:internal-enter-frame()`, options)
     },
     utilityContext,
-    waitForIframe({ url }) {
+    waitForIframe({ url, injectUtilityScript = true }) {
       return WaitForIframe.waitForIframe({
         browserRpc,
         createPage: create,
@@ -120,6 +120,7 @@ export const create = ({
         idleTimeout,
         sessionRpc,
         url,
+        injectUtilityScript,
       })
     },
     waitForSubIframe({ url }) {
