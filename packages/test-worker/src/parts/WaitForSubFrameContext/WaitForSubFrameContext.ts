@@ -6,6 +6,7 @@ export const waitForSubFrameContext = (rpc, urlRegex, timeout) => {
   let matchingFrameId = ''
   const cleanupMaybe = () => {
     if (matchingFrameId && matchingFrameId in loaded) {
+      console.log('DO CLEANUp')
       cleanup({
         frameId: matchingFrameId,
       })
@@ -33,8 +34,8 @@ export const waitForSubFrameContext = (rpc, urlRegex, timeout) => {
     console.log(event)
     if (urlRegex.test(event.params.frame.url)) {
       console.log('MATCH')
-      matchingFrameId = event.params.id
-      loaded[event.params.id] = true
+      matchingFrameId = event.params.frame.id
+      loaded[event.params.frame.id] = true
     } else {
       console.log('NO MATCH')
     }
