@@ -31,7 +31,6 @@ export const waitForSession = async (browserRpc, attachedToPageTimeout) => {
   }
 
   const { sessionId, targetInfo } = event.params
-  console.log({ event, targetInfo })
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
 
   return {
