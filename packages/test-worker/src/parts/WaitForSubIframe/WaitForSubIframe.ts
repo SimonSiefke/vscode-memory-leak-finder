@@ -19,10 +19,7 @@ export const waitForSubIframe = async ({ electronRpc, url, electronObjectId, idl
   // 3. enable page api
   // 4. resolve promise with execution context id and frame Id, clean up listeners
 
-  const timeout = 10_000
-  const subFramePromise = waitForSubFrameContext(sessionRpc, url, timeout)
   const { frameTree } = await DevtoolsProtocolPage.getFrameTree(sessionRpc)
-  console.log({ frameTree })
   const childFrames = frameTree.childFrames.map((item) => item.frame)
   const matchingFrame = getMatchingSubFrame(childFrames, url)
   if (!matchingFrame) {

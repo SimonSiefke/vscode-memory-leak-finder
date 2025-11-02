@@ -36,8 +36,6 @@ export const waitForIframe = async ({
     throw new Error(`no matching iframe found for ${url}`)
   }
 
-  // TODO need to wait for that frame
-
   const iframeSessionId = await DevtoolsProtocolTarget.attachToTarget(sessionRpc, {
     targetId: matchingIframe.targetId,
     flatten: true,
