@@ -24,6 +24,7 @@ export const waitForSubIframe = async ({ electronRpc, url, electronObjectId, idl
   const subFrame = await subFramePromise
   await DevtoolsProtocolPage.disable(sessionRpc)
   console.log({ subFrame })
+
   const { frameTree } = await DevtoolsProtocolPage.getFrameTree(sessionRpc)
   const childFrames = frameTree.childFrames.map((item) => item.frame)
   const matchingFrame = getMatchingSubFrame(childFrames, url)
