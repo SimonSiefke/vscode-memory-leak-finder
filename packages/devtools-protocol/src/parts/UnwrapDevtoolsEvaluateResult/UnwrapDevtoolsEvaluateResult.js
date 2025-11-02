@@ -77,5 +77,8 @@ export const unwrapResult = (rawResult) => {
   if (typeof rawResult === 'object' && 'frameTree' in rawResult) {
     return rawResult
   }
+  if (typeof rawResult === 'object' && 'executionContextId' in rawResult) {
+    return rawResult
+  }
   throw new Error(`Failed to unwrap devtools evaluate result`)
 }
