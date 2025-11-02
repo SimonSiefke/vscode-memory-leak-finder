@@ -1,7 +1,5 @@
 import type { TestContext } from '../types.ts'
 
-export const skip = true
-
 export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
@@ -17,9 +15,15 @@ export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promi
 }
 
 // @ts-ignore
-export const run = async ({ QuickPick, WellKnownCommands, MarkdownPreview }: TestContext): Promise<void> => {
+export const run = async ({ Editor, QuickPick, WellKnownCommands, MarkdownPreview }: TestContext): Promise<void> => {
   await QuickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
   const subFrame = await MarkdownPreview.shouldBeVisible()
   await MarkdownPreview.shouldHaveHeading(subFrame, 'hello-world')
+  await Editor.deleteAll()
+  await Editor.type('#')
+  await Editor.type('a')
+  await Editor.type('b')
+  await Editor.type('c')
+  await MarkdownPreview.shouldHaveHeading(subFrame, 'abc')
   // TODO update editor and verify that markdown preview updates as well
 }
