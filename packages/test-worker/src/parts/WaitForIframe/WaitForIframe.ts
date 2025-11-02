@@ -1,7 +1,6 @@
+import { addUtilityExecutionContext } from '../AddUtilityExecutionContext/AddUtilityExecutionContext.ts'
 import { createSessionRpcConnection } from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
-import { DevtoolsProtocolPage, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
-import * as WaitForUtilityExecutionContext from '../WaitForUtilityExecutionContext/WaitForUtilityExecutionContext.ts'
+import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 const findMatchingIframe = (targets, expectedUrl) => {
   for (const target of targets) {
@@ -47,19 +46,8 @@ export const waitForIframe = async ({
   const utilityExecutionContextName = 'utility'
 
   if (injectUtilityScript) {
-    const script = await UtilityScript.getUtilityScript()
-
-    const executionContextPromise = WaitForUtilityExecutionContext.waitForUtilityExecutionContext(iframeRpc, utilityExecutionContextName)
-
-    await Promise.all([
-      DevtoolsProtocolPage.enable(iframeRpc),
-      DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(iframeRpc, {
-        source: script,
-        worldName: utilityExecutionContextName,
-        runImmediately: true,
-      }),
-    ])
-    iframeUtilityContext = await executionContextPromise
+    const frameId = '' // TODO
+    iframeUtilityContext = await addUtilityExecutionContext(iframeRpc, utilityExecutionContextName, frameId)
   }
 
   const iframe = createPage({
