@@ -26,6 +26,7 @@ export const create = ({ electronRpc, electronObjectId, idleTimeout, firstWindow
         browserRpc,
         sessionRpc,
         createPage: Page.create,
+        injectUtilityScript: true,
       })
     },
   }

@@ -19,7 +19,7 @@ export const waitForSubIframe = async ({ electronRpc, url, electronObjectId, idl
   // 3. enable page api
   // 4. resolve promise with execution context id and frame Id, clean up listeners
 
-  const subFramePromise = waitForSubFrameContext(sessionRpc, url, 10_000)
+  const subFramePromise = waitForSubFrameContext(sessionRpc, url, 3_000)
   await DevtoolsProtocolPage.enable(sessionRpc)
   const subFrame = await subFramePromise
   await DevtoolsProtocolPage.disable(sessionRpc)
