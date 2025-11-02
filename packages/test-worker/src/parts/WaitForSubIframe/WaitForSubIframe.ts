@@ -26,23 +26,29 @@ export const waitForSubIframe = async ({ electronRpc, url, electronObjectId, idl
     throw new Error(`no matching frame found`)
   }
 
-  // TODO wait for execution context created to get unique id
   const executionContextPromise = waitForUtilityExecutionContext(sessionRpc)
-  console.log({ matchingFrame })
   const { executionContextId } = await DevtoolsProtocolPage.createIsolatedWorld(sessionRpc, {
     frameId: matchingFrame.id,
     worldName: 'utility',
   })
 
-  const context = await executionContextPromise
-  console.log({ context })
+  const utilityContext = await executionContextPromise
   const utilityScript = await UtilityScript.getUtilityScript()
   await DevtoolsProtocolRuntime.evaluate(sessionRpc, {
     contextId: executionContextId,
     expression: utilityScript,
   })
 
-  console.log({ executionContextId })
-  await new Promise((r) => {})
-  // TODO create page with subframe data
+  const iframe = createPage({
+    electronObjectId,
+    electronRpc,
+    idleTimeout,
+    rpc: sessionRpc,
+    sessionId: sessionRpc.sessionId,
+    targetId: '', // TODO use that of parent target
+    utilityContext,
+    browserRpc,
+    sessionRpc,
+  })
+  return iframe
 }
