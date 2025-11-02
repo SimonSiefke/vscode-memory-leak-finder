@@ -12,7 +12,6 @@ export const waitForSubFrameContextEvent = (rpc, urlRegex, timeout, signal: Abor
     }
   }
   const handleFrameNavigation = (event) => {
-    console.log(event)
     if (urlRegex.test(event.params.url)) {
       matchingFrameId = event.params.frameId
     }
