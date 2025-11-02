@@ -1,6 +1,6 @@
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 
-export const waitForSubFrameContextEvent = (rpc, urlRegex, timeout) => {
+export const waitForSubFrameContextEvent = (rpc, urlRegex, timeout, signal: AbortSignal) => {
   const { resolve, promise } = Promise.withResolvers()
   const loaded = Object.create(null)
   let matchingFrameId = ''
@@ -45,16 +45,22 @@ export const waitForSubFrameContextEvent = (rpc, urlRegex, timeout) => {
     console.log('timeout')
     cleanup(null)
   }
+  const handleAbort = () => {
+    console.log('abort')
+    cleanup(null)
+  }
   const cleanup = (result) => {
     rpc.off(DevtoolsEventType.PageFrameRequestedNavigation, handleFrameNavigation)
     rpc.off(DevtoolsEventType.PageFrameStoppedLoading, handleFrameStoppedLoading)
     rpc.off(DevtoolsEventType.PageDocumentOpened, handleDocumentOpened)
     clearTimeout(timeoutRef)
+    signal.onabort = null
     resolve(result)
   }
   rpc.on(DevtoolsEventType.PageFrameRequestedNavigation, handleFrameNavigation)
   rpc.on(DevtoolsEventType.PageFrameStoppedLoading, handleFrameStoppedLoading)
   rpc.on(DevtoolsEventType.PageDocumentOpened, handleDocumentOpened)
   const timeoutRef = setTimeout(handleTimeout, timeout)
+  signal.onabort = handleAbort
   return promise
 }
