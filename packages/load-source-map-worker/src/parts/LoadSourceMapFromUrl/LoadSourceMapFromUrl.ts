@@ -8,7 +8,7 @@ import { writeFile } from 'node:fs/promises'
 import { emptySourceMap } from '../EmptySourceMap/EmptySourceMap.ts'
 
 const isNotFoundError = (error) => {
-  return error && error.message && error.message.includes('Response code 404')
+  return error && error.message && (error.message.includes('Response code 404') || error.message.includes('status code 404'))
 }
 
 export const loadSourceMap = async (url: string, hash: string): Promise<any> => {
