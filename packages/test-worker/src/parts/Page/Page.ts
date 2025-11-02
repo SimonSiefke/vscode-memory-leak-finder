@@ -9,6 +9,7 @@ import * as PageMouse from '../PageMouse/PageMouse.ts'
 import * as PageReload from '../PageReload/PageReload.ts'
 import * as PageWaitForIdle from '../PageWaitForIdle/PageWaitForIdle.ts'
 import * as WaitForIframe from '../WaitForIframe/WaitForIframe.ts'
+import { waitForSubIframe } from '../WaitForSubIframe/WaitForSubIframe.ts'
 import * as WebWorker from '../WebWorker/WebWorker.ts'
 
 const createKeyboard = (rpc) => {
@@ -112,6 +113,17 @@ export const create = ({
     utilityContext,
     waitForIframe({ url }) {
       return WaitForIframe.waitForIframe({
+        browserRpc,
+        createPage: create,
+        electronObjectId,
+        electronRpc,
+        idleTimeout,
+        sessionRpc,
+        url,
+      })
+    },
+    waitForSubIframe({ url }) {
+      return waitForSubIframe({
         browserRpc,
         createPage: create,
         electronObjectId,
