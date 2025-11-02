@@ -14,7 +14,7 @@ export const isVisible = async (locator) => {
       awaitPromise: true,
       returnByValue: true,
     },
-    locator.sessionId,
+    locator,
   )
   return value
 }

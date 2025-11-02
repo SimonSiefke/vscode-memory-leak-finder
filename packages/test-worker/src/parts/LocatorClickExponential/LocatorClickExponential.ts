@@ -16,6 +16,6 @@ export const clickExponential = async (locator, options) => {
       ],
       awaitPromise: true,
     },
-    locator.sessionId,
+    locator,
   )
 }

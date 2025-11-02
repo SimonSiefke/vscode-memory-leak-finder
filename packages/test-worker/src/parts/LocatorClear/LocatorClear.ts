@@ -21,6 +21,6 @@ export const clear = async (locator) => {
       ],
       awaitPromise: true,
     },
-    locator.sessionId,
+    locator,
   )
 }

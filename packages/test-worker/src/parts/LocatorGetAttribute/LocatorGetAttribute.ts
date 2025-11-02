@@ -17,7 +17,7 @@ export const getAttribute = async (locator, attributeName) => {
       ],
       awaitPromise: true,
     },
-    locator.sessionId,
+    locator,
   )
   return attributeValue
 }

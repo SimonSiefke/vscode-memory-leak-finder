@@ -25,7 +25,7 @@ export const type = async (locator, text) => {
       ],
       awaitPromise: true,
     },
-    locator.sessionId,
+    locator,
   )
 }
 
@@ -42,6 +42,6 @@ export const typeAndWaitFor = async (locator, text, waitFor, options) => {
       ],
       awaitPromise: true,
     },
-    locator.sessionId,
+    locator,
   )
 }

@@ -15,7 +15,7 @@ export const boundingBox = async (locator) => {
       awaitPromise: true,
       returnByValue: true,
     },
-    locator.sessionId,
+    locator,
   )
   return boundingBox
 }

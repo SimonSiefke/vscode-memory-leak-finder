@@ -22,6 +22,6 @@ export const press = async (locator, key) => {
       ],
       awaitPromise: true,
     },
-    locator.sessionId,
+    locator,
   )
 }

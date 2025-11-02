@@ -22,6 +22,6 @@ export const setValue = async (locator, text) => {
       ],
       awaitPromise: true,
     },
-    locator.sessionId,
+    locator,
   )
 }
