@@ -28,6 +28,7 @@ export const create = ({ expect, page, VError, electronApp }) => {
         await expect(webView).toHaveClass('ready')
         await electronApp.waitForIframe({
           url: /extensionId=vscode.markdown-language-features/,
+          injectUtilityScript: false,
         })
       } catch (error) {
         throw new VError(error, `Failed to check that markdown preview is visible`)

@@ -46,7 +46,7 @@ export const waitForIframe = async ({
 
   let iframeUtilityContext = undefined
 
-  console.log({ injectUtilityScript })
+  console.trace({ injectUtilityScript })
   const utilityExecutionContextName = 'utility'
 
   if (injectUtilityScript) {
