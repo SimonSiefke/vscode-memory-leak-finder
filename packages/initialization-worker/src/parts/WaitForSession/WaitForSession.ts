@@ -29,7 +29,9 @@ export const waitForSession = async (browserRpc, attachedToPageTimeout) => {
   if (!event) {
     throw new Error(`Failed to attach to page`)
   }
+
   const { sessionId, targetInfo } = event.params
+  console.log({ event, targetInfo })
   const sessionRpc = DebuggerCreateSessionRpcConnection.createSessionRpcConnection(browserRpc, sessionId)
 
   return {
