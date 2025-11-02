@@ -22,6 +22,9 @@ export const create = ({ expect, page, VError, electronApp }) => {
         const subFrame = await childPage.waitForSubIframe({
           url: /extensionId=vscode.markdown-language-features/,
         })
+        await subFrame.waitForIdle()
+        const markDown = subFrame.locator('.markdown-body')
+        await expect(markDown).toBeVisible()
         return subFrame
       } catch (error) {
         throw new VError(error, `Failed to check that markdown preview is visible`)
