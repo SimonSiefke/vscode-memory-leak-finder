@@ -24,11 +24,11 @@ export const waitForSubIframe = async ({ electronRpc, url, electronObjectId, idl
   console.log('enabled page')
   const { frameTree } = await DevtoolsProtocolPage.getFrameTree(sessionRpc)
   const childFrames = frameTree.childFrames.map((item) => item.frame)
-  console.log({ childFrames })
+  // console.log({ childFrames })
 
   const subFrame = await subFramePromise
-  // await DevtoolsProtocolPage.disable(sessionRpc)
-  console.log({ subFrame })
+  await DevtoolsProtocolPage.disable(sessionRpc)
+  // console.log({ subFrame })
 
   const matchingFrame = getMatchingSubFrame(childFrames, url)
   if (!matchingFrame) {
@@ -44,9 +44,7 @@ export const waitForSubIframe = async ({ electronRpc, url, electronObjectId, idl
     worldName: utilityExecutionContextName,
   })
 
-  console.log('after world')
   const utilityContext = await executionContextPromise
-  console.log('after wait')
   const utilityScript = await UtilityScript.getUtilityScript()
   await DevtoolsProtocolRuntime.evaluate(sessionRpc, {
     uniqueContextId: utilityContext.uniqueId,
