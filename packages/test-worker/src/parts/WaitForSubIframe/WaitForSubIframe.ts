@@ -1,4 +1,3 @@
-import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { waitForSubFrameContext } from '../WaitForSubFrameContext/WaitForSubFrameContext.ts'
 
@@ -18,8 +17,10 @@ export const waitForSubIframe = async ({ electronRpc, url, electronObjectId, idl
 
   {
     const { frameTree } = await DevtoolsProtocolPage.getFrameTree(sessionRpc)
+    const childFrames = frameTree.childFrames
     console.log({ frameTree })
     console.log({ subFrame })
+    console.log({ childFrames })
   }
 
   await new Promise((r) => {})
