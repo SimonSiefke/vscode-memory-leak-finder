@@ -2,7 +2,16 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
-export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promise<void> => {
+export const setup = async ({
+  Workbench,
+  Workspace,
+  Explorer,
+  Editor,
+  QuickPick,
+  // @ts-ignore
+  WellKnownCommands,
+  MarkdownPreview,
+}: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'index.md',
@@ -14,16 +23,19 @@ export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promi
   await Explorer.refresh()
   await Explorer.shouldHaveItem('index.md')
   await Editor.open('index.md')
-}
-
-// @ts-ignore
-export const run = async ({ Workbench, Editor, QuickPick, WellKnownCommands, MarkdownPreview }: TestContext): Promise<void> => {
   await QuickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
   const subFrame = await MarkdownPreview.shouldBeVisible()
   // @ts-ignore
   await MarkdownPreview.shouldHaveHeading(subFrame, 'hello-world')
   // @ts-ignore
   await Workbench.focusLeftEditorGroup()
+}
+
+// @ts-ignore
+export const run = async ({ Workbench, Editor, QuickPick, WellKnownCommands, MarkdownPreview }: TestContext): Promise<void> => {
+  const subFrame = await MarkdownPreview.shouldBeVisible()
+  // @ts-ignore
+  await MarkdownPreview.shouldHaveHeading(subFrame, 'hello-world')
   await Editor.deleteAll()
   await Editor.type('a')
   await Editor.type('b')
@@ -48,6 +60,7 @@ export const run = async ({ Workbench, Editor, QuickPick, WellKnownCommands, Mar
   await Editor.type('#')
   // @ts-ignore
   await MarkdownPreview.shouldHaveHeading(subFrame, 'hello-world')
+  await Editor.save({ viaKeyBoard: true })
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {

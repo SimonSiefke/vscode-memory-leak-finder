@@ -13,15 +13,16 @@ export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promi
   await Explorer.focus()
   await Explorer.refresh()
   await Explorer.shouldHaveItem('index.md')
-  await Editor.open('index.md')
 }
 
 // @ts-ignore
-export const run = async ({ QuickPick, WellKnownCommands, MarkdownPreview }: TestContext): Promise<void> => {
+export const run = async ({ Editor, QuickPick, WellKnownCommands, MarkdownPreview }: TestContext): Promise<void> => {
+  await Editor.open('index.md')
   await QuickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
   const subFrame = await MarkdownPreview.shouldBeVisible()
   // @ts-ignore
   await MarkdownPreview.shouldHaveHeading(subFrame, 'hello-world')
+  await Editor.closeAll()
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
