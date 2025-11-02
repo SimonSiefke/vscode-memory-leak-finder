@@ -4,9 +4,13 @@ import * as Assert from '../Assert/Assert.ts'
 // TODO use page object
 export const evaluateInUtilityContext = async (options: any, locator: any): Promise<any> => {
   const { rpc, utilityContext } = locator
+  console.log(options)
+  console.log(rpc)
   Assert.object(rpc)
   Assert.object(utilityContext)
-  const result = await DevtoolsProtocolRuntime.evaluate(rpc, {
+  Assert.string(utilityContext.uniqueId)
+  Assert.string(rpc.sessionId)
+  const result = await DevtoolsProtocolRuntime.callFunctionOn(rpc, {
     ...options,
     uniqueContextId: utilityContext.uniqueId,
   })

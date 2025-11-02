@@ -62,9 +62,7 @@ export const create = (rpc, sessionId, selector, { hasText = '', hasExactText = 
       }
     },
     count() {
-      return LocatorCount.count({
-        selector: this.selector,
-      })
+      return LocatorCount.count(this)
     },
     locator(selector, { hasText = '', hasExactText = '', nth = -1 } = {}) {
       return {
@@ -81,18 +79,11 @@ export const create = (rpc, sessionId, selector, { hasText = '', hasExactText = 
       )
     },
     type(text) {
-      return LocatorType.type(
-        {
-          selector: this.selector,
-        },
-        text,
-      )
+      return LocatorType.type(this, text)
     },
     typeAndWaitFor(text, locator, options) {
       return LocatorType.typeAndWaitFor(
-        {
-          selector: this.selector,
-        },
+        this,
         text,
         {
           selector: locator.selector,
@@ -101,99 +92,52 @@ export const create = (rpc, sessionId, selector, { hasText = '', hasExactText = 
       )
     },
     setValue(value) {
-      return LocatorSetValue.setValue(
-        {
-          selector: this.selector,
-        },
-        value,
-      )
+      return LocatorSetValue.setValue(this, value)
     },
     click(options = {}) {
-      return LocatorClick.click(
-        {
-          selector: this.selector,
-        },
-        options,
-      )
+      return LocatorClick.click(this, options)
     },
     clear() {
-      return LocatorClear.clear({
-        selector: this.selector,
-      })
+      return LocatorClear.clear(this)
     },
     boundingBox() {
-      return LocatorBoundingBox.boundingBox({
-        selector: this.selector,
-      })
+      return LocatorBoundingBox.boundingBox(this)
     },
     dblclick() {
-      return LocatorClick.dblclick({
-        selector: this.selector,
-      })
+      return LocatorClick.dblclick(this)
     },
     hover() {
-      return LocatorHover.hover({
-        selector: this.selector,
-      })
+      return LocatorHover.hover(this)
     },
     focus() {
-      return LocatorFocus.focus({
-        selector: this.selector,
-      })
+      return LocatorFocus.focus(this)
     },
     blur() {
-      return LocatorBlur.blur({
-        selector: this.selector,
-      })
+      return LocatorBlur.blur(this)
     },
     textContent() {
-      return LocatorTextContent.getTextContent({
-        selector: this.selector,
-      })
+      return LocatorTextContent.getTextContent(this)
     },
     selectText() {
-      return LocatorSelectText.selectText({
-        selector: this.selector,
-      })
+      return LocatorSelectText.selectText(this)
     },
     getAttribute(attributeName) {
-      return LocatorGetAttribute.getAttribute(
-        {
-          selector: this.selector,
-        },
-        attributeName,
-      )
+      return LocatorGetAttribute.getAttribute(this, attributeName)
     },
     clickExponential(options) {
-      return LocatorClickExponential.clickExponential(
-        {
-          selector: this.selector,
-        },
-        options,
-      )
+      return LocatorClickExponential.clickExponential(this, options)
     },
     press(key) {
-      return LocatorPress.press(
-        {
-          selector: this.selector,
-        },
-        key,
-      )
+      return LocatorPress.press(this, key)
     },
     isVisible() {
-      return LocatorIsVisible.isVisible({
-        selector: this.selector,
-      })
+      return LocatorIsVisible.isVisible(this)
     },
     scrollDown() {
-      return LocatorScrollDown.scrollDown({
-        selector: this.selector,
-      })
+      return LocatorScrollDown.scrollDown(this)
     },
     scrollUp() {
-      return LocatorScrollUp.scrollUp({
-        selector: this.selector,
-      })
+      return LocatorScrollUp.scrollUp(this)
     },
   }
 }
