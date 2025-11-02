@@ -11,10 +11,16 @@ export const waitForSubIframe = async ({ electronRpc, url, electronObjectId, idl
 
   const timeout = 10_000
   const subFramePromise = waitForSubFrameContext(sessionRpc, url, timeout)
-  await DevtoolsProtocolPage.enable()
+  const { frameTree } = await DevtoolsProtocolPage.getFrameTree(sessionRpc)
+  console.log({ frameTree })
+  await DevtoolsProtocolPage.enable(sessionRpc)
   const subFrame = await subFramePromise
 
-  console.log({ subFrame })
+  {
+    const { frameTree } = await DevtoolsProtocolPage.getFrameTree(sessionRpc)
+    console.log({ frameTree })
+    console.log({ subFrame })
+  }
 
   await new Promise((r) => {})
   // TODO create page with subframe data

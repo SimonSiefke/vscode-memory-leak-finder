@@ -11,7 +11,7 @@ export const create = ({ expect, page, VError, electronApp }) => {
         })
         // TODO double iframe...
         const subFrame = await childPage.waitForSubIframe({
-          url: /fake\.html/,
+          url: /extensionId=vscode.markdown-language-features/,
         })
         console.log({ subFrame })
         const heading = subFrame.locator(`#${id}`)
