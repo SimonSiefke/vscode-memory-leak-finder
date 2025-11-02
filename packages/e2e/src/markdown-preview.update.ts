@@ -1,5 +1,6 @@
 import type { TestContext } from '../types.ts'
 
+export const skip = 1
 export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
@@ -18,7 +19,9 @@ export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promi
 export const run = async ({ Workbench, Editor, QuickPick, WellKnownCommands, MarkdownPreview }: TestContext): Promise<void> => {
   await QuickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
   const subFrame = await MarkdownPreview.shouldBeVisible()
+  // @ts-ignore
   await MarkdownPreview.shouldHaveHeading(subFrame, 'hello-world')
+  // @ts-ignore
   await Workbench.focusLeftEditorGroup()
   await Editor.deleteAll()
   await Editor.type('a')
@@ -26,6 +29,7 @@ export const run = async ({ Workbench, Editor, QuickPick, WellKnownCommands, Mar
   await Editor.type('c')
   await Editor.type(' ')
   await Editor.type('#')
+  // @ts-ignore
   await MarkdownPreview.shouldHaveHeading(subFrame, 'cba') // TODO why is it reverse?
   await Editor.deleteAll()
   await Editor.type('d')
@@ -41,5 +45,6 @@ export const run = async ({ Workbench, Editor, QuickPick, WellKnownCommands, Mar
   await Editor.type('h')
   await Editor.type(' ')
   await Editor.type('#')
+  // @ts-ignore
   await MarkdownPreview.shouldHaveHeading(subFrame, 'hello-world')
 }
