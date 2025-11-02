@@ -4,8 +4,6 @@ import * as Assert from '../Assert/Assert.ts'
 // TODO use page object
 export const evaluateInUtilityContext = async (options: any, locator: any): Promise<any> => {
   const { rpc, utilityContext } = locator
-  console.log(options)
-  console.log(rpc)
   Assert.object(rpc)
   Assert.object(utilityContext)
   Assert.string(utilityContext.uniqueId)
