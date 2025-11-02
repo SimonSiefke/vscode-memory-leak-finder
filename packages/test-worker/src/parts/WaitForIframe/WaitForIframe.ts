@@ -22,6 +22,7 @@ export const waitForIframe = async ({
   createPage,
   injectUtilityScript,
 }) => {
+  console.log('before wait for iframe')
   // TODO
   // 1. enable page api
   // 2. add listener to page frame attached, frameStartedNavigating, check if it matches the expected url, take note of the frame id
@@ -30,6 +31,7 @@ export const waitForIframe = async ({
 
   // TODO ask browser rpc for targets / add target change listener
   const targets = await DevtoolsProtocolTarget.getTargets(sessionRpc)
+  console.log('after targerts')
   const iframes = targets.filter((target) => target.type === 'iframe')
   const matchingIframe = findMatchingIframe(iframes, url)
   if (!matchingIframe) {
@@ -47,7 +49,7 @@ export const waitForIframe = async ({
   if (injectUtilityScript) {
     const script = await UtilityScript.getUtilityScript()
 
-    const executionContextPromise = WaitForUtilityExecutionContext.waitForUtilityExecutionContext(iframeRpc)
+    const executionContextPromise = WaitForUtilityExecutionContext.waitForUtilityExecutionContext(iframeRpc, 'utility')
 
     await Promise.all([
       DevtoolsProtocolPage.enable(iframeRpc),

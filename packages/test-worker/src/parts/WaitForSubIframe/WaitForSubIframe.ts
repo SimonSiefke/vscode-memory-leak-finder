@@ -38,12 +38,15 @@ export const waitForSubIframe = async ({ electronRpc, url, electronObjectId, idl
   const utilityExecutionContextName = 'utility-iframe'
   const executionContextPromise = waitForUtilityExecutionContext(sessionRpc, utilityExecutionContextName)
 
+  console.log('before wait')
   await DevtoolsProtocolPage.createIsolatedWorld(sessionRpc, {
     frameId: matchingFrame.id,
     worldName: utilityExecutionContextName,
   })
 
+  console.log('after world')
   const utilityContext = await executionContextPromise
+  console.log('after wait')
   const utilityScript = await UtilityScript.getUtilityScript()
   await DevtoolsProtocolRuntime.evaluate(sessionRpc, {
     uniqueContextId: utilityContext.uniqueId,
