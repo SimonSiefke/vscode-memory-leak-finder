@@ -46,16 +46,19 @@ export const waitForIframe = async ({
 
   let iframeUtilityContext = undefined
 
+  console.log({ injectUtilityScript })
+  const utilityExecutionContextName = 'utility'
+
   if (injectUtilityScript) {
     const script = await UtilityScript.getUtilityScript()
 
-    const executionContextPromise = WaitForUtilityExecutionContext.waitForUtilityExecutionContext(iframeRpc, 'utility')
+    const executionContextPromise = WaitForUtilityExecutionContext.waitForUtilityExecutionContext(iframeRpc, utilityExecutionContextName)
 
     await Promise.all([
       DevtoolsProtocolPage.enable(iframeRpc),
       DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(iframeRpc, {
         source: script,
-        worldName: 'utility',
+        worldName: utilityExecutionContextName,
         runImmediately: true,
       }),
     ])
