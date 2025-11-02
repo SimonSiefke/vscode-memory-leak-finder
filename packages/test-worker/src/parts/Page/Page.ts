@@ -125,7 +125,7 @@ export const create = ({
         injectUtilityScript,
       })
     },
-    waitForSubIframe({ url }) {
+    waitForSubIframe({ url, injectUtilityScript = true }) {
       return waitForSubIframe({
         browserRpc,
         createPage: create,
@@ -134,6 +134,7 @@ export const create = ({
         idleTimeout,
         sessionRpc,
         url,
+        injectUtilityScript,
       })
     },
   }
