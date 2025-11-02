@@ -1,8 +1,6 @@
 import { createSessionRpcConnection } from '../DebuggerCreateSessionRpcConnection/DebuggerCreateSessionRpcConnection.ts'
-import { DevtoolsProtocolPage, DevtoolsProtocolRuntime, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-import * as Page from '../Page/Page.ts'
+import { DevtoolsProtocolPage, DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as UtilityScript from '../UtilityScript/UtilityScript.ts'
-import { waitForAttachedEvent } from '../WaitForAttachedEvent/WaitForAttachedEvent.ts'
 import * as WaitForUtilityExecutionContext from '../WaitForUtilityExecutionContext/WaitForUtilityExecutionContext.ts'
 
 const findMatchingIframe = (targets, expectedUrl) => {
@@ -14,51 +12,29 @@ const findMatchingIframe = (targets, expectedUrl) => {
   return undefined
 }
 
-export const waitForIframe = async ({ electronRpc, url, electronObjectId, idleTimeout, browserRpc, sessionRpc }) => {
+export const waitForIframe = async ({
+  electronRpc,
+  url,
+  electronObjectId,
+  idleTimeout,
+  browserRpc,
+  sessionRpc,
+  createPage,
+  injectUtilityScript,
+}) => {
+  // TODO
+  // 1. enable page api
+  // 2. add listener to page frame attached, frameStartedNavigating, check if it matches the expected url, take note of the frame id
+  // 3. add listener for runtime execution context created, check if it matches the frame id from above
+  // 4. resolve promise with execution context id and frame Id, clean up listeners
+
   // TODO ask browser rpc for targets / add target change listener
   const targets = await DevtoolsProtocolTarget.getTargets(sessionRpc)
   const iframes = targets.filter((target) => target.type === 'iframe')
   const matchingIframe = findMatchingIframe(iframes, url)
   if (!matchingIframe) {
-    const eventPromise = waitForAttachedEvent(sessionRpc, 10_000)
-
-    await DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
-      autoAttach: true,
-      waitForDebuggerOnStart: false,
-      flatten: true,
-      filter: [
-        {
-          type: 'browser',
-          exclude: true,
-        },
-        {
-          type: 'tab',
-          exclude: true,
-        },
-        {
-          type: 'page',
-          exclude: false,
-        },
-        {
-          type: 'iframe',
-          exclude: false,
-        },
-      ],
-    })
-
-    const event = await eventPromise
-
-    if (event === null) {
-      throw new Error(`no matching iframe found for ${url}`)
-    }
-    const targetInfo = event.params.targetInfo
-
-    const targets = await DevtoolsProtocolTarget.getTargets(sessionRpc)
-
     throw new Error(`no matching iframe found for ${url}`)
   }
-
-  // TODO need to wait for that frame
 
   const iframeSessionId = await DevtoolsProtocolTarget.attachToTarget(sessionRpc, {
     targetId: matchingIframe.targetId,
@@ -66,20 +42,25 @@ export const waitForIframe = async ({ electronRpc, url, electronObjectId, idleTi
   })
   const iframeRpc = createSessionRpcConnection(browserRpc, iframeSessionId)
 
-  const script = await UtilityScript.getUtilityScript()
+  let iframeUtilityContext = undefined
 
-  const executionContextPromise = WaitForUtilityExecutionContext.waitForUtilityExecutionContext(iframeRpc)
-  await Promise.all([
-    DevtoolsProtocolPage.enable(sessionRpc),
-    DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(iframeRpc, {
-      source: script,
-      worldName: 'utility',
-      runImmediately: true,
-    }),
-  ])
-  const iframeUtilityContext = await executionContextPromise
+  if (injectUtilityScript) {
+    const script = await UtilityScript.getUtilityScript()
 
-  const iframe = Page.create({
+    const executionContextPromise = WaitForUtilityExecutionContext.waitForUtilityExecutionContext(iframeRpc)
+
+    await Promise.all([
+      DevtoolsProtocolPage.enable(iframeRpc),
+      DevtoolsProtocolPage.addScriptToEvaluateOnNewDocument(iframeRpc, {
+        source: script,
+        worldName: 'utility',
+        runImmediately: true,
+      }),
+    ])
+    iframeUtilityContext = await executionContextPromise
+  }
+
+  const iframe = createPage({
     electronObjectId,
     electronRpc,
     idleTimeout,
@@ -87,6 +68,8 @@ export const waitForIframe = async ({ electronRpc, url, electronObjectId, idleTi
     sessionId: iframeRpc.sessionId,
     targetId: matchingIframe.targetId,
     utilityContext: iframeUtilityContext,
+    browserRpc,
+    sessionRpc: iframeRpc,
   })
   return iframe
 }

@@ -8,6 +8,8 @@ import * as PageKeyBoard from '../PageKeyBoard/PageKeyBoard.ts'
 import * as PageMouse from '../PageMouse/PageMouse.ts'
 import * as PageReload from '../PageReload/PageReload.ts'
 import * as PageWaitForIdle from '../PageWaitForIdle/PageWaitForIdle.ts'
+import * as WaitForIframe from '../WaitForIframe/WaitForIframe.ts'
+import { waitForSubIframe } from '../WaitForSubIframe/WaitForSubIframe.ts'
 import * as WebWorker from '../WebWorker/WebWorker.ts'
 
 const createKeyboard = (rpc) => {
@@ -46,7 +48,17 @@ const createMouse = (rpc) => {
   }
 }
 
-export const create = ({ electronRpc, electronObjectId, targetId, sessionId, rpc, idleTimeout, utilityContext }) => {
+export const create = ({
+  browserRpc,
+  sessionRpc,
+  electronRpc,
+  electronObjectId,
+  targetId,
+  sessionId,
+  rpc,
+  idleTimeout,
+  utilityContext,
+}) => {
   return {
     type: DevtoolsTargetType.Page,
     objectType: DevtoolsTargetType.Page,
@@ -55,6 +67,8 @@ export const create = ({ electronRpc, electronObjectId, targetId, sessionId, rpc
     rpc,
     electronRpc,
     electronObjectId,
+    browserRpc,
+    sessionRpc,
     async evaluate({ expression, awaitPromise = false, replMode = false }) {
       return PageEvaluate.evaluate(this.rpc, {
         expression,
@@ -97,5 +111,28 @@ export const create = ({ electronRpc, electronObjectId, targetId, sessionId, rpc
       return Locator.create(this.rpc, this.sessionId, `${selector}:internal-enter-frame()`, options)
     },
     utilityContext,
+    waitForIframe({ url, injectUtilityScript = true }) {
+      return WaitForIframe.waitForIframe({
+        browserRpc,
+        createPage: create,
+        electronObjectId,
+        electronRpc,
+        idleTimeout,
+        sessionRpc,
+        url,
+        injectUtilityScript,
+      })
+    },
+    waitForSubIframe({ url }) {
+      return waitForSubIframe({
+        browserRpc,
+        createPage: create,
+        electronObjectId,
+        electronRpc,
+        idleTimeout,
+        sessionRpc,
+        url,
+      })
+    },
   }
 }
