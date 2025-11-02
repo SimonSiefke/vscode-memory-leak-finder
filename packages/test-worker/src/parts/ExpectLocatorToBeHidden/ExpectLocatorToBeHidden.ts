@@ -17,6 +17,6 @@ export const toBeHidden = async (locator, options = {}) => {
       ],
       awaitPromise: true,
     },
-    locator.sessionId,
+    locator,
   )
 }

@@ -13,7 +13,7 @@ export const getTextContent = async (locator) => {
       ],
       awaitPromise: true,
     },
-    locator.sessionId,
+    locator,
   )
   return text
 }
