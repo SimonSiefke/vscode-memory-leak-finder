@@ -1,7 +1,6 @@
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
-const waitForEventInternal = (sessionRpc, utilityExecutionContextName): Promise<any> => {
+const waitForEventInternal = (sessionRpc, utilityExecutionContextName, contexts): Promise<any> => {
   const { resolve, promise } = Promise.withResolvers<any>()
   const cleanup = (value) => {
     // TODO remove event listener
@@ -11,6 +10,11 @@ const waitForEventInternal = (sessionRpc, utilityExecutionContextName): Promise<
     const { params } = event
     const { context } = params
     const { name, id, uniqueId } = context
+    contexts[uniqueId] = {
+      name,
+      id,
+      uniqueId,
+    }
     if (name === utilityExecutionContextName) {
       cleanup({
         name,
@@ -23,12 +27,9 @@ const waitForEventInternal = (sessionRpc, utilityExecutionContextName): Promise<
   return promise
 }
 
-export const waitForUtilityExecutionContext = async (sessionRpc, utilityExecutionContextName) => {
-  const eventPromise = waitForEventInternal(sessionRpc, utilityExecutionContextName)
-  await DevtoolsProtocolRuntime.enable(sessionRpc)
+export const waitForUtilityExecutionContext = async (sessionRpc, utilityExecutionContextName, contexts) => {
+  const eventPromise = waitForEventInternal(sessionRpc, utilityExecutionContextName, contexts)
   const { name, id, uniqueId } = await eventPromise
-  await DevtoolsProtocolRuntime.disable(sessionRpc)
-
   return {
     name,
     id,
