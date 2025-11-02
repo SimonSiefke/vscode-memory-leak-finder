@@ -35,10 +35,12 @@ export const waitForSubIframe = async ({ electronRpc, url, electronObjectId, idl
     throw new Error(`no matching frame found`)
   }
 
-  const executionContextPromise = waitForUtilityExecutionContext(sessionRpc)
-  const { executionContextId } = await DevtoolsProtocolPage.createIsolatedWorld(sessionRpc, {
+  const utilityExecutionContextName = 'utility-iframe'
+  const executionContextPromise = waitForUtilityExecutionContext(sessionRpc, utilityExecutionContextName)
+
+  await DevtoolsProtocolPage.createIsolatedWorld(sessionRpc, {
     frameId: matchingFrame.id,
-    worldName: 'utility',
+    worldName: utilityExecutionContextName,
   })
 
   const utilityContext = await executionContextPromise
