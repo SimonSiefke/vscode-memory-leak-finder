@@ -1,7 +1,5 @@
 import type { TestContext } from '../types.ts'
 
-export const skip = 1
-
 export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
@@ -48,4 +46,9 @@ export const run = async ({ Workbench, Editor, QuickPick, WellKnownCommands, Mar
   await Editor.type('#')
   // @ts-ignore
   await MarkdownPreview.shouldHaveHeading(subFrame, 'hello-world')
+}
+
+export const teardown = async ({ Editor }: TestContext): Promise<void> => {
+  await Editor.save({ viaKeyBoard: true })
+  await Editor.closeAll()
 }

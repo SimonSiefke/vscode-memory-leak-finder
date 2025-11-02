@@ -1,6 +1,7 @@
+import { addUtilityExecutionContext } from '../AddUtilityExecutionContext/AddUtilityExecutionContext.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { DevtoolsProtocolPage, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as DisableTimeouts from '../DisableTimeouts/DisableTimeouts.ts'
 import * as ElectronApp from '../ElectronApp/ElectronApp.ts'
 import * as Expect from '../Expect/Expect.ts'
@@ -19,12 +20,11 @@ export const connectDevtools = async (
   pageObjectPath: string,
   parsedIdeVersion: any,
   timeouts: boolean,
-  utilityContext: any,
+  _utilityContext: any,
   attachedToPageTimeout: number,
 ) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
-  Assert.object(utilityContext)
   // TODO must create separate electron object id since it is a separate connection
 
   const [electronRpc, browserRpc] = await Promise.all([
@@ -32,6 +32,13 @@ export const connectDevtools = async (
     DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl),
   ])
   const { sessionRpc, sessionId, targetId } = await waitForSession(browserRpc, attachedToPageTimeout)
+
+  const { frameTree } = await DevtoolsProtocolPage.getFrameTree(sessionRpc)
+  const frameId = frameTree.frame.id
+
+  const utilityExecutionContextName = 'utility'
+  const utilityContext = await addUtilityExecutionContext(sessionRpc, utilityExecutionContextName, frameId)
+
   const firstWindow = Page.create({
     electronObjectId,
     electronRpc,
