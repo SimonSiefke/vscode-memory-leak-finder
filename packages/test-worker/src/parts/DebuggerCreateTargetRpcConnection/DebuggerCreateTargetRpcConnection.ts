@@ -3,7 +3,6 @@ export const createTargetRpcConnection = (rpc, targetId, sessionId) => {
     listeners: rpc.listeners,
     callbacks: rpc.callbacks,
     invoke(method, params) {
-      console.log({ method, params })
       return rpc.invokeWithTarget(targetId, sessionId, method, params)
     },
     on: rpc.on,

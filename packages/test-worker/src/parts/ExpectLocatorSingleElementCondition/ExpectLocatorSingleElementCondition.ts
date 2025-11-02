@@ -2,7 +2,6 @@ import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateI
 import * as IsDevtoolsInternalError from '../IsDevtoolsInternalError/IsDevtoolsInternalError.ts'
 
 export const checkSingleElementCondition = async (fnName, locator, options = {}) => {
-  console.log({ locator })
   while (true) {
     try {
       await EvaluateInUtilityContext.evaluateInUtilityContext(

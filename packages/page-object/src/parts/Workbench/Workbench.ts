@@ -1,3 +1,6 @@
+import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
+
 export const create = ({ page, expect, VError }) => {
   return {
     async shouldHaveEditorBackground(color) {
@@ -13,6 +16,12 @@ export const create = ({ page, expect, VError }) => {
     async shouldBeVisible() {
       const workbench = page.locator('.monaco-workbench')
       await expect(workbench).toBeVisible()
+    },
+    async focusLeftEditorGroup() {
+      await page.waitForIdle()
+      const quickPick = QuickPick.create({ page, expect, VError })
+      await quickPick.executeCommand(WellKnownCommands.ViewFocusLeftEditorGroup)
+      await page.waitForIdle()
     },
   }
 }
