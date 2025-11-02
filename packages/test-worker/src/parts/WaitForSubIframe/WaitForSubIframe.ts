@@ -55,6 +55,8 @@ export const waitForSubIframe = async ({ electronRpc, url, electronObjectId, idl
     expression: `document.body.innerHTML`,
   })
 
+  console.log({ html })
+
   const iframe = createPage({
     electronObjectId,
     electronRpc,
