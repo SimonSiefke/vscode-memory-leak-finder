@@ -9,6 +9,12 @@ export const waitForSubFrameContext = (rpc, urlRegex, timeout) => {
       cleanup({
         frameId: matchingFrameId,
       })
+    } else {
+      console.log('NO CLEANUP')
+      console.log({
+        loaded,
+        matchingFrameId,
+      })
     }
   }
   const handleFrameNavigation = (event) => {
@@ -28,6 +34,7 @@ export const waitForSubFrameContext = (rpc, urlRegex, timeout) => {
     if (urlRegex.test(event.params.frame.url)) {
       console.log('MATCH')
       matchingFrameId = event.params.id
+      loaded[event.params.id] = true
     } else {
       console.log('NO MATCH')
     }
