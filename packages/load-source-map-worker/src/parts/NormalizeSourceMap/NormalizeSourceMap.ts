@@ -14,8 +14,10 @@ export const normalizeSourceMap = async (originalPath: string, outFilePath: stri
       const source = cleanSources[i]
       const sourcePath = resolve(sourcesPath, source)
       if (!sourcePath.startsWith(sourcesPath)) {
-        console.log({ sourcesPath, sourcePath })
         throw new Error(`cannot write to file outside of source: ${sourcePath}`)
+      }
+      if (sourcePath === sourcesPath) {
+        throw new Error(`cannot write source to directory ${sourcePath}`)
       }
       await mkdir(dirname(sourcePath), { recursive: true })
       await writeFile(sourcePath, data.sourcesContent[i])
