@@ -17,13 +17,6 @@ export const waitForSubIframe = async ({ electronRpc, url, electronObjectId, idl
   const utilityExecutionContextName = 'utility-iframe'
   const utilityContext = await addUtilityExecutionContext(sessionRpc, utilityExecutionContextName, subFrame.id)
 
-  const html = await DevtoolsProtocolRuntime.evaluate(sessionRpc, {
-    uniqueContextId: utilityContext.uniqueId,
-    expression: `document.body.innerHTML`,
-  })
-
-  console.log({ html })
-
   const iframe = createPage({
     electronObjectId,
     electronRpc,
