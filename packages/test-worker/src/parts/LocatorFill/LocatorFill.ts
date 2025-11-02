@@ -22,6 +22,6 @@ export const fill = async (locator, text) => {
       ],
       awaitPromise: true,
     },
-    locator.sessionId,
+    locator,
   )
 }

@@ -19,6 +19,6 @@ export const blur = async (locator) => {
       ],
       awaitPromise: true,
     },
-    locator.sessionId,
+    locator,
   )
 }

@@ -12,38 +12,40 @@ import * as WaitForIframe from '../WaitForIframe/WaitForIframe.ts'
 import { waitForSubIframe } from '../WaitForSubIframe/WaitForSubIframe.ts'
 import * as WebWorker from '../WebWorker/WebWorker.ts'
 
-const createKeyboard = (rpc) => {
+const createKeyboard = (rpc, utilityContext) => {
   return {
     rpc,
+    utilityContext,
     press(key) {
-      return PageKeyBoard.press(this.rpc, key)
+      return PageKeyBoard.press(this.rpc, this.utilityContext, key)
     },
     type(text) {
-      return PageKeyBoard.type(this.rpc, text)
+      return PageKeyBoard.type(this.rpc, this.utilityContext, text)
     },
     pressKeyExponential(options) {
-      return PageKeyBoard.pressKeyExponential(options)
+      return PageKeyBoard.pressKeyExponential(this.rpc, this.utilityContext, options)
     },
     contentEditableInsert(options) {
-      return PageKeyBoard.contentEditableInsert(options)
+      return PageKeyBoard.contentEditableInsert(this.rpc, this.utilityContext, options)
     },
   }
 }
 
-const createMouse = (rpc) => {
+const createMouse = (rpc, utilityContext) => {
   return {
     rpc,
+    utilityContext,
     down() {
-      return PageMouse.down(this.rpc)
+      return PageMouse.down(this.rpc, this.utilityContext)
     },
     move(x, y) {
-      return PageMouse.move(this.rpc, x, y)
+      return PageMouse.move(this.rpc, this.utilityContext, x, y)
     },
     up() {
-      return PageMouse.up(this.rpc)
+      return PageMouse.up(this.rpc, this.utilityContext)
     },
     mockPointerEvents() {
-      return PageMouse.mockPointerEvents(this.rpc)
+      return PageMouse.mockPointerEvents(this.rpc, this.utilityContext)
     },
   }
 }
@@ -86,15 +88,15 @@ export const create = ({
       return PageClose.close(this.rpc)
     },
     pressKeyExponential(options) {
-      return PageKeyBoard.pressKeyExponential(options)
+      return PageKeyBoard.pressKeyExponential(this.sessionRpc, utilityContext, options)
     },
-    keyboard: createKeyboard(rpc),
-    mouse: createMouse(rpc),
+    keyboard: createKeyboard(sessionRpc, utilityContext),
+    mouse: createMouse(sessionRpc, utilityContext),
     webWorker() {
       return WebWorker.waitForWebWorker({ sessionId })
     },
     locator(selector, options = {}) {
-      return Locator.create(this.rpc, this.sessionId, selector, options)
+      return Locator.create(this.rpc, this.sessionId, selector, options, this.utilityContext)
     },
     blur() {
       return PageBlur.blur({

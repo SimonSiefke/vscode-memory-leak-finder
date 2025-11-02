@@ -23,6 +23,6 @@ export const hover = async (locator) => {
       ],
       awaitPromise: true,
     },
-    locator.sessionId,
+    locator,
   )
 }

@@ -22,7 +22,7 @@ export const click = async (locator, options) => {
       ],
       awaitPromise: true,
     },
-    locator.sessionId,
+    locator,
   )
 }
 
@@ -46,6 +46,6 @@ export const dblclick = async (locator) => {
       ],
       awaitPromise: true,
     },
-    locator.sessionId,
+    locator,
   )
 }

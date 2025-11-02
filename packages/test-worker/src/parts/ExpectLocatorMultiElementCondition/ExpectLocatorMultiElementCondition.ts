@@ -20,7 +20,7 @@ export const checkMultiElementCondition = async (fnName, locator, options = {}) 
       ],
       awaitPromise: true,
     },
-    locator.sessionId,
+    locator,
   )
 
   // TODO

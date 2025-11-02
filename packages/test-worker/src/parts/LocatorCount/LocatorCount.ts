@@ -17,7 +17,7 @@ export const count = async (locator) => {
       awaitPromise: true,
       returnByValue: true,
     },
-    locator.sessionId,
+    locator,
   )
   return value
 }

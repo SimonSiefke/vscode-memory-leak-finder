@@ -42,11 +42,13 @@ const mergeSelectors = (selector, subSelector = '', hasText = '', hasExactText =
   return merged
 }
 
-export const create = (rpc, sessionId, selector, { hasText = '', hasExactText = '', nth = -1 } = {}) => {
+export const create = (rpc, sessionId, selector, { hasText = '', hasExactText = '', nth = -1 } = {}, utilityContext = {}) => {
   return {
     objectType: ObjectType.Locator,
+    rpc,
     selector: mergeSelectors('', selector, hasText, hasExactText, nth),
     sessionId,
+    utilityContext,
     nth(value) {
       return {
         ...this,

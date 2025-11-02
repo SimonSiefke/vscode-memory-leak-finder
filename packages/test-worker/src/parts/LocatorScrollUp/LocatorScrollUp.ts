@@ -22,6 +22,6 @@ export const scrollUp = async (locator, options = {}) => {
       ],
       awaitPromise: true,
     },
-    locator.sessionId,
+    locator,
   )
 }

@@ -21,6 +21,6 @@ export const selectText = async (locator) => {
       ],
       awaitPromise: true,
     },
-    locator.sessionId,
+    locator,
   )
 }
