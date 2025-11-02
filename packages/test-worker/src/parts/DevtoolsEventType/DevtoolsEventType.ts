@@ -8,6 +8,7 @@ export const PageFrameStartedNavigating = 'Page.frameStartedNavigating'
 export const PageFrameRequestedNavigation = 'Page.frameRequestedNavigation'
 export const PageLifeCycleEvent = 'Page.lifecycleEvent'
 export const PageLoadEventFired = 'Page.loadEventFired'
+export const PageFrameStoppedLoading = 'Page.frameStoppedLoading'
 
 export const RuntimeExecutionContextCreated = 'Runtime.executionContextCreated'
 export const RuntimeExecutionContextDestroyed = 'Runtime.executionContextDestroyed'

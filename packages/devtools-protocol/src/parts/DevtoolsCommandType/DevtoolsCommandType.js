@@ -54,6 +54,8 @@ export const PageStopScreenCast = 'Page.stopScreencast'
 
 export const PageEnable = 'Page.enable'
 
+export const PageDisable = 'Page.disable'
+
 export const PageReload = 'Page.reload'
 
 export const PageCaptureScreenshot = 'Page.captureScreenshot'

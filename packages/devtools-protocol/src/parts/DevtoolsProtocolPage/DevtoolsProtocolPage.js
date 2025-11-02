@@ -29,6 +29,10 @@ export const enable = (rpc, options) => {
   return Invoke.invoke(rpc, DevtoolsCommandType.PageEnable, options)
 }
 
+export const disable = (rpc, options) => {
+  return Invoke.invoke(rpc, DevtoolsCommandType.PageDisable, options)
+}
+
 export const reload = (rpc, options) => {
   return Invoke.invoke(rpc, DevtoolsCommandType.PageReload, options)
 }
