@@ -1,6 +1,15 @@
 import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import { waitForSubFrameContext } from '../WaitForSubFrameContext/WaitForSubFrameContext.ts'
 
+const getMatchingSubFrame = (frames, url) => {
+  for (const frame of frames) {
+    if (url.test(frame.url)) {
+      return frame
+    }
+  }
+  return undefined
+}
+
 export const waitForSubIframe = async ({ electronRpc, url, electronObjectId, idleTimeout, browserRpc, sessionRpc, createPage }) => {
   // TODO
   // 1. add listener to page frame attached, frameStartedNavigating, check if it matches the expected url, take note of the frame id
@@ -13,8 +22,11 @@ export const waitForSubIframe = async ({ electronRpc, url, electronObjectId, idl
   const { frameTree } = await DevtoolsProtocolPage.getFrameTree(sessionRpc)
   console.log({ frameTree })
   const childFrames = frameTree.childFrames.map((item) => item.frame)
-  console.log({ frameTree })
-  console.log({ childFrames })
+  const matchingFrame = getMatchingSubFrame(childFrames, url)
+  if (!matchingFrame) {
+    throw new Error(`no matching frame found`)
+  }
+  console.log({ matchingFrame })
 
   await new Promise((r) => {})
   // TODO create page with subframe data
