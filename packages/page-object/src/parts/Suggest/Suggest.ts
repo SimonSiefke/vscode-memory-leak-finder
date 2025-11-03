@@ -3,13 +3,17 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ page, expect, VError }) => {
   return {
-    async open() {
+    async open(expectedItem: string) {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.TriggerSuggest)
         const suggestWidget = page.locator('.suggest-widget')
         await expect(suggestWidget).toBeVisible()
         await page.waitForIdle()
+        if (expectedItem) {
+          const element = suggestWidget.locator(`.monaco-list-row[aria-label="${expectedItem}"]`)
+          await expect(element).toBeVisible()
+        }
       } catch (error) {
         throw new VError(error, `Failed to open suggest widget`)
       }
