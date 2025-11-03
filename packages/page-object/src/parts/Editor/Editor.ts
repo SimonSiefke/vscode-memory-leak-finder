@@ -235,6 +235,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.show()
+        await page.waitForIdle()
         await quickPick.type(`:${line}:${column}`)
         await page.waitForIdle()
         await quickPick.select(`Go to line ${line} and character ${column}.`)
