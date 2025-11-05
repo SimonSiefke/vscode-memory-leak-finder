@@ -423,9 +423,9 @@ It seems there is memory leak when opening and closing a notebook. But just look
 | NotebookEditorWidget | https://github.com/microsoft/vscode/issues/204756 | Fixed  |
 | SettingsEditor2      | https://github.com/microsoft/vscode/pull/216763   | Fixed  |
 | SettingEnumRenderer  | https://github.com/microsoft/vscode/pull/216855   | Fixed  |
-| GettingStarted       | https://github.com/microsoft/vscode/issues/216858 | Review |
+| GettingStarted       | https://github.com/microsoft/vscode/issues/216858 | Fixed  |
 | ExtensionTabs        | https://github.com/microsoft/vscode/pull/219726   | Fixed  |
-| Output               | https://github.com/microsoft/vscode/pull/221605   | Review |
+| Output               | https://github.com/microsoft/vscode/pull/221605   | Fixed  |
 | StickyScroll         | https://github.com/microsoft/vscode/pull/221622   | Fixed  |
 | SelectBox            | https://github.com/microsoft/vscode/pull/221507   | Fixed  |
 | DebugView            | https://github.com/microsoft/vscode/pull/225334   | Fixed  |
