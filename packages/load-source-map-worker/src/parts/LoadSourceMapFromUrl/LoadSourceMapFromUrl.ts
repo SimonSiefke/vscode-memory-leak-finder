@@ -6,9 +6,10 @@ import { readJson } from '../ReadJson/ReadJson.ts'
 import * as Root from '../Root/Root.ts'
 import { writeFile } from 'node:fs/promises'
 import { emptySourceMap } from '../EmptySourceMap/EmptySourceMap.ts'
+import { isNotFoundOrNotAvailableMessage } from '../IsNotFoundOrNotAvailableMessage/IsNotFoundOrNotAvailableMessage.ts'
 
-const isNotFoundError = (error) => {
-  return error && error.message && (error.message.includes('Response code 404') || error.message.includes('status code 404'))
+const isNotFoundOrNotAvailableError = (error) => {
+  return error && error.message && isNotFoundOrNotAvailableMessage(error.message)
 }
 
 export const loadSourceMap = async (url: string, hash: string): Promise<any> => {
@@ -20,7 +21,7 @@ export const loadSourceMap = async (url: string, hash: string): Promise<any> => 
       await downloadSourceMap(url, originalPath)
       await normalizeSourceMap(originalPath, outFilePath)
     } catch (error) {
-      if (isNotFoundError(error)) {
+      if (isNotFoundOrNotAvailableError(error)) {
         await writeFile(outFilePath, JSON.stringify(emptySourceMap))
       } else {
         throw error
