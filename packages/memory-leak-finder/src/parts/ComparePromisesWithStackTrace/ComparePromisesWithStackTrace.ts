@@ -61,8 +61,8 @@ const cleanItem = (item) => {
   const { preview, stackTrace } = item
   const { properties } = preview
   return {
-    stackTrace: stackTrace.split('\n'),
     properties,
+    stackTrace: stackTrace.split('\n'),
   }
 }
 
