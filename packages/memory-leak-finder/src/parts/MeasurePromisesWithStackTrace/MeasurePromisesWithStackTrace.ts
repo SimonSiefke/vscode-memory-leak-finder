@@ -1,15 +1,8 @@
 import * as ComparePromises from '../ComparePromises/ComparePromises.ts'
-import * as GetPromises from '../GetPromises/GetPromises.ts'
-import * as MeasureId from '../MeasureId/MeasureId.ts'
-import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
-import * as TargetId from '../TargetId/TargetId.ts'
+import * as GetPromisesWithStackTraces from '../GetPromisesWithStackTraces/GetPromisesWithStackTraces.ts'
 import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
-import * as AddStackTracesToEventListeners from '../AddStackTracesToEventListeners/AddStackTracesToEventListeners.ts'
-import * as CompareEventListenersWithStackTraces from '../CompareEventListenersWithStackTraces/CompareEventListenersWithStackTraces.ts'
-import * as GetEventListeners from '../GetEventListeners/GetEventListeners.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
-import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as StartTrackEventListenerStackTraces from '../StartTrackEventListenerStackTraces/StartTrackEventListenerStackTraces.ts'
 import * as StopTrackingPromiseStackTraces from '../StopTrackPromiseStackTraces/StopTrackingPromiseStackTraces.ts'
@@ -29,13 +22,13 @@ export const create = (session) => {
 export const start = async (session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   await StartTrackEventListenerStackTraces.startTrackingEventListenerStackTraces(session, objectGroup)
-  return GetPromises.getPromises(session, objectGroup)
+  return GetPromisesWithStackTraces.getPromisesWithStackTraces(session, objectGroup)
 }
 
 export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.stop(session)
   await StopTrackingPromiseStackTraces.stopTrackingPromiseStackTraces(session, objectGroup)
-  return GetPromises.getPromises(session, objectGroup)
+  return GetPromisesWithStackTraces.getPromisesWithStackTraces(session, objectGroup)
 }
 
 export const compare = ComparePromises.comparePromises
