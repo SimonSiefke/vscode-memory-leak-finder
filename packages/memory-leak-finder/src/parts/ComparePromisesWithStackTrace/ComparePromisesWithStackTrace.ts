@@ -57,10 +57,31 @@ const getAdded = (before, after) => {
   return leaked
 }
 
+const deduplicate = (leaked) => {
+  const map = Object.create(null)
+  const countMap = Object.create(null)
+  for (const item of leaked) {
+    const hash = hashPromise(item)
+    map[hash] = item
+    countMap[hash] ||= 0
+    countMap[hash]++
+  }
+  const deduplicated: any[] = []
+  for (const [key, value] of map) {
+    const count = countMap[key]
+    deduplicated.push({
+      ...value,
+      count,
+    })
+  }
+  return deduplicated
+}
+
 const cleanItem = (item) => {
-  const { preview, stackTrace } = item
+  const { preview, stackTrace, count } = item
   const { properties } = preview
   return {
+    count,
     properties,
     stackTrace: stackTrace.split('\n'),
   }
@@ -74,6 +95,7 @@ export const comparePromisesWithStackTrace = (before, after) => {
   Assert.array(before)
   Assert.array(after)
   const leaked = getAdded(before, after)
-  const cleanLeaked = clean(leaked)
+  const deduplicated = deduplicate(leaked)
+  const cleanLeaked = clean(deduplicated)
   return cleanLeaked
 }
