@@ -67,7 +67,7 @@ const deduplicate = (leaked) => {
     countMap[hash]++
   }
   const deduplicated: any[] = []
-  for (const [key, value] of map) {
+  for (const [key, value] of Object.entries(map)) {
     const count = countMap[key]
     deduplicated.push({
       ...value,
