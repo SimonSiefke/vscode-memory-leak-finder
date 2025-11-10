@@ -32,6 +32,10 @@ globalThis.Promise = class extends globalThis.___originalPromise {
     return globalThis.___originalPromise
   }
 
+  static [Symbol.hasInstance](instance) {
+    return instance.constructor.name === 'Promise'
+  }
+
   // then(...args){
   //   const result = super.then(...args)
   //   const stackTrace = callsites()
