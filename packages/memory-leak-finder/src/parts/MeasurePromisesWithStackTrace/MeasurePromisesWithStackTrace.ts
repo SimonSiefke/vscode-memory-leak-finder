@@ -1,4 +1,3 @@
-import * as ComparePromises from '../ComparePromises/ComparePromises.ts'
 import { comparePromisesWithStackTrace } from '../ComparePromisesWithStackTrace/ComparePromisesWithStackTrace.ts'
 import * as GetPromisesWithStackTraces from '../GetPromisesWithStackTraces/GetPromisesWithStackTraces.ts'
 import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
