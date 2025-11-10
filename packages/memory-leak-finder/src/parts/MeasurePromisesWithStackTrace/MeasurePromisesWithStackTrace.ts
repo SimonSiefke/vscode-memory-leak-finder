@@ -27,8 +27,9 @@ export const start = async (session, objectGroup, scriptHandler: IScriptHandler)
 
 export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.stop(session)
+  const promises = await GetPromisesWithStackTraces.getPromisesWithStackTraces(session, objectGroup)
   await StopTrackingPromiseStackTraces.stopTrackingPromiseStackTraces(session, objectGroup)
-  return GetPromisesWithStackTraces.getPromisesWithStackTraces(session, objectGroup)
+  return promises
 }
 
 export const compare = ComparePromises.comparePromises

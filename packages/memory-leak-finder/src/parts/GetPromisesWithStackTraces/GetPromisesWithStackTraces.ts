@@ -21,7 +21,6 @@ const promises = this
 const stackTraces = promises.map(promise => {
   const item = globalThis.___promiseStackTraces.get(promise)
   return item || ''
-
 })
 
 return stackTraces
