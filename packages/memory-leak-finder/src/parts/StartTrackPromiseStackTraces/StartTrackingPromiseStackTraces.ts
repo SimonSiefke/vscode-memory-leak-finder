@@ -29,14 +29,14 @@ globalThis.Promise = class extends globalThis.___originalPromise {
   }
 
   then(...args){
-    const result = super(...args)
+    const result = super.then(...args)
     const stackTrace = callsites()
     globalThis.___promiseStackTraces.set(result, stackTrace)
     return result
   }
 
   catch(...args){
-    const result = super(...args)
+    const result = super.catch(...args)
     const stackTrace = callsites()
     globalThis.___promiseStackTraces.set(result, stackTrace)
     return result
