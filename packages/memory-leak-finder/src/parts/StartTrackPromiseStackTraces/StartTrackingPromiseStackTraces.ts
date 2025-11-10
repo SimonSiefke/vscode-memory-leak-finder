@@ -27,6 +27,20 @@ globalThis.Promise = class extends globalThis.___originalPromise {
     const stackTrace = callsites()
     globalThis.___promiseStackTraces.set(this, stackTrace)
   }
+
+  then(...args){
+    const result = super(...args)
+    const stackTrace = callsites()
+    globalThis.___promiseStackTraces.set(result, stackTrace)
+    return result
+  }
+
+  catch(...args){
+    const result = super(...args)
+    const stackTrace = callsites()
+    globalThis.___promiseStackTraces.set(result, stackTrace)
+    return result
+  }
 }
 
 })()
