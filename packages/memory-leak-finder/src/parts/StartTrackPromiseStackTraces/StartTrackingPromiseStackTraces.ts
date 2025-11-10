@@ -28,6 +28,10 @@ globalThis.Promise = class extends globalThis.___originalPromise {
     globalThis.___promiseStackTraces.set(this, stackTrace)
   }
 
+  static get [Symbol.species]() {
+    return globalThis.___originalPromise
+  }
+
   // then(...args){
   //   const result = super.then(...args)
   //   const stackTrace = callsites()
