@@ -1,4 +1,5 @@
 import * as Assert from '../Assert/Assert.ts'
+import * as Hash from '../Hash/Hash.ts'
 
 const isPropertyPromiseState = (property) => {
   return property.name === '[[PromiseState]]'
@@ -28,25 +29,51 @@ const prettifyPromise = (promise) => {
   }
 }
 
+const hashPromise = (item) => {
+  const { preview, stackTrace } = item
+  const { properties } = preview
+  return Hash.hash({
+    properties,
+    stackTrace,
+  })
+}
+
 const getAdded = (before, after) => {
-  const beforeMap = Object.create(null)
+  const map = Object.create(null)
   for (const item of before) {
-    beforeMap[item.objectId] = true
+    const hash = hashPromise(item)
+    map[hash] ||= 0
+    map[hash]++
   }
-  const added = []
+  const leaked = []
   for (const item of after) {
-    if (item.objectId in beforeMap) {
-      // ignore
+    const hash = hashPromise(item)
+    if (map[hash]) {
+      map[hash]--
     } else {
-      added.push(item)
+      leaked.push(item)
     }
   }
-  return added
+  return leaked
+}
+
+const cleanItem = (item) => {
+  const { preview, stackTrace } = item
+  const { properties } = preview
+  return {
+    stackTrace: stackTrace.split('\n'),
+    properties,
+  }
+}
+
+const clean = (items) => {
+  return items.map(cleanItem)
 }
 
 export const comparePromisesWithStackTrace = (before, after) => {
   Assert.array(before)
   Assert.array(after)
   const leaked = getAdded(before, after)
-  return leaked
+  const cleanLeaked = clean(leaked)
+  return cleanLeaked
 }
