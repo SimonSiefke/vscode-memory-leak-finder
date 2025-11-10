@@ -91,11 +91,20 @@ const clean = (items) => {
   return items.map(cleanItem)
 }
 
+const compareItem = (a, b) => {
+  return b.count - a.count
+}
+
+const sortItems = (items) => {
+  return items.toSorted(compareItem)
+}
+
 export const comparePromisesWithStackTrace = (before, after) => {
   Assert.array(before)
   Assert.array(after)
   const leaked = getAdded(before, after)
   const deduplicated = deduplicate(leaked)
-  const cleanLeaked = clean(deduplicated)
+  const sorted = sortItems(deduplicated)
+  const cleanLeaked = clean(sorted)
   return cleanLeaked
 }
