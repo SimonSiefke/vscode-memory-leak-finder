@@ -29,7 +29,10 @@ export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) 
   await scriptHandler.stop(session)
   const promises = await GetPromisesWithStackTraces.getPromisesWithStackTraces(session, objectGroup)
   await StopTrackingPromiseStackTraces.stopTrackingPromiseStackTraces(session, objectGroup)
-  return promises
+  return {
+    result: promises,
+    scriptMap: scriptHandler.scriptMap,
+  }
 }
 
 export const compare = comparePromisesWithStackTrace
