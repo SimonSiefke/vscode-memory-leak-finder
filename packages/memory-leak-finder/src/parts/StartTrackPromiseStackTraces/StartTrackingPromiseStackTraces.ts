@@ -28,10 +28,6 @@ globalThis.Promise = class extends globalThis.___originalPromise {
     globalThis.___promiseStackTraces.set(this, stackTrace)
   }
 
-  static get [Symbol.species]() {
-    return globalThis.___originalPromise
-  }
-
   static [Symbol.hasInstance](instance) {
     return instance.constructor.name === 'Promise'
   }
@@ -52,6 +48,55 @@ globalThis.Promise = class extends globalThis.___originalPromise {
 
   finally(...args){
     const result = super.finally(...args)
+    const stackTrace = callsites()
+    globalThis.___promiseStackTraces.set(result, stackTrace)
+    return result
+  }
+
+  static all(...args){
+    const result = super.all(...args)
+    const stackTrace = callsites()
+    globalThis.___promiseStackTraces.set(result, stackTrace)
+    return result
+  }
+
+  static allSettled(...args){
+    const result = super.allSettled(...args)
+    const stackTrace = callsites()
+    globalThis.___promiseStackTraces.set(result, stackTrace)
+    return result
+  }
+
+  static any(...args){
+    const result = super.any(...args)
+    const stackTrace = callsites()
+    globalThis.___promiseStackTraces.set(result, stackTrace)
+    return result
+  }
+
+  static race(...args){
+    const result = super.race(...args)
+    const stackTrace = callsites()
+    globalThis.___promiseStackTraces.set(result, stackTrace)
+    return result
+  }
+
+  static reject(...args){
+    const result = super.reject(...args)
+    const stackTrace = callsites()
+    globalThis.___promiseStackTraces.set(result, stackTrace)
+    return result
+  }
+
+  static resolve(...args){
+    const result = super.resolve(...args)
+    const stackTrace = callsites()
+    globalThis.___promiseStackTraces.set(result, stackTrace)
+    return result
+  }
+
+  static try(...args){
+    const result = super.try(...args)
     const stackTrace = callsites()
     globalThis.___promiseStackTraces.set(result, stackTrace)
     return result
