@@ -49,6 +49,13 @@ globalThis.Promise = class extends globalThis.___originalPromise {
     globalThis.___promiseStackTraces.set(result, stackTrace)
     return result
   }
+
+  finally(...args){
+    const result = super.finally(...args)
+    const stackTrace = callsites()
+    globalThis.___promiseStackTraces.set(result, stackTrace)
+    return result
+  }
 }
 
 globalThis.Promise.prototype.constructor = Promise
