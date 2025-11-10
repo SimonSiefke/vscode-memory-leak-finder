@@ -70,7 +70,7 @@ const deduplicate = (leaked) => {
   for (const [key, value] of Object.entries(map)) {
     const count = countMap[key]
     deduplicated.push({
-      ...value,
+      ...(value as any),
       count,
     })
   }
