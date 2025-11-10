@@ -35,6 +35,6 @@ export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) 
 
 export const compare = comparePromisesWithStackTrace
 
-export const isLeak = (result) => {
-  return result.after.length > result.before.length
+export const isLeak = (leaked) => {
+  return leaked.length > 0
 }

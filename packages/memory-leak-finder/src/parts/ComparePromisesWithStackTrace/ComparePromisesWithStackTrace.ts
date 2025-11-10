@@ -28,18 +28,25 @@ const prettifyPromise = (promise) => {
   }
 }
 
-const getAdded=(before, after)=>{
-  const beforeMap=Object.create(null)
-  for(const item of before)
+const getAdded = (before, after) => {
+  const beforeMap = Object.create(null)
+  for (const item of before) {
+    beforeMap[item.objectId] = true
+  }
+  const added = []
+  for (const item of after) {
+    if (item.objectId in beforeMap) {
+      // ignore
+    } else {
+      added.push(item)
+    }
+  }
+  return added
 }
 
 export const comparePromisesWithStackTrace = (before, after) => {
   Assert.array(before)
   Assert.array(after)
-  const prettyBefore = before.map(prettifyPromise)
-  const prettyAfter = after.map(prettifyPromise)
-  return {
-    before: prettyBefore,
-    after: prettyAfter,
-  }
+  const leaked = getAdded(before, after)
+  return leaked
 }
