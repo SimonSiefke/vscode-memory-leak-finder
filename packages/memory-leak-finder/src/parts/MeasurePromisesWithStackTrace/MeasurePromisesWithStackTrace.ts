@@ -4,7 +4,7 @@ import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
-import * as StartTrackEventListenerStackTraces from '../StartTrackEventListenerStackTraces/StartTrackEventListenerStackTraces.ts'
+import * as StartTrackPromiseStackTraces from '../StartTrackPromiseStackTraces/StartTrackingPromiseStackTraces.ts'
 import * as StopTrackingPromiseStackTraces from '../StopTrackPromiseStackTraces/StopTrackingPromiseStackTraces.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
 
@@ -21,7 +21,7 @@ export const create = (session) => {
 
 export const start = async (session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
-  await StartTrackEventListenerStackTraces.startTrackingEventListenerStackTraces(session, objectGroup)
+  await StartTrackPromiseStackTraces.startTrackingPromiseStackTraces(session, objectGroup)
   return GetPromisesWithStackTraces.getPromisesWithStackTraces(session, objectGroup)
 }
 
