@@ -28,20 +28,37 @@ globalThis.Promise = class extends globalThis.___originalPromise {
     globalThis.___promiseStackTraces.set(this, stackTrace)
   }
 
+  static get [Symbol.species]() {
+    return globalThis.___originalPromise
+  }
+
+  static [Symbol.hasInstance](instance) {
+    return instance.constructor.name === 'Promise'
+  }
+
   then(...args){
-    const result = super(...args)
+    const result = super.then(...args)
     const stackTrace = callsites()
     globalThis.___promiseStackTraces.set(result, stackTrace)
     return result
   }
 
   catch(...args){
-    const result = super(...args)
+    const result = super.catch(...args)
+    const stackTrace = callsites()
+    globalThis.___promiseStackTraces.set(result, stackTrace)
+    return result
+  }
+
+  finally(...args){
+    const result = super.finally(...args)
     const stackTrace = callsites()
     globalThis.___promiseStackTraces.set(result, stackTrace)
     return result
   }
 }
+
+globalThis.Promise.prototype.constructor = Promise
 
 })()
 undefined
