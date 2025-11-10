@@ -1,34 +1,6 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as Hash from '../Hash/Hash.ts'
 
-const isPropertyPromiseState = (property) => {
-  return property.name === '[[PromiseState]]'
-}
-
-const isPropertyPromiseResult = (property) => {
-  return property.name === '[[PromiseResult]]'
-}
-
-const getPropertyPromiseState = (properties) => {
-  return properties.find(isPropertyPromiseState)
-}
-
-const getPropertyPromiseResult = (properties) => {
-  return properties.find(isPropertyPromiseResult)
-}
-
-const prettifyPromise = (promise) => {
-  const { preview, objectId } = promise
-  const { properties } = preview
-  // console.log({ preview, properties })
-  const state = getPropertyPromiseState(properties)
-  const result = getPropertyPromiseResult(properties)
-  return {
-    state,
-    result,
-  }
-}
-
 const hashPromise = (item) => {
   const { preview, stackTrace } = item
   const { properties } = preview
