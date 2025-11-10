@@ -28,8 +28,6 @@ return stackTraces
     objectId: objects.objects.objectId,
     returnByValue: true,
   })
-  console.log({ result })
-  console.log({ objects })
   const fnResult1 = await DevtoolsProtocolRuntime.getProperties(session, {
     objectId: objects.objects.objectId,
     ownProperties: true,
@@ -38,6 +36,11 @@ return stackTraces
     nonIndexedPropertiesOnly: false,
   })
   const descriptors = GetDescriptorValues.getDescriptorValues(fnResult1.result)
-  console.log(descriptors)
-  return descriptors
+  const withStackTraces = descriptors.map((descriptor, index) => {
+    return {
+      ...descriptor,
+      stackTrace: result[index] || '',
+    }
+  })
+  return withStackTraces
 }

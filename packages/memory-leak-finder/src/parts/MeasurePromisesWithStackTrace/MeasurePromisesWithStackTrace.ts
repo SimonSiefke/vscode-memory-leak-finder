@@ -1,4 +1,5 @@
 import * as ComparePromises from '../ComparePromises/ComparePromises.ts'
+import { comparePromisesWithStackTrace } from '../ComparePromisesWithStackTrace/ComparePromisesWithStackTrace.ts'
 import * as GetPromisesWithStackTraces from '../GetPromisesWithStackTraces/GetPromisesWithStackTraces.ts'
 import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
@@ -32,7 +33,7 @@ export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) 
   return promises
 }
 
-export const compare = ComparePromises.comparePromises
+export const compare = comparePromisesWithStackTrace
 
 export const isLeak = (result) => {
   return result.after.length > result.before.length
