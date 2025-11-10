@@ -13,6 +13,7 @@ export const getPromises = async (session, objectGroup) => {
     prototypeObjectId: prototype.objectId,
     objectGroup,
   })
+  console.log({ objects })
   const fnResult1 = await DevtoolsProtocolRuntime.getProperties(session, {
     objectId: objects.objects.objectId,
     ownProperties: true,
@@ -21,5 +22,6 @@ export const getPromises = async (session, objectGroup) => {
     nonIndexedPropertiesOnly: false,
   })
   const descriptors = GetDescriptorValues.getDescriptorValues(fnResult1.result)
+  console.log(descriptors)
   return descriptors
 }

@@ -17,8 +17,9 @@ const getPropertyPromiseResult = (properties) => {
 }
 
 const prettifyPromise = (promise) => {
-  const { preview } = promise
+  const { preview, objectId } = promise
   const { properties } = preview
+  // console.log({ preview, properties })
   const state = getPropertyPromiseState(properties)
   const result = getPropertyPromiseResult(properties)
   return {
