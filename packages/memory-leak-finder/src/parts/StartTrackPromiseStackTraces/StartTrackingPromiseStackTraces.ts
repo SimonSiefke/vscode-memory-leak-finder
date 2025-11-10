@@ -47,6 +47,8 @@ globalThis.Promise = class extends globalThis.___originalPromise {
   // }
 }
 
+globalThis.Promise.prototype.constructor = Promise
+
 })()
 undefined
 `,
