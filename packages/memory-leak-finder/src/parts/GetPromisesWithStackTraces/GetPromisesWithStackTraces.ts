@@ -8,10 +8,27 @@ export const getPromisesWithStackTraces = async (session, objectGroup) => {
     returnByValue: false,
     objectGroup,
   })
+
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
     prototypeObjectId: prototype.objectId,
     objectGroup,
   })
+
+  const result = await DevtoolsProtocolRuntime.callFunctionOn(session, {
+    functionDeclaration: `
+function () {
+const promises = this
+const stackTraces = promises.map(promise => {
+  const item = globalThis.___promiseStackTraces.get(promise)
+  return item || ''
+})
+
+return stackTraces
+}`,
+    objectId: objects.objectId,
+    returnByValue: true,
+  })
+  console.log({ result })
   console.log({ objects })
   const fnResult1 = await DevtoolsProtocolRuntime.getProperties(session, {
     objectId: objects.objects.objectId,
