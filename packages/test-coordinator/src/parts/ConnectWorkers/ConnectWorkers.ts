@@ -28,19 +28,6 @@ export const connectWorkers = async (
     promises.push(Promise.resolve(undefined))
   }
   promises.push(
-    MemoryLeakWorker.startWorker(
-      devtoolsWebSocketUrl,
-      webSocketUrl,
-      connectionId,
-      measureId,
-      attachedToPageTimeout,
-      measureNode,
-      inspectSharedProcess,
-      inspectExtensions,
-      inspectPtyHost,
-    ),
-  )
-  promises.push(
     LaunchTestWorker.launchTestWorker(
       runMode,
       connectionId,
@@ -58,7 +45,20 @@ export const connectWorkers = async (
       inspectPtyHost,
     ),
   )
-  const [videoRpc, memoryRpc, testWorkerRpc] = await Promise.all(promises)
+  const [videoRpc, testWorkerRpc] = await Promise.all(promises)
+
+  const memoryRpc = await MemoryLeakWorker.startWorker(
+    devtoolsWebSocketUrl,
+    webSocketUrl,
+    connectionId,
+    measureId,
+    attachedToPageTimeout,
+    measureNode,
+    inspectSharedProcess,
+    inspectExtensions,
+    inspectPtyHost,
+  )
+
   return {
     videoRpc,
     memoryRpc,

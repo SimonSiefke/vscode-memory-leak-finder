@@ -181,6 +181,7 @@ export const runTestsWithCallback = async ({
         )
         workers = {
           testWorkerRpc: testWorkerRpc || emptyRpc,
+          // @ts-ignore
           memoryRpc: memoryRpc || emptyRpc,
           videoRpc: videoRpc || emptyRpc,
           initializationWorkerRpc: initializationWorkerRpc || emptyRpc,

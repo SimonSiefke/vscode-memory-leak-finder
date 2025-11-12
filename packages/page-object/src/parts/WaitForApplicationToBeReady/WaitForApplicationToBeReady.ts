@@ -1,3 +1,5 @@
+import * as Terminal from '../Terminal/Terminal.ts'
+
 const isDevtoolsCannotFindContextError = (error) => {
   return (
     error.name === 'DevtoolsProtocolError' &&
@@ -5,9 +7,9 @@ const isDevtoolsCannotFindContextError = (error) => {
   )
 }
 
-export const create = ({ page, expect }) => {
+export const create = ({ page, expect, VError }) => {
   return {
-    async waitForApplicationToBeReady(): Promise<void> {
+    async waitForApplicationToBeReady({ inspectPtyHost }: { inspectPtyHost: boolean }): Promise<void> {
       try {
         const main = page.locator('[role="main"]')
         await expect(main).toBeVisible({
@@ -29,6 +31,15 @@ export const create = ({ page, expect }) => {
       await expect(notification).toBeVisible({
         timeout: 15_000,
       })
+      if (inspectPtyHost) {
+        const terminal = Terminal.create({
+          page,
+          expect,
+          VError,
+        })
+        await terminal.show()
+        await terminal.killAll()
+      }
     },
   }
 }
