@@ -2,7 +2,7 @@ import * as Panel from '../Panel/Panel.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, VError, ideVersion }) => {
   return {
     async killAll() {
       try {
@@ -78,7 +78,11 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
         await page.waitForIdle()
-        await quickPick.executeCommand(WellKnownCommands.FocusTerminal)
+        if (ideVersion && ideVersion.minor <= 105) {
+          // do nothing
+        } else {
+          await quickPick.executeCommand(WellKnownCommands.FocusTerminal)
+        }
         const count = await terminalTabs.count()
         if (count > 1) {
           throw new Error(`expected terminal tab count to be zero or one`)
