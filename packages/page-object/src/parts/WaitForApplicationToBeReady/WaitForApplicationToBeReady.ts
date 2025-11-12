@@ -7,7 +7,7 @@ const isDevtoolsCannotFindContextError = (error) => {
   )
 }
 
-export const create = ({ page, expect, VError }) => {
+export const create = ({ page, expect, VError, ideVersion }) => {
   return {
     async waitForApplicationToBeReady({ inspectPtyHost }: { inspectPtyHost: boolean }): Promise<void> {
       try {
@@ -36,6 +36,7 @@ export const create = ({ page, expect, VError }) => {
           page,
           expect,
           VError,
+          ideVersion,
         })
         await terminal.show()
         await terminal.killAll()
