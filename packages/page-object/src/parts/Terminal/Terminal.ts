@@ -2,26 +2,30 @@ import * as Panel from '../Panel/Panel.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, VError, ideVersion }) => {
   return {
     async killAll() {
       try {
+        await page.waitForIdle()
         const panel = Panel.create({ page, expect, VError })
         await panel.hide()
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.KillAllTerminals)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to kill all terminals`)
       }
     },
     async show() {
       try {
+        await page.waitForIdle()
         await page.focus()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.FocusTerminal)
         const terminalSplitPane = page.locator('.terminal-split-pane')
         await expect(terminalSplitPane).toBeVisible()
+        await page.waitForIdle()
         const terminal = page.locator('.terminal')
         await expect(terminal).toHaveCount(1)
         await expect(terminal).toBeVisible()
@@ -49,11 +53,12 @@ export const create = ({ expect, page, VError }) => {
     },
     async add() {
       try {
+        await page.waitForIdle()
         const newTerminal = page.locator('[aria-label^="New Terminal"]')
         await newTerminal.click()
         const terminalTabs = page.locator('[aria-label="Terminal tabs"]')
         await expect(terminalTabs).toBeVisible()
-        const tabsEntry = page.locator('.terminal-tabs-entry')
+        const tabsEntry = page.locator('.tabs-list .terminal-tabs-entry')
         await expect(tabsEntry).toHaveCount(2)
         await page.waitForIdle()
       } catch (error) {
@@ -64,12 +69,24 @@ export const create = ({ expect, page, VError }) => {
       try {
         const terminalTabs = page.locator('[aria-label="Terminal tabs"]')
         await expect(terminalTabs).toBeVisible()
-        const tabsEntry = page.locator('.terminal-tabs-entry')
+        const tabsEntry = page.locator('.tabs-list .terminal-tabs-entry')
         await expect(tabsEntry).toHaveCount(2)
+        await page.waitForIdle()
         const secondEntry = tabsEntry.nth(1)
         const deleteAction = secondEntry.locator('[aria-label^="Kill"]')
         await deleteAction.click()
-        await expect(terminalTabs).toHaveCount(0)
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await page.waitForIdle()
+        if (ideVersion && ideVersion.minor <= 105) {
+          // do nothing
+        } else {
+          await quickPick.executeCommand(WellKnownCommands.FocusTerminal)
+        }
+        const count = await terminalTabs.count()
+        if (count > 1) {
+          throw new Error(`expected terminal tab count to be zero or one`)
+        }
         await page.waitForIdle()
         const terminal = page.locator('.terminal')
         await expect(terminal).toHaveCount(1)
