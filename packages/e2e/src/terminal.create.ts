@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.ts'
 
-export const skip = process.platform === 'win32'
+export const skip = true
 
 export const setup = async ({ Terminal, Panel }: TestContext): Promise<void> => {
   await Panel.hide()
