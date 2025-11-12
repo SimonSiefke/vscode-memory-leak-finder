@@ -13,7 +13,12 @@ test('cleanSource - markdown language features', () => {
   )
 })
 
-test.only('cleanSource - external commonjs vscode', () => {
+test('cleanSource - external commonjs vscode', () => {
   const input = 'webpack://markdown-language-features/external commonjs "vscode"'
   expect(cleanSource(input)).toBe('extensions/markdown-language-features/external/commonjs/vscode')
+})
+
+test('cleanSource - odd relative path', () => {
+  const input = './file:/Users/cloudtest/vss/_work/1/s/src/vs/base/common/lazy.ts'
+  expect(cleanSource(input)).toBe('src/vs/base/common/lazy.ts')
 })
