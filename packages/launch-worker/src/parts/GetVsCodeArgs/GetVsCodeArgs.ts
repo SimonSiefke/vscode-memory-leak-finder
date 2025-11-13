@@ -10,6 +10,7 @@ export const getVscodeArgs = ({ extensionsDir, userDataDir, extraLaunchArgs, ins
     '--skip-welcome',
     '--skip-release-notes',
     '--disable-workspace-trust',
+    '--ozone-platform=x11',
     '--disable-extensions',
     '--extensions-dir',
     extensionsDir,
