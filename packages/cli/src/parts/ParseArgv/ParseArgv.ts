@@ -50,6 +50,7 @@ export const parseArgv = (argv) => {
     inspectSharedProcess: false,
     inspectExtensions: false,
     inspectPtyHost: false,
+    enableExtensions: false,
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -125,6 +126,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--inspect-ptyhost')) {
     options.inspectPtyHost = true
+  }
+  if (argv.includes('--enable-extensions')) {
+    options.enableExtensions = true
   }
   return options
 }
