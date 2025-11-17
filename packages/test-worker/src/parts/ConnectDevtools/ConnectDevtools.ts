@@ -25,6 +25,7 @@ export const connectDevtools = async (
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
+  enableExtensions: boolean,
 ) => {
   Assert.number(connectionId)
   Assert.string(devtoolsWebSocketUrl)
@@ -102,6 +103,7 @@ export const connectDevtools = async (
 
   await pageObject.WaitForApplicationToBeReady.waitForApplicationToBeReady({
     inspectPtyHost,
+    enableExtensions,
   })
   if (timeouts === false) {
     // TODO this should be part of initialization worker

@@ -1,6 +1,14 @@
 import * as ChromiumSwitches from '../ChromiumSwitches/ChromiumSwitches.ts'
 
-export const getVscodeArgs = ({ extensionsDir, userDataDir, extraLaunchArgs, inspectSharedProcess, inspectExtensions, inspectPtyHost }) => {
+export const getVscodeArgs = ({
+  extensionsDir,
+  userDataDir,
+  extraLaunchArgs,
+  inspectSharedProcess,
+  inspectExtensions,
+  inspectPtyHost,
+  enableExtensions,
+}) => {
   const args = [
     ...ChromiumSwitches.chromiumSwitches,
     '--wait',
@@ -11,12 +19,15 @@ export const getVscodeArgs = ({ extensionsDir, userDataDir, extraLaunchArgs, ins
     '--skip-release-notes',
     '--disable-workspace-trust',
     '--ozone-platform=x11',
-    '--disable-extensions',
     '--extensions-dir',
     extensionsDir,
     '--user-data-dir',
     userDataDir,
   ]
+
+  if (!enableExtensions) {
+    args.push('--disable-extensions')
+  }
 
   if (inspectPtyHost) {
     args.push('--inspect-ptyhost=5877')

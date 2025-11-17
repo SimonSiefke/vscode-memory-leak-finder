@@ -82,6 +82,7 @@ export const runTestsWithCallback = async ({
     const attachedToPageTimeout = TimeoutConstants.AttachToPage
     const idleTimeout = TimeoutConstants.Idle
     const pageObjectPath = GetPageObjectPath.getPageObjectPath()
+    const enableExtensions = true
 
     // TODO for each connection id, launch all needed workers
     // when a new connection id comes in, dispose them (even while running)
@@ -108,6 +109,7 @@ export const runTestsWithCallback = async ({
         inspectSharedProcess,
         inspectExtensions,
         inspectPtyHost,
+        enableExtensions,
       )
       await testWorkerRpc.dispose()
       await memoryRpc?.dispose()
@@ -178,6 +180,7 @@ export const runTestsWithCallback = async ({
           inspectSharedProcess,
           inspectExtensions,
           inspectPtyHost,
+          enableExtensions,
         )
         workers = {
           testWorkerRpc: testWorkerRpc || emptyRpc,
