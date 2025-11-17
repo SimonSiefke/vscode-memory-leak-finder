@@ -16,6 +16,8 @@ export const create = ({ expect, page, VError }) => {
         await quickPick.executeCommand(WellKnownCommands.CloseAllNotifications)
         await expect(toastContainer).toBeHidden()
         await page.waitForIdle()
+        await expect(toastContainer).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to close notifications`)
       }
@@ -27,6 +29,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(toasts).toBeVisible({ timeout: 10_000 })
         const notificationList = page.locator('.notifications-list-container')
         await expect(notificationList).toBeVisible()
+        await page.waitForIdle()
         const item = notificationList.locator(`[aria-label^="Info: ${expectedMessage}"]`)
         await expect(item).toBeVisible()
         await page.waitForIdle()

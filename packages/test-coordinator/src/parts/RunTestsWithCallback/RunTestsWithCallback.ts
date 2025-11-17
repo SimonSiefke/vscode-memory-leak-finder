@@ -82,7 +82,7 @@ export const runTestsWithCallback = async ({
     const attachedToPageTimeout = TimeoutConstants.AttachToPage
     const idleTimeout = TimeoutConstants.Idle
     const pageObjectPath = GetPageObjectPath.getPageObjectPath()
-    const enableExtensions = true
+    const enableExtensions = false
 
     // TODO for each connection id, launch all needed workers
     // when a new connection id comes in, dispose them (even while running)
