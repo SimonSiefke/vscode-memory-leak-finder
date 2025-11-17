@@ -75,6 +75,7 @@ export const prepareTestsAndAttach = async (
     inspectSharedProcess,
     inspectExtensions,
     inspectPtyHost,
+    enableExtensions,
   )
   return {
     memoryRpc,
