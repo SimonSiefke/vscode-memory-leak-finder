@@ -8,7 +8,7 @@ export const createBarChart = (data: any, options: any): string => {
   const chartOptions = getCommonBarChartOptions(dataCount, options)
 
   const baseHtml = Plot.plot({
-    style: 'overflow: visible;background:white',
+    style: 'overflow: visible; background:white',
     width: chartOptions.width,
     height: chartOptions.height,
     marginLeft: chartOptions.marginLeft,
