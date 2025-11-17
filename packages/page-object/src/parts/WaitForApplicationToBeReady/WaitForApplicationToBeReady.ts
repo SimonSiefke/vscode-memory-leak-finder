@@ -9,7 +9,13 @@ const isDevtoolsCannotFindContextError = (error) => {
 
 export const create = ({ page, expect, VError, ideVersion }) => {
   return {
-    async waitForApplicationToBeReady({ inspectPtyHost }: { inspectPtyHost: boolean }): Promise<void> {
+    async waitForApplicationToBeReady({
+      inspectPtyHost,
+      enableExtensions,
+    }: {
+      inspectPtyHost: boolean
+      enableExtensions: boolean
+    }): Promise<void> {
       try {
         const main = page.locator('[role="main"]')
         await expect(main).toBeVisible({
@@ -27,10 +33,12 @@ export const create = ({ page, expect, VError, ideVersion }) => {
           throw error
         }
       }
-      const notification = page.locator('text=All installed extensions are temporarily disabled.')
-      await expect(notification).toBeVisible({
-        timeout: 15_000,
-      })
+      if (!enableExtensions) {
+        const notification = page.locator('text=All installed extensions are temporarily disabled.')
+        await expect(notification).toBeVisible({
+          timeout: 15_000,
+        })
+      }
       if (inspectPtyHost) {
         const terminal = Terminal.create({
           page,

@@ -20,6 +20,7 @@ export const connectWorkers = async (
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
+  enableExtensions: boolean,
 ) => {
   const promises: Promise<any>[] = []
   if (recordVideo) {
@@ -43,6 +44,7 @@ export const connectWorkers = async (
       inspectSharedProcess,
       inspectExtensions,
       inspectPtyHost,
+      enableExtensions,
     ),
   )
   const [videoRpc, testWorkerRpc] = await Promise.all(promises)

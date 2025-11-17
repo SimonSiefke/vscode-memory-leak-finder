@@ -16,6 +16,7 @@ export const connectDevtools = (
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
+  enableExtensions: boolean,
 ) => {
   Assert.object(rpc)
   Assert.number(connectionId)
@@ -35,5 +36,6 @@ export const connectDevtools = (
     inspectSharedProcess,
     inspectExtensions,
     inspectPtyHost,
+    enableExtensions,
   )
 }
