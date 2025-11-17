@@ -14,6 +14,7 @@ export const launchIde = async ({
   inspectSharedProcess,
   inspectExtensions,
   inspectPtyHost,
+  enableExtensions,
 }) => {
   if (ide === Ide.Cursor) {
     const cursorVersion = '0.45.14' // TODO make it configurable
@@ -26,6 +27,7 @@ export const launchIde = async ({
       inspectSharedProcess,
       inspectExtensions,
       inspectPtyHost,
+      enableExtensions,
     })
     return {
       ...result,
@@ -42,6 +44,7 @@ export const launchIde = async ({
     inspectSharedProcess,
     inspectExtensions,
     inspectPtyHost,
+    enableExtensions,
   })
   return {
     ...result,

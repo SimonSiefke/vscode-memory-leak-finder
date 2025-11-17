@@ -24,6 +24,7 @@ export const prepareBoth = async (
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
+  enableExtensions: boolean,
 ): Promise<PrepareBothResult> => {
   const initializationWorkerRpc = await launchInitializationWorker()
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, sessionId, targetId } =
@@ -41,6 +42,7 @@ export const prepareBoth = async (
       inspectSharedProcess,
       inspectExtensions,
       inspectPtyHost,
+      enableExtensions,
     )
   return {
     initializationWorkerRpc,

@@ -28,6 +28,7 @@ export const prepareTestsAndAttach = async (
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
+  enableExtensions: boolean,
 ) => {
   const isFirst = state.promise === undefined
   if (isFirst) {
@@ -49,6 +50,7 @@ export const prepareTestsAndAttach = async (
       inspectSharedProcess,
       inspectExtensions,
       inspectPtyHost,
+      enableExtensions,
     )
   }
   const result = await state.promise
