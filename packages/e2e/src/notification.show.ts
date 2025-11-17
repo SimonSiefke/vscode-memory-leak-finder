@@ -1,22 +1,18 @@
 import type { TestContext } from '../types.ts'
 
-// @ts-ignore
-import path, { dirname, join } from 'node:path'
-// @ts-ignore
-import { fileURLToPath } from 'node:url'
+export const skip = 1
 
-export const skip = true
+export const setup = async ({ Extensions }: TestContext) => {
+  // @ts-ignore
+  await Extensions.add(`packages/e2e/fixtures/sample.show-notification`, 'helloworld-sample')
+}
 
-// @ts-ignore
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
-const root = path.join(__dirname, '../../../')
-
-const extensionPath = join(root, 'packages', 'e2e', 'fixtures', 'sample.show-notification')
-
-export const extraLaunchArgs = [`--extensionDevelopmentPath=${extensionPath}`]
-
-export const run = async ({ QuickPick }: TestContext): Promise<void> => {
-  await QuickPick.show()
+export const run = async ({ QuickPick, Notification }: TestContext): Promise<void> => {
+  await QuickPick.showCommands()
+  await QuickPick.type('Hello world')
   await QuickPick.select('Hello World')
+
+  // @ts-ignore
+  await Notification.shouldHaveItem('Hello World!')
+  await Notification.closeAll()
 }
