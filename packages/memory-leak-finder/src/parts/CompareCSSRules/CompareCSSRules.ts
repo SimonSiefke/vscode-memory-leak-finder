@@ -1,6 +1,17 @@
 export const compareCssRules = (before, after) => {
+  const leaked = []
+  const countMap = Object.create(null)
+  for (const item of before) {
+    countMap[item] ||= []
+    countMap[item]++
+  }
+  for (const item of after) {
+    countMap[item]--
+    if (countMap[item] < 0) {
+      leaked.push(item)
+    }
+  }
   return {
-    before,
-    after,
+    leaked,
   }
 }

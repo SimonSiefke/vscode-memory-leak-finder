@@ -23,6 +23,6 @@ export const stop = (session, objectGroup) => {
 
 export const compare = compareCssRules
 
-export const isLeak = () => {
-  return true
+export const isLeak = (leaked) => {
+  return leaked.length > 0
 }
