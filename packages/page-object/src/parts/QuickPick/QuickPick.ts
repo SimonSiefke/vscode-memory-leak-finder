@@ -39,6 +39,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(quickPickInput).toBeVisible()
         await expect(quickPickInput).toBeFocused({ timeout: 3000 })
         await quickPickInput.type(value)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to type ${value}`)
       }
@@ -66,6 +67,7 @@ export const create = ({ expect, page, VError }) => {
     },
     async select(text, stayVisible = false) {
       try {
+        await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
         const option = quickPick.locator('.label-name', {
@@ -75,6 +77,7 @@ export const create = ({ expect, page, VError }) => {
         if (!stayVisible) {
           await expect(quickPick).toBeHidden()
         }
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to select "${text}"`)
       }

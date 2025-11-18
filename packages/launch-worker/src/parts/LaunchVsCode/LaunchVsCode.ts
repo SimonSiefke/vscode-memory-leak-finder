@@ -27,6 +27,7 @@ export const launchVsCode = async ({
   inspectSharedProcess,
   inspectExtensions,
   inspectPtyHost,
+  enableExtensions,
 }) => {
   try {
     const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
@@ -62,6 +63,7 @@ export const launchVsCode = async ({
       inspectSharedProcess,
       inspectExtensions,
       inspectPtyHost,
+      enableExtensions,
     })
     const env = GetVsCodeEnv.getVsCodeEnv({ runtimeDir, processEnv: process.env })
     const { child } = await LaunchElectron.launchElectron({

@@ -15,6 +15,12 @@ export const getCommonBarChartOptions = (dataCount: number, options: any) => {
   let height = 0
   if (dataCount === 1) {
     height = fixedBarHeight * 2
+  } else if (dataCount === 2) {
+    height = fixedBarHeight * 2 + fixedBarHeight
+  } else if (dataCount === 3) {
+    height = fixedBarHeight * 3 + fixedBarHeight
+  } else if (dataCount === 4) {
+    height = fixedBarHeight * 4 + fixedBarHeight
   } else {
     height = Math.max(minHeight, Math.min(maxHeight, calculatedHeight))
   }

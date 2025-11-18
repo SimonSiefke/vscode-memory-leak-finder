@@ -2,6 +2,9 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as IsMacos from '../IsMacos/IsMacos.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
+import * as Root from '../Root/Root.ts'
+import { basename, join } from 'path'
+import { cp, rm } from 'fs/promises'
 
 const selectAll = IsMacos.isMacos ? 'Meta+A' : 'Control+A'
 
@@ -48,6 +51,27 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         await this.shouldHaveValue('')
       } catch (error) {
         throw new VError(error, `Failed to clear`)
+      }
+    },
+    async add(path, expectedName) {
+      try {
+        // TODO could create symlink also
+        const absolutePath = join(Root.root, path)
+        const base = basename(absolutePath)
+        const destination = join(Root.root, '.vscode-extensions', base)
+        await rm(destination, { recursive: true, force: true })
+        await cp(absolutePath, destination, { recursive: true })
+        await page.waitForIdle()
+        await this.show()
+        await this.search('@installed')
+        const firstExtension = page.locator('.extension-list-item').first()
+        await expect(firstExtension).toBeVisible()
+        const nameLocator = firstExtension.locator('.name')
+        await expect(nameLocator).toHaveText(expectedName)
+        await page.waitForIdle()
+        await this.hide()
+      } catch (error) {
+        throw new VError(error, `Failed to add extension`)
       }
     },
     async shouldHaveValue(value) {
