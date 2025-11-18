@@ -25,4 +25,5 @@ export interface StartRunningOptions {
   inspectSharedProcess: boolean
   inspectExtensions: boolean
   inspectPtyHost: boolean
+  enableExtensions: boolean
 }

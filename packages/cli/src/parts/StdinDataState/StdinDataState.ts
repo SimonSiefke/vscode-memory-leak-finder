@@ -34,6 +34,7 @@ export interface StdinDataState {
   inspectSharedProcess: boolean
   inspectExtensions: boolean
   inspectPtyHost: boolean
+  enableExtensions: boolean
 }
 
 let state: StdinDataState = {
@@ -66,6 +67,7 @@ let state: StdinDataState = {
   inspectSharedProcess: false,
   inspectExtensions: false,
   inspectPtyHost: false,
+  enableExtensions: false,
 }
 
 export const setState = (newState): void => {
