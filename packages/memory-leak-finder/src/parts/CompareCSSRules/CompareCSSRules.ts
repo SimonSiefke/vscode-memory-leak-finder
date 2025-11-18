@@ -1,6 +1,6 @@
-export const compareCssRules = (before, after) => {
-  const leaked = []
-  const countMap = Object.create(null)
+export const compareCssRules = (before: readonly string[], after: readonly string[]) => {
+  const leaked: string[] = []
+  const countMap: Record<string, number> = Object.create(null)
   for (const item of before) {
     countMap[item] ||= 0
     countMap[item]++
