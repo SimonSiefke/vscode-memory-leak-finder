@@ -34,4 +34,5 @@ export const createDefaultState = (): StdinDataState => ({
   inspectPtyHost: false,
   inspectSharedProcess: false,
   measureNode: false,
+  enableExtensions: false,
 })
