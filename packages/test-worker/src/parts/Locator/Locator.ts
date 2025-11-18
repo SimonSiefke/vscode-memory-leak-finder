@@ -115,8 +115,8 @@ export const create = (rpc, sessionId, selector, { hasText = '', hasExactText = 
     blur() {
       return LocatorBlur.blur(this)
     },
-    textContent() {
-      return LocatorTextContent.getTextContent(this)
+    textContent({ allowHidden = false } = {}) {
+      return LocatorTextContent.getTextContent(this, { allowHidden })
     },
     selectText() {
       return LocatorSelectText.selectText(this)
