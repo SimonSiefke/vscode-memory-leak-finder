@@ -8,18 +8,18 @@ export const getCssRules = async (session: Session, objectGroup: string): Promis
 function getSheetRules(sheet){
   const allRules = []
   const rules = Array.from(sheet.cssRules || sheet.rules || []);
-  for(const rule of allRules){
+  for(const rule of rules){
     allRules.push(rule.cssText)
   }
   // Also count nested rules (like those inside @media queries)
-  rules.forEach(rule => {
+  for(const rule of rules){
     if (rule.cssRules) {
       const nested = Array.from(rule.cssRules);
       for(const item of nested){
         allRules.push(item.cssText)
       }
     }
-  });
+  };
   return allRules
 }
 

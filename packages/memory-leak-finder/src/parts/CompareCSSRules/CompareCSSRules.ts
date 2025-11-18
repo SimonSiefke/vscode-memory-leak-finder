@@ -11,6 +11,8 @@ export const compareCssRules = (before, after) => {
       leaked.push(item)
     }
   }
+  console.log('oldcount', before.length)
+  console.log('newcount', after.length)
   return {
     leaked,
   }
