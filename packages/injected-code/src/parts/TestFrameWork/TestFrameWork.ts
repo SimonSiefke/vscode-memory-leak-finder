@@ -325,11 +325,14 @@ export const boundingBox = (locator) => {
   }
 }
 
-export const getTextContent = async (locator) => {
+export const getTextContent = async (locator, { allowHidden = false } = {}) => {
   Assert.object(locator)
   const element = QuerySelector.querySelector(locator.selector)
   if (!element) {
     throw new Error(`element not found ${locator.selector}`)
+  }
+  if (allowHidden) {
+    return element.textContent
   }
   const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
   if (!toBeVisible(element, {} as any)) {

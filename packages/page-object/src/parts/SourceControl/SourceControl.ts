@@ -1,7 +1,22 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as Editor from '../Editor/Editor.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }) => {
+const getMatchingText = async (styleElements, className) => {
+  const [first, second] = className.split(' ')
+  const styleCount = await styleElements.count()
+  for (let i = 0; i < styleCount; i++) {
+    const styleElement = styleElements.nth(i)
+    const text = await styleElement.textContent({ allowHidden: true })
+    console.log(text)
+    if (text.includes(first) || text.includes(second)) {
+      return text
+    }
+  }
+  return ''
+}
+
+export const create = ({ expect, page, VError, ideVersion }) => {
   return {
     async shouldHaveUnstagedFile(name) {
       try {
@@ -97,6 +112,44 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to hide branch picker`)
+      }
+    },
+    async enableInlineBlame() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.ToggleBlameEditorDecoration)
+        await page.waitForIdle()
+        const editor = Editor.create({ page, expect, VError, ideVersion })
+        await editor.focus()
+        await editor.cursorRight()
+        await page.waitForIdle()
+        const decoration = page.locator('[class^="ced-1-TextEditorDecorationType"]').nth(1)
+        await expect(decoration).toBeVisible()
+        await page.waitForIdle()
+        const className = await decoration.getAttribute('class')
+        const styleElements = page.locator('style')
+        const text = await getMatchingText(styleElements, className)
+        await new Promise((r) => {})
+        if (!text) {
+          throw new Error(`decoration css not found`)
+        }
+        console.log({ text, className })
+        // TODO get all style sheets, and try to find the one containg this class
+        // then parse the class and query the content property to get the text content
+        // finally verify the text content matches the expected content
+      } catch (error) {
+        throw new VError(error, `Failed to enable inline blame`)
+      }
+    },
+    async disableInlineBlame() {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.ToggleBlameEditorDecoration)
+        await page.waitForIdle()
+        // TODO verify that inline blame is hidden
+      } catch (error) {
+        throw new VError(error, `Failed to disable inline`)
       }
     },
   }
