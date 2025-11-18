@@ -19,9 +19,7 @@ export const setup = async ({ Workspace, Git, ActivityBar, SourceControl, Editor
   await Editor.shouldHaveText('<h1>hello world</h1>')
 }
 
-export const run = async ({ SourceControl, Editor }: TestContext): Promise<void> => {
-  await SourceControl.enableInlineBlame()
-  await Editor.focus()
-  await Editor.cursorRight()
+export const run = async ({ SourceControl }: TestContext): Promise<void> => {
+  await SourceControl.enableInlineBlame({ expectedDecoration: /first commit/ })
   await SourceControl.disableInlineBlame()
 }
