@@ -1,0 +1,21 @@
+{
+  "name": "webview-sample",
+  "displayName": "webview-sample",
+  "version": "0.0.0-dev",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [],
+  "activationEvents": [
+    "onWebviewPanel:catCoding"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.showWebView",
+        "title": "Test: Show WebView"
+      }
+    ]
+  }
+}

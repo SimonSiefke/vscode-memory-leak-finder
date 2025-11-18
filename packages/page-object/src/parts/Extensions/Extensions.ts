@@ -1,10 +1,10 @@
+import { cp } from 'fs/promises'
+import { basename, join } from 'path'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as IsMacos from '../IsMacos/IsMacos.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
-import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 import * as Root from '../Root/Root.ts'
-import { basename, join } from 'path'
-import { cp, rm } from 'fs/promises'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 const selectAll = IsMacos.isMacos ? 'Meta+A' : 'Control+A'
 
@@ -59,11 +59,12 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         const absolutePath = join(Root.root, path)
         const base = basename(absolutePath)
         const destination = join(Root.root, '.vscode-extensions', base)
-        await rm(destination, { recursive: true, force: true })
-        await cp(absolutePath, destination, { recursive: true })
+        await cp(absolutePath, destination, { recursive: true, force: true })
         await page.waitForIdle()
         await this.show()
+        await page.waitForIdle()
         await this.search('@installed')
+        await page.waitForIdle()
         const firstExtension = page.locator('.extension-list-item').first()
         await expect(firstExtension).toBeVisible()
         const nameLocator = firstExtension.locator('.name')
