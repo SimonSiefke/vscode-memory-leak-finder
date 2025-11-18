@@ -33,5 +33,41 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to unstage file`)
       }
     },
+    async shouldHaveHistoryItem(name) {
+      try {
+        const history = page.locator('[aria-label="Source Control History"]')
+        await expect(history).toBeVisible()
+        const item = history.locator(`.monaco-list-row[aria-label^="${name}"]`)
+        await expect(item).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify history item`)
+      }
+    },
+    async shouldNotHaveHistoryItem(name) {
+      try {
+        const history = page.locator('[aria-label="Source Control History"]')
+        await expect(history).toBeVisible()
+        const item = history.locator(`.monaco-list-row[aria-label^="${name}"]`)
+        await expect(item).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that history item is hidden`)
+      }
+    },
+    async undoLastCommit() {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.UndoLastCommit)
+      } catch (error) {
+        throw new VError(error, `Failed to undo last commit`)
+      }
+    },
+    async refresh() {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.GitRefresh)
+      } catch (error) {
+        throw new VError(error, `Failed to git refresh`)
+      }
+    },
   }
 }
