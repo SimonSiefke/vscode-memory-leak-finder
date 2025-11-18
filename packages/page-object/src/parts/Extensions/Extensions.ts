@@ -1,10 +1,10 @@
+import { cp } from 'fs/promises'
+import { basename, join } from 'path'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as IsMacos from '../IsMacos/IsMacos.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
-import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 import * as Root from '../Root/Root.ts'
-import { basename, join } from 'path'
-import { cp, rm } from 'fs/promises'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 const selectAll = IsMacos.isMacos ? 'Meta+A' : 'Control+A'
 
