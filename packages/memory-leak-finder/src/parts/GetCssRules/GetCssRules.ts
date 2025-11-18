@@ -2,7 +2,7 @@ import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 export const getCssRules = async (session: Session, objectGroup: string): Promise<number> => {
-  const ruleCount = await DevtoolsProtocolRuntime.evaluate(session, {
+  const rules = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: `
 
 function getSheetRules(sheet){
@@ -42,5 +42,5 @@ function getCSSRules() {
     returnByValue: true,
     objectGroup,
   })
-  return ruleCount
+  return rules
 }
