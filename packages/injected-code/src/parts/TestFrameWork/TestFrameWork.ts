@@ -325,6 +325,18 @@ export const boundingBox = (locator) => {
   }
 }
 
+const getTextFromSheet = (style: HTMLStyleElement) => {
+  if (!style.sheet) {
+    return ''
+  }
+  const all: string[] = []
+  for (let i = 0; i < style.sheet.cssRules.length; i++) {
+    const rule = style.sheet.cssRules.item(i)
+    all.push(rule?.cssText || '')
+  }
+  return all.join('\n')
+}
+
 export const getTextContent = async (locator, { allowHidden = false } = {}) => {
   Assert.object(locator)
   const element = QuerySelector.querySelector(locator.selector)
@@ -332,8 +344,16 @@ export const getTextContent = async (locator, { allowHidden = false } = {}) => {
     throw new Error(`element not found ${locator.selector}`)
   }
   if (allowHidden) {
-    return element.textContent
+    const text = element.textContent
+    if (text) {
+      return text
+    }
+    if (element instanceof HTMLStyleElement) {
+      return getTextFromSheet(element)
+    }
+    return text
   }
+
   const toBeVisible = SingleElementConditionMap.getFunction('toBeVisible')
   if (!toBeVisible(element, {} as any)) {
     throw new Error(`must be visible`)
