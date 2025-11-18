@@ -69,5 +69,35 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to git refresh`)
       }
     },
+    async showBranchPicker() {
+      try {
+        await page.waitForIdle()
+        const graphSection = page.locator('[aria-label="Graph Section"]')
+        await expect(graphSection).toBeVisible()
+        const action = graphSection.locator('a.scm-graph-history-item-picker')
+        await expect(action).toHaveAttribute('aria-disabled', null)
+        await expect(action).toBeVisible()
+        await page.waitForIdle()
+        await action.click()
+        await page.waitForIdle()
+        const quickInput = page.locator('.quick-input-widget.show-checkboxes')
+        await expect(quickInput).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to show branch picker`)
+      }
+    },
+    async hideBranchPicker() {
+      try {
+        await page.waitForIdle()
+        const quickInput = page.locator('.quick-input-widget.show-checkboxes')
+        await expect(quickInput).toBeVisible()
+        await page.keyboard.press('Escape')
+        await page.waitForIdle()
+        await expect(quickInput).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to hide branch picker`)
+      }
+    },
   }
 }
