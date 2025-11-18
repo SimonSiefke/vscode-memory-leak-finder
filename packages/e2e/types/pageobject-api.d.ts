@@ -436,6 +436,7 @@ export interface Server {
 export interface PageObjectApi {
   readonly ActivityBar: ActivityBar
   readonly Colors: any
+  readonly Git: any
   readonly ChatEditor: ChatEditor
   readonly ExtensionDetailView: any
   readonly ContextMenu: ContextMenu
@@ -472,7 +473,7 @@ export interface PageObjectApi {
   readonly SettingsEditorFilter: SettingsEditorFilter
   readonly SettingsEditorInput: SettingsEditorInput
   readonly SideBar: SideBar
-  readonly SourceControl: SourceControl
+  readonly SourceControl: any
   readonly StatusBar: StatusBar
   readonly Suggest: Suggest
   readonly Tab: Tab
