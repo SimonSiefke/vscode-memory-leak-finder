@@ -8,12 +8,45 @@ const getMatchingText = async (styleElements, className) => {
   for (let i = 0; i < styleCount; i++) {
     const styleElement = styleElements.nth(i)
     const text = await styleElement.textContent({ allowHidden: true })
-    console.log(text)
     if (text.includes(first) || text.includes(second)) {
       return text
     }
   }
   return ''
+}
+
+const getDecorationLine = (text: string, className: string): string => {
+  const parts = className.split(' ')
+  const lines = text.split('\n')
+  for (const line of lines) {
+    for (const part of parts) {
+      if (line.startsWith(`.monaco-editor .${part}`)) {
+        return line
+      }
+    }
+  }
+  return ''
+}
+
+const RE_CONTENT = /content: "(.*)"/
+
+const getDecorationContent = (text: string, className: string): string => {
+  const line = getDecorationLine(text, className)
+  if (!line) {
+    return ''
+  }
+  const curlyStartIndex = line.indexOf('{')
+  const curlyEndIndex = line.lastIndexOf('}')
+  if (curlyStartIndex === -1 || curlyEndIndex === -1) {
+    return ''
+  }
+  const inner = line.slice(curlyStartIndex, curlyEndIndex)
+  const contentMatch = inner.match(RE_CONTENT)
+  if (!contentMatch) {
+    return ''
+  }
+  const content = contentMatch[1]
+  return content
 }
 
 export const create = ({ expect, page, VError, ideVersion }) => {
@@ -114,7 +147,7 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         throw new VError(error, `Failed to hide branch picker`)
       }
     },
-    async enableInlineBlame() {
+    async enableInlineBlame({ expectedDecoration }) {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
@@ -130,24 +163,26 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         const className = await decoration.getAttribute('class')
         const styleElements = page.locator('style')
         const text = await getMatchingText(styleElements, className)
-        await new Promise((r) => {})
         if (!text) {
           throw new Error(`decoration css not found`)
         }
-        console.log({ text, className })
-        // TODO get all style sheets, and try to find the one containg this class
-        // then parse the class and query the content property to get the text content
-        // finally verify the text content matches the expected content
+        const content = getDecorationContent(text, className)
+        if (!expectedDecoration.test(content)) {
+          throw new Error(`expected decoration content to be ${expectedDecoration}`)
+        }
       } catch (error) {
         throw new VError(error, `Failed to enable inline blame`)
       }
     },
     async disableInlineBlame() {
       try {
+        const decoration = page.locator('[class^="ced-1-TextEditorDecorationType"]').nth(1)
+        await expect(decoration).toBeVisible()
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.ToggleBlameEditorDecoration)
         await page.waitForIdle()
-        // TODO verify that inline blame is hidden
+        await expect(decoration).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to disable inline`)
       }
