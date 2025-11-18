@@ -6,6 +6,10 @@ export const compareCssRules = (before: readonly string[], after: readonly strin
     countMap[item]++
   }
   for (const item of after) {
+    if (!(item in countMap)) {
+      leaked.push(item)
+      continue
+    }
     countMap[item]--
     if (countMap[item] < 0) {
       leaked.push(item)
