@@ -23,6 +23,7 @@ export interface RunTestsOptions {
   readonly inspectSharedProcess: boolean
   readonly inspectExtensions: boolean
   readonly inspectPtyHost: boolean
+  readonly enableExtensions: boolean
 }
 
 export interface RunTestsWithCallbackOptions extends RunTestsOptions {
