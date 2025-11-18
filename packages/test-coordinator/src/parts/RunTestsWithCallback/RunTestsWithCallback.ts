@@ -56,6 +56,7 @@ export const runTestsWithCallback = async ({
   inspectSharedProcess,
   inspectExtensions,
   inspectPtyHost,
+  enableExtensions,
   callback,
 }: RunTestsWithCallbackOptions) => {
   try {
@@ -77,12 +78,12 @@ export const runTestsWithCallback = async ({
     Assert.string(ide)
     Assert.string(ideVersion)
     Assert.boolean(setupOnly)
+    Assert.boolean(enableExtensions)
 
     const connectionId = Id.create()
     const attachedToPageTimeout = TimeoutConstants.AttachToPage
     const idleTimeout = TimeoutConstants.Idle
     const pageObjectPath = GetPageObjectPath.getPageObjectPath()
-    const enableExtensions = false
 
     // TODO for each connection id, launch all needed workers
     // when a new connection id comes in, dispose them (even while running)

@@ -52,6 +52,7 @@ export const updateState = async (newState: any): Promise<void> => {
       inspectExtensions: state.inspectExtensions,
       inspectPtyHost: state.inspectPtyHost,
       inspectSharedProcess: state.inspectSharedProcess,
+      enableExtensions: state.enableExtensions,
     })
   }
   if (newState.mode === ModeType.Interrupted) {
