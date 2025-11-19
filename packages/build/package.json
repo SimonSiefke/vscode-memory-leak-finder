@@ -19,7 +19,7 @@
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@types/node": "^24.10.1",
     "dts-bundle-generator": "^9.5.1",
-    "rollup": "^4.53.2"
+    "rollup": "^4.53.3"
   },
   "dependencies": {
     "@lvce-editor/assert": "^1.4.0"
