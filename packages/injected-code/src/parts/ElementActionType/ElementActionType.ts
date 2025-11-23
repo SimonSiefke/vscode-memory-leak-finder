@@ -21,10 +21,8 @@ export const type = (element, options) => {
     element.value = newValue
   }
   dispatchEditContextUpdate(element, newValue)
-  DispatchEvent.input(element, {})
-  const event = new InputEvent('input', {
-    data: newValue,
+  DispatchEvent.input(element, {
+    inputType: 'insertText',
   })
-  element.dispatchEvent(event)
   DispatchEvent.change(element, {})
 }
