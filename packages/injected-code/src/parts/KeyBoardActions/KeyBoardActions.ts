@@ -57,7 +57,7 @@ export const press = (options, element = document.activeElement) => {
   for (const option of allOptions) {
     DispatchEvent.keyPress(element, option)
   }
-  if ((isInputElement(element) && options.key === ' ') || options.key === 'Space') {
+  if (isInputElement(element) && (options.key === ' ' || options.key === 'Space')) {
     element.dispatchEvent(
       new CustomInputEvent('input', {
         data: ' ',
