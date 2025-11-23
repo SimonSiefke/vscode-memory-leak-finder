@@ -1,6 +1,6 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as DispatchEvent from '../DispatchEvent/DispatchEvent.ts'
-import { createCustomInputEvent, CustomInputEvent, isInputElement } from '../ElementActionType/ElementActionType.ts'
+import { isInputElement } from '../ElementActionType/ElementActionType.ts'
 import * as GetKeyCode from '../GetKeyCode/GetKeyCode.ts'
 
 const getAllOptions = (options) => {
