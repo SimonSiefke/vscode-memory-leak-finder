@@ -1,6 +1,7 @@
 import * as Panel from '../Panel/Panel.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
+import * as Workspace from '../Workspace/Workspace.ts'
 
 const cleanup = async ({ page, row1 }) => {
   for (let i = 0; i < 50; i++) {
@@ -28,7 +29,7 @@ const waitForTerminalReady = async ({ page, row1 }) => {
   return false
 }
 
-export const create = ({ expect, page, VError, ideVersion }) => {
+export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
   return {
     async killAll() {
       try {
@@ -155,11 +156,12 @@ export const create = ({ expect, page, VError, ideVersion }) => {
           await page.keyboard.press(letter)
           await page.waitForIdle()
         }
-        // await new Promise((r) => {
-        //   setTimeout(r, 15000)
-        // })
-
-        await new Promise((r) => {})
+        await page.keyboard.press('Enter')
+        const workspace = Workspace.create({ page, expect, VError, electronApp })
+        const exists = await workspace.waitForFile(waitForFile)
+        if (!exists) {
+          throw new Error(`expected file to be created`)
+        }
       } catch (error) {
         throw new VError(error, `Failed to execute terminal command`)
       }
