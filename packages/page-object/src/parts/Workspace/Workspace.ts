@@ -5,6 +5,7 @@ import * as Electron from '../Electron/Electron.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Root from '../Root/Root.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
+import { existsSync } from 'node:fs'
 
 export const create = ({ electronApp, page, expect, VError }) => {
   return {
@@ -63,6 +64,24 @@ export const create = ({ electronApp, page, expect, VError }) => {
     getWorkspacePath() {
       const workspace = join(Root.root, '.vscode-test-workspace')
       return workspace
+    },
+    async waitForFile(fileName) {
+      const workspace = join(Root.root, '.vscode-test-workspace')
+      const absolutePath = join(workspace, fileName)
+      if (existsSync(absolutePath)) {
+        return true
+      }
+      const maxWaits = 100
+      const checkTime = 50
+      for (let i = 0; i < maxWaits; i++) {
+        if (existsSync(absolutePath)) {
+          return true
+        }
+        const { resolve, promise } = Promise.withResolvers()
+        setTimeout(resolve, checkTime)
+        await promise
+      }
+      return false
     },
     getWorkspaceFilePath(relativePath) {
       const filePath = join(Root.root, '.vscode-test-workspace', relativePath)

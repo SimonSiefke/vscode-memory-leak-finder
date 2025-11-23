@@ -1,8 +1,35 @@
 import * as Panel from '../Panel/Panel.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
+import * as Workspace from '../Workspace/Workspace.ts'
 
-export const create = ({ expect, page, VError, ideVersion }) => {
+const cleanup = async ({ page, row1 }) => {
+  for (let i = 0; i < 50; i++) {
+    await page.waitForIdle()
+    await page.keyboard.press('Backspace')
+    await page.waitForIdle()
+    const text = await row1.textContent()
+    if (text.endsWith('$ ')) {
+      return
+    }
+  }
+}
+
+const waitForTerminalReady = async ({ page, row1 }) => {
+  for (let i = 0; i < 50; i++) {
+    await page.waitForIdle()
+    await page.keyboard.press('a')
+    await page.waitForIdle()
+    const text = await row1.textContent()
+    if (text.includes('aaaaa')) {
+      await cleanup({ page, row1 })
+      return true
+    }
+  }
+  return false
+}
+
+export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
   return {
     async killAll() {
       try {
@@ -17,7 +44,7 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         throw new VError(error, `Failed to kill all terminals`)
       }
     },
-    async show() {
+    async show({ waitForReady = false } = {}) {
       try {
         await page.waitForIdle()
         await page.focus()
@@ -31,8 +58,28 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         await expect(terminal).toBeVisible()
         await expect(terminal).toHaveClass('focus')
         await page.waitForIdle()
+        if (waitForReady) {
+          await this.waitForReady()
+        }
       } catch (error) {
         throw new VError(error, `Failed to show terminal`)
+      }
+    },
+    async waitForReady() {
+      await page.waitForIdle()
+      const terminal = page.locator('.terminal')
+      const textarea = terminal.locator('.xterm-helper-textarea')
+      await expect(textarea).toBeFocused()
+      const rows = terminal.locator('.xterm-rows')
+      await expect(rows).toBeVisible()
+      const cursor = terminal.locator('.xterm-cursor')
+      await expect(cursor).toBeVisible()
+      const row1 = rows.nth(0)
+      await expect(row1).toHaveText(/\$/)
+      await page.waitForIdle()
+      const isReady = await waitForTerminalReady({ page, row1 })
+      if (!isReady) {
+        throw new Error(`terminal is not ready`)
       }
     },
     async split() {
@@ -107,17 +154,31 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         throw new VError(error, `Failed to kill terminal`)
       }
     },
-    async execute(command) {
+    async execute(command, { waitForFile = '' } = {}) {
       try {
         await page.waitForIdle()
         const terminal = page.locator('.terminal')
         const textarea = terminal.locator('.xterm-helper-textarea')
         await expect(textarea).toBeFocused()
-        // TODO
-        // 1. type text into terminal
-        // 2. press enter
-        // 3. verify command has executed successfully
-        await textarea.type(command)
+        const rows = terminal.locator('.xterm-rows')
+        await expect(rows).toBeVisible()
+        const cursor = terminal.locator('.xterm-cursor')
+        await expect(cursor).toBeVisible()
+        await page.waitForIdle()
+        const letters = command.split('')
+        for (const letter of letters) {
+          await page.keyboard.press(letter)
+          await page.waitForIdle()
+        }
+        await page.keyboard.press('Enter')
+        await page.waitForIdle()
+        if (waitForFile) {
+          const workspace = Workspace.create({ page, expect, VError, electronApp })
+          const exists = await workspace.waitForFile(waitForFile)
+          if (!exists) {
+            throw new Error(`expected file to be created`)
+          }
+        }
       } catch (error) {
         throw new VError(error, `Failed to execute terminal command`)
       }
@@ -125,7 +186,8 @@ export const create = ({ expect, page, VError, ideVersion }) => {
     async clear() {
       try {
         await page.waitForIdle()
-        // TODO
+        await this.execute('clear')
+        // TODO maybe verify terminal is clear
       } catch (error) {
         throw new VError(error, `Failed to clear terminal`)
       }

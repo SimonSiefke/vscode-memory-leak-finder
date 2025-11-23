@@ -8,7 +8,7 @@ const getNewValue = (value, selectionStart, selectionEnd, text) => {
   return value.slice(0, selectionStart) + text + value.slice(selectionEnd)
 }
 
-const isInputElement = (element) => {
+export const isInputElement = (element) => {
   return element && (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement)
 }
 
