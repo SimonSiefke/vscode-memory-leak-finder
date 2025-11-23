@@ -154,7 +154,7 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         throw new VError(error, `Failed to kill terminal`)
       }
     },
-    async execute(command, { waitForFile }) {
+    async execute(command, { waitForFile = '' } = {}) {
       try {
         await page.waitForIdle()
         const terminal = page.locator('.terminal')
@@ -171,10 +171,13 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
           await page.waitForIdle()
         }
         await page.keyboard.press('Enter')
-        const workspace = Workspace.create({ page, expect, VError, electronApp })
-        const exists = await workspace.waitForFile(waitForFile)
-        if (!exists) {
-          throw new Error(`expected file to be created`)
+        await page.waitForIdle()
+        if (waitForFile) {
+          const workspace = Workspace.create({ page, expect, VError, electronApp })
+          const exists = await workspace.waitForFile(waitForFile)
+          if (!exists) {
+            throw new Error(`expected file to be created`)
+          }
         }
       } catch (error) {
         throw new VError(error, `Failed to execute terminal command`)
@@ -183,7 +186,8 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
     async clear() {
       try {
         await page.waitForIdle()
-        // TODO
+        await this.execute('clear')
+        // TODO maybe verify terminal is clear
       } catch (error) {
         throw new VError(error, `Failed to clear terminal`)
       }
