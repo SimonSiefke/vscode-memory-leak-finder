@@ -45,7 +45,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
           expect,
           VError,
           ideVersion,
-          electronApp,
+          electronApp: {},
         })
         await terminal.show()
         await terminal.killAll()
