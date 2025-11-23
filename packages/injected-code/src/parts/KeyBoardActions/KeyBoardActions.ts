@@ -1,6 +1,6 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as DispatchEvent from '../DispatchEvent/DispatchEvent.ts'
-import { CustomInputEvent, isInputElement } from '../ElementActionType/ElementActionType.ts'
+import { createCustomInputEvent, CustomInputEvent, isInputElement } from '../ElementActionType/ElementActionType.ts'
 import * as GetKeyCode from '../GetKeyCode/GetKeyCode.ts'
 
 const getAllOptions = (options) => {
@@ -45,6 +45,10 @@ const getAllOptions = (options) => {
   return allOptions
 }
 
+const isSpaceLike = (key) => {
+  return key === ' ' || key === 'Space'
+}
+
 export const press = (options, element = document.activeElement) => {
   if (!element) {
     throw new Error(`element not found`)
@@ -57,14 +61,8 @@ export const press = (options, element = document.activeElement) => {
   for (const option of allOptions) {
     DispatchEvent.keyPress(element, option)
   }
-  if (isInputElement(element) && (options.key === ' ' || options.key === 'Space')) {
-    element.dispatchEvent(
-      new CustomInputEvent('input', {
-        data: ' ',
-        bubbles: true,
-        cancelable: true,
-      }),
-    )
+  if (isInputElement(element) && isSpaceLike(options.key)) {
+    element.dispatchEvent(new InputEvent('input', { data: ' ', isComposing: false, inputType: 'insertText' }))
   }
   for (const option of allOptions) {
     DispatchEvent.keyUp(element, option)

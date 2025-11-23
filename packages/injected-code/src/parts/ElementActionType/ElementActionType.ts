@@ -12,7 +12,6 @@ export const isInputElement = (element) => {
   return element && (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement)
 }
 
-// workaround for chrome bug, inputType not working for inputEvent
 export class CustomInputEvent extends Event {
   inputType: string
   data: any
@@ -20,6 +19,21 @@ export class CustomInputEvent extends Event {
     super(type, options)
     this.inputType = 'insertText'
   }
+
+  static inputType = 'insertText'
+}
+
+export const createCustomInputEvent = (options) => {
+  // workaround for event being created utility context
+  // and losing some properties when transferred to another context.
+  //
+  // Also workaround for chrome bug, inputType not working for inputEvent
+  // const event = new Event('input', {})
+  // // @ts-ignore
+  // event.data = options.data
+  // // @ts-ignore
+  // event.inputType = 'insertText'
+  return new InputEvent('input', { data: ' ', isComposing: false, inputType: 'insertText' })
 }
 
 export const type = (element, options) => {
