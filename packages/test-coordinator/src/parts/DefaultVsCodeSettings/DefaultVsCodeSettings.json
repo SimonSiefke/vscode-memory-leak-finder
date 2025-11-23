@@ -35,5 +35,6 @@
   "window.commandCenter": false,
   "extensions.ignoreRecommendations": true,
   "workbench.experimental.enableNewProfilesUI": false,
-  "workbench.secondarySideBar.defaultVisibility": "hidden"
+  "workbench.secondarySideBar.defaultVisibility": "hidden",
+  "terminal.integrated.gpuAcceleration": "off"
 }
