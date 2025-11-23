@@ -192,5 +192,39 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         throw new VError(error, `Failed to clear terminal`)
       }
     },
+    async openFind() {
+      try {
+        await page.waitForIdle()
+        await page.keyboard.press('Control+f')
+        await page.waitForIdle()
+        const find = page.locator('.simple-find-part.visible')
+        await expect(find).toBeVisible()
+        await page.waitForIdle()
+        const inputBox = find.locator('.monaco-inputbox')
+        await expect(inputBox).toHaveClass('idle')
+        await expect(inputBox).toHaveClass('synthetic-focus')
+        await page.waitForIdle()
+        const input = find.locator('input[placeholder="Find"]')
+        await expect(input).toBeVisible()
+        await page.waitForIdle()
+        await expect(input).toBeFocused()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open terminal find`)
+      }
+    },
+    async closeFind() {
+      try {
+        await page.waitForIdle()
+        const find = page.locator('.simple-find-part.visible')
+        await expect(find).toBeVisible()
+        await page.keyboard.press('Escape')
+        await page.waitForIdle()
+        await expect(find).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to close terminal find`)
+      }
+    },
   }
 }
