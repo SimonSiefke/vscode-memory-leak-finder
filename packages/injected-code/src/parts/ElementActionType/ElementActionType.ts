@@ -17,9 +17,8 @@ export class CustomInputEvent extends Event {
   inputType: string
   data: any
   constructor(type, options) {
-    super(type)
+    super(type, options)
     this.inputType = 'insertText'
-    this.data = options.data
   }
 }
 

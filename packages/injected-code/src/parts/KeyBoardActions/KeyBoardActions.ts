@@ -61,6 +61,8 @@ export const press = (options, element = document.activeElement) => {
     element.dispatchEvent(
       new CustomInputEvent('input', {
         data: ' ',
+        bubbles: true,
+        cancelable: true,
       }),
     )
   }
