@@ -36,5 +36,7 @@
   "extensions.ignoreRecommendations": true,
   "workbench.experimental.enableNewProfilesUI": false,
   "workbench.secondarySideBar.defaultVisibility": "hidden",
-  "terminal.integrated.gpuAcceleration": "off"
+  "terminal.integrated.gpuAcceleration": "off",
+  "editor.accessibilitySupport": "off",
+  "terminal.integrated.shellIntegration.enabled": false
 }
