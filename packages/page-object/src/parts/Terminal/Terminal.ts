@@ -44,7 +44,7 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         throw new VError(error, `Failed to kill all terminals`)
       }
     },
-    async show() {
+    async show({ waitForReady = false } = {}) {
       try {
         await page.waitForIdle()
         await page.focus()
@@ -58,8 +58,28 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         await expect(terminal).toBeVisible()
         await expect(terminal).toHaveClass('focus')
         await page.waitForIdle()
+        if (waitForReady) {
+          await this.waitForReady()
+        }
       } catch (error) {
         throw new VError(error, `Failed to show terminal`)
+      }
+    },
+    async waitForReady() {
+      await page.waitForIdle()
+      const terminal = page.locator('.terminal')
+      const textarea = terminal.locator('.xterm-helper-textarea')
+      await expect(textarea).toBeFocused()
+      const rows = terminal.locator('.xterm-rows')
+      await expect(rows).toBeVisible()
+      const cursor = terminal.locator('.xterm-cursor')
+      await expect(cursor).toBeVisible()
+      const row1 = rows.nth(0)
+      await expect(row1).toHaveText(/\$/)
+      await page.waitForIdle()
+      const isReady = await waitForTerminalReady({ page, row1 })
+      if (!isReady) {
+        throw new Error(`terminal is not ready`)
       }
     },
     async split() {
