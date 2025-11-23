@@ -126,5 +126,27 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to change task icon`)
       }
     },
+    async openQuickPick({ item }) {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.RunTask, {
+          stayVisible: true,
+        })
+        const row = page.locator(`.monaco-list-row[aria-label="${item}"]`)
+        await expect(row).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to open task quickpick`)
+      }
+    },
+    async hideQuickPick() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.close()
+      } catch (error) {
+        throw new VError(error, `Failed to close task quickpick`)
+      }
+    },
   }
 }
