@@ -146,38 +146,19 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         const row1 = rows.nth(0)
         await expect(row1).toHaveText(/\$/)
         await page.waitForIdle()
-        // const initialHint = terminal.locator('.terminal-initial-hint')
-        // await expect(initialHint).toBeVisible()
-        await page.waitForIdle()
         const isReady = await waitForTerminalReady({ page, row1 })
         if (!isReady) {
           throw new Error(`terminal is not ready`)
         }
-        // const letters = command.split('')
-        // for (const letter of letters) {
-        //   if (letter === ' ') {
-        //     await textarea.type(letter)
-        //   } else {
-        //     await page.keyboard.press(letter)
-        //   }
-        //   await page.waitForIdle()
-        // }
-        await new Promise((r) => {
-          setTimeout(r, 15000)
-        })
-        await page.keyboard.press(' ')
+        const letters = command.split('')
+        for (const letter of letters) {
+          await page.keyboard.press(letter)
+          await page.waitForIdle()
+        }
+        // await new Promise((r) => {
+        //   setTimeout(r, 15000)
+        // })
 
-        console.log('pressed space')
-
-        // const quickPick = QuickPick.create({ page, expect, VError })
-        // await quickPick.show()
-        // TODO
-        // 1. type text into terminal
-        // 2. press enter
-        // 3. verify command has executed successfully
-        // await page.waitForIdle()
-        // await page.keyboard.press('Enter')
-        // await page.waitForIdle()
         await new Promise((r) => {})
       } catch (error) {
         throw new VError(error, `Failed to execute terminal command`)
