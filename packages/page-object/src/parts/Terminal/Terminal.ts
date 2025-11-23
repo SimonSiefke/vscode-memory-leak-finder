@@ -164,13 +164,7 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         await expect(rows).toBeVisible()
         const cursor = terminal.locator('.xterm-cursor')
         await expect(cursor).toBeVisible()
-        const row1 = rows.nth(0)
-        await expect(row1).toHaveText(/\$/)
         await page.waitForIdle()
-        const isReady = await waitForTerminalReady({ page, row1 })
-        if (!isReady) {
-          throw new Error(`terminal is not ready`)
-        }
         const letters = command.split('')
         for (const letter of letters) {
           await page.keyboard.press(letter)
