@@ -2,6 +2,32 @@ import * as Panel from '../Panel/Panel.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
+const cleanup = async ({ page, row1 }) => {
+  for (let i = 0; i < 50; i++) {
+    await page.waitForIdle()
+    await page.keyboard.press('Backspace')
+    await page.waitForIdle()
+    const text = await row1.textContent()
+    if (text.endsWith('$ ')) {
+      return
+    }
+  }
+}
+
+const waitForTerminalReady = async ({ page, row1 }) => {
+  for (let i = 0; i < 50; i++) {
+    await page.waitForIdle()
+    await page.keyboard.press('a')
+    await page.waitForIdle()
+    const text = await row1.textContent()
+    if (text.includes('aaaaa')) {
+      await cleanup({ page, row1 })
+      return true
+    }
+  }
+  return false
+}
+
 export const create = ({ expect, page, VError, ideVersion }) => {
   return {
     async killAll() {
@@ -107,17 +133,52 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         throw new VError(error, `Failed to kill terminal`)
       }
     },
-    async execute(command) {
+    async execute(command, { waitForFile }) {
       try {
         await page.waitForIdle()
         const terminal = page.locator('.terminal')
         const textarea = terminal.locator('.xterm-helper-textarea')
         await expect(textarea).toBeFocused()
+        const rows = terminal.locator('.xterm-rows')
+        await expect(rows).toBeVisible()
+        const cursor = terminal.locator('.xterm-cursor')
+        await expect(cursor).toBeVisible()
+        const row1 = rows.nth(0)
+        await expect(row1).toHaveText(/\$/)
+        await page.waitForIdle()
+        // const initialHint = terminal.locator('.terminal-initial-hint')
+        // await expect(initialHint).toBeVisible()
+        await page.waitForIdle()
+        const isReady = await waitForTerminalReady({ page, row1 })
+        if (!isReady) {
+          throw new Error(`terminal is not ready`)
+        }
+        // const letters = command.split('')
+        // for (const letter of letters) {
+        //   if (letter === ' ') {
+        //     await textarea.type(letter)
+        //   } else {
+        //     await page.keyboard.press(letter)
+        //   }
+        //   await page.waitForIdle()
+        // }
+        await new Promise((r) => {
+          setTimeout(r, 15000)
+        })
+        await page.keyboard.press(' ')
+
+        console.log('pressed space')
+
+        // const quickPick = QuickPick.create({ page, expect, VError })
+        // await quickPick.show()
         // TODO
         // 1. type text into terminal
         // 2. press enter
         // 3. verify command has executed successfully
-        await textarea.type(command)
+        // await page.waitForIdle()
+        // await page.keyboard.press('Enter')
+        // await page.waitForIdle()
+        await new Promise((r) => {})
       } catch (error) {
         throw new VError(error, `Failed to execute terminal command`)
       }

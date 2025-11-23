@@ -8,8 +8,19 @@ const getNewValue = (value, selectionStart, selectionEnd, text) => {
   return value.slice(0, selectionStart) + text + value.slice(selectionEnd)
 }
 
-const isInputElement = (element) => {
+export const isInputElement = (element) => {
   return element && (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement)
+}
+
+// workaround for chrome bug, inputType not working for inputEvent
+export class CustomInputEvent extends Event {
+  inputType: string
+  data: any
+  constructor(type, options) {
+    super(type)
+    this.inputType = 'insertText'
+    this.data = options.data
+  }
 }
 
 export const type = (element, options) => {
@@ -22,5 +33,9 @@ export const type = (element, options) => {
   }
   dispatchEditContextUpdate(element, newValue)
   DispatchEvent.input(element, {})
+  const event = new CustomInputEvent('input', {
+    data: newValue,
+  })
+  element.dispatchEvent(event)
   DispatchEvent.change(element, {})
 }
