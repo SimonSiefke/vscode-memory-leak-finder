@@ -21,6 +21,7 @@ export const cleanSource = (source: string): string => {
     .replace('out-vscode/vs/workbench/file:/mnt/vss/_work/1/s', '')
     .replace('file:/Users/cloudtest/vss/_work/1/s/', '')
     .replace(RE_VS, './src/vs/')
+    .replace('../src', 'src')
     .replace('./src', 'src')
     .replace(RE_EXTERNAL_COMMON_JS, commonJsExternalReplace)
 }
