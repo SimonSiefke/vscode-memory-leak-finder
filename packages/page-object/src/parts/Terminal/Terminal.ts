@@ -81,6 +81,7 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
       if (!isReady) {
         throw new Error(`terminal is not ready`)
       }
+      await page.waitForIdle()
     },
     async split() {
       try {
@@ -224,6 +225,33 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to close terminal find`)
+      }
+    },
+    async moveToEditorArea() {
+      try {
+        await page.waitForIdle()
+        // const body = page.locator('body')
+        // await body.focus()
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.MoveTerminalToEditorArea, {
+          pressKeyOnce: true,
+        })
+        await page.waitForIdle()
+        // TODO verify terminal tab is visible
+      } catch (error) {
+        throw new VError(error, `Failed to move panel to editor area`)
+      }
+    },
+    async moveToPanelArea() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.MoveTerminalToPanelArea)
+        await page.waitForIdle()
+        // TODO verify terminal tab is hidden
+      } catch (error) {
+        throw new VError(error, `Failed to move panel to panel area`)
       }
     },
   }
