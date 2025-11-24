@@ -3,17 +3,21 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, page, VError }) => {
   return {
-    async show(key = KeyBindings.OpenQuickPickFiles) {
+    async show({ key = KeyBindings.OpenQuickPickFiles, pressKeyOnce = false } = {}) {
       try {
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
         // TODO there might be a conflict here when pressing the keyboard shortcut
         // too often, the quickpick opens, making the next statement pass
         // but then the keyboard shortcut is still processing, making the quickpick close again
-        await page.pressKeyExponential({
-          key: key,
-          waitFor: quickPick,
-        })
+        if (pressKeyOnce) {
+          await page.keyboard.press(key)
+        } else {
+          await page.pressKeyExponential({
+            key: key,
+            waitFor: quickPick,
+          })
+        }
         await expect(quickPick).toBeVisible({
           timeout: 10_000,
         })
@@ -25,9 +29,9 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to show quick pick`)
       }
     },
-    async showCommands() {
+    async showCommands({ pressKeyOnce = false } = {}) {
       try {
-        return this.show(KeyBindings.OpenQuickPickCommands)
+        return this.show({ key: KeyBindings.OpenQuickPickCommands, pressKeyOnce })
       } catch (error) {
         throw new VError(error, `Failed to show quick pick`)
       }
@@ -82,10 +86,10 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to select "${text}"`)
       }
     },
-    async executeCommand(command, { stayVisible = false } = {}) {
+    async executeCommand(command, { stayVisible = false, pressKeyOnce = false } = {}) {
       try {
         await page.waitForIdle()
-        await this.showCommands()
+        await this.showCommands({ pressKeyOnce })
         await this.type(command)
         await this.select(command, stayVisible)
         await page.waitForIdle()
@@ -96,7 +100,7 @@ export const create = ({ expect, page, VError }) => {
     async openFile(fileName) {
       try {
         await page.waitForIdle()
-        await this.show(KeyBindings.OpenQuickPickFiles)
+        await this.show({ key: KeyBindings.OpenQuickPickFiles })
         const quickPick = page.locator('.quick-input-widget')
         await expect(quickPick).toBeVisible()
         const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
