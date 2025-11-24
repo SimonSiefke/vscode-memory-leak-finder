@@ -22,3 +22,8 @@ test('cleanSource - odd relative path', () => {
   const input = './file:/Users/cloudtest/vss/_work/1/s/src/vs/base/common/lazy.ts'
   expect(cleanSource(input)).toBe('src/vs/base/common/lazy.ts')
 })
+
+test('cleanSource - up a folder relative path', () => {
+  const input = '../src/eventEmitter2.ts'
+  expect(cleanSource(input)).toBe('src/eventEmitter2.ts')
+})
