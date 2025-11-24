@@ -133,10 +133,34 @@ export const create = ({ page, expect, VError }) => {
         await quickPick.executeCommand(WellKnownCommands.RunTask, {
           stayVisible: true,
         })
-        const row = page.locator(`.monaco-list-row[aria-label="${item}"]`)
+        const row = page.locator(`.monaco-list-row[aria-label^="${item}"]`)
         await expect(row).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to open task quickpick`)
+      }
+    },
+    async selectQuickPickItem({ item }) {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.RunTask, {
+          stayVisible: true,
+        })
+        const row = page.locator(`.monaco-list-row[aria-label^="${item}"]`)
+        await expect(row).toBeVisible()
+        await row.click()
+        await page.waitForIdle()
+        const terminal = page.locator('.terminal.xterm')
+        await expect(terminal).toBeVisible()
+        const rows = terminal.locator('.xterm-rows > div')
+        const row1 = rows.nth(0)
+        await expect(row1).toBeVisible()
+        await page.waitForIdle()
+        const decoration = terminal.locator('.codicon-terminal-decoration-success.terminal-command-decoration')
+        await expect(decoration).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to select quickpick item`)
       }
     },
     async hideQuickPick() {
@@ -146,6 +170,16 @@ export const create = ({ page, expect, VError }) => {
         await quickPick.close()
       } catch (error) {
         throw new VError(error, `Failed to close task quickpick`)
+      }
+    },
+    async clear() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.ClearTerminal)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to clear task terminal`)
       }
     },
   }
