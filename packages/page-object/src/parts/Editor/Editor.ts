@@ -298,6 +298,15 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to go to definition`)
       }
     },
+    async toggleScreenReaderAccessibilityMode() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.ToggleScreenReaderAccessibilityMode)
+      } catch (error) {
+        throw new VError(error, `Failed to go to definition`)
+      }
+    },
     async findAllReferences() {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
