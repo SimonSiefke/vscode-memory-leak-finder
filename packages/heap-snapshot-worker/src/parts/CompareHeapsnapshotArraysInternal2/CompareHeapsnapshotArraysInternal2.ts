@@ -1,7 +1,6 @@
 import * as Assert from '../Assert/Assert.ts'
 import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
-import * as CreateNameMap from '../CreateNameMap/CreateNameMap.ts'
-import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import * as SortCountMap from '../SortCountMap/SortCountMap.ts'
 
 const createCountMap = (names) => {
@@ -38,9 +37,9 @@ const getArrayNamesWithCount = (countMap) => {
   return arrayNamesWithCount
 }
 
-const getSortedCounts = (heapsnapshot) => {
-  const { snapshot, nodes: nodesRaw, edges: edgesRaw, strings } = heapsnapshot
-  const meta = heapsnapshot.meta || snapshot.meta
+const getSortedCounts = (heapsnapshot: Snapshot) => {
+  const { nodes: nodesRaw, edges: edgesRaw, strings } = heapsnapshot
+  const meta = heapsnapshot.meta
   const { node_fields, edge_fields, edge_types } = meta
 
   // Convert to Uint32Array if needed
@@ -149,7 +148,7 @@ const compareCounts = (before, after) => {
   return sorted
 }
 
-export const compareHeapsnapshotArraysInternal2 = async (snapshotA: any, snapshotB: any) => {
+export const compareHeapsnapshotArraysInternal2 = async (snapshotA: Snapshot, snapshotB: Snapshot) => {
   Assert.object(snapshotA)
   Assert.object(snapshotB)
   const countsA = getSortedCounts(snapshotA)
