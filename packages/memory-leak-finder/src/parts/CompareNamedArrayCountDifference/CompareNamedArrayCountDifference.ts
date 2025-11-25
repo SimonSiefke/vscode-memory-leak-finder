@@ -12,6 +12,8 @@ const sortByCounts = (items) => {
 }
 
 export const compareNamedArrayCountDifference = (before, after) => {
+  console.time('compare')
+  console.log('size', JSON.stringify(before).length)
   Assert.array(before)
   Assert.array(after)
   const beforeMap = Object.create(null)
@@ -32,5 +34,7 @@ export const compareNamedArrayCountDifference = (before, after) => {
     }
   }
   const sorted = sortByCounts(leaked)
+  console.timeEnd('compare')
+
   return sorted
 }
