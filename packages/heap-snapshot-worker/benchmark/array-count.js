@@ -1,5 +1,5 @@
-import { writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { mkdir, writeFile } from 'node:fs/promises'
+import { dirname, join } from 'node:path'
 import { compareHeapsnapshotArrays2 } from '../src/parts/CompareHeapsnapshotArrays2/CompareHeapsnapshotArrays2.ts'
 
 const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
@@ -13,6 +13,7 @@ const testOptimized = async () => {
     console.time('compare')
     const values = await compareHeapsnapshotArrays2(filePath1, filePath2)
     console.timeEnd('compare')
+    await mkdir(dirname(resultPath), { recursive: true })
     await writeFile(resultPath, JSON.stringify(values, null, 2) + '\n')
 
     console.log(JSON.stringify(values, null, 2))

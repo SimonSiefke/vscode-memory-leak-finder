@@ -1,0 +1,232 @@
+[
+  {
+    "name": "args",
+    "count": 234,
+    "delta": 4
+  },
+  {
+    "name": "keys",
+    "count": 137,
+    "delta": 32
+  },
+  {
+    "name": "identifiers",
+    "count": 96,
+    "delta": 32
+  },
+  {
+    "name": "_keys",
+    "count": 21,
+    "delta": 1
+  },
+  {
+    "name": "_overrides",
+    "count": 21,
+    "delta": 1
+  },
+  {
+    "name": "include",
+    "count": 17,
+    "delta": 1
+  },
+  {
+    "name": "validProperties",
+    "count": 9,
+    "delta": 3
+  },
+  {
+    "name": "configurations",
+    "count": 8,
+    "delta": 1
+  },
+  {
+    "name": "preferences",
+    "count": 8,
+    "delta": 2
+  },
+  {
+    "name": "editor.rulers",
+    "count": 8,
+    "delta": 1
+  },
+  {
+    "name": "compounds",
+    "count": 7,
+    "delta": 1
+  },
+  {
+    "name": "rulers",
+    "count": 7,
+    "delta": 2
+  },
+  {
+    "name": "path",
+    "count": 6,
+    "delta": 1
+  },
+  {
+    "name": "customData",
+    "count": 6,
+    "delta": 2
+  },
+  {
+    "name": "autoImportFileExcludePatterns",
+    "count": 6,
+    "delta": 2
+  },
+  {
+    "name": "autoImportSpecifierExcludeRegexes",
+    "count": 6,
+    "delta": 2
+  },
+  {
+    "name": "commandsToSkipShell",
+    "count": 5,
+    "delta": 1
+  },
+  {
+    "name": "localEchoExcludePrograms",
+    "count": 5,
+    "delta": 1
+  },
+  {
+    "name": "ignoreProcessNames",
+    "count": 5,
+    "delta": 1
+  },
+  {
+    "name": "allowedLinkSchemes",
+    "count": 5,
+    "delta": 1
+  },
+  {
+    "name": "pub.name",
+    "count": 5,
+    "delta": 1
+  },
+  {
+    "name": "fallbackLigatures",
+    "count": 5,
+    "delta": 1
+  },
+  {
+    "name": "confirmedUriHandlerExtensionIds",
+    "count": 4,
+    "delta": 1
+  },
+  {
+    "name": "noProxy",
+    "count": 4,
+    "delta": 1
+  },
+  {
+    "name": "wordSegmenterLocales",
+    "count": 4,
+    "delta": 1
+  },
+  {
+    "name": "defaultExtensionsIfInstalledLocally",
+    "count": 4,
+    "delta": 1
+  },
+  {
+    "name": "candidateGuessEncodings",
+    "count": 4,
+    "delta": 1
+  },
+  {
+    "name": "watcherInclude",
+    "count": 4,
+    "delta": 1
+  },
+  {
+    "name": "displayOrder",
+    "count": 4,
+    "delta": 1
+  },
+  {
+    "name": "applyToAllProfiles",
+    "count": 4,
+    "delta": 1
+  },
+  {
+    "name": "tasks",
+    "count": 4,
+    "delta": 2
+  },
+  {
+    "name": "scriptExplorerExclude",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "styles",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "ignoredRepositories",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "scanRepositories",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "repositoryScanIgnoredFolders",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "commandsToLog",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "branchProtection",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "checkoutType",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "excludeLanguages",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "extensionsPath",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "schemas",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "pluginPaths",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "autoAttachSmartPattern",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "dictionary",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "ignoredLinks",
+    "count": 3,
+    "delta": 1
+  }
+]
