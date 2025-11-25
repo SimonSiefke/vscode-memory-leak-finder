@@ -3,40 +3,6 @@ import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import * as SortCountMap from '../SortCountMap/SortCountMap.ts'
 
-const createCountMap = (names) => {
-  const map = Object.create(null)
-  for (const name of names) {
-    map[name] ||= 0
-    map[name]++
-  }
-  return map
-}
-
-const filterByArray = (value) => {
-  return value.nodeName === 'Array'
-}
-
-const getValueName = (value) => {
-  return value.edgeName || value.nodeName
-}
-
-const getArrayNames = (nameMap) => {
-  const values = Object.values(nameMap)
-  const filtered = values.filter(filterByArray)
-  const mapped = filtered.map(getValueName)
-  return mapped
-}
-
-const getArrayNamesWithCount = (countMap) => {
-  const arrayNamesWithCount = Object.entries(countMap).map(([key, value]) => {
-    return {
-      name: key,
-      count: value,
-    }
-  })
-  return arrayNamesWithCount
-}
-
 const getSortedCounts = (heapsnapshot: Snapshot) => {
   const { nodes, edges, strings } = heapsnapshot
   const meta = heapsnapshot.meta
