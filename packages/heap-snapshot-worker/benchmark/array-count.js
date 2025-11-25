@@ -1,9 +1,10 @@
+import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { getBigintObjectsFromHeapSnapshot } from '../src/parts/GetBigintObjectsFromHeapSnapshot/GetBigintObjectsFromHeapSnapshot.ts'
 import { compareHeapsnapshotArrays2 } from '../src/parts/CompareHeapsnapshotArrays2/CompareHeapsnapshotArrays2.ts'
 
 const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
 const filePath2 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/1.json')
+const resultPath = join(import.meta.dirname, '../snapshots', 'result.json')
 
 const testOptimized = async () => {
   // console.log(`\n=== Testing Optimized Named Function Count for: ${filePath} ===`)
@@ -12,6 +13,8 @@ const testOptimized = async () => {
     console.time('compare')
     const values = await compareHeapsnapshotArrays2(filePath1, filePath2)
     console.timeEnd('compare')
+    await writeFile(resultPath, JSON.stringify(values, null, 2) + '\n')
+
     console.log(JSON.stringify(values, null, 2))
 
     // console.log(`  Duration: ${duration.toFixed(2)}ms`)
