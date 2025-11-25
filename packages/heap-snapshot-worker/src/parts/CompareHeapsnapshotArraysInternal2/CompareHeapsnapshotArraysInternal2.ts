@@ -38,13 +38,9 @@ const getArrayNamesWithCount = (countMap) => {
 }
 
 const getSortedCounts = (heapsnapshot: Snapshot) => {
-  const { nodes: nodesRaw, edges: edgesRaw, strings } = heapsnapshot
+  const { nodes, edges, strings } = heapsnapshot
   const meta = heapsnapshot.meta
   const { node_fields, edge_fields, edge_types } = meta
-
-  // Convert to Uint32Array if needed
-  const nodes = nodesRaw instanceof Uint32Array ? nodesRaw : new Uint32Array(nodesRaw)
-  const edges = edgesRaw instanceof Uint32Array ? edgesRaw : new Uint32Array(edgesRaw)
 
   const nodeFieldCount = node_fields.length
   const edgeFieldCount = edge_fields.length
