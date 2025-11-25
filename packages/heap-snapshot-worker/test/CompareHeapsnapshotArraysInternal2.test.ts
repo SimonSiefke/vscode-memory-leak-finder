@@ -3,7 +3,6 @@ import { compareHeapsnapshotArraysInternal2 } from '../src/parts/CompareHeapsnap
 
 const createHeapSnapshot = (nodes: number[], edges: number[], strings: string[]) => {
   return {
-    snapshot: {
       meta: {
         node_types: [
           [
@@ -28,7 +27,6 @@ const createHeapSnapshot = (nodes: number[], edges: number[], strings: string[])
         edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
-      },
     },
     nodes,
     edges,
