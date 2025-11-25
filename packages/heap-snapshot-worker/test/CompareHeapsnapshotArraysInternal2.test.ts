@@ -1,42 +1,8 @@
 import { test, expect } from '@jest/globals'
 import { compareHeapsnapshotArraysInternal2 } from '../src/parts/CompareHeapsnapshotArraysInternal2/CompareHeapsnapshotArraysInternal2.ts'
-
-const createHeapSnapshot = (nodes: number[], edges: number[], strings: string[]) => {
-  return {
-      meta: {
-        node_types: [
-          [
-            'hidden',
-            'array',
-            'string',
-            'object',
-            'code',
-            'closure',
-            'regexp',
-            'number',
-            'native',
-            'synthetic',
-            'concatenated string',
-            'sliced string',
-            'symbol',
-            'bigint',
-            'object shape',
-          ],
-        ],
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
-        edge_fields: ['type', 'name_or_index', 'to_node'],
-        location_fields: ['object_index', 'script_id', 'line', 'column'],
-    },
-    nodes,
-    edges,
-    strings,
-    locations: [],
-  }
-}
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('compareHeapsnapshotArraysInternal2 - no leaks', async () => {
-  const strings = ['', 'Array', 'globalThis']
   const nodes = [
     // globalThis node at index 0
     9, // type: synthetic
@@ -62,15 +28,80 @@ test('compareHeapsnapshotArraysInternal2 - no leaks', async () => {
     7, // to_node: Array node at index 7
   ]
 
-  const snapshotA = createHeapSnapshot(nodes, edges, ['', 'Array', 'globalThis', 'myArray'])
-  const snapshotB = createHeapSnapshot(nodes, edges, ['', 'Array', 'globalThis', 'myArray'])
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [
+        [
+          'hidden',
+          'array',
+          'string',
+          'object',
+          'code',
+          'closure',
+          'regexp',
+          'number',
+          'native',
+          'synthetic',
+          'concatenated string',
+          'sliced string',
+          'symbol',
+          'bigint',
+          'object shape',
+        ],
+      ],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 2,
+    edge_count: 1,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array(nodes),
+    edges: new Uint32Array(edges),
+    strings: ['', 'Array', 'globalThis', 'myArray'],
+    locations: new Uint32Array([]),
+  }
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [
+        [
+          'hidden',
+          'array',
+          'string',
+          'object',
+          'code',
+          'closure',
+          'regexp',
+          'number',
+          'native',
+          'synthetic',
+          'concatenated string',
+          'sliced string',
+          'symbol',
+          'bigint',
+          'object shape',
+        ],
+      ],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 2,
+    edge_count: 1,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array(nodes),
+    edges: new Uint32Array(edges),
+    strings: ['', 'Array', 'globalThis', 'myArray'],
+    locations: new Uint32Array([]),
+  }
 
   const result = await compareHeapsnapshotArraysInternal2(snapshotA, snapshotB)
   expect(result).toEqual([])
 })
 
 test('compareHeapsnapshotArraysInternal2 - one array count increased', async () => {
-  const strings = ['', 'Array', 'globalThis', 'myArray']
   const nodesA = [
     // globalThis node at index 0
     9, // type: synthetic
@@ -133,8 +164,74 @@ test('compareHeapsnapshotArraysInternal2 - one array count increased', async () 
     14, // to_node: Array node 2
   ]
 
-  const snapshotA = createHeapSnapshot(nodesA, edgesA, strings)
-  const snapshotB = createHeapSnapshot(nodesB, edgesB, strings)
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [
+        [
+          'hidden',
+          'array',
+          'string',
+          'object',
+          'code',
+          'closure',
+          'regexp',
+          'number',
+          'native',
+          'synthetic',
+          'concatenated string',
+          'sliced string',
+          'symbol',
+          'bigint',
+          'object shape',
+        ],
+      ],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 2,
+    edge_count: 1,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array(nodesA),
+    edges: new Uint32Array(edgesA),
+    strings: ['', 'Array', 'globalThis', 'myArray'],
+    locations: new Uint32Array([]),
+  }
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [
+        [
+          'hidden',
+          'array',
+          'string',
+          'object',
+          'code',
+          'closure',
+          'regexp',
+          'number',
+          'native',
+          'synthetic',
+          'concatenated string',
+          'sliced string',
+          'symbol',
+          'bigint',
+          'object shape',
+        ],
+      ],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 3,
+    edge_count: 2,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array(nodesB),
+    edges: new Uint32Array(edgesB),
+    strings: ['', 'Array', 'globalThis', 'myArray'],
+    locations: new Uint32Array([]),
+  }
 
   const result = await compareHeapsnapshotArraysInternal2(snapshotA, snapshotB)
   expect(result).toEqual([
@@ -147,7 +244,6 @@ test('compareHeapsnapshotArraysInternal2 - one array count increased', async () 
 })
 
 test('compareHeapsnapshotArraysInternal2 - new array appeared', async () => {
-  const strings = ['', 'Array', 'globalThis', 'myArray', 'newArray']
   const nodesA = [
     // globalThis node at index 0
     9, // type: synthetic
@@ -210,8 +306,74 @@ test('compareHeapsnapshotArraysInternal2 - new array appeared', async () => {
     14, // to_node: Array node 2
   ]
 
-  const snapshotA = createHeapSnapshot(nodesA, edgesA, strings)
-  const snapshotB = createHeapSnapshot(nodesB, edgesB, strings)
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [
+        [
+          'hidden',
+          'array',
+          'string',
+          'object',
+          'code',
+          'closure',
+          'regexp',
+          'number',
+          'native',
+          'synthetic',
+          'concatenated string',
+          'sliced string',
+          'symbol',
+          'bigint',
+          'object shape',
+        ],
+      ],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 2,
+    edge_count: 1,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array(nodesA),
+    edges: new Uint32Array(edgesA),
+    strings: ['', 'Array', 'globalThis', 'myArray', 'newArray'],
+    locations: new Uint32Array([]),
+  }
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [
+        [
+          'hidden',
+          'array',
+          'string',
+          'object',
+          'code',
+          'closure',
+          'regexp',
+          'number',
+          'native',
+          'synthetic',
+          'concatenated string',
+          'sliced string',
+          'symbol',
+          'bigint',
+          'object shape',
+        ],
+      ],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 3,
+    edge_count: 2,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array(nodesB),
+    edges: new Uint32Array(edgesB),
+    strings: ['', 'Array', 'globalThis', 'myArray', 'newArray'],
+    locations: new Uint32Array([]),
+  }
 
   const result = await compareHeapsnapshotArraysInternal2(snapshotA, snapshotB)
   expect(result).toEqual([
@@ -224,7 +386,6 @@ test('compareHeapsnapshotArraysInternal2 - new array appeared', async () => {
 })
 
 test('compareHeapsnapshotArraysInternal2 - multiple arrays with different changes', async () => {
-  const strings = ['', 'Array', 'globalThis', 'array1', 'array2', 'array3']
   const nodesA = [
     // globalThis node at index 0
     9, // type: synthetic
@@ -335,8 +496,74 @@ test('compareHeapsnapshotArraysInternal2 - multiple arrays with different change
     35, // to_node: Array node 5
   ]
 
-  const snapshotA = createHeapSnapshot(nodesA, edgesA, strings)
-  const snapshotB = createHeapSnapshot(nodesB, edgesB, strings)
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [
+        [
+          'hidden',
+          'array',
+          'string',
+          'object',
+          'code',
+          'closure',
+          'regexp',
+          'number',
+          'native',
+          'synthetic',
+          'concatenated string',
+          'sliced string',
+          'symbol',
+          'bigint',
+          'object shape',
+        ],
+      ],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 3,
+    edge_count: 2,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array(nodesA),
+    edges: new Uint32Array(edgesA),
+    strings: ['', 'Array', 'globalThis', 'array1', 'array2', 'array3'],
+    locations: new Uint32Array([]),
+  }
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [
+        [
+          'hidden',
+          'array',
+          'string',
+          'object',
+          'code',
+          'closure',
+          'regexp',
+          'number',
+          'native',
+          'synthetic',
+          'concatenated string',
+          'sliced string',
+          'symbol',
+          'bigint',
+          'object shape',
+        ],
+      ],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 6,
+    edge_count: 5,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array(nodesB),
+    edges: new Uint32Array(edgesB),
+    strings: ['', 'Array', 'globalThis', 'array1', 'array2', 'array3'],
+    locations: new Uint32Array([]),
+  }
 
   const result = await compareHeapsnapshotArraysInternal2(snapshotA, snapshotB)
   expect(result).toEqual([
@@ -354,7 +581,6 @@ test('compareHeapsnapshotArraysInternal2 - multiple arrays with different change
 })
 
 test('compareHeapsnapshotArraysInternal2 - array count decreased (not a leak)', async () => {
-  const strings = ['', 'Array', 'globalThis', 'myArray']
   const nodesA = [
     // globalThis node at index 0
     9, // type: synthetic
@@ -417,8 +643,74 @@ test('compareHeapsnapshotArraysInternal2 - array count decreased (not a leak)', 
     7, // to_node: Array node
   ]
 
-  const snapshotA = createHeapSnapshot(nodesA, edgesA, strings)
-  const snapshotB = createHeapSnapshot(nodesB, edgesB, strings)
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [
+        [
+          'hidden',
+          'array',
+          'string',
+          'object',
+          'code',
+          'closure',
+          'regexp',
+          'number',
+          'native',
+          'synthetic',
+          'concatenated string',
+          'sliced string',
+          'symbol',
+          'bigint',
+          'object shape',
+        ],
+      ],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 3,
+    edge_count: 2,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array(nodesA),
+    edges: new Uint32Array(edgesA),
+    strings: ['', 'Array', 'globalThis', 'myArray'],
+    locations: new Uint32Array([]),
+  }
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [
+        [
+          'hidden',
+          'array',
+          'string',
+          'object',
+          'code',
+          'closure',
+          'regexp',
+          'number',
+          'native',
+          'synthetic',
+          'concatenated string',
+          'sliced string',
+          'symbol',
+          'bigint',
+          'object shape',
+        ],
+      ],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 2,
+    edge_count: 1,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array(nodesB),
+    edges: new Uint32Array(edgesB),
+    strings: ['', 'Array', 'globalThis', 'myArray'],
+    locations: new Uint32Array([]),
+  }
 
   const result = await compareHeapsnapshotArraysInternal2(snapshotA, snapshotB)
   expect(result).toEqual([])
