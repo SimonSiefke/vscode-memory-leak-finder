@@ -42,9 +42,7 @@ export const getNamedArrayCountFromHeapSnapshot = async (id) => {
   const heapsnapshot = HeapSnapshotState.get(id)
 
   Assert.object(heapsnapshot)
-  console.time('parse')
   const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
-  console.timeEnd('parse')
   const nameMap = CreateNameMap.createNameMap(parsedNodes, graph)
   const arrayNames = getArrayNames(nameMap)
   const countMap = createCountMap(arrayNames)
