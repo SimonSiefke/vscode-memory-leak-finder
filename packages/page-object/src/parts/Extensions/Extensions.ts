@@ -235,13 +235,12 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         throw new VError(error, `Failed to check mcp welcome heading`)
       }
     },
-    async restart(expectedText) {
+    async restart() {
       try {
-        const mcpWelcomeTitle = page.locator('.mcp-welcome-title')
-        await expect(mcpWelcomeTitle).toBeVisible()
-        await expect(mcpWelcomeTitle).toHaveText(expectedText)
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.RestartExtensions)
       } catch (error) {
-        throw new VError(error, `Failed to check mcp welcome heading`)
+        throw new VError(error, `Failed to restart extensions`)
       }
     },
     async shouldHaveTitle(expectedTtitle) {
