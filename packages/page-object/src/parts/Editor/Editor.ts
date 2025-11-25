@@ -238,7 +238,11 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
         await quickPick.type(`:${line}:${column}`)
         await page.waitForIdle()
-        await quickPick.select(`Go to line ${line} and character ${column}.`)
+        if (ideVersion.minor >= 105) {
+          await quickPick.select(`Press 'Enter' to go to line ${line} at column ${column}.`)
+        } else {
+          await quickPick.select(`Go to line ${line} and character ${column}.`)
+        }
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to set cursor`)

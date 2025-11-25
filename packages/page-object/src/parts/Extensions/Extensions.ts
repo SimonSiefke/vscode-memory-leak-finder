@@ -235,6 +235,16 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         throw new VError(error, `Failed to check mcp welcome heading`)
       }
     },
+    async restart() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.RestartExtensions)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to restart extensions`)
+      }
+    },
     async shouldHaveTitle(expectedTtitle) {
       try {
         const title = page.locator('.sidebar .title-label h2')
