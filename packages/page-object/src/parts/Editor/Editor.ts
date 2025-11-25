@@ -452,6 +452,14 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to save file`)
       }
     },
+    async format() {
+      try {
+        const quickpick = QuickPick.create({ page, expect, VError })
+        await quickpick.executeCommand(WellKnownCommands.FormatDocument)
+      } catch (error) {
+        throw new VError(error, `Failed to format file`)
+      }
+    },
     async switchToTab(name) {
       try {
         const tab = page.locator(`[role="tab"][data-resource-name="${name}"]`)
