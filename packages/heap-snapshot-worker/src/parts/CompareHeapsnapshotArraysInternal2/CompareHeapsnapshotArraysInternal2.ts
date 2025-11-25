@@ -1,4 +1,5 @@
 import * as Assert from '../Assert/Assert.ts'
+import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
 import * as CreateNameMap from '../CreateNameMap/CreateNameMap.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 import * as SortCountMap from '../SortCountMap/SortCountMap.ts'
@@ -38,13 +39,40 @@ const getArrayNamesWithCount = (countMap) => {
 }
 
 const getSortedCounts = (heapsnapshot) => {
-  const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
-  const nameMap = CreateNameMap.createNameMap(parsedNodes, graph)
-  const arrayNames = getArrayNames(nameMap)
-  const countMap = createCountMap(arrayNames)
-  const arrayNamesWithCount = getArrayNamesWithCount(countMap)
-  const sortedArrayNamesWithCount = SortCountMap.sortCountMap(arrayNamesWithCount)
-  return sortedArrayNamesWithCount
+  const edgeMap = createEdgeMap(heapsnapshot.nodes, heapsnapshot.meta.node_fields)
+  const nodeFieldCount = heapsnapshot.meta.node_fields.length
+  const nameMetaIndex = heapsnapshot.meta.node_fields.indexOf('name')
+  const edgeNameMetaIndex = heapsnapshot.meta.edge_fields.indexOf('name')
+  const edgeFieldCount = heapsnapshot.meta.edge_fields.length
+  const edgeCountFieldIndex = heapsnapshot.meta.node_fields.indexOf('edge_count')
+  const edgeCountTypeIndex = heapsnapshot.meta.edge_fields.indexOf('type')
+  const edgeTypeMetaElement = heapsnapshot.meta.edge_types[0].indexOf('element')
+
+  let arrayCount = 0
+  const nameMap = Object.create(null)
+  const { nodes, strings, edges } = heapsnapshot
+
+  for (let i = 0; i < nodes.length; i += nodeFieldCount) {
+    const nameIndex = nodes[i + nameMetaIndex]
+    const name = strings[nameIndex]
+    if (name === 'Array') {
+      const edgeCount = nodes[i + edgeCountFieldIndex]
+      const edgeIndexBase = edgeMap[i / nodeFieldCount]
+      for (let j = 0; j < edgeCount; j++) {
+        const edgeIndex = edgeIndexBase + j * edgeFieldCount
+        const edgeType = edges[edgeIndex + edgeCountTypeIndex]
+        if (edgeType === edgeTypeMetaElement) {
+          const edgeNameIndex = edges[edgeIndex + edgeNameMetaIndex]
+          const edgeName = strings[edgeNameIndex]
+          nameMap[edgeName] ||= 0
+          nameMap[edgeName]++
+          break
+        }
+      }
+      arrayCount++
+    }
+  }
+  return []
 }
 
 const compareItem = (a, b) => {
