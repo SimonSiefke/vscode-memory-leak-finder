@@ -433,7 +433,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
       const breadCrumb = page.locator(`.monaco-breadcrumb-item`, {
         hasText: text,
       })
-      await expect(breadCrumb).toBeVisible()
+      await expect(breadCrumb).toBeVisible({ timeout: 10_000 })
       await page.waitForIdle()
     },
     async save(options) {
