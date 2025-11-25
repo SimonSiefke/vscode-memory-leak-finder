@@ -39,40 +39,82 @@ const getArrayNamesWithCount = (countMap) => {
 }
 
 const getSortedCounts = (heapsnapshot) => {
-  const edgeMap = createEdgeMap(heapsnapshot.nodes, heapsnapshot.meta.node_fields)
-  const nodeFieldCount = heapsnapshot.meta.node_fields.length
-  const nameMetaIndex = heapsnapshot.meta.node_fields.indexOf('name')
-  const edgeNameMetaIndex = heapsnapshot.meta.edge_fields.indexOf('name')
-  const edgeFieldCount = heapsnapshot.meta.edge_fields.length
-  const edgeCountFieldIndex = heapsnapshot.meta.node_fields.indexOf('edge_count')
-  const edgeCountTypeIndex = heapsnapshot.meta.edge_fields.indexOf('type')
-  const edgeTypeMetaElement = heapsnapshot.meta.edge_types[0].indexOf('element')
+  const { snapshot, nodes: nodesRaw, edges: edgesRaw, strings } = heapsnapshot
+  const meta = heapsnapshot.meta || snapshot.meta
+  const { node_fields, edge_fields, edge_types } = meta
 
-  let arrayCount = 0
-  const nameMap = Object.create(null)
-  const { nodes, strings, edges } = heapsnapshot
+  // Convert to Uint32Array if needed
+  const nodes = nodesRaw instanceof Uint32Array ? nodesRaw : new Uint32Array(nodesRaw)
+  const edges = edgesRaw instanceof Uint32Array ? edgesRaw : new Uint32Array(edgesRaw)
 
+  const nodeFieldCount = node_fields.length
+  const edgeFieldCount = edge_fields.length
+  const nameFieldIndex = node_fields.indexOf('name')
+  const typeFieldIndex = node_fields.indexOf('type')
+  const edgeCountFieldIndex = node_fields.indexOf('edge_count')
+  const edgeTypeFieldIndex = edge_fields.indexOf('type')
+  const edgeNameFieldIndex = edge_fields.indexOf('name_or_index')
+  const edgeToNodeFieldIndex = edge_fields.indexOf('to_node')
+  const edgeTypes = edge_types[0] || []
+  const edgeTypeProperty = edgeTypes.indexOf('property')
+  const nodeTypes = meta.node_types[0] || []
+  const nodeTypeObject = nodeTypes.indexOf('object')
+
+  // First pass: find all Array nodes and store their byte offsets
+  const arrayNodeOffsets = new Set<number>()
   for (let i = 0; i < nodes.length; i += nodeFieldCount) {
-    const nameIndex = nodes[i + nameMetaIndex]
+    const typeIndex = nodes[i + typeFieldIndex]
+    const nameIndex = nodes[i + nameFieldIndex]
     const name = strings[nameIndex]
-    if (name === 'Array') {
-      const edgeCount = nodes[i + edgeCountFieldIndex]
-      const edgeIndexBase = edgeMap[i / nodeFieldCount]
-      for (let j = 0; j < edgeCount; j++) {
-        const edgeIndex = edgeIndexBase + j * edgeFieldCount
-        const edgeType = edges[edgeIndex + edgeCountTypeIndex]
-        if (edgeType === edgeTypeMetaElement) {
-          const edgeNameIndex = edges[edgeIndex + edgeNameMetaIndex]
-          const edgeName = strings[edgeNameIndex]
-          nameMap[edgeName] ||= 0
-          nameMap[edgeName]++
-          break
-        }
-      }
-      arrayCount++
+    if (typeIndex === nodeTypeObject && name === 'Array') {
+      arrayNodeOffsets.add(i)
     }
   }
-  return []
+
+  // Second pass: scan all edges to find property edges pointing TO array nodes
+  const nameMap = Object.create(null)
+  const edgeMap = createEdgeMap(nodes, node_fields)
+
+  for (let nodeOffset = 0; nodeOffset < nodes.length; nodeOffset += nodeFieldCount) {
+    const nodeIndex = nodeOffset / nodeFieldCount
+    const edgeCount = nodes[nodeOffset + edgeCountFieldIndex]
+    const edgeStartIndex = edgeMap[nodeIndex]
+
+    // Scan edges from this node
+    for (let j = 0; j < edgeCount; j++) {
+      const edgeIndex = (edgeStartIndex + j) * edgeFieldCount
+      const edgeType = edges[edgeIndex + edgeTypeFieldIndex]
+      const edgeToNode = edges[edgeIndex + edgeToNodeFieldIndex]
+
+      // Check if this is a property edge pointing to an array node
+      // edgeToNode is a byte offset in the nodes array
+      if (edgeType === edgeTypeProperty && arrayNodeOffsets.has(edgeToNode)) {
+        const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
+        const edgeName = strings[edgeNameIndex] || ''
+        // Filter out internal properties
+        if (
+          edgeName &&
+          edgeName !== 'constructor' &&
+          edgeName !== '__proto__' &&
+          edgeName !== 'prototype' &&
+          !edgeName.startsWith('<symbol')
+        ) {
+          nameMap[edgeName] ||= 0
+          nameMap[edgeName]++
+        }
+      }
+    }
+  }
+
+  // Convert nameMap to array format and sort
+  const arrayNamesWithCount = Object.entries(nameMap).map(([key, value]) => {
+    return {
+      name: key,
+      count: value,
+    }
+  })
+  const sorted = SortCountMap.sortCountMap(arrayNamesWithCount)
+  return sorted
 }
 
 const compareItem = (a, b) => {
