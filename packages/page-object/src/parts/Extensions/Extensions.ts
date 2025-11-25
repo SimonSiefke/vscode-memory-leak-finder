@@ -237,8 +237,10 @@ export const create = ({ expect, page, VError, ideVersion }) => {
     },
     async restart() {
       try {
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.RestartExtensions)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to restart extensions`)
       }
