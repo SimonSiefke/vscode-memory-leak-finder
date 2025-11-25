@@ -5,6 +5,7 @@ const getThreshold = (context: any): number => {
   const threshold = context && Number.isFinite(context.runs) ? context.runs : defaultRuns
   return threshold
 }
+
 export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: string, context: any): Promise<readonly any[]> => {
   const threshold = getThreshold(context)
   const options = {

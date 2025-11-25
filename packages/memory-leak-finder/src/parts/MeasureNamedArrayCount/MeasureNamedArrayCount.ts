@@ -1,5 +1,5 @@
-import * as CompareNamedArrayCountDifference from '../CompareNamedArrayCountDifference/CompareNamedArrayCountDifference.ts'
-import * as GetNamedArrayCount from '../GetNamedArrayCount/GetNamedArrayCount.ts'
+import { compareNamedArrayCountDifference2 } from '../CompareNamedArrayCountDifference2/CompareNamedArrayCountDifference2.ts'
+import { getHeapSnapshot } from '../GetHeapSnapshot/GetHeapSnapshot.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
@@ -16,19 +16,21 @@ export const create = (session) => {
 
 export const start = async (session, objectGroup) => {
   const id = 0
-  return GetNamedArrayCount.getNamedArrayCount(session, objectGroup, id)
+  const heapSnapshotPath = await getHeapSnapshot(session, id)
+  return heapSnapshotPath
 }
 
 export const stop = async (session, objectGroup) => {
   const id = 1
-  return GetNamedArrayCount.getNamedArrayCount(session, objectGroup, id)
+  const heapSnapshotPath = await getHeapSnapshot(session, id)
+  return heapSnapshotPath
 }
 
 export const releaseResources = async (session, objectGroup) => {
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 
-export const compare = CompareNamedArrayCountDifference.compareNamedArrayCountDifference
+export const compare = compareNamedArrayCountDifference2
 
 export const isLeak = (leaked) => {
   return leaked.length > 0
