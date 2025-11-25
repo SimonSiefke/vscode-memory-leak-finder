@@ -235,6 +235,15 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         throw new VError(error, `Failed to check mcp welcome heading`)
       }
     },
+    async restart(expectedText) {
+      try {
+        const mcpWelcomeTitle = page.locator('.mcp-welcome-title')
+        await expect(mcpWelcomeTitle).toBeVisible()
+        await expect(mcpWelcomeTitle).toHaveText(expectedText)
+      } catch (error) {
+        throw new VError(error, `Failed to check mcp welcome heading`)
+      }
+    },
     async shouldHaveTitle(expectedTtitle) {
       try {
         const title = page.locator('.sidebar .title-label h2')
