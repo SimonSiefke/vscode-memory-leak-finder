@@ -40,8 +40,13 @@ export const isChromeInternalArrayName = (name: string): boolean => {
   }
 
   // Check for specific internal names
-  if (name === 'transition_info' || name.includes('transition_info/') || name.includes('/transition_info')) {
-    return true
+  // Check each part when names are joined with "/"
+  const nameParts = name.split('/')
+  for (const part of nameParts) {
+    const trimmed = part.trim()
+    if (trimmed === 'transition_info') {
+      return true
+    }
   }
 
   return false
