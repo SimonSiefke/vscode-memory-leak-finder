@@ -32,5 +32,6 @@ export const compareNamedArrayCountDifference = (before, after) => {
     }
   }
   const sorted = sortByCounts(leaked)
+
   return sorted
 }

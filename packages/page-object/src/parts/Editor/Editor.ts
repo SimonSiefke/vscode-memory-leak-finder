@@ -367,6 +367,26 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to verify that editor has no squiggly error`)
       }
     },
+    async closeAllEditorGroups() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.CloseAllEditorGroups)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to close all editor groups`)
+      }
+    },
+    async enable2x2GridView() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.EditorGridLayout)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to enable editor grid layout`)
+      }
+    },
     async deleteCharactersRight({ count }) {
       try {
         for (let i = 0; i < count; i++) {

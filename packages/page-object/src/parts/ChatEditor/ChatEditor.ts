@@ -25,7 +25,8 @@ export const create = ({ expect, page, VError }) => {
         await editContext.setValue(message)
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
-        const sendButton = chatView.locator('[aria-label^="Send and Dispatch"]')
+        const sendButton = chatView.locator('.action-label[aria-label^="Send"]')
+        await expect(sendButton).toBeVisible()
         await sendButton.click()
         await page.waitForIdle()
         // TODO check that message is visible and response also
