@@ -1,5 +1,6 @@
 import * as Assert from '../Assert/Assert.ts'
 import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
+import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import * as SortCountMap from '../SortCountMap/SortCountMap.ts'
 
@@ -13,12 +14,19 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
   const nameFieldIndex = node_fields.indexOf('name')
   const typeFieldIndex = node_fields.indexOf('type')
   const edgeCountFieldIndex = node_fields.indexOf('edge_count')
+  const traceNodeIdFieldIndex = node_fields.indexOf('trace_node_id')
   const edgeTypeFieldIndex = edge_fields.indexOf('type')
   const edgeNameFieldIndex = edge_fields.indexOf('name_or_index')
   const edgeToNodeFieldIndex = edge_fields.indexOf('to_node')
   const edgeTypes = edge_types[0] || []
   const nodeTypes = meta.node_types[0] || []
   const nodeTypeObject = nodeTypes.indexOf('object')
+
+  // Get location field offsets if locations are available
+  const locationFields = meta.location_fields || []
+  const hasLocations = locationFields.length > 0 && heapsnapshot.locations && heapsnapshot.locations.length > 0
+  const locationOffsets = hasLocations ? getLocationFieldOffsets(locationFields) : null
+  const locations = hasLocations ? heapsnapshot.locations : null
 
   // First pass: find all Array nodes and store their byte offsets
   const arrayNodeOffsets = new Set<number>()
@@ -32,9 +40,9 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
   }
 
   // Second pass: scan all edges to find edges pointing TO array nodes
-  // Collect ALL edge names for each array to better differentiate arrays with the same name
+  // Collect ALL edge names for each array, including source node context for better identification
   // CreateNameMap processes ALL edge types, not just property edges
-  const arrayNamesMap = Object.create(null) // arrayNodeOffset -> Set of edge names
+  const arrayNamesMap = Object.create(null) // arrayNodeOffset -> Set of full names (sourceNodeName/edgeName or edgeName)
   const edgeMap = createEdgeMap(nodes, node_fields)
   const edgeTypeElement = edgeTypes.indexOf('element')
 
@@ -47,6 +55,21 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
     const nodeIndex = nodeOffset / nodeFieldCount
     const edgeCount = nodes[nodeOffset + edgeCountFieldIndex]
     const edgeStartIndex = edgeMap[nodeIndex]
+
+    // Get source node name for context
+    const sourceNodeNameIndex = nodes[nodeOffset + nameFieldIndex]
+    const sourceNodeTypeIndex = nodes[nodeOffset + typeFieldIndex]
+    const sourceNodeName = sourceNodeNameIndex >= 0 && sourceNodeNameIndex < strings.length ? strings[sourceNodeNameIndex] : null
+    const sourceNodeType = sourceNodeTypeIndex >= 0 && sourceNodeTypeIndex < nodeTypes.length ? nodeTypes[sourceNodeTypeIndex] : null
+
+    // Only include source node name if it's an object (not Array, not primitive types)
+    const includeSourceName =
+      sourceNodeName &&
+      sourceNodeType === 'object' &&
+      sourceNodeName !== 'Array' &&
+      sourceNodeName !== 'Object' &&
+      !sourceNodeName.startsWith('<') &&
+      sourceNodeName !== ''
 
     // Scan edges from this node
     for (let j = 0; j < edgeCount; j++) {
@@ -83,7 +106,9 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
           edgeName !== 'prototype' &&
           !edgeName.startsWith('<symbol')
         ) {
-          arrayNamesMap[edgeToNode].add(edgeName)
+          // Build full name: include source node name if available and meaningful
+          const fullName = includeSourceName ? `${sourceNodeName}.${edgeName}` : edgeName
+          arrayNamesMap[edgeToNode].add(fullName)
         }
       }
     }
@@ -91,23 +116,55 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
 
   // Count arrays by joined names (one count per array, not per edge)
   // Join all names with "/" to differentiate arrays with the same name
-  const nameMap = Object.create(null)
+  // Also collect location info for potential original name resolution
+  const nameMap = Object.create(null) // joinedName -> { count, locations: Set<string> }
   for (const arrayOffset of arrayNodeOffsets) {
     const edgeNames = arrayNamesMap[arrayOffset]
     if (edgeNames.size > 0) {
       // Sort names for consistent ordering, then join with "/"
       const sortedNames = Array.from(edgeNames).sort()
       const joinedName = sortedNames.join('/')
-      nameMap[joinedName] ||= 0
-      nameMap[joinedName]++
+
+      // Try to get location info for this array (for potential original name resolution)
+      let locationKey: string | null = null
+      if (hasLocations && locationOffsets && locations && traceNodeIdFieldIndex >= 0) {
+        const traceNodeId = nodes[arrayOffset + traceNodeIdFieldIndex]
+        if (traceNodeId !== undefined && traceNodeId !== 0) {
+          // Find the location in the locations array
+          for (let locIndex = 0; locIndex < locations.length; locIndex += locationOffsets.itemsPerLocation) {
+            const objectIndex = locations[locIndex + locationOffsets.objectIndexOffset] / nodeFieldCount
+            if (objectIndex === traceNodeId) {
+              const scriptId = locations[locIndex + locationOffsets.scriptIdOffset]
+              const line = locations[locIndex + locationOffsets.lineOffset]
+              const column = locations[locIndex + locationOffsets.columnOffset]
+              locationKey = `${scriptId}:${line}:${column}`
+              break
+            }
+          }
+        }
+      }
+
+      if (!nameMap[joinedName]) {
+        nameMap[joinedName] = {
+          count: 0,
+          locations: new Set<string>(),
+        }
+      }
+      nameMap[joinedName].count++
+      if (locationKey) {
+        nameMap[joinedName].locations.add(locationKey)
+      }
     }
   }
 
   // Convert nameMap to array format and sort
+  // Note: Location info is collected but not exposed yet - can be used for original name resolution
   const arrayNamesWithCount = Object.entries(nameMap).map(([key, value]) => {
     return {
       name: key,
-      count: value,
+      count: value.count,
+      // TODO: Use locations for original name resolution via source maps
+      // locations: Array.from(value.locations),
     }
   })
   const sorted = SortCountMap.sortCountMap(arrayNamesWithCount)

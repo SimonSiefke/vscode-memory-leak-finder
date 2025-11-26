@@ -715,3 +715,438 @@ test('compareHeapsnapshotArraysInternal2 - array count decreased (not a leak)', 
   const result = await compareHeapsnapshotArraysInternal2(snapshotA, snapshotB)
   expect(result).toEqual([])
 })
+
+test('compareHeapsnapshotArraysInternal2 - array with source node context', async () => {
+  const nodesA = [
+    // configurationProperties object at index 0
+    3, // type: object
+    3, // name: configurationProperties (string index 3)
+    1, // id: 1
+    100, // self_size
+    1, // edge_count: 1
+    0, // trace_node_id
+    0, // detachedness
+    // Array node at index 7
+    3, // type: object
+    1, // name: Array
+    2, // id: 2
+    64, // self_size
+    0, // edge_count: 0
+    0, // trace_node_id
+    0, // detachedness
+  ]
+  const edgesA = [
+    // configurationProperties -> Array via 'problemMatchers' property
+    2, // type: property
+    4, // name_or_index: 'problemMatchers' (string index 4)
+    7, // to_node: Array node at index 7
+  ]
+
+  const nodesB = [
+    // configurationProperties object at index 0
+    3, // type: object
+    3, // name: configurationProperties
+    1, // id: 1
+    100, // self_size
+    2, // edge_count: 2 (increased)
+    0, // trace_node_id
+    0, // detachedness
+    // Array node 1 at index 7
+    3, // type: object
+    1, // name: Array
+    2, // id: 2
+    64, // self_size
+    0, // edge_count: 0
+    0, // trace_node_id
+    0, // detachedness
+    // Array node 2 at index 14
+    3, // type: object
+    1, // name: Array
+    3, // id: 3
+    64, // self_size
+    0, // edge_count: 0
+    0, // trace_node_id
+    0, // detachedness
+  ]
+  const edgesB = [
+    // configurationProperties -> Array 1 via 'problemMatchers'
+    2, // type: property
+    4, // name_or_index: 'problemMatchers'
+    7, // to_node: Array node 1
+    // configurationProperties -> Array 2 via 'problemMatchers'
+    2, // type: property
+    4, // name_or_index: 'problemMatchers'
+    14, // to_node: Array node 2
+  ]
+
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [
+        [
+          'hidden',
+          'array',
+          'string',
+          'object',
+          'code',
+          'closure',
+          'regexp',
+          'number',
+          'native',
+          'synthetic',
+          'concatenated string',
+          'sliced string',
+          'symbol',
+          'bigint',
+          'object shape',
+        ],
+      ],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 2,
+    edge_count: 1,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array(nodesA),
+    edges: new Uint32Array(edgesA),
+    strings: ['', 'Array', 'globalThis', 'configurationProperties', 'problemMatchers'],
+    locations: new Uint32Array([]),
+  }
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [
+        [
+          'hidden',
+          'array',
+          'string',
+          'object',
+          'code',
+          'closure',
+          'regexp',
+          'number',
+          'native',
+          'synthetic',
+          'concatenated string',
+          'sliced string',
+          'symbol',
+          'bigint',
+          'object shape',
+        ],
+      ],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 3,
+    edge_count: 2,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array(nodesB),
+    edges: new Uint32Array(edgesB),
+    strings: ['', 'Array', 'globalThis', 'configurationProperties', 'problemMatchers'],
+    locations: new Uint32Array([]),
+  }
+
+  const result = await compareHeapsnapshotArraysInternal2(snapshotA, snapshotB)
+  expect(result).toEqual([
+    {
+      name: 'configurationProperties.problemMatchers',
+      count: 2,
+      delta: 1,
+    },
+  ])
+})
+
+test('compareHeapsnapshotArraysInternal2 - array without meaningful source context', async () => {
+  const nodesA = [
+    // Object node at index 0 (generic Object, should be filtered out)
+    3, // type: object
+    2, // name: Object (string index 2)
+    1, // id: 1
+    100, // self_size
+    1, // edge_count: 1
+    0, // trace_node_id
+    0, // detachedness
+    // Array node at index 7
+    3, // type: object
+    1, // name: Array
+    2, // id: 2
+    64, // self_size
+    0, // edge_count: 0
+    0, // trace_node_id
+    0, // detachedness
+  ]
+  const edgesA = [
+    // Object -> Array via 'items' property
+    2, // type: property
+    4, // name_or_index: 'items' (string index 4)
+    7, // to_node: Array node at index 7
+  ]
+
+  const nodesB = [
+    // Object node at index 0
+    3, // type: object
+    2, // name: Object
+    1, // id: 1
+    100, // self_size
+    2, // edge_count: 2 (increased)
+    0, // trace_node_id
+    0, // detachedness
+    // Array node 1 at index 7
+    3, // type: object
+    1, // name: Array
+    2, // id: 2
+    64, // self_size
+    0, // edge_count: 0
+    0, // trace_node_id
+    0, // detachedness
+    // Array node 2 at index 14
+    3, // type: object
+    1, // name: Array
+    3, // id: 3
+    64, // self_size
+    0, // edge_count: 0
+    0, // trace_node_id
+    0, // detachedness
+  ]
+  const edgesB = [
+    // Object -> Array 1 via 'items'
+    2, // type: property
+    4, // name_or_index: 'items'
+    7, // to_node: Array node 1
+    // Object -> Array 2 via 'items'
+    2, // type: property
+    4, // name_or_index: 'items'
+    14, // to_node: Array node 2
+  ]
+
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [
+        [
+          'hidden',
+          'array',
+          'string',
+          'object',
+          'code',
+          'closure',
+          'regexp',
+          'number',
+          'native',
+          'synthetic',
+          'concatenated string',
+          'sliced string',
+          'symbol',
+          'bigint',
+          'object shape',
+        ],
+      ],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 2,
+    edge_count: 1,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array(nodesA),
+    edges: new Uint32Array(edgesA),
+    strings: ['', 'Array', 'Object', 'globalThis', 'items'],
+    locations: new Uint32Array([]),
+  }
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [
+        [
+          'hidden',
+          'array',
+          'string',
+          'object',
+          'code',
+          'closure',
+          'regexp',
+          'number',
+          'native',
+          'synthetic',
+          'concatenated string',
+          'sliced string',
+          'symbol',
+          'bigint',
+          'object shape',
+        ],
+      ],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 3,
+    edge_count: 2,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array(nodesB),
+    edges: new Uint32Array(edgesB),
+    strings: ['', 'Array', 'Object', 'globalThis', 'items'],
+    locations: new Uint32Array([]),
+  }
+
+  const result = await compareHeapsnapshotArraysInternal2(snapshotA, snapshotB)
+  // Generic "Object" name should be filtered out, so just use edge name
+  expect(result).toEqual([
+    {
+      name: 'items',
+      count: 2,
+      delta: 1,
+    },
+  ])
+})
+
+test('compareHeapsnapshotArraysInternal2 - array with multiple names and source context', async () => {
+  const nodesA = [
+    // configSchema object at index 0
+    3, // type: object
+    3, // name: configSchema (string index 3)
+    1, // id: 1
+    100, // self_size
+    1, // edge_count: 1
+    0, // trace_node_id
+    0, // detachedness
+    // settings object at index 7
+    3, // type: object
+    4, // name: settings (string index 4)
+    2, // id: 2
+    100, // self_size
+    1, // edge_count: 1
+    0, // trace_node_id
+    0, // detachedness
+    // Array node at index 14
+    3, // type: object
+    1, // name: Array
+    3, // id: 3
+    64, // self_size
+    0, // edge_count: 0
+    0, // trace_node_id
+    0, // detachedness
+  ]
+  const edgesA = [
+    // configSchema -> Array via 'properties' property
+    2, // type: property
+    5, // name_or_index: 'properties'
+    14, // to_node: Array node
+    // settings -> Array via 'items' property
+    2, // type: property
+    6, // name_or_index: 'items'
+    14, // to_node: Array node
+  ]
+
+  const nodesB = [
+    // configSchema object at index 0
+    3, // type: object
+    3, // name: configSchema
+    1, // id: 1
+    100, // self_size
+    1, // edge_count: 1
+    0, // trace_node_id
+    0, // detachedness
+    // settings object at index 7
+    3, // type: object
+    4, // name: settings
+    2, // id: 2
+    100, // self_size
+    1, // edge_count: 1
+    0, // trace_node_id
+    0, // detachedness
+    // Array node at index 14
+    3, // type: object
+    1, // name: Array
+    3, // id: 3
+    64, // self_size
+    0, // edge_count: 0
+    0, // trace_node_id
+    0, // detachedness
+  ]
+  const edgesB = [
+    // configSchema -> Array via 'properties'
+    2, // type: property
+    5, // name_or_index: 'properties'
+    14, // to_node: Array node
+    // settings -> Array via 'items'
+    2, // type: property
+    6, // name_or_index: 'items'
+    14, // to_node: Array node
+  ]
+
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [
+        [
+          'hidden',
+          'array',
+          'string',
+          'object',
+          'code',
+          'closure',
+          'regexp',
+          'number',
+          'native',
+          'synthetic',
+          'concatenated string',
+          'sliced string',
+          'symbol',
+          'bigint',
+          'object shape',
+        ],
+      ],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 3,
+    edge_count: 2,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array(nodesA),
+    edges: new Uint32Array(edgesA),
+    strings: ['', 'Array', 'globalThis', 'configSchema', 'settings', 'properties', 'items'],
+    locations: new Uint32Array([]),
+  }
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [
+        [
+          'hidden',
+          'array',
+          'string',
+          'object',
+          'code',
+          'closure',
+          'regexp',
+          'number',
+          'native',
+          'synthetic',
+          'concatenated string',
+          'sliced string',
+          'symbol',
+          'bigint',
+          'object shape',
+        ],
+      ],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 3,
+    edge_count: 2,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array(nodesB),
+    edges: new Uint32Array(edgesB),
+    strings: ['', 'Array', 'globalThis', 'configSchema', 'settings', 'properties', 'items'],
+    locations: new Uint32Array([]),
+  }
+
+  const result = await compareHeapsnapshotArraysInternal2(snapshotA, snapshotB)
+  // Array should have both names with source context, sorted alphabetically
+  // Since counts are the same, no leak is reported
+  expect(result).toEqual([])
+})
