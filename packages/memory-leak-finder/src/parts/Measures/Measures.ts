@@ -100,6 +100,7 @@ export * as MeasureSymbolCount from '../MeasureSymbolCount/MeasureSymbolCount.ts
 export * as MeasureSymbols from '../MeasureSymbols/MeasureSymbols.ts'
 export * as MeasureTextDecoderCount from '../MeasureTextDecoderCount/MeasureTextDecoderCount.ts'
 export * as MeasureTextEncoderCount from '../MeasureTextEncoderCount/MeasureTextEncoderCount.ts'
+export * as MeasureTrustedTypePolicyCount from '../MeasureTrustedTypePolicyCount/MeasureTrustedTypePolicyCount.ts'
 export * as MeasureTypedArrayCount from '../MeasureTypedArrayCount/MeasureTypedArrayCount.ts'
 export * as MeasureUrlCount from '../MeasureUrlCount/MeasureUrlCount.ts'
 export * as MeasureUserStringCount from '../MeasureUserStringCount/MeasureUserStringCount.ts'
