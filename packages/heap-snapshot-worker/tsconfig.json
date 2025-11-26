@@ -23,5 +23,5 @@
     "useUnknownInCatchVariables": false,
     "allowImportingTsExtensions": true
   },
-  "include": ["src", "benchmark"]
+  "include": ["src"]
 }
