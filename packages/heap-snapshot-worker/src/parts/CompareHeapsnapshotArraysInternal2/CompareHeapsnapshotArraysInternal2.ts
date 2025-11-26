@@ -33,7 +33,8 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
   }
 
   // Second pass: scan all edges to find property edges pointing TO array nodes
-  const nameMap = Object.create(null)
+  // Use a map to track the first edge name for each array (matching CreateNameMap behavior)
+  const arrayNameMap = Object.create(null) // arrayNodeOffset -> first edge name
   const edgeMap = createEdgeMap(nodes, node_fields)
 
   for (let nodeOffset = 0; nodeOffset < nodes.length; nodeOffset += nodeFieldCount) {
@@ -50,20 +51,32 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
       // Check if this is a property edge pointing to an array node
       // edgeToNode is a byte offset in the nodes array
       if (edgeType === edgeTypeProperty && arrayNodeOffsets.has(edgeToNode)) {
-        const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
-        const edgeName = strings[edgeNameIndex] || ''
-        // Filter out internal properties
-        if (
-          edgeName &&
-          edgeName !== 'constructor' &&
-          edgeName !== '__proto__' &&
-          edgeName !== 'prototype' &&
-          !edgeName.startsWith('<symbol')
-        ) {
-          nameMap[edgeName] ||= 0
-          nameMap[edgeName]++
+        // Only use the first edge name for each array (matching CreateNameMap behavior)
+        if (!arrayNameMap[edgeToNode]) {
+          const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
+          const edgeName = strings[edgeNameIndex] || ''
+          // Filter out internal properties
+          if (
+            edgeName &&
+            edgeName !== 'constructor' &&
+            edgeName !== '__proto__' &&
+            edgeName !== 'prototype' &&
+            !edgeName.startsWith('<symbol')
+          ) {
+            arrayNameMap[edgeToNode] = edgeName
+          }
         }
       }
+    }
+  }
+
+  // Count arrays by name (one count per array, not per edge)
+  const nameMap = Object.create(null)
+  for (const arrayOffset of arrayNodeOffsets) {
+    const edgeName = arrayNameMap[arrayOffset]
+    if (edgeName) {
+      nameMap[edgeName] ||= 0
+      nameMap[edgeName]++
     }
   }
 

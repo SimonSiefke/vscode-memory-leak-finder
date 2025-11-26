@@ -1,8 +1,23 @@
 [
   {
+    "name": "enum",
+    "count": 1592,
+    "delta": 1
+  },
+  {
     "name": "args",
-    "count": 234,
+    "count": 230,
     "delta": 4
+  },
+  {
+    "name": "markdownEnumDescriptions",
+    "count": 165,
+    "delta": 2
+  },
+  {
+    "name": "languages",
+    "count": 139,
+    "delta": 11
   },
   {
     "name": "keys",
@@ -10,9 +25,24 @@
     "delta": 32
   },
   {
+    "name": "grammars",
+    "count": 115,
+    "delta": 11
+  },
+  {
     "name": "identifiers",
     "count": 96,
     "delta": 32
+  },
+  {
+    "name": "commands",
+    "count": 51,
+    "delta": 5
+  },
+  {
+    "name": "snippets",
+    "count": 31,
+    "delta": 3
   },
   {
     "name": "_keys",
@@ -25,9 +55,54 @@
     "delta": 1
   },
   {
+    "name": "added",
+    "count": 21,
+    "delta": 13
+  },
+  {
+    "name": "jsonValidation",
+    "count": 20,
+    "delta": 2
+  },
+  {
+    "name": "highlights",
+    "count": 19,
+    "delta": 3
+  },
+  {
+    "name": "configuration",
+    "count": 18,
+    "delta": 2
+  },
+  {
+    "name": "taskDefinitions",
+    "count": 18,
+    "delta": 6
+  },
+  {
     "name": "include",
     "count": 17,
     "delta": 1
+  },
+  {
+    "name": "enumItemLabels",
+    "count": 15,
+    "delta": 1
+  },
+  {
+    "name": "restrictedConfigurations",
+    "count": 12,
+    "delta": 4
+  },
+  {
+    "name": "mimeTypes",
+    "count": 12,
+    "delta": 1
+  },
+  {
+    "name": "notebookRenderer",
+    "count": 11,
+    "delta": 3
   },
   {
     "name": "validProperties",
@@ -45,8 +120,8 @@
     "delta": 2
   },
   {
-    "name": "editor.rulers",
-    "count": 8,
+    "name": "semanticTokenScopes",
+    "count": 7,
     "delta": 1
   },
   {
@@ -55,19 +130,19 @@
     "delta": 1
   },
   {
-    "name": "rulers",
+    "name": "editor.rulers",
     "count": 7,
+    "delta": 1
+  },
+  {
+    "name": "rulers",
+    "count": 6,
     "delta": 2
   },
   {
     "name": "path",
     "count": 6,
     "delta": 1
-  },
-  {
-    "name": "customData",
-    "count": 6,
-    "delta": 2
   },
   {
     "name": "autoImportFileExcludePatterns",
@@ -80,7 +155,32 @@
     "delta": 2
   },
   {
+    "name": "customData",
+    "count": 6,
+    "delta": 2
+  },
+  {
+    "name": "languageModelTools",
+    "count": 5,
+    "delta": 1
+  },
+  {
+    "name": "notebooks",
+    "count": 5,
+    "delta": 1
+  },
+  {
+    "name": "pub.name",
+    "count": 5,
+    "delta": 1
+  },
+  {
     "name": "commandsToSkipShell",
+    "count": 5,
+    "delta": 1
+  },
+  {
+    "name": "fallbackLigatures",
     "count": 5,
     "delta": 1
   },
@@ -96,16 +196,6 @@
   },
   {
     "name": "allowedLinkSchemes",
-    "count": 5,
-    "delta": 1
-  },
-  {
-    "name": "pub.name",
-    "count": 5,
-    "delta": 1
-  },
-  {
-    "name": "fallbackLigatures",
     "count": 5,
     "delta": 1
   },
@@ -145,22 +235,42 @@
     "delta": 1
   },
   {
-    "name": "applyToAllProfiles",
-    "count": 4,
-    "delta": 1
-  },
-  {
     "name": "tasks",
     "count": 4,
     "delta": 2
   },
   {
-    "name": "scriptExplorerExclude",
+    "name": "applyToAllProfiles",
+    "count": 4,
+    "delta": 1
+  },
+  {
+    "name": "chatOutputRenderers",
     "count": 3,
     "delta": 1
   },
   {
-    "name": "styles",
+    "name": "dictionary",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "ignoredLinks",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "autoAttachSmartPattern",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "pluginPaths",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "languageModelChatProviders",
     "count": 3,
     "delta": 1
   },
@@ -195,6 +305,16 @@
     "delta": 1
   },
   {
+    "name": "styles",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "scriptExplorerExclude",
+    "count": 3,
+    "delta": 1
+  },
+  {
     "name": "excludeLanguages",
     "count": 3,
     "delta": 1
@@ -210,23 +330,28 @@
     "delta": 1
   },
   {
-    "name": "pluginPaths",
-    "count": 3,
+    "name": "universalWatchRequests",
+    "count": 1,
     "delta": 1
   },
   {
-    "name": "autoAttachSmartPattern",
-    "count": 3,
+    "name": "treeRenderers",
+    "count": 1,
     "delta": 1
   },
   {
-    "name": "dictionary",
-    "count": 3,
+    "name": "commandsSchemas",
+    "count": 1,
     "delta": 1
   },
   {
-    "name": "ignoredLinks",
-    "count": 3,
+    "name": "commandsEnum",
+    "count": 1,
+    "delta": 1
+  },
+  {
+    "name": "commandsEnumDescriptions",
+    "count": 1,
     "delta": 1
   }
 ]
