@@ -158,8 +158,6 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
     }
   }
 
-  // Convert nameMap to array format, filter out Chrome internal arrays, and sort
-  // Note: Location info is collected but not exposed yet - can be used for original name resolution
   const arrayNamesWithCount = Object.entries(nameMap)
     .filter(([name]) => !isChromeInternalArrayName(name))
     .map(([key, value]) => {
