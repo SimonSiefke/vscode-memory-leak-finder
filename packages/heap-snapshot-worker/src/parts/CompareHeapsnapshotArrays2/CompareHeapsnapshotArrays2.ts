@@ -10,6 +10,5 @@ export const compareHeapsnapshotArrays2 = async (pathA: string, pathB: string) =
       parseStrings: true,
     }),
   ])
-
   return compareHeapsnapshotArraysInternal2(snapshotA, snapshotB)
 }
