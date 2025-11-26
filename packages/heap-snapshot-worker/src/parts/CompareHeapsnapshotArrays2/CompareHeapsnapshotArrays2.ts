@@ -2,7 +2,6 @@ import { compareHeapsnapshotArraysInternal2 } from '../CompareHeapsnapshotArrays
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 
 export const compareHeapsnapshotArrays2 = async (pathA: string, pathB: string) => {
-  console.time('parse')
   const [snapshotA, snapshotB] = await Promise.all([
     prepareHeapSnapshot(pathA, {
       parseStrings: true,
@@ -11,7 +10,5 @@ export const compareHeapsnapshotArrays2 = async (pathA: string, pathB: string) =
       parseStrings: true,
     }),
   ])
-  console.timeEnd('parse')
-
   return compareHeapsnapshotArraysInternal2(snapshotA, snapshotB)
 }
