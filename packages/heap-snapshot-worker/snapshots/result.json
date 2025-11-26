@@ -1,23 +1,13 @@
 [
   {
-    "name": "enum",
-    "count": 1592,
-    "delta": 1
-  },
-  {
     "name": "args",
-    "count": 230,
+    "count": 228,
     "delta": 4
   },
   {
-    "name": "markdownEnumDescriptions",
-    "count": 165,
-    "delta": 2
-  },
-  {
-    "name": "languages",
-    "count": 139,
-    "delta": 11
+    "name": "transition_info",
+    "count": 159,
+    "delta": 18
   },
   {
     "name": "keys",
@@ -25,24 +15,9 @@
     "delta": 32
   },
   {
-    "name": "grammars",
-    "count": 115,
-    "delta": 11
-  },
-  {
     "name": "identifiers",
-    "count": 96,
+    "count": 97,
     "delta": 32
-  },
-  {
-    "name": "commands",
-    "count": 51,
-    "delta": 5
-  },
-  {
-    "name": "snippets",
-    "count": 31,
-    "delta": 3
   },
   {
     "name": "_keys",
@@ -55,57 +30,12 @@
     "delta": 1
   },
   {
-    "name": "added",
-    "count": 21,
-    "delta": 13
-  },
-  {
-    "name": "jsonValidation",
-    "count": 20,
-    "delta": 2
-  },
-  {
-    "name": "highlights",
-    "count": 19,
-    "delta": 3
-  },
-  {
-    "name": "configuration",
-    "count": 18,
-    "delta": 2
-  },
-  {
-    "name": "taskDefinitions",
-    "count": 18,
-    "delta": 6
-  },
-  {
     "name": "include",
-    "count": 17,
+    "count": 16,
     "delta": 1
   },
   {
-    "name": "enumItemLabels",
-    "count": 15,
-    "delta": 1
-  },
-  {
-    "name": "restrictedConfigurations",
-    "count": 12,
-    "delta": 4
-  },
-  {
-    "name": "mimeTypes",
-    "count": 12,
-    "delta": 1
-  },
-  {
-    "name": "notebookRenderer",
-    "count": 11,
-    "delta": 3
-  },
-  {
-    "name": "validProperties",
+    "name": "52/validProperties",
     "count": 9,
     "delta": 3
   },
@@ -115,29 +45,9 @@
     "delta": 1
   },
   {
-    "name": "preferences",
-    "count": 8,
-    "delta": 2
-  },
-  {
-    "name": "semanticTokenScopes",
-    "count": 7,
-    "delta": 1
-  },
-  {
     "name": "compounds",
     "count": 7,
     "delta": 1
-  },
-  {
-    "name": "editor.rulers",
-    "count": 7,
-    "delta": 1
-  },
-  {
-    "name": "rulers",
-    "count": 6,
-    "delta": 2
   },
   {
     "name": "path",
@@ -145,28 +55,13 @@
     "delta": 1
   },
   {
-    "name": "autoImportFileExcludePatterns",
+    "name": "preferences",
     "count": 6,
     "delta": 2
   },
   {
-    "name": "autoImportSpecifierExcludeRegexes",
+    "name": "editor.rulers",
     "count": 6,
-    "delta": 2
-  },
-  {
-    "name": "customData",
-    "count": 6,
-    "delta": 2
-  },
-  {
-    "name": "languageModelTools",
-    "count": 5,
-    "delta": 1
-  },
-  {
-    "name": "notebooks",
-    "count": 5,
     "delta": 1
   },
   {
@@ -175,62 +70,27 @@
     "delta": 1
   },
   {
-    "name": "commandsToSkipShell",
-    "count": 5,
-    "delta": 1
-  },
-  {
-    "name": "fallbackLigatures",
-    "count": 5,
-    "delta": 1
-  },
-  {
-    "name": "localEchoExcludePrograms",
-    "count": 5,
-    "delta": 1
-  },
-  {
-    "name": "ignoreProcessNames",
-    "count": 5,
-    "delta": 1
-  },
-  {
-    "name": "allowedLinkSchemes",
-    "count": 5,
-    "delta": 1
-  },
-  {
-    "name": "confirmedUriHandlerExtensionIds",
+    "name": "133/rulers",
     "count": 4,
     "delta": 1
   },
   {
-    "name": "noProxy",
+    "name": "139/wordSegmenterLocales",
     "count": 4,
     "delta": 1
   },
   {
-    "name": "wordSegmenterLocales",
+    "name": "91/candidateGuessEncodings",
     "count": 4,
     "delta": 1
   },
   {
-    "name": "defaultExtensionsIfInstalledLocally",
+    "name": "190/watcherInclude",
     "count": 4,
     "delta": 1
   },
   {
-    "name": "candidateGuessEncodings",
-    "count": 4,
-    "delta": 1
-  },
-  {
-    "name": "watcherInclude",
-    "count": 4,
-    "delta": 1
-  },
-  {
-    "name": "displayOrder",
+    "name": "184/displayOrder",
     "count": 4,
     "delta": 1
   },
@@ -240,117 +100,192 @@
     "delta": 2
   },
   {
-    "name": "applyToAllProfiles",
+    "name": "52/commandsToSkipShell",
     "count": 4,
     "delta": 1
   },
   {
-    "name": "chatOutputRenderers",
+    "name": "fallbackLigatures",
+    "count": 4,
+    "delta": 1
+  },
+  {
+    "name": "226/localEchoExcludePrograms",
+    "count": 4,
+    "delta": 1
+  },
+  {
+    "name": "292/ignoreProcessNames",
+    "count": 4,
+    "delta": 1
+  },
+  {
+    "name": "358/allowedLinkSchemes",
+    "count": 4,
+    "delta": 1
+  },
+  {
+    "name": "customData",
+    "count": 4,
+    "delta": 2
+  },
+  {
+    "name": "(GC roots)/confirmedUriHandlerExtensionIds",
     "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "noProxy",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "(Builtins)/defaultExtensionsIfInstalledLocally",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "(Bootstrapper)/applyToAllProfiles",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "70/ignoredRepositories",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "103/scanRepositories",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "235/repositoryScanIgnoredFolders",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "325/commandsToLog",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "496/branchProtection",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "721/checkoutType",
+    "count": 3,
+    "delta": 1
+  },
+  {
+    "name": "<dummy>/ignoredLinks",
+    "count": 2,
+    "delta": 1
+  },
+  {
+    "name": "(GC roots)/autoAttachSmartPattern",
+    "count": 2,
+    "delta": 1
+  },
+  {
+    "name": "(Builtins)/pluginPaths",
+    "count": 2,
+    "delta": 1
+  },
+  {
+    "name": "autoImportFileExcludePatterns",
+    "count": 2,
+    "delta": 1
+  },
+  {
+    "name": "(GC roots)/autoImportSpecifierExcludeRegexes",
+    "count": 2,
+    "delta": 1
+  },
+  {
+    "name": "<dummy>/autoImportFileExcludePatterns",
+    "count": 2,
+    "delta": 1
+  },
+  {
+    "name": "autoImportSpecifierExcludeRegexes",
+    "count": 2,
     "delta": 1
   },
   {
     "name": "dictionary",
-    "count": 3,
+    "count": 2,
     "delta": 1
   },
   {
-    "name": "ignoredLinks",
-    "count": 3,
+    "name": "rulers",
+    "count": 2,
     "delta": 1
   },
   {
-    "name": "autoAttachSmartPattern",
-    "count": 3,
-    "delta": 1
-  },
-  {
-    "name": "pluginPaths",
-    "count": 3,
-    "delta": 1
-  },
-  {
-    "name": "languageModelChatProviders",
-    "count": 3,
-    "delta": 1
-  },
-  {
-    "name": "ignoredRepositories",
-    "count": 3,
-    "delta": 1
-  },
-  {
-    "name": "scanRepositories",
-    "count": 3,
-    "delta": 1
-  },
-  {
-    "name": "repositoryScanIgnoredFolders",
-    "count": 3,
-    "delta": 1
-  },
-  {
-    "name": "commandsToLog",
-    "count": 3,
-    "delta": 1
-  },
-  {
-    "name": "branchProtection",
-    "count": 3,
-    "delta": 1
-  },
-  {
-    "name": "checkoutType",
-    "count": 3,
+    "name": "(Builtins)/scriptExplorerExclude",
+    "count": 2,
     "delta": 1
   },
   {
     "name": "styles",
-    "count": 3,
-    "delta": 1
-  },
-  {
-    "name": "scriptExplorerExclude",
-    "count": 3,
+    "count": 2,
     "delta": 1
   },
   {
     "name": "excludeLanguages",
-    "count": 3,
+    "count": 2,
     "delta": 1
   },
   {
-    "name": "extensionsPath",
-    "count": 3,
+    "name": "(GC roots)/extensionsPath",
+    "count": 2,
     "delta": 1
   },
   {
     "name": "schemas",
-    "count": 3,
+    "count": 2,
     "delta": 1
   },
   {
-    "name": "universalWatchRequests",
+    "name": "11/19/30/62/initial_array_prototype/obj",
     "count": 1,
     "delta": 1
   },
   {
-    "name": "treeRenderers",
+    "name": "16/2/25/26/27/28/specialSelectors",
     "count": 1,
     "delta": 1
   },
   {
-    "name": "commandsSchemas",
+    "name": "22/25/26/31/33/filter",
     "count": 1,
     "delta": 1
   },
   {
-    "name": "commandsEnum",
+    "name": "0/5/9/mostRecentActiveParts",
     "count": 1,
     "delta": 1
   },
   {
-    "name": "commandsEnumDescriptions",
+    "name": "0/_keyCodeToStr",
+    "count": 1,
+    "delta": 1
+  },
+  {
+    "name": "0/24/_keyCodeToStr",
+    "count": 1,
+    "delta": 1
+  },
+  {
+    "name": "14/154/157/176/179/27/30/55/68/events",
+    "count": 1,
+    "delta": 1
+  },
+  {
+    "name": "12/39/56/8/rootRef",
     "count": 1,
     "delta": 1
   }

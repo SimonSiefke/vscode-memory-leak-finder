@@ -17,7 +17,6 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
   const edgeNameFieldIndex = edge_fields.indexOf('name_or_index')
   const edgeToNodeFieldIndex = edge_fields.indexOf('to_node')
   const edgeTypes = edge_types[0] || []
-  const edgeTypeProperty = edgeTypes.indexOf('property')
   const nodeTypes = meta.node_types[0] || []
   const nodeTypeObject = nodeTypes.indexOf('object')
 
@@ -32,10 +31,17 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
     }
   }
 
-  // Second pass: scan all edges to find property edges pointing TO array nodes
-  // Use a map to track the first edge name for each array (matching CreateNameMap behavior)
-  const arrayNameMap = Object.create(null) // arrayNodeOffset -> first edge name
+  // Second pass: scan all edges to find edges pointing TO array nodes
+  // Collect ALL edge names for each array to better differentiate arrays with the same name
+  // CreateNameMap processes ALL edge types, not just property edges
+  const arrayNamesMap = Object.create(null) // arrayNodeOffset -> Set of edge names
   const edgeMap = createEdgeMap(nodes, node_fields)
+  const edgeTypeElement = edgeTypes.indexOf('element')
+
+  // Initialize sets for all array nodes
+  for (const arrayOffset of arrayNodeOffsets) {
+    arrayNamesMap[arrayOffset] = new Set<string>()
+  }
 
   for (let nodeOffset = 0; nodeOffset < nodes.length; nodeOffset += nodeFieldCount) {
     const nodeIndex = nodeOffset / nodeFieldCount
@@ -48,35 +54,52 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
       const edgeType = edges[edgeIndex + edgeTypeFieldIndex]
       const edgeToNode = edges[edgeIndex + edgeToNodeFieldIndex]
 
-      // Check if this is a property edge pointing to an array node
+      // Check if this edge points to an array node (process ALL edge types, not just property)
       // edgeToNode is a byte offset in the nodes array
-      if (edgeType === edgeTypeProperty && arrayNodeOffsets.has(edgeToNode)) {
-        // Only use the first edge name for each array (matching CreateNameMap behavior)
-        if (!arrayNameMap[edgeToNode]) {
-          const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
-          const edgeName = strings[edgeNameIndex] || ''
-          // Filter out internal properties
-          if (
-            edgeName &&
-            edgeName !== 'constructor' &&
-            edgeName !== '__proto__' &&
-            edgeName !== 'prototype' &&
-            !edgeName.startsWith('<symbol')
-          ) {
-            arrayNameMap[edgeToNode] = edgeName
+      if (arrayNodeOffsets.has(edgeToNode)) {
+        const edgeNameOrIndex = edges[edgeIndex + edgeNameFieldIndex]
+        let edgeName: string | null = null
+
+        // For element edges, skip (they have numeric indices which aren't useful names)
+        if (edgeType === edgeTypeElement) {
+          continue
+        }
+
+        // For other edge types, get the name from strings array
+        // edgeNameOrIndex is a string index for non-element edges
+        if (edgeNameOrIndex >= 0 && edgeNameOrIndex < strings.length) {
+          const potentialName = strings[edgeNameOrIndex]
+          // Only use if it's a non-empty string (not a number or other type)
+          if (typeof potentialName === 'string' && potentialName !== '') {
+            edgeName = potentialName
           }
+        }
+
+        // Filter out internal properties (but allow other edge types through)
+        if (
+          edgeName &&
+          edgeName !== 'constructor' &&
+          edgeName !== '__proto__' &&
+          edgeName !== 'prototype' &&
+          !edgeName.startsWith('<symbol')
+        ) {
+          arrayNamesMap[edgeToNode].add(edgeName)
         }
       }
     }
   }
 
-  // Count arrays by name (one count per array, not per edge)
+  // Count arrays by joined names (one count per array, not per edge)
+  // Join all names with "/" to differentiate arrays with the same name
   const nameMap = Object.create(null)
   for (const arrayOffset of arrayNodeOffsets) {
-    const edgeName = arrayNameMap[arrayOffset]
-    if (edgeName) {
-      nameMap[edgeName] ||= 0
-      nameMap[edgeName]++
+    const edgeNames = arrayNamesMap[arrayOffset]
+    if (edgeNames.size > 0) {
+      // Sort names for consistent ordering, then join with "/"
+      const sortedNames = Array.from(edgeNames).sort()
+      const joinedName = sortedNames.join('/')
+      nameMap[joinedName] ||= 0
+      nameMap[joinedName]++
     }
   }
 
