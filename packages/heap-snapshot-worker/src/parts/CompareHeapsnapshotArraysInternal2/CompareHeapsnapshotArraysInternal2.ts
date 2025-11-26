@@ -167,8 +167,6 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
         name: key,
         // @ts-ignore
         count: value.count,
-        // TODO: Use locations for original name resolution via source maps
-        // locations: Array.from(value.locations),
       }
     })
   const sorted = SortCountMap.sortCountMap(arrayNamesWithCount)
