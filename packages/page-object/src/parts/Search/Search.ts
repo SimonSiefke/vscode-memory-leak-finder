@@ -25,6 +25,7 @@ export const create = ({ expect, page, VError }) => {
         await searchInput.focus()
         await expect(searchInput).toBeFocused()
         await searchInput.clear()
+        await page.waitForIdle()
         await searchInput.type(text)
         await page.waitForIdle()
       } catch (error) {
@@ -89,11 +90,14 @@ export const create = ({ expect, page, VError }) => {
         const searchView = page.locator('.search-view')
         const searchInput = searchView.locator('textarea[placeholder="Search"]')
         await expect(searchInput).toBeFocused()
+        await page.waitForIdle()
         const messages = page.locator('.text-search-provider-messages')
         await expect(messages).toBeVisible()
+        await page.waitForIdle()
         await expect(messages).toHaveText(
           `No results found. Review your settings for configured exclusions and check your gitignore files - Open Settings - Learn More`,
         )
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify search message`)
       }
