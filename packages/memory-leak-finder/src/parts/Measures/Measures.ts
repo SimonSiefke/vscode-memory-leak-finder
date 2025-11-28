@@ -1,3 +1,4 @@
+export * as MeasureImageBitmapCount from '../MeasureImageBitmapCount/MeasureImageBitmapCount.ts'
 export * as MeasureAbortControllerCount from '../MeasureAbortControllerCount/MeasureAbortControllerCount.ts'
 export * as MeasureAbortSignalCount from '../MeasureAbortSignalCount/MeasureAbortSignalCount.ts'
 export * as MeasureArrayCount from '../MeasureArrayCount/MeasureArrayCount.ts'
