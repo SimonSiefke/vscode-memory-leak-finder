@@ -6,6 +6,7 @@ export * as MeasureAttachedDomNodeCount from '../MeasureAttachedDomNodeCount/Mea
 export * as MeasureBlobCount from '../MeasureBlobCount/MeasureBlobCount.ts'
 export * as MeasureBooleanCount from '../MeasureBooleanCount/MeasureBooleanCount.ts'
 export * as MeasureCanvasCount from '../MeasureCanvasCount/MeasureCanvasCount.ts'
+export * as MeasureCanvasRenderingContext2dCount from '../MeasureCanvasRenderingContext2dCount/MeasureCanvasRenderingContext2dCount.ts'
 export * as MeasureClassCount from '../MeasureClassCount/MeasureClassCount.ts'
 export * as MeasureClosureCount from '../MeasureClosureCount/MeasureClosureCount.ts'
 export * as MeasureCodeEditorWidgetCount from '../MeasureCodeEditorWidgetCount/MeasureCodeEditorWidgetCount.ts'
