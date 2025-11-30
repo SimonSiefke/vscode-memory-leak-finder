@@ -1,4 +1,5 @@
 export const AutoFix = 'Auto Fix...'
+export const ChangeLanguageMode = 'Change Language Mode'
 export const ClearTerminal = 'Terminal: Clear'
 export const CloseAllEditorGroups = 'View: Close All Editor Groups'
 export const CloseAllNotifications = 'Notifications: Clear All Notifications'
