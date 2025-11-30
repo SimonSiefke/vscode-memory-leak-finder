@@ -24,7 +24,6 @@ const isEventListenerKey = key => {
   return key.startsWith('on')
 }
 
-
 // based on https://github.com/facebook/jest/pull/5107/files
 const spyOnPropertyEventListener = (object, eventListenerKey) => {
   const descriptor = Object.getOwnPropertyDescriptor(object, eventListenerKey)
