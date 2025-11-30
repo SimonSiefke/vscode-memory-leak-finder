@@ -53,10 +53,27 @@ const spyOnPropertyEventListeners = (object) => {
   }
 }
 
-for(const object of [HTMLElement.prototype, Document.prototype, window]){
-  spyOnPropertyEventListeners(object)
-
+const spyOnEventTarget = (object) => {
+  // based on https://gist.github.com/nolanlawson/0e18b8d7b5f6eb11554b5aa1fc4b5a4a
+  const originalAddEventListener = object.prototype.addEventListener
+  object.prototype.addEventListener = function (...args){
+    const stackTrace = callsites()
+    globalThis.___eventListenerStackTraces.push({args, stackTrace})
+    return originalAddEventListener.apply(this, args)
+  }
 }
+
+const prototypes = [HTMLElement.prototype, Document.prototype, window]
+const primitives = [EventTarget]
+
+for(const object of prototypes){
+  spyOnPropertyEventListeners(object)
+}
+
+for(const object of primitives){
+  spyOnEventTarget(object)
+}
+
 })()
 undefined
 `,
