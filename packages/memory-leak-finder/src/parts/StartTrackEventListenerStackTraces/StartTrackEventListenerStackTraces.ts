@@ -20,9 +20,6 @@ const callsites = () => {
 	return stack.join('\\n')
 }
 
-
-
-
 const isEventListenerKey = key => {
   return key.startsWith('on')
 }
