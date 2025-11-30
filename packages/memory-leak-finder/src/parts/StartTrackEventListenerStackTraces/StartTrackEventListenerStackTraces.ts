@@ -63,7 +63,7 @@ const spyOnEventTarget = (object) => {
 }
 
 const prototypes = [HTMLElement.prototype, Document.prototype, window]
-const primitives = [Node]
+const primitives = [EventTarget]
 
 for(const object of prototypes){
   spyOnPropertyEventListeners(object)
