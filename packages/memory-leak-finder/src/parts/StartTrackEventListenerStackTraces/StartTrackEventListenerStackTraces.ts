@@ -21,13 +21,7 @@ const callsites = () => {
 }
 
 
-// based on https://gist.github.com/nolanlawson/0e18b8d7b5f6eb11554b5aa1fc4b5a4a
-const originalAddEventListener = Node.prototype.addEventListener
-Node.prototype.addEventListener = function (...args){
-  const stackTrace = callsites()
-  globalThis.___eventListenerStackTraces.push({args, stackTrace})
-  return originalAddEventListener.apply(this, args)
-}
+
 
 const isEventListenerKey = key => {
   return key.startsWith('on')
@@ -55,7 +49,7 @@ const spyOnPropertyEventListener = (object, eventListenerKey) => {
   })
 }
 
-const spyOnPropertyEventListeners = object => {
+const spyOnPropertyEventListeners = (object) => {
   const eventListenerKeys = Object.keys(object).filter(isEventListenerKey)
   for(const eventListenerKey of eventListenerKeys){
     spyOnPropertyEventListener(object, eventListenerKey)
