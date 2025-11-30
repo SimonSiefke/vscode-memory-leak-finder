@@ -9,7 +9,7 @@ export const startTrackingEventListenerStackTraces = async (session, objectGroup
   await DevtoolsProtocolRuntime.evaluate(session, {
     expression: `(()=>{
 globalThis.___eventListenerStackTraces = []
-
+globalThis.___eventListenerDisposables = []
 
 // based on https://github.com/sindresorhus/callsites
 const callsites = () => {
@@ -43,6 +43,9 @@ const spyOnPropertyEventListener = (object, eventListenerKey) => {
     writeable: true,
     enumerable: true
   })
+  globalThis.___eventListenerDisposables.push(() => {
+    Object.defineProperty(object, eventListenerKey, descriptor)
+  })
 }
 
 const spyOnPropertyEventListeners = (object) => {
@@ -60,6 +63,9 @@ const spyOnEventTarget = (object) => {
     globalThis.___eventListenerStackTraces.push({args, stackTrace})
     return originalAddEventListener.apply(this, args)
   }
+  globalThis.___eventListenerDisposables.push(() => {
+    object.prototype.addEventListener = originalAddEventListener
+  })
 }
 
 const prototypes = [HTMLElement.prototype, Document.prototype, window]

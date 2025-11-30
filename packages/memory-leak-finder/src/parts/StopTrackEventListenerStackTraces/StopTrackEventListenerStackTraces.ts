@@ -9,7 +9,13 @@ export const stopTrackingEventListenerStackTraces = async (session, objectGroup)
   await DevtoolsProtocolRuntime.evaluate(session, {
     expression: `(()=>{
 
-// TODO
+const fns = globalThis.___eventListenerDisposables
+for(const fn of fns){
+  fn()
+}
+
+delete globalThis.___eventListenerDisposables
+delete globalThis.___eventListenerStackTraces
 
 undefined
 `,
