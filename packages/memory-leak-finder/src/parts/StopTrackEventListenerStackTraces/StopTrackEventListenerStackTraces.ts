@@ -17,6 +17,7 @@ for(const fn of fns){
 delete globalThis.___eventListenerDisposables
 delete globalThis.___eventListenerStackTraces
 
+})()
 undefined
 `,
     objectGroup,
