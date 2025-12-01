@@ -18,7 +18,7 @@
     "@lvce-editor/assert": "^1.4.0",
     "@lvce-editor/rpc": "^4.20.0",
     "@lvce-editor/verror": "^1.7.0",
-    "execa": "^9.6.0"
+    "execa": "^9.6.1"
   },
   "devDependencies": {
     "@types/node": "^24.10.1"

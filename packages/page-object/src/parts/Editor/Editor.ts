@@ -930,6 +930,24 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to scroll up in editor`)
       }
     },
+    async setLanguageMode(languageId) {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.ChangeLanguageMode, {
+          stayVisible: true,
+          pressKeyOnce: true,
+        })
+        await page.waitForIdle()
+        await quickPick.type(languageId)
+        await page.waitForIdle()
+        await quickPick.select(languageId)
+        await page.waitForIdle()
+        // TODO verify that language mode has actually changed
+      } catch (error) {
+        throw new VError(error, `Failed to change language mode`)
+      }
+    },
     async shouldHaveActiveLineNumber(value) {
       try {
         const stringValue = `${value}`
@@ -940,6 +958,20 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await expect(lineNumber).toHaveText(stringValue)
       } catch (error) {
         throw new VError(error, `Failed to verify active line number ${value}`)
+      }
+    },
+    async threeColumnsLayout() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.ThreeColumnLayout)
+        await page.waitForIdle()
+        const main = page.locator('[role="main"]')
+        const groups = main.locator('.editor-group-container')
+        await expect(groups).toHaveCount(3)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to create three columns layout`)
       }
     },
     async moveScrollBar(y, expectedScrollBarY) {
