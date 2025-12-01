@@ -28,7 +28,7 @@ const locations = [
   '.github/workflows/ci.yml',
   '.github/workflows/release.yml',
   'scripts/computeNodeModulesCacheKey.js',
-  'packages/initialization-worker/src/parts/VsCodeVersion/VsCodeVersion.ts',
+  'packages/launch-worker/src/parts/VsCodeVersion/VsCodeVersion.ts',
 ]
 
 const packagesFolder = join(root, 'packages')
