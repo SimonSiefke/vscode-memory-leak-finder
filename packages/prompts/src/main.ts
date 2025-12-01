@@ -1,6 +1,6 @@
+import clipboard from 'clipboardy'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
-import clipboard from 'clipboardy'
 
 const dirname = import.meta.dirname
 
