@@ -1,0 +1,8 @@
+export const WatchMode: string = 'w'
+export const FilterMode: string = 'p'
+export const All: string = 'a'
+export const Quit: string = 'q'
+export const Fail: string = 'f'
+export const ToggleHeadlessMode: string = 'h'
+export const Escape: string = 'Esc'
+export const Enter: string = 'Enter'

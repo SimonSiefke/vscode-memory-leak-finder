@@ -1,0 +1,69 @@
+import type { StartRunningOptions } from './StartRunningOptions.ts'
+import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
+import * as RunTest from '../RunTest/RunTest.ts'
+import * as Stdout from '../Stdout/Stdout.ts'
+import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
+
+export const startRunning = async (options: StartRunningOptions): Promise<void> => {
+  const {
+    filterValue,
+    headlessMode,
+    color,
+    checkLeaks,
+    runSkippedTestsAnyway,
+    recordVideo,
+    cwd,
+    runs,
+    measure,
+    measureAfter,
+    measureNode,
+    timeouts,
+    timeoutBetween,
+    restartBetween,
+    runMode,
+    ide,
+    ideVersion,
+    vscodePath,
+    commit,
+    setupOnly,
+    workers,
+    isWindows,
+    shouldContinue,
+    inspectSharedProcess,
+    inspectExtensions,
+    inspectPtyHost,
+    enableExtensions,
+  } = options
+  const clear = await AnsiEscapes.clear(isWindows)
+  await Stdout.write(clear)
+  const rpc = await RunTest.prepare()
+  await rpc.invoke(TestWorkerCommandType.RunTests, {
+    root: cwd,
+    cwd,
+    filterValue,
+    headlessMode,
+    color,
+    checkLeaks,
+    runSkippedTestsAnyway,
+    recordVideo,
+    runs,
+    measure,
+    measureAfter,
+    measureNode,
+    timeouts,
+    timeoutBetween,
+    restartBetween,
+    runMode,
+    ide,
+    ideVersion,
+    vscodePath,
+    commit,
+    setupOnly,
+    workers,
+    shouldContinue,
+    inspectSharedProcess,
+    inspectExtensions,
+    inspectPtyHost,
+    enableExtensions,
+  })
+}

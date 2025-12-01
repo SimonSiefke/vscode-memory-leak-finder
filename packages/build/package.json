@@ -1,0 +1,27 @@
+{
+  "name": "@vscode-memory-leak-finder/build",
+  "version": "0.0.0-dev",
+  "description": "",
+  "main": "src/main.ts",
+  "type": "module",
+  "scripts": {
+    "build": "rollup -c rollup.config.js",
+    "build:watch": "rollup -c rollup.config.js -w",
+    "generate-api-types": "node src/generate-api-types.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/preset-typescript": "^7.28.5",
+    "@rollup/plugin-babel": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@types/node": "^24.10.1",
+    "dts-bundle-generator": "^9.5.1",
+    "rollup": "^4.53.3"
+  },
+  "dependencies": {
+    "@lvce-editor/assert": "^1.4.0"
+  }
+}

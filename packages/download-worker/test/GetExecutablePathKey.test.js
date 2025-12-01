@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import * as GetExecutablePathKey from '../src/parts/GetExecutablePathKey/GetExecutablePathKey.js'
+import * as GetExecutablePathKey from '../src/parts/GetExecutablePathKey/GetExecutablePathKey.ts'
 
 test('linux', () => {
   const platform = 'linux'

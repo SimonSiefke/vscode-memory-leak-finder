@@ -5,6 +5,14 @@ export const setFontSizes = () => {
   throw new Error('not implemented')
 }
 
+export const getFrameTree = (rpc, options) => {
+  return Invoke.invoke(rpc, DevtoolsCommandType.PageGetFrameTree, options)
+}
+
+export const createIsolatedWorld = (rpc, options) => {
+  return Invoke.invoke(rpc, DevtoolsCommandType.PageGetIsolatedWorld, options)
+}
+
 export const startScreencast = (rpc, options) => {
   return Invoke.invoke(rpc, DevtoolsCommandType.PageStartScreenCast, options)
 }
@@ -19,6 +27,10 @@ export const stopScreencast = (rpc, options) => {
 
 export const enable = (rpc, options) => {
   return Invoke.invoke(rpc, DevtoolsCommandType.PageEnable, options)
+}
+
+export const disable = (rpc, options) => {
+  return Invoke.invoke(rpc, DevtoolsCommandType.PageDisable, options)
 }
 
 export const reload = (rpc, options) => {

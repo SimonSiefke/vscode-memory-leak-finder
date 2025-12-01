@@ -1,0 +1,67 @@
+import type { RunTestsOptions } from '../RunTestsOptions/RunTestsOptions.ts'
+import * as CliProcess from '../CliProcess/CliProcess.ts'
+import * as RunTestsWithCallback from '../RunTestsWithCallback/RunTestsWithCallback.ts'
+import * as Disposables from '../Disposables/Disposables.ts'
+
+const callback = async (method, ...params) => {
+  await CliProcess.invoke(method, ...params)
+}
+
+export const runTests = ({
+  root,
+  cwd,
+  filterValue,
+  headlessMode,
+  color,
+  checkLeaks,
+  runSkippedTestsAnyway,
+  recordVideo,
+  runs,
+  measure,
+  measureAfter,
+  measureNode,
+  timeouts,
+  timeoutBetween,
+  restartBetween,
+  runMode,
+  ide,
+  ideVersion,
+  vscodePath,
+  commit,
+  setupOnly,
+  inspectSharedProcess,
+  inspectExtensions,
+  inspectPtyHost,
+  enableExtensions,
+}: RunTestsOptions) => {
+  return RunTestsWithCallback.runTestsWithCallback({
+    root,
+    cwd,
+    filterValue,
+    headlessMode,
+    color,
+    checkLeaks,
+    runSkippedTestsAnyway,
+    recordVideo,
+    runs,
+    measure,
+    measureAfter,
+    measureNode,
+    timeouts,
+    timeoutBetween,
+    restartBetween,
+    runMode,
+    ide,
+    ideVersion,
+    vscodePath,
+    commit,
+    setupOnly,
+    inspectSharedProcess,
+    inspectExtensions,
+    inspectPtyHost,
+    enableExtensions,
+    callback,
+    addDisposable: Disposables.add,
+    clearDisposables: Disposables.disposeAll,
+  })
+}

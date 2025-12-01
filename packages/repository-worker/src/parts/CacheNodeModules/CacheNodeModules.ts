@@ -1,0 +1,34 @@
+import { VError } from '@lvce-editor/verror'
+import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
+import * as GetCacheFileOperations from '../GetCacheFileOperations/GetCacheFileOperations.ts'
+import * as Path from '../Path/Path.ts'
+
+const isNeededNodeModules = (path: string): boolean => {
+  if (path.includes('.git')) {
+    return false
+  }
+  const nodeModulesIndex = path.indexOf('node_modules')
+  const lastNodeModulesIndex = path.lastIndexOf('node_modules')
+  if (nodeModulesIndex !== lastNodeModulesIndex) {
+    return false
+  }
+  return true
+}
+
+export const moveNodeModulesToCache = async (repoPath: string, commitHash: string, cacheDir: string, nodeModulesHash: string) => {
+  try {
+    const cachedNodeModulesPath = Path.join(cacheDir, nodeModulesHash)
+    const allNodeModulesPaths = await FileSystemWorker.findFiles('**/node_modules', { cwd: repoPath })
+    const nodeModulesPaths = allNodeModulesPaths.filter(isNeededNodeModules)
+    const fileOperations = await GetCacheFileOperations.getCacheFileOperations(
+      repoPath,
+      commitHash,
+      cacheDir,
+      cachedNodeModulesPath,
+      nodeModulesPaths,
+    )
+    await FileSystemWorker.applyFileOperations(fileOperations)
+  } catch (error) {
+    throw new VError(error, 'Failed to cache node_modules')
+  }
+}

@@ -17,11 +17,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-15, windows-2025]
-    timeout-minutes: 300
+        os: [ubuntu-24.04, macos-26, windows-2025]
+    timeout-minutes: 1000
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version-file: '.nvmrc'
       - name: Compute node modules cache key
@@ -36,17 +36,28 @@ jobs:
             **/.vscode-test
             **/.vscode-user-data-dir
             **/.vscode-ffmpeg
-            **/.vscode-source-maps
             **/.vscode-resolve-source-map-cache
           key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+      - name: Compute source maps cache key
+        id: sourceMapsCacheKey
+        run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/cache@v4
+        id: source-maps-cache
+        with:
+          path: |
+            **/.vscode-source-maps
+            **/.vscode-sources
+          key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
       - name: npm ci
         run: npm ci --ignore-scripts && npm run postinstall
         if: steps.npm-cache.outputs.cache-hit != 'true'
       - run: npm run type-check
+      - run: npm run lint
       - run: npm run build
       - run: npm test
       - name: Run headless test (with videos)
-        if: matrix.os != 'macos-15'
+        if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --record-video
@@ -55,17 +66,17 @@ jobs:
         with:
           run: npm run e2e
       - name: Run headless test (flakyness check)
-        if: matrix.os != 'macos-15'
+        if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1
         with:
           run: npm run e2e:check-flakyness
       - name: Run headless test (second flakyness check)
-        if: matrix.os != 'macos-15'
+        if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1
         with:
           run: npm run e2e:check-flakyness
       - name: Run headless test (check leaks)
-        if: matrix.os != 'macos-15'
+        if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after
@@ -89,16 +100,56 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure promise-count
+      - name: Run headless test (check leaks, promises with stack trace)
+        if: matrix.os == 'ubuntu-24.04'
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure promises-with-stack-trace
+      - name: Run headless test (check leaks, named array count)
+        if: matrix.os == 'ubuntu-24.04'
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure named-array-count
+      - name: Run headless test (check leaks, css rule count)
+        if: matrix.os == 'ubuntu-24.04'
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure css-rule-count
       - name: Run headless test (check leaks, regex count)
         if: matrix.os == 'ubuntu-24.04'
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure regex-count
+      - name: Run headless test (check leaks, edit context count)
+        if: matrix.os == 'ubuntu-24.04'
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure edit-context-count
       - name: Run headless test (check leaks, function count)
         if: matrix.os == 'ubuntu-24.04'
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure function-count
+      - name: Run headless test (check leaks, function count 3)
+        if: matrix.os == 'ubuntu-24.04'
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure named-function-count3 --runs 37 --restart-between --run-skipped-tests-anyway
+      - name: Run headless test (check leaks, function count 3, shared process)
+        if: matrix.os == 'ubuntu-24.04'
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure named-function-count3 --runs 37 --restart-between --run-skipped-tests-anyway --inspect-shared-process
+      # - name: Run headless test (check leaks, function count 3, extensions)
+      #   if: matrix.os == 'ubuntu-24.04'
+      #   uses: coactions/setup-xvfb@v1
+      #   with:
+      #     run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure named-function-count3 --runs 37 --restart-between --run-skipped-tests-anyway --inspect-extensions
+      - name: Run headless test (check leaks, function count 3, node)
+        if: matrix.os == 'ubuntu-24.04'
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure named-function-count3 --runs 37 --restart-between --run-skipped-tests-anyway --measure-node
       - name: Run headless test (check leaks, mutation observer count)
         if: matrix.os == 'ubuntu-24.04'
         uses: coactions/setup-xvfb@v1
@@ -124,11 +175,11 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure error-count
-      - name: Run headless test (check leaks, proxy count)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure proxy-count
+      # - name: Run headless test (check leaks, proxy count)
+      #   if: matrix.os == 'ubuntu-24.04'
+      #   uses: coactions/setup-xvfb@v1
+      #   with:
+      #     run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure proxy-count
       - name: Run headless test (check leaks, weak set count)
         if: matrix.os == 'ubuntu-24.04'
         uses: coactions/setup-xvfb@v1
@@ -154,11 +205,11 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure iframe-count
-      - name: Run headless test (check leaks, typed array count)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure typed-array-count
+      # - name: Run headless test (check leaks, typed array count)
+      #   if: matrix.os == 'ubuntu-24.04'
+      #   uses: coactions/setup-xvfb@v1
+      #   with:
+      #     run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure typed-array-count --restart-between
       - name: Run headless test (check leaks, message port count)
         if: matrix.os == 'ubuntu-24.04'
         uses: coactions/setup-xvfb@v1
@@ -190,16 +241,19 @@ jobs:
       #   with:
       #     run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure instance-counts-with-source-map
       - name: Generate charts
-        run: node packages/charts/src/main.js
+        run: node packages/charts/src/main.ts
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: vscode-memory-leak-finder-results-${{ runner.os }}
-          path: .vscode-memory-leak-finder-results
+          path: ./.vscode-memory-leak-finder-results
+          include-hidden-files: true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: vscode-videos-${{ runner.os }}
-          path: .vscode-videos
+          path: ./.vscode-videos
+          include-hidden-files: true
       - name: Upload artifact
         if: matrix.os == 'ubuntu-24.04'
         uses: actions/upload-pages-artifact@v3

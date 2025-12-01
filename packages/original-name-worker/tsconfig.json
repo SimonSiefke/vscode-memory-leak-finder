@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "lib": ["esnext"],
+    "target": "esnext",
+    "checkJs": true,
+    "module": "NodeNext",
+    "types": ["node"],
+    "moduleResolution": "NodeNext",
+    "isolatedModules": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "allowSyntheticDefaultImports": false,
+    "assumeChangesOnlyAffectDirectDependencies": true,
+    "resolveJsonModule": true,
+    "rootDir": ".",
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "allowImportingTsExtensions": true
+  },
+  "include": ["src", "test"]
+}

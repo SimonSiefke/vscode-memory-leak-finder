@@ -1,0 +1,20 @@
+import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
+import { loadSourceMapWorkerPath } from '../LoadSourceMapWorkerPath/LoadSourceMapWorkerPath.ts'
+import { VError } from '../VError/VError.ts'
+
+export const loadSourceMap = async (url: string, hash: string): Promise<any> => {
+  try {
+    // TODO use `using`
+    const rpc = await NodeWorkerRpcParent.create({
+      path: loadSourceMapWorkerPath,
+      stdio: 'inherit',
+      execArgv: [],
+      commandMap: {},
+    })
+    const sourceMap = await rpc.invoke('LoadSourceMap.loadSourceMap', url, hash)
+    await rpc.dispose()
+    return sourceMap
+  } catch (error) {
+    throw new VError(error, `Failed to load source map for ${url}`)
+  }
+}
