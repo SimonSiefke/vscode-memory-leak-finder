@@ -5,11 +5,13 @@
   "main": "src/main.ts",
   "scripts": {
     "#test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
-    "#test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
+    "#test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch",
+    "dev": "node src/main.ts"
   },
   "dependencies": {
     "@lvce-editor/assert": "^1.4.0",
     "@lvce-editor/rpc": "^4.20.0",
-    "@lvce-editor/verror": "^1.7.0"
+    "@lvce-editor/verror": "^1.7.0",
+    "clipboardy": "^5.0.1"
   }
 }
