@@ -950,6 +950,20 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to verify active line number ${value}`)
       }
     },
+    async threeColumnsLayout() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.ThreeColumnLayout)
+        await page.waitForIdle()
+        const main = page.locator('[role="main"]')
+        const groups = main.locator('.editor-group-container')
+        await expect(groups).toHaveCount(3)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to create three columns layout`)
+      }
+    },
     async moveScrollBar(y, expectedScrollBarY) {
       try {
         await page.mouse.mockPointerEvents()
