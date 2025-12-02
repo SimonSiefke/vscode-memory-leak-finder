@@ -255,9 +255,8 @@ test('analyze boolean structure with type and value edges', (): void => {
 
 test('enhanced boolean detection in GetObjectsWithPropertiesInternal', async (): Promise<void> => {
   // Import is done for side effects and potential future use
-  const { getObjectsWithPropertiesInternal } = await import(
-    '../src/parts/GetObjectsWithPropertiesInternal/GetObjectsWithPropertiesInternal.ts'
-  )
+  const { getObjectsWithPropertiesInternal } =
+    await import('../src/parts/GetObjectsWithPropertiesInternal/GetObjectsWithPropertiesInternal.ts')
 
   // prettier-ignore
   const snapshot: any = {
