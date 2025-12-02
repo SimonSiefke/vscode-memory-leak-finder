@@ -28,7 +28,6 @@ const isRelativeSourceMap = (sourceMapUrl) => {
 
 const getSourceMapUrl = (script: ScriptInfo): string => {
   if (script.url && script.sourceMapUrl && isRelativeSourceMap(script.sourceMapUrl)) {
-    // const dirname = path.dirname(script.url)
     return new URL(script.sourceMapUrl, script.url).toString()
   }
   return script.sourceMapUrl || ''
