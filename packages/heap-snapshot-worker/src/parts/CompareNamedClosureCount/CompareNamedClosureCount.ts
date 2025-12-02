@@ -41,9 +41,7 @@ const getClosureCounts = (nodes: Uint32Array, edges: Uint32Array, strings: reado
     ITEMS_PER_EDGE,
     typeFieldIndex,
     nameFieldIndex,
-    idFieldIndex,
     edgeCountFieldIndex,
-    edgeTypeFieldIndex,
     edgeNameFieldIndex,
     edgeToNodeFieldIndex,
     nodeTypes,
@@ -67,7 +65,6 @@ const getClosureCounts = (nodes: Uint32Array, edges: Uint32Array, strings: reado
       continue
     }
 
-    const closureId = nodes[nodeIndex + idFieldIndex]
     const closureNameIndex = nodes[nodeIndex + nameFieldIndex]
     const edgeCount = nodes[nodeIndex + edgeCountFieldIndex]
     const logicalNodeIndex = nodeIndex / ITEMS_PER_NODE
@@ -134,7 +131,6 @@ const getClosureInfos = (nodes: Uint32Array, edges: Uint32Array, strings: readon
     nameFieldIndex,
     idFieldIndex,
     edgeCountFieldIndex,
-    edgeTypeFieldIndex,
     edgeNameFieldIndex,
     edgeToNodeFieldIndex,
     nodeTypes,

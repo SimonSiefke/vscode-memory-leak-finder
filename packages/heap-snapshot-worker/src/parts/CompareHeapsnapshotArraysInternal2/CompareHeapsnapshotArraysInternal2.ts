@@ -19,7 +19,6 @@ const getSortedCounts = (
   const nameFieldIndex = node_fields.indexOf('name')
   const typeFieldIndex = node_fields.indexOf('type')
   const edgeCountFieldIndex = node_fields.indexOf('edge_count')
-  const traceNodeIdFieldIndex = node_fields.indexOf('trace_node_id')
   const edgeTypeFieldIndex = edge_fields.indexOf('type')
   const edgeNameFieldIndex = edge_fields.indexOf('name_or_index')
   const edgeToNodeFieldIndex = edge_fields.indexOf('to_node')
