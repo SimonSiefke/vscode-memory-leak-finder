@@ -13,49 +13,56 @@ const hashPromise = (item) => {
 }
 
 const getAdded = (before, after) => {
-  const map = Object.create(null)
+  const beforeMap = Object.create(null)
   for (const item of before) {
     const hash = hashPromise(item)
-    map[hash] ||= 0
-    map[hash]++
+    beforeMap[hash] ||= 0
+    beforeMap[hash]++
   }
+  const beforeCounts = { ...beforeMap }
+  const afterCounts = Object.create(null)
   const leaked = []
   for (const item of after) {
     const hash = hashPromise(item)
-    if (map[hash]) {
-      map[hash]--
+    afterCounts[hash] ||= 0
+    afterCounts[hash]++
+    if (beforeMap[hash]) {
+      beforeMap[hash]--
     } else {
       leaked.push(item)
     }
   }
-  return leaked
+  return { leaked, beforeCounts, afterCounts }
 }
 
-const deduplicate = (leaked) => {
+const deduplicate = (leaked, beforeCounts, afterCounts) => {
   const map = Object.create(null)
-  const countMap = Object.create(null)
   for (const item of leaked) {
     const hash = hashPromise(item)
-    map[hash] = item
-    countMap[hash] ||= 0
-    countMap[hash]++
+    if (!map[hash]) {
+      map[hash] = item
+    }
   }
   const deduplicated: any[] = []
   for (const [key, value] of Object.entries(map)) {
-    const count = countMap[key]
+    const beforeCount = beforeCounts[key] || 0
+    const afterCount = afterCounts[key] || 0
+    const delta = afterCount - beforeCount
     deduplicated.push({
       ...(value as any),
-      count,
+      count: afterCount,
+      delta,
     })
   }
   return deduplicated
 }
 
 const cleanItem = (item) => {
-  const { preview, stackTrace, count } = item
+  const { preview, stackTrace, count, delta } = item
   const { properties } = preview
   return {
     count,
+    delta,
     properties,
     stackTrace: typeof stackTrace === 'string' ? stackTrace.split('\n') : stackTrace,
   }
@@ -107,8 +114,8 @@ export const comparePromisesWithStackTrace = async (before, after) => {
     scriptMap = after.scriptMap
   }
   Assert.array(afterResult)
-  const leaked = getAdded(before, afterResult)
-  const deduplicated = deduplicate(leaked)
+  const { leaked, beforeCounts, afterCounts } = getAdded(before, afterResult)
+  const deduplicated = deduplicate(leaked, beforeCounts, afterCounts)
   const sorted = sortItems(deduplicated)
   const cleanLeaked = clean(sorted)
   if (scriptMap) {
