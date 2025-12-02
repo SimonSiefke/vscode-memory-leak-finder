@@ -1,51 +1,214 @@
-import * as IsImportantEdge from '../IsImportantEdge/IsImportantEdge.ts'
-import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
+import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.ts'
+import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
+import * as IgnoredHeapSnapshotEdges from '../IgnoredHeapSnapshotEdges/IgnoredHeapSnapshotEdges.ts'
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 
-const isClosure = (node: any): boolean => {
-  return node.type === 'closure'
+const ignoredSet = new Set(IgnoredHeapSnapshotEdges.ignoredHeapSnapshotEdges)
+
+const isImportantEdge = (edgeName: string): boolean => {
+  return !ignoredSet.has(edgeName)
 }
 
-const isContext = (edge: any): boolean => {
-  return edge.name === 'context'
-}
-
-const getName = (node: any, contextNodes: any[]): string => {
-  if (node.name) {
-    return node.name
+const getName = (
+  closureNameIndex: number,
+  strings: string[],
+  contextNodeEdges: Array<{ nameIndex: number; edgeName: string }>,
+): string => {
+  if (closureNameIndex >= 0 && strings[closureNameIndex]) {
+    return strings[closureNameIndex]
   }
-  return contextNodes
-    .map((node) => node.name)
+  return contextNodeEdges
+    .map((edge) => edge.edgeName)
     .join(':')
     .slice(0, 100)
 }
 
-const getClosureCounts = (parsedNodes: any[], graph: any): Map<string, number> => {
-  const closures = parsedNodes.filter(isClosure)
+interface ClosureInfo {
+  name: string
+  contextNodeCount: number
+  id: number
+  nodeIndex: number
+}
+
+const getClosureCounts = (
+  nodes: Uint32Array,
+  edges: Uint32Array,
+  strings: string[],
+  meta: any,
+): Map<string, number> => {
+  const { node_types, node_fields, edge_types, edge_fields } = meta
+  const {
+    ITEMS_PER_NODE,
+    ITEMS_PER_EDGE,
+    typeFieldIndex,
+    nameFieldIndex,
+    idFieldIndex,
+    edgeCountFieldIndex,
+    edgeTypeFieldIndex,
+    edgeNameFieldIndex,
+    edgeToNodeFieldIndex,
+    nodeTypes,
+    edgeTypes,
+  } = computeHeapSnapshotIndices(node_types, node_fields, edge_types, edge_fields)
+
+  const closureTypeIndex = nodeTypes.indexOf('closure')
+  const contextEdgeTypeIndex = edgeTypes.indexOf('context')
+
+  if (closureTypeIndex === -1 || contextEdgeTypeIndex === -1) {
+    return new Map()
+  }
+
+  const edgeMap = createEdgeMap(nodes, node_fields)
   const nameToTotalCountMap = new Map<string, number>()
 
-  for (const node of closures) {
-    const edges = graph[node.id]
-    if (!edges) {
+  // Iterate through all nodes to find closures
+  for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex += ITEMS_PER_NODE) {
+    const typeIndex = nodes[nodeIndex + typeFieldIndex]
+    if (typeIndex !== closureTypeIndex) {
       continue
     }
-    const contextEdge = edges.find(isContext)
-    if (!contextEdge) {
+
+    const closureId = nodes[nodeIndex + idFieldIndex]
+    const closureNameIndex = nodes[nodeIndex + nameFieldIndex]
+    const edgeCount = nodes[nodeIndex + edgeCountFieldIndex]
+    const logicalNodeIndex = nodeIndex / ITEMS_PER_NODE
+    const edgeStartIndex = edgeMap[logicalNodeIndex]
+
+    // Find context edge
+    let contextNodeByteOffset = -1
+    for (let i = 0; i < edgeCount; i++) {
+      const edgeIndex = (edgeStartIndex + i) * ITEMS_PER_EDGE
+      const edgeType = edges[edgeIndex + edgeTypeFieldIndex]
+      if (edgeType === contextEdgeTypeIndex) {
+        contextNodeByteOffset = edges[edgeIndex + edgeToNodeFieldIndex]
+        break
+      }
+    }
+
+    if (contextNodeByteOffset === -1) {
       continue
     }
-    const contextNode = parsedNodes[contextEdge.index]
-    if (!contextNode) {
-      continue
+
+    // Convert byte offset to node index
+    const contextNodeIndex = Math.floor(contextNodeByteOffset / ITEMS_PER_NODE)
+
+    // Count important edges from context node
+    const contextNodeOffset = contextNodeIndex * ITEMS_PER_NODE
+    const contextEdgeCount = nodes[contextNodeOffset + edgeCountFieldIndex]
+    const contextEdgeStartIndex = edgeMap[contextNodeIndex]
+
+    const contextNodeEdges: Array<{ nameIndex: number; edgeName: string }> = []
+    for (let i = 0; i < contextEdgeCount; i++) {
+      const edgeIndex = (contextEdgeStartIndex + i) * ITEMS_PER_EDGE
+      const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
+      const edgeName = strings[edgeNameIndex] || ''
+      if (isImportantEdge(edgeName)) {
+        contextNodeEdges.push({ nameIndex: edgeNameIndex, edgeName })
+      }
     }
-    const contextNodeEdges = graph[contextNode.id]?.filter(IsImportantEdge.isImportantEdge) || []
+
     const contextNodeCount = contextNodeEdges.length
-    const name = getName(node, contextNodeEdges.map((edge: any) => parsedNodes[edge.index]).filter(Boolean))
+    const name = getName(closureNameIndex, strings, contextNodeEdges)
 
     const currentTotal = nameToTotalCountMap.get(name) || 0
     nameToTotalCountMap.set(name, currentTotal + contextNodeCount)
   }
 
   return nameToTotalCountMap
+}
+
+const getClosureInfos = (
+  nodes: Uint32Array,
+  edges: Uint32Array,
+  strings: string[],
+  meta: any,
+): Map<string, ClosureInfo> => {
+  const { node_types, node_fields, edge_types, edge_fields } = meta
+  const {
+    ITEMS_PER_NODE,
+    ITEMS_PER_EDGE,
+    typeFieldIndex,
+    nameFieldIndex,
+    idFieldIndex,
+    edgeCountFieldIndex,
+    edgeTypeFieldIndex,
+    edgeNameFieldIndex,
+    edgeToNodeFieldIndex,
+    nodeTypes,
+    edgeTypes,
+  } = computeHeapSnapshotIndices(node_types, node_fields, edge_types, edge_fields)
+
+  const closureTypeIndex = nodeTypes.indexOf('closure')
+  const contextEdgeTypeIndex = edgeTypes.indexOf('context')
+
+  if (closureTypeIndex === -1 || contextEdgeTypeIndex === -1) {
+    return new Map()
+  }
+
+  const edgeMap = createEdgeMap(nodes, node_fields)
+  const nameToClosureInfoMap = new Map<string, ClosureInfo>()
+
+  // Iterate through all nodes to find closures
+  for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex += ITEMS_PER_NODE) {
+    const typeIndex = nodes[nodeIndex + typeFieldIndex]
+    if (typeIndex !== closureTypeIndex) {
+      continue
+    }
+
+    const closureId = nodes[nodeIndex + idFieldIndex]
+    const closureNameIndex = nodes[nodeIndex + nameFieldIndex]
+    const edgeCount = nodes[nodeIndex + edgeCountFieldIndex]
+    const logicalNodeIndex = nodeIndex / ITEMS_PER_NODE
+    const edgeStartIndex = edgeMap[logicalNodeIndex]
+
+    // Find context edge
+    let contextNodeByteOffset = -1
+    for (let i = 0; i < edgeCount; i++) {
+      const edgeIndex = (edgeStartIndex + i) * ITEMS_PER_EDGE
+      const edgeType = edges[edgeIndex + edgeTypeFieldIndex]
+      if (edgeType === contextEdgeTypeIndex) {
+        contextNodeByteOffset = edges[edgeIndex + edgeToNodeFieldIndex]
+        break
+      }
+    }
+
+    if (contextNodeByteOffset === -1) {
+      continue
+    }
+
+    // Convert byte offset to node index
+    const contextNodeIndex = Math.floor(contextNodeByteOffset / ITEMS_PER_NODE)
+
+    // Count important edges from context node
+    const contextNodeOffset = contextNodeIndex * ITEMS_PER_NODE
+    const contextEdgeCount = nodes[contextNodeOffset + edgeCountFieldIndex]
+    const contextEdgeStartIndex = edgeMap[contextNodeIndex]
+
+    const contextNodeEdges: Array<{ nameIndex: number; edgeName: string }> = []
+    for (let i = 0; i < contextEdgeCount; i++) {
+      const edgeIndex = (contextEdgeStartIndex + i) * ITEMS_PER_EDGE
+      const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
+      const edgeName = strings[edgeNameIndex] || ''
+      if (isImportantEdge(edgeName)) {
+        contextNodeEdges.push({ nameIndex: edgeNameIndex, edgeName })
+      }
+    }
+
+    const contextNodeCount = contextNodeEdges.length
+    const name = getName(closureNameIndex, strings, contextNodeEdges)
+
+    // Store first closure info for each name
+    if (!nameToClosureInfoMap.has(name)) {
+      nameToClosureInfoMap.set(name, {
+        name,
+        contextNodeCount,
+        id: closureId,
+        nodeIndex: logicalNodeIndex,
+      })
+    }
+  }
+
+  return nameToClosureInfoMap
 }
 
 export const compareNamedClosureCountFromHeapSnapshot = async (
@@ -61,24 +224,12 @@ export const compareNamedClosureCountFromHeapSnapshot = async (
     }),
   ])
 
-  // Parse both snapshots to get parsedNodes and graph
-  const { parsedNodes: parsedNodesA, graph: graphA } = ParseHeapSnapshot.parseHeapSnapshot({
-    nodes: snapshotA.nodes,
-    strings: snapshotA.strings,
-    edges: snapshotA.edges,
-    snapshot: { meta: snapshotA.meta },
-  } as any)
-
-  const { parsedNodes: parsedNodesB, graph: graphB } = ParseHeapSnapshot.parseHeapSnapshot({
-    nodes: snapshotB.nodes,
-    strings: snapshotB.strings,
-    edges: snapshotB.edges,
-    snapshot: { meta: snapshotB.meta },
-  } as any)
-
   // Get closure counts by name for both snapshots
-  const countsA = getClosureCounts(parsedNodesA, graphA)
-  const countsB = getClosureCounts(parsedNodesB, graphB)
+  const countsA = getClosureCounts(snapshotA.nodes, snapshotA.edges, snapshotA.strings, snapshotA.meta)
+  const countsB = getClosureCounts(snapshotB.nodes, snapshotB.edges, snapshotB.strings, snapshotB.meta)
+
+  // Get closure infos from snapshot B for leaked closures
+  const closureInfosB = getClosureInfos(snapshotB.nodes, snapshotB.edges, snapshotB.strings, snapshotB.meta)
 
   // Find leaked closures (where count increased)
   const leakedClosures: any[] = []
@@ -87,33 +238,14 @@ export const compareNamedClosureCountFromHeapSnapshot = async (
     const countA = countsA.get(name) || 0
     const delta = countB - countA
     if (delta > 0) {
-      // Find the closure in snapshot B to get full details
-      const closures = parsedNodesB.filter(isClosure)
-      for (const node of closures) {
-        const edges = graphB[node.id]
-        if (!edges) {
-          continue
-        }
-        const contextEdge = edges.find(isContext)
-        if (!contextEdge) {
-          continue
-        }
-        const contextNode = parsedNodesB[contextEdge.index]
-        if (!contextNode) {
-          continue
-        }
-        const contextNodeEdges = graphB[contextNode.id]?.filter(IsImportantEdge.isImportantEdge) || []
-        const closureName = getName(node, contextNodeEdges.map((edge: any) => parsedNodesB[edge.index]).filter(Boolean))
-
-        if (closureName === name) {
-          leakedClosures.push({
-            ...node,
-            name: closureName,
-            contextNodeCount: contextNodeEdges.length,
-            delta,
-          })
-          break // Only add one representative closure per name
-        }
+      const closureInfo = closureInfosB.get(name)
+      if (closureInfo) {
+        leakedClosures.push({
+          id: closureInfo.id,
+          name: closureInfo.name,
+          contextNodeCount: closureInfo.contextNodeCount,
+          delta,
+        })
       }
     }
   }
