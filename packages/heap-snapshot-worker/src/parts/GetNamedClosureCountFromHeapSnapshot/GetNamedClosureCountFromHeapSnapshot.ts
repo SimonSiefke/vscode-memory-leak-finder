@@ -42,5 +42,8 @@ export const getNamedClosureCountFromHeapSnapshot = async (id) => {
       contextNodeCount,
     }
   })
-  return mapped
+  const sorted = (mapped.toSorted = (a, b) => {
+    return b.contextNodeCount - a.contextNodeCount
+  })
+  return sorted
 }
