@@ -53,34 +53,19 @@ const getClosureCounts = (nodes: Uint32Array, edges: Uint32Array, strings: reado
   const closureTypeIndex = nodeTypes.indexOf('closure')
   const contextEdgeTypeIndex = edgeTypes.indexOf('context')
 
-  console.log('getClosureCounts - Type indices:', {
-    closureTypeIndex,
-    contextEdgeTypeIndex,
-    nodeTypesLength: nodeTypes.length,
-    edgeTypesLength: edgeTypes.length,
-    nodeTypesSample: nodeTypes.slice(0, 10),
-    edgeTypesSample: edgeTypes.slice(0, 10),
-    nodesLength: nodes.length,
-    edgesLength: edges.length,
-  })
-
   if (closureTypeIndex === -1 || contextEdgeTypeIndex === -1) {
-    console.log('getClosureCounts - Missing types:', { closureTypeIndex, contextEdgeTypeIndex, nodeTypes, edgeTypes })
     return new Map()
   }
 
   const edgeMap = createEdgeMap(nodes, node_fields)
   const nameToTotalCountMap = new Map<string, number>()
 
-  let closureCount = 0
-  let closuresWithoutContext = 0
   // Iterate through all nodes to find closures
   for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex += ITEMS_PER_NODE) {
     const typeIndex = nodes[nodeIndex + typeFieldIndex]
     if (typeIndex !== closureTypeIndex) {
       continue
     }
-    closureCount++
 
     const closureId = nodes[nodeIndex + idFieldIndex]
     const closureNameIndex = nodes[nodeIndex + nameFieldIndex]
@@ -88,19 +73,21 @@ const getClosureCounts = (nodes: Uint32Array, edges: Uint32Array, strings: reado
     const logicalNodeIndex = nodeIndex / ITEMS_PER_NODE
     const edgeStartIndex = edgeMap[logicalNodeIndex]
 
-    // Find context edge
+    // Find context edge - check edge name, not type!
     let contextNodeByteOffset = -1
+    const contextStringIndex = strings.indexOf('context')
     for (let i = 0; i < edgeCount; i++) {
       const edgeIndex = (edgeStartIndex + i) * ITEMS_PER_EDGE
-      const edgeType = edges[edgeIndex + edgeTypeFieldIndex]
-      if (edgeType === contextEdgeTypeIndex) {
+      const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
+      const edgeName = strings[edgeNameIndex] || ''
+      // Check if this is a context edge by name (not type)
+      if (edgeName === 'context' || (contextStringIndex >= 0 && edgeNameIndex === contextStringIndex)) {
         contextNodeByteOffset = edges[edgeIndex + edgeToNodeFieldIndex]
         break
       }
     }
 
     if (contextNodeByteOffset === -1) {
-      closuresWithoutContext++
       continue
     }
 
@@ -135,13 +122,6 @@ const getClosureCounts = (nodes: Uint32Array, edges: Uint32Array, strings: reado
     nameToTotalCountMap.set(name, currentTotal + contextNodeCount)
   }
 
-  console.log('getClosureCounts:', {
-    closureCount,
-    closuresWithoutContext,
-    nameToTotalCountMapSize: nameToTotalCountMap.size,
-    closureTypeIndex,
-    contextEdgeTypeIndex,
-  })
   return nameToTotalCountMap
 }
 
@@ -165,14 +145,12 @@ const getClosureInfos = (nodes: Uint32Array, edges: Uint32Array, strings: readon
   const contextEdgeTypeIndex = edgeTypes.indexOf('context')
 
   if (closureTypeIndex === -1 || contextEdgeTypeIndex === -1) {
-    console.log('Missing types:', { closureTypeIndex, contextEdgeTypeIndex, nodeTypes, edgeTypes })
     return new Map()
   }
 
   const edgeMap = createEdgeMap(nodes, node_fields)
   const nameToClosureInfoMap = new Map<string, ClosureInfo>()
 
-  let closuresWithoutContext = 0
   // Iterate through all nodes to find closures
   for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex += ITEMS_PER_NODE) {
     const typeIndex = nodes[nodeIndex + typeFieldIndex]
@@ -186,19 +164,21 @@ const getClosureInfos = (nodes: Uint32Array, edges: Uint32Array, strings: readon
     const logicalNodeIndex = nodeIndex / ITEMS_PER_NODE
     const edgeStartIndex = edgeMap[logicalNodeIndex]
 
-    // Find context edge
+    // Find context edge - check edge name, not type!
     let contextNodeByteOffset = -1
+    const contextStringIndex = strings.indexOf('context')
     for (let i = 0; i < edgeCount; i++) {
       const edgeIndex = (edgeStartIndex + i) * ITEMS_PER_EDGE
-      const edgeType = edges[edgeIndex + edgeTypeFieldIndex]
-      if (edgeType === contextEdgeTypeIndex) {
+      const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
+      const edgeName = strings[edgeNameIndex] || ''
+      // Check if this is a context edge by name (not type)
+      if (edgeName === 'context' || (contextStringIndex >= 0 && edgeNameIndex === contextStringIndex)) {
         contextNodeByteOffset = edges[edgeIndex + edgeToNodeFieldIndex]
         break
       }
     }
 
     if (contextNodeByteOffset === -1) {
-      closuresWithoutContext++
       continue
     }
 
@@ -253,18 +233,6 @@ export const compareNamedClosureCountFromHeapSnapshot = async (pathA: string, pa
     }),
   ])
 
-  console.log('Snapshot A:', {
-    nodeCount: snapshotA.nodes.length,
-    edgeCount: snapshotA.edges.length,
-    stringsCount: snapshotA.strings?.length || 0,
-    meta: snapshotA.meta,
-  })
-  console.log('Snapshot B:', {
-    nodeCount: snapshotB.nodes.length,
-    edgeCount: snapshotB.edges.length,
-    stringsCount: snapshotB.strings?.length || 0,
-    meta: snapshotB.meta,
-  })
 
   // Get closure counts by name for both snapshots
   const countsA = getClosureCounts(snapshotA.nodes, snapshotA.edges, snapshotA.strings, snapshotA.meta)
