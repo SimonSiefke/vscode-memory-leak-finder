@@ -241,7 +241,6 @@ export const compareNamedClosureCountFromHeapSnapshot = async (pathA: string, pa
   // Get closure infos from snapshot B for leaked closures
   const closureInfosB = getClosureInfos(snapshotB.nodes, snapshotB.edges, snapshotB.strings, snapshotB.meta)
 
-  console.log({ countsA, countsB })
   // Find leaked closures (where count increased)
   const leakedClosures: any[] = []
 
