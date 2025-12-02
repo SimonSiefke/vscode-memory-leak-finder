@@ -245,3 +245,56 @@ test('comparePromisesWithStackTrace - with result and scriptMap', async () => {
     },
   ])
 })
+
+test('comparePromisesWithStackTrace - filter by context.runs', async () => {
+  const before = [
+    {
+      preview: {
+        properties: [{ name: 'status', value: 'pending' }],
+      },
+      stackTrace: 'at test.js:1:1',
+    },
+  ]
+  const after = [
+    {
+      preview: {
+        properties: [{ name: 'status', value: 'pending' }],
+      },
+      stackTrace: 'at test.js:1:1',
+    },
+    {
+      preview: {
+        properties: [{ name: 'status', value: 'pending' }],
+      },
+      stackTrace: 'at test.js:1:1',
+    },
+    {
+      preview: {
+        properties: [{ name: 'status', value: 'resolved' }],
+      },
+      stackTrace: 'at test.js:2:2',
+    },
+    {
+      preview: {
+        properties: [{ name: 'status', value: 'resolved' }],
+      },
+      stackTrace: 'at test.js:2:2',
+    },
+    {
+      preview: {
+        properties: [{ name: 'status', value: 'resolved' }],
+      },
+      stackTrace: 'at test.js:2:2',
+    },
+  ]
+  const context = { runs: 3 }
+  const result = await ComparePromisesWithStackTrace.comparePromisesWithStackTrace(before, after, context)
+  expect(result).toEqual([
+    {
+      count: 3,
+      delta: 3,
+      properties: [{ name: 'status', value: 'resolved' }],
+      stackTrace: ['at test.js:2:2'],
+    },
+  ])
+})
