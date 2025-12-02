@@ -19,8 +19,11 @@ const getAdded = (before, after) => {
     beforeMap[hash] ||= 0
     beforeMap[hash]++
   }
-  const beforeCounts = { ...beforeMap }
-  const afterCounts = Object.create(null)
+  const beforeCounts: Record<string, number> = Object.create(null)
+  for (const hash in beforeMap) {
+    beforeCounts[hash] = beforeMap[hash]
+  }
+  const afterCounts: Record<string, number> = Object.create(null)
   const leaked = []
   for (const item of after) {
     const hash = hashPromise(item)
@@ -35,7 +38,7 @@ const getAdded = (before, after) => {
   return { leaked, beforeCounts, afterCounts }
 }
 
-const deduplicate = (leaked, beforeCounts, afterCounts) => {
+const deduplicate = (leaked, beforeCounts: Record<string, number>, afterCounts: Record<string, number>) => {
   const map = Object.create(null)
   for (const item of leaked) {
     const hash = hashPromise(item)
