@@ -12,13 +12,13 @@ const isImportantEdge = (edgeName: string): boolean => {
 const getName = (
   closureNameIndex: number,
   strings: readonly string[],
-  contextNodeEdges: Array<{ nameIndex: number; edgeName: string }>,
+  contextNodeEdges: Array<{ targetNodeName: string }>,
 ): string => {
   if (closureNameIndex >= 0 && strings[closureNameIndex]) {
     return strings[closureNameIndex]
   }
   return contextNodeEdges
-    .map((edge) => edge.edgeName)
+    .map((edge) => edge.targetNodeName)
     .join(':')
     .slice(0, 100)
 }
@@ -50,18 +50,22 @@ const getClosureCounts = (nodes: Uint32Array, edges: Uint32Array, strings: reado
   const contextEdgeTypeIndex = edgeTypes.indexOf('context')
 
   if (closureTypeIndex === -1 || contextEdgeTypeIndex === -1) {
+    console.log('Missing types:', { closureTypeIndex, contextEdgeTypeIndex, nodeTypes, edgeTypes })
     return new Map()
   }
 
   const edgeMap = createEdgeMap(nodes, node_fields)
   const nameToTotalCountMap = new Map<string, number>()
 
+  let closureCount = 0
+  let closuresWithoutContext = 0
   // Iterate through all nodes to find closures
   for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex += ITEMS_PER_NODE) {
     const typeIndex = nodes[nodeIndex + typeFieldIndex]
     if (typeIndex !== closureTypeIndex) {
       continue
     }
+    closureCount++
 
     const closureId = nodes[nodeIndex + idFieldIndex]
     const closureNameIndex = nodes[nodeIndex + nameFieldIndex]
@@ -81,6 +85,7 @@ const getClosureCounts = (nodes: Uint32Array, edges: Uint32Array, strings: reado
     }
 
     if (contextNodeByteOffset === -1) {
+      closuresWithoutContext++
       continue
     }
 
@@ -92,13 +97,19 @@ const getClosureCounts = (nodes: Uint32Array, edges: Uint32Array, strings: reado
     const contextEdgeCount = nodes[contextNodeOffset + edgeCountFieldIndex]
     const contextEdgeStartIndex = edgeMap[contextNodeIndex]
 
-    const contextNodeEdges: Array<{ nameIndex: number; edgeName: string }> = []
+    const contextNodeEdges: Array<{ targetNodeName: string }> = []
     for (let i = 0; i < contextEdgeCount; i++) {
       const edgeIndex = (contextEdgeStartIndex + i) * ITEMS_PER_EDGE
       const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
       const edgeName = strings[edgeNameIndex] || ''
       if (isImportantEdge(edgeName)) {
-        contextNodeEdges.push({ nameIndex: edgeNameIndex, edgeName })
+        // Get target node name
+        const targetNodeByteOffset = edges[edgeIndex + edgeToNodeFieldIndex]
+        const targetNodeIndex = Math.floor(targetNodeByteOffset / ITEMS_PER_NODE)
+        const targetNodeOffset = targetNodeIndex * ITEMS_PER_NODE
+        const targetNodeNameIndex = nodes[targetNodeOffset + nameFieldIndex]
+        const targetNodeName = strings[targetNodeNameIndex] || ''
+        contextNodeEdges.push({ targetNodeName })
       }
     }
 
@@ -109,6 +120,13 @@ const getClosureCounts = (nodes: Uint32Array, edges: Uint32Array, strings: reado
     nameToTotalCountMap.set(name, currentTotal + contextNodeCount)
   }
 
+  console.log('getClosureCounts:', {
+    closureCount,
+    closuresWithoutContext,
+    nameToTotalCountMapSize: nameToTotalCountMap.size,
+    closureTypeIndex,
+    contextEdgeTypeIndex,
+  })
   return nameToTotalCountMap
 }
 
@@ -132,6 +150,7 @@ const getClosureInfos = (nodes: Uint32Array, edges: Uint32Array, strings: readon
   const contextEdgeTypeIndex = edgeTypes.indexOf('context')
 
   if (closureTypeIndex === -1 || contextEdgeTypeIndex === -1) {
+    console.log('Missing types:', { closureTypeIndex, contextEdgeTypeIndex, nodeTypes, edgeTypes })
     return new Map()
   }
 
@@ -163,6 +182,7 @@ const getClosureInfos = (nodes: Uint32Array, edges: Uint32Array, strings: readon
     }
 
     if (contextNodeByteOffset === -1) {
+      closuresWithoutContext++
       continue
     }
 
@@ -174,13 +194,19 @@ const getClosureInfos = (nodes: Uint32Array, edges: Uint32Array, strings: readon
     const contextEdgeCount = nodes[contextNodeOffset + edgeCountFieldIndex]
     const contextEdgeStartIndex = edgeMap[contextNodeIndex]
 
-    const contextNodeEdges: Array<{ nameIndex: number; edgeName: string }> = []
+    const contextNodeEdges: Array<{ targetNodeName: string }> = []
     for (let i = 0; i < contextEdgeCount; i++) {
       const edgeIndex = (contextEdgeStartIndex + i) * ITEMS_PER_EDGE
       const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
       const edgeName = strings[edgeNameIndex] || ''
       if (isImportantEdge(edgeName)) {
-        contextNodeEdges.push({ nameIndex: edgeNameIndex, edgeName })
+        // Get target node name
+        const targetNodeByteOffset = edges[edgeIndex + edgeToNodeFieldIndex]
+        const targetNodeIndex = Math.floor(targetNodeByteOffset / ITEMS_PER_NODE)
+        const targetNodeOffset = targetNodeIndex * ITEMS_PER_NODE
+        const targetNodeNameIndex = nodes[targetNodeOffset + nameFieldIndex]
+        const targetNodeName = strings[targetNodeNameIndex] || ''
+        contextNodeEdges.push({ targetNodeName })
       }
     }
 
