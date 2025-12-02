@@ -1,6 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
-import { getNamedClosureCountFromHeapSnapshot } from '../src/parts/GetNamedClosureCountFromHeapSnapshot/GetNamedClosureCountFromHeapSnapshot.ts'
+import { compareNamedClosureCountFromHeapSnapshot } from '../src/parts/CompareNamedClosureCount/CompareNamedClosureCount.ts'
 import { loadHeapSnapshot } from '../src/parts/LoadHeapSnapshot/LoadHeapSnapshot.ts'
 
 const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
@@ -17,7 +17,7 @@ const testOptimized = async () => {
     await loadHeapSnapshot(id)
     const scriptMapContent = await readFile(scriptMapPath, 'utf-8')
     const scriptMap = JSON.parse(scriptMapContent)
-    const values = await getNamedClosureCountFromHeapSnapshot(id)
+    const values = await compareNamedClosureCountFromHeapSnapshot(filePath1, filePath2)
     console.timeEnd('compare')
     await mkdir(dirname(resultPath), { recursive: true })
     await writeFile(resultPath, JSON.stringify(values, null, 2) + '\n')
