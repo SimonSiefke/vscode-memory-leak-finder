@@ -108,7 +108,7 @@ const sortItems = (items) => {
   return items.toSorted(compareItem)
 }
 
-export const comparePromisesWithStackTrace = async (before, after, context) => {
+export const comparePromisesWithStackTrace = async (before, after, context = {}) => {
   Assert.array(before)
   let afterResult = after
   let scriptMap = null
