@@ -31,6 +31,10 @@ interface ClosureInfo {
 }
 
 const getClosureCounts = (nodes: Uint32Array, edges: Uint32Array, strings: readonly string[], meta: any): Map<string, number> => {
+  if (!meta || !meta.node_types || !meta.edge_types) {
+    console.log('getClosureCounts - Invalid meta:', meta)
+    return new Map()
+  }
   const { node_types, node_fields, edge_types, edge_fields } = meta
   const {
     ITEMS_PER_NODE,
@@ -49,8 +53,19 @@ const getClosureCounts = (nodes: Uint32Array, edges: Uint32Array, strings: reado
   const closureTypeIndex = nodeTypes.indexOf('closure')
   const contextEdgeTypeIndex = edgeTypes.indexOf('context')
 
+  console.log('getClosureCounts - Type indices:', {
+    closureTypeIndex,
+    contextEdgeTypeIndex,
+    nodeTypesLength: nodeTypes.length,
+    edgeTypesLength: edgeTypes.length,
+    nodeTypesSample: nodeTypes.slice(0, 10),
+    edgeTypesSample: edgeTypes.slice(0, 10),
+    nodesLength: nodes.length,
+    edgesLength: edges.length,
+  })
+
   if (closureTypeIndex === -1 || contextEdgeTypeIndex === -1) {
-    console.log('Missing types:', { closureTypeIndex, contextEdgeTypeIndex, nodeTypes, edgeTypes })
+    console.log('getClosureCounts - Missing types:', { closureTypeIndex, contextEdgeTypeIndex, nodeTypes, edgeTypes })
     return new Map()
   }
 
@@ -237,6 +252,19 @@ export const compareNamedClosureCountFromHeapSnapshot = async (pathA: string, pa
       parseStrings: true,
     }),
   ])
+
+  console.log('Snapshot A:', {
+    nodeCount: snapshotA.nodes.length,
+    edgeCount: snapshotA.edges.length,
+    stringsCount: snapshotA.strings?.length || 0,
+    meta: snapshotA.meta,
+  })
+  console.log('Snapshot B:', {
+    nodeCount: snapshotB.nodes.length,
+    edgeCount: snapshotB.edges.length,
+    stringsCount: snapshotB.strings?.length || 0,
+    meta: snapshotB.meta,
+  })
 
   // Get closure counts by name for both snapshots
   const countsA = getClosureCounts(snapshotA.nodes, snapshotA.edges, snapshotA.strings, snapshotA.meta)
