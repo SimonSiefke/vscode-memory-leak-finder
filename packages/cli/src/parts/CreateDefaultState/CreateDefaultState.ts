@@ -29,7 +29,7 @@ export const createDefaultState = (): StdinDataState => ({
   isWindows: false,
   previousFilters: [],
   exitCode: 0,
-  shouldContinue: false,
+  continueValue: '',
   inspectExtensions: false,
   inspectPtyHost: false,
   inspectSharedProcess: false,

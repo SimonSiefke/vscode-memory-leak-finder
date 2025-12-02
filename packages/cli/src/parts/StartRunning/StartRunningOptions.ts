@@ -21,7 +21,7 @@ export interface StartRunningOptions {
   setupOnly: boolean
   workers: boolean
   isWindows: boolean
-  shouldContinue: boolean
+  continueValue: string
   inspectSharedProcess: boolean
   inspectExtensions: boolean
   inspectPtyHost: boolean

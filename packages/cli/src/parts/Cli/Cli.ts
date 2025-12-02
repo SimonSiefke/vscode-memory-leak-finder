@@ -40,7 +40,7 @@ export const run = async (platform: string, argv: readonly string[], env: NodeJS
     vscodePath: options.vscodePath,
     watch: options.watch,
     workers: options.workers,
-    shouldContinue: options.shouldContinue,
+    continueValue: options.continueValue,
     inspectSharedProcess: options.inspectSharedProcess,
     inspectExtensions: options.inspectExtensions,
     inspectPtyHost: options.inspectPtyHost,
