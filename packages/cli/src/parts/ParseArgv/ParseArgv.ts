@@ -46,7 +46,7 @@ export const parseArgv = (argv) => {
     commit: '',
     setupOnly: false,
     workers: false,
-    shouldContinue: false,
+    continueValue: '',
     inspectSharedProcess: false,
     inspectExtensions: false,
     inspectPtyHost: false,
@@ -116,7 +116,7 @@ export const parseArgv = (argv) => {
     options.workers = true
   }
   if (argv.includes('--continue')) {
-    options.shouldContinue = true
+    options.continueValue = parseArgvString(argv, '--continue')
   }
   if (argv.includes('--inspect-shared-process')) {
     options.inspectSharedProcess = true

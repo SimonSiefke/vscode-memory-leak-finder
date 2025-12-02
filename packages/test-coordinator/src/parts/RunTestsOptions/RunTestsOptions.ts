@@ -24,6 +24,7 @@ export interface RunTestsOptions {
   readonly inspectExtensions: boolean
   readonly inspectPtyHost: boolean
   readonly enableExtensions: boolean
+  readonly continueValue: string
 }
 
 export interface RunTestsWithCallbackOptions extends RunTestsOptions {

@@ -33,6 +33,7 @@ export const runTests = ({
   inspectExtensions,
   inspectPtyHost,
   enableExtensions,
+  continueValue,
 }: RunTestsOptions) => {
   return RunTestsWithCallback.runTestsWithCallback({
     root,
@@ -60,6 +61,7 @@ export const runTests = ({
     inspectExtensions,
     inspectPtyHost,
     enableExtensions,
+    continueValue,
     callback,
     addDisposable: Disposables.add,
     clearDisposables: Disposables.disposeAll,

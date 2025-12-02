@@ -30,7 +30,7 @@ export interface StdinDataState {
   previousFilters: string[]
   exitCode: number
   isWindows: boolean
-  shouldContinue: boolean
+  continueValue: string
   inspectSharedProcess: boolean
   inspectExtensions: boolean
   inspectPtyHost: boolean
@@ -63,7 +63,7 @@ let state: StdinDataState = {
   previousFilters: [],
   isWindows: false,
   exitCode: 0,
-  shouldContinue: false,
+  continueValue: '',
   inspectSharedProcess: false,
   inspectExtensions: false,
   inspectPtyHost: false,
@@ -95,7 +95,7 @@ export const setState = (newState): void => {
     stdout: newState.stdout,
     previousFilters: newState.previousFilters,
     isWindows: newState.isWindows,
-    shouldContinue: newState.shouldContinue,
+    continueValue: newState.continueValue,
     inspectSharedProcess: newState.inspectSharedProcess,
     inspectExtensions: newState.inspectExtensions,
     inspectPtyHost: newState.inspectPtyHost,
