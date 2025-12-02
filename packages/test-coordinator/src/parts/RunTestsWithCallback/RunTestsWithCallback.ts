@@ -124,12 +124,7 @@ export const runTestsWithCallback = async ({
     let skipped = 0
     let skippedFailed = 0
     let leaking = 0
-    let formattedPaths = await GetTestToRun.getTestsToRun(root, cwd, filterValue)
-    if (continueValue) {
-      formattedPaths = formattedPaths.filter((formattedPath) => {
-        return formattedPath.dirent >= continueValue
-      })
-    }
+    const formattedPaths = await GetTestToRun.getTestsToRun(root, cwd, filterValue, continueValue)
     const total = formattedPaths.length
     if (total === 0) {
       return callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, 0, leaking, total, 0, filterValue)
