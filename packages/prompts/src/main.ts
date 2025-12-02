@@ -9,7 +9,7 @@ const root = join(dirname, '..', '..', '..')
 const localVscodePath = '/home/simon/.cache/repos/vscode'
 
 // const relativePath = '.vscode-memory-leak-finder-results/event-listeners-with-stack-trace/ev.json'
-const relativePath = '.vscode-memory-leak-finder-results/named-function-count3/debug.json'
+const relativePath = '.vscode-memory-leak-finder-results/named-function-count3/debug-javascript-step.json'
 
 const getPrompt = (content, localVscodePath) => {
   const prompt = `Hello,
@@ -47,12 +47,13 @@ Also keep in mind these rules:
 1. Never ever run a full VSCode build. It crashes my comuter.
 2. Never ever run full tsc in the VSCode folder. It crashes my computer.
 3. Never ever run the VSCode compile script. It crashes my computer.
-4. Never ever run tests. It crashes my computer.
-5. Never ever run hygiene. It crashes my computer.
-6. Never ever run tests. It crashes my computer.
-7. Never ever run hygiene. It crashes my computer.
-8. Never ever run tests. It crashes my computer.
-9. Don't crash my computer.
+4. Never ever run the VSCode build task. It crashes my computer.
+5. Never ever run tests. It crashes my computer.
+6. Never ever run hygiene. It crashes my computer.
+7. Never ever run tests. It crashes my computer.
+8. Never ever run hygiene. It crashes my computer.
+9. Never ever run tests. It crashes my computer.
+10. Don't crash my computer.
 
 
 Additionally there are some stylistic rules:
