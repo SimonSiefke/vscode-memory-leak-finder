@@ -6,7 +6,10 @@ import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import * as SortCountMap from '../SortCountMap/SortCountMap.ts'
 import { getLocationKey } from '../GetLocationKey/GetLocationKey.ts'
 
-const getSortedCounts = (heapsnapshot: Snapshot) => {
+const getSortedCounts = (
+  heapsnapshot: Snapshot,
+  scriptMap: Record<number, { readonly url?: string; readonly sourceMapUrl?: string }> = {},
+) => {
   const { nodes, edges, strings } = heapsnapshot
   const meta = heapsnapshot.meta
   const { node_fields, edge_fields, edge_types } = meta
@@ -136,7 +139,11 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
       const scriptId = locations[locIndex + locationOffsets.scriptIdOffset]
       const line = locations[locIndex + locationOffsets.lineOffset]
       const column = locations[locIndex + locationOffsets.columnOffset]
-      const locationKey = getLocationKey(scriptId, line, column)
+      const script = scriptMap[scriptId]
+      // Store location key with URL if available
+      const locationKey = script?.url
+        ? `${script.url}:${line}:${column}`
+        : getLocationKey(scriptId, line, column)
       locationMap.set(objectIndex, locationKey)
     }
 
@@ -359,11 +366,30 @@ const getSortedCounts = (heapsnapshot: Snapshot) => {
     .map(([key, value]) => {
       // @ts-ignore
       const locationKeys = Array.from(value.locations || [])
+      // Parse location keys to enrich with script info
+      const enrichedLocations = locationKeys.map((locationKey: string) => {
+        // Check if it's already enriched with URL (format: "url:line:column")
+        if (locationKey.includes('://') || locationKey.startsWith('file://')) {
+          return locationKey
+        }
+        // Otherwise it's in format "scriptId:line:column"
+        const parts = locationKey.split(':')
+        if (parts.length === 3) {
+          const scriptId = Number(parts[0])
+          const line = parts[1]
+          const column = parts[2]
+          const script = scriptMap[scriptId]
+          if (script?.url) {
+            return `${script.url}:${line}:${column}`
+          }
+        }
+        return locationKey
+      })
       return {
         name: key,
         // @ts-ignore
         count: value.count,
-        locations: locationKeys,
+        locations: enrichedLocations,
       }
     })
   const sorted = SortCountMap.sortCountMap(arrayNamesWithCount)
@@ -402,11 +428,15 @@ const compareCounts = (before, after) => {
   return sorted
 }
 
-export const compareHeapsnapshotArraysInternal2 = async (snapshotA: Snapshot, snapshotB: Snapshot) => {
+export const compareHeapsnapshotArraysInternal2 = async (
+  snapshotA: Snapshot,
+  snapshotB: Snapshot,
+  scriptMap: Record<number, { readonly url?: string; readonly sourceMapUrl?: string }> = {},
+) => {
   Assert.object(snapshotA)
   Assert.object(snapshotB)
-  const countsA = getSortedCounts(snapshotA)
-  const countsB = getSortedCounts(snapshotB)
+  const countsA = getSortedCounts(snapshotA, scriptMap)
+  const countsB = getSortedCounts(snapshotB, scriptMap)
   const result = compareCounts(countsA, countsB)
   return result
 }
