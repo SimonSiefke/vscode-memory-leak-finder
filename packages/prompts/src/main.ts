@@ -8,7 +8,8 @@ const root = join(dirname, '..', '..', '..')
 
 const localVscodePath = '/home/simon/.cache/repos/vscode'
 
-const relativePath = '.vscode-memory-leak-finder-results/event-listeners-with-stack-trace/ev.json'
+// const relativePath = '.vscode-memory-leak-finder-results/event-listeners-with-stack-trace/ev.json'
+const relativePath = '.vscode-memory-leak-finder-results/named-function-count3/debug.json'
 
 const getPrompt = (content, localVscodePath) => {
   const prompt = `Hello,
@@ -46,7 +47,12 @@ Also keep in mind these rules:
 1. Never ever run a full VSCode build. It crashes my comuter.
 2. Never ever run full tsc in the VSCode folder. It crashes my computer.
 3. Never ever run the VSCode compile script. It crashes my computer.
-4. Don't crash my computer.
+4. Never ever run tests. It crashes my computer.
+5. Never ever run hygiene. It crashes my computer.
+6. Never ever run tests. It crashes my computer.
+7. Never ever run hygiene. It crashes my computer.
+8. Never ever run tests. It crashes my computer.
+9. Don't crash my computer.
 
 
 Additionally there are some stylistic rules:
@@ -54,8 +60,9 @@ Additionally there are some stylistic rules:
 2. Don't use the \`as any\` annotation
 3. Don't use ts-ignore
 4. Don't add any comment
-5. Don't modify any comment
-6. Don't modify the type signature of any other types or functions when not needed. Only change them when necessary
+5. Don't remove any comment
+6. Don't modify any comment
+7. Don't modify the type signature of any other types or functions when not needed. Only change them when necessary
 
 `
 
