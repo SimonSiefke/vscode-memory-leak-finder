@@ -157,6 +157,7 @@ const getClosureInfos = (nodes: Uint32Array, edges: Uint32Array, strings: readon
   const edgeMap = createEdgeMap(nodes, node_fields)
   const nameToClosureInfoMap = new Map<string, ClosureInfo>()
 
+  let closuresWithoutContext = 0
   // Iterate through all nodes to find closures
   for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex += ITEMS_PER_NODE) {
     const typeIndex = nodes[nodeIndex + typeFieldIndex]
