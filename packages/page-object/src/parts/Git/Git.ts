@@ -7,6 +7,8 @@ export const create = ({ electronApp, page, expect, VError }) => {
     async init() {
       const workspace = join(Root.root, '.vscode-test-workspace')
       await execa('git', ['init'], { cwd: workspace })
+      await execa('git', ['config', 'user.name', 'Test User'], { cwd: workspace })
+      await execa('git', ['config', 'user.email', 'test@example.com'], { cwd: workspace })
       await page.waitForIdle()
     },
     async add() {
