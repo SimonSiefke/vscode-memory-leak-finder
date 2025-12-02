@@ -9,7 +9,7 @@ const root = join(dirname, '..', '..', '..')
 const localVscodePath = '/home/simon/.cache/repos/vscode'
 
 // const relativePath = '.vscode-memory-leak-finder-results/event-listeners-with-stack-trace/ev.json'
-const relativePath = '.vscode-memory-leak-finder-results/named-function-count3/debug-javascript-step.json'
+const relativePath = '.vscode-memory-leak-finder-results/named-function-count3/ref.json'
 
 const getPrompt = (content, localVscodePath) => {
   const prompt = `Hello,
@@ -53,8 +53,13 @@ Also keep in mind these rules:
 7. Never ever run tests. It crashes my computer.
 8. Never ever run hygiene. It crashes my computer.
 9. Never ever run tests. It crashes my computer.
+10. Never run npx tsc. It crashes my computer.
 10. Don't crash my computer.
 
+
+Again, to be very clear,
+- never write "Let me start the build task"
+- never run the task "VS Code - Build"
 
 Additionally there are some stylistic rules:
 1. Don't use the \`any\` type
