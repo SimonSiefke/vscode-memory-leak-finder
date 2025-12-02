@@ -11,7 +11,7 @@ const isImportantEdge = (edgeName: string): boolean => {
 
 const getName = (
   closureNameIndex: number,
-  strings: string[],
+  strings: readonly string[],
   contextNodeEdges: Array<{ nameIndex: number; edgeName: string }>,
 ): string => {
   if (closureNameIndex >= 0 && strings[closureNameIndex]) {
@@ -30,12 +30,7 @@ interface ClosureInfo {
   nodeIndex: number
 }
 
-const getClosureCounts = (
-  nodes: Uint32Array,
-  edges: Uint32Array,
-  strings: string[],
-  meta: any,
-): Map<string, number> => {
+const getClosureCounts = (nodes: Uint32Array, edges: Uint32Array, strings: readonly string[], meta: any): Map<string, number> => {
   const { node_types, node_fields, edge_types, edge_fields } = meta
   const {
     ITEMS_PER_NODE,
@@ -117,12 +112,7 @@ const getClosureCounts = (
   return nameToTotalCountMap
 }
 
-const getClosureInfos = (
-  nodes: Uint32Array,
-  edges: Uint32Array,
-  strings: string[],
-  meta: any,
-): Map<string, ClosureInfo> => {
+const getClosureInfos = (nodes: Uint32Array, edges: Uint32Array, strings: readonly string[], meta: any): Map<string, ClosureInfo> => {
   const { node_types, node_fields, edge_types, edge_fields } = meta
   const {
     ITEMS_PER_NODE,
@@ -211,10 +201,7 @@ const getClosureInfos = (
   return nameToClosureInfoMap
 }
 
-export const compareNamedClosureCountFromHeapSnapshot = async (
-  pathA: string,
-  pathB: string,
-): Promise<any[]> => {
+export const compareNamedClosureCountFromHeapSnapshot = async (pathA: string, pathB: string): Promise<any[]> => {
   const [snapshotA, snapshotB] = await Promise.all([
     prepareHeapSnapshot(pathA, {
       parseStrings: true,
@@ -231,6 +218,7 @@ export const compareNamedClosureCountFromHeapSnapshot = async (
   // Get closure infos from snapshot B for leaked closures
   const closureInfosB = getClosureInfos(snapshotB.nodes, snapshotB.edges, snapshotB.strings, snapshotB.meta)
 
+  console.log({ countsA, countsB })
   // Find leaked closures (where count increased)
   const leakedClosures: any[] = []
 

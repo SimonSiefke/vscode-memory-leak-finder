@@ -1,6 +1,7 @@
 import { Worker } from 'node:worker_threads'
 import { getHeapSnapshotWorkerPath } from '../GetHeapSnapshotWorkerPath/GetHeapSnapshotWorkerPath.ts'
 import { waitForResult } from '../WaitForResult/WaitForResult.ts'
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 const createDisposableWorker = (workerPath: string) => {
   const worker = new Worker(workerPath)
@@ -18,7 +19,7 @@ const createDisposableWorker = (workerPath: string) => {
  * @param {{parseStrings?:boolean}} options - Options for parsing
  * @returns {Promise<import('../Snapshot/Snapshot.ts').Snapshot>}>}
  */
-export const prepareHeapSnapshot = async (path, options) => {
+export const prepareHeapSnapshot = async (path: string, options: any): Promise<Snapshot> => {
   const workerPath = getHeapSnapshotWorkerPath()
   using worker = createDisposableWorker(workerPath)
   const resultPromise = waitForResult(worker.worker)
