@@ -115,6 +115,7 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
     },
     async killSecond() {
       try {
+        await page.waitForIdle()
         const terminalTabs = page.locator('[aria-label="Terminal tabs"]')
         await expect(terminalTabs).toBeVisible()
         const tabsEntry = page.locator('.tabs-list .terminal-tabs-entry')
@@ -138,6 +139,7 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         await page.waitForIdle()
         const terminal = page.locator('.terminal')
         await expect(terminal).toHaveCount(1)
+        await page.waitForIdle()
         await expect(terminal).toHaveClass('focus')
       } catch (error) {
         throw new VError(error, `Failed to kill second terminal`)
