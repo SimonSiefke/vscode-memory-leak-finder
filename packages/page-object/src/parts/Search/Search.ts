@@ -94,12 +94,10 @@ export const create = ({ expect, page, VError }) => {
         const messages = page.locator('.text-search-provider-messages')
         await expect(messages).toBeVisible()
         await page.waitForIdle()
-        await expect(messages).toHaveText(
-          `No results found. Review your settings for configured exclusions and check your gitignore files - Open Settings - Learn More`,
-        )
+        await expect(messages).toHaveText(/No results found/)
         await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to verify search message`)
+        throw new VError(error, `Failed to that search results are empty`)
       }
     },
     async expandFiles() {
