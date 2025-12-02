@@ -108,7 +108,7 @@ const sortItems = (items) => {
   return items.toSorted(compareItem)
 }
 
-export const comparePromisesWithStackTrace = async (before, after) => {
+export const comparePromisesWithStackTrace = async (before, after, context) => {
   Assert.array(before)
   let afterResult = after
   let scriptMap = null
@@ -121,12 +121,16 @@ export const comparePromisesWithStackTrace = async (before, after) => {
   const deduplicated = deduplicate(leaked, beforeCounts, afterCounts)
   const sorted = sortItems(deduplicated)
   const cleanLeaked = clean(sorted)
+  let filtered = cleanLeaked
+  if (context && typeof context === 'object' && 'runs' in context && typeof context.runs === 'number') {
+    filtered = cleanLeaked.filter((item) => item.delta >= context.runs)
+  }
   if (scriptMap) {
-    const stackTraces = cleanLeaked.map((item) => item.stackTrace)
+    const stackTraces = filtered.map((item) => item.stackTrace)
     const fullQuery = GetEventListenersQuery.getEventListenerQuery(stackTraces, scriptMap)
     const cleanInstances = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(fullQuery, false)
-    const sortedWithOriginal = mergeOriginal(cleanLeaked, cleanInstances)
+    const sortedWithOriginal = mergeOriginal(filtered, cleanInstances)
     return sortedWithOriginal
   }
-  return cleanLeaked
+  return filtered
 }
