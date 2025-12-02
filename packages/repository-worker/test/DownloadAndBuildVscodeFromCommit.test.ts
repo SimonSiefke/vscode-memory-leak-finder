@@ -139,9 +139,8 @@ afterEach(() => {
   jest.resetModules()
 })
 
-const { downloadAndBuildVscodeFromCommit } = await import(
-  '../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.ts'
-)
+const { downloadAndBuildVscodeFromCommit } =
+  await import('../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.ts')
 
 test.skip('downloadVscodeCommit - tests git clone operations with mocked execa', async () => {
   const testCommitHash = 'a1b2c3d4e5f6789012345678901234567890abcd'
