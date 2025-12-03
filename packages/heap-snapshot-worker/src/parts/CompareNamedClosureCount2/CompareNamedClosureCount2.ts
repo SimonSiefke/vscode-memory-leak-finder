@@ -3,7 +3,7 @@ import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationF
 import { getLocationKey } from '../GetLocationKey/GetLocationKey.ts'
 import { getUniqueLocationMap2 } from '../GetUniqueLocationMap2/GetUniqueLocationMap2.ts'
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
-import { Snapshot } from '../Snapshot/Snapshot.ts'
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 const createKeyMap = (keys) => {
   const map = Object.create(null)
