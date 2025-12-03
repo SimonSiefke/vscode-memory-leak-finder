@@ -57,7 +57,6 @@ const getLeaked = (oldNodeMap, newNodeMap) => {
     leakedMap[key] = []
     const oldItems = oldNodeMap[key]
     const newItems = newNodeMap[key]
-    console.log(`checking ${oldItems.length} and ${newItems.length} entries for ${key}`)
     const seen = Object.create(null)
     for (const item of oldItems) {
       const hash = getNodeHash(item)
