@@ -9,11 +9,7 @@ const isImportantEdge = (edgeName: string): boolean => {
   return !ignoredSet.has(edgeName)
 }
 
-const getName = (
-  closureNameIndex: number,
-  strings: readonly string[],
-  contextNodeEdges: Array<{ targetNodeName: string }>,
-): string => {
+const getName = (closureNameIndex: number, strings: readonly string[], contextNodeEdges: Array<{ targetNodeName: string }>): string => {
   if (closureNameIndex >= 0 && strings[closureNameIndex]) {
     return strings[closureNameIndex]
   }
@@ -24,10 +20,10 @@ const getName = (
 }
 
 interface ClosureInfo {
-  name: string
-  contextNodeCount: number
-  id: number
-  nodeIndex: number
+  readonly name: string
+  readonly contextNodeCount: number
+  readonly id: number
+  readonly nodeIndex: number
 }
 
 const getClosureCounts = (nodes: Uint32Array, edges: Uint32Array, strings: readonly string[], meta: any): Map<string, number> => {
@@ -228,7 +224,6 @@ export const compareNamedClosureCountFromHeapSnapshot = async (pathA: string, pa
       parseStrings: true,
     }),
   ])
-
 
   // Get closure counts by name for both snapshots
   const countsA = getClosureCounts(snapshotA.nodes, snapshotA.edges, snapshotA.strings, snapshotA.meta)
