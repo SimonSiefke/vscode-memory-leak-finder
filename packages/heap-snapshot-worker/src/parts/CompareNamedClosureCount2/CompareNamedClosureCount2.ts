@@ -2,6 +2,14 @@ import { getNewItems } from '../CompareHeapSnapshotsFunctionsInternal2/CompareHe
 import { getUniqueLocationMap2 } from '../GetUniqueLocationMap2/GetUniqueLocationMap2.ts'
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 
+const createIndexMap = (indices) => {
+  const map = Object.create(null)
+  for (const index of indices) {
+    map[index] = true
+  }
+  return map
+}
+
 export const compareNamedClosureCountFromHeapSnapshot2 = async (pathA: string, pathB: string): Promise<any[]> => {
   console.time('parse')
   const [snapshotA, snapshotB] = await Promise.all([
@@ -18,8 +26,10 @@ export const compareNamedClosureCountFromHeapSnapshot2 = async (pathA: string, p
   const map1 = getUniqueLocationMap2(snapshotA)
   const map2 = getUniqueLocationMap2(snapshotB)
   const newItems = getNewItems(map1, map2, minCount)
+  const indices = newItems.map((item) => item.index)
+  const indexMap = createIndexMap(indices)
 
-  console.log({ newItems })
+  console.log({ indexMap })
 
   return []
 }
