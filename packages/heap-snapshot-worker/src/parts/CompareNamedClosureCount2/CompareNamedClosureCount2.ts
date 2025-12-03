@@ -19,6 +19,7 @@ const getMatchingNodes = (snapshot: Snapshot, keyMap: any): readonly any[] => {
   )
   const { nodes, locations, strings } = snapshot
   const nodeNameOffset = snapshot.meta.node_fields.indexOf('name')
+  const nodeIdOffset = snapshot.meta.node_fields.indexOf('id')
 
   // TODO get the nodes whose location index matches the index
 
@@ -34,14 +35,43 @@ const getMatchingNodes = (snapshot: Snapshot, keyMap: any): readonly any[] => {
       // this one is leaked, get the node
       const nodeIndex = locations[i + objectIndexOffset]
       const nodeNameIndex = nodes[nodeIndex + nodeNameOffset]
+      const nodeId = nodes[nodeIndex + nodeIdOffset]
       const nodeName = strings[nodeNameIndex] || 'anonymous'
       matchingNodeMap[key].push({
         nodeIndex,
         nodeName,
+        nodeId,
       })
     }
   }
   return matchingNodeMap
+}
+
+const getNodeHash = (node) => {
+  return `${node.nodeName}:`
+}
+
+const getLeaked = (oldNodeMap, newNodeMap) => {
+  const leakedMap = Object.create(null)
+  const keys = Object.keys(oldNodeMap)
+  for (const key of keys) {
+    leakedMap[key] = []
+    const oldItems = oldNodeMap[key]
+    const newItems = newNodeMap[key]
+    const seen = Object.create(null)
+    for (const item of oldItems) {
+      const hash = getNodeHash(item)
+      seen[hash] = true
+    }
+
+    for (const item of newItems) {
+      const hash = getNodeHash(item)
+      if (!(hash in seen)) {
+        leakedMap[key].push(item)
+      }
+    }
+  }
+  return leakedMap
 }
 
 export const compareNamedClosureCountFromHeapSnapshot2 = async (pathA: string, pathB: string): Promise<any[]> => {
@@ -62,10 +92,12 @@ export const compareNamedClosureCountFromHeapSnapshot2 = async (pathA: string, p
   const newItems = getNewItems(map1, map2, minCount)
   const keys = newItems.map((item) => item.key)
   const keyMap = createKeyMap(keys)
+  console.time('matching')
   const oldMatchingNodes = getMatchingNodes(snapshotA, keyMap)
   const newMatchingNodes = getMatchingNodes(snapshotB, keyMap)
+  const leaked = getLeaked(oldMatchingNodes, newMatchingNodes)
 
-  console.log({ oldMatchingNodes, newMatchingNodes })
+  console.log({ leaked })
 
   // TODO now that we have indices of leaked locations
   // we need to loop over all nodes, check which nodes are of type closure
