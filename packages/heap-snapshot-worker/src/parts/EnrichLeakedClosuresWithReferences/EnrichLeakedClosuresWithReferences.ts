@@ -34,7 +34,7 @@ export const enrichLeakedClosuresWithReferences = (
   const edgeTypeNames = edge_types[0] || []
 
   // Excluded node names that should be filtered out
-  const excludedNodeNames = new Set<string>(['(object elements)', 'system / Context', 'system / WeakFixedArray'])
+  const excludedNodeNames = new Set<string>(['(object elements)', 'system / Context', 'system / WeakFixedArray', 'system / WeakCell'])
 
   // Excluded edge patterns: edgeType + sourceNodeName combinations
   const excludedEdgePatterns = new Set<string>(['internal:system / Context'])
