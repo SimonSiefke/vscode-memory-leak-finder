@@ -38,6 +38,7 @@ export const run = async (platform: string, argv: readonly string[], env: NodeJS
     timeouts: options.timeouts,
     value: options.filter,
     vscodePath: options.vscodePath,
+    vscodeVersion: options.vscodeVersion,
     watch: options.watch,
     workers: options.workers,
     continueValue: options.continueValue,

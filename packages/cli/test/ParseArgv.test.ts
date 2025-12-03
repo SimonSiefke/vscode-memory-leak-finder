@@ -73,6 +73,24 @@ test('parseArgv - vscode-path flag not present', () => {
   expect(options.vscodePath).toBe('')
 })
 
+test('parseArgv - vscode-version flag', () => {
+  const argv = ['--vscode-version', '1.100.0']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.vscodeVersion).toBe('1.100.0')
+})
+
+test('parseArgv - vscode-version flag empty', () => {
+  const argv = ['--vscode-version', '']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.vscodeVersion).toBe('')
+})
+
+test('parseArgv - vscode-version flag not present', () => {
+  const argv = []
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.vscodeVersion).toBe('1.106.0')
+})
+
 test('parseArgv - commit flag', () => {
   const argv = ['--commit', 'abc123']
   const options = ParseArgv.parseArgv(argv)
