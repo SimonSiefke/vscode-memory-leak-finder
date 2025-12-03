@@ -1,7 +1,10 @@
 import { join } from 'path'
-import { loadHeapSnapshot2 } from '../src/parts/LoadHeapSnapshot2/LoadHeapSnapshot2.js'
+import { importHeapSnapshotWorker } from './import-heap-snapshot-worker.ts'
 
-const main = async () => {
+const main = async (): Promise<void> => {
+  const { loadHeapSnapshot2 } = await importHeapSnapshotWorker(
+    'parts/LoadHeapSnapshot2/LoadHeapSnapshot2.ts'
+  )
   const path = join(import.meta.dirname, '../../../.vscode-heapsnapshots', '1.json')
   console.log(process.memoryUsage())
   console.time('load')

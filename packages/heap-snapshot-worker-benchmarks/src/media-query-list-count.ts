@@ -1,12 +1,15 @@
 import { join } from 'node:path'
-import { getMediaQueryListCountFromHeapSnapshot } from '../src/parts/GetMediaQueryListCountFromHeapSnapshot/GetMediaQueryListCountFromHeapSnapshot.ts'
+import { importHeapSnapshotWorker } from './import-heap-snapshot-worker.ts'
 
-const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
+const filePath1 = join(import.meta.dirname, '../../../.vscode-heapsnapshots/0.json')
 
 const testOptimized = async (): Promise<void> => {
   console.log('Testing Optimized Approach (getMediaQueryListCountFromHeapSnapshot):')
 
   try {
+    const { getMediaQueryListCountFromHeapSnapshot } = await importHeapSnapshotWorker(
+      'parts/GetMediaQueryListCountFromHeapSnapshot/GetMediaQueryListCountFromHeapSnapshot.ts'
+    )
     const count: number = await getMediaQueryListCountFromHeapSnapshot(filePath1)
     console.log({ count })
 

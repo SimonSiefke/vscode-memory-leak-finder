@@ -1,18 +1,19 @@
 import { writeFile } from 'fs/promises'
 import { join } from 'path'
-import { analyzeNodeFromFile } from '../src/parts/ExamineNode/ExamineNode.ts'
+import { importHeapSnapshotWorker } from './import-heap-snapshot-worker.ts'
 
-async function testGetObjectsWithProperties() {
+async function testGetObjectsWithProperties(): Promise<void> {
   console.log('Testing getObjectsWithProperties function...')
 
   // Load the actual heap snapshot file
   // const heapSnapshotPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/abc2.heapsnapshot'
   const heapSnapshotPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/1.json'
-  const property = 'dispose'
-  const resultPath = join(import.meta.dirname, '../snapshots', 'result.json')
-  const depth = 1
+  // const property = 'dispose'
+  const resultPath = join(import.meta.dirname, '../../heap-snapshot-worker/snapshots', 'result.json')
+  // const depth = 1
 
   try {
+    const { analyzeNodeFromFile } = await importHeapSnapshotWorker('parts/ExamineNode/ExamineNode.ts')
     const id = 302297
     const r = await analyzeNodeFromFile(heapSnapshotPath, id)
 
