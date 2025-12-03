@@ -48,7 +48,7 @@ const getMatchingNodes = (snapshot: Snapshot, keyMap: any): readonly any[] => {
 }
 
 const getNodeHash = (node) => {
-  return `${node.nodeName}:`
+  return `${node.nodeName}:${node.nodeId}`
 }
 
 const getLeaked = (oldNodeMap, newNodeMap) => {
@@ -75,7 +75,6 @@ const getLeaked = (oldNodeMap, newNodeMap) => {
 }
 
 export const compareNamedClosureCountFromHeapSnapshot2 = async (pathA: string, pathB: string): Promise<any[]> => {
-  console.time('parse')
   const [snapshotA, snapshotB] = await Promise.all([
     prepareHeapSnapshot(pathA, {
       parseStrings: true,
@@ -84,7 +83,6 @@ export const compareNamedClosureCountFromHeapSnapshot2 = async (pathA: string, p
       parseStrings: true,
     }),
   ])
-  console.timeEnd('parse')
 
   const minCount = 1
   const map1 = getUniqueLocationMap2(snapshotA)
@@ -92,12 +90,9 @@ export const compareNamedClosureCountFromHeapSnapshot2 = async (pathA: string, p
   const newItems = getNewItems(map1, map2, minCount)
   const keys = newItems.map((item) => item.key)
   const keyMap = createKeyMap(keys)
-  console.time('matching')
   const oldMatchingNodes = getMatchingNodes(snapshotA, keyMap)
   const newMatchingNodes = getMatchingNodes(snapshotB, keyMap)
   const leaked = getLeaked(oldMatchingNodes, newMatchingNodes)
-
-  console.log({ leaked })
 
   // TODO now that we have indices of leaked locations
   // we need to loop over all nodes, check which nodes are of type closure
@@ -105,5 +100,5 @@ export const compareNamedClosureCountFromHeapSnapshot2 = async (pathA: string, p
 
   // console.log({ oldMatchingNodes: oldMatchingNodes.length, newMatchingNodes: newMatchingNodes.length })
 
-  return []
+  return leaked
 }
