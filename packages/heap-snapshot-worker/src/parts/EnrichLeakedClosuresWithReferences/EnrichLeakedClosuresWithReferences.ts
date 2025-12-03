@@ -13,6 +13,7 @@ export interface LeakedClosureWithReferences {
     readonly path: string
     readonly count: number
   }[]
+  readonly count: number
 }
 
 export const enrichLeakedClosuresWithReferences = (
@@ -221,9 +222,48 @@ export const enrichLeakedClosuresWithReferences = (
       return {
         nodeName: closure.nodeName,
         references: deduplicatedReferences,
+        count: 1,
       }
     })
   }
 
-  return enriched
+  // Step 9: Deduplicate outer closure items by nodeName and references
+  const finalEnriched: Record<string, readonly LeakedClosureWithReferences[]> = {}
+  for (const [locationKey, closures] of Object.entries(enriched)) {
+    const deduplicatedMap = new Map<
+      string,
+      {
+        nodeName: string
+        references: readonly {
+          sourceNodeName: string | null
+          sourceNodeType: string | null
+          edgeType: string
+          edgeName: string
+          path: string
+          count: number
+        }[]
+        count: number
+      }
+    >()
+
+    for (const closure of closures) {
+      // Create a unique key based on nodeName and serialized references
+      const referencesKey = JSON.stringify(closure.references)
+      const key = `${closure.nodeName}:${referencesKey}`
+      const existing = deduplicatedMap.get(key)
+      if (existing) {
+        existing.count++
+      } else {
+        deduplicatedMap.set(key, {
+          nodeName: closure.nodeName,
+          references: closure.references,
+          count: 1,
+        })
+      }
+    }
+
+    finalEnriched[locationKey] = Array.from(deduplicatedMap.values())
+  }
+
+  return finalEnriched
 }
