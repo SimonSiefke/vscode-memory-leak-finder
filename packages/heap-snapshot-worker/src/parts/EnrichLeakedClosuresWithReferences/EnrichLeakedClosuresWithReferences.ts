@@ -32,10 +32,13 @@ export const enrichLeakedClosuresWithReferences = (
   const edgeTypeNames = edge_types[0] || []
 
   // Excluded node names that should be filtered out
-  const excludedNodeNames = new Set<string>(['(object elements)'])
+  const excludedNodeNames = new Set<string>(['(object elements)', 'system / Context'])
 
   // Excluded edge patterns: edgeType + sourceNodeName combinations
   const excludedEdgePatterns = new Set<string>(['internal:system / Context'])
+
+  // Excluded type patterns: edgeType + sourceNodeType combinations
+  const excludedTypePatterns = new Set<string>(['internal:array'])
 
   // Step 1: Collect all leaked node byte offsets into a Set for O(1) lookup
   const leakedNodeByteOffsets = new Set<number>()
@@ -137,6 +140,13 @@ export const enrichLeakedClosuresWithReferences = (
         if (sourceNodeName) {
           const edgePattern = `${edgeTypeName}:${sourceNodeName}`
           if (excludedEdgePatterns.has(edgePattern)) {
+            continue
+          }
+        }
+        // Filter out excluded type patterns (edgeType:sourceNodeType)
+        if (sourceNodeType) {
+          const typePattern = `${edgeTypeName}:${sourceNodeType}`
+          if (excludedTypePatterns.has(typePattern)) {
             continue
           }
         }
