@@ -35,7 +35,7 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshot2 = async (
   ])
 
   const leaked = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, options)
-  const enriched = await enrichLeakedClosuresWithReferences(leaked, snapshotB, scriptMapPath)
+  const enriched = await enrichLeakedClosuresWithReferences(leaked, snapshotB, scriptMapPath, options.excludeOriginalPaths)
 
   return enriched
 }
@@ -47,6 +47,6 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2 = a
   options: CompareClosuresOptions = {},
 ): Promise<Record<string, readonly LeakedClosureWithReferences[]>> => {
   const leaked = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, options)
-  const enriched = await enrichLeakedClosuresWithReferences(leaked, snapshotB, scriptMapPath)
+  const enriched = await enrichLeakedClosuresWithReferences(leaked, snapshotB, scriptMapPath, options.excludeOriginalPaths)
   return enriched
 }
