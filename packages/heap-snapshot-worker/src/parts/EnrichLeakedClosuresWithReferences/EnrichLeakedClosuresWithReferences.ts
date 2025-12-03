@@ -11,6 +11,7 @@ export interface LeakedClosureWithReferences {
     readonly edgeType: string
     readonly edgeName: string
     readonly path: string
+    readonly count: number
   }[]
 }
 
@@ -183,9 +184,43 @@ export const enrichLeakedClosuresWithReferences = (
         // Then sort by path
         return a.path.localeCompare(b.path)
       })
+
+      // Step 8: Deduplicate references and add count
+      const deduplicatedMap = new Map<
+        string,
+        {
+          sourceNodeName: string | null
+          sourceNodeType: string | null
+          edgeType: string
+          edgeName: string
+          path: string
+          count: number
+        }
+      >()
+
+      for (const ref of sortedReferences) {
+        // Create a unique key based on all properties
+        const key = `${ref.sourceNodeName ?? ''}:${ref.sourceNodeType ?? ''}:${ref.edgeType}:${ref.edgeName}:${ref.path}`
+        const existing = deduplicatedMap.get(key)
+        if (existing) {
+          existing.count++
+        } else {
+          deduplicatedMap.set(key, {
+            sourceNodeName: ref.sourceNodeName,
+            sourceNodeType: ref.sourceNodeType,
+            edgeType: ref.edgeType,
+            edgeName: ref.edgeName,
+            path: ref.path,
+            count: 1,
+          })
+        }
+      }
+
+      const deduplicatedReferences = Array.from(deduplicatedMap.values())
+
       return {
         nodeName: closure.nodeName,
-        references: sortedReferences,
+        references: deduplicatedReferences,
       }
     })
   }
