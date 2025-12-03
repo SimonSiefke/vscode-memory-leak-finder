@@ -1,4 +1,7 @@
-import { compareNamedClosureCountFromHeapSnapshotInternal2 } from '../CompareNamedClosureCountInternal2/CompareNamedClosureCountInternal2.ts'
+import {
+  compareNamedClosureCountFromHeapSnapshotInternal2,
+  type CompareClosuresOptions,
+} from '../CompareNamedClosureCountInternal2/CompareNamedClosureCountInternal2.ts'
 import { enrichLeakedClosuresWithReferences } from '../EnrichLeakedClosuresWithReferences/EnrichLeakedClosuresWithReferences.ts'
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
@@ -21,6 +24,7 @@ export interface LeakedClosureWithReferences {
 export const compareNamedClosureCountWithReferencesFromHeapSnapshot2 = async (
   pathA: string,
   pathB: string,
+  options: CompareClosuresOptions = {},
 ): Promise<Record<string, readonly LeakedClosureWithReferences[]>> => {
   const [snapshotA, snapshotB] = await Promise.all([
     prepareHeapSnapshot(pathA, {
@@ -31,10 +35,11 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshot2 = async (
     }),
   ])
 
-  const leaked = (await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)) as unknown as Record<
-    string,
-    Array<{ nodeIndex: number; nodeName: string; nodeId: number }>
-  >
+  const leaked = (await compareNamedClosureCountFromHeapSnapshotInternal2(
+    snapshotA,
+    snapshotB,
+    options,
+  )) as unknown as Record<string, Array<{ nodeIndex: number; nodeName: string; nodeId: number }>>
   const enriched = enrichLeakedClosuresWithReferences(leaked, snapshotB)
 
   return enriched
@@ -43,11 +48,13 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshot2 = async (
 export const compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2 = async (
   snapshotA: Snapshot,
   snapshotB: Snapshot,
+  minCount: number = 1,
 ): Promise<Record<string, readonly LeakedClosureWithReferences[]>> => {
-  const leaked = (await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)) as unknown as Record<
-    string,
-    Array<{ nodeIndex: number; nodeName: string; nodeId: number }>
-  >
+  const leaked = (await compareNamedClosureCountFromHeapSnapshotInternal2(
+    snapshotA,
+    snapshotB,
+    minCount,
+  )) as unknown as Record<string, Array<{ nodeIndex: number; nodeName: string; nodeId: number }>>
   const enriched = enrichLeakedClosuresWithReferences(leaked, snapshotB)
 
   return enriched

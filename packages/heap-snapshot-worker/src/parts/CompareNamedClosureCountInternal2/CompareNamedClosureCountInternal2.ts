@@ -73,8 +73,16 @@ const getLeaked = (oldNodeMap, newNodeMap) => {
   return leakedMap
 }
 
-export const compareNamedClosureCountFromHeapSnapshotInternal2 = async (snapshotA: Snapshot, snapshotB: Snapshot): Promise<any[]> => {
-  const minCount = 1
+export interface CompareClosuresOptions {
+  readonly minCount?: number
+}
+
+export const compareNamedClosureCountFromHeapSnapshotInternal2 = async (
+  snapshotA: Snapshot,
+  snapshotB: Snapshot,
+  options: CompareClosuresOptions = {},
+): Promise<any[]> => {
+  const minCount = options.minCount ?? 1
   const map1 = getUniqueLocationMap2(snapshotA)
   const map2 = getUniqueLocationMap2(snapshotB)
   const newItems = getNewItems(map1, map2, minCount)
