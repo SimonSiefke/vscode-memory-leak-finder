@@ -29,7 +29,10 @@ export interface CompareResult {
 interface UniqueLocationWithDelta extends UniqueLocation {
   readonly delta: number
   readonly oldIndex: number
+  readonly key: string
 }
+
+// TODO maybe have a different function for functions and closures. keys are not needed for functions
 
 export const getNewItems = (map1: UniqueLocationMap, map2: UniqueLocationMap, minCount: number): readonly UniqueLocationWithDelta[] => {
   const newitems: UniqueLocationWithDelta[] = []
@@ -38,7 +41,7 @@ export const getNewItems = (map1: UniqueLocationMap, map2: UniqueLocationMap, mi
     const newItem = map2[key]
     const delta = newItem.count - oldItem.count
     if (delta >= minCount) {
-      newitems.push({ ...newItem, delta, oldIndex: oldItem.index })
+      newitems.push({ ...newItem, delta, oldIndex: oldItem.index, key })
     }
   }
   return newitems

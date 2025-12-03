@@ -5,15 +5,15 @@ import { getUniqueLocationMap2 } from '../GetUniqueLocationMap2/GetUniqueLocatio
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 import { Snapshot } from '../Snapshot/Snapshot.ts'
 
-const createIndexMap = (indices) => {
+const createKeyMap = (keys) => {
   const map = Object.create(null)
-  for (const index of indices) {
-    map[index] = true
+  for (const key of keys) {
+    map[key] = true
   }
   return map
 }
 
-const getMatchingNodes = (snapshot: Snapshot, locationIndices: any, indexMap: any): readonly any[] => {
+const getMatchingNodes = (snapshot: Snapshot, keyMap: any): readonly any[] => {
   const { itemsPerLocation, scriptIdOffset, lineOffset, columnOffset, objectIndexOffset } = getLocationFieldOffsets(
     snapshot.meta.location_fields,
   )
@@ -29,7 +29,7 @@ const getMatchingNodes = (snapshot: Snapshot, locationIndices: any, indexMap: an
     const lineIndex = locations[i + lineOffset]
     const columnIndex = locations[i + columnOffset]
     const key = getLocationKey(scriptId, lineIndex, columnIndex)
-    if (key in indexMap) {
+    if (key in keyMap) {
       // this one is leaked, get the node
       const nodeIndex = locations[i + objectIndexOffset]
       const nodeNameIndex = nodes[nodeIndex + nodeNameOffset]
@@ -59,18 +59,16 @@ export const compareNamedClosureCountFromHeapSnapshot2 = async (pathA: string, p
   const map1 = getUniqueLocationMap2(snapshotA)
   const map2 = getUniqueLocationMap2(snapshotB)
   const newItems = getNewItems(map1, map2, minCount)
-  const oldIndices = newItems.map((item) => item.oldIndex)
-  const oldIndexMap = createIndexMap(oldIndices)
-  const newIndices = newItems.map((item) => item.index)
-  const newIndexMap = createIndexMap(newIndices)
-
-  const oldMatchingNodes = getMatchingNodes(snapshotA, oldIndices)
+  const keys = newItems.map((item) => item.key)
+  const keyMap = createKeyMap(keys)
+  const oldMatchingNodes = getMatchingNodes(snapshotA, keyMap)
+  const newMatchingNodes = getMatchingNodes(snapshotB, keyMap)
 
   // TODO now that we have indices of leaked locations
   // we need to loop over all nodes, check which nodes are of type closure
   // and whose location matches the index in indexmap (locations)
 
-  console.log({ oldIndexMap, newIndexMap })
+  console.log({ oldMatchingNodes, newMatchingNodes })
 
   return []
 }
