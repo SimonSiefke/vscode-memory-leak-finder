@@ -25,10 +25,8 @@ const emptyRpc = {
 
 const disposeWorkers = async (workers) => {
   const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = workers
+  await Promise.all([memoryRpc.dispose(), testWorkerRpc.dispose(), videoRpc.dispose()])
   await initializationWorkerRpc.dispose()
-  await memoryRpc.dispose()
-  await testWorkerRpc.dispose()
-  await videoRpc.dispose()
 }
 
 export const runTestsWithCallback = async ({
