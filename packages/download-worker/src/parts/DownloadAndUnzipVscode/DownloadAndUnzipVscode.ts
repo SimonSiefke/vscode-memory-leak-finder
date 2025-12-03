@@ -26,9 +26,9 @@ export const downloadAndUnzipVscode = async (vscodeVersion: string): Promise<str
       return Env.env.VSCODE_PATH
     }
     const cachedPath = await GetVscodeRuntimePath.getVscodeRuntimePath(vscodeVersion)
-    if (cachedPath) {
-      return cachedPath
-    }
+    // if (cachedPath) {
+    //   return cachedPath
+    // }
     const { downloadAndUnzipVSCode } = await import('@vscode/test-electron')
     const path = await downloadAndUnzipVSCode({
       version: vscodeVersion,
