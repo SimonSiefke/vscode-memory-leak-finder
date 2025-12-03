@@ -3,9 +3,9 @@ import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOrigi
 import * as GetEventListenersQuery from '../GetEventListenersQuery/GetEventListenersQuery.ts'
 
 const sortOriginal = (cleanInstances) => {
-  const cleaned = []
+  const cleaned: any[] = []
   const sorted = Arrays.toSorted(cleanInstances, (a: any, b: any) => (a.originalIndex || 0) - (b.originalIndex || 0))
-  let current = []
+  let current: any[] = []
   let currentIndex = -1
   for (const value of sorted) {
     if (value.originalIndex > currentIndex) {
@@ -20,7 +20,7 @@ const sortOriginal = (cleanInstances) => {
 }
 
 export const prettifyConstructorStackTracesWithSourceMap = async (constructorStackTraces, scriptMap) => {
-  const fullQuery = []
+  const fullQuery: any[] = []
   for (let i = 0; i < constructorStackTraces.length; i++) {
     const stackTrace = constructorStackTraces[i]
     const eventListeners = GetEventListenersQuery.getEventListenerQuery(stackTrace, scriptMap)

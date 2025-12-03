@@ -6,7 +6,7 @@ const getDifference = (prettyBefore, prettyAfter) => {
   for (const element of prettyBefore) {
     beforeMap[element.description] = element.count
   }
-  const result = []
+  const result: any[] = []
   for (const element of prettyAfter) {
     const beforeCount = beforeMap[element.description] || 0
     if (element.count > beforeCount) {

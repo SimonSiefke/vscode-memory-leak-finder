@@ -3,7 +3,7 @@ export const compareLargestArrayCount = (before, after) => {
   for (const item of before) {
     beforeMap[item.id] = item.count
   }
-  const leaked = []
+  const leaked: any[] = []
   for (const item of after) {
     const afterCount = item.count
     const beforeCount = beforeMap[item.id] || 0

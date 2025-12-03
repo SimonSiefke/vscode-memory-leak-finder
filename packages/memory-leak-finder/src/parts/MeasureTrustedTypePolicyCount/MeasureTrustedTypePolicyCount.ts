@@ -13,11 +13,11 @@ export const create = (session) => {
 }
 
 export const start = (session) => {
-  return GetTrustedTypePolicyCount.getTrustedTypePolicyCount(session, undefined)
+  return GetTrustedTypePolicyCount.getTrustedTypePolicyCount(session)
 }
 
 export const stop = (session) => {
-  return GetTrustedTypePolicyCount.getTrustedTypePolicyCount(session, undefined)
+  return GetTrustedTypePolicyCount.getTrustedTypePolicyCount(session)
 }
 
 export const compare = CompareCount.compareCount
