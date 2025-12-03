@@ -2,9 +2,9 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { importHeapSnapshotWorker } from './import-heap-snapshot-worker.ts'
 
-const { loadHeapSnapshot } = await importHeapSnapshotWorker('parts/LoadHeapSnapshot/LoadHeapSnapshot.ts')
+const { loadHeapSnapshot } = await importHeapSnapshotWorker('src/parts/LoadHeapSnapshot/LoadHeapSnapshot.ts')
 const { compareNamedClosureCountFromHeapSnapshot } = await importHeapSnapshotWorker(
-  'parts/CompareNamedClosureCount/CompareNamedClosureCount.ts',
+  'src/parts/CompareNamedClosureCount/CompareNamedClosureCount.ts',
 )
 
 const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
