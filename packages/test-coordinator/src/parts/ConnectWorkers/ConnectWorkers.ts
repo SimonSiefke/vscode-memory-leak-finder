@@ -65,6 +65,9 @@ export const connectWorkers = async (
     inspectSharedProcess,
     inspectExtensions,
     inspectPtyHost,
+    inspectPtyHostPort,
+    inspectSharedProcessPort,
+    inspectExtensionsPort,
   )
 
   return {

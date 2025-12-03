@@ -189,6 +189,9 @@ export const runTestsWithCallback = async ({
           inspectExtensions,
           inspectPtyHost,
           enableExtensions,
+          inspectPtyHostPort,
+          inspectSharedProcessPort,
+          inspectExtensionsPort,
         )
         workers = {
           testWorkerRpc: testWorkerRpc || emptyRpc,
