@@ -18,6 +18,20 @@ const testOptimized = async () => {
     console.time('compare')
     const values = await compareNamedClosureCountWithReferencesFromHeapSnapshot2(filePath1, filePath2, scriptMapPath, {
       minCount: 97,
+      excludeOriginalPaths: [
+        'async.ts',
+        'editStack.ts',
+        'event.ts',
+        'files.ts',
+        'functional.ts',
+        'lazy.ts',
+        'lifecycle.ts',
+        'linkedList.ts',
+        'numbers.ts',
+        'ternarySearchTree.ts',
+        'undoRedoService.ts',
+        'uri.ts',
+      ].map((item) => item.replace('.ts', '.js')),
     })
     console.timeEnd('compare')
     await mkdir(dirname(resultPath), { recursive: true })

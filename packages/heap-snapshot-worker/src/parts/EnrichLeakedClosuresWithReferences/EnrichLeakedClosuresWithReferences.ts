@@ -21,6 +21,7 @@ export const enrichLeakedClosuresWithReferences = async (
   leakedClosures: Record<string, Array<{ nodeIndex: number; nodeName: string; nodeId: number }>>,
   snapshot: Snapshot,
   scriptMapPath?: string,
+  excludeOriginalPaths?: readonly string[],
 ): Promise<Record<string, readonly LeakedClosureWithReferences[]>> => {
   const { nodes, edges, strings, meta } = snapshot
   const { node_fields, edge_fields, node_types, edge_types } = meta
@@ -300,6 +301,29 @@ export const enrichLeakedClosuresWithReferences = async (
       // Keep original key if format doesn't match
       result[locationKey] = closures
     }
+  }
+
+  // Step 11: Filter out excluded paths
+  if (excludeOriginalPaths && excludeOriginalPaths.length > 0) {
+    const filteredResult: Record<string, readonly LeakedClosureWithReferences[]> = {}
+    for (const [locationKey, closures] of Object.entries(result)) {
+      // Parse location key to get the URL part (format: "url:line:column" or "scriptId:line:column")
+      const parts = locationKey.split(':')
+      if (parts.length >= 3) {
+        const url = parts.slice(0, -2).join(':') // Get all parts except the last two (line and column)
+        // Check if URL matches any excluded path
+        const shouldExclude = excludeOriginalPaths.some((excludedPath) => {
+          return url.includes(excludedPath)
+        })
+        if (!shouldExclude) {
+          filteredResult[locationKey] = closures
+        }
+      } else {
+        // Keep keys that don't match the expected format
+        filteredResult[locationKey] = closures
+      }
+    }
+    return filteredResult
   }
 
   return result

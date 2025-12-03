@@ -75,6 +75,7 @@ const getLeaked = (oldNodeMap, newNodeMap) => {
 
 export interface CompareClosuresOptions {
   readonly minCount?: number
+  readonly excludeOriginalPaths?: readonly string[]
 }
 
 export const compareNamedClosureCountFromHeapSnapshotInternal2 = async (
