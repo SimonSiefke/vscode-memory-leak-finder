@@ -31,6 +31,12 @@ export const enrichLeakedClosuresWithReferences = (
 
   const edgeTypeNames = edge_types[0] || []
 
+  // Excluded node names that should be filtered out
+  const excludedNodeNames = new Set<string>(['(object elements)'])
+
+  // Excluded edge patterns: edgeType + sourceNodeName combinations
+  const excludedEdgePatterns = new Set<string>(['internal:system / Context'])
+
   // Step 1: Collect all leaked node byte offsets into a Set for O(1) lookup
   const leakedNodeByteOffsets = new Set<number>()
   for (const closures of Object.values(leakedClosures)) {
@@ -122,7 +128,20 @@ export const enrichLeakedClosuresWithReferences = (
           }
         }
 
-        // Step 5: Add the reference to the appropriate array
+        // Step 5: Filter out unimportant edges/references
+        // Filter out excluded node names
+        if (sourceNodeName && excludedNodeNames.has(sourceNodeName)) {
+          continue
+        }
+        // Filter out excluded edge patterns (edgeType:sourceNodeName)
+        if (sourceNodeName) {
+          const edgePattern = `${edgeTypeName}:${sourceNodeName}`
+          if (excludedEdgePatterns.has(edgePattern)) {
+            continue
+          }
+        }
+
+        // Step 6: Add the reference to the appropriate array
         const references = referencesMap.get(edgeToNode)
         if (references) {
           references.push({
@@ -139,7 +158,7 @@ export const enrichLeakedClosuresWithReferences = (
     currentEdgeOffset += edgeCount
   }
 
-  // Step 6: Map the closures to include their references
+  // Step 7: Map the closures to include their references
   const enriched: Record<string, LeakedClosureWithReferences[]> = {}
   for (const [locationKey, closures] of Object.entries(leakedClosures)) {
     enriched[locationKey] = closures.map((closure) => {
