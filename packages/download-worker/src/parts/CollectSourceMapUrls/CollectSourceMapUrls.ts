@@ -1,4 +1,4 @@
-import { glob, readFile } from 'node:fs/promises'
+import { glob } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import * as ExtractSourceMapUrls from '../ExtractSourceMapUrls/ExtractSourceMapUrls.ts'
 
