@@ -5,7 +5,7 @@ const filePath1 = join(import.meta.dirname, '../../../.vscode-heapsnapshots/0.he
 
 const testWeakRefCount = async (): Promise<void> => {
   const { getMessagePortCountFromHeapSnapshot } = await importHeapSnapshotWorker(
-    'parts/GetMessagePortCountFromHeapSnapshot/GetMessagePortCountFromHeapSnapshot.ts'
+    'parts/GetMessagePortCountFromHeapSnapshot/GetMessagePortCountFromHeapSnapshot.ts',
   )
   console.log('Testing MessagePort Count:')
 

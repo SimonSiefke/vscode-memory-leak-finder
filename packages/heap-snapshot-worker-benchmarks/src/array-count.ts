@@ -10,9 +10,7 @@ const testOptimized = async (): Promise<void> => {
   // console.log(`\n=== Testing Optimized Named Function Count for: ${filePath} ===`)
 
   try {
-    const { compareHeapsnapshotArrays2 } = await importHeapSnapshotWorker(
-      'parts/CompareHeapsnapshotArrays2/CompareHeapsnapshotArrays2.ts'
-    )
+    const { compareHeapsnapshotArrays2 } = await importHeapSnapshotWorker('parts/CompareHeapsnapshotArrays2/CompareHeapsnapshotArrays2.ts')
     console.time('compare')
     const values = await compareHeapsnapshotArrays2(filePath1, filePath2)
     console.timeEnd('compare')

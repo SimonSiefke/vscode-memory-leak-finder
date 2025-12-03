@@ -5,7 +5,7 @@ const filePath1 = join(import.meta.dirname, '../../../.vscode-heapsnapshots/0.he
 
 const testNamedMapCount = async (): Promise<void> => {
   const { getNamedMapCountFromHeapSnapshot } = await importHeapSnapshotWorker(
-    'parts/GetNamedMapCountFromHeapSnapshot/GetNamedMapCountFromHeapSnapshot.ts'
+    'parts/GetNamedMapCountFromHeapSnapshot/GetNamedMapCountFromHeapSnapshot.ts',
   )
   console.log('Testing Named Map Count:')
 

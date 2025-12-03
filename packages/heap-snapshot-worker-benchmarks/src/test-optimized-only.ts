@@ -11,7 +11,7 @@ const testOptimized = async (): Promise<void> => {
 
   try {
     const { compareHeapSnapshotFunctions } = await importHeapSnapshotWorker(
-      'parts/CompareHeapSnapshotsFunctions/CompareHeapSnapshotsFunctions.ts'
+      'parts/CompareHeapSnapshotsFunctions/CompareHeapSnapshotsFunctions.ts',
     )
     await compareHeapSnapshotFunctions(filePath1, filePath2)
 

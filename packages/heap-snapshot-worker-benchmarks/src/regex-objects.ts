@@ -10,7 +10,7 @@ const testOptimized = async (): Promise<void> => {
 
   try {
     const { getRegexpObjectsFromHeapSnapshot } = await importHeapSnapshotWorker(
-      'parts/GetRegexpObjectsFromHeapSnapshot/GetRegexpObjectsFromHeapSnapshot.ts'
+      'parts/GetRegexpObjectsFromHeapSnapshot/GetRegexpObjectsFromHeapSnapshot.ts',
     )
     const count = await getRegexpObjectsFromHeapSnapshot(filePath1)
     console.log({ count: count })

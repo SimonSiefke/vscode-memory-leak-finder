@@ -5,7 +5,7 @@ const filePath1 = join(import.meta.dirname, '../../../.vscode-heapsnapshots/0.he
 
 const testTextDecoderCount = async (): Promise<void> => {
   const { getTextDecoderCountFromHeapSnapshot } = await importHeapSnapshotWorker(
-    'parts/GetTextDecoderCountFromHeapSnapshot/GetTextDecoderCountFromHeapSnapshot.ts'
+    'parts/GetTextDecoderCountFromHeapSnapshot/GetTextDecoderCountFromHeapSnapshot.ts',
   )
   console.log('Testing TextDecoder Count:')
 

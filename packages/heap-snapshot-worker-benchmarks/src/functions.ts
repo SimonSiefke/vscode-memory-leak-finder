@@ -8,7 +8,7 @@ const resultPath = join(import.meta.dirname, '../../heap-snapshot-worker/.tmp', 
 
 const testFunctionCount = async (): Promise<void> => {
   const { compareHeapSnapshotFunctions2 } = await importHeapSnapshotWorker(
-    'parts/CompareHeapSnapshotsFunctions2/CompareHeapSnapshotsFunctions2.ts'
+    'parts/CompareHeapSnapshotsFunctions2/CompareHeapSnapshotsFunctions2.ts',
   )
   console.log('Testing Function Count:')
   const count = await compareHeapSnapshotFunctions2(filePath1, filePath2, {

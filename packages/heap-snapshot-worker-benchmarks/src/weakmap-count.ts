@@ -5,7 +5,7 @@ const filePath1 = join(import.meta.dirname, '../../../.vscode-heapsnapshots/0.he
 
 const testWeakMapCount = async (): Promise<void> => {
   const { getWeakMapCountFromHeapSnapshot } = await importHeapSnapshotWorker(
-    'parts/GetWeakMapCountFromHeapSnapshot/GetWeakMapCountFromHeapSnapshot.ts'
+    'parts/GetWeakMapCountFromHeapSnapshot/GetWeakMapCountFromHeapSnapshot.ts',
   )
   console.log('Testing WeakMap Count:')
 

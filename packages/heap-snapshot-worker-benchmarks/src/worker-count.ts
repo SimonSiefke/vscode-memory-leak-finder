@@ -8,7 +8,7 @@ const testWorkerCount = async (): Promise<void> => {
 
   try {
     const { getWorkerCountFromHeapSnapshot } = await importHeapSnapshotWorker(
-      'parts/GetWorkerCountFromHeapSnapshot/GetWorkerCountFromHeapSnapshot.ts'
+      'parts/GetWorkerCountFromHeapSnapshot/GetWorkerCountFromHeapSnapshot.ts',
     )
     const count = await getWorkerCountFromHeapSnapshot(filePath1)
     console.log({ count })

@@ -5,7 +5,7 @@ const filePath1 = join(import.meta.dirname, '../../../.vscode-heapsnapshots/0.he
 
 const testPromiseCount = async (): Promise<void> => {
   const { getPromiseCountFromHeapSnapshot } = await importHeapSnapshotWorker(
-    'parts/GetPromiseCountFromHeapSnapshot/GetPromiseCountFromHeapSnapshot.ts'
+    'parts/GetPromiseCountFromHeapSnapshot/GetPromiseCountFromHeapSnapshot.ts',
   )
   console.log('Testing Promise Count:')
 

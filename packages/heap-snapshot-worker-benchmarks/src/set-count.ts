@@ -4,9 +4,7 @@ import { importHeapSnapshotWorker } from './import-heap-snapshot-worker.ts'
 const filePath1 = join(import.meta.dirname, '../../../.vscode-heapsnapshots/0.heapsnapshot')
 
 const testSetCount = async (): Promise<void> => {
-  const { getSetCountFromHeapSnapshot } = await importHeapSnapshotWorker(
-    'parts/GetSetCountFromHeapSnapshot/GetSetCountFromHeapSnapshot.ts'
-  )
+  const { getSetCountFromHeapSnapshot } = await importHeapSnapshotWorker('parts/GetSetCountFromHeapSnapshot/GetSetCountFromHeapSnapshot.ts')
   console.log('Testing Set Count:')
 
   try {

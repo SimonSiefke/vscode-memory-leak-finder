@@ -3,10 +3,7 @@ import { importHeapSnapshotWorker } from './import-heap-snapshot-worker.ts'
 import { dirname, join } from 'path'
 
 async function testGetObjectsWithProperties(): Promise<void> {
-  const [
-    { getAddedObjectsWithPropertiesInternalAst },
-    { prepareHeapSnapshot },
-  ] = await Promise.all([
+  const [{ getAddedObjectsWithPropertiesInternalAst }, { prepareHeapSnapshot }] = await Promise.all([
     importHeapSnapshotWorker('parts/GetAddedObjectsWithPropertiesInternalAst/GetAddedObjectsWithPropertiesInternalAst.ts'),
     importHeapSnapshotWorker('parts/PrepareHeapSnapshot/PrepareHeapSnapshot.ts'),
   ])

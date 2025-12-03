@@ -5,7 +5,7 @@ const filePath1 = join(import.meta.dirname, '../../../.vscode-heapsnapshots/0.he
 
 const testV8EventListenerCount = async (): Promise<void> => {
   const { getV8EventListenerCountFromHeapSnapshot } = await importHeapSnapshotWorker(
-    'parts/GetV8EventListenerCountFromHeapSnapshot/GetV8EventListenerCountFromHeapSnapshot.ts'
+    'parts/GetV8EventListenerCountFromHeapSnapshot/GetV8EventListenerCountFromHeapSnapshot.ts',
   )
   console.log('Testing V8EventListener Count:')
 

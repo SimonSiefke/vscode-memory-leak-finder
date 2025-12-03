@@ -8,7 +8,7 @@ const testOptimized = async (): Promise<void> => {
 
   try {
     const { getMediaQueryListCountFromHeapSnapshot } = await importHeapSnapshotWorker(
-      'parts/GetMediaQueryListCountFromHeapSnapshot/GetMediaQueryListCountFromHeapSnapshot.ts'
+      'parts/GetMediaQueryListCountFromHeapSnapshot/GetMediaQueryListCountFromHeapSnapshot.ts',
     )
     const count: number = await getMediaQueryListCountFromHeapSnapshot(filePath1)
     console.log({ count })

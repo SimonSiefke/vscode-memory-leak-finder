@@ -10,7 +10,7 @@ const testOptimized = async (): Promise<void> => {
 
   try {
     const { parseHeapSnapshotStringsCount } = await importHeapSnapshotWorker(
-      'parts/ParseHeapSnapshotStringsCount/ParseHeapSnapshotStringsCount.ts'
+      'parts/ParseHeapSnapshotStringsCount/ParseHeapSnapshotStringsCount.ts',
     )
     const count = await parseHeapSnapshotStringsCount(filePath1)
     console.log({ count })

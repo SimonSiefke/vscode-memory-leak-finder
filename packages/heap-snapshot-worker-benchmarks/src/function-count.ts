@@ -8,7 +8,7 @@ const testFunctionCount = async (): Promise<void> => {
 
   try {
     const { getFunctionCountFromHeapSnapshot } = await importHeapSnapshotWorker(
-      'parts/GetFunctionCountFromHeapSnapshot/GetFunctionCountFromHeapSnapshot.ts'
+      'parts/GetFunctionCountFromHeapSnapshot/GetFunctionCountFromHeapSnapshot.ts',
     )
     const count = await getFunctionCountFromHeapSnapshot(filePath1)
     console.log({ count })

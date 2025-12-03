@@ -10,7 +10,7 @@ const testOptimized = async (): Promise<void> => {
 
   try {
     const { getBigintObjectsFromHeapSnapshot } = await importHeapSnapshotWorker(
-      'parts/GetBigintObjectsFromHeapSnapshot/GetBigintObjectsFromHeapSnapshot.ts'
+      'parts/GetBigintObjectsFromHeapSnapshot/GetBigintObjectsFromHeapSnapshot.ts',
     )
     const values = await getBigintObjectsFromHeapSnapshot(filePath1)
     console.log(JSON.stringify(values, null, 2))

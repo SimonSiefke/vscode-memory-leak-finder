@@ -10,7 +10,7 @@ const testOptimized = async (): Promise<void> => {
 
   try {
     const { getArrayBufferCountFromHeapSnapshot } = await importHeapSnapshotWorker(
-      'parts/GetArrayBufferCountFromHeapSnapshot/GetArrayBufferCountFromHeapSnapshot.ts'
+      'parts/GetArrayBufferCountFromHeapSnapshot/GetArrayBufferCountFromHeapSnapshot.ts',
     )
     const count = await getArrayBufferCountFromHeapSnapshot(filePath1)
     console.log({ count })
