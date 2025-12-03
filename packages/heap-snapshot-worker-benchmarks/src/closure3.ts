@@ -31,6 +31,7 @@ const testOptimized = async () => {
         'ternarySearchTree.ts',
         'undoRedoService.ts',
         'uri.ts',
+        'debugName.ts',
       ].map((item) => item.replace('.ts', '.js')),
     })
     console.timeEnd('compare')
