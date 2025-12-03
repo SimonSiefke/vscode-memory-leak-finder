@@ -15,6 +15,7 @@ export const loadSourceMaps = async (sourceMapUrls: readonly string[]): Promise<
   const httpsUrls = sourceMapUrls.filter(isHttpsUrl)
   for (const url of httpsUrls) {
     try {
+      console.log(`loading ${url}`)
       const hash = hashUrl(url)
       await LoadSourceMap.loadSourceMap(url, hash)
     } catch (error) {
