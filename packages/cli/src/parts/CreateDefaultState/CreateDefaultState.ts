@@ -35,4 +35,7 @@ export const createDefaultState = (): StdinDataState => ({
   inspectSharedProcess: false,
   measureNode: false,
   enableExtensions: false,
+  inspectPtyHostPort: 5877,
+  inspectSharedProcessPort: 5879,
+  inspectExtensionsPort: 5870,
 })
