@@ -81,6 +81,7 @@ export const downloadAndBuildVscodeFromCommit = async (
   }
 
   if (needsInstall) {
+    process.versions.node
     Logger.log(`[repository] Installing dependencies for commit ${commitHash}...`)
     const nodeModulesHash = await computeVscodeNodeModulesCacheKey(repoPathWithCommitHash)
     const cacheExists = await FileSystemWorker.pathExists(Path.join(nodeModulesCacheDir, nodeModulesHash))
