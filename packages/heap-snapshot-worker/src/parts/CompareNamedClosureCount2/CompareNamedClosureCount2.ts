@@ -22,7 +22,7 @@ const getMatchingNodes = (snapshot: Snapshot, keyMap: any): readonly any[] => {
 
   // TODO get the nodes whose location index matches the index
 
-  const matchingNodes: any[] = []
+  const matchingNodeMap = Object.create(null)
 
   for (let i = 0; i < locations.length; i += itemsPerLocation) {
     const scriptId = locations[i + scriptIdOffset]
@@ -30,17 +30,18 @@ const getMatchingNodes = (snapshot: Snapshot, keyMap: any): readonly any[] => {
     const columnIndex = locations[i + columnOffset]
     const key = getLocationKey(scriptId, lineIndex, columnIndex)
     if (key in keyMap) {
+      matchingNodeMap[key] ||= []
       // this one is leaked, get the node
       const nodeIndex = locations[i + objectIndexOffset]
       const nodeNameIndex = nodes[nodeIndex + nodeNameOffset]
       const nodeName = strings[nodeNameIndex] || 'anonymous'
-      matchingNodes.push({
+      matchingNodeMap[key].push({
         nodeIndex,
         nodeName,
       })
     }
   }
-  return matchingNodes
+  return matchingNodeMap
 }
 
 export const compareNamedClosureCountFromHeapSnapshot2 = async (pathA: string, pathB: string): Promise<any[]> => {
@@ -64,11 +65,13 @@ export const compareNamedClosureCountFromHeapSnapshot2 = async (pathA: string, p
   const oldMatchingNodes = getMatchingNodes(snapshotA, keyMap)
   const newMatchingNodes = getMatchingNodes(snapshotB, keyMap)
 
+  console.log({ oldMatchingNodes, newMatchingNodes })
+
   // TODO now that we have indices of leaked locations
   // we need to loop over all nodes, check which nodes are of type closure
   // and whose location matches the index in indexmap (locations)
 
-  console.log({ oldMatchingNodes, newMatchingNodes })
+  // console.log({ oldMatchingNodes: oldMatchingNodes.length, newMatchingNodes: newMatchingNodes.length })
 
   return []
 }
