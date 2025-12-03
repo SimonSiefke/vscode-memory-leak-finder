@@ -28,6 +28,7 @@ export interface CompareResult {
 
 interface UniqueLocationWithDelta extends UniqueLocation {
   readonly delta: number
+  readonly oldIndex: number
 }
 
 export const getNewItems = (map1: UniqueLocationMap, map2: UniqueLocationMap, minCount: number): readonly UniqueLocationWithDelta[] => {
@@ -37,7 +38,7 @@ export const getNewItems = (map1: UniqueLocationMap, map2: UniqueLocationMap, mi
     const newItem = map2[key]
     const delta = newItem.count - oldItem.count
     if (delta >= minCount) {
-      newitems.push({ ...newItem, delta })
+      newitems.push({ ...newItem, delta, oldIndex: oldItem.index })
     }
   }
   return newitems

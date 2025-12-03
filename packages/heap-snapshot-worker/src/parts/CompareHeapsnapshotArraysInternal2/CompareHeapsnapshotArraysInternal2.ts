@@ -140,9 +140,7 @@ const getSortedCounts = (
       const column = locations[locIndex + locationOffsets.columnOffset]
       const script = scriptMap[scriptId]
       // Store location key with URL if available
-      const locationKey = script?.url
-        ? `${script.url}:${line}:${column}`
-        : getLocationKey(scriptId, line, column)
+      const locationKey = script?.url ? `${script.url}:${line}:${column}` : getLocationKey(scriptId, line, column)
       locationMap.set(objectIndex, locationKey)
     }
 
@@ -263,11 +261,7 @@ const getSortedCounts = (
             // Also propagate closure references to other objects (for next depth level)
             // Only add if it's an object type (not array, string, closure, etc.)
             const targetTypeIndex = nodes[objectEdgeToNode + typeFieldIndex]
-            if (
-              targetTypeIndex === nodeTypeObject &&
-              targetTypeIndex !== nodeTypeClosure &&
-              !objectToClosureMap.has(targetNodeIndex)
-            ) {
+            if (targetTypeIndex === nodeTypeObject && targetTypeIndex !== nodeTypeClosure && !objectToClosureMap.has(targetNodeIndex)) {
               objectToClosureMap.set(targetNodeIndex, new Set(closureIds))
               objectsToProcess.push([targetNodeIndex, closureIds])
             }

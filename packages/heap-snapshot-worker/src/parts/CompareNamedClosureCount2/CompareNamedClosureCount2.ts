@@ -1,6 +1,9 @@
 import { getNewItems } from '../CompareHeapSnapshotsFunctionsInternal2/CompareHeapSnapshotsFunctionsInternal2.ts'
+import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
+import { getLocationKey } from '../GetLocationKey/GetLocationKey.ts'
 import { getUniqueLocationMap2 } from '../GetUniqueLocationMap2/GetUniqueLocationMap2.ts'
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
+import { Snapshot } from '../Snapshot/Snapshot.ts'
 
 const createIndexMap = (indices) => {
   const map = Object.create(null)
@@ -8,6 +11,36 @@ const createIndexMap = (indices) => {
     map[index] = true
   }
   return map
+}
+
+const getMatchingNodes = (snapshot: Snapshot, locationIndices: any, indexMap: any): readonly any[] => {
+  const { itemsPerLocation, scriptIdOffset, lineOffset, columnOffset, objectIndexOffset } = getLocationFieldOffsets(
+    snapshot.meta.location_fields,
+  )
+  const { nodes, locations, strings } = snapshot
+  const nodeNameOffset = snapshot.meta.node_fields.indexOf('name')
+
+  // TODO get the nodes whose location index matches the index
+
+  const matchingNodes: any[] = []
+
+  for (let i = 0; i < locations.length; i += itemsPerLocation) {
+    const scriptId = locations[i + scriptIdOffset]
+    const lineIndex = locations[i + lineOffset]
+    const columnIndex = locations[i + columnOffset]
+    const key = getLocationKey(scriptId, lineIndex, columnIndex)
+    if (key in indexMap) {
+      // this one is leaked, get the node
+      const nodeIndex = locations[i + objectIndexOffset]
+      const nodeNameIndex = nodes[nodeIndex + nodeNameOffset]
+      const nodeName = strings[nodeNameIndex] || 'anonymous'
+      matchingNodes.push({
+        nodeIndex,
+        nodeName,
+      })
+    }
+  }
+  return matchingNodes
 }
 
 export const compareNamedClosureCountFromHeapSnapshot2 = async (pathA: string, pathB: string): Promise<any[]> => {
@@ -26,14 +59,18 @@ export const compareNamedClosureCountFromHeapSnapshot2 = async (pathA: string, p
   const map1 = getUniqueLocationMap2(snapshotA)
   const map2 = getUniqueLocationMap2(snapshotB)
   const newItems = getNewItems(map1, map2, minCount)
-  const indices = newItems.map((item) => item.index)
-  const indexMap = createIndexMap(indices)
+  const oldIndices = newItems.map((item) => item.oldIndex)
+  const oldIndexMap = createIndexMap(oldIndices)
+  const newIndices = newItems.map((item) => item.index)
+  const newIndexMap = createIndexMap(newIndices)
+
+  const oldMatchingNodes = getMatchingNodes(snapshotA, oldIndices)
 
   // TODO now that we have indices of leaked locations
   // we need to loop over all nodes, check which nodes are of type closure
   // and whose location matches the index in indexmap (locations)
 
-  console.log({ indexMap })
+  console.log({ oldIndexMap, newIndexMap })
 
   return []
 }

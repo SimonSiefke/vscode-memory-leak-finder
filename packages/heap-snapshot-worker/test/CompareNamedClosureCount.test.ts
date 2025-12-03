@@ -37,19 +37,51 @@ test('should return empty array when no closures leaked', async () => {
     // to_node is byte offset: node index * ITEMS_PER_NODE
     // Edges must be ordered by source node: all edges from node 0, then node 1, etc.
     nodes: [
-      5, 0, 0, 50, 1, 0, 0, // Closure 1 (node 0) - type=closure(5), id=0, edge_count=1
-      3, 0, 1, 30, 2, 0, 0, // Context 1 (node 1) - type=object(3), id=1, edge_count=2
-      5, 0, 2, 50, 1, 0, 0, // Closure 2 (node 2) - type=closure(5), id=2, edge_count=1
-      3, 0, 3, 30, 1, 0, 0, // Context 2 (node 3) - type=object(3), id=3, edge_count=1
+      5,
+      0,
+      0,
+      50,
+      1,
+      0,
+      0, // Closure 1 (node 0) - type=closure(5), id=0, edge_count=1
+      3,
+      0,
+      1,
+      30,
+      2,
+      0,
+      0, // Context 1 (node 1) - type=object(3), id=1, edge_count=2
+      5,
+      0,
+      2,
+      50,
+      1,
+      0,
+      0, // Closure 2 (node 2) - type=closure(5), id=2, edge_count=1
+      3,
+      0,
+      3,
+      30,
+      1,
+      0,
+      0, // Context 2 (node 3) - type=object(3), id=3, edge_count=1
     ],
     edges: [
       // Node 0 (Closure 1) edges:
-      0, 3, 7, // Closure 1 -> Context 1 via context edge (to node 1 = byte offset 7)
+      0,
+      3,
+      7, // Closure 1 -> Context 1 via context edge (to node 1 = byte offset 7)
       // Node 1 (Context 1) edges:
-      2, 1, 14, // Context 1 -> property edge (to node 2 = byte offset 14)
-      2, 2, 21, // Context 1 -> property edge (to node 3 = byte offset 21)
+      2,
+      1,
+      14, // Context 1 -> property edge (to node 2 = byte offset 14)
+      2,
+      2,
+      21, // Context 1 -> property edge (to node 3 = byte offset 21)
       // Node 2 (Closure 2) edges:
-      0, 3, 21, // Closure 2 -> Context 2 via context edge (to node 3 = byte offset 21)
+      0,
+      3,
+      21, // Closure 2 -> Context 2 via context edge (to node 3 = byte offset 21)
       // Node 3 (Context 2) edges: (none, edge_count=1 but that's the incoming edge)
     ],
     strings: ['', 'prop1', 'prop2', 'context'],
@@ -70,19 +102,51 @@ test('should return empty array when no closures leaked', async () => {
     },
     // Same structure - no leaks
     nodes: [
-      5, 0, 0, 50, 1, 0, 0, // Closure 1 (node 0)
-      3, 0, 1, 30, 2, 0, 0, // Context 1 (node 1)
-      5, 0, 2, 50, 1, 0, 0, // Closure 2 (node 2)
-      3, 0, 3, 30, 1, 0, 0, // Context 2 (node 3)
+      5,
+      0,
+      0,
+      50,
+      1,
+      0,
+      0, // Closure 1 (node 0)
+      3,
+      0,
+      1,
+      30,
+      2,
+      0,
+      0, // Context 1 (node 1)
+      5,
+      0,
+      2,
+      50,
+      1,
+      0,
+      0, // Closure 2 (node 2)
+      3,
+      0,
+      3,
+      30,
+      1,
+      0,
+      0, // Context 2 (node 3)
     ],
     edges: [
       // Node 0 (Closure 1) edges:
-      0, 3, 7, // Closure 1 -> Context 1
+      0,
+      3,
+      7, // Closure 1 -> Context 1
       // Node 1 (Context 1) edges:
-      2, 1, 14, // Context 1 -> property
-      2, 2, 21, // Context 1 -> property
+      2,
+      1,
+      14, // Context 1 -> property
+      2,
+      2,
+      21, // Context 1 -> property
       // Node 2 (Closure 2) edges:
-      0, 3, 21, // Closure 2 -> Context 2
+      0,
+      3,
+      21, // Closure 2 -> Context 2
       // Node 3 (Context 2) edges: (none)
     ],
     strings: ['', 'prop1', 'prop2', 'context'],
@@ -116,21 +180,55 @@ test('should return leaked closures where contextNodeCount increased', async () 
     },
     // Closure 1 -> Context 1 (1 important edge) -> contextNodeCount = 1
     nodes: [
-      5, 0, 0, 50, 1, 0, 0, // Closure 1 (node 0) - edge_count=1
-      3, 0, 1, 30, 1, 0, 0, // Context 1 (node 1) - edge_count=1
-      5, 0, 2, 50, 1, 0, 0, // Closure 2 (node 2) - edge_count=1
-      3, 0, 3, 30, 2, 0, 0, // Context 2 (node 3) - edge_count=2
+      5,
+      0,
+      0,
+      50,
+      1,
+      0,
+      0, // Closure 1 (node 0) - edge_count=1
+      3,
+      0,
+      1,
+      30,
+      1,
+      0,
+      0, // Context 1 (node 1) - edge_count=1
+      5,
+      0,
+      2,
+      50,
+      1,
+      0,
+      0, // Closure 2 (node 2) - edge_count=1
+      3,
+      0,
+      3,
+      30,
+      2,
+      0,
+      0, // Context 2 (node 3) - edge_count=2
     ],
     edges: [
       // Node 0 (Closure 1) edges:
-      0, 3, 7, // Closure 1 -> Context 1
+      0,
+      3,
+      7, // Closure 1 -> Context 1
       // Node 1 (Context 1) edges:
-      2, 1, 0, // Context 1 -> property edge (prop1, to node 0)
+      2,
+      1,
+      0, // Context 1 -> property edge (prop1, to node 0)
       // Node 2 (Closure 2) edges:
-      0, 3, 21, // Closure 2 -> Context 2
+      0,
+      3,
+      21, // Closure 2 -> Context 2
       // Node 3 (Context 2) edges:
-      2, 1, 14, // Context 2 -> property edge (prop1, to node 2)
-      2, 2, 0, // Context 2 -> property edge (prop2, to node 0)
+      2,
+      1,
+      14, // Context 2 -> property edge (prop1, to node 2)
+      2,
+      2,
+      0, // Context 2 -> property edge (prop2, to node 0)
     ],
     strings: ['', 'prop1', 'prop2', 'context'],
     locations: [],
@@ -151,22 +249,58 @@ test('should return leaked closures where contextNodeCount increased', async () 
     // Closure 1 -> Context 1 (now has 2 important edges) -> contextNodeCount = 2 (LEAKED!)
     // Closure 2 -> Context 2 (still 2 edges) -> contextNodeCount = 2 (no leak)
     nodes: [
-      5, 0, 0, 50, 1, 0, 0, // Closure 1 (node 0) - edge_count=1
-      3, 0, 1, 30, 2, 0, 0, // Context 1 (node 1) - now edge_count=2 (NEW edge added)
-      5, 0, 2, 50, 1, 0, 0, // Closure 2 (node 2) - edge_count=1
-      3, 0, 3, 30, 2, 0, 0, // Context 2 (node 3) - still edge_count=2
+      5,
+      0,
+      0,
+      50,
+      1,
+      0,
+      0, // Closure 1 (node 0) - edge_count=1
+      3,
+      0,
+      1,
+      30,
+      2,
+      0,
+      0, // Context 1 (node 1) - now edge_count=2 (NEW edge added)
+      5,
+      0,
+      2,
+      50,
+      1,
+      0,
+      0, // Closure 2 (node 2) - edge_count=1
+      3,
+      0,
+      3,
+      30,
+      2,
+      0,
+      0, // Context 2 (node 3) - still edge_count=2
     ],
     edges: [
       // Node 0 (Closure 1) edges:
-      0, 3, 7, // Closure 1 -> Context 1
+      0,
+      3,
+      7, // Closure 1 -> Context 1
       // Node 1 (Context 1) edges:
-      2, 1, 0, // Context 1 -> property edge (prop1, to node 0)
-      2, 2, 14, // Context 1 -> property edge (prop2, to node 2) - NEW!
+      2,
+      1,
+      0, // Context 1 -> property edge (prop1, to node 0)
+      2,
+      2,
+      14, // Context 1 -> property edge (prop2, to node 2) - NEW!
       // Node 2 (Closure 2) edges:
-      0, 3, 21, // Closure 2 -> Context 2
+      0,
+      3,
+      21, // Closure 2 -> Context 2
       // Node 3 (Context 2) edges:
-      2, 1, 14, // Context 2 -> property edge (prop1, to node 2)
-      2, 2, 0, // Context 2 -> property edge (prop2, to node 0)
+      2,
+      1,
+      14, // Context 2 -> property edge (prop1, to node 2)
+      2,
+      2,
+      0, // Context 2 -> property edge (prop2, to node 0)
     ],
     strings: ['', 'prop1', 'prop2', 'context'],
     locations: [],

@@ -89,8 +89,7 @@ export const getNamedArrayCountFromHeapSnapshot = async (
     nodeTypes,
   } = computeHeapSnapshotIndices(node_types, node_fields, edge_types, edge_fields)
 
-  const { itemsPerLocation, objectIndexOffset, scriptIdOffset, lineOffset, columnOffset } =
-    getLocationFieldOffsets(location_fields)
+  const { itemsPerLocation, objectIndexOffset, scriptIdOffset, lineOffset, columnOffset } = getLocationFieldOffsets(location_fields)
 
   // Map: closure node ID -> location info
   const closureLocationMap = new Map<number, LocationInfo>()
@@ -240,8 +239,7 @@ export const getNamedArrayCountFromHeapSnapshot = async (
                   const location = closureLocationMap.get(sourceNodeId)
                   if (location) {
                     const exists = closureLocations.some(
-                      (loc) =>
-                        loc.scriptId === location.scriptId && loc.line === location.line && loc.column === location.column,
+                      (loc) => loc.scriptId === location.scriptId && loc.line === location.line && loc.column === location.column,
                     )
                     if (!exists) {
                       closureLocations.push(location)
