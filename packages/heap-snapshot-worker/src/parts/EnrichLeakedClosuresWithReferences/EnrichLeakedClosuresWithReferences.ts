@@ -23,6 +23,7 @@ export const enrichLeakedClosuresWithReferences = (
   const enriched: Record<string, LeakedClosureWithReferences[]> = {}
   const ITEMS_PER_NODE = snapshot.meta.node_fields.length
 
+  console.log({ leakedClosures })
   for (const [locationKey, closures] of Object.entries(leakedClosures)) {
     enriched[locationKey] = closures.map((closure) => {
       // nodeIndex is a byte offset, convert to node index

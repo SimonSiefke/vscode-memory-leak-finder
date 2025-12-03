@@ -6,21 +6,12 @@ const getThreshold = (context: any): number => {
   return threshold
 }
 
-export const compareClosuresWithReferences = async (
-  beforePath: string,
-  after: { heapSnapshotPath: string },
-  context: any,
-) => {
+export const compareClosuresWithReferences = async (beforePath: string, after: { heapSnapshotPath: string }, context: any) => {
   const afterPath = after.heapSnapshotPath
   const minCount = getThreshold(context)
   const options = {
     minCount,
   }
-  const result = await HeapSnapshotWorker.invoke(
-    'HeapSnapshot.compareNamedClosureCountWithReferences2',
-    beforePath,
-    afterPath,
-    options,
-  )
+  const result = await HeapSnapshotWorker.invoke('HeapSnapshot.compareNamedClosureCountWithReferences2', beforePath, afterPath, options)
   return result
 }
