@@ -4,12 +4,8 @@ import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 
 export interface LeakedClosureWithReferences {
-  readonly nodeIndex: number
   readonly nodeName: string
-  readonly nodeId: number
   readonly references: readonly {
-    readonly sourceNodeIndex: number
-    readonly sourceNodeId: number
     readonly sourceNodeName: string | null
     readonly sourceNodeType: string | null
     readonly edgeType: string
@@ -48,8 +44,6 @@ export const enrichLeakedClosuresWithReferences = (
   const referencesMap = new Map<
     number,
     Array<{
-      readonly sourceNodeIndex: number
-      readonly sourceNodeId: number
       readonly sourceNodeName: string | null
       readonly sourceNodeType: string | null
       readonly edgeType: string
@@ -132,8 +126,6 @@ export const enrichLeakedClosuresWithReferences = (
         const references = referencesMap.get(edgeToNode)
         if (references) {
           references.push({
-            sourceNodeIndex: sourceNodeIndex / ITEMS_PER_NODE,
-            sourceNodeId,
             sourceNodeName,
             sourceNodeType,
             edgeType: edgeTypeName,
@@ -163,9 +155,7 @@ export const enrichLeakedClosuresWithReferences = (
         return a.path.localeCompare(b.path)
       })
       return {
-        nodeIndex: closure.nodeIndex,
         nodeName: closure.nodeName,
-        nodeId: closure.nodeId,
         references: sortedReferences,
       }
     })

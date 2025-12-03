@@ -7,12 +7,8 @@ import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 export interface LeakedClosureWithReferences {
-  readonly nodeIndex: number
   readonly nodeName: string
-  readonly nodeId: number
   readonly references: readonly {
-    readonly sourceNodeIndex: number
-    readonly sourceNodeId: number
     readonly sourceNodeName: string | null
     readonly sourceNodeType: string | null
     readonly edgeType: string
