@@ -109,13 +109,14 @@ test('should detect single leaked closure at one location', async () => {
   }
 
   const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  const key = '1:10:5'
-  expect(result).toHaveProperty(key)
-  expect(result[key]).toHaveLength(1)
-  expect(result[key][0]).toEqual({
-    nodeIndex: 7,
-    nodeName: 'anonymous',
-    nodeId: 2,
+  expect(result).toEqual({
+    '1:10:5': [
+      {
+        nodeIndex: 7,
+        nodeName: 'anonymous',
+        nodeId: 2,
+      },
+    ],
   })
 })
 
@@ -382,13 +383,14 @@ test('should detect closure with named function', async () => {
   }
 
   const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  const key = '1:10:5'
-  expect(result).toHaveProperty(key)
-  expect(result[key]).toHaveLength(1)
-  expect(result[key][0]).toEqual({
-    nodeIndex: 14,
-    nodeName: 'myFunction',
-    nodeId: 2,
+  expect(result).toEqual({
+    '1:10:5': [
+      {
+        nodeIndex: 7,
+        nodeName: 'myFunction',
+        nodeId: 2,
+      },
+    ],
   })
 })
 
@@ -446,13 +448,14 @@ test('should handle closures with different names at same location', async () =>
   }
 
   const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  const key = '1:10:5'
-  expect(result).toHaveProperty(key)
-  expect(result[key]).toHaveLength(1)
-  expect(result[key][0]).toEqual({
-    nodeIndex: 14,
-    nodeName: 'funcB',
-    nodeId: 2,
+  expect(result).toEqual({
+    '1:10:5': [
+      {
+        nodeIndex: 7,
+        nodeName: 'funcB',
+        nodeId: 2,
+      },
+    ],
   })
 })
 
@@ -508,13 +511,14 @@ test('should handle empty locations in snapshotA', async () => {
   }
 
   const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  const key = '1:10:5'
-  expect(result).toHaveProperty(key)
-  expect(result[key]).toHaveLength(1)
-  expect(result[key][0]).toEqual({
-    nodeIndex: 7,
-    nodeName: 'anonymous',
-    nodeId: 2,
+  expect(result).toEqual({
+    '1:10:5': [
+      {
+        nodeIndex: 7,
+        nodeName: 'anonymous',
+        nodeId: 2,
+      },
+    ],
   })
 })
 
@@ -980,13 +984,14 @@ test('should handle node name fallback to anonymous when string index is invalid
   }
 
   const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  const key = '1:10:5'
-  expect(result).toHaveProperty(key)
-  expect(result[key]).toHaveLength(1)
-  expect(result[key][0]).toEqual({
-    nodeIndex: 7,
-    nodeName: 'anonymous',
-    nodeId: 2,
+  expect(result).toEqual({
+    '1:10:5': [
+      {
+        nodeIndex: 7,
+        nodeName: 'anonymous',
+        nodeId: 2,
+      },
+    ],
   })
 })
 
@@ -1041,12 +1046,7 @@ test('should handle count increase but no new unique nodes', async () => {
   }
 
   const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  const key = '1:10:5'
-  if (key in result) {
-    expect(result[key]).toHaveLength(0)
-  } else {
-    expect(result).toEqual({})
-  }
+  expect(result).toEqual({})
 })
 
 test('should handle empty snapshots', async () => {
