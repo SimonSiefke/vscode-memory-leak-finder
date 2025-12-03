@@ -86,8 +86,8 @@ test('should detect single leaked closure at one location', async () => {
       0, 3, 21, // Closure 2 -> Context 2
     ],
     [
-      0, 1, 10, 5, // location 0: same closure (count=1)
-      2, 1, 10, 5, // location 1: NEW closure at same location (count=2, increased)
+      0, 1, 10, 5, // location 0: same closure (count=1), object_index=0 (byte offset)
+      14, 1, 10, 5, // location 1: NEW closure at same location (count=2, increased), object_index=14 (byte offset for node 2)
     ],
     ['', 'anonymous'],
   )
@@ -133,9 +133,9 @@ test('should detect multiple leaked closures at same location', async () => {
       0, 3, 35, // Closure 3 -> Context 3
     ],
     [
-      0, 1, 10, 5, // location 0: same closure
-      2, 1, 10, 5, // location 1: NEW closure 1 at same location
-      4, 1, 10, 5, // location 2: NEW closure 2 at same location
+      0, 1, 10, 5, // location 0: same closure, object_index=0
+      14, 1, 10, 5, // location 1: NEW closure 1 at same location, object_index=14 (node 2)
+      28, 1, 10, 5, // location 2: NEW closure 2 at same location, object_index=28 (node 4)
     ],
     ['', 'anonymous'],
   )
@@ -145,12 +145,12 @@ test('should detect multiple leaked closures at same location', async () => {
   expect(result).toHaveProperty(key)
   expect(result[key]).toHaveLength(2)
   expect(result[key][0]).toMatchObject({
-    nodeIndex: 2,
+    nodeIndex: 14,
     nodeName: 'anonymous',
     nodeId: 2,
   })
   expect(result[key][1]).toMatchObject({
-    nodeIndex: 4,
+    nodeIndex: 28,
     nodeName: 'anonymous',
     nodeId: 4,
   })
@@ -186,9 +186,9 @@ test('should detect leaked closures at different locations', async () => {
       0, 3, 35, // Closure 3 -> Context 3
     ],
     [
-      0, 1, 10, 5, // location 0: same closure
-      2, 1, 20, 10, // location 1: NEW closure at different location
-      4, 1, 30, 15, // location 2: NEW closure at different location
+      0, 1, 10, 5, // location 0: same closure, object_index=0
+      14, 1, 20, 10, // location 1: NEW closure at different location, object_index=14 (node 2)
+      28, 1, 30, 15, // location 2: NEW closure at different location, object_index=28 (node 4)
     ],
     ['', 'anonymous'],
   )
@@ -200,12 +200,12 @@ test('should detect leaked closures at different locations', async () => {
   expect(result['1:20:10']).toHaveLength(1)
   expect(result['1:30:15']).toHaveLength(1)
   expect(result['1:20:10'][0]).toMatchObject({
-    nodeIndex: 2,
+    nodeIndex: 14,
     nodeName: 'anonymous',
     nodeId: 2,
   })
   expect(result['1:30:15'][0]).toMatchObject({
-    nodeIndex: 4,
+    nodeIndex: 28,
     nodeName: 'anonymous',
     nodeId: 4,
   })
@@ -277,8 +277,8 @@ test('should detect closure with named function', async () => {
       0, 3, 21, // Closure 2 -> Context 2
     ],
     [
-      0, 1, 10, 5, // location 0: same closure
-      2, 1, 10, 5, // location 1: NEW closure at same location
+      0, 1, 10, 5, // location 0: same closure, object_index=0
+      14, 1, 10, 5, // location 1: NEW closure at same location, object_index=14 (node 2)
     ],
     ['', 'myFunction', 'anonymous'],
   )
@@ -288,7 +288,7 @@ test('should detect closure with named function', async () => {
   expect(result).toHaveProperty(key)
   expect(result[key]).toHaveLength(1)
   expect(result[key][0]).toMatchObject({
-    nodeIndex: 2,
+    nodeIndex: 14,
     nodeName: 'myFunction',
     nodeId: 2,
   })
@@ -321,8 +321,8 @@ test('should handle closures with different names at same location', async () =>
       0, 3, 21, // Closure 2 -> Context 2
     ],
     [
-      0, 1, 10, 5, // location 0: same closure
-      2, 1, 10, 5, // location 1: NEW closure at same location
+      0, 1, 10, 5, // location 0: same closure, object_index=0
+      14, 1, 10, 5, // location 1: NEW closure at same location, object_index=14 (node 2)
     ],
     ['', 'funcA', 'funcB'],
   )
@@ -332,7 +332,7 @@ test('should handle closures with different names at same location', async () =>
   expect(result).toHaveProperty(key)
   expect(result[key]).toHaveLength(1)
   expect(result[key][0]).toMatchObject({
-    nodeIndex: 2,
+    nodeIndex: 14,
     nodeName: 'funcB',
     nodeId: 2,
   })
@@ -363,8 +363,8 @@ test('should handle empty locations in snapshotA', async () => {
       0, 3, 21, // Closure 2 -> Context 2
     ],
     [
-      0, 1, 10, 5, // location 0
-      2, 1, 10, 5, // location 1: NEW closure
+      0, 1, 10, 5, // location 0, object_index=0
+      14, 1, 10, 5, // location 1: NEW closure, object_index=14 (node 2)
     ],
     ['', 'anonymous'],
   )
@@ -441,9 +441,9 @@ test('should handle multiple leaks with same name but different IDs', async () =
       0, 3, 35, // Closure 3 -> Context 3
     ],
     [
-      0, 1, 10, 5, // location 0: same closure
-      2, 1, 10, 5, // location 1: NEW closure 1
-      4, 1, 10, 5, // location 2: NEW closure 2
+      0, 1, 10, 5, // location 0: same closure, object_index=0
+      14, 1, 10, 5, // location 1: NEW closure 1, object_index=14 (node 2)
+      28, 1, 10, 5, // location 2: NEW closure 2, object_index=28 (node 4)
     ],
     ['', 'myFunc'],
   )
@@ -483,8 +483,8 @@ test('should handle closures at different script IDs', async () => {
       0, 3, 21, // Closure 2 -> Context 2
     ],
     [
-      0, 1, 10, 5, // location 0: script_id=1, same
-      2, 2, 10, 5, // location 1: script_id=2, NEW
+      0, 1, 10, 5, // location 0: script_id=1, same, object_index=0
+      14, 2, 10, 5, // location 1: script_id=2, NEW, object_index=14 (node 2)
     ],
     ['', 'anonymous'],
   )
@@ -526,8 +526,8 @@ test('should handle closures at different lines', async () => {
       0, 3, 21, // Closure 2 -> Context 2
     ],
     [
-      0, 1, 10, 5, // location 0: line=10, same
-      2, 1, 20, 5, // location 1: line=20, NEW
+      0, 1, 10, 5, // location 0: line=10, same, object_index=0
+      14, 1, 20, 5, // location 1: line=20, NEW, object_index=14 (node 2)
     ],
     ['', 'anonymous'],
   )
@@ -569,8 +569,8 @@ test('should handle closures at different columns', async () => {
       0, 3, 21, // Closure 2 -> Context 2
     ],
     [
-      0, 1, 10, 5, // location 0: column=5, same
-      2, 1, 10, 10, // location 1: column=10, NEW
+      0, 1, 10, 5, // location 0: column=5, same, object_index=0
+      14, 1, 10, 10, // location 1: column=10, NEW, object_index=14 (node 2)
     ],
     ['', 'anonymous'],
   )
@@ -625,11 +625,11 @@ test('should handle complex scenario with multiple locations and leaks', async (
       0, 3, 63, // Closure 5 -> Context 5
     ],
     [
-      0, 1, 10, 5, // location 0: funcA, same
-      2, 1, 20, 10, // location 1: funcB, same
-      4, 1, 10, 5, // location 2: funcA, NEW leak
-      6, 1, 20, 10, // location 3: funcB, NEW leak
-      8, 1, 30, 15, // location 4: funcA, NEW leak at new location
+      0, 1, 10, 5, // location 0: funcA, same, object_index=0
+      14, 1, 20, 10, // location 1: funcB, same, object_index=14 (node 2)
+      28, 1, 10, 5, // location 2: funcA, NEW leak, object_index=28 (node 4)
+      42, 1, 20, 10, // location 3: funcB, NEW leak, object_index=42 (node 6)
+      56, 1, 30, 15, // location 4: funcA, NEW leak at new location, object_index=56 (node 8)
     ],
     ['', 'funcA', 'funcB'],
   )
@@ -679,8 +679,8 @@ test('should handle node name fallback to anonymous when string index is invalid
       0, 3, 21, // Closure 2 -> Context 2
     ],
     [
-      0, 1, 10, 5, // location 0: same closure
-      2, 1, 10, 5, // location 1: NEW closure
+      0, 1, 10, 5, // location 0: same closure, object_index=0
+      14, 1, 10, 5, // location 1: NEW closure, object_index=14 (node 2)
     ],
     ['', 'anonymous'],
   )
@@ -690,7 +690,7 @@ test('should handle node name fallback to anonymous when string index is invalid
   expect(result).toHaveProperty(key)
   expect(result[key]).toHaveLength(1)
   expect(result[key][0]).toMatchObject({
-    nodeIndex: 2,
+    nodeIndex: 14,
     nodeName: 'anonymous',
     nodeId: 2,
   })
