@@ -30,7 +30,7 @@ interface UniqueLocationWithDelta extends UniqueLocation {
   readonly delta: number
 }
 
-const getNewItems = (map1: UniqueLocationMap, map2: UniqueLocationMap, minCount: number): readonly UniqueLocationWithDelta[] => {
+export const getNewItems = (map1: UniqueLocationMap, map2: UniqueLocationMap, minCount: number): readonly UniqueLocationWithDelta[] => {
   const newitems: UniqueLocationWithDelta[] = []
   for (const key of Object.keys(map2)) {
     const oldItem = map1[key] || emptyItem
