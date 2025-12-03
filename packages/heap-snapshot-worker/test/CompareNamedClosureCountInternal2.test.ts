@@ -62,8 +62,8 @@ test('should return empty object when no closures leaked', async () => {
 test('should detect single leaked closure at one location', async () => {
   const snapshotA = createSnapshot(
     [
-      5, 0, 0, 50, 1, 0, 0, // Closure 1 (node 0)
-      3, 0, 1, 30, 1, 0, 0, // Context 1 (node 1)
+      5, 0, 0, 50, 1, 0, 0, // Closure 1 (node 0, id=0)
+      3, 0, 1, 30, 1, 0, 0, // Context 1 (node 1, id=1)
     ],
     [
       0, 3, 7, // Closure 1 -> Context 1
@@ -76,18 +76,18 @@ test('should detect single leaked closure at one location', async () => {
 
   const snapshotB = createSnapshot(
     [
-      5, 0, 0, 50, 1, 0, 0, // Closure 1 (node 0) - same
-      5, 0, 2, 50, 1, 0, 0, // Closure 2 (node 2) - NEW LEAK
-      3, 0, 1, 30, 1, 0, 0, // Context 1 (node 1)
-      3, 0, 3, 30, 1, 0, 0, // Context 2 (node 3)
+      5, 0, 0, 50, 1, 0, 0, // Closure 1 (node 0, id=0) - same
+      5, 0, 2, 50, 1, 0, 0, // Closure 2 (node 2, id=2) - NEW LEAK
+      3, 0, 1, 30, 1, 0, 0, // Context 1 (node 1, id=1)
+      3, 0, 3, 30, 1, 0, 0, // Context 2 (node 3, id=3)
     ],
     [
       0, 3, 7, // Closure 1 -> Context 1
       0, 3, 21, // Closure 2 -> Context 2
     ],
     [
-      0, 1, 10, 5, // location 0: same closure
-      2, 1, 10, 5, // location 1: NEW closure at same location
+      0, 1, 10, 5, // location 0: same closure (count=1)
+      2, 1, 10, 5, // location 1: NEW closure at same location (count=2, increased)
     ],
     ['', 'anonymous'],
   )
@@ -775,4 +775,3 @@ test('should handle snapshotB with no new locations', async () => {
   const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
   expect(result).toEqual({})
 })
-
