@@ -1,15 +1,19 @@
-import { writeFile } from 'fs/promises'
-import { getObjectsWithPropertiesInternal } from '../src/parts/GetObjectsWithPropertiesInternal/GetObjectsWithPropertiesInternal.ts'
-import { prepareHeapSnapshot } from '../src/parts/PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
-import * as Timing from '../src/parts/Timing/Timing.ts'
+// import { writeFile } from 'fs/promises'
+import { importHeapSnapshotWorker } from './import-heap-snapshot-worker.ts'
 
-async function testGetObjectsWithProperties() {
+async function testGetObjectsWithProperties(): Promise<void> {
+  const [{ getObjectsWithPropertiesInternal }, { prepareHeapSnapshot }, Timing] = await Promise.all([
+    importHeapSnapshotWorker('parts/GetObjectsWithPropertiesInternal/GetObjectsWithPropertiesInternal.ts'),
+    importHeapSnapshotWorker('parts/PrepareHeapSnapshot/PrepareHeapSnapshot.ts'),
+    importHeapSnapshotWorker('parts/Timing/Timing.ts'),
+  ])
+
   console.log('Testing getObjectsWithProperties function...')
 
   // Load the actual heap snapshot file
   // const heapSnapshotPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/abc2.heapsnapshot'
   const heapSnapshotPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/0.heapsnapshot'
-  const resultPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-memory-leak-finder-results/objects-with-properties.json'
+  // const resultPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-memory-leak-finder-results/objects-with-properties.json'
   const property = 'dispose'
   const depth = 1
 

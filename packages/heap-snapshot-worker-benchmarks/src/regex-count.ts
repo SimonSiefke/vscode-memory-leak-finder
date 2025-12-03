@@ -1,22 +1,19 @@
-import { mkdir, writeFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
-import { compareHeapsnapshotArrays2 } from '../src/parts/CompareHeapsnapshotArrays2/CompareHeapsnapshotArrays2.ts'
+import { join } from 'node:path'
+import { importHeapSnapshotWorker } from './import-heap-snapshot-worker.ts'
 
-const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
-const filePath2 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/1.json')
-const resultPath = join(import.meta.dirname, '../snapshots', 'result.json')
+const filePath1 = join(import.meta.dirname, '../../../.vscode-heapsnapshots/0.json')
 
-const testOptimized = async () => {
+const testOptimized = async (): Promise<void> => {
   // console.log(`\n=== Testing Optimized Named Function Count for: ${filePath} ===`)
 
-  try {
-    console.time('compare')
-    const values = await compareHeapsnapshotArrays2(filePath1, filePath2)
-    console.timeEnd('compare')
-    await mkdir(dirname(resultPath), { recursive: true })
-    await writeFile(resultPath, JSON.stringify(values, null, 2) + '\n')
+  console.log('Testing Optimized Approach (getNamedFunctionCountFromHeapSnapshot2):')
 
-    console.log(JSON.stringify(values, null, 2))
+  try {
+    const { getRegexCountFromHeapSnapshot } = await importHeapSnapshotWorker(
+      'parts/GetRegexCountFromHeapSnapshot/GetRegexCountFromHeapSnapshot.ts',
+    )
+    const count = await getRegexCountFromHeapSnapshot(filePath1)
+    console.log({ count })
 
     // console.log(`  Duration: ${duration.toFixed(2)}ms`)
     // console.log(`  Functions found: ${result.length / 5}`)
@@ -37,15 +34,15 @@ const testOptimized = async () => {
 
     // return { duration, count: result.length }
   } catch (error) {
-    console.error('Error:', error.message)
+    console.error('Error:', (error as Error).message)
   }
 }
 
-const main = async () => {
+const main = async (): Promise<void> => {
   try {
     await testOptimized()
   } catch (error) {
-    console.error('Test failed:', error.message)
+    console.error('Test failed:', (error as Error).message)
     process.exit(1)
   }
 }

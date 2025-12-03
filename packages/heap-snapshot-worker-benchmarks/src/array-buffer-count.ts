@@ -1,16 +1,19 @@
 import { join } from 'node:path'
-import { compareHeapSnapshotFunctions } from '../src/parts/CompareHeapSnapshotsFunctions/CompareHeapSnapshotsFunctions.js'
+import { importHeapSnapshotWorker } from './import-heap-snapshot-worker.ts'
 
-const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
-const filePath2 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/1.json')
+const filePath1 = join(import.meta.dirname, '../../../.vscode-heapsnapshots/0.json')
 
-const testOptimized = async () => {
+const testOptimized = async (): Promise<void> => {
   // console.log(`\n=== Testing Optimized Named Function Count for: ${filePath} ===`)
 
   console.log('Testing Optimized Approach (getNamedFunctionCountFromHeapSnapshot2):')
 
   try {
-    await compareHeapSnapshotFunctions(filePath1, filePath2)
+    const { getArrayBufferCountFromHeapSnapshot } = await importHeapSnapshotWorker(
+      'parts/GetArrayBufferCountFromHeapSnapshot/GetArrayBufferCountFromHeapSnapshot.ts',
+    )
+    const count = await getArrayBufferCountFromHeapSnapshot(filePath1)
+    console.log({ count })
 
     // console.log(`  Duration: ${duration.toFixed(2)}ms`)
     // console.log(`  Functions found: ${result.length / 5}`)
@@ -31,19 +34,17 @@ const testOptimized = async () => {
 
     // return { duration, count: result.length }
   } catch (error) {
-    console.error('Error:', error.message)
+    console.error('Error:', (error as Error).message)
   }
 }
 
-const main = async () => {
+const main = async (): Promise<void> => {
   try {
     await testOptimized()
   } catch (error) {
-    console.error('Test failed:', error.message)
+    console.error('Test failed:', (error as Error).message)
     process.exit(1)
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main()
-}
+main()

@@ -1,16 +1,20 @@
 import { mkdir, writeFile } from 'fs/promises'
-import { getAddedObjectsWithPropertiesInternalAst } from '../src/parts/GetAddedObjectsWithPropertiesInternalAst/GetAddedObjectsWithPropertiesInternalAst.ts'
-import { prepareHeapSnapshot } from '../src/parts/PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
+import { importHeapSnapshotWorker } from './import-heap-snapshot-worker.ts'
 import { dirname, join } from 'path'
 
-async function testGetObjectsWithProperties() {
+async function testGetObjectsWithProperties(): Promise<void> {
+  const [{ getAddedObjectsWithPropertiesInternalAst }, { prepareHeapSnapshot }] = await Promise.all([
+    importHeapSnapshotWorker('parts/GetAddedObjectsWithPropertiesInternalAst/GetAddedObjectsWithPropertiesInternalAst.ts'),
+    importHeapSnapshotWorker('parts/PrepareHeapSnapshot/PrepareHeapSnapshot.ts'),
+  ])
+
   console.log('Testing getObjectsWithProperties function...')
 
   // Load the actual heap snapshot file
   // const heapSnapshotPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/abc2.heapsnapshot'
   const beforePath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/0.json'
   const afterPath = '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-heapsnapshots/1.json'
-  const resultPath = join(import.meta.dirname, '..', '.tmp', 'difference.json')
+  const resultPath = join(import.meta.dirname, '../../heap-snapshot-worker/.tmp', 'difference.json')
   const property = 'dispose'
   const depth = 1
   const includeProperties = false

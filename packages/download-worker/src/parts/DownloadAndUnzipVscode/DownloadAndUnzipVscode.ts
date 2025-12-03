@@ -3,6 +3,7 @@ import { resolve } from 'node:path'
 import * as AdjustVscodeProductJson from '../AdjustVscodeProductJson/AdjustVscodeProductJson.ts'
 import * as CollectSourceMapUrls from '../CollectSourceMapUrls/CollectSourceMapUrls.ts'
 import * as Env from '../Env/Env.ts'
+import * as GetVscodeRuntimePath from '../GetVscodeRuntimePath/GetVscodeRuntimePath.ts'
 import * as JsonFile from '../JsonFile/JsonFile.ts'
 import * as LoadSourceMaps from '../LoadSourceMaps/LoadSourceMaps.ts'
 import * as RemoveUnusedFiles from '../RemoveUnusedFiles/RemoveUnusedFiles.ts'
@@ -24,6 +25,10 @@ export const downloadAndUnzipVscode = async (vscodeVersion: string): Promise<str
       console.warn('Warning: Using VSCODE_PATH environment variable is deprecated. Please use --vscode-path CLI flag instead.')
       return Env.env.VSCODE_PATH
     }
+    const cachedPath = await GetVscodeRuntimePath.getVscodeRuntimePath(vscodeVersion)
+    if (cachedPath) {
+      return cachedPath
+    }
     const { downloadAndUnzipVSCode } = await import('@vscode/test-electron')
     const path = await downloadAndUnzipVSCode({
       version: vscodeVersion,
@@ -37,6 +42,7 @@ export const downloadAndUnzipVscode = async (vscodeVersion: string): Promise<str
     const sourceMapUrls = await CollectSourceMapUrls.collectSourceMapUrls(path)
     console.log({ sourceMapUrls })
     await LoadSourceMaps.loadSourceMaps(sourceMapUrls)
+    await GetVscodeRuntimePath.setVscodeRuntimePath(vscodeVersion, path)
     return path
   } catch (error) {
     throw new VError(error, `Failed to download vscode ${vscodeVersion}`)
