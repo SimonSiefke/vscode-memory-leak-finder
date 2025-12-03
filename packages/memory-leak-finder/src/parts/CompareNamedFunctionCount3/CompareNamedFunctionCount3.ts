@@ -22,6 +22,7 @@ export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: 
       'numbers.ts',
       'ternarySearchTree.ts',
       'undoRedoService.ts',
+      'debugName.ts',
       'uri.ts',
     ],
   }

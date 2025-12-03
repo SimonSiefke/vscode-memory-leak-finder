@@ -308,9 +308,11 @@ export const enrichLeakedClosuresWithReferences = async (
     const filteredResult: Record<string, readonly LeakedClosureWithReferences[]> = {}
     for (const [locationKey, closures] of Object.entries(result)) {
       // Parse location key to get the URL part (format: "url:line:column" or "scriptId:line:column")
-      const parts = locationKey.split(':')
-      if (parts.length >= 3) {
-        const url = parts.slice(0, -2).join(':') // Get all parts except the last two (line and column)
+      // Find the last two colons to separate URL from line and column
+      const lastColonIndex = locationKey.lastIndexOf(':')
+      const secondLastColonIndex = locationKey.lastIndexOf(':', lastColonIndex - 1)
+      if (secondLastColonIndex !== -1) {
+        const url = locationKey.slice(0, secondLastColonIndex)
         // Check if URL matches any excluded path
         const shouldExclude = excludeOriginalPaths.some((excludedPath) => {
           return url.includes(excludedPath)
