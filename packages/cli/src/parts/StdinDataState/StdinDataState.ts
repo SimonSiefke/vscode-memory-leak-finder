@@ -67,13 +67,13 @@ let state: StdinDataState = {
   isWindows: false,
   exitCode: 0,
   continueValue: '',
-    inspectSharedProcess: false,
-    inspectExtensions: false,
-    inspectPtyHost: false,
-    enableExtensions: false,
-    inspectPtyHostPort: 5877,
-    inspectSharedProcessPort: 5879,
-    inspectExtensionsPort: 5870,
+  inspectSharedProcess: false,
+  inspectExtensions: false,
+  inspectPtyHost: false,
+  enableExtensions: false,
+  inspectPtyHostPort: 5877,
+  inspectSharedProcessPort: 5879,
+  inspectExtensionsPort: 5870,
 }
 
 export const setState = (newState): void => {
