@@ -29,6 +29,10 @@ export const compareNamedClosureCountFromHeapSnapshot2 = async (pathA: string, p
   const indices = newItems.map((item) => item.index)
   const indexMap = createIndexMap(indices)
 
+  // TODO now that we have indices of leaked locations
+  // we need to loop over all nodes, check which nodes are of type closure
+  // and whose location matches the index in indexmap (locations)
+
   console.log({ indexMap })
 
   return []
