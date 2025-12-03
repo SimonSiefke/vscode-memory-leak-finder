@@ -28,7 +28,7 @@ export const compareEventTargets = (before, after) => {
     beforeMap[item.description] ||= 0
     beforeMap[item.description] += item.count
   }
-  const leaked = []
+  const leaked: any[] = []
   for (const item of pretty.after) {
     const beforeCount = beforeMap[item.description] || 0
     const afterCount = item.count

@@ -21,7 +21,7 @@ export const combineEventListenersWithSourceMapResults = (eventListeners, map, c
   Assert.array(eventListeners)
   Assert.object(map)
   Assert.object(cleanPositionMap)
-  const newEventListeners = []
+  const newEventListeners: any[] = []
   for (const eventListener of eventListeners) {
     const { sourceMapUrl, line, column } = GetSourceMapUrl.getSourceMapUrl(eventListener)
     const index = getIndex(map[sourceMapUrl], line, column)

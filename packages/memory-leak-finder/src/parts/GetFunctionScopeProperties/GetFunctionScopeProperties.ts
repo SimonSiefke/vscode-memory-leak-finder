@@ -7,7 +7,7 @@ export const getFunctionScopeProperties = async (session, objectGroup) => {
   Assert.object(session)
   Assert.string(objectGroup)
   const objectIds = await GetAllFunctions.getAllFunctions(session, objectGroup)
-  const promises = []
+  const promises: Promise<any>[] = []
   for (const objectId of objectIds) {
     promises.push(GetFunctionScopeProperty.getFunctionScopeProperty(session, objectGroup, objectId))
   }

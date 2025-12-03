@@ -24,7 +24,7 @@ const getAdded = (before, after) => {
     beforeCounts[hash] = beforeMap[hash]
   }
   const afterCounts: Record<string, number> = Object.create(null)
-  const leaked = []
+  const leaked: any[] = []
   for (const item of after) {
     const hash = hashPromise(item)
     afterCounts[hash] ||= 0
@@ -80,11 +80,11 @@ const mergeOriginal = (items, cleanInstances) => {
   for (const instance of cleanInstances) {
     reverseMap[instance.originalIndex] = instance
   }
-  const merged = []
+  const merged: any[] = []
   let originalIndex = 0
   for (const item of items) {
     originalIndex++
-    const originalStack = []
+    const originalStack: any[] = []
     for (let i = 0; i < item.stackTrace.length; i++) {
       originalIndex++
       const instance = reverseMap[originalIndex]
@@ -123,7 +123,8 @@ export const comparePromisesWithStackTrace = async (before, after, context = {})
   const cleanLeaked = clean(sorted)
   let filtered = cleanLeaked
   if (context && typeof context === 'object' && 'runs' in context && typeof context.runs === 'number') {
-    filtered = cleanLeaked.filter((item) => item.delta >= context.runs)
+    const runs = context.runs as number
+    filtered = cleanLeaked.filter((item) => item.delta >= runs)
   }
   if (scriptMap) {
     const stackTraces = filtered.map((item) => item.stackTrace)

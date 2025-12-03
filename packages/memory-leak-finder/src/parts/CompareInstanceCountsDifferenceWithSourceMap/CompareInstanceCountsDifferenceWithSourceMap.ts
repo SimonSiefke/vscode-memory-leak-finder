@@ -10,7 +10,7 @@ export const compareInstanceCountsDifferenceWithSourceMap = async (before, after
     const key = getKey(element)
     beforeMap[key] = element.count
   }
-  const leaked = []
+  const leaked: any[] = []
   for (const element of after) {
     const key = getKey(element)
     const beforeCount = beforeMap[key] || 0

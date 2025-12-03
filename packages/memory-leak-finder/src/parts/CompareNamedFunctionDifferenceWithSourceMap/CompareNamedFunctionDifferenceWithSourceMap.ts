@@ -14,7 +14,7 @@ const prepareBaseDifferenceItem = (baseDifferenceItem) => {
 }
 
 const prepareBaseDifference = (baseDifference) => {
-  const prepared = []
+  const prepared: any[] = []
   for (const item of baseDifference) {
     prepared.push(prepareBaseDifferenceItem(item))
   }
