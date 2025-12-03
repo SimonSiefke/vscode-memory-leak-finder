@@ -1,5 +1,6 @@
 import * as Ide from '../Ide/Ide.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
+import * as VsCodeVersion from '../VsCodeVersion/VsCodeVersion.ts'
 
 const parseArgvNumber = (argv, name) => {
   const index = argv.indexOf(name)
@@ -42,6 +43,7 @@ export const parseArgv = (argv) => {
     runMode: TestRunMode.Auto,
     ide: Ide.VsCode,
     ideVersion: '', // TODO
+    vscodeVersion: VsCodeVersion.vscodeVersion,
     vscodePath: '',
     commit: '',
     setupOnly: false,
@@ -102,6 +104,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--ide=cursor')) {
     options.ide = Ide.Cursor
+  }
+  if (argv.includes('--vscode-version')) {
+    options.vscodeVersion = parseArgvString(argv, '--vscode-version')
   }
   if (argv.includes('--vscode-path')) {
     options.vscodePath = parseArgvString(argv, '--vscode-path')

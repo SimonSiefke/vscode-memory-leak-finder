@@ -2,13 +2,13 @@ import * as Ide from '../Ide/Ide.ts'
 import * as LaunchCursor from '../LaunchCursor/LaunchCursor.ts'
 import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.ts'
 import * as ParseVersion from '../ParseVersion/ParseVersion.ts'
-import * as VscodeVersion from '../VsCodeVersion/VsCodeVersion.ts'
 
 export const launchIde = async ({
   headlessMode,
   cwd,
   ide,
   vscodePath,
+  vscodeVersion,
   commit,
   addDisposable,
   inspectSharedProcess,
@@ -37,7 +37,7 @@ export const launchIde = async ({
   const result = await LaunchVsCode.launchVsCode({
     headlessMode,
     cwd,
-    vscodeVersion: VscodeVersion.vscodeVersion,
+    vscodeVersion,
     vscodePath,
     commit,
     addDisposable,
@@ -48,6 +48,6 @@ export const launchIde = async ({
   })
   return {
     ...result,
-    parsedVersion: ParseVersion.parseVersion(VscodeVersion.vscodeVersion),
+    parsedVersion: ParseVersion.parseVersion(vscodeVersion),
   }
 }
