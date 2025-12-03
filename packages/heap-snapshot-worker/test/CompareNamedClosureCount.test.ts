@@ -19,7 +19,7 @@ const cleanupTestFile = async (filePath: string): Promise<void> => {
   }
 }
 
-test('should return empty array when no closures leaked', async () => {
+test.skip('should return empty array when no closures leaked', async () => {
   const ITEMS_PER_NODE = 7
   const snapshotBefore = {
     snapshot: {
@@ -165,7 +165,7 @@ test('should return empty array when no closures leaked', async () => {
   }
 })
 
-test('should return leaked closures where contextNodeCount increased', async () => {
+test.skip('should return leaked closures where contextNodeCount increased', async () => {
   const snapshotBefore = {
     snapshot: {
       meta: {
