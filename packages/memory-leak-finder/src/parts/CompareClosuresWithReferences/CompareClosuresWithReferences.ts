@@ -9,4 +9,3 @@ export const compareClosuresWithReferences = async (beforePath: string, after: {
   )
   return result
 }
-

@@ -35,9 +35,13 @@ export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) 
   }
 }
 
-export const isLeak = (leaked) => {
-  return leaked.length > 0
+export const isLeak = (leaked: Record<string, readonly any[]>) => {
+  for (const closures of Object.values(leaked)) {
+    if (closures.length > 0) {
+      return true
+    }
+  }
+  return false
 }
 
 export { compareClosuresWithReferences as compare } from '../CompareClosuresWithReferences/CompareClosuresWithReferences.ts'
-
