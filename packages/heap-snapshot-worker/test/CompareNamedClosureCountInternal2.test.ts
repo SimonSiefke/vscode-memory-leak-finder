@@ -177,18 +177,19 @@ test('should detect multiple leaked closures at same location', async () => {
   }
 
   const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  const key = '1:10:5'
-  expect(result).toHaveProperty(key)
-  expect(result[key]).toHaveLength(2)
-  expect(result[key][0]).toEqual({
-    nodeIndex: 7,
-    nodeName: 'anonymous',
-    nodeId: 2,
-  })
-  expect(result[key][1]).toEqual({
-    nodeIndex: 14,
-    nodeName: 'anonymous',
-    nodeId: 4,
+  expect(result).toEqual({
+    '1:10:5': [
+      {
+        nodeIndex: 7,
+        nodeName: 'anonymous',
+        nodeId: 2,
+      },
+      {
+        nodeIndex: 14,
+        nodeName: 'anonymous',
+        nodeId: 4,
+      },
+    ],
   })
 })
 
@@ -250,20 +251,21 @@ test('should detect leaked closures at different locations', async () => {
   }
 
   const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(Object.keys(result)).toHaveLength(2)
-  expect(result).toHaveProperty('1:20:10')
-  expect(result).toHaveProperty('1:30:15')
-  expect(result['1:20:10']).toHaveLength(1)
-  expect(result['1:30:15']).toHaveLength(1)
-  expect(result['1:20:10'][0]).toEqual({
-    nodeIndex: 7,
-    nodeName: 'anonymous',
-    nodeId: 2,
-  })
-  expect(result['1:30:15'][0]).toEqual({
-    nodeIndex: 14,
-    nodeName: 'anonymous',
-    nodeId: 4,
+  expect(result).toEqual({
+    '1:20:10': [
+      {
+        nodeIndex: 7,
+        nodeName: 'anonymous',
+        nodeId: 2,
+      },
+    ],
+    '1:30:15': [
+      {
+        nodeIndex: 14,
+        nodeName: 'anonymous',
+        nodeId: 4,
+      },
+    ],
   })
 })
 
@@ -625,11 +627,20 @@ test('should handle multiple leaks with same name but different IDs', async () =
   }
 
   const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  const key = '1:10:5'
-  expect(result).toHaveProperty(key)
-  expect(result[key]).toHaveLength(2)
-  const nodeIds = result[key].map((node) => node.nodeId).sort()
-  expect(nodeIds).toEqual([2, 4])
+  expect(result).toEqual({
+    '1:10:5': [
+      {
+        nodeIndex: 7,
+        nodeName: 'myFunc',
+        nodeId: 2,
+      },
+      {
+        nodeIndex: 14,
+        nodeName: 'myFunc',
+        nodeId: 4,
+      },
+    ],
+  })
 })
 
 test('should handle closures at different script IDs', async () => {
@@ -686,12 +697,14 @@ test('should handle closures at different script IDs', async () => {
   }
 
   const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toHaveProperty('2:10:5')
-  expect(result['2:10:5']).toHaveLength(1)
-  expect(result['2:10:5'][0]).toEqual({
-    nodeIndex: 7,
-    nodeName: 'anonymous',
-    nodeId: 2,
+  expect(result).toEqual({
+    '2:10:5': [
+      {
+        nodeIndex: 7,
+        nodeName: 'anonymous',
+        nodeId: 2,
+      },
+    ],
   })
 })
 
@@ -749,12 +762,14 @@ test('should handle closures at different lines', async () => {
   }
 
   const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toHaveProperty('1:20:5')
-  expect(result['1:20:5']).toHaveLength(1)
-  expect(result['1:20:5'][0]).toEqual({
-    nodeIndex: 7,
-    nodeName: 'anonymous',
-    nodeId: 2,
+  expect(result).toEqual({
+    '1:20:5': [
+      {
+        nodeIndex: 7,
+        nodeName: 'anonymous',
+        nodeId: 2,
+      },
+    ],
   })
 })
 
@@ -812,12 +827,14 @@ test('should handle closures at different columns', async () => {
   }
 
   const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toHaveProperty('1:10:10')
-  expect(result['1:10:10']).toHaveLength(1)
-  expect(result['1:10:10'][0]).toEqual({
-    nodeIndex: 7,
-    nodeName: 'anonymous',
-    nodeId: 2,
+  expect(result).toEqual({
+    '1:10:10': [
+      {
+        nodeIndex: 7,
+        nodeName: 'anonymous',
+        nodeId: 2,
+      },
+    ],
   })
 })
 
@@ -883,28 +900,29 @@ test('should handle complex scenario with multiple locations and leaks', async (
     strings: ['', 'funcA', 'funcB'],
     locations: new Uint32Array([
       0, 1, 10, 5, // location 0: funcA, same, object_index=0
-      14, 1, 20, 10, // location 1: funcB, same, object_index=14 (node 2)
-      28, 1, 10, 5, // location 2: funcA, NEW leak, object_index=28 (node 4)
-      42, 1, 20, 10, // location 3: funcB, NEW leak, object_index=42 (node 6)
-      56, 1, 30, 15, // location 4: funcA, NEW leak at new location, object_index=56 (node 8)
+      14, 1, 20, 10, // location 1: funcB, same, object_index=14 (Closure 2)
+      28, 1, 10, 5, // location 2: funcA, NEW leak, object_index=28 (Closure 3)
+      42, 1, 20, 10, // location 3: funcB, NEW leak, object_index=42 (Closure 4)
+      56, 1, 30, 15, // location 4: funcA, NEW leak at new location, object_index=56 (Closure 5)
     ]),
   }
 
   const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(Object.keys(result)).toHaveLength(2)
-  expect(result).toHaveProperty('1:10:5')
-  expect(result).toHaveProperty('1:30:15')
-  expect(result['1:10:5']).toHaveLength(1)
-  expect(result['1:30:15']).toHaveLength(1)
-  expect(result['1:10:5'][0]).toEqual({
-    nodeIndex: 28,
-    nodeName: 'funcA',
-    nodeId: 4,
-  })
-  expect(result['1:30:15'][0]).toEqual({
-    nodeIndex: 56,
-    nodeName: 'funcA',
-    nodeId: 8,
+  expect(result).toEqual({
+    '1:10:5': [
+      {
+        nodeIndex: 28,
+        nodeName: 'funcA',
+        nodeId: 4,
+      },
+    ],
+    '1:30:15': [
+      {
+        nodeIndex: 56,
+        nodeName: 'funcA',
+        nodeId: 8,
+      },
+    ],
   })
 })
 
@@ -957,7 +975,7 @@ test('should handle node name fallback to anonymous when string index is invalid
     strings: ['', 'anonymous'],
     locations: new Uint32Array([
       0, 1, 10, 5, // location 0: same closure, object_index=0
-      14, 1, 10, 5, // location 1: NEW closure, object_index=14 (node 2)
+      7, 1, 10, 5, // location 1: NEW closure, object_index=7 (Closure 2)
     ]),
   }
 
