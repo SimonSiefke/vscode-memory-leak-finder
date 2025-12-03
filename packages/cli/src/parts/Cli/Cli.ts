@@ -45,6 +45,10 @@ export const run = async (platform: string, argv: readonly string[], env: NodeJS
     inspectSharedProcess: options.inspectSharedProcess,
     inspectExtensions: options.inspectExtensions,
     inspectPtyHost: options.inspectPtyHost,
+    enableExtensions: options.enableExtensions,
+    inspectPtyHostPort: options.inspectPtyHostPort,
+    inspectSharedProcessPort: options.inspectSharedProcessPort,
+    inspectExtensionsPort: options.inspectExtensionsPort,
   })
   return InitialStart.initialStart(options)
 }
