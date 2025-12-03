@@ -16,22 +16,13 @@ const testOptimized = async () => {
 
   try {
     console.time('compare')
-<<<<<<< HEAD
-    const values = await compareNamedClosureCountWithReferencesFromHeapSnapshot2(filePath1, filePath2)
-=======
     const values = await compareNamedClosureCountWithReferencesFromHeapSnapshot2(filePath1, filePath2, {
       minCount: 97,
     })
->>>>>>> origin/main
     console.timeEnd('compare')
     await mkdir(dirname(resultPath), { recursive: true })
     await writeFile(resultPath, JSON.stringify(values, null, 2) + '\n')
 
-<<<<<<< HEAD
-    console.log(JSON.stringify(values, null, 2))
-
-=======
->>>>>>> origin/main
     // console.log(`  Duration: ${duration.toFixed(2)}ms`)
     // console.log(`  Functions found: ${result.length / 5}`)
 
