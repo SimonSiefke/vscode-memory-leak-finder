@@ -81,7 +81,7 @@ export const compareNamedClosureCountFromHeapSnapshotInternal2 = async (
   snapshotA: Snapshot,
   snapshotB: Snapshot,
   options: CompareClosuresOptions = {},
-): Promise<any[]> => {
+): Promise<any> => {
   const minCount = options.minCount ?? 1
   const map1 = getUniqueLocationMap2(snapshotA)
   const map2 = getUniqueLocationMap2(snapshotB)
