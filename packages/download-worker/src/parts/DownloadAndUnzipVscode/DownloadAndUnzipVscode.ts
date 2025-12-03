@@ -16,6 +16,8 @@ const getProductJsonPath = (path: string): string => {
   return resolve(path, '..', 'resources', 'app', 'product.json')
 }
 
+const automaticallyDownloadSourceMaps = false
+
 /**
  * @param {string} vscodeVersion
  */
@@ -26,9 +28,9 @@ export const downloadAndUnzipVscode = async (vscodeVersion: string): Promise<str
       return Env.env.VSCODE_PATH
     }
     const cachedPath = await GetVscodeRuntimePath.getVscodeRuntimePath(vscodeVersion)
-    // if (cachedPath) {
-    //   return cachedPath
-    // }
+    if (cachedPath) {
+      return cachedPath
+    }
     const { downloadAndUnzipVSCode } = await import('@vscode/test-electron')
     const path = await downloadAndUnzipVSCode({
       version: vscodeVersion,
@@ -39,9 +41,10 @@ export const downloadAndUnzipVscode = async (vscodeVersion: string): Promise<str
     const newProductJson = AdjustVscodeProductJson.adjustVscodeProductJson(productJson)
     await JsonFile.writeJson(productPath, newProductJson)
     await RemoveUnusedFiles.removeUnusedFiles(path)
-    const sourceMapUrls = await CollectSourceMapUrls.collectSourceMapUrls(path)
-    console.log({ sourceMapUrls })
-    await LoadSourceMaps.loadSourceMaps(sourceMapUrls)
+    if (automaticallyDownloadSourceMaps) {
+      const sourceMapUrls = await CollectSourceMapUrls.collectSourceMapUrls(path)
+      await LoadSourceMaps.loadSourceMaps(sourceMapUrls)
+    }
     await GetVscodeRuntimePath.setVscodeRuntimePath(vscodeVersion, path)
     return path
   } catch (error) {
