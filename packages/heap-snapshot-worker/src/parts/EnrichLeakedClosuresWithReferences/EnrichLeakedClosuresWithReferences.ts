@@ -45,15 +45,18 @@ export const enrichLeakedClosuresWithReferences = (
   }
 
   // Step 2: Create a map from node byte offset to references array
-  const referencesMap = new Map<number, Array<{
-    readonly sourceNodeIndex: number
-    readonly sourceNodeId: number
-    readonly sourceNodeName: string | null
-    readonly sourceNodeType: string | null
-    readonly edgeType: string
-    readonly edgeName: string
-    readonly path: string
-  }>>()
+  const referencesMap = new Map<
+    number,
+    Array<{
+      readonly sourceNodeIndex: number
+      readonly sourceNodeId: number
+      readonly sourceNodeName: string | null
+      readonly sourceNodeType: string | null
+      readonly edgeType: string
+      readonly edgeName: string
+      readonly path: string
+    }>
+  >()
 
   // Initialize empty arrays for all leaked nodes
   for (const byteOffset of leakedNodeByteOffsets) {
@@ -149,11 +152,21 @@ export const enrichLeakedClosuresWithReferences = (
   for (const [locationKey, closures] of Object.entries(leakedClosures)) {
     enriched[locationKey] = closures.map((closure) => {
       const references = referencesMap.get(closure.nodeIndex) || []
+      const sortedReferences = [...references].sort((a, b) => {
+        // Sort by sourceNodeName first
+        const sourceNodeNameA = a.sourceNodeName ?? ''
+        const sourceNodeNameB = b.sourceNodeName ?? ''
+        if (sourceNodeNameA !== sourceNodeNameB) {
+          return sourceNodeNameA.localeCompare(sourceNodeNameB)
+        }
+        // Then sort by path
+        return a.path.localeCompare(b.path)
+      })
       return {
         nodeIndex: closure.nodeIndex,
         nodeName: closure.nodeName,
         nodeId: closure.nodeId,
-        references,
+        references: sortedReferences,
       }
     })
   }

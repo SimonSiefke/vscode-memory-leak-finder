@@ -4,3 +4,4 @@ export interface OriginalPosition {
   readonly column: number | null
   readonly name: string | null
 }
+
