@@ -27,4 +27,7 @@ export interface StartRunningOptions {
   inspectExtensions: boolean
   inspectPtyHost: boolean
   enableExtensions: boolean
+  inspectPtyHostPort: number
+  inspectSharedProcessPort: number
+  inspectExtensionsPort: number
 }

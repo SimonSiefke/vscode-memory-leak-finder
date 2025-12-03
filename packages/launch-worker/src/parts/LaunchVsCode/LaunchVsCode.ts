@@ -28,6 +28,9 @@ export const launchVsCode = async ({
   inspectExtensions,
   inspectPtyHost,
   enableExtensions,
+  inspectPtyHostPort,
+  inspectSharedProcessPort,
+  inspectExtensionsPort,
 }) => {
   try {
     const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
@@ -64,6 +67,9 @@ export const launchVsCode = async ({
       inspectExtensions,
       inspectPtyHost,
       enableExtensions,
+      inspectPtyHostPort,
+      inspectSharedProcessPort,
+      inspectExtensionsPort,
     })
     const env = GetVsCodeEnv.getVsCodeEnv({ runtimeDir, processEnv: process.env })
     const { child } = await LaunchElectron.launchElectron({

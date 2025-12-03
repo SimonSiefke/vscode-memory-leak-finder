@@ -35,6 +35,9 @@ export interface StdinDataState {
   inspectExtensions: boolean
   inspectPtyHost: boolean
   enableExtensions: boolean
+  inspectPtyHostPort: number
+  inspectSharedProcessPort: number
+  inspectExtensionsPort: number
 }
 
 let state: StdinDataState = {
@@ -68,6 +71,9 @@ let state: StdinDataState = {
   inspectExtensions: false,
   inspectPtyHost: false,
   enableExtensions: false,
+  inspectPtyHostPort: 5877,
+  inspectSharedProcessPort: 5879,
+  inspectExtensionsPort: 5870,
 }
 
 export const setState = (newState): void => {
@@ -99,6 +105,10 @@ export const setState = (newState): void => {
     inspectSharedProcess: newState.inspectSharedProcess,
     inspectExtensions: newState.inspectExtensions,
     inspectPtyHost: newState.inspectPtyHost,
+    enableExtensions: newState.enableExtensions,
+    inspectPtyHostPort: newState.inspectPtyHostPort,
+    inspectSharedProcessPort: newState.inspectSharedProcessPort,
+    inspectExtensionsPort: newState.inspectExtensionsPort,
   }
 }
 
