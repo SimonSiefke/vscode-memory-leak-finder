@@ -1,8 +1,10 @@
 import { VError } from '@lvce-editor/verror'
 import { resolve } from 'node:path'
 import * as AdjustVscodeProductJson from '../AdjustVscodeProductJson/AdjustVscodeProductJson.ts'
+import * as CollectSourceMapUrls from '../CollectSourceMapUrls/CollectSourceMapUrls.ts'
 import * as Env from '../Env/Env.ts'
 import * as JsonFile from '../JsonFile/JsonFile.ts'
+import * as LoadSourceMaps from '../LoadSourceMaps/LoadSourceMaps.ts'
 import * as RemoveUnusedFiles from '../RemoveUnusedFiles/RemoveUnusedFiles.ts'
 import * as VscodeTestCachePath from '../VscodeTestCachePath/VscodeTestCachePath.ts'
 
@@ -32,6 +34,9 @@ export const downloadAndUnzipVscode = async (vscodeVersion: string): Promise<str
     const newProductJson = AdjustVscodeProductJson.adjustVscodeProductJson(productJson)
     await JsonFile.writeJson(productPath, newProductJson)
     await RemoveUnusedFiles.removeUnusedFiles(path)
+    const sourceMapUrls = await CollectSourceMapUrls.collectSourceMapUrls(path)
+    console.log({ sourceMapUrls })
+    await LoadSourceMaps.loadSourceMaps(sourceMapUrls)
     return path
   } catch (error) {
     throw new VError(error, `Failed to download vscode ${vscodeVersion}`)
