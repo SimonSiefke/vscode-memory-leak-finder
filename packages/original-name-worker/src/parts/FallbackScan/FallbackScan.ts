@@ -1,7 +1,9 @@
 const LOCATION_UNKNOWN: string = 'unknown'
+const RE_CLASSNAME: RegExp = /^[a-zA-Z\d]+/
+const RE_VAR_ASSIGNMENT: RegExp = /(?:const|let|var)\s+(\w+).*=.*class\s+implements/
+const RE_CLASS_EXTENDS: RegExp = /class\s+extends\s+([A-Za-z\d]+)/
 
 export const fallbackScan = (sourceContent: string, originalLine: number): string => {
-  const RE_CLASSNAME: RegExp = /^[a-zA-Z\d]+/
   const classPrefix: string = 'class '
   const extendsPrefix: string = 'extends'
   const lines: string[] = sourceContent.split('\n')
@@ -25,7 +27,7 @@ export const fallbackScan = (sourceContent: string, originalLine: number): strin
         }
         if (originalClassName === 'implements') {
           // For "class implements", look for variable assignment
-          const varMatch: RegExpMatchArray | null = line.match(/(?:const|let|var)\s+(\w+).*=.*class\s+implements/)
+          const varMatch: RegExpMatchArray | null = line.match(RE_VAR_ASSIGNMENT)
           if (varMatch) {
             return varMatch[1]
           }
@@ -34,7 +36,7 @@ export const fallbackScan = (sourceContent: string, originalLine: number): strin
       }
     }
   }
-  const anyMatch: RegExpMatchArray | null = sourceContent.match(/class\s+extends\s+([A-Za-z\d]+)/)
+  const anyMatch: RegExpMatchArray | null = sourceContent.match(RE_CLASS_EXTENDS)
   if (anyMatch && anyMatch[1]) {
     return `class extends ${anyMatch[1]}`
   }
