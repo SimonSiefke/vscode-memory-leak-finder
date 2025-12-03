@@ -8,7 +8,7 @@ const { compareNamedClosureCountWithReferencesFromHeapSnapshot2 } = await import
 
 const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
 const filePath2 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/1.json')
-// const scriptMapPath = join(import.meta.dirname, ' ../../../../../.vscode-script-maps/1.json')
+const scriptMapPath = join(import.meta.dirname, ' ../../../../../.vscode-script-maps/1.json')
 const resultPath = join(import.meta.dirname, '../snapshots', 'result.json')
 
 const testOptimized = async () => {
@@ -16,7 +16,7 @@ const testOptimized = async () => {
 
   try {
     console.time('compare')
-    const values = await compareNamedClosureCountWithReferencesFromHeapSnapshot2(filePath1, filePath2, {
+    const values = await compareNamedClosureCountWithReferencesFromHeapSnapshot2(filePath1, filePath2, scriptMapPath, {
       minCount: 97,
     })
     console.timeEnd('compare')

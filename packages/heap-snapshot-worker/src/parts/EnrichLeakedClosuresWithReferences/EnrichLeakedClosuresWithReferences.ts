@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
@@ -16,10 +17,11 @@ export interface LeakedClosureWithReferences {
   readonly count: number
 }
 
-export const enrichLeakedClosuresWithReferences = (
+export const enrichLeakedClosuresWithReferences = async (
   leakedClosures: Record<string, Array<{ nodeIndex: number; nodeName: string; nodeId: number }>>,
   snapshot: Snapshot,
-): Record<string, readonly LeakedClosureWithReferences[]> => {
+  scriptMapPath?: string,
+): Promise<Record<string, readonly LeakedClosureWithReferences[]>> => {
   const { nodes, edges, strings, meta } = snapshot
   const { node_fields, edge_fields, node_types, edge_types } = meta
 
@@ -32,6 +34,17 @@ export const enrichLeakedClosuresWithReferences = (
   const edgeToNodeFieldIndex = edge_fields.indexOf('to_node')
 
   const edgeTypeNames = edge_types[0] || []
+
+  // Load script map if provided
+  let scriptMap: Record<string, { url?: string; sourceMapUrl?: string }> = {}
+  if (scriptMapPath) {
+    try {
+      const content = await readFile(scriptMapPath, 'utf8')
+      scriptMap = JSON.parse(content) as Record<string, { url?: string; sourceMapUrl?: string }>
+    } catch {
+      // Ignore if file not found or invalid
+    }
+  }
 
   // Excluded node names that should be filtered out
   const excludedNodeNames = new Set<string>(['(object elements)', 'system / Context', 'system / WeakFixedArray', 'system / WeakCell'])
@@ -265,5 +278,29 @@ export const enrichLeakedClosuresWithReferences = (
     finalEnriched[locationKey] = Array.from(deduplicatedMap.values())
   }
 
-  return finalEnriched
+  // Step 10: Replace script IDs in keys with URLs from script map
+  const result: Record<string, readonly LeakedClosureWithReferences[]> = {}
+  for (const [locationKey, closures] of Object.entries(finalEnriched)) {
+    // Parse location key (format: "scriptId:line:column")
+    const parts = locationKey.split(':')
+    if (parts.length === 3) {
+      const scriptId = parts[0]
+      const line = parts[1]
+      const column = parts[2]
+      const script = scriptMap[scriptId]
+      if (script?.url) {
+        // Replace script ID with URL
+        const newKey = `${script.url}:${line}:${column}`
+        result[newKey] = closures
+      } else {
+        // Keep original key if no URL found
+        result[locationKey] = closures
+      }
+    } else {
+      // Keep original key if format doesn't match
+      result[locationKey] = closures
+    }
+  }
+
+  return result
 }
