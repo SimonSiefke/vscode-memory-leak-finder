@@ -13,6 +13,9 @@ export const connectDevtools = async (
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
+  inspectPtyHostPort: number,
+  inspectSharedProcessPort: number,
+  inspectExtensionsPort: number,
 ): Promise<void> => {
   Assert.string(devtoolsWebSocketUrl)
   Assert.string(electronWebSocketUrl)
@@ -28,6 +31,9 @@ export const connectDevtools = async (
     inspectSharedProcess,
     inspectExtensions,
     inspectPtyHost,
+    inspectPtyHostPort,
+    inspectSharedProcessPort,
+    inspectExtensionsPort,
   )
 
   const measure = await GetCombinedMeasure.getCombinedMeasure(measureRpc, measureId)

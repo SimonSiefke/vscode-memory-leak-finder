@@ -16,6 +16,7 @@ export const prepareBoth = async (
   cwd: string,
   ide: string,
   vscodePath: string,
+  vscodeVersion: string,
   commit: string,
   connectionId: number,
   isFirstConnection: boolean,
@@ -25,6 +26,9 @@ export const prepareBoth = async (
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
   enableExtensions: boolean,
+  inspectPtyHostPort: number,
+  inspectSharedProcessPort: number,
+  inspectExtensionsPort: number,
 ): Promise<PrepareBothResult> => {
   const initializationWorkerRpc = await launchInitializationWorker()
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, sessionId, targetId } =
@@ -34,6 +38,7 @@ export const prepareBoth = async (
       cwd,
       ide,
       vscodePath,
+      vscodeVersion,
       commit,
       connectionId,
       isFirstConnection,
@@ -43,6 +48,9 @@ export const prepareBoth = async (
       inspectExtensions,
       inspectPtyHost,
       enableExtensions,
+      inspectPtyHostPort,
+      inspectSharedProcessPort,
+      inspectExtensionsPort,
     )
   return {
     initializationWorkerRpc,

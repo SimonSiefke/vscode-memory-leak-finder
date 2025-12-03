@@ -49,6 +49,8 @@ export const create = ({ electronApp, page, expect, VError }) => {
     async initializeGitRepository() {
       const workspace = join(Root.root, '.vscode-test-workspace')
       await execa('git', ['init'], { cwd: workspace })
+      await execa('git', ['config', 'user.name', 'Test User'], { cwd: workspace })
+      await execa('git', ['config', 'user.email', 'test@example.com'], { cwd: workspace })
     },
     async add(file) {
       const workspace = join(Root.root, '.vscode-test-workspace')

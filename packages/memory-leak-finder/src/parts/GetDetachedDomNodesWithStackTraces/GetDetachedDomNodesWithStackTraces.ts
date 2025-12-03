@@ -35,7 +35,7 @@ return stackTraces
     returnByValue: true,
     objectGroup,
   })
-  const merged = []
+  const merged: any[] = []
   if (descriptors.length !== stackTraces.length) {
     throw new Error(`descriptor length mismatch`)
   }

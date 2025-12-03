@@ -13,11 +13,11 @@ export const create = (session) => {
 }
 
 export const start = (session) => {
-  return GetWebgl2RenderingContextCount.getWebgl2RenderingContextCount(session, undefined)
+  return GetWebgl2RenderingContextCount.getWebgl2RenderingContextCount(session)
 }
 
 export const stop = (session) => {
-  return GetWebgl2RenderingContextCount.getWebgl2RenderingContextCount(session, undefined)
+  return GetWebgl2RenderingContextCount.getWebgl2RenderingContextCount(session)
 }
 
 export const compare = CompareCount.compareCount

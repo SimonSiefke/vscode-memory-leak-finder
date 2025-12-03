@@ -38,12 +38,17 @@ export const run = async (platform: string, argv: readonly string[], env: NodeJS
     timeouts: options.timeouts,
     value: options.filter,
     vscodePath: options.vscodePath,
+    vscodeVersion: options.vscodeVersion,
     watch: options.watch,
     workers: options.workers,
-    shouldContinue: options.shouldContinue,
+    continueValue: options.continueValue,
     inspectSharedProcess: options.inspectSharedProcess,
     inspectExtensions: options.inspectExtensions,
     inspectPtyHost: options.inspectPtyHost,
+    enableExtensions: options.enableExtensions,
+    inspectPtyHostPort: options.inspectPtyHostPort,
+    inspectSharedProcessPort: options.inspectSharedProcessPort,
+    inspectExtensionsPort: options.inspectExtensionsPort,
   })
   return InitialStart.initialStart(options)
 }

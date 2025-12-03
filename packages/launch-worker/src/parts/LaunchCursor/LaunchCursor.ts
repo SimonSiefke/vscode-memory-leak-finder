@@ -23,6 +23,9 @@ export const launchCursor = async ({
   inspectExtensions,
   inspectPtyHost,
   enableExtensions,
+  inspectPtyHostPort,
+  inspectSharedProcessPort,
+  inspectExtensionsPort,
 }) => {
   try {
     const testWorkspacePath = join(Root.root, '.cursor-test-workspace')
@@ -51,6 +54,9 @@ export const launchCursor = async ({
       inspectExtensions,
       inspectPtyHost,
       enableExtensions,
+      inspectPtyHostPort,
+      inspectSharedProcessPort,
+      inspectExtensionsPort,
     })
     const env = GetVsCodeEnv.getVsCodeEnv({ runtimeDir, processEnv: process.env })
     const { child } = await LaunchElectron.launchElectron({

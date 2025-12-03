@@ -2,7 +2,7 @@ import * as Assert from '../Assert/Assert.ts'
 import * as ImproveDisposableOutput from '../ImproveDisposableOutput/ImproveDisposableOutput.ts'
 
 const addDeltas = (prettyBefore, prettyAfter) => {
-  const newItems = []
+  const newItems: any[] = []
   const countMap = Object.create(null)
   for (const item of prettyBefore) {
     countMap[item.name] = item.count

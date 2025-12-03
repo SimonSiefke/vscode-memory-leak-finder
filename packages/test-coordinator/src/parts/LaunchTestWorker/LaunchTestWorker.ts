@@ -30,6 +30,9 @@ export const launchTestWorker = async (
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
   enableExtensions: boolean,
+  inspectPtyHostPort: number,
+  inspectSharedProcessPort: number,
+  inspectExtensionsPort: number,
 ) => {
   try {
     const url = GetTestWorkerUrl.getTestWorkerUrl()
@@ -55,6 +58,9 @@ export const launchTestWorker = async (
       inspectExtensions,
       inspectPtyHost,
       enableExtensions,
+      inspectPtyHostPort,
+      inspectSharedProcessPort,
+      inspectExtensionsPort,
     )
     return rpc
   } catch (error) {

@@ -5,6 +5,7 @@ import * as PreviousFilters from '../PreviousFilters/PreviousFilters.ts'
 import * as StartRunning from '../StartRunning/StartRunning.ts'
 import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 import * as Stdout from '../Stdout/Stdout.ts'
+import * as VsCodeVersion from '../VsCodeVersion/VsCodeVersion.ts'
 
 export const updateState = async (newState: any): Promise<void> => {
   const state = StdinDataState.getState()
@@ -43,16 +44,20 @@ export const updateState = async (newState: any): Promise<void> => {
       ide: state.ide,
       ideVersion: state.ideVersion,
       vscodePath: '',
+      vscodeVersion: VsCodeVersion.vscodeVersion,
       commit: '',
       setupOnly: false,
       workers: state.workers,
       isWindows: state.isWindows,
       runSkippedTestsAnyway: state.runSkippedTestsAnyway,
-      shouldContinue: state.shouldContinue,
+      continueValue: state.continueValue,
       inspectExtensions: state.inspectExtensions,
       inspectPtyHost: state.inspectPtyHost,
       inspectSharedProcess: state.inspectSharedProcess,
       enableExtensions: state.enableExtensions,
+      inspectPtyHostPort: state.inspectPtyHostPort,
+      inspectSharedProcessPort: state.inspectSharedProcessPort,
+      inspectExtensionsPort: state.inspectExtensionsPort,
     })
   }
   if (newState.mode === ModeType.Interrupted) {

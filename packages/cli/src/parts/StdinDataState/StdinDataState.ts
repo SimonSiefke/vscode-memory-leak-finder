@@ -30,11 +30,14 @@ export interface StdinDataState {
   previousFilters: string[]
   exitCode: number
   isWindows: boolean
-  shouldContinue: boolean
+  continueValue: string
   inspectSharedProcess: boolean
   inspectExtensions: boolean
   inspectPtyHost: boolean
   enableExtensions: boolean
+  inspectPtyHostPort: number
+  inspectSharedProcessPort: number
+  inspectExtensionsPort: number
 }
 
 let state: StdinDataState = {
@@ -63,11 +66,14 @@ let state: StdinDataState = {
   previousFilters: [],
   isWindows: false,
   exitCode: 0,
-  shouldContinue: false,
+  continueValue: '',
   inspectSharedProcess: false,
   inspectExtensions: false,
   inspectPtyHost: false,
   enableExtensions: false,
+  inspectPtyHostPort: 5877,
+  inspectSharedProcessPort: 5879,
+  inspectExtensionsPort: 5870,
 }
 
 export const setState = (newState): void => {
@@ -95,10 +101,14 @@ export const setState = (newState): void => {
     stdout: newState.stdout,
     previousFilters: newState.previousFilters,
     isWindows: newState.isWindows,
-    shouldContinue: newState.shouldContinue,
+    continueValue: newState.continueValue,
     inspectSharedProcess: newState.inspectSharedProcess,
     inspectExtensions: newState.inspectExtensions,
     inspectPtyHost: newState.inspectPtyHost,
+    enableExtensions: newState.enableExtensions,
+    inspectPtyHostPort: newState.inspectPtyHostPort,
+    inspectSharedProcessPort: newState.inspectSharedProcessPort,
+    inspectExtensionsPort: newState.inspectExtensionsPort,
   }
 }
 

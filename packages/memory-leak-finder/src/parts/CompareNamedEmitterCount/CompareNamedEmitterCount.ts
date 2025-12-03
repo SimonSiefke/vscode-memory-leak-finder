@@ -17,7 +17,7 @@ export const compareNamedEmitterCount = (before, after) => {
     beforeMap[item.name] ||= 0
     beforeMap[item.name] += item.count
   }
-  const result = []
+  const result: any[] = []
   for (const item of after) {
     const beforeCount = beforeMap[item.name] || 0
     const afterCount = item.count

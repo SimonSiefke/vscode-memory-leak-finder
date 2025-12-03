@@ -6,7 +6,7 @@ const getHash = (node) => {
 
 const getUnique = (nodes) => {
   const seen = Object.create(null)
-  const unique = []
+  const unique: any[] = []
   for (const node of nodes) {
     const hash = getHash(node)
     if (hash in seen) {
@@ -40,7 +40,7 @@ export const compareDomListeners = (before, after) => {
     newCountMap[hash]++
   }
   const unique = getUnique(after)
-  const leaked = []
+  const leaked: any[] = []
   for (const item of unique) {
     const hash = getHash(item)
     const oldCount = oldCountMap[hash] || 0
