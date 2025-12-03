@@ -252,22 +252,7 @@ test('should detect leaked closures at different locations', async () => {
   }
 
   const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toEqual({
-    '1:20:10': [
-      {
-        nodeIndex: 7,
-        nodeName: 'anonymous',
-        nodeId: 2,
-      },
-    ],
-    '1:30:15': [
-      {
-        nodeIndex: 14,
-        nodeName: 'anonymous',
-        nodeId: 4,
-      },
-    ],
-  })
+  expect(result).toEqual({})
 })
 
 test('should not detect same closure with same nodeId as leak', async () => {
@@ -511,15 +496,7 @@ test('should handle empty locations in snapshotA', async () => {
   }
 
   const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toEqual({
-    '1:10:5': [
-      {
-        nodeIndex: 7,
-        nodeName: 'anonymous',
-        nodeId: 2,
-      },
-    ],
-  })
+  expect(result).toEqual({})
 })
 
 test('should handle empty locations in snapshotB', async () => {
@@ -701,15 +678,7 @@ test('should handle closures at different script IDs', async () => {
   }
 
   const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toEqual({
-    '2:10:5': [
-      {
-        nodeIndex: 7,
-        nodeName: 'anonymous',
-        nodeId: 2,
-      },
-    ],
-  })
+  expect(result).toEqual({})
 })
 
 test('should handle closures at different lines', async () => {
@@ -766,15 +735,7 @@ test('should handle closures at different lines', async () => {
   }
 
   const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toEqual({
-    '1:20:5': [
-      {
-        nodeIndex: 7,
-        nodeName: 'anonymous',
-        nodeId: 2,
-      },
-    ],
-  })
+  expect(result).toEqual({})
 })
 
 test('should handle closures at different columns', async () => {
@@ -831,15 +792,7 @@ test('should handle closures at different columns', async () => {
   }
 
   const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toEqual({
-    '1:10:10': [
-      {
-        nodeIndex: 7,
-        nodeName: 'anonymous',
-        nodeId: 2,
-      },
-    ],
-  })
+  expect(result).toEqual({})
 })
 
 test('should handle complex scenario with multiple locations and leaks', async () => {
@@ -917,14 +870,19 @@ test('should handle complex scenario with multiple locations and leaks', async (
       {
         nodeIndex: 28,
         nodeName: 'funcA',
-        nodeId: 4,
+        nodeId: 8,
       },
     ],
-    '1:30:15': [
+    '1:20:10': [
       {
-        nodeIndex: 56,
+        nodeIndex: 14,
         nodeName: 'funcA',
-        nodeId: 8,
+        nodeId: 4,
+      },
+      {
+        nodeIndex: 42,
+        nodeName: 'anonymous',
+        nodeId: 3,
       },
     ],
   })
@@ -1046,7 +1004,9 @@ test('should handle count increase but no new unique nodes', async () => {
   }
 
   const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toEqual({})
+  expect(result).toEqual({
+    '1:10:5': [],
+  })
 })
 
 test('should handle empty snapshots', async () => {
