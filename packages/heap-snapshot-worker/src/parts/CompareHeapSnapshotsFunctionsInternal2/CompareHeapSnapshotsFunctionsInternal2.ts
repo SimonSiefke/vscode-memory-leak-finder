@@ -79,6 +79,40 @@ export interface CompareFunctionsOptions {
   readonly excludeOriginalPaths?: readonly string[]
 }
 
+const filterOutExcluded = (items: readonly any[], excludes: readonly string[]): readonly any[] => {
+  if (excludes.length > 0) {
+    const lowered = excludes.map((e) => e.toLowerCase())
+    return items.filter((item) => {
+      const original = (item.originalUrl || item.originalSource || '').toLowerCase()
+      if (!original) {
+        return true
+      }
+      for (const ex of lowered) {
+        if (original.includes(ex)) {
+          return false
+        }
+      }
+      return true
+    })
+  }
+  return items
+}
+
+const compareCount = (a, b) => {
+  return b.count - a.count
+}
+
+const cleanItem = (item) => {
+  return {
+    count: item.count,
+    delta: item.delta,
+    name: item.name,
+    sourceLocation: item.sourceLocation,
+    originalLocation: item.originalLocation,
+    originalName: item.originalName,
+  }
+}
+
 export const compareHeapSnapshotFunctionsInternal2 = async (
   before: Snapshot,
   after: Snapshot,
@@ -104,33 +138,10 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
     nodeNameOffset,
     after.strings,
   )
-  let enriched = await addOriginalSources(formattedItems)
+  const enriched = await addOriginalSources(formattedItems)
   const excludes = options.excludeOriginalPaths || []
-  if (excludes.length > 0) {
-    const lowered = excludes.map((e) => e.toLowerCase())
-    enriched = enriched.filter((item) => {
-      const original = (item.originalUrl || item.originalSource || '').toLowerCase()
-      if (!original) {
-        return true
-      }
-      for (const ex of lowered) {
-        if (original.includes(ex)) {
-          return false
-        }
-      }
-      return true
-    })
-  }
-  const sorted = enriched.toSorted((a, b) => b.count - a.count)
-  const cleanItems = sorted.map((item) => {
-    return {
-      count: item.count,
-      delta: item.delta,
-      name: item.name,
-      sourceLocation: item.sourceLocation,
-      originalLocation: item.originalLocation,
-      originalName: item.originalName,
-    }
-  })
+  const filtered = filterOutExcluded(enriched, excludes)
+  const sorted = filtered.toSorted(compareCount)
+  const cleanItems = sorted.map(cleanItem)
   return cleanItems
 }
