@@ -216,6 +216,7 @@ const getClosureInfos = (nodes: Uint32Array, edges: Uint32Array, strings: readon
 }
 
 export const compareNamedClosureCountFromHeapSnapshot = async (pathA: string, pathB: string): Promise<any[]> => {
+  console.time('parse')
   const [snapshotA, snapshotB] = await Promise.all([
     prepareHeapSnapshot(pathA, {
       parseStrings: true,
@@ -224,13 +225,20 @@ export const compareNamedClosureCountFromHeapSnapshot = async (pathA: string, pa
       parseStrings: true,
     }),
   ])
+  console.timeEnd('parse')
 
   // Get closure counts by name for both snapshots
+  console.time('counts1')
   const countsA = getClosureCounts(snapshotA.nodes, snapshotA.edges, snapshotA.strings, snapshotA.meta)
+  console.timeEnd('counts1')
+  console.time('counts2')
   const countsB = getClosureCounts(snapshotB.nodes, snapshotB.edges, snapshotB.strings, snapshotB.meta)
+  console.timeEnd('counts2')
 
   // Get closure infos from snapshot B for leaked closures
+  console.time('diffrenece')
   const closureInfosB = getClosureInfos(snapshotB.nodes, snapshotB.edges, snapshotB.strings, snapshotB.meta)
+  console.timeEnd('diffrenece')
 
   // Find leaked closures (where count increased)
   const leakedClosures: any[] = []
