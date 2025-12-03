@@ -1,0 +1,104 @@
+[
+  {
+    "id": 140461,
+    "name": "DXe:undefined:Control+Shift+I:<div class=\"monaco-keybinding\" custom-hover=\"true\" aria-label=\"Control",
+    "contextNodeCount": 12,
+    "delta": 48
+  },
+  {
+    "id": 635663,
+    "name": "cancel",
+    "contextNodeCount": 13207,
+    "delta": 10
+  },
+  {
+    "id": 374955,
+    "name": "catch",
+    "contextNodeCount": 10,
+    "delta": 10
+  },
+  {
+    "id": 1652359,
+    "name": "finally",
+    "contextNodeCount": 10,
+    "delta": 10
+  },
+  {
+    "id": 174459,
+    "name": "ft:Promise:false:Promise:system / Context",
+    "contextNodeCount": 5,
+    "delta": 10
+  },
+  {
+    "id": 374945,
+    "name": "then",
+    "contextNodeCount": 10,
+    "delta": 10
+  },
+  {
+    "id": 1215309,
+    "name": "GHi:undefined:undefined:Wt:I:system / Context",
+    "contextNodeCount": 6,
+    "delta": 6
+  },
+  {
+    "id": 2225821,
+    "name": "t:true:system / Context",
+    "contextNodeCount": 3,
+    "delta": 6
+  },
+  {
+    "id": 258179,
+    "name": "Rle:system / ContextCell:system / Context",
+    "contextNodeCount": 3,
+    "delta": 3
+  },
+  {
+    "id": 2230659,
+    "name": "$provideCodeLenses:system / Context",
+    "contextNodeCount": 2,
+    "delta": 2
+  },
+  {
+    "id": 2230657,
+    "name": "$provideDocumentSemanticTokens:system / Context",
+    "contextNodeCount": 2,
+    "delta": 2
+  },
+  {
+    "id": 247881,
+    "name": "I:system / Context",
+    "contextNodeCount": 2,
+    "delta": 2
+  },
+  {
+    "id": 909737,
+    "name": "lDt:system / Context",
+    "contextNodeCount": 2,
+    "delta": 2
+  },
+  {
+    "id": 599829,
+    "name": "onDidRemoveLastListener",
+    "contextNodeCount": 4,
+    "delta": 1
+  },
+  {
+    "id": 599827,
+    "name": "onWillAddFirstListener",
+    "contextNodeCount": 4,
+    "delta": 1
+  },
+  {
+    "id": 912111,
+    "name": "onWillRemoveListener",
+    "contextNodeCount": 6,
+    "delta": 1
+  },
+  {
+    "id": 2225917,
+    "name": "Wt",
+    "contextNodeCount": 5,
+    "delta": 1
+  }
+]
