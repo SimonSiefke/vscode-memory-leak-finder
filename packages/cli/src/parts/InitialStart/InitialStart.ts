@@ -40,5 +40,8 @@ export const initialStart = async (options): Promise<void> => {
     inspectExtensions: options.inspectExtensions,
     inspectPtyHost: options.inspectPtyHost,
     enableExtensions: options.enableExtensions,
+    inspectPtyHostPort: options.inspectPtyHostPort,
+    inspectSharedProcessPort: options.inspectSharedProcessPort,
+    inspectExtensionsPort: options.inspectExtensionsPort,
   })
 }

@@ -22,6 +22,9 @@ export const prepareTests = async (
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
   enableExtensions: boolean,
+  inspectPtyHostPort: number,
+  inspectSharedProcessPort: number,
+  inspectExtensionsPort: number,
 ) => {
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
@@ -42,6 +45,9 @@ export const prepareTests = async (
       inspectExtensions,
       inspectPtyHost,
       enableExtensions,
+      inspectPtyHostPort,
+      inspectSharedProcessPort,
+      inspectExtensionsPort,
     )
 
   return {

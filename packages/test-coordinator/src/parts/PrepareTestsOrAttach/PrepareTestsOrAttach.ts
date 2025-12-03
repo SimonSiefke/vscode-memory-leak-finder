@@ -30,6 +30,9 @@ export const prepareTestsAndAttach = async (
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
   enableExtensions: boolean,
+  inspectPtyHostPort: number,
+  inspectSharedProcessPort: number,
+  inspectExtensionsPort: number,
 ) => {
   const isFirst = state.promise === undefined
   if (isFirst) {
@@ -53,6 +56,9 @@ export const prepareTestsAndAttach = async (
       inspectExtensions,
       inspectPtyHost,
       enableExtensions,
+      inspectPtyHostPort,
+      inspectSharedProcessPort,
+      inspectExtensionsPort,
     )
   }
   const result = await state.promise
@@ -78,6 +84,9 @@ export const prepareTestsAndAttach = async (
     inspectExtensions,
     inspectPtyHost,
     enableExtensions,
+    inspectPtyHostPort,
+    inspectSharedProcessPort,
+    inspectExtensionsPort,
   )
   return {
     memoryRpc,

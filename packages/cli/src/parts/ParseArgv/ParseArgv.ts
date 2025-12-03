@@ -53,6 +53,9 @@ export const parseArgv = (argv) => {
     inspectExtensions: false,
     inspectPtyHost: false,
     enableExtensions: false,
+    inspectPtyHostPort: 5877,
+    inspectSharedProcessPort: 5879,
+    inspectExtensionsPort: 5870,
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -134,6 +137,15 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--enable-extensions')) {
     options.enableExtensions = true
+  }
+  if (argv.includes('--inspect-ptyhost-port')) {
+    options.inspectPtyHostPort = parseArgvNumber(argv, '--inspect-ptyhost-port')
+  }
+  if (argv.includes('--inspect-shared-process-port')) {
+    options.inspectSharedProcessPort = parseArgvNumber(argv, '--inspect-shared-process-port')
+  }
+  if (argv.includes('--inspect-extensions-port')) {
+    options.inspectExtensionsPort = parseArgvNumber(argv, '--inspect-extensions-port')
   }
   return options
 }

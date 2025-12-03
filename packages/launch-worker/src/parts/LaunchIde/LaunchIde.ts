@@ -15,6 +15,9 @@ export const launchIde = async ({
   inspectExtensions,
   inspectPtyHost,
   enableExtensions,
+  inspectPtyHostPort,
+  inspectSharedProcessPort,
+  inspectExtensionsPort,
 }) => {
   if (ide === Ide.Cursor) {
     const cursorVersion = '0.45.14' // TODO make it configurable
@@ -28,6 +31,9 @@ export const launchIde = async ({
       inspectExtensions,
       inspectPtyHost,
       enableExtensions,
+      inspectPtyHostPort,
+      inspectSharedProcessPort,
+      inspectExtensionsPort,
     })
     return {
       ...result,
@@ -45,6 +51,9 @@ export const launchIde = async ({
     inspectExtensions,
     inspectPtyHost,
     enableExtensions,
+    inspectPtyHostPort,
+    inspectSharedProcessPort,
+    inspectExtensionsPort,
   })
   return {
     ...result,

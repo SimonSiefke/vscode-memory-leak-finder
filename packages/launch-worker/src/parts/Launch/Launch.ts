@@ -19,6 +19,9 @@ export const launch = async (
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
   enableExtensions: boolean,
+  inspectPtyHostPort: number,
+  inspectSharedProcessPort: number,
+  inspectExtensionsPort: number,
 ): Promise<any> => {
   const { child } = await LaunchIde.launchIde({
     headlessMode,
@@ -32,6 +35,9 @@ export const launch = async (
     inspectExtensions,
     inspectPtyHost,
     enableExtensions,
+    inspectPtyHostPort,
+    inspectSharedProcessPort,
+    inspectExtensionsPort,
   })
   const { port, dispose } = createPipeline(child.stderr)
   const rpc = await NodeWorkerRpcParent.create({
