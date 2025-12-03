@@ -88,17 +88,9 @@ export const compareNamedClosureCountFromHeapSnapshotInternal2 = async (
   const map2 = getUniqueLocationMap2(snapshotB)
   const newItems = getNewItems(map1, map2, minCount)
   const keys = newItems.map((item) => item.key)
-  console.time('kymap')
   const keyMap = createKeyMap(keys)
-  console.timeEnd('kymap')
-  console.time('oldmatching')
   const oldMatchingNodes = getMatchingNodes(snapshotA, keyMap)
-  console.timeEnd('oldmatching')
-  console.time('newm')
   const newMatchingNodes = getMatchingNodes(snapshotB, keyMap)
-  console.timeEnd('newm')
-
   const leaked = getLeaked(oldMatchingNodes, newMatchingNodes)
-  console.log('got leaked')
   return leaked
 }

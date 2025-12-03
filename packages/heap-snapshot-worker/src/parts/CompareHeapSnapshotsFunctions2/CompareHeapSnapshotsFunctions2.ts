@@ -18,8 +18,6 @@ export const compareHeapSnapshotFunctions2 = async (
       parseStrings: true,
     }),
   ])
-  console.time('compare')
   const result = await compareHeapSnapshotFunctionsInternal2(snapshotA, snapshotB, options)
-  console.timeEnd('compare')
   return result
 }
