@@ -1,9 +1,12 @@
 import { join } from 'node:path'
-import { getNamedMapCountFromHeapSnapshot } from '../src/parts/GetNamedMapCountFromHeapSnapshot/GetNamedMapCountFromHeapSnapshot.js'
+import { importHeapSnapshotWorker } from './import-heap-snapshot-worker.ts'
 
 const filePath1 = join(import.meta.dirname, '../../../.vscode-heapsnapshots/0.heapsnapshot')
 
-const testNamedMapCount = async () => {
+const testNamedMapCount = async (): Promise<void> => {
+  const { getNamedMapCountFromHeapSnapshot } = await importHeapSnapshotWorker(
+    'parts/GetNamedMapCountFromHeapSnapshot/GetNamedMapCountFromHeapSnapshot.ts',
+  )
   console.log('Testing Named Map Count:')
 
   try {
@@ -26,7 +29,7 @@ const testNamedMapCount = async () => {
     }
 
     // Show some statistics
-    const sizeStats = {}
+    const sizeStats: Record<number, number> = {}
     maps.forEach((map) => {
       sizeStats[map.size] = (sizeStats[map.size] || 0) + 1
     })
@@ -39,15 +42,15 @@ const testNamedMapCount = async () => {
         console.log(`Size ${size}: ${count} maps`)
       })
   } catch (error) {
-    console.error('Error:', error.message)
+    console.error('Error:', (error as Error).message)
   }
 }
 
-const main = async () => {
+const main = async (): Promise<void> => {
   try {
     await testNamedMapCount()
   } catch (error) {
-    console.error('Test failed:', error.message)
+    console.error('Test failed:', (error as Error).message)
     process.exit(1)
   }
 }
