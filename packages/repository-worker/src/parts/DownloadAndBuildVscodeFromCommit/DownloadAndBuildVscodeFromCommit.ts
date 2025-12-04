@@ -91,12 +91,6 @@ export const downloadAndBuildVscodeFromCommit = async (
       )
     } else {
       await InstallDependencies.installDependencies(repoPathWithCommitHash, useNice)
-      // const toRemove=['test/mcp/node_modules/npm-run-all/node_modules/which/bin/which']
-      // for(const item of toRemove){
-      //   await rm(join(
-      //     repoPathWithCommitHash, item
-      //   ), {force:true})
-      // }
       await CacheNodeModules.moveNodeModulesToCache(repoPathWithCommitHash, commitHash, nodeModulesCacheDir, nodeModulesHash)
     }
   } else if (!existsMainJsPath) {
