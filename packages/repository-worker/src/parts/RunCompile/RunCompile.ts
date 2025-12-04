@@ -8,7 +8,7 @@ import { getNpmPathFromNvmrc } from '../GetNpmPathFromNvmrc/GetNpmPathFromNvmrc.
  * @param {boolean} useNice - Whether to use nice command for resource management
  */
 export const runCompile = async (cwd: string, useNice: boolean, mainJsPath: string) => {
-  const npmPath = getNpmPathFromNvmrc(cwd)
+  const npmPath = await getNpmPathFromNvmrc(cwd)
   let result
   if (useNice) {
     result = await exec('nice', ['-n', '10', npmPath, 'run', 'compile'], { cwd, reject: false })
