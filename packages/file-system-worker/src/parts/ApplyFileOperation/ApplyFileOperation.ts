@@ -33,6 +33,7 @@ export const applyFileOperation = async (operation: FileOperation): Promise<void
         const toPath: string = operation.to
         await copy(fromPath, toPath, {
           recursive: true,
+          force: true,
         })
         break
       }
