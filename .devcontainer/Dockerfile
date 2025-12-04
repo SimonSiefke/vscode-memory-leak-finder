@@ -47,4 +47,6 @@ RUN  sudo apt-get install -y build-essential g++ libx11-dev libxkbfile-dev libse
 
 RUN sudo apt-get install -y python3-setuptools
 
+RUN sudo apt-get install -y libkrb5-dev
+
 COPY . .
