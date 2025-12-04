@@ -70,6 +70,7 @@ export const MutationObserversWithStackTracesWithSourceMaps = 'mutationObservers
 export const NamedArrayCount = 'namedArrayCount'
 export const NamedArrayCountDifference = 'namedArrayCountDifference'
 export const NamedClosureCount = 'namedClosureCount'
+export const ClosuresWithReferences = 'closuresWithReferences'
 export const NamedEmitterCount = 'namedEmitterCount'
 export const NamedFunctionCount = 'namedFunctionCount'
 export const NamedFunctionCount2 = 'namedFunctionCount2'
