@@ -43,4 +43,8 @@ RUN apt-get install -y \
   libxtst6 \
   xauth
 
+RUN  sudo apt-get install -y build-essential g++ libx11-dev libxkbfile-dev libsecret-1-dev python-is-python3
+
+RUN sudo apt-get install -y python3-setuptools
+
 COPY . .
