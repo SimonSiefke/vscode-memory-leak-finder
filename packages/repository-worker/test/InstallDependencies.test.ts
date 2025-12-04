@@ -10,6 +10,9 @@ test('installDependencies - runs npm ci without nice', async () => {
     if (method === 'FileSystem.readFileContent') {
       return '20'
     }
+    if (method === 'FileSystem.exists') {
+      return true
+    }
     if (method === 'FileSystem.exec') {
       return { stdout: '', stderr: '', exitCode: 0 }
     }
@@ -32,6 +35,9 @@ test('installDependencies - runs npm ci with nice', async () => {
   mockInvoke.mockImplementation((method) => {
     if (method === 'FileSystem.readFileContent') {
       return '20'
+    }
+    if (method === 'FileSystem.exists') {
+      return true
     }
     if (method === 'FileSystem.exec') {
       return { stdout: '', stderr: '', exitCode: 0 }
@@ -56,6 +62,9 @@ test('installDependencies - throws VError when exec fails without nice', async (
     if (method === 'FileSystem.readFileContent') {
       return '20'
     }
+    if (method === 'FileSystem.exists') {
+      return true
+    }
     if (method === 'FileSystem.exec') {
       throw new Error('npm ci failed')
     }
@@ -78,6 +87,9 @@ test('installDependencies - throws VError when exec fails with nice', async () =
   mockInvoke.mockImplementation((method) => {
     if (method === 'FileSystem.readFileContent') {
       return '20'
+    }
+    if (method === 'FileSystem.exists') {
+      return true
     }
     if (method === 'FileSystem.exec') {
       throw new Error('nice command failed')
