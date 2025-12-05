@@ -6,8 +6,8 @@ const { compareNamedClosureCountWithReferencesFromHeapSnapshot2 } = await import
   'src/parts/CompareNamedClosureCountWithReferences2/CompareNamedClosureCountWithReferences2.ts',
 )
 
-const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
-const filePath2 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/1.json')
+const filePath1 = `/home/simon/Documents/vue-memory-leak/heap-snapshot-1.heapsnapshot`
+const filePath2 = `/home/simon/Documents/vue-memory-leak/heap-snapshot-2.heapsnapshot`
 // const scriptMapPath = join(import.meta.dirname, ' ../../../../../.vscode-script-maps/1.json')
 const resultPath = join(import.meta.dirname, '../snapshots', 'result.json')
 
