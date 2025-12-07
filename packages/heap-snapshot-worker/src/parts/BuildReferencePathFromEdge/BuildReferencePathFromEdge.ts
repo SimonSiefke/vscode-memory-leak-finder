@@ -1,8 +1,7 @@
 import type { ReferencePath } from '../ReferencePath/ReferencePath.ts'
-import type { Node } from '../ParseNode/ParseNode.ts'
 
 export const buildReferencePathFromEdge = (
-  sourceNode: Node,
+  sourceNode: any,
   sourceNodeName: string | null,
   sourceNodeType: string | null,
   edgeTypeName: string,
