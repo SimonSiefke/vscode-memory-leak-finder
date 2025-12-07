@@ -14,6 +14,15 @@ export interface LeakedClosureWithReferences {
   readonly references: readonly ReferencePath[]
 }
 
+const addUrls = (enriched: any, scriptMap: any): any => {
+  const result: Record<string, readonly LeakedClosureWithReferences[]> = {}
+  for (const [locationKey, closures] of Object.entries(enriched)) {
+    const urlKey = convertLocationKeyToUrl(locationKey, scriptMap || {})
+    result[urlKey] = closures
+  }
+  return result
+}
+
 export const compareNamedClosureCountWithReferencesFromHeapSnapshot2 = async (
   pathA: string,
   pathB: string,
@@ -32,10 +41,11 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshot2 = async (
 
   const scriptMapContent = await readFile(scriptMapPath, 'utf8')
   const scriptMap = JSON.parse(scriptMapContent)
+  console.log(scriptMap)
   const leaked = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, scriptMap, options)
   const enriched = enrichLeakedClosuresWithReferences(leaked, snapshotB)
-
-  return enriched
+  const final = addUrls(enriched, scriptMap)
+  return final
 }
 
 export const compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2 = async (
@@ -48,10 +58,7 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2 = a
   const scriptMap = JSON.parse(scriptMapContent)
   const leaked = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, scriptMap, options)
   const enriched = enrichLeakedClosuresWithReferences(leaked, snapshotB)
-  const result: Record<string, readonly LeakedClosureWithReferences[]> = {}
-  for (const [locationKey, closures] of Object.entries(enriched)) {
-    const urlKey = convertLocationKeyToUrl(locationKey, scriptMap || {})
-    result[urlKey] = closures
-  }
-  return result
+  const final = addUrls(enriched, scriptMap)
+
+  return final
 }
