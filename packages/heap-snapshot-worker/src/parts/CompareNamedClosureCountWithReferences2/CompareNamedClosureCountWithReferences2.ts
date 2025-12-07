@@ -6,6 +6,7 @@ import { enrichLeakedClosuresWithReferences } from '../EnrichLeakedClosuresWithR
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import type { ReferencePath } from '../ReferencePath/ReferencePath.ts'
+import { convertLocationKeyToUrl } from '../ConvertLocationKeyToUrl/ConvertLocationKeyToUrl.ts'
 
 export interface LeakedClosureWithReferences {
   readonly nodeName: string
@@ -35,9 +36,15 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshot2 = async (
 export const compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2 = async (
   snapshotA: Snapshot,
   snapshotB: Snapshot,
+  scriptMap: any,
   options: CompareClosuresOptions = {},
 ): Promise<Record<string, readonly LeakedClosureWithReferences[]>> => {
-  const leaked = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, options)
+  const leaked = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, scriptMap, options)
   const enriched = enrichLeakedClosuresWithReferences(leaked, snapshotB)
-  return enriched
+  const result: Record<string, readonly LeakedClosureWithReferences[]> = {}
+  for (const [locationKey, closures] of Object.entries(enriched)) {
+    const urlKey = convertLocationKeyToUrl(locationKey, scriptMap || {})
+    result[urlKey] = closures
+  }
+  return result
 }
