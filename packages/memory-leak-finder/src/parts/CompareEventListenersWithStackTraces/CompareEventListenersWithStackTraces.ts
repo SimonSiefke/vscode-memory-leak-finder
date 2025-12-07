@@ -9,7 +9,7 @@ export const compareEventListenersWithStackTraces = async (before, after) => {
     map[key] ||= 0
     map[key]++
   }
-  const leaked = []
+  const leaked: any[] = []
   for (const listener of after) {
     const key = GetEventListenerKey.getEventListenerKey(listener)
     if (map[key]) {

@@ -11,29 +11,27 @@ export const getMeasureRpc = async (
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
+  inspectPtyHostPort: number,
+  inspectSharedProcessPort: number,
+  inspectExtensionsPort: number,
 ): Promise<any> => {
-  // Default debug ports for utility processes
-  const SHARED_PROCESS_PORT = 5879
-  const EXTENSIONS_PORT = 5870
-  const PTYHOST_PORT = 5877
-
   const browserRpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   const { sessionRpc } = await waitForSession(browserRpc, attachedToPageTimeout)
 
   // Connect to the appropriate debug port based on the flags
   if (inspectSharedProcess) {
     await sessionRpc.dispose()
-    const sharedProcessRpc = await connectToDevtoolsWithJsonUrl(SHARED_PROCESS_PORT)
+    const sharedProcessRpc = await connectToDevtoolsWithJsonUrl(inspectSharedProcessPort)
     return sharedProcessRpc
   }
   if (inspectExtensions) {
     await sessionRpc.dispose()
-    const extensionsRpc = await connectToDevtoolsWithJsonUrl(EXTENSIONS_PORT)
+    const extensionsRpc = await connectToDevtoolsWithJsonUrl(inspectExtensionsPort)
     return extensionsRpc
   }
   if (inspectPtyHost) {
     await sessionRpc.dispose()
-    const ptyhostRpc = await connectToDevtoolsWithJsonUrl(PTYHOST_PORT)
+    const ptyhostRpc = await connectToDevtoolsWithJsonUrl(inspectPtyHostPort)
     return ptyhostRpc
   }
   if (measureNode) {

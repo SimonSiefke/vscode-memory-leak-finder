@@ -8,6 +8,9 @@ export const getVscodeArgs = ({
   inspectExtensions,
   inspectPtyHost,
   enableExtensions,
+  inspectPtyHostPort,
+  inspectSharedProcessPort,
+  inspectExtensionsPort,
 }) => {
   const args = [
     ...ChromiumSwitches.chromiumSwitches,
@@ -30,13 +33,13 @@ export const getVscodeArgs = ({
   }
 
   if (inspectPtyHost) {
-    args.push('--inspect-ptyhost=5877')
+    args.push(`--inspect-ptyhost=${inspectPtyHostPort}`)
   }
   if (inspectSharedProcess) {
-    args.push('--inspect-sharedprocess=5879')
+    args.push(`--inspect-sharedprocess=${inspectSharedProcessPort}`)
   }
   if (inspectExtensions) {
-    args.push('--inspect-extensions=5870')
+    args.push(`--inspect-extensions=${inspectExtensionsPort}`)
   }
   args.push(...extraLaunchArgs)
   return args

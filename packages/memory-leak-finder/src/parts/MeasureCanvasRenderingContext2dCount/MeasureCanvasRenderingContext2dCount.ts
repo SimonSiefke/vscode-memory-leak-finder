@@ -13,11 +13,11 @@ export const create = (session) => {
 }
 
 export const start = (session) => {
-  return GetCanvasRenderingContext2dCount.getCanvasRenderingContext2dCount(session, undefined)
+  return GetCanvasRenderingContext2dCount.getCanvasRenderingContext2dCount(session)
 }
 
 export const stop = (session) => {
-  return GetCanvasRenderingContext2dCount.getCanvasRenderingContext2dCount(session, undefined)
+  return GetCanvasRenderingContext2dCount.getCanvasRenderingContext2dCount(session)
 }
 
 export const compare = CompareCount.compareCount

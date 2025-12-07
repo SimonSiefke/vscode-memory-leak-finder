@@ -9,7 +9,7 @@ export const deduplicateEventListeners = (eventListeners) => {
     countMap[key] ||= 0
     countMap[key]++
   }
-  const deduplicated = []
+  const deduplicated: any[] = []
   for (const [key, value] of Object.entries(eventListenerMap)) {
     const count = countMap[key]
     deduplicated.push({

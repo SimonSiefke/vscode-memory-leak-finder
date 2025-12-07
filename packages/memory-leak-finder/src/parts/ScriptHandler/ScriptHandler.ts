@@ -1,4 +1,5 @@
 import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
+import * as ExtractDataUrlSourceMap from '../ExtractDataUrlSourceMap/ExtractDataUrlSourceMap.ts'
 
 export const create = (): IScriptHandler => {
   const scriptMap = Object.create(null)
@@ -7,9 +8,18 @@ export const create = (): IScriptHandler => {
     if (!url) {
       return
     }
+    let sourceMapUrl = sourceMapURL
+    if (ExtractDataUrlSourceMap.isDataUrl(sourceMapURL)) {
+      try {
+        sourceMapUrl = ExtractDataUrlSourceMap.extractDataUrlSourceMap(sourceMapURL)
+      } catch (error) {
+        // ignore
+        console.error('Failed to extract data URL sourcemap:', error)
+      }
+    }
     scriptMap[scriptId] = {
       url,
-      sourceMapUrl: sourceMapURL,
+      sourceMapUrl,
     }
   }
   return {

@@ -14,7 +14,7 @@ const prepareDisposable = (disposable, scriptMap) => {
 }
 
 const prepareDisposables = (disposables, scriptMap) => {
-  const prepared = []
+  const prepared: any[] = []
   for (const disposable of disposables) {
     prepared.push(prepareDisposable(disposable, scriptMap))
   }

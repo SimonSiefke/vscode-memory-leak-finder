@@ -13,11 +13,11 @@ export const create = (session) => {
 }
 
 export const start = (session) => {
-  return GetGpuCanvasContextCount.getWebGpuCanvasContextCount(session, undefined)
+  return GetGpuCanvasContextCount.getWebGpuCanvasContextCount(session)
 }
 
 export const stop = (session) => {
-  return GetGpuCanvasContextCount.getWebGpuCanvasContextCount(session, undefined)
+  return GetGpuCanvasContextCount.getWebGpuCanvasContextCount(session)
 }
 
 export const compare = CompareCount.compareCount

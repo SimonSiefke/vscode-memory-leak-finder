@@ -38,7 +38,7 @@ const getArrayNamesWithCount = (countMap) => {
   return arrayNamesWithCount
 }
 
-export const getNamedArrayCountFromHeapSnapshot = async (id) => {
+export const getNamedArrayCountFromHeapSnapshot = async (id, scriptMap = {}) => {
   const heapsnapshot = HeapSnapshotState.get(id)
 
   Assert.object(heapsnapshot)

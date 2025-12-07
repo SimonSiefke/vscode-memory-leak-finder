@@ -25,10 +25,8 @@ const emptyRpc = {
 
 const disposeWorkers = async (workers) => {
   const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = workers
+  await Promise.all([memoryRpc.dispose(), testWorkerRpc.dispose(), videoRpc.dispose()])
   await initializationWorkerRpc.dispose()
-  await memoryRpc.dispose()
-  await testWorkerRpc.dispose()
-  await videoRpc.dispose()
 }
 
 export const runTestsWithCallback = async ({
@@ -51,12 +49,17 @@ export const runTestsWithCallback = async ({
   ide,
   ideVersion,
   vscodePath,
+  vscodeVersion,
   commit,
   setupOnly,
   inspectSharedProcess,
   inspectExtensions,
   inspectPtyHost,
   enableExtensions,
+  continueValue,
+  inspectPtyHostPort,
+  inspectSharedProcessPort,
+  inspectExtensionsPort,
   callback,
 }: RunTestsWithCallbackOptions) => {
   try {
@@ -100,8 +103,8 @@ export const runTestsWithCallback = async ({
         ide,
         ideVersion,
         vscodePath,
+        vscodeVersion,
         commit,
-
         attachedToPageTimeout,
         measure,
         idleTimeout,
@@ -111,6 +114,9 @@ export const runTestsWithCallback = async ({
         inspectExtensions,
         inspectPtyHost,
         enableExtensions,
+        inspectPtyHostPort,
+        inspectSharedProcessPort,
+        inspectExtensionsPort,
       )
       await testWorkerRpc.dispose()
       await memoryRpc?.dispose()
@@ -123,7 +129,7 @@ export const runTestsWithCallback = async ({
     let skipped = 0
     let skippedFailed = 0
     let leaking = 0
-    const formattedPaths = await GetTestToRun.getTestsToRun(root, cwd, filterValue)
+    const formattedPaths = await GetTestToRun.getTestsToRun(root, cwd, filterValue, continueValue)
     const total = formattedPaths.length
     if (total === 0) {
       return callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, 0, leaking, total, 0, filterValue)
@@ -172,6 +178,7 @@ export const runTestsWithCallback = async ({
           ide,
           ideVersion,
           vscodePath,
+          vscodeVersion,
           commit,
           attachedToPageTimeout,
           measure,
@@ -182,6 +189,9 @@ export const runTestsWithCallback = async ({
           inspectExtensions,
           inspectPtyHost,
           enableExtensions,
+          inspectPtyHostPort,
+          inspectSharedProcessPort,
+          inspectExtensionsPort,
         )
         workers = {
           testWorkerRpc: testWorkerRpc || emptyRpc,

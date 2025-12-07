@@ -13,11 +13,11 @@ export const create = (session) => {
 }
 
 export const start = (session) => {
-  return GetImageBitmapCount.getImageBitmapCount(session, undefined)
+  return GetImageBitmapCount.getImageBitmapCount(session)
 }
 
 export const stop = (session) => {
-  return GetImageBitmapCount.getImageBitmapCount(session, undefined)
+  return GetImageBitmapCount.getImageBitmapCount(session)
 }
 
 export const compare = CompareCount.compareCount

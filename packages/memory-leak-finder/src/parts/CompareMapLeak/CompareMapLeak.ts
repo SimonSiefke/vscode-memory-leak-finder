@@ -5,7 +5,7 @@ export const compareMapLeak = (before, after, getKey) => {
     map[key] ||= 0
     map[key]++
   }
-  const leaked = []
+  const leaked: any[] = []
   for (const element of after) {
     const key = getKey(element)
     if (map[key]) {

@@ -13,6 +13,9 @@ export const startWorker = async (
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
+  inspectPtyHostPort: number,
+  inspectSharedProcessPort: number,
+  inspectExtensionsPort: number,
 ) => {
   Assert.string(devtoolsWebsocketUrl)
   const rpc = await NodeWorkerRpcParent.create({
@@ -31,6 +34,9 @@ export const startWorker = async (
     inspectSharedProcess,
     inspectExtensions,
     inspectPtyHost,
+    inspectPtyHostPort,
+    inspectSharedProcessPort,
+    inspectExtensionsPort,
   )
   return rpc
 }

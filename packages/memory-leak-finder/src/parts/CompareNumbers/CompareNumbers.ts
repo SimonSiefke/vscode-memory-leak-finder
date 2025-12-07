@@ -11,8 +11,8 @@ export const compareNumbers = (before, after) => {
     afterMap[element] ||= 0
     afterMap[element]++
   }
-  const result = []
-  const seen = []
+  const result: any[] = []
+  const seen: any[] = []
   for (const element of after) {
     if (seen.includes(element)) {
       continue
