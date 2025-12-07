@@ -18,3 +18,4 @@ export const collectSourceMapUrls = async (vscodePath: string): Promise<string[]
   }
   return sourceMapUrls
 }
+
