@@ -17,6 +17,8 @@ export interface LeakedClosureWithReferences {
 export const compareNamedClosureCountWithReferencesFromHeapSnapshot2 = async (
   pathA: string,
   pathB: string,
+  scriptMapPath: string,
+
   options: CompareClosuresOptions = {},
 ): Promise<Record<string, readonly LeakedClosureWithReferences[]>> => {
   const [snapshotA, snapshotB] = await Promise.all([
@@ -28,7 +30,9 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshot2 = async (
     }),
   ])
 
-  const leaked = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, options)
+  const scriptMapContent = await readFile(scriptMapPath, 'utf8')
+  const scriptMap = JSON.parse(scriptMapContent)
+  const leaked = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, scriptMap, options)
   const enriched = enrichLeakedClosuresWithReferences(leaked, snapshotB)
 
   return enriched
