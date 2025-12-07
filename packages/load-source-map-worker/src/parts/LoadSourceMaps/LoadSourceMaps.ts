@@ -25,4 +25,3 @@ export const loadSourceMaps = async (sourceMapUrls: readonly string[]): Promise<
     }
   }
 }
-

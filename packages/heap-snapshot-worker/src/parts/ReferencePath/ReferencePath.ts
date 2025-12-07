@@ -5,4 +5,3 @@ export interface ReferencePath {
   readonly edgeName: string
   readonly path: string
 }
-
