@@ -5,16 +5,11 @@ import {
 import { enrichLeakedClosuresWithReferences } from '../EnrichLeakedClosuresWithReferences/EnrichLeakedClosuresWithReferences.ts'
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
+import type { ReferencePath } from '../ReferencePath/ReferencePath.ts'
 
 export interface LeakedClosureWithReferences {
   readonly nodeName: string
-  readonly references: readonly {
-    readonly sourceNodeName: string | null
-    readonly sourceNodeType: string | null
-    readonly edgeType: string
-    readonly edgeName: string
-    readonly path: string
-  }[]
+  readonly references: readonly ReferencePath[]
 }
 
 export const compareNamedClosureCountWithReferencesFromHeapSnapshot2 = async (
