@@ -36,15 +36,17 @@ export const downloadAndBuildVscodeFromCommit = async (
   // Check what's needed at the start
   const mainJsPath = Path.join(repoPathWithCommitHash, 'out', 'main.js')
   const nodeModulesPath = Path.join(repoPathWithCommitHash, 'node_modules')
+  const nodeModulesPackageLock = Path.join(repoPathWithCommitHash, 'node_modules', '.package-lock.json')
   const outPath = Path.join(repoPathWithCommitHash, 'out')
 
   const existsRepoPath = await FileSystemWorker.pathExists(repoPathWithCommitHash)
   const existsMainJsPath = await FileSystemWorker.pathExists(mainJsPath)
   const existsNodeModulesPath = await FileSystemWorker.pathExists(nodeModulesPath)
+  const existsNodeModulesLockPath = await FileSystemWorker.pathExists(nodeModulesPackageLock)
   const existsOutPath = await FileSystemWorker.pathExists(outPath)
 
   const needsClone = !existsRepoPath
-  const needsInstall = !existsMainJsPath && !existsNodeModulesPath
+  const needsInstall = !existsMainJsPath && (!existsNodeModulesPath || !existsNodeModulesLockPath)
   const needsCompile = !existsMainJsPath && !existsOutPath
 
   if (!existsReposDir) {
@@ -91,12 +93,6 @@ export const downloadAndBuildVscodeFromCommit = async (
       )
     } else {
       await InstallDependencies.installDependencies(repoPathWithCommitHash, useNice)
-      // const toRemove=['test/mcp/node_modules/npm-run-all/node_modules/which/bin/which']
-      // for(const item of toRemove){
-      //   await rm(join(
-      //     repoPathWithCommitHash, item
-      //   ), {force:true})
-      // }
       await CacheNodeModules.moveNodeModulesToCache(repoPathWithCommitHash, commitHash, nodeModulesCacheDir, nodeModulesHash)
     }
   } else if (!existsMainJsPath) {
