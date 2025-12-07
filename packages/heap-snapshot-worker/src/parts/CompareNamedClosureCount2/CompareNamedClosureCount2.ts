@@ -10,5 +10,5 @@ export const compareNamedClosureCountFromHeapSnapshot2 = async (pathA: string, p
       parseStrings: true,
     }),
   ])
-  return compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  return compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, {})
 }
