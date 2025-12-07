@@ -14,15 +14,12 @@ export interface LeakedClosureWithReferences {
     readonly edgeType: string
     readonly edgeName: string
     readonly path: string
-    readonly count: number
   }[]
-  readonly count: number
 }
 
 export const compareNamedClosureCountWithReferencesFromHeapSnapshot2 = async (
   pathA: string,
   pathB: string,
-  scriptMapPath?: string,
   options: CompareClosuresOptions = {},
 ): Promise<Record<string, readonly LeakedClosureWithReferences[]>> => {
   const [snapshotA, snapshotB] = await Promise.all([
@@ -35,7 +32,7 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshot2 = async (
   ])
 
   const leaked = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, options)
-  const enriched = await enrichLeakedClosuresWithReferences(leaked, snapshotB, scriptMapPath, options.excludeOriginalPaths)
+  const enriched = enrichLeakedClosuresWithReferences(leaked, snapshotB)
 
   return enriched
 }
@@ -43,10 +40,9 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshot2 = async (
 export const compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2 = async (
   snapshotA: Snapshot,
   snapshotB: Snapshot,
-  scriptMapPath?: string,
   options: CompareClosuresOptions = {},
 ): Promise<Record<string, readonly LeakedClosureWithReferences[]>> => {
   const leaked = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, options)
-  const enriched = await enrichLeakedClosuresWithReferences(leaked, snapshotB, scriptMapPath, options.excludeOriginalPaths)
+  const enriched = enrichLeakedClosuresWithReferences(leaked, snapshotB)
   return enriched
 }
