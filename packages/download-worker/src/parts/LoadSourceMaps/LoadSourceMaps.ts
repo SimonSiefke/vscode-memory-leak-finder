@@ -19,4 +19,3 @@ export const loadSourceMaps = async (sourceMapUrls: readonly string[]): Promise<
     throw new VError(error, `Failed to load source maps`)
   }
 }
-

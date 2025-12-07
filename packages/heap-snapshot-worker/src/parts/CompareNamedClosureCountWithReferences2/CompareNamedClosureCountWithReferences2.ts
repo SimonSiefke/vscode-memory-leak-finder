@@ -41,11 +41,16 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshot2 = async (
 export const compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2 = async (
   snapshotA: Snapshot,
   snapshotB: Snapshot,
-  scriptMapPath: string,
+  scriptMapPathOrScriptMap?: string | Record<number, { readonly url?: string; readonly sourceMapUrl?: string }>,
   options: CompareClosuresOptions = {},
 ): Promise<Record<string, readonly LeakedClosureWithReferences[]>> => {
-  const scriptMapContent = await readFile(scriptMapPath, 'utf8')
-  const scriptMap = JSON.parse(scriptMapContent)
+  let scriptMap: Record<number, { readonly url?: string; readonly sourceMapUrl?: string }>
+  if (typeof scriptMapPathOrScriptMap === 'string') {
+    const scriptMapContent = await readFile(scriptMapPathOrScriptMap, 'utf8')
+    scriptMap = JSON.parse(scriptMapContent)
+  } else {
+    scriptMap = scriptMapPathOrScriptMap || {}
+  }
   const leaked = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, scriptMap, options)
   const enriched = enrichLeakedClosuresWithReferences(leaked, snapshotB)
   const final = addUrls(enriched, scriptMap)

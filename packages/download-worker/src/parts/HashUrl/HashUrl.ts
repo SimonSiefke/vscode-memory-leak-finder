@@ -5,4 +5,3 @@ export const hashUrl = (url: string): string => {
   hash.update(url)
   return hash.digest('hex')
 }
-

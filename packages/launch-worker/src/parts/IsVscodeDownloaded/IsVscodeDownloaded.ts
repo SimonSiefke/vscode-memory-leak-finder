@@ -6,4 +6,3 @@ export const isVscodeDownloaded = async (vscodeVersion: string, vscodePath: stri
   await rpc.dispose()
   return result
 }
-
