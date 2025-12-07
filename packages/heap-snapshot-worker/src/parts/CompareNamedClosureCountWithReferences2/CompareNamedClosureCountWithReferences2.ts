@@ -41,7 +41,6 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshot2 = async (
 
   const scriptMapContent = await readFile(scriptMapPath, 'utf8')
   const scriptMap = JSON.parse(scriptMapContent)
-  console.log(scriptMap)
   const leaked = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, scriptMap, options)
   const enriched = enrichLeakedClosuresWithReferences(leaked, snapshotB)
   const final = addUrls(enriched, scriptMap)
