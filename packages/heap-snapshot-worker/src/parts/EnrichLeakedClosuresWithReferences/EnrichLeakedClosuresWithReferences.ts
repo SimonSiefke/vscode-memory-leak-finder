@@ -1,4 +1,3 @@
-import { readFile } from 'node:fs/promises'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
@@ -12,17 +11,13 @@ export interface LeakedClosureWithReferences {
     readonly edgeType: string
     readonly edgeName: string
     readonly path: string
-    readonly count: number
   }[]
-  readonly count: number
 }
 
-export const enrichLeakedClosuresWithReferences = async (
+export const enrichLeakedClosuresWithReferences = (
   leakedClosures: Record<string, Array<{ nodeIndex: number; nodeName: string; nodeId: number }>>,
   snapshot: Snapshot,
-  scriptMapPath?: string,
-  excludeOriginalPaths?: readonly string[],
-): Promise<Record<string, readonly LeakedClosureWithReferences[]>> => {
+): Record<string, readonly LeakedClosureWithReferences[]> => {
   const { nodes, edges, strings, meta } = snapshot
   const { node_fields, edge_fields, node_types, edge_types } = meta
 
@@ -35,26 +30,6 @@ export const enrichLeakedClosuresWithReferences = async (
   const edgeToNodeFieldIndex = edge_fields.indexOf('to_node')
 
   const edgeTypeNames = edge_types[0] || []
-
-  // Load script map if provided
-  let scriptMap: Record<string, { url?: string; sourceMapUrl?: string }> = {}
-  if (scriptMapPath) {
-    try {
-      const content = await readFile(scriptMapPath, 'utf8')
-      scriptMap = JSON.parse(content) as Record<string, { url?: string; sourceMapUrl?: string }>
-    } catch {
-      // Ignore if file not found or invalid
-    }
-  }
-
-  // Excluded node names that should be filtered out
-  const excludedNodeNames = new Set<string>(['(object elements)', 'system / Context', 'system / WeakFixedArray', 'system / WeakCell'])
-
-  // Excluded edge patterns: edgeType + sourceNodeName combinations
-  const excludedEdgePatterns = new Set<string>(['internal:system / Context'])
-
-  // Excluded type patterns: edgeType + sourceNodeType combinations
-  const excludedTypePatterns = new Set<string>(['internal:array'])
 
   // Step 1: Collect all leaked node byte offsets into a Set for O(1) lookup
   const leakedNodeByteOffsets = new Set<number>()
@@ -147,27 +122,7 @@ export const enrichLeakedClosuresWithReferences = async (
           }
         }
 
-        // Step 5: Filter out unimportant edges/references
-        // Filter out excluded node names
-        if (sourceNodeName && excludedNodeNames.has(sourceNodeName)) {
-          continue
-        }
-        // Filter out excluded edge patterns (edgeType:sourceNodeName)
-        if (sourceNodeName) {
-          const edgePattern = `${edgeTypeName}:${sourceNodeName}`
-          if (excludedEdgePatterns.has(edgePattern)) {
-            continue
-          }
-        }
-        // Filter out excluded type patterns (edgeType:sourceNodeType)
-        if (sourceNodeType) {
-          const typePattern = `${edgeTypeName}:${sourceNodeType}`
-          if (excludedTypePatterns.has(typePattern)) {
-            continue
-          }
-        }
-
-        // Step 6: Add the reference to the appropriate array
+        // Step 5: Add the reference to the appropriate array
         const references = referencesMap.get(edgeToNode)
         if (references) {
           references.push({
@@ -184,7 +139,7 @@ export const enrichLeakedClosuresWithReferences = async (
     currentEdgeOffset += edgeCount
   }
 
-  // Step 7: Map the closures to include their references
+  // Step 6: Map the closures to include their references
   const enriched: Record<string, LeakedClosureWithReferences[]> = {}
   for (const [locationKey, closures] of Object.entries(leakedClosures)) {
     enriched[locationKey] = closures.map((closure) => {
@@ -199,134 +154,12 @@ export const enrichLeakedClosuresWithReferences = async (
         // Then sort by path
         return a.path.localeCompare(b.path)
       })
-
-      // Step 8: Deduplicate references and add count
-      const deduplicatedMap = new Map<
-        string,
-        {
-          sourceNodeName: string | null
-          sourceNodeType: string | null
-          edgeType: string
-          edgeName: string
-          path: string
-          count: number
-        }
-      >()
-
-      for (const ref of sortedReferences) {
-        // Create a unique key based on all properties
-        const key = `${ref.sourceNodeName ?? ''}:${ref.sourceNodeType ?? ''}:${ref.edgeType}:${ref.edgeName}:${ref.path}`
-        const existing = deduplicatedMap.get(key)
-        if (existing) {
-          existing.count++
-        } else {
-          deduplicatedMap.set(key, {
-            sourceNodeName: ref.sourceNodeName,
-            sourceNodeType: ref.sourceNodeType,
-            edgeType: ref.edgeType,
-            edgeName: ref.edgeName,
-            path: ref.path,
-            count: 1,
-          })
-        }
-      }
-
-      const deduplicatedReferences = Array.from(deduplicatedMap.values())
-
       return {
         nodeName: closure.nodeName,
-        references: deduplicatedReferences,
-        count: 1,
+        references: sortedReferences,
       }
     })
   }
 
-  // Step 9: Deduplicate outer closure items by nodeName and references
-  const finalEnriched: Record<string, readonly LeakedClosureWithReferences[]> = {}
-  for (const [locationKey, closures] of Object.entries(enriched)) {
-    const deduplicatedMap = new Map<
-      string,
-      {
-        nodeName: string
-        references: readonly {
-          sourceNodeName: string | null
-          sourceNodeType: string | null
-          edgeType: string
-          edgeName: string
-          path: string
-          count: number
-        }[]
-        count: number
-      }
-    >()
-
-    for (const closure of closures) {
-      // Create a unique key based on nodeName and serialized references
-      const referencesKey = JSON.stringify(closure.references)
-      const key = `${closure.nodeName}:${referencesKey}`
-      const existing = deduplicatedMap.get(key)
-      if (existing) {
-        existing.count++
-      } else {
-        deduplicatedMap.set(key, {
-          nodeName: closure.nodeName,
-          references: closure.references,
-          count: 1,
-        })
-      }
-    }
-
-    finalEnriched[locationKey] = Array.from(deduplicatedMap.values())
-  }
-
-  // Step 10: Replace script IDs in keys with URLs from script map
-  const result: Record<string, readonly LeakedClosureWithReferences[]> = {}
-  for (const [locationKey, closures] of Object.entries(finalEnriched)) {
-    // Parse location key (format: "scriptId:line:column")
-    const parts = locationKey.split(':')
-    if (parts.length === 3) {
-      const scriptId = parts[0]
-      const line = parts[1]
-      const column = parts[2]
-      const script = scriptMap[scriptId]
-      if (script?.url) {
-        // Replace script ID with URL
-        const newKey = `${script.url}:${line}:${column}`
-        result[newKey] = closures
-      } else {
-        // Keep original key if no URL found
-        result[locationKey] = closures
-      }
-    } else {
-      // Keep original key if format doesn't match
-      result[locationKey] = closures
-    }
-  }
-
-  // Step 11: Filter out excluded paths
-  if (excludeOriginalPaths && excludeOriginalPaths.length > 0) {
-    const filteredResult: Record<string, readonly LeakedClosureWithReferences[]> = {}
-    for (const [locationKey, closures] of Object.entries(result)) {
-      // Parse location key to get the URL part (format: "url:line:column" or "scriptId:line:column")
-      // Find the last two colons to separate URL from line and column
-      const lastColonIndex = locationKey.lastIndexOf(':')
-      const secondLastColonIndex = locationKey.lastIndexOf(':', lastColonIndex - 1)
-      if (secondLastColonIndex !== -1) {
-        const url = locationKey.slice(0, secondLastColonIndex)
-        // Check if URL matches any excluded path
-        const shouldExclude = excludeOriginalPaths.some((excludedPath) => {
-          return url.includes(excludedPath)
-        })
-        if (!shouldExclude) {
-          filteredResult[locationKey] = closures
-        }
-      } else {
-        // Keep keys that don't match the expected format
-        filteredResult[locationKey] = closures
-      }
-    }
-    return filteredResult
-  }
-
-  return result
+  return enriched
 }
