@@ -7,6 +7,7 @@ import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import type { ReferencePath } from '../ReferencePath/ReferencePath.ts'
 import { convertLocationKeyToUrl } from '../ConvertLocationKeyToUrl/ConvertLocationKeyToUrl.ts'
+import { readFile } from 'fs/promises'
 
 export interface LeakedClosureWithReferences {
   readonly nodeName: string
@@ -36,9 +37,11 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshot2 = async (
 export const compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2 = async (
   snapshotA: Snapshot,
   snapshotB: Snapshot,
-  scriptMap: any,
+  scriptMapPath: string,
   options: CompareClosuresOptions = {},
 ): Promise<Record<string, readonly LeakedClosureWithReferences[]>> => {
+  const scriptMapContent = await readFile(scriptMapPath, 'utf8')
+  const scriptMap = JSON.parse(scriptMapContent)
   const leaked = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, scriptMap, options)
   const enriched = enrichLeakedClosuresWithReferences(leaked, snapshotB)
   const result: Record<string, readonly LeakedClosureWithReferences[]> = {}
