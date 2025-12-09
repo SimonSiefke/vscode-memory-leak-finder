@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ ActivityBar, Electron, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ ActivityBar, Electron, Workspace, Search }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'test-file-1.ts',
@@ -17,14 +17,14 @@ export const setup = async ({ ActivityBar, Electron, Workspace }: TestContext): 
   ])
   await ActivityBar.showSearch()
   await Electron.mockDialog({ response: 1 })
-}
-
-export const run = async ({ Search }: TestContext): Promise<void> => {
   await Search.expandFiles()
   // @ts-ignore
   await Search.setFilesToInclude('test*.ts')
   // @ts-ignore
   await Search.enableRegex()
+}
+
+export const run = async ({ Search }: TestContext): Promise<void> => {
   await Search.type('test(\\d+)')
   await Search.toHaveResults([
     'test-file-1.ts2',
@@ -38,7 +38,15 @@ export const run = async ({ Search }: TestContext): Promise<void> => {
   await Search.replace()
   await Search.typeReplace('')
   await Search.type('replaced(\\d+)')
-  await Search.toHaveResults(['test-file-1.ts1', 'replaced123'])
+  await new Promise((r) => {})
+  await Search.toHaveResults([
+    'test-file-1.ts2',
+    'const value1 = "replaced123"',
+    'const value2 = "replaced456"',
+    'test-file-2.ts2',
+    'const value3 = "replaced789"',
+    'const value4 = "replaced012"',
+  ])
   await Search.typeReplace('test$1')
   await Search.replace()
   await Search.typeReplace('')
