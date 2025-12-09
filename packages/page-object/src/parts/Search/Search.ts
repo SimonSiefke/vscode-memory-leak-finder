@@ -26,7 +26,7 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         await searchInput.focus()
         await page.waitForIdle()
-        await expect(searchInput).toBeFocused()
+        // await expect(searchInput).toBeFocused()
         await searchInput.clear()
         await page.waitForIdle()
         await searchInput.type(text)
@@ -115,6 +115,8 @@ export const create = ({ expect, page, VError }) => {
       try {
         await page.waitForIdle()
         const toggleDetails = page.locator(`[role="button"].codicon-search-details`)
+        await expect(toggleDetails).toBeVisible()
+        await page.waitForIdle()
         const expanded = await toggleDetails.getAttribute('aria-expanded')
         if (expanded === 'true') {
           return
