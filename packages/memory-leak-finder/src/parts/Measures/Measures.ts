@@ -67,6 +67,7 @@ export * as MeasureMutationObserversWithStackTracesWithSourceMaps from '../Measu
 export * as MeasureNamedArrayCount from '../MeasureNamedArrayCount/MeasureNamedArrayCount.ts'
 export * as MeasureNamedArrayCountDifference from '../MeasureNamedArrayCountDifference/MeasureNamedArrayCountDifference.ts'
 export * as MeasureNamedClosureCount from '../MeasureNamedClosureCount/MeasureNamedClosureCount.ts'
+export * as MeasureClosuresWithReferences from '../MeasureClosuresWithReferences/MeasureClosuresWithReferences.ts'
 export * as MeasureNamedEmitterCount from '../MeasureNamedEmitterCount/MeasureNamedEmitterCount.ts'
 export * as MeasureNamedFunctionCount from '../MeasureNamedFunctionCount/MeasureNamedFunctionCount.ts'
 export * as MeasureNamedFunctionCount2 from '../MeasureNamedFunctionCount2/MeasureNamedFunctionCount2.ts'
