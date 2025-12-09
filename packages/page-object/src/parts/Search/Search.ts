@@ -52,12 +52,17 @@ export const create = ({ expect, page, VError }) => {
       try {
         await page.waitForIdle()
         const searchView = page.locator('.search-view')
+        await expect(searchView).toBeVisible()
+        await page.waitForIdle()
         const replaceInput = searchView.locator('textarea[placeholder="Replace"]')
         await expect(replaceInput).toBeVisible()
         await page.waitForIdle()
         await replaceInput.focus()
+        await page.waitForIdle()
         await expect(replaceInput).toBeFocused()
+        await page.waitForIdle()
         await replaceInput.clear()
+        await page.waitForIdle()
         await replaceInput.type(text)
         await page.waitForIdle()
       } catch (error) {
