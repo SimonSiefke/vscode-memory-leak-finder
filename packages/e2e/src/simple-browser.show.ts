@@ -6,7 +6,9 @@ export const setup = async ({ Workspace, Editor }: TestContext): Promise<void> =
 }
 
 export const run = async ({ Editor, SimpleBrowser }: TestContext): Promise<void> => {
-  await SimpleBrowser.show('http://localhost:3000')
+  await SimpleBrowser.show({
+    port: 3000,
+  })
   await Editor.closeAll()
 }
 

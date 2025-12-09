@@ -4,7 +4,7 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ page, expect, VError, ideVersion }) => {
   return {
-    async show(url) {
+    async show({ port }) {
       try {
         const server = createServer((req, res) => {
           res.statusCode = 200
@@ -12,10 +12,16 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         })
         const { resolve, promise } = Promise.withResolvers()
         server.once('listening', resolve)
+        server.listen(port)
         await promise
 
         const quickPick = QuickPick.create({ page, expect, VError })
-        await quickPick.executeCommand(WellKnownCommands.SimpleBrowserShow)
+        await quickPick.executeCommand(WellKnownCommands.SimpleBrowserShow, {
+          pressKeyOnce: true,
+          stayVisible: true,
+        })
+        console.log('waiten')
+        await new Promise((r) => {})
         // TODO maybe create a mock http server
         // with a custom index html file to use
         // as url
