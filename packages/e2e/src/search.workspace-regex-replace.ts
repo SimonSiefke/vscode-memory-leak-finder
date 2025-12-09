@@ -32,9 +32,8 @@ export const run = async ({ Search }: TestContext): Promise<void> => {
     'const value2 = "test456"',
     'test-file-2.ts2',
     'const value3 = "test789"',
-    'const value4 = "test0123"',
+    'const value4 = "test012"',
   ])
-  await new Promise((r) => {})
   await Search.typeReplace('replaced$1')
   await Search.replace()
   await Search.typeReplace('')
