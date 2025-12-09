@@ -164,6 +164,7 @@ export const create = ({ expect, page, VError }) => {
         const searchView = page.locator('.search-view')
         const regexCheckbox = searchView.locator('[aria-label^="Use Regular Expression"]')
         await expect(regexCheckbox).toBeVisible()
+        await page.waitForIdle()
         const checked = await regexCheckbox.getAttribute('aria-checked')
         if (checked === 'true') {
           return
@@ -171,6 +172,7 @@ export const create = ({ expect, page, VError }) => {
         await regexCheckbox.click()
         await page.waitForIdle()
         await expect(regexCheckbox).toHaveAttribute('aria-checked', 'true')
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to enable regex`)
       }
@@ -183,7 +185,9 @@ export const create = ({ expect, page, VError }) => {
         const includeInput = include.locator('.input')
         await expect(includeInput).toBeVisible()
         await includeInput.focus()
+        await page.waitForIdle()
         await includeInput.clear()
+        await page.waitForIdle()
         await includeInput.type(pattern)
         await page.waitForIdle()
       } catch (error) {
