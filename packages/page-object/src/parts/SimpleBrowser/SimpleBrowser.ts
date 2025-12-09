@@ -90,7 +90,6 @@ export const create = ({ page, expect, VError }) => {
 
         // TODO check that inner iframe (x3) has expected content
         await page.waitForIdle()
-        const {} = Promise.withResolvers()
       } catch (error) {
         throw new VError(error, `Failed to open simple browser`)
       }
