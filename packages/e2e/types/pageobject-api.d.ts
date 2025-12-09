@@ -436,6 +436,7 @@ export interface Server {
 export interface PageObjectApi {
   readonly ActivityBar: ActivityBar
   readonly Colors: any
+  readonly SimpleBrowser: any
   readonly Git: any
   readonly ChatEditor: ChatEditor
   readonly ExtensionDetailView: any
