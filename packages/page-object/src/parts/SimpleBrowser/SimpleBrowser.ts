@@ -24,10 +24,18 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         const message = page.locator('#quickInput_message')
         await expect(message).toBeVisible()
         await expect(message).toHaveText(`Enter url to visit (Press 'Enter' to confirm or 'Escape' to cancel)`)
+        await page.waitForIdle()
         await quickPick.type(`http://localhost:${port}`)
         await page.waitForIdle()
         await quickPick.pressEnter()
         await page.waitForIdle()
+
+        const tab = page.locator('.tab', { hasText: `Simple Browser` })
+        await expect(tab).toBeVisible()
+        await expect(tab).toHaveCount(1)
+        await page.waitForIdle()
+
+        // TODO check that iframe and subframe is visble
         console.log('waiten')
         await new Promise((r) => {})
         // TODO maybe create a mock http server
