@@ -41,6 +41,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
           extensionId: 'vscode.simple-browser',
           hasLineOfCodeCounter: false,
         })
+        await subFrame.waitForIdle()
         const nav = subFrame.locator('nav.controls')
         await expect(nav).toBeVisible()
         const urlInput = subFrame.locator('.url-input')
