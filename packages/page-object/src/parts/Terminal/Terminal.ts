@@ -161,6 +161,16 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         throw new VError(error, `Failed to kill terminal`)
       }
     },
+    async restartPtyHost() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.RestartPtyHost)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to restart pty host`)
+      }
+    },
     async execute(command, { waitForFile = '' } = {}) {
       try {
         await page.waitForIdle()
