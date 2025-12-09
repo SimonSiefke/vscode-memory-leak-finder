@@ -25,6 +25,9 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await expect(message).toBeVisible()
         await expect(message).toHaveText(`Enter url to visit (Press 'Enter' to confirm or 'Escape' to cancel)`)
         await quickPick.type(`http://localhost:${port}`)
+        await page.waitForIdle()
+        await quickPick.pressEnter()
+        await page.waitForIdle()
         console.log('waiten')
         await new Promise((r) => {})
         // TODO maybe create a mock http server
