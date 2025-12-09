@@ -23,6 +23,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(searchInput).toBeVisible()
         await page.waitForIdle()
         await searchInput.focus()
+        await page.waitForIdle()
         await expect(searchInput).toBeFocused()
         await searchInput.clear()
         await page.waitForIdle()
