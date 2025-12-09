@@ -127,7 +127,7 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
         await page.waitForIdle()
-        if (ideVersion && ideVersion.minor <= 105) {
+        if (ideVersion && ideVersion.minor <= 106) {
           // do nothing
         } else {
           await quickPick.executeCommand(WellKnownCommands.FocusTerminal)
