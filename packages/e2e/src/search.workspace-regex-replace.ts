@@ -1,6 +1,10 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ ActivityBar, Electron, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({
+  ActivityBar,
+  Electron,
+  Workspace,
+}: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'test-file-1.ts',
