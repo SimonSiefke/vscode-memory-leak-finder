@@ -1,10 +1,6 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({
-  ActivityBar,
-  Electron,
-  Workspace,
-}: TestContext): Promise<void> => {
+export const setup = async ({ ActivityBar, Electron, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'test-file-1.ts',
@@ -25,7 +21,9 @@ export const setup = async ({
 
 export const run = async ({ Search }: TestContext): Promise<void> => {
   await Search.expandFiles()
+  // @ts-ignore
   await Search.setFilesToInclude('test-.*\\.(ts|js)')
+  // @ts-ignore
   await Search.enableRegex()
   await Search.type('test(\\d+)')
   await Search.toHaveResults(['test-file-1.ts1', 'test123'])

@@ -162,9 +162,8 @@ export const create = ({ expect, page, VError }) => {
       try {
         await page.waitForIdle()
         const searchView = page.locator('.search-view')
-        const regexCheckbox = searchView.locator(
-          '[aria-label="Use Regular Expression"]',
-        )
+        const regexCheckbox = searchView.locator('[aria-label^="Use Regular Expression"]')
+        await expect(regexCheckbox).toBeVisible()
         const checked = await regexCheckbox.getAttribute('aria-checked')
         if (checked === 'true') {
           return
