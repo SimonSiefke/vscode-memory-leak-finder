@@ -2,11 +2,16 @@ import * as Character from '../Character/Character.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
+import * as WebView from '../WebView/WebView.ts'
 
 const initialDiagnosticTimeout = 30_000
 
 const isNotebook = (file) => {
   return file.endsWith('.ipynb')
+}
+
+const isImage = (file) => {
+  return file.endsWith('.svg')
 }
 
 export const create = ({ page, expect, VError, ideVersion }) => {
@@ -24,6 +29,14 @@ export const create = ({ page, expect, VError, ideVersion }) => {
           const list = notebookEditor.locator('.monaco-list')
           await page.waitForIdle()
           await expect(list).toBeFocused()
+        } else if (isImage(fileName)) {
+          const webView = WebView.create({ page, expect, VError })
+          const subFrame = await webView.shouldBeVisible2({
+            extensionId: `vscode.media-preview`,
+            hasLineOfCodeCounter: false,
+          })
+          const img = subFrame.locator('img')
+          await expect(img).toBeVisible()
         } else {
           const editor = page.locator('.editor-instance')
           await expect(editor).toBeVisible()
