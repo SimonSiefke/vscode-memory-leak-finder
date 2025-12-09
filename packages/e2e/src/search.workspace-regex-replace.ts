@@ -38,7 +38,6 @@ export const run = async ({ Search }: TestContext): Promise<void> => {
   await Search.replace()
   await Search.typeReplace('')
   await Search.type('replaced(\\d+)')
-  await new Promise((r) => {})
   await Search.toHaveResults([
     'test-file-1.ts2',
     'const value1 = "replaced123"',
