@@ -1,7 +1,7 @@
 import { createServer } from 'node:http'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
-import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 import * as WebView from '../WebView/WebView.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 interface MockServer {
   [Symbol.asyncDispose]: () => Promise<void>
@@ -27,10 +27,26 @@ const createMockServer = async ({ port }): Promise<MockServer> => {
 
 export const create = ({ page, expect, VError }) => {
   return {
+    mockServers: Object.create(null),
+    async createMockServer({ port, id }) {
+      try {
+        const server = await createMockServer({ port })
+        this.mockServers[id] = server
+      } catch (error) {
+        throw new VError(error, `Failed to create mock server`)
+      }
+    },
+    async disposeMockServer({ id }) {
+      try {
+        const server = this.mockServers[id]
+        await server[Symbol.asyncDispose]()
+        delete this.mockServers[id]
+      } catch (error) {
+        throw new VError(error, `Failed to dispose mock server`)
+      }
+    },
     async show({ port }) {
       try {
-        await using _ = await createMockServer({ port })
-
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.SimpleBrowserShow, {
           pressKeyOnce: true,
