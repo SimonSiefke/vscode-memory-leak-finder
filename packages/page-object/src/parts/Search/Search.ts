@@ -71,11 +71,14 @@ export const create = ({ expect, page, VError }) => {
     },
     async replace() {
       try {
+        await page.waitForIdle()
         const button = page.locator('[aria-label="Replace All (Ctrl+Alt+Enter)"]')
         await button.click()
+        await page.waitForIdle()
         const messageLocator = page.locator('.text-search-provider-messages .message')
         await expect(messageLocator).toBeVisible()
         await expect(messageLocator).toHaveText(/Replaced/)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to replace`)
       }
