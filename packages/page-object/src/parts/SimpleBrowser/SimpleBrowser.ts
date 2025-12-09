@@ -3,18 +3,33 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 import * as WebView from '../WebView/WebView.ts'
 
-export const create = ({ page, expect, VError, ideVersion }) => {
+interface MockServer {
+  [Symbol.asyncDispose]: () => Promise<void>
+}
+
+const createMockServer = async ({ port }): Promise<MockServer> => {
+  const server = createServer((req, res) => {
+    res.statusCode = 200
+    res.end('<h1>hello world</h1>')
+  })
+  const { resolve, promise } = Promise.withResolvers()
+  server.once('listening', resolve)
+  server.listen(port)
+  await promise
+  return {
+    async [Symbol.asyncDispose]() {
+      const { resolve, promise } = Promise.withResolvers()
+      server.close(resolve)
+      await promise
+    },
+  }
+}
+
+export const create = ({ page, expect, VError }) => {
   return {
     async show({ port }) {
       try {
-        const server = createServer((req, res) => {
-          res.statusCode = 200
-          res.end('<h1>hello world</h1>')
-        })
-        const { resolve, promise } = Promise.withResolvers()
-        server.once('listening', resolve)
-        server.listen(port)
-        await promise
+        await using _ = await createMockServer({ port })
 
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.SimpleBrowserShow, {
@@ -53,6 +68,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
 
         // TODO check that inner iframe (x3) has expected content
         await page.waitForIdle()
+        const {} = Promise.withResolvers()
       } catch (error) {
         throw new VError(error, `Failed to open simple browser`)
       }
