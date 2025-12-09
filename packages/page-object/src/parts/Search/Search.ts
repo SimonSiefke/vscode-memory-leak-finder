@@ -19,6 +19,8 @@ export const create = ({ expect, page, VError }) => {
       try {
         await page.waitForIdle()
         const searchView = page.locator('.search-view')
+        await expect(searchView).toBeVisible()
+        await page.waitForIdle()
         const searchInput = searchView.locator('textarea[placeholder="Search"]')
         await expect(searchInput).toBeVisible()
         await page.waitForIdle()
