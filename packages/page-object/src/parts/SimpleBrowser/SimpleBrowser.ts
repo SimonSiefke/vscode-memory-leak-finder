@@ -1,6 +1,7 @@
 import { createServer } from 'node:http'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
+import * as WebView from '../WebView/WebView.ts'
 
 export const create = ({ page, expect, VError, ideVersion }) => {
   return {
@@ -35,13 +36,21 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await expect(tab).toHaveCount(1)
         await page.waitForIdle()
 
-        // TODO check that iframe and subframe is visble
-        console.log('waiten')
-        await new Promise((r) => {})
-        // TODO maybe create a mock http server
-        // with a custom index html file to use
-        // as url
+        const webView = WebView.create({ page, expect, VError })
+        const subFrame = await webView.shouldBeVisible2({
+          extensionId: 'vscode.simple-browser',
+          hasLineOfCodeCounter: false,
+        })
+        const nav = subFrame.locator('nav.controls')
+        await expect(nav).toBeVisible()
+        const urlInput = subFrame.locator('.url-input')
+        await expect(urlInput).toBeVisible()
         await page.waitForIdle()
+        const subIframe = subFrame.locator('.content iframe')
+        await expect(subIframe).toBeVisible()
+        await page.waitForIdle()
+
+        // TODO check that inner iframe (x3) has expected content
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open simple browser`)
