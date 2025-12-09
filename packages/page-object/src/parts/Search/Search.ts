@@ -158,5 +158,36 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to open search editor`)
       }
     },
+    async enableRegex() {
+      try {
+        await page.waitForIdle()
+        const searchView = page.locator('.search-view')
+        const regexCheckbox = searchView.locator('[aria-label="Use Regular Expression"]')
+        const checked = await regexCheckbox.getAttribute('aria-checked')
+        if (checked === 'true') {
+          return
+        }
+        await regexCheckbox.click()
+        await page.waitForIdle()
+        await expect(regexCheckbox).toHaveAttribute('aria-checked', 'true')
+      } catch (error) {
+        throw new VError(error, `Failed to enable regex`)
+      }
+    },
+    async setFilesToInclude(pattern: string) {
+      try {
+        await page.waitForIdle()
+        await this.expandFiles()
+        const include = page.locator('.file-types.includes')
+        const includeInput = include.locator('.input')
+        await expect(includeInput).toBeVisible()
+        await includeInput.focus()
+        await includeInput.clear()
+        await includeInput.type(pattern)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to set files to include`)
+      }
+    },
   }
 }
