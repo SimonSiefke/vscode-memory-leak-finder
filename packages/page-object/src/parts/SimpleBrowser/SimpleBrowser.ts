@@ -30,8 +30,10 @@ export const create = ({ page, expect, VError }) => {
     mockServers: Object.create(null),
     async createMockServer({ port, id }) {
       try {
+        await page.waitForIdle()
         const server = await createMockServer({ port })
         this.mockServers[id] = server
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to create mock server`)
       }
@@ -47,6 +49,7 @@ export const create = ({ page, expect, VError }) => {
     },
     async show({ port }) {
       try {
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.SimpleBrowserShow, {
           pressKeyOnce: true,
@@ -55,6 +58,7 @@ export const create = ({ page, expect, VError }) => {
         await page.waitForIdle()
         const message = page.locator('#quickInput_message')
         await expect(message).toBeVisible()
+        await page.waitForIdle()
         await expect(message).toHaveText(`Enter url to visit (Press 'Enter' to confirm or 'Escape' to cancel)`)
         await page.waitForIdle()
         await quickPick.type(`http://localhost:${port}`)
@@ -64,6 +68,7 @@ export const create = ({ page, expect, VError }) => {
 
         const tab = page.locator('.tab', { hasText: `Simple Browser` })
         await expect(tab).toBeVisible()
+        await page.waitForIdle()
         await expect(tab).toHaveCount(1)
         await page.waitForIdle()
 
@@ -73,6 +78,7 @@ export const create = ({ page, expect, VError }) => {
           hasLineOfCodeCounter: false,
         })
         await subFrame.waitForIdle()
+        await page.waitForIdle()
         const nav = subFrame.locator('nav.controls')
         await expect(nav).toBeVisible()
         const urlInput = subFrame.locator('.url-input')
