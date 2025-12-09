@@ -59,6 +59,7 @@ export const ShowOrFocusStandaloneColorPicker = 'Show or Focus Standalone Color 
 export const ShowReleaseNotes = 'Code: Show Release Notes'
 export const ShowRunAndDebug = 'View: Show Run and Debug'
 export const ShowRunningExtensions = 'Developer: Show Running Extensions'
+export const SimpleBrowserShow = 'Simple Browser: Show'
 export const SourceAction = 'Source Action...'
 export const TerminalSplitTerminal = 'Terminal: Split Terminal'
 export const ThreeColumnLayout = 'View: Three Columns Editor Layout'
