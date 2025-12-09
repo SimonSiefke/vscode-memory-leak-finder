@@ -20,6 +20,11 @@ export const create = ({ page, expect, VError, ideVersion }) => {
           pressKeyOnce: true,
           stayVisible: true,
         })
+        await page.waitForIdle()
+        const message = page.locator('#quickInput_message')
+        await expect(message).toBeVisible()
+        await expect(message).toHaveText(`Enter url to visit (Press 'Enter' to confirm or 'Escape' to cancel)`)
+        await quickPick.type(`http://localhost:${port}`)
         console.log('waiten')
         await new Promise((r) => {})
         // TODO maybe create a mock http server
