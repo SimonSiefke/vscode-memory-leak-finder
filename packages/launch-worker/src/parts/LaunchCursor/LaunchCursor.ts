@@ -12,6 +12,7 @@ import * as LaunchElectron from '../LaunchElectron/LaunchElectron.ts'
 import { join } from '../Path/Path.ts'
 import * as Root from '../Root/Root.ts'
 import { VError } from '../VError/VError.ts'
+import * as HttpProxyServer from '../HttpProxyServer/HttpProxyServer.ts'
 
 export const launchCursor = async ({
   headlessMode,
@@ -26,6 +27,7 @@ export const launchCursor = async ({
   inspectPtyHostPort,
   inspectSharedProcessPort,
   inspectExtensionsPort,
+  enableProxy,
 }) => {
   try {
     const testWorkspacePath = join(Root.root, '.cursor-test-workspace')
@@ -46,6 +48,39 @@ export const launchCursor = async ({
     const settingsPath = join(userDataDir, 'User', 'settings.json')
     await mkdir(dirname(settingsPath), { recursive: true })
     await copyFile(defaultSettingsSourcePath, settingsPath)
+
+    // Start proxy server if enabled
+    let proxyServer: { port: number; url: string; dispose: () => Promise<void> } | null = null
+    if (enableProxy) {
+      try {
+        console.log('[LaunchCursor] Starting proxy server...')
+        proxyServer = await HttpProxyServer.createHttpProxyServer(0)
+        console.log(`[LaunchCursor] Proxy server started on ${proxyServer.url} (port ${proxyServer.port})`)
+
+        // Update settings
+        const { readFile, writeFile } = await import('fs/promises')
+        const settingsContent = await readFile(settingsPath, 'utf8')
+        const settings = JSON.parse(settingsContent)
+        settings['http.proxy'] = proxyServer.url
+        settings['http.proxyStrictSSL'] = false
+        await writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf8')
+        console.log(`[LaunchCursor] Proxy configured: ${proxyServer.url}`)
+
+        // Keep proxy server alive
+        if (addDisposable && proxyServer) {
+          addDisposable(async () => {
+            console.log('[LaunchCursor] Disposing proxy server...')
+            await proxyServer!.dispose()
+          })
+        }
+
+        // Wait a bit to ensure proxy server is ready
+        await new Promise(resolve => setTimeout(resolve, 100))
+      } catch (error) {
+        console.error('[LaunchCursor] Error setting up proxy:', error)
+        // Continue even if proxy setup fails
+      }
+    }
     const args = GetVsCodeArgs.getVscodeArgs({
       userDataDir,
       extensionsDir,
