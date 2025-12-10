@@ -1,15 +1,14 @@
-import { createServer, IncomingMessage, ServerResponse } from 'http'
-import { request as httpRequest } from 'http'
-import { request as httpsRequest } from 'https'
-import { URL, fileURLToPath } from 'url'
-import { mkdir, writeFile, readFile } from 'fs/promises'
-import { join, dirname } from 'path'
 import { existsSync } from 'fs'
+import { mkdir, readFile, writeFile } from 'fs/promises'
+import { createServer, request as httpRequest, IncomingMessage, ServerResponse } from 'http'
+import { request as httpsRequest } from 'https'
+import { dirname, join } from 'path'
+import { fileURLToPath, URL } from 'url'
+import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
+import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
+import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
 import * as Root from '../Root/Root.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
-import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
-import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
-import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 

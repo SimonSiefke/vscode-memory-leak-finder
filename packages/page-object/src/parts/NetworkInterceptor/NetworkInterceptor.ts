@@ -1,6 +1,6 @@
 import * as Root from '../Root/Root.ts'
-import { join } from 'path'
-import { readFile, writeFile } from 'fs/promises'
+import { join, dirname } from 'path'
+import { readFile, writeFile, mkdir } from 'fs/promises'
 import { existsSync } from 'fs'
 
 const getSettingsPath = (): string => {
@@ -32,8 +32,6 @@ const updateVsCodeSettings = async (proxyUrl: string | null): Promise<void> => {
     delete settings['http.proxyStrictSSL']
   }
 
-  const { mkdir } = await import('fs/promises')
-  const { dirname } = await import('path')
   await mkdir(dirname(settingsPath), { recursive: true })
   await writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf8')
 }
