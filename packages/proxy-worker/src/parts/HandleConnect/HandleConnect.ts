@@ -1,7 +1,7 @@
 import { IncomingMessage } from 'http'
 import { request as httpsRequest } from 'https'
 import { createSecureContext, TLSSocket } from 'tls'
-import { mkdir, writeFile } from 'fs/promises'
+import { mkdir, writeFile, unlink } from 'fs/promises'
 import { join } from 'path'
 import * as Root from '../Root/Root.ts'
 import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
@@ -11,8 +11,10 @@ import { getCertificateForDomain } from '../GetCertificateForDomain/GetCertifica
 import { sanitizeFilename } from '../SanitizeFilename/SanitizeFilename.ts'
 import { decompressBody } from '../DecompressBody/DecompressBody.ts'
 import { parseJsonIfApplicable } from '../HttpProxyServer/HttpProxyServer.ts'
+import { CERT_DIR } from '../Constants/Constants.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
+const DOMAIN_SANITIZE_REGEX = /[^a-zA-Z0-9]/g
 
 const saveInterceptedRequest = async (
   method: string,
@@ -73,11 +75,47 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
 
   try {
     // Get certificate for this domain
-    const { cert, key } = await getCertificateForDomain(hostname)
-    const secureContext = createSecureContext({
-      cert,
-      key,
-    })
+    let certPair: { cert: string; key: string }
+    try {
+      certPair = await getCertificateForDomain(hostname)
+    } catch (error) {
+      console.error(`[Proxy] Error getting certificate for ${hostname}, regenerating...`, error)
+      // If there's an error getting the certificate, try to regenerate it
+      const certPath = join(CERT_DIR, `${hostname.replace(DOMAIN_SANITIZE_REGEX, '_')}-cert.pem`)
+      const keyPath = join(CERT_DIR, `${hostname.replace(DOMAIN_SANITIZE_REGEX, '_')}-key.pem`)
+      await Promise.all([
+        unlink(certPath).catch(() => {}),
+        unlink(keyPath).catch(() => {}),
+      ])
+      certPair = await getCertificateForDomain(hostname)
+    }
+
+    let secureContext
+    try {
+      secureContext = createSecureContext({
+        cert: certPair.cert,
+        key: certPair.key,
+      })
+    } catch (error) {
+      const errorCode = (error as NodeJS.ErrnoException).code
+      if (errorCode === 'ERR_OSSL_X509_KEY_VALUES_MISMATCH') {
+        // Certificate-key mismatch detected, regenerate
+        console.log(`[Proxy] Certificate-key mismatch for ${hostname}, regenerating...`)
+        const certPath = join(CERT_DIR, `${hostname.replace(DOMAIN_SANITIZE_REGEX, '_')}-cert.pem`)
+        const keyPath = join(CERT_DIR, `${hostname.replace(DOMAIN_SANITIZE_REGEX, '_')}-key.pem`)
+        await Promise.all([
+          unlink(certPath).catch(() => {}),
+          unlink(keyPath).catch(() => {}),
+        ])
+        certPair = await getCertificateForDomain(hostname)
+        secureContext = createSecureContext({
+          cert: certPair.cert,
+          key: certPair.key,
+        })
+      } else {
+        throw error
+      }
+    }
 
     // Send CONNECT response first
     socket.write('HTTP/1.1 200 Connection Established\r\n\r\n')
