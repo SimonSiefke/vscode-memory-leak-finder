@@ -6,12 +6,14 @@ import * as GenerateCertificateForDomain from '../GenerateCertificateForDomain/G
 import { CERT_DIR } from '../Constants/Constants.ts'
 import type { CertificatePair } from '../CertificatePair/CertificatePair.ts'
 
+const DOMAIN_SANITIZE_REGEX = /[^a-zA-Z0-9]/g
+
 export const getCertificateForDomain = async (
   domain: string,
 ): Promise<CertificatePair> => {
   const ca = await GetOrCreateCA.getOrCreateCA()
-  const certPath = join(CERT_DIR, `${domain.replace(/[^a-zA-Z0-9]/g, '_')}-cert.pem`)
-  const keyPath = join(CERT_DIR, `${domain.replace(/[^a-zA-Z0-9]/g, '_')}-key.pem`)
+  const certPath = join(CERT_DIR, `${domain.replace(DOMAIN_SANITIZE_REGEX, '_')}-cert.pem`)
+  const keyPath = join(CERT_DIR, `${domain.replace(DOMAIN_SANITIZE_REGEX, '_')}-key.pem`)
 
   if (existsSync(certPath) && existsSync(keyPath)) {
     const cert = await readFile(certPath, 'utf8')

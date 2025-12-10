@@ -2,13 +2,7 @@ import { readFile } from 'fs/promises'
 import { join, dirname } from 'path'
 import { existsSync } from 'fs'
 import { fileURLToPath } from 'url'
-
-interface MockConfigEntry {
-  hostname: string
-  pathname: string
-  method: string
-  filename: string
-}
+import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const MOCK_CONFIG_PATH = join(__dirname, 'mock-config.json')
@@ -71,4 +65,3 @@ export const getMockFileName = async (hostname: string, pathname: string, method
   const pathPart = pathnameSanitized || 'root'
   return `${hostnameSanitized}_${pathPart}_${methodLower}.json`
 }
-
