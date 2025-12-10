@@ -1,4 +1,4 @@
-export const getVsCodeEnv = async ({ runtimeDir, processEnv, proxyUrl, proxyWorkerRpc }) => {
+export const getVsCodeEnv = async ({ runtimeDir, processEnv, proxyEnvVars }) => {
   const env = {
     ...processEnv,
   }
@@ -14,8 +14,7 @@ export const getVsCodeEnv = async ({ runtimeDir, processEnv, proxyUrl, proxyWork
   delete env.ELECTRON_RUN_AS_NODE
 
   // Set HTTP_PROXY/HTTPS_PROXY environment variables if proxy is configured
-  if (proxyUrl && proxyWorkerRpc) {
-    const proxyEnvVars = await proxyWorkerRpc.invoke('Proxy.getProxyEnvVars', proxyUrl)
+  if (proxyEnvVars) {
     Object.assign(env, proxyEnvVars)
   }
 

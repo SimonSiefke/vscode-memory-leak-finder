@@ -87,11 +87,14 @@ export const launchCursor = async ({
       inspectExtensionsPort,
       enableProxy,
     })
+    let proxyEnvVars: Record<string, string> | null = null
+    if (proxyServer && proxyWorkerRpc) {
+      proxyEnvVars = await proxyWorkerRpc.invoke('Proxy.getProxyEnvVars', proxyServer.url)
+    }
     const env = await GetVsCodeEnv.getVsCodeEnv({
       runtimeDir,
       processEnv: process.env,
-      proxyUrl: proxyServer ? proxyServer.url : null,
-      proxyWorkerRpc,
+      proxyEnvVars,
     })
     const { child } = await LaunchElectron.launchElectron({
       cliPath: binaryPath,
