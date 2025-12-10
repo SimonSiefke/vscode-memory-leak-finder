@@ -177,7 +177,15 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
         await SavePostBody.savePostBody(req.method, targetUrl, req.headers as Record<string, string>, requestBody)
       }
 
-      SaveRequest.saveRequest(req, res, responseData).catch((err) => {
+      // Convert headers to Record<string, string | string[]> format
+      const responseHeaders: Record<string, string | string[]> = {}
+      Object.entries(proxyRes.headers).forEach(([k, v]) => {
+        if (v !== undefined) {
+          responseHeaders[k] = v
+        }
+      })
+
+      SaveRequest.saveRequest(req, proxyRes.statusCode || 200, proxyRes.statusMessage, responseHeaders, responseData).catch((err) => {
         console.error('[Proxy] Error saving request:', err)
       })
     })

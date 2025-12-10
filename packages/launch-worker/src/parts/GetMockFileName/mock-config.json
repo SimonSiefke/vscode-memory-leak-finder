@@ -64,5 +64,11 @@
     "pathname": "/copilot_internal/subscribe_limited_user",
     "method": "POST",
     "filename": "api_github_com_copilot_internal_subscribe_limited_user_post.json"
+  },
+  {
+    "hostname": "telemetry.individual.githubcopilot.com",
+    "pathname": "/telemetry",
+    "method": "*",
+    "filename": "telemetry_individual_githubcopilot_com_telemetry.json"
   }
 ]

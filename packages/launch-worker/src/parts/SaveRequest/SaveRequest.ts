@@ -1,4 +1,4 @@
-import { IncomingMessage, ServerResponse } from 'http'
+import { IncomingMessage } from 'http'
 import { createGunzip, createInflate, createBrotliDecompress } from 'zlib'
 import { mkdir, writeFile } from 'fs/promises'
 import { join } from 'path'
@@ -87,7 +87,13 @@ const parseJsonIfApplicable = (body: string, contentType: string | string[] | un
   return body
 }
 
-export const saveRequest = async (req: IncomingMessage, response: ServerResponse, responseData: Buffer): Promise<void> => {
+export const saveRequest = async (
+  req: IncomingMessage,
+  statusCode: number,
+  statusMessage: string | undefined,
+  responseHeaders: Record<string, string | string[]>,
+  responseData: Buffer,
+): Promise<void> => {
   try {
     await mkdir(REQUESTS_DIR, { recursive: true })
     const timestamp = Date.now()
@@ -95,10 +101,11 @@ export const saveRequest = async (req: IncomingMessage, response: ServerResponse
     const filename = `${timestamp}_${sanitizeFilename(url)}.json`
     const filepath = join(REQUESTS_DIR, filename)
 
-    const responseHeaders = response.getHeaders()
-    const { body: decompressedBody, wasCompressed } = await decompressBody(responseData, responseHeaders['content-encoding'])
+    const contentEncoding = responseHeaders['content-encoding'] || responseHeaders['Content-Encoding']
+    const contentType = responseHeaders['content-type'] || responseHeaders['Content-Type']
+    const { body: decompressedBody, wasCompressed } = await decompressBody(responseData, contentEncoding)
 
-    const parsedBody = parseJsonIfApplicable(decompressedBody, responseHeaders['content-type'])
+    const parsedBody = parseJsonIfApplicable(decompressedBody, contentType)
 
     const requestData = {
       timestamp,
@@ -106,8 +113,8 @@ export const saveRequest = async (req: IncomingMessage, response: ServerResponse
       url: req.url,
       headers: req.headers,
       response: {
-        statusCode: response.statusCode,
-        statusMessage: response.statusMessage,
+        statusCode,
+        statusMessage,
         headers: responseHeaders,
         body: parsedBody,
         wasCompressed,

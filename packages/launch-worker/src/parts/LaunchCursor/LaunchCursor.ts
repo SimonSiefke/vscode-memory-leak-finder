@@ -78,7 +78,7 @@ export const launchCursor = async ({
         }
 
         // Wait a bit to ensure proxy server is ready
-        await new Promise(resolve => setTimeout(resolve, 100))
+        await new Promise((resolve) => setTimeout(resolve, 100))
       } catch (error) {
         console.error('[LaunchCursor] Error setting up proxy:', error)
         // Continue even if proxy setup fails
@@ -95,6 +95,7 @@ export const launchCursor = async ({
       inspectPtyHostPort,
       inspectSharedProcessPort,
       inspectExtensionsPort,
+      enableProxy,
     })
     const env = await GetVsCodeEnv.getVsCodeEnv({
       runtimeDir,
