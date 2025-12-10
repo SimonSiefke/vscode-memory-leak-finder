@@ -406,7 +406,7 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
       socket.end()
     })
 
-    socket.on('error', (error) => {
+    socket.on('error', (error: Error) => {
       const errorCode = (error as NodeJS.ErrnoException).code
       if (errorCode === 'EPIPE' || errorCode === 'ECONNRESET' || errorCode === 'ETIMEDOUT' || errorCode === 'ENETUNREACH') {
         tlsSocket.end()
@@ -425,4 +425,3 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
     socket.end()
   }
 }
-

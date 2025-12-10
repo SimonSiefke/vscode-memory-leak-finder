@@ -66,4 +66,3 @@ export const decompressBody = async (body: Buffer, encoding: string | string[] |
 
   return { body: body.toString('utf8'), wasCompressed: false }
 }
-

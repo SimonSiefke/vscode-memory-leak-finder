@@ -12,9 +12,14 @@ export const createHttpProxyServer = async (
   if (proxyServerInstance) {
     throw new Error('Proxy server already created')
   }
-  proxyServerInstance = await HttpProxyServer.createHttpProxyServer(port || 0, useProxyMock)
-  if (!proxyServerInstance) {
-    throw new Error('Failed to create proxy server')
+  const server = await HttpProxyServer.createHttpProxyServer({
+    port: port || 0,
+    useProxyMock: useProxyMock || false,
+  })
+  proxyServerInstance = {
+    port: server.port,
+    url: server.url,
+    [Symbol.asyncDispose]: server.dispose,
   }
   return {
     port: proxyServerInstance.port,
