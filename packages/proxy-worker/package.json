@@ -15,6 +15,7 @@
     "@lvce-editor/assert": "^1.4.0",
     "@lvce-editor/rpc": "^4.20.0",
     "@lvce-editor/verror": "^1.7.0",
+<<<<<<< HEAD
     "@mongodb-js/zstd": "^7.0.0",
     "execa": "^9.6.1",
     "node-forge": "^1.3.1"
@@ -22,5 +23,11 @@
   "devDependencies": {
     "@types/node": "^24.10.1",
     "@types/node-forge": "^1.3.11"
+=======
+    "execa": "^9.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1"
+>>>>>>> origin/main
   }
 }

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import * as Proxy from '../Proxy/Proxy.ts'
 import * as ConvertRequestsToMocks from '../ConvertRequestsToMocks/ConvertRequestsToMocks.ts'
 
@@ -9,3 +10,6 @@ export const commandMap = {
   'Proxy.getProxyEnvVars': Proxy.getProxyEnvVars,
   'Proxy.setupProxy': Proxy.setupProxy,
 }
+=======
+export const commandMap = {}
+>>>>>>> origin/main
