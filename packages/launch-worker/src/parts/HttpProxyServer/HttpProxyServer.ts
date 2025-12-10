@@ -419,13 +419,20 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer, us
           const mockResponse = await GetMockResponse.getMockResponse(method, fullUrl)
           if (mockResponse) {
             console.log(`[Proxy] Returning mock response for ${method} ${fullUrl}`)
-            const bodyStr = typeof mockResponse.body === 'string' ? mockResponse.body : JSON.stringify(mockResponse.body)
+            let bodyStr: string
+            if (mockResponse.body === null || mockResponse.body === undefined) {
+              bodyStr = ''
+            } else if (typeof mockResponse.body === 'string') {
+              bodyStr = mockResponse.body
+            } else {
+              bodyStr = JSON.stringify(mockResponse.body)
+            }
             const bodyBuffer = Buffer.from(bodyStr, 'utf8')
 
             // Convert headers to the format expected and check for existing CORS headers
             const cleanedHeaders: Record<string, string> = {}
             const lowerCaseHeaders: Set<string> = new Set()
-            
+
             Object.entries(mockResponse.headers).forEach(([k, v]) => {
               const lowerKey = k.toLowerCase()
               // Skip Content-Length headers (case-insensitive) - we'll set it below

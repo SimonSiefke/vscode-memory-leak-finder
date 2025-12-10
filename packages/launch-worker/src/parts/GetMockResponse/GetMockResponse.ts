@@ -90,13 +90,20 @@ export const getMockResponse = async (method: string, url: string): Promise<Mock
 }
 
 export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse, httpVersion: string = 'HTTP/1.1'): void => {
-  const bodyStr = typeof mockResponse.body === 'string' ? mockResponse.body : JSON.stringify(mockResponse.body)
+  let bodyStr: string
+  if (mockResponse.body === null || mockResponse.body === undefined) {
+    bodyStr = ''
+  } else if (typeof mockResponse.body === 'string') {
+    bodyStr = mockResponse.body
+  } else {
+    bodyStr = JSON.stringify(mockResponse.body)
+  }
   const bodyBuffer = Buffer.from(bodyStr, 'utf8')
 
   // Convert headers to the format expected by writeHead and check for existing CORS headers
   const headers: Record<string, string> = {}
   const lowerCaseHeaders: Set<string> = new Set()
-  
+
   Object.entries(mockResponse.headers).forEach(([key, value]) => {
     const lowerKey = key.toLowerCase()
     // Skip Content-Length headers (case-insensitive) - we'll set it below
