@@ -175,15 +175,15 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   for (const [key, value] of Object.entries(mockResponse.headers)) {
     const lowerKey = key.toLowerCase()
     // Skip Content-Length headers (case-insensitive) - we'll set it below
-    // Skip Content-Encoding and Transfer-Encoding headers for zip files - binary data is not encoded
-    if (lowerKey !== 'content-length' && !(isZipFile && (lowerKey === 'content-encoding' || lowerKey === 'transfer-encoding'))) {
+    // Skip Content-Encoding and Transfer-Encoding headers for zip files and SSE files - data is not encoded
+    if (lowerKey !== 'content-length' && !((isZipFile || isSseFile) && (lowerKey === 'content-encoding' || lowerKey === 'transfer-encoding'))) {
       headers[key] = Array.isArray(value) ? value.join(', ') : String(value)
       lowerCaseHeaders.add(lowerKey)
     }
   }
 
-  // Double-check: explicitly remove Content-Encoding and Transfer-Encoding for zip files
-  if (isZipFile) {
+  // Double-check: explicitly remove Content-Encoding and Transfer-Encoding for zip files and SSE files
+  if (isZipFile || isSseFile) {
     const keysToRemove: string[] = []
     for (const k of Object.keys(headers)) {
       const lowerKey = k.toLowerCase()
@@ -195,7 +195,8 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
       delete headers[k]
       lowerCaseHeaders.delete(k.toLowerCase())
     }
-    console.log(`[Proxy] sendMockResponse - Final headers for zip file (after cleanup):`, Object.keys(headers))
+    const fileType = isZipFile ? 'zip file' : 'SSE file'
+    console.log(`[Proxy] sendMockResponse - Final headers for ${fileType} (after cleanup):`, Object.keys(headers))
   }
 
   // Add CORS headers if not already present (case-insensitive check)
