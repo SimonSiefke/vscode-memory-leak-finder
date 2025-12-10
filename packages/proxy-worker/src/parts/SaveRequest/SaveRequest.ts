@@ -5,12 +5,9 @@ import { join } from 'path'
 import { decompress as zstdDecompress } from '@mongodb-js/zstd'
 import * as Root from '../Root/Root.ts'
 import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
+import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
-
-const sanitizeFilename = (url: string): string => {
-  return url.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 200)
-}
 
 const decompressBody = async (body: Buffer, encoding: string | string[] | undefined): Promise<{ body: string; wasCompressed: boolean }> => {
   if (!encoding) {
@@ -110,7 +107,7 @@ export const saveRequest = async (
     await mkdir(REQUESTS_DIR, { recursive: true })
     const timestamp = Date.now()
     const url = req.url || ''
-    const filename = `${timestamp}_${sanitizeFilename(url)}.json`
+    const filename = `${timestamp}_${SanitizeFilename.sanitizeFilename(url)}.json`
     const filepath = join(REQUESTS_DIR, filename)
 
     const contentEncoding = responseHeaders['content-encoding'] || responseHeaders['Content-Encoding']
