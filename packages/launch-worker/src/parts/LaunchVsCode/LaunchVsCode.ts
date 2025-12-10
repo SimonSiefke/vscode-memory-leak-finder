@@ -31,6 +31,8 @@ export const launchVsCode = async ({
   inspectPtyHostPort,
   inspectSharedProcessPort,
   inspectExtensionsPort,
+  enableProxy,
+  useProxyMock,
 }) => {
   try {
     const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
@@ -70,8 +72,13 @@ export const launchVsCode = async ({
       inspectPtyHostPort,
       inspectSharedProcessPort,
       inspectExtensionsPort,
+      enableProxy: enableProxy,
     })
-    const env = GetVsCodeEnv.getVsCodeEnv({ runtimeDir, processEnv: process.env })
+
+    const env = GetVsCodeEnv.getVsCodeEnv({
+      runtimeDir,
+      processEnv: process.env,
+    })
     const { child } = await LaunchElectron.launchElectron({
       cliPath: binaryPath,
       args,
