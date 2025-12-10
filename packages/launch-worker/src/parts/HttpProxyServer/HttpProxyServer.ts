@@ -254,6 +254,9 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
       key,
     })
 
+    // Send CONNECT response first
+    socket.write('HTTP/1.1 200 Connection Established\r\n\r\n')
+
     // Create TLS server to terminate the connection
     const { TLSSocket } = await import('tls')
     const tlsSocket = new TLSSocket(socket, {
@@ -448,7 +451,7 @@ export const createHttpProxyServer = async (
   dispose: () => Promise<void>
 }> => {
   await mkdir(REQUESTS_DIR, { recursive: true })
-  
+
   // Initialize CA certificate for HTTPS inspection
   await CertificateManager.getOrCreateCA()
 
