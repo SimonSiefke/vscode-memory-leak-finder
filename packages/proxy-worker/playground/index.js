@@ -1,23 +1,51 @@
-import { request } from 'http'
+import fetch from 'node-fetch'
+import { HttpProxyAgent } from 'http-proxy-agent'
+import * as HttpProxyServer from '../src/parts/HttpProxyServer/HttpProxyServer.ts'
 
-const options = {
-  hostname: '127.0.0.1',
-  port: 34355,
-  method: 'GET',
-  path: 'https://github.gallerycdn.vsassets.io/extensions/github/copilot/1.388.0/1761326434179/Microsoft.VisualStudio.Services.VSIXPackage',
+// Start proxy server
+console.log('Starting proxy server...')
+const proxyServer = await HttpProxyServer.createHttpProxyServer({
+  port: 0, // Let system assign a free port
+  useProxyMock: false,
+})
+console.log(`Proxy server running on ${proxyServer.url}`)
+
+const proxyUrl = proxyServer.url
+const targetUrl = 'https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery'
+
+const agent = new HttpProxyAgent(proxyUrl)
+
+const body = '{"filters":[{"criteria":[{"filterType":10,"value":"copilot2"},{"filterType":8,"value":"Microsoft.VisualStudio.Code"},{"filterType":12,"value":"4096"}],"pageNumber":1,"pageSize":50,"sortBy":0,"sortOrder":0}],"assetTypes":[],"flags":950}'
+
+console.log('Making request through proxy...')
+const response = await fetch(targetUrl, {
+  method: 'POST',
+  agent,
   headers: {
-    Host: 'github.gallerycdn.vsassets.io',
+    accept: 'application/json;api-version=3.0-preview.1',
+    'accept-language': 'en-US',
+    'content-type': 'application/json',
+    'sec-ch-ua': '"Not)A;Brand";v="8", "Chromium";v="138"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': '"Linux"',
+    'sec-fetch-dest': 'empty',
+    'sec-fetch-mode': 'cors',
+    'sec-fetch-site': 'cross-site',
+    'x-market-client-id': 'VSCode 1.106.0',
   },
+  body,
+})
+
+console.log(`Status: ${response.status}`)
+console.log(`Headers:`, Object.fromEntries(response.headers.entries()))
+
+const responseData = await response.text()
+try {
+  const parsed = JSON.parse(responseData)
+  console.log('Response:', JSON.stringify(parsed, null, 2))
+} catch (e) {
+  console.log('Response:', responseData)
 }
 
-const req = request(options, (res) => {
-  console.log(`Status: ${res.statusCode}`)
-  console.log(`Headers:`, res.headers)
-  res.pipe(process.stdout)
-})
-
-req.on('error', (e) => {
-  console.error(`Problem with request: ${e.message}`)
-})
-
-req.end()
+await proxyServer.dispose()
+console.log('Proxy server stopped')

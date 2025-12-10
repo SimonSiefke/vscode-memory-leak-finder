@@ -174,6 +174,14 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
         }
       }
 
+      // Explicitly remove Transfer-Encoding header if it somehow got through
+      // (case-insensitive check)
+      Object.keys(responseHeaders).forEach((key) => {
+        if (key.toLowerCase() === 'transfer-encoding') {
+          delete responseHeaders[key]
+        }
+      })
+
       // Set Content-Length to avoid chunked encoding
       responseHeaders['Content-Length'] = String(responseData.length)
 
