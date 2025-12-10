@@ -5,4 +5,3 @@ export const getProxyWorkerUrl = (): string => {
   const url = join(Root.root, 'packages/proxy-worker/bin/proxy-worker.js')
   return url
 }
-

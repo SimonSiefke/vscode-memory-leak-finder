@@ -8,9 +8,7 @@ import type { CertificatePair } from '../CertificatePair/CertificatePair.ts'
 
 const DOMAIN_SANITIZE_REGEX = /[^a-zA-Z0-9]/g
 
-export const getCertificateForDomain = async (
-  domain: string,
-): Promise<CertificatePair> => {
+export const getCertificateForDomain = async (domain: string): Promise<CertificatePair> => {
   const ca = await GetOrCreateCA.getOrCreateCA()
   const certPath = join(CERT_DIR, `${domain.replace(DOMAIN_SANITIZE_REGEX, '_')}-cert.pem`)
   const keyPath = join(CERT_DIR, `${domain.replace(DOMAIN_SANITIZE_REGEX, '_')}-key.pem`)
@@ -21,11 +19,7 @@ export const getCertificateForDomain = async (
     return { cert, key }
   }
 
-  const domainCert = GenerateCertificateForDomain.generateCertificateForDomain(
-    domain,
-    ca.key,
-    ca.cert,
-  )
+  const domainCert = GenerateCertificateForDomain.generateCertificateForDomain(domain, ca.key, ca.cert)
   await writeFile(certPath, domainCert.cert, 'utf8')
   await writeFile(keyPath, domainCert.key, 'utf8')
   return domainCert

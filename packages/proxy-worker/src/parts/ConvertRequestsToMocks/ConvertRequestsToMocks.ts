@@ -27,7 +27,6 @@ interface RecordedRequest {
   }
 }
 
-
 const loadMockConfig = async (): Promise<MockConfigEntry[]> => {
   try {
     if (!existsSync(MOCK_CONFIG_PATH)) {

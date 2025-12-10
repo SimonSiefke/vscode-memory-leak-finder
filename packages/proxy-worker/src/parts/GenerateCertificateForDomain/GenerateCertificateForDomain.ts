@@ -4,11 +4,7 @@ import type { CertificatePair } from '../CertificatePair/CertificatePair.ts'
 const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/
 const ipv6Regex = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^::1$|^::$/
 
-export const generateCertificateForDomain = (
-  domain: string,
-  caKey: string,
-  caCert: string,
-): CertificatePair => {
+export const generateCertificateForDomain = (domain: string, caKey: string, caCert: string): CertificatePair => {
   const caPrivateKey = forge.pki.privateKeyFromPem(caKey)
   const caCertificate = forge.pki.certificateFromPem(caCert)
 

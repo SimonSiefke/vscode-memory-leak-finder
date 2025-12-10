@@ -11,4 +11,3 @@ export const launch = async () => {
   })
   return rpc
 }
-

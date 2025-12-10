@@ -276,13 +276,18 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
   // but HTTP requests will be captured
 }
 
+export interface CreateHttpProxyServerOptions {
+  port?: number
+}
+
 export const createHttpProxyServer = async (
-  port: number = 0,
+  options: CreateHttpProxyServerOptions = {},
 ): Promise<{
   port: number
   url: string
   dispose: () => Promise<void>
 }> => {
+  const { port = 0 } = options
   await mkdir(REQUESTS_DIR, { recursive: true })
 
   const server = createServer()

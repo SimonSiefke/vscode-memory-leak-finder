@@ -149,7 +149,9 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   const isZipFile = contentTypeStr.includes('application/zip') || hasZipMagicBytes
 
   if (isZipFile) {
-    console.log(`[Proxy] Detected zip file - removing Content-Encoding/Transfer-Encoding headers. Content-Type: ${contentTypeStr}, Has magic bytes: ${hasZipMagicBytes}`)
+    console.log(
+      `[Proxy] Detected zip file - removing Content-Encoding/Transfer-Encoding headers. Content-Type: ${contentTypeStr}, Has magic bytes: ${hasZipMagicBytes}`,
+    )
   }
 
   // Convert headers to the format expected by writeHead and check for existing CORS headers
