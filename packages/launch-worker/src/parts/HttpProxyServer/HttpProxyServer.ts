@@ -15,7 +15,12 @@ const sanitizeFilename = (url: string): string => {
   return url.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 200)
 }
 
-const savePostBody = async (method: string, url: string, headers: Record<string, string>, body: Buffer): Promise<void> => {
+const savePostBody = async (
+  method: string,
+  url: string,
+  headers: Record<string, string>,
+  body: Buffer,
+): Promise<void> => {
   if (method !== 'POST' && method !== 'PUT' && method !== 'PATCH') {
     return
   }
@@ -79,7 +84,10 @@ const savePostBody = async (method: string, url: string, headers: Record<string,
   }
 }
 
-const decompressBody = async (body: Buffer, encoding: string | string[] | undefined): Promise<{ body: string; wasCompressed: boolean }> => {
+const decompressBody = async (
+  body: Buffer,
+  encoding: string | string[] | undefined,
+): Promise<{ body: string; wasCompressed: boolean }> => {
   if (!encoding) {
     return { body: body.toString('utf8'), wasCompressed: false }
   }
@@ -135,7 +143,10 @@ const decompressBody = async (body: Buffer, encoding: string | string[] | undefi
   return { body: body.toString('utf8'), wasCompressed: false }
 }
 
-const parseJsonIfApplicable = (body: string, contentType: string | string[] | undefined): string | object => {
+const parseJsonIfApplicable = (
+  body: string,
+  contentType: string | string[] | undefined,
+): string | object => {
   if (!contentType) {
     return body
   }
@@ -165,7 +176,10 @@ const saveRequest = async (req: IncomingMessage, response: ServerResponse, respo
     const filepath = join(REQUESTS_DIR, filename)
 
     const responseHeaders = response.getHeaders()
-    const { body: decompressedBody, wasCompressed } = await decompressBody(responseData, responseHeaders['content-encoding'])
+    const { body: decompressedBody, wasCompressed } = await decompressBody(
+      responseData,
+      responseHeaders['content-encoding'],
+    )
 
     const parsedBody = parseJsonIfApplicable(decompressedBody, responseHeaders['content-type'])
 
@@ -190,6 +204,7 @@ const saveRequest = async (req: IncomingMessage, response: ServerResponse, respo
     console.error('[Proxy] Failed to save request:', error)
   }
 }
+
 
 const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: string): void => {
   let parsedUrl: URL
@@ -240,6 +255,9 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
   delete options.headers['proxy-connection']
   delete options.headers['proxy-authorization']
 
+  // Capture request body for POST/PUT/PATCH requests
+  const requestBodyChunks: Buffer[] = []
+
   const proxyReq = requestModule(options, (proxyRes) => {
     console.log(`[Proxy] Forwarding response: ${proxyRes.statusCode} for ${targetUrl}`)
     res.writeHead(proxyRes.statusCode || 200, proxyRes.headers)
@@ -250,9 +268,21 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
       res.write(chunk)
     })
 
-    proxyRes.on('end', () => {
+    proxyRes.on('end', async () => {
       res.end()
       const responseData = Buffer.concat(chunks)
+
+      // Save POST body if applicable
+      if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
+        const requestBody = Buffer.concat(requestBodyChunks)
+        await savePostBody(
+          req.method,
+          targetUrl,
+          req.headers as Record<string, string>,
+          requestBody,
+        )
+      }
+
       saveRequest(req, res, responseData).catch((err) => {
         console.error('[Proxy] Error saving request:', err)
       })
@@ -265,7 +295,12 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
     const isAzureMetadata = parsedUrl.hostname === '169.254.169.254'
 
     // Handle common network errors silently
-    if (errorCode === 'EPIPE' || errorCode === 'ECONNRESET' || errorCode === 'ETIMEDOUT' || errorCode === 'ENETUNREACH') {
+    if (
+      errorCode === 'EPIPE' ||
+      errorCode === 'ECONNRESET' ||
+      errorCode === 'ETIMEDOUT' ||
+      errorCode === 'ENETUNREACH'
+    ) {
       if (isAzureMetadata) {
         // Azure metadata endpoint failures are expected when not on Azure
         if (!res.headersSent) {
@@ -288,7 +323,11 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
           JSON.stringify({
             error: errorCode === 'ETIMEDOUT' ? 'Gateway Timeout' : 'Network Error',
             message:
-              errorCode === 'ETIMEDOUT' ? 'Connection timeout' : errorCode === 'ENETUNREACH' ? 'Network unreachable' : 'Connection error',
+              errorCode === 'ETIMEDOUT'
+                ? 'Connection timeout'
+                : errorCode === 'ENETUNREACH'
+                  ? 'Network unreachable'
+                  : 'Connection error',
             target: targetUrl,
           }),
         )
@@ -345,6 +384,11 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
   })
 
   req.on('data', (chunk: Buffer) => {
+    // Capture body for POST/PUT/PATCH requests
+    if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
+      requestBodyChunks.push(chunk)
+    }
+    // Forward to target server
     proxyReq.write(chunk)
   })
 
@@ -464,96 +508,106 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
         }
 
         const targetReq = httpsRequest(targetOptions, (targetRes) => {
-          const responseChunks: Buffer[] = []
+        const responseChunks: Buffer[] = []
 
-          // Buffer the entire response first to handle chunked encoding properly
-          targetRes.on('data', (chunk: Buffer) => {
-            responseChunks.push(chunk)
-          })
-
-          targetRes.on('end', async () => {
-            // Save the intercepted request/response
-            const responseData = Buffer.concat(responseChunks)
-            // Convert headers to Record<string, string | string[]> format
-            const responseHeaders: Record<string, string | string[]> = {}
-            Object.entries(targetRes.headers).forEach(([k, v]) => {
-              if (v !== undefined) {
-                responseHeaders[k] = v
-              }
-            })
-            await saveInterceptedRequest(method, fullUrl, headers, targetRes.statusCode || 200, responseHeaders, responseData)
-
-            // Write response back through TLS
-            // Remove transfer-encoding header and set content-length instead
-            const cleanedHeaders: Record<string, string> = {}
-            Object.entries(targetRes.headers).forEach(([k, v]) => {
-              const lowerKey = k.toLowerCase()
-              // Skip transfer-encoding and connection headers
-              if (lowerKey !== 'transfer-encoding' && lowerKey !== 'connection') {
-                cleanedHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
-              }
-            })
-            // Set content-length
-            cleanedHeaders['Content-Length'] = String(responseData.length)
-
-            const statusLine = `${httpVersion} ${targetRes.statusCode} ${targetRes.statusMessage || ''}\r\n`
-            const headerLines = Object.entries(cleanedHeaders)
-              .map(([k, v]) => `${k}: ${v}\r\n`)
-              .join('')
-            tlsSocket.write(statusLine + headerLines + '\r\n')
-            tlsSocket.write(responseData)
-          })
-
-          targetRes.on('error', (error) => {
-            const errorCode = (error as NodeJS.ErrnoException).code
-            if (errorCode === 'EPIPE' || errorCode === 'ECONNRESET' || errorCode === 'ETIMEDOUT' || errorCode === 'ENETUNREACH') {
-              // Send error response back through TLS
-              const errorResponse = `${httpVersion} 502 Bad Gateway\r\nContent-Type: application/json\r\nContent-Length: 0\r\n\r\n`
-              tlsSocket.write(errorResponse)
-              return
-            }
-            console.error(`[Proxy] Error reading HTTPS response:`, error)
-            const errorResponse = `${httpVersion} 502 Bad Gateway\r\nContent-Type: application/json\r\nContent-Length: 0\r\n\r\n`
-            tlsSocket.write(errorResponse)
-          })
+        // Buffer the entire response first to handle chunked encoding properly
+        targetRes.on('data', (chunk: Buffer) => {
+          responseChunks.push(chunk)
         })
 
-        targetReq.on('error', (error) => {
+        targetRes.on('end', async () => {
+          // Save the intercepted request/response
+          const responseData = Buffer.concat(responseChunks)
+          // Convert headers to Record<string, string | string[]> format
+          const responseHeaders: Record<string, string | string[]> = {}
+          Object.entries(targetRes.headers).forEach(([k, v]) => {
+            if (v !== undefined) {
+              responseHeaders[k] = v
+            }
+          })
+          await saveInterceptedRequest(method, fullUrl, headers, targetRes.statusCode || 200, responseHeaders, responseData)
+
+          // Write response back through TLS
+          // Remove transfer-encoding header and set content-length instead
+          const cleanedHeaders: Record<string, string> = {}
+          Object.entries(targetRes.headers).forEach(([k, v]) => {
+            const lowerKey = k.toLowerCase()
+            // Skip transfer-encoding and connection headers
+            if (lowerKey !== 'transfer-encoding' && lowerKey !== 'connection') {
+              cleanedHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
+            }
+          })
+          // Set content-length
+          cleanedHeaders['Content-Length'] = String(responseData.length)
+
+          const statusLine = `${httpVersion} ${targetRes.statusCode} ${targetRes.statusMessage || ''}\r\n`
+          const headerLines = Object.entries(cleanedHeaders)
+            .map(([k, v]) => `${k}: ${v}\r\n`)
+            .join('')
+          tlsSocket.write(statusLine + headerLines + '\r\n')
+          tlsSocket.write(responseData)
+        })
+
+        targetRes.on('error', (error) => {
           const errorCode = (error as NodeJS.ErrnoException).code
-          if (errorCode === 'EPIPE' || errorCode === 'ECONNRESET' || errorCode === 'ETIMEDOUT' || errorCode === 'ENETUNREACH') {
+          if (
+            errorCode === 'EPIPE' ||
+            errorCode === 'ECONNRESET' ||
+            errorCode === 'ETIMEDOUT' ||
+            errorCode === 'ENETUNREACH'
+          ) {
             // Send error response back through TLS
-            const errorMessage = errorCode === 'ETIMEDOUT' ? 'Gateway Timeout' : 'Bad Gateway'
-            const statusCode = errorCode === 'ETIMEDOUT' ? 504 : 502
-            const errorBody = JSON.stringify({
-              error: errorMessage,
-              message: errorCode === 'ETIMEDOUT' ? 'Connection timeout' : 'Connection error',
-              target: fullUrl,
-            })
-            const errorResponse = `${httpVersion} ${statusCode} ${errorMessage}\r\nContent-Type: application/json\r\nContent-Length: ${Buffer.byteLength(errorBody)}\r\n\r\n${errorBody}`
+            const errorResponse = `${httpVersion} 502 Bad Gateway\r\nContent-Type: application/json\r\nContent-Length: 0\r\n\r\n`
             tlsSocket.write(errorResponse)
             return
           }
-          console.error(`[Proxy] Error forwarding HTTPS request:`, error)
-          const errorBody = JSON.stringify({
-            error: 'Proxy Error',
-            message: error.message,
-            target: fullUrl,
-          })
-          const errorResponse = `${httpVersion} 502 Bad Gateway\r\nContent-Type: application/json\r\nContent-Length: ${Buffer.byteLength(errorBody)}\r\n\r\n${errorBody}`
+          console.error(`[Proxy] Error reading HTTPS response:`, error)
+          const errorResponse = `${httpVersion} 502 Bad Gateway\r\nContent-Type: application/json\r\nContent-Length: 0\r\n\r\n`
           tlsSocket.write(errorResponse)
         })
+      })
 
-        // Handle timeout
-        targetReq.setTimeout(30000, () => {
-          targetReq.destroy()
+      targetReq.on('error', (error) => {
+        const errorCode = (error as NodeJS.ErrnoException).code
+        if (
+          errorCode === 'EPIPE' ||
+          errorCode === 'ECONNRESET' ||
+          errorCode === 'ETIMEDOUT' ||
+          errorCode === 'ENETUNREACH'
+        ) {
+          // Send error response back through TLS
+          const errorMessage = errorCode === 'ETIMEDOUT' ? 'Gateway Timeout' : 'Bad Gateway'
+          const statusCode = errorCode === 'ETIMEDOUT' ? 504 : 502
           const errorBody = JSON.stringify({
-            error: 'Gateway Timeout',
-            message: 'Request to target server timed out',
+            error: errorMessage,
+            message: errorCode === 'ETIMEDOUT' ? 'Connection timeout' : 'Connection error',
             target: fullUrl,
           })
-          const errorResponse = `${httpVersion} 504 Gateway Timeout\r\nContent-Type: application/json\r\nContent-Length: ${Buffer.byteLength(errorBody)}\r\n\r\n${errorBody}`
+          const errorResponse = `${httpVersion} ${statusCode} ${errorMessage}\r\nContent-Type: application/json\r\nContent-Length: ${Buffer.byteLength(errorBody)}\r\n\r\n${errorBody}`
           tlsSocket.write(errorResponse)
+          return
+        }
+        console.error(`[Proxy] Error forwarding HTTPS request:`, error)
+        const errorBody = JSON.stringify({
+          error: 'Proxy Error',
+          message: error.message,
+          target: fullUrl,
         })
+        const errorResponse = `${httpVersion} 502 Bad Gateway\r\nContent-Type: application/json\r\nContent-Length: ${Buffer.byteLength(errorBody)}\r\n\r\n${errorBody}`
+        tlsSocket.write(errorResponse)
+      })
+
+      // Handle timeout
+      targetReq.setTimeout(30000, () => {
+        targetReq.destroy()
+        const errorBody = JSON.stringify({
+          error: 'Gateway Timeout',
+          message: 'Request to target server timed out',
+          target: fullUrl,
+        })
+        const errorResponse = `${httpVersion} 504 Gateway Timeout\r\nContent-Type: application/json\r\nContent-Length: ${Buffer.byteLength(errorBody)}\r\n\r\n${errorBody}`
+        tlsSocket.write(errorResponse)
+      })
 
         // Write request body
         if (body.length > 0) {
@@ -561,6 +615,7 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
         }
         targetReq.end()
       }
+
     }
 
     tlsSocket.on('data', async (data: Buffer) => {
@@ -570,21 +625,31 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
 
     tlsSocket.on('error', (error) => {
       const errorCode = (error as NodeJS.ErrnoException).code
-      if (errorCode === 'EPIPE' || errorCode === 'ECONNRESET' || errorCode === 'ETIMEDOUT' || errorCode === 'ENETUNREACH') {
+      if (
+        errorCode === 'EPIPE' ||
+        errorCode === 'ECONNRESET' ||
+        errorCode === 'ETIMEDOUT' ||
+        errorCode === 'ENETUNREACH'
+      ) {
         socket.end()
         return
       }
       console.error(`[Proxy] TLS error for ${hostname}:${targetPort}:`, error)
-      socket.end()
-    })
+    socket.end()
+  })
 
-    socket.on('error', (error) => {
+  socket.on('error', (error) => {
       const errorCode = (error as NodeJS.ErrnoException).code
-      if (errorCode === 'EPIPE' || errorCode === 'ECONNRESET' || errorCode === 'ETIMEDOUT' || errorCode === 'ENETUNREACH') {
+      if (
+        errorCode === 'EPIPE' ||
+        errorCode === 'ECONNRESET' ||
+        errorCode === 'ETIMEDOUT' ||
+        errorCode === 'ENETUNREACH'
+      ) {
         tlsSocket.end()
         return
       }
-      console.error(`[Proxy] Socket error for ${hostname}:${targetPort}:`, error)
+    console.error(`[Proxy] Socket error for ${hostname}:${targetPort}:`, error)
       tlsSocket.end()
     })
 
@@ -658,7 +723,8 @@ export const createHttpProxyServer = async (
     // Handle health check endpoint
     if (targetUrl === '/' || targetUrl === '/health' || targetUrl === '/status') {
       const address = server.address()
-      const port = address !== null && typeof address === 'object' && 'port' in address ? address.port : 'unknown'
+      const port =
+        address !== null && typeof address === 'object' && 'port' in address ? address.port : 'unknown'
       res.writeHead(200, { 'Content-Type': 'application/json' })
       res.end(
         JSON.stringify({
@@ -675,7 +741,7 @@ export const createHttpProxyServer = async (
     // Reduce logging for Azure metadata endpoint (expected to fail when not on Azure)
     const isAzureMetadata = targetUrl.includes('169.254.169.254')
     if (!isAzureMetadata) {
-      console.log(`[Proxy] Received ${req.method} request: ${targetUrl}`)
+    console.log(`[Proxy] Received ${req.method} request: ${targetUrl}`)
     }
 
     // If it's not a proxy request (doesn't start with http:// or https://), return error JSON
@@ -712,7 +778,8 @@ export const createHttpProxyServer = async (
   }
 
   const address = server.address()
-  const actualPort = address !== null && typeof address === 'object' && 'port' in address ? address.port : port
+  const actualPort =
+    address !== null && typeof address === 'object' && 'port' in address ? address.port : port
   const url = `http://localhost:${actualPort}`
 
   console.log(`[Proxy] Proxy server running on http://127.0.0.1:${actualPort}`)
