@@ -29,7 +29,10 @@ export const prepareBoth = async (
   inspectPtyHostPort: number,
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
+  enableProxy: boolean,
+  useProxyMock: boolean,
 ): Promise<PrepareBothResult> => {
+  console.log(`[PrepareBoth] enableProxy parameter: ${enableProxy} (type: ${typeof enableProxy})`)
   const initializationWorkerRpc = await launchInitializationWorker()
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, sessionId, targetId } =
     await initializationWorkerRpc.invoke(
@@ -51,6 +54,8 @@ export const prepareBoth = async (
       inspectPtyHostPort,
       inspectSharedProcessPort,
       inspectExtensionsPort,
+      enableProxy,
+      useProxyMock,
     )
   return {
     initializationWorkerRpc,
