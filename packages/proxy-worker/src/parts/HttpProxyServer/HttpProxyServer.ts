@@ -124,15 +124,26 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
   const proxyReq = requestModule(options, (proxyRes) => {
     console.log(`[Proxy] Forwarding response: ${proxyRes.statusCode} for ${targetUrl}`)
 
-    // Add CORS headers for marketplace API responses
-    const responseHeaders = { ...proxyRes.headers }
-    if (isMarketplaceApi) {
-      // Only add CORS headers if they don't already exist
-      const lowerCaseHeaders: Set<string> = new Set()
-      Object.keys(responseHeaders).forEach((k) => {
-        lowerCaseHeaders.add(k.toLowerCase())
-      })
+    // Clean headers - remove Transfer-Encoding and Connection headers
+    // since we're manually writing chunks, Node.js will handle chunked encoding automatically
+    const responseHeaders: Record<string, string | string[]> = {}
+    const lowerCaseHeaders: Set<string> = new Set()
+    Object.entries(proxyRes.headers).forEach(([k, v]) => {
+      if (v !== undefined) {
+        const lowerKey = k.toLowerCase()
+        // Skip transfer-encoding and connection headers when manually writing chunks
+        if (lowerKey !== 'transfer-encoding' && lowerKey !== 'connection') {
+          // Avoid duplicate headers by checking case-insensitively
+          if (!lowerCaseHeaders.has(lowerKey)) {
+            responseHeaders[k] = v
+            lowerCaseHeaders.add(lowerKey)
+          }
+        }
+      }
+    })
 
+    // Add CORS headers for marketplace API responses
+    if (isMarketplaceApi) {
       if (!lowerCaseHeaders.has('access-control-allow-origin')) {
         responseHeaders['Access-Control-Allow-Origin'] = '*'
       }
