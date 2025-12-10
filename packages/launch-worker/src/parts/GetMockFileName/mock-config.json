@@ -1,0 +1,45 @@
+[
+  {
+    "hostname": "applicationinsights.azure.com",
+    "pathname": "*",
+    "method": "*",
+    "filename": "applicationinsights_azure_com.json"
+  },
+  {
+    "hostname": "api.github.com",
+    "pathname": "/copilot_internal/user",
+    "method": "OPTIONS",
+    "filename": "api_github_com_copilot_internal_user_options.json"
+  },
+  {
+    "hostname": "api.github.com",
+    "pathname": "/copilot_internal/user",
+    "method": "GET",
+    "filename": "api_github_com_copilot_internal_user_get.json"
+  },
+  {
+    "hostname": "api.github.com",
+    "pathname": "/copilot_internal/v2/token",
+    "method": "*",
+    "filename": "api_github_com_copilot_internal_v2_token.json"
+  },
+  {
+    "hostname": "main.vscode-cdn.net",
+    "pathname": "/extensions/chat.json",
+    "method": "*",
+    "filename": "main_vscode_cdn_net_extensions_chat_json.json"
+  },
+  {
+    "hostname": "api.github.com",
+    "pathname": "/user",
+    "method": "*",
+    "filename": "api_github_com_user.json"
+  },
+  {
+    "hostname": "api.individual.githubcopilot.com",
+    "pathname": "/agents",
+    "method": "*",
+    "filename": "api_individual_githubcopilot_com_agents.json"
+  }
+]
+

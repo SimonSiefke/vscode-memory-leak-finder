@@ -1,7 +1,7 @@
 import { readFile } from 'fs/promises'
-import { join } from 'path'
+import { join, dirname } from 'path'
 import { existsSync } from 'fs'
-import * as Root from '../Root/Root.ts'
+import { fileURLToPath } from 'url'
 
 interface MockConfigEntry {
   hostname: string
@@ -10,7 +10,9 @@ interface MockConfigEntry {
   filename: string
 }
 
-const MOCK_CONFIG_PATH = join(Root.root, '.vscode-mock-requests', 'mock-config.json')
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+const MOCK_CONFIG_PATH = join(__dirname, 'mock-config.json')
 
 const matchesPattern = (value: string, pattern: string): boolean => {
   if (pattern === '*') {
