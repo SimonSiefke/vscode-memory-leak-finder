@@ -10,8 +10,7 @@ interface MockConfigEntry {
   filename: string
 }
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
+const __dirname = dirname(fileURLToPath(import.meta.url))
 const MOCK_CONFIG_PATH = join(__dirname, 'mock-config.json')
 
 const matchesPattern = (value: string, pattern: string): boolean => {
