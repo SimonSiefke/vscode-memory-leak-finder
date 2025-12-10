@@ -240,7 +240,9 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
             Object.entries(mockResponse.headers).forEach(([k, v]) => {
               const lowerKey = k.toLowerCase()
               // Skip Content-Length headers (case-insensitive) - we'll set it below
-              if (lowerKey !== 'content-length') {
+              // Skip Transfer-Encoding headers - we'll set Content-Length instead
+              // Skip Content-Encoding headers - mock body is already decompressed
+              if (lowerKey !== 'content-length' && lowerKey !== 'transfer-encoding' && lowerKey !== 'content-encoding') {
                 cleanedHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
                 lowerCaseHeaders.add(lowerKey)
               }
@@ -262,6 +264,17 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
             if (!lowerCaseHeaders.has('access-control-allow-credentials')) {
               cleanedHeaders['Access-Control-Allow-Credentials'] = 'true'
             }
+
+            // Explicitly remove Transfer-Encoding and Content-Encoding headers if they somehow got through
+            // (case-insensitive check) - we're setting Content-Length, so Transfer-Encoding can't be present
+            // Content-Encoding is removed because mock body is already decompressed
+            Object.keys(cleanedHeaders).forEach((key) => {
+              const lowerKey = key.toLowerCase()
+              if (lowerKey === 'transfer-encoding' || lowerKey === 'content-encoding') {
+                delete cleanedHeaders[key]
+                lowerCaseHeaders.delete(lowerKey)
+              }
+            })
 
             // Always set Content-Length to match actual body length
             cleanedHeaders['Content-Length'] = String(bodyBuffer.length)
@@ -346,6 +359,15 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
                 cleanedHeaders['Access-Control-Allow-Headers'] = 'authorization, content-type, accept, x-requested-with, x-market-client-id'
               }
             }
+
+            // Explicitly remove Transfer-Encoding header if it somehow got through
+            // (case-insensitive check) - we're setting Content-Length, so Transfer-Encoding can't be present
+            Object.keys(cleanedHeaders).forEach((key) => {
+              if (key.toLowerCase() === 'transfer-encoding') {
+                delete cleanedHeaders[key]
+                lowerCaseHeaders.delete(key.toLowerCase())
+              }
+            })
 
             // Set content-length
             cleanedHeaders['Content-Length'] = String(responseData.length)
