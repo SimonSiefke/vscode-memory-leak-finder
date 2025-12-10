@@ -34,9 +34,10 @@ const saveRequest = async (req: IncomingMessage, response: ServerResponse, respo
     }
 
     await writeFile(filepath, JSON.stringify(requestData, null, 2), 'utf8')
+    console.log(`[Proxy] Saved request to ${filepath}`)
   } catch (error) {
     // Ignore errors when saving requests
-    console.error('Failed to save request:', error)
+    console.error('[Proxy] Failed to save request:', error)
   }
 }
 
@@ -52,7 +53,9 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
       const host = req.headers.host || ''
       parsedUrl = new URL(`http://${host}${targetUrl}`)
     }
+    console.log(`[Proxy] Forwarding ${req.method} ${parsedUrl.protocol}//${parsedUrl.hostname}:${parsedUrl.port}${parsedUrl.pathname}`)
   } catch (error) {
+    console.error(`[Proxy] Invalid URL: ${targetUrl}`, error)
     res.writeHead(400)
     res.end(`Invalid URL: ${targetUrl}`)
     return
@@ -77,6 +80,7 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
   delete options.headers['proxy-authorization']
 
   const proxyReq = requestModule(options, (proxyRes) => {
+    console.log(`[Proxy] Forwarding response: ${proxyRes.statusCode} for ${targetUrl}`)
     res.writeHead(proxyRes.statusCode || 200, proxyRes.headers)
     const chunks: Buffer[] = []
 
@@ -88,15 +92,28 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
     proxyRes.on('end', () => {
       res.end()
       const responseData = Buffer.concat(chunks)
-      saveRequest(req, res, responseData).catch(() => {
-        // Ignore errors
+      saveRequest(req, res, responseData).catch((err) => {
+        console.error('[Proxy] Error saving request:', err)
       })
     })
   })
 
   proxyReq.on('error', (error) => {
-    res.writeHead(500)
-    res.end(`Proxy error: ${error.message}`)
+    console.error(`[Proxy] Error forwarding request to ${targetUrl}:`, error)
+    if (!res.headersSent) {
+      res.writeHead(500)
+      res.end(`Proxy error: ${error.message}`)
+    }
+  })
+
+  // Handle request timeout
+  proxyReq.setTimeout(30000, () => {
+    console.error(`[Proxy] Timeout forwarding request to ${targetUrl}`)
+    if (!res.headersSent) {
+      res.writeHead(504)
+      res.end('Gateway Timeout')
+    }
+    proxyReq.destroy()
   })
 
   req.on('data', (chunk: Buffer) => {
@@ -116,6 +133,7 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
   const targetPort = parts[1] ? parseInt(parts[1], 10) : 443
 
   const { createConnection } = await import('net')
+  console.log(`[Proxy] Establishing CONNECT tunnel to ${hostname}:${targetPort}`)
   const proxySocket = createConnection(targetPort, hostname, () => {
     socket.write('HTTP/1.1 200 Connection Established\r\n\r\n')
     if (head.length > 0) {
@@ -123,13 +141,16 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
     }
     proxySocket.pipe(socket)
     socket.pipe(proxySocket)
+    console.log(`[Proxy] CONNECT tunnel established to ${hostname}:${targetPort}`)
   })
 
-  proxySocket.on('error', () => {
+  proxySocket.on('error', (error) => {
+    console.error(`[Proxy] CONNECT tunnel error to ${hostname}:${targetPort}:`, error)
     socket.end()
   })
 
-  socket.on('error', () => {
+  socket.on('error', (error) => {
+    console.error(`[Proxy] Socket error for ${hostname}:${targetPort}:`, error)
     proxySocket.end()
   })
 
@@ -152,18 +173,21 @@ export const createHttpProxyServer = async (
     // For HTTP requests, extract target URL from request line
     // In HTTP proxy protocol, the request line contains the full URL
     const targetUrl = req.url || ''
+    console.log(`[Proxy] Received ${req.method} request: ${targetUrl}`)
     forwardRequest(req, res, targetUrl)
   })
 
   server.on('connect', (req: IncomingMessage, socket: any, head: Buffer) => {
     // Handle CONNECT method for HTTPS tunneling
+    const target = req.url || ''
+    console.log(`[Proxy] Received CONNECT request: ${target}`)
     handleConnect(req, socket, head).catch(() => {
       socket.end()
     })
   })
 
   const { promise, resolve } = Promise.withResolvers<Error | undefined>()
-  server.listen(port, () => resolve(undefined))
+  server.listen(port, '127.0.0.1', () => resolve(undefined))
 
   const error = await promise
   if (error) {
@@ -174,7 +198,8 @@ export const createHttpProxyServer = async (
   const actualPort = typeof address === 'object' && address !== null ? address.port : port
   const url = `http://localhost:${actualPort}`
 
-  console.log(`proxy running on ${actualPort}`)
+  console.log(`[Proxy] Proxy server running on http://127.0.0.1:${actualPort}`)
+  console.log(`[Proxy] Proxy URL: ${url}`)
 
   return {
     port: actualPort,

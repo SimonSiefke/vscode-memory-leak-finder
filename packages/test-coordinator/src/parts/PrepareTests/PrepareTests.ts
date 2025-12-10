@@ -35,11 +35,26 @@ export const prepareTests = async (
 
   // Start proxy server before launching VS Code if enabled
   if (enableProxy) {
+    console.log('[PrepareTests] Starting proxy server...')
     const proxyServer = await createHttpProxyServer(0)
+    console.log(`[PrepareTests] Proxy server started on ${proxyServer.url} (port ${proxyServer.port})`)
     await ProxyState.setProxyState({
       proxyUrl: proxyServer.url,
       port: proxyServer.port,
     })
+    console.log(`[PrepareTests] Proxy state saved to .vscode-proxy-state.json`)
+    
+    // Test that proxy server is accessible
+    try {
+      const testResponse = await fetch(`http://127.0.0.1:${proxyServer.port}`, {
+        method: 'GET',
+        signal: AbortSignal.timeout(1000),
+      }).catch(() => null)
+      console.log(`[PrepareTests] Proxy server test: ${testResponse ? 'accessible' : 'not responding (expected)'}`)
+    } catch (error) {
+      // Expected to fail - proxy needs a proper proxy request
+      console.log(`[PrepareTests] Proxy server is listening on port ${proxyServer.port}`)
+    }
   }
 
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, initializationWorkerRpc } =

@@ -58,7 +58,39 @@ export const launchVsCode = async ({
     const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
     const settingsPath = join(userDataDir, 'User', 'settings.json')
     await mkdir(dirname(settingsPath), { recursive: true })
+
+    // Copy default settings, then merge with any existing proxy settings
     await copyFile(defaultSettingsSourcePath, settingsPath)
+
+    // Check if proxy state exists and merge proxy settings
+    try {
+      const { readFile, writeFile } = await import('fs/promises')
+      const { existsSync } = await import('fs')
+      const proxyStateFile = join(Root.root, '.vscode-proxy-state.json')
+
+      if (existsSync(proxyStateFile)) {
+        const proxyStateContent = await readFile(proxyStateFile, 'utf8')
+        const proxyState = JSON.parse(proxyStateContent)
+
+        if (proxyState.proxyUrl) {
+          const settingsContent = await readFile(settingsPath, 'utf8')
+          const settings = JSON.parse(settingsContent)
+          settings['http.proxy'] = proxyState.proxyUrl
+          settings['http.proxyStrictSSL'] = false
+          await writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf8')
+          console.log(`[LaunchVsCode] Merged proxy settings: ${proxyState.proxyUrl}`)
+          console.log(`[LaunchVsCode] Settings file written to: ${settingsPath}`)
+          
+          // Verify settings were written correctly
+          const verifyContent = await readFile(settingsPath, 'utf8')
+          const verifySettings = JSON.parse(verifyContent)
+          console.log(`[LaunchVsCode] Verified proxy setting: ${verifySettings['http.proxy']}`)
+        }
+      }
+    } catch (error) {
+      // Ignore errors merging proxy settings
+      console.error('[LaunchVsCode] Error merging proxy settings:', error)
+    }
     const args = GetVsCodeArgs.getVscodeArgs({
       userDataDir,
       extensionsDir,

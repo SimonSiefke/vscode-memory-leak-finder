@@ -32,6 +32,10 @@ export const getVsCodeEnv = async ({ runtimeDir, processEnv }) => {
         env.HTTPS_PROXY = proxyState.proxyUrl
         env.http_proxy = proxyState.proxyUrl
         env.https_proxy = proxyState.proxyUrl
+        // Don't proxy localhost connections
+        env.NO_PROXY = 'localhost,127.0.0.1,0.0.0.0'
+        env.no_proxy = 'localhost,127.0.0.1,0.0.0.0'
+        console.log(`[GetVsCodeEnv] Set proxy environment variables: HTTP_PROXY=${proxyState.proxyUrl}`)
       }
     }
   } catch (error) {
