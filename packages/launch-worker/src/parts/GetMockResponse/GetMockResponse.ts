@@ -49,6 +49,30 @@ export const getMockResponse = async (method: string, url: string): Promise<Mock
     const hostname = parsedUrl.hostname
     const pathname = parsedUrl.pathname
 
+    // Handle OPTIONS preflight requests - return a proper CORS preflight response
+    if (method === 'OPTIONS') {
+      const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
+      const mockFile = join(MOCK_REQUESTS_DIR, mockFileName)
+      const mockResponse = await loadMockResponse(mockFile)
+
+      if (mockResponse) {
+        return mockResponse
+      }
+
+      // If no OPTIONS mock exists, create a default preflight response
+      return {
+        statusCode: 204,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+          'Access-Control-Allow-Headers': 'authorization, content-type, accept, x-requested-with',
+          'Access-Control-Allow-Credentials': 'true',
+          'Access-Control-Max-Age': '86400',
+        },
+        body: '',
+      }
+    }
+
     // Try to load mock from file
     const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
     const mockFile = join(MOCK_REQUESTS_DIR, mockFileName)
@@ -77,6 +101,20 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
       headers[key] = Array.isArray(value) ? value.join(', ') : String(value)
     }
   })
+
+  // Add CORS headers if not already present
+  if (!headers['Access-Control-Allow-Origin']) {
+    headers['Access-Control-Allow-Origin'] = '*'
+  }
+  if (!headers['Access-Control-Allow-Methods']) {
+    headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, PATCH, OPTIONS'
+  }
+  if (!headers['Access-Control-Allow-Headers']) {
+    headers['Access-Control-Allow-Headers'] = 'authorization, content-type, accept, x-requested-with'
+  }
+  if (!headers['Access-Control-Allow-Credentials']) {
+    headers['Access-Control-Allow-Credentials'] = 'true'
+  }
 
   // Always set Content-Length to match actual body length
   headers['Content-Length'] = String(bodyBuffer.length)

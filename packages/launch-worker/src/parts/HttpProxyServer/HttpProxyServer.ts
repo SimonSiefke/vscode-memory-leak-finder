@@ -430,6 +430,21 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer, us
                 cleanedHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
               }
             })
+
+            // Add CORS headers if not already present
+            if (!cleanedHeaders['Access-Control-Allow-Origin']) {
+              cleanedHeaders['Access-Control-Allow-Origin'] = '*'
+            }
+            if (!cleanedHeaders['Access-Control-Allow-Methods']) {
+              cleanedHeaders['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, PATCH, OPTIONS'
+            }
+            if (!cleanedHeaders['Access-Control-Allow-Headers']) {
+              cleanedHeaders['Access-Control-Allow-Headers'] = 'authorization, content-type, accept, x-requested-with'
+            }
+            if (!cleanedHeaders['Access-Control-Allow-Credentials']) {
+              cleanedHeaders['Access-Control-Allow-Credentials'] = 'true'
+            }
+
             // Always set Content-Length to match actual body length
             cleanedHeaders['Content-Length'] = String(bodyBuffer.length)
 
