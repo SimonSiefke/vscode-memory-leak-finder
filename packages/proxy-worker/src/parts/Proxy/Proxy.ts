@@ -59,8 +59,5 @@ export const setupProxy = async (
     }
   }
 
-  // Wait a bit to ensure proxy server is ready
-  await new Promise((resolve) => setTimeout(resolve, 100))
-
   return proxyServer
 }

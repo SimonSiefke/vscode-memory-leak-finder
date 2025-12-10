@@ -1,4 +1,5 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
+import * as fs from 'node:fs/promises'
 
 beforeEach(() => {
   jest.resetModules()
@@ -12,7 +13,6 @@ jest.unstable_mockModule('node:fs/promises', () => {
 })
 
 const MakeExecutable = await import('../src/parts/MakeExecutable/MakeExecutable.ts')
-const fs = await import('node:fs/promises')
 
 test.skip('makeExecutable - error', async () => {
   jest.spyOn(fs, 'chmod').mockRejectedValue(new TypeError('x is not a function'))
