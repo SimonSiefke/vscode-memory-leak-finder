@@ -116,10 +116,18 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
       // Check if this is a zip file and remove Content-Encoding header
       const contentType = mockResponse.headers['content-type'] || mockResponse.headers['Content-Type']
       const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
-      const isZipFile = contentTypeStr.includes('application/zip') || targetUrl.toLowerCase().endsWith('.zip') || targetUrl.toLowerCase().endsWith('.vsix')
+      // Check URL pathname (handle query parameters)
+      let urlPathname = targetUrl
+      try {
+        const parsedUrl = new URL(targetUrl)
+        urlPathname = parsedUrl.pathname
+      } catch {
+        // If URL parsing fails, use the original URL
+      }
+      const isZipFile = contentTypeStr.includes('application/zip') || urlPathname.toLowerCase().endsWith('.zip') || urlPathname.toLowerCase().endsWith('.vsix')
 
       if (isZipFile) {
-        // Remove Content-Encoding header for zip files
+        // Remove Content-Encoding and Transfer-Encoding headers for zip files
         const cleanedHeaders = { ...mockResponse.headers }
         const lowerCaseHeaders: Set<string> = new Set()
         Object.keys(cleanedHeaders).forEach((k) => {
@@ -128,6 +136,13 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
         if (lowerCaseHeaders.has('content-encoding')) {
           Object.keys(cleanedHeaders).forEach((k) => {
             if (k.toLowerCase() === 'content-encoding') {
+              delete cleanedHeaders[k]
+            }
+          })
+        }
+        if (lowerCaseHeaders.has('transfer-encoding')) {
+          Object.keys(cleanedHeaders).forEach((k) => {
+            if (k.toLowerCase() === 'transfer-encoding') {
               delete cleanedHeaders[k]
             }
           })
@@ -516,7 +531,15 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer, us
             // Check if this is a zip file (binary data)
             const contentType = mockResponse.headers['content-type'] || mockResponse.headers['Content-Type']
             const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
-            const isZipFile = contentTypeStr.includes('application/zip') || fullUrl.toLowerCase().endsWith('.zip') || fullUrl.toLowerCase().endsWith('.vsix')
+            // Check URL pathname (handle query parameters)
+            let urlPathname = path
+            try {
+              const parsedUrl = new URL(fullUrl)
+              urlPathname = parsedUrl.pathname
+            } catch {
+              // If URL parsing fails, use the path
+            }
+            const isZipFile = contentTypeStr.includes('application/zip') || urlPathname.toLowerCase().endsWith('.zip') || urlPathname.toLowerCase().endsWith('.vsix')
 
             // Convert headers to the format expected and check for existing CORS headers
             const cleanedHeaders: Record<string, string> = {}
@@ -525,8 +548,8 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer, us
             Object.entries(mockResponse.headers).forEach(([k, v]) => {
               const lowerKey = k.toLowerCase()
               // Skip Content-Length headers (case-insensitive) - we'll set it below
-              // Skip Content-Encoding headers for zip files - binary data is not encoded
-              if (lowerKey !== 'content-length' && !(isZipFile && lowerKey === 'content-encoding')) {
+              // Skip Content-Encoding and Transfer-Encoding headers for zip files - binary data is not encoded
+              if (lowerKey !== 'content-length' && !(isZipFile && (lowerKey === 'content-encoding' || lowerKey === 'transfer-encoding'))) {
                 cleanedHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
                 lowerCaseHeaders.add(lowerKey)
               }

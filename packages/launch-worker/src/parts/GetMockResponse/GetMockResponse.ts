@@ -34,16 +34,49 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
 
     // Handle file references (for zip files)
     let body = response.body
+    let isZipFile = false
     if (typeof body === 'string' && body.startsWith('file-reference:')) {
       const zipData = await LoadZipData.loadZipData(body)
       if (zipData) {
         body = zipData
+        isZipFile = true
+      }
+    }
+
+    // Check if this is a zip file by content type
+    const contentType = response.headers['content-type'] || response.headers['Content-Type']
+    const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
+    if (contentTypeStr.includes('application/zip')) {
+      isZipFile = true
+    }
+
+    // Remove Content-Encoding and Transfer-Encoding headers for zip files
+    // since the binary data is not encoded
+    const cleanedHeaders = { ...response.headers }
+    if (isZipFile) {
+      const lowerCaseHeaders: Set<string> = new Set()
+      Object.keys(cleanedHeaders).forEach((k) => {
+        lowerCaseHeaders.add(k.toLowerCase())
+      })
+      if (lowerCaseHeaders.has('content-encoding')) {
+        Object.keys(cleanedHeaders).forEach((k) => {
+          if (k.toLowerCase() === 'content-encoding') {
+            delete cleanedHeaders[k]
+          }
+        })
+      }
+      if (lowerCaseHeaders.has('transfer-encoding')) {
+        Object.keys(cleanedHeaders).forEach((k) => {
+          if (k.toLowerCase() === 'transfer-encoding') {
+            delete cleanedHeaders[k]
+          }
+        })
       }
     }
 
     return {
       statusCode: response.statusCode,
-      headers: response.headers,
+      headers: cleanedHeaders,
       body,
     }
   } catch (error) {
@@ -114,7 +147,13 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   // Check if this is a zip file (binary data)
   const contentType = mockResponse.headers['content-type'] || mockResponse.headers['Content-Type']
   const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
-  const isZipFile = contentTypeStr.includes('application/zip') || (Buffer.isBuffer(bodyBuffer) && bodyBuffer.length > 0 && bodyBuffer[0] === 0x50 && bodyBuffer[1] === 0x4b)
+  // Check for ZIP magic bytes (PK - ZIP file signature)
+  const hasZipMagicBytes = Buffer.isBuffer(bodyBuffer) && bodyBuffer.length >= 2 && bodyBuffer[0] === 0x50 && bodyBuffer[1] === 0x4b
+  const isZipFile = contentTypeStr.includes('application/zip') || hasZipMagicBytes
+  
+  if (isZipFile) {
+    console.log(`[Proxy] Detected zip file - removing Content-Encoding/Transfer-Encoding headers. Content-Type: ${contentTypeStr}, Has magic bytes: ${hasZipMagicBytes}`)
+  }
 
   // Convert headers to the format expected by writeHead and check for existing CORS headers
   const headers: Record<string, string> = {}
@@ -123,8 +162,8 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   Object.entries(mockResponse.headers).forEach(([key, value]) => {
     const lowerKey = key.toLowerCase()
     // Skip Content-Length headers (case-insensitive) - we'll set it below
-    // Skip Content-Encoding headers for zip files - binary data is not encoded
-    if (lowerKey !== 'content-length' && !(isZipFile && lowerKey === 'content-encoding')) {
+    // Skip Content-Encoding and Transfer-Encoding headers for zip files - binary data is not encoded
+    if (lowerKey !== 'content-length' && !(isZipFile && (lowerKey === 'content-encoding' || lowerKey === 'transfer-encoding'))) {
       headers[key] = Array.isArray(value) ? value.join(', ') : String(value)
       lowerCaseHeaders.add(lowerKey)
     }
