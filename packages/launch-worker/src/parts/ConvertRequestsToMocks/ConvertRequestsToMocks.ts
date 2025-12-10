@@ -1,12 +1,23 @@
 import { readdir, readFile, writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
+import { join, dirname } from 'path'
 import { URL } from 'url'
 import { existsSync } from 'fs'
+import { fileURLToPath } from 'url'
 import * as Root from '../Root/Root.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const MOCK_CONFIG_PATH = join(__dirname, '..', 'GetMockFileName', 'mock-config.json')
+
+interface MockConfigEntry {
+  hostname: string
+  pathname: string
+  method: string
+  filename: string
+}
 
 interface RecordedRequest {
   timestamp: number
@@ -25,6 +36,45 @@ interface RecordedRequest {
 interface RequestKey {
   url: string
   method: string
+}
+
+const loadMockConfig = async (): Promise<MockConfigEntry[]> => {
+  try {
+    if (!existsSync(MOCK_CONFIG_PATH)) {
+      return []
+    }
+    const configContent = await readFile(MOCK_CONFIG_PATH, 'utf8')
+    return JSON.parse(configContent) as MockConfigEntry[]
+  } catch (error) {
+    console.error(`Error loading mock config from ${MOCK_CONFIG_PATH}:`, error)
+    return []
+  }
+}
+
+const matchesPattern = (value: string, pattern: string): boolean => {
+  if (pattern === '*') {
+    return true
+  }
+  if (pattern.includes('*')) {
+    // Simple wildcard matching: convert pattern to regex
+    const regexPattern = pattern.replace(/\*/g, '.*').replace(/\?/g, '.')
+    const regex = new RegExp(`^${regexPattern}$`)
+    return regex.test(value)
+  }
+  return value === pattern
+}
+
+const hasConfigEntry = (config: MockConfigEntry[], hostname: string, pathname: string, method: string): boolean => {
+  const methodLower = method.toLowerCase()
+  for (const entry of config) {
+    const hostnameMatch = matchesPattern(hostname, entry.hostname) || hostname.includes(entry.hostname)
+    const pathnameMatch = matchesPattern(pathname, entry.pathname)
+    const methodMatch = matchesPattern(methodLower, entry.method.toLowerCase())
+    if (hostnameMatch && pathnameMatch && methodMatch) {
+      return true
+    }
+  }
+  return false
 }
 
 const convertRequestsToMocks = async (): Promise<void> => {
@@ -72,9 +122,13 @@ const convertRequestsToMocks = async (): Promise<void> => {
 
     console.log(`Found ${latestRequests.size} unique request/response pairs`)
 
+    // Load existing mock config
+    const mockConfig = await loadMockConfig()
+
     // Convert each request to mock format and save
     let savedCount = 0
     let skippedCount = 0
+    let configAddedCount = 0
 
     for (const request of latestRequests.values()) {
       try {
@@ -101,10 +155,38 @@ const convertRequestsToMocks = async (): Promise<void> => {
         // Save mock file
         await writeFile(mockFilePath, JSON.stringify(mockData, null, 2), 'utf8')
         savedCount++
+
+        // Check if we need to add this to mock-config.json
+        if (!hasConfigEntry(mockConfig, hostname, pathname, request.method)) {
+          const newEntry: MockConfigEntry = {
+            hostname,
+            pathname,
+            method: request.method,
+            filename: mockFileName,
+          }
+          mockConfig.push(newEntry)
+          configAddedCount++
+        }
       } catch (error) {
         console.error(`Error converting request ${request.method} ${request.url}:`, error)
         skippedCount++
       }
+    }
+
+    // Save updated mock config
+    if (configAddedCount > 0) {
+      // Sort config entries for consistency
+      mockConfig.sort((a, b) => {
+        if (a.hostname !== b.hostname) {
+          return a.hostname.localeCompare(b.hostname)
+        }
+        if (a.pathname !== b.pathname) {
+          return a.pathname.localeCompare(b.pathname)
+        }
+        return a.method.localeCompare(b.method)
+      })
+      await writeFile(MOCK_CONFIG_PATH, JSON.stringify(mockConfig, null, 2), 'utf8')
+      console.log(`Added ${configAddedCount} entries to mock-config.json`)
     }
 
     console.log(`Successfully converted ${savedCount} requests to mocks`)
