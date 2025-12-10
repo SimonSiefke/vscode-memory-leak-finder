@@ -16,6 +16,8 @@ import * as RemoveVscodeGlobalStorage from '../RemoveVscodeGlobalStorage/RemoveV
 import * as RemoveVscodeWorkspaceStorage from '../RemoveVscodeWorkspaceStorage/RemoveVscodeWorkspaceStorage.ts'
 import * as Root from '../Root/Root.ts'
 import { VError } from '../VError/VError.ts'
+import { createHttpProxyServer } from '../../../../page-object/src/parts/NetworkInterceptor/HttpProxyServer.ts'
+import * as ProxyState from '../../../../page-object/src/parts/NetworkInterceptor/ProxyState.ts'
 
 export const launchVsCode = async ({
   headlessMode,
@@ -59,37 +61,64 @@ export const launchVsCode = async ({
     const settingsPath = join(userDataDir, 'User', 'settings.json')
     await mkdir(dirname(settingsPath), { recursive: true })
 
-    // Copy default settings, then merge with any existing proxy settings
+    // Copy default settings
     await copyFile(defaultSettingsSourcePath, settingsPath)
 
-    // Check if proxy state exists and merge proxy settings
+    // Start proxy server if proxy state file exists (indicates proxy should be enabled)
+    let proxyServer: { port: number; url: string; dispose: () => Promise<void> } | null = null
     try {
-      const { readFile, writeFile } = await import('fs/promises')
       const { existsSync } = await import('fs')
       const proxyStateFile = join(Root.root, '.vscode-proxy-state.json')
 
       if (existsSync(proxyStateFile)) {
-        const proxyStateContent = await readFile(proxyStateFile, 'utf8')
-        const proxyState = JSON.parse(proxyStateContent)
-
-        if (proxyState.proxyUrl) {
+        const existingState = await ProxyState.getProxyState()
+        
+        // If proxy state exists but no server URL, start one
+        if (!existingState.proxyUrl || !existingState.port) {
+          // Start new proxy server
+          console.log('[LaunchVsCode] Starting proxy server...')
+          proxyServer = await createHttpProxyServer(0)
+          console.log(`[LaunchVsCode] Proxy server started on ${proxyServer.url} (port ${proxyServer.port})`)
+          
+          // Store proxy state
+          await ProxyState.setProxyState({
+            proxyUrl: proxyServer.url,
+            port: proxyServer.port,
+          })
+          
+          // Update settings
+          const { readFile, writeFile } = await import('fs/promises')
           const settingsContent = await readFile(settingsPath, 'utf8')
           const settings = JSON.parse(settingsContent)
-          settings['http.proxy'] = proxyState.proxyUrl
+          settings['http.proxy'] = proxyServer.url
           settings['http.proxyStrictSSL'] = false
           await writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf8')
-          console.log(`[LaunchVsCode] Merged proxy settings: ${proxyState.proxyUrl}`)
-          console.log(`[LaunchVsCode] Settings file written to: ${settingsPath}`)
-
-          // Verify settings were written correctly
-          const verifyContent = await readFile(settingsPath, 'utf8')
-          const verifySettings = JSON.parse(verifyContent)
-          console.log(`[LaunchVsCode] Verified proxy setting: ${verifySettings['http.proxy']}`)
+          console.log(`[LaunchVsCode] Proxy configured: ${proxyServer.url}`)
+          
+          // Keep proxy server alive
+          if (addDisposable && proxyServer) {
+            addDisposable(async () => {
+              console.log('[LaunchVsCode] Disposing proxy server...')
+              await proxyServer!.dispose()
+            })
+          }
+          
+          // Wait a bit to ensure proxy server is ready
+          await new Promise(resolve => setTimeout(resolve, 100))
+        } else {
+          // Proxy already configured, just use existing settings
+          const { readFile, writeFile } = await import('fs/promises')
+          const settingsContent = await readFile(settingsPath, 'utf8')
+          const settings = JSON.parse(settingsContent)
+          settings['http.proxy'] = existingState.proxyUrl
+          settings['http.proxyStrictSSL'] = false
+          await writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf8')
+          console.log(`[LaunchVsCode] Using existing proxy: ${existingState.proxyUrl}`)
         }
       }
     } catch (error) {
-      // Ignore errors merging proxy settings
-      console.error('[LaunchVsCode] Error merging proxy settings:', error)
+      console.error('[LaunchVsCode] Error setting up proxy:', error)
+      // Continue even if proxy setup fails
     }
     const args = GetVsCodeArgs.getVscodeArgs({
       userDataDir,
