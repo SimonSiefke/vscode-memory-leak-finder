@@ -1,110 +1,111 @@
-export const create = ({ page, VError }) => {
-  let isEnabled = false
-  let requestPausedHandler: ((event: any) => Promise<void>) | null = null
+import { createHttpProxyServer } from './HttpProxyServer.ts'
+import * as Root from '../Root/Root.ts'
+import { join } from 'path'
+import { readFile, writeFile } from 'fs/promises'
+import { existsSync } from 'fs'
 
-  const enableFetchDomain = async (): Promise<void> => {
-    if (isEnabled) {
-      return
-    }
+const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
+const getSettingsPath = (): string => {
+  // VS Code settings are stored in userDataDir/User/settings.json
+  // Use the same path as the launch worker
+  const userDataDir = join(Root.root, '.vscode-user-data-dir')
+  return join(userDataDir, 'User', 'settings.json')
+}
+
+const updateVsCodeSettings = async (proxyUrl: string | null): Promise<void> => {
+  const settingsPath = getSettingsPath()
+  let settings: any = {}
+
+  if (existsSync(settingsPath)) {
     try {
-      const sessionRpc = page.sessionRpc
-
-      // Enable Fetch domain
-      await sessionRpc.invoke('Fetch.enable', {
-        handleAuthRequests: false,
-        patterns: [
-          {
-            urlPattern: '*api.github.com*',
-          },
-          {
-            urlPattern: '*github.com/api*',
-          },
-        ],
-      })
-
-      // Listen for requestPaused events
-      requestPausedHandler = async (event: any): Promise<void> => {
-        const requestId = event.params.requestId
-        const requestUrl = event.params.request.url
-
-        // Check if this is a GitHub API request
-        if (requestUrl.includes('api.github.com') || requestUrl.includes('github.com/api')) {
-          // Create a mock response
-          const mockResponse = {
-            responseCode: 200,
-            responseHeaders: [
-              {
-                name: 'Content-Type',
-                value: 'application/json',
-              },
-            ],
-            body: Buffer.from(
-              JSON.stringify({
-                message: 'Mock response',
-                data: [],
-              }),
-            ).toString('base64'),
-          }
-
-          // Fulfill the request with the mock response
-          await sessionRpc.invoke('Fetch.fulfillRequest', {
-            requestId,
-            responseCode: mockResponse.responseCode,
-            responseHeaders: mockResponse.responseHeaders,
-            body: mockResponse.body,
-          })
-        } else {
-          // For non-GitHub API requests, continue normally
-          await sessionRpc.invoke('Fetch.continueRequest', {
-            requestId,
-          })
-        }
-      }
-
-      sessionRpc.on('Fetch.requestPaused', requestPausedHandler)
-
-      isEnabled = true
+      const content = await readFile(settingsPath, 'utf8')
+      settings = JSON.parse(content)
     } catch (error) {
-      throw new VError(error, `Failed to enable network interceptor`)
+      // If settings file is invalid, start fresh
+      settings = {}
     }
   }
 
-  const disableFetchDomain = async (): Promise<void> => {
-    if (!isEnabled) {
+  if (proxyUrl) {
+    settings['http.proxy'] = proxyUrl
+    settings['http.proxyStrictSSL'] = false
+  } else {
+    delete settings['http.proxy']
+    delete settings['http.proxyStrictSSL']
+  }
+
+  const { mkdir } = await import('fs/promises')
+  const { dirname } = await import('path')
+  await mkdir(dirname(settingsPath), { recursive: true })
+  await writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf8')
+}
+
+
+export const create = ({ page, VError }) => {
+  let isEnabled = false
+  let proxyServer: { port: number; url: string; dispose: () => Promise<void> } | null = null
+
+  const enableProxy = async (): Promise<void> => {
+    if (proxyServer) {
       return
     }
 
     try {
-      const sessionRpc = page.sessionRpc
-      if (requestPausedHandler) {
-        sessionRpc.off('Fetch.requestPaused', requestPausedHandler)
-        requestPausedHandler = null
-      }
-      await sessionRpc.invoke('Fetch.disable', {})
-      isEnabled = false
+      // Start proxy server
+      proxyServer = await createHttpProxyServer(0)
+
+      // Update VS Code settings to use the proxy
+      await updateVsCodeSettings(proxyServer.url)
     } catch (error) {
-      throw new VError(error, `Failed to disable network interceptor`)
+      throw new VError(error, `Failed to enable proxy server`)
+    }
+  }
+
+  const disableProxy = async (): Promise<void> => {
+    if (!proxyServer) {
+      return
+    }
+
+    try {
+      // Remove proxy from VS Code settings
+      await updateVsCodeSettings(null)
+
+      // Stop proxy server
+      await proxyServer.dispose()
+      proxyServer = null
+    } catch (error) {
+      throw new VError(error, `Failed to disable proxy server`)
     }
   }
 
   return {
     async enable() {
+      if (isEnabled) {
+        return
+      }
+
       try {
-        await enableFetchDomain()
+        await enableProxy()
+        isEnabled = true
       } catch (error) {
         throw new VError(error, `Failed to enable network interceptor`)
       }
     },
     async disable() {
+      if (!isEnabled) {
+        return
+      }
+
       try {
-        await disableFetchDomain()
+        await disableProxy()
+        isEnabled = false
       } catch (error) {
         throw new VError(error, `Failed to disable network interceptor`)
       }
     },
     async [Symbol.asyncDispose]() {
-      await disableFetchDomain()
+      await disableProxy()
     },
   }
 }
