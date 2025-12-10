@@ -62,7 +62,7 @@ export const getMockResponse = async (
     }
 
     // Try to load mock from file
-    const mockFileName = GetMockFileName.getMockFileName(hostname, pathname, method)
+    const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
     const mockFile = join(MOCK_REQUESTS_DIR, mockFileName)
     const mockResponse = await loadMockResponse(mockFile)
 

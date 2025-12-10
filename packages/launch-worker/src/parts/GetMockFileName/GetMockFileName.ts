@@ -1,38 +1,81 @@
-export const getMockFileName = (hostname: string, pathname: string, method: string): string => {
-  // Convert URL to filename format: hostname_pathname_method.json
+import { readFile } from 'fs/promises'
+import { join } from 'path'
+import { existsSync } from 'fs'
+import * as Root from '../Root/Root.ts'
+
+interface MockConfigEntry {
+  hostname: string
+  pathname: string
+  method: string
+  filename: string
+}
+
+const MOCK_CONFIG_PATH = join(Root.root, '.vscode-mock-requests', 'mock-config.json')
+
+const matchesPattern = (value: string, pattern: string): boolean => {
+  if (pattern === '*') {
+    return true
+  }
+  if (pattern.includes('*')) {
+    // Simple wildcard matching: convert pattern to regex
+    const regexPattern = pattern.replace(/\*/g, '.*').replace(/\?/g, '.')
+    const regex = new RegExp(`^${regexPattern}$`)
+    return regex.test(value)
+  }
+  return value === pattern
+}
+
+const loadConfig = async (): Promise<MockConfigEntry[]> => {
+  try {
+    if (!existsSync(MOCK_CONFIG_PATH)) {
+      return []
+    }
+    const configContent = await readFile(MOCK_CONFIG_PATH, 'utf8')
+    return JSON.parse(configContent) as MockConfigEntry[]
+  } catch (error) {
+    console.error(`[Proxy] Error loading mock config from ${MOCK_CONFIG_PATH}:`, error)
+    return []
+  }
+}
+
+const findConfigMatch = (
+  config: MockConfigEntry[],
+  hostname: string,
+  pathname: string,
+  method: string,
+): string | null => {
+  const methodLower = method.toLowerCase()
+
+  for (const entry of config) {
+    const hostnameMatch = matchesPattern(hostname, entry.hostname) || hostname.includes(entry.hostname)
+    const pathnameMatch = matchesPattern(pathname, entry.pathname)
+    const methodMatch = matchesPattern(methodLower, entry.method.toLowerCase())
+
+    if (hostnameMatch && pathnameMatch && methodMatch) {
+      return entry.filename
+    }
+  }
+
+  return null
+}
+
+export const getMockFileName = async (
+  hostname: string,
+  pathname: string,
+  method: string,
+): Promise<string> => {
+  // Try to load config first
+  const config = await loadConfig()
+  const configMatch = findConfigMatch(config, hostname, pathname, method)
+
+  if (configMatch) {
+    return configMatch
+  }
+
+  // Generic fallback: Convert URL to filename format: hostname_pathname_method.json
   const hostnameSanitized = hostname.replace(/[^a-zA-Z0-9]/g, '_')
   const pathnameSanitized = pathname.replace(/[^a-zA-Z0-9]/g, '_').replace(/^_+/, '')
   const methodLower = method.toLowerCase()
-
-  // Special handling for specific endpoints
-  if (hostname.includes('applicationinsights.azure.com')) {
-    return 'applicationinsights_azure_com.json'
-  }
-
-  if (hostname === 'api.github.com' && pathname === '/copilot_internal/user') {
-    if (methodLower === 'options') {
-      return 'api_github_com_copilot_internal_user_options.json'
-    }
-    return 'api_github_com_copilot_internal_user_get.json'
-  }
-
-  if (hostname === 'api.github.com' && pathname === '/copilot_internal/v2/token') {
-    return 'api_github_com_copilot_internal_v2_token.json'
-  }
-
-  if (hostname === 'main.vscode-cdn.net' && pathname === '/extensions/chat.json') {
-    return 'main_vscode_cdn_net_extensions_chat_json.json'
-  }
-
-  if (hostname === 'api.github.com' && pathname === '/user') {
-    return 'api_github_com_user.json'
-  }
-
-  if (hostname === 'api.individual.githubcopilot.com' && pathname === '/agents') {
-    return 'api_individual_githubcopilot_com_agents.json'
-  }
-
-  // Generic fallback
   const pathPart = pathnameSanitized || 'root'
   return `${hostnameSanitized}_${pathPart}_${methodLower}.json`
 }
