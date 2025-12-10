@@ -2,6 +2,7 @@ import { IncomingMessage } from 'http'
 import { createGunzip, createInflate, createBrotliDecompress } from 'zlib'
 import { mkdir, writeFile } from 'fs/promises'
 import { join } from 'path'
+import { decompress as zstdDecompress } from '@mongodb-js/zstd'
 import * as Root from '../Root/Root.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
@@ -61,6 +62,16 @@ const decompressBody = async (body: Buffer, encoding: string | string[] | undefi
       brotli.write(body)
       brotli.end()
     })
+  }
+
+  if (normalizedEncoding === 'zstd') {
+    try {
+      const decompressed = await zstdDecompress(body)
+      return { body: decompressed.toString('utf8'), wasCompressed: true }
+    } catch (error) {
+      // If decompression fails, return original body
+      return { body: body.toString('utf8'), wasCompressed: false }
+    }
   }
 
   return { body: body.toString('utf8'), wasCompressed: false }

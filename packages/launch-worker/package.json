@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "@lvce-editor/rpc": "^4.20.0",
-    "@lvce-editor/verror": "^1.7.0"
+    "@lvce-editor/verror": "^1.7.0",
+    "@mongodb-js/zstd": "^7.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.6.1"
