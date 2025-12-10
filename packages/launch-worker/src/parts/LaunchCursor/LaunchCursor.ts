@@ -53,6 +53,7 @@ export const launchCursor = async ({
     await copyFile(defaultSettingsSourcePath, settingsPath)
 
     // Start proxy server if enabled
+    let proxyEnvVars: Record<string, string> = {}
     let proxyServer: { port: number; url: string } | null = null
     let proxyWorkerRpc: Awaited<ReturnType<typeof ProxyWorker.launch>> | null = null
     if (enableProxy) {
@@ -60,6 +61,11 @@ export const launchCursor = async ({
         console.log('[LaunchCursor] Starting proxy worker...')
         proxyWorkerRpc = await ProxyWorker.launch()
         proxyServer = await proxyWorkerRpc.invoke('Proxy.setupProxy', 0, useProxyMock, settingsPath)
+
+        // Get proxy environment variables
+        if (proxyServer) {
+          proxyEnvVars = await proxyWorkerRpc.invoke('Proxy.getProxyEnvVars', proxyServer.url)
+        }
 
         // Keep proxy server alive
         if (addDisposable && proxyWorkerRpc) {
@@ -87,11 +93,7 @@ export const launchCursor = async ({
       inspectExtensionsPort,
       enableProxy,
     })
-    let proxyEnvVars: Record<string, string> | null = null
-    if (proxyServer && proxyWorkerRpc) {
-      proxyEnvVars = await proxyWorkerRpc.invoke('Proxy.getProxyEnvVars', proxyServer.url)
-    }
-    const env = await GetVsCodeEnv.getVsCodeEnv({
+    const env = GetVsCodeEnv.getVsCodeEnv({
       runtimeDir,
       processEnv: process.env,
       proxyEnvVars,

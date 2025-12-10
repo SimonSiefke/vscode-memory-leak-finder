@@ -72,6 +72,7 @@ export const launchVsCode = async ({
     // Default to false if undefined
     const shouldEnableProxy = enableProxy === true
     console.log(`[LaunchVsCode] shouldEnableProxy: ${shouldEnableProxy} (enableProxy was: ${enableProxy})`)
+    let proxyEnvVars: Record<string, string> = {}
     let proxyServer: { port: number; url: string } | null = null
     let proxyWorkerRpc: Awaited<ReturnType<typeof ProxyWorker.launch>> | null = null
     if (shouldEnableProxy) {
@@ -79,6 +80,11 @@ export const launchVsCode = async ({
         console.log('[LaunchVsCode] Starting proxy worker...')
         proxyWorkerRpc = await ProxyWorker.launch()
         proxyServer = await proxyWorkerRpc.invoke('Proxy.setupProxy', 0, useProxyMock, settingsPath)
+
+        // Get proxy environment variables
+        if (proxyServer) {
+          proxyEnvVars = await proxyWorkerRpc.invoke('Proxy.getProxyEnvVars', proxyServer.url)
+        }
 
         // Keep proxy server alive
         if (addDisposable && proxyWorkerRpc) {
@@ -106,11 +112,7 @@ export const launchVsCode = async ({
       inspectExtensionsPort,
       enableProxy: shouldEnableProxy,
     })
-    let proxyEnvVars: Record<string, string> | null = null
-    if (proxyServer && proxyWorkerRpc) {
-      proxyEnvVars = await proxyWorkerRpc.invoke('Proxy.getProxyEnvVars', proxyServer.url)
-    }
-    const env = await GetVsCodeEnv.getVsCodeEnv({
+    const env = GetVsCodeEnv.getVsCodeEnv({
       runtimeDir,
       processEnv: process.env,
       proxyEnvVars,

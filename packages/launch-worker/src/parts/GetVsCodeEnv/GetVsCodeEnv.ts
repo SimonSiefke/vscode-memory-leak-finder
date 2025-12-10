@@ -1,4 +1,4 @@
-export const getVsCodeEnv = async ({ runtimeDir, processEnv, proxyEnvVars }) => {
+export const getVsCodeEnv = ({ runtimeDir, processEnv, proxyEnvVars }) => {
   const env = {
     ...processEnv,
   }
@@ -14,9 +14,7 @@ export const getVsCodeEnv = async ({ runtimeDir, processEnv, proxyEnvVars }) => 
   delete env.ELECTRON_RUN_AS_NODE
 
   // Set HTTP_PROXY/HTTPS_PROXY environment variables if proxy is configured
-  if (proxyEnvVars) {
-    Object.assign(env, proxyEnvVars)
-  }
+  Object.assign(env, proxyEnvVars)
 
   return env
 }
