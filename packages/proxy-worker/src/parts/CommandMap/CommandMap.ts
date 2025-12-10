@@ -6,5 +6,6 @@ export const commandMap = {
   'Proxy.disposeProxyServer': Proxy.disposeProxyServer,
   'Proxy.getCACertPath': Proxy.getCACertPath,
   'Proxy.getProxyEnvVars': Proxy.getProxyEnvVars,
+  'Proxy.setupProxy': Proxy.setupProxy,
   'ConvertRequestsToMocks.convertRequestsToMocksMain': ConvertRequestsToMocks.convertRequestsToMocksMain,
 }

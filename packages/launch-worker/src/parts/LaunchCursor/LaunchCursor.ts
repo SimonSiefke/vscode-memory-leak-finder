@@ -59,18 +59,7 @@ export const launchCursor = async ({
       try {
         console.log('[LaunchCursor] Starting proxy worker...')
         proxyWorkerRpc = await ProxyWorker.launch()
-        console.log('[LaunchCursor] Creating proxy server via proxy-worker...')
-        proxyServer = await proxyWorkerRpc.invoke('Proxy.createHttpProxyServer', 0, useProxyMock)
-        console.log(`[LaunchCursor] Proxy server started on ${proxyServer.url} (port ${proxyServer.port})`)
-
-        // Update settings
-        const { readFile, writeFile } = await import('fs/promises')
-        const settingsContent = await readFile(settingsPath, 'utf8')
-        const settings = JSON.parse(settingsContent)
-        settings['http.proxy'] = proxyServer.url
-        settings['http.proxyStrictSSL'] = false
-        await writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf8')
-        console.log(`[LaunchCursor] Proxy configured: ${proxyServer.url}`)
+        proxyServer = await proxyWorkerRpc.invoke('Proxy.setupProxy', 0, useProxyMock, settingsPath)
 
         // Keep proxy server alive
         if (addDisposable && proxyWorkerRpc) {
@@ -80,9 +69,6 @@ export const launchCursor = async ({
             await proxyWorkerRpc!.dispose()
           })
         }
-
-        // Wait a bit to ensure proxy server is ready
-        await new Promise((resolve) => setTimeout(resolve, 100))
       } catch (error) {
         console.error('[LaunchCursor] Error setting up proxy:', error)
         // Continue even if proxy setup fails
