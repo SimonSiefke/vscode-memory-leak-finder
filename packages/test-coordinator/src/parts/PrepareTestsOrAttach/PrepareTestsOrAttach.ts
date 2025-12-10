@@ -33,6 +33,7 @@ export const prepareTestsAndAttach = async (
   inspectPtyHostPort: number,
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
+  enableProxy: boolean,
 ) => {
   const isFirst = state.promise === undefined
   if (isFirst) {
@@ -59,6 +60,7 @@ export const prepareTestsAndAttach = async (
       inspectPtyHostPort,
       inspectSharedProcessPort,
       inspectExtensionsPort,
+      enableProxy,
     )
   }
   const result = await state.promise

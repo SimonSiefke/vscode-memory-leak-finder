@@ -57,11 +57,12 @@ export const runTestsWithCallback = async ({
   inspectPtyHost,
   enableExtensions,
   continueValue,
-  inspectPtyHostPort,
-  inspectSharedProcessPort,
-  inspectExtensionsPort,
-  callback,
-}: RunTestsWithCallbackOptions) => {
+    inspectPtyHostPort,
+    inspectSharedProcessPort,
+    inspectExtensionsPort,
+    enableProxy,
+    callback,
+  }: RunTestsWithCallbackOptions) => {
   try {
     Assert.string(root)
     Assert.string(cwd)
@@ -117,6 +118,7 @@ export const runTestsWithCallback = async ({
         inspectPtyHostPort,
         inspectSharedProcessPort,
         inspectExtensionsPort,
+        enableProxy,
       )
       await testWorkerRpc.dispose()
       await memoryRpc?.dispose()
@@ -192,6 +194,7 @@ export const runTestsWithCallback = async ({
           inspectPtyHostPort,
           inspectSharedProcessPort,
           inspectExtensionsPort,
+          enableProxy,
         )
         workers = {
           testWorkerRpc: testWorkerRpc || emptyRpc,

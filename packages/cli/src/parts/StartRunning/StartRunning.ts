@@ -37,6 +37,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     inspectPtyHostPort,
     inspectSharedProcessPort,
     inspectExtensionsPort,
+    enableProxy,
   } = options
   const clear = await AnsiEscapes.clear(isWindows)
   await Stdout.write(clear)
@@ -73,5 +74,6 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     inspectPtyHostPort,
     inspectSharedProcessPort,
     inspectExtensionsPort,
+    enableProxy,
   })
 }

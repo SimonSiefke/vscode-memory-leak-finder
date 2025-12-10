@@ -56,6 +56,7 @@ export const parseArgv = (argv) => {
     inspectPtyHostPort: 5877,
     inspectSharedProcessPort: 5879,
     inspectExtensionsPort: 5870,
+    enableProxy: false,
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -146,6 +147,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--inspect-extensions-port')) {
     options.inspectExtensionsPort = parseArgvNumber(argv, '--inspect-extensions-port')
+  }
+  if (argv.includes('--enable-proxy')) {
+    options.enableProxy = true
   }
   return options
 }

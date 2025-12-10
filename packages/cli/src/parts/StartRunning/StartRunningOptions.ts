@@ -30,4 +30,5 @@ export interface StartRunningOptions {
   inspectPtyHostPort: number
   inspectSharedProcessPort: number
   inspectExtensionsPort: number
+  enableProxy: boolean
 }

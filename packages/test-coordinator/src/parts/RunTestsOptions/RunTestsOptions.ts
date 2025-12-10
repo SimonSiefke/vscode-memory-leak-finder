@@ -29,6 +29,7 @@ export interface RunTestsOptions {
   readonly inspectPtyHostPort: number
   readonly inspectSharedProcessPort: number
   readonly inspectExtensionsPort: number
+  readonly enableProxy: boolean
 }
 
 export interface RunTestsWithCallbackOptions extends RunTestsOptions {

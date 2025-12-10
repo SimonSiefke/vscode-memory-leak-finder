@@ -71,7 +71,7 @@ export const launchVsCode = async ({
       inspectSharedProcessPort,
       inspectExtensionsPort,
     })
-    const env = GetVsCodeEnv.getVsCodeEnv({ runtimeDir, processEnv: process.env })
+    const env = await GetVsCodeEnv.getVsCodeEnv({ runtimeDir, processEnv: process.env })
     const { child } = await LaunchElectron.launchElectron({
       cliPath: binaryPath,
       args,

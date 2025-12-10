@@ -35,10 +35,11 @@ export const runTests = ({
   inspectPtyHost,
   enableExtensions,
   continueValue,
-  inspectPtyHostPort,
-  inspectSharedProcessPort,
-  inspectExtensionsPort,
-}: RunTestsOptions) => {
+    inspectPtyHostPort,
+    inspectSharedProcessPort,
+    inspectExtensionsPort,
+    enableProxy,
+  }: RunTestsOptions) => {
   return RunTestsWithCallback.runTestsWithCallback({
     root,
     cwd,
@@ -70,6 +71,7 @@ export const runTests = ({
     inspectPtyHostPort,
     inspectSharedProcessPort,
     inspectExtensionsPort,
+    enableProxy,
     callback,
     addDisposable: Disposables.add,
     clearDisposables: Disposables.disposeAll,

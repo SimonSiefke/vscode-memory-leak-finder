@@ -137,7 +137,9 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
   // but HTTP requests will be captured
 }
 
-export const createHttpProxyServer = async (port: number = 0): Promise<{
+export const createHttpProxyServer = async (
+  port: number = 0,
+): Promise<{
   port: number
   url: string
   dispose: () => Promise<void>

@@ -1,4 +1,5 @@
 import { createHttpProxyServer } from './HttpProxyServer.ts'
+import * as ProxyState from './ProxyState.ts'
 import * as Root from '../Root/Root.ts'
 import { join } from 'path'
 import { readFile, writeFile } from 'fs/promises'
@@ -52,8 +53,22 @@ export const create = ({ page, VError }) => {
     }
 
     try {
+      // Check if proxy is already running (started via CLI flag)
+      const existingState = await ProxyState.getProxyState()
+      if (existingState.proxyUrl && existingState.port) {
+        // Proxy already running, just update settings
+        await updateVsCodeSettings(existingState.proxyUrl)
+        return
+      }
+
       // Start proxy server
       proxyServer = await createHttpProxyServer(0)
+
+      // Store proxy state for launch worker to read
+      await ProxyState.setProxyState({
+        proxyUrl: proxyServer.url,
+        port: proxyServer.port,
+      })
 
       // Update VS Code settings to use the proxy
       await updateVsCodeSettings(proxyServer.url)
@@ -68,6 +83,9 @@ export const create = ({ page, VError }) => {
     }
 
     try {
+      // Clear proxy state
+      await ProxyState.clearProxyState()
+
       // Remove proxy from VS Code settings
       await updateVsCodeSettings(null)
 
