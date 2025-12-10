@@ -31,4 +31,5 @@ export interface StartRunningOptions {
   inspectSharedProcessPort: number
   inspectExtensionsPort: number
   enableProxy: boolean
+  useProxyMock: boolean
 }

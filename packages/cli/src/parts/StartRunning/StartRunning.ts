@@ -38,6 +38,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     inspectSharedProcessPort,
     inspectExtensionsPort,
     enableProxy,
+    useProxyMock,
   } = options
   console.log({ enableProxy })
   const clear = await AnsiEscapes.clear(isWindows)
@@ -76,5 +77,6 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     inspectSharedProcessPort,
     inspectExtensionsPort,
     enableProxy,
+    useProxyMock,
   })
 }

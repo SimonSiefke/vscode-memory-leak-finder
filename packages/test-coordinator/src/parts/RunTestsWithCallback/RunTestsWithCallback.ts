@@ -61,6 +61,7 @@ export const runTestsWithCallback = async ({
     inspectSharedProcessPort,
     inspectExtensionsPort,
     enableProxy,
+    useProxyMock,
     callback,
   }: RunTestsWithCallbackOptions) => {
   try {

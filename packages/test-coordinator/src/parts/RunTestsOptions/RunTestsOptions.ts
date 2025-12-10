@@ -30,6 +30,7 @@ export interface RunTestsOptions {
   readonly inspectSharedProcessPort: number
   readonly inspectExtensionsPort: number
   readonly enableProxy: boolean
+  readonly useProxyMock: boolean
 }
 
 export interface RunTestsWithCallbackOptions extends RunTestsOptions {

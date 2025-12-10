@@ -44,5 +44,6 @@ export const initialStart = async (options): Promise<void> => {
     inspectSharedProcessPort: options.inspectSharedProcessPort,
     inspectExtensionsPort: options.inspectExtensionsPort,
     enableProxy: options.enableProxy,
+    useProxyMock: options.useProxyMock,
   })
 }
