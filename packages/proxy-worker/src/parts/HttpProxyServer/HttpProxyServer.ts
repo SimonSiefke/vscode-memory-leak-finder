@@ -284,7 +284,7 @@ export const createHttpProxyServer = async (
 ): Promise<{
   port: number
   url: string
-  dispose: () => Promise<void>
+  [Symbol.asyncDispose]: () => Promise<void>
 }> => {
   await mkdir(REQUESTS_DIR, { recursive: true })
 
@@ -360,7 +360,7 @@ export const createHttpProxyServer = async (
   return {
     port: actualPort,
     url,
-    async dispose() {
+    async [Symbol.asyncDispose]() {
       const { promise, resolve } = Promise.withResolvers<void>()
       server.close(() => resolve())
       await promise
