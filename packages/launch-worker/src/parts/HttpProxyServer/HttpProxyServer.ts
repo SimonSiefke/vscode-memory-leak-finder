@@ -2,7 +2,7 @@ import { createServer, IncomingMessage, ServerResponse } from 'http'
 import { request as httpRequest } from 'http'
 import { request as httpsRequest } from 'https'
 import { createSecureContext } from 'tls'
-import { createGunzip, createInflate } from 'zlib'
+import { createGunzip, createInflate, createBrotliDecompress } from 'zlib'
 import { URL } from 'url'
 import { mkdir, writeFile } from 'fs/promises'
 import { join } from 'path'
@@ -53,6 +53,21 @@ const decompressBody = async (
       inflate.on('error', reject)
       inflate.write(body)
       inflate.end()
+    })
+  }
+
+  if (normalizedEncoding === 'br') {
+    return new Promise((resolve, reject) => {
+      const brotli = createBrotliDecompress()
+      const chunks: Buffer[] = []
+      brotli.on('data', (chunk: Buffer) => chunks.push(chunk))
+      brotli.on('end', () => {
+        const decompressed = Buffer.concat(chunks).toString('utf8')
+        resolve({ body: decompressed, wasCompressed: true })
+      })
+      brotli.on('error', reject)
+      brotli.write(body)
+      brotli.end()
     })
   }
 
