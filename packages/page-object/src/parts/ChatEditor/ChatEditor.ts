@@ -1,4 +1,5 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, page, VError }) => {
   return {
@@ -125,6 +126,16 @@ export const create = ({ expect, page, VError }) => {
         await removeButton.click()
       } catch (error) {
         throw new VError(error, `Failed to clear chat context`)
+      }
+    },
+    async clearAll() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to clear all chats`)
       }
     },
   }
