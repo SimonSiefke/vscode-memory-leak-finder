@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, mkdirSync } from 'fs'
+import { readFileSync, writeFileSync } from 'fs'
 import { dirname, join, resolve } from 'path'
 import { fileURLToPath } from 'url'
 
@@ -139,6 +139,7 @@ export const generateApiTypes = async (): Promise<void> => {
 
     // Ensure the output directory exists
     const outputDir = resolve(__dirname, '../../e2e/types')
+    const { mkdirSync } = await import('fs')
     try {
       mkdirSync(outputDir, { recursive: true })
     } catch (error) {
