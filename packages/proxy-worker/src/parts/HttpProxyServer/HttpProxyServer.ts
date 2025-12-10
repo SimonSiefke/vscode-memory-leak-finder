@@ -404,8 +404,6 @@ export const createHttpProxyServer = async (
 
   server.on('connect', (req: IncomingMessage, socket: any, head: Buffer) => {
     // Handle CONNECT method for HTTPS tunneling
-    const target = req.url || ''
-    console.log(`[Proxy] Received CONNECT request: ${target}`)
     HandleConnect.handleConnect(req, socket, head, useProxyMock).catch(() => {
       socket.end()
     })
