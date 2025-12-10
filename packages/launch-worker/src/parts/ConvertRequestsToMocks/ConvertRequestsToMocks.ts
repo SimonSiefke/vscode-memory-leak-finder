@@ -132,6 +132,13 @@ const convertRequestsToMocks = async (): Promise<void> => {
 
     for (const request of latestRequests.values()) {
       try {
+        // Skip requests without a response or without required fields
+        if (!request.response || typeof request.response.statusCode === 'undefined') {
+          console.log(`Skipping request ${request.method} ${request.url} - no response data or missing statusCode`)
+          skippedCount++
+          continue
+        }
+
         // Parse URL to get hostname and pathname
         const parsedUrl = new URL(request.url)
         const hostname = parsedUrl.hostname
@@ -146,7 +153,7 @@ const convertRequestsToMocks = async (): Promise<void> => {
           response: {
             statusCode: request.response.statusCode,
             statusMessage: request.response.statusMessage,
-            headers: request.response.headers,
+            headers: request.response.headers || {},
             body: request.response.body,
             wasCompressed: request.response.wasCompressed,
           },

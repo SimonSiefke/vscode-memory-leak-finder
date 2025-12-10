@@ -61,9 +61,21 @@
   },
   {
     "hostname": "api.individual.githubcopilot.com",
+    "pathname": "/chat/completions",
+    "method": "POST",
+    "filename": "api_individual_githubcopilot_com_chat_completions_post.json"
+  },
+  {
+    "hostname": "api.individual.githubcopilot.com",
     "pathname": "/models",
     "method": "GET",
     "filename": "api_individual_githubcopilot_com_models_get.json"
+  },
+  {
+    "hostname": "api.individual.githubcopilot.com",
+    "pathname": "/models/session",
+    "method": "POST",
+    "filename": "api_individual_githubcopilot_com_models_session_post.json"
   },
   {
     "hostname": "api.individual.githubcopilot.com",
@@ -84,10 +96,52 @@
     "filename": "avatars_githubusercontent_com_u_12345678_get.json"
   },
   {
+    "hostname": "avatars.githubusercontent.com",
+    "pathname": "/u/72156503",
+    "method": "GET",
+    "filename": "avatars_githubusercontent_com_u_72156503_get.json"
+  },
+  {
     "hostname": "copilot-telemetry.githubusercontent.com",
     "pathname": "/telemetry",
     "method": "GET",
     "filename": "copilot_telemetry_githubusercontent_com_telemetry_get.json"
+  },
+  {
+    "hostname": "embeddings.vscode-cdn.net",
+    "pathname": "/text-3-small/v1.106/commands/GitHub.copilot-chat.json",
+    "method": "GET",
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_106_commands_GitHub_copilot_chat_json_get.json"
+  },
+  {
+    "hostname": "embeddings.vscode-cdn.net",
+    "pathname": "/text-3-small/v1.106/commands/GitHub.copilot.json",
+    "method": "GET",
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_106_commands_GitHub_copilot_json_get.json"
+  },
+  {
+    "hostname": "embeddings.vscode-cdn.net",
+    "pathname": "/text-3-small/v1.106/commands/latest.txt",
+    "method": "GET",
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_106_commands_latest_txt_get.json"
+  },
+  {
+    "hostname": "embeddings.vscode-cdn.net",
+    "pathname": "/text-3-small/v1.106/commands/ms-vscode.js-debug-companion.json",
+    "method": "GET",
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_106_commands_ms_vscode_js_debug_companion_json_get.json"
+  },
+  {
+    "hostname": "embeddings.vscode-cdn.net",
+    "pathname": "/text-3-small/v1.106/commands/ms-vscode.js-debug.json",
+    "method": "GET",
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_106_commands_ms_vscode_js_debug_json_get.json"
+  },
+  {
+    "hostname": "embeddings.vscode-cdn.net",
+    "pathname": "/text-3-small/v1.106/commands/ms-vscode.vscode-js-profile-table.json",
+    "method": "GET",
+    "filename": "embeddings_vscode_cdn_net_text_3_small_v1_106_commands_ms_vscode_vscode_js_profile_table_json_get.json"
   },
   {
     "hostname": "github.gallery.vsassets.io",
