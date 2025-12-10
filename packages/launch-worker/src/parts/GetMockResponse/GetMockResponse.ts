@@ -42,10 +42,7 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
   }
 }
 
-export const getMockResponse = async (
-  method: string,
-  url: string,
-): Promise<MockResponse | null> => {
+export const getMockResponse = async (method: string, url: string): Promise<MockResponse | null> => {
   try {
     const { URL } = await import('url')
     const parsedUrl = new URL(url)
@@ -77,15 +74,8 @@ export const getMockResponse = async (
   }
 }
 
-export const sendMockResponse = (
-  res: ServerResponse,
-  mockResponse: MockResponse,
-  httpVersion: string = 'HTTP/1.1',
-): void => {
-  const bodyStr =
-    typeof mockResponse.body === 'string'
-      ? mockResponse.body
-      : JSON.stringify(mockResponse.body)
+export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse, httpVersion: string = 'HTTP/1.1'): void => {
+  const bodyStr = typeof mockResponse.body === 'string' ? mockResponse.body : JSON.stringify(mockResponse.body)
   const bodyBuffer = Buffer.from(bodyStr, 'utf8')
 
   // Convert headers to the format expected by writeHead

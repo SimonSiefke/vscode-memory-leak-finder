@@ -39,12 +39,7 @@ const loadConfig = async (): Promise<MockConfigEntry[]> => {
   }
 }
 
-const findConfigMatch = (
-  config: MockConfigEntry[],
-  hostname: string,
-  pathname: string,
-  method: string,
-): string | null => {
+const findConfigMatch = (config: MockConfigEntry[], hostname: string, pathname: string, method: string): string | null => {
   const methodLower = method.toLowerCase()
 
   for (const entry of config) {
@@ -60,11 +55,7 @@ const findConfigMatch = (
   return null
 }
 
-export const getMockFileName = async (
-  hostname: string,
-  pathname: string,
-  method: string,
-): Promise<string> => {
+export const getMockFileName = async (hostname: string, pathname: string, method: string): Promise<string> => {
   // Try to load config first
   const config = await loadConfig()
   const configMatch = findConfigMatch(config, hostname, pathname, method)

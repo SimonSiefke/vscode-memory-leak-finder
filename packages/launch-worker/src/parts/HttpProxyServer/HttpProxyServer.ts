@@ -10,6 +10,7 @@ import * as Root from '../Root/Root.ts'
 import * as CertificateManager from '../CertificateManager/CertificateManager.ts'
 import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
 import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
+import * as SaveRequest from '../SaveRequest/SaveRequest.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
@@ -94,41 +95,6 @@ const parseJsonIfApplicable = (body: string, contentType: string | string[] | un
   return body
 }
 
-const saveRequest = async (req: IncomingMessage, response: ServerResponse, responseData: Buffer): Promise<void> => {
-  try {
-    await mkdir(REQUESTS_DIR, { recursive: true })
-    const timestamp = Date.now()
-    const url = req.url || ''
-    const filename = `${timestamp}_${sanitizeFilename(url)}.json`
-    const filepath = join(REQUESTS_DIR, filename)
-
-    const responseHeaders = response.getHeaders()
-    const { body: decompressedBody, wasCompressed } = await decompressBody(responseData, responseHeaders['content-encoding'])
-
-    const parsedBody = parseJsonIfApplicable(decompressedBody, responseHeaders['content-type'])
-
-    const requestData = {
-      timestamp,
-      method: req.method,
-      url: req.url,
-      headers: req.headers,
-      response: {
-        statusCode: response.statusCode,
-        statusMessage: response.statusMessage,
-        headers: responseHeaders,
-        body: parsedBody,
-        wasCompressed,
-      },
-    }
-
-    await writeFile(filepath, JSON.stringify(requestData, null, 2), 'utf8')
-    console.log(`[Proxy] Saved request to ${filepath}`)
-  } catch (error) {
-    // Ignore errors when saving requests
-    console.error('[Proxy] Failed to save request:', error)
-  }
-}
-
 const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetUrl: string, useProxyMock: boolean): Promise<void> => {
   // Check for mock response first (only if useProxyMock is enabled)
   if (useProxyMock) {
@@ -211,7 +177,7 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
         await SavePostBody.savePostBody(req.method, targetUrl, req.headers as Record<string, string>, requestBody)
       }
 
-      saveRequest(req, res, responseData).catch((err) => {
+      SaveRequest.saveRequest(req, res, responseData).catch((err) => {
         console.error('[Proxy] Error saving request:', err)
       })
     })
@@ -626,10 +592,12 @@ const saveInterceptedRequest = async (
   }
 }
 
-export const createHttpProxyServer = async (options: {
-  port?: number
-  useProxyMock?: boolean
-} = {}): Promise<{
+export const createHttpProxyServer = async (
+  options: {
+    port?: number
+    useProxyMock?: boolean
+  } = {},
+): Promise<{
   port: number
   url: string
   dispose: () => Promise<void>
