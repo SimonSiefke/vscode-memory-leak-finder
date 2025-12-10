@@ -401,7 +401,18 @@ export const createHttpProxyServer = async (
       }
 
       // No mock found - log error and return error response
-      console.error(`[Proxy] No mock found for request: ${method} ${targetUrl}`)
+      let formattedUrl = targetUrl
+      try {
+        const parsedUrl = new URL(targetUrl)
+        if (parsedUrl.protocol === 'https:' && parsedUrl.port === '443') {
+          formattedUrl = `${parsedUrl.protocol}//${parsedUrl.hostname}${parsedUrl.pathname}${parsedUrl.search}${parsedUrl.hash}`
+        } else {
+          formattedUrl = parsedUrl.toString()
+        }
+      } catch {
+        // If URL parsing fails, use original URL
+      }
+      console.error(`[Proxy] No mock found for request: ${method} ${formattedUrl}`)
       res.writeHead(404, { 'Content-Type': 'application/json' })
       res.end(
         JSON.stringify({
@@ -426,6 +437,7 @@ export const createHttpProxyServer = async (
       const parts = target.split(':')
       const hostname = parts[0]
       const targetPort = parts[1] ? parseInt(parts[1], 10) : 443
+      // CONNECT requests don't have pathnames, but format consistently
       const url = targetPort === 443 ? `https://${hostname}` : `https://${hostname}:${targetPort}`
       console.error(`[Proxy] CONNECT request blocked (useProxyMock enabled): ${url}`)
       socket.write('HTTP/1.1 403 Forbidden\r\n\r\n')
