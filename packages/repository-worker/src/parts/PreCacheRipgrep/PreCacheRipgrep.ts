@@ -3,9 +3,6 @@ import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 import * as Logger from '../Logger/Logger.ts'
 import * as Path from '../Path/Path.ts'
 import * as os from 'os'
-import * as fs from 'fs'
-import * as https from 'https'
-import { URL } from 'url'
 
 // Configuration constants
 const RIPGREP_VERSION = 'v13.0.0-13'
@@ -74,6 +71,9 @@ const getVersionForTarget = (target: string): string => {
  * Downloads a file using Node.js built-in modules with retry logic
  */
 const downloadWithRetry = async (url: string, outputPath: string, maxRetries = 3): Promise<void> => {
+  const https = await import('https')
+  const fs = await import('fs')
+  const { URL } = await import('url')
 
   let lastError: Error | null = null
 
