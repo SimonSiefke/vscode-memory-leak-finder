@@ -80,7 +80,7 @@ export const launchVsCode = async ({
           await writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf8')
           console.log(`[LaunchVsCode] Merged proxy settings: ${proxyState.proxyUrl}`)
           console.log(`[LaunchVsCode] Settings file written to: ${settingsPath}`)
-          
+
           // Verify settings were written correctly
           const verifyContent = await readFile(settingsPath, 'utf8')
           const verifySettings = JSON.parse(verifyContent)
