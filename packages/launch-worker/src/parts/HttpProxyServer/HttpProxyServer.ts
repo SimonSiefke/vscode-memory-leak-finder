@@ -124,15 +124,33 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
       } catch {
         // If URL parsing fails, use the original URL
       }
-      const isZipFile = contentTypeStr.includes('application/zip') || urlPathname.toLowerCase().endsWith('.zip') || urlPathname.toLowerCase().endsWith('.vsix')
+      // Check body buffer for ZIP magic bytes
+      let bodyBuffer: Buffer
+      if (mockResponse.body === null || mockResponse.body === undefined) {
+        bodyBuffer = Buffer.alloc(0)
+      } else if (Buffer.isBuffer(mockResponse.body)) {
+        bodyBuffer = mockResponse.body
+      } else if (typeof mockResponse.body === 'string') {
+        bodyBuffer = Buffer.from(mockResponse.body, 'utf8')
+      } else {
+        bodyBuffer = Buffer.from(JSON.stringify(mockResponse.body), 'utf8')
+      }
+      const hasZipMagicBytes = bodyBuffer.length >= 2 && bodyBuffer[0] === 0x50 && bodyBuffer[1] === 0x4b
+      const isZipFile = contentTypeStr.includes('application/zip') || urlPathname.toLowerCase().endsWith('.zip') || urlPathname.toLowerCase().endsWith('.vsix') || hasZipMagicBytes
 
       if (isZipFile) {
+        console.log(`[Proxy] Detected zip file in forwardRequest - URL: ${targetUrl}, Content-Type: ${contentTypeStr}, Has magic bytes: ${hasZipMagicBytes}, Body length: ${bodyBuffer.length}`)
         // Remove Content-Encoding and Transfer-Encoding headers for zip files
         const cleanedHeaders = { ...mockResponse.headers }
         const lowerCaseHeaders: Set<string> = new Set()
         Object.keys(cleanedHeaders).forEach((k) => {
           lowerCaseHeaders.add(k.toLowerCase())
         })
+        const originalContentEncoding = cleanedHeaders['content-encoding'] || cleanedHeaders['Content-Encoding']
+        const originalTransferEncoding = cleanedHeaders['transfer-encoding'] || cleanedHeaders['Transfer-Encoding']
+        if (originalContentEncoding || originalTransferEncoding) {
+          console.log(`[Proxy] Removing encoding headers - Content-Encoding: ${originalContentEncoding}, Transfer-Encoding: ${originalTransferEncoding}`)
+        }
         if (lowerCaseHeaders.has('content-encoding')) {
           Object.keys(cleanedHeaders).forEach((k) => {
             if (k.toLowerCase() === 'content-encoding') {
@@ -147,6 +165,17 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
             }
           })
         }
+        // Double-check removal
+        const finalKeysToRemove: string[] = []
+        Object.keys(cleanedHeaders).forEach((k) => {
+          if (k.toLowerCase() === 'content-encoding' || k.toLowerCase() === 'transfer-encoding') {
+            finalKeysToRemove.push(k)
+          }
+        })
+        finalKeysToRemove.forEach((k) => {
+          delete cleanedHeaders[k]
+        })
+        console.log(`[Proxy] Final headers for zip file (after cleanup):`, Object.keys(cleanedHeaders))
         GetMockResponse.sendMockResponse(res, { ...mockResponse, headers: cleanedHeaders })
       } else {
         GetMockResponse.sendMockResponse(res, mockResponse)
@@ -539,7 +568,19 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer, us
             } catch {
               // If URL parsing fails, use the path
             }
-            const isZipFile = contentTypeStr.includes('application/zip') || urlPathname.toLowerCase().endsWith('.zip') || urlPathname.toLowerCase().endsWith('.vsix')
+            // Check for ZIP magic bytes (PK - ZIP file signature)
+            const hasZipMagicBytes = bodyBuffer.length >= 2 && bodyBuffer[0] === 0x50 && bodyBuffer[1] === 0x4b
+            const isZipFile = contentTypeStr.includes('application/zip') || urlPathname.toLowerCase().endsWith('.zip') || urlPathname.toLowerCase().endsWith('.vsix') || hasZipMagicBytes
+
+            if (isZipFile) {
+              console.log(`[Proxy] Detected zip file in handleConnect - URL: ${fullUrl}, Content-Type: ${contentTypeStr}, Has magic bytes: ${hasZipMagicBytes}, Body length: ${bodyBuffer.length}`)
+              // Log original headers for debugging
+              const originalContentEncoding = mockResponse.headers['content-encoding'] || mockResponse.headers['Content-Encoding']
+              const originalTransferEncoding = mockResponse.headers['transfer-encoding'] || mockResponse.headers['Transfer-Encoding']
+              if (originalContentEncoding || originalTransferEncoding) {
+                console.log(`[Proxy] Removing encoding headers - Content-Encoding: ${originalContentEncoding}, Transfer-Encoding: ${originalTransferEncoding}`)
+              }
+            }
 
             // Convert headers to the format expected and check for existing CORS headers
             const cleanedHeaders: Record<string, string> = {}
@@ -554,6 +595,22 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer, us
                 lowerCaseHeaders.add(lowerKey)
               }
             })
+
+            // Double-check: explicitly remove Content-Encoding and Transfer-Encoding for zip files
+            if (isZipFile) {
+              const keysToRemove: string[] = []
+              Object.keys(cleanedHeaders).forEach((k) => {
+                const lowerKey = k.toLowerCase()
+                if (lowerKey === 'content-encoding' || lowerKey === 'transfer-encoding') {
+                  keysToRemove.push(k)
+                }
+              })
+              keysToRemove.forEach((k) => {
+                delete cleanedHeaders[k]
+                lowerCaseHeaders.delete(k.toLowerCase())
+              })
+              console.log(`[Proxy] Final headers for zip file (after cleanup):`, Object.keys(cleanedHeaders))
+            }
 
             // Add CORS headers if not already present (case-insensitive check)
             if (!lowerCaseHeaders.has('access-control-allow-origin')) {

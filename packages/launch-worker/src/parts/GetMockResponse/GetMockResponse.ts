@@ -169,6 +169,22 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
     }
   })
 
+  // Double-check: explicitly remove Content-Encoding and Transfer-Encoding for zip files
+  if (isZipFile) {
+    const keysToRemove: string[] = []
+    Object.keys(headers).forEach((k) => {
+      const lowerKey = k.toLowerCase()
+      if (lowerKey === 'content-encoding' || lowerKey === 'transfer-encoding') {
+        keysToRemove.push(k)
+      }
+    })
+    keysToRemove.forEach((k) => {
+      delete headers[k]
+      lowerCaseHeaders.delete(k.toLowerCase())
+    })
+    console.log(`[Proxy] sendMockResponse - Final headers for zip file (after cleanup):`, Object.keys(headers))
+  }
+
   // Add CORS headers if not already present (case-insensitive check)
   if (!lowerCaseHeaders.has('access-control-allow-origin')) {
     headers['Access-Control-Allow-Origin'] = '*'
