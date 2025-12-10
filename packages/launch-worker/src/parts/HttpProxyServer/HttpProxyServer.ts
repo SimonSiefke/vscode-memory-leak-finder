@@ -59,6 +59,30 @@ const decompressBody = async (
   return { body: body.toString('utf8'), wasCompressed: false }
 }
 
+const parseJsonIfApplicable = (
+  body: string,
+  contentType: string | string[] | undefined,
+): string | object => {
+  if (!contentType) {
+    return body
+  }
+
+  const contentTypeStr = Array.isArray(contentType) ? contentType[0] : contentType
+  const normalizedContentType = contentTypeStr.toLowerCase().trim()
+
+  // Check if content type is JSON
+  if (normalizedContentType.includes('application/json') || normalizedContentType.includes('text/json')) {
+    try {
+      return JSON.parse(body)
+    } catch (error) {
+      // If parsing fails, return as string
+      return body
+    }
+  }
+
+  return body
+}
+
 const saveRequest = async (req: IncomingMessage, response: ServerResponse, responseData: Buffer): Promise<void> => {
   try {
     await mkdir(REQUESTS_DIR, { recursive: true })
@@ -73,6 +97,8 @@ const saveRequest = async (req: IncomingMessage, response: ServerResponse, respo
       responseHeaders['content-encoding'],
     )
 
+    const parsedBody = parseJsonIfApplicable(decompressedBody, responseHeaders['content-type'])
+
     const requestData = {
       timestamp,
       method: req.method,
@@ -82,7 +108,7 @@ const saveRequest = async (req: IncomingMessage, response: ServerResponse, respo
         statusCode: response.statusCode,
         statusMessage: response.statusMessage,
         headers: responseHeaders,
-        body: decompressedBody,
+        body: parsedBody,
         wasCompressed,
       },
     }
@@ -477,7 +503,10 @@ const saveInterceptedRequest = async (
     const filepath = join(REQUESTS_DIR, filename)
 
     const contentEncoding = responseHeaders['content-encoding'] || responseHeaders['Content-Encoding']
+    const contentType = responseHeaders['content-type'] || responseHeaders['Content-Type']
     const { body: decompressedBody, wasCompressed } = await decompressBody(responseBody, contentEncoding)
+
+    const parsedBody = parseJsonIfApplicable(decompressedBody, contentType)
 
     const requestData = {
       timestamp,
@@ -487,7 +516,7 @@ const saveInterceptedRequest = async (
       response: {
         statusCode,
         headers: responseHeaders,
-        body: decompressedBody,
+        body: parsedBody,
         wasCompressed,
       },
     }
