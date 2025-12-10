@@ -4,6 +4,7 @@ import { request as httpsRequest } from 'https'
 import { URL } from 'url'
 import { mkdir } from 'fs/promises'
 import { join } from 'path'
+import { PassThrough } from 'stream'
 import * as Root from '../Root/Root.ts'
 import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
 import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
@@ -125,13 +126,13 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
     console.log(`[Proxy] Forwarding response: ${proxyRes.statusCode} for ${targetUrl}`)
 
     // Clean headers - remove Transfer-Encoding and Connection headers
-    // since we're manually writing chunks, Node.js will handle chunked encoding automatically
+    // Use pipe() which handles encoding properly
     const responseHeaders: Record<string, string | string[]> = {}
     const lowerCaseHeaders: Set<string> = new Set()
     Object.entries(proxyRes.headers).forEach(([k, v]) => {
       if (v !== undefined) {
         const lowerKey = k.toLowerCase()
-        // Skip transfer-encoding and connection headers when manually writing chunks
+        // Skip transfer-encoding and connection headers - pipe() will handle encoding
         if (lowerKey !== 'transfer-encoding' && lowerKey !== 'connection') {
           // Avoid duplicate headers by checking case-insensitively
           if (!lowerCaseHeaders.has(lowerKey)) {
@@ -191,13 +192,31 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
       })
     }
 
-    proxyRes.on('data', (chunk: Buffer) => {
+    // Use PassThrough to capture data while piping
+    // This allows pipe() to handle encoding properly while we capture data
+    const captureStream = new PassThrough()
+    captureStream.on('data', (chunk: Buffer) => {
       chunks.push(chunk)
-      res.write(chunk)
     })
 
+    // Pipe through capture stream first, then to response
+    // pipe() handles Transfer-Encoding automatically
+    proxyRes.pipe(captureStream)
+    captureStream.pipe(res)
+
+    // Forward errors
+    proxyRes.on('error', (err) => {
+      captureStream.destroy(err)
+    })
+    captureStream.on('error', (err) => {
+      if (!res.headersSent) {
+        res.writeHead(500, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify({ error: 'Stream error', message: err.message }))
+      }
+    })
+
+    // Handle end events on proxyRes (source stream)
     proxyRes.on('end', async () => {
-      res.end()
       await saveResponseData()
     })
 
