@@ -38,6 +38,8 @@ export const runTests = ({
   inspectPtyHostPort,
   inspectSharedProcessPort,
   inspectExtensionsPort,
+  enableProxy,
+  useProxyMock,
 }: RunTestsOptions) => {
   return RunTestsWithCallback.runTestsWithCallback({
     root,
@@ -70,6 +72,8 @@ export const runTests = ({
     inspectPtyHostPort,
     inspectSharedProcessPort,
     inspectExtensionsPort,
+    enableProxy,
+    useProxyMock,
     callback,
     addDisposable: Disposables.add,
     clearDisposables: Disposables.disposeAll,
