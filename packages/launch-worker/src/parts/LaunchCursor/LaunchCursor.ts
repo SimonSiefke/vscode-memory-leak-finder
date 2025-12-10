@@ -93,7 +93,11 @@ export const launchCursor = async ({
       inspectSharedProcessPort,
       inspectExtensionsPort,
     })
-    const env = await GetVsCodeEnv.getVsCodeEnv({ runtimeDir, processEnv: process.env })
+    const env = await GetVsCodeEnv.getVsCodeEnv({
+      runtimeDir,
+      processEnv: process.env,
+      proxyUrl: proxyServer ? proxyServer.url : null,
+    })
     const { child } = await LaunchElectron.launchElectron({
       cliPath: binaryPath,
       args,

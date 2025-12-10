@@ -71,7 +71,7 @@ export const launchVsCode = async ({
         console.log('[LaunchVsCode] Starting proxy server...')
         proxyServer = await HttpProxyServer.createHttpProxyServer(0)
         console.log(`[LaunchVsCode] Proxy server started on ${proxyServer.url} (port ${proxyServer.port})`)
-        
+
         // Update settings
         const { readFile, writeFile } = await import('fs/promises')
         const settingsContent = await readFile(settingsPath, 'utf8')
@@ -80,7 +80,7 @@ export const launchVsCode = async ({
         settings['http.proxyStrictSSL'] = false
         await writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf8')
         console.log(`[LaunchVsCode] Proxy configured: ${proxyServer.url}`)
-        
+
         // Keep proxy server alive
         if (addDisposable && proxyServer) {
           addDisposable(async () => {
@@ -88,7 +88,7 @@ export const launchVsCode = async ({
             await proxyServer!.dispose()
           })
         }
-        
+
         // Wait a bit to ensure proxy server is ready
         await new Promise(resolve => setTimeout(resolve, 100))
       } catch (error) {
@@ -108,7 +108,11 @@ export const launchVsCode = async ({
       inspectSharedProcessPort,
       inspectExtensionsPort,
     })
-    const env = await GetVsCodeEnv.getVsCodeEnv({ runtimeDir, processEnv: process.env })
+    const env = await GetVsCodeEnv.getVsCodeEnv({
+      runtimeDir,
+      processEnv: process.env,
+      proxyUrl: proxyServer ? proxyServer.url : null,
+    })
     const { child } = await LaunchElectron.launchElectron({
       cliPath: binaryPath,
       args,
