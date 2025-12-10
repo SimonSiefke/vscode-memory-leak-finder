@@ -75,11 +75,13 @@ const getLeaked = (oldNodeMap, newNodeMap) => {
 
 export interface CompareClosuresOptions {
   readonly minCount?: number
+  readonly excludeOriginalPaths?: readonly string[]
 }
 
 export const compareNamedClosureCountFromHeapSnapshotInternal2 = async (
   snapshotA: Snapshot,
   snapshotB: Snapshot,
+  scriptMap: any,
   options: CompareClosuresOptions = {},
 ): Promise<any> => {
   const minCount = options.minCount ?? 1

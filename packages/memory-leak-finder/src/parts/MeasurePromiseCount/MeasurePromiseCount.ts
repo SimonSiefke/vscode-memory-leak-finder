@@ -4,6 +4,7 @@ import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
 
 export const id = MeasureId.PromiseCount
 
@@ -14,12 +15,16 @@ export const create = (session) => {
   return [session, objectGroup]
 }
 
-export const start = (session, objectGroup) => {
-  return GetPromiseCount.getPromiseCount(session, objectGroup)
+export const start = async (session, objectGroup) => {
+  const result = await GetPromiseCount.getPromiseCount(session, objectGroup)
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
+  return result
 }
 
-export const stop = (session, objectGroup) => {
-  return GetPromiseCount.getPromiseCount(session, objectGroup)
+export const stop = async (session, objectGroup) => {
+  const result = await GetPromiseCount.getPromiseCount(session, objectGroup)
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
+  return result
 }
 
 export const compare = CompareCount.compareCount

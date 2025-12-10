@@ -20,7 +20,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to check that webview is visible`)
       }
     },
-    async shouldBeVisible2({ extensionId }) {
+    async shouldBeVisible2({ extensionId, hasLineOfCodeCounter = true }) {
       try {
         await page.waitForIdle()
         const webView = page.locator('.webview')
@@ -36,8 +36,10 @@ export const create = ({ expect, page, VError }) => {
           url: regex,
         })
         await subFrame.waitForIdle()
-        const linesOfCodeCounter = subFrame.locator('#lines-of-code-counter')
-        await expect(linesOfCodeCounter).toBeVisible()
+        if (hasLineOfCodeCounter) {
+          const linesOfCodeCounter = subFrame.locator('#lines-of-code-counter')
+          await expect(linesOfCodeCounter).toBeVisible()
+        }
         await subFrame.waitForIdle()
         return subFrame
       } catch (error) {

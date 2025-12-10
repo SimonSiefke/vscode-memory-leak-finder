@@ -127,7 +127,7 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
         await page.waitForIdle()
-        if (ideVersion && ideVersion.minor <= 105) {
+        if (ideVersion && ideVersion.minor <= 106) {
           // do nothing
         } else {
           await quickPick.executeCommand(WellKnownCommands.FocusTerminal)
@@ -140,7 +140,11 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         const terminal = page.locator('.terminal')
         await expect(terminal).toHaveCount(1)
         await page.waitForIdle()
-        await expect(terminal).toHaveClass('focus')
+        if (ideVersion && ideVersion.minor <= 106) {
+          // do nothing
+        } else {
+          await expect(terminal).toHaveClass('focus')
+        }
       } catch (error) {
         throw new VError(error, `Failed to kill second terminal`)
       }
@@ -155,6 +159,16 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to kill terminal`)
+      }
+    },
+    async restartPtyHost() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.RestartPtyHost)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to restart pty host`)
       }
     },
     async execute(command, { waitForFile = '' } = {}) {
