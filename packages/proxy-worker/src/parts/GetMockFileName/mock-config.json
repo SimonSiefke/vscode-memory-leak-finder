@@ -43,6 +43,12 @@
   },
   {
     "hostname": "api.github.com",
+    "pathname": "/embeddings",
+    "method": "POST",
+    "filename": "api_github_com_embeddings_post.json"
+  },
+  {
+    "hostname": "api.github.com",
     "pathname": "/embeddings/models",
     "method": "GET",
     "filename": "api_github_com_embeddings_models_get.json"
