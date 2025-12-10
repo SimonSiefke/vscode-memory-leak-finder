@@ -81,13 +81,14 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   // Convert headers to the format expected by writeHead
   const headers: Record<string, string> = {}
   Object.entries(mockResponse.headers).forEach(([key, value]) => {
-    headers[key] = Array.isArray(value) ? value.join(', ') : String(value)
+    // Skip Content-Length headers (case-insensitive) - we'll set it below
+    if (key.toLowerCase() !== 'content-length') {
+      headers[key] = Array.isArray(value) ? value.join(', ') : String(value)
+    }
   })
 
-  // Set Content-Length if not already set
-  if (!headers['content-length'] && !headers['Content-Length']) {
-    headers['Content-Length'] = String(bodyBuffer.length)
-  }
+  // Always set Content-Length to match actual body length
+  headers['Content-Length'] = String(bodyBuffer.length)
 
   res.writeHead(mockResponse.statusCode, headers)
   res.end(bodyBuffer)

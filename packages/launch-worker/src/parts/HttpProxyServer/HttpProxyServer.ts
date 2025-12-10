@@ -425,8 +425,12 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer, us
             // Convert headers to the format expected
             const cleanedHeaders: Record<string, string> = {}
             Object.entries(mockResponse.headers).forEach(([k, v]) => {
-              cleanedHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
+              // Skip Content-Length headers (case-insensitive) - we'll set it below
+              if (k.toLowerCase() !== 'content-length') {
+                cleanedHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
+              }
             })
+            // Always set Content-Length to match actual body length
             cleanedHeaders['Content-Length'] = String(bodyBuffer.length)
 
             const statusLine = `${httpVersion} ${mockResponse.statusCode} ${mockResponse.statusCode === 200 ? 'OK' : mockResponse.statusCode === 204 ? 'No Content' : ''}\r\n`
