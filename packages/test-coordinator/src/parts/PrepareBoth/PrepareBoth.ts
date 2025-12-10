@@ -31,6 +31,7 @@ export const prepareBoth = async (
   inspectExtensionsPort: number,
   enableProxy: boolean,
 ): Promise<PrepareBothResult> => {
+  console.log(`[PrepareBoth] enableProxy parameter: ${enableProxy} (type: ${typeof enableProxy})`)
   const initializationWorkerRpc = await launchInitializationWorker()
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, sessionId, targetId } =
     await initializationWorkerRpc.invoke(
