@@ -7,6 +7,7 @@ import * as Root from '../Root/Root.ts'
 import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
 import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
 import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
+import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
 import { getCertificateForDomain } from '../GetCertificateForDomain/GetCertificateForDomain.ts'
 import { sanitizeFilename } from '../SanitizeFilename/SanitizeFilename.ts'
 import { decompressBody } from '../DecompressBody/DecompressBody.ts'
@@ -35,11 +36,15 @@ const saveInterceptedRequest = async (
     const contentTypeLower = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
 
     // Handle zip files separately - don't decompress them
+    // Handle SSE (Server-Sent Events) separately - save as text file
     let parsedBody: any
     let wasCompressed = false
     if (contentTypeLower.includes('application/zip')) {
       const zipFilePath = await SaveZipData.saveZipData(responseBody, url, timestamp)
       parsedBody = `file-reference:${zipFilePath}`
+    } else if (contentTypeLower.includes('text/event-stream')) {
+      const sseFilePath = await SaveSseData.saveSseData(responseBody, url, timestamp)
+      parsedBody = `file-reference:${sseFilePath}`
     } else {
       const { body: decompressedBody, wasCompressed: wasCompressedResult } = await decompressBody(responseBody, contentEncoding)
       wasCompressed = wasCompressedResult

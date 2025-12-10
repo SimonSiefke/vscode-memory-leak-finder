@@ -156,12 +156,6 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
 
       const responseData = Buffer.concat(chunks)
 
-      // Save POST body if applicable
-      if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
-        const requestBody = Buffer.concat(requestBodyChunks)
-        await SavePostBody.savePostBody(req.method, targetUrl, req.headers as Record<string, string>, requestBody)
-      }
-
       // Convert headers to Record<string, string | string[]> format
       const responseHeaders: Record<string, string | string[]> = {}
       Object.entries(proxyRes.headers).forEach(([k, v]) => {
@@ -169,6 +163,17 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
           responseHeaders[k] = v
         }
       })
+
+      // Save POST body if applicable (with response data)
+      if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
+        const requestBody = Buffer.concat(requestBodyChunks)
+        await SavePostBody.savePostBody(req.method, targetUrl, req.headers as Record<string, string>, requestBody, {
+          statusCode: proxyRes.statusCode || 200,
+          statusMessage: proxyRes.statusMessage,
+          responseHeaders,
+          responseData,
+        })
+      }
 
       SaveRequest.saveRequest(req, proxyRes.statusCode || 200, proxyRes.statusMessage, responseHeaders, responseData).catch((err) => {
         console.error('[Proxy] Error saving request:', err)
