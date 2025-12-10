@@ -174,6 +174,8 @@ export const createHttpProxyServer = async (
   const actualPort = typeof address === 'object' && address !== null ? address.port : port
   const url = `http://localhost:${actualPort}`
 
+  console.log(`proxy running on ${actualPort}`)
+
   return {
     port: actualPort,
     url,
