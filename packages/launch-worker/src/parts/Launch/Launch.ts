@@ -22,6 +22,8 @@ export const launch = async (
   inspectPtyHostPort: number,
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
+  enableProxy: boolean,
+  useProxyMock: boolean,
 ): Promise<any> => {
   const { child } = await LaunchIde.launchIde({
     headlessMode,
@@ -38,6 +40,8 @@ export const launch = async (
     inspectPtyHostPort,
     inspectSharedProcessPort,
     inspectExtensionsPort,
+    enableProxy,
+    useProxyMock,
   })
   const { port, dispose } = createPipeline(child.stderr)
   const rpc = await NodeWorkerRpcParent.create({
