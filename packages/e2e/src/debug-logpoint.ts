@@ -23,10 +23,9 @@ setInterval(()=>{
 
 export const run = async ({ ActivityBar, RunAndDebug, DebugConsole }: TestContext): Promise<void> => {
   await ActivityBar.showRunAndDebug()
-  await RunAndDebug.runAndWaitForPaused({
-    file: 'index.js',
-    line: 4,
-    callStackSize: 11,
+  // @ts-ignore
+  await RunAndDebug.runAndWaitForDebugConsoleOutput({
+    output: `x = 1`,
   })
   // await DebugConsole.show()
   // await DebugConsole.shouldHaveLogpointOutput('x = 1')

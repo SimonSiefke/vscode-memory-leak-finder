@@ -117,6 +117,32 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to run debugger`)
       }
     },
+    async runAndWaitForDebugConsoleOutput({ output }) {
+      try {
+        const quickPick = QuickPick.create({
+          page,
+          expect,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.ShowRunAndDebug)
+        await page.waitForIdle()
+        await this.startRunAndDebug()
+        await this.waitForDebugConsoleOutput({ output })
+      } catch (error) {
+        throw new VError(error, `Failed to run debugger`)
+      }
+    },
+    async waitForDebugConsoleOutput({ output }) {
+      try {
+        await page.waitForIdle()
+        const repl = page.locator('.repl')
+        await expect(repl).toBeVisible()
+        // TODO verify that output line is vsible
+        await new Promise((r) => {})
+      } catch (error) {
+        throw new VError(error, `Failed to wait for debug console output`)
+      }
+    },
     async removeAllBreakpoints() {
       try {
         const quickPick = QuickPick.create({
