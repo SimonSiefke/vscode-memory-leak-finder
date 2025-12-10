@@ -1,6 +1,7 @@
 import { readFile, writeFile } from 'fs/promises'
 import * as HttpProxyServer from '../HttpProxyServer/HttpProxyServer.ts'
 import { getCACertPath as getCACertPathImpl } from '../GetCACertPath/GetCACertPath.ts'
+import { getProxyEnvVars } from '../GetProxyEnvVars/GetProxyEnvVars.ts'
 
 let proxyServerInstance: { port: number; url: string; [Symbol.asyncDispose]: () => Promise<void> } | null = null
 
@@ -28,28 +29,7 @@ export const disposeProxyServer = async (): Promise<void> => {
   }
 }
 
-export const getProxyEnvVars = async (proxyUrl: string | null): Promise<Record<string, string>> => {
-  const envVars: Record<string, string> = {}
-
-  if (proxyUrl) {
-    envVars.HTTP_PROXY = proxyUrl
-    envVars.HTTPS_PROXY = proxyUrl
-    envVars.http_proxy = proxyUrl
-    envVars.https_proxy = proxyUrl
-    // Don't proxy localhost connections
-    envVars.NO_PROXY = 'localhost,127.0.0.1,0.0.0.0'
-    envVars.no_proxy = 'localhost,127.0.0.1,0.0.0.0'
-
-    // Set NODE_EXTRA_CA_CERTS to trust our MITM proxy CA certificate
-    const caCertPath = getCACertPathImpl()
-    envVars.NODE_EXTRA_CA_CERTS = caCertPath
-
-    console.log(`[Proxy] Generated proxy environment variables: HTTP_PROXY=${proxyUrl}`)
-    console.log(`[Proxy] Set NODE_EXTRA_CA_CERTS=${caCertPath}`)
-  }
-
-  return envVars
-}
+export { getProxyEnvVars }
 
 export const getCACertPath = (): string => {
   return getCACertPathImpl()
