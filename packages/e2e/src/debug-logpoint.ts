@@ -21,15 +21,13 @@ setInterval(()=>{
   await Editor.setLogpoint(4, 'x = {x}')
 }
 
-export const run = async ({ ActivityBar, RunAndDebug, DebugConsole }: TestContext): Promise<void> => {
+export const run = async ({ ActivityBar, RunAndDebug }: TestContext): Promise<void> => {
   await ActivityBar.showRunAndDebug()
   // @ts-ignore
   await RunAndDebug.runAndWaitForDebugConsoleOutput({
     output: `x = 1`,
   })
-  // await DebugConsole.show()
-  // await DebugConsole.shouldHaveLogpointOutput('x = 1')
-  // await RunAndDebug.stop()
+  await RunAndDebug.stop()
 }
 
 export const teardown = async ({ RunAndDebug, Editor }: TestContext): Promise<void> => {
