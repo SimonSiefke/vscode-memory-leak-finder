@@ -461,9 +461,7 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer, us
 
         // Handle OPTIONS preflight requests for VS Code APIs that need CORS support
         const isMarketplaceApi =
-          hostname === 'marketplace.visualstudio.com' ||
-          hostname === 'www.vscode-unpkg.net' ||
-          hostname === 'github.gallerycdn.vsassets.io'
+          hostname === 'marketplace.visualstudio.com' || hostname === 'www.vscode-unpkg.net' || hostname === 'github.gallerycdn.vsassets.io'
         if (method === 'OPTIONS' && isMarketplaceApi) {
           const requestedHeaders = headers['access-control-request-headers']
           const requestedMethod = headers['access-control-request-method'] || 'GET'

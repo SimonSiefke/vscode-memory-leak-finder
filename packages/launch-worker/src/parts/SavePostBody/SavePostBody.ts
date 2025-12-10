@@ -78,4 +78,3 @@ export const savePostBody = async (method: string, url: string, headers: Record<
     console.error('[Proxy] Failed to save POST body:', error)
   }
 }
-

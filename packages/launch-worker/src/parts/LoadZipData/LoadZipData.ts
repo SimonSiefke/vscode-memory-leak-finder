@@ -11,4 +11,3 @@ export const loadZipData = async (fileReference: string): Promise<Buffer | null>
   }
   return await readFile(filepath)
 }
-
