@@ -603,6 +603,7 @@ export const createHttpProxyServer = async (
   dispose: () => Promise<void>
 }> => {
   const { port = 0, useProxyMock = false } = options
+  console.log({ useProxyMock })
   await mkdir(REQUESTS_DIR, { recursive: true })
   await mkdir(join(Root.root, '.vscode-mock-requests'), { recursive: true })
 
