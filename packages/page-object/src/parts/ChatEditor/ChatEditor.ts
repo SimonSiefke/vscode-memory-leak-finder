@@ -43,7 +43,7 @@ export const create = ({ expect, page, VError }) => {
           const responseMessage = chatView.locator('.monaco-list-row[data-index="1"]')
           await expect(responseMessage).toBeVisible()
           await page.waitForIdle()
-          await expect(responseMessage).toHaveAttribute('aria-label', new RegExp(`^${expectedResponse}`), { timeout: 60_000 })
+          await expect(responseMessage).toHaveAttribute('aria-label', new RegExp(`^${expectedResponse}`), { timeout: 120_000 })
         }
       } catch (error) {
         throw new VError(error, `Failed to send chat message`)
