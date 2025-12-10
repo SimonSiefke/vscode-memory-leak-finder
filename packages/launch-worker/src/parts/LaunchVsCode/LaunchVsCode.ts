@@ -72,20 +72,20 @@ export const launchVsCode = async ({
 
       if (existsSync(proxyStateFile)) {
         const existingState = await ProxyState.getProxyState()
-        
+
         // If proxy state exists but no server URL, start one
         if (!existingState.proxyUrl || !existingState.port) {
           // Start new proxy server
           console.log('[LaunchVsCode] Starting proxy server...')
           proxyServer = await createHttpProxyServer(0)
           console.log(`[LaunchVsCode] Proxy server started on ${proxyServer.url} (port ${proxyServer.port})`)
-          
+
           // Store proxy state
           await ProxyState.setProxyState({
             proxyUrl: proxyServer.url,
             port: proxyServer.port,
           })
-          
+
           // Update settings
           const { readFile, writeFile } = await import('fs/promises')
           const settingsContent = await readFile(settingsPath, 'utf8')
@@ -94,7 +94,7 @@ export const launchVsCode = async ({
           settings['http.proxyStrictSSL'] = false
           await writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf8')
           console.log(`[LaunchVsCode] Proxy configured: ${proxyServer.url}`)
-          
+
           // Keep proxy server alive
           if (addDisposable && proxyServer) {
             addDisposable(async () => {
@@ -102,7 +102,7 @@ export const launchVsCode = async ({
               await proxyServer!.dispose()
             })
           }
-          
+
           // Wait a bit to ensure proxy server is ready
           await new Promise(resolve => setTimeout(resolve, 100))
         } else {

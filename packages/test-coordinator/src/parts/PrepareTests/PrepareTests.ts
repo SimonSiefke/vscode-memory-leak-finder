@@ -2,8 +2,6 @@ import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.ts
 import * as KillExistingIdeInstances from '../KillExistingIdeInstances/KillExistingIdeInstances.ts'
 import { prepareBoth } from '../PrepareBoth/PrepareBoth.ts'
 import * as ProxyState from '../../../../page-object/src/parts/NetworkInterceptor/ProxyState.ts'
-import * as Root from '../Root/Root.ts'
-import { join } from 'path'
 
 export const prepareTests = async (
   cwd: string,
