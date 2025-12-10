@@ -38,7 +38,6 @@ const updateVsCodeSettings = async (proxyUrl: string | null): Promise<void> => {
   await writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf8')
 }
 
-
 export const create = ({ page, VError }) => {
   let isEnabled = false
 

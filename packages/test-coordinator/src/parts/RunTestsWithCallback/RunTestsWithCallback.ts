@@ -57,13 +57,13 @@ export const runTestsWithCallback = async ({
   inspectPtyHost,
   enableExtensions,
   continueValue,
-    inspectPtyHostPort,
-    inspectSharedProcessPort,
-    inspectExtensionsPort,
-    enableProxy,
-    useProxyMock,
-    callback,
-  }: RunTestsWithCallbackOptions) => {
+  inspectPtyHostPort,
+  inspectSharedProcessPort,
+  inspectExtensionsPort,
+  enableProxy,
+  useProxyMock,
+  callback,
+}: RunTestsWithCallbackOptions) => {
   try {
     Assert.string(root)
     Assert.string(cwd)
