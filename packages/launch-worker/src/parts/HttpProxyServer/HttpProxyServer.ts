@@ -53,7 +53,8 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
       const host = req.headers.host || ''
       parsedUrl = new URL(`http://${host}${targetUrl}`)
     }
-    console.log(`[Proxy] Forwarding ${req.method} ${parsedUrl.protocol}//${parsedUrl.hostname}:${parsedUrl.port}${parsedUrl.pathname}`)
+    const portStr = parsedUrl.port ? `:${parsedUrl.port}` : ''
+    console.log(`[Proxy] Forwarding ${req.method} ${parsedUrl.protocol}//${parsedUrl.hostname}${portStr}${parsedUrl.pathname}`)
   } catch (error) {
     console.error(`[Proxy] Invalid URL: ${targetUrl}`, error)
     res.writeHead(400, { 'Content-Type': 'application/json' })
@@ -105,6 +106,40 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
   })
 
   proxyReq.on('error', (error) => {
+    const errorCode = (error as NodeJS.ErrnoException).code
+    // Azure metadata endpoint (169.254.169.254) is expected to fail when not on Azure
+    const isAzureMetadata = parsedUrl.hostname === '169.254.169.254'
+
+    // ECONNRESET is common when servers close connections and can be ignored for Azure metadata
+    if (isAzureMetadata && errorCode === 'ECONNRESET') {
+      if (!res.headersSent) {
+        res.writeHead(503, { 'Content-Type': 'application/json' })
+        res.end(
+          JSON.stringify({
+            error: 'Service Unavailable',
+            message: 'Azure metadata service not available',
+            target: targetUrl,
+          }),
+        )
+      }
+      return
+    }
+
+    // EPIPE errors are common when sockets are closed and can be ignored
+    if (errorCode === 'EPIPE') {
+      if (!res.headersSent) {
+        res.writeHead(500, { 'Content-Type': 'application/json' })
+        res.end(
+          JSON.stringify({
+            error: 'Connection closed',
+            message: 'Connection was closed before response',
+            target: targetUrl,
+          }),
+        )
+      }
+      return
+    }
+
     console.error(`[Proxy] Error forwarding request to ${targetUrl}:`, error)
     if (!res.headersSent) {
       res.writeHead(500, { 'Content-Type': 'application/json' })
@@ -120,6 +155,24 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
 
   // Handle request timeout
   proxyReq.setTimeout(30000, () => {
+    const isAzureMetadata = parsedUrl.hostname === '169.254.169.254'
+
+    // Azure metadata endpoint timeouts are expected when not on Azure
+    if (isAzureMetadata) {
+      if (!res.headersSent) {
+        res.writeHead(503, { 'Content-Type': 'application/json' })
+        res.end(
+          JSON.stringify({
+            error: 'Service Unavailable',
+            message: 'Azure metadata service not available',
+            target: targetUrl,
+          }),
+        )
+      }
+      proxyReq.destroy()
+      return
+    }
+
     console.error(`[Proxy] Timeout forwarding request to ${targetUrl}`)
     if (!res.headersSent) {
       res.writeHead(504, { 'Content-Type': 'application/json' })
@@ -163,11 +216,25 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
   })
 
   proxySocket.on('error', (error) => {
+    // EPIPE and ECONNRESET are common when sockets are closed and can be ignored
+    const errorCode = (error as NodeJS.ErrnoException).code
+    if (errorCode === 'EPIPE' || errorCode === 'ECONNRESET') {
+      // Silently handle expected connection closures
+      socket.end()
+      return
+    }
     console.error(`[Proxy] CONNECT tunnel error to ${hostname}:${targetPort}:`, error)
     socket.end()
   })
 
   socket.on('error', (error) => {
+    // EPIPE and ECONNRESET are common when sockets are closed and can be ignored
+    const errorCode = (error as NodeJS.ErrnoException).code
+    if (errorCode === 'EPIPE' || errorCode === 'ECONNRESET') {
+      // Silently handle expected connection closures
+      proxySocket.end()
+      return
+    }
     console.error(`[Proxy] Socket error for ${hostname}:${targetPort}:`, error)
     proxySocket.end()
   })
