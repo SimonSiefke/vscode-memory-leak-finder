@@ -2,7 +2,7 @@ import { readFile, writeFile } from 'fs/promises'
 import * as HttpProxyServer from '../HttpProxyServer/HttpProxyServer.ts'
 import { getCACertPath as getCACertPathImpl } from '../GetCACertPath/GetCACertPath.ts'
 
-let proxyServerInstance: { port: number; url: string; dispose: () => Promise<void> } | null = null
+let proxyServerInstance: { port: number; url: string; [Symbol.asyncDispose]: () => Promise<void> } | null = null
 
 export const createHttpProxyServer = async (
   port: number | undefined,
@@ -26,7 +26,7 @@ export const createHttpProxyServer = async (
 
 export const disposeProxyServer = async (): Promise<void> => {
   if (proxyServerInstance) {
-    await proxyServerInstance.dispose()
+    await proxyServerInstance[Symbol.asyncDispose]()
     proxyServerInstance = null
   }
 }
