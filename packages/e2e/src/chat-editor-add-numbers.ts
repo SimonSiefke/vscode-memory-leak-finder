@@ -8,7 +8,10 @@ export const setup = async ({ Editor, ChatEditor }: TestContext): Promise<void> 
 }
 
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
-  await ChatEditor.sendMessage({ message: `what's 1 + 1? Respond with just the number. Don't use any todo list.`, expectedResponse: '2' })
+  await ChatEditor.sendMessage({
+    message: `what's 1 + 1? Respond with just the number. Don't use any todo list. Don't create a todo. Under no circumstances use any tool.`,
+    expectedResponse: '2',
+  })
   // @ts-ignore
   await ChatEditor.clearAll()
 }
