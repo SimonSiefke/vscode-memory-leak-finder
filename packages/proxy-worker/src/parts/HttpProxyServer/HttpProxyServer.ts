@@ -1,16 +1,12 @@
-import { createServer, IncomingMessage, ServerResponse } from 'http'
-import { request as httpRequest } from 'http'
-import { request as httpsRequest } from 'https'
-import { URL } from 'url'
 import { mkdir, writeFile } from 'fs/promises'
+import { createServer, request as httpRequest, IncomingMessage, ServerResponse } from 'http'
+import { request as httpsRequest } from 'https'
 import { join } from 'path'
+import { URL } from 'url'
 import * as Root from '../Root/Root.ts'
+import { sanitizeFilename } from '../SanitizeFilename/SanitizeFilename.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
-
-const sanitizeFilename = (url: string): string => {
-  return url.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 200)
-}
 
 const saveRequest = async (req: IncomingMessage, response: ServerResponse, responseData: Buffer): Promise<void> => {
   try {
