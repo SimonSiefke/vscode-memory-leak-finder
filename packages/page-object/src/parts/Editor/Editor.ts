@@ -851,26 +851,6 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to set logpoint`)
       }
     },
-    async setLogpoint(lineNumber, logMessage) {
-      try {
-        const editor = page.locator('.part.editor .editor-instance')
-        const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber - 1})`)
-        await expect(lineNumberElement).toBeVisible()
-        const contextMenu = ContextMenu.create({ page, expect, VError })
-        await contextMenu.open(lineNumberElement)
-        await contextMenu.select('Add Logpoint...')
-        await page.waitForIdle()
-        const logpointInput = page.locator('.logpoint-input')
-        await expect(logpointInput).toBeVisible()
-        const input = logpointInput.locator('input')
-        await expect(input).toBeVisible()
-        await input.type(logMessage)
-        await page.keyboard.press('Enter')
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to set logpoint`)
-      }
-    },
     async goToFile({ file, line, column }) {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
