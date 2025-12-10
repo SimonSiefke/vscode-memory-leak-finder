@@ -111,6 +111,11 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
     bodyBuffer = Buffer.from(JSON.stringify(mockResponse.body), 'utf8')
   }
 
+  // Check if this is a zip file (binary data)
+  const contentType = mockResponse.headers['content-type'] || mockResponse.headers['Content-Type']
+  const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
+  const isZipFile = contentTypeStr.includes('application/zip') || (Buffer.isBuffer(bodyBuffer) && bodyBuffer.length > 0 && bodyBuffer[0] === 0x50 && bodyBuffer[1] === 0x4b)
+
   // Convert headers to the format expected by writeHead and check for existing CORS headers
   const headers: Record<string, string> = {}
   const lowerCaseHeaders: Set<string> = new Set()
@@ -118,7 +123,8 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   Object.entries(mockResponse.headers).forEach(([key, value]) => {
     const lowerKey = key.toLowerCase()
     // Skip Content-Length headers (case-insensitive) - we'll set it below
-    if (lowerKey !== 'content-length') {
+    // Skip Content-Encoding headers for zip files - binary data is not encoded
+    if (lowerKey !== 'content-length' && !(isZipFile && lowerKey === 'content-encoding')) {
       headers[key] = Array.isArray(value) ? value.join(', ') : String(value)
       lowerCaseHeaders.add(lowerKey)
     }
