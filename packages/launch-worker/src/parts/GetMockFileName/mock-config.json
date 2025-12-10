@@ -48,6 +48,12 @@
     "filename": "api_individual_githubcopilot_com_models_get.json"
   },
   {
+    "hostname": "api.individual.githubcopilot.com",
+    "pathname": "/responses",
+    "method": "POST",
+    "filename": "api_individual_githubcopilot_com_responses_post.json"
+  },
+  {
     "hostname": "api.github.com",
     "pathname": "/copilot_internal/subscribe_limited_user",
     "method": "OPTIONS",
