@@ -472,6 +472,26 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to rename text ${newText}`)
       }
     },
+    async renameWithPreview(newText) {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.RenameSymbol)
+        const renameInput = page.locator('.rename-input')
+        await expect(renameInput).toBeVisible()
+        await expect(renameInput).toBeFocused()
+        await renameInput.type(newText)
+        await page.waitForIdle()
+        const renamePreviewWidget = page.locator('.rename-widget')
+        await expect(renamePreviewWidget).toBeVisible({ timeout: 10000 })
+        await page.waitForIdle()
+        const applyButton = renamePreviewWidget.locator('.monaco-button:has-text("Apply")')
+        await expect(applyButton).toBeVisible()
+        await applyButton.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to rename with preview ${newText}`)
+      }
+    },
     async renameCancel(newText) {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
