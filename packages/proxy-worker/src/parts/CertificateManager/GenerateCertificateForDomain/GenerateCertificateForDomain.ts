@@ -1,7 +1,11 @@
 import forge from 'node-forge'
 import type { CertificatePair } from '../CertificatePair/CertificatePair.ts'
 
-export const generateCertificateForDomain = (domain: string, caKey: string, caCert: string): CertificatePair => {
+export const generateCertificateForDomain = (
+  domain: string,
+  caKey: string,
+  caCert: string,
+): CertificatePair => {
   const caPrivateKey = forge.pki.privateKeyFromPem(caKey)
   const caCertificate = forge.pki.certificateFromPem(caCert)
 
@@ -63,3 +67,4 @@ export const generateCertificateForDomain = (domain: string, caKey: string, caCe
     cert: forge.pki.certificateToPem(cert),
   }
 }
+

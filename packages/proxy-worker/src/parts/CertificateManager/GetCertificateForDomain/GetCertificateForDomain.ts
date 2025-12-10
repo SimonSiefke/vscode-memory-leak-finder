@@ -1,13 +1,15 @@
 import { readFile, writeFile } from 'fs/promises'
 import { existsSync } from 'fs'
 import { join } from 'path'
-import * as getOrCreateCA from '../getOrCreateCA/getOrCreateCA.ts'
-import * as generateCertificateForDomain from '../generateCertificateForDomain/generateCertificateForDomain.ts'
-import { CERT_DIR } from '../constants/constants.ts'
+import * as GetOrCreateCA from '../GetOrCreateCA/GetOrCreateCA.ts'
+import * as GenerateCertificateForDomain from '../GenerateCertificateForDomain/GenerateCertificateForDomain.ts'
+import { CERT_DIR } from '../Constants/Constants.ts'
 import type { CertificatePair } from '../CertificatePair/CertificatePair.ts'
 
-export const getCertificateForDomain = async (domain: string): Promise<CertificatePair> => {
-  const ca = await getOrCreateCA.getOrCreateCA()
+export const getCertificateForDomain = async (
+  domain: string,
+): Promise<CertificatePair> => {
+  const ca = await GetOrCreateCA.getOrCreateCA()
   const certPath = join(CERT_DIR, `${domain.replace(/[^a-zA-Z0-9]/g, '_')}-cert.pem`)
   const keyPath = join(CERT_DIR, `${domain.replace(/[^a-zA-Z0-9]/g, '_')}-key.pem`)
 
@@ -17,8 +19,13 @@ export const getCertificateForDomain = async (domain: string): Promise<Certifica
     return { cert, key }
   }
 
-  const domainCert = generateCertificateForDomain.generateCertificateForDomain(domain, ca.key, ca.cert)
+  const domainCert = GenerateCertificateForDomain.generateCertificateForDomain(
+    domain,
+    ca.key,
+    ca.cert,
+  )
   await writeFile(certPath, domainCert.cert, 'utf8')
   await writeFile(keyPath, domainCert.key, 'utf8')
   return domainCert
 }
+

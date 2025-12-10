@@ -41,3 +41,4 @@ export const generateCA = (): CertificatePair => {
     cert: forge.pki.certificateToPem(cert),
   }
 }
+
