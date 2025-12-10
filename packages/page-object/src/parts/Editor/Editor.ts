@@ -851,9 +851,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
         await logpointInput.setValue(logMessage)
         await page.waitForIdle()
-
         await page.keyboard.press('Enter')
-        await new Promise((r) => {})
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to set logpoint`)

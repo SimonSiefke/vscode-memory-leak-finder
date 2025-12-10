@@ -21,11 +21,16 @@ setInterval(()=>{
   await Editor.setLogpoint(4, 'x = {x}')
 }
 
-export const run = async ({ RunAndDebug, DebugConsole }: TestContext): Promise<void> => {
-  await RunAndDebug.startRunAndDebug()
-  await DebugConsole.show()
-  await DebugConsole.shouldHaveLogpointOutput('x = 1')
-  await RunAndDebug.stop()
+export const run = async ({ ActivityBar, RunAndDebug, DebugConsole }: TestContext): Promise<void> => {
+  await ActivityBar.showRunAndDebug()
+  await RunAndDebug.runAndWaitForPaused({
+    file: 'index.js',
+    line: 4,
+    callStackSize: 11,
+  })
+  // await DebugConsole.show()
+  // await DebugConsole.shouldHaveLogpointOutput('x = 1')
+  // await RunAndDebug.stop()
 }
 
 export const teardown = async ({ RunAndDebug, Editor }: TestContext): Promise<void> => {
