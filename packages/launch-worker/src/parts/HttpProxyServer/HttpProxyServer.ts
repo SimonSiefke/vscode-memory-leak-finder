@@ -148,8 +148,7 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
   }
 
   // Handle OPTIONS preflight requests for VS Code APIs that need CORS support
-  const isMarketplaceApi =
-    parsedUrl.hostname === 'marketplace.visualstudio.com' || parsedUrl.hostname === 'www.vscode-unpkg.net'
+  const isMarketplaceApi = parsedUrl.hostname === 'marketplace.visualstudio.com' || parsedUrl.hostname === 'www.vscode-unpkg.net'
   if (req.method === 'OPTIONS' && isMarketplaceApi) {
     const requestedHeaders = req.headers['access-control-request-headers']
     const requestedMethod = req.headers['access-control-request-method'] || 'GET'
@@ -200,7 +199,7 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
       Object.keys(responseHeaders).forEach((k) => {
         lowerCaseHeaders.add(k.toLowerCase())
       })
-      
+
       if (!lowerCaseHeaders.has('access-control-allow-origin')) {
         responseHeaders['Access-Control-Allow-Origin'] = '*'
       }
@@ -457,8 +456,7 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer, us
         console.log(`[Proxy] Intercepted HTTPS ${method} ${fullUrl}`)
 
         // Handle OPTIONS preflight requests for VS Code APIs that need CORS support
-        const isMarketplaceApi =
-          hostname === 'marketplace.visualstudio.com' || hostname === 'www.vscode-unpkg.net'
+        const isMarketplaceApi = hostname === 'marketplace.visualstudio.com' || hostname === 'www.vscode-unpkg.net'
         if (method === 'OPTIONS' && isMarketplaceApi) {
           const requestedHeaders = headers['access-control-request-headers']
           const requestedMethod = headers['access-control-request-method'] || 'GET'
@@ -584,7 +582,7 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer, us
               Object.keys(cleanedHeaders).forEach((k) => {
                 lowerCaseCleanedHeaders.add(k.toLowerCase())
               })
-              
+
               if (!lowerCaseCleanedHeaders.has('access-control-allow-origin')) {
                 cleanedHeaders['Access-Control-Allow-Origin'] = '*'
               }
