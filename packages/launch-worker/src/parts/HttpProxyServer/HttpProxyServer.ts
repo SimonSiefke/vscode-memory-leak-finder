@@ -5,7 +5,7 @@ import { URL } from 'url'
 import { mkdir, writeFile } from 'fs/promises'
 import { join } from 'path'
 import * as Root from '../Root/Root.ts'
-import { sanitizeFilename } from '../SanitizeFilename/SanitizeFilename.ts'
+import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
@@ -14,7 +14,7 @@ const saveRequest = async (req: IncomingMessage, response: ServerResponse, respo
     await mkdir(REQUESTS_DIR, { recursive: true })
     const timestamp = Date.now()
     const url = req.url || ''
-    const filename = `${timestamp}_${sanitizeFilename(url)}.json`
+    const filename = `${timestamp}_${SanitizeFilename.sanitizeFilename(url)}.json`
     const filepath = join(REQUESTS_DIR, filename)
 
     const requestData = {
@@ -43,7 +43,7 @@ const saveConnectTunnel = async (hostname: string, port: number): Promise<void> 
     await mkdir(REQUESTS_DIR, { recursive: true })
     const timestamp = Date.now()
     const target = `${hostname}:${port}`
-    const filename = `${timestamp}_CONNECT_${sanitizeFilename(target)}.json`
+    const filename = `${timestamp}_CONNECT_${SanitizeFilename.sanitizeFilename(target)}.json`
     const filepath = join(REQUESTS_DIR, filename)
 
     const tunnelData = {
