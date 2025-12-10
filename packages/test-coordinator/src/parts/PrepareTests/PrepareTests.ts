@@ -31,9 +31,6 @@ export const prepareTests = async (
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
-
-  console.log(`[PrepareTests] enableProxy parameter: ${enableProxy} (type: ${typeof enableProxy})`)
-
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, initializationWorkerRpc } =
     await prepareBoth(
       headlessMode,

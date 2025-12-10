@@ -32,7 +32,6 @@ export const prepareBoth = async (
   enableProxy: boolean,
   useProxyMock: boolean,
 ): Promise<PrepareBothResult> => {
-  console.log(`[PrepareBoth] enableProxy parameter: ${enableProxy} (type: ${typeof enableProxy})`)
   const initializationWorkerRpc = await launchInitializationWorker()
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, sessionId, targetId } =
     await initializationWorkerRpc.invoke(
