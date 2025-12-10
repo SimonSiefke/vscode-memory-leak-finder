@@ -108,7 +108,7 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
     headers: {
       ...req.headers,
       host: parsedUrl.host,
-    },
+    } as Record<string, string | string[] | undefined>,
   }
 
   // Remove proxy-specific headers
@@ -263,7 +263,7 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
     socket.end()
   })
 
-  socket.on('error', (error) => {
+  socket.on('error', (error: Error) => {
     // EPIPE, ECONNRESET, ETIMEDOUT, and ENETUNREACH are common network errors
     const errorCode = (error as NodeJS.ErrnoException).code
     if (errorCode === 'EPIPE' || errorCode === 'ECONNRESET' || errorCode === 'ETIMEDOUT' || errorCode === 'ENETUNREACH') {
@@ -295,11 +295,14 @@ export const createHttpProxyServer = async (
 
     // Handle health check endpoint
     if (targetUrl === '/' || targetUrl === '/health' || targetUrl === '/status') {
+      const address = server.address()
+      const port = typeof address === 'object' && address !== null ? address.port : 'unknown'
+
       res.writeHead(200, { 'Content-Type': 'application/json' })
       res.end(
         JSON.stringify({
           status: 'running',
-          port: server.address() && typeof server.address() === 'object' ? server.address()?.port : 'unknown',
+          port,
           timestamp: Date.now(),
         }),
       )
