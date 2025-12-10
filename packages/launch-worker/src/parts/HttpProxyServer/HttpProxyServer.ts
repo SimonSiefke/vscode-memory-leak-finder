@@ -53,8 +53,12 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
       const host = req.headers.host || ''
       parsedUrl = new URL(`http://${host}${targetUrl}`)
     }
-    const portStr = parsedUrl.port ? `:${parsedUrl.port}` : ''
-    console.log(`[Proxy] Forwarding ${req.method} ${parsedUrl.protocol}//${parsedUrl.hostname}${portStr}${parsedUrl.pathname}`)
+    // Reduce logging for Azure metadata endpoint (expected to fail when not on Azure)
+    const isAzureMetadata = parsedUrl.hostname === '169.254.169.254'
+    if (!isAzureMetadata) {
+      const portStr = parsedUrl.port ? `:${parsedUrl.port}` : ''
+      console.log(`[Proxy] Forwarding ${req.method} ${parsedUrl.protocol}//${parsedUrl.hostname}${portStr}${parsedUrl.pathname}`)
+    }
   } catch (error) {
     console.error(`[Proxy] Invalid URL: ${targetUrl}`, error)
     res.writeHead(400, { 'Content-Type': 'application/json' })
@@ -110,14 +114,40 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
     // Azure metadata endpoint (169.254.169.254) is expected to fail when not on Azure
     const isAzureMetadata = parsedUrl.hostname === '169.254.169.254'
 
-    // ECONNRESET is common when servers close connections and can be ignored for Azure metadata
-    if (isAzureMetadata && errorCode === 'ECONNRESET') {
+    // Handle common network errors silently
+    if (
+      errorCode === 'EPIPE' ||
+      errorCode === 'ECONNRESET' ||
+      errorCode === 'ETIMEDOUT' ||
+      errorCode === 'ENETUNREACH'
+    ) {
+      if (isAzureMetadata) {
+        // Azure metadata endpoint failures are expected when not on Azure
+        if (!res.headersSent) {
+          res.writeHead(503, { 'Content-Type': 'application/json' })
+          res.end(
+            JSON.stringify({
+              error: 'Service Unavailable',
+              message: 'Azure metadata service not available',
+              target: targetUrl,
+            }),
+          )
+        }
+        return
+      }
+      // For other endpoints, handle network errors silently
       if (!res.headersSent) {
-        res.writeHead(503, { 'Content-Type': 'application/json' })
+        const statusCode = errorCode === 'ETIMEDOUT' || errorCode === 'ENETUNREACH' ? 504 : 500
+        res.writeHead(statusCode, { 'Content-Type': 'application/json' })
         res.end(
           JSON.stringify({
-            error: 'Service Unavailable',
-            message: 'Azure metadata service not available',
+            error: errorCode === 'ETIMEDOUT' ? 'Gateway Timeout' : 'Network Error',
+            message:
+              errorCode === 'ETIMEDOUT'
+                ? 'Connection timeout'
+                : errorCode === 'ENETUNREACH'
+                  ? 'Network unreachable'
+                  : 'Connection error',
             target: targetUrl,
           }),
         )
@@ -125,21 +155,7 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
       return
     }
 
-    // EPIPE errors are common when sockets are closed and can be ignored
-    if (errorCode === 'EPIPE') {
-      if (!res.headersSent) {
-        res.writeHead(500, { 'Content-Type': 'application/json' })
-        res.end(
-          JSON.stringify({
-            error: 'Connection closed',
-            message: 'Connection was closed before response',
-            target: targetUrl,
-          }),
-        )
-      }
-      return
-    }
-
+    // Only log unexpected errors
     console.error(`[Proxy] Error forwarding request to ${targetUrl}:`, error)
     if (!res.headersSent) {
       res.writeHead(500, { 'Content-Type': 'application/json' })
@@ -216,10 +232,15 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
   })
 
   proxySocket.on('error', (error) => {
-    // EPIPE and ECONNRESET are common when sockets are closed and can be ignored
+    // EPIPE, ECONNRESET, ETIMEDOUT, and ENETUNREACH are common network errors
     const errorCode = (error as NodeJS.ErrnoException).code
-    if (errorCode === 'EPIPE' || errorCode === 'ECONNRESET') {
-      // Silently handle expected connection closures
+    if (
+      errorCode === 'EPIPE' ||
+      errorCode === 'ECONNRESET' ||
+      errorCode === 'ETIMEDOUT' ||
+      errorCode === 'ENETUNREACH'
+    ) {
+      // Silently handle expected connection closures and network errors
       socket.end()
       return
     }
@@ -228,10 +249,15 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
   })
 
   socket.on('error', (error) => {
-    // EPIPE and ECONNRESET are common when sockets are closed and can be ignored
+    // EPIPE, ECONNRESET, ETIMEDOUT, and ENETUNREACH are common network errors
     const errorCode = (error as NodeJS.ErrnoException).code
-    if (errorCode === 'EPIPE' || errorCode === 'ECONNRESET') {
-      // Silently handle expected connection closures
+    if (
+      errorCode === 'EPIPE' ||
+      errorCode === 'ECONNRESET' ||
+      errorCode === 'ETIMEDOUT' ||
+      errorCode === 'ENETUNREACH'
+    ) {
+      // Silently handle expected connection closures and network errors
       proxySocket.end()
       return
     }
@@ -272,7 +298,11 @@ export const createHttpProxyServer = async (
 
     // For HTTP requests, extract target URL from request line
     // In HTTP proxy protocol, the request line contains the full URL
-    console.log(`[Proxy] Received ${req.method} request: ${targetUrl}`)
+    // Reduce logging for Azure metadata endpoint (expected to fail when not on Azure)
+    const isAzureMetadata = targetUrl.includes('169.254.169.254')
+    if (!isAzureMetadata) {
+      console.log(`[Proxy] Received ${req.method} request: ${targetUrl}`)
+    }
 
     // If it's not a proxy request (doesn't start with http:// or https://), return error JSON
     if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
