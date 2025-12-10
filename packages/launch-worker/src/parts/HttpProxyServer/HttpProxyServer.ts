@@ -341,61 +341,79 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
     // Parse HTTP requests from the decrypted stream
     let requestBuffer = Buffer.alloc(0)
 
-    tlsSocket.on('data', async (data: Buffer) => {
-      requestBuffer = Buffer.concat([requestBuffer, data])
-
-      // Try to parse HTTP request
-      const requestStr = requestBuffer.toString('utf8')
-      const requestLineEnd = requestStr.indexOf('\r\n')
-      if (requestLineEnd === -1) {
-        return // Need more data
-      }
-
-      const requestLine = requestStr.substring(0, requestLineEnd)
-      const parts = requestLine.split(' ')
-      const method = parts[0]
-      const path = parts[1]
-      const httpVersion = parts[2] || 'HTTP/1.1'
-
-      if (!method || !path) {
-        return
-      }
-
-      // Find end of headers
-      const headersEnd = requestStr.indexOf('\r\n\r\n')
-      if (headersEnd === -1) {
-        return // Need more data
-      }
-
-      const headersStr = requestStr.substring(requestLineEnd + 2, headersEnd)
-      const headers: Record<string, string> = {}
-      headersStr.split('\r\n').forEach((line) => {
-        const colonIndex = line.indexOf(':')
-        if (colonIndex > 0) {
-          const key = line.substring(0, colonIndex).trim().toLowerCase()
-          const value = line.substring(colonIndex + 1).trim()
-          headers[key] = value
+    const parseAndProcessRequest = async (): Promise<void> => {
+      while (true) {
+        // Try to parse HTTP request
+        const requestStr = requestBuffer.toString('utf8')
+        const requestLineEnd = requestStr.indexOf('\r\n')
+        if (requestLineEnd === -1) {
+          return // Need more data
         }
-      })
 
-      const bodyStart = headersEnd + 4
-      const body = requestBuffer.subarray(bodyStart)
-      requestBuffer = Buffer.alloc(0) // Reset buffer
+        const requestLine = requestStr.substring(0, requestLineEnd)
+        const parts = requestLine.split(' ')
+        const method = parts[0]
+        const path = parts[1]
+        const httpVersion = parts[2] || 'HTTP/1.1'
 
-      const fullUrl = `https://${hostname}${path}`
-      console.log(`[Proxy] Intercepted HTTPS ${method} ${fullUrl}`)
+        if (!method || !path) {
+          return // Invalid request line
+        }
 
-      // Forward request to target server
-      const targetOptions = {
-        hostname,
-        port: targetPort,
-        path,
-        method,
-        headers,
-        rejectUnauthorized: false,
-      }
+        // Find end of headers
+        const headersEnd = requestStr.indexOf('\r\n\r\n')
+        if (headersEnd === -1) {
+          return // Need more data
+        }
 
-      const targetReq = httpsRequest(targetOptions, (targetRes) => {
+        const headersStr = requestStr.substring(requestLineEnd + 2, headersEnd)
+        const headers: Record<string, string> = {}
+        headersStr.split('\r\n').forEach((line) => {
+          const colonIndex = line.indexOf(':')
+          if (colonIndex > 0) {
+            const key = line.substring(0, colonIndex).trim().toLowerCase()
+            const value = line.substring(colonIndex + 1).trim()
+            headers[key] = value
+          }
+        })
+
+        // Calculate body length
+        const bodyStart = headersEnd + 4
+        let bodyLength = 0
+        const contentLengthHeader = headers['content-length']
+        if (contentLengthHeader) {
+          bodyLength = parseInt(contentLengthHeader, 10)
+          if (isNaN(bodyLength)) {
+            bodyLength = 0
+          }
+        }
+
+        // Check if we have the complete request (headers + body)
+        const totalRequestLength = bodyStart + bodyLength
+        if (requestBuffer.length < totalRequestLength) {
+          return // Need more data
+        }
+
+        // Extract body
+        const body = requestBuffer.subarray(bodyStart, totalRequestLength)
+
+        // Remove processed request from buffer BEFORE processing (to avoid re-parsing)
+        requestBuffer = requestBuffer.subarray(totalRequestLength)
+
+        const fullUrl = `https://${hostname}${path}`
+        console.log(`[Proxy] Intercepted HTTPS ${method} ${fullUrl}`)
+
+        // Forward request to target server
+        const targetOptions = {
+          hostname,
+          port: targetPort,
+          path,
+          method,
+          headers,
+          rejectUnauthorized: false,
+        }
+
+        const targetReq = httpsRequest(targetOptions, (targetRes) => {
         const responseChunks: Buffer[] = []
 
         // Buffer the entire response first to handle chunked encoding properly
@@ -497,11 +515,18 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
         tlsSocket.write(errorResponse)
       })
 
-      // Write request body
-      if (body.length > 0) {
-        targetReq.write(body)
+        // Write request body
+        if (body.length > 0) {
+          targetReq.write(body)
+        }
+        targetReq.end()
       }
-      targetReq.end()
+
+    }
+
+    tlsSocket.on('data', async (data: Buffer) => {
+      requestBuffer = Buffer.concat([requestBuffer, data])
+      await parseAndProcessRequest()
     })
 
     tlsSocket.on('error', (error) => {
