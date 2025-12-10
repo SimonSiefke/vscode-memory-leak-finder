@@ -97,7 +97,7 @@ export const launchVsCode = async ({
         }
 
         // Wait a bit to ensure proxy server is ready
-        await new Promise((resolve) => setTimeout(resolve, 100))
+        await new Promise(resolve => setTimeout(resolve, 100))
       } catch (error) {
         console.error('[LaunchVsCode] Error setting up proxy:', error)
         // Continue even if proxy setup fails
