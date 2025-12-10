@@ -147,6 +147,26 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
     return
   }
 
+  // Handle OPTIONS preflight requests for marketplace API
+  const isMarketplaceApi = parsedUrl.hostname === 'marketplace.visualstudio.com'
+  if (req.method === 'OPTIONS' && isMarketplaceApi) {
+    const requestedHeaders = req.headers['access-control-request-headers']
+    const requestedMethod = req.headers['access-control-request-method'] || 'GET'
+    const allowHeaders = requestedHeaders
+      ? `${requestedHeaders}, x-market-client-id`
+      : 'authorization, content-type, accept, x-requested-with, x-market-client-id'
+    
+    res.writeHead(204, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': requestedMethod || 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+      'Access-Control-Allow-Headers': allowHeaders,
+      'Access-Control-Allow-Credentials': 'true',
+      'Access-Control-Max-Age': '86400',
+    })
+    res.end()
+    return
+  }
+
   const isHttps = parsedUrl.protocol === 'https:'
   const requestModule = isHttps ? httpsRequest : httpRequest
 
@@ -170,7 +190,18 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
 
   const proxyReq = requestModule(options, (proxyRes) => {
     console.log(`[Proxy] Forwarding response: ${proxyRes.statusCode} for ${targetUrl}`)
-    res.writeHead(proxyRes.statusCode || 200, proxyRes.headers)
+    
+    // Add CORS headers for marketplace API responses
+    const responseHeaders = { ...proxyRes.headers }
+    if (isMarketplaceApi) {
+      responseHeaders['Access-Control-Allow-Origin'] = '*'
+      responseHeaders['Access-Control-Allow-Credentials'] = 'true'
+      if (!responseHeaders['Access-Control-Allow-Headers']) {
+        responseHeaders['Access-Control-Allow-Headers'] = 'authorization, content-type, accept, x-requested-with, x-market-client-id'
+      }
+    }
+    
+    res.writeHead(proxyRes.statusCode || 200, responseHeaders)
     const chunks: Buffer[] = []
     let saved = false
 
@@ -414,6 +445,21 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer, us
         const fullUrl = `https://${hostname}${path}`
         console.log(`[Proxy] Intercepted HTTPS ${method} ${fullUrl}`)
 
+        // Handle OPTIONS preflight requests for marketplace API
+        const isMarketplaceApi = hostname === 'marketplace.visualstudio.com'
+        if (method === 'OPTIONS' && isMarketplaceApi) {
+          const requestedHeaders = headers['access-control-request-headers']
+          const requestedMethod = headers['access-control-request-method'] || 'GET'
+          const allowHeaders = requestedHeaders
+            ? `${requestedHeaders}, x-market-client-id`
+            : 'authorization, content-type, accept, x-requested-with, x-market-client-id'
+          
+          const corsHeaders = `Access-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: ${requestedMethod || 'GET, POST, PUT, DELETE, PATCH, OPTIONS'}\r\nAccess-Control-Allow-Headers: ${allowHeaders}\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Max-Age: 86400\r\n`
+          const statusLine = `${httpVersion} 204 No Content\r\n`
+          tlsSocket.write(statusLine + corsHeaders + '\r\n')
+          return
+        }
+
         // Check for mock response first (only if useProxyMock is enabled)
         if (useProxyMock) {
           const mockResponse = await GetMockResponse.getMockResponse(method, fullUrl)
@@ -515,6 +561,16 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer, us
                 cleanedHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
               }
             })
+            
+            // Add CORS headers for marketplace API responses
+            if (isMarketplaceApi) {
+              cleanedHeaders['Access-Control-Allow-Origin'] = '*'
+              cleanedHeaders['Access-Control-Allow-Credentials'] = 'true'
+              if (!cleanedHeaders['Access-Control-Allow-Headers']) {
+                cleanedHeaders['Access-Control-Allow-Headers'] = 'authorization, content-type, accept, x-requested-with, x-market-client-id'
+              }
+            }
+            
             // Set content-length
             cleanedHeaders['Content-Length'] = String(responseData.length)
 
