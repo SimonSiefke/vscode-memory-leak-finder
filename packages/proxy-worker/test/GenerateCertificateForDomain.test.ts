@@ -2,7 +2,6 @@ import { expect, test } from '@jest/globals'
 import forge from 'node-forge'
 import { generateCertificateForDomain } from '../src/parts/GenerateCertificateForDomain/GenerateCertificateForDomain.ts'
 import { generateCA } from '../src/parts/GenerateCA/GenerateCA.ts'
-import type { CertificatePair } from '../src/parts/CertificatePair/CertificatePair.ts'
 
 test('generateCertificateForDomain - generates certificate for regular domain', () => {
   const ca = generateCA()
@@ -26,10 +25,10 @@ test('generateCertificateForDomain - generates certificate for IPv4 address', ()
   expect(result.cert).toBeTruthy()
 
   const cert = forge.pki.certificateFromPem(result.cert)
-  const altNames = cert.getExtension('subjectAltName') as forge.x509.SubjectAlternativeName | null
+  const altNames = cert.getExtension('subjectAltName') as { altNames: Array<{ type: number; value?: string; ip?: string }> } | null
   expect(altNames).toBeTruthy()
   if (altNames) {
-    const hasIP = altNames.altNames.some((altName) => altName.type === 7 && altName.ip === '192.168.1.1')
+    const hasIP = altNames.altNames.some((altName: { type: number; value?: string; ip?: string }) => altName.type === 7 && altName.ip === '192.168.1.1')
     expect(hasIP).toBe(true)
   }
 })
@@ -42,10 +41,10 @@ test('generateCertificateForDomain - generates certificate for IPv6 address', ()
   expect(result.cert).toBeTruthy()
 
   const cert = forge.pki.certificateFromPem(result.cert)
-  const altNames = cert.getExtension('subjectAltName') as forge.x509.SubjectAlternativeName | null
+  const altNames = cert.getExtension('subjectAltName') as { altNames: Array<{ type: number; value?: string; ip?: string }> } | null
   expect(altNames).toBeTruthy()
   if (altNames) {
-    const hasIP = altNames.altNames.some((altName) => altName.type === 7 && altName.ip === '::1')
+    const hasIP = altNames.altNames.some((altName: { type: number; value?: string; ip?: string }) => altName.type === 7 && altName.ip === '::1')
     expect(hasIP).toBe(true)
   }
 })
@@ -83,23 +82,23 @@ test('generateCertificateForDomain - certificate has correct extensions', () => 
 
   const cert = forge.pki.certificateFromPem(result.cert)
 
-  const basicConstraints = cert.getExtension('basicConstraints') as forge.x509.BasicConstraints | null
+  const basicConstraints = cert.getExtension('basicConstraints') as { cA: boolean } | null
   expect(basicConstraints).toBeTruthy()
   if (basicConstraints) {
     expect(basicConstraints.cA).toBe(false)
   }
 
-  const keyUsage = cert.getExtension('keyUsage') as forge.x509.KeyUsage | null
+  const keyUsage = cert.getExtension('keyUsage') as { keyEncipherment: boolean; digitalSignature: boolean } | null
   expect(keyUsage).toBeTruthy()
   if (keyUsage) {
     expect(keyUsage.keyEncipherment).toBe(true)
     expect(keyUsage.digitalSignature).toBe(true)
   }
 
-  const subjectAltName = cert.getExtension('subjectAltName') as forge.x509.SubjectAlternativeName | null
+  const subjectAltName = cert.getExtension('subjectAltName') as { altNames: Array<{ type: number; value?: string; ip?: string }> } | null
   expect(subjectAltName).toBeTruthy()
   if (subjectAltName) {
-    const hasDNS = subjectAltName.altNames.some((altName) => altName.type === 2 && altName.value === 'example.com')
+    const hasDNS = subjectAltName.altNames.some((altName: { type: number; value?: string; ip?: string }) => altName.type === 2 && altName.value === 'example.com')
     expect(hasDNS).toBe(true)
   }
 })

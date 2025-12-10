@@ -33,10 +33,6 @@ interface RecordedRequest {
   }
 }
 
-interface RequestKey {
-  url: string
-  method: string
-}
 
 const loadMockConfig = async (): Promise<MockConfigEntry[]> => {
   try {
