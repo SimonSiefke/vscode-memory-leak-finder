@@ -136,30 +136,6 @@ const saveRequest = async (req: IncomingMessage, response: ServerResponse, respo
   }
 }
 
-const saveConnectTunnel = async (hostname: string, port: number): Promise<void> => {
-  try {
-    await mkdir(REQUESTS_DIR, { recursive: true })
-    const timestamp = Date.now()
-    const target = `${hostname}:${port}`
-    const filename = `${timestamp}_CONNECT_${sanitizeFilename(target)}.json`
-    const filepath = join(REQUESTS_DIR, filename)
-
-    const tunnelData = {
-      timestamp,
-      method: 'CONNECT',
-      target,
-      hostname,
-      port,
-      note: 'HTTPS tunnel - actual request/response data is encrypted and cannot be captured',
-    }
-
-    await writeFile(filepath, JSON.stringify(tunnelData, null, 2), 'utf8')
-    console.log(`[Proxy] Saved CONNECT tunnel to ${filepath}`)
-  } catch (error) {
-    // Ignore errors when saving tunnel metadata
-    console.error('[Proxy] Failed to save CONNECT tunnel:', error)
-  }
-}
 
 const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: string): void => {
   let parsedUrl: URL
@@ -437,7 +413,32 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
         targetRes.on('end', async () => {
           // Save the intercepted request/response
           const responseData = Buffer.concat(responseChunks)
-          await saveInterceptedRequest(method, fullUrl, headers, targetRes.statusCode || 200, targetRes.headers, responseData)
+          // Convert headers to Record<string, string | string[]> format
+          const responseHeaders: Record<string, string | string[]> = {}
+          Object.entries(targetRes.headers).forEach(([k, v]) => {
+            if (v !== undefined) {
+              responseHeaders[k] = v
+            }
+          })
+          await saveInterceptedRequest(method, fullUrl, headers, targetRes.statusCode || 200, responseHeaders, responseData)
+        })
+
+        targetRes.on('error', (error) => {
+          const errorCode = (error as NodeJS.ErrnoException).code
+          if (
+            errorCode === 'EPIPE' ||
+            errorCode === 'ECONNRESET' ||
+            errorCode === 'ETIMEDOUT' ||
+            errorCode === 'ENETUNREACH'
+          ) {
+            // Send error response back through TLS
+            const errorResponse = `${httpVersion} 502 Bad Gateway\r\nContent-Type: application/json\r\nContent-Length: 0\r\n\r\n`
+            tlsSocket.write(errorResponse)
+            return
+          }
+          console.error(`[Proxy] Error reading HTTPS response:`, error)
+          const errorResponse = `${httpVersion} 502 Bad Gateway\r\nContent-Type: application/json\r\nContent-Length: 0\r\n\r\n`
+          tlsSocket.write(errorResponse)
         })
       })
 
@@ -449,11 +450,38 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
           errorCode === 'ETIMEDOUT' ||
           errorCode === 'ENETUNREACH'
         ) {
-          tlsSocket.end()
+          // Send error response back through TLS
+          const errorMessage = errorCode === 'ETIMEDOUT' ? 'Gateway Timeout' : 'Bad Gateway'
+          const statusCode = errorCode === 'ETIMEDOUT' ? 504 : 502
+          const errorBody = JSON.stringify({
+            error: errorMessage,
+            message: errorCode === 'ETIMEDOUT' ? 'Connection timeout' : 'Connection error',
+            target: fullUrl,
+          })
+          const errorResponse = `${httpVersion} ${statusCode} ${errorMessage}\r\nContent-Type: application/json\r\nContent-Length: ${Buffer.byteLength(errorBody)}\r\n\r\n${errorBody}`
+          tlsSocket.write(errorResponse)
           return
         }
         console.error(`[Proxy] Error forwarding HTTPS request:`, error)
-        tlsSocket.end()
+        const errorBody = JSON.stringify({
+          error: 'Proxy Error',
+          message: error.message,
+          target: fullUrl,
+        })
+        const errorResponse = `${httpVersion} 502 Bad Gateway\r\nContent-Type: application/json\r\nContent-Length: ${Buffer.byteLength(errorBody)}\r\n\r\n${errorBody}`
+        tlsSocket.write(errorResponse)
+      })
+
+      // Handle timeout
+      targetReq.setTimeout(30000, () => {
+        targetReq.destroy()
+        const errorBody = JSON.stringify({
+          error: 'Gateway Timeout',
+          message: 'Request to target server timed out',
+          target: fullUrl,
+        })
+        const errorResponse = `${httpVersion} 504 Gateway Timeout\r\nContent-Type: application/json\r\nContent-Length: ${Buffer.byteLength(errorBody)}\r\n\r\n${errorBody}`
+        tlsSocket.write(errorResponse)
       })
 
       // Write request body
@@ -562,11 +590,14 @@ export const createHttpProxyServer = async (
 
     // Handle health check endpoint
     if (targetUrl === '/' || targetUrl === '/health' || targetUrl === '/status') {
+      const address = server.address()
+      const port =
+        address !== null && typeof address === 'object' && 'port' in address ? address.port : 'unknown'
       res.writeHead(200, { 'Content-Type': 'application/json' })
       res.end(
         JSON.stringify({
           status: 'running',
-          port: server.address() && typeof server.address() === 'object' ? server.address()?.port : 'unknown',
+          port,
           timestamp: Date.now(),
         }),
       )
@@ -615,7 +646,8 @@ export const createHttpProxyServer = async (
   }
 
   const address = server.address()
-  const actualPort = typeof address === 'object' && address !== null ? address.port : port
+  const actualPort =
+    address !== null && typeof address === 'object' && 'port' in address ? address.port : port
   const url = `http://localhost:${actualPort}`
 
   console.log(`[Proxy] Proxy server running on http://127.0.0.1:${actualPort}`)
