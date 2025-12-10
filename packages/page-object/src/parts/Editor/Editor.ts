@@ -14,6 +14,14 @@ const isImage = (file) => {
   return file.endsWith('.svg')
 }
 
+const isVideo = (file) => {
+  return file.endsWith('.mp4') || file.endsWith('.webm') || file.endsWith('.avi')
+}
+
+const isBinary = (file) => {
+  return file.endsWith('.bin') || file.endsWith('.exe') || file.endsWith('.dll') || file.endsWith('.so')
+}
+
 export const create = ({ page, expect, VError, ideVersion }) => {
   return {
     async open(fileName) {
@@ -37,6 +45,30 @@ export const create = ({ page, expect, VError, ideVersion }) => {
           })
           const img = subFrame.locator('img')
           await expect(img).toBeVisible()
+        } else if (isVideo(fileName)) {
+          const webView = WebView.create({ page, expect, VError })
+          const subFrame = await webView.shouldBeVisible2({
+            extensionId: `vscode.media-preview`,
+            hasLineOfCodeCounter: false,
+          })
+          const video = subFrame.locator('video')
+          await expect(video).toBeVisible()
+        } else if (isBinary(fileName)) {
+          const placeholder = page.locator('.monaco-editor-pane-placeholder')
+          await expect(placeholder).toBeVisible()
+          await page.waitForIdle()
+          const quickPick = QuickPick.create({ page, expect, VError })
+          await quickPick.executeCommand('workbench.action.reopenEditorWith')
+          await page.waitForIdle()
+          await quickPick.type('hex')
+          await page.waitForIdle()
+          await quickPick.select(/hex.*editor/i)
+          await page.waitForIdle()
+          const webView = WebView.create({ page, expect, VError })
+          await webView.shouldBeVisible2({
+            extensionId: `vscode.hexeditor`,
+            hasLineOfCodeCounter: false,
+          })
         } else {
           const editor = page.locator('.editor-instance')
           await expect(editor).toBeVisible()
@@ -797,6 +829,26 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await contextMenu.select('Add Breakpoint')
       } catch (error) {
         throw new VError(error, `Failed set breakpoint`)
+      }
+    },
+    async setLogpoint(lineNumber, logMessage) {
+      try {
+        const editor = page.locator('.part.editor .editor-instance')
+        const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber - 1})`)
+        await expect(lineNumberElement).toBeVisible()
+        const contextMenu = ContextMenu.create({ page, expect, VError })
+        await contextMenu.open(lineNumberElement)
+        await contextMenu.select('Add Logpoint...')
+        await page.waitForIdle()
+        const logpointInput = page.locator('.logpoint-input')
+        await expect(logpointInput).toBeVisible()
+        const input = logpointInput.locator('input')
+        await expect(input).toBeVisible()
+        await input.type(logMessage)
+        await page.keyboard.press('Enter')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to set logpoint`)
       }
     },
     async goToFile({ file, line, column }) {
