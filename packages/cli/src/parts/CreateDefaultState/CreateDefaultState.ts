@@ -39,4 +39,5 @@ export const createDefaultState = (): StdinDataState => ({
   inspectSharedProcessPort: 5879,
   inspectExtensionsPort: 5870,
   enableProxy: false,
+  useProxyMock: false,
 })
