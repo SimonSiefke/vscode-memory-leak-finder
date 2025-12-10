@@ -30,6 +30,8 @@ export const launchCursor = async ({
   enableProxy,
   useProxyMock,
 }) => {
+  console.log(`[LaunchCursor] enableProxy parameter: ${enableProxy} (type: ${typeof enableProxy})`)
+  console.log(`[LaunchCursor] useProxyMock parameter: ${useProxyMock} (type: ${typeof useProxyMock})`)
   try {
     const testWorkspacePath = join(Root.root, '.cursor-test-workspace')
     await CreateTestWorkspace.createTestWorkspace(testWorkspacePath)
@@ -93,7 +95,6 @@ export const launchCursor = async ({
       inspectPtyHostPort,
       inspectSharedProcessPort,
       inspectExtensionsPort,
-      enableProxy,
     })
     const env = await GetVsCodeEnv.getVsCodeEnv({
       runtimeDir,
