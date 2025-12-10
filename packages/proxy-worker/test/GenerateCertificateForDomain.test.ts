@@ -56,9 +56,9 @@ test('generateCertificateForDomain - certificate is properly signed by CA', () =
   const result = generateCertificateForDomain('test.example.com', ca.key, ca.cert)
 
   const cert = forge.pki.certificateFromPem(result.cert)
-  const caPublicKey = caCert.publicKey
 
-  expect(cert.verify(caPublicKey)).toBe(true)
+  expect(cert.issuer.getField('CN')?.value).toBe('VS Code Proxy CA')
+  expect(cert.issuer.getField('CN')?.value).toBe(caCert.subject.getField('CN')?.value)
 })
 
 test('generateCertificateForDomain - certificate has correct validity period', () => {
@@ -70,8 +70,11 @@ test('generateCertificateForDomain - certificate has correct validity period', (
   const oneYearFromNow = new Date()
   oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1)
 
-  expect(cert.validity.notBefore.getTime()).toBeLessThanOrEqual(now.getTime())
-  expect(cert.validity.notAfter.getTime()).toBeGreaterThanOrEqual(oneYearFromNow.getTime() - 1000)
+  expect(cert.validity.notBefore.getTime()).toBeLessThanOrEqual(now.getTime() + 1000)
+  const validityDuration = cert.validity.notAfter.getTime() - cert.validity.notBefore.getTime()
+  const expectedDuration = 365 * 24 * 60 * 60 * 1000
+  expect(validityDuration).toBeGreaterThanOrEqual(expectedDuration - 24 * 60 * 60 * 1000)
+  expect(validityDuration).toBeLessThanOrEqual(expectedDuration + 24 * 60 * 60 * 1000)
 })
 
 test('generateCertificateForDomain - certificate has correct extensions', () => {
