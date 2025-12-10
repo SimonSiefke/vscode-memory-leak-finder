@@ -112,4 +112,3 @@ test('generateCertificateForDomain - certificate key can be used to create priva
   expect(privateKey).toBeTruthy()
   expect(privateKey.n).toBeTruthy()
 })
-

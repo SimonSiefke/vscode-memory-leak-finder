@@ -1,4 +1,4 @@
 export interface CertificatePair {
-  key: string
-  cert: string
+  readonly key: string
+  readonly cert: string
 }
