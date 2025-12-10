@@ -16,7 +16,7 @@ import * as RemoveVscodeGlobalStorage from '../RemoveVscodeGlobalStorage/RemoveV
 import * as RemoveVscodeWorkspaceStorage from '../RemoveVscodeWorkspaceStorage/RemoveVscodeWorkspaceStorage.ts'
 import * as Root from '../Root/Root.ts'
 import { VError } from '../VError/VError.ts'
-import { createHttpProxyServer } from '../../../../page-object/src/parts/NetworkInterceptor/HttpProxyServer.ts'
+import * as HttpProxyServer from '../HttpProxyServer/HttpProxyServer.ts'
 
 export const launchVsCode = async ({
   headlessMode,
@@ -69,7 +69,7 @@ export const launchVsCode = async ({
     if (enableProxy) {
       try {
         console.log('[LaunchVsCode] Starting proxy server...')
-        proxyServer = await createHttpProxyServer(0)
+        proxyServer = await HttpProxyServer.createHttpProxyServer(0)
         console.log(`[LaunchVsCode] Proxy server started on ${proxyServer.url} (port ${proxyServer.port})`)
         
         // Update settings

@@ -1,11 +1,7 @@
-import { createHttpProxyServer } from './HttpProxyServer.ts'
-import * as ProxyState from './ProxyState.ts'
 import * as Root from '../Root/Root.ts'
 import { join } from 'path'
 import { readFile, writeFile } from 'fs/promises'
 import { existsSync } from 'fs'
-
-const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
 const getSettingsPath = (): string => {
   // VS Code settings are stored in userDataDir/User/settings.json
@@ -45,55 +41,33 @@ const updateVsCodeSettings = async (proxyUrl: string | null): Promise<void> => {
 
 export const create = ({ page, VError }) => {
   let isEnabled = false
-  let proxyServer: { port: number; url: string; dispose: () => Promise<void> } | null = null
 
   const enableProxy = async (): Promise<void> => {
-    if (proxyServer) {
-      return
-    }
-
     try {
-      // Check if proxy is already running (started via CLI flag)
-      const existingState = await ProxyState.getProxyState()
-      if (existingState.proxyUrl && existingState.port) {
-        // Proxy already running, just update settings
-        await updateVsCodeSettings(existingState.proxyUrl)
-        return
+      // Proxy server is started in LaunchVsCode when --enable-proxy is used
+      // We just need to read the settings.json to get the proxy URL and verify it's set
+      const settingsPath = getSettingsPath()
+      if (existsSync(settingsPath)) {
+        const content = await readFile(settingsPath, 'utf8')
+        const settings = JSON.parse(content)
+        if (settings['http.proxy']) {
+          console.log(`[NetworkInterceptor] Proxy already configured: ${settings['http.proxy']}`)
+          return
+        }
       }
-
-      // Start proxy server
-      proxyServer = await createHttpProxyServer(0)
-
-      // Store proxy state for launch worker to read
-      await ProxyState.setProxyState({
-        proxyUrl: proxyServer.url,
-        port: proxyServer.port,
-      })
-
-      // Update VS Code settings to use the proxy
-      await updateVsCodeSettings(proxyServer.url)
+      // If proxy is not configured, that's okay - it might not be enabled
+      console.log('[NetworkInterceptor] No proxy configured in settings')
     } catch (error) {
-      throw new VError(error, `Failed to enable proxy server`)
+      throw new VError(error, `Failed to enable proxy`)
     }
   }
 
   const disableProxy = async (): Promise<void> => {
-    if (!proxyServer) {
-      return
-    }
-
     try {
-      // Clear proxy state
-      await ProxyState.clearProxyState()
-
       // Remove proxy from VS Code settings
       await updateVsCodeSettings(null)
-
-      // Stop proxy server
-      await proxyServer.dispose()
-      proxyServer = null
     } catch (error) {
-      throw new VError(error, `Failed to disable proxy server`)
+      throw new VError(error, `Failed to disable proxy`)
     }
   }
 
