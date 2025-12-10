@@ -49,15 +49,6 @@ export const getMockResponse = async (method: string, url: string): Promise<Mock
     const hostname = parsedUrl.hostname
     const pathname = parsedUrl.pathname
 
-    // VS Code Marketplace CDN and Extensions CDN - use real data (pass through)
-    if (
-      hostname.includes('marketplace.visualstudio.com') ||
-      hostname.includes('gallerycdn.vsassets.io') ||
-      hostname.includes('gallery.vsassets.io')
-    ) {
-      return null // Pass through
-    }
-
     // Try to load mock from file
     const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
     const mockFile = join(MOCK_REQUESTS_DIR, mockFileName)
