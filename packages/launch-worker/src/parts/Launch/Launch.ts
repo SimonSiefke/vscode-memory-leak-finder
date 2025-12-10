@@ -24,6 +24,7 @@ export const launch = async (
   inspectExtensionsPort: number,
   enableProxy: boolean,
 ): Promise<any> => {
+  console.log(`[Launch] enableProxy parameter: ${enableProxy} (type: ${typeof enableProxy})`)
   const { child } = await LaunchIde.launchIde({
     headlessMode,
     cwd,

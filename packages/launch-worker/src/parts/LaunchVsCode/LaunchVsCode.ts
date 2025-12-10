@@ -34,6 +34,7 @@ export const launchVsCode = async ({
   inspectExtensionsPort,
   enableProxy,
 }) => {
+  console.log(`[LaunchVsCode] enableProxy parameter: ${enableProxy} (type: ${typeof enableProxy})`)
   try {
     const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
     await CreateTestWorkspace.createTestWorkspace(testWorkspacePath)

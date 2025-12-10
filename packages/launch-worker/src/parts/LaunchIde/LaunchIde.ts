@@ -20,6 +20,7 @@ export const launchIde = async ({
   inspectExtensionsPort,
   enableProxy,
 }) => {
+  console.log(`[LaunchIde] enableProxy parameter: ${enableProxy} (type: ${typeof enableProxy})`)
   if (ide === Ide.Cursor) {
     const cursorVersion = '0.45.14' // TODO make it configurable
     const result = await LaunchCursor.launchCursor({
