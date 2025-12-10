@@ -39,10 +39,7 @@ export interface StdinDataState {
   inspectSharedProcessPort: number
   inspectExtensionsPort: number
   enableProxy: boolean
-<<<<<<< HEAD
-=======
   useProxyMock: boolean
->>>>>>> origin/main
 }
 
 let state: StdinDataState = {
@@ -80,10 +77,7 @@ let state: StdinDataState = {
   inspectSharedProcessPort: 5879,
   inspectExtensionsPort: 5870,
   enableProxy: false,
-<<<<<<< HEAD
-=======
   useProxyMock: false,
->>>>>>> origin/main
 }
 
 export const setState = (newState): void => {
@@ -120,10 +114,7 @@ export const setState = (newState): void => {
     inspectSharedProcessPort: newState.inspectSharedProcessPort,
     inspectExtensionsPort: newState.inspectExtensionsPort,
     enableProxy: newState.enableProxy,
-<<<<<<< HEAD
-=======
     useProxyMock: newState.useProxyMock,
->>>>>>> origin/main
   }
 }
 

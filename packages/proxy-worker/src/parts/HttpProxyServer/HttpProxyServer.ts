@@ -1,6 +1,5 @@
-import { createServer, Server, IncomingMessage, ServerResponse } from 'http'
-import { createServer as createHttpsServer, Server as HttpsServer } from 'https'
-import { connect } from 'net'
+import { createServer, IncomingMessage, ServerResponse } from 'http'
+import { createServer as createHttpsServer } from 'https'
 import { URL } from 'url'
 import * as GetCertificateForDomain from '../GetCertificateForDomain/GetCertificateForDomain.ts'
 import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
@@ -48,7 +47,13 @@ const handleHttpRequest = async (
     // Save POST body if applicable
     if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
       const body = await collectRequestBody(req)
-      await SavePostBody.savePostBody(method, fullUrl, req.headers as Record<string, string>, body)
+      const headers: Record<string, string> = {}
+      for (const [key, value] of Object.entries(req.headers)) {
+        if (value !== undefined) {
+          headers[key] = Array.isArray(value) ? value.join(', ') : value
+        }
+      }
+      await SavePostBody.savePostBody(method, fullUrl, headers, body)
     }
 
     // Forward the request
@@ -70,11 +75,17 @@ const handleHttpRequest = async (
       const responseData = Buffer.concat(responseChunks)
 
       // Save the request/response
+      const responseHeaders: Record<string, string | string[]> = {}
+      for (const [key, value] of Object.entries(proxyRes.headers)) {
+        if (value !== undefined) {
+          responseHeaders[key] = value
+        }
+      }
       await SaveRequest.saveRequest(
         req,
         proxyRes.statusCode || 200,
         proxyRes.statusMessage,
-        proxyRes.headers,
+        responseHeaders,
         responseData,
       )
 
@@ -150,7 +161,13 @@ const handleConnect = async (
       // Save POST body if applicable
       if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
         const body = await collectRequestBody(clientReq)
-        await SavePostBody.savePostBody(method, fullUrl, clientReq.headers as Record<string, string>, body)
+        const headers: Record<string, string> = {}
+        for (const [key, value] of Object.entries(clientReq.headers)) {
+          if (value !== undefined) {
+            headers[key] = Array.isArray(value) ? value.join(', ') : value
+          }
+        }
+        await SavePostBody.savePostBody(method, fullUrl, headers, body)
       }
 
       // Forward to actual server
@@ -171,11 +188,17 @@ const handleConnect = async (
         const responseData = Buffer.concat(responseChunks)
 
         // Save the request/response
+        const responseHeaders: Record<string, string | string[]> = {}
+        for (const [key, value] of Object.entries(proxyRes.headers)) {
+          if (value !== undefined) {
+            responseHeaders[key] = value
+          }
+        }
         await SaveRequest.saveRequest(
           clientReq,
           proxyRes.statusCode || 200,
           proxyRes.statusMessage,
-          proxyRes.headers,
+          responseHeaders,
           responseData,
         )
 
