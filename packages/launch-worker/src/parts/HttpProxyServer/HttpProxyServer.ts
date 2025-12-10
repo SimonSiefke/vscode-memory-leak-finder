@@ -161,14 +161,14 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
     console.log(`[Proxy] Forwarding response: ${proxyRes.statusCode} for ${targetUrl}`)
     res.writeHead(proxyRes.statusCode || 200, proxyRes.headers)
     const chunks: Buffer[] = []
+    let saved = false
 
-    proxyRes.on('data', (chunk: Buffer) => {
-      chunks.push(chunk)
-      res.write(chunk)
-    })
+    const saveResponseData = async (): Promise<void> => {
+      if (saved) {
+        return
+      }
+      saved = true
 
-    proxyRes.on('end', async () => {
-      res.end()
       const responseData = Buffer.concat(chunks)
 
       // Save POST body if applicable
@@ -188,6 +188,24 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
       SaveRequest.saveRequest(req, proxyRes.statusCode || 200, proxyRes.statusMessage, responseHeaders, responseData).catch((err) => {
         console.error('[Proxy] Error saving request:', err)
       })
+    }
+
+    proxyRes.on('data', (chunk: Buffer) => {
+      chunks.push(chunk)
+      res.write(chunk)
+    })
+
+    proxyRes.on('end', async () => {
+      res.end()
+      await saveResponseData()
+    })
+
+    // Also handle 'close' event in case connection closes without 'end'
+    // This is important for SSE streams that may never fire 'end'
+    proxyRes.on('close', async () => {
+      if (!saved) {
+        await saveResponseData()
+      }
     })
   })
 
