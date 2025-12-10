@@ -150,7 +150,7 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   // Check for ZIP magic bytes (PK - ZIP file signature)
   const hasZipMagicBytes = Buffer.isBuffer(bodyBuffer) && bodyBuffer.length >= 2 && bodyBuffer[0] === 0x50 && bodyBuffer[1] === 0x4b
   const isZipFile = contentTypeStr.includes('application/zip') || hasZipMagicBytes
-  
+
   if (isZipFile) {
     console.log(`[Proxy] Detected zip file - removing Content-Encoding/Transfer-Encoding headers. Content-Type: ${contentTypeStr}, Has magic bytes: ${hasZipMagicBytes}`)
   }
