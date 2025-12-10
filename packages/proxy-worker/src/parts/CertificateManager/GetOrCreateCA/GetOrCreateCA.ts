@@ -20,4 +20,3 @@ export const getOrCreateCA = async (): Promise<CertificatePair> => {
   console.log(`[CertificateManager] To trust this CA, set NODE_EXTRA_CA_CERTS=${CA_CERT_PATH}`)
   return ca
 }
-

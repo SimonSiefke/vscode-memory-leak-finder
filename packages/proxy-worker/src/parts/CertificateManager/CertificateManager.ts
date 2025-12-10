@@ -1,4 +1,4 @@
-export { getOrCreateCA } from './getOrCreateCA/getOrCreateCA.ts'
-export { getCertificateForDomain } from './getCertificateForDomain/getCertificateForDomain.ts'
-export { getCACertPath } from './getCACertPath/getCACertPath.ts'
+export { getOrCreateCA } from './GetOrCreateCA/GetOrCreateCA.ts'
+export { getCertificateForDomain } from './GetCertificateForDomain/GetCertificateForDomain.ts'
+export { getCACertPath } from './GetCACertPath/GetCACertPath.ts'
 export type { CertificatePair } from './CertificatePair/CertificatePair.ts'

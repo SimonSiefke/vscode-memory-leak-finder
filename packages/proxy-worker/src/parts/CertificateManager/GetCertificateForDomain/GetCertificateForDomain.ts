@@ -28,4 +28,3 @@ export const getCertificateForDomain = async (
   await writeFile(keyPath, domainCert.key, 'utf8')
   return domainCert
 }
-

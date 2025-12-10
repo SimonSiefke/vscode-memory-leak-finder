@@ -1,6 +1,9 @@
 import forge from 'node-forge'
 import type { CertificatePair } from '../CertificatePair/CertificatePair.ts'
 
+const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/
+const ipv6Regex = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^::1$|^::$/
+
 export const generateCertificateForDomain = (
   domain: string,
   caKey: string,
@@ -35,8 +38,6 @@ export const generateCertificateForDomain = (
   ]
 
   // Check if domain is an IP address (IPv4 or IPv6)
-  const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/
-  const ipv6Regex = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^::1$|^::$/
   if (ipv4Regex.test(domain) || ipv6Regex.test(domain)) {
     altNames.push({
       type: 7, // IP
@@ -67,4 +68,3 @@ export const generateCertificateForDomain = (
     cert: forge.pki.certificateToPem(cert),
   }
 }
-
