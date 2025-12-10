@@ -59,6 +59,7 @@ export const updateState = async (newState: any): Promise<void> => {
       inspectSharedProcessPort: state.inspectSharedProcessPort,
       inspectExtensionsPort: state.inspectExtensionsPort,
       enableProxy: state.enableProxy,
+      useProxyMock: state.useProxyMock,
     })
   }
   if (newState.mode === ModeType.Interrupted) {

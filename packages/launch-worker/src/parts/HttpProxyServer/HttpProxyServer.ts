@@ -9,75 +9,12 @@ import { join } from 'path'
 import * as Root from '../Root/Root.ts'
 import * as CertificateManager from '../CertificateManager/CertificateManager.ts'
 import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
+import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
 const sanitizeFilename = (url: string): string => {
   return url.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 200)
-}
-
-const savePostBody = async (method: string, url: string, headers: Record<string, string>, body: Buffer): Promise<void> => {
-  if (method !== 'POST' && method !== 'PUT' && method !== 'PATCH') {
-    return
-  }
-
-  try {
-    await mkdir(REQUESTS_DIR, { recursive: true })
-    const timestamp = Date.now()
-    const filename = `${timestamp}_POST_${sanitizeFilename(url)}.json`
-    const filepath = join(REQUESTS_DIR, filename)
-
-    const contentType = headers['content-type'] || headers['Content-Type'] || ''
-    const contentTypeLower = contentType.toLowerCase()
-
-    let parsedBody: any = body.toString('utf8')
-    let bodyFormat = 'text'
-
-    // Try to parse JSON
-    if (contentTypeLower.includes('application/json')) {
-      try {
-        parsedBody = JSON.parse(parsedBody)
-        bodyFormat = 'json'
-      } catch {
-        // Keep as string if parsing fails
-      }
-    }
-    // Try to parse form data
-    else if (contentTypeLower.includes('application/x-www-form-urlencoded')) {
-      try {
-        const formData: Record<string, string> = {}
-        const params = new URLSearchParams(parsedBody)
-        params.forEach((value, key) => {
-          formData[key] = value
-        })
-        parsedBody = formData
-        bodyFormat = 'form-urlencoded'
-      } catch {
-        // Keep as string if parsing fails
-      }
-    }
-    // Try to parse multipart form data (basic parsing)
-    else if (contentTypeLower.includes('multipart/form-data')) {
-      bodyFormat = 'multipart-form-data'
-      // For multipart, we'll save the raw body as it's complex to parse
-    }
-
-    const postData = {
-      timestamp,
-      method,
-      url,
-      contentType,
-      bodyFormat,
-      headers,
-      body: parsedBody,
-      rawBody: body.toString('utf8'),
-    }
-
-    await writeFile(filepath, JSON.stringify(postData, null, 2), 'utf8')
-    console.log(`[Proxy] Saved POST body to ${filepath}`)
-  } catch (error) {
-    console.error('[Proxy] Failed to save POST body:', error)
-  }
 }
 
 const decompressBody = async (body: Buffer, encoding: string | string[] | undefined): Promise<{ body: string; wasCompressed: boolean }> => {
@@ -271,7 +208,7 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
       // Save POST body if applicable
       if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
         const requestBody = Buffer.concat(requestBodyChunks)
-        await savePostBody(req.method, targetUrl, req.headers as Record<string, string>, requestBody)
+        await SavePostBody.savePostBody(req.method, targetUrl, req.headers as Record<string, string>, requestBody)
       }
 
       saveRequest(req, res, responseData).catch((err) => {
@@ -501,7 +438,7 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer, us
 
         // Save POST body separately for inspection
         if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
-          await savePostBody(method, fullUrl, headers, body)
+          await SavePostBody.savePostBody(method, fullUrl, headers, body)
         }
 
         // Forward request to target server
