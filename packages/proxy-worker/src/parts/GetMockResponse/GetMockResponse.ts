@@ -175,8 +175,15 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   for (const [key, value] of Object.entries(mockResponse.headers)) {
     const lowerKey = key.toLowerCase()
     // Skip Content-Length headers (case-insensitive) - we'll set it below
+    // Skip Transfer-Encoding headers - we'll set Content-Length instead
+    // Skip Content-Encoding headers - mock body is already decompressed, so we can't send gzip encoding
     // Skip Content-Encoding and Transfer-Encoding headers for zip files and SSE files - data is not encoded
-    if (lowerKey !== 'content-length' && !((isZipFile || isSseFile) && (lowerKey === 'content-encoding' || lowerKey === 'transfer-encoding'))) {
+    if (
+      lowerKey !== 'content-length' &&
+      lowerKey !== 'transfer-encoding' &&
+      lowerKey !== 'content-encoding' &&
+      !((isZipFile || isSseFile) && lowerKey === 'content-encoding')
+    ) {
       headers[key] = Array.isArray(value) ? value.join(', ') : String(value)
       lowerCaseHeaders.add(lowerKey)
     }
@@ -212,6 +219,17 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   if (!lowerCaseHeaders.has('access-control-allow-credentials')) {
     headers['Access-Control-Allow-Credentials'] = 'true'
   }
+
+  // Explicitly remove Transfer-Encoding and Content-Encoding headers if they somehow got through
+  // (case-insensitive check) - we're setting Content-Length, so Transfer-Encoding can't be present
+  // Content-Encoding is removed because mock body is already decompressed
+  Object.keys(headers).forEach((key) => {
+    const lowerKey = key.toLowerCase()
+    if (lowerKey === 'transfer-encoding' || lowerKey === 'content-encoding') {
+      delete headers[key]
+      lowerCaseHeaders.delete(lowerKey)
+    }
+  })
 
   // Always set Content-Length to match actual body length
   headers['Content-Length'] = String(bodyBuffer.length)
