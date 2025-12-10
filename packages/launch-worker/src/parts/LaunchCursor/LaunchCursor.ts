@@ -26,6 +26,8 @@ export const launchCursor = async ({
   inspectPtyHostPort,
   inspectSharedProcessPort,
   inspectExtensionsPort,
+  enableProxy,
+  useProxyMock,
 }) => {
   try {
     const testWorkspacePath = join(Root.root, '.cursor-test-workspace')
@@ -46,6 +48,7 @@ export const launchCursor = async ({
     const settingsPath = join(userDataDir, 'User', 'settings.json')
     await mkdir(dirname(settingsPath), { recursive: true })
     await copyFile(defaultSettingsSourcePath, settingsPath)
+
     const args = GetVsCodeArgs.getVscodeArgs({
       userDataDir,
       extensionsDir,
@@ -57,8 +60,12 @@ export const launchCursor = async ({
       inspectPtyHostPort,
       inspectSharedProcessPort,
       inspectExtensionsPort,
+      enableProxy,
     })
-    const env = GetVsCodeEnv.getVsCodeEnv({ runtimeDir, processEnv: process.env })
+    const env = GetVsCodeEnv.getVsCodeEnv({
+      runtimeDir,
+      processEnv: process.env,
+    })
     const { child } = await LaunchElectron.launchElectron({
       cliPath: binaryPath,
       args,
