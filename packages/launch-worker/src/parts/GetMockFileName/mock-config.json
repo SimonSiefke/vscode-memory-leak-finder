@@ -70,5 +70,17 @@
     "pathname": "/telemetry",
     "method": "*",
     "filename": "telemetry_individual_githubcopilot_com_telemetry.json"
+  },
+  {
+    "hostname": "api.github.com",
+    "pathname": "/copilot/mcp_registry",
+    "method": "OPTIONS",
+    "filename": "api_github_com_copilot_mcp_registry_options.json"
+  },
+  {
+    "hostname": "api.github.com",
+    "pathname": "/copilot/mcp_registry",
+    "method": "GET",
+    "filename": "api_github_com_copilot_mcp_registry_get.json"
   }
 ]
