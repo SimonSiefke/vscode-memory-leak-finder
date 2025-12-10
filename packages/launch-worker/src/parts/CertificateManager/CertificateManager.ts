@@ -75,6 +75,24 @@ const generateCertificateForDomain = (domain: string, caKey: string, caCert: str
 
   cert.setIssuer(caCertificate.subject.attributes)
 
+  // Build altNames array - only add IP if domain is actually an IP address
+  const altNames: Array<{ type: number; value?: string; ip?: string }> = [
+    {
+      type: 2, // DNS
+      value: domain,
+    },
+  ]
+
+  // Check if domain is an IP address (IPv4 or IPv6)
+  const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/
+  const ipv6Regex = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^::1$|^::$/
+  if (ipv4Regex.test(domain) || ipv6Regex.test(domain)) {
+    altNames.push({
+      type: 7, // IP
+      ip: domain,
+    })
+  }
+
   cert.setExtensions([
     {
       name: 'basicConstraints',
@@ -87,16 +105,7 @@ const generateCertificateForDomain = (domain: string, caKey: string, caCert: str
     },
     {
       name: 'subjectAltName',
-      altNames: [
-        {
-          type: 2, // DNS
-          value: domain,
-        },
-        {
-          type: 7, // IP
-          ip: domain,
-        },
-      ],
+      altNames,
     },
   ])
 
