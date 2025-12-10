@@ -93,26 +93,30 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   const bodyStr = typeof mockResponse.body === 'string' ? mockResponse.body : JSON.stringify(mockResponse.body)
   const bodyBuffer = Buffer.from(bodyStr, 'utf8')
 
-  // Convert headers to the format expected by writeHead
+  // Convert headers to the format expected by writeHead and check for existing CORS headers
   const headers: Record<string, string> = {}
+  const lowerCaseHeaders: Set<string> = new Set()
+  
   Object.entries(mockResponse.headers).forEach(([key, value]) => {
+    const lowerKey = key.toLowerCase()
     // Skip Content-Length headers (case-insensitive) - we'll set it below
-    if (key.toLowerCase() !== 'content-length') {
+    if (lowerKey !== 'content-length') {
       headers[key] = Array.isArray(value) ? value.join(', ') : String(value)
+      lowerCaseHeaders.add(lowerKey)
     }
   })
 
-  // Add CORS headers if not already present
-  if (!headers['Access-Control-Allow-Origin']) {
+  // Add CORS headers if not already present (case-insensitive check)
+  if (!lowerCaseHeaders.has('access-control-allow-origin')) {
     headers['Access-Control-Allow-Origin'] = '*'
   }
-  if (!headers['Access-Control-Allow-Methods']) {
+  if (!lowerCaseHeaders.has('access-control-allow-methods')) {
     headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, PATCH, OPTIONS'
   }
-  if (!headers['Access-Control-Allow-Headers']) {
+  if (!lowerCaseHeaders.has('access-control-allow-headers')) {
     headers['Access-Control-Allow-Headers'] = 'authorization, content-type, accept, x-requested-with'
   }
-  if (!headers['Access-Control-Allow-Credentials']) {
+  if (!lowerCaseHeaders.has('access-control-allow-credentials')) {
     headers['Access-Control-Allow-Credentials'] = 'true'
   }
 

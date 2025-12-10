@@ -422,26 +422,30 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer, us
             const bodyStr = typeof mockResponse.body === 'string' ? mockResponse.body : JSON.stringify(mockResponse.body)
             const bodyBuffer = Buffer.from(bodyStr, 'utf8')
 
-            // Convert headers to the format expected
+            // Convert headers to the format expected and check for existing CORS headers
             const cleanedHeaders: Record<string, string> = {}
+            const lowerCaseHeaders: Set<string> = new Set()
+            
             Object.entries(mockResponse.headers).forEach(([k, v]) => {
+              const lowerKey = k.toLowerCase()
               // Skip Content-Length headers (case-insensitive) - we'll set it below
-              if (k.toLowerCase() !== 'content-length') {
+              if (lowerKey !== 'content-length') {
                 cleanedHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
+                lowerCaseHeaders.add(lowerKey)
               }
             })
 
-            // Add CORS headers if not already present
-            if (!cleanedHeaders['Access-Control-Allow-Origin']) {
+            // Add CORS headers if not already present (case-insensitive check)
+            if (!lowerCaseHeaders.has('access-control-allow-origin')) {
               cleanedHeaders['Access-Control-Allow-Origin'] = '*'
             }
-            if (!cleanedHeaders['Access-Control-Allow-Methods']) {
+            if (!lowerCaseHeaders.has('access-control-allow-methods')) {
               cleanedHeaders['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, PATCH, OPTIONS'
             }
-            if (!cleanedHeaders['Access-Control-Allow-Headers']) {
+            if (!lowerCaseHeaders.has('access-control-allow-headers')) {
               cleanedHeaders['Access-Control-Allow-Headers'] = 'authorization, content-type, accept, x-requested-with'
             }
-            if (!cleanedHeaders['Access-Control-Allow-Credentials']) {
+            if (!lowerCaseHeaders.has('access-control-allow-credentials')) {
               cleanedHeaders['Access-Control-Allow-Credentials'] = 'true'
             }
 
