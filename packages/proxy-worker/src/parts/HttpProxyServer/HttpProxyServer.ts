@@ -1,10 +1,18 @@
-import { mkdir, writeFile } from 'fs/promises'
-import { createServer, request as httpRequest, IncomingMessage, ServerResponse } from 'http'
+import { createServer, IncomingMessage, ServerResponse } from 'http'
+import { request as httpRequest } from 'http'
 import { request as httpsRequest } from 'https'
-import { join } from 'path'
 import { URL } from 'url'
+import { mkdir, writeFile } from 'fs/promises'
+import { join } from 'path'
 import * as Root from '../Root/Root.ts'
-import { sanitizeFilename } from '../SanitizeFilename/SanitizeFilename.ts'
+import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
+import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
+import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
+import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
+import { readFile } from 'fs/promises'
+import { existsSync } from 'fs'
+import { join, dirname } from 'path'
+import { fileURLToPath } from 'url'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
@@ -13,7 +21,7 @@ const saveRequest = async (req: IncomingMessage, response: ServerResponse, respo
     await mkdir(REQUESTS_DIR, { recursive: true })
     const timestamp = Date.now()
     const url = req.url || ''
-    const filename = `${timestamp}_${sanitizeFilename(url)}.json`
+    const filename = `${timestamp}_${SanitizeFilename.sanitizeFilename(url)}.json`
     const filepath = join(REQUESTS_DIR, filename)
 
     const requestData = {
@@ -42,7 +50,7 @@ const saveConnectTunnel = async (hostname: string, port: number): Promise<void> 
     await mkdir(REQUESTS_DIR, { recursive: true })
     const timestamp = Date.now()
     const target = `${hostname}:${port}`
-    const filename = `${timestamp}_CONNECT_${sanitizeFilename(target)}.json`
+    const filename = `${timestamp}_CONNECT_${SanitizeFilename.sanitizeFilename(target)}.json`
     const filepath = join(REQUESTS_DIR, filename)
 
     const tunnelData = {
@@ -275,8 +283,62 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
   // but HTTP requests will be captured
 }
 
+const matchesPattern = (value: string, pattern: string): boolean => {
+  if (pattern === '*') {
+    return true
+  }
+  if (pattern.includes('*')) {
+    const regexPattern = pattern.replace(/\*/g, '.*').replace(/\?/g, '.')
+    const regex = new RegExp(`^${regexPattern}$`)
+    return regex.test(value)
+  }
+  return value === pattern
+}
+
+const checkMockExists = async (method: string, url: string): Promise<boolean> => {
+  try {
+    const parsedUrl = new URL(url)
+    const hostname = parsedUrl.hostname
+    const pathname = parsedUrl.pathname
+    const methodLower = method.toLowerCase()
+    
+    // Check mock config first
+    const __dirname = dirname(fileURLToPath(import.meta.url))
+    const MOCK_CONFIG_PATH = join(__dirname, '../GetMockFileName/mock-config.json')
+    
+    if (existsSync(MOCK_CONFIG_PATH)) {
+      const configContent = await readFile(MOCK_CONFIG_PATH, 'utf8')
+      const config = JSON.parse(configContent) as MockConfigEntry[]
+      
+      for (const entry of config) {
+        const hostnameMatch = matchesPattern(hostname, entry.hostname) || hostname.includes(entry.hostname)
+        const pathnameMatch = matchesPattern(pathname, entry.pathname)
+        const methodMatch = matchesPattern(methodLower, entry.method.toLowerCase())
+        
+        if (hostnameMatch && pathnameMatch && methodMatch) {
+          // Check if the mock file actually exists
+          const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
+          const mockFile = join(MOCK_REQUESTS_DIR, entry.filename)
+          if (existsSync(mockFile)) {
+            return true
+          }
+        }
+      }
+    }
+    
+    // Fallback: check if mock file exists using filename generation
+    const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
+    const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
+    const mockFile = join(MOCK_REQUESTS_DIR, mockFileName)
+    return existsSync(mockFile)
+  } catch {
+    return false
+  }
+}
+
 export const createHttpProxyServer = async (
   port: number = 0,
+  useProxyMock: boolean | undefined = false,
 ): Promise<{
   port: number
   url: string
@@ -286,7 +348,7 @@ export const createHttpProxyServer = async (
 
   const server = createServer()
 
-  server.on('request', (req: IncomingMessage, res: ServerResponse) => {
+  server.on('request', async (req: IncomingMessage, res: ServerResponse) => {
     const targetUrl = req.url || ''
 
     // Handle health check endpoint
@@ -321,6 +383,50 @@ export const createHttpProxyServer = async (
           error: 'Invalid proxy request',
           message: 'This is an HTTP proxy server. Requests must use proxy protocol with full URLs.',
           received: targetUrl,
+        }),
+      )
+      return
+    }
+
+    // When useProxyMock is enabled, only return mock responses
+    if (useProxyMock) {
+      const method = req.method || 'GET'
+      const mockResponse = await GetMockResponse.getMockResponse(method, targetUrl)
+      
+      // For OPTIONS requests, getMockResponse might return a default preflight response
+      // even if no mock exists. We need to check if an actual mock file exists.
+      if (mockResponse) {
+        // Check if this is a real mock or just a default OPTIONS response
+        if (method === 'OPTIONS') {
+          const parsedUrl = new URL(targetUrl)
+          const hostname = parsedUrl.hostname
+          const pathname = parsedUrl.pathname
+          const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
+          const { existsSync } = await import('fs')
+          const { join } = await import('path')
+          const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
+          const mockFile = join(MOCK_REQUESTS_DIR, mockFileName)
+          
+          if (existsSync(mockFile)) {
+            GetMockResponse.sendMockResponse(res, mockResponse)
+            return
+          }
+          // If no OPTIONS mock file exists, fall through to error
+        } else {
+          GetMockResponse.sendMockResponse(res, mockResponse)
+          return
+        }
+      }
+
+      // No mock found - log error and return error response
+      console.error(`[Proxy] No mock found for request: ${method} ${targetUrl}`)
+      res.writeHead(404, { 'Content-Type': 'application/json' })
+      res.end(
+        JSON.stringify({
+          error: 'No mock found',
+          message: 'useProxyMock is enabled but no mock response exists for this request',
+          method,
+          url: targetUrl,
         }),
       )
       return

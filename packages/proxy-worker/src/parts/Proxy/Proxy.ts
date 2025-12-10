@@ -12,7 +12,7 @@ export const createHttpProxyServer = async (
   if (proxyServerInstance) {
     throw new Error('Proxy server already created')
   }
-  proxyServerInstance = await HttpProxyServer.createHttpProxyServer(port || 0)
+  proxyServerInstance = await HttpProxyServer.createHttpProxyServer(port || 0, useProxyMock)
   if (!proxyServerInstance) {
     throw new Error('Failed to create proxy server')
   }
@@ -58,6 +58,9 @@ export const setupProxy = async (
       // Continue even if settings update fails
     }
   }
+
+  // Wait a bit to ensure proxy server is ready
+  await new Promise((resolve) => setTimeout(resolve, 100))
 
   return proxyServer
 }
