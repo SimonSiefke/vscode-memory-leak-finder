@@ -110,22 +110,14 @@ export const launchVsCode = async ({
       inspectPtyHostPort,
       inspectSharedProcessPort,
       inspectExtensionsPort,
-<<<<<<< HEAD
       enableProxy: shouldEnableProxy,
     })
     const env = GetVsCodeEnv.getVsCodeEnv({
       runtimeDir,
       processEnv: process.env,
       proxyEnvVars,
-=======
-      enableProxy: enableProxy,
     })
 
-    const env = GetVsCodeEnv.getVsCodeEnv({
-      runtimeDir,
-      processEnv: process.env,
->>>>>>> origin/main
-    })
     const { child } = await LaunchElectron.launchElectron({
       cliPath: binaryPath,
       args,
