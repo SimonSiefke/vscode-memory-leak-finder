@@ -16,7 +16,7 @@ import * as RemoveVscodeGlobalStorage from '../RemoveVscodeGlobalStorage/RemoveV
 import * as RemoveVscodeWorkspaceStorage from '../RemoveVscodeWorkspaceStorage/RemoveVscodeWorkspaceStorage.ts'
 import * as Root from '../Root/Root.ts'
 import { VError } from '../VError/VError.ts'
-import * as HttpProxyServer from '../HttpProxyServer/HttpProxyServer.ts'
+import * as ProxyWorker from '../ProxyWorker/ProxyWorker.ts'
 
 export const launchVsCode = async ({
   headlessMode,
@@ -72,11 +72,14 @@ export const launchVsCode = async ({
     // Default to false if undefined
     const shouldEnableProxy = enableProxy === true
     console.log(`[LaunchVsCode] shouldEnableProxy: ${shouldEnableProxy} (enableProxy was: ${enableProxy})`)
-    let proxyServer: { port: number; url: string; dispose: () => Promise<void> } | null = null
+    let proxyServer: { port: number; url: string } | null = null
+    let proxyWorkerRpc: Awaited<ReturnType<typeof ProxyWorker.launch>> | null = null
     if (shouldEnableProxy) {
       try {
-        console.log('[LaunchVsCode] Starting proxy server...')
-        proxyServer = await HttpProxyServer.createHttpProxyServer({ port: 0, useProxyMock })
+        console.log('[LaunchVsCode] Starting proxy worker...')
+        proxyWorkerRpc = await ProxyWorker.launch()
+        console.log('[LaunchVsCode] Creating proxy server via proxy-worker...')
+        proxyServer = await proxyWorkerRpc.invoke('Proxy.createHttpProxyServer', 0, useProxyMock)
         console.log(`[LaunchVsCode] Proxy server started on ${proxyServer.url} (port ${proxyServer.port})`)
 
         // Update settings
@@ -89,10 +92,11 @@ export const launchVsCode = async ({
         console.log(`[LaunchVsCode] Proxy configured: ${proxyServer.url}`)
 
         // Keep proxy server alive
-        if (addDisposable && proxyServer) {
+        if (addDisposable && proxyWorkerRpc) {
           addDisposable(async () => {
             console.log('[LaunchVsCode] Disposing proxy server...')
-            await proxyServer!.dispose()
+            await proxyWorkerRpc!.invoke('Proxy.disposeProxyServer')
+            await proxyWorkerRpc!.dispose()
           })
         }
 
@@ -120,6 +124,7 @@ export const launchVsCode = async ({
       runtimeDir,
       processEnv: process.env,
       proxyUrl: proxyServer ? proxyServer.url : null,
+      proxyWorkerRpc,
     })
     const { child } = await LaunchElectron.launchElectron({
       cliPath: binaryPath,

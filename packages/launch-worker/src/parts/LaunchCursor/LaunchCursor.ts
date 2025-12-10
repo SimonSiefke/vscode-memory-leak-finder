@@ -12,7 +12,7 @@ import * as LaunchElectron from '../LaunchElectron/LaunchElectron.ts'
 import { join } from '../Path/Path.ts'
 import * as Root from '../Root/Root.ts'
 import { VError } from '../VError/VError.ts'
-import * as HttpProxyServer from '../HttpProxyServer/HttpProxyServer.ts'
+import * as ProxyWorker from '../ProxyWorker/ProxyWorker.ts'
 
 export const launchCursor = async ({
   headlessMode,
@@ -53,11 +53,14 @@ export const launchCursor = async ({
     await copyFile(defaultSettingsSourcePath, settingsPath)
 
     // Start proxy server if enabled
-    let proxyServer: { port: number; url: string; dispose: () => Promise<void> } | null = null
+    let proxyServer: { port: number; url: string } | null = null
+    let proxyWorkerRpc: Awaited<ReturnType<typeof ProxyWorker.launch>> | null = null
     if (enableProxy) {
       try {
-        console.log('[LaunchCursor] Starting proxy server...')
-        proxyServer = await HttpProxyServer.createHttpProxyServer({ port: 0, useProxyMock })
+        console.log('[LaunchCursor] Starting proxy worker...')
+        proxyWorkerRpc = await ProxyWorker.launch()
+        console.log('[LaunchCursor] Creating proxy server via proxy-worker...')
+        proxyServer = await proxyWorkerRpc.invoke('Proxy.createHttpProxyServer', 0, useProxyMock)
         console.log(`[LaunchCursor] Proxy server started on ${proxyServer.url} (port ${proxyServer.port})`)
 
         // Update settings
@@ -70,10 +73,11 @@ export const launchCursor = async ({
         console.log(`[LaunchCursor] Proxy configured: ${proxyServer.url}`)
 
         // Keep proxy server alive
-        if (addDisposable && proxyServer) {
+        if (addDisposable && proxyWorkerRpc) {
           addDisposable(async () => {
             console.log('[LaunchCursor] Disposing proxy server...')
-            await proxyServer!.dispose()
+            await proxyWorkerRpc!.invoke('Proxy.disposeProxyServer')
+            await proxyWorkerRpc!.dispose()
           })
         }
 
@@ -101,6 +105,7 @@ export const launchCursor = async ({
       runtimeDir,
       processEnv: process.env,
       proxyUrl: proxyServer ? proxyServer.url : null,
+      proxyWorkerRpc,
     })
     const { child } = await LaunchElectron.launchElectron({
       cliPath: binaryPath,
