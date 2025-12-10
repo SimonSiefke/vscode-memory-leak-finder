@@ -41,6 +41,31 @@ const saveRequest = async (req: IncomingMessage, response: ServerResponse, respo
   }
 }
 
+const saveConnectTunnel = async (hostname: string, port: number): Promise<void> => {
+  try {
+    await mkdir(REQUESTS_DIR, { recursive: true })
+    const timestamp = Date.now()
+    const target = `${hostname}:${port}`
+    const filename = `${timestamp}_CONNECT_${sanitizeFilename(target)}.json`
+    const filepath = join(REQUESTS_DIR, filename)
+
+    const tunnelData = {
+      timestamp,
+      method: 'CONNECT',
+      target,
+      hostname,
+      port,
+      note: 'HTTPS tunnel - actual request/response data is encrypted and cannot be captured',
+    }
+
+    await writeFile(filepath, JSON.stringify(tunnelData, null, 2), 'utf8')
+    console.log(`[Proxy] Saved CONNECT tunnel to ${filepath}`)
+  } catch (error) {
+    // Ignore errors when saving tunnel metadata
+    console.error('[Proxy] Failed to save CONNECT tunnel:', error)
+  }
+}
+
 const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: string): void => {
   let parsedUrl: URL
   try {
@@ -229,6 +254,10 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
     proxySocket.pipe(socket)
     socket.pipe(proxySocket)
     console.log(`[Proxy] CONNECT tunnel established to ${hostname}:${targetPort}`)
+    // Save tunnel metadata (we can't capture encrypted HTTPS traffic)
+    saveConnectTunnel(hostname, targetPort).catch((err) => {
+      console.error('[Proxy] Error saving CONNECT tunnel:', err)
+    })
   })
 
   proxySocket.on('error', (error) => {
