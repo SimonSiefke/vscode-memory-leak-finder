@@ -1,10 +1,12 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http'
 import { request as httpRequest } from 'http'
 import { request as httpsRequest } from 'https'
+import { createSecureContext } from 'tls'
 import { URL } from 'url'
 import { mkdir, writeFile } from 'fs/promises'
 import { join } from 'path'
 import * as Root from '../Root/Root.ts'
+import * as CertificateManager from '../CertificateManager/CertificateManager.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
@@ -238,64 +240,204 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
 }
 
 const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): Promise<void> => {
-  // Handle HTTPS CONNECT requests for tunneling
+  // Handle HTTPS CONNECT requests with TLS termination for inspection
   const target = req.url || ''
   const parts = target.split(':')
   const hostname = parts[0]
   const targetPort = parts[1] ? parseInt(parts[1], 10) : 443
 
-  const { createConnection } = await import('net')
-  console.log(`[Proxy] Establishing CONNECT tunnel to ${hostname}:${targetPort}`)
-  const proxySocket = createConnection(targetPort, hostname, () => {
-    socket.write('HTTP/1.1 200 Connection Established\r\n\r\n')
-    if (head.length > 0) {
-      proxySocket.write(head)
-    }
-    proxySocket.pipe(socket)
-    socket.pipe(proxySocket)
-    console.log(`[Proxy] CONNECT tunnel established to ${hostname}:${targetPort}`)
-    // Save tunnel metadata (we can't capture encrypted HTTPS traffic)
-    saveConnectTunnel(hostname, targetPort).catch((err) => {
-      console.error('[Proxy] Error saving CONNECT tunnel:', err)
+  try {
+    // Get certificate for this domain
+    const { cert, key } = await CertificateManager.getCertificateForDomain(hostname)
+    const secureContext = createSecureContext({
+      cert,
+      key,
     })
-  })
 
-  proxySocket.on('error', (error) => {
-    // EPIPE, ECONNRESET, ETIMEDOUT, and ENETUNREACH are common network errors
-    const errorCode = (error as NodeJS.ErrnoException).code
-    if (
-      errorCode === 'EPIPE' ||
-      errorCode === 'ECONNRESET' ||
-      errorCode === 'ETIMEDOUT' ||
-      errorCode === 'ENETUNREACH'
-    ) {
-      // Silently handle expected connection closures and network errors
+    // Create TLS server to terminate the connection
+    const { TLSSocket } = await import('tls')
+    const tlsSocket = new TLSSocket(socket, {
+      secureContext,
+      isServer: true,
+    })
+
+    // Handle the TLS handshake
+    tlsSocket.on('secureConnect', () => {
+      console.log(`[Proxy] TLS connection established to ${hostname}:${targetPort}`)
+    })
+
+    // Parse HTTP requests from the decrypted stream
+    let requestBuffer = Buffer.alloc(0)
+
+    tlsSocket.on('data', async (data: Buffer) => {
+      requestBuffer = Buffer.concat([requestBuffer, data])
+
+      // Try to parse HTTP request
+      const requestStr = requestBuffer.toString('utf8')
+      const requestLineEnd = requestStr.indexOf('\r\n')
+      if (requestLineEnd === -1) {
+        return // Need more data
+      }
+
+      const requestLine = requestStr.substring(0, requestLineEnd)
+      const parts = requestLine.split(' ')
+      const method = parts[0]
+      const path = parts[1]
+      const httpVersion = parts[2] || 'HTTP/1.1'
+
+      if (!method || !path) {
+        return
+      }
+
+      // Find end of headers
+      const headersEnd = requestStr.indexOf('\r\n\r\n')
+      if (headersEnd === -1) {
+        return // Need more data
+      }
+
+      const headersStr = requestStr.substring(requestLineEnd + 2, headersEnd)
+      const headers: Record<string, string> = {}
+      headersStr.split('\r\n').forEach((line) => {
+        const colonIndex = line.indexOf(':')
+        if (colonIndex > 0) {
+          const key = line.substring(0, colonIndex).trim().toLowerCase()
+          const value = line.substring(colonIndex + 1).trim()
+          headers[key] = value
+        }
+      })
+
+      const bodyStart = headersEnd + 4
+      const body = requestBuffer.subarray(bodyStart)
+      requestBuffer = Buffer.alloc(0) // Reset buffer
+
+      const fullUrl = `https://${hostname}${path}`
+      console.log(`[Proxy] Intercepted HTTPS ${method} ${fullUrl}`)
+
+      // Forward request to target server
+      const targetOptions = {
+        hostname,
+        port: targetPort,
+        path,
+        method,
+        headers,
+        rejectUnauthorized: false,
+      }
+
+      const targetReq = httpsRequest(targetOptions, (targetRes) => {
+        const responseChunks: Buffer[] = []
+
+        // Write response back through TLS
+        const statusLine = `${httpVersion} ${targetRes.statusCode} ${targetRes.statusMessage || ''}\r\n`
+        const responseHeaders = Object.entries(targetRes.headers)
+          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}\r\n`)
+          .join('')
+        tlsSocket.write(statusLine + responseHeaders + '\r\n')
+
+        targetRes.on('data', (chunk: Buffer) => {
+          responseChunks.push(chunk)
+          tlsSocket.write(chunk)
+        })
+
+        targetRes.on('end', async () => {
+          // Save the intercepted request/response
+          const responseData = Buffer.concat(responseChunks)
+          await saveInterceptedRequest(method, fullUrl, headers, targetRes.statusCode || 200, targetRes.headers, responseData)
+        })
+      })
+
+      targetReq.on('error', (error) => {
+        const errorCode = (error as NodeJS.ErrnoException).code
+        if (
+          errorCode === 'EPIPE' ||
+          errorCode === 'ECONNRESET' ||
+          errorCode === 'ETIMEDOUT' ||
+          errorCode === 'ENETUNREACH'
+        ) {
+          tlsSocket.end()
+          return
+        }
+        console.error(`[Proxy] Error forwarding HTTPS request:`, error)
+        tlsSocket.end()
+      })
+
+      // Write request body
+      if (body.length > 0) {
+        targetReq.write(body)
+      }
+      targetReq.end()
+    })
+
+    tlsSocket.on('error', (error) => {
+      const errorCode = (error as NodeJS.ErrnoException).code
+      if (
+        errorCode === 'EPIPE' ||
+        errorCode === 'ECONNRESET' ||
+        errorCode === 'ETIMEDOUT' ||
+        errorCode === 'ENETUNREACH'
+      ) {
+        socket.end()
+        return
+      }
+      console.error(`[Proxy] TLS error for ${hostname}:${targetPort}:`, error)
       socket.end()
-      return
+    })
+
+    socket.on('error', (error) => {
+      const errorCode = (error as NodeJS.ErrnoException).code
+      if (
+        errorCode === 'EPIPE' ||
+        errorCode === 'ECONNRESET' ||
+        errorCode === 'ETIMEDOUT' ||
+        errorCode === 'ENETUNREACH'
+      ) {
+        tlsSocket.end()
+        return
+      }
+      console.error(`[Proxy] Socket error for ${hostname}:${targetPort}:`, error)
+      tlsSocket.end()
+    })
+
+    // Write the initial data if any
+    if (head.length > 0) {
+      tlsSocket.write(head)
     }
-    console.error(`[Proxy] CONNECT tunnel error to ${hostname}:${targetPort}:`, error)
+  } catch (error) {
+    console.error(`[Proxy] Error handling CONNECT for ${hostname}:${targetPort}:`, error)
     socket.end()
-  })
+  }
+}
 
-  socket.on('error', (error) => {
-    // EPIPE, ECONNRESET, ETIMEDOUT, and ENETUNREACH are common network errors
-    const errorCode = (error as NodeJS.ErrnoException).code
-    if (
-      errorCode === 'EPIPE' ||
-      errorCode === 'ECONNRESET' ||
-      errorCode === 'ETIMEDOUT' ||
-      errorCode === 'ENETUNREACH'
-    ) {
-      // Silently handle expected connection closures and network errors
-      proxySocket.end()
-      return
+const saveInterceptedRequest = async (
+  method: string,
+  url: string,
+  requestHeaders: Record<string, string>,
+  statusCode: number,
+  responseHeaders: Record<string, string | string[]>,
+  responseBody: Buffer,
+): Promise<void> => {
+  try {
+    await mkdir(REQUESTS_DIR, { recursive: true })
+    const timestamp = Date.now()
+    const filename = `${timestamp}_${sanitizeFilename(url)}.json`
+    const filepath = join(REQUESTS_DIR, filename)
+
+    const requestData = {
+      timestamp,
+      method,
+      url,
+      headers: requestHeaders,
+      response: {
+        statusCode,
+        headers: responseHeaders,
+        body: responseBody.toString('utf8'),
+      },
     }
-    console.error(`[Proxy] Socket error for ${hostname}:${targetPort}:`, error)
-    proxySocket.end()
-  })
 
-  // Note: We can't easily capture HTTPS traffic through CONNECT,
-  // but HTTP requests will be captured
+    await writeFile(filepath, JSON.stringify(requestData, null, 2), 'utf8')
+    console.log(`[Proxy] Saved intercepted HTTPS request to ${filepath}`)
+  } catch (error) {
+    console.error('[Proxy] Failed to save intercepted request:', error)
+  }
 }
 
 export const createHttpProxyServer = async (
@@ -306,6 +448,9 @@ export const createHttpProxyServer = async (
   dispose: () => Promise<void>
 }> => {
   await mkdir(REQUESTS_DIR, { recursive: true })
+  
+  // Initialize CA certificate for HTTPS inspection
+  await CertificateManager.getOrCreateCA()
 
   const server = createServer()
 

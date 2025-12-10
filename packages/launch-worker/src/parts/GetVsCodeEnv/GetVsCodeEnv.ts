@@ -22,7 +22,14 @@ export const getVsCodeEnv = async ({ runtimeDir, processEnv, proxyUrl }) => {
     // Don't proxy localhost connections
     env.NO_PROXY = 'localhost,127.0.0.1,0.0.0.0'
     env.no_proxy = 'localhost,127.0.0.1,0.0.0.0'
+    
+    // Set NODE_EXTRA_CA_CERTS to trust our MITM proxy CA certificate
+    const { getCACertPath } = await import('../CertificateManager/CertificateManager.ts')
+    const caCertPath = getCACertPath()
+    env.NODE_EXTRA_CA_CERTS = caCertPath
+    
     console.log(`[GetVsCodeEnv] Set proxy environment variables: HTTP_PROXY=${proxyUrl}`)
+    console.log(`[GetVsCodeEnv] Set NODE_EXTRA_CA_CERTS=${caCertPath}`)
   }
 
   return env

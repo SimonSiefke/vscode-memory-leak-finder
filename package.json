@@ -47,5 +47,8 @@
     "semi": false,
     "singleQuote": true,
     "printWidth": 140
+  },
+  "dependencies": {
+    "node-forge": "^1.3.3"
   }
 }
