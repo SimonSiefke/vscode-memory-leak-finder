@@ -57,6 +57,7 @@ export const parseArgv = (argv) => {
     inspectSharedProcessPort: 5879,
     inspectExtensionsPort: 5870,
     enableProxy: false,
+    useProxyMock: false,
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -150,6 +151,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--enable-proxy')) {
     options.enableProxy = true
+  }
+  if (argv.includes('--use-proxy-mock')) {
+    options.useProxyMock = true
   }
   return options
 }
