@@ -398,16 +398,9 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
       const targetReq = httpsRequest(targetOptions, (targetRes) => {
         const responseChunks: Buffer[] = []
 
-        // Write response back through TLS
-        const statusLine = `${httpVersion} ${targetRes.statusCode} ${targetRes.statusMessage || ''}\r\n`
-        const responseHeaders = Object.entries(targetRes.headers)
-          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}\r\n`)
-          .join('')
-        tlsSocket.write(statusLine + responseHeaders + '\r\n')
-
+        // Buffer the entire response first to handle chunked encoding properly
         targetRes.on('data', (chunk: Buffer) => {
           responseChunks.push(chunk)
-          tlsSocket.write(chunk)
         })
 
         targetRes.on('end', async () => {
@@ -421,6 +414,26 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
             }
           })
           await saveInterceptedRequest(method, fullUrl, headers, targetRes.statusCode || 200, responseHeaders, responseData)
+
+          // Write response back through TLS
+          // Remove transfer-encoding header and set content-length instead
+          const cleanedHeaders: Record<string, string> = {}
+          Object.entries(targetRes.headers).forEach(([k, v]) => {
+            const lowerKey = k.toLowerCase()
+            // Skip transfer-encoding and connection headers
+            if (lowerKey !== 'transfer-encoding' && lowerKey !== 'connection') {
+              cleanedHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
+            }
+          })
+          // Set content-length
+          cleanedHeaders['Content-Length'] = String(responseData.length)
+
+          const statusLine = `${httpVersion} ${targetRes.statusCode} ${targetRes.statusMessage || ''}\r\n`
+          const headerLines = Object.entries(cleanedHeaders)
+            .map(([k, v]) => `${k}: ${v}\r\n`)
+            .join('')
+          tlsSocket.write(statusLine + headerLines + '\r\n')
+          tlsSocket.write(responseData)
         })
 
         targetRes.on('error', (error) => {
