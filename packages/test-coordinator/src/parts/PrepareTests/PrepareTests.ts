@@ -26,6 +26,7 @@ export const prepareTests = async (
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
   enableProxy: boolean,
+  useProxyMock: boolean,
 ) => {
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
@@ -53,6 +54,7 @@ export const prepareTests = async (
       inspectSharedProcessPort,
       inspectExtensionsPort,
       enableProxy,
+      useProxyMock,
     )
 
   return {

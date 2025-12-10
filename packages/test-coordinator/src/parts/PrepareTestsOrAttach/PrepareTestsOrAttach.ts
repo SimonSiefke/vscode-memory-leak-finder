@@ -34,6 +34,7 @@ export const prepareTestsAndAttach = async (
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
   enableProxy: boolean,
+  useProxyMock: boolean,
 ) => {
   const isFirst = state.promise === undefined
   if (isFirst) {
@@ -61,6 +62,7 @@ export const prepareTestsAndAttach = async (
       inspectSharedProcessPort,
       inspectExtensionsPort,
       enableProxy,
+      useProxyMock,
     )
   }
   const result = await state.promise

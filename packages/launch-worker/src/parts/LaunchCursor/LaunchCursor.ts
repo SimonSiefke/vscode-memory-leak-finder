@@ -28,6 +28,7 @@ export const launchCursor = async ({
   inspectSharedProcessPort,
   inspectExtensionsPort,
   enableProxy,
+  useProxyMock,
 }) => {
   try {
     const testWorkspacePath = join(Root.root, '.cursor-test-workspace')
@@ -54,7 +55,7 @@ export const launchCursor = async ({
     if (enableProxy) {
       try {
         console.log('[LaunchCursor] Starting proxy server...')
-        proxyServer = await HttpProxyServer.createHttpProxyServer(0)
+        proxyServer = await HttpProxyServer.createHttpProxyServer(0, useProxyMock)
         console.log(`[LaunchCursor] Proxy server started on ${proxyServer.url} (port ${proxyServer.port})`)
 
         // Update settings
@@ -75,7 +76,7 @@ export const launchCursor = async ({
         }
 
         // Wait a bit to ensure proxy server is ready
-        await new Promise(resolve => setTimeout(resolve, 100))
+        await new Promise((resolve) => setTimeout(resolve, 100))
       } catch (error) {
         console.error('[LaunchCursor] Error setting up proxy:', error)
         // Continue even if proxy setup fails
@@ -92,6 +93,7 @@ export const launchCursor = async ({
       inspectPtyHostPort,
       inspectSharedProcessPort,
       inspectExtensionsPort,
+      enableProxy,
     })
     const env = await GetVsCodeEnv.getVsCodeEnv({
       runtimeDir,

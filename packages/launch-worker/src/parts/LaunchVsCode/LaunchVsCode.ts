@@ -33,6 +33,7 @@ export const launchVsCode = async ({
   inspectSharedProcessPort,
   inspectExtensionsPort,
   enableProxy,
+  useProxyMock,
 }) => {
   console.log(`[LaunchVsCode] enableProxy parameter: ${enableProxy} (type: ${typeof enableProxy})`)
   try {
@@ -74,7 +75,7 @@ export const launchVsCode = async ({
     if (shouldEnableProxy) {
       try {
         console.log('[LaunchVsCode] Starting proxy server...')
-        proxyServer = await HttpProxyServer.createHttpProxyServer(0)
+        proxyServer = await HttpProxyServer.createHttpProxyServer(0, useProxyMock)
         console.log(`[LaunchVsCode] Proxy server started on ${proxyServer.url} (port ${proxyServer.port})`)
 
         // Update settings

@@ -19,6 +19,7 @@ export const launchIde = async ({
   inspectSharedProcessPort,
   inspectExtensionsPort,
   enableProxy,
+  useProxyMock,
 }) => {
   console.log(`[LaunchIde] enableProxy parameter: ${enableProxy} (type: ${typeof enableProxy})`)
   if (ide === Ide.Cursor) {
@@ -37,6 +38,7 @@ export const launchIde = async ({
       inspectSharedProcessPort,
       inspectExtensionsPort,
       enableProxy,
+      useProxyMock,
     })
     return {
       ...result,
@@ -58,6 +60,7 @@ export const launchIde = async ({
     inspectSharedProcessPort,
     inspectExtensionsPort,
     enableProxy,
+    useProxyMock,
   })
   return {
     ...result,

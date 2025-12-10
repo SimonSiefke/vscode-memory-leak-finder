@@ -192,13 +192,15 @@ const saveRequest = async (req: IncomingMessage, response: ServerResponse, respo
   }
 }
 
-const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetUrl: string): Promise<void> => {
-  // Check for mock response first
-  const mockResponse = await GetMockResponse.getMockResponse(req.method || 'GET', targetUrl)
-  if (mockResponse) {
-    console.log(`[Proxy] Returning mock response for ${req.method} ${targetUrl}`)
-    GetMockResponse.sendMockResponse(res, mockResponse)
-    return // Don't record mock requests
+const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetUrl: string, useProxyMock: boolean): Promise<void> => {
+  // Check for mock response first (only if useProxyMock is enabled)
+  if (useProxyMock) {
+    const mockResponse = await GetMockResponse.getMockResponse(req.method || 'GET', targetUrl)
+    if (mockResponse) {
+      console.log(`[Proxy] Returning mock response for ${req.method} ${targetUrl}`)
+      GetMockResponse.sendMockResponse(res, mockResponse)
+      return // Don't record mock requests
+    }
   }
 
   let parsedUrl: URL
@@ -377,7 +379,7 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
   })
 }
 
-const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): Promise<void> => {
+const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer, useProxyMock: boolean): Promise<void> => {
   // Handle HTTPS CONNECT requests with TLS termination for inspection
   const target = req.url || ''
   const parts = target.split(':')
@@ -472,27 +474,29 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
         const fullUrl = `https://${hostname}${path}`
         console.log(`[Proxy] Intercepted HTTPS ${method} ${fullUrl}`)
 
-        // Check for mock response first
-        const mockResponse = await GetMockResponse.getMockResponse(method, fullUrl)
-        if (mockResponse) {
-          console.log(`[Proxy] Returning mock response for ${method} ${fullUrl}`)
-          const bodyStr = typeof mockResponse.body === 'string' ? mockResponse.body : JSON.stringify(mockResponse.body)
-          const bodyBuffer = Buffer.from(bodyStr, 'utf8')
+        // Check for mock response first (only if useProxyMock is enabled)
+        if (useProxyMock) {
+          const mockResponse = await GetMockResponse.getMockResponse(method, fullUrl)
+          if (mockResponse) {
+            console.log(`[Proxy] Returning mock response for ${method} ${fullUrl}`)
+            const bodyStr = typeof mockResponse.body === 'string' ? mockResponse.body : JSON.stringify(mockResponse.body)
+            const bodyBuffer = Buffer.from(bodyStr, 'utf8')
 
-          // Convert headers to the format expected
-          const cleanedHeaders: Record<string, string> = {}
-          Object.entries(mockResponse.headers).forEach(([k, v]) => {
-            cleanedHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
-          })
-          cleanedHeaders['Content-Length'] = String(bodyBuffer.length)
+            // Convert headers to the format expected
+            const cleanedHeaders: Record<string, string> = {}
+            Object.entries(mockResponse.headers).forEach(([k, v]) => {
+              cleanedHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
+            })
+            cleanedHeaders['Content-Length'] = String(bodyBuffer.length)
 
-          const statusLine = `${httpVersion} ${mockResponse.statusCode} ${mockResponse.statusCode === 200 ? 'OK' : mockResponse.statusCode === 204 ? 'No Content' : ''}\r\n`
-          const headerLines = Object.entries(cleanedHeaders)
-            .map(([k, v]) => `${k}: ${v}\r\n`)
-            .join('')
-          tlsSocket.write(statusLine + headerLines + '\r\n')
-          tlsSocket.write(bodyBuffer)
-          return // Don't record mock requests
+            const statusLine = `${httpVersion} ${mockResponse.statusCode} ${mockResponse.statusCode === 200 ? 'OK' : mockResponse.statusCode === 204 ? 'No Content' : ''}\r\n`
+            const headerLines = Object.entries(cleanedHeaders)
+              .map(([k, v]) => `${k}: ${v}\r\n`)
+              .join('')
+            tlsSocket.write(statusLine + headerLines + '\r\n')
+            tlsSocket.write(bodyBuffer)
+            return // Don't record mock requests
+          }
         }
 
         // Save POST body separately for inspection
@@ -687,6 +691,7 @@ const saveInterceptedRequest = async (
 
 export const createHttpProxyServer = async (
   port: number = 0,
+  useProxyMock: boolean = false,
 ): Promise<{
   port: number
   url: string
@@ -739,7 +744,7 @@ export const createHttpProxyServer = async (
       return
     }
 
-    forwardRequest(req, res, targetUrl).catch((error) => {
+    forwardRequest(req, res, targetUrl, useProxyMock).catch((error) => {
       console.error('[Proxy] Error in forwardRequest:', error)
       if (!res.headersSent) {
         res.writeHead(500, { 'Content-Type': 'application/json' })
@@ -757,7 +762,7 @@ export const createHttpProxyServer = async (
     // Handle CONNECT method for HTTPS tunneling
     const target = req.url || ''
     console.log(`[Proxy] Received CONNECT request: ${target}`)
-    handleConnect(req, socket, head).catch(() => {
+    handleConnect(req, socket, head, useProxyMock).catch(() => {
       socket.end()
     })
   })

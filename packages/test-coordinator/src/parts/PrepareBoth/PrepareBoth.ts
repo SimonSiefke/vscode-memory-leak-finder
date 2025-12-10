@@ -30,6 +30,7 @@ export const prepareBoth = async (
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
   enableProxy: boolean,
+  useProxyMock: boolean,
 ): Promise<PrepareBothResult> => {
   console.log(`[PrepareBoth] enableProxy parameter: ${enableProxy} (type: ${typeof enableProxy})`)
   const initializationWorkerRpc = await launchInitializationWorker()
@@ -54,6 +55,7 @@ export const prepareBoth = async (
       inspectSharedProcessPort,
       inspectExtensionsPort,
       enableProxy,
+      useProxyMock,
     )
   return {
     initializationWorkerRpc,

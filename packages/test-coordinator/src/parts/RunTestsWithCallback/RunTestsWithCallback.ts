@@ -120,6 +120,7 @@ export const runTestsWithCallback = async ({
         inspectSharedProcessPort,
         inspectExtensionsPort,
         enableProxy,
+        useProxyMock,
       )
       await testWorkerRpc.dispose()
       await memoryRpc?.dispose()
