@@ -1,7 +1,6 @@
 import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.ts'
 import * as KillExistingIdeInstances from '../KillExistingIdeInstances/KillExistingIdeInstances.ts'
 import { prepareBoth } from '../PrepareBoth/PrepareBoth.ts'
-import * as ProxyState from '../../../../page-object/src/parts/NetworkInterceptor/ProxyState.ts'
 
 export const prepareTests = async (
   cwd: string,
@@ -32,15 +31,6 @@ export const prepareTests = async (
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
 
-  // If proxy is enabled, create proxy state file to signal LaunchVsCode to start proxy server
-  if (enableProxy) {
-    await ProxyState.setProxyState({
-      proxyUrl: '', // Empty URL signals that proxy should be started
-      port: null,
-    })
-    console.log('[PrepareTests] Proxy enabled - LaunchVsCode will start proxy server')
-  }
-
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, initializationWorkerRpc } =
     await prepareBoth(
       headlessMode,
@@ -60,6 +50,7 @@ export const prepareTests = async (
       inspectPtyHostPort,
       inspectSharedProcessPort,
       inspectExtensionsPort,
+      enableProxy,
     )
 
   return {

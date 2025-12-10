@@ -17,7 +17,6 @@ import * as RemoveVscodeWorkspaceStorage from '../RemoveVscodeWorkspaceStorage/R
 import * as Root from '../Root/Root.ts'
 import { VError } from '../VError/VError.ts'
 import { createHttpProxyServer } from '../../../../page-object/src/parts/NetworkInterceptor/HttpProxyServer.ts'
-import * as ProxyState from '../../../../page-object/src/parts/NetworkInterceptor/ProxyState.ts'
 
 export const launchVsCode = async ({
   headlessMode,
@@ -33,6 +32,7 @@ export const launchVsCode = async ({
   inspectPtyHostPort,
   inspectSharedProcessPort,
   inspectExtensionsPort,
+  enableProxy,
 }) => {
   try {
     const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
@@ -64,61 +64,37 @@ export const launchVsCode = async ({
     // Copy default settings
     await copyFile(defaultSettingsSourcePath, settingsPath)
 
-    // Start proxy server if proxy state file exists (indicates proxy should be enabled)
+    // Start proxy server if enabled
     let proxyServer: { port: number; url: string; dispose: () => Promise<void> } | null = null
-    try {
-      const { existsSync } = await import('fs')
-      const proxyStateFile = join(Root.root, '.vscode-proxy-state.json')
-
-      if (existsSync(proxyStateFile)) {
-        const existingState = await ProxyState.getProxyState()
-
-        // If proxy state exists but no server URL, start one
-        if (!existingState.proxyUrl || !existingState.port) {
-          // Start new proxy server
-          console.log('[LaunchVsCode] Starting proxy server...')
-          proxyServer = await createHttpProxyServer(0)
-          console.log(`[LaunchVsCode] Proxy server started on ${proxyServer.url} (port ${proxyServer.port})`)
-
-          // Store proxy state
-          await ProxyState.setProxyState({
-            proxyUrl: proxyServer.url,
-            port: proxyServer.port,
+    if (enableProxy) {
+      try {
+        console.log('[LaunchVsCode] Starting proxy server...')
+        proxyServer = await createHttpProxyServer(0)
+        console.log(`[LaunchVsCode] Proxy server started on ${proxyServer.url} (port ${proxyServer.port})`)
+        
+        // Update settings
+        const { readFile, writeFile } = await import('fs/promises')
+        const settingsContent = await readFile(settingsPath, 'utf8')
+        const settings = JSON.parse(settingsContent)
+        settings['http.proxy'] = proxyServer.url
+        settings['http.proxyStrictSSL'] = false
+        await writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf8')
+        console.log(`[LaunchVsCode] Proxy configured: ${proxyServer.url}`)
+        
+        // Keep proxy server alive
+        if (addDisposable && proxyServer) {
+          addDisposable(async () => {
+            console.log('[LaunchVsCode] Disposing proxy server...')
+            await proxyServer!.dispose()
           })
-
-          // Update settings
-          const { readFile, writeFile } = await import('fs/promises')
-          const settingsContent = await readFile(settingsPath, 'utf8')
-          const settings = JSON.parse(settingsContent)
-          settings['http.proxy'] = proxyServer.url
-          settings['http.proxyStrictSSL'] = false
-          await writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf8')
-          console.log(`[LaunchVsCode] Proxy configured: ${proxyServer.url}`)
-
-          // Keep proxy server alive
-          if (addDisposable && proxyServer) {
-            addDisposable(async () => {
-              console.log('[LaunchVsCode] Disposing proxy server...')
-              await proxyServer!.dispose()
-            })
-          }
-
-          // Wait a bit to ensure proxy server is ready
-          await new Promise(resolve => setTimeout(resolve, 100))
-        } else {
-          // Proxy already configured, just use existing settings
-          const { readFile, writeFile } = await import('fs/promises')
-          const settingsContent = await readFile(settingsPath, 'utf8')
-          const settings = JSON.parse(settingsContent)
-          settings['http.proxy'] = existingState.proxyUrl
-          settings['http.proxyStrictSSL'] = false
-          await writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf8')
-          console.log(`[LaunchVsCode] Using existing proxy: ${existingState.proxyUrl}`)
         }
+        
+        // Wait a bit to ensure proxy server is ready
+        await new Promise(resolve => setTimeout(resolve, 100))
+      } catch (error) {
+        console.error('[LaunchVsCode] Error setting up proxy:', error)
+        // Continue even if proxy setup fails
       }
-    } catch (error) {
-      console.error('[LaunchVsCode] Error setting up proxy:', error)
-      // Continue even if proxy setup fails
     }
     const args = GetVsCodeArgs.getVscodeArgs({
       userDataDir,

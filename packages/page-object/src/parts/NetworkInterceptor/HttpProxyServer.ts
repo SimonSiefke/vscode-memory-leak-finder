@@ -56,8 +56,14 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
     console.log(`[Proxy] Forwarding ${req.method} ${parsedUrl.protocol}//${parsedUrl.hostname}:${parsedUrl.port}${parsedUrl.pathname}`)
   } catch (error) {
     console.error(`[Proxy] Invalid URL: ${targetUrl}`, error)
-    res.writeHead(400)
-    res.end(`Invalid URL: ${targetUrl}`)
+    res.writeHead(400, { 'Content-Type': 'application/json' })
+    res.end(
+      JSON.stringify({
+        error: 'Invalid URL',
+        message: error instanceof Error ? error.message : 'Failed to parse URL',
+        received: targetUrl,
+      }),
+    )
     return
   }
 
@@ -101,8 +107,14 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
   proxyReq.on('error', (error) => {
     console.error(`[Proxy] Error forwarding request to ${targetUrl}:`, error)
     if (!res.headersSent) {
-      res.writeHead(500)
-      res.end(`Proxy error: ${error.message}`)
+      res.writeHead(500, { 'Content-Type': 'application/json' })
+      res.end(
+        JSON.stringify({
+          error: 'Proxy forwarding error',
+          message: error.message,
+          target: targetUrl,
+        }),
+      )
     }
   })
 
@@ -110,8 +122,14 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
   proxyReq.setTimeout(30000, () => {
     console.error(`[Proxy] Timeout forwarding request to ${targetUrl}`)
     if (!res.headersSent) {
-      res.writeHead(504)
-      res.end('Gateway Timeout')
+      res.writeHead(504, { 'Content-Type': 'application/json' })
+      res.end(
+        JSON.stringify({
+          error: 'Gateway Timeout',
+          message: 'Request to target server timed out',
+          target: targetUrl,
+        }),
+      )
     }
     proxyReq.destroy()
   })
@@ -170,10 +188,38 @@ export const createHttpProxyServer = async (
   const server = createServer()
 
   server.on('request', (req: IncomingMessage, res: ServerResponse) => {
+    const targetUrl = req.url || ''
+
+    // Handle health check endpoint
+    if (targetUrl === '/' || targetUrl === '/health' || targetUrl === '/status') {
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      res.end(
+        JSON.stringify({
+          status: 'running',
+          port: server.address() && typeof server.address() === 'object' ? server.address()?.port : 'unknown',
+          timestamp: Date.now(),
+        }),
+      )
+      return
+    }
+
     // For HTTP requests, extract target URL from request line
     // In HTTP proxy protocol, the request line contains the full URL
-    const targetUrl = req.url || ''
     console.log(`[Proxy] Received ${req.method} request: ${targetUrl}`)
+
+    // If it's not a proxy request (doesn't start with http:// or https://), return error JSON
+    if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+      res.writeHead(400, { 'Content-Type': 'application/json' })
+      res.end(
+        JSON.stringify({
+          error: 'Invalid proxy request',
+          message: 'This is an HTTP proxy server. Requests must use proxy protocol with full URLs.',
+          received: targetUrl,
+        }),
+      )
+      return
+    }
+
     forwardRequest(req, res, targetUrl)
   })
 
