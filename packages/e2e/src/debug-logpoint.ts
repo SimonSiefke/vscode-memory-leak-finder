@@ -18,20 +18,21 @@ setInterval(()=>{
   await Explorer.shouldHaveItem('index.js')
   await RunAndDebug.removeAllBreakpoints()
   await Editor.open('index.js')
-  await Editor.setLogpoint(4, 'x = {x}')
 }
 
-export const run = async ({ ActivityBar, RunAndDebug }: TestContext): Promise<void> => {
+export const run = async ({ Editor, ActivityBar, RunAndDebug }: TestContext): Promise<void> => {
+  await Editor.setLogpoint(4, 'x = {x}')
+
   await ActivityBar.showRunAndDebug()
   // @ts-ignore
   await RunAndDebug.runAndWaitForDebugConsoleOutput({
     output: `x = 1`,
   })
   await RunAndDebug.stop()
+  await RunAndDebug.removeAllBreakpoints()
 }
 
 export const teardown = async ({ RunAndDebug, Editor }: TestContext): Promise<void> => {
   await RunAndDebug.stop()
-  await RunAndDebug.removeAllBreakpoints()
   await Editor.closeAll()
 }
