@@ -137,6 +137,10 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const repl = page.locator('.repl')
         await expect(repl).toBeVisible()
+        await page.waitForIdle()
+        const row = page.locator('.monaco-list-row[aria-label="x = 1"]')
+        await expect(row).toBeVisible()
+
         // TODO verify that output line is vsible
         await new Promise((r) => {})
       } catch (error) {
