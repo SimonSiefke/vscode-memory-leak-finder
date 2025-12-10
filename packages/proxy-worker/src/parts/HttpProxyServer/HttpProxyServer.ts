@@ -14,14 +14,12 @@ import * as SaveRequest from '../SaveRequest/SaveRequest.ts'
 import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
 import { getCertificateForDomain } from '../GetCertificateForDomain/GetCertificateForDomain.ts'
 import * as GetOrCreateCA from '../GetOrCreateCA/GetOrCreateCA.ts'
+import * as HandleConnect from '../HandleConnect/HandleConnect.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
-const sanitizeFilename = (url: string): string => {
-  return url.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 200)
-}
 
-const decompressBody = async (body: Buffer, encoding: string | string[] | undefined): Promise<{ body: string; wasCompressed: boolean }> => {
+export const decompressBody = async (body: Buffer, encoding: string | string[] | undefined): Promise<{ body: string; wasCompressed: boolean }> => {
   if (!encoding) {
     return { body: body.toString('utf8'), wasCompressed: false }
   }
@@ -87,7 +85,7 @@ const decompressBody = async (body: Buffer, encoding: string | string[] | undefi
   return { body: body.toString('utf8'), wasCompressed: false }
 }
 
-const parseJsonIfApplicable = (body: string, contentType: string | string[] | undefined): string | object => {
+export const parseJsonIfApplicable = (body: string, contentType: string | string[] | undefined): string | object => {
   if (!contentType) {
     return body
   }

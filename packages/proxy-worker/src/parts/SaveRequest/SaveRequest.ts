@@ -18,48 +18,48 @@ const decompressBody = async (body: Buffer, encoding: string | string[] | undefi
   const normalizedEncoding = encodingStr.toLowerCase().trim()
 
   if (normalizedEncoding === 'gzip') {
-    return new Promise((resolve, reject) => {
-      const gunzip = createGunzip()
-      const chunks: Buffer[] = []
-      gunzip.on('data', (chunk: Buffer) => chunks.push(chunk))
-      gunzip.on('end', () => {
-        const decompressed = Buffer.concat(chunks).toString('utf8')
-        resolve({ body: decompressed, wasCompressed: true })
-      })
-      gunzip.on('error', reject)
-      gunzip.write(body)
-      gunzip.end()
+    const { promise, resolve, reject } = Promise.withResolvers<{ body: string; wasCompressed: boolean }>()
+    const gunzip = createGunzip()
+    const chunks: Buffer[] = []
+    gunzip.on('data', (chunk: Buffer) => chunks.push(chunk))
+    gunzip.on('end', () => {
+      const decompressed = Buffer.concat(chunks).toString('utf8')
+      resolve({ body: decompressed, wasCompressed: true })
     })
+    gunzip.on('error', reject)
+    gunzip.write(body)
+    gunzip.end()
+    return promise
   }
 
   if (normalizedEncoding === 'deflate') {
-    return new Promise((resolve, reject) => {
-      const inflate = createInflate()
-      const chunks: Buffer[] = []
-      inflate.on('data', (chunk: Buffer) => chunks.push(chunk))
-      inflate.on('end', () => {
-        const decompressed = Buffer.concat(chunks).toString('utf8')
-        resolve({ body: decompressed, wasCompressed: true })
-      })
-      inflate.on('error', reject)
-      inflate.write(body)
-      inflate.end()
+    const { promise, resolve, reject } = Promise.withResolvers<{ body: string; wasCompressed: boolean }>()
+    const inflate = createInflate()
+    const chunks: Buffer[] = []
+    inflate.on('data', (chunk: Buffer) => chunks.push(chunk))
+    inflate.on('end', () => {
+      const decompressed = Buffer.concat(chunks).toString('utf8')
+      resolve({ body: decompressed, wasCompressed: true })
     })
+    inflate.on('error', reject)
+    inflate.write(body)
+    inflate.end()
+    return promise
   }
 
   if (normalizedEncoding === 'br') {
-    return new Promise((resolve, reject) => {
-      const brotli = createBrotliDecompress()
-      const chunks: Buffer[] = []
-      brotli.on('data', (chunk: Buffer) => chunks.push(chunk))
-      brotli.on('end', () => {
-        const decompressed = Buffer.concat(chunks).toString('utf8')
-        resolve({ body: decompressed, wasCompressed: true })
-      })
-      brotli.on('error', reject)
-      brotli.write(body)
-      brotli.end()
+    const { promise, resolve, reject } = Promise.withResolvers<{ body: string; wasCompressed: boolean }>()
+    const brotli = createBrotliDecompress()
+    const chunks: Buffer[] = []
+    brotli.on('data', (chunk: Buffer) => chunks.push(chunk))
+    brotli.on('end', () => {
+      const decompressed = Buffer.concat(chunks).toString('utf8')
+      resolve({ body: decompressed, wasCompressed: true })
     })
+    brotli.on('error', reject)
+    brotli.write(body)
+    brotli.end()
+    return promise
   }
 
   if (normalizedEncoding === 'zstd') {
