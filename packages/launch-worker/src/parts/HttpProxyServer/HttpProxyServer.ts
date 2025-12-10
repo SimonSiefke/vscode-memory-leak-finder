@@ -445,13 +445,14 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer, us
 
         const targetReq = httpsRequest(targetOptions, (targetRes) => {
           const responseChunks: Buffer[] = []
+          let saved = false
 
-          // Buffer the entire response first to handle chunked encoding properly
-          targetRes.on('data', (chunk: Buffer) => {
-            responseChunks.push(chunk)
-          })
+          const saveAndWriteResponse = async (): Promise<void> => {
+            if (saved) {
+              return
+            }
+            saved = true
 
-          targetRes.on('end', async () => {
             // Save the intercepted request/response
             const responseData = Buffer.concat(responseChunks)
             // Convert headers to Record<string, string | string[]> format
@@ -482,6 +483,23 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer, us
               .join('')
             tlsSocket.write(statusLine + headerLines + '\r\n')
             tlsSocket.write(responseData)
+          }
+
+          // Buffer the entire response first to handle chunked encoding properly
+          targetRes.on('data', (chunk: Buffer) => {
+            responseChunks.push(chunk)
+          })
+
+          targetRes.on('end', async () => {
+            await saveAndWriteResponse()
+          })
+
+          // Also handle 'close' event in case connection closes without 'end'
+          // This is important for SSE streams that may never fire 'end'
+          targetRes.on('close', async () => {
+            if (!saved) {
+              await saveAndWriteResponse()
+            }
           })
 
           targetRes.on('error', (error) => {
