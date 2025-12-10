@@ -39,6 +39,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     inspectExtensionsPort,
     enableProxy,
   } = options
+  console.log({ enableProxy })
   const clear = await AnsiEscapes.clear(isWindows)
   await Stdout.write(clear)
   const rpc = await RunTest.prepare()

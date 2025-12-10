@@ -66,8 +66,12 @@ export const launchVsCode = async ({
     await copyFile(defaultSettingsSourcePath, settingsPath)
 
     // Start proxy server if enabled
+    // Note: enableProxy might be undefined if RPC call doesn't pass it correctly
+    // Default to false if undefined
+    const shouldEnableProxy = enableProxy === true
+    console.log(`[LaunchVsCode] shouldEnableProxy: ${shouldEnableProxy} (enableProxy was: ${enableProxy})`)
     let proxyServer: { port: number; url: string; dispose: () => Promise<void> } | null = null
-    if (enableProxy) {
+    if (shouldEnableProxy) {
       try {
         console.log('[LaunchVsCode] Starting proxy server...')
         proxyServer = await HttpProxyServer.createHttpProxyServer(0)
