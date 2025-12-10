@@ -197,6 +197,7 @@ export const runTestsWithCallback = async ({
           inspectSharedProcessPort,
           inspectExtensionsPort,
           enableProxy,
+          useProxyMock,
         )
         workers = {
           testWorkerRpc: testWorkerRpc || emptyRpc,
