@@ -4,13 +4,14 @@ import { existsSync } from 'fs'
 import { ServerResponse } from 'http'
 import * as Root from '../Root/Root.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
+import * as LoadZipData from '../LoadZipData/LoadZipData.ts'
 
 const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
 
 export interface MockResponse {
   statusCode: number
   headers: Record<string, string | string[]>
-  body: any
+  body: any | Buffer
 }
 
 const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> => {
@@ -31,10 +32,19 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
       }
     }
 
+    // Handle file references (for zip files)
+    let body = response.body
+    if (typeof body === 'string' && body.startsWith('file-reference:')) {
+      const zipData = await LoadZipData.loadZipData(body)
+      if (zipData) {
+        body = zipData
+      }
+    }
+
     return {
       statusCode: response.statusCode,
       headers: response.headers,
-      body: response.body,
+      body,
     }
   } catch (error) {
     console.error(`[Proxy] Error loading mock file ${mockFile}:`, error)
@@ -90,15 +100,16 @@ export const getMockResponse = async (method: string, url: string): Promise<Mock
 }
 
 export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse, httpVersion: string = 'HTTP/1.1'): void => {
-  let bodyStr: string
+  let bodyBuffer: Buffer
   if (mockResponse.body === null || mockResponse.body === undefined) {
-    bodyStr = ''
+    bodyBuffer = Buffer.alloc(0)
+  } else if (Buffer.isBuffer(mockResponse.body)) {
+    bodyBuffer = mockResponse.body
   } else if (typeof mockResponse.body === 'string') {
-    bodyStr = mockResponse.body
+    bodyBuffer = Buffer.from(mockResponse.body, 'utf8')
   } else {
-    bodyStr = JSON.stringify(mockResponse.body)
+    bodyBuffer = Buffer.from(JSON.stringify(mockResponse.body), 'utf8')
   }
-  const bodyBuffer = Buffer.from(bodyStr, 'utf8')
 
   // Convert headers to the format expected by writeHead and check for existing CORS headers
   const headers: Record<string, string> = {}

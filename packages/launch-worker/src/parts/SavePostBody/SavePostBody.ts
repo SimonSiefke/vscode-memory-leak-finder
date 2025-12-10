@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from 'fs/promises'
 import { join } from 'path'
 import * as Root from '../Root/Root.ts'
+import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
@@ -25,8 +26,14 @@ export const savePostBody = async (method: string, url: string, headers: Record<
     let parsedBody: any = body.toString('utf8')
     let bodyFormat = 'text'
 
+    // Handle zip files separately
+    if (contentTypeLower.includes('application/zip')) {
+      const zipFilePath = await SaveZipData.saveZipData(body, url, timestamp)
+      parsedBody = `file-reference:${zipFilePath}`
+      bodyFormat = 'zip'
+    }
     // Try to parse JSON
-    if (contentTypeLower.includes('application/json')) {
+    else if (contentTypeLower.includes('application/json')) {
       try {
         parsedBody = JSON.parse(parsedBody)
         bodyFormat = 'json'
@@ -62,7 +69,7 @@ export const savePostBody = async (method: string, url: string, headers: Record<
       bodyFormat,
       headers,
       body: parsedBody,
-      rawBody: body.toString('utf8'),
+      rawBody: bodyFormat === 'zip' ? undefined : body.toString('utf8'),
     }
 
     await writeFile(filepath, JSON.stringify(postData, null, 2), 'utf8')
@@ -71,3 +78,4 @@ export const savePostBody = async (method: string, url: string, headers: Record<
     console.error('[Proxy] Failed to save POST body:', error)
   }
 }
+

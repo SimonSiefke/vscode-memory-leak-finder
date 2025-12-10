@@ -12,6 +12,7 @@ import * as CertificateManager from '../CertificateManager/CertificateManager.ts
 import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
 import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
 import * as SaveRequest from '../SaveRequest/SaveRequest.ts'
+import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
@@ -148,7 +149,10 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
   }
 
   // Handle OPTIONS preflight requests for VS Code APIs that need CORS support
-  const isMarketplaceApi = parsedUrl.hostname === 'marketplace.visualstudio.com' || parsedUrl.hostname === 'www.vscode-unpkg.net'
+  const isMarketplaceApi =
+    parsedUrl.hostname === 'marketplace.visualstudio.com' ||
+    parsedUrl.hostname === 'www.vscode-unpkg.net' ||
+    parsedUrl.hostname === 'github.gallerycdn.vsassets.io'
   if (req.method === 'OPTIONS' && isMarketplaceApi) {
     const requestedHeaders = req.headers['access-control-request-headers']
     const requestedMethod = req.headers['access-control-request-method'] || 'GET'
@@ -456,7 +460,10 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer, us
         console.log(`[Proxy] Intercepted HTTPS ${method} ${fullUrl}`)
 
         // Handle OPTIONS preflight requests for VS Code APIs that need CORS support
-        const isMarketplaceApi = hostname === 'marketplace.visualstudio.com' || hostname === 'www.vscode-unpkg.net'
+        const isMarketplaceApi =
+          hostname === 'marketplace.visualstudio.com' ||
+          hostname === 'www.vscode-unpkg.net' ||
+          hostname === 'github.gallerycdn.vsassets.io'
         if (method === 'OPTIONS' && isMarketplaceApi) {
           const requestedHeaders = headers['access-control-request-headers']
           const requestedMethod = headers['access-control-request-method'] || 'GET'
@@ -475,15 +482,16 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer, us
           const mockResponse = await GetMockResponse.getMockResponse(method, fullUrl)
           if (mockResponse) {
             console.log(`[Proxy] Returning mock response for ${method} ${fullUrl}`)
-            let bodyStr: string
+            let bodyBuffer: Buffer
             if (mockResponse.body === null || mockResponse.body === undefined) {
-              bodyStr = ''
+              bodyBuffer = Buffer.alloc(0)
+            } else if (Buffer.isBuffer(mockResponse.body)) {
+              bodyBuffer = mockResponse.body
             } else if (typeof mockResponse.body === 'string') {
-              bodyStr = mockResponse.body
+              bodyBuffer = Buffer.from(mockResponse.body, 'utf8')
             } else {
-              bodyStr = JSON.stringify(mockResponse.body)
+              bodyBuffer = Buffer.from(JSON.stringify(mockResponse.body), 'utf8')
             }
-            const bodyBuffer = Buffer.from(bodyStr, 'utf8')
 
             // Convert headers to the format expected and check for existing CORS headers
             const cleanedHeaders: Record<string, string> = {}
@@ -567,11 +575,16 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer, us
             // Write response back through TLS
             // Remove transfer-encoding header and set content-length instead
             const cleanedHeaders: Record<string, string> = {}
+            const lowerCaseHeaders: Set<string> = new Set()
             Object.entries(targetRes.headers).forEach(([k, v]) => {
               const lowerKey = k.toLowerCase()
               // Skip transfer-encoding and connection headers
               if (lowerKey !== 'transfer-encoding' && lowerKey !== 'connection') {
-                cleanedHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
+                // Avoid duplicate headers by checking case-insensitively
+                if (!lowerCaseHeaders.has(lowerKey)) {
+                  cleanedHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
+                  lowerCaseHeaders.add(lowerKey)
+                }
               }
             })
 
@@ -732,9 +745,19 @@ const saveInterceptedRequest = async (
 
     const contentEncoding = responseHeaders['content-encoding'] || responseHeaders['Content-Encoding']
     const contentType = responseHeaders['content-type'] || responseHeaders['Content-Type']
-    const { body: decompressedBody, wasCompressed } = await decompressBody(responseBody, contentEncoding)
+    const contentTypeLower = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
 
-    const parsedBody = parseJsonIfApplicable(decompressedBody, contentType)
+    // Handle zip files separately - don't decompress them
+    let parsedBody: any
+    let wasCompressed = false
+    if (contentTypeLower.includes('application/zip')) {
+      const zipFilePath = await SaveZipData.saveZipData(responseBody, url, timestamp)
+      parsedBody = `file-reference:${zipFilePath}`
+    } else {
+      const { body: decompressedBody, wasCompressed: wasCompressedResult } = await decompressBody(responseBody, contentEncoding)
+      wasCompressed = wasCompressedResult
+      parsedBody = parseJsonIfApplicable(decompressedBody, contentType)
+    }
 
     const requestData = {
       timestamp,

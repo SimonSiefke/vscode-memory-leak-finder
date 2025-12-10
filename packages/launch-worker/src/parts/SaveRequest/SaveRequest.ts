@@ -4,6 +4,7 @@ import { mkdir, writeFile } from 'fs/promises'
 import { join } from 'path'
 import { decompress as zstdDecompress } from '@mongodb-js/zstd'
 import * as Root from '../Root/Root.ts'
+import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
@@ -114,9 +115,19 @@ export const saveRequest = async (
 
     const contentEncoding = responseHeaders['content-encoding'] || responseHeaders['Content-Encoding']
     const contentType = responseHeaders['content-type'] || responseHeaders['Content-Type']
-    const { body: decompressedBody, wasCompressed } = await decompressBody(responseData, contentEncoding)
+    const contentTypeLower = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
 
-    const parsedBody = parseJsonIfApplicable(decompressedBody, contentType)
+    // Handle zip files separately - don't decompress them
+    let parsedBody: any
+    let wasCompressed = false
+    if (contentTypeLower.includes('application/zip')) {
+      const zipFilePath = await SaveZipData.saveZipData(responseData, url, timestamp)
+      parsedBody = `file-reference:${zipFilePath}`
+    } else {
+      const { body: decompressedBody, wasCompressed: wasCompressedResult } = await decompressBody(responseData, contentEncoding)
+      wasCompressed = wasCompressedResult
+      parsedBody = parseJsonIfApplicable(decompressedBody, contentType)
+    }
 
     const requestData = {
       timestamp,
