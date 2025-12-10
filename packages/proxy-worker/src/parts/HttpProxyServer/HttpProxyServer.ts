@@ -1,14 +1,15 @@
-import { existsSync } from 'fs'
-import { mkdir, readFile, writeFile } from 'fs/promises'
-import { createServer, request as httpRequest, IncomingMessage, ServerResponse } from 'http'
+import { createServer, IncomingMessage, ServerResponse } from 'http'
+import { request as httpRequest } from 'http'
 import { request as httpsRequest } from 'https'
-import { dirname, join } from 'path'
-import { fileURLToPath, URL } from 'url'
-import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
-import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
-import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
+import { URL, fileURLToPath } from 'url'
+import { mkdir, writeFile, readFile } from 'fs/promises'
+import { join, dirname } from 'path'
+import { existsSync } from 'fs'
 import * as Root from '../Root/Root.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
+import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
+import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
+import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
@@ -422,7 +423,11 @@ export const createHttpProxyServer = async (
 
     // When useProxyMock is enabled, block CONNECT requests (no external network access)
     if (useProxyMock) {
-      console.error(`[Proxy] CONNECT request blocked (useProxyMock enabled): ${target}`)
+      const parts = target.split(':')
+      const hostname = parts[0]
+      const targetPort = parts[1] ? parseInt(parts[1], 10) : 443
+      const url = targetPort === 443 ? `https://${hostname}` : `https://${hostname}:${targetPort}`
+      console.error(`[Proxy] CONNECT request blocked (useProxyMock enabled): ${url}`)
       socket.write('HTTP/1.1 403 Forbidden\r\n\r\n')
       socket.end()
       return
