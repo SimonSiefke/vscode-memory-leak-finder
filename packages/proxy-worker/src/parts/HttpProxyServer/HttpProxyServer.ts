@@ -51,12 +51,18 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
   try {
     // In HTTP proxy protocol, the request line contains the full URL
     // e.g., "GET http://example.com/path HTTP/1.1"
-    if (targetUrl.startsWith('http://') || targetUrl.startsWith('https://')) {
-      parsedUrl = new URL(targetUrl)
+    // Normalize http://hostname:443 to https://hostname (some proxy agents send this incorrectly)
+    let normalizedUrl = targetUrl
+    if (targetUrl.startsWith('http://') && targetUrl.includes(':443')) {
+      normalizedUrl = targetUrl.replace('http://', 'https://').replace(':443', '')
+    }
+
+    if (normalizedUrl.startsWith('http://') || normalizedUrl.startsWith('https://')) {
+      parsedUrl = new URL(normalizedUrl)
     } else {
       // Fallback: construct from host header (shouldn't happen in proxy mode)
       const host = req.headers.host || ''
-      parsedUrl = new URL(`http://${host}${targetUrl}`)
+      parsedUrl = new URL(`http://${host}${normalizedUrl}`)
     }
     // Reduce logging for Azure metadata endpoint (expected to fail when not on Azure)
     const isAzureMetadata = parsedUrl.hostname === '169.254.169.254'

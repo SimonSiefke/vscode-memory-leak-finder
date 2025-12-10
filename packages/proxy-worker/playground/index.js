@@ -6,7 +6,7 @@ import * as HttpProxyServer from '../src/parts/HttpProxyServer/HttpProxyServer.t
 console.log('Starting proxy server...')
 const proxyServer = await HttpProxyServer.createHttpProxyServer({
   port: 0, // Let system assign a free port
-  useProxyMock: false,
+  useProxyMock: true,
 })
 console.log(`Proxy server running on ${proxyServer.url}`)
 
@@ -15,7 +15,8 @@ const targetUrl = 'https://marketplace.visualstudio.com/_apis/public/gallery/ext
 
 const agent = new HttpProxyAgent(proxyUrl)
 
-const body = '{"filters":[{"criteria":[{"filterType":10,"value":"copilot2"},{"filterType":8,"value":"Microsoft.VisualStudio.Code"},{"filterType":12,"value":"4096"}],"pageNumber":1,"pageSize":50,"sortBy":0,"sortOrder":0}],"assetTypes":[],"flags":950}'
+const body =
+  '{"filters":[{"criteria":[{"filterType":10,"value":"copilot2"},{"filterType":8,"value":"Microsoft.VisualStudio.Code"},{"filterType":12,"value":"4096"}],"pageNumber":1,"pageSize":50,"sortBy":0,"sortOrder":0}],"assetTypes":[],"flags":950}'
 
 console.log('Making request through proxy...')
 const response = await fetch(targetUrl, {
