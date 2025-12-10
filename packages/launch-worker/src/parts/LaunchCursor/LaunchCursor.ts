@@ -52,7 +52,6 @@ export const launchCursor = async ({
     await mkdir(dirname(settingsPath), { recursive: true })
     await copyFile(defaultSettingsSourcePath, settingsPath)
 
-<<<<<<< HEAD
     // Start proxy server if enabled
     let proxyEnvVars: Record<string, string> = {}
     let proxyServer: { port: number; url: string } | null = null
@@ -81,8 +80,6 @@ export const launchCursor = async ({
         // Continue even if proxy setup fails
       }
     }
-=======
->>>>>>> origin/main
     const args = GetVsCodeArgs.getVscodeArgs({
       userDataDir,
       extensionsDir,
@@ -99,10 +96,7 @@ export const launchCursor = async ({
     const env = GetVsCodeEnv.getVsCodeEnv({
       runtimeDir,
       processEnv: process.env,
-<<<<<<< HEAD
       proxyEnvVars,
-=======
->>>>>>> origin/main
     })
     const { child } = await LaunchElectron.launchElectron({
       cliPath: binaryPath,
