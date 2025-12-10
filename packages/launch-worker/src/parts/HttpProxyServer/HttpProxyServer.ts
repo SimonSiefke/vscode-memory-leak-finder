@@ -2,6 +2,7 @@ import { createServer, IncomingMessage, ServerResponse } from 'http'
 import { request as httpRequest } from 'http'
 import { request as httpsRequest } from 'https'
 import { createSecureContext } from 'tls'
+import { createGunzip, createInflate } from 'zlib'
 import { URL } from 'url'
 import { mkdir, writeFile } from 'fs/promises'
 import { join } from 'path'
@@ -14,6 +15,50 @@ const sanitizeFilename = (url: string): string => {
   return url.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 200)
 }
 
+const decompressBody = async (
+  body: Buffer,
+  encoding: string | string[] | undefined,
+): Promise<{ body: string; wasCompressed: boolean }> => {
+  if (!encoding) {
+    return { body: body.toString('utf8'), wasCompressed: false }
+  }
+
+  const encodingStr = Array.isArray(encoding) ? encoding[0] : encoding
+  const normalizedEncoding = encodingStr.toLowerCase().trim()
+
+  if (normalizedEncoding === 'gzip') {
+    return new Promise((resolve, reject) => {
+      const gunzip = createGunzip()
+      const chunks: Buffer[] = []
+      gunzip.on('data', (chunk: Buffer) => chunks.push(chunk))
+      gunzip.on('end', () => {
+        const decompressed = Buffer.concat(chunks).toString('utf8')
+        resolve({ body: decompressed, wasCompressed: true })
+      })
+      gunzip.on('error', reject)
+      gunzip.write(body)
+      gunzip.end()
+    })
+  }
+
+  if (normalizedEncoding === 'deflate') {
+    return new Promise((resolve, reject) => {
+      const inflate = createInflate()
+      const chunks: Buffer[] = []
+      inflate.on('data', (chunk: Buffer) => chunks.push(chunk))
+      inflate.on('end', () => {
+        const decompressed = Buffer.concat(chunks).toString('utf8')
+        resolve({ body: decompressed, wasCompressed: true })
+      })
+      inflate.on('error', reject)
+      inflate.write(body)
+      inflate.end()
+    })
+  }
+
+  return { body: body.toString('utf8'), wasCompressed: false }
+}
+
 const saveRequest = async (req: IncomingMessage, response: ServerResponse, responseData: Buffer): Promise<void> => {
   try {
     await mkdir(REQUESTS_DIR, { recursive: true })
@@ -21,6 +66,12 @@ const saveRequest = async (req: IncomingMessage, response: ServerResponse, respo
     const url = req.url || ''
     const filename = `${timestamp}_${sanitizeFilename(url)}.json`
     const filepath = join(REQUESTS_DIR, filename)
+
+    const responseHeaders = response.getHeaders()
+    const { body: decompressedBody, wasCompressed } = await decompressBody(
+      responseData,
+      responseHeaders['content-encoding'],
+    )
 
     const requestData = {
       timestamp,
@@ -30,8 +81,9 @@ const saveRequest = async (req: IncomingMessage, response: ServerResponse, respo
       response: {
         statusCode: response.statusCode,
         statusMessage: response.statusMessage,
-        headers: response.getHeaders(),
-        body: responseData.toString('utf8'),
+        headers: responseHeaders,
+        body: decompressedBody,
+        wasCompressed,
       },
     }
 
@@ -424,6 +476,9 @@ const saveInterceptedRequest = async (
     const filename = `${timestamp}_${sanitizeFilename(url)}.json`
     const filepath = join(REQUESTS_DIR, filename)
 
+    const contentEncoding = responseHeaders['content-encoding'] || responseHeaders['Content-Encoding']
+    const { body: decompressedBody, wasCompressed } = await decompressBody(responseBody, contentEncoding)
+
     const requestData = {
       timestamp,
       method,
@@ -432,7 +487,8 @@ const saveInterceptedRequest = async (
       response: {
         statusCode,
         headers: responseHeaders,
-        body: responseBody.toString('utf8'),
+        body: decompressedBody,
+        wasCompressed,
       },
     }
 
