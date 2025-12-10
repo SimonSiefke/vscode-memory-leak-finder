@@ -2,17 +2,15 @@ import { readFile } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
 import { ServerResponse } from 'http'
+import { URL } from 'url'
 import * as Root from '../Root/Root.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import * as LoadZipData from '../LoadZipData/LoadZipData.ts'
+import type { MockResponse } from '../MockResponse/MockResponse.ts'
+
+export type { MockResponse }
 
 const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
-
-export interface MockResponse {
-  statusCode: number
-  headers: Record<string, string | string[]>
-  body: any | Buffer
-}
 
 const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> => {
   try {
@@ -87,7 +85,6 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
 
 export const getMockResponse = async (method: string, url: string): Promise<MockResponse | null> => {
   try {
-    const { URL } = await import('url')
     const parsedUrl = new URL(url)
     const hostname = parsedUrl.hostname
     const pathname = parsedUrl.pathname
@@ -159,7 +156,7 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   const headers: Record<string, string> = {}
   const lowerCaseHeaders: Set<string> = new Set()
 
-  Object.entries(mockResponse.headers).forEach(([key, value]) => {
+  for (const [key, value] of Object.entries(mockResponse.headers)) {
     const lowerKey = key.toLowerCase()
     // Skip Content-Length headers (case-insensitive) - we'll set it below
     // Skip Content-Encoding and Transfer-Encoding headers for zip files - binary data is not encoded
@@ -167,21 +164,21 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
       headers[key] = Array.isArray(value) ? value.join(', ') : String(value)
       lowerCaseHeaders.add(lowerKey)
     }
-  })
+  }
 
   // Double-check: explicitly remove Content-Encoding and Transfer-Encoding for zip files
   if (isZipFile) {
     const keysToRemove: string[] = []
-    Object.keys(headers).forEach((k) => {
+    for (const k of Object.keys(headers)) {
       const lowerKey = k.toLowerCase()
       if (lowerKey === 'content-encoding' || lowerKey === 'transfer-encoding') {
         keysToRemove.push(k)
       }
-    })
-    keysToRemove.forEach((k) => {
+    }
+    for (const k of keysToRemove) {
       delete headers[k]
       lowerCaseHeaders.delete(k.toLowerCase())
-    })
+    }
     console.log(`[Proxy] sendMockResponse - Final headers for zip file (after cleanup):`, Object.keys(headers))
   }
 
@@ -205,4 +202,3 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   res.writeHead(mockResponse.statusCode, headers)
   res.end(bodyBuffer)
 }
-

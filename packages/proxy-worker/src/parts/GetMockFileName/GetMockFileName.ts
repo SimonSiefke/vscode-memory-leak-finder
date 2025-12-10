@@ -6,6 +6,8 @@ import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const MOCK_CONFIG_PATH = join(__dirname, 'mock-config.json')
+const NON_ALPHANUMERIC_REGEX = /[^a-zA-Z0-9]/g
+const LEADING_UNDERSCORES_REGEX = /^_+/
 
 const matchesPattern = (value: string, pattern: string): boolean => {
   if (pattern === '*') {
@@ -59,8 +61,8 @@ export const getMockFileName = async (hostname: string, pathname: string, method
   }
 
   // Generic fallback: Convert URL to filename format: hostname_pathname_method.json
-  const hostnameSanitized = hostname.replace(/[^a-zA-Z0-9]/g, '_')
-  const pathnameSanitized = pathname.replace(/[^a-zA-Z0-9]/g, '_').replace(/^_+/, '')
+  const hostnameSanitized = hostname.replace(NON_ALPHANUMERIC_REGEX, '_')
+  const pathnameSanitized = pathname.replace(NON_ALPHANUMERIC_REGEX, '_').replace(LEADING_UNDERSCORES_REGEX, '')
   const methodLower = method.toLowerCase()
   const pathPart = pathnameSanitized || 'root'
   return `${hostnameSanitized}_${pathPart}_${methodLower}.json`

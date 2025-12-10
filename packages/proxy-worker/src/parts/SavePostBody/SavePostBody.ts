@@ -2,12 +2,9 @@ import { mkdir, writeFile } from 'fs/promises'
 import { join } from 'path'
 import * as Root from '../Root/Root.ts'
 import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
+import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
-
-const sanitizeFilename = (url: string): string => {
-  return url.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 200)
-}
 
 export const savePostBody = async (method: string, url: string, headers: Record<string, string>, body: Buffer): Promise<void> => {
   if (method !== 'POST' && method !== 'PUT' && method !== 'PATCH') {
@@ -17,7 +14,7 @@ export const savePostBody = async (method: string, url: string, headers: Record<
   try {
     await mkdir(REQUESTS_DIR, { recursive: true })
     const timestamp = Date.now()
-    const filename = `${timestamp}_POST_${sanitizeFilename(url)}.json`
+    const filename = `${timestamp}_POST_${SanitizeFilename.sanitizeFilename(url)}.json`
     const filepath = join(REQUESTS_DIR, filename)
 
     const contentType = headers['content-type'] || headers['Content-Type'] || ''
@@ -78,4 +75,3 @@ export const savePostBody = async (method: string, url: string, headers: Record<
     console.error('[Proxy] Failed to save POST body:', error)
   }
 }
-
