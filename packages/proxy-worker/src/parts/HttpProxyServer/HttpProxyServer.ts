@@ -1,24 +1,15 @@
-import { createServer, IncomingMessage, ServerResponse } from 'http'
-import { request as httpRequest } from 'http'
-import { request as httpsRequest } from 'https'
-<<<<<<< HEAD
-import { URL, fileURLToPath } from 'url'
-import { mkdir, writeFile, readFile } from 'fs/promises'
-import { join, dirname } from 'path'
 import { existsSync } from 'fs'
-import * as Root from '../Root/Root.ts'
-import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
-import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
-import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
+import { mkdir, readFile, writeFile } from 'fs/promises'
+import { createServer, request as httpRequest, IncomingMessage, ServerResponse } from 'http'
+import { request as httpsRequest } from 'https'
+import { dirname, join } from 'path'
+import { fileURLToPath, URL } from 'url'
 import * as FormatUrl from '../FormatUrl/FormatUrl.ts'
+import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
+import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
 import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
-=======
-import { URL } from 'url'
-import { mkdir, writeFile } from 'fs/promises'
-import { join } from 'path'
 import * as Root from '../Root/Root.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
->>>>>>> origin/main
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
@@ -289,7 +280,6 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
   // but HTTP requests will be captured
 }
 
-<<<<<<< HEAD
 const matchesPattern = (value: string, pattern: string): boolean => {
   if (pattern === '*') {
     return true
@@ -346,10 +336,6 @@ const checkMockExists = async (method: string, url: string): Promise<boolean> =>
 export const createHttpProxyServer = async (
   port: number = 0,
   useProxyMock: boolean | undefined = false,
-=======
-export const createHttpProxyServer = async (
-  port: number = 0,
->>>>>>> origin/main
 ): Promise<{
   port: number
   url: string
@@ -359,11 +345,7 @@ export const createHttpProxyServer = async (
 
   const server = createServer()
 
-<<<<<<< HEAD
   server.on('request', async (req: IncomingMessage, res: ServerResponse) => {
-=======
-  server.on('request', (req: IncomingMessage, res: ServerResponse) => {
->>>>>>> origin/main
     const targetUrl = req.url || ''
 
     // Handle health check endpoint
@@ -403,7 +385,6 @@ export const createHttpProxyServer = async (
       return
     }
 
-<<<<<<< HEAD
     // When useProxyMock is enabled, exclusively use mock data - no external network requests
     if (useProxyMock) {
       const method = req.method || 'GET'
@@ -455,14 +436,6 @@ export const createHttpProxyServer = async (
       return
     }
 
-=======
-    forwardRequest(req, res, targetUrl)
-  })
-
-  server.on('connect', (req: IncomingMessage, socket: any, head: Buffer) => {
-    // Handle CONNECT method for HTTPS tunneling
-    const target = req.url || ''
->>>>>>> origin/main
     console.log(`[Proxy] Received CONNECT request: ${target}`)
     handleConnect(req, socket, head).catch(() => {
       socket.end()
