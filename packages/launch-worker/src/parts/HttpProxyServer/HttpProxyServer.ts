@@ -626,14 +626,15 @@ const saveInterceptedRequest = async (
   }
 }
 
-export const createHttpProxyServer = async (
-  port: number = 0,
-  useProxyMock: boolean = false,
-): Promise<{
+export const createHttpProxyServer = async (options: {
+  port?: number
+  useProxyMock?: boolean
+} = {}): Promise<{
   port: number
   url: string
   dispose: () => Promise<void>
 }> => {
+  const { port = 0, useProxyMock = false } = options
   await mkdir(REQUESTS_DIR, { recursive: true })
   await mkdir(join(Root.root, '.vscode-mock-requests'), { recursive: true })
 

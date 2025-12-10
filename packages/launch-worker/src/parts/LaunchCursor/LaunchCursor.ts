@@ -55,7 +55,7 @@ export const launchCursor = async ({
     if (enableProxy) {
       try {
         console.log('[LaunchCursor] Starting proxy server...')
-        proxyServer = await HttpProxyServer.createHttpProxyServer(0, useProxyMock)
+        proxyServer = await HttpProxyServer.createHttpProxyServer({ port: 0, useProxyMock })
         console.log(`[LaunchCursor] Proxy server started on ${proxyServer.url} (port ${proxyServer.port})`)
 
         // Update settings
