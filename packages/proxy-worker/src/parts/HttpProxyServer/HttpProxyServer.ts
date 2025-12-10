@@ -1,18 +1,15 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http'
 import { request as httpRequest } from 'http'
 import { request as httpsRequest } from 'https'
-import { URL } from 'url'
-import { mkdir, writeFile } from 'fs/promises'
-import { join } from 'path'
+import { URL, fileURLToPath } from 'url'
+import { mkdir, writeFile, readFile } from 'fs/promises'
+import { join, dirname } from 'path'
+import { existsSync } from 'fs'
 import * as Root from '../Root/Root.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
-import { readFile } from 'fs/promises'
-import { existsSync } from 'fs'
-import { join, dirname } from 'path'
-import { fileURLToPath } from 'url'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
@@ -301,20 +298,20 @@ const checkMockExists = async (method: string, url: string): Promise<boolean> =>
     const hostname = parsedUrl.hostname
     const pathname = parsedUrl.pathname
     const methodLower = method.toLowerCase()
-    
+
     // Check mock config first
     const __dirname = dirname(fileURLToPath(import.meta.url))
     const MOCK_CONFIG_PATH = join(__dirname, '../GetMockFileName/mock-config.json')
-    
+
     if (existsSync(MOCK_CONFIG_PATH)) {
       const configContent = await readFile(MOCK_CONFIG_PATH, 'utf8')
       const config = JSON.parse(configContent) as MockConfigEntry[]
-      
+
       for (const entry of config) {
         const hostnameMatch = matchesPattern(hostname, entry.hostname) || hostname.includes(entry.hostname)
         const pathnameMatch = matchesPattern(pathname, entry.pathname)
         const methodMatch = matchesPattern(methodLower, entry.method.toLowerCase())
-        
+
         if (hostnameMatch && pathnameMatch && methodMatch) {
           // Check if the mock file actually exists
           const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
@@ -325,7 +322,7 @@ const checkMockExists = async (method: string, url: string): Promise<boolean> =>
         }
       }
     }
-    
+
     // Fallback: check if mock file exists using filename generation
     const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
     const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
@@ -388,31 +385,16 @@ export const createHttpProxyServer = async (
       return
     }
 
-    // When useProxyMock is enabled, only return mock responses
+    // When useProxyMock is enabled, exclusively use mock data - no external network requests
     if (useProxyMock) {
       const method = req.method || 'GET'
-      const mockResponse = await GetMockResponse.getMockResponse(method, targetUrl)
-      
-      // For OPTIONS requests, getMockResponse might return a default preflight response
-      // even if no mock exists. We need to check if an actual mock file exists.
-      if (mockResponse) {
-        // Check if this is a real mock or just a default OPTIONS response
-        if (method === 'OPTIONS') {
-          const parsedUrl = new URL(targetUrl)
-          const hostname = parsedUrl.hostname
-          const pathname = parsedUrl.pathname
-          const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, method)
-          const { existsSync } = await import('fs')
-          const { join } = await import('path')
-          const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
-          const mockFile = join(MOCK_REQUESTS_DIR, mockFileName)
-          
-          if (existsSync(mockFile)) {
-            GetMockResponse.sendMockResponse(res, mockResponse)
-            return
-          }
-          // If no OPTIONS mock file exists, fall through to error
-        } else {
+
+      // Check if an actual mock exists (not just default OPTIONS responses)
+      const mockExists = await checkMockExists(method, targetUrl)
+
+      if (mockExists) {
+        const mockResponse = await GetMockResponse.getMockResponse(method, targetUrl)
+        if (mockResponse) {
           GetMockResponse.sendMockResponse(res, mockResponse)
           return
         }
@@ -435,9 +417,18 @@ export const createHttpProxyServer = async (
     forwardRequest(req, res, targetUrl)
   })
 
-  server.on('connect', (req: IncomingMessage, socket: any, head: Buffer) => {
+  server.on('connect', async (req: IncomingMessage, socket: any, head: Buffer) => {
     // Handle CONNECT method for HTTPS tunneling
     const target = req.url || ''
+
+    // When useProxyMock is enabled, block CONNECT requests (no external network access)
+    if (useProxyMock) {
+      console.error(`[Proxy] CONNECT request blocked (useProxyMock enabled): ${target}`)
+      socket.write('HTTP/1.1 403 Forbidden\r\n\r\n')
+      socket.end()
+      return
+    }
+
     console.log(`[Proxy] Received CONNECT request: ${target}`)
     handleConnect(req, socket, head).catch(() => {
       socket.end()
