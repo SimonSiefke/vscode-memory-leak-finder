@@ -8,3 +8,4 @@ ConvertRequestsToMocks.convertRequestsToMocksMain()
     console.error('Failed to convert requests to mocks:', error)
     process.exit(1)
   })
+
