@@ -833,12 +833,16 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     },
     async setLogpoint(lineNumber, logMessage) {
       try {
+<<<<<<< HEAD
         await page.waitForIdle()
+=======
+>>>>>>> origin/main
         const editor = page.locator('.part.editor .editor-instance')
         const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber - 1})`)
         await expect(lineNumberElement).toBeVisible()
         const contextMenu = ContextMenu.create({ page, expect, VError })
         await contextMenu.open(lineNumberElement)
+<<<<<<< HEAD
         await page.waitForIdle()
         await contextMenu.select('Add Logpoint...')
         await page.waitForIdle()
@@ -851,6 +855,15 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await expect(logpointInput).toBeFocused()
         await logpointInput.type(logMessage)
         await page.waitForIdle()
+=======
+        await contextMenu.select('Add Logpoint...')
+        await page.waitForIdle()
+        const logpointInput = page.locator('.logpoint-input')
+        await expect(logpointInput).toBeVisible()
+        const input = logpointInput.locator('input')
+        await expect(input).toBeVisible()
+        await input.type(logMessage)
+>>>>>>> origin/main
         await page.keyboard.press('Enter')
         await page.waitForIdle()
       } catch (error) {
