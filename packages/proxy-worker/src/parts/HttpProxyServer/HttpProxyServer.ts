@@ -9,22 +9,10 @@ import * as Root from '../Root/Root.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
+import * as FormatUrl from '../FormatUrl/FormatUrl.ts'
 import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
-
-const formatUrl = (url: string): string => {
-  try {
-    const parsedUrl = new URL(url)
-    if (parsedUrl.protocol === 'https:' && parsedUrl.port === '443') {
-      return `${parsedUrl.protocol}//${parsedUrl.hostname}${parsedUrl.pathname}${parsedUrl.search}${parsedUrl.hash}`
-    }
-    return parsedUrl.toString()
-  } catch {
-    // If URL parsing fails, use original URL
-    return url
-  }
-}
 
 const saveRequest = async (req: IncomingMessage, response: ServerResponse, responseData: Buffer): Promise<void> => {
   try {
@@ -414,7 +402,7 @@ export const createHttpProxyServer = async (
       }
 
       // No mock found - log error and return error response
-      const formattedUrl = formatUrl(targetUrl)
+      const formattedUrl = FormatUrl.formatUrl(targetUrl)
       console.error(`[Proxy] No mock found for request: ${method} ${formattedUrl}`)
       res.writeHead(404, { 'Content-Type': 'application/json' })
       res.end(
@@ -442,7 +430,7 @@ export const createHttpProxyServer = async (
       const targetPort = parts[1] ? parseInt(parts[1], 10) : 443
       // CONNECT requests don't have pathnames, but format consistently
       const urlString = `https://${hostname}:${targetPort}`
-      const formattedUrl = formatUrl(urlString)
+      const formattedUrl = FormatUrl.formatUrl(urlString)
       console.error(`[Proxy] CONNECT request blocked (useProxyMock enabled): ${formattedUrl}`)
       socket.write('HTTP/1.1 403 Forbidden\r\n\r\n')
       socket.end()
