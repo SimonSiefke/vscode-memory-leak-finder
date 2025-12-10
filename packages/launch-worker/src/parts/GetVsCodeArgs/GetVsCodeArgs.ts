@@ -11,6 +11,7 @@ export const getVscodeArgs = ({
   inspectPtyHostPort,
   inspectSharedProcessPort,
   inspectExtensionsPort,
+  enableProxy,
 }) => {
   const args = [
     ...ChromiumSwitches.chromiumSwitches,
@@ -27,6 +28,11 @@ export const getVscodeArgs = ({
     '--user-data-dir',
     userDataDir,
   ]
+
+  // Ignore certificate errors when proxy is enabled (for MITM proxy)
+  if (enableProxy) {
+    args.push('--ignore-certificate-errors')
+  }
 
   if (!enableExtensions) {
     args.push('--disable-extensions')

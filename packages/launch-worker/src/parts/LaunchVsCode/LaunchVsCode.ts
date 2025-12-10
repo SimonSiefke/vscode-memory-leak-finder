@@ -112,6 +112,7 @@ export const launchVsCode = async ({
       inspectPtyHostPort,
       inspectSharedProcessPort,
       inspectExtensionsPort,
+      enableProxy: shouldEnableProxy,
     })
     const env = await GetVsCodeEnv.getVsCodeEnv({
       runtimeDir,
