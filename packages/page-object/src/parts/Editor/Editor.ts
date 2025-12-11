@@ -449,6 +449,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     },
     async press(key) {
       try {
+        await page.waitForIdle()
         await page.keyboard.press(key)
         await page.waitForIdle()
       } catch (error) {
