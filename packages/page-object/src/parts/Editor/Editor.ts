@@ -447,6 +447,14 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to type ${text}`)
       }
     },
+    async press(key) {
+      try {
+        await page.keyboard.press(key)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to press key ${key}`)
+      }
+    },
     async shouldHaveText(text) {
       try {
         const editor = page.locator('.editor-instance')
