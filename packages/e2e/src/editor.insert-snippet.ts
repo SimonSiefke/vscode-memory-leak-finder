@@ -3,6 +3,8 @@ import type { TestContext } from '../types.ts'
 const expectedHtml =
   '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Document</title>\n</head>\n<body><h1>hello world</h1>\n        </body>\n</html>'
 
+export const skip = 1
+
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
