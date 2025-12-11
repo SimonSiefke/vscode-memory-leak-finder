@@ -20,19 +20,45 @@ const mergeArtifacts = async (): Promise<void> => {
   const entries = await readdir(root)
   console.log(`\nFound ${entries.length} entries in root directory`)
 
+  // Debug: List all directories for troubleshooting
+  const allDirs: string[] = []
+  for (const entry of entries) {
+    const entryPath = join(root, entry)
+    try {
+      const stats = await stat(entryPath)
+      if (stats.isDirectory()) {
+        allDirs.push(entry)
+      }
+    } catch (error) {
+      // Skip entries that can't be stat'd
+    }
+  }
+  console.log(`\nFound ${allDirs.length} directories total:`)
+  for (const dir of allDirs.slice(0, 20)) {
+    // Show first 20 directories
+    console.log(`  - ${dir}`)
+  }
+  if (allDirs.length > 20) {
+    console.log(`  ... and ${allDirs.length - 20} more`)
+  }
+
   // Filter directories matching the pattern
   const matchingDirs: string[] = []
   for (const entry of entries) {
     if (entry.startsWith(pattern)) {
       const entryPath = join(root, entry)
-      const stats = await stat(entryPath)
-      if (stats.isDirectory()) {
-        matchingDirs.push(entry)
+      try {
+        const stats = await stat(entryPath)
+        if (stats.isDirectory()) {
+          matchingDirs.push(entry)
+        }
+      } catch (error) {
+        console.log(`  ⚠️  Could not stat ${entry}: ${(error as Error).message}`)
       }
     }
   }
 
-  console.log(`\nFound ${matchingDirs.length} directories matching pattern:`)
+  console.log(`\nFound ${matchingDirs.length} directories matching pattern "${pattern}*":`)
   for (const dir of matchingDirs) {
     console.log(`  - ${dir}`)
   }
