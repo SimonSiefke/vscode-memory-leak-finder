@@ -14,7 +14,7 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
 export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.type('!')
   await Editor.press('Enter')
-  // Press Tab 3-4 times to navigate to body
+  // Press Tab 3 times to navigate to body (lang -> title -> body), then one more to exit snippet mode
   for (let i = 0; i < 4; i++) {
     await Editor.press('Tab')
   }
