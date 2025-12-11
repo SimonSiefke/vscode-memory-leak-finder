@@ -63,5 +63,29 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to cancel port edit`)
       }
     },
+    async forwardPort(portId: number): Promise<void> {
+      try {
+        await this.setPortInput(portId)
+        await page.keyboard.press('Enter')
+        await page.waitForIdle()
+        const tunnelView = page.locator('[aria-label="Tunnel View"]')
+        await expect(tunnelView).not.toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to forward port ${portId}`)
+      }
+    },
+    async shouldHaveForwardedPort(portId: number): Promise<void> {
+      try {
+        await page.waitForIdle()
+        const portsView = page.locator('#\\~remote\\.forwardedPortsContainer')
+        const portItem = portsView.locator('.monaco-list-row', {
+          hasText: `${portId}`,
+        })
+        await expect(portItem).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify port ${portId} is forwarded`)
+      }
+    },
   }
 }
