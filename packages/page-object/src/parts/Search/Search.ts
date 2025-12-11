@@ -19,10 +19,13 @@ export const create = ({ expect, page, VError }) => {
       try {
         await page.waitForIdle()
         const searchView = page.locator('.search-view')
-        const searchInput = searchView.locator('textarea[placeholder="Search"]')
+        await expect(searchView).toBeVisible()
+        await page.waitForIdle()
+        const searchInput = searchView.locator('textarea[aria-label^="Search"]')
         await expect(searchInput).toBeVisible()
         await page.waitForIdle()
         await searchInput.focus()
+        await page.waitForIdle()
         await expect(searchInput).toBeFocused()
         await searchInput.clear()
         await page.waitForIdle()
@@ -49,12 +52,17 @@ export const create = ({ expect, page, VError }) => {
       try {
         await page.waitForIdle()
         const searchView = page.locator('.search-view')
+        await expect(searchView).toBeVisible()
+        await page.waitForIdle()
         const replaceInput = searchView.locator('textarea[placeholder="Replace"]')
         await expect(replaceInput).toBeVisible()
         await page.waitForIdle()
         await replaceInput.focus()
+        await page.waitForIdle()
         await expect(replaceInput).toBeFocused()
+        await page.waitForIdle()
         await replaceInput.clear()
+        await page.waitForIdle()
         await replaceInput.type(text)
         await page.waitForIdle()
       } catch (error) {
@@ -63,11 +71,14 @@ export const create = ({ expect, page, VError }) => {
     },
     async replace() {
       try {
+        await page.waitForIdle()
         const button = page.locator('[aria-label="Replace All (Ctrl+Alt+Enter)"]')
         await button.click()
+        await page.waitForIdle()
         const messageLocator = page.locator('.text-search-provider-messages .message')
         await expect(messageLocator).toBeVisible()
         await expect(messageLocator).toHaveText(/Replaced/)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to replace`)
       }
@@ -104,6 +115,8 @@ export const create = ({ expect, page, VError }) => {
       try {
         await page.waitForIdle()
         const toggleDetails = page.locator(`[role="button"].codicon-search-details`)
+        await expect(toggleDetails).toBeVisible()
+        await page.waitForIdle()
         const expanded = await toggleDetails.getAttribute('aria-expanded')
         if (expanded === 'true') {
           return
@@ -156,6 +169,42 @@ export const create = ({ expect, page, VError }) => {
         await expect(line).toHaveText(/result/)
       } catch (error) {
         throw new VError(error, `Failed to open search editor`)
+      }
+    },
+    async enableRegex() {
+      try {
+        await page.waitForIdle()
+        const searchView = page.locator('.search-view')
+        const regexCheckbox = searchView.locator('[aria-label^="Use Regular Expression"]')
+        await expect(regexCheckbox).toBeVisible()
+        await page.waitForIdle()
+        const checked = await regexCheckbox.getAttribute('aria-checked')
+        if (checked === 'true') {
+          return
+        }
+        await regexCheckbox.click()
+        await page.waitForIdle()
+        await expect(regexCheckbox).toHaveAttribute('aria-checked', 'true')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to enable regex`)
+      }
+    },
+    async setFilesToInclude(pattern: string) {
+      try {
+        await page.waitForIdle()
+        await this.expandFiles()
+        const include = page.locator('.file-types.includes')
+        const includeInput = include.locator('.input')
+        await expect(includeInput).toBeVisible()
+        await includeInput.focus()
+        await page.waitForIdle()
+        await includeInput.clear()
+        await page.waitForIdle()
+        await includeInput.type(pattern)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to set files to include`)
       }
     },
   }
