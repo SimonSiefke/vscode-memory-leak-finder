@@ -52,15 +52,12 @@ export const create = ({ expect, page, VError }) => {
     },
     async cancelPortEdit() {
       try {
-        await (() => {
-          const { resolve, promise } = Promise.withResolvers<void>()
-          setTimeout(resolve, 2100)
-          return promise
-        })()
         await page.waitForIdle()
         await page.keyboard.press('Escape')
+        await page.waitForIdle()
         const forwardPortButton = page.locator('[role="button"]', { hasText: 'Forward a Port' })
         await expect(forwardPortButton).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to cancel port edit`)
       }
@@ -68,10 +65,12 @@ export const create = ({ expect, page, VError }) => {
     async forwardPort(portId: number): Promise<void> {
       try {
         await this.setPortInput(portId)
+        await page.waitForIdle()
         await page.keyboard.press('Enter')
         await page.waitForIdle()
         const tunnelView = page.locator('[aria-label="Tunnel View"]')
         await expect(tunnelView).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to forward port ${portId}`)
       }
