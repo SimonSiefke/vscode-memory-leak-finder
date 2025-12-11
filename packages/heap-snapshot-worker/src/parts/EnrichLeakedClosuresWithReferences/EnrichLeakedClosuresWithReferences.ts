@@ -11,7 +11,7 @@ export interface LeakedClosureWithReferences {
   readonly references: readonly ReferencePath[]
 }
 
-export const enrichLeakedClosuresWithReferences = async (
+export const enrichLeakedClosuresWithReferences = (
   leakedClosures: Record<string, Array<{ nodeIndex: number; nodeName: string; nodeId: number }>>,
   snapshot: Snapshot,
 ): Record<string, readonly LeakedClosureWithReferences[]> => {
