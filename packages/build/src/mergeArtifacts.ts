@@ -56,10 +56,17 @@ const mergeArtifacts = async (): Promise<void> => {
       try {
         const nestedEntries = await readdir(nestedResultsPath)
         console.log(`   ✓ Found ${nestedEntries.length} entries in nested directory`)
-        await cp(nestedResultsPath, targetDir, {
-          recursive: true,
-          force: true,
-        })
+        // Copy each entry individually to merge into target directory
+        for (const entry of nestedEntries) {
+          const sourcePath = join(nestedResultsPath, entry)
+          const targetPath = join(targetDir, entry)
+          const entryStats = await stat(sourcePath)
+          if (entryStats.isDirectory()) {
+            await cp(sourcePath, targetPath, { recursive: true, force: true })
+          } else {
+            await cp(sourcePath, targetPath, { force: true })
+          }
+        }
         console.log(`   ✓ Copied ${nestedEntries.length} entries to target directory`)
       } catch (error) {
         console.error(`   ✗ Error copying from nested directory:`, error)
