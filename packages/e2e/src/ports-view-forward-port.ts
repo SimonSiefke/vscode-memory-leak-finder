@@ -2,7 +2,9 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 0
 
-export const setup = async ({ PortsView }: TestContext): Promise<void> => {
+export const setup = async ({ PortsView, Panel }: TestContext): Promise<void> => {
+  await Panel.hide()
+  await Panel.show()
   await PortsView.open()
 }
 
