@@ -3,7 +3,12 @@ import { join, dirname } from 'path'
 import { URL } from 'url'
 import { existsSync } from 'fs'
 import { fileURLToPath } from 'url'
+import { generateKeyPairSync } from 'crypto'
+import { createRequire } from 'module'
 import * as Root from '../Root/Root.ts'
+
+const require = createRequire(import.meta.url)
+const jwt = require('jsonwebtoken')
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
 
@@ -64,6 +69,204 @@ const hasConfigEntry = (config: MockConfigEntry[], hostname: string, pathname: s
     }
   }
   return false
+}
+
+// JWT pattern: three base64url-encoded parts separated by dots
+const JWT_PATTERN = /^eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/
+
+// Cache for ECDSA key pairs (one per curve)
+const ecdsaKeyPairs = new Map<string, { privateKey: string; publicKey: string }>()
+
+// Cache for RSA key pair (one is enough for mock tokens)
+let rsaKeyPair: { privateKey: string; publicKey: string } | null = null
+
+const getEcdsaKeyPair = (algorithm: string): { privateKey: string; publicKey: string } => {
+  // Map algorithm to curve name
+  let curve: string
+  if (algorithm === 'ES256') {
+    curve = 'prime256v1' // P-256
+  } else if (algorithm === 'ES384') {
+    curve = 'secp384r1' // P-384
+  } else if (algorithm === 'ES512') {
+    curve = 'secp521r1' // P-521
+  } else {
+    curve = 'prime256v1' // Default to P-256
+  }
+
+  if (!ecdsaKeyPairs.has(curve)) {
+    const { privateKey, publicKey } = generateKeyPairSync('ec', {
+      namedCurve: curve,
+    })
+    ecdsaKeyPairs.set(curve, {
+      privateKey: privateKey.export({ type: 'sec1', format: 'pem' }) as string,
+      publicKey: publicKey.export({ type: 'spki', format: 'pem' }) as string,
+    })
+  }
+
+  return ecdsaKeyPairs.get(curve)!
+}
+
+const getRsaKeyPair = (): { privateKey: string; publicKey: string } => {
+  if (!rsaKeyPair) {
+    const { privateKey, publicKey } = generateKeyPairSync('rsa', {
+      modulusLength: 2048,
+    })
+    rsaKeyPair = {
+      privateKey: privateKey.export({ type: 'pkcs8', format: 'pem' }) as string,
+      publicKey: publicKey.export({ type: 'spki', format: 'pem' }) as string,
+    }
+  }
+  return rsaKeyPair
+}
+
+const isJwtToken = (value: string): boolean => {
+  if (typeof value !== 'string') {
+    return false
+  }
+  // Check if it matches JWT pattern (three parts separated by dots)
+  const parts = value.split('.')
+  if (parts.length !== 3) {
+    return false
+  }
+  // Check if it matches the pattern (starts with eyJ which is base64url for {" header)
+  return JWT_PATTERN.test(value)
+}
+
+const replaceJwtToken = (token: string): string => {
+  try {
+    // Decode the JWT without verification to get the payload
+    const decoded = jwt.decode(token, { complete: true })
+    if (!decoded || typeof decoded === 'string' || !decoded.payload) {
+      return token // Return original if decoding fails
+    }
+
+    const payload = decoded.payload as Record<string, any>
+    const header = decoded.header
+
+    // Update expiration to one month from now
+    const oneMonthFromNow = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60
+    const newPayload = {
+      ...payload,
+      exp: oneMonthFromNow,
+      iat: Math.floor(Date.now() / 1000), // Update issued at time
+    }
+
+    // Generate new JWT with the same algorithm (default to HS256 if not specified)
+    const algorithm = (header.alg || 'HS256') as jwt.Algorithm
+
+    // Determine if algorithm is symmetric or asymmetric
+    const symmetricAlgorithms = ['HS256', 'HS384', 'HS512']
+    const isSymmetric = symmetricAlgorithms.includes(algorithm)
+
+    let newToken: string
+
+    if (isSymmetric) {
+      // Use secret for symmetric algorithms
+      const secret = 'mock-secret-key-for-jwt-generation' // Fixed secret for mock tokens
+      newToken = jwt.sign(newPayload, secret, {
+        algorithm,
+      })
+    } else {
+      // Use key pair for asymmetric algorithms (RS256, RS384, RS512, ES256, ES384, ES512)
+      if (algorithm.startsWith('ES')) {
+        // ECDSA algorithms
+        const { privateKey } = getEcdsaKeyPair(algorithm)
+        newToken = jwt.sign(newPayload, privateKey, {
+          algorithm,
+        })
+      } else if (algorithm.startsWith('RS') || algorithm.startsWith('PS')) {
+        // RSA algorithms - use cached key pair
+        const { privateKey } = getRsaKeyPair()
+        newToken = jwt.sign(newPayload, privateKey, {
+          algorithm,
+        })
+      } else {
+        // Fallback to HS256 for unknown algorithms
+        const secret = 'mock-secret-key-for-jwt-generation'
+        newToken = jwt.sign(newPayload, secret, {
+          algorithm: 'HS256',
+        })
+      }
+    }
+
+    return newToken
+  } catch (error) {
+    // If anything fails, return the original token
+    console.warn(`Failed to replace JWT token: ${error}`)
+    return token
+  }
+}
+
+// Patterns for expiration-related property names
+const EXPIRATION_PATTERNS = [
+  /^expires?$/i,
+  /^expires?_at$/i,
+  /^expiresAt$/i,
+  /^expiry$/i,
+  /^expiry_at$/i,
+  /^expiryAt$/i,
+  /^exp$/i,
+  /^expiration$/i,
+  /^expiration_at$/i,
+  /^expirationAt$/i,
+  /^token_expires?$/i,
+  /^token_expires?_at$/i,
+  /^access_token_expires?$/i,
+  /^access_token_expires?_at$/i,
+  /^refresh_token_expires?$/i,
+  /^refresh_token_expires?_at$/i,
+]
+
+const isExpirationProperty = (key: string): boolean => {
+  return EXPIRATION_PATTERNS.some((pattern) => pattern.test(key))
+}
+
+const isUnixTimestamp = (value: any): boolean => {
+  if (typeof value !== 'number') {
+    return false
+  }
+  // Check if it's a reasonable Unix timestamp (between year 2000 and year 2100)
+  const minTimestamp = 946684800 // 2000-01-01
+  const maxTimestamp = 4102444800 // 2100-01-01
+  return value >= minTimestamp && value <= maxTimestamp
+}
+
+const replaceJwtTokensInValue = (value: any, parentKey?: string): any => {
+  if (typeof value === 'string') {
+    if (isJwtToken(value)) {
+      return replaceJwtToken(value)
+    }
+    // Check if the string contains a JWT token (e.g., "Bearer eyJ...")
+    const jwtMatch = value.match(/(Bearer\s+)?(eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)/)
+    if (jwtMatch) {
+      const prefix = jwtMatch[1] || ''
+      const token = jwtMatch[2]
+      if (isJwtToken(token)) {
+        return prefix + replaceJwtToken(token)
+      }
+    }
+    return value
+  }
+
+  // Check if this is an expiration timestamp property
+  if (parentKey && isExpirationProperty(parentKey) && isUnixTimestamp(value)) {
+    const oneMonthFromNow = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60
+    return oneMonthFromNow
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => replaceJwtTokensInValue(item))
+  }
+
+  if (value !== null && typeof value === 'object') {
+    const result: Record<string, any> = {}
+    for (const [key, val] of Object.entries(value)) {
+      result[key] = replaceJwtTokensInValue(val, key)
+    }
+    return result
+  }
+
+  return value
 }
 
 const convertRequestsToMocks = async (): Promise<void> => {
@@ -137,13 +340,18 @@ const convertRequestsToMocks = async (): Promise<void> => {
         const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, request.method)
         const mockFilePath = join(MOCK_REQUESTS_DIR, mockFileName)
 
+        // Replace JWT tokens in request headers, response headers, and response body
+        const sanitizedRequestHeaders = replaceJwtTokensInValue(request.headers || {})
+        const sanitizedResponseHeaders = replaceJwtTokensInValue(request.response.headers || {})
+        const sanitizedResponseBody = replaceJwtTokensInValue(request.response.body)
+
         // Create mock data structure matching what GetMockResponse expects
         const mockData = {
           response: {
             statusCode: request.response.statusCode,
             statusMessage: request.response.statusMessage,
-            headers: request.response.headers || {},
-            body: request.response.body,
+            headers: sanitizedResponseHeaders,
+            body: sanitizedResponseBody,
             wasCompressed: request.response.wasCompressed,
           },
         }

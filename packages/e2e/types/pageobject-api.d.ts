@@ -213,6 +213,10 @@ export interface MCP {
   listServers(): Promise<void>
   openConfiguration(): Promise<void>
 }
+export interface NetworkInterceptor {
+  enable(): Promise<void>
+  disable(): Promise<void>
+}
 export interface MarkdownPreview {
   shouldHaveHeading(id: any): Promise<void>
   shouldBeVisible(): Promise<void>
@@ -457,6 +461,7 @@ export interface PageObjectApi {
   readonly Hover: Hover
   readonly KeyBindingsEditor: KeyBindingsEditor
   readonly MCP: MCP
+  readonly NetworkInterceptor: NetworkInterceptor
   readonly MarkdownPreview: MarkdownPreview
   readonly Notebook: Notebook
   readonly Notification: Notification

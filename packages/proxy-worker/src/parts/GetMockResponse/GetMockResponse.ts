@@ -30,14 +30,22 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
       }
     }
 
-    // Handle file references (for zip files)
+    // Handle file references (for zip files and SSE files)
     let body = response.body
     let isZipFile = false
+    let isSseFile = false
     if (typeof body === 'string' && body.startsWith('file-reference:')) {
-      const zipData = await LoadZipData.loadZipData(body)
-      if (zipData) {
-        body = zipData
-        isZipFile = true
+      const fileData = await LoadZipData.loadZipData(body)
+      if (fileData) {
+        body = fileData
+        // Check if this is a zip file or SSE file by content type
+        const contentType = response.headers['content-type'] || response.headers['Content-Type']
+        const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
+        if (contentTypeStr.includes('application/zip')) {
+          isZipFile = true
+        } else if (contentTypeStr.includes('text/event-stream')) {
+          isSseFile = true
+        }
       }
     }
 
@@ -46,12 +54,14 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
     const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
     if (contentTypeStr.includes('application/zip')) {
       isZipFile = true
+    } else if (contentTypeStr.includes('text/event-stream')) {
+      isSseFile = true
     }
 
-    // Remove Content-Encoding and Transfer-Encoding headers for zip files
-    // since the binary data is not encoded
+    // Remove Content-Encoding and Transfer-Encoding headers for zip files and SSE files
+    // since the binary/text data is not encoded
     const cleanedHeaders = { ...response.headers }
-    if (isZipFile) {
+    if (isZipFile || isSseFile) {
       const lowerCaseHeaders: Set<string> = new Set()
       Object.keys(cleanedHeaders).forEach((k) => {
         lowerCaseHeaders.add(k.toLowerCase())
@@ -141,17 +151,21 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
     bodyBuffer = Buffer.from(JSON.stringify(mockResponse.body), 'utf8')
   }
 
-  // Check if this is a zip file (binary data)
+  // Check if this is a zip file (binary data) or SSE file (text/event-stream)
   const contentType = mockResponse.headers['content-type'] || mockResponse.headers['Content-Type']
   const contentTypeStr = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
   // Check for ZIP magic bytes (PK - ZIP file signature)
   const hasZipMagicBytes = Buffer.isBuffer(bodyBuffer) && bodyBuffer.length >= 2 && bodyBuffer[0] === 0x50 && bodyBuffer[1] === 0x4b
   const isZipFile = contentTypeStr.includes('application/zip') || hasZipMagicBytes
+  const isSseFile = contentTypeStr.includes('text/event-stream')
 
   if (isZipFile) {
     console.log(
       `[Proxy] Detected zip file - removing Content-Encoding/Transfer-Encoding headers. Content-Type: ${contentTypeStr}, Has magic bytes: ${hasZipMagicBytes}`,
     )
+  }
+  if (isSseFile) {
+    console.log(`[Proxy] Detected SSE file - removing Content-Encoding/Transfer-Encoding headers. Content-Type: ${contentTypeStr}`)
   }
 
   // Convert headers to the format expected by writeHead and check for existing CORS headers
@@ -161,15 +175,22 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   for (const [key, value] of Object.entries(mockResponse.headers)) {
     const lowerKey = key.toLowerCase()
     // Skip Content-Length headers (case-insensitive) - we'll set it below
-    // Skip Content-Encoding and Transfer-Encoding headers for zip files - binary data is not encoded
-    if (lowerKey !== 'content-length' && !(isZipFile && (lowerKey === 'content-encoding' || lowerKey === 'transfer-encoding'))) {
+    // Skip Transfer-Encoding headers - we'll set Content-Length instead
+    // Skip Content-Encoding headers - mock body is already decompressed, so we can't send gzip encoding
+    // Skip Content-Encoding and Transfer-Encoding headers for zip files and SSE files - data is not encoded
+    if (
+      lowerKey !== 'content-length' &&
+      lowerKey !== 'transfer-encoding' &&
+      lowerKey !== 'content-encoding' &&
+      !((isZipFile || isSseFile) && lowerKey === 'content-encoding')
+    ) {
       headers[key] = Array.isArray(value) ? value.join(', ') : String(value)
       lowerCaseHeaders.add(lowerKey)
     }
   }
 
-  // Double-check: explicitly remove Content-Encoding and Transfer-Encoding for zip files
-  if (isZipFile) {
+  // Double-check: explicitly remove Content-Encoding and Transfer-Encoding for zip files and SSE files
+  if (isZipFile || isSseFile) {
     const keysToRemove: string[] = []
     for (const k of Object.keys(headers)) {
       const lowerKey = k.toLowerCase()
@@ -181,7 +202,8 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
       delete headers[k]
       lowerCaseHeaders.delete(k.toLowerCase())
     }
-    console.log(`[Proxy] sendMockResponse - Final headers for zip file (after cleanup):`, Object.keys(headers))
+    const fileType = isZipFile ? 'zip file' : 'SSE file'
+    console.log(`[Proxy] sendMockResponse - Final headers for ${fileType} (after cleanup):`, Object.keys(headers))
   }
 
   // Add CORS headers if not already present (case-insensitive check)
@@ -197,6 +219,17 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   if (!lowerCaseHeaders.has('access-control-allow-credentials')) {
     headers['Access-Control-Allow-Credentials'] = 'true'
   }
+
+  // Explicitly remove Transfer-Encoding and Content-Encoding headers if they somehow got through
+  // (case-insensitive check) - we're setting Content-Length, so Transfer-Encoding can't be present
+  // Content-Encoding is removed because mock body is already decompressed
+  Object.keys(headers).forEach((key) => {
+    const lowerKey = key.toLowerCase()
+    if (lowerKey === 'transfer-encoding' || lowerKey === 'content-encoding') {
+      delete headers[key]
+      lowerCaseHeaders.delete(lowerKey)
+    }
+  })
 
   // Always set Content-Length to match actual body length
   headers['Content-Length'] = String(bodyBuffer.length)

@@ -1,4 +1,5 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, page, VError }) => {
   return {
@@ -15,21 +16,35 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to open chat editor`)
       }
     },
-    async sendMessage(message) {
+    async sendMessage({ message, expectedResponse }) {
       try {
         const editContext = page.locator('.native-edit-context')
         await expect(editContext).toBeVisible()
         await page.waitForIdle()
         await editContext.focus()
         await page.waitForIdle()
-        await editContext.setValue(message)
+        await editContext.type(message)
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
+        await expect(chatView).toBeVisible()
+        await page.waitForIdle()
         const sendButton = chatView.locator('.action-label[aria-label^="Send"]')
         await expect(sendButton).toBeVisible()
-        await sendButton.click()
         await page.waitForIdle()
-        // TODO check that message is visible and response also
+        await page.keyboard.press('Enter')
+        // await sendButton.click()
+        await page.waitForIdle()
+
+        const requestMessage = chatView.locator(`.monaco-list-row.request[aria-label="${message}"]`)
+        await expect(requestMessage).toBeVisible()
+        await page.waitForIdle()
+
+        if (expectedResponse) {
+          const responseMessage = chatView.locator('.monaco-list-row[data-index="1"]')
+          await expect(responseMessage).toBeVisible()
+          await page.waitForIdle()
+          await expect(responseMessage).toHaveAttribute('aria-label', new RegExp(`^${expectedResponse}`), { timeout: 120_000 })
+        }
       } catch (error) {
         throw new VError(error, `Failed to send chat message`)
       }
@@ -111,6 +126,16 @@ export const create = ({ expect, page, VError }) => {
         await removeButton.click()
       } catch (error) {
         throw new VError(error, `Failed to clear chat context`)
+      }
+    },
+    async clearAll() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to clear all chats`)
       }
     },
   }
