@@ -1,16 +1,18 @@
 import { join } from 'node:path'
 import { importHeapSnapshotWorker } from './import-heap-snapshot-worker.ts'
 
-const filePath1 = join(import.meta.dirname, '../../../.vscode-heapsnapshots/0.heapsnapshot')
+const filePath1 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/0.json')
+const filePath2 = join(import.meta.dirname, ' ../../../../../.vscode-heapsnapshots/1.json')
 
 const testPromiseCount = async (): Promise<void> => {
   const { getPromiseCountFromHeapSnapshot } = await importHeapSnapshotWorker(
-    'parts/GetPromiseCountFromHeapSnapshot/GetPromiseCountFromHeapSnapshot.ts',
+    'src/parts/GetPromiseCountFromHeapSnapshot/GetPromiseCountFromHeapSnapshot.ts',
   )
   console.log('Testing Promise Count:')
 
   const count = await getPromiseCountFromHeapSnapshot(filePath1)
-  console.log({ count })
+  const count2 = await getPromiseCountFromHeapSnapshot(filePath2)
+  console.log({ count, count2 })
 }
 
 const main = async (): Promise<void> => {
