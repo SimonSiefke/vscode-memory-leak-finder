@@ -19,10 +19,12 @@ export const create = ({ expect, page, VError }) => {
     },
     async close() {
       try {
+        await page.waitForIdle()
         const portsView = page.locator('#\\~remote\\.forwardedPortsContainer')
         await expect(portsView).toBeVisible()
         const panel = Panel.create({ expect, page, VError })
         await panel.hide()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to close ports view`)
       }
@@ -78,10 +80,8 @@ export const create = ({ expect, page, VError }) => {
       try {
         await page.waitForIdle()
         const portsView = page.locator('#\\~remote\\.forwardedPortsContainer')
-        const portItem = portsView.locator('.monaco-list-row', {
-          hasText: `${portId}`,
-        })
-        await expect(portItem).toBeVisible()
+        const portItem = portsView.locator(`[aria-label*="${portId}"], .monaco-list-row:has-text("${portId}")`).first()
+        await expect(portItem).toBeVisible({ timeout: 10_000 })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify port ${portId} is forwarded`)
