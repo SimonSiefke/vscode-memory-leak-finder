@@ -7,10 +7,10 @@ export const setup = async ({ PortsView }: TestContext): Promise<void> => {
 }
 
 export const run = async ({ PortsView }: TestContext): Promise<void> => {
-  const portId = 3007
+  const port = 3007
   // @ts-ignore
-  await PortsView.forwardPort(portId)
+  await PortsView.forwardPort(port)
 
   // @ts-ignore
-  await PortsView.unforwardAllPorts()
+  await PortsView.unforwardAllPorts(port)
 }

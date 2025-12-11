@@ -106,10 +106,19 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to verify port ${portId} is forwarded`)
       }
     },
-    async unforwardAllPorts(): Promise<void> {
+    async unforwardAllPorts(port: number): Promise<void> {
       try {
         await page.waitForIdle()
-        await new Promise((r) => {})
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.StopPortForwarding, {
+          pressKeyOnce: true,
+          stayVisible: true,
+        })
+        await page.waitForIdle()
+        await quickPick.select(`${port}`)
+        await page.waitForIdle()
+        const tunnelView = page.locator('[aria-label="Tunnel View"]')
+        await expect(tunnelView).toBeHidden()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed unforward all ports`)
