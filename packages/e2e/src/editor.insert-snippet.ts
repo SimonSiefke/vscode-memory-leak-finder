@@ -18,7 +18,7 @@ export const run = async ({ Editor }: TestContext): Promise<void> => {
   for (let i = 0; i < 4; i++) {
     await Editor.press('Tab')
   }
-  await Editor.type('h1 hello world')
+  await Editor.type('<h1>hello world</h1>')
   await Editor.shouldHaveText(
     '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Document</title>\n</head>\n<body>\n    <h1>hello world</h1>\n</body>\n</html>',
   )
