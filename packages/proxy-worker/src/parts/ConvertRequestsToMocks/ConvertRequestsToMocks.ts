@@ -4,8 +4,11 @@ import { URL } from 'url'
 import { existsSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { generateKeyPairSync } from 'crypto'
-import * as jwt from 'jsonwebtoken'
+import { createRequire } from 'module'
 import * as Root from '../Root/Root.ts'
+
+const require = createRequire(import.meta.url)
+const jwt = require('jsonwebtoken')
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
 
