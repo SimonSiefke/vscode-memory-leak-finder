@@ -335,17 +335,7 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-disposable-count
       - name: Merge all measure results
-        run: |
-          mkdir -p ./.vscode-memory-leak-finder-results
-          for dir in vscode-memory-leak-finder-results-linux-*; do
-            if [ -d "$dir" ]; then
-              if [ -d "$dir/.vscode-memory-leak-finder-results" ]; then
-                cp -r "$dir/.vscode-memory-leak-finder-results"/* ./.vscode-memory-leak-finder-results/ 2>/dev/null || true
-              else
-                cp -r "$dir"/* ./.vscode-memory-leak-finder-results/ 2>/dev/null || true
-              fi
-            fi
-          done
+        run: node packages/build/src/mergeArtifacts.ts
       - name: Generate charts
         run: node packages/charts/src/main.ts
       - name: Upload artifact
