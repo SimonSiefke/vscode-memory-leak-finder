@@ -3,6 +3,7 @@ import { join, dirname } from 'path'
 import { URL } from 'url'
 import { existsSync } from 'fs'
 import { fileURLToPath } from 'url'
+import jwt from 'jsonwebtoken'
 import * as Root from '../Root/Root.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
@@ -64,6 +65,90 @@ const hasConfigEntry = (config: MockConfigEntry[], hostname: string, pathname: s
     }
   }
   return false
+}
+
+// JWT pattern: three base64url-encoded parts separated by dots
+const JWT_PATTERN = /^eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/
+
+const isJwtToken = (value: string): boolean => {
+  if (typeof value !== 'string') {
+    return false
+  }
+  // Check if it matches JWT pattern (three parts separated by dots)
+  const parts = value.split('.')
+  if (parts.length !== 3) {
+    return false
+  }
+  // Check if it matches the pattern (starts with eyJ which is base64url for {" header)
+  return JWT_PATTERN.test(value)
+}
+
+const replaceJwtToken = (token: string): string => {
+  try {
+    // Decode the JWT without verification to get the payload
+    const decoded = jwt.decode(token, { complete: true })
+    if (!decoded || typeof decoded === 'string' || !decoded.payload) {
+      return token // Return original if decoding fails
+    }
+
+    const payload = decoded.payload as Record<string, any>
+    const header = decoded.header
+
+    // Update expiration to one month from now
+    const oneMonthFromNow = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60
+    const newPayload = {
+      ...payload,
+      exp: oneMonthFromNow,
+      iat: Math.floor(Date.now() / 1000), // Update issued at time
+    }
+
+    // Generate new JWT with the same algorithm (default to HS256 if not specified)
+    const algorithm = header.alg || 'HS256'
+    const secret = 'mock-secret-key-for-jwt-generation' // Fixed secret for mock tokens
+
+    // Use the same algorithm from the original token
+    const newToken = jwt.sign(newPayload, secret, {
+      algorithm: algorithm as jwt.Algorithm,
+    })
+
+    return newToken
+  } catch (error) {
+    // If anything fails, return the original token
+    console.warn(`Failed to replace JWT token: ${error}`)
+    return token
+  }
+}
+
+const replaceJwtTokensInValue = (value: any): any => {
+  if (typeof value === 'string') {
+    if (isJwtToken(value)) {
+      return replaceJwtToken(value)
+    }
+    // Check if the string contains a JWT token (e.g., "Bearer eyJ...")
+    const jwtMatch = value.match(/(Bearer\s+)?(eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)/)
+    if (jwtMatch) {
+      const prefix = jwtMatch[1] || ''
+      const token = jwtMatch[2]
+      if (isJwtToken(token)) {
+        return prefix + replaceJwtToken(token)
+      }
+    }
+    return value
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(replaceJwtTokensInValue)
+  }
+
+  if (value !== null && typeof value === 'object') {
+    const result: Record<string, any> = {}
+    for (const [key, val] of Object.entries(value)) {
+      result[key] = replaceJwtTokensInValue(val)
+    }
+    return result
+  }
+
+  return value
 }
 
 const convertRequestsToMocks = async (): Promise<void> => {
@@ -137,13 +222,18 @@ const convertRequestsToMocks = async (): Promise<void> => {
         const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, request.method)
         const mockFilePath = join(MOCK_REQUESTS_DIR, mockFileName)
 
+        // Replace JWT tokens in request headers, response headers, and response body
+        const sanitizedRequestHeaders = replaceJwtTokensInValue(request.headers || {})
+        const sanitizedResponseHeaders = replaceJwtTokensInValue(request.response.headers || {})
+        const sanitizedResponseBody = replaceJwtTokensInValue(request.response.body)
+
         // Create mock data structure matching what GetMockResponse expects
         const mockData = {
           response: {
             statusCode: request.response.statusCode,
             statusMessage: request.response.statusMessage,
-            headers: request.response.headers || {},
-            body: request.response.body,
+            headers: sanitizedResponseHeaders,
+            body: sanitizedResponseBody,
             wasCompressed: request.response.wasCompressed,
           },
         }
