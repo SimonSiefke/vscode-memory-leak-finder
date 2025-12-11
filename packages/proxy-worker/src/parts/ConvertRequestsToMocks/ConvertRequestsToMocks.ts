@@ -3,7 +3,8 @@ import { join, dirname } from 'path'
 import { URL } from 'url'
 import { existsSync } from 'fs'
 import { fileURLToPath } from 'url'
-import jwt from 'jsonwebtoken'
+import { generateKeyPairSync } from 'crypto'
+import * as jwt from 'jsonwebtoken'
 import * as Root from '../Root/Root.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
@@ -70,6 +71,51 @@ const hasConfigEntry = (config: MockConfigEntry[], hostname: string, pathname: s
 // JWT pattern: three base64url-encoded parts separated by dots
 const JWT_PATTERN = /^eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/
 
+// Cache for ECDSA key pairs (one per curve)
+const ecdsaKeyPairs = new Map<string, { privateKey: string; publicKey: string }>()
+
+// Cache for RSA key pair (one is enough for mock tokens)
+let rsaKeyPair: { privateKey: string; publicKey: string } | null = null
+
+const getEcdsaKeyPair = (algorithm: string): { privateKey: string; publicKey: string } => {
+  // Map algorithm to curve name
+  let curve: string
+  if (algorithm === 'ES256') {
+    curve = 'prime256v1' // P-256
+  } else if (algorithm === 'ES384') {
+    curve = 'secp384r1' // P-384
+  } else if (algorithm === 'ES512') {
+    curve = 'secp521r1' // P-521
+  } else {
+    curve = 'prime256v1' // Default to P-256
+  }
+
+  if (!ecdsaKeyPairs.has(curve)) {
+    const { privateKey, publicKey } = generateKeyPairSync('ec', {
+      namedCurve: curve,
+    })
+    ecdsaKeyPairs.set(curve, {
+      privateKey: privateKey.export({ type: 'sec1', format: 'pem' }) as string,
+      publicKey: publicKey.export({ type: 'spki', format: 'pem' }) as string,
+    })
+  }
+
+  return ecdsaKeyPairs.get(curve)!
+}
+
+const getRsaKeyPair = (): { privateKey: string; publicKey: string } => {
+  if (!rsaKeyPair) {
+    const { privateKey, publicKey } = generateKeyPairSync('rsa', {
+      modulusLength: 2048,
+    })
+    rsaKeyPair = {
+      privateKey: privateKey.export({ type: 'pkcs8', format: 'pem' }) as string,
+      publicKey: publicKey.export({ type: 'spki', format: 'pem' }) as string,
+    }
+  }
+  return rsaKeyPair
+}
+
 const isJwtToken = (value: string): boolean => {
   if (typeof value !== 'string') {
     return false
@@ -103,13 +149,42 @@ const replaceJwtToken = (token: string): string => {
     }
 
     // Generate new JWT with the same algorithm (default to HS256 if not specified)
-    const algorithm = header.alg || 'HS256'
-    const secret = 'mock-secret-key-for-jwt-generation' // Fixed secret for mock tokens
+    const algorithm = (header.alg || 'HS256') as jwt.Algorithm
 
-    // Use the same algorithm from the original token
-    const newToken = jwt.sign(newPayload, secret, {
-      algorithm: algorithm as jwt.Algorithm,
-    })
+    // Determine if algorithm is symmetric or asymmetric
+    const symmetricAlgorithms = ['HS256', 'HS384', 'HS512']
+    const isSymmetric = symmetricAlgorithms.includes(algorithm)
+
+    let newToken: string
+
+    if (isSymmetric) {
+      // Use secret for symmetric algorithms
+      const secret = 'mock-secret-key-for-jwt-generation' // Fixed secret for mock tokens
+      newToken = jwt.sign(newPayload, secret, {
+        algorithm,
+      })
+    } else {
+      // Use key pair for asymmetric algorithms (RS256, RS384, RS512, ES256, ES384, ES512)
+      if (algorithm.startsWith('ES')) {
+        // ECDSA algorithms
+        const { privateKey } = getEcdsaKeyPair(algorithm)
+        newToken = jwt.sign(newPayload, privateKey, {
+          algorithm,
+        })
+      } else if (algorithm.startsWith('RS') || algorithm.startsWith('PS')) {
+        // RSA algorithms - use cached key pair
+        const { privateKey } = getRsaKeyPair()
+        newToken = jwt.sign(newPayload, privateKey, {
+          algorithm,
+        })
+      } else {
+        // Fallback to HS256 for unknown algorithms
+        const secret = 'mock-secret-key-for-jwt-generation'
+        newToken = jwt.sign(newPayload, secret, {
+          algorithm: 'HS256',
+        })
+      }
+    }
 
     return newToken
   } catch (error) {
