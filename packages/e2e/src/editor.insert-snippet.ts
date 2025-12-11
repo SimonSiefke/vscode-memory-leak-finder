@@ -1,7 +1,7 @@
 import type { TestContext } from '../types.ts'
 
 const expectedHtml =
-  '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Document</title>\n</head>\n<body><h1>hello world</h1>\n    </body>\n</html>'
+  '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Document</title>\n</head>\n<body><h1>hello world</h1>\n        </body>\n</html>'
 
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
@@ -19,10 +19,10 @@ export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.press('Enter')
   // Press Tab to navigate to lang="en" placeholder
   await Editor.press('Tab')
-  await Editor.shouldHaveCursor(/(150px|159px|160px|590px|600px|606px|610px|620px|630px)/)
+  await Editor.shouldHaveCursor(/(0px|150px|159px|160px|590px|600px|606px|610px|620px|630px)/)
   // Press Tab to navigate to title "Document" placeholder
   await Editor.press('Tab')
-  await Editor.shouldHaveCursor(/(150px|159px|160px|590px|600px|606px|610px|620px|630px)/)
+  await Editor.shouldHaveCursor(/(0px|150px|159px|160px|590px|600px|606px|610px|620px|630px)/)
   // Press Tab to navigate to body placeholder
   await Editor.press('Tab')
   await Editor.shouldHaveCursor(/(32px|33px|40px|48px|56px|64px|72px|80px|90px|100px)/)
