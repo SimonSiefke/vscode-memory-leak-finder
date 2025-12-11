@@ -1,6 +1,7 @@
 import * as Panel from '../Panel/Panel.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
+import * as Server from '../Server/Server.ts'
 
 export const create = ({ expect, page, VError }) => {
   return {
@@ -32,6 +33,7 @@ export const create = ({ expect, page, VError }) => {
     async setPortInput(portId) {
       try {
         await page.waitForIdle()
+        await new Promise((r) => {})
         const forwardPortButton = page.locator('[role="button"]', { hasText: 'Forward a Port' })
         await expect(forwardPortButton).toBeVisible()
         await page.waitForIdle()
@@ -62,17 +64,35 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to cancel port edit`)
       }
     },
-    async forwardPort(portId: number): Promise<void> {
+    async forwardPort(port: number): Promise<void> {
       try {
-        await this.setPortInput(portId)
+        const server = Server.create({ VError })
+        const serverInfo = await server.start({
+          port,
+          requestHandler(req, res) {
+            res.end('Hello World')
+          },
+        })
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.ForwardAPort, {
+          pressKeyOnce: true,
+          stayVisible: true,
+        })
         await page.waitForIdle()
-        await page.keyboard.press('Enter')
+        await quickPick.type(`${port}`)
+        await page.waitForIdle()
+        await quickPick.pressEnter()
         await page.waitForIdle()
         const tunnelView = page.locator('[aria-label="Tunnel View"]')
-        await expect(tunnelView).toBeHidden()
+        await expect(tunnelView).toBeVisible({
+          timeout: 120_000,
+        })
+        const portRow = tunnelView.locator(`.monaco-list-row[aria-label^="Remote port localhost:${port} forwarded"]`)
+        await expect(portRow).toBeVisible()
         await page.waitForIdle()
+        // TODO dispose server?
       } catch (error) {
-        throw new VError(error, `Failed to forward port ${portId}`)
+        throw new VError(error, `Failed to forward port ${port}`)
       }
     },
     async shouldHaveForwardedPort(portId: number): Promise<void> {
@@ -84,6 +104,15 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify port ${portId} is forwarded`)
+      }
+    },
+    async unforwardAllPorts(): Promise<void> {
+      try {
+        await page.waitForIdle()
+        await new Promise((r) => {})
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed unforward all ports`)
       }
     },
   }
