@@ -459,7 +459,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to verify editor text ${text}`)
       }
     },
-    async rename(newText) {
+    async rename(newText: string) {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.RenameSymbol)
@@ -467,9 +467,37 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await expect(renameInput).toBeVisible()
         await expect(renameInput).toBeFocused()
         await renameInput.type(newText)
+        await page.waitForIdle()
         await page.keyboard.press('Enter')
       } catch (error) {
         throw new VError(error, `Failed to rename text ${newText}`)
+      }
+    },
+    async renameWithPreview(newText: string) {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.RenameSymbol)
+        const renameInput = page.locator('.rename-input')
+        await page.waitForIdle()
+        await expect(renameInput).toBeVisible()
+        await expect(renameInput).toBeFocused()
+        await page.waitForIdle()
+        await renameInput.type(newText)
+        await page.waitForIdle()
+        await page.keyboard.press('Control+Enter')
+        await page.waitForIdle()
+        const refactorPreview = page.locator('.panel#refactorPreview')
+        await expect(refactorPreview).toBeVisible()
+        const applyButton = refactorPreview.locator('.monaco-button', { hasText: 'Apply' })
+        await expect(applyButton).toBeVisible()
+        await page.waitForIdle()
+        await applyButton.click()
+        await page.waitForIdle()
+        await expect(refactorPreview).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to rename with preview ${newText}`)
       }
     },
     async renameCancel(newText) {
