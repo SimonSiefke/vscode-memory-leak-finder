@@ -197,7 +197,41 @@ const replaceJwtToken = (token: string): string => {
   }
 }
 
-const replaceJwtTokensInValue = (value: any): any => {
+// Patterns for expiration-related property names
+const EXPIRATION_PATTERNS = [
+  /^expires?$/i,
+  /^expires?_at$/i,
+  /^expiresAt$/i,
+  /^expiry$/i,
+  /^expiry_at$/i,
+  /^expiryAt$/i,
+  /^exp$/i,
+  /^expiration$/i,
+  /^expiration_at$/i,
+  /^expirationAt$/i,
+  /^token_expires?$/i,
+  /^token_expires?_at$/i,
+  /^access_token_expires?$/i,
+  /^access_token_expires?_at$/i,
+  /^refresh_token_expires?$/i,
+  /^refresh_token_expires?_at$/i,
+]
+
+const isExpirationProperty = (key: string): boolean => {
+  return EXPIRATION_PATTERNS.some((pattern) => pattern.test(key))
+}
+
+const isUnixTimestamp = (value: any): boolean => {
+  if (typeof value !== 'number') {
+    return false
+  }
+  // Check if it's a reasonable Unix timestamp (between year 2000 and year 2100)
+  const minTimestamp = 946684800 // 2000-01-01
+  const maxTimestamp = 4102444800 // 2100-01-01
+  return value >= minTimestamp && value <= maxTimestamp
+}
+
+const replaceJwtTokensInValue = (value: any, parentKey?: string): any => {
   if (typeof value === 'string') {
     if (isJwtToken(value)) {
       return replaceJwtToken(value)
@@ -214,14 +248,20 @@ const replaceJwtTokensInValue = (value: any): any => {
     return value
   }
 
+  // Check if this is an expiration timestamp property
+  if (parentKey && isExpirationProperty(parentKey) && isUnixTimestamp(value)) {
+    const oneMonthFromNow = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60
+    return oneMonthFromNow
+  }
+
   if (Array.isArray(value)) {
-    return value.map(replaceJwtTokensInValue)
+    return value.map((item) => replaceJwtTokensInValue(item))
   }
 
   if (value !== null && typeof value === 'object') {
     const result: Record<string, any> = {}
     for (const [key, val] of Object.entries(value)) {
-      result[key] = replaceJwtTokensInValue(val)
+      result[key] = replaceJwtTokensInValue(val, key)
     }
     return result
   }
