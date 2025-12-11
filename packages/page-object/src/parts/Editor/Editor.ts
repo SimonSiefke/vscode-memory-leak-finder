@@ -343,6 +343,16 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to go to definition`)
       }
     },
+    async toggleScreenReaderAccessibilityMode() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.ToggleScreenReaderAccessibilityMode)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to toggle screen reader accessibility mode`)
+      }
+    },
     async findAllReferences() {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
