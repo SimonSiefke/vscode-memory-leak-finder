@@ -5,23 +5,24 @@ import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
+import { Session } from '../Session/Session.ts'
 
 export const id = MeasureId.PromiseCount
 
 export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]
 }
 
-export const start = async (session, objectGroup) => {
+export const start = async (session: Session, objectGroup: string) => {
   const result = await GetPromiseCount.getPromiseCount(session, objectGroup)
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return result
 }
 
-export const stop = async (session, objectGroup) => {
+export const stop = async (session: Session, objectGroup: string) => {
   const result = await GetPromiseCount.getPromiseCount(session, objectGroup)
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return result
