@@ -17,18 +17,18 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
 export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.type('!')
   await Editor.press('Enter')
-  // Press Tab to navigate to lang placeholder
+  // Press Tab to navigate to lang="en" placeholder
   await Editor.press('Tab')
-  await Editor.shouldHaveCursor(/(\d+px)/)
-  // Press Tab to navigate to title placeholder
+  await Editor.shouldHaveCursor(/(590px|600px|606px|610px|620px|630px)/)
+  // Press Tab to navigate to title "Document" placeholder
   await Editor.press('Tab')
-  await Editor.shouldHaveCursor(/(\d+px)/)
+  await Editor.shouldHaveCursor(/(590px|600px|606px|610px|620px|630px)/)
   // Press Tab to navigate to body placeholder
   await Editor.press('Tab')
-  await Editor.shouldHaveCursor(/(\d+px)/)
+  await Editor.shouldHaveCursor(/(32px|40px|48px|56px|64px|72px|80px|90px|100px)/)
   // Press Tab one more time to exit snippet mode
   await Editor.press('Tab')
-  await Editor.shouldHaveCursor(/(\d+px)/)
+  await Editor.shouldHaveCursor(/(32px|40px|48px|56px|64px|72px|80px|90px|100px|110px|120px)/)
   await Editor.type('<h1>hello world</h1>')
   await Editor.shouldHaveText(expectedHtml)
   await Editor.selectAll()
