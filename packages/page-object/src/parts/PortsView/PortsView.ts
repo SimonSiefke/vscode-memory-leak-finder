@@ -64,7 +64,9 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to cancel port edit`)
       }
     },
-    async forwardPort(port: number): Promise<void> {
+    async forwardPort(port: number): Promise<{
+      [Symbol.asyncDispose]: () => Promise<void>
+    }> {
       try {
         const server = Server.create({ VError })
         const serverInfo = await server.start({
@@ -91,6 +93,11 @@ export const create = ({ expect, page, VError }) => {
         await expect(portRow).toBeVisible()
         await page.waitForIdle()
         // TODO dispose server?
+        return {
+          async [Symbol.asyncDispose]() {
+            await serverInfo.dispose()
+          },
+        }
       } catch (error) {
         throw new VError(error, `Failed to forward port ${port}`)
       }
