@@ -69,7 +69,7 @@ export const create = ({ expect, page, VError }) => {
         await page.keyboard.press('Enter')
         await page.waitForIdle()
         const tunnelView = page.locator('[aria-label="Tunnel View"]')
-        await expect(tunnelView).not.toBeVisible()
+        await expect(tunnelView).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to forward port ${portId}`)
       }

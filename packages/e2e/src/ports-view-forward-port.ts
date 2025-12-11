@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.ts'
 
-export const skip = 1
+export const skip = 0
 
 export const setup = async ({ Panel, PortsView }: TestContext): Promise<void> => {
   await Panel.hide()
