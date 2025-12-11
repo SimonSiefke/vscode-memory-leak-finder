@@ -2,11 +2,24 @@ import * as Character from '../Character/Character.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
+import * as WebView from '../WebView/WebView.ts'
 
 const initialDiagnosticTimeout = 30_000
 
 const isNotebook = (file) => {
   return file.endsWith('.ipynb')
+}
+
+const isImage = (file) => {
+  return file.endsWith('.svg')
+}
+
+const isVideo = (file) => {
+  return file.endsWith('.mp4') || file.endsWith('.webm') || file.endsWith('.avi')
+}
+
+const isBinary = (file) => {
+  return file.endsWith('.bin') || file.endsWith('.exe') || file.endsWith('.dll') || file.endsWith('.so')
 }
 
 export const create = ({ page, expect, VError, ideVersion }) => {
@@ -24,6 +37,38 @@ export const create = ({ page, expect, VError, ideVersion }) => {
           const list = notebookEditor.locator('.monaco-list')
           await page.waitForIdle()
           await expect(list).toBeFocused()
+        } else if (isImage(fileName)) {
+          const webView = WebView.create({ page, expect, VError })
+          const subFrame = await webView.shouldBeVisible2({
+            extensionId: `vscode.media-preview`,
+            hasLineOfCodeCounter: false,
+          })
+          const img = subFrame.locator('img')
+          await expect(img).toBeVisible()
+        } else if (isVideo(fileName)) {
+          const webView = WebView.create({ page, expect, VError })
+          const subFrame = await webView.shouldBeVisible2({
+            extensionId: `vscode.media-preview`,
+            hasLineOfCodeCounter: false,
+          })
+          const video = subFrame.locator('video')
+          await expect(video).toBeVisible()
+        } else if (isBinary(fileName)) {
+          const placeholder = page.locator('.monaco-editor-pane-placeholder')
+          await expect(placeholder).toBeVisible()
+          await page.waitForIdle()
+          const quickPick = QuickPick.create({ page, expect, VError })
+          await quickPick.executeCommand('workbench.action.reopenEditorWith')
+          await page.waitForIdle()
+          await quickPick.type('hex')
+          await page.waitForIdle()
+          await quickPick.select(/hex.*editor/i)
+          await page.waitForIdle()
+          const webView = WebView.create({ page, expect, VError })
+          await webView.shouldBeVisible2({
+            extensionId: `vscode.hexeditor`,
+            hasLineOfCodeCounter: false,
+          })
         } else {
           const editor = page.locator('.editor-instance')
           await expect(editor).toBeVisible()
@@ -414,7 +459,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to verify editor text ${text}`)
       }
     },
-    async rename(newText) {
+    async rename(newText: string) {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.RenameSymbol)
@@ -422,9 +467,37 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await expect(renameInput).toBeVisible()
         await expect(renameInput).toBeFocused()
         await renameInput.type(newText)
+        await page.waitForIdle()
         await page.keyboard.press('Enter')
       } catch (error) {
         throw new VError(error, `Failed to rename text ${newText}`)
+      }
+    },
+    async renameWithPreview(newText: string) {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.RenameSymbol)
+        const renameInput = page.locator('.rename-input')
+        await page.waitForIdle()
+        await expect(renameInput).toBeVisible()
+        await expect(renameInput).toBeFocused()
+        await page.waitForIdle()
+        await renameInput.type(newText)
+        await page.waitForIdle()
+        await page.keyboard.press('Control+Enter')
+        await page.waitForIdle()
+        const refactorPreview = page.locator('.panel#refactorPreview')
+        await expect(refactorPreview).toBeVisible()
+        const applyButton = refactorPreview.locator('.monaco-button', { hasText: 'Apply' })
+        await expect(applyButton).toBeVisible()
+        await page.waitForIdle()
+        await applyButton.click()
+        await page.waitForIdle()
+        await expect(refactorPreview).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to rename with preview ${newText}`)
       }
     },
     async renameCancel(newText) {
@@ -784,6 +857,31 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await contextMenu.select('Add Breakpoint')
       } catch (error) {
         throw new VError(error, `Failed set breakpoint`)
+      }
+    },
+    async setLogpoint(lineNumber, logMessage) {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.part.editor .editor-instance')
+        const lineNumberElement = editor.locator(`.margin-view-overlays > div:nth(${lineNumber - 1})`)
+        await expect(lineNumberElement).toBeVisible()
+        const contextMenu = ContextMenu.create({ page, expect, VError })
+        await contextMenu.open(lineNumberElement)
+        await page.waitForIdle()
+        await contextMenu.select('Add Logpoint...')
+        await page.waitForIdle()
+        const logpointInput = page.locator('.breakpoint-widget .inputContainer .native-edit-context')
+        await expect(logpointInput).toBeVisible()
+        await page.waitForIdle()
+        await expect(logpointInput).toBeVisible()
+        await page.waitForIdle()
+        await expect(logpointInput).toBeFocused()
+        await logpointInput.type(logMessage)
+        await page.waitForIdle()
+        await page.keyboard.press('Enter')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to set logpoint`)
       }
     },
     async goToFile({ file, line, column }) {

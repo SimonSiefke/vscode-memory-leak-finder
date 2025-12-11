@@ -81,6 +81,7 @@ export interface CompareClosuresOptions {
 export const compareNamedClosureCountFromHeapSnapshotInternal2 = async (
   snapshotA: Snapshot,
   snapshotB: Snapshot,
+  scriptMap: any,
   options: CompareClosuresOptions = {},
 ): Promise<any> => {
   const minCount = options.minCount ?? 1

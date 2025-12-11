@@ -60,6 +60,8 @@ export const runTestsWithCallback = async ({
   inspectPtyHostPort,
   inspectSharedProcessPort,
   inspectExtensionsPort,
+  enableProxy,
+  useProxyMock,
   callback,
 }: RunTestsWithCallbackOptions) => {
   try {
@@ -117,6 +119,8 @@ export const runTestsWithCallback = async ({
         inspectPtyHostPort,
         inspectSharedProcessPort,
         inspectExtensionsPort,
+        enableProxy,
+        useProxyMock,
       )
       await testWorkerRpc.dispose()
       await memoryRpc?.dispose()
@@ -192,6 +196,8 @@ export const runTestsWithCallback = async ({
           inspectPtyHostPort,
           inspectSharedProcessPort,
           inspectExtensionsPort,
+          enableProxy,
+          useProxyMock,
         )
         workers = {
           testWorkerRpc: testWorkerRpc || emptyRpc,

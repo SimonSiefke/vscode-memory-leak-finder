@@ -37,7 +37,10 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     inspectPtyHostPort,
     inspectSharedProcessPort,
     inspectExtensionsPort,
+    enableProxy,
+    useProxyMock,
   } = options
+  console.log({ enableProxy })
   const clear = await AnsiEscapes.clear(isWindows)
   await Stdout.write(clear)
   const rpc = await RunTest.prepare()
@@ -73,5 +76,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     inspectPtyHostPort,
     inspectSharedProcessPort,
     inspectExtensionsPort,
+    enableProxy,
+    useProxyMock,
   })
 }

@@ -38,6 +38,8 @@ export interface StdinDataState {
   inspectPtyHostPort: number
   inspectSharedProcessPort: number
   inspectExtensionsPort: number
+  enableProxy: boolean
+  useProxyMock: boolean
 }
 
 let state: StdinDataState = {
@@ -74,6 +76,8 @@ let state: StdinDataState = {
   inspectPtyHostPort: 5877,
   inspectSharedProcessPort: 5879,
   inspectExtensionsPort: 5870,
+  enableProxy: false,
+  useProxyMock: false,
 }
 
 export const setState = (newState): void => {
@@ -109,6 +113,8 @@ export const setState = (newState): void => {
     inspectPtyHostPort: newState.inspectPtyHostPort,
     inspectSharedProcessPort: newState.inspectSharedProcessPort,
     inspectExtensionsPort: newState.inspectExtensionsPort,
+    enableProxy: newState.enableProxy,
+    useProxyMock: newState.useProxyMock,
   }
 }
 

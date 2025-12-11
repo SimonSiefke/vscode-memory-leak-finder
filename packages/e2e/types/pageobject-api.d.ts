@@ -53,6 +53,7 @@ export interface DebugConsole {
   clear(): Promise<void>
   shouldHaveCompletions(items: any): Promise<void>
   clearInput(): Promise<void>
+  shouldHaveLogpointOutput(expectedMessage: any): Promise<void>
 }
 export interface DebugHover {
   expandProperty(name: any, childProperties: any): Promise<void>
@@ -129,6 +130,7 @@ export interface Editor {
   shouldHaveInspectedToken(name: any): Promise<void>
   closeInspectedTokens(): Promise<void>
   setBreakpoint(lineNumber: any): Promise<void>
+  setLogpoint(lineNumber: any, logMessage: any): Promise<void>
   goToFile(options: any): Promise<void>
   showDebugHover(options: any): Promise<void>
   hideDebugHover(): Promise<void>
@@ -399,6 +401,7 @@ export interface View {
 }
 export interface WebView {
   shouldBeVisible(): Promise<void>
+  shouldBeVisible2(options: { extensionId: string; hasLineOfCodeCounter?: boolean }): Promise<any>
   focus(): Promise<void>
 }
 export interface WelcomePage {
@@ -436,6 +439,7 @@ export interface Server {
 export interface PageObjectApi {
   readonly ActivityBar: ActivityBar
   readonly Colors: any
+  readonly SimpleBrowser: any
   readonly Git: any
   readonly ChatEditor: ChatEditor
   readonly ExtensionDetailView: any
