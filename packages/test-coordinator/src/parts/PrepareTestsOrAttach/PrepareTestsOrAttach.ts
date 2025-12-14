@@ -39,7 +39,7 @@ export const prepareTestsAndAttach = async (
 ) => {
   const isFirst = state.promise === undefined
   if (isFirst) {
-    state.promise = PrepareTests.prepareTests(
+    state.promise = PrepareTests.prepareTests({
       cwd,
       headlessMode,
       recordVideo,
@@ -65,7 +65,7 @@ export const prepareTestsAndAttach = async (
       inspectExtensionsPort,
       enableProxy,
       useProxyMock,
-    )
+    })
   }
   const result = await state.promise
 
