@@ -66,7 +66,6 @@ export const runTestsWithCallback = async ({
   useProxyMock,
   callback,
 }: RunTestsWithCallbackOptions): Promise<RunTestsResult> => {
-  console.log(`[debug] RunTestsWithCallback.runTestsWithCallback called with insidersCommit: ${insidersCommit} (type: ${typeof insidersCommit})`)
   try {
     Assert.string(root)
     Assert.string(cwd)

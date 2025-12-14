@@ -37,7 +37,6 @@ export const prepareTestsAndAttach = async (
   enableProxy: boolean,
   useProxyMock: boolean,
 ) => {
-  console.log(`[debug] PrepareTestsOrAttach.prepareTestsAndAttach called with insidersCommit: ${insidersCommit} (type: ${typeof insidersCommit})`)
   const isFirst = state.promise === undefined
   if (isFirst) {
     state.promise = PrepareTests.prepareTests(
