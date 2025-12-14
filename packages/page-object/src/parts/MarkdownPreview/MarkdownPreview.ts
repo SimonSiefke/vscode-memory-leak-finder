@@ -25,6 +25,7 @@ export const create = ({ expect, page, VError }) => {
         await subFrame.waitForIdle()
         const markDown = subFrame.locator('.markdown-body')
         await expect(markDown).toBeVisible()
+        await page.waitForIdle()
         return subFrame
       } catch (error) {
         throw new VError(error, `Failed to check that markdown preview is visible`)
