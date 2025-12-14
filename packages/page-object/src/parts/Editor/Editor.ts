@@ -930,6 +930,16 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to hide debug hover`)
       }
     },
+    async reloadWebViews() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.ReloadWebViews)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to reload webviews`)
+      }
+    },
     async autoFix({ hasFixes }) {
       try {
         const quickPick = QuickPick.create({
