@@ -60,6 +60,8 @@ export const updateState = async (newState: any): Promise<void> => {
       inspectExtensionsPort: state.inspectExtensionsPort,
       enableProxy: state.enableProxy,
       useProxyMock: state.useProxyMock,
+      insidersCommit: state.insidersCommit,
+      bisect: state.bisect,
     })
   }
   if (newState.mode === ModeType.Interrupted) {
