@@ -13,6 +13,7 @@ export const create = ({ electronApp, page, expect, VError }) => {
     },
     async add() {
       await execa('git', ['add', '-f', '.'], { cwd: workspace })
+      await page.waitForIdle()
     },
     async commit(message) {
       await execa('git', ['commit', '-m', message], { cwd: workspace })
