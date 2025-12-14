@@ -23,6 +23,7 @@ export const launchVsCode = async ({
   vscodeVersion,
   vscodePath,
   commit,
+  insidersCommit,
   addDisposable,
   inspectSharedProcess,
   inspectExtensions,
@@ -31,6 +32,8 @@ export const launchVsCode = async ({
   inspectPtyHostPort,
   inspectSharedProcessPort,
   inspectExtensionsPort,
+  enableProxy,
+  useProxyMock,
 }) => {
   try {
     const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
@@ -50,7 +53,7 @@ export const launchVsCode = async ({
     await mkdir(sourceMapCacheDir, { recursive: true })
     const sourcesDir = join(Root.root, '.vscode-sources')
     await mkdir(sourcesDir, { recursive: true })
-    const binaryPath = await GetBinaryPath.getBinaryPath(vscodeVersion, vscodePath, commit)
+    const binaryPath = await GetBinaryPath.getBinaryPath(vscodeVersion, vscodePath, commit, insidersCommit)
     const userDataDir = GetUserDataDir.getUserDataDir()
     const extensionsDir = GetExtensionsDir.getExtensionsDir()
     await rm(extensionsDir, { recursive: true, force: true })
@@ -70,8 +73,13 @@ export const launchVsCode = async ({
       inspectPtyHostPort,
       inspectSharedProcessPort,
       inspectExtensionsPort,
+      enableProxy: enableProxy,
     })
-    const env = GetVsCodeEnv.getVsCodeEnv({ runtimeDir, processEnv: process.env })
+
+    const env = GetVsCodeEnv.getVsCodeEnv({
+      runtimeDir,
+      processEnv: process.env,
+    })
     const { child } = await LaunchElectron.launchElectron({
       cliPath: binaryPath,
       args,

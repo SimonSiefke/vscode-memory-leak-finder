@@ -21,6 +21,7 @@ export const prepareTestsAndAttach = async (
   vscodePath: string,
   vscodeVersion: string,
   commit: string,
+  insidersCommit: string,
   attachedToPageTimeout: number,
   measureId: string,
   idleTimeout: number,
@@ -33,6 +34,8 @@ export const prepareTestsAndAttach = async (
   inspectPtyHostPort: number,
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
+  enableProxy: boolean,
+  useProxyMock: boolean,
 ) => {
   const isFirst = state.promise === undefined
   if (isFirst) {
@@ -47,6 +50,7 @@ export const prepareTestsAndAttach = async (
       vscodePath,
       vscodeVersion,
       commit,
+      insidersCommit,
       attachedToPageTimeout,
       measureId,
       idleTimeout,
@@ -59,6 +63,8 @@ export const prepareTestsAndAttach = async (
       inspectPtyHostPort,
       inspectSharedProcessPort,
       inspectExtensionsPort,
+      enableProxy,
+      useProxyMock,
     )
   }
   const result = await state.promise

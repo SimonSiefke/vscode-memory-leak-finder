@@ -11,6 +11,7 @@ export const launch = async (
   vscodePath: string,
   vscodeVersion: string,
   commit: string,
+  insidersCommit: string,
   connectionId: number,
   isFirstConnection: boolean,
   canUseIdleCallback: boolean,
@@ -22,6 +23,8 @@ export const launch = async (
   inspectPtyHostPort: number,
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
+  enableProxy: boolean,
+  useProxyMock: boolean,
 ): Promise<any> => {
   const { child } = await LaunchIde.launchIde({
     headlessMode,
@@ -30,6 +33,7 @@ export const launch = async (
     vscodePath,
     vscodeVersion,
     commit,
+    insidersCommit,
     addDisposable: Disposables.add,
     inspectSharedProcess,
     inspectExtensions,
@@ -38,6 +42,8 @@ export const launch = async (
     inspectPtyHostPort,
     inspectSharedProcessPort,
     inspectExtensionsPort,
+    enableProxy,
+    useProxyMock,
   })
   const { port, dispose } = createPipeline(child.stderr)
   const rpc = await NodeWorkerRpcParent.create({

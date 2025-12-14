@@ -10,7 +10,7 @@ const downloadExtension = async (extension) => {
   const [publisher, name] = id.split('/')
   const publisherLower = publisher.toLowerCase()
   const url = urlPlaceHolder.replace('$PUBLISHER', publisher).replace('$NAME', name).replace('$VERSION', version)
-  console.log({ url })
+  console.info(`[download worker] Downloading extension ${id}`)
   const outDir = join(root, '.vscode-tool-downloads', `${name}-extracted`)
   await downloadAndExtract(name, [url], outDir)
   await cp(join(outDir, 'extension'), join(root, '.vscode-extensions', `${publisherLower}.${name}-${version}`), {

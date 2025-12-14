@@ -13,6 +13,7 @@ export const prepareTests = async (
   vscodePath: string,
   vscodeVersion: string,
   commit: string,
+  insidersCommit: string,
   attachedToPageTimeout: number,
   measureId: string,
   idleTimeout: number,
@@ -25,6 +26,8 @@ export const prepareTests = async (
   inspectPtyHostPort: number,
   inspectSharedProcessPort: number,
   inspectExtensionsPort: number,
+  enableProxy: boolean,
+  useProxyMock: boolean,
 ) => {
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
@@ -37,6 +40,7 @@ export const prepareTests = async (
       vscodePath,
       vscodeVersion,
       commit,
+      insidersCommit,
       connectionId,
       isFirstConnection,
       canUseIdleCallback,
@@ -48,6 +52,8 @@ export const prepareTests = async (
       inspectPtyHostPort,
       inspectSharedProcessPort,
       inspectExtensionsPort,
+      enableProxy,
+      useProxyMock,
     )
 
   return {
