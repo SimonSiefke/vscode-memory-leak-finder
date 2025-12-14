@@ -11,6 +11,8 @@ export const setup = async ({ Terminal, Workspace, SideBar }: TestContext): Prom
     waitForReady: true,
   })
   // @ts-ignore
+  await Terminal.type('echo abc')
+  // @ts-ignore
   await Terminal.openFind()
 }
 
