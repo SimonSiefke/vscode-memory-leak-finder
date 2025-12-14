@@ -1,9 +1,4 @@
-import * as os from 'node:os'
-
-export const getVscodePlatformName = (): string => {
-  const platform = process.platform
-  const arch = os.arch()
-
+export const getVscodePlatformName = (platform: string, arch: string): string => {
   if (platform === 'linux') {
     if (arch === 'arm64' || arch === 'aarch64') {
       return 'linux-arm64'
@@ -30,4 +25,3 @@ export const getVscodePlatformName = (): string => {
 
   throw new Error(`Unsupported platform: ${platform}`)
 }
-

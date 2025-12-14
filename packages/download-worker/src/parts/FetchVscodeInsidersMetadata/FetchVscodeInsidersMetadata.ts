@@ -1,4 +1,5 @@
 import { VError } from '@lvce-editor/verror'
+import * as os from 'node:os'
 import * as GetVscodePlatformName from '../GetVscodePlatformName/GetVscodePlatformName.ts'
 
 export interface IBuildMetadata {
@@ -10,7 +11,7 @@ export interface IBuildMetadata {
 
 export const fetchVscodeInsidersMetadata = async (commit: string): Promise<IBuildMetadata> => {
   try {
-    const platformName = GetVscodePlatformName.getVscodePlatformName()
+    const platformName = GetVscodePlatformName.getVscodePlatformName(process.platform, os.arch())
     const quality = 'insider'
     const url = `https://update.code.visualstudio.com/api/versions/commit:${commit}/${platformName}/${quality}`
 
@@ -34,4 +35,3 @@ export const fetchVscodeInsidersMetadata = async (commit: string): Promise<IBuil
     throw new VError(error, `Failed to fetch VS Code Insiders metadata for commit ${commit}`)
   }
 }
-
