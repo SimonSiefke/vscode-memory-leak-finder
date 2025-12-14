@@ -1,13 +1,6 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({
-  Workspace,
-  Git,
-  Editor,
-  ActivityBar,
-  SourceControl,
-  Explorer,
-}: TestContext): Promise<void> => {
+export const setup = async ({ Workspace, Git, Editor, ActivityBar, SourceControl, Explorer }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'a.txt',
@@ -42,10 +35,7 @@ export const setup = async ({
   await Editor.open('b.txt')
 }
 
-export const run = async ({
-  SourceControl,
-  Editor,
-}: TestContext): Promise<void> => {
+export const run = async ({ SourceControl, Editor }: TestContext): Promise<void> => {
   await Editor.shouldHaveText('content in main branch')
   await SourceControl.showBranchPicker()
   await SourceControl.selectBranch('b')
@@ -53,8 +43,6 @@ export const run = async ({
   await SourceControl.showBranchPicker()
   await SourceControl.selectBranch('main')
   await Editor.shouldHaveText('content in main branch')
-}
-
   await Editor.close()
   await Editor.open('b.txt')
   await Editor.shouldHaveText('content in branch b')
