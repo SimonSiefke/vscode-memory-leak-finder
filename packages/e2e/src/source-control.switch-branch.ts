@@ -20,6 +20,7 @@ export const setup = async ({ Workspace, Git, Editor, ActivityBar, SourceControl
   await Git.commit('update b.txt in branch b')
   await Git.checkoutBranch('main')
   await ActivityBar.showSourceControl()
+  await SourceControl.shouldHaveHistoryItem('initial commit')
   await Editor.closeAll()
   await Explorer.focus()
   await Explorer.shouldHaveItem('b.txt')
