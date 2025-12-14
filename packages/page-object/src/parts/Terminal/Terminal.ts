@@ -306,5 +306,25 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         throw new VError(error, `Failed to move panel to panel area`)
       }
     },
+    async scrollToTop() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.TerminalScrollToTop)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to scroll to top`)
+      }
+    },
+    async scrollToBottom() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.TerminalScrollToBottom)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to scroll to bottom`)
+      }
+    },
   }
 }
