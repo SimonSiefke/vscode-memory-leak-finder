@@ -50,7 +50,7 @@ export const run = async (platform: string, argv: readonly string[], env: NodeJS
     inspectSharedProcessPort: options.inspectSharedProcessPort,
     inspectExtensionsPort: options.inspectExtensionsPort,
     bisect: options.bisect,
-    insiders: options.bisect,
+    insidersCommit: options.insidersCommit,
   })
   return InitialStart.initialStart(options)
 }
