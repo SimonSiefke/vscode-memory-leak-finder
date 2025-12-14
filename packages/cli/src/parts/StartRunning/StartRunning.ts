@@ -5,8 +5,23 @@ import * as Stdout from '../Stdout/Stdout.ts'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
 import * as HandleTestsFinished from '../HandleTestsFinished/HandleTestsFinished.ts'
 import * as HandleTestsUnexpectedError from '../HandleTestsUnexpectedError/HandleTestsUnexpectedError.ts'
+import * as Bisect from '../Bisect/Bisect.ts'
 
 export const startRunning = async (options: StartRunningOptions): Promise<void> => {
+  if (options.bisect) {
+    const result = await Bisect.bisect(options)
+    if (result.type === 'success') {
+      await Stdout.write(`\nBisect did find a matching commit introducing the regression: ${result.commit}\n`)
+      process.exit(0)
+    } else if (result.type === 'failed-test') {
+      await Stdout.write(`\nBisect failed due to failed test.\n`)
+      process.exit(1)
+    } else {
+      await Stdout.write(`\nBisect didn't find a matching commit introducing the regression.\n`)
+      process.exit(1)
+    }
+    return
+  }
   const {
     filterValue,
     headlessMode,
