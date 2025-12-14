@@ -33,13 +33,15 @@ const getBinaryPathFromExtractDir = (extractDir: string): string => {
 }
 
 export const downloadAndUnzipInsiders = async (commit: string): Promise<string> => {
+  const cachedPath = await GetVscodeRuntimePath.getVscodeRuntimePath(commit)
+  if (cachedPath) {
+    console.log(`[insiders] Using cached vscode-insiders for commit ${commit}`)
+    return cachedPath
+  }
+  console.log(`[insiders] Cache miss, downloading vscode-insiders for commit ${commit}`)
   const metadata = await FetchVscodeInsidersMetadata.fetchVscodeInsidersMetadata(commit)
   const insidersVersionsDir = join(Root.root, '.vscode-insiders-versions')
   const extractDir = join(insidersVersionsDir, commit)
-  const cachedPath = await GetVscodeRuntimePath.getVscodeRuntimePath(commit)
-  if (cachedPath) {
-    return cachedPath
-  }
   console.log({ url: metadata.url })
   await DownloadAndExtract.downloadAndExtract('vscode-insiders', [metadata.url], extractDir)
   const path = getBinaryPathFromExtractDir(extractDir)
