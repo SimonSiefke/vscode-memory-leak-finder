@@ -23,6 +23,7 @@ export const start = async (session: Session, objectGroup: string) => {
 
 export const stop = async (session: Session, objectGroup: string) => {
   const result = await GetInstanceCounts.getInstanceCounts(session, objectGroup)
+  await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
   return result
 }
 
