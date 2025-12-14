@@ -50,10 +50,6 @@ export const run = async (platform: string, argv: readonly string[], env: NodeJS
     inspectSharedProcessPort: options.inspectSharedProcessPort,
     inspectExtensionsPort: options.inspectExtensionsPort,
     bisect: options.bisect,
-<<<<<<< HEAD
-=======
-    insiders: options.bisect,
->>>>>>> origin/main
   })
   return InitialStart.initialStart(options)
 }
