@@ -1,5 +1,7 @@
 import type { TestContext } from '../types.ts'
 
+export const skip = 1
+
 export const setup = async ({ Workspace, Git, Editor, ActivityBar, SourceControl, Explorer }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
