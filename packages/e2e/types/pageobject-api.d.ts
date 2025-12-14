@@ -110,6 +110,7 @@ export interface Editor {
   shouldHaveBreadCrumb(text: any): Promise<void>
   save(options?: any): Promise<void>
   switchToTab(name: any): Promise<void>
+  openSettingsJson(): Promise<void>
   showColorPicker(): Promise<void>
   hideColorPicker(): Promise<void>
   showBreadCrumbs(): Promise<void>
@@ -316,6 +317,7 @@ export interface SettingsEditor {
   search(options: any): Promise<void>
   clear(): Promise<void>
   select(options: any): Promise<void>
+  setTextInput(options: any): Promise<void>
   toggleCheckBox(options: any): Promise<void>
   enableCheckBox(options: any): Promise<void>
   openTab(tabName: any): Promise<void>
