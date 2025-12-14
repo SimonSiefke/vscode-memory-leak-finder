@@ -16,13 +16,9 @@ export const getBinaryPath = async (vscodeVersion: string, vscodePath: string, c
     return await DownloadAndBuildVscodeFromCommit.downloadAndBuildVscodeFromCommit(commit, repoUrl, reposDir, nodeModulesCacheDir, useNice)
   }
   if (insidersCommit) {
-    const { downloadAndUnzipVSCode } = await import('@vscode/test-electron')
-    const cachePath = join(Root.root, '.vscode-test')
-    const path = await downloadAndUnzipVSCode({
-      version: `insider-${insidersCommit}`,
-      cachePath,
+    return await DownloadAndUnzipVscode.downloadAndUnzipVscode({
+      insidersCommit,
     })
-    return path
   }
   if (Env.env.VSCODE_PATH) {
     console.warn('Warning: Using VSCODE_PATH environment variable is deprecated. Please use --vscode-path CLI flag instead.')

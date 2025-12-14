@@ -1,8 +1,8 @@
 import { VError } from '@lvce-editor/verror'
+import * as os from 'node:os'
 import { join, resolve } from 'node:path'
 import * as AdjustVscodeProductJson from '../AdjustVscodeProductJson/AdjustVscodeProductJson.ts'
 import * as CollectSourceMapUrls from '../CollectSourceMapUrls/CollectSourceMapUrls.ts'
-import * as Download from '../Download/Download.ts'
 import * as DownloadAndExtract from '../DownloadAndExtract/DownloadAndExtract.ts'
 import * as Env from '../Env/Env.ts'
 import * as FetchVscodeInsidersMetadata from '../FetchVscodeInsidersMetadata/FetchVscodeInsidersMetadata.ts'
@@ -22,11 +22,16 @@ const getProductJsonPath = (path: string): string => {
 
 const automaticallyDownloadSourceMaps = false
 
-const getExtractedPath = (extractDir: string): string => {
+const getBinaryPathFromExtractDir = (extractDir: string): string => {
   if (process.platform === 'darwin') {
-    return join(extractDir, 'Visual Studio Code - Insiders.app', 'Contents', 'MacOS')
+    return join(extractDir, 'Visual Studio Code - Insiders.app', 'Contents', 'MacOS', 'Electron')
   }
-  return join(extractDir, 'VSCode-linux-x64')
+  if (process.platform === 'win32') {
+    return join(extractDir, 'Code - Insiders', 'Code - Insiders.exe')
+  }
+  const arch = os.arch()
+  const archSuffix = arch === 'arm64' || arch === 'aarch64' ? 'arm64' : 'x64'
+  return join(extractDir, `VSCode-linux-${archSuffix}`, 'code')
 }
 
 const downloadAndUnzipInsiders = async (commit: string): Promise<string> => {
@@ -38,7 +43,7 @@ const downloadAndUnzipInsiders = async (commit: string): Promise<string> => {
     return cachedPath
   }
   await DownloadAndExtract.downloadAndExtract('vscode-insiders', [metadata.url], extractDir)
-  const path = getExtractedPath(extractDir)
+  const path = getBinaryPathFromExtractDir(extractDir)
   const productPath = getProductJsonPath(path)
   const productJson = await JsonFile.readJson(productPath)
   const newProductJson = AdjustVscodeProductJson.adjustVscodeProductJson(productJson)
