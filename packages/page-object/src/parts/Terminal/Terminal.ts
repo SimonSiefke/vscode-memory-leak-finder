@@ -234,8 +234,13 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
     async ignoreHover() {
       try {
         await page.waitForIdle()
+        const hover = page.locator('.monaco-hover.workbench-hover')
+        await expect(hover).toBeVisible()
+        await expect(hover).toBeFocused()
+        await page.waitForIdle()
         await page.keyboard.press('Escape')
-        // TODO verify hover is hidden
+        await page.waitForIdle()
+        await expect(hover).toBeHidden()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to dismiss hover`)
