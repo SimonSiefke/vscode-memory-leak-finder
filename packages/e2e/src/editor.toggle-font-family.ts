@@ -13,7 +13,7 @@ export const setup = async ({ Editor, Workspace, SettingsEditor }: TestContext):
   await SettingsEditor.open()
   await SettingsEditor.search({
     value: 'editor.fontFamily',
-    resultCount: 1,
+    resultCount: 6,
   })
 }
 
