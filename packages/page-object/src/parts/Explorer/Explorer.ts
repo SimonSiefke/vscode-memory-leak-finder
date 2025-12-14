@@ -38,6 +38,7 @@ export const create = ({ page, expect, VError }) => {
         await page.keyboard.press('Control+A')
         await page.waitForIdle()
         await this.openContextMenu(`1.txt`)
+        await page.waitForIdle()
         const contextMenu = ContextMenu.create({ page, expect, VError })
         await contextMenu.select('Open to the Side')
         await page.waitForIdle()
