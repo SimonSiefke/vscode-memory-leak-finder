@@ -223,6 +223,10 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.TerminalFocusHover)
         await page.waitForIdle()
+        const hover = page.locator('.monaco-hover.workbench-hover')
+        await expect(hover).toBeVisible()
+        await expect(hover).toBeFocused()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to focus hover`)
       }
