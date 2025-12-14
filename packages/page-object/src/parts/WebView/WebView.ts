@@ -9,11 +9,15 @@ const waitForExtraIdle = async (page) => {
 
 export const create = ({ expect, page, VError }) => {
   return {
+    /**
+     * @deprecated use shouldBeVisible2 instead
+     */
     async shouldBeVisible() {
       try {
         await page.waitForIdle()
         const webView = page.locator('.webview')
         await expect(webView).toBeVisible()
+        await page.waitForIdle()
         await expect(webView).toHaveClass('ready')
         await waitForExtraIdle(page)
       } catch (error) {
@@ -25,7 +29,9 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const webView = page.locator('.webview')
         await expect(webView).toBeVisible()
+        await page.waitForIdle()
         await expect(webView).toHaveClass('ready')
+        await page.waitForIdle()
         const regex = new RegExp(`extensionId=${extensionId}`)
         const childPage = await page.waitForIframe({
           url: regex,

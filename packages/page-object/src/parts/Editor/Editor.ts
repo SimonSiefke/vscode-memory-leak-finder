@@ -43,16 +43,20 @@ export const create = ({ page, expect, VError, ideVersion }) => {
             extensionId: `vscode.media-preview`,
             hasLineOfCodeCounter: false,
           })
+          await subFrame.waitForIdle()
           const img = subFrame.locator('img')
           await expect(img).toBeVisible()
+          await subFrame.waitForIdle()
         } else if (isVideo(fileName)) {
           const webView = WebView.create({ page, expect, VError })
           const subFrame = await webView.shouldBeVisible2({
             extensionId: `vscode.media-preview`,
             hasLineOfCodeCounter: false,
           })
+          await subFrame.waitForIdle()
           const video = subFrame.locator('video')
           await expect(video).toBeVisible()
+          await subFrame.waitForIdle()
         } else if (isBinary(fileName)) {
           const placeholder = page.locator('.monaco-editor-pane-placeholder')
           await expect(placeholder).toBeVisible()
@@ -948,6 +952,38 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await expect(debugHover).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to hide debug hover`)
+      }
+    },
+    async reloadWebViews({ expectViews }: { expectViews: readonly string[] }) {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.ReloadWebViews)
+        await page.waitForIdle()
+        // TODO need to wait for subframe to be
+        // destroyed and recreated. currently it thinks
+        // the previous iframe is visible, which it is
+        // but then it gets destroyed and doesn't check
+        // for the new iframe
+        await new Promise((resolve) => {
+          setTimeout(resolve, 2000)
+        })
+        for (const view of expectViews) {
+          // TODO check view matching tab
+          if (view.endsWith('.svg')) {
+            const webView = WebView.create({ page, expect, VError })
+            const subFrame = await webView.shouldBeVisible2({
+              extensionId: `vscode.media-preview`,
+              hasLineOfCodeCounter: false,
+            })
+            await subFrame.waitForIdle()
+            const img = subFrame.locator('img')
+            await expect(img).toBeVisible()
+            await subFrame.waitForIdle()
+          }
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to reload webviews`)
       }
     },
     async autoFix({ hasFixes }) {
