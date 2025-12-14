@@ -40,6 +40,7 @@ export const downloadAndUnzipInsiders = async (commit: string): Promise<string> 
   if (cachedPath) {
     return cachedPath
   }
+  console.log({ url: metadata.url })
   await DownloadAndExtract.downloadAndExtract('vscode-insiders', [metadata.url], extractDir)
   const path = getBinaryPathFromExtractDir(extractDir)
   const productPath = getProductJsonPath(path)
