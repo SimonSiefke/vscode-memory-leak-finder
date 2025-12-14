@@ -42,7 +42,8 @@ export const performBisect = async (options: RunTestsOptions): Promise<BisectRes
     try {
       const result = await RunTestsWithCallback.runTestsWithCallback({
         ...options,
-        commit: commitHash,
+        commit: '',
+        insidersCommit: commitHash,
         callback,
         addDisposable: Disposables.add,
         clearDisposables: Disposables.disposeAll,

@@ -28,7 +28,7 @@ const getBinaryPathFromExtractDir = (extractDir: string): string => {
     return join(extractDir, 'Code - Insiders', 'Code - Insiders.exe')
   }
   const arch = os.arch()
-  const archSuffix = arch === 'arm64' || arch === 'aarch64' ? 'arm64' : 'x64'
+  const archSuffix = arch === 'arm64' ? 'arm64' : 'x64'
   return join(extractDir, `VSCode-linux-${archSuffix}`, 'code-insiders')
 }
 
