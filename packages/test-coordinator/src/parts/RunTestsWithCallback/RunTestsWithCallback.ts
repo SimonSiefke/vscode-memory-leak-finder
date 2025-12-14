@@ -29,23 +29,6 @@ const disposeWorkers = async (workers) => {
   await initializationWorkerRpc.dispose()
 }
 
-export type RunTestsResult =
-  | {
-      type: 'success'
-      passed: number
-      failed: number
-      skipped: number
-      skippedFailed: number
-      leaked: number
-      total: number
-      duration: number
-      filterValue: string
-    }
-  | {
-      type: 'error'
-      prettyError: any
-    }
-
 export const runTestsWithCallback = async ({
   root,
   cwd,
@@ -80,7 +63,7 @@ export const runTestsWithCallback = async ({
   enableProxy,
   useProxyMock,
   callback,
-}: RunTestsWithCallbackOptions): Promise<RunTestsResult> => {
+}: RunTestsWithCallbackOptions) => {
   try {
     Assert.string(root)
     Assert.string(cwd)
@@ -142,17 +125,7 @@ export const runTestsWithCallback = async ({
       await testWorkerRpc.dispose()
       await memoryRpc?.dispose()
       await videoRpc?.dispose()
-      return {
-        type: 'success',
-        passed: 0,
-        failed: 0,
-        skipped: 0,
-        skippedFailed: 0,
-        leaked: 0,
-        total: 0,
-        duration: 0,
-        filterValue,
-      }
+      return callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, 0, 0, 0, filterValue)
     }
 
     let passed = 0
@@ -163,17 +136,7 @@ export const runTestsWithCallback = async ({
     const formattedPaths = await GetTestToRun.getTestsToRun(root, cwd, filterValue, continueValue)
     const total = formattedPaths.length
     if (total === 0) {
-      return {
-        type: 'success',
-        passed,
-        failed,
-        skipped,
-        skippedFailed: 0,
-        leaked: leaking,
-        total,
-        duration: 0,
-        filterValue,
-      }
+      return callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, 0, leaking, total, 0, filterValue)
     }
     const initialStart = Time.now()
     const first = formattedPaths[0]
