@@ -1,11 +1,16 @@
-import type { StartRunningOptions } from './StartRunningOptions.ts'
 import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
+import * as HandleTestsFinished from '../HandleTestsFinished/HandleTestsFinished.ts'
+import * as HandleTestsUnexpectedError from '../HandleTestsUnexpectedError/HandleTestsUnexpectedError.ts'
 import * as RunTest from '../RunTest/RunTest.ts'
 import * as Stdout from '../Stdout/Stdout.ts'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
+<<<<<<< HEAD
 import * as HandleTestsFinished from '../HandleTestsFinished/HandleTestsFinished.ts'
 import * as HandleTestsUnexpectedError from '../HandleTestsUnexpectedError/HandleTestsUnexpectedError.ts'
 import * as Bisect from '../Bisect/Bisect.ts'
+=======
+import type { StartRunningOptions } from './StartRunningOptions.ts'
+>>>>>>> origin/main
 
 export const startRunning = async (options: StartRunningOptions): Promise<void> => {
   if (options.bisect) {
@@ -97,6 +102,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     inspectExtensionsPort,
     enableProxy,
     useProxyMock,
+    bisect,
   })
   if (result.type === 'success') {
     await HandleTestsFinished.handleTestsFinished(

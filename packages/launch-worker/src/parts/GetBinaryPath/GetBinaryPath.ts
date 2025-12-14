@@ -8,7 +8,12 @@ export const getBinaryPath = async (vscodeVersion: string, vscodePath: string, c
   if (vscodePath) {
     return vscodePath
   }
-  if (commit) {
+  if (insidersCommit && typeof insidersCommit === 'string' && insidersCommit !== '') {
+    return await DownloadAndUnzipVscode.downloadAndUnzipVscode({
+      insidersCommit,
+    })
+  }
+  if (commit && typeof commit === 'string' && commit !== '') {
     const repoUrl = 'https://github.com/microsoft/vscode.git'
     const reposDir = join(Root.root, '.vscode-repos')
     const nodeModulesCacheDir = join(Root.root, '.vscode-node-modules-cache')

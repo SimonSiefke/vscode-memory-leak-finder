@@ -28,13 +28,20 @@ export interface DownloadAndUnzipVscodeOptions {
  * @param {DownloadAndUnzipVscodeOptions} options
  */
 export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOptions | string): Promise<string> => {
+<<<<<<< HEAD
+=======
+  let vscodeVersion: string | undefined
+>>>>>>> origin/main
   try {
     if (Env.env.VSCODE_PATH) {
       console.warn('Warning: Using VSCODE_PATH environment variable is deprecated. Please use --vscode-path CLI flag instead.')
       return Env.env.VSCODE_PATH
     }
 
+<<<<<<< HEAD
     let vscodeVersion: string | undefined
+=======
+>>>>>>> origin/main
     let insidersCommit: string | undefined
 
     if (typeof options === 'string') {
@@ -44,7 +51,10 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
       insidersCommit = options.insidersCommit
     }
 
+<<<<<<< HEAD
     console.log({ insidersCommit })
+=======
+>>>>>>> origin/main
     if (insidersCommit) {
       return await DownloadAndUnzipInsiders.downloadAndUnzipInsiders(insidersCommit)
     }
