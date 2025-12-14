@@ -17,15 +17,19 @@ export const setup = async ({ Editor, Workspace, SettingsEditor }: TestContext):
   })
 }
 
-export const run = async ({ SettingsEditor }: TestContext): Promise<void> => {
+export const run = async ({ SettingsEditor, Editor }: TestContext): Promise<void> => {
   await SettingsEditor.setTextInput({
     name: 'editor.fontFamily',
     value: 'serif',
   })
+  // @ts-ignore
+  await Editor.shouldHaveFontFamily('serif')
   await SettingsEditor.setTextInput({
     name: 'editor.fontFamily',
     value: 'sans-serif',
   })
+  // @ts-ignore
+  await Editor.shouldHaveFontFamily('sans-serif')
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {

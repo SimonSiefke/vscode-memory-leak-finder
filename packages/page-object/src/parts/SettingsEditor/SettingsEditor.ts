@@ -80,19 +80,17 @@ export const create = ({ expect, page, VError }) => {
     async setTextInput({ name, value }) {
       try {
         await page.waitForIdle()
-        const settingItem = page.locator(`.setting-item-contents[aria-label="${name}"]`)
+        const settingItem = page.locator(`.setting-item-contents[data-key="${name}"]`)
         await expect(settingItem).toBeVisible()
         await page.waitForIdle()
         const textInput = settingItem.locator('input[type="text"]')
-        const textArea = settingItem.locator('textarea')
-        const input = textInput.or(textArea).first()
+        const input = textInput
         await expect(input).toBeVisible()
         await input.click()
         await page.waitForIdle()
         await input.focus()
         await page.waitForIdle()
-        const selectAll = process.platform === 'darwin' ? 'Meta+A' : 'Control+A'
-        await page.keyboard.press(selectAll)
+        await page.keyboard.press('Control+A')
         await page.waitForIdle()
         await input.type(value)
         await page.waitForIdle()

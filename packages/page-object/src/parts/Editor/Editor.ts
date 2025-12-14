@@ -840,6 +840,21 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed cursor assertion`)
       }
     },
+    async shouldHaveFontFamily(fontFamily: string) {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.monaco-editor[data-uri$="file.txt"]')
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
+        const token = page.locator('.mtk1')
+        await expect(token).toBeVisible()
+        await page.waitForIdle()
+        await token.shouldHaveCSS(`font-family`, new RegExp(`^${fontFamily}`))
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify font family`)
+      }
+    },
     async enableReadonly() {
       try {
         await page.waitForIdle()
