@@ -575,6 +575,16 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to switch to tab ${name}`)
       }
     },
+    async openSettingsJson() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand('Preferences: Open User Settings (JSON)')
+        await this.switchToTab('settings.json')
+      } catch (error) {
+        throw new VError(error, `Failed to open settings JSON`)
+      }
+    },
     async showColorPicker() {
       try {
         await page.waitForIdle()

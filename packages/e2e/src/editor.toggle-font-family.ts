@@ -1,7 +1,6 @@
 import type { TestContext } from '../types.ts'
-import * as QuickPick from '../../page-object/src/parts/QuickPick/QuickPick.ts'
 
-export const setup = async ({ Editor, Workspace, page, expect, VError }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'file.txt',
@@ -11,9 +10,7 @@ export const setup = async ({ Editor, Workspace, page, expect, VError }: TestCon
   await Editor.closeAll()
   await Editor.open('file.txt')
   await Editor.splitRight()
-  const quickPick = QuickPick.create({ expect, page, VError })
-  await quickPick.executeCommand('Preferences: Open User Settings (JSON)')
-  await Editor.switchToTab('settings.json')
+  await Editor.openSettingsJson()
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
@@ -21,26 +18,9 @@ export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.type('editor.fontFamily')
   await Editor.press('Escape')
   await Editor.select('editor.fontFamily')
-  await Editor.press('ArrowRight')
-  await Editor.press('ArrowRight')
-  await Editor.press('ArrowRight')
-  await Editor.press('ArrowRight')
-  await Editor.press('ArrowRight')
-  await Editor.press('ArrowRight')
-  await Editor.press('ArrowRight')
-  await Editor.press('ArrowRight')
-  await Editor.press('ArrowRight')
-  await Editor.press('ArrowRight')
-  await Editor.press('ArrowRight')
-  await Editor.press('ArrowRight')
-  await Editor.press('ArrowRight')
-  await Editor.press('ArrowRight')
-  await Editor.press('ArrowRight')
-  await Editor.press('ArrowRight')
-  await Editor.press('ArrowRight')
-  await Editor.press('ArrowRight')
-  await Editor.press('ArrowRight')
-  await Editor.press('ArrowRight')
+  await Editor.press('End')
+  await Editor.press('ArrowLeft')
+  await Editor.press('Control+Shift+ArrowLeft')
   await Editor.selectAll()
   await Editor.type('"serif"')
   await Editor.select('"serif"')
@@ -52,4 +32,3 @@ export const teardown = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.save({ viaKeyBoard: true })
   await Editor.closeAll()
 }
-
