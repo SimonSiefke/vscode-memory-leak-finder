@@ -19,6 +19,8 @@ export const bisect = async (options: BisectOptions): Promise<BisectResult> => {
     }
   }
 
+  console.log(`Found ${commits.length} commits, starting bisect...`)
+
   return performBisect(commits, options)
 }
 
@@ -35,6 +37,8 @@ const performBisect = async (
     const commit = commits[mid]
     const commitHash = commit.commit
 
+    console.log(`Testing commit ${mid + 1}/${commits.length}: ${commitHash}`)
+
     try {
       const result = await RunTests.runTests({
         ...options,
@@ -42,6 +46,7 @@ const performBisect = async (
       })
 
       if (result.type === 'error') {
+        console.log(`Test failed for commit ${commitHash}: ${result.prettyError}`)
         return {
           type: 'failed-test',
         }
@@ -51,11 +56,14 @@ const performBisect = async (
 
       if (hasLeak) {
         lastLeakingCommit = commitHash
+        console.log(`Leak detected in commit ${commitHash}, searching newer commits...`)
         right = mid - 1
       } else {
+        console.log(`No leak detected in commit ${commitHash}, searching older commits...`)
         left = mid + 1
       }
     } catch (error) {
+      console.log(`Test failed for commit ${commitHash}: ${error}`)
       return {
         type: 'failed-test',
       }

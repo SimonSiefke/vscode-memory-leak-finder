@@ -30,4 +30,3 @@ export const fetchCommits = async (): Promise<Commit[]> => {
     throw new VError(error, 'Failed to fetch commits')
   }
 }
-
