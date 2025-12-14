@@ -54,6 +54,12 @@ export const performBisect = async (options: RunTestsOptions): Promise<BisectRes
         }
       }
 
+      if (result.type !== 'success') {
+        return {
+          type: 'failed-test',
+        }
+      }
+
       const hasLeak = result.leaked > 0
 
       if (hasLeak) {
