@@ -46,6 +46,7 @@ export const parseArgv = (argv) => {
     vscodeVersion: VsCodeVersion.vscodeVersion,
     vscodePath: '',
     commit: '',
+    insidersCommit: '',
     setupOnly: false,
     workers: false,
     continueValue: '',
@@ -119,6 +120,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--commit')) {
     options.commit = parseArgvString(argv, '--commit')
+  }
+  if (argv.includes('--insiders-commit')) {
+    options.insidersCommit = parseArgvString(argv, '--insiders-commit')
   }
   if (argv.includes('--setup-only')) {
     options.setupOnly = true

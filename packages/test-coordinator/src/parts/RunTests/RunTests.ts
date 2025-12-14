@@ -39,6 +39,7 @@ export const runTests = async (options: RunTestsOptions): Promise<RunTestsResult
     vscodePath: options.vscodePath,
     vscodeVersion: options.vscodeVersion,
     commit: options.commit,
+    insidersCommit: options.insidersCommit,
     setupOnly: options.setupOnly,
     inspectSharedProcess: options.inspectSharedProcess,
     inspectExtensions: options.inspectExtensions,

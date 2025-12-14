@@ -32,6 +32,7 @@ export const initialStart = async (options): Promise<void> => {
     vscodePath: options.vscodePath,
     vscodeVersion: options.vscodeVersion,
     commit: options.commit,
+    insidersCommit: options.insidersCommit,
     setupOnly: options.setupOnly,
     workers: options.workers,
     isWindows: options.isWindows,

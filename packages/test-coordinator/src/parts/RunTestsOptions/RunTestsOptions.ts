@@ -20,6 +20,7 @@ export interface RunTestsOptions {
   readonly vscodePath: string
   readonly vscodeVersion: string
   readonly commit: string
+  readonly insidersCommit: string
   readonly setupOnly: boolean
   readonly inspectSharedProcess: boolean
   readonly inspectExtensions: boolean

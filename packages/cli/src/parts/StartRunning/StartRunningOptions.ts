@@ -19,6 +19,7 @@ export interface StartRunningOptions {
   vscodePath: string
   vscodeVersion: string
   commit: string
+  insidersCommit: string
   setupOnly: boolean
   workers: boolean
   isWindows: boolean
