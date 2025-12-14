@@ -20,5 +20,6 @@ export const setup = async ({ Workspace, Editor, Explorer }: TestContext): Promi
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
-  await Editor.close()
+  // @ts-ignore
+  await Editor.reloadWebViews()
 }
