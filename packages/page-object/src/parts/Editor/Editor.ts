@@ -849,7 +849,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         const token = page.locator('.mtk1')
         await expect(token).toBeVisible()
         await page.waitForIdle()
-        await token.shouldHaveCSS(`font-family`, new RegExp(`^${fontFamily}`))
+        await expect(token).toHaveCss(`font-family`, new RegExp(`^${fontFamily}`))
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify font family`)
