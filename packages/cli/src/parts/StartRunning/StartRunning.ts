@@ -3,6 +3,8 @@ import * as AnsiEscapes from '../AnsiEscapes/AnsiEscapes.ts'
 import * as RunTest from '../RunTest/RunTest.ts'
 import * as Stdout from '../Stdout/Stdout.ts'
 import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
+import * as HandleTestsFinished from '../HandleTestsFinished/HandleTestsFinished.ts'
+import * as HandleTestsUnexpectedError from '../HandleTestsUnexpectedError/HandleTestsUnexpectedError.ts'
 
 export const startRunning = async (options: StartRunningOptions): Promise<void> => {
   const {
@@ -40,11 +42,10 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     enableProxy,
     useProxyMock,
   } = options
-  console.log({ enableProxy })
   const clear = await AnsiEscapes.clear(isWindows)
   await Stdout.write(clear)
   const rpc = await RunTest.prepare()
-  await rpc.invoke(TestWorkerCommandType.RunTests, {
+  const result = await rpc.invoke(TestWorkerCommandType.RunTests, {
     root: cwd,
     cwd,
     filterValue,
@@ -79,4 +80,18 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     enableProxy,
     useProxyMock,
   })
+  if (result.type === 'success') {
+    await HandleTestsFinished.handleTestsFinished(
+      result.passed,
+      result.failed,
+      result.skipped,
+      result.skippedFailed,
+      result.leaked,
+      result.total,
+      result.duration,
+      result.filterValue,
+    )
+  } else {
+    await HandleTestsUnexpectedError.handleTestsUnexpectedError(result.prettyError)
+  }
 }
