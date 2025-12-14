@@ -16,11 +16,5 @@ export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promi
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.open('file.ipynb')
-  // await new Promise((r) => {
-  //   setTimeout(r, 3000)
-  // })
   await Editor.closeAll()
-  // await new Promise((r) => {
-  //   setTimeout(r, 3000)
-  // })
 }
