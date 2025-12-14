@@ -152,8 +152,12 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         await page.waitForIdle()
         const quickInput = page.locator('.quick-input-widget.show-checkboxes')
         await expect(quickInput).toBeVisible()
-        const quickPick = QuickPick.create({ expect, page, VError })
-        await quickPick.select(branchName)
+        const option = quickInput.locator('.label-name', {
+          hasExactText: branchName,
+        })
+        await option.click()
+        await page.waitForIdle()
+        await expect(quickInput).toBeHidden({ timeout: 5000 })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to select branch "${branchName}"`)
