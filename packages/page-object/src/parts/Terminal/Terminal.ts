@@ -243,6 +243,34 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         throw new VError(error, `Failed to close terminal find`)
       }
     },
+    async setFindInput(value: string) {
+      try {
+        await page.waitForIdle()
+        const find = page.locator('.simple-find-part.visible')
+        await expect(find).toBeVisible()
+        await page.waitForIdle()
+        const findInput = find.locator('.input[aria-label="Find"]')
+        await expect(findInput).toBeVisible()
+        await findInput.type(value)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to set terminal find input`)
+      }
+    },
+    async clearFindInput() {
+      try {
+        await page.waitForIdle()
+        const find = page.locator('.simple-find-part.visible')
+        await expect(find).toBeVisible()
+        await page.waitForIdle()
+        const findInput = find.locator('.input[aria-label="Find"]')
+        await expect(findInput).toBeVisible()
+        await findInput.clear()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to clear terminal find input`)
+      }
+    },
     async moveToEditorArea() {
       try {
         await page.waitForIdle()
