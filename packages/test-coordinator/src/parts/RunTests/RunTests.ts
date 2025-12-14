@@ -2,12 +2,13 @@ import type { RunTestsOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import * as CliProcess from '../CliProcess/CliProcess.ts'
 import * as RunTestsWithCallback from '../RunTestsWithCallback/RunTestsWithCallback.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
+import type { RunTestsResult } from '../RunTestsResult/RunTestsResult.ts'
 
 const callback = async (method, ...params) => {
   await CliProcess.invoke(method, ...params)
 }
 
-export const runTests = ({
+export const runTests = async ({
   root,
   cwd,
   filterValue,
@@ -29,6 +30,7 @@ export const runTests = ({
   vscodePath,
   vscodeVersion,
   commit,
+  insidersCommit,
   setupOnly,
   inspectSharedProcess,
   inspectExtensions,
@@ -40,7 +42,7 @@ export const runTests = ({
   inspectExtensionsPort,
   enableProxy,
   useProxyMock,
-}: RunTestsOptions) => {
+}: RunTestsOptions): Promise<RunTestsResult> => {
   return RunTestsWithCallback.runTestsWithCallback({
     root,
     cwd,
@@ -63,6 +65,7 @@ export const runTests = ({
     vscodePath,
     vscodeVersion,
     commit,
+    insidersCommit,
     setupOnly,
     inspectSharedProcess,
     inspectExtensions,

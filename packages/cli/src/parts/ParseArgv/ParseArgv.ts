@@ -46,6 +46,7 @@ export const parseArgv = (argv) => {
     vscodeVersion: VsCodeVersion.vscodeVersion,
     vscodePath: '',
     commit: '',
+    insidersCommit: '',
     setupOnly: false,
     workers: false,
     continueValue: '',
@@ -58,6 +59,7 @@ export const parseArgv = (argv) => {
     inspectExtensionsPort: 5870,
     enableProxy: false,
     useProxyMock: false,
+    bisect: false,
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -119,6 +121,9 @@ export const parseArgv = (argv) => {
   if (argv.includes('--commit')) {
     options.commit = parseArgvString(argv, '--commit')
   }
+  if (argv.includes('--insiders-commit')) {
+    options.insidersCommit = parseArgvString(argv, '--insiders-commit')
+  }
   if (argv.includes('--setup-only')) {
     options.setupOnly = true
   }
@@ -154,6 +159,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--use-proxy-mock')) {
     options.useProxyMock = true
+  }
+  if (argv.includes('--bisect')) {
+    options.bisect = true
   }
   return options
 }

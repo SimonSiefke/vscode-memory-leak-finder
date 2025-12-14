@@ -4,11 +4,16 @@ import * as DownloadAndUnzipVscode from '../DownloadAndUnzipVscode/DownloadAndUn
 import * as Env from '../Env/Env.ts'
 import * as Root from '../Root/Root.ts'
 
-export const getBinaryPath = async (vscodeVersion: string, vscodePath: string, commit: string): Promise<string> => {
+export const getBinaryPath = async (vscodeVersion: string, vscodePath: string, commit: string, insidersCommit: string): Promise<string> => {
   if (vscodePath) {
     return vscodePath
   }
-  if (commit) {
+  if (insidersCommit && typeof insidersCommit === 'string' && insidersCommit !== '') {
+    return await DownloadAndUnzipVscode.downloadAndUnzipVscode({
+      insidersCommit,
+    })
+  }
+  if (commit && typeof commit === 'string' && commit !== '') {
     const repoUrl = 'https://github.com/microsoft/vscode.git'
     const reposDir = join(Root.root, '.vscode-repos')
     const nodeModulesCacheDir = join(Root.root, '.vscode-node-modules-cache')

@@ -102,6 +102,7 @@ export interface Editor {
   deleteCharactersRight(options: any): Promise<void>
   deleteCharactersLeft(options: any): Promise<void>
   type(text: any): Promise<void>
+  press(key: any): Promise<void>
   shouldHaveText(text: any): Promise<void>
   rename(newText: any): Promise<void>
   renameCancel(newText: any): Promise<void>
