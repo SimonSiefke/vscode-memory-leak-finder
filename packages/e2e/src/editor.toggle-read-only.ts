@@ -10,11 +10,14 @@ export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promi
   await Editor.closeAll()
   await Explorer.focus()
   await Explorer.shouldHaveItem('file.txt')
+  await Editor.open('file.txt')
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
-  await Editor.open('file.txt')
-  await Editor.closeAll()
+  // @ts-ignore
+  await Editor.enableReadonly()
+  // @ts-ignore
+  await Editor.disableReadonly()
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
