@@ -20,7 +20,7 @@ export const bisect = async (options: StartRunningOptions): Promise<BisectResult
   const rpc = await RunTest.prepare()
 
   try {
-    const result = await rpc.invoke(TestWorkerCommandType.Bisect, {
+    const result = await rpc.invoke(TestWorkerCommandType.RunTests, {
       root: options.cwd,
       cwd: options.cwd,
       filterValue: options.filterValue,
@@ -53,18 +53,27 @@ export const bisect = async (options: StartRunningOptions): Promise<BisectResult
       inspectExtensionsPort: options.inspectExtensionsPort,
       enableProxy: options.enableProxy,
       useProxyMock: options.useProxyMock,
+      bisect: true,
     })
 
-    if (result.type === 'success') {
+    // Type guard to check if result is a BisectResult (has 'commit' field but not 'passed')
+    if (result.type === 'success' && 'commit' in result && !('passed' in result)) {
       await Stdout.write(`\nBisect completed successfully!\n`)
       await Stdout.write(`Memory leak regression introduced in commit: ${result.commit}\n`)
+      return result as BisectResult
     } else if (result.type === 'failed-test') {
       await Stdout.write(`\nBisect failed due to failed test.\n`)
-    } else {
+      return result as BisectResult
+    } else if (result.type === 'not-found') {
       await Stdout.write(`\nBisect completed but no leaking commit found in the tested range.\n`)
+      return result as BisectResult
+    } else {
+      // This shouldn't happen, but handle regular test results
+      await Stdout.write(`\nUnexpected result type from bisect.\n`)
+      return {
+        type: 'failed-test',
+      }
     }
-
-    return result
   } catch (error) {
     await Stdout.write(`Bisect failed: ${error}\n`)
     return {

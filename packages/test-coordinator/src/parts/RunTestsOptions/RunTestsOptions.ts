@@ -31,6 +31,7 @@ export interface RunTestsOptions {
   readonly inspectExtensionsPort: number
   readonly enableProxy: boolean
   readonly useProxyMock: boolean
+  readonly bisect?: boolean
 }
 
 export interface RunTestsWithCallbackOptions extends RunTestsOptions {
