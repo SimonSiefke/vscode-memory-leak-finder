@@ -49,6 +49,8 @@ export const run = async (platform: string, argv: readonly string[], env: NodeJS
     inspectPtyHostPort: options.inspectPtyHostPort,
     inspectSharedProcessPort: options.inspectSharedProcessPort,
     inspectExtensionsPort: options.inspectExtensionsPort,
+    bisect: options.bisect,
+    insiders: options.bisect,
   })
   return InitialStart.initialStart(options)
 }

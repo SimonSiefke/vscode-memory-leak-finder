@@ -40,4 +40,6 @@ export const createDefaultState = (): StdinDataState => ({
   inspectExtensionsPort: 5870,
   enableProxy: false,
   useProxyMock: false,
+  bisect: false,
+  insidersCommit: '',
 })
