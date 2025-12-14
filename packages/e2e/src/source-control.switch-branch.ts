@@ -6,6 +6,7 @@ export const setup = async ({
   Editor,
   ActivityBar,
   SourceControl,
+  Explorer,
 }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
@@ -35,6 +36,9 @@ export const setup = async ({
   await ActivityBar.showSourceControl()
   await SourceControl.refresh()
   await Editor.closeAll()
+  await Editor.closeAll()
+  await Explorer.focus()
+  await Explorer.shouldHaveItem('b.txt')
   await Editor.open('b.txt')
 }
 
@@ -51,3 +55,12 @@ export const run = async ({
   await Editor.shouldHaveText('content in main branch')
 }
 
+  await Editor.close()
+  await Editor.open('b.txt')
+  await Editor.shouldHaveText('content in branch b')
+  await SourceControl.showBranchPicker()
+  await SourceControl.selectBranch('main')
+  await Editor.close()
+  await Editor.open('b.txt')
+  await Editor.shouldHaveText('content in main branch')
+}
