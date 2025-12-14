@@ -7,7 +7,7 @@ export const setup = async ({ Terminal, Workspace, SideBar }: TestContext): Prom
   await Workspace.setFiles([
     {
       name: 'file.txt',
-      content: `a`.repeat(20_000),
+      content: `a`.repeat(60_000),
     },
   ])
   await SideBar.hide()
@@ -15,13 +15,18 @@ export const setup = async ({ Terminal, Workspace, SideBar }: TestContext): Prom
   await Terminal.show({
     waitForReady: true,
   })
-}
-
-export const run = async ({ Terminal, Workspace }: TestContext): Promise<void> => {
   // @ts-ignore
   await Terminal.execute('cat file.txt && touch test.txt', {
     waitForFile: 'test.txt',
   })
   await Workspace.remove('test.txt')
+}
+
+export const run = async ({ Terminal }: TestContext): Promise<void> => {
+  // @ts-ignore
+  await Terminal.scrollToTop()
+  // @ts-ignore
+  await Terminal.scrollToBottom()
+  await new Promise((r) => {})
   // await Terminal.clear()
 }
