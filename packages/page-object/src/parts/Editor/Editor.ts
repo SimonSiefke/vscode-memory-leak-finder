@@ -826,6 +826,26 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed cursor assertion`)
       }
     },
+    async enableReadonly() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.EnableReadonly)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to enable readonly mode`)
+      }
+    },
+    async disableReadonly() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.DisableReadonly)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to disable readonly mode`)
+      }
+    },
     async inspectTokens() {
       try {
         await page.waitForIdle()
