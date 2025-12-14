@@ -29,7 +29,6 @@ export const prepareTests = async (
   enableProxy: boolean,
   useProxyMock: boolean,
 ) => {
-  console.log(`[debug] PrepareTests.prepareTests called with insidersCommit: ${insidersCommit} (type: ${typeof insidersCommit})`)
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)

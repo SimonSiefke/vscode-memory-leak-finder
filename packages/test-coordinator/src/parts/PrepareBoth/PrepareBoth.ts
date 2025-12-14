@@ -33,7 +33,6 @@ export const prepareBoth = async (
   enableProxy: boolean,
   useProxyMock: boolean,
 ): Promise<PrepareBothResult> => {
-  console.log(`[debug] PrepareBoth.prepareBoth called with insidersCommit: ${insidersCommit} (type: ${typeof insidersCommit})`)
   const initializationWorkerRpc = await launchInitializationWorker()
   const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, sessionId, targetId } =
     await initializationWorkerRpc.invoke(
