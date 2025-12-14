@@ -77,6 +77,27 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to open select`)
       }
     },
+    async setTextInput({ name, value }) {
+      try {
+        await page.waitForIdle()
+        const settingItem = page.locator(`.setting-item-contents[data-key="${name}"]`)
+        await expect(settingItem).toBeVisible()
+        await page.waitForIdle()
+        const input = settingItem.locator('input[type="text"]')
+        await expect(input).toBeVisible()
+        await page.waitForIdle()
+        await input.click()
+        await page.waitForIdle()
+        await input.focus()
+        await page.waitForIdle()
+        await input.clear()
+        await page.waitForIdle()
+        await input.type(value)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to set text input for ${name}`)
+      }
+    },
     async toggleCheckBox({ name }) {
       try {
         await page.waitForIdle()
