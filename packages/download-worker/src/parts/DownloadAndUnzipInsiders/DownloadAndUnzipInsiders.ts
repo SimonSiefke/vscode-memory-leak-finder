@@ -54,4 +54,3 @@ export const downloadAndUnzipInsiders = async (commit: string): Promise<string> 
   await GetVscodeRuntimePath.setVscodeRuntimePath(commit, path)
   return path
 }
-
