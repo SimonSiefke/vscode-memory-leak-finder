@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace, SettingsEditor }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'file.txt',
@@ -10,22 +10,22 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
   await Editor.closeAll()
   await Editor.open('file.txt')
   await Editor.splitRight()
-  await Editor.openSettingsJson()
+  await SettingsEditor.open()
+  await SettingsEditor.search({
+    value: 'editor.fontFamily',
+    resultCount: 1,
+  })
 }
 
-export const run = async ({ Editor }: TestContext): Promise<void> => {
-  await Editor.openFind()
-  await Editor.type('editor.fontFamily')
-  await Editor.press('Escape')
-  await Editor.select('editor.fontFamily')
-  await Editor.press('End')
-  await Editor.press('ArrowLeft')
-  await Editor.press('Control+Shift+ArrowLeft')
-  await Editor.selectAll()
-  await Editor.type('"serif"')
-  await Editor.select('"serif"')
-  await Editor.selectAll()
-  await Editor.type('"sans-serif"')
+export const run = async ({ SettingsEditor }: TestContext): Promise<void> => {
+  await SettingsEditor.setTextInput({
+    name: 'editor.fontFamily',
+    value: 'serif',
+  })
+  await SettingsEditor.setTextInput({
+    name: 'editor.fontFamily',
+    value: 'sans-serif',
+  })
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
