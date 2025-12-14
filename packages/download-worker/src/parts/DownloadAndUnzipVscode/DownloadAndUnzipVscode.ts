@@ -45,7 +45,7 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
     }
 
     if (insidersCommit) {
-      return await downloadAndUnzipInsiders(insidersCommit)
+      return await DownloadAndUnzipInsiders.downloadAndUnzipInsiders(insidersCommit)
     }
 
     if (!vscodeVersion) {
