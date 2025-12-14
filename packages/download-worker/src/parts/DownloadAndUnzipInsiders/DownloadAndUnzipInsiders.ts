@@ -29,7 +29,7 @@ const getBinaryPathFromExtractDir = (extractDir: string): string => {
   }
   const arch = os.arch()
   const archSuffix = arch === 'arm64' || arch === 'aarch64' ? 'arm64' : 'x64'
-  return join(extractDir, `VSCode-linux-${archSuffix}`, 'code')
+  return join(extractDir, `VSCode-linux-${archSuffix}`, 'code-insiders')
 }
 
 export const downloadAndUnzipInsiders = async (commit: string): Promise<string> => {
