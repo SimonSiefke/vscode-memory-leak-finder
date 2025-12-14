@@ -217,6 +217,16 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         throw new VError(error, `Failed to clear terminal`)
       }
     },
+    async focusHover() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.TerminalFocusHover)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to focus hover`)
+      }
+    },
     async openFind() {
       try {
         await page.waitForIdle()
