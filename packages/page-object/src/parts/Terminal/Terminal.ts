@@ -171,7 +171,7 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         throw new VError(error, `Failed to restart pty host`)
       }
     },
-    async execute(command, { waitForFile = '' } = {}) {
+    async type(command: string) {
       try {
         await page.waitForIdle()
         const terminal = page.locator('.terminal')
@@ -187,6 +187,14 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
           await page.keyboard.press(letter)
           await page.waitForIdle()
         }
+      } catch (error) {
+        throw new VError(error, `Failed to type`)
+      }
+    },
+    async execute(command, { waitForFile = '' } = {}) {
+      try {
+        await page.waitForIdle()
+        await this.type(command)
         await page.keyboard.press('Enter')
         await page.waitForIdle()
         if (waitForFile) {
@@ -207,6 +215,35 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         // TODO maybe verify terminal is clear
       } catch (error) {
         throw new VError(error, `Failed to clear terminal`)
+      }
+    },
+    async focusHover() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.TerminalFocusHover)
+        await page.waitForIdle()
+        const hover = page.locator('.monaco-hover.workbench-hover')
+        await expect(hover).toBeVisible()
+        await expect(hover).toBeFocused()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to focus hover`)
+      }
+    },
+    async ignoreHover() {
+      try {
+        await page.waitForIdle()
+        const hover = page.locator('.monaco-hover.workbench-hover')
+        await expect(hover).toBeVisible()
+        await expect(hover).toBeFocused()
+        await page.waitForIdle()
+        await page.keyboard.press('Escape')
+        await page.waitForIdle()
+        await expect(hover).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to dismiss hover`)
       }
     },
     async openFind() {
@@ -243,6 +280,34 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         throw new VError(error, `Failed to close terminal find`)
       }
     },
+    async setFindInput(value: string) {
+      try {
+        await page.waitForIdle()
+        const find = page.locator('.simple-find-part.visible')
+        await expect(find).toBeVisible()
+        await page.waitForIdle()
+        const findInput = find.locator('.input[aria-label="Find"]')
+        await expect(findInput).toBeVisible()
+        await findInput.type(value)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to set terminal find input`)
+      }
+    },
+    async clearFindInput() {
+      try {
+        await page.waitForIdle()
+        const find = page.locator('.simple-find-part.visible')
+        await expect(find).toBeVisible()
+        await page.waitForIdle()
+        const findInput = find.locator('.input[aria-label="Find"]')
+        await expect(findInput).toBeVisible()
+        await findInput.clear()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to clear terminal find input`)
+      }
+    },
     async moveToEditorArea() {
       try {
         await page.waitForIdle()
@@ -268,6 +333,26 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         // TODO verify terminal tab is hidden
       } catch (error) {
         throw new VError(error, `Failed to move panel to panel area`)
+      }
+    },
+    async scrollToTop() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.TerminalScrollToTop)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to scroll to top`)
+      }
+    },
+    async scrollToBottom() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.TerminalScrollToBottom)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to scroll to bottom`)
       }
     },
   }
