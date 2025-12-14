@@ -27,6 +27,4 @@ export const run = async ({ Terminal }: TestContext): Promise<void> => {
   await Terminal.scrollToTop()
   // @ts-ignore
   await Terminal.scrollToBottom()
-  await new Promise((r) => {})
-  // await Terminal.clear()
 }
