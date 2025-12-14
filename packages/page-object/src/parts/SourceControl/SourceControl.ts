@@ -147,7 +147,7 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         throw new VError(error, `Failed to hide branch picker`)
       }
     },
-    async selectBranch(branchName) {
+    async selectBranch(branchName: string) {
       try {
         await page.waitForIdle()
         const quickInput = page.locator('.quick-input-widget.show-checkboxes')
@@ -158,9 +158,21 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         await expect(option).toBeVisible()
         await option.click()
         await page.waitForIdle()
-        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to select branch "${branchName}"`)
+      }
+    },
+    async checkoutBranch(branchName: string) {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.GitCheckoutTo, {
+          stayVisible: true,
+        })
+        await quickPick.select(branchName)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to checkout branch "${branchName}"`)
       }
     },
     async enableInlineBlame({ expectedDecoration }) {

@@ -32,6 +32,7 @@ export const run = async ({ SourceControl, Editor, ActivityBar }: TestContext): 
   await ActivityBar.showSourceControl()
   await SourceControl.showBranchPicker()
   await SourceControl.selectBranch('b')
+  await new Promise((r) => {})
   await Editor.close()
   await Editor.open('b.txt')
   await Editor.shouldHaveText('content in branch b')
