@@ -45,5 +45,6 @@ export const initialStart = async (options): Promise<void> => {
     inspectExtensionsPort: options.inspectExtensionsPort,
     enableProxy: options.enableProxy,
     useProxyMock: options.useProxyMock,
+    bisect: options.bisect,
   })
 }

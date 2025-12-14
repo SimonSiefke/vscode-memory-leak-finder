@@ -58,6 +58,7 @@ export const parseArgv = (argv) => {
     inspectExtensionsPort: 5870,
     enableProxy: false,
     useProxyMock: false,
+    bisect: false,
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -154,6 +155,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--use-proxy-mock')) {
     options.useProxyMock = true
+  }
+  if (argv.includes('--bisect')) {
+    options.bisect = true
   }
   return options
 }

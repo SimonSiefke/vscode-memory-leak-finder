@@ -41,6 +41,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     inspectExtensionsPort,
     enableProxy,
     useProxyMock,
+    bisect,
   } = options
   const clear = await AnsiEscapes.clear(isWindows)
   await Stdout.write(clear)

@@ -32,4 +32,5 @@ export interface StartRunningOptions {
   inspectExtensionsPort: number
   enableProxy: boolean
   useProxyMock: boolean
+  bisect: boolean
 }
