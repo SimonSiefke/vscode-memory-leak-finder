@@ -169,7 +169,8 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         await quickPick.executeCommand(WellKnownCommands.GitCheckoutTo, {
           stayVisible: true,
         })
-        await quickPick.select(branchName)
+        await page.waitForIdle()
+        await quickPick.select(` ${branchName}`)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to checkout branch "${branchName}"`)
