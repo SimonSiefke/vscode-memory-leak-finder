@@ -950,12 +950,24 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to hide debug hover`)
       }
     },
-    async reloadWebViews() {
+    async reloadWebViews({ expectViews }: { expectViews: readonly string[] }) {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.ReloadWebViews)
         await page.waitForIdle()
+        for (const view of expectViews) {
+          // TODO check view matching tab
+          if (view.endsWith('.svg')) {
+            const webView = WebView.create({ page, expect, VError })
+            const subFrame = await webView.shouldBeVisible2({
+              extensionId: `vscode.media-preview`,
+              hasLineOfCodeCounter: false,
+            })
+            const img = subFrame.locator('img')
+            await expect(img).toBeVisible()
+          }
+        }
       } catch (error) {
         throw new VError(error, `Failed to reload webviews`)
       }
