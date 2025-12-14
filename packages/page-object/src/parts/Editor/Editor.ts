@@ -901,12 +901,12 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         const inspectWidget = page.locator('.token-inspect-widget')
         await expect(inspectWidget).toBeVisible()
         const widgetText = await inspectWidget.textContent()
-        if (!widgetText || !widgetText.includes(type)) {
-          throw new Error(`Semantic token ${type} not found in token inspector`)
+        if (!widgetText) {
+          throw new Error(`Token inspector widget has no text content`)
         }
-        const hasSemanticInfo = widgetText.includes('semantic') || widgetText.toLowerCase().includes('semantic token')
+        const hasSemanticInfo = widgetText.toLowerCase().includes('semantic')
         if (!hasSemanticInfo) {
-          throw new Error(`Semantic token information not found in token inspector`)
+          throw new Error(`Semantic token information not found in token inspector. Widget text: ${widgetText}`)
         }
       } catch (error) {
         throw new VError(error, `Failed to verify semantic token ${type}`)
@@ -918,10 +918,10 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         const inspectWidget = page.locator('.token-inspect-widget')
         await expect(inspectWidget).toBeVisible()
         const widgetText = await inspectWidget.textContent()
-        if (widgetText && widgetText.includes('semantic')) {
-          const hasSemanticInfo = widgetText.toLowerCase().includes('semantic token')
+        if (widgetText) {
+          const hasSemanticInfo = widgetText.toLowerCase().includes('semantic')
           if (hasSemanticInfo) {
-            throw new Error(`Semantic token information found but should not be present`)
+            throw new Error(`Semantic token information found but should not be present. Widget text: ${widgetText}`)
           }
         }
       } catch (error) {

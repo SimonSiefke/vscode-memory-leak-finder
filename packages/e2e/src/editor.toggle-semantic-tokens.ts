@@ -26,6 +26,7 @@ export const setup = async ({ Editor, Workspace, SettingsEditor }: TestContext):
 }
 
 export const run = async ({ Editor, SettingsEditor }: TestContext): Promise<void> => {
+  await Editor.focus()
   await Editor.click('class')
   await Editor.inspectTokens()
   await Editor.shouldHaveInspectedToken('class')
@@ -34,6 +35,7 @@ export const run = async ({ Editor, SettingsEditor }: TestContext): Promise<void
   await SettingsEditor.disableCheckBox({
     name: 'editor.semanticHighlighting.enabled',
   })
+  await Editor.focus()
   await Editor.click('class')
   await Editor.inspectTokens()
   await Editor.shouldHaveInspectedToken('class')
@@ -42,6 +44,7 @@ export const run = async ({ Editor, SettingsEditor }: TestContext): Promise<void
   await SettingsEditor.enableCheckBox({
     name: 'editor.semanticHighlighting.enabled',
   })
+  await Editor.focus()
   await Editor.click('class')
   await Editor.inspectTokens()
   await Editor.shouldHaveInspectedToken('class')
@@ -52,4 +55,3 @@ export const run = async ({ Editor, SettingsEditor }: TestContext): Promise<void
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.closeAll()
 }
-
