@@ -20,8 +20,8 @@ const getProductJsonPath = (path: string): string => {
 const automaticallyDownloadSourceMaps = false
 
 export interface DownloadAndUnzipVscodeOptions {
-  vscodeVersion?: string
-  insidersCommit?: string
+  readonly vscodeVersion?: string
+  readonly insidersCommit?: string
 }
 
 /**
@@ -44,6 +44,7 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
       insidersCommit = options.insidersCommit
     }
 
+    console.log({ insidersCommit })
     if (insidersCommit) {
       return await DownloadAndUnzipInsiders.downloadAndUnzipInsiders(insidersCommit)
     }
