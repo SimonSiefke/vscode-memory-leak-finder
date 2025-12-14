@@ -227,6 +227,16 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         throw new VError(error, `Failed to focus hover`)
       }
     },
+    async ignoreHover() {
+      try {
+        await page.waitForIdle()
+        await page.keyboard.press('Escape')
+        // TODO verify hover is hidden
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to dismiss hover`)
+      }
+    },
     async openFind() {
       try {
         await page.waitForIdle()

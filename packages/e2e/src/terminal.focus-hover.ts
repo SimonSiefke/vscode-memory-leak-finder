@@ -18,6 +18,8 @@ export const setup = async ({ Terminal, Workspace, SideBar }: TestContext): Prom
 }
 
 export const run = async ({ Terminal }: TestContext): Promise<void> => {
+  // @ts-ignore
   await Terminal.focusHover()
+  // @ts-ignore
   await Terminal.ignoreHover()
 }
