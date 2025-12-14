@@ -69,10 +69,10 @@ export const performBisect = async (options: RunTestsOptions): Promise<BisectRes
 
       if (hasLeak) {
         lastLeakingCommit = commitHash
-        console.log(`Leak detected in commit ${commitHash}, searching newer commits...`)
+        console.log(`Leak detected in commit ${commitHash}, searching older commits to find first leak...`)
         right = mid - 1
       } else {
-        console.log(`No leak detected in commit ${commitHash}, searching older commits...`)
+        console.log(`No leak detected in commit ${commitHash}, searching newer commits...`)
         left = mid + 1
       }
     } catch (error) {
