@@ -89,6 +89,7 @@ export const create = ({ expect, page, VError }) => {
         await input.click()
         await page.waitForIdle()
         await input.focus()
+        await input.clear()
         await page.waitForIdle()
         await page.keyboard.press('Control+A')
         await page.waitForIdle()
