@@ -44,6 +44,7 @@ export const prepareBoth = async (
       vscodeVersion,
       insidersCommit,
       commit,
+      insidersCommit,
       connectionId,
       isFirstConnection,
       canUseIdleCallback,
