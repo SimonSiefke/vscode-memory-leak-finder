@@ -27,18 +27,13 @@ export const setup = async ({ Workspace, Git, Editor, ActivityBar, SourceControl
   await Editor.open('b.txt')
 }
 
-export const run = async ({ SourceControl, Editor, ActivityBar }: TestContext): Promise<void> => {
+export const run = async ({ SourceControl, Editor }: TestContext): Promise<void> => {
   await Editor.shouldHaveText('content in main branch')
-  await ActivityBar.showSourceControl()
-  await SourceControl.showBranchPicker()
-  await SourceControl.selectBranch('b')
-  await new Promise((r) => {})
+  await SourceControl.checkoutBranch('b')
   await Editor.close()
   await Editor.open('b.txt')
   await Editor.shouldHaveText('content in branch b')
-  await ActivityBar.showSourceControl()
-  await SourceControl.showBranchPicker()
-  await SourceControl.selectBranch('main')
+  await SourceControl.checkoutBranch('main')
   await Editor.close()
   await Editor.open('b.txt')
   await Editor.shouldHaveText('content in main branch')
