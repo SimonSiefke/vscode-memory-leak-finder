@@ -71,7 +71,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to get input value`)
       }
     },
-    async select(text: string, stayVisible = false) {
+    async select(text: string | RegExp, stayVisible = false) {
       try {
         await page.waitForIdle()
         const quickPick = page.locator('.quick-input-widget')
