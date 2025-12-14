@@ -97,7 +97,7 @@ export const runTestsWithCallback = async ({
     // Then recreate the workers, ensuring a clean state
 
     if (setupOnly && commit) {
-      const { testWorkerRpc, memoryRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach(
+      const { testWorkerRpc, memoryRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
         cwd,
         headlessMode,
         recordVideo,
@@ -111,7 +111,7 @@ export const runTestsWithCallback = async ({
         commit,
         insidersCommit,
         attachedToPageTimeout,
-        measure,
+        measureId: measure,
         idleTimeout,
         pageObjectPath,
         measureNode,
@@ -124,7 +124,7 @@ export const runTestsWithCallback = async ({
         inspectExtensionsPort,
         enableProxy,
         useProxyMock,
-      )
+      })
       await testWorkerRpc.dispose()
       await memoryRpc?.dispose()
       await videoRpc?.dispose()
@@ -195,7 +195,7 @@ export const runTestsWithCallback = async ({
       if (needsSetup) {
         await disposeWorkers(workers)
         PrepareTestsOrAttach.state.promise = undefined
-        const { testWorkerRpc, memoryRpc, videoRpc, initializationWorkerRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach(
+        const { testWorkerRpc, memoryRpc, videoRpc, initializationWorkerRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
           cwd,
           headlessMode,
           recordVideo,
@@ -209,7 +209,7 @@ export const runTestsWithCallback = async ({
           commit,
           insidersCommit,
           attachedToPageTimeout,
-          measure,
+          measureId: measure,
           idleTimeout,
           pageObjectPath,
           measureNode,
@@ -222,7 +222,7 @@ export const runTestsWithCallback = async ({
           inspectExtensionsPort,
           enableProxy,
           useProxyMock,
-        )
+        })
         workers = {
           testWorkerRpc: testWorkerRpc || emptyRpc,
           // @ts-ignore
