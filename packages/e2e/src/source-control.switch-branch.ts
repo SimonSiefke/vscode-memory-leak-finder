@@ -12,17 +12,14 @@ export const setup = async ({ Workspace, Git, Editor, ActivityBar, SourceControl
   await Git.commit('initial commit')
   await Git.createBranch('b')
   await Git.checkoutBranch('b')
-  await Workspace.setFiles([
-    {
-      name: 'b.txt',
-      content: 'content in branch b',
-    },
-  ])
+  await Workspace.add({
+    name: 'b.txt',
+    content: 'content in branch b',
+  })
   await Git.add()
   await Git.commit('update b.txt in branch b')
   await Git.checkoutBranch('main')
   await ActivityBar.showSourceControl()
-  await SourceControl.refresh()
   await Editor.closeAll()
   await Explorer.focus()
   await Explorer.shouldHaveItem('b.txt')
