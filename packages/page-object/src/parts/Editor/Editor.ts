@@ -43,16 +43,20 @@ export const create = ({ page, expect, VError, ideVersion }) => {
             extensionId: `vscode.media-preview`,
             hasLineOfCodeCounter: false,
           })
+          await subFrame.waitForIdle()
           const img = subFrame.locator('img')
           await expect(img).toBeVisible()
+          await subFrame.waitForIdle()
         } else if (isVideo(fileName)) {
           const webView = WebView.create({ page, expect, VError })
           const subFrame = await webView.shouldBeVisible2({
             extensionId: `vscode.media-preview`,
             hasLineOfCodeCounter: false,
           })
+          await subFrame.waitForIdle()
           const video = subFrame.locator('video')
           await expect(video).toBeVisible()
+          await subFrame.waitForIdle()
         } else if (isBinary(fileName)) {
           const placeholder = page.locator('.monaco-editor-pane-placeholder')
           await expect(placeholder).toBeVisible()
