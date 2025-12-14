@@ -28,13 +28,13 @@ export interface DownloadAndUnzipVscodeOptions {
  * @param {DownloadAndUnzipVscodeOptions} options
  */
 export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOptions | string): Promise<string> => {
-  let vscodeVersion: string | undefined
   try {
     if (Env.env.VSCODE_PATH) {
       console.warn('Warning: Using VSCODE_PATH environment variable is deprecated. Please use --vscode-path CLI flag instead.')
       return Env.env.VSCODE_PATH
     }
 
+    let vscodeVersion: string | undefined
     let insidersCommit: string | undefined
 
     if (typeof options === 'string') {
@@ -73,6 +73,6 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
     await GetVscodeRuntimePath.setVscodeRuntimePath(vscodeVersion, path)
     return path
   } catch (error) {
-    throw new VError(error, `Failed to download vscode ${vscodeVersion}`)
+    throw new VError(error, `Failed to download vscode`)
   }
 }
