@@ -130,6 +130,8 @@ export interface Editor {
   shouldHaveCursor(estimate: any): Promise<void>
   inspectTokens(): Promise<void>
   shouldHaveInspectedToken(name: any): Promise<void>
+  shouldHaveSemanticToken(type: any): Promise<void>
+  shouldNotHaveSemanticToken(type: any): Promise<void>
   closeInspectedTokens(): Promise<void>
   setBreakpoint(lineNumber: any): Promise<void>
   setLogpoint(lineNumber: any, logMessage: any): Promise<void>
