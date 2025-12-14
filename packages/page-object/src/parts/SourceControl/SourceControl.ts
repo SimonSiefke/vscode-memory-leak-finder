@@ -155,9 +155,9 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         const option = quickInput.locator('.label-name', {
           hasExactText: branchName,
         })
+        await expect(option).toBeVisible()
         await option.click()
         await page.waitForIdle()
-        await expect(quickInput).toBeHidden({ timeout: 5000 })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to select branch "${branchName}"`)
