@@ -26,6 +26,7 @@ export const launch = async (
   enableProxy: boolean,
   useProxyMock: boolean,
 ): Promise<any> => {
+  console.log(`[debug] Launch.launch called with insidersCommit: ${insidersCommit} (type: ${typeof insidersCommit})`)
   const { child } = await LaunchIde.launchIde({
     headlessMode,
     cwd,

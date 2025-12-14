@@ -52,6 +52,7 @@ export const runTestsWithCallback = async ({
   vscodePath,
   vscodeVersion,
   commit,
+  insidersCommit,
   setupOnly,
   inspectSharedProcess,
   inspectExtensions,
@@ -65,6 +66,7 @@ export const runTestsWithCallback = async ({
   useProxyMock,
   callback,
 }: RunTestsWithCallbackOptions): Promise<RunTestsResult> => {
+  console.log(`[debug] RunTestsWithCallback.runTestsWithCallback called with insidersCommit: ${insidersCommit} (type: ${typeof insidersCommit})`)
   try {
     Assert.string(root)
     Assert.string(cwd)
@@ -108,6 +110,7 @@ export const runTestsWithCallback = async ({
         vscodePath,
         vscodeVersion,
         commit,
+        insidersCommit,
         attachedToPageTimeout,
         measure,
         idleTimeout,
@@ -205,6 +208,7 @@ export const runTestsWithCallback = async ({
           vscodePath,
           vscodeVersion,
           commit,
+          insidersCommit,
           attachedToPageTimeout,
           measure,
           idleTimeout,

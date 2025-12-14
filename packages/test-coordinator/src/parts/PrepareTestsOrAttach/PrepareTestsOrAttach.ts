@@ -21,6 +21,7 @@ export const prepareTestsAndAttach = async (
   vscodePath: string,
   vscodeVersion: string,
   commit: string,
+  insidersCommit: string,
   attachedToPageTimeout: number,
   measureId: string,
   idleTimeout: number,
@@ -36,6 +37,7 @@ export const prepareTestsAndAttach = async (
   enableProxy: boolean,
   useProxyMock: boolean,
 ) => {
+  console.log(`[debug] PrepareTestsOrAttach.prepareTestsAndAttach called with insidersCommit: ${insidersCommit} (type: ${typeof insidersCommit})`)
   const isFirst = state.promise === undefined
   if (isFirst) {
     state.promise = PrepareTests.prepareTests(
@@ -49,6 +51,7 @@ export const prepareTestsAndAttach = async (
       vscodePath,
       vscodeVersion,
       commit,
+      insidersCommit,
       attachedToPageTimeout,
       measureId,
       idleTimeout,

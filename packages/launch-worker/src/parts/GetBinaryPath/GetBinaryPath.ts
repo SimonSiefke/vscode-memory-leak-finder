@@ -5,10 +5,12 @@ import * as Env from '../Env/Env.ts'
 import * as Root from '../Root/Root.ts'
 
 export const getBinaryPath = async (vscodeVersion: string, vscodePath: string, commit: string, insidersCommit: string): Promise<string> => {
+  console.log(`[debug] GetBinaryPath called with vscodeVersion: ${vscodeVersion}, vscodePath: ${vscodePath}, commit: ${commit}, insidersCommit: ${insidersCommit} (type: ${typeof insidersCommit})`)
   if (vscodePath) {
     return vscodePath
   }
   if (insidersCommit && typeof insidersCommit === 'string' && insidersCommit !== '') {
+    console.log(`[debug] Using insidersCommit: ${insidersCommit}`)
     return await DownloadAndUnzipVscode.downloadAndUnzipVscode({
       insidersCommit,
     })

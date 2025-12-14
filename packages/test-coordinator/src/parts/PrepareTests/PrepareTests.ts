@@ -13,6 +13,7 @@ export const prepareTests = async (
   vscodePath: string,
   vscodeVersion: string,
   commit: string,
+  insidersCommit: string,
   attachedToPageTimeout: number,
   measureId: string,
   idleTimeout: number,
@@ -28,6 +29,7 @@ export const prepareTests = async (
   enableProxy: boolean,
   useProxyMock: boolean,
 ) => {
+  console.log(`[debug] PrepareTests.prepareTests called with insidersCommit: ${insidersCommit} (type: ${typeof insidersCommit})`)
   const isFirstConnection = true
   const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
   await KillExistingIdeInstances.killExisingIdeInstances(ide)
@@ -39,6 +41,7 @@ export const prepareTests = async (
       vscodePath,
       vscodeVersion,
       commit,
+      insidersCommit,
       connectionId,
       isFirstConnection,
       canUseIdleCallback,
