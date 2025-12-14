@@ -1,5 +1,6 @@
 import type { RunTestsOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import type { BisectResult } from '../BisectResult/BisectResult.ts'
+import type { RunTestsSuccessResult } from '../RunTestsSuccessResult/RunTestsSuccessResult.ts'
 import * as FetchCommits from '../FetchCommits/FetchCommits.ts'
 import * as RunTestsWithCallback from '../RunTestsWithCallback/RunTestsWithCallback.ts'
 import * as CliProcess from '../CliProcess/CliProcess.ts'
@@ -54,13 +55,16 @@ export const performBisect = async (options: RunTestsOptions): Promise<BisectRes
         }
       }
 
+      // Type guard: after checking for 'error', result must be 'success' (RunTestsSuccessResult)
+      // since RunTestsWithCallback doesn't return BisectResult
       if (result.type !== 'success') {
         return {
           type: 'failed-test',
         }
       }
 
-      const hasLeak = result.leaked > 0
+      const successResult = result as RunTestsSuccessResult
+      const hasLeak = successResult.leaked > 0
 
       if (hasLeak) {
         lastLeakingCommit = commitHash
