@@ -117,6 +117,34 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to run debugger`)
       }
     },
+    async runAndWaitForDebugConsoleOutput({ output }) {
+      try {
+        const quickPick = QuickPick.create({
+          page,
+          expect,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.ShowRunAndDebug)
+        await page.waitForIdle()
+        await this.startRunAndDebug()
+        await this.waitForDebugConsoleOutput({ output })
+      } catch (error) {
+        throw new VError(error, `Failed to run debugger`)
+      }
+    },
+    async waitForDebugConsoleOutput({ output }) {
+      try {
+        await page.waitForIdle()
+        const repl = page.locator('.repl')
+        await expect(repl).toBeVisible()
+        await page.waitForIdle()
+        const row = page.locator('.monaco-list-row[aria-label^="x = 1"]')
+        await expect(row).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to wait for debug console output`)
+      }
+    },
     async removeAllBreakpoints() {
       try {
         const quickPick = QuickPick.create({

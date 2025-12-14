@@ -3,11 +3,11 @@ import { downloadExtensions } from '../DownloadExtensions/DownloadExtensions.ts'
 const extensions = [
   {
     id: `GitHub/copilot-chat`,
-    version: '0.30.3',
+    version: '0.33.5',
   },
   {
     id: 'GitHub/copilot',
-    version: '1.364.0',
+    version: '1.388.0',
   },
 ]
 

@@ -38,4 +38,8 @@ export const createDefaultState = (): StdinDataState => ({
   inspectPtyHostPort: 5877,
   inspectSharedProcessPort: 5879,
   inspectExtensionsPort: 5870,
+  enableProxy: false,
+  useProxyMock: false,
+  bisect: false,
+  insidersCommit: '',
 })

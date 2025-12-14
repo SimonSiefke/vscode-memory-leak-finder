@@ -2,6 +2,7 @@ import { VError } from '@lvce-editor/verror'
 import { resolve } from 'node:path'
 import * as AdjustVscodeProductJson from '../AdjustVscodeProductJson/AdjustVscodeProductJson.ts'
 import * as CollectSourceMapUrls from '../CollectSourceMapUrls/CollectSourceMapUrls.ts'
+import * as DownloadAndUnzipInsiders from '../DownloadAndUnzipInsiders/DownloadAndUnzipInsiders.ts'
 import * as Env from '../Env/Env.ts'
 import * as GetVscodeRuntimePath from '../GetVscodeRuntimePath/GetVscodeRuntimePath.ts'
 import * as JsonFile from '../JsonFile/JsonFile.ts'
@@ -18,15 +19,39 @@ const getProductJsonPath = (path: string): string => {
 
 const automaticallyDownloadSourceMaps = false
 
+export interface DownloadAndUnzipVscodeOptions {
+  readonly vscodeVersion?: string
+  readonly insidersCommit?: string
+}
+
 /**
- * @param {string} vscodeVersion
+ * @param {DownloadAndUnzipVscodeOptions} options
  */
-export const downloadAndUnzipVscode = async (vscodeVersion: string): Promise<string> => {
+export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOptions | string): Promise<string> => {
   try {
     if (Env.env.VSCODE_PATH) {
       console.warn('Warning: Using VSCODE_PATH environment variable is deprecated. Please use --vscode-path CLI flag instead.')
       return Env.env.VSCODE_PATH
     }
+
+    let vscodeVersion: string | undefined
+    let insidersCommit: string | undefined
+
+    if (typeof options === 'string') {
+      vscodeVersion = options
+    } else {
+      vscodeVersion = options.vscodeVersion
+      insidersCommit = options.insidersCommit
+    }
+
+    if (insidersCommit) {
+      return await DownloadAndUnzipInsiders.downloadAndUnzipInsiders(insidersCommit)
+    }
+
+    if (!vscodeVersion) {
+      throw new Error('Either vscodeVersion or insidersCommit must be provided')
+    }
+
     const cachedPath = await GetVscodeRuntimePath.getVscodeRuntimePath(vscodeVersion)
     if (cachedPath) {
       return cachedPath
@@ -48,6 +73,6 @@ export const downloadAndUnzipVscode = async (vscodeVersion: string): Promise<str
     await GetVscodeRuntimePath.setVscodeRuntimePath(vscodeVersion, path)
     return path
   } catch (error) {
-    throw new VError(error, `Failed to download vscode ${vscodeVersion}`)
+    throw new VError(error, `Failed to download vscode`)
   }
 }

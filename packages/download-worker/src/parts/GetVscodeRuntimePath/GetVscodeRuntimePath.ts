@@ -22,7 +22,7 @@ export const getVscodeRuntimePath = async (vscodeVersion: string): Promise<strin
       return ''
     }
     return path
-  } catch {
+  } catch (error) {
     return ''
   }
 }

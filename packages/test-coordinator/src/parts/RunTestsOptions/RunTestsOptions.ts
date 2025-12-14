@@ -20,6 +20,7 @@ export interface RunTestsOptions {
   readonly vscodePath: string
   readonly vscodeVersion: string
   readonly commit: string
+  readonly insidersCommit: string
   readonly setupOnly: boolean
   readonly inspectSharedProcess: boolean
   readonly inspectExtensions: boolean
@@ -29,6 +30,9 @@ export interface RunTestsOptions {
   readonly inspectPtyHostPort: number
   readonly inspectSharedProcessPort: number
   readonly inspectExtensionsPort: number
+  readonly enableProxy: boolean
+  readonly useProxyMock: boolean
+  readonly bisect?: boolean
 }
 
 export interface RunTestsWithCallbackOptions extends RunTestsOptions {

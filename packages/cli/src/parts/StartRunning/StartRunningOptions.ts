@@ -19,6 +19,7 @@ export interface StartRunningOptions {
   vscodePath: string
   vscodeVersion: string
   commit: string
+  insidersCommit: string
   setupOnly: boolean
   workers: boolean
   isWindows: boolean
@@ -30,4 +31,7 @@ export interface StartRunningOptions {
   inspectPtyHostPort: number
   inspectSharedProcessPort: number
   inspectExtensionsPort: number
+  enableProxy: boolean
+  useProxyMock: boolean
+  bisect: boolean
 }
