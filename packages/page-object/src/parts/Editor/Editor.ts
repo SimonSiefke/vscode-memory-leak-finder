@@ -960,6 +960,14 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.ReloadWebViews)
         await page.waitForIdle()
+        // TODO need to wait for subframe to be
+        // destroyed and recreated. currently it thinks
+        // the previous iframe is visible, which it is
+        // but then it gets destroyed and doesn't check
+        // for the new iframe
+        await new Promise((resolve) => {
+          setTimeout(resolve, 2000)
+        })
         for (const view of expectViews) {
           // TODO check view matching tab
           if (view.endsWith('.svg')) {
