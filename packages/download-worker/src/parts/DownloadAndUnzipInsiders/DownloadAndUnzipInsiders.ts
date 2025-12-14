@@ -42,6 +42,7 @@ export const downloadAndUnzipInsiders = async (commit: string): Promise<string> 
   const extractDir = join(insidersVersionsDir, commit)
   console.log(`[download-worker] Downloading ${metadata.url}`)
   await DownloadAndExtract.downloadAndExtract('vscode-insiders', [metadata.url], extractDir)
+  console.log(`[download-worker] Finished Download`)
   const path = getBinaryPathFromExtractDir(extractDir)
   const productPath = getProductJsonPath(path)
   const productJson = await JsonFile.readJson(productPath)
