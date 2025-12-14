@@ -4,7 +4,7 @@ import * as DownloadAndUnzipVscode from '../DownloadAndUnzipVscode/DownloadAndUn
 import * as Env from '../Env/Env.ts'
 import * as Root from '../Root/Root.ts'
 
-export const getBinaryPath = async (vscodeVersion: string, vscodePath: string, commit: string): Promise<string> => {
+export const getBinaryPath = async (vscodeVersion: string, vscodePath: string, commit: string, insidersCommit: string): Promise<string> => {
   if (vscodePath) {
     return vscodePath
   }
@@ -14,6 +14,11 @@ export const getBinaryPath = async (vscodeVersion: string, vscodePath: string, c
     const nodeModulesCacheDir = join(Root.root, '.vscode-node-modules-cache')
     const useNice = process.platform === 'linux'
     return await DownloadAndBuildVscodeFromCommit.downloadAndBuildVscodeFromCommit(commit, repoUrl, reposDir, nodeModulesCacheDir, useNice)
+  }
+  if (insidersCommit) {
+    return await DownloadAndUnzipVscode.downloadAndUnzipVscode({
+      insidersCommit,
+    })
   }
   if (Env.env.VSCODE_PATH) {
     console.warn('Warning: Using VSCODE_PATH environment variable is deprecated. Please use --vscode-path CLI flag instead.')
