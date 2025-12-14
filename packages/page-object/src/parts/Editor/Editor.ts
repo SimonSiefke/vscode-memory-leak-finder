@@ -968,8 +968,10 @@ export const create = ({ page, expect, VError, ideVersion }) => {
               extensionId: `vscode.media-preview`,
               hasLineOfCodeCounter: false,
             })
+            await subFrame.waitForIdle()
             const img = subFrame.locator('img')
             await expect(img).toBeVisible()
+            await subFrame.waitForIdle()
           }
         }
       } catch (error) {
