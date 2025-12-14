@@ -12,6 +12,7 @@
     "isolatedModules": true,
     "assumeChangesOnlyAffectDirectDependencies": true,
     "strict": true,
+    "strictNullChecks": true,
     "noImplicitAny": false,
     "composite": true,
     "allowImportingTsExtensions": true,

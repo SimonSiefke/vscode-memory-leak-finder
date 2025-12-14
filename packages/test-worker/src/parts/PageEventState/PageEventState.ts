@@ -6,11 +6,11 @@ const state = {
   /**
    * @type {any}
    */
-  events: [],
+  events: [] as any[],
   /**
    * @type {any}
    */
-  callbacks: [],
+  callbacks: [] as any[],
 }
 
 export const addEvent = (event) => {

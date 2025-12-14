@@ -6,11 +6,11 @@ const mergeOriginal = (nodes, cleanInstances) => {
   for (const instance of cleanInstances) {
     reverseMap[instance.originalIndex] = instance
   }
-  const merged = []
+  const merged: any[] = []
   let originalIndex = 0
   for (const node of nodes) {
     originalIndex++
-    const originalStack = []
+    const originalStack: any[] = []
     for (let i = 0; i < node.stackTrace.length; i++) {
       originalIndex++
       const instance = reverseMap[originalIndex]

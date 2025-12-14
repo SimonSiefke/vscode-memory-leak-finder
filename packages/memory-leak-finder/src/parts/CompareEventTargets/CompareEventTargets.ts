@@ -16,7 +16,7 @@ const prettifyEventTargets = (eventTargets) => {
     countMap[description] ||= 0
     countMap[description]++
   }
-  const result = []
+  const result: any[] = []
   for (const [key, value] of Object.entries(countMap)) {
     result.push({
       description: key,

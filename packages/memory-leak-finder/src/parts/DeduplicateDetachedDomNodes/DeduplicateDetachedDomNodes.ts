@@ -15,7 +15,7 @@ export const deduplicatedDetachedDomNodes = (detachedDomNodes) => {
     countMap[hash] ||= 0
     countMap[hash]++
   }
-  const deduplicated = []
+  const deduplicated: any[] = []
   for (const [key, value] of Object.entries(detachedDomNodeMap)) {
     const count = countMap[key]
     // @ts-ignore

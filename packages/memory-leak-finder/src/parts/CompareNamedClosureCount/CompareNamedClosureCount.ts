@@ -22,7 +22,7 @@ export const compareNamedClosureCount = (before, after) => {
     afterMap[item.name] ||= 0
     afterMap[item.name] += item.contextNodeCount + 1
   }
-  const result = []
+  const result: any[] = []
   for (const [key, value] of Object.entries(afterMap)) {
     const beforeCount = beforeMap[key] || 0
     const afterCount = value

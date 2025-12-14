@@ -1,7 +1,7 @@
 import { DevtoolsProtocolDomDebugger } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 export const getEventListenersOfTargets = async (session, targets) => {
-  const promises = []
+  const promises: Promise<any>[] = []
   for (const target of targets) {
     const promise = DevtoolsProtocolDomDebugger.getEventListeners(session, {
       objectId: target.objectId,

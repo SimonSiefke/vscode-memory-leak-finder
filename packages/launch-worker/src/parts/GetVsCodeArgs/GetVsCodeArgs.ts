@@ -8,6 +8,10 @@ export const getVscodeArgs = ({
   inspectExtensions,
   inspectPtyHost,
   enableExtensions,
+  inspectPtyHostPort,
+  inspectSharedProcessPort,
+  inspectExtensionsPort,
+  enableProxy,
 }) => {
   const args = [
     ...ChromiumSwitches.chromiumSwitches,
@@ -25,18 +29,23 @@ export const getVscodeArgs = ({
     userDataDir,
   ]
 
+  // Ignore certificate errors when proxy is enabled (for MITM proxy)
+  if (enableProxy) {
+    args.push('--ignore-certificate-errors')
+  }
+
   if (!enableExtensions) {
     args.push('--disable-extensions')
   }
 
   if (inspectPtyHost) {
-    args.push('--inspect-ptyhost=5877')
+    args.push(`--inspect-ptyhost=${inspectPtyHostPort}`)
   }
   if (inspectSharedProcess) {
-    args.push('--inspect-sharedprocess=5879')
+    args.push(`--inspect-sharedprocess=${inspectSharedProcessPort}`)
   }
   if (inspectExtensions) {
-    args.push('--inspect-extensions=5870')
+    args.push(`--inspect-extensions=${inspectExtensionsPort}`)
   }
   args.push(...extraLaunchArgs)
   return args

@@ -38,5 +38,8 @@
   "workbench.secondarySideBar.defaultVisibility": "hidden",
   "terminal.integrated.gpuAcceleration": "off",
   "editor.accessibilitySupport": "off",
-  "terminal.integrated.shellIntegration.enabled": false
+  "terminal.integrated.shellIntegration.enabled": false,
+  "extensions.verifySignature": false,
+  "telemetry.feedback.enabled": false,
+  "telemetry.editStats.enabled": false
 }

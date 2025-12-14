@@ -5,7 +5,7 @@ const compareFunction = (a, b) => {
 }
 
 export const cleanFunctionLocations = (names, counts, functionLocations) => {
-  const instances = []
+  const instances: any[] = []
   for (let i = 0; i < functionLocations.length; i++) {
     const name = names[i]
     const count = counts[i]

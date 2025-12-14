@@ -54,7 +54,9 @@ export const create = ({ expect, page, VError }) => {
         const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
         await expect(quickPickInput).toBeVisible()
         await expect(quickPickInput).toBeFocused({ timeout: 3000 })
+        await page.waitForIdle()
         await quickPickInput.press('Enter')
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to press Enter`)
       }

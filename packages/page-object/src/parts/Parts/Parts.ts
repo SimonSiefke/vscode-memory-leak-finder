@@ -37,6 +37,7 @@ export * as SettingsEditorCompletion from '../SettingsEditorCompletion/SettingsE
 export * as SettingsEditorFilter from '../SettingsEditorFilter/SettingsEditorFilter.ts'
 export * as SettingsEditorInput from '../SettingsEditorInput/SettingsEditorInput.ts'
 export * as SideBar from '../SideBar/SideBar.ts'
+export * as SimpleBrowser from '../SimpleBrowser/SimpleBrowser.ts'
 export * as SourceControl from '../SourceControl/SourceControl.ts'
 export * as StatusBar from '../StatusBar/StatusBar.ts'
 export * as Suggest from '../Suggest/Suggest.ts'

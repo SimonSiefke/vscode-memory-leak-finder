@@ -5,7 +5,7 @@ import { join } from 'node:path'
 const root = join(import.meta.dirname, '../../..')
 
 const computeSourceMapsCacheKey = async (): Promise<string> => {
-  const vscodeVersionPath = join(root, 'packages/initialization-worker/src/parts/VsCodeVersion/VsCodeVersion.ts')
+  const vscodeVersionPath = join(root, 'packages/cli/src/parts/VsCodeVersion/VsCodeVersion.ts')
   const content = await readFile(vscodeVersionPath, 'utf8')
   const hash = createHash('sha1')
   hash.update(content)

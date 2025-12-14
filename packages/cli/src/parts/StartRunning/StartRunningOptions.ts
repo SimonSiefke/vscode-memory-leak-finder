@@ -17,13 +17,21 @@ export interface StartRunningOptions {
   ide: string
   ideVersion: string
   vscodePath: string
+  vscodeVersion: string
   commit: string
+  insidersCommit: string
   setupOnly: boolean
   workers: boolean
   isWindows: boolean
-  shouldContinue: boolean
+  continueValue: string
   inspectSharedProcess: boolean
   inspectExtensions: boolean
   inspectPtyHost: boolean
   enableExtensions: boolean
+  inspectPtyHostPort: number
+  inspectSharedProcessPort: number
+  inspectExtensionsPort: number
+  enableProxy: boolean
+  useProxyMock: boolean
+  bisect: boolean
 }

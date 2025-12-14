@@ -9,7 +9,7 @@ export const getAllScopeListPropertiesInternal = async (session, objectGroup, ob
   Assert.object(session)
   Assert.string(objectGroup)
   Assert.array(objectIds)
-  const promises = []
+  const promises: Promise<any>[] = []
   for (const objectId of objectIds) {
     promises.push(GetScopeProperties.getFunctionScopeProperty(session, objectGroup, objectId))
   }
