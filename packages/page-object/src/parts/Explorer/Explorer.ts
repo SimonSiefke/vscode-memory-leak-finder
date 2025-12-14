@@ -32,6 +32,24 @@ const getListId = (classNameString) => {
 
 export const create = ({ page, expect, VError }) => {
   return {
+    async openAllFiles() {
+      try {
+        await page.waitForIdle()
+        await page.keyboard.press('Control+A')
+        await page.waitForIdle()
+        await this.openContextMenu(`1.txt`)
+        const contextMenu = ContextMenu.create({ page, expect, VError })
+        await contextMenu.select('Open to the Side')
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.CloseOtherGroups)
+        await page.waitForIdle()
+        // TODO open context menu, the open to the side
+        // then close left group
+      } catch (error) {
+        throw new VError(error, `Failed to open all files`)
+      }
+    },
     async focus() {
       try {
         await page.waitForIdle()
@@ -199,7 +217,7 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to copy explorer item ${dirent}`)
       }
     },
-    async openContextMenu(dirent, select = undefined) {
+    async openContextMenu(dirent: string, select = undefined) {
       try {
         await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
