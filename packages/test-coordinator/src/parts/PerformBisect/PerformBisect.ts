@@ -67,7 +67,7 @@ export const performBisect = async (options: RunTestsOptions): Promise<BisectRes
       const successResult = result as RunTestsSuccessResult
       const hasLeak = successResult.leaked > 0
 
-      // Commits are ordered from oldest (index 0) to newest (index n-1)
+      // Commits are ordered from newest (index 0) to oldest (index n-1)
       // We want to find the oldest commit that has a leak (first chronologically)
       if (hasLeak) {
         lastLeakingCommit = commitHash
