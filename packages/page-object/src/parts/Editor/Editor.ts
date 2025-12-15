@@ -873,28 +873,17 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         })
         const count = await actionItem.count()
         if (count === 0) {
-<<<<<<< HEAD
           throw new Error(`source action item ${actionText} not found`)
-=======
-          // Try case-insensitive match
-          actionItem = sourceAction.locator('.action-item').filter({
-            hasText: new RegExp(actionText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'),
-          })
->>>>>>> origin/main
         }
         await expect(actionItem.first()).toBeVisible({ timeout: 10000 })
         await actionItem.first().click()
         await page.waitForIdle()
         await expect(sourceAction).toBeHidden()
-<<<<<<< HEAD
         await page.waitForIdle()
-=======
->>>>>>> origin/main
       } catch (error) {
         throw new VError(error, `Failed to select source action "${actionText}"`)
       }
     },
-<<<<<<< HEAD
     async selectRefactor(actionText: string) {
       try {
         await page.waitForIdle()
@@ -911,8 +900,6 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to select refactor action "${actionText}"`)
       }
     },
-=======
->>>>>>> origin/main
     async shouldHaveCursor(estimate) {
       try {
         await page.waitForIdle()
