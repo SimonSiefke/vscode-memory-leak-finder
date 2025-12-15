@@ -35,8 +35,7 @@ export const run = async ({ Editor, SettingsEditor }: TestContext): Promise<void
   await Editor.click('myFunction')
   await Editor.inspectTokens()
   await Editor.shouldHaveInspectedToken('myFunction10 chars')
-  await new Promise((r) => {})
-  await Editor.shouldHaveSemanticToken('myFunction10 chars')
+  await Editor.shouldHaveSemanticToken('function')
   await Editor.closeInspectedTokens()
   await SettingsEditor.select({
     name: 'editor.semanticHighlighting.enabled',
