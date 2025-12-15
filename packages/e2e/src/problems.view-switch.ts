@@ -32,7 +32,7 @@ export const setup = async ({ Editor, Workspace, Problems }: TestContext): Promi
 }
 
 export const run = async ({ Problems }: TestContext): Promise<void> => {
-  await Problems.switchToListView()
+  await Problems.switchToTreeView()
   // @ts-ignore
   await Problems.switchToTableView()
 }

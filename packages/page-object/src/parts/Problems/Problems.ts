@@ -40,14 +40,14 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to hide problems`)
       }
     },
-    async switchToListView() {
+    async switchToTreeView() {
       try {
         await page.waitForIdle()
         const markersPanel = page.locator('.markers-panel')
         await expect(markersPanel).toBeVisible()
         await page.waitForIdle()
         const panel = page.locator('.part.panel')
-        const viewAsListButton = panel.locator('[aria-label="View as List"]')
+        const viewAsListButton = panel.locator('[aria-label="View as Tree"]')
         const count = await viewAsListButton.count()
         if (count === 0) {
           return
@@ -57,7 +57,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(viewAsListButton).toBeHidden()
         await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to switch to list view`)
+        throw new VError(error, `Failed to switch to tree view`)
       }
     },
     async switchToTableView() {
@@ -68,6 +68,7 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const panel = page.locator('.part.panel')
         const viewAsTableButton = panel.locator('[aria-label="View as Table"]')
+        await new Promise((r) => {})
         const count = await viewAsTableButton.count()
         if (count === 0) {
           return
