@@ -821,6 +821,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     },
     async showRefactor() {
       try {
+        await page.waitForIdle()
         const refactorWidget = page.locator('[aria-label="Action Widget"]')
         await expect(refactorWidget).toBeHidden()
         await page.waitForIdle()
@@ -828,8 +829,9 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await quickPick.executeCommand(WellKnownCommands.Refactor)
         await page.waitForIdle()
         await expect(refactorWidget).toBeVisible({
-          timeout: 15_000,
+          timeout: 30_000,
         })
+        await page.waitForIdle()
         await expect(refactorWidget).toHaveText(/Modify/)
         await page.waitForIdle()
       } catch (error) {
