@@ -127,6 +127,7 @@ export interface Editor {
   hideSourceActionEmpty(): Promise<void>
   showSourceAction(): Promise<void>
   hideSourceAction(): Promise<void>
+  selectSourceAction(actionText: string): Promise<void>
   shouldHaveCursor(estimate: any): Promise<void>
   inspectTokens(): Promise<void>
   shouldHaveInspectedToken(name: any): Promise<void>
