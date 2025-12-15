@@ -1,11 +1,10 @@
-import type { TestContext } from '../types.ts'
+import type { TestContext } from '../types.js'
 
-const originalContent = `export const main = () => {
-  const a = 1
-  const b = 2
-  const result = a + b
-  return result
-}
+const originalContent = `
+const a = 1
+const b = 2
+const result = a + b
+
 `
 
 export const skip = 1
@@ -40,8 +39,10 @@ export const setup = async ({ Editor, Workspace, Explorer }: TestContext): Promi
 
 export const run = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   // @ts-ignore
-  await Editor.setCursor(5, 3)
-  await Editor.showSourceAction()
+  await Editor.setCursor(2, 3)
+  await Editor.selectAll()
+  // @ts-ignore
+  await Editor.showRefactor()
   await Editor.selectSourceAction('Extract Function')
   await Editor.shouldHaveText(`function extractedFunction() {
   const a = 1

@@ -803,6 +803,21 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to hide empty source action`)
       }
     },
+    async showRefactor() {
+      try {
+        const refactorWidget = page.locator('[aria-label="Action Widget"]')
+        await expect(refactorWidget).toBeHidden()
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.Refactor)
+        await page.waitForIdle()
+        await expect(refactorWidget).toBeVisible()
+        await expect(refactorWidget).toHaveText(/Refactor Action/)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to show refactor action`)
+      }
+    },
     async showSourceAction() {
       try {
         const sourceAction = page.locator('[aria-label="Action Widget"]')
