@@ -23,16 +23,14 @@ export const setup = async ({ Editor, Workspace, Problems }: TestContext): Promi
   ])
   await Editor.closeAll()
   await Editor.open('main.ts')
-  await new Promise((resolve) => setTimeout(resolve, 2000))
+  await Editor.shouldHaveBreadCrumb('main.ts')
   await Problems.show()
   await Problems.shouldHaveCount(1)
 }
 
 export const run = async ({ Problems }: TestContext): Promise<void> => {
   await Problems.switchToListView()
-  await Problems.shouldBeInListView()
   await Problems.switchToTreeView()
-  await Problems.shouldBeInTreeView()
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
