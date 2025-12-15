@@ -57,6 +57,8 @@ function newFunction() {
 }
 
 `)
+  await Editor.save({ viaKeyBoard: true })
+
   await Workspace.add({
     name: 'src/main.ts',
     content: originalContent,
@@ -64,5 +66,6 @@ function newFunction() {
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
+  await Editor.save({ viaKeyBoard: true })
   await Editor.closeAll()
 }
