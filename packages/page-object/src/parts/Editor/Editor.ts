@@ -477,6 +477,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
         const renameInput = page.locator('.rename-input')
         await expect(renameInput).toBeVisible()
+        await page.waitForIdle()
         await expect(renameInput).toBeFocused()
         await page.waitForIdle()
         await page.keyboard.press('Enter')
