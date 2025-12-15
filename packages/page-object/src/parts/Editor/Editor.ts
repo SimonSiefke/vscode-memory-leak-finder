@@ -850,7 +850,6 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         const sourceAction = page.locator('[aria-label="Action Widget"]')
         await expect(sourceAction).toBeVisible()
         await page.waitForIdle()
-        await new Promise((r) => {})
         // Try exact match first, then case-insensitive regex
         let actionItem = sourceAction.locator('.action-item', {
           hasText: actionText,

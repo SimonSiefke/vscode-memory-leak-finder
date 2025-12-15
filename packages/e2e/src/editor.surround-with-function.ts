@@ -43,7 +43,7 @@ export const run = async ({ Editor, Workspace }: TestContext): Promise<void> => 
   await Editor.selectAll()
   // @ts-ignore
   await Editor.showRefactor()
-  await Editor.selectSourceAction('Extract Function')
+  await Editor.selectSourceAction('Extract to function in global scope')
   await Editor.shouldHaveText(`function extractedFunction() {
   const a = 1
   const b = 2
