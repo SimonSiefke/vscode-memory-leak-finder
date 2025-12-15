@@ -42,42 +42,19 @@ export const create = ({ expect, page, VError }) => {
     },
     async switchToListView() {
       try {
+        await page.waitForIdle()
         const markersPanel = page.locator('.markers-panel')
         await expect(markersPanel).toBeVisible()
         await page.waitForIdle()
-        const treeView = markersPanel.locator('.monaco-tree')
-        const isTreeVisible = await treeView.isVisible().catch(() => false)
-        if (isTreeVisible) {
-          const toolbar = markersPanel.locator('.monaco-action-bar, .actions-container, .toolbar')
-          const viewModeButton = toolbar
-            .locator(
-              '[aria-label*="View Mode"], [aria-label*="Toggle View"], [aria-label*="List"], [aria-label*="Tree"], [title*="View Mode"], [title*="Toggle View"], [aria-label*="Switch"], button[class*="view"], .action-item[class*="view"]',
-            )
-            .first()
-          const buttonExists = await viewModeButton.isVisible().catch(() => false)
-          if (buttonExists) {
-            await viewModeButton.click()
-            await page.waitForIdle()
-          } else {
-            const allButtons = toolbar.locator('button, .action-item, [role="button"]')
-            const buttonCount = await allButtons.count()
-            for (let i = 0; i < buttonCount; i++) {
-              const button = allButtons.nth(i)
-              const ariaLabel = await button.getAttribute('aria-label').catch(() => '')
-              const title = await button.getAttribute('title').catch(() => '')
-              if (
-                (ariaLabel && (ariaLabel.includes('View') || ariaLabel.includes('List') || ariaLabel.includes('Tree'))) ||
-                (title && (title.includes('View') || title.includes('List') || title.includes('Tree')))
-              ) {
-                await button.click()
-                await page.waitForIdle()
-                break
-              }
-            }
-          }
+        const panel = page.locator('.part.panel')
+        const viewAsTableButton = panel.locator('[aria-label="View as Table"]')
+        const count = await viewAsTableButton.count()
+        if (count === 0) {
+          return
         }
-        const listView = markersPanel.locator('.monaco-list')
-        await expect(listView).toBeVisible()
+        await viewAsTableButton.click()
+        await page.waitForIdle()
+        await expect(viewAsTableButton).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to switch to list view`)
       }
@@ -94,65 +71,11 @@ export const create = ({ expect, page, VError }) => {
         if (count === 0) {
           return
         }
-        const listView = markersPanel.locator('.monaco-list')
-        const isListVisible = await listView.isVisible().catch(() => false)
-        if (isListVisible) {
-          const toolbar = markersPanel.locator('.monaco-action-bar, .actions-container, .toolbar')
-          const viewModeButton = toolbar
-            .locator(
-              '[aria-label*="View Mode"], [aria-label*="Toggle View"], [aria-label*="List"], [aria-label*="Tree"], [title*="View Mode"], [title*="Toggle View"], [aria-label*="Switch"], button[class*="view"], .action-item[class*="view"]',
-            )
-            .first()
-          const buttonExists = await viewModeButton.isVisible().catch(() => false)
-          if (buttonExists) {
-            await viewModeButton.click()
-            await page.waitForIdle()
-          } else {
-            const allButtons = toolbar.locator('button, .action-item, [role="button"]')
-            const buttonCount = await allButtons.count()
-            for (let i = 0; i < buttonCount; i++) {
-              const button = allButtons.nth(i)
-              const ariaLabel = await button.getAttribute('aria-label').catch(() => '')
-              const title = await button.getAttribute('title').catch(() => '')
-              if (
-                (ariaLabel && (ariaLabel.includes('View') || ariaLabel.includes('List') || ariaLabel.includes('Tree'))) ||
-                (title && (title.includes('View') || title.includes('List') || title.includes('Tree')))
-              ) {
-                await button.click()
-                await page.waitForIdle()
-                break
-              }
-            }
-          }
-        }
-        const treeView = markersPanel.locator('.monaco-tree')
-        await expect(treeView).toBeVisible()
+        await viewAsTableButton.click()
+        await page.waitForIdle()
+        await expect(viewAsTableButton).toBeHidden()
       } catch (error) {
-        throw new VError(error, `Failed to switch to tree view`)
-      }
-    },
-    async shouldBeInListView() {
-      try {
-        const markersPanel = page.locator('.markers-panel')
-        await expect(markersPanel).toBeVisible()
-        const listView = markersPanel.locator('.monaco-list')
-        await expect(listView).toBeVisible()
-        const treeView = markersPanel.locator('.monaco-tree')
-        await expect(treeView).toBeHidden()
-      } catch (error) {
-        throw new VError(error, `Failed to verify list view`)
-      }
-    },
-    async shouldBeInTreeView() {
-      try {
-        const markersPanel = page.locator('.markers-panel')
-        await expect(markersPanel).toBeVisible()
-        const treeView = markersPanel.locator('.monaco-tree')
-        await expect(treeView).toBeVisible()
-        const listView = markersPanel.locator('.monaco-list')
-        await expect(listView).toBeHidden()
-      } catch (error) {
-        throw new VError(error, `Failed to verify tree view`)
+        throw new VError(error, `Failed to switch to table view`)
       }
     },
   }
