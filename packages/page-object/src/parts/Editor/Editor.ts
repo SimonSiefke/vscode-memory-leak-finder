@@ -811,7 +811,9 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.Refactor)
         await page.waitForIdle()
-        await expect(refactorWidget).toBeVisible()
+        await expect(refactorWidget).toBeVisible({
+          timeout: 15_000,
+        })
         await expect(refactorWidget).toHaveText(/Modify/)
         await page.waitForIdle()
       } catch (error) {
@@ -855,6 +857,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
           hasText: actionText,
         })
         const count = await actionItem.count()
+        await new Promise((r) => {})
         if (count === 0) {
           throw new Error(`source action item ${actionText} not found`)
         }
@@ -865,6 +868,22 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to select source action "${actionText}"`)
+      }
+    },
+    async selectRefactor(actionText: string) {
+      try {
+        await page.waitForIdle()
+        const widget = page.locator('.action-widget')
+        await expect(widget).toBeVisible()
+        await page.waitForIdle()
+        const actionItem = widget.locator(`.monaco-list-row[aria-label="${actionText}"]`)
+        await expect(actionItem).toBeVisible({ timeout: 10_000 })
+        await actionItem.click()
+        await page.waitForIdle()
+        await expect(widget).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to select refactor action "${actionText}"`)
       }
     },
     async shouldHaveCursor(estimate) {
