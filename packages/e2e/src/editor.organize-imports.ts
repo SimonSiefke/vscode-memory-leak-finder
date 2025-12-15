@@ -10,7 +10,7 @@ export const main = () => {
 
 export const skip = 1
 
-export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace, Explorer }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'src/main.ts',
@@ -42,10 +42,15 @@ export const unused = () => {
     },
   ])
   await Editor.closeAll()
-  await Editor.open('src/main.ts')
+  await Explorer.focus()
+  await Explorer.expand('src')
+  await Explorer.shouldHaveItem('main.ts')
+  await Editor.open('main.ts')
 }
 
 export const run = async ({ Editor, Workspace }: TestContext): Promise<void> => {
+  // Wait a bit for TypeScript language server to initialize
+  await new Promise((resolve) => setTimeout(resolve, 2000))
   await Editor.showSourceAction()
   await Editor.selectSourceAction('Organize Imports')
   await Editor.shouldHaveText(`import { used } from './add.ts'
