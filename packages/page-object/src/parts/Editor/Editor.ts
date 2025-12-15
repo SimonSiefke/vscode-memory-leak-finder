@@ -841,15 +841,13 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         })
         const count = await actionItem.count()
         if (count === 0) {
-          // Try case-insensitive match
-          actionItem = sourceAction.locator('.action-item').filter({
-            hasText: new RegExp(actionText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'),
-          })
+          throw new Error(`source action item ${actionText} not found`)
         }
         await expect(actionItem.first()).toBeVisible({ timeout: 10000 })
         await actionItem.first().click()
         await page.waitForIdle()
         await expect(sourceAction).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to select source action "${actionText}"`)
       }
