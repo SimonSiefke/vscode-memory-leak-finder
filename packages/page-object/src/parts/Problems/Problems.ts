@@ -82,11 +82,18 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to switch to list view`)
       }
     },
-    async switchToTreeView() {
+    async switchToTableView() {
       try {
+        await page.waitForIdle()
         const markersPanel = page.locator('.markers-panel')
         await expect(markersPanel).toBeVisible()
         await page.waitForIdle()
+        const panel = page.locator('.part.panel')
+        const viewAsTableButton = panel.locator('[aria-label="View as Table"]')
+        const count = await viewAsTableButton.count()
+        if (count === 0) {
+          return
+        }
         const listView = markersPanel.locator('.monaco-list')
         const isListVisible = await listView.isVisible().catch(() => false)
         if (isListVisible) {

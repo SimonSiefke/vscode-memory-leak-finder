@@ -27,11 +27,14 @@ export const setup = async ({ Editor, Workspace, Problems }: TestContext): Promi
   await Editor.shouldHaveSquigglyError()
   await Problems.show()
   await Problems.shouldHaveCount(1)
+  // @ts-ignore
+  await Problems.switchToTableView()
 }
 
 export const run = async ({ Problems }: TestContext): Promise<void> => {
   await Problems.switchToListView()
-  await Problems.switchToTreeView()
+  // @ts-ignore
+  await Problems.switchToTableView()
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
