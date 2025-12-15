@@ -472,6 +472,21 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to verify editor text ${text}`)
       }
     },
+    async acceptRename() {
+      try {
+        await page.waitForIdle()
+        const renameInput = page.locator('.rename-input')
+        await expect(renameInput).toBeVisible()
+        await expect(renameInput).toBeFocused()
+        await page.waitForIdle()
+        await page.keyboard.press('Enter')
+        await page.waitForIdle()
+        await expect(renameInput).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to accept rename`)
+      }
+    },
     async rename(newText: string) {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
@@ -857,7 +872,6 @@ export const create = ({ page, expect, VError, ideVersion }) => {
           hasText: actionText,
         })
         const count = await actionItem.count()
-        await new Promise((r) => {})
         if (count === 0) {
           throw new Error(`source action item ${actionText} not found`)
         }
