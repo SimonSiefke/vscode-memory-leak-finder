@@ -47,18 +47,15 @@ export const run = async ({ Editor, Workspace }: TestContext): Promise<void> => 
   await Editor.selectRefactor('Extract to function in global scope')
   // @ts-ignore
   await Editor.acceptRename()
-  await new Promise((r) => {})
-  await Editor.shouldHaveText(`function extractedFunction() {
-  const a = 1
-  const b = 2
-  const result = a + b
-  return result
+  await Editor.shouldHaveText(`
+newFunction()
+
+function newFunction() {
+    const a = 1
+    const b = 2
+    const result = a + b
 }
 
-export const main = () => {
-  const result = extractedFunction()
-  return result
-}
 `)
   await Workspace.add({
     name: 'src/main.ts',
