@@ -905,8 +905,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
           throw new Error(`Token inspector widget has no text content`)
         }
         const hasSemanticTokenType = widgetText.toLowerCase().includes('semantic token type')
-        const hasStandardTokenType = widgetText.toLowerCase().includes('standard token type')
-        if (!hasSemanticTokenType && hasStandardTokenType) {
+        if (!hasSemanticTokenType) {
           throw new Error(`Semantic token information not found in token inspector. Widget text: ${widgetText}`)
         }
       } catch (error) {
