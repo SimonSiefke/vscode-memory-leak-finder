@@ -24,6 +24,7 @@ export const setup = async ({ Editor, Workspace, Problems }: TestContext): Promi
   await Editor.closeAll()
   await Editor.open('main.ts')
   await Editor.shouldHaveBreadCrumb('main.ts')
+  await Editor.shouldHaveSquigglyError()
   await Problems.show()
   await Problems.shouldHaveCount(1)
 }
