@@ -916,7 +916,8 @@ export const create = ({ page, expect, VError, ideVersion }) => {
           for (let i = 0; i < 10; i++) {
             await page.waitForIdle()
             widgetText = await inspectWidget.textContent()
-            const hasSemantic = widgetText && (widgetText.toLowerCase().includes('semantic token type') || widgetText.toLowerCase().includes('semantic'))
+            const hasSemantic =
+              widgetText && (widgetText.toLowerCase().includes('semantic token type') || widgetText.toLowerCase().includes('semantic'))
             if (hasSemantic) {
               return
             }
