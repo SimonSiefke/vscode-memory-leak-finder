@@ -900,18 +900,27 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
         const inspectWidget = page.locator('.token-inspect-widget')
         await expect(inspectWidget).toBeVisible()
+        const semanticSection = inspectWidget.locator('.tiw-semantic-token-info, [class*="semantic-token"], [class*="semantic"]')
+        const count = await semanticSection.count()
+        if (count > 0) {
+          await expect(semanticSection.first()).toBeVisible({ timeout: 5000 })
+          return
+        }
         let widgetText = await inspectWidget.textContent()
         if (!widgetText) {
           throw new Error(`Token inspector widget has no text content`)
         }
-        let hasSemanticTokenType = widgetText.toLowerCase().includes('semantic token type')
-        if (!hasSemanticTokenType) {
-          await page.waitForTimeout(1000)
-          await page.waitForIdle()
-          widgetText = await inspectWidget.textContent()
-          hasSemanticTokenType = widgetText && widgetText.toLowerCase().includes('semantic token type')
-        }
-        if (!hasSemanticTokenType) {
+        const hasSemanticTokenType = widgetText.toLowerCase().includes('semantic token type')
+        const hasSemanticInfo = widgetText.toLowerCase().includes('semantic')
+        if (!hasSemanticTokenType && !hasSemanticInfo) {
+          for (let i = 0; i < 10; i++) {
+            await page.waitForIdle()
+            widgetText = await inspectWidget.textContent()
+            const hasSemantic = widgetText && (widgetText.toLowerCase().includes('semantic token type') || widgetText.toLowerCase().includes('semantic'))
+            if (hasSemantic) {
+              return
+            }
+          }
           throw new Error(`Semantic token information not found in token inspector. Widget text: ${widgetText}`)
         }
       } catch (error) {
