@@ -47,14 +47,15 @@ export const create = ({ expect, page, VError }) => {
         await expect(markersPanel).toBeVisible()
         await page.waitForIdle()
         const panel = page.locator('.part.panel')
-        const viewAsTableButton = panel.locator('[aria-label="View as Table"]')
-        const count = await viewAsTableButton.count()
+        const viewAsListButton = panel.locator('[aria-label="View as List"]')
+        const count = await viewAsListButton.count()
         if (count === 0) {
           return
         }
-        await viewAsTableButton.click()
+        await viewAsListButton.click()
         await page.waitForIdle()
-        await expect(viewAsTableButton).toBeHidden()
+        await expect(viewAsListButton).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to switch to list view`)
       }
@@ -74,6 +75,7 @@ export const create = ({ expect, page, VError }) => {
         await viewAsTableButton.click()
         await page.waitForIdle()
         await expect(viewAsTableButton).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to switch to table view`)
       }
