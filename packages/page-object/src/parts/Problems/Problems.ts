@@ -68,7 +68,6 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const panel = page.locator('.part.panel')
         const viewAsTableButton = panel.locator('[aria-label="View as Table"]')
-        await new Promise((r) => {})
         const count = await viewAsTableButton.count()
         if (count === 0) {
           return
