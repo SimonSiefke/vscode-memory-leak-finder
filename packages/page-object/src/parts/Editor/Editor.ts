@@ -24,7 +24,7 @@ const isBinary = (file) => {
 
 export const create = ({ page, expect, VError, ideVersion }) => {
   return {
-    async open(fileName) {
+    async open(fileName: string) {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
