@@ -900,11 +900,17 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
         const inspectWidget = page.locator('.token-inspect-widget')
         await expect(inspectWidget).toBeVisible()
-        const widgetText = await inspectWidget.textContent()
+        let widgetText = await inspectWidget.textContent()
         if (!widgetText) {
           throw new Error(`Token inspector widget has no text content`)
         }
-        const hasSemanticTokenType = widgetText.toLowerCase().includes('semantic token type')
+        let hasSemanticTokenType = widgetText.toLowerCase().includes('semantic token type')
+        if (!hasSemanticTokenType) {
+          await page.waitForTimeout(1000)
+          await page.waitForIdle()
+          widgetText = await inspectWidget.textContent()
+          hasSemanticTokenType = widgetText && widgetText.toLowerCase().includes('semantic token type')
+        }
         if (!hasSemanticTokenType) {
           throw new Error(`Semantic token information not found in token inspector. Widget text: ${widgetText}`)
         }
