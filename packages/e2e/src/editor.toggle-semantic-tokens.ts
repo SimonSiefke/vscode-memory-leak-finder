@@ -27,9 +27,6 @@ export const setup = async ({ Editor, Workspace, SettingsEditor }: TestContext):
     name: 'editor.semanticHighlighting.enabled',
     value: 'configuredByTheme',
   })
-}
-
-export const run = async ({ Editor, SettingsEditor }: TestContext): Promise<void> => {
   await Editor.switchToTab('file.ts')
   await Editor.focus()
   await Editor.click('myFunction')
@@ -37,6 +34,9 @@ export const run = async ({ Editor, SettingsEditor }: TestContext): Promise<void
   await Editor.shouldHaveInspectedToken('myFunction10 chars')
   await Editor.shouldHaveSemanticToken('function')
   await Editor.closeInspectedTokens()
+}
+
+export const run = async ({ Editor, SettingsEditor }: TestContext): Promise<void> => {
   await SettingsEditor.select({
     name: 'editor.semanticHighlighting.enabled',
     value: 'false',
@@ -57,7 +57,7 @@ export const run = async ({ Editor, SettingsEditor }: TestContext): Promise<void
   await Editor.click('myFunction')
   await Editor.inspectTokens()
   await Editor.shouldHaveInspectedToken('myFunction10 chars')
-  await Editor.shouldHaveSemanticToken('class')
+  await Editor.shouldHaveSemanticToken('function')
   await Editor.closeInspectedTokens()
 }
 
