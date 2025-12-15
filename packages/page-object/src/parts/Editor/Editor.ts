@@ -812,7 +812,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await quickPick.executeCommand(WellKnownCommands.Refactor)
         await page.waitForIdle()
         await expect(refactorWidget).toBeVisible()
-        await expect(refactorWidget).toHaveText(/Refactor Action/)
+        await expect(refactorWidget).toHaveText(/Modify/)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show refactor action`)
@@ -850,6 +850,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         const sourceAction = page.locator('[aria-label="Action Widget"]')
         await expect(sourceAction).toBeVisible()
         await page.waitForIdle()
+        await new Promise((r) => {})
         // Try exact match first, then case-insensitive regex
         let actionItem = sourceAction.locator('.action-item', {
           hasText: actionText,
