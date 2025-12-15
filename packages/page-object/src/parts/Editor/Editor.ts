@@ -829,6 +829,22 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to hide source action`)
       }
     },
+    async selectSourceAction(actionText: string) {
+      try {
+        await page.waitForIdle()
+        const sourceAction = page.locator('[aria-label="Action Widget"]')
+        await expect(sourceAction).toBeVisible()
+        await page.waitForIdle()
+        const actionItem = sourceAction.locator('.action-item', {
+          hasText: actionText,
+        })
+        await actionItem.click()
+        await page.waitForIdle()
+        await expect(sourceAction).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to select source action "${actionText}"`)
+      }
+    },
     async shouldHaveCursor(estimate) {
       try {
         await page.waitForIdle()
