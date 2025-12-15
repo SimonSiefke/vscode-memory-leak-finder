@@ -247,6 +247,10 @@ export interface Problems {
   shouldHaveCount(count: any): Promise<void>
   show(): Promise<void>
   hide(): Promise<void>
+  switchToListView(): Promise<void>
+  switchToTreeView(): Promise<void>
+  shouldBeInListView(): Promise<void>
+  shouldBeInTreeView(): Promise<void>
 }
 export interface Profile {
   removeOtherProfiles(): Promise<void>
