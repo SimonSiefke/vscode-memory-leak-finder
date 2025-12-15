@@ -2,8 +2,10 @@ export const create = ({ expect, page, VError }) => {
   return {
     async shouldHaveHeading(subFrame, id) {
       try {
+        await page.waitForIdle()
         const heading = subFrame.locator(`#${id}`)
         await expect(heading).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to check that markdown preview has heading ${id}`)
       }
@@ -13,7 +15,9 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const webView = page.locator('.webview')
         await expect(webView).toBeVisible()
+        await page.waitForIdle()
         await expect(webView).toHaveClass('ready')
+        await page.waitForIdle()
         const childPage = await page.waitForIframe({
           url: /extensionId=vscode.markdown-language-features/,
           injectUtilityScript: false,
@@ -25,6 +29,7 @@ export const create = ({ expect, page, VError }) => {
         await subFrame.waitForIdle()
         const markDown = subFrame.locator('.markdown-body')
         await expect(markDown).toBeVisible()
+        await page.waitForIdle()
         return subFrame
       } catch (error) {
         throw new VError(error, `Failed to check that markdown preview is visible`)
