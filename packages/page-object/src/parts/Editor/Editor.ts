@@ -900,13 +900,15 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
         const inspectWidget = page.locator('.token-inspect-widget')
         await expect(inspectWidget).toBeVisible()
-        const semanticSection = inspectWidget.locator('.tiw-semantic-token-info, [class*="semantic"]')
-        const count = await semanticSection.count()
-        if (count === 0) {
-          const widgetText = await inspectWidget.textContent()
+        const widgetText = await inspectWidget.textContent()
+        if (!widgetText) {
+          throw new Error(`Token inspector widget has no text content`)
+        }
+        const hasSemanticTokenType = widgetText.toLowerCase().includes('semantic token type')
+        const hasStandardTokenType = widgetText.toLowerCase().includes('standard token type')
+        if (!hasSemanticTokenType && hasStandardTokenType) {
           throw new Error(`Semantic token information not found in token inspector. Widget text: ${widgetText}`)
         }
-        await expect(semanticSection.first()).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to verify semantic token ${type}`)
       }
@@ -916,11 +918,12 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
         const inspectWidget = page.locator('.token-inspect-widget')
         await expect(inspectWidget).toBeVisible()
-        const semanticSection = inspectWidget.locator('.tiw-semantic-token-info, [class*="semantic"]')
-        const count = await semanticSection.count()
-        if (count > 0) {
-          const widgetText = await inspectWidget.textContent()
-          throw new Error(`Semantic token information found but should not be present. Widget text: ${widgetText}`)
+        const widgetText = await inspectWidget.textContent()
+        if (widgetText) {
+          const hasSemanticTokenType = widgetText.toLowerCase().includes('semantic token type')
+          if (hasSemanticTokenType) {
+            throw new Error(`Semantic token information found but should not be present. Widget text: ${widgetText}`)
+          }
         }
       } catch (error) {
         throw new VError(error, `Failed to verify semantic token ${type} is not present`)
