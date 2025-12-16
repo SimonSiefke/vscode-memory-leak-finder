@@ -111,10 +111,12 @@ export const create = ({ expect, page, VError }) => {
         const extensionEditor = page.locator('.extension-editor')
         await expect(extensionEditor).toBeVisible()
         await page.waitForIdle()
-
         const installButton = extensionEditor.locator('.action-label[aria-label^="Install"], .action-label[aria-label*="Install"]')
         await expect(installButton).toBeVisible()
         await page.waitForIdle()
+        await installButton.click()
+        await page.waitForIdle()
+        await expect(installButton).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to install extension`)
       }
