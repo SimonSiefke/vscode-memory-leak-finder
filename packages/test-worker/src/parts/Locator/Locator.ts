@@ -13,6 +13,7 @@ import * as LocatorPress from '../LocatorPress/LocatorPress.ts'
 import * as LocatorScrollDown from '../LocatorScrollDown/LocatorScrollDown.ts'
 import * as LocatorScrollUp from '../LocatorScrollUp/LocatorScrollUp.ts'
 import * as LocatorSelectText from '../LocatorSelectText/LocatorSelectText.ts'
+import * as LocatorSetChecked from '../LocatorSetChecked/LocatorSetChecked.ts'
 import * as LocatorSetValue from '../LocatorSetValue/LocatorSetValue.ts'
 import * as LocatorTextContent from '../LocatorTextContent/LocatorTextContent.ts'
 import * as LocatorType from '../LocatorType/LocatorType.ts'
@@ -93,6 +94,9 @@ export const create = (rpc, sessionId, selector, { hasText = '', hasExactText = 
     },
     setValue(value) {
       return LocatorSetValue.setValue(this, value)
+    },
+    setChecked(value: boolean) {
+      return LocatorSetChecked.setChecked(this, value)
     },
     click(options = {}) {
       return LocatorClick.click(this, options)
