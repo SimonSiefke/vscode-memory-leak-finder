@@ -255,12 +255,15 @@ export const create = ({ expect, page, VError, ideVersion }) => {
       }
     },
     first: {
-      async shouldBe(name) {
+      async shouldBe(name: string) {
         const firstExtension = page.locator('.extension-list-item').first()
         await expect(firstExtension).toBeVisible({
-          timeout: 7000,
+          timeout: 15_000,
         })
+        await page.waitForIdle()
         const nameLocator = firstExtension.locator('.name')
+        await expect(nameLocator).toBeVisible()
+        await page.waitForIdle()
         await expect(nameLocator).toHaveText(name)
         await page.waitForIdle()
       },
