@@ -16,6 +16,8 @@ h2 {
     },
   ])
   await Editor.open('file.css')
+  await Editor.shouldHaveBreadCrumb('file.css')
+  await Editor.shouldHaveBreadCrumb('h1')
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {

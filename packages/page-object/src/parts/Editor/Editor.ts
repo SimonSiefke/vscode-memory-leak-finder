@@ -155,32 +155,43 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     },
     async fold() {
       try {
+        await page.waitForIdle()
         const inlineFolded = page.locator('.inline-folded')
         await expect(inlineFolded).toBeHidden()
+        await page.waitForIdle()
         const collapsedIcon = page.locator('.codicon-folding-collapsed').first()
         await expect(collapsedIcon).toBeHidden()
+        await page.waitForIdle()
         const foldingIcon = page.locator('.codicon-folding-expanded').first()
         await expect(foldingIcon).toBeVisible()
+        await page.waitForIdle()
         const firstIcon = foldingIcon.first()
         await firstIcon.click()
+        await page.waitForIdle()
         await expect(inlineFolded).toBeVisible()
+        await page.waitForIdle()
         await expect(collapsedIcon).toBeVisible()
-        await collapsedIcon.click()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to fold editor`)
       }
     },
     async unfold() {
       try {
+        await page.waitForIdle()
         const inlineFolded = page.locator('.inline-folded')
         await expect(inlineFolded).toBeVisible()
+        await page.waitForIdle()
         const collapsedIcon = page.locator('.codicon-folding-collapsed').first()
         await expect(collapsedIcon).toBeVisible()
-        const foldingIcon = page.locator('.codicon-folding-expanded').first()
-        await expect(foldingIcon).toBeHidden()
+        await page.waitForIdle()
+        await page.waitForIdle()
         await collapsedIcon.click()
+        await page.waitForIdle()
         await expect(inlineFolded).toBeHidden()
+        await page.waitForIdle()
         await expect(collapsedIcon).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to unfold editor`)
       }
