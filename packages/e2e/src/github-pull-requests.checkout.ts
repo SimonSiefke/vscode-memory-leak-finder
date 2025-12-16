@@ -28,7 +28,7 @@ export const setup = async ({ Extensions, Editor, ExtensionDetailView, Git }: Te
   await Git.cloneRepository('https://github.com/octocat/Hello-World.git')
 }
 
-export const run = async ({ GitHubPullRequests, SourceControl, ActivityBar, Git }: TestContext): Promise<void> => {
+export const run = async ({ GitHubPullRequests, SourceControl, ActivityBar }: TestContext): Promise<void> => {
   // Wait a bit for the extension to fully load after installation
   const { resolve: resolveInit, promise: promiseInit } = Promise.withResolvers<void>()
   setTimeout(resolveInit, 3000)
