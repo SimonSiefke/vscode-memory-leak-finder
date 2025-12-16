@@ -15,7 +15,7 @@ export const create = ({ expect, page, VError }) => {
         const pullRequests = page.locator('.monaco-list[aria-label="Pull Requests"]')
         await expect(pullRequests).toBeVisible()
         await page.waitForIdle()
-        const allOpen = pullRequests.locator('.[aria-label="All open pull requests in the current repository"]')
+        const allOpen = pullRequests.locator('[aria-label="All open pull requests in the current repository"]')
         await expect(allOpen).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to focus on Pull Requests view`)
