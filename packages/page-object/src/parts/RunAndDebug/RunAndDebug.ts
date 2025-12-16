@@ -220,43 +220,17 @@ export const create = ({ expect, page, VError }) => {
     },
     async setPauseOnExceptions({ pauseOnExceptions, pauseOnCaughtExceptions }) {
       try {
-        const debugToolBar = page.locator('.debug-toolbar')
-        await expect(debugToolBar).toBeVisible()
         await page.waitForIdle()
-        const pauseOnExceptionsAction = debugToolBar
-          .locator(
-            '[aria-label*="Pause on Exceptions"], [aria-label*="pause on exceptions"], [title*="Pause on Exceptions"], [title*="pause on exceptions"]',
-          )
-          .first()
-        const pauseOnCaughtExceptionsAction = debugToolBar
-          .locator(
-            '[aria-label*="Pause on Caught Exceptions"], [aria-label*="pause on caught exceptions"], [title*="Pause on Caught Exceptions"], [title*="pause on caught exceptions"]',
-          )
-          .first()
-        if (pauseOnExceptions !== undefined) {
-          const isChecked = await pauseOnExceptionsAction.getAttribute('aria-checked')
-          const hasClass = await pauseOnExceptionsAction.getAttribute('class')
-          const checked = isChecked === 'true' || (hasClass && hasClass.includes('checked'))
-          if (pauseOnExceptions && !checked) {
-            await pauseOnExceptionsAction.click()
-            await page.waitForIdle()
-          } else if (!pauseOnExceptions && checked) {
-            await pauseOnExceptionsAction.click()
-            await page.waitForIdle()
-          }
-        }
-        if (pauseOnCaughtExceptions !== undefined) {
-          const isChecked = await pauseOnCaughtExceptionsAction.getAttribute('aria-checked')
-          const hasClass = await pauseOnCaughtExceptionsAction.getAttribute('class')
-          const checked = isChecked === 'true' || (hasClass && hasClass.includes('checked'))
-          if (pauseOnCaughtExceptions && !checked) {
-            await pauseOnCaughtExceptionsAction.click()
-            await page.waitForIdle()
-          } else if (!pauseOnCaughtExceptions && checked) {
-            await pauseOnCaughtExceptionsAction.click()
-            await page.waitForIdle()
-          }
-        }
+        const breakpoints = page.locator('.debug-breakpoints')
+        await expect(breakpoints).tobeVisible()
+        const exception = breakpoints.locator('[aria-label="Caught Exceptions"] input[type="checkbox"]')
+        await expect(exception).toBeVisible()
+        const uncaughtException = breakpoints.locator('[aria-label="Uncaught Exceptions"] input[type="checkbox"]')
+        await expect(uncaughtException).toBeVisible()
+
+        await exception.setChecked(pauseOnExceptions)
+        await uncaughtException.setChecked(pauseOnCaughtExceptions)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to set pause on exceptions`)
       }

@@ -23,11 +23,11 @@ setInterval(() => {
   await Editor.open('index.js')
   await ActivityBar.showRunAndDebug()
   await RunAndDebug.startRunAndDebug()
-  await new Promise((r) => {})
   await RunAndDebug.setPauseOnExceptions({
     pauseOnExceptions: true,
     pauseOnCaughtExceptions: true,
   })
+  await new Promise((r) => {})
 }
 
 export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
