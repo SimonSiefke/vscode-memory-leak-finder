@@ -261,8 +261,10 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     },
     async selectAll() {
       try {
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.SelectAll)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to select all`)
       }
