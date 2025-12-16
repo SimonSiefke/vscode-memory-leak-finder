@@ -2,12 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({
-  Editor,
-  Workspace,
-  Explorer,
-  RunAndDebug,
-}: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace, Explorer, RunAndDebug }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'index.js',
@@ -22,6 +17,7 @@ export const setup = async ({
   await Explorer.shouldHaveItem('index.js')
   await RunAndDebug.removeAllBreakpoints()
   await Editor.open('index.js')
+  await new Promise((r) => {})
   await RunAndDebug.startRunAndDebug()
   await RunAndDebug.setPauseOnExceptions({
     pauseOnExceptions: true,
