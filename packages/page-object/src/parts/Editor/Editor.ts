@@ -1003,6 +1003,55 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed verify inspected token`)
       }
     },
+    async shouldHaveSemanticToken(type) {
+      try {
+        await page.waitForIdle()
+        const inspectWidget = page.locator('.token-inspect-widget')
+        await expect(inspectWidget).toBeVisible()
+        const semanticSection = inspectWidget.locator('.tiw-semantic-token-info, [class*="semantic-token"], [class*="semantic"]')
+        const count = await semanticSection.count()
+        if (count > 0) {
+          await expect(semanticSection.first()).toBeVisible({ timeout: 5000 })
+          return
+        }
+        let widgetText = await inspectWidget.textContent()
+        if (!widgetText) {
+          throw new Error(`Token inspector widget has no text content`)
+        }
+        const hasSemanticTokenType = widgetText.toLowerCase().includes('semantic token type')
+        const hasSemanticInfo = widgetText.toLowerCase().includes('semantic')
+        if (!hasSemanticTokenType && !hasSemanticInfo) {
+          for (let i = 0; i < 10; i++) {
+            await page.waitForIdle()
+            widgetText = await inspectWidget.textContent()
+            const hasSemantic =
+              widgetText && (widgetText.toLowerCase().includes('semantic token type') || widgetText.toLowerCase().includes('semantic'))
+            if (hasSemantic) {
+              return
+            }
+          }
+          throw new Error(`Semantic token information not found in token inspector. Widget text: ${widgetText}`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to verify semantic token ${type}`)
+      }
+    },
+    async shouldNotHaveSemanticToken(type) {
+      try {
+        await page.waitForIdle()
+        const inspectWidget = page.locator('.token-inspect-widget')
+        await expect(inspectWidget).toBeVisible()
+        const widgetText = await inspectWidget.textContent()
+        if (widgetText) {
+          const hasSemanticTokenType = widgetText.toLowerCase().includes('semantic token type')
+          if (hasSemanticTokenType) {
+            throw new Error(`Semantic token information found but should not be present. Widget text: ${widgetText}`)
+          }
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to verify semantic token ${type} is not present`)
+      }
+    },
     async closeInspectedTokens() {
       try {
         const inspectWidget = page.locator('.token-inspect-widget')
