@@ -16,7 +16,7 @@ export const create = ({ expect, page, VError }) => {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.showCommands()
-        await quickPick.type('GitHub Pull Requests: Checkout')
+        await quickPick.type(WellKnownCommands.GitHubPullRequestsCheckout)
         const allCommands = await quickPick.getVisibleCommands()
         const checkoutCommands = allCommands.filter((cmd: string) =>
           cmd.toLowerCase().includes('checkout') && (cmd.toLowerCase().includes('pull request') || cmd.toLowerCase().includes('pr'))
@@ -62,7 +62,7 @@ export const create = ({ expect, page, VError }) => {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.showCommands()
-        await quickPick.type('GitHub Pull Requests: Checkout')
+        await quickPick.type(WellKnownCommands.GitHubPullRequestsCheckout)
         
         const checkoutCommands = await this.findCheckoutCommands()
         
