@@ -261,8 +261,10 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     },
     async selectAll() {
       try {
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.SelectAll)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to select all`)
       }
@@ -472,6 +474,22 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to verify editor text ${text}`)
       }
     },
+    async acceptRename() {
+      try {
+        await page.waitForIdle()
+        const renameInput = page.locator('.rename-input')
+        await expect(renameInput).toBeVisible()
+        await page.waitForIdle()
+        await expect(renameInput).toBeFocused()
+        await page.waitForIdle()
+        await page.keyboard.press('Enter')
+        await page.waitForIdle()
+        await expect(renameInput).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to accept rename`)
+      }
+    },
     async rename(newText: string) {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
@@ -545,10 +563,12 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     async save(options) {
       try {
         if (options?.viaKeyBoard) {
+          await page.waitForIdle()
           await page.keyboard.press('Control+S')
           await page.waitForIdle()
           const dirtyTabs = page.locator('.tab.dirty')
           await expect(dirtyTabs).toHaveCount(0)
+          await page.waitForIdle()
         } else {
           const quickPick = QuickPick.create({ expect, page, VError })
           await quickPick.executeCommand(WellKnownCommands.FileSave)
@@ -803,6 +823,25 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to hide empty source action`)
       }
     },
+    async showRefactor() {
+      try {
+        await page.waitForIdle()
+        const refactorWidget = page.locator('[aria-label="Action Widget"]')
+        await expect(refactorWidget).toBeHidden()
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.Refactor)
+        await page.waitForIdle()
+        await expect(refactorWidget).toBeVisible({
+          timeout: 30_000,
+        })
+        await page.waitForIdle()
+        await expect(refactorWidget).toHaveText(/Modify/)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to show refactor action`)
+      }
+    },
     async showSourceAction() {
       try {
         const sourceAction = page.locator('[aria-label="Action Widget"]')
@@ -841,17 +880,31 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         })
         const count = await actionItem.count()
         if (count === 0) {
-          // Try case-insensitive match
-          actionItem = sourceAction.locator('.action-item').filter({
-            hasText: new RegExp(actionText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'),
-          })
+          throw new Error(`source action item ${actionText} not found`)
         }
         await expect(actionItem.first()).toBeVisible({ timeout: 10000 })
         await actionItem.first().click()
         await page.waitForIdle()
         await expect(sourceAction).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to select source action "${actionText}"`)
+      }
+    },
+    async selectRefactor(actionText: string) {
+      try {
+        await page.waitForIdle()
+        const widget = page.locator('.action-widget')
+        await expect(widget).toBeVisible()
+        await page.waitForIdle()
+        const actionItem = widget.locator(`.monaco-list-row[aria-label="${actionText}"]`)
+        await expect(actionItem).toBeVisible({ timeout: 10_000 })
+        await actionItem.click()
+        await page.waitForIdle()
+        await expect(widget).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to select refactor action "${actionText}"`)
       }
     },
     async shouldHaveCursor(estimate) {
