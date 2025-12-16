@@ -27,17 +27,22 @@ setInterval(() => {
     pauseOnExceptions: true,
     pauseOnCaughtExceptions: true,
   })
-  await new Promise((r) => {})
 }
 
 export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
   await RunAndDebug.waitForPausedOnException({
     file: 'index.js',
-    line: 2,
+    line: 6,
   })
   await Editor.shouldHaveExceptionWidget()
   await RunAndDebug.continue()
+  await RunAndDebug.waitForPausedOnException({
+    file: 'index.js',
+    line: 6,
+  })
+}
+
+export const teardown = async ({ Editor, RunAndDebug }: TestContext) => {
   await RunAndDebug.stop()
-  await RunAndDebug.removeAllBreakpoints()
   await Editor.closeAll()
 }
