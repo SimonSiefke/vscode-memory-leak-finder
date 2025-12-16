@@ -146,6 +146,7 @@ export interface Editor {
   scrollUp(): Promise<void>
   shouldHaveActiveLineNumber(value: any): Promise<void>
   moveScrollBar(y: any, expectedScrollBarY: any): Promise<void>
+  shouldHaveExceptionWidget(): Promise<void>
 }
 export interface Electron {
   evaluate(expression: any): Promise<void>
@@ -293,6 +294,9 @@ export interface RunAndDebug {
   removeAllBreakpoints(): Promise<void>
   step(expectedFile: any, expectedPauseLine: any, expectedCallStackSize?: any): Promise<void>
   setValue(variableName: any, variableValue: any, newVariableValue: any): Promise<void>
+  continue(): Promise<void>
+  setPauseOnExceptions(options: any): Promise<void>
+  waitForPausedOnException(options: any): Promise<void>
 }
 export interface RunningExtensions {
   show(): Promise<void>

@@ -5,8 +5,10 @@ export const create = ({ expect, page, VError }) => {
   return {
     async startRunAndDebug() {
       try {
+        await page.waitForIdle()
         const button = page.locator('.monaco-button:has-text("Run and Debug")')
         await expect(button).toBeVisible()
+        await page.waitForIdle()
         await button.click()
         await page.waitForIdle()
         const quickPickWidget = page.locator('.quick-input-widget')
@@ -25,7 +27,9 @@ export const create = ({ expect, page, VError }) => {
         if (value === 1) {
           const nodeJsOption = page.locator('[role="option"][aria-label="Node.js"]')
           await expect(quickPickWidget).toBeVisible()
+          await page.waitForIdle()
           await nodeJsOption.click()
+          await page.waitForIdle()
         }
         await expect(debugToolBar).toBeVisible({
           timeout: 30_000,
@@ -219,8 +223,16 @@ export const create = ({ expect, page, VError }) => {
         const debugToolBar = page.locator('.debug-toolbar')
         await expect(debugToolBar).toBeVisible()
         await page.waitForIdle()
-        const pauseOnExceptionsAction = debugToolBar.locator('[aria-label*="Pause on Exceptions"], [aria-label*="pause on exceptions"], [title*="Pause on Exceptions"], [title*="pause on exceptions"]').first()
-        const pauseOnCaughtExceptionsAction = debugToolBar.locator('[aria-label*="Pause on Caught Exceptions"], [aria-label*="pause on caught exceptions"], [title*="Pause on Caught Exceptions"], [title*="pause on caught exceptions"]').first()
+        const pauseOnExceptionsAction = debugToolBar
+          .locator(
+            '[aria-label*="Pause on Exceptions"], [aria-label*="pause on exceptions"], [title*="Pause on Exceptions"], [title*="pause on exceptions"]',
+          )
+          .first()
+        const pauseOnCaughtExceptionsAction = debugToolBar
+          .locator(
+            '[aria-label*="Pause on Caught Exceptions"], [aria-label*="pause on caught exceptions"], [title*="Pause on Caught Exceptions"], [title*="pause on caught exceptions"]',
+          )
+          .first()
         if (pauseOnExceptions !== undefined) {
           const isChecked = await pauseOnExceptionsAction.getAttribute('aria-checked')
           const hasClass = await pauseOnExceptionsAction.getAttribute('class')
