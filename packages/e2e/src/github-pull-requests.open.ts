@@ -26,3 +26,7 @@ export const run = async ({ GitHubPullRequests, SideBar }: TestContext): Promise
   await SideBar.hide()
   await GitHubPullRequests.focusView()
 }
+
+export const teardown = async ({ SideBar }: TestContext) => {
+  await SideBar.hide()
+}
