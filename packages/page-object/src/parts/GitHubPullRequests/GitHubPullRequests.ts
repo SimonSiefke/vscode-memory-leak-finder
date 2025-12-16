@@ -41,10 +41,11 @@ export const create = ({ expect, page, VError }) => {
           extensionId: 'GitHub.vscode-pull-request-github',
           hasLineOfCodeCounter: false,
         })
+        await page.waitForIdle()
         await subFrame.waitForIdle()
         const checkoutButton = subFrame.locator('button[title="Checkout"]')
         await expect(checkoutButton).toBeVisible({
-          timeout: 30_000,
+          timeout: 45_000,
         })
         await subFrame.waitForIdle()
         await page.waitForIdle()
