@@ -5,8 +5,10 @@ export const create = ({ expect, page, VError }) => {
   return {
     async startRunAndDebug() {
       try {
+        await page.waitForIdle()
         const button = page.locator('.monaco-button:has-text("Run and Debug")')
         await expect(button).toBeVisible()
+        await page.waitForIdle()
         await button.click()
         await page.waitForIdle()
         const quickPickWidget = page.locator('.quick-input-widget')
@@ -25,7 +27,9 @@ export const create = ({ expect, page, VError }) => {
         if (value === 1) {
           const nodeJsOption = page.locator('[role="option"][aria-label="Node.js"]')
           await expect(quickPickWidget).toBeVisible()
+          await page.waitForIdle()
           await nodeJsOption.click()
+          await page.waitForIdle()
         }
         await expect(debugToolBar).toBeVisible({
           timeout: 30_000,
@@ -201,6 +205,67 @@ export const create = ({ expect, page, VError }) => {
       } catch (error) {
         throw new VError(error, `Failed to set variable value for ${variableName}`)
       }
+    },
+    async continue() {
+      try {
+        const debugToolBar = page.locator('.debug-toolbar')
+        await expect(debugToolBar).toBeVisible()
+        const continueButton = debugToolBar.locator('[aria-label^="Continue"]')
+        await expect(continueButton).toBeVisible()
+        await continueButton.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to continue`)
+      }
+    },
+    async setPauseOnExceptions({ pauseOnExceptions, pauseOnCaughtExceptions }) {
+      try {
+        await page.waitForIdle()
+        const breakpoints = page.locator('.debug-breakpoints')
+        await expect(breakpoints).toBeVisible()
+        const exception = breakpoints.locator('[aria-label="Caught Exceptions"] input[type="checkbox"]')
+        await expect(exception).toBeVisible()
+        const uncaughtException = breakpoints.locator('[aria-label="Uncaught Exceptions"] input[type="checkbox"]')
+        await expect(uncaughtException).toBeVisible()
+
+        await exception.setChecked(pauseOnExceptions)
+        await uncaughtException.setChecked(pauseOnCaughtExceptions)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to set pause on exceptions`)
+      }
+    },
+    async waitForPausedOnException({ file, line, exception = false }) {
+      await page.waitForIdle()
+      const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
+      await expect(continueButton).toBeVisible({ timeout: 20_000 })
+      await page.waitForIdle()
+      const pausedStackFrame = page.locator('.debug-top-stack-frame-column')
+      await expect(pausedStackFrame).toBeVisible()
+      await page.waitForIdle()
+      const debugCallStack = page.locator('.debug-call-stack')
+      await expect(debugCallStack).toBeVisible()
+      await page.waitForIdle()
+      const sessionLabel = debugCallStack.locator('.state.label')
+      await expect(sessionLabel).toBeVisible()
+      await expect(sessionLabel).toHaveText(/Paused/)
+      await page.waitForIdle()
+      const stackFrame = page.locator('.debug-call-stack .monaco-list-row.selected')
+      await expect(stackFrame).toBeVisible()
+      await expect(stackFrame).toHaveAttribute('aria-label', `Stack Frame <anonymous>, line ${line}, ${file}`)
+      await page.waitForIdle()
+      if (exception) {
+        const widget = page.locator('.exception-widget')
+        await expect(widget).toBeVisible()
+        await page.waitForIdle()
+        await expect(widget).toBeFocused()
+      } else {
+        const cursor = page.locator('.part.editor .monaco-editor .cursor')
+        await expect(cursor).toBeVisible()
+        const editor = page.locator('.part.editor [role="textbox"][aria-roledescription="editor"]')
+        await expect(editor).toBeFocused()
+      }
+      await page.waitForIdle()
     },
   }
 }
