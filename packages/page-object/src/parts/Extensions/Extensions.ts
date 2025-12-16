@@ -13,7 +13,7 @@ const nonBreakingSpace = String.fromCharCode(160)
 
 export const create = ({ expect, page, VError, ideVersion }) => {
   return {
-    async search(value) {
+    async search(value: string) {
       try {
         await page.waitForIdle()
         const extensionsView = page.locator(`.extensions-viewlet`)
@@ -44,6 +44,9 @@ export const create = ({ expect, page, VError, ideVersion }) => {
           const extensionsInput = extensionsView.locator('.native-edit-context')
           await extensionsInput.type(value)
         }
+        await page.waitForIdle()
+        const progress = page.locator('.sidebar. monaco-progress-container')
+        await expect(progress).toBeHidden({ timeout: 30_000 })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to search for ${value}`)
