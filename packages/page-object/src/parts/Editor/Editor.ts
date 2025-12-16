@@ -566,6 +566,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
           await page.waitForIdle()
           const dirtyTabs = page.locator('.tab.dirty')
           await expect(dirtyTabs).toHaveCount(0)
+          await page.waitForIdle()
         } else {
           const quickPick = QuickPick.create({ expect, page, VError })
           await quickPick.executeCommand(WellKnownCommands.FileSave)
