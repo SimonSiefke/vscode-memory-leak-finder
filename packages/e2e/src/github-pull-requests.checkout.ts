@@ -19,7 +19,6 @@ export const setup = async ({
   await Editor.closeAll()
   await GitHubPullRequests.focusView()
   await GitHubPullRequests.checkoutIndex(0)
-  await new Promise((r) => {})
 }
 
 export const run = async ({ GitHubPullRequests, Editor }: TestContext): Promise<void> => {
