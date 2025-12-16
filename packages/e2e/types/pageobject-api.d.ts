@@ -127,6 +127,7 @@ export interface Editor {
   hideSourceActionEmpty(): Promise<void>
   showSourceAction(): Promise<void>
   hideSourceAction(): Promise<void>
+  selectSourceAction(actionText: string): Promise<void>
   shouldHaveCursor(estimate: any): Promise<void>
   inspectTokens(): Promise<void>
   shouldHaveInspectedToken(name: any): Promise<void>
@@ -147,6 +148,7 @@ export interface Editor {
   scrollUp(): Promise<void>
   shouldHaveActiveLineNumber(value: any): Promise<void>
   moveScrollBar(y: any, expectedScrollBarY: any): Promise<void>
+  shouldHaveExceptionWidget(): Promise<void>
 }
 export interface Electron {
   evaluate(expression: any): Promise<void>
@@ -249,6 +251,10 @@ export interface Problems {
   shouldHaveCount(count: any): Promise<void>
   show(): Promise<void>
   hide(): Promise<void>
+  switchToListView(): Promise<void>
+  switchToTreeView(): Promise<void>
+  shouldBeInListView(): Promise<void>
+  shouldBeInTreeView(): Promise<void>
 }
 export interface Profile {
   removeOtherProfiles(): Promise<void>
@@ -290,6 +296,9 @@ export interface RunAndDebug {
   removeAllBreakpoints(): Promise<void>
   step(expectedFile: any, expectedPauseLine: any, expectedCallStackSize?: any): Promise<void>
   setValue(variableName: any, variableValue: any, newVariableValue: any): Promise<void>
+  continue(): Promise<void>
+  setPauseOnExceptions(options: any): Promise<void>
+  waitForPausedOnException(options: any): Promise<void>
 }
 export interface RunningExtensions {
   show(): Promise<void>
@@ -444,6 +453,7 @@ export interface Server {
 export interface PageObjectApi {
   readonly ActivityBar: ActivityBar
   readonly Colors: any
+  readonly GitHubPullRequests: any
   readonly SimpleBrowser: any
   readonly Git: any
   readonly ChatEditor: ChatEditor
