@@ -561,6 +561,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     async save(options) {
       try {
         if (options?.viaKeyBoard) {
+          await page.waitForIdle()
           await page.keyboard.press('Control+S')
           await page.waitForIdle()
           const dirtyTabs = page.locator('.tab.dirty')
