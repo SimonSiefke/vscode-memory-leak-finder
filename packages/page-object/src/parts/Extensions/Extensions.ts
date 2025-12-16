@@ -63,6 +63,7 @@ export const create = ({ expect, page, VError, ideVersion }) => {
     },
     async add(path, expectedName) {
       try {
+        await page.waitForIdle()
         // TODO could create symlink also
         const absolutePath = join(Root.root, path)
         const base = basename(absolutePath)
@@ -76,9 +77,11 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         const firstExtension = page.locator('.extension-list-item').first()
         await expect(firstExtension).toBeVisible()
         const nameLocator = firstExtension.locator('.name')
+        await expect(nameLocator).toBeVisible()
         await expect(nameLocator).toHaveText(expectedName)
         await page.waitForIdle()
         await this.hide()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to add extension`)
       }
