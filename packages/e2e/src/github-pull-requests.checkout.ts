@@ -28,23 +28,25 @@ export const setup = async ({ Extensions, Editor, ExtensionDetailView, Git }: Te
   await Git.cloneRepository('https://github.com/octocat/Hello-World.git')
 }
 
-export const run = async ({ QuickPick }: TestContext): Promise<void> => {
+// @ts-ignore
+export const run = async ({ QuickPick, WellKnownCommands }: TestContext): Promise<void> => {
   // Use QuickPick to checkout a pull request
   // The GitHub Pull Requests extension typically provides commands like "GitHub Pull Requests: Checkout Pull Request"
   await QuickPick.showCommands()
+  await QuickPick.executeCommand(WellKnownCommands.FocusOnPullRequestsView)
   await QuickPick.type('GitHub Pull Requests')
 
   // Get visible commands to find any GitHub PR related commands
   const allCommands = await QuickPick.getVisibleCommands()
-  const prCommands = allCommands.filter((cmd: string) =>
-    cmd.toLowerCase().includes('github') && (cmd.toLowerCase().includes('pull request') || cmd.toLowerCase().includes('pr'))
+  const prCommands = allCommands.filter(
+    (cmd: string) =>
+      cmd.toLowerCase().includes('github') && (cmd.toLowerCase().includes('pull request') || cmd.toLowerCase().includes('pr')),
   )
 
   // Look for checkout command first
-  let checkoutCommand = prCommands.find((cmd: string) =>
-    cmd.toLowerCase().includes('checkout')
-  )
+  let checkoutCommand = prCommands.find((cmd: string) => cmd.toLowerCase().includes('checkout'))
 
+  await new Promise((r) => {})
   // If no checkout command, look for any PR command
   if (!checkoutCommand && prCommands.length > 0) {
     checkoutCommand = prCommands[0]
