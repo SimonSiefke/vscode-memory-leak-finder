@@ -118,6 +118,11 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         await expect(installButton).toBeHidden()
         await page.waitForIdle()
+        // TODO avoid hardcoded timeout
+        await new Promise((r) => {
+          setTimeout(r, 2000)
+        })
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to install extension`)
       }
