@@ -73,7 +73,7 @@ export interface DropDownContextMenu {
   close(): Promise<void>
 }
 export interface Editor {
-  open(fileName: any): Promise<void>
+  open(fileName: any, options: any): Promise<void>
   focus(): Promise<void>
   hover(text: any, hoverText: any): Promise<void>
   splitRight(): Promise<void>

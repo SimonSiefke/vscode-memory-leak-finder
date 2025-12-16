@@ -24,7 +24,7 @@ const isBinary = (file) => {
 
 export const create = ({ page, expect, VError, ideVersion }) => {
   return {
-    async open(fileName: string) {
+    async open(fileName: string, options?: any) {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
@@ -47,6 +47,9 @@ export const create = ({ page, expect, VError, ideVersion }) => {
           const img = subFrame.locator('img')
           await expect(img).toBeVisible()
           await subFrame.waitForIdle()
+        } else if (options?.hasError) {
+          // TODO
+          await new Promise((r) => {})
         } else if (isVideo(fileName)) {
           const webView = WebView.create({ page, expect, VError })
           const subFrame = await webView.shouldBeVisible2({
@@ -54,8 +57,13 @@ export const create = ({ page, expect, VError, ideVersion }) => {
             hasLineOfCodeCounter: false,
           })
           await subFrame.waitForIdle()
-          const video = subFrame.locator('video')
-          await expect(video).toBeVisible()
+          if (options?.hasError) {
+            const error = subFrame.locator('.loading-error')
+            await expect(error).toBeVisible()
+          } else {
+            const video = subFrame.locator('video')
+            await expect(video).toBeVisible()
+          }
           await subFrame.waitForIdle()
         } else if (isBinary(fileName)) {
           const placeholder = page.locator('.monaco-editor-pane-placeholder')
