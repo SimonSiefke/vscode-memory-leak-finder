@@ -1,10 +1,6 @@
 import { execa } from 'execa'
-import { join, dirname } from 'node:path'
-<<<<<<< HEAD
-import { mkdir } from 'node:fs/promises'
-=======
 import { mkdir, readdir, rm } from 'node:fs/promises'
->>>>>>> origin/main
+import { dirname, join } from 'node:path'
 import * as Root from '../Root/Root.ts'
 
 export const create = ({ electronApp, page, expect, VError }) => {
@@ -35,8 +31,6 @@ export const create = ({ electronApp, page, expect, VError }) => {
     },
     async createBranch(branchName) {
       await execa('git', ['checkout', '-b', branchName], { cwd: workspace, env: { ...process.env, ...gitEnv } })
-<<<<<<< HEAD
-=======
       await page.waitForIdle()
     },
     async cloneRepository(repoUrl: string) {
@@ -48,7 +42,6 @@ export const create = ({ electronApp, page, expect, VError }) => {
       }
       // Clone directly into the workspace directory
       await execa('git', ['clone', repoUrl, '.'], { cwd: workspace, env: { ...process.env, ...gitEnv } })
->>>>>>> origin/main
       await page.waitForIdle()
     },
   }
