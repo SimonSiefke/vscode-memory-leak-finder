@@ -185,6 +185,36 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to unfold editor`)
       }
     },
+    async enableVersionLens() {
+      try {
+        await page.waitForIdle()
+        const button = page.locator('.action-label[aria-label="Show dependency versions"]')
+        await expect(button).toBeVisible()
+        await button.click()
+        await page.waitForIdle()
+        const codeLens = page.locator('[widgetid^="codelens.widget"]').first()
+        await expect(codeLens).toBeVisible({
+          timeout: 10_000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to enable version lens`)
+      }
+    },
+    async disableVersionLens() {
+      try {
+        await page.waitForIdle()
+        const button = page.locator('.action-label[aria-label="Hide dependency versions"]')
+        await expect(button).toBeVisible()
+        await button.click()
+        await page.waitForIdle()
+        const codeLens = page.locator('[widgetid^="codelens.widget"]').first()
+        await expect(codeLens).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to disable version lens`)
+      }
+    },
     async splitDown() {
       return this.split(WellKnownCommands.ViewSplitEditorDown)
     },
@@ -1272,6 +1302,38 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to find exception widget`)
+      }
+    },
+    async shouldHaveCodeLens(options?: { timeout?: number }) {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        const timeout = options?.timeout || 15000
+        await page.waitForIdle({ timeout: 10000 })
+        const codeLens = page.locator('.codelens-decoration')
+        await expect(codeLens).toBeVisible({ timeout })
+      } catch (error) {
+        throw new VError(error, `Failed to verify code lens is visible`)
+      }
+    },
+    async shouldHaveCodeLensWithVersion(options?: { timeout?: number }) {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        const timeout = options?.timeout || 15000
+        await page.waitForIdle({ timeout: 10000 })
+        const codeLens = page.locator('.codelens-decoration')
+        await expect(codeLens).toBeVisible({ timeout })
+        const codeLensText = await codeLens.textContent()
+        const hasVersionInfo =
+          codeLensText && (codeLensText.includes('latest') || codeLensText.includes('update') || codeLensText.match(/\d+\.\d+\.\d+/))
+        if (!hasVersionInfo) {
+          throw new Error(`Expected code lens to show version information, but got: ${codeLensText || 'null'}`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to verify code lens shows version information`)
       }
     },
   }
