@@ -5,8 +5,10 @@ import { URL } from 'url'
 import { root } from '../Root/Root.ts'
 import { rm } from 'fs/promises'
 import assert from 'assert'
+import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, VError, ideVersion }) => {
   const servers: Record<number, Server.ServerInfo> = Object.create(null)
   return {
     async createMCPServer(): Promise<Server.ServerInfo> {
@@ -78,32 +80,11 @@ export const create = ({ expect, page, VError }) => {
         const serverUrl = server.url
         // Step 1: Open QuickPick and search for MCP commands
         await page.waitForIdle()
-        const quickPick = page.locator('.quick-input-widget')
-        await page.pressKeyExponential({
-          key: KeyBindings.OpenQuickPickCommands,
-          waitFor: quickPick,
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.McpAddServer, {
+          stayVisible: true,
+          pressKeyOnce: true,
         })
-        await expect(quickPick).toBeVisible({ timeout: 10_000 })
-
-        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
-        await expect(quickPickInput).toBeVisible()
-        await expect(quickPickInput).toBeFocused()
-
-        // Step 2: Type "mcp" to find MCP commands
-        await quickPickInput.type('mcp')
-
-        const mcpCommands = await this.getVisibleCommands()
-
-        // Step 4: Look for "MCP: Add Server" command
-        const addServerCommand = mcpCommands.find(
-          (cmd: string) => cmd.toLowerCase().includes('add server') || cmd.toLowerCase().includes('mcp: add'),
-        )
-
-        if (!addServerCommand) {
-          throw new VError(new Error('MCP: Add Server command not found'), 'MCP Add Server command not available')
-        }
-
-        await this.selectCommand(addServerCommand, true)
 
         const serverTypeCommands = await this.getVisibleCommands()
 
@@ -117,19 +98,31 @@ export const create = ({ expect, page, VError }) => {
         }
 
         await this.selectCommand(httpOption, true)
+
+        const quickPickLocator = page.locator('.quick-input-widget')
+        const quickPickInput = quickPickLocator.locator('[aria-autocomplete="list"]')
         await expect(quickPickInput).toHaveAttribute('aria-label', `URL of the MCP server (e.g., http://localhost:3000) - Enter Server URL`)
         await page.waitForIdle()
         await quickPickInput.type(`${serverUrl}/mcp`)
         await page.waitForIdle()
-        await quickPickInput.press('Enter')
+        await quickPick.pressEnter()
 
+        // if (ideVersion && ideVersion.minor <= 80) {
         await expect(quickPickInput).toHaveAttribute('aria-label', `Unique identifier for this server - Enter Server ID`)
+        // } else {
+        //   await expect(quickPickInput).toHaveAttribute(
+        //     'aria-label',
+        //     `URL of the MCP server (e.g., http://localhost:3000) - Enter Server URL`,
+        //   )
+        // }
         await page.waitForIdle()
-        await quickPickInput.type(serverName)
+        await quickPickInput.clear()
         await page.waitForIdle()
-        await quickPickInput.press('Enter')
+        await quickPick.type(serverName)
+        await page.waitForIdle()
+        await quickPick.pressEnter()
 
-        await expect(quickPickInput).toHaveAttribute('aria-label', `Choose where to install the MCP server`)
+        await expect(quickPickInput).toHaveAttribute('aria-label', `Select the configuration target - Add MCP Server`)
         await this.selectCommand('Global')
 
         await page.waitForIdle()
