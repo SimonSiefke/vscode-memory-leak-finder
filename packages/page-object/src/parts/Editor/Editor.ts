@@ -1264,5 +1264,15 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to scroll in editor`)
       }
     },
+    async shouldHaveExceptionWidget() {
+      try {
+        await page.waitForIdle()
+        const exceptionWidget = page.locator('.exception-widget')
+        await expect(exceptionWidget).toBeVisible({ timeout: 20_000 })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to find exception widget`)
+      }
+    },
   }
 }
