@@ -1294,7 +1294,6 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to scroll in editor`)
       }
     },
-<<<<<<< Updated upstream
     async shouldHaveExceptionWidget() {
       try {
         await page.waitForIdle()
@@ -1303,7 +1302,8 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to find exception widget`)
-=======
+      }
+    },
     async shouldHaveCodeLens(options?: { timeout?: number }) {
       try {
         await page.waitForIdle()
@@ -1334,7 +1334,6 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         }
       } catch (error) {
         throw new VError(error, `Failed to verify code lens shows version information`)
->>>>>>> Stashed changes
       }
     },
   }
