@@ -147,6 +147,8 @@ export interface Editor {
   shouldHaveActiveLineNumber(value: any): Promise<void>
   moveScrollBar(y: any, expectedScrollBarY: any): Promise<void>
   shouldHaveExceptionWidget(): Promise<void>
+  shouldHaveCodeLens(options?: any): Promise<void>
+  shouldHaveCodeLensWithVersion(options?: any): Promise<void>
 }
 export interface Electron {
   evaluate(expression: any): Promise<void>
