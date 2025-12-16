@@ -11,7 +11,9 @@ export const setup = async ({
   await Workspace.setFiles([
     {
       name: 'index.js',
-      content: `throw new Error('Test exception')
+      content: `setInterval(() => {
+  throw new Error('Test exception')
+}, 1000)
 `,
     },
   ])
@@ -30,7 +32,7 @@ export const setup = async ({
 export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
   await RunAndDebug.waitForPausedOnException({
     file: 'index.js',
-    line: 1,
+    line: 2,
   })
   await Editor.shouldHaveExceptionWidget()
   await RunAndDebug.continue()
