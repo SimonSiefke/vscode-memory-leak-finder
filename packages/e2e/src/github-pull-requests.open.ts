@@ -22,8 +22,8 @@ export const setup = async ({
   await GitHubPullRequests.focusView()
 }
 
-export const run = async ({ GitHubPullRequests, SideBar }: TestContext): Promise<void> => {
-  await SideBar.hide()
+export const run = async ({ GitHubPullRequests, ActivityBar }: TestContext): Promise<void> => {
+  await ActivityBar.showExplorer()
   await GitHubPullRequests.focusView()
 }
 
