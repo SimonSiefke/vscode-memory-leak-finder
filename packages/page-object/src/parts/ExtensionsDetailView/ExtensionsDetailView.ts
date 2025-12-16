@@ -110,30 +110,11 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const extensionEditor = page.locator('.extension-editor')
         await expect(extensionEditor).toBeVisible()
+        await page.waitForIdle()
 
-        // Look for install button - it might have different labels
         const installButton = extensionEditor.locator('.action-label[aria-label^="Install"], .action-label[aria-label*="Install"]')
-        const installButtonCount = await installButton.count()
-
-        if (installButtonCount > 0) {
-          const isVisible = await installButton.isVisible().catch(() => false)
-          if (isVisible) {
-            await installButton.click()
-            await page.waitForIdle({ timeout: 30000 })
-            // Wait a bit for installation to complete
-            const { resolve, promise } = Promise.withResolvers<void>()
-            setTimeout(resolve, 2000)
-            await promise
-          }
-        } else {
-          // Extension might already be installed - check for "Uninstall" or "Installed" status
-          const installedLabel = extensionEditor.locator('.extension-status-label[aria-label="Installed"], .action-label[aria-label*="Uninstall"]')
-          const installedCount = await installedLabel.count()
-          if (installedCount > 0) {
-            // Extension is already installed, just wait a bit
-            await page.waitForIdle()
-          }
-        }
+        await expect(installButton).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to install extension`)
       }
