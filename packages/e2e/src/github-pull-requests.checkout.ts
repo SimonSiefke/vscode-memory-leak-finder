@@ -24,13 +24,13 @@ export const setup = async ({ Extensions, Editor, ExtensionDetailView, QuickPick
   // Close the extension detail view
   await Editor.closeAll()
 
-  // Clone a repository (choose a repository with pull requests)
-  // Using a popular repository that likely has open PRs
+  // Clone a repository (choose a smaller repository with pull requests)
+  // Using a smaller popular repository that likely has open PRs
   await QuickPick.showCommands()
   await QuickPick.type('Git: Clone')
   await QuickPick.select('Git: Clone')
-  // Enter the repository URL
-  await QuickPick.type('https://github.com/microsoft/vscode.git')
+  // Enter the repository URL - using a smaller repo
+  await QuickPick.type('https://github.com/octocat/Hello-World.git')
   await QuickPick.pressEnter()
   // Select the folder to clone into (or press Enter to use default)
   await QuickPick.pressEnter()
