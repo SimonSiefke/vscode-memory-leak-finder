@@ -27,18 +27,20 @@ setInterval(() => {
     pauseOnExceptions: true,
     pauseOnCaughtExceptions: true,
   })
-}
-
-export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
   await RunAndDebug.waitForPausedOnException({
     file: 'index.js',
     line: 6,
+    exception: true,
   })
+}
+
+export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
   await Editor.shouldHaveExceptionWidget()
   await RunAndDebug.continue()
   await RunAndDebug.waitForPausedOnException({
     file: 'index.js',
     line: 6,
+    exception: true,
   })
 }
 

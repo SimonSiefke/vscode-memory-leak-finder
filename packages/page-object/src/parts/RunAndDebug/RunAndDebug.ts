@@ -235,7 +235,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to set pause on exceptions`)
       }
     },
-    async waitForPausedOnException({ file, line }) {
+    async waitForPausedOnException({ file, line, exception = false }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
       await expect(continueButton).toBeVisible({ timeout: 20_000 })
@@ -254,10 +254,17 @@ export const create = ({ expect, page, VError }) => {
       await expect(stackFrame).toBeVisible()
       await expect(stackFrame).toHaveAttribute('aria-label', `Stack Frame <anonymous>, line ${line}, ${file}`)
       await page.waitForIdle()
-      const cursor = page.locator('.part.editor .monaco-editor .cursor')
-      await expect(cursor).toBeVisible()
-      const editor = page.locator('.part.editor [role="textbox"][aria-roledescription="editor"]')
-      await expect(editor).toBeFocused()
+      if (exception) {
+        const widget = page.locator('.exception-widget')
+        await expect(widget).toBeVisible()
+        await page.waitForIdle()
+        await expect(widget).toBeFocused()
+      } else {
+        const cursor = page.locator('.part.editor .monaco-editor .cursor')
+        await expect(cursor).toBeVisible()
+        const editor = page.locator('.part.editor [role="textbox"][aria-roledescription="editor"]')
+        await expect(editor).toBeFocused()
+      }
       await page.waitForIdle()
     },
   }
