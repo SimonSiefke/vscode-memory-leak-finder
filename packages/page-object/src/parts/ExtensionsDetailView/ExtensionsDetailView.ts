@@ -117,6 +117,7 @@ export const create = ({ expect, page, VError }) => {
         await installButton.click()
         await page.waitForIdle()
         await expect(installButton).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to install extension`)
       }
