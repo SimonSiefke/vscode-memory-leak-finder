@@ -110,11 +110,11 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const extensionEditor = page.locator('.extension-editor')
         await expect(extensionEditor).toBeVisible()
-        
+
         // Look for install button - it might have different labels
         const installButton = extensionEditor.locator('.action-label[aria-label^="Install"], .action-label[aria-label*="Install"]')
         const installButtonCount = await installButton.count()
-        
+
         if (installButtonCount > 0) {
           const isVisible = await installButton.isVisible().catch(() => false)
           if (isVisible) {

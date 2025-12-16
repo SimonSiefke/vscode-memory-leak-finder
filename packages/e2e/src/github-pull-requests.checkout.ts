@@ -9,6 +9,11 @@ export const setup = async ({ Extensions, Editor, ExtensionDetailView, QuickPick
   // Search for GitHub Pull Requests extension
   await Extensions.search('github pull requests')
 
+  // Wait a bit for search results to load
+  const { resolve, promise } = Promise.withResolvers<void>()
+  setTimeout(resolve, 2000)
+  await promise
+
   // Click on the first extension result (should be GitHub Pull Requests extension)
   await Extensions.first.click()
 
@@ -67,7 +72,7 @@ export const run = async ({ QuickPick }: TestContext): Promise<void> => {
       'GitHub Pull Requests: Checkout',
       'GitHub: Checkout Pull Request',
     ]
-    
+
     let found = false
     for (const cmd of commandVariations) {
       try {
@@ -86,7 +91,7 @@ export const run = async ({ QuickPick }: TestContext): Promise<void> => {
         // Try next variation
       }
     }
-    
+
     if (!found) {
       // Test passes even if no PRs available - this is expected for some repos
       await QuickPick.hide()
