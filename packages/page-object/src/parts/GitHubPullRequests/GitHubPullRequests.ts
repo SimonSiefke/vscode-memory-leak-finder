@@ -12,7 +12,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to focus on Pull Requests view`)
       }
     },
-    async findCheckoutCommands() {
+    async findCheckoutCommands(): Promise<string[]> {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.showCommands()
@@ -26,7 +26,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to find checkout commands`)
       }
     },
-    async getAvailablePullRequests() {
+    async getAvailablePullRequests(): Promise<Array<{ number: string; command: string }>> {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
         const checkoutCommands = await this.findCheckoutCommands()
@@ -58,7 +58,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to get available pull requests`)
       }
     },
-    async checkoutPullRequest(prNumber: string) {
+    async checkoutPullRequest(prNumber: string): Promise<void> {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.showCommands()
@@ -98,7 +98,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to checkout pull request #${prNumber}`)
       }
     },
-    async checkoutFirstPullRequest() {
+    async checkoutFirstPullRequest(): Promise<string> {
       try {
         const prs = await this.getAvailablePullRequests()
         

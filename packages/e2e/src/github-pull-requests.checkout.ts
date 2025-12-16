@@ -52,22 +52,7 @@ export const run = async ({ GitHubPullRequests, SourceControl, ActivityBar, Git 
   // The source control view should show we're on a branch (not necessarily the PR number in the name)
 
   // Checkout the main branch
-  try {
-    await SourceControl.checkoutBranch('main')
-  } catch {
-    // Try 'master' if 'main' doesn't exist
-    try {
-      await SourceControl.checkoutBranch('master')
-    } catch {
-      // If both fail, try using Git directly
-      await Git.checkoutBranch('main').catch(() => Git.checkoutBranch('master'))
-    }
-  }
-
-  // Wait a bit
-  const { resolve: resolve4, promise: promise4 } = Promise.withResolvers<void>()
-  setTimeout(resolve4, 2000)
-  await promise4
+  await SourceControl.checkoutBranch('main')
 
   // Checkout the first pull request again
   await GitHubPullRequests.checkoutPullRequest(firstPrNumber)
