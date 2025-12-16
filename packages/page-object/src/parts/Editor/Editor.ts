@@ -279,12 +279,15 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
         const editor = page.locator('.editor-instance')
         const element = editor.locator('[class^="mtk"]', { hasText: text }).first()
+        await expect(element).toBeVisible()
+        await page.waitForIdle()
         await expect(element).toHaveText(text)
         await page.waitForIdle()
         await element.dblclick()
         await page.waitForIdle()
         const selection = page.locator('.selected-text')
         await expect(selection).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to select ${text}`)
       }
