@@ -1,7 +1,7 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, VError, sessionRpc }) => {
   return {
     async startRunAndDebug() {
       try {
@@ -201,6 +201,73 @@ export const create = ({ expect, page, VError }) => {
       } catch (error) {
         throw new VError(error, `Failed to set variable value for ${variableName}`)
       }
+    },
+    async continue() {
+      try {
+        const debugToolBar = page.locator('.debug-toolbar')
+        await expect(debugToolBar).toBeVisible()
+        const continueButton = debugToolBar.locator('[aria-label^="Continue"]')
+        await expect(continueButton).toBeVisible()
+        await continueButton.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to continue`)
+      }
+    },
+    async setPauseOnExceptions({ pauseOnExceptions, pauseOnCaughtExceptions }) {
+      try {
+        const debugToolBar = page.locator('.debug-toolbar')
+        await expect(debugToolBar).toBeVisible()
+        const pauseOnExceptionsAction = debugToolBar.locator('[aria-label*="Pause on Exceptions"]')
+        const pauseOnCaughtExceptionsAction = debugToolBar.locator('[aria-label*="Pause on Caught Exceptions"]')
+        if (pauseOnExceptions !== undefined) {
+          const isChecked = await pauseOnExceptionsAction.getAttribute('aria-checked')
+          if (pauseOnExceptions && isChecked !== 'true') {
+            await pauseOnExceptionsAction.click()
+            await page.waitForIdle()
+          } else if (!pauseOnExceptions && isChecked === 'true') {
+            await pauseOnExceptionsAction.click()
+            await page.waitForIdle()
+          }
+        }
+        if (pauseOnCaughtExceptions !== undefined) {
+          const isChecked = await pauseOnCaughtExceptionsAction.getAttribute('aria-checked')
+          if (pauseOnCaughtExceptions && isChecked !== 'true') {
+            await pauseOnCaughtExceptionsAction.click()
+            await page.waitForIdle()
+          } else if (!pauseOnCaughtExceptions && isChecked === 'true') {
+            await pauseOnCaughtExceptionsAction.click()
+            await page.waitForIdle()
+          }
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to set pause on exceptions`)
+      }
+    },
+    async waitForPausedOnException({ file, line }) {
+      await page.waitForIdle()
+      const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
+      await expect(continueButton).toBeVisible({ timeout: 20_000 })
+      await page.waitForIdle()
+      const pausedStackFrame = page.locator('.debug-top-stack-frame-column')
+      await expect(pausedStackFrame).toBeVisible()
+      await page.waitForIdle()
+      const debugCallStack = page.locator('.debug-call-stack')
+      await expect(debugCallStack).toBeVisible()
+      await page.waitForIdle()
+      const sessionLabel = debugCallStack.locator('.state.label')
+      await expect(sessionLabel).toBeVisible()
+      await expect(sessionLabel).toHaveText(/Paused/)
+      await page.waitForIdle()
+      const stackFrame = page.locator('.debug-call-stack .monaco-list-row.selected')
+      await expect(stackFrame).toBeVisible()
+      await expect(stackFrame).toHaveAttribute('aria-label', `Stack Frame <anonymous>, line ${line}, ${file}`)
+      await page.waitForIdle()
+      const cursor = page.locator('.part.editor .monaco-editor .cursor')
+      await expect(cursor).toBeVisible()
+      const editor = page.locator('.part.editor [role="textbox"][aria-roledescription="editor"]')
+      await expect(editor).toBeFocused()
+      await page.waitForIdle()
     },
   }
 }
