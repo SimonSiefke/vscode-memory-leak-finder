@@ -1,6 +1,6 @@
 import { execa } from 'execa'
-import { join, dirname } from 'node:path'
 import { mkdir, readdir, rm } from 'node:fs/promises'
+import { dirname, join } from 'node:path'
 import * as Root from '../Root/Root.ts'
 
 export const create = ({ electronApp, page, expect, VError }) => {
