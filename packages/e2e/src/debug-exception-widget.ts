@@ -6,7 +6,11 @@ export const setup = async ({ ActivityBar, Editor, Workspace, Explorer, RunAndDe
   await Workspace.setFiles([
     {
       name: 'index.js',
-      content: `setInterval(() => {
+      content: `process.on('uncaughtException', () => {
+  // Ignore exception to keep process running
+})
+
+setInterval(() => {
   throw new Error('Test exception')
 }, 1000)
 `,
