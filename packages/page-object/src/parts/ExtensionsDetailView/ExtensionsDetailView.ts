@@ -13,11 +13,14 @@ export const create = ({ expect, page, VError }) => {
     },
     async selectCategory(text) {
       try {
+        await page.waitForIdle()
         const category = page.locator('.extension-editor .category', {
           hasText: text,
         })
         await expect(category).toBeVisible()
+        await page.waitForIdle()
         await category.click()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to select extension detail category ${text}`)
       }

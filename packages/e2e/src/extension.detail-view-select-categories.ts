@@ -2,7 +2,6 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-// @ts-ignore
 export const setup = async ({ Extensions, Editor, ExtensionDetailView }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Extensions.show()
@@ -13,7 +12,6 @@ export const setup = async ({ Extensions, Editor, ExtensionDetailView }: TestCon
   await ExtensionDetailView.shouldHaveTab('Details')
 }
 
-// @ts-ignore
 export const run = async ({ ExtensionDetailView, Extensions }: TestContext): Promise<void> => {
   await ExtensionDetailView.selectCategory('Programming Languages')
   await Extensions.shouldHaveValue('@category:"Programming Languages"')
