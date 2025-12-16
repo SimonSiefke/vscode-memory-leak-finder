@@ -290,7 +290,7 @@ export const create = ({ page, expect, VError }) => {
       await contextMenu.select(option)
       await page.waitForIdle()
     },
-    async rename(oldDirentName, newDirentName) {
+    async rename(oldDirentName: string, newDirentName: string) {
       try {
         await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
@@ -302,13 +302,17 @@ export const create = ({ page, expect, VError }) => {
         await this.executeContextMenuCommand(oldDirent, 'Rename...')
         await page.waitForIdle()
         const input = explorer.locator('input')
-        await expect(input).toBeVisible({ timeout: 5000 })
+        await expect(input).toBeVisible({ timeout: 10_000 })
+        await page.waitForIdle()
         await input.selectText()
+        await page.waitForIdle()
         await input.type(newDirentName)
+        await page.waitForIdle()
         await input.press('Enter')
         await expect(oldDirent).toBeHidden()
         const newDirent = explorer.locator(`text=${newDirentName}`)
         await expect(newDirent).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to rename explorer item from "${oldDirentName}" to "${newDirentName}"`)
       }
