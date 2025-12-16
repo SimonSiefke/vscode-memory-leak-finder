@@ -222,7 +222,7 @@ export const create = ({ expect, page, VError }) => {
       try {
         await page.waitForIdle()
         const breakpoints = page.locator('.debug-breakpoints')
-        await expect(breakpoints).tobeVisible()
+        await expect(breakpoints).toBeVisible()
         const exception = breakpoints.locator('[aria-label="Caught Exceptions"] input[type="checkbox"]')
         await expect(exception).toBeVisible()
         const uncaughtException = breakpoints.locator('[aria-label="Uncaught Exceptions"] input[type="checkbox"]')
