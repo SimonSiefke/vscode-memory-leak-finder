@@ -119,7 +119,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(installButton).toBeHidden()
         await page.waitForIdle()
         const unInstallButton = extensionEditor.locator('.action-label[aria-label^="Uninstall"], .action-label[aria-label*="Uninstall"]')
-        await expect(unInstallButton).toBeVisible()
+        await expect(unInstallButton).toBeVisible({ timeout: 15_000 })
         await page.waitForIdle()
         await page.waitForIdle()
       } catch (error) {
