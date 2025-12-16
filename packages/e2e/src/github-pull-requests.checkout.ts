@@ -28,68 +28,24 @@ export const setup = async ({ Extensions, Editor, ExtensionDetailView, Git }: Te
   await Git.cloneRepository('https://github.com/octocat/Hello-World.git')
 }
 
-// @ts-ignore
-export const run = async ({ QuickPick, WellKnownCommands, Git, SourceControl, ActivityBar }: TestContext): Promise<void> => {
+export const run = async ({ GitHubPullRequests, SourceControl, ActivityBar, Git }: TestContext): Promise<void> => {
   // Wait a bit for the extension to fully load after installation
   const { resolve: resolveInit, promise: promiseInit } = Promise.withResolvers<void>()
   setTimeout(resolveInit, 3000)
   await promiseInit
 
-  // Look for open pull requests using QuickPick commands
-  // The GitHub PR extension provides commands to checkout PRs by number
-  await QuickPick.showCommands()
-  await QuickPick.type('GitHub Pull Requests: Checkout')
+  // Look for open pull requests in the view
+  const prs = await GitHubPullRequests.getAvailablePullRequests()
 
-  // Get all visible commands related to PR checkout
-  const allCommands = await QuickPick.getVisibleCommands()
-  const checkoutCommands = allCommands.filter((cmd: string) =>
-    cmd.toLowerCase().includes('checkout') && (cmd.toLowerCase().includes('pull request') || cmd.toLowerCase().includes('pr'))
-  )
-
-  if (checkoutCommands.length === 0) {
-    // No PR checkout commands found - repo might not have PRs or extension not fully loaded
+  if (prs.length === 0) {
+    // No PRs found - repo might not have PRs or extension not fully loaded
     return
   }
 
-  // Execute the first checkout command (this will show a list of PRs)
-  const firstCheckoutCommand = checkoutCommands[0]
-  await QuickPick.select(firstCheckoutCommand, true)
-  
-  // Wait for PR list to appear
-  const { resolve: resolve2, promise: promise2 } = Promise.withResolvers<void>()
-  setTimeout(resolve2, 2000)
-  await promise2
+  const firstPrNumber = prs[0].number
 
-  // Get the list of PRs from the QuickPick
-  const prCommands = await QuickPick.getVisibleCommands()
-  const prNumbers = prCommands
-    .map((cmd: string) => {
-      const match = cmd.match(/#(\d+)/)
-      return match ? match[1] : null
-    })
-    .filter((num: string | null) => num !== null)
-
-  if (prNumbers.length === 0) {
-    // No PRs found in the list
-    await QuickPick.hide()
-    return
-  }
-
-  const firstPrNumber = prNumbers[0]
-
-  // Find and select the first PR
-  const firstPrCommand = prCommands.find((cmd: string) => cmd.includes(`#${firstPrNumber}`))
-  if (firstPrCommand) {
-    await QuickPick.select(firstPrCommand)
-  } else {
-    // Fallback: select the first item in the list
-    await QuickPick.pressEnter()
-  }
-
-  // Wait for checkout to complete
-  const { resolve: resolve3, promise: promise3 } = Promise.withResolvers<void>()
-  setTimeout(resolve3, 3000)
-  await promise3
+  // Checkout the first pull request
+  await GitHubPullRequests.checkoutPullRequest(firstPrNumber)
 
   // Verify the expected data is displayed - check source control shows we're on a PR branch
   await ActivityBar.showSourceControl()
@@ -114,28 +70,5 @@ export const run = async ({ QuickPick, WellKnownCommands, Git, SourceControl, Ac
   await promise4
 
   // Checkout the first pull request again
-  await QuickPick.showCommands()
-  await QuickPick.type('GitHub Pull Requests: Checkout')
-  
-  const checkoutCommands2 = await QuickPick.getVisibleCommands()
-  const checkoutCmd2 = checkoutCommands2.find((cmd: string) =>
-    cmd.toLowerCase().includes('checkout') && (cmd.toLowerCase().includes('pull request') || cmd.toLowerCase().includes('pr'))
-  )
-
-  if (checkoutCmd2) {
-    await QuickPick.select(checkoutCmd2, true)
-    // Wait for PR list
-    const { resolve: resolve5, promise: promise5 } = Promise.withResolvers<void>()
-    setTimeout(resolve5, 2000)
-    await promise5
-    
-    // Select the same PR again
-    const prCommands2 = await QuickPick.getVisibleCommands()
-    const samePrCommand = prCommands2.find((cmd: string) => cmd.includes(`#${firstPrNumber}`))
-    if (samePrCommand) {
-      await QuickPick.select(samePrCommand)
-    } else {
-      await QuickPick.pressEnter()
-    }
-  }
+  await GitHubPullRequests.checkoutPullRequest(firstPrNumber)
 }
