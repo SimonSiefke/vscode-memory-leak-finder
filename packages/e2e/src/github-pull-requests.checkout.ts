@@ -1,39 +1,19 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ Extensions, Editor, ExtensionDetailView, Git }: TestContext): Promise<void> => {
+export const setup = async ({ Workspace, Extensions, Editor, ExtensionDetailView, Git }: TestContext): Promise<void> => {
   await Editor.closeAll()
-
-  // Open extensions view
-  await Extensions.show()
-
-  // Search for GitHub Pull Requests extension
-  await Extensions.search('github pull requests')
-
-  // Wait a bit for search results to load
-  const { resolve, promise } = Promise.withResolvers<void>()
-  setTimeout(resolve, 2000)
-  await promise
-
-  // Click on the first extension result (should be GitHub Pull Requests extension)
-  await Extensions.first.click()
-
-  // Install the extension
-  await ExtensionDetailView.installExtension()
-
-  // Close the extension detail view
-  await Editor.closeAll()
-
-  // Clone a repository (choose a smaller repository with pull requests)
-  // Using a smaller popular repository that likely has open PRs
+  await Workspace.setFiles([])
   await Git.cloneRepository('https://github.com/octocat/Hello-World.git')
+  await Extensions.show()
+  await Extensions.search('github pull requests')
+  await Extensions.first.shouldBe('GitHub Pull Requests')
+  await Extensions.first.click()
+  await ExtensionDetailView.installExtension()
+  await Editor.closeAll()
+  await new Promise((r) => {})
 }
 
 export const run = async ({ GitHubPullRequests, SourceControl, ActivityBar }: TestContext): Promise<void> => {
-  // Wait a bit for the extension to fully load after installation
-  const { resolve: resolveInit, promise: promiseInit } = Promise.withResolvers<void>()
-  setTimeout(resolveInit, 3000)
-  await promiseInit
-
   // Look for open pull requests in the view
   const prs = await GitHubPullRequests.getAvailablePullRequests()
 
