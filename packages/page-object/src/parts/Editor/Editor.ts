@@ -433,10 +433,12 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     },
     async shouldHaveSquigglyError() {
       try {
+        await page.waitForIdle()
         const squiggle = page.locator('.squiggly-error')
         await expect(squiggle).toBeVisible({
           timeout: initialDiagnosticTimeout,
         })
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify squiggly error`)
       }
@@ -890,6 +892,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     },
     async showSourceAction() {
       try {
+        await page.waitForIdle()
         const sourceAction = page.locator('[aria-label="Action Widget"]')
         await expect(sourceAction).toBeHidden()
         await page.waitForIdle()
@@ -897,6 +900,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await quickPick.executeCommand(WellKnownCommands.SourceAction)
         await page.waitForIdle()
         await expect(sourceAction).toBeVisible()
+        await page.waitForIdle()
         await expect(sourceAction).toHaveText(/Source Action/)
         await page.waitForIdle()
       } catch (error) {
@@ -920,16 +924,13 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         const sourceAction = page.locator('[aria-label="Action Widget"]')
         await expect(sourceAction).toBeVisible()
         await page.waitForIdle()
-        // Try exact match first, then case-insensitive regex
-        let actionItem = sourceAction.locator('.action-item', {
-          hasText: actionText,
-        })
-        const count = await actionItem.count()
-        if (count === 0) {
-          throw new Error(`source action item ${actionText} not found`)
-        }
-        await expect(actionItem.first()).toBeVisible({ timeout: 10000 })
-        await actionItem.first().click()
+        const actionItem = sourceAction
+          .locator('.action-item', {
+            hasText: actionText,
+          })
+          .first()
+        await expect(actionItem).toBeVisible({ timeout: 10_000 })
+        await actionItem.click()
         await page.waitForIdle()
         await expect(sourceAction).toBeHidden()
         await page.waitForIdle()
