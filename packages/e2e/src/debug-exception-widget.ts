@@ -38,4 +38,3 @@ export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> =
   await RunAndDebug.removeAllBreakpoints()
   await Editor.closeAll()
 }
-

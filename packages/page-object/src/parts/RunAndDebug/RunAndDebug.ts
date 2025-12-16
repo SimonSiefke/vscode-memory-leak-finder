@@ -1,7 +1,7 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError, sessionRpc }) => {
+export const create = ({ expect, page, VError }) => {
   return {
     async startRunAndDebug() {
       try {
@@ -218,24 +218,29 @@ export const create = ({ expect, page, VError, sessionRpc }) => {
       try {
         const debugToolBar = page.locator('.debug-toolbar')
         await expect(debugToolBar).toBeVisible()
-        const pauseOnExceptionsAction = debugToolBar.locator('[aria-label*="Pause on Exceptions"]')
-        const pauseOnCaughtExceptionsAction = debugToolBar.locator('[aria-label*="Pause on Caught Exceptions"]')
+        await page.waitForIdle()
+        const pauseOnExceptionsAction = debugToolBar.locator('[aria-label*="Pause on Exceptions"], [aria-label*="pause on exceptions"], [title*="Pause on Exceptions"], [title*="pause on exceptions"]').first()
+        const pauseOnCaughtExceptionsAction = debugToolBar.locator('[aria-label*="Pause on Caught Exceptions"], [aria-label*="pause on caught exceptions"], [title*="Pause on Caught Exceptions"], [title*="pause on caught exceptions"]').first()
         if (pauseOnExceptions !== undefined) {
           const isChecked = await pauseOnExceptionsAction.getAttribute('aria-checked')
-          if (pauseOnExceptions && isChecked !== 'true') {
+          const hasClass = await pauseOnExceptionsAction.getAttribute('class')
+          const checked = isChecked === 'true' || (hasClass && hasClass.includes('checked'))
+          if (pauseOnExceptions && !checked) {
             await pauseOnExceptionsAction.click()
             await page.waitForIdle()
-          } else if (!pauseOnExceptions && isChecked === 'true') {
+          } else if (!pauseOnExceptions && checked) {
             await pauseOnExceptionsAction.click()
             await page.waitForIdle()
           }
         }
         if (pauseOnCaughtExceptions !== undefined) {
           const isChecked = await pauseOnCaughtExceptionsAction.getAttribute('aria-checked')
-          if (pauseOnCaughtExceptions && isChecked !== 'true') {
+          const hasClass = await pauseOnCaughtExceptionsAction.getAttribute('class')
+          const checked = isChecked === 'true' || (hasClass && hasClass.includes('checked'))
+          if (pauseOnCaughtExceptions && !checked) {
             await pauseOnCaughtExceptionsAction.click()
             await page.waitForIdle()
-          } else if (!pauseOnCaughtExceptions && isChecked === 'true') {
+          } else if (!pauseOnCaughtExceptions && checked) {
             await pauseOnCaughtExceptionsAction.click()
             await page.waitForIdle()
           }
