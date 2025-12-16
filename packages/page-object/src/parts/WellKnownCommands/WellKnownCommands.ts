@@ -68,13 +68,9 @@ export const ShowRunAndDebug = 'View: Show Run and Debug'
 export const ShowRunningExtensions = 'Developer: Show Running Extensions'
 export const SimpleBrowserShow = 'Simple Browser: Show'
 export const SourceAction = 'Source Action...'
-<<<<<<< HEAD
 export const TerminalFocusHover = 'Terminal: Focus Hover'
 export const TerminalScrollToBottom = 'Terminal: Scroll to Bottom'
 export const TerminalScrollToTop = 'Terminal: Scroll to Top'
-=======
-export const Refactor = 'Refactor...'
->>>>>>> origin/main
 export const TerminalSplitTerminal = 'Terminal: Split Terminal'
 export const ThreeColumnLayout = 'View: Three Columns Editor Layout'
 export const ToggleActivityBarVisibility = 'View: Toggle Activity Bar Visibility'
