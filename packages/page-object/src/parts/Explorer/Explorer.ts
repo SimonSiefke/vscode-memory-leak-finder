@@ -141,28 +141,34 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to click into explorer`)
       }
     },
-    async expand(folderName) {
+    async expand(folderName: string) {
       try {
+        await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
-        const folder = explorer.locator('.monaco-list-row', {
-          hasText: folderName,
-        })
-        // TODO verify that folder has aria-expanded=false
+        const folder = explorer.locator(`.monaco-list-row[aria-label="${folderName}"]`)
+        await expect(folder).toBeVisible()
+        await page.waitForIdle()
         await folder.click()
+        await page.waitForIdle()
+        await expect(folder).toHaveAttribute('aria-expanded', 'true')
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to expand explorer folder`)
       }
     },
-    async collapse(folderName) {
+    async collapse(folderName: string) {
       try {
+        await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         const folder = explorer.locator('.monaco-list-row', {
           hasText: folderName,
         })
-        // TODO verify that folder has aria-expanded=false
+        await expect(folder).toBeVisible()
+        await page.waitForIdle()
         await folder.click()
+        await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to expand explorer folder`)
+        throw new VError(error, `Failed to collapse explorer folder`)
       }
     },
     async collapseAll() {
