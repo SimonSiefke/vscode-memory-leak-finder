@@ -37,11 +37,16 @@ export const create = ({ expect, page, VError }) => {
           expect,
           VError,
         })
-        const instance = await webView.shouldBeVisible2({
+        const subFrame = await webView.shouldBeVisible2({
           extensionId: 'GitHub.vscode-pull-request-github',
           hasLineOfCodeCounter: false,
         })
-        await instance.waitForIdle()
+        await subFrame.waitForIdle()
+        const checkoutButton = subFrame.locator('button[title="Checkout"]')
+        await expect(checkoutButton).toBeVisible({
+          timeout: 30_000,
+        })
+        await subFrame.waitForIdle()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to find checkout commands`)

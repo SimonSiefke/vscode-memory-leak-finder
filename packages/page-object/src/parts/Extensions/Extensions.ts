@@ -18,6 +18,7 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         await page.waitForIdle()
         const extensionsView = page.locator(`.extensions-viewlet`)
         await expect(extensionsView).toBeVisible()
+        await page.waitForIdle()
         if (ideVersion && ideVersion.minor <= 100) {
           const extensionsInput = extensionsView.locator('.inputarea')
           await expect(extensionsInput).toBeFocused()
@@ -29,10 +30,13 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         }
         const lines = extensionsView.locator('.monaco-editor .view-lines')
         await page.keyboard.press(selectAll)
+        await page.waitForIdle()
         await page.keyboard.press('Backspace')
+        await page.waitForIdle()
         await expect(lines).toHaveText('', {
           timeout: 3000,
         })
+        await page.waitForIdle()
         if (ideVersion && ideVersion.minor <= 100) {
           const extensionsInput = extensionsView.locator('.inputarea')
           await extensionsInput.type(value)
@@ -40,6 +44,7 @@ export const create = ({ expect, page, VError, ideVersion }) => {
           const extensionsInput = extensionsView.locator('.native-edit-context')
           await extensionsInput.type(value)
         }
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to search for ${value}`)
       }
@@ -256,6 +261,7 @@ export const create = ({ expect, page, VError, ideVersion }) => {
     },
     first: {
       async shouldBe(name: string) {
+        await page.waitForIdle()
         const firstExtension = page.locator('.extension-list-item').first()
         await expect(firstExtension).toBeVisible({
           timeout: 15_000,
