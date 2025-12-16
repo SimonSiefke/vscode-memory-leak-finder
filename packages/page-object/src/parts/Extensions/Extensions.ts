@@ -45,7 +45,7 @@ export const create = ({ expect, page, VError, ideVersion }) => {
           await extensionsInput.type(value)
         }
         await page.waitForIdle()
-        const progress = page.locator('.sidebar. monaco-progress-container')
+        const progress = page.locator('.sidebar .monaco-progress-container')
         await expect(progress).toBeHidden({ timeout: 30_000 })
         await page.waitForIdle()
       } catch (error) {
