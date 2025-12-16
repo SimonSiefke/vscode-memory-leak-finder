@@ -60,16 +60,20 @@ export const create = ({ expect, page, VError }) => {
     },
     async stop() {
       try {
+        await page.waitForIdle()
         const debugToolBar = page.locator('.debug-toolbar')
         await expect(debugToolBar).toBeVisible()
+        await page.waitForIdle()
         const stopButton = debugToolBar.locator('[aria-label^="Stop"]')
         await expect(stopButton).toBeVisible()
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.DebugStop)
         await expect(stopButton).toBeHidden({
           timeout: 5000,
         })
         await expect(debugToolBar).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to stop`)
       }
