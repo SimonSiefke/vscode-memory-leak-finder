@@ -105,5 +105,21 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to disable extension`)
       }
     },
+    async installExtension() {
+      try {
+        await page.waitForIdle()
+        const extensionEditor = page.locator('.extension-editor')
+        const installButton = extensionEditor.locator('.action-label[aria-label^="Install"]')
+        const installButtonCount = await installButton.count()
+        if (installButtonCount > 0) {
+          await expect(installButton).toBeVisible()
+          await installButton.click()
+          await page.waitForIdle({ timeout: 30000 })
+          await page.waitForTimeout(2000)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to install extension`)
+      }
+    },
   }
 }
