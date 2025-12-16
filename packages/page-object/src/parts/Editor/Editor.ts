@@ -643,6 +643,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.ShowOrFocusStandaloneColorPicker)
+        await page.waitForIdle()
         await expect(colorPicker).toBeVisible()
         await page.waitForIdle()
       } catch (error) {
@@ -660,9 +661,12 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await expect(colorPicker).toBeFocused()
         await page.waitForIdle()
         await page.keyboard.press('Escape')
+        await page.waitForIdle()
         await page.keyboard.press('Escape')
+        await page.waitForIdle()
         await page.keyboard.press('Escape')
         await expect(colorPicker).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to hide color picker`)
       }
