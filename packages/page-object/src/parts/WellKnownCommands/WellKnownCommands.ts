@@ -12,6 +12,7 @@ export const DebugConsoleFocusOnDebugConsoleView = 'Debug Console: Focus on Debu
 export const DebugPause = 'Debug: Pause'
 export const DebugShowHover = 'Debug: Show Hover'
 export const DebugStepOver = 'Debug: Step Over'
+export const McpAddServer = 'MCP: Add Server...'
 export const DebugStop = 'Debug: Stop'
 export const DeleteAllLeft = 'Delete All Left'
 export const DeveloperInspectTokensAndScopes = 'Developer: Inspect Editor Tokens and Scopes'
