@@ -204,18 +204,22 @@ export const create = ({ expect, page, VError, ideVersion }) => {
     },
     async openSuggest() {
       try {
+        await page.waitForIdle()
         const extensionsView = page.locator('.extensions-viewlet')
         const extensionsInput = extensionsView.locator('.native-edit-context')
+        await expect(extensionsInput).toBeVisible()
+        await page.waitForIdle()
         await expect(extensionsInput).toBeFocused()
+        await page.waitForIdle()
         const suggestions = page.locator('[aria-label="Suggest"]')
-        for (let i = 0; i < 5; i++) {
-          await page.waitForIdle()
-          const count = await suggestions.count()
-          if (count > 0) {
-            break
-          }
-          await extensionsInput.press('Control+Space')
-        }
+        // for (let i = 0; i < 5; i++) {
+        //   await page.waitForIdle()
+        //   const count = await suggestions.count()
+        //   if (count > 0) {
+        //     break
+        //   }
+        await extensionsInput.press('Control+Space')
+        // }
         await page.waitForIdle()
         // TODO scope selector to extensions view
         await expect(suggestions).toBeVisible()
