@@ -82,7 +82,7 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to pin ${name}`)
       }
     },
-    async run(taskName) {
+    async run(taskName: string) {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.RunTask, { stayVisible: true })
@@ -93,35 +93,50 @@ export const create = ({ page, expect, VError }) => {
         await expect(panel).toBeVisible()
         const terminal = page.locator('.terminal')
         await expect(terminal).toHaveCount(1)
+        await page.waitForIdle()
         await expect(terminal).toBeVisible()
-        await expect(terminal).toHaveClass('terminal xterm')
+        await page.waitForIdle()
+        await expect(terminal).toHaveClass('xterm')
+        await page.waitForIdle()
         const terminalActions = page.locator('[aria-label="Terminal actions"]')
         await expect(terminalActions).toBeVisible()
+        await page.waitForIdle()
         const actionLabel = terminalActions.locator('.action-label')
         await expect(actionLabel).toBeVisible()
+        await page.waitForIdle()
         await expect(actionLabel).toHaveText(' echo  -  Task ')
+        await page.waitForIdle()
         const check = actionLabel.locator('.codicon-check')
         await expect(check).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to run task`)
       }
     },
     async changeIcon(fromIcon, toIcon) {
       try {
+        await page.waitForIdle()
         const terminalActions = page.locator('[aria-label="Terminal actions"]')
         await expect(terminalActions).toBeVisible()
+        await page.waitForIdle()
         const actionLabel = terminalActions.locator('.action-label')
         await expect(actionLabel).toBeVisible()
+        await page.waitForIdle()
         await expect(actionLabel).toHaveText(' echo  -  Task ')
+        await page.waitForIdle()
         const currentIcon = actionLabel.locator(`.codicon-${fromIcon}`)
         await expect(currentIcon).toBeVisible()
+        await page.waitForIdle()
         await actionLabel.click()
+        await page.waitForIdle()
         const contextMenu = ContextMenu.create({ page, expect, VError })
         await contextMenu.select('Change Icon...')
         const iconSelect = IconSelect.create({ page, expect, VError })
         await iconSelect.select(toIcon)
+        await page.waitForIdle()
         const newIcon = actionLabel.locator(`.codicon-${toIcon}`)
         await expect(newIcon).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to change task icon`)
       }
