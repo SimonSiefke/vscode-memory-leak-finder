@@ -11,11 +11,11 @@ export const create = ({ electronApp, page, expect, VError }) => {
   }
   return {
     async init() {
+      await page.waitForIdle()
       await mkdir(workspace, { recursive: true })
       await execa('git', ['init'], { cwd: workspace, env: { ...process.env, ...gitEnv } })
       await execa('git', ['config', 'user.name', 'Test User'], { cwd: workspace, env: { ...process.env, ...gitEnv } })
       await execa('git', ['config', 'user.email', 'test@example.com'], { cwd: workspace, env: { ...process.env, ...gitEnv } })
-      await page.waitForIdle()
     },
     async add() {
       await execa('git', ['add', '-f', '.'], { cwd: workspace, env: { ...process.env, ...gitEnv } })
@@ -26,6 +26,7 @@ export const create = ({ electronApp, page, expect, VError }) => {
       await page.waitForIdle()
     },
     async checkoutBranch(branchName) {
+      await page.waitForIdle()
       await execa('git', ['checkout', branchName], { cwd: workspace, env: { ...process.env, ...gitEnv } })
       await page.waitForIdle()
     },
