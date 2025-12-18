@@ -204,6 +204,26 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to unfold editor`)
       }
     },
+    async foldAll() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand('Fold All')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to fold all`)
+      }
+    },
+    async unfoldAll() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand('Unfold All')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to unfold all`)
+      }
+    },
     async enableVersionLens() {
       try {
         await page.waitForIdle()
