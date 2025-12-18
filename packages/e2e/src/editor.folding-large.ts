@@ -9,7 +9,7 @@ export const setup = async ({ Editor, Workspace, SettingsEditor }: TestContext):
   await SettingsEditor.open()
   await SettingsEditor.search({
     value: 'editor.folding',
-    resultCount: 1,
+    resultCount: 5,
   })
   await SettingsEditor.enableCheckBox({
     name: 'editor.folding',
@@ -53,7 +53,7 @@ export const teardown = async ({ Editor, SettingsEditor }: TestContext): Promise
   await SettingsEditor.open()
   await SettingsEditor.search({
     value: 'editor.folding',
-    resultCount: 1,
+    resultCount: 5,
   })
   await SettingsEditor.disableCheckBox({
     name: 'editor.folding',
