@@ -39,7 +39,7 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         await page.waitForIdle()
         await page.keyboard.press('Control+i')
         await page.waitForIdle()
-        const terminalInlineChat = terminal.locator('.inline-chat')
+        const terminalInlineChat = page.locator('.terminal-split-pane .inline-chat')
         await expect(terminalInlineChat).toBeVisible()
         await page.waitForIdle()
         const editor = terminalInlineChat.locator('.monaco-editor[data-uri^="chatSessionInput"]')
