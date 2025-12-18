@@ -55,11 +55,13 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
     },
     async hide() {
       try {
+        await page.waitForIdle()
         const terminal = page.locator('.terminal.xterm')
         await expect(terminal).toBeVisible()
         await page.waitForIdle()
         const terminalInlineChat = page.locator('.terminal-split-pane .inline-chat')
         await expect(terminalInlineChat).toBeVisible()
+        await page.waitForIdle()
         await page.keyboard.press('Escape')
         await page.waitForIdle()
         await expect(terminalInlineChat).toBeHidden()
