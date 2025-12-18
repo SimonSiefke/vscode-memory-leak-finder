@@ -3,6 +3,7 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, page, VError, ideVersion }) => {
   return {
+    isFirst: false,
     async open() {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
@@ -46,9 +47,12 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         await expect(sendButton).toBeFocused()
         await page.waitForIdle()
         // TODO get rid of timeout
-        await new Promise((r) => {
-          setTimeout(r, 1000)
-        })
+        if (this.isFirst) {
+          this.isFirst = false
+          await new Promise((r) => {
+            setTimeout(r, 1000)
+          })
+        }
         await page.keyboard.press('Enter')
         await page.waitForIdle()
 
