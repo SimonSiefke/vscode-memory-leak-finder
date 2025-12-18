@@ -46,7 +46,11 @@ export * as Suggest from '../Suggest/Suggest.ts'
 export * as Tab from '../Tab/Tab.ts'
 export * as Task from '../Task/Task.ts'
 export * as Terminal from '../Terminal/Terminal.ts'
+<<<<<<< HEAD
 export * as Testing from '../Testing/Testing.ts'
+=======
+export * as TerminalInlineChat from '../TerminalInlineChat/TerminalInlineChat.ts'
+>>>>>>> origin/main
 export * as TitleBar from '../TitleBar/TitleBar.ts'
 export * as View from '../View/View.ts'
 export * as WaitForApplicationToBeReady from '../WaitForApplicationToBeReady/WaitForApplicationToBeReady.ts'
