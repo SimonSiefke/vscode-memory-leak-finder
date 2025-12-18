@@ -355,5 +355,17 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         throw new VError(error, `Failed to scroll to bottom`)
       }
     },
+    async shouldHaveSuccessDecoration() {
+      try {
+        await page.waitForIdle()
+        const terminal = page.locator('.terminal.xterm')
+        await expect(terminal).toBeVisible()
+        const decoration = terminal.locator('.codicon-terminal-decoration-success.terminal-command-decoration')
+        await expect(decoration).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify terminal success decoration`)
+      }
+    },
   }
 }

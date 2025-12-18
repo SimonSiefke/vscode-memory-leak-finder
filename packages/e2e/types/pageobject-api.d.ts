@@ -410,6 +410,7 @@ export interface Terminal {
   focusSecond(): Promise<void>
   killThird(): Promise<void>
   shouldNotHaveActiveTerminals(): Promise<void>
+  shouldHaveSuccessDecoration(): Promise<void>
 }
 export interface TitleBar {
   showMenu(text: any): Promise<void>
