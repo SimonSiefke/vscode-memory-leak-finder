@@ -15,7 +15,7 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, 'Failed to focus test explorer')
       }
     },
-    async runAllTests({ expectedRowCount }) {
+    async runAllTests({ expectedRowCount, expectedTestOutputRowCount }) {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
@@ -31,8 +31,10 @@ export const create = ({ page, expect, VError }) => {
         await expect(tree).toBeVisible()
         await page.waitForIdle()
         const rows = tree.locator('.monaco-list-row')
-        await new Promise((r) => {})
         await expect(rows).toHaveCount(expectedRowCount)
+        await page.waitForIdle()
+        const otherRows = page.locator('.test-output-peek-tree .monaco-list-row')
+        await expect(otherRows).toHaveCount(expectedTestOutputRowCount)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, 'Failed to run all tests')

@@ -32,5 +32,6 @@ export const run = async ({ Testing }): Promise<void> => {
   // TODO
   await Testing.runAllTests({
     expectedRowCount: 1,
+    expectedTestOutputRowCount: 5,
   })
 }
