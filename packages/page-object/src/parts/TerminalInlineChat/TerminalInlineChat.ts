@@ -1,34 +1,3 @@
-import * as Panel from '../Panel/Panel.ts'
-import * as QuickPick from '../QuickPick/QuickPick.ts'
-import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
-import * as Workspace from '../Workspace/Workspace.ts'
-
-const cleanup = async ({ page, row1 }) => {
-  for (let i = 0; i < 50; i++) {
-    await page.waitForIdle()
-    await page.keyboard.press('Backspace')
-    await page.waitForIdle()
-    const text = await row1.textContent()
-    if (text.endsWith('$ ')) {
-      return
-    }
-  }
-}
-
-const waitForTerminalReady = async ({ page, row1 }) => {
-  for (let i = 0; i < 50; i++) {
-    await page.waitForIdle()
-    await page.keyboard.press('a')
-    await page.waitForIdle()
-    const text = await row1.textContent()
-    if (text.includes('aaaaa')) {
-      await cleanup({ page, row1 })
-      return true
-    }
-  }
-  return false
-}
-
 export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
   return {
     isFirst: false,
