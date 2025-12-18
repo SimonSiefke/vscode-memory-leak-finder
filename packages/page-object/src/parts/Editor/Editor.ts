@@ -1413,5 +1413,23 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to verify code lens shows version information`)
       }
     },
+    async shouldHaveFoldingGutter(enabled: boolean) {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        await page.waitForIdle()
+        if (enabled) {
+          const foldingIcon = page.locator('.codicon-folding-expanded').first()
+          await expect(foldingIcon).toBeVisible()
+        } else {
+          const foldingIcon = page.locator('.codicon-folding-expanded').first()
+          await expect(foldingIcon).toBeHidden()
+        }
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify folding gutter`)
+      }
+    },
   }
 }
