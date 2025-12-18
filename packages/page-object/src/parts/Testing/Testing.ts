@@ -1,7 +1,20 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ page, expect, VError }) => {
   return {
+    async focusOnTestExplorerView() {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.FocusOnTestExplorerView)
+        await page.waitForIdle()
+        const testExplorer = page.locator('.test-explorer')
+        await expect(testExplorer).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, 'Failed to focus test explorer')
+      }
+    },
     async runTask(taskName: string): Promise<void> {
       try {
         await page.waitForIdle()
