@@ -2,7 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ Workspace, Editor }: TestContext): Promise<void> => {
+export const setup = async ({ Workspace, Editor, Testing }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'test-file-1.md',
@@ -22,8 +22,14 @@ export const setup = async ({ Workspace, Editor }: TestContext): Promise<void> =
   await Workspace.addExtension('test-provider-sample')
   await Editor.closeAll()
   await Editor.open('test-file-1.md')
+  // @ts-ignore
+  await Testing.focusOnTestExplorerView()
 }
 
-export const run = async (): Promise<void> => {
+// @ts-ignore
+export const run = async ({ Testing }): Promise<void> => {
   // TODO
+  await Testing.runAllTests({
+    expectedRowCount: 1,
+  })
 }

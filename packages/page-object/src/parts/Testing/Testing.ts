@@ -15,6 +15,25 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, 'Failed to focus test explorer')
       }
     },
+    async runAllTests({ expectedRowCount }) {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.RunAllTests)
+        await page.waitForIdle()
+        const testExplorer = page.locator('.test-explorer')
+        await expect(testExplorer).toBeVisible()
+        const summary = testExplorer.locator('.result-summary')
+        await expect(summary).toBeVisible()
+        await page.waitForIdle()
+        const tree = page.locator('.test-explorer-tree')
+        await expect(tree).toBeVisible()
+        const rows = tree.locator('.monaco-list-row')
+        await expect(rows).toHaveCount(expectedRowCount)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, 'Failed to run all tests')
+      }
+    },
     async runTask(taskName: string): Promise<void> {
       try {
         await page.waitForIdle()
