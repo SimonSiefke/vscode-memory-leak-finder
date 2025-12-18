@@ -124,7 +124,6 @@ export const create = ({ expect, page, VError }) => {
         const unInstallButton = extensionEditor.locator('.action-label[aria-label^="Uninstall"], .action-label[aria-label*="Uninstall"]')
         await expect(unInstallButton).toBeVisible({ timeout: 15_000 })
         await page.waitForIdle()
-        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to install extension`)
       }
