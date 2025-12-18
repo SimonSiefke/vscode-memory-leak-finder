@@ -1,13 +1,7 @@
-<<<<<<< HEAD:packages/page-object/src/parts/Explorer/Explorer.js
 import * as ContextMenu from '../ContextMenu/ContextMenu.js'
-import * as QuickPick from '../QuickPick/QuickPick.js'
 import * as Electron from '../Electron/Electron.js'
+import * as QuickPick from '../QuickPick/QuickPick.js'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.js'
-=======
-import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
-import * as QuickPick from '../QuickPick/QuickPick.ts'
-import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
->>>>>>> origin/main:packages/page-object/src/parts/Explorer/Explorer.ts
 
 const RE_NUMER_AT_END = /\d+$/
 
