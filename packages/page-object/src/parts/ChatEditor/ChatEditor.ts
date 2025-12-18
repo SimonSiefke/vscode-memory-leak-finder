@@ -26,7 +26,10 @@ export const create = ({ expect, page, VError, ideVersion }) => {
     },
     async sendMessage(message: string, { verify = false } = {}) {
       try {
+        await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
+        await expect(chatView).toBeVisible()
+        await page.waitForIdle()
         const editArea = chatView.locator('.monaco-editor[data-uri^="chatSessionInput"]')
         await expect(editArea).toBeVisible()
         await page.waitForIdle()
@@ -39,6 +42,8 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         await page.waitForIdle()
         await editContext.type(message)
         await page.waitForIdle()
+        const lines = editArea.locator('.view-lines')
+        await expect(lines).toHaveText(message)
         const interactiveInput = page.locator('.interactive-input-and-side-toolbar')
         await expect(interactiveInput).toBeVisible()
         await page.waitForIdle()
@@ -57,7 +62,7 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         }
         await sendButton.click()
         await page.waitForIdle()
-
+        await expect(lines).toHaveText('')
         if (verify) {
           const row = chatView.locator(`.monaco-list-row[aria-label="${message}"]`)
           await expect(row).toBeVisible()
