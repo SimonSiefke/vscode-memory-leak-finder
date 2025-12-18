@@ -41,5 +41,6 @@
   "terminal.integrated.shellIntegration.enabled": false,
   "extensions.verifySignature": false,
   "telemetry.feedback.enabled": false,
-  "telemetry.editStats.enabled": false
+  "telemetry.editStats.enabled": false,
+  "security.workspace.trust.enabled": false
 }

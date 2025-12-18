@@ -24,6 +24,12 @@ export const create = ({ expect, page, VError, ideVersion }) => {
           await expect(inputArea).toBeFocused()
         }
         await page.waitForIdle()
+        const viewLines = outputView.locator('.view-lines')
+        await expect(viewLines).toBeVisible()
+        await page.waitForIdle()
+        const select = page.locator('[aria-label="Output actions"] .monaco-select-box')
+        await expect(select).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show output`)
       }
@@ -45,6 +51,10 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         const outputView = page.locator('.pane-body.output-view')
         await expect(outputView).toBeVisible()
         const select = page.locator('[aria-label="Output actions"] .monaco-select-box')
+        await page.waitForIdle()
+        await expect(select).toHaveAttribute('custom-hover', 'true')
+        await page.waitForIdle()
+        await select.focus()
         await page.waitForIdle()
         await select.click()
         const monacoList = page.locator('.select-box-dropdown-list-container .monaco-list')

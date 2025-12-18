@@ -69,6 +69,7 @@ export const connectDevtools = async (
     VError,
     electronApp,
     ideVersion: parsedIdeVersion,
+    sessionRpc,
     utilityContext: {
       callFunctionOn(options) {
         return DevtoolsProtocolRuntime.callFunctionOn(sessionRpc, {

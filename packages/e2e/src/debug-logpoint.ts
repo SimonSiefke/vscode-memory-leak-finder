@@ -31,7 +31,7 @@ export const run = async ({ Editor, ActivityBar, RunAndDebug }: TestContext): Pr
   await RunAndDebug.removeAllBreakpoints()
 }
 
-export const teardown = async ({ RunAndDebug, Editor }: TestContext): Promise<void> => {
-  await RunAndDebug.stop()
+export const teardown = async ({ SideBar, Editor }: TestContext): Promise<void> => {
+  await SideBar.hide()
   await Editor.closeAll()
 }

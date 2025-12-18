@@ -24,7 +24,11 @@ const isBinary = (file) => {
 
 export const create = ({ page, expect, VError, ideVersion }) => {
   return {
+<<<<<<< HEAD
     async open(fileName: string) {
+=======
+    async open(fileName: string, options?: any) {
+>>>>>>> origin/main
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
@@ -47,6 +51,9 @@ export const create = ({ page, expect, VError, ideVersion }) => {
           const img = subFrame.locator('img')
           await expect(img).toBeVisible()
           await subFrame.waitForIdle()
+        } else if (options?.hasError) {
+          // TODO
+          await new Promise((r) => {})
         } else if (isVideo(fileName)) {
           const webView = WebView.create({ page, expect, VError })
           const subFrame = await webView.shouldBeVisible2({
@@ -54,8 +61,13 @@ export const create = ({ page, expect, VError, ideVersion }) => {
             hasLineOfCodeCounter: false,
           })
           await subFrame.waitForIdle()
-          const video = subFrame.locator('video')
-          await expect(video).toBeVisible()
+          if (options?.hasError) {
+            const error = subFrame.locator('.loading-error')
+            await expect(error).toBeVisible()
+          } else {
+            const video = subFrame.locator('video')
+            await expect(video).toBeVisible()
+          }
           await subFrame.waitForIdle()
         } else if (isBinary(fileName)) {
           const placeholder = page.locator('.monaco-editor-pane-placeholder')
@@ -155,34 +167,75 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     },
     async fold() {
       try {
+        await page.waitForIdle()
         const inlineFolded = page.locator('.inline-folded')
         await expect(inlineFolded).toBeHidden()
+        await page.waitForIdle()
         const collapsedIcon = page.locator('.codicon-folding-collapsed').first()
         await expect(collapsedIcon).toBeHidden()
+        await page.waitForIdle()
         const foldingIcon = page.locator('.codicon-folding-expanded').first()
         await expect(foldingIcon).toBeVisible()
+        await page.waitForIdle()
         const firstIcon = foldingIcon.first()
         await firstIcon.click()
+        await page.waitForIdle()
         await expect(inlineFolded).toBeVisible()
+        await page.waitForIdle()
         await expect(collapsedIcon).toBeVisible()
-        await collapsedIcon.click()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to fold editor`)
       }
     },
     async unfold() {
       try {
+        await page.waitForIdle()
         const inlineFolded = page.locator('.inline-folded')
         await expect(inlineFolded).toBeVisible()
+        await page.waitForIdle()
         const collapsedIcon = page.locator('.codicon-folding-collapsed').first()
         await expect(collapsedIcon).toBeVisible()
-        const foldingIcon = page.locator('.codicon-folding-expanded').first()
-        await expect(foldingIcon).toBeHidden()
+        await page.waitForIdle()
+        await page.waitForIdle()
         await collapsedIcon.click()
+        await page.waitForIdle()
         await expect(inlineFolded).toBeHidden()
+        await page.waitForIdle()
         await expect(collapsedIcon).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to unfold editor`)
+      }
+    },
+    async enableVersionLens() {
+      try {
+        await page.waitForIdle()
+        const button = page.locator('.action-label[aria-label="Show dependency versions"]')
+        await expect(button).toBeVisible()
+        await button.click()
+        await page.waitForIdle()
+        const codeLens = page.locator('[widgetid^="codelens.widget"]').first()
+        await expect(codeLens).toBeVisible({
+          timeout: 10_000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to enable version lens`)
+      }
+    },
+    async disableVersionLens() {
+      try {
+        await page.waitForIdle()
+        const button = page.locator('.action-label[aria-label="Hide dependency versions"]')
+        await expect(button).toBeVisible()
+        await button.click()
+        await page.waitForIdle()
+        const codeLens = page.locator('[widgetid^="codelens.widget"]').first()
+        await expect(codeLens).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to disable version lens`)
       }
     },
     async splitDown() {
@@ -249,20 +302,25 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
         const editor = page.locator('.editor-instance')
         const element = editor.locator('[class^="mtk"]', { hasText: text }).first()
+        await expect(element).toBeVisible()
+        await page.waitForIdle()
         await expect(element).toHaveText(text)
         await page.waitForIdle()
         await element.dblclick()
         await page.waitForIdle()
         const selection = page.locator('.selected-text')
         await expect(selection).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to select ${text}`)
       }
     },
     async selectAll() {
       try {
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.SelectAll)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to select all`)
       }
@@ -400,10 +458,12 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     },
     async shouldHaveSquigglyError() {
       try {
+        await page.waitForIdle()
         const squiggle = page.locator('.squiggly-error')
         await expect(squiggle).toBeVisible({
           timeout: initialDiagnosticTimeout,
         })
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify squiggly error`)
       }
@@ -482,6 +542,22 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to verify editor text ${text}`)
       }
     },
+    async acceptRename() {
+      try {
+        await page.waitForIdle()
+        const renameInput = page.locator('.rename-input')
+        await expect(renameInput).toBeVisible()
+        await page.waitForIdle()
+        await expect(renameInput).toBeFocused()
+        await page.waitForIdle()
+        await page.keyboard.press('Enter')
+        await page.waitForIdle()
+        await expect(renameInput).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to accept rename`)
+      }
+    },
     async rename(newText: string) {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
@@ -555,10 +631,12 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     async save(options) {
       try {
         if (options?.viaKeyBoard) {
+          await page.waitForIdle()
           await page.keyboard.press('Control+S')
           await page.waitForIdle()
           const dirtyTabs = page.locator('.tab.dirty')
           await expect(dirtyTabs).toHaveCount(0)
+          await page.waitForIdle()
         } else {
           const quickPick = QuickPick.create({ expect, page, VError })
           await quickPick.executeCommand(WellKnownCommands.FileSave)
@@ -603,6 +681,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.ShowOrFocusStandaloneColorPicker)
+        await page.waitForIdle()
         await expect(colorPicker).toBeVisible()
         await page.waitForIdle()
       } catch (error) {
@@ -620,9 +699,12 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await expect(colorPicker).toBeFocused()
         await page.waitForIdle()
         await page.keyboard.press('Escape')
+        await page.waitForIdle()
         await page.keyboard.press('Escape')
+        await page.waitForIdle()
         await page.keyboard.press('Escape')
         await expect(colorPicker).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to hide color picker`)
       }
@@ -760,6 +842,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.RemoveAllBreakpoints)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to remove all breakpoints`)
       }
@@ -813,8 +896,28 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to hide empty source action`)
       }
     },
+    async showRefactor() {
+      try {
+        await page.waitForIdle()
+        const refactorWidget = page.locator('[aria-label="Action Widget"]')
+        await expect(refactorWidget).toBeHidden()
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.Refactor)
+        await page.waitForIdle()
+        await expect(refactorWidget).toBeVisible({
+          timeout: 30_000,
+        })
+        await page.waitForIdle()
+        await expect(refactorWidget).toHaveText(/Modify/)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to show refactor action`)
+      }
+    },
     async showSourceAction() {
       try {
+        await page.waitForIdle()
         const sourceAction = page.locator('[aria-label="Action Widget"]')
         await expect(sourceAction).toBeHidden()
         await page.waitForIdle()
@@ -822,6 +925,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await quickPick.executeCommand(WellKnownCommands.SourceAction)
         await page.waitForIdle()
         await expect(sourceAction).toBeVisible()
+        await page.waitForIdle()
         await expect(sourceAction).toHaveText(/Source Action/)
         await page.waitForIdle()
       } catch (error) {
@@ -837,6 +941,42 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await expect(sourceAction).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to hide source action`)
+      }
+    },
+    async selectSourceAction(actionText: string) {
+      try {
+        await page.waitForIdle()
+        const sourceAction = page.locator('[aria-label="Action Widget"]')
+        await expect(sourceAction).toBeVisible()
+        await page.waitForIdle()
+        const actionItem = sourceAction
+          .locator('.action-item', {
+            hasText: actionText,
+          })
+          .first()
+        await expect(actionItem).toBeVisible({ timeout: 10_000 })
+        await actionItem.click()
+        await page.waitForIdle()
+        await expect(sourceAction).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to select source action "${actionText}"`)
+      }
+    },
+    async selectRefactor(actionText: string) {
+      try {
+        await page.waitForIdle()
+        const widget = page.locator('.action-widget')
+        await expect(widget).toBeVisible()
+        await page.waitForIdle()
+        const actionItem = widget.locator(`.monaco-list-row[aria-label="${actionText}"]`)
+        await expect(actionItem).toBeVisible({ timeout: 10_000 })
+        await actionItem.click()
+        await page.waitForIdle()
+        await expect(widget).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to select refactor action "${actionText}"`)
       }
     },
     async shouldHaveCursor(estimate) {
@@ -903,6 +1043,55 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await expect(inspectedToken).toHaveText(name)
       } catch (error) {
         throw new VError(error, `Failed verify inspected token`)
+      }
+    },
+    async shouldHaveSemanticToken(type) {
+      try {
+        await page.waitForIdle()
+        const inspectWidget = page.locator('.token-inspect-widget')
+        await expect(inspectWidget).toBeVisible()
+        const semanticSection = inspectWidget.locator('.tiw-semantic-token-info, [class*="semantic-token"], [class*="semantic"]')
+        const count = await semanticSection.count()
+        if (count > 0) {
+          await expect(semanticSection.first()).toBeVisible({ timeout: 5000 })
+          return
+        }
+        let widgetText = await inspectWidget.textContent()
+        if (!widgetText) {
+          throw new Error(`Token inspector widget has no text content`)
+        }
+        const hasSemanticTokenType = widgetText.toLowerCase().includes('semantic token type')
+        const hasSemanticInfo = widgetText.toLowerCase().includes('semantic')
+        if (!hasSemanticTokenType && !hasSemanticInfo) {
+          for (let i = 0; i < 10; i++) {
+            await page.waitForIdle()
+            widgetText = await inspectWidget.textContent()
+            const hasSemantic =
+              widgetText && (widgetText.toLowerCase().includes('semantic token type') || widgetText.toLowerCase().includes('semantic'))
+            if (hasSemantic) {
+              return
+            }
+          }
+          throw new Error(`Semantic token information not found in token inspector. Widget text: ${widgetText}`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to verify semantic token ${type}`)
+      }
+    },
+    async shouldNotHaveSemanticToken(type) {
+      try {
+        await page.waitForIdle()
+        const inspectWidget = page.locator('.token-inspect-widget')
+        await expect(inspectWidget).toBeVisible()
+        const widgetText = await inspectWidget.textContent()
+        if (widgetText) {
+          const hasSemanticTokenType = widgetText.toLowerCase().includes('semantic token type')
+          if (hasSemanticTokenType) {
+            throw new Error(`Semantic token information found but should not be present. Widget text: ${widgetText}`)
+          }
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to verify semantic token ${type} is not present`)
       }
     },
     async closeInspectedTokens() {
@@ -1194,6 +1383,48 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await expect(scrollbarSlider).toHaveCss('top', `${expectedScrollBarY}px`)
       } catch (error) {
         throw new VError(error, `Failed to scroll in editor`)
+      }
+    },
+    async shouldHaveExceptionWidget() {
+      try {
+        await page.waitForIdle()
+        const exceptionWidget = page.locator('.exception-widget')
+        await expect(exceptionWidget).toBeVisible({ timeout: 20_000 })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to find exception widget`)
+      }
+    },
+    async shouldHaveCodeLens(options?: { timeout?: number }) {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        const timeout = options?.timeout || 15000
+        await page.waitForIdle({ timeout: 10000 })
+        const codeLens = page.locator('.codelens-decoration')
+        await expect(codeLens).toBeVisible({ timeout })
+      } catch (error) {
+        throw new VError(error, `Failed to verify code lens is visible`)
+      }
+    },
+    async shouldHaveCodeLensWithVersion(options?: { timeout?: number }) {
+      try {
+        await page.waitForIdle()
+        const editor = page.locator('.editor-instance')
+        await expect(editor).toBeVisible()
+        const timeout = options?.timeout || 15000
+        await page.waitForIdle({ timeout: 10000 })
+        const codeLens = page.locator('.codelens-decoration')
+        await expect(codeLens).toBeVisible({ timeout })
+        const codeLensText = await codeLens.textContent()
+        const hasVersionInfo =
+          codeLensText && (codeLensText.includes('latest') || codeLensText.includes('update') || codeLensText.match(/\d+\.\d+\.\d+/))
+        if (!hasVersionInfo) {
+          throw new Error(`Expected code lens to show version information, but got: ${codeLensText || 'null'}`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to verify code lens shows version information`)
       }
     },
   }

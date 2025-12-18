@@ -9,4 +9,5 @@ export const setup = async ({ Editor, RunningExtensions }: TestContext): Promise
 
 export const run = async ({ RunningExtensions }: TestContext): Promise<void> => {
   await RunningExtensions.startDebuggingExtensionHost()
+  // TODO stop debugging
 }
