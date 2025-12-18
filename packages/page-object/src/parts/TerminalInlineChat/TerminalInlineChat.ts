@@ -1,4 +1,4 @@
-export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
+export const create = ({ expect, page, VError }) => {
   return {
     isFirst: false,
     async show() {
