@@ -23,7 +23,6 @@ export const setup = async ({ Workspace, Editor, Testing, SideBar }: TestContext
   await Editor.closeAll()
   await SideBar.hide()
   await Editor.open('test-file-1.md')
-  await new Promise((r) => {})
   // @ts-ignore
   await Testing.focusOnTestExplorerView()
 }
