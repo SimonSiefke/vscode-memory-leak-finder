@@ -3,6 +3,7 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, page, VError, ideVersion }) => {
   return {
+    isFirst: false,
     async open() {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
@@ -25,7 +26,10 @@ export const create = ({ expect, page, VError, ideVersion }) => {
     },
     async sendMessage(message: string, { verify = false } = {}) {
       try {
+        await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
+        await expect(chatView).toBeVisible()
+        await page.waitForIdle()
         const editArea = chatView.locator('.monaco-editor[data-uri^="chatSessionInput"]')
         await expect(editArea).toBeVisible()
         await page.waitForIdle()
@@ -34,8 +38,12 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         await page.waitForIdle()
         await editContext.focus()
         await page.waitForIdle()
+        await expect(editContext).toBeFocused()
+        await page.waitForIdle()
         await editContext.type(message)
         await page.waitForIdle()
+        const lines = editArea.locator('.view-lines')
+        await expect(lines).toHaveText(message)
         const interactiveInput = page.locator('.interactive-input-and-side-toolbar')
         await expect(interactiveInput).toBeVisible()
         await page.waitForIdle()
@@ -45,21 +53,26 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         await page.waitForIdle()
         await expect(sendButton).toBeFocused()
         await page.waitForIdle()
-        await expect(sendButton).toHaveAttribute('tabindex', '-1')
+        if (this.isFirst) {
+          this.isFirst = false
+          // TODO get rid of timeout
+          await new Promise((r) => {
+            setTimeout(r, 1000)
+          })
+        }
+        await sendButton.click()
         await page.waitForIdle()
-        // TODO get rid of timeout
-        await new Promise((r) => {
-          setTimeout(r, 1000)
-        })
-        await page.keyboard.press('Enter')
-        await page.waitForIdle()
-
+        await expect(lines).toHaveText('')
         if (verify) {
           const row = chatView.locator(`.monaco-list-row[aria-label="${message}"]`)
           await expect(row).toBeVisible()
-          // const currentIndex
           await page.waitForIdle()
           const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
+          await expect(response).toBeVisible({ timeout: 60_000 })
+          await page.waitForIdle()
+          const progress = chatView.locator('.rendered-markdown.progress-step')
+          await expect(progress).toBeHidden({ timout: 45_000 })
+          await page.waitForIdle()
           await expect(response).toBeVisible({ timeout: 30_000 })
           await page.waitForIdle()
         }
