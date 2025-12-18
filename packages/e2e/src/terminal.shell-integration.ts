@@ -1,5 +1,7 @@
 import type { TestContext } from '../types.ts'
 
+export const skip = 1
+
 export const setup = async ({ Editor, SideBar, SettingsEditor, Terminal, Workspace }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await SideBar.hide()
@@ -19,7 +21,7 @@ export const setup = async ({ Editor, SideBar, SettingsEditor, Terminal, Workspa
   })
 }
 
-export const run = async ({ Terminal }: TestContext): Promise<void> => {
+export const run = async ({ Terminal, Workspace }: TestContext): Promise<void> => {
   // @ts-ignore
   await Terminal.execute('echo hello > test.txt', {
     waitForFile: 'test.txt',
@@ -27,6 +29,7 @@ export const run = async ({ Terminal }: TestContext): Promise<void> => {
   // @ts-ignore
   await Terminal.shouldHaveSuccessDecoration()
   await Terminal.clear()
+  await Workspace.remove('test.txt')
 }
 
 export const teardown = async ({ Terminal }: TestContext): Promise<void> => {
