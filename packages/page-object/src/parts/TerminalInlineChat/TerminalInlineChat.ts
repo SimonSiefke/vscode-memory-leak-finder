@@ -66,7 +66,7 @@ export const create = ({ expect, page, VError, ideVersion, electronApp }) => {
         await page.waitForIdle()
         await page.keyboard.press('Escape')
         await page.waitForIdle()
-        await expect(terminalInlineChat).toBeHidden()
+        await expect(editor).toBeHidden()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to hide terminal inline chat`)
