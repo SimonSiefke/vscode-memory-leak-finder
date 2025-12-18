@@ -1,8 +1,8 @@
 import * as Character from '../Character/Character.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
-import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 import * as WebView from '../WebView/WebView.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 const initialDiagnosticTimeout = 30_000
 
@@ -24,11 +24,7 @@ const isBinary = (file) => {
 
 export const create = ({ page, expect, VError, ideVersion }) => {
   return {
-<<<<<<< HEAD
-    async open(fileName: string) {
-=======
     async open(fileName: string, options?: any) {
->>>>>>> origin/main
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
