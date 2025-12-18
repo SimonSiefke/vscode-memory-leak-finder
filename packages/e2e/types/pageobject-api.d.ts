@@ -151,6 +151,8 @@ export interface Editor {
   shouldHaveExceptionWidget(): Promise<void>
   shouldHaveCodeLens(options?: any): Promise<void>
   shouldHaveCodeLensWithVersion(options?: any): Promise<void>
+  foldAll(): Promise<void>
+  unfoldAll(): Promise<void>
 }
 export interface Electron {
   evaluate(expression: any): Promise<void>
@@ -223,6 +225,11 @@ export interface MCP {
 export interface MarkdownPreview {
   shouldHaveHeading(id: any): Promise<void>
   shouldBeVisible(): Promise<void>
+}
+export interface MultiDiffEditor {
+  open(files: any): Promise<void>
+  shouldBeVisible(): Promise<void>
+  close(): Promise<void>
 }
 export interface Notebook {
   addMarkdownCell(): Promise<void>
@@ -474,6 +481,7 @@ export interface PageObjectApi {
   readonly KeyBindingsEditor: KeyBindingsEditor
   readonly MCP: MCP
   readonly MarkdownPreview: MarkdownPreview
+  readonly MultiDiffEditor: MultiDiffEditor
   readonly Notebook: Notebook
   readonly Notification: Notification
   readonly Output: Output
