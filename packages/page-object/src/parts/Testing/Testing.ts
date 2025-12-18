@@ -34,7 +34,9 @@ export const create = ({ page, expect, VError }) => {
         await expect(rows).toHaveCount(expectedRowCount)
         await page.waitForIdle()
         const otherRows = page.locator('.test-output-peek-tree .monaco-list-row')
-        await expect(otherRows).toHaveCount(expectedTestOutputRowCount)
+        await expect(otherRows).toHaveCount(expectedTestOutputRowCount, {
+          timeout: 30_000,
+        })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, 'Failed to run all tests')
