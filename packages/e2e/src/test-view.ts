@@ -35,3 +35,9 @@ export const run = async ({ Testing }): Promise<void> => {
     expectedTestOutputRowCount: 5,
   })
 }
+
+export const teardown = async ({ SideBar, Editor, Panel }: TestContext): Promise<void> => {
+  await Editor.closeAll()
+  await SideBar.hide()
+  await Panel.hide()
+}
