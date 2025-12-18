@@ -82,67 +82,17 @@ test('multiply two numbers', () => {
   await Editor.closeAll()
 }
 
-// @ts-ignore
-export const run = async ({ QuickPick, Editor, Terminal, page, expect, VError }: TestContext): Promise<void> => {
-  await page.waitForIdle()
-
-  await QuickPick.executeCommand('Tasks: Run Task')
-  await page.waitForIdle()
-
-  await QuickPick.select('run tests')
-  await page.waitForIdle()
-
-  const panel = page.locator('.part.panel')
-  await expect(panel).toBeVisible()
-  await page.waitForIdle()
-
-  const terminal = page.locator('.terminal')
-  await expect(terminal).toBeVisible()
-  await page.waitForIdle()
-
-  const terminalActions = page.locator('[aria-label="Terminal actions"]')
-  await expect(terminalActions).toBeVisible({ timeout: 10000 })
-  await page.waitForIdle()
-
-  const actionLabel = terminalActions.locator('.action-label')
-  await expect(actionLabel).toBeVisible()
-  await page.waitForIdle()
-
-  const successDecoration = terminal.locator('.codicon-terminal-decoration-success, .codicon-check')
-  await expect(successDecoration.first()).toBeVisible({ timeout: 15000 })
-  await page.waitForIdle()
+export const run = async ({ Testing, Editor, Terminal }: TestContext): Promise<void> => {
+  await Testing.runTask('run tests')
+  await Testing.shouldHaveTestSuccess()
 
   await Editor.open('src/math.test.js')
-  await page.waitForIdle()
-
   await Editor.select('5')
-  await page.waitForIdle()
-
-  await page.keyboard.press('Backspace')
-  await page.waitForIdle()
-
   await Editor.type('99')
-  await page.waitForIdle()
-
   await Editor.save()
-  await page.waitForIdle()
 
   await Terminal.killAll()
-  await page.waitForIdle()
 
-  await QuickPick.executeCommand('Tasks: Run Task')
-  await page.waitForIdle()
-
-  await QuickPick.select('run tests')
-  await page.waitForIdle()
-
-  await expect(panel).toBeVisible()
-  await page.waitForIdle()
-
-  await expect(terminal).toBeVisible()
-  await page.waitForIdle()
-
-  const errorDecoration = terminal.locator('.codicon-terminal-decoration-error, .codicon-error')
-  await expect(errorDecoration.first()).toBeVisible({ timeout: 15000 })
-  await page.waitForIdle()
+  await Testing.runTask('run tests')
+  await Testing.shouldHaveTestFailure()
 }
