@@ -1,15 +1,27 @@
-const vscode = require('vscode')
-const { getContentFromFilesystem, TestCase, testData, TestFile } = require('./testTree')
+import {
+  tests as _tests,
+  EventEmitter,
+  TestRunRequest,
+  TestRunProfileKind,
+  StatementCoverage,
+  Position,
+  workspace,
+  RelativePattern,
+  FileCoverage,
+  Uri,
+  TestCoverageCount,
+} from 'vscode'
+import { getContentFromFilesystem, TestCase, testData, TestFile } from './testTree'
 
-exports.activate = async function (context) {
-  const ctrl = vscode.tests.createTestController('mathTestController', 'Markdown Math')
+export async function activate(context) {
+  const ctrl = _tests.createTestController('mathTestController', 'Markdown Math')
   context.subscriptions.push(ctrl)
 
-  const fileChangedEmitter = new vscode.EventEmitter()
+  const fileChangedEmitter = new EventEmitter()
   const watchingTests = new Map()
   fileChangedEmitter.event((uri) => {
     if (watchingTests.has('ALL')) {
-      startTestRun(new vscode.TestRunRequest(undefined, undefined, watchingTests.get('ALL'), true))
+      startTestRun(new TestRunRequest(undefined, undefined, watchingTests.get('ALL'), true))
       return
     }
 
@@ -24,7 +36,7 @@ exports.activate = async function (context) {
     }
 
     if (include.length) {
-      startTestRun(new vscode.TestRunRequest(include, undefined, profile, true))
+      startTestRun(new TestRunRequest(include, undefined, profile, true))
     }
   })
 
@@ -66,14 +78,12 @@ exports.activate = async function (context) {
           await discoverTests(gatherTestItems(test.children))
         }
 
-        if (test.uri && !coveredLines.has(test.uri.toString()) && request.profile?.kind === vscode.TestRunProfileKind.Coverage) {
+        if (test.uri && !coveredLines.has(test.uri.toString()) && request.profile?.kind === TestRunProfileKind.Coverage) {
           try {
             const lines = (await getContentFromFilesystem(test.uri)).split('\n')
             coveredLines.set(
               test.uri.toString(),
-              lines.map((lineText, lineNo) =>
-                lineText.trim().length ? new vscode.StatementCoverage(0, new vscode.Position(lineNo, 0)) : undefined,
-              ),
+              lines.map((lineText, lineNo) => (lineText.trim().length ? new StatementCoverage(0, new Position(lineNo, 0)) : undefined)),
             )
           } catch {
             // ignored
@@ -116,9 +126,9 @@ exports.activate = async function (context) {
     await Promise.all(getWorkspaceTestPatterns().map(({ pattern }) => findInitialFiles(ctrl, pattern)))
   }
 
-  ctrl.createRunProfile('Run Tests', vscode.TestRunProfileKind.Run, runHandler, true, undefined, true)
+  ctrl.createRunProfile('Run Tests', TestRunProfileKind.Run, runHandler, true, undefined, true)
 
-  const coverageProfile = ctrl.createRunProfile('Run with Coverage', vscode.TestRunProfileKind.Coverage, runHandler, true, undefined, true)
+  const coverageProfile = ctrl.createRunProfile('Run with Coverage', TestRunProfileKind.Coverage, runHandler, true, undefined, true)
   coverageProfile.loadDetailedCoverage = async (_testRun, coverage) => {
     if (coverage instanceof MarkdownFileCoverage) {
       return coverage.coveredLines.filter((l) => !!l)
@@ -152,13 +162,13 @@ exports.activate = async function (context) {
     data.updateFromContents(ctrl, e.getText(), file)
   }
 
-  for (const document of vscode.workspace.textDocuments) {
+  for (const document of workspace.textDocuments) {
     updateNodeForDocument(document)
   }
 
   context.subscriptions.push(
-    vscode.workspace.onDidOpenTextDocument(updateNodeForDocument),
-    vscode.workspace.onDidChangeTextDocument((e) => updateNodeForDocument(e.document)),
+    workspace.onDidOpenTextDocument(updateNodeForDocument),
+    workspace.onDidChangeTextDocument((e) => updateNodeForDocument(e.document)),
   )
 }
 
@@ -185,25 +195,25 @@ function gatherTestItems(collection) {
 }
 
 function getWorkspaceTestPatterns() {
-  if (!vscode.workspace.workspaceFolders) {
+  if (!workspace.workspaceFolders) {
     return []
   }
 
-  return vscode.workspace.workspaceFolders.map((workspaceFolder) => ({
+  return workspace.workspaceFolders.map((workspaceFolder) => ({
     workspaceFolder,
-    pattern: new vscode.RelativePattern(workspaceFolder, '**/*.md'),
+    pattern: new RelativePattern(workspaceFolder, '**/*.md'),
   }))
 }
 
 async function findInitialFiles(controller, pattern) {
-  for (const file of await vscode.workspace.findFiles(pattern)) {
+  for (const file of await workspace.findFiles(pattern)) {
     getOrCreateFile(controller, file)
   }
 }
 
 function startWatchingWorkspace(controller, fileChangedEmitter) {
   return getWorkspaceTestPatterns().map(({ workspaceFolder, pattern }) => {
-    const watcher = vscode.workspace.createFileSystemWatcher(pattern)
+    const watcher = workspace.createFileSystemWatcher(pattern)
 
     watcher.onDidCreate((uri) => {
       getOrCreateFile(controller, uri)
@@ -224,9 +234,9 @@ function startWatchingWorkspace(controller, fileChangedEmitter) {
   })
 }
 
-class MarkdownFileCoverage extends vscode.FileCoverage {
+class MarkdownFileCoverage extends FileCoverage {
   constructor(uri, coveredLines) {
-    super(vscode.Uri.parse(uri), new vscode.TestCoverageCount(0, 0))
+    super(Uri.parse(uri), new TestCoverageCount(0, 0))
     this.coveredLines = coveredLines
     for (const line of coveredLines) {
       if (line) {

@@ -17,17 +17,21 @@ export const create = ({ page, expect, VError }) => {
     },
     async runAllTests({ expectedRowCount }) {
       try {
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.RunAllTests)
         await page.waitForIdle()
         const testExplorer = page.locator('.test-explorer')
         await expect(testExplorer).toBeVisible()
+        await page.waitForIdle()
         const summary = testExplorer.locator('.result-summary')
         await expect(summary).toBeVisible()
         await page.waitForIdle()
         const tree = page.locator('.test-explorer-tree')
         await expect(tree).toBeVisible()
+        await page.waitForIdle()
         const rows = tree.locator('.monaco-list-row')
+        await new Promise((r) => {})
         await expect(rows).toHaveCount(expectedRowCount)
         await page.waitForIdle()
       } catch (error) {

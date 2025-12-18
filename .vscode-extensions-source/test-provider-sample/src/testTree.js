@@ -1,16 +1,16 @@
-const { TextDecoder } = require('util')
-const vscode = require('vscode')
-const { parseMarkdown } = require('./parser')
+import { TextDecoder } from 'util'
+import { workspace, TestMessage, Location } from 'vscode'
+import { parseMarkdown } from './parser'
 
 const textDecoder = new TextDecoder('utf-8')
 
-exports.testData = new WeakMap()
+export const testData = new WeakMap()
 
 let generationCounter = 0
 
-exports.getContentFromFilesystem = async (uri) => {
+export async function getContentFromFilesystem(uri) {
   try {
-    const rawContent = await vscode.workspace.fs.readFile(uri)
+    const rawContent = await workspace.fs.readFile(uri)
     return textDecoder.decode(rawContent)
   } catch (e) {
     console.warn(`Error providing tests for ${uri.fsPath}`, e)
@@ -18,7 +18,7 @@ exports.getContentFromFilesystem = async (uri) => {
   }
 }
 
-exports.TestFile = class {
+export class TestFile {
   didResolve = false
 
   async updateFromDisk(controller, item) {
@@ -76,13 +76,13 @@ exports.TestFile = class {
   }
 }
 
-exports.TestHeading = class {
+export class TestHeading {
   constructor(generation) {
     this.generation = generation
   }
 }
 
-exports.TestCase = class {
+export class TestCase {
   constructor(a, operator, b, expected, generation) {
     this.a = a
     this.operator = operator
@@ -104,8 +104,8 @@ exports.TestCase = class {
     if (actual === this.expected) {
       options.passed(item, duration)
     } else {
-      const message = vscode.TestMessage.diff(`Expected ${item.label}`, String(this.expected), String(actual))
-      message.location = new vscode.Location(item.uri, item.range)
+      const message = TestMessage.diff(`Expected ${item.label}`, String(this.expected), String(actual))
+      message.location = new Location(item.uri, item.range)
       options.failed(item, message, duration)
     }
   }
