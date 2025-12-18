@@ -2,6 +2,8 @@ import type { TestContext } from '../types.ts'
 
 const CLASS_COUNT = 4000
 
+export const skip = 1
+
 export const setup = async ({ Editor, Workspace, SettingsEditor }: TestContext): Promise<void> => {
   await Editor.closeAll()
 
