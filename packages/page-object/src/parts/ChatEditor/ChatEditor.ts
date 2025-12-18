@@ -64,10 +64,10 @@ export const create = ({ expect, page, VError, ideVersion }) => {
           // const currentIndex
           await page.waitForIdle()
           const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
-          await expect(response).toBeVisible({ timeout: 30_000 })
+          await expect(response).toBeVisible({ timeout: 60_000 })
           await page.waitForIdle()
           const progress = chatView.locator('.rendered-markdown.progress-step')
-          await expect(progress).toBeHidden({ timout: 60_000 })
+          await expect(progress).toBeHidden({ timout: 120_000 })
           await page.waitForIdle()
           await expect(response).toBeVisible({ timeout: 30_000 })
           await page.waitForIdle()
