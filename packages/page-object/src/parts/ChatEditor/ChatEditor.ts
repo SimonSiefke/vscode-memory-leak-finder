@@ -155,8 +155,9 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         } else {
           await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
         }
+        await page.waitForIdle()
         const requestOne = page.locator('.monaco-list-row.request').first()
-        await expect(requestOne).toBeHidden()
+        await expect(requestOne).toBeHidden({ timeout: 10_000 })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to clear chat context`)
