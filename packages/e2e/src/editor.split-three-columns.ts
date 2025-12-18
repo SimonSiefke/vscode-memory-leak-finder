@@ -1,0 +1,18 @@
+import type { TestContext } from '../types.js'
+
+export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
+  await Workspace.setFiles([
+    {
+      name: 'file.txt',
+      content: 'sample text',
+    },
+  ])
+  await Editor.closeAll()
+}
+
+export const run = async ({ Editor }: TestContext): Promise<void> => {
+  await Editor.open('file.txt')
+  // @ts-ignore
+  await Editor.threeColumnsLayout()
+  await Editor.closeAll()
+}

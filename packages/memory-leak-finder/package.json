@@ -2,22 +2,11 @@
   "name": "@vscode-memory-leak-finder/memory-leak-finder",
   "version": "0.0.0-dev",
   "description": "",
-  "main": "src/index.js",
-  "types": "src/index.d.ts",
   "type": "module",
+  "main": "src/main.ts",
   "scripts": {
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
-  "dependencies": {
-    "@lvce-editor/assert": "^1.4.0",
-    "@lvce-editor/json-rpc": "^6.2.0",
-    "@lvce-editor/verror": "^1.7.0",
-    "@vscode-memory-leak-finder/devtools-protocol": "file:../devtools-protocol",
-    "pretty-bytes": "^7.0.0"
   },
   "xo": {
     "rules": {
@@ -66,16 +55,11 @@
       "distmin"
     ]
   },
-  "jest": {
-    "injectGlobals": false,
-    "collectCoverage": true,
-    "coverageThreshold": {
-      "global": {
-        "branches": 50,
-        "functions": 60,
-        "lines": 60,
-        "statements": 60
-      }
-    }
+  "dependencies": {
+    "@lvce-editor/assert": "^1.5.1",
+    "@lvce-editor/rpc": "^4.20.0",
+    "@lvce-editor/verror": "^1.7.0",
+    "pretty-bytes": "^7.1.0",
+    "wait-for-localhost": "^5.0.1"
   }
 }

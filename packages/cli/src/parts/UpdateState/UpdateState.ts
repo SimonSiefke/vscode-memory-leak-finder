@@ -1,0 +1,70 @@
+import * as HandleExit from '../HandleExit/HandleExit.ts'
+import * as KillWorkers from '../KillWorkers/KillWorkers.ts'
+import * as ModeType from '../ModeType/ModeType.ts'
+import * as PreviousFilters from '../PreviousFilters/PreviousFilters.ts'
+import * as StartRunning from '../StartRunning/StartRunning.ts'
+import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
+import * as Stdout from '../Stdout/Stdout.ts'
+import * as VsCodeVersion from '../VsCodeVersion/VsCodeVersion.ts'
+
+export const updateState = async (newState: any): Promise<void> => {
+  const state = StdinDataState.getState()
+  if (newState === state) {
+    return
+  }
+  if (newState.stdout && newState.stdout.length > 0) {
+    await Stdout.write(newState.stdout.join(''))
+  }
+  if (newState.previousFilters.length > 0) {
+    await PreviousFilters.addAll(newState.previousFilters)
+  }
+  if (newState.mode === ModeType.Exit || newState.mode === ModeType.FinishedRunning) {
+    if (newState.exitCode) {
+      process.exitCode = newState.exitCode
+    }
+    return HandleExit.handleExit()
+  }
+  StdinDataState.setState({ ...newState, stdout: [], previousFilters: [] })
+  if (state.mode !== ModeType.Running && newState.mode === ModeType.Running) {
+    await StartRunning.startRunning({
+      filterValue: state.value,
+      headlessMode: state.headless,
+      color: true,
+      checkLeaks: state.checkLeaks,
+      recordVideo: state.recordVideo,
+      cwd: state.cwd,
+      runs: state.runs,
+      measure: state.measure,
+      measureAfter: state.measureAfter,
+      measureNode: false,
+      timeouts: state.timeouts,
+      timeoutBetween: state.timeoutBetween,
+      restartBetween: state.restartBetween,
+      runMode: state.runMode,
+      ide: state.ide,
+      ideVersion: state.ideVersion,
+      vscodePath: '',
+      vscodeVersion: VsCodeVersion.vscodeVersion,
+      commit: '',
+      setupOnly: false,
+      workers: state.workers,
+      isWindows: state.isWindows,
+      runSkippedTestsAnyway: state.runSkippedTestsAnyway,
+      continueValue: state.continueValue,
+      inspectExtensions: state.inspectExtensions,
+      inspectPtyHost: state.inspectPtyHost,
+      inspectSharedProcess: state.inspectSharedProcess,
+      enableExtensions: state.enableExtensions,
+      inspectPtyHostPort: state.inspectPtyHostPort,
+      inspectSharedProcessPort: state.inspectSharedProcessPort,
+      inspectExtensionsPort: state.inspectExtensionsPort,
+      enableProxy: state.enableProxy,
+      useProxyMock: state.useProxyMock,
+      insidersCommit: state.insidersCommit,
+      bisect: state.bisect,
+    })
+  }
+  if (newState.mode === ModeType.Interrupted) {
+    await KillWorkers.killWorkers()
+  }
+}

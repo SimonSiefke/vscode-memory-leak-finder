@@ -5,6 +5,9 @@ export const Auto = () => {
   if (process.argv.includes('--ipc-type=worker-thread')) {
     return NodeWorkerThread
   }
+  if (process.argv.includes('--ipc-type=node-worker')) {
+    return NodeWorkerThread
+  }
   if (process.argv.includes('--ipc-type=forked-process')) {
     return NodeForkedProcess
   }
