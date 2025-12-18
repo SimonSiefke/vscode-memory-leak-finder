@@ -2,7 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ Workspace, Editor, Testing }: TestContext): Promise<void> => {
+export const setup = async ({ Workspace, Editor, Testing, SideBar }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'test-file-1.md',
@@ -21,7 +21,9 @@ export const setup = async ({ Workspace, Editor, Testing }: TestContext): Promis
   ])
   await Workspace.addExtension('test-provider-sample')
   await Editor.closeAll()
+  await SideBar.hide()
   await Editor.open('test-file-1.md')
+  await new Promise((r) => {})
   // @ts-ignore
   await Testing.focusOnTestExplorerView()
 }

@@ -11,7 +11,7 @@ import {
   Uri,
   TestCoverageCount,
 } from 'vscode'
-import { getContentFromFilesystem, TestCase, testData, TestFile } from './testTree'
+import { getContentFromFilesystem, TestCase, testData, TestFile } from './testTree.js'
 
 export async function activate(context) {
   const ctrl = _tests.createTestController('mathTestController', 'Markdown Math')

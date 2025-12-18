@@ -1,6 +1,6 @@
 import { TextDecoder } from 'util'
 import { workspace, TestMessage, Location } from 'vscode'
-import { parseMarkdown } from './parser'
+import { parseMarkdown } from './parser.js'
 
 const textDecoder = new TextDecoder('utf-8')
 
