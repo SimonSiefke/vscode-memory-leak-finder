@@ -1,7 +1,7 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, VError, ideVersion }) => {
   return {
     async open() {
       try {
@@ -150,7 +150,11 @@ export const create = ({ expect, page, VError }) => {
     async clearAll() {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
-        await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
+        if (ideVersion && ideVersion.minor <= 100) {
+          await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
+        } else {
+          await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
+        }
         const requestOne = page.locator('.monaco-list-row.request').first()
         await expect(requestOne).toBeHidden()
         await page.waitForIdle()
