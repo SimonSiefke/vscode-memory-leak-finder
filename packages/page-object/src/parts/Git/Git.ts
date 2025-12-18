@@ -11,6 +11,10 @@ export const create = ({ electronApp, page, expect, VError }) => {
   }
   return {
     async init() {
+      await mkdir(workspace, { recursive: true })
+      await execa('git', ['init'], { cwd: workspace, env: { ...process.env, ...gitEnv } })
+      await execa('git', ['config', 'user.name', 'Test User'], { cwd: workspace, env: { ...process.env, ...gitEnv } })
+      await execa('git', ['config', 'user.email', 'test@example.com'], { cwd: workspace, env: { ...process.env, ...gitEnv } })
       await page.waitForIdle()
       await mkdir(workspace, { recursive: true })
       await execa('git', ['init'], { cwd: workspace, env: { ...process.env, ...gitEnv } })
