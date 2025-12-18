@@ -6,30 +6,49 @@ export const create = ({ expect, page, VError }) => {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand('Chat: New Chat Editor')
+        await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
         await expect(chatView).toBeVisible()
         await page.waitForIdle()
-        const editContext = page.locator('.native-edit-context')
+        const editArea = chatView.locator('.monaco-editor[data-uri^="chatSessionInput"]')
+        await expect(editArea).toBeVisible()
+        await page.waitForIdle()
+        const editContext = editArea.locator('.native-edit-context')
         await expect(editContext).toBeVisible()
+        await page.waitForIdle()
+        await expect(editContext).toBeFocused()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open chat editor`)
       }
     },
-    async sendMessage(message) {
+    async sendMessage(message: string, { verify = false } = {}) {
       try {
-        const editContext = page.locator('.native-edit-context')
+        const chatView = page.locator('.interactive-session')
+        const editArea = chatView.locator('.monaco-editor[data-uri^="chatSessionInput"]')
+        await expect(editArea).toBeVisible()
+        await page.waitForIdle()
+        const editContext = editArea.locator('.native-edit-context')
         await expect(editContext).toBeVisible()
         await page.waitForIdle()
         await editContext.focus()
         await page.waitForIdle()
-        await editContext.setValue(message)
+        await editContext.type(message)
         await page.waitForIdle()
-        const chatView = page.locator('.interactive-session')
-        const sendButton = chatView.locator('.action-label[aria-label^="Send"]')
+        const interactiveInput = page.locator('.interactive-input-and-side-toolbar')
+        await expect(interactiveInput).toBeVisible()
+        await page.waitForIdle()
+        const sendButton = interactiveInput.locator('.action-item .action-label[aria-label^="Send"]')
         await expect(sendButton).toBeVisible()
         await sendButton.click()
         await page.waitForIdle()
-        // TODO check that message is visible and response also
+
+        if (verify) {
+          const row = page.locator(`.monaco-list-row[aria-label="${message}"]`)
+          // await new Promise((r) => {})
+          await expect(row).toBeVisible()
+          await page.waitForIdle()
+        }
       } catch (error) {
         throw new VError(error, `Failed to send chat message`)
       }
