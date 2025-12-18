@@ -2,6 +2,8 @@ import type { TestContext } from '../types.js'
 
 export const skip = 1
 
+export const requiresNetwork = true
+
 export const setup = async ({ Editor, ChatEditor, Extensions, ExtensionDetailView, SideBar }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Extensions.show()
@@ -11,15 +13,18 @@ export const setup = async ({ Editor, ChatEditor, Extensions, ExtensionDetailVie
   await ExtensionDetailView.installExtension()
   await SideBar.hide()
   await Editor.closeAll()
+  // @ts-ignore
+  await ChatEditor.clearAll()
   await ChatEditor.open()
 }
 
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
-  // TODO send message and clear it
   // @ts-ignore
   await ChatEditor.sendMessage(`What is displayed on https://example.com`, {
     verify: true,
   })
+  // @ts-ignore
+  await ChatEditor.clearAll()
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {

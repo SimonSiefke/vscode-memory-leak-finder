@@ -1,11 +1,12 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, page, VError }) => {
   return {
     async open() {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
-        await quickPick.executeCommand('Chat: New Chat Editor')
+        await quickPick.executeCommand(WellKnownCommands.NewChartEditor)
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
         await expect(chatView).toBeVisible()
@@ -38,15 +39,28 @@ export const create = ({ expect, page, VError }) => {
         const interactiveInput = page.locator('.interactive-input-and-side-toolbar')
         await expect(interactiveInput).toBeVisible()
         await page.waitForIdle()
-        const sendButton = interactiveInput.locator('.action-item .action-label[aria-label^="Send"]')
+        const sendButton = interactiveInput.locator('.action-item .action-label:not(.disabled)[aria-label^="Send"]')
         await expect(sendButton).toBeVisible()
-        await sendButton.click()
+        await sendButton.focus()
+        await page.waitForIdle()
+        await expect(sendButton).toBeFocused()
+        await page.waitForIdle()
+        await expect(sendButton).toHaveAttribute('tabindex', '-1')
+        await page.waitForIdle()
+        // TODO get rid of timeout
+        await new Promise((r) => {
+          setTimeout(r, 1000)
+        })
+        await page.keyboard.press('Enter')
         await page.waitForIdle()
 
         if (verify) {
-          const row = page.locator(`.monaco-list-row[aria-label="${message}"]`)
-          // await new Promise((r) => {})
+          const row = chatView.locator(`.monaco-list-row[aria-label="${message}"]`)
           await expect(row).toBeVisible()
+          // const currentIndex
+          await page.waitForIdle()
+          const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
+          await expect(response).toBeVisible({ timeout: 30_000 })
           await page.waitForIdle()
         }
       } catch (error) {
@@ -128,6 +142,18 @@ export const create = ({ expect, page, VError }) => {
         const removeButton = contextLabel.locator('[role="button"][aria-label^="Remove from context"]')
         await expect(removeButton).toBeVisible()
         await removeButton.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to clear chat context`)
+      }
+    },
+    async clearAll() {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
+        const requestOne = page.locator('.monaco-list-row.request').first()
+        await expect(requestOne).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to clear chat context`)
       }

@@ -2,6 +2,8 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
+export const requiresNetwork = true
+
 export const setup = async ({ Editor, ChatEditor }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await ChatEditor.open()
