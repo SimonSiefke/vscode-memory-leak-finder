@@ -1,0 +1,71 @@
+import type { TestContext } from '../types.js'
+
+export const skip = 1
+
+export const requiresNetwork = 1
+
+export const setup = async ({
+  Electron,
+  Extensions,
+  ExtensionDetailView,
+  Editor,
+  Panel,
+  SideBar,
+  SettingsEditor,
+  Terminal,
+  Workspace,
+}: TestContext): Promise<void> => {
+  await Electron.mockDialog({
+    response: 1,
+  })
+  await Editor.closeAll()
+  await Extensions.show()
+  await Extensions.search('github copilot chat')
+  await Extensions.first.shouldBe('GitHub Copilot Chat')
+  await Extensions.first.click()
+  await ExtensionDetailView.installExtension()
+  await SideBar.hide()
+  await Editor.closeAll()
+  await Editor.closeAll()
+  await SideBar.hide()
+  await Panel.hide()
+  await SettingsEditor.open()
+  await SettingsEditor.search({
+    value: 'terminal.integrated.shellIntegration.enabled',
+    resultCount: 5,
+  })
+  await SettingsEditor.enableCheckBox({
+    name: 'terminal.integrated.shellIntegration.enabled',
+  })
+  await Editor.closeAll()
+  await Workspace.setFiles([])
+  await Panel.hide()
+  // @ts-ignore
+  await Terminal.show({
+    waitForReady: true,
+  })
+}
+
+export const run = async ({ Terminal, Workspace }: TestContext): Promise<void> => {
+  // @ts-ignore
+  await Terminal.execute('echo hello > test.txt', {
+    waitForFile: 'test.txt',
+  })
+  // @ts-ignore
+  await Terminal.shouldHaveSuccessDecoration()
+  await Terminal.clear()
+  await Workspace.remove('test.txt')
+}
+
+export const teardown = async ({ Editor, Terminal, SettingsEditor }: TestContext): Promise<void> => {
+  await Terminal.killAll()
+  await SettingsEditor.open()
+  await SettingsEditor.search({
+    value: 'terminal.integrated.shellIntegration.enabled',
+    resultCount: 5,
+  })
+  await SettingsEditor.disableCheckBox({
+    name: 'terminal.integrated.shellIntegration.enabled',
+  })
+  await Editor.closeAll()
+}
