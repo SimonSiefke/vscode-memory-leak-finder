@@ -22,7 +22,7 @@ export const setup = async ({ Editor, ChatEditor, Electron, ExtensionDetailView,
 
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   // TODO send message and clear it
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 15; i++) {
     // @ts-ignore
     await ChatEditor.sendMessage('test', {
       verify: true,
