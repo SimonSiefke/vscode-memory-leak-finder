@@ -119,7 +119,8 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const checkbox = page.locator(`.monaco-custom-toggle[aria-label="${name}"]`)
         await expect(checkbox).toBeVisible()
-        const checkedValue = checkbox.getAttribute('aria-checked')
+        await page.waitForIdle()
+        const checkedValue = await checkbox.getAttribute('aria-checked')
         if (checkedValue === 'true') {
           return
         }
