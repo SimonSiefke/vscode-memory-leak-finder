@@ -298,6 +298,12 @@ export const pressKey = async (key) => {
   Assert.string(key)
   const keyboardEventOptions = GetKeyboardEventOptions.getKeyboardEventOptions(key)
   KeyBoardActions.press(keyboardEventOptions)
+  if (
+    document.activeElement &&
+    (document.activeElement instanceof HTMLAnchorElement || document.activeElement instanceof HTMLButtonElement)
+  ) {
+    document.activeElement.click()
+  }
 }
 
 export const type = (text) => {
