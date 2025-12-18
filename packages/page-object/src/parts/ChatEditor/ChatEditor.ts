@@ -35,6 +35,8 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         await page.waitForIdle()
         await editContext.focus()
         await page.waitForIdle()
+        await expect(editContext).toBeFocused()
+        await page.waitForIdle()
         await editContext.type(message)
         await page.waitForIdle()
         const interactiveInput = page.locator('.interactive-input-and-side-toolbar')
@@ -46,14 +48,14 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         await page.waitForIdle()
         await expect(sendButton).toBeFocused()
         await page.waitForIdle()
-        // TODO get rid of timeout
         if (this.isFirst) {
           this.isFirst = false
+          // TODO get rid of timeout
           await new Promise((r) => {
             setTimeout(r, 1000)
           })
         }
-        await page.keyboard.press('Enter')
+        await sendButton.click()
         await page.waitForIdle()
 
         if (verify) {
@@ -65,7 +67,7 @@ export const create = ({ expect, page, VError, ideVersion }) => {
           await expect(response).toBeVisible({ timeout: 30_000 })
           await page.waitForIdle()
           const progress = chatView.locator('.rendered-markdown.progress-step')
-          await expect(progress).toBeHidden({ timout: 30_000 })
+          await expect(progress).toBeHidden({ timout: 60_000 })
           await page.waitForIdle()
           await expect(response).toBeVisible({ timeout: 30_000 })
           await page.waitForIdle()
