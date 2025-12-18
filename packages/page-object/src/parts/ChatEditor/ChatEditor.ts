@@ -61,7 +61,6 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         if (verify) {
           const row = chatView.locator(`.monaco-list-row[aria-label="${message}"]`)
           await expect(row).toBeVisible()
-          // const currentIndex
           await page.waitForIdle()
           const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
           await expect(response).toBeVisible({ timeout: 60_000 })
