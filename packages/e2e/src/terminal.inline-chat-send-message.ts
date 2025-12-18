@@ -46,15 +46,14 @@ export const setup = async ({
   })
 }
 
-export const run = async ({ Terminal, Workspace }: TestContext): Promise<void> => {
-  // @ts-ignore
-  await Terminal.execute('echo hello > test.txt', {
-    waitForFile: 'test.txt',
+// @ts-ignore
+export const run = async ({ Terminal, Workspace, TerminalInlineChat }: TestContext): Promise<void> => {
+  await TerminalInlineChat.show()
+  await TerminalInlineChat.sendMessage({
+    message: 'test',
+    verify: true,
   })
-  // @ts-ignore
-  await Terminal.shouldHaveSuccessDecoration()
-  await Terminal.clear()
-  await Workspace.remove('test.txt')
+  await TerminalInlineChat.hide()
 }
 
 export const teardown = async ({ Editor, Terminal, SettingsEditor }: TestContext): Promise<void> => {
