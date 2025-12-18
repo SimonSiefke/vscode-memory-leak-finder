@@ -40,10 +40,9 @@ ${classes.join('\n\n')}
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
-  // Fold all
+  // @ts-ignore
   await Editor.foldAll()
-
-  // Unfold all
+  // @ts-ignore
   await Editor.unfoldAll()
 }
 
