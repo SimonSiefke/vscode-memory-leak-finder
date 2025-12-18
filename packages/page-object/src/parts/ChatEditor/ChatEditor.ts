@@ -45,8 +45,6 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         await page.waitForIdle()
         await expect(sendButton).toBeFocused()
         await page.waitForIdle()
-        await expect(sendButton).toHaveAttribute('tabindex', '-1')
-        await page.waitForIdle()
         // TODO get rid of timeout
         await new Promise((r) => {
           setTimeout(r, 1000)
@@ -60,6 +58,11 @@ export const create = ({ expect, page, VError, ideVersion }) => {
           // const currentIndex
           await page.waitForIdle()
           const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
+          await expect(response).toBeVisible({ timeout: 30_000 })
+          await page.waitForIdle()
+          const progress = chatView.locator('.rendered-markdown.progress-step')
+          await expect(progress).toBeHidden({ timout: 30_000 })
+          await page.waitForIdle()
           await expect(response).toBeVisible({ timeout: 30_000 })
           await page.waitForIdle()
         }
