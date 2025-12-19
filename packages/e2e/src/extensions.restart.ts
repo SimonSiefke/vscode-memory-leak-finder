@@ -2,6 +2,8 @@ import type { TestContext } from '../types.js'
 
 export const skip = 1
 
+export const requiresNetwork = 1
+
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
