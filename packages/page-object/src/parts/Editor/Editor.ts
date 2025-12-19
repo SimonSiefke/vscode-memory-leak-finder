@@ -70,7 +70,10 @@ export const create = ({ page, expect, VError, ideVersion }) => {
           await expect(placeholder).toBeVisible()
           await page.waitForIdle()
           const quickPick = QuickPick.create({ page, expect, VError })
-          await quickPick.executeCommand('workbench.action.reopenEditorWith')
+          await quickPick.executeCommand(WellKnownCommands.ReopenEditorWith, {
+            stayVisible: true,
+            pressKeyOnce: true,
+          })
           await page.waitForIdle()
           await quickPick.type('hex')
           await page.waitForIdle()
