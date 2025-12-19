@@ -44,12 +44,19 @@ export const create = ({ expect, page, VError, ideVersion }) => {
           const extensionsInput = extensionsView.locator('.native-edit-context')
           await extensionsInput.type(value)
         }
+        await this.waitForProgressToBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to search for ${value}`)
+      }
+    },
+    async waitForProgressToBeHidden() {
+      try {
         await page.waitForIdle()
         const progress = page.locator('.sidebar .monaco-progress-container')
         await expect(progress).toBeHidden({ timeout: 30_000 })
         await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to search for ${value}`)
+        throw new VError(error, `Failed to hide progress`)
       }
     },
     async clear() {
