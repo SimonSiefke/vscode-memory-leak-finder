@@ -9,10 +9,15 @@ export const create = ({ page, expect, VError }) => {
       try {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, VError })
-        await quickPick.executeCommand(WellKnownCommands.ConfigureTask)
+        await quickPick.executeCommand(WellKnownCommands.ConfigureTask, {
+          pressKeyOnce: true,
+          stayVisible: true,
+        })
         await page.waitForIdle()
         await quickPick.select('Create tasks.json file from template', true)
         await page.waitForIdle()
+        const taskInput = page.locator('input[aria-label="Select a Task Template"]')
+        await expect(taskInput).toBeVisible()
         await quickPick.select('Others')
         const tabsContainer = page.locator('.tabs-and-actions-container')
         await expect(tabsContainer).toBeVisible()
