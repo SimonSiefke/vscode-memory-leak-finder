@@ -19,6 +19,6 @@
     "@lvce-editor/rpc": "^4.20.0"
   },
   "devDependencies": {
-    "@types/node": "^25.0.2"
+    "@types/node": "^25.0.3"
   }
 }
