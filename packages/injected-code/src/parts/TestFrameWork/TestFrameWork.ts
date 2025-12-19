@@ -184,7 +184,8 @@ export const checkTitle = async (expectedTitle) => {
 
 export const checkMultiElementCondition = async (locator, fnName, options) => {
   const startTime = Time.getTimeStamp()
-  const endTime = startTime + maxTimeout
+  const timeout = options.timeout || maxTimeout
+  const endTime = startTime + timeout
   let currentTime = startTime
   const fn = MultiElementConditionMap.getFunction(fnName)
   while (currentTime < endTime) {
