@@ -123,6 +123,8 @@ jobs:
             args: --measure named-function-count3 --runs 37 --restart-between --run-skipped-tests-anyway
           - name: named-function-count3-shared-process
             args: --measure named-function-count3 --runs 37 --restart-between --run-skipped-tests-anyway --inspect-shared-process
+          - name: named-function-count3-extensions
+            args: --measure named-function-count3 --runs 37 --restart-between --run-skipped-tests-anyway --inspect-extensions
           - name: mutation-observer-count
             args: --measure mutation-observer-count
           - name: resize-observer-count
@@ -290,6 +292,11 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-named-function-count3-shared-process
           path: ./vscode-memory-leak-finder-results-linux-named-function-count3-shared-process
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-named-function-count3-extensions
+          path: ./vscode-memory-leak-finder-results-linux-named-function-count3-extensions
       - uses: actions/download-artifact@v4
         continue-on-error: true
         with:
