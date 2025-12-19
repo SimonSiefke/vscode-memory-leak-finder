@@ -1,6 +1,7 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as ImportTest from '../ImportTest/ImportTest.ts'
 import * as TestStage from '../TestStage/TestStage.ts'
+import * as TestWorkerState from '../TestWorkerState/TestWorkerState.ts'
 
 // @ts-ignore
 export const setupTestWithCallback = async (pageObject, file, forceRun) => {
@@ -11,6 +12,14 @@ export const setupTestWithCallback = async (pageObject, file, forceRun) => {
   const wasOriginallySkipped = Boolean(module.skip)
   const isCi = process.env.GITHUB_ACTIONS
   if (module.requiresNetwork && isCi) {
+    return { skipped: true, wasOriginallySkipped, error: null }
+  }
+  const inspectExtensions = TestWorkerState.getInspectExtensions()
+  if (
+    inspectExtensions &&
+    Array.isArray(module.flags) &&
+    module.flags.includes('skipIfInspectExtensions')
+  ) {
     return { skipped: true, wasOriginallySkipped, error: null }
   }
   if (module.skip && !forceRun) {
