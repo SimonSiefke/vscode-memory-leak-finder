@@ -25,26 +25,20 @@ export const create = ({ electronApp, page, expect, VError }) => {
       await page.waitForIdle()
     },
     async addExtension(name) {
-      const electron = Electron.create({ electronApp, VError })
-      const extensionsFolder = join(Root.root, '.vscode-extensions-source', name)
-      await electron.mockOpenDialog({
-        response: {
+      try {
+        const electron = Electron.create({ electronApp, VError })
+        const extensionsFolder = join(Root.root, '.vscode-extensions-source', name)
+        await electron.mockOpenDialog({
           canceled: false,
           filePaths: [extensionsFolder],
           bookmarks: [],
-        },
-      })
-      const quickPick = QuickPick.create({ page, expect, VError })
-      await quickPick.executeCommand(WellKnownCommands.InstallExtensionFromLocation)
-      // const destination = join(Root.root, '.vscode-test-workspace', '.vscode', 'extensions', name)
-      // await mkdir(dirname(destination), {
-      //   recursive: true,
-      // })
-      // await cp(extensionsFolder, destination, {
-      //   recursive: true,
-      // })
-      // await page.waitForIdle()
-      // TODO mock dialog
+        })
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.InstallExtensionFromLocation)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to add extension ${name}`)
+      }
     },
     async initializeGitRepository() {
       const workspace = join(Root.root, '.vscode-test-workspace')
