@@ -43,7 +43,7 @@ export const toHaveText = (element, options) => {
     const regex = new RegExp(options.regex, 'i')
     return regex.test(existingText)
   }
-  throw new Error(`invalid options`)
+  throw new Error(`invalid options: text or regex is required`)
 }
 
 export const toHaveAttribute = (element, { key, value, isRegex }) => {

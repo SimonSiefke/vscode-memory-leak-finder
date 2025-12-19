@@ -7,23 +7,36 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
     {
       name: 'index.css',
       content: `h1{
-    abc
+abc
 }`,
     },
   ])
   await Editor.open('index.css')
+  await Editor.shouldHaveBreadCrumb('index.css')
   await Editor.shouldHaveSquigglyError()
+  // @ts-ignore
+  await Editor.setCursor(1, 1)
 }
 
 export const run = async ({ Editor, Hover }: TestContext): Promise<void> => {
+  await Editor.shouldHaveText(`h1{
+abc
+}`)
   await Editor.shouldHaveSquigglyError()
   // @ts-ignore
-  await Editor.hover('}')
-  await Hover.shouldHaveText('colon expected')
-  await Editor.click('abc')
-  await Editor.deleteCharactersRight({ count: 4 })
+  await Editor.hover('}', /colon expected/)
+  await Hover.hide()
+  // @ts-ignore
+  await Editor.setCursor(2, 1)
+  await Editor.deleteCharactersRight({ count: 3 })
+  await Editor.shouldHaveText(`h1{
+
+}`)
   await Editor.shouldNotHaveSquigglyError()
-  await Editor.type(' abc')
+  await Editor.type('abc')
+  await Editor.shouldHaveText(`h1{
+abc
+}`)
   await Editor.shouldHaveSquigglyError()
 }
 

@@ -110,7 +110,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await expect(editContext).toBeFocused()
       }
     },
-    async hover(text, hoverText) {
+    async hover(text: string, hoverText: string) {
       try {
         await page.waitForIdle()
         const editor = page.locator('.editor-instance')
@@ -118,28 +118,18 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
         const startTag = editor.locator('[class^="mtk"]', { hasText: text }).first()
         await expect(startTag).toBeVisible()
+        await page.waitForIdle()
         await startTag.click()
-        let tries = 0
         const quickPick = QuickPick.create({ expect, page, VError })
         const tooltip = editor.locator('.monaco-hover')
-        while (true) {
-          for (let i = 0; i < tries; i++) {
-            await page.waitForIdle()
-          }
-          await quickPick.executeCommand(WellKnownCommands.ShowOrFocusHover)
-          const isVisible = await tooltip.isVisible()
-          if (isVisible) {
-            break
-          }
-          for (let i = 0; i < tries; i++) {
-            await page.waitForIdle()
-          }
-          tries++
-          if (tries === 30) {
-            throw new Error(`Failed to wait for hover`)
-          }
-        }
+        await expect(tooltip).toBeHidden()
+        await quickPick.executeCommand(WellKnownCommands.ShowOrFocusHover, {
+          pressKeyOnce: true,
+        })
+        await expect(tooltip).toBeVisible()
+        await page.waitForIdle()
         await expect(tooltip).toHaveText(hoverText)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to hover ${text}`)
       }
@@ -514,9 +504,12 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     },
     async deleteCharactersRight({ count }) {
       try {
+        await page.waitForIdle()
         for (let i = 0; i < count; i++) {
           await page.keyboard.press('Delete')
+          await page.waitForIdle()
         }
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to delete character right`)
       }
