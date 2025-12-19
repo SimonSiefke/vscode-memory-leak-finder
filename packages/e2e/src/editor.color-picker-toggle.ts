@@ -13,7 +13,10 @@ export const setup = async ({ Editor, Workspace, Explorer }: TestContext): Promi
   await Explorer.focus()
   await Explorer.shouldHaveItem('index.txt')
   await Editor.open('index.txt')
+  await Editor.shouldHaveBreadCrumb('index.txt')
   await Editor.shouldHaveText('hello world')
+  // @ts-ignore
+  await Editor.setCursor(1, 1)
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
