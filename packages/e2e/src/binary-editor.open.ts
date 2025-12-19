@@ -12,6 +12,7 @@ export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promi
   ])
   await Editor.closeAll()
   await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.shouldHaveItem('file.bin')
 }
 
