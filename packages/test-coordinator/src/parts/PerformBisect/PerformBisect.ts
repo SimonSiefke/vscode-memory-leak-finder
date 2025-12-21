@@ -1,10 +1,10 @@
-import type { RunTestsOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import type { BisectResult } from '../BisectResult/BisectResult.ts'
+import type { RunTestsOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import type { RunTestsSuccessResult } from '../RunTestsSuccessResult/RunTestsSuccessResult.ts'
-import * as FetchCommits from '../FetchCommits/FetchCommits.ts'
-import * as RunTestsWithCallback from '../RunTestsWithCallback/RunTestsWithCallback.ts'
 import * as CliProcess from '../CliProcess/CliProcess.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
+import * as FetchCommits from '../FetchCommits/FetchCommits.ts'
+import * as RunTestsWithCallback from '../RunTestsWithCallback/RunTestsWithCallback.ts'
 
 const callback = async (method, ...params) => {
   await CliProcess.invoke(method, ...params)
@@ -14,7 +14,7 @@ export const performBisect = async (options: RunTestsOptions): Promise<BisectRes
   let commits
   try {
     commits = await FetchCommits.fetchCommits()
-  } catch (error) {
+  } catch {
     return {
       type: 'failed-test',
     }
@@ -42,11 +42,11 @@ export const performBisect = async (options: RunTestsOptions): Promise<BisectRes
     try {
       const result = await RunTestsWithCallback.runTestsWithCallback({
         ...options,
+        addDisposable: Disposables.add,
+        callback,
+        clearDisposables: Disposables.disposeAll,
         commit: '',
         insidersCommit: commitHash,
-        callback,
-        addDisposable: Disposables.add,
-        clearDisposables: Disposables.disposeAll,
       })
 
       if (result.type === 'error') {
@@ -87,8 +87,8 @@ export const performBisect = async (options: RunTestsOptions): Promise<BisectRes
 
   if (lastLeakingCommit) {
     return {
-      type: 'success',
       commit: lastLeakingCommit,
+      type: 'success',
     }
   } else {
     return {

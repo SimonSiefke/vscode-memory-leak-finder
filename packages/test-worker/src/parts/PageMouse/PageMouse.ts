@@ -5,12 +5,12 @@ export const mockPointerEvents = async (rpc, utilityContext) => {
   Assert.object(rpc)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
+      arguments: [],
+      awaitPromise: true,
       functionDeclaration: `() => {
   Element.prototype.setPointerCapture = () => {}
   Element.prototype.releasePointerCapture = () => {}
 }`,
-      arguments: [],
-      awaitPromise: true,
     },
     {
       rpc,
@@ -22,9 +22,9 @@ export const down = async (rpc, utilityContext) => {
   Assert.object(rpc)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(key) => test.mouseDown(key)',
       arguments: [],
       awaitPromise: true,
+      functionDeclaration: '(key) => test.mouseDown(key)',
     },
     {
       rpc,
@@ -39,7 +39,6 @@ export const move = async (rpc, utilityContext, x, y) => {
   Assert.number(y)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(x,y) => test.mouseMove(x,y)',
       arguments: [
         {
           value: x,
@@ -49,6 +48,7 @@ export const move = async (rpc, utilityContext, x, y) => {
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(x,y) => test.mouseMove(x,y)',
     },
     {
       rpc,
@@ -61,9 +61,9 @@ export const up = async (rpc, utilityContext) => {
   Assert.object(rpc)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(locator, fnName, options) => test.mouseUp(locator, fnName, options)',
       arguments: [],
       awaitPromise: true,
+      functionDeclaration: '(locator, fnName, options) => test.mouseUp(locator, fnName, options)',
     },
     {
       rpc,

@@ -4,8 +4,6 @@ import * as ExpectPageToBeMinimized from '../src/parts/ExpectPageToBeMinimized/E
 
 test('execute', async () => {
   const page = {
-    sessionId: 'test-sessionId',
-    targetId: 'test-targetId',
     electronObjectId: 'test-electronObjectId',
     electronRpc: {
       invoke: jest.fn(() => {
@@ -18,6 +16,8 @@ test('execute', async () => {
         }
       }),
     },
+    sessionId: 'test-sessionId',
+    targetId: 'test-targetId',
   }
   await ExpectPageToBeMinimized.toBeMinimized(page)
   expect(page.electronRpc.invoke).toHaveBeenCalledTimes(1)
@@ -28,8 +28,8 @@ test('execute', async () => {
         value: 'test-targetId',
       },
     ],
-    functionDeclaration: expect.any(String),
     awaitPromise: true,
+    functionDeclaration: expect.any(String),
     objectId: 'test-electronObjectId',
     returnByValue: true,
   })
