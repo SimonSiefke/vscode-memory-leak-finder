@@ -21,12 +21,12 @@ export const getKeyboardEventOptions = (rawKey) => {
   const keyCode = GetKeyCode.getKeyCode(key)
   const code = GetKeyCode.getCode(key)
   return {
+    bubbles: true,
+    code,
     ctrlKey,
+    key,
+    keyCode,
     metaKey,
     shiftKey,
-    key,
-    bubbles: true,
-    keyCode,
-    code,
   }
 }

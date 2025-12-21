@@ -8,7 +8,7 @@ export const querySelectorAll = (root, selector) => {
   const parts = ParseSelector.parseSelector(selector)
   let currentRoots = [root]
   for (const part of parts) {
-    const { type, body } = part
+    const { body, type } = part
     const module = QuerySelectorAll.getSelectorModule(type)
     currentRoots = module.querySelectorAll(currentRoots, body, selector)
   }

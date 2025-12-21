@@ -46,7 +46,7 @@ export const toHaveText = (element, options) => {
   throw new Error(`invalid options: text or regex is required`)
 }
 
-export const toHaveAttribute = (element, { key, value, isRegex }) => {
+export const toHaveAttribute = (element, { isRegex, key, value }) => {
   Assert.string(key)
   const actualValue = element.getAttribute(key)
   if (isRegex) {
@@ -75,7 +75,7 @@ export const toHaveId = (element, { id }) => {
   return element.id === id
 }
 
-export const toHaveCss = (element, { key, value, isRegex }) => {
+export const toHaveCss = (element, { isRegex, key, value }) => {
   Assert.string(key)
   const actualValue = GetStyleValue.getStyleValue(element, key)
   if (isRegex) {

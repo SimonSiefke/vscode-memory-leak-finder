@@ -2,10 +2,10 @@ import * as MultiElementConditions from '../MultiElementConditions/MultiElementC
 
 export const getFunction = (fnName) => {
   switch (fnName) {
-    case 'toHaveCount':
-      return MultiElementConditions.toHaveCount
     case 'toBeHidden':
       return MultiElementConditions.toBeHidden
+    case 'toHaveCount':
+      return MultiElementConditions.toHaveCount
     default:
       throw new Error(`unexpected function name ${fnName}`)
   }
