@@ -10,6 +10,7 @@ export const handleTestsFinished = async (
   passed: number,
   failed: number,
   skipped: number,
+  skippedFailed: number,
   leaked: number,
   total: number,
   duration: number,
@@ -18,15 +19,17 @@ export const handleTestsFinished = async (
   Assert.number(passed)
   Assert.number(failed)
   Assert.number(skipped)
+  Assert.number(skippedFailed)
   Assert.number(leaked)
   Assert.number(total)
   Assert.number(duration)
   Assert.string(filterValue)
   const isWatchMode = StdinDataState.isWatchMode()
-  const message = GetAllTestsFinishedMessage.getAllTestsFinishedMessage(
+  const message = await GetAllTestsFinishedMessage.getAllTestsFinishedMessage(
     passed,
     failed,
     skipped,
+    skippedFailed,
     leaked,
     total,
     duration,

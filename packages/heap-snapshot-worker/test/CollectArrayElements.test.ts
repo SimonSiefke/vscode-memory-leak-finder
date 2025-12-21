@@ -14,11 +14,11 @@ test('collectArrayElements - should collect elements from a simple array', () =>
       // Node 0: Array object
       // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
       0, 0, 1, 100, 2, 0, 0,  // object "Array" id=1 size=100 edges=2
-      
-      // Node 1: String element "hello"  
+
+      // Node 1: String element "hello"
       // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
       3, 1, 2, 50, 0, 0, 0,   // string "hello" id=2 size=50 edges=0
-      
+
       // Node 2: Number element 42
       // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
       4, 2, 3, 24, 0, 0, 0,   // number "42" id=3 size=24 edges=0
@@ -27,8 +27,8 @@ test('collectArrayElements - should collect elements from a simple array', () =>
       // Edge 0: Array[0] -> string "hello"
       // [type, name_or_index, to_node]
       1, 0, 7,   // element edge: index=0 -> node_1 (offset 7)
-      
-      // Edge 1: Array[1] -> number 42  
+
+      // Edge 1: Array[1] -> number 42
       // [type, name_or_index, to_node]
       1, 1, 14,  // element edge: index=1 -> node_2 (offset 14)
     ]),
@@ -46,7 +46,7 @@ test('collectArrayElements - should collect elements from a simple array', () =>
   const edgeMap = createEdgeMap(snapshot.nodes, snapshot.meta.node_fields)
   const result = collectArrayElements(0, snapshot, edgeMap, 1)
 
-  expect(result).toEqual(['hello', '2'])
+  expect(result).toEqual(['hello', 42])
 })
 
 test('collectArrayElements - should handle empty array', () => {
@@ -140,28 +140,28 @@ test('collectArrayElements - should handle nested arrays at depth > 1', () => {
       // Node 0: Outer Array
       // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
       0, 0, 1, 100, 1, 0, 0,  // object "Array" id=1 size=100 edges=1
-      
-      // Node 1: Inner Array  
+
+      // Node 1: Inner Array
       // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
       0, 0, 2, 80, 2, 0, 0,   // object "Array" id=2 size=80 edges=2
-      
+
       // Node 2: String "inner1"
       // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
       3, 1, 3, 50, 0, 0, 0,   // string "inner1" id=3 size=50 edges=0
-      
+
       // Node 3: String "inner2"
-      // [type, name, id, self_size, edge_count, trace_node_id, detachedness]  
+      // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
       3, 2, 4, 50, 0, 0, 0,   // string "inner2" id=4 size=50 edges=0
     ]),
     edges: new Uint32Array([
       // Edge 0: Outer[0] -> Inner Array
       // [type, name_or_index, to_node]
       1, 0, 7,   // element edge: index=0 -> inner_array (offset 7)
-      
+
       // Edge 1: Inner[0] -> "inner1"
-      // [type, name_or_index, to_node]  
+      // [type, name_or_index, to_node]
       1, 0, 14,  // element edge: index=0 -> "inner1" (offset 14)
-      
+
       // Edge 2: Inner[1] -> "inner2"
       // [type, name_or_index, to_node]
       1, 1, 21,  // element edge: index=1 -> "inner2" (offset 21)

@@ -2,7 +2,7 @@ import * as GetWidgetCountData from '../GetWidgetCountData/GetWidgetCountData.ts
 
 export const name = 'widget-count'
 
-export const getData = GetWidgetCountData.getWidgetCountData
+export const getData = (basePath: string) => GetWidgetCountData.getWidgetCountData(basePath)
 
 export const createChart = () => {
   return {

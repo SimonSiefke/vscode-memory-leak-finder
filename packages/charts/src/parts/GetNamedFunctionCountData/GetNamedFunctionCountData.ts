@@ -1,10 +1,9 @@
 import { existsSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { join } from 'path'
-import * as Root from '../Root/Root.ts'
 
-export const getNamedFunctionCountData = async () => {
-  const resultsPath = join(Root.root, '.vscode-memory-leak-finder-results', 'named-function-count2')
+export const getNamedFunctionCountData = async (basePath: string) => {
+  const resultsPath = join(basePath, 'named-function-count2')
   if (!existsSync(resultsPath)) {
     console.log('no result')
     return []

@@ -1,20 +1,14 @@
-import { fixHtmlNamespace } from '../FixXmlNamespace/FixXmlNamespace.ts'
-import * as Plot from '../Plot/Plot.ts'
+import { createBarChart } from '../CreateBarChart/CreateBarChart.ts'
+import { createDefaultChart } from '../CreateDefaultChart/CreateDefaultChart.ts'
+import { createDualBarChart } from '../CreateDualBarChart/CreateDualBarChart.ts'
 
-export const createChart = (data, { x, y, xLabel, yLabel }) => {
-  const baseHtml = Plot.plot({
-    style: 'overflow: visible;background:white',
-    marginLeft: 60,
-    y: {
-      grid: true,
-      label: yLabel,
-    },
-    x: {
-      label: xLabel,
-    },
-    marks: [Plot.lineY(data, { x, y })],
-  }).outerHTML
-
-  const finalHtml = fixHtmlNamespace(baseHtml)
-  return finalHtml
+export const createChart = (data: any, options: any) => {
+  switch (options.type) {
+    case 'bar-chart':
+      return createBarChart(data, options)
+    case 'dual-bar-chart':
+      return createDualBarChart(data, options)
+    default:
+      return createDefaultChart(data, options)
+  }
 }

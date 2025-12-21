@@ -1,0 +1,37 @@
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import type { Session } from '../Session/Session.ts'
+import * as SplitLines from '../SplitLines/SplitLines.ts'
+
+export const getConstructorStackTraces = async (session: Session, objectGroup: string, key: string) => {
+  const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
+    expression: `___original${key}.prototype`,
+    returnByValue: false,
+    objectGroup,
+  })
+  const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
+    prototypeObjectId: prototypeDescriptor.objectId,
+    objectGroup,
+  })
+  const stackTraces = await DevtoolsProtocolRuntime.callFunctionOn(session, {
+    functionDeclaration: `function(){
+  const objects = this
+  const getStackTraces = (objects, key) => {
+    const map = globalThis['___map'+key]
+    const stackTraces = []
+    for(const object of objects){
+      const value = map.get(object)
+      if(value){
+        stackTraces.push(value)
+      }
+    }
+    return stackTraces
+  }
+  return getStackTraces(objects, '${key}')
+}`,
+    returnByValue: true,
+    objectId: objects.objects.objectId,
+    objectGroup,
+  })
+  const betterStackTraces = stackTraces.map(SplitLines.splitLines)
+  return betterStackTraces
+}

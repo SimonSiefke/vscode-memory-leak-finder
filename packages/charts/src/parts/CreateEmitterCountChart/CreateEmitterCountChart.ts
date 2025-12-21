@@ -2,7 +2,7 @@ import * as GetEmitterCountData from '../GetEmitterCountData/GetEmitterCountData
 
 export const name = 'emitter-count'
 
-export const getData = GetEmitterCountData.getEmitterCountData
+export const getData = (basePath: string) => GetEmitterCountData.getEmitterCountData(basePath)
 
 export const createChart = () => {
   return {

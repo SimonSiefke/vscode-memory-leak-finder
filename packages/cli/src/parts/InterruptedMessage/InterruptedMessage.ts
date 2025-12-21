@@ -1,9 +1,5 @@
-import chalk from 'chalk'
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
-const interruptedText = 'Test run was interrupted.'
-
-const interruptedMessage = chalk.bold.red(interruptedText)
-
-export const print = (): string => {
-  return interruptedMessage
+export const print = async (): Promise<string> => {
+  return StdoutWorker.invoke('Stdout.getInterruptedMessage')
 }

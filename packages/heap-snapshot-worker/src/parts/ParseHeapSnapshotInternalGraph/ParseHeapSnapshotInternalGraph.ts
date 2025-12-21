@@ -1,0 +1,18 @@
+import * as Assert from '../Assert/Assert.ts'
+
+export const parseHeapSnapshotInternalGraph = (nodes, edges) => {
+  Assert.array(edges)
+  Assert.array(nodes)
+  const graph = Object.create(null)
+  for (const node of nodes) {
+    graph[node.id] = []
+  }
+  let edgeIndex = 0
+  for (const node of nodes) {
+    for (let i = 0; i < node.edgeCount; i++) {
+      const edge = edges[edgeIndex++]
+      graph[node.id].push({ index: edge.toNode, name: edge.nameOrIndex })
+    }
+  }
+  return graph
+}

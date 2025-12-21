@@ -1,9 +1,9 @@
+import { test, expect, beforeAll } from '@jest/globals'
+import * as DomEventType from '../src/parts/DomEventType/DomEventType.ts'
 /**
  * @jest-environment jsdom
  */
 import * as GetEventClass from '../src/parts/GetEventClass/GetEventClass.ts'
-import * as DomEventType from '../src/parts/DomEventType/DomEventType.ts'
-import { test, expect, beforeAll } from '@jest/globals'
 
 beforeAll(() => {
   // @ts-ignore

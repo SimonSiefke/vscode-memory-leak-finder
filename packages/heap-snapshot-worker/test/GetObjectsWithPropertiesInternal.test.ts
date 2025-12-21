@@ -163,12 +163,12 @@ test('should handle number property values', () => {
   expect(result[0]).toEqual({
     id: 1,
     name: 'Object1',
-    propertyValue: '42',
+    propertyValue: 42,
     type: 'object',
     selfSize: 100,
     edgeCount: 1,
     preview: {
-      test: '42',
+      test: 42,
     },
   })
 })
@@ -642,7 +642,7 @@ test('should collect object properties with depth 1', () => {
     edgeCount: 3,
     preview: {
       config: '[Object 4]',
-      newState: '42',
+      newState: 42,
       oldState: 'hello',
     },
   })
@@ -1026,6 +1026,44 @@ test('should show array contents in property preview at depth > 1', () => {
       ],
     },
   })
+})
+
+test('should show closure locations in preview as [function: scriptId:line:column]', () => {
+  // prettier-ignore
+  const snapshot: Snapshot = {
+    node_count: 2,
+    edge_count: 1,
+    extra_native_bytes: 0,
+    meta: {
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp', 'number', 'native', 'synthetic', 'concatenated string', 'sliced string', 'symbol', 'bigint']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    // [type, name, id, self_size, edge_count, trace_node_id, detachedness]
+    nodes: new Uint32Array([
+      3, 1, 1, 100, 1, 0, 0,   // Object with property "send"
+      5, 2, 37423, 0, 0, 123, 0, // Closure node with trace_node_id=123
+    ]),
+    // [type, name_or_index, to_node]
+    edges: new Uint32Array([
+      2, 2, 7, // property edge "send" from object (node 0) to closure (node 1), to_node = 1 * 7
+    ]),
+    strings: ['', 'TestObject', 'send', 'sendClosure'],
+    // locations: one entry mapping trace_node_id (123) to script 1, line 201, column 22
+    // object_index stores array index, so multiply by ITEMS_PER_NODE (7)
+    locations: new Uint32Array([
+      861, 1, 201, 22, // 123 * 7 = 861
+    ]),
+  }
+
+  const result = getObjectsWithPropertiesInternal(snapshot, 'send', 1)
+
+  expect(result).toHaveLength(1)
+  expect(result[0].id).toBe(1)
+  expect(result[0].preview).toBeDefined()
+  expect(result[0].preview?.send).toBe('[function: 1:201:22]')
 })
 
 test('should show simple array contents with primitive values', () => {

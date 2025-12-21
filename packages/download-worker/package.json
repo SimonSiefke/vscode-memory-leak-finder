@@ -2,30 +2,17 @@
   "name": "@vscode-memory-leak-finder/download-worker",
   "version": "0.0.0-dev",
   "description": "",
-  "main": "src/main.ts",
+  "keywords": [],
+  "license": "MIT",
+  "author": "",
   "type": "module",
+  "main": "src/main.ts",
   "bin": {
     "download-worker": "bin/download-worker.js"
   },
   "scripts": {
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
     "test:watch": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
-  "dependencies": {
-    "@lvce-editor/assert": "^1.4.0",
-    "@lvce-editor/rpc": "^4.14.0",
-    "@lvce-editor/verror": "^1.7.0",
-    "@vscode/test-electron": "^2.5.2",
-    "execa": "^9.6.0",
-    "extract-zip": "^2.0.1",
-    "got": "^14.4.7"
-  },
-  "devDependencies": {
-    "ts-jest": "^29.4.1",
-    "@jest/globals": "^30.0.5"
   },
   "jest": {
     "preset": "ts-jest",
@@ -58,5 +45,15 @@
         "statements": 10
       }
     }
-  }
+  },
+  "dependencies": {
+    "@lvce-editor/assert": "^1.5.1",
+    "@lvce-editor/rpc": "^4.20.0",
+    "@lvce-editor/verror": "^1.7.0",
+    "@vscode/test-electron": "^2.5.2",
+    "execa": "^9.6.1",
+    "extract-zip": "^2.0.1",
+    "got": "^14.6.5"
+  },
+  "devDependencies": {}
 }

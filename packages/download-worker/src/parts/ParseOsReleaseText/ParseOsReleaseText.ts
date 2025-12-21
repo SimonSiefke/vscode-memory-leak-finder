@@ -7,7 +7,7 @@ export const parseOSReleaseText = (osReleaseText: string): Record<string, string
     const name = tokens.shift()
     let value = tokens.join('=').trim()
     if (value.startsWith('"') && value.endsWith('"')) {
-      value = value.slice(1, value.length - 1)
+      value = value.slice(1, -1)
     }
     if (!name) {
       continue

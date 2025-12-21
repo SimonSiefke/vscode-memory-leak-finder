@@ -5,9 +5,9 @@ test('getFfmpegOptions returns array of strings', () => {
   const result = GetFfmpegOptions.getFfmpegOptions(25, 1024, 768, '/tmp/test.webm')
   expect(Array.isArray(result)).toBe(true)
   expect(result.length).toBeGreaterThan(0)
-  result.forEach((arg) => {
+  for (const arg of result) {
     expect(typeof arg).toBe('string')
-  })
+  }
 })
 
 test('getFfmpegOptions includes fps in arguments', () => {

@@ -5,8 +5,8 @@ test('main', () => {
   const data = []
   const options = {
     x: 0,
-    y: 0,
     xLabel: 'X',
+    y: 0,
     yLabel: 'Y',
   }
   expect(createChart(data, options))

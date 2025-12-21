@@ -1,8 +1,8 @@
 import { test, expect } from '@jest/globals'
-import * as TestStateOutput from '../src/parts/TestStateOutput/TestStateOutput.ts'
+import * as Character from '../src/parts/Character/Character.ts'
 import * as TestOutputState from '../src/parts/TestOutputState/TestOutputState.ts'
 import * as TestOutputType from '../src/parts/TestOutputType/TestOutputType.ts'
-import * as Character from '../src/parts/Character/Character.ts'
+import * as TestStateOutput from '../src/parts/TestStateOutput/TestStateOutput.ts'
 
 test('addStdout - adds stdout data to state', () => {
   TestOutputState.clear()
@@ -13,8 +13,8 @@ test('addStdout - adds stdout data to state', () => {
   const pending = TestOutputState.getAll()
   expect(pending).toHaveLength(1)
   expect(pending[0]).toEqual({
-    type: TestOutputType.Stdout,
     data: testData,
+    type: TestOutputType.Stdout,
   })
 })
 
@@ -27,8 +27,8 @@ test('addStdErr - adds stderr data to state', () => {
   const pending = TestOutputState.getAll()
   expect(pending).toHaveLength(1)
   expect(pending[0]).toEqual({
-    type: TestOutputType.Stderr,
     data: testData,
+    type: TestOutputType.Stderr,
   })
 })
 

@@ -1,4 +1,6 @@
 export const AllTestsFinished = 'Test.allFinished'
+export const HandleInitialized = 'Test.handleInitialized'
+export const HandleInitializing = 'Test.handleInitializing'
 export const TestFailed = 'Test.failed'
 export const TestPassed = 'Test.passed'
 export const TestRunning = 'Test.running'

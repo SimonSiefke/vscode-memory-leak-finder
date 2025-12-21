@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { getWeakRefCountFromHeapSnapshotInternal } from '../src/parts/GetWeakRefCountFromHeapSnapshotInternal/GetWeakRefCountFromHeapSnapshotInternal.ts'
-import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('should count weak ref objects from heap snapshot', () => {
   // prettier-ignore

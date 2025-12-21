@@ -59,7 +59,7 @@ test('parseHeapSnapshotMetaData - handles snapshot with nested objects', () => {
   expect(result.endIndex).toBeGreaterThan(0)
   expect(result.data).toHaveProperty('node_count', 2)
   expect(result.data).toHaveProperty('edge_count', 1)
-  expect(result.data).toHaveProperty('timestamp', 1234567890)
+  expect(result.data).toHaveProperty('timestamp', 1_234_567_890)
 })
 
 test('parseHeapSnapshotMetaData - handles snapshot with arrays in metadata', () => {
@@ -109,5 +109,5 @@ test('parseHeapSnapshotMetaData - handles snapshot with numeric values in metada
 
   expect(result.couldParse).toBe(true)
   expect(result.endIndex).toBeGreaterThan(0)
-  expect(result.data).toHaveProperty('max_js_object_id', 12345)
+  expect(result.data).toHaveProperty('max_js_object_id', 12_345)
 })

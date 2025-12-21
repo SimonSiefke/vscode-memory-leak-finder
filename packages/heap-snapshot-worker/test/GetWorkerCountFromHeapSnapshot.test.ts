@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { getWorkerCountFromHeapSnapshotInternal } from '../src/parts/GetWorkerCountFromHeapSnapshotInternal/GetWorkerCountFromHeapSnapshotInternal.ts'
-import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('should count worker objects from heap snapshot', () => {
   // prettier-ignore

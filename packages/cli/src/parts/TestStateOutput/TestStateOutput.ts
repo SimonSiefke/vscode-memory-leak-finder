@@ -1,13 +1,13 @@
+import * as Character from '../Character/Character.ts'
 import * as TestOutputState from '../TestOutputState/TestOutputState.ts'
 import * as TestOutputType from '../TestOutputType/TestOutputType.ts'
-import * as Character from '../Character/Character.ts'
 
 export const addStdout = (data) => {
-  TestOutputState.add({ type: TestOutputType.Stdout, data })
+  TestOutputState.add({ data, type: TestOutputType.Stdout })
 }
 
 export const addStdErr = (data) => {
-  TestOutputState.add({ type: TestOutputType.Stderr, data })
+  TestOutputState.add({ data, type: TestOutputType.Stderr })
 }
 const getData = (item) => {
   return item.data

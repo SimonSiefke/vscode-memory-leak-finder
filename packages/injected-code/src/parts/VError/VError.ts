@@ -46,8 +46,8 @@ export class VError extends Error {
       const errorStack = getErrorStack(error)
       this.stack = mergeStacks(this.stack, errorStack)
     }
-    if ((error as any).codeFrame) {
-      ;(this as any).codeFrame = (error as any).codeFrame
+    if (error.codeFrame) {
+      ;(this as any).codeFrame = error.codeFrame
     }
     this.cause = error
   }

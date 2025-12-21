@@ -1,7 +1,5 @@
-const clear = '\r\u001B[K\r\u001B[1A'
-const height = 2
-const clearMessage = clear.repeat(height)
+import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 
-export const getTestClearMessage = (): string => {
-  return clearMessage
+export const getTestClearMessage = async (): Promise<string> => {
+  return StdoutWorker.invoke('Stdout.getTestClearMessage')
 }

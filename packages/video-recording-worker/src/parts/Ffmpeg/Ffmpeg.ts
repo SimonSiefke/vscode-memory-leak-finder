@@ -1,20 +1,20 @@
 import { spawn } from 'child_process'
+import { existsSync } from 'fs'
 import * as Assert from '../Assert/Assert.ts'
 import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.ts'
 import * as GetFfmpegOptions from '../GetFfmpegOptions/GetFfmpegOptions.ts'
 import * as GetFfmpegPath from '../GetFfmpegPath/GetFfmpegPath.ts'
-import { existsSync } from 'fs'
 
 const handleStdinError = () => {
-  console.log('ffmpeg error')
+  console.log('[video-recording-worker] ffmpeg error')
 }
 
 const handleStdinFinished = () => {
-  console.log('ffmpeg finished')
+  console.log('[video-recording-worker] ffmpeg finished')
 }
 
 const handleExit = () => {
-  console.log('ffmpeg exit')
+  console.log('[video-recording-worker] ffmpeg exit')
 }
 
 export const start = async (outFile: string): Promise<void> => {
@@ -32,11 +32,11 @@ export const start = async (outFile: string): Promise<void> => {
     stdio: ['pipe', 'pipe', 'pipe'],
   })
   FfmpegProcessState.set(childProcess)
-  childProcess.stdout.on('data', (x) => {
-    console.log({ x: x.toString() })
+  childProcess.stdout.on('data', (data) => {
+    console.log({ stdout: data.toString() })
   })
-  childProcess.stderr.on('data', (x) => {
-    console.log({ x: x.toString() })
+  childProcess.stderr.on('data', (data) => {
+    console.log({ stderr: data.toString() })
   })
   childProcess.stdin.on('finish', handleStdinFinished)
   childProcess.stdin.on('error', handleStdinError)

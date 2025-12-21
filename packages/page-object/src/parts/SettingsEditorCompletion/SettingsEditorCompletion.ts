@@ -5,11 +5,12 @@ export const create = ({ expect, page, VError }) => {
   return {
     async select({ completionName, completionText }) {
       try {
+        await page.waitForIdle()
         const suggest = page.locator('.settings-header .suggest-input-container .suggest-widget')
         await expect(suggest).toBeVisible()
         const rows = suggest.locator('.monaco-list-rows')
         await expect(rows).toBeVisible()
-        const row = rows.locator(`[role="option"][aria-label="${completionName} "]`)
+        const row = rows.locator(`[role="option"][aria-label="${completionName} , Keyword"]`)
         await expect(row).toBeVisible()
         await page.waitForIdle()
         await row.click()

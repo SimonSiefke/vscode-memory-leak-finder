@@ -1,0 +1,1 @@
+export const E_LAUNCH_ERROR = 'E_LAUNCH_ERROR'

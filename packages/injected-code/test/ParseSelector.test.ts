@@ -1,6 +1,6 @@
+import { test, expect } from '@jest/globals'
 import * as ParseSelector from '../src/parts/ParseSelector/ParseSelector.ts'
 import * as SelectorType from '../src/parts/SelectorType/SelectorType.ts'
-import { test, expect } from '@jest/globals'
 
 test('parseSelector - empty', () => {
   const selector = ''
@@ -11,8 +11,8 @@ test('parseSelector - html element', () => {
   const selector = 'h1'
   expect(ParseSelector.parseSelector(selector)).toEqual([
     {
-      type: SelectorType.Css,
       body: 'h1',
+      type: SelectorType.Css,
     },
   ])
 })
@@ -21,8 +21,8 @@ test('parseSelector - role', () => {
   const selector = '[role="main"]'
   expect(ParseSelector.parseSelector(selector)).toEqual([
     {
-      type: SelectorType.Css,
       body: '[role="main"]',
+      type: SelectorType.Css,
     },
   ])
 })
@@ -31,8 +31,8 @@ test('parseSelector - nth of type', () => {
   const selector = ':nth-of-type(1)'
   expect(ParseSelector.parseSelector(selector)).toEqual([
     {
-      type: SelectorType.Css,
       body: ':nth-of-type(1)',
+      type: SelectorType.Css,
     },
   ])
 })
@@ -41,8 +41,8 @@ test('parseSelector - id', () => {
   const selector = '#main'
   expect(ParseSelector.parseSelector(selector)).toEqual([
     {
-      type: SelectorType.Css,
       body: '#main',
+      type: SelectorType.Css,
     },
   ])
 })
@@ -51,8 +51,8 @@ test('parseSelector - class', () => {
   const selector = '.focused'
   expect(ParseSelector.parseSelector(selector)).toEqual([
     {
-      type: SelectorType.Css,
       body: '.focused',
+      type: SelectorType.Css,
     },
   ])
 })
@@ -61,12 +61,12 @@ test('parseSelector - nth', () => {
   const selector = 'h1:nth(1)'
   expect(ParseSelector.parseSelector(selector)).toEqual([
     {
-      type: SelectorType.Css,
       body: 'h1',
+      type: SelectorType.Css,
     },
     {
-      type: SelectorType.Nth,
       body: ':nth(1)',
+      type: SelectorType.Nth,
     },
   ])
 })
@@ -75,12 +75,12 @@ test('parseSelector - enter iframe', () => {
   const selector = 'iframe:internal-enter-frame()'
   expect(ParseSelector.parseSelector(selector)).toEqual([
     {
-      type: SelectorType.Css,
       body: 'iframe',
+      type: SelectorType.Css,
     },
     {
-      type: SelectorType.InternalEnterFrame,
       body: ':internal-enter-frame()',
+      type: SelectorType.InternalEnterFrame,
     },
   ])
 })
@@ -89,12 +89,12 @@ test('parseSelector - enter shadow', () => {
   const selector = 'div:enter-shadow()'
   expect(ParseSelector.parseSelector(selector)).toEqual([
     {
-      type: SelectorType.Css,
       body: 'div',
+      type: SelectorType.Css,
     },
     {
-      type: SelectorType.EnterShadow,
       body: ':enter-shadow()',
+      type: SelectorType.EnterShadow,
     },
   ])
 })
@@ -103,12 +103,12 @@ test('parseSelector - text', () => {
   const selector = 'h1:has-text("test")'
   expect(ParseSelector.parseSelector(selector)).toEqual([
     {
-      type: SelectorType.Css,
       body: 'h1',
+      type: SelectorType.Css,
     },
     {
-      type: SelectorType.Text,
       body: ':has-text("test")',
+      type: SelectorType.Text,
     },
   ])
 })
@@ -117,12 +117,12 @@ test('parseSelector - text with colon', () => {
   const selector = 'h1:has-text("test: test")'
   expect(ParseSelector.parseSelector(selector)).toEqual([
     {
-      type: SelectorType.Css,
       body: 'h1',
+      type: SelectorType.Css,
     },
     {
-      type: SelectorType.Text,
       body: ':has-text("test: test")',
+      type: SelectorType.Text,
     },
   ])
 })
@@ -131,16 +131,16 @@ test('parseSelector - mix', () => {
   const selector = '.editor-instance [class^="mtk"]:has-text("h1"):nth(0)'
   expect(ParseSelector.parseSelector(selector)).toEqual([
     {
-      type: SelectorType.Css,
       body: '.editor-instance [class^="mtk"]',
+      type: SelectorType.Css,
     },
     {
-      type: SelectorType.Text,
       body: ':has-text("h1")',
+      type: SelectorType.Text,
     },
     {
-      type: SelectorType.Nth,
       body: ':nth(0)',
+      type: SelectorType.Nth,
     },
   ])
 })

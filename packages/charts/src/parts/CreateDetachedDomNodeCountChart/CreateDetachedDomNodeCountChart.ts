@@ -2,7 +2,7 @@ import * as GetDetachedDomNodeCountData from '../GetDetachedDomNodeCountData/Get
 
 export const name = 'detached-dom-node-count'
 
-export const getData = GetDetachedDomNodeCountData.getDetachedDomNodeCountData
+export const getData = (basePath: string) => GetDetachedDomNodeCountData.getDetachedDomNodeCountData(basePath)
 
 export const createChart = () => {
   return {

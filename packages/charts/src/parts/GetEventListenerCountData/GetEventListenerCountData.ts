@@ -1,5 +1,5 @@
 import * as GetCountData from '../GetCountData/GetCountData.ts'
 
-export const getEventListenerCountData = () => {
-  return GetCountData.getCountData('event-listener-count', 'eventListenerCount')
+export const getEventListenerCountData = (basePath: string) => {
+  return GetCountData.getCountData('event-listener-count', 'eventListenerCount', basePath)
 }

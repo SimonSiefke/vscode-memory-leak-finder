@@ -19,15 +19,30 @@ const CHAR_MINUS = '-'.charCodeAt(0)
 for (let i = 0; i < 128; i++) {
   if (i >= CHAR_0 && i <= CHAR_9) {
     charTypes[i] = DIGIT
-  } else if (i === CHAR_COMMA || i === CHAR_SPACE || i === CHAR_TAB || i === CHAR_NEWLINE) {
-    charTypes[i] = SEPARATOR
-  } else if (i === CHAR_CLOSING_BRACKET) {
-    charTypes[i] = CLOSING_BRACKET
-  } else if (i === CHAR_MINUS) {
-    charTypes[i] = MINUS
-  } else {
-    charTypes[i] = OTHER
-  }
+  } else
+    switch (i) {
+      case CHAR_COMMA:
+      case CHAR_SPACE:
+      case CHAR_TAB:
+      case CHAR_NEWLINE: {
+        charTypes[i] = SEPARATOR
+
+        break
+      }
+      case CHAR_CLOSING_BRACKET: {
+        charTypes[i] = CLOSING_BRACKET
+
+        break
+      }
+      case CHAR_MINUS: {
+        charTypes[i] = MINUS
+
+        break
+      }
+      default: {
+        charTypes[i] = OTHER
+      }
+    }
 }
 
 export { charTypes }

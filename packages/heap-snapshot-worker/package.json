@@ -5,7 +5,7 @@
   "main": "src/main.ts",
   "type": "module",
   "bin": {
-    "memory-leak-worker": "bin/heap-snapshot-worker.js"
+    "heap-snapshot-worker": "bin/heap-snapshot-worker.js"
   },
   "scripts": {
     "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit",
@@ -15,15 +15,10 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@lvce-editor/assert": "^1.4.0",
-    "@lvce-editor/rpc": "^4.14.0",
-    "@lvce-editor/verror": "^1.7.0"
+    "@lvce-editor/assert": "^1.5.1",
+    "@lvce-editor/rpc": "^4.20.0"
   },
   "devDependencies": {
-    "@types/node": "^24.2.0",
-    "@jest/globals": "^30.0.5",
-    "@types/babel__code-frame": "^7.0.6",
-    "@types/jest": "^30.0.0",
-    "ts-jest": "^29.4.1"
+    "@types/node": "^25.0.3"
   }
 }

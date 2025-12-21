@@ -14,7 +14,7 @@ export const getEraseDown = (): string => ansiEscapes.eraseDown
 
 export const getBackspace = (): string => ansiEscapes.cursorBackward() + ansiEscapes.eraseEndLine
 
-export const getCursorBackward = (): string => ansiEscapes.cursorBackward()
+export const getCursorBackward = (length: number): string => ansiEscapes.cursorBackward(length)
 
 export const getEraseEndLine = (): string => ansiEscapes.eraseEndLine
 

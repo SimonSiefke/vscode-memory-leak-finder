@@ -1,6 +1,6 @@
+import * as IsMacos from '../IsMacos/IsMacos.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
-import * as IsMacos from '../IsMacos/IsMacos.ts'
 
 const getKeybindingButtonsText = (keyBinding) => {
   if (keyBinding.startsWith('Control+')) {
@@ -20,7 +20,7 @@ export const create = ({ expect, page, VError }) => {
         await quickPick.executeCommand(WellKnownCommands.OpenKeyboardShortcuts)
         const keyBindingsEditor = page.locator('.keybindings-editor')
         await expect(keyBindingsEditor).toBeVisible({
-          timeout: 3_000,
+          timeout: 3000,
         })
         const body = page.locator('.keybindings-body')
         await expect(body).toBeVisible()
@@ -47,7 +47,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(keyBindingsEditor).toBeVisible()
         const row = keyBindingsEditor.locator(`.monaco-list-row[aria-label^="${commandName}"]:nth-of-type(1)`)
         await expect(row).toBeVisible({
-          timeout: 3_000,
+          timeout: 3000,
         })
         await row.dblclick()
         const defineKeyBindingWidget = page.locator('.defineKeybindingWidget')

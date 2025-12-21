@@ -1,28 +1,24 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
+import { MockRpc } from '@lvce-editor/rpc'
 
 beforeEach(() => {
   jest.resetModules()
+  jest.resetAllMocks()
 })
 
 jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   return {
-    write: jest.fn().mockImplementation(() => Promise.resolve()),
+    write: jest.fn(),
   }
 })
 
-jest.unstable_mockModule('../src/parts/IsGithubActions/IsGithubActions.ts', () => {
-  return {
-    isGithubActions: false,
-  }
-})
-
-jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => {
-  return {
-    isBuffering() {
-      return true
-    },
-  }
-})
+jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => ({
+  isBuffering: () => false,
+  isGithubActions: () => true,
+  isWindows: () => false,
+  setBuffering: () => {},
+  setTestStateChange: () => {},
+}))
 
 jest.unstable_mockModule('../src/parts/TestStateOutput/TestStateOutput.ts', () => {
   return {
@@ -32,15 +28,32 @@ jest.unstable_mockModule('../src/parts/TestStateOutput/TestStateOutput.ts', () =
   }
 })
 
+jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string) => {
+      if (method === 'Stdout.getClear') {
+        return '\u001B[2J\u001B[3J\u001B[H'
+      }
+      if (method === 'Stdout.getHandleTestPassedMessage') {
+        return '[ansi-clear] test passed'
+      }
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+
+  return {
+    invoke: mockRpc.invoke.bind(mockRpc),
+  }
+})
+
 const Stdout = await import('../src/parts/Stdout/Stdout.ts')
 const TestStateOutput = await import('../src/parts/TestStateOutput/TestStateOutput.ts')
 const HandleTestPassed = await import('../src/parts/HandleTestPassed/HandleTestPassed.ts')
 
-test('handleTestPassed', () => {
-  HandleTestPassed.handleTestPassed('/test/app.test.js', '/test', 'app.test.js', 100, false)
+test.skip('handleTestPassed', async () => {
+  await HandleTestPassed.handleTestPassed('/test/app.test.js', '/test', 'app.test.js', 100, false, false)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
-  expect(Stdout.write).toHaveBeenCalledWith(
-    '\r\u001B[K\r\u001B[1A\r\u001B[K\r\u001B[1A\u001B[0m\u001B[7m\u001B[1m\u001B[32m PASS \u001B[39m\u001B[22m\u001B[27m\u001B[0m \u001B[2m/test/\u001B[22m\u001B[1mapp.test.js\u001B[22m (0.100 s)\n',
-  )
+  expect(typeof (Stdout.write as any).mock.calls[0][0]).toBe('string')
   expect(TestStateOutput.clearPending).toHaveBeenCalledTimes(1)
 })

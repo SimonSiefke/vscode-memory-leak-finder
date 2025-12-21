@@ -5,7 +5,7 @@ import * as IsFfmpeg from '../IsFfmpeg/IsFfmpeg.ts'
 import * as Registry from '../Registry/Registry.ts'
 
 export const downloadFfmpeg = async (): Promise<void> => {
-  const platform = process.platform
+  const { platform } = process
   const hostPlatform = await GetHostPlatform.getHostPlatform(platform)
   const browsers = Registry.load()
   const ffmpeg = browsers.find(IsFfmpeg.isFfmpeg)

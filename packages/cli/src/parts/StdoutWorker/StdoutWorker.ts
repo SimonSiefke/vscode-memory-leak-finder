@@ -3,13 +3,17 @@ import * as GetStdoutWorkerUrl from '../GetStdoutWorkerUrl/GetStdoutWorkerUrl.ts
 
 let stdoutWorkerRpc: Rpc | undefined
 
+export const set = (rpc: Rpc) => {
+  stdoutWorkerRpc = rpc
+}
+
 export const initialize = async (): Promise<void> => {
   if (!stdoutWorkerRpc) {
     const url = GetStdoutWorkerUrl.getStdoutWorkerUrl()
     stdoutWorkerRpc = await NodeWorkerRpcParent.create({
-      path: url,
       // @ts-ignore
       name: 'Stdout Worker',
+      path: url,
       ref: false,
     })
   }

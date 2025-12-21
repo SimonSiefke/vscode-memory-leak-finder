@@ -1,4 +1,6 @@
 import { beforeEach, expect, jest, test } from '@jest/globals'
+import { MockRpc } from '@lvce-editor/rpc'
+import * as StdoutWorker from '../src/parts/StdoutWorker/StdoutWorker.ts'
 
 beforeEach(() => {
   jest.resetModules()
@@ -10,6 +12,19 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
     write: jest.fn().mockImplementation(() => Promise.resolve()),
   }
 })
+
+const mockRpc = MockRpc.create({
+  commandMap: {},
+  invoke: (method: string) => {
+    if (method === 'Stdout.getWatchUsageMessage') {
+      return 'watch usage'
+    }
+    throw new Error(`unexpected method ${method}`)
+  },
+})
+
+StdoutWorker.set(mockRpc)
+
 jest.unstable_mockModule('../src/parts/WatchUsage/WatchUsage.ts', () => {
   return {
     print: jest.fn(() => 'watch usage'),
@@ -36,11 +51,11 @@ const WatchUsage = await import('../src/parts/WatchUsage/WatchUsage.ts')
 
 test('initialStart - watch mode - show details', async () => {
   const options = {
-    watch: true,
     filter: '',
+    watch: true,
   }
   // @ts-ignore
-  WatchUsage.print.mockImplementation(() => 'watch usage')
+  WatchUsage.print.mockImplementation(async () => 'watch usage')
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).toHaveBeenCalledTimes(1)
   expect(Stdout.write).toHaveBeenCalledTimes(1)
@@ -50,64 +65,24 @@ test('initialStart - watch mode - show details', async () => {
 
 test('initialStart - watch mode - start running', async () => {
   const options = {
-    watch: true,
     filter: 'a',
+    watch: true,
   }
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).toHaveBeenCalledTimes(1)
   expect(Stdout.write).not.toHaveBeenCalled()
   expect(StartRunning.startRunning).toHaveBeenCalledTimes(1)
-  expect(StartRunning.startRunning).toHaveBeenCalledWith(
-    'a',
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-  )
+  expect(StartRunning.startRunning).toHaveBeenCalledWith(expect.objectContaining({ filterValue: 'a' }))
 })
 
 test('initialStart - start running', async () => {
   const options = {
-    watch: false,
     filter: 'a',
+    watch: false,
   }
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).not.toHaveBeenCalled()
   expect(Stdout.write).not.toHaveBeenCalled()
   expect(StartRunning.startRunning).toHaveBeenCalledTimes(1)
-  expect(StartRunning.startRunning).toHaveBeenCalledWith(
-    'a',
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-  )
+  expect(StartRunning.startRunning).toHaveBeenCalledWith(expect.objectContaining({ filterValue: 'a' }))
 })

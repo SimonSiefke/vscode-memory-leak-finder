@@ -1,3 +1,5 @@
+import * as Assert from '../Assert/Assert.ts'
+
 /**
  * Gets the edges for a specific node using the edge map
  * @param nodeIndex - The node index
@@ -15,26 +17,16 @@ export const getNodeEdges = (
   edges: Uint32Array,
   nodeFields: readonly string[],
   edgeFields: readonly string[],
-): Array<{ type: number; nameIndex: number; toNode: number }> => {
+): Uint32Array => {
   const ITEMS_PER_NODE = nodeFields.length
   const ITEMS_PER_EDGE = edgeFields.length
   const edgeCountFieldIndex = nodeFields.indexOf('edge_count')
-  const edgeTypeFieldIndex = edgeFields.indexOf('type')
-  const edgeNameFieldIndex = edgeFields.indexOf('name_or_index')
-  const edgeToNodeFieldIndex = edgeFields.indexOf('to_node')
 
   const startEdgeIndex = edgeMap[nodeIndex]
+  Assert.number(startEdgeIndex)
   const edgeCount = nodes[nodeIndex * ITEMS_PER_NODE + edgeCountFieldIndex]
-  const nodeEdges: Array<{ type: number; nameIndex: number; toNode: number }> = []
 
-  for (let i = 0; i < edgeCount; i++) {
-    const edgeIndex = (startEdgeIndex + i) * ITEMS_PER_EDGE
-    nodeEdges.push({
-      type: edges[edgeIndex + edgeTypeFieldIndex],
-      nameIndex: edges[edgeIndex + edgeNameFieldIndex],
-      toNode: edges[edgeIndex + edgeToNodeFieldIndex],
-    })
-  }
-
-  return nodeEdges
+  const start = startEdgeIndex * ITEMS_PER_EDGE
+  const end = (startEdgeIndex + edgeCount) * ITEMS_PER_EDGE
+  return edges.subarray(start, end)
 }

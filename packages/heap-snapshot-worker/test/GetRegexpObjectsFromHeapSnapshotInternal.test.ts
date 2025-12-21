@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { getRegexpObjectsFromHeapSnapshotInternal } from '../src/parts/GetRegexpObjectsFromHeapSnapshotInternal/GetRegexpObjectsFromHeapSnapshotInternal.js'
-import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('getRegexpObjectsFromHeapSnapshot - no regexp objects', async () => {
   // prettier-ignore

@@ -160,7 +160,7 @@ test('HeapSnapshotWriteStream - handles large numbers in arrays', async () => {
       node_count: 1,
       edge_count: 0,
     },
-    nodes: [0, 0, 123456789, 0, 0, 0, 0],
+    nodes: [0, 0, 123_456_789, 0, 0, 0, 0],
     edges: [],
     locations: [],
     strings: ['', 'root'],
@@ -173,7 +173,7 @@ test('HeapSnapshotWriteStream - handles large numbers in arrays', async () => {
 
   const result = stream.getResult()
 
-  expect(result.nodes[2]).toBe(123456789) // The large number should be parsed correctly
+  expect(result.nodes[2]).toBe(123_456_789) // The large number should be parsed correctly
 })
 
 test('HeapSnapshotWriteStream - handles negative numbers (skips minus sign)', async () => {

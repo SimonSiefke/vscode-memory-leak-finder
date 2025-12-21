@@ -3,7 +3,7 @@ import * as Assert from '../Assert/Assert.ts'
 const querySelectorRoot = (root, body) => {
   Assert.object(root)
   Assert.string(body)
-  return Array.from(root.querySelectorAll(body))
+  return [...root.querySelectorAll(body)]
 }
 
 export const querySelectorAll = (roots, body) => {

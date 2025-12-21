@@ -1,0 +1,37 @@
+export interface StartRunningOptions {
+  bisect: boolean
+  checkLeaks: boolean
+  color: boolean
+  commit: string
+  continueValue: string
+  cwd: string
+  enableExtensions: boolean
+  enableProxy: boolean
+  filterValue: string
+  headlessMode: boolean
+  ide: string
+  ideVersion: string
+  insidersCommit: string
+  inspectExtensions: boolean
+  inspectExtensionsPort: number
+  inspectPtyHost: boolean
+  inspectPtyHostPort: number
+  inspectSharedProcess: boolean
+  inspectSharedProcessPort: number
+  isWindows: boolean
+  measure: string
+  measureAfter: boolean
+  measureNode: boolean
+  recordVideo: boolean
+  restartBetween: boolean
+  runMode: number
+  runs: number
+  runSkippedTestsAnyway: boolean
+  setupOnly: boolean
+  timeoutBetween: number
+  timeouts: boolean
+  useProxyMock: boolean
+  vscodePath: string
+  vscodeVersion: string
+  workers: boolean
+}

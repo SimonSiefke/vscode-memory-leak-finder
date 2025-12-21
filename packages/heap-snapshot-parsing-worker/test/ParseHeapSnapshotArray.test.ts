@@ -10,7 +10,7 @@ test('parseHeapSnapshotArray - parses simple comma-separated numbers', () => {
   expect(result.done).toBe(true)
   expect(result.arrayIndex).toBe(3)
   expect(result.dataIndex).toBe(6) // Position after ']'
-  expect(Array.from(array)).toEqual([1, 2, 3])
+  expect([...array]).toEqual([1, 2, 3])
 })
 
 test('parseHeapSnapshotArray - parses single number', () => {
@@ -72,8 +72,8 @@ test('parseHeapSnapshotArray - handles large numbers', () => {
 
   expect(result.done).toBe(true)
   expect(result.arrayIndex).toBe(2)
-  expect(array[0]).toBe(123456789)
-  expect(array[1]).toBe(987654321)
+  expect(array[0]).toBe(123_456_789)
+  expect(array[1]).toBe(987_654_321)
 })
 
 test('parseHeapSnapshotArray - handles zero values', () => {
@@ -84,7 +84,7 @@ test('parseHeapSnapshotArray - handles zero values', () => {
 
   expect(result.done).toBe(true)
   expect(result.arrayIndex).toBe(3)
-  expect(Array.from(array)).toEqual([0, 0, 0])
+  expect([...array]).toEqual([0, 0, 0])
 })
 
 test('parseHeapSnapshotArray - handles consecutive commas', () => {
@@ -107,7 +107,7 @@ test('parseHeapSnapshotArray - handles whitespace around numbers', () => {
 
   expect(result.done).toBe(true)
   expect(result.arrayIndex).toBe(3)
-  expect(Array.from(array)).toEqual([1, 2, 3])
+  expect([...array]).toEqual([1, 2, 3])
 })
 
 test('parseHeapSnapshotArray - throws error for unexpected token', () => {

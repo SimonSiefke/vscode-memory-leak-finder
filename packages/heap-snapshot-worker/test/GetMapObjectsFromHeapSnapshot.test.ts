@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { getMapObjectsFromHeapSnapshotInternal } from '../src/parts/GetMapObjectsFromHeapSnapshotInternal/GetMapObjectsFromHeapSnapshotInternal.js'
-import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('getMapObjectsFromHeapSnapshot - no map objects', () => {
   // prettier-ignore

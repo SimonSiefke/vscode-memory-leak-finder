@@ -1,8 +1,9 @@
 import { getWorkerCountFromHeapSnapshotInternal } from '../GetWorkerCountFromHeapSnapshotInternal/GetWorkerCountFromHeapSnapshotInternal.ts'
-import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.js'
+import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 
 export const getWorkerCountFromHeapSnapshot = async (path: string): Promise<number> => {
-  const snapshot = await prepareHeapSnapshot(path, {
+  // @ts-ignore minimal typing for migration
+  const snapshot: any = await prepareHeapSnapshot(path, {
     parseStrings: true,
   })
   return getWorkerCountFromHeapSnapshotInternal(snapshot)

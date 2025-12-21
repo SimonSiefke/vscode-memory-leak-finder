@@ -1,8 +1,9 @@
-import { getMediaQueryListCountFromHeapSnapshotInternal } from '../GetMediaQueryListCountFromHeapSnapshotInternal/GetMediaQueryListCountFromHeapSnapshotInternal.js'
-import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.js'
+import { getMediaQueryListCountFromHeapSnapshotInternal } from '../GetMediaQueryListCountFromHeapSnapshotInternal/GetMediaQueryListCountFromHeapSnapshotInternal.ts'
+import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 
 export const getMediaQueryListCountFromHeapSnapshot = async (path: string): Promise<number> => {
-  const snapshot = await prepareHeapSnapshot(path, {
+  // @ts-ignore minimal typing for migration
+  const snapshot: any = await prepareHeapSnapshot(path, {
     parseStrings: true,
   })
   return getMediaQueryListCountFromHeapSnapshotInternal(snapshot)

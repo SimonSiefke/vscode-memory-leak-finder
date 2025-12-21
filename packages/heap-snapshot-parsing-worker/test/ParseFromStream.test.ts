@@ -1,6 +1,6 @@
 import { test, expect } from '@jest/globals'
-import { createHeapSnapshotWriteStream } from '../src/parts/HeapSnapshotWriteStream/HeapSnapshotWriteStream.ts'
 import * as HeapSnapshotParsingState from '../src/parts/HeapSnapshotParsingState/HeapSnapshotParsingState.ts'
+import { createHeapSnapshotWriteStream } from '../src/parts/HeapSnapshotWriteStream/HeapSnapshotWriteStream.ts'
 
 test('parseFromStream - reproduces string parsing issue with multiple chunks', async () => {
   // Create a minimal heap snapshot that ends with locations and strings
@@ -31,8 +31,8 @@ test('parseFromStream - reproduces string parsing issue with multiple chunks', a
 
   // Split the data into chunks that would cause the issue
   // The first chunk ends right after the locations array
-  const chunk1 = heapSnapshotData.substring(0, heapSnapshotData.indexOf('"strings":'))
-  const chunk2 = heapSnapshotData.substring(heapSnapshotData.indexOf('"strings":'))
+  const chunk1 = heapSnapshotData.slice(0, Math.max(0, heapSnapshotData.indexOf('"strings":')))
+  const chunk2 = heapSnapshotData.slice(Math.max(0, heapSnapshotData.indexOf('"strings":')))
 
   const writeStream = createHeapSnapshotWriteStream({
     parseStrings: true,
@@ -86,8 +86,8 @@ test('parseFromStream - reproduces issue with locations array ending in middle o
 
   // Split the data so that the locations array ends in the middle of chunk1
   const locationsEndIndex = heapSnapshotData.indexOf('],')
-  const chunk1 = heapSnapshotData.substring(0, locationsEndIndex + 2) // Include the "],"
-  const chunk2 = heapSnapshotData.substring(locationsEndIndex + 2)
+  const chunk1 = heapSnapshotData.slice(0, Math.max(0, locationsEndIndex + 2)) // Include the "],"
+  const chunk2 = heapSnapshotData.slice(Math.max(0, locationsEndIndex + 2))
 
   const writeStream = createHeapSnapshotWriteStream({
     parseStrings: true,
@@ -142,8 +142,8 @@ test('parseFromStream - reproduces actual heap snapshot format issue', async () 
   // Split the data to simulate the actual issue where the locations array ends with numbers
   // and is immediately followed by the strings section
   const locationsEndIndex = heapSnapshotData.indexOf('],')
-  const chunk1 = heapSnapshotData.substring(0, locationsEndIndex + 2) // Include the "],"
-  const chunk2 = heapSnapshotData.substring(locationsEndIndex + 2)
+  const chunk1 = heapSnapshotData.slice(0, Math.max(0, locationsEndIndex + 2)) // Include the "],"
+  const chunk2 = heapSnapshotData.slice(Math.max(0, locationsEndIndex + 2))
 
   const writeStream = createHeapSnapshotWriteStream({
     parseStrings: true,
@@ -204,8 +204,8 @@ test('parseFromStream - reproduces issue with multiple opening brackets before s
 
   // Split the data so that the locations array ends and strings begin in the middle
   const locationsEndIndex = largeDataWithBrackets.indexOf('],')
-  const chunk1 = largeDataWithBrackets.substring(0, locationsEndIndex + 2) // Include the "],"
-  const chunk2 = largeDataWithBrackets.substring(locationsEndIndex + 2)
+  const chunk1 = largeDataWithBrackets.slice(0, Math.max(0, locationsEndIndex + 2)) // Include the "],"
+  const chunk2 = largeDataWithBrackets.slice(Math.max(0, locationsEndIndex + 2))
 
   const writeStream = createHeapSnapshotWriteStream({
     parseStrings: true,

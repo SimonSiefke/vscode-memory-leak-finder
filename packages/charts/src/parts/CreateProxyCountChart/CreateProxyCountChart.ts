@@ -2,7 +2,7 @@ import * as GetProxyCountData from '../GetProxyCountData/GetProxyCountData.ts'
 
 export const name = 'proxy-count'
 
-export const getData = GetProxyCountData.getProxyCountData
+export const getData = (basePath: string) => GetProxyCountData.getProxyCountData(basePath)
 
 export const createChart = () => {
   return {

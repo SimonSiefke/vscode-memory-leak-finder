@@ -1,5 +1,5 @@
-import { chmod } from 'node:fs/promises'
 import { VError } from '@lvce-editor/verror'
+import { chmod } from 'node:fs/promises'
 
 export const makeExecutable = async (file: string): Promise<void> => {
   try {

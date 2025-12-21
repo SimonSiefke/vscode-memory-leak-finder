@@ -8,19 +8,21 @@ const getNewValue = (value, selectionStart, selectionEnd, text) => {
   return value.slice(0, selectionStart) + text + value.slice(selectionEnd)
 }
 
-const isInputElement = (element) => {
+export const isInputElement = (element) => {
   return element && (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement)
 }
 
 export const type = (element, options) => {
-  const selectionStart = element.selectionStart
-  const selectionEnd = element.selectionEnd
+  const { selectionStart } = element
+  const { selectionEnd } = element
   const oldValue = element.value || ''
   const newValue = getNewValue(oldValue, selectionStart, selectionEnd, options.text)
   if (isInputElement(element)) {
     element.value = newValue
   }
   dispatchEditContextUpdate(element, newValue)
-  DispatchEvent.input(element, {})
+  DispatchEvent.input(element, {
+    inputType: 'insertText',
+  })
   DispatchEvent.change(element, {})
 }

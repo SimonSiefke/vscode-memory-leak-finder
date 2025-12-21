@@ -1,13 +1,13 @@
 import { VError } from '@lvce-editor/verror'
+import { findFiles } from '../FileSystemWorker/FileSystemWorker.ts'
 import * as Path from '../Path/Path.ts'
-import { findFiles } from '../Filesystem/Filesystem.ts'
 
 /**
  * Finds all package-lock.json files in a directory using glob
  * @param {string} folder - of the directory to search in
  * @returns {Promise<string[]>} - Array of paths to package-lock.json files
  */
-export const findPackageLockFiles = async (folder) => {
+export const findPackageLockFiles = async (folder: string): Promise<readonly string[]> => {
   try {
     const packageLockPaths = await findFiles('**/package-lock.json', {
       cwd: folder,

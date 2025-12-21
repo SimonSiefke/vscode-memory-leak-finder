@@ -11,11 +11,11 @@ class ReadableString extends Readable {
   }
 
   _read() {
-    if (!this.sent) {
+    if (this.sent) {
+      this.push(null)
+    } else {
       this.push(Buffer.from(this.str))
       this.sent = true
-    } else {
-      this.push(null)
     }
   }
 }

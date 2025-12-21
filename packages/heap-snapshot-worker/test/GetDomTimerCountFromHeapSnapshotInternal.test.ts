@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { getDomTimerCountFromHeapSnapshotInternal } from '../src/parts/GetDomTimerCountFromHeapSnapshotInternal/GetDomTimerCountFromHeapSnapshotInternal.js'
-import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('should count DOM timer objects from heap snapshot', () => {
   // prettier-ignore

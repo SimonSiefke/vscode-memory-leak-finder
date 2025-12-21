@@ -1,6 +1,6 @@
+import * as Panel from '../Panel/Panel.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
-import * as Panel from '../Panel/Panel.ts'
 
 export const create = ({ expect, page, VError }) => {
   return {
@@ -38,6 +38,46 @@ export const create = ({ expect, page, VError }) => {
         await expect(markersPanel).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to hide problems`)
+      }
+    },
+    async switchToTreeView() {
+      try {
+        await page.waitForIdle()
+        const markersPanel = page.locator('.markers-panel')
+        await expect(markersPanel).toBeVisible()
+        await page.waitForIdle()
+        const panel = page.locator('.part.panel')
+        const viewAsListButton = panel.locator('[aria-label="View as Tree"]')
+        const count = await viewAsListButton.count()
+        if (count === 0) {
+          return
+        }
+        await viewAsListButton.click()
+        await page.waitForIdle()
+        await expect(viewAsListButton).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to switch to tree view`)
+      }
+    },
+    async switchToTableView() {
+      try {
+        await page.waitForIdle()
+        const markersPanel = page.locator('.markers-panel')
+        await expect(markersPanel).toBeVisible()
+        await page.waitForIdle()
+        const panel = page.locator('.part.panel')
+        const viewAsTableButton = panel.locator('[aria-label="View as Table"]')
+        const count = await viewAsTableButton.count()
+        if (count === 0) {
+          return
+        }
+        await viewAsTableButton.click()
+        await page.waitForIdle()
+        await expect(viewAsTableButton).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to switch to table view`)
       }
     },
   }

@@ -1,8 +1,8 @@
+import { test, expect } from '@jest/globals'
 /**
  * @jest-environment jsdom
  */
 import * as QuerySelectorAllInternalEnterFrame from '../src/parts/QuerySelectorAllInternalEnterFrame/QuerySelectorAllInternalEnterFrame.ts'
-import { test, expect } from '@jest/globals'
 
 test('no elements found', () => {
   const roots = []
@@ -23,10 +23,10 @@ test('element is not of type iframe', () => {
 
 test('select inside iframe', () => {
   const element = {
-    nodeName: 'IFRAME',
     contentDocument: {
       querySelectorAll() {},
     },
+    nodeName: 'IFRAME',
   }
   const roots = [element]
   expect(QuerySelectorAllInternalEnterFrame.querySelectorAll(roots, '', '')).toEqual([element.contentDocument])

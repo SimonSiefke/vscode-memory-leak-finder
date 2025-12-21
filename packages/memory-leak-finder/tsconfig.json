@@ -8,6 +8,7 @@
     "moduleResolution": "NodeNext",
     "isolatedModules": true,
     "strict": false,
+    "strictNullChecks": true,
     "noImplicitAny": false,
     "skipLibCheck": true,
     "noEmit": true,
@@ -17,9 +18,10 @@
     "rootDir": ".",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
-    "noUnusedLocals": false,
+    "noUnusedLocals": true,
     "composite": true,
-    "useUnknownInCatchVariables": false
+    "useUnknownInCatchVariables": false,
+    "allowImportingTsExtensions": true
   },
   "include": ["src", "test"]
 }

@@ -1,5 +1,5 @@
-import { VError } from '../VError/VError.ts'
 import * as Json from '../Json/Json.ts'
+import { VError } from '../VError/VError.ts'
 import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWebSocketToBeOpen.ts'
 
 /**
@@ -10,12 +10,8 @@ export const createConnection = async (wsUrl) => {
     const webSocket = new WebSocket(wsUrl)
     await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket)
     return {
-      /**
-       *
-       * @param {any} message
-       */
-      send(message) {
-        webSocket.send(Json.stringify(message))
+      dispose() {
+        webSocket.close()
       },
       get onmessage() {
         return webSocket.onmessage
@@ -27,6 +23,13 @@ export const createConnection = async (wsUrl) => {
           listener(parsed)
         }
         webSocket.onmessage = handleMessage
+      },
+      /**
+       *
+       * @param {any} message
+       */
+      send(message) {
+        webSocket.send(Json.stringify(message))
       },
     }
   } catch (error) {

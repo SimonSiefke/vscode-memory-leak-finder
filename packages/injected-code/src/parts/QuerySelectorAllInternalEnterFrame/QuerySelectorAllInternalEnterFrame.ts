@@ -9,6 +9,6 @@ export const querySelectorAll = (roots: any[], body: string, selector: string): 
   if (element.nodeName !== 'IFRAME') {
     throw new Error('node is not of type iframe')
   }
-  const contentDocument = element.contentDocument
+  const { contentDocument } = element
   return [contentDocument]
 }

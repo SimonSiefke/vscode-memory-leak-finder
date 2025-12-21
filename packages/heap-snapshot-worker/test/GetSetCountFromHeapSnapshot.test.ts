@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { getSetCountFromHeapSnapshotInternal } from '../src/parts/GetSetCountFromHeapSnapshotInternal/GetSetCountFromHeapSnapshotInternal.js'
-import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('should count Set objects from heap snapshot', () => {
   // prettier-ignore

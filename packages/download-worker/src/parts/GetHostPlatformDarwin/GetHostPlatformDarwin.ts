@@ -6,7 +6,7 @@ export const getHostPlatform = (): string => {
   const ver = os
     .release()
     .split('.')
-    .map((a) => parseInt(a, 10))
+    .map((a) => Number.parseInt(a, 10))
   let macVersion = ''
   if (ver[0] < 18) {
     // Everything before 10.14 is considered 10.13.

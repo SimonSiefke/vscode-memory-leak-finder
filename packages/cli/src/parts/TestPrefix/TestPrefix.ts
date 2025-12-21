@@ -3,9 +3,13 @@ import * as TestPrefixText from '../TestPrefixText/TestPrefixText.ts'
 
 export const Pass = chalk.reset.inverse.bold.green(TestPrefixText.Pass)
 
+export const Initialized = chalk.reset.inverse.bold.green(TestPrefixText.Initialized)
+
 export const Leak = chalk.reset.inverse.blue(TestPrefixText.Leak)
 
 export const Runs = chalk.reset.inverse.yellow.bold(TestPrefixText.Runs)
+
+export const Initialize = chalk.reset.inverse.yellow.bold(TestPrefixText.Initializing)
 
 export const Setup = chalk.reset.inverse.yellow(TestPrefixText.Setup)
 

@@ -1,5 +1,5 @@
 import * as GetCountData from '../GetCountData/GetCountData.ts'
 
-export const getObjectCountsData = () => {
-  return GetCountData.getCountData('object-count', 'objectCount')
+export const getObjectCountsData = (basePath: string) => {
+  return GetCountData.getCountData('object-count', 'objectCount', basePath)
 }

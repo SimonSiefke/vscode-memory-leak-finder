@@ -1,10 +1,9 @@
 // @ts-nocheck
-import { fixHtmlNamespace } from '../FixXmlNamespace/FixXmlNamespace.ts'
 import * as GetNamedFunctionCountData from '../GetNamedFunctionCountData/GetNamedFunctionCountData.ts'
 
 export const name = 'named-function-count'
 
-export const getData = GetNamedFunctionCountData.getNamedFunctionCountData
+export const getData = (basePath: string) => GetNamedFunctionCountData.getNamedFunctionCountData(basePath)
 
 export const skip = 1
 
