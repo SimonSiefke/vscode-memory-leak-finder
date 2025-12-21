@@ -1,10 +1,10 @@
 import type { NodePath } from '@babel/traverse'
 import type * as t from '@babel/types'
-import { parseAst } from '../ParseAst/ParseAst.ts'
 import { fallbackScan } from '../FallbackScan/FallbackScan.ts'
 import { getEnclosingNames } from '../GetEnclosingNames/GetEnclosingNames.ts'
-import { isLocationInside } from '../IsLocationInside/IsLocationInside.ts'
 import { traverseAst } from '../GetTraverse/GetTraverse.ts'
+import { isLocationInside } from '../IsLocationInside/IsLocationInside.ts'
+import { parseAst } from '../ParseAst/ParseAst.ts'
 
 const LOCATION_UNKNOWN: string = 'unknown'
 
@@ -53,7 +53,7 @@ export const getOriginalClassName = (
     return fallback
   }
 
-  const name: string = getEnclosingNames(bestPath, { line: originalLine, column: originalColumn })
+  const name: string = getEnclosingNames(bestPath, { column: originalColumn, line: originalLine })
   if (name && name !== LOCATION_UNKNOWN) {
     return name
   }
