@@ -1,5 +1,5 @@
-import { parse } from '@babel/parser'
 import type * as t from '@babel/types'
+import { parse } from '@babel/parser'
 
 export const parseAst = (sourceContent: string): t.File => {
   if (!sourceContent) {
@@ -8,10 +8,10 @@ export const parseAst = (sourceContent: string): t.File => {
 
   try {
     const ast = parse(sourceContent, {
-      sourceType: 'module',
+      errorRecovery: true,
       plugins: ['typescript', 'classProperties', 'decorators-legacy'],
       ranges: false,
-      errorRecovery: true,
+      sourceType: 'module',
       tokens: false,
     })
 

@@ -25,9 +25,9 @@ export const connectScreenRecording = async (sessionRpc: any, attachedToPageTime
       DevtoolsProtocolPage.enable(sessionRpc),
       DevtoolsProtocolPage.startScreencast(sessionRpc, {
         format: 'jpeg',
-        quality: ScreencastQuality.screencastQuality,
-        maxWidth: 1024,
         maxHeight: 768,
+        maxWidth: 1024,
+        quality: ScreencastQuality.screencastQuality,
       }),
     ]),
     {
