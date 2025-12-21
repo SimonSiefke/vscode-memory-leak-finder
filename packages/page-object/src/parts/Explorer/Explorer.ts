@@ -1,8 +1,4 @@
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
-<<<<<<< Updated upstream
-=======
-import * as Electron from '../Electron/Electron.ts'
->>>>>>> Stashed changes
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
