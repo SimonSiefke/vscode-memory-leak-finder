@@ -22,9 +22,9 @@ test('file error minimal', () => {
 test('file error with position and title', () => {
   expect(
     GetGitHubFileErrorMessage.getGitHubFileErrorMessage('Parse failed', {
+      col: 5,
       file: 'src/file.ts',
       line: 12,
-      col: 5,
       title: 'Parser Error',
     }),
   ).toBe('::error file=src/file.ts,line=12,col=5,title=Parser Error::Parse failed\n')

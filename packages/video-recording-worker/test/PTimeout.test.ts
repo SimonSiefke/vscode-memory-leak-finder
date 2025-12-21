@@ -8,7 +8,7 @@ test('pTimeout should resolve when promise resolves before timeout', async () =>
 })
 
 test('pTimeout should throw when timeout is reached', async () => {
-  const { resolve, promise } = Promise.withResolvers<void>()
+  const { promise, resolve } = Promise.withResolvers<void>()
   setTimeout(resolve, 1000)
   await expect(PTimeout.pTimeout(promise, { milliseconds: 100 })).rejects.toThrow('timeout of 100ms reached')
 })

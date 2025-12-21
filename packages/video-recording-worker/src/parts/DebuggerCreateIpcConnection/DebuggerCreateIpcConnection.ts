@@ -10,9 +10,6 @@ export const createConnection = async (wsUrl: string): Promise<any> => {
     // @ts-ignore
     await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket)
     const ipc = {
-      send(message: any) {
-        webSocket.send(Json.stringify(message))
-      },
       get onmessage() {
         return webSocket.onmessage
       },
@@ -23,6 +20,9 @@ export const createConnection = async (wsUrl: string): Promise<any> => {
           listener(parsed)
         }
         webSocket.onmessage = handleMessage
+      },
+      send(message: any) {
+        webSocket.send(Json.stringify(message))
       },
     }
     const rpc = createRpc(ipc)

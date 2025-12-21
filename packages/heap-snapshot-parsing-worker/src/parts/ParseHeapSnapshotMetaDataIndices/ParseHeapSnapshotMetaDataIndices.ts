@@ -1,8 +1,8 @@
 import { getBalancedJsonIndices } from '../GetBalancedJsonIndices/GetBalancedJsonIndices.ts'
 
 export const EMPTY_DATA = {
-  startIndex: -1,
   endIndex: -1,
+  startIndex: -1,
 }
 
 export const parseHeapSnapshotMetaDataIndices = (data) => {
@@ -17,7 +17,7 @@ export const parseHeapSnapshotMetaDataIndices = (data) => {
     return EMPTY_DATA
   }
   return {
-    startIndex,
     endIndex,
+    startIndex,
   }
 }

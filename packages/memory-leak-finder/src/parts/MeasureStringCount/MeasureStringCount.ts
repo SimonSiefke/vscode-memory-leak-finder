@@ -1,6 +1,7 @@
 import { getHeapSnapshot } from '../GetHeapSnapshot/GetHeapSnapshot.ts'
 import * as HeapSnapshotFunctions from '../HeapSnapshotFunctions/HeapSnapshotFunctions.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
+import { launchHeapSnapshotWorker } from '../LaunchHeapSnapshotWorker/LaunchHeapSnapshotWorker.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
@@ -25,9 +26,10 @@ export const stop = (session, objectGroup) => {
 }
 
 const compareHeapSnapshotStringCount = async (before, after) => {
+  await using rpc = await launchHeapSnapshotWorker()
   const [beforeCount, afterCount] = await Promise.all([
-    HeapSnapshotFunctions.getStringCount(before),
-    HeapSnapshotFunctions.getStringCount(after),
+    HeapSnapshotFunctions.getStringCount(rpc, before),
+    HeapSnapshotFunctions.getStringCount(rpc, after),
   ])
   return {
     before: beforeCount,

@@ -11,13 +11,13 @@ test('getExecutablePath returns platform-specific path', () => {
   const result = GetExecutablePath.getExecutablePath('ffmpeg')
 
   switch (process.platform) {
-    case 'linux': {
-      expect(result[0]).toBe('ffmpeg-linux')
+    case 'darwin': {
+      expect(result[0]).toBe('ffmpeg-mac')
 
       break
     }
-    case 'darwin': {
-      expect(result[0]).toBe('ffmpeg-mac')
+    case 'linux': {
+      expect(result[0]).toBe('ffmpeg-linux')
 
       break
     }
