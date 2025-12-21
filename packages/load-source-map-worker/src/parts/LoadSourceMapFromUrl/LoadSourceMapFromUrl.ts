@@ -1,12 +1,12 @@
 import { existsSync } from 'node:fs'
+import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { downloadSourceMap } from '../DownloadSourceMap/DownloadSourceMap.ts'
+import { emptySourceMap } from '../EmptySourceMap/EmptySourceMap.ts'
+import { isNotFoundOrNotAvailableMessage } from '../IsNotFoundOrNotAvailableMessage/IsNotFoundOrNotAvailableMessage.ts'
 import { normalizeSourceMap } from '../NormalizeSourceMap/NormalizeSourceMap.ts'
 import { readJson } from '../ReadJson/ReadJson.ts'
 import * as Root from '../Root/Root.ts'
-import { writeFile } from 'node:fs/promises'
-import { emptySourceMap } from '../EmptySourceMap/EmptySourceMap.ts'
-import { isNotFoundOrNotAvailableMessage } from '../IsNotFoundOrNotAvailableMessage/IsNotFoundOrNotAvailableMessage.ts'
 
 const isNotFoundOrNotAvailableError = (error) => {
   return error && error.message && isNotFoundOrNotAvailableMessage(error.message)
