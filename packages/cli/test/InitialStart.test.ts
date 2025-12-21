@@ -51,8 +51,8 @@ const WatchUsage = await import('../src/parts/WatchUsage/WatchUsage.ts')
 
 test('initialStart - watch mode - show details', async () => {
   const options = {
-    watch: true,
     filter: '',
+    watch: true,
   }
   // @ts-ignore
   WatchUsage.print.mockImplementation(async () => 'watch usage')
@@ -65,8 +65,8 @@ test('initialStart - watch mode - show details', async () => {
 
 test('initialStart - watch mode - start running', async () => {
   const options = {
-    watch: true,
     filter: 'a',
+    watch: true,
   }
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).toHaveBeenCalledTimes(1)
@@ -77,8 +77,8 @@ test('initialStart - watch mode - start running', async () => {
 
 test('initialStart - start running', async () => {
   const options = {
-    watch: false,
     filter: 'a',
+    watch: false,
   }
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).not.toHaveBeenCalled()

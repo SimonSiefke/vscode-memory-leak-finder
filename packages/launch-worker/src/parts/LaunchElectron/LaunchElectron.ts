@@ -19,9 +19,9 @@ const handleStdErr = (data) => {
   // logStream.write(data)
 }
 
-export const launchElectron = async ({ cliPath, args, headlessMode, cwd, env, addDisposable }) => {
+export const launchElectron = async ({ addDisposable, args, cliPath, cwd, env, headlessMode }) => {
   try {
-    const allArgs = GetElectronArgs.getElectronArgs({ headlessMode, args })
+    const allArgs = GetElectronArgs.getElectronArgs({ args, headlessMode })
     const child = Spawn.spawn(cliPath, allArgs, {
       cwd,
       env,

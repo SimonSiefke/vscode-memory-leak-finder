@@ -1,6 +1,6 @@
+import { existsSync } from 'fs'
 import { readFile } from 'fs/promises'
 import { join, dirname } from 'path'
-import { existsSync } from 'fs'
 import { fileURLToPath } from 'url'
 import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
 
@@ -15,7 +15,7 @@ const matchesPattern = (value: string, pattern: string): boolean => {
   }
   if (pattern.includes('*')) {
     // Simple wildcard matching: convert pattern to regex
-    const regexPattern = pattern.replace(/\*/g, '.*').replace(/\?/g, '.')
+    const regexPattern = pattern.replaceAll('*', '.*').replaceAll('?', '.')
     const regex = new RegExp(`^${regexPattern}$`)
     return regex.test(value)
   }
@@ -61,8 +61,8 @@ export const getMockFileName = async (hostname: string, pathname: string, method
   }
 
   // Generic fallback: Convert URL to filename format: hostname_pathname_method.json
-  const hostnameSanitized = hostname.replace(NON_ALPHANUMERIC_REGEX, '_')
-  const pathnameSanitized = pathname.replace(NON_ALPHANUMERIC_REGEX, '_').replace(LEADING_UNDERSCORES_REGEX, '')
+  const hostnameSanitized = hostname.replaceAll(NON_ALPHANUMERIC_REGEX, '_')
+  const pathnameSanitized = pathname.replaceAll(NON_ALPHANUMERIC_REGEX, '_').replace(LEADING_UNDERSCORES_REGEX, '')
   const methodLower = method.toLowerCase()
   const pathPart = pathnameSanitized || 'root'
   return `${hostnameSanitized}_${pathPart}_${methodLower}.json`

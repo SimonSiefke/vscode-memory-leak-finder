@@ -11,9 +11,9 @@ export const handleTestsUnexpectedError = async (prettyError) => {
   const state = StdinDataState.getState()
   const newState = {
     ...state,
-    stdout: [...state.stdout, fullMessage],
-    mode: ModeType.FinishedRunning,
     exitCode: ExitCode.UnexpectedTestError,
+    mode: ModeType.FinishedRunning,
+    stdout: [...state.stdout, fullMessage],
   }
   await updateState(newState)
 }

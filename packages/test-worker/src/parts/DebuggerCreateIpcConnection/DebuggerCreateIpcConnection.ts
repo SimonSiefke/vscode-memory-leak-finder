@@ -11,13 +11,6 @@ export const createConnection = async (wsUrl) => {
     const webSocket = new WebSocket(wsUrl)
     await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket)
     const ipc = {
-      /**
-       *
-       * @param {any} message
-       */
-      send(message) {
-        webSocket.send(Json.stringify(message))
-      },
       get onmessage() {
         return webSocket.onmessage
       },
@@ -28,6 +21,13 @@ export const createConnection = async (wsUrl) => {
           listener(parsed)
         }
         webSocket.onmessage = handleMessage
+      },
+      /**
+       *
+       * @param {any} message
+       */
+      send(message) {
+        webSocket.send(Json.stringify(message))
       },
     }
     const rpc = DebuggerCreateRpcConnection.createRpc(ipc, true)

@@ -2,15 +2,15 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ Editor, Workspace, Explorer, RunAndDebug }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, RunAndDebug, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'index.js',
       content: `let x = 1
 
 setInterval(()=>{
   x++
 }, 1000)`,
+      name: 'index.js',
     },
   ])
   await Editor.closeAll()
@@ -27,16 +27,16 @@ setInterval(()=>{
 
 export const run = async ({ DebugConsole }: TestContext): Promise<void> => {
   await DebugConsole.evaluate({
-    expression: 'glob',
     expectedResult: {
-      type: 'error',
       message: /Uncaught ReferenceError ReferenceError: glob is not defined/,
+      type: 'error',
     },
+    expression: 'glob',
   })
   await DebugConsole.clear()
 }
 
-export const teardown = async ({ RunAndDebug, Editor }: TestContext): Promise<void> => {
+export const teardown = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
   await RunAndDebug.stop()
   await RunAndDebug.removeAllBreakpoints()
   await Editor.closeAll()

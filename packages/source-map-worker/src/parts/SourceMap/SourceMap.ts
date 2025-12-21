@@ -1,5 +1,5 @@
-import { join, resolve } from 'node:path'
 import type { RawSourceMap } from 'source-map'
+import { join, resolve } from 'node:path'
 import { SourceMapConsumer } from 'source-map'
 import * as AddOriginalPositions from '../AddOriginalPositions/AddOriginalPositions.ts'
 import * as Assert from '../Assert/Assert.ts'
@@ -7,6 +7,16 @@ import type { IntermediateItem } from '../IntermediateItem/IntermediateItem.ts'
 import type { OriginalPosition } from '../OriginalPosition/OriginalPosition.ts'
 import { root } from '../Root/Root.ts'
 
+<<<<<<< HEAD
+=======
+interface OriginalPosition {
+  column: number | null
+  line: number | null
+  name: string | null
+  source: string | null
+}
+
+>>>>>>> origin/main
 export const getOriginalPositions = async (
   sourceMap: RawSourceMap,
   positions: number[],
@@ -21,8 +31,8 @@ export const getOriginalPositions = async (
       const line: number = positions[i]
       const column: number = positions[i + 1]
       const originalPosition = consumer.originalPositionFor({
-        line: line + 1,
         column: column + 1,
+        line: line + 1,
       })
       let codePath: string | null = null
       let needsOriginalName = false

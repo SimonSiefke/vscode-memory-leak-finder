@@ -1,6 +1,7 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import type { Session } from '../Session/Session.ts'
 
-export const getConstructors = async (session, objectGroup, instancesObjectId) => {
+export const getConstructors = async (session: Session, objectGroup: string, instancesObjectId: string) => {
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
   const instances = this

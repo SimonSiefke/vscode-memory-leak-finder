@@ -4,8 +4,8 @@ import { isFullCommitHash } from '../IsFullCommitHash/IsFullCommitHash.ts'
 import { parseCommitHash } from '../ParseCommitHash/ParseCommitHash.ts'
 
 export interface ResolvedCommit {
-  readonly owner: string
   readonly commitHash: string
+  readonly owner: string
 }
 
 /**
@@ -27,7 +27,7 @@ const parseForkCommit = (commitRef: string): { owner: string; commit: string } |
     return null
   }
 
-  return { owner, commit }
+  return { commit, owner }
 }
 
 export const resolveCommitHash = async (baseRepoUrl: string | null, commitRef: string): Promise<ResolvedCommit> => {
@@ -53,8 +53,8 @@ export const resolveCommitHash = async (baseRepoUrl: string | null, commitRef: s
     // If it's already a full commit hash, return it directly
     if (isFullCommitHash(actualCommitRef)) {
       return {
-        owner,
         commitHash: actualCommitRef,
+        owner,
       }
     }
 
@@ -65,8 +65,8 @@ export const resolveCommitHash = async (baseRepoUrl: string | null, commitRef: s
     const resolvedHash = parseCommitHash(result.stdout, actualCommitRef)
 
     return {
-      owner,
       commitHash: resolvedHash,
+      owner,
     }
   } catch (error) {
     throw new VError(error, `Failed to resolve commit reference '${commitRef}'`)

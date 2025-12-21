@@ -7,6 +7,27 @@ import * as PatternUsage from '../PatternUsage/PatternUsage.ts'
 
 export const handleStdinDataWaitingMode = async (state, key) => {
   switch (key) {
+    case AnsiKeys.AltBackspace:
+    case AnsiKeys.ControlBackspace: {
+      const eraseLine = await AnsiEscapes.eraseLine()
+      const cursorLeft = await AnsiEscapes.cursorLeft()
+      return {
+        ...state,
+        stdout: [...state.stdout, eraseLine + cursorLeft],
+        value: Character.EmptyString,
+      }
+    }
+    case AnsiKeys.ArrowDown:
+    case AnsiKeys.ArrowUp:
+      return state
+    case AnsiKeys.ArrowLeft:
+    case AnsiKeys.ArrowRight:
+      return state
+    case AnsiKeys.Backspace(state.isWindows):
+      return {
+        ...state,
+        value: state.value.slice(0, -1),
+      }
     case AnsiKeys.ControlC:
     case AnsiKeys.ControlD:
       return {
@@ -22,40 +43,21 @@ export const handleStdinDataWaitingMode = async (state, key) => {
         stdout: [...state.stdout, eraseLine + cursorLeft],
       }
     }
-    case AnsiKeys.ArrowUp:
-    case AnsiKeys.ArrowDown:
-      return state
-    case AnsiKeys.AltBackspace:
-    case AnsiKeys.ControlBackspace: {
-      const eraseLine = await AnsiEscapes.eraseLine()
-      const cursorLeft = await AnsiEscapes.cursorLeft()
-      return {
-        ...state,
-        value: Character.EmptyString,
-        stdout: [...state.stdout, eraseLine + cursorLeft],
-      }
-    }
-    case AnsiKeys.Backspace(state.isWindows):
-      return {
-        ...state,
-        value: state.value.slice(0, -1),
-      }
-    case AnsiKeys.ArrowLeft:
-    case AnsiKeys.ArrowRight:
+    case AnsiKeys.Escape:
       return state
     case CliKeys.All:
       return {
         ...state,
-        value: Character.EmptyString,
         mode: ModeType.Running,
+        value: Character.EmptyString,
       }
     case CliKeys.FilterMode:
       const clear = await AnsiEscapes.clear(state.isWindows)
       return {
         ...state,
-        value: Character.EmptyString,
         mode: ModeType.FilterWaiting,
         stdout: [...state.stdout, clear + (await PatternUsage.print())],
+        value: Character.EmptyString,
       }
     case CliKeys.Quit:
       return {
@@ -68,8 +70,6 @@ export const handleStdinDataWaitingMode = async (state, key) => {
         headless: !state.headless,
         mode: ModeType.Running,
       }
-    case AnsiKeys.Escape:
-      return state
     default:
       return state
   }

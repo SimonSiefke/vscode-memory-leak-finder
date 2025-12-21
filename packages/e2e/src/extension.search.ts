@@ -2,7 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ Extensions, Editor }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Extensions }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Extensions.show()
   await Extensions.search('@builtin html')

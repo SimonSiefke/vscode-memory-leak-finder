@@ -1,17 +1,17 @@
-import { readFile, writeFile } from 'fs/promises'
 import { existsSync } from 'fs'
+import { readFile, writeFile } from 'fs/promises'
 import { join } from 'path'
-import * as GetOrCreateCA from '../GetOrCreateCA/GetOrCreateCA.ts'
-import * as GenerateCertificateForDomain from '../GenerateCertificateForDomain/GenerateCertificateForDomain.ts'
-import { CERT_DIR } from '../Constants/Constants.ts'
 import type { CertificatePair } from '../CertificatePair/CertificatePair.ts'
+import { CERT_DIR } from '../Constants/Constants.ts'
+import * as GenerateCertificateForDomain from '../GenerateCertificateForDomain/GenerateCertificateForDomain.ts'
+import * as GetOrCreateCA from '../GetOrCreateCA/GetOrCreateCA.ts'
 
 const DOMAIN_SANITIZE_REGEX = /[^a-zA-Z0-9]/g
 
 export const getCertificateForDomain = async (domain: string): Promise<CertificatePair> => {
   const ca = await GetOrCreateCA.getOrCreateCA()
-  const certPath = join(CERT_DIR, `${domain.replace(DOMAIN_SANITIZE_REGEX, '_')}-cert.pem`)
-  const keyPath = join(CERT_DIR, `${domain.replace(DOMAIN_SANITIZE_REGEX, '_')}-key.pem`)
+  const certPath = join(CERT_DIR, `${domain.replaceAll(DOMAIN_SANITIZE_REGEX, '_')}-cert.pem`)
+  const keyPath = join(CERT_DIR, `${domain.replaceAll(DOMAIN_SANITIZE_REGEX, '_')}-key.pem`)
 
   if (existsSync(certPath) && existsSync(keyPath)) {
     const cert = await readFile(certPath, 'utf8')

@@ -6,13 +6,13 @@ export const boundingBox = async (locator) => {
   // TODO ask for bounding box
   const boundingBox = await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(locator) => test.boundingBox(locator)',
       arguments: [
         {
           value: locator,
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(locator) => test.boundingBox(locator)',
       returnByValue: true,
     },
     locator,

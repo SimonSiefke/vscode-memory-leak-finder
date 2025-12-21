@@ -10,6 +10,7 @@ export const main = () => {
 
 export const skip = 1
 
+<<<<<<< HEAD
 export const setup = async ({ Editor, Workspace, Explorer }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
@@ -18,6 +19,15 @@ export const setup = async ({ Editor, Workspace, Explorer }: TestContext): Promi
     },
     {
       name: 'src/add.ts',
+=======
+export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
+  await Workspace.setFiles([
+    {
+      content: originalContent,
+      name: 'src/main.ts',
+    },
+    {
+>>>>>>> origin/main
       content: `export const used = () => {
   return 42
 }
@@ -26,9 +36,15 @@ export const unused = () => {
   return 0
 }
 `,
+<<<<<<< HEAD
     },
     {
       name: 'tsconfig.json',
+=======
+      name: 'src/add.ts',
+    },
+    {
+>>>>>>> origin/main
       content: `{
   "compilerOptions": {
     "strict": true,
@@ -39,6 +55,10 @@ export const unused = () => {
   "include": ["src"]
 }
 `,
+<<<<<<< HEAD
+=======
+      name: 'tsconfig.json',
+>>>>>>> origin/main
     },
   ])
   await Editor.closeAll()
@@ -67,8 +87,13 @@ export const main = () => {
 }
 `)
   await Workspace.add({
+<<<<<<< HEAD
     name: 'src/main.ts',
     content: originalContent,
+=======
+    content: originalContent,
+    name: 'src/main.ts',
+>>>>>>> origin/main
   })
 }
 

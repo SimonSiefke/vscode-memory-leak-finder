@@ -5,7 +5,6 @@ export const click = async (locator, options) => {
   Assert.object(locator)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
       arguments: [
         {
           value: locator,
@@ -21,6 +20,7 @@ export const click = async (locator, options) => {
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
     },
     locator,
   )
@@ -30,7 +30,6 @@ export const dblclick = async (locator) => {
   Assert.object(locator)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
       arguments: [
         {
           value: locator,
@@ -45,6 +44,7 @@ export const dblclick = async (locator) => {
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
     },
     locator,
   )

@@ -1,5 +1,6 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as GetAllScopePropertiesInternal from '../GetAllScopePropertiesInternal/GetAllScopePropertiesInternal.ts'
+import type { Session } from '../Session/Session.ts'
 
 const getNewRemaining = (seen, newObjectIds) => {
   const newRemaining: any[] = []
@@ -21,7 +22,7 @@ const getNewAllScopeProperties = (allScopeProperties, scopeProperties) => {
   return [...allScopeProperties, ...scopeProperties]
 }
 
-export const getAllScopeProperties = async (session, objectGroup, objectIds) => {
+export const getAllScopeProperties = async (session: Session, objectGroup: string, objectIds: readonly any[]) => {
   Assert.object(session)
   Assert.string(objectGroup)
   Assert.array(objectIds)

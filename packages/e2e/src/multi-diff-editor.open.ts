@@ -2,6 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
+<<<<<<< HEAD
 export const setup = async ({ Workspace, Editor, Explorer }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
@@ -15,6 +16,21 @@ export const setup = async ({ Workspace, Editor, Explorer }: TestContext): Promi
     {
       name: 'c.txt',
       content: 'c',
+=======
+export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
+  await Workspace.setFiles([
+    {
+      content: 'a',
+      name: 'a.txt',
+    },
+    {
+      content: 'b',
+      name: 'b.txt',
+    },
+    {
+      content: 'c',
+      name: 'c.txt',
+>>>>>>> origin/main
     },
   ])
   await Editor.closeAll()

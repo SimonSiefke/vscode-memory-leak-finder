@@ -21,9 +21,9 @@ test('handleStdinDataRunningMode - show watch mode details', async () => {
   StdoutWorker.set(mockRpc)
 
   const state = {
-    value: '',
     mode: ModeType.Running,
     stdout: [],
+    value: '',
   }
   const key = 'Enter'
 
@@ -48,9 +48,9 @@ test('handleStdinDataRunningMode - quit', async () => {
   StdoutWorker.set(mockRpc)
 
   const state = {
-    value: '',
     mode: ModeType.Running,
     stdout: [],
+    value: '',
   }
   const key = AnsiKeys.ControlC
 

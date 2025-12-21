@@ -2,7 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const beforeSetup = async ({ tmpDir, writeFile, join }: any) => {
+export const beforeSetup = async ({ join, tmpDir, writeFile }: any) => {
   await writeFile(
     join(tmpDir, 'index.css'),
     `h1 {
@@ -12,7 +12,7 @@ export const beforeSetup = async ({ tmpDir, writeFile, join }: any) => {
 }
 
 // @ts-ignore
-export const setup = async ({ page, expect, Editor, StatusBar, Problems }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, expect, page, Problems, StatusBar }: TestContext): Promise<void> => {
   await Editor.open('index.css')
   await Editor.shouldHaveSquigglyError()
   const problemsButton = await StatusBar.item('status.problems')

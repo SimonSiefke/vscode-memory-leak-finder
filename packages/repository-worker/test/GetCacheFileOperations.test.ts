@@ -6,12 +6,12 @@ test.skip('getCacheFileOperations returns empty array when no nodeModulesPaths p
 
   const expected = [
     {
-      type: 'mkdir',
       path: '/cache/dir',
+      type: 'mkdir',
     },
     {
-      type: 'mkdir',
       path: '/cache/dir/cache-key',
+      type: 'mkdir',
     },
   ]
 
@@ -23,21 +23,21 @@ test.skip('getCacheFileOperations creates correct file operations for single nod
 
   const expected = [
     {
-      type: 'mkdir',
       path: '/cache/dir',
-    },
-    {
       type: 'mkdir',
-      path: '/cache/dir/cache-key',
     },
     {
+      path: '/cache/dir/cache-key',
       type: 'mkdir',
-      path: '/cache/dir/cache-key',
     },
     {
-      type: 'copy',
+      path: '/cache/dir/cache-key',
+      type: 'mkdir',
+    },
+    {
       from: '/repo/path/node_modules',
       to: '/cache/dir/cache-key/node_modules',
+      type: 'copy',
     },
   ]
 
@@ -53,39 +53,39 @@ test.skip('getCacheFileOperations handles multiple node_modules paths', async ()
 
   const expected = [
     {
-      type: 'mkdir',
       path: '/cache/dir',
-    },
-    {
       type: 'mkdir',
-      path: '/cache/dir/cache-key',
     },
     {
+      path: '/cache/dir/cache-key',
       type: 'mkdir',
-      path: '/cache/dir/cache-key',
     },
     {
-      type: 'copy',
+      path: '/cache/dir/cache-key',
+      type: 'mkdir',
+    },
+    {
       from: '/repo/path/node_modules',
       to: '/cache/dir/cache-key/node_modules',
-    },
-    {
-      type: 'mkdir',
-      path: '/cache/dir/cache-key/packages/a',
-    },
-    {
       type: 'copy',
+    },
+    {
+      path: '/cache/dir/cache-key/packages/a',
+      type: 'mkdir',
+    },
+    {
       from: '/repo/path/packages/a/node_modules',
       to: '/cache/dir/cache-key/packages/a/node_modules',
-    },
-    {
-      type: 'mkdir',
-      path: '/cache/dir/cache-key/packages/b',
-    },
-    {
       type: 'copy',
+    },
+    {
+      path: '/cache/dir/cache-key/packages/b',
+      type: 'mkdir',
+    },
+    {
       from: '/repo/path/packages/b/node_modules',
       to: '/cache/dir/cache-key/packages/b/node_modules',
+      type: 'copy',
     },
   ]
 
@@ -100,30 +100,30 @@ test.skip('getCacheFileOperations handles paths with leading slashes correctly',
 
   const expected = [
     {
-      type: 'mkdir',
       path: '/cache/dir',
-    },
-    {
       type: 'mkdir',
-      path: '/cache/dir/cache-key',
     },
     {
+      path: '/cache/dir/cache-key',
       type: 'mkdir',
-      path: '/cache/dir/cache-key',
     },
     {
-      type: 'copy',
+      path: '/cache/dir/cache-key',
+      type: 'mkdir',
+    },
+    {
       from: '/repo/path/node_modules',
       to: '/cache/dir/cache-key/node_modules',
-    },
-    {
-      type: 'mkdir',
-      path: '/cache/dir/cache-key/packages/a',
-    },
-    {
       type: 'copy',
+    },
+    {
+      path: '/cache/dir/cache-key/packages/a',
+      type: 'mkdir',
+    },
+    {
       from: '/repo/path/packages/a/node_modules',
       to: '/cache/dir/cache-key/packages/a/node_modules',
+      type: 'copy',
     },
   ]
 
@@ -137,21 +137,21 @@ test.skip('getCacheFileOperations handles nested paths correctly', async () => {
 
   const expected = [
     {
-      type: 'mkdir',
       path: '/cache/dir',
+      type: 'mkdir',
     },
     {
-      type: 'mkdir',
       path: '/cache/dir/cache-key',
-    },
-    {
       type: 'mkdir',
-      path: '/cache/dir/cache-key/packages/deeply/nested/module',
     },
     {
-      type: 'copy',
+      path: '/cache/dir/cache-key/packages/deeply/nested/module',
+      type: 'mkdir',
+    },
+    {
       from: '/repo/path/packages/deeply/nested/module/node_modules',
       to: '/cache/dir/cache-key/packages/deeply/nested/module/node_modules',
+      type: 'copy',
     },
   ]
 
@@ -169,30 +169,30 @@ test.skip('getCacheFileOperations handles Windows-style paths', async () => {
 
   const expected = [
     {
-      type: 'mkdir',
       path: 'C:\\cache\\dir',
-    },
-    {
       type: 'mkdir',
-      path: 'C:\\cache\\dir\\cache-key',
     },
     {
+      path: 'C:\\cache\\dir\\cache-key',
       type: 'mkdir',
-      path: 'C:\\cache\\dir\\cache-key',
     },
     {
-      type: 'copy',
+      path: 'C:\\cache\\dir\\cache-key',
+      type: 'mkdir',
+    },
+    {
       from: 'C:\\repo\\path/node_modules',
       to: 'C:\\cache\\dir\\cache-key/node_modules',
-    },
-    {
-      type: 'mkdir',
-      path: 'C:\\cache\\dir\\cache-key',
-    },
-    {
       type: 'copy',
+    },
+    {
+      path: 'C:\\cache\\dir\\cache-key',
+      type: 'mkdir',
+    },
+    {
       from: 'C:\\repo\\path/packages\\a\\node_modules',
       to: 'C:\\cache\\dir\\cache-key/packages\\a\\node_modules',
+      type: 'copy',
     },
   ]
 
@@ -210,30 +210,30 @@ test.skip('getCacheFileOperations handles special characters in paths', async ()
 
   const expected = [
     {
-      type: 'mkdir',
       path: '/cache/dir with spaces',
-    },
-    {
       type: 'mkdir',
-      path: '/cache/dir with spaces/cache-key-with-dashes',
     },
     {
+      path: '/cache/dir with spaces/cache-key-with-dashes',
       type: 'mkdir',
-      path: '/cache/dir with spaces/cache-key-with-dashes',
     },
     {
-      type: 'copy',
+      path: '/cache/dir with spaces/cache-key-with-dashes',
+      type: 'mkdir',
+    },
+    {
       from: '/repo/path with spaces/node_modules',
       to: '/cache/dir with spaces/cache-key-with-dashes/node_modules',
-    },
-    {
-      type: 'mkdir',
-      path: '/cache/dir with spaces/cache-key-with-dashes/packages/my-package',
-    },
-    {
       type: 'copy',
+    },
+    {
+      path: '/cache/dir with spaces/cache-key-with-dashes/packages/my-package',
+      type: 'mkdir',
+    },
+    {
       from: '/repo/path with spaces/packages/my-package/node_modules',
       to: '/cache/dir with spaces/cache-key-with-dashes/packages/my-package/node_modules',
+      type: 'copy',
     },
   ]
 

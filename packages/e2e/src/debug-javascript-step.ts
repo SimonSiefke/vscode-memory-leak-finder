@@ -2,16 +2,16 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ Editor, Workspace, Explorer, RunAndDebug }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, RunAndDebug, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'index.js',
       content: `let x = 1
 
 setInterval(()=>{
   x++
   x++
 }, 1000)`,
+      name: 'index.js',
     },
   ])
   await Editor.closeAll()
@@ -24,9 +24,9 @@ export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> =
   await Editor.open('index.js')
   await Editor.setBreakpoint(4)
   await RunAndDebug.runAndWaitForPaused({
+    callStackSize: 11,
     file: 'index.js',
     line: 4,
-    callStackSize: 11,
   })
   await RunAndDebug.step('index.js', 5)
   await RunAndDebug.stop()

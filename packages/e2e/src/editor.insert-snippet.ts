@@ -8,8 +8,8 @@ export const skip = 1
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'test.html',
       content: '',
+      name: 'test.html',
     },
   ])
   await Editor.closeAll()

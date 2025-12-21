@@ -2,10 +2,16 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
+<<<<<<< HEAD
 export const setup = async ({ Editor, Workspace, SettingsEditor }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       name: 'file.ts',
+=======
+export const setup = async ({ Editor, SettingsEditor, Workspace }: TestContext): Promise<void> => {
+  await Workspace.setFiles([
+    {
+>>>>>>> origin/main
       content: `class MyClass {
   myMethod(): void {
     const myFunction = () => {
@@ -15,6 +21,10 @@ export const setup = async ({ Editor, Workspace, SettingsEditor }: TestContext):
   }
 }
 `,
+<<<<<<< HEAD
+=======
+      name: 'file.ts',
+>>>>>>> origin/main
     },
   ])
   await Editor.closeAll()
@@ -22,8 +32,13 @@ export const setup = async ({ Editor, Workspace, SettingsEditor }: TestContext):
   await Editor.splitRight()
   await SettingsEditor.open()
   await SettingsEditor.search({
+<<<<<<< HEAD
     value: 'editor.semanticHighlighting.enabled',
     resultCount: 1,
+=======
+    resultCount: 1,
+    value: 'editor.semanticHighlighting.enabled',
+>>>>>>> origin/main
   })
   await SettingsEditor.select({
     name: 'editor.semanticHighlighting.enabled',

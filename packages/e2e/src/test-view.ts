@@ -2,10 +2,13 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
+<<<<<<< HEAD
 export const setup = async ({ Workspace, Editor, Testing, SideBar }: TestContext): Promise<void> => {
+=======
+export const setup = async ({ Editor, SideBar, Testing, Workspace }: TestContext): Promise<void> => {
+>>>>>>> origin/main
   await Workspace.setFiles([
     {
-      name: 'test-file-1.md',
       content: `# Easy Math
 
 2 + 2 = 4 // this test will pass
@@ -17,6 +20,7 @@ export const setup = async ({ Workspace, Editor, Testing, SideBar }: TestContext
 
 3 - 1 = 2
 `,
+      name: 'test-file-1.md',
     },
   ])
   await Workspace.addExtension('test-provider-sample')
@@ -36,7 +40,11 @@ export const run = async ({ Testing }): Promise<void> => {
   })
 }
 
+<<<<<<< HEAD
 export const teardown = async ({ SideBar, Editor, Panel }: TestContext): Promise<void> => {
+=======
+export const teardown = async ({ Editor, Panel, SideBar }: TestContext): Promise<void> => {
+>>>>>>> origin/main
   await Editor.closeAll()
   await SideBar.hide()
   await Panel.hide()

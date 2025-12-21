@@ -35,7 +35,7 @@ export const connectDevtools = async (
     DebuggerCreateIpcConnection.createConnection(electronWebSocketUrl),
     DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl),
   ])
-  const { sessionRpc, sessionId, targetId } = await waitForSession(browserRpc, attachedToPageTimeout)
+  const { sessionId, sessionRpc, targetId } = await waitForSession(browserRpc, attachedToPageTimeout)
 
   const { frameTree } = await DevtoolsProtocolPage.getFrameTree(sessionRpc)
   const frameId = frameTree.frame.id
@@ -44,31 +44,45 @@ export const connectDevtools = async (
   const utilityContext = await addUtilityExecutionContext(sessionRpc, utilityExecutionContextName, frameId)
 
   const firstWindow = Page.create({
+    browserRpc,
     electronObjectId,
     electronRpc,
-    sessionId,
-    targetId,
-    rpc: sessionRpc,
     idleTimeout,
-    utilityContext,
-    browserRpc,
+    rpc: sessionRpc,
+    sessionId,
     sessionRpc,
+    targetId,
+    utilityContext,
   })
 
   const electronApp = ElectronApp.create({
-    electronRpc,
-    electronObjectId,
-    idleTimeout,
-    firstWindow,
     browserRpc,
+    electronObjectId,
+    electronRpc,
+    firstWindow,
+    idleTimeout,
     sessionRpc,
   })
   const pageObjectContext = {
-    page: firstWindow,
-    expect: Expect.expect,
-    VError,
+    defaultContext: {
+      callFunctionOn(options) {
+        return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
+          ...options,
+          uniqueContextId: utilityContext.uniqueId,
+        })
+      },
+    },
     electronApp,
+    evaluateInDefaultContext(item) {
+      throw new Error(`not implemented`)
+    },
+    evaluateInUtilityContext(item) {},
+    expect: Expect.expect,
     ideVersion: parsedIdeVersion,
+<<<<<<< HEAD
+=======
+    page: firstWindow,
+>>>>>>> origin/main
     sessionRpc,
     utilityContext: {
       callFunctionOn(options) {
@@ -84,18 +98,7 @@ export const connectDevtools = async (
         })
       },
     },
-    defaultContext: {
-      callFunctionOn(options) {
-        return DevtoolsProtocolRuntime.evaluate(sessionRpc, {
-          ...options,
-          uniqueContextId: utilityContext.uniqueId,
-        })
-      },
-    },
-    evaluateInUtilityContext(item) {},
-    evaluateInDefaultContext(item) {
-      throw new Error(`not implemented`)
-    },
+    VError,
   }
 
   const pageObjectModule = await ImportScript.importScript(pageObjectPath)
@@ -103,8 +106,8 @@ export const connectDevtools = async (
   PageObjectState.set(connectionId, pageObject, pageObjectContext)
 
   await pageObject.WaitForApplicationToBeReady.waitForApplicationToBeReady({
-    inspectPtyHost,
     enableExtensions,
+    inspectPtyHost,
   })
   if (timeouts === false) {
     // TODO this should be part of initialization worker

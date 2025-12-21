@@ -5,11 +5,11 @@ export const skip = true
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'index.css',
       content: `:root {
   --font-size: 10px;
   --font-size: 10px;
 }`,
+      name: 'index.css',
     },
   ])
   await Editor.open('index.css')

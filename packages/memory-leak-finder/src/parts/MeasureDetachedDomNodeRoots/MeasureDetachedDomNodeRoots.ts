@@ -4,27 +4,28 @@ import * as GetDetachedDomNodes from '../GetDetachedDomNodes/GetDetachedDomNodes
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
+import type { Session } from '../Session/Session.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.DetachedDomNodeRoots
 
 export const targets = [TargetId.Browser]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]
 }
 
-export const start = (session, objectGroup) => {
+export const start = (session: Session, objectGroup: string) => {
   return GetDetachedDomNodes.getDetachedDomNodes(session, objectGroup)
 }
 
-export const stop = async (session, objectGroup) => {
+export const stop = async (session: Session, objectGroup: string) => {
   const result = await GetDetachedDomNodes.getDetachedDomNodes(session, objectGroup)
   return result
 }
 
-export const releaseResources = async (session, objectGroup) => {
+export const releaseResources = async (session: Session, objectGroup: string) => {
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 

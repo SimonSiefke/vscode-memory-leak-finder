@@ -7,8 +7,8 @@ export const setup = async ({ Editor, SettingsEditor }: TestContext): Promise<vo
 
 export const run = async ({ SettingsEditor }: TestContext): Promise<void> => {
   await SettingsEditor.search({
-    value: 'editor.autoclosingcomments',
     resultCount: 1,
+    value: 'editor.autoclosingcomments',
   })
   await SettingsEditor.clear()
 }

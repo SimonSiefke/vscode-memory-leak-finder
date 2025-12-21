@@ -6,8 +6,8 @@ export const setup = async ({ Editor, SettingsEditor }: TestContext): Promise<vo
   await Editor.closeAll()
   await SettingsEditor.open()
   await SettingsEditor.search({
-    value: 'Editor: Auto Closing Comments',
     resultCount: 2,
+    value: 'Editor: Auto Closing Comments',
   })
 }
 

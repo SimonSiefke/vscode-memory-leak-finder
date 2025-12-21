@@ -43,33 +43,28 @@ const mergeSelectors = (selector, subSelector = '', hasText = '', hasExactText =
   return merged
 }
 
-export const create = (rpc, sessionId, selector, { hasText = '', hasExactText = '', nth = -1 } = {}, utilityContext = {}) => {
+export const create = (rpc, sessionId, selector, { hasExactText = '', hasText = '', nth = -1 } = {}, utilityContext = {}) => {
   return {
-    objectType: ObjectType.Locator,
-    rpc,
-    selector: mergeSelectors('', selector, hasText, hasExactText, nth),
-    sessionId,
-    utilityContext,
-    nth(value) {
-      return {
-        ...this,
-        selector: `${this.selector}:nth(${value})`,
-      }
+    blur() {
+      return LocatorBlur.blur(this)
     },
-    first() {
-      return {
-        ...this,
-        selector: `${this.selector}:nth(0)`,
-      }
+    boundingBox() {
+      return LocatorBoundingBox.boundingBox(this)
+    },
+    clear() {
+      return LocatorClear.clear(this)
+    },
+    click(options = {}) {
+      return LocatorClick.click(this, options)
+    },
+    clickExponential(options) {
+      return LocatorClickExponential.clickExponential(this, options)
     },
     count() {
       return LocatorCount.count(this)
     },
-    locator(selector, { hasText = '', hasExactText = '', nth = -1 } = {}) {
-      return {
-        ...this,
-        selector: mergeSelectors(this.selector, selector, hasText, hasExactText, nth),
-      }
+    dblclick() {
+      return LocatorClick.dblclick(this)
     },
     fill(text) {
       return LocatorFill.fill(
@@ -78,6 +73,61 @@ export const create = (rpc, sessionId, selector, { hasText = '', hasExactText = 
         },
         text,
       )
+    },
+    first() {
+      return {
+        ...this,
+        selector: `${this.selector}:nth(0)`,
+      }
+    },
+    focus() {
+      return LocatorFocus.focus(this)
+    },
+    getAttribute(attributeName) {
+      return LocatorGetAttribute.getAttribute(this, attributeName)
+    },
+    hover() {
+      return LocatorHover.hover(this)
+    },
+    isVisible() {
+      return LocatorIsVisible.isVisible(this)
+    },
+    locator(selector, { hasExactText = '', hasText = '', nth = -1 } = {}) {
+      return {
+        ...this,
+        selector: mergeSelectors(this.selector, selector, hasText, hasExactText, nth),
+      }
+    },
+    nth(value) {
+      return {
+        ...this,
+        selector: `${this.selector}:nth(${value})`,
+      }
+    },
+    objectType: ObjectType.Locator,
+    press(key) {
+      return LocatorPress.press(this, key)
+    },
+    rpc,
+    scrollDown() {
+      return LocatorScrollDown.scrollDown(this)
+    },
+    scrollUp() {
+      return LocatorScrollUp.scrollUp(this)
+    },
+    selector: mergeSelectors('', selector, hasText, hasExactText, nth),
+    selectText() {
+      return LocatorSelectText.selectText(this)
+    },
+    sessionId,
+    setChecked(value: boolean) {
+      return LocatorSetChecked.setChecked(this, value)
+    },
+    setValue(value) {
+      return LocatorSetValue.setValue(this, value)
+    },
+    textContent({ allowHidden = false } = {}) {
+      return LocatorTextContent.getTextContent(this, { allowHidden })
     },
     type(text) {
       return LocatorType.type(this, text)
@@ -92,6 +142,7 @@ export const create = (rpc, sessionId, selector, { hasText = '', hasExactText = 
         options,
       )
     },
+<<<<<<< HEAD
     setValue(value) {
       return LocatorSetValue.setValue(this, value)
     },
@@ -143,5 +194,8 @@ export const create = (rpc, sessionId, selector, { hasText = '', hasExactText = 
     scrollUp() {
       return LocatorScrollUp.scrollUp(this)
     },
+=======
+    utilityContext,
+>>>>>>> origin/main
   }
 }

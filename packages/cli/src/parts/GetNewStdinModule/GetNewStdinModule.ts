@@ -7,16 +7,16 @@ import * as ModeType from '../ModeType/ModeType.ts'
 
 export const getFn = (mode) => {
   switch (mode) {
-    case ModeType.Waiting:
-      return HandleStdinDataWaitingMode.handleStdinDataWaitingMode
-    case ModeType.Running:
-      return HandleStdinDataRunningMode.handleStdinDataRunningMode
     case ModeType.FilterWaiting:
       return HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode
     case ModeType.FinishedRunning:
       return HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode
     case ModeType.Interrupted:
       return HandleStdinDataInterruptedMode.handleStdinDataInterruptedMode
+    case ModeType.Running:
+      return HandleStdinDataRunningMode.handleStdinDataRunningMode
+    case ModeType.Waiting:
+      return HandleStdinDataWaitingMode.handleStdinDataWaitingMode
     default:
       throw new Error(`unexpected stdin mode ${mode}`)
   }

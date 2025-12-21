@@ -2,11 +2,10 @@ import type { TestContext } from '../types.js'
 
 export const skip = true
 
-export const setup = async ({ Editor, Workspace, ActivityBar, Explorer }: TestContext): Promise<void> => {
+export const setup = async ({ ActivityBar, Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Workspace.setFiles([
     {
-      name: '.vscode/tasks.json',
       content: `{
   // See https://go.microsoft.com/fwlink/?LinkId=733558
   // for the documentation about the tasks.json format
@@ -19,6 +18,7 @@ export const setup = async ({ Editor, Workspace, ActivityBar, Explorer }: TestCo
       }
   ]
 }`,
+      name: '.vscode/tasks.json',
     },
   ])
   await ActivityBar.showExplorer()
