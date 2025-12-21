@@ -1,60 +1,12 @@
 import { execa } from 'execa'
-import { mkdir, readdir, rm } from 'node:fs/promises'
+import { readdir, rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import * as Root from '../Root/Root.ts'
 
-<<<<<<< HEAD
-export const create = ({ electronApp, expect, page, VError }) => {
-=======
 export const create = ({ page, VError }) => {
->>>>>>> 60bb13c7ff78 (feature: improve git error handling (#2289))
   const workspace = join(Root.root, '.vscode-test-workspace')
 
   return {
-    async add() {
-      await execa('git', ['add', '-f', '.'], { cwd: workspace, env: { ...process.env, ...gitEnv } })
-      await page.waitForIdle()
-    },
-    async checkoutBranch(branchName) {
-      await page.waitForIdle()
-      await execa('git', ['checkout', branchName], { cwd: workspace, env: { ...process.env, ...gitEnv } })
-      await page.waitForIdle()
-    },
-    async cloneRepository(repoUrl: string) {
-      // Clear the workspace first
-      const dirents = await readdir(workspace).catch(() => [])
-      for (const dirent of dirents) {
-        const absolutePath = join(workspace, dirent)
-        await rm(absolutePath, { force: true, recursive: true })
-      }
-      // Clone directly into the workspace directory
-      await execa('git', ['clone', repoUrl, '.'], { cwd: workspace, env: { ...process.env, ...gitEnv } })
-      await page.waitForIdle()
-    },
-    async commit(message) {
-      await execa('git', ['commit', '-m', message], { cwd: workspace, env: { ...process.env, ...gitEnv } })
-      await page.waitForIdle()
-    },
-    async createBranch(branchName) {
-      await execa('git', ['checkout', '-b', branchName], { cwd: workspace, env: { ...process.env, ...gitEnv } })
-      await page.waitForIdle()
-    },
-    async init() {
-      try {
-        await execa('git', ['init'], { cwd: workspace, env: { ...process.env } })
-        await execa('git', ['config', 'user.name', 'Test User'], { cwd: workspace, env: { ...process.env } })
-        await execa('git', ['config', 'user.email', 'test@example.com'], { cwd: workspace, env: { ...process.env } })
-        await page.waitForIdle()
-        await mkdir(workspace, { recursive: true })
-        await execa('git', ['init'], { cwd: workspace, env: { ...process.env } })
-        await execa('git', ['config', 'user.name', 'Test User'], { cwd: workspace, env: { ...process.env } })
-        await execa('git', ['config', 'user.email', 'test@example.com'], { cwd: workspace, env: { ...process.env } })
-      } catch (error) {
-        throw new VError(error, `Failed to init`)
-      }
-    },
-<<<<<<< HEAD
-=======
     async add() {
       try {
         await page.waitForIdle()
@@ -102,6 +54,5 @@ export const create = ({ page, VError }) => {
       await execa('git', ['clone', repoUrl, '.'], { cwd: workspace, env: { ...process.env } })
       await page.waitForIdle()
     },
->>>>>>> 60bb13c7ff78 (feature: improve git error handling (#2289))
   }
 }
