@@ -4,7 +4,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
       try {
         await page.waitForIdle()
         const input = page.locator('.find-part .monaco-findInput textarea[aria-label="Find"]')
-        await input.type(value)
+        await input.setValue(value)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to set search value`)
@@ -46,7 +46,7 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         await page.waitForIdle()
         await replace.focus()
         await page.waitForIdle()
-        await replace.type(value)
+        await replace.setValue(value)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to set replace value`)
