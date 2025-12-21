@@ -1,4 +1,4 @@
-import * as HeapSnapshotWorker from '../HeapSnapshotWorker/HeapSnapshotWorker.ts'
+import { launchHeapSnapshotWorker } from '../LaunchHeapSnapshotWorker/LaunchHeapSnapshotWorker.ts'
 
 const getThreshold = (context: any): number => {
   const defaultRuns = 2
@@ -12,6 +12,7 @@ export const compareClosuresWithReferences = async (beforePath: string, after: {
   const options = {
     minCount,
   }
-  const result = await HeapSnapshotWorker.invoke('HeapSnapshot.compareNamedClosureCountWithReferences2', beforePath, afterPath, options)
+  await using rpc = await launchHeapSnapshotWorker()
+  const result = await rpc.invoke('HeapSnapshot.compareNamedClosureCountWithReferences2', beforePath, afterPath, options)
   return result
 }
