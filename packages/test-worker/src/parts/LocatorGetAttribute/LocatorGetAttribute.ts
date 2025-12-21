@@ -6,7 +6,6 @@ export const getAttribute = async (locator, attributeName) => {
   Assert.string(attributeName)
   const attributeValue = await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(locator, attributeName) => test.getAttribute(locator, attributeName)',
       arguments: [
         {
           value: locator,
@@ -16,6 +15,7 @@ export const getAttribute = async (locator, attributeName) => {
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(locator, attributeName) => test.getAttribute(locator, attributeName)',
     },
     locator,
   )

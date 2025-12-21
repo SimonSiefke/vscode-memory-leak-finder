@@ -5,7 +5,6 @@ export const getTextContent = async (locator, { allowHidden }) => {
   Assert.object(locator)
   const text = await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(locator, options) => test.getTextContent(locator, options)',
       arguments: [
         {
           value: locator,
@@ -17,6 +16,7 @@ export const getTextContent = async (locator, { allowHidden }) => {
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(locator, options) => test.getTextContent(locator, options)',
     },
     locator,
   )

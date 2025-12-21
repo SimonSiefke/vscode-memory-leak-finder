@@ -5,7 +5,6 @@ export const scrollUp = async (locator, options = {}) => {
   Assert.object(locator)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
       arguments: [
         {
           value: locator,
@@ -21,6 +20,7 @@ export const scrollUp = async (locator, options = {}) => {
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
     },
     locator,
   )

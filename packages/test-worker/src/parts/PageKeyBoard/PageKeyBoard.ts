@@ -6,17 +6,17 @@ export const press = async (rpc, utilityContext, key) => {
   Assert.string(key)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(key) => test.pressKey(key)',
       arguments: [
         {
           value: key,
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(key) => test.pressKey(key)',
     },
     {
-      utilityContext,
       rpc,
+      utilityContext,
     },
   )
 }
@@ -26,17 +26,17 @@ export const type = async (rpc, utilityContext, text) => {
   Assert.string(text)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(text) => test.type(text)',
       arguments: [
         {
           value: text,
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(text) => test.type(text)',
     },
     {
-      utilityContext,
       rpc,
+      utilityContext,
     },
   )
 }
@@ -47,17 +47,17 @@ export const pressKeyExponential = async (rpc, utilityContext, options) => {
   Assert.object(options.waitFor)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(locator, fnName, options) => test.pressKeyExponential(locator, fnName, options)',
       arguments: [
         {
           value: options,
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(locator, fnName, options) => test.pressKeyExponential(locator, fnName, options)',
     },
     {
-      utilityContext,
       rpc,
+      utilityContext,
     },
   )
 
@@ -69,17 +69,17 @@ export const contentEditableInsert = async (utilityContext, rpc, options) => {
   Assert.string(options.value)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(options) => test.contentEditableInsert(options)',
       arguments: [
         {
           value: options,
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(options) => test.contentEditableInsert(options)',
     },
     {
-      utilityContext,
       rpc,
+      utilityContext,
     },
   )
 }
