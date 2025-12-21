@@ -64,7 +64,7 @@ export const connectElectron = async (electronRpc, headlessMode) => {
   await DevtoolsProtocolRuntime.runIfWaitingForDebugger(electronRpc)
 
   return {
-    monkeyPatchedElectronId: monkeyPatchedElectron.objectId,
     electronObjectId,
+    monkeyPatchedElectronId: monkeyPatchedElectron.objectId,
   }
 }

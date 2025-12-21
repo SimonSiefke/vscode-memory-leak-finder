@@ -1,5 +1,5 @@
+import type { MessagePort } from 'node:worker_threads'
 import { Writable } from 'node:stream'
-import { MessagePort } from 'node:worker_threads'
 
 export class PortStream extends Writable {
   port: MessagePort

@@ -1,4 +1,4 @@
-export const getElectronArgs = ({ headlessMode, args = [] }) => {
+export const getElectronArgs = ({ args = [], headlessMode }) => {
   const allArgs: string[] = [...args]
   if (headlessMode) {
     allArgs.unshift('--headless')
