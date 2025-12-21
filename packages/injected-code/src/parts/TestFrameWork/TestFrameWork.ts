@@ -184,7 +184,8 @@ export const checkTitle = async (expectedTitle) => {
 
 export const checkMultiElementCondition = async (locator, fnName, options) => {
   const startTime = Time.getTimeStamp()
-  const endTime = startTime + maxTimeout
+  const timeout = options.timeout || maxTimeout
+  const endTime = startTime + timeout
   let currentTime = startTime
   const fn = MultiElementConditionMap.getFunction(fnName)
   while (currentTime < endTime) {
@@ -298,6 +299,12 @@ export const pressKey = async (key) => {
   Assert.string(key)
   const keyboardEventOptions = GetKeyboardEventOptions.getKeyboardEventOptions(key)
   KeyBoardActions.press(keyboardEventOptions)
+  if (
+    document.activeElement &&
+    (document.activeElement instanceof HTMLAnchorElement || document.activeElement instanceof HTMLButtonElement)
+  ) {
+    document.activeElement.click()
+  }
 }
 
 export const type = (text) => {

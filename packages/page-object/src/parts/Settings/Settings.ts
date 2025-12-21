@@ -8,6 +8,8 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.PreferencesOpenSettingsUi)
+        await page.waitForIdle()
+        // TODO
         // const heading=page.locator('settings-group-title-label', {
         //   hasText:'Commonly Used'
         // })

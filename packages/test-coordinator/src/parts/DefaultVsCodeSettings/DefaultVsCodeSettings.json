@@ -42,5 +42,6 @@
   "extensions.verifySignature": false,
   "telemetry.feedback.enabled": false,
   "telemetry.editStats.enabled": false,
-  "chat.extensionUnification.enabled": false
+  "chat.extensionUnification.enabled": false,
+  "security.workspace.trust.enabled": false
 }

@@ -9,6 +9,10 @@ export const setupTestWithCallback = async (pageObject, file, forceRun) => {
   Assert.boolean(forceRun)
   const module = await ImportTest.importTest(file)
   const wasOriginallySkipped = Boolean(module.skip)
+  const isCi = process.env.GITHUB_ACTIONS
+  if (module.requiresNetwork && isCi) {
+    return { skipped: true, wasOriginallySkipped, error: null }
+  }
   if (module.skip && !forceRun) {
     return { skipped: true, wasOriginallySkipped, error: null }
   }

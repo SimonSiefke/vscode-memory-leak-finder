@@ -33,12 +33,16 @@ export const create = ({ expect, page, VError }) => {
       try {
         await page.waitForIdle()
         const searchInput = page.locator('.search-container [role="textbox"]')
+        await expect(searchInput).toBeVisible()
+        await page.waitForIdle()
         await expect(searchInput).toBeFocused()
         await page.waitForIdle()
         await searchInput.type(value)
         await page.waitForIdle()
         const searchCount = page.locator('.settings-count-widget')
         const word = resultCount === 1 ? 'Setting' : 'Settings'
+        await expect(searchCount).toBeVisible()
+        await page.waitForIdle()
         await expect(searchCount).toHaveText(`${resultCount} ${word} Found`)
         await page.waitForIdle()
       } catch (error) {
@@ -119,7 +123,8 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const checkbox = page.locator(`.monaco-custom-toggle[aria-label="${name}"]`)
         await expect(checkbox).toBeVisible()
-        const checkedValue = checkbox.getAttribute('aria-checked')
+        await page.waitForIdle()
+        const checkedValue = await checkbox.getAttribute('aria-checked')
         if (checkedValue === 'true') {
           return
         }

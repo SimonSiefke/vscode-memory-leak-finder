@@ -1,6 +1,8 @@
-import type { TestContext } from '../types.ts'
+import type { TestContext } from '../types.js'
 
 export const skip = 1
+
+export const requiresNetwork = 1
 
 // Minimal valid MP4 file (ftyp box only)
 // This is the smallest valid MP4 file structure
@@ -45,10 +47,13 @@ export const setup = async ({ Workspace, Editor, Explorer }: TestContext): Promi
   ])
   await Editor.closeAll()
   await Explorer.focus()
+  await Explorer.refresh()
   await Explorer.shouldHaveItem('test-video.mp4')
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
-  await Editor.open('test-video.mp4')
+  await Editor.open('test-video.mp4', {
+    hasError: true,
+  })
   await Editor.close()
 }
