@@ -21,23 +21,23 @@ export const generateCA = (): CertificatePair => {
   cert.setIssuer(attrs)
   cert.setExtensions([
     {
-      cA: true,
       name: 'basicConstraints',
+      cA: true,
     },
     {
-      dataEncipherment: true,
-      digitalSignature: true,
-      keyCertSign: true,
-      keyEncipherment: true,
       name: 'keyUsage',
+      keyCertSign: true,
+      digitalSignature: true,
       nonRepudiation: true,
+      keyEncipherment: true,
+      dataEncipherment: true,
     },
   ])
 
   cert.sign(keys.privateKey, forge.md.sha256.create())
 
   return {
-    cert: forge.pki.certificateToPem(cert),
     key: forge.pki.privateKeyToPem(keys.privateKey),
+    cert: forge.pki.certificateToPem(cert),
   }
 }
