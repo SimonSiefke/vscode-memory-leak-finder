@@ -6,7 +6,7 @@ export const fixSvgHeight = (svgHtml: string, dataCount: number): string => {
   // Reduce height by 20px for all charts
   const heightMatch = svgHtml.match(HEIGHT_REGEX)
   if (heightMatch) {
-    const currentHeight = parseInt(heightMatch[1])
+    const currentHeight = Number.parseInt(heightMatch[1])
     const newHeight = Math.max(20, currentHeight - 20) // Ensure minimum height of 20px
 
     return svgHtml.replace(HEIGHT_REGEX, `height="${newHeight}"`).replace(VIEWBOX_REGEX, (match) => {
