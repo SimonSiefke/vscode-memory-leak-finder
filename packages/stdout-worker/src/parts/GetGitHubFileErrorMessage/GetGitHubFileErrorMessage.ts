@@ -10,7 +10,7 @@ const escape = (value: string): string => {
 }
 
 export const getGitHubFileErrorMessage = (message: string, options: GitHubFileErrorOptions): string => {
-  const parts: string[] = [ '::error']
+  const parts: string[] = ['::error']
   const annotations: string[] = []
   if (options.file) {
     annotations.push(`file=${options.file}`)
