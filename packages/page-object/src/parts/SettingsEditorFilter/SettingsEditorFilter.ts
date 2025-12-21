@@ -21,7 +21,7 @@ export const create = ({ expect, page, VError }) => {
         })
         await page.waitForIdle()
         await expect(menu).toBeHidden()
-        const settingsEditorInput = SettingsEditorInput.create({ page, expect, VError })
+        const settingsEditorInput = SettingsEditorInput.create({ expect, page, VError })
         await settingsEditorInput.shouldHaveText(filterText)
       } catch (error) {
         throw new VError(error, `Failed to select filter ${filterName}`)

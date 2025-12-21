@@ -14,22 +14,6 @@ const getKeybindingButtonsText = (keyBinding) => {
 
 export const create = ({ expect, page, VError }) => {
   return {
-    async show() {
-      try {
-        const quickPick = QuickPick.create({ expect, page, VError })
-        await quickPick.executeCommand(WellKnownCommands.OpenKeyboardShortcuts)
-        const keyBindingsEditor = page.locator('.keybindings-editor')
-        await expect(keyBindingsEditor).toBeVisible({
-          timeout: 3000,
-        })
-        const body = page.locator('.keybindings-body')
-        await expect(body).toBeVisible()
-        const list = body.locator('.monaco-list')
-        await expect(list).toBeVisible()
-      } catch (error) {
-        throw new VError(error, `Failed to show keybindings editor`)
-      }
-    },
     async searchFor(searchValue) {
       try {
         const keyBindingsEditor = page.locator('.keybindings-editor')
@@ -63,6 +47,22 @@ export const create = ({ expect, page, VError }) => {
         await expect(rowKeybinding).toHaveText(keyBindingsButtonText, { timeout: 5000 })
       } catch (error) {
         throw new VError(error, `Failed to set keyBinding "${keyBinding}"`)
+      }
+    },
+    async show() {
+      try {
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.OpenKeyboardShortcuts)
+        const keyBindingsEditor = page.locator('.keybindings-editor')
+        await expect(keyBindingsEditor).toBeVisible({
+          timeout: 3000,
+        })
+        const body = page.locator('.keybindings-body')
+        await expect(body).toBeVisible()
+        const list = body.locator('.monaco-list')
+        await expect(list).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to show keybindings editor`)
       }
     },
   }
