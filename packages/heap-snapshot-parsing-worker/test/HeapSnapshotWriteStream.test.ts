@@ -40,20 +40,20 @@ test('HeapSnapshotWriteStream - processes complete heap snapshot data', async ()
   const stream = createHeapSnapshotWriteStream()
 
   const heapSnapshotData = {
-    edges: [0, 0, 0],
-    locations: [0, 0, 1, 2],
-    nodes: [0, 0, 1, 0, 0, 0, 0, 1, 1, 2, 0, 1, 0, 0],
     snapshot: {
-      edge_count: 1,
       meta: {
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         edge_types: [['context', 'element', 'property', 'internal']],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
       },
       node_count: 2,
+      edge_count: 1,
     },
+    nodes: [0, 0, 1, 0, 0, 0, 0, 1, 1, 2, 0, 1, 0, 0],
+    edges: [0, 0, 0],
+    locations: [0, 0, 1, 2],
     strings: ['', 'root', 'child'],
   }
 
@@ -75,20 +75,20 @@ test('HeapSnapshotWriteStream - handles empty heap snapshot', async () => {
   const stream = createHeapSnapshotWriteStream()
 
   const heapSnapshotData = {
-    edges: [],
-    locations: [],
-    nodes: [],
     snapshot: {
-      edge_count: 0,
       meta: {
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         edge_types: [['context', 'element', 'property', 'internal']],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
       },
       node_count: 0,
+      edge_count: 0,
     },
+    nodes: [],
+    edges: [],
+    locations: [],
     strings: [''],
   }
 
@@ -110,20 +110,20 @@ test('HeapSnapshotWriteStream - handles partial data chunks', async () => {
   const stream = createHeapSnapshotWriteStream()
 
   const heapSnapshotData = {
-    edges: [],
-    locations: [],
-    nodes: [0, 0, 1, 0, 0, 0, 0],
     snapshot: {
-      edge_count: 0,
       meta: {
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         edge_types: [['context', 'element', 'property', 'internal']],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
       },
       node_count: 1,
+      edge_count: 0,
     },
+    nodes: [0, 0, 1, 0, 0, 0, 0],
+    edges: [],
+    locations: [],
     strings: ['', 'root'],
   }
 
@@ -149,20 +149,20 @@ test('HeapSnapshotWriteStream - handles large numbers in arrays', async () => {
   const stream = createHeapSnapshotWriteStream()
 
   const heapSnapshotData = {
-    edges: [],
-    locations: [],
-    nodes: [0, 0, 123_456_789, 0, 0, 0, 0],
     snapshot: {
-      edge_count: 0,
       meta: {
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         edge_types: [['context', 'element', 'property', 'internal']],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
       },
       node_count: 1,
+      edge_count: 0,
     },
+    nodes: [0, 0, 123_456_789, 0, 0, 0, 0],
+    edges: [],
+    locations: [],
     strings: ['', 'root'],
   }
 
@@ -180,20 +180,20 @@ test('HeapSnapshotWriteStream - handles negative numbers (skips minus sign)', as
   const stream = createHeapSnapshotWriteStream()
 
   const heapSnapshotData = {
-    edges: [],
-    locations: [],
-    nodes: [0, 0, 1, -100, 0, 0, 0],
     snapshot: {
-      edge_count: 0,
       meta: {
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         edge_types: [['context', 'element', 'property', 'internal']],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
       },
       node_count: 1,
+      edge_count: 0,
     },
+    nodes: [0, 0, 1, -100, 0, 0, 0],
+    edges: [],
+    locations: [],
     strings: ['', 'root'],
   }
 
@@ -212,20 +212,20 @@ test('HeapSnapshotWriteStream - handles missing nodes array header gracefully', 
 
   // Create data without the "nodes": token
   const heapSnapshotData = {
-    // Missing "nodes": array
-    edges: [],
-    locations: [],
     snapshot: {
-      edge_count: 0,
       meta: {
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         edge_types: [['context', 'element', 'property', 'internal']],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
       },
       node_count: 1,
+      edge_count: 0,
     },
+    // Missing "nodes": array
+    edges: [],
+    locations: [],
     strings: ['', 'root'],
   }
 
@@ -246,20 +246,20 @@ test('HeapSnapshotWriteStream - handles missing edges array header gracefully', 
 
   // Create data without the "edges": token
   const heapSnapshotData = {
-    // Missing "edges": array
-    locations: [],
-    nodes: [0, 0, 1, 0, 0, 0, 0],
     snapshot: {
-      edge_count: 0,
       meta: {
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         edge_types: [['context', 'element', 'property', 'internal']],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
       },
       node_count: 1,
+      edge_count: 0,
     },
+    nodes: [0, 0, 1, 0, 0, 0, 0],
+    // Missing "edges": array
+    locations: [],
     strings: ['', 'root'],
   }
 
@@ -280,19 +280,19 @@ test('HeapSnapshotWriteStream - handles missing locations array header gracefull
 
   // Create data without the "locations": token
   const heapSnapshotData = {
-    edges: [],
-    nodes: [0, 0, 1, 0, 0, 0, 0],
     snapshot: {
-      edge_count: 0,
       meta: {
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         edge_types: [['context', 'element', 'property', 'internal']],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
       },
       node_count: 1,
+      edge_count: 0,
     },
+    nodes: [0, 0, 1, 0, 0, 0, 0],
+    edges: [],
     // Missing "locations": array
     strings: ['', 'root'],
   }
@@ -397,20 +397,20 @@ test('HeapSnapshotWriteStream - processes heap snapshot with strings when parseS
   const stream = createHeapSnapshotWriteStream({ parseStrings: true })
 
   const heapSnapshotData = {
-    edges: [],
-    locations: [0, 0, 1, 2],
-    nodes: [0, 0, 1, 0, 0, 0, 0],
     snapshot: {
-      edge_count: 0,
       meta: {
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         edge_types: [['context', 'element', 'property', 'internal']],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
       },
       node_count: 1,
+      edge_count: 0,
     },
+    nodes: [0, 0, 1, 0, 0, 0, 0],
+    edges: [],
+    locations: [0, 0, 1, 2],
     strings: ['', 'root', 'child', 'grandchild'],
   }
 
@@ -432,20 +432,20 @@ test('HeapSnapshotWriteStream - skips strings when parseStrings is false', async
   const stream = createHeapSnapshotWriteStream({ parseStrings: false })
 
   const heapSnapshotData = {
-    edges: [],
-    locations: [0, 0, 1, 2],
-    nodes: [0, 0, 1, 0, 0, 0, 0],
     snapshot: {
-      edge_count: 0,
       meta: {
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         edge_types: [['context', 'element', 'property', 'internal']],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
       },
       node_count: 1,
+      edge_count: 0,
     },
+    nodes: [0, 0, 1, 0, 0, 0, 0],
+    edges: [],
+    locations: [0, 0, 1, 2],
     strings: ['', 'root', 'child'],
   }
 
@@ -466,20 +466,20 @@ test('HeapSnapshotWriteStream - handles partial string data', async () => {
   const stream = createHeapSnapshotWriteStream({ parseStrings: true })
 
   const heapSnapshotData = {
-    edges: [],
-    locations: [0, 0, 1, 2],
-    nodes: [0, 0, 1, 0, 0, 0, 0],
     snapshot: {
-      edge_count: 0,
       meta: {
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         edge_types: [['context', 'element', 'property', 'internal']],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
       },
       node_count: 1,
+      edge_count: 0,
     },
+    nodes: [0, 0, 1, 0, 0, 0, 0],
+    edges: [],
+    locations: [0, 0, 1, 2],
     strings: ['', 'root', 'child'],
   }
 
