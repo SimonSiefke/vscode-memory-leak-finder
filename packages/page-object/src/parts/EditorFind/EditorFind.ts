@@ -1,16 +1,37 @@
 export const create = ({ page, expect, VError, ideVersion }) => {
   return {
-    async setSearchValue() {
+    async setSearchValue(value: string) {
       try {
         await page.waitForIdle()
+        const input = page.locator('.find-part .monaco-findInput textarea[aria-label="Find"]')
+        await input.type(value)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to set search value`)
       }
     },
-    async setReplaceValue() {
+    async setReplaceValue(value: string) {
       try {
         await page.waitForIdle()
+        const findWidget = page.locator('.find-widget.visible')
+        await expect(findWidget).toBeVisible()
+        await page.waitForIdle()
+        const toggleReplace = findWidget.locator('[aria-label="Toggle Replace"]')
+        await expect(toggleReplace).toBeVisible()
+        await page.waitForIdle()
+        const expanded = await toggleReplace.getAttribute('aria-expanded')
+        if (!expanded) {
+          await page.waitForIdle()
+          await toggleReplace.click()
+          await expect(toggleReplace).toHaveAttribute('aria-expanded', 'true')
+        }
+
+        const replace = page.locator('.replace-part .monaco-findInput textarea[aria-label="Replace"]')
+        await expect(replace).toBeVisible()
+        await page.waitForIdle()
+        await replace.focus()
+        await page.waitForIdle()
+        await replace.type(value)
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to set replace value`)
@@ -18,6 +39,13 @@ export const create = ({ page, expect, VError, ideVersion }) => {
     },
     async replace() {
       try {
+        await page.waitForIdle()
+        const findWidget = page.locator('.find-widget.visible')
+        await expect(findWidget).toBeVisible()
+        await page.waitForIdle()
+        const button = findWidget.locator('[aria-label^="Replace All"][tabIndex="0"]')
+        await expect(button).toBeVisible()
+        await button.click()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to replace`)
