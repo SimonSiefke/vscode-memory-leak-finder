@@ -5,13 +5,13 @@ export const skip = 1
 export const requiresNetwork = 1
 
 export const setup = async ({
-  Editor,
   ChatEditor,
-  Workspace,
+  Editor,
   Electron,
-  Extensions,
   ExtensionDetailView,
+  Extensions,
   SideBar,
+  Workspace,
 }: TestContext): Promise<void> => {
   await Electron.mockDialog({
     response: 1,
@@ -26,8 +26,8 @@ export const setup = async ({
   await Editor.closeAll()
   await Workspace.setFiles([
     {
-      name: 'index.ts',
       content: `let x: string = 1`,
+      name: 'index.ts',
     },
   ])
   await Editor.closeAll()

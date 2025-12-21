@@ -1,5 +1,6 @@
 import { existsSync } from 'fs'
 import { readFile, writeFile, unlink } from 'fs/promises'
+import { readFile, writeFile } from 'fs/promises'
 import { join } from 'path'
 import type { CertificatePair } from '../CertificatePair/CertificatePair.ts'
 import { CERT_DIR } from '../Constants/Constants.ts'
@@ -25,10 +26,7 @@ export const getCertificateForDomain = async (domain: string): Promise<Certifica
 
     // If validation fails, delete the mismatched files and regenerate
     console.log(`[CertificateManager] Certificate-key mismatch detected for ${domain}, regenerating...`)
-    await Promise.all([
-      unlink(certPath).catch(() => {}),
-      unlink(keyPath).catch(() => {}),
-    ])
+    await Promise.all([unlink(certPath).catch(() => {}), unlink(keyPath).catch(() => {})])
   }
 
   const domainCert = GenerateCertificateForDomain.generateCertificateForDomain(domain, ca.key, ca.cert)

@@ -6,9 +6,9 @@ export const getRestoreNodeModulesFileOperations = (from: string, to: string, pa
     const sourceNodeModulesPath = Path.join(from, relativePath)
     const targetPath = Path.join(to, relativePath)
     return {
-      type: 'copy',
       from: sourceNodeModulesPath,
       to: targetPath,
+      type: 'copy',
     }
   })
 }

@@ -8,8 +8,6 @@ import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import * as LoadZipData from '../LoadZipData/LoadZipData.ts'
 import * as Root from '../Root/Root.ts'
 
-
-
 const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
 
 const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> => {
@@ -19,7 +17,7 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
     }
 
     const mockData = JSON.parse(await readFile(mockFile, 'utf8'))
-    const {response} = mockData
+    const { response } = mockData
 
     // Handle OPTIONS requests specially - they might have empty body
     if (response.statusCode === 204) {
@@ -30,8 +28,8 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
       }
     }
 
-    // Handle file references (for zip files and SSE files)
-    let {body} = response
+    // Handle file references (for zip files)
+    let { body } = response
     let isZipFile = false
     let isSseFile = false
     if (typeof body === 'string' && body.startsWith('file-reference:')) {
@@ -96,8 +94,8 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
 export const getMockResponse = async (method: string, url: string): Promise<MockResponse | null> => {
   try {
     const parsedUrl = new URL(url)
-    const {hostname} = parsedUrl
-    const {pathname} = parsedUrl
+    const { hostname } = parsedUrl
+    const { pathname } = parsedUrl
 
     // Handle OPTIONS preflight requests - return a proper CORS preflight response
     if (method === 'OPTIONS') {
@@ -238,4 +236,4 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   res.end(bodyBuffer)
 }
 
-export {type MockResponse} from '../MockResponse/MockResponse.ts'
+export { type MockResponse } from '../MockResponse/MockResponse.ts'

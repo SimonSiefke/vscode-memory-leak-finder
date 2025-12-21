@@ -2,15 +2,15 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ Editor, Workspace, Explorer, RunAndDebug }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, RunAndDebug, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'index.js',
       content: `let x = 1
 
 setInterval(()=>{
   x++
 }, 1000)`,
+      name: 'index.js',
     },
   ])
   await Editor.closeAll()
@@ -20,14 +20,14 @@ setInterval(()=>{
   await Editor.open('index.js')
   await Editor.setBreakpoint(4)
   await RunAndDebug.runAndWaitForPaused({
+    callStackSize: 11,
     file: 'index.js',
     line: 4,
-    callStackSize: 11,
   })
   await Editor.goToFile({
+    column: 0,
     file: 'index.js',
     line: 3,
-    column: 0,
   })
 }
 
@@ -38,7 +38,7 @@ export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.hideDebugHover()
 }
 
-export const teardown = async ({ RunAndDebug, Editor }: TestContext): Promise<void> => {
+export const teardown = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
   await RunAndDebug.stop()
   await RunAndDebug.removeAllBreakpoints()
   await Editor.closeAll()

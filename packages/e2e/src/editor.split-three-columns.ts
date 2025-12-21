@@ -3,8 +3,8 @@ import type { TestContext } from '../types.js'
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'file.txt',
       content: 'sample text',
+      name: 'file.txt',
     },
   ])
   await Editor.closeAll()

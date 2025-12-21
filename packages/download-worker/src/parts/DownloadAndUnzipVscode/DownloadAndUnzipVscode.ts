@@ -20,8 +20,8 @@ const getProductJsonPath = (path: string): string => {
 const automaticallyDownloadSourceMaps = false
 
 export interface DownloadAndUnzipVscodeOptions {
-  readonly vscodeVersion?: string
   readonly insidersCommit?: string
+  readonly vscodeVersion?: string
 }
 
 /**
@@ -58,8 +58,8 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
     }
     const { downloadAndUnzipVSCode } = await import('@vscode/test-electron')
     const path = await downloadAndUnzipVSCode({
-      version: vscodeVersion,
       cachePath: VscodeTestCachePath.vscodeTestCachePath,
+      version: vscodeVersion,
     })
     const productPath = getProductJsonPath(path)
     const productJson = await JsonFile.readJson(productPath)

@@ -2,25 +2,25 @@ import { VError } from '@lvce-editor/verror'
 import { copy, makeDirectory, remove, writeFileContent } from '../Filesystem/Filesystem.ts'
 
 export interface CopyOperation {
-  readonly type: 'copy'
   readonly from: string
   readonly to: string
+  readonly type: 'copy'
 }
 
 export interface MkdirOperation {
-  readonly type: 'mkdir'
   readonly path: string
+  readonly type: 'mkdir'
 }
 
 export interface RemoveOperation {
-  readonly type: 'remove'
   readonly from: string
+  readonly type: 'remove'
 }
 
 export interface WriteOperation {
-  readonly type: 'write'
-  readonly path: string
   readonly content: string
+  readonly path: string
+  readonly type: 'write'
 }
 
 export type FileOperation = CopyOperation | MkdirOperation | RemoveOperation | WriteOperation
@@ -37,20 +37,20 @@ export const applyFileOperation = async (operation: FileOperation): Promise<void
         break
       }
 
-      case 'remove': {
-        const fromPath: string = operation.from
-        await remove(fromPath, { recursive: true })
-        break
-      }
-
       case 'mkdir': {
         const { path } = operation
         await makeDirectory(path, { recursive: true })
         break
       }
 
+      case 'remove': {
+        const fromPath: string = operation.from
+        await remove(fromPath, { recursive: true })
+        break
+      }
+
       case 'write': {
-        const { path, content } = operation
+        const { content, path } = operation
         await writeFileContent(path, content, 'utf8')
         break
       }

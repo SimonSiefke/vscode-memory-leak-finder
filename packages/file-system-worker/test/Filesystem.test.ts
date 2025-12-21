@@ -10,10 +10,10 @@ const mockPathExists = jest.fn()
 
 jest.unstable_mockModule('node:fs/promises', () => ({
   cp: mockCp,
-  mkdir: mockMkdir,
-  rm: mockRm,
-  readFile: mockReadFile,
   glob: mockGlob,
+  mkdir: mockMkdir,
+  readFile: mockReadFile,
+  rm: mockRm,
   writeFile: jest.fn(),
 }))
 
@@ -37,19 +37,19 @@ test('copy - copies file with default options', async () => {
   await filesystemModule.copy('/source/file.txt', '/dest/file.txt')
 
   expect(mockCp).toHaveBeenCalledWith('/source/file.txt', '/dest/file.txt', {
-    recursive: true,
     force: true,
+    recursive: true,
   })
 })
 
 test('copy - copies file with custom options', async () => {
   mockCp.mockReturnValue(undefined)
 
-  await filesystemModule.copy('/source/file.txt', '/dest/file.txt', { recursive: false, force: false })
+  await filesystemModule.copy('/source/file.txt', '/dest/file.txt', { force: false, recursive: false })
 
   expect(mockCp).toHaveBeenCalledWith('/source/file.txt', '/dest/file.txt', {
-    recursive: false,
     force: false,
+    recursive: false,
   })
 })
 
@@ -93,19 +93,19 @@ test('remove - removes file with default options', async () => {
   await filesystemModule.remove('/path/to/file.txt')
 
   expect(mockRm).toHaveBeenCalledWith('/path/to/file.txt', {
-    recursive: true,
     force: true,
+    recursive: true,
   })
 })
 
 test('remove - removes file with custom options', async () => {
   mockRm.mockReturnValue(undefined)
 
-  await filesystemModule.remove('/path/to/file.txt', { recursive: false, force: false })
+  await filesystemModule.remove('/path/to/file.txt', { force: false, recursive: false })
 
   expect(mockRm).toHaveBeenCalledWith('/path/to/file.txt', {
-    recursive: false,
     force: false,
+    recursive: false,
   })
 })
 

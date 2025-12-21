@@ -35,8 +35,8 @@ export const addUtilityExecutionContext = async (rpc, utilityExecutionContextNam
 
   const utilityScript = await UtilityScript.getUtilityScript()
   await DevtoolsProtocolRuntime.evaluate(rpc, {
-    uniqueContextId: utilityContext.uniqueId,
     expression: utilityScript,
+    uniqueContextId: utilityContext.uniqueId,
   })
   return utilityContext
 }

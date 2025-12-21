@@ -10,8 +10,8 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
   await Editor.closeAll()
   await Workspace.setFiles([
     {
-      name: 'file.txt',
       content: generateFileContent(),
+      name: 'file.txt',
     },
   ])
   await Editor.open('file.txt')

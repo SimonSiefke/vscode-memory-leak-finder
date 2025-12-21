@@ -7,7 +7,7 @@ export const setup = async ({ Extensions }: TestContext) => {
   await Extensions.add(`packages/e2e/fixtures/sample.webview-provider`, 'webview-sample')
 }
 
-export const run = async ({ QuickPick, WebView, Editor }: TestContext): Promise<void> => {
+export const run = async ({ Editor, QuickPick, WebView }: TestContext): Promise<void> => {
   await QuickPick.showCommands()
   await QuickPick.type('Test: Show WebView')
   await QuickPick.select('Test: Show WebView')

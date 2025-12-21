@@ -73,6 +73,7 @@ export const savePostBody = async (
     }
 
     const postData: any = {
+    const postData = {
       body: parsedBody,
       bodyFormat,
       contentType,

@@ -1,5 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import { mkdir } from 'fs/promises'
+import type { IncomingMessage, ServerResponse } from 'http'
+import { mkdir, writeFile } from 'fs/promises'
 import { createServer } from 'http'
 import { request as httpRequest } from 'http'
 import { request as httpsRequest } from 'https'
@@ -15,6 +17,18 @@ import * as SaveRequest from '../SaveRequest/SaveRequest.ts'
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
 
+    const requestData = {
+      headers: req.headers,
+      method: req.method,
+      response: {
+        body: responseData.toString('utf8'),
+        headers: response.getHeaders(),
+        statusCode: response.statusCode,
+        statusMessage: response.statusMessage,
+      },
+      timestamp,
+      url: req.url,
+    }
 
 export const parseJsonIfApplicable = (body: string, contentType: string | string[] | undefined): string | object => {
   if (!contentType) {
@@ -45,6 +59,21 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
       console.log(`[Proxy] Returning mock response for ${req.method} ${targetUrl}`)
       GetMockResponse.sendMockResponse(res, mockResponse)
       return // Don't record mock requests
+const saveConnectTunnel = async (hostname: string, port: number): Promise<void> => {
+  try {
+    await mkdir(REQUESTS_DIR, { recursive: true })
+    const timestamp = Date.now()
+    const target = `${hostname}:${port}`
+    const filename = `${timestamp}_CONNECT_${SanitizeFilename.sanitizeFilename(target)}.json`
+    const filepath = join(REQUESTS_DIR, filename)
+
+    const tunnelData = {
+      hostname,
+      method: 'CONNECT',
+      note: 'HTTPS tunnel - actual request/response data is encrypted and cannot be captured',
+      port,
+      target,
+      timestamp,
     }
   }
 
@@ -114,7 +143,11 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
     headers: {
       ...req.headers,
       host: parsedUrl.host,
+<<<<<<< HEAD
     },
+=======
+    } as Record<string, string | string[] | undefined>,
+>>>>>>> origin/main
     hostname: parsedUrl.hostname,
     method: req.method,
     path: parsedUrl.pathname + parsedUrl.search,
@@ -224,6 +257,7 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
       }
     })
 
+<<<<<<< HEAD
     // Buffer the entire response first
     proxyRes.on('data', (chunk: Buffer) => {
       responseChunks.push(chunk)
@@ -239,6 +273,14 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
       if (!saved) {
         await saveAndWriteResponse()
       }
+=======
+    proxyRes.on('end', () => {
+      res.end()
+      const responseData = Buffer.concat(chunks)
+      saveRequest(req, res, responseData).catch((error) => {
+        console.error('[Proxy] Error saving request:', error)
+      })
+>>>>>>> origin/main
     })
   })
 
@@ -341,6 +383,59 @@ const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetU
   })
 }
 
+<<<<<<< HEAD
+=======
+const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): Promise<void> => {
+  // Handle HTTPS CONNECT requests for tunneling
+  const target = req.url || ''
+  const parts = target.split(':')
+  const hostname = parts[0]
+  const targetPort = parts[1] ? Number.parseInt(parts[1], 10) : 443
+
+  const { createConnection } = await import('net')
+  console.log(`[Proxy] Establishing CONNECT tunnel to ${hostname}:${targetPort}`)
+  const proxySocket = createConnection(targetPort, hostname, () => {
+    socket.write('HTTP/1.1 200 Connection Established\r\n\r\n')
+    if (head.length > 0) {
+      proxySocket.write(head)
+    }
+    proxySocket.pipe(socket)
+    socket.pipe(proxySocket)
+    console.log(`[Proxy] CONNECT tunnel established to ${hostname}:${targetPort}`)
+    // Save tunnel metadata (we can't capture encrypted HTTPS traffic)
+    saveConnectTunnel(hostname, targetPort).catch((error) => {
+      console.error('[Proxy] Error saving CONNECT tunnel:', error)
+    })
+  })
+
+  proxySocket.on('error', (error) => {
+    // EPIPE, ECONNRESET, ETIMEDOUT, and ENETUNREACH are common network errors
+    const errorCode = (error as NodeJS.ErrnoException).code
+    if (errorCode === 'EPIPE' || errorCode === 'ECONNRESET' || errorCode === 'ETIMEDOUT' || errorCode === 'ENETUNREACH') {
+      // Silently handle expected connection closures and network errors
+      socket.end()
+      return
+    }
+    console.error(`[Proxy] CONNECT tunnel error to ${hostname}:${targetPort}:`, error)
+    socket.end()
+  })
+
+  socket.on('error', (error: Error) => {
+    // EPIPE, ECONNRESET, ETIMEDOUT, and ENETUNREACH are common network errors
+    const errorCode = (error as NodeJS.ErrnoException).code
+    if (errorCode === 'EPIPE' || errorCode === 'ECONNRESET' || errorCode === 'ETIMEDOUT' || errorCode === 'ENETUNREACH') {
+      // Silently handle expected connection closures and network errors
+      proxySocket.end()
+      return
+    }
+    console.error(`[Proxy] Socket error for ${hostname}:${targetPort}:`, error)
+    proxySocket.end()
+  })
+
+  // Note: We can't easily capture HTTPS traffic through CONNECT,
+  // but HTTP requests will be captured
+}
+>>>>>>> origin/main
 
 export const createHttpProxyServer = async (
   options: {
@@ -438,12 +533,20 @@ export const createHttpProxyServer = async (
   console.log(`[Proxy] Proxy URL: ${url}`)
 
   return {
+<<<<<<< HEAD
     async dispose() {
+=======
+    port: actualPort,
+    async [Symbol.asyncDispose]() {
+>>>>>>> origin/main
       const { promise, resolve } = Promise.withResolvers<void>()
       server.close(() => resolve())
       await promise
     },
+<<<<<<< HEAD
     port: actualPort,
+=======
+>>>>>>> origin/main
     url,
   }
 }

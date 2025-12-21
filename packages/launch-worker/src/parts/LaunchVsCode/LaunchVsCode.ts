@@ -19,22 +19,22 @@ import { VError } from '../VError/VError.ts'
 import * as ProxyWorker from '../ProxyWorker/ProxyWorker.ts'
 
 export const launchVsCode = async ({
-  headlessMode,
-  cwd,
-  vscodeVersion,
-  vscodePath,
-  commit,
-  insidersCommit,
   addDisposable,
-  inspectSharedProcess,
-  inspectExtensions,
-  inspectPtyHost,
+  commit,
+  cwd,
   enableExtensions,
-  inspectPtyHostPort,
-  inspectSharedProcessPort,
-  inspectExtensionsPort,
   enableProxy,
+  headlessMode,
+  insidersCommit,
+  inspectExtensions,
+  inspectExtensionsPort,
+  inspectPtyHost,
+  inspectPtyHostPort,
+  inspectSharedProcess,
+  inspectSharedProcessPort,
   useProxyMock,
+  vscodePath,
+  vscodeVersion,
 }) => {
   console.log(`[LaunchVsCode] enableProxy parameter: ${enableProxy} (type: ${typeof enableProxy})`)
   console.log(`[LaunchVsCode] useProxyMock parameter: ${useProxyMock} (type: ${typeof useProxyMock})`)
@@ -59,7 +59,7 @@ export const launchVsCode = async ({
     const binaryPath = await GetBinaryPath.getBinaryPath(vscodeVersion, vscodePath, commit, insidersCommit)
     const userDataDir = GetUserDataDir.getUserDataDir()
     const extensionsDir = GetExtensionsDir.getExtensionsDir()
-    await rm(extensionsDir, { recursive: true, force: true })
+    await rm(extensionsDir, { force: true, recursive: true })
     await mkdir(extensionsDir)
     const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
     const settingsPath = join(userDataDir, 'User', 'settings.json')
@@ -101,31 +101,32 @@ export const launchVsCode = async ({
       }
     }
     const args = GetVsCodeArgs.getVscodeArgs({
-      userDataDir,
+      enableExtensions,
+      enableProxy: enableProxy,
       extensionsDir,
       extraLaunchArgs: [testWorkspacePath],
-      inspectSharedProcess,
       inspectExtensions,
-      inspectPtyHost,
-      enableExtensions,
-      inspectPtyHostPort,
-      inspectSharedProcessPort,
       inspectExtensionsPort,
       enableProxy: shouldEnableProxy,
+      inspectPtyHost,
+      inspectPtyHostPort,
+      inspectSharedProcess,
+      inspectSharedProcessPort,
+      userDataDir,
     })
     const env = GetVsCodeEnv.getVsCodeEnv({
-      runtimeDir,
       processEnv: process.env,
       proxyEnvVars,
+      runtimeDir,
     })
 
     const { child } = await LaunchElectron.launchElectron({
-      cliPath: binaryPath,
+      addDisposable,
       args,
-      headlessMode,
+      cliPath: binaryPath,
       cwd,
       env,
-      addDisposable,
+      headlessMode,
     })
     return {
       child,

@@ -1,5 +1,5 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as Assert from '../Assert/Assert.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 // TODO use page object
 export const evaluateInUtilityContext = async (options: any, locator: any): Promise<any> => {

@@ -2,15 +2,15 @@ import type { TestContext } from '../types.ts'
 
 export const skip = process.platform === 'darwin'
 
-export const run = async ({ Workspace, Editor, Explorer, ContextMenu }: TestContext): Promise<void> => {
+export const run = async ({ ContextMenu, Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'a.txt',
       content: 'a',
+      name: 'a.txt',
     },
     {
-      name: 'b.txt',
       content: 'b',
+      name: 'b.txt',
     },
   ])
   await Editor.closeAll()
