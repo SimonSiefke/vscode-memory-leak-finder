@@ -68,23 +68,5 @@ export const create = ({ page, VError }) => {
       await execa('git', ['clone', repoUrl, '.'], { cwd: workspace, env: { ...process.env } })
       await page.waitForIdle()
     },
-    async commit(message: string) {
-      try {
-        await page.waitForIdle()
-        await execa('git', ['commit', '-m', message], { cwd: workspace, env: { ...process.env } })
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to commit`)
-      }
-    },
-    async createBranch(branchName: string) {
-      try {
-        await page.waitForIdle()
-        await execa('git', ['checkout', '-b', branchName], { cwd: workspace, env: { ...process.env } })
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to create branch ${branchName}`)
-      }
-    },
   }
 }
