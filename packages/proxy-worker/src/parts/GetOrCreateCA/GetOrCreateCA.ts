@@ -1,15 +1,15 @@
-import { existsSync } from 'fs'
 import { readFile, writeFile, mkdir } from 'fs/promises'
-import type { CertificatePair } from '../CertificatePair/CertificatePair.ts'
-import { CA_KEY_PATH, CA_CERT_PATH, CERT_DIR } from '../Constants/Constants.ts'
+import { existsSync } from 'fs'
 import * as GenerateCA from '../GenerateCA/GenerateCA.ts'
+import { CA_KEY_PATH, CA_CERT_PATH, CERT_DIR } from '../Constants/Constants.ts'
+import type { CertificatePair } from '../CertificatePair/CertificatePair.ts'
 
 export const getOrCreateCA = async (): Promise<CertificatePair> => {
   await mkdir(CERT_DIR, { recursive: true })
 
   if (existsSync(CA_KEY_PATH) && existsSync(CA_CERT_PATH)) {
     const [key, cert] = await Promise.all([readFile(CA_KEY_PATH, 'utf8'), readFile(CA_CERT_PATH, 'utf8')])
-    return { cert, key }
+    return { key, cert }
   }
 
   const ca = GenerateCA.generateCA()
