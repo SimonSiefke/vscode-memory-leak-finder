@@ -1,8 +1,9 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as RemoveServerUrlPrefix from '../RemoveServerUrlPrefix/RemoveServerUrlPrefix.ts'
+import type { Session } from '../Session/Session.ts'
 import * as SplitLines from '../SplitLines/SplitLines.ts'
 
-export const addStackTraceToEventListener = async (session, eventListener) => {
+export const addStackTraceToEventListener = async (session: Session, eventListener: any) => {
   if (!eventListener.objectId) {
     throw new Error('object id is required')
   }
