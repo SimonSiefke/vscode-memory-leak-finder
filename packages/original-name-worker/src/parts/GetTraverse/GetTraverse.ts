@@ -1,6 +1,6 @@
-import traverse from '@babel/traverse'
 import type { Visitor } from '@babel/traverse'
 import type * as t from '@babel/types'
+import traverse from '@babel/traverse'
 
 // Handle different module formats for @babel/traverse
 const getTraverseFunction = (): ((ast: t.File, visitors: Visitor) => void) => {
