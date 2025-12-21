@@ -7,7 +7,7 @@ export const EMPTY_DATA = {
 }
 
 export const parseHeapSnapshotMetaData = (data) => {
-  const { startIndex, endIndex } = parseHeapSnapshotMetaDataIndices(data)
+  const { endIndex, startIndex } = parseHeapSnapshotMetaDataIndices(data)
   if (endIndex === -1) {
     return EMPTY_DATA
   }

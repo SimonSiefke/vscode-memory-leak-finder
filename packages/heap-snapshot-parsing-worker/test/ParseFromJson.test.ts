@@ -4,20 +4,20 @@ import { parseFromJson } from '../src/parts/ParseFromJson/ParseFromJson.ts'
 test('prepareHeapSnapshot - parses simple heap snapshot', async () => {
   // Create a minimal heap snapshot data
   const heapSnapshotData = {
+    edges: [],
+    locations: [],
+    nodes: [0, 0, 1, 0, 0, 0, 0],
     snapshot: {
+      edge_count: 0,
       meta: {
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         edge_types: [['context', 'element', 'property', 'internal']],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
       },
       node_count: 1,
-      edge_count: 0,
     },
-    nodes: [0, 0, 1, 0, 0, 0, 0],
-    edges: [],
-    locations: [],
     strings: ['', 'root'],
   }
   const result = await parseFromJson(heapSnapshotData)
@@ -39,20 +39,20 @@ test('prepareHeapSnapshot - parses simple heap snapshot', async () => {
 test('prepareHeapSnapshot - parses strings when parseStrings is true', async () => {
   // Create a minimal heap snapshot file with strings
   const heapSnapshotData = {
+    edges: [],
+    locations: [],
+    nodes: [0, 0, 1, 0, 0, 0, 0],
     snapshot: {
+      edge_count: 0,
       meta: {
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         edge_types: [['context', 'element', 'property', 'internal']],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
       },
       node_count: 1,
-      edge_count: 0,
     },
-    nodes: [0, 0, 1, 0, 0, 0, 0],
-    edges: [],
-    locations: [],
     strings: ['', 'root', 'test', 'hello world'],
   }
 
@@ -78,20 +78,20 @@ test('prepareHeapSnapshot - parses strings when parseStrings is true', async () 
 test('prepareHeapSnapshot - parses special strings', async () => {
   // Create a minimal heap snapshot file with strings
   const heapSnapshotData = {
+    edges: [],
+    locations: [],
+    nodes: [0, 0, 1, 0, 0, 0, 0],
     snapshot: {
+      edge_count: 0,
       meta: {
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         edge_types: [['context', 'element', 'property', 'internal']],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
       },
       node_count: 1,
-      edge_count: 0,
     },
-    nodes: [0, 0, 1, 0, 0, 0, 0],
-    edges: [],
-    locations: [],
     strings: ['get webUtils', 'get noDeprecation', 'set noDeprecation', '<symbol nodejs.util.inspect.custom>'],
   }
 
@@ -117,20 +117,20 @@ test('prepareHeapSnapshot - parses special strings', async () => {
 test('prepareHeapSnapshot - does not parse strings when parseStrings is false', async () => {
   // Create a minimal heap snapshot file with strings
   const heapSnapshotData = {
+    edges: [],
+    locations: [],
+    nodes: [0, 0, 1, 0, 0, 0, 0],
     snapshot: {
+      edge_count: 0,
       meta: {
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         edge_types: [['context', 'element', 'property', 'internal']],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
       },
       node_count: 1,
-      edge_count: 0,
     },
-    nodes: [0, 0, 1, 0, 0, 0, 0],
-    edges: [],
-    locations: [],
     strings: ['', 'root', 'test'],
   }
 
@@ -154,10 +154,10 @@ test('prepareHeapSnapshot - does not parse strings when parseStrings is false', 
 
 test('parseFromJson - throws HeapSnapshotParserError when metadata is missing', async () => {
   const heapSnapshotData = {
-    // Missing snapshot metadata
-    nodes: [0, 0, 1, 0, 0, 0, 0],
     edges: [],
     locations: [],
+    // Missing snapshot metadata
+    nodes: [0, 0, 1, 0, 0, 0, 0],
     strings: ['', 'root'],
   }
 
@@ -166,20 +166,20 @@ test('parseFromJson - throws HeapSnapshotParserError when metadata is missing', 
 
 test('parseFromJson - throws HeapSnapshotParserError when nodes are missing', async () => {
   const heapSnapshotData = {
-    snapshot: {
-      meta: {
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
-        edge_fields: ['type', 'name_or_index', 'to_node'],
-        edge_types: [['context', 'element', 'property', 'internal']],
-        location_fields: ['object_index', 'script_id', 'line', 'column'],
-      },
-      node_count: 1,
-      edge_count: 0,
-    },
     // Missing nodes array
     edges: [],
     locations: [],
+    snapshot: {
+      edge_count: 0,
+      meta: {
+        edge_fields: ['type', 'name_or_index', 'to_node'],
+        edge_types: [['context', 'element', 'property', 'internal']],
+        location_fields: ['object_index', 'script_id', 'line', 'column'],
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
+      },
+      node_count: 1,
+    },
     strings: ['', 'root'],
   }
 
@@ -188,20 +188,20 @@ test('parseFromJson - throws HeapSnapshotParserError when nodes are missing', as
 
 test('parseFromJson - throws HeapSnapshotParserError when edges are missing', async () => {
   const heapSnapshotData = {
+    // Missing edges array
+    locations: [],
+    nodes: [0, 0, 1, 0, 0, 0, 0],
     snapshot: {
+      edge_count: 0,
       meta: {
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         edge_types: [['context', 'element', 'property', 'internal']],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
       },
       node_count: 1,
-      edge_count: 0,
     },
-    nodes: [0, 0, 1, 0, 0, 0, 0],
-    // Missing edges array
-    locations: [],
     strings: ['', 'root'],
   }
 
@@ -210,19 +210,19 @@ test('parseFromJson - throws HeapSnapshotParserError when edges are missing', as
 
 test('parseFromJson - throws HeapSnapshotParserError when locations are missing', async () => {
   const heapSnapshotData = {
+    edges: [],
+    nodes: [0, 0, 1, 0, 0, 0, 0],
     snapshot: {
+      edge_count: 0,
       meta: {
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         edge_types: [['context', 'element', 'property', 'internal']],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
       },
       node_count: 1,
-      edge_count: 0,
     },
-    nodes: [0, 0, 1, 0, 0, 0, 0],
-    edges: [],
     // Missing locations array
     strings: ['', 'root'],
   }
@@ -232,20 +232,20 @@ test('parseFromJson - throws HeapSnapshotParserError when locations are missing'
 
 test('parseFromJson - allows empty nodes array', async () => {
   const heapSnapshotData = {
+    edges: [],
+    locations: [],
+    nodes: [], // Empty nodes array is allowed
     snapshot: {
+      edge_count: 0,
       meta: {
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         edge_types: [['context', 'element', 'property', 'internal']],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
       },
       node_count: 0,
-      edge_count: 0,
     },
-    nodes: [], // Empty nodes array is allowed
-    edges: [],
-    locations: [],
     strings: ['', 'root'],
   }
 
@@ -256,20 +256,20 @@ test('parseFromJson - allows empty nodes array', async () => {
 
 test('parseFromJson - allows empty edges array', async () => {
   const heapSnapshotData = {
+    edges: [], // Empty edges array is allowed
+    locations: [],
+    nodes: [0, 0, 1, 0, 0, 0, 0],
     snapshot: {
+      edge_count: 0,
       meta: {
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         edge_types: [['context', 'element', 'property', 'internal']],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
       },
       node_count: 1,
-      edge_count: 0,
     },
-    nodes: [0, 0, 1, 0, 0, 0, 0],
-    edges: [], // Empty edges array is allowed
-    locations: [],
     strings: ['', 'root'],
   }
 
@@ -280,20 +280,20 @@ test('parseFromJson - allows empty edges array', async () => {
 
 test('parseFromJson - allows empty locations array', async () => {
   const heapSnapshotData = {
+    edges: [],
+    locations: [], // Empty locations array is allowed
+    nodes: [0, 0, 1, 0, 0, 0, 0],
     snapshot: {
+      edge_count: 0,
       meta: {
-        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-        node_types: [['hidden', 'array', 'string', 'object']],
         edge_fields: ['type', 'name_or_index', 'to_node'],
         edge_types: [['context', 'element', 'property', 'internal']],
         location_fields: ['object_index', 'script_id', 'line', 'column'],
+        node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+        node_types: [['hidden', 'array', 'string', 'object']],
       },
       node_count: 1,
-      edge_count: 0,
     },
-    nodes: [0, 0, 1, 0, 0, 0, 0],
-    edges: [],
-    locations: [], // Empty locations array is allowed
     strings: ['', 'root'],
   }
 
@@ -304,10 +304,10 @@ test('parseFromJson - allows empty locations array', async () => {
 
 test('parseFromJson - throws HeapSnapshotParserError when snapshot metadata is completely missing', async () => {
   const heapSnapshotData = {
-    // Missing snapshot property entirely
-    nodes: [0, 0, 1, 0, 0, 0, 0],
     edges: [],
     locations: [],
+    // Missing snapshot property entirely
+    nodes: [0, 0, 1, 0, 0, 0, 0],
     strings: ['', 'root'],
   }
 
