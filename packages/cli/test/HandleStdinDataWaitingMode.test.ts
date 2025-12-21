@@ -71,17 +71,17 @@ test('handleStdinDataWaitingMode - escape', async () => {
 test('handleStdinDataWaitingMode - toggle headless mode', async () => {
   const state = {
     ...createDefaultState(),
+    headless: false,
     mode: ModeType.Waiting,
     value: 'abc',
-    headless: false,
   }
   const key = 'h'
   const newState = await HandleStdinDataWaitingMode.handleStdinDataWaitingMode(state, key)
   expect(newState).toEqual({
     ...createDefaultState(),
-    value: 'abc',
     headless: true,
     mode: ModeType.Running,
+    value: 'abc',
   })
 })
 

@@ -6,11 +6,11 @@ beforeEach(() => {
 
 jest.unstable_mockModule('../src/parts/Stdin/Stdin.ts', () => {
   return {
-    setRawMode: jest.fn(),
-    resume: jest.fn(),
-    setEncoding: jest.fn(),
     on: jest.fn(),
     pause: jest.fn(),
+    resume: jest.fn(),
+    setEncoding: jest.fn(),
+    setRawMode: jest.fn(),
   }
 })
 
