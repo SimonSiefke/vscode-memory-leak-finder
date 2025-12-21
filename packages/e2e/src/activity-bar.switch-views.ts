@@ -2,11 +2,21 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const run = async ({ ActivityBar, Explorer }: TestContext): Promise<void> => {
-  await Explorer.focus()
-  await ActivityBar.showSearch()
-  await ActivityBar.showSourceControl()
-  await ActivityBar.showRunAndDebug()
-  await ActivityBar.showExtensions()
+export const setup = async ({ SideBar }: TestContext) => {
+  await SideBar.hide()
+}
+
+export const run = async ({ ActivityBar, SideBar }: TestContext): Promise<void> => {
   await ActivityBar.showExplorer()
+  await SideBar.hide()
+  await ActivityBar.showSearch()
+  await SideBar.hide()
+  await ActivityBar.showSourceControl()
+  await SideBar.hide()
+  await ActivityBar.showRunAndDebug()
+  await SideBar.hide()
+  await ActivityBar.showExtensions()
+  await SideBar.hide()
+  await ActivityBar.showExplorer()
+  await SideBar.hide()
 }
