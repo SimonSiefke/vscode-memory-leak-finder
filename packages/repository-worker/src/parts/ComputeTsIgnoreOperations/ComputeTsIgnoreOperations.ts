@@ -2,9 +2,9 @@ import { VError } from '@lvce-editor/verror'
 import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 
 export interface TsIgnoreOperation {
-  readonly type: 'write'
-  readonly path: string
   readonly content: string
+  readonly path: string
+  readonly type: 'write'
 }
 
 export interface ErrorLocationByFile {
@@ -53,7 +53,7 @@ export const computeTsIgnoreOperations = async (
         offset++
       }
       const updated = originalLines.join('\n')
-      operations.push({ type: 'write', path: filePath, content: updated })
+      operations.push({ content: updated, path: filePath, type: 'write' })
     }
 
     return operations

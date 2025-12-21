@@ -22,7 +22,7 @@ test('runCompile throws error when main.js not found after compilation', async (
         return true
       }
       if (method === 'FileSystem.exec') {
-        return { stdout: '', stderr: '', exitCode: 0 }
+        return { exitCode: 0, stderr: '', stdout: '' }
       }
       throw new Error(`not implemented: ${method}`)
     },
