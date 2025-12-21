@@ -1,11 +1,11 @@
+import { existsSync } from 'fs'
 import { readdir, readFile, writeFile, mkdir } from 'fs/promises'
 import { join, dirname } from 'path'
 import { URL } from 'url'
-import { existsSync } from 'fs'
 import { fileURLToPath } from 'url'
-import * as Root from '../Root/Root.ts'
-import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
+import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
+import * as Root from '../Root/Root.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
@@ -14,10 +14,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const MOCK_CONFIG_PATH = join(__dirname, '..', 'GetMockFileName', 'mock-config.json')
 
 interface RecordedRequest {
-  timestamp: number
-  method: string
-  url: string
   headers: Record<string, string | string[]>
+  method: string
   response: {
     statusCode: number
     statusMessage?: string
@@ -25,6 +23,8 @@ interface RecordedRequest {
     body: any
     wasCompressed?: boolean
   }
+  timestamp: number
+  url: string
 }
 
 const loadMockConfig = async (): Promise<MockConfigEntry[]> => {
@@ -46,7 +46,7 @@ const matchesPattern = (value: string, pattern: string): boolean => {
   }
   if (pattern.includes('*')) {
     // Simple wildcard matching: convert pattern to regex
-    const regexPattern = pattern.replace(/\*/g, '.*').replace(/\?/g, '.')
+    const regexPattern = pattern.replaceAll('*', '.*').replaceAll('?', '.')
     const regex = new RegExp(`^${regexPattern}$`)
     return regex.test(value)
   }
@@ -122,7 +122,7 @@ const convertRequestsToMocks = async (): Promise<void> => {
     for (const request of latestRequests.values()) {
       try {
         // Skip requests without a response or without required fields
-        if (!request.response || typeof request.response.statusCode === 'undefined') {
+        if (!request.response || request.response.statusCode === undefined) {
           console.log(`Skipping request ${request.method} ${request.url} - no response data or missing statusCode`)
           skippedCount++
           continue
@@ -130,8 +130,8 @@ const convertRequestsToMocks = async (): Promise<void> => {
 
         // Parse URL to get hostname and pathname
         const parsedUrl = new URL(request.url)
-        const hostname = parsedUrl.hostname
-        const pathname = parsedUrl.pathname
+        const {hostname} = parsedUrl
+        const {pathname} = parsedUrl
 
         // Generate mock filename using the same logic as GetMockFileName
         const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, request.method)
@@ -140,10 +140,10 @@ const convertRequestsToMocks = async (): Promise<void> => {
         // Create mock data structure matching what GetMockResponse expects
         const mockData = {
           response: {
+            body: request.response.body,
+            headers: request.response.headers || {},
             statusCode: request.response.statusCode,
             statusMessage: request.response.statusMessage,
-            headers: request.response.headers || {},
-            body: request.response.body,
             wasCompressed: request.response.wasCompressed,
           },
         }
@@ -155,10 +155,10 @@ const convertRequestsToMocks = async (): Promise<void> => {
         // Check if we need to add this to mock-config.json
         if (!hasConfigEntry(mockConfig, hostname, pathname, request.method)) {
           const newEntry: MockConfigEntry = {
-            hostname,
-            pathname,
-            method: request.method,
             filename: mockFileName,
+            hostname,
+            method: request.method,
+            pathname,
           }
           mockConfig.push(newEntry)
           configAddedCount++

@@ -1,11 +1,11 @@
-import { IncomingMessage } from 'http'
-import { createGunzip, createInflate, createBrotliDecompress } from 'zlib'
+import type { IncomingMessage } from 'http'
+import { decompress as zstdDecompress } from '@mongodb-js/zstd'
 import { mkdir, writeFile } from 'fs/promises'
 import { join } from 'path'
-import { decompress as zstdDecompress } from '@mongodb-js/zstd'
+import { createGunzip, createInflate, createBrotliDecompress } from 'zlib'
 import * as Root from '../Root/Root.ts'
-import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
+import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
@@ -66,7 +66,7 @@ const decompressBody = async (body: Buffer, encoding: string | string[] | undefi
     try {
       const decompressed = await zstdDecompress(body)
       return { body: decompressed.toString('utf8'), wasCompressed: true }
-    } catch (error) {
+    } catch {
       // If decompression fails, return original body
       return { body: body.toString('utf8'), wasCompressed: false }
     }
@@ -87,7 +87,7 @@ const parseJsonIfApplicable = (body: string, contentType: string | string[] | un
   if (normalizedContentType.includes('application/json') || normalizedContentType.includes('text/json')) {
     try {
       return JSON.parse(body)
-    } catch (error) {
+    } catch {
       // If parsing fails, return as string
       return body
     }
@@ -127,17 +127,17 @@ export const saveRequest = async (
     }
 
     const requestData = {
-      timestamp,
-      method: req.method,
-      url: req.url,
       headers: req.headers,
+      method: req.method,
       response: {
+        body: parsedBody,
+        headers: responseHeaders,
         statusCode,
         statusMessage,
-        headers: responseHeaders,
-        body: parsedBody,
         wasCompressed,
       },
+      timestamp,
+      url: req.url,
     }
 
     await writeFile(filepath, JSON.stringify(requestData, null, 2), 'utf8')
