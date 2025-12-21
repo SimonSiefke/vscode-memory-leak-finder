@@ -2,11 +2,13 @@ import type { TestContext } from '../types.js'
 
 export const skip = 1
 
+export const requiresNetwork = 1
+
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'index.html',
       content: '<h1>hello world</h1>',
+      name: 'index.html',
     },
   ])
   await Editor.open('index.html')

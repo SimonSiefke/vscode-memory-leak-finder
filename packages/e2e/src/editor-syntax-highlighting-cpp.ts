@@ -5,7 +5,6 @@ export const skip = 1
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'main.cpp',
       content: `#include <iostream>
 #include <vector>
 
@@ -21,6 +20,7 @@ int main() {
     return 0;
 }
 `,
+      name: 'main.cpp',
     },
   ])
   await Editor.closeAll()
@@ -28,6 +28,7 @@ int main() {
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.open('main.cpp')
+  await Editor.shouldHaveBreadCrumb('main.cpp')
   await Editor.shouldHaveText(`#include <iostream>
 #include <vector>
 
@@ -43,8 +44,10 @@ int main() {
     return 0;
 }
 `)
+  // @ts-ignore
+  await Editor.setCursor(4, 2)
   await Editor.inspectTokens()
-  await Editor.shouldHaveInspectedToken('int')
+  await Editor.shouldHaveInspectedToken('int3 chars')
   await Editor.closeInspectedTokens()
   await Editor.close()
 }

@@ -7,7 +7,7 @@ export const setup = async ({ Extensions }: TestContext) => {
   await Extensions.add(`packages/e2e/fixtures/sample.show-notification`, 'helloworld-sample')
 }
 
-export const run = async ({ QuickPick, Notification }: TestContext): Promise<void> => {
+export const run = async ({ Notification, QuickPick }: TestContext): Promise<void> => {
   await QuickPick.showCommands()
   await QuickPick.type('Hello world')
   await QuickPick.select('Hello World')

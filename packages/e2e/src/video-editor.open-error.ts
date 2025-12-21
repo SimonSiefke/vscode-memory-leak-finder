@@ -2,6 +2,8 @@ import type { TestContext } from '../types.js'
 
 export const skip = 1
 
+export const requiresNetwork = 1
+
 // Minimal valid MP4 file (ftyp box only)
 // This is the smallest valid MP4 file structure
 const minimalMp4 = Buffer.from([
@@ -36,11 +38,11 @@ const minimalMp4 = Buffer.from([
   0x31, // compatible brand 'mp41'
 ])
 
-export const setup = async ({ Workspace, Editor, Explorer }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'test-video.mp4',
       content: minimalMp4,
+      name: 'test-video.mp4',
     },
   ])
   await Editor.closeAll()

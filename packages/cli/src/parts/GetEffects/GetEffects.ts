@@ -6,15 +6,15 @@ interface Effect {
 }
 
 interface EffectsResult {
-  readonly newState: any
   readonly effects: readonly Effect[]
+  readonly newState: any
 }
 
 export const getEffects = async (state: any, newState: any): Promise<EffectsResult> => {
   if (newState === state) {
     return {
-      newState,
       effects: [],
+      newState,
     }
   }
   const effects: Effect[] = []
@@ -45,7 +45,7 @@ export const getEffects = async (state: any, newState: any): Promise<EffectsResu
   if (state.mode !== ModeType.Running && newState.mode === ModeType.Running) {
   }
   return {
-    newState,
     effects,
+    newState,
   }
 }

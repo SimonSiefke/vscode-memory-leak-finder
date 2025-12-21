@@ -1,15 +1,15 @@
 import * as os from 'node:os'
 import { join } from 'node:path'
+import { resolve } from 'node:path'
 import * as AdjustVscodeProductJson from '../AdjustVscodeProductJson/AdjustVscodeProductJson.ts'
 import * as CollectSourceMapUrls from '../CollectSourceMapUrls/CollectSourceMapUrls.ts'
 import * as DownloadAndExtract from '../DownloadAndExtract/DownloadAndExtract.ts'
+import * as FetchVscodeInsidersMetadata from '../FetchVscodeInsidersMetadata/FetchVscodeInsidersMetadata.ts'
 import * as GetVscodeRuntimePath from '../GetVscodeRuntimePath/GetVscodeRuntimePath.ts'
 import * as JsonFile from '../JsonFile/JsonFile.ts'
 import * as LoadSourceMaps from '../LoadSourceMaps/LoadSourceMaps.ts'
 import * as RemoveUnusedFiles from '../RemoveUnusedFiles/RemoveUnusedFiles.ts'
 import * as Root from '../Root/Root.ts'
-import * as FetchVscodeInsidersMetadata from '../FetchVscodeInsidersMetadata/FetchVscodeInsidersMetadata.ts'
-import { resolve } from 'node:path'
 
 const automaticallyDownloadSourceMaps = false
 

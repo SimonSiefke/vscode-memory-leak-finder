@@ -33,57 +33,57 @@ export const createRpc = (ipc, canUseIdleCallback) => {
   const onceListeners = Object.create(null)
   let _id = 0
   return {
-    objectType: ObjectType.Rpc,
     callbacks,
-    listeners,
-    onceListeners,
     canUseIdleCallback,
     invoke(method, params) {
-      const { resolve, reject, promise } = Promise.withResolvers()
+      const { promise, reject, resolve } = Promise.withResolvers()
       const id = _id++
-      callbacks[id] = { resolve, reject }
+      callbacks[id] = { reject, resolve }
       ipc.send({
+        id,
         method,
         params,
-        id,
-      })
-      return promise
-    },
-    invokeWithTarget(targetId, sessionId, method, params) {
-      const { resolve, reject, promise } = Promise.withResolvers()
-      const id = _id++
-      callbacks[id] = { resolve, reject }
-      ipc.send({
-        sessionId,
-        targetId,
-        method,
-        params,
-        id,
       })
       return promise
     },
     invokeWithSession(sessionId, method, params) {
-      const { resolve, reject, promise } = Promise.withResolvers()
+      const { promise, reject, resolve } = Promise.withResolvers()
       const id = _id++
-      callbacks[id] = { resolve, reject }
+      callbacks[id] = { reject, resolve }
       ipc.send({
-        sessionId,
+        id,
         method,
         params,
-        id,
+        sessionId,
       })
       return promise
+    },
+    invokeWithTarget(targetId, sessionId, method, params) {
+      const { promise, reject, resolve } = Promise.withResolvers()
+      const id = _id++
+      callbacks[id] = { reject, resolve }
+      ipc.send({
+        id,
+        method,
+        params,
+        sessionId,
+        targetId,
+      })
+      return promise
+    },
+    listeners,
+    objectType: ObjectType.Rpc,
+    off(event, listener) {
+      delete listener[event]
     },
     on(event, listener) {
       listeners[event] = listener
     },
-    off(event, listener) {
-      delete listener[event]
-    },
     once(event) {
-      const { resolve, promise } = Promise.withResolvers()
+      const { promise, resolve } = Promise.withResolvers()
       onceListeners[event] = resolve
       return promise
     },
+    onceListeners,
   }
 }

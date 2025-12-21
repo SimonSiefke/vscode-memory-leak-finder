@@ -9,23 +9,23 @@ test.skip('fixTypescriptErrors - adds ts-ignore operations and applies them', as
   // @ts-ignore
   mockInvoke.mockImplementation((method: string, ...params: any[]) => {
     switch (method) {
-      case 'FileSystem.findFiles':
-        return ['src/tsconfig.json']
-      case 'FileSystem.exec':
-        return { stdout: 'src/a.ts:2:1 - error TS2345: message', stderr: '', exitCode: 2 }
-      case 'FileSystem.readFileContent':
-        return 'const a = 1\nconst b: number = "x"\n'
       case 'FileSystem.applyFileOperations': {
         const ops = params[0]
         expect(ops).toEqual([
           {
-            type: 'write',
-            path: '/repo/src/src/a.ts',
             content: 'const a = 1\n// @ts-ignore\nconst b: number = "x"\n',
+            path: '/repo/src/src/a.ts',
+            type: 'write',
           },
         ])
         return undefined
       }
+      case 'FileSystem.exec':
+        return { exitCode: 2, stderr: '', stdout: 'src/a.ts:2:1 - error TS2345: message' }
+      case 'FileSystem.findFiles':
+        return ['src/tsconfig.json']
+      case 'FileSystem.readFileContent':
+        return 'const a = 1\nconst b: number = "x"\n'
       default:
         throw new Error(`unexpected method ${method}`)
     }

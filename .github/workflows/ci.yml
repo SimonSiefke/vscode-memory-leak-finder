@@ -20,15 +20,15 @@ jobs:
         os: [ubuntu-24.04, macos-26, windows-2025]
     timeout-minutes: 1000
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
       - name: Compute node modules cache key
         id: nodeModulesCacheKey
         run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
         shell: bash
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         id: npm-cache
         with:
           path: |
@@ -42,7 +42,7 @@ jobs:
         id: sourceMapsCacheKey
         run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> $GITHUB_OUTPUT
         shell: bash
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         id: source-maps-cache
         with:
           path: |
@@ -80,13 +80,13 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: vscode-memory-leak-finder-results-${{ runner.os }}
           path: ./.vscode-memory-leak-finder-results
           include-hidden-files: true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: vscode-videos-${{ runner.os }}
@@ -123,6 +123,8 @@ jobs:
             args: --measure named-function-count3 --runs 37 --restart-between --run-skipped-tests-anyway
           - name: named-function-count3-shared-process
             args: --measure named-function-count3 --runs 37 --restart-between --run-skipped-tests-anyway --inspect-shared-process
+          - name: named-function-count3-extensions
+            args: --measure named-function-count3 --runs 37 --restart-between --run-skipped-tests-anyway --inspect-extensions
           - name: mutation-observer-count
             args: --measure mutation-observer-count
           - name: resize-observer-count
@@ -153,15 +155,15 @@ jobs:
             args: --measure disposable-count
     timeout-minutes: 180
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
       - name: Compute node modules cache key
         id: nodeModulesCacheKey
         run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
         shell: bash
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         id: npm-cache
         with:
           path: |
@@ -175,7 +177,7 @@ jobs:
         id: sourceMapsCacheKey
         run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> $GITHUB_OUTPUT
         shell: bash
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         id: source-maps-cache
         with:
           path: |
@@ -193,7 +195,7 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after ${{ matrix.measure.args }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: vscode-memory-leak-finder-results-linux-${{ matrix.measure.name }}
@@ -205,15 +207,15 @@ jobs:
     needs: ci-linux-measures
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
       - name: Compute node modules cache key
         id: nodeModulesCacheKey
         run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
         shell: bash
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         id: npm-cache
         with:
           path: |
@@ -230,132 +232,137 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - name: Download all measure results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-event-listeners
           path: ./vscode-memory-leak-finder-results-linux-event-listeners
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-dom-counters
           path: ./vscode-memory-leak-finder-results-linux-dom-counters
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-detached-dom-node-count
           path: ./vscode-memory-leak-finder-results-linux-detached-dom-node-count
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-promise-count
           path: ./vscode-memory-leak-finder-results-linux-promise-count
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace
           path: ./vscode-memory-leak-finder-results-linux-promises-with-stack-trace
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-named-array-count
           path: ./vscode-memory-leak-finder-results-linux-named-array-count
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-css-rule-count
           path: ./vscode-memory-leak-finder-results-linux-css-rule-count
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-regex-count
           path: ./vscode-memory-leak-finder-results-linux-regex-count
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-edit-context-count
           path: ./vscode-memory-leak-finder-results-linux-edit-context-count
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-function-count
           path: ./vscode-memory-leak-finder-results-linux-function-count
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-named-function-count3
           path: ./vscode-memory-leak-finder-results-linux-named-function-count3
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-named-function-count3-shared-process
           path: ./vscode-memory-leak-finder-results-linux-named-function-count3-shared-process
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-named-function-count3-extensions
+          path: ./vscode-memory-leak-finder-results-linux-named-function-count3-extensions
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-mutation-observer-count
           path: ./vscode-memory-leak-finder-results-linux-mutation-observer-count
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-resize-observer-count
           path: ./vscode-memory-leak-finder-results-linux-resize-observer-count
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-weak-map-count
           path: ./vscode-memory-leak-finder-results-linux-weak-map-count
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-number-count
           path: ./vscode-memory-leak-finder-results-linux-number-count
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-error-count
           path: ./vscode-memory-leak-finder-results-linux-error-count
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-weak-set-count
           path: ./vscode-memory-leak-finder-results-linux-weak-set-count
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-map-size
           path: ./vscode-memory-leak-finder-results-linux-map-size
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-set-size
           path: ./vscode-memory-leak-finder-results-linux-set-size
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-canvas-count
           path: ./vscode-memory-leak-finder-results-linux-canvas-count
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-iframe-count
           path: ./vscode-memory-leak-finder-results-linux-iframe-count
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-message-port-count
           path: ./vscode-memory-leak-finder-results-linux-message-port-count
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-symbol-count
           path: ./vscode-memory-leak-finder-results-linux-symbol-count
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-object-count
           path: ./vscode-memory-leak-finder-results-linux-object-count
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
           name: vscode-memory-leak-finder-results-linux-disposable-count
@@ -365,7 +372,7 @@ jobs:
       - name: Generate charts
         run: node packages/charts/src/main.ts
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ./.vscode-charts
 

@@ -5,8 +5,8 @@ export const skip = true
 export const setup = async ({ ActivityBar, Electron, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'file.txt',
       content: 'sample text',
+      name: 'file.txt',
     },
   ])
   await ActivityBar.showSearch()

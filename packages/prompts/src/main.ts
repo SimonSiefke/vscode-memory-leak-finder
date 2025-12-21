@@ -9,8 +9,7 @@ const root = join(dirname, '..', '..', '..')
 
 const localVscodePath = '/home/simon/.cache/repos/vscode'
 
-const relativePath =
-  '/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-memory-leak-finder-results/named-function-count3/search.workspace-regex-replace.json'
+const relativePath = `/home/simon/.cache/repos/vscode-memory-leak-finder/.vscode-memory-leak-finder-results/named-function-count3/terminal.shell-integration.json`
 
 const main = async () => {
   const absolutePath = isAbsolute(relativePath) ? relativePath : join(root, relativePath)

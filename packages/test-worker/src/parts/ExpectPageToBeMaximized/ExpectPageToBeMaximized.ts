@@ -3,14 +3,14 @@ import * as FunctionExpectElectronWindowToBeMaximized from '../FunctionExpectEle
 
 export const toBeMaximized = async (page) => {
   await DevtoolsProtocolRuntime.callFunctionOn(page.electronRpc, {
-    objectId: page.electronObjectId,
-    returnByValue: true,
-    functionDeclaration: FunctionExpectElectronWindowToBeMaximized.code,
-    awaitPromise: true,
     arguments: [
       {
         value: page.targetId,
       },
     ],
+    awaitPromise: true,
+    functionDeclaration: FunctionExpectElectronWindowToBeMaximized.code,
+    objectId: page.electronObjectId,
+    returnByValue: true,
   })
 }

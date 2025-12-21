@@ -1,9 +1,9 @@
 export const getExecutablePathKey = (platform: string): string => {
   switch (platform) {
-    case 'linux':
-      return 'linux'
     case 'darwin':
       return 'mac'
+    case 'linux':
+      return 'linux'
     case 'win32':
       return 'win'
     default:

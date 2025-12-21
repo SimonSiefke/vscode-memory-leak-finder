@@ -410,6 +410,12 @@ export interface Terminal {
   focusSecond(): Promise<void>
   killThird(): Promise<void>
   shouldNotHaveActiveTerminals(): Promise<void>
+  shouldHaveSuccessDecoration(): Promise<void>
+}
+export interface Testing {
+  runTask(taskName: string): Promise<void>
+  shouldHaveTestSuccess(): Promise<void>
+  shouldHaveTestFailure(): Promise<void>
 }
 export interface TitleBar {
   showMenu(text: any): Promise<void>
@@ -508,6 +514,7 @@ export interface PageObjectApi {
   readonly Tab: Tab
   readonly Task: Task
   readonly Terminal: Terminal
+  readonly Testing: Testing
   readonly TitleBar: TitleBar
   readonly View: View
   readonly WebView: WebView

@@ -36,13 +36,13 @@ test.skip('launch - error - address already in use', async () => {
       stderr.emit('data', `Starting inspector on 127.0.0.1:4444 failed: address already in use`)
     }, 0)
     return {
-      stdout,
       stderr,
+      stdout,
     }
   })
   // TODO mock WaitForDebuggerlistening module instead of mocking spawn
   await expect(
-    LaunchElectron.launchElectron({ cliPath: '', args: [], headlessMode: true, addDisposable() {}, cwd: '', env: {} }),
+    LaunchElectron.launchElectron({ addDisposable() {}, args: [], cliPath: '', cwd: '', env: {}, headlessMode: true }),
   ).rejects.toThrow(new Error(`Failed to launch electron: Starting inspector on 127.0.0.1:4444 failed: address already in use`))
 })
 
@@ -60,12 +60,12 @@ test.skip('launch - error - unexpected first message', async () => {
       stderr.emit('data', `abc`)
     }, 0)
     return {
-      stdout,
       stderr,
+      stdout,
     }
   })
   await expect(
-    LaunchElectron.launchElectron({ cliPath: '', args: [], headlessMode: true, addDisposable() {}, cwd: '', env: {} }),
+    LaunchElectron.launchElectron({ addDisposable() {}, args: [], cliPath: '', cwd: '', env: {}, headlessMode: true }),
   ).rejects.toThrow(new Error('Failed to launch electron: Failed to connect to debugger: Unexpected first message: abc'))
 })
 
@@ -75,7 +75,7 @@ test('launch - error - empty cli path', async () => {
     throw new Error("The argument 'file' cannot be empty. Received ''")
   })
   await expect(
-    LaunchElectron.launchElectron({ cliPath: '', args: [], headlessMode: true, cwd: '', env: {}, addDisposable() {} }),
+    LaunchElectron.launchElectron({ addDisposable() {}, args: [], cliPath: '', cwd: '', env: {}, headlessMode: true }),
   ).rejects.toThrow(new Error(`Failed to launch electron: The argument 'file' cannot be empty. Received ''`))
 })
 
@@ -105,11 +105,11 @@ test.skip('launch - error - yarn is not installed', async () => {
       )
     }, 0)
     return {
-      stdout,
       stderr,
+      stdout,
     }
   })
   await expect(
-    LaunchElectron.launchElectron({ cliPath: '', args: [], headlessMode: true, addDisposable() {}, cwd: '', env: {} }),
+    LaunchElectron.launchElectron({ addDisposable() {}, args: [], cliPath: '', cwd: '', env: {}, headlessMode: true }),
   ).rejects.toThrow(new Error(`Failed to launch electron: yarn not installed in this node version (test-node-version)`))
 })

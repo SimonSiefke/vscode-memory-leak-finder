@@ -43,7 +43,7 @@ const maxTimeout = 2000
 
 const Timeout = {
   async short() {
-    const { resolve, promise } = Promise.withResolvers<void>()
+    const { promise, resolve } = Promise.withResolvers<void>()
     setTimeout(resolve, 1000)
     await promise
   },
@@ -51,7 +51,7 @@ const Timeout = {
     const disposables: (() => void)[] = []
     await Promise.race([
       (() => {
-        const { resolve, promise } = Promise.withResolvers<void>()
+        const { promise, resolve } = Promise.withResolvers<void>()
         const timeout = setTimeout(resolve, maxDelay)
         disposables.push(() => {
           clearTimeout(timeout)
@@ -59,18 +59,18 @@ const Timeout = {
         return promise
       })(),
       (() => {
-        const { resolve, promise } = Promise.withResolvers<void>()
+        const { promise, resolve } = Promise.withResolvers<void>()
         const callback = () => {
           resolve()
         }
         const observer = new MutationObserver(callback)
         observer.observe(document.body, {
-          childList: true,
+          attributeOldValue: true,
           attributes: true,
           characterData: true,
-          subtree: true,
-          attributeOldValue: true,
           characterDataOldValue: true,
+          childList: true,
+          subtree: true,
         })
         disposables.push(() => {
           observer.disconnect()
@@ -184,7 +184,8 @@ export const checkTitle = async (expectedTitle) => {
 
 export const checkMultiElementCondition = async (locator, fnName, options) => {
   const startTime = Time.getTimeStamp()
-  const endTime = startTime + maxTimeout
+  const timeout = options.timeout || maxTimeout
+  const endTime = startTime + timeout
   let currentTime = startTime
   const fn = MultiElementConditionMap.getFunction(fnName)
   while (currentTime < endTime) {
@@ -201,7 +202,7 @@ export const checkMultiElementCondition = async (locator, fnName, options) => {
   throw new AssertionError(message)
 }
 
-export const pressKeyExponential = async ({ key, waitFor, timeout = maxTimeout }) => {
+export const pressKeyExponential = async ({ key, timeout = maxTimeout, waitFor }) => {
   Assert.string(key)
   Assert.object(waitFor)
   const locator = waitFor
@@ -226,7 +227,7 @@ export const pressKeyExponential = async ({ key, waitFor, timeout = maxTimeout }
   throw new AssertionError(message)
 }
 
-export const typeAndWaitFor = async ({ locator, text, waitFor, timeout = maxTimeout }) => {
+export const typeAndWaitFor = async ({ locator, text, timeout = maxTimeout, waitFor }) => {
   Assert.object(locator)
   Assert.string(text)
   Assert.object(waitFor)
@@ -253,7 +254,7 @@ export const typeAndWaitFor = async ({ locator, text, waitFor, timeout = maxTime
   throw new AssertionError(message)
 }
 
-export const clickExponential = async ({ locator, waitFor, waitForHidden, timeout = maxTimeout, button = '' }) => {
+export const clickExponential = async ({ button = '', locator, timeout = maxTimeout, waitFor, waitForHidden }) => {
   const exponentialFactor = 2
   const startTime = Time.getTimeStamp()
   const endTime = startTime + timeout
@@ -298,6 +299,12 @@ export const pressKey = async (key) => {
   Assert.string(key)
   const keyboardEventOptions = GetKeyboardEventOptions.getKeyboardEventOptions(key)
   KeyBoardActions.press(keyboardEventOptions)
+  if (
+    document.activeElement &&
+    (document.activeElement instanceof HTMLAnchorElement || document.activeElement instanceof HTMLButtonElement)
+  ) {
+    document.activeElement.click()
+  }
 }
 
 export const type = (text) => {
@@ -318,10 +325,10 @@ export const boundingBox = (locator) => {
   }
   const rect = element.getBoundingClientRect()
   return {
+    height: rect.height,
+    width: rect.width,
     x: rect.x,
     y: rect.y,
-    width: rect.width,
-    height: rect.height,
   }
 }
 
@@ -404,21 +411,21 @@ const pointerLikeEvent = (element, pointerEventType, mouseEventType, x, y) => {
   const buttons = 0
   const bubbles = true
   actuallyDispatchEvent(element, pointerEventType, {
-    clientX: x,
-    clientY: y,
-    button,
-    buttons,
     // pointerType,
     bubbles,
+    button,
+    buttons,
+    clientX: x,
+    clientY: y,
     // pointerId,
   })
   actuallyDispatchEvent(element, mouseEventType, {
-    clientX: x,
-    clientY: y,
-    button,
-    buttons,
     // pointerType,
     bubbles,
+    button,
+    buttons,
+    clientX: x,
+    clientY: y,
     // pointerId,
   })
 }

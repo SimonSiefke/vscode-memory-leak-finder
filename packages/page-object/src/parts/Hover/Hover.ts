@@ -2,6 +2,7 @@ export const create = ({ expect, page, VError }) => {
   return {
     async hide() {
       try {
+        await page.waitForIdle()
         const hover = page.locator('.monaco-hover')
         await expect(hover).toBeVisible()
         await page.waitForIdle()

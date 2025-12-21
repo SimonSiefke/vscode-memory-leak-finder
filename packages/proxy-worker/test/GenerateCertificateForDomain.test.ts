@@ -1,7 +1,7 @@
 import { expect, test } from '@jest/globals'
 import forge from 'node-forge'
-import { generateCertificateForDomain } from '../src/parts/GenerateCertificateForDomain/GenerateCertificateForDomain.ts'
 import { generateCA } from '../src/parts/GenerateCA/GenerateCA.ts'
+import { generateCertificateForDomain } from '../src/parts/GenerateCertificateForDomain/GenerateCertificateForDomain.ts'
 
 test('generateCertificateForDomain - generates certificate for regular domain', () => {
   const ca = generateCA()

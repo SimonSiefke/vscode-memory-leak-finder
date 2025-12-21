@@ -6,7 +6,7 @@ import * as Root from '../Root/Root.ts'
 import * as Unzip from '../Unzip/Unzip.ts'
 
 export const downloadAndExtract = async (name: string, urls: string[], outDir: string): Promise<void> => {
-  await rm(outDir, { recursive: true, force: true })
+  await rm(outDir, { force: true, recursive: true })
   const tmpDir = join(Root.root, '.vscode-tool-downloads')
   const downloadUrl = urls[0]
   const urlBasename = basename(new URL(downloadUrl).pathname)

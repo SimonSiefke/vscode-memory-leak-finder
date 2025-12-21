@@ -1,6 +1,6 @@
 import { createBarChart } from '../CreateBarChart/CreateBarChart.ts'
-import { createDualBarChart } from '../CreateDualBarChart/CreateDualBarChart.ts'
 import { createDefaultChart } from '../CreateDefaultChart/CreateDefaultChart.ts'
+import { createDualBarChart } from '../CreateDualBarChart/CreateDualBarChart.ts'
 
 export const createChart = (data: any, options: any) => {
   switch (options.type) {
