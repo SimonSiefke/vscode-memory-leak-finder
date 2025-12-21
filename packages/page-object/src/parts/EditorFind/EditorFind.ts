@@ -10,6 +10,23 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to set search value`)
       }
     },
+    async openReplace() {
+      try {
+        const findWidget = page.locator('.find-widget.visible')
+        await page.waitForIdle()
+        const toggleReplace = findWidget.locator('[aria-label="Toggle Replace"]')
+        await expect(toggleReplace).toBeVisible()
+        const expanded = await toggleReplace.getAttribute('aria-expanded')
+        if (expanded === 'true') {
+          return
+        }
+        await page.waitForIdle()
+        await toggleReplace.click()
+        await expect(toggleReplace).toHaveAttribute('aria-expanded', 'true')
+      } catch (error) {
+        throw new VError(error, `Failed to open replace`)
+      }
+    },
     async setReplaceValue(value: string) {
       try {
         await page.waitForIdle()
@@ -19,12 +36,6 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         const toggleReplace = findWidget.locator('[aria-label="Toggle Replace"]')
         await expect(toggleReplace).toBeVisible()
         await page.waitForIdle()
-        const expanded = await toggleReplace.getAttribute('aria-expanded')
-        if (!expanded) {
-          await page.waitForIdle()
-          await toggleReplace.click()
-          await expect(toggleReplace).toHaveAttribute('aria-expanded', 'true')
-        }
 
         const replace = page.locator('.replace-part .monaco-findInput textarea[aria-label="Replace"]')
         await expect(replace).toBeVisible()

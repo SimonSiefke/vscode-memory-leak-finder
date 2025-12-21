@@ -2,7 +2,8 @@ import type { TestContext } from '../types.js'
 
 export const skip = 1
 
-export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
+// @ts-ignore
+export const setup = async ({ Editor, Explorer, Workspace, EditorFind }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       content: '<h1>abc</h1>',
@@ -20,6 +21,7 @@ export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promi
   await Editor.shouldHaveBreadCrumb('h1')
   await Editor.closeFind()
   await Editor.openFind()
+  await EditorFind.openReplace()
 }
 
 // @ts-ignore
