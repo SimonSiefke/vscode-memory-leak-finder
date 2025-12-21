@@ -11,7 +11,6 @@ export const getPageObject = (pageObjectId) => {
 export const getPageObjectContext = (pageObjectId) => {
   const value = pageObjects[pageObjectId]
   if (!value) {
-    console.log({ pageObjects })
     throw new Error(`no page object context found with id ${[pageObjectId]}`)
   }
   return value.pageObjectContext

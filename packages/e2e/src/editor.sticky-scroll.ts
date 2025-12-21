@@ -17,13 +17,13 @@ const getContent = (letterCount: number) => {
   return code
 }
 
-export const setup = async ({ Workspace, Editor }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Editor.closeAll()
   const content = getContent(20)
   await Workspace.setFiles([
     {
-      name: 'file.js',
       content: content,
+      name: 'file.js',
     },
   ])
   await Editor.open('file.js')

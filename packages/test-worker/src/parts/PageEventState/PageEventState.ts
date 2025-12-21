@@ -6,11 +6,11 @@ const state = {
   /**
    * @type {any}
    */
-  events: [],
+  callbacks: [] as any[],
   /**
    * @type {any}
    */
-  callbacks: [],
+  events: [] as any[],
 }
 
 export const addEvent = (event) => {
@@ -34,8 +34,8 @@ export const waitForEvent = async ({ frameId, name, timeout = TimeoutConstants.P
     }
     return await PTimeout.pTimeout(
       (() => {
-        const { resolve, reject, promise } = Promise.withResolvers<void>()
-        state.callbacks.push({ frameId, name, resolve, reject })
+        const { promise, reject, resolve } = Promise.withResolvers<void>()
+        state.callbacks.push({ frameId, name, reject, resolve })
         return promise
       })(),
       { milliseconds: timeout },

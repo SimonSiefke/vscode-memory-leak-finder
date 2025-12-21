@@ -5,12 +5,15 @@ export const skip = true
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'index.html',
       content: '<h1>hello world</h1>',
+      name: 'index.html',
     },
   ])
   await Editor.open('index.html')
   await Editor.shouldHaveText('<h1>hello world</h1>')
+  await Editor.shouldHaveBreadCrumb('index.html')
+  await Editor.shouldHaveToken('h1', 'rgb(86, 156, 214)')
+  await Editor.shouldHaveBreadCrumb('h1')
 }
 
 export const run = async ({ Editor }: TestContext): Promise<void> => {

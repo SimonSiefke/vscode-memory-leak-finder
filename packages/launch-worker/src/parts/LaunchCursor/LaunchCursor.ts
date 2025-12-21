@@ -14,14 +14,20 @@ import * as Root from '../Root/Root.ts'
 import { VError } from '../VError/VError.ts'
 
 export const launchCursor = async ({
-  headlessMode,
-  cwd,
-  cursorVersion,
-  vscodePath,
   addDisposable,
-  inspectSharedProcess,
+  cursorVersion,
+  cwd,
+  enableExtensions,
+  enableProxy,
+  headlessMode,
   inspectExtensions,
+  inspectExtensionsPort,
   inspectPtyHost,
+  inspectPtyHostPort,
+  inspectSharedProcess,
+  inspectSharedProcessPort,
+  useProxyMock,
+  vscodePath,
 }) => {
   try {
     const testWorkspacePath = join(Root.root, '.cursor-test-workspace')
@@ -36,28 +42,37 @@ export const launchCursor = async ({
     const binaryPath = vscodePath || (await DownloadAndUnzipCursor.downloadAndUnzipCursor(cursorVersion))
     const userDataDir = GetUserDataDir.getUserDataDir()
     const extensionsDir = GetExtensionsDir.getExtensionsDir()
-    await rm(extensionsDir, { recursive: true, force: true })
+    await rm(extensionsDir, { force: true, recursive: true })
     await mkdir(extensionsDir)
     const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
     const settingsPath = join(userDataDir, 'User', 'settings.json')
     await mkdir(dirname(settingsPath), { recursive: true })
     await copyFile(defaultSettingsSourcePath, settingsPath)
+
     const args = GetVsCodeArgs.getVscodeArgs({
-      userDataDir,
+      enableExtensions,
+      enableProxy,
       extensionsDir,
       extraLaunchArgs: [testWorkspacePath],
-      inspectSharedProcess,
       inspectExtensions,
+      inspectExtensionsPort,
       inspectPtyHost,
+      inspectPtyHostPort,
+      inspectSharedProcess,
+      inspectSharedProcessPort,
+      userDataDir,
     })
-    const env = GetVsCodeEnv.getVsCodeEnv({ runtimeDir, processEnv: process.env })
+    const env = GetVsCodeEnv.getVsCodeEnv({
+      processEnv: process.env,
+      runtimeDir,
+    })
     const { child } = await LaunchElectron.launchElectron({
-      cliPath: binaryPath,
+      addDisposable,
       args,
-      headlessMode,
+      cliPath: binaryPath,
       cwd,
       env,
-      addDisposable,
+      headlessMode,
     })
     return {
       child,

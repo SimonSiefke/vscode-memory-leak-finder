@@ -2,7 +2,7 @@ import * as ParseHeapSnapshotInternal from '../ParseHeapSnapshotInternal/ParseHe
 
 export const parseHeapSnapshot = (heapsnapshot) => {
   const { snapshot, nodes, edges, strings, locations } = heapsnapshot
-  const { meta } = snapshot
+  const meta = heapsnapshot.meta || snapshot.meta
   const { node_types, node_fields, edge_types, edge_fields, location_fields } = meta
   return ParseHeapSnapshotInternal.parseHeapSnapshotInternal(
     nodes,

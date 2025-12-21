@@ -32,6 +32,25 @@ const getListId = (classNameString) => {
 
 export const create = ({ page, expect, VError }) => {
   return {
+    async openAllFiles() {
+      try {
+        await page.waitForIdle()
+        await page.keyboard.press('Control+A')
+        await page.waitForIdle()
+        await this.openContextMenu(`1.txt`)
+        await page.waitForIdle()
+        const contextMenu = ContextMenu.create({ page, expect, VError })
+        await contextMenu.select('Open to the Side')
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.CloseOtherGroups)
+        await page.waitForIdle()
+        // TODO open context menu, the open to the side
+        // then close left group
+      } catch (error) {
+        throw new VError(error, `Failed to open all files`)
+      }
+    },
     async focus() {
       try {
         await page.waitForIdle()
@@ -122,28 +141,34 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to click into explorer`)
       }
     },
-    async expand(folderName) {
+    async expand(folderName: string) {
       try {
+        await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
-        const folder = explorer.locator('.monaco-list-row', {
-          hasText: folderName,
-        })
-        // TODO verify that folder has aria-expanded=false
+        const folder = explorer.locator(`.monaco-list-row[aria-label="${folderName}"]`)
+        await expect(folder).toBeVisible()
+        await page.waitForIdle()
         await folder.click()
+        await page.waitForIdle()
+        await expect(folder).toHaveAttribute('aria-expanded', 'true')
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to expand explorer folder`)
       }
     },
-    async collapse(folderName) {
+    async collapse(folderName: string) {
       try {
+        await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         const folder = explorer.locator('.monaco-list-row', {
           hasText: folderName,
         })
-        // TODO verify that folder has aria-expanded=false
+        await expect(folder).toBeVisible()
+        await page.waitForIdle()
         await folder.click()
+        await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to expand explorer folder`)
+        throw new VError(error, `Failed to collapse explorer folder`)
       }
     },
     async collapseAll() {
@@ -199,7 +224,7 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to copy explorer item ${dirent}`)
       }
     },
-    async openContextMenu(dirent, select = undefined) {
+    async openContextMenu(dirent: string, select = undefined) {
       try {
         await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
@@ -271,7 +296,7 @@ export const create = ({ page, expect, VError }) => {
       await contextMenu.select(option)
       await page.waitForIdle()
     },
-    async rename(oldDirentName, newDirentName) {
+    async rename(oldDirentName: string, newDirentName: string) {
       try {
         await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
@@ -283,13 +308,17 @@ export const create = ({ page, expect, VError }) => {
         await this.executeContextMenuCommand(oldDirent, 'Rename...')
         await page.waitForIdle()
         const input = explorer.locator('input')
-        await expect(input).toBeVisible({ timeout: 5000 })
+        await expect(input).toBeVisible({ timeout: 10_000 })
+        await page.waitForIdle()
         await input.selectText()
+        await page.waitForIdle()
         await input.type(newDirentName)
+        await page.waitForIdle()
         await input.press('Enter')
         await expect(oldDirent).toBeHidden()
         const newDirent = explorer.locator(`text=${newDirentName}`)
         await expect(newDirent).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to rename explorer item from "${oldDirentName}" to "${newDirentName}"`)
       }

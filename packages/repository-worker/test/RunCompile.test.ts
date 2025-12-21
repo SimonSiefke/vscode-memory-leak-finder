@@ -11,14 +11,20 @@ test('runCompile throws error when main.js not found after compilation', async (
   const mockRpc = MockRpc.create({
     commandMap: {},
     invoke(method, ...params) {
-      switch (method) {
-        case 'FileSystem.exists':
-          return false
-        case 'FileSystem.exec':
-          return { stdout: '', stderr: '', exitCode: 0 }
-        default:
-          throw new Error(`not implemented: ${method}`)
+      if (method === 'FileSystem.readFileContent') {
+        return '20'
       }
+      if (method === 'FileSystem.exists') {
+        const path = params[0]
+        if (path === mainJsPath) {
+          return false
+        }
+        return true
+      }
+      if (method === 'FileSystem.exec') {
+        return { exitCode: 0, stderr: '', stdout: '' }
+      }
+      throw new Error(`not implemented: ${method}`)
     },
   })
   FileSystemWorker.set(mockRpc)

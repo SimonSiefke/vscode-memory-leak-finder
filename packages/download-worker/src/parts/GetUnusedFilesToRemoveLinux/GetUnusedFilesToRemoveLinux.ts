@@ -21,7 +21,7 @@ export const getUnusedFilesToRemoveLinux = async (binaryPath: string): Promise<r
   } catch {}
 
   // bin folder
-  files.push(join(installDir, 'bin'))
+  // files.push(join(installDir, 'bin'))
 
   // licenses
   files.push(join(installDir, 'licenses'))

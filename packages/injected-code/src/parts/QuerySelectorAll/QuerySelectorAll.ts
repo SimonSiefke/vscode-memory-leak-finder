@@ -10,16 +10,16 @@ export const getSelectorModule = (type) => {
   switch (type) {
     case SelectorType.Css:
       return QuerySelectorAllByCss
-    case SelectorType.Text:
-      return QuerySelectorAllByText
-    case SelectorType.Nth:
-      return QuerySelectorAllNth
-    case SelectorType.InternalEnterFrame:
-      return QuerySelectorAllInternalEnterFrame
     case SelectorType.EnterShadow:
       return QuerySelectorAllEnterShadow
     case SelectorType.ExactText:
       return QuerySelectorAllByExactText
+    case SelectorType.InternalEnterFrame:
+      return QuerySelectorAllInternalEnterFrame
+    case SelectorType.Nth:
+      return QuerySelectorAllNth
+    case SelectorType.Text:
+      return QuerySelectorAllByText
     default:
       throw new Error('not found')
   }

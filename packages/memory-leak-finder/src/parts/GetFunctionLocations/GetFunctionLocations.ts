@@ -4,7 +4,7 @@ import * as GetFunctionLocation from '../GetFunctionLocation/GetFunctionLocation
 const BATCH_SIZE = 50
 
 const processBatch = async (session, objectIds, startIndex) => {
-  const promises = []
+  const promises: Promise<any>[] = []
   const endIndex = Math.min(startIndex + BATCH_SIZE, objectIds.length)
 
   for (let i = startIndex; i < endIndex; i++) {
@@ -18,7 +18,7 @@ export const getFunctionLocations = async (session, objectIds) => {
   Assert.object(session)
   Assert.array(objectIds)
 
-  const results = []
+  const results: any[] = []
 
   for (let i = 0; i < objectIds.length; i += BATCH_SIZE) {
     const batchResults = await processBatch(session, objectIds, i)

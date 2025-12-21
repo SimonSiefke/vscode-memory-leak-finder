@@ -10,8 +10,8 @@ import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 export const exec = async (command, args, options = {}) => {
   const result = await FileSystemWorker.exec(command, args, options)
   return {
-    stdout: result.stdout || '',
-    stderr: result.stderr || '',
     exitCode: result.exitCode || 0,
+    stderr: result.stderr || '',
+    stdout: result.stdout || '',
   }
 }

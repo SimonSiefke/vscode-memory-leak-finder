@@ -3,14 +3,14 @@ import * as FunctionExpectElectronWindowToBeMinimized from '../FunctionExpectEle
 
 export const toBeMinimized = async (page) => {
   await DevtoolsProtocolRuntime.callFunctionOn(page.electronRpc, {
-    objectId: page.electronObjectId,
-    returnByValue: true,
-    functionDeclaration: FunctionExpectElectronWindowToBeMinimized.code,
-    awaitPromise: true,
     arguments: [
       {
         value: page.targetId,
       },
     ],
+    awaitPromise: true,
+    functionDeclaration: FunctionExpectElectronWindowToBeMinimized.code,
+    objectId: page.electronObjectId,
+    returnByValue: true,
   })
 }

@@ -9,6 +9,6 @@ export const setup = async ({ Editor, WelcomePage }: TestContext): Promise<void>
 }
 
 export const run = async ({ WelcomePage }: TestContext): Promise<void> => {
-  await WelcomePage.expandStep('findLanguageExtensions')
   await WelcomePage.expandStep('pickColorTheme')
+  await WelcomePage.expandStep('videoTutorial')
 }

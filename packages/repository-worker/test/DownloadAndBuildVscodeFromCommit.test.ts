@@ -73,35 +73,35 @@ beforeEach(() => {
   mockExec.mockImplementation((command, args, options) => {
     if (command === 'git' && Array.isArray(args) && args.includes('ls-remote')) {
       return {
-        stdout: 'a1b2c3d4e5f6789012345678901234567890abcd',
-        stderr: '',
         exitCode: 0,
+        stderr: '',
+        stdout: 'a1b2c3d4e5f6789012345678901234567890abcd',
       }
     }
 
     if (command === 'git' && Array.isArray(args) && args.includes('clone')) {
-      return { stdout: '', stderr: '', exitCode: 0 }
+      return { exitCode: 0, stderr: '', stdout: '' }
     }
 
     if (command === 'git' && Array.isArray(args) && args.includes('checkout')) {
-      return { stdout: '', stderr: '', exitCode: 0 }
+      return { exitCode: 0, stderr: '', stdout: '' }
     }
 
     // Default mock for other commands
-    return { stdout: '', stderr: '', exitCode: 0 }
+    return { exitCode: 0, stderr: '', stdout: '' }
   })
 
   mockExeca.mockImplementation((command, args, options) => {
     if (command === 'git' && Array.isArray(args) && args.includes('clone')) {
-      return { stdout: '', stderr: '' }
+      return { stderr: '', stdout: '' }
     }
 
     if (command === 'git' && Array.isArray(args) && args.includes('checkout')) {
-      return { stdout: '', stderr: '' }
+      return { stderr: '', stdout: '' }
     }
 
     // Default mock for other commands
-    return { stdout: '', stderr: '' }
+    return { stderr: '', stdout: '' }
   })
 
   mockResolveCommitHash.mockImplementation((repoUrl, commitRef) => {
@@ -122,10 +122,10 @@ beforeEach(() => {
       switch (method) {
         case 'FileSystem.exists':
           return mockPathExists(...params)
-        case 'FileSystem.makeDirectory':
-          return mockMkdir(...params)
         case 'FileSystem.findFiles':
           return []
+        case 'FileSystem.makeDirectory':
+          return mockMkdir(...params)
 
         default:
           throw new Error(`not implemented ${method}`)
@@ -139,9 +139,8 @@ afterEach(() => {
   jest.resetModules()
 })
 
-const { downloadAndBuildVscodeFromCommit } = await import(
-  '../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.ts'
-)
+const { downloadAndBuildVscodeFromCommit } =
+  await import('../src/parts/DownloadAndBuildVscodeFromCommit/DownloadAndBuildVscodeFromCommit.ts')
 
 test.skip('downloadVscodeCommit - tests git clone operations with mocked execa', async () => {
   const testCommitHash = 'a1b2c3d4e5f6789012345678901234567890abcd'

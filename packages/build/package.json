@@ -13,15 +13,15 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@babel/core": "^7.28.4",
-    "@babel/preset-typescript": "^7.27.1",
+    "@babel/core": "^7.28.5",
+    "@babel/preset-typescript": "^7.28.5",
     "@rollup/plugin-babel": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
-    "@types/node": "^24.7.2",
+    "@types/node": "^25.0.3",
     "dts-bundle-generator": "^9.5.1",
-    "rollup": "^4.52.4"
+    "rollup": "^4.53.5"
   },
   "dependencies": {
-    "@lvce-editor/assert": "^1.4.0"
+    "@lvce-editor/assert": "^1.5.1"
   }
 }

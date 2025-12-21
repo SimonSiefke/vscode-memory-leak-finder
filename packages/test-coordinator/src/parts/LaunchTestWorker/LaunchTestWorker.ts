@@ -1,8 +1,8 @@
 import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
 import { VError } from '@lvce-editor/verror'
+import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
 import * as GetTestWorkerUrl from '../GetTestWorkerUrl/GetTestWorkerUrl.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
-import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
 
 const getExecArgv = (runMode: number): readonly string[] => {
   switch (runMode) {
@@ -29,14 +29,18 @@ export const launchTestWorker = async (
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
+  enableExtensions: boolean,
+  inspectPtyHostPort: number,
+  inspectSharedProcessPort: number,
+  inspectExtensionsPort: number,
 ) => {
   try {
     const url = GetTestWorkerUrl.getTestWorkerUrl()
     const rpc = await NodeWorkerRpcParent.create({
+      commandMap: {},
+      execArgv: getExecArgv(runMode),
       path: url,
       stdio: 'inherit',
-      execArgv: getExecArgv(runMode),
-      commandMap: {},
     })
     await ConnectDevtools.connectDevtools(
       rpc,
@@ -53,6 +57,10 @@ export const launchTestWorker = async (
       inspectSharedProcess,
       inspectExtensions,
       inspectPtyHost,
+      enableExtensions,
+      inspectPtyHostPort,
+      inspectSharedProcessPort,
+      inspectExtensionsPort,
     )
     return rpc
   } catch (error) {

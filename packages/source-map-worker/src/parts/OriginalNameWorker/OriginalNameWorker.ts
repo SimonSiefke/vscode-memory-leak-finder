@@ -3,10 +3,10 @@ import { getOriginalNameWorkerPath } from '../OriginalNameWorkerPath/OriginalNam
 
 let rpcPromise: Promise<Rpc> | undefined
 
-const create = async () => {
+export const create = async () => {
   const rpc = await NodeWorkerRpcParent.create({
-    path: getOriginalNameWorkerPath(),
     commandMap: {},
+    path: getOriginalNameWorkerPath(),
   })
   return rpc
 }

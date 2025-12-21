@@ -108,3 +108,114 @@ test('parseArgv - measure-node flag', () => {
   const options = ParseArgv.parseArgv(argv)
   expect(options.measureNode).toBe(true)
 })
+
+test('parseArgv - inspect-shared-process flag', () => {
+  const argv = ['--inspect-shared-process']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.inspectSharedProcess).toBe(true)
+})
+
+test('parseArgv - inspect-shared-process flag not present', () => {
+  const argv = []
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.inspectSharedProcess).toBe(false)
+})
+
+test('parseArgv - inspect-extensions flag', () => {
+  const argv = ['--inspect-extensions']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.inspectExtensions).toBe(true)
+})
+
+test('parseArgv - inspect-extensions flag not present', () => {
+  const argv = []
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.inspectExtensions).toBe(false)
+})
+
+test('parseArgv - inspect-ptyhost flag', () => {
+  const argv = ['--inspect-ptyhost']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.inspectPtyHost).toBe(true)
+})
+
+test('parseArgv - inspect-ptyhost flag not present', () => {
+  const argv = []
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.inspectPtyHost).toBe(false)
+})
+
+test('parseArgv - enable-extensions flag', () => {
+  const argv = ['--enable-extensions']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.enableExtensions).toBe(true)
+})
+
+test('parseArgv - enable-extensions flag not present', () => {
+  const argv = []
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.enableExtensions).toBe(false)
+})
+
+test('parseArgv - inspect-ptyhost-port flag', () => {
+  const argv = ['--inspect-ptyhost-port', '9999']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.inspectPtyHostPort).toBe(9999)
+})
+
+test('parseArgv - inspect-ptyhost-port flag not present', () => {
+  const argv = []
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.inspectPtyHostPort).toBe(5877)
+})
+
+test('parseArgv - inspect-shared-process-port flag', () => {
+  const argv = ['--inspect-shared-process-port', '8888']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.inspectSharedProcessPort).toBe(8888)
+})
+
+test('parseArgv - inspect-shared-process-port flag not present', () => {
+  const argv = []
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.inspectSharedProcessPort).toBe(5879)
+})
+
+test('parseArgv - inspect-extensions-port flag', () => {
+  const argv = ['--inspect-extensions-port', '7777']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.inspectExtensionsPort).toBe(7777)
+})
+
+test('parseArgv - inspect-extensions-port flag not present', () => {
+  const argv = []
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.inspectExtensionsPort).toBe(5870)
+})
+
+test('parseArgv - inspect ports with invalid number', () => {
+  const argv = ['--inspect-ptyhost-port', 'invalid']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.inspectPtyHostPort).toBe(1)
+})
+
+test('parseArgv - multiple inspect flags and ports', () => {
+  const argv = [
+    '--inspect-shared-process',
+    '--inspect-shared-process-port',
+    '8888',
+    '--inspect-extensions',
+    '--inspect-extensions-port',
+    '7777',
+    '--inspect-ptyhost',
+    '--inspect-ptyhost-port',
+    '9999',
+  ]
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.inspectSharedProcess).toBe(true)
+  expect(options.inspectSharedProcessPort).toBe(8888)
+  expect(options.inspectExtensions).toBe(true)
+  expect(options.inspectExtensionsPort).toBe(7777)
+  expect(options.inspectPtyHost).toBe(true)
+  expect(options.inspectPtyHostPort).toBe(9999)
+})

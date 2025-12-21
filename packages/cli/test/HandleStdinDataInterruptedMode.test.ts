@@ -25,9 +25,9 @@ StdoutWorker.set(mockRpc)
 test('HandleStdinDataInterruptedMode - watch mode key', async () => {
   const state = {
     ...createDefaultState(),
-    value: '',
     mode: ModeType.Interrupted,
     stdout: [],
+    value: '',
   }
   const key = CliKeys.WatchMode
   const newState = await HandleStdinDataInterruptedMode.handleStdinDataInterruptedMode(state, key)
@@ -38,9 +38,9 @@ test('HandleStdinDataInterruptedMode - watch mode key', async () => {
 test('HandleStdinDataInterruptedMode - go to filter mode', async () => {
   const state = {
     ...createDefaultState(),
-    value: '',
     mode: ModeType.Interrupted,
     stdout: [],
+    value: '',
   }
   const key = CliKeys.FilterMode
   const newState = await HandleStdinDataInterruptedMode.handleStdinDataInterruptedMode(state, key)
@@ -58,9 +58,9 @@ test('HandleStdinDataInterruptedMode - go to filter mode', async () => {
 test('HandleStdinDataInterruptedMode - quit', async () => {
   const state = {
     ...createDefaultState(),
-    value: '',
     mode: ModeType.Interrupted,
     stdout: [],
+    value: '',
   }
   const key = CliKeys.Quit
   const newState = await HandleStdinDataInterruptedMode.handleStdinDataInterruptedMode(state, key)
@@ -71,9 +71,9 @@ test('HandleStdinDataInterruptedMode - quit', async () => {
 test('HandleStdinDataInterruptedMode - run again', async () => {
   const state = {
     ...createDefaultState(),
-    value: '',
     mode: ModeType.Interrupted,
     stdout: [],
+    value: '',
   }
   const key = AnsiKeys.Enter
   const newState = await HandleStdinDataInterruptedMode.handleStdinDataInterruptedMode(state, key)

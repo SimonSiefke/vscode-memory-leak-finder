@@ -3,7 +3,7 @@ const matchesSubType = (value, subtype) => {
 }
 
 export const filterBySubType = (values, subtype) => {
-  const filtered = []
+  const filtered: any[] = []
   for (const value of values) {
     if (matchesSubType(value, subtype)) {
       filtered.push(value)

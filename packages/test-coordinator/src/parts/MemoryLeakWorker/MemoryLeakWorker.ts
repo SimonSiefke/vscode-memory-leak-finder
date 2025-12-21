@@ -13,12 +13,15 @@ export const startWorker = async (
   inspectSharedProcess: boolean,
   inspectExtensions: boolean,
   inspectPtyHost: boolean,
+  inspectPtyHostPort: number,
+  inspectSharedProcessPort: number,
+  inspectExtensionsPort: number,
 ) => {
   Assert.string(devtoolsWebsocketUrl)
   const rpc = await NodeWorkerRpcParent.create({
+    commandMap: CommandMapRef.commandMapRef,
     path: MemoryLeakWorkerUrl.memoryLeakWorkerUrl,
     stdio: 'inherit',
-    commandMap: CommandMapRef.commandMapRef,
   })
   await rpc.invoke(
     'ConnectDevtools.connectDevtools',
@@ -31,6 +34,9 @@ export const startWorker = async (
     inspectSharedProcess,
     inspectExtensions,
     inspectPtyHost,
+    inspectPtyHostPort,
+    inspectSharedProcessPort,
+    inspectExtensionsPort,
   )
   return rpc
 }

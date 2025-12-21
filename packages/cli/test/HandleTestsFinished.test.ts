@@ -15,10 +15,10 @@ jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
 
 jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => {
   return {
+    getState() {},
     isWatchMode() {
       return true
     },
-    getState() {},
     setState() {},
   }
 })

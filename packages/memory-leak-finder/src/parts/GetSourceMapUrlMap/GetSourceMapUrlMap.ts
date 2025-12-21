@@ -3,7 +3,7 @@ import * as GetSourceMapUrl from '../GetSourceMapUrl/GetSourceMapUrl.ts'
 
 const getUniqueInputs = (inputs) => {
   const seen = Object.create(null)
-  const result = []
+  const result: any[] = []
   for (const input of inputs) {
     const { sourceMapUrl, line, column } = input
     const key = FormatUrl.formatUrl(sourceMapUrl, line, column)

@@ -4,7 +4,7 @@ import * as CreateCountMap from '../CreateCountMap/CreateCountMap.ts'
 export const getDifference = (sortedBefore, sortedAfter) => {
   Assert.array(sortedBefore)
   Assert.array(sortedAfter)
-  const result = []
+  const result: any[] = []
   const beforeMap = CreateCountMap.createCountMap(sortedBefore, 'url')
   for (const value of sortedAfter) {
     const beforeCount = beforeMap[value.url] || 0

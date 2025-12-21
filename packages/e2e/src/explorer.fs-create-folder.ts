@@ -2,22 +2,22 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
-export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
+export const setup = async ({ Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'existing-file.txt',
       content: 'test content',
+      name: 'existing-file.txt',
     },
   ])
   await Explorer.focus()
   await Explorer.shouldHaveItem('existing-file.txt')
 }
 
-export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
+export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> => {
   // Create a new folder by creating a file inside it (this creates the folder structure)
   await Workspace.add({
-    name: 'new-folder/nested-file.txt',
     content: 'nested content',
+    name: 'new-folder/nested-file.txt',
   })
 
   // Verify the folder appears in the explorer UI
@@ -29,8 +29,8 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
 
   // Create another nested folder via file system operation
   await Workspace.add({
-    name: 'new-folder/sub-folder/deep-file.txt',
     content: 'deep content',
+    name: 'new-folder/sub-folder/deep-file.txt',
   })
 
   // Verify the nested structure appears in explorer

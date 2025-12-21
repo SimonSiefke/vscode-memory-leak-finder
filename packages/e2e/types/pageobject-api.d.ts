@@ -53,6 +53,7 @@ export interface DebugConsole {
   clear(): Promise<void>
   shouldHaveCompletions(items: any): Promise<void>
   clearInput(): Promise<void>
+  shouldHaveLogpointOutput(expectedMessage: any): Promise<void>
 }
 export interface DebugHover {
   expandProperty(name: any, childProperties: any): Promise<void>
@@ -72,7 +73,7 @@ export interface DropDownContextMenu {
   close(): Promise<void>
 }
 export interface Editor {
-  open(fileName: any): Promise<void>
+  open(fileName: any, options?: any): Promise<void>
   focus(): Promise<void>
   hover(text: any, hoverText: any): Promise<void>
   splitRight(): Promise<void>
@@ -101,6 +102,7 @@ export interface Editor {
   deleteCharactersRight(options: any): Promise<void>
   deleteCharactersLeft(options: any): Promise<void>
   type(text: any): Promise<void>
+  press(key: any): Promise<void>
   shouldHaveText(text: any): Promise<void>
   rename(newText: any): Promise<void>
   renameCancel(newText: any): Promise<void>
@@ -108,6 +110,7 @@ export interface Editor {
   shouldHaveBreadCrumb(text: any): Promise<void>
   save(options?: any): Promise<void>
   switchToTab(name: any): Promise<void>
+  openSettingsJson(): Promise<void>
   showColorPicker(): Promise<void>
   hideColorPicker(): Promise<void>
   showBreadCrumbs(): Promise<void>
@@ -124,11 +127,15 @@ export interface Editor {
   hideSourceActionEmpty(): Promise<void>
   showSourceAction(): Promise<void>
   hideSourceAction(): Promise<void>
+  selectSourceAction(actionText: string): Promise<void>
   shouldHaveCursor(estimate: any): Promise<void>
   inspectTokens(): Promise<void>
   shouldHaveInspectedToken(name: any): Promise<void>
+  shouldHaveSemanticToken(type: any): Promise<void>
+  shouldNotHaveSemanticToken(type: any): Promise<void>
   closeInspectedTokens(): Promise<void>
   setBreakpoint(lineNumber: any): Promise<void>
+  setLogpoint(lineNumber: any, logMessage: any): Promise<void>
   goToFile(options: any): Promise<void>
   showDebugHover(options: any): Promise<void>
   hideDebugHover(): Promise<void>
@@ -141,6 +148,11 @@ export interface Editor {
   scrollUp(): Promise<void>
   shouldHaveActiveLineNumber(value: any): Promise<void>
   moveScrollBar(y: any, expectedScrollBarY: any): Promise<void>
+  shouldHaveExceptionWidget(): Promise<void>
+  shouldHaveCodeLens(options?: any): Promise<void>
+  shouldHaveCodeLensWithVersion(options?: any): Promise<void>
+  foldAll(): Promise<void>
+  unfoldAll(): Promise<void>
 }
 export interface Electron {
   evaluate(expression: any): Promise<void>
@@ -214,6 +226,11 @@ export interface MarkdownPreview {
   shouldHaveHeading(id: any): Promise<void>
   shouldBeVisible(): Promise<void>
 }
+export interface MultiDiffEditor {
+  open(files: any): Promise<void>
+  shouldBeVisible(): Promise<void>
+  close(): Promise<void>
+}
 export interface Notebook {
   addMarkdownCell(): Promise<void>
   removeMarkdownCell(): Promise<void>
@@ -243,6 +260,10 @@ export interface Problems {
   shouldHaveCount(count: any): Promise<void>
   show(): Promise<void>
   hide(): Promise<void>
+  switchToListView(): Promise<void>
+  switchToTreeView(): Promise<void>
+  shouldBeInListView(): Promise<void>
+  shouldBeInTreeView(): Promise<void>
 }
 export interface Profile {
   removeOtherProfiles(): Promise<void>
@@ -284,6 +305,9 @@ export interface RunAndDebug {
   removeAllBreakpoints(): Promise<void>
   step(expectedFile: any, expectedPauseLine: any, expectedCallStackSize?: any): Promise<void>
   setValue(variableName: any, variableValue: any, newVariableValue: any): Promise<void>
+  continue(): Promise<void>
+  setPauseOnExceptions(options: any): Promise<void>
+  waitForPausedOnException(options: any): Promise<void>
 }
 export interface RunningExtensions {
   show(): Promise<void>
@@ -313,6 +337,7 @@ export interface SettingsEditor {
   search(options: any): Promise<void>
   clear(): Promise<void>
   select(options: any): Promise<void>
+  setTextInput(options: any): Promise<void>
   toggleCheckBox(options: any): Promise<void>
   enableCheckBox(options: any): Promise<void>
   openTab(tabName: any): Promise<void>
@@ -385,6 +410,12 @@ export interface Terminal {
   focusSecond(): Promise<void>
   killThird(): Promise<void>
   shouldNotHaveActiveTerminals(): Promise<void>
+  shouldHaveSuccessDecoration(): Promise<void>
+}
+export interface Testing {
+  runTask(taskName: string): Promise<void>
+  shouldHaveTestSuccess(): Promise<void>
+  shouldHaveTestFailure(): Promise<void>
 }
 export interface TitleBar {
   showMenu(text: any): Promise<void>
@@ -399,6 +430,7 @@ export interface View {
 }
 export interface WebView {
   shouldBeVisible(): Promise<void>
+  shouldBeVisible2(options: { extensionId: string; hasLineOfCodeCounter?: boolean }): Promise<any>
   focus(): Promise<void>
 }
 export interface WelcomePage {
@@ -436,6 +468,9 @@ export interface Server {
 export interface PageObjectApi {
   readonly ActivityBar: ActivityBar
   readonly Colors: any
+  readonly GitHubPullRequests: any
+  readonly SimpleBrowser: any
+  readonly Git: any
   readonly ChatEditor: ChatEditor
   readonly ExtensionDetailView: any
   readonly ContextMenu: ContextMenu
@@ -452,6 +487,7 @@ export interface PageObjectApi {
   readonly KeyBindingsEditor: KeyBindingsEditor
   readonly MCP: MCP
   readonly MarkdownPreview: MarkdownPreview
+  readonly MultiDiffEditor: MultiDiffEditor
   readonly Notebook: Notebook
   readonly Notification: Notification
   readonly Output: Output
@@ -472,12 +508,13 @@ export interface PageObjectApi {
   readonly SettingsEditorFilter: SettingsEditorFilter
   readonly SettingsEditorInput: SettingsEditorInput
   readonly SideBar: SideBar
-  readonly SourceControl: SourceControl
+  readonly SourceControl: any
   readonly StatusBar: StatusBar
   readonly Suggest: Suggest
   readonly Tab: Tab
   readonly Task: Task
   readonly Terminal: Terminal
+  readonly Testing: Testing
   readonly TitleBar: TitleBar
   readonly View: View
   readonly WebView: WebView

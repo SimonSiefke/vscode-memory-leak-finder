@@ -13,8 +13,8 @@ test('addStdout - adds stdout data to state', () => {
   const pending = TestOutputState.getAll()
   expect(pending).toHaveLength(1)
   expect(pending[0]).toEqual({
-    type: TestOutputType.Stdout,
     data: testData,
+    type: TestOutputType.Stdout,
   })
 })
 
@@ -27,8 +27,8 @@ test('addStdErr - adds stderr data to state', () => {
   const pending = TestOutputState.getAll()
   expect(pending).toHaveLength(1)
   expect(pending[0]).toEqual({
-    type: TestOutputType.Stderr,
     data: testData,
+    type: TestOutputType.Stderr,
   })
 })
 

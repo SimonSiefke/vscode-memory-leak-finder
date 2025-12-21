@@ -5,6 +5,7 @@ import * as PreviousFilters from '../PreviousFilters/PreviousFilters.ts'
 import * as StartRunning from '../StartRunning/StartRunning.ts'
 import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 import * as Stdout from '../Stdout/Stdout.ts'
+import * as VsCodeVersion from '../VsCodeVersion/VsCodeVersion.ts'
 
 export const updateState = async (newState: any): Promise<void> => {
   const state = StdinDataState.getState()
@@ -23,35 +24,44 @@ export const updateState = async (newState: any): Promise<void> => {
     }
     return HandleExit.handleExit()
   }
-  StdinDataState.setState({ ...newState, stdout: [], previousFilters: [] })
+  StdinDataState.setState({ ...newState, previousFilters: [], stdout: [] })
   if (state.mode !== ModeType.Running && newState.mode === ModeType.Running) {
     await StartRunning.startRunning({
+      bisect: state.bisect,
+      checkLeaks: state.checkLeaks,
+      color: true,
+      commit: '',
+      continueValue: state.continueValue,
+      cwd: state.cwd,
+      enableExtensions: state.enableExtensions,
+      enableProxy: state.enableProxy,
       filterValue: state.value,
       headlessMode: state.headless,
-      color: true,
-      checkLeaks: state.checkLeaks,
-      recordVideo: state.recordVideo,
-      cwd: state.cwd,
-      runs: state.runs,
+      ide: state.ide,
+      ideVersion: state.ideVersion,
+      insidersCommit: state.insidersCommit,
+      inspectExtensions: state.inspectExtensions,
+      inspectExtensionsPort: state.inspectExtensionsPort,
+      inspectPtyHost: state.inspectPtyHost,
+      inspectPtyHostPort: state.inspectPtyHostPort,
+      inspectSharedProcess: state.inspectSharedProcess,
+      inspectSharedProcessPort: state.inspectSharedProcessPort,
+      isWindows: state.isWindows,
       measure: state.measure,
       measureAfter: state.measureAfter,
       measureNode: false,
-      timeouts: state.timeouts,
-      timeoutBetween: state.timeoutBetween,
+      recordVideo: state.recordVideo,
       restartBetween: state.restartBetween,
       runMode: state.runMode,
-      ide: state.ide,
-      ideVersion: state.ideVersion,
-      vscodePath: '',
-      commit: '',
-      setupOnly: false,
-      workers: state.workers,
-      isWindows: state.isWindows,
+      runs: state.runs,
       runSkippedTestsAnyway: state.runSkippedTestsAnyway,
-      shouldContinue: state.shouldContinue,
-      inspectExtensions: state.inspectExtensions,
-      inspectPtyHost: state.inspectPtyHost,
-      inspectSharedProcess: state.inspectSharedProcess,
+      setupOnly: false,
+      timeoutBetween: state.timeoutBetween,
+      timeouts: state.timeouts,
+      useProxyMock: state.useProxyMock,
+      vscodePath: '',
+      vscodeVersion: VsCodeVersion.vscodeVersion,
+      workers: state.workers,
     })
   }
   if (newState.mode === ModeType.Interrupted) {

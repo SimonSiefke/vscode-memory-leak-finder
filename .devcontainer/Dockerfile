@@ -1,11 +1,52 @@
 FROM ubuntu:24.04
 
-WORKDIR /home/
+# make sure apt is up to date
+RUN apt-get update --fix-missing
+RUN apt-get install -y \
+  curl \
+  git \
+  gnupg2 \
+  jq \
+  sudo \
+  zsh \
+  python3 \
+  build-essential \
+  g++ \
+  libx11-dev \
+  libxkbfile-dev \
+  libsecret-1-dev \
+  python-is-python3 \
+  python3-setuptools \
+  fonts-liberation \
+  libcairo2 \
+  libasound2t64 \
+  libcups2 \
+  libdbus-1-3 \
+  libdrm2 \
+  libegl1 \
+  libgbm1 \
+  libglib2.0-0 \
+  libgtk-3-0 \
+  libnspr4 \
+  libnss3 \
+  libpango-1.0-0 \
+  libx11-6 \
+  libx11-xcb1 \
+  libxcb1 \
+  libxcomposite1 \
+  libxdamage1 \
+  libxext6 \
+  libxfixes3 \
+  libxrandr2 \
+  libxshmfence1 \
+  xvfb \
+  libxtst6 \
+  xauth
+
+RUN  sudo apt-get install -y build-essential g++ libx11-dev libxkbfile-dev libsecret-1-dev python-is-python3
+
+RUN sudo apt-get install -y python3-setuptools
+
+RUN sudo apt-get install -y libkrb5-dev
 
 COPY . .
-
-RUN bash ./setup.sh
-
-RUN echo 'export NVM_DIR="$HOME/.nvm"' >> "$HOME/.zshrc"
-RUN echo '\n' >> "$HOME/.zshrc"
-RUN echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> "$HOME/.zshrc"

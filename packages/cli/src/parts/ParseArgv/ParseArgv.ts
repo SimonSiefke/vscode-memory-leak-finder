@@ -1,5 +1,6 @@
 import * as Ide from '../Ide/Ide.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
+import * as VsCodeVersion from '../VsCodeVersion/VsCodeVersion.ts'
 
 const parseArgvNumber = (argv, name) => {
   const index = argv.indexOf(name)
@@ -24,32 +25,41 @@ const parseArgvString = (argv, name) => {
 
 export const parseArgv = (argv) => {
   const options = {
-    watch: false,
-    headless: false,
+    bisect: false,
     checkLeaks: false,
-    runSkippedTestsAnyway: false,
-    runs: 1,
     color: true,
-    recordVideo: false,
+    commit: '',
+    continueValue: '',
     cwd: process.cwd(),
+    enableExtensions: false,
+    enableProxy: false,
     filter: '',
+    headless: false,
+    ide: Ide.VsCode,
+    ideVersion: '', // TODO
+    insidersCommit: '',
+    inspectExtensions: false,
+    inspectExtensionsPort: 5870,
+    inspectPtyHost: false,
+    inspectPtyHostPort: 5877,
+    inspectSharedProcess: false,
+    inspectSharedProcessPort: 5879,
     measure: 'event-listener-count',
     measureAfter: false,
     measureNode: false,
-    timeouts: true,
-    timeoutBetween: 0,
+    recordVideo: false,
     restartBetween: false,
     runMode: TestRunMode.Auto,
-    ide: Ide.VsCode,
-    ideVersion: '', // TODO
-    vscodePath: '',
-    commit: '',
+    runs: 1,
+    runSkippedTestsAnyway: false,
     setupOnly: false,
+    timeoutBetween: 0,
+    timeouts: true,
+    useProxyMock: false,
+    vscodePath: '',
+    vscodeVersion: VsCodeVersion.vscodeVersion,
+    watch: false,
     workers: false,
-    shouldContinue: false,
-    inspectSharedProcess: false,
-    inspectExtensions: false,
-    inspectPtyHost: false,
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -102,11 +112,17 @@ export const parseArgv = (argv) => {
   if (argv.includes('--ide=cursor')) {
     options.ide = Ide.Cursor
   }
+  if (argv.includes('--vscode-version')) {
+    options.vscodeVersion = parseArgvString(argv, '--vscode-version')
+  }
   if (argv.includes('--vscode-path')) {
     options.vscodePath = parseArgvString(argv, '--vscode-path')
   }
   if (argv.includes('--commit')) {
     options.commit = parseArgvString(argv, '--commit')
+  }
+  if (argv.includes('--insiders-commit')) {
+    options.insidersCommit = parseArgvString(argv, '--insiders-commit')
   }
   if (argv.includes('--setup-only')) {
     options.setupOnly = true
@@ -115,7 +131,7 @@ export const parseArgv = (argv) => {
     options.workers = true
   }
   if (argv.includes('--continue')) {
-    options.shouldContinue = true
+    options.continueValue = parseArgvString(argv, '--continue')
   }
   if (argv.includes('--inspect-shared-process')) {
     options.inspectSharedProcess = true
@@ -125,6 +141,27 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--inspect-ptyhost')) {
     options.inspectPtyHost = true
+  }
+  if (argv.includes('--enable-extensions')) {
+    options.enableExtensions = true
+  }
+  if (argv.includes('--inspect-ptyhost-port')) {
+    options.inspectPtyHostPort = parseArgvNumber(argv, '--inspect-ptyhost-port')
+  }
+  if (argv.includes('--inspect-shared-process-port')) {
+    options.inspectSharedProcessPort = parseArgvNumber(argv, '--inspect-shared-process-port')
+  }
+  if (argv.includes('--inspect-extensions-port')) {
+    options.inspectExtensionsPort = parseArgvNumber(argv, '--inspect-extensions-port')
+  }
+  if (argv.includes('--enable-proxy')) {
+    options.enableProxy = true
+  }
+  if (argv.includes('--use-proxy-mock')) {
+    options.useProxyMock = true
+  }
+  if (argv.includes('--bisect')) {
+    options.bisect = true
   }
   return options
 }

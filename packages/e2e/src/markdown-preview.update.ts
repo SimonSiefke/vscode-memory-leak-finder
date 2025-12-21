@@ -1,12 +1,21 @@
 import type { TestContext } from '../types.ts'
 
-export const skip = true
+export const skip = 1
 
-export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promise<void> => {
+export const setup = async ({
+  Editor,
+  Explorer,
+  MarkdownPreview,
+  QuickPick,
+  // @ts-ignore
+  WellKnownCommands,
+  Workbench,
+  Workspace,
+}: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'index.md',
       content: `# hello world`,
+      name: 'index.md',
     },
   ])
   await Editor.closeAll()
@@ -14,12 +23,47 @@ export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promi
   await Explorer.refresh()
   await Explorer.shouldHaveItem('index.md')
   await Editor.open('index.md')
+  await QuickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
+  const subFrame = await MarkdownPreview.shouldBeVisible()
+  // @ts-ignore
+  await MarkdownPreview.shouldHaveHeading(subFrame, 'hello-world')
+  // @ts-ignore
+  await Workbench.focusLeftEditorGroup()
 }
 
 // @ts-ignore
-export const run = async ({ QuickPick, WellKnownCommands, MarkdownPreview }: TestContext): Promise<void> => {
-  await QuickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
-  await MarkdownPreview.shouldBeVisible()
-  await MarkdownPreview.shouldHaveHeading('hello-world')
-  // TODO update editor and verify that markdown preview updates as well
+export const run = async ({ Editor, MarkdownPreview, QuickPick, WellKnownCommands, Workbench }: TestContext): Promise<void> => {
+  const subFrame = await MarkdownPreview.shouldBeVisible()
+  // @ts-ignore
+  await MarkdownPreview.shouldHaveHeading(subFrame, 'hello-world')
+  await Editor.deleteAll()
+  await Editor.type('a')
+  await Editor.type('b')
+  await Editor.type('c')
+  await Editor.type(' ')
+  await Editor.type('#')
+  // @ts-ignore
+  await MarkdownPreview.shouldHaveHeading(subFrame, 'cba') // TODO why is it reverse?
+  await Editor.deleteAll()
+  await Editor.type('d')
+  await Editor.type('l')
+  await Editor.type('r')
+  await Editor.type('o')
+  await Editor.type('w')
+  await Editor.type('-')
+  await Editor.type('o')
+  await Editor.type('l')
+  await Editor.type('l')
+  await Editor.type('e')
+  await Editor.type('h')
+  await Editor.type(' ')
+  await Editor.type('#')
+  // @ts-ignore
+  await MarkdownPreview.shouldHaveHeading(subFrame, 'hello-world')
+  await Editor.save({ viaKeyBoard: true })
+}
+
+export const teardown = async ({ Editor }: TestContext): Promise<void> => {
+  await Editor.save({ viaKeyBoard: true })
+  await Editor.closeAll()
 }

@@ -6,7 +6,6 @@ export const setValue = async (locator, text) => {
   Assert.string(text)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
       arguments: [
         {
           value: locator,
@@ -21,7 +20,8 @@ export const setValue = async (locator, text) => {
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
     },
-    locator.sessionId,
+    locator,
   )
 }

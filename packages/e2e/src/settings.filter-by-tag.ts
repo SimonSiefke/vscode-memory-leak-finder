@@ -9,7 +9,7 @@ export const setup = async ({ Editor, SettingsEditor }: TestContext): Promise<vo
   await SettingsEditor.collapseOutline()
 }
 
-export const run = async ({ SettingsEditor, SettingsEditorFilter, SettingsEditorCompletion }: TestContext): Promise<void> => {
+export const run = async ({ SettingsEditor, SettingsEditorCompletion, SettingsEditorFilter }: TestContext): Promise<void> => {
   await SettingsEditorFilter.select({
     filterName: 'Tag...',
     filterText: '@tag:',

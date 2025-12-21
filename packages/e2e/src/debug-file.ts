@@ -2,10 +2,9 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ Editor, Workspace, Explorer }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'index.js',
       content: `const add = (a, b) => {
   return a + b
 }
@@ -13,6 +12,7 @@ export const setup = async ({ Editor, Workspace, Explorer }: TestContext): Promi
 setInterval(()=>{
   add(1, 2)
 }, 1000)`,
+      name: 'index.js',
     },
   ])
   await Editor.closeAll()

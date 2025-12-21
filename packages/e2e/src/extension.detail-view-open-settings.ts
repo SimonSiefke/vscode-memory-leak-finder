@@ -1,13 +1,13 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ Extensions, Editor }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Extensions }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Extensions.show()
   await Extensions.search('@builtin html language features')
   await Extensions.first.shouldBe('HTML Language Features')
 }
 
-export const run = async ({ Extensions, Editor, ExtensionDetailView }: TestContext): Promise<void> => {
+export const run = async ({ Editor, ExtensionDetailView, Extensions }: TestContext): Promise<void> => {
   await Extensions.first.click()
   await ExtensionDetailView.shouldHaveHeading('HTML Language Features')
   await ExtensionDetailView.shouldHaveTab('Details')

@@ -3,6 +3,6 @@ import * as GetObjectCount from '../GetObjectCount/GetObjectCount.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
 export const getPromiseCount = async (session: Session, objectGroup: string): Promise<number> => {
-  const count = await GetObjectCount.getObjectCount(session, PrototypeExpression.Promise)
+  const count = await GetObjectCount.getObjectCount(session, PrototypeExpression.Promise, objectGroup)
   return count
 }

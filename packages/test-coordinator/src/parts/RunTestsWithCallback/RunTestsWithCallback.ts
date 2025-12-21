@@ -1,4 +1,6 @@
 import { join } from 'node:path'
+import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
+import type { RunTestsResult } from '../RunTestsResult/RunTestsResult.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
 import * as GetTestToRun from '../GetTestToRun/GetTestsToRun.ts'
@@ -6,7 +8,6 @@ import * as Id from '../Id/Id.ts'
 import * as MemoryLeakFinder from '../MemoryLeakFinder/MemoryLeakFinder.ts'
 import * as MemoryLeakResultsPath from '../MemoryLeakResultsPath/MemoryLeakResultsPath.ts'
 import * as PrepareTestsOrAttach from '../PrepareTestsOrAttach/PrepareTestsOrAttach.ts'
-import type { RunTestsWithCallbackOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import * as TestWorkerEventType from '../TestWorkerEventType/TestWorkerEventType.ts'
 import * as TestWorkerRunTest from '../TestWorkerRunTest/TestWorkerRunTest.ts'
 import * as TestWorkerSetupTest from '../TestWorkerSetupTest/TestWorkerSetupTest.ts'
@@ -17,47 +18,54 @@ import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
 
 const emptyRpc = {
+  async dispose() {},
   invoke() {
     throw new Error(`not implemented`)
   },
-  async dispose() {},
 }
 
 const disposeWorkers = async (workers) => {
   const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = workers
+  await Promise.all([memoryRpc.dispose(), testWorkerRpc.dispose(), videoRpc.dispose()])
   await initializationWorkerRpc.dispose()
-  await memoryRpc.dispose()
-  await testWorkerRpc.dispose()
-  await videoRpc.dispose()
 }
 
 export const runTestsWithCallback = async ({
-  root,
+  callback,
+  checkLeaks,
+  color,
+  commit,
+  continueValue,
   cwd,
+  enableExtensions,
+  enableProxy,
   filterValue,
   headlessMode,
-  color,
-  checkLeaks,
-  runSkippedTestsAnyway,
-  recordVideo,
-  runs,
+  ide,
+  ideVersion,
+  insidersCommit,
+  inspectExtensions,
+  inspectExtensionsPort,
+  inspectPtyHost,
+  inspectPtyHostPort,
+  inspectSharedProcess,
+  inspectSharedProcessPort,
   measure,
   measureAfter,
   measureNode,
-  timeouts,
-  timeoutBetween,
+  recordVideo,
   restartBetween,
+  root,
   runMode,
-  ide,
-  ideVersion,
-  vscodePath,
-  commit,
+  runs,
+  runSkippedTestsAnyway,
   setupOnly,
-  inspectSharedProcess,
-  inspectExtensions,
-  inspectPtyHost,
-  callback,
-}: RunTestsWithCallbackOptions) => {
+  timeoutBetween,
+  timeouts,
+  useProxyMock,
+  vscodePath,
+  vscodeVersion,
+}: RunTestsWithCallbackOptions): Promise<RunTestsResult> => {
   try {
     Assert.string(root)
     Assert.string(cwd)
@@ -77,6 +85,7 @@ export const runTestsWithCallback = async ({
     Assert.string(ide)
     Assert.string(ideVersion)
     Assert.boolean(setupOnly)
+    Assert.boolean(enableExtensions)
 
     const connectionId = Id.create()
     const attachedToPageTimeout = TimeoutConstants.AttachToPage
@@ -88,31 +97,48 @@ export const runTestsWithCallback = async ({
     // Then recreate the workers, ensuring a clean state
 
     if (setupOnly && commit) {
-      const { testWorkerRpc, memoryRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach(
-        cwd,
-        headlessMode,
-        recordVideo,
+      const { memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
+        attachedToPageTimeout,
+        commit,
         connectionId,
-        timeouts,
-        runMode,
+        cwd,
+        enableExtensions,
+        enableProxy,
+        headlessMode,
         ide,
         ideVersion,
-        vscodePath,
-        commit,
-
-        attachedToPageTimeout,
-        measure,
         idleTimeout,
-        pageObjectPath,
-        measureNode,
-        inspectSharedProcess,
+        insidersCommit,
         inspectExtensions,
+        inspectExtensionsPort,
         inspectPtyHost,
-      )
+        inspectPtyHostPort,
+        inspectSharedProcess,
+        inspectSharedProcessPort,
+        measureId: measure,
+        measureNode,
+        pageObjectPath,
+        recordVideo,
+        runMode,
+        timeouts,
+        useProxyMock,
+        vscodePath,
+        vscodeVersion,
+      })
       await testWorkerRpc.dispose()
       await memoryRpc?.dispose()
       await videoRpc?.dispose()
-      return callback(TestWorkerEventType.AllTestsFinished, 0, 0, 0, 0, 0, 0, 0, filterValue)
+      return {
+        duration: 0,
+        failed: 0,
+        filterValue,
+        leaked: 0,
+        passed: 0,
+        skipped: 0,
+        skippedFailed: 0,
+        total: 0,
+        type: 'success',
+      }
     }
 
     let passed = 0
@@ -120,10 +146,20 @@ export const runTestsWithCallback = async ({
     let skipped = 0
     let skippedFailed = 0
     let leaking = 0
-    const formattedPaths = await GetTestToRun.getTestsToRun(root, cwd, filterValue)
+    const formattedPaths = await GetTestToRun.getTestsToRun(root, cwd, filterValue, continueValue)
     const total = formattedPaths.length
     if (total === 0) {
-      return callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, 0, leaking, total, 0, filterValue)
+      return {
+        duration: 0,
+        failed,
+        filterValue,
+        leaked: leaking,
+        passed,
+        skipped,
+        skippedFailed: 0,
+        total,
+        type: 'success',
+      }
     }
     const initialStart = Time.now()
     const first = formattedPaths[0]
@@ -143,15 +179,15 @@ export const runTestsWithCallback = async ({
     await callback(TestWorkerEventType.TestRunning, first.absolutePath, first.relativeDirname, first.dirent, /* isFirst */ true)
 
     let workers = {
-      testWorkerRpc: emptyRpc,
-      memoryRpc: emptyRpc,
-      videoRpc: emptyRpc,
       initializationWorkerRpc: emptyRpc,
+      memoryRpc: emptyRpc,
+      testWorkerRpc: emptyRpc,
+      videoRpc: emptyRpc,
     }
 
     for (let i = 0; i < formattedPaths.length; i++) {
       const formattedPath = formattedPaths[i]
-      const { absolutePath, relativeDirname, dirent, relativePath } = formattedPath
+      const { absolutePath, dirent, relativeDirname, relativePath } = formattedPath
       const forceRun = runSkippedTestsAnyway || dirent === `${filterValue}.js`
 
       const needsSetup = i === 0 || restartBetween
@@ -159,35 +195,44 @@ export const runTestsWithCallback = async ({
       if (needsSetup) {
         await disposeWorkers(workers)
         PrepareTestsOrAttach.state.promise = undefined
-        const { testWorkerRpc, memoryRpc, videoRpc, initializationWorkerRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach(
-          cwd,
-          headlessMode,
-          recordVideo,
+        const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
+          attachedToPageTimeout,
+          commit,
           connectionId,
-          timeouts,
-          runMode,
+          cwd,
+          enableExtensions,
+          enableProxy,
+          headlessMode,
           ide,
           ideVersion,
-          vscodePath,
-          commit,
-          attachedToPageTimeout,
-          measure,
           idleTimeout,
-          pageObjectPath,
-          measureNode,
-          inspectSharedProcess,
+          insidersCommit,
           inspectExtensions,
+          inspectExtensionsPort,
           inspectPtyHost,
-        )
+          inspectPtyHostPort,
+          inspectSharedProcess,
+          inspectSharedProcessPort,
+          measureId: measure,
+          measureNode,
+          pageObjectPath,
+          recordVideo,
+          runMode,
+          timeouts,
+          useProxyMock,
+          vscodePath,
+          vscodeVersion,
+        })
         workers = {
-          testWorkerRpc: testWorkerRpc || emptyRpc,
-          memoryRpc: memoryRpc || emptyRpc,
-          videoRpc: videoRpc || emptyRpc,
           initializationWorkerRpc: initializationWorkerRpc || emptyRpc,
+          // @ts-ignore
+          memoryRpc: memoryRpc || emptyRpc,
+          testWorkerRpc: testWorkerRpc || emptyRpc,
+          videoRpc: videoRpc || emptyRpc,
         }
       }
 
-      const { testWorkerRpc, memoryRpc, videoRpc } = workers
+      const { memoryRpc, testWorkerRpc, videoRpc } = workers
 
       let wasOriginallySkipped = false
       if (i !== 0) {
@@ -299,10 +344,23 @@ export const runTestsWithCallback = async ({
       testWorkerRpc: emptyRpc,
       videoRpc: emptyRpc,
     }
-    await callback(TestWorkerEventType.AllTestsFinished, passed, failed, skipped, skippedFailed, leaking, total, duration, filterValue)
+    return {
+      duration,
+      failed,
+      filterValue,
+      leaked: leaking,
+      passed,
+      skipped,
+      skippedFailed,
+      total,
+      type: 'success',
+    }
   } catch (error) {
     const PrettyError = await import('../PrettyError/PrettyError.ts')
     const prettyError = await PrettyError.prepare(error, { color, root })
-    await callback(TestWorkerEventType.UnexpectedTestError, prettyError)
+    return {
+      prettyError,
+      type: 'error',
+    }
   }
 }

@@ -6,7 +6,7 @@ import * as GetMatchingFiles from '../GetMatchingFiles/GetMatchingFiles.ts'
 import * as Path from '../Path/Path.ts'
 import { VError } from '../VError/VError.ts'
 
-export const getTestsToRun = async (root, cwd, filterValue) => {
+export const getTestsToRun = async (root, cwd, filterValue, continueValue) => {
   try {
     Assert.string(root)
     Assert.string(cwd)
@@ -17,7 +17,12 @@ export const getTestsToRun = async (root, cwd, filterValue) => {
     }
     const testDirents = await FileSystem.readDir(testsPath)
     const matchingDirents = GetMatchingFiles.getMatchingFiles(testDirents, filterValue)
-    const formattedPaths = FormatPaths.formatPaths(cwd, testsPath, matchingDirents)
+    let formattedPaths = FormatPaths.formatPaths(cwd, testsPath, matchingDirents)
+    if (continueValue) {
+      formattedPaths = formattedPaths.filter((formattedPath) => {
+        return formattedPath.dirent >= continueValue
+      })
+    }
     return formattedPaths
   } catch (error) {
     throw new VError(error, `Failed to determine which tests to run`)

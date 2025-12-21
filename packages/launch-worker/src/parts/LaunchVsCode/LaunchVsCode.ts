@@ -18,15 +18,22 @@ import * as Root from '../Root/Root.ts'
 import { VError } from '../VError/VError.ts'
 
 export const launchVsCode = async ({
-  headlessMode,
-  cwd,
-  vscodeVersion,
-  vscodePath,
-  commit,
   addDisposable,
-  inspectSharedProcess,
+  commit,
+  cwd,
+  enableExtensions,
+  enableProxy,
+  headlessMode,
+  insidersCommit,
   inspectExtensions,
+  inspectExtensionsPort,
   inspectPtyHost,
+  inspectPtyHostPort,
+  inspectSharedProcess,
+  inspectSharedProcessPort,
+  useProxyMock,
+  vscodePath,
+  vscodeVersion,
 }) => {
   try {
     const testWorkspacePath = join(Root.root, '.vscode-test-workspace')
@@ -37,31 +44,49 @@ export const launchVsCode = async ({
     }
     await RemoveVscodeBackups.removeVscodeBackups()
     const runtimeDir = GetVscodeRuntimeDir.getVscodeRuntimeDir()
-    const binaryPath = await GetBinaryPath.getBinaryPath(vscodeVersion, vscodePath, commit)
+    if (runtimeDir) {
+      await mkdir(runtimeDir, { recursive: true })
+    }
+    const sourceMapDir = join(Root.root, '.vscode-source-maps')
+    await mkdir(sourceMapDir, { recursive: true })
+    const sourceMapCacheDir = join(Root.root, '.vscode-resolve-source-map-cache')
+    await mkdir(sourceMapCacheDir, { recursive: true })
+    const sourcesDir = join(Root.root, '.vscode-sources')
+    await mkdir(sourcesDir, { recursive: true })
+    const binaryPath = await GetBinaryPath.getBinaryPath(vscodeVersion, vscodePath, commit, insidersCommit)
     const userDataDir = GetUserDataDir.getUserDataDir()
     const extensionsDir = GetExtensionsDir.getExtensionsDir()
-    await rm(extensionsDir, { recursive: true, force: true })
+    await rm(extensionsDir, { force: true, recursive: true })
     await mkdir(extensionsDir)
     const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
     const settingsPath = join(userDataDir, 'User', 'settings.json')
     await mkdir(dirname(settingsPath), { recursive: true })
     await copyFile(defaultSettingsSourcePath, settingsPath)
     const args = GetVsCodeArgs.getVscodeArgs({
-      userDataDir,
+      enableExtensions,
+      enableProxy: enableProxy,
       extensionsDir,
       extraLaunchArgs: [testWorkspacePath],
-      inspectSharedProcess,
       inspectExtensions,
+      inspectExtensionsPort,
       inspectPtyHost,
+      inspectPtyHostPort,
+      inspectSharedProcess,
+      inspectSharedProcessPort,
+      userDataDir,
     })
-    const env = GetVsCodeEnv.getVsCodeEnv({ runtimeDir, processEnv: process.env })
+
+    const env = GetVsCodeEnv.getVsCodeEnv({
+      processEnv: process.env,
+      runtimeDir,
+    })
     const { child } = await LaunchElectron.launchElectron({
-      cliPath: binaryPath,
+      addDisposable,
       args,
-      headlessMode,
+      cliPath: binaryPath,
       cwd,
       env,
-      addDisposable,
+      headlessMode,
     })
     return {
       child,
