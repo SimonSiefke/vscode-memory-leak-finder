@@ -1,11 +1,11 @@
 import { mkdir, writeFile } from 'fs/promises'
 import { join } from 'path'
-import * as Root from '../Root/Root.ts'
-import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
-import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
-import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 import { decompressBody } from '../DecompressBody/DecompressBody.ts'
 import { parseJsonIfApplicable } from '../HttpProxyServer/HttpProxyServer.ts'
+import * as Root from '../Root/Root.ts'
+import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
+import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
+import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
@@ -57,9 +57,9 @@ export const savePostBody = async (
       try {
         const formData: Record<string, string> = {}
         const params = new URLSearchParams(parsedBody)
-        params.forEach((value, key) => {
+        for (const [key, value] of params.entries()) {
           formData[key] = value
-        })
+        }
         parsedBody = formData
         bodyFormat = 'form-urlencoded'
       } catch {
@@ -73,14 +73,14 @@ export const savePostBody = async (
     }
 
     const postData: any = {
-      timestamp,
-      method,
-      url,
-      contentType,
-      bodyFormat,
-      headers,
       body: parsedBody,
+      bodyFormat,
+      contentType,
+      headers,
+      method,
       rawBody: bodyFormat === 'zip' ? undefined : body.toString('utf8'),
+      timestamp,
+      url,
     }
 
     // Add response data if available
@@ -120,12 +120,12 @@ export const savePostBody = async (
       }
 
       postData.response = {
-        statusCode: responseData.statusCode,
-        statusMessage: responseData.statusMessage,
-        headers: responseData.responseHeaders,
         body: parsedResponseBody,
         bodyFormat: responseBodyFormat,
+        headers: responseData.responseHeaders,
         rawBody: responseBodyFormat === 'zip' || responseBodyFormat === 'sse' ? undefined : responseData.responseData.toString('utf8'),
+        statusCode: responseData.statusCode,
+        statusMessage: responseData.statusMessage,
         wasCompressed: responseWasCompressed,
       }
     }

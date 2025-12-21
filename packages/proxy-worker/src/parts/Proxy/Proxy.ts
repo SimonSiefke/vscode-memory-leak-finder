@@ -1,7 +1,6 @@
 import { readFile, writeFile } from 'fs/promises'
-import * as HttpProxyServer from '../HttpProxyServer/HttpProxyServer.ts'
 import { getCACertPath as getCACertPathImpl } from '../GetCACertPath/GetCACertPath.ts'
-import { getProxyEnvVars } from '../GetProxyEnvVars/GetProxyEnvVars.ts'
+import * as HttpProxyServer from '../HttpProxyServer/HttpProxyServer.ts'
 
 let proxyServerInstance: { port: number; url: string; [Symbol.asyncDispose]: () => Promise<void> } | null = null
 
@@ -18,8 +17,8 @@ export const createHttpProxyServer = async (
   })
   proxyServerInstance = {
     port: server.port,
-    url: server.url,
     [Symbol.asyncDispose]: server.dispose,
+    url: server.url,
   }
   return {
     port: proxyServerInstance.port,
@@ -34,7 +33,7 @@ export const disposeProxyServer = async (): Promise<void> => {
   }
 }
 
-export { getProxyEnvVars }
+
 
 export const getCACertPath = (): string => {
   return getCACertPathImpl()
@@ -66,3 +65,5 @@ export const setupProxy = async (
 
   return proxyServer
 }
+
+export {getProxyEnvVars} from '../GetProxyEnvVars/GetProxyEnvVars.ts'

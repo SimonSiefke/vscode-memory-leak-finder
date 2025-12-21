@@ -1,5 +1,5 @@
-import { createGunzip, createInflate, createBrotliDecompress } from 'zlib'
 import { decompress as zstdDecompress } from '@mongodb-js/zstd'
+import { createGunzip, createInflate, createBrotliDecompress } from 'zlib'
 
 export const decompressBody = async (body: Buffer, encoding: string | string[] | undefined): Promise<{ body: string; wasCompressed: boolean }> => {
   if (!encoding) {
@@ -10,7 +10,7 @@ export const decompressBody = async (body: Buffer, encoding: string | string[] |
   const normalizedEncoding = encodingStr.toLowerCase().trim()
 
   if (normalizedEncoding === 'gzip') {
-    const { promise, resolve, reject } = Promise.withResolvers<{ body: string; wasCompressed: boolean }>()
+    const { promise, reject, resolve } = Promise.withResolvers<{ body: string; wasCompressed: boolean }>()
     const gunzip = createGunzip()
     const chunks: Buffer[] = []
     gunzip.on('data', (chunk: Buffer) => chunks.push(chunk))
@@ -25,7 +25,7 @@ export const decompressBody = async (body: Buffer, encoding: string | string[] |
   }
 
   if (normalizedEncoding === 'deflate') {
-    const { promise, resolve, reject } = Promise.withResolvers<{ body: string; wasCompressed: boolean }>()
+    const { promise, reject, resolve } = Promise.withResolvers<{ body: string; wasCompressed: boolean }>()
     const inflate = createInflate()
     const chunks: Buffer[] = []
     inflate.on('data', (chunk: Buffer) => chunks.push(chunk))
@@ -40,7 +40,7 @@ export const decompressBody = async (body: Buffer, encoding: string | string[] |
   }
 
   if (normalizedEncoding === 'br') {
-    const { promise, resolve, reject } = Promise.withResolvers<{ body: string; wasCompressed: boolean }>()
+    const { promise, reject, resolve } = Promise.withResolvers<{ body: string; wasCompressed: boolean }>()
     const brotli = createBrotliDecompress()
     const chunks: Buffer[] = []
     brotli.on('data', (chunk: Buffer) => chunks.push(chunk))
@@ -58,7 +58,7 @@ export const decompressBody = async (body: Buffer, encoding: string | string[] |
     try {
       const decompressed = await zstdDecompress(body)
       return { body: decompressed.toString('utf8'), wasCompressed: true }
-    } catch (error) {
+    } catch {
       // If decompression fails, return original body
       return { body: body.toString('utf8'), wasCompressed: false }
     }

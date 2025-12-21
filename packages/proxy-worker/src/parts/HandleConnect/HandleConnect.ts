@@ -1,18 +1,18 @@
-import { IncomingMessage } from 'http'
-import { request as httpsRequest } from 'https'
-import { createSecureContext, TLSSocket } from 'tls'
+import type { IncomingMessage } from 'http'
 import { mkdir, writeFile, unlink } from 'fs/promises'
+import { request as httpsRequest } from 'https'
 import { join } from 'path'
-import * as Root from '../Root/Root.ts'
-import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
-import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
-import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
-import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
-import { getCertificateForDomain } from '../GetCertificateForDomain/GetCertificateForDomain.ts'
-import { sanitizeFilename } from '../SanitizeFilename/SanitizeFilename.ts'
-import { decompressBody } from '../DecompressBody/DecompressBody.ts'
-import { parseJsonIfApplicable } from '../HttpProxyServer/HttpProxyServer.ts'
+import { createSecureContext, TLSSocket } from 'tls'
 import { CERT_DIR } from '../Constants/Constants.ts'
+import { decompressBody } from '../DecompressBody/DecompressBody.ts'
+import { getCertificateForDomain } from '../GetCertificateForDomain/GetCertificateForDomain.ts'
+import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
+import { parseJsonIfApplicable } from '../HttpProxyServer/HttpProxyServer.ts'
+import * as Root from '../Root/Root.ts'
+import { sanitizeFilename } from '../SanitizeFilename/SanitizeFilename.ts'
+import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
+import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
+import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 const DOMAIN_SANITIZE_REGEX = /[^a-zA-Z0-9]/g
@@ -52,16 +52,16 @@ const saveInterceptedRequest = async (
     }
 
     const requestData = {
-      timestamp,
-      method,
-      url,
       headers: requestHeaders,
+      method,
       response: {
-        statusCode,
-        headers: responseHeaders,
         body: parsedBody,
+        headers: responseHeaders,
+        statusCode,
         wasCompressed,
       },
+      timestamp,
+      url,
     }
 
     await writeFile(filepath, JSON.stringify(requestData, null, 2), 'utf8')
@@ -76,7 +76,7 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
   const target = req.url || ''
   const parts = target.split(':')
   const hostname = parts[0]
-  const targetPort = parts[1] ? parseInt(parts[1], 10) : 443
+  const targetPort = parts[1] ? Number.parseInt(parts[1], 10) : 443
 
   try {
     // Get certificate for this domain
@@ -86,8 +86,8 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
     } catch (error) {
       console.error(`[Proxy] Error getting certificate for ${hostname}, regenerating...`, error)
       // If there's an error getting the certificate, try to regenerate it
-      const certPath = join(CERT_DIR, `${hostname.replace(DOMAIN_SANITIZE_REGEX, '_')}-cert.pem`)
-      const keyPath = join(CERT_DIR, `${hostname.replace(DOMAIN_SANITIZE_REGEX, '_')}-key.pem`)
+      const certPath = join(CERT_DIR, `${hostname.replaceAll(DOMAIN_SANITIZE_REGEX, '_')}-cert.pem`)
+      const keyPath = join(CERT_DIR, `${hostname.replaceAll(DOMAIN_SANITIZE_REGEX, '_')}-key.pem`)
       await Promise.all([
         unlink(certPath).catch(() => {}),
         unlink(keyPath).catch(() => {}),
@@ -106,8 +106,8 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
       if (errorCode === 'ERR_OSSL_X509_KEY_VALUES_MISMATCH') {
         // Certificate-key mismatch detected, regenerate
         console.log(`[Proxy] Certificate-key mismatch for ${hostname}, regenerating...`)
-        const certPath = join(CERT_DIR, `${hostname.replace(DOMAIN_SANITIZE_REGEX, '_')}-cert.pem`)
-        const keyPath = join(CERT_DIR, `${hostname.replace(DOMAIN_SANITIZE_REGEX, '_')}-key.pem`)
+        const certPath = join(CERT_DIR, `${hostname.replaceAll(DOMAIN_SANITIZE_REGEX, '_')}-cert.pem`)
+        const keyPath = join(CERT_DIR, `${hostname.replaceAll(DOMAIN_SANITIZE_REGEX, '_')}-key.pem`)
         await Promise.all([
           unlink(certPath).catch(() => {}),
           unlink(keyPath).catch(() => {}),
@@ -127,8 +127,8 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
 
     // Create TLS server to terminate the connection
     const tlsSocket = new TLSSocket(socket, {
-      secureContext,
       isServer: true,
+      secureContext,
     })
 
     // Handle the TLS handshake
@@ -148,7 +148,7 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
           return // Need more data
         }
 
-        const requestLine = requestStr.substring(0, requestLineEnd)
+        const requestLine = requestStr.slice(0, Math.max(0, requestLineEnd))
         const parts = requestLine.split(' ')
         const method = parts[0]
         const path = parts[1]
@@ -166,21 +166,21 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
 
         const headersStr = requestStr.substring(requestLineEnd + 2, headersEnd)
         const headers: Record<string, string> = {}
-        headersStr.split('\r\n').forEach((line) => {
+        for (const line of headersStr.split('\r\n')) {
           const colonIndex = line.indexOf(':')
           if (colonIndex > 0) {
-            const key = line.substring(0, colonIndex).trim().toLowerCase()
-            const value = line.substring(colonIndex + 1).trim()
+            const key = line.slice(0, Math.max(0, colonIndex)).trim().toLowerCase()
+            const value = line.slice(Math.max(0, colonIndex + 1)).trim()
             headers[key] = value
           }
-        })
+        }
 
         // Calculate body length
         const bodyStart = headersEnd + 4
         let bodyLength = 0
         const contentLengthHeader = headers['content-length']
         if (contentLengthHeader) {
-          bodyLength = parseInt(contentLengthHeader, 10)
+          bodyLength = Number.parseInt(contentLengthHeader, 10)
           if (isNaN(bodyLength)) {
             bodyLength = 0
           }
@@ -237,7 +237,7 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
             const cleanedHeaders: Record<string, string> = {}
             const lowerCaseHeaders: Set<string> = new Set()
 
-            Object.entries(mockResponse.headers).forEach(([k, v]) => {
+            for (const [k, v] of Object.entries(mockResponse.headers)) {
               const lowerKey = k.toLowerCase()
               // Skip Content-Length headers (case-insensitive) - we'll set it below
               // Skip Transfer-Encoding headers - we'll set Content-Length instead
@@ -246,7 +246,7 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
                 cleanedHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
                 lowerCaseHeaders.add(lowerKey)
               }
-            })
+            }
 
             // Add CORS headers if not already present (case-insensitive check)
             if (!lowerCaseHeaders.has('access-control-allow-origin')) {
@@ -268,18 +268,18 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
             // Explicitly remove Transfer-Encoding and Content-Encoding headers if they somehow got through
             // (case-insensitive check) - we're setting Content-Length, so Transfer-Encoding can't be present
             // Content-Encoding is removed because mock body is already decompressed
-            Object.keys(cleanedHeaders).forEach((key) => {
+            for (const key of Object.keys(cleanedHeaders)) {
               const lowerKey = key.toLowerCase()
               if (lowerKey === 'transfer-encoding' || lowerKey === 'content-encoding') {
                 delete cleanedHeaders[key]
                 lowerCaseHeaders.delete(lowerKey)
               }
-            })
+            }
 
             // Always set Content-Length to match actual body length
             cleanedHeaders['Content-Length'] = String(bodyBuffer.length)
 
-            const statusLine = `${httpVersion} ${mockResponse.statusCode} ${mockResponse.statusCode === 200 ? 'OK' : mockResponse.statusCode === 204 ? 'No Content' : ''}\r\n`
+            const statusLine = `${httpVersion} ${mockResponse.statusCode} ${mockResponse.statusCode === 200 ? 'OK' : (mockResponse.statusCode === 204 ? 'No Content' : '')}\r\n`
             const headerLines = Object.entries(cleanedHeaders)
               .map(([k, v]) => `${k}: ${v}\r\n`)
               .join('')
@@ -296,11 +296,11 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
 
         // Forward request to target server
         const targetOptions = {
-          hostname,
-          port: targetPort,
-          path,
-          method,
           headers,
+          hostname,
+          method,
+          path,
+          port: targetPort,
           rejectUnauthorized: false,
         }
 
@@ -318,36 +318,34 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
             const responseData = Buffer.concat(responseChunks)
             // Convert headers to Record<string, string | string[]> format
             const responseHeaders: Record<string, string | string[]> = {}
-            Object.entries(targetRes.headers).forEach(([k, v]) => {
+            for (const [k, v] of Object.entries(targetRes.headers)) {
               if (v !== undefined) {
                 responseHeaders[k] = v
               }
-            })
+            }
             await saveInterceptedRequest(method, fullUrl, headers, targetRes.statusCode || 200, responseHeaders, responseData)
 
             // Write response back through TLS
             // Remove transfer-encoding header and set content-length instead
             const cleanedHeaders: Record<string, string> = {}
             const lowerCaseHeaders: Set<string> = new Set()
-            Object.entries(targetRes.headers).forEach(([k, v]) => {
+            for (const [k, v] of Object.entries(targetRes.headers)) {
               const lowerKey = k.toLowerCase()
               // Skip transfer-encoding and connection headers
-              if (lowerKey !== 'transfer-encoding' && lowerKey !== 'connection') {
-                // Avoid duplicate headers by checking case-insensitively
-                if (!lowerCaseHeaders.has(lowerKey)) {
+              if (lowerKey !== 'transfer-encoding' && lowerKey !== 'connection' && // Avoid duplicate headers by checking case-insensitively
+                !lowerCaseHeaders.has(lowerKey)) {
                   cleanedHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
                   lowerCaseHeaders.add(lowerKey)
                 }
-              }
-            })
+            }
 
             // Add CORS headers for marketplace API responses
             if (isMarketplaceApi) {
               // Only add CORS headers if they don't already exist
               const lowerCaseCleanedHeaders: Set<string> = new Set()
-              Object.keys(cleanedHeaders).forEach((k) => {
+              for (const k of Object.keys(cleanedHeaders)) {
                 lowerCaseCleanedHeaders.add(k.toLowerCase())
-              })
+              }
 
               if (!lowerCaseCleanedHeaders.has('access-control-allow-origin')) {
                 cleanedHeaders['Access-Control-Allow-Origin'] = '*'
@@ -362,12 +360,12 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
 
             // Explicitly remove Transfer-Encoding header if it somehow got through
             // (case-insensitive check) - we're setting Content-Length, so Transfer-Encoding can't be present
-            Object.keys(cleanedHeaders).forEach((key) => {
+            for (const key of Object.keys(cleanedHeaders)) {
               if (key.toLowerCase() === 'transfer-encoding') {
                 delete cleanedHeaders[key]
                 lowerCaseHeaders.delete(key.toLowerCase())
               }
-            })
+            }
 
             // Set content-length
             cleanedHeaders['Content-Length'] = String(responseData.length)
@@ -437,7 +435,7 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
         })
 
         // Handle timeout
-        targetReq.setTimeout(30000, () => {
+        targetReq.setTimeout(30_000, () => {
           targetReq.destroy()
           const errorBody = JSON.stringify({
             error: 'Gateway Timeout',

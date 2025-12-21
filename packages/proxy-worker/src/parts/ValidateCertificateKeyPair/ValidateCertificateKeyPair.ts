@@ -15,7 +15,7 @@ export const validateCertificateKeyPair = (cert: string, key: string): boolean =
     }
 
     return false
-  } catch (error) {
+  } catch {
     return false
   }
 }

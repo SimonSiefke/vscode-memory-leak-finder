@@ -1,16 +1,16 @@
+import { generateKeyPairSync } from 'crypto'
+import { existsSync } from 'fs'
 import { readdir, readFile, writeFile, mkdir } from 'fs/promises'
+import { createRequire } from 'module'
 import { join, dirname } from 'path'
 import { URL } from 'url'
-import { existsSync } from 'fs'
 import { fileURLToPath } from 'url'
-import { generateKeyPairSync } from 'crypto'
-import { createRequire } from 'module'
 import * as Root from '../Root/Root.ts'
 
 const require = createRequire(import.meta.url)
 const jwt = require('jsonwebtoken')
-import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
+import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
@@ -19,10 +19,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const MOCK_CONFIG_PATH = join(__dirname, '..', 'GetMockFileName', 'mock-config.json')
 
 interface RecordedRequest {
-  timestamp: number
-  method: string
-  url: string
   headers: Record<string, string | string[]>
+  method: string
   response: {
     statusCode: number
     statusMessage?: string
@@ -30,6 +28,8 @@ interface RecordedRequest {
     body: any
     wasCompressed?: boolean
   }
+  timestamp: number
+  url: string
 }
 
 const loadMockConfig = async (): Promise<MockConfigEntry[]> => {
@@ -51,7 +51,7 @@ const matchesPattern = (value: string, pattern: string): boolean => {
   }
   if (pattern.includes('*')) {
     // Simple wildcard matching: convert pattern to regex
-    const regexPattern = pattern.replace(/\*/g, '.*').replace(/\?/g, '.')
+    const regexPattern = pattern.replaceAll('*', '.*').replaceAll('?', '.')
     const regex = new RegExp(`^${regexPattern}$`)
     return regex.test(value)
   }
@@ -83,14 +83,25 @@ let rsaKeyPair: { privateKey: string; publicKey: string } | null = null
 const getEcdsaKeyPair = (algorithm: string): { privateKey: string; publicKey: string } => {
   // Map algorithm to curve name
   let curve: string
-  if (algorithm === 'ES256') {
+  switch (algorithm) {
+  case 'ES256': {
     curve = 'prime256v1' // P-256
-  } else if (algorithm === 'ES384') {
+  
+  break;
+  }
+  case 'ES384': {
     curve = 'secp384r1' // P-384
-  } else if (algorithm === 'ES512') {
+  
+  break;
+  }
+  case 'ES512': {
     curve = 'secp521r1' // P-521
-  } else {
+  
+  break;
+  }
+  default: {
     curve = 'prime256v1' // Default to P-256
+  }
   }
 
   if (!ecdsaKeyPairs.has(curve)) {
@@ -98,8 +109,8 @@ const getEcdsaKeyPair = (algorithm: string): { privateKey: string; publicKey: st
       namedCurve: curve,
     })
     ecdsaKeyPairs.set(curve, {
-      privateKey: privateKey.export({ type: 'sec1', format: 'pem' }) as string,
-      publicKey: publicKey.export({ type: 'spki', format: 'pem' }) as string,
+      privateKey: privateKey.export({ format: 'pem', type: 'sec1' }),
+      publicKey: publicKey.export({ format: 'pem', type: 'spki' }),
     })
   }
 
@@ -112,8 +123,8 @@ const getRsaKeyPair = (): { privateKey: string; publicKey: string } => {
       modulusLength: 2048,
     })
     rsaKeyPair = {
-      privateKey: privateKey.export({ type: 'pkcs8', format: 'pem' }) as string,
-      publicKey: publicKey.export({ type: 'spki', format: 'pem' }) as string,
+      privateKey: privateKey.export({ format: 'pem', type: 'pkcs8' }),
+      publicKey: publicKey.export({ format: 'pem', type: 'spki' }),
     }
   }
   return rsaKeyPair
@@ -141,7 +152,7 @@ const replaceJwtToken = (token: string): string => {
     }
 
     const payload = decoded.payload as Record<string, any>
-    const header = decoded.header
+    const {header} = decoded
 
     // Update expiration to one month from now
     const oneMonthFromNow = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60
@@ -226,8 +237,8 @@ const isUnixTimestamp = (value: any): boolean => {
     return false
   }
   // Check if it's a reasonable Unix timestamp (between year 2000 and year 2100)
-  const minTimestamp = 946684800 // 2000-01-01
-  const maxTimestamp = 4102444800 // 2100-01-01
+  const minTimestamp = 946_684_800 // 2000-01-01
+  const maxTimestamp = 4_102_444_800 // 2100-01-01
   return value >= minTimestamp && value <= maxTimestamp
 }
 
@@ -325,7 +336,7 @@ const convertRequestsToMocks = async (): Promise<void> => {
     for (const request of latestRequests.values()) {
       try {
         // Skip requests without a response or without required fields
-        if (!request.response || typeof request.response.statusCode === 'undefined') {
+        if (!request.response || request.response.statusCode === undefined) {
           console.log(`Skipping request ${request.method} ${request.url} - no response data or missing statusCode`)
           skippedCount++
           continue
@@ -333,8 +344,8 @@ const convertRequestsToMocks = async (): Promise<void> => {
 
         // Parse URL to get hostname and pathname
         const parsedUrl = new URL(request.url)
-        const hostname = parsedUrl.hostname
-        const pathname = parsedUrl.pathname
+        const {hostname} = parsedUrl
+        const {pathname} = parsedUrl
 
         // Generate mock filename using the same logic as GetMockFileName
         const mockFileName = await GetMockFileName.getMockFileName(hostname, pathname, request.method)
@@ -348,10 +359,10 @@ const convertRequestsToMocks = async (): Promise<void> => {
         // Create mock data structure matching what GetMockResponse expects
         const mockData = {
           response: {
+            body: sanitizedResponseBody,
+            headers: sanitizedResponseHeaders,
             statusCode: request.response.statusCode,
             statusMessage: request.response.statusMessage,
-            headers: sanitizedResponseHeaders,
-            body: sanitizedResponseBody,
             wasCompressed: request.response.wasCompressed,
           },
         }
@@ -363,10 +374,10 @@ const convertRequestsToMocks = async (): Promise<void> => {
         // Check if we need to add this to mock-config.json
         if (!hasConfigEntry(mockConfig, hostname, pathname, request.method)) {
           const newEntry: MockConfigEntry = {
-            hostname,
-            pathname,
-            method: request.method,
             filename: mockFileName,
+            hostname,
+            method: request.method,
+            pathname,
           }
           mockConfig.push(newEntry)
           configAddedCount++

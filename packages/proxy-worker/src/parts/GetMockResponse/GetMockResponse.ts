@@ -1,14 +1,14 @@
+import type { ServerResponse } from 'http'
+import { existsSync } from 'fs'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
-import { existsSync } from 'fs'
-import { ServerResponse } from 'http'
 import { URL } from 'url'
-import * as Root from '../Root/Root.ts'
+import type { MockResponse } from '../MockResponse/MockResponse.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import * as LoadZipData from '../LoadZipData/LoadZipData.ts'
-import type { MockResponse } from '../MockResponse/MockResponse.ts'
+import * as Root from '../Root/Root.ts'
 
-export type { MockResponse }
+
 
 const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
 
@@ -19,19 +19,19 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
     }
 
     const mockData = JSON.parse(await readFile(mockFile, 'utf8'))
-    const response = mockData.response
+    const {response} = mockData
 
     // Handle OPTIONS requests specially - they might have empty body
     if (response.statusCode === 204) {
       return {
-        statusCode: response.statusCode,
-        headers: response.headers,
         body: '',
+        headers: response.headers,
+        statusCode: response.statusCode,
       }
     }
 
     // Handle file references (for zip files and SSE files)
-    let body = response.body
+    let {body} = response
     let isZipFile = false
     let isSseFile = false
     if (typeof body === 'string' && body.startsWith('file-reference:')) {
@@ -63,29 +63,29 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
     const cleanedHeaders = { ...response.headers }
     if (isZipFile || isSseFile) {
       const lowerCaseHeaders: Set<string> = new Set()
-      Object.keys(cleanedHeaders).forEach((k) => {
+      for (const k of Object.keys(cleanedHeaders)) {
         lowerCaseHeaders.add(k.toLowerCase())
-      })
+      }
       if (lowerCaseHeaders.has('content-encoding')) {
-        Object.keys(cleanedHeaders).forEach((k) => {
+        for (const k of Object.keys(cleanedHeaders)) {
           if (k.toLowerCase() === 'content-encoding') {
             delete cleanedHeaders[k]
           }
-        })
+        }
       }
       if (lowerCaseHeaders.has('transfer-encoding')) {
-        Object.keys(cleanedHeaders).forEach((k) => {
+        for (const k of Object.keys(cleanedHeaders)) {
           if (k.toLowerCase() === 'transfer-encoding') {
             delete cleanedHeaders[k]
           }
-        })
+        }
       }
     }
 
     return {
-      statusCode: response.statusCode,
-      headers: cleanedHeaders,
       body,
+      headers: cleanedHeaders,
+      statusCode: response.statusCode,
     }
   } catch (error) {
     console.error(`[Proxy] Error loading mock file ${mockFile}:`, error)
@@ -96,8 +96,8 @@ const loadMockResponse = async (mockFile: string): Promise<MockResponse | null> 
 export const getMockResponse = async (method: string, url: string): Promise<MockResponse | null> => {
   try {
     const parsedUrl = new URL(url)
-    const hostname = parsedUrl.hostname
-    const pathname = parsedUrl.pathname
+    const {hostname} = parsedUrl
+    const {pathname} = parsedUrl
 
     // Handle OPTIONS preflight requests - return a proper CORS preflight response
     if (method === 'OPTIONS') {
@@ -111,15 +111,15 @@ export const getMockResponse = async (method: string, url: string): Promise<Mock
 
       // If no OPTIONS mock exists, create a default preflight response
       return {
-        statusCode: 204,
+        body: '',
         headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-          'Access-Control-Allow-Headers': 'authorization, content-type, accept, x-requested-with',
           'Access-Control-Allow-Credentials': 'true',
+          'Access-Control-Allow-Headers': 'authorization, content-type, accept, x-requested-with',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+          'Access-Control-Allow-Origin': '*',
           'Access-Control-Max-Age': '86400',
         },
-        body: '',
+        statusCode: 204,
       }
     }
 
@@ -223,13 +223,13 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   // Explicitly remove Transfer-Encoding and Content-Encoding headers if they somehow got through
   // (case-insensitive check) - we're setting Content-Length, so Transfer-Encoding can't be present
   // Content-Encoding is removed because mock body is already decompressed
-  Object.keys(headers).forEach((key) => {
+  for (const key of Object.keys(headers)) {
     const lowerKey = key.toLowerCase()
     if (lowerKey === 'transfer-encoding' || lowerKey === 'content-encoding') {
       delete headers[key]
       lowerCaseHeaders.delete(lowerKey)
     }
-  })
+  }
 
   // Always set Content-Length to match actual body length
   headers['Content-Length'] = String(bodyBuffer.length)
@@ -237,3 +237,5 @@ export const sendMockResponse = (res: ServerResponse, mockResponse: MockResponse
   res.writeHead(mockResponse.statusCode, headers)
   res.end(bodyBuffer)
 }
+
+export {type MockResponse} from '../MockResponse/MockResponse.ts'

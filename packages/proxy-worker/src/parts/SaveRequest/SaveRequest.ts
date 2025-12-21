@@ -1,12 +1,12 @@
-import { IncomingMessage } from 'http'
+import type { IncomingMessage } from 'http'
 import { mkdir, writeFile } from 'fs/promises'
 import { join } from 'path'
-import * as Root from '../Root/Root.ts'
-import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
-import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
-import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 import { decompressBody } from '../DecompressBody/DecompressBody.ts'
 import { parseJsonIfApplicable } from '../HttpProxyServer/HttpProxyServer.ts'
+import * as Root from '../Root/Root.ts'
+import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
+import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
+import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
@@ -45,17 +45,17 @@ export const saveRequest = async (
     }
 
     const requestData = {
-      timestamp,
-      method: req.method,
-      url: req.url,
       headers: req.headers,
+      method: req.method,
       response: {
+        body: parsedBody,
+        headers: responseHeaders,
         statusCode,
         statusMessage,
-        headers: responseHeaders,
-        body: parsedBody,
         wasCompressed,
       },
+      timestamp,
+      url: req.url,
     }
 
     await writeFile(filepath, JSON.stringify(requestData, null, 2), 'utf8')
