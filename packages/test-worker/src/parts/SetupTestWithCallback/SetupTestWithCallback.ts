@@ -15,11 +15,7 @@ export const setupTestWithCallback = async (pageObject, file, forceRun) => {
     return { error: null, skipped: true, wasOriginallySkipped }
   }
   const inspectExtensions = TestWorkerState.getInspectExtensions()
-  if (
-    inspectExtensions &&
-    Array.isArray(module.flags) &&
-    module.flags.includes('skipIfInspectExtensions')
-  ) {
+  if (inspectExtensions && Array.isArray(module.flags) && module.flags.includes('skipIfInspectExtensions')) {
     return { skipped: true, wasOriginallySkipped, error: null }
   }
   if (module.skip && !forceRun) {
