@@ -24,8 +24,8 @@ export const stop = async (session, objectGroup) => {
 
 export const compare = (before, after) => {
   return {
-    before,
     after,
+    before,
   }
 }
 

@@ -5,12 +5,12 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 export const getCssInlineStyleCount = async (session: Session, objectGroup: string): Promise<number> => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Node,
-    returnByValue: false,
     objectGroup,
+    returnByValue: false,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
-    prototypeObjectId: prototypeDescriptor.objectId,
     objectGroup,
+    prototypeObjectId: prototypeDescriptor.objectId,
   })
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
@@ -38,9 +38,9 @@ const getTotalInlineStyleCount = (nodes) => {
 const totalCount = getTotalInlineStyleCount(objects)
 return totalCount
 }`,
+    objectGroup,
     objectId: objects.objects.objectId,
     returnByValue: true,
-    objectGroup,
   })
   return fnResult1
 }

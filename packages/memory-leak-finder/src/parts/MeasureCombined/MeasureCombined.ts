@@ -42,10 +42,10 @@ export const combine = (...measures) => {
   }
 
   return {
+    compare,
     id: MeasureId.Combined,
+    releaseResources,
     start,
     stop,
-    compare,
-    releaseResources,
   }
 }

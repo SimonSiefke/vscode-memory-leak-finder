@@ -4,24 +4,24 @@ import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 import { VError } from '../VError/VError.ts'
 
 export interface ExecutionContext {
-  readonly sessionId: string
-  readonly uniqueId: string
-  readonly type?: string
   readonly name?: string
+  readonly sessionId: string
+  readonly type?: string
+  readonly uniqueId: string
 }
 
 interface State {
-  executionContexts: Record<string, ExecutionContext>
-  defaultExecutionContextCallbacks: Record<string, any>
-  utilityExecutionContextCallbacks: Record<string, any>
   crashCallbacks: Record<string, any>
+  defaultExecutionContextCallbacks: Record<string, any>
+  executionContexts: Record<string, ExecutionContext>
+  utilityExecutionContextCallbacks: Record<string, any>
 }
 
 export const state: State = {
-  executionContexts: Object.create(null),
-  defaultExecutionContextCallbacks: Object.create(null),
-  utilityExecutionContextCallbacks: Object.create(null),
   crashCallbacks: Object.create(null),
+  defaultExecutionContextCallbacks: Object.create(null),
+  executionContexts: Object.create(null),
+  utilityExecutionContextCallbacks: Object.create(null),
 }
 
 export const reset = () => {
@@ -36,8 +36,8 @@ const isDefaultExecutionContext = (executionContext: ExecutionContext, sessionId
 }
 
 export const add = (id: string, executionContext: ExecutionContext): void => {
-  const { executionContexts, defaultExecutionContextCallbacks, utilityExecutionContextCallbacks } = state
-  const { sessionId, type, name } = executionContext
+  const { defaultExecutionContextCallbacks, executionContexts, utilityExecutionContextCallbacks } = state
+  const { name, sessionId, type } = executionContext
   // console.log('add executioncontext', id, executionContext)
   executionContexts[id] = executionContext
   // console.log({
@@ -87,7 +87,7 @@ export const waitForDefaultExecutionContext = async (sessionId: string): Promise
     }
     return await PTimeout.pTimeout(
       (() => {
-        const { resolve, promise } = Promise.withResolvers<ExecutionContext>()
+        const { promise, resolve } = Promise.withResolvers<ExecutionContext>()
         state.defaultExecutionContextCallbacks[sessionId] = resolve
         return promise
       })(),

@@ -30,13 +30,13 @@ export const releaseResources = async (session, objectGroup) => {
 
 export const compare = CompareDetachedDomNodes.compareDetachedDomNodes
 
-export const isLeak = ({ before, after }) => {
+export const isLeak = ({ after, before }) => {
   return GetTotalInstanceCounts.getTotalInstanceCounts(after) > GetTotalInstanceCounts.getTotalInstanceCounts(before)
 }
 
-export const summary = ({ before, after }) => {
+export const summary = ({ after, before }) => {
   return {
-    before: GetTotalInstanceCounts.getTotalInstanceCounts(before),
     after: GetTotalInstanceCounts.getTotalInstanceCounts(after),
+    before: GetTotalInstanceCounts.getTotalInstanceCounts(before),
   }
 }

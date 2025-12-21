@@ -1,3 +1,3 @@
-export const isLeakCount = ({ before, after }) => {
+export const isLeakCount = ({ after, before }) => {
   return after > before
 }

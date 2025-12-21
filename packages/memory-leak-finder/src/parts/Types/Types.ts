@@ -1,47 +1,47 @@
 // Common type definitions
 
 export interface DevToolsMessage {
-  readonly id?: number
-  readonly method: string
-  readonly params?: Record<string, unknown>
-  readonly sessionId?: string
-  readonly result?: unknown
   readonly error?: {
     readonly code: number
     readonly message: string
   }
+  readonly id?: number
+  readonly method: string
+  readonly params?: Record<string, unknown>
+  readonly result?: unknown
+  readonly sessionId?: string
 }
 
 export interface IpcMessage {
+  readonly error?: unknown
   readonly id?: string | number
+  readonly jsonrpc?: string
   readonly method?: string
   readonly params?: unknown[]
   readonly result?: unknown
-  readonly error?: unknown
-  readonly jsonrpc?: string
 }
 
 export interface RpcConnection {
   invoke(method: string, params?: Record<string, unknown>): Promise<unknown>
   invokeWithSession?(sessionId: string, method: string, params?: Record<string, unknown>): Promise<unknown>
-  on(event: string, listener: (...args: unknown[]) => void): void
   off(event: string, listener: (...args: unknown[]) => void): void
+  on(event: string, listener: (...args: unknown[]) => void): void
   once?(event: string): Promise<unknown>
   send?(message: IpcMessage): void
 }
 
 export interface WebSocketLike {
-  readonly readyState: number
   addEventListener(type: string, listener: (event: Event) => void): void
+  close(): void
+  readonly readyState: number
   removeEventListener(type: string, listener: (event: Event) => void): void
   send(data: string): void
-  close(): void
 }
 
 export interface NodeProcessLike {
-  send?(message: unknown): void
   on(event: string, listener: (...args: unknown[]) => void): void
   removeListener(event: string, listener: (...args: unknown[]) => void): void
+  send?(message: unknown): void
 }
 
 export interface MeasureResult {
@@ -50,10 +50,10 @@ export interface MeasureResult {
 }
 
 export interface MemoryLeakFinderInstance {
+  readonly after?: MeasureResult
+  readonly before?: MeasureResult
   readonly id: string
   readonly measure: unknown
-  readonly before?: MeasureResult
-  readonly after?: MeasureResult
 }
 
 export interface ExecuteFunction {
@@ -65,17 +65,17 @@ export interface CommandFunction {
 }
 
 export interface ErrorObject {
-  readonly name?: string
-  readonly message?: string
-  readonly stack?: string
+  readonly cause?: () => ErrorObject
   readonly code?: string | number
   readonly codeFrame?: string
-  readonly cause?: () => ErrorObject
+  readonly message?: string
+  readonly name?: string
+  readonly stack?: string
 }
 
 export interface StackFrame {
+  readonly column: number
   readonly file: string
   readonly line: number
-  readonly column: number
   readonly path?: string
 }

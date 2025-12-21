@@ -2,14 +2,14 @@ import * as FormatUrl from '../FormatUrl/FormatUrl.ts'
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.ts'
 
 const prepareDisposable = (disposable, scriptMap) => {
-  const { lineNumber, columnNumber, count, scriptId, name } = disposable
+  const { columnNumber, count, lineNumber, name, scriptId } = disposable
   const script = scriptMap[scriptId] || {}
   const formattedUrl = FormatUrl.formatUrl(script.url, lineNumber, columnNumber)
   return {
-    stack: [formattedUrl],
-    sourceMaps: [script.sourceMapUrl],
     count,
     name,
+    sourceMaps: [script.sourceMapUrl],
+    stack: [formattedUrl],
   }
 }
 
@@ -22,11 +22,11 @@ const prepareDisposables = (disposables, scriptMap) => {
 }
 
 const finishDisposable = (disposableWithStack) => {
-  const { stack, count, originalStack, originalName, name } = disposableWithStack
+  const { count, name, originalName, originalStack, stack } = disposableWithStack
   return {
-    name: originalName || name,
     count,
     location: originalStack?.[0] || stack?.[0] || '',
+    name: originalName || name,
   }
 }
 

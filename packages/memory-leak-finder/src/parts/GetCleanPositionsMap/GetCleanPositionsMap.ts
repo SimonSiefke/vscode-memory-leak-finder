@@ -6,9 +6,9 @@ const sourceMapWorkerPath = join(Root.root, 'packages', 'source-map-worker', 'sr
 
 export const getCleanPositionsMap = async (sourceMapUrlMap, classNames) => {
   const rpc = await NodeWorkerRpcParent.create({
-    stdio: 'inherit',
-    path: sourceMapWorkerPath,
     commandMap: {},
+    path: sourceMapWorkerPath,
+    stdio: 'inherit',
   })
   const response = await rpc.invoke('SourceMap.getCleanPositionsMap', sourceMapUrlMap, classNames)
   await rpc.dispose()

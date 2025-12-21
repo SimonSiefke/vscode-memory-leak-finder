@@ -5,12 +5,12 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 export const getBooleanCount = async (session: Session, objectGroup: string): Promise<number> => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Object,
-    returnByValue: false,
     objectGroup,
+    returnByValue: false,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
-    prototypeObjectId: prototype.objectId,
     objectGroup,
+    prototypeObjectId: prototype.objectId,
   })
   const result = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function () {
@@ -38,9 +38,9 @@ export const getBooleanCount = async (session: Session, objectGroup: string): Pr
   }
   return booleans.length
 }`,
+    objectGroup,
     objectId: objects.objects.objectId,
     returnByValue: true,
-    objectGroup,
   })
 
   return result

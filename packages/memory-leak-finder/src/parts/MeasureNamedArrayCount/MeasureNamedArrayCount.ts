@@ -1,4 +1,4 @@
-import { compareNamedArrayCountDifference2 } from '../CompareNamedArrayCountDifference2/CompareNamedArrayCountDifference2.ts'
+
 import { getHeapSnapshot } from '../GetHeapSnapshot/GetHeapSnapshot.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
@@ -30,8 +30,10 @@ export const releaseResources = async (session, objectGroup) => {
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 
-export const compare = compareNamedArrayCountDifference2
+
 
 export const isLeak = (leaked) => {
   return leaked.length > 0
 }
+
+export {compareNamedArrayCountDifference2 as compare} from '../CompareNamedArrayCountDifference2/CompareNamedArrayCountDifference2.ts'

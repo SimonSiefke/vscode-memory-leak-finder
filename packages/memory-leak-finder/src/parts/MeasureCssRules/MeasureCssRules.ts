@@ -1,4 +1,4 @@
-import { compareCssRules } from '../CompareCSSRules/CompareCSSRules.ts'
+
 import * as GetCssRules from '../GetCssRules/GetCssRules.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
@@ -21,8 +21,10 @@ export const stop = (session, objectGroup) => {
   return GetCssRules.getCssRules(session, objectGroup)
 }
 
-export const compare = compareCssRules
+
 
 export const isLeak = (leaked) => {
   return leaked.length > 0
 }
+
+export {compareCssRules as compare} from '../CompareCSSRules/CompareCSSRules.ts'

@@ -23,7 +23,7 @@ export const combineEventListenersWithSourceMapResults = (eventListeners, map, c
   Assert.object(cleanPositionMap)
   const newEventListeners: any[] = []
   for (const eventListener of eventListeners) {
-    const { sourceMapUrl, line, column } = GetSourceMapUrl.getSourceMapUrl(eventListener)
+    const { column, line, sourceMapUrl } = GetSourceMapUrl.getSourceMapUrl(eventListener)
     const index = getIndex(map[sourceMapUrl], line, column)
     if (index === -1) {
       throw new Error(`index not found for ${sourceMapUrl}:${line}:${column}`)
@@ -33,8 +33,8 @@ export const combineEventListenersWithSourceMapResults = (eventListeners, map, c
       const { sourceMaps, ...rest } = eventListener
       newEventListeners.push({
         ...rest,
-        originalStack: [`${cleanPosition.source}:${cleanPosition.line}:${cleanPosition.column}`],
         originalName: cleanPosition.name,
+        originalStack: [`${cleanPosition.source}:${cleanPosition.line}:${cleanPosition.column}`],
       })
     } else {
       newEventListeners.push(eventListener)
