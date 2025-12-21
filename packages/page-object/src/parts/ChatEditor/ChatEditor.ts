@@ -44,7 +44,6 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         await page.waitForIdle()
         await page.waitForIdle()
         await page.keyboard.press('Enter')
-        // await sendButton.click()
         await page.waitForIdle()
 
         const requestMessage = chatView.locator(`.monaco-list-row.request[aria-label="${message}"]`)
