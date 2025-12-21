@@ -2,7 +2,7 @@ import * as Explorer from '../Explorer/Explorer.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as SideBar from '../SideBar/SideBar.ts'
 
-export const create = ({ page, expect, VError }) => {
+export const create = ({ page, expect, VError, electronApp }) => {
   return {
     async open(files) {
       try {
@@ -10,7 +10,7 @@ export const create = ({ page, expect, VError }) => {
           throw new Error('MultiDiffEditor requires at least 2 files')
         }
 
-        const explorer = Explorer.create({ page, expect, VError })
+        const explorer = Explorer.create({ page, expect, VError, electronApp })
         const contextMenu = ContextMenu.create({ page, expect, VError })
         const sideBar = SideBar.create({ page, expect, VError })
 
