@@ -2,9 +2,9 @@ import { VError } from '@lvce-editor/verror'
 import { exec } from '../Exec/Exec.ts'
 
 export interface TscResult {
-  readonly stdout: string
-  readonly stderr: string
   readonly exitCode: number
+  readonly stderr: string
+  readonly stdout: string
 }
 
 export const runTsc = async (cwd: string): Promise<TscResult> => {
