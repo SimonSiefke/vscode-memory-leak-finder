@@ -36,31 +36,31 @@ export const generateCertificateForDomain = (domain: string, caKey: string, caCe
   // Check if domain is an IP address (IPv4 or IPv6)
   if (ipv4Regex.test(domain) || ipv6Regex.test(domain)) {
     altNames.push({
-      ip: domain,
       type: 7, // IP
+      ip: domain,
     })
   }
 
   cert.setExtensions([
     {
-      cA: false,
       name: 'basicConstraints',
+      cA: false,
     },
     {
-      digitalSignature: true,
-      keyEncipherment: true,
       name: 'keyUsage',
+      keyEncipherment: true,
+      digitalSignature: true,
     },
     {
-      altNames,
       name: 'subjectAltName',
+      altNames,
     },
   ])
 
   cert.sign(caPrivateKey, forge.md.sha256.create())
 
   return {
-    cert: forge.pki.certificateToPem(cert),
     key: forge.pki.privateKeyToPem(keys.privateKey),
+    cert: forge.pki.certificateToPem(cert),
   }
 }
