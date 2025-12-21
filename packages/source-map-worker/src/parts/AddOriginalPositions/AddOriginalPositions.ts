@@ -4,7 +4,7 @@ import * as OriginalNameWorker from '../OriginalNameWorker/OriginalNameWorker.ts
 
 // TODO rename to addoriginalNames
 export const addOriginalPositions = async (intermediateItems: readonly IntermediateItem[]): Promise<readonly OriginalPosition[]> => {
-  const rpc = await OriginalNameWorker.create()
+  await using rpc = await OriginalNameWorker.create()
   const finalResults: OriginalPosition[] = []
   for (const item of intermediateItems) {
     if (item.needsOriginalName && item.codePath && item.line !== null && item.column !== null) {
@@ -24,6 +24,5 @@ export const addOriginalPositions = async (intermediateItems: readonly Intermedi
       })
     }
   }
-  await rpc.dispose()
   return finalResults
 }
