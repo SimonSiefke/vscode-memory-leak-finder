@@ -142,60 +142,6 @@ export const create = (rpc, sessionId, selector, { hasExactText = '', hasText = 
         options,
       )
     },
-<<<<<<< HEAD
-    setValue(value) {
-      return LocatorSetValue.setValue(this, value)
-    },
-    setChecked(value: boolean) {
-      return LocatorSetChecked.setChecked(this, value)
-    },
-    click(options = {}) {
-      return LocatorClick.click(this, options)
-    },
-    clear() {
-      return LocatorClear.clear(this)
-    },
-    boundingBox() {
-      return LocatorBoundingBox.boundingBox(this)
-    },
-    dblclick() {
-      return LocatorClick.dblclick(this)
-    },
-    hover() {
-      return LocatorHover.hover(this)
-    },
-    focus() {
-      return LocatorFocus.focus(this)
-    },
-    blur() {
-      return LocatorBlur.blur(this)
-    },
-    textContent({ allowHidden = false } = {}) {
-      return LocatorTextContent.getTextContent(this, { allowHidden })
-    },
-    selectText() {
-      return LocatorSelectText.selectText(this)
-    },
-    getAttribute(attributeName) {
-      return LocatorGetAttribute.getAttribute(this, attributeName)
-    },
-    clickExponential(options) {
-      return LocatorClickExponential.clickExponential(this, options)
-    },
-    press(key) {
-      return LocatorPress.press(this, key)
-    },
-    isVisible() {
-      return LocatorIsVisible.isVisible(this)
-    },
-    scrollDown() {
-      return LocatorScrollDown.scrollDown(this)
-    },
-    scrollUp() {
-      return LocatorScrollUp.scrollUp(this)
-    },
-=======
     utilityContext,
->>>>>>> origin/main
   }
 }
