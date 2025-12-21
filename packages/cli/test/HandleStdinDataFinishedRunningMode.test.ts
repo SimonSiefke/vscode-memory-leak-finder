@@ -28,8 +28,8 @@ test('handleStdinDataFinishedRunningMode - show watch mode details', async () =>
 
   const state = {
     ...createDefaultState(),
-    value: '',
     mode: ModeType.FinishedRunning,
+    value: '',
   }
   const key = CliKeys.WatchMode
 
@@ -43,14 +43,14 @@ test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
     commandMap: {},
     invoke(method) {
       switch (method) {
-        case 'Stdout.getCursorUp':
-          return '[cursor-up]'
-        case 'Stdout.getPatternUsageMessage':
-          return '[pattern-usage]'
         case 'Stdout.getClear':
           return '[clear]'
+        case 'Stdout.getCursorUp':
+          return '[cursor-up]'
         case 'Stdout.getEraseDown':
           return '[erase-down]'
+        case 'Stdout.getPatternUsageMessage':
+          return '[pattern-usage]'
         case 'Stdout.getWatchUsageMessage':
           return '[watch-usage]'
         default:
@@ -62,9 +62,9 @@ test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
   StdoutWorker.set(mockRpc)
   const state = {
     ...createDefaultState(),
-    value: '',
     mode: ModeType.FinishedRunning,
     stdout: [],
+    value: '',
   }
   const key = CliKeys.FilterMode
 
@@ -94,9 +94,9 @@ test('handleStdinDataFinishedRunningMode - quit', async () => {
   StdoutWorker.set(mockRpc)
   const state = {
     ...createDefaultState(),
-    value: '',
     mode: ModeType.FinishedRunning,
     stdout: [],
+    value: '',
   }
   const key = CliKeys.Quit
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)
@@ -123,9 +123,9 @@ test('handleStdinDataFinishedRunningMode - run again', async () => {
   StdoutWorker.set(mockRpc)
   const state = {
     ...createDefaultState(),
-    value: '',
     mode: ModeType.FinishedRunning,
     stdout: [],
+    value: '',
   }
   const key = AnsiKeys.Enter
   const newState = await HandleStdinDataFinishedRunningMode.handleStdinDataFinishedRunningMode(state, key)

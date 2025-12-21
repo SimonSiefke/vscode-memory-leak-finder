@@ -18,24 +18,19 @@ export const handleStdinDataFinishedRunningMode = async (
         ...state,
         mode: ModeType.Exit,
       }
-    case CliKeys.WatchMode: {
-      const cursorUp = await AnsiEscapes.cursorUp(1)
-      const eraseDown = await AnsiEscapes.eraseDown()
-      const watchUsage = await WatchUsage.print()
+    case AnsiKeys.Enter:
       return {
         ...state,
-        mode: ModeType.Waiting,
-        stdout: [...state.stdout, cursorUp + eraseDown + watchUsage],
+        mode: ModeType.Running,
       }
-    }
     case CliKeys.FilterMode: {
       const clear = await AnsiEscapes.clear(state.isWindows)
       const patternUsage = await PatternUsage.print()
       return {
         ...state,
-        value: Character.EmptyString,
         mode: ModeType.FilterWaiting,
         stdout: [...state.stdout, clear + patternUsage],
+        value: Character.EmptyString,
       }
     }
     case CliKeys.Quit:
@@ -49,11 +44,16 @@ export const handleStdinDataFinishedRunningMode = async (
         headless: !state.headless,
         mode: ModeType.Running,
       }
-    case AnsiKeys.Enter:
+    case CliKeys.WatchMode: {
+      const cursorUp = await AnsiEscapes.cursorUp(1)
+      const eraseDown = await AnsiEscapes.eraseDown()
+      const watchUsage = await WatchUsage.print()
       return {
         ...state,
-        mode: ModeType.Running,
+        mode: ModeType.Waiting,
+        stdout: [...state.stdout, cursorUp + eraseDown + watchUsage],
       }
+    }
     default:
       return state
   }
