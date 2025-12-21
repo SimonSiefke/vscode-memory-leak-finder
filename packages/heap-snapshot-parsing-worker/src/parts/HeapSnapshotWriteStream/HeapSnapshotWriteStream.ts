@@ -92,7 +92,7 @@ class HeapSnapshotWriteStream extends Writable {
 
   writeArrayData(chunk, array, nextState) {
     // Parse the chunk directly - no concatenation needed due to stateful parsing
-    const { dataIndex, arrayIndex, done, currentNumber, hasDigits } = parseHeapSnapshotArray(
+    const { arrayIndex, currentNumber, dataIndex, done, hasDigits } = parseHeapSnapshotArray(
       chunk,
       array,
       this.arrayIndex,
@@ -148,7 +148,7 @@ class HeapSnapshotWriteStream extends Writable {
 
   writeResizableArrayData(chunk, nextState) {
     // Parse the chunk directly - no concatenation needed due to stateful parsing
-    const { dataIndex, arrayIndex, done, currentNumber, hasDigits } = parseHeapSnapshotArray(
+    const { arrayIndex, currentNumber, dataIndex, done, hasDigits } = parseHeapSnapshotArray(
       chunk,
       this.intermediateArray,
       0,
@@ -213,34 +213,34 @@ class HeapSnapshotWriteStream extends Writable {
 
   handleChunk(chunk) {
     switch (this.state) {
-      case HeapSnapshotParsingState.SearchingSnapshotMetaData:
-        this.writeMetaData(chunk)
-        break
-      case HeapSnapshotParsingState.ParsingNodesMetaData:
-        this.writeParsingNodesMetaData(chunk)
-        break
-      case HeapSnapshotParsingState.ParsingNodes:
-        this.writeParsingNodes(chunk)
-        break
-      case HeapSnapshotParsingState.ParsingEdgesMetaData:
-        this.writeParsingEdgesMetaData(chunk)
+      case HeapSnapshotParsingState.Done:
         break
       case HeapSnapshotParsingState.ParsingEdges:
         this.writeParsingEdges(chunk)
         break
-      case HeapSnapshotParsingState.ParsingLocationsMetaData:
-        this.writeParsingLocationsMetaData(chunk)
+      case HeapSnapshotParsingState.ParsingEdgesMetaData:
+        this.writeParsingEdgesMetaData(chunk)
         break
       case HeapSnapshotParsingState.ParsingLocations:
         this.writeParsingLocations(chunk)
         break
-      case HeapSnapshotParsingState.ParsingStringsMetaData:
-        this.writeParsingStringsMetaData(chunk)
+      case HeapSnapshotParsingState.ParsingLocationsMetaData:
+        this.writeParsingLocationsMetaData(chunk)
+        break
+      case HeapSnapshotParsingState.ParsingNodes:
+        this.writeParsingNodes(chunk)
+        break
+      case HeapSnapshotParsingState.ParsingNodesMetaData:
+        this.writeParsingNodesMetaData(chunk)
         break
       case HeapSnapshotParsingState.ParsingStrings:
         this.writeParsingStrings(chunk)
         break
-      case HeapSnapshotParsingState.Done:
+      case HeapSnapshotParsingState.ParsingStringsMetaData:
+        this.writeParsingStringsMetaData(chunk)
+        break
+      case HeapSnapshotParsingState.SearchingSnapshotMetaData:
+        this.writeMetaData(chunk)
         break
       default:
         break
@@ -275,12 +275,12 @@ class HeapSnapshotWriteStream extends Writable {
   getResult() {
     const { data } = this.metaData
     return {
-      node_count: data.node_count,
       edge_count: data.edge_count,
-      meta: data.meta,
       edges: this.edges,
-      nodes: this.nodes,
       locations: this.locations,
+      meta: data.meta,
+      node_count: data.node_count,
+      nodes: this.nodes,
       strings: this.strings,
     }
   }

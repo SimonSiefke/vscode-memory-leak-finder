@@ -4,7 +4,7 @@ import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
 
-export const id = MeasureId.Webgl2RenderinngContextCount
+export const id = MeasureId.Webgl2RenderingContextCount
 
 export const targets = [TargetId.Browser]
 

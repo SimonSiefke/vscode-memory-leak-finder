@@ -7,9 +7,9 @@ import { traverseAst } from '../src/parts/GetTraverse/GetTraverse.ts'
 
 const findBestPathAt = (code: string, line: number, column: number): NodePath => {
   const ast: t.File = parse(code, {
-    sourceType: 'unambiguous',
-    plugins: ['classProperties', 'classPrivateProperties', 'classPrivateMethods', 'decorators-legacy', 'jsx', 'typescript'],
     errorRecovery: true,
+    plugins: ['classProperties', 'classPrivateProperties', 'classPrivateMethods', 'decorators-legacy', 'jsx', 'typescript'],
+    sourceType: 'unambiguous',
   })
 
   let best: NodePath | null = null
@@ -45,17 +45,17 @@ const findBestPathAt = (code: string, line: number, column: number): NodePath =>
 test('getEnclosingNames - class method', () => {
   const code = `class ToolBar {\n  handleClick(){\n    return 1\n  }\n}`
   const path = findBestPathAt(code, 2, 2)
-  expect(getEnclosingNames(path, { line: 2, column: 2 })).toBe('ToolBar.handleClick')
+  expect(getEnclosingNames(path, { column: 2, line: 2 })).toBe('ToolBar.handleClick')
 })
 
 test('getEnclosingNames - function name', () => {
   const code = `function hello(){\n  return 1\n}`
   const path = findBestPathAt(code, 1, 1)
-  expect(getEnclosingNames(path, { line: 1, column: 1 })).toBe('hello')
+  expect(getEnclosingNames(path, { column: 1, line: 1 })).toBe('hello')
 })
 
 test('getEnclosingNames - variable arrow function', () => {
   const code = `const run = () => {\n  return 1\n}`
   const path = findBestPathAt(code, 1, 1)
-  expect(getEnclosingNames(path, { line: 1, column: 1 })).toBe('run')
+  expect(getEnclosingNames(path, { column: 1, line: 1 })).toBe('run')
 })

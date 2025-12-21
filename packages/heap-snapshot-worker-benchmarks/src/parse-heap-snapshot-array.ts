@@ -1,6 +1,6 @@
-import { importHeapSnapshotWorker } from './import-heap-snapshot-worker.ts'
 import { readFileSync } from 'fs'
 import { join } from 'path'
+import { importHeapSnapshotWorker } from './import-heap-snapshot-worker.ts'
 
 const main = async (): Promise<void> => {
   const { parseHeapSnapshotArray } = await importHeapSnapshotWorker('parts/ParseHeapSnapshotArray/ParseHeapSnapshotArray.ts')
@@ -31,14 +31,14 @@ const main = async (): Promise<void> => {
 
   // Extract a sample of the nodes array (first 100KB for testing)
   const sampleStart = bracketStart + 1 // Skip the opening '['
-  const sampleEnd = Math.min(sampleStart + 100000, fileContent.length)
+  const sampleEnd = Math.min(sampleStart + 100_000, fileContent.length)
   const sampleString = fileContent.substring(sampleStart, sampleEnd)
 
   // Convert string to Uint8Array for buffer-based parsing
   const sampleData = new TextEncoder().encode(sampleString)
 
   console.log('Sample data length:', sampleData.length)
-  console.log('Sample data preview (first 200 chars):', sampleString.substring(0, 200))
+  console.log('Sample data preview (first 200 chars):', sampleString.slice(0, 200))
 
   // Count how many numbers are in the sample
   let numberCount = 0
@@ -92,7 +92,7 @@ const main = async (): Promise<void> => {
 
   // Test with different chunk sizes to simulate streaming
   console.log('\n=== STREAMING SIMULATION (BUFFER-BASED) ===')
-  const chunkSizes = [1000, 5000, 10000, 50000]
+  const chunkSizes = [1000, 5000, 10_000, 50_000]
   for (const chunkSize of chunkSizes) {
     const chunks: any[] = []
     for (let i = 0; i < sampleData.length; i += chunkSize) {

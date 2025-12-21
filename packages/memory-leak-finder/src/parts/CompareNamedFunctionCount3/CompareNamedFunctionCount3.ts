@@ -1,4 +1,4 @@
-import * as HeapSnapshotWorker from '../HeapSnapshotWorker/HeapSnapshotWorker.ts'
+import { launchHeapSnapshotWorker } from '../LaunchHeapSnapshotWorker/LaunchHeapSnapshotWorker.ts'
 
 const getThreshold = (context: any): number => {
   const defaultRuns = 2
@@ -25,6 +25,7 @@ export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: 
       'uri.ts',
     ],
   }
-  const result = await HeapSnapshotWorker.invoke('HeapSnapshot.compareFunctions2', beforePath, afterPath, options)
+  await using rpc = await launchHeapSnapshotWorker()
+  const result = await rpc.invoke('HeapSnapshot.compareFunctions2', beforePath, afterPath, options)
   return result
 }

@@ -21,16 +21,16 @@ for (let i = 0; i < 128; i++) {
     charTypes[i] = DIGIT
   } else
     switch (i) {
-      case CHAR_COMMA:
-      case CHAR_SPACE:
-      case CHAR_TAB:
-      case CHAR_NEWLINE: {
-        charTypes[i] = SEPARATOR
+      case CHAR_CLOSING_BRACKET: {
+        charTypes[i] = CLOSING_BRACKET
 
         break
       }
-      case CHAR_CLOSING_BRACKET: {
-        charTypes[i] = CLOSING_BRACKET
+      case CHAR_COMMA:
+      case CHAR_NEWLINE:
+      case CHAR_SPACE:
+      case CHAR_TAB: {
+        charTypes[i] = SEPARATOR
 
         break
       }

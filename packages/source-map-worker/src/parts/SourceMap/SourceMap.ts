@@ -1,17 +1,10 @@
-import type { RawSourceMap } from 'source-map'
 import { join, resolve } from 'node:path'
+import type { RawSourceMap } from 'source-map'
 import { SourceMapConsumer } from 'source-map'
 import * as Assert from '../Assert/Assert.ts'
-import * as GetOriginalClassName from '../GetOriginalClassName/GetOriginalClassName.ts'
 import * as OriginalNameWorker from '../OriginalNameWorker/OriginalNameWorker.ts'
+import type { OriginalPosition } from '../OriginalPosition/OriginalPosition.ts'
 import { root } from '../Root/Root.ts'
-
-interface OriginalPosition {
-  column: number | null
-  line: number | null
-  name: string | null
-  source: string | null
-}
 
 export const getOriginalPositions = async (
   sourceMap: RawSourceMap,
@@ -21,6 +14,7 @@ export const getOriginalPositions = async (
 ): Promise<OriginalPosition[]> => {
   Assert.object(sourceMap)
   Assert.array(positions)
+  await using originalNameWorker = await OriginalNameWorker.create()
   const originalPositions = await SourceMapConsumer.with(sourceMap, null, async (consumer) => {
     const originalPositions: OriginalPosition[] = []
     for (let i = 0; i < positions.length; i += 2) {
@@ -36,7 +30,8 @@ export const getOriginalPositions = async (
           // TODO maybe compute this separately
           const sourceFileRelativePath: string = sourceMap.sources[index]
           const originalCodePath: string = resolve(join(root, '.vscode-sources', hash, sourceFileRelativePath))
-          const originalClassName: string = await GetOriginalClassName.getOriginalClassNameFromFile(
+          const originalClassName: string = await originalNameWorker.invoke(
+            'OriginalName.getOriginalNameFromFile',
             originalCodePath,
             originalPosition.line,
             originalPosition.column,
@@ -48,8 +43,6 @@ export const getOriginalPositions = async (
     }
     return originalPositions
   })
-
   // TODO add original names here, and cache computations
-  await OriginalNameWorker.dispose()
   return originalPositions
 }
