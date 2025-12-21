@@ -24,7 +24,8 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   // TODO send message and clear it
   for (let i = 0; i < 10; i++) {
     // @ts-ignore
-    await ChatEditor.sendMessage('test', {
+    await ChatEditor.sendMessage({
+      message: 'test',
       verify: true,
     })
   }

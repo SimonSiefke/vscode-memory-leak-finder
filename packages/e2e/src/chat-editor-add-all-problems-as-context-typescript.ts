@@ -40,7 +40,8 @@ export const setup = async ({
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.addContext('Problems...', 'All Problems', 'All Problems')
   // @ts-ignore
-  await ChatEditor.sendMessage(`Fix the problems please`, {
+  await ChatEditor.sendMessage({
+    message: `Fix the problems please`,
     verify: true,
   })
   // @ts-ignore
