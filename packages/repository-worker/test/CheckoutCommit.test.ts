@@ -8,7 +8,7 @@ test('checkoutCommit executes git checkout command', async () => {
   const commit = 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0'
 
   const mockInvoke = jest.fn()
-  mockInvoke.mockReturnValue({ stdout: '', stderr: '', exitCode: 0 })
+  mockInvoke.mockReturnValue({ exitCode: 0, stderr: '', stdout: '' })
 
   const mockRpc = MockRpc.create({
     commandMap: {},
@@ -26,7 +26,7 @@ test('checkoutCommit handles different commit formats', async () => {
   const commit = 'main'
 
   const mockInvoke = jest.fn()
-  mockInvoke.mockReturnValue({ stdout: '', stderr: '', exitCode: 0 })
+  mockInvoke.mockReturnValue({ exitCode: 0, stderr: '', stdout: '' })
 
   const mockRpc = MockRpc.create({
     commandMap: {},
@@ -44,7 +44,7 @@ test('checkoutCommit handles short commit hash', async () => {
   const commit = 'a1b2c3d'
 
   const mockInvoke = jest.fn()
-  mockInvoke.mockReturnValue({ stdout: '', stderr: '', exitCode: 0 })
+  mockInvoke.mockReturnValue({ exitCode: 0, stderr: '', stdout: '' })
 
   const mockRpc = MockRpc.create({
     commandMap: {},

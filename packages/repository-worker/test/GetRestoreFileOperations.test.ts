@@ -17,14 +17,14 @@ test.skip('getRestoreNodeModulesFileOperations returns copy operations for cache
 
   expect(result).toEqual([
     {
-      type: 'copy',
       from: '/test/node-modules-cache/1234/node_modules/package1',
       to: '/test/vscode/5678/node_modules/package1',
+      type: 'copy',
     },
     {
-      type: 'copy',
       from: '/test/node-modules-cache/1234/node_modules/package2',
       to: '/test/vscode/5678/node_modules/package2',
+      type: 'copy',
     },
   ])
 })
