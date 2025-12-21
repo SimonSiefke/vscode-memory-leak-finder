@@ -1,17 +1,17 @@
 import * as ChromiumSwitches from '../ChromiumSwitches/ChromiumSwitches.ts'
 
 export const getVscodeArgs = ({
-  extensionsDir,
-  userDataDir,
-  extraLaunchArgs,
-  inspectSharedProcess,
-  inspectExtensions,
-  inspectPtyHost,
   enableExtensions,
-  inspectPtyHostPort,
-  inspectSharedProcessPort,
-  inspectExtensionsPort,
   enableProxy,
+  extensionsDir,
+  extraLaunchArgs,
+  inspectExtensions,
+  inspectExtensionsPort,
+  inspectPtyHost,
+  inspectPtyHostPort,
+  inspectSharedProcess,
+  inspectSharedProcessPort,
+  userDataDir,
 }) => {
   const args = [
     ...ChromiumSwitches.chromiumSwitches,

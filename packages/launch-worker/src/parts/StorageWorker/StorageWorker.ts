@@ -5,10 +5,10 @@ import * as GetStorageWorkerUrl from '../GetStorageWorkerUrl/GetStorageWorkerUrl
 export const launch = async () => {
   const url = GetStorageWorkerUrl.getStorageWorkerUrl()
   const rpc = await NodeWorkerRpcParent.create({
+    commandMap: CommandMapRef.commandMapRef,
+    execArgv: [],
     path: url,
     stdio: 'inherit',
-    execArgv: [],
-    commandMap: CommandMapRef.commandMapRef,
   })
   return rpc
 }
