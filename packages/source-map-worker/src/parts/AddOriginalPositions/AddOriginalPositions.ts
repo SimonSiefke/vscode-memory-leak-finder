@@ -1,6 +1,6 @@
 import type { IntermediateItem } from '../IntermediateItem/IntermediateItem.ts'
-import * as OriginalNameWorker from '../OriginalNameWorker/OriginalNameWorker.ts'
 import type { OriginalPosition } from '../OriginalPosition/OriginalPosition.ts'
+import * as OriginalNameWorker from '../OriginalNameWorker/OriginalNameWorker.ts'
 
 // TODO rename to addoriginalNames
 export const addOriginalPositions = async (intermediateItems: readonly IntermediateItem[]): Promise<readonly OriginalPosition[]> => {
@@ -10,15 +10,15 @@ export const addOriginalPositions = async (intermediateItems: readonly Intermedi
     if (item.needsOriginalName && item.codePath && item.line !== null && item.column !== null) {
       const originalName: string = await rpc.invoke('OriginalName.getOriginalNameFromFile', item.codePath, item.line, item.column)
       finalResults.push({
-        line: item.line,
         column: item.column,
+        line: item.line,
         name: originalName || null,
         source: item.source,
       })
     } else {
       finalResults.push({
-        line: item.line,
         column: item.column,
+        line: item.line,
         name: item.name,
         source: item.source,
       })

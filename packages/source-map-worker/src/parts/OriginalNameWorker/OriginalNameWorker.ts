@@ -5,8 +5,8 @@ let rpcPromise: Promise<Rpc> | undefined
 
 export const create = async () => {
   const rpc = await NodeWorkerRpcParent.create({
-    path: getOriginalNameWorkerPath(),
     commandMap: {},
+    path: getOriginalNameWorkerPath(),
   })
   return rpc
 }
