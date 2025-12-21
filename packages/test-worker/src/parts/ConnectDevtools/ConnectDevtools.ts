@@ -79,10 +79,7 @@ export const connectDevtools = async (
     evaluateInUtilityContext(item) {},
     expect: Expect.expect,
     ideVersion: parsedIdeVersion,
-<<<<<<< HEAD
-=======
     page: firstWindow,
->>>>>>> origin/main
     sessionRpc,
     utilityContext: {
       callFunctionOn(options) {
