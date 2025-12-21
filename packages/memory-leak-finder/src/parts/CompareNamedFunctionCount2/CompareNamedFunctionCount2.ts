@@ -16,7 +16,7 @@ const addSourceLocations = async (functionObjects, scriptMap) => {
   })
   const withOriginalStack = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(requests, classNames)
   const normalized = withOriginalStack.map((item) => {
-    const { stack, count, originalStack, originalName, name, beforeCount, delta } = item
+    const { stack, count, originalStack, originalName, name, delta } = item
 
     return {
       name: originalName || name,
@@ -32,7 +32,7 @@ export const compareNamedFunctionCount2 = async (beforePath, after, useParallel 
   // TODO ask heapsnapshot worker to compare functions
   // TODO then for the leaked functions, add sourcemap info
   const afterPath = after.heapSnapshotPath
-  const scriptMap = after.scriptMap
+  const { scriptMap } = after
   console.log({ scriptMap })
   console.time('check')
   const leaked = await HeapSnapshotFunctions.compareHeapSnapshotFunctions(beforePath, afterPath, useParallel)

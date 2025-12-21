@@ -1,27 +1,52 @@
-FROM mcr.microsoft.com/devcontainers/javascript-node:1-22-bullseye
+FROM ubuntu:24.04
 
-# Install VNC and Electron dependencies
-RUN apt-get update && apt-get install -y \
-    tigervnc-standalone-server \
-    jwm \
-    libgtk-3-0 \
-    libnss3 \
-    libasound2 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# make sure apt is up to date
+RUN apt-get update --fix-missing
+RUN apt-get install -y \
+  curl \
+  git \
+  gnupg2 \
+  jq \
+  sudo \
+  zsh \
+  python3 \
+  build-essential \
+  g++ \
+  libx11-dev \
+  libxkbfile-dev \
+  libsecret-1-dev \
+  python-is-python3 \
+  python3-setuptools \
+  fonts-liberation \
+  libcairo2 \
+  libasound2t64 \
+  libcups2 \
+  libdbus-1-3 \
+  libdrm2 \
+  libegl1 \
+  libgbm1 \
+  libglib2.0-0 \
+  libgtk-3-0 \
+  libnspr4 \
+  libnss3 \
+  libpango-1.0-0 \
+  libx11-6 \
+  libx11-xcb1 \
+  libxcb1 \
+  libxcomposite1 \
+  libxdamage1 \
+  libxext6 \
+  libxfixes3 \
+  libxrandr2 \
+  libxshmfence1 \
+  xvfb \
+  libxtst6 \
+  xauth
 
-# Set up VNC
-ENV DISPLAY=:1
-ENV VNC_PASSWORD=vscode
+RUN  sudo apt-get install -y build-essential g++ libx11-dev libxkbfile-dev libsecret-1-dev python-is-python3
 
-# Create VNC startup script
-RUN echo '#!/bin/bash\n\
-mkdir -p ~/.vnc\n\
-echo "$VNC_PASSWORD" | vncpasswd -f > ~/.vnc/passwd\n\
-chmod 600 ~/.vnc/passwd\n\
-vncserver :1 -geometry 1920x1080 -depth 24\n\
-jwm &\n\
-exec "$@"' > /usr/local/bin/start-vnc.sh \
-    && chmod +x /usr/local/bin/start-vnc.sh
+RUN sudo apt-get install -y python3-setuptools
 
-CMD ["/usr/local/bin/start-vnc.sh", "sleep", "infinity"]
+RUN sudo apt-get install -y libkrb5-dev
+
+COPY . .

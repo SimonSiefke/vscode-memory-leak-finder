@@ -1,0 +1,13 @@
+{
+  "name": "@vscode-memory-leak-finder/heap-snapshot-worker-benchmarks",
+  "version": "0.0.0-dev",
+  "description": "Benchmarks for heap-snapshot-worker",
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^24.10.1"
+  }
+}

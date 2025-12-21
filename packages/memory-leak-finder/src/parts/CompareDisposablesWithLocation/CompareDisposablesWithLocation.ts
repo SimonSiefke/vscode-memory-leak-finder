@@ -2,7 +2,7 @@ import * as Assert from '../Assert/Assert.ts'
 import * as ImproveDisposableOutput from '../ImproveDisposableOutput/ImproveDisposableOutput.ts'
 
 const addDeltas = (prettyBefore, prettyAfter) => {
-  const newItems = []
+  const newItems: any[] = []
   const countMap = Object.create(null)
   for (const item of prettyBefore) {
     countMap[item.name] = item.count
@@ -24,7 +24,7 @@ const addDeltas = (prettyBefore, prettyAfter) => {
 export const compareDisposablesWithLocation = async (before, after) => {
   const beforeResult = before
   const afterResult = after.result
-  const scriptMap = after.scriptMap
+  const { scriptMap } = after
   Assert.array(beforeResult)
   Assert.array(afterResult)
   Assert.object(scriptMap)

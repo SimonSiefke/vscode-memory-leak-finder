@@ -2,6 +2,7 @@ import * as StdoutWorker from '../StdoutWorker/StdoutWorker.ts'
 import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 import * as ExtractLineAndColumnFromStack from '../ExtractLineAndColumnFromStack/ExtractLineAndColumnFromStack.ts'
 
+<<<<<<< HEAD
 export const getHandleTestFailedMessage = async (
   file: string,
   relativeDirName: string,
@@ -10,12 +11,17 @@ export const getHandleTestFailedMessage = async (
   error: any,
 ): Promise<string> => {
   const baseMessage: string = await StdoutWorker.invoke(
+=======
+export const getHandleTestFailedMessage = (file, relativeDirName, relativeFilePath, fileName, error, wasOriginallySkipped) => {
+  return StdoutWorker.invoke(
+>>>>>>> origin/main
     'Stdout.getHandleTestFailedMessage',
     file,
     relativeDirName,
     relativeFilePath,
     fileName,
     error,
+<<<<<<< HEAD
   )
 
   if (!StdinDataState.isGithubActions()) {
@@ -40,4 +46,8 @@ export const getHandleTestFailedMessage = async (
   })
 
   return `${annotation}${baseMessage}`
+=======
+    wasOriginallySkipped,
+  )
+>>>>>>> origin/main
 }

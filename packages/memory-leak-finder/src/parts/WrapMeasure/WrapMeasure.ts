@@ -1,23 +1,21 @@
-import { getDefaultTarget } from '../MeasureTargetDefaults/MeasureTargetDefaults.ts'
+import type { Session } from '../Session/Session.ts'
 
-export const wrapMeasure = (measure) => {
+export const wrapMeasure = (measure: any) => {
   return {
     id: measure.id,
-    create(session) {
+    create(session: Session) {
       const args = measure.create(session)
       return {
         ...measure,
-        targets:
-          Array.isArray(measure.targets) && measure.targets.length > 0
-            ? measure.targets
-            : Array.isArray(measure.target) && measure.target.length > 0
-              ? measure.target
-              : getDefaultTarget(measure.id),
+        targets: measure.targets || [],
         start() {
           return measure.start(...args)
         },
         stop() {
           return measure.stop(...args)
+        },
+        compare(before, after, context) {
+          return measure.compare(before, after, context)
         },
         async releaseResources() {
           if (measure.releaseResources) {

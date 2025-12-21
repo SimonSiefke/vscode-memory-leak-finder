@@ -1,78 +1,133 @@
-import * as CanUseIdleCallback from '../CanUseIdleCallback/CanUseIdleCallback.ts'
-import * as ConnectDevtools from '../ConnectDevtools/ConnectDevtools.ts'
-import * as GetPageObjectPath from '../GetPageObjectPath/GetPageObjectPath.ts'
-import * as LaunchTestWorker from '../LaunchTestWorker/LaunchTestWorker.ts'
-import * as PageObject from '../PageObject/PageObject.ts'
+import { connectWorkers } from '../ConnectWorkers/ConnectWorkers.ts'
 import * as PrepareTests from '../PrepareTests/PrepareTests.ts'
 
 interface State {
-  firstLaunch: boolean
-  devtoolsWebSocketUrl: string
-  webSocketUrl: string
-  connectionId: number
-  headlessMode: boolean
-  parsedVersion: any
   promise: Promise<any> | undefined
 }
 
 export const state: State = {
-  firstLaunch: false,
-  devtoolsWebSocketUrl: '',
-  webSocketUrl: '',
-  connectionId: 0,
-  headlessMode: false,
-  parsedVersion: null,
-  /**
-   * @type {Promise|undefined}
-   */
   promise: undefined,
 }
 
-export const prepareTestsOrAttach = async (
-  cwd: string,
-  headlessMode: boolean,
-  recordVideo: boolean,
-  connectionId: number,
-  timeouts: any,
-  runMode: string,
-  ide: string,
-  ideVersion: string,
-  vscodePath: string,
-  commit: string,
-) => {
-  const pageObjectPath = GetPageObjectPath.getPageObjectPath()
-  const testWorkerRpc = await LaunchTestWorker.launchTestWorker(runMode)
+export interface PrepareTestsAndAttachOptions {
+  readonly attachedToPageTimeout: number
+  readonly commit: string
+  readonly connectionId: number
+  readonly cwd: string
+  readonly enableExtensions: boolean
+  readonly enableProxy: boolean
+  readonly headlessMode: boolean
+  readonly ide: string
+  readonly ideVersion: string
+  readonly idleTimeout: number
+  readonly insidersCommit: string
+  readonly inspectExtensions: boolean
+  readonly inspectExtensionsPort: number
+  readonly inspectPtyHost: boolean
+  readonly inspectPtyHostPort: number
+  readonly inspectSharedProcess: boolean
+  readonly inspectSharedProcessPort: number
+  readonly measureId: string
+  readonly measureNode: boolean
+  readonly pageObjectPath: string
+  readonly recordVideo: boolean
+  readonly runMode: number
+  readonly timeouts: any
+  readonly useProxyMock: boolean
+  readonly vscodePath: string
+  readonly vscodeVersion: string
+}
+
+export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOptions) => {
+  const {
+    attachedToPageTimeout,
+    commit,
+    connectionId,
+    cwd,
+    enableExtensions,
+    enableProxy,
+    headlessMode,
+    ide,
+    ideVersion,
+    idleTimeout,
+    insidersCommit,
+    inspectExtensions,
+    inspectExtensionsPort,
+    inspectPtyHost,
+    inspectPtyHostPort,
+    inspectSharedProcess,
+    inspectSharedProcessPort,
+    measureId,
+    measureNode,
+    pageObjectPath,
+    recordVideo,
+    runMode,
+    timeouts,
+    useProxyMock,
+    vscodePath,
+    vscodeVersion,
+  } = options
   const isFirst = state.promise === undefined
   if (isFirst) {
-    state.promise = PrepareTests.prepareTests(
-      testWorkerRpc,
-      cwd,
-      headlessMode,
-      recordVideo,
+    state.promise = PrepareTests.prepareTests({
+      attachedToPageTimeout,
+      commit,
       connectionId,
-      timeouts,
+      cwd,
+      enableExtensions,
+      enableProxy,
+      headlessMode,
       ide,
       ideVersion,
+      idleTimeout,
+      insidersCommit,
+      inspectExtensions,
+      inspectExtensionsPort,
+      inspectPtyHost,
+      inspectPtyHostPort,
+      inspectSharedProcess,
+      inspectSharedProcessPort,
+      measureId,
+      pageObjectPath,
+      recordVideo,
+      runMode,
+      timeouts,
+      useProxyMock,
       vscodePath,
-      commit,
-    )
-    const result = await state.promise
-    state.parsedVersion = result.parsedVersion
-    return testWorkerRpc
+      vscodeVersion,
+    })
   }
-  const { webSocketUrl, devtoolsWebSocketUrl, electronObjectId } = await state.promise
-  const isFirstConnection = false
-  const canUseIdleCallback = CanUseIdleCallback.canUseIdleCallback(headlessMode)
-  await ConnectDevtools.connectDevtools(
-    testWorkerRpc,
+  const result = await state.promise
+
+  const { devtoolsWebSocketUrl, electronObjectId, initializationWorkerRpc, parsedVersion, utilityContext, webSocketUrl } = await result
+
+  const { memoryRpc, testWorkerRpc, videoRpc } = await connectWorkers(
+    recordVideo,
     connectionId,
     devtoolsWebSocketUrl,
-    electronObjectId,
-    isFirstConnection,
-    headlessMode,
     webSocketUrl,
-    canUseIdleCallback,
+    electronObjectId,
+    attachedToPageTimeout,
+    measureId,
+    idleTimeout,
+    pageObjectPath,
+    parsedVersion,
+    timeouts,
+    utilityContext,
+    runMode,
+    measureNode,
+    inspectSharedProcess,
+    inspectExtensions,
+    inspectPtyHost,
+    enableExtensions,
+    inspectPtyHostPort,
+    inspectSharedProcessPort,
+    inspectExtensionsPort,
   )
-  await PageObject.create(testWorkerRpc, connectionId, isFirstConnection, headlessMode, timeouts, state.parsedVersion, pageObjectPath)
-  return testWorkerRpc
+  return {
+    initializationWorkerRpc,
+    memoryRpc,
+    testWorkerRpc,
+    videoRpc,
+  }
 }

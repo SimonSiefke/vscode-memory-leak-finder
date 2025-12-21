@@ -4,9 +4,9 @@ import * as Character from '../Character/Character.ts'
  * @enum {number}
  */
 const State = {
-  TopLevel: 1,
   DoubleQuote: 2,
   Round: 3,
+  TopLevel: 1,
 }
 
 export const getSpecialSelectorBody = (selector: string, i: number, specialSelector: string): string => {
@@ -16,25 +16,9 @@ export const getSpecialSelectorBody = (selector: string, i: number, specialSelec
   for (let j = startIndex; j < selector.length; j++) {
     const char = selector[j]
     switch (state) {
-      case State.TopLevel:
-        switch (char) {
-          case Character.RoundOpen: {
-            stack.push(state)
-            state = State.Round
-
-            break
-          }
-          case Character.DoubleQuote: {
-            stack.push(state)
-            state = State.DoubleQuote
-
-            break
-          }
-          case Character.Colon:
-          case Character.Space: {
-            return selector.slice(i, j)
-          }
-          // No default
+      case State.DoubleQuote:
+        if (char === Character.DoubleQuote) {
+          state = stack.pop() || State.TopLevel
         }
         break
       case State.Round:
@@ -45,9 +29,25 @@ export const getSpecialSelectorBody = (selector: string, i: number, specialSelec
           state = stack.pop() || State.TopLevel
         }
         break
-      case State.DoubleQuote:
-        if (char === Character.DoubleQuote) {
-          state = stack.pop() || State.TopLevel
+      case State.TopLevel:
+        switch (char) {
+          case Character.Colon:
+          case Character.Space: {
+            return selector.slice(i, j)
+          }
+          case Character.DoubleQuote: {
+            stack.push(state)
+            state = State.DoubleQuote
+
+            break
+          }
+          case Character.RoundOpen: {
+            stack.push(state)
+            state = State.Round
+
+            break
+          }
+          // No default
         }
         break
       default:

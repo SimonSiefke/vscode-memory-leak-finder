@@ -5,11 +5,11 @@ import * as GetTestCoordinatorUrl from '../GetTestCoordinatorUrl/GetTestCoordina
 export const listen = async (): Promise<Rpc> => {
   const url = GetTestCoordinatorUrl.getTestCoordinatorUrl()
   const rpc = await NodeWorkerRpcParent.create({
-    path: url,
+    commandMap: CommandMapRef.commandMapRef,
     // @ts-ignore
     name: 'Test Coordinator',
+    path: url,
     ref: false,
-    commandMap: CommandMapRef.commandMapRef,
   })
   return rpc
 }

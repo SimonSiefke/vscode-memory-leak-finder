@@ -1,19 +1,19 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.ts'
+// import * as ExecutionContextState from '../ExecutionContextState/ExecutionContextState.ts'
 import { ExpectError } from '../ExpectError/ExpectError.ts'
+import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
 import * as PTimeout from '../PTimeout/PTimeout.ts'
 
-export const evaluate = async (rpc, { expression, awaitPromise = false, replMode = false }) => {
+export const evaluate = async (rpc, { awaitPromise = false, expression, replMode = false }) => {
   try {
-    const utilityExecutionContext = await ExecutionContextState.waitForUtilityExecutionContext(rpc.sessionId)
+    const connectionId = 1
+    const pageObject = PageObjectState.getPageObjectContext(connectionId)
     const result = await PTimeout.pTimeout(
-      DevtoolsProtocolRuntime.evaluate(rpc, {
-        expression,
-        returnByValue: true,
-        generatePreview: true,
+      pageObject.utilityContext.evaluate({
         awaitPromise,
+        expression,
+        generatePreview: true,
         replMode,
-        uniqueContextId: utilityExecutionContext.uniqueId,
+        returnByValue: true,
       }),
       {
         milliseconds: 3000,

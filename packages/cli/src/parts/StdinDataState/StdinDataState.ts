@@ -4,101 +4,152 @@ import * as ModeType from '../ModeType/ModeType.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 
 export interface StdinDataState {
+  bisect: boolean
   buffering: boolean
   checkLeaks: boolean
-  runSkippedTestsAnyway: boolean
+  continueValue: string
   cwd: string
+  enableExtensions: boolean
+  enableProxy: boolean
+  exitCode: number
   filter: string
   headless: boolean
-  isGithubActions: boolean
-  measure: string
-  measureNode?: boolean
-  mode: number
-  recordVideo: boolean
-  runs: number
-  value: string
-  watch: boolean
-  measureAfter: boolean
-  timeouts: boolean
-  timeoutBetween: number
-  restartBetween: boolean
-  runMode: number
   ide: string
   ideVersion: string
-  workers: boolean
-  stdout: string[]
-  previousFilters: string[]
-  exitCode: number
+  insidersCommit: string
+  inspectExtensions: boolean
+  inspectExtensionsPort: number
+  inspectPtyHost: boolean
+  inspectPtyHostPort: number
+  inspectSharedProcess: boolean
+  inspectSharedProcessPort: number
+  isGithubActions: boolean
   isWindows: boolean
+  measure: string
+  measureAfter: boolean
+  measureNode?: boolean
+  mode: number
+  previousFilters: string[]
+  recordVideo: boolean
+  restartBetween: boolean
+  runMode: number
+  runs: number
+  runSkippedTestsAnyway: boolean
+  stdout: string[]
+  timeoutBetween: number
+  timeouts: boolean
+  useProxyMock: boolean
+  value: string
+  watch: boolean
+  workers: boolean
 }
 
-export const state: StdinDataState = {
+let state: StdinDataState = {
+  bisect: false,
   buffering: false,
   checkLeaks: false,
-  runSkippedTestsAnyway: false,
+  continueValue: '',
   cwd: Character.EmptyString,
+  enableExtensions: false,
+  enableProxy: false,
+  exitCode: 0,
   filter: Character.EmptyString,
   headless: false,
-  isGithubActions: false,
-  measure: Character.EmptyString,
-  mode: ModeType.Waiting,
-  recordVideo: false,
-  runs: 1,
-  value: Character.EmptyString,
-  watch: false,
-  measureAfter: false,
-  timeouts: true,
-  timeoutBetween: 0,
-  restartBetween: false,
-  runMode: TestRunMode.Auto,
   ide: Ide.VsCode,
   ideVersion: Ide.VsCode,
-  workers: false,
-  stdout: [],
-  previousFilters: [],
+  insidersCommit: '',
+  inspectExtensions: false,
+  inspectExtensionsPort: 5870,
+  inspectPtyHost: false,
+  inspectPtyHostPort: 5877,
+  inspectSharedProcess: false,
+  inspectSharedProcessPort: 5879,
+  isGithubActions: false,
   isWindows: false,
-  exitCode: 0,
+  measure: Character.EmptyString,
+  measureAfter: false,
+  mode: ModeType.Waiting,
+  previousFilters: [],
+  recordVideo: false,
+  restartBetween: false,
+  runMode: TestRunMode.Auto,
+  runs: 1,
+  runSkippedTestsAnyway: false,
+  stdout: [],
+  timeoutBetween: 0,
+  timeouts: true,
+  useProxyMock: false,
+  value: Character.EmptyString,
+  watch: false,
+  workers: false,
 }
 
 export const setState = (newState): void => {
-  state.checkLeaks = newState.checkLeaks
-  state.runSkippedTestsAnyway = newState.runSkippedTestsAnyway
-  state.cwd = newState.cwd
-  state.headless = newState.headless
-  state.isGithubActions = newState.isGithubActions
-  state.measure = newState.measure
-  state.mode = newState.mode
-  state.recordVideo = newState.recordVideo
-  state.runs = newState.runs
-  state.value = newState.value
-  state.watch = newState.watch
-  state.measureAfter = newState.measureAfter
-  state.timeouts = newState.timeouts
-  state.timeoutBetween = newState.timeoutBetween
-  state.restartBetween = newState.restartBetween
-  state.runMode = newState.runMode
-  state.ide = newState.ide
-  state.ideVersion = newState.ideVersion
-  state.workers = newState.workers
-  state.stdout = newState.stdout
-  state.previousFilters = newState.previousFilters
-  state.isWindows = newState.isWindows
+  state = {
+    ...state,
+    bisect: newState.bisect,
+    checkLeaks: newState.checkLeaks,
+    continueValue: newState.continueValue,
+    cwd: newState.cwd,
+    enableExtensions: newState.enableExtensions,
+    enableProxy: newState.enableProxy,
+    headless: newState.headless,
+    ide: newState.ide,
+    ideVersion: newState.ideVersion,
+    insidersCommit: newState.insidersCommit,
+    inspectExtensions: newState.inspectExtensions,
+    inspectExtensionsPort: newState.inspectExtensionsPort,
+    inspectPtyHost: newState.inspectPtyHost,
+    inspectPtyHostPort: newState.inspectPtyHostPort,
+    inspectSharedProcess: newState.inspectSharedProcess,
+    inspectSharedProcessPort: newState.inspectSharedProcessPort,
+    isGithubActions: newState.isGithubActions,
+    isWindows: newState.isWindows,
+    measure: newState.measure,
+    measureAfter: newState.measureAfter,
+    mode: newState.mode,
+    previousFilters: newState.previousFilters,
+    recordVideo: newState.recordVideo,
+    restartBetween: newState.restartBetween,
+    runMode: newState.runMode,
+    runs: newState.runs,
+    runSkippedTestsAnyway: newState.runSkippedTestsAnyway,
+    stdout: newState.stdout,
+    timeoutBetween: newState.timeoutBetween,
+    timeouts: newState.timeouts,
+    useProxyMock: newState.useProxyMock,
+    value: newState.value,
+    watch: newState.watch,
+    workers: newState.workers,
+  }
 }
 
 export const setBuffering = (value: boolean): void => {
-  state.buffering = value
+  state = {
+    ...state,
+    buffering: value,
+  }
 }
 
 export const setTestSetup = (): void => {
-  state.mode = ModeType.Waiting
+  state = {
+    ...state,
+    mode: ModeType.Waiting,
+  }
 }
 
 export const setTestRunning = (): void => {
-  state.mode = ModeType.Running
+  state = {
+    ...state,
+    mode: ModeType.Running,
+  }
 }
 
 export const setTestStateChange = (): void => {
-  state.mode = ModeType.Waiting
+  state = {
+    ...state,
+    mode: ModeType.Waiting,
+  }
 }
 
 export const isBuffering = (): boolean => {

@@ -8,6 +8,7 @@ jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.ts', () => ({
   copy: mockCopy,
   makeDirectory: mockMakeDirectory,
   remove: mockRemove,
+  writeFileContent: jest.fn(),
 }))
 
 let applyFileOperationModule
@@ -24,9 +25,9 @@ test('applyFileOperation - applies copy operation', async () => {
   mockCopy.mockReturnValue(undefined)
 
   const operation = {
-    type: 'copy',
     from: '/source/file.txt',
     to: '/dest/file.txt',
+    type: 'copy',
   }
 
   await applyFileOperationModule.applyFileOperation(operation)
@@ -39,8 +40,8 @@ test('applyFileOperation - applies mkdir operation', async () => {
   mockMakeDirectory.mockReturnValue(undefined)
 
   const operation = {
-    type: 'mkdir',
     path: '/path/to/directory',
+    type: 'mkdir',
   }
 
   await applyFileOperationModule.applyFileOperation(operation)
@@ -53,8 +54,8 @@ test('applyFileOperation - applies remove operation', async () => {
   mockRemove.mockReturnValue(undefined)
 
   const operation = {
-    type: 'remove',
     from: '/path/to/file.txt',
+    type: 'remove',
   }
 
   await applyFileOperationModule.applyFileOperation(operation)
@@ -70,9 +71,9 @@ test('applyFileOperation - handles copy operation error', async () => {
   })
 
   const operation = {
-    type: 'copy',
     from: '/source/file.txt',
     to: '/dest/file.txt',
+    type: 'copy',
   }
 
   await expect(applyFileOperationModule.applyFileOperation(operation)).rejects.toThrow('Failed to apply file operation copy')
@@ -85,8 +86,8 @@ test('applyFileOperation - handles mkdir operation error', async () => {
   })
 
   const operation = {
-    type: 'mkdir',
     path: '/path/to/directory',
+    type: 'mkdir',
   }
 
   await expect(applyFileOperationModule.applyFileOperation(operation)).rejects.toThrow('Failed to apply file operation mkdir')
@@ -99,8 +100,8 @@ test('applyFileOperation - handles remove operation error', async () => {
   })
 
   const operation = {
-    type: 'remove',
     from: '/path/to/file.txt',
+    type: 'remove',
   }
 
   await expect(applyFileOperationModule.applyFileOperation(operation)).rejects.toThrow('Failed to apply file operation remove')

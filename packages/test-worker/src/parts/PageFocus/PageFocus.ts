@@ -16,8 +16,8 @@ const script = `(async function () {
 export const focus = async ({ electronRpc }) => {
   try {
     await DevtoolsProtocolRuntime.evaluate(electronRpc, {
-      expression: script,
       awaitPromise: true,
+      expression: script,
     })
   } catch (error) {
     throw new VError(error, `Failed to focus page`)

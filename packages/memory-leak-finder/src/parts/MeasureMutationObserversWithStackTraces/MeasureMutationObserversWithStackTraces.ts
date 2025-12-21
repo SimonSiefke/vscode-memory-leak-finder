@@ -17,7 +17,7 @@ export const create = (session) => {
 
 export const start = async (session, objectGroup) => {
   await StartTrackingMutationObserverStackTraces.startTrackingMutationObserverStackTraces(session, objectGroup)
-  return GetMutationObserverCount.getMutationObserverCount(session)
+  return GetMutationObserverCount.getMutationObserverCount(session, objectGroup)
 }
 
 export const stop = async (session, objectGroup) => {

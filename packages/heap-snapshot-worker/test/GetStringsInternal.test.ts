@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { getStringsInternal } from '../src/parts/GetStringsInternal/GetStringsInternal.js'
-import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('getStrings - extracts strings array from heap snapshot file', async () => {
   const heapsnapshot: Snapshot = {

@@ -10,6 +10,7 @@ export const handleTestsFinished = async (
   passed: number,
   failed: number,
   skipped: number,
+  skippedFailed: number,
   leaked: number,
   total: number,
   duration: number,
@@ -18,6 +19,7 @@ export const handleTestsFinished = async (
   Assert.number(passed)
   Assert.number(failed)
   Assert.number(skipped)
+  Assert.number(skippedFailed)
   Assert.number(leaked)
   Assert.number(total)
   Assert.number(duration)
@@ -27,6 +29,7 @@ export const handleTestsFinished = async (
     passed,
     failed,
     skipped,
+    skippedFailed,
     leaked,
     total,
     duration,

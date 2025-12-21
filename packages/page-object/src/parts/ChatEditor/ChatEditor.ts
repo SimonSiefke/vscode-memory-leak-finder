@@ -1,31 +1,81 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ expect, page, VError, ideVersion }) => {
   return {
+    isFirst: false,
     async open() {
       try {
         const quickPick = QuickPick.create({ page, expect, VError })
-        await quickPick.executeCommand('Chat: New Chat Editor')
+        await quickPick.executeCommand(WellKnownCommands.NewChartEditor)
+        await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
         await expect(chatView).toBeVisible()
         await page.waitForIdle()
-        const editContext = page.locator('.native-edit-context')
+        const editArea = chatView.locator('.monaco-editor[data-uri^="chatSessionInput"]')
+        await expect(editArea).toBeVisible()
+        await page.waitForIdle()
+        const editContext = editArea.locator('.native-edit-context')
+        await expect(editContext).toBeVisible()
+        await page.waitForIdle()
         await expect(editContext).toBeFocused()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open chat editor`)
       }
     },
-    async sendMessage(message) {
+    async sendMessage(message: string, { verify = false } = {}) {
       try {
-        const editContext = page.locator('.native-edit-context')
-        await expect(editContext).toBeFocused()
-        await editContext.setValue(message)
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
-        const sendButton = chatView.locator('[aria-label^="Send and Dispatch"]')
+        await expect(chatView).toBeVisible()
+        await page.waitForIdle()
+        const editArea = chatView.locator('.monaco-editor[data-uri^="chatSessionInput"]')
+        await expect(editArea).toBeVisible()
+        await page.waitForIdle()
+        const editContext = editArea.locator('.native-edit-context')
+        await expect(editContext).toBeVisible()
+        await page.waitForIdle()
+        await editContext.focus()
+        await page.waitForIdle()
+        await expect(editContext).toBeFocused()
+        await page.waitForIdle()
+        await editContext.type(message)
+        await page.waitForIdle()
+        const lines = editArea.locator('.view-lines')
+        await expect(lines).toHaveText(message)
+        const interactiveInput = page.locator('.interactive-input-and-side-toolbar')
+        await expect(interactiveInput).toBeVisible()
+        await page.waitForIdle()
+        const sendButton = interactiveInput.locator('.action-item .action-label:not(.disabled)[aria-label^="Send"]')
+        await expect(sendButton).toBeVisible()
+        await sendButton.focus()
+        await page.waitForIdle()
+        await expect(sendButton).toBeFocused()
+        await page.waitForIdle()
+        if (this.isFirst) {
+          this.isFirst = false
+          // TODO get rid of timeout
+          await new Promise((r) => {
+            setTimeout(r, 1000)
+          })
+        }
         await sendButton.click()
         await page.waitForIdle()
-        // TODO check that message is visible and response also
+        await expect(lines).toHaveText('')
+        if (verify) {
+          const row = chatView.locator(`.monaco-list-row[aria-label="${message}"]`)
+          await expect(row).toBeVisible()
+          await page.waitForIdle()
+          const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
+          await expect(response).toBeVisible({ timeout: 60_000 })
+          await page.waitForIdle()
+          const progress = chatView.locator('.rendered-markdown.progress-step')
+          await expect(progress).toBeHidden({ timout: 45_000 })
+          await page.waitForIdle()
+          await expect(response).toBeVisible({ timeout: 30_000 })
+          await page.waitForIdle()
+        }
       } catch (error) {
         throw new VError(error, `Failed to send chat message`)
       }
@@ -105,6 +155,23 @@ export const create = ({ expect, page, VError }) => {
         const removeButton = contextLabel.locator('[role="button"][aria-label^="Remove from context"]')
         await expect(removeButton).toBeVisible()
         await removeButton.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to clear chat context`)
+      }
+    },
+    async clearAll() {
+      try {
+        const quickPick = QuickPick.create({ page, expect, VError })
+        if (ideVersion && ideVersion.minor <= 100) {
+          await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
+        } else {
+          await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
+        }
+        await page.waitForIdle()
+        const requestOne = page.locator('.monaco-list-row.request').first()
+        await expect(requestOne).toBeHidden({ timeout: 10_000 })
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to clear chat context`)
       }

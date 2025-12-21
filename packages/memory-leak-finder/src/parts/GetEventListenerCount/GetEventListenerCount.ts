@@ -12,7 +12,7 @@ export const getEventListenerCount = async (session: Session): Promise<number> =
     const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
       prototypeObjectId: prototype.objectId,
     })
-    const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
+    await DevtoolsProtocolRuntime.callFunctionOn(session, {
       functionDeclaration: `function(){
 globalThis.____objects = this
 }`,

@@ -9,7 +9,7 @@ export const startTrackingEventListenerStackTraces = async (session, objectGroup
   await DevtoolsProtocolRuntime.evaluate(session, {
     expression: `(()=>{
 globalThis.___eventListenerStackTraces = []
-
+globalThis.___eventListenerDisposables = []
 
 // based on https://github.com/sindresorhus/callsites
 const callsites = () => {
@@ -20,19 +20,9 @@ const callsites = () => {
 	return stack.join('\\n')
 }
 
-
-// based on https://gist.github.com/nolanlawson/0e18b8d7b5f6eb11554b5aa1fc4b5a4a
-const originalAddEventListener = Node.prototype.addEventListener
-Node.prototype.addEventListener = function (...args){
-  const stackTrace = callsites()
-  globalThis.___eventListenerStackTraces.push({args, stackTrace})
-  return originalAddEventListener.apply(this, args)
-}
-
 const isEventListenerKey = key => {
   return key.startsWith('on')
 }
-
 
 // based on https://github.com/facebook/jest/pull/5107/files
 const spyOnPropertyEventListener = (object, eventListenerKey) => {
@@ -53,19 +43,42 @@ const spyOnPropertyEventListener = (object, eventListenerKey) => {
     writeable: true,
     enumerable: true
   })
+  globalThis.___eventListenerDisposables.push(() => {
+    Object.defineProperty(object, eventListenerKey, descriptor)
+  })
 }
 
-const spyOnPropertyEventListeners = object => {
+const spyOnPropertyEventListeners = (object) => {
   const eventListenerKeys = Object.keys(object).filter(isEventListenerKey)
   for(const eventListenerKey of eventListenerKeys){
     spyOnPropertyEventListener(object, eventListenerKey)
   }
 }
 
-for(const object of [HTMLElement.prototype, Document.prototype, window]){
-  spyOnPropertyEventListeners(object)
-
+const spyOnEventTarget = (object) => {
+  // based on https://gist.github.com/nolanlawson/0e18b8d7b5f6eb11554b5aa1fc4b5a4a
+  const originalAddEventListener = object.prototype.addEventListener
+  object.prototype.addEventListener = function (...args){
+    const stackTrace = callsites()
+    globalThis.___eventListenerStackTraces.push({args, stackTrace})
+    return originalAddEventListener.apply(this, args)
+  }
+  globalThis.___eventListenerDisposables.push(() => {
+    object.prototype.addEventListener = originalAddEventListener
+  })
 }
+
+const prototypes = [HTMLElement.prototype, Document.prototype, window]
+const primitives = [EventTarget]
+
+for(const object of prototypes){
+  spyOnPropertyEventListeners(object)
+}
+
+for(const object of primitives){
+  spyOnEventTarget(object)
+}
+
 })()
 undefined
 `,

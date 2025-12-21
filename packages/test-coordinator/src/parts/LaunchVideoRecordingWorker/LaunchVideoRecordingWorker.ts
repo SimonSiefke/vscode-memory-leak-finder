@@ -3,9 +3,9 @@ import * as VideoRecordingWorkerPath from '../VideoRecordingWorkerPath/VideoReco
 
 export const start = async () => {
   const rpc = await NodeWorkerRpcParent.create({
+    commandMap: {},
     path: VideoRecordingWorkerPath.videoRecordingWorkerPath,
     stdio: 'inherit',
-    commandMap: {},
   })
   await rpc.invoke('VideoRecording.initialize')
   return rpc

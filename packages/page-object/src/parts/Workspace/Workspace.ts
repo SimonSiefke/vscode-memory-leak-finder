@@ -5,10 +5,12 @@ import * as Electron from '../Electron/Electron.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Root from '../Root/Root.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
+import { existsSync } from 'node:fs'
 
 export const create = ({ electronApp, page, expect, VError }) => {
   return {
     async setFiles(files) {
+      await page.waitForIdle()
       const workspace = join(Root.root, '.vscode-test-workspace')
       const dirents = await readdir(workspace)
       for (const dirent of dirents) {
@@ -23,30 +25,26 @@ export const create = ({ electronApp, page, expect, VError }) => {
       await page.waitForIdle()
     },
     async addExtension(name) {
-      const electron = Electron.create({ electronApp, VError })
-      const extensionsFolder = join(Root.root, '.vscode-extensions-source', name)
-      await electron.mockOpenDialog({
-        response: {
+      try {
+        const electron = Electron.create({ electronApp, VError })
+        const extensionsFolder = join(Root.root, '.vscode-extensions-source', name)
+        await electron.mockOpenDialog({
           canceled: false,
           filePaths: [extensionsFolder],
           bookmarks: [],
-        },
-      })
-      const quickPick = QuickPick.create({ page, expect, VError })
-      await quickPick.executeCommand(WellKnownCommands.InstallExtensionFromLocation)
-      // const destination = join(Root.root, '.vscode-test-workspace', '.vscode', 'extensions', name)
-      // await mkdir(dirname(destination), {
-      //   recursive: true,
-      // })
-      // await cp(extensionsFolder, destination, {
-      //   recursive: true,
-      // })
-      // await page.waitForIdle()
-      // TODO mock dialog
+        })
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.InstallExtensionFromLocation)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to add extension ${name}`)
+      }
     },
     async initializeGitRepository() {
       const workspace = join(Root.root, '.vscode-test-workspace')
       await execa('git', ['init'], { cwd: workspace })
+      await execa('git', ['config', 'user.name', 'Test User'], { cwd: workspace })
+      await execa('git', ['config', 'user.email', 'test@example.com'], { cwd: workspace })
     },
     async add(file) {
       const workspace = join(Root.root, '.vscode-test-workspace')
@@ -57,11 +55,29 @@ export const create = ({ electronApp, page, expect, VError }) => {
     async remove(file) {
       const workspace = join(Root.root, '.vscode-test-workspace')
       const absolutePath = join(workspace, file)
-      await rm(absolutePath)
+      await rm(absolutePath, { recursive: true, force: true })
     },
     getWorkspacePath() {
       const workspace = join(Root.root, '.vscode-test-workspace')
       return workspace
+    },
+    async waitForFile(fileName) {
+      const workspace = join(Root.root, '.vscode-test-workspace')
+      const absolutePath = join(workspace, fileName)
+      if (existsSync(absolutePath)) {
+        return true
+      }
+      const maxWaits = 100
+      const checkTime = 50
+      for (let i = 0; i < maxWaits; i++) {
+        if (existsSync(absolutePath)) {
+          return true
+        }
+        const { resolve, promise } = Promise.withResolvers()
+        setTimeout(resolve, checkTime)
+        await promise
+      }
+      return false
     },
     getWorkspaceFilePath(relativePath) {
       const filePath = join(Root.root, '.vscode-test-workspace', relativePath)

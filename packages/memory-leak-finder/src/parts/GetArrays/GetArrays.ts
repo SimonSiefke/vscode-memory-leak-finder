@@ -1,5 +1,6 @@
 import * as GetArrayNameMap from '../GetArrayNameMap/GetArrayNameMap.ts'
 
+// @ts-ignore
 const getAllScopes = async (session, objectGroup) => {
   // const scopes = await GetAllScopePropertiesInternal.getAllScopePropertiesInternal(session, objectGroup, functionObjectIds)
   // const firstObjectId = scopes[0].objectId
@@ -20,6 +21,7 @@ export const getArrays = async (session, objectGroup) => {
   //   prototypeObjectId: prototypeDescriptor.objectId,
   //   objectGroup,
   // })
+  // @ts-ignore
   const nameMap = await GetArrayNameMap.getArrayNameMap(session, objectGroup)
   // const functionObjectIds = await GetAllFunctions.getAllFunctions(session, objectGroup)
   // functionObjectIds.length = 42 // TODO

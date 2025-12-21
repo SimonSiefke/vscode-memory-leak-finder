@@ -1,6 +1,6 @@
 export const compareStrings = (before, after) => {
   const beforeSet = new Set(before)
-  const newStrings = []
+  const newStrings: any[] = []
   for (const string of after) {
     if (!beforeSet.has(string)) {
       newStrings.push(string)

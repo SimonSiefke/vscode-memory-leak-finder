@@ -10,13 +10,37 @@ export interface ScriptInfo {
   readonly sourceMapUrl?: string
 }
 
-export const addOriginalSources = async (items: readonly CompareResult[]): Promise<readonly CompareResult[]> => {
+const isRelativeSourceMap = (sourceMapUrl) => {
+  if (sourceMapUrl.startsWith('file://')) {
+    return false
+  }
+  if (sourceMapUrl.startsWith('data:')) {
+    return false
+  }
+  if (sourceMapUrl.startsWith('http://')) {
+    return false
+  }
+  if (sourceMapUrl.startsWith('https://')) {
+    return false
+  }
+  return true
+}
+
+const getSourceMapUrl = (script: ScriptInfo): string => {
+  if (script.url && script.sourceMapUrl && isRelativeSourceMap(script.sourceMapUrl)) {
+    return new URL(script.sourceMapUrl, script.url).toString()
+  }
+  return script.sourceMapUrl || ''
+}
+
+const thisDir: string = dirname(fileURLToPath(import.meta.url))
+const packageDir: string = resolve(thisDir, '../../..')
+const repoRoot: string = resolve(packageDir, '../..')
+
+export const addOriginalSources = async (items: readonly CompareResult[]): Promise<readonly any[]> => {
   let scriptMap: Record<number, ScriptInfo> | undefined
   // Always attempt to load script maps from disk
   try {
-    const thisDir: string = dirname(fileURLToPath(import.meta.url))
-    const packageDir: string = resolve(thisDir, '../../..')
-    const repoRoot: string = resolve(packageDir, '../..')
     const scriptMapsDir: string = join(repoRoot, '.vscode-script-maps')
     const entries = await readdir(scriptMapsDir, { withFileTypes: true })
     const mergedMap: Record<number, ScriptInfo> = Object.create(null)
@@ -60,16 +84,17 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
     const script = scriptMap[item.scriptId]
     if (script) {
       item.url = script.url
-      item.sourceMapUrl = script.sourceMapUrl
+      const sourceMapUrl = getSourceMapUrl(script)
+      item.sourceMapUrl = sourceMapUrl
       if (item.url) {
         item.sourceLocation = `${item.url}:${item.line}:${item.column}`
       }
-      if (script.sourceMapUrl) {
-        if (!sourceMapUrlToPositions[script.sourceMapUrl]) {
-          sourceMapUrlToPositions[script.sourceMapUrl] = []
+      if (sourceMapUrl) {
+        if (!sourceMapUrlToPositions[sourceMapUrl]) {
+          sourceMapUrlToPositions[sourceMapUrl] = []
         }
-        sourceMapUrlToPositions[script.sourceMapUrl].push(item.line, item.column)
-        positionPointers.push({ index: i, sourceMapUrl: script.sourceMapUrl })
+        sourceMapUrlToPositions[sourceMapUrl].push(item.line, item.column)
+        positionPointers.push({ index: i, sourceMapUrl: sourceMapUrl })
       }
     }
   }
@@ -87,7 +112,8 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
       path: sourceMapWorkerPath,
       commandMap: {},
     })
-    const cleanPositionMap = await rpc.invoke('SourceMap.getCleanPositionsMap', sourceMapUrlToPositions, false)
+    const extendedOriginalNames = true
+    const cleanPositionMap = await rpc.invoke('SourceMap.getCleanPositionsMap', sourceMapUrlToPositions, extendedOriginalNames)
     await rpc.dispose()
 
     const offsetMap: Record<string, number> = Object.create(null)
@@ -108,7 +134,8 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
         }
       }
     }
-  } catch {
+  } catch (error) {
+    console.log({ error })
     // ignore sourcemap resolution errors
   }
 

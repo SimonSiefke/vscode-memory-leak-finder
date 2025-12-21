@@ -36,7 +36,9 @@ export const startTrackingArrays = async (session, objectGroup) => {
     objectId: smallerArrays.objectId,
     ownProperties: true,
   })
+  // @ts-ignore
   const enumerableObjectIds = getEnumerableValues(smallerArrayProperties.result).map(getObjectId)
+  // @ts-ignore
   const fullMap = Object.create(null)
   // for (const objectId of enumerableObjectIds) {
   //   const fnResult3 = await DevtoolsProtocolRuntime.getProperties(session, {

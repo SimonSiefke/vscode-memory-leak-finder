@@ -1,0 +1,26 @@
+{
+  "name": "mock-chat-provider",
+  "version": "0.0.1",
+  "description": "Mock chat provider extension for e2e testing",
+  "main": "dist/extension.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "keywords": [
+    "vscode",
+    "extension",
+    "chat",
+    "mock",
+    "test"
+  ],
+  "author": "SimonSiefke",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "@types/vscode": "^1.105.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.7.2"
+  },
+  "dependencies": {}
+}

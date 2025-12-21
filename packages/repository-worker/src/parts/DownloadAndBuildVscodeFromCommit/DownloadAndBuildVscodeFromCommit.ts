@@ -1,57 +1,85 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as CacheNodeModules from '../CacheNodeModules/CacheNodeModules.ts'
-import * as CheckoutCommit from '../CheckoutCommit/CheckoutCommit.ts'
 import * as CloneRepository from '../CloneRepository/CloneRepository.ts'
 import { computeVscodeNodeModulesCacheKey } from '../ComputeVscodeNodeModulesCacheKey/ComputeVscodeNodeModulesCacheKey.ts'
 import * as SetupNodeModulesFromCache from '../CopyNodeModulesFromCacheToRepositoryFolder/CopyNodeModulesFromCacheToRepositoryFolder.ts'
 import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
+import { fixTypescriptErrors } from '../FixTypescriptErrors/FixTypescriptErrors.ts'
 import * as InstallDependencies from '../InstallDependencies/InstallDependencies.ts'
 import * as Logger from '../Logger/Logger.ts'
 import * as Path from '../Path/Path.ts'
+import { preCacheRipgrep } from '../PreCacheRipgrep/PreCacheRipgrep.ts'
 import * as ResolveCommitHash from '../ResolveCommitHash/ResolveCommitHash.ts'
 import * as RunCompile from '../RunCompile/RunCompile.ts'
 
 export const downloadAndBuildVscodeFromCommit = async (
   commitRef: string,
-  repoUrl: string,
+  _repoUrl: string,
   reposDir: string,
   nodeModulesCacheDir: string,
   useNice: boolean,
 ) => {
   Assert.string(commitRef)
-  Assert.string(repoUrl)
+  // Assert.string(repoUrl)
   Assert.string(reposDir)
   Assert.string(nodeModulesCacheDir)
   Assert.boolean(useNice)
-  // Resolve the commit reference to an actual commit hash
-  const commitHash = await ResolveCommitHash.resolveCommitHash(repoUrl, commitRef)
+
+  // Resolve the commit reference to get repository URL and commit hash
+  const { commitHash, owner } = await ResolveCommitHash.resolveCommitHash(_repoUrl, commitRef)
+
   const repoPathWithCommitHash = Path.join(reposDir, commitHash)
 
   // Create parent directory if it doesn't exist
   const existsReposDir = await FileSystemWorker.pathExists(reposDir)
 
   // Check what's needed at the start
-  const mainJsPath = Path.join(repoPathWithCommitHash, 'out', 'main.ts')
+  const mainJsPath = Path.join(repoPathWithCommitHash, 'out', 'main.js')
   const nodeModulesPath = Path.join(repoPathWithCommitHash, 'node_modules')
+  const nodeModulesPackageLock = Path.join(repoPathWithCommitHash, 'node_modules', '.package-lock.json')
   const outPath = Path.join(repoPathWithCommitHash, 'out')
 
   const existsRepoPath = await FileSystemWorker.pathExists(repoPathWithCommitHash)
   const existsMainJsPath = await FileSystemWorker.pathExists(mainJsPath)
   const existsNodeModulesPath = await FileSystemWorker.pathExists(nodeModulesPath)
+  const existsNodeModulesLockPath = await FileSystemWorker.pathExists(nodeModulesPackageLock)
   const existsOutPath = await FileSystemWorker.pathExists(outPath)
 
   const needsClone = !existsRepoPath
-  const needsInstall = !existsMainJsPath && !existsNodeModulesPath
+  const needsInstall = !existsMainJsPath && (!existsNodeModulesPath || !existsNodeModulesLockPath)
   const needsCompile = !existsMainJsPath && !existsOutPath
 
   if (!existsReposDir) {
     await FileSystemWorker.makeDirectory(reposDir)
   }
 
+  // For fork commits, ensure the owner directory exists
+  if (commitRef.includes('/') && !commitRef.startsWith('http')) {
+    const owner = commitRef.split('/')[0]
+    const ownerDir = Path.join(reposDir, owner)
+    const existsOwnerDir = await FileSystemWorker.pathExists(ownerDir)
+    if (!existsOwnerDir) {
+      await FileSystemWorker.makeDirectory(ownerDir)
+    }
+  }
+
   // Clone the repository if needed
   if (needsClone) {
-    await CloneRepository.cloneRepository(repoUrl, repoPathWithCommitHash)
-    await CheckoutCommit.checkoutCommit(repoPathWithCommitHash, commitHash)
+    const repoUrl = `https://github.com/${owner}/vscode.git`
+
+    await CloneRepository.cloneRepository(repoUrl, repoPathWithCommitHash, commitHash)
+  }
+
+  // Pre-cache ripgrep binary after cloning but before installing dependencies
+  // This avoids GitHub API 403 errors during npm ci
+  if (needsInstall) {
+    Logger.log(`[repository] Pre-caching ripgrep binary before installing dependencies...`)
+    try {
+      await preCacheRipgrep()
+    } catch (error) {
+      Logger.log(`[repository] Warning: Failed to pre-cache ripgrep: ${error}`)
+      Logger.log(`[repository] Continuing with npm ci - may encounter GitHub API issues`)
+    }
   }
 
   if (needsInstall) {
@@ -65,7 +93,7 @@ export const downloadAndBuildVscodeFromCommit = async (
       )
     } else {
       await InstallDependencies.installDependencies(repoPathWithCommitHash, useNice)
-      await CacheNodeModules.addNodeModulesToCache(repoPathWithCommitHash, commitHash, nodeModulesCacheDir)
+      await CacheNodeModules.moveNodeModulesToCache(repoPathWithCommitHash, commitHash, nodeModulesCacheDir, nodeModulesHash)
     }
   } else if (!existsMainJsPath) {
     Logger.log(`[repository] node_modules already exists in repo for commit ${commitHash}, skipping npm ci...`)
@@ -73,6 +101,7 @@ export const downloadAndBuildVscodeFromCommit = async (
 
   // Compile if needed
   if (needsCompile) {
+    await fixTypescriptErrors(repoPathWithCommitHash)
     Logger.log(`[repository] Compiling VS Code for commit ${commitHash}...`)
     await RunCompile.runCompile(repoPathWithCommitHash, useNice, mainJsPath)
   }

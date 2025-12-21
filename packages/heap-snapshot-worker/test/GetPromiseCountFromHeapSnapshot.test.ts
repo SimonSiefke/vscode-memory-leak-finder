@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { getPromiseCountFromHeapSnapshotInternal } from '../src/parts/GetPromiseCountFromHeapSnapshotInternal/GetPromiseCountFromHeapSnapshotInternal.js'
-import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('should count Promise objects from heap snapshot', () => {
   // prettier-ignore

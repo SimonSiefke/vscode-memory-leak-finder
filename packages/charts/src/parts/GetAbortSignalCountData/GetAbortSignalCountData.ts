@@ -1,5 +1,5 @@
 import * as GetCountData from '../GetCountData/GetCountData.ts'
 
-export const getAbortSignalCountData = () => {
-  return GetCountData.getCountData('abort-signal-count', 'abortSignalCount')
+export const getAbortSignalCountData = (basePath: string) => {
+  return GetCountData.getCountData('abort-signal-count', 'abortSignalCount', basePath)
 }

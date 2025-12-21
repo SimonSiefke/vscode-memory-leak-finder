@@ -1,31 +1,11 @@
 import * as Assert from '../Assert/Assert.ts'
+import { connectScreenRecording } from '../ConnectScreenRecording/ConnectScreenRecording.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
-import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
-import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
-import { DevtoolsProtocolTarget } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-import * as ObjectType from '../ObjectType/ObjectType.ts'
-import * as ScenarioFunctions from '../ScenarioFunctions/ScenarioFunctions.ts'
-import * as SessionState from '../SessionState/SessionState.ts'
+import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 
-export const connectDevtools = async (devtoolsWebSocketUrl: string): Promise<void> => {
+export const connectDevtools = async (devtoolsWebSocketUrl: string, attachedToPageTimeout: number): Promise<void> => {
   Assert.string(devtoolsWebSocketUrl)
-  const browserIpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
-  const browserRpc = DebuggerCreateRpcConnection.createRpc(browserIpc)
-
-  SessionState.addSession('browser', {
-    type: ObjectType.Browser,
-    objectType: ObjectType.Browser,
-    url: '',
-    sessionId: '',
-    rpc: browserRpc,
-  })
-
-  browserRpc.on(DevtoolsEventType.TargetAttachedToTarget, ScenarioFunctions.handleAttachedToTarget)
-  browserRpc.on(DevtoolsEventType.TargetDetachedFromTarget, ScenarioFunctions.handleDetachedFromTarget)
-
-  await DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
-    autoAttach: true,
-    waitForDebuggerOnStart: false,
-    flatten: true,
-  })
+  const browserRpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
+  const { sessionRpc } = await waitForSession(browserRpc, attachedToPageTimeout)
+  await connectScreenRecording(sessionRpc, attachedToPageTimeout)
 }

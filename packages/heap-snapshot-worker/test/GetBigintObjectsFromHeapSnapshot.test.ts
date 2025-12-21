@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { getBigintObjectsFromHeapSnapshotInternal } from '../src/parts/GetBigintObjectsFromHeapSnapshotInternal/GetBigintObjectsFromHeapSnapshotInternal.js'
-import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('getBigintObjectsFromHeapSnapshot - no bigint objects', () => {
   // prettier-ignore

@@ -1,34 +1,16 @@
 import type { RawSourceMap } from 'source-map'
-import { readFile } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { SourceMapConsumer } from 'source-map'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetOriginalClassName from '../GetOriginalClassName/GetOriginalClassName.ts'
+import * as OriginalNameWorker from '../OriginalNameWorker/OriginalNameWorker.ts'
 import { root } from '../Root/Root.ts'
 
 interface OriginalPosition {
-  source: string | null
-  line: number | null
   column: number | null
+  line: number | null
   name: string | null
-}
-
-export const getOriginalPosition = async (sourceMap: RawSourceMap, line: number, column: number): Promise<OriginalPosition> => {
-  Assert.object(sourceMap)
-  Assert.number(line)
-  Assert.number(column)
-  const originalPosition = await SourceMapConsumer.with(sourceMap, null, (consumer) => {
-    return consumer.originalPositionFor({
-      line: line + 1,
-      column: column + 1,
-    })
-  })
-  return {
-    source: originalPosition.source,
-    line: originalPosition.line,
-    column: originalPosition.column,
-    name: originalPosition.name,
-  }
+  source: string | null
 }
 
 export const getOriginalPositions = async (
@@ -45,8 +27,8 @@ export const getOriginalPositions = async (
       const line: number = positions[i]
       const column: number = positions[i + 1]
       const originalPosition = consumer.originalPositionFor({
-        line: line + 1,
         column: column + 1,
+        line: line + 1,
       })
       if (classNames && originalPosition.source && originalPosition.line !== null && originalPosition.column !== null) {
         const index: number = sourceMap.sources.indexOf(originalPosition.source)
@@ -54,9 +36,8 @@ export const getOriginalPositions = async (
           // TODO maybe compute this separately
           const sourceFileRelativePath: string = sourceMap.sources[index]
           const originalCodePath: string = resolve(join(root, '.vscode-sources', hash, sourceFileRelativePath))
-          const originalCode: string = await readFile(originalCodePath, 'utf8')
-          const originalClassName: string = GetOriginalClassName.getOriginalClassName(
-            originalCode,
+          const originalClassName: string = await GetOriginalClassName.getOriginalClassNameFromFile(
+            originalCodePath,
             originalPosition.line,
             originalPosition.column,
           )
@@ -67,5 +48,8 @@ export const getOriginalPositions = async (
     }
     return originalPositions
   })
+
+  // TODO add original names here, and cache computations
+  await OriginalNameWorker.dispose()
   return originalPositions
 }

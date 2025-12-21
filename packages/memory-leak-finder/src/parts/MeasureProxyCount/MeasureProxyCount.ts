@@ -13,11 +13,11 @@ export const create = (session) => {
 }
 
 export const start = (session) => {
-  return GetProxyCount.getProxyCount(session, undefined)
+  return GetProxyCount.getProxyCount(session)
 }
 
 export const stop = (session) => {
-  return GetProxyCount.getProxyCount(session, undefined)
+  return GetProxyCount.getProxyCount(session)
 }
 
 export const compare = CompareCount.compareCount

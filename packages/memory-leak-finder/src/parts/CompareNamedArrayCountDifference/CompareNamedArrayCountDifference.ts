@@ -19,7 +19,7 @@ export const compareNamedArrayCountDifference = (before, after) => {
     beforeMap[item.name] ||= 0
     beforeMap[item.name] += item.count
   }
-  const leaked = []
+  const leaked: any[] = []
   for (const item of after) {
     const oldCount = beforeMap[item.name] || 0
     const afterCount = item.count
@@ -32,5 +32,6 @@ export const compareNamedArrayCountDifference = (before, after) => {
     }
   }
   const sorted = sortByCounts(leaked)
+
   return sorted
 }

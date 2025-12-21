@@ -16,7 +16,7 @@ const getActualPath = (fileUri) => {
 const RE_MODULE_NOT_FOUND_STACK = /Cannot find package '([^']+)' imported from (.+)$/
 
 const prepareModuleNotFoundError = (error) => {
-  const message = error.message
+  const { message } = error
   const match = message.match(RE_MODULE_NOT_FOUND_STACK)
   if (!match) {
     return {
@@ -120,7 +120,7 @@ export const prepare = async (error, { color = true, root = '' } = {}) => {
       codeFrame: error.codeFrame,
     }
   }
-  const message = error.message
+  const { message } = error
   if (error && error.cause) {
     const cause = error.cause()
     if (cause) {

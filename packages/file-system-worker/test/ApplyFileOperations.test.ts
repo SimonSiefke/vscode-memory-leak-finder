@@ -3,11 +3,13 @@ import { beforeEach, expect, jest, test } from '@jest/globals'
 const mockCopy = jest.fn()
 const mockMakeDirectory = jest.fn()
 const mockRemove = jest.fn()
+const mockWriteFileContent = jest.fn()
 
 jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.ts', () => ({
   copy: mockCopy,
   makeDirectory: mockMakeDirectory,
   remove: mockRemove,
+  writeFileContent: mockWriteFileContent,
 }))
 
 let applyFileOperationsModule
@@ -28,6 +30,7 @@ test('applyFileOperations handles empty array gracefully', async () => {
   expect(mockCopy).not.toHaveBeenCalled()
   expect(mockMakeDirectory).not.toHaveBeenCalled()
   expect(mockRemove).not.toHaveBeenCalled()
+  expect(mockWriteFileContent).not.toHaveBeenCalled()
 })
 
 test('applyFileOperations - applies copy operation', async () => {
@@ -35,9 +38,9 @@ test('applyFileOperations - applies copy operation', async () => {
 
   const operations = [
     {
-      type: 'copy',
       from: '/source/file.txt',
       to: '/dest/file.txt',
+      type: 'copy',
     },
   ]
 
@@ -52,8 +55,8 @@ test('applyFileOperations - applies mkdir operation', async () => {
 
   const operations = [
     {
-      type: 'mkdir',
       path: '/path/to/directory',
+      type: 'mkdir',
     },
   ]
 
@@ -68,8 +71,8 @@ test('applyFileOperations - applies remove operation', async () => {
 
   const operations = [
     {
-      type: 'remove',
       from: '/path/to/file.txt',
+      type: 'remove',
     },
   ]
 
@@ -79,6 +82,23 @@ test('applyFileOperations - applies remove operation', async () => {
   expect(mockRemove).toHaveBeenCalledTimes(1)
 })
 
+test('applyFileOperations - applies write operation', async () => {
+  mockWriteFileContent.mockReturnValue(undefined)
+
+  const operations = [
+    {
+      content: 'new content',
+      path: '/path/to/file.ts',
+      type: 'write',
+    },
+  ]
+
+  await applyFileOperationsModule.applyFileOperations(operations)
+
+  expect(mockWriteFileContent).toHaveBeenCalledWith('/path/to/file.ts', 'new content', 'utf8')
+  expect(mockWriteFileContent).toHaveBeenCalledTimes(1)
+})
+
 test('applyFileOperations - applies multiple operations in sequence', async () => {
   mockCopy.mockReturnValue(undefined)
   mockMakeDirectory.mockReturnValue(undefined)
@@ -86,17 +106,17 @@ test('applyFileOperations - applies multiple operations in sequence', async () =
 
   const operations = [
     {
-      type: 'mkdir',
       path: '/path/to/directory',
+      type: 'mkdir',
     },
     {
-      type: 'copy',
       from: '/source/file.txt',
       to: '/dest/file.txt',
+      type: 'copy',
     },
     {
-      type: 'remove',
       from: '/old/file.txt',
+      type: 'remove',
     },
   ]
 
@@ -119,9 +139,9 @@ test('applyFileOperations - handles copy operation error', async () => {
 
   const operations = [
     {
-      type: 'copy',
       from: '/source/file.txt',
       to: '/dest/file.txt',
+      type: 'copy',
     },
   ]
 
@@ -136,8 +156,8 @@ test('applyFileOperations - handles mkdir operation error', async () => {
 
   const operations = [
     {
-      type: 'mkdir',
       path: '/path/to/directory',
+      type: 'mkdir',
     },
   ]
 
@@ -152,8 +172,8 @@ test('applyFileOperations - handles remove operation error', async () => {
 
   const operations = [
     {
-      type: 'remove',
       from: '/path/to/file.txt',
+      type: 'remove',
     },
   ]
 
@@ -169,13 +189,13 @@ test('applyFileOperations - stops on first error and does not continue with rema
 
   const operations = [
     {
-      type: 'copy',
       from: '/source/file.txt',
       to: '/dest/file.txt',
+      type: 'copy',
     },
     {
-      type: 'mkdir',
       path: '/path/to/directory',
+      type: 'mkdir',
     },
   ]
 
@@ -191,14 +211,14 @@ test('applyFileOperations - handles multiple copy operations', async () => {
 
   const operations = [
     {
-      type: 'copy',
       from: '/source1/file1.txt',
       to: '/dest1/file1.txt',
+      type: 'copy',
     },
     {
-      type: 'copy',
       from: '/source2/file2.txt',
       to: '/dest2/file2.txt',
+      type: 'copy',
     },
   ]
 
@@ -214,12 +234,12 @@ test('applyFileOperations - handles multiple mkdir operations', async () => {
 
   const operations = [
     {
-      type: 'mkdir',
       path: '/path1/directory1',
+      type: 'mkdir',
     },
     {
-      type: 'mkdir',
       path: '/path2/directory2',
+      type: 'mkdir',
     },
   ]
 
@@ -235,12 +255,12 @@ test('applyFileOperations - handles multiple remove operations', async () => {
 
   const operations = [
     {
-      type: 'remove',
       from: '/path1/file1.txt',
+      type: 'remove',
     },
     {
-      type: 'remove',
       from: '/path2/file2.txt',
+      type: 'remove',
     },
   ]
 
@@ -261,17 +281,17 @@ test('applyFileOperations - handles mixed operations with errors', async () => {
 
   const operations = [
     {
-      type: 'copy',
       from: '/source/file.txt',
       to: '/dest/file.txt',
+      type: 'copy',
     },
     {
-      type: 'mkdir',
       path: '/path/to/directory',
+      type: 'mkdir',
     },
     {
-      type: 'remove',
       from: '/path/to/file.txt',
+      type: 'remove',
     },
   ]
 

@@ -1,17 +1,17 @@
 interface CopyOperation {
-  type: 'copy'
   from: string
   to: string
+  type: 'copy'
 }
 
 interface MkdirOperation {
-  type: 'mkdir'
   path: string
+  type: 'mkdir'
 }
 
 interface RemoveOperation {
-  type: 'remove'
   from: string
+  type: 'remove'
 }
 
 export type FileOperation = CopyOperation | MkdirOperation | RemoveOperation

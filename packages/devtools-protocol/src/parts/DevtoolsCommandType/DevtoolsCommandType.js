@@ -20,6 +20,8 @@ export const RuntimeGetProperties = 'Runtime.getProperties'
 
 export const RuntimeEnable = 'Runtime.enable'
 
+export const RuntimeDisable = 'Runtime.disable'
+
 export const RuntimeCallFunctionOn = 'Runtime.callFunctionOn'
 
 export const RuntimeRunIfWaitingForDebugger = 'Runtime.runIfWaitingForDebugger'
@@ -44,9 +46,15 @@ export const DebuggerResumed = 'Debugger.resumed'
 
 export const PageStartScreenCast = 'Page.startScreencast'
 
+export const PageGetFrameTree = 'Page.getFrameTree'
+
+export const PageGetIsolatedWorld = 'Page.createIsolatedWorld'
+
 export const PageStopScreenCast = 'Page.stopScreencast'
 
 export const PageEnable = 'Page.enable'
+
+export const PageDisable = 'Page.disable'
 
 export const PageReload = 'Page.reload'
 

@@ -3,7 +3,7 @@ import * as PrettifyInstanceCounts from '../PrettifyInstanceCounts/PrettifyInsta
 
 export const compareInstanceCountsDifference = async (before, after) => {
   const beforeMap = CreateCountMap.createCountMap(before, 'name')
-  const leaked = []
+  const leaked: any[] = []
   for (const element of after) {
     const beforeCount = beforeMap[element.name] || 0
     const afterCount = element.count

@@ -10,7 +10,10 @@ jest.unstable_mockModule('../src/parts/GetLinuxDistributionInfo/GetLinuxDistribu
   }
 })
 
-const arch = jest.fn(() => '')
+/**
+ * @type {jest.MockedFunction<() => 'arm64' | 'x64'>}
+ */
+const arch = jest.fn(() => 'x64')
 
 jest.unstable_mockModule('node:os', () => {
   return {

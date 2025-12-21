@@ -1,6 +1,6 @@
 import { test, expect } from '@jest/globals'
 import { getMediaQueryListCountFromHeapSnapshotInternal } from '../src/parts/GetMediaQueryListCountFromHeapSnapshotInternal/GetMediaQueryListCountFromHeapSnapshotInternal.ts'
-import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('getMediaQueryListCountFromHeapSnapshot should return zero for no MediaQueryList objects', () => {
   const testData: Snapshot = {

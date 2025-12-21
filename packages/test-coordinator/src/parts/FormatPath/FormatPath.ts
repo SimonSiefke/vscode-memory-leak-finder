@@ -6,8 +6,8 @@ export const formatPath = (cwd, testsPath, dirent) => {
   const relativeDirname = Path.dirname(relativePath)
   return {
     absolutePath,
-    relativePath,
-    relativeDirname,
     dirent,
+    relativeDirname,
+    relativePath,
   }
 }

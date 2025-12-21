@@ -5,7 +5,7 @@ export const startTrackingTimeouts = async (session: Session, objectGroup: strin
   // object group is required for function preview to work
   // see https://github.com/puppeteer/puppeteer/issues/3349#issuecomment-548428762
 
-  const evaluateResult = await DevtoolsProtocolRuntime.evaluate(session, {
+  await DevtoolsProtocolRuntime.evaluate(session, {
     expression: `(()=>{
 globalThis.___timeouts = 0
 globalThis.___knownIds = Object.create(null)
@@ -40,7 +40,7 @@ undefined
 }
 
 export const stopTrackingTimeouts = async (session: Session, objectGroup: string) => {
-  const evaluateResult = await DevtoolsProtocolRuntime.evaluate(session, {
+  await DevtoolsProtocolRuntime.evaluate(session, {
     expression: `(()=>{
 globalThis.___knownIds = Object.create(null)
 globalThis.setTimeout = globalThis.___originalSetTimeout

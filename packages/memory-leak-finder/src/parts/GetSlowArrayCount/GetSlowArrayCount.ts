@@ -15,7 +15,7 @@ export const getSlowArrayCount = async (session, objectGroup) => {
     prototypeObjectId: prototypeDescriptor.objectId,
     objectGroup,
   })
-  const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
+  await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
   const arrays = this
   let total = 0

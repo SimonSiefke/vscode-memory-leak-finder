@@ -7,7 +7,15 @@ export const handleTestFailed = async (
   relativeFilePath: string,
   fileName: string,
   error: any,
+  wasOriginallySkipped: boolean,
 ): Promise<void> => {
-  const message = await GetHandleTestFailedMessage.getHandleTestFailedMessage(file, relativeDirName, relativeFilePath, fileName, error)
+  const message = await GetHandleTestFailedMessage.getHandleTestFailedMessage(
+    file,
+    relativeDirName,
+    relativeFilePath,
+    fileName,
+    error,
+    wasOriginallySkipped,
+  )
   await HandleTestStateChange.handleTestStateChange(message)
 }

@@ -5,7 +5,6 @@ export const focus = async (locator) => {
   Assert.object(locator)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
       arguments: [
         {
           value: locator,
@@ -20,7 +19,8 @@ export const focus = async (locator) => {
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
     },
-    locator.sessionId,
+    locator,
   )
 }

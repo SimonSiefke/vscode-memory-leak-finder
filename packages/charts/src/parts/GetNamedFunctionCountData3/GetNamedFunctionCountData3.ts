@@ -1,40 +1,49 @@
 import { existsSync } from 'node:fs'
+import { readdir } from 'node:fs/promises'
 import { join } from 'path'
 import { readJson } from '../ReadJson/ReadJson.ts'
-import * as Root from '../Root/Root.ts'
 
-const getCount = async (file: string, name: string): Promise<number> => {
-  const data = await readJson(file)
-  for (const item of data.namedFunctionCount3) {
-    if (item.name === name) {
-      return item.count
-    }
+const getUniqueName = (usedNames: Set<string>, currentName: string): string => {
+  let uniqueName = currentName
+  let counter = 2
+
+  while (usedNames.has(uniqueName)) {
+    uniqueName = `${currentName} (${counter})`
+    counter++
   }
-  return -1
+
+  return uniqueName
 }
 
-export const getNamedFunctionCountData3 = async (name: string) => {
-  const resultsPath = join(Root.root, '.vscode-memory-leak-finder-results', 'named-function-count3')
+export const getNamedFunctionCountData3 = async (name: string, basePath: string) => {
+  const resultsPath = join(basePath, 'named-function-count3')
   if (!existsSync(resultsPath)) {
     return []
   }
+  const dirents = await readdir(resultsPath)
+  const allData: any[] = []
+  for (const dirent of dirents) {
+    const beforePath = join(resultsPath, dirent)
+    const rawData = await readJson(beforePath)
+    const usedNames = new Set<string>()
+    const data = (rawData.namedFunctionCount3 || []).map((item) => {
+      const baseName = item.originalName || item.name
+      const uniqueName = getUniqueName(usedNames, baseName)
+      usedNames.add(uniqueName)
 
-  const before = join(resultsPath, 'editor.no-autofixes-available.json')
-  const after = join(resultsPath, 'editor.no-autofixes-available-after.json')
-  const countBefore = await getCount(before, name)
-  const countAfter = await getCount(after, name)
-  console.log({ countBefore, countAfter })
-  const data = [
-    {
-      name: '1',
-      count: countBefore,
-      index: 0,
-    },
-    {
-      name: '2',
-      count: countAfter,
-      index: 1,
-    },
-  ]
-  return data
+      return {
+        name: uniqueName,
+        count: item.count,
+        delta: item.delta,
+      }
+    })
+    data.sort((a, b) => b.count - a.count)
+    // Add filename metadata to the data
+    const dataWithFilename = {
+      data,
+      filename: dirent.replace('.json', ''),
+    }
+    allData.push(dataWithFilename)
+  }
+  return allData
 }

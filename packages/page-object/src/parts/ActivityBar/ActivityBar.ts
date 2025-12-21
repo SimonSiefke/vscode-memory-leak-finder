@@ -10,23 +10,27 @@ export const create = ({ expect, page, VError }) => {
         await expect(activityBar).toBeHidden()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.FocusActivityBar)
-        await expect(activityBar).toBeVisible()
+        await expect(activityBar).toBeVisible({ timeout: 10_000 })
       } catch (error) {
         throw new VError(error, `Failed to show activity bar`)
       }
     },
     async showView({ ariaLabel, titleLabel = ariaLabel }) {
       try {
+        await page.waitForIdle()
         const activityBar = page.locator('.part.activitybar')
         await expect(activityBar).toBeVisible()
+        await page.waitForIdle()
         const activityBarItem = activityBar.locator(`.action-item:has(.action-label[aria-label^="${ariaLabel}"])`)
         const expanded = await activityBarItem.getAttribute('aria-expanded')
         if (expanded === 'false') {
           await activityBarItem.click()
         }
+        await page.waitForIdle()
         const sideBar = page.locator('.sidebar')
         const title = sideBar.locator('.composite.title')
         await expect(title).toHaveText(titleLabel)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show ${ariaLabel.toLowerCase()}`)
       }

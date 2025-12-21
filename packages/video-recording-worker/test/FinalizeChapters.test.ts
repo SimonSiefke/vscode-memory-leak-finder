@@ -3,6 +3,12 @@ import { test, expect, jest } from '@jest/globals'
 test('FinalizeChapters - should return early if native ffmpeg not available', async () => {
   jest.unstable_mockModule('fs', () => ({
     existsSync: jest.fn(() => false),
+    statSync: jest.fn(() => false),
+    readFileSync: jest.fn(() => ''),
+    appendFileSync: jest.fn(() => {}),
+    writeFileSync: jest.fn(() => {}),
+    createReadStream: jest.fn(() => {}),
+    createWriteStream: jest.fn(() => {}),
   }))
 
   const { finalizeChapters } = await import('../src/parts/FinalizeChapters/FinalizeChapters.ts')

@@ -2,7 +2,7 @@ import * as GetIframeCountsData from '../GetIframeCountsData/GetIframeCountsData
 
 export const name = 'iframe-count'
 
-export const getData = GetIframeCountsData.getIframeCountsData
+export const getData = (basePath: string) => GetIframeCountsData.getIframeCountsData(basePath)
 
 export const createChart = () => {
   return {

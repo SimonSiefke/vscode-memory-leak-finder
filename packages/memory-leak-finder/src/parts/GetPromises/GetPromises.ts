@@ -3,7 +3,6 @@ import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
 export const getPromises = async (session, objectGroup) => {
-  // TODO get promises array with [[PromiseState]] and [[PromiseResult]]
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Promise,
     returnByValue: false,

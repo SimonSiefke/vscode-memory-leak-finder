@@ -1,3 +1,4 @@
+import { createRpc } from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import * as Json from '../Json/Json.ts'
 import { VError } from '../VError/VError.ts'
 import * as WaitForWebsocketToBeOpen from '../WaitForWebSocketToBeOpen/WaitForWebSocketToBeOpen.ts'
@@ -8,10 +9,10 @@ export const createConnection = async (wsUrl: string): Promise<any> => {
 
     // TODO remove error listener and message listener when ipc is disposed
     webSocket.addEventListener('error', (error: any) => {
-      throw new Error(`memory leak worker websocket error: ${error}`)
+      throw new Error(`memory leak worker websocket error`)
     })
     await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket as any)
-    return {
+    const ipc = {
       send(message: any): void {
         webSocket.send(Json.stringify(message))
       },
@@ -26,7 +27,12 @@ export const createConnection = async (wsUrl: string): Promise<any> => {
         }
         webSocket.onmessage = handleMessage
       },
+      dispose() {
+        webSocket.close()
+      },
     }
+    const rpc = createRpc(ipc)
+    return rpc
   } catch (error) {
     throw new VError(error, `Failed to create websocket connection`)
   }

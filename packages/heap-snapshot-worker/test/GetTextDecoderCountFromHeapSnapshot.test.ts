@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { getTextDecoderCountFromHeapSnapshotInternal } from '../src/parts/GetTextDecoderCountFromHeapSnapshotInternal/GetTextDecoderCountFromHeapSnapshotInternal.ts'
-import { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
+import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
 test('should count text decoder objects from heap snapshot', () => {
   // prettier-ignore

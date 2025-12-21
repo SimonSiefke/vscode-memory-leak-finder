@@ -4,7 +4,7 @@ const state = {
   /**
    * @type {any}
    */
-  rpcPromise: undefined,
+  rpcPromise: undefined as any,
 }
 
 const getOrCreate = async () => {
@@ -16,5 +16,8 @@ const getOrCreate = async () => {
 
 export const invoke = async (method, ...params) => {
   const rpc = await getOrCreate()
+  if (!rpc) {
+    throw new Error('RPC not available')
+  }
   return rpc.invoke(method, ...params)
 }

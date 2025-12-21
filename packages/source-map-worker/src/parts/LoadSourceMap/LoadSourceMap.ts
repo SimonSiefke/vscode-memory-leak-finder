@@ -6,10 +6,10 @@ export const loadSourceMap = async (url: string, hash: string): Promise<any> => 
   try {
     // TODO use `using`
     const rpc = await NodeWorkerRpcParent.create({
+      commandMap: {},
+      execArgv: [],
       path: loadSourceMapWorkerPath,
       stdio: 'inherit',
-      execArgv: [],
-      commandMap: {},
     })
     const sourceMap = await rpc.invoke('LoadSourceMap.loadSourceMap', url, hash)
     await rpc.dispose()
