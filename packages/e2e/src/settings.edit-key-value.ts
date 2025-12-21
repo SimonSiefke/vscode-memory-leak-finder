@@ -6,16 +6,16 @@ export const setup = async ({ Editor, SettingsEditor }: TestContext): Promise<vo
   await Editor.closeAll()
   await SettingsEditor.open()
   await SettingsEditor.search({
-    value: 'Associations',
     resultCount: 2,
+    value: 'Associations',
   })
   await SettingsEditor.ensureIdle()
 }
 
 export const run = async ({ SettingsEditor }: TestContext): Promise<void> => {
   await SettingsEditor.addItem({
-    name: 'files.associations',
     key: 'test-key',
+    name: 'files.associations',
     value: 'test-value',
   })
   await SettingsEditor.removeItem({

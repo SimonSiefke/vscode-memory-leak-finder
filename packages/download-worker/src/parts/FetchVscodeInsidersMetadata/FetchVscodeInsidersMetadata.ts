@@ -3,10 +3,10 @@ import * as os from 'node:os'
 import * as GetVscodePlatformName from '../GetVscodePlatformName/GetVscodePlatformName.ts'
 
 export interface IBuildMetadata {
-  readonly url: string
-  readonly version: string
   readonly productVersion: string
   readonly sha256hash: string
+  readonly url: string
+  readonly version: string
 }
 
 export const fetchVscodeInsidersMetadata = async (commit: string): Promise<IBuildMetadata> => {
@@ -19,7 +19,7 @@ export const fetchVscodeInsidersMetadata = async (commit: string): Promise<IBuil
       headers: {
         'User-Agent': 'vscode-memory-leak-finder/1.0.0',
       },
-      signal: AbortSignal.timeout(30000),
+      signal: AbortSignal.timeout(30_000),
     })
 
     if (!response.ok) {

@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ Editor, Workspace, Explorer, SideBar, ActivityBar }: TestContext): Promise<void> => {
+export const setup = async ({ ActivityBar, Editor, Explorer, SideBar, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([])
   await Editor.closeAll()
   await Explorer.focus()

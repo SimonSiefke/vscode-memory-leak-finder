@@ -2,10 +2,9 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ Workspace, Editor }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'test-file-1.md',
       content: `# Easy Math
 
 2 + 2 = 4 // this test will pass
@@ -17,6 +16,7 @@ export const setup = async ({ Workspace, Editor }: TestContext): Promise<void> =
 
 3 - 1 = 2
 `,
+      name: 'test-file-1.md',
     },
   ])
   await Workspace.addExtension('test-provider-sample')

@@ -2,27 +2,27 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
-export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
+export const setup = async ({ Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'file-to-delete.txt',
       content: 'content to be deleted',
+      name: 'file-to-delete.txt',
     },
     {
-      name: 'keep-this-file.txt',
       content: 'this should remain',
+      name: 'keep-this-file.txt',
     },
     {
-      name: 'nested-folder/file-in-folder.txt',
       content: 'nested content',
+      name: 'nested-folder/file-in-folder.txt',
     },
     {
-      name: 'nested-folder/another-file.txt',
       content: 'another nested file',
+      name: 'nested-folder/another-file.txt',
     },
     {
-      name: 'empty-folder/placeholder.txt',
       content: 'placeholder',
+      name: 'empty-folder/placeholder.txt',
     },
   ])
   await Explorer.focus()
@@ -32,7 +32,7 @@ export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void>
   await Explorer.shouldHaveItem('empty-folder')
 }
 
-export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
+export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> => {
   // Delete a single file via file system operation
   await Workspace.remove('file-to-delete.txt')
 
@@ -67,21 +67,21 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
 
   // Clean up: Restore original state to make test idempotent
   await Workspace.add({
-    name: 'file-to-delete.txt',
     content: 'content to be deleted',
+    name: 'file-to-delete.txt',
   })
   await Workspace.add({
-    name: 'nested-folder/file-in-folder.txt',
     content: 'nested content',
+    name: 'nested-folder/file-in-folder.txt',
   })
   await Workspace.add({
-    name: 'nested-folder/another-file.txt',
     content: 'another nested file',
+    name: 'nested-folder/another-file.txt',
   })
   // Note: empty-folder will be recreated when we add the placeholder file
   await Workspace.add({
-    name: 'empty-folder/placeholder.txt',
     content: 'placeholder',
+    name: 'empty-folder/placeholder.txt',
   })
 
   // Verify original state is restored
