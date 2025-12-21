@@ -5,7 +5,7 @@ export const skip = 1
 export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      content: '<h1>hello world</h1>',
+      content: '<h1>abc</h1>',
       name: 'index.html',
     },
   ])
