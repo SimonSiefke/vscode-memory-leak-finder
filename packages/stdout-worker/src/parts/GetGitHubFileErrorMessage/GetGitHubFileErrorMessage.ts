@@ -1,7 +1,7 @@
 export interface GitHubFileErrorOptions {
+  col?: number
   file: string
   line?: number
-  col?: number
   title?: string
 }
 
@@ -10,8 +10,7 @@ const escape = (value: string): string => {
 }
 
 export const getGitHubFileErrorMessage = (message: string, options: GitHubFileErrorOptions): string => {
-  const parts: string[] = []
-  parts.push('::error')
+  const parts: string[] = [ '::error']
   const annotations: string[] = []
   if (options.file) {
     annotations.push(`file=${options.file}`)
