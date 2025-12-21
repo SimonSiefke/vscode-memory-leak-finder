@@ -7,8 +7,8 @@ import * as VideoWorkerCommandType from '../VideoWorkerCommandType/VideoWorkerCo
 
 export const commandMap = {
   [VideoWorkerCommandType.ConnectDevtools]: ConnectDevtools.connectDevtools,
-  [VideoWorkerCommandType.VideoRecordingStart]: VideoRecording.start,
+  [VideoWorkerCommandType.Initialize]: Initialize.intialize,
   [VideoWorkerCommandType.VideoRecordingAddChapter]: VideoChapter.addChapter,
   [VideoWorkerCommandType.VideoRecordingFinalize]: Finalize.finalize,
-  [VideoWorkerCommandType.Initialize]: Initialize.intialize,
+  [VideoWorkerCommandType.VideoRecordingStart]: VideoRecording.start,
 }

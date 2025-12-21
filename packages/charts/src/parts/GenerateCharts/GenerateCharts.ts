@@ -17,7 +17,7 @@ const visitors = Object.values(Charts).map((value) => {
 })
 
 export const generateCharts = async () => {
-  const rpc = await launchChartWorker()
+  await using rpc = await launchChartWorker()
 
   // Generate charts for all process types
   const basePaths = [
@@ -81,6 +81,4 @@ export const generateCharts = async () => {
       }
     }
   }
-
-  await rpc[Symbol.asyncDispose]()
 }

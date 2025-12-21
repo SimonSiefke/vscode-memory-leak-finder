@@ -2,14 +2,14 @@ import type { NodePath } from '@babel/traverse'
 import type * as t from '@babel/types'
 import { parse } from '@babel/parser'
 import { test, expect } from '@jest/globals'
-import { isLocationInside } from '../src/parts/IsLocationInside/IsLocationInside.ts'
 import { traverseAst } from '../src/parts/GetTraverse/GetTraverse.ts'
+import { isLocationInside } from '../src/parts/IsLocationInside/IsLocationInside.ts'
 
 const getFirstNodePath = (code: string): NodePath => {
   const ast: t.File = parse(code, {
-    sourceType: 'unambiguous',
-    plugins: ['classProperties', 'classPrivateProperties', 'classPrivateMethods', 'decorators-legacy', 'jsx', 'typescript'],
     errorRecovery: true,
+    plugins: ['classProperties', 'classPrivateProperties', 'classPrivateMethods', 'decorators-legacy', 'jsx', 'typescript'],
+    sourceType: 'unambiguous',
   }) as unknown as t.File
   let found: NodePath | null = null
   traverseAst(ast, {
