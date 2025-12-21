@@ -8,7 +8,7 @@ test.skip('cloneRepository executes git clone command', async () => {
   const repoPath = '/test/repo'
 
   const mockInvoke = jest.fn()
-  mockInvoke.mockReturnValue({ stdout: '', stderr: '', exitCode: 0 })
+  mockInvoke.mockReturnValue({ exitCode: 0, stderr: '', stdout: '' })
 
   const mockRpc = MockRpc.create({
     commandMap: {},
@@ -45,7 +45,7 @@ test.skip('cloneRepository handles different repository URLs', async () => {
   const repoPath = '/test/repo'
 
   const mockInvoke = jest.fn()
-  mockInvoke.mockReturnValue({ stdout: '', stderr: '', exitCode: 0 })
+  mockInvoke.mockReturnValue({ exitCode: 0, stderr: '', stdout: '' })
 
   const mockRpc = MockRpc.create({
     commandMap: {},
@@ -63,7 +63,7 @@ test.skip('cloneRepository handles different local paths', async () => {
   const repoPath = '/custom/path/to/repo'
 
   const mockInvoke = jest.fn()
-  mockInvoke.mockReturnValue({ stdout: '', stderr: '', exitCode: 0 })
+  mockInvoke.mockReturnValue({ exitCode: 0, stderr: '', stdout: '' })
 
   const mockRpc = MockRpc.create({
     commandMap: {},

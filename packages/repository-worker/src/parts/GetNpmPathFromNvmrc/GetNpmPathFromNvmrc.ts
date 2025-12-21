@@ -7,7 +7,7 @@ export const getNpmPathFromNvmrc = async (repoPath: string): Promise<string> => 
   const nvmrcContent = await FileSystemWorker.readFileContent(nvmrcPath)
   const nodeVersion = nvmrcContent.trim().replace(/^v/, '')
   const homeDir = homedir()
-  const execPath = process.execPath
+  const { execPath } = process
   const nvmIndex = execPath.indexOf('/nvm/')
   if (nvmIndex !== -1) {
     const rest = execPath.slice(0, nvmIndex)

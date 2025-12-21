@@ -14,7 +14,7 @@ test('installDependencies - runs npm ci without nice', async () => {
       return true
     }
     if (method === 'FileSystem.exec') {
-      return { stdout: '', stderr: '', exitCode: 0 }
+      return { exitCode: 0, stderr: '', stdout: '' }
     }
     throw new Error(`unexpected method ${method}`)
   })
@@ -40,7 +40,7 @@ test('installDependencies - runs npm ci with nice', async () => {
       return true
     }
     if (method === 'FileSystem.exec') {
-      return { stdout: '', stderr: '', exitCode: 0 }
+      return { exitCode: 0, stderr: '', stdout: '' }
     }
     throw new Error(`unexpected method ${method}`)
   })
