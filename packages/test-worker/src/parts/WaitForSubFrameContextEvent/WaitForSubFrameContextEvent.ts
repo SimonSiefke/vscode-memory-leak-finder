@@ -1,7 +1,7 @@
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 
 export const waitForSubFrameContextEvent = (rpc, urlRegex, timeout, signal: AbortSignal) => {
-  const { resolve, promise } = Promise.withResolvers()
+  const { promise, resolve } = Promise.withResolvers()
   const loaded = Object.create(null)
   let matchingFrameId = ''
   const cleanupMaybe = () => {

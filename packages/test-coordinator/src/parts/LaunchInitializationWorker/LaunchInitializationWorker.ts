@@ -4,9 +4,9 @@ import { getLaunchWorkerUrl } from '../GetLaunchWorkerUrl/GetLaunchWorkerUrl.ts'
 export const launchInitializationWorker = async () => {
   const url = getLaunchWorkerUrl()
   const rpc = await NodeWorkerRpcParent.create({
+    commandMap: {},
     path: url,
     stdio: 'inherit',
-    commandMap: {},
   })
 
   const originalDispose = rpc.dispose.bind(rpc)

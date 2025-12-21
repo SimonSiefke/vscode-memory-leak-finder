@@ -4,11 +4,10 @@ import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateI
 export const setChecked = async (locator, value: boolean): Promise<void> => {
   Assert.object(locator)
   if (typeof value !== 'boolean') {
-    throw new Error(`setChecked expects a boolean value, got ${typeof value}`)
+    throw new TypeError(`setChecked expects a boolean value, got ${typeof value}`)
   }
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
       arguments: [
         {
           value: locator,
@@ -23,6 +22,7 @@ export const setChecked = async (locator, value: boolean): Promise<void> => {
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
     },
     locator,
   )
