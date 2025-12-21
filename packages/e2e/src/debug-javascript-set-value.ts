@@ -2,16 +2,16 @@ import type { TestContext } from '../types.ts'
 
 export const skip = process.platform === 'darwin'
 
-export const setup = async ({ Editor, Workspace, Explorer, RunAndDebug }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, RunAndDebug, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'index.js',
       content: `let x = 1
 
 setInterval(()=>{
   x++
   x++
 }, 1000)`,
+      name: 'index.js',
     },
   ])
   await Editor.closeAll()
@@ -31,7 +31,7 @@ export const run = async ({ RunAndDebug }: TestContext): Promise<void> => {
   await RunAndDebug.setValue('x', '5', '1')
 }
 
-export const teardown = async ({ RunAndDebug, Editor }: TestContext): Promise<void> => {
+export const teardown = async ({ Editor, RunAndDebug }: TestContext): Promise<void> => {
   await RunAndDebug.stop()
   await RunAndDebug.removeAllBreakpoints()
   await Editor.closeAll()

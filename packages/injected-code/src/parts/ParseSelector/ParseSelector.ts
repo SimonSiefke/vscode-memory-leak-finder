@@ -13,8 +13,8 @@ export const parseSelector = (selector: string): any[] => {
     const text = selector.slice('text='.length)
     return [
       {
-        type: SelectorType.Text,
         body: `:has-text("${text}")`,
+        type: SelectorType.Text,
       },
     ]
   }
@@ -29,16 +29,16 @@ export const parseSelector = (selector: string): any[] => {
       if (specialSelector) {
         if (i > start) {
           parts.push({
-            type: SelectorType.Css,
             body: selector.slice(start, i),
+            type: SelectorType.Css,
           })
         }
         const type = GetSpecialSelectorType.getSpecialSelectorType(specialSelector)
         const body = GetSpecialSelectorBody.getSpecialSelectorBody(selector, i, specialSelector)
         i += body.length
         parts.push({
-          type,
           body,
+          type,
         })
         start = i
         i--
@@ -47,8 +47,8 @@ export const parseSelector = (selector: string): any[] => {
   }
   if (start < length) {
     parts.push({
-      type: SelectorType.Css,
       body: selector.slice(start, length),
+      type: SelectorType.Css,
     })
   }
   return parts

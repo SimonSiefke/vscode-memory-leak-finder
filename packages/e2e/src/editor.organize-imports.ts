@@ -10,14 +10,13 @@ export const main = () => {
 
 export const skip = 1
 
-export const setup = async ({ Editor, Workspace, Explorer }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'src/main.ts',
       content: originalContent,
+      name: 'src/main.ts',
     },
     {
-      name: 'src/add.ts',
       content: `export const used = () => {
   return 42
 }
@@ -26,9 +25,9 @@ export const unused = () => {
   return 0
 }
 `,
+      name: 'src/add.ts',
     },
     {
-      name: 'tsconfig.json',
       content: `{
   "compilerOptions": {
     "strict": true,
@@ -39,6 +38,7 @@ export const unused = () => {
   "include": ["src"]
 }
 `,
+      name: 'tsconfig.json',
     },
   ])
   await Editor.closeAll()
@@ -67,8 +67,8 @@ export const main = () => {
 }
 `)
   await Workspace.add({
-    name: 'src/main.ts',
     content: originalContent,
+    name: 'src/main.ts',
   })
 }
 

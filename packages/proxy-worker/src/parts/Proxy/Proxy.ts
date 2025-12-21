@@ -1,6 +1,6 @@
 import { readFile, writeFile } from 'fs/promises'
-import * as HttpProxyServer from '../HttpProxyServer/HttpProxyServer.ts'
 import { getCACertPath as getCACertPathImpl } from '../GetCACertPath/GetCACertPath.ts'
+import * as HttpProxyServer from '../HttpProxyServer/HttpProxyServer.ts'
 
 let proxyServerInstance: { port: number; url: string; [Symbol.asyncDispose]: () => Promise<void> } | null = null
 

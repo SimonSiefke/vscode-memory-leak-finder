@@ -19,9 +19,9 @@ export const startWorker = async (
 ) => {
   Assert.string(devtoolsWebsocketUrl)
   const rpc = await NodeWorkerRpcParent.create({
+    commandMap: CommandMapRef.commandMapRef,
     path: MemoryLeakWorkerUrl.memoryLeakWorkerUrl,
     stdio: 'inherit',
-    commandMap: CommandMapRef.commandMapRef,
   })
   await rpc.invoke(
     'ConnectDevtools.connectDevtools',

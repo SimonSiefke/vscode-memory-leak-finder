@@ -3,11 +3,11 @@ import type { TestContext } from '../types.ts'
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'file.css',
       content: `h1 {
   font-size: 20px;
 }
 `,
+      name: 'file.css',
     },
   ])
   await Editor.closeAll()

@@ -1,6 +1,6 @@
+import type { Readable } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
 import { PortStream } from '../PortStream/PortStream.ts'
-import { Readable } from 'node:stream'
 
 export const createPipeline = (stream: Readable) => {
   const { port1, port2 } = new MessageChannel()

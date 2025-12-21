@@ -11,7 +11,7 @@ export const fetchCommits = async (): Promise<Commit[]> => {
       headers: {
         'User-Agent': 'vscode-memory-leak-finder/1.0.0',
       },
-      signal: AbortSignal.timeout(30000),
+      signal: AbortSignal.timeout(30_000),
     })
 
     if (!response.ok) {

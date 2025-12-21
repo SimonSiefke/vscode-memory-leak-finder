@@ -2,7 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   const notebook = {
     cells: [
       {
@@ -97,8 +97,8 @@ export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promi
 
   await Workspace.setFiles([
     {
-      name: 'test.ipynb',
       content: JSON.stringify(notebook, null, 2) + '\n',
+      name: 'test.ipynb',
     },
   ])
   await Editor.closeAll()

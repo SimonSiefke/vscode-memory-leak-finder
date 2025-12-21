@@ -1,14 +1,14 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ Workspace, Editor, Explorer }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'a.txt',
       content: 'a',
+      name: 'a.txt',
     },
     {
-      name: 'b.txt',
       content: 'b',
+      name: 'b.txt',
     },
   ])
   await Editor.closeAll()

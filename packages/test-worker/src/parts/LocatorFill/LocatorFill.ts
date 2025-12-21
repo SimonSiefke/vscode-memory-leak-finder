@@ -6,7 +6,6 @@ export const fill = async (locator, text) => {
   Assert.string(text)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
       arguments: [
         {
           value: locator,
@@ -21,6 +20,7 @@ export const fill = async (locator, text) => {
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
     },
     locator,
   )

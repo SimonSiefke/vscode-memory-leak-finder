@@ -5,13 +5,13 @@ export const toHaveTitle = async (page, expectedTitle) => {
   const pageObject = PageObjectState.getPageObjectContext(connectionId)
   // @ts-ignore
   const actualTitle = await pageObject.utilityContext.callFunctionOn({
-    functionDeclaration: '(expectedTitle) => test.checkTitle(expectedTitle)',
-    awaitPromise: true,
-    returnByValue: true,
     arguments: [
       {
         value: expectedTitle,
       },
     ],
+    awaitPromise: true,
+    functionDeclaration: '(expectedTitle) => test.checkTitle(expectedTitle)',
+    returnByValue: true,
   })
 }

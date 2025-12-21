@@ -2,27 +2,27 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
-export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
+export const setup = async ({ Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'file-to-copy.txt',
       content: 'original content to be copied',
+      name: 'file-to-copy.txt',
     },
     {
-      name: 'source-folder/original-file.txt',
       content: 'file in source folder',
+      name: 'source-folder/original-file.txt',
     },
     {
-      name: 'source-folder/nested-file.js',
       content: 'console.log("hello world");',
+      name: 'source-folder/nested-file.js',
     },
     {
+      content: 'placeholder',
       name: 'destination-folder/placeholder.txt',
-      content: 'placeholder',
     },
     {
-      name: 'another-folder/placeholder.txt',
       content: 'placeholder',
+      name: 'another-folder/placeholder.txt',
     },
   ])
   await Explorer.focus()
@@ -32,11 +32,11 @@ export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void>
   await Explorer.shouldHaveItem('another-folder')
 }
 
-export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
+export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> => {
   // Copy a file from root to a folder via file system operation
   await Workspace.add({
-    name: 'destination-folder/copied-file.txt',
     content: 'original content to be copied',
+    name: 'destination-folder/copied-file.txt',
   })
 
   // Verify original file still exists and copy appears in destination
@@ -46,8 +46,8 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
 
   // Copy a file from one folder to another via file system operation
   await Workspace.add({
-    name: 'destination-folder/source-file.txt',
     content: 'file copied from source folder',
+    name: 'destination-folder/source-file.txt',
   })
 
   // Verify file was copied to destination
@@ -56,8 +56,8 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
 
   // Copy with different name
   await Workspace.add({
-    name: 'another-folder/renamed-copy.txt',
     content: 'original content to be copied',
+    name: 'another-folder/renamed-copy.txt',
   })
 
   // Verify the renamed copy exists

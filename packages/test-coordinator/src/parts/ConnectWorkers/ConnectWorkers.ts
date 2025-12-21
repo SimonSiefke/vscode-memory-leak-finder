@@ -71,8 +71,8 @@ export const connectWorkers = async (
   )
 
   return {
-    videoRpc,
     memoryRpc,
     testWorkerRpc,
+    videoRpc,
   }
 }

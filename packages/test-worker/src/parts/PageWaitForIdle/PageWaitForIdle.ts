@@ -1,7 +1,7 @@
 import * as Assert from '../Assert/Assert.ts'
 import { ExpectError } from '../ExpectError/ExpectError.ts'
-import * as PTimeout from '../PTimeout/PTimeout.ts'
 import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
+import * as PTimeout from '../PTimeout/PTimeout.ts'
 import { VError } from '../VError/VError.ts'
 
 const getExpression = (canUseIdleCallback) => {
@@ -20,10 +20,10 @@ const waitRpcIdle = (pageObject, canUseIdleCallback) => {
   const expression = getExpression(canUseIdleCallback)
   return pageObject.utilityContext.evaluate({
     awaitPromise: true,
-    replMode: true,
     expression,
-    returnByValue: true,
     generatePreview: true,
+    replMode: true,
+    returnByValue: true,
   })
 }
 

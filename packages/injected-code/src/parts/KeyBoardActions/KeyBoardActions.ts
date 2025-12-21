@@ -7,11 +7,11 @@ const getAllOptions = (options) => {
     return [
       {
         ...options,
-        keyCode: 32,
-        code: 'Space',
-        key: ' ',
         bubbles: true,
         cancelable: true,
+        code: 'Space',
+        key: ' ',
+        keyCode: 32,
       },
     ]
   }
@@ -65,7 +65,7 @@ export const press = (options, element = document.activeElement) => {
     DispatchEvent.keyPress(element, option)
   }
   if (isInputElement(element) && isSpaceLike(options.key)) {
-    element.dispatchEvent(new InputEvent('input', { data: ' ', isComposing: false, inputType: 'insertText' }))
+    element.dispatchEvent(new InputEvent('input', { data: ' ', inputType: 'insertText', isComposing: false }))
   }
   for (const option of allOptions) {
     DispatchEvent.keyUp(element, option)
