@@ -23,10 +23,10 @@ test('element is not of type iframe', () => {
 
 test('select inside iframe', () => {
   const element = {
-    nodeName: 'IFRAME',
     contentDocument: {
       querySelectorAll() {},
     },
+    nodeName: 'IFRAME',
   }
   const roots = [element]
   expect(QuerySelectorAllInternalEnterFrame.querySelectorAll(roots, '', '')).toEqual([element.contentDocument])
