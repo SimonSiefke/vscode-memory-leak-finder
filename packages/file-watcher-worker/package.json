@@ -1,13 +1,13 @@
 {
   "name": "@vscode-memory-leak-finder/file-watcher-worker",
   "version": "0.0.0-dev",
-  "type": "module",
   "description": "",
+  "keywords": [],
+  "license": "MIT",
+  "author": "",
+  "type": "module",
   "main": "src/main.js",
   "scripts": {},
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
   "dependencies": {
     "chokidar": "^5.0.0"
   }
