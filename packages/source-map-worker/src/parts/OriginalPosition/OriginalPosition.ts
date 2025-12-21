@@ -1,6 +1,6 @@
 export interface OriginalPosition {
-  readonly source: string | null
-  readonly line: number | null
   readonly column: number | null
+  readonly line: number | null
   readonly name: string | null
+  readonly source: string | null
 }
