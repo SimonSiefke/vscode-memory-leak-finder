@@ -1,5 +1,5 @@
-import * as Proxy from '../Proxy/Proxy.ts'
 import * as ConvertRequestsToMocks from '../ConvertRequestsToMocks/ConvertRequestsToMocks.ts'
+import * as Proxy from '../Proxy/Proxy.ts'
 
 export const commandMap = {
   'ConvertRequestsToMocks.convertRequestsToMocksMain': ConvertRequestsToMocks.convertRequestsToMocksMain,
