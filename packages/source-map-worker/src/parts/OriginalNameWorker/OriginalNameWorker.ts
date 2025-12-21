@@ -6,5 +6,12 @@ export const create = async () => {
     commandMap: {},
     path: getOriginalNameWorkerPath(),
   })
-  return rpc
+  return {
+    invoke(method: string, ...params: readonly any[]): Promise<any> {
+      return rpc.invoke(method, ...params)
+    },
+    async [Symbol.asyncDispose]() {
+      await rpc.dispose()
+    },
+  }
 }
