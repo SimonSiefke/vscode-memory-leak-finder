@@ -108,7 +108,7 @@ jobs:
           - name: promise-count
             args: --measure promise-count
           - name: promises-with-stack-trace
-            args: --measure promises-with-stack-trace --runs 37
+            args: --measure promises-with-stack-trace --runs 37  --restart-between --run-skipped-tests-anyway
           - name: named-array-count
             args: --measure named-array-count
           - name: css-rule-count
