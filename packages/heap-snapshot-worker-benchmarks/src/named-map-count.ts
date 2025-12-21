@@ -38,8 +38,8 @@ const testNamedMapCount = async (): Promise<void> => {
     for (const [size, count] of Object.entries(sizeStats)
       .sort((a, b) => Number.parseInt(a[0]) - Number.parseInt(b[0]))
       .slice(0, 10)) {
-        console.log(`Size ${size}: ${count} maps`)
-      }
+      console.log(`Size ${size}: ${count} maps`)
+    }
   } catch (error) {
     console.error('Error:', (error as Error).message)
   }
