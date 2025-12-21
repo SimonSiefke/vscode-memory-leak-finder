@@ -7,13 +7,8 @@ export const requiresNetwork = 1
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-<<<<<<< HEAD
-      name: 'index.html',
-      content: '<h1>hello world</h1>',
-=======
       content: '<h1>hello world</h1>',
       name: 'index.html',
->>>>>>> origin/main
     },
   ])
   await Editor.open('index.html')

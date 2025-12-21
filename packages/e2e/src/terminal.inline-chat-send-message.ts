@@ -5,15 +5,6 @@ export const skip = 1
 export const requiresNetwork = 1
 
 export const setup = async ({
-<<<<<<< HEAD
-  Electron,
-  Extensions,
-  ExtensionDetailView,
-  Editor,
-  Panel,
-  SideBar,
-  SettingsEditor,
-=======
   Editor,
   Electron,
   ExtensionDetailView,
@@ -21,7 +12,6 @@ export const setup = async ({
   Panel,
   SettingsEditor,
   SideBar,
->>>>>>> origin/main
   Terminal,
   Workspace,
 }: TestContext): Promise<void> => {
@@ -41,13 +31,8 @@ export const setup = async ({
   await Panel.hide()
   await SettingsEditor.open()
   await SettingsEditor.search({
-<<<<<<< HEAD
-    value: 'terminal.integrated.shellIntegration.enabled',
-    resultCount: 5,
-=======
     resultCount: 5,
     value: 'terminal.integrated.shellIntegration.enabled',
->>>>>>> origin/main
   })
   await SettingsEditor.enableCheckBox({
     name: 'terminal.integrated.shellIntegration.enabled',
@@ -62,11 +47,7 @@ export const setup = async ({
 }
 
 // @ts-ignore
-<<<<<<< HEAD
-export const run = async ({ Terminal, Workspace, TerminalInlineChat }: TestContext): Promise<void> => {
-=======
 export const run = async ({ Terminal, TerminalInlineChat, Workspace }: TestContext): Promise<void> => {
->>>>>>> origin/main
   await TerminalInlineChat.show()
   await TerminalInlineChat.sendMessage({
     message: 'test',
@@ -75,21 +56,12 @@ export const run = async ({ Terminal, TerminalInlineChat, Workspace }: TestConte
   await TerminalInlineChat.hide()
 }
 
-<<<<<<< HEAD
-export const teardown = async ({ Editor, Terminal, SettingsEditor }: TestContext): Promise<void> => {
-  await Terminal.killAll()
-  await SettingsEditor.open()
-  await SettingsEditor.search({
-    value: 'terminal.integrated.shellIntegration.enabled',
-    resultCount: 5,
-=======
 export const teardown = async ({ Editor, SettingsEditor, Terminal }: TestContext): Promise<void> => {
   await Terminal.killAll()
   await SettingsEditor.open()
   await SettingsEditor.search({
     resultCount: 5,
     value: 'terminal.integrated.shellIntegration.enabled',
->>>>>>> origin/main
   })
   await SettingsEditor.disableCheckBox({
     name: 'terminal.integrated.shellIntegration.enabled',

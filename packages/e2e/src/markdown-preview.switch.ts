@@ -20,23 +20,6 @@ export const setup = async ({
     {
       content: `# abc`,
       name: 'other.md',
-  Workbench,
-  Workspace,
-  Explorer,
-  Editor,
-  QuickPick,
-  // @ts-ignore
-  WellKnownCommands,
-  MarkdownPreview,
-}: TestContext): Promise<void> => {
-  await Workspace.setFiles([
-    {
-      name: 'index.md',
-      content: `# hello world`,
-    },
-    {
-      name: 'other.md',
-      content: `# abc`,
     },
   ])
   await Editor.closeAll()
@@ -54,7 +37,6 @@ export const setup = async ({
 
 // @ts-ignore
 export const run = async ({ Editor, MarkdownPreview, QuickPick, WellKnownCommands, Workbench }: TestContext): Promise<void> => {
-export const run = async ({ Workbench, Editor, QuickPick, WellKnownCommands, MarkdownPreview }: TestContext): Promise<void> => {
   await Editor.open('other.md')
   const subFrame2 = await MarkdownPreview.shouldBeVisible()
   // @ts-ignore

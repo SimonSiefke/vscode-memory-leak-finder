@@ -1,16 +1,5 @@
 import type { TestContext } from '../types.ts'
 
-<<<<<<< HEAD
-export const setup = async ({ Editor, Workspace, Problems }: TestContext): Promise<void> => {
-  await Workspace.setFiles([
-    {
-      name: 'src/main.ts',
-      content: `const x: string = 42
-`,
-    },
-    {
-      name: 'tsconfig.json',
-=======
 export const setup = async ({ Editor, Problems, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
@@ -19,7 +8,6 @@ export const setup = async ({ Editor, Problems, Workspace }: TestContext): Promi
       name: 'src/main.ts',
     },
     {
->>>>>>> origin/main
       content: `{
   "compilerOptions": {
     "strict": true,
@@ -30,10 +18,7 @@ export const setup = async ({ Editor, Problems, Workspace }: TestContext): Promi
   "include": ["src"]
 }
 `,
-<<<<<<< HEAD
-=======
       name: 'tsconfig.json',
->>>>>>> origin/main
     },
   ])
   await Editor.closeAll()
