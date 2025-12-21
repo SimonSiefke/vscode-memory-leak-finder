@@ -1,7 +1,8 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import { Session } from '../Session/Session.ts'
 import * as SplitLines from '../SplitLines/SplitLines.ts'
 
-export const getConstructorStackTraces = async (session, objectGroup, key) => {
+export const getConstructorStackTraces = async (session: Session, objectGroup: string, key: string) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: `___original${key}.prototype`,
     returnByValue: false,

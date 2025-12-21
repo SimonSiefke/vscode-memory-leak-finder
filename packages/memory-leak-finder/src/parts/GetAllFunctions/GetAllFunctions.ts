@@ -3,8 +3,9 @@ import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
 import * as GetObjectIds from '../GetObjectIds/GetObjectIds.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
+import { Session } from '../Session/Session.ts'
 
-export const getAllFunctions = async (session, objectGroup) => {
+export const getAllFunctions = async (session: Session, objectGroup: string) => {
   Assert.object(session)
   Assert.string(objectGroup)
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {

@@ -3,22 +3,23 @@ import * as GetBooleanCount from '../GetBooleanCount/GetBooleanCount.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import { Session } from '../Session/Session.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.BooleanCount
 
 export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]
 }
 
-export const start = (session, objectGroup) => {
+export const start = (session: Session, objectGroup: string) => {
   return GetBooleanCount.getBooleanCount(session, objectGroup)
 }
 
-export const stop = (session, objectGroup) => {
+export const stop = (session: Session, objectGroup: string) => {
   return GetBooleanCount.getBooleanCount(session, objectGroup)
 }
 
