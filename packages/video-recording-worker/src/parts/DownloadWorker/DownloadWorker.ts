@@ -4,10 +4,10 @@ import * as GetDownloadWorkerUrl from '../GetDownloadWorkerUrl/GetDownloadWorker
 export const launch = async () => {
   const url = GetDownloadWorkerUrl.getDownloadWorkerUrl()
   const rpc = await NodeWorkerRpcParent.create({
+    commandMap: {},
+    execArgv: [],
     path: url,
     stdio: 'inherit',
-    execArgv: [],
-    commandMap: {},
   })
   return rpc
 }

@@ -5,8 +5,8 @@ test('DebuggerCreateRpcConnection - createRpc should create RPC object', async (
   const { Rpc } = await import('../src/parts/ObjectType/ObjectType.ts')
 
   const mockIpc = {
-    send: jest.fn(),
     onmessage: null,
+    send: jest.fn(),
   }
 
   const rpc = createRpc(mockIpc)
@@ -26,8 +26,8 @@ test('DebuggerCreateRpcConnection - invoke should send message and handle respon
   const { createRpc } = await import('../src/parts/DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts')
 
   const mockIpc = {
-    send: jest.fn(),
     onmessage: null as any,
+    send: jest.fn(),
   }
 
   const rpc = createRpc(mockIpc)
@@ -40,8 +40,8 @@ test('DebuggerCreateRpcConnection - should handle messages without listener', as
   const { createRpc } = await import('../src/parts/DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts')
 
   const mockIpc = {
-    send: jest.fn(),
     onmessage: null as any,
+    send: jest.fn(),
   }
 
   createRpc(mockIpc)
