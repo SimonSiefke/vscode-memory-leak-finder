@@ -1,13 +1,6 @@
 import { NodeForkedProcessRpcParent } from '@lvce-editor/rpc'
 import * as HeapSnapshotWorkerPath from '../HeapSnapshotWorkerPath/HeapSnapshotWorkerPath.ts'
-
-const getNodeMajorVersion = () => {
-  const raw = process.versions.node || ''
-  const parts = raw.split('.')
-  const first = parts[0]
-  const parsed = parseInt(first, 0)
-  return parsed
-}
+import { getNodeMajorVersion } from '../GetNodeVersionMajor/GetNodeVersionMajor.ts'
 
 export const launchHeapSnapshotWorker = async () => {
   const major = getNodeMajorVersion()
@@ -20,5 +13,12 @@ export const launchHeapSnapshotWorker = async () => {
     execArgv: ['--max-old-space-size=8192'],
     commandMap: {},
   })
-  return rpc
+  return {
+    invoke(method: string, ...params: readonly any[]) {
+      return rpc.invoke(method, ...params)
+    },
+    async [Symbol.asyncDispose]() {
+      await rpc.dispose()
+    },
+  }
 }
