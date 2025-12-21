@@ -5,8 +5,8 @@ export const skip = true
 export const setup = async ({ ActivityBar, Search, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'file.txt',
       content: 'sample text',
+      name: 'file.txt',
     },
   ])
   await ActivityBar.showSearch()
@@ -14,7 +14,7 @@ export const setup = async ({ ActivityBar, Search, Workspace }: TestContext): Pr
   await Search.toHaveResults(['file.txt1', 'sample text'])
 }
 
-export const run = async ({ Search, Editor }: TestContext): Promise<void> => {
+export const run = async ({ Editor, Search }: TestContext): Promise<void> => {
   await Search.openEditor()
   await Editor.close()
 }

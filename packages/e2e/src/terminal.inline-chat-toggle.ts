@@ -5,13 +5,13 @@ export const skip = 1
 export const requiresNetwork = 1
 
 export const setup = async ({
-  Electron,
-  Extensions,
-  ExtensionDetailView,
   Editor,
+  Electron,
+  ExtensionDetailView,
+  Extensions,
   Panel,
-  SideBar,
   SettingsEditor,
+  SideBar,
   Terminal,
   Workspace,
 }: TestContext): Promise<void> => {
@@ -31,8 +31,8 @@ export const setup = async ({
   await Panel.hide()
   await SettingsEditor.open()
   await SettingsEditor.search({
-    value: 'terminal.integrated.shellIntegration.enabled',
     resultCount: 5,
+    value: 'terminal.integrated.shellIntegration.enabled',
   })
   await SettingsEditor.enableCheckBox({
     name: 'terminal.integrated.shellIntegration.enabled',
@@ -52,12 +52,12 @@ export const run = async ({ TerminalInlineChat }: TestContext): Promise<void> =>
   await TerminalInlineChat.hide()
 }
 
-export const teardown = async ({ Editor, Terminal, SettingsEditor }: TestContext): Promise<void> => {
+export const teardown = async ({ Editor, SettingsEditor, Terminal }: TestContext): Promise<void> => {
   await Terminal.killAll()
   await SettingsEditor.open()
   await SettingsEditor.search({
-    value: 'terminal.integrated.shellIntegration.enabled',
     resultCount: 5,
+    value: 'terminal.integrated.shellIntegration.enabled',
   })
   await SettingsEditor.disableCheckBox({
     name: 'terminal.integrated.shellIntegration.enabled',

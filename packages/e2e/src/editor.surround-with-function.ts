@@ -9,14 +9,13 @@ const result = a + b
 
 export const skip = 1
 
-export const setup = async ({ Editor, Workspace, Explorer }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'src/main.ts',
       content: originalContent,
+      name: 'src/main.ts',
     },
     {
-      name: 'tsconfig.json',
       content: `{
   "compilerOptions": {
     "strict": true,
@@ -27,6 +26,7 @@ export const setup = async ({ Editor, Workspace, Explorer }: TestContext): Promi
   "include": ["src"]
 }
 `,
+      name: 'tsconfig.json',
     },
   ])
   await Editor.closeAll()
@@ -62,8 +62,8 @@ function newFunction() {
   await Editor.save({ viaKeyBoard: true })
 
   await Workspace.add({
-    name: 'src/main.ts',
     content: originalContent,
+    name: 'src/main.ts',
   })
 }
 

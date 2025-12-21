@@ -2,11 +2,11 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ Workspace, Editor }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'file.html',
       content: 'sample text',
+      name: 'file.html',
     },
   ])
   await Editor.open('file.html')

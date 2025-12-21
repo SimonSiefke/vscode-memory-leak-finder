@@ -6,8 +6,8 @@ export const setup = async ({ Editor, Electron, Workspace }: TestContext): Promi
   await Workspace.setFiles([])
   const filePath = Workspace.getWorkspaceFilePath('exported-profile.code-profile')
   await Electron.mockSaveDialog({
-    filePath,
     canceled: false,
+    filePath,
   })
   await Electron.mockDialog({
     response: 0,
@@ -15,7 +15,7 @@ export const setup = async ({ Editor, Electron, Workspace }: TestContext): Promi
   await Editor.closeAll()
 }
 
-export const run = async ({ Profile, Explorer, Workspace }: TestContext): Promise<void> => {
+export const run = async ({ Explorer, Profile, Workspace }: TestContext): Promise<void> => {
   await Profile.export({
     name: 'test',
   })
