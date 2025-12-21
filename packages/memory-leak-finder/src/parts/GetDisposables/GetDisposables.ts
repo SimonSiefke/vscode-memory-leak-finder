@@ -1,6 +1,6 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
-import { Session } from '../Session/Session.ts'
+import type { Session } from '../Session/Session.ts'
 
 export const getDisposables = async (session: Session, objectGroup: string) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {

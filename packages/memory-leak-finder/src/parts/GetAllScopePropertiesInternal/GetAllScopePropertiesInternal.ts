@@ -1,6 +1,6 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as GetScopeProperties from '../GetFunctionScopeProperty/GetFunctionScopeProperty.ts'
-import { Session } from '../Session/Session.ts'
+import type { Session } from '../Session/Session.ts'
 
 const isDefined = (value) => {
   return value !== ''

@@ -1,5 +1,5 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-import { Session } from '../Session/Session.ts'
+import type { Session } from '../Session/Session.ts'
 import * as SplitLines from '../SplitLines/SplitLines.ts'
 
 export const getConstructorStackTraces = async (session: Session, objectGroup: string, key: string) => {

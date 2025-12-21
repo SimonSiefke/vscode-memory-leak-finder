@@ -8,7 +8,7 @@ import * as StartTrackPromiseStackTraces from '../StartTrackPromiseStackTraces/S
 import * as StopTrackingPromiseStackTraces from '../StopTrackPromiseStackTraces/StopTrackingPromiseStackTraces.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
-import { Session } from '../Session/Session.ts'
+import type { Session } from '../Session/Session.ts'
 
 export const id = MeasureId.PromisesWithStackTrace
 

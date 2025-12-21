@@ -1,5 +1,5 @@
 import * as AddStackTraceToEventListener from '../AddStackTraceToEventListener/AddStackTraceToEventListener.ts'
-import { Session } from '../Session/Session.ts'
+import type { Session } from '../Session/Session.ts'
 
 export const addStackTracesToEventListeners = async (session: Session, leakingEventListeners: readonly any[]) => {
   const promises: Promise<any>[] = []

@@ -2,7 +2,7 @@ import { join } from 'node:path'
 import * as HeapSnapshot from '../HeapSnapshot/HeapSnapshot.ts'
 import * as HeapSnapshotFunctions from '../HeapSnapshotFunctions/HeapSnapshotFunctions.ts'
 import * as Root from '../Root/Root.ts'
-import { Session } from '../Session/Session.ts'
+import type { Session } from '../Session/Session.ts'
 /**
  *
  * @param {any} session

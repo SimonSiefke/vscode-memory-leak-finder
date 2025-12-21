@@ -2,7 +2,7 @@ import * as CompareEventTargets from '../CompareEventTargets/CompareEventTargets
 import * as GetEventTargets from '../GetEventTargets/GetEventTargets.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
-import { Session } from '../Session/Session.ts'
+import type { Session } from '../Session/Session.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.EventTargets
