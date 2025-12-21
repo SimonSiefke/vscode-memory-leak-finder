@@ -1,8 +1,8 @@
 import { mkdir, writeFile } from 'fs/promises'
 import { join } from 'path'
 import * as Root from '../Root/Root.ts'
-import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
+import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
@@ -43,9 +43,9 @@ export const savePostBody = async (method: string, url: string, headers: Record<
       try {
         const formData: Record<string, string> = {}
         const params = new URLSearchParams(parsedBody)
-        params.forEach((value, key) => {
+        for (const [key, value] of params.entries()) {
           formData[key] = value
-        })
+        }
         parsedBody = formData
         bodyFormat = 'form-urlencoded'
       } catch {
@@ -59,14 +59,14 @@ export const savePostBody = async (method: string, url: string, headers: Record<
     }
 
     const postData = {
-      timestamp,
-      method,
-      url,
-      contentType,
-      bodyFormat,
-      headers,
       body: parsedBody,
+      bodyFormat,
+      contentType,
+      headers,
+      method,
       rawBody: bodyFormat === 'zip' ? undefined : body.toString('utf8'),
+      timestamp,
+      url,
     }
 
     await writeFile(filepath, JSON.stringify(postData, null, 2), 'utf8')
