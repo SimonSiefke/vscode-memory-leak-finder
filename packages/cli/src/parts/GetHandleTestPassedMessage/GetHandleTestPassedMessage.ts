@@ -6,6 +6,7 @@ export const getHandleTestPassedMessage = async (
   fileName: string,
   duration: number,
   isLeak: boolean,
+  wasOriginallySkipped: boolean,
 ): Promise<string> => {
-  return StdoutWorker.invoke('Stdout.getHandleTestPassedMessage', file, relativeDirName, fileName, duration, isLeak)
+  return StdoutWorker.invoke('Stdout.getHandleTestPassedMessage', file, relativeDirName, fileName, duration, isLeak, wasOriginallySkipped)
 }

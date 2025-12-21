@@ -1,8 +1,8 @@
 import { VError } from '@lvce-editor/verror'
+import * as os from 'os'
 import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 import * as Logger from '../Logger/Logger.ts'
 import * as Path from '../Path/Path.ts'
-import * as os from 'os'
 
 // Configuration constants
 const RIPGREP_VERSION = 'v13.0.0-13'
@@ -22,33 +22,33 @@ const getTarget = (): string => {
 
     case 'linux':
       switch (arch) {
-        case 'x64':
-          return 'x86_64-unknown-linux-musl'
-        case 'arm64':
         case 'aarch64':
+        case 'arm64':
           return 'aarch64-unknown-linux-musl'
         case 'arm':
         case 'armv7l':
           return 'arm-unknown-linux-gnueabihf'
+        case 'ia32':
+        case 'x32':
+          return 'i686-unknown-linux-musl'
         case 'ppc64':
           return 'powerpc64le-unknown-linux-gnu'
         case 'riscv64':
           return 'riscv64gc-unknown-linux-gnu'
         case 's390x':
           return 's390x-unknown-linux-gnu'
-        case 'ia32':
-        case 'x32':
-          return 'i686-unknown-linux-musl'
+        case 'x64':
+          return 'x86_64-unknown-linux-musl'
         default:
           return 'x86_64-unknown-linux-musl'
       }
 
     case 'win32':
       switch (arch) {
-        case 'x64':
-          return 'x86_64-pc-windows-msvc'
         case 'arm64':
           return 'aarch64-pc-windows-msvc'
+        case 'x64':
+          return 'x86_64-pc-windows-msvc'
         default:
           return 'i686-pc-windows-msvc'
       }
@@ -87,11 +87,11 @@ const downloadWithRetry = async (url: string, outputPath: string, maxRetries = 3
 
         const request = https.get(
           {
-            hostname: parsedUrl.hostname,
-            path: parsedUrl.pathname + parsedUrl.search,
             headers: {
               'User-Agent': 'vscode-memory-leak-finder/1.0.0',
             },
+            hostname: parsedUrl.hostname,
+            path: parsedUrl.pathname + parsedUrl.search,
           },
           (response) => {
             // Handle redirects
@@ -132,7 +132,7 @@ const downloadWithRetry = async (url: string, outputPath: string, maxRetries = 3
           reject(err)
         })
 
-        request.setTimeout(30000, () => {
+        request.setTimeout(30_000, () => {
           request.destroy()
           file.close()
           fs.unlink(outputPath, () => {}) // Clean up on timeout

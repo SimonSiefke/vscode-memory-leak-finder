@@ -2,7 +2,7 @@ import * as GetMessagePortCountsData from '../GetMessagePortCountsData/GetMessag
 
 export const name = 'message-port-count'
 
-export const getData = GetMessagePortCountsData.getMessagePortCountsData
+export const getData = (basePath: string) => GetMessagePortCountsData.getMessagePortCountsData(basePath)
 
 export const createChart = () => {
   return {

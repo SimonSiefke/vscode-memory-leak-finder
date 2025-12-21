@@ -1,3 +1,5 @@
+import * as Terminal from '../Terminal/Terminal.ts'
+
 const isDevtoolsCannotFindContextError = (error) => {
   return (
     error.name === 'DevtoolsProtocolError' &&
@@ -5,9 +7,15 @@ const isDevtoolsCannotFindContextError = (error) => {
   )
 }
 
-export const create = ({ page, expect }) => {
+export const create = ({ page, expect, VError, ideVersion, electronApp }) => {
   return {
-    async waitForApplicationToBeReady(): Promise<void> {
+    async waitForApplicationToBeReady({
+      inspectPtyHost,
+      enableExtensions,
+    }: {
+      inspectPtyHost: boolean
+      enableExtensions: boolean
+    }): Promise<void> {
       try {
         const main = page.locator('[role="main"]')
         await expect(main).toBeVisible({
@@ -25,10 +33,23 @@ export const create = ({ page, expect }) => {
           throw error
         }
       }
-      const notification = page.locator('text=All installed extensions are temporarily disabled.')
-      await expect(notification).toBeVisible({
-        timeout: 15_000,
-      })
+      if (!enableExtensions) {
+        const notification = page.locator('text=All installed extensions are temporarily disabled.')
+        await expect(notification).toBeVisible({
+          timeout: 15_000,
+        })
+      }
+      if (inspectPtyHost) {
+        const terminal = Terminal.create({
+          page,
+          expect,
+          VError,
+          ideVersion,
+          electronApp,
+        })
+        await terminal.show()
+        await terminal.killAll()
+      }
     },
   }
 }

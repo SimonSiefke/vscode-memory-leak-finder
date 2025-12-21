@@ -1,6 +1,9 @@
+import { cp } from 'fs/promises'
+import { basename, join } from 'path'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as IsMacos from '../IsMacos/IsMacos.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as Root from '../Root/Root.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 const selectAll = IsMacos.isMacos ? 'Meta+A' : 'Control+A'
@@ -10,10 +13,12 @@ const nonBreakingSpace = String.fromCharCode(160)
 
 export const create = ({ expect, page, VError, ideVersion }) => {
   return {
-    async search(value) {
+    async search(value: string) {
       try {
+        await page.waitForIdle()
         const extensionsView = page.locator(`.extensions-viewlet`)
         await expect(extensionsView).toBeVisible()
+        await page.waitForIdle()
         if (ideVersion && ideVersion.minor <= 100) {
           const extensionsInput = extensionsView.locator('.inputarea')
           await expect(extensionsInput).toBeFocused()
@@ -25,10 +30,13 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         }
         const lines = extensionsView.locator('.monaco-editor .view-lines')
         await page.keyboard.press(selectAll)
+        await page.waitForIdle()
         await page.keyboard.press('Backspace')
+        await page.waitForIdle()
         await expect(lines).toHaveText('', {
           timeout: 3000,
         })
+        await page.waitForIdle()
         if (ideVersion && ideVersion.minor <= 100) {
           const extensionsInput = extensionsView.locator('.inputarea')
           await extensionsInput.type(value)
@@ -36,8 +44,19 @@ export const create = ({ expect, page, VError, ideVersion }) => {
           const extensionsInput = extensionsView.locator('.native-edit-context')
           await extensionsInput.type(value)
         }
+        await this.waitForProgressToBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to search for ${value}`)
+      }
+    },
+    async waitForProgressToBeHidden() {
+      try {
+        await page.waitForIdle()
+        const progress = page.locator('.sidebar .monaco-progress-container')
+        await expect(progress).toBeHidden({ timeout: 30_000 })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to hide progress`)
       }
     },
     async clear() {
@@ -47,6 +66,31 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         await this.shouldHaveValue('')
       } catch (error) {
         throw new VError(error, `Failed to clear`)
+      }
+    },
+    async add(path, expectedName) {
+      try {
+        await page.waitForIdle()
+        // TODO could create symlink also
+        const absolutePath = join(Root.root, path)
+        const base = basename(absolutePath)
+        const destination = join(Root.root, '.vscode-extensions', base)
+        await cp(absolutePath, destination, { recursive: true, force: true })
+        await page.waitForIdle()
+        await this.show()
+        await page.waitForIdle()
+        await this.search('@installed')
+        await page.waitForIdle()
+        const firstExtension = page.locator('.extension-list-item').first()
+        await expect(firstExtension).toBeVisible()
+        const nameLocator = firstExtension.locator('.name')
+        await expect(nameLocator).toBeVisible()
+        await expect(nameLocator).toHaveText(expectedName)
+        await page.waitForIdle()
+        await this.hide()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to add extension`)
       }
     },
     async shouldHaveValue(value) {
@@ -60,8 +104,50 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         throw new VError(error, `Failed to verify that extension input has value ${value}`)
       }
     },
+    async shouldHaveMcpItem({ name }) {
+      try {
+        const paneHeader = page.locator('[aria-label="MCP Servers - Installed Section"]')
+        await expect(paneHeader).toBeVisible()
+        const list = page.locator('.monaco-list[aria-label="MCP Servers"]')
+        await expect(list).toBeVisible()
+        const item = list.locator(`[aria-label="${name}"]`)
+        await expect(item).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that mcp item is visible ${name}`)
+      }
+    },
+    async selectMcpItem({ name }) {
+      try {
+        const list = page.locator('.monaco-list[aria-label="MCP Servers"]')
+        await expect(list).toBeVisible()
+        const item = list.locator(`[aria-label="${name}"]`)
+        await expect(item).toBeVisible()
+        await item.click()
+        const editor = page.locator('.part.editor')
+        await expect(editor).toBeVisible()
+        const tab = page.locator('.tab[aria-label="MCP Server: my-advanced-mcp-server"]')
+        await expect(tab).toBeVisible()
+        const mcpEditor = page.locator('.extension-editor.mcp-server-editor')
+        await expect(mcpEditor).toBeVisible()
+        const configuration = mcpEditor.locator('.configuration')
+        await expect(configuration).toBeVisible()
+        const firstItem = configuration.locator('.config-section').nth(0)
+        const firstItemLabel = firstItem.locator('.config-label')
+        const firstItemValue = firstItem.locator('.config-value')
+        await expect(firstItemLabel).toHaveText('Name:')
+        await expect(firstItemValue).toHaveText('my-advanced-mcp-server')
+        const secondItem = configuration.locator('.config-section').nth(1)
+        const secondItemLabel = secondItem.locator('.config-label')
+        const secondItemValue = secondItem.locator('.config-value')
+        await expect(secondItemLabel).toHaveText('Type:')
+        await expect(secondItemValue).toHaveText('http')
+      } catch (error) {
+        throw new VError(error, `Failed select item ${name}`)
+      }
+    },
     async show() {
       try {
+        await page.waitForIdle()
         const searchItem = page.locator(`.action-item:has([aria-label^="Extensions"])`)
         const selected = await searchItem.getAttribute('aria-selected')
         if (selected !== 'true') {
@@ -73,6 +159,7 @@ export const create = ({ expect, page, VError, ideVersion }) => {
           await quickPick.executeCommand(WellKnownCommands.ShowExtensions)
           const extensionsView = page.locator(`.extensions-viewlet`)
           await expect(extensionsView).toBeVisible()
+          await page.waitForIdle()
         }
         const extensionsView = page.locator(`.extensions-viewlet`)
         const suggestContainer = page.locator(`.suggest-input-container`)
@@ -93,10 +180,14 @@ export const create = ({ expect, page, VError, ideVersion }) => {
           const className = await suggestContainer.getAttribute('class')
           if (!className.includes('synthetic-focus')) {
             await suggestContainer.click()
+            await page.waitForIdle()
             await expect(extensionsInput).toBeVisible()
+            await page.waitForIdle()
             await extensionsInput.click()
+            await page.waitForIdle()
           }
           await extensionsInput.focus()
+          await page.waitForIdle()
           await expect(suggestContainer).toHaveClass('synthetic-focus')
           await expect(extensionsInput).toBeFocused()
           await page.waitForIdle()
@@ -123,12 +214,24 @@ export const create = ({ expect, page, VError, ideVersion }) => {
     },
     async openSuggest() {
       try {
+        await page.waitForIdle()
         const extensionsView = page.locator('.extensions-viewlet')
-        const extensionsInput = extensionsView.locator('.inputarea')
+        const extensionsInput = extensionsView.locator('.native-edit-context')
+        await expect(extensionsInput).toBeVisible()
+        await page.waitForIdle()
         await expect(extensionsInput).toBeFocused()
-        await extensionsInput.press('Control+Space')
-        // TODO scope selector to extensions view
+        await page.waitForIdle()
         const suggestions = page.locator('[aria-label="Suggest"]')
+        // for (let i = 0; i < 5; i++) {
+        //   await page.waitForIdle()
+        //   const count = await suggestions.count()
+        //   if (count > 0) {
+        //     break
+        //   }
+        await extensionsInput.press('Control+Space')
+        // }
+        await page.waitForIdle()
+        // TODO scope selector to extensions view
         await expect(suggestions).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to open extensions suggestions`)
@@ -154,6 +257,16 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         throw new VError(error, `Failed to check mcp welcome heading`)
       }
     },
+    async restart() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.RestartExtensions)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to restart extensions`)
+      }
+    },
     async shouldHaveTitle(expectedTtitle) {
       try {
         const title = page.locator('.sidebar .title-label h2')
@@ -164,12 +277,16 @@ export const create = ({ expect, page, VError, ideVersion }) => {
       }
     },
     first: {
-      async shouldBe(name) {
+      async shouldBe(name: string) {
+        await page.waitForIdle()
         const firstExtension = page.locator('.extension-list-item').first()
         await expect(firstExtension).toBeVisible({
-          timeout: 7000,
+          timeout: 15_000,
         })
+        await page.waitForIdle()
         const nameLocator = firstExtension.locator('.name')
+        await expect(nameLocator).toBeVisible()
+        await page.waitForIdle()
         await expect(nameLocator).toHaveText(name)
         await page.waitForIdle()
       },

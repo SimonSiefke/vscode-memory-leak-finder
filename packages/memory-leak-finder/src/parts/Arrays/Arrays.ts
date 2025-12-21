@@ -11,7 +11,7 @@ export const sum = (values) => {
 }
 
 export const unique = (values) => {
-  const seen = []
+  const seen: any[] = []
   for (const value of values) {
     if (!seen.includes(value)) {
       seen.push(value)
@@ -21,7 +21,7 @@ export const unique = (values) => {
 }
 
 export const contextMap = (array, fn, ...context) => {
-  const result = []
+  const result: any[] = []
   for (const element of array) {
     result.push(fn(element, ...context))
   }
@@ -29,7 +29,7 @@ export const contextMap = (array, fn, ...context) => {
 }
 
 export const contextZipMap = (array1, array2, fn, ...context) => {
-  const result = []
+  const result: any[] = []
   for (let i = 0; i < array1.length; i++) {
     const a = array1[i]
     const b = array2[i]

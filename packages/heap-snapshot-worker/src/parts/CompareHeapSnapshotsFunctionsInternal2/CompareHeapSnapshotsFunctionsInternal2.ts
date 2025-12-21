@@ -28,16 +28,20 @@ export interface CompareResult {
 
 interface UniqueLocationWithDelta extends UniqueLocation {
   readonly delta: number
+  readonly oldIndex: number
+  readonly key: string
 }
 
-const getNewItems = (map1: UniqueLocationMap, map2: UniqueLocationMap, minCount: number): readonly UniqueLocationWithDelta[] => {
+// TODO maybe have a different function for functions and closures. keys are not needed for functions
+
+export const getNewItems = (map1: UniqueLocationMap, map2: UniqueLocationMap, minCount: number): readonly UniqueLocationWithDelta[] => {
   const newitems: UniqueLocationWithDelta[] = []
   for (const key of Object.keys(map2)) {
     const oldItem = map1[key] || emptyItem
     const newItem = map2[key]
     const delta = newItem.count - oldItem.count
-    if (delta > 0 && newItem.count >= minCount) {
-      newitems.push({ ...newItem, delta })
+    if (delta >= minCount) {
+      newitems.push({ ...newItem, delta, oldIndex: oldItem.index, key })
     }
   }
   return newitems
@@ -79,6 +83,40 @@ export interface CompareFunctionsOptions {
   readonly excludeOriginalPaths?: readonly string[]
 }
 
+const filterOutExcluded = (items: readonly any[], excludes: readonly string[]): readonly any[] => {
+  if (excludes.length > 0) {
+    const lowered = excludes.map((e) => e.toLowerCase())
+    return items.filter((item) => {
+      const original = (item.originalUrl || item.originalSource || '').toLowerCase()
+      if (!original) {
+        return true
+      }
+      for (const ex of lowered) {
+        if (original.includes(ex)) {
+          return false
+        }
+      }
+      return true
+    })
+  }
+  return items
+}
+
+const compareCount = (a, b) => {
+  return b.count - a.count
+}
+
+const cleanItem = (item) => {
+  return {
+    count: item.count,
+    delta: item.delta,
+    name: item.name,
+    sourceLocation: item.sourceLocation,
+    originalLocation: item.originalLocation,
+    originalName: item.originalName,
+  }
+}
+
 export const compareHeapSnapshotFunctionsInternal2 = async (
   before: Snapshot,
   after: Snapshot,
@@ -104,33 +142,10 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
     nodeNameOffset,
     after.strings,
   )
-  let enriched = await addOriginalSources(formattedItems)
+  const enriched = await addOriginalSources(formattedItems)
   const excludes = options.excludeOriginalPaths || []
-  if (excludes.length > 0) {
-    const lowered = excludes.map((e) => e.toLowerCase())
-    enriched = enriched.filter((item) => {
-      const original = (item.originalUrl || item.originalSource || '').toLowerCase()
-      if (!original) {
-        return true
-      }
-      for (const ex of lowered) {
-        if (original.includes(ex)) {
-          return false
-        }
-      }
-      return true
-    })
-  }
-  const sorted = enriched.toSorted((a, b) => b.count - a.count)
-  const cleanItems = sorted.map((item) => {
-    return {
-      count: item.count,
-      delta: item.delta,
-      name: item.name,
-      sourceLocation: item.sourceLocation,
-      originalLocation: item.originalLocation,
-      originalName: item.originalName,
-    }
-  })
+  const filtered = filterOutExcluded(enriched, excludes)
+  const sorted = filtered.toSorted(compareCount)
+  const cleanItems = sorted.map(cleanItem)
   return cleanItems
 }

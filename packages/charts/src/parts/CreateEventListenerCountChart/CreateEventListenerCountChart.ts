@@ -2,7 +2,7 @@ import * as GetEventListenerCountData from '../GetEventListenerCountData/GetEven
 
 export const name = 'event-listener-count'
 
-export const getData = GetEventListenerCountData.getEventListenerCountData
+export const getData = (basePath: string) => GetEventListenerCountData.getEventListenerCountData(basePath)
 
 export const createChart = () => {
   return {

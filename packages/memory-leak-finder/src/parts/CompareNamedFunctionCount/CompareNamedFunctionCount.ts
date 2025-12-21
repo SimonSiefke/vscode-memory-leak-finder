@@ -3,7 +3,7 @@ import * as SortNamedFunctions from '../SortNamedFunctions/SortNamedFunctions.ts
 
 const mergeFunctions = (beforeFunctions, afterFunctions) => {
   const beforeMap = CreateCountMap.createCountMap(beforeFunctions, 'url')
-  const leaked = []
+  const leaked: any[] = []
   for (const element of afterFunctions) {
     const beforeCount = beforeMap[element.url] || ''
     const afterCount = element.count

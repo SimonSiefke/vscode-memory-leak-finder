@@ -1,52 +1,32 @@
 import type { NodePath } from '@babel/traverse'
 import type * as t from '@babel/types'
-import { parse } from '@babel/parser'
-import traverse from '@babel/traverse'
+import { parseAst } from '../ParseAst/ParseAst.ts'
 import { fallbackScan } from '../FallbackScan/FallbackScan.ts'
 import { getEnclosingNames } from '../GetEnclosingNames/GetEnclosingNames.ts'
 import { isLocationInside } from '../IsLocationInside/IsLocationInside.ts'
+import { traverseAst } from '../GetTraverse/GetTraverse.ts'
 
 const LOCATION_UNKNOWN: string = 'unknown'
 
-export const getOriginalClassName = (sourceContent: string, originalLine: number, originalColumn: number): string => {
+export const getOriginalClassName = (
+  sourceContent: string,
+  originalLine: number,
+  originalColumn: number,
+  originalFileName: string,
+): string => {
   if (!sourceContent) {
-    return LOCATION_UNKNOWN
-  }
-
-  if (sourceContent.includes('class extends ')) {
-    const fb: string = fallbackScan(sourceContent, originalLine)
-    if (fb !== LOCATION_UNKNOWN) {
-      return fb
-    }
+    return LOCATION_UNKNOWN + ' in ' + originalFileName
   }
 
   let ast: t.File
   try {
-    ast = parse(sourceContent, {
-      sourceType: 'unambiguous',
-      plugins: ['classProperties', 'classPrivateProperties', 'classPrivateMethods', 'decorators-legacy', 'jsx', 'typescript'],
-      ranges: false,
-      errorRecovery: true,
-      tokens: false,
-    }) as unknown as t.File
+    ast = parseAst(sourceContent)
   } catch {
-    return LOCATION_UNKNOWN
+    return LOCATION_UNKNOWN + ' in ' + originalFileName
   }
 
-  const tAny = traverse as unknown as { default?: unknown; traverse?: unknown }
-  const traverseFn =
-    typeof (traverse as unknown) === 'function'
-      ? (traverse as unknown as (ast: t.File, visitors: unknown) => void)
-      : typeof tAny.default === 'function'
-        ? (tAny.default as unknown as (ast: t.File, visitors: unknown) => void)
-        : typeof tAny.traverse === 'function'
-          ? (tAny.traverse as unknown as (ast: t.File, visitors: unknown) => void)
-          : typeof (tAny.default as { default?: unknown })?.default === 'function'
-            ? ((tAny.default as { default?: unknown }).default as (ast: t.File, visitors: unknown) => void)
-            : (null as unknown as (ast: t.File, visitors: unknown) => void)
-
   let bestPath: NodePath | null = null
-  traverseFn(ast, {
+  traverseAst(ast, {
     enter(path: NodePath) {
       const { node } = path
       if (!node.loc) {

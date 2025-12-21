@@ -4,7 +4,7 @@ import * as PrettifyFlatScopeList from '../PrettifyFlatScopeList/PrettifyFlatSco
 
 export const getFlatScopeList = async (session, objectGroup) => {
   const scopeListsObjectIds = await GetFunctionScopeProperties.getFunctionScopeProperties(session, objectGroup)
-  const promises2 = []
+  const promises2: Promise<any>[] = []
   for (const objectId of scopeListsObjectIds) {
     if (!objectId) {
       continue

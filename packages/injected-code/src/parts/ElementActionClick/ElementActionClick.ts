@@ -5,6 +5,7 @@ export const click = (element, options) => {
   options.clientX = (rect.left + rect.right) / 2
   options.clientY = (rect.top + rect.bottom) / 2
   options.cancelable = true
+  options.bubbles = true
   if (options.button === 'right') {
     options.button = 2
   }

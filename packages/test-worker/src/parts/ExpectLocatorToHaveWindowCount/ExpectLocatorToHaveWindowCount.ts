@@ -1,13 +1,10 @@
 import { ExpectError } from '../ExpectError/ExpectError.ts'
-import * as SessionState from '../SessionState/SessionState.ts'
-
-const isWindow = (session) => {
-  return session.type === 'page'
-}
+import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
 
 const waitForWindowCount = (count) => {
-  const sessions = SessionState.getAllSessions()
-  const windows = sessions.filter(isWindow)
+  const connectionId = 1
+  const pageObject = PageObjectState.getPageObjectContext(connectionId)
+  const windows = pageObject.getWindows()
   if (windows.length !== count) {
     throw new ExpectError(`expected window count to be ${count} but was ${windows.length}`)
   }

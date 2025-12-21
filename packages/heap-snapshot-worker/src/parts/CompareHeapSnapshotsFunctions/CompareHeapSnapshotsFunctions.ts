@@ -44,14 +44,11 @@ export const compareHeapSnapshotFunctions = async (pathA: string, pathB: string,
     resultB = await prepareFunctions(pathB)
   }
 
-  console.timeEnd('parse')
   const parseEndTime = performance.now()
   console.log(`[CompareHeapSnapshotFunctions] Both snapshots parsed in ${(parseEndTime - startTime).toFixed(2)}ms`)
 
-  console.time('compare')
   const compareStartTime = performance.now()
   const result = compareHeapSnapshotFunctionsInternal(resultA, resultB, resultA.meta.location_fields)
-  console.timeEnd('compare')
   const compareEndTime = performance.now()
   console.log(`[CompareHeapSnapshotFunctions] Comparison completed in ${(compareEndTime - compareStartTime).toFixed(2)}ms`)
 

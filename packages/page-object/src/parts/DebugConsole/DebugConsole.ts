@@ -45,8 +45,10 @@ export const create = ({ expect, page, VError }) => {
     },
     async type(value) {
       try {
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ page, expect, VError })
         await quickPick.executeCommand(WellKnownCommands.DebugConsoleFocusOnDebugConsoleView)
+        await page.waitForIdle()
         const replInputWrapper = page.locator('.repl-input-wrapper')
         await expect(replInputWrapper).toBeVisible()
         const viewLine = replInputWrapper.locator('.view-line')
@@ -100,6 +102,21 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to clear debug console input`)
+      }
+    },
+    async shouldHaveLogpointOutput(expectedMessage) {
+      try {
+        const debugConsole = page.locator('[aria-label="Debug Console"]')
+        await expect(debugConsole).toBeVisible()
+        const logpointOutput = debugConsole.locator('[role="treeitem"]', {
+          hasText: expectedMessage,
+        })
+        await expect(logpointOutput).toBeVisible({
+          timeout: 10_000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify logpoint output: ${expectedMessage}`)
       }
     },
   }

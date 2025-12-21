@@ -8,84 +8,77 @@ import * as PageKeyBoard from '../PageKeyBoard/PageKeyBoard.ts'
 import * as PageMouse from '../PageMouse/PageMouse.ts'
 import * as PageReload from '../PageReload/PageReload.ts'
 import * as PageWaitForIdle from '../PageWaitForIdle/PageWaitForIdle.ts'
+import * as WaitForIframe from '../WaitForIframe/WaitForIframe.ts'
+import { waitForSubIframe } from '../WaitForSubIframe/WaitForSubIframe.ts'
 import * as WebWorker from '../WebWorker/WebWorker.ts'
 
-const createKeyboard = (rpc) => {
+const createKeyboard = (rpc, utilityContext) => {
   return {
-    rpc,
-    press(key) {
-      return PageKeyBoard.press(this.rpc, key)
+    contentEditableInsert(options) {
+      return PageKeyBoard.contentEditableInsert(this.rpc, this.utilityContext, options)
     },
-    type(text) {
-      return PageKeyBoard.type(this.rpc, text)
+    press(key) {
+      return PageKeyBoard.press(this.rpc, this.utilityContext, key)
     },
     pressKeyExponential(options) {
-      return PageKeyBoard.pressKeyExponential(options)
+      return PageKeyBoard.pressKeyExponential(this.rpc, this.utilityContext, options)
     },
-    contentEditableInsert(options) {
-      return PageKeyBoard.contentEditableInsert(options)
+    rpc,
+    type(text) {
+      return PageKeyBoard.type(this.rpc, this.utilityContext, text)
     },
+    utilityContext,
   }
 }
 
-const createMouse = (rpc) => {
+const createMouse = (rpc, utilityContext) => {
   return {
-    rpc,
     down() {
-      return PageMouse.down(this.rpc)
-    },
-    move(x, y) {
-      return PageMouse.move(this.rpc, x, y)
-    },
-    up() {
-      return PageMouse.up(this.rpc)
+      return PageMouse.down(this.rpc, this.utilityContext)
     },
     mockPointerEvents() {
-      return PageMouse.mockPointerEvents(this.rpc)
+      return PageMouse.mockPointerEvents(this.rpc, this.utilityContext)
     },
+    move(x, y) {
+      return PageMouse.move(this.rpc, this.utilityContext, x, y)
+    },
+    rpc,
+    up() {
+      return PageMouse.up(this.rpc, this.utilityContext)
+    },
+    utilityContext,
   }
 }
 
-export const create = async ({ electronRpc, electronObjectId, targetId, sessionId, rpc, idleTimeout }) => {
+export const create = ({
+  browserRpc,
+  electronObjectId,
+  electronRpc,
+  idleTimeout,
+  rpc,
+  sessionId,
+  sessionRpc,
+  targetId,
+  utilityContext,
+}) => {
   return {
-    type: DevtoolsTargetType.Page,
-    objectType: DevtoolsTargetType.Page,
-    sessionId,
-    targetId,
-    rpc,
-    electronRpc,
-    electronObjectId,
-    async evaluate({ expression, awaitPromise = false, replMode = false }) {
-      return PageEvaluate.evaluate(this.rpc, {
-        expression,
-        awaitPromise,
-        replMode,
+    blur() {
+      return PageBlur.blur({
+        electronObjectId: this.electronObjectId,
+        electronRpc: this.electronRpc,
       })
     },
-    async waitForIdle() {
-      return PageWaitForIdle.waitForIdle(this.rpc, this.electronRpc.canUseIdleCallback, idleTimeout)
-    },
-    async reload() {
-      return PageReload.reload(this.rpc)
-    },
+    browserRpc,
     async close() {
       return PageClose.close(this.rpc)
     },
-    pressKeyExponential(options) {
-      return PageKeyBoard.pressKeyExponential(options)
-    },
-    keyboard: createKeyboard(rpc),
-    mouse: createMouse(rpc),
-    webWorker() {
-      return WebWorker.waitForWebWorker({ sessionId })
-    },
-    locator(selector, options = {}) {
-      return Locator.create(this.rpc, this.sessionId, selector, options)
-    },
-    blur() {
-      return PageBlur.blur({
-        electronRpc: this.electronRpc,
-        electronObjectId: this.electronObjectId,
+    electronObjectId,
+    electronRpc,
+    async evaluate({ awaitPromise = false, expression, replMode = false }) {
+      return PageEvaluate.evaluate(this.rpc, {
+        awaitPromise,
+        expression,
+        replMode,
       })
     },
     focus() {
@@ -95,6 +88,54 @@ export const create = async ({ electronRpc, electronObjectId, targetId, sessionI
     },
     frameLocator(selector, options = {}) {
       return Locator.create(this.rpc, this.sessionId, `${selector}:internal-enter-frame()`, options)
+    },
+    keyboard: createKeyboard(sessionRpc, utilityContext),
+    locator(selector, options = {}) {
+      return Locator.create(this.rpc, this.sessionId, selector, options, this.utilityContext)
+    },
+    mouse: createMouse(sessionRpc, utilityContext),
+    objectType: DevtoolsTargetType.Page,
+    pressKeyExponential(options) {
+      return PageKeyBoard.pressKeyExponential(this.sessionRpc, utilityContext, options)
+    },
+    async reload() {
+      return PageReload.reload(this.rpc)
+    },
+    rpc,
+    sessionId,
+    sessionRpc,
+    targetId,
+    type: DevtoolsTargetType.Page,
+    utilityContext,
+    async waitForIdle() {
+      return PageWaitForIdle.waitForIdle(this.rpc, this.electronRpc.canUseIdleCallback, idleTimeout)
+    },
+    waitForIframe({ injectUtilityScript = true, url }) {
+      return WaitForIframe.waitForIframe({
+        browserRpc,
+        createPage: create,
+        electronObjectId,
+        electronRpc,
+        idleTimeout,
+        injectUtilityScript,
+        sessionRpc,
+        url,
+      })
+    },
+    waitForSubIframe({ injectUtilityScript = true, url }) {
+      return waitForSubIframe({
+        browserRpc,
+        createPage: create,
+        electronObjectId,
+        electronRpc,
+        idleTimeout,
+        injectUtilityScript,
+        sessionRpc,
+        url,
+      })
+    },
+    webWorker() {
+      return WebWorker.waitForWebWorker({ sessionId })
     },
   }
 }

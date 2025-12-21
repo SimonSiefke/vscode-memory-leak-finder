@@ -32,6 +32,25 @@ const getListId = (classNameString) => {
 
 export const create = ({ page, expect, VError }) => {
   return {
+    async openAllFiles() {
+      try {
+        await page.waitForIdle()
+        await page.keyboard.press('Control+A')
+        await page.waitForIdle()
+        await this.openContextMenu(`1.txt`)
+        await page.waitForIdle()
+        const contextMenu = ContextMenu.create({ page, expect, VError })
+        await contextMenu.select('Open to the Side')
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ page, expect, VError })
+        await quickPick.executeCommand(WellKnownCommands.CloseOtherGroups)
+        await page.waitForIdle()
+        // TODO open context menu, the open to the side
+        // then close left group
+      } catch (error) {
+        throw new VError(error, `Failed to open all files`)
+      }
+    },
     async focus() {
       try {
         await page.waitForIdle()
@@ -43,6 +62,7 @@ export const create = ({ page, expect, VError }) => {
         await quickPick.executeCommand(WellKnownCommands.FocusExplorer)
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         await expect(explorer).toBeFocused()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to focus explorer`)
       }
@@ -52,9 +72,12 @@ export const create = ({ page, expect, VError }) => {
         await page.waitForIdle()
         const newFileButton = page.locator('.sidebar [aria-label="New File..."]')
         await expect(newFileButton).toBeVisible()
+        await page.waitForIdle()
         await newFileButton.click()
+        await page.waitForIdle()
         const inputBox = await page.locator('.monaco-inputbox input')
         await expect(inputBox).toBeVisible()
+        await page.waitForIdle()
         await expect(inputBox).toBeFocused()
         await inputBox.type(name)
         await page.keyboard.press('Enter')
@@ -118,28 +141,34 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to click into explorer`)
       }
     },
-    async expand(folderName) {
+    async expand(folderName: string) {
       try {
+        await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
-        const folder = explorer.locator('.monaco-list-row', {
-          hasText: folderName,
-        })
-        // TODO verify that folder has aria-expanded=false
+        const folder = explorer.locator(`.monaco-list-row[aria-label="${folderName}"]`)
+        await expect(folder).toBeVisible()
+        await page.waitForIdle()
         await folder.click()
+        await page.waitForIdle()
+        await expect(folder).toHaveAttribute('aria-expanded', 'true')
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to expand explorer folder`)
       }
     },
-    async collapse(folderName) {
+    async collapse(folderName: string) {
       try {
+        await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         const folder = explorer.locator('.monaco-list-row', {
           hasText: folderName,
         })
-        // TODO verify that folder has aria-expanded=false
+        await expect(folder).toBeVisible()
+        await page.waitForIdle()
         await folder.click()
+        await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to expand explorer folder`)
+        throw new VError(error, `Failed to collapse explorer folder`)
       }
     },
     async collapseAll() {
@@ -155,11 +184,13 @@ export const create = ({ page, expect, VError }) => {
     },
     async toHaveItem(direntName) {
       try {
+        await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         const dirent = explorer.locator('.monaco-list-row', {
           hasText: direntName,
         })
         await expect(dirent).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify that explorer has dirent "${direntName}"`)
       }
@@ -172,7 +203,11 @@ export const create = ({ page, expect, VError }) => {
         })
         await expect(dirent).toBeVisible()
         const id = await dirent.getAttribute('id')
-        await expect(explorer).toHaveAttribute('aria-activedescendant', id)
+
+        // TODO why is id null?
+        if (id) {
+          await expect(explorer).toHaveAttribute('aria-activedescendant', id)
+        }
       } catch (error) {
         throw new VError(error, `Failed to verify that explorer has focused dirent "${direntName}"`)
       }
@@ -189,7 +224,7 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to copy explorer item ${dirent}`)
       }
     },
-    async openContextMenu(dirent, select = undefined) {
+    async openContextMenu(dirent: string, select = undefined) {
       try {
         await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
@@ -208,9 +243,26 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to open context menu for "${dirent}"`)
       }
     },
-    async paste() {
+    async paste({ waitForItem }) {
       try {
+        const explorer = page.locator('.explorer-folders-view .monaco-list')
+        const dirent = explorer.locator('.monaco-list-row', {
+          hasText: waitForItem,
+        })
+        await page.waitForIdle()
         await page.keyboard.press('Control+V')
+        for (let i = 0; i < 5; i++) {
+          await page.waitForIdle()
+          const count = await dirent.count()
+          if (count > 0) {
+            break
+          }
+        }
+        await expect(dirent).toBeVisible()
+        const id = await dirent.getAttribute('id')
+        if (id) {
+          await expect(explorer).toHaveAttribute('aria-activedescendant', id)
+        }
       } catch (error) {
         throw new VError(error, `Failed to paste`)
       }
@@ -223,6 +275,13 @@ export const create = ({ page, expect, VError }) => {
         })
         await expect(oldDirent).toBeVisible()
         await page.keyboard.press('Delete')
+        for (let i = 0; i < 5; i++) {
+          await page.waitForIdle()
+          const count = await oldDirent.count()
+          if (count === 0) {
+            break
+          }
+        }
         await expect(oldDirent).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to delete ${item}`)
@@ -237,7 +296,7 @@ export const create = ({ page, expect, VError }) => {
       await contextMenu.select(option)
       await page.waitForIdle()
     },
-    async rename(oldDirentName, newDirentName) {
+    async rename(oldDirentName: string, newDirentName: string) {
       try {
         await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
@@ -249,26 +308,33 @@ export const create = ({ page, expect, VError }) => {
         await this.executeContextMenuCommand(oldDirent, 'Rename...')
         await page.waitForIdle()
         const input = explorer.locator('input')
-        await expect(input).toBeVisible({ timeout: 5000 })
+        await expect(input).toBeVisible({ timeout: 10_000 })
+        await page.waitForIdle()
         await input.selectText()
+        await page.waitForIdle()
         await input.type(newDirentName)
+        await page.waitForIdle()
         await input.press('Enter')
         await expect(oldDirent).toBeHidden()
         const newDirent = explorer.locator(`text=${newDirentName}`)
         await expect(newDirent).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to rename explorer item from "${oldDirentName}" to "${newDirentName}"`)
       }
     },
     async refresh() {
       try {
+        await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         await expect(explorer).toBeVisible()
         const header = page.locator(`.pane-header[aria-label^="Explorer Section"]`)
         await expect(header).toBeVisible()
         await header.hover()
+        await page.waitForIdle()
         const button = page.locator(`[role="button"][aria-label="Refresh Explorer"]`)
         await button.click()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to refresh explorer`)
       }

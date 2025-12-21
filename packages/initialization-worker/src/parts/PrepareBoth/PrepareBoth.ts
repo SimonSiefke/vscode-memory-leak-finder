@@ -1,38 +1,24 @@
+import type { MessagePort } from 'node:worker_threads'
 import { connectDevtools } from '../ConnectDevtools/ConnectDevtools.ts'
 import { connectElectron } from '../ConnectElectron/ConnectElectron.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import * as DebuggerCreateRpcConnection from '../DebuggerCreateRpcConnection/DebuggerCreateRpcConnection.ts'
 import { DevtoolsProtocolDebugger, DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-import * as Disposables from '../Disposables/Disposables.ts'
-import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
+import { PortReadStream } from '../PortReadStream/PortReadStream.ts'
+import * as WaitForDebuggerListening from '../WaitForDebuggerListening/WaitForDebuggerListening.ts'
 import * as WaitForDevtoolsListening from '../WaitForDevtoolsListening/WaitForDevtoolsListening.ts'
 
-export const prepareBoth = async (
-  headlessMode: boolean,
-  cwd: string,
-  ide: string,
-  vscodePath: string,
-  commit: string,
-  connectionId: number,
-  isFirstConnection: boolean,
-  canUseIdleCallback: boolean,
-  attachedToPageTimeout: number,
-): Promise<any> => {
-  const { child, webSocketUrl, parsedVersion } = await LaunchIde.launchIde({
-    headlessMode,
-    cwd,
-    ide,
-    vscodePath,
-    commit,
-    addDisposable: Disposables.add,
-  })
-  const devtoolsWebSocketUrlPromise = WaitForDevtoolsListening.waitForDevtoolsListening(child.stderr)
+export const prepareBoth = async (headlessMode: boolean, attachedToPageTimeout: number, port: MessagePort): Promise<any> => {
+  const stream = new PortReadStream(port)
+  const webSocketUrl = await WaitForDebuggerListening.waitForDebuggerListening(stream)
+
+  const devtoolsWebSocketUrlPromise = WaitForDevtoolsListening.waitForDevtoolsListening(stream)
 
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc)
 
-  const { monkeyPatchedElectronId, electronObjectId } = await connectElectron(electronRpc, headlessMode)
+  const { electronObjectId, monkeyPatchedElectronId } = await connectElectron(electronRpc, headlessMode)
 
   await DevtoolsProtocolDebugger.resume(electronRpc)
 
@@ -41,7 +27,7 @@ export const prepareBoth = async (
   const connectDevtoolsPromise = connectDevtools(devtoolsWebSocketUrl, attachedToPageTimeout)
 
   if (headlessMode) {
-    console.log('headldessmode')
+    // TODO
   }
 
   await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
@@ -49,14 +35,23 @@ export const prepareBoth = async (
     objectId: monkeyPatchedElectronId,
   })
 
-  await connectDevtoolsPromise
+  const { dispose, sessionId, targetId } = await connectDevtoolsPromise
+
+  await Promise.all([electronRpc.dispose(), dispose()])
 
   return {
-    webSocketUrl,
     devtoolsWebSocketUrl,
-    monkeyPatchedElectronId,
     electronObjectId,
-    childPid: child.pid,
-    parsedVersion,
+    monkeyPatchedElectronId,
+    parsedVersion: {
+      // TODO
+      major: 1,
+      minor: 105,
+      patch: 0,
+    },
+    sessionId,
+    targetId,
+    utilityContext: undefined,
+    webSocketUrl,
   }
 }

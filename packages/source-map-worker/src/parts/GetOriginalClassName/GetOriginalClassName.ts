@@ -1,5 +1,5 @@
 import * as OriginalNameWorker from '../OriginalNameWorker/OriginalNameWorker.ts'
 
-export const getOriginalClassName = async (sourceContent: string, originalLine: number, originalColumn: number): Promise<string> => {
-  return OriginalNameWorker.invoke('OriginalName.getOriginalName', sourceContent, originalLine, originalColumn)
+export const getOriginalClassNameFromFile = async (originalPath: string, originalLine: number, originalColumn: number): Promise<string> => {
+  return OriginalNameWorker.invoke('OriginalName.getOriginalNameFromFile', originalPath, originalLine, originalColumn)
 }

@@ -14,14 +14,19 @@ export const handleStdinDataInterruptedMode = async (state: StdinDataState, key:
         ...state,
         mode: ModeType.Exit,
       }
+    case AnsiKeys.Enter:
+      return {
+        ...state,
+        mode: ModeType.Running,
+      }
     case CliKeys.FilterMode: {
       const clear = await AnsiEscapes.clear(state.isWindows)
       const patternUsage = await PatternUsage.print()
       return {
         ...state,
-        value: Character.EmptyString,
         mode: ModeType.FilterWaiting,
         stdout: [...state.stdout, clear + patternUsage],
+        value: Character.EmptyString,
       }
     }
     case CliKeys.Quit:
@@ -33,11 +38,6 @@ export const handleStdinDataInterruptedMode = async (state: StdinDataState, key:
       return {
         ...state,
         headless: !state.headless,
-        mode: ModeType.Running,
-      }
-    case AnsiKeys.Enter:
-      return {
-        ...state,
         mode: ModeType.Running,
       }
     default:

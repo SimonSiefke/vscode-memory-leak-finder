@@ -5,6 +5,7 @@ import { ExpectError } from '../ExpectError/ExpectError.ts'
  * @param {string} expectedTitle
  */
 export const toHaveTitle = async (expectedTitle) => {
+  // @ts-ignore
   const title = await EvaluateInUtilityContext.evaluateInUtilityContext({
     expression: `document.title`,
   })

@@ -22,7 +22,7 @@ export const getFfmpegOptions = (fps: number, width: number, height: number, out
     '-c:v',
     'mjpeg',
     '-i',
-    '-',
+    'pipe:0',
     '-y',
     '-an',
     '-r',

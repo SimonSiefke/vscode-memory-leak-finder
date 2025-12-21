@@ -17,18 +17,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-15, windows-2025]
-    timeout-minutes: 300
+        os: [ubuntu-24.04, macos-26, windows-2025]
+    timeout-minutes: 1000
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
       - name: Compute node modules cache key
         id: nodeModulesCacheKey
         run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
         shell: bash
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         id: npm-cache
         with:
           path: |
@@ -36,9 +36,19 @@ jobs:
             **/.vscode-test
             **/.vscode-user-data-dir
             **/.vscode-ffmpeg
-            **/.vscode-source-maps
             **/.vscode-resolve-source-map-cache
           key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+      - name: Compute source maps cache key
+        id: sourceMapsCacheKey
+        run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/cache@v5
+        id: source-maps-cache
+        with:
+          path: |
+            **/.vscode-source-maps
+            **/.vscode-sources
+          key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
       - name: npm ci
         run: npm ci --ignore-scripts && npm run postinstall
         if: steps.npm-cache.outputs.cache-hit != 'true'
@@ -47,7 +57,7 @@ jobs:
       - run: npm run build
       - run: npm test
       - name: Run headless test (with videos)
-        if: matrix.os != 'macos-15'
+        if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --record-video
@@ -56,167 +66,313 @@ jobs:
         with:
           run: npm run e2e
       - name: Run headless test (flakyness check)
-        if: matrix.os != 'macos-15'
+        if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1
         with:
           run: npm run e2e:check-flakyness
       - name: Run headless test (second flakyness check)
-        if: matrix.os != 'macos-15'
+        if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1
         with:
           run: npm run e2e:check-flakyness
       - name: Run headless test (check leaks)
-        if: matrix.os != 'macos-15'
+        if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after
-      - name: Run headless test (check leaks, event listeners)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure event-listeners
-      - name: Run headless test (check leaks, dom counters)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure dom-counters
-      - name: Run headless test (check leaks, detached dom node count)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure detached-dom-node-count
-      - name: Run headless test (check leaks, promise count)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure promise-count
-      - name: Run headless test (check leaks, regex count)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure regex-count
-      - name: Run headless test (check leaks, edit context count)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure edit-context-count
-      - name: Run headless test (check leaks, function count)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure function-count
-      - name: Run headless test (check leaks, function count 3)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure named-function-count3 --restart-between
-      - name: Run headless test (check leaks, mutation observer count)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure mutation-observer-count
-      - name: Run headless test (check leaks, resize observer count)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure resize-observer-count
-      - name: Run headless test (check leaks, weak map count)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure weak-map-count
-      - name: Run headless test (check leaks, number count)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure number-count
-      - name: Run headless test (check leaks, error count)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure error-count
-      # - name: Run headless test (check leaks, proxy count)
-      #   if: matrix.os == 'ubuntu-24.04'
-      #   uses: coactions/setup-xvfb@v1
-      #   with:
-      #     run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure proxy-count
-      - name: Run headless test (check leaks, weak set count)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure weak-set-count
-      - name: Run headless test (check leaks, map size)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure map-size
-      - name: Run headless test (check leaks, set size)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure set-size
-      - name: Run headless test (check leaks, canvas count)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure canvas-count
-      - name: Run headless test (check leaks, iframe count)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure iframe-count
-      - name: Run headless test (check leaks, typed array count)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure typed-array-count
-      - name: Run headless test (check leaks, message port count)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure message-port-count
-      - name: Run headless test (check leaks, symbol count)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure symbol-count
-      # - name: Run headless test (check leaks, string count)
-      #   if: matrix.os == 'ubuntu-24.04'
-      #   uses: coactions/setup-xvfb@v1
-      #   with:
-      #     run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure string-count
-      - name: Run headless test (check leaks, object count)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure object-count
-      - name: Run headless test (check leaks, disposable counts)
-        if: matrix.os == 'ubuntu-24.04'
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after --measure disposable-count
-      # - name: Run headless test (check leaks, instance counts)
-      #   if: matrix.os == 'ubuntu-24.04'
-      #   uses: coactions/setup-xvfb@v1
-      #   with:
-      #     run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure instance-counts-with-source-map
-      - name: Generate charts
-        run: node packages/charts/src/main.ts
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: vscode-memory-leak-finder-results-${{ runner.os }}
           path: ./.vscode-memory-leak-finder-results
           include-hidden-files: true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: vscode-videos-${{ runner.os }}
           path: ./.vscode-videos
           include-hidden-files: true
+
+  ci-linux-measures:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        measure:
+          - name: event-listeners
+            args: --measure event-listeners --runs 17
+          - name: dom-counters
+            args: --measure dom-counters
+          - name: detached-dom-node-count
+            args: --measure detached-dom-node-count
+          - name: promise-count
+            args: --measure promise-count
+          - name: promises-with-stack-trace
+            args: --measure promises-with-stack-trace
+          - name: named-array-count
+            args: --measure named-array-count
+          - name: css-rule-count
+            args: --measure css-rule-count
+          - name: regex-count
+            args: --measure regex-count
+          - name: edit-context-count
+            args: --measure edit-context-count
+          - name: function-count
+            args: --measure function-count
+          - name: named-function-count3
+            args: --measure named-function-count3 --runs 37 --restart-between --run-skipped-tests-anyway
+          - name: named-function-count3-shared-process
+            args: --measure named-function-count3 --runs 37 --restart-between --run-skipped-tests-anyway --inspect-shared-process
+          - name: named-function-count3-extensions
+            args: --measure named-function-count3 --runs 37 --restart-between --run-skipped-tests-anyway --inspect-extensions
+          - name: mutation-observer-count
+            args: --measure mutation-observer-count
+          - name: resize-observer-count
+            args: --measure resize-observer-count
+          - name: weak-map-count
+            args: --measure weak-map-count
+          - name: number-count
+            args: --measure number-count
+          - name: error-count
+            args: --measure error-count
+          - name: weak-set-count
+            args: --measure weak-set-count
+          - name: map-size
+            args: --measure map-size
+          - name: set-size
+            args: --measure set-size
+          - name: canvas-count
+            args: --measure canvas-count
+          - name: iframe-count
+            args: --measure iframe-count
+          - name: message-port-count
+            args: --measure message-port-count
+          - name: symbol-count
+            args: --measure symbol-count
+          - name: object-count
+            args: --measure object-count
+          - name: disposable-count
+            args: --measure disposable-count
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+      - name: Compute node modules cache key
+        id: nodeModulesCacheKey
+        run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/cache@v5
+        id: npm-cache
+        with:
+          path: |
+            **/node_modules
+            **/.vscode-test
+            **/.vscode-user-data-dir
+            **/.vscode-ffmpeg
+            **/.vscode-resolve-source-map-cache
+          key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+      - name: Compute source maps cache key
+        id: sourceMapsCacheKey
+        run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/cache@v5
+        id: source-maps-cache
+        with:
+          path: |
+            **/.vscode-source-maps
+            **/.vscode-sources
+          key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
+      - name: npm ci
+        run: npm ci --ignore-scripts && npm run postinstall
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+      - run: npm run type-check
+      - run: npm run lint
+      - run: npm run build
+      - run: npm test
+      - name: Run headless test (check leaks, ${{ matrix.measure.name }})
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after ${{ matrix.measure.args }}
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: vscode-memory-leak-finder-results-linux-${{ matrix.measure.name }}
+          path: ./.vscode-memory-leak-finder-results
+          include-hidden-files: true
+
+  ci-linux-charts:
+    runs-on: ubuntu-24.04
+    needs: ci-linux-measures
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+      - name: Compute node modules cache key
+        id: nodeModulesCacheKey
+        run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/cache@v5
+        id: npm-cache
+        with:
+          path: |
+            **/node_modules
+            **/.vscode-test
+            **/.vscode-user-data-dir
+            **/.vscode-ffmpeg
+            **/.vscode-resolve-source-map-cache
+          key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+      - name: npm ci
+        run: npm ci --ignore-scripts && npm run postinstall
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+      - run: npm run type-check
+      - run: npm run lint
+      - run: npm run build
+      - name: Download all measure results
+        uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-event-listeners
+          path: ./vscode-memory-leak-finder-results-linux-event-listeners
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-dom-counters
+          path: ./vscode-memory-leak-finder-results-linux-dom-counters
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-detached-dom-node-count
+          path: ./vscode-memory-leak-finder-results-linux-detached-dom-node-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-promise-count
+          path: ./vscode-memory-leak-finder-results-linux-promise-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace
+          path: ./vscode-memory-leak-finder-results-linux-promises-with-stack-trace
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-named-array-count
+          path: ./vscode-memory-leak-finder-results-linux-named-array-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-css-rule-count
+          path: ./vscode-memory-leak-finder-results-linux-css-rule-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-regex-count
+          path: ./vscode-memory-leak-finder-results-linux-regex-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-edit-context-count
+          path: ./vscode-memory-leak-finder-results-linux-edit-context-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-function-count
+          path: ./vscode-memory-leak-finder-results-linux-function-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-named-function-count3
+          path: ./vscode-memory-leak-finder-results-linux-named-function-count3
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-named-function-count3-shared-process
+          path: ./vscode-memory-leak-finder-results-linux-named-function-count3-shared-process
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-named-function-count3-extensions
+          path: ./vscode-memory-leak-finder-results-linux-named-function-count3-extensions
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-mutation-observer-count
+          path: ./vscode-memory-leak-finder-results-linux-mutation-observer-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-resize-observer-count
+          path: ./vscode-memory-leak-finder-results-linux-resize-observer-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-weak-map-count
+          path: ./vscode-memory-leak-finder-results-linux-weak-map-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-number-count
+          path: ./vscode-memory-leak-finder-results-linux-number-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-error-count
+          path: ./vscode-memory-leak-finder-results-linux-error-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-weak-set-count
+          path: ./vscode-memory-leak-finder-results-linux-weak-set-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-map-size
+          path: ./vscode-memory-leak-finder-results-linux-map-size
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-set-size
+          path: ./vscode-memory-leak-finder-results-linux-set-size
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-canvas-count
+          path: ./vscode-memory-leak-finder-results-linux-canvas-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-iframe-count
+          path: ./vscode-memory-leak-finder-results-linux-iframe-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-message-port-count
+          path: ./vscode-memory-leak-finder-results-linux-message-port-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-symbol-count
+          path: ./vscode-memory-leak-finder-results-linux-symbol-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-object-count
+          path: ./vscode-memory-leak-finder-results-linux-object-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-disposable-count
+          path: ./vscode-memory-leak-finder-results-linux-disposable-count
+      - name: Merge all measure results
+        run: node packages/build/src/mergeArtifacts.ts
+      - name: Generate charts
+        run: node packages/charts/src/main.ts
       - name: Upload artifact
-        if: matrix.os == 'ubuntu-24.04'
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ./.vscode-charts
 
@@ -225,7 +381,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-24.04
-    needs: ci
+    needs: [ci, ci-linux-charts]
     steps:
       - name: Deploy to GitHub Pages
         id: deployment

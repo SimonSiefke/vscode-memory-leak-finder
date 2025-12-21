@@ -1,0 +1,30 @@
+import type { TestContext } from '../types.ts'
+
+export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
+  await Workspace.setFiles([
+    {
+      content: `h1 {
+  font-size: 20px;
+}
+`,
+      name: 'file.css',
+    },
+  ])
+  await Editor.closeAll()
+  await Editor.open('file.css')
+  await Editor.shouldHaveText(`h1 {
+  font-size: 20px;
+}
+`)
+  await Editor.shouldHaveCursor('0px')
+}
+
+export const run = async ({ Editor }: TestContext): Promise<void> => {
+  await Editor.inspectTokens()
+  await Editor.shouldHaveInspectedToken('h12 chars')
+  await Editor.closeInspectedTokens()
+}
+
+export const teardown = async ({ Editor }: TestContext): Promise<void> => {
+  await Editor.closeAll()
+}

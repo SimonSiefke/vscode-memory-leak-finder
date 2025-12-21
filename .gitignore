@@ -1,4 +1,12 @@
-# playground
+.vscode-insiders-versions
+.vscode-zip-data
+.vscode-requests-old
+.vscode-mock-requests
+.vscode-proxy-certs
+.vscode-requests
+snapshot
+snapshots
+.vscode-runtime-paths
 benchmark-results
 .vscode-sources
 .vscode-script-maps

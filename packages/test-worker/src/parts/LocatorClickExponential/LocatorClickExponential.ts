@@ -5,7 +5,6 @@ export const clickExponential = async (locator, options) => {
   Assert.object(locator)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(options) => test.clickExponential(options)',
       arguments: [
         {
           value: {
@@ -15,7 +14,8 @@ export const clickExponential = async (locator, options) => {
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(options) => test.clickExponential(options)',
     },
-    locator.sessionId,
+    locator,
   )
 }

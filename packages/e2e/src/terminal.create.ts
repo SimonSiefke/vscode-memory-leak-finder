@@ -1,0 +1,14 @@
+import type { TestContext } from '../types.ts'
+
+export const skip = true
+
+export const setup = async ({ Panel, Terminal }: TestContext): Promise<void> => {
+  await Panel.hide()
+  await Terminal.killAll()
+  await Terminal.show()
+}
+
+export const run = async ({ Terminal }: TestContext): Promise<void> => {
+  await Terminal.add()
+  await Terminal.killSecond()
+}

@@ -6,13 +6,12 @@ export const checkSingleElementCondition = async (fnName, locator, options = {})
     try {
       await EvaluateInUtilityContext.evaluateInUtilityContext(
         {
-          functionDeclaration: '(locator, fnName, options) => test.checkSingleElementCondition(locator, fnName, options)',
           arguments: [
             {
               value: {
-                selector: locator.selector,
-                nth: -1,
                 hasText: locator.hasText,
+                nth: -1,
+                selector: locator.selector,
               },
             },
             {
@@ -23,8 +22,9 @@ export const checkSingleElementCondition = async (fnName, locator, options = {})
             },
           ],
           awaitPromise: true,
+          functionDeclaration: '(locator, fnName, options) => test.checkSingleElementCondition(locator, fnName, options)',
         },
-        locator.sessionId,
+        locator,
       )
       return
     } catch (error) {

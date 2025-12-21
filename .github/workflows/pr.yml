@@ -11,20 +11,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-15, windows-2025]
+        os: [ubuntu-24.04, macos-26, windows-2025]
     timeout-minutes: 240
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: |
           git fetch --no-tags --prune --depth=1 origin +refs/heads/main:refs/remotes/origin/main
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
       - name: Compute node modules cache key
         id: nodeModulesCacheKey
         run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
         shell: bash
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         id: npm-cache
         with:
           path: |
@@ -32,9 +32,19 @@ jobs:
             **/.vscode-test
             **/.vscode-user-data-dir
             **/.vscode-ffmpeg
-            **/.vscode-source-maps
             **/.vscode-resolve-source-map-cache
           key: ${{ runner.os }}-cacheNodeModules-${{ steps.nodeModulesCacheKey.outputs.value }}
+      - name: Compute source maps cache key
+        id: sourceMapsCacheKey
+        run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/cache@v5
+        id: source-maps-cache
+        with:
+          path: |
+            **/.vscode-source-maps
+            **/.vscode-sources
+          key: ${{ runner.os }}-cacheSourceMaps-${{ steps.sourceMapsCacheKey.outputs.value }}
       - name: npm ci
         run: npm ci --ignore-scripts && npm run postinstall
         if: steps.npm-cache.outputs.cache-hit != 'true'
@@ -43,7 +53,7 @@ jobs:
       - run: npm run build
       - run: npx lerna run test --since origin/main
       - name: Run headless test (with videos)
-        if: matrix.os != 'macos-15'
+        if: matrix.os != 'macos-26'
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --record-video
@@ -51,6 +61,7 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: npm run e2e
+<<<<<<< HEAD
       - name: Run headless test (first flakyness check)
         uses: coactions/setup-xvfb@v1
         with:
@@ -64,10 +75,23 @@ jobs:
         with:
           run: npm run e2e:check-flakyness
       - name: Run headless test (fourth flakyness check)
+=======
+      - name: Run headless test (flakyness check)
+        if: matrix.os != 'macos-26'
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: npm run e2e:check-flakyness
+      - name: Run headless test (second flakyness check)
+        if: matrix.os != 'macos-26'
+>>>>>>> origin/main
         uses: coactions/setup-xvfb@v1
         with:
           run: npm run e2e:check-flakyness
       - name: Run headless test (check leaks, event listener count)
+<<<<<<< HEAD
+=======
+        if: matrix.os != 'macos-26'
+>>>>>>> origin/main
         uses: coactions/setup-xvfb@v1
         with:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure-after
@@ -77,7 +101,7 @@ jobs:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure event-listeners
       - name: Generate charts
         run: node packages/charts/src/main.ts
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: vscode-videos-${{ runner.os }}

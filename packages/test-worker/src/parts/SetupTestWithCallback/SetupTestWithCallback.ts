@@ -8,9 +8,20 @@ export const setupTestWithCallback = async (pageObject, file, forceRun) => {
   Assert.string(file)
   Assert.boolean(forceRun)
   const module = await ImportTest.importTest(file)
-  if (module.skip && !forceRun) {
-    return true
+  const wasOriginallySkipped = Boolean(module.skip)
+  const isCi = process.env.GITHUB_ACTIONS
+  if (module.requiresNetwork && isCi) {
+    return { error: null, skipped: true, wasOriginallySkipped }
   }
-  await TestStage.beforeSetup(module, pageObject)
-  await TestStage.setup(module, pageObject)
+  if (module.skip && !forceRun) {
+    return { error: null, skipped: true, wasOriginallySkipped }
+  }
+  try {
+    await TestStage.beforeSetup(module, pageObject)
+    await TestStage.setup(module, pageObject)
+    return { error: null, skipped: false, wasOriginallySkipped }
+  } catch (error) {
+    // If setup fails, return the error information instead of throwing
+    return { error: error, skipped: false, wasOriginallySkipped }
+  }
 }

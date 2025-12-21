@@ -1,5 +1,7 @@
-import * as TargetState from '../TargetState/TargetState.ts'
+import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
 
 export const toBeClosed = async (page) => {
-  await TargetState.waitForTargetToBeClosed(page.targetId)
+  const connectionId = 1
+  const pageObject = PageObjectState.getPageObjectContext(connectionId)
+  await pageObject.waitForTargetToBeClosed(page.targetId)
 }

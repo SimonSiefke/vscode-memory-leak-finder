@@ -1,6 +1,17 @@
 import { Worker } from 'node:worker_threads'
 import { getHeapSnapshotWorkerPath } from '../GetHeapSnapshotWorkerPath/GetHeapSnapshotWorkerPath.ts'
 import { waitForResult } from '../WaitForResult/WaitForResult.ts'
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
+
+const createDisposableWorker = (workerPath: string) => {
+  const worker = new Worker(workerPath)
+  return {
+    worker,
+    [Symbol.dispose]() {
+      worker.terminate()
+    },
+  }
+}
 
 /**
  * Prepares a heap snapshot by parsing it in a separate worker for better performance
@@ -8,24 +19,13 @@ import { waitForResult } from '../WaitForResult/WaitForResult.ts'
  * @param {{parseStrings?:boolean}} options - Options for parsing
  * @returns {Promise<import('../Snapshot/Snapshot.ts').Snapshot>}>}
  */
-export const prepareHeapSnapshot = async (path, options) => {
+export const prepareHeapSnapshot = async (path: string, options: any): Promise<Snapshot> => {
   const workerPath = getHeapSnapshotWorkerPath()
-  const worker = new Worker(workerPath)
-
-  try {
-    // Create the result promise (sets up event listeners)
-    const resultPromise = waitForResult(worker)
-
-    // Send the parsing command
-    worker.postMessage({
-      method: 'HeapSnapshot.parse',
-      params: [path, options],
-    })
-
-    // Wait for the result
-    return await resultPromise
-  } finally {
-    // Always terminate the worker
-    await worker.terminate()
-  }
+  using worker = createDisposableWorker(workerPath)
+  const resultPromise = waitForResult(worker.worker)
+  worker.worker.postMessage({
+    method: 'HeapSnapshot.parse',
+    params: [path, options],
+  })
+  return await resultPromise
 }

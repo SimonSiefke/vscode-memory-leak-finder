@@ -26,7 +26,7 @@ export const getEventListenerQuery = (stacks, scriptMap) => {
     reverseScriptMap[v.url] = v.sourceMapUrl
   }
   let originalIndex = 0
-  const allQueries = []
+  const allQueries: any[] = []
   for (const stack of stacks) {
     originalIndex++
     for (const stackLine of stack) {

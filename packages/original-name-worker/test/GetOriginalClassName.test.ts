@@ -1,6 +1,8 @@
 import { test, expect } from '@jest/globals'
 import * as GetOriginalClassName from '../src/parts/GetOriginalClassName/GetOriginalClassName.ts'
 
+const originalFileName = 'test.ts'
+
 test('getOriginalClassName', () => {
   const sourceContent = `class Test {
   constructor(value){
@@ -9,18 +11,44 @@ test('getOriginalClassName', () => {
 }`
   const originalLine = 1
   const originalColumn = 14
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('Test')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('Test')
+})
+
+test('getOriginalClassName - typescript constructor', () => {
+  const sourceContent = `export class FolderConfiguration extends Disposable {
+
+	protected readonly _onDidChange: Emitter<void> = this._register(new Emitter<void>());
+	readonly onDidChange: Event<void> = this._onDidChange.event;
+
+	private folderConfiguration: CachedFolderConfiguration | FileServiceBasedConfiguration;
+	private readonly scopes: ConfigurationScope[];
+	private readonly configurationFolder: URI;
+	private cachedFolderConfiguration: CachedFolderConfiguration;
+
+	constructor(
+		useCache: boolean,
+		readonly workspaceFolder: IWorkspaceFolder,
+	) {
+		super();
+  }
+}
+`
+  const originalLine = 10
+  const originalColumn = 2
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe(
+    'FolderConfiguration',
+  )
 })
 
 test('getOriginalClassName - extends', () => {
-  const sourceContent = `class extends Test {
+  const sourceContent = `const A = class extends Test {
   constructor(value){
     this.value = value
   }
 }`
   const originalLine = 1
   const originalColumn = 14
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('class extends Test')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('A')
 })
 
 test('getOriginalClassName - class method', () => {
@@ -31,7 +59,9 @@ test('getOriginalClassName - class method', () => {
 }`
   const originalLine = 2
   const originalColumn = 4
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('ToolBar.handleClick')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe(
+    'ToolBar.handleClick',
+  )
 })
 
 test('getOriginalClassName - static class method', () => {
@@ -42,7 +72,7 @@ test('getOriginalClassName - static class method', () => {
 }`
   const originalLine = 2
   const originalColumn = 2
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('App.init')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('App.init')
 })
 
 test('getOriginalClassName - class field arrow function', () => {
@@ -53,7 +83,7 @@ test('getOriginalClassName - class field arrow function', () => {
 }`
   const originalLine = 2
   const originalColumn = 2
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('A.onClick')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('A.onClick')
 })
 
 test('getOriginalClassName - function declaration', () => {
@@ -62,7 +92,7 @@ test('getOriginalClassName - function declaration', () => {
 }`
   const originalLine = 1
   const originalColumn = 2
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('doSomething')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('doSomething')
 })
 
 test('getOriginalClassName - nested function', () => {
@@ -74,7 +104,7 @@ test('getOriginalClassName - nested function', () => {
 }`
   const originalLine = 2
   const originalColumn = 4
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('inner')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('inner')
 })
 
 test('getOriginalClassName - variable arrow function', () => {
@@ -83,7 +113,7 @@ test('getOriginalClassName - variable arrow function', () => {
 }`
   const originalLine = 1
   const originalColumn = 2
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('run')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('run')
 })
 
 test('getOriginalClassName - getter method', () => {
@@ -94,7 +124,7 @@ test('getOriginalClassName - getter method', () => {
 }`
   const originalLine = 2
   const originalColumn = 4
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('Store.value')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('Store.get value')
 })
 
 test('getOriginalClassName - function expression', () => {
@@ -103,7 +133,7 @@ test('getOriginalClassName - function expression', () => {
 }`
   const originalLine = 1
   const originalColumn = 2
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('compute')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('compute')
 })
 
 test('getOriginalClassName - prototype method assignment', () => {
@@ -113,7 +143,7 @@ App.prototype.start = function(){
 }`
   const originalLine = 2
   const originalColumn = 2
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('App.start')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('App.start')
 })
 
 test('getOriginalClassName - private class method (ts)', () => {
@@ -124,7 +154,7 @@ test('getOriginalClassName - private class method (ts)', () => {
 }`
   const originalLine = 2
   const originalColumn = 4
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('Service.compute')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('Service.compute')
 })
 
 test('getOriginalClassName - protected class method (ts)', () => {
@@ -135,7 +165,7 @@ test('getOriginalClassName - protected class method (ts)', () => {
 }`
   const originalLine = 2
   const originalColumn = 2
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('Repository.save')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('Repository.save')
 })
 
 test('getOriginalClassName - abstract class with abstract method (ts)', () => {
@@ -144,7 +174,7 @@ test('getOriginalClassName - abstract class with abstract method (ts)', () => {
 }`
   const originalLine = 2
   const originalColumn = 2
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('Model')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('Model')
 })
 
 test('getOriginalClassName - interface should be unknown (ts)', () => {
@@ -153,7 +183,7 @@ test('getOriginalClassName - interface should be unknown (ts)', () => {
 }`
   const originalLine = 1
   const originalColumn = 2
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('unknown')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('unknown')
 })
 
 test('getOriginalClassName - enum should be unknown (ts)', () => {
@@ -163,7 +193,7 @@ test('getOriginalClassName - enum should be unknown (ts)', () => {
 }`
   const originalLine = 1
   const originalColumn = 2
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('unknown')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('unknown')
 })
 
 test('getOriginalClassName - namespace function returns function name (ts)', () => {
@@ -174,7 +204,7 @@ test('getOriginalClassName - namespace function returns function name (ts)', () 
 }`
   const originalLine = 2
   const originalColumn = 10
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('sum')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('sum')
 })
 
 test('getOriginalClassName - generic class and method (ts)', () => {
@@ -185,7 +215,7 @@ test('getOriginalClassName - generic class and method (ts)', () => {
 }`
   const originalLine = 2
   const originalColumn = 3
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('Box.get')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('Box.get')
 })
 
 test('getOriginalClassName - readonly class field with type (ts)', () => {
@@ -194,7 +224,7 @@ test('getOriginalClassName - readonly class field with type (ts)', () => {
 }`
   const originalLine = 1
   const originalColumn = 11
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('Store.value')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('Store.value')
 })
 
 test('getOriginalClassName - decorator on method (ts)', () => {
@@ -206,5 +236,144 @@ test('getOriginalClassName - decorator on method (ts)', () => {
 }`
   const originalLine = 3
   const originalColumn = 3
-  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn)).toBe('Controller.run')
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('Controller.run')
+})
+
+test('getOriginalClassName - method of function', () => {
+  const sourceContent = `export const MenuRegistry: IMenuRegistry = new class implements IMenuRegistry {
+
+	private readonly _commands = new Map<string, ICommandAction>();
+	private readonly _menuItems = new Map<MenuId, LinkedList<IMenuItem | ISubmenuItem>>();
+	private readonly _onDidChangeMenu = new MicrotaskEmitter<IMenuRegistryChangeEvent>({
+		merge: MenuRegistryChangeEvent.merge
+	});
+
+	readonly onDidChangeMenu: Event<IMenuRegistryChangeEvent> = this._onDidChangeMenu.event;
+
+	addCommand(command: ICommandAction): IDisposable {
+		this._commands.set(command.id, command);
+		this._onDidChangeMenu.fire(MenuRegistryChangeEvent.for(MenuId.CommandPalette));
+
+		return markAsSingleton(toDisposable(() => {
+			if (this._commands.delete(command.id)) {
+				this._onDidChangeMenu.fire(MenuRegistryChangeEvent.for(MenuId.CommandPalette));
+			}
+		}));
+	}
+
+	getCommand(id: string): ICommandAction | undefined {
+		return this._commands.get(id);
+	}
+
+	getCommands(): ICommandsMap {
+		const map = new Map<string, ICommandAction>();
+		this._commands.forEach((value, key) => map.set(key, value));
+		return map;
+	}
+
+	appendMenuItem(id: MenuId, item: IMenuItem | ISubmenuItem): IDisposable {
+		let list = this._menuItems.get(id);
+		if (!list) {
+			list = new LinkedList();
+			this._menuItems.set(id, list);
+		}
+		const rm = list.push(item);
+		this._onDidChangeMenu.fire(MenuRegistryChangeEvent.for(id));
+		return markAsSingleton(toDisposable(() => {
+			rm();
+			this._onDidChangeMenu.fire(MenuRegistryChangeEvent.for(id));
+		}));
+	}
+}
+`
+  const originalLine = 39
+  const originalColumn = 38
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe(
+    'MenuRegistry.appendMenuItem',
+  )
+})
+
+test('getOriginalClassName - class getter', () => {
+  const sourceContent = `export class Emitter<T> {
+
+	private readonly _options?: EmitterOptions;
+	private readonly _leakageMon?: LeakageMonitor;
+	private readonly _perfMon?: EventProfiling;
+	private _disposed?: true;
+	private _event?: Event<T>;
+	protected _listeners?: ListenerOrListeners<T>;
+	private _deliveryQueue?: EventDeliveryQueuePrivate;
+	protected _size = 0;
+
+	constructor(options?: EmitterOptions) {}
+
+	dispose() {}
+
+	get event(): Event<T> {
+		this._event ??= (callback: (e: T) => unknown, thisArgs?: any, disposables?: IDisposable[] | DisposableStore) => {
+			return undefined;
+		};
+		return this._event;
+	}
+}`
+  const originalLine = 16
+  const originalColumn = 19
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('Emitter.get event')
+})
+
+test('getOriginalClassName - domListener', () => {
+  const sourceContent = `class DomListener implements IDisposable {
+
+	private _handler: (e: any) => void;
+	private _node: EventTarget;
+	private readonly _type: string;
+	private readonly _options: boolean | AddEventListenerOptions;
+
+	constructor(node: EventTarget, type: string, handler: (e: any) => void, options?: boolean | AddEventListenerOptions) {
+		this._node = node;
+		this._type = type;
+		this._handler = handler;
+		this._options = (options || false);
+		this._node.addEventListener(this._type, this._handler, this._options);
+	}
+}`
+  const originalLine = 7
+  const originalColumn = 13
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('DomListener')
+})
+
+test('getOriginalClassName - nested function', () => {
+  const sourceContent = `export function toDisposable(fn: () => void): IDisposable {
+	const self = trackDisposable({
+		dispose: createSingleCallFunction(() => {
+			markAsDisposed(self);
+			fn();
+		})
+	});
+	return self;
+}`
+  const originalLine = 2
+  const originalColumn = 36
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('toDisposable')
+})
+
+test('getOriginalClassName - context key constructor', () => {
+  const sourceContent = `export class ContextKeyAndExpr implements IContextKeyExpression {
+
+	public static create(_expr: ReadonlyArray<ContextKeyExpression | null | undefined>, negated: ContextKeyExpression | null, extraRedundantCheck: boolean): ContextKeyExpression | undefined {
+		return ContextKeyAndExpr._normalizeArr(_expr, negated, extraRedundantCheck);
+	}
+
+	public readonly type = ContextKeyExprType.And;
+
+	private constructor(
+		public readonly expr: ContextKeyExpression[],
+		private negated: ContextKeyExpression | null
+	) {
+	}
+}
+`
+  const originalLine = 8
+  const originalColumn = 18
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('ContextKeyAndExpr')
 })

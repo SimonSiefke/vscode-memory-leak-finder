@@ -5,7 +5,6 @@ export const count = async (locator) => {
   Assert.object(locator)
   const value = await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(locator, options) => test.count(locator, options)',
       arguments: [
         {
           value: locator,
@@ -15,9 +14,10 @@ export const count = async (locator) => {
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(locator, options) => test.count(locator, options)',
       returnByValue: true,
     },
-    locator.sessionId,
+    locator,
   )
   return value
 }

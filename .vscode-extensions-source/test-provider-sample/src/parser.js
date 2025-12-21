@@ -1,9 +1,9 @@
-const vscode = require('vscode')
+import { Range, Position } from 'vscode'
 
 const testRe = /^([0-9]+)\s*([+*/-])\s*([0-9]+)\s*=\s*([0-9]+)/
 const headingRe = /^(#+)\s*(.+)$/
 
-exports.parseMarkdown = (text, events) => {
+export function parseMarkdown(text, events) {
   const lines = text.split('\n')
 
   for (let lineNo = 0; lineNo < lines.length; lineNo++) {
@@ -11,7 +11,7 @@ exports.parseMarkdown = (text, events) => {
     const test = testRe.exec(line)
     if (test) {
       const [, a, operator, b, expected] = test
-      const range = new vscode.Range(new vscode.Position(lineNo, 0), new vscode.Position(lineNo, test[0].length))
+      const range = new Range(new Position(lineNo, 0), new Position(lineNo, test[0].length))
       events.onTest(range, Number(a), operator, Number(b), Number(expected))
       continue
     }
@@ -19,7 +19,7 @@ exports.parseMarkdown = (text, events) => {
     const heading = headingRe.exec(line)
     if (heading) {
       const [, pounds, name] = heading
-      const range = new vscode.Range(new vscode.Position(lineNo, 0), new vscode.Position(lineNo, line.length))
+      const range = new Range(new Position(lineNo, 0), new Position(lineNo, line.length))
       events.onHeading(range, name, pounds.length)
     }
   }
