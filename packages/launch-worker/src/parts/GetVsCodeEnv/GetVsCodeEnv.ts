@@ -1,4 +1,4 @@
-export const getVsCodeEnv = ({ runtimeDir, processEnv }) => {
+export const getVsCodeEnv = ({ processEnv, runtimeDir }) => {
   const env = {
     ...processEnv,
   }

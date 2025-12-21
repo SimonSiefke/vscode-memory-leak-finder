@@ -33,46 +33,46 @@ export const createRpc = (ipc: any) => {
   const onceListeners = Object.create(null)
   let _id = 0
   return {
-    objectType: ObjectType.Rpc,
     callbacks,
-    listeners,
-    onceListeners,
+    async dispose() {
+      await ipc.dispose()
+    },
     invoke(method: string, params: any) {
-      const { resolve, reject, promise } = Promise.withResolvers<any>()
+      const { promise, reject, resolve } = Promise.withResolvers<any>()
       const id = _id++
-      callbacks[id] = { resolve, reject }
+      callbacks[id] = { reject, resolve }
       ipc.send({
+        id,
         method,
         params,
-        id,
       })
       return promise
     },
     invokeWithSession(sessionId: string, method: string, params: any) {
-      const { resolve, reject, promise } = Promise.withResolvers<any>()
+      const { promise, reject, resolve } = Promise.withResolvers<any>()
       const id = _id++
-      callbacks[id] = { resolve, reject }
+      callbacks[id] = { reject, resolve }
       ipc.send({
-        sessionId,
+        id,
         method,
         params,
-        id,
+        sessionId,
       })
       return promise
+    },
+    listeners,
+    objectType: ObjectType.Rpc,
+    off(event: string, listener: any) {
+      delete listener[event]
     },
     on(event: string, listener: any) {
       listeners[event] = listener
     },
-    off(event: string, listener: any) {
-      delete listener[event]
-    },
     once(event: string) {
-      const { resolve, promise } = Promise.withResolvers<any>()
+      const { promise, resolve } = Promise.withResolvers<any>()
       onceListeners[event] = resolve
       return promise
     },
-    async dispose() {
-      await ipc.dispose()
-    },
+    onceListeners,
   }
 }
