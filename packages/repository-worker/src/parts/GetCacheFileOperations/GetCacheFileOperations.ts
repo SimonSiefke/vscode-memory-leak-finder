@@ -29,7 +29,7 @@ export const getCacheFileOperations = async (
   cachedNodeModulesPath: string,
   nodeModulesPaths: string[],
 ): Promise<FileOperation[]> => {
-  const fileOperations: FileOperation[] = [ 
+  const fileOperations: FileOperation[] = [
     {
       path: cacheDir,
       type: 'mkdir',
@@ -37,7 +37,8 @@ export const getCacheFileOperations = async (
     {
       path: cachedNodeModulesPath,
       type: 'mkdir',
-    }]
+    },
+  ]
 
   for (const nodeModulePath of nodeModulesPaths) {
     const cacheTargetPath = Path.join(cachedNodeModulesPath, nodeModulePath)
