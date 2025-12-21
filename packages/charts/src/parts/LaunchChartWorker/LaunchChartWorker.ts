@@ -5,10 +5,10 @@ import * as Root from '../Root/Root.ts'
 export const launchChartWorker = async () => {
   const chartWorkerPath = join(Root.root, 'packages', 'chart-worker', 'src', 'main.ts')
   const rpc = await NodeWorkerRpcParent.create({
-    path: chartWorkerPath,
+    commandMap: {},
     // @ts-ignore
     name: 'Chart Worker',
-    commandMap: {},
+    path: chartWorkerPath,
     stdio: 'inherit',
   })
   return {
