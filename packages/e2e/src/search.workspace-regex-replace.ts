@@ -2,19 +2,19 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
-export const setup = async ({ ActivityBar, Electron, Workspace, Search }: TestContext): Promise<void> => {
+export const setup = async ({ ActivityBar, Electron, Search, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'test-file-1.ts',
       content: 'const value1 = "test123"\nconst value2 = "test456"',
+      name: 'test-file-1.ts',
     },
     {
-      name: 'test-file-2.ts',
       content: 'const value3 = "test789"\nconst value4 = "test012"',
+      name: 'test-file-2.ts',
     },
     {
-      name: 'other-file.txt',
       content: 'some other content',
+      name: 'other-file.txt',
     },
   ])
   await ActivityBar.showSearch()

@@ -2,15 +2,15 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ Workspace, Editor, Explorer }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'a.txt',
       content: 'a',
+      name: 'a.txt',
     },
     {
-      name: 'b.txt',
       content: 'b',
+      name: 'b.txt',
     },
   ])
   await Editor.closeAll()
@@ -19,7 +19,7 @@ export const setup = async ({ Workspace, Editor, Explorer }: TestContext): Promi
   await Explorer.shouldHaveItem('b.txt')
 }
 
-export const run = async ({ Editor, DiffEditor }: TestContext): Promise<void> => {
+export const run = async ({ DiffEditor, Editor }: TestContext): Promise<void> => {
   await DiffEditor.open('a.txt', 'b.txt')
   await DiffEditor.expectOriginal('a')
   await DiffEditor.expectModified('b')

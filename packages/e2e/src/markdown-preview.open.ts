@@ -2,11 +2,11 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
-export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'index.md',
       content: `# hello world`,
+      name: 'index.md',
     },
   ])
   await Editor.closeAll()
@@ -16,7 +16,7 @@ export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promi
 }
 
 // @ts-ignore
-export const run = async ({ Editor, QuickPick, WellKnownCommands, MarkdownPreview }: TestContext): Promise<void> => {
+export const run = async ({ Editor, MarkdownPreview, QuickPick, WellKnownCommands }: TestContext): Promise<void> => {
   await Editor.open('index.md')
   await QuickPick.executeCommand(WellKnownCommands.MarkdownOpenPreviewToTheSide)
   const subFrame = await MarkdownPreview.shouldBeVisible()

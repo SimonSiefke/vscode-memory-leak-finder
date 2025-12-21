@@ -2,19 +2,19 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
-export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
+export const setup = async ({ Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'original-file.txt',
       content: 'original content',
+      name: 'original-file.txt',
     },
     {
-      name: 'folder/nested-file.txt',
       content: 'nested content',
+      name: 'folder/nested-file.txt',
     },
     {
-      name: 'another-file.js',
       content: 'console.log("hello");',
+      name: 'another-file.js',
     },
   ])
   await Explorer.focus()
@@ -23,12 +23,12 @@ export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void>
   await Explorer.shouldHaveItem('another-file.js')
 }
 
-export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
+export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> => {
   // Rename a file via file system operation
   await Workspace.remove('original-file.txt')
   await Workspace.add({
-    name: 'renamed-file.txt',
     content: 'original content',
+    name: 'renamed-file.txt',
   })
 
   // Verify the old name is gone and new name appears in explorer
@@ -38,8 +38,8 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
   // Rename a file in a subfolder via file system operation
   await Workspace.remove('folder/nested-file.txt')
   await Workspace.add({
-    name: 'folder/renamed-nested-file.txt',
     content: 'nested content',
+    name: 'folder/renamed-nested-file.txt',
   })
 
   // Expand folder and verify the rename
@@ -50,8 +50,8 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
   // Rename with different extension
   await Workspace.remove('another-file.js')
   await Workspace.add({
-    name: 'another-file.ts',
     content: 'console.log("hello");',
+    name: 'another-file.ts',
   })
 
   // Verify the extension change is reflected
@@ -61,8 +61,8 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
   // Rename folder itself by recreating the structure
   await Workspace.remove('folder/renamed-nested-file.txt')
   await Workspace.add({
-    name: 'renamed-folder/renamed-nested-file.txt',
     content: 'nested content',
+    name: 'renamed-folder/renamed-nested-file.txt',
   })
 
   // Collapse and verify folder rename
@@ -77,20 +77,20 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
   // Clean up: Restore original state to make test idempotent
   await Workspace.remove('renamed-folder/renamed-nested-file.txt')
   await Workspace.add({
-    name: 'folder/nested-file.txt',
     content: 'nested content',
+    name: 'folder/nested-file.txt',
   })
 
   await Workspace.remove('renamed-file.txt')
   await Workspace.add({
-    name: 'original-file.txt',
     content: 'original content',
+    name: 'original-file.txt',
   })
 
   await Workspace.remove('another-file.ts')
   await Workspace.add({
-    name: 'another-file.js',
     content: 'console.log("hello");',
+    name: 'another-file.js',
   })
 
   // Refresh explorer to ensure UI updates

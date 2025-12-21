@@ -9,15 +9,15 @@ const generateFileContent = () => {
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'file.txt',
       content: generateFileContent(),
+      name: 'file.txt',
     },
   ])
   await Editor.closeAll()
   await Editor.open('file.txt')
 }
 
-export const run = async ({ Tab, ContextMenu }: TestContext): Promise<void> => {
+export const run = async ({ ContextMenu, Tab }: TestContext): Promise<void> => {
   await Tab.openContextMenu('file.txt')
   await ContextMenu.close()
 }

@@ -8,10 +8,10 @@ const loadSourceMapWorkerPath: string = join(Root.root, 'packages', 'load-source
 export const loadSourceMaps = async (sourceMapUrls: readonly string[]): Promise<void> => {
   try {
     const rpc = await NodeWorkerRpcParent.create({
+      commandMap: {},
+      execArgv: [],
       path: loadSourceMapWorkerPath,
       stdio: 'inherit',
-      execArgv: [],
-      commandMap: {},
     })
     await rpc.invoke('LoadSourceMaps.loadSourceMaps', sourceMapUrls)
     await rpc.dispose()

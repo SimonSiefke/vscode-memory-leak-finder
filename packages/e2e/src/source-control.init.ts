@@ -6,17 +6,17 @@ export const setup = async ({ Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([])
 }
 
-export const run = async ({ SourceControl, Workspace, Git, ActivityBar }: TestContext): Promise<void> => {
+export const run = async ({ ActivityBar, Git, SourceControl, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'index.html',
       content: '<h1>hello world</h1>',
+      name: 'index.html',
     },
   ])
   await Git.init()
   await Git.add()
   await Git.commit('first commit')
-  await Workspace.add({ name: 'file2.txt', content: 'test' })
+  await Workspace.add({ content: 'test', name: 'file2.txt' })
   await Git.add()
   await Git.commit('second commit')
   await ActivityBar.showSourceControl()

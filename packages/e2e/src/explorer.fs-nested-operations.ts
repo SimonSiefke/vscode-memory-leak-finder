@@ -2,23 +2,23 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
-export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
+export const setup = async ({ Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'level1/level2/level3/deep-file.txt',
       content: 'deeply nested content',
+      name: 'level1/level2/level3/deep-file.txt',
     },
     {
-      name: 'level1/level2/mid-file.txt',
       content: 'mid level content',
+      name: 'level1/level2/mid-file.txt',
     },
     {
-      name: 'level1/top-file.txt',
       content: 'top level content',
+      name: 'level1/top-file.txt',
     },
     {
-      name: 'another-branch/sub1/sub2/file.txt',
       content: 'another branch file',
+      name: 'another-branch/sub1/sub2/file.txt',
     },
   ])
   await Explorer.focus()
@@ -26,11 +26,11 @@ export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void>
   await Explorer.shouldHaveItem('another-branch')
 }
 
-export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
+export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> => {
   // Create complex nested structure via file system operation
   await Workspace.add({
-    name: 'complex/nested/structure/deep-file.txt',
     content: 'deep content',
+    name: 'complex/nested/structure/deep-file.txt',
   })
 
   // Verify the complex structure appears in explorer
@@ -47,8 +47,8 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
   // Create and delete nested folders in sequence
   // Create the nested structure step by step
   await Workspace.add({
-    name: 'temp/nested/folders/temp-file.txt',
     content: 'temp content',
+    name: 'temp/nested/folders/temp-file.txt',
   })
 
   // Verify creation step by step
@@ -77,12 +77,12 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
   await Workspace.remove('level1/level2/level3/deep-file.txt')
   await Workspace.remove('level1/level2/mid-file.txt')
   await Workspace.add({
-    name: 'level1/renamed-level2/level3/deep-file.txt',
     content: 'deeply nested content',
+    name: 'level1/renamed-level2/level3/deep-file.txt',
   })
   await Workspace.add({
-    name: 'level1/renamed-level2/mid-file.txt',
     content: 'mid level content',
+    name: 'level1/renamed-level2/mid-file.txt',
   })
 
   // Verify the rename affects the entire subtree
@@ -103,12 +103,12 @@ export const run = async ({ Workspace, Explorer }: TestContext): Promise<void> =
   await Workspace.remove('level1/renamed-level2/level3/deep-file.txt')
   await Workspace.remove('level1/renamed-level2/mid-file.txt')
   await Workspace.add({
-    name: 'level1/level2/level3/deep-file.txt',
     content: 'deeply nested content',
+    name: 'level1/level2/level3/deep-file.txt',
   })
   await Workspace.add({
-    name: 'level1/level2/mid-file.txt',
     content: 'mid level content',
+    name: 'level1/level2/mid-file.txt',
   })
 
   // Verify original state is restored

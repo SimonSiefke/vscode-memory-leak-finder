@@ -2,7 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
-export const setup = async ({ Workspace, Explorer, Editor, DiffEditor }: TestContext): Promise<void> => {
+export const setup = async ({ DiffEditor, Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   const notebook1 = {
     cells: [
       {
@@ -188,12 +188,12 @@ export const setup = async ({ Workspace, Explorer, Editor, DiffEditor }: TestCon
 
   await Workspace.setFiles([
     {
-      name: 'notebook-1.ipynb',
       content: JSON.stringify(notebook1, null, 2) + '\n',
+      name: 'notebook-1.ipynb',
     },
     {
-      name: 'notebook-2.ipynb',
       content: JSON.stringify(notebook2, null, 2) + '\n',
+      name: 'notebook-2.ipynb',
     },
   ])
   await Editor.closeAll()
