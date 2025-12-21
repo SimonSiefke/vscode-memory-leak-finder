@@ -22,7 +22,12 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         }
         await page.waitForIdle()
         await toggleReplace.click()
+        await page.waitForIdle()
         await expect(toggleReplace).toHaveAttribute('aria-expanded', 'true')
+        await page.waitForIdle()
+        const replace = page.locator('.replace-part .monaco-findInput textarea[aria-label="Replace"]')
+        await expect(replace).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open replace`)
       }
@@ -36,7 +41,6 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         const toggleReplace = findWidget.locator('[aria-label="Toggle Replace"]')
         await expect(toggleReplace).toBeVisible()
         await page.waitForIdle()
-
         const replace = page.locator('.replace-part .monaco-findInput textarea[aria-label="Replace"]')
         await expect(replace).toBeVisible()
         await page.waitForIdle()
