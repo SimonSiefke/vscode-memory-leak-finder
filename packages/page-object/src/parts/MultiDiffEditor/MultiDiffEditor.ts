@@ -4,7 +4,7 @@ import * as SideBar from '../SideBar/SideBar.ts'
 
 export const create = ({ page, expect, VError, electronApp }) => {
   return {
-    async open(files) {
+    async open(files: readonly any[]) {
       try {
         if (files.length < 2) {
           throw new Error('MultiDiffEditor requires at least 2 files')
