@@ -109,9 +109,16 @@ export const getEnclosingNames = (path: NodePath, position: { line: number; colu
 const getClassName = (classPath: NodePath): string | undefined => {
   const cls = classPath.node
 
-  if (classPath.isClassDeclaration() && 'id' in cls && cls.id && typeof cls.id === 'object' && 'name' in cls.id && typeof cls.id.name === 'string') {
-      return cls.id.name
-    }
+  if (
+    classPath.isClassDeclaration() &&
+    'id' in cls &&
+    cls.id &&
+    typeof cls.id === 'object' &&
+    'name' in cls.id &&
+    typeof cls.id.name === 'string'
+  ) {
+    return cls.id.name
+  }
 
   if (classPath.isClassExpression()) {
     // Look for variable declarator in the parent chain
@@ -164,22 +171,22 @@ const getSuperClassName = (classPath: NodePath): string | undefined => {
   const cls = classPath.node
 
   if ('superClass' in cls && cls.superClass && typeof cls.superClass === 'object' && 'type' in cls.superClass) {
-      if (cls.superClass.type === 'Identifier' && 'name' in cls.superClass && typeof cls.superClass.name === 'string') {
-        return cls.superClass.name
-      }
-      if (cls.superClass.type === 'MemberExpression') {
-        // Handle cases like SomeClass.someProperty
-        return getMemberExpressionName(cls.superClass)
-      }
+    if (cls.superClass.type === 'Identifier' && 'name' in cls.superClass && typeof cls.superClass.name === 'string') {
+      return cls.superClass.name
     }
+    if (cls.superClass.type === 'MemberExpression') {
+      // Handle cases like SomeClass.someProperty
+      return getMemberExpressionName(cls.superClass)
+    }
+  }
 
   return undefined
 }
 
 const getMemberExpressionName = (memberExpr: any): string | undefined => {
   if (memberExpr.type === 'MemberExpression') {
-    const {object} = memberExpr
-    const {property} = memberExpr
+    const { object } = memberExpr
+    const { property } = memberExpr
 
     if (object && object.type === 'Identifier' && property && property.type === 'Identifier') {
       return `${object.name}.${property.name}`
