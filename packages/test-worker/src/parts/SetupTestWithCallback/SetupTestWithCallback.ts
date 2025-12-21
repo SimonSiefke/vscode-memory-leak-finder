@@ -11,11 +11,7 @@ export const setupTestWithCallback = async (pageObject, file, forceRun) => {
   const wasOriginallySkipped = Boolean(module.skip)
   const isCi = process.env.GITHUB_ACTIONS
   if (module.requiresNetwork && isCi) {
-<<<<<<< HEAD
-    return { skipped: true, wasOriginallySkipped, error: null }
-=======
     return { error: null, skipped: true, wasOriginallySkipped }
->>>>>>> origin/main
   }
   if (module.skip && !forceRun) {
     return { error: null, skipped: true, wasOriginallySkipped }
