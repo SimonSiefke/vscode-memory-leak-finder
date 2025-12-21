@@ -3,10 +3,10 @@ import * as GetTestsUnexpectedErrorMessage from '../src/parts/GetTestsUnexpected
 
 test('getTestsUnexpectedErrorMessage - formats error with all properties', () => {
   const error = {
-    type: 'TypeError',
+    codeFrame: 'const result = obj.property\n             ^^^',
     message: 'Cannot read property of undefined',
     stack: 'TypeError: Cannot read property of undefined\n    at Object.<anonymous> (/path/to/file.js:10:5)',
-    codeFrame: 'const result = obj.property\n             ^^^',
+    type: 'TypeError',
   }
 
   const result = GetTestsUnexpectedErrorMessage.getTestsUnexpectedErrorMessage(error)
@@ -18,10 +18,10 @@ test('getTestsUnexpectedErrorMessage - formats error with all properties', () =>
 
 test('getTestsUnexpectedErrorMessage - handles error with empty codeFrame', () => {
   const error = {
-    type: 'ReferenceError',
+    codeFrame: '',
     message: 'variable is not defined',
     stack: 'ReferenceError: variable is not defined\n    at test.js:5:1',
-    codeFrame: '',
+    type: 'ReferenceError',
   }
 
   const result = GetTestsUnexpectedErrorMessage.getTestsUnexpectedErrorMessage(error)
@@ -33,10 +33,10 @@ test('getTestsUnexpectedErrorMessage - handles error with empty codeFrame', () =
 
 test('getTestsUnexpectedErrorMessage - handles error with no codeFrame', () => {
   const error = {
-    type: 'SyntaxError',
+    codeFrame: null,
     message: 'Unexpected token',
     stack: 'SyntaxError: Unexpected token\n    at Module._compile (module.js:434:26)',
-    codeFrame: null,
+    type: 'SyntaxError',
   }
 
   const result = GetTestsUnexpectedErrorMessage.getTestsUnexpectedErrorMessage(error)
@@ -47,10 +47,10 @@ test('getTestsUnexpectedErrorMessage - handles error with no codeFrame', () => {
 
 test('getTestsUnexpectedErrorMessage - returns string with proper structure', () => {
   const error = {
-    type: 'Error',
+    codeFrame: 'line of code',
     message: 'Something went wrong',
     stack: 'Error: Something went wrong\n    at test:1:1',
-    codeFrame: 'line of code',
+    type: 'Error',
   }
 
   const result = GetTestsUnexpectedErrorMessage.getTestsUnexpectedErrorMessage(error)
@@ -62,10 +62,10 @@ test('getTestsUnexpectedErrorMessage - returns string with proper structure', ()
 
 test('getTestsUnexpectedErrorMessage - handles multiline stack trace', () => {
   const error = {
-    type: 'Error',
+    codeFrame: 'some code\nmore code',
     message: 'Test error',
     stack: 'Error: Test error\n    at first.js:1:1\n    at second.js:2:2\n    at third.js:3:3',
-    codeFrame: 'some code\nmore code',
+    type: 'Error',
   }
 
   const result = GetTestsUnexpectedErrorMessage.getTestsUnexpectedErrorMessage(error)

@@ -4,10 +4,10 @@ import * as Indent from '../Indent/Indent.ts'
 import * as TestPrefix from '../TestPrefix/TestPrefix.ts'
 
 interface TestError {
-  type: string
+  codeFrame: string
   message: string
   stack: string
-  codeFrame: string
+  type: string
 }
 
 export const getHandleTestFailedMessage = (

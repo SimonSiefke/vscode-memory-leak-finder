@@ -1,13 +1,13 @@
 import type { ChildProcess } from 'child_process'
 
 interface State {
-  process: ChildProcess | undefined
   outFile: string
+  process: ChildProcess | undefined
 }
 
 export const state: State = {
-  process: undefined,
   outFile: '',
+  process: undefined,
 }
 
 export const set = (value: ChildProcess | undefined): void => {
