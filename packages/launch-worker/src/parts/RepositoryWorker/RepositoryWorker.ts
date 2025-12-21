@@ -4,10 +4,10 @@ import { getRepositoryWorkerUrl } from '../GetRepositoryWorkerUrl/GetRepositoryW
 export const launch = async () => {
   const url = getRepositoryWorkerUrl()
   const rpc = await NodeWorkerRpcParent.create({
+    commandMap: {},
+    execArgv: [],
     path: url,
     stdio: 'inherit',
-    execArgv: [],
-    commandMap: {},
   })
   return rpc
 }
