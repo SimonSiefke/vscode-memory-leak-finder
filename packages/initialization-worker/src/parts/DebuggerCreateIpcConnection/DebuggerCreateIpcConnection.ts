@@ -10,12 +10,8 @@ export const createConnection = async (wsUrl) => {
     const webSocket = new WebSocket(wsUrl)
     await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket)
     return {
-      /**
-       *
-       * @param {any} message
-       */
-      send(message) {
-        webSocket.send(Json.stringify(message))
+      dispose() {
+        webSocket.close()
       },
       get onmessage() {
         return webSocket.onmessage
@@ -28,8 +24,12 @@ export const createConnection = async (wsUrl) => {
         }
         webSocket.onmessage = handleMessage
       },
-      dispose() {
-        webSocket.close()
+      /**
+       *
+       * @param {any} message
+       */
+      send(message) {
+        webSocket.send(Json.stringify(message))
       },
     }
   } catch (error) {

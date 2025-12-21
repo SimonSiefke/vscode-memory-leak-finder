@@ -5,71 +5,71 @@ import { getInitializationWorkerUrl } from '../GetInitializationWorkerUrl/GetIni
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 
 export interface LaunchOptions {
-  readonly headlessMode: boolean
+  readonly attachedToPageTimeout: number
+  readonly canUseIdleCallback: boolean
+  readonly commit: string
+  readonly connectionId: number
   readonly cwd: string
+  readonly enableExtensions: boolean
+  readonly enableProxy: boolean
+  readonly headlessMode: boolean
   readonly ide: string
+  readonly insidersCommit: string
+  readonly inspectExtensions: boolean
+  readonly inspectExtensionsPort: number
+  readonly inspectPtyHost: boolean
+  readonly inspectPtyHostPort: number
+  readonly inspectSharedProcess: boolean
+  readonly inspectSharedProcessPort: number
+  readonly isFirstConnection: boolean
+  readonly useProxyMock: boolean
   readonly vscodePath: string
   readonly vscodeVersion: string
-  readonly commit: string
-  readonly insidersCommit: string
-  readonly connectionId: number
-  readonly isFirstConnection: boolean
-  readonly canUseIdleCallback: boolean
-  readonly attachedToPageTimeout: number
-  readonly inspectSharedProcess: boolean
-  readonly inspectExtensions: boolean
-  readonly inspectPtyHost: boolean
-  readonly enableExtensions: boolean
-  readonly inspectPtyHostPort: number
-  readonly inspectSharedProcessPort: number
-  readonly inspectExtensionsPort: number
-  readonly enableProxy: boolean
-  readonly useProxyMock: boolean
 }
 
 export const launch = async (options: LaunchOptions): Promise<any> => {
   const {
-    headlessMode,
+    attachedToPageTimeout,
+    commit,
     cwd,
+    enableExtensions,
+    enableProxy,
+    headlessMode,
     ide,
+    insidersCommit,
+    inspectExtensions,
+    inspectExtensionsPort,
+    inspectPtyHost,
+    inspectPtyHostPort,
+    inspectSharedProcess,
+    inspectSharedProcessPort,
+    useProxyMock,
     vscodePath,
     vscodeVersion,
-    commit,
-    insidersCommit,
-    attachedToPageTimeout,
-    inspectSharedProcess,
-    inspectExtensions,
-    inspectPtyHost,
-    enableExtensions,
-    inspectPtyHostPort,
-    inspectSharedProcessPort,
-    inspectExtensionsPort,
-    enableProxy,
-    useProxyMock,
   } = options
   const { child } = await LaunchIde.launchIde({
-    headlessMode,
+    addDisposable: Disposables.add,
+    commit,
     cwd,
+    enableExtensions,
+    enableProxy,
+    headlessMode,
     ide,
+    insidersCommit,
+    inspectExtensions,
+    inspectExtensionsPort,
+    inspectPtyHost,
+    inspectPtyHostPort,
+    inspectSharedProcess,
+    inspectSharedProcessPort,
+    useProxyMock,
     vscodePath,
     vscodeVersion,
-    commit,
-    insidersCommit,
-    addDisposable: Disposables.add,
-    inspectSharedProcess,
-    inspectExtensions,
-    inspectPtyHost,
-    enableExtensions,
-    inspectPtyHostPort,
-    inspectSharedProcessPort,
-    inspectExtensionsPort,
-    enableProxy,
-    useProxyMock,
   })
-  const { port, dispose } = createPipeline(child.stderr)
+  const { dispose, port } = createPipeline(child.stderr)
   const rpc = await NodeWorkerRpcParent.create({
-    path: getInitializationWorkerUrl(),
     commandMap: {},
+    path: getInitializationWorkerUrl(),
     stdio: 'inherit',
   })
   const { devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, webSocketUrl } = await rpc.invokeAndTransfer(

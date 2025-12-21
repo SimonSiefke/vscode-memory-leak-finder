@@ -1,4 +1,4 @@
-import { MessagePort } from 'node:worker_threads'
+import type { MessagePort } from 'node:worker_threads'
 import { connectDevtools } from '../ConnectDevtools/ConnectDevtools.ts'
 import { connectElectron } from '../ConnectElectron/ConnectElectron.ts'
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
@@ -18,7 +18,7 @@ export const prepareBoth = async (headlessMode: boolean, attachedToPageTimeout: 
   const electronIpc = await DebuggerCreateIpcConnection.createConnection(webSocketUrl)
   const electronRpc = DebuggerCreateRpcConnection.createRpc(electronIpc)
 
-  const { monkeyPatchedElectronId, electronObjectId } = await connectElectron(electronRpc, headlessMode)
+  const { electronObjectId, monkeyPatchedElectronId } = await connectElectron(electronRpc, headlessMode)
 
   await DevtoolsProtocolDebugger.resume(electronRpc)
 
@@ -35,7 +35,7 @@ export const prepareBoth = async (headlessMode: boolean, attachedToPageTimeout: 
     objectId: monkeyPatchedElectronId,
   })
 
-  const { sessionId, targetId, dispose } = await connectDevtoolsPromise
+  const { dispose, sessionId, targetId } = await connectDevtoolsPromise
 
   await Promise.all([electronRpc.dispose(), dispose()])
 
