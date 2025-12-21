@@ -14,7 +14,7 @@ export const getVscodeRuntimePath = async (vscodeVersion: string): Promise<strin
   }
   try {
     const cache = await JsonFile.readJson(cacheFilePath)
-    const {path} = cache
+    const { path } = cache
     if (typeof path !== 'string') {
       return ''
     }
