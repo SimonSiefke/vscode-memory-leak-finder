@@ -29,8 +29,8 @@ test('handleStdinDataFilterWaitingMode - alt + backspace', async () => {
 test('handleStdinDataFilterWaitingMode - ctrl + backspace', async () => {
   const state = {
     ...createDefaultState(),
-    value: 'abc',
     stdout: [],
+    value: 'abc',
   }
   const key = AnsiKeys.ControlBackspace
 
@@ -54,8 +54,8 @@ test('handleStdinDataFilterWaitingMode - ctrl + backspace', async () => {
 test('handleStdinDataFilterWaitingMode - ctrl + backspace - empty value', async () => {
   const state = {
     ...createDefaultState(),
-    value: '',
     stdout: [],
+    value: '',
   }
   const key = AnsiKeys.ControlBackspace
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
@@ -65,8 +65,8 @@ test('handleStdinDataFilterWaitingMode - ctrl + backspace - empty value', async 
 test('handleStdinDataFilterWaitingMode - ctrl + c', async () => {
   const state = {
     ...createDefaultState(),
-    value: 'abc',
     stdout: [],
+    value: 'abc',
   }
   const key = AnsiKeys.ControlC
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
@@ -76,8 +76,8 @@ test('handleStdinDataFilterWaitingMode - ctrl + c', async () => {
 test('handleStdinDataFilterWaitingMode - ctrl + d', async () => {
   const state = {
     ...createDefaultState(),
-    value: 'abc',
     stdout: [],
+    value: 'abc',
   }
   const key = AnsiKeys.ControlD
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
@@ -87,9 +87,9 @@ test('handleStdinDataFilterWaitingMode - ctrl + d', async () => {
 test('handleStdinDataFilterWaitingMode - enter', async () => {
   const state = {
     ...createDefaultState(),
-    value: 'abc',
-    stdout: [],
     previousFilters: [],
+    stdout: [],
+    value: 'abc',
   }
   const key = AnsiKeys.Enter
 
@@ -113,8 +113,8 @@ test('handleStdinDataFilterWaitingMode - enter', async () => {
 test('handleStdinDataFilterWaitingMode - escape', async () => {
   const state = {
     ...createDefaultState(),
-    value: 'abc',
     stdout: [],
+    value: 'abc',
   }
   const key = AnsiKeys.Escape
 
@@ -137,8 +137,8 @@ test('handleStdinDataFilterWaitingMode - escape', async () => {
 test('handleStdinDataFilterWaitingMode - home', async () => {
   const state = {
     ...createDefaultState(),
-    value: 'abc',
     stdout: [],
+    value: 'abc',
   }
   const key = AnsiKeys.Home
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)
@@ -148,8 +148,8 @@ test('handleStdinDataFilterWaitingMode - home', async () => {
 test('handleStdinDataFilterWaitingMode - end', async () => {
   const state = {
     ...createDefaultState(),
-    value: 'abc',
     stdout: [],
+    value: 'abc',
   }
   const key = AnsiKeys.End
   const newState = await HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode(state, key)

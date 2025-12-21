@@ -1,11 +1,11 @@
-import * as RunTest from '../RunTest/RunTest.ts'
-import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
-import * as Stdout from '../Stdout/Stdout.ts'
 import type { StartRunningOptions } from '../StartRunning/StartRunningOptions.ts'
+import * as RunTest from '../RunTest/RunTest.ts'
+import * as Stdout from '../Stdout/Stdout.ts'
+import * as TestWorkerCommandType from '../TestWorkerCommandType/TestWorkerCommandType.ts'
 
 export interface BisectResult {
-  type: 'success' | 'failed-test' | 'not-found'
   commit?: string
+  type: 'success' | 'failed-test' | 'not-found'
 }
 
 export const bisect = async (options: StartRunningOptions): Promise<BisectResult> => {
@@ -21,39 +21,39 @@ export const bisect = async (options: StartRunningOptions): Promise<BisectResult
 
   try {
     const result = await rpc.invoke(TestWorkerCommandType.RunTests, {
-      root: options.cwd,
+      bisect: true,
+      checkLeaks: options.checkLeaks,
+      color: options.color,
+      commit: options.commit,
+      continueValue: options.continueValue,
       cwd: options.cwd,
+      enableExtensions: options.enableExtensions,
+      enableProxy: options.enableProxy,
       filterValue: options.filterValue,
       headlessMode: options.headlessMode,
-      color: options.color,
-      checkLeaks: options.checkLeaks,
-      runSkippedTestsAnyway: options.runSkippedTestsAnyway,
-      recordVideo: options.recordVideo,
-      runs: options.runs,
+      ide: options.ide,
+      ideVersion: options.ideVersion,
+      inspectExtensions: options.inspectExtensions,
+      inspectExtensionsPort: options.inspectExtensionsPort,
+      inspectPtyHost: options.inspectPtyHost,
+      inspectPtyHostPort: options.inspectPtyHostPort,
+      inspectSharedProcess: options.inspectSharedProcess,
+      inspectSharedProcessPort: options.inspectSharedProcessPort,
       measure: options.measure,
       measureAfter: options.measureAfter,
       measureNode: options.measureNode,
-      timeouts: options.timeouts,
-      timeoutBetween: options.timeoutBetween,
+      recordVideo: options.recordVideo,
       restartBetween: options.restartBetween,
+      root: options.cwd,
       runMode: options.runMode,
-      ide: options.ide,
-      ideVersion: options.ideVersion,
+      runs: options.runs,
+      runSkippedTestsAnyway: options.runSkippedTestsAnyway,
+      setupOnly: options.setupOnly,
+      timeoutBetween: options.timeoutBetween,
+      timeouts: options.timeouts,
+      useProxyMock: options.useProxyMock,
       vscodePath: options.vscodePath,
       vscodeVersion: options.vscodeVersion,
-      commit: options.commit,
-      setupOnly: options.setupOnly,
-      continueValue: options.continueValue,
-      inspectSharedProcess: options.inspectSharedProcess,
-      inspectExtensions: options.inspectExtensions,
-      inspectPtyHost: options.inspectPtyHost,
-      enableExtensions: options.enableExtensions,
-      inspectPtyHostPort: options.inspectPtyHostPort,
-      inspectSharedProcessPort: options.inspectSharedProcessPort,
-      inspectExtensionsPort: options.inspectExtensionsPort,
-      enableProxy: options.enableProxy,
-      useProxyMock: options.useProxyMock,
-      bisect: true,
     })
 
     // Type guard to check if result is a BisectResult (has 'commit' field but not 'passed')
