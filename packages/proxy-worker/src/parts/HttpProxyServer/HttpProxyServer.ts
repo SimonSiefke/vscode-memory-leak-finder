@@ -1,4 +1,4 @@
-import type { IncomingMessage, ServerResponse } from 'http';
+import type { IncomingMessage, ServerResponse } from 'http'
 import { mkdir, writeFile } from 'fs/promises'
 import { createServer } from 'http'
 import { request as httpRequest } from 'http'
@@ -161,7 +161,7 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
           JSON.stringify({
             error: errorCode === 'ETIMEDOUT' ? 'Gateway Timeout' : 'Network Error',
             message:
-              errorCode === 'ETIMEDOUT' ? 'Connection timeout' : (errorCode === 'ENETUNREACH' ? 'Network unreachable' : 'Connection error'),
+              errorCode === 'ETIMEDOUT' ? 'Connection timeout' : errorCode === 'ENETUNREACH' ? 'Network unreachable' : 'Connection error',
             target: targetUrl,
           }),
         )
