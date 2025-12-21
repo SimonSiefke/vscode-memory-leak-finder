@@ -11,17 +11,17 @@ export const setupTestWithCallback = async (pageObject, file, forceRun) => {
   const wasOriginallySkipped = Boolean(module.skip)
   const isCi = process.env.GITHUB_ACTIONS
   if (module.requiresNetwork && isCi) {
-    return { skipped: true, wasOriginallySkipped, error: null }
+    return { error: null, skipped: true, wasOriginallySkipped }
   }
   if (module.skip && !forceRun) {
-    return { skipped: true, wasOriginallySkipped, error: null }
+    return { error: null, skipped: true, wasOriginallySkipped }
   }
   try {
     await TestStage.beforeSetup(module, pageObject)
     await TestStage.setup(module, pageObject)
-    return { skipped: false, wasOriginallySkipped, error: null }
+    return { error: null, skipped: false, wasOriginallySkipped }
   } catch (error) {
     // If setup fails, return the error information instead of throwing
-    return { skipped: false, wasOriginallySkipped, error: error }
+    return { error: error, skipped: false, wasOriginallySkipped }
   }
 }

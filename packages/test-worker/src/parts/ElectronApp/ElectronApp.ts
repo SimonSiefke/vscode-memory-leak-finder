@@ -1,33 +1,33 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as ObjectType from '../ObjectType/ObjectType.ts'
-import * as WaitForIframe from '../WaitForIframe/WaitForIframe.ts'
 import * as Page from '../Page/Page.ts'
+import * as WaitForIframe from '../WaitForIframe/WaitForIframe.ts'
 
-export const create = ({ electronRpc, electronObjectId, idleTimeout, firstWindow, browserRpc, sessionRpc }) => {
+export const create = ({ browserRpc, electronObjectId, electronRpc, firstWindow, idleTimeout, sessionRpc }) => {
   return {
-    objectType: ObjectType.ElectronApp,
-    rpc: electronRpc,
     electronObjectId,
-    windows: [],
-    firstWindow() {
-      return firstWindow
-    },
     evaluate(expression) {
       return DevtoolsProtocolRuntime.evaluate(this.rpc, {
         expression,
       })
     },
-    waitForIframe({ url, injectUtilityScript = true }) {
+    firstWindow() {
+      return firstWindow
+    },
+    objectType: ObjectType.ElectronApp,
+    rpc: electronRpc,
+    waitForIframe({ injectUtilityScript = true, url }) {
       return WaitForIframe.waitForIframe({
+        browserRpc,
+        createPage: Page.create,
         electronObjectId,
         electronRpc,
-        url,
         idleTimeout,
-        browserRpc,
-        sessionRpc,
-        createPage: Page.create,
         injectUtilityScript,
+        sessionRpc,
+        url,
       })
     },
+    windows: [],
   }
 }

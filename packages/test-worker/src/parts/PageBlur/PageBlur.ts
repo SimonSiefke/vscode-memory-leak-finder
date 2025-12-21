@@ -11,7 +11,7 @@ const script = `function () {
   browserWindow.blur()
 }`
 
-export const blur = async ({ electronRpc, electronObjectId }) => {
+export const blur = async ({ electronObjectId, electronRpc }) => {
   await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
     functionDeclaration: script,
     objectId: electronObjectId,

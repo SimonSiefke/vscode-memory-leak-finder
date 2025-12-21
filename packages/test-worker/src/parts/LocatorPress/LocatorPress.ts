@@ -5,7 +5,6 @@ export const press = async (locator, key) => {
   Assert.object(locator)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
       arguments: [
         {
           value: locator,
@@ -15,12 +14,13 @@ export const press = async (locator, key) => {
         },
         {
           value: {
-            key,
             bubbles: true,
+            key,
           },
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
     },
     locator,
   )

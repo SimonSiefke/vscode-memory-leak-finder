@@ -9,7 +9,6 @@ export const type = async (locator, text) => {
   Assert.string(text)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
       arguments: [
         {
           value: locator,
@@ -24,6 +23,7 @@ export const type = async (locator, text) => {
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(locator, fnName, options) => test.performAction(locator, fnName, options)',
     },
     locator,
   )
@@ -34,13 +34,13 @@ export const typeAndWaitFor = async (locator, text, waitFor, options) => {
   Assert.string(text)
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(options) => test.typeAndWaitFor(options)',
       arguments: [
         {
           value: { locator, text, waitFor, ...options },
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(options) => test.typeAndWaitFor(options)',
     },
     locator,
   )
