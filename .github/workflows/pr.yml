@@ -14,17 +14,17 @@ jobs:
         os: [ubuntu-24.04, macos-26, windows-2025]
     timeout-minutes: 240
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - run: |
           git fetch --no-tags --prune --depth=1 origin +refs/heads/main:refs/remotes/origin/main
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
       - name: Compute node modules cache key
         id: nodeModulesCacheKey
         run: echo "value=$(node scripts/computeNodeModulesCacheKey.js)" >> $GITHUB_OUTPUT
         shell: bash
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         id: npm-cache
         with:
           path: |
@@ -38,7 +38,7 @@ jobs:
         id: sourceMapsCacheKey
         run: echo "value=$(node packages/build/src/computeSourceMapsCacheKey.ts)" >> $GITHUB_OUTPUT
         shell: bash
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         id: source-maps-cache
         with:
           path: |
@@ -83,7 +83,7 @@ jobs:
           run: node packages/cli/bin/test.js --cwd packages/e2e --check-leaks --measure event-listeners
       - name: Generate charts
         run: node packages/charts/src/main.ts
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: vscode-videos-${{ runner.os }}
