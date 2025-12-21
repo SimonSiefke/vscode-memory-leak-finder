@@ -2,11 +2,11 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ Workspace, Explorer, Editor }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'file.ipynb',
       content: '',
+      name: 'file.ipynb',
     },
   ])
   await Editor.closeAll()

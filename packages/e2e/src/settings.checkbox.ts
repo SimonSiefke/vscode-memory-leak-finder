@@ -4,8 +4,8 @@ export const setup = async ({ Editor, SettingsEditor }: TestContext): Promise<vo
   await Editor.closeAll()
   await SettingsEditor.open()
   await SettingsEditor.search({
-    value: 'comments.visible',
     resultCount: 1,
+    value: 'comments.visible',
   })
   await SettingsEditor.enableCheckBox({
     name: 'comments.visible',

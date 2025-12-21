@@ -4,11 +4,10 @@ export const requiresNetwork = true
 
 export const skip = 1
 
-export const setup = async ({ SideBar, Workspace, Extensions, Editor, ExtensionDetailView }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, ExtensionDetailView, Extensions, SideBar, Workspace }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Workspace.setFiles([
     {
-      name: 'package.json',
       content: `{
   "name": "test-project",
   "version": "1.0.0",
@@ -16,6 +15,7 @@ export const setup = async ({ SideBar, Workspace, Extensions, Editor, ExtensionD
     "lodash": "1.0.0"
   }
 }`,
+      name: 'package.json',
     },
   ])
   await Extensions.show()

@@ -3,7 +3,7 @@ import type { TestContext } from '../types.ts'
 export const skip = 1
 
 // @ts-ignore
-export const setup = async ({ Extensions, Editor, ExtensionDetailView }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, ExtensionDetailView, Extensions }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Extensions.show()
   await Extensions.search('@builtin html')
@@ -15,7 +15,7 @@ export const setup = async ({ Extensions, Editor, ExtensionDetailView }: TestCon
 // @ts-ignore
 export const run = async ({ ExtensionDetailView }: TestContext): Promise<void> => {
   await ExtensionDetailView.shouldHaveTab('Details')
-  await ExtensionDetailView.openTab('Features', { webView: false, timeout: 30000 })
-  await ExtensionDetailView.openTab('Changelog', { webView: true, timeout: 30000 })
-  await ExtensionDetailView.openTab('Details', { webView: true, timeout: 30000 })
+  await ExtensionDetailView.openTab('Features', { timeout: 30_000, webView: false })
+  await ExtensionDetailView.openTab('Changelog', { timeout: 30_000, webView: true })
+  await ExtensionDetailView.openTab('Details', { timeout: 30_000, webView: true })
 }

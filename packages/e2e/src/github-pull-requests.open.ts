@@ -5,12 +5,12 @@ export const skip = 1
 export const requiresNetwork = true
 
 export const setup = async ({
-  GitHubPullRequests,
-  Workspace,
-  Extensions,
   Editor,
   ExtensionDetailView,
+  Extensions,
   Git,
+  GitHubPullRequests,
+  Workspace,
 }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Workspace.setFiles([])
@@ -24,7 +24,7 @@ export const setup = async ({
   await GitHubPullRequests.focusView()
 }
 
-export const run = async ({ GitHubPullRequests, ActivityBar, SideBar }: TestContext): Promise<void> => {
+export const run = async ({ ActivityBar, GitHubPullRequests, SideBar }: TestContext): Promise<void> => {
   await SideBar.hide()
   await ActivityBar.showExplorer()
   await GitHubPullRequests.focusView()

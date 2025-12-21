@@ -1,9 +1,8 @@
-import type { TestContext } from '../types.ts'
-
 // @ts-ignore
 import path, { dirname, join } from 'node:path'
 // @ts-ignore
 import { fileURLToPath } from 'node:url'
+import type { TestContext } from '../types.ts'
 
 export const skip = true
 

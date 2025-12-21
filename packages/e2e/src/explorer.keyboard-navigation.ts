@@ -4,14 +4,14 @@ const createFiles = () => {
   const files = []
   for (let i = 0; i < 10; i++) {
     files.push({
-      name: `file-${i}.txt`,
       content: `file content ${i}`,
+      name: `file-${i}.txt`,
     })
   }
   return files
 }
 
-export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
+export const setup = async ({ Explorer, Workspace }: TestContext): Promise<void> => {
   const files = createFiles()
   await Workspace.setFiles(files)
   await Explorer.focus()

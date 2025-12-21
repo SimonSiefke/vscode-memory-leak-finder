@@ -7,8 +7,8 @@ export const requiresNetwork = 1
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'index.css',
       content: 'h1 { visibil }',
+      name: 'index.css',
     },
   ])
   await Editor.open('index.css')
@@ -17,7 +17,7 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
   await Editor.setCursor(1, 13)
 }
 
-export const run = async ({ Suggest, Editor, Extensions }: TestContext): Promise<void> => {
+export const run = async ({ Editor, Extensions, Suggest }: TestContext): Promise<void> => {
   // @ts-ignore
   await Extensions.restart()
   // @ts-ignore

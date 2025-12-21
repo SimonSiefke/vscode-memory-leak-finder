@@ -5,14 +5,14 @@ export const skip = true
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'tsconfig.json',
       content: `{}
 `,
+      name: 'tsconfig.json',
     },
     {
-      name: 'file.ts',
       content: `abc
 def`,
+      name: 'file.ts',
     },
   ])
   await Editor.open('file.ts')
