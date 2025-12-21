@@ -1,4 +1,8 @@
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
+<<<<<<< Updated upstream
+=======
+import * as Electron from '../Electron/Electron.ts'
+>>>>>>> Stashed changes
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
@@ -337,6 +341,18 @@ export const create = ({ page, expect, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to refresh explorer`)
+      }
+    },
+    async removeCurrent() {
+      try {
+        await page.waitForIdle()
+        await page.keyboard.press('Home')
+        await page.waitForIdle()
+        await page.keyboard.press('Delete')
+        await this.refresh()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to delete`)
       }
     },
     not: {
