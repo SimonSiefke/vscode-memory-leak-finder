@@ -17,6 +17,37 @@ export const parseStringArray = (data: Uint8Array, strings: string[]) => {
     const char = String.fromCharCode(byte)
 
     switch (state) {
+      case 'after_backslash':
+        // Skip the escaped character (it's already included in the string)
+        dataIndex++
+        state = 'inside_string'
+        break
+
+      case 'inside_string':
+        if (char === '\\') {
+          // Escape character, next character is literal
+          state = 'after_backslash'
+          dataIndex++
+        } else if (char === '"') {
+          // End of string
+          const stringEnd = dataIndex
+          if (stringStart <= stringEnd) {
+            const stringBytes = data.slice(stringStart, stringEnd)
+            const string = textDecoder.decode(stringBytes)
+            // Process escaped characters in the string
+            const processedString = string.replaceAll(String.raw`\"`, '"').replaceAll('\\\\', '\\')
+            strings.push(processedString)
+          }
+
+          state = 'outside'
+          dataIndex++
+        } else {
+          // Regular character inside string
+          dataIndex++
+        }
+
+        break
+
       case 'outside':
         if (char === '"') {
           // Start of a string
@@ -51,37 +82,6 @@ export const parseStringArray = (data: Uint8Array, strings: string[]) => {
           return { dataIndex, done: false }
         }
 
-        break
-
-      case 'inside_string':
-        if (char === '\\') {
-          // Escape character, next character is literal
-          state = 'after_backslash'
-          dataIndex++
-        } else if (char === '"') {
-          // End of string
-          const stringEnd = dataIndex
-          if (stringStart <= stringEnd) {
-            const stringBytes = data.slice(stringStart, stringEnd)
-            const string = textDecoder.decode(stringBytes)
-            // Process escaped characters in the string
-            const processedString = string.replaceAll(String.raw`\"`, '"').replaceAll('\\\\', '\\')
-            strings.push(processedString)
-          }
-
-          state = 'outside'
-          dataIndex++
-        } else {
-          // Regular character inside string
-          dataIndex++
-        }
-
-        break
-
-      case 'after_backslash':
-        // Skip the escaped character (it's already included in the string)
-        dataIndex++
-        state = 'inside_string'
         break
     }
   }
