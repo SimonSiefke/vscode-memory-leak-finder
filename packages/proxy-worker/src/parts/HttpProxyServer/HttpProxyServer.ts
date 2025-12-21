@@ -1,9 +1,10 @@
-import { createServer, IncomingMessage, ServerResponse } from 'http'
+import type { IncomingMessage, ServerResponse } from 'http'
+import { mkdir, writeFile } from 'fs/promises'
+import { createServer } from 'http'
 import { request as httpRequest } from 'http'
 import { request as httpsRequest } from 'https'
-import { URL } from 'url'
-import { mkdir, writeFile } from 'fs/promises'
 import { join } from 'path'
+import { URL } from 'url'
 import * as Root from '../Root/Root.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 
@@ -18,16 +19,16 @@ const saveRequest = async (req: IncomingMessage, response: ServerResponse, respo
     const filepath = join(REQUESTS_DIR, filename)
 
     const requestData = {
-      timestamp,
-      method: req.method,
-      url: req.url,
       headers: req.headers,
+      method: req.method,
       response: {
+        body: responseData.toString('utf8'),
+        headers: response.getHeaders(),
         statusCode: response.statusCode,
         statusMessage: response.statusMessage,
-        headers: response.getHeaders(),
-        body: responseData.toString('utf8'),
       },
+      timestamp,
+      url: req.url,
     }
 
     await writeFile(filepath, JSON.stringify(requestData, null, 2), 'utf8')
@@ -47,12 +48,12 @@ const saveConnectTunnel = async (hostname: string, port: number): Promise<void> 
     const filepath = join(REQUESTS_DIR, filename)
 
     const tunnelData = {
-      timestamp,
-      method: 'CONNECT',
-      target,
       hostname,
-      port,
+      method: 'CONNECT',
       note: 'HTTPS tunnel - actual request/response data is encrypted and cannot be captured',
+      port,
+      target,
+      timestamp,
     }
 
     await writeFile(filepath, JSON.stringify(tunnelData, null, 2), 'utf8')
@@ -98,14 +99,14 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
   const requestModule = isHttps ? httpsRequest : httpRequest
 
   const options = {
-    hostname: parsedUrl.hostname,
-    port: parsedUrl.port || (isHttps ? 443 : 80),
-    path: parsedUrl.pathname + parsedUrl.search,
-    method: req.method,
     headers: {
       ...req.headers,
       host: parsedUrl.host,
     } as Record<string, string | string[] | undefined>,
+    hostname: parsedUrl.hostname,
+    method: req.method,
+    path: parsedUrl.pathname + parsedUrl.search,
+    port: parsedUrl.port || (isHttps ? 443 : 80),
   }
 
   // Remove proxy-specific headers
@@ -125,8 +126,8 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
     proxyRes.on('end', () => {
       res.end()
       const responseData = Buffer.concat(chunks)
-      saveRequest(req, res, responseData).catch((err) => {
-        console.error('[Proxy] Error saving request:', err)
+      saveRequest(req, res, responseData).catch((error) => {
+        console.error('[Proxy] Error saving request:', error)
       })
     })
   })
@@ -183,7 +184,7 @@ const forwardRequest = (req: IncomingMessage, res: ServerResponse, targetUrl: st
   })
 
   // Handle request timeout
-  proxyReq.setTimeout(30000, () => {
+  proxyReq.setTimeout(30_000, () => {
     const isAzureMetadata = parsedUrl.hostname === '169.254.169.254'
 
     // Azure metadata endpoint timeouts are expected when not on Azure
@@ -230,7 +231,7 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
   const target = req.url || ''
   const parts = target.split(':')
   const hostname = parts[0]
-  const targetPort = parts[1] ? parseInt(parts[1], 10) : 443
+  const targetPort = parts[1] ? Number.parseInt(parts[1], 10) : 443
 
   const { createConnection } = await import('net')
   console.log(`[Proxy] Establishing CONNECT tunnel to ${hostname}:${targetPort}`)
@@ -243,8 +244,8 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
     socket.pipe(proxySocket)
     console.log(`[Proxy] CONNECT tunnel established to ${hostname}:${targetPort}`)
     // Save tunnel metadata (we can't capture encrypted HTTPS traffic)
-    saveConnectTunnel(hostname, targetPort).catch((err) => {
-      console.error('[Proxy] Error saving CONNECT tunnel:', err)
+    saveConnectTunnel(hostname, targetPort).catch((error) => {
+      console.error('[Proxy] Error saving CONNECT tunnel:', error)
     })
   })
 
@@ -298,8 +299,8 @@ export const createHttpProxyServer = async (
       res.writeHead(200, { 'Content-Type': 'application/json' })
       res.end(
         JSON.stringify({
-          status: 'running',
           port,
+          status: 'running',
           timestamp: Date.now(),
         }),
       )
@@ -356,11 +357,11 @@ export const createHttpProxyServer = async (
 
   return {
     port: actualPort,
-    url,
     async [Symbol.asyncDispose]() {
       const { promise, resolve } = Promise.withResolvers<void>()
       server.close(() => resolve())
       await promise
     },
+    url,
   }
 }
