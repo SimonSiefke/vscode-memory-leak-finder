@@ -2,14 +2,14 @@ import { addUtilityExecutionContext } from '../AddUtilityExecutionContext/AddUti
 import { waitForSubFrame } from '../WaitForSubFrameContext/WaitForSubFrameContext.ts'
 
 export const waitForSubIframe = async ({
-  electronRpc,
-  url,
-  electronObjectId,
-  idleTimeout,
   browserRpc,
-  sessionRpc,
   createPage,
+  electronObjectId,
+  electronRpc,
+  idleTimeout,
   injectUtilityScript,
+  sessionRpc,
+  url,
 }) => {
   // TODO
   // 1. add listener to page frame attached, frameStartedNavigating, check if it matches the expected url, take note of the frame id
@@ -17,7 +17,7 @@ export const waitForSubIframe = async ({
   // 3. enable page api
   // 4. resolve promise with execution context id and frame Id, clean up listeners
 
-  const subFrame = await waitForSubFrame(sessionRpc, url, 3_000)
+  const subFrame = await waitForSubFrame(sessionRpc, url, 3000)
   if (!subFrame) {
     throw new Error(`no matching frame found`)
   }
@@ -29,15 +29,15 @@ export const waitForSubIframe = async ({
   }
 
   const iframe = createPage({
+    browserRpc,
     electronObjectId,
     electronRpc,
     idleTimeout,
     rpc: sessionRpc,
     sessionId: sessionRpc.sessionId,
+    sessionRpc,
     targetId: '', // TODO use that of parent target
     utilityContext,
-    browserRpc,
-    sessionRpc,
   })
   return iframe
 }

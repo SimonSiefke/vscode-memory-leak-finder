@@ -2,7 +2,7 @@ import * as PageEventState from '../PageEventState/PageEventState.ts'
 import * as PageEventType from '../PageEventType/PageEventType.ts'
 import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 
-export const waitForFirstWindow = async ({ electronApp, isHeadless, isFirstConnection }) => {
+export const waitForFirstWindow = async ({ electronApp, isFirstConnection, isHeadless }) => {
   const firstWindow = await electronApp.firstWindow()
   if (isFirstConnection) {
     await PageEventState.waitForEvent({

@@ -12,14 +12,14 @@ const findMatchingIframe = (targets, expectedUrl) => {
 }
 
 export const waitForIframe = async ({
-  electronRpc,
-  url,
-  electronObjectId,
-  idleTimeout,
   browserRpc,
-  sessionRpc,
   createPage,
+  electronObjectId,
+  electronRpc,
+  idleTimeout,
   injectUtilityScript,
+  sessionRpc,
+  url,
 }) => {
   // TODO
   // 1. enable page api
@@ -36,8 +36,8 @@ export const waitForIframe = async ({
   }
 
   const iframeSessionId = await DevtoolsProtocolTarget.attachToTarget(sessionRpc, {
-    targetId: matchingIframe.targetId,
     flatten: true,
+    targetId: matchingIframe.targetId,
   })
   const iframeRpc = createSessionRpcConnection(browserRpc, iframeSessionId)
 
@@ -51,15 +51,15 @@ export const waitForIframe = async ({
   }
 
   const iframe = createPage({
+    browserRpc,
     electronObjectId,
     electronRpc,
     idleTimeout,
     rpc: iframeRpc,
     sessionId: iframeRpc.sessionId,
+    sessionRpc: iframeRpc,
     targetId: matchingIframe.targetId,
     utilityContext: iframeUtilityContext,
-    browserRpc,
-    sessionRpc: iframeRpc,
   })
   return iframe
 }

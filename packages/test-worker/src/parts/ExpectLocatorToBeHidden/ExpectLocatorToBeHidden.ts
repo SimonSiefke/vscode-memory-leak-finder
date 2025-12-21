@@ -3,12 +3,11 @@ import * as EvaluateInUtilityContext from '../EvaluateInUtilityContext/EvaluateI
 export const toBeHidden = async (locator, options = {}) => {
   await EvaluateInUtilityContext.evaluateInUtilityContext(
     {
-      functionDeclaration: '(locator, options) => test.checkHidden(locator, options)',
       arguments: [
         {
           value: {
-            selector: locator.selector,
             nth: locator.nth,
+            selector: locator.selector,
           },
         },
         {
@@ -16,6 +15,7 @@ export const toBeHidden = async (locator, options = {}) => {
         },
       ],
       awaitPromise: true,
+      functionDeclaration: '(locator, options) => test.checkHidden(locator, options)',
     },
     locator,
   )
