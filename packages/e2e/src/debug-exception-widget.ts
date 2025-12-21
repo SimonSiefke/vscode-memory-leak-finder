@@ -2,10 +2,9 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ ActivityBar, Editor, Workspace, Explorer, RunAndDebug }: TestContext): Promise<void> => {
+export const setup = async ({ ActivityBar, Editor, Explorer, RunAndDebug, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'index.js',
       content: `process.on('uncaughtException', () => {
   // Ignore exception to keep process running
 })
@@ -14,6 +13,7 @@ setInterval(() => {
   throw new Error('Test exception')
 }, 1000)
 `,
+      name: 'index.js',
     },
   ])
   await Editor.closeAll()
@@ -24,13 +24,13 @@ setInterval(() => {
   await ActivityBar.showRunAndDebug()
   await RunAndDebug.startRunAndDebug()
   await RunAndDebug.setPauseOnExceptions({
-    pauseOnExceptions: true,
     pauseOnCaughtExceptions: true,
+    pauseOnExceptions: true,
   })
   await RunAndDebug.waitForPausedOnException({
+    exception: true,
     file: 'index.js',
     line: 6,
-    exception: true,
   })
 }
 
@@ -38,9 +38,9 @@ export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> =
   await Editor.shouldHaveExceptionWidget()
   await RunAndDebug.continue()
   await RunAndDebug.waitForPausedOnException({
+    exception: true,
     file: 'index.js',
     line: 6,
-    exception: true,
   })
 }
 

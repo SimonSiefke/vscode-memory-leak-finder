@@ -3,23 +3,23 @@ import type { TestContext } from '../types.js'
 export const skip = 1
 
 export const setup = async ({
-  Workbench,
-  Workspace,
-  Explorer,
   Editor,
+  Explorer,
+  MarkdownPreview,
   QuickPick,
   // @ts-ignore
   WellKnownCommands,
-  MarkdownPreview,
+  Workbench,
+  Workspace,
 }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'index.md',
       content: `# hello world`,
+      name: 'index.md',
     },
     {
-      name: 'other.md',
       content: `# abc`,
+      name: 'other.md',
     },
   ])
   await Editor.closeAll()
@@ -36,7 +36,7 @@ export const setup = async ({
 }
 
 // @ts-ignore
-export const run = async ({ Workbench, Editor, QuickPick, WellKnownCommands, MarkdownPreview }: TestContext): Promise<void> => {
+export const run = async ({ Editor, MarkdownPreview, QuickPick, WellKnownCommands, Workbench }: TestContext): Promise<void> => {
   await Editor.open('other.md')
   const subFrame2 = await MarkdownPreview.shouldBeVisible()
   // @ts-ignore

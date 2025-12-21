@@ -2,7 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const skip = 1
 
-export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
+export const setup = async ({ Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([])
   await Explorer.focus()
   await Explorer.refresh()

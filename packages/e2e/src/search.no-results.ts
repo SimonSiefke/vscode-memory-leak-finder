@@ -3,8 +3,8 @@ import type { TestContext } from '../types.ts'
 export const setup = async ({ ActivityBar, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'file.txt',
       content: 'sample text',
+      name: 'file.txt',
     },
   ])
   await ActivityBar.showSearch()

@@ -2,11 +2,11 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ Editor, Workspace, Explorer, ActivityBar }: TestContext): Promise<void> => {
+export const setup = async ({ ActivityBar, Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'index.html',
       content: '<h1>hello world</h1>',
+      name: 'index.html',
     },
   ])
   await Workspace.initializeGitRepository()

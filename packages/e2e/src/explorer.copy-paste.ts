@@ -2,23 +2,23 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ Workspace, Explorer }: TestContext): Promise<void> => {
+export const setup = async ({ Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
+      content: '',
       name: 'file-1.txt',
-      content: '',
     },
     {
+      content: '',
       name: 'file-2.txt',
-      content: '',
     },
     {
+      content: '',
       name: 'file-3.txt',
-      content: '',
     },
     {
-      name: 'file-4.txt',
       content: '',
+      name: 'file-4.txt',
     },
   ])
   await Explorer.focus()

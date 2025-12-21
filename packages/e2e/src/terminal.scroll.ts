@@ -2,12 +2,12 @@ import type { TestContext } from '../types.js'
 
 export const skip = true
 
-export const setup = async ({ Terminal, Workspace, SideBar }: TestContext): Promise<void> => {
+export const setup = async ({ SideBar, Terminal, Workspace }: TestContext): Promise<void> => {
   await Terminal.killAll()
   await Workspace.setFiles([
     {
-      name: 'file.txt',
       content: `a`.repeat(60_000),
+      name: 'file.txt',
     },
   ])
   await SideBar.hide()

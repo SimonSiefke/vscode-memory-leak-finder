@@ -2,13 +2,13 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ Editor, Workspace, Explorer }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'index.js',
       content: `import {readFile} from 'node:fs'
 
 readFile`,
+      name: 'index.js',
     },
   ])
   await Editor.closeAll()

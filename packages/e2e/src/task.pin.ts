@@ -2,7 +2,7 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ Editor, Workspace, Task }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Task, Workspace }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Workspace.setFiles([])
   await Task.openRun()

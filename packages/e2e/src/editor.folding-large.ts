@@ -4,14 +4,14 @@ const CLASS_COUNT = 4000
 
 export const skip = 1
 
-export const setup = async ({ Editor, Workspace, SettingsEditor }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, SettingsEditor, Workspace }: TestContext): Promise<void> => {
   await Editor.closeAll()
 
   // Enable folding setting
   await SettingsEditor.open()
   await SettingsEditor.search({
-    value: 'editor.folding',
     resultCount: 5,
+    value: 'editor.folding',
   })
   await SettingsEditor.enableCheckBox({
     name: 'editor.folding',
@@ -30,10 +30,10 @@ export const setup = async ({ Editor, Workspace, SettingsEditor }: TestContext):
 
   await Workspace.setFiles([
     {
-      name: 'large-file.ts',
       content: `// Large TypeScript file for folding test with 4000 classes
 ${classes.join('\n\n')}
 `,
+      name: 'large-file.ts',
     },
   ])
 
@@ -58,8 +58,8 @@ export const teardown = async ({ Editor, SettingsEditor }: TestContext): Promise
   // Disable folding setting
   await SettingsEditor.open()
   await SettingsEditor.search({
-    value: 'editor.folding',
     resultCount: 5,
+    value: 'editor.folding',
   })
   await SettingsEditor.disableCheckBox({
     name: 'editor.folding',

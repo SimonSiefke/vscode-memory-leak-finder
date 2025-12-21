@@ -5,7 +5,6 @@ export const skip = 1
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      name: 'main.cpp',
       content: `#include <iostream>
 #include <vector>
 
@@ -21,6 +20,7 @@ int main() {
     return 0;
 }
 `,
+      name: 'main.cpp',
     },
   ])
   await Editor.closeAll()
