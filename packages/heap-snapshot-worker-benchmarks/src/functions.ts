@@ -12,7 +12,6 @@ const testFunctionCount = async (): Promise<void> => {
   )
   console.log('Testing Function Count:')
   const count = await compareHeapSnapshotFunctions2(filePath1, filePath2, {
-    minCount: 0,
     excludeOriginalPaths: [
       'functional.ts',
       'lifecycle.ts',
@@ -23,6 +22,7 @@ const testFunctionCount = async (): Promise<void> => {
       'undoRedoService.ts',
       'editStack.ts',
     ],
+    minCount: 0,
   })
   console.log(count.length)
   await mkdir(dirname(resultPath), { recursive: true })

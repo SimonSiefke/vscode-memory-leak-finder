@@ -14,7 +14,7 @@ async function testGetObjectsWithProperties(): Promise<void> {
 
   try {
     const { analyzeNodeFromFile } = await importHeapSnapshotWorker('parts/ExamineNode/ExamineNode.ts')
-    const id = 302297
+    const id = 302_297
     const r = await analyzeNodeFromFile(heapSnapshotPath, id)
 
     console.log(JSON.stringify(r, null, 2))

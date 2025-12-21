@@ -37,6 +37,6 @@ workerPort.on('message', async (message) => {
     const transferList = getTransferList(result)
     workerPort.postMessage({ id, result }, transferList)
   } catch (error) {
-    workerPort.postMessage({ id, error: error.message })
+    workerPort.postMessage({ error: error.message, id })
   }
 })

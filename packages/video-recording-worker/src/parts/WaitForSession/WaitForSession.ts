@@ -7,22 +7,22 @@ export const waitForSession = async (browserRpc: any, attachedToPageTimeout: num
 
   await DevtoolsProtocolTarget.setAutoAttach(browserRpc, {
     autoAttach: true,
-    waitForDebuggerOnStart: false,
-    flatten: true,
     filter: [
       {
+        exclude: true,
         type: 'browser',
-        exclude: true,
       },
       {
+        exclude: true,
         type: 'tab',
-        exclude: true,
       },
       {
-        type: 'page',
         exclude: false,
+        type: 'page',
       },
     ],
+    flatten: true,
+    waitForDebuggerOnStart: false,
   })
 
   const event = await eventPromise
@@ -36,7 +36,7 @@ export const waitForSession = async (browserRpc: any, attachedToPageTimeout: num
   // TODO can remove attachment now
   return {
     sessionId,
-    targetId: targetInfo.targetId,
     sessionRpc,
+    targetId: targetInfo.targetId,
   }
 }
