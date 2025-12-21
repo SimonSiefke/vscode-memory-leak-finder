@@ -7,8 +7,8 @@ const createDisposableWorker = (workerPath: string) => {
   const worker = new Worker(workerPath)
   return {
     worker,
-    [Symbol.dispose]() {
-      worker.terminate()
+    async [Symbol.asyncDispose]() {
+      await worker.terminate()
     },
   }
 }
@@ -21,7 +21,7 @@ const createDisposableWorker = (workerPath: string) => {
  */
 export const prepareHeapSnapshot = async (path: string, options: any): Promise<Snapshot> => {
   const workerPath = getHeapSnapshotWorkerPath()
-  using worker = createDisposableWorker(workerPath)
+  await using worker = createDisposableWorker(workerPath)
   const resultPromise = waitForResult(worker.worker)
   worker.worker.postMessage({
     method: 'HeapSnapshot.parse',
