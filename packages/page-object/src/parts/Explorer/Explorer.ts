@@ -292,6 +292,18 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to refresh explorer`)
       }
     },
+    async removeCurrent() {
+      try {
+        await page.waitForIdle()
+        await page.keyboard.press('Home')
+        await page.waitForIdle()
+        await page.keyboard.press('Delete')
+        await this.refresh()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to delete`)
+      }
+    },
     async rename(oldDirentName: string, newDirentName: string) {
       try {
         await page.waitForIdle()
@@ -350,18 +362,6 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify that explorer has dirent "${direntName}"`)
-      }
-    },
-    async removeCurrent() {
-      try {
-        await page.waitForIdle()
-        await page.keyboard.press('Home')
-        await page.waitForIdle()
-        await page.keyboard.press('Delete')
-        await this.refresh()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to delete`)
       }
     },
   }
