@@ -5,6 +5,7 @@ export const create = ({ expect, page, VError }) => {
   return {
     async close() {
       try {
+        await page.waitForIdle()
         const suggestWidget = page.locator('.suggest-widget')
         await expect(suggestWidget).toBeVisible()
         await page.keyboard.press('Escape')
