@@ -2,14 +2,13 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 
 export const create = ({ expect, page, VError }) => {
   return {
-    async show() {
+    async resetFocus() {
       try {
-        const quickPick = QuickPick.create({ expect, page, VError })
-        await quickPick.executeCommand('Cursor: New Chat')
-        const chat = page.locator('.composer-bar')
-        await expect(chat).toBeVisible()
+        await page.waitForIdle()
+        await page.keyboard.press('Escape')
+        await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to show chat`)
+        throw new VError(error, `Failed to reset focus`)
       }
     },
     async sendMessage(question) {
@@ -46,13 +45,14 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to verify response text`)
       }
     },
-    async resetFocus() {
+    async show() {
       try {
-        await page.waitForIdle()
-        await page.keyboard.press('Escape')
-        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand('Cursor: New Chat')
+        const chat = page.locator('.composer-bar')
+        await expect(chat).toBeVisible()
       } catch (error) {
-        throw new VError(error, `Failed to reset focus`)
+        throw new VError(error, `Failed to show chat`)
       }
     },
   }

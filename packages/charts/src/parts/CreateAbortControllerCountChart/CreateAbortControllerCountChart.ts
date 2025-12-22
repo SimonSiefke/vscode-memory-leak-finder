@@ -7,8 +7,8 @@ export const getData = (basePath: string) => GetAbortControllerCountData.getAbor
 export const createChart = () => {
   return {
     x: 'index',
-    y: 'count',
     xLabel: 'Index',
+    y: 'count',
     yLabel: 'AbortController Count',
   }
 }

@@ -1,8 +1,18 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ page, expect, VError }) => {
+export const create = ({ expect, page, VError }) => {
   return {
+    async focusLeftEditorGroup() {
+      await page.waitForIdle()
+      const quickPick = QuickPick.create({ expect, page, VError })
+      await quickPick.executeCommand(WellKnownCommands.ViewFocusLeftEditorGroup)
+      await page.waitForIdle()
+    },
+    async shouldBeVisible() {
+      const workbench = page.locator('.monaco-workbench')
+      await expect(workbench).toBeVisible()
+    },
     async shouldHaveEditorBackground(color) {
       try {
         const workbench = page.locator('.monaco-workbench')
@@ -12,16 +22,6 @@ export const create = ({ page, expect, VError }) => {
       } catch (error) {
         throw new VError(error, `workbench has not the expected background color`)
       }
-    },
-    async shouldBeVisible() {
-      const workbench = page.locator('.monaco-workbench')
-      await expect(workbench).toBeVisible()
-    },
-    async focusLeftEditorGroup() {
-      await page.waitForIdle()
-      const quickPick = QuickPick.create({ page, expect, VError })
-      await quickPick.executeCommand(WellKnownCommands.ViewFocusLeftEditorGroup)
-      await page.waitForIdle()
     },
   }
 }

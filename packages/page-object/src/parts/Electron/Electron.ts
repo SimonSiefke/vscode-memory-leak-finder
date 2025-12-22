@@ -3,12 +3,6 @@ export const create = ({ electronApp, VError }) => {
     async evaluate(expression) {
       return await electronApp.evaluate(expression)
     },
-    async mockElectron(namespace, key, implementationCode) {
-      await this.evaluate(`(() => {
-  const electron = globalThis._____electron
-  electron['${namespace}']['${key}'] = ${implementationCode}
-})()`)
-    },
     async mockDialog(response) {
       try {
         const responseString = JSON.stringify(JSON.stringify(response))
@@ -17,13 +11,11 @@ export const create = ({ electronApp, VError }) => {
         throw new VError(error, `Failed to mock electron dialog`)
       }
     },
-    async mockSaveDialog(response) {
-      try {
-        const responseString = JSON.stringify(JSON.stringify(response))
-        await this.mockElectron('dialog', 'showSaveDialog', `() => { return JSON.parse(${responseString}) }`)
-      } catch (error) {
-        throw new VError(error, `Failed to mock electron save dialog`)
-      }
+    async mockElectron(namespace, key, implementationCode) {
+      await this.evaluate(`(() => {
+  const electron = globalThis._____electron
+  electron['${namespace}']['${key}'] = ${implementationCode}
+})()`)
     },
     async mockOpenDialog(response) {
       try {
@@ -31,6 +23,14 @@ export const create = ({ electronApp, VError }) => {
         await this.mockElectron('dialog', 'showOpenDialog', `() => { return JSON.parse(${responseString}) }`)
       } catch (error) {
         throw new VError(error, `Failed to mock electron open dialog`)
+      }
+    },
+    async mockSaveDialog(response) {
+      try {
+        const responseString = JSON.stringify(JSON.stringify(response))
+        await this.mockElectron('dialog', 'showSaveDialog', `() => { return JSON.parse(${responseString}) }`)
+      } catch (error) {
+        throw new VError(error, `Failed to mock electron save dialog`)
       }
     },
     async mockShellTrashItem() {

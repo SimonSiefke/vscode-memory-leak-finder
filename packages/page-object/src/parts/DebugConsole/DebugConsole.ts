@@ -4,30 +4,26 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, page, VError }) => {
   return {
-    async show() {
+    async clear() {
       try {
-        const repl = page.locator('.repl')
-        await expect(repl).toBeHidden()
-        const quickPick = QuickPick.create({ expect, page, VError })
-        await quickPick.executeCommand(WellKnownCommands.DebugConsoleFocusOnDebugConsoleView)
-        await expect(repl).toBeVisible()
-      } catch (error) {
-        throw new VError(error, `Failed to show debug console`)
-      }
-    },
-    async hide() {
-      try {
-        const repl = page.locator('.repl')
-        await expect(repl).toBeVisible()
-        const panel = Panel.create({ expect, page, VError })
-        await panel.hide()
-        await expect(repl).toBeHidden()
+        const clearConsoleButton = page.locator('[aria-label="Clear Console"]')
+        await clearConsoleButton.click()
         await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to hide debug console`)
+        throw new VError(error, `Failed to clear debug console`)
       }
     },
-    async evaluate({ expression, expectedResult }) {
+    async clearInput() {
+      try {
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.SelectAll)
+        await quickPick.executeCommand(WellKnownCommands.DeleteAllLeft)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to clear debug console input`)
+      }
+    },
+    async evaluate({ expectedResult, expression }) {
       try {
         const replInputWrapper = page.locator('.repl-input-wrapper')
         await expect(replInputWrapper).toBeVisible()
@@ -43,34 +39,16 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to evaluate expression in debug console`)
       }
     },
-    async type(value) {
+    async hide() {
       try {
-        await page.waitForIdle()
-        const quickPick = QuickPick.create({ page, expect, VError })
-        await quickPick.executeCommand(WellKnownCommands.DebugConsoleFocusOnDebugConsoleView)
-        await page.waitForIdle()
-        const replInputWrapper = page.locator('.repl-input-wrapper')
-        await expect(replInputWrapper).toBeVisible()
-        const viewLine = replInputWrapper.locator('.view-line')
-        await expect(viewLine).toBeVisible()
-        await viewLine.click()
-        const cursor = replInputWrapper.locator('.cursor')
-        await expect(cursor).toBeVisible()
-        const replInput = replInputWrapper.locator('.native-edit-context')
-        await replInput.focus()
-        await replInput.type(value)
+        const repl = page.locator('.repl')
+        await expect(repl).toBeVisible()
+        const panel = Panel.create({ expect, page, VError })
+        await panel.hide()
+        await expect(repl).toBeHidden()
         await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to type into debug console`)
-      }
-    },
-    async clear() {
-      try {
-        const clearConsoleButton = page.locator('[aria-label="Clear Console"]')
-        await clearConsoleButton.click()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to clear debug console`)
+        throw new VError(error, `Failed to hide debug console`)
       }
     },
     async shouldHaveCompletions(items) {
@@ -78,7 +56,7 @@ export const create = ({ expect, page, VError }) => {
         const completions = page.locator('.repl-input-wrapper .suggest-widget')
         const count = await completions.count()
         if (count === 0) {
-          const quickPick = QuickPick.create({ page, expect, VError })
+          const quickPick = QuickPick.create({ expect, page, VError })
           await quickPick.executeCommand(WellKnownCommands.TriggerSuggest)
           await page.waitForIdle()
         }
@@ -94,16 +72,6 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to verify debug console completion items`)
       }
     },
-    async clearInput() {
-      try {
-        const quickPick = QuickPick.create({ page, expect, VError })
-        await quickPick.executeCommand(WellKnownCommands.SelectAll)
-        await quickPick.executeCommand(WellKnownCommands.DeleteAllLeft)
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to clear debug console input`)
-      }
-    },
     async shouldHaveLogpointOutput(expectedMessage) {
       try {
         const debugConsole = page.locator('[aria-label="Debug Console"]')
@@ -117,6 +85,38 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify logpoint output: ${expectedMessage}`)
+      }
+    },
+    async show() {
+      try {
+        const repl = page.locator('.repl')
+        await expect(repl).toBeHidden()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.DebugConsoleFocusOnDebugConsoleView)
+        await expect(repl).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to show debug console`)
+      }
+    },
+    async type(value) {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.DebugConsoleFocusOnDebugConsoleView)
+        await page.waitForIdle()
+        const replInputWrapper = page.locator('.repl-input-wrapper')
+        await expect(replInputWrapper).toBeVisible()
+        const viewLine = replInputWrapper.locator('.view-line')
+        await expect(viewLine).toBeVisible()
+        await viewLine.click()
+        const cursor = replInputWrapper.locator('.cursor')
+        await expect(cursor).toBeVisible()
+        const replInput = replInputWrapper.locator('.native-edit-context')
+        await replInput.focus()
+        await replInput.type(value)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to type into debug console`)
       }
     },
   }
