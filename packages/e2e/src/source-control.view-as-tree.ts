@@ -20,6 +20,5 @@ export const setup = async ({ ActivityBar, Editor, Explorer, Workspace, SourceCo
 
 export const run = async ({ SourceControl }: TestContext): Promise<void> => {
   await SourceControl.viewAsTree()
-  await new Promise((r) => {})
   await SourceControl.viewAsList()
 }
