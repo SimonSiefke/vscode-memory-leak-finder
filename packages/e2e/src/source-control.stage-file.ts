@@ -9,7 +9,7 @@ export const setup = async ({ ActivityBar, Editor, Explorer, Workspace }: TestCo
       name: 'index.html',
     },
   ])
-  await Workspace.initializeGitRepository() //
+  await Workspace.initializeGitRepository()
   await Editor.closeAll()
   await Explorer.focus()
   await ActivityBar.showSourceControl()
