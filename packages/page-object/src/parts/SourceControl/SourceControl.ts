@@ -218,15 +218,19 @@ export const create = ({ expect, ideVersion, page, VError }) => {
       }
     },
     async doMoreAction(name: string) {
+      await page.waitForIdle()
       const moreActions = page.locator('.sidebar [aria-label^="Views and More Actions"]')
       await expect(moreActions).toBeVisible()
+      await page.waitForIdle()
       await moreActions.click()
+      await page.waitForIdle()
       const contextMenu = ContextMenu.create({
         page,
         expect,
         VError,
       })
       await contextMenu.shouldHaveItem(name)
+      await page.waitForIdle()
       await contextMenu.select(name)
       await page.waitForIdle()
     },
@@ -258,7 +262,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
         const graph = page.locator('[aria-label="Graph Section"]')
         const count = await graph.count()
-        console.log({ count })
         if (count === 0) {
           return
         }
