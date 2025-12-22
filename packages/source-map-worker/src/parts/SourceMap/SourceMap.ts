@@ -1,9 +1,9 @@
 import type { RawSourceMap } from 'source-map'
 import { SourceMapConsumer } from 'source-map'
-import * as AddOriginalPositions from '../AddOriginalPositions/AddOriginalPositions.ts'
-import * as Assert from '../Assert/Assert.ts'
 import type { IntermediateItem } from '../IntermediateItem/IntermediateItem.ts'
 import type { OriginalPosition } from '../OriginalPosition/OriginalPosition.ts'
+import * as AddOriginalPositions from '../AddOriginalPositions/AddOriginalPositions.ts'
+import * as Assert from '../Assert/Assert.ts'
 
 export const getOriginalPositions = async (
   sourceMap: RawSourceMap,
@@ -22,12 +22,12 @@ export const getOriginalPositions = async (
         column: column + 1,
         line: line + 1,
       })
-      let codePath: string | null = null
-      let needsOriginalName = false
+      const codePath: string | null = null
+      const needsOriginalName = false
       intermediateItems.push({
-        line: originalPosition.line,
-        column: originalPosition.column,
         codePath,
+        column: originalPosition.column,
+        line: originalPosition.line,
         name: originalPosition.name,
         needsOriginalName,
         source: originalPosition.source,
