@@ -4,7 +4,7 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WebView from '../WebView/WebView.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-const initialDiagnosticTimeout = 30_000
+const initialDiagnosticTimeout = 60_000
 
 const isNotebook = (file) => {
   return file.endsWith('.ipynb')
