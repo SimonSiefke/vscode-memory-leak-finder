@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-=======
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
->>>>>>> origin/main
 import * as Editor from '../Editor/Editor.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
@@ -82,8 +79,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to disable inline`)
       }
     },
-<<<<<<< HEAD
-=======
     async doMoreAction(name: string) {
       await page.waitForIdle()
       const moreActions = page.locator('.sidebar [aria-label^="Views and More Actions"]')
@@ -101,7 +96,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
       await contextMenu.select(name)
       await page.waitForIdle()
     },
->>>>>>> origin/main
     async enableInlineBlame({ expectedDecoration }) {
       try {
         await page.waitForIdle()
@@ -142,8 +136,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to hide branch picker`)
       }
     },
-<<<<<<< HEAD
-=======
     async hideGraph() {
       try {
         await page.waitForIdle()
@@ -186,7 +178,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to hide graph`)
       }
     },
->>>>>>> origin/main
     async refresh() {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
@@ -257,24 +248,16 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to show branch picker`)
       }
     },
-<<<<<<< HEAD
-    async stageFile(name) {
-=======
     async stageFile(name: string, parentFolder?: string) {
->>>>>>> origin/main
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.GitStageAllChanges)
         const file = page.locator(`[role="treeitem"][aria-label^="${name}"]`)
-<<<<<<< HEAD
-        await expect(file).toHaveAttribute('aria-label', `${name}, Index Added`)
-=======
         if (parentFolder) {
           await expect(file).toHaveAttribute('aria-label', `${name}, Index Added, ${[parentFolder]}`)
         } else {
           await expect(file).toHaveAttribute('aria-label', `${name}, Index Added`)
         }
->>>>>>> origin/main
       } catch (error) {
         throw new VError(error, `Failed to stage file`)
       }
@@ -295,8 +278,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await expect(file).toHaveAttribute('aria-label', `${name}, Untracked`)
       } catch (error) {
         throw new VError(error, `Failed to unstage file`)
-<<<<<<< HEAD
-=======
       }
     },
     async viewAsList() {
@@ -317,7 +298,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to view as tree`)
->>>>>>> origin/main
       }
     },
   }
