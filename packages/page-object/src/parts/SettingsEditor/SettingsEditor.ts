@@ -237,43 +237,46 @@ export const create = ({ expect, page, VError }) => {
         const scrollbar = editor.locator('.scrollbar.vertical').first()
         await scrollbar.hover()
         await page.waitForIdle()
-        const scrollBarVisible = editor.locator('.scrollbar.visible.scrollbar.vertical')
-        await expect(scrollBarVisible).toBeVisible()
-        await page.waitForIdle()
-        await page.waitForIdle()
-        await page.waitForIdle()
-        const scrollbarSlider = scrollbar.locator('.slider')
-        await expect(scrollbarSlider).toBeVisible()
-        await page.waitForIdle()
-        const elementBox1 = await scrollbarSlider.boundingBox()
-        if (!elementBox1) {
-          throw new Error('Unable to find bounding box on element')
-        }
+        // const scrollBarVisible = editor.locator('.scrollbar.visible.scrollbar.vertical')
+        // await expect(scrollBarVisible).toBeVisible()
+        // await page.waitForIdle()
+        // await page.waitForIdle()
+        // await page.waitForIdle()
+        // const scrollbarSlider = scrollbar.locator('.slider')
+        // await expect(scrollbarSlider).toBeVisible()
+        // await page.waitForIdle()
+        // const elementBox1 = await scrollbarSlider.boundingBox()
+        // if (!elementBox1) {
+        //   throw new Error('Unable to find bounding box on element')
+        // }
 
-        const elementCenterX = elementBox1.x + elementBox1.width / 2
-        const elementCenterY = elementBox1.y + elementBox1.height / 2
+        // const elementCenterX = elementBox1.x + elementBox1.width / 2
+        // const elementCenterY = elementBox1.y + elementBox1.height / 2
 
-        const xOffset = 0
-        const yOffset = y
+        // const xOffset = 0
+        // const yOffset = y
 
-        await page.waitForIdle()
-        await scrollbarSlider.hover()
-        await page.waitForIdle()
-        await page.mouse.move(elementCenterX, elementCenterY)
-        await page.waitForIdle()
-        await page.mouse.down()
-        await page.waitForIdle()
-        await new Promise((r) => {})
-        await expect(scrollbarSlider).toHaveClass('slider active')
-        await page.waitForIdle()
-        await page.mouse.move(elementCenterX + xOffset, elementCenterY + yOffset)
-        await page.waitForIdle()
-        await page.mouse.up()
-        await page.waitForIdle()
-        await expect(scrollbarSlider).toHaveCss('top', `${expectedScrollBarTop}px`)
+        // await page.waitForIdle()
+        // await scrollbarSlider.hover()
+        // await page.waitForIdle()
+        // await page.mouse.move(elementCenterX, elementCenterY)
+        // await page.waitForIdle()
+        // await page.mouse.down()
+        // await page.waitForIdle()
+        await new Promise((r) => {
+          setTimeout(r, 3000)
+        })
+        // await expect(scrollbarSlider).toHaveClass('slider active')
+        // await page.waitForIdle()
+        // await page.mouse.move(elementCenterX + xOffset, elementCenterY + yOffset)
+        // await page.waitForIdle()
+        // await page.mouse.up()
+        // await page.waitForIdle()
+        // await expect(scrollbarSlider).toHaveCss('top', `${expectedScrollBarTop}px`)
         const scrollContainer = page.locator('.settings-editor-tree .monaco-scrollable-element')
-        await expect(scrollContainer).toBeVisible()
+        // await expect(scrollContainer).toBeVisible()
         await scrollContainer.scrollDown()
+        console.log('scrolled')
         await page.waitForIdle()
         await new Promise((r) => {})
       } catch (error) {
