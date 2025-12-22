@@ -8,7 +8,6 @@ import * as Expect from '../Expect/Expect.ts'
 import * as ImportScript from '../ImportScript/ImportScript.ts'
 import * as Page from '../Page/Page.ts'
 import * as PageObjectState from '../PageObjectState/PageObjectState.ts'
-import * as TestWorkerState from '../TestWorkerState/TestWorkerState.ts'
 import { VError } from '../VError/VError.ts'
 import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 
@@ -102,7 +101,6 @@ export const connectDevtools = async (
   const pageObjectModule = await ImportScript.importScript(pageObjectPath)
   const pageObject = await pageObjectModule.create(pageObjectContext)
   PageObjectState.set(connectionId, pageObject, pageObjectContext)
-  TestWorkerState.setInspectExtensions(inspectExtensions)
 
   await pageObject.WaitForApplicationToBeReady.waitForApplicationToBeReady({
     enableExtensions,
