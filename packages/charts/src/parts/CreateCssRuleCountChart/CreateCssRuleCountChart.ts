@@ -7,8 +7,8 @@ export const getData = (basePath: string) => GetCssRuleCountData.getCssRuleCount
 export const createChart = () => {
   return {
     x: 'index',
-    y: 'count',
     xLabel: 'Index',
+    y: 'count',
     yLabel: 'Css Rule Count',
   }
 }

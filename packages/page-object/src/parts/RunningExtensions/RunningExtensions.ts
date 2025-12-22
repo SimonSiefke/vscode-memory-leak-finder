@@ -5,8 +5,8 @@ export const create = ({ expect, page, VError }) => {
   return {
     async show() {
       const quickPick = QuickPick.create({
-        page,
         expect,
+        page,
         VError,
       })
       await quickPick.executeCommand(WellKnownCommands.ShowRunningExtensions)

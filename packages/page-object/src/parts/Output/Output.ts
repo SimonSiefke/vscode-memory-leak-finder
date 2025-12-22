@@ -2,38 +2,8 @@ import * as Panel from '../Panel/Panel.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError, ideVersion }) => {
+export const create = ({ expect, ideVersion, page, VError }) => {
   return {
-    async show() {
-      try {
-        await page.waitForIdle()
-        const outputView = page.locator('.pane-body.output-view')
-        await expect(outputView).toBeHidden()
-        await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
-        await quickPick.executeCommand(WellKnownCommands.OutputFocusOnOutputView)
-        await page.waitForIdle()
-        await expect(outputView).toBeVisible()
-        const paneBody = page.locator('.pane-body.output-view')
-        await expect(paneBody).toBeVisible()
-        if (ideVersion && ideVersion.minor <= 100) {
-          const inputArea = paneBody.locator('.inputarea')
-          await expect(inputArea).toBeFocused()
-        } else {
-          const inputArea = paneBody.locator('.native-edit-context')
-          await expect(inputArea).toBeFocused()
-        }
-        await page.waitForIdle()
-        const viewLines = outputView.locator('.view-lines')
-        await expect(viewLines).toBeVisible()
-        await page.waitForIdle()
-        const select = page.locator('[aria-label="Output actions"] .monaco-select-box')
-        await expect(select).toBeVisible()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to show output`)
-      }
-    },
     async hide() {
       try {
         const outputView = page.locator('.pane-body.output-view')
@@ -69,6 +39,36 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to select output channel ${channelName}`)
+      }
+    },
+    async show() {
+      try {
+        await page.waitForIdle()
+        const outputView = page.locator('.pane-body.output-view')
+        await expect(outputView).toBeHidden()
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.OutputFocusOnOutputView)
+        await page.waitForIdle()
+        await expect(outputView).toBeVisible()
+        const paneBody = page.locator('.pane-body.output-view')
+        await expect(paneBody).toBeVisible()
+        if (ideVersion && ideVersion.minor <= 100) {
+          const inputArea = paneBody.locator('.inputarea')
+          await expect(inputArea).toBeFocused()
+        } else {
+          const inputArea = paneBody.locator('.native-edit-context')
+          await expect(inputArea).toBeFocused()
+        }
+        await page.waitForIdle()
+        const viewLines = outputView.locator('.view-lines')
+        await expect(viewLines).toBeVisible()
+        await page.waitForIdle()
+        const select = page.locator('[aria-label="Output actions"] .monaco-select-box')
+        await expect(select).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to show output`)
       }
     },
   }

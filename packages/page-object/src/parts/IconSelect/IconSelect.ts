@@ -1,4 +1,4 @@
-export const create = ({ page, expect, VError }) => {
+export const create = ({ expect, page, VError }) => {
   return {
     async select(iconName) {
       try {

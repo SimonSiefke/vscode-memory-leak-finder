@@ -6,15 +6,15 @@ export const getData = (basePath: string) => GetNamedFunctionCountData3.getNamed
 
 export const createChart = () => {
   return {
-    type: 'dual-bar-chart',
-    x: 'index',
-    y: 'count',
-    xLabel: 'Index',
-    yLabel: 'Function Counts',
-    width: 1400,
+    fontSize: 12,
     marginLeft: 500,
     marginRight: 500,
-    fontSize: 12,
+    type: 'dual-bar-chart',
+    width: 1400,
+    x: 'index',
+    xLabel: 'Index',
+    y: 'count',
+    yLabel: 'Function Counts',
   }
 }
 
