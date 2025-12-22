@@ -9,5 +9,12 @@ export const launch = async () => {
     path: url,
     stdio: 'inherit',
   })
-  return rpc
+  return {
+    invoke(method: string, ...params: readonly any[]) {
+      return rpc.invoke(method, ...params)
+    },
+    async [Symbol.asyncDispose]() {
+      await rpc.dispose()
+    },
+  }
 }

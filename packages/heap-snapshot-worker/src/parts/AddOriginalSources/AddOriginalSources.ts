@@ -37,6 +37,24 @@ const thisDir: string = dirname(fileURLToPath(import.meta.url))
 const packageDir: string = resolve(thisDir, '../../..')
 const repoRoot: string = resolve(packageDir, '../..')
 
+const launchSourceMapWorker = async () => {
+  const sourceMapWorkerPath: string = getSourceMapWorkerPath()
+
+  const rpc = await NodeWorkerRpcParent.create({
+    stdio: 'inherit',
+    path: sourceMapWorkerPath,
+    commandMap: {},
+  })
+  return {
+    invoke(method: string, ...params: readonly any[]) {
+      return rpc.invoke(method, ...params)
+    },
+    async [Symbol.asyncDispose]() {
+      await rpc.dispose()
+    },
+  }
+}
+
 export const addOriginalSources = async (items: readonly CompareResult[]): Promise<readonly any[]> => {
   let scriptMap: Record<number, ScriptInfo> | undefined
   // Always attempt to load script maps from disk
@@ -105,17 +123,9 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
   }
 
   try {
-    const sourceMapWorkerPath: string = getSourceMapWorkerPath()
-
-    const rpc = await NodeWorkerRpcParent.create({
-      stdio: 'inherit',
-      path: sourceMapWorkerPath,
-      commandMap: {},
-    })
+    await using rpc = await launchSourceMapWorker()
     const extendedOriginalNames = true
     const cleanPositionMap = await rpc.invoke('SourceMap.getCleanPositionsMap', sourceMapUrlToPositions, extendedOriginalNames)
-    await rpc.dispose()
-
     const offsetMap: Record<string, number> = Object.create(null)
     for (const pointer of positionPointers) {
       const positions = cleanPositionMap[pointer.sourceMapUrl] || []
