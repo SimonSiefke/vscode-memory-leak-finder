@@ -25,6 +25,7 @@ export const create = ({ expect, page, VError }) => {
           const element = suggestWidget.locator(`.monaco-list-row[aria-label="${expectedItem}"]`)
           await expect(element).toBeVisible()
         }
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open suggest widget`)
       }
