@@ -254,6 +254,12 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         const editContext = input.locator('.native-edit-context')
         await expect(editContext).toBeVisible()
         await page.waitForIdle()
+        const graph = page.locator('.abc')
+        const count = await graph.count()
+        await new Promise((r) => {})
+        if (count === 0) {
+          return
+        }
         const actions = page.locator(`[aria-label="Source Control actions"]`)
         await expect(actions).toBeVisible()
         await page.waitForIdle()
