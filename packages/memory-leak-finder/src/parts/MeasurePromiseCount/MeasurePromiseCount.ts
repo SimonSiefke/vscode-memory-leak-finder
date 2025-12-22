@@ -1,10 +1,10 @@
+import type { Session } from '../Session/Session.ts'
 import * as CompareCount from '../CompareCount/CompareCount.ts'
 import * as GetPromiseCount from '../GetPromiseCount/GetPromiseCount.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
-import type { Session } from '../Session/Session.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.PromiseCount

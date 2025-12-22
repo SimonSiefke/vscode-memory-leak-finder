@@ -23,12 +23,12 @@ const getEnumerableValues = (result) => {
 export const startTrackingArrays = async (session, objectGroup) => {
   const arrayDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Array,
-    returnByValue: false,
     objectGroup,
+    returnByValue: false,
   })
   const arrays = await DevtoolsProtocolRuntime.queryObjects(session, {
-    prototypeObjectId: arrayDescriptor.objectId,
     objectGroup,
+    prototypeObjectId: arrayDescriptor.objectId,
   })
   // partition array into smaller arrays to avoid zlib error
   const smallerArrays = await PartitionArray.partitionArray(session, objectGroup, arrays.objects.objectId, ArrayChunkSize)

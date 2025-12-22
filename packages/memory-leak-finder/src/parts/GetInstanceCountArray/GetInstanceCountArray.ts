@@ -15,9 +15,9 @@ export const getInstanceCountArray = async (session, objectGroup, map) => {
 
   return array
 }`,
+    objectGroup,
     objectId: map.objectId,
     returnByValue: true,
-    objectGroup,
   })
   return fnResult1
 }

@@ -20,8 +20,8 @@ export const stop = (session) => {
 
 export const compare = (before, after) => {
   return {
-    before,
     after,
+    before,
   }
 }
 

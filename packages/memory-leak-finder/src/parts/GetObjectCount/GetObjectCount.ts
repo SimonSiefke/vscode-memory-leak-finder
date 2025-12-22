@@ -8,8 +8,8 @@ export const getObjectCount = async (session: Session, prototype: string, object
     returnByValue: false,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
-    prototypeObjectId: prototypeDescriptor.objectId,
     objectGroup,
+    prototypeObjectId: prototypeDescriptor.objectId,
   })
   const fnResult1 = await GetRemoteObjectLength.getRemoteObjectLength(session, objects.objects.objectId, objectGroup)
   return fnResult1

@@ -10,8 +10,8 @@ import * as IsEnumerable from '../IsEnumerable/IsEnumerable.ts'
  */
 export const getPropertyValues = async (session, objectGroup, objectId) => {
   const rawResult = await DevtoolsProtocolRuntime.getProperties(session, {
-    objectId: objectId,
     generatePreview: false,
+    objectId: objectId,
     ownProperties: true,
   })
   // TODO maybe filter properties in debugger instead of node because amount of properties can be huge

@@ -5,13 +5,13 @@ test('cleanInstanceCounts', () => {
   const instances = [{}]
   const constructorLocations = [
     {
-      scriptId: '16',
-      lineNumber: 1552,
       columnNumber: 2776,
+      lineNumber: 1552,
+      scriptId: '16',
     },
   ]
   const scriptMap = {
-    16: { url: 'index.js', sourceMapUrl: 'index.js.map' },
+    16: { sourceMapUrl: 'index.js.map', url: 'index.js' },
   }
   expect(CleanInstanceCounts.cleanInstanceCounts(instances, constructorLocations, scriptMap)).toEqual([
     {

@@ -37,8 +37,8 @@ export const startTrackingDisposableStores = async (session, objectGroup) => {
     return globalThis.___disposableStoreOriginalAdd.apply(this, args)
   }
 }`,
+    objectGroup,
     objectId: fnResult1.objectId,
     returnByValue: false,
-    objectGroup,
   })
 }

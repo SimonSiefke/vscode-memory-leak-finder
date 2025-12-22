@@ -41,8 +41,8 @@ const getAllEventListeners = (nodes) => {
 const listenerMap = getAllEventListeners([...objects, document, window])
 return listenerMap
 })()`,
-      returnByValue: true,
       includeCommandLineAPI: true,
+      returnByValue: true,
     })
     const value = fnResult2
     if (typeof value !== 'number') {

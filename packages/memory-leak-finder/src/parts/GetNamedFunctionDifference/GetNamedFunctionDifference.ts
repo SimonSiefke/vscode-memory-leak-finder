@@ -12,11 +12,11 @@ export const getDifference = (sortedBefore, sortedAfter) => {
       continue
     }
     result.push({
-      name: value.name,
-      count: value.count,
       beforeCount,
-      url: value.url,
+      count: value.count,
+      name: value.name,
       sourceMapUrl: value.sourceMapUrl,
+      url: value.url,
     })
   }
   return result

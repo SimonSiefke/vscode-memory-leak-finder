@@ -5,18 +5,18 @@ import * as GetSourceMapUrlMap from '../src/parts/GetSourceMapUrlMap/GetSourceMa
 test('combineEventListenersWithSourceMapResults', () => {
   const eventListeners = [
     {
-      stack: ['index.js:1:1'],
       sourceMaps: ['index.js.map'],
+      stack: ['index.js:1:1'],
     },
   ]
   const map = GetSourceMapUrlMap.getSourceMapUrlMap(eventListeners)
   const cleanPositionMap = {
     'index.js.map': [
       {
-        line: 2,
         column: 2,
-        source: 'index.ts',
+        line: 2,
         originalName: 'test',
+        source: 'index.ts',
       },
     ],
   }
@@ -24,8 +24,8 @@ test('combineEventListenersWithSourceMapResults', () => {
     CombineEventListenersWithSourceMapResults.combineEventListenersWithSourceMapResults(eventListeners, map, cleanPositionMap),
   ).toEqual([
     {
-      stack: ['index.js:1:1'],
       originalStack: [`index.ts:2:2`],
+      stack: ['index.js:1:1'],
     },
   ])
 })
@@ -33,22 +33,22 @@ test('combineEventListenersWithSourceMapResults', () => {
 test('combineEventListenersWithSourceMapResults - multiple inputs', () => {
   const eventListeners = [
     {
-      stack: ['index.js:1:1'],
       sourceMaps: ['index.js.map'],
+      stack: ['index.js:1:1'],
     },
     {
-      stack: ['index.js:1:1'],
       sourceMaps: ['index.js.map'],
+      stack: ['index.js:1:1'],
     },
   ]
   const map = GetSourceMapUrlMap.getSourceMapUrlMap(eventListeners)
   const cleanPositionMap = {
     'index.js.map': [
       {
-        line: 2,
         column: 2,
-        source: 'index.ts',
+        line: 2,
         originalName: 'test',
+        source: 'index.ts',
       },
     ],
   }
@@ -56,12 +56,12 @@ test('combineEventListenersWithSourceMapResults - multiple inputs', () => {
     CombineEventListenersWithSourceMapResults.combineEventListenersWithSourceMapResults(eventListeners, map, cleanPositionMap),
   ).toEqual([
     {
-      stack: ['index.js:1:1'],
       originalStack: [`index.ts:2:2`],
+      stack: ['index.js:1:1'],
     },
     {
-      stack: ['index.js:1:1'],
       originalStack: [`index.ts:2:2`],
+      stack: ['index.js:1:1'],
     },
   ])
 })
