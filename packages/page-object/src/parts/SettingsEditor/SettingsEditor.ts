@@ -231,11 +231,10 @@ export const create = ({ expect, page, VError }) => {
       try {
         await page.waitForIdle()
         await page.mouse.mockPointerEvents()
-        const editor = page.locator('.editor-instance')
-        await expect(editor).toBeVisible()
+        const tree = page.locator('.settings-tree-container')
+        await expect(tree).toBeVisible()
         await page.waitForIdle()
-        await new Promise((r) => {})
-        const scrollbar = editor.locator('.scrollbar.vertical').first()
+        const scrollbar = tree.locator('.scrollbar.vertical').first()
         await expect(scrollbar).toBeHidden()
         await new Promise((r) => {
           setTimeout(r, 3000)
@@ -243,7 +242,7 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         await scrollbar.hover()
         await page.waitForIdle()
-        const scrollBarVisible = editor.locator('.scrollbar.visible.scrollbar.vertical')
+        const scrollBarVisible = tree.locator('.scrollbar.visible.scrollbar.vertical')
         await expect(scrollBarVisible).toBeVisible()
         await page.waitForIdle()
         await page.waitForIdle()
