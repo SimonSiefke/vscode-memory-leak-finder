@@ -133,6 +133,11 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         const select = page.locator('[aria-label="Output actions"] .monaco-select-box')
         await expect(select).toBeVisible()
         await page.waitForIdle()
+        const cursor = outputView.locator('.cursor.monaco-mouse-cursor-text')
+        await expect(cursor).toBeVisible()
+        await page.waitForIdle()
+        await expect(cursor).toHaveCount(1)
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show output`)
       }
