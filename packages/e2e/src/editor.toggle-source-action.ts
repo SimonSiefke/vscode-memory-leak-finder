@@ -1,10 +1,6 @@
-<<<<<<< HEAD:packages/e2e/src/editor.toggle-source-action.js
-// export const skip = true
-=======
 import type { TestContext } from '../types.ts'
 
 export const skip = true
->>>>>>> origin/main:packages/e2e/src/editor.toggle-source-action.ts
 
 export const setup = async ({ Editor, Explorer, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
