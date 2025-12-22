@@ -377,3 +377,47 @@ test('getOriginalClassName - context key constructor', () => {
   const originalColumn = 18
   expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe('ContextKeyAndExpr')
 })
+
+test('getOriginalClassName - method of object in class method', () => {
+  const sourceContent = `
+export class ExtensionHostManager extends Disposable {
+	constructor() {
+		super();
+		this._cachedActivationEvents = new Map<string, Promise<void>>();
+		this._resolvedActivationEvents = new Set<string>();
+		this._rpcProtocol = null;
+		this._customers = [];
+	}
+
+
+	private _createExtensionHostCustomers(kind: ExtensionHostKind, protocol: IMessagePassingProtocol): IExtensionHostProxy {
+		const extHostContext: IInternalExtHostContext = {
+			remoteAuthority: this._extensionHost.remoteAuthority,
+			extensionHostKind: this.kind,
+			getProxy: <T>(identifier: ProxyIdentifier<T>): Proxied<T> => this._rpcProtocol!.getProxy(identifier),
+			set: <T, R extends T>(identifier: ProxyIdentifier<T>, instance: R): R => this._rpcProtocol!.set(identifier, instance),
+			dispose: (): void => this._rpcProtocol!.dispose(),
+			assertRegistered: (identifiers: ProxyIdentifier<any>[]): void => this._rpcProtocol!.assertRegistered(identifiers),
+			drain: (): Promise<void> => this._rpcProtocol!.drain(),
+
+			//#region internal
+			internalExtensionService: this._internalExtensionService,
+			_setExtensionHostProxy: (value: IExtensionHostProxy): void => {
+				extensionHostProxy = value;
+			},
+			_setAllMainProxyIdentifiers: (value: ProxyIdentifier<any>[]): void => {
+				mainProxyIdentifiers = value;
+			},
+			//#endregion
+		};
+		return extensionHostProxy;
+	}
+}
+`
+  const originalLine = 27
+  const originalColumn = 36
+  // TODO
+  expect(GetOriginalClassName.getOriginalClassName(sourceContent, originalLine, originalColumn, originalFileName)).toBe(
+    'ExtensionHostManager._createExtensionHostCustomers',
+  )
+})
