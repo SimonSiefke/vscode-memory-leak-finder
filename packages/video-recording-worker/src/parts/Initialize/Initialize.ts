@@ -7,7 +7,6 @@ export const intialize = async () => {
   if (existsSync(ffmpegPath)) {
     return
   }
-  const rpc = await DownloadWorker.launch()
+  await using rpc = await DownloadWorker.launch()
   await rpc.invoke('Download.downloadFfmpegMaybe')
-  await rpc.dispose()
 }
