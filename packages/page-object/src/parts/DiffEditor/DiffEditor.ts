@@ -3,7 +3,7 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as Explorer from '../Explorer/Explorer.ts'
 import * as SideBar from '../SideBar/SideBar.ts'
 
-export const create = ({ page, expect, VError, electronApp }) => {
+export const create = ({ electronApp, expect, page, VError }) => {
   return {
     async expectModified(text) {
       try {
@@ -23,9 +23,9 @@ export const create = ({ page, expect, VError, electronApp }) => {
     },
     async open(a, b) {
       try {
-        const explorer = Explorer.create({ page, expect, VError, electronApp })
-        const contextMenu = ContextMenu.create({ page, expect, VError })
-        const sideBar = SideBar.create({ page, expect, VError })
+        const explorer = Explorer.create({ electronApp, expect, page, VError })
+        const contextMenu = ContextMenu.create({ expect, page, VError })
+        const sideBar = SideBar.create({ expect, page, VError })
         await explorer.focus()
         await explorer.openContextMenu(a)
         await contextMenu.select('Select for Compare')

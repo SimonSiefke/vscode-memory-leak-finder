@@ -1,15 +1,5 @@
-export const create = ({ page, expect, VError, ideVersion }) => {
+export const create = ({ expect, ideVersion, page, VError }) => {
   return {
-    async setSearchValue(value: string) {
-      try {
-        await page.waitForIdle()
-        const input = page.locator('.find-part .monaco-findInput textarea[aria-label="Find"]')
-        await input.setValue(value)
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to set search value`)
-      }
-    },
     async openReplace() {
       try {
         const findWidget = page.locator('.find-widget.visible')
@@ -32,6 +22,20 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to open replace`)
       }
     },
+    async replace() {
+      try {
+        await page.waitForIdle()
+        const findWidget = page.locator('.find-widget.visible')
+        await expect(findWidget).toBeVisible()
+        await page.waitForIdle()
+        const button = findWidget.locator('[aria-label^="Replace All"][tabIndex="0"]')
+        await expect(button).toBeVisible()
+        await button.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to replace`)
+      }
+    },
     async setReplaceValue(value: string) {
       try {
         await page.waitForIdle()
@@ -52,18 +56,14 @@ export const create = ({ page, expect, VError, ideVersion }) => {
         throw new VError(error, `Failed to set replace value`)
       }
     },
-    async replace() {
+    async setSearchValue(value: string) {
       try {
         await page.waitForIdle()
-        const findWidget = page.locator('.find-widget.visible')
-        await expect(findWidget).toBeVisible()
-        await page.waitForIdle()
-        const button = findWidget.locator('[aria-label^="Replace All"][tabIndex="0"]')
-        await expect(button).toBeVisible()
-        await button.click()
+        const input = page.locator('.find-part .monaco-findInput textarea[aria-label="Find"]')
+        await input.setValue(value)
         await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to replace`)
+        throw new VError(error, `Failed to set search value`)
       }
     },
   }

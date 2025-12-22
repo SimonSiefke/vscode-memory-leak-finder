@@ -31,7 +31,7 @@ const getListId = (classNameString) => {
   throw new Error(`Failed to extract list id from explorer`)
 }
 
-export const create = ({ electronApp, page, expect, VError }) => {
+export const create = ({ electronApp, expect, page, VError }) => {
   return {
     async cancel() {
       try {
