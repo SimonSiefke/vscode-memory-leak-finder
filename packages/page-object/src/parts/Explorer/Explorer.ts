@@ -352,7 +352,6 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to verify that explorer has dirent "${direntName}"`)
       }
     },
-<<<<<<< HEAD
     async removeCurrent() {
       try {
         await page.waitForIdle()
@@ -365,20 +364,5 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to delete`)
       }
     },
-    not: {
-      async toHaveItem(direntName) {
-        try {
-          const explorer = page.locator('.explorer-folders-view .monaco-list')
-          const dirent = explorer.locator('.monaco-list-row', {
-            hasText: direntName,
-          })
-          await expect(dirent).toBeHidden()
-        } catch (error) {
-          throw new VError(error, `Failed to verify that explorer doesn't have dirent ${direntName}`)
-        }
-      },
-    },
-=======
->>>>>>> origin/main
   }
 }
