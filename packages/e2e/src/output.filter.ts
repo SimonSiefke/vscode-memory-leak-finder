@@ -2,8 +2,9 @@ import type { TestContext } from '../types.js'
 
 export const skip = true
 
-export const setup = async ({ Editor, Output, Panel }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Output, Panel, SideBar }: TestContext): Promise<void> => {
   await Editor.closeAll()
+  await SideBar.hide()
   await Panel.hide()
   await Output.show()
   await Output.select('Main')
