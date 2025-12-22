@@ -2,18 +2,18 @@
   "name": "@vscode-memory-leak-finder/cursor-e2e",
   "version": "0.0.0-dev",
   "description": "",
+  "keywords": [],
+  "license": "MIT",
+  "author": "",
   "type": "module",
   "scripts": {
-    "e2e": "echo ok",
     "#e2e": "node ../cli/bin/test.js --ide=cursor",
-    "e2e:check-flakyness": "echo ok",
     "#e2e:check-flakyness": "node ../cli/bin/test.js --runs 10",
+    "e2e": "echo ok",
+    "e2e:check-flakyness": "echo ok",
     "e2e:headless": "node ../cli/bin/test.js --headless",
     "test:watch": "node ../cli/bin/test.js --watch --ide=cursor"
   },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
   "dependencies": {},
   "devDependencies": {
     "tree-kill": "^1.2.2",
