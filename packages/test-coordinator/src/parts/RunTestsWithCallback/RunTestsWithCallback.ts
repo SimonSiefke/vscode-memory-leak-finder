@@ -241,7 +241,14 @@ export const runTestsWithCallback = async ({
 
       try {
         const start = i === 0 ? initialStart : Time.now()
-        const testResult = await TestWorkerSetupTest.testWorkerSetupTest(testWorkerRpc, connectionId, absolutePath, forceRun, timeouts)
+        const testResult = await TestWorkerSetupTest.testWorkerSetupTest(
+          testWorkerRpc,
+          connectionId,
+          absolutePath,
+          forceRun,
+          inspectExtensions,
+          timeouts,
+        )
         const testSkipped = testResult.skipped
         wasOriginallySkipped = testResult.wasOriginallySkipped
 
