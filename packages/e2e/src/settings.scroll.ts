@@ -14,7 +14,7 @@ export const setup = async ({ Editor, Settings, SettingsEditor, SideBar }: TestC
 
 export const run = async ({ SettingsEditor }: TestContext): Promise<void> => {
   // @ts-ignore
-  await SettingsEditor.scrollDown(20, -20)
+  await SettingsEditor.scrollDown(20, 20)
   // @ts-ignore
-  await SettingsEditor.scrollUp(-20, 20)
+  await SettingsEditor.scrollUp(-20, 0)
 }
