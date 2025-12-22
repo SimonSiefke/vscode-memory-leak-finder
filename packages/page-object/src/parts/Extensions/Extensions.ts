@@ -1,13 +1,13 @@
 import { cp } from 'fs/promises'
 import { basename, join } from 'path'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
+import * as Editor from '../Editor/Editor.ts'
+import * as ExtensionDetailView from '../ExtensionsDetailView/ExtensionsDetailView.ts'
 import * as IsMacos from '../IsMacos/IsMacos.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Root from '../Root/Root.ts'
-import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
-import * as Editor from '../Editor/Editor.ts'
-import * as ExtensionDetailView from '../ExtensionsDetailView/ExtensionsDetailView.ts'
 import * as SideBar from '../SideBar/SideBar.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 const selectAll = IsMacos.isMacos ? 'Meta+A' : 'Control+A'
 
@@ -48,24 +48,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await this.shouldHaveValue('')
       } catch (error) {
         throw new VError(error, `Failed to clear`)
-      }
-    },
-    async install({ id, name }: { id: string; name: string }) {
-      try {
-        const editor = Editor.create({ page, expect, VError, ideVersion })
-        await editor.closeAll()
-        await this.show()
-        await this.search(id)
-        await this.first.shouldBe(name)
-        await this.first.click()
-        const extensionDetailView = ExtensionDetailView.create({ page, expect, VError })
-        await extensionDetailView.installExtension()
-        const sideBar = SideBar.create({ page, expect, VError })
-        await sideBar.hide()
-        await editor.closeAll()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to install ${id}`)
       }
     },
     async closeSuggest() {
@@ -132,6 +114,24 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to hide extensions view`)
+      }
+    },
+    async install({ id, name }: { id: string; name: string }) {
+      try {
+        const editor = Editor.create({ expect, ideVersion, page, VError })
+        await editor.closeAll()
+        await this.show()
+        await this.search(id)
+        await this.first.shouldBe(name)
+        await this.first.click()
+        const extensionDetailView = ExtensionDetailView.create({ expect, page, VError })
+        await extensionDetailView.installExtension()
+        const sideBar = SideBar.create({ expect, page, VError })
+        await sideBar.hide()
+        await editor.closeAll()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to install ${id}`)
       }
     },
     async openSuggest() {

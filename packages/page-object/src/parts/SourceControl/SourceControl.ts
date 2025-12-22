@@ -1,7 +1,7 @@
+import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as Editor from '../Editor/Editor.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
-import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 
 const getMatchingText = async (styleElements, className) => {
   const [first, second] = className.split(' ')
@@ -79,6 +79,23 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to disable inline`)
       }
     },
+    async doMoreAction(name: string) {
+      await page.waitForIdle()
+      const moreActions = page.locator('.sidebar [aria-label^="Views and More Actions"]')
+      await expect(moreActions).toBeVisible()
+      await page.waitForIdle()
+      await moreActions.click()
+      await page.waitForIdle()
+      const contextMenu = ContextMenu.create({
+        expect,
+        page,
+        VError,
+      })
+      await contextMenu.shouldHaveItem(name)
+      await page.waitForIdle()
+      await contextMenu.select(name)
+      await page.waitForIdle()
+    },
     async enableInlineBlame({ expectedDecoration }) {
       try {
         await page.waitForIdle()
@@ -117,6 +134,48 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to hide branch picker`)
+      }
+    },
+    async hideGraph() {
+      try {
+        await page.waitForIdle()
+        const input = page.locator('.scm-input')
+        await expect(input).toBeVisible()
+        await page.waitForIdle()
+        const editContext = input.locator('.native-edit-context')
+        await expect(editContext).toBeVisible()
+        await page.waitForIdle()
+        const management = page.locator('[aria-label="Source Control Management"]')
+        await expect(management).toBeVisible()
+        await page.waitForIdle()
+        const graph = page.locator('[aria-label="Graph Section"]')
+        const count = await graph.count()
+        if (count === 0) {
+          return
+        }
+        const actions = page.locator(`[aria-label="Source Control actions"]`)
+        await expect(actions).toBeVisible()
+        await page.waitForIdle()
+        const moreActions = actions.locator(`[aria-label^="Views and More Actions"]`)
+        await expect(moreActions).toBeVisible()
+        await page.waitForIdle()
+        await moreActions.click()
+        await page.waitForIdle()
+        const contextMenu = ContextMenu.create({
+          expect,
+          page,
+          VError,
+        })
+        await contextMenu.shouldHaveItem(`Graph`)
+        // @ts-ignore
+        await contextMenu.uncheck('Graph')
+        await page.waitForIdle()
+        await contextMenu.close()
+        await page.waitForIdle()
+        await expect(graph).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to hide graph`)
       }
     },
     async refresh() {
@@ -221,33 +280,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to unstage file`)
       }
     },
-    async doMoreAction(name: string) {
-      await page.waitForIdle()
-      const moreActions = page.locator('.sidebar [aria-label^="Views and More Actions"]')
-      await expect(moreActions).toBeVisible()
-      await page.waitForIdle()
-      await moreActions.click()
-      await page.waitForIdle()
-      const contextMenu = ContextMenu.create({
-        page,
-        expect,
-        VError,
-      })
-      await contextMenu.shouldHaveItem(name)
-      await page.waitForIdle()
-      await contextMenu.select(name)
-      await page.waitForIdle()
-    },
-    async viewAsTree() {
-      try {
-        await this.doMoreAction('View as Tree')
-        const src = page.locator('[aria-label="src"][aria-expanded="true"]')
-        await expect(src).toBeVisible()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to view as tree`)
-      }
-    },
     async viewAsList() {
       try {
         await this.doMoreAction('View as List')
@@ -258,46 +290,14 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to view as list`)
       }
     },
-    async hideGraph() {
+    async viewAsTree() {
       try {
-        await page.waitForIdle()
-        const input = page.locator('.scm-input')
-        await expect(input).toBeVisible()
-        await page.waitForIdle()
-        const editContext = input.locator('.native-edit-context')
-        await expect(editContext).toBeVisible()
-        await page.waitForIdle()
-        const management = page.locator('[aria-label="Source Control Management"]')
-        await expect(management).toBeVisible()
-        await page.waitForIdle()
-        const graph = page.locator('[aria-label="Graph Section"]')
-        const count = await graph.count()
-        if (count === 0) {
-          return
-        }
-        const actions = page.locator(`[aria-label="Source Control actions"]`)
-        await expect(actions).toBeVisible()
-        await page.waitForIdle()
-        const moreActions = actions.locator(`[aria-label^="Views and More Actions"]`)
-        await expect(moreActions).toBeVisible()
-        await page.waitForIdle()
-        await moreActions.click()
-        await page.waitForIdle()
-        const contextMenu = ContextMenu.create({
-          page,
-          expect,
-          VError,
-        })
-        await contextMenu.shouldHaveItem(`Graph`)
-        // @ts-ignore
-        await contextMenu.uncheck('Graph')
-        await page.waitForIdle()
-        await contextMenu.close()
-        await page.waitForIdle()
-        await expect(graph).toBeHidden()
+        await this.doMoreAction('View as Tree')
+        const src = page.locator('[aria-label="src"][aria-expanded="true"]')
+        await expect(src).toBeVisible()
         await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to hide graph`)
+        throw new VError(error, `Failed to view as tree`)
       }
     },
   }

@@ -72,8 +72,7 @@ export const create = ({ expect, page, VError }) => {
       }
     },
     closeSettingsContextMenu(name) {
-      try {
-      } catch (error) {
+      try {} catch (error) {
         throw new VError(error, `Failed to close settings conext menu for "${name}"`)
       }
     },
