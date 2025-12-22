@@ -218,7 +218,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
       }
     },
     async doMoreAction(name: string) {
-      const moreActions = page.locator('.sidebar [aria-label="Views and More Actions..."]')
+      const moreActions = page.locator('.sidebar [aria-label^="Views and More Actions"]')
       await expect(moreActions).toBeVisible()
       await moreActions.click()
       await new Promise((r) => {})
@@ -270,6 +270,8 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await contextMenu.shouldHaveItem(`Graph`)
         // @ts-ignore
         await contextMenu.uncheck('Graph')
+        await page.waitForIdle()
+        await contextMenu.close()
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to hide graph`)
