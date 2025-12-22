@@ -234,7 +234,13 @@ export const create = ({ expect, page, VError }) => {
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
         await page.waitForIdle()
+        await new Promise((r) => {})
         const scrollbar = editor.locator('.scrollbar.vertical').first()
+        await expect(scrollbar).toBeHidden()
+        await new Promise((r) => {
+          setTimeout(r, 3000)
+        })
+        await page.waitForIdle()
         await scrollbar.hover()
         await page.waitForIdle()
         const scrollBarVisible = editor.locator('.scrollbar.visible.scrollbar.vertical')
@@ -263,9 +269,7 @@ export const create = ({ expect, page, VError }) => {
         // await page.waitForIdle()
         // await page.mouse.down()
         // await page.waitForIdle()
-        await new Promise((r) => {
-          setTimeout(r, 3000)
-        })
+
         // await expect(scrollbarSlider).toHaveClass('slider active')
         // await page.waitForIdle()
         // await page.mouse.move(elementCenterX + xOffset, elementCenterY + yOffset)

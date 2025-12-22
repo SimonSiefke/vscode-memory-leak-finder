@@ -10,7 +10,6 @@ export const setup = async ({ Editor, Settings, SettingsEditor, SideBar }: TestC
     resultCount: 498,
     value: 'editor',
   })
-  await SettingsEditor.ensureIdle()
 }
 
 export const run = async ({ SettingsEditor }: TestContext): Promise<void> => {
