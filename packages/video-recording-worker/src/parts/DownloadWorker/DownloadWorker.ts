@@ -4,10 +4,17 @@ import * as GetDownloadWorkerUrl from '../GetDownloadWorkerUrl/GetDownloadWorker
 export const launch = async () => {
   const url = GetDownloadWorkerUrl.getDownloadWorkerUrl()
   const rpc = await NodeWorkerRpcParent.create({
+    commandMap: {},
+    execArgv: [],
     path: url,
     stdio: 'inherit',
-    execArgv: [],
-    commandMap: {},
   })
-  return rpc
+  return {
+    invoke(method: string, ...params: readonly any[]) {
+      return rpc.invoke(method, ...params)
+    },
+    async [Symbol.asyncDispose]() {
+      await rpc.dispose()
+    },
+  }
 }

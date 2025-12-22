@@ -1,5 +1,15 @@
 export const create = ({ expect, page, VError }) => {
   return {
+    async close() {
+      try {
+        const contextMenu = page.locator('.context-view.monaco-menu-container')
+        await expect(contextMenu).toBeVisible()
+        await page.keyboard.press('Escape')
+        await expect(contextMenu).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to close context menu`)
+      }
+    },
     async open(locator) {
       try {
         await page.waitForIdle()
@@ -51,16 +61,6 @@ export const create = ({ expect, page, VError }) => {
       })
       await page.waitForIdle()
       await expect(contextMenuItem).toBeVisible()
-    },
-    async close() {
-      try {
-        const contextMenu = page.locator('.context-view.monaco-menu-container')
-        await expect(contextMenu).toBeVisible()
-        await page.keyboard.press('Escape')
-        await expect(contextMenu).toBeHidden()
-      } catch (error) {
-        throw new VError(error, `Failed to close context menu`)
-      }
     },
   }
 }

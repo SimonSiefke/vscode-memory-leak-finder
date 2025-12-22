@@ -3,8 +3,55 @@ import * as IconSelect from '../IconSelect/IconSelect.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ page, expect, VError }) => {
+export const create = ({ expect, page, VError }) => {
   return {
+    async changeIcon(fromIcon, toIcon) {
+      try {
+        await page.waitForIdle()
+        const terminalActions = page.locator('[aria-label="Terminal actions"]')
+        await expect(terminalActions).toBeVisible()
+        await page.waitForIdle()
+        const actionLabel = terminalActions.locator('.action-label')
+        await expect(actionLabel).toBeVisible()
+        await page.waitForIdle()
+        await expect(actionLabel).toHaveText(' echo  -  Task ')
+        await page.waitForIdle()
+        const currentIcon = actionLabel.locator(`.codicon-${fromIcon}`)
+        await expect(currentIcon).toBeVisible()
+        await page.waitForIdle()
+        await actionLabel.click()
+        await page.waitForIdle()
+        const contextMenu = ContextMenu.create({ expect, page, VError })
+        await contextMenu.select('Change Icon...')
+        const iconSelect = IconSelect.create({ expect, page, VError })
+        await iconSelect.select(toIcon)
+        await page.waitForIdle()
+        const newIcon = actionLabel.locator(`.codicon-${toIcon}`)
+        await expect(newIcon).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to change task icon`)
+      }
+    },
+    async clear() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.ClearTerminal)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to clear task terminal`)
+      }
+    },
+    async hideQuickPick() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.close()
+      } catch (error) {
+        throw new VError(error, `Failed to close task quickpick`)
+      }
+    },
     async open() {
       try {
         await page.waitForIdle()
@@ -27,6 +74,19 @@ export const create = ({ page, expect, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open task`)
+      }
+    },
+    async openQuickPick({ item }) {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.RunTask, {
+          stayVisible: true,
+        })
+        const row = page.locator(`.monaco-list-row[aria-label^="${item}"]`)
+        await expect(row).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to open task quickpick`)
       }
     },
     async openRun() {
@@ -67,26 +127,6 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to pin "${name}"`)
       }
     },
-    async unpin(name) {
-      try {
-        const quickPick = page.locator('.quick-input-widget')
-        await expect(quickPick).toBeVisible()
-        const option = quickPick.locator('.label-name', {
-          hasExactText: ` ${name}`,
-        })
-        await expect(option).toBeVisible()
-        const focusedRow = quickPick.locator('.monaco-list-row.focused')
-        await expect(focusedRow).toBeVisible()
-        const unpinAction = focusedRow.locator('[aria-label="Pinned command"]')
-        await expect(unpinAction).toBeVisible()
-        await unpinAction.click()
-        await expect(unpinAction).toBeHidden()
-        const pinAction = focusedRow.locator('[aria-label="Pin command"]')
-        await expect(pinAction).toBeVisible()
-      } catch (error) {
-        throw new VError(error, `Failed to pin ${name}`)
-      }
-    },
     async run(taskName: string) {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
@@ -118,51 +158,10 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to run task`)
       }
     },
-    async changeIcon(fromIcon, toIcon) {
-      try {
-        await page.waitForIdle()
-        const terminalActions = page.locator('[aria-label="Terminal actions"]')
-        await expect(terminalActions).toBeVisible()
-        await page.waitForIdle()
-        const actionLabel = terminalActions.locator('.action-label')
-        await expect(actionLabel).toBeVisible()
-        await page.waitForIdle()
-        await expect(actionLabel).toHaveText(' echo  -  Task ')
-        await page.waitForIdle()
-        const currentIcon = actionLabel.locator(`.codicon-${fromIcon}`)
-        await expect(currentIcon).toBeVisible()
-        await page.waitForIdle()
-        await actionLabel.click()
-        await page.waitForIdle()
-        const contextMenu = ContextMenu.create({ page, expect, VError })
-        await contextMenu.select('Change Icon...')
-        const iconSelect = IconSelect.create({ page, expect, VError })
-        await iconSelect.select(toIcon)
-        await page.waitForIdle()
-        const newIcon = actionLabel.locator(`.codicon-${toIcon}`)
-        await expect(newIcon).toBeVisible()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to change task icon`)
-      }
-    },
-    async openQuickPick({ item }) {
-      try {
-        await page.waitForIdle()
-        const quickPick = QuickPick.create({ page, expect, VError })
-        await quickPick.executeCommand(WellKnownCommands.RunTask, {
-          stayVisible: true,
-        })
-        const row = page.locator(`.monaco-list-row[aria-label^="${item}"]`)
-        await expect(row).toBeVisible()
-      } catch (error) {
-        throw new VError(error, `Failed to open task quickpick`)
-      }
-    },
     async selectQuickPickItem({ item }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ page, expect, VError })
+        const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.RunTask, {
           stayVisible: true,
         })
@@ -183,23 +182,24 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to select quickpick item`)
       }
     },
-    async hideQuickPick() {
+    async unpin(name) {
       try {
-        await page.waitForIdle()
-        const quickPick = QuickPick.create({ page, expect, VError })
-        await quickPick.close()
+        const quickPick = page.locator('.quick-input-widget')
+        await expect(quickPick).toBeVisible()
+        const option = quickPick.locator('.label-name', {
+          hasExactText: ` ${name}`,
+        })
+        await expect(option).toBeVisible()
+        const focusedRow = quickPick.locator('.monaco-list-row.focused')
+        await expect(focusedRow).toBeVisible()
+        const unpinAction = focusedRow.locator('[aria-label="Pinned command"]')
+        await expect(unpinAction).toBeVisible()
+        await unpinAction.click()
+        await expect(unpinAction).toBeHidden()
+        const pinAction = focusedRow.locator('[aria-label="Pin command"]')
+        await expect(pinAction).toBeVisible()
       } catch (error) {
-        throw new VError(error, `Failed to close task quickpick`)
-      }
-    },
-    async clear() {
-      try {
-        await page.waitForIdle()
-        const quickPick = QuickPick.create({ page, expect, VError })
-        await quickPick.executeCommand(WellKnownCommands.ClearTerminal)
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to clear task terminal`)
+        throw new VError(error, `Failed to pin ${name}`)
       }
     },
   }

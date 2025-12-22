@@ -7,8 +7,8 @@ export const getData = (basePath: string) => GetDetachedDomNodeCountData.getDeta
 export const createChart = () => {
   return {
     x: 'index',
-    y: 'count',
     xLabel: 'Index',
+    y: 'count',
     yLabel: 'Detached Dom Node Count',
   }
 }

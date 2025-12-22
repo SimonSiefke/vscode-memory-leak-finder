@@ -1,5 +1,19 @@
 export const create = ({ expect, page, VError }) => {
   return {
+    async collapseProperty(name) {
+      try {
+        const hoverTree = page.locator('.debug-hover-tree')
+        await expect(hoverTree).toBeVisible()
+        const nameRow = hoverTree.locator(`.monaco-list-row[aria-label^="${name},"]`)
+        const nameElement = nameRow.locator('.name')
+        await expect(nameRow).toHaveAttribute('aria-expanded', 'true')
+        await nameElement.click()
+        await expect(nameRow).toHaveAttribute('aria-expanded', 'false')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to collapse debug hover property`)
+      }
+    },
     async expandProperty(name, childProperties) {
       try {
         const hoverTree = page.locator('.debug-hover-tree')
@@ -18,20 +32,6 @@ export const create = ({ expect, page, VError }) => {
         }
       } catch (error) {
         throw new VError(error, `Failed to expand debug hover property`)
-      }
-    },
-    async collapseProperty(name) {
-      try {
-        const hoverTree = page.locator('.debug-hover-tree')
-        await expect(hoverTree).toBeVisible()
-        const nameRow = hoverTree.locator(`.monaco-list-row[aria-label^="${name},"]`)
-        const nameElement = nameRow.locator('.name')
-        await expect(nameRow).toHaveAttribute('aria-expanded', 'true')
-        await nameElement.click()
-        await expect(nameRow).toHaveAttribute('aria-expanded', 'false')
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to collapse debug hover property`)
       }
     },
   }

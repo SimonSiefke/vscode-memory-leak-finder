@@ -16,7 +16,7 @@ export const create = ({ expect, page, VError }) => {
         await row.click()
         await page.waitForIdle()
         await expect(suggest).toBeHidden()
-        const settingsEditorInput = SettingsEditorInput.create({ page, expect, VError })
+        const settingsEditorInput = SettingsEditorInput.create({ expect, page, VError })
         await settingsEditorInput.shouldHaveText(`${completionText}${Character.NonBreakingSpace}`)
       } catch (error) {
         throw new VError(error, `Failed to select completion ${completionName}`)

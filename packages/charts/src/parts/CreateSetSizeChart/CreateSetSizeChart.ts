@@ -7,8 +7,8 @@ export const getData = (basePath: string) => GetSetSizeData.getSetSizeData(baseP
 export const createChart = () => {
   return {
     x: 'index',
-    y: 'count',
     xLabel: 'Index',
+    y: 'count',
     yLabel: 'Set Size',
   }
 }
