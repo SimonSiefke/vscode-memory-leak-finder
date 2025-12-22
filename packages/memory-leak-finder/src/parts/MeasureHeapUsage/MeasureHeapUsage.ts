@@ -22,6 +22,6 @@ export const stop = (session: Session) => {
 
 export const compare = CompareHeapUsage.compareHeapUsage
 
-export const isLeak = ({ usedBefore, usedAfter }) => {
-  return usedAfter > usedBefore
+export const isLeak = ({ isLeak }) => {
+  return isLeak
 }
