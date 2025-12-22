@@ -526,7 +526,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed inspect tokens`)
       }
     },
-    async moveScrollBar(y, expectedScrollBarY) {
+    async moveScrollBar(y: number, expectedScrollBarY: number) {
       try {
         await page.mouse.mockPointerEvents()
         const editor = page.locator('.editor-instance')

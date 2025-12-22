@@ -227,7 +227,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to remove item`)
       }
     },
-    async scrollDown(y: number, expectedScrollBarTop: number) {
+    async moveScrollBar(y: number, expectedScrollBarTop: number) {
       try {
         await page.waitForIdle()
         await page.mouse.mockPointerEvents()
@@ -275,17 +275,6 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to scroll down in settings editor`)
-      }
-    },
-    async scrollUp() {
-      try {
-        await page.waitForIdle()
-        const scrollContainer = page.locator('.settings-editor-tree .monaco-scrollable-element')
-        await expect(scrollContainer).toBeVisible()
-        await scrollContainer.scrollUp()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to scroll up in settings editor`)
       }
     },
     async search({ resultCount, value }) {
