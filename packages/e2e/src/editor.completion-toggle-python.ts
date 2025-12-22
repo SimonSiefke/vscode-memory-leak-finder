@@ -8,7 +8,7 @@ export const setup = async ({ Editor, Workspace, Extensions }: TestContext): Pro
   await Workspace.setFiles([
     {
       content: `def add(a,b):
-  return a + `,
+  return a + b`,
       name: 'index.py',
     },
   ])
@@ -19,14 +19,14 @@ export const setup = async ({ Editor, Workspace, Extensions }: TestContext): Pro
   })
   await Editor.open('index.py')
   // @ts-ignore
-  await Editor.setCursor(2, 8)
+  await Editor.setCursor(2, 15)
+  await Editor.shouldHaveSquigglyError()
   await Editor.shouldHaveBreadCrumb('index.py')
 }
 
 export const run = async ({ Suggest }: TestContext): Promise<void> => {
-  await Suggest.open()
-  await new Promise((r) => {})
-  // TODO verify item is visible
+  // @ts-ignore
+  await Suggest.open('bool')
   await Suggest.close()
 }
 
