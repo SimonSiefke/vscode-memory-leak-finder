@@ -1,4 +1,5 @@
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
+import * as Electron from '../Electron/Electron.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
@@ -30,7 +31,7 @@ const getListId = (classNameString) => {
   throw new Error(`Failed to extract list id from explorer`)
 }
 
-export const create = ({ expect, page, VError }) => {
+export const create = ({ electronApp, expect, page, VError }) => {
   return {
     async cancel() {
       try {
@@ -87,21 +88,19 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to copy explorer item ${dirent}`)
       }
     },
-    async delete(item) {
+    async delete(item: string) {
       try {
+        const electron = Electron.create({ electronApp, VError })
+        await electron.mockShellTrashItem()
+        await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         const oldDirent = explorer.locator('.monaco-list-row', {
           hasText: item,
         })
         await expect(oldDirent).toBeVisible()
+        await page.waitForIdle()
         await page.keyboard.press('Delete')
-        for (let i = 0; i < 5; i++) {
-          await page.waitForIdle()
-          const count = await oldDirent.count()
-          if (count === 0) {
-            break
-          }
-        }
+        await page.waitForIdle()
         await expect(oldDirent).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to delete ${item}`)
@@ -278,6 +277,8 @@ export const create = ({ expect, page, VError }) => {
     },
     async refresh() {
       try {
+        const electron = Electron.create({ electronApp, VError })
+        await electron.mockShellTrashItem()
         await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         await expect(explorer).toBeVisible()
