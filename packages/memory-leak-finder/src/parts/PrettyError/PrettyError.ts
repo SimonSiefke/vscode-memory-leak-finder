@@ -20,9 +20,9 @@ const prepareModuleNotFoundError = (error) => {
   const match = message.match(RE_MODULE_NOT_FOUND_STACK)
   if (!match) {
     return {
-      codeFrame: '',
       message,
       stack: error.stack,
+      codeFrame: '',
     }
   }
   const notFoundModule = match[1]
@@ -42,8 +42,8 @@ const prepareModuleNotFoundError = (error) => {
   }
   const location = {
     start: {
-      column,
       line,
+      column,
     },
   }
   const codeFrame = codeFrameColumns(rawLines, location, { highlightCode: false })
@@ -51,9 +51,9 @@ const prepareModuleNotFoundError = (error) => {
   const newStackLines = [stackLines[0], `    at ${importedFrom}:${line}:${column}`, ...stackLines.slice(1)]
   const newStack = newStackLines.join('\n')
   return {
-    codeFrame,
     message,
     stack: newStack,
+    codeFrame,
   }
 }
 
@@ -72,8 +72,8 @@ const getPathDetails = (lines) => {
         }
         const actualPath = getActualPath(path)
         return {
-          column: Number.parseInt(column),
           line: Number.parseInt(line),
+          column: Number.parseInt(column),
           path: actualPath,
         }
       }
@@ -89,16 +89,16 @@ const getCodeFrame = (cleanedStack, { color }) => {
     if (!pathDetails) {
       return ''
     }
-    const { column, line, path } = pathDetails
+    const { path, line, column } = pathDetails
     const actualPath = getActualPath(path)
     const rawLines = FileSystem.readFileSync(actualPath, 'utf8')
     const location = {
       start: {
-        column: column,
         line: line,
+        column: column,
       },
     }
-    const codeFrame = codeFrameColumns(rawLines, location, { forceColor: color, highlightCode: color })
+    const codeFrame = codeFrameColumns(rawLines, location, { highlightCode: color, forceColor: color })
     return codeFrame
   } catch (error) {
     console.warn(`failed to generate code frame: ${error}`)
@@ -115,9 +115,9 @@ export const prepare = async (error, { color = true, root = '' } = {}) => {
     const lines = SplitLines.splitLines(cleanedStack)
     const relevantStack = lines.join('\n')
     return {
-      codeFrame: error.codeFrame,
       message: error.message,
       stack: relevantStack,
+      codeFrame: error.codeFrame,
     }
   }
   const { message } = error
@@ -132,8 +132,8 @@ export const prepare = async (error, { color = true, root = '' } = {}) => {
   const codeFrame = getCodeFrame(cleanedStack, { color })
   const relevantStack = lines.join('\n')
   return {
-    codeFrame,
     message,
     stack: relevantStack,
+    codeFrame,
   }
 }
