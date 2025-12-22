@@ -221,7 +221,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
       const moreActions = page.locator('.sidebar [aria-label^="Views and More Actions"]')
       await expect(moreActions).toBeVisible()
       await moreActions.click()
-      await new Promise((r) => {})
       const contextMenu = ContextMenu.create({
         page,
         expect,
@@ -254,8 +253,12 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         const editContext = input.locator('.native-edit-context')
         await expect(editContext).toBeVisible()
         await page.waitForIdle()
+        const management = page.locator('[aria-label="Source Control Management"]')
+        await expect(management).toBeVisible()
+        await page.waitForIdle()
         const graph = page.locator('[aria-label="Graph Section"]')
         const count = await graph.count()
+        console.log({ count })
         if (count === 0) {
           return
         }
