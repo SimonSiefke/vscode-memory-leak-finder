@@ -220,12 +220,12 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async doMoreAction(name: string) {
       const moreActions = page.locator('.sidebar [aria-label="Views and More Actions..."]')
       await expect(moreActions).toBeVisible()
+      await moreActions.click()
       const contextMenu = ContextMenu.create({
         page,
         expect,
         VError,
       })
-      await contextMenu.open(moreActions)
       await contextMenu.shouldHaveItem(name)
       await contextMenu.select(name)
       await page.waitForIdle()
