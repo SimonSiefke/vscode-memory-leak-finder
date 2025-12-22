@@ -4,6 +4,8 @@ import type { IntermediateItem } from '../IntermediateItem/IntermediateItem.ts'
 import type { OriginalPosition } from '../OriginalPosition/OriginalPosition.ts'
 import * as AddOriginalPositions from '../AddOriginalPositions/AddOriginalPositions.ts'
 import * as Assert from '../Assert/Assert.ts'
+import { join, resolve } from 'path'
+import { root } from '../Root/Root.ts'
 
 export const getOriginalPositions = async (
   sourceMap: RawSourceMap,
@@ -22,14 +24,19 @@ export const getOriginalPositions = async (
         column: column + 1,
         line: line + 1,
       })
-      const codePath: string | null = null
-      const needsOriginalName = false
+      let codePath: string | null = null
+      if (classNames && originalPosition.source && originalPosition.line !== null && originalPosition.column !== null) {
+        const index: number = sourceMap.sources.indexOf(originalPosition.source)
+        if (index !== -1) {
+          const sourceFileRelativePath: string = sourceMap.sources[index]
+          codePath = resolve(join(root, '.vscode-sources', hash, sourceFileRelativePath))
+        }
+      }
       intermediateItems.push({
         codePath,
         column: originalPosition.column,
         line: originalPosition.line,
         name: originalPosition.name,
-        needsOriginalName,
         source: originalPosition.source,
       })
     }
