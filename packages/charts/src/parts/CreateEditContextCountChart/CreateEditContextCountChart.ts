@@ -7,8 +7,8 @@ export const getData = (basePath: string) => GetEditContextCountData.getEditCont
 export const createChart = () => {
   return {
     x: 'index',
-    y: 'count',
     xLabel: 'Index',
+    y: 'count',
     yLabel: 'Edit Context Count',
   }
 }

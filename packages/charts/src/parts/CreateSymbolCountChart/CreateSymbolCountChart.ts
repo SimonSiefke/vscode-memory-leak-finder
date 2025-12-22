@@ -7,8 +7,8 @@ export const getData = (basePath: string) => GetSymbolCountsData.getSymbolCounts
 export const createChart = () => {
   return {
     x: 'index',
-    y: 'count',
     xLabel: 'Index',
+    y: 'count',
     yLabel: 'Symbol Count',
   }
 }
