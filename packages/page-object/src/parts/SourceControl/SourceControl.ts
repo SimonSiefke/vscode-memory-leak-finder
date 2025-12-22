@@ -254,9 +254,8 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         const editContext = input.locator('.native-edit-context')
         await expect(editContext).toBeVisible()
         await page.waitForIdle()
-        const graph = page.locator('.abc')
+        const graph = page.locator('[aria-label="Graph Section"]')
         const count = await graph.count()
-        await new Promise((r) => {})
         if (count === 0) {
           return
         }
