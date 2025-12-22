@@ -272,10 +272,7 @@ export const create = ({ expect, page, VError }) => {
         await page.mouse.up()
         await page.waitForIdle()
         await expect(scrollbarSlider).toHaveCss('top', `${expectedScrollBarTop}px`)
-        const scrollContainer = page.locator('.settings-editor-tree .monaco-scrollable-element')
-        console.log('scrolled')
         await page.waitForIdle()
-        await new Promise((r) => {})
       } catch (error) {
         throw new VError(error, `Failed to scroll down in settings editor`)
       }
