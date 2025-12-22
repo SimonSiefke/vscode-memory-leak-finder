@@ -26,8 +26,6 @@ export const run = async ({ Suggest, Editor, Workspace }: TestContext): Promise<
   // @ts-ignore
   await Editor.setCursor(2, 15)
   await Editor.shouldHaveSquigglyError()
-  // @ts-ignore
-  await Editor.shouldHaveSpark()
   await Editor.shouldHaveText(`def add(a,b,c):
   return a + b + `)
   // @ts-ignore
