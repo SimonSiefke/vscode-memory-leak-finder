@@ -534,6 +534,9 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         const scrollbar = editor.locator('.scrollbar.vertical').first()
         await scrollbar.hover()
         await page.waitForIdle()
+        const scrollBarVisible = editor.locator('.scrollbar.visible.scrollbar.vertical')
+        await expect(scrollBarVisible).toBeVisible()
+        await page.waitForIdle()
         const scrollbarSlider = scrollbar.locator('.slider')
         const elementBox1 = await scrollbarSlider.boundingBox()
         if (!elementBox1) {

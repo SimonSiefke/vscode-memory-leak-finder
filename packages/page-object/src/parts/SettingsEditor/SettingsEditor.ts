@@ -237,18 +237,18 @@ export const create = ({ expect, page, VError }) => {
         const scrollbar = editor.locator('.scrollbar.vertical').first()
         await scrollbar.hover()
         await page.waitForIdle()
-        // const scrollBarVisible = editor.locator('.scrollbar.visible.scrollbar.vertical')
-        // await expect(scrollBarVisible).toBeVisible()
-        // await page.waitForIdle()
-        // await page.waitForIdle()
-        // await page.waitForIdle()
-        // const scrollbarSlider = scrollbar.locator('.slider')
-        // await expect(scrollbarSlider).toBeVisible()
-        // await page.waitForIdle()
-        // const elementBox1 = await scrollbarSlider.boundingBox()
-        // if (!elementBox1) {
-        //   throw new Error('Unable to find bounding box on element')
-        // }
+        const scrollBarVisible = editor.locator('.scrollbar.visible.scrollbar.vertical')
+        await expect(scrollBarVisible).toBeVisible()
+        await page.waitForIdle()
+        await page.waitForIdle()
+        await page.waitForIdle()
+        const scrollbarSlider = scrollbar.locator('.slider')
+        await expect(scrollbarSlider).toBeVisible()
+        await page.waitForIdle()
+        const elementBox1 = await scrollbarSlider.boundingBox()
+        if (!elementBox1) {
+          throw new Error('Unable to find bounding box on element')
+        }
 
         // const elementCenterX = elementBox1.x + elementBox1.width / 2
         // const elementCenterY = elementBox1.y + elementBox1.height / 2
