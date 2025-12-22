@@ -7,11 +7,11 @@ const isDevtoolsCannotFindContextError = (error) => {
   )
 }
 
-export const create = ({ page, expect, VError, ideVersion, electronApp }) => {
+export const create = ({ electronApp, expect, ideVersion, page, VError }) => {
   return {
     async waitForApplicationToBeReady({
-      inspectPtyHost,
       enableExtensions,
+      inspectPtyHost,
     }: {
       inspectPtyHost: boolean
       enableExtensions: boolean
@@ -41,11 +41,11 @@ export const create = ({ page, expect, VError, ideVersion, electronApp }) => {
       }
       if (inspectPtyHost) {
         const terminal = Terminal.create({
-          page,
-          expect,
-          VError,
-          ideVersion,
           electronApp,
+          expect,
+          ideVersion,
+          page,
+          VError,
         })
         await terminal.show()
         await terminal.killAll()
