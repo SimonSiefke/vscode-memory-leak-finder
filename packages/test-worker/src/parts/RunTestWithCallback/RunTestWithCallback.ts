@@ -11,7 +11,7 @@ const getModule = (runMode) => {
   }
 }
 
-export const runTestWithCallback = async (pageObject, file, forceRun, runMode) => {
+export const runTestWithCallback = async (pageObject: any, file: string, forceRun: boolean, runMode: any, inspectExtensions: boolean) => {
   const fn = getModule(runMode)
-  await fn(pageObject, file, forceRun)
+  await fn(pageObject, file, forceRun, inspectExtensions)
 }
