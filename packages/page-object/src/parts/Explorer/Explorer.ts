@@ -88,21 +88,19 @@ export const create = ({ electronApp, expect, page, VError }) => {
         throw new VError(error, `Failed to copy explorer item ${dirent}`)
       }
     },
-    async delete(item) {
+    async delete(item: string) {
       try {
+        const electron = Electron.create({ electronApp, VError })
+        await electron.mockShellTrashItem()
+        await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         const oldDirent = explorer.locator('.monaco-list-row', {
           hasText: item,
         })
         await expect(oldDirent).toBeVisible()
+        await page.waitForIdle()
         await page.keyboard.press('Delete')
-        for (let i = 0; i < 5; i++) {
-          await page.waitForIdle()
-          const count = await oldDirent.count()
-          if (count === 0) {
-            break
-          }
-        }
+        await page.waitForIdle()
         await expect(oldDirent).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to delete ${item}`)
