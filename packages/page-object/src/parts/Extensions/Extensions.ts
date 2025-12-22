@@ -11,8 +11,143 @@ const selectAll = IsMacos.isMacos ? 'Meta+A' : 'Control+A'
 const space = ' '
 const nonBreakingSpace = String.fromCharCode(160)
 
-export const create = ({ expect, page, VError, ideVersion }) => {
+export const create = ({ expect, ideVersion, page, VError }) => {
   return {
+    async add(path, expectedName) {
+      try {
+        await page.waitForIdle()
+        // TODO could create symlink also
+        const absolutePath = join(Root.root, path)
+        const base = basename(absolutePath)
+        const destination = join(Root.root, '.vscode-extensions', base)
+        await cp(absolutePath, destination, { force: true, recursive: true })
+        await page.waitForIdle()
+        await this.show()
+        await page.waitForIdle()
+        await this.search('@installed')
+        await page.waitForIdle()
+        const firstExtension = page.locator('.extension-list-item').first()
+        await expect(firstExtension).toBeVisible()
+        const nameLocator = firstExtension.locator('.name')
+        await expect(nameLocator).toBeVisible()
+        await expect(nameLocator).toHaveText(expectedName)
+        await page.waitForIdle()
+        await this.hide()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to add extension`)
+      }
+    },
+    async clear() {
+      try {
+        const clearButton = page.locator('[aria-label="Clear Extensions Search Results"]')
+        await clearButton.click()
+        await this.shouldHaveValue('')
+      } catch (error) {
+        throw new VError(error, `Failed to clear`)
+      }
+    },
+    async closeSuggest() {
+      try {
+        // TODO scope selector to extensions view
+        const suggestions = page.locator('[aria-label="Suggest"]')
+        await expect(suggestions).toBeVisible()
+        await page.keyboard.press('Escape')
+        await expect(suggestions).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to close extensions suggestions`)
+      }
+    },
+    first: {
+      async click() {
+        // TODO select by data index
+        const firstExtension = page.locator('.extension-list-item').first()
+        await expect(firstExtension).toBeVisible()
+        const nameLocator = firstExtension.locator('.name')
+        const name = await nameLocator.textContent()
+        await expect(nameLocator).toHaveText(name)
+        await firstExtension.click()
+        const extensionEditor = page.locator('.extension-editor')
+        await expect(extensionEditor).toBeVisible()
+        const heading = extensionEditor.locator('.name').first()
+        await expect(heading).toHaveText(name)
+        await page.waitForIdle()
+      },
+      async openContextMenu() {
+        const firstExtension = page.locator('.extension-list-item').first()
+        await expect(firstExtension).toBeVisible()
+        const nameLocator = firstExtension.locator('.name')
+        const name = await nameLocator.textContent()
+        await expect(nameLocator).toHaveText(name)
+        const contextMenu = ContextMenu.create({ expect, page, VError })
+        await contextMenu.open(firstExtension)
+        await contextMenu.close()
+      },
+      async shouldBe(name: string) {
+        await page.waitForIdle()
+        const firstExtension = page.locator('.extension-list-item').first()
+        await expect(firstExtension).toBeVisible({
+          timeout: 15_000,
+        })
+        await page.waitForIdle()
+        const nameLocator = firstExtension.locator('.name')
+        await expect(nameLocator).toBeVisible()
+        await page.waitForIdle()
+        await expect(nameLocator).toHaveText(name)
+        await page.waitForIdle()
+      },
+    },
+    async hide() {
+      try {
+        const extensionsView = page.locator(`.extensions-viewlet`)
+        await expect(extensionsView).toBeVisible()
+        const quickPick = QuickPick.create({
+          expect,
+          page,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
+        await expect(extensionsView).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to hide extensions view`)
+      }
+    },
+    async openSuggest() {
+      try {
+        await page.waitForIdle()
+        const extensionsView = page.locator('.extensions-viewlet')
+        const extensionsInput = extensionsView.locator('.native-edit-context')
+        await expect(extensionsInput).toBeVisible()
+        await page.waitForIdle()
+        await expect(extensionsInput).toBeFocused()
+        await page.waitForIdle()
+        const suggestions = page.locator('[aria-label="Suggest"]')
+        // for (let i = 0; i < 5; i++) {
+        //   await page.waitForIdle()
+        //   const count = await suggestions.count()
+        //   if (count > 0) {
+        //     break
+        //   }
+        await extensionsInput.press('Control+Space')
+        // }
+        await page.waitForIdle()
+        // TODO scope selector to extensions view
+        await expect(suggestions).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to open extensions suggestions`)
+      }
+    },
+    async restart() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.RestartExtensions)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to restart extensions`)
+      }
+    },
     async search(value: string) {
       try {
         await page.waitForIdle()
@@ -49,73 +184,6 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         throw new VError(error, `Failed to search for ${value}`)
       }
     },
-    async waitForProgressToBeHidden() {
-      try {
-        await page.waitForIdle()
-        const progress = page.locator('.sidebar .monaco-progress-container')
-        await expect(progress).toBeHidden({ timeout: 30_000 })
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to hide progress`)
-      }
-    },
-    async clear() {
-      try {
-        const clearButton = page.locator('[aria-label="Clear Extensions Search Results"]')
-        await clearButton.click()
-        await this.shouldHaveValue('')
-      } catch (error) {
-        throw new VError(error, `Failed to clear`)
-      }
-    },
-    async add(path, expectedName) {
-      try {
-        await page.waitForIdle()
-        // TODO could create symlink also
-        const absolutePath = join(Root.root, path)
-        const base = basename(absolutePath)
-        const destination = join(Root.root, '.vscode-extensions', base)
-        await cp(absolutePath, destination, { recursive: true, force: true })
-        await page.waitForIdle()
-        await this.show()
-        await page.waitForIdle()
-        await this.search('@installed')
-        await page.waitForIdle()
-        const firstExtension = page.locator('.extension-list-item').first()
-        await expect(firstExtension).toBeVisible()
-        const nameLocator = firstExtension.locator('.name')
-        await expect(nameLocator).toBeVisible()
-        await expect(nameLocator).toHaveText(expectedName)
-        await page.waitForIdle()
-        await this.hide()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to add extension`)
-      }
-    },
-    async shouldHaveValue(value) {
-      try {
-        const extensionsView = page.locator(`.extensions-viewlet`)
-        await expect(extensionsView).toBeVisible()
-        const extensionsInputElement = page.locator('.extensions-search-container .view-lines')
-        const actualText = value.replaceAll(space, nonBreakingSpace)
-        await expect(extensionsInputElement).toHaveText(actualText)
-      } catch (error) {
-        throw new VError(error, `Failed to verify that extension input has value ${value}`)
-      }
-    },
-    async shouldHaveMcpItem({ name }) {
-      try {
-        const paneHeader = page.locator('[aria-label="MCP Servers - Installed Section"]')
-        await expect(paneHeader).toBeVisible()
-        const list = page.locator('.monaco-list[aria-label="MCP Servers"]')
-        await expect(list).toBeVisible()
-        const item = list.locator(`[aria-label="${name}"]`)
-        await expect(item).toBeVisible()
-      } catch (error) {
-        throw new VError(error, `Failed to verify that mcp item is visible ${name}`)
-      }
-    },
     async selectMcpItem({ name }) {
       try {
         const list = page.locator('.monaco-list[aria-label="MCP Servers"]')
@@ -145,6 +213,47 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         throw new VError(error, `Failed select item ${name}`)
       }
     },
+    async shouldHaveMcpItem({ name }) {
+      try {
+        const paneHeader = page.locator('[aria-label="MCP Servers - Installed Section"]')
+        await expect(paneHeader).toBeVisible()
+        const list = page.locator('.monaco-list[aria-label="MCP Servers"]')
+        await expect(list).toBeVisible()
+        const item = list.locator(`[aria-label="${name}"]`)
+        await expect(item).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that mcp item is visible ${name}`)
+      }
+    },
+    async shouldHaveMcpWelcomeHeading(expectedText) {
+      try {
+        const mcpWelcomeTitle = page.locator('.mcp-welcome-title')
+        await expect(mcpWelcomeTitle).toBeVisible()
+        await expect(mcpWelcomeTitle).toHaveText(expectedText)
+      } catch (error) {
+        throw new VError(error, `Failed to check mcp welcome heading`)
+      }
+    },
+    async shouldHaveTitle(expectedTtitle) {
+      try {
+        const title = page.locator('.sidebar .title-label h2')
+        await expect(title).toBeVisible()
+        await expect(title).toHaveText(expectedTtitle)
+      } catch (error) {
+        throw new VError(error, `Failed to check extensions title`)
+      }
+    },
+    async shouldHaveValue(value) {
+      try {
+        const extensionsView = page.locator(`.extensions-viewlet`)
+        await expect(extensionsView).toBeVisible()
+        const extensionsInputElement = page.locator('.extensions-search-container .view-lines')
+        const actualText = value.replaceAll(space, nonBreakingSpace)
+        await expect(extensionsInputElement).toHaveText(actualText)
+      } catch (error) {
+        throw new VError(error, `Failed to verify that extension input has value ${value}`)
+      }
+    },
     async show() {
       try {
         await page.waitForIdle()
@@ -152,8 +261,8 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         const selected = await searchItem.getAttribute('aria-selected')
         if (selected !== 'true') {
           const quickPick = QuickPick.create({
-            page,
             expect,
+            page,
             VError,
           })
           await quickPick.executeCommand(WellKnownCommands.ShowExtensions)
@@ -196,124 +305,15 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         throw new VError(error, `Failed to show extensions view`)
       }
     },
-    async hide() {
-      try {
-        const extensionsView = page.locator(`.extensions-viewlet`)
-        await expect(extensionsView).toBeVisible()
-        const quickPick = QuickPick.create({
-          page,
-          expect,
-          VError,
-        })
-        await quickPick.executeCommand(WellKnownCommands.TogglePrimarySideBarVisibility)
-        await expect(extensionsView).toBeHidden()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to hide extensions view`)
-      }
-    },
-    async openSuggest() {
+    async waitForProgressToBeHidden() {
       try {
         await page.waitForIdle()
-        const extensionsView = page.locator('.extensions-viewlet')
-        const extensionsInput = extensionsView.locator('.native-edit-context')
-        await expect(extensionsInput).toBeVisible()
-        await page.waitForIdle()
-        await expect(extensionsInput).toBeFocused()
-        await page.waitForIdle()
-        const suggestions = page.locator('[aria-label="Suggest"]')
-        // for (let i = 0; i < 5; i++) {
-        //   await page.waitForIdle()
-        //   const count = await suggestions.count()
-        //   if (count > 0) {
-        //     break
-        //   }
-        await extensionsInput.press('Control+Space')
-        // }
-        await page.waitForIdle()
-        // TODO scope selector to extensions view
-        await expect(suggestions).toBeVisible()
-      } catch (error) {
-        throw new VError(error, `Failed to open extensions suggestions`)
-      }
-    },
-    async closeSuggest() {
-      try {
-        // TODO scope selector to extensions view
-        const suggestions = page.locator('[aria-label="Suggest"]')
-        await expect(suggestions).toBeVisible()
-        await page.keyboard.press('Escape')
-        await expect(suggestions).toBeHidden()
-      } catch (error) {
-        throw new VError(error, `Failed to close extensions suggestions`)
-      }
-    },
-    async shouldHaveMcpWelcomeHeading(expectedText) {
-      try {
-        const mcpWelcomeTitle = page.locator('.mcp-welcome-title')
-        await expect(mcpWelcomeTitle).toBeVisible()
-        await expect(mcpWelcomeTitle).toHaveText(expectedText)
-      } catch (error) {
-        throw new VError(error, `Failed to check mcp welcome heading`)
-      }
-    },
-    async restart() {
-      try {
-        await page.waitForIdle()
-        const quickPick = QuickPick.create({ page, expect, VError })
-        await quickPick.executeCommand(WellKnownCommands.RestartExtensions)
+        const progress = page.locator('.sidebar .monaco-progress-container')
+        await expect(progress).toBeHidden({ timeout: 30_000 })
         await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to restart extensions`)
+        throw new VError(error, `Failed to hide progress`)
       }
-    },
-    async shouldHaveTitle(expectedTtitle) {
-      try {
-        const title = page.locator('.sidebar .title-label h2')
-        await expect(title).toBeVisible()
-        await expect(title).toHaveText(expectedTtitle)
-      } catch (error) {
-        throw new VError(error, `Failed to check extensions title`)
-      }
-    },
-    first: {
-      async shouldBe(name: string) {
-        await page.waitForIdle()
-        const firstExtension = page.locator('.extension-list-item').first()
-        await expect(firstExtension).toBeVisible({
-          timeout: 15_000,
-        })
-        await page.waitForIdle()
-        const nameLocator = firstExtension.locator('.name')
-        await expect(nameLocator).toBeVisible()
-        await page.waitForIdle()
-        await expect(nameLocator).toHaveText(name)
-        await page.waitForIdle()
-      },
-      async click() {
-        // TODO select by data index
-        const firstExtension = page.locator('.extension-list-item').first()
-        await expect(firstExtension).toBeVisible()
-        const nameLocator = firstExtension.locator('.name')
-        const name = await nameLocator.textContent()
-        await expect(nameLocator).toHaveText(name)
-        await firstExtension.click()
-        const extensionEditor = page.locator('.extension-editor')
-        await expect(extensionEditor).toBeVisible()
-        const heading = extensionEditor.locator('.name').first()
-        await expect(heading).toHaveText(name)
-        await page.waitForIdle()
-      },
-      async openContextMenu() {
-        const firstExtension = page.locator('.extension-list-item').first()
-        await expect(firstExtension).toBeVisible()
-        const nameLocator = firstExtension.locator('.name')
-        const name = await nameLocator.textContent()
-        await expect(nameLocator).toHaveText(name)
-        const contextMenu = ContextMenu.create({ page, expect, VError })
-        await contextMenu.open(firstExtension)
-        await contextMenu.close()
-      },
     },
   }
 }

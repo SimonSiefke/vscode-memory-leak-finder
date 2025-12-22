@@ -1,18 +1,26 @@
-import * as Explorer from '../Explorer/Explorer.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
+import * as Explorer from '../Explorer/Explorer.ts'
 import * as SideBar from '../SideBar/SideBar.ts'
 
-export const create = ({ page, expect, VError }) => {
+export const create = ({ expect, page, VError }) => {
   return {
+    async close() {
+      try {
+        await page.keyboard.press('Control+W')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to close diff editor`)
+      }
+    },
     async open(files) {
       try {
         if (files.length < 2) {
           throw new Error('MultiDiffEditor requires at least 2 files')
         }
 
-        const explorer = Explorer.create({ page, expect, VError })
-        const contextMenu = ContextMenu.create({ page, expect, VError })
-        const sideBar = SideBar.create({ page, expect, VError })
+        const explorer = Explorer.create({ expect, page, VError })
+        const contextMenu = ContextMenu.create({ expect, page, VError })
+        const sideBar = SideBar.create({ expect, page, VError })
 
         await explorer.focus()
 
@@ -38,14 +46,6 @@ export const create = ({ page, expect, VError }) => {
         await expect(diffEditor).toBeVisible()
       } catch (error) {
         throw new VError(error, `Expected diff editor to be visible`)
-      }
-    },
-    async close() {
-      try {
-        await page.keyboard.press('Control+W')
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to close diff editor`)
       }
     },
   }

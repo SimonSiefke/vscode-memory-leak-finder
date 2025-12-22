@@ -1,5 +1,27 @@
-export const create = ({ page, expect, VError }) => {
+export const create = ({ expect, page, VError }) => {
   return {
+    async clear() {
+      try {
+        await page.waitForIdle()
+        const clearButton = page.locator('.sidebar [aria-label="Clear"]')
+        await expect(clearButton).toBeVisible()
+        await clearButton.click()
+        await this.shouldHaveMessage('No results. Try running a previous search again:')
+      } catch (error) {
+        throw new VError(error, `Failed to clear references`)
+      }
+    },
+    async shouldBeFocused() {
+      try {
+        await page.waitForIdle()
+        const results = page.locator('[aria-label="Reference Search Results"]')
+        await expect(results).toBeVisible()
+        await expect(results).toBeFocused()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Expected references to be focused`)
+      }
+    },
     async shouldBeVisible() {
       try {
         await page.waitForIdle()
@@ -18,28 +40,6 @@ export const create = ({ page, expect, VError }) => {
         await expect(messageItem).toHaveText(message)
       } catch (error) {
         throw new VError(error, `Expected references to have message ${message}`)
-      }
-    },
-    async shouldBeFocused() {
-      try {
-        await page.waitForIdle()
-        const results = page.locator('[aria-label="Reference Search Results"]')
-        await expect(results).toBeVisible()
-        await expect(results).toBeFocused()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Expected references to be focused`)
-      }
-    },
-    async clear() {
-      try {
-        await page.waitForIdle()
-        const clearButton = page.locator('.sidebar [aria-label="Clear"]')
-        await expect(clearButton).toBeVisible()
-        await clearButton.click()
-        await this.shouldHaveMessage('No results. Try running a previous search again:')
-      } catch (error) {
-        throw new VError(error, `Failed to clear references`)
       }
     },
   }

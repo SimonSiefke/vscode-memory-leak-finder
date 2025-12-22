@@ -9,8 +9,8 @@ export const create = ({ expect, page, VError }) => {
         const toastContainer = page.locator('.notifications-toasts')
         await expect(toastContainer).toBeVisible()
         const quickPick = QuickPick.create({
-          page,
           expect,
+          page,
           VError,
         })
         await quickPick.executeCommand(WellKnownCommands.CloseAllNotifications)
