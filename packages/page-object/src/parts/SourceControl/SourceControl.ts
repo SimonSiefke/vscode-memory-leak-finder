@@ -221,6 +221,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
       const moreActions = page.locator('.sidebar [aria-label="Views and More Actions..."]')
       await expect(moreActions).toBeVisible()
       await moreActions.click()
+      await new Promise((r) => {})
       const contextMenu = ContextMenu.create({
         page,
         expect,
@@ -242,6 +243,27 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await this.doMoreAction('View as List')
       } catch (error) {
         throw new VError(error, `Failed to view as list`)
+      }
+    },
+    async hideGraph() {
+      try {
+        await page.waitForIdle()
+        const actions = page.locator(`[aria-label="Source Control actions"]`)
+        await expect(actions).toBeVisible()
+        await page.waitForIdle()
+        await actions.click()
+        await page.waitForIdle()
+        const contextMenu = ContextMenu.create({
+          page,
+          expect,
+          VError,
+        })
+        await contextMenu.shouldHaveItem(`Graph`)
+        // @ts-ignore
+        await contextMenu.uncheck('Graph')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to hide graph`)
       }
     },
   }

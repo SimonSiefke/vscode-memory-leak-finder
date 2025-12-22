@@ -15,6 +15,7 @@ export const setup = async ({ ActivityBar, Editor, Explorer, Workspace, SourceCo
   await ActivityBar.showSourceControl()
   await SourceControl.shouldHaveUnstagedFile('index.html')
   await SourceControl.stageFile('index.html')
+  await SourceControl.hideGraph()
 }
 
 export const run = async ({ SourceControl }: TestContext): Promise<void> => {
