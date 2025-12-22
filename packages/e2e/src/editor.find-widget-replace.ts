@@ -3,11 +3,7 @@ import type { TestContext } from '../types.js'
 export const skip = 1
 
 // @ts-ignore
-<<<<<<< HEAD
-export const setup = async ({ Editor, Explorer, Workspace, EditorFind }: TestContext): Promise<void> => {
-=======
 export const setup = async ({ Editor, EditorFind, Explorer, Workspace }: TestContext): Promise<void> => {
->>>>>>> origin/main
   await Workspace.setFiles([
     {
       content: '<h1>abc</h1>',
