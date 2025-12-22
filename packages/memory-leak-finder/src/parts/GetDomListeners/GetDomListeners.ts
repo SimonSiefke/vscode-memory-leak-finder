@@ -32,9 +32,9 @@ export const getDomListeners = async (session, objectGroup) => {
 
   return array
 }`,
+    objectGroup,
     objectId: instances.objectId,
     returnByValue: true,
-    objectGroup,
   })
   return fnResult2
 }

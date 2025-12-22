@@ -24,9 +24,9 @@ export const compareNamedEmitterCount = (before, after) => {
     const delta = afterCount - beforeCount
     if (delta > 0) {
       result.push({
-        name: item.name,
         count: afterCount,
         delta,
+        name: item.name,
       })
     }
   }

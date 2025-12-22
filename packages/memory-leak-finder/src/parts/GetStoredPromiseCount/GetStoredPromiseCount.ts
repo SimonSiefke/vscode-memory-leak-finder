@@ -4,12 +4,12 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 export const getStoredPromiseCount = async (session, objectGroup) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Object,
-    returnByValue: false,
     objectGroup,
+    returnByValue: false,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
-    prototypeObjectId: prototypeDescriptor.objectId,
     objectGroup,
+    prototypeObjectId: prototypeDescriptor.objectId,
   })
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
@@ -37,9 +37,9 @@ export const getStoredPromiseCount = async (session, objectGroup) => {
   const total = storedPromises.length
   return total
 }`,
+    objectGroup,
     objectId: objects.objects.objectId,
     returnByValue: true,
-    objectGroup,
   })
   return fnResult1
 }

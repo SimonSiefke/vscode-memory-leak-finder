@@ -1,4 +1,4 @@
-export const isLeakCssInlineStyles = ({ before, after }) => {
+export const isLeakCssInlineStyles = ({ after, before }) => {
   // TODO
   return false
 }

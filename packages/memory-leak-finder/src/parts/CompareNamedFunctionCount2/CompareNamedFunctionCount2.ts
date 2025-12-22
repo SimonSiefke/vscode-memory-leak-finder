@@ -9,19 +9,19 @@ const addSourceLocations = async (functionObjects, scriptMap) => {
     return {
       ...item,
       name: 'abc',
-      url: url,
-      stack: [url],
       sourceMaps: [script.sourceMapUrl],
+      stack: [url],
+      url: url,
     }
   })
   const withOriginalStack = await GetEventListenerOriginalSourcesCached.getEventListenerOriginalSourcesCached(requests, classNames)
   const normalized = withOriginalStack.map((item) => {
-    const { stack, count, originalStack, originalName, name, delta } = item
+    const { count, delta, name, originalName, originalStack, stack } = item
 
     return {
-      name: originalName || name,
       count,
       delta,
+      name: originalName || name,
       url: originalStack?.[0] || stack?.[0] || '',
     }
   })

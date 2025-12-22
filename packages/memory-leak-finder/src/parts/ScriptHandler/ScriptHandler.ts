@@ -4,7 +4,7 @@ import * as ExtractDataUrlSourceMap from '../ExtractDataUrlSourceMap/ExtractData
 export const create = (): IScriptHandler => {
   const scriptMap = Object.create(null)
   const handleScriptParsed = (event) => {
-    const { url, scriptId, sourceMapURL } = event.params
+    const { scriptId, sourceMapURL, url } = event.params
     if (!url) {
       return
     }
@@ -18,11 +18,12 @@ export const create = (): IScriptHandler => {
       }
     }
     scriptMap[scriptId] = {
-      url,
       sourceMapUrl,
+      url,
     }
   }
   return {
+    scriptMap,
     async start(session) {
       session.on('Debugger.scriptParsed', handleScriptParsed)
       await session.invoke('Debugger.enable')
@@ -31,6 +32,5 @@ export const create = (): IScriptHandler => {
       session.off('Debugger.scriptParsed', handleScriptParsed)
       await session.invoke('Debugger.disable')
     },
-    scriptMap,
   }
 }

@@ -12,10 +12,10 @@ export const createPipeline = (stream: Readable) => {
   })
 
   return {
-    async dispose() {
+    port: port1,
+    async [Symbol.asyncDispose]() {
       port2.close()
       await Promise.allSettled([pipelinePromise, controller.abort()])
     },
-    port: port1,
   }
 }

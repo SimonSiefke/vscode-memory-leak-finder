@@ -20,17 +20,17 @@ export const getNamedFunctionLocation = async (objectId, session, scriptMap, inc
   if (!objectId) {
     return {
       ...EmptyFunctionLocation.emptyFunctionLocation,
-      objectId,
       name: '',
-      url: '',
+      objectId,
       sourceMapUrl: '',
+      url: '',
     }
   }
   const fnResult1 = await DevtoolsProtocolRuntime.getProperties(session, {
-    objectId,
     accessorPropertiesOnly: false,
-    nonIndexedPropertiesOnly: false,
     generatePreview: false,
+    nonIndexedPropertiesOnly: false,
+    objectId,
     ownProperties: true,
   })
   const functionLocation = await GetNamedFunctionLocationProperty.getNamedFunctionLocationProperty(
@@ -45,9 +45,9 @@ export const getNamedFunctionLocation = async (objectId, session, scriptMap, inc
   const functionSourceMapUrl = getFunctionSourceMapUrl(functionLocation, scriptMap)
   return {
     ...functionLocation,
-    objectId,
     name: functionName,
-    url: functionUrl,
+    objectId,
     sourceMapUrl: includeSourceMap ? functionSourceMapUrl : '',
+    url: functionUrl,
   }
 }

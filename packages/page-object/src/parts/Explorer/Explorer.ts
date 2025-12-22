@@ -295,6 +295,18 @@ export const create = ({ electronApp, expect, page, VError }) => {
         throw new VError(error, `Failed to refresh explorer`)
       }
     },
+    async removeCurrent() {
+      try {
+        await page.waitForIdle()
+        await page.keyboard.press('Home')
+        await page.waitForIdle()
+        await page.keyboard.press('Delete')
+        await this.refresh()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to delete`)
+      }
+    },
     async rename(oldDirentName: string, newDirentName: string) {
       try {
         await page.waitForIdle()

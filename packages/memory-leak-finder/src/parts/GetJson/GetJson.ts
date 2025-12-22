@@ -4,9 +4,9 @@ import { VError } from '../VError/VError.ts'
 export const getJson = async (port: number): Promise<any[]> => {
   try {
     await waitForLocalhost({
+      path: '/json/list',
       port,
       signal: AbortSignal.timeout(30_000),
-      path: '/json/list',
       useGet: true,
     })
 
@@ -17,7 +17,7 @@ export const getJson = async (port: number): Promise<any[]> => {
 
     const targets = await response.json()
     if (!Array.isArray(targets)) {
-      throw new Error(`Expected array but got ${typeof targets}`)
+      throw new TypeError(`Expected array but got ${typeof targets}`)
     }
 
     return targets

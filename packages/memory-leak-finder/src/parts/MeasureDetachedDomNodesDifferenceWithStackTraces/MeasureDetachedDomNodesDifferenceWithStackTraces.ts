@@ -51,6 +51,6 @@ const getTotal = (instance) => {
   return Arrays.sum(counts)
 }
 
-export const isLeak = ({ before, after }) => {
+export const isLeak = ({ after, before }) => {
   return getTotal(after) > getTotal(before)
 }

@@ -12,8 +12,8 @@ export const getSlowArrayCount = async (session, objectGroup) => {
     returnByValue: false,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
-    prototypeObjectId: prototypeDescriptor.objectId,
     objectGroup,
+    prototypeObjectId: prototypeDescriptor.objectId,
   })
   await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
@@ -27,9 +27,9 @@ export const getSlowArrayCount = async (session, objectGroup) => {
   }
   return total
 }`,
+    objectGroup,
     objectId: objects.objects.objectId,
     returnByValue: true,
-    objectGroup,
   })
   return 0
 }
