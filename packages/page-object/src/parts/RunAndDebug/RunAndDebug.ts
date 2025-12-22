@@ -3,6 +3,123 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, page, VError }) => {
   return {
+    async continue() {
+      try {
+        const debugToolBar = page.locator('.debug-toolbar')
+        await expect(debugToolBar).toBeVisible()
+        const continueButton = debugToolBar.locator('[aria-label^="Continue"]')
+        await expect(continueButton).toBeVisible()
+        await continueButton.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to continue`)
+      }
+    },
+    async pause() {
+      try {
+        const debugToolBar = page.locator('.debug-toolbar')
+        await expect(debugToolBar).toBeVisible()
+        const pauseButton = debugToolBar.locator('[aria-label^="Pause"]')
+        await expect(pauseButton).toBeVisible()
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.DebugPause)
+        await page.waitForIdle()
+        await expect(pauseButton).toBeHidden({
+          timeout: 20_000,
+        })
+        const continueButton = debugToolBar.locator('[aria-label^="Continue"]')
+        await expect(continueButton).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to pause`)
+      }
+    },
+    async removeAllBreakpoints() {
+      try {
+        const quickPick = QuickPick.create({
+          expect,
+          page,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.RemoveAllBreakpoints)
+      } catch (error) {
+        throw new VError(error, `Failed to remove all breakpoints`)
+      }
+    },
+    async runAndWaitForDebugConsoleOutput({ output }) {
+      try {
+        const quickPick = QuickPick.create({
+          expect,
+          page,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.ShowRunAndDebug)
+        await page.waitForIdle()
+        await this.startRunAndDebug()
+        await this.waitForDebugConsoleOutput({ output })
+      } catch (error) {
+        throw new VError(error, `Failed to run debugger`)
+      }
+    },
+    async runAndWaitForPaused({ callStackSize, file, line }) {
+      try {
+        const quickPick = QuickPick.create({
+          expect,
+          page,
+          VError,
+        })
+        await quickPick.executeCommand(WellKnownCommands.ShowRunAndDebug)
+        await page.waitForIdle()
+        await this.startRunAndDebug()
+        await this.waitForPaused({ callStackSize, file, line })
+      } catch (error) {
+        throw new VError(error, `Failed to run debugger`)
+      }
+    },
+    async setPauseOnExceptions({ pauseOnCaughtExceptions, pauseOnExceptions }) {
+      try {
+        await page.waitForIdle()
+        const breakpoints = page.locator('.debug-breakpoints')
+        await expect(breakpoints).toBeVisible()
+        const exception = breakpoints.locator('[aria-label="Caught Exceptions"] input[type="checkbox"]')
+        await expect(exception).toBeVisible()
+        const uncaughtException = breakpoints.locator('[aria-label="Uncaught Exceptions"] input[type="checkbox"]')
+        await expect(uncaughtException).toBeVisible()
+
+        await exception.setChecked(pauseOnExceptions)
+        await uncaughtException.setChecked(pauseOnCaughtExceptions)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to set pause on exceptions`)
+      }
+    },
+    async setValue(variableName, variableValue, newVariableValue) {
+      try {
+        const debugVariables = page.locator('.debug-variables')
+        const scopeLocal = debugVariables.locator('[aria-label="Scope Local"]')
+        await expect(scopeLocal).toBeVisible()
+        const scopeModule = debugVariables.locator('[aria-label="Scope Module"]')
+        await expect(scopeModule).toBeVisible()
+        const isExpanded = await scopeModule.getAttribute('aria-expanded')
+        if (isExpanded === 'false') {
+          const scopeModuleText = scopeModule.locator('.monaco-highlighted-label')
+          await scopeModuleText.click()
+        }
+        await expect(scopeModule).toHaveAttribute('aria-expanded', 'true')
+        const variableRow = debugVariables.locator(`[aria-label="${variableName}, value ${variableValue}"]`)
+        await variableRow.dblclick()
+        const input = page.locator('input[aria-label="Type new variable value"]')
+        await expect(input).toBeVisible()
+        await expect(input).toHaveValue(variableValue)
+        await input.type(newVariableValue)
+        await input.blur()
+        await expect(input).toBeHidden()
+        const newVariableRow = debugVariables.locator(`[aria-label="${variableName}, value ${newVariableValue}"]`)
+        await expect(newVariableRow).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to set variable value for ${variableName}`)
+      }
+    },
     async startRunAndDebug() {
       try {
         await page.waitForIdle()
@@ -39,23 +156,22 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to start run and debug`)
       }
     },
-    async pause() {
+    async step(expectedFile, expectedPauseLine, expectedCallStackSize) {
       try {
-        const debugToolBar = page.locator('.debug-toolbar')
-        await expect(debugToolBar).toBeVisible()
-        const pauseButton = debugToolBar.locator('[aria-label^="Pause"]')
-        await expect(pauseButton).toBeVisible()
-        await page.waitForIdle()
-        const quickPick = QuickPick.create({ expect, page, VError })
-        await quickPick.executeCommand(WellKnownCommands.DebugPause)
-        await page.waitForIdle()
-        await expect(pauseButton).toBeHidden({
-          timeout: 20_000,
+        const quickPick = QuickPick.create({
+          expect,
+          page,
+          VError,
         })
-        const continueButton = debugToolBar.locator('[aria-label^="Continue"]')
-        await expect(continueButton).toBeVisible()
+        await quickPick.executeCommand(WellKnownCommands.DebugStepOver)
+        await page.waitForIdle()
+        await this.waitForPaused({
+          callStackSize: expectedCallStackSize,
+          file: expectedFile,
+          line: expectedPauseLine,
+        })
       } catch (error) {
-        throw new VError(error, `Failed to pause`)
+        throw new VError(error, `Failed to step over`)
       }
     },
     async stop() {
@@ -78,7 +194,20 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to stop`)
       }
     },
-    async waitForPaused({ file, line, callStackSize }) {
+    async waitForDebugConsoleOutput({ output }) {
+      try {
+        await page.waitForIdle()
+        const repl = page.locator('.repl')
+        await expect(repl).toBeVisible()
+        await page.waitForIdle()
+        const row = page.locator('.monaco-list-row[aria-label^="x = 1"]')
+        await expect(row).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to wait for debug console output`)
+      }
+    },
+    async waitForPaused({ callStackSize, file, line }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
       await expect(continueButton).toBeVisible({ timeout: 20_000 })
@@ -110,136 +239,7 @@ export const create = ({ expect, page, VError }) => {
       await expect(editor).toBeFocused()
       await page.waitForIdle()
     },
-    async runAndWaitForPaused({ file, line, callStackSize }) {
-      try {
-        const quickPick = QuickPick.create({
-          page,
-          expect,
-          VError,
-        })
-        await quickPick.executeCommand(WellKnownCommands.ShowRunAndDebug)
-        await page.waitForIdle()
-        await this.startRunAndDebug()
-        await this.waitForPaused({ file, line, callStackSize })
-      } catch (error) {
-        throw new VError(error, `Failed to run debugger`)
-      }
-    },
-    async runAndWaitForDebugConsoleOutput({ output }) {
-      try {
-        const quickPick = QuickPick.create({
-          page,
-          expect,
-          VError,
-        })
-        await quickPick.executeCommand(WellKnownCommands.ShowRunAndDebug)
-        await page.waitForIdle()
-        await this.startRunAndDebug()
-        await this.waitForDebugConsoleOutput({ output })
-      } catch (error) {
-        throw new VError(error, `Failed to run debugger`)
-      }
-    },
-    async waitForDebugConsoleOutput({ output }) {
-      try {
-        await page.waitForIdle()
-        const repl = page.locator('.repl')
-        await expect(repl).toBeVisible()
-        await page.waitForIdle()
-        const row = page.locator('.monaco-list-row[aria-label^="x = 1"]')
-        await expect(row).toBeVisible()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to wait for debug console output`)
-      }
-    },
-    async removeAllBreakpoints() {
-      try {
-        const quickPick = QuickPick.create({
-          page,
-          expect,
-          VError,
-        })
-        await quickPick.executeCommand(WellKnownCommands.RemoveAllBreakpoints)
-      } catch (error) {
-        throw new VError(error, `Failed to remove all breakpoints`)
-      }
-    },
-    async step(expectedFile, expectedPauseLine, expectedCallStackSize) {
-      try {
-        const quickPick = QuickPick.create({
-          page,
-          expect,
-          VError,
-        })
-        await quickPick.executeCommand(WellKnownCommands.DebugStepOver)
-        await page.waitForIdle()
-        await this.waitForPaused({
-          file: expectedFile,
-          line: expectedPauseLine,
-          callStackSize: expectedCallStackSize,
-        })
-      } catch (error) {
-        throw new VError(error, `Failed to step over`)
-      }
-    },
-    async setValue(variableName, variableValue, newVariableValue) {
-      try {
-        const debugVariables = page.locator('.debug-variables')
-        const scopeLocal = debugVariables.locator('[aria-label="Scope Local"]')
-        await expect(scopeLocal).toBeVisible()
-        const scopeModule = debugVariables.locator('[aria-label="Scope Module"]')
-        await expect(scopeModule).toBeVisible()
-        const isExpanded = await scopeModule.getAttribute('aria-expanded')
-        if (isExpanded === 'false') {
-          const scopeModuleText = scopeModule.locator('.monaco-highlighted-label')
-          await scopeModuleText.click()
-        }
-        await expect(scopeModule).toHaveAttribute('aria-expanded', 'true')
-        const variableRow = debugVariables.locator(`[aria-label="${variableName}, value ${variableValue}"]`)
-        await variableRow.dblclick()
-        const input = page.locator('input[aria-label="Type new variable value"]')
-        await expect(input).toBeVisible()
-        await expect(input).toHaveValue(variableValue)
-        await input.type(newVariableValue)
-        await input.blur()
-        await expect(input).toBeHidden()
-        const newVariableRow = debugVariables.locator(`[aria-label="${variableName}, value ${newVariableValue}"]`)
-        await expect(newVariableRow).toBeVisible()
-      } catch (error) {
-        throw new VError(error, `Failed to set variable value for ${variableName}`)
-      }
-    },
-    async continue() {
-      try {
-        const debugToolBar = page.locator('.debug-toolbar')
-        await expect(debugToolBar).toBeVisible()
-        const continueButton = debugToolBar.locator('[aria-label^="Continue"]')
-        await expect(continueButton).toBeVisible()
-        await continueButton.click()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to continue`)
-      }
-    },
-    async setPauseOnExceptions({ pauseOnExceptions, pauseOnCaughtExceptions }) {
-      try {
-        await page.waitForIdle()
-        const breakpoints = page.locator('.debug-breakpoints')
-        await expect(breakpoints).toBeVisible()
-        const exception = breakpoints.locator('[aria-label="Caught Exceptions"] input[type="checkbox"]')
-        await expect(exception).toBeVisible()
-        const uncaughtException = breakpoints.locator('[aria-label="Uncaught Exceptions"] input[type="checkbox"]')
-        await expect(uncaughtException).toBeVisible()
-
-        await exception.setChecked(pauseOnExceptions)
-        await uncaughtException.setChecked(pauseOnCaughtExceptions)
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to set pause on exceptions`)
-      }
-    },
-    async waitForPausedOnException({ file, line, exception = false }) {
+    async waitForPausedOnException({ exception = false, file, line }) {
       await page.waitForIdle()
       const continueButton = page.locator('.debug-toolbar .codicon-debug-continue')
       await expect(continueButton).toBeVisible({ timeout: 20_000 })

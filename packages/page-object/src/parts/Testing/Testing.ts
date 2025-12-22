@@ -1,11 +1,11 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ page, expect, VError }) => {
+export const create = ({ expect, page, VError }) => {
   return {
     async focusOnTestExplorerView() {
       try {
-        const quickPick = QuickPick.create({ page, expect, VError })
+        const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.FocusOnTestExplorerView)
         await page.waitForIdle()
         const testExplorer = page.locator('.test-explorer')
@@ -18,7 +18,7 @@ export const create = ({ page, expect, VError }) => {
     async runAllTests({ expectedRowCount, expectedTestOutputRowCount }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ page, expect, VError })
+        const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.RunAllTests)
         await page.waitForIdle()
         const testExplorer = page.locator('.test-explorer')
@@ -57,23 +57,10 @@ export const create = ({ page, expect, VError }) => {
         await expect(terminal).toBeVisible()
         await page.waitForIdle()
         const terminalActions = page.locator('[aria-label="Terminal actions"]')
-        await expect(terminalActions).toBeVisible({ timeout: 10000 })
+        await expect(terminalActions).toBeVisible({ timeout: 10_000 })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to run task ${taskName}`)
-      }
-    },
-    async shouldHaveTestSuccess(): Promise<void> {
-      try {
-        await page.waitForIdle()
-        const terminal = page.locator('.terminal')
-        await expect(terminal).toBeVisible()
-        await page.waitForIdle()
-        const successDecoration = terminal.locator('.codicon-terminal-decoration-success, .codicon-check')
-        await expect(successDecoration.first()).toBeVisible({ timeout: 15000 })
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, 'Failed to verify test success')
       }
     },
     async shouldHaveTestFailure(): Promise<void> {
@@ -83,10 +70,23 @@ export const create = ({ page, expect, VError }) => {
         await expect(terminal).toBeVisible()
         await page.waitForIdle()
         const errorDecoration = terminal.locator('.codicon-terminal-decoration-error, .codicon-error')
-        await expect(errorDecoration.first()).toBeVisible({ timeout: 15000 })
+        await expect(errorDecoration.first()).toBeVisible({ timeout: 15_000 })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, 'Failed to verify test failure')
+      }
+    },
+    async shouldHaveTestSuccess(): Promise<void> {
+      try {
+        await page.waitForIdle()
+        const terminal = page.locator('.terminal')
+        await expect(terminal).toBeVisible()
+        await page.waitForIdle()
+        const successDecoration = terminal.locator('.codicon-terminal-decoration-success, .codicon-check')
+        await expect(successDecoration.first()).toBeVisible({ timeout: 15_000 })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, 'Failed to verify test success')
       }
     },
   }

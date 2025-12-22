@@ -11,5 +11,6 @@ export const compareHeapUsage = async (before: HeapUsage, after: HeapUsage) => {
     totalBefore,
     usedAfter,
     usedBefore,
+    isLeak: usedAfter > usedBefore,
   }
 }

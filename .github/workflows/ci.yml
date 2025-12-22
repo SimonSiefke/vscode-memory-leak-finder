@@ -108,7 +108,7 @@ jobs:
           - name: promise-count
             args: --measure promise-count
           - name: promises-with-stack-trace
-            args: --measure promises-with-stack-trace
+            args: --measure promises-with-stack-trace --runs 37  --restart-between --run-skipped-tests-anyway
           - name: named-array-count
             args: --measure named-array-count
           - name: css-rule-count
@@ -143,6 +143,14 @@ jobs:
             args: --measure set-size
           - name: canvas-count
             args: --measure canvas-count
+          - name: canvas-rendering-context-2d-count
+            args: --measure canvas-rendering-context-2d-count
+          - name: gpu-canvas-context-count
+            args: --measure gpu-canvas-context-count
+          - name: image-bitmap-count
+            args: --measure image-bitmap-count
+          - name: webgl2-rendering-context-count
+            args: --measure webgl2-rendering-context-count
           - name: iframe-count
             args: --measure iframe-count
           - name: message-port-count
@@ -342,6 +350,26 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-canvas-count
           path: ./vscode-memory-leak-finder-results-linux-canvas-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-canvas-rendering-context-2d-count
+          path: ./vscode-memory-leak-finder-results-linux-canvas-rendering-context-2d-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-gpu-canvas-context-count
+          path: ./vscode-memory-leak-finder-results-linux-gpu-canvas-context-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-image-bitmap-count
+          path: ./vscode-memory-leak-finder-results-linux-image-bitmap-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-webgl2-rendering-context-count
+          path: ./vscode-memory-leak-finder-results-linux-webgl2-rendering-context-count
       - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
