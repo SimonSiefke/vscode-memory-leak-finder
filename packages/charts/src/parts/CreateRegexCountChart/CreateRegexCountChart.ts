@@ -7,8 +7,8 @@ export const getData = (basePath: string) => GetRegexCountData.getRegexCountData
 export const createChart = () => {
   return {
     x: 'index',
-    y: 'count',
     xLabel: 'Index',
+    y: 'count',
     yLabel: 'Regex Count',
   }
 }

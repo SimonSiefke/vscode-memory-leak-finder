@@ -32,9 +32,9 @@ export const getNamedFunctionCountData3 = async (name: string, basePath: string)
       usedNames.add(uniqueName)
 
       return {
-        name: uniqueName,
         count: item.count,
         delta: item.delta,
+        name: uniqueName,
       }
     })
     data.sort((a, b) => b.count - a.count)
