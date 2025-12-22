@@ -1,6 +1,7 @@
 import * as Editor from '../Editor/Editor.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
+import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 
 const getMatchingText = async (styleElements, className) => {
   const [first, second] = className.split(' ')
@@ -214,6 +215,33 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await expect(file).toHaveAttribute('aria-label', `${name}, Untracked`)
       } catch (error) {
         throw new VError(error, `Failed to unstage file`)
+      }
+    },
+    async doMoreAction(name: string) {
+      const moreActions = page.locator('.sidebar [aria-label="Views and More Actions..."]')
+      await expect(moreActions).toBeVisible()
+      const contextMenu = ContextMenu.create({
+        page,
+        expect,
+        VError,
+      })
+      await contextMenu.open(moreActions)
+      await contextMenu.shouldHaveItem(name)
+      await contextMenu.select(name)
+      await page.waitForIdle()
+    },
+    async viewAsTree() {
+      try {
+        await this.doMoreAction('View as Tree')
+      } catch (error) {
+        throw new VError(error, `Failed to view as tree`)
+      }
+    },
+    async viewAsList() {
+      try {
+        await this.doMoreAction('View as List')
+      } catch (error) {
+        throw new VError(error, `Failed to view as list`)
       }
     },
   }
