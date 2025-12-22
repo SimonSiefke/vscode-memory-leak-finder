@@ -6,20 +6,45 @@ export const create = ({ expect, ideVersion, page, VError }) => {
   return {
     async filter(filterValue: string) {
       try {
+        await page.waitForIdle()
         const outputView = page.locator('.pane-body.output-view')
         await expect(outputView).toBeVisible()
-        // TODO set output value
-        // TODO check that highlights are visible
+        const outputActions = page.locator('[aria-label="Output actions"]')
+        await expect(outputActions).toBeVisible()
+        const input = outputActions.locator('.input[placeholder="Filter"]')
+        await expect(input).toBeVisible()
+        await input.focus()
+        await page.waitForIdle()
+        await input.type(filterValue)
+        await page.waitForIdle()
+        const findMatch = page
+          .locator('.findMatchInline', {
+            hasText: filterValue,
+          })
+          .first()
+        await expect(findMatch).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to filter output`)
       }
     },
     async clearFilter() {
       try {
+        await page.waitForIdle()
         const outputView = page.locator('.pane-body.output-view')
         await expect(outputView).toBeVisible()
-        // TODO clear filter
-        // TODO check that highlights are hidden
+        const findMatch = page.locator('.findMatchInline').first()
+        await expect(findMatch).toBeVisible()
+        const outputActions = page.locator('[aria-label="Output actions"]')
+        await expect(outputActions).toBeVisible()
+        const input = outputActions.locator('.input[placeholder="Filter"]')
+        await expect(input).toBeVisible()
+        await input.focus()
+        await page.waitForIdle()
+        await input.clear()
+        await page.waitForIdle()
+        await expect(findMatch).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed clear filter output`)
       }
