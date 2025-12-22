@@ -251,30 +251,28 @@ export const create = ({ expect, page, VError }) => {
           throw new Error('Unable to find bounding box on element')
         }
 
-        // const elementCenterX = elementBox1.x + elementBox1.width / 2
-        // const elementCenterY = elementBox1.y + elementBox1.height / 2
+        const elementCenterX = elementBox1.x + elementBox1.width / 2
+        const elementCenterY = elementBox1.y + elementBox1.height / 2
 
-        // const xOffset = 0
-        // const yOffset = y
+        const xOffset = 0
+        const yOffset = y
 
-        // await page.waitForIdle()
-        // await scrollbarSlider.hover()
-        // await page.waitForIdle()
-        // await page.mouse.move(elementCenterX, elementCenterY)
-        // await page.waitForIdle()
-        // await page.mouse.down()
-        // await page.waitForIdle()
+        await page.waitForIdle()
+        await scrollbarSlider.hover()
+        await page.waitForIdle()
+        await page.mouse.move(elementCenterX, elementCenterY)
+        await page.waitForIdle()
+        await page.mouse.down()
+        await page.waitForIdle()
 
-        // await expect(scrollbarSlider).toHaveClass('slider active')
-        // await page.waitForIdle()
-        // await page.mouse.move(elementCenterX + xOffset, elementCenterY + yOffset)
-        // await page.waitForIdle()
-        // await page.mouse.up()
-        // await page.waitForIdle()
-        // await expect(scrollbarSlider).toHaveCss('top', `${expectedScrollBarTop}px`)
+        await expect(scrollbarSlider).toHaveClass('slider active')
+        await page.waitForIdle()
+        await page.mouse.move(elementCenterX + xOffset, elementCenterY + yOffset)
+        await page.waitForIdle()
+        await page.mouse.up()
+        await page.waitForIdle()
+        await expect(scrollbarSlider).toHaveCss('top', `${expectedScrollBarTop}px`)
         const scrollContainer = page.locator('.settings-editor-tree .monaco-scrollable-element')
-        // await expect(scrollContainer).toBeVisible()
-        await scrollContainer.scrollDown()
         console.log('scrolled')
         await page.waitForIdle()
         await new Promise((r) => {})
