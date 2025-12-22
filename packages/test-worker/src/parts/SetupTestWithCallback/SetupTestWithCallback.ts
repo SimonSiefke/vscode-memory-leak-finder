@@ -1,10 +1,9 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as ImportTest from '../ImportTest/ImportTest.ts'
 import * as TestStage from '../TestStage/TestStage.ts'
-import * as TestWorkerState from '../TestWorkerState/TestWorkerState.ts'
 
 // @ts-ignore
-export const setupTestWithCallback = async (pageObject: any, file: string, forceRun: boolean) => {
+export const setupTestWithCallback = async (pageObject: any, file: string, forceRun: boolean, inspectExtensions: boolean) => {
   Assert.object(pageObject)
   Assert.string(file)
   Assert.boolean(forceRun)
@@ -14,7 +13,6 @@ export const setupTestWithCallback = async (pageObject: any, file: string, force
   if (module.requiresNetwork && isCi) {
     return { error: null, skipped: true, wasOriginallySkipped }
   }
-  const inspectExtensions = TestWorkerState.getInspectExtensions()
   if (inspectExtensions && Array.isArray(module.flags) && module.flags.includes('skipIfInspectExtensions')) {
     return { skipped: true, wasOriginallySkipped, error: null }
   }
