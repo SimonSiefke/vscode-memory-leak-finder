@@ -10,8 +10,8 @@ export const getCssStyleSheetCount = async (session: Session, objectGroup: strin
 }
 
 ;(getStyleSheetCount())`,
-    returnByValue: true,
     objectGroup,
+    returnByValue: true,
   })
   return count
 }

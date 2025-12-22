@@ -18,10 +18,10 @@ export const getNamedFunctionCountData = async (basePath: string) => {
   for (const item of data.namedFunctionCount2) {
     const index = data.namedFunctionCount2.indexOf(item)
     allData.push({
-      name: item.name + index,
-      delta: item.delta,
       count: item.count,
+      delta: item.delta,
       index: index,
+      name: item.name + index,
     })
   }
   allData.sort((a, b) => b.delta - a.delta)

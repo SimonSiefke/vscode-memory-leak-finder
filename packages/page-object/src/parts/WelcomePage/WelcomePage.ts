@@ -2,8 +2,29 @@ import * as Editor from '../Editor/Editor.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError, ideVersion }) => {
+export const create = ({ expect, ideVersion, page, VError }) => {
   return {
+    async expandStep(name) {
+      try {
+        const step = page.locator(`.getting-started-step[data-step-id="${name}"]`)
+        await expect(step).toHaveAttribute('aria-expanded', 'false')
+        await step.click()
+        await expect(step).toHaveAttribute('aria-expanded', 'true')
+      } catch (error) {
+        throw new VError(error, `Failed to expand step ${name}`)
+      }
+    },
+    async hide() {
+      try {
+        const gettingStartedContainer = page.locator('.gettingStartedContainer')
+        await expect(gettingStartedContainer).toBeVisible()
+        const editor = Editor.create({ expect, ideVersion, page, VError })
+        await editor.closeAll()
+        await expect(gettingStartedContainer).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to hide welcome page`)
+      }
+    },
     async show() {
       try {
         const gettingStartedContainer = page.locator('.gettingStartedContainer')
@@ -27,27 +48,6 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         await expect(heading).toHaveText(/Get Started with VS Code/i)
       } catch (error) {
         throw new VError(error, `Failed to fundamentals page`)
-      }
-    },
-    async expandStep(name) {
-      try {
-        const step = page.locator(`.getting-started-step[data-step-id="${name}"]`)
-        await expect(step).toHaveAttribute('aria-expanded', 'false')
-        await step.click()
-        await expect(step).toHaveAttribute('aria-expanded', 'true')
-      } catch (error) {
-        throw new VError(error, `Failed to expand step ${name}`)
-      }
-    },
-    async hide() {
-      try {
-        const gettingStartedContainer = page.locator('.gettingStartedContainer')
-        await expect(gettingStartedContainer).toBeVisible()
-        const editor = Editor.create({ expect, page, VError, ideVersion })
-        await editor.closeAll()
-        await expect(gettingStartedContainer).toBeHidden()
-      } catch (error) {
-        throw new VError(error, `Failed to hide welcome page`)
       }
     },
   }

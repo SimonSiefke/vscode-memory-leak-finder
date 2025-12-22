@@ -21,14 +21,14 @@ export const stop = (session) => {
 
 export const compare = (before, after) => {
   return {
-    before,
     after,
+    before,
   }
 }
 
 export const isLeak = IsLeakDomCounters.isLeakDomCounters
 
-export const summary = ({ before, after }) => {
+export const summary = ({ after, before }) => {
   const documentsBefore = before.documents
   const nodesBefore = before.nodes
   const eventListenersBefore = before.jsEventListeners
@@ -36,11 +36,11 @@ export const summary = ({ before, after }) => {
   const nodesAfter = after.nodes
   const eventListenersAfter = after.jsEventListeners
   return {
-    documentsBefore,
     documentsAfter,
-    nodesBefore,
-    nodesAfter,
-    eventListenersBefore,
+    documentsBefore,
     eventListenersAfter,
+    eventListenersBefore,
+    nodesAfter,
+    nodesBefore,
   }
 }

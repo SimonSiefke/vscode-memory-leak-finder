@@ -4,8 +4,8 @@ import * as GetSourceMapUrlMap from '../src/parts/GetSourceMapUrlMap/GetSourceMa
 test('getSourceMapUrlMap', () => {
   const eventListeners = [
     {
-      stack: ['index.js:1:1'],
       sourceMaps: ['index.js.map'],
+      stack: ['index.js:1:1'],
     },
   ]
   expect(GetSourceMapUrlMap.getSourceMapUrlMap(eventListeners)).toEqual({
@@ -16,12 +16,12 @@ test('getSourceMapUrlMap', () => {
 test('getSourceMapUrlMap - deduplicate inputs', () => {
   const eventListeners = [
     {
-      stack: ['index.js:1:1'],
       sourceMaps: ['index.js.map'],
+      stack: ['index.js:1:1'],
     },
     {
-      stack: ['index.js:1:1'],
       sourceMaps: ['index.js.map'],
+      stack: ['index.js:1:1'],
     },
   ]
   expect(GetSourceMapUrlMap.getSourceMapUrlMap(eventListeners)).toEqual({
@@ -32,12 +32,12 @@ test('getSourceMapUrlMap - deduplicate inputs', () => {
 test('getSourceMapUrlMap - sort inputs', () => {
   const eventListeners = [
     {
-      stack: ['index.js:1:1'],
       sourceMaps: ['index.js.map'],
+      stack: ['index.js:1:1'],
     },
     {
-      stack: ['index.js:12:1'],
       sourceMaps: ['index.js.map'],
+      stack: ['index.js:12:1'],
     },
   ]
   expect(GetSourceMapUrlMap.getSourceMapUrlMap(eventListeners)).toEqual({

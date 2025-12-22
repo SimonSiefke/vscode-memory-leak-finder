@@ -7,8 +7,8 @@ export const getData = (basePath: string) => GetStringCountData.getStringCountDa
 export const createChart = () => {
   return {
     x: 'index',
-    y: 'count',
     xLabel: 'Index',
+    y: 'count',
     yLabel: 'String Count',
   }
 }

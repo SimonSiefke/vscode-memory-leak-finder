@@ -1,77 +1,16 @@
-import { join } from 'path'
-import * as KeyBindings from '../KeyBindings/KeyBindings.ts'
-import * as Server from '../Server/Server.ts'
-import { URL } from 'url'
-import { root } from '../Root/Root.ts'
-import { rm } from 'fs/promises'
 import assert from 'assert'
+import { rm } from 'fs/promises'
+import { join } from 'path'
+import { URL } from 'url'
+import * as KeyBindings from '../KeyBindings/KeyBindings.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
+import { root } from '../Root/Root.ts'
+import * as Server from '../Server/Server.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError, ideVersion }) => {
+export const create = ({ expect, ideVersion, page, VError }) => {
   const servers: Record<number, Server.ServerInfo> = Object.create(null)
   return {
-    async createMCPServer(): Promise<Server.ServerInfo> {
-      const path = '/mcp'
-      const server = Server.create({ VError })
-      const requests: any[] = []
-      const requestHandler = (req, res) => {
-        requests.push({
-          url: req.url,
-        })
-        const parsedUrl = new URL(req.url || '', 'http://localhost')
-
-        if (parsedUrl.pathname === path) {
-          res.writeHead(200, {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type',
-          })
-
-          if (req.method === 'OPTIONS') {
-            res.end()
-            return
-          }
-
-          const response = {
-            jsonrpc: '2.0',
-            id: 1,
-            result: {
-              protocolVersion: '2024-11-05',
-              capabilities: {
-                tools: {
-                  listChanged: true,
-                },
-                resources: {
-                  subscribe: true,
-                  listChanged: true,
-                },
-                prompts: {
-                  listChanged: true,
-                },
-              },
-              serverInfo: {
-                name: 'mock-mcp-server',
-                version: '1.0.0',
-              },
-            },
-          }
-
-          res.end(JSON.stringify(response))
-        } else {
-          res.writeHead(404, { 'Content-Type': 'application/json' })
-          res.end(JSON.stringify({ error: 'Not found' }))
-        }
-      }
-      const instance = await server.start({
-        port: 0,
-        requestHandler,
-      })
-      // @ts-ignore
-      instance.requests = requests
-      return instance
-    },
     async addServer({ serverName }: { serverName: string }) {
       try {
         const server = await this.createMCPServer()
@@ -80,10 +19,10 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         const serverUrl = server.url
         // Step 1: Open QuickPick and search for MCP commands
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ page, expect, VError })
+        const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.McpAddServer, {
-          stayVisible: true,
           pressKeyOnce: true,
+          stayVisible: true,
         })
 
         const serverTypeCommands = await this.getVisibleCommands()
@@ -139,6 +78,78 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         throw new VError(error, `Failed to add MCP server`)
       }
     },
+    async createMCPServer(): Promise<Server.ServerInfo> {
+      const path = '/mcp'
+      const server = Server.create({ VError })
+      const requests: any[] = []
+      const requestHandler = (req, res) => {
+        requests.push({
+          url: req.url,
+        })
+        const parsedUrl = new URL(req.url || '', 'http://localhost')
+
+        if (parsedUrl.pathname === path) {
+          res.writeHead(200, {
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json',
+          })
+
+          if (req.method === 'OPTIONS') {
+            res.end()
+            return
+          }
+
+          const response = {
+            id: 1,
+            jsonrpc: '2.0',
+            result: {
+              capabilities: {
+                prompts: {
+                  listChanged: true,
+                },
+                resources: {
+                  listChanged: true,
+                  subscribe: true,
+                },
+                tools: {
+                  listChanged: true,
+                },
+              },
+              protocolVersion: '2024-11-05',
+              serverInfo: {
+                name: 'mock-mcp-server',
+                version: '1.0.0',
+              },
+            },
+          }
+
+          res.end(JSON.stringify(response))
+        } else {
+          res.writeHead(404, { 'Content-Type': 'application/json' })
+          res.end(JSON.stringify({ error: 'Not found' }))
+        }
+      }
+      const instance = await server.start({
+        port: 0,
+        requestHandler,
+      })
+      // @ts-ignore
+      instance.requests = requests
+      return instance
+    },
+
+    async getInputValue() {
+      try {
+        const quickPick = page.locator('.quick-input-widget')
+        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
+        await expect(quickPickInput).toBeVisible()
+        return (await quickPickInput.getAttribute('value')) || ''
+      } catch (error) {
+        throw new VError(error, `Failed to get input value`)
+      }
+    },
 
     async getVisibleCommands() {
       try {
@@ -156,33 +167,6 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         return commands
       } catch (error) {
         throw new VError(error, `Failed to get visible commands`)
-      }
-    },
-
-    async selectCommand(text, stayVisible = false) {
-      try {
-        const quickPick = page.locator('.quick-input-widget')
-        await expect(quickPick).toBeVisible()
-        const option = quickPick.locator('.label-name', {
-          hasExactText: text,
-        })
-        await option.click()
-        if (!stayVisible) {
-          await expect(quickPick).toBeHidden()
-        }
-      } catch (error) {
-        throw new VError(error, `Failed to select command "${text}"`)
-      }
-    },
-
-    async getInputValue() {
-      try {
-        const quickPick = page.locator('.quick-input-widget')
-        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
-        await expect(quickPickInput).toBeVisible()
-        return (await quickPickInput.getAttribute('value')) || ''
-      } catch (error) {
-        throw new VError(error, `Failed to get input value`)
       }
     },
 
@@ -254,6 +238,20 @@ export const create = ({ expect, page, VError, ideVersion }) => {
       }
     },
 
+    async removeAllServers() {
+      try {
+        for (const [key, value] of Object.entries(servers)) {
+          await value.dispose()
+          delete servers[key]
+        }
+        const storagePath = join(root, '.vscode-user-data-dir', 'User')
+        const mcpPath = join(storagePath, 'mcp.json')
+        await rm(mcpPath, { force: true, recursive: true })
+      } catch (error) {
+        throw new VError(error, `Failed to remove all MCP servers`)
+      }
+    },
+
     async removeServer(serverName: string) {
       try {
         // Open QuickPick and search for MCP list commands
@@ -312,17 +310,19 @@ export const create = ({ expect, page, VError, ideVersion }) => {
       }
     },
 
-    async removeAllServers() {
+    async selectCommand(text, stayVisible = false) {
       try {
-        for (const [key, value] of Object.entries(servers)) {
-          await value.dispose()
-          delete servers[key]
+        const quickPick = page.locator('.quick-input-widget')
+        await expect(quickPick).toBeVisible()
+        const option = quickPick.locator('.label-name', {
+          hasExactText: text,
+        })
+        await option.click()
+        if (!stayVisible) {
+          await expect(quickPick).toBeHidden()
         }
-        const storagePath = join(root, '.vscode-user-data-dir', 'User')
-        const mcpPath = join(storagePath, 'mcp.json')
-        await rm(mcpPath, { recursive: true, force: true })
       } catch (error) {
-        throw new VError(error, `Failed to remove all MCP servers`)
+        throw new VError(error, `Failed to select command "${text}"`)
       }
     },
   }

@@ -22,8 +22,8 @@ const prettifyPromise = (promise) => {
   const state = getPropertyPromiseState(properties)
   const result = getPropertyPromiseResult(properties)
   return {
-    state,
     result,
+    state,
   }
 }
 
@@ -33,7 +33,7 @@ export const comparePromises = (before, after) => {
   const prettyBefore = before.map(prettifyPromise)
   const prettyAfter = after.map(prettifyPromise)
   return {
-    before: prettyBefore,
     after: prettyAfter,
+    before: prettyBefore,
   }
 }

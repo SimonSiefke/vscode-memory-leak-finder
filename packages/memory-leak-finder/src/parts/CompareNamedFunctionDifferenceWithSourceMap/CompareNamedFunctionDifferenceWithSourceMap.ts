@@ -3,13 +3,13 @@ import * as CompareFunctionDifference from '../CompareFunctionDifference/Compare
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.ts'
 
 const prepareBaseDifferenceItem = (baseDifferenceItem) => {
-  const { url, sourceMapUrl, count, beforeCount, name } = baseDifferenceItem
+  const { beforeCount, count, name, sourceMapUrl, url } = baseDifferenceItem
   return {
-    stack: [url],
-    sourceMaps: [sourceMapUrl],
-    count,
     beforeCount,
+    count,
     name,
+    sourceMaps: [sourceMapUrl],
+    stack: [url],
   }
 }
 
@@ -22,11 +22,11 @@ const prepareBaseDifference = (baseDifference) => {
 }
 
 const finishBaseDifferenceItem = (baseDifferenceItem) => {
-  const { stack, count, originalStack, originalName, name, beforeCount } = baseDifferenceItem
+  const { beforeCount, count, name, originalName, originalStack, stack } = baseDifferenceItem
   return {
-    name: originalName || name,
-    count,
     beforeCount,
+    count,
+    name: originalName || name,
     url: originalStack?.[0] || stack?.[0] || '',
   }
 }

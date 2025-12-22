@@ -34,6 +34,6 @@ export const compare = () => {
   return {}
 }
 
-export const isLeak = ({ before, after }) => {
+export const isLeak = ({ after, before }) => {
   return true
 }

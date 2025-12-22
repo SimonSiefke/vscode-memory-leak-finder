@@ -1,4 +1,4 @@
-export const create = ({ page, VError, expect }) => {
+export const create = ({ expect, page, VError }) => {
   return {
     async click(label) {
       try {
@@ -42,6 +42,16 @@ export const create = ({ page, VError, expect }) => {
         throw new VError(error, `Failed to hide status bar item "${id}"`)
       }
     },
+    async selectItem(id) {
+      try {
+        const selector = this.getSelector(id)
+        const item = page.locator(selector).first()
+        await expect(item).toBeVisible()
+        await item.click()
+      } catch (error) {
+        throw new VError(error, `Failed to select status bar item`)
+      }
+    },
     async showItem(id) {
       try {
         await page.waitForIdle()
@@ -67,16 +77,6 @@ export const create = ({ page, VError, expect }) => {
         await expect(item).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to show status bar item`)
-      }
-    },
-    async selectItem(id) {
-      try {
-        const selector = this.getSelector(id)
-        const item = page.locator(selector).first()
-        await expect(item).toBeVisible()
-        await item.click()
-      } catch (error) {
-        throw new VError(error, `Failed to select status bar item`)
       }
     },
   }

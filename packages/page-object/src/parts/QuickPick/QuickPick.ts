@@ -3,6 +3,135 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, page, VError }) => {
   return {
+    async close() {
+      try {
+        await this.hide()
+      } catch (error) {
+        throw new VError(error, `Failed to close quick pick`)
+      }
+    },
+    async executeCommand(command, { pressKeyOnce = false, stayVisible = false } = {}) {
+      try {
+        await page.waitForIdle()
+        await this.showCommands({ pressKeyOnce })
+        await this.type(command)
+        await this.select(command, stayVisible)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to execute command "${command}"`)
+      }
+    },
+    async focusNext() {
+      try {
+        // TODO verify that aria active descendant has changed
+        await page.keyboard.press(KeyBindings.ArrowDown)
+      } catch (error) {
+        throw new VError(error, `Failed to focus next quick pick item`)
+      }
+    },
+    async focusPrevious() {
+      try {
+        // TODO verify that aria active descendant has changed
+        await page.keyboard.press(KeyBindings.ArrowUp)
+      } catch (error) {
+        throw new VError(error, `Failed to focus previous quick pick item`)
+      }
+    },
+    async getInputValue() {
+      try {
+        const quickPick = page.locator('.quick-input-widget')
+        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
+        await expect(quickPickInput).toBeVisible()
+        return (await quickPickInput.getAttribute('value')) || ''
+      } catch (error) {
+        throw new VError(error, `Failed to get input value`)
+      }
+    },
+    async getVisibleCommands() {
+      try {
+        const quickPick = page.locator('.quick-input-widget')
+        await expect(quickPick).toBeVisible()
+        const commandElements = quickPick.locator('.monaco-list-row .label-name')
+        const count = await commandElements.count()
+        const commands = []
+        for (let i = 0; i < count; i++) {
+          const text = await commandElements.nth(i).textContent()
+          if (text) {
+            // @ts-ignore
+            commands.push(text)
+          }
+        }
+        return commands
+      } catch (error) {
+        throw new VError(error, `Failed to get visible commands`)
+      }
+    },
+    async hide() {
+      try {
+        const quickPick = page.locator('.quick-input-widget')
+        await expect(quickPick).toBeVisible()
+        await page.keyboard.press(KeyBindings.Escape)
+        await expect(quickPick).toBeHidden()
+        await page.waitForIdle()
+        await (() => {
+          const { promise, resolve } = Promise.withResolvers<void>()
+          setTimeout(resolve, 2000)
+          return promise
+        })()
+      } catch (error) {
+        throw new VError(error, `Failed to hide quick pick`)
+      }
+    },
+    async openFile(fileName) {
+      try {
+        await page.waitForIdle()
+        await this.show({ key: KeyBindings.OpenQuickPickFiles })
+        const quickPick = page.locator('.quick-input-widget')
+        await expect(quickPick).toBeVisible()
+        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
+        await expect(quickPickInput).toBeVisible()
+        await expect(quickPickInput).toBeFocused({ timeout: 3000 })
+        const option = quickPick.locator('.label-name', {
+          hasText: fileName,
+        })
+        await quickPickInput.typeAndWaitFor(fileName, option, {
+          timeout: 6000,
+        })
+        await this.select(fileName)
+      } catch (error) {
+        throw new VError(error, `Failed to open "${fileName}"`)
+      }
+    },
+    async pressEnter() {
+      try {
+        const quickPick = page.locator('.quick-input-widget')
+        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
+        await expect(quickPickInput).toBeVisible()
+        await expect(quickPickInput).toBeFocused({ timeout: 3000 })
+        await page.waitForIdle()
+        await quickPickInput.press('Enter')
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to press Enter`)
+      }
+    },
+    async select(text: string | RegExp, stayVisible = false) {
+      try {
+        await page.waitForIdle()
+        const quickPick = page.locator('.quick-input-widget')
+        await expect(quickPick).toBeVisible()
+        const option = quickPick.locator('.label-name', {
+          hasExactText: text,
+        })
+        await option.click()
+        if (!stayVisible) {
+          await expect(quickPick).toBeHidden()
+        }
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to select "${text}"`)
+      }
+    },
     async show({ key = KeyBindings.OpenQuickPickFiles, pressKeyOnce = false } = {}) {
       try {
         await page.waitForIdle()
@@ -29,6 +158,15 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to show quick pick`)
       }
     },
+    async showColorTheme() {
+      try {
+        await this.executeCommand(WellKnownCommands.SelectColorTheme, {
+          stayVisible: true,
+        })
+      } catch (error) {
+        throw new VError(error, `Failed to show quick pick color theme`)
+      }
+    },
     async showCommands({ pressKeyOnce = false } = {}) {
       try {
         return this.show({ key: KeyBindings.OpenQuickPickCommands, pressKeyOnce })
@@ -46,144 +184,6 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to type ${value}`)
-      }
-    },
-    async pressEnter() {
-      try {
-        const quickPick = page.locator('.quick-input-widget')
-        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
-        await expect(quickPickInput).toBeVisible()
-        await expect(quickPickInput).toBeFocused({ timeout: 3000 })
-        await page.waitForIdle()
-        await quickPickInput.press('Enter')
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to press Enter`)
-      }
-    },
-    async getInputValue() {
-      try {
-        const quickPick = page.locator('.quick-input-widget')
-        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
-        await expect(quickPickInput).toBeVisible()
-        return (await quickPickInput.getAttribute('value')) || ''
-      } catch (error) {
-        throw new VError(error, `Failed to get input value`)
-      }
-    },
-    async select(text: string | RegExp, stayVisible = false) {
-      try {
-        await page.waitForIdle()
-        const quickPick = page.locator('.quick-input-widget')
-        await expect(quickPick).toBeVisible()
-        const option = quickPick.locator('.label-name', {
-          hasExactText: text,
-        })
-        await option.click()
-        if (!stayVisible) {
-          await expect(quickPick).toBeHidden()
-        }
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to select "${text}"`)
-      }
-    },
-    async executeCommand(command, { stayVisible = false, pressKeyOnce = false } = {}) {
-      try {
-        await page.waitForIdle()
-        await this.showCommands({ pressKeyOnce })
-        await this.type(command)
-        await this.select(command, stayVisible)
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to execute command "${command}"`)
-      }
-    },
-    async openFile(fileName) {
-      try {
-        await page.waitForIdle()
-        await this.show({ key: KeyBindings.OpenQuickPickFiles })
-        const quickPick = page.locator('.quick-input-widget')
-        await expect(quickPick).toBeVisible()
-        const quickPickInput = quickPick.locator('[aria-autocomplete="list"]')
-        await expect(quickPickInput).toBeVisible()
-        await expect(quickPickInput).toBeFocused({ timeout: 3000 })
-        const option = quickPick.locator('.label-name', {
-          hasText: fileName,
-        })
-        await quickPickInput.typeAndWaitFor(fileName, option, {
-          timeout: 6000,
-        })
-        await this.select(fileName)
-      } catch (error) {
-        throw new VError(error, `Failed to open "${fileName}"`)
-      }
-    },
-    async showColorTheme() {
-      try {
-        await this.executeCommand(WellKnownCommands.SelectColorTheme, {
-          stayVisible: true,
-        })
-      } catch (error) {
-        throw new VError(error, `Failed to show quick pick color theme`)
-      }
-    },
-    async focusNext() {
-      try {
-        // TODO verify that aria active descendant has changed
-        await page.keyboard.press(KeyBindings.ArrowDown)
-      } catch (error) {
-        throw new VError(error, `Failed to focus next quick pick item`)
-      }
-    },
-    async focusPrevious() {
-      try {
-        // TODO verify that aria active descendant has changed
-        await page.keyboard.press(KeyBindings.ArrowUp)
-      } catch (error) {
-        throw new VError(error, `Failed to focus previous quick pick item`)
-      }
-    },
-    async hide() {
-      try {
-        const quickPick = page.locator('.quick-input-widget')
-        await expect(quickPick).toBeVisible()
-        await page.keyboard.press(KeyBindings.Escape)
-        await expect(quickPick).toBeHidden()
-        await page.waitForIdle()
-        await (() => {
-          const { resolve, promise } = Promise.withResolvers<void>()
-          setTimeout(resolve, 2000)
-          return promise
-        })()
-      } catch (error) {
-        throw new VError(error, `Failed to hide quick pick`)
-      }
-    },
-    async close() {
-      try {
-        await this.hide()
-      } catch (error) {
-        throw new VError(error, `Failed to close quick pick`)
-      }
-    },
-    async getVisibleCommands() {
-      try {
-        const quickPick = page.locator('.quick-input-widget')
-        await expect(quickPick).toBeVisible()
-        const commandElements = quickPick.locator('.monaco-list-row .label-name')
-        const count = await commandElements.count()
-        const commands = []
-        for (let i = 0; i < count; i++) {
-          const text = await commandElements.nth(i).textContent()
-          if (text) {
-            // @ts-ignore
-            commands.push(text)
-          }
-        }
-        return commands
-      } catch (error) {
-        throw new VError(error, `Failed to get visible commands`)
       }
     },
   }

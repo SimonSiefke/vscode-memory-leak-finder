@@ -20,9 +20,9 @@ function () {
   }
   return smallerArrays
 }`,
-    returnByValue: false,
     objectGroup,
     objectId,
+    returnByValue: false,
   })
   return smallerArraysDescriptor
 }

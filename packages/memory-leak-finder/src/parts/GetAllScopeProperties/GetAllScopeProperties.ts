@@ -1,6 +1,6 @@
+import type { Session } from '../Session/Session.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetAllScopePropertiesInternal from '../GetAllScopePropertiesInternal/GetAllScopePropertiesInternal.ts'
-import type { Session } from '../Session/Session.ts'
 
 const getNewRemaining = (seen, newObjectIds) => {
   const newRemaining: any[] = []

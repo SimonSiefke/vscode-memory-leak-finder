@@ -31,9 +31,9 @@ export const compareNamedClosureCount = (before, after) => {
       continue
     }
     result.push({
-      name: key,
       contextNodeCount: afterCount,
       delta,
+      name: key,
     })
   }
   const sorted = sortByCounts(result)

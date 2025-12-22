@@ -38,9 +38,9 @@ export const filterNamedFunctions = async (session: Session, objects: any, objec
   const normalFunctions = functions.filter(isNormalFunction)
   return normalFunctions
 }`,
+    objectGroup,
     objectId: objects.objects.objectId,
     returnByValue: false,
-    objectGroup,
   })
   return fnResult2
 }

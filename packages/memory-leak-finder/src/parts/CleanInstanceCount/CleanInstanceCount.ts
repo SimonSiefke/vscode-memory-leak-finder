@@ -21,11 +21,11 @@ export const cleanInstanceCount = (instance, constructorLocation, scriptMap) => 
   Assert.object(instance)
   Assert.object(constructorLocation)
   Assert.object(scriptMap)
-  const { url, sourceMapUrl } = GetSourceMapUrlFromScriptMap.getSourceMapUrlFromScriptMap(constructorLocation.scriptId, scriptMap)
+  const { sourceMapUrl, url } = GetSourceMapUrlFromScriptMap.getSourceMapUrlFromScriptMap(constructorLocation.scriptId, scriptMap)
   return {
     ...instance,
     ...constructorLocation,
-    stack: getStack(url, constructorLocation.lineNumber, constructorLocation.columnNumber),
     sourceMaps: getSourceMaps(sourceMapUrl),
+    stack: getStack(url, constructorLocation.lineNumber, constructorLocation.columnNumber),
   }
 }

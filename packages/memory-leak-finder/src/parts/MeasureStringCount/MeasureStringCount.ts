@@ -32,8 +32,8 @@ const compareHeapSnapshotStringCount = async (before, after) => {
     HeapSnapshotFunctions.getStringCount(rpc, after),
   ])
   return {
-    before: beforeCount,
     after: afterCount,
+    before: beforeCount,
   }
 }
 

@@ -1,12 +1,74 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, page, VError, ideVersion }) => {
+export const create = ({ expect, ideVersion, page, VError }) => {
   return {
+    async addContext(initialPrompt, secondPrompt, confirmText) {
+      try {
+        const addContextButton = page.locator('[role="button"][aria-label^="Add Context"]')
+        await addContextButton.click()
+        await page.waitForIdle()
+
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.select(initialPrompt, true)
+        await quickPick.select(secondPrompt)
+        await page.waitForIdle()
+
+        const contextLabel = page.locator(`[aria-label="Attached context, ${confirmText}"]`)
+        await expect(contextLabel).toBeVisible()
+        // TODO navigate to first quickpick
+        // TODO navigate to second quickpick
+        // TODO verify that context has been applied
+      } catch (error) {
+        throw new VError(error, `Failed to set chat context`)
+      }
+    },
+    async clearAll() {
+      try {
+        const quickPick = QuickPick.create({ expect, page, VError })
+        if (ideVersion && ideVersion.minor <= 100) {
+          await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
+        } else {
+          await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
+        }
+        await page.waitForIdle()
+        const requestOne = page.locator('.monaco-list-row.request').first()
+        await expect(requestOne).toBeHidden({ timeout: 10_000 })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to clear chat context`)
+      }
+    },
+    async clearContext(contextName) {
+      try {
+        const contextLabel = page.locator(`[aria-label="Attached context, ${contextName}"]`)
+        await expect(contextLabel).toBeVisible()
+        const removeButton = contextLabel.locator('[role="button"][aria-label^="Remove from context"]')
+        await expect(removeButton).toBeVisible()
+        await removeButton.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to clear chat context`)
+      }
+    },
+    async closeFinishSetup() {
+      try {
+        const hover = page.locator('.context-view .monaco-hover[role="tooltip"]')
+        await expect(hover).toBeVisible()
+        const statusBarItem = page.locator('#chat\\.statusBarEntry')
+        await expect(statusBarItem).toBeVisible()
+        await page.waitForIdle()
+        await page.keyboard.press('Escape')
+        await page.waitForIdle()
+        await expect(hover).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to close finish setup`)
+      }
+    },
     isFirst: false,
     async open() {
       try {
-        const quickPick = QuickPick.create({ page, expect, VError })
+        const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.NewChartEditor)
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
@@ -22,6 +84,19 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open chat editor`)
+      }
+    },
+    async openFinishSetup() {
+      try {
+        const statusBarItem = page.locator('#chat\\.statusBarEntry .statusbar-item-label')
+        await expect(statusBarItem).toBeVisible()
+        await statusBarItem.click()
+        await page.waitForIdle()
+        const hover = page.locator('.context-view .monaco-hover[role="tooltip"]')
+        await expect(hover).toBeVisible()
+        await expect(hover).toBeFocused()
+      } catch (error) {
+        throw new VError(error, `Failed to open finish setup`)
       }
     },
     async sendMessage({ message, expectedResponse, verify = false }) {
@@ -115,81 +190,6 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         await expect(modeLabelElement).toHaveText(modeLabel)
       } catch (error) {
         throw new VError(error, `Failed to set chat mode to ${modeLabel}`)
-      }
-    },
-    async openFinishSetup() {
-      try {
-        const statusBarItem = page.locator('#chat\\.statusBarEntry .statusbar-item-label')
-        await expect(statusBarItem).toBeVisible()
-        await statusBarItem.click()
-        await page.waitForIdle()
-        const hover = page.locator('.context-view .monaco-hover[role="tooltip"]')
-        await expect(hover).toBeVisible()
-        await expect(hover).toBeFocused()
-      } catch (error) {
-        throw new VError(error, `Failed to open finish setup`)
-      }
-    },
-    async closeFinishSetup() {
-      try {
-        const hover = page.locator('.context-view .monaco-hover[role="tooltip"]')
-        await expect(hover).toBeVisible()
-        const statusBarItem = page.locator('#chat\\.statusBarEntry')
-        await expect(statusBarItem).toBeVisible()
-        await page.waitForIdle()
-        await page.keyboard.press('Escape')
-        await page.waitForIdle()
-        await expect(hover).toBeHidden()
-      } catch (error) {
-        throw new VError(error, `Failed to close finish setup`)
-      }
-    },
-    async addContext(initialPrompt, secondPrompt, confirmText) {
-      try {
-        const addContextButton = page.locator('[role="button"][aria-label^="Add Context"]')
-        await addContextButton.click()
-        await page.waitForIdle()
-
-        const quickPick = QuickPick.create({ page, expect, VError })
-        await quickPick.select(initialPrompt, true)
-        await quickPick.select(secondPrompt)
-        await page.waitForIdle()
-
-        const contextLabel = page.locator(`[aria-label="Attached context, ${confirmText}"]`)
-        await expect(contextLabel).toBeVisible()
-        // TODO navigate to first quickpick
-        // TODO navigate to second quickpick
-        // TODO verify that context has been applied
-      } catch (error) {
-        throw new VError(error, `Failed to set chat context`)
-      }
-    },
-    async clearContext(contextName) {
-      try {
-        const contextLabel = page.locator(`[aria-label="Attached context, ${contextName}"]`)
-        await expect(contextLabel).toBeVisible()
-        const removeButton = contextLabel.locator('[role="button"][aria-label^="Remove from context"]')
-        await expect(removeButton).toBeVisible()
-        await removeButton.click()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to clear chat context`)
-      }
-    },
-    async clearAll() {
-      try {
-        const quickPick = QuickPick.create({ page, expect, VError })
-        if (ideVersion && ideVersion.minor <= 100) {
-          await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
-        } else {
-          await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
-        }
-        await page.waitForIdle()
-        const requestOne = page.locator('.monaco-list-row.request').first()
-        await expect(requestOne).toBeHidden({ timeout: 10_000 })
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to clear chat context`)
       }
     },
   }

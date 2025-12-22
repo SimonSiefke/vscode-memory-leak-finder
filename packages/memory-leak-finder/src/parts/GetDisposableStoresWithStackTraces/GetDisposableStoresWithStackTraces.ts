@@ -25,9 +25,9 @@ export const getDisposableStoresWithStackTraces = async (session, objectGroup) =
   const allStackTraces = disposableStores.map(getStackTraces).filter(hasLength)
   return allStackTraces
 }`,
+    objectGroup,
     objectId: fnResult1.objectId,
     returnByValue: true,
-    objectGroup,
   })
   return fnResult2
 }
