@@ -3,24 +3,6 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, page, VError }) => {
   return {
-    async toggle() {
-      try {
-        const quickPick = QuickPick.create({ expect, page, VError })
-        await quickPick.executeCommand(WellKnownCommands.TogglePanelVisibilty)
-      } catch (error) {
-        throw new VError(error, `Failed to toggle panel`)
-      }
-    },
-    async show() {
-      try {
-        const panel = page.locator('.part.panel')
-        await expect(panel).toBeHidden()
-        await this.toggle()
-        await expect(panel).toBeVisible()
-      } catch (error) {
-        throw new VError(error, `Failed to show panel`)
-      }
-    },
     async hide() {
       try {
         const panel = page.locator('.part.panel')
@@ -36,6 +18,24 @@ export const create = ({ expect, page, VError }) => {
         await expect(group).toBeFocused()
       } catch (error) {
         throw new VError(error, `Failed to hide panel`)
+      }
+    },
+    async show() {
+      try {
+        const panel = page.locator('.part.panel')
+        await expect(panel).toBeHidden()
+        await this.toggle()
+        await expect(panel).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to show panel`)
+      }
+    },
+    async toggle() {
+      try {
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.TogglePanelVisibilty)
+      } catch (error) {
+        throw new VError(error, `Failed to toggle panel`)
       }
     },
   }

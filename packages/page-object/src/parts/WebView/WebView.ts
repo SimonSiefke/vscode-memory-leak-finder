@@ -9,6 +9,17 @@ const waitForExtraIdle = async (page) => {
 
 export const create = ({ expect, page, VError }) => {
   return {
+    async focus() {
+      try {
+        await page.waitForIdle()
+        const webView = page.locator('.webview.ready')
+        await webView.focus()
+        await expect(webView).toBeFocused()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to check that webview is focused`)
+      }
+    },
     /**
      * @deprecated use shouldBeVisible2 instead
      */
@@ -34,8 +45,8 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         const regex = new RegExp(`extensionId=${extensionId}`)
         const childPage = await page.waitForIframe({
-          url: regex,
           injectUtilityScript: false,
+          url: regex,
         })
         // TODO double iframe...
         const subFrame = await childPage.waitForSubIframe({
@@ -50,17 +61,6 @@ export const create = ({ expect, page, VError }) => {
         return subFrame
       } catch (error) {
         throw new VError(error, `Failed to check that webview is visible`)
-      }
-    },
-    async focus() {
-      try {
-        await page.waitForIdle()
-        const webView = page.locator('.webview.ready')
-        await webView.focus()
-        await expect(webView).toBeFocused()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to check that webview is focused`)
       }
     },
   }
