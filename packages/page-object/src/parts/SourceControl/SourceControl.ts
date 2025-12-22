@@ -241,6 +241,11 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async viewAsTree() {
       try {
         await this.doMoreAction('View as Tree')
+        const src = page.locator('.monaco-icon-label-container', {
+          hasText: 'src',
+        })
+        await expect(src).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to view as tree`)
       }
@@ -248,6 +253,11 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async viewAsList() {
       try {
         await this.doMoreAction('View as List')
+        const src = page.locator('.monaco-icon-label-container', {
+          hasText: 'src',
+        })
+        await expect(src).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to view as list`)
       }
