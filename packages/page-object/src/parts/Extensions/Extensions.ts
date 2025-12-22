@@ -116,8 +116,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to hide extensions view`)
       }
     },
-<<<<<<< HEAD
-=======
     async install({ id, name }: { id: string; name: string }) {
       try {
         const editor = Editor.create({ expect, ideVersion, page, VError })
@@ -136,7 +134,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to install ${id}`)
       }
     },
->>>>>>> origin/main
     async openSuggest() {
       try {
         await page.waitForIdle()
