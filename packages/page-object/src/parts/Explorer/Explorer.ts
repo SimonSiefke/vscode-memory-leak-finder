@@ -352,5 +352,17 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to verify that explorer has dirent "${direntName}"`)
       }
     },
+    async removeCurrent() {
+      try {
+        await page.waitForIdle()
+        await page.keyboard.press('Home')
+        await page.waitForIdle()
+        await page.keyboard.press('Delete')
+        await this.refresh()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to delete`)
+      }
+    },
   }
 }
