@@ -1,9 +1,9 @@
-import { join, resolve } from 'node:path'
 import type { RawSourceMap } from 'source-map'
+import { join, resolve } from 'node:path'
 import { SourceMapConsumer } from 'source-map'
+import type { OriginalPosition } from '../OriginalPosition/OriginalPosition.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as OriginalNameWorker from '../OriginalNameWorker/OriginalNameWorker.ts'
-import type { OriginalPosition } from '../OriginalPosition/OriginalPosition.ts'
 import { root } from '../Root/Root.ts'
 
 export const getOriginalPositions = async (

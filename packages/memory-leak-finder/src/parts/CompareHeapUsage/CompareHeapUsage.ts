@@ -7,10 +7,10 @@ export const compareHeapUsage = async (before: HeapUsage, after: HeapUsage) => {
   const usedAfter = await FormatMemory.formatMemory(after.usedSize)
   const totalAfter = await FormatMemory.formatMemory(after.totalSize)
   return {
+    isLeak: usedAfter > usedBefore,
     totalAfter,
     totalBefore,
     usedAfter,
     usedBefore,
-    isLeak: usedAfter > usedBefore,
   }
 }

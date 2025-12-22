@@ -123,7 +123,7 @@ export const comparePromisesWithStackTrace = async (before, after, context = {})
   const cleanLeaked = clean(sorted)
   let filtered = cleanLeaked
   if (context && typeof context === 'object' && 'runs' in context && typeof context.runs === 'number') {
-    const runs = context.runs
+    const { runs } = context
     filtered = cleanLeaked.filter((item) => item.delta >= runs)
   }
   if (scriptMap) {
