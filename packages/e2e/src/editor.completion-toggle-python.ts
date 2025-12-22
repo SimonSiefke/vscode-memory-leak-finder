@@ -18,10 +18,11 @@ export const setup = async ({ Editor, Workspace, Extensions }: TestContext): Pro
     name: 'Python',
   })
   await Editor.open('index.py')
+  await Editor.shouldHaveSquigglyError()
   // @ts-ignore
   await Editor.setCursor(2, 15)
-  await Editor.shouldHaveSquigglyError()
   await Editor.shouldHaveBreadCrumb('index.py')
+  await Editor.shouldHaveBreadCrumb('add')
 }
 
 export const run = async ({ Suggest }: TestContext): Promise<void> => {
