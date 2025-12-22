@@ -2,11 +2,13 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WebView from '../WebView/WebView.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
+const indexDelta = 5
+
 export const create = ({ expect, page, VError }) => {
   return {
     async checkoutIndex(index: number): Promise<void> {
       try {
-        const adjusted = `${index + 5}`
+        const adjusted = `${index + indexDelta}`
         const pullRequests = page.locator('.monaco-list[aria-label="Pull Requests"]')
         const item5 = pullRequests.locator(`.monaco-list-row[data-index="${adjusted}"]`)
         await expect(item5).toBeVisible()
@@ -50,7 +52,7 @@ export const create = ({ expect, page, VError }) => {
         const allOpen = pullRequests.locator('[aria-label="All open pull requests in the current repository"]')
         await expect(allOpen).toBeVisible()
         const index = 0
-        const adjusted = `${index + 5}`
+        const adjusted = `${index + indexDelta}`
         const item5 = pullRequests.locator(`.monaco-list-row[data-index="${adjusted}"]`)
         await expect(item5).toBeVisible()
         await page.waitForIdle()
