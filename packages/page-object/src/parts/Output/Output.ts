@@ -71,6 +71,8 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
         await select.focus()
         await page.waitForIdle()
+        await expect(select).toBeFocused()
+        await page.waitForIdle()
         await select.click()
         await page.waitForIdle()
         const monacoList = page.locator('.select-box-dropdown-list-container .monaco-list')
@@ -102,13 +104,19 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await quickPick.executeCommand(WellKnownCommands.OutputFocusOnOutputView)
         await page.waitForIdle()
         await expect(outputView).toBeVisible()
+        await page.waitForIdle()
         const paneBody = page.locator('.pane-body.output-view')
         await expect(paneBody).toBeVisible()
+        await page.waitForIdle()
         if (ideVersion && ideVersion.minor <= 100) {
           const inputArea = paneBody.locator('.inputarea')
+          await expect(inputArea).toBeVisible()
+          await page.waitForIdle()
           await expect(inputArea).toBeFocused()
         } else {
           const inputArea = paneBody.locator('.native-edit-context')
+          await expect(inputArea).toBeVisible()
+          await page.waitForIdle()
           await expect(inputArea).toBeFocused()
         }
         await page.waitForIdle()
