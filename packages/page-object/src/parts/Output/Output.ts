@@ -15,7 +15,9 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await expect(input).toBeVisible()
         await input.focus()
         await page.waitForIdle()
-        await input.type(filterValue)
+        await input.clear()
+        await page.waitForIdle()
+        await input.setValue(filterValue)
         await page.waitForIdle()
         const findMatch = page
           .locator('.findMatchInline', {
