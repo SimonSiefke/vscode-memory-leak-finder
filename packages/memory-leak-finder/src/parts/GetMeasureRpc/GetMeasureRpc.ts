@@ -41,10 +41,10 @@ export const getMeasureRpc = async (
   }
 
   await DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
-      autoAttach: true,
-      flatten: true,
-      waitForDebuggerOnStart: false,
-    })
+    autoAttach: true,
+    flatten: true,
+    waitForDebuggerOnStart: false,
+  })
 
   return sessionRpc
 }

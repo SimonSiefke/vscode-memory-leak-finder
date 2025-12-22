@@ -38,10 +38,8 @@ export const stop = async (session: Session, objectGroup1: string, objectGroup2:
   }
 }
 
-
-
 export const isLeak = (leaked) => {
   return leaked.length > 0
 }
 
-export {comparePromisesWithStackTrace as compare} from '../ComparePromisesWithStackTrace/ComparePromisesWithStackTrace.ts'
+export { comparePromisesWithStackTrace as compare } from '../ComparePromisesWithStackTrace/ComparePromisesWithStackTrace.ts'
