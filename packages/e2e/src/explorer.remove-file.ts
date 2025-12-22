@@ -29,6 +29,6 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
   // @ts-ignore
   await Explorer.removeCurrent()
   await Explorer.not.toHaveItem('file-1.txt')
-  await Workspace.add({ name: 'file-1.txt', content: '' })
+  await Workspace.add({ content: '', name: 'file-1.txt' })
   await Explorer.refresh()
 }
