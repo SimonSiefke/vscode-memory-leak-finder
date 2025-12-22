@@ -7,14 +7,14 @@ export const setup = async ({ Editor, Settings, SettingsEditor, SideBar }: TestC
   await SideBar.hide()
   await Settings.open()
   await SettingsEditor.search({
-    resultCount: 498,
+    resultCount: 498, // TODO this is very specific
     value: 'editor',
   })
 }
 
 export const run = async ({ SettingsEditor }: TestContext): Promise<void> => {
   // @ts-ignore
-  await SettingsEditor.moveScrollBar(20, 20)
+  await SettingsEditor.moveScrollBar(200, 200)
   // @ts-ignore
-  await SettingsEditor.moveScrollBar(-20, 0)
+  await SettingsEditor.moveScrollBar(-200, 0)
 }
