@@ -38,12 +38,7 @@ export const combine = (...measures) => {
     return afterMap
   }
 
-<<<<<<< HEAD:packages/memory-leak-finder/src/parts/MeasureCombined/MeasureCombined.js
-  const compare = async (before, after) => {
-    console.log({ before, after })
-=======
   const compare = async (before, after, context) => {
->>>>>>> origin/main:packages/memory-leak-finder/src/parts/MeasureCombined/MeasureCombined.ts
     const resultMap = Object.create(null)
     for (const measure of measures) {
       const comparison = await measure.compare(before[measure.id], after[measure.id], context)
@@ -65,15 +60,8 @@ export const combine = (...measures) => {
   }
 
   return {
-<<<<<<< HEAD
-<<<<<<< HEAD
     measures,
-=======
     compare,
->>>>>>> 754f9c7c3911 (feature: sort memory leak finder (#2295))
-=======
-    compare,
->>>>>>> origin/main
     id: MeasureId.Combined,
     releaseResources,
     start,
