@@ -71,8 +71,7 @@ export const create = ({ expect, page, VError }) => {
         await expect(response).toBeVisible({ timeout: 30_000 })
         await page.waitForIdle()
       }
-      try {
-      } catch (error) {
+      try {} catch (error) {
         throw new VError(error, `Failed to send message`)
       }
     },
