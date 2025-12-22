@@ -17,13 +17,14 @@ export const create = ({ expect, page, VError }) => {
     async open(expectedItem: string) {
       try {
         await page.waitForIdle()
+        const suggestWidget = page.locator('.suggest-widget')
+        await expect(suggestWidget).toBeHidden()
+        await page.waitForIdle()
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.TriggerSuggest, {
           pressKeyOnce: true,
         })
-        const suggestWidget = page.locator('.suggest-widget')
         await expect(suggestWidget).toBeVisible()
-        await new Promise((r) => {})
         await page.waitForIdle()
         if (expectedItem) {
           const element = suggestWidget.locator(`.monaco-list-row[aria-label="${expectedItem}"]`)
