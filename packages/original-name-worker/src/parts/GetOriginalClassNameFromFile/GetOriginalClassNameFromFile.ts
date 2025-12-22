@@ -6,7 +6,7 @@ import * as GetOriginalClassName from '../GetOriginalClassName/GetOriginalClassN
 
 export const getOriginalClassNameFromFile = async (originalCodePath: string, originalLine: number, originalColumn: number) => {
   try {
-    if (!existsSync(originalCodePath)) {
+    if (originalLine === null || originalColumn === null || !existsSync(originalCodePath)) {
       return ''
     }
     const originalCode: string = await readFile(originalCodePath, 'utf8')
