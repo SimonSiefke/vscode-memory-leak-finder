@@ -17,8 +17,8 @@ export const stopTrackingDisposableStores = async (session, objectGroup) => {
 
   delete globalThis.___disposableStoreOriginalAdd
 }`,
+    objectGroup,
     objectId: fnResult1.objectId,
     returnByValue: false,
-    objectGroup,
   })
 }

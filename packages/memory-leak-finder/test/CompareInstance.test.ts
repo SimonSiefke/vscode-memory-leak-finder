@@ -3,24 +3,24 @@ import * as CompareInstance from '../src/parts/CompareInstance/CompareInstance.t
 
 test('compareInstance - by name', () => {
   const a = {
-    name: 'NotebookOutlineAccessibility',
     count: 2,
+    name: 'NotebookOutlineAccessibility',
   }
   const b = {
-    name: 'class extends Action2',
     count: 2,
+    name: 'class extends Action2',
   }
   expect(CompareInstance.compareInstance(a, b)).toBe(1)
 })
 
 test('compareInstance - by count', () => {
   const a = {
-    name: 'NotebookOutlineAccessibility',
     count: 2,
+    name: 'NotebookOutlineAccessibility',
   }
   const b = {
-    name: 'NotebookOutlineAccessibility',
     count: 3,
+    name: 'NotebookOutlineAccessibility',
   }
   expect(CompareInstance.compareInstance(a, b)).toBe(1)
 })

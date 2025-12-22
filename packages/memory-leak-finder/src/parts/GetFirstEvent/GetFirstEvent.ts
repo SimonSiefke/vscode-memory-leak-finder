@@ -1,5 +1,5 @@
 export const getFirstEvent = async (eventEmitter, eventMap) => {
-  const { resolve, promise } = Promise.withResolvers<any>()
+  const { promise, resolve } = Promise.withResolvers<any>()
   const listenerMap = Object.create(null)
   const cleanup = (value) => {
     for (const event of Object.keys(eventMap)) {
@@ -10,13 +10,13 @@ export const getFirstEvent = async (eventEmitter, eventMap) => {
   for (const [event, type] of Object.entries(eventMap)) {
     const listener = (event) => {
       cleanup({
-        type,
         event,
+        type,
       })
     }
     eventEmitter.on(event, listener)
     listenerMap[event] = listener
   }
-  const { type, event } = await promise
-  return { type, event }
+  const { event, type } = await promise
+  return { event, type }
 }

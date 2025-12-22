@@ -2,19 +2,11 @@ import type { Session } from '../Session/Session.ts'
 
 export const wrapMeasure = (measure: any) => {
   return {
-    id: measure.id,
     create(session: Session) {
       const args = measure.create(session)
       return {
         args,
         ...measure,
-        targets: measure.targets || [],
-        start() {
-          return measure.start(...args)
-        },
-        stop() {
-          return measure.stop(...args)
-        },
         compare(before, after, context) {
           return measure.compare(before, after, context)
         },
@@ -23,7 +15,15 @@ export const wrapMeasure = (measure: any) => {
             await measure.releaseResources(...args)
           }
         },
+        start() {
+          return measure.start(...args)
+        },
+        stop() {
+          return measure.stop(...args)
+        },
+        targets: measure.targets || [],
       }
     },
+    id: measure.id,
   }
 }

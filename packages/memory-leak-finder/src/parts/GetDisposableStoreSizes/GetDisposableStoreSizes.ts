@@ -15,9 +15,9 @@ export const getDisposableStoreSizes = async (session: Session, objectGroup: str
   const disposableStoresWithSizes = disposableStores.map(getSize)
   return disposableStoresWithSizes
 }`,
+    objectGroup,
     objectId: fnResult1.objectId,
     returnByValue: true,
-    objectGroup,
   })
   return fnResult2
 }

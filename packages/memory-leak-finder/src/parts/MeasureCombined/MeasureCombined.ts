@@ -65,11 +65,14 @@ export const combine = (...measures) => {
   }
 
   return {
+<<<<<<< HEAD
     measures,
+=======
+    compare,
+>>>>>>> 754f9c7c3911 (feature: sort memory leak finder (#2295))
     id: MeasureId.Combined,
+    releaseResources,
     start,
     stop,
-    compare,
-    releaseResources,
   }
 }

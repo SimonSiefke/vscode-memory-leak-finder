@@ -1,8 +1,8 @@
 import * as CamelCase from '../CamelCase/CamelCase.ts'
 
 interface Measure {
-  readonly id: string
   readonly create?: (session: any) => any
+  readonly id: string
 }
 
 export const getMeasure = (MemoryLeakFinder: any, measureId: string): Measure => {

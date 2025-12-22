@@ -4,11 +4,11 @@ import * as CompareInstance from '../CompareInstance/CompareInstance.ts'
 import * as GetEventListenerOriginalSourcesCached from '../GetEventListenerOriginalSourcesCached/GetEventListenerOriginalSourcesCached.ts'
 
 const cleanInstance = (instance) => {
-  const { name, originalName, count, originalStack, stack, beforeCount } = instance
+  const { beforeCount, count, name, originalName, originalStack, stack } = instance
   return {
-    name: originalName || name,
-    count,
     beforeCount,
+    count,
+    name: originalName || name,
     url: originalStack?.[0] || stack?.[0] || '',
   }
 }

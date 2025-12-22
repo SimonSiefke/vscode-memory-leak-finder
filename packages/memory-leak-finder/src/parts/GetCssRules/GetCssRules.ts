@@ -39,8 +39,8 @@ function getCSSRules() {
 }
 
 ;(getCSSRules())`,
-    returnByValue: true,
     objectGroup,
+    returnByValue: true,
   })
   return rules
 }

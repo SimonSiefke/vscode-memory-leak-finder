@@ -35,7 +35,7 @@ const getAdded = (before, after) => {
       leaked.push(item)
     }
   }
-  return { leaked, beforeCounts, afterCounts }
+  return { afterCounts, beforeCounts, leaked }
 }
 
 const deduplicate = (leaked, beforeCounts: Record<string, number>, afterCounts: Record<string, number>) => {
@@ -61,7 +61,7 @@ const deduplicate = (leaked, beforeCounts: Record<string, number>, afterCounts: 
 }
 
 const cleanItem = (item) => {
-  const { preview, stackTrace, count, delta } = item
+  const { count, delta, preview, stackTrace } = item
   const { properties } = preview
   return {
     count,
@@ -117,13 +117,13 @@ export const comparePromisesWithStackTrace = async (before, after, context = {})
     scriptMap = after.scriptMap
   }
   Assert.array(afterResult)
-  const { leaked, beforeCounts, afterCounts } = getAdded(before, afterResult)
+  const { afterCounts, beforeCounts, leaked } = getAdded(before, afterResult)
   const deduplicated = deduplicate(leaked, beforeCounts, afterCounts)
   const sorted = sortItems(deduplicated)
   const cleanLeaked = clean(sorted)
   let filtered = cleanLeaked
   if (context && typeof context === 'object' && 'runs' in context && typeof context.runs === 'number') {
-    const runs = context.runs as number
+    const runs = context.runs
     filtered = cleanLeaked.filter((item) => item.delta >= runs)
   }
   if (scriptMap) {

@@ -14,12 +14,12 @@ const sortNumbers = (numbers) => {
 export const getNumbers = async (session: Session, objectGroup: string): Promise<readonly number[]> => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Object,
-    returnByValue: false,
     objectGroup,
+    returnByValue: false,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
-    prototypeObjectId: prototype.objectId,
     objectGroup,
+    prototypeObjectId: prototype.objectId,
   })
   const result = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function () {
@@ -47,9 +47,9 @@ export const getNumbers = async (session: Session, objectGroup: string): Promise
   }
   return numbers
 }`,
+    objectGroup,
     objectId: objects.objects.objectId,
     returnByValue: true,
-    objectGroup,
   })
 
   const sortedNumbers = sortNumbers(result)

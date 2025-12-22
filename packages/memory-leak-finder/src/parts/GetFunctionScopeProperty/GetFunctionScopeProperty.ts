@@ -7,9 +7,9 @@ export const getFunctionScopeProperty = async (session, objectGroup, objectId) =
   Assert.string(objectGroup)
   Assert.string(objectId)
   const fnResult1 = await DevtoolsProtocolRuntime.getProperties(session, {
+    generatePreview: false,
     objectId: objectId,
     ownProperties: true,
-    generatePreview: false,
   })
   const scopeListObjectId = ParseFunctionScopeListProperty.parseFunctionScopeListProperty(fnResult1)
   return scopeListObjectId
