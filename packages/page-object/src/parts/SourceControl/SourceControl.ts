@@ -189,12 +189,16 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to show branch picker`)
       }
     },
-    async stageFile(name) {
+    async stageFile(name: string, parentFolder?: string) {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.GitStageAllChanges)
         const file = page.locator(`[role="treeitem"][aria-label^="${name}"]`)
-        await expect(file).toHaveAttribute('aria-label', `${name}, Index Added`)
+        if (parentFolder) {
+          await expect(file).toHaveAttribute('aria-label', `${name}, Index Added, ${[parentFolder]}`)
+        } else {
+          await expect(file).toHaveAttribute('aria-label', `${name}, Index Added`)
+        }
       } catch (error) {
         throw new VError(error, `Failed to stage file`)
       }

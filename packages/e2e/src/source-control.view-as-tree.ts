@@ -6,7 +6,7 @@ export const setup = async ({ ActivityBar, Editor, Explorer, Workspace, SourceCo
   await Workspace.setFiles([
     {
       content: '<h1>hello world</h1>',
-      name: 'index.html',
+      name: 'src/index.html',
     },
   ])
   await Workspace.initializeGitRepository()
@@ -14,11 +14,12 @@ export const setup = async ({ ActivityBar, Editor, Explorer, Workspace, SourceCo
   await Explorer.focus()
   await ActivityBar.showSourceControl()
   await SourceControl.shouldHaveUnstagedFile('index.html')
-  await SourceControl.stageFile('index.html')
+  await SourceControl.stageFile('index.html', 'src')
   await SourceControl.hideGraph()
 }
 
 export const run = async ({ SourceControl }: TestContext): Promise<void> => {
   await SourceControl.viewAsTree()
+  await new Promise((r) => {})
   await SourceControl.viewAsList()
 }
