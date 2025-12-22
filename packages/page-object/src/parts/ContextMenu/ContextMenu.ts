@@ -62,8 +62,6 @@ export const create = ({ expect, page, VError }) => {
       await page.waitForIdle()
       await expect(contextMenuItem).toBeVisible()
     },
-<<<<<<< HEAD
-=======
     async uncheck(name: string) {
       await page.waitForIdle()
       const contextMenu = page.locator('.context-view.monaco-menu-container .actions-container')
@@ -80,6 +78,5 @@ export const create = ({ expect, page, VError }) => {
       await expect(contextMenu).toBeHidden()
       await page.waitForIdle()
     },
->>>>>>> origin/main
   }
 }
