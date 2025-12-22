@@ -32,6 +32,7 @@ cd packages/chart-worker && updateDependencies && cd ../../ &&
 cd packages/charts && updateDependencies && cd ../../ &&
 cd packages/cli && updateDependencies && cd ../../ &&
 cd packages/cursor-e2e && updateDependencies && cd ../../ &&
+cd packages/compression-worker && updateDependencies && cd ../../ &&
 cd packages/devtools-protocol && updateDependencies && cd ../../ &&
 cd packages/download-worker && updateDependencies && cd ../../ &&
 cd packages/e2e && updateDependencies && cd ../../ &&
