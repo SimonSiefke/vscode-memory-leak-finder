@@ -7,8 +7,8 @@ export const requiresNetwork = 1
 export const setup = async ({ Editor, Workspace, Extensions }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
-      content: `def add(a,b):
-  return a + b`,
+      content: `def add(a,b,c):
+  return a + b + `,
       name: 'index.py',
     },
   ])
@@ -18,11 +18,11 @@ export const setup = async ({ Editor, Workspace, Extensions }: TestContext): Pro
     name: 'Python',
   })
   await Editor.open('index.py')
+  await Editor.shouldHaveBreadCrumb('index.py')
+  await Editor.shouldHaveBreadCrumb('add')
   await Editor.shouldHaveSquigglyError()
   // @ts-ignore
   await Editor.setCursor(2, 15)
-  await Editor.shouldHaveBreadCrumb('index.py')
-  await Editor.shouldHaveBreadCrumb('add')
 }
 
 export const run = async ({ Suggest }: TestContext): Promise<void> => {
