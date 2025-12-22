@@ -19,8 +19,8 @@ const prettifyEventTargets = (eventTargets) => {
   const result: any[] = []
   for (const [key, value] of Object.entries(countMap)) {
     result.push({
-      description: key,
       count: value,
+      description: key,
     })
   }
   const sorted = sort(result)
@@ -33,7 +33,7 @@ export const compareEventTargets = (before, after) => {
   const prettyBefore = prettifyEventTargets(before)
   const prettyAfter = prettifyEventTargets(after)
   return {
-    before: prettyBefore,
     after: prettyAfter,
+    before: prettyBefore,
   }
 }

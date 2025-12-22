@@ -33,9 +33,9 @@ export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) 
 }
 
 export const compare = (before, after) => {
-  return { before, after }
+  return { after, before }
 }
 
-export const isLeak = ({ before, after }) => {
+export const isLeak = ({ after, before }) => {
   return after > before
 }

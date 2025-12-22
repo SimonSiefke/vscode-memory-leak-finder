@@ -20,7 +20,7 @@ export const compareDisposableStores = (before, after) => {
   const prettyBefore = prettifyDisposableStores(before)
   const prettyAfter = prettifyDisposableStores(after)
   return {
-    before: prettyBefore,
     after: prettyAfter,
+    before: prettyBefore,
   }
 }

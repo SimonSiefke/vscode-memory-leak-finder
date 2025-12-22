@@ -27,6 +27,25 @@ export interface LaunchOptions {
   readonly vscodeVersion: string
 }
 
+const launchInitializationWorker = async () => {
+  const rpc = await NodeWorkerRpcParent.create({
+    commandMap: {},
+    path: getInitializationWorkerUrl(),
+    stdio: 'inherit',
+  })
+  return {
+    invoke(method, ...params) {
+      return rpc.invoke(method, ...params)
+    },
+    invokeAndTransfer(method, ...params) {
+      return rpc.invokeAndTransfer(method, ...params)
+    },
+    async [Symbol.asyncDispose]() {
+      await rpc.dispose()
+    },
+  }
+}
+
 export const launch = async (options: LaunchOptions): Promise<any> => {
   const {
     attachedToPageTimeout,
@@ -66,20 +85,14 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     vscodePath,
     vscodeVersion,
   })
-  const { dispose, port } = createPipeline(child.stderr)
-  const rpc = await NodeWorkerRpcParent.create({
-    commandMap: {},
-    path: getInitializationWorkerUrl(),
-    stdio: 'inherit',
-  })
+  await using port = createPipeline(child.stderr)
+  await using rpc = await launchInitializationWorker()
   const { devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, webSocketUrl } = await rpc.invokeAndTransfer(
     'Initialize.prepare',
     headlessMode,
     attachedToPageTimeout,
-    port,
+    port.port,
   )
-  await Promise.all([rpc.dispose(), dispose()])
-
   return {
     devtoolsWebSocketUrl,
     electronObjectId,

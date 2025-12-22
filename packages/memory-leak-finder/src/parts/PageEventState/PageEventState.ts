@@ -10,18 +10,18 @@ interface PageEvent {
 interface EventCallback {
   readonly frameId: string
   readonly name: string
-  readonly resolve: () => void
   readonly reject: (reason?: unknown) => void
+  readonly resolve: () => void
 }
 
 interface State {
-  events: PageEvent[]
   callbacks: EventCallback[]
+  events: PageEvent[]
 }
 
 export const state: State = {
-  events: [],
   callbacks: [],
+  events: [],
 }
 
 export const addEvent = (event: PageEvent): void => {
@@ -43,8 +43,8 @@ export const waitForEvent = async ({ frameId, name }: { readonly frameId: string
         return
       }
     }
-    const { resolve, reject, promise } = Promise.withResolvers()
-    const eventCallback: EventCallback = { frameId, name, resolve: () => resolve(undefined), reject }
+    const { promise, reject, resolve } = Promise.withResolvers()
+    const eventCallback: EventCallback = { frameId, name, reject, resolve: () => resolve(undefined) }
     state.callbacks.push(eventCallback)
     return await PTimeout.pTimeout(promise, { milliseconds: TimeoutConstants.PageEvent })
   } catch (error) {

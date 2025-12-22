@@ -7,16 +7,16 @@ import * as GetSourceMapUrlFromScriptMap from '../GetSourceMapUrlFromScriptMap/G
 export const cleanEventListener = (eventListener, scriptMap) => {
   Assert.object(eventListener)
   Assert.object(scriptMap)
-  const { url, sourceMapUrl } = GetSourceMapUrlFromScriptMap.getSourceMapUrlFromScriptMap(eventListener.scriptId, scriptMap)
+  const { sourceMapUrl, url } = GetSourceMapUrlFromScriptMap.getSourceMapUrlFromScriptMap(eventListener.scriptId, scriptMap)
   const prettyUrl = GetPrettyEventListenerUrl.getPrettyEventListenerUrl(url)
   const formattedUrl = FormatUrl.formatUrl(prettyUrl, eventListener.lineNumber, eventListener.columnNumber)
   const stack = [`listener (${formattedUrl})`]
   const sourceMaps = [sourceMapUrl]
   return {
-    type: eventListener.type,
     description: cleanEventListenerDescription(eventListener.handler.description),
     objectId: eventListener.handler.objectId,
-    stack,
     sourceMaps,
+    stack,
+    type: eventListener.type,
   }
 }

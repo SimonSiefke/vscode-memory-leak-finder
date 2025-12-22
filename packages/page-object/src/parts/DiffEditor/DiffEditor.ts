@@ -3,7 +3,11 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as Explorer from '../Explorer/Explorer.ts'
 import * as SideBar from '../SideBar/SideBar.ts'
 
+<<<<<<< HEAD
 export const create = ({ expect, page, VError }) => {
+=======
+export const create = ({ electronApp, expect, page, VError }) => {
+>>>>>>> origin/main
   return {
     async expectModified(text) {
       try {
@@ -23,7 +27,11 @@ export const create = ({ expect, page, VError }) => {
     },
     async open(a, b) {
       try {
+<<<<<<< HEAD
         const explorer = Explorer.create({ expect, page, VError })
+=======
+        const explorer = Explorer.create({ electronApp, expect, page, VError })
+>>>>>>> origin/main
         const contextMenu = ContextMenu.create({ expect, page, VError })
         const sideBar = SideBar.create({ expect, page, VError })
         await explorer.focus()

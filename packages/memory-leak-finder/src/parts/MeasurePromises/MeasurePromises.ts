@@ -1,8 +1,8 @@
+import type { Session } from '../Session/Session.ts'
 import * as ComparePromises from '../ComparePromises/ComparePromises.ts'
 import * as GetPromises from '../GetPromises/GetPromises.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
-import type { Session } from '../Session/Session.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.Promises

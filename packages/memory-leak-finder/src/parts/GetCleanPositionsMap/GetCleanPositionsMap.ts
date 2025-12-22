@@ -6,9 +6,9 @@ const sourceMapWorkerPath = join(Root.root, 'packages', 'source-map-worker', 'sr
 
 const launchSourceMapWorker = async () => {
   const rpc = await NodeWorkerRpcParent.create({
-    stdio: 'inherit',
-    path: sourceMapWorkerPath,
     commandMap: {},
+    path: sourceMapWorkerPath,
+    stdio: 'inherit',
   })
   return {
     invoke(method, ...params) {

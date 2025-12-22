@@ -5,12 +5,12 @@ import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues
 export const getDescriptors = async (session: Session, prototype: string, objectGroup: string): Promise<any> => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: prototype,
-    returnByValue: false,
     objectGroup,
+    returnByValue: false,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
-    prototypeObjectId: prototypeDescriptor.objectId,
     objectGroup,
+    prototypeObjectId: prototypeDescriptor.objectId,
   })
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
@@ -53,9 +53,9 @@ const getDetachedNodes = (nodes) => {
 const detachedNodes = getDetachedNodes(objects)
 return detachedNodes
 }`,
+    objectGroup,
     objectId: objects.objects.objectId,
     returnByValue: false,
-    objectGroup,
   })
 
   const fnResult2 = await DevtoolsProtocolRuntime.getProperties(session, {

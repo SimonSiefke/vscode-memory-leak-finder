@@ -1,9 +1,9 @@
-import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import type { Session } from '../Session/Session.ts'
+import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 export interface HeapUsage {
-  readonly usedSize: number
   readonly totalSize: number
+  readonly usedSize: number
 }
 
 export const getHeapUsage = async (session: Session): Promise<HeapUsage> => {

@@ -14,17 +14,17 @@ export const getNamedFunctionCount = async (
 ): Promise<readonly any[]> => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Function,
-    returnByValue: false,
     objectGroup,
+    returnByValue: false,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
-    prototypeObjectId: prototypeDescriptor.objectId,
     objectGroup,
+    prototypeObjectId: prototypeDescriptor.objectId,
   })
   const fnResult2 = await filterNamedFunctions(session, objects, objectGroup)
   const fnResult3 = await DevtoolsProtocolRuntime.getProperties(session, {
-    objectId: fnResult2.objectId,
     generatePreview: false,
+    objectId: fnResult2.objectId,
     ownProperties: true,
   })
   const descriptors = GetDescriptorValues.getDescriptorValues(fnResult3.result)

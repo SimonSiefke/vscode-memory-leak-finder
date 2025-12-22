@@ -31,9 +31,9 @@ const getStackTraces = (detachedNodes) => {
 const stackTraces = getStackTraces(detachedRoots)
 return stackTraces
 }`,
+    objectGroup,
     objectId: fnResult1.objectId,
     returnByValue: true,
-    objectGroup,
   })
   const merged: any[] = []
   if (descriptors.length !== stackTraces.length) {

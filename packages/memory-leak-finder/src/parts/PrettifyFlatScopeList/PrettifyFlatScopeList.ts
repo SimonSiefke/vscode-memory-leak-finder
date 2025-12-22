@@ -1,11 +1,11 @@
 const prettifyFlatScopeListItem = (flatScopeListItem) => {
   const { value } = flatScopeListItem
-  const { type, subtype, description, objectId } = value
+  const { description, objectId, subtype, type } = value
   return {
-    type,
-    subtype,
     description,
     objectId,
+    subtype,
+    type,
   }
 }
 

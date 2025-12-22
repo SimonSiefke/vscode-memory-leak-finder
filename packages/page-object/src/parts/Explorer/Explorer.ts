@@ -1,4 +1,5 @@
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
+import * as Electron from '../Electron/Electron.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
@@ -30,7 +31,11 @@ const getListId = (classNameString) => {
   throw new Error(`Failed to extract list id from explorer`)
 }
 
+<<<<<<< HEAD
 export const create = ({ expect, page, VError }) => {
+=======
+export const create = ({ electronApp, expect, page, VError }) => {
+>>>>>>> origin/main
   return {
     async cancel() {
       try {
@@ -87,13 +92,22 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to copy explorer item ${dirent}`)
       }
     },
+<<<<<<< HEAD
     async delete(item) {
       try {
+=======
+    async delete(item: string) {
+      try {
+        const electron = Electron.create({ electronApp, VError })
+        await electron.mockShellTrashItem()
+        await page.waitForIdle()
+>>>>>>> origin/main
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         const oldDirent = explorer.locator('.monaco-list-row', {
           hasText: item,
         })
         await expect(oldDirent).toBeVisible()
+<<<<<<< HEAD
         await page.keyboard.press('Delete')
         for (let i = 0; i < 5; i++) {
           await page.waitForIdle()
@@ -102,6 +116,11 @@ export const create = ({ expect, page, VError }) => {
             break
           }
         }
+=======
+        await page.waitForIdle()
+        await page.keyboard.press('Delete')
+        await page.waitForIdle()
+>>>>>>> origin/main
         await expect(oldDirent).toBeHidden()
       } catch (error) {
         throw new VError(error, `Failed to delete ${item}`)
@@ -278,6 +297,11 @@ export const create = ({ expect, page, VError }) => {
     },
     async refresh() {
       try {
+<<<<<<< HEAD
+=======
+        const electron = Electron.create({ electronApp, VError })
+        await electron.mockShellTrashItem()
+>>>>>>> origin/main
         await page.waitForIdle()
         const explorer = page.locator('.explorer-folders-view .monaco-list')
         await expect(explorer).toBeVisible()
@@ -292,6 +316,21 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to refresh explorer`)
       }
     },
+<<<<<<< HEAD
+=======
+    async removeCurrent() {
+      try {
+        await page.waitForIdle()
+        await page.keyboard.press('Home')
+        await page.waitForIdle()
+        await page.keyboard.press('Delete')
+        await this.refresh()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to delete`)
+      }
+    },
+>>>>>>> origin/main
     async rename(oldDirentName: string, newDirentName: string) {
       try {
         await page.waitForIdle()

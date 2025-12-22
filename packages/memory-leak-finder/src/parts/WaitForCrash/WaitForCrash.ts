@@ -18,9 +18,9 @@ export const waitForCrash = (targetId: string): { readonly promise: Promise<any>
   // }
   // ExecutionContextState.registerCrashListener(targetId, crashCallback)
   return {
-    promise,
     dispose() {
       resolve(undefined)
     },
+    promise,
   }
 }

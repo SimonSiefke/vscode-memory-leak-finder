@@ -11,10 +11,10 @@ test('getFunctionLocation', async () => {
               {
                 name: '[[FunctionLocation]]',
                 value: {
-                  type: 'object',
-                  subtype: 'internal#location',
-                  value: { scriptId: '16', lineNumber: 1552, columnNumber: 2776 },
                   description: 'Object',
+                  subtype: 'internal#location',
+                  type: 'object',
+                  value: { columnNumber: 2776, lineNumber: 1552, scriptId: '16' },
                 },
               },
             ],
@@ -24,5 +24,5 @@ test('getFunctionLocation', async () => {
     },
   }
   const objectId = 'test-123'
-  expect(await GetFunctionLocation.getFunctionLocation(session, objectId)).toEqual({ scriptId: '16', lineNumber: 1552, columnNumber: 2776 })
+  expect(await GetFunctionLocation.getFunctionLocation(session, objectId)).toEqual({ columnNumber: 2776, lineNumber: 1552, scriptId: '16' })
 })

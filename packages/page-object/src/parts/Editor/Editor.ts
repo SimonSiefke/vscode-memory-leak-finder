@@ -4,7 +4,7 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WebView from '../WebView/WebView.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-const initialDiagnosticTimeout = 30_000
+const initialDiagnosticTimeout = 60_000
 
 const isNotebook = (file) => {
   return file.endsWith('.ipynb')
@@ -1324,8 +1324,25 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to show empty source action`)
       }
     },
+<<<<<<< HEAD
     async split(command) {
       try {
+=======
+    async shouldHaveSpark() {
+      try {
+        await page.waitForIdle()
+        const spark = page.locator('.codicon.codicon-gutter-lightbulb-sparkle-filled')
+        await expect(spark).toBeVisible({
+          timeout: 20_000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify spark`)
+      }
+    },
+    async split(command) {
+      try {
+>>>>>>> origin/main
         const editors = page.locator('.editor-instance')
         const currentCount = await editors.count()
         if (currentCount === 0) {

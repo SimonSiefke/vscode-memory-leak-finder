@@ -4,37 +4,37 @@ import * as TimeoutConstants from '../TimeoutConstants/TimeoutConstants.ts'
 import { VError } from '../VError/VError.ts'
 
 interface Target {
-  readonly type: string
-  readonly id?: string
-  readonly targetId?: string
-  readonly url?: string
-  readonly sessionId?: string
-  readonly title?: string
   readonly browserContextId?: string
+  readonly id?: string
+  readonly sessionId?: string
+  readonly targetId?: string
+  readonly title?: string
+  readonly type: string
+  readonly url?: string
 }
 
 interface TargetCallback {
-  readonly type: string
   readonly index: number
-  readonly resolve: (value: Target) => void
   readonly reject: (reason?: unknown) => void
+  readonly resolve: (value: Target) => void
+  readonly type: string
 }
 
 interface DestroyedCallback {
-  readonly targetId: string
   readonly resolve: () => void
+  readonly targetId: string
 }
 
 interface State {
-  targets: Record<string, Target>
   callbacks: TargetCallback[]
   destroyedCallbacks: DestroyedCallback[]
+  targets: Record<string, Target>
 }
 
 export const state: State = {
-  targets: Object.create(null),
   callbacks: [],
   destroyedCallbacks: [],
+  targets: Object.create(null),
 }
 
 export const reset = () => {
@@ -78,7 +78,7 @@ export const removeTarget = (targetId: string): void => {
   state.destroyedCallbacks = newCallbacks
 }
 
-export const waitForTarget = async ({ type, index }: { readonly type: string; readonly index: number }): Promise<Target> => {
+export const waitForTarget = async ({ index, type }: { readonly type: string; readonly index: number }): Promise<Target> => {
   try {
     let currentIndex = 0
     for (const target of Object.values(state.targets)) {
@@ -92,10 +92,10 @@ export const waitForTarget = async ({ type, index }: { readonly type: string; re
     return await PTimeout.pTimeout(
       new Promise<Target>((resolve, reject) => {
         state.callbacks.push({
-          type,
           index,
-          resolve,
           reject,
+          resolve,
+          type,
         })
       }),
       { milliseconds: TimeoutConstants.Target },
@@ -113,8 +113,8 @@ export const waitForTargetToBeClosed = async (targetId: string): Promise<void> =
   return await PTimeout.pTimeout(
     new Promise<void>((resolve, reject) => {
       state.destroyedCallbacks.push({
-        targetId,
         resolve: () => resolve(),
+        targetId,
       })
     }),
     { milliseconds: TimeoutConstants.Target },
