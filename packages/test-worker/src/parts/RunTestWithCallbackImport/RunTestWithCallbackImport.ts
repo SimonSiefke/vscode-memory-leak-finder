@@ -1,16 +1,10 @@
 import * as ImportTest from '../ImportTest/ImportTest.ts'
 import * as TestStage from '../TestStage/TestStage.ts'
-import * as TestWorkerState from '../TestWorkerState/TestWorkerState.ts'
 
-export const runTest = async (pageObject, file, forceRun) => {
+export const runTest = async (pageObject: any, file: string, forceRun: boolean, inspectExtensions: boolean) => {
   const module = await ImportTest.importTest(file)
   const wasOriginallySkipped = module.skip
-  const inspectExtensions = TestWorkerState.getInspectExtensions()
-  if (
-    inspectExtensions &&
-    Array.isArray(module.flags) &&
-    module.flags.includes('skipIfInspectExtensions')
-  ) {
+  if (inspectExtensions && Array.isArray(module.flags) && module.flags.includes('skipIfInspectExtensions')) {
     return { skipped: true, wasOriginallySkipped }
   }
   if (module.skip && !forceRun) {
