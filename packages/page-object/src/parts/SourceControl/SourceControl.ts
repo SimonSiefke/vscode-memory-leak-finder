@@ -248,10 +248,28 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async hideGraph() {
       try {
         await page.waitForIdle()
+        const input = page.locator('.scm-input')
+        await expect(input).toBeVisible()
+        await page.waitForIdle()
+        const editContext = input.locator('.native-edit-context')
+        await expect(editContext).toBeVisible()
+        await page.waitForIdle()
         const actions = page.locator(`[aria-label="Source Control actions"]`)
         await expect(actions).toBeVisible()
         await page.waitForIdle()
-        await actions.click()
+        const moreActions = actions.locator(`[aria-label^="Views and More Actions"]`)
+        await expect(moreActions).toBeVisible()
+        await page.waitForIdle()
+        await moreActions.click()
+        await page.waitForIdle()
+        await new Promise((r) => {})
+        // TODO get rid of timeout
+        await new Promise((r) => {
+          setTimeout(r, 1000)
+        })
+        // await page.keyboard.press('Enter')
+        await page.waitForIdle()
+        await new Promise((r) => {})
         await page.waitForIdle()
         const contextMenu = ContextMenu.create({
           page,
