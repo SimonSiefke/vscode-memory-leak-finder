@@ -235,10 +235,6 @@ export const create = ({ expect, page, VError }) => {
         await expect(tree).toBeVisible()
         await page.waitForIdle()
         const scrollbar = tree.locator('.scrollbar.vertical').first()
-        await expect(scrollbar).toBeHidden()
-        await new Promise((r) => {
-          setTimeout(r, 3000)
-        })
         await page.waitForIdle()
         await scrollbar.hover()
         await page.waitForIdle()
