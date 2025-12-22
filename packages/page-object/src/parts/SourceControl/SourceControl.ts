@@ -262,15 +262,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
         await moreActions.click()
         await page.waitForIdle()
-        await new Promise((r) => {})
-        // TODO get rid of timeout
-        await new Promise((r) => {
-          setTimeout(r, 1000)
-        })
-        // await page.keyboard.press('Enter')
-        await page.waitForIdle()
-        await new Promise((r) => {})
-        await page.waitForIdle()
         const contextMenu = ContextMenu.create({
           page,
           expect,
