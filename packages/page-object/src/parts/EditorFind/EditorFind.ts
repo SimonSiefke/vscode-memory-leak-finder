@@ -1,20 +1,5 @@
-<<<<<<< HEAD
-export const create = ({ page, expect, VError, ideVersion }) => {
-  return {
-    async setSearchValue(value: string) {
-      try {
-        await page.waitForIdle()
-        const input = page.locator('.find-part .monaco-findInput textarea[aria-label="Find"]')
-        await input.setValue(value)
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to set search value`)
-      }
-    },
-=======
 export const create = ({ expect, ideVersion, page, VError }) => {
   return {
->>>>>>> origin/main
     async openReplace() {
       try {
         const findWidget = page.locator('.find-widget.visible')
@@ -37,8 +22,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to open replace`)
       }
     },
-<<<<<<< HEAD
-=======
     async replace() {
       try {
         await page.waitForIdle()
@@ -53,7 +36,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to replace`)
       }
     },
->>>>>>> origin/main
     async setReplaceValue(value: string) {
       try {
         await page.waitForIdle()
@@ -74,20 +56,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to set replace value`)
       }
     },
-<<<<<<< HEAD
-    async replace() {
-      try {
-        await page.waitForIdle()
-        const findWidget = page.locator('.find-widget.visible')
-        await expect(findWidget).toBeVisible()
-        await page.waitForIdle()
-        const button = findWidget.locator('[aria-label^="Replace All"][tabIndex="0"]')
-        await expect(button).toBeVisible()
-        await button.click()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to replace`)
-=======
     async setSearchValue(value: string) {
       try {
         await page.waitForIdle()
@@ -96,7 +64,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to set search value`)
->>>>>>> origin/main
       }
     },
   }
