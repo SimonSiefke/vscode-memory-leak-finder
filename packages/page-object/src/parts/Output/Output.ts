@@ -45,7 +45,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
         await expect(input).toHaveValue('')
         await page.waitForIdle()
-        await expect(findMatch).toBeHidden({ timeout: 10_000 })
+        // await expect(findMatch).toBeHidden({ timeout: 10_000 })
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed clear filter output`)

@@ -15,6 +15,10 @@ export const run = async ({ Output }: TestContext): Promise<void> => {
   await Output.filter('update#setState')
   // @ts-ignore
   await Output.clearFilter()
+  // @ts-ignore
+  await Output.filter('update')
+  // @ts-ignore
+  await Output.clearFilter()
 }
 
 export const teardown = async ({ Panel }: TestContext) => {
