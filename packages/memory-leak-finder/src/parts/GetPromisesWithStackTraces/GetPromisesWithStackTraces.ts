@@ -5,13 +5,13 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 export const getPromisesWithStackTraces = async (session, objectGroup) => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Promise,
-    returnByValue: false,
     objectGroup,
+    returnByValue: false,
   })
 
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
-    prototypeObjectId: prototype.objectId,
     objectGroup,
+    prototypeObjectId: prototype.objectId,
   })
 
   const result = await DevtoolsProtocolRuntime.callFunctionOn(session, {
@@ -29,11 +29,11 @@ return stackTraces
     returnByValue: true,
   })
   const fnResult1 = await DevtoolsProtocolRuntime.getProperties(session, {
+    accessorPropertiesOnly: false,
+    generatePreview: true,
+    nonIndexedPropertiesOnly: false,
     objectId: objects.objects.objectId,
     ownProperties: true,
-    generatePreview: true,
-    accessorPropertiesOnly: false,
-    nonIndexedPropertiesOnly: false,
   })
   const descriptors = GetDescriptorValues.getDescriptorValues(fnResult1.result)
   const withStackTraces = descriptors.map((descriptor, index) => {

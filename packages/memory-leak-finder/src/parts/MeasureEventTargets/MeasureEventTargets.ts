@@ -1,8 +1,8 @@
+import type { Session } from '../Session/Session.ts'
 import * as CompareEventTargets from '../CompareEventTargets/CompareEventTargets.ts'
 import * as GetEventTargets from '../GetEventTargets/GetEventTargets.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
-import type { Session } from '../Session/Session.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.EventTargets
@@ -39,7 +39,7 @@ const getTotalCount = (items) => {
 }
 
 export const isLeak = (leaked) => {
-  const { before, after } = leaked
+  const { after, before } = leaked
   const totalBefore = getTotalCount(before)
   const totalAfter = getTotalCount(after)
   return totalAfter > totalBefore

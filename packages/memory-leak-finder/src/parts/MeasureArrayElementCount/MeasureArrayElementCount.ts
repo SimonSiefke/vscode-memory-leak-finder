@@ -28,11 +28,11 @@ export const releaseResources = async (session, objectGroup) => {
 
 export const compare = (before, after) => {
   return {
-    before,
     after,
+    before,
   }
 }
 
-export const isLeak = ({ before, after }) => {
+export const isLeak = ({ after, before }) => {
   return after > before
 }

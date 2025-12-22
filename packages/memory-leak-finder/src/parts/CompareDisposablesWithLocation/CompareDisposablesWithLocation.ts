@@ -8,14 +8,14 @@ const addDeltas = (prettyBefore, prettyAfter) => {
     countMap[item.name] = item.count
   }
   for (const item of prettyAfter) {
-    const { name, count, location } = item
+    const { count, location, name } = item
     const oldCount = countMap[item.name] || 0
     const delta = count - oldCount
     newItems.push({
-      name,
       count,
       delta,
       location,
+      name,
     })
   }
   return newItems

@@ -38,6 +38,6 @@ const getTotalCount = (instances) => {
   return Arrays.sum(instances.map(getCount))
 }
 
-export const isLeak = ({ before, after }) => {
+export const isLeak = ({ after, before }) => {
   return getTotalCount(after) > getTotalCount(before)
 }

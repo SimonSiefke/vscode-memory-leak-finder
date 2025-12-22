@@ -1,14 +1,13 @@
-import { comparePromisesWithStackTrace } from '../ComparePromisesWithStackTrace/ComparePromisesWithStackTrace.ts'
-import * as GetPromisesWithStackTraces from '../GetPromisesWithStackTraces/GetPromisesWithStackTraces.ts'
 import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
+import type { Session } from '../Session/Session.ts'
+import * as GetPromisesWithStackTraces from '../GetPromisesWithStackTraces/GetPromisesWithStackTraces.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
+import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as StartTrackPromiseStackTraces from '../StartTrackPromiseStackTraces/StartTrackingPromiseStackTraces.ts'
 import * as StopTrackingPromiseStackTraces from '../StopTrackPromiseStackTraces/StopTrackingPromiseStackTraces.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
-import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
-import type { Session } from '../Session/Session.ts'
 
 export const id = MeasureId.PromisesWithStackTrace
 
@@ -39,8 +38,8 @@ export const stop = async (session: Session, objectGroup1: string, objectGroup2:
   }
 }
 
-export const compare = comparePromisesWithStackTrace
-
 export const isLeak = (leaked) => {
   return leaked.length > 0
 }
+
+export { comparePromisesWithStackTrace as compare } from '../ComparePromisesWithStackTrace/ComparePromisesWithStackTrace.ts'

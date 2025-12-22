@@ -9,12 +9,12 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 export const getEventListeners = async (session: Session, objectGroup: string, scriptMap: any): Promise<readonly any[]> => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.EventTarget,
-    returnByValue: false,
     objectGroup,
+    returnByValue: false,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
-    prototypeObjectId: prototype.objectId,
     objectGroup,
+    prototypeObjectId: prototype.objectId,
   })
   const fnResult1 = await DevtoolsProtocolRuntime.getProperties(session, {
     objectId: objects.objects.objectId,

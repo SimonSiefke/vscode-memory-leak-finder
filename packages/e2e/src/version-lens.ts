@@ -4,7 +4,7 @@ export const requiresNetwork = true
 
 export const skip = 1
 
-export const setup = async ({ Editor, ExtensionDetailView, Extensions, SideBar, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await Workspace.setFiles([
     {
@@ -18,13 +18,11 @@ export const setup = async ({ Editor, ExtensionDetailView, Extensions, SideBar, 
       name: 'package.json',
     },
   ])
-  await Extensions.show()
-  await Extensions.search('version lens')
-  await Extensions.first.shouldBe('Version Lens')
-  await Extensions.first.click()
-  await ExtensionDetailView.installExtension()
-  await Editor.closeAll()
-  await SideBar.hide()
+  // @ts-ignore
+  await Extensions.install({
+    id: 'version lens',
+    name: 'Version Lens',
+  })
   await Editor.open('package.json')
 }
 

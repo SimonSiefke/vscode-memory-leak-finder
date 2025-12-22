@@ -10,10 +10,10 @@ export const getFunctionLocation = async (session, objectId) => {
     return EmptyFunctionLocation.emptyFunctionLocation
   }
   const fnResult1 = await DevtoolsProtocolRuntime.getProperties(session, {
-    objectId,
     accessorPropertiesOnly: false,
-    nonIndexedPropertiesOnly: false,
     generatePreview: false,
+    nonIndexedPropertiesOnly: false,
+    objectId,
     ownProperties: true,
   })
   const functionLocation = fnResult1.internalProperties.find(IsFunctionLocation.isFunctionLocation)

@@ -4,23 +4,23 @@ import * as DeduplicateDetachedDomNodes from '../src/parts/DeduplicateDetachedDo
 test('deduplicateDetachedDomNodes', () => {
   const detachedDomNodes = [
     {
-      type: 'object',
-      subtype: 'node',
       className: 'HTMLAnchorElement',
       description: 'a.action-label.codicon.codicon-references',
+      subtype: 'node',
+      type: 'object',
     },
     {
-      type: 'object',
-      subtype: 'node',
       className: 'HTMLAnchorElement',
       description: 'a.action-label.codicon.codicon-references',
+      subtype: 'node',
+      type: 'object',
     },
   ]
   expect(DeduplicateDetachedDomNodes.deduplicatedDetachedDomNodes(detachedDomNodes)).toEqual([
     {
       className: 'HTMLAnchorElement',
-      description: 'a.action-label.codicon.codicon-references',
       count: 2,
+      description: 'a.action-label.codicon.codicon-references',
     },
   ])
 })

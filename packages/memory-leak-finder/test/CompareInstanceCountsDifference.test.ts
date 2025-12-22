@@ -4,74 +4,74 @@ import * as CompareInstanceCountsDifference from '../src/parts/CompareInstanceCo
 test('compareInstanceCountsDifference', async () => {
   const before = [
     {
-      name: 'LoaderEvent',
       count: 9392,
+      name: 'LoaderEvent',
     },
     {
-      name: 'Node',
       count: 5561,
+      name: 'Node',
     },
     {
-      name: 'AsyncFunction',
       count: 4698,
+      name: 'AsyncFunction',
     },
     {
-      name: 'Module',
       count: 2560,
+      name: 'Module',
     },
     {
-      name: 'UniqueContainer',
       count: 2453,
+      name: 'UniqueContainer',
     },
     {
-      name: 'LinkedList',
       count: 2389,
+      name: 'LinkedList',
     },
     {
-      name: 'Emitter',
       count: 2055,
+      name: 'Emitter',
     },
   ]
   const after = [
     {
-      name: 'LoaderEvent',
       count: 9392,
+      name: 'LoaderEvent',
     },
     {
-      name: 'Node',
       count: 5561,
+      name: 'Node',
     },
     {
-      name: 'AsyncFunction',
       count: 4698,
+      name: 'AsyncFunction',
     },
     {
-      name: 'Module',
       count: 2560,
+      name: 'Module',
     },
     {
-      name: 'UniqueContainer',
       count: 2460,
+      name: 'UniqueContainer',
     },
     {
-      name: 'LinkedList',
       count: 2389,
+      name: 'LinkedList',
     },
     {
-      name: 'Emitter',
       count: 2118,
+      name: 'Emitter',
     },
   ]
   expect(await CompareInstanceCountsDifference.compareInstanceCountsDifference(before, after)).toEqual([
     {
-      name: 'UniqueContainer',
       count: 2460,
       delta: 7,
+      name: 'UniqueContainer',
     },
     {
-      name: 'Emitter',
       count: 2118,
       delta: 63,
+      name: 'Emitter',
     },
   ])
 })

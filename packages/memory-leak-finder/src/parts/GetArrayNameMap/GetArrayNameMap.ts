@@ -18,8 +18,8 @@ const isArrayScopeValue = (rawScopeValue) => {
 
 const getScopeChildValues = async (session, objectId) => {
   const rawResult = await DevtoolsProtocolRuntime.getProperties(session, {
-    objectId,
     generatePreview: false,
+    objectId,
     ownProperties: true,
   })
   const ownProperties = rawResult.result.filter(IsEnumerable.isEnumerable).filter(isArrayScopeValue).map(parseChildScopeValue)
@@ -28,8 +28,8 @@ const getScopeChildValues = async (session, objectId) => {
 
 const getScopeValues = async (session, objectId) => {
   const rawResult = await DevtoolsProtocolRuntime.getProperties(session, {
-    objectId,
     generatePreview: false,
+    objectId,
     ownProperties: true,
   })
   const descriptorValues = GetDescriptorValues.getDescriptorValues(rawResult)

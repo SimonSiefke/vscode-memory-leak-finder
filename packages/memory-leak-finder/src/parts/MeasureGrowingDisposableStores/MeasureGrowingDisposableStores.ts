@@ -44,6 +44,6 @@ export const releaseResources = async (session, objectGroup) => {
 
 export const compare = CompareDisposableStores.compareDisposableStores
 
-export const isLeak = ({ before, after }) => {
+export const isLeak = ({ after, before }) => {
   return after.length > 0
 }

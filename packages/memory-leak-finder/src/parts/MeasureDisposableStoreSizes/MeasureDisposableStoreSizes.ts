@@ -1,9 +1,9 @@
+import type { Session } from '../Session/Session.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
 import * as GetDisposableStoreSizes from '../GetDisposableStoreSizes/GetDisposableStoreSizes.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
-import type { Session } from '../Session/Session.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.DisposableStoreSizes
@@ -38,8 +38,8 @@ const cleanArray = (sizes) => {
 
 export const compare = (before, after) => {
   return {
-    before: cleanArray(before),
     after: cleanArray(after),
+    before: cleanArray(before),
   }
 }
 
@@ -47,6 +47,6 @@ const getTotal = (disposableStoreSizes) => {
   return Arrays.sum(disposableStoreSizes)
 }
 
-export const isLeak = ({ before, after }) => {
+export const isLeak = ({ after, before }) => {
   return getTotal(after) > getTotal(before)
 }
