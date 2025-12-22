@@ -4,7 +4,7 @@ import type { IntermediateItem } from '../IntermediateItem/IntermediateItem.ts'
 import type { OriginalPosition } from '../OriginalPosition/OriginalPosition.ts'
 import * as AddOriginalPositions from '../AddOriginalPositions/AddOriginalPositions.ts'
 import * as Assert from '../Assert/Assert.ts'
-import { join, resolve } from 'path'
+import { join, resolve } from 'node:path'
 import { root } from '../Root/Root.ts'
 
 export const getOriginalPositions = async (
