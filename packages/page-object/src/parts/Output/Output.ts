@@ -4,6 +4,26 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, ideVersion, page, VError }) => {
   return {
+    async filter(filterValue: string) {
+      try {
+        const outputView = page.locator('.pane-body.output-view')
+        await expect(outputView).toBeVisible()
+        // TODO set output value
+        // TODO check that highlights are visible
+      } catch (error) {
+        throw new VError(error, `Failed to filter output`)
+      }
+    },
+    async clearFilter() {
+      try {
+        const outputView = page.locator('.pane-body.output-view')
+        await expect(outputView).toBeVisible()
+        // TODO clear filter
+        // TODO check that highlights are hidden
+      } catch (error) {
+        throw new VError(error, `Failed clear filter output`)
+      }
+    },
     async hide() {
       try {
         const outputView = page.locator('.pane-body.output-view')
