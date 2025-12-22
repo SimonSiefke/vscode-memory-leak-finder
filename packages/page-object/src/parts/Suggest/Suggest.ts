@@ -22,8 +22,8 @@ export const create = ({ expect, page, VError }) => {
           pressKeyOnce: true,
         })
         const suggestWidget = page.locator('.suggest-widget')
-        await new Promise((r) => {})
         await expect(suggestWidget).toBeVisible()
+        await new Promise((r) => {})
         await page.waitForIdle()
         if (expectedItem) {
           const element = suggestWidget.locator(`.monaco-list-row[aria-label="${expectedItem}"]`)

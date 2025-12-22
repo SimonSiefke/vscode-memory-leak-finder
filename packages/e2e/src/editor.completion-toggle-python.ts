@@ -23,13 +23,15 @@ export const setup = async ({ Editor, Workspace, Extensions }: TestContext): Pro
   // @ts-ignore
   await Editor.setCursor(2, 15)
   await Editor.shouldHaveSquigglyError()
+  // @ts-ignore
+  await Editor.shouldHaveSpark()
   await Editor.shouldHaveText(`def add(a,b,c):
   return a + b + `)
 }
 
 export const run = async ({ Suggest }: TestContext): Promise<void> => {
   // @ts-ignore
-  await Suggest.open('bool')
+  await Suggest.open('bool, Class')
   await Suggest.close()
 }
 
