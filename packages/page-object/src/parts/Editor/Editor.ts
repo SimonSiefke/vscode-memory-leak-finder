@@ -1324,10 +1324,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to show empty source action`)
       }
     },
-<<<<<<< HEAD
-    async split(command) {
-      try {
-=======
     async shouldHaveSpark() {
       try {
         await page.waitForIdle()
@@ -1342,7 +1338,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     },
     async split(command) {
       try {
->>>>>>> origin/main
         const editors = page.locator('.editor-instance')
         const currentCount = await editors.count()
         if (currentCount === 0) {
