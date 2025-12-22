@@ -60,7 +60,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to hide output`)
       }
     },
-    async select(channelName) {
+    async select(channelName: string) {
       try {
         await page.waitForIdle()
         const outputView = page.locator('.pane-body.output-view')
@@ -72,14 +72,20 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await select.focus()
         await page.waitForIdle()
         await select.click()
+        await page.waitForIdle()
         const monacoList = page.locator('.select-box-dropdown-list-container .monaco-list')
         await expect(monacoList).toBeVisible()
+        await page.waitForIdle()
         await expect(monacoList).toBeFocused()
+        await page.waitForIdle()
         const option = monacoList.locator(`[role="option"][aria-label="${channelName}"]`)
         await expect(option).toBeVisible()
         await option.click()
+        await page.waitForIdle()
         await expect(monacoList).toBeHidden()
+        await page.waitForIdle()
         await expect(select).toBeFocused()
+        await page.waitForIdle()
         await expect(select).toHaveValue(channelName)
         await page.waitForIdle()
       } catch (error) {
