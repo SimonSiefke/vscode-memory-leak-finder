@@ -281,6 +281,8 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
         await contextMenu.close()
         await page.waitForIdle()
+        await expect(graph).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to hide graph`)
       }
