@@ -4,7 +4,7 @@ import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
 
-export const id = MeasureId.GPUCanvasContext
+export const id = MeasureId.GPUCanvasContextCount
 
 export const targets = [TargetId.Browser]
 

@@ -1,6 +1,6 @@
 import { writeFile, mkdir } from 'fs/promises'
-import { readdir, stat } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
+import { readdir, stat } from 'node:fs/promises'
 import { join } from 'path'
 import * as Root from '../Root/Root.ts'
 

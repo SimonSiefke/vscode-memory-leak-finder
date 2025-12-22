@@ -7,8 +7,8 @@ export const getData = (basePath: string) => GetTypedArrayCountsData.getTypedArr
 export const createChart = () => {
   return {
     x: 'index',
-    y: 'count',
     xLabel: 'Index',
+    y: 'count',
     yLabel: 'Typed Array Count',
   }
 }

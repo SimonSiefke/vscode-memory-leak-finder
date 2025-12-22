@@ -2,29 +2,12 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ page, expect, VError }) => {
+export const create = ({ expect, page, VError }) => {
   return {
-    async removeOtherProfiles() {
-      try {
-        const profilesList = page.locator('.profiles-list')
-        const profileListIems = profilesList.locator(`.profile-list-item`)
-        const contextMenu = ContextMenu.create({ page, expect, VError })
-        const count = await profileListIems.count()
-        for (let i = 2; i < count; i++) {
-          const second = profileListIems.nth(1)
-          await contextMenu.open(second)
-          await contextMenu.shouldHaveItem('Delete')
-          await contextMenu.select('Delete')
-          await expect(profileListIems).toHaveCount(count - i + 1)
-        }
-      } catch (error) {
-        throw new VError(error, `Failed to remove other profiles`)
-      }
-    },
     async create(info) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ page, expect, VError })
+        const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.ProfilesNewProfile, {
           stayVisible: true,
         })
@@ -60,35 +43,10 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to create profile`)
       }
     },
-    async remove(info) {
-      try {
-        await page.waitForIdle()
-        const quickPick = QuickPick.create({ page, expect, VError })
-        await quickPick.executeCommand(WellKnownCommands.ProfilesDeleteProfile, {
-          stayVisible: true,
-        })
-        const input = page.locator('[placeholder="Select Profiles to Delete"]')
-        await input.type(info.name)
-        const row = page.locator('.monaco-list-row[aria-label="test, Current"]')
-        const rowLabel = row.locator('.quick-input-list-label')
-        await rowLabel.click()
-        await expect(row).toHaveAttribute('aria-checked', 'true')
-        const okButton = page.locator('.monaco-button', {
-          hasText: 'OK',
-        })
-        await okButton.click()
-        const profileBadge = page.locator('.profile-badge', {
-          hasText: 'TE',
-        })
-        await expect(profileBadge).toHaveCount(0)
-      } catch (error) {
-        throw new VError(error, `Failed to remove profile`)
-      }
-    },
     async export({ name }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ page, expect, VError })
+        const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.ProfilesExport)
         const profileViewContainer = page.locator('.profile-view-tree-container')
         await expect(profileViewContainer).toBeVisible()
@@ -115,6 +73,48 @@ export const create = ({ page, expect, VError }) => {
         await fileOption.click()
       } catch (error) {
         throw new VError(error, `Failed to export profile`)
+      }
+    },
+    async remove(info) {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.ProfilesDeleteProfile, {
+          stayVisible: true,
+        })
+        const input = page.locator('[placeholder="Select Profiles to Delete"]')
+        await input.type(info.name)
+        const row = page.locator('.monaco-list-row[aria-label="test, Current"]')
+        const rowLabel = row.locator('.quick-input-list-label')
+        await rowLabel.click()
+        await expect(row).toHaveAttribute('aria-checked', 'true')
+        const okButton = page.locator('.monaco-button', {
+          hasText: 'OK',
+        })
+        await okButton.click()
+        const profileBadge = page.locator('.profile-badge', {
+          hasText: 'TE',
+        })
+        await expect(profileBadge).toHaveCount(0)
+      } catch (error) {
+        throw new VError(error, `Failed to remove profile`)
+      }
+    },
+    async removeOtherProfiles() {
+      try {
+        const profilesList = page.locator('.profiles-list')
+        const profileListIems = profilesList.locator(`.profile-list-item`)
+        const contextMenu = ContextMenu.create({ expect, page, VError })
+        const count = await profileListIems.count()
+        for (let i = 2; i < count; i++) {
+          const second = profileListIems.nth(1)
+          await contextMenu.open(second)
+          await contextMenu.shouldHaveItem('Delete')
+          await contextMenu.select('Delete')
+          await expect(profileListIems).toHaveCount(count - i + 1)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to remove other profiles`)
       }
     },
   }
