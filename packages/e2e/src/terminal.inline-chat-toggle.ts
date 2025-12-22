@@ -7,7 +7,6 @@ export const requiresNetwork = 1
 export const setup = async ({
   Editor,
   Electron,
-  ExtensionDetailView,
   Extensions,
   Panel,
   SettingsEditor,
@@ -18,14 +17,11 @@ export const setup = async ({
   await Electron.mockDialog({
     response: 1,
   })
-  await Editor.closeAll()
-  await Extensions.show()
-  await Extensions.search('github copilot chat')
-  await Extensions.first.shouldBe('GitHub Copilot Chat')
-  await Extensions.first.click()
-  await ExtensionDetailView.installExtension()
-  await SideBar.hide()
-  await Editor.closeAll()
+  // @ts-ignore
+  await Extensions.install({
+    id: 'github copilot chat',
+    name: 'GitHub Copilot Chat',
+  })
   await Editor.closeAll()
   await SideBar.hide()
   await Panel.hide()
