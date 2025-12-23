@@ -5,6 +5,7 @@
     { "path": "./packages/build" },
     { "path": "./packages/chart-worker" },
     { "path": "./packages/charts" },
+    { "path": "./packages/cryptography-worker" },
     { "path": "./packages/cli" },
     { "path": "./packages/compression-worker" },
     { "path": "./packages/cursor-e2e" },
