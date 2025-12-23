@@ -6,7 +6,13 @@ import { monkeyPatchElectronHeadlessMode } from '../MonkeyPatchElectronHeadlessM
 import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyPatchElectronScript.ts'
 import { VError } from '../VError/VError.ts'
 
-const waitForDebuggerToBePaused = async (rpc) => {
+interface RpcConnection {
+  once(event: string): Promise<{ params: { callFrames: Array<{ callFrameId: string }> } }>
+  dispose(): Promise<void>
+  invoke(method: string, params?: unknown): Promise<unknown>
+}
+
+const waitForDebuggerToBePaused = async (rpc: RpcConnection) => {
   try {
     const msg = await rpc.once(DevtoolsEventType.DebuggerPaused)
     return msg
@@ -15,7 +21,7 @@ const waitForDebuggerToBePaused = async (rpc) => {
   }
 }
 
-export const connectElectron = async (electronRpc, headlessMode) => {
+export const connectElectron = async (electronRpc: RpcConnection, headlessMode: boolean) => {
   const debuggerPausedPromise = waitForDebuggerToBePaused(electronRpc)
   await Promise.all([
     DevtoolsProtocolDebugger.enable(electronRpc),
