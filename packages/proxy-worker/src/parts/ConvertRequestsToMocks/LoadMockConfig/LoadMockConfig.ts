@@ -4,7 +4,7 @@ import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import type { MockConfigEntry } from '../../MockConfigEntry/MockConfigEntry.ts'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __dirname = import.meta.dirname
 const MOCK_CONFIG_PATH = join(__dirname, '..', '..', 'GetMockFileName', 'mock-config.json')
 
 export const loadMockConfig = async (): Promise<MockConfigEntry[]> => {
