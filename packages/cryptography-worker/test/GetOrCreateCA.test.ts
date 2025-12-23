@@ -1,9 +1,9 @@
 import { expect, test, jest, beforeEach, afterEach } from '@jest/globals'
 
-const mockExistsSync = jest.fn()
-const mockReadFile = jest.fn()
-const mockWriteFile = jest.fn()
-const mockMkdir = jest.fn()
+const mockExistsSync = jest.fn<(path: string) => boolean>()
+const mockReadFile = jest.fn<(path: string) => Promise<string>>()
+const mockWriteFile = jest.fn<(path: string, data: string, encoding: string) => Promise<void>>()
+const mockMkdir = jest.fn<(path: string, options?: { recursive?: boolean }) => Promise<void>>()
 
 jest.unstable_mockModule('node:fs', () => ({
   existsSync: mockExistsSync,
@@ -20,7 +20,7 @@ let GetOrCreateCAModule: typeof import('../src/parts/GetOrCreateCA/GetOrCreateCA
 beforeEach(async () => {
   jest.clearAllMocks()
   GetOrCreateCAModule = await import('../src/parts/GetOrCreateCA/GetOrCreateCA.ts')
-  mockMkdir.mockResolvedValue(undefined)
+  mockMkdir.mockResolvedValue(void 0)
 })
 
 afterEach(() => {
@@ -29,7 +29,7 @@ afterEach(() => {
 
 test('getOrCreateCA - creates CA when files do not exist', async () => {
   mockExistsSync.mockReturnValue(false)
-  mockWriteFile.mockResolvedValue(undefined)
+  mockWriteFile.mockResolvedValue(void 0)
 
   const ca = await GetOrCreateCAModule.getOrCreateCA()
 
@@ -67,7 +67,7 @@ test('getOrCreateCA - returns existing CA when files exist', async () => {
 
 test('getOrCreateCA - creates directory recursively', async () => {
   mockExistsSync.mockReturnValue(false)
-  mockWriteFile.mockResolvedValue(undefined)
+  mockWriteFile.mockResolvedValue(void 0)
 
   await GetOrCreateCAModule.getOrCreateCA()
 
@@ -94,19 +94,19 @@ test('getOrCreateCA - reads both CA files in parallel when they exist', async ()
   await GetOrCreateCAModule.getOrCreateCA()
 
   expect(mockReadFile).toHaveBeenCalledTimes(2)
-  const calls = mockReadFile.mock.calls
+  const calls = mockReadFile.mock.calls as Array<[string]>
   expect(calls.some((call) => call[0].includes('ca-cert.pem'))).toBe(true)
   expect(calls.some((call) => call[0].includes('ca-key.pem'))).toBe(true)
 })
 
 test('getOrCreateCA - writes both CA files in parallel when creating', async () => {
   mockExistsSync.mockReturnValue(false)
-  mockWriteFile.mockResolvedValue(undefined)
+  mockWriteFile.mockResolvedValue(void 0)
 
   await GetOrCreateCAModule.getOrCreateCA()
 
   expect(mockWriteFile).toHaveBeenCalledTimes(2)
-  const calls = mockWriteFile.mock.calls
+  const calls = mockWriteFile.mock.calls as Array<[string, string, string]>
   expect(calls.some((call) => call[0].includes('ca-cert.pem'))).toBe(true)
   expect(calls.some((call) => call[0].includes('ca-key.pem'))).toBe(true)
 })
@@ -125,14 +125,14 @@ test('getOrCreateCA - checks for both key and cert files', async () => {
 
   await GetOrCreateCAModule.getOrCreateCA()
 
-  const calls = mockExistsSync.mock.calls
+  const calls = mockExistsSync.mock.calls as unknown as Array<[string]>
   expect(calls.some((call) => call[0].includes('ca-cert.pem'))).toBe(true)
   expect(calls.some((call) => call[0].includes('ca-key.pem'))).toBe(true)
 })
 
 test('getOrCreateCA - returns valid certificate pair when creating new CA', async () => {
   mockExistsSync.mockReturnValue(false)
-  mockWriteFile.mockResolvedValue(undefined)
+  mockWriteFile.mockResolvedValue(void 0)
 
   const ca = await GetOrCreateCAModule.getOrCreateCA()
 

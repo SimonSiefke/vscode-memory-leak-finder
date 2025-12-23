@@ -1,7 +1,7 @@
 import { expect, test, jest, beforeEach, afterEach } from '@jest/globals'
 import forge from 'node-forge'
 
-const mockExistsSync = jest.fn<() => boolean>()
+const mockExistsSync = jest.fn<(path: string) => boolean>()
 const mockReadFile = jest.fn<(path: string) => Promise<string>>()
 const mockWriteFile = jest.fn<(path: string, data: string, encoding: string) => Promise<void>>()
 const mockUnlink = jest.fn<(path: string) => Promise<void>>()
@@ -225,7 +225,7 @@ test('getCertificateForDomain - checks for both cert and key files', async () =>
 
   await GetCertificateForDomainModule.getCertificateForDomain('example.com')
 
-  const calls = mockExistsSync.mock.calls as Array<[string]>
+  const calls = mockExistsSync.mock.calls as unknown as Array<[string]>
   const domainCertCalls = calls.filter((call) => call[0].includes('example_com'))
   expect(domainCertCalls.length).toBeGreaterThanOrEqual(2)
   expect(domainCertCalls.some((call) => call[0].includes('cert.pem'))).toBe(true)
