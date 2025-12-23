@@ -251,14 +251,18 @@ export const create = ({ electronApp, expect, page, VError }) => {
         throw new VError(error, `Failed to open context menu for "${dirent}"`)
       }
     },
-    async paste({ waitForItem }) {
+    async paste({ waitForItem = '' } = {}) {
       try {
         const explorer = page.locator('.explorer-folders-view .monaco-list')
+        await page.waitForIdle()
+        await page.keyboard.press('Control+V')
+        await page.waitForIdle()
+        if (!waitForItem) {
+          return
+        }
         const dirent = explorer.locator('.monaco-list-row', {
           hasText: waitForItem,
         })
-        await page.waitForIdle()
-        await page.keyboard.press('Control+V')
         for (let i = 0; i < 5; i++) {
           await page.waitForIdle()
           const count = await dirent.count()
