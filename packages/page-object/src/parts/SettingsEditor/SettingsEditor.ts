@@ -1,6 +1,6 @@
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
-import * as Settings from '../Settings/Settings.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, page, VError }: { expect: any; page: any; VError: any }) => {
   return {
@@ -71,10 +71,18 @@ export const create = ({ expect, page, VError }: { expect: any; page: any; VErro
         throw new VError(error, `Failed to clear search input`)
       }
     },
-    closeSettingsContextMenu(name: string) {
+    async closeSettingsContextMenu(name) {
       try {
+        await page.waitForIdle()
+        const outerItem = page.locator(`.settings-editor-tree .monaco-list-row[aria-label^="${name}"]`)
+        await expect(outerItem).toBeVisible()
+        const contextMenu = outerItem.locator('.setting-toolbar-container .shadow-root-host:enter-shadow() .context-view')
+        await expect(contextMenu).toBeVisible()
+        await page.keyboard.press('Escape')
+        await expect(contextMenu).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to close settings conext menu for "${name}"`)
+        throw new VError(error, `Failed to close settings context menu for "${name}"`)
       }
     },
     async collapse(groupName: string) {
@@ -217,8 +225,23 @@ export const create = ({ expect, page, VError }: { expect: any; page: any; VErro
       }
     },
     async open() {
-      const settings = Settings.create({ expect, page, VError })
-      await settings.open()
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.PreferencesOpenSettingsUi)
+        await page.waitForIdle()
+        const settingsSwitcher = page.locator('[aria-label="Settings Switcher"]')
+        await expect(settingsSwitcher).toBeVisible()
+        await page.waitForIdle()
+        const body = page.locator('.settings-body')
+        await expect(body).toBeVisible()
+        await page.waitForIdle()
+        const rightControls = page.locator('.settings-right-controls')
+        await expect(rightControls).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open settings ui`)
+      }
     },
     async openSettingsContextMenu(name: string, { waitForItem }: { waitForItem: string }) {
       try {

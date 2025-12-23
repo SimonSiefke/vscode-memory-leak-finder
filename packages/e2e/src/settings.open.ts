@@ -4,7 +4,7 @@ export const setup = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.closeAll()
 }
 
-export const run = async ({ Editor, Settings }: TestContext): Promise<void> => {
-  await Settings.open()
+export const run = async ({ Editor, SettingsEditor }: TestContext): Promise<void> => {
+  await SettingsEditor.open()
   await Editor.closeAll()
 }
