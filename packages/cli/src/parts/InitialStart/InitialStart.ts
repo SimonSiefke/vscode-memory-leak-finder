@@ -38,6 +38,7 @@ export const initialStart = async (options): Promise<void> => {
     recordVideo: options.recordVideo,
     restartBetween: options.restartBetween,
     runMode: options.runMode,
+    screencastQuality: options.screencastQuality,
     runs: options.runs,
     runSkippedTestsAnyway: options.runSkippedTestsAnyway,
     setupOnly: options.setupOnly,
