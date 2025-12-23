@@ -62,6 +62,7 @@ export const updateState = async (newState: any): Promise<void> => {
       vscodePath: '',
       vscodeVersion: VsCodeVersion.vscodeVersion,
       workers: state.workers,
+      screencastQuality: state.screencastQuality,
     })
   }
   if (newState.mode === ModeType.Interrupted) {
