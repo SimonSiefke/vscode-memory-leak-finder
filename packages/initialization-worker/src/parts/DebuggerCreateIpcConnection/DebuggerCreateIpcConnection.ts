@@ -13,7 +13,7 @@ export const createConnection = async (wsUrl: string) => {
       get onmessage() {
         return webSocket.onmessage
       },
-      set onmessage(listener: ((message: unknown) => void) | null) {
+      set onmessage(listener: ((this: WebSocket, ev: MessageEvent) => void) | null) {
         const handleMessage = (event: MessageEvent) => {
           const parsed = JSON.parse(event.data)
           // @ts-ignore

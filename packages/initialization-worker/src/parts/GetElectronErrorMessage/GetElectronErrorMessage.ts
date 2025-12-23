@@ -28,11 +28,11 @@ const isStackLine = (line: string): boolean => {
   return line.startsWith('    at ')
 }
 
-interface ReadableStream extends NodeJS.ReadableStream {
-  on(event: 'data', listener: (data: string) => void): this
+interface ReadableStreamLike {
+  on(event: 'data', listener: (data: string) => void): unknown
 }
 
-export const getElectronErrorMessage = async (firstData: string, stream?: ReadableStream): Promise<Error> => {
+export const getElectronErrorMessage = async (firstData: string, stream?: ReadableStreamLike): Promise<Error> => {
   if (firstData.includes('Error launching app')) {
     const normalData = stripAnsi(firstData)
     const lines = normalData.split('\n')
@@ -54,7 +54,7 @@ export const getElectronErrorMessage = async (firstData: string, stream?: Readab
       const messageLine = lines[0]
       error.message = `App threw an error during load: ${messageLine}`
       const mergedStack = MergeStacks.mergeStacks(error.stack, lines.slice(stackLineIndex).join('\n'))
-      error.stack = mergedStack
+      error.stack = mergedStack ?? undefined
       return error
     }
     if (RE_PATH.test(lines[0])) {

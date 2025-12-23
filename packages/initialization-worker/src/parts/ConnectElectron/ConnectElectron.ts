@@ -9,6 +9,7 @@ import { VError } from '../VError/VError.ts'
 interface RpcConnection {
   once(event: string): Promise<{ params: { callFrames: Array<{ callFrameId: string }> } }>
   dispose(): Promise<void>
+  invoke(method: string, params?: unknown): Promise<unknown>
 }
 
 const waitForDebuggerToBePaused = async (rpc: RpcConnection) => {
