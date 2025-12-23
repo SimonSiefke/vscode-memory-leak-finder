@@ -32,6 +32,7 @@ export interface PrepareTestsAndAttachOptions {
   readonly pageObjectPath: string
   readonly recordVideo: boolean
   readonly runMode: number
+  readonly screencastQuality: number
   readonly timeouts: any
   readonly useProxyMock: boolean
   readonly vscodePath: string
@@ -62,6 +63,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     pageObjectPath,
     recordVideo,
     runMode,
+    screencastQuality,
     timeouts,
     useProxyMock,
     vscodePath,
@@ -103,6 +105,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
 
   const { memoryRpc, testWorkerRpc, videoRpc } = await connectWorkers(
     recordVideo,
+    screencastQuality,
     connectionId,
     devtoolsWebSocketUrl,
     webSocketUrl,
