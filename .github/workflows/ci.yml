@@ -131,6 +131,8 @@ jobs:
             args: --measure mutation-observer-count
           - name: resize-observer-count
             args: --measure resize-observer-count
+          - name: intersection-observer-count
+            args: --measure intersection-observer-count
           - name: weak-map-count
             args: --measure weak-map-count
           - name: number-count
@@ -322,6 +324,11 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-resize-observer-count
           path: ./vscode-memory-leak-finder-results-linux-resize-observer-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-intersection-observer-count
+          path: ./vscode-memory-leak-finder-results-linux-intersection-observer-count
       - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
