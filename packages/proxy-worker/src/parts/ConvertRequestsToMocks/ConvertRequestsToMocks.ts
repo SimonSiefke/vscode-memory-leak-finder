@@ -10,7 +10,7 @@ import * as Root from '../Root/Root.ts'
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __dirname = import.meta.dirname
 const MOCK_CONFIG_PATH = join(__dirname, '..', 'GetMockFileName', 'mock-config.json')
 
 interface RecordedRequest {

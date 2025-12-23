@@ -1,6 +1,5 @@
-import path, { dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import path from 'node:path'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __dirname = import.meta.dirname
 
 export const root = path.join(__dirname, '../../../../../')
