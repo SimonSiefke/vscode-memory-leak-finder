@@ -9,11 +9,15 @@ export const create = ({ expect, page, VError }) => {
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.PreferencesOpenSettingsUi)
         await page.waitForIdle()
-        // TODO
-        // const heading=page.locator('settings-group-title-label', {
-        //   hasText:'Commonly Used'
-        // })
-        // await expect(heading).toBeVisible()
+        const settingsSwitcher = page.locator('[aria-label="Settings Switcher"]')
+        await expect(settingsSwitcher).toBeVisible()
+        await page.waitForIdle()
+        const body = page.locator('.settings-body')
+        await expect(body).toBeVisible()
+        await page.waitForIdle()
+        const rightControls = page.locator('.settings-right-controls')
+        await expect(rightControls).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open settings ui`)
       }
