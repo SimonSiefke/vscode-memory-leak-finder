@@ -157,6 +157,8 @@ jobs:
             args: --measure webgl2-rendering-context-count
           - name: iframe-count
             args: --measure iframe-count
+          - name: media-query-list-count
+            args: --measure media-query-list-count
           - name: message-port-count
             args: --measure message-port-count
           - name: symbol-count
@@ -391,6 +393,11 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-iframe-count
           path: ./vscode-memory-leak-finder-results-linux-iframe-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-media-query-list-count
+          path: ./vscode-memory-leak-finder-results-linux-media-query-list-count
       - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
