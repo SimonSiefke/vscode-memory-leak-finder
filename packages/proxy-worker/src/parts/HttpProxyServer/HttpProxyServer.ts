@@ -1,6 +1,4 @@
 import type { IncomingMessage, ServerResponse } from 'http';
-import { mkdir } from 'fs/promises'
-import type { IncomingMessage, ServerResponse } from 'http'
 import { mkdir, writeFile } from 'fs/promises'
 import { createServer } from 'http'
 import { request as httpRequest } from 'http'
@@ -17,18 +15,6 @@ import * as SaveRequest from '../SaveRequest/SaveRequest.ts'
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
 
-    const requestData = {
-      headers: req.headers,
-      method: req.method,
-      response: {
-        body: responseData.toString('utf8'),
-        headers: response.getHeaders(),
-        statusCode: response.statusCode,
-        statusMessage: response.statusMessage,
-      },
-      timestamp,
-      url: req.url,
-    }
 
 export const parseJsonIfApplicable = (body: string, contentType: string | string[] | undefined): string | object => {
   if (!contentType) {
@@ -51,14 +37,7 @@ export const parseJsonIfApplicable = (body: string, contentType: string | string
   return body
 }
 
-const forwardRequest = async (req: IncomingMessage, res: ServerResponse, targetUrl: string, useProxyMock: boolean): Promise<void> => {
-  // Check for mock response first (only if useProxyMock is enabled)
-  if (useProxyMock) {
-    const mockResponse = await GetMockResponse.getMockResponse(req.method || 'GET', targetUrl)
-    if (mockResponse) {
-      console.log(`[Proxy] Returning mock response for ${req.method} ${targetUrl}`)
-      GetMockResponse.sendMockResponse(res, mockResponse)
-      return // Don't record mock requests
+
 const saveConnectTunnel = async (hostname: string, port: number): Promise<void> => {
   try {
     await mkdir(REQUESTS_DIR, { recursive: true })
@@ -143,11 +122,8 @@ const saveConnectTunnel = async (hostname: string, port: number): Promise<void> 
     headers: {
       ...req.headers,
       host: parsedUrl.host,
-<<<<<<< HEAD
     },
-=======
     } as Record<string, string | string[] | undefined>,
->>>>>>> origin/main
     hostname: parsedUrl.hostname,
     method: req.method,
     path: parsedUrl.pathname + parsedUrl.search,
@@ -257,7 +233,6 @@ const saveConnectTunnel = async (hostname: string, port: number): Promise<void> 
       }
     })
 
-<<<<<<< HEAD
     // Buffer the entire response first
     proxyRes.on('data', (chunk: Buffer) => {
       responseChunks.push(chunk)
@@ -273,14 +248,12 @@ const saveConnectTunnel = async (hostname: string, port: number): Promise<void> 
       if (!saved) {
         await saveAndWriteResponse()
       }
-=======
     proxyRes.on('end', () => {
       res.end()
       const responseData = Buffer.concat(chunks)
       saveRequest(req, res, responseData).catch((error) => {
         console.error('[Proxy] Error saving request:', error)
       })
->>>>>>> origin/main
     })
   })
 
@@ -383,8 +356,6 @@ const saveConnectTunnel = async (hostname: string, port: number): Promise<void> 
   })
 }
 
-<<<<<<< HEAD
-=======
 const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): Promise<void> => {
   // Handle HTTPS CONNECT requests for tunneling
   const target = req.url || ''
@@ -435,7 +406,6 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
   // Note: We can't easily capture HTTPS traffic through CONNECT,
   // but HTTP requests will be captured
 }
->>>>>>> origin/main
 
 export const createHttpProxyServer = async (
   options: {
