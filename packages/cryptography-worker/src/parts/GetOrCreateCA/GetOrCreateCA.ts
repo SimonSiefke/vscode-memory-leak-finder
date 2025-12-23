@@ -1,5 +1,5 @@
-import { existsSync } from 'fs'
-import { readFile, writeFile, mkdir } from 'fs/promises'
+import { existsSync } from 'node:fs'
+import { readFile, writeFile, mkdir } from 'node:fs/promises'
 import type { CertificatePair } from '../CertificatePair/CertificatePair.ts'
 import { CA_KEY_PATH, CA_CERT_PATH, CERT_DIR } from '../Constants/Constants.ts'
 import * as GenerateCA from '../GenerateCA/GenerateCA.ts'
