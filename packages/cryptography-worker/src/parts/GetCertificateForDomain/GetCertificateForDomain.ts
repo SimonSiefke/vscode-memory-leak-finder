@@ -1,6 +1,5 @@
 import { existsSync } from 'fs'
-import { readFile, writeFile, unlink } from 'fs/promises'
-import { readFile, writeFile } from 'fs/promises'
+import { readFile, unlink, writeFile } from 'fs/promises'
 import { join } from 'path'
 import type { CertificatePair } from '../CertificatePair/CertificatePair.ts'
 import { CERT_DIR } from '../Constants/Constants.ts'
