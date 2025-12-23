@@ -3,7 +3,12 @@ import * as Assert from '../Assert/Assert.ts'
 import * as VideoRecordingWorker from '../LaunchVideoRecordingWorker/LaunchVideoRecordingWorker.ts'
 import * as Root from '../Root/Root.ts'
 
-export const start = async (devtoolsWebsocketUrl: string, attachedToPageTimeout: number, idleTimeout: number, screencastQuality: number) => {
+export const start = async (
+  devtoolsWebsocketUrl: string,
+  attachedToPageTimeout: number,
+  idleTimeout: number,
+  screencastQuality: number,
+) => {
   Assert.string(devtoolsWebsocketUrl)
   const rpc = await VideoRecordingWorker.start()
   await rpc.invoke('ConnectDevtools.connectDevtools', devtoolsWebsocketUrl, attachedToPageTimeout, idleTimeout, screencastQuality)

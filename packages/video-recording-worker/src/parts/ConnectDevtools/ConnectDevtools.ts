@@ -3,7 +3,12 @@ import { connectScreenRecording } from '../ConnectScreenRecording/ConnectScreenR
 import * as DebuggerCreateIpcConnection from '../DebuggerCreateIpcConnection/DebuggerCreateIpcConnection.ts'
 import { waitForSession } from '../WaitForSession/WaitForSession.ts'
 
-export const connectDevtools = async (devtoolsWebSocketUrl: string, attachedToPageTimeout: number, idleTimeout: number, screencastQuality: number): Promise<void> => {
+export const connectDevtools = async (
+  devtoolsWebSocketUrl: string,
+  attachedToPageTimeout: number,
+  idleTimeout: number,
+  screencastQuality: number,
+): Promise<void> => {
   Assert.string(devtoolsWebSocketUrl)
   const browserRpc = await DebuggerCreateIpcConnection.createConnection(devtoolsWebSocketUrl)
   const { sessionRpc } = await waitForSession(browserRpc, attachedToPageTimeout)
