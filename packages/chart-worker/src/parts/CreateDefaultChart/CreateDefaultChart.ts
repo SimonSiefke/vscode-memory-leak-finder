@@ -1,7 +1,7 @@
 import { fixHtmlNamespace } from '../FixXmlNamespace/FixXmlNamespace.ts'
 import * as Plot from '../Plot/Plot.ts'
 
-export const createDefaultChart = (data, { x, xLabel, y, yLabel }) => {
+export const createDefaultChart = (data: any[], { x, xLabel, y, yLabel }: { x: string | number; xLabel: string; y: string | number; yLabel: string }) => {
   const baseHtml = Plot.plot({
     marginLeft: 60,
     marks: [Plot.lineY(data, { stroke: 'black', x, y })],
