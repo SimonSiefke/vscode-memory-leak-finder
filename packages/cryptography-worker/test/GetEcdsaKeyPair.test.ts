@@ -73,7 +73,6 @@ test('getEcdsaKeyPair - public key can be used to create crypto key object', () 
 test('getEcdsaKeyPair - public key matches private key', () => {
   const keyPair = getEcdsaKeyPair('ES256')
   const privateKey = createPrivateKey(keyPair.privateKey)
-  const publicKey = createPublicKey(keyPair.publicKey)
   const exportedPublicKey = privateKey.export({ format: 'pem', type: 'spki' })
   expect(exportedPublicKey.toString()).toBe(keyPair.publicKey)
 })

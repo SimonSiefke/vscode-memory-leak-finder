@@ -1,5 +1,4 @@
 import { expect, test } from '@jest/globals'
-import forge from 'node-forge'
 import { validateCertificateKeyPair } from '../src/parts/ValidateCertificateKeyPair/ValidateCertificateKeyPair.ts'
 import { generateCA } from '../src/parts/GenerateCA/GenerateCA.ts'
 import { generateCertificateForDomain } from '../src/parts/GenerateCertificateForDomain/GenerateCertificateForDomain.ts'

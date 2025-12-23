@@ -1,11 +1,11 @@
 import { expect, test, jest, beforeEach, afterEach } from '@jest/globals'
 import forge from 'node-forge'
 
-const mockExistsSync = jest.fn()
-const mockReadFile = jest.fn()
-const mockWriteFile = jest.fn()
-const mockUnlink = jest.fn()
-const mockMkdir = jest.fn()
+const mockExistsSync = jest.fn<() => boolean>()
+const mockReadFile = jest.fn<(path: string) => Promise<string>>()
+const mockWriteFile = jest.fn<(path: string, data: string, encoding: string) => Promise<void>>()
+const mockUnlink = jest.fn<(path: string) => Promise<void>>()
+const mockMkdir = jest.fn<(path: string, options?: { recursive?: boolean }) => Promise<void>>()
 
 jest.unstable_mockModule('node:fs', () => ({
   existsSync: mockExistsSync,
@@ -25,9 +25,9 @@ let GenerateCertificateForDomainModule: typeof import('../src/parts/GenerateCert
 
 beforeEach(async () => {
   jest.clearAllMocks()
-  mockMkdir.mockResolvedValue(undefined)
-  mockUnlink.mockResolvedValue(undefined)
-  mockWriteFile.mockResolvedValue(undefined)
+  mockMkdir.mockResolvedValue(void 0)
+  mockUnlink.mockResolvedValue(void 0)
+  mockWriteFile.mockResolvedValue(void 0)
   GetCertificateForDomainModule = await import('../src/parts/GetCertificateForDomain/GetCertificateForDomain.ts')
   GetOrCreateCAModule = await import('../src/parts/GetOrCreateCA/GetOrCreateCA.ts')
   ValidateCertificateKeyPairModule = await import('../src/parts/ValidateCertificateKeyPair/ValidateCertificateKeyPair.ts')
@@ -119,7 +119,7 @@ test('getCertificateForDomain - sanitizes domain name in file paths', async () =
 
   await GetCertificateForDomainModule.getCertificateForDomain('example.com')
 
-  const writeCalls = mockWriteFile.mock.calls
+  const writeCalls = mockWriteFile.mock.calls as Array<[string, string, string]>
   expect(writeCalls.some((call) => call[0].includes('example_com'))).toBe(true)
 })
 
@@ -128,7 +128,7 @@ test('getCertificateForDomain - sanitizes special characters in domain', async (
 
   await GetCertificateForDomainModule.getCertificateForDomain('test.example.com')
 
-  const writeCalls = mockWriteFile.mock.calls
+  const writeCalls = mockWriteFile.mock.calls as Array<[string, string, string]>
   expect(writeCalls.some((call) => call[0].includes('test_example_com'))).toBe(true)
 })
 
@@ -137,7 +137,7 @@ test('getCertificateForDomain - handles domain with hyphens', async () => {
 
   await GetCertificateForDomainModule.getCertificateForDomain('test-example.com')
 
-  const writeCalls = mockWriteFile.mock.calls
+  const writeCalls = mockWriteFile.mock.calls as Array<[string, string, string]>
   expect(writeCalls.some((call) => call[0].includes('test_example_com'))).toBe(true)
 })
 
@@ -207,7 +207,7 @@ test('getCertificateForDomain - deletes mismatched files even if unlink fails', 
     }
     return Promise.reject(new Error('Unexpected path'))
   })
-  mockUnlink.mockRejectedValue(new Error('File not found'))
+  mockUnlink.mockRejectedValue(new Error('File not found') as never)
 
   const result = await GetCertificateForDomainModule.getCertificateForDomain('example.com')
 
@@ -225,7 +225,7 @@ test('getCertificateForDomain - checks for both cert and key files', async () =>
 
   await GetCertificateForDomainModule.getCertificateForDomain('example.com')
 
-  const calls = mockExistsSync.mock.calls
+  const calls = mockExistsSync.mock.calls as Array<[string]>
   const domainCertCalls = calls.filter((call) => call[0].includes('example_com'))
   expect(domainCertCalls.length).toBeGreaterThanOrEqual(2)
   expect(domainCertCalls.some((call) => call[0].includes('cert.pem'))).toBe(true)
