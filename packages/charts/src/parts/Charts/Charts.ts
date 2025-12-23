@@ -16,6 +16,7 @@ export * as IframeCount from '../CreateIframeCountChart/CreateIframeCountChart.t
 export * as ImageBitmapCount from '../CreateImageBitmapCountChart/CreateImageBitmapCountChart.ts'
 export * as IntersectionObserverCount from '../CreateIntersectionObserverCountChart/CreateIntersectionObserverCountChart.ts'
 export * as MapSize from '../CreateMapSizeChart/CreateMapSizeChart.ts'
+export * as MediaQueryListCount from '../CreateMediaQueryListCountChart/CreateMediaQueryListCountChart.ts'
 export * as MessagePortCount from '../CreateMessagePortCountChart/CreateMessagePortCountChart.ts'
 export * as MutationObserverCount from '../CreateMutationObserverCountChart/CreateMutationObserverCountChart.ts'
 export * as NamedFunctionCount3 from '../CreateNamedFunctionCountChart3/CreateNamedFunctionCountChart3.ts'
