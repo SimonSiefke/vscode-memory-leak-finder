@@ -54,7 +54,7 @@ export const getElectronErrorMessage = async (firstData: string, stream?: Readab
       const messageLine = lines[0]
       error.message = `App threw an error during load: ${messageLine}`
       const mergedStack = MergeStacks.mergeStacks(error.stack, lines.slice(stackLineIndex).join('\n'))
-      error.stack = mergedStack ?? undefined
+      error.stack = mergedStack ?? undefined ?? undefined
       return error
     }
     if (RE_PATH.test(lines[0])) {
@@ -62,9 +62,9 @@ export const getElectronErrorMessage = async (firstData: string, stream?: Readab
       const messageLine = lines[stackLineIndex - 1]
       const codeFrameLines = lines.slice(1, stackLineIndex - 1)
       error.message = `App threw an error during load: ${messageLine}`
-      ;(error as Error & { codeFrame?: string }).codeFrame = `${codeFrameLines.join('\n')}`.trim()
+      ;(error as Error & { codeFrame?: string | undefined }).codeFrame = `${codeFrameLines.join('\n')}`.trim()
       const mergedStack = MergeStacks.mergeStacks(error.stack, `    at ${lines[0]}\n${lines.slice(stackLineIndex).join('\n')}`)
-      error.stack = mergedStack
+      error.stack = mergedStack ?? undefined
       return error
     }
     return new Error(`${firstData}${secondData}`)

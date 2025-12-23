@@ -6,10 +6,6 @@ const script = `function () {
 }
 `
 
-interface ElectronRpc {
-  invoke(method: string, params?: unknown): Promise<unknown>
-}
-
 export const makeElectronAvailableGlobally = async (electronRpc: { invoke(method: string, params?: unknown): Promise<unknown> }, electronObjectId: string): Promise<void> => {
   await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
     functionDeclaration: script,
