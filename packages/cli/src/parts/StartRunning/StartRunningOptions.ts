@@ -25,6 +25,7 @@ export interface StartRunningOptions {
   recordVideo: boolean
   restartBetween: boolean
   runMode: number
+  screencastQuality: number
   runs: number
   runSkippedTestsAnyway: boolean
   setupOnly: boolean
