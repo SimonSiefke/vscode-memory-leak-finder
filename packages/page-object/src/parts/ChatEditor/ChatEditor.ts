@@ -99,7 +99,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to open finish setup`)
       }
     },
-    async sendMessage(message: string, { verify = false } = {}) {
+    async sendMessage({ expectedResponse, message, verify = false }) {
       try {
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
@@ -138,6 +138,8 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await sendButton.click()
         await page.waitForIdle()
         await expect(lines).toHaveText('')
+        await page.waitForIdle()
+
         if (verify) {
           const row = chatView.locator(`.monaco-list-row[aria-label="${message}"]`)
           await expect(row).toBeVisible()
@@ -151,11 +153,35 @@ export const create = ({ expect, ideVersion, page, VError }) => {
           await expect(response).toBeVisible({ timeout: 30_000 })
           await page.waitForIdle()
         }
+
+        if (expectedResponse) {
+          const requestMessage = chatView.locator(`.monaco-list-row.request[aria-label="${message}"]`)
+          await expect(requestMessage).toBeVisible()
+          await page.waitForIdle()
+          await sendButton.click()
+          await page.waitForIdle()
+          await expect(lines).toHaveText('')
+          const row = chatView.locator(`.monaco-list-row[aria-label="${message}"]`)
+          await expect(row).toBeVisible()
+          await page.waitForIdle()
+          const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
+          await expect(response).toBeVisible({ timeout: 60_000 })
+          await page.waitForIdle()
+          const progress = chatView.locator('.rendered-markdown.progress-step')
+          await expect(progress).toBeHidden({ timout: 45_000 })
+          await page.waitForIdle()
+          await expect(response).toBeVisible({ timeout: 30_000 })
+          await page.waitForIdle()
+          const responseMessage = chatView.locator('.monaco-list-row[data-index="1"]')
+          await expect(responseMessage).toBeVisible()
+          await page.waitForIdle()
+          await expect(responseMessage).toHaveAttribute('aria-label', new RegExp(`^${expectedResponse}`), { timeout: 120_000 })
+        }
       } catch (error) {
         throw new VError(error, `Failed to send chat message`)
       }
     },
-    async setMode(modeLabel) {
+    async setMode(modeLabel: string) {
       try {
         const chatView = page.locator('.interactive-session')
         const setModeButton = chatView.locator('[aria-label^="Set Mode"]')
