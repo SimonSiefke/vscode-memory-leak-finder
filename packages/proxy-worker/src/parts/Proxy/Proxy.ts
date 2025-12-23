@@ -33,8 +33,6 @@ export const disposeProxyServer = async (): Promise<void> => {
   }
 }
 
-
-
 export const getCACertPath = (): string => {
   return getCACertPathImpl()
 }
@@ -66,4 +64,4 @@ export const setupProxy = async (
   return proxyServer
 }
 
-export {getProxyEnvVars} from '../GetProxyEnvVars/GetProxyEnvVars.ts'
+export { getProxyEnvVars } from '../GetProxyEnvVars/GetProxyEnvVars.ts'
