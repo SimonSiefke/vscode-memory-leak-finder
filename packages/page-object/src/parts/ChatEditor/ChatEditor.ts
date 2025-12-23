@@ -142,6 +142,22 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         const requestMessage = chatView.locator(`.monaco-list-row.request[aria-label="${message}"]`)
         await expect(requestMessage).toBeVisible()
         await page.waitForIdle()
+        await sendButton.click()
+        await page.waitForIdle()
+        await expect(lines).toHaveText('')
+        if (verify) {
+          const row = chatView.locator(`.monaco-list-row[aria-label="${message}"]`)
+          await expect(row).toBeVisible()
+          await page.waitForIdle()
+          const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
+          await expect(response).toBeVisible({ timeout: 60_000 })
+          await page.waitForIdle()
+          const progress = chatView.locator('.rendered-markdown.progress-step')
+          await expect(progress).toBeHidden({ timout: 45_000 })
+          await page.waitForIdle()
+          await expect(response).toBeVisible({ timeout: 30_000 })
+          await page.waitForIdle()
+        }
 
         if (expectedResponse) {
           const row = chatView.locator(`.monaco-list-row[aria-label="${message}"]`)
