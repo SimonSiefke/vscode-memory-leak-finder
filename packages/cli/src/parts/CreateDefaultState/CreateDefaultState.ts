@@ -42,4 +42,5 @@ export const createDefaultState = (): StdinDataState => ({
   value: '',
   watch: false,
   workers: false,
+  screencastQuality: 90,
 })
