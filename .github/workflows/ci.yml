@@ -165,6 +165,8 @@ jobs:
             args: --measure object-count
           - name: disposable-count
             args: --measure disposable-count
+          - name: worker-count
+            args: --measure worker-count
     timeout-minutes: 180
     steps:
       - uses: actions/checkout@v6
@@ -409,6 +411,11 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-disposable-count
           path: ./vscode-memory-leak-finder-results-linux-disposable-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-worker-count
+          path: ./vscode-memory-leak-finder-results-linux-worker-count
       - name: Merge all measure results
         run: node packages/build/src/mergeArtifacts.ts
       - name: Generate charts
