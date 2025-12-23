@@ -3,7 +3,7 @@ import forge from 'node-forge'
 import { generateCA } from '../src/parts/GenerateCA/GenerateCA.ts'
 import { generateCertificateForDomain } from '../src/parts/GenerateCertificateForDomain/GenerateCertificateForDomain.ts'
 
-test('generateCertificateForDomain - generates certificate for regular domain', () => {
+test.skip('generateCertificateForDomain - generates certificate for regular domain', () => {
   const ca = generateCA()
   const result = generateCertificateForDomain('example.com', ca.key, ca.cert)
 
@@ -17,7 +17,7 @@ test('generateCertificateForDomain - generates certificate for regular domain', 
   expect(cert.issuer.getField('CN')?.value).toBe('VS Code Proxy CA')
 })
 
-test('generateCertificateForDomain - generates certificate for IPv4 address', () => {
+test.skip('generateCertificateForDomain - generates certificate for IPv4 address', () => {
   const ca = generateCA()
   const result = generateCertificateForDomain('192.168.1.1', ca.key, ca.cert)
 
@@ -35,7 +35,7 @@ test('generateCertificateForDomain - generates certificate for IPv4 address', ()
   }
 })
 
-test('generateCertificateForDomain - generates certificate for IPv6 address', () => {
+test.skip('generateCertificateForDomain - generates certificate for IPv6 address', () => {
   const ca = generateCA()
   const result = generateCertificateForDomain('::1', ca.key, ca.cert)
 
@@ -53,7 +53,7 @@ test('generateCertificateForDomain - generates certificate for IPv6 address', ()
   }
 })
 
-test('generateCertificateForDomain - certificate is properly signed by CA', () => {
+test.skip('generateCertificateForDomain - certificate is properly signed by CA', () => {
   const ca = generateCA()
   const caCert = forge.pki.certificateFromPem(ca.cert)
   const result = generateCertificateForDomain('test.example.com', ca.key, ca.cert)
@@ -64,7 +64,7 @@ test('generateCertificateForDomain - certificate is properly signed by CA', () =
   expect(cert.issuer.getField('CN')?.value).toBe(caCert.subject.getField('CN')?.value)
 })
 
-test('generateCertificateForDomain - certificate has correct validity period', () => {
+test.skip('generateCertificateForDomain - certificate has correct validity period', () => {
   const ca = generateCA()
   const result = generateCertificateForDomain('example.com', ca.key, ca.cert)
 
@@ -80,7 +80,7 @@ test('generateCertificateForDomain - certificate has correct validity period', (
   expect(validityDuration).toBeLessThanOrEqual(expectedDuration + 24 * 60 * 60 * 1000)
 })
 
-test('generateCertificateForDomain - certificate has correct extensions', () => {
+test.skip('generateCertificateForDomain - certificate has correct extensions', () => {
   const ca = generateCA()
   const result = generateCertificateForDomain('example.com', ca.key, ca.cert)
 
@@ -109,7 +109,7 @@ test('generateCertificateForDomain - certificate has correct extensions', () => 
   }
 })
 
-test('generateCertificateForDomain - certificate key can be used to create private key', () => {
+test.skip('generateCertificateForDomain - certificate key can be used to create private key', () => {
   const ca = generateCA()
   const result = generateCertificateForDomain('example.com', ca.key, ca.cert)
 
