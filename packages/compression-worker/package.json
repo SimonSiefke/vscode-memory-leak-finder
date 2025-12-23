@@ -19,6 +19,11 @@
     "@lvce-editor/verror": "^1.7.0",
     "@lvce-editor/assert": "^1.5.1",
     "@mongodb-js/zstd": "^7.0.0",
-    "extract-zip": "^2.0.1"
+    "execa": "^9.6.1",
+    "extract-zip": "^2.0.1",
+    "http-proxy-agent": "^7.0.2",
+    "jsonwebtoken": "^9.0.2",
+    "node-fetch": "^3.3.2",
+    "node-forge": "^1.3.3"
   }
 }
