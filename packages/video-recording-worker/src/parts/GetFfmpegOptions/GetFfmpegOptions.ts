@@ -1,6 +1,5 @@
 import * as Assert from '../Assert/Assert.ts'
 
-// TODO add test
 export const getFfmpegOptions = (fps: number, width: number, height: number, outFile: string): readonly string[] => {
   Assert.number(fps)
   Assert.number(width)
