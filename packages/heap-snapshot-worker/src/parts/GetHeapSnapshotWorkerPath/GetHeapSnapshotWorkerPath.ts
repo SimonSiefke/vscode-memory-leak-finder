@@ -1,10 +1,10 @@
 import { join } from 'node:path'
+import { root } from '../Root/Root.ts'
 
 /**
  * Gets the file path to the heap snapshot parsing worker executable
  * @returns {string} The absolute path to the heap snapshot parsing worker
  */
 export const getHeapSnapshotWorkerPath = () => {
-  const __dirname = import.meta.dirname
-  return join(__dirname, '../../../../heap-snapshot-parsing-worker/bin/heap-snapshot-parsing-worker.js')
+  return join(root, 'packages/heap-snapshot-parsing-worker/bin/heap-snapshot-parsing-worker.js')
 }
