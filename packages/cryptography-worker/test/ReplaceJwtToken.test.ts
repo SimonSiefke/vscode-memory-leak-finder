@@ -1,5 +1,6 @@
 import { expect, test } from '@jest/globals'
 import jwt from 'jsonwebtoken'
+import { generateKeyPairSync } from 'crypto'
 import { replaceJwtToken } from '../src/parts/ReplaceJwtToken/ReplaceJwtToken.ts'
 
 test('replaceJwtToken - replaces HS256 token with extended expiration', () => {
@@ -21,7 +22,7 @@ test('replaceJwtToken - replaces HS256 token with extended expiration', () => {
 })
 
 test('replaceJwtToken - replaces RS256 token with extended expiration', () => {
-  const { privateKey, publicKey } = require('crypto').generateKeyPairSync('rsa', {
+  const { privateKey } = generateKeyPairSync('rsa', {
     modulusLength: 2048,
   })
   const originalToken = jwt.sign({ sub: '123', exp: Math.floor(Date.now() / 1000) + 3600 }, privateKey, {
@@ -39,7 +40,7 @@ test('replaceJwtToken - replaces RS256 token with extended expiration', () => {
 })
 
 test('replaceJwtToken - replaces ES256 token with extended expiration', () => {
-  const { privateKey } = require('crypto').generateKeyPairSync('ec', {
+  const { privateKey } = generateKeyPairSync('ec', {
     namedCurve: 'prime256v1',
   })
   const originalToken = jwt.sign({ sub: '123', exp: Math.floor(Date.now() / 1000) + 3600 }, privateKey, {
@@ -57,7 +58,7 @@ test('replaceJwtToken - replaces ES256 token with extended expiration', () => {
 })
 
 test('replaceJwtToken - replaces ES384 token with extended expiration', () => {
-  const { privateKey } = require('crypto').generateKeyPairSync('ec', {
+  const { privateKey } = generateKeyPairSync('ec', {
     namedCurve: 'secp384r1',
   })
   const originalToken = jwt.sign({ sub: '123', exp: Math.floor(Date.now() / 1000) + 3600 }, privateKey, {
@@ -71,7 +72,7 @@ test('replaceJwtToken - replaces ES384 token with extended expiration', () => {
 })
 
 test('replaceJwtToken - replaces ES512 token with extended expiration', () => {
-  const { privateKey } = require('crypto').generateKeyPairSync('ec', {
+  const { privateKey } = generateKeyPairSync('ec', {
     namedCurve: 'secp521r1',
   })
   const originalToken = jwt.sign({ sub: '123', exp: Math.floor(Date.now() / 1000) + 3600 }, privateKey, {
@@ -145,7 +146,7 @@ test('replaceJwtToken - handles token without exp field', () => {
 })
 
 test('replaceJwtToken - handles RS384 token', () => {
-  const { privateKey } = require('crypto').generateKeyPairSync('rsa', {
+  const { privateKey } = generateKeyPairSync('rsa', {
     modulusLength: 2048,
   })
   const originalToken = jwt.sign({ sub: '123', exp: Math.floor(Date.now() / 1000) + 3600 }, privateKey, {
@@ -156,7 +157,7 @@ test('replaceJwtToken - handles RS384 token', () => {
 })
 
 test('replaceJwtToken - handles RS512 token', () => {
-  const { privateKey } = require('crypto').generateKeyPairSync('rsa', {
+  const { privateKey } = generateKeyPairSync('rsa', {
     modulusLength: 2048,
   })
   const originalToken = jwt.sign({ sub: '123', exp: Math.floor(Date.now() / 1000) + 3600 }, privateKey, {
@@ -173,4 +174,3 @@ test('replaceJwtToken - handles unknown algorithm by falling back to HS256', () 
   const replacedToken = replaceJwtToken(originalToken)
   expect(replacedToken).not.toBe(originalToken)
 })
-

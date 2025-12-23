@@ -11,4 +11,3 @@ test('getCACertPath - returns path ending with ca-cert.pem', () => {
   const path = getCACertPath()
   expect(path).toContain('ca-cert.pem')
 })
-

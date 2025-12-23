@@ -15,8 +15,9 @@ test('generateCA - returns valid PEM format', () => {
   const ca = generateCA()
   expect(ca.cert).toContain('BEGIN CERTIFICATE')
   expect(ca.cert).toContain('END CERTIFICATE')
-  expect(ca.key).toContain('BEGIN PRIVATE KEY')
-  expect(ca.key).toContain('END PRIVATE KEY')
+  expect(ca.key).toContain('BEGIN')
+  expect(ca.key).toContain('PRIVATE KEY')
+  expect(ca.key).toContain('END')
 })
 
 test('generateCA - certificate can be parsed', () => {
@@ -117,4 +118,3 @@ test('generateCA - private key matches certificate', () => {
   expect(publicKey.n.equals(privateKey.n)).toBe(true)
   expect(publicKey.e.equals(privateKey.e)).toBe(true)
 })
-

@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { getRsaKeyPair } from '../src/parts/GetRsaKeyPair/GetRsaKeyPair.ts'
-import { createPublicKey, createPrivateKey } from 'crypto'
+import { createPublicKey, createPrivateKey } from 'node:crypto'
 
 test('getRsaKeyPair - returns key pair with privateKey and publicKey', () => {
   const keyPair = getRsaKeyPair()
@@ -44,7 +44,6 @@ test('getRsaKeyPair - public key matches private key', () => {
   const keyPair = getRsaKeyPair()
   const privateKey = createPrivateKey(keyPair.privateKey)
   const publicKey = createPublicKey(keyPair.publicKey)
-  const exportedPublicKey = privateKey.export({ type: 'spki', format: 'pem' })
+  const exportedPublicKey = privateKey.export({ format: 'pem', type: 'spki' })
   expect(exportedPublicKey.toString()).toBe(keyPair.publicKey)
 })
-

@@ -57,4 +57,3 @@ test('validateCertificateKeyPair - returns false for certificate with different 
   const cert2 = generateCertificateForDomain('test.com', ca.key, ca.cert)
   expect(validateCertificateKeyPair(cert1.cert, cert2.key)).toBe(false)
 })
-

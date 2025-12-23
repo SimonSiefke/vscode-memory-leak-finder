@@ -101,4 +101,3 @@ test('isExpirationProperty - returns true for "expire" (singular)', () => {
   expect(isExpirationProperty('expire')).toBe(true)
   expect(isExpirationProperty('EXPIRE')).toBe(true)
 })
-

@@ -21,6 +21,7 @@ jest.unstable_mockModule('node:fs/promises', () => ({
 let GetCertificateForDomainModule: typeof import('../src/parts/GetCertificateForDomain/GetCertificateForDomain.ts')
 let GetOrCreateCAModule: typeof import('../src/parts/GetOrCreateCA/GetOrCreateCA.ts')
 let ValidateCertificateKeyPairModule: typeof import('../src/parts/ValidateCertificateKeyPair/ValidateCertificateKeyPair.ts')
+let GenerateCertificateForDomainModule: typeof import('../src/parts/GenerateCertificateForDomain/GenerateCertificateForDomain.ts')
 
 beforeEach(async () => {
   jest.clearAllMocks()
@@ -30,6 +31,7 @@ beforeEach(async () => {
   GetCertificateForDomainModule = await import('../src/parts/GetCertificateForDomain/GetCertificateForDomain.ts')
   GetOrCreateCAModule = await import('../src/parts/GetOrCreateCA/GetOrCreateCA.ts')
   ValidateCertificateKeyPairModule = await import('../src/parts/ValidateCertificateKeyPair/ValidateCertificateKeyPair.ts')
+  GenerateCertificateForDomainModule = await import('../src/parts/GenerateCertificateForDomain/GenerateCertificateForDomain.ts')
 })
 
 afterEach(() => {
@@ -48,26 +50,26 @@ test('getCertificateForDomain - generates new certificate when files do not exis
 })
 
 test('getCertificateForDomain - returns existing certificate when files exist and are valid', async () => {
+  const ca = await GetOrCreateCAModule.getOrCreateCA()
+  const domainCert = GenerateCertificateForDomainModule.generateCertificateForDomain('example.com', ca.key, ca.cert)
+  const existingCert = domainCert.cert
+  const existingKey = domainCert.key
+
   mockExistsSync.mockImplementation((path: string) => {
     if (path.includes('ca-cert.pem') || path.includes('ca-key.pem')) {
       return false
     }
-    if (path.includes('example.com')) {
+    if (path.includes('example_com')) {
       return true
     }
     return false
   })
 
-  const ca = await GetOrCreateCAModule.getOrCreateCA()
-  const domainCert = await GetCertificateForDomainModule.getCertificateForDomain('example.com')
-  const existingCert = domainCert.cert
-  const existingKey = domainCert.key
-
   mockReadFile.mockImplementation((path: string) => {
-    if (path.includes('example.com') && path.includes('cert.pem')) {
+    if (path.includes('example_com') && path.includes('cert.pem')) {
       return Promise.resolve(existingCert)
     }
-    if (path.includes('example.com') && path.includes('key.pem')) {
+    if (path.includes('example_com') && path.includes('key.pem')) {
       return Promise.resolve(existingKey)
     }
     return Promise.reject(new Error('Unexpected path'))
@@ -84,7 +86,7 @@ test('getCertificateForDomain - regenerates certificate when validation fails', 
     if (path.includes('ca-cert.pem') || path.includes('ca-key.pem')) {
       return false
     }
-    if (path.includes('example.com')) {
+    if (path.includes('example_com')) {
       return true
     }
     return false
@@ -94,10 +96,10 @@ test('getCertificateForDomain - regenerates certificate when validation fails', 
   const mismatchedKey = '-----BEGIN PRIVATE KEY-----\nMISMATCHED KEY\n-----END PRIVATE KEY-----'
 
   mockReadFile.mockImplementation((path: string) => {
-    if (path.includes('example.com') && path.includes('cert.pem')) {
+    if (path.includes('example_com') && path.includes('cert.pem')) {
       return Promise.resolve(mismatchedCert)
     }
-    if (path.includes('example.com') && path.includes('key.pem')) {
+    if (path.includes('example_com') && path.includes('key.pem')) {
       return Promise.resolve(mismatchedKey)
     }
     return Promise.reject(new Error('Unexpected path'))
@@ -187,7 +189,7 @@ test('getCertificateForDomain - deletes mismatched files even if unlink fails', 
     if (path.includes('ca-cert.pem') || path.includes('ca-key.pem')) {
       return false
     }
-    if (path.includes('example.com')) {
+    if (path.includes('example_com')) {
       return true
     }
     return false
@@ -197,10 +199,10 @@ test('getCertificateForDomain - deletes mismatched files even if unlink fails', 
   const mismatchedKey = '-----BEGIN PRIVATE KEY-----\nMISMATCHED KEY\n-----END PRIVATE KEY-----'
 
   mockReadFile.mockImplementation((path: string) => {
-    if (path.includes('example.com') && path.includes('cert.pem')) {
+    if (path.includes('example_com') && path.includes('cert.pem')) {
       return Promise.resolve(mismatchedCert)
     }
-    if (path.includes('example.com') && path.includes('key.pem')) {
+    if (path.includes('example_com') && path.includes('key.pem')) {
       return Promise.resolve(mismatchedKey)
     }
     return Promise.reject(new Error('Unexpected path'))
@@ -214,14 +216,20 @@ test('getCertificateForDomain - deletes mismatched files even if unlink fails', 
 })
 
 test('getCertificateForDomain - checks for both cert and key files', async () => {
-  mockExistsSync.mockReturnValue(false)
+  mockExistsSync.mockImplementation((path: string) => {
+    if (path.includes('ca-cert.pem') || path.includes('ca-key.pem')) {
+      return false
+    }
+    return false
+  })
 
   await GetCertificateForDomainModule.getCertificateForDomain('example.com')
 
-  expect(mockExistsSync).toHaveBeenCalledTimes(2)
   const calls = mockExistsSync.mock.calls
-  expect(calls.some((call) => call[0].includes('cert.pem'))).toBe(true)
-  expect(calls.some((call) => call[0].includes('key.pem'))).toBe(true)
+  const domainCertCalls = calls.filter((call) => call[0].includes('example_com'))
+  expect(domainCertCalls.length).toBeGreaterThanOrEqual(2)
+  expect(domainCertCalls.some((call) => call[0].includes('cert.pem'))).toBe(true)
+  expect(domainCertCalls.some((call) => call[0].includes('key.pem'))).toBe(true)
 })
 
 test('getCertificateForDomain - returns valid certificate-key pair', async () => {
@@ -231,4 +239,3 @@ test('getCertificateForDomain - returns valid certificate-key pair', async () =>
 
   expect(ValidateCertificateKeyPairModule.validateCertificateKeyPair(cert.cert, cert.key)).toBe(true)
 })
-

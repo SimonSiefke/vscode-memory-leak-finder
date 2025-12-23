@@ -41,4 +41,3 @@ test('isJwtToken - returns true for JWT with base64url characters', () => {
   expect(isJwtToken(tokenWithUnderscore)).toBe(true)
   expect(isJwtToken(tokenWithDash)).toBe(true)
 })
-

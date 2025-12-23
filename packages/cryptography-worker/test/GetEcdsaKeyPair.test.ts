@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { getEcdsaKeyPair } from '../src/parts/GetEcdsaKeyPair/GetEcdsaKeyPair.ts'
-import { createPublicKey, createPrivateKey } from 'crypto'
+import { createPublicKey, createPrivateKey } from 'node:crypto'
 
 test('getEcdsaKeyPair - returns key pair for ES256', () => {
   const keyPair = getEcdsaKeyPair('ES256')
@@ -74,7 +74,6 @@ test('getEcdsaKeyPair - public key matches private key', () => {
   const keyPair = getEcdsaKeyPair('ES256')
   const privateKey = createPrivateKey(keyPair.privateKey)
   const publicKey = createPublicKey(keyPair.publicKey)
-  const exportedPublicKey = privateKey.export({ type: 'spki', format: 'pem' })
+  const exportedPublicKey = privateKey.export({ format: 'pem', type: 'spki' })
   expect(exportedPublicKey.toString()).toBe(keyPair.publicKey)
 })
-
