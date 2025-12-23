@@ -262,7 +262,7 @@ export const create = ({ expect, page, VError }: { expect: any; page: any; VErro
         throw new VError(error, `Failed to open tab "${tabName}"`)
       }
     },
-    async removeItem({ name }) {
+    async removeItem({ name }: { name: string }) {
       try {
         await page.waitForIdle()
         const block = page.locator(`.setting-item-contents[aria-label="${name}"]`)
@@ -277,7 +277,7 @@ export const create = ({ expect, page, VError }: { expect: any; page: any; VErro
         throw new VError(error, `Failed to remove item`)
       }
     },
-    async search({ resultCount, value }) {
+    async search({ resultCount, value }: { resultCount: number; value: string }) {
       try {
         await page.waitForIdle()
         const searchInput = page.locator('.search-container [role="textbox"]')
@@ -297,7 +297,7 @@ export const create = ({ expect, page, VError }: { expect: any; page: any; VErro
         throw new VError(error, `Failed to search for ${value}`)
       }
     },
-    async select({ name, value }) {
+    async select({ name, value }: { name: string; value: string }) {
       try {
         await page.waitForIdle()
         const select = page.locator(`.monaco-select-box[aria-label="${name}"]`)
@@ -314,7 +314,7 @@ export const create = ({ expect, page, VError }: { expect: any; page: any; VErro
         throw new VError(error, `Failed to open select`)
       }
     },
-    async setTextInput({ name, value }) {
+    async setTextInput({ name, value }: { name: string; value: string }) {
       try {
         await page.waitForIdle()
         const settingItem = page.locator(`.setting-item-contents[data-key="${name}"]`)
@@ -335,7 +335,7 @@ export const create = ({ expect, page, VError }: { expect: any; page: any; VErro
         throw new VError(error, `Failed to set text input for ${name}`)
       }
     },
-    async toggleCheckBox({ name }) {
+    async toggleCheckBox({ name }: { name: string }) {
       try {
         await page.waitForIdle()
         const checkbox = page.locator(`.monaco-custom-toggle[aria-label="${name}"]`)
