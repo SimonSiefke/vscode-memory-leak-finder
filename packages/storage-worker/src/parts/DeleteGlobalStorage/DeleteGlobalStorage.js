@@ -3,10 +3,16 @@ import { existsSync } from 'fs'
 import { join } from 'path'
 import * as ExecuteSql from '../ExecuteSql/ExecuteSql.js'
 
+/**
+ * @param {import('@vscode/sqlite3').Database} db
+ */
 const removeItems = async (db) => {
   await ExecuteSql.executeSql(db, 'DELETE FROM ItemTable')
 }
 
+/**
+ * @param {string} path
+ */
 export const deleteGlobalStorage = async (path) => {
   if (!existsSync(path)) {
     throw new Error(`storage not found ${path}`)
