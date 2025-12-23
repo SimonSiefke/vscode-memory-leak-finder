@@ -32,6 +32,7 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
     content: 'deep content',
     name: 'complex/nested/structure/deep-file.txt',
   })
+  await Explorer.refresh()
 
   // Verify the complex structure appears in explorer
   await Explorer.shouldHaveItem('complex')
@@ -51,6 +52,8 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
     name: 'temp/nested/folders/temp-file.txt',
   })
 
+  await Explorer.refresh()
+
   // Verify creation step by step
   await Explorer.shouldHaveItem('temp')
   await Explorer.expand('temp')
@@ -66,6 +69,8 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
   await Workspace.remove('temp/nested/folders')
   await Workspace.remove('temp/nested')
   await Workspace.remove('temp')
+
+  await Explorer.refresh()
 
   // Verify deletion
   await Explorer.collapse('folders')
@@ -84,6 +89,7 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
     content: 'mid level content',
     name: 'level1/renamed-level2/mid-file.txt',
   })
+  await Explorer.refresh()
 
   // Verify the rename affects the entire subtree
   await Explorer.expand('level1')
@@ -110,6 +116,7 @@ export const run = async ({ Explorer, Workspace }: TestContext): Promise<void> =
     content: 'mid level content',
     name: 'level1/level2/mid-file.txt',
   })
+  await Explorer.refresh()
 
   // Verify original state is restored
   await Explorer.collapse('level3')
