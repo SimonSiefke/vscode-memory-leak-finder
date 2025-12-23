@@ -4,6 +4,7 @@ import * as VideoRecording from '../VideoRecording/VideoRecording.ts'
 
 export const connectWorkers = async (
   recordVideo: boolean,
+  screencastQuality: number,
   connectionId: number,
   devtoolsWebSocketUrl: string,
   webSocketUrl: string,
@@ -27,7 +28,7 @@ export const connectWorkers = async (
 ) => {
   const promises: Promise<any>[] = []
   if (recordVideo) {
-    promises.push(VideoRecording.start(devtoolsWebSocketUrl, attachedToPageTimeout, idleTimeout))
+    promises.push(VideoRecording.start(devtoolsWebSocketUrl, attachedToPageTimeout, idleTimeout, screencastQuality))
   } else {
     promises.push(Promise.resolve(undefined))
   }
