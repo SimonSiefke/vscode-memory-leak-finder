@@ -4,6 +4,29 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, ideVersion, page, VError }) => {
   return {
+    async clearFilter() {
+      try {
+        await page.waitForIdle()
+        const outputView = page.locator('.pane-body.output-view')
+        await expect(outputView).toBeVisible()
+        const findMatch = page.locator('.findMatchInline').first()
+        await expect(findMatch).toBeVisible()
+        const outputActions = page.locator('[aria-label="Output actions"]')
+        await expect(outputActions).toBeVisible()
+        const input = outputActions.locator('.input[placeholder="Filter"]')
+        await expect(input).toBeVisible()
+        await input.focus()
+        await page.waitForIdle()
+        await input.clear()
+        await page.waitForIdle()
+        await expect(input).toHaveValue('')
+        await page.waitForIdle()
+        // await expect(findMatch).toBeHidden({ timeout: 10_000 })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed clear filter output`)
+      }
+    },
     async filter(filterValue: string) {
       try {
         await page.waitForIdle()
@@ -30,29 +53,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to filter output`)
-      }
-    },
-    async clearFilter() {
-      try {
-        await page.waitForIdle()
-        const outputView = page.locator('.pane-body.output-view')
-        await expect(outputView).toBeVisible()
-        const findMatch = page.locator('.findMatchInline').first()
-        await expect(findMatch).toBeVisible()
-        const outputActions = page.locator('[aria-label="Output actions"]')
-        await expect(outputActions).toBeVisible()
-        const input = outputActions.locator('.input[placeholder="Filter"]')
-        await expect(input).toBeVisible()
-        await input.focus()
-        await page.waitForIdle()
-        await input.clear()
-        await page.waitForIdle()
-        await expect(input).toHaveValue('')
-        await page.waitForIdle()
-        // await expect(findMatch).toBeHidden({ timeout: 10_000 })
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed clear filter output`)
       }
     },
     async hide() {

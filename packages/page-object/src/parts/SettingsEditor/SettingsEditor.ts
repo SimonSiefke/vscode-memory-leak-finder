@@ -166,6 +166,56 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to focus outline item`)
       }
     },
+    async moveScrollBar(y: number, expectedScrollBarTop: number) {
+      try {
+        await page.waitForIdle()
+        await page.mouse.mockPointerEvents()
+        const tree = page.locator('.settings-tree-container')
+        await expect(tree).toBeVisible()
+        await page.waitForIdle()
+        const scrollbar = tree.locator('.scrollbar.vertical').first()
+        await page.waitForIdle()
+        await scrollbar.hover()
+        await page.waitForIdle()
+        const scrollBarVisible = tree.locator('.scrollbar.visible.scrollbar.vertical')
+        await expect(scrollBarVisible).toBeVisible()
+        await page.waitForIdle()
+        await page.waitForIdle()
+        await page.waitForIdle()
+        const scrollbarSlider = scrollbar.locator('.slider')
+        await expect(scrollbarSlider).toBeVisible()
+        await page.waitForIdle()
+        const elementBox1 = await scrollbarSlider.boundingBox()
+        if (!elementBox1) {
+          throw new Error('Unable to find bounding box on element')
+        }
+
+        const elementCenterX = elementBox1.x + elementBox1.width / 2
+        const elementCenterY = elementBox1.y + elementBox1.height / 2
+
+        const xOffset = 0
+        const yOffset = y
+
+        await page.waitForIdle()
+        await scrollbarSlider.hover()
+        await page.waitForIdle()
+        await page.mouse.move(elementCenterX, elementCenterY)
+        await page.waitForIdle()
+        await page.mouse.down()
+        await page.waitForIdle()
+
+        await expect(scrollbarSlider).toHaveClass('slider active')
+        await page.waitForIdle()
+        await page.mouse.move(elementCenterX + xOffset, elementCenterY + yOffset)
+        await page.waitForIdle()
+        await page.mouse.up()
+        await page.waitForIdle()
+        await expect(scrollbarSlider).toHaveCss('top', `${expectedScrollBarTop}px`)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to scroll down in settings editor`)
+      }
+    },
     async open() {
       const settings = Settings.create({ expect, page, VError })
       await settings.open()
@@ -225,56 +275,6 @@ export const create = ({ expect, page, VError }) => {
         await expect(row).toHaveCount(0)
       } catch (error) {
         throw new VError(error, `Failed to remove item`)
-      }
-    },
-    async moveScrollBar(y: number, expectedScrollBarTop: number) {
-      try {
-        await page.waitForIdle()
-        await page.mouse.mockPointerEvents()
-        const tree = page.locator('.settings-tree-container')
-        await expect(tree).toBeVisible()
-        await page.waitForIdle()
-        const scrollbar = tree.locator('.scrollbar.vertical').first()
-        await page.waitForIdle()
-        await scrollbar.hover()
-        await page.waitForIdle()
-        const scrollBarVisible = tree.locator('.scrollbar.visible.scrollbar.vertical')
-        await expect(scrollBarVisible).toBeVisible()
-        await page.waitForIdle()
-        await page.waitForIdle()
-        await page.waitForIdle()
-        const scrollbarSlider = scrollbar.locator('.slider')
-        await expect(scrollbarSlider).toBeVisible()
-        await page.waitForIdle()
-        const elementBox1 = await scrollbarSlider.boundingBox()
-        if (!elementBox1) {
-          throw new Error('Unable to find bounding box on element')
-        }
-
-        const elementCenterX = elementBox1.x + elementBox1.width / 2
-        const elementCenterY = elementBox1.y + elementBox1.height / 2
-
-        const xOffset = 0
-        const yOffset = y
-
-        await page.waitForIdle()
-        await scrollbarSlider.hover()
-        await page.waitForIdle()
-        await page.mouse.move(elementCenterX, elementCenterY)
-        await page.waitForIdle()
-        await page.mouse.down()
-        await page.waitForIdle()
-
-        await expect(scrollbarSlider).toHaveClass('slider active')
-        await page.waitForIdle()
-        await page.mouse.move(elementCenterX + xOffset, elementCenterY + yOffset)
-        await page.waitForIdle()
-        await page.mouse.up()
-        await page.waitForIdle()
-        await expect(scrollbarSlider).toHaveCss('top', `${expectedScrollBarTop}px`)
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to scroll down in settings editor`)
       }
     },
     async search({ resultCount, value }) {
