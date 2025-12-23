@@ -139,11 +139,40 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
         await expect(lines).toHaveText('')
         await page.waitForIdle()
+<<<<<<< HEAD
         const requestMessage = chatView.locator(`.monaco-list-row.request[aria-label="${message}"]`)
         await expect(requestMessage).toBeVisible()
         await page.waitForIdle()
 
         if (expectedResponse) {
+=======
+
+        if (verify) {
+>>>>>>> origin/main
+          const row = chatView.locator(`.monaco-list-row[aria-label="${message}"]`)
+          await expect(row).toBeVisible()
+          await page.waitForIdle()
+          const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
+          await expect(response).toBeVisible({ timeout: 60_000 })
+          await page.waitForIdle()
+          const progress = chatView.locator('.rendered-markdown.progress-step')
+          await expect(progress).toBeHidden({ timout: 45_000 })
+          await page.waitForIdle()
+          await expect(response).toBeVisible({ timeout: 30_000 })
+          await page.waitForIdle()
+          const responseMessage = chatView.locator('.monaco-list-row[data-index="1"]')
+          await expect(responseMessage).toBeVisible()
+          await page.waitForIdle()
+          await expect(responseMessage).toHaveAttribute('aria-label', new RegExp(`^${expectedResponse}`), { timeout: 120_000 })
+        }
+
+        if (expectedResponse) {
+          const requestMessage = chatView.locator(`.monaco-list-row.request[aria-label="${message}"]`)
+          await expect(requestMessage).toBeVisible()
+          await page.waitForIdle()
+          await sendButton.click()
+          await page.waitForIdle()
+          await expect(lines).toHaveText('')
           const row = chatView.locator(`.monaco-list-row[aria-label="${message}"]`)
           await expect(row).toBeVisible()
           await page.waitForIdle()
