@@ -24,6 +24,7 @@ export interface RunTestsOptions {
   readonly recordVideo: boolean
   readonly restartBetween: boolean
   readonly root: string
+  readonly screencastQuality: number
   readonly runMode: number
   readonly runs: number
   readonly runSkippedTestsAnyway: boolean

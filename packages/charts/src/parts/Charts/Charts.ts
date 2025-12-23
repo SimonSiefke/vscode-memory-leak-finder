@@ -2,6 +2,7 @@ export * as AbortControllerCount from '../CreateAbortControllerCountChart/Create
 export * as AbortSignalCount from '../CreateAbortSignalCountChart/CreateAbortSignalCountChart.ts'
 export * as AttachedDomNodeCount from '../CreateAttachedDomNodeCountChart/CreateAttachedDomNodeCountChart.ts'
 export * as CanvasCount from '../CreateCanvasCountChart/CreateCanvasCountChart.ts'
+export * as CanvasRenderingContext2dCount from '../CreateCanvasRenderingContext2dCountChart/CreateCanvasRenderingContext2dCountChart.ts'
 export * as CssRuleCount from '../CreateCssRuleCountChart/CreateCssRuleCountChart.ts'
 export * as DetachedDomNodeCount from '../CreateDetachedDomNodeCountChart/CreateDetachedDomNodeCountChart.ts'
 export * as EditContextCount from '../CreateEditContextCountChart/CreateEditContextCountChart.ts'
@@ -9,7 +10,10 @@ export * as EmitterCount from '../CreateEmitterCountChart/CreateEmitterCountChar
 export * as ErrorCount from '../CreateErrorCountChart/CreateErrorCountChart.ts'
 export * as EventListenerCount from '../CreateEventListenerCountChart/CreateEventListenerCountChart.ts'
 export * as FunctionCount from '../CreateFunctionCountChart/CreateFunctionCountChart.ts'
+export * as GpuCanvasContextCount from '../CreateGpuCanvasContextCountChart/CreateGpuCanvasContextCountChart.ts'
 export * as IframeCount from '../CreateIframeCountChart/CreateIframeCountChart.ts'
+export * as ImageBitmapCount from '../CreateImageBitmapCountChart/CreateImageBitmapCountChart.ts'
+export * as IntersectionObserverCount from '../CreateIntersectionObserverCountChart/CreateIntersectionObserverCountChart.ts'
 export * as MapSize from '../CreateMapSizeChart/CreateMapSizeChart.ts'
 export * as MessagePortCount from '../CreateMessagePortCountChart/CreateMessagePortCountChart.ts'
 export * as MutationObserverCount from '../CreateMutationObserverCountChart/CreateMutationObserverCountChart.ts'
@@ -24,4 +28,8 @@ export * as SymbolCount from '../CreateSymbolCountChart/CreateSymbolCountChart.t
 export * as TypedArrayCount from '../CreateTypedArrayCountChart/CreateTypedArrayCountChart.ts'
 export * as WeakMapCount from '../CreateWeakMapCountChart/CreateWeakMapCountChart.ts'
 export * as WeakSetCount from '../CreateWeakSetCountChart/CreateWeakSetCountChart.ts'
+<<<<<<< HEAD
 export * as WorkerCount from '../CreateWorkerCountChart/CreateWorkerCountChart.ts'
+=======
+export * as Webgl2RenderingContextCount from '../CreateWebgl2RenderingContextCountChart/CreateWebgl2RenderingContextCountChart.ts'
+>>>>>>> origin/main
