@@ -1,5 +1,7 @@
-import { decompress as zstdDecompress } from '@mongodb-js/zstd'
-import { createGunzip, createInflate, createBrotliDecompress } from 'zlib'
+import { decompressGzip } from '../DecompressGzip/DecompressGzip.ts'
+import { decompressDeflate } from '../DecompressDeflate/DecompressDeflate.ts'
+import { decompressBrotli } from '../DecompressBrotli/DecompressBrotli.ts'
+import { decompressZstd } from '../DecompressZstd/DecompressZstd.ts'
 
 export const decompressBody = async (
   body: Buffer,
@@ -13,58 +15,19 @@ export const decompressBody = async (
   const normalizedEncoding = encodingStr.toLowerCase().trim()
 
   if (normalizedEncoding === 'gzip') {
-    const { promise, reject, resolve } = Promise.withResolvers<{ body: string; wasCompressed: boolean }>()
-    const gunzip = createGunzip()
-    const chunks: Buffer[] = []
-    gunzip.on('data', (chunk: Buffer) => chunks.push(chunk))
-    gunzip.on('end', () => {
-      const decompressed = Buffer.concat(chunks).toString('utf8')
-      resolve({ body: decompressed, wasCompressed: true })
-    })
-    gunzip.on('error', reject)
-    gunzip.write(body)
-    gunzip.end()
-    return promise
+    return decompressGzip(body)
   }
 
   if (normalizedEncoding === 'deflate') {
-    const { promise, reject, resolve } = Promise.withResolvers<{ body: string; wasCompressed: boolean }>()
-    const inflate = createInflate()
-    const chunks: Buffer[] = []
-    inflate.on('data', (chunk: Buffer) => chunks.push(chunk))
-    inflate.on('end', () => {
-      const decompressed = Buffer.concat(chunks).toString('utf8')
-      resolve({ body: decompressed, wasCompressed: true })
-    })
-    inflate.on('error', reject)
-    inflate.write(body)
-    inflate.end()
-    return promise
+    return decompressDeflate(body)
   }
 
   if (normalizedEncoding === 'br') {
-    const { promise, reject, resolve } = Promise.withResolvers<{ body: string; wasCompressed: boolean }>()
-    const brotli = createBrotliDecompress()
-    const chunks: Buffer[] = []
-    brotli.on('data', (chunk: Buffer) => chunks.push(chunk))
-    brotli.on('end', () => {
-      const decompressed = Buffer.concat(chunks).toString('utf8')
-      resolve({ body: decompressed, wasCompressed: true })
-    })
-    brotli.on('error', reject)
-    brotli.write(body)
-    brotli.end()
-    return promise
+    return decompressBrotli(body)
   }
 
   if (normalizedEncoding === 'zstd') {
-    try {
-      const decompressed = await zstdDecompress(body)
-      return { body: decompressed.toString('utf8'), wasCompressed: true }
-    } catch {
-      // If decompression fails, return original body
-      return { body: body.toString('utf8'), wasCompressed: false }
-    }
+    return decompressZstd(body)
   }
 
   return { body: body.toString('utf8'), wasCompressed: false }
