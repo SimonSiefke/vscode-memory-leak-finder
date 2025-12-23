@@ -20,7 +20,8 @@ export const setup = async ({ ChatEditor, Electron, Extensions }: TestContext): 
 
 export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   // @ts-ignore
-  await ChatEditor.sendMessage(`What is displayed on https://example.com`, {
+  await ChatEditor.sendMessage({
+    message: `What is displayed on https://example.com`,
     verify: true,
   })
   // @ts-ignore

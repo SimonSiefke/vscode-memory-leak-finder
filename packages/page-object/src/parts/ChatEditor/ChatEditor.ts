@@ -99,7 +99,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to open finish setup`)
       }
     },
-    async sendMessage(message: string, { verify = false } = {}) {
+    async sendMessage({ expectedResponse, message, verify = false }) {
       try {
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
@@ -138,7 +138,12 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await sendButton.click()
         await page.waitForIdle()
         await expect(lines).toHaveText('')
-        if (verify) {
+        await page.waitForIdle()
+        const requestMessage = chatView.locator(`.monaco-list-row.request[aria-label="${message}"]`)
+        await expect(requestMessage).toBeVisible()
+        await page.waitForIdle()
+
+        if (expectedResponse) {
           const row = chatView.locator(`.monaco-list-row[aria-label="${message}"]`)
           await expect(row).toBeVisible()
           await page.waitForIdle()
@@ -150,12 +155,16 @@ export const create = ({ expect, ideVersion, page, VError }) => {
           await page.waitForIdle()
           await expect(response).toBeVisible({ timeout: 30_000 })
           await page.waitForIdle()
+          const responseMessage = chatView.locator('.monaco-list-row[data-index="1"]')
+          await expect(responseMessage).toBeVisible()
+          await page.waitForIdle()
+          await expect(responseMessage).toHaveAttribute('aria-label', new RegExp(`^${expectedResponse}`), { timeout: 120_000 })
         }
       } catch (error) {
         throw new VError(error, `Failed to send chat message`)
       }
     },
-    async setMode(modeLabel) {
+    async setMode(modeLabel: string) {
       try {
         const chatView = page.locator('.interactive-session')
         const setModeButton = chatView.locator('[aria-label^="Set Mode"]')
