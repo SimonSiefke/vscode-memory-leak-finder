@@ -1,14 +1,10 @@
 import { decompress as zstdDecompress } from '@mongodb-js/zstd'
 import { createGunzip, createInflate, createBrotliDecompress } from 'zlib'
 
-<<<<<<< HEAD
-export const decompressBody = async (body: Buffer, encoding: string | string[] | undefined): Promise<{ body: string; wasCompressed: boolean }> => {
-=======
 export const decompressBody = async (
   body: Buffer,
   encoding: string | string[] | undefined,
 ): Promise<{ body: string; wasCompressed: boolean }> => {
->>>>>>> origin/main
   if (!encoding) {
     return { body: body.toString('utf8'), wasCompressed: false }
   }

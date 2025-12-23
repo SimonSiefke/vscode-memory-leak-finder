@@ -7,6 +7,7 @@ export const getEcdsaKeyPair = (algorithm: string): { privateKey: string; public
   // Map algorithm to curve name
   let curve: string
   switch (algorithm) {
+<<<<<<< HEAD
   case 'ES256': {
     curve = 'prime256v1' // P-256
 
@@ -25,6 +26,26 @@ export const getEcdsaKeyPair = (algorithm: string): { privateKey: string; public
   default: {
     curve = 'prime256v1' // Default to P-256
   }
+=======
+    case 'ES256': {
+      curve = 'prime256v1' // P-256
+
+      break
+    }
+    case 'ES384': {
+      curve = 'secp384r1' // P-384
+
+      break
+    }
+    case 'ES512': {
+      curve = 'secp521r1' // P-521
+
+      break
+    }
+    default: {
+      curve = 'prime256v1' // Default to P-256
+    }
+>>>>>>> origin/main
   }
 
   if (!ecdsaKeyPairs.has(curve)) {
