@@ -1,6 +1,6 @@
+import type { IncomingMessage } from 'http'
 import { decompress as zstdDecompress } from '@mongodb-js/zstd'
 import { mkdir, writeFile } from 'fs/promises'
-import type { IncomingMessage } from 'http'
 import { join } from 'path'
 import { createBrotliDecompress, createGunzip, createInflate } from 'zlib'
 import { decompressBody } from '../DecompressBody/DecompressBody.ts'

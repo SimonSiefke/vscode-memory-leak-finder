@@ -88,10 +88,7 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
       // If there's an error getting the certificate, try to regenerate it
       const certPath = join(CERT_DIR, `${hostname.replaceAll(DOMAIN_SANITIZE_REGEX, '_')}-cert.pem`)
       const keyPath = join(CERT_DIR, `${hostname.replaceAll(DOMAIN_SANITIZE_REGEX, '_')}-key.pem`)
-      await Promise.all([
-        unlink(certPath).catch(() => {}),
-        unlink(keyPath).catch(() => {}),
-      ])
+      await Promise.all([unlink(certPath).catch(() => {}), unlink(keyPath).catch(() => {})])
       certPair = await getCertificateForDomain(hostname)
     }
 
@@ -108,10 +105,7 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
         console.log(`[Proxy] Certificate-key mismatch for ${hostname}, regenerating...`)
         const certPath = join(CERT_DIR, `${hostname.replaceAll(DOMAIN_SANITIZE_REGEX, '_')}-cert.pem`)
         const keyPath = join(CERT_DIR, `${hostname.replaceAll(DOMAIN_SANITIZE_REGEX, '_')}-key.pem`)
-        await Promise.all([
-          unlink(certPath).catch(() => {}),
-          unlink(keyPath).catch(() => {}),
-        ])
+        await Promise.all([unlink(certPath).catch(() => {}), unlink(keyPath).catch(() => {})])
         certPair = await getCertificateForDomain(hostname)
         secureContext = createSecureContext({
           cert: certPair.cert,
@@ -332,11 +326,14 @@ export const handleConnect = async (req: IncomingMessage, socket: any, head: Buf
             for (const [k, v] of Object.entries(targetRes.headers)) {
               const lowerKey = k.toLowerCase()
               // Skip transfer-encoding and connection headers
-              if (lowerKey !== 'transfer-encoding' && lowerKey !== 'connection' && // Avoid duplicate headers by checking case-insensitively
-                !lowerCaseHeaders.has(lowerKey)) {
-                  cleanedHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
-                  lowerCaseHeaders.add(lowerKey)
-                }
+              if (
+                lowerKey !== 'transfer-encoding' &&
+                lowerKey !== 'connection' && // Avoid duplicate headers by checking case-insensitively
+                !lowerCaseHeaders.has(lowerKey)
+              ) {
+                cleanedHeaders[k] = Array.isArray(v) ? v.join(', ') : String(v)
+                lowerCaseHeaders.add(lowerKey)
+              }
             }
 
             // Add CORS headers for marketplace API responses

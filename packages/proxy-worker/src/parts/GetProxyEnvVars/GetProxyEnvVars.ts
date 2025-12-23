@@ -1,8 +1,6 @@
 import { getCACertPath } from '../GetCACertPath/GetCACertPath.ts'
 
-export const getProxyEnvVars = async (
-  proxyUrl: string | null,
-): Promise<Record<string, string>> => {
+export const getProxyEnvVars = async (proxyUrl: string | null): Promise<Record<string, string>> => {
   const envVars: Record<string, string> = {}
 
   if (proxyUrl) {
