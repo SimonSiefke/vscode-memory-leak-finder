@@ -24,5 +24,4 @@ export * as SymbolCount from '../CreateSymbolCountChart/CreateSymbolCountChart.t
 export * as TypedArrayCount from '../CreateTypedArrayCountChart/CreateTypedArrayCountChart.ts'
 export * as WeakMapCount from '../CreateWeakMapCountChart/CreateWeakMapCountChart.ts'
 export * as WeakSetCount from '../CreateWeakSetCountChart/CreateWeakSetCountChart.ts'
-export * as Webgl2RenderingContextCount from '../CreateWebgl2RenderingContextCountChart/CreateWebgl2RenderingContextCountChart.ts'
 export * as WorkerCount from '../CreateWorkerCountChart/CreateWorkerCountChart.ts'
