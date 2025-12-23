@@ -99,7 +99,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to open finish setup`)
       }
     },
-    async sendMessage({ message, expectedResponse, verify = false }) {
+    async sendMessage({ expectedResponse, message, verify = false }) {
       try {
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')

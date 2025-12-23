@@ -1163,6 +1163,18 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to verify semantic token ${type}`)
       }
     },
+    async shouldHaveSpark() {
+      try {
+        await page.waitForIdle()
+        const spark = page.locator('.codicon.codicon-gutter-lightbulb-sparkle-filled')
+        await expect(spark).toBeVisible({
+          timeout: 20_000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify spark`)
+      }
+    },
     async shouldHaveSquigglyError() {
       try {
         await page.waitForIdle()
@@ -1325,18 +1337,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to show empty source action`)
-      }
-    },
-    async shouldHaveSpark() {
-      try {
-        await page.waitForIdle()
-        const spark = page.locator('.codicon.codicon-gutter-lightbulb-sparkle-filled')
-        await expect(spark).toBeVisible({
-          timeout: 20_000,
-        })
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to verify spark`)
       }
     },
     async split(command) {
