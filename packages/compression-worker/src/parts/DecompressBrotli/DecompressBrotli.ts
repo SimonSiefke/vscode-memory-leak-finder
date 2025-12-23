@@ -1,8 +1,6 @@
 import { createBrotliDecompress } from 'zlib'
 
-export const decompressBrotli = async (
-  body: Buffer,
-): Promise<{ body: string; wasCompressed: boolean }> => {
+export const decompressBrotli = async (body: Buffer): Promise<{ body: string; wasCompressed: boolean }> => {
   const { promise, reject, resolve } = Promise.withResolvers<{
     body: string
     wasCompressed: boolean
