@@ -43,7 +43,8 @@ export const getElectronErrorMessage = async (firstData: string, stream?: Readab
     if (!stream) {
       throw new Error('Stream is required when App threw an error during load')
     }
-    const [secondData] = await once(stream, 'data') as [string]
+    const dataEvents = await once(stream as NodeJS.ReadableStream, 'data')
+    const secondData = dataEvents[0] as string
     const lines = secondData.trim().split('\n')
     if (RE_ES_MODULES_NOT_SUPPORTED.test(secondData)) {
       return new Error(`App threw an error during load: ${lines[0]}`)
@@ -54,7 +55,9 @@ export const getElectronErrorMessage = async (firstData: string, stream?: Readab
       const messageLine = lines[0]
       error.message = `App threw an error during load: ${messageLine}`
       const mergedStack = MergeStacks.mergeStacks(error.stack, lines.slice(stackLineIndex).join('\n'))
-      error.stack = mergedStack ?? undefined ?? undefined
+      if (mergedStack !== undefined) {
+        error.stack = mergedStack
+      }
       return error
     }
     if (RE_PATH.test(lines[0])) {
@@ -64,7 +67,9 @@ export const getElectronErrorMessage = async (firstData: string, stream?: Readab
       error.message = `App threw an error during load: ${messageLine}`
       ;(error as Error & { codeFrame?: string | undefined }).codeFrame = `${codeFrameLines.join('\n')}`.trim()
       const mergedStack = MergeStacks.mergeStacks(error.stack, `    at ${lines[0]}\n${lines.slice(stackLineIndex).join('\n')}`)
-      error.stack = mergedStack ?? undefined
+      if (mergedStack !== undefined) {
+        error.stack = mergedStack
+      }
       return error
     }
     return new Error(`${firstData}${secondData}`)
