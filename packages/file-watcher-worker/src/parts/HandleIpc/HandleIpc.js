@@ -14,8 +14,10 @@ export const handleIpc = async (ipc) => {
    * @param {unknown} message
    */
   const handleMessage = async (message) => {
-    const { method, params } = message
+    const msg = /** @type {{ method: string; params: unknown[] }} */ (message)
+    const { method, params } = msg
     const fn = HandleMessage.getFn(method)
+    // @ts-ignore - params is an array, spread is safe
     fn(...params, callback)
   }
   ipc.on('message', handleMessage)

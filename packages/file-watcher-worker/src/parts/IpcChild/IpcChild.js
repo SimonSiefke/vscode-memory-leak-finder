@@ -1,17 +1,16 @@
 import * as IpcChildType from '../IpcChildType/IpcChildType.js'
 
 /**
- * @param {string} method
+ * @param {string | number} method
  */
 const getModule = (method) => {
-  switch (method) {
-    case IpcChildType.NodeForkedProcess:
-      return import('../IpcChildWithNodeForkedProcess/IpcChildWithNodeForkedProcess.js')
-    case IpcChildType.NodeWorkerThread:
-      return import('../IpcChildWithNodeWorkerThread/IpcChildWithNodeWorkerThread.js')
-    default:
-      throw new Error('unexpected ipc type')
+  if (method === IpcChildType.NodeForkedProcess || method === String(IpcChildType.NodeForkedProcess)) {
+    return import('../IpcChildWithNodeForkedProcess/IpcChildWithNodeForkedProcess.js')
   }
+  if (method === IpcChildType.NodeWorkerThread || method === String(IpcChildType.NodeWorkerThread)) {
+    return import('../IpcChildWithNodeWorkerThread/IpcChildWithNodeWorkerThread.js')
+  }
+  throw new Error('unexpected ipc type')
 }
 
 /**

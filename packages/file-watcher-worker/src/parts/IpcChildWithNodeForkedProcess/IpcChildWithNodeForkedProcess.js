@@ -25,6 +25,7 @@ export const wrap = (process) => {
     on(event, listener) {
       switch (event) {
         case 'message':
+          // @ts-ignore - process.on exists for NodeJS.Process
           process.on('message', listener)
           break
         default:
