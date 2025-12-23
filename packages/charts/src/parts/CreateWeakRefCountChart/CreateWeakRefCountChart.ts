@@ -12,4 +12,3 @@ export const createChart = () => {
     yLabel: 'Weak Ref Count',
   }
 }
-
