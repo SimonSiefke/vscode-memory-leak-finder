@@ -1,5 +1,6 @@
 export * as AbortControllerCount from '../CreateAbortControllerCountChart/CreateAbortControllerCountChart.ts'
 export * as AbortSignalCount from '../CreateAbortSignalCountChart/CreateAbortSignalCountChart.ts'
+export * as ArrayCount from '../CreateArrayCountChart/CreateArrayCountChart.ts'
 export * as AttachedDomNodeCount from '../CreateAttachedDomNodeCountChart/CreateAttachedDomNodeCountChart.ts'
 export * as CanvasCount from '../CreateCanvasCountChart/CreateCanvasCountChart.ts'
 export * as CanvasRenderingContext2dCount from '../CreateCanvasRenderingContext2dCountChart/CreateCanvasRenderingContext2dCountChart.ts'
