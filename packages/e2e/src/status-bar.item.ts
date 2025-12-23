@@ -7,7 +7,7 @@ import type { TestContext } from '../types.ts'
 export const skip = true
 
 // @ts-ignore
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __dirname = import.meta.dirname
 
 const root = path.join(__dirname, '../../../')
 
