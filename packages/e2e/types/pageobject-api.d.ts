@@ -342,7 +342,8 @@ export interface SettingsEditor {
   enableCheckBox(options: any): Promise<void>
   openTab(tabName: any): Promise<void>
   disableCheckBox(options: any): Promise<void>
-  openSettingsContextMenu(name: any): Promise<void>
+  openSettingsContextMenu(name: any, options: { waitForItem: any }): Promise<void>
+  closeSettingsContextMenu(name: any): Promise<void>
   expand(groupName: any): Promise<void>
   collapse(groupName: any): Promise<void>
   ensureIdle(): Promise<void>
