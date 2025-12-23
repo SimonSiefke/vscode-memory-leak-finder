@@ -21,6 +21,7 @@ import * as CompareNamedClosureCountWithReferences2 from '../CompareNamedClosure
 import * as CompareHeapsnapshotArrays2 from '../CompareHeapsnapshotArrays2/CompareHeapsnapshotArrays2.ts'
 import * as ParseUserStrings from '../ParseUserStrings/ParseUserStrings.ts'
 import * as CompareHeapSnapshotsFunctions2 from '../CompareHeapSnapshotsFunctions2/CompareHeapSnapshotsFunctions2.ts'
+import * as CompareStringCount from '../CompareStringCount/CompareStringCount.ts'
 
 export const commandMap = {
   'HeapSnapshot.compareArrays2': CompareHeapsnapshotArrays2.compareHeapsnapshotArrays2,
@@ -46,6 +47,7 @@ export const commandMap = {
   'HeapSnapshot.compareNamedClosureCount': CompareNamedClosureCount.compareNamedClosureCountFromHeapSnapshot,
   'HeapSnapshot.compareNamedClosureCountWithReferences2':
     CompareNamedClosureCountWithReferences2.compareNamedClosureCountWithReferencesFromHeapSnapshot2,
+  'HeapSnapshot.compareStringCount': CompareStringCount.compareStringCount,
   'HeapSnapshot.parseStrings': ParseHeapSnapshotStrings.parseHeapSnapshotStrings,
   'HeapSnapshot.parseUserStrings': ParseUserStrings.parseUserStrings,
 }
