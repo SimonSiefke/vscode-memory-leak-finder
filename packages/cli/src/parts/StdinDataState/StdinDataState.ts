@@ -4,44 +4,45 @@ import * as ModeType from '../ModeType/ModeType.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 
 export interface StdinDataState {
-  bisect: boolean
-  buffering: boolean
-  checkLeaks: boolean
-  continueValue: string
-  cwd: string
-  enableExtensions: boolean
-  enableProxy: boolean
-  exitCode: number
-  filter: string
-  headless: boolean
-  ide: string
-  ideVersion: string
-  insidersCommit: string
-  inspectExtensions: boolean
-  inspectExtensionsPort: number
-  inspectPtyHost: boolean
-  inspectPtyHostPort: number
-  inspectSharedProcess: boolean
-  inspectSharedProcessPort: number
-  isGithubActions: boolean
-  isWindows: boolean
-  measure: string
-  measureAfter: boolean
-  measureNode?: boolean
-  mode: number
-  previousFilters: string[]
-  recordVideo: boolean
-  restartBetween: boolean
-  runMode: number
-  runs: number
-  runSkippedTestsAnyway: boolean
-  stdout: string[]
-  timeoutBetween: number
-  timeouts: boolean
-  useProxyMock: boolean
-  value: string
-  watch: boolean
-  workers: boolean
+  readonly bisect: boolean
+  readonly buffering: boolean
+  readonly checkLeaks: boolean
+  readonly continueValue: string
+  readonly cwd: string
+  readonly enableExtensions: boolean
+  readonly enableProxy: boolean
+  readonly exitCode: number
+  readonly filter: string
+  readonly headless: boolean
+  readonly ide: string
+  readonly ideVersion: string
+  readonly insidersCommit: string
+  readonly inspectExtensions: boolean
+  readonly inspectExtensionsPort: number
+  readonly inspectPtyHost: boolean
+  readonly inspectPtyHostPort: number
+  readonly inspectSharedProcess: boolean
+  readonly inspectSharedProcessPort: number
+  readonly isGithubActions: boolean
+  readonly isWindows: boolean
+  readonly measure: string
+  readonly measureAfter: boolean
+  readonly measureNode?: boolean
+  readonly mode: number
+  readonly previousFilters: string[]
+  readonly recordVideo: boolean
+  readonly restartBetween: boolean
+  readonly runMode: number
+  readonly runs: number
+  readonly runSkippedTestsAnyway: boolean
+  readonly stdout: string[]
+  readonly timeoutBetween: number
+  readonly timeouts: boolean
+  readonly useProxyMock: boolean
+  readonly value: string
+  readonly watch: boolean
+  readonly workers: boolean
+  readonly screencastQuality: number
 }
 
 let state: StdinDataState = {
@@ -82,6 +83,7 @@ let state: StdinDataState = {
   value: Character.EmptyString,
   watch: false,
   workers: false,
+  screencastQuality: 90,
 }
 
 export const setState = (newState): void => {
@@ -121,6 +123,7 @@ export const setState = (newState): void => {
     value: newState.value,
     watch: newState.watch,
     workers: newState.workers,
+    screencastQuality: newState.screencastQuality,
   }
 }
 

@@ -49,6 +49,7 @@ export const parseArgv = (argv) => {
     measureNode: false,
     recordVideo: false,
     restartBetween: false,
+    screencastQuality: 90,
     runMode: TestRunMode.Auto,
     runs: 1,
     runSkippedTestsAnyway: false,
@@ -162,6 +163,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--bisect')) {
     options.bisect = true
+  }
+  if (argv.includes('--screencast-quality')) {
+    options.screencastQuality = parseArgvNumber(argv, '--screencast-quality')
   }
   return options
 }
