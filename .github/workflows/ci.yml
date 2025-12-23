@@ -113,6 +113,8 @@ jobs:
             args: --measure promises-with-stack-trace --runs 37 --restart-between --run-skipped-tests-anyway --inspect-extensions
           - name: named-array-count
             args: --measure named-array-count
+          - name: array-count
+            args: --measure array-count
           - name: css-rule-count
             args: --measure css-rule-count
           - name: regex-count
@@ -283,6 +285,11 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-named-array-count
           path: ./vscode-memory-leak-finder-results-linux-named-array-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-array-count
+          path: ./vscode-memory-leak-finder-results-linux-array-count
       - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
