@@ -12,8 +12,6 @@ export const setup = async ({ Editor, SettingsEditor }: TestContext): Promise<vo
 }
 
 export const run = async ({ SettingsEditor }: TestContext): Promise<void> => {
-  // @ts-ignore
   await SettingsEditor.openSettingsContextMenu('Comments', { waitForItem: 'Reset Setting' })
-  // @ts-ignore
   await SettingsEditor.closeSettingsContextMenu('Comments')
 }

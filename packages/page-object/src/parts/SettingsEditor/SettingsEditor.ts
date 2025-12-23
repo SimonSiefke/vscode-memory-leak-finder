@@ -71,10 +71,18 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to clear search input`)
       }
     },
-    closeSettingsContextMenu(name) {
+    async closeSettingsContextMenu(name) {
       try {
+        await page.waitForIdle()
+        const outerItem = page.locator(`.settings-editor-tree .monaco-list-row[aria-label^="${name}"]`)
+        await expect(outerItem).toBeVisible()
+        const contextMenu = outerItem.locator('.setting-toolbar-container .shadow-root-host:enter-shadow() .context-view')
+        await expect(contextMenu).toBeVisible()
+        await page.keyboard.press('Escape')
+        await expect(contextMenu).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to close settings conext menu for "${name}"`)
+        throw new VError(error, `Failed to close settings context menu for "${name}"`)
       }
     },
     async collapse(groupName) {
