@@ -1,5 +1,8 @@
 import * as IpcChildType from '../IpcChildType/IpcChildType.js'
 
+/**
+ * @param {string} method
+ */
 const getModule = (method) => {
   switch (method) {
     case IpcChildType.NodeForkedProcess:
@@ -11,6 +14,9 @@ const getModule = (method) => {
   }
 }
 
+/**
+ * @param {{ method: string }} options
+ */
 export const listen = async ({ method }) => {
   const module = await getModule(method)
   const rawIpc = module.create()

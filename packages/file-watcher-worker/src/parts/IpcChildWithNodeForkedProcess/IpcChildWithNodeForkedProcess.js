@@ -7,11 +7,21 @@ export const create = () => {
   return process
 }
 
+/**
+ * @param {NodeJS.Process} process
+ */
 export const wrap = (process) => {
   return {
+    /**
+     * @param {unknown} message
+     */
     send(message) {
       process.send(message)
     },
+    /**
+     * @param {string} event
+     * @param {(message: unknown) => void} listener
+     */
     on(event, listener) {
       switch (event) {
         case 'message':
