@@ -25,7 +25,7 @@ export const getCertificateForDomain = async (domain: string): Promise<Certifica
 
     // If validation fails, delete the mismatched files and regenerate
     console.log(`[CertificateManager] Certificate-key mismatch detected for ${domain}, regenerating...`)
-    await Promise.all([unlink(certPath).catch(() => {}), unlink(keyPath).catch(() => {})])
+    await Promise.allSettled([unlink(certPath), unlink(keyPath)])
   }
 
   const domainCert = GenerateCertificateForDomain.generateCertificateForDomain(domain, ca.key, ca.cert)
