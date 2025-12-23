@@ -23,7 +23,7 @@ test('log handles empty string', () => {
 
 test('log handles complex objects', () => {
   const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-  const message = { key: 'value', number: 123 }
+  const message = JSON.stringify({ key: 'value', number: 123 })
 
   log(message)
 

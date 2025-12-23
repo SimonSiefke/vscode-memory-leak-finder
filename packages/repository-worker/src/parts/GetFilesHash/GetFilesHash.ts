@@ -2,9 +2,9 @@ import { VError } from '@lvce-editor/verror'
 import { readFileContent } from '../FileSystemWorker/FileSystemWorker.ts'
 import { getHash } from '../GetHash/GetHash.ts'
 
-export const getFilesHash = async (absolutePaths) => {
+export const getFilesHash = async (absolutePaths: readonly string[]): Promise<string> => {
   try {
-    const contents = await Promise.all(absolutePaths.map((file) => readFileContent(file)))
+    const contents = await Promise.all(absolutePaths.map((file: string) => readFileContent(file)))
     const hash = getHash(contents)
     return hash
   } catch (error) {

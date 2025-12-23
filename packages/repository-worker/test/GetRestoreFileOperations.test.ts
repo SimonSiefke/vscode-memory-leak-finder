@@ -4,7 +4,7 @@ import { getRestoreNodeModulesFileOperations } from '../src/parts/GetRestoreFile
 test.skip('getRestoreNodeModulesFileOperations returns empty array when no cached paths', () => {
   const from = '/test/node-modules-cache/1234'
   const to = '/test/vscode/5678'
-  const pathsToRestore = []
+  const pathsToRestore: string[] = []
   const result = getRestoreNodeModulesFileOperations(from, to, pathsToRestore)
   expect(result).toEqual([])
 })

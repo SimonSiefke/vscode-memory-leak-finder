@@ -21,6 +21,9 @@ export const skipCursorWelcome = async () => {
     }
     const db = await GetDb.getDb(storagePath)
     const rows = await ExecuteSql.executeSql(db, 'SELECT * FROM ItemTable')
+    /**
+     * @param {{ key: string }} row
+     */
     const privacyMode = rows.find((row) => row.key === keyPrivacyMode)
     if (privacyMode === 'true') {
       return
