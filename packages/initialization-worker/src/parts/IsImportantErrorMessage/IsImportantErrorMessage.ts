@@ -1,7 +1,7 @@
 const RE_LIB_GIO_PROXY_ERROR = /Failed to load module: .*libgiolibproxy.so/
 const RE_LIB_PROXY_NOT_FOUND = /not found \(required by .*libproxy.so/
 
-export const isImportantErrorMessage = (data) => {
+export const isImportantErrorMessage = (data: string): boolean => {
   if (data.includes('libva error')) {
     return false
   }
