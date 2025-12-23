@@ -12,4 +12,3 @@ export const createChart = () => {
     yLabel: 'Intersection Observer Count',
   }
 }
-

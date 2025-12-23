@@ -12,4 +12,3 @@ export const createChart = () => {
     yLabel: 'WebGL2 Rendering Context Count',
   }
 }
-

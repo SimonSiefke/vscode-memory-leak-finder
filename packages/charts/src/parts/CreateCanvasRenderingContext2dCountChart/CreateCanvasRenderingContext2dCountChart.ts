@@ -12,4 +12,3 @@ export const createChart = () => {
     yLabel: 'Canvas Rendering Context 2D Count',
   }
 }
-
