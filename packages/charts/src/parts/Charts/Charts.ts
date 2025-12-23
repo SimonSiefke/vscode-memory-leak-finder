@@ -5,6 +5,7 @@ export * as CanvasCount from '../CreateCanvasCountChart/CreateCanvasCountChart.t
 export * as CanvasRenderingContext2dCount from '../CreateCanvasRenderingContext2dCountChart/CreateCanvasRenderingContext2dCountChart.ts'
 export * as CssRuleCount from '../CreateCssRuleCountChart/CreateCssRuleCountChart.ts'
 export * as DetachedDomNodeCount from '../CreateDetachedDomNodeCountChart/CreateDetachedDomNodeCountChart.ts'
+export * as DomTimerCount from '../CreateDomTimerCountChart/CreateDomTimerCountChart.ts'
 export * as EditContextCount from '../CreateEditContextCountChart/CreateEditContextCountChart.ts'
 export * as EmitterCount from '../CreateEmitterCountChart/CreateEmitterCountChart.ts'
 export * as ErrorCount from '../CreateErrorCountChart/CreateErrorCountChart.ts'
