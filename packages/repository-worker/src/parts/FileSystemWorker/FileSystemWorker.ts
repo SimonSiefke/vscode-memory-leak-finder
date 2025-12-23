@@ -49,7 +49,11 @@ interface ExecOptions {
   stdio?: string
 }
 
-export const exec = (command: string, args: string[], options: ExecOptions): Promise<{ exitCode: number; stderr: string; stdout: string }> => {
+export const exec = (
+  command: string,
+  args: string[],
+  options: ExecOptions,
+): Promise<{ exitCode: number; stderr: string; stdout: string }> => {
   return invoke('FileSystem.exec', command, args, options) as Promise<{ exitCode: number; stderr: string; stdout: string }>
 }
 
