@@ -17,7 +17,7 @@ export const create = (session: Session) => {
   return [session, objectGroup, scriptHandler]
 }
 
-export const start = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+export const start = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   const id = 0
   const heapSnapshotPath = await getHeapSnapshot(session, id)
@@ -25,7 +25,7 @@ export const start = async (session, objectGroup, scriptHandler: IScriptHandler)
   return heapSnapshotPath
 }
 
-export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+export const stop = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
   const id = 1
   const heapSnapshotPath = await getHeapSnapshot(session, id)
   await WriteScriptMap.writeScriptMap(scriptHandler.scriptMap, id)

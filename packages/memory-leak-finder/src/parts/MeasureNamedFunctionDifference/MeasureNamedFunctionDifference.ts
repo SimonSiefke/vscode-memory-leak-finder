@@ -20,12 +20,12 @@ export const create = (session: Session) => {
 
 const includeSourceMap = false
 
-export const start = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+export const start = async (session: Session, objectGroup: string, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   return GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap, includeSourceMap)
 }
 
-export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+export const stop = async (session: Session, objectGroup: string, scriptHandler: IScriptHandler) => {
   await scriptHandler.stop(session)
   const result = await GetNamedFunctionCount.getNamedFunctionCount(session, objectGroup, scriptHandler.scriptMap, includeSourceMap)
   return result

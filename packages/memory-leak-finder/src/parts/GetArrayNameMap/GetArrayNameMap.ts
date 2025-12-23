@@ -17,7 +17,7 @@ const isArrayScopeValue = (rawScopeValue) => {
   return rawScopeValue.value.type === 'object' && rawScopeValue.value.subtype === 'array'
 }
 
-const getScopeChildValues = async (session, objectId) => {
+const getScopeChildValues = async (session: Session, objectId: string) => {
   const rawResult = await DevtoolsProtocolRuntime.getProperties(session, {
     generatePreview: false,
     objectId,
@@ -27,7 +27,7 @@ const getScopeChildValues = async (session, objectId) => {
   return ownProperties
 }
 
-const getScopeValues = async (session, objectId) => {
+const getScopeValues = async (session: Session, objectId: string) => {
   const rawResult = await DevtoolsProtocolRuntime.getProperties(session, {
     generatePreview: false,
     objectId,

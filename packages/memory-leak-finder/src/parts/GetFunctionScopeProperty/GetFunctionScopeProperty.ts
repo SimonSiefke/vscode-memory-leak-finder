@@ -1,8 +1,9 @@
 import * as Assert from '../Assert/Assert.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as ParseFunctionScopeListProperty from '../ParseFunctionScopeListProperty/ParseFunctionScopeListProperty.ts'
+import type { Session } from '../Session/Session.ts'
 
-export const getFunctionScopeProperty = async (session, objectGroup, objectId) => {
+export const getFunctionScopeProperty = async (session: Session, objectGroup, objectId) => {
   Assert.object(session)
   Assert.string(objectGroup)
   Assert.string(objectId)

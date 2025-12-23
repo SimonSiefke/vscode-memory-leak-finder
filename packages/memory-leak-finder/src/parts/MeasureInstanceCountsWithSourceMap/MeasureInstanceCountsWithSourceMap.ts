@@ -18,12 +18,12 @@ export const create = (session: Session) => {
   return [session, objectGroup, scriptHandler]
 }
 
-export const start = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+export const start = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   return GetInstanceCountsWithSourceMap.getInstanceCountsWithSourceMap(session, objectGroup, scriptHandler.scriptMap)
 }
 
-export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+export const stop = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.stop(session)
   return GetInstanceCountsWithSourceMap.getInstanceCountsWithSourceMap(session, objectGroup, scriptHandler.scriptMap)
 }

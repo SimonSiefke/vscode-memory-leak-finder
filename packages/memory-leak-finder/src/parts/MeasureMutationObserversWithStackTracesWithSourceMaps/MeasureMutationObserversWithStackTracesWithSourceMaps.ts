@@ -20,13 +20,13 @@ export const create = (session: Session) => {
   return [session, objectGroup, scriptHandler]
 }
 
-export const start = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+export const start = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   await StartTrackingMutationObserverStackTraces.startTrackingMutationObserverStackTraces(session, objectGroup)
   return GetMutationObserverCount.getMutationObserverCount(session, objectGroup)
 }
 
-export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+export const stop = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.stop(session)
   const added = await GetMutationObserversWithStackTraces.getMutationObserversWithStackTraces(session, objectGroup)
   await StopTrackingMutationObserverStackTraces.stopTrackingMutationObserverStackTraces(session, objectGroup)

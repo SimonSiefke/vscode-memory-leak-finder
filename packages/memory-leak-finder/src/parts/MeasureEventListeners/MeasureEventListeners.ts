@@ -23,13 +23,13 @@ export const create = (session: Session) => {
   return [session, objectGroup, scriptHandler]
 }
 
-export const start = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+export const start = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptHandler.scriptMap)
   return result
 }
 
-export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+export const stop = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.stop(session)
   const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptHandler.scriptMap)
   return result
