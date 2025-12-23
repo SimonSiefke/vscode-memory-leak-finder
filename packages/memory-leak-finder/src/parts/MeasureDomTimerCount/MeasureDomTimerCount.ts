@@ -1,5 +1,6 @@
+import { compareDomTimerCount } from '../CompareDomTimerCount/CompareDomTimerCount.ts'
+import { getHeapSnapshot } from '../GetHeapSnapshot/GetHeapSnapshot.ts'
 import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
-import * as GetDomTimerCount from '../GetDomTimerCount/GetDomTimerCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
@@ -19,22 +20,20 @@ export const create = (session) => {
 export const start = async (session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   const id = 0
-  const result = await GetDomTimerCount.getDomTimerCount(session, objectGroup, id)
+  const heapSnapshotPath = await getHeapSnapshot(session, id)
   await WriteScriptMap.writeScriptMap(scriptHandler.scriptMap, id)
-  return result
+  return heapSnapshotPath
 }
 
 export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) => {
   const id = 1
-  const result = await GetDomTimerCount.getDomTimerCount(session, objectGroup, id)
+  const heapSnapshotPath = await getHeapSnapshot(session, id)
   await WriteScriptMap.writeScriptMap(scriptHandler.scriptMap, id)
   await scriptHandler.stop(session)
-  return result
+  return heapSnapshotPath
 }
 
-export const compare = (before, after) => {
-  return { after, before }
-}
+export const compare = compareDomTimerCount
 
 export const isLeak = ({ after, before }) => {
   return after > before
