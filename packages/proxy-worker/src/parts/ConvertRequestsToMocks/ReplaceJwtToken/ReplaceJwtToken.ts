@@ -14,11 +14,7 @@ export const replaceJwtToken = (token: string): string => {
     }
 
     const payload = decoded.payload as Record<string, any>
-<<<<<<< HEAD
-    const {header} = decoded
-=======
     const { header } = decoded
->>>>>>> origin/main
 
     // Update expiration to one month from now
     const oneMonthFromNow = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60
