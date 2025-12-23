@@ -405,7 +405,7 @@ const baseStructure = `
 </html>
 `
 
-const getMiddleHtml = (dirents) => {
+const getMiddleHtml = (dirents: string[]) => {
   let html = '<ul class="Charts">\n'
   for (const dirent of dirents) {
     if (!dirent.endsWith('.svg')) {
