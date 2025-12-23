@@ -164,7 +164,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to send chat message`)
       }
     },
-    async setMode(modeLabel) {
+    async setMode(modeLabel: string) {
       try {
         const chatView = page.locator('.interactive-session')
         const setModeButton = chatView.locator('[aria-label^="Set Mode"]')
