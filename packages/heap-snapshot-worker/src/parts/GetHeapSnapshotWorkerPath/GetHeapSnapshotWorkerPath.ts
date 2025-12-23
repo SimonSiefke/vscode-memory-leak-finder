@@ -1,5 +1,4 @@
-import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 
 /**
  * Gets the file path to the heap snapshot parsing worker executable
