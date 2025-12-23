@@ -2,7 +2,8 @@ import { expect, test } from '@jest/globals'
 import { isJwtToken } from '../src/parts/IsJwtToken/IsJwtToken.ts'
 
 test('isJwtToken - returns true for valid JWT token', () => {
-  const validToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+  const validToken =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
   expect(isJwtToken(validToken)).toBe(true)
 })
 
@@ -15,7 +16,9 @@ test('isJwtToken - returns false for non-string input', () => {
 
 test('isJwtToken - returns false for string with less than 3 parts', () => {
   expect(isJwtToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9')).toBe(false)
-  expect(isJwtToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ')).toBe(false)
+  expect(
+    isJwtToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ'),
+  ).toBe(false)
 })
 
 test('isJwtToken - returns false for string with more than 3 parts', () => {
