@@ -14,11 +14,12 @@ const getModule = (method) => {
 }
 
 /**
- * @param {{ method: string }} options
+ * @param {{ method: string | number }} options
  */
 export const listen = async ({ method }) => {
   const module = await getModule(method)
   const rawIpc = module.create()
+  // @ts-ignore - rawIpc can be Process or MessagePort, wrap handles both
   const ipc = module.wrap(rawIpc)
   return ipc
 }
