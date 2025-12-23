@@ -8,12 +8,13 @@ import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as StartTrackingMutationObserverStackTraces from '../StartTrackingMutationObserverStackTraces/StartTrackingMutationObserverStackTraces.ts'
 import * as StopTrackingMutationObserverStackTraces from '../StopTrackingMutationObserverStackTraces/StopTrackingMutationObserverStackTraces.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
+import type { Session } from '../Session/Session.ts'
 
 export const id = MeasureId.MutationObserversWithStackTracesWithSourceMaps
 
 export const targets = [TargetId.Browser]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   const scriptHandler = ScriptHandler.create()
   return [session, objectGroup, scriptHandler]

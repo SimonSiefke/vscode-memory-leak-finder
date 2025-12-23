@@ -9,31 +9,32 @@ import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as StartTrackingDomNodeStackTraces from '../StartTrackingDomNodeStackTraces/StartTrackingDomNodeStackTraces.ts'
 import * as StopTrackingDomNodeStackTraces from '../StopTrackingDomNodeStackTraces/StopTrackingDomNodeStackTraces.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
+import type { Session } from '../Session/Session.ts'
 
 export const id = MeasureId.DetachedDomNodeRootsWithStackTraces
 
 export const targets = [TargetId.Browser]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   const scriptHandler = ScriptHandler.create()
   return [session, objectGroup, scriptHandler]
 }
 
-export const start = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+export const start = async (session: Session, objectGroup: string, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   await StartTrackingDomNodeStackTraces.startTrackingDomNodeStackTraces(session, objectGroup)
   return GetDetachedDomNodesWithStackTraces.getDetachedDomNodesWithStackTraces(session, objectGroup, scriptHandler.scriptMap)
 }
 
-export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+export const stop = async (session: Session, objectGroup: string, scriptHandler: IScriptHandler) => {
   await scriptHandler.stop(session)
   const result = await GetDetachedDomNodesWithStackTraces.getDetachedDomNodesWithStackTraces(session, objectGroup, scriptHandler.scriptMap)
   await StopTrackingDomNodeStackTraces.stopTrackingDomNodeStackTraces(session, objectGroup)
   return result
 }
 
-export const releaseResources = async (session, objectGroup) => {
+export const releaseResources = async (session: Session, objectGroup: string) => {
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 

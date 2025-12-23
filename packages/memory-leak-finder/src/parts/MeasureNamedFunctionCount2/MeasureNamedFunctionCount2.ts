@@ -5,12 +5,13 @@ import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
 import * as WriteScriptMap from '../WriteScriptMap/WriteScriptMap.ts'
+import type { Session } from '../Session/Session.ts'
 
 export const id = MeasureId.NamedFunctionCount2
 
 export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   const scriptHandler = ScriptHandler.create()
   return [session, objectGroup, scriptHandler]

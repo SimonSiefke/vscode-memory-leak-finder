@@ -5,12 +5,13 @@ import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
+import type { Session } from '../Session/Session.ts'
 
 export const id = MeasureId.WeakMapCount
 
 export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   return [session]
 }
 

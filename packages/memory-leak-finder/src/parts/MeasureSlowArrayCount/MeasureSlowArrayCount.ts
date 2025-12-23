@@ -5,26 +5,27 @@ import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
+import type { Session } from '../Session/Session.ts'
 
 export const id = MeasureId.SlowArrayCount
 
 export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]
 }
 
-export const start = (session, objectGroup) => {
+export const start = (session: Session, objectGroup: string) => {
   return GetSlowArrayCount.getSlowArrayCount(session, objectGroup)
 }
 
-export const stop = async (session, objectGroup) => {
+export const stop = async (session: Session, objectGroup: string) => {
   const result = await GetSlowArrayCount.getSlowArrayCount(session, objectGroup)
   return result
 }
 
-export const releaseResources = async (session, objectGroup) => {
+export const releaseResources = async (session: Session, objectGroup: string) => {
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 

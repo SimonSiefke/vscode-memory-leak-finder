@@ -52,7 +52,7 @@ undefined
   })
 }
 
-export const getTimeoutCount = async (session: Session): Promise<number> => {
+export const getTimeoutCount = async (session): Promise<number> => {
   const count = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: 'globalThis.___timeouts',
     returnByValue: false,

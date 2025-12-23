@@ -6,6 +6,7 @@ import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
+import type { Session } from '../Session/Session.ts'
 
 export const id = MeasureId.EventListeners
 
@@ -16,7 +17,7 @@ export const targets = [TargetId.Browser]
  * @param {any} session
  */
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   const scriptHandler = ScriptHandler.create()
   return [session, objectGroup, scriptHandler]
@@ -34,7 +35,7 @@ export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) 
   return result
 }
 
-export const releaseResources = async (session, objectGroup) => {
+export const releaseResources = async (session: Session, objectGroup: string) => {
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 

@@ -4,6 +4,7 @@ import * as GetAllFunctions from '../GetAllFunctions/GetAllFunctions.ts'
 import * as GetAllScopePropertiesInternal from '../GetAllScopePropertiesInternal/GetAllScopePropertiesInternal.ts'
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
 import * as IsEnumerable from '../IsEnumerable/IsEnumerable.ts'
+import type { Session } from '../Session/Session.ts'
 
 const parseChildScopeValue = (rawScopeValue) => {
   return {
@@ -41,7 +42,7 @@ const getScopeValues = async (session, objectId) => {
   return childScopeArrays
 }
 
-export const getArrayNameMap = async (session, objectGroup) => {
+export const getArrayNameMap = async (session: Session, objectGroup: string) => {
   Assert.object(session)
   Assert.string(objectGroup)
   const functionObjectIds = await GetAllFunctions.getAllFunctions(session, objectGroup)
