@@ -526,13 +526,16 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed inspect tokens`)
       }
     },
-    async moveScrollBar(y, expectedScrollBarY) {
+    async moveScrollBar(y: number, expectedScrollBarY: number) {
       try {
         await page.mouse.mockPointerEvents()
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
         const scrollbar = editor.locator('.scrollbar.vertical').first()
         await scrollbar.hover()
+        await page.waitForIdle()
+        const scrollBarVisible = editor.locator('.scrollbar.visible.scrollbar.vertical')
+        await expect(scrollBarVisible).toBeVisible()
         await page.waitForIdle()
         const scrollbarSlider = scrollbar.locator('.slider')
         const elementBox1 = await scrollbarSlider.boundingBox()
