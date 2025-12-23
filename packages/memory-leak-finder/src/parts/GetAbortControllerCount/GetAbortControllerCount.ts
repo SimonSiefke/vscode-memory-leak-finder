@@ -3,6 +3,6 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 import type { Session } from '../Session/Session.ts'
 
 export const getAbortControllerCount = async (session: Session, objectGroup: string): Promise<number> => {
-  const count = await GetObjectCount.getObjectCount(session, PrototypeExpression.AbortController)
+  const count = await GetObjectCount.getObjectCount(session, PrototypeExpression.AbortController, objectGroup)
   return count
 }
