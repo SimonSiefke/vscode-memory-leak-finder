@@ -17,4 +17,3 @@ export const decompressGzip = async (body: Buffer): Promise<{ body: string; wasC
   gunzip.end()
   return promise
 }
-
