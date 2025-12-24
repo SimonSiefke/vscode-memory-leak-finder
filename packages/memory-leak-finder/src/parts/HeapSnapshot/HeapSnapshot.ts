@@ -4,8 +4,9 @@ import { dirname } from 'node:path'
 import { pipeline } from 'node:stream/promises'
 import * as Assert from '../Assert/Assert.ts'
 import * as HeapSnapshotStream from '../HeapSnapshotStream/HeapSnapshotStream.ts'
+import type { Session } from '../Session/Session.ts'
 
-export const takeHeapSnapshot = async (session, outFile, options = {}) => {
+export const takeHeapSnapshot = async (session: Session, outFile, options = {}) => {
   Assert.object(session)
   Assert.string(outFile)
   await mkdir(dirname(outFile), { recursive: true })

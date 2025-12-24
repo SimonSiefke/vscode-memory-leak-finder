@@ -1,6 +1,7 @@
 import { Readable } from 'node:stream'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 import { DevtoolsProtocolHeapProfiler } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import type { Session } from '../Session/Session.ts'
 
 class CustomStream extends Readable {
   rpc: any
@@ -25,15 +26,15 @@ class CustomStream extends Readable {
 
   async start() {
     await DevtoolsProtocolHeapProfiler.takeHeapSnapshot(this.rpc, {
+      captureNumericValues: this.options.captureNumericValues,
       exposeInternals: false,
       reportProgress: true,
-      captureNumericValues: this.options.captureNumericValues,
     })
     this.rpc.off(DevtoolsEventType.HeapProfilerAddHeapSnapshotChunk, this.handleChunk)
     this.push(null)
   }
 }
 
-export const create = (session, options = {}) => {
+export const create = (session: Session, options = {}) => {
   return new CustomStream(session, options)
 }

@@ -14,4 +14,10 @@ interface RemoveOperation {
   type: 'remove'
 }
 
-export type FileOperation = CopyOperation | MkdirOperation | RemoveOperation
+interface WriteOperation {
+  content: string
+  path: string
+  type: 'write'
+}
+
+export type FileOperation = CopyOperation | MkdirOperation | RemoveOperation | WriteOperation

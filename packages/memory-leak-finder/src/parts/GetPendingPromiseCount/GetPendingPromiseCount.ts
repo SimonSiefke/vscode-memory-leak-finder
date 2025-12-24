@@ -6,18 +6,18 @@ import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression
 export const getPendingPromiseCount = async (session: Session, objectGroup: string): Promise<number> => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Promise,
-    returnByValue: false,
     objectGroup,
+    returnByValue: false,
   })
   const fnResult1 = await DevtoolsProtocolRuntime.queryObjects(session, {
-    prototypeObjectId: prototype.objectId,
     objectGroup,
+    prototypeObjectId: prototype.objectId,
   })
   const fnResult2 = await DevtoolsProtocolRuntime.getProperties(session, {
-    objectId: fnResult1.objects.objectId,
     accessorPropertiesOnly: false,
     generatePreview: true,
     nonIndexedPropertiesOnly: false,
+    objectId: fnResult1.objects.objectId,
     ownProperties: false,
   })
   const descriptors = GetDescriptorValues.getDescriptorValues(fnResult2.result)

@@ -2,7 +2,7 @@ import { expect, test } from '@jest/globals'
 import { createChart } from '../src/parts/CreateChart/CreateChart.ts'
 
 test('main', () => {
-  const data = []
+  const data: any[] = []
   const options = {
     x: 0,
     xLabel: 'X',

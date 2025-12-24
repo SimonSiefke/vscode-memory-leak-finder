@@ -5,7 +5,7 @@ const getUniqueInputs = (inputs) => {
   const seen = Object.create(null)
   const result: any[] = []
   for (const input of inputs) {
-    const { sourceMapUrl, line, column } = input
+    const { column, line, sourceMapUrl } = input
     const key = FormatUrl.formatUrl(sourceMapUrl, line, column)
     if (key in seen) {
       continue
@@ -21,7 +21,7 @@ export const getSourceMapUrlMap = (eventListeners) => {
   const inputs = eventListeners.map(GetSourceMapUrl.getSourceMapUrl)
   const uniqueInputs = getUniqueInputs(inputs)
   for (const input of uniqueInputs) {
-    const { sourceMapUrl, line, column } = input
+    const { column, line, sourceMapUrl } = input
     map[sourceMapUrl] ||= []
     map[sourceMapUrl].push(line, column)
   }

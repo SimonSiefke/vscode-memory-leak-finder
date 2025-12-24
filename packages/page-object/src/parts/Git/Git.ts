@@ -56,14 +56,11 @@ export const create = ({ page, VError }) => {
     },
     async init() {
       try {
-        await execa('git', ['init'], { cwd: workspace, env: { ...process.env } })
+        await mkdir(workspace, { recursive: true })
+        await execa('git', ['init', '-b', 'main'], { cwd: workspace, env: { ...process.env } })
         await execa('git', ['config', 'user.name', 'Test User'], { cwd: workspace, env: { ...process.env } })
         await execa('git', ['config', 'user.email', 'test@example.com'], { cwd: workspace, env: { ...process.env } })
         await page.waitForIdle()
-        await mkdir(workspace, { recursive: true })
-        await execa('git', ['init'], { cwd: workspace, env: { ...process.env } })
-        await execa('git', ['config', 'user.name', 'Test User'], { cwd: workspace, env: { ...process.env } })
-        await execa('git', ['config', 'user.email', 'test@example.com'], { cwd: workspace, env: { ...process.env } })
       } catch (error) {
         throw new VError(error, `Failed to init`)
       }

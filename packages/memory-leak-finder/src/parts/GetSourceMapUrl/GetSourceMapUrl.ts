@@ -2,9 +2,9 @@ import { dirname, sep } from 'node:path'
 import * as ParseLineAndColumn from '../ParseLineAndColumn/ParseLineAndColumn.ts'
 
 const emptySourceMapUrl = {
-  sourceMapUrl: '',
-  line: 0,
   column: 0,
+  line: 0,
+  sourceMapUrl: '',
 }
 
 const isRelativeSourceMap = (sourceMapUrl) => {
@@ -26,7 +26,7 @@ const isRelativeSourceMap = (sourceMapUrl) => {
 const RE_PATH = /\((.+):\d+:\d+\)$/
 
 export const getSourceMapUrl = (eventListener) => {
-  const { stack, sourceMaps } = eventListener
+  const { sourceMaps, stack } = eventListener
   if (!stack || !sourceMaps) {
     return emptySourceMapUrl
   }
@@ -45,8 +45,8 @@ export const getSourceMapUrl = (eventListener) => {
   }
 
   return {
-    sourceMapUrl,
-    line: parsed.line,
     column: parsed.column,
+    line: parsed.line,
+    sourceMapUrl,
   }
 }

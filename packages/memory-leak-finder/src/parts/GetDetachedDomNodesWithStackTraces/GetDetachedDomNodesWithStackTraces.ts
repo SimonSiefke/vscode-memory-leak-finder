@@ -2,9 +2,10 @@ import * as CleanDetachedDomNodesWithStackTraces from '../CleanDetachedDomNodesW
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
 import * as GetDetachedDomNodeRoots from '../GetDetachedDomNodeRoots/GetDetachedDomNodeRoots.ts'
+import type { Session } from '../Session/Session.ts'
 import * as SplitLines from '../SplitLines/SplitLines.ts'
 
-export const getDetachedDomNodesWithStackTraces = async (session, objectGroup, scriptMap) => {
+export const getDetachedDomNodesWithStackTraces = async (session: Session, objectGroup: string, scriptMap: Record<string, any>) => {
   const fnResult1 = await GetDetachedDomNodeRoots.getDetachedDomNodeRoots(session, objectGroup)
   const fnResult2 = await DevtoolsProtocolRuntime.getProperties(session, {
     objectId: fnResult1.objectId,
@@ -31,9 +32,9 @@ const getStackTraces = (detachedNodes) => {
 const stackTraces = getStackTraces(detachedRoots)
 return stackTraces
 }`,
+    objectGroup,
     objectId: fnResult1.objectId,
     returnByValue: true,
-    objectGroup,
   })
   const merged: any[] = []
   if (descriptors.length !== stackTraces.length) {

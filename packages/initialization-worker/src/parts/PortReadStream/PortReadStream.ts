@@ -18,7 +18,7 @@ export class PortReadStream extends Readable {
 
   _read(size: number): void {}
 
-  handleMessage(message) {
+  handleMessage(message: string): void {
     this.push(message)
   }
 }

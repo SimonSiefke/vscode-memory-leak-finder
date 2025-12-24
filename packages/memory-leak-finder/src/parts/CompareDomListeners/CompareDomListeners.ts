@@ -48,12 +48,12 @@ export const compareDomListeners = (before, after) => {
     const delta = newCount - oldCount
     if (delta > 0) {
       leaked.push({
-        type: item.type,
-        handlerName: item.handlerName,
-        nodeDescription: item.nodeDescription,
-        disposed: item.disposed,
         count: newCount,
         delta,
+        disposed: item.disposed,
+        handlerName: item.handlerName,
+        nodeDescription: item.nodeDescription,
+        type: item.type,
       })
     }
   }

@@ -2,7 +2,7 @@ import { existsSync } from 'fs'
 import { readFile, writeFile, mkdir } from 'fs/promises'
 import type { CertificatePair } from '../CertificatePair/CertificatePair.ts'
 import { CA_KEY_PATH, CA_CERT_PATH, CERT_DIR } from '../Constants/Constants.ts'
-import * as GenerateCA from '../GenerateCA/GenerateCA.ts'
+import * as CryptographyWorker from '../CryptographyWorker/CryptographyWorker.ts'
 
 export const getOrCreateCA = async (): Promise<CertificatePair> => {
   await mkdir(CERT_DIR, { recursive: true })
@@ -12,7 +12,8 @@ export const getOrCreateCA = async (): Promise<CertificatePair> => {
     return { cert, key }
   }
 
-  const ca = GenerateCA.generateCA()
+  const cryptographyWorker = await CryptographyWorker.getCryptographyWorker()
+  const ca = await cryptographyWorker.invoke('Cryptography.generateCA')
   await Promise.all([writeFile(CA_KEY_PATH, ca.key, 'utf8'), writeFile(CA_CERT_PATH, ca.cert, 'utf8')])
   console.log(`[CertificateManager] Generated CA certificate at ${CA_CERT_PATH}`)
   console.log(`[CertificateManager] To trust this CA, set NODE_EXTRA_CA_CERTS=${CA_CERT_PATH}`)

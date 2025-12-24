@@ -4,7 +4,7 @@ import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WebView from '../WebView/WebView.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-const initialDiagnosticTimeout = 30_000
+const initialDiagnosticTimeout = 60_000
 
 const isNotebook = (file) => {
   return file.endsWith('.ipynb')
@@ -526,13 +526,16 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed inspect tokens`)
       }
     },
-    async moveScrollBar(y, expectedScrollBarY) {
+    async moveScrollBar(y: number, expectedScrollBarY: number) {
       try {
         await page.mouse.mockPointerEvents()
         const editor = page.locator('.editor-instance')
         await expect(editor).toBeVisible()
         const scrollbar = editor.locator('.scrollbar.vertical').first()
         await scrollbar.hover()
+        await page.waitForIdle()
+        const scrollBarVisible = editor.locator('.scrollbar.visible.scrollbar.vertical')
+        await expect(scrollBarVisible).toBeVisible()
         await page.waitForIdle()
         const scrollbarSlider = scrollbar.locator('.slider')
         const elementBox1 = await scrollbarSlider.boundingBox()
@@ -811,6 +814,19 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         }
       } catch (error) {
         throw new VError(error, `Failed to save file`)
+      }
+    },
+    async saveAll() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.FileSaveAll)
+        await page.waitForIdle()
+        const dirtyTabs = page.locator('.tab.dirty')
+        await expect(dirtyTabs).toHaveCount(0)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to save all files`)
       }
     },
     async scrollDown() {
@@ -1158,6 +1174,18 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         }
       } catch (error) {
         throw new VError(error, `Failed to verify semantic token ${type}`)
+      }
+    },
+    async shouldHaveSpark() {
+      try {
+        await page.waitForIdle()
+        const spark = page.locator('.codicon.codicon-gutter-lightbulb-sparkle-filled')
+        await expect(spark).toBeVisible({
+          timeout: 20_000,
+        })
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to verify spark`)
       }
     },
     async shouldHaveSquigglyError() {

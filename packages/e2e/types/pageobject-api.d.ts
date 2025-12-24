@@ -109,6 +109,7 @@ export interface Editor {
   shouldHaveToken(text: any, color: any): Promise<void>
   shouldHaveBreadCrumb(text: any): Promise<void>
   save(options?: any): Promise<void>
+  saveAll(): Promise<void>
   switchToTab(name: any): Promise<void>
   openSettingsJson(): Promise<void>
   showColorPicker(): Promise<void>
@@ -342,7 +343,8 @@ export interface SettingsEditor {
   enableCheckBox(options: any): Promise<void>
   openTab(tabName: any): Promise<void>
   disableCheckBox(options: any): Promise<void>
-  openSettingsContextMenu(name: any): Promise<void>
+  openSettingsContextMenu(name: any, options: { waitForItem: any }): Promise<void>
+  closeSettingsContextMenu(name: any): Promise<void>
   expand(groupName: any): Promise<void>
   collapse(groupName: any): Promise<void>
   ensureIdle(): Promise<void>

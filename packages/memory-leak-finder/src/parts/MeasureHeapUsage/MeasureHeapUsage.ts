@@ -1,7 +1,7 @@
+import type { Session } from '../Session/Session.ts'
 import * as CompareHeapUsage from '../CompareHeapUsage/CompareHeapUsage.ts'
 import * as GetHeapUsage from '../GetHeapUsage/GetHeapUsage.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
-import type { Session } from '../Session/Session.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.HeapUsage

@@ -59,6 +59,7 @@ export const runTestsWithCallback = async ({
   runMode,
   runs,
   runSkippedTestsAnyway,
+  screencastQuality,
   setupOnly,
   timeoutBetween,
   timeouts,
@@ -120,6 +121,7 @@ export const runTestsWithCallback = async ({
         pageObjectPath,
         recordVideo,
         runMode,
+        screencastQuality,
         timeouts,
         useProxyMock,
         vscodePath,
@@ -218,6 +220,7 @@ export const runTestsWithCallback = async ({
           pageObjectPath,
           recordVideo,
           runMode,
+          screencastQuality,
           timeouts,
           useProxyMock,
           vscodePath,
@@ -275,6 +278,10 @@ export const runTestsWithCallback = async ({
               await Timeout.setTimeout(timeoutBetween)
             }
             await MemoryLeakFinder.stop(memoryRpc, connectionId)
+
+            if (measureAfter) {
+              await Timeout.setTimeout(3000)
+            }
 
             const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
             const testName = fileName.replace('.json', '')

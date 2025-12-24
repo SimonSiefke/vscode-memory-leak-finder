@@ -1,15 +1,16 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
+import type { Session } from '../Session/Session.ts'
 
-export const getDetachedDomNodeRoots = async (session, objectGroup) => {
+export const getDetachedDomNodeRoots = async (session: Session, objectGroup: string) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Node,
-    returnByValue: false,
     objectGroup,
+    returnByValue: false,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
-    prototypeObjectId: prototypeDescriptor.objectId,
     objectGroup,
+    prototypeObjectId: prototypeDescriptor.objectId,
   })
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
@@ -65,9 +66,9 @@ const detachedNodes = getDetachedNodes(objects)
 const detachedRoots = getDetachedRoots(detachedNodes)
 return detachedRoots
 }`,
+    objectGroup,
     objectId: objects.objects.objectId,
     returnByValue: false,
-    objectGroup,
   })
   return fnResult1
 }

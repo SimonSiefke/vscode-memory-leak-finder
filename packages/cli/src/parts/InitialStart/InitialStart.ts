@@ -40,6 +40,7 @@ export const initialStart = async (options): Promise<void> => {
     runMode: options.runMode,
     runs: options.runs,
     runSkippedTestsAnyway: options.runSkippedTestsAnyway,
+    screencastQuality: options.screencastQuality,
     setupOnly: options.setupOnly,
     timeoutBetween: options.timeoutBetween,
     timeouts: options.timeouts,

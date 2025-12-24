@@ -26,7 +26,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async clearAll() {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
-        if (ideVersion && ideVersion.minor <= 100) {
+        if (ideVersion && ideVersion.minor >= 108) {
           await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
         } else {
           await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
@@ -99,7 +99,14 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to open finish setup`)
       }
     },
-    async sendMessage(message: string, { verify = false } = {}) {
+    async sendMessage({
+      expectedResponse,
+      message,
+      verify = false,
+      validateRequest = {
+        exists: [],
+      },
+    }) {
       try {
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
@@ -118,12 +125,18 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await editContext.type(message)
         await page.waitForIdle()
         const lines = editArea.locator('.view-lines')
-        await expect(lines).toHaveText(message)
+        await expect(lines).toBeVisible()
+        await page.waitForIdle()
+        const nonBreakingSpace = String.fromCharCode(160)
+        const adjustedMessage = message.replaceAll('\n', '').replaceAll(' ', nonBreakingSpace)
+        await expect(lines).toHaveText(adjustedMessage)
+        await page.waitForIdle()
         const interactiveInput = page.locator('.interactive-input-and-side-toolbar')
         await expect(interactiveInput).toBeVisible()
         await page.waitForIdle()
         const sendButton = interactiveInput.locator('.action-item .action-label:not(.disabled)[aria-label^="Send"]')
         await expect(sendButton).toBeVisible()
+        await page.waitForIdle()
         await sendButton.focus()
         await page.waitForIdle()
         await expect(sendButton).toBeFocused()
@@ -135,10 +148,52 @@ export const create = ({ expect, ideVersion, page, VError }) => {
             setTimeout(r, 1000)
           })
         }
+        const requests = chatView.locator('.monaco-list-row.request')
+        const count = await requests.count()
+        await page.waitForIdle()
         await sendButton.click()
         await page.waitForIdle()
         await expect(lines).toHaveText('')
+        await page.waitForIdle()
+        await expect(requests).toHaveCount(count + 1)
+        const last = requests.nth(count)
+        if (validateRequest && validateRequest.exists && validateRequest.exists.length > 0) {
+          const ariaLabel = await last.getAttribute('aria-label')
+          if (ariaLabel !== message) {
+            throw new Error(`unexpected aria label: ${ariaLabel}`)
+          }
+        }
+
+        if (validateRequest && validateRequest.exists && validateRequest.exists.length > 0) {
+          const requestMessage = last
+          await expect(requestMessage).toBeVisible()
+          for (const selector of validateRequest.exists) {
+            const locator = requestMessage.locator(selector)
+            await expect(locator).toBeVisible()
+          }
+        }
+
         if (verify) {
+          const row = last
+          await expect(row).toBeVisible()
+          await page.waitForIdle()
+          const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
+          await expect(response).toBeVisible({ timeout: 60_000 })
+          await page.waitForIdle()
+          const progress = chatView.locator('.rendered-markdown.progress-step')
+          await expect(progress).toBeHidden({ timeout: 45_000 })
+          await page.waitForIdle()
+          await expect(response).toBeVisible({ timeout: 30_000 })
+          await page.waitForIdle()
+        }
+
+        if (expectedResponse) {
+          const requestMessage = last
+          await expect(requestMessage).toBeVisible()
+          await page.waitForIdle()
+          await sendButton.click()
+          await page.waitForIdle()
+          await expect(lines).toHaveText('')
           const row = chatView.locator(`.monaco-list-row[aria-label="${message}"]`)
           await expect(row).toBeVisible()
           await page.waitForIdle()
@@ -146,16 +201,20 @@ export const create = ({ expect, ideVersion, page, VError }) => {
           await expect(response).toBeVisible({ timeout: 60_000 })
           await page.waitForIdle()
           const progress = chatView.locator('.rendered-markdown.progress-step')
-          await expect(progress).toBeHidden({ timout: 45_000 })
+          await expect(progress).toBeHidden({ timeout: 45_000 })
           await page.waitForIdle()
           await expect(response).toBeVisible({ timeout: 30_000 })
           await page.waitForIdle()
+          const responseMessage = chatView.locator('.monaco-list-row[data-index="1"]')
+          await expect(responseMessage).toBeVisible()
+          await page.waitForIdle()
+          await expect(responseMessage).toHaveAttribute('aria-label', new RegExp(`^${expectedResponse}`), { timeout: 120_000 })
         }
       } catch (error) {
         throw new VError(error, `Failed to send chat message`)
       }
     },
-    async setMode(modeLabel) {
+    async setMode(modeLabel: string) {
       try {
         const chatView = page.locator('.interactive-session')
         const setModeButton = chatView.locator('[aria-label^="Set Mode"]')

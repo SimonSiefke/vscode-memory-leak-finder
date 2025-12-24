@@ -1,23 +1,24 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
+import type { Session } from '../Session/Session.ts'
 
-export const getPromises = async (session, objectGroup) => {
+export const getPromises = async (session: Session, objectGroup: string) => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Promise,
-    returnByValue: false,
     objectGroup,
+    returnByValue: false,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
-    prototypeObjectId: prototype.objectId,
     objectGroup,
+    prototypeObjectId: prototype.objectId,
   })
   const fnResult1 = await DevtoolsProtocolRuntime.getProperties(session, {
+    accessorPropertiesOnly: false,
+    generatePreview: true,
+    nonIndexedPropertiesOnly: false,
     objectId: objects.objects.objectId,
     ownProperties: true,
-    generatePreview: true,
-    accessorPropertiesOnly: false,
-    nonIndexedPropertiesOnly: false,
   })
   const descriptors = GetDescriptorValues.getDescriptorValues(fnResult1.result)
   return descriptors

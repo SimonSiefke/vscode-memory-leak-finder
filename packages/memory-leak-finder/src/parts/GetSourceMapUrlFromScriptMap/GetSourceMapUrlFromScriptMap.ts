@@ -7,14 +7,14 @@ const cleanUrl = (url) => {
 export const getSourceMapUrlFromScriptMap = (scriptId, scriptMap) => {
   if (scriptId in scriptMap) {
     const entry = scriptMap[scriptId]
-    const { url, sourceMapUrl } = entry
+    const { sourceMapUrl, url } = entry
     return {
-      url: cleanUrl(url),
       sourceMapUrl,
+      url: cleanUrl(url),
     }
   }
   return {
-    url: '',
     sourceMapUrl: '',
+    url: '',
   }
 }

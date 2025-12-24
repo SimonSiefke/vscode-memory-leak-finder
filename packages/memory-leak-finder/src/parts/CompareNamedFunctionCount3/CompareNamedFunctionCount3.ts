@@ -9,7 +9,6 @@ const getThreshold = (context: any): number => {
 export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: string, context: any): Promise<readonly any[]> => {
   const threshold = getThreshold(context)
   const options = {
-    minCount: threshold,
     excludeOriginalPaths: [
       'async.ts',
       'editStack.ts',
@@ -23,7 +22,9 @@ export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: 
       'ternarySearchTree.ts',
       'undoRedoService.ts',
       'uri.ts',
+      'uriIdentityService.ts',
     ],
+    minCount: threshold,
   }
   await using rpc = await launchHeapSnapshotWorker()
   const result = await rpc.invoke('HeapSnapshot.compareFunctions2', beforePath, afterPath, options)

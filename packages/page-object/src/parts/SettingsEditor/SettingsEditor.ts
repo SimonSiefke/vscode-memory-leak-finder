@@ -1,6 +1,6 @@
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
-import * as Settings from '../Settings/Settings.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 export const create = ({ expect, page, VError }) => {
   return {
@@ -71,10 +71,18 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to clear search input`)
       }
     },
-    closeSettingsContextMenu(name) {
+    async closeSettingsContextMenu(name) {
       try {
+        await page.waitForIdle()
+        const outerItem = page.locator(`.settings-editor-tree .monaco-list-row[aria-label^="${name}"]`)
+        await expect(outerItem).toBeVisible()
+        const contextMenu = outerItem.locator('.setting-toolbar-container .shadow-root-host:enter-shadow() .context-view')
+        await expect(contextMenu).toBeVisible()
+        await page.keyboard.press('Escape')
+        await expect(contextMenu).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to close settings conext menu for "${name}"`)
+        throw new VError(error, `Failed to close settings context menu for "${name}"`)
       }
     },
     async collapse(groupName) {
@@ -166,9 +174,74 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to focus outline item`)
       }
     },
+    async moveScrollBar(y: number, expectedScrollBarTop: number) {
+      try {
+        await page.waitForIdle()
+        await page.mouse.mockPointerEvents()
+        const tree = page.locator('.settings-tree-container')
+        await expect(tree).toBeVisible()
+        await page.waitForIdle()
+        const scrollbar = tree.locator('.scrollbar.vertical').first()
+        await page.waitForIdle()
+        await scrollbar.hover()
+        await page.waitForIdle()
+        const scrollBarVisible = tree.locator('.scrollbar.visible.scrollbar.vertical')
+        await expect(scrollBarVisible).toBeVisible()
+        await page.waitForIdle()
+        await page.waitForIdle()
+        await page.waitForIdle()
+        const scrollbarSlider = scrollbar.locator('.slider')
+        await expect(scrollbarSlider).toBeVisible()
+        await page.waitForIdle()
+        const elementBox1 = await scrollbarSlider.boundingBox()
+        if (!elementBox1) {
+          throw new Error('Unable to find bounding box on element')
+        }
+
+        const elementCenterX = elementBox1.x + elementBox1.width / 2
+        const elementCenterY = elementBox1.y + elementBox1.height / 2
+
+        const xOffset = 0
+        const yOffset = y
+
+        await page.waitForIdle()
+        await scrollbarSlider.hover()
+        await page.waitForIdle()
+        await page.mouse.move(elementCenterX, elementCenterY)
+        await page.waitForIdle()
+        await page.mouse.down()
+        await page.waitForIdle()
+
+        await expect(scrollbarSlider).toHaveClass('slider active')
+        await page.waitForIdle()
+        await page.mouse.move(elementCenterX + xOffset, elementCenterY + yOffset)
+        await page.waitForIdle()
+        await page.mouse.up()
+        await page.waitForIdle()
+        await expect(scrollbarSlider).toHaveCss('top', `${expectedScrollBarTop}px`)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to scroll down in settings editor`)
+      }
+    },
     async open() {
-      const settings = Settings.create({ expect, page, VError })
-      await settings.open()
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.PreferencesOpenSettingsUi)
+        await page.waitForIdle()
+        const settingsSwitcher = page.locator('[aria-label="Settings Switcher"]')
+        await expect(settingsSwitcher).toBeVisible()
+        await page.waitForIdle()
+        const body = page.locator('.settings-body')
+        await expect(body).toBeVisible()
+        await page.waitForIdle()
+        const rightControls = page.locator('.settings-right-controls')
+        await expect(rightControls).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to open settings ui`)
+      }
     },
     async openSettingsContextMenu(name, { waitForItem }) {
       try {
@@ -225,27 +298,6 @@ export const create = ({ expect, page, VError }) => {
         await expect(row).toHaveCount(0)
       } catch (error) {
         throw new VError(error, `Failed to remove item`)
-      }
-    },
-    async scrollDown() {
-      try {
-        await page.waitForIdle()
-        const scrollContainer = page.locator('.settings-editor-tree .monaco-scrollable-element')
-        await expect(scrollContainer).toBeVisible()
-        await scrollContainer.scrollDown()
-      } catch (error) {
-        throw new VError(error, `Failed to scroll down in settings editor`)
-      }
-    },
-    async scrollUp() {
-      try {
-        await page.waitForIdle()
-        const scrollContainer = page.locator('.settings-editor-tree .monaco-scrollable-element')
-        await expect(scrollContainer).toBeVisible()
-        await scrollContainer.scrollUp()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to scroll up in settings editor`)
       }
     },
     async search({ resultCount, value }) {

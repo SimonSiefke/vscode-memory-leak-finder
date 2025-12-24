@@ -1,11 +1,12 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import type { Session } from '../Session/Session.ts'
 
 /**
  * @param {any} session
  * @param {string} objectGroup
  * @returns {Promise<any>}
  */
-export const startTrackingDomNodeStackTraces = async (session, objectGroup) => {
+export const startTrackingDomNodeStackTraces = async (session: Session, objectGroup: string) => {
   await DevtoolsProtocolRuntime.evaluate(session, {
     expression: `(()=>{
 

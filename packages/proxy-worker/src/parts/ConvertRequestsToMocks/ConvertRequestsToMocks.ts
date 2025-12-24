@@ -1,8 +1,7 @@
 import { existsSync } from 'fs'
 import { readdir, readFile, writeFile, mkdir } from 'fs/promises'
-import { join, dirname } from 'path'
+import { join } from 'path'
 import { URL } from 'url'
-import { fileURLToPath } from 'url'
 import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
 import * as GetMockFileName from '../GetMockFileName/GetMockFileName.ts'
 import * as Root from '../Root/Root.ts'
@@ -10,7 +9,7 @@ import * as Root from '../Root/Root.ts'
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 const MOCK_REQUESTS_DIR = join(Root.root, '.vscode-mock-requests')
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __dirname = import.meta.dirname
 const MOCK_CONFIG_PATH = join(__dirname, '..', 'GetMockFileName', 'mock-config.json')
 
 interface RecordedRequest {

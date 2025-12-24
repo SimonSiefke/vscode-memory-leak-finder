@@ -1,6 +1,7 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as PartitionArray from '../PartitionArray/PartitionArray.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
+import type { Session } from '../Session/Session.ts'
 
 const ArrayChunkSize = 100_000
 
@@ -20,15 +21,15 @@ const getEnumerableValues = (result) => {
   return result.filter(isEnumerable).map(getValue)
 }
 
-export const startTrackingArrays = async (session, objectGroup) => {
+export const startTrackingArrays = async (session: Session, objectGroup: string) => {
   const arrayDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Array,
-    returnByValue: false,
     objectGroup,
+    returnByValue: false,
   })
   const arrays = await DevtoolsProtocolRuntime.queryObjects(session, {
-    prototypeObjectId: arrayDescriptor.objectId,
     objectGroup,
+    prototypeObjectId: arrayDescriptor.objectId,
   })
   // partition array into smaller arrays to avoid zlib error
   const smallerArrays = await PartitionArray.partitionArray(session, objectGroup, arrays.objects.objectId, ArrayChunkSize)

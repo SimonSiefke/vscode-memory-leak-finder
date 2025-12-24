@@ -1,4 +1,5 @@
 import * as GetFlatScopeList from '../GetFlatScopeList/GetFlatScopeList.ts'
+import type { Session } from '../Session/Session.ts'
 
 const getScopeMap = (flatScopeMap) => {
   const counts = Object.create(null)
@@ -9,7 +10,7 @@ const getScopeMap = (flatScopeMap) => {
   return counts
 }
 
-export const getScopes = async (session, objectGroup) => {
+export const getScopes = async (session: Session, objectGroup: string) => {
   const flatScopeList = await GetFlatScopeList.getFlatScopeList(session, objectGroup)
   const scopeMap = getScopeMap(flatScopeList)
   return scopeMap

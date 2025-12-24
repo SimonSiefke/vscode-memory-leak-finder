@@ -6,6 +6,7 @@ import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts
 import * as StartTrackingDisposableStores from '../StartTrackingDisposableStores/StartTrackingDisposableStores.ts'
 import * as StopTrackingDisposableStores from '../StopTrackingDisposableStores/StopTrackingDisposableStores.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
+import type { Session } from '../Session/Session.ts'
 
 // TODO
 // 1. find the DisposableStore constructor
@@ -22,28 +23,28 @@ export const id = MeasureId.GrowingDisposableStores
 
 export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]
 }
 
-export const start = async (session, objectGroup) => {
+export const start = async (session: Session, objectGroup: string) => {
   await StartTrackingDisposableStores.startTrackingDisposableStores(session, objectGroup)
   return []
 }
 
-export const stop = async (session, objectGroup) => {
+export const stop = async (session: Session, objectGroup: string) => {
   const stackTraces = await GetDisposableStoresWithStackTraces.getDisposableStoresWithStackTraces(session, objectGroup)
   await StopTrackingDisposableStores.stopTrackingDisposableStores(session, objectGroup)
   return stackTraces
 }
 
-export const releaseResources = async (session, objectGroup) => {
+export const releaseResources = async (session: Session, objectGroup: string) => {
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 
 export const compare = CompareDisposableStores.compareDisposableStores
 
-export const isLeak = ({ before, after }) => {
+export const isLeak = ({ after, before }) => {
   return after.length > 0
 }

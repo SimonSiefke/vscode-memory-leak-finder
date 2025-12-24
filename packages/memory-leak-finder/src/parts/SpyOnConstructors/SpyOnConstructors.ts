@@ -1,6 +1,7 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import type { Session } from '../Session/Session.ts'
 
-export const spyOnContructors = async (session, objectGroup, constructorsObjectId) => {
+export const spyOnContructors = async (session: Session, objectGroup, constructorsObjectId) => {
   // TODO
   // 1. for each class, modify constructor to point to custom class
   //    that captures stack trace on creation

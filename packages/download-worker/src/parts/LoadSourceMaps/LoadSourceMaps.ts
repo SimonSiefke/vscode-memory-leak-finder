@@ -13,7 +13,7 @@ const launchLoadSourceMapsWorker = async () => {
     stdio: 'inherit',
   })
   return {
-    invoke(method, ...params) {
+    invoke(method: string, ...params: any[]) {
       return rpc.invoke(method, ...params)
     },
     async [Symbol.asyncDispose]() {
