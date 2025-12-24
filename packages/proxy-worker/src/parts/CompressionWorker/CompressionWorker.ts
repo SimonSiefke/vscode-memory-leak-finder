@@ -23,4 +23,3 @@ export const disposeCompressionWorker = async (): Promise<void> => {
     compressionWorkerRpc = null
   }
 }
-
