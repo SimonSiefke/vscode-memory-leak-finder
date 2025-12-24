@@ -16,11 +16,11 @@ export const create = (session: Session) => {
 }
 
 export const start = (session: Session, objectGroup: string) => {
-  return GetWeakSetCount.getWeakSetCount(session)
+  return GetWeakSetCount.getWeakSetCount(session, objectGroup)
 }
 
 export const stop = (session: Session, objectGroup: string) => {
-  return GetWeakSetCount.getWeakSetCount(session)
+  return GetWeakSetCount.getWeakSetCount(session, objectGroup)
 }
 
 export const compare = CompareCount.compareCount

@@ -9,3 +9,4 @@ export const decompressZstd = async (body: Buffer): Promise<{ body: string; wasC
     return { body: body.toString('utf8'), wasCompressed: false }
   }
 }
+

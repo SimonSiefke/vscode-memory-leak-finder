@@ -2,6 +2,7 @@ import * as CompareCount from '../CompareCount/CompareCount.ts'
 import * as GetTrustedTypePolicyCount from '../GetTrustedTypePolicyCount/GetTrustedTypePolicyCount.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
 import type { Session } from '../Session/Session.ts'
 
@@ -10,15 +11,16 @@ export const id = MeasureId.TrustedTypePolicyCount
 export const targets = [TargetId.Browser]
 
 export const create = (session: Session) => {
-  return [session]
+  const objectGroup = ObjectGroupId.create()
+  return [session, objectGroup]
 }
 
-export const start = (session: Session) => {
-  return GetTrustedTypePolicyCount.getTrustedTypePolicyCount(session)
+export const start = (session: Session, objectGroup: string) => {
+  return GetTrustedTypePolicyCount.getTrustedTypePolicyCount(session, objectGroup)
 }
 
-export const stop = (session: Session) => {
-  return GetTrustedTypePolicyCount.getTrustedTypePolicyCount(session)
+export const stop = (session: Session, objectGroup: string) => {
+  return GetTrustedTypePolicyCount.getTrustedTypePolicyCount(session, objectGroup)
 }
 
 export const compare = CompareCount.compareCount
