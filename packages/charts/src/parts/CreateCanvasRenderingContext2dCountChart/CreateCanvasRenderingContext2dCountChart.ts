@@ -2,9 +2,9 @@ import * as GetCanvasRenderingContext2dCountsData from '../GetCanvasRenderingCon
 
 export const name = 'canvas-rendering-context-2d-count'
 
-export const getData = (basePath: string) => GetCanvasRenderingContext2dCountsData.getCanvasRenderingContext2dCountsData(basePath)
+export const getData = (basePath: string): Promise<any[]> => GetCanvasRenderingContext2dCountsData.getCanvasRenderingContext2dCountsData(basePath)
 
-export const createChart = () => {
+export const createChart = (): { x: string; xLabel: string; y: string; yLabel: string } => {
   return {
     x: 'index',
     xLabel: 'Index',

@@ -2,9 +2,9 @@ import * as GetImageBitmapCountsData from '../GetImageBitmapCountsData/GetImageB
 
 export const name = 'image-bitmap-count'
 
-export const getData = (basePath: string) => GetImageBitmapCountsData.getImageBitmapCountsData(basePath)
+export const getData = (basePath: string): Promise<any[]> => GetImageBitmapCountsData.getImageBitmapCountsData(basePath)
 
-export const createChart = () => {
+export const createChart = (): { x: string; xLabel: string; y: string; yLabel: string } => {
   return {
     x: 'index',
     xLabel: 'Index',
@@ -12,3 +12,4 @@ export const createChart = () => {
     yLabel: 'Image Bitmap Count',
   }
 }
+
