@@ -46,6 +46,14 @@ export const launchIde = async ({
       parsedVersion: ParseVersion.parseVersion(cursorVersion),
     }
   }
+  let versionToParse: string
+  if (insidersCommit) {
+    const metadata = await FetchVscodeInsidersMetadata.fetchVscodeInsidersMetadata(insidersCommit)
+    const productVersion = metadata.productVersion
+    versionToParse = productVersion.replace('-insider', '')
+  } else {
+    versionToParse = vscodeVersion
+  }
   const result = await LaunchVsCode.launchVsCode({
     addDisposable,
     commit,
@@ -64,14 +72,7 @@ export const launchIde = async ({
     vscodePath,
     vscodeVersion,
   })
-  let versionToParse: string
-  if (insidersCommit) {
-    const metadata = await FetchVscodeInsidersMetadata.fetchVscodeInsidersMetadata(insidersCommit)
-    const productVersion = metadata.productVersion
-    versionToParse = productVersion.replace('-insider', '')
-  } else {
-    versionToParse = vscodeVersion
-  }
+
   return {
     ...result,
     parsedVersion: ParseVersion.parseVersion(versionToParse),
