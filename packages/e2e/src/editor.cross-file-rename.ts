@@ -1,39 +1,38 @@
 import type { TestContext } from '../types.ts'
 
-export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
-  await Workspace.setFiles([
-    {
-      content: `export function add(a: number, b: number): number {
+const initialFiles = [
+  {
+    content: `export function add(a: number, b: number): number {
   return a + b
 }`,
-      name: 'add.ts',
-    },
-    {
-      content: `import { add } from './add'
+    name: 'add.ts',
+  },
+  {
+    content: `import { add } from './add'
 
 const result = add(1, 2)
 console.log(result)
 `,
-      name: 'a.ts',
-    },
-    {
-      content: `import { add } from './add'
+    name: 'a.ts',
+  },
+  {
+    content: `import { add } from './add'
 
 const result = add(3, 4)
 console.log(result)
 `,
-      name: 'b.ts',
-    },
-    {
-      content: `import { add } from './add'
+    name: 'b.ts',
+  },
+  {
+    content: `import { add } from './add'
 
 const result = add(5, 6)
 console.log(result)
 `,
-      name: 'c.ts',
-    },
-    {
-      content: `{
+    name: 'c.ts',
+  },
+  {
+    content: `{
   "compilerOptions": {
     "strict": true,
     "moduleResolution": "bundler",
@@ -43,9 +42,12 @@ console.log(result)
   "include": ["*.ts"]
 }
 `,
-      name: 'tsconfig.json',
-    },
-  ])
+    name: 'tsconfig.json',
+  },
+]
+
+export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
+  await Workspace.setFiles(initialFiles)
   await Editor.closeAll()
 }
 
@@ -93,49 +95,5 @@ export const teardown = async ({ Editor, Workspace }: TestContext): Promise<void
   await Editor.switchToTab('c.ts')
   await Editor.save({ viaKeyBoard: true })
   await Editor.closeAll()
-  await Workspace.setFiles([
-    {
-      content: `export function add(a: number, b: number): number {
-  return a + b
-}`,
-      name: 'add.ts',
-    },
-    {
-      content: `import { add } from './add'
-
-const result = add(1, 2)
-console.log(result)
-`,
-      name: 'a.ts',
-    },
-    {
-      content: `import { add } from './add'
-
-const result = add(3, 4)
-console.log(result)
-`,
-      name: 'b.ts',
-    },
-    {
-      content: `import { add } from './add'
-
-const result = add(5, 6)
-console.log(result)
-`,
-      name: 'c.ts',
-    },
-    {
-      content: `{
-  "compilerOptions": {
-    "strict": true,
-    "moduleResolution": "bundler",
-    "target": "ES2022",
-    "module": "ES2022"
-  },
-  "include": ["*.ts"]
-}
-`,
-      name: 'tsconfig.json',
-    },
-  ])
+  await Workspace.setFiles(initialFiles)
 }
