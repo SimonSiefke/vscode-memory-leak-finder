@@ -2,26 +2,39 @@ import { expect, test } from '@jest/globals'
 import { compareGrowingArraysInternal } from '../src/parts/CompareGrowingArraysInternal/CompareGrowingArraysInternal.js'
 import type { Snapshot } from '../src/parts/Snapshot/Snapshot.ts'
 
-const createBaseSnapshot = (): Snapshot => ({
-  meta: {
-    node_types: [['hidden', 'array', 'string', 'object']],
-    node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
-    edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
-    edge_fields: ['type', 'name_or_index', 'to_node'],
-    location_fields: ['object_index', 'script_id', 'line', 'column'],
-  },
-  node_count: 0,
-  edge_count: 0,
-  extra_native_bytes: 0,
-  nodes: new Uint32Array([]),
-  edges: new Uint32Array([]),
-  locations: new Uint32Array([]),
-  strings: ['', 'Array'],
-})
-
 test('should return zero counts for empty snapshots', () => {
-  const snapshotA = createBaseSnapshot()
-  const snapshotB = createBaseSnapshot()
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 0,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([]),
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+    strings: ['', 'Array'],
+  }
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 0,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([]),
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+    strings: ['', 'Array'],
+  }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
 
@@ -30,8 +43,16 @@ test('should return zero counts for empty snapshots', () => {
 
 test('should return zero counts when no arrays are present', () => {
   const snapshotA: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 2,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Object 1 - type=object(3), name=''(0), id=1
       3, 0, 1, 64, 0, 0, 0,
@@ -39,11 +60,21 @@ test('should return zero counts when no arrays are present', () => {
       2, 0, 2, 32, 0, 0, 0,
     ]),
     strings: ['', 'Array', 'SomeObject'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 1,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Object 1 - type=object(3), name=''(0), id=1
       3, 0, 1, 64, 0, 0, 0,
@@ -58,8 +89,16 @@ test('should return zero counts when no arrays are present', () => {
 
 test('should count single array in snapshot A', () => {
   const snapshotA: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 1,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array - type=object(3), name=Array(1), id=1
       3, 1, 1, 100, 0, 0, 0,
@@ -75,11 +114,34 @@ test('should count single array in snapshot A', () => {
 })
 
 test('should count single array in snapshot B', () => {
-  const snapshotA = createBaseSnapshot()
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 0,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([]),
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+    strings: ['', 'Array'],
+  }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 1,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array - type=object(3), name=Array(1), id=1
       3, 1, 1, 100, 0, 0, 0,
@@ -94,8 +156,16 @@ test('should count single array in snapshot B', () => {
 
 test('should count arrays in both snapshots', () => {
   const snapshotA: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 1,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array - type=object(3), name=Array(1), id=1
       3, 1, 1, 100, 0, 0, 0,
@@ -120,8 +190,16 @@ test('should count arrays in both snapshots', () => {
 
 test('should count multiple arrays in snapshot A', () => {
   const snapshotA: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 3,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array 1 - type=object(3), name=Array(1), id=1
       3, 1, 1, 100, 0, 0, 0,
