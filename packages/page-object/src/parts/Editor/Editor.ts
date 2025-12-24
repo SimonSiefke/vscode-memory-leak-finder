@@ -816,6 +816,19 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to save file`)
       }
     },
+    async saveAll() {
+      try {
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.FileSaveAll)
+        await page.waitForIdle()
+        const dirtyTabs = page.locator('.tab.dirty')
+        await expect(dirtyTabs).toHaveCount(0)
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to save all files`)
+      }
+    },
     async scrollDown() {
       try {
         await page.waitForIdle()
