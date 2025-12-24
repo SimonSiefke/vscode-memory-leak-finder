@@ -26,7 +26,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async clearAll() {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
-        if (ideVersion && ideVersion.minor <= 100) {
+        if (ideVersion && ideVersion.minor >= 107) {
           await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
         } else {
           await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
@@ -125,14 +125,18 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await editContext.type(message)
         await page.waitForIdle()
         const lines = editArea.locator('.view-lines')
+        await expect(lines).toBeVisible()
+        await page.waitForIdle()
         const nonBreakingSpace = String.fromCharCode(160)
         const adjustedMessage = message.replaceAll('\n', '').replaceAll(' ', nonBreakingSpace)
         await expect(lines).toHaveText(adjustedMessage)
+        await page.waitForIdle()
         const interactiveInput = page.locator('.interactive-input-and-side-toolbar')
         await expect(interactiveInput).toBeVisible()
         await page.waitForIdle()
         const sendButton = interactiveInput.locator('.action-item .action-label:not(.disabled)[aria-label^="Send"]')
         await expect(sendButton).toBeVisible()
+        await page.waitForIdle()
         await sendButton.focus()
         await page.waitForIdle()
         await expect(sendButton).toBeFocused()
@@ -146,6 +150,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         }
         const requests = chatView.locator('.monaco-list-row.request')
         const count = await requests.count()
+        await page.waitForIdle()
         await sendButton.click()
         await page.waitForIdle()
         await expect(lines).toHaveText('')

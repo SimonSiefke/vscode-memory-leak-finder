@@ -46,7 +46,7 @@ export const prepareBoth = async (headlessMode: boolean, attachedToPageTimeout: 
     parsedVersion: {
       // TODO
       major: 1,
-      minor: 105,
+      minor: 107,
       patch: 0,
     },
     sessionId,
