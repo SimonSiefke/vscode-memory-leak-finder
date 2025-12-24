@@ -1,3 +1,4 @@
+import { compareGrowingArrays } from '../CompareGrowingArrays/CompareGrowingArrays.ts'
 import { getHeapSnapshot } from '../GetHeapSnapshot/GetHeapSnapshot.ts'
 import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
@@ -36,3 +37,5 @@ export const stop = async (session: Session, objectGroup: string, scriptHandler:
 export const isLeak = ({ after, before }) => {
   return true
 }
+
+export const compare = compareGrowingArrays

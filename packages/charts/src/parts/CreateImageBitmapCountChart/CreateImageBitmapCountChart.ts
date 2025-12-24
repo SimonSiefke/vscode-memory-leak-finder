@@ -12,3 +12,4 @@ export const createChart = () => {
     yLabel: 'Image Bitmap Count',
   }
 }
+

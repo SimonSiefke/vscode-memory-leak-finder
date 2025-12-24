@@ -25,3 +25,4 @@ export const getVscodePlatformName = (platform: string, arch: string): string =>
 
   throw new Error(`Unsupported platform: ${platform}`)
 }
+

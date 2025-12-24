@@ -12,3 +12,4 @@ export const createChart = () => {
     yLabel: 'GPU Canvas Context Count',
   }
 }
+
