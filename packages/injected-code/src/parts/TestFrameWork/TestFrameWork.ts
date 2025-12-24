@@ -9,6 +9,7 @@ import * as KeyBoardActions from '../KeyBoardActions/KeyBoardActions.ts'
 import * as MultiElementConditionMap from '../MultiElementConditionMap/MultiElementConditionMap.ts'
 import * as QuerySelector from '../QuerySelector/QuerySelector.ts'
 import * as SingleElementConditionMap from '../SingleElementConditionMap/SingleElementConditionMap.ts'
+import * as Timeout from '../Timeout/Timeout.ts'
 
 const create$Overlay = () => {
   const $TestOverlay = document.createElement('div')
@@ -40,49 +41,6 @@ const Time = {
 }
 
 const maxTimeout = 2000
-
-const Timeout = {
-  async short() {
-    const { promise, resolve } = Promise.withResolvers<void>()
-    setTimeout(resolve, 1000)
-    await promise
-  },
-  async waitForMutation(element: any, maxDelay: number) {
-    const disposables: (() => void)[] = []
-    await Promise.race([
-      (() => {
-        const { promise, resolve } = Promise.withResolvers<void>()
-        const timeout = setTimeout(resolve, maxDelay)
-        disposables.push(() => {
-          clearTimeout(timeout)
-        })
-        return promise
-      })(),
-      (() => {
-        const { promise, resolve } = Promise.withResolvers<void>()
-        const callback = () => {
-          resolve()
-        }
-        const observer = new MutationObserver(callback)
-        observer.observe(document.body, {
-          attributeOldValue: true,
-          attributes: true,
-          characterData: true,
-          characterDataOldValue: true,
-          childList: true,
-          subtree: true,
-        })
-        disposables.push(() => {
-          observer.disconnect()
-        })
-        return promise
-      })(),
-    ])
-    for (const disposable of disposables) {
-      disposable()
-    }
-  },
-}
 
 export const performAction = async (locator: any, fnName: string, options: any): Promise<void> => {
   Assert.object(locator)
