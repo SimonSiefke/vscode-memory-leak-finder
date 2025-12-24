@@ -13,8 +13,9 @@ test.skip('getConstructorScope', () => {
     },
   ]
   const constructorScopeMap = new Uint32Array([1, 0])
+  const edgeMap = new Uint32Array([0, 0])
   const node = parsedNodes[0]
-  expect(GetConstructorScope.getConstructorScope(parsedNodes, constructorScopeMap, node)).toEqual({
+  expect(GetConstructorScope.getConstructorScope(parsedNodes, constructorScopeMap, edgeMap, node)).toEqual({
     id: 2,
     name: 'Relay',
   })
