@@ -6,8 +6,8 @@ const compressionWorkerUrl = join(root, 'packages', 'compression-worker', 'bin',
 
 const launchCompressionWorker = async () => {
   const rpc = await NodeWorkerRpcParent.create({
-    path: compressionWorkerUrl,
     commandMap: {},
+    path: compressionWorkerUrl,
   })
   return {
     invoke(method, ...params) {

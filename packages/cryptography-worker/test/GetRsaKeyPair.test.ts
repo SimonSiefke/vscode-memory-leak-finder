@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
-import { getRsaKeyPair } from '../src/parts/GetRsaKeyPair/GetRsaKeyPair.ts'
 import { createPublicKey, createPrivateKey } from 'node:crypto'
+import { getRsaKeyPair } from '../src/parts/GetRsaKeyPair/GetRsaKeyPair.ts'
 
 test.skip('getRsaKeyPair - returns key pair with privateKey and publicKey', () => {
   const keyPair = getRsaKeyPair()

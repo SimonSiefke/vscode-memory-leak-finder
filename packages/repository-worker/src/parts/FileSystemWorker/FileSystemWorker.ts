@@ -44,8 +44,8 @@ export const readFileContent = (path: string): Promise<string> => {
 
 interface ExecOptions {
   cwd?: string
-  reject?: boolean
   env?: Record<string, string | undefined>
+  reject?: boolean
   stdio?: string
 }
 
