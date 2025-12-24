@@ -47,14 +47,14 @@ test.skip('getOrCreateCA - returns existing CA when files exist', async () => {
   const existingKey = '-----BEGIN PRIVATE KEY-----\nEXISTING KEY\n-----END PRIVATE KEY-----'
 
   mockExistsSync.mockReturnValue(true)
-  mockReadFile.mockImplementation((path: string) => {
+  mockReadFile.mockImplementation(async (path: string) => {
     if (path.includes('ca-cert.pem')) {
-      return Promise.resolve(existingCert)
+      return existingCert
     }
     if (path.includes('ca-key.pem')) {
-      return Promise.resolve(existingKey)
+      return existingKey
     }
-    return Promise.reject(new Error('Unexpected path'))
+    throw new Error('Unexpected path')
   })
 
   const ca = await GetOrCreateCAModule.getOrCreateCA()
@@ -81,14 +81,14 @@ test.skip('getOrCreateCA - reads both CA files in parallel when they exist', asy
   const existingKey = '-----BEGIN PRIVATE KEY-----\nEXISTING KEY\n-----END PRIVATE KEY-----'
 
   mockExistsSync.mockReturnValue(true)
-  mockReadFile.mockImplementation((path: string) => {
+  mockReadFile.mockImplementation(async (path: string) => {
     if (path.includes('ca-cert.pem')) {
-      return Promise.resolve(existingCert)
+      return existingCert
     }
     if (path.includes('ca-key.pem')) {
-      return Promise.resolve(existingKey)
+      return existingKey
     }
-    return Promise.reject(new Error('Unexpected path'))
+    throw new Error('Unexpected path')
   })
 
   await GetOrCreateCAModule.getOrCreateCA()
