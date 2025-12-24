@@ -66,7 +66,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     vscodePath,
     vscodeVersion,
   } = options
-  const { child } = await LaunchIde.launchIde({
+  const { child, parsedVersion } = await LaunchIde.launchIde({
     addDisposable: Disposables.add,
     commit,
     cwd,
@@ -87,11 +87,12 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   })
   await using port = createPipeline(child.stderr)
   await using rpc = await launchInitializationWorker()
-  const { devtoolsWebSocketUrl, electronObjectId, parsedVersion, utilityContext, webSocketUrl } = await rpc.invokeAndTransfer(
+  const { devtoolsWebSocketUrl, electronObjectId, utilityContext, webSocketUrl } = await rpc.invokeAndTransfer(
     'Initialize.prepare',
     headlessMode,
     attachedToPageTimeout,
     port.port,
+    parsedVersion,
   )
   return {
     devtoolsWebSocketUrl,
