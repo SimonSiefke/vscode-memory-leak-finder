@@ -9,9 +9,13 @@ import type { ReferencePath } from '../ReferencePath/ReferencePath.ts'
 import { readFile } from 'fs/promises'
 import { addUrls } from '../AddUrls/AddUrls.ts'
 
+export interface ReferencePathWithCount extends ReferencePath {
+  readonly count: number
+}
+
 export interface LeakedClosureWithReferences {
   readonly nodeName: string
-  readonly references: readonly ReferencePath[]
+  readonly references: readonly ReferencePathWithCount[]
   readonly count: number
 }
 
@@ -65,6 +69,56 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2 = a
   return transformToArray(final)
 }
 
+const areReferencePathsEqual = (a: ReferencePath, b: ReferencePath): boolean => {
+  return (
+    a.sourceNodeName === b.sourceNodeName &&
+    a.sourceNodeType === b.sourceNodeType &&
+    a.edgeType === b.edgeType &&
+    a.edgeName === b.edgeName &&
+    a.path === b.path
+  )
+}
+
+const groupAndCountReferencePaths = (referencePaths: readonly ReferencePath[]): readonly ReferencePathWithCount[] => {
+  const grouped: ReferencePath[] = []
+  const counts: number[] = []
+
+  for (const ref of referencePaths) {
+    let found = false
+    for (let i = 0; i < grouped.length; i++) {
+      if (areReferencePathsEqual(ref, grouped[i])) {
+        counts[i] = (counts[i] || 1) + 1
+        found = true
+        break
+      }
+    }
+    if (!found) {
+      grouped.push(ref)
+      counts.push(1)
+    }
+  }
+
+  const result: ReferencePathWithCount[] = []
+  for (let i = 0; i < grouped.length; i++) {
+    result.push({
+      ...grouped[i],
+      count: counts[i] || 1,
+    })
+  }
+
+  result.sort((a, b) => {
+    if (a.count > b.count) {
+      return -1
+    }
+    if (a.count < b.count) {
+      return 1
+    }
+    return 0
+  })
+
+  return result
+}
+
 const areReferencesEqual = (
   a: { readonly nodeName: string; readonly references: readonly ReferencePath[] },
   b: { readonly nodeName: string; readonly references: readonly ReferencePath[] },
@@ -78,13 +132,7 @@ const areReferencesEqual = (
   for (let i = 0; i < a.references.length; i++) {
     const refA = a.references[i]
     const refB = b.references[i]
-    if (
-      refA.sourceNodeName !== refB.sourceNodeName ||
-      refA.sourceNodeType !== refB.sourceNodeType ||
-      refA.edgeType !== refB.edgeType ||
-      refA.edgeName !== refB.edgeName ||
-      refA.path !== refB.path
-    ) {
+    if (!areReferencePathsEqual(refA, refB)) {
       return false
     }
   }
@@ -114,9 +162,10 @@ const groupAndCountReferences = (
 
   const result: LeakedClosureWithReferences[] = []
   for (let i = 0; i < grouped.length; i++) {
+    const groupedReferencePaths = groupAndCountReferencePaths(grouped[i].references)
     result.push({
       nodeName: grouped[i].nodeName,
-      references: grouped[i].references,
+      references: groupedReferencePaths,
       count: counts[i] || 1,
     })
   }
