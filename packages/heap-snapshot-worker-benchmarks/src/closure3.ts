@@ -15,7 +15,7 @@ const testOptimized = async () => {
   try {
     console.time('compare')
     const values = await compareNamedClosureCountWithReferencesFromHeapSnapshot2(filePath1, filePath2, scriptMapPath, {
-      minCount: 97,
+      minCount: 37,
       excludeOriginalPaths: [
         'async.ts',
         'editStack.ts',
