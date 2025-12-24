@@ -103,10 +103,27 @@ test('should count single array in snapshot A', () => {
       // Array - type=object(3), name=Array(1), id=1
       3, 1, 1, 100, 0, 0, 0,
     ]),
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
     strings: ['', 'Array'],
   }
 
-  const snapshotB = createBaseSnapshot()
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 0,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([]),
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+    strings: ['', 'Array'],
+  }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
 
@@ -147,6 +164,8 @@ test('should count single array in snapshot B', () => {
       3, 1, 1, 100, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
@@ -171,16 +190,28 @@ test('should count arrays in both snapshots', () => {
       3, 1, 1, 100, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 1,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array - type=object(3), name=Array(1), id=1
       3, 1, 1, 100, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
@@ -209,9 +240,26 @@ test('should count multiple arrays in snapshot A', () => {
       3, 1, 3, 150, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
-  const snapshotB = createBaseSnapshot()
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 0,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([]),
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+    strings: ['', 'Array'],
+  }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
 
@@ -260,6 +308,8 @@ test('should count multiple arrays in snapshot B', () => {
       3, 1, 5, 220, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
@@ -286,11 +336,21 @@ test('should count arrays in both snapshots with different counts', () => {
       3, 1, 2, 200, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 4,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array 1 - type=object(3), name=Array(1), id=1
       3, 1, 1, 100, 0, 0, 0,
@@ -301,6 +361,8 @@ test('should count arrays in both snapshots with different counts', () => {
       // Array 4 - type=object(3), name=Array(1), id=4
       3, 1, 4, 180, 0, 0, 0,
     ]),
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
     strings: ['', 'Array'],
   }
 
@@ -429,10 +491,27 @@ test('should ignore non-object types even if named Array', () => {
       // Array type (not object) - type=array(1), name=Array(1), id=3
       1, 1, 3, 64, 0, 0, 0,
     ]),
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
     strings: ['', 'Array'],
   }
 
-  const snapshotB = createBaseSnapshot()
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 0,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([]),
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+    strings: ['', 'Array'],
+  }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
 
@@ -469,17 +548,26 @@ test('should handle large number of arrays', () => {
   }
 
   const snapshotA: Snapshot = {
-    ...createBaseSnapshot(),
     node_count: arrayCountA,
     nodes: nodesA,
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: arrayCountB,
     nodes: nodesB,
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
@@ -556,6 +644,8 @@ test('should handle arrays mixed with many other objects', () => {
       3, 1, 8, 180, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
@@ -697,6 +787,8 @@ test('should handle Array string at different index', () => {
       3, 1, 1, 100, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
@@ -727,10 +819,18 @@ test('should handle snapshots with only arrays', () => {
       3, 1, 7, 210, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 3,
     nodes: new Uint32Array([
       // All arrays
@@ -739,6 +839,8 @@ test('should handle snapshots with only arrays', () => {
       3, 1, 3, 150, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
@@ -767,10 +869,18 @@ test('should handle arrays with different sizes', () => {
       3, 1, 3, 100000, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 2,
     nodes: new Uint32Array([
       // Small array
@@ -779,6 +889,8 @@ test('should handle arrays with different sizes', () => {
       3, 1, 2, 50000, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
@@ -806,16 +918,28 @@ test('should handle arrays with edges', () => {
       3, 1, 2, 200, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 1,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array with many edges - type=object(3), name=Array(1), id=1, edge_count=10
       3, 1, 1, 100, 10, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
@@ -845,10 +969,18 @@ test('should handle arrays with trace_node_id', () => {
       3, 1, 3, 150, 0, 0, 5,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 2,
     nodes: new Uint32Array([
       // Array with trace_node_id=2
@@ -857,6 +989,8 @@ test('should handle arrays with trace_node_id', () => {
       3, 1, 2, 200, 0, 0, 3,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
@@ -884,16 +1018,28 @@ test('should handle arrays with detachedness', () => {
       3, 1, 2, 200, 0, 0, 1,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 1,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array with detachedness=1 (detached)
       3, 1, 1, 100, 0, 0, 1,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
@@ -952,6 +1098,8 @@ test('should handle case where snapshot A has zero arrays and B has many', () =>
       3, 1, 10, 130, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
@@ -983,10 +1131,18 @@ test('should handle case where snapshot B has zero arrays and A has many', () =>
       3, 1, 8, 250, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 4,
     nodes: new Uint32Array([
       // Only non-array objects
@@ -1046,6 +1202,8 @@ test('should handle identical snapshots with same array count', () => {
       3, 1, 5, 220, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
@@ -1074,16 +1232,28 @@ test('should handle sparse arrays in nodes array', () => {
       3, 1, 3, 150, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 1,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array 1
       3, 1, 1, 100, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
@@ -1121,17 +1291,26 @@ test('should handle very large array counts', () => {
   }
 
   const snapshotA: Snapshot = {
-    ...createBaseSnapshot(),
     node_count: arrayCountA,
     nodes: nodesA,
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: arrayCountB,
     nodes: nodesB,
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
@@ -1141,8 +1320,16 @@ test('should handle very large array counts', () => {
 
 test('should correctly identify Array name regardless of string index', () => {
   const snapshotA: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 2,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array with name at index 10
       3, 10, 1, 100, 0, 0, 0,
@@ -1150,16 +1337,28 @@ test('should correctly identify Array name regardless of string index', () => {
       3, 10, 2, 200, 0, 0, 0,
     ]),
     strings: ['', 'Object1', 'Object2', 'Object3', 'Object4', 'Object5', 'Object6', 'Object7', 'Object8', 'Object9', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 1,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array with name at index 1
       3, 1, 1, 100, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
@@ -1169,8 +1368,16 @@ test('should correctly identify Array name regardless of string index', () => {
 
 test('should handle arrays with same count but different properties', () => {
   const snapshotA: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 3,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array with large size
       3, 1, 1, 1000000, 5, 1, 0,
@@ -1180,10 +1387,18 @@ test('should handle arrays with same count but different properties', () => {
       3, 1, 3, 100, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 3,
     nodes: new Uint32Array([
       // Array with different size
@@ -1194,6 +1409,8 @@ test('should handle arrays with same count but different properties', () => {
       3, 1, 3, 50, 0, 0, 1,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
