@@ -85,7 +85,7 @@ test('should return empty object when no closures leaked', async () => {
     ]),
   }
 
-  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, {})
   expect(result).toEqual({})
 })
 
@@ -193,7 +193,7 @@ test('should detect single leaked closure at one location', async () => {
     ]),
   }
 
-  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, {})
   expect(result).toEqual({
     '1:10:5': [
       {
@@ -330,7 +330,7 @@ test('should detect multiple leaked closures at same location', async () => {
     ]),
   }
 
-  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, {})
   expect(result).toEqual({
     '1:10:5': [
       {
@@ -472,7 +472,7 @@ test('should detect leaked closures at different locations', async () => {
     ]),
   }
 
-  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, {})
   expect(result).toEqual({})
 })
 
@@ -563,7 +563,7 @@ test('should not detect same closure with same nodeId as leak', async () => {
     ]),
   }
 
-  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, {})
   const key = '1:10:5'
   if (key in result) {
     expect(result[key]).toHaveLength(0)
@@ -676,7 +676,7 @@ test('should detect closure with named function', async () => {
     ]),
   }
 
-  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, {})
   expect(result).toEqual({
     '1:10:5': [
       {
@@ -792,7 +792,7 @@ test('should handle closures with different names at same location', async () =>
     ]),
   }
 
-  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, {})
   expect(result).toEqual({
     '1:10:5': [
       {
@@ -903,7 +903,7 @@ test('should handle empty locations in snapshotA', async () => {
     ]),
   }
 
-  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, {})
   expect(result).toEqual({})
 })
 
@@ -985,7 +985,7 @@ test('should handle empty locations in snapshotB', async () => {
     locations: new Uint32Array([]), // No locations
   }
 
-  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, {})
   expect(result).toEqual({})
 })
 
@@ -1114,7 +1114,7 @@ test('should handle multiple leaks with same name but different IDs', async () =
     ]),
   }
 
-  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, {})
   expect(result).toEqual({
     '1:10:5': [
       {
@@ -1235,7 +1235,7 @@ test('should handle closures at different script IDs', async () => {
     ]),
   }
 
-  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, {})
   expect(result).toEqual({})
 })
 
@@ -1343,7 +1343,7 @@ test('should handle closures at different lines', async () => {
     ]),
   }
 
-  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, {})
   expect(result).toEqual({})
 })
 
@@ -1451,7 +1451,7 @@ test('should handle closures at different columns', async () => {
     ]),
   }
 
-  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, {})
   expect(result).toEqual({})
 })
 
@@ -1643,7 +1643,7 @@ test('should handle complex scenario with multiple locations and leaks', async (
     ]),
   }
 
-  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, {})
   expect(result).toEqual({
     '1:10:5': [
       {
@@ -1771,7 +1771,7 @@ test('should handle node name fallback to anonymous when string index is invalid
     ]),
   }
 
-  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, {})
   expect(result).toEqual({
     '1:10:5': [
       {
@@ -1870,7 +1870,7 @@ test('should handle count increase but no new unique nodes', async () => {
     ]),
   }
 
-  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, {})
   expect(result).toEqual({
     '1:10:5': [],
   })
@@ -1911,7 +1911,7 @@ test('should handle empty snapshots', async () => {
     locations: new Uint32Array([]),
   }
 
-  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, {})
   expect(result).toEqual({})
 })
 
@@ -1998,6 +1998,6 @@ test('should handle snapshotB with no new locations', async () => {
     ]),
   }
 
-  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  const result = await compareNamedClosureCountFromHeapSnapshotInternal2(snapshotA, snapshotB, {})
   expect(result).toEqual({})
 })
