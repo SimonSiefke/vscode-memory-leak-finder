@@ -279,6 +279,10 @@ export const runTestsWithCallback = async ({
             }
             await MemoryLeakFinder.stop(memoryRpc, connectionId)
 
+            if (measureAfter) {
+              await Timeout.setTimeout(3000)
+            }
+
             const fileName = dirent.replace('.js', '.json').replace('.ts', '.json')
             const testName = fileName.replace('.json', '')
             let resultPath
