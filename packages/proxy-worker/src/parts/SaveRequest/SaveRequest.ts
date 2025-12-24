@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from 'fs/promises'
 import type { IncomingMessage } from 'http'
 import { join } from 'path'
-import { decompressBody } from '../DecompressBody/DecompressBody.ts'
+import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
 import * as Root from '../Root/Root.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
 import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
@@ -59,8 +59,10 @@ export const saveRequest = async (
       const sseFilePath = await SaveSseData.saveSseData(responseData, url, timestamp)
       parsedBody = `file-reference:${sseFilePath}`
     } else {
-      const { body: decompressedBody, wasCompressed: wasCompressedResult } = await decompressBody(responseData, contentEncoding)
-      wasCompressed = wasCompressedResult
+      const compressionWorker = await CompressionWorker.getCompressionWorker()
+      const result = await compressionWorker.invoke('Compression.decompressBody', responseData, contentEncoding)
+      const decompressedBody = result.body
+      wasCompressed = result.wasCompressed
       parsedBody = parseJsonIfApplicable(decompressedBody, contentType)
     }
 
