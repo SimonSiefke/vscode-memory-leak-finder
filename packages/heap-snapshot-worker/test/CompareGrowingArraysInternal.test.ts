@@ -219,11 +219,34 @@ test('should count multiple arrays in snapshot A', () => {
 })
 
 test('should count multiple arrays in snapshot B', () => {
-  const snapshotA = createBaseSnapshot()
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 0,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([]),
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+    strings: ['', 'Array'],
+  }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 5,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array 1 - type=object(3), name=Array(1), id=1
       3, 1, 1, 100, 0, 0, 0,
@@ -246,8 +269,16 @@ test('should count multiple arrays in snapshot B', () => {
 
 test('should count arrays in both snapshots with different counts', () => {
   const snapshotA: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 2,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array 1 - type=object(3), name=Array(1), id=1
       3, 1, 1, 100, 0, 0, 0,
@@ -280,8 +311,16 @@ test('should count arrays in both snapshots with different counts', () => {
 
 test('should ignore non-array objects', () => {
   const snapshotA: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 3,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array - type=object(3), name=Array(1), id=1
       3, 1, 1, 100, 0, 0, 0,
@@ -291,11 +330,21 @@ test('should ignore non-array objects', () => {
       2, 0, 3, 32, 0, 0, 0,
     ]),
     strings: ['', 'Array', 'SomeObject'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 2,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Regular object - type=object(3), name=''(0), id=1
       3, 0, 1, 64, 0, 0, 0,
@@ -312,8 +361,16 @@ test('should ignore non-array objects', () => {
 
 test('should ignore objects with name other than Array', () => {
   const snapshotA: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 3,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array - type=object(3), name=Array(1), id=1
       3, 1, 1, 100, 0, 0, 0,
@@ -323,11 +380,21 @@ test('should ignore objects with name other than Array', () => {
       3, 3, 3, 64, 0, 0, 0,
     ]),
     strings: ['', 'Array', 'Map', 'Set'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 2,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Object with different name - type=object(3), name=Map(2), id=1
       3, 2, 1, 64, 0, 0, 0,
@@ -344,8 +411,16 @@ test('should ignore objects with name other than Array', () => {
 
 test('should ignore non-object types even if named Array', () => {
   const snapshotA: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 3,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array object - type=object(3), name=Array(1), id=1
       3, 1, 1, 100, 0, 0, 0,
@@ -414,8 +489,16 @@ test('should handle large number of arrays', () => {
 
 test('should handle arrays mixed with many other objects', () => {
   const snapshotA: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 10,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array 1
       3, 1, 1, 100, 0, 0, 0,
@@ -439,11 +522,21 @@ test('should handle arrays mixed with many other objects', () => {
       3, 0, 10, 64, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 8,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Object
       3, 0, 1, 64, 0, 0, 0,
@@ -496,12 +589,22 @@ test('should handle different node field orders', () => {
   }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 1,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array - type=object(3), name=Array(1), id=1, self_size=100, edge_count=0, trace_node_id=0, detachedness=0
       3, 1, 1, 100, 0, 0, 0,
     ]),
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
     strings: ['', 'Array'],
   }
 
@@ -513,16 +616,41 @@ test('should handle different node field orders', () => {
 
 test('should handle empty strings array', () => {
   const snapshotA: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 1,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array - type=object(3), name=Array(1), but strings array is empty
       3, 0, 1, 100, 0, 0, 0,
     ]),
     strings: [],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
-  const snapshotB = createBaseSnapshot()
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 0,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([]),
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+    strings: ['', 'Array'],
+  }
 
   const result = compareGrowingArraysInternal(snapshotA, snapshotB)
 
@@ -532,8 +660,16 @@ test('should handle empty strings array', () => {
 
 test('should handle Array string at different index', () => {
   const snapshotA: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 2,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array 1 - type=object(3), name=Array(5), id=1
       3, 5, 1, 100, 0, 0, 0,
@@ -541,11 +677,21 @@ test('should handle Array string at different index', () => {
       3, 5, 2, 200, 0, 0, 0,
     ]),
     strings: ['', 'SomeObject', 'AnotherObject', 'YetAnother', 'Map', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
   }
 
   const snapshotB: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 1,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Array - type=object(3), name=Array(1), id=1
       3, 1, 1, 100, 0, 0, 0,
@@ -560,8 +706,16 @@ test('should handle Array string at different index', () => {
 
 test('should handle snapshots with only arrays', () => {
   const snapshotA: Snapshot = {
-    ...createBaseSnapshot(),
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
     node_count: 7,
+    edge_count: 0,
+    extra_native_bytes: 0,
     nodes: new Uint32Array([
       // All arrays
       3, 1, 1, 100, 0, 0, 0,
