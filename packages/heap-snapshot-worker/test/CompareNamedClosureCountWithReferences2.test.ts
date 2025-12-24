@@ -1806,20 +1806,72 @@ test('should group multiple identical closures together with count', async () =>
   }
 
   const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  // The closures all point to the same shared context and have the same object reference
-  // They should be grouped if they have identical references arrays
-  expect(result).toHaveLength(1)
-  expect(result[0].location).toBe('1:10:5')
-  // Should have at least one reference group
-  expect(result[0].references.length).toBeGreaterThan(0)
-  // All closures should be anonymous
-  for (const ref of result[0].references) {
-    expect(ref.nodeName).toBe('anonymous')
-  }
-  // Check that closures are sorted by count (highest first)
-  for (let i = 0; i < result[0].references.length - 1; i++) {
-    expect(result[0].references[i].count).toBeGreaterThanOrEqual(result[0].references[i + 1].count)
-  }
+  const expectedResult = [
+    {
+      location: '1:10:5',
+      references: [
+        {
+          nodeName: 'anonymous',
+          references: [
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 0].context',
+              count: 1,
+            },
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'object',
+              edgeType: 'property',
+              edgeName: 'callback',
+              path: '[Object 1].callback',
+              count: 1,
+            },
+          ],
+          count: 1,
+        },
+        {
+          nodeName: 'anonymous',
+          references: [
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 2].context',
+              count: 1,
+            },
+            {
+              sourceNodeName: 'anonymous',
+              sourceNodeType: 'object',
+              edgeType: 'property',
+              edgeName: 'callback',
+              path: 'anonymous.callback',
+              count: 1,
+            },
+          ],
+          count: 1,
+        },
+        {
+          nodeName: 'anonymous',
+          references: [
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 4].context',
+              count: 1,
+            },
+          ],
+          count: 1,
+        },
+      ],
+    },
+  ]
+  expect(result).toEqual(expectedResult)
 })
 
 test('should group multiple identical reference paths together with count', async () => {
@@ -1942,18 +1994,36 @@ test('should group multiple identical reference paths together with count', asyn
   }
 
   const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  // Both objects have the same name 'myObject', so they create the same reference path
-  expect(result).toHaveLength(1)
-  expect(result[0].location).toBe('1:10:5')
-  expect(result[0].references).toHaveLength(1)
-  const closure = result[0].references[0]
-  // Should have context reference and callback reference
-  // The callback reference should have count 2 if both objects create the same path
-  const callbackRef = closure.references.find((r) => r.edgeName === 'callback')
-  expect(callbackRef).toBeDefined()
-  if (callbackRef) {
-    expect(callbackRef.count).toBeGreaterThanOrEqual(1)
-  }
+  const expectedResult = [
+    {
+      location: '1:10:5',
+      references: [
+        {
+          nodeName: 'anonymous',
+          references: [
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 0].context',
+              count: 1,
+            },
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'object',
+              edgeType: 'property',
+              edgeName: 'callback',
+              path: '[Object 1].callback',
+              count: 1,
+            },
+          ],
+          count: 1,
+        },
+      ],
+    },
+  ]
+  expect(result).toEqual(expectedResult)
 })
 
 test('should sort closures by count (highest first)', async () => {
@@ -2119,16 +2189,70 @@ test('should sort closures by count (highest first)', async () => {
   }
 
   const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  // Should have closures grouped by their references
-  // Anonymous closures with same references should be grouped together
-  expect(result).toHaveLength(1)
-  expect(result[0].location).toBe('1:10:5')
-  // Should have at least one reference group
-  expect(result[0].references.length).toBeGreaterThan(0)
-  // Check that closures are sorted by count (highest first)
-  for (let i = 0; i < result[0].references.length - 1; i++) {
-    expect(result[0].references[i].count).toBeGreaterThanOrEqual(result[0].references[i + 1].count)
-  }
+  const expectedResult = [
+    {
+      location: '1:10:5',
+      references: [
+        {
+          nodeName: 'MyClosure',
+          references: [
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 0].context',
+              count: 1,
+            },
+          ],
+          count: 1,
+        },
+        {
+          nodeName: 'MyClosure',
+          references: [
+            {
+              sourceNodeName: 'MyClosure',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: 'MyClosure.context',
+              count: 1,
+            },
+          ],
+          count: 1,
+        },
+        {
+          nodeName: 'anonymous',
+          references: [
+            {
+              sourceNodeName: 'MyClosure',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: 'MyClosure.context',
+              count: 1,
+            },
+          ],
+          count: 1,
+        },
+        {
+          nodeName: 'anonymous',
+          references: [
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 6].context',
+              count: 1,
+            },
+          ],
+          count: 1,
+        },
+      ],
+    },
+  ]
+  expect(result).toEqual(expectedResult)
 })
 
 test('should sort reference paths by count (highest first)', async () => {
@@ -2254,21 +2378,43 @@ test('should sort reference paths by count (highest first)', async () => {
   }
 
   const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toHaveLength(1)
-  expect(result[0].location).toBe('1:10:5')
-  expect(result[0].references).toHaveLength(1)
-  const closure = result[0].references[0]
-  expect(closure.references.length).toBeGreaterThan(0)
-  // Check that reference paths are sorted by count (highest first)
-  for (let i = 0; i < closure.references.length - 1; i++) {
-    expect(closure.references[i].count).toBeGreaterThanOrEqual(closure.references[i + 1].count)
-  }
-  // Verify callback reference exists and has count >= 1
-  const callbackRef = closure.references.find((r) => r.edgeName === 'callback')
-  expect(callbackRef).toBeDefined()
-  if (callbackRef) {
-    expect(callbackRef.count).toBeGreaterThanOrEqual(1)
-  }
+  console.log(JSON.stringify(result, null, 2))
+  const expectedResult = [
+    {
+      location: '1:10:5',
+      references: [
+        {
+          nodeName: 'anonymous',
+          references: [
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'object',
+              edgeType: 'property',
+              edgeName: 'callback',
+              path: '[Object 1].callback',
+              count: 2,
+            },
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 0].context',
+              count: 1,
+            },
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'object',
+              edgeType: 'property',
+              edgeName: 'other',
+              path: '[Object 3].other',
+              count: 1,
+            },
+          ],
+          count: 1,
+        },
+      ],
+    },
+  ]
+  expect(result).toEqual(expectedResult)
 })
-
-
