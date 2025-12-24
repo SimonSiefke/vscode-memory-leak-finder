@@ -1,6 +1,6 @@
+import type { Session } from '../Session/Session.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetFunctionLocation from '../GetFunctionLocation/GetFunctionLocation.ts'
-import type { Session } from '../Session/Session.ts'
 
 const BATCH_SIZE = 50
 

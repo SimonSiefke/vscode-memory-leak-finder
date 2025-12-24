@@ -1,6 +1,6 @@
+import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as IsEnumerable from '../IsEnumerable/IsEnumerable.ts'
-import type { Session } from '../Session/Session.ts'
 
 /**
  *

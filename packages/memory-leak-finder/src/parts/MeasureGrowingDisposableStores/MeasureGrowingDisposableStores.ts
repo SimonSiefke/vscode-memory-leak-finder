@@ -1,3 +1,4 @@
+import type { Session } from '../Session/Session.ts'
 import * as CompareDisposableStores from '../CompareDisposableStores/CompareDisposableStores.ts'
 import * as GetDisposableStoresWithStackTraces from '../GetDisposableStoresWithStackTraces/GetDisposableStoresWithStackTraces.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
@@ -6,7 +7,6 @@ import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts
 import * as StartTrackingDisposableStores from '../StartTrackingDisposableStores/StartTrackingDisposableStores.ts'
 import * as StopTrackingDisposableStores from '../StopTrackingDisposableStores/StopTrackingDisposableStores.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
-import type { Session } from '../Session/Session.ts'
 
 // TODO
 // 1. find the DisposableStore constructor

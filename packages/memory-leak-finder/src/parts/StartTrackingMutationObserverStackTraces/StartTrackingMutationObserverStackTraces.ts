@@ -1,6 +1,6 @@
+import type { Session } from '../Session/Session.ts'
 import * as ConstructorKey from '../ConstructorKey/ConstructorKey.ts'
 import * as StartTrackingConstructorStackTraces from '../StartTrackingConstructorStackTraces/StartTrackingConstructorStackTraces.ts'
-import type { Session } from '../Session/Session.ts'
 
 /**
  * @param {any} session

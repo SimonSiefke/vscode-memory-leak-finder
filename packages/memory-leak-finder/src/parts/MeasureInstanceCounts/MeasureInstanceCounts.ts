@@ -1,3 +1,4 @@
+import type { Session } from '../Session/Session.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
 import * as CompareInstanceCounts from '../CompareInstanceCounts/CompareInstanceCounts.ts'
 import * as GetInstanceCounts from '../GetInstanceCounts/GetInstanceCounts.ts'
@@ -5,7 +6,6 @@ import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
-import type { Session } from '../Session/Session.ts'
 
 export const id = MeasureId.InstanceCounts
 
