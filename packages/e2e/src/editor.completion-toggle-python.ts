@@ -4,7 +4,7 @@ export const skip = 1
 
 export const requiresNetwork = 1
 
-export const setup = async ({ Editor, Workspace, Extensions }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Extensions, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       content: `def add(a,b,c):

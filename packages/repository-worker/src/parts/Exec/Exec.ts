@@ -2,8 +2,13 @@ import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 
 interface ExecOptions {
   cwd?: string
+<<<<<<< HEAD
   reject?: boolean
   env?: Record<string, string | undefined>
+=======
+  env?: Record<string, string | undefined>
+  reject?: boolean
+>>>>>>> origin/main
   stdio?: string
 }
 

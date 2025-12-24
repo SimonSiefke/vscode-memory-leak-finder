@@ -3,10 +3,10 @@ import * as IsJwtToken from '../IsJwtToken/IsJwtToken.ts'
 import * as IsUnixTimestamp from '../IsUnixTimestamp/IsUnixTimestamp.ts'
 import * as ReplaceJwtToken from '../ReplaceJwtToken/ReplaceJwtToken.ts'
 
-export const replaceJwtTokensInValue = (value: any, parentKey?: string): any => {
+export const replaceJwtTokensInValue = async (value: any, parentKey?: string): Promise<any> => {
   if (typeof value === 'string') {
     if (IsJwtToken.isJwtToken(value)) {
-      return ReplaceJwtToken.replaceJwtToken(value)
+      return await ReplaceJwtToken.replaceJwtToken(value)
     }
     // Check if the string contains a JWT token (e.g., "Bearer eyJ...")
     const jwtMatch = value.match(/(Bearer\s+)?(eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)/)
@@ -14,7 +14,7 @@ export const replaceJwtTokensInValue = (value: any, parentKey?: string): any => 
       const prefix = jwtMatch[1] || ''
       const token = jwtMatch[2]
       if (IsJwtToken.isJwtToken(token)) {
-        return prefix + ReplaceJwtToken.replaceJwtToken(token)
+        return prefix + (await ReplaceJwtToken.replaceJwtToken(token))
       }
     }
     return value
@@ -27,13 +27,13 @@ export const replaceJwtTokensInValue = (value: any, parentKey?: string): any => 
   }
 
   if (Array.isArray(value)) {
-    return value.map((item) => replaceJwtTokensInValue(item))
+    return await Promise.all(value.map((item) => replaceJwtTokensInValue(item)))
   }
 
   if (value !== null && typeof value === 'object') {
     const result: Record<string, any> = {}
     for (const [key, val] of Object.entries(value)) {
-      result[key] = replaceJwtTokensInValue(val, key)
+      result[key] = await replaceJwtTokensInValue(val, key)
     }
     return result
   }

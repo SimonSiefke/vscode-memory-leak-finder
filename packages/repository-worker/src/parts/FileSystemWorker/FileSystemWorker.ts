@@ -44,12 +44,25 @@ export const readFileContent = (path: string): Promise<string> => {
 
 interface ExecOptions {
   cwd?: string
+<<<<<<< HEAD
   reject?: boolean
   env?: Record<string, string | undefined>
   stdio?: string
 }
 
 export const exec = (command: string, args: string[], options: ExecOptions): Promise<{ exitCode: number; stderr: string; stdout: string }> => {
+=======
+  env?: Record<string, string | undefined>
+  reject?: boolean
+  stdio?: string
+}
+
+export const exec = (
+  command: string,
+  args: string[],
+  options: ExecOptions,
+): Promise<{ exitCode: number; stderr: string; stdout: string }> => {
+>>>>>>> origin/main
   return invoke('FileSystem.exec', command, args, options) as Promise<{ exitCode: number; stderr: string; stdout: string }>
 }
 

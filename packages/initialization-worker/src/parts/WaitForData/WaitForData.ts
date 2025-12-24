@@ -1,8 +1,13 @@
 import { once } from 'node:events'
 
 interface ReadableStreamLike {
+<<<<<<< HEAD
   on(event: 'data', listener: (data: string) => void): unknown
   emit(event: 'data', data: string): boolean
+=======
+  emit(event: 'data', data: string): boolean
+  on(event: 'data', listener: (data: string) => void): unknown
+>>>>>>> origin/main
 }
 
 type ErrorChecker = (data: string, stream: ReadableStreamLike) => Promise<void> | void
