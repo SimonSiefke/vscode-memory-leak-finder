@@ -23,12 +23,12 @@ test('FinalizeChapters - should handle case when ffmpeg is available', async () 
   }))
 
   jest.unstable_mockModule('fs/promises', () => ({
-    readFile: jest.fn(() => Promise.resolve(';FFMETADATA1\n')),
-    writeFile: jest.fn(() => Promise.resolve()),
+    readFile: jest.fn(async () => ';FFMETADATA1\n'),
+    writeFile: jest.fn(async () => {}),
   }))
 
   jest.unstable_mockModule('../src/parts/Exec/Exec.ts', () => ({
-    exec: jest.fn(() => Promise.resolve({})),
+    exec: jest.fn(async () => ({})),
   }))
 
   jest.unstable_mockModule('../src/parts/FfmpegProcessState/FfmpegProcessState.ts', () => ({
