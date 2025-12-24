@@ -109,6 +109,7 @@ export interface Editor {
   shouldHaveToken(text: any, color: any): Promise<void>
   shouldHaveBreadCrumb(text: any): Promise<void>
   save(options?: any): Promise<void>
+  saveAll(): Promise<void>
   switchToTab(name: any): Promise<void>
   openSettingsJson(): Promise<void>
   showColorPicker(): Promise<void>

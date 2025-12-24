@@ -86,14 +86,7 @@ console.log(result)
 }
 
 export const teardown = async ({ Editor, Workspace }: TestContext): Promise<void> => {
-  await Editor.switchToTab('add.ts')
-  await Editor.save({ viaKeyBoard: true })
-  await Editor.switchToTab('a.ts')
-  await Editor.save({ viaKeyBoard: true })
-  await Editor.switchToTab('b.ts')
-  await Editor.save({ viaKeyBoard: true })
-  await Editor.switchToTab('c.ts')
-  await Editor.save({ viaKeyBoard: true })
+  await Editor.saveAll()
   await Editor.closeAll()
   await Workspace.setFiles(initialFiles)
 }
