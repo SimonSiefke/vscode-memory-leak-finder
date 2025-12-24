@@ -26,7 +26,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async clearAll() {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
-        if (ideVersion && ideVersion.minor >= 107) {
+        if (ideVersion && ideVersion.minor >= 108) {
           await quickPick.executeCommand(WellKnownCommands.ClearAllWorkspaceChats)
         } else {
           await quickPick.executeCommand(WellKnownCommands.DeleteAllWorkspaceChatSessions)
