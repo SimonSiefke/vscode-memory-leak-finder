@@ -1,5 +1,5 @@
-import * as GetConstructorInstanceCount from '../GetConstructorInstanceCount/GetConstructorInstanceCount.ts'
 import type { Session } from '../Session/Session.ts'
+import * as GetConstructorInstanceCount from '../GetConstructorInstanceCount/GetConstructorInstanceCount.ts'
 
 /**
  *

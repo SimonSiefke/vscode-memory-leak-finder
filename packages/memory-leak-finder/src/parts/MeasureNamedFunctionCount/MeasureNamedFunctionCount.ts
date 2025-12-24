@@ -1,4 +1,5 @@
 import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
+import type { Session } from '../Session/Session.ts'
 // deprecated in favor of namedFunctionCount2, which works with heapsnapshot
 // whereas this queries chrome for all function locations individually, crashing chrome
 import * as CompareNamedFunctionCount from '../CompareNamedFunctionCount/CompareNamedFunctionCount.ts'
@@ -7,7 +8,6 @@ import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
-import type { Session } from '../Session/Session.ts'
 
 export const id = MeasureId.NamedFunctionCount
 

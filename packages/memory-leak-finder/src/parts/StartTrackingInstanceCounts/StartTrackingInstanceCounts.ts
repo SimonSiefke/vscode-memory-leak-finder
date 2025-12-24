@@ -1,7 +1,7 @@
+import type { Session } from '../Session/Session.ts'
 import * as GetConstructors from '../GetConstructors/GetConstructors.ts'
 import * as GetInstances from '../GetInstances/GetInstances.ts'
 import * as SpyOnConstructors from '../SpyOnConstructors/SpyOnConstructors.ts'
-import type { Session } from '../Session/Session.ts'
 
 // TODO
 // 1. find all instances
