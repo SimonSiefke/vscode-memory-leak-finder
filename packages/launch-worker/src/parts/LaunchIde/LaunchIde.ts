@@ -1,3 +1,4 @@
+import * as FetchVscodeInsidersMetadata from '../FetchVscodeInsidersMetadata/FetchVscodeInsidersMetadata.ts'
 import * as Ide from '../Ide/Ide.ts'
 import * as LaunchCursor from '../LaunchCursor/LaunchCursor.ts'
 import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.ts'
@@ -63,8 +64,16 @@ export const launchIde = async ({
     vscodePath,
     vscodeVersion,
   })
+  let versionToParse: string
+  if (insidersCommit) {
+    const metadata = await FetchVscodeInsidersMetadata.fetchVscodeInsidersMetadata(insidersCommit)
+    const productVersion = metadata.productVersion
+    versionToParse = productVersion.replace('-insider', '')
+  } else {
+    versionToParse = vscodeVersion
+  }
   return {
     ...result,
-    parsedVersion: ParseVersion.parseVersion(vscodeVersion),
+    parsedVersion: ParseVersion.parseVersion(versionToParse),
   }
 }
