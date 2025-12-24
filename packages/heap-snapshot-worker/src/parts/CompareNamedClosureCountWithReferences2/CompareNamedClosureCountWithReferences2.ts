@@ -69,13 +69,19 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2 = a
   return transformToArray(final)
 }
 
+const normalizePath = (path: string): string => {
+  // Replace node IDs in paths like [array 3018681].internal with [array].internal
+  // This allows us to merge references that differ only by node ID
+  return path.replace(/\[(\w+)\s+\d+\]/g, '[$1]')
+}
+
 const areReferencePathsEqual = (a: ReferencePath, b: ReferencePath): boolean => {
   return (
     a.sourceNodeName === b.sourceNodeName &&
     a.sourceNodeType === b.sourceNodeType &&
     a.edgeType === b.edgeType &&
     a.edgeName === b.edgeName &&
-    a.path === b.path
+    normalizePath(a.path) === normalizePath(b.path)
   )
 }
 

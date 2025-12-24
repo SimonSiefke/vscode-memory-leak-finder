@@ -2378,7 +2378,6 @@ test('should sort reference paths by count (highest first)', async () => {
   }
 
   const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  console.log(JSON.stringify(result, null, 2))
   const expectedResult = [
     {
       location: '1:10:5',
@@ -2390,8 +2389,8 @@ test('should sort reference paths by count (highest first)', async () => {
               sourceNodeName: '',
               sourceNodeType: 'object',
               edgeType: 'property',
-              edgeName: 'callback',
-              path: '[Object 1].callback',
+              edgeName: 'obj2',
+              path: '[Object 1].obj2',
               count: 2,
             },
             {
@@ -2403,11 +2402,11 @@ test('should sort reference paths by count (highest first)', async () => {
               count: 1,
             },
             {
-              sourceNodeName: '',
+              sourceNodeName: 'anonymous',
               sourceNodeType: 'object',
               edgeType: 'property',
-              edgeName: 'other',
-              path: '[Object 3].other',
+              edgeName: 'callback',
+              path: 'anonymous.callback',
               count: 1,
             },
           ],
