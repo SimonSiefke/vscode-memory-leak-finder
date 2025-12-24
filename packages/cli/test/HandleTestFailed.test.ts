@@ -35,7 +35,7 @@ jest.unstable_mockModule('../src/parts/StdoutWorker/StdoutWorker.ts', () => {
         return '[ansi-clear]'
       }
       if (method === 'Stdout.getHandleTestFailedMessage') {
-        return Promise.resolve('test failed\n')
+        return 'test failed\n'
       }
       throw new Error(`unexpected method ${method}`)
     }),

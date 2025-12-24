@@ -9,7 +9,7 @@ const mockInvoke = jest.fn() as jest.MockedFunction<(...args: any[]) => Promise<
 
 jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   return {
-    write: jest.fn().mockImplementation(() => Promise.resolve()),
+    write: jest.fn().mockImplementation(async () => {}),
   }
 })
 
