@@ -83,6 +83,7 @@ console.log(result)
 const result = subtract(5, 6)
 console.log(result)
 `)
+  await Editor.saveAll()
   await Editor.closeAll()
   await Workspace.setFiles(initialFiles)
 }
