@@ -2,7 +2,8 @@ import * as GetWebgl2RenderingContextCountsData from '../GetWebgl2RenderingConte
 
 export const name = 'webgl2-rendering-context-count'
 
-export const getData = (basePath: string): Promise<any[]> => GetWebgl2RenderingContextCountsData.getWebgl2RenderingContextCountsData(basePath)
+export const getData = (basePath: string): Promise<any[]> =>
+  GetWebgl2RenderingContextCountsData.getWebgl2RenderingContextCountsData(basePath)
 
 export const createChart = (): { x: string; xLabel: string; y: string; yLabel: string } => {
   return {
@@ -12,4 +13,3 @@ export const createChart = (): { x: string; xLabel: string; y: string; yLabel: s
     yLabel: 'WebGL2 Rendering Context Count',
   }
 }
-
