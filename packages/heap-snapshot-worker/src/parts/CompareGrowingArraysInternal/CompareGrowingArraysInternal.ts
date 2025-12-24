@@ -26,12 +26,8 @@ export const countArrays = (snapshot: Snapshot): number => {
   return arrayCount
 }
 
-export const compareGrowingArraysInternal = (
-  snapshotA: Snapshot,
-  snapshotB: Snapshot,
-): { aCount: number; bCount: number } => {
+export const compareGrowingArraysInternal = (snapshotA: Snapshot, snapshotB: Snapshot): { aCount: number; bCount: number } => {
   const aCount = countArrays(snapshotA)
   const bCount = countArrays(snapshotB)
   return { aCount, bCount }
 }
-

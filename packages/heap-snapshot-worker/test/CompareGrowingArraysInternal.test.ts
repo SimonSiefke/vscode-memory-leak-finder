@@ -827,13 +827,8 @@ test('should handle snapshots with only arrays', () => {
     extra_native_bytes: 0,
     nodes: new Uint32Array([
       // All arrays
-      3, 1, 1, 100, 0, 0, 0,
-      3, 1, 2, 200, 0, 0, 0,
-      3, 1, 3, 150, 0, 0, 0,
-      3, 1, 4, 180, 0, 0, 0,
-      3, 1, 5, 220, 0, 0, 0,
-      3, 1, 6, 190, 0, 0, 0,
-      3, 1, 7, 210, 0, 0, 0,
+      3, 1, 1, 100, 0, 0, 0, 3, 1, 2, 200, 0, 0, 0, 3, 1, 3, 150, 0, 0, 0, 3, 1, 4, 180, 0, 0, 0, 3, 1, 5, 220, 0, 0, 0, 3, 1, 6, 190, 0, 0,
+      0, 3, 1, 7, 210, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
     edges: new Uint32Array([]),
@@ -853,9 +848,7 @@ test('should handle snapshots with only arrays', () => {
     extra_native_bytes: 0,
     nodes: new Uint32Array([
       // All arrays
-      3, 1, 1, 100, 0, 0, 0,
-      3, 1, 2, 200, 0, 0, 0,
-      3, 1, 3, 150, 0, 0, 0,
+      3, 1, 1, 100, 0, 0, 0, 3, 1, 2, 200, 0, 0, 0, 3, 1, 3, 150, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
     edges: new Uint32Array([]),
@@ -1085,11 +1078,7 @@ test('should handle case where snapshot A has zero arrays and B has many', () =>
     extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Only non-array objects
-      3, 0, 1, 64, 0, 0, 0,
-      3, 0, 2, 64, 0, 0, 0,
-      3, 0, 3, 64, 0, 0, 0,
-      2, 0, 4, 32, 0, 0, 0,
-      3, 0, 5, 64, 0, 0, 0,
+      3, 0, 1, 64, 0, 0, 0, 3, 0, 2, 64, 0, 0, 0, 3, 0, 3, 64, 0, 0, 0, 2, 0, 4, 32, 0, 0, 0, 3, 0, 5, 64, 0, 0, 0,
     ]),
     strings: ['', 'Array', 'SomeObject'],
     edges: new Uint32Array([]),
@@ -1109,16 +1098,8 @@ test('should handle case where snapshot A has zero arrays and B has many', () =>
     extra_native_bytes: 0,
     nodes: new Uint32Array([
       // All arrays
-      3, 1, 1, 100, 0, 0, 0,
-      3, 1, 2, 200, 0, 0, 0,
-      3, 1, 3, 150, 0, 0, 0,
-      3, 1, 4, 180, 0, 0, 0,
-      3, 1, 5, 220, 0, 0, 0,
-      3, 1, 6, 190, 0, 0, 0,
-      3, 1, 7, 210, 0, 0, 0,
-      3, 1, 8, 240, 0, 0, 0,
-      3, 1, 9, 160, 0, 0, 0,
-      3, 1, 10, 130, 0, 0, 0,
+      3, 1, 1, 100, 0, 0, 0, 3, 1, 2, 200, 0, 0, 0, 3, 1, 3, 150, 0, 0, 0, 3, 1, 4, 180, 0, 0, 0, 3, 1, 5, 220, 0, 0, 0, 3, 1, 6, 190, 0, 0,
+      0, 3, 1, 7, 210, 0, 0, 0, 3, 1, 8, 240, 0, 0, 0, 3, 1, 9, 160, 0, 0, 0, 3, 1, 10, 130, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
     edges: new Uint32Array([]),
@@ -1144,14 +1125,8 @@ test('should handle case where snapshot B has zero arrays and A has many', () =>
     extra_native_bytes: 0,
     nodes: new Uint32Array([
       // All arrays
-      3, 1, 1, 100, 0, 0, 0,
-      3, 1, 2, 200, 0, 0, 0,
-      3, 1, 3, 150, 0, 0, 0,
-      3, 1, 4, 180, 0, 0, 0,
-      3, 1, 5, 220, 0, 0, 0,
-      3, 1, 6, 190, 0, 0, 0,
-      3, 1, 7, 210, 0, 0, 0,
-      3, 1, 8, 250, 0, 0, 0,
+      3, 1, 1, 100, 0, 0, 0, 3, 1, 2, 200, 0, 0, 0, 3, 1, 3, 150, 0, 0, 0, 3, 1, 4, 180, 0, 0, 0, 3, 1, 5, 220, 0, 0, 0, 3, 1, 6, 190, 0, 0,
+      0, 3, 1, 7, 210, 0, 0, 0, 3, 1, 8, 250, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
     edges: new Uint32Array([]),
@@ -1171,10 +1146,7 @@ test('should handle case where snapshot B has zero arrays and A has many', () =>
     extra_native_bytes: 0,
     nodes: new Uint32Array([
       // Only non-array objects
-      3, 0, 1, 64, 0, 0, 0,
-      3, 0, 2, 64, 0, 0, 0,
-      2, 0, 3, 32, 0, 0, 0,
-      3, 0, 4, 64, 0, 0, 0,
+      3, 0, 1, 64, 0, 0, 0, 3, 0, 2, 64, 0, 0, 0, 2, 0, 3, 32, 0, 0, 0, 3, 0, 4, 64, 0, 0, 0,
     ]),
     strings: ['', 'Array', 'SomeObject'],
     edges: new Uint32Array([]),
@@ -1199,11 +1171,7 @@ test('should handle identical snapshots with same array count', () => {
     edge_count: 0,
     extra_native_bytes: 0,
     nodes: new Uint32Array([
-      3, 1, 1, 100, 0, 0, 0,
-      3, 1, 2, 200, 0, 0, 0,
-      3, 1, 3, 150, 0, 0, 0,
-      3, 1, 4, 180, 0, 0, 0,
-      3, 1, 5, 220, 0, 0, 0,
+      3, 1, 1, 100, 0, 0, 0, 3, 1, 2, 200, 0, 0, 0, 3, 1, 3, 150, 0, 0, 0, 3, 1, 4, 180, 0, 0, 0, 3, 1, 5, 220, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
     edges: new Uint32Array([]),
@@ -1222,11 +1190,7 @@ test('should handle identical snapshots with same array count', () => {
     edge_count: 0,
     extra_native_bytes: 0,
     nodes: new Uint32Array([
-      3, 1, 1, 100, 0, 0, 0,
-      3, 1, 2, 200, 0, 0, 0,
-      3, 1, 3, 150, 0, 0, 0,
-      3, 1, 4, 180, 0, 0, 0,
-      3, 1, 5, 220, 0, 0, 0,
+      3, 1, 1, 100, 0, 0, 0, 3, 1, 2, 200, 0, 0, 0, 3, 1, 3, 150, 0, 0, 0, 3, 1, 4, 180, 0, 0, 0, 3, 1, 5, 220, 0, 0, 0,
     ]),
     strings: ['', 'Array'],
     edges: new Uint32Array([]),
