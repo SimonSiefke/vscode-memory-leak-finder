@@ -4,7 +4,7 @@ import { request as httpsRequest } from 'https'
 import { join } from 'path'
 import { createSecureContext, TLSSocket } from 'tls'
 import { CERT_DIR } from '../Constants/Constants.ts'
-import { decompressBody } from '../DecompressBody/DecompressBody.ts'
+import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
 import { getCertificateForDomain } from '../GetCertificateForDomain/GetCertificateForDomain.ts'
 import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
 import * as Root from '../Root/Root.ts'
@@ -45,8 +45,10 @@ const saveInterceptedRequest = async (
       const sseFilePath = await SaveSseData.saveSseData(responseBody, url, timestamp)
       parsedBody = `file-reference:${sseFilePath}`
     } else {
-      const { body: decompressedBody, wasCompressed: wasCompressedResult } = await decompressBody(responseBody, contentEncoding)
-      wasCompressed = wasCompressedResult
+      const compressionWorker = await CompressionWorker.getCompressionWorker()
+      const result = await compressionWorker.invoke('Compression.decompressBody', responseBody, contentEncoding)
+      const decompressedBody = result.body
+      wasCompressed = result.wasCompressed
       // @ts-ignore
       parsedBody = parseJsonIfApplicable(decompressedBody, contentType)
     }

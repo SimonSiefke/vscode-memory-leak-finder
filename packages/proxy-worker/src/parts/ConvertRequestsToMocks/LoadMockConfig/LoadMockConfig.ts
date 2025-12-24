@@ -1,7 +1,6 @@
 import { existsSync } from 'fs'
 import { readFile } from 'fs/promises'
-import { join, dirname } from 'path'
-import { fileURLToPath } from 'url'
+import { join } from 'path'
 import type { MockConfigEntry } from '../../MockConfigEntry/MockConfigEntry.ts'
 
 const __dirname = import.meta.dirname
