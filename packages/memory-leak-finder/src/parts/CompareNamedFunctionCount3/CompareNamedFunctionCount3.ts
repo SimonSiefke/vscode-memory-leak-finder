@@ -22,6 +22,7 @@ export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: 
       'ternarySearchTree.ts',
       'undoRedoService.ts',
       'uri.ts',
+      'uriIdentityService.ts',
     ],
     minCount: threshold,
   }
