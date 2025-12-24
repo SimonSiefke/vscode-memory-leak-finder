@@ -19,7 +19,13 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
 \`\`\`json
 { "count":123, "value": 567 }
 \`\`\``,
+    validateRequest: {
+      exists: ['.interactive-result-editor[data-mode-id="json"]'],
+    },
+    verify: true,
   })
+  // @ts-ignore
+  await ChatEditor.clearAll()
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {

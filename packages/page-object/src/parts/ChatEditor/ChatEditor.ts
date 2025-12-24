@@ -99,7 +99,14 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to open finish setup`)
       }
     },
-    async sendMessage({ expectedResponse, message, verify = false }) {
+    async sendMessage({
+      expectedResponse,
+      message,
+      verify = false,
+      validateRequest = {
+        exists: [],
+      },
+    }) {
       try {
         await page.waitForIdle()
         const chatView = page.locator('.interactive-session')
@@ -137,13 +144,32 @@ export const create = ({ expect, ideVersion, page, VError }) => {
             setTimeout(r, 1000)
           })
         }
+        const requests = chatView.locator('.monaco-list-row.request')
+        const count = await requests.count()
         await sendButton.click()
         await page.waitForIdle()
         await expect(lines).toHaveText('')
         await page.waitForIdle()
+        await expect(requests).toHaveCount(count + 1)
+        const last = requests.nth(count)
+        if (validateRequest && validateRequest.exists && validateRequest.exists.length > 0) {
+          const ariaLabel = await last.getAttribute('aria-label')
+          if (ariaLabel !== message) {
+            throw new Error(`unexpected aria label: ${ariaLabel}`)
+          }
+        }
+
+        if (validateRequest && validateRequest.exists && validateRequest.exists.length > 0) {
+          const requestMessage = last
+          await expect(requestMessage).toBeVisible()
+          for (const selector of validateRequest.exists) {
+            const locator = requestMessage.locator(selector)
+            await expect(locator).toBeVisible()
+          }
+        }
 
         if (verify) {
-          const row = chatView.locator(`.monaco-list-row[aria-label="${message}"]`)
+          const row = last
           await expect(row).toBeVisible()
           await page.waitForIdle()
           const response = chatView.locator('.monaco-list-row .chat-most-recent-response')
@@ -157,7 +183,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         }
 
         if (expectedResponse) {
-          const requestMessage = chatView.locator(`.monaco-list-row.request[aria-label="${message}"]`)
+          const requestMessage = last
           await expect(requestMessage).toBeVisible()
           await page.waitForIdle()
           await sendButton.click()
