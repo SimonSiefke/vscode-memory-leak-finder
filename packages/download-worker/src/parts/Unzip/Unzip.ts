@@ -10,7 +10,7 @@ const launchCompressionWorker = async () => {
     commandMap: {},
   })
   return {
-    invoke(method, ...params) {
+    invoke(method: string, ...params: readonly any[]) {
       return rpc.invoke(method, ...params)
     },
     async [Symbol.asyncDispose]() {

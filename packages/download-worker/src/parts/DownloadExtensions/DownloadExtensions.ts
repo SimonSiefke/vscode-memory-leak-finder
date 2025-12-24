@@ -5,7 +5,7 @@ import { root } from '../Root/Root.ts'
 
 const urlPlaceHolder = `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/$PUBLISHER/vsextensions/$NAME/$VERSION/vspackage`
 
-const downloadExtension = async (extension) => {
+const downloadExtension = async (extension: { id: string; version: string }) => {
   const { id, version } = extension
   const [publisher, name] = id.split('/')
   const publisherLower = publisher.toLowerCase()
@@ -18,7 +18,7 @@ const downloadExtension = async (extension) => {
   })
 }
 
-export const downloadExtensions = async (extensions) => {
+export const downloadExtensions = async (extensions: Array<{ id: string; version: string }>) => {
   for (const extension of extensions) {
     await downloadExtension(extension)
   }
