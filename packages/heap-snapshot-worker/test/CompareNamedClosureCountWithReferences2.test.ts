@@ -86,7 +86,7 @@ test('should return empty object when no closures leaked', async () => {
   }
 
   const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toEqual({})
+  expect(result).toEqual([])
 })
 
 test('should detect single leaked closure with property reference', async () => {
@@ -204,14 +204,33 @@ test('should detect single leaked closure with property reference', async () => 
   }
 
   const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toHaveProperty('1:10:5')
-  expect(result['1:10:5']).toHaveLength(1)
-  expect(result['1:10:5'][0].nodeName).toBe('anonymous')
-  expect(result['1:10:5'][0].references.length).toBeGreaterThan(0)
-  const propertyRef = result['1:10:5'][0].references.find((r) => r.edgeType === 'property')
-  expect(propertyRef).toBeDefined()
-  expect(propertyRef?.edgeName).toBe('callback')
-  expect(propertyRef?.path).toContain('callback')
+  const expectedResult = [
+    {
+      location: '1:10:5',
+      references: [
+        {
+          nodeName: 'anonymous',
+          references: [
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 0].context',
+            },
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'object',
+              edgeType: 'property',
+              edgeName: 'callback',
+              path: '[Object 1].callback',
+            },
+          ],
+        },
+      ],
+    },
+  ]
+  expect(result).toEqual(expectedResult)
 })
 
 test('should detect single leaked closure with array element reference', async () => {
@@ -324,13 +343,33 @@ test('should detect single leaked closure with array element reference', async (
   }
 
   const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toHaveProperty('1:10:5')
-  expect(result['1:10:5']).toHaveLength(1)
-  expect(result['1:10:5'][0].references.length).toBeGreaterThan(0)
-  const elementRef = result['1:10:5'][0].references.find((r) => r.edgeType === 'element')
-  expect(elementRef).toBeDefined()
-  expect(elementRef?.edgeName).toBe('[0]')
-  expect(elementRef?.path).toContain('[0]')
+  const expectedResult = [
+    {
+      location: '1:10:5',
+      references: [
+        {
+          nodeName: 'anonymous',
+          references: [
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'object',
+              edgeType: 'element',
+              edgeName: '[0]',
+              path: '[Array 1][0]',
+            },
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 0].context',
+            },
+          ],
+        },
+      ],
+    },
+  ]
+  expect(result).toEqual(expectedResult)
 })
 
 test('should detect single leaked closure with context reference', async () => {
@@ -443,13 +482,34 @@ test('should detect single leaked closure with context reference', async () => {
   }
 
   const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toHaveProperty('1:10:5')
-  expect(result['1:10:5']).toHaveLength(1)
-  expect(result['1:10:5'][0].references.length).toBeGreaterThan(0)
-  const contextRef = result['1:10:5'][0].references.find((r) => r.edgeType === 'context')
-  expect(contextRef).toBeDefined()
-  expect(contextRef?.edgeName).toBe('context')
-  expect(contextRef?.path).toContain('context')
+  console.log('context test:', JSON.stringify(result, null, 2))
+  const expectedResult = [
+    {
+      location: '1:10:5',
+      references: [
+        {
+          nodeName: 'anonymous',
+          references: [
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 0].context',
+            },
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 2].context',
+            },
+          ],
+        },
+      ],
+    },
+  ]
+  expect(result).toEqual(expectedResult)
 })
 
 test('should detect single leaked closure with multiple references', async () => {
@@ -582,18 +642,47 @@ test('should detect single leaked closure with multiple references', async () =>
   }
 
   const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toHaveProperty('1:10:5')
-  expect(result['1:10:5']).toHaveLength(1)
-  expect(result['1:10:5'][0].references.length).toBeGreaterThanOrEqual(3)
-
-  const propertyRef = result['1:10:5'][0].references.find((r) => r.edgeType === 'property')
-  expect(propertyRef).toBeDefined()
-
-  const elementRef = result['1:10:5'][0].references.find((r) => r.edgeType === 'element')
-  expect(elementRef).toBeDefined()
-
-  const contextRef = result['1:10:5'][0].references.find((r) => r.edgeType === 'context')
-  expect(contextRef).toBeDefined()
+  const expectedResult = [
+    {
+      location: '1:10:5',
+      references: [
+        {
+          nodeName: 'anonymous',
+          references: [
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 0].context',
+            },
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 3].context',
+            },
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'array',
+              edgeType: 'element',
+              edgeName: '[0]',
+              path: '[Array 2][0]',
+            },
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'object',
+              edgeType: 'property',
+              edgeName: 'callback',
+              path: '[Object 1].callback',
+            },
+          ],
+        },
+      ],
+    },
+  ]
+  expect(result).toEqual(expectedResult)
 })
 
 test('should detect leaked closures at different locations with different references', async () => {
@@ -737,18 +826,33 @@ test('should detect leaked closures at different locations with different refere
   }
 
   const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toHaveProperty('1:10:5')
-  expect(result['1:10:5']).toHaveLength(1)
-
-  // Closure 2 should have property reference
-  const closure2 = result['1:10:5'][0]
-  const propertyRef = closure2.references.find((r) => r.edgeType === 'property')
-  expect(propertyRef).toBeDefined()
-
-  // Note: location "1:20:10" is a new location (not in snapshotA), so it should be detected
-  // But if it's not, that's okay - the function behavior may vary
-  // Let's just verify that we got at least one closure with references
-  expect(closure2.references.length).toBeGreaterThan(0)
+  const expectedResult = [
+    {
+      location: '1:10:5',
+      references: [
+        {
+          nodeName: 'anonymous',
+          references: [
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 0].context',
+            },
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'object',
+              edgeType: 'property',
+              edgeName: 'handler',
+              path: '[Object 1].handler',
+            },
+          ],
+        },
+      ],
+    },
+  ]
+  expect(result).toEqual(expectedResult)
 })
 
 test('should handle leaked closure with no references', async () => {
@@ -851,10 +955,26 @@ test('should handle leaked closure with no references', async () => {
   }
 
   const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toHaveProperty('1:10:5')
-  expect(result['1:10:5']).toHaveLength(1)
-  // Closure 2 has no incoming edges, so references should be empty or only contain context
-  expect(Array.isArray(result['1:10:5'][0].references)).toBe(true)
+  const expectedResult = [
+    {
+      location: '1:10:5',
+      references: [
+        {
+          nodeName: 'anonymous',
+          references: [
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 0].context',
+            },
+          ],
+        },
+      ],
+    },
+  ]
+  expect(result).toEqual(expectedResult)
 })
 
 test('should detect leaked closure with internal reference', async () => {
@@ -967,13 +1087,33 @@ test('should detect leaked closure with internal reference', async () => {
   }
 
   const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toHaveProperty('1:10:5')
-  expect(result['1:10:5']).toHaveLength(1)
-  expect(result['1:10:5'][0].references.length).toBeGreaterThan(0)
-  const internalRef = result['1:10:5'][0].references.find((r) => r.edgeType === 'internal')
-  expect(internalRef).toBeDefined()
-  expect(internalRef?.edgeName).toBe('internal')
-  expect(internalRef?.path).toContain('internal')
+  const expectedResult = [
+    {
+      location: '1:10:5',
+      references: [
+        {
+          nodeName: 'anonymous',
+          references: [
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 0].context',
+            },
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'object',
+              edgeType: 'internal',
+              edgeName: 'internal',
+              path: '[object 1].internal',
+            },
+          ],
+        },
+      ],
+    },
+  ]
+  expect(result).toEqual(expectedResult)
 })
 
 test('should include source node information in references', async () => {
@@ -1086,13 +1226,33 @@ test('should include source node information in references', async () => {
   }
 
   const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toHaveProperty('1:10:5')
-  const ref = result['1:10:5'][0].references[0]
-  expect(ref).toHaveProperty('sourceNodeName')
-  expect(ref).toHaveProperty('sourceNodeType')
-  expect(ref).toHaveProperty('edgeType')
-  expect(ref).toHaveProperty('edgeName')
-  expect(ref).toHaveProperty('path')
+  const expectedResult = [
+    {
+      location: '1:10:5',
+      references: [
+        {
+          nodeName: 'anonymous',
+          references: [
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 0].context',
+            },
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'object',
+              edgeType: 'property',
+              edgeName: 'callback',
+              path: '[Object 1].callback',
+            },
+          ],
+        },
+      ],
+    },
+  ]
+  expect(result).toEqual(expectedResult)
 })
 
 test.skip('should handle multiple leaked closures at same location with different references', async () => {
@@ -1229,11 +1389,52 @@ test.skip('should handle multiple leaked closures at same location with differen
   }
 
   const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toHaveProperty('1:10:5')
-  expect(result['1:10:5']).toHaveLength(2)
-
-  expect(result['1:10:5'][0].references.length).toBeGreaterThan(0)
-  expect(result['1:10:5'][1].references.length).toBeGreaterThan(0)
+  const expectedResult = [
+    {
+      location: '1:10:5',
+      references: [
+        {
+          nodeName: 'anonymous',
+          references: [
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 0].context',
+            },
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'object',
+              edgeType: 'property',
+              edgeName: 'handler',
+              path: '[Object 2].handler',
+            },
+          ],
+        },
+        {
+          nodeName: 'anonymous',
+          references: [
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 0].context',
+            },
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'array',
+              edgeType: 'element',
+              edgeName: '[0]',
+              path: '[Array 3][0]',
+            },
+          ],
+        },
+      ],
+    },
+  ]
+  expect(result).toEqual(expectedResult)
 })
 
 test('should handle empty references array gracefully', async () => {
@@ -1336,12 +1537,26 @@ test('should handle empty references array gracefully', async () => {
   }
 
   const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toHaveProperty('1:10:5')
-  expect(result['1:10:5']).toHaveLength(1)
-  expect(result['1:10:5'][0].references).toBeDefined()
-  expect(Array.isArray(result['1:10:5'][0].references)).toBe(true)
-  // References might be empty if closure has no incoming edges (only context)
-  // Context reference should still be present
+  const expectedResult = [
+    {
+      location: '1:10:5',
+      references: [
+        {
+          nodeName: 'anonymous',
+          references: [
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 0].context',
+            },
+          ],
+        },
+      ],
+    },
+  ]
+  expect(result).toEqual(expectedResult)
 })
 
 test('should handle closure with byte offset correctly', async () => {
@@ -1444,6 +1659,24 @@ test('should handle closure with byte offset correctly', async () => {
   }
 
   const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  expect(result).toHaveProperty('1:10:5')
-  expect(result['1:10:5']).toHaveLength(1)
+  const expectedResult = [
+    {
+      location: '1:10:5',
+      references: [
+        {
+          nodeName: 'anonymous',
+          references: [
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'closure',
+              edgeType: 'context',
+              edgeName: 'context',
+              path: '[Closure 0].context',
+            },
+          ],
+        },
+      ],
+    },
+  ]
+  expect(result).toEqual(expectedResult)
 })

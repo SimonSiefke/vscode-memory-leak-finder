@@ -14,13 +14,18 @@ export interface LeakedClosureWithReferences {
   readonly references: readonly ReferencePath[]
 }
 
+export interface LocationWithReferences {
+  readonly location: string
+  readonly references: readonly LeakedClosureWithReferences[]
+}
+
 export const compareNamedClosureCountWithReferencesFromHeapSnapshot2 = async (
   pathA: string,
   pathB: string,
   scriptMapPath: string,
 
   options: CompareClosuresOptions = {},
-): Promise<Record<string, readonly LeakedClosureWithReferences[]>> => {
+): Promise<readonly LocationWithReferences[]> => {
   const [snapshotA, snapshotB] = await Promise.all([
     prepareHeapSnapshot(pathA, {
       parseStrings: true,
@@ -36,7 +41,7 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshot2 = async (
   const enriched = enrichLeakedClosuresWithReferences(leaked, snapshotB)
   console.log({ leaked, enriched })
   const final = addUrls(enriched, scriptMap)
-  return final
+  return transformToArray(final)
 }
 
 export const compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2 = async (
@@ -44,7 +49,7 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2 = a
   snapshotB: Snapshot,
   scriptMapPathOrScriptMap?: string | Record<number, { readonly url?: string; readonly sourceMapUrl?: string }>,
   options: CompareClosuresOptions = {},
-): Promise<Record<string, readonly LeakedClosureWithReferences[]>> => {
+): Promise<readonly LocationWithReferences[]> => {
   let scriptMap: Record<number, { readonly url?: string; readonly sourceMapUrl?: string }>
   if (typeof scriptMapPathOrScriptMap === 'string') {
     const scriptMapContent = await readFile(scriptMapPathOrScriptMap, 'utf8')
@@ -56,5 +61,27 @@ export const compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2 = a
   const enriched = enrichLeakedClosuresWithReferences(leaked, snapshotB)
   const final = addUrls(enriched, scriptMap)
 
-  return final
+  return transformToArray(final)
+}
+
+const transformToArray = (
+  result: Record<string, readonly LeakedClosureWithReferences[]>,
+): readonly LocationWithReferences[] => {
+  const array: LocationWithReferences[] = []
+  for (const [location, references] of Object.entries(result)) {
+    array.push({
+      location,
+      references,
+    })
+  }
+  array.sort((a, b) => {
+    if (a.location < b.location) {
+      return -1
+    }
+    if (a.location > b.location) {
+      return 1
+    }
+    return 0
+  })
+  return array
 }
