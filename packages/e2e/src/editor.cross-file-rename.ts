@@ -47,11 +47,11 @@ console.log(result)
 ]
 
 export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
-  await Workspace.setFiles(initialFiles)
   await Editor.closeAll()
+  await Workspace.setFiles(initialFiles)
 }
 
-export const run = async ({ Editor }: TestContext): Promise<void> => {
+export const run = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Editor.open('add.ts')
   await Editor.open('a.ts')
   await Editor.open('b.ts')
@@ -83,10 +83,12 @@ console.log(result)
 const result = subtract(5, 6)
 console.log(result)
 `)
+  await Editor.closeAll()
+  await Workspace.setFiles(initialFiles)
 }
 
 export const teardown = async ({ Editor, Workspace }: TestContext): Promise<void> => {
   await Editor.saveAll()
   await Editor.closeAll()
-  await Workspace.setFiles(initialFiles)
+  await Workspace.setFiles([])
 }
