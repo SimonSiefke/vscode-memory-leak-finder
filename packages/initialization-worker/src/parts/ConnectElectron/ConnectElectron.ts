@@ -7,9 +7,9 @@ import * as MonkeyPatchElectronScript from '../MonkeyPatchElectronScript/MonkeyP
 import { VError } from '../VError/VError.ts'
 
 interface RpcConnection {
-  once(event: string): Promise<{ params: { callFrames: Array<{ callFrameId: string }> } }>
   dispose(): Promise<void>
   invoke(method: string, params?: unknown): Promise<unknown>
+  once(event: string): Promise<{ params: { callFrames: Array<{ callFrameId: string }> } }>
 }
 
 const waitForDebuggerToBePaused = async (rpc: RpcConnection) => {

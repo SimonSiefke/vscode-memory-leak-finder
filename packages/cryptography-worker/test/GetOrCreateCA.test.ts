@@ -10,9 +10,9 @@ jest.unstable_mockModule('node:fs', () => ({
 }))
 
 jest.unstable_mockModule('node:fs/promises', () => ({
+  mkdir: mockMkdir,
   readFile: mockReadFile,
   writeFile: mockWriteFile,
-  mkdir: mockMkdir,
 }))
 
 let GetOrCreateCAModule: typeof import('../src/parts/GetOrCreateCA/GetOrCreateCA.ts')

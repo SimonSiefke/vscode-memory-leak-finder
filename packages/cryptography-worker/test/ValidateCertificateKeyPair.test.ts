@@ -1,7 +1,7 @@
 import { expect, test } from '@jest/globals'
-import { validateCertificateKeyPair } from '../src/parts/ValidateCertificateKeyPair/ValidateCertificateKeyPair.ts'
 import { generateCA } from '../src/parts/GenerateCA/GenerateCA.ts'
 import { generateCertificateForDomain } from '../src/parts/GenerateCertificateForDomain/GenerateCertificateForDomain.ts'
+import { validateCertificateKeyPair } from '../src/parts/ValidateCertificateKeyPair/ValidateCertificateKeyPair.ts'
 
 test('validateCertificateKeyPair - returns true for matching certificate and key', () => {
   const ca = generateCA()
