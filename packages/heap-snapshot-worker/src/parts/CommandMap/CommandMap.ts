@@ -4,6 +4,7 @@ import * as CompareHeapSnapshotsFunctions from '../CompareHeapSnapshotsFunctions
 import * as CompareHeapSnapshotsFunctions2 from '../CompareHeapSnapshotsFunctions2/CompareHeapSnapshotsFunctions2.ts'
 import * as CompareNamedClosureCount from '../CompareNamedClosureCount/CompareNamedClosureCount.ts'
 import * as CompareNamedClosureCountWithReferences2 from '../CompareNamedClosureCountWithReferences2/CompareNamedClosureCountWithReferences2.ts'
+import * as CompareStringCount from '../CompareStringCount/CompareStringCount.ts'
 import * as GetArraysByClosureLocationFromHeapSnapshotCommand from '../GetArraysByClosureLocationFromHeapSnapshotCommand/GetArraysByClosureLocationFromHeapSnapshotCommand.ts'
 import * as GetDomTimerCountFromHeapSnapshot from '../GetDomTimerCountFromHeapSnapshot/GetDomTimerCountFromHeapSnapshot.ts'
 import * as GetLargestArraysFromHeapSnapshot from '../GetLargestArraysFromHeapSnapshot/GetLargestArraysFromHeapSnapshot.ts'
@@ -48,6 +49,7 @@ export const commandMap = {
   'HeapSnapshot.compareNamedClosureCount': CompareNamedClosureCount.compareNamedClosureCountFromHeapSnapshot,
   'HeapSnapshot.compareNamedClosureCountWithReferences2':
     CompareNamedClosureCountWithReferences2.compareNamedClosureCountWithReferencesFromHeapSnapshot2,
+  'HeapSnapshot.compareStringCount': CompareStringCount.compareStringCount,
   'HeapSnapshot.parseStrings': ParseHeapSnapshotStrings.parseHeapSnapshotStrings,
   'HeapSnapshot.parseUserStrings': ParseUserStrings.parseUserStrings,
 }
