@@ -2,6 +2,7 @@ import type { RunTestsOptions } from '../RunTestsOptions/RunTestsOptions.ts'
 import type { RunTestsResult } from '../RunTestsResult/RunTestsResult.ts'
 import * as CliProcess from '../CliProcess/CliProcess.ts'
 import * as Disposables from '../Disposables/Disposables.ts'
+import * as FetchAllInsidersVersions from '../FetchAllInsidersVersions/FetchAllInsidersVersions.ts'
 import * as PerformBisect from '../PerformBisect/PerformBisect.ts'
 import * as RunTestsWithCallback from '../RunTestsWithCallback/RunTestsWithCallback.ts'
 
@@ -22,7 +23,7 @@ export const runTests = async ({
   headlessMode,
   ide,
   ideVersion,
-  insidersCommit,
+  insidersCommit: insidersCommitInput,
   inspectExtensions,
   inspectExtensionsPort,
   inspectPtyHost,
@@ -46,6 +47,14 @@ export const runTests = async ({
   vscodePath,
   vscodeVersion,
 }: RunTestsOptions): Promise<RunTestsResult> => {
+  let insidersCommit = insidersCommitInput
+  if (insidersCommit === 'today') {
+    const versions = await FetchAllInsidersVersions.fetchAllInsidersVersions()
+    if (versions.length === 0) {
+      throw new Error('No insiders versions found')
+    }
+    insidersCommit = versions[0].commit
+  }
   if (bisect) {
     if (!checkLeaks) {
       throw new Error('--bisect requires --check-leaks to be enabled')
