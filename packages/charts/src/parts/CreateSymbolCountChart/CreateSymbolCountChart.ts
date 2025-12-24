@@ -2,9 +2,9 @@ import * as GetSymbolCountsData from '../GetSymbolCountsData/GetSymbolCountsData
 
 export const name = 'symbol-count'
 
-export const getData = (basePath: string) => GetSymbolCountsData.getSymbolCountsData(basePath)
+export const getData = (basePath: string): Promise<any[]> => GetSymbolCountsData.getSymbolCountsData(basePath)
 
-export const createChart = () => {
+export const createChart = (): { x: string; xLabel: string; y: string; yLabel: string } => {
   return {
     x: 'index',
     xLabel: 'Index',
