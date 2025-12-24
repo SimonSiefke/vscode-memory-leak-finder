@@ -13,10 +13,10 @@ test('handleStdinDataFilterWaitingMode - alt + backspace', async () => {
   const mockRpc = MockRpc.create({
     invoke(method: any) {
       if (method === 'Stdout.getCursorBackward') {
-        return Promise.resolve('\u001B[3D')
+        return '\u001B[3D'
       }
       if (method === 'Stdout.getEraseEndLine') {
-        return Promise.resolve('\u001B[K')
+        return '\u001B[K'
       }
       throw new Error(`unexpected method ${method}`)
     },
@@ -37,10 +37,10 @@ test('handleStdinDataFilterWaitingMode - ctrl + backspace', async () => {
   const mockRpc = MockRpc.create({
     invoke: (method: any) => {
       if (method === 'Stdout.getCursorBackward') {
-        return Promise.resolve('\u001B[3D')
+        return '\u001B[3D'
       }
       if (method === 'Stdout.getEraseEndLine') {
-        return Promise.resolve('\u001B[K')
+        return '\u001B[K'
       }
       throw new Error(`unexpected method ${method}`)
     },
@@ -96,10 +96,10 @@ test('handleStdinDataFilterWaitingMode - enter', async () => {
   const mockRpc = MockRpc.create({
     invoke: (method: any) => {
       if (method === 'Stdout.getEraseLine') {
-        return Promise.resolve('\u001B[2K')
+        return '\u001B[2K'
       }
       if (method === 'Stdout.getCursorLeft') {
-        return Promise.resolve('\u001B[G')
+        return '\u001B[G'
       }
       throw new Error(`unexpected method ${method}`)
     },
@@ -121,10 +121,10 @@ test('handleStdinDataFilterWaitingMode - escape', async () => {
   const mockRpc = MockRpc.create({
     invoke: (method: any) => {
       if (method === 'Stdout.getClear') {
-        return Promise.resolve('[ansi-clear]\n')
+        return '[ansi-clear]\n'
       }
       if (method === 'Stdout.getWatchUsageMessage') {
-        return Promise.resolve('[watch usage]')
+        return '[watch usage]'
       }
       throw new Error(`unexpected method ${method}`)
     },
