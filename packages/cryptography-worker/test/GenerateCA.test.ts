@@ -88,7 +88,7 @@ test('generateCA - certificate is properly signed', () => {
   const ca = generateCA()
   const cert = forge.pki.certificateFromPem(ca.cert)
   const privateKey = forge.pki.privateKeyFromPem(ca.key)
-  const {publicKey} = cert
+  const { publicKey } = cert
 
   expect(publicKey.n).toBeDefined()
   expect(publicKey.e).toBeDefined()
@@ -113,7 +113,7 @@ test('generateCA - private key matches certificate', () => {
   const ca = generateCA()
   const cert = forge.pki.certificateFromPem(ca.cert)
   const privateKey = forge.pki.privateKeyFromPem(ca.key)
-  const {publicKey} = cert
+  const { publicKey } = cert
 
   expect(publicKey.n.equals(privateKey.n)).toBe(true)
   expect(publicKey.e.equals(privateKey.e)).toBe(true)
