@@ -5,8 +5,8 @@ import * as WaitForData from '../WaitForData/WaitForData.ts'
 const RE_LISTENING_ON = /DevTools listening on (ws:\/\/.*)/
 
 interface ReadableStreamLike {
-  on(event: 'data', listener: (data: string) => void): unknown
   emit(event: 'data', data: string): boolean
+  on(event: 'data', listener: (data: string) => void): unknown
 }
 
 const errorChecker = async (data: string, stream: ReadableStreamLike): Promise<void> => {

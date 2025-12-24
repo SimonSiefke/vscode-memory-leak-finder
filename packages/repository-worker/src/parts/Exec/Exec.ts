@@ -2,8 +2,8 @@ import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 
 interface ExecOptions {
   cwd?: string
-  reject?: boolean
   env?: Record<string, string | undefined>
+  reject?: boolean
   stdio?: string
 }
 

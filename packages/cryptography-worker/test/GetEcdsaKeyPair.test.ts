@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
-import { getEcdsaKeyPair } from '../src/parts/GetEcdsaKeyPair/GetEcdsaKeyPair.ts'
 import { createPublicKey, createPrivateKey } from 'node:crypto'
+import { getEcdsaKeyPair } from '../src/parts/GetEcdsaKeyPair/GetEcdsaKeyPair.ts'
 
 test.skip('getEcdsaKeyPair - returns key pair for ES256', () => {
   const keyPair = getEcdsaKeyPair('ES256')

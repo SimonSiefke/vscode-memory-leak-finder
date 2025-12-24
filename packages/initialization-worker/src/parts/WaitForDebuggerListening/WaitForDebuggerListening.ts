@@ -32,8 +32,8 @@ const errorChecker = (data: string) => {
 }
 
 interface ReadableStreamLike {
-  on(event: 'data', listener: (data: string) => void): unknown
   emit(event: 'data', data: string): boolean
+  on(event: 'data', listener: (data: string) => void): unknown
 }
 
 export const waitForDebuggerListening = async (stream: ReadableStreamLike): Promise<string> => {
