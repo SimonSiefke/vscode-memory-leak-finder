@@ -151,7 +151,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to that search results are empty`)
       }
     },
-    async toHaveResults(results) {
+    async toHaveResults(results: readonly string[]) {
       try {
         const searchView = page.locator('.search-view')
         const searchResults = searchView.locator('.monaco-list-row')
@@ -166,7 +166,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to assert search results`)
       }
     },
-    async type(text) {
+    async type(text: string) {
       try {
         await page.waitForIdle()
         const searchView = page.locator('.search-view')
@@ -186,7 +186,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to type into search input`)
       }
     },
-    async typeReplace(text) {
+    async typeReplace(text: string) {
       try {
         await page.waitForIdle()
         const searchView = page.locator('.search-view')

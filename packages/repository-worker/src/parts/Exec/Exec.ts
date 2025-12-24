@@ -1,13 +1,22 @@
 import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 
+interface ExecOptions {
+  cwd?: string
+  reject?: boolean
+  env?: Record<string, string | undefined>
+  stdio?: string
+}
+
+interface ExecResult {
+  exitCode: number
+  stderr: string
+  stdout: string
+}
+
 /**
  * Executes a command with arguments and returns stdout and stderr
- * @param {string} command - The command to execute
- * @param {string[]} args - Array of arguments to pass to the command
- * @param {{cwd?:string}} options - Additional options for execa
- * @returns {Promise<{stdout: string, stderr: string, exitCode: number}>} The stdout, stderr, and exit code from the command
  */
-export const exec = async (command, args, options = {}) => {
+export const exec = async (command: string, args: string[], options: ExecOptions = {}): Promise<ExecResult> => {
   const result = await FileSystemWorker.exec(command, args, options)
   return {
     exitCode: result.exitCode || 0,

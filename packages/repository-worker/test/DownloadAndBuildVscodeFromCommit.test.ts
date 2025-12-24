@@ -118,7 +118,7 @@ beforeEach(() => {
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke(method, ...params) {
+    invoke(method: string, ...params: unknown[]) {
       switch (method) {
         case 'FileSystem.exists':
           return mockPathExists(...params)
