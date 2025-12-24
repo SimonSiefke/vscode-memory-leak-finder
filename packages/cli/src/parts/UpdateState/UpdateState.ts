@@ -55,6 +55,7 @@ export const updateState = async (newState: any): Promise<void> => {
       runMode: state.runMode,
       runs: state.runs,
       runSkippedTestsAnyway: state.runSkippedTestsAnyway,
+      screencastQuality: state.screencastQuality,
       setupOnly: false,
       timeoutBetween: state.timeoutBetween,
       timeouts: state.timeouts,
@@ -62,7 +63,6 @@ export const updateState = async (newState: any): Promise<void> => {
       vscodePath: '',
       vscodeVersion: VsCodeVersion.vscodeVersion,
       workers: state.workers,
-      screencastQuality: state.screencastQuality,
     })
   }
   if (newState.mode === ModeType.Interrupted) {

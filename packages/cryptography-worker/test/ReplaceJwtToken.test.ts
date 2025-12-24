@@ -1,10 +1,10 @@
 import { expect, test } from '@jest/globals'
-import jwt from 'jsonwebtoken'
 import { generateKeyPairSync } from 'crypto'
+import jwt from 'jsonwebtoken'
 import { replaceJwtToken } from '../src/parts/ReplaceJwtToken/ReplaceJwtToken.ts'
 
 test('replaceJwtToken - replaces HS256 token with extended expiration', () => {
-  const originalToken = jwt.sign({ sub: '123', exp: Math.floor(Date.now() / 1000) + 3600 }, 'secret', {
+  const originalToken = jwt.sign({ exp: Math.floor(Date.now() / 1000) + 3600, sub: '123' }, 'secret', {
     algorithm: 'HS256',
   })
   const replacedToken = replaceJwtToken(originalToken)
@@ -25,7 +25,7 @@ test('replaceJwtToken - replaces RS256 token with extended expiration', () => {
   const { privateKey } = generateKeyPairSync('rsa', {
     modulusLength: 2048,
   })
-  const originalToken = jwt.sign({ sub: '123', exp: Math.floor(Date.now() / 1000) + 3600 }, privateKey, {
+  const originalToken = jwt.sign({ exp: Math.floor(Date.now() / 1000) + 3600, sub: '123' }, privateKey, {
     algorithm: 'RS256',
   })
   const replacedToken = replaceJwtToken(originalToken)
@@ -43,7 +43,7 @@ test('replaceJwtToken - replaces ES256 token with extended expiration', () => {
   const { privateKey } = generateKeyPairSync('ec', {
     namedCurve: 'prime256v1',
   })
-  const originalToken = jwt.sign({ sub: '123', exp: Math.floor(Date.now() / 1000) + 3600 }, privateKey, {
+  const originalToken = jwt.sign({ exp: Math.floor(Date.now() / 1000) + 3600, sub: '123' }, privateKey, {
     algorithm: 'ES256',
   })
   const replacedToken = replaceJwtToken(originalToken)
@@ -61,7 +61,7 @@ test('replaceJwtToken - replaces ES384 token with extended expiration', () => {
   const { privateKey } = generateKeyPairSync('ec', {
     namedCurve: 'secp384r1',
   })
-  const originalToken = jwt.sign({ sub: '123', exp: Math.floor(Date.now() / 1000) + 3600 }, privateKey, {
+  const originalToken = jwt.sign({ exp: Math.floor(Date.now() / 1000) + 3600, sub: '123' }, privateKey, {
     algorithm: 'ES384',
   })
   const replacedToken = replaceJwtToken(originalToken)
@@ -75,7 +75,7 @@ test('replaceJwtToken - replaces ES512 token with extended expiration', () => {
   const { privateKey } = generateKeyPairSync('ec', {
     namedCurve: 'secp521r1',
   })
-  const originalToken = jwt.sign({ sub: '123', exp: Math.floor(Date.now() / 1000) + 3600 }, privateKey, {
+  const originalToken = jwt.sign({ exp: Math.floor(Date.now() / 1000) + 3600, sub: '123' }, privateKey, {
     algorithm: 'ES512',
   })
   const replacedToken = replaceJwtToken(originalToken)
@@ -86,7 +86,7 @@ test('replaceJwtToken - replaces ES512 token with extended expiration', () => {
 })
 
 test('replaceJwtToken - updates iat field', () => {
-  const originalToken = jwt.sign({ sub: '123', iat: Math.floor(Date.now() / 1000) - 1000 }, 'secret', {
+  const originalToken = jwt.sign({ iat: Math.floor(Date.now() / 1000) - 1000, sub: '123' }, 'secret', {
     algorithm: 'HS256',
   })
   const replacedToken = replaceJwtToken(originalToken)
@@ -101,7 +101,7 @@ test('replaceJwtToken - updates iat field', () => {
 
 test('replaceJwtToken - preserves other payload fields', () => {
   const originalToken = jwt.sign(
-    { sub: '123', name: 'John Doe', email: 'john@example.com', exp: Math.floor(Date.now() / 1000) + 3600 },
+    { email: 'john@example.com', exp: Math.floor(Date.now() / 1000) + 3600, name: 'John Doe', sub: '123' },
     'secret',
     {
       algorithm: 'HS256',
@@ -149,7 +149,7 @@ test('replaceJwtToken - handles RS384 token', () => {
   const { privateKey } = generateKeyPairSync('rsa', {
     modulusLength: 2048,
   })
-  const originalToken = jwt.sign({ sub: '123', exp: Math.floor(Date.now() / 1000) + 3600 }, privateKey, {
+  const originalToken = jwt.sign({ exp: Math.floor(Date.now() / 1000) + 3600, sub: '123' }, privateKey, {
     algorithm: 'RS384',
   })
   const replacedToken = replaceJwtToken(originalToken)
@@ -160,7 +160,7 @@ test('replaceJwtToken - handles RS512 token', () => {
   const { privateKey } = generateKeyPairSync('rsa', {
     modulusLength: 2048,
   })
-  const originalToken = jwt.sign({ sub: '123', exp: Math.floor(Date.now() / 1000) + 3600 }, privateKey, {
+  const originalToken = jwt.sign({ exp: Math.floor(Date.now() / 1000) + 3600, sub: '123' }, privateKey, {
     algorithm: 'RS512',
   })
   const replacedToken = replaceJwtToken(originalToken)
@@ -168,7 +168,7 @@ test('replaceJwtToken - handles RS512 token', () => {
 })
 
 test('replaceJwtToken - handles unknown algorithm by falling back to HS256', () => {
-  const originalToken = jwt.sign({ sub: '123', exp: Math.floor(Date.now() / 1000) + 3600 }, 'secret', {
+  const originalToken = jwt.sign({ exp: Math.floor(Date.now() / 1000) + 3600, sub: '123' }, 'secret', {
     algorithm: 'HS256',
   })
   const replacedToken = replaceJwtToken(originalToken)

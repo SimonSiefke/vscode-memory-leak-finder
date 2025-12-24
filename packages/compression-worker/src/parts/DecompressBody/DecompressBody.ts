@@ -1,6 +1,6 @@
-import { decompressGzip } from '../DecompressGzip/DecompressGzip.ts'
-import { decompressDeflate } from '../DecompressDeflate/DecompressDeflate.ts'
 import { decompressBrotli } from '../DecompressBrotli/DecompressBrotli.ts'
+import { decompressDeflate } from '../DecompressDeflate/DecompressDeflate.ts'
+import { decompressGzip } from '../DecompressGzip/DecompressGzip.ts'
 import { decompressZstd } from '../DecompressZstd/DecompressZstd.ts'
 
 export const decompressBody = async (

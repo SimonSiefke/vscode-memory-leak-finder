@@ -35,6 +35,7 @@ export interface StdinDataState {
   readonly runMode: number
   readonly runs: number
   readonly runSkippedTestsAnyway: boolean
+  readonly screencastQuality: number
   readonly stdout: string[]
   readonly timeoutBetween: number
   readonly timeouts: boolean
@@ -42,7 +43,6 @@ export interface StdinDataState {
   readonly value: string
   readonly watch: boolean
   readonly workers: boolean
-  readonly screencastQuality: number
 }
 
 let state: StdinDataState = {
@@ -76,6 +76,7 @@ let state: StdinDataState = {
   runMode: TestRunMode.Auto,
   runs: 1,
   runSkippedTestsAnyway: false,
+  screencastQuality: 90,
   stdout: [],
   timeoutBetween: 0,
   timeouts: true,
@@ -83,7 +84,6 @@ let state: StdinDataState = {
   value: Character.EmptyString,
   watch: false,
   workers: false,
-  screencastQuality: 90,
 }
 
 export const setState = (newState): void => {
@@ -116,6 +116,7 @@ export const setState = (newState): void => {
     runMode: newState.runMode,
     runs: newState.runs,
     runSkippedTestsAnyway: newState.runSkippedTestsAnyway,
+    screencastQuality: newState.screencastQuality,
     stdout: newState.stdout,
     timeoutBetween: newState.timeoutBetween,
     timeouts: newState.timeouts,
@@ -123,7 +124,6 @@ export const setState = (newState): void => {
     value: newState.value,
     watch: newState.watch,
     workers: newState.workers,
-    screencastQuality: newState.screencastQuality,
   }
 }
 

@@ -3,7 +3,7 @@ import * as ExecutablePaths from '../ExecutablePaths/ExecutablePaths.ts'
 import * as GetExecutablePathKey from '../GetExecutablePathKey/GetExecutablePathKey.ts'
 
 export const getExecutablePath = (name: string): string[] => {
-  const osPaths = ExecutablePaths[name]
+  const osPaths = (ExecutablePaths as Record<string, Record<string, string[]>>)[name]
   const key = GetExecutablePathKey.getExecutablePathKey(process.platform)
   const osPath = osPaths[key]
   return osPath

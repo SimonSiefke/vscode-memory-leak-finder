@@ -12,10 +12,10 @@ jest.unstable_mockModule('node:fs', () => ({
 }))
 
 jest.unstable_mockModule('node:fs/promises', () => ({
-  readFile: mockReadFile,
-  writeFile: mockWriteFile,
-  unlink: mockUnlink,
   mkdir: mockMkdir,
+  readFile: mockReadFile,
+  unlink: mockUnlink,
+  writeFile: mockWriteFile,
 }))
 
 let GetCertificateForDomainModule: typeof import('../src/parts/GetCertificateForDomain/GetCertificateForDomain.ts')
