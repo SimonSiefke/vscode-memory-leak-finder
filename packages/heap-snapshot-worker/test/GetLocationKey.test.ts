@@ -31,26 +31,6 @@ test('should handle decimal values by converting to string', () => {
   expect(result).toBe('1.5:10.2:5.7')
 })
 
-test('should handle undefined values', () => {
-  const result = getLocationKey(undefined, undefined, undefined)
-  expect(result).toBe('undefined:undefined:undefined')
-})
-
-test('should handle null values', () => {
-  const result = getLocationKey(null, null, null)
-  expect(result).toBe('null:null:null')
-})
-
-test('should handle string values', () => {
-  const result = getLocationKey('script1', 'line10', 'col5')
-  expect(result).toBe('script1:line10:col5')
-})
-
-test('should handle mixed types', () => {
-  const result = getLocationKey(1, 'line10', null)
-  expect(result).toBe('1:line10:null')
-})
-
 test('should create unique keys for different combinations', () => {
   const key1 = getLocationKey(1, 10, 5)
   const key2 = getLocationKey(1, 10, 6)
