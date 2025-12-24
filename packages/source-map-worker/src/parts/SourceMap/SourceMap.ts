@@ -1,10 +1,10 @@
 import type { RawSourceMap } from 'source-map'
+import { join, resolve } from 'node:path'
 import { SourceMapConsumer } from 'source-map'
 import type { IntermediateItem } from '../IntermediateItem/IntermediateItem.ts'
 import type { OriginalPosition } from '../OriginalPosition/OriginalPosition.ts'
 import * as AddOriginalPositions from '../AddOriginalPositions/AddOriginalPositions.ts'
 import * as Assert from '../Assert/Assert.ts'
-import { join, resolve } from 'node:path'
 import { root } from '../Root/Root.ts'
 
 export const getOriginalPositions = async (
