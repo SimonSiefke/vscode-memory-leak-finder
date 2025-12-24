@@ -176,7 +176,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
           await expect(response).toBeVisible({ timeout: 60_000 })
           await page.waitForIdle()
           const progress = chatView.locator('.rendered-markdown.progress-step')
-          await expect(progress).toBeHidden({ timout: 45_000 })
+          await expect(progress).toBeHidden({ timeout: 45_000 })
           await page.waitForIdle()
           await expect(response).toBeVisible({ timeout: 30_000 })
           await page.waitForIdle()
