@@ -1,6 +1,7 @@
 {
   "name": "@vscode-memory-leak-finder/file-system-worker",
   "version": "0.0.0-dev",
+  "license": "MIT",
   "type": "module",
   "main": "src/main.ts",
   "scripts": {
@@ -38,6 +39,5 @@
     "@lvce-editor/verror": "^1.7.0",
     "execa": "^9.6.1",
     "path-exists": "^5.0.0"
-  },
-  "devDependencies": {}
+  }
 }
