@@ -1,17 +1,12 @@
 {
   "name": "@vscode-memory-leak-finder/e2e",
   "version": "0.0.0-dev",
-  "description": "",
-  "keywords": [],
   "license": "MIT",
-  "author": "",
   "type": "module",
   "scripts": {
     "e2e": "node ../cli/bin/test.js",
     "e2e:check-flakyness": "node ../cli/bin/test.js --runs 10",
     "e2e:headless": "node ../cli/bin/test.js --headless",
     "test:watch": "node ../cli/bin/test.js --watch"
-  },
-  "dependencies": {},
-  "devDependencies": {}
+  }
 }
