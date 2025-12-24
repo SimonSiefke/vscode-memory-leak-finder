@@ -1458,3 +1458,931 @@ test('should handle arrays with same count but different properties', () => {
   // Count should be the same regardless of other properties
   expect(result).toEqual({ aCount: 3, bCount: 3 })
 })
+
+test('should ignore WeakMap objects', () => {
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 4,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Array - type=object(3), name=Array(1), id=1
+      3, 1, 1, 100, 0, 0, 0,
+      // WeakMap - type=object(3), name=WeakMap(2), id=2
+      3, 2, 2, 64, 0, 0, 0,
+      // WeakMap - type=object(3), name=WeakMap(2), id=3
+      3, 2, 3, 64, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=4
+      3, 1, 4, 200, 0, 0, 0,
+    ]),
+    strings: ['', 'Array', 'WeakMap'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 3,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // WeakMap - type=object(3), name=WeakMap(2), id=1
+      3, 2, 1, 64, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=2
+      3, 1, 2, 100, 0, 0, 0,
+      // WeakMap - type=object(3), name=WeakMap(2), id=3
+      3, 2, 3, 64, 0, 0, 0,
+    ]),
+    strings: ['', 'Array', 'WeakMap'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const result = compareGrowingArraysInternal(snapshotA, snapshotB)
+
+  expect(result).toEqual({ aCount: 2, bCount: 1 })
+})
+
+test('should ignore WeakSet objects', () => {
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 5,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Array - type=object(3), name=Array(1), id=1
+      3, 1, 1, 100, 0, 0, 0,
+      // WeakSet - type=object(3), name=WeakSet(2), id=2
+      3, 2, 2, 64, 0, 0, 0,
+      // WeakSet - type=object(3), name=WeakSet(2), id=3
+      3, 2, 3, 64, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=4
+      3, 1, 4, 200, 0, 0, 0,
+      // WeakSet - type=object(3), name=WeakSet(2), id=5
+      3, 2, 5, 64, 0, 0, 0,
+    ]),
+    strings: ['', 'Array', 'WeakSet'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 2,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // WeakSet - type=object(3), name=WeakSet(2), id=1
+      3, 2, 1, 64, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=2
+      3, 1, 2, 100, 0, 0, 0,
+    ]),
+    strings: ['', 'Array', 'WeakSet'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const result = compareGrowingArraysInternal(snapshotA, snapshotB)
+
+  expect(result).toEqual({ aCount: 2, bCount: 1 })
+})
+
+test('should ignore WeakRef objects', () => {
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 4,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Array - type=object(3), name=Array(1), id=1
+      3, 1, 1, 100, 0, 0, 0,
+      // WeakRef - type=object(3), name=WeakRef(2), id=2
+      3, 2, 2, 64, 0, 0, 0,
+      // WeakRef - type=object(3), name=WeakRef(2), id=3
+      3, 2, 3, 64, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=4
+      3, 1, 4, 200, 0, 0, 0,
+    ]),
+    strings: ['', 'Array', 'WeakRef'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 3,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // WeakRef - type=object(3), name=WeakRef(2), id=1
+      3, 2, 1, 64, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=2
+      3, 1, 2, 100, 0, 0, 0,
+      // WeakRef - type=object(3), name=WeakRef(2), id=3
+      3, 2, 3, 64, 0, 0, 0,
+    ]),
+    strings: ['', 'Array', 'WeakRef'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const result = compareGrowingArraysInternal(snapshotA, snapshotB)
+
+  expect(result).toEqual({ aCount: 2, bCount: 1 })
+})
+
+test('should ignore Set objects', () => {
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 6,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Array - type=object(3), name=Array(1), id=1
+      3, 1, 1, 100, 0, 0, 0,
+      // Set - type=object(3), name=Set(2), id=2
+      3, 2, 2, 64, 0, 0, 0,
+      // Set - type=object(3), name=Set(2), id=3
+      3, 2, 3, 64, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=4
+      3, 1, 4, 200, 0, 0, 0,
+      // Set - type=object(3), name=Set(2), id=5
+      3, 2, 5, 64, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=6
+      3, 1, 6, 150, 0, 0, 0,
+    ]),
+    strings: ['', 'Array', 'Set'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 4,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Set - type=object(3), name=Set(2), id=1
+      3, 2, 1, 64, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=2
+      3, 1, 2, 100, 0, 0, 0,
+      // Set - type=object(3), name=Set(2), id=3
+      3, 2, 3, 64, 0, 0, 0,
+      // Set - type=object(3), name=Set(2), id=4
+      3, 2, 4, 64, 0, 0, 0,
+    ]),
+    strings: ['', 'Array', 'Set'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const result = compareGrowingArraysInternal(snapshotA, snapshotB)
+
+  expect(result).toEqual({ aCount: 3, bCount: 1 })
+})
+
+test('should ignore Map objects', () => {
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 5,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Array - type=object(3), name=Array(1), id=1
+      3, 1, 1, 100, 0, 0, 0,
+      // Map - type=object(3), name=Map(2), id=2
+      3, 2, 2, 64, 0, 0, 0,
+      // Map - type=object(3), name=Map(2), id=3
+      3, 2, 3, 64, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=4
+      3, 1, 4, 200, 0, 0, 0,
+      // Map - type=object(3), name=Map(2), id=5
+      3, 2, 5, 64, 0, 0, 0,
+    ]),
+    strings: ['', 'Array', 'Map'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 3,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Map - type=object(3), name=Map(2), id=1
+      3, 2, 1, 64, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=2
+      3, 1, 2, 100, 0, 0, 0,
+      // Map - type=object(3), name=Map(2), id=3
+      3, 2, 3, 64, 0, 0, 0,
+    ]),
+    strings: ['', 'Array', 'Map'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const result = compareGrowingArraysInternal(snapshotA, snapshotB)
+
+  expect(result).toEqual({ aCount: 2, bCount: 1 })
+})
+
+test('should ignore closure objects', () => {
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'closure']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 4,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Array - type=object(3), name=Array(1), id=1
+      3, 1, 1, 100, 0, 0, 0,
+      // Closure - type=closure(4), name=''(0), id=2
+      4, 0, 2, 64, 0, 0, 0,
+      // Closure - type=closure(4), name=''(0), id=3
+      4, 0, 3, 64, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=4
+      3, 1, 4, 200, 0, 0, 0,
+    ]),
+    strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'closure']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 3,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Closure - type=closure(4), name=''(0), id=1
+      4, 0, 1, 64, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=2
+      3, 1, 2, 100, 0, 0, 0,
+      // Closure - type=closure(4), name=''(0), id=3
+      4, 0, 3, 64, 0, 0, 0,
+    ]),
+    strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const result = compareGrowingArraysInternal(snapshotA, snapshotB)
+
+  expect(result).toEqual({ aCount: 2, bCount: 1 })
+})
+
+test('should ignore boolean objects', () => {
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'boolean']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 4,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Array - type=object(3), name=Array(1), id=1
+      3, 1, 1, 100, 0, 0, 0,
+      // Boolean - type=boolean(4), name=''(0), id=2
+      4, 0, 2, 8, 0, 0, 0,
+      // Boolean - type=boolean(4), name=''(0), id=3
+      4, 0, 3, 8, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=4
+      3, 1, 4, 200, 0, 0, 0,
+    ]),
+    strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'boolean']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 3,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Boolean - type=boolean(4), name=''(0), id=1
+      4, 0, 1, 8, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=2
+      3, 1, 2, 100, 0, 0, 0,
+      // Boolean - type=boolean(4), name=''(0), id=3
+      4, 0, 3, 8, 0, 0, 0,
+    ]),
+    strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const result = compareGrowingArraysInternal(snapshotA, snapshotB)
+
+  expect(result).toEqual({ aCount: 2, bCount: 1 })
+})
+
+test('should ignore number objects', () => {
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'number']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 5,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Array - type=object(3), name=Array(1), id=1
+      3, 1, 1, 100, 0, 0, 0,
+      // Number - type=number(4), name=''(0), id=2
+      4, 0, 2, 8, 0, 0, 0,
+      // Number - type=number(4), name=''(0), id=3
+      4, 0, 3, 8, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=4
+      3, 1, 4, 200, 0, 0, 0,
+      // Number - type=number(4), name=''(0), id=5
+      4, 0, 5, 8, 0, 0, 0,
+    ]),
+    strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'number']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 4,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Number - type=number(4), name=''(0), id=1
+      4, 0, 1, 8, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=2
+      3, 1, 2, 100, 0, 0, 0,
+      // Number - type=number(4), name=''(0), id=3
+      4, 0, 3, 8, 0, 0, 0,
+      // Number - type=number(4), name=''(0), id=4
+      4, 0, 4, 8, 0, 0, 0,
+    ]),
+    strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const result = compareGrowingArraysInternal(snapshotA, snapshotB)
+
+  expect(result).toEqual({ aCount: 2, bCount: 1 })
+})
+
+test('should ignore string objects', () => {
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 4,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Array - type=object(3), name=Array(1), id=1
+      3, 1, 1, 100, 0, 0, 0,
+      // String - type=string(2), name=''(0), id=2
+      2, 0, 2, 32, 0, 0, 0,
+      // String - type=string(2), name=''(0), id=3
+      2, 0, 3, 32, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=4
+      3, 1, 4, 200, 0, 0, 0,
+    ]),
+    strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 3,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // String - type=string(2), name=''(0), id=1
+      2, 0, 1, 32, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=2
+      3, 1, 2, 100, 0, 0, 0,
+      // String - type=string(2), name=''(0), id=3
+      2, 0, 3, 32, 0, 0, 0,
+    ]),
+    strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const result = compareGrowingArraysInternal(snapshotA, snapshotB)
+
+  expect(result).toEqual({ aCount: 2, bCount: 1 })
+})
+
+test('should ignore custom class objects', () => {
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 5,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Array - type=object(3), name=Array(1), id=1
+      3, 1, 1, 100, 0, 0, 0,
+      // CustomClass - type=object(3), name=CustomClass(2), id=2
+      3, 2, 2, 64, 0, 0, 0,
+      // CustomClass - type=object(3), name=CustomClass(2), id=3
+      3, 2, 3, 64, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=4
+      3, 1, 4, 200, 0, 0, 0,
+      // CustomClass - type=object(3), name=CustomClass(2), id=5
+      3, 2, 5, 64, 0, 0, 0,
+    ]),
+    strings: ['', 'Array', 'CustomClass'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 3,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // CustomClass - type=object(3), name=CustomClass(2), id=1
+      3, 2, 1, 64, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=2
+      3, 1, 2, 100, 0, 0, 0,
+      // CustomClass - type=object(3), name=CustomClass(2), id=3
+      3, 2, 3, 64, 0, 0, 0,
+    ]),
+    strings: ['', 'Array', 'CustomClass'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const result = compareGrowingArraysInternal(snapshotA, snapshotB)
+
+  expect(result).toEqual({ aCount: 2, bCount: 1 })
+})
+
+test('should ignore objects with Symbol.asyncDispose name', () => {
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 4,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Array - type=object(3), name=Array(1), id=1
+      3, 1, 1, 100, 0, 0, 0,
+      // Symbol.asyncDispose - type=object(3), name=Symbol.asyncDispose(2), id=2
+      3, 2, 2, 64, 0, 0, 0,
+      // Symbol.asyncDispose - type=object(3), name=Symbol.asyncDispose(2), id=3
+      3, 2, 3, 64, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=4
+      3, 1, 4, 200, 0, 0, 0,
+    ]),
+    strings: ['', 'Array', 'Symbol.asyncDispose'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 3,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Symbol.asyncDispose - type=object(3), name=Symbol.asyncDispose(2), id=1
+      3, 2, 1, 64, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=2
+      3, 1, 2, 100, 0, 0, 0,
+      // Symbol.asyncDispose - type=object(3), name=Symbol.asyncDispose(2), id=3
+      3, 2, 3, 64, 0, 0, 0,
+    ]),
+    strings: ['', 'Array', 'Symbol.asyncDispose'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const result = compareGrowingArraysInternal(snapshotA, snapshotB)
+
+  expect(result).toEqual({ aCount: 2, bCount: 1 })
+})
+
+test('should handle complex snapshot with many different object types', () => {
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'closure', 'number', 'boolean']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 15,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Array 1
+      3, 1, 1, 100, 0, 0, 0,
+      // Map
+      3, 2, 2, 64, 0, 0, 0,
+      // Array 2
+      3, 1, 3, 200, 0, 0, 0,
+      // Set
+      3, 3, 4, 64, 0, 0, 0,
+      // WeakMap
+      3, 4, 5, 64, 0, 0, 0,
+      // Array 3
+      3, 1, 6, 150, 0, 0, 0,
+      // WeakSet
+      3, 5, 7, 64, 0, 0, 0,
+      // WeakRef
+      3, 6, 8, 64, 0, 0, 0,
+      // Closure
+      4, 0, 9, 64, 0, 0, 0,
+      // Array 4
+      3, 1, 10, 180, 0, 0, 0,
+      // Boolean
+      5, 0, 11, 8, 0, 0, 0,
+      // Number
+      6, 0, 12, 8, 0, 0, 0,
+      // String
+      2, 0, 13, 32, 0, 0, 0,
+      // CustomClass
+      3, 7, 14, 64, 0, 0, 0,
+      // Array 5
+      3, 1, 15, 220, 0, 0, 0,
+    ]),
+    strings: ['', 'Array', 'Map', 'Set', 'WeakMap', 'WeakSet', 'WeakRef', 'CustomClass'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'closure', 'number', 'boolean']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 12,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Map
+      3, 2, 1, 64, 0, 0, 0,
+      // Array 1
+      3, 1, 2, 100, 0, 0, 0,
+      // Set
+      3, 3, 3, 64, 0, 0, 0,
+      // WeakMap
+      3, 4, 4, 64, 0, 0, 0,
+      // WeakSet
+      3, 5, 5, 64, 0, 0, 0,
+      // Array 2
+      3, 1, 6, 200, 0, 0, 0,
+      // WeakRef
+      3, 6, 7, 64, 0, 0, 0,
+      // Closure
+      4, 0, 8, 64, 0, 0, 0,
+      // Boolean
+      5, 0, 9, 8, 0, 0, 0,
+      // Number
+      6, 0, 10, 8, 0, 0, 0,
+      // CustomClass
+      3, 7, 11, 64, 0, 0, 0,
+      // Array 3
+      3, 1, 12, 150, 0, 0, 0,
+    ]),
+    strings: ['', 'Array', 'Map', 'Set', 'WeakMap', 'WeakSet', 'WeakRef', 'CustomClass'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const result = compareGrowingArraysInternal(snapshotA, snapshotB)
+
+  expect(result).toEqual({ aCount: 5, bCount: 3 })
+})
+
+test('should handle snapshot with all types except arrays', () => {
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'closure', 'number', 'boolean']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 10,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Map - strings[2] = 'Map'
+      3, 2, 1, 64, 0, 0, 0,
+      // Set - strings[3] = 'Set'
+      3, 3, 2, 64, 0, 0, 0,
+      // WeakMap - strings[4] = 'WeakMap'
+      3, 4, 3, 64, 0, 0, 0,
+      // WeakSet - strings[5] = 'WeakSet'
+      3, 5, 4, 64, 0, 0, 0,
+      // WeakRef - strings[6] = 'WeakRef'
+      3, 6, 5, 64, 0, 0, 0,
+      // Closure
+      4, 0, 6, 64, 0, 0, 0,
+      // Boolean
+      5, 0, 7, 8, 0, 0, 0,
+      // Number
+      6, 0, 8, 8, 0, 0, 0,
+      // String
+      2, 0, 9, 32, 0, 0, 0,
+      // CustomClass - strings[7] = 'CustomClass'
+      3, 7, 10, 64, 0, 0, 0,
+    ]),
+    strings: ['', 'Array', 'Map', 'Set', 'WeakMap', 'WeakSet', 'WeakRef', 'CustomClass'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'closure', 'number', 'boolean']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 8,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Map - strings[2] = 'Map'
+      3, 2, 1, 64, 0, 0, 0,
+      // Set - strings[3] = 'Set'
+      3, 3, 2, 64, 0, 0, 0,
+      // WeakMap - strings[4] = 'WeakMap'
+      3, 4, 3, 64, 0, 0, 0,
+      // WeakSet - strings[5] = 'WeakSet'
+      3, 5, 4, 64, 0, 0, 0,
+      // Closure
+      4, 0, 5, 64, 0, 0, 0,
+      // Boolean
+      5, 0, 6, 8, 0, 0, 0,
+      // Number
+      6, 0, 7, 8, 0, 0, 0,
+      // CustomClass - strings[7] = 'CustomClass'
+      3, 7, 8, 64, 0, 0, 0,
+    ]),
+    strings: ['', 'Array', 'Map', 'Set', 'WeakMap', 'WeakSet', 'WeakRef', 'CustomClass'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const result = compareGrowingArraysInternal(snapshotA, snapshotB)
+
+  expect(result).toEqual({ aCount: 0, bCount: 0 })
+})
+
+test('should handle snapshot with arrays and undefined/null-like objects', () => {
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 4,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Array - type=object(3), name=Array(1), id=1
+      3, 1, 1, 100, 0, 0, 0,
+      // Object with undefined name - type=object(3), name=''(0), id=2
+      3, 0, 2, 64, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=3
+      3, 1, 3, 200, 0, 0, 0,
+      // Object with undefined name - type=object(3), name=''(0), id=4
+      3, 0, 4, 64, 0, 0, 0,
+    ]),
+    strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 3,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Object with undefined name - type=object(3), name=''(0), id=1
+      3, 0, 1, 64, 0, 0, 0,
+      // Array - type=object(3), name=Array(1), id=2
+      3, 1, 2, 100, 0, 0, 0,
+      // Object with undefined name - type=object(3), name=''(0), id=3
+      3, 0, 3, 64, 0, 0, 0,
+    ]),
+    strings: ['', 'Array'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const result = compareGrowingArraysInternal(snapshotA, snapshotB)
+
+  expect(result).toEqual({ aCount: 2, bCount: 1 })
+})
+
+test('should handle snapshot with multiple custom class types', () => {
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 8,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // Array 1
+      3, 1, 1, 100, 0, 0, 0,
+      // MyClass
+      3, 2, 2, 64, 0, 0, 0,
+      // Array 2
+      3, 1, 3, 200, 0, 0, 0,
+      // AnotherClass
+      3, 3, 4, 64, 0, 0, 0,
+      // Array 3
+      3, 1, 5, 150, 0, 0, 0,
+      // ThirdClass
+      3, 4, 6, 64, 0, 0, 0,
+      // Array 4
+      3, 1, 7, 180, 0, 0, 0,
+      // FourthClass
+      3, 5, 8, 64, 0, 0, 0,
+    ]),
+    strings: ['', 'Array', 'MyClass', 'AnotherClass', 'ThirdClass', 'FourthClass'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal', 'hidden', 'shortcut', 'weak']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 5,
+    edge_count: 0,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      // MyClass
+      3, 2, 1, 64, 0, 0, 0,
+      // Array 1
+      3, 1, 2, 100, 0, 0, 0,
+      // AnotherClass
+      3, 3, 3, 64, 0, 0, 0,
+      // Array 2
+      3, 1, 4, 200, 0, 0, 0,
+      // ThirdClass
+      3, 4, 5, 64, 0, 0, 0,
+    ]),
+    strings: ['', 'Array', 'MyClass', 'AnotherClass', 'ThirdClass', 'FourthClass'],
+    edges: new Uint32Array([]),
+    locations: new Uint32Array([]),
+  }
+
+  const result = compareGrowingArraysInternal(snapshotA, snapshotB)
+
+  expect(result).toEqual({ aCount: 4, bCount: 2 })
+})
