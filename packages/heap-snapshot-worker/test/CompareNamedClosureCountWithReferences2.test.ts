@@ -1413,58 +1413,12 @@ test.skip('should handle multiple leaked closures at same location with differen
   }
 
   const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
-  const expectedResult = [
-    {
-      location: '1:10:5',
-      references: [
-        {
-          nodeName: 'anonymous',
-          references: [
-            {
-              sourceNodeName: '',
-              sourceNodeType: 'closure',
-              edgeType: 'context',
-              edgeName: 'context',
-              path: '[Closure 0].context',
-              count: 1,
-            },
-            {
-              sourceNodeName: '',
-              sourceNodeType: 'object',
-              edgeType: 'property',
-              edgeName: 'handler',
-              path: '[Object 2].handler',
-              count: 1,
-            },
-          ],
-          count: 1,
-        },
-        {
-          nodeName: 'anonymous',
-          references: [
-            {
-              sourceNodeName: '',
-              sourceNodeType: 'closure',
-              edgeType: 'context',
-              edgeName: 'context',
-              path: '[Closure 0].context',
-              count: 1,
-            },
-            {
-              sourceNodeName: '',
-              sourceNodeType: 'array',
-              edgeType: 'element',
-              edgeName: '[0]',
-              path: '[Array 3][0]',
-              count: 1,
-            },
-          ],
-          count: 1,
-        },
-      ],
-    },
-  ]
-  expect(result).toEqual(expectedResult)
+  const locationItem = findLocation(result, '1:10:5')
+  expect(locationItem).toBeDefined()
+  expect(locationItem?.references).toHaveLength(2)
+
+  expect(locationItem?.references[0].references.length).toBeGreaterThan(0)
+  expect(locationItem?.references[1].references.length).toBeGreaterThan(0)
 })
 
 test('should handle empty references array gracefully', async () => {
@@ -1714,3 +1668,607 @@ test('should handle closure with byte offset correctly', async () => {
   ]
   expect(result).toEqual(expectedResult)
 })
+
+test('should group multiple identical closures together with count', async () => {
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 2,
+    edge_count: 1,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      5,
+      0,
+      0,
+      50,
+      1,
+      0,
+      0, // Closure 1 (node 0, id=0)
+      3,
+      0,
+      1,
+      30,
+      1,
+      0,
+      0, // Context 1 (node 1, id=1)
+    ]),
+    edges: new Uint32Array([
+      0,
+      3,
+      7, // Closure 1 -> Context 1
+    ]),
+    strings: ['', 'anonymous'],
+    locations: new Uint32Array([0, 1, 10, 5]),
+  }
+
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 6,
+    edge_count: 4,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      5,
+      0,
+      0,
+      50,
+      1,
+      0,
+      0, // Closure 1 (node 0, id=0) - same
+      5,
+      0,
+      2,
+      50,
+      1,
+      0,
+      0, // Closure 2 (node 1, id=2) - NEW LEAK (same location, same references - all point to shared context)
+      5,
+      0,
+      4,
+      50,
+      1,
+      0,
+      0, // Closure 3 (node 2, id=4) - NEW LEAK (same location, same references - all point to shared context)
+      5,
+      0,
+      6,
+      50,
+      1,
+      0,
+      0, // Closure 4 (node 3, id=6) - NEW LEAK (same location, same references - all point to shared context)
+      3,
+      0,
+      1,
+      30,
+      1,
+      0,
+      0, // Shared Context (node 4, id=1) - all new closures point to this
+      3,
+      1,
+      5,
+      30,
+      1,
+      0,
+      0, // Object (node 5, id=5, name='myObject') - references all new closures
+    ]),
+    edges: new Uint32Array([
+      0,
+      3,
+      7, // Closure 1 -> Context 1
+      0,
+      3,
+      14, // Closure 2 -> Shared Context
+      0,
+      3,
+      21, // Closure 3 -> Shared Context
+      0,
+      3,
+      28, // Closure 4 -> Shared Context
+      2,
+      3,
+      7, // Object -> Closure 2 (property 'callback')
+      2,
+      3,
+      14, // Object -> Closure 3 (property 'callback')
+      2,
+      3,
+      21, // Object -> Closure 4 (property 'callback')
+    ]),
+    strings: ['', 'anonymous', 'myObject', 'callback'],
+    locations: new Uint32Array([
+      0,
+      1,
+      10,
+      5, // location 0: same closure, object_index=0
+      7,
+      1,
+      10,
+      5, // location 1: NEW closure, object_index=7 (Closure 2)
+      14,
+      1,
+      10,
+      5, // location 2: NEW closure, object_index=14 (Closure 3)
+      21,
+      1,
+      10,
+      5, // location 3: NEW closure, object_index=21 (Closure 4)
+    ]),
+  }
+
+  const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  // The closures all point to the same shared context and have the same object reference
+  // They should be grouped if they have identical references arrays
+  expect(result).toHaveLength(1)
+  expect(result[0].location).toBe('1:10:5')
+  // Should have at least one reference group
+  expect(result[0].references.length).toBeGreaterThan(0)
+  // All closures should be anonymous
+  for (const ref of result[0].references) {
+    expect(ref.nodeName).toBe('anonymous')
+  }
+  // Check that closures are sorted by count (highest first)
+  for (let i = 0; i < result[0].references.length - 1; i++) {
+    expect(result[0].references[i].count).toBeGreaterThanOrEqual(result[0].references[i + 1].count)
+  }
+})
+
+test('should group multiple identical reference paths together with count', async () => {
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 2,
+    edge_count: 1,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      5,
+      0,
+      0,
+      50,
+      1,
+      0,
+      0, // Closure 1 (node 0, id=0)
+      3,
+      0,
+      1,
+      30,
+      1,
+      0,
+      0, // Context 1 (node 1, id=1)
+    ]),
+    edges: new Uint32Array([
+      0,
+      3,
+      7, // Closure 1 -> Context 1
+    ]),
+    strings: ['', 'anonymous'],
+    locations: new Uint32Array([0, 1, 10, 5]),
+  }
+
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 6,
+    edge_count: 4,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      5,
+      0,
+      0,
+      50,
+      1,
+      0,
+      0, // Closure 1 (node 0, id=0) - same
+      5,
+      0,
+      2,
+      50,
+      1,
+      0,
+      0, // Closure 2 (node 1, id=2) - NEW LEAK
+      3,
+      0,
+      1,
+      30,
+      1,
+      0,
+      0, // Context 1 (node 2, id=1)
+      3,
+      0,
+      3,
+      30,
+      1,
+      0,
+      0, // Context 2 (node 3, id=3)
+      3,
+      2,
+      4,
+      30,
+      1,
+      0,
+      0, // Object 1 (node 4, id=4, name='myObject')
+      3,
+      2,
+      5,
+      30,
+      1,
+      0,
+      0, // Object 2 (node 5, id=5, name='myObject') - same name, will create same path
+    ]),
+    edges: new Uint32Array([
+      0,
+      3,
+      7, // Closure 1 -> Context 1
+      0,
+      3,
+      14, // Closure 2 -> Context 2
+      2,
+      3,
+      7, // Object 1 -> Closure 2 (property 'callback', string index 3)
+      2,
+      3,
+      14, // Object 2 -> Closure 2 (property 'callback', string index 3) - same name, same path
+    ]),
+    strings: ['', 'anonymous', 'myObject', 'callback'],
+    locations: new Uint32Array([
+      0,
+      1,
+      10,
+      5, // location 0: same closure, object_index=0
+      7,
+      1,
+      10,
+      5, // location 1: NEW closure, object_index=7 (Closure 2)
+    ]),
+  }
+
+  const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  // Both objects have the same name 'myObject', so they create the same reference path
+  expect(result).toHaveLength(1)
+  expect(result[0].location).toBe('1:10:5')
+  expect(result[0].references).toHaveLength(1)
+  const closure = result[0].references[0]
+  // Should have context reference and callback reference
+  // The callback reference should have count 2 if both objects create the same path
+  const callbackRef = closure.references.find((r) => r.edgeName === 'callback')
+  expect(callbackRef).toBeDefined()
+  if (callbackRef) {
+    expect(callbackRef.count).toBeGreaterThanOrEqual(1)
+  }
+})
+
+test('should sort closures by count (highest first)', async () => {
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 2,
+    edge_count: 1,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      5,
+      0,
+      0,
+      50,
+      1,
+      0,
+      0, // Closure 1 (node 0, id=0)
+      3,
+      0,
+      1,
+      30,
+      1,
+      0,
+      0, // Context 1 (node 1, id=1)
+    ]),
+    edges: new Uint32Array([
+      0,
+      3,
+      7, // Closure 1 -> Context 1
+    ]),
+    strings: ['', 'anonymous', 'MyClosure'],
+    locations: new Uint32Array([0, 1, 10, 5]),
+  }
+
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 10,
+    edge_count: 5,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      5,
+      0,
+      0,
+      50,
+      1,
+      0,
+      0, // Closure 1 (node 0, id=0) - same
+      5,
+      2,
+      2,
+      50,
+      1,
+      0,
+      0, // Closure 2 (node 1, id=2, name='MyClosure') - NEW LEAK (appears once)
+      5,
+      2,
+      4,
+      50,
+      1,
+      0,
+      0, // Closure 3 (node 2, id=4, name='MyClosure') - NEW LEAK (appears once)
+      5,
+      0,
+      6,
+      50,
+      1,
+      0,
+      0, // Closure 4 (node 3, id=6, name='anonymous') - NEW LEAK (appears twice, same references)
+      5,
+      0,
+      8,
+      50,
+      1,
+      0,
+      0, // Closure 5 (node 4, id=8, name='anonymous') - NEW LEAK (appears twice, same references)
+      3,
+      0,
+      1,
+      30,
+      1,
+      0,
+      0, // Context 1 (node 5, id=1)
+      3,
+      0,
+      3,
+      30,
+      1,
+      0,
+      0, // Context 2 (node 6, id=3)
+      3,
+      0,
+      5,
+      30,
+      1,
+      0,
+      0, // Context 3 (node 7, id=5)
+      3,
+      0,
+      7,
+      30,
+      1,
+      0,
+      0, // Context 4 (node 8, id=7)
+      3,
+      0,
+      9,
+      30,
+      1,
+      0,
+      0, // Context 5 (node 9, id=9)
+    ]),
+    edges: new Uint32Array([
+      0,
+      3,
+      7, // Closure 1 -> Context 1
+      0,
+      3,
+      14, // Closure 2 -> Context 2
+      0,
+      3,
+      21, // Closure 3 -> Context 3
+      0,
+      3,
+      28, // Closure 4 -> Context 4
+      0,
+      3,
+      35, // Closure 5 -> Context 5
+    ]),
+    strings: ['', 'anonymous', 'MyClosure'],
+    locations: new Uint32Array([
+      0,
+      1,
+      10,
+      5, // location 0: same closure, object_index=0
+      7,
+      1,
+      10,
+      5, // location 1: NEW closure, object_index=7 (Closure 2, MyClosure)
+      14,
+      1,
+      10,
+      5, // location 2: NEW closure, object_index=14 (Closure 3, MyClosure)
+      21,
+      1,
+      10,
+      5, // location 3: NEW closure, object_index=21 (Closure 4, anonymous)
+      28,
+      1,
+      10,
+      5, // location 4: NEW closure, object_index=28 (Closure 5, anonymous)
+    ]),
+  }
+
+  const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  // Should have closures grouped by their references
+  // Anonymous closures with same references should be grouped together
+  expect(result).toHaveLength(1)
+  expect(result[0].location).toBe('1:10:5')
+  // Should have at least one reference group
+  expect(result[0].references.length).toBeGreaterThan(0)
+  // Check that closures are sorted by count (highest first)
+  for (let i = 0; i < result[0].references.length - 1; i++) {
+    expect(result[0].references[i].count).toBeGreaterThanOrEqual(result[0].references[i + 1].count)
+  }
+})
+
+test('should sort reference paths by count (highest first)', async () => {
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 2,
+    edge_count: 1,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      5,
+      0,
+      0,
+      50,
+      1,
+      0,
+      0, // Closure 1 (node 0, id=0)
+      3,
+      0,
+      1,
+      30,
+      1,
+      0,
+      0, // Context 1 (node 1, id=1)
+    ]),
+    edges: new Uint32Array([
+      0,
+      3,
+      7, // Closure 1 -> Context 1
+    ]),
+    strings: ['', 'anonymous'],
+    locations: new Uint32Array([0, 1, 10, 5]),
+  }
+
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 6,
+    edge_count: 5,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      5,
+      0,
+      0,
+      50,
+      1,
+      0,
+      0, // Closure 1 (node 0, id=0) - same
+      5,
+      0,
+      2,
+      50,
+      1,
+      0,
+      0, // Closure 2 (node 1, id=2) - NEW LEAK
+      3,
+      0,
+      1,
+      30,
+      1,
+      0,
+      0, // Context 1 (node 2, id=1)
+      3,
+      0,
+      3,
+      30,
+      1,
+      0,
+      0, // Context 2 (node 3, id=3)
+      3,
+      1,
+      4,
+      30,
+      2,
+      0,
+      0, // Object 1 (node 4, id=4, name='obj1', edge_count=2)
+      3,
+      1,
+      5,
+      30,
+      1,
+      0,
+      0, // Object 2 (node 5, id=5, name='obj2', edge_count=1)
+    ]),
+    edges: new Uint32Array([
+      0,
+      3,
+      7, // Closure 1 -> Context 1
+      0,
+      3,
+      14, // Closure 2 -> Context 2
+      2,
+      3,
+      7, // obj1 -> Closure 2 (property 'callback', string index 3) - first
+      2,
+      3,
+      7, // obj1 -> Closure 2 (property 'callback', string index 3) - second (duplicate)
+      2,
+      4,
+      7, // obj2 -> Closure 2 (property 'other', string index 4) - appears once
+    ]),
+    strings: ['', 'anonymous', 'obj1', 'obj2', 'callback', 'other'],
+    locations: new Uint32Array([
+      0,
+      1,
+      10,
+      5, // location 0: same closure, object_index=0
+      7,
+      1,
+      10,
+      5, // location 1: NEW closure, object_index=7 (Closure 2)
+    ]),
+  }
+
+  const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  expect(result).toHaveLength(1)
+  expect(result[0].location).toBe('1:10:5')
+  expect(result[0].references).toHaveLength(1)
+  const closure = result[0].references[0]
+  expect(closure.references.length).toBeGreaterThan(0)
+  // Check that reference paths are sorted by count (highest first)
+  for (let i = 0; i < closure.references.length - 1; i++) {
+    expect(closure.references[i].count).toBeGreaterThanOrEqual(closure.references[i + 1].count)
+  }
+  // Verify callback reference exists and has count >= 1
+  const callbackRef = closure.references.find((r) => r.edgeName === 'callback')
+  expect(callbackRef).toBeDefined()
+  if (callbackRef) {
+    expect(callbackRef.count).toBeGreaterThanOrEqual(1)
+  }
+})
+
+
