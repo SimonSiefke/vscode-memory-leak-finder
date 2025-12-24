@@ -1,4 +1,5 @@
 import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
+import type { Session } from '../Session/Session.ts'
 import * as AddStackTracesToEventListeners from '../AddStackTracesToEventListeners/AddStackTracesToEventListeners.ts'
 import * as CompareEventListenersWithStackTraces from '../CompareEventListenersWithStackTraces/CompareEventListenersWithStackTraces.ts'
 import * as GetEventListeners from '../GetEventListeners/GetEventListeners.ts'
@@ -9,7 +10,6 @@ import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as StartTrackEventListenerStackTraces from '../StartTrackEventListenerStackTraces/StartTrackEventListenerStackTraces.ts'
 import * as StopTrackingEventListenerStackTraces from '../StopTrackingEventListenerStackTraces/StopTrackingEventListenerStackTraces.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
-import type { Session } from '../Session/Session.ts'
 
 export const id = MeasureId.EventListenersWithStackTrace
 

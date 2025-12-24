@@ -1,5 +1,5 @@
-import { DevtoolsProtocolDomDebugger } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import type { Session } from '../Session/Session.ts'
+import { DevtoolsProtocolDomDebugger } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 export const getEventListenersOfTargets = async (session: Session, targets) => {
   const promises: Promise<any>[] = []

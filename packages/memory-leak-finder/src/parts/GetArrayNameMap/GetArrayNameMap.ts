@@ -1,10 +1,10 @@
+import type { Session } from '../Session/Session.ts'
 import * as Assert from '../Assert/Assert.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as GetAllFunctions from '../GetAllFunctions/GetAllFunctions.ts'
 import * as GetAllScopePropertiesInternal from '../GetAllScopePropertiesInternal/GetAllScopePropertiesInternal.ts'
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
 import * as IsEnumerable from '../IsEnumerable/IsEnumerable.ts'
-import type { Session } from '../Session/Session.ts'
 
 const parseChildScopeValue = (rawScopeValue) => {
   return {

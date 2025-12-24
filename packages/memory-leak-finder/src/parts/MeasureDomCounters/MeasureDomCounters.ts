@@ -1,8 +1,8 @@
+import type { Session } from '../Session/Session.ts'
 import * as GetDomCounters from '../GetDomCounters/GetDomCounters.ts'
 import * as IsLeakDomCounters from '../IsLeakDomCounters/IsLeakDomCounters.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
-import type { Session } from '../Session/Session.ts'
 
 export const id = MeasureId.DomCounters
 

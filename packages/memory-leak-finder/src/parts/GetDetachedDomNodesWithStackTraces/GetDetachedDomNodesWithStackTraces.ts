@@ -1,8 +1,8 @@
+import type { Session } from '../Session/Session.ts'
 import * as CleanDetachedDomNodesWithStackTraces from '../CleanDetachedDomNodesWithStackTraces/CleanDetachedDomNodesWithStackTraces.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
 import * as GetDetachedDomNodeRoots from '../GetDetachedDomNodeRoots/GetDetachedDomNodeRoots.ts'
-import type { Session } from '../Session/Session.ts'
 import * as SplitLines from '../SplitLines/SplitLines.ts'
 
 export const getDetachedDomNodesWithStackTraces = async (session: Session, objectGroup: string, scriptMap: Record<string, any>) => {

@@ -1,7 +1,7 @@
+import type { Session } from '../Session/Session.ts'
 import * as FilterBySubType from '../FilterBySubType/FilterBySubType.ts'
 import * as GetObjects from '../GetObjects/GetObjects.ts'
 import * as GetPropertyValues from '../GetPropertyValues/GetPropertyValues.ts'
-import type { Session } from '../Session/Session.ts'
 
 /**
  *

@@ -1,3 +1,4 @@
+import type { Session } from '../Session/Session.ts'
 import * as CompareCount from '../CompareCount/CompareCount.ts'
 import * as GetObjectCount from '../GetObjectCount/GetObjectCount.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
@@ -6,7 +7,6 @@ import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
-import type { Session } from '../Session/Session.ts'
 
 export const id = MeasureId.ObjectCount
 

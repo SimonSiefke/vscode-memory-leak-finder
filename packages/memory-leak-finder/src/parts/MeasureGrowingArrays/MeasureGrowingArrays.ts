@@ -1,10 +1,10 @@
+import type { Session } from '../Session/Session.ts'
 import * as GetArrays from '../GetArrays/GetArrays.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
 import * as StartTrackingArrays from '../StartTrackingArrays/StartTrackingArrays.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
-import type { Session } from '../Session/Session.ts'
 
 export const id = MeasureId.GrowingArrays
 

@@ -1,4 +1,5 @@
 import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
+import type { Session } from '../Session/Session.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
 import * as CompareInstanceCountsWithSourceMap from '../CompareInstanceCountsWithSourceMap/CompareInstanceCountsWithSourceMap.ts'
 import * as GetInstanceCountsWithSourceMap from '../GetInstanceCountsWithSourceMap/GetInstanceCountsWithSourceMap.ts'
@@ -6,7 +7,6 @@ import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ScriptHandler from '../ScriptHandler/ScriptHandler.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
-import type { Session } from '../Session/Session.ts'
 
 export const id = MeasureId.InstanceCountsWithSourceMap
 

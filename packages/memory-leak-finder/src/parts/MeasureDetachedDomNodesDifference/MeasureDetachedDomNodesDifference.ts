@@ -1,10 +1,10 @@
+import type { Session } from '../Session/Session.ts'
 import * as CompareDetachedDomNodesDifference from '../CompareDetachedDomNodesDifference/CompareDetachedDomNodesDifference.ts'
 import * as GetDetachedDomNodes from '../GetDetachedDomNodes/GetDetachedDomNodes.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as ReleaseObjectGroup from '../ReleaseObjectGroup/ReleaseObjectGroup.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
-import type { Session } from '../Session/Session.ts'
 
 export const id = MeasureId.DetachedDomNodesDifference
 
