@@ -1,6 +1,4 @@
-import * as os from 'node:os'
-import * as FetchVscodeApi from '../FetchVscodeApi/FetchVscodeApi.ts'
-import * as GetVscodePlatformName from '../GetVscodePlatformName/GetVscodePlatformName.ts'
+import * as FetchCommits from '../FetchCommits/FetchCommits.ts'
 
 export interface IVersionMetadata {
   readonly commit: string
@@ -11,9 +9,13 @@ export interface IVersionMetadata {
 }
 
 export const fetchAllInsidersVersions = async (): Promise<IVersionMetadata[]> => {
-  const platformName = GetVscodePlatformName.getVscodePlatformName(process.platform, os.arch())
-  const quality = 'insider'
-  const url = `https://update.code.visualstudio.com/api/versions/${platformName}/${quality}`
-  const versions = await FetchVscodeApi.fetchVscodeApi<IVersionMetadata[]>(url)
+  const commits = await FetchCommits.fetchCommits()
+  const versions: IVersionMetadata[] = commits.map((commit) => ({
+    commit: commit.commit,
+    productVersion: '',
+    sha256hash: '',
+    url: '',
+    version: '',
+  }))
   return versions
 }
