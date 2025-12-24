@@ -15,11 +15,11 @@ export const create = (session) => {
 }
 
 export const start = (session, objectGroup) => {
-  return GetMapCount.getMapCount(session)
+  return GetMapCount.getMapCount(session, objectGroup)
 }
 
 export const stop = (session, objectGroup) => {
-  return GetMapCount.getMapCount(session)
+  return GetMapCount.getMapCount(session, objectGroup)
 }
 
 export const compare = CompareCount.compareCount

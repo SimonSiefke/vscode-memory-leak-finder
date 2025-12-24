@@ -1,11 +1,12 @@
 import * as GetObjectCount from '../GetObjectCount/GetObjectCount.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
+import type { Session } from '../Session/Session.ts'
 
 /**
  *
  * @param {any} session
  * @returns {Promise<number>}
  */
-export const getWeakSetCount = (session) => {
-  return GetObjectCount.getObjectCount(session, PrototypeExpression.WeakSet)
+export const getWeakSetCount = (session: Session, objectGroup: string) => {
+  return GetObjectCount.getObjectCount(session, PrototypeExpression.WeakSet, objectGroup)
 }

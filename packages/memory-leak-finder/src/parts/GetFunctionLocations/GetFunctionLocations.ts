@@ -1,9 +1,10 @@
 import * as Assert from '../Assert/Assert.ts'
 import * as GetFunctionLocation from '../GetFunctionLocation/GetFunctionLocation.ts'
+import type { Session } from '../Session/Session.ts'
 
 const BATCH_SIZE = 50
 
-const processBatch = async (session, objectIds, startIndex) => {
+const processBatch = async (session: Session, objectIds, startIndex) => {
   const promises: Promise<any>[] = []
   const endIndex = Math.min(startIndex + BATCH_SIZE, objectIds.length)
 
@@ -14,7 +15,7 @@ const processBatch = async (session, objectIds, startIndex) => {
   return Promise.all(promises)
 }
 
-export const getFunctionLocations = async (session, objectIds) => {
+export const getFunctionLocations = async (session: Session, objectIds) => {
   Assert.object(session)
   Assert.array(objectIds)
 

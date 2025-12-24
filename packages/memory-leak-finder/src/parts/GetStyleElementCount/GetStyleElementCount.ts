@@ -1,11 +1,12 @@
 import * as GetObjectCount from '../GetObjectCount/GetObjectCount.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
+import type { Session } from '../Session/Session.ts'
 
 /**
  *
  * @param {any} session
  * @returns {Promise<number>}
  */
-export const getCanvasCount = async (session, objectGroup) => {
+export const getCanvasCount = async (session: Session, objectGroup: string) => {
   return GetObjectCount.getObjectCount(session, PrototypeExpression.StyleElement, objectGroup)
 }

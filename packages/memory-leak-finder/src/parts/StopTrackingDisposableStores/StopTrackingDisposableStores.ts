@@ -1,7 +1,8 @@
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as GetDisposableStores from '../GetDisposableStores/GetDisposableStores.ts'
+import type { Session } from '../Session/Session.ts'
 
-export const stopTrackingDisposableStores = async (session, objectGroup) => {
+export const stopTrackingDisposableStores = async (session: Session, objectGroup: string) => {
   const fnResult1 = await GetDisposableStores.getDisposableStores(session, objectGroup)
   await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
