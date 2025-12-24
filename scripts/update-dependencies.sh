@@ -31,9 +31,9 @@ cd packages/build && updateDependencies && cd ../../ &&
 cd packages/chart-worker && updateDependencies && cd ../../ &&
 cd packages/charts && updateDependencies && cd ../../ &&
 cd packages/cli && updateDependencies && cd ../../ &&
-cd packages/cursor-e2e && updateDependencies && cd ../../ &&
 cd packages/compression-worker && updateDependencies && cd ../../ &&
 cd packages/cryptography-worker && updateDependencies && cd ../../ &&
+cd packages/cursor-e2e && updateDependencies && cd ../../ &&
 cd packages/devtools-protocol && updateDependencies && cd ../../ &&
 cd packages/download-worker && updateDependencies && cd ../../ &&
 cd packages/e2e && updateDependencies && cd ../../ &&
@@ -41,6 +41,7 @@ cd packages/file-system-worker && updateDependencies && cd ../../ &&
 cd packages/file-watcher-worker && updateDependencies && cd ../../ &&
 cd packages/heap-snapshot-parsing-worker && updateDependencies && cd ../../ &&
 cd packages/heap-snapshot-worker && updateDependencies && cd ../../ &&
+cd packages/heap-snapshot-worker-benchmarks && updateDependencies && cd ../../ &&
 cd packages/initialization-worker && updateDependencies && cd ../../ &&
 cd packages/injected-code && updateDependencies && cd ../../ &&
 cd packages/launch-worker && updateDependencies && cd ../../ &&
