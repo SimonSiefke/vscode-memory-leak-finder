@@ -1,7 +1,4 @@
 import * as FetchCommits from '../FetchCommits/FetchCommits.ts'
-import * as os from 'node:os'
-import * as FetchVscodeApi from '../FetchVscodeApi/FetchVscodeApi.ts'
-import * as GetVscodePlatformName from '../GetVscodePlatformName/GetVscodePlatformName.ts'
 
 export interface IVersionMetadata {
   readonly commit: string
