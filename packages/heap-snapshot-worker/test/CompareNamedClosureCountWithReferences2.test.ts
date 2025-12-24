@@ -2417,3 +2417,194 @@ test('should sort reference paths by count (highest first)', async () => {
   ]
   expect(result).toEqual(expectedResult)
 })
+
+test('should merge references with different node IDs in paths', async () => {
+  const snapshotA: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 2,
+    edge_count: 1,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      5,
+      0,
+      0,
+      50,
+      1,
+      0,
+      0, // Closure 1 (node 0, id=0)
+      3,
+      0,
+      1,
+      30,
+      1,
+      0,
+      0, // Context 1 (node 1, id=1)
+    ]),
+    edges: new Uint32Array([
+      0,
+      3,
+      7, // Closure 1 -> Context 1
+    ]),
+    strings: ['', 'ResourceReasonPair'],
+    locations: new Uint32Array([0, 1, 10, 5]),
+  }
+
+  const snapshotB: Snapshot = {
+    meta: {
+      node_types: [['hidden', 'array', 'string', 'object', 'code', 'closure', 'regexp']],
+      node_fields: ['type', 'name', 'id', 'self_size', 'edge_count', 'trace_node_id', 'detachedness'],
+      edge_types: [['context', 'element', 'property', 'internal']],
+      edge_fields: ['type', 'name_or_index', 'to_node'],
+      location_fields: ['object_index', 'script_id', 'line', 'column'],
+    },
+    node_count: 10,
+    edge_count: 7,
+    extra_native_bytes: 0,
+    nodes: new Uint32Array([
+      5,
+      0,
+      0,
+      50,
+      1,
+      0,
+      0, // Closure 1 (node 0, id=0) - same
+      5,
+      1,
+      2,
+      50,
+      1,
+      0,
+      0, // Closure 2 (node 1, id=2, name='ResourceReasonPair') - NEW LEAK
+      5,
+      1,
+      4,
+      50,
+      1,
+      0,
+      0, // Closure 3 (node 2, id=4, name='ResourceReasonPair') - NEW LEAK
+      5,
+      1,
+      6,
+      50,
+      1,
+      0,
+      0, // Closure 4 (node 3, id=6, name='ResourceReasonPair') - NEW LEAK
+      3,
+      0,
+      1,
+      30,
+      1,
+      0,
+      0, // Context 1 (node 4, id=1)
+      3,
+      0,
+      3,
+      30,
+      1,
+      0,
+      0, // Context 2 (node 5, id=3)
+      3,
+      0,
+      5,
+      30,
+      1,
+      0,
+      0, // Context 3 (node 6, id=5)
+      3,
+      0,
+      7,
+      30,
+      1,
+      0,
+      0, // Context 4 (node 7, id=7)
+      3,
+      0,
+      8,
+      30,
+      1,
+      0,
+      0, // Array 1 (node 8, id=3018681)
+      3,
+      0,
+      9,
+      30,
+      1,
+      0,
+      0, // Array 2 (node 9, id=3080985)
+    ]),
+    edges: new Uint32Array([
+      0,
+      3,
+      7, // Closure 1 -> Context 1
+      0,
+      3,
+      14, // Closure 2 -> Context 2
+      0,
+      3,
+      21, // Closure 3 -> Context 3
+      0,
+      3,
+      28, // Closure 4 -> Context 4
+      3,
+      0,
+      7, // Array 1 -> Closure 2 (internal edge)
+      3,
+      0,
+      14, // Array 2 -> Closure 3 (internal edge)
+      3,
+      0,
+      21, // Array 2 -> Closure 4 (internal edge)
+    ]),
+    strings: ['', 'ResourceReasonPair'],
+    locations: new Uint32Array([
+      0,
+      1,
+      10,
+      5, // location 0: same closure, object_index=0
+      7,
+      1,
+      10,
+      5, // location 1: NEW closure, object_index=7 (Closure 2)
+      14,
+      1,
+      10,
+      5, // location 2: NEW closure, object_index=14 (Closure 3)
+      21,
+      1,
+      10,
+      5, // location 3: NEW closure, object_index=21 (Closure 4)
+    ]),
+  }
+
+  const result = await compareNamedClosureCountWithReferencesFromHeapSnapshotInternal2(snapshotA, snapshotB)
+  // All three ResourceReasonPair closures should be merged into one with count 3
+  // The references with different array IDs should also be merged
+  const expectedResult = [
+    {
+      location: '1:10:5',
+      references: [
+        {
+          nodeName: 'ResourceReasonPair',
+          references: [
+            {
+              sourceNodeName: '',
+              sourceNodeType: 'array',
+              edgeType: 'internal',
+              edgeName: 'internal',
+              path: '[array 3018681].internal',
+              count: 3,
+            },
+          ],
+          count: 3,
+        },
+      ],
+    },
+  ]
+  expect(result).toEqual(expectedResult)
+})
