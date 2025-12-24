@@ -1,10 +1,7 @@
 {
   "name": "@vscode-memory-leak-finder/test-worker",
   "version": "0.0.0-dev",
-  "description": "",
-  "keywords": [],
   "license": "MIT",
-  "author": "",
   "type": "module",
   "main": "src/main.ts",
   "bin": {
@@ -18,6 +15,5 @@
     "@lvce-editor/assert": "^1.5.1",
     "@lvce-editor/rpc": "^4.20.0",
     "@lvce-editor/verror": "^1.7.0"
-  },
-  "devDependencies": {}
+  }
 }
