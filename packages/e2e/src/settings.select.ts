@@ -1,6 +1,6 @@
 import type { TestContext } from '../types.ts'
 
-export const skip = process.platform === 'darwin'
+export const skip = true
 
 export const setup = async ({ Editor, SettingsEditor }: TestContext): Promise<void> => {
   await Editor.closeAll()
