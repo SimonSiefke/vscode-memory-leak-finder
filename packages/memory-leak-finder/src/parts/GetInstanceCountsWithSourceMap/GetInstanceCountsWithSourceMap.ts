@@ -4,8 +4,9 @@ import * as GetConstructorLocations from '../GetConstructorLocations/GetConstruc
 import * as GetInstanceCountArray from '../GetInstanceCountArray/GetInstanceCountArray.ts'
 import * as GetInstanceCountMap from '../GetInstanceCountMap/GetInstanceCountMap.ts'
 import * as GetInstances from '../GetInstances/GetInstances.ts'
+import type { Session } from '../Session/Session.ts'
 
-export const getInstanceCountsWithSourceMap = async (session, objectGroup, scriptMap) => {
+export const getInstanceCountsWithSourceMap = async (session: Session, objectGroup, scriptMap) => {
   Assert.object(session)
   Assert.string(objectGroup)
   Assert.object(scriptMap)

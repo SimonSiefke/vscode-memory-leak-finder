@@ -1,7 +1,8 @@
 import * as Assert from '../Assert/Assert.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
+import type { Session } from '../Session/Session.ts'
 
-export const partitionArray = async (session, objectGroup, objectId, chunkSize) => {
+export const partitionArray = async (session: Session, objectGroup, objectId, chunkSize) => {
   Assert.object(session)
   Assert.string(objectGroup)
   Assert.string(objectId)
