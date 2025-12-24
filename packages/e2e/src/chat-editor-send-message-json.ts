@@ -4,9 +4,14 @@ export const skip = 1
 
 export const requiresNetwork = true
 
-export const setup = async ({ ChatEditor, Editor, Electron }: TestContext): Promise<void> => {
+export const setup = async ({ ChatEditor, Editor, Electron, Extensions }: TestContext): Promise<void> => {
   await Electron.mockDialog({
     response: 1,
+  })
+  // @ts-ignore
+  await Extensions.install({
+    id: 'github copilot chat',
+    name: 'GitHub Copilot Chat',
   })
   await Editor.closeAll()
   await ChatEditor.open()
