@@ -5,6 +5,7 @@ export const wrapMeasure = (measure: any) => {
     create(session: Session) {
       const args = measure.create(session)
       return {
+        args,
         ...measure,
         compare(before, after, context) {
           return measure.compare(before, after, context)
