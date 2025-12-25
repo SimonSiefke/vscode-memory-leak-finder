@@ -11,6 +11,7 @@ export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: 
   const options = {
     excludeOriginalPaths: [
       'async.ts',
+      'debugName.ts',
       'editStack.ts',
       'event.ts',
       'files.ts',
