@@ -160,10 +160,12 @@ export const extractReturnType = (content: string, methodStartIndex: number, met
       return 'Promise<string[]>'
     }
     // Check for string returns
-    if (returnValue.includes("getAttribute('value')") ||
-        returnValue.includes("textContent()") ||
-        returnValue.includes("|| ''") ||
-        returnValue.includes("|| \"\"")) {
+    if (
+      returnValue.includes("getAttribute('value')") ||
+      returnValue.includes('textContent()') ||
+      returnValue.includes("|| ''") ||
+      returnValue.includes('|| ""')
+    ) {
       return 'Promise<string>'
     }
     // Check for object/any returns

@@ -59,7 +59,7 @@ export const extractMethodInfo = (content: string): MethodInfo[] => {
     const methodStartIndex = match.index
 
     // Skip if this method was already captured as async
-    if (methods.some(m => m.name === methodName && m.isAsync)) {
+    if (methods.some((m) => m.name === methodName && m.isAsync)) {
       continue
     }
 

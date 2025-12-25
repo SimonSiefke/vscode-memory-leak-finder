@@ -50,7 +50,7 @@ test('extractReturnType - inferred from return statement with commands', () => {
 })
 
 test('extractReturnType - inferred from return statement with getAttribute', () => {
-  const content = 'async method() { return getAttribute(\'value\') }'
+  const content = "async method() { return getAttribute('value') }"
   const result = extractReturnType(content, 0, 'method')
   expect(result).toBe('Promise<string>')
 })

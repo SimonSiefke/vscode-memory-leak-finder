@@ -42,8 +42,8 @@ test('extractProperties - multiple properties', () => {
   `
   const result = extractProperties(content)
   expect(result).toHaveLength(2)
-  expect(result.map(p => p.name)).toContain('first')
-  expect(result.map(p => p.name)).toContain('not')
+  expect(result.map((p) => p.name)).toContain('first')
+  expect(result.map((p) => p.name)).toContain('not')
 })
 
 test('extractProperties - property without async methods', () => {

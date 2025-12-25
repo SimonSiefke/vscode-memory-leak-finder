@@ -63,7 +63,7 @@ test('extractMethodInfo - multiple methods', () => {
   `
   const result = extractMethodInfo(content)
   expect(result).toHaveLength(3)
-  expect(result.map(m => m.name)).toEqual(['method1', 'method2', 'method3'])
+  expect(result.map((m) => m.name)).toEqual(['method1', 'method2', 'method3'])
 })
 
 test('extractMethodInfo - qualified return type simplified', () => {

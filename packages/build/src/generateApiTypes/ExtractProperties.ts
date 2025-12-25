@@ -30,9 +30,7 @@ export const extractProperties = (content: string): PropertyInfo[] => {
     const beforeProperty = returnObjectContent.substring(Math.max(0, propertyStart - 20), propertyStart)
 
     // Skip if it's part of a method parameter, destructuring, or type annotation
-    if (beforeProperty.includes('async') ||
-        beforeProperty.includes('function') ||
-        beforeProperty.match(/\([^)]*$/)) {
+    if (beforeProperty.includes('async') || beforeProperty.includes('function') || beforeProperty.match(/\([^)]*$/)) {
       continue
     }
 
