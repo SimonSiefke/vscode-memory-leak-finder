@@ -12,7 +12,9 @@ export const setup = async ({ Editor, SimpleBrowser, Workspace, Electron }: Test
   await SimpleBrowser.show({
     port: 3001,
   })
+  // @ts-ignore
   await Electron.mockWebViewDebugger({
+    // @ts-ignore
     async 'Overlay.inspectNodeRequested'(emitter) {
       await emitter.emit('Overlay.inspectNodeRequested')
       return {
@@ -33,7 +35,6 @@ export const run = async ({ Editor, SimpleBrowser }: TestContext): Promise<void>
   // 2. filter to find the one matching the simple browser
   // 3. overwrite debugger.prototype.sendCommand and when it is called, send a fake inspectNoderequested event
   // 4. undo the mocks from 3.
-  await new Promise((r) => {})
   await Editor.closeAll()
 }
 
