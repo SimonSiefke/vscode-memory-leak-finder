@@ -23,7 +23,6 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     return
   }
   const {
-    attachToPageTimeout,
     bisect,
     checkLeaks,
     color,
@@ -65,7 +64,6 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
   await Stdout.write(clear)
   const rpc = await RunTest.prepare()
   const result = await rpc.invoke(TestWorkerCommandType.RunTests, {
-    attachToPageTimeout,
     bisect,
     checkLeaks,
     color,
