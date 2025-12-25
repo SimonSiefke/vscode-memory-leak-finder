@@ -40,6 +40,8 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         const count = await rows.count()
         await page.waitForIdle()
         const editContext = page.locator('.models-search-container .monaco-editor .native-edit-context')
+        await expect(editContext).toBeVisible()
+        await page.waitForIdle()
         await editContext.type(searchValue)
         await page.waitForIdle()
         let now = performance.now()
@@ -54,7 +56,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         }
         const newCount = await rows.count()
         if (newCount === count) {
-          throw new Error(`filter has no effect`)
+          throw new Error(`Filter has no effect: oldCount: ${count}, newCount: ${newCount}`)
         }
         await page.waitForIdle()
       } catch (error) {
