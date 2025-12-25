@@ -8,7 +8,28 @@ export const extractParameterInfo = (paramString: string): ParameterInfo[] => {
   const params: ParameterInfo[] = []
 
   // First, try to split by comma to handle multiple parameters
-  const paramList = paramString.split(',').map(p => p.trim()).filter(p => p)
+  // But be careful with destructuring - need to handle nested braces/brackets
+  const paramList: string[] = []
+  let currentParam = ''
+  let braceDepth = 0
+  let bracketDepth = 0
+
+  for (let i = 0; i < paramString.length; i++) {
+    const char = paramString[i]
+    if (char === '{') braceDepth++
+    else if (char === '}') braceDepth--
+    else if (char === '[') bracketDepth++
+    else if (char === ']') bracketDepth--
+    else if (char === ',' && braceDepth === 0 && bracketDepth === 0) {
+      paramList.push(currentParam.trim())
+      currentParam = ''
+      continue
+    }
+    currentParam += char
+  }
+  if (currentParam.trim()) {
+    paramList.push(currentParam.trim())
+  }
 
   // If there's only one parameter and it contains destructuring, handle it specially
   if (paramList.length === 1 && (paramList[0].includes('{') || paramList[0].includes('['))) {
@@ -45,4 +66,3 @@ export const extractParameterInfo = (paramString: string): ParameterInfo[] => {
 
   return params
 }
-

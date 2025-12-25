@@ -30,4 +30,3 @@ test('findMatchingBrace - starting from middle', () => {
   const result = findMatchingBrace(str, 7)
   expect(result).toBe(15)
 })
-

@@ -64,7 +64,9 @@ test('generateInterfaceFromMethods - with properties', () => {
       isAsync: true,
     },
   ]
-  const properties: PropertyInfo[] = [{ name: 'not', type: 'any' }]
+  const properties: PropertyInfo[] = [
+    { name: 'not', type: 'any' },
+  ]
   const result = generateInterfaceFromMethods(methods, properties, 'TestInterface')
   expect(result).toContain('method(): Promise<void>')
   expect(result).toContain('not: any')

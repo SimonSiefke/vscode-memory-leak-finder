@@ -16,4 +16,3 @@ export default {
   testMatch: ['<rootDir>/test/**/*.ts'],
   injectGlobals: false,
 }
-

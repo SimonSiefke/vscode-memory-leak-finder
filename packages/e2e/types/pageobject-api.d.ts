@@ -12,9 +12,9 @@ export interface PageObjectContext {
 }
 
 export interface ActivityBar {
-  hide(): Promise<string[]>
-  hideTooltip(): Promise<string[]>
-  show(): Promise<string[]>
+  hide(): Promise<void>
+  hideTooltip(): Promise<void>
+  show(): Promise<void>
   showTooltipExplorer(): Promise<void>
   showView(options?: any): Promise<void>
 }
@@ -25,7 +25,7 @@ export interface ChatEditor {
   closeFinishSetup(): Promise<void>
   open(): Promise<void>
   openFinishSetup(): Promise<void>
-  sendMessage(options: any): Promise<void>
+  sendMessage(options?: any): Promise<void>
   setMode(modeLabel: any): Promise<void>
 }
 export interface ContextMenu {
@@ -74,103 +74,103 @@ export interface DropDownContextMenu {
   shouldHaveItem(option: any): Promise<void>
 }
 export interface Editor {
-  acceptRename(): Promise<string[]>
-  autoFix(options: any): Promise<string[]>
-  click(text: any): Promise<string[]>
-  close(): Promise<string[]>
-  closeAll(): Promise<string[]>
-  closeAllEditorGroups(): Promise<string[]>
-  closeAutoFix(): Promise<string[]>
-  closeFind(): Promise<string[]>
-  closeInspectedTokens(): Promise<string[]>
-  cursorRight(): Promise<string[]>
-  deleteAll(): Promise<string[]>
-  deleteCharactersLeft(options: any): Promise<string[]>
-  deleteCharactersRight(options: any): Promise<string[]>
-  disableReadonly(): Promise<string[]>
-  disableStickyScroll(): Promise<string[]>
-  disableVersionLens(): Promise<string[]>
-  duplicateSelection(): Promise<string[]>
-  enable2x2GridView(): Promise<string[]>
-  enableReadonly(): Promise<string[]>
-  enableStickyScroll(): Promise<string[]>
-  enableVersionLens(): Promise<string[]>
-  findAllReferences(): Promise<string[]>
-  focus(): Promise<string[]>
-  fold(): Promise<string[]>
-  foldAll(): Promise<string[]>
-  format(): Promise<string[]>
-  focusRightEditorGroup(): Promise<string[]>
-  focusLeftEditorGroup(): Promise<string[]>
-  focusBottomEditorGroup(): Promise<string[]>
-  focusTopEditorGroup(): Promise<string[]>
-  goToDefinition(): Promise<string[]>
-  goToFile(options: any): Promise<string[]>
-  goToSourceDefinition(options: any): Promise<string[]>
-  hideBreadCrumbs(): Promise<string[]>
-  hideColorPicker(): Promise<string>
-  hideDebugHover(): Promise<string>
-  hideMinimap(): Promise<string>
-  hideSourceAction(): Promise<string>
-  hideSourceActionEmpty(): Promise<string>
-  hover(text: any, hoverText: any): Promise<string>
-  inspectTokens(): Promise<string>
-  moveScrollBar(y: any, expectedScrollBarY: any): Promise<string>
-  newTextFile(): Promise<string>
-  open(fileName: any, options?: any): Promise<string>
-  openFind(): Promise<string>
-  openSettingsJson(): Promise<string>
-  pin(): Promise<string>
-  press(key: any): Promise<string>
-  reloadWebViews(options: any): Promise<string>
-  removeAllBreakpoints(): Promise<string>
-  rename(newText: any): Promise<string>
-  renameCancel(newText: any): Promise<string>
-  renameWithPreview(newText: any): Promise<string>
-  save(options: any): Promise<string>
-  saveAll(): Promise<string>
-  scrollDown(): Promise<string>
-  scrollUp(): Promise<string>
-  select(text: any): Promise<string>
-  selectAll(): Promise<string>
-  selectRefactor(actionText: any): Promise<string>
-  selectSourceAction(actionText: any): Promise<string>
-  setBreakpoint(lineNumber: any): Promise<string>
-  setCursor(line: any, column: any): Promise<string>
-  setLanguageMode(languageId: any): Promise<string>
-  setLogpoint(lineNumber: any, logMessage: any): Promise<string>
-  shouldHaveActiveLineNumber(value: any): Promise<string>
-  shouldHaveBreadCrumb(text: any): Promise<string>
-  shouldHaveCodeLens(options: any): Promise<string>
-  shouldHaveCodeLensWithVersion(options: any): Promise<string>
-  shouldHaveCursor(estimate: any): Promise<string>
-  shouldHaveEmptySelection(): Promise<string>
-  shouldHaveError(fileName: any): Promise<string>
-  shouldHaveExceptionWidget(): Promise<string>
-  shouldHaveFoldingGutter(enabled: any): Promise<string>
-  shouldHaveFontFamily(fontFamily: any): Promise<string>
-  shouldHaveInspectedToken(name: any): Promise<string>
-  shouldHaveOverlayMessage(message: any): Promise<string>
-  shouldHaveSelection(left: any, width: any): Promise<string>
-  shouldHaveSemanticToken(type: any): Promise<string>
-  shouldHaveSpark(): Promise<string[]>
-  shouldHaveSquigglyError(): Promise<string[]>
-  shouldHaveText(text: any, fileName?: any): Promise<string[]>
-  shouldHaveToken(text: any, color: any): Promise<string[]>
-  shouldNotHaveSemanticToken(type: any): Promise<string[]>
-  shouldNotHaveSquigglyError(): Promise<string[]>
-  showBreadCrumbs(): Promise<string[]>
-  showColorPicker(): Promise<string[]>
-  showDebugHover(options: any): Promise<string[]>
-  showMinimap(): Promise<string[]>
-  showRefactor(): Promise<string[]>
-  showSourceAction(): Promise<string[]>
-  showSourceActionEmpty(): Promise<string[]>
-  split(command: any): Promise<string[]>
-  splitDown(): Promise<string[]>
-  splitLeft(): Promise<string[]>
-  splitRight(): Promise<string[]>
-  splitUp(): Promise<string[]>
+  acceptRename(): Promise<void>
+  autoFix(options: any): Promise<void>
+  click(text: any): Promise<void>
+  close(): Promise<void>
+  closeAll(): Promise<void>
+  closeAllEditorGroups(): Promise<void>
+  closeAutoFix(): Promise<void>
+  closeFind(): Promise<void>
+  closeInspectedTokens(): Promise<void>
+  cursorRight(): Promise<void>
+  deleteAll(): Promise<void>
+  deleteCharactersLeft(options: any): Promise<void>
+  deleteCharactersRight(options: any): Promise<void>
+  disableReadonly(): Promise<void>
+  disableStickyScroll(): Promise<void>
+  disableVersionLens(): Promise<void>
+  duplicateSelection(): Promise<void>
+  enable2x2GridView(): Promise<void>
+  enableReadonly(): Promise<void>
+  enableStickyScroll(): Promise<void>
+  enableVersionLens(): Promise<void>
+  findAllReferences(): Promise<void>
+  focus(): Promise<void>
+  fold(): Promise<void>
+  foldAll(): Promise<void>
+  format(): Promise<void>
+  focusRightEditorGroup(): Promise<void>
+  focusLeftEditorGroup(): Promise<void>
+  focusBottomEditorGroup(): Promise<void>
+  focusTopEditorGroup(): Promise<void>
+  goToDefinition(): Promise<void>
+  goToFile(options: any): Promise<void>
+  goToSourceDefinition(options: any): Promise<void>
+  hideBreadCrumbs(): Promise<void>
+  hideColorPicker(): Promise<void>
+  hideDebugHover(): Promise<void>
+  hideMinimap(): Promise<void>
+  hideSourceAction(): Promise<void>
+  hideSourceActionEmpty(): Promise<void>
+  hover(text: any, hoverText: any): Promise<void>
+  inspectTokens(): Promise<void>
+  moveScrollBar(y: any, expectedScrollBarY: any): Promise<void>
+  newTextFile(): Promise<void>
+  open(fileName: any, options?: any): Promise<void>
+  openFind(): Promise<void>
+  openSettingsJson(): Promise<void>
+  pin(): Promise<void>
+  press(key: any): Promise<void>
+  reloadWebViews(options: any): Promise<void>
+  removeAllBreakpoints(): Promise<void>
+  rename(newText: any): Promise<void>
+  renameCancel(newText: any): Promise<void>
+  renameWithPreview(newText: any): Promise<void>
+  save(options: any): Promise<void>
+  saveAll(): Promise<void>
+  scrollDown(): Promise<void>
+  scrollUp(): Promise<void>
+  select(text: any): Promise<void>
+  selectAll(): Promise<void>
+  selectRefactor(actionText: any): Promise<void>
+  selectSourceAction(actionText: any): Promise<void>
+  setBreakpoint(lineNumber: any): Promise<void>
+  setCursor(line: any, column: any): Promise<void>
+  setLanguageMode(languageId: any): Promise<void>
+  setLogpoint(lineNumber: any, logMessage: any): Promise<void>
+  shouldHaveActiveLineNumber(value: any): Promise<void>
+  shouldHaveBreadCrumb(text: any): Promise<void>
+  shouldHaveCodeLens(options: any): Promise<void>
+  shouldHaveCodeLensWithVersion(options: any): Promise<void>
+  shouldHaveCursor(estimate: any): Promise<void>
+  shouldHaveEmptySelection(): Promise<void>
+  shouldHaveError(fileName: any): Promise<void>
+  shouldHaveExceptionWidget(): Promise<void>
+  shouldHaveFoldingGutter(enabled: any): Promise<void>
+  shouldHaveFontFamily(fontFamily: any): Promise<void>
+  shouldHaveInspectedToken(name: any): Promise<void>
+  shouldHaveOverlayMessage(message: any): Promise<void>
+  shouldHaveSelection(left: any, width: any): Promise<void>
+  shouldHaveSemanticToken(type: any): Promise<void>
+  shouldHaveSpark(): Promise<void>
+  shouldHaveSquigglyError(): Promise<void>
+  shouldHaveText(text: any, fileName?: any): Promise<void>
+  shouldHaveToken(text: any, color: any): Promise<void>
+  shouldNotHaveSemanticToken(type: any): Promise<void>
+  shouldNotHaveSquigglyError(): Promise<void>
+  showBreadCrumbs(): Promise<void>
+  showColorPicker(): Promise<void>
+  showDebugHover(options: any): Promise<void>
+  showMinimap(): Promise<void>
+  showRefactor(): Promise<void>
+  showSourceAction(): Promise<void>
+  showSourceActionEmpty(): Promise<void>
+  split(command: any): Promise<void>
+  splitDown(): Promise<void>
+  splitLeft(): Promise<void>
+  splitRight(): Promise<void>
+  splitUp(): Promise<void>
   switchToTab(name: any): Promise<void>
   threeColumnsLayout(): Promise<void>
   toggleBreakpoint(): Promise<void>
@@ -182,14 +182,14 @@ export interface Editor {
   unpin(): Promise<void>
 }
 export interface EditorFind {
-  openReplace(): Promise<string[]>
+  openReplace(): Promise<void>
   replace(): Promise<void>
   setReplaceValue(value: any): Promise<void>
   setSearchValue(value: any): Promise<void>
 }
 export interface Electron {
-  evaluate(expression: any): Promise<string[]>
-  mockDialog(response: any): Promise<string[]>
+  evaluate(expression: any): Promise<void>
+  mockDialog(response: any): Promise<void>
   mockElectron(namespace: any, key: any, implementationCode: any): Promise<void>
   mockOpenDialog(response: any): Promise<void>
   mockSaveDialog(response: any): Promise<void>
@@ -210,7 +210,7 @@ export interface Explorer {
   newFolder(options: any): Promise<void>
   toHaveItem(direntName: any): Promise<void>
   openAllFiles(): Promise<void>
-  openContextMenu(dirent?: any): Promise<void>
+  openContextMenu(dirent: any, select?: any): Promise<void>
   paste(options?: any): Promise<void>
   refresh(): Promise<void>
   removeCurrent(): Promise<void>
@@ -272,7 +272,7 @@ export interface MarkdownPreview {
   shouldHaveHeading(subFrame: any, id: any): Promise<void>
 }
 export interface MCP {
-  addServer(options: any): Promise<string[]>
+  addServer(options: any): Promise<void>
   createMCPServer(): Promise<any>
   getInputValue(): Promise<string>
   getVisibleCommands(): Promise<string[]>
@@ -280,7 +280,7 @@ export interface MCP {
   openConfiguration(): Promise<void>
   removeAllServers(): Promise<void>
   removeServer(serverName: any): Promise<void>
-  selectCommand(text, stayVisible?: any): Promise<void>
+  selectCommand(text: any, stayVisible?: any): Promise<void>
 }
 export interface MultiDiffEditor {
   close(): Promise<void>
@@ -305,13 +305,13 @@ export interface Output {
   show(): Promise<void>
 }
 export interface Panel {
-  hide(): Promise<string[]>
+  hide(): Promise<void>
   show(): Promise<void>
   toggle(): Promise<void>
 }
 export interface PortsView {
-  cancelPortEdit(): Promise<string[]>
-  close(): Promise<string[]>
+  cancelPortEdit(): Promise<void>
+  close(): Promise<void>
   forwardPort(port: any): Promise<any>
   open(): Promise<void>
   setPortInput(portId: any): Promise<void>
@@ -319,10 +319,10 @@ export interface PortsView {
   unforwardAllPorts(port: any): Promise<void>
 }
 export interface Problems {
-  hide(): Promise<string[]>
-  shouldHaveCount(count: any): Promise<string[]>
-  show(): Promise<string[]>
-  switchToTableView(): Promise<string[]>
+  hide(): Promise<void>
+  shouldHaveCount(count: any): Promise<void>
+  show(): Promise<void>
+  switchToTableView(): Promise<void>
   switchToTreeView(): Promise<void>
 }
 export interface Profile {
@@ -332,19 +332,19 @@ export interface Profile {
   removeOtherProfiles(): Promise<void>
 }
 export interface QuickPick {
-  close(): Promise<string[]>
-  executeCommand(options?: any): Promise<string[]>
-  focusNext(): Promise<string[]>
-  focusPrevious(): Promise<string[]>
+  close(): Promise<void>
+  executeCommand(command: any, options?: any): Promise<void>
+  focusNext(): Promise<void>
+  focusPrevious(): Promise<void>
   getInputValue(): Promise<string>
   getVisibleCommands(): Promise<string[]>
-  hide(): Promise<string[]>
-  openFile(fileName: any): Promise<string[]>
-  pressEnter(): Promise<string[]>
-  select(text?: any): Promise<string[]>
-  show(options?: any): Promise<string[]>
-  showColorTheme(): Promise<string[]>
-  showCommands(options?: any): Promise<string[]>
+  hide(): Promise<void>
+  openFile(fileName: any): Promise<void>
+  pressEnter(): Promise<void>
+  select(text: any, stayVisible?: any): Promise<void>
+  show(options?: any): Promise<void>
+  showColorTheme(): Promise<void>
+  showCommands(options?: any): Promise<void>
   type(value: any): Promise<void>
 }
 export interface References {
@@ -378,11 +378,11 @@ export interface RunningExtensions {
   stopProfilingExtensionHost(): Promise<void>
 }
 export interface Search {
-  clear(): Promise<string[]>
-  collapseFiles(): Promise<string[]>
-  deleteText(): Promise<string[]>
-  enableRegex(): Promise<string[]>
-  expandFiles(): Promise<string[]>
+  clear(): Promise<void>
+  collapseFiles(): Promise<void>
+  deleteText(): Promise<void>
+  enableRegex(): Promise<void>
+  expandFiles(): Promise<void>
   openEditor(): Promise<void>
   replace(): Promise<void>
   setFilesToInclude(pattern: any): Promise<void>
@@ -392,20 +392,20 @@ export interface Search {
   typeReplace(text: any): Promise<void>
 }
 export interface SettingsEditor {
-  addItem(options: any): Promise<string[]>
-  applyFilter(options: any): Promise<string[]>
-  clear(): Promise<string[]>
-  closeSettingsContextMenu(name: any): Promise<string[]>
-  collapse(groupName: any): Promise<string[]>
-  collapseOutline(): Promise<string[]>
-  disableCheckBox(options: any): Promise<string[]>
-  enableCheckBox(options: any): Promise<string[]>
+  addItem(options: any): Promise<void>
+  applyFilter(options: any): Promise<void>
+  clear(): Promise<void>
+  closeSettingsContextMenu(name: any): Promise<void>
+  collapse(groupName: any): Promise<void>
+  collapseOutline(): Promise<void>
+  disableCheckBox(options: any): Promise<void>
+  enableCheckBox(options: any): Promise<void>
   ensureIdle(): Promise<void>
   expand(groupName: any): Promise<void>
   focusOutline(name: any): Promise<void>
   moveScrollBar(y: any, expectedScrollBarTop: any): Promise<void>
   open(): Promise<void>
-  openSettingsContextMenu(options: any): Promise<void>
+  openSettingsContextMenu(name: any, options: any): Promise<void>
   openTab(tabName: any): Promise<void>
   removeItem(options: any): Promise<void>
   search(options: any): Promise<void>
@@ -438,13 +438,13 @@ export interface SimpleBrowser {
   mockElectronDebugger(options: any): Promise<void>
 }
 export interface SourceControl {
-  checkoutBranch(branchName: any): Promise<string[]>
-  disableInlineBlame(): Promise<string[]>
-  doMoreAction(name: any): Promise<string[]>
-  enableInlineBlame(options: any): Promise<string[]>
-  hideBranchPicker(): Promise<string[]>
-  hideGraph(): Promise<string[]>
-  showGraph(): Promise<string[]>
+  checkoutBranch(branchName: any): Promise<void>
+  disableInlineBlame(): Promise<void>
+  doMoreAction(name: any): Promise<void>
+  enableInlineBlame(options: any): Promise<void>
+  hideBranchPicker(): Promise<void>
+  hideGraph(): Promise<void>
+  showGraph(): Promise<void>
   refresh(): Promise<void>
   selectBranch(branchName: any): Promise<void>
   shouldHaveHistoryItem(name: any): Promise<void>
@@ -487,7 +487,7 @@ export interface Terminal {
   clear(): Promise<void>
   clearFindInput(): Promise<void>
   closeFind(): Promise<void>
-  execute(options?: any): Promise<void>
+  execute(command: any, options?: any): Promise<void>
   focusHover(): Promise<void>
   ignoreHover(): Promise<void>
   killAll(): Promise<void>
@@ -519,8 +519,8 @@ export interface Testing {
   shouldHaveTestSuccess(): Promise<void>
 }
 export interface TitleBar {
-  hideMenu(text: any): Promise<string[]>
-  hideMenuFile(): Promise<string[]>
+  hideMenu(text: any): Promise<void>
+  hideMenuFile(): Promise<void>
   showMenu(text: any): Promise<void>
   showMenuEdit(): Promise<void>
   showMenuFile(): Promise<void>
@@ -553,8 +553,8 @@ export interface Workbench {
   shouldHaveEditorBackground(color: any): Promise<void>
 }
 export interface Workspace {
-  add(file: any): Promise<string[]>
-  addExtension(name: any): Promise<string[]>
+  add(file: any): Promise<void>
+  addExtension(name: any): Promise<void>
   initializeGitRepository(): Promise<void>
   remove(file: any): Promise<void>
   setFiles(files: any): Promise<void>

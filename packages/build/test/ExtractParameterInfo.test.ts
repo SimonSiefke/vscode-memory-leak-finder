@@ -55,4 +55,3 @@ test('extractParameterInfo - mixed simple and complex', () => {
     { name: 'options', isOptional: false },
   ])
 })
-

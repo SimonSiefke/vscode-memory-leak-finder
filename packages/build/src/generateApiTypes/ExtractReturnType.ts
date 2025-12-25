@@ -22,20 +22,30 @@ export const extractReturnType = (content: string, methodStartIndex: number, met
     } else {
       // There's a return type annotation
       const returnTypeStart = colonIndex + 1
-      // Check a larger preview to catch multi-line return types
-      const returnTypePreview = afterParen.substring(returnTypeStart, Math.min(returnTypeStart + 500, afterParen.length))
+      // Find where the return type ends (before the method body brace)
+      // Check a larger preview to catch multi-line return types, but stop at method body
+      let previewEnd = braceIndex !== -1 ? braceIndex : Math.min(returnTypeStart + 500, afterParen.length)
+      const returnTypePreview = afterParen.substring(returnTypeStart, previewEnd).trim()
 
       // If return type contains braces or brackets (but not just Promise<>), it's complex - use Promise<any>
       // Check if braces/brackets are inside the Promise<> or part of the type itself
       const trimmedPreview = returnTypePreview.trim()
       if (trimmedPreview.startsWith('Promise<')) {
-        // Check if there are braces/brackets after Promise<
+        // Check if there are braces/brackets after Promise< and before the closing >
         const afterPromise = trimmedPreview.substring('Promise<'.length)
-        if (afterPromise.includes('{') || afterPromise.includes('[')) {
-          return 'Promise<any>'
+        const closingAngleIndex = afterPromise.indexOf('>')
+        if (closingAngleIndex !== -1) {
+          const innerType = afterPromise.substring(0, closingAngleIndex)
+          if (innerType.includes('{') || innerType.includes('[')) {
+            return 'Promise<any>'
+          }
         }
       } else if (returnTypePreview.includes('{') || returnTypePreview.includes('[')) {
-        return 'Promise<any>'
+        // Check if the brace/bracket is part of the return type or the method body
+        // If we found a brace index and it's after the preview, the braces in preview are in the type
+        if (braceIndex === -1 || braceIndex > returnTypeStart + returnTypePreview.length) {
+          return 'Promise<any>'
+        }
       }
 
       // For simple return types, find the method body brace
@@ -110,7 +120,17 @@ export const extractReturnType = (content: string, methodStartIndex: number, met
     return 'Promise<void>'
   }
 
-  const methodBody = methodSignature.substring(methodBodyStart)
+  // Find the matching closing brace for the method body
+  let methodBodyEnd = methodBodyStart + 1
+  let depth = 1
+  while (methodBodyEnd < methodSignature.length && depth > 0) {
+    if (methodSignature[methodBodyEnd] === '{') depth++
+    if (methodSignature[methodBodyEnd] === '}') depth--
+    methodBodyEnd++
+  }
+  
+  // Extract only this method's body, not subsequent methods
+  const methodBody = methodSignature.substring(methodBodyStart, methodBodyEnd)
 
   // Check for specific method name patterns
   if (methodName.includes('getInputValue') || methodName.includes('getValue')) {
@@ -126,10 +146,15 @@ export const extractReturnType = (content: string, methodStartIndex: number, met
     return 'Promise<any>'
   }
 
-  // Look for return statements
-  const returnMatches = methodBody.matchAll(/return\s+([^;]+)/g)
+  // Look for return statements with actual values (not just "return" alone)
+  // Match "return" followed by non-whitespace (actual return value), stopping at ; or newline/brace
+  const returnMatches = methodBody.matchAll(/return\s+([^\s;{}]+[^;{}]*?)(?:\s*[;{}]|$)/g)
   for (const returnMatch of returnMatches) {
     const returnValue = returnMatch[1].trim()
+    // Skip empty return values (just "return" with no value)
+    if (!returnValue || returnValue === '') {
+      continue
+    }
     // Check for array returns
     if (returnValue.includes('commands') || returnValue.includes('[]') || returnValue.match(/\[.*\]/)) {
       return 'Promise<string[]>'
@@ -150,4 +175,3 @@ export const extractReturnType = (content: string, methodStartIndex: number, met
   // Default to Promise<void> for async methods
   return 'Promise<void>'
 }
-
