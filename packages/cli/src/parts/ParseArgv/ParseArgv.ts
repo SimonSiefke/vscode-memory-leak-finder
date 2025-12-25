@@ -1,8 +1,9 @@
 import * as Ide from '../Ide/Ide.ts'
+import * as IsWindows from '../IsWindows/IsWindows.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 import * as VsCodeVersion from '../VsCodeVersion/VsCodeVersion.ts'
 
-const parseArgvNumber = (argv, name) => {
+const parseArgvNumber = (argv: readonly string[], name: string): number => {
   const index = argv.indexOf(name)
   const next = index + 1
   const value = argv[next]
@@ -13,7 +14,7 @@ const parseArgvNumber = (argv, name) => {
   return 1
 }
 
-const parseArgvString = (argv, name) => {
+const parseArgvString = (argv: readonly string[], name: string): string => {
   const index = argv.indexOf(name)
   const next = index + 1
   const value = argv[next]
@@ -23,7 +24,7 @@ const parseArgvString = (argv, name) => {
   return ''
 }
 
-export const parseArgv = (argv) => {
+export const parseArgv = (argv: readonly string[]) => {
   const options = {
     bisect: false,
     checkLeaks: false,
@@ -61,6 +62,7 @@ export const parseArgv = (argv) => {
     vscodeVersion: VsCodeVersion.vscodeVersion,
     watch: false,
     workers: false,
+    isWindows: IsWindows.isWindows(process.platform),
   }
   if (argv.includes('--watch')) {
     options.watch = true

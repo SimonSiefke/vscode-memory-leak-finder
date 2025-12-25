@@ -34,10 +34,10 @@ const launchInitializationWorker = async () => {
     stdio: 'inherit',
   })
   return {
-    invoke(method, ...params) {
+    invoke(method: string, ...params: unknown[]) {
       return rpc.invoke(method, ...params)
     },
-    invokeAndTransfer(method, ...params) {
+    invokeAndTransfer(method: string, ...params: unknown[]) {
       return rpc.invokeAndTransfer(method, ...params)
     },
     async [Symbol.asyncDispose]() {
