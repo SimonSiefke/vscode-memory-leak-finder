@@ -10,7 +10,7 @@ if (!parentPort) {
 const workerPort = parentPort
 
 // Helper function to get transferrable objects for zero-copy transfer
-const getTransferList = (result) => {
+const getTransferList = (result: unknown): ArrayBuffer[] => {
   const transferList: any[] = []
   if (result && typeof result === 'object') {
     if (result.nodes && result.nodes.buffer) {
@@ -29,7 +29,7 @@ const getTransferList = (result) => {
 workerPort.on('message', async (message) => {
   const { id, method, params } = message
   try {
-    const handler = commandMap[method]
+    const handler = commandMap[method as keyof typeof commandMap]
     if (!handler) {
       throw new Error(`Unknown method: ${method}`)
     }
