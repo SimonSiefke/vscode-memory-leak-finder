@@ -86,7 +86,11 @@ let state: StdinDataState = {
   workers: false,
 }
 
+<<<<<<< HEAD
 export const setState = (newState: Partial<StdinDataState>): void => {
+=======
+export const setState = (newState: StdinDataState): void => {
+>>>>>>> origin/main
   state = {
     ...state,
     bisect: newState.bisect ?? state.bisect,

@@ -34,6 +34,23 @@ export const launchVsCode = async ({
   useProxyMock,
   vscodePath,
   vscodeVersion,
+}: {
+  addDisposable: (fn: () => Promise<void> | void) => void
+  commit: string
+  cwd: string
+  enableExtensions: boolean
+  enableProxy: boolean
+  headlessMode: boolean
+  insidersCommit: string
+  inspectExtensions: boolean
+  inspectExtensionsPort: number
+  inspectPtyHost: boolean
+  inspectPtyHostPort: number
+  inspectSharedProcess: boolean
+  inspectSharedProcessPort: number
+  useProxyMock: boolean
+  vscodePath: string
+  vscodeVersion: string
 }) => {
   try {
     const testWorkspacePath = join(Root.root, '.vscode-test-workspace')

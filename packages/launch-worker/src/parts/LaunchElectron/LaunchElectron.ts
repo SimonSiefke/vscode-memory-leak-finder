@@ -5,21 +5,29 @@ import { VError } from '../VError/VError.ts'
 // const logFile = '/tmp/lvce-manual-tests-log.txt'
 // const logStream = createWriteStream(logFile)
 
-/**
- * @param {string} data
- */
-const handleStdout = (data) => {
+const handleStdout = (data: string) => {
   // logStream.write(data)
 }
 
-/**
- * @param {string} data
- */
-const handleStdErr = (data) => {
+const handleStdErr = (data: string) => {
   // logStream.write(data)
 }
 
-export const launchElectron = async ({ addDisposable, args, cliPath, cwd, env, headlessMode }) => {
+export const launchElectron = async ({
+  addDisposable,
+  args,
+  cliPath,
+  cwd,
+  env,
+  headlessMode,
+}: {
+  addDisposable: (fn: () => Promise<void> | void) => void
+  args: string[]
+  cliPath: string
+  cwd: string
+  env: NodeJS.ProcessEnv
+  headlessMode: boolean
+}) => {
   try {
     const allArgs = GetElectronArgs.getElectronArgs({ args, headlessMode })
     const child = Spawn.spawn(cliPath, allArgs, {

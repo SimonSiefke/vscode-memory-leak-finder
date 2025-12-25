@@ -4,7 +4,14 @@ import * as ModeType from '../ModeType/ModeType.ts'
 import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
 
+<<<<<<< HEAD
 export const handleStdinDataRunningMode = async (state: StdinDataState.StdinDataState, key: string): Promise<StdinDataState.StdinDataState> => {
+=======
+export const handleStdinDataRunningMode = async (
+  state: StdinDataState.StdinDataState,
+  key: string,
+): Promise<StdinDataState.StdinDataState> => {
+>>>>>>> origin/main
   switch (key) {
     case AnsiKeys.AltBackspace:
     case AnsiKeys.ArrowDown:
