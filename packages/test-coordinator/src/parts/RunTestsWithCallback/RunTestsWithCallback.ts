@@ -33,6 +33,7 @@ const disposeWorkers = async (workers) => {
 export const runTestsWithCallback = async ({
   callback,
   checkLeaks,
+  clearExtensions,
   color,
   commit,
   continueValue,
@@ -100,6 +101,7 @@ export const runTestsWithCallback = async ({
     if (setupOnly && commit) {
       const { memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
         attachedToPageTimeout,
+        clearExtensions,
         commit,
         connectionId,
         cwd,
@@ -199,6 +201,7 @@ export const runTestsWithCallback = async ({
         PrepareTestsOrAttach.state.promise = undefined
         const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
           attachedToPageTimeout,
+          clearExtensions,
           commit,
           connectionId,
           cwd,

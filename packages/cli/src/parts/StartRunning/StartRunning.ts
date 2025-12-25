@@ -25,6 +25,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
   const {
     bisect,
     checkLeaks,
+    clearExtensions,
     color,
     commit,
     continueValue,
@@ -66,6 +67,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
   const result = await rpc.invoke(TestWorkerCommandType.RunTests, {
     bisect,
     checkLeaks,
+    clearExtensions,
     color,
     commit,
     continueValue,

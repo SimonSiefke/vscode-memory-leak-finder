@@ -1,6 +1,7 @@
 export interface StartRunningOptions {
   readonly bisect: boolean
   readonly checkLeaks: boolean
+  readonly clearExtensions: boolean
   readonly color: boolean
   readonly commit: string
   readonly continueValue: string

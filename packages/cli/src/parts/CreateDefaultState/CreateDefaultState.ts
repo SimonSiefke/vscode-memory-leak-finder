@@ -43,4 +43,5 @@ export const createDefaultState = (): StdinDataState => ({
   value: '',
   watch: false,
   workers: false,
+  clearExtensions: true,
 })

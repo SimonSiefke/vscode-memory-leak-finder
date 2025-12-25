@@ -28,6 +28,7 @@ export const parseArgv = (argv: readonly string[]) => {
   const options = {
     bisect: false,
     checkLeaks: false,
+    clearExtensions: false,
     color: true,
     commit: '',
     continueValue: '',
@@ -168,6 +169,9 @@ export const parseArgv = (argv: readonly string[]) => {
   }
   if (argv.includes('--screencast-quality')) {
     options.screencastQuality = parseArgvNumber(argv, '--screencast-quality')
+  }
+  if (argv.includes('--clear-extensions')) {
+    options.clearExtensions = true
   }
   return options
 }

@@ -1,5 +1,6 @@
 import { copyFile, mkdir, rm } from 'node:fs/promises'
 import { dirname } from 'node:path'
+import * as ClearExtensionsDirIfEmpty from '../ClearExtensionsDirIfEmpty/ClearExtensionsDirIfEmpty.ts'
 import * as CreateTestWorkspace from '../CreateTestWorkspace/CreateTestWorkspace.ts'
 import * as DefaultVscodeSettingsPath from '../DefaultVscodeSettingsPath/DefaultVsCodeSettingsPath.ts'
 import * as GetBinaryPath from '../GetBinaryPath/GetBinaryPath.ts'
@@ -19,6 +20,7 @@ import { VError } from '../VError/VError.ts'
 
 export const launchVsCode = async ({
   addDisposable,
+  clearExtensions,
   commit,
   cwd,
   enableExtensions,
@@ -36,6 +38,7 @@ export const launchVsCode = async ({
   vscodeVersion,
 }: {
   addDisposable: (fn: () => Promise<void> | void) => void
+  clearExtensions: boolean
   commit: string
   cwd: string
   enableExtensions: boolean
@@ -73,8 +76,12 @@ export const launchVsCode = async ({
     const binaryPath = await GetBinaryPath.getBinaryPath(vscodeVersion, vscodePath, commit, insidersCommit)
     const userDataDir = GetUserDataDir.getUserDataDir()
     const extensionsDir = GetExtensionsDir.getExtensionsDir()
-    await rm(extensionsDir, { force: true, recursive: true })
-    await mkdir(extensionsDir)
+    if (clearExtensions) {
+      await rm(extensionsDir, { force: true, recursive: true })
+      await mkdir(extensionsDir)
+    } else {
+      await ClearExtensionsDirIfEmpty.clearExtensionsDirIfEmpty(extensionsDir)
+    }
     const defaultSettingsSourcePath = DefaultVscodeSettingsPath.defaultVsCodeSettingsPath
     const settingsPath = join(userDataDir, 'User', 'settings.json')
     await mkdir(dirname(settingsPath), { recursive: true })
