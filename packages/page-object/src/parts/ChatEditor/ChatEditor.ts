@@ -106,10 +106,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         exists: [],
       },
       verify = false,
-<<<<<<< HEAD
       viewLinesText = '',
-=======
->>>>>>> origin/main
     }) {
       try {
         await page.waitForIdle()
