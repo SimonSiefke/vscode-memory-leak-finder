@@ -20,7 +20,6 @@ const cleanupTestFile = async (filePath: string): Promise<void> => {
 }
 
 test.skip('should return empty array when no closures leaked', async () => {
-  const ITEMS_PER_NODE = 7
   const snapshotBefore = {
     snapshot: {
       meta: {

@@ -1,3 +1,4 @@
+import type { Session } from '../Session/Session.ts'
 import * as CompareCount from '../CompareCount/CompareCount.ts'
 import * as GetEventListenerCount from '../GetEventListenerCount/GetEventListenerCount.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
@@ -8,15 +9,15 @@ export const id = MeasureId.EventListenerCount
 
 export const targets = [TargetId.Browser]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   return [session]
 }
 
-export const start = (session) => {
+export const start = (session: Session) => {
   return GetEventListenerCount.getEventListenerCount(session)
 }
 
-export const stop = (session) => {
+export const stop = (session: Session) => {
   return GetEventListenerCount.getEventListenerCount(session)
 }
 

@@ -1,23 +1,26 @@
+import type { Session } from '../Session/Session.ts'
 import * as CompareCount from '../CompareCount/CompareCount.ts'
 import * as GetIntersectionObserverCount from '../GetIntersectionObserverCount/GetIntersectionObserverCount.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
+import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.IntersectionObserverCount
 
 export const targets = [TargetId.Browser]
 
-export const create = (session) => {
-  return [session]
+export const create = (session: Session) => {
+  const objectGroup = ObjectGroupId.create()
+  return [session, objectGroup]
 }
 
-export const start = (session) => {
-  return GetIntersectionObserverCount.getIntersectionObserverCount(session)
+export const start = (session: Session, objectGroup: string) => {
+  return GetIntersectionObserverCount.getIntersectionObserverCount(session, objectGroup)
 }
 
-export const stop = (session) => {
-  return GetIntersectionObserverCount.getIntersectionObserverCount(session)
+export const stop = (session: Session, objectGroup: string) => {
+  return GetIntersectionObserverCount.getIntersectionObserverCount(session, objectGroup)
 }
 
 export const compare = CompareCount.compareCount

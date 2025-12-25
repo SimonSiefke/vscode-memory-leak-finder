@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs'
 import { readdir } from 'node:fs/promises'
-import { join } from 'path'
+import { join } from 'node:path'
 import * as ReadJson from '../ReadJson/ReadJson.ts'
 
 export const getCountData = async (name: string, key: string, basePath: string): Promise<any[]> => {
@@ -15,9 +15,9 @@ export const getCountData = async (name: string, key: string, basePath: string):
     const absolutePath = join(resultsPath, dirent)
     const data = await ReadJson.readJson(absolutePath)
     allData.push({
-      name: dirent,
       count: data[key]?.after || 0,
       index: index++,
+      name: dirent,
     })
   }
   return allData

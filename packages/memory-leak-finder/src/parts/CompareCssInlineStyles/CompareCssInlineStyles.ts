@@ -22,7 +22,7 @@ export const compareCssInlineStyles = (before, after) => {
   const prettyBefore = prettifyMap(before)
   const prettyAfter = prettifyMap(after)
   return {
-    before: prettyBefore,
     after: prettyAfter,
+    before: prettyBefore,
   }
 }

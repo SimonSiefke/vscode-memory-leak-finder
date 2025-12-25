@@ -1,5 +1,5 @@
-import { writeFile } from 'fs/promises'
-import { join } from 'path'
+import { writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import { importHeapSnapshotWorker } from './import-heap-snapshot-worker.ts'
 
 async function testGetObjectsWithProperties(): Promise<void> {
@@ -14,7 +14,7 @@ async function testGetObjectsWithProperties(): Promise<void> {
 
   try {
     const { analyzeNodeFromFile } = await importHeapSnapshotWorker('parts/ExamineNode/ExamineNode.ts')
-    const id = 302297
+    const id = 302_297
     const r = await analyzeNodeFromFile(heapSnapshotPath, id)
 
     console.log(JSON.stringify(r, null, 2))

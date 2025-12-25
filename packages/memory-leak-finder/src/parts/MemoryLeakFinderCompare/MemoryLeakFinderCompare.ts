@@ -1,7 +1,7 @@
-import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinderState.ts'
 import * as Assert from '../Assert/Assert.ts'
-import * as JsonFile from '../JsonFile/JsonFile.ts'
 import { getSummary } from '../GetSummary/GetSummary.ts'
+import * as JsonFile from '../JsonFile/JsonFile.ts'
+import * as MemoryLeakFinderState from '../MemoryLeakFinderState/MemoryLeakFinderState.ts'
 
 export const compare = async (connectionId: number, context: any, resultPath: string): Promise<any> => {
   Assert.number(connectionId)
@@ -10,7 +10,7 @@ export const compare = async (connectionId: number, context: any, resultPath: st
   if (!measure) {
     throw new Error(`no measure found`)
   }
-  const { before, after } = measure
+  const { after, before } = measure
   if (!before) {
     throw new Error(`before missing`)
   }

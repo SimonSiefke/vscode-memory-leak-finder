@@ -2,13 +2,13 @@ import * as GetFunctionCountsData from '../GetFunctionCountsData/GetFunctionCoun
 
 export const name = 'function-count'
 
-export const getData = (basePath: string) => GetFunctionCountsData.getFunctionCountsData(basePath)
+export const getData = (basePath: string): Promise<any[]> => GetFunctionCountsData.getFunctionCountsData(basePath)
 
-export const createChart = () => {
+export const createChart = (): { x: string; xLabel: string; y: string; yLabel: string } => {
   return {
     x: 'index',
-    y: 'count',
     xLabel: 'Index',
+    y: 'count',
     yLabel: 'Function Count',
   }
 }

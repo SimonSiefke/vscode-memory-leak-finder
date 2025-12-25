@@ -2,13 +2,13 @@ import { test, expect, jest } from '@jest/globals'
 
 test('FinalizeChapters - should return early if native ffmpeg not available', async () => {
   jest.unstable_mockModule('fs', () => ({
-    existsSync: jest.fn(() => false),
-    statSync: jest.fn(() => false),
-    readFileSync: jest.fn(() => ''),
     appendFileSync: jest.fn(() => {}),
-    writeFileSync: jest.fn(() => {}),
     createReadStream: jest.fn(() => {}),
     createWriteStream: jest.fn(() => {}),
+    existsSync: jest.fn(() => false),
+    readFileSync: jest.fn(() => ''),
+    statSync: jest.fn(() => false),
+    writeFileSync: jest.fn(() => {}),
   }))
 
   const { finalizeChapters } = await import('../src/parts/FinalizeChapters/FinalizeChapters.ts')
@@ -23,12 +23,12 @@ test('FinalizeChapters - should handle case when ffmpeg is available', async () 
   }))
 
   jest.unstable_mockModule('fs/promises', () => ({
-    readFile: jest.fn(() => Promise.resolve(';FFMETADATA1\n')),
-    writeFile: jest.fn(() => Promise.resolve()),
+    readFile: jest.fn(async () => ';FFMETADATA1\n'),
+    writeFile: jest.fn(async () => {}),
   }))
 
   jest.unstable_mockModule('../src/parts/Exec/Exec.ts', () => ({
-    exec: jest.fn(() => Promise.resolve({})),
+    exec: jest.fn(async () => ({})),
   }))
 
   jest.unstable_mockModule('../src/parts/FfmpegProcessState/FfmpegProcessState.ts', () => ({

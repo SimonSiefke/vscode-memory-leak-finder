@@ -6,16 +6,16 @@ const parseUrl = (stackLine) => {
   const urlMatch = stackLine.match(RE_URL)
   if (!urlMatch) {
     return {
-      url: '',
-      line: 0,
       column: 0,
+      line: 0,
+      url: '',
     }
   }
   return {
+    column: Number.parseInt(urlMatch[4]),
+    line: Number.parseInt(urlMatch[3]),
     prefix: urlMatch[1],
     url: urlMatch[2],
-    line: Number.parseInt(urlMatch[3]),
-    column: Number.parseInt(urlMatch[4]),
   }
 }
 
@@ -31,14 +31,14 @@ export const getEventListenerQuery = (stacks, scriptMap) => {
     originalIndex++
     for (const stackLine of stack) {
       originalIndex++
-      const { prefix, url, line, column } = parseUrl(stackLine)
+      const { column, line, prefix, url } = parseUrl(stackLine)
       const sourceMapUrl = reverseScriptMap[url]
       const formattedUrl = FormatUrl.formatUrl(url, line - 1, column)
       const newStackLine = `${prefix}(${formattedUrl})`
       allQueries.push({
         originalIndex,
-        stack: [newStackLine],
         sourceMaps: [sourceMapUrl],
+        stack: [newStackLine],
       })
     }
   }

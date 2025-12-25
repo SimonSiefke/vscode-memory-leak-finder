@@ -1,14 +1,16 @@
-import { join } from 'path'
+import { join } from 'node:path'
 import type { Session } from '../Session/Session.ts'
 import * as HeapSnapshot from '../HeapSnapshot/HeapSnapshot.ts'
 import * as HeapSnapshotFunctions from '../HeapSnapshotFunctions/HeapSnapshotFunctions.ts'
+import { launchHeapSnapshotWorker } from '../LaunchHeapSnapshotWorker/LaunchHeapSnapshotWorker.ts'
 import * as Root from '../Root/Root.ts'
 
 export const getLargestArrayCount = async (session: Session, objectGroup: string, id: number): Promise<any> => {
   const outFile = join(Root.root, '.vscode-heapsnapshots', `largest-array-count-${id}.json`)
   await HeapSnapshot.takeHeapSnapshot(session, outFile)
-  await HeapSnapshotFunctions.loadHeapSnapshot(outFile)
-  const arrays = await HeapSnapshotFunctions.getLargestArraysFromHeapSnapshot(outFile)
-  await HeapSnapshotFunctions.disposeHeapSnapshot(outFile)
+  await using rpc = await launchHeapSnapshotWorker()
+  await HeapSnapshotFunctions.loadHeapSnapshot(rpc, outFile)
+  const arrays = await HeapSnapshotFunctions.getLargestArraysFromHeapSnapshot(rpc, outFile)
+  await HeapSnapshotFunctions.disposeHeapSnapshot(rpc, outFile)
   return arrays
 }

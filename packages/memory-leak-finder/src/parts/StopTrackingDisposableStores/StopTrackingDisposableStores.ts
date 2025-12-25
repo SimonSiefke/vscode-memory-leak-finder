@@ -1,7 +1,8 @@
+import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as GetDisposableStores from '../GetDisposableStores/GetDisposableStores.ts'
 
-export const stopTrackingDisposableStores = async (session, objectGroup) => {
+export const stopTrackingDisposableStores = async (session: Session, objectGroup: string) => {
   const fnResult1 = await GetDisposableStores.getDisposableStores(session, objectGroup)
   await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
@@ -17,8 +18,8 @@ export const stopTrackingDisposableStores = async (session, objectGroup) => {
 
   delete globalThis.___disposableStoreOriginalAdd
 }`,
+    objectGroup,
     objectId: fnResult1.objectId,
     returnByValue: false,
-    objectGroup,
   })
 }

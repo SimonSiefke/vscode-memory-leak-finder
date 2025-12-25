@@ -1,12 +1,25 @@
-import { mkdir, writeFile } from 'fs/promises'
-import { join } from 'path'
+import { mkdir, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
+import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
 import * as Root from '../Root/Root.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
+import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
 import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
 
-export const savePostBody = async (method: string, url: string, headers: Record<string, string>, body: Buffer): Promise<void> => {
+export const savePostBody = async (
+  method: string,
+  url: string,
+  headers: Record<string, string>,
+  body: Buffer,
+  responseData?: {
+    statusCode: number
+    statusMessage: string | undefined
+    responseHeaders: Record<string, string | string[]>
+    responseData: Buffer
+  },
+): Promise<void> => {
   if (method !== 'POST' && method !== 'PUT' && method !== 'PATCH') {
     return
   }
@@ -67,6 +80,52 @@ export const savePostBody = async (method: string, url: string, headers: Record<
       rawBody: bodyFormat === 'zip' ? undefined : body.toString('utf8'),
       timestamp,
       url,
+    }
+
+    // Add response data if available
+    if (responseData) {
+      const responseContentEncoding = responseData.responseHeaders['content-encoding'] || responseData.responseHeaders['Content-Encoding']
+      const responseContentType = responseData.responseHeaders['content-type'] || responseData.responseHeaders['Content-Type']
+      const responseContentTypeLower = responseContentType
+        ? (Array.isArray(responseContentType) ? responseContentType[0] : responseContentType).toLowerCase()
+        : ''
+
+      let parsedResponseBody: any
+      let responseWasCompressed = false
+      let responseBodyFormat = 'text'
+
+      // Handle zip files separately - don't decompress them
+      // Handle SSE (Server-Sent Events) separately - save as text file
+      if (responseContentTypeLower.includes('application/zip')) {
+        const zipFilePath = await SaveZipData.saveZipData(responseData.responseData, url, timestamp)
+        parsedResponseBody = `file-reference:${zipFilePath}`
+        responseBodyFormat = 'zip'
+      } else if (responseContentTypeLower.includes('text/event-stream')) {
+        const sseFilePath = await SaveSseData.saveSseData(responseData.responseData, url, timestamp)
+        parsedResponseBody = `file-reference:${sseFilePath}`
+        responseBodyFormat = 'sse'
+      } else {
+        const compressionWorker = await CompressionWorker.getCompressionWorker()
+        const result = await compressionWorker.invoke('Compression.decompressBody', responseData.responseData, responseContentEncoding)
+        const decompressedBody = result.body
+        responseWasCompressed = result.wasCompressed
+        // @ts-ignore
+        parsedResponseBody = parseJsonIfApplicable(decompressedBody, responseContentType)
+        if (responseContentTypeLower.includes('application/json')) {
+          responseBodyFormat = 'json'
+        }
+      }
+
+      // @ts-ignore
+      postData.response = {
+        body: parsedResponseBody,
+        bodyFormat: responseBodyFormat,
+        headers: responseData.responseHeaders,
+        rawBody: responseBodyFormat === 'zip' || responseBodyFormat === 'sse' ? undefined : responseData.responseData.toString('utf8'),
+        statusCode: responseData.statusCode,
+        statusMessage: responseData.statusMessage,
+        wasCompressed: responseWasCompressed,
+      }
     }
 
     await writeFile(filepath, JSON.stringify(postData, null, 2), 'utf8')

@@ -2,13 +2,13 @@ import * as GetAbortControllerCountData from '../GetAbortControllerCountData/Get
 
 export const name = 'abort-controller-count'
 
-export const getData = (basePath: string) => GetAbortControllerCountData.getAbortControllerCountData(basePath)
+export const getData = (basePath: string): Promise<any[]> => GetAbortControllerCountData.getAbortControllerCountData(basePath)
 
-export const createChart = () => {
+export const createChart = (): { x: string; xLabel: string; y: string; yLabel: string } => {
   return {
     x: 'index',
-    y: 'count',
     xLabel: 'Index',
+    y: 'count',
     yLabel: 'AbortController Count',
   }
 }

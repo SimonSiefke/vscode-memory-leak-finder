@@ -2,9 +2,7 @@
   "name": "@vscode-memory-leak-finder/heap-snapshot-parsing-worker",
   "version": "0.0.0-dev",
   "description": "Worker for parsing heap snapshots with zero-copy transfer",
-  "keywords": [],
   "license": "MIT",
-  "author": "",
   "type": "module",
   "main": "src/main.ts",
   "bin": {
@@ -62,7 +60,6 @@
       "distmin"
     ]
   },
-  "dependencies": {},
   "devDependencies": {
     "@types/node": "^25.0.3"
   }

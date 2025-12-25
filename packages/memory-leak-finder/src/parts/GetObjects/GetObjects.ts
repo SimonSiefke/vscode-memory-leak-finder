@@ -1,15 +1,16 @@
+import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
-export const getObjects = async (session, objectGroup?: string) => {
+export const getObjects = async (session: Session, objectGroup?: string) => {
   const prototype = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Object,
-    returnByValue: false,
     objectGroup,
+    returnByValue: false,
   })
   const objects = await DevtoolsProtocolRuntime.queryObjects(session, {
-    prototypeObjectId: prototype.objectId,
     objectGroup,
+    prototypeObjectId: prototype.objectId,
   })
 
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
@@ -40,9 +41,9 @@ export const getObjects = async (session, objectGroup?: string) => {
   const values = getAllValues(objects)
   return values
 }`,
+    objectGroup,
     objectId: objects.objects.objectId,
     returnByValue: false,
-    objectGroup,
   })
   return fnResult1
 }

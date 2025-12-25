@@ -1,9 +1,9 @@
 import { fork } from 'node:child_process'
 
-export const create = async ({ url, execArgv = [] }) => {
+export const create = async ({ execArgv = [], url }) => {
   const childProcess = fork(url, ['--ipc-type=forked-process'], {
-    stdio: 'pipe',
     execArgv,
+    stdio: 'pipe',
   })
   childProcess.stdout?.pipe(process.stdout)
   childProcess.stderr?.pipe(process.stderr)
@@ -13,14 +13,6 @@ export const create = async ({ url, execArgv = [] }) => {
 export const wrap = (childProcess) => {
   return {
     childProcess,
-    send(message) {
-      this.childProcess.send(message)
-    },
-    set onmessage(listener) {
-      this.childProcess.on('message', listener)
-    },
-    stdout: childProcess.stdout,
-    stderr: childProcess.stderr,
     dispose() {
       this.childProcess.kill()
     },
@@ -38,15 +30,23 @@ export const wrap = (childProcess) => {
     },
     once(event, listener) {
       switch (event) {
-        case 'exit':
-          this.childProcess.once('exit', listener)
-          break
         case 'error':
           this.childProcess.once('error', listener)
+          break
+        case 'exit':
+          this.childProcess.once('exit', listener)
           break
         default:
           throw new Error('unexpected listener')
       }
     },
+    set onmessage(listener) {
+      this.childProcess.on('message', listener)
+    },
+    send(message) {
+      this.childProcess.send(message)
+    },
+    stderr: childProcess.stderr,
+    stdout: childProcess.stdout,
   }
 }

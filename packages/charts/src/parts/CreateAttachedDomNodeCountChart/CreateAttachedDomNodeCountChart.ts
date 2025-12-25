@@ -2,13 +2,13 @@ import * as GetAttachedDomNodeCountData from '../GetAttachedDomNodeCountData/Get
 
 export const name = 'attached-dom-node-count'
 
-export const getData = (basePath: string) => GetAttachedDomNodeCountData.getAttachedDomNodeCountData(basePath)
+export const getData = (basePath: string): Promise<any[]> => GetAttachedDomNodeCountData.getAttachedDomNodeCountData(basePath)
 
-export const createChart = () => {
+export const createChart = (): { x: string; xLabel: string; y: string; yLabel: string } => {
   return {
     x: 'index',
-    y: 'count',
     xLabel: 'Index',
+    y: 'count',
     yLabel: 'Attached Dom Node Count',
   }
 }

@@ -1,5 +1,5 @@
-import { spawn } from 'child_process'
-import { existsSync } from 'fs'
+import { spawn } from 'node:child_process'
+import { existsSync } from 'node:fs'
 import * as Assert from '../Assert/Assert.ts'
 import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.ts'
 import * as GetFfmpegOptions from '../GetFfmpegOptions/GetFfmpegOptions.ts'

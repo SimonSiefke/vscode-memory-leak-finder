@@ -1,3 +1,4 @@
+import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
 /**
@@ -5,7 +6,7 @@ import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts
  * @param {string} objectGroup
  * @returns {Promise<any>}
  */
-export const startTrackingMutationObserverStackTraces = async (session, objectGroup, key) => {
+export const startTrackingMutationObserverStackTraces = async (session: Session, objectGroup, key) => {
   await DevtoolsProtocolRuntime.evaluate(session, {
     expression: `(()=>{
 

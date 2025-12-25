@@ -1,9 +1,9 @@
 import clipboard from 'clipboardy'
-import { readFile } from 'fs/promises'
-import { isAbsolute, join } from 'path'
+import { readFile } from 'node:fs/promises'
+import { isAbsolute, join } from 'node:path'
 import { getPrompt } from './getPrompt.ts'
 
-const dirname = import.meta.dirname
+const { dirname } = import.meta
 
 const root = join(dirname, '..', '..', '..')
 

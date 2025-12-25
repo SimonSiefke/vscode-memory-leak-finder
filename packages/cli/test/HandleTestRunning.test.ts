@@ -13,7 +13,7 @@ jest.unstable_mockModule('../src/parts/StdinDataState/StdinDataState.ts', () => 
 
 jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   return {
-    write: jest.fn().mockImplementation(() => Promise.resolve()),
+    write: jest.fn().mockImplementation(async () => {}),
   }
 })
 

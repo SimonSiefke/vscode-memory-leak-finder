@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join } from 'node:path'
 import * as Assert from '../Assert/Assert.ts'
 import * as DownloadAndExtract from '../DownloadAndExtract/DownloadAndExtract.ts'
 import * as GetDownloadUrls from '../GetDownloadUrls/GetDownloadUrls.ts'

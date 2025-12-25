@@ -1,6 +1,6 @@
-import { mkdir, writeFile } from 'fs/promises'
+import { mkdir, writeFile } from 'node:fs/promises'
+import { dirname, join } from 'node:path'
 import { importHeapSnapshotWorker } from './import-heap-snapshot-worker.ts'
-import { dirname, join } from 'path'
 
 async function testGetObjectsWithProperties(): Promise<void> {
   const [{ getAddedObjectsWithPropertiesInternalAst }, { prepareHeapSnapshot }] = await Promise.all([

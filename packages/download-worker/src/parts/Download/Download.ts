@@ -1,9 +1,9 @@
 import { VError } from '@lvce-editor/verror'
-import { createWriteStream } from 'fs'
-import { mkdir } from 'fs/promises'
+import { createWriteStream } from 'node:fs'
+import { mkdir } from 'node:fs/promises'
 import got from 'got'
-import { dirname } from 'path'
-import { pipeline } from 'stream/promises'
+import { dirname } from 'node:path'
+import { pipeline } from 'node:stream/promises'
 
 export const download = async (name: string, downloadUrls: string[], outFile: string): Promise<void> => {
   try {

@@ -22,9 +22,9 @@ export const compareNumbers = (before, after) => {
     const afterCount = afterMap[element] || 0
     const delta = afterCount - beforeCount
     result.push({
-      value: element,
       count: afterCount,
       delta,
+      value: element,
     })
   }
   const sortedResult = SortCountMap.sortCountMap(result)

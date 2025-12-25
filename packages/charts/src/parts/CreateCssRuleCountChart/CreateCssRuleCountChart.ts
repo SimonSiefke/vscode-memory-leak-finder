@@ -2,13 +2,13 @@ import * as GetCssRuleCountData from '../GetCssRuleCountData/GetCssRuleCountData
 
 export const name = 'css-rule-count'
 
-export const getData = (basePath: string) => GetCssRuleCountData.getCssRuleCountData(basePath)
+export const getData = (basePath: string): Promise<any[]> => GetCssRuleCountData.getCssRuleCountData(basePath)
 
-export const createChart = () => {
+export const createChart = (): { x: string; xLabel: string; y: string; yLabel: string } => {
   return {
     x: 'index',
-    y: 'count',
     xLabel: 'Index',
+    y: 'count',
     yLabel: 'Css Rule Count',
   }
 }

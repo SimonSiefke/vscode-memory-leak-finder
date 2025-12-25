@@ -1,27 +1,5 @@
 export const create = ({ expect, page, VError }) => {
   return {
-    isFirst: false,
-    async show() {
-      try {
-        const terminal = page.locator('.terminal.xterm')
-        await expect(terminal).toBeVisible()
-        await page.waitForIdle()
-        await page.keyboard.press('Control+i')
-        await page.waitForIdle()
-        const terminalInlineChat = page.locator('.terminal-split-pane .terminal-inline-chat:not(.hide)')
-        await expect(terminalInlineChat).toBeVisible()
-        await page.waitForIdle()
-        const editor = terminalInlineChat.locator('.monaco-editor[data-uri^="chatSessionInput"]')
-        await expect(editor).toBeVisible()
-        const editContext = editor.locator('.native-edit-context')
-        await expect(editContext).toBeVisible()
-        await page.waitForIdle()
-        await expect(editContext).toBeFocused()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to show terminal inline chat`)
-      }
-    },
     async hide() {
       try {
         await page.waitForIdle()
@@ -44,7 +22,8 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to hide terminal inline chat`)
       }
     },
-    async sendMessage({ verify = true, message }) {
+    isFirst: false,
+    async sendMessage({ message, verify = true }) {
       const terminal = page.locator('.terminal.xterm')
       await expect(terminal).toBeVisible()
       await page.waitForIdle()
@@ -95,6 +74,27 @@ export const create = ({ expect, page, VError }) => {
       try {
       } catch (error) {
         throw new VError(error, `Failed to send message`)
+      }
+    },
+    async show() {
+      try {
+        const terminal = page.locator('.terminal.xterm')
+        await expect(terminal).toBeVisible()
+        await page.waitForIdle()
+        await page.keyboard.press('Control+i')
+        await page.waitForIdle()
+        const terminalInlineChat = page.locator('.terminal-split-pane .terminal-inline-chat:not(.hide)')
+        await expect(terminalInlineChat).toBeVisible()
+        await page.waitForIdle()
+        const editor = terminalInlineChat.locator('.monaco-editor[data-uri^="chatSessionInput"]')
+        await expect(editor).toBeVisible()
+        const editContext = editor.locator('.native-edit-context')
+        await expect(editContext).toBeVisible()
+        await page.waitForIdle()
+        await expect(editContext).toBeFocused()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to show terminal inline chat`)
       }
     },
   }

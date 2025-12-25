@@ -1,3 +1,4 @@
+import type { Session } from '../Session/Session.ts'
 import * as CompareCssInlineStyles from '../CompareCssInlineStyles/CompareCssInlineStyles.ts'
 import * as GetCssInlineStyles from '../GetCssInlineStyles/GetCssInlineStyles.ts'
 import * as IsLeakCssInlineStyles from '../IsLeakCssInlineStyles/IsLeakCssInlineStyles.ts'
@@ -9,16 +10,16 @@ export const id = MeasureId.CssInlineStyles
 
 export const targets = [TargetId.Browser]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]
 }
 
-export const start = (session, objectGroup) => {
+export const start = (session: Session, objectGroup: string) => {
   return GetCssInlineStyles.getCssInlineStyles(session, objectGroup)
 }
 
-export const stop = (session, objectGroup) => {
+export const stop = (session: Session, objectGroup: string) => {
   return GetCssInlineStyles.getCssInlineStyles(session, objectGroup)
 }
 

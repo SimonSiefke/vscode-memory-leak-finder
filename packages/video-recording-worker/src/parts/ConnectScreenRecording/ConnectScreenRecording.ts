@@ -3,10 +3,9 @@ import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 import { DevtoolsProtocolPage } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as FfmpegProcessState from '../FfmpegProcessState/FfmpegProcessState.ts'
 import * as PTimeout from '../PTimeout/PTimeout.ts'
-import * as ScreencastQuality from '../ScreencastQuality/ScreencastQuality.ts'
 import * as VideosPath from '../VideosPath/VideosPath.ts'
 
-export const connectScreenRecording = async (sessionRpc: any, attachedToPageTimeout: number): Promise<void> => {
+export const connectScreenRecording = async (sessionRpc: any, attachedToPageTimeout: number, screencastQuality: number): Promise<void> => {
   const handleFrame = async (message: any): Promise<void> => {
     const ffmpegProcess = FfmpegProcessState.get()
     if (!ffmpegProcess || !ffmpegProcess.stdin) {
@@ -25,9 +24,9 @@ export const connectScreenRecording = async (sessionRpc: any, attachedToPageTime
       DevtoolsProtocolPage.enable(sessionRpc),
       DevtoolsProtocolPage.startScreencast(sessionRpc, {
         format: 'jpeg',
-        quality: ScreencastQuality.screencastQuality,
-        maxWidth: 1024,
         maxHeight: 768,
+        maxWidth: 1024,
+        quality: screencastQuality,
       }),
     ]),
     {

@@ -26,7 +26,7 @@ class HeapSnapshotWriteStream extends Writable {
   strings: string[]
   validate: any
 
-  constructor(options) {
+  constructor(options: { parseStrings?: boolean; validate?: boolean } = {}) {
     super()
     this.arrayIndex = 0
     this.currentNumber = 0
@@ -51,8 +51,8 @@ class HeapSnapshotWriteStream extends Writable {
     this.hasDigits = false
   }
 
-  writeMetaData(chunk) {
-    this.data = concatArray(this.data, chunk)
+  writeMetaData(chunk: Uint8Array): void {
+    this.data = concatArray(this.data, chunk) as Uint8Array
     const dataString = decodeArray(this.data)
     const metaData = parseHeapSnapshotMetaData(dataString)
     if (metaData === EMPTY_DATA) {
@@ -70,8 +70,8 @@ class HeapSnapshotWriteStream extends Writable {
     this.handleChunk(rest)
   }
 
-  writeParsingArrayMetaData(chunk, nodeName, nextState) {
-    this.data = concatArray(this.data, chunk)
+  writeParsingArrayMetaData(chunk: Uint8Array, nodeName: string, nextState: number): void {
+    this.data = concatArray(this.data, chunk) as Uint8Array
     const dataString = decodeArray(this.data)
     const endIndex = parseHeapSnapshotArrayHeader(dataString, nodeName)
     if (endIndex === -1) {
@@ -86,13 +86,13 @@ class HeapSnapshotWriteStream extends Writable {
     this.handleChunk(rest)
   }
 
-  writeParsingNodesMetaData(chunk) {
+  writeParsingNodesMetaData(chunk: Uint8Array): void {
     this.writeParsingArrayMetaData(chunk, TokenType.Nodes, HeapSnapshotParsingState.ParsingNodes)
   }
 
-  writeArrayData(chunk, array, nextState) {
+  writeArrayData(chunk: Uint8Array, array: Uint32Array, nextState: number): void {
     // Parse the chunk directly - no concatenation needed due to stateful parsing
-    const { dataIndex, arrayIndex, done, currentNumber, hasDigits } = parseHeapSnapshotArray(
+    const { arrayIndex, currentNumber, dataIndex, done, hasDigits } = parseHeapSnapshotArray(
       chunk,
       array,
       this.arrayIndex,
@@ -130,25 +130,25 @@ class HeapSnapshotWriteStream extends Writable {
     // When not done, we don't need to store leftover data - the parsing state handles it
   }
 
-  writeParsingNodes(chunk) {
+  writeParsingNodes(chunk: Uint8Array): void {
     this.writeArrayData(chunk, this.nodes, HeapSnapshotParsingState.ParsingEdgesMetaData)
   }
 
-  writeParsingEdgesMetaData(chunk) {
+  writeParsingEdgesMetaData(chunk: Uint8Array): void {
     this.writeParsingArrayMetaData(chunk, TokenType.Edges, HeapSnapshotParsingState.ParsingEdges)
   }
 
-  writeParsingEdges(chunk) {
+  writeParsingEdges(chunk: Uint8Array): void {
     this.writeArrayData(chunk, this.edges, HeapSnapshotParsingState.ParsingLocationsMetaData)
   }
 
-  writeParsingLocationsMetaData(chunk) {
+  writeParsingLocationsMetaData(chunk: Uint8Array): void {
     this.writeParsingArrayMetaData(chunk, TokenType.Locations, HeapSnapshotParsingState.ParsingLocations)
   }
 
-  writeResizableArrayData(chunk, nextState) {
+  writeResizableArrayData(chunk: Uint8Array, nextState: number): void {
     // Parse the chunk directly - no concatenation needed due to stateful parsing
-    const { dataIndex, arrayIndex, done, currentNumber, hasDigits } = parseHeapSnapshotArray(
+    const { arrayIndex, currentNumber, dataIndex, done, hasDigits } = parseHeapSnapshotArray(
       chunk,
       this.intermediateArray,
       0,
@@ -163,7 +163,7 @@ class HeapSnapshotWriteStream extends Writable {
 
     // Concatenate the parsed numbers to the main array
     const parsedNumbers = this.intermediateArray.slice(0, arrayIndex)
-    this.locations = concatUint32Array(this.locations, parsedNumbers)
+    this.locations = concatUint32Array(this.locations, parsedNumbers) as Uint32Array
 
     // Update parsing state for next chunk
     this.currentNumber = currentNumber
@@ -178,7 +178,7 @@ class HeapSnapshotWriteStream extends Writable {
     // When not done, we don't need to store leftover data - the parsing state handles it
   }
 
-  writeParsingLocations(chunk) {
+  writeParsingLocations(chunk: Uint8Array): void {
     if (this.options.parseStrings) {
       this.writeResizableArrayData(chunk, HeapSnapshotParsingState.ParsingStringsMetaData)
     } else {
@@ -186,12 +186,12 @@ class HeapSnapshotWriteStream extends Writable {
     }
   }
 
-  writeParsingStringsMetaData(chunk) {
+  writeParsingStringsMetaData(chunk: Uint8Array): void {
     this.writeParsingArrayMetaData(chunk, 'strings', HeapSnapshotParsingState.ParsingStrings)
   }
 
-  writeParsingStrings(chunk) {
-    this.data = concatArray(this.data, chunk)
+  writeParsingStrings(chunk: Uint8Array): void {
+    this.data = concatArray(this.data, chunk) as Uint8Array
     // Parse the chunk directly - no concatenation needed due to stateful parsing
     const { dataIndex, done } = parseStringArray(this.data, this.strings)
 
@@ -211,43 +211,43 @@ class HeapSnapshotWriteStream extends Writable {
     // When not done, we don't need to store leftover data - the parsing state handles it
   }
 
-  handleChunk(chunk) {
+  handleChunk(chunk: Uint8Array): void {
     switch (this.state) {
-      case HeapSnapshotParsingState.SearchingSnapshotMetaData:
-        this.writeMetaData(chunk)
-        break
-      case HeapSnapshotParsingState.ParsingNodesMetaData:
-        this.writeParsingNodesMetaData(chunk)
-        break
-      case HeapSnapshotParsingState.ParsingNodes:
-        this.writeParsingNodes(chunk)
-        break
-      case HeapSnapshotParsingState.ParsingEdgesMetaData:
-        this.writeParsingEdgesMetaData(chunk)
+      case HeapSnapshotParsingState.Done:
         break
       case HeapSnapshotParsingState.ParsingEdges:
         this.writeParsingEdges(chunk)
         break
-      case HeapSnapshotParsingState.ParsingLocationsMetaData:
-        this.writeParsingLocationsMetaData(chunk)
+      case HeapSnapshotParsingState.ParsingEdgesMetaData:
+        this.writeParsingEdgesMetaData(chunk)
         break
       case HeapSnapshotParsingState.ParsingLocations:
         this.writeParsingLocations(chunk)
         break
-      case HeapSnapshotParsingState.ParsingStringsMetaData:
-        this.writeParsingStringsMetaData(chunk)
+      case HeapSnapshotParsingState.ParsingLocationsMetaData:
+        this.writeParsingLocationsMetaData(chunk)
+        break
+      case HeapSnapshotParsingState.ParsingNodes:
+        this.writeParsingNodes(chunk)
+        break
+      case HeapSnapshotParsingState.ParsingNodesMetaData:
+        this.writeParsingNodesMetaData(chunk)
         break
       case HeapSnapshotParsingState.ParsingStrings:
         this.writeParsingStrings(chunk)
         break
-      case HeapSnapshotParsingState.Done:
+      case HeapSnapshotParsingState.ParsingStringsMetaData:
+        this.writeParsingStringsMetaData(chunk)
+        break
+      case HeapSnapshotParsingState.SearchingSnapshotMetaData:
+        this.writeMetaData(chunk)
         break
       default:
         break
     }
   }
 
-  _write(chunk, encoding, callback) {
+  _write(chunk: Buffer, encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
     this.handleChunk(chunk)
     callback()
   }
@@ -264,7 +264,7 @@ class HeapSnapshotWriteStream extends Writable {
     }
   }
 
-  _final(callback) {
+  _final(callback: (error?: Error | null) => void): void {
     if (this.validate) {
       this.validateRequiredMetadata()
     }
@@ -275,12 +275,12 @@ class HeapSnapshotWriteStream extends Writable {
   getResult() {
     const { data } = this.metaData
     return {
-      node_count: data.node_count,
       edge_count: data.edge_count,
-      meta: data.meta,
       edges: this.edges,
-      nodes: this.nodes,
       locations: this.locations,
+      meta: data.meta,
+      node_count: data.node_count,
+      nodes: this.nodes,
       strings: this.strings,
     }
   }
@@ -292,6 +292,8 @@ class HeapSnapshotWriteStream extends Writable {
  * @param {boolean} [options.parseStrings=false] - Whether to parse and return strings
  * @returns {HeapSnapshotWriteStream} A new HeapSnapshotWriteStream instance
  */
-export const createHeapSnapshotWriteStream = (options = { parseStrings: false }) => {
+export const createHeapSnapshotWriteStream = (
+  options: { parseStrings?: boolean; validate?: boolean } = { parseStrings: false },
+): HeapSnapshotWriteStream => {
   return new HeapSnapshotWriteStream(options)
 }

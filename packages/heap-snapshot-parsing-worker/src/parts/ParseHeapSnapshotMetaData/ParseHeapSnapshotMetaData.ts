@@ -6,8 +6,8 @@ export const EMPTY_DATA = {
   endIndex: -1,
 }
 
-export const parseHeapSnapshotMetaData = (data) => {
-  const { startIndex, endIndex } = parseHeapSnapshotMetaDataIndices(data)
+export const parseHeapSnapshotMetaData = (data: string) => {
+  const { endIndex, startIndex } = parseHeapSnapshotMetaDataIndices(data)
   if (endIndex === -1) {
     return EMPTY_DATA
   }

@@ -2,19 +2,30 @@ import * as GetNamedFunctionCountData3 from '../GetNamedFunctionCountData3/GetNa
 
 export const name = 'named-function-count-3'
 
-export const getData = (basePath: string) => GetNamedFunctionCountData3.getNamedFunctionCountData3('named-function-count3', basePath)
+export const getData = (basePath: string): Promise<any[]> =>
+  GetNamedFunctionCountData3.getNamedFunctionCountData3('named-function-count3', basePath)
 
-export const createChart = () => {
+export const createChart = (): {
+  fontSize: number
+  marginLeft: number
+  marginRight: number
+  type: string
+  width: number
+  x: string
+  xLabel: string
+  y: string
+  yLabel: string
+} => {
   return {
-    type: 'dual-bar-chart',
-    x: 'index',
-    y: 'count',
-    xLabel: 'Index',
-    yLabel: 'Function Counts',
-    width: 1400,
+    fontSize: 12,
     marginLeft: 500,
     marginRight: 500,
-    fontSize: 12,
+    type: 'dual-bar-chart',
+    width: 1400,
+    x: 'index',
+    xLabel: 'Index',
+    y: 'count',
+    yLabel: 'Function Counts',
   }
 }
 

@@ -34,8 +34,8 @@ function getCSSRuleCount() {
 }
 
 ;(getCSSRuleCount())`,
-    returnByValue: true,
     objectGroup,
+    returnByValue: true,
   })
   return ruleCount
 }

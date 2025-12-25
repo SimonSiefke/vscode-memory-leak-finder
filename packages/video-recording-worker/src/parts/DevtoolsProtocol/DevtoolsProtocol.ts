@@ -2,12 +2,12 @@ const url = new URL('../../../../devtools-protocol/src/index.js', import.meta.ur
 const module = await import(url)
 
 const {
+  DevtoolsProtocolDomDebugger,
   DevtoolsProtocolHeapProfiler,
+  DevtoolsProtocolMemory,
   DevtoolsProtocolPage,
   DevtoolsProtocolRuntime,
   DevtoolsProtocolTarget,
-  DevtoolsProtocolMemory,
-  DevtoolsProtocolDomDebugger,
 } = module
 
 export {

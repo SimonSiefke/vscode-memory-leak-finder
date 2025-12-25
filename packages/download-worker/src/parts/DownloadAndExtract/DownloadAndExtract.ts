@@ -1,5 +1,5 @@
-import { rm } from 'fs/promises'
-import { basename, join } from 'path'
+import { rm } from 'node:fs/promises'
+import { basename, join } from 'node:path'
 import * as Download from '../Download/Download.ts'
 import * as ExtractTarGz from '../ExtractTarGz/ExtractTarGz.ts'
 import * as Root from '../Root/Root.ts'

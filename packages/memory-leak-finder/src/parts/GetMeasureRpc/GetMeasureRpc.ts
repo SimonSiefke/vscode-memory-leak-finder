@@ -40,13 +40,11 @@ export const getMeasureRpc = async (
     return electronRpc
   }
 
-  await Promise.all([
-    DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
-      autoAttach: true,
-      waitForDebuggerOnStart: false,
-      flatten: true,
-    }),
-  ])
+  await DevtoolsProtocolTarget.setAutoAttach(sessionRpc, {
+    autoAttach: true,
+    flatten: true,
+    waitForDebuggerOnStart: false,
+  })
 
   return sessionRpc
 }

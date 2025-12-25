@@ -1,3 +1,4 @@
+import type { Session } from '../Session/Session.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
 import * as CompareInstanceCounts from '../CompareInstanceCounts/CompareInstanceCounts.ts'
 import * as GetInstanceCounts from '../GetInstanceCounts/GetInstanceCounts.ts'
@@ -10,21 +11,21 @@ export const id = MeasureId.InstanceCounts
 
 export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]
 }
 
-export const start = async (session, objectGroup) => {
+export const start = async (session: Session, objectGroup: string) => {
   return GetInstanceCounts.getInstanceCounts(session, objectGroup)
 }
 
-export const stop = async (session, objectGroup) => {
+export const stop = async (session: Session, objectGroup: string) => {
   const result = await GetInstanceCounts.getInstanceCounts(session, objectGroup)
   return result
 }
 
-export const releaseResources = async (session, objectGroup) => {
+export const releaseResources = async (session: Session, objectGroup: string) => {
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 
@@ -38,6 +39,6 @@ const getTotalCount = (instances) => {
   return Arrays.sum(instances.map(getCount))
 }
 
-export const isLeak = ({ before, after }) => {
+export const isLeak = ({ after, before }) => {
   return getTotalCount(after) > getTotalCount(before)
 }

@@ -1,7 +1,8 @@
+import type { Session } from '../Session/Session.ts'
 import * as GetArrayNameMap from '../GetArrayNameMap/GetArrayNameMap.ts'
 
 // @ts-ignore
-const getAllScopes = async (session, objectGroup) => {
+const getAllScopes = async (session: Session, objectGroup: string) => {
   // const scopes = await GetAllScopePropertiesInternal.getAllScopePropertiesInternal(session, objectGroup, functionObjectIds)
   // const firstObjectId = scopes[0].objectId
   // const scopeListProperties = await DevtoolsProtocolRuntime.getProperties(session, {
@@ -11,7 +12,7 @@ const getAllScopes = async (session, objectGroup) => {
   // })
 }
 
-export const getArrays = async (session, objectGroup) => {
+export const getArrays = async (session: Session, objectGroup: string) => {
   // const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
   //   expression: PrototypeExpression.Array,
   //   returnByValue: false,

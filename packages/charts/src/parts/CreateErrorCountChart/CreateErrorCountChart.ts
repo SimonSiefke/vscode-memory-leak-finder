@@ -2,13 +2,13 @@ import * as GetErrorCountData from '../GetErrorCountData/GetErrorCountData.ts'
 
 export const name = 'error-count'
 
-export const getData = (basePath: string) => GetErrorCountData.getErrorCountData(basePath)
+export const getData = (basePath: string): Promise<any[]> => GetErrorCountData.getErrorCountData(basePath)
 
-export const createChart = () => {
+export const createChart = (): { x: string; xLabel: string; y: string; yLabel: string } => {
   return {
     x: 'index',
-    y: 'count',
     xLabel: 'Index',
+    y: 'count',
     yLabel: 'Error Count',
   }
 }
