@@ -12,7 +12,7 @@ jest.unstable_mockModule('../src/parts/Filesystem/Filesystem.ts', () => ({
   writeFileContent: mockWriteFileContent,
 }))
 
-let applyFileOperationsModule
+let applyFileOperationsModule: typeof import('../src/parts/ApplyFileOperations/ApplyFileOperations.ts')
 
 beforeEach(async () => {
   // Reset all mocks

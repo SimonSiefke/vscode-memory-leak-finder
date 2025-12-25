@@ -6,14 +6,10 @@ const script = `function () {
 }
 `
 
-<<<<<<< HEAD
-export const makeElectronAvailableGlobally = async (electronRpc: { invoke(method: string, params?: unknown): Promise<unknown> }, electronObjectId: string): Promise<void> => {
-=======
 export const makeElectronAvailableGlobally = async (
   electronRpc: { invoke(method: string, params?: unknown): Promise<unknown> },
   electronObjectId: string,
 ): Promise<void> => {
->>>>>>> origin/main
   await DevtoolsProtocolRuntime.callFunctionOn(electronRpc, {
     functionDeclaration: script,
     objectId: electronObjectId,
