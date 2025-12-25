@@ -6,23 +6,33 @@ import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 const initialDiagnosticTimeout = 60_000
 
-const isNotebook = (file) => {
+const isNotebook = (file: string) => {
   return file.endsWith('.ipynb')
 }
 
-const isImage = (file) => {
+const isImage = (file: string) => {
   return file.endsWith('.svg')
 }
 
-const isVideo = (file) => {
+const isVideo = (file: string) => {
   return file.endsWith('.mp4') || file.endsWith('.webm') || file.endsWith('.avi')
 }
 
-const isBinary = (file) => {
+const isBinary = (file: string) => {
   return file.endsWith('.bin') || file.endsWith('.exe') || file.endsWith('.dll') || file.endsWith('.so')
 }
 
-export const create = ({ expect, ideVersion, page, VError }) => {
+export const create = ({
+  expect,
+  ideVersion,
+  page,
+  VError,
+}: {
+  expect: any
+  ideVersion: any
+  page: any
+  VError: any
+}) => {
   return {
     async acceptRename() {
       try {
