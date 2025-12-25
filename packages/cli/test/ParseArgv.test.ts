@@ -116,7 +116,7 @@ test('parseArgv - inspect-shared-process flag', () => {
 })
 
 test('parseArgv - inspect-shared-process flag not present', () => {
-  const argv = []
+  const argv: readonly string[] = []
   const options = ParseArgv.parseArgv(argv)
   expect(options.inspectSharedProcess).toBe(false)
 })
