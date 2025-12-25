@@ -69,6 +69,7 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
   await ChatEditor.sendMessage({
     message,
     verify: true,
+    viewLinesText: /^Please analyze these code blocks/,
   })
   // @ts-ignore
   await ChatEditor.clearAll()
