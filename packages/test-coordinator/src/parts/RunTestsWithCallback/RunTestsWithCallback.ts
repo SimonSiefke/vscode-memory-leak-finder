@@ -31,7 +31,6 @@ const disposeWorkers = async (workers) => {
 }
 
 export const runTestsWithCallback = async ({
-  attachToPageTimeout,
   callback,
   checkLeaks,
   color,
@@ -90,6 +89,7 @@ export const runTestsWithCallback = async ({
     Assert.boolean(enableExtensions)
 
     const connectionId = Id.create()
+    const attachedToPageTimeout = TimeoutConstants.AttachToPage
     const idleTimeout = TimeoutConstants.Idle
     const pageObjectPath = GetPageObjectPath.getPageObjectPath()
 
