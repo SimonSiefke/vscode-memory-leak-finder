@@ -14,6 +14,7 @@
     { "path": "./packages/e2e" },
     { "path": "./packages/file-system-worker" },
     { "path": "./packages/file-watcher-worker" },
+    { "path": "./packages/load-source-map-worker" },
     { "path": "./packages/heap-snapshot-worker" },
     { "path": "./packages/initialization-worker" },
     { "path": "./packages/injected-code" },
