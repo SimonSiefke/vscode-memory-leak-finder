@@ -8,6 +8,9 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.ManageLanguageModels)
         // TODO verify editor is open
+        const container = page.locator('.models-search-container')
+        await expect(container).toBeVisible()
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to set chat context`)
       }
