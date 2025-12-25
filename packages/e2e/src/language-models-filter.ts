@@ -15,13 +15,12 @@ export const setup = async ({ Editor, Electron, Extensions, LanguageModelEditor 
     name: 'GitHub Copilot Chat',
   })
   await Editor.closeAll()
+  await LanguageModelEditor.open()
 }
 
 // @ts-ignore
 export const run = async ({ LanguageModelEditor, Editor }: TestContext): Promise<void> => {
-  await LanguageModelEditor.open()
-  await Editor.closeAll()
-  // TODO open and close language model editor
+  // TODO filter
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
