@@ -12,5 +12,12 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to set chat context`)
       }
     },
+    async filter({ searchValue, expectedResults }) {
+      try {
+        // TODO filter
+      } catch (error) {
+        throw new VError(error, `Failed to filter`)
+      }
+    },
   }
 }
