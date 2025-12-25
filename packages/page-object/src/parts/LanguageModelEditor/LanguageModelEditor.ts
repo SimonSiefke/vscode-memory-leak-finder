@@ -50,5 +50,17 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to filter`)
       }
     },
+    async clearFilter() {
+      try {
+        await page.waitForIdle()
+        const editContext = page.locator('.models-search-container .monaco-editor .native-edit-context')
+        await expect(editContext).toBeVisible()
+        await page.waitForIdle()
+        await editContext.clear()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to filter`)
+      }
+    },
   }
 }

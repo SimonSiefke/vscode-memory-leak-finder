@@ -23,8 +23,8 @@ export const run = async ({ LanguageModelEditor, Editor }: TestContext): Promise
   await LanguageModelEditor.filter({
     searchValue: 'gpt',
   })
-  // TODO filter
   await new Promise((r) => {})
+  await LanguageModelEditor.clearFilter()
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
