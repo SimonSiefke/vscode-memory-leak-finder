@@ -1,15 +1,9 @@
-<<<<<<< HEAD
-import { writeFile, mkdir } from 'node:fs/promises'
+import { readFile } from 'fs/promises'
 import { existsSync } from 'node:fs'
-import { readdir, stat } from 'node:fs/promises'
+import { mkdir, readdir, stat, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-=======
-import { readFile, writeFile, mkdir } from 'fs/promises'
-import { existsSync } from 'node:fs'
-import { readdir, stat } from 'node:fs/promises'
-import { dirname, join } from 'path'
+import { dirname } from 'path'
 import { fileURLToPath } from 'url'
->>>>>>> origin/main
 import * as Root from '../Root/Root.ts'
 
 const __filename = fileURLToPath(import.meta.url)
