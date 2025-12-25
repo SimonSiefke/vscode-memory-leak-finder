@@ -3,9 +3,19 @@ import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as Explorer from '../Explorer/Explorer.ts'
 import * as SideBar from '../SideBar/SideBar.ts'
 
-export const create = ({ electronApp, expect, page, VError }) => {
+export const create = ({
+  electronApp,
+  expect,
+  page,
+  VError,
+}: {
+  electronApp: any
+  expect: any
+  page: any
+  VError: any
+}) => {
   return {
-    async expectModified(text) {
+    async expectModified(text: string) {
       try {
         const modified = page.locator('.editor.modified .view-lines')
         await expect(modified).toHaveText(text)
@@ -13,7 +23,7 @@ export const create = ({ electronApp, expect, page, VError }) => {
         throw new VError(error, `Failed to verify modified text ${text}`)
       }
     },
-    async expectOriginal(text) {
+    async expectOriginal(text: string) {
       try {
         const original = page.locator('.editor.original .view-lines')
         await expect(original).toHaveText(text)
@@ -21,7 +31,7 @@ export const create = ({ electronApp, expect, page, VError }) => {
         throw new VError(error, `Failed to verify original text ${text}`)
       }
     },
-    async open(a, b) {
+    async open(a: string, b: string) {
       try {
         const explorer = Explorer.create({ electronApp, expect, page, VError })
         const contextMenu = ContextMenu.create({ expect, page, VError })
@@ -57,7 +67,7 @@ export const create = ({ electronApp, expect, page, VError }) => {
         throw new VError(error, `Failed to scroll up in diff editor`)
       }
     },
-    async shouldHaveModifiedEditor(text) {
+    async shouldHaveModifiedEditor(text: string) {
       try {
         const editor = page.locator('.editor.modified')
         const editorLines = editor.locator('.view-lines')
@@ -69,7 +79,7 @@ export const create = ({ electronApp, expect, page, VError }) => {
         throw new VError(error, `Failed to assert modified editor contents`)
       }
     },
-    async shouldHaveOriginalEditor(text) {
+    async shouldHaveOriginalEditor(text: string) {
       try {
         const editor = page.locator('.editor.original')
         const editorLines = editor.locator('.view-lines')
