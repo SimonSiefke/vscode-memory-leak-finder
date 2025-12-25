@@ -18,8 +18,18 @@ export const create = ({ expect, page, VError }) => {
         await expect(progress).toBeHidden({ timeout: 30_000 })
         await page.waitForIdle()
         const rows = table.locator('.monaco-list-row')
-        const firstRow = rows.nth(1)
+        const firstRow = rows.nth(0)
         await expect(firstRow).toBeVisible({
+          timeout: 30_000,
+        })
+        await page.waitForIdle()
+        const secondRow = rows.nth(1)
+        await expect(secondRow).toBeVisible({
+          timeout: 30_000,
+        })
+        await page.waitForIdle()
+        const thirdRow = rows.nth(2)
+        await expect(thirdRow).toBeVisible({
           timeout: 30_000,
         })
         await page.waitForIdle()
