@@ -1,9 +1,7 @@
 import { mkdir, readdir, rm, stat } from 'node:fs/promises'
 import { join } from '../Path/Path.ts'
 
-export const clearExtensionsDirIfEmpty = async (
-  extensionsDir: string,
-): Promise<void> => {
+export const clearExtensionsDirIfEmpty = async (extensionsDir: string): Promise<void> => {
   // Only clear extensions directory if it's empty or doesn't exist
   // This preserves installed extensions across test runs
   try {
