@@ -20,6 +20,9 @@ export const setup = async ({ Editor, Electron, Extensions, LanguageModelEditor 
 
 // @ts-ignore
 export const run = async ({ LanguageModelEditor, Editor }: TestContext): Promise<void> => {
+  await LanguageModelEditor.filter({
+    searchValue: 'gpt',
+  })
   // TODO filter
   await new Promise((r) => {})
 }
