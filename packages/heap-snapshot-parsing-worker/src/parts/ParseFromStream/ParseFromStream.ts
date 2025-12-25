@@ -9,16 +9,15 @@ import { createHeapSnapshotWriteStream } from '../HeapSnapshotWriteStream/HeapSn
  * @param {boolean} [options.parseStrings=false] - Whether to parse and return strings
  * @returns {Promise<{metaData: any, nodes: Uint32Array, edges: Uint32Array, locations: Uint32Array, strings: string[]}>} Promise containing parsed heap snapshot data with transferable arrays
  */
-export const parseFromStream = async (readStream, options = { parseStrings: false }) => {
+export const parseFromStream = async (readStream: Readable, options: { parseStrings?: boolean } = { parseStrings: false }) => {
   const writeStream = createHeapSnapshotWriteStream(options)
   await pipeline(readStream, writeStream)
-  const { edges, locations, metaData, nodes, strings } = writeStream.getResult()
-  const result = {
-    edges,
-    locations,
-    metaData,
-    nodes,
-    strings,
+  const result = writeStream.getResult()
+  return {
+    edges: result.edges,
+    locations: result.locations,
+    metaData: (writeStream as any).metaData,
+    nodes: result.nodes,
+    strings: result.strings,
   }
-  return result
 }
