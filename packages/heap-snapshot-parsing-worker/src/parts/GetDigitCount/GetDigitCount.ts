@@ -1,4 +1,4 @@
-export const getDigitCount = (number) => {
+export const getDigitCount = (number: number): number => {
   if (number === 0) {
     return 1
   }
