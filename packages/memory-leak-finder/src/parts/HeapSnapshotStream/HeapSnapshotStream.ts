@@ -1,7 +1,7 @@
 import { Readable } from 'node:stream'
+import type { Session } from '../Session/Session.ts'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 import { DevtoolsProtocolHeapProfiler } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
-import type { Session } from '../Session/Session.ts'
 
 class CustomStream extends Readable {
   rpc: any

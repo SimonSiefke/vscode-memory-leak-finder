@@ -1,7 +1,7 @@
 {
   "name": "@vscode-memory-leak-finder/memory-leak-finder",
   "version": "0.0.0-dev",
-  "description": "",
+  "license": "MIT",
   "type": "module",
   "main": "src/main.ts",
   "scripts": {

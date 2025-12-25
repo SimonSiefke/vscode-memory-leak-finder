@@ -1,5 +1,5 @@
-import * as GetFlatScopeList from '../GetFlatScopeList/GetFlatScopeList.ts'
 import type { Session } from '../Session/Session.ts'
+import * as GetFlatScopeList from '../GetFlatScopeList/GetFlatScopeList.ts'
 
 const getScopeMap = (flatScopeMap) => {
   const counts = Object.create(null)

@@ -357,7 +357,7 @@ export const createHttpProxyServer = async (
 
   return {
     port: actualPort,
-    async [Symbol.asyncDispose]() {
+    async [Symbol.asyncDispose](): Promise<void> {
       const { promise, resolve } = Promise.withResolvers<void>()
       server.close(() => resolve())
       await promise

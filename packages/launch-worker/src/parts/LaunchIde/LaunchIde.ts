@@ -49,7 +49,7 @@ export const launchIde = async ({
   let versionToParse: string
   if (insidersCommit) {
     const metadata = await FetchVscodeInsidersMetadata.fetchVscodeInsidersMetadata(insidersCommit)
-    const productVersion = metadata.productVersion
+    const { productVersion } = metadata
     versionToParse = productVersion.replace('-insider', '')
   } else {
     versionToParse = vscodeVersion

@@ -2,9 +2,9 @@ import * as GetIframeCountsData from '../GetIframeCountsData/GetIframeCountsData
 
 export const name = 'iframe-count'
 
-export const getData = (basePath: string) => GetIframeCountsData.getIframeCountsData(basePath)
+export const getData = (basePath: string): Promise<any[]> => GetIframeCountsData.getIframeCountsData(basePath)
 
-export const createChart = () => {
+export const createChart = (): { x: string; xLabel: string; y: string; yLabel: string } => {
   return {
     x: 'index',
     xLabel: 'Index',

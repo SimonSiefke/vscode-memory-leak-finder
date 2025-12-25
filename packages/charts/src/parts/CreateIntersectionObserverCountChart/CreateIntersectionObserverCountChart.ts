@@ -2,9 +2,9 @@ import * as GetIntersectionObserverCountData from '../GetIntersectionObserverCou
 
 export const name = 'intersection-observer-count'
 
-export const getData = (basePath: string) => GetIntersectionObserverCountData.getIntersectionObserverCountData(basePath)
+export const getData = (basePath: string): Promise<any[]> => GetIntersectionObserverCountData.getIntersectionObserverCountData(basePath)
 
-export const createChart = () => {
+export const createChart = (): { x: string; xLabel: string; y: string; yLabel: string } => {
   return {
     x: 'index',
     xLabel: 'Index',

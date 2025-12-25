@@ -1,9 +1,9 @@
+import type { Session } from '../Session/Session.ts'
 import * as CleanFunctionLocations from '../CleanFunctionLocations/CleanFunctionLocations.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
 import * as GetFunctionLocations from '../GetFunctionLocations/GetFunctionLocations.ts'
 import * as GetFunctionObjectIds from '../GetFunctionObjectIds/GetFunctionObjectIds.ts'
-import type { Session } from '../Session/Session.ts'
 
 export const getDisposableLocations = async (session: Session, objectGroup, disposables) => {
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
