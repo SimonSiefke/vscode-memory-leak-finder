@@ -1,7 +1,7 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
-export const create = ({ expect, ideVersion, page, VError }) => {
+export const create = ({ expect, page, VError }) => {
   return {
     async open() {
       try {
