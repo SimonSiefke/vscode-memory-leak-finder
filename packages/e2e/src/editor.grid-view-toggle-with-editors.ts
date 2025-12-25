@@ -26,7 +26,16 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
 export const run = async ({ Editor }: TestContext): Promise<void> => {
   // @ts-ignore
   await Editor.enable2x2GridView()
-  await new Promise((r) => {})
+  await Editor.open('a.txt')
+  // @ts-ignore
+  await Editor.focusRightEditorGroup()
+  await Editor.open('b.txt')
+  // @ts-ignore
+  await Editor.focusBottomEditorGroup()
+  await Editor.open('d.txt')
+  // @ts-ignore
+  await Editor.focusLeftEditorGroup()
+  await Editor.open('c.txt')
   // @ts-ignore
   await Editor.closeAllEditorGroups()
 }

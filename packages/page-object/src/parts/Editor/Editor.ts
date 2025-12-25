@@ -365,6 +365,38 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to format file`)
       }
     },
+    async focusRightEditorGroup() {
+      try {
+        const quickpick = QuickPick.create({ expect, page, VError })
+        await quickpick.executeCommand(WellKnownCommands.FocusRightEditorGroup)
+      } catch (error) {
+        throw new VError(error, `Failed to focus right editor group`)
+      }
+    },
+    async focusLeftEditorGroup() {
+      try {
+        const quickpick = QuickPick.create({ expect, page, VError })
+        await quickpick.executeCommand(WellKnownCommands.FocusLeftEditorGroup)
+      } catch (error) {
+        throw new VError(error, `Failed to focus left editor group`)
+      }
+    },
+    async focusBottomEditorGroup() {
+      try {
+        const quickpick = QuickPick.create({ expect, page, VError })
+        await quickpick.executeCommand(WellKnownCommands.FocusLeftEditorGroup)
+      } catch (error) {
+        throw new VError(error, `Failed to focus bottom editor group`)
+      }
+    },
+    async focusTopEditorGroup() {
+      try {
+        const quickpick = QuickPick.create({ expect, page, VError })
+        await quickpick.executeCommand(WellKnownCommands.FocusAboveEditorGroup)
+      } catch (error) {
+        throw new VError(error, `Failed to focus top editor group`)
+      }
+    },
     async goToDefinition() {
       try {
         await page.waitForIdle()
