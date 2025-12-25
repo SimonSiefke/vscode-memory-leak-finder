@@ -1,6 +1,7 @@
 import { expect, test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
 import * as AnsiKeys from '../src/parts/AnsiKeys/AnsiKeys.ts'
+import { createDefaultState } from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as HandleStdinDataRunningMode from '../src/parts/HandleStdinDataRunningMode/HandleStdinDataRunningMode.ts'
 import * as ModeType from '../src/parts/ModeType/ModeType.ts'
 import * as StdoutWorker from '../src/parts/StdoutWorker/StdoutWorker.ts'
@@ -21,6 +22,7 @@ test('handleStdinDataRunningMode - show watch mode details', async () => {
   StdoutWorker.set(mockRpc)
 
   const state = {
+    ...createDefaultState(),
     mode: ModeType.Running,
     stdout: [],
     value: '',
@@ -48,6 +50,7 @@ test('handleStdinDataRunningMode - quit', async () => {
   StdoutWorker.set(mockRpc)
 
   const state = {
+    ...createDefaultState(),
     mode: ModeType.Running,
     stdout: [],
     value: '',

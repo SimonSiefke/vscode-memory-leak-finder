@@ -1,9 +1,10 @@
 import * as AnsiKeys from '../AnsiKeys/AnsiKeys.ts'
 import * as InterruptedMessage from '../InterruptedMessage/InterruptedMessage.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
+import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 import * as WatchUsage from '../WatchUsage/WatchUsage.ts'
 
-export const handleStdinDataRunningMode = async (state, key) => {
+export const handleStdinDataRunningMode = async (state: StdinDataState.StdinDataState, key: string): Promise<StdinDataState.StdinDataState> => {
   switch (key) {
     case AnsiKeys.AltBackspace:
     case AnsiKeys.ArrowDown:

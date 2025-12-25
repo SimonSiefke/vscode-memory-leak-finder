@@ -6,7 +6,7 @@ export const state: State = {
   pending: [],
 }
 
-export const add = (object) => {
+export const add = (object: unknown): void => {
   state.pending.push(object)
 }
 
