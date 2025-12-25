@@ -14,6 +14,7 @@ export interface PrepareBothResult {
 export interface PrepareBothOptions {
   readonly attachedToPageTimeout: number
   readonly canUseIdleCallback: boolean
+  readonly clearExtensions: boolean
   readonly commit: string
   readonly connectionId: number
   readonly cwd: string
@@ -38,6 +39,7 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
   const {
     attachedToPageTimeout,
     canUseIdleCallback,
+    clearExtensions,
     commit,
     connectionId,
     cwd,
@@ -62,6 +64,7 @@ export const prepareBoth = async (options: PrepareBothOptions): Promise<PrepareB
     await initializationWorkerRpc.invoke('Launch.launch', {
       attachedToPageTimeout,
       canUseIdleCallback,
+      clearExtensions,
       commit,
       connectionId,
       cwd,

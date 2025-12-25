@@ -7,6 +7,7 @@ import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 export interface LaunchOptions {
   readonly attachedToPageTimeout: number
   readonly canUseIdleCallback: boolean
+  readonly clearExtensions: boolean
   readonly commit: string
   readonly connectionId: number
   readonly cwd: string
@@ -49,6 +50,7 @@ const launchInitializationWorker = async () => {
 export const launch = async (options: LaunchOptions): Promise<any> => {
   const {
     attachedToPageTimeout,
+    clearExtensions,
     commit,
     cwd,
     enableExtensions,
@@ -68,6 +70,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
   } = options
   const { child, parsedVersion } = await LaunchIde.launchIde({
     addDisposable: Disposables.add,
+    clearExtensions,
     commit,
     cwd,
     enableExtensions,

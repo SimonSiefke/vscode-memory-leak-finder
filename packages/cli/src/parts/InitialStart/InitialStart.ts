@@ -15,6 +15,7 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
   await StartRunning.startRunning({
     bisect: options.bisect,
     checkLeaks: options.checkLeaks,
+    clearExtensions: options.clearExtensions,
     color: options.color,
     commit: options.commit,
     continueValue: options.continueValue,

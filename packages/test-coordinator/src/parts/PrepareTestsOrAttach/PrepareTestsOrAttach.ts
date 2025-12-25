@@ -11,6 +11,7 @@ export const state: State = {
 
 export interface PrepareTestsAndAttachOptions {
   readonly attachedToPageTimeout: number
+  readonly clearExtensions: boolean
   readonly commit: string
   readonly connectionId: number
   readonly cwd: string
@@ -42,6 +43,7 @@ export interface PrepareTestsAndAttachOptions {
 export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOptions) => {
   const {
     attachedToPageTimeout,
+    clearExtensions,
     commit,
     connectionId,
     cwd,
@@ -73,6 +75,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
   if (isFirst) {
     state.promise = PrepareTests.prepareTests({
       attachedToPageTimeout,
+      clearExtensions,
       commit,
       connectionId,
       cwd,

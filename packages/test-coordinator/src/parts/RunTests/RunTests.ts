@@ -13,6 +13,7 @@ const callback = async (method, ...params) => {
 export const runTests = async ({
   bisect,
   checkLeaks,
+  clearExtensions,
   color,
   commit,
   continueValue,
@@ -62,6 +63,7 @@ export const runTests = async ({
     const options: RunTestsOptions = {
       bisect,
       checkLeaks,
+      clearExtensions,
       color,
       commit,
       continueValue,
@@ -104,6 +106,7 @@ export const runTests = async ({
     callback,
     checkLeaks,
     clearDisposables: Disposables.disposeAll,
+    clearExtensions,
     color,
     commit,
     continueValue,

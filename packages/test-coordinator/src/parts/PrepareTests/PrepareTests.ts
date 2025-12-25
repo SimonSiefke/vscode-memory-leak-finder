@@ -4,6 +4,7 @@ import { prepareBoth } from '../PrepareBoth/PrepareBoth.ts'
 
 export interface PrepareTestsOptions {
   readonly attachedToPageTimeout: number
+  readonly clearExtensions: boolean
   readonly commit: string
   readonly connectionId: number
   readonly cwd: string
@@ -33,6 +34,7 @@ export interface PrepareTestsOptions {
 export const prepareTests = async (options: PrepareTestsOptions) => {
   const {
     attachedToPageTimeout,
+    clearExtensions,
     commit,
     connectionId,
     cwd,
@@ -58,6 +60,7 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
     await prepareBoth({
       attachedToPageTimeout,
       canUseIdleCallback,
+      clearExtensions,
       commit,
       connectionId,
       cwd,
