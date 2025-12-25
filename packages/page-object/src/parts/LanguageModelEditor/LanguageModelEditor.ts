@@ -48,6 +48,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         const maxWait = 15_000
         const end = now + maxWait
         while (now < end) {
+          await page.waitForIdle()
           const newCount = await rows.count()
           if (newCount !== count) {
             break
