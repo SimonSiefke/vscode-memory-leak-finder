@@ -1,71 +1,12 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { extractMethodInfo } from './generateApiTypes/ExtractMethodInfo.ts'
+import { extractProperties } from './generateApiTypes/ExtractProperties.ts'
+import { generateInterfaceFromMethods } from './generateApiTypes/GenerateInterface.ts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
-
-interface MethodInfo {
-  name: string
-  parameters: string[]
-  returnType: string
-  isAsync: boolean
-}
-
-const extractMethodInfo = (content: string): MethodInfo[] => {
-  const methods: MethodInfo[] = []
-
-  // Match async method definitions
-  const asyncMethodRegex = /async\s+(\w+)\s*\([^)]*\)\s*{/g
-  let match
-
-  while ((match = asyncMethodRegex.exec(content)) !== null) {
-    const methodName = match[1]
-    const fullMatch = match[0]
-
-    // Extract parameters from the method signature
-    const paramMatch = fullMatch.match(/\(([^)]*)\)/)
-    let parameters: string[] = []
-
-    if (paramMatch) {
-      const paramString = paramMatch[1].trim()
-      if (paramString) {
-        // Only process simple parameters (no destructuring or complex syntax)
-        if (!paramString.includes('{') && !paramString.includes('[') && !paramString.includes('=')) {
-          parameters = paramString
-            .split(',')
-            .map((p) => p.trim())
-            .filter((p) => p)
-        } else {
-          // For complex parameters, just use a generic name
-          parameters = ['options']
-        }
-      }
-    }
-
-    methods.push({
-      name: methodName,
-      parameters,
-      returnType: 'Promise<void>',
-      isAsync: true,
-    })
-  }
-
-  return methods
-}
-
-const generateInterfaceFromMethods = (methods: MethodInfo[], interfaceName: string): string => {
-  const methodSignatures = methods
-    .map((method) => {
-      // For now, just use any for all parameters to avoid syntax issues
-      const params = method.parameters.length > 0 ? method.parameters.map((param) => `${param}: any`).join(', ') : ''
-
-      return `  ${method.name}(${params}): ${method.returnType}`
-    })
-    .join('\n')
-
-  return `export interface ${interfaceName} {\n${methodSignatures}\n}`
-}
 
 export const generateApiTypes = async (): Promise<void> => {
   const pageObjectDir = resolve(__dirname, '../../page-object/src/parts')
@@ -94,9 +35,10 @@ export const generateApiTypes = async (): Promise<void> => {
       try {
         const content = readFileSync(partFile, 'utf8')
         const methods = extractMethodInfo(content)
+        const properties = extractProperties(content)
 
-        if (methods.length > 0) {
-          const interfaceDef = generateInterfaceFromMethods(methods, partName)
+        if (methods.length > 0 || properties.length > 0) {
+          const interfaceDef = generateInterfaceFromMethods(methods, properties, partName)
           interfaces.push(interfaceDef)
           apiProperties.push(`${partName}: ${partName}`)
         }
