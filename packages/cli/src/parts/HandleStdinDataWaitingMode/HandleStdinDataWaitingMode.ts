@@ -6,7 +6,10 @@ import * as ModeType from '../ModeType/ModeType.ts'
 import * as PatternUsage from '../PatternUsage/PatternUsage.ts'
 import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 
-export const handleStdinDataWaitingMode = async (state: StdinDataState.StdinDataState, key: string): Promise<StdinDataState.StdinDataState> => {
+export const handleStdinDataWaitingMode = async (
+  state: StdinDataState.StdinDataState,
+  key: string,
+): Promise<StdinDataState.StdinDataState> => {
   switch (key) {
     case AnsiKeys.AltBackspace:
     case AnsiKeys.ControlBackspace: {
