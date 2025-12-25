@@ -28,7 +28,7 @@ export const parseArgv = (argv: readonly string[]) => {
   const options = {
     bisect: false,
     checkLeaks: false,
-    clearExtensions: true,
+    clearExtensions: false,
     color: true,
     commit: '',
     continueValue: '',
@@ -172,9 +172,6 @@ export const parseArgv = (argv: readonly string[]) => {
   }
   if (argv.includes('--clear-extensions')) {
     options.clearExtensions = true
-  }
-  if (argv.includes('--dont-clear-extensions')) {
-    options.clearExtensions = false
   }
   return options
 }

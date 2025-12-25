@@ -27,4 +27,3 @@ export const clearExtensionsDirIfEmpty = async (
     await mkdir(extensionsDir, { recursive: true })
   }
 }
-
