@@ -10,7 +10,7 @@ import * as StdoutWorker from '../src/parts/StdoutWorker/StdoutWorker.ts'
 test('handleStdinDataFinishedRunningMode - show watch mode details', async () => {
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke(method) {
+    invoke(method: string) {
       switch (method) {
         case 'Stdout.getCursorUp':
           return '[cursor-up]'
@@ -41,7 +41,7 @@ test('handleStdinDataFinishedRunningMode - show watch mode details', async () =>
 test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke(method) {
+    invoke(method: string) {
       switch (method) {
         case 'Stdout.getClear':
           return '[clear]'
@@ -77,7 +77,7 @@ test('handleStdinDataFinishedRunningMode - go to filter mode', async () => {
 test('handleStdinDataFinishedRunningMode - quit', async () => {
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke(method) {
+    invoke(method: string) {
       switch (method) {
         case 'Stdout.getCursorUp':
           return '[cursor-up]'
@@ -106,7 +106,7 @@ test('handleStdinDataFinishedRunningMode - quit', async () => {
 test('handleStdinDataFinishedRunningMode - run again', async () => {
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke(method) {
+    invoke(method: string) {
       switch (method) {
         case 'Stdout.getCursorUp':
           return '[cursor-up]'
