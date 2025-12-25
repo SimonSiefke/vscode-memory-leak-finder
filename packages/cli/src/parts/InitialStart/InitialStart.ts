@@ -11,19 +11,19 @@ export const initialStart = async (options): Promise<void> => {
     await Stdout.write(await WatchUsage.print())
     return
   }
-    await StartRunning.startRunning({
-      attachToPageTimeout: options.attachToPageTimeout,
-      bisect: options.bisect,
-      checkLeaks: options.checkLeaks,
-      color: options.color,
-      commit: options.commit,
-      continueValue: options.continueValue,
-      cwd: options.cwd,
-      enableExtensions: options.enableExtensions,
-      enableProxy: options.enableProxy,
-      filterValue: options.filter,
-      headlessMode: options.headless,
-      ide: options.ide,
+  await StartRunning.startRunning({
+    attachToPageTimeout: options.attachToPageTimeout,
+    bisect: options.bisect,
+    checkLeaks: options.checkLeaks,
+    color: options.color,
+    commit: options.commit,
+    continueValue: options.continueValue,
+    cwd: options.cwd,
+    enableExtensions: options.enableExtensions,
+    enableProxy: options.enableProxy,
+    filterValue: options.filter,
+    headlessMode: options.headless,
+    ide: options.ide,
     ideVersion: options.ideVersion,
     insidersCommit: options.insidersCommit,
     inspectExtensions: options.inspectExtensions,

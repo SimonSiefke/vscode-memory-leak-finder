@@ -17,4 +17,3 @@ export const decompressDeflate = async (body: Buffer): Promise<{ body: string; w
   inflate.end()
   return promise
 }
-
