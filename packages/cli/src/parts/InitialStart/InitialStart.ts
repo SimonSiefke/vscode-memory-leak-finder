@@ -12,7 +12,6 @@ export const initialStart = async (options): Promise<void> => {
     return
   }
   await StartRunning.startRunning({
-    attachToPageTimeout: options.attachToPageTimeout,
     bisect: options.bisect,
     checkLeaks: options.checkLeaks,
     color: options.color,
