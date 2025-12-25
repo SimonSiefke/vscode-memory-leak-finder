@@ -833,7 +833,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to rename with preview ${newText}`)
       }
     },
-    async save(options) {
+    async save(options?: { viaKeyBoard: boolean }) {
       try {
         if (options?.viaKeyBoard) {
           await page.waitForIdle()
