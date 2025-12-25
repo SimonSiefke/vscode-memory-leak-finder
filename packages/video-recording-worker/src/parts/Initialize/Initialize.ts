@@ -1,4 +1,4 @@
-import { existsSync } from 'fs'
+import { existsSync } from 'node:fs'
 import * as DownloadWorker from '../DownloadWorker/DownloadWorker.ts'
 import * as GetFfmpegPath from '../GetFfmpegPath/GetFfmpegPath.ts'
 

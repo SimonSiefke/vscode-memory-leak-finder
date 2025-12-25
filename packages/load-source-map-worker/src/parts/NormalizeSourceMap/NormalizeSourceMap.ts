@@ -1,5 +1,5 @@
-import { mkdir, writeFile } from 'fs/promises'
-import path, { basename, dirname, join, resolve } from 'path'
+import { mkdir, writeFile } from 'node:fs/promises'
+import path, { basename, dirname, join, resolve } from 'node:path'
 import { cleanSource } from '../CleanSource/CleanSource.ts'
 import { readJson } from '../ReadJson/ReadJson.ts'
 

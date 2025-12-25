@@ -1,4 +1,4 @@
-import { createInflate } from 'zlib'
+import { createInflate } from 'node:zlib'
 
 export const decompressDeflate = async (body: Buffer): Promise<{ body: string; wasCompressed: boolean }> => {
   const { promise, reject, resolve } = Promise.withResolvers<{

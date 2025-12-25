@@ -1,4 +1,4 @@
-import { generateKeyPairSync } from 'crypto'
+import { generateKeyPairSync } from 'node:crypto'
 
 // Cache for ECDSA key pairs (one per curve)
 const ecdsaKeyPairs = new Map<string, { privateKey: string; publicKey: string }>()

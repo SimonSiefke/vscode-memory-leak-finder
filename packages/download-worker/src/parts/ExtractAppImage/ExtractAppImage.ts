@@ -1,6 +1,6 @@
 import { VError } from '@lvce-editor/verror'
 import { execa } from 'execa'
-import { dirname } from 'path'
+import { dirname } from 'node:path'
 
 export const extractAppImage = async (appImagePath: string): Promise<void> => {
   try {
