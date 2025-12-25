@@ -21,7 +21,6 @@ export const bisect = async (options: StartRunningOptions): Promise<BisectResult
 
   try {
     const result = await rpc.invoke(TestWorkerCommandType.RunTests, {
-      attachToPageTimeout: options.attachToPageTimeout,
       bisect: true,
       checkLeaks: options.checkLeaks,
       color: options.color,
