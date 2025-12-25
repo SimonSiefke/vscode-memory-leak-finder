@@ -1,5 +1,16 @@
 * {
-  font-family: 'Ubuntu', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family:
+    'Ubuntu',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
 }
 
 .Main {
@@ -17,7 +28,7 @@
 }
 
 .ChartImage {
-  max-width:100%;
+  max-width: 100%;
 }
 
 @media screen and (min-width: 700px) {
