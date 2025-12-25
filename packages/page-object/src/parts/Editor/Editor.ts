@@ -1,3 +1,4 @@
+import { basename } from 'node:path'
 import * as Character from '../Character/Character.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
@@ -365,6 +366,38 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to format file`)
       }
     },
+    async focusRightEditorGroup() {
+      try {
+        const quickpick = QuickPick.create({ expect, page, VError })
+        await quickpick.executeCommand(WellKnownCommands.FocusRightEditorGroup)
+      } catch (error) {
+        throw new VError(error, `Failed to focus right editor group`)
+      }
+    },
+    async focusLeftEditorGroup() {
+      try {
+        const quickpick = QuickPick.create({ expect, page, VError })
+        await quickpick.executeCommand(WellKnownCommands.FocusLeftEditorGroup)
+      } catch (error) {
+        throw new VError(error, `Failed to focus left editor group`)
+      }
+    },
+    async focusBottomEditorGroup() {
+      try {
+        const quickpick = QuickPick.create({ expect, page, VError })
+        await quickpick.executeCommand(WellKnownCommands.FocusBelowEditorGroup)
+      } catch (error) {
+        throw new VError(error, `Failed to focus bottom editor group`)
+      }
+    },
+    async focusTopEditorGroup() {
+      try {
+        const quickpick = QuickPick.create({ expect, page, VError })
+        await quickpick.executeCommand(WellKnownCommands.FocusAboveEditorGroup)
+      } catch (error) {
+        throw new VError(error, `Failed to focus top editor group`)
+      }
+    },
     async goToDefinition() {
       try {
         await page.waitForIdle()
@@ -634,8 +667,10 @@ export const create = ({ expect, ideVersion, page, VError }) => {
             hasLineOfCodeCounter: false,
           })
         } else {
-          const editor = page.locator('.editor-instance')
+          const baseName = basename(fileName)
+          const editor = page.locator(`.editor-instance[aria-label^="${baseName}"]`)
           await expect(editor).toBeVisible()
+
           if (ideVersion && ideVersion.minor <= 100) {
             const editorInput = editor.locator('.inputarea')
             await expect(editorInput).toBeFocused()
@@ -1200,14 +1235,25 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to verify squiggly error`)
       }
     },
-    async shouldHaveText(text) {
+    async shouldHaveText(text: string, fileName?: string) {
       try {
-        const editor = page.locator('.editor-instance')
+        await page.waitForIdle()
+        let editor
+        if (fileName) {
+          const baseName = basename(fileName)
+          editor = page.locator(`.editor-instance[aria-label^="${baseName}"]`)
+        } else {
+          editor = page.locator(`.editor-instance`)
+        }
+        await expect(editor).toBeVisible()
         const editorLines = editor.locator('.view-lines')
+        await expect(editorLines).toBeVisible()
+        await page.waitForIdle()
         const actualText = text.replaceAll(Character.NewLine, Character.EmptyString).replaceAll(Character.Space, Character.NonBreakingSpace)
         await expect(editorLines).toHaveText(actualText, {
           timeout: 3000,
         })
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify editor text ${text}`)
       }
