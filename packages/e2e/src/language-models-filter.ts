@@ -23,7 +23,6 @@ export const run = async ({ LanguageModelEditor, Editor }: TestContext): Promise
   await LanguageModelEditor.filter({
     searchValue: 'gpt',
   })
-  await new Promise((r) => {})
   await LanguageModelEditor.clearFilter()
 }
 

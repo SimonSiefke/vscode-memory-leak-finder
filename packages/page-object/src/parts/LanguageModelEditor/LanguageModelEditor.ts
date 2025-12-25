@@ -64,13 +64,15 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async clearFilter() {
       try {
         await page.waitForIdle()
-        const editContext = page.locator('.models-search-container .monaco-editor .native-edit-context')
-        await expect(editContext).toBeVisible()
+        const modeleditor = page.locator('.ai-models-management-editor')
+        const clearButton = modeleditor.locator('[aria-label="Clear Search"]')
+        await expect(clearButton).toBeVisible()
         await page.waitForIdle()
-        await editContext.clear()
+        await clearButton.click()
         await page.waitForIdle()
+        // TODO maybe check that input has been cleared
       } catch (error) {
-        throw new VError(error, `Failed to filter`)
+        throw new VError(error, `Failed to clear filter`)
       }
     },
   }
