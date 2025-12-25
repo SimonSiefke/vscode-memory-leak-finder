@@ -5,7 +5,7 @@ import * as HandleStdinDataRunningMode from '../HandleStdinDataRunningMode/Handl
 import * as HandleStdinDataWaitingMode from '../HandleStdinDataWaitingMode/HandleStdinDataWaitingMode.ts'
 import * as ModeType from '../ModeType/ModeType.ts'
 
-export const getFn = (mode) => {
+export const getFn = (mode: string) => {
   switch (mode) {
     case ModeType.FilterWaiting:
       return HandleStdinDataFilterWaitingMode.handleStdinDataFilterWaitingMode

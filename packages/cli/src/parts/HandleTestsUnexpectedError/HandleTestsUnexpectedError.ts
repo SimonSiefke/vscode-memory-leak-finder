@@ -5,7 +5,7 @@ import * as StdinDataState from '../StdinDataState/StdinDataState.ts'
 import * as TestStateOutput from '../TestStateOutput/TestStateOutput.ts'
 import { updateState } from '../UpdateState/UpdateState.ts'
 
-export const handleTestsUnexpectedError = async (prettyError) => {
+export const handleTestsUnexpectedError = async (prettyError: unknown): Promise<void> => {
   const message = await GetTestsUnexpectedErrorMessage.getTestsUnexpectedErrorMessage(prettyError)
   const fullMessage = TestStateOutput.clearPending() + message
   const state = StdinDataState.getState()

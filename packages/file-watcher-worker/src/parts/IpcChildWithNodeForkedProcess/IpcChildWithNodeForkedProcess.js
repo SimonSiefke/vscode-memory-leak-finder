@@ -16,6 +16,9 @@ export const wrap = (process) => {
      * @param {unknown} message
      */
     send(message) {
+      if (!process.send) {
+        throw new IpcError('process.send is not available')
+      }
       process.send(message)
     },
     /**

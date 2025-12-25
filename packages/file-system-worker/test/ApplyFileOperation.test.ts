@@ -27,7 +27,7 @@ test('applyFileOperation - applies copy operation', async () => {
   const operation = {
     from: '/source/file.txt',
     to: '/dest/file.txt',
-    type: 'copy',
+    type: 'copy' as const,
   }
 
   await applyFileOperationModule.applyFileOperation(operation)
@@ -41,7 +41,7 @@ test('applyFileOperation - applies mkdir operation', async () => {
 
   const operation = {
     path: '/path/to/directory',
-    type: 'mkdir',
+    type: 'mkdir' as const,
   }
 
   await applyFileOperationModule.applyFileOperation(operation)
@@ -55,7 +55,7 @@ test('applyFileOperation - applies remove operation', async () => {
 
   const operation = {
     from: '/path/to/file.txt',
-    type: 'remove',
+    type: 'remove' as const,
   }
 
   await applyFileOperationModule.applyFileOperation(operation)
@@ -73,7 +73,7 @@ test('applyFileOperation - handles copy operation error', async () => {
   const operation = {
     from: '/source/file.txt',
     to: '/dest/file.txt',
-    type: 'copy',
+    type: 'copy' as const,
   }
 
   await expect(applyFileOperationModule.applyFileOperation(operation)).rejects.toThrow('Failed to apply file operation copy')
@@ -87,7 +87,7 @@ test('applyFileOperation - handles mkdir operation error', async () => {
 
   const operation = {
     path: '/path/to/directory',
-    type: 'mkdir',
+    type: 'mkdir' as const,
   }
 
   await expect(applyFileOperationModule.applyFileOperation(operation)).rejects.toThrow('Failed to apply file operation mkdir')
@@ -101,7 +101,7 @@ test('applyFileOperation - handles remove operation error', async () => {
 
   const operation = {
     from: '/path/to/file.txt',
-    type: 'remove',
+    type: 'remove' as const,
   }
 
   await expect(applyFileOperationModule.applyFileOperation(operation)).rejects.toThrow('Failed to apply file operation remove')
