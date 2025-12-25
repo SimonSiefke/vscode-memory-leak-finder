@@ -1,0 +1,131 @@
+* {
+  font-family:
+    'Ubuntu',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+}
+
+.Main {
+  display: flex;
+  padding: 0 10px;
+}
+.Charts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr;
+  width: 100%;
+  overflow: hidden;
+}
+
+.ChartImage {
+  max-width: 100%;
+}
+
+@media screen and (min-width: 700px) {
+  .Charts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+}
+
+.SingleColumn {
+  grid-template-columns: 1fr !important;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.SingleColumn .ChartImage {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+}
+
+.Layout {
+  display: flex;
+  gap: 20px;
+  min-height: 100vh;
+}
+
+.Navigation {
+  position: sticky;
+  top: 0;
+  width: 250px;
+  height: 100vh;
+  background: #f8f9fa;
+  border-right: 1px solid #e9ecef;
+  padding: 20px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.Navigation h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.ChartList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ChartList li {
+  margin-bottom: 8px;
+}
+
+.ChartLink {
+  display: block;
+  padding: 8px 12px;
+  color: #666;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  word-break: break-word;
+}
+
+.ChartLink:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.ChartLink.active {
+  background: black;
+  color: white;
+}
+
+.ChartsContainer {
+  flex: 1;
+  padding: 20px 0;
+}
+
+.ChartsContainer .Charts {
+  margin: 0;
+  padding: 0;
+}
+
+.ArrowOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.ArrowOverlay path {
+  transition: opacity 0.3s ease;
+}

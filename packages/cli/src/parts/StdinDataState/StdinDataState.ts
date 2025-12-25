@@ -86,7 +86,7 @@ let state: StdinDataState = {
   workers: false,
 }
 
-export const setState = (newState): void => {
+export const setState = (newState: StdinDataState): void => {
   state = {
     ...state,
     bisect: newState.bisect,
