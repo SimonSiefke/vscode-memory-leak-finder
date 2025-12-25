@@ -1,4 +1,4 @@
-import { generateKeyPairSync } from 'crypto'
+import { generateKeyPairSync } from 'node:crypto'
 
 // Cache for RSA key pair (one is enough for mock tokens)
 let rsaKeyPair: { privateKey: string; publicKey: string } | null = null

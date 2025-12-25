@@ -1,6 +1,6 @@
 import sqlite3 from '@vscode/sqlite3'
-import { existsSync } from 'fs'
-import { join } from 'path'
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 import * as ExecuteSql from '../ExecuteSql/ExecuteSql.js'
 
 /**

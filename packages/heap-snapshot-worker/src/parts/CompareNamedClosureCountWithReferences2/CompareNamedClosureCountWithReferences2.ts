@@ -6,7 +6,7 @@ import { enrichLeakedClosuresWithReferences } from '../EnrichLeakedClosuresWithR
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import type { ReferencePath } from '../ReferencePath/ReferencePath.ts'
-import { readFile } from 'fs/promises'
+import { readFile } from 'node:fs/promises'
 import { addUrls } from '../AddUrls/AddUrls.ts'
 
 export interface ReferencePathWithCount extends ReferencePath {
