@@ -128,7 +128,7 @@ test('parseArgv - inspect-extensions flag', () => {
 })
 
 test('parseArgv - inspect-extensions flag not present', () => {
-  const argv = []
+  const argv: readonly string[] = []
   const options = ParseArgv.parseArgv(argv)
   expect(options.inspectExtensions).toBe(false)
 })
@@ -140,7 +140,7 @@ test('parseArgv - inspect-ptyhost flag', () => {
 })
 
 test('parseArgv - inspect-ptyhost flag not present', () => {
-  const argv = []
+  const argv: readonly string[] = []
   const options = ParseArgv.parseArgv(argv)
   expect(options.inspectPtyHost).toBe(false)
 })
@@ -152,7 +152,7 @@ test('parseArgv - enable-extensions flag', () => {
 })
 
 test('parseArgv - enable-extensions flag not present', () => {
-  const argv = []
+  const argv: readonly string[] = []
   const options = ParseArgv.parseArgv(argv)
   expect(options.enableExtensions).toBe(false)
 })
@@ -164,7 +164,7 @@ test('parseArgv - inspect-ptyhost-port flag', () => {
 })
 
 test('parseArgv - inspect-ptyhost-port flag not present', () => {
-  const argv = []
+  const argv: readonly string[] = []
   const options = ParseArgv.parseArgv(argv)
   expect(options.inspectPtyHostPort).toBe(5877)
 })
@@ -176,7 +176,7 @@ test('parseArgv - inspect-shared-process-port flag', () => {
 })
 
 test('parseArgv - inspect-shared-process-port flag not present', () => {
-  const argv = []
+  const argv: readonly string[] = []
   const options = ParseArgv.parseArgv(argv)
   expect(options.inspectSharedProcessPort).toBe(5879)
 })
@@ -188,7 +188,7 @@ test('parseArgv - inspect-extensions-port flag', () => {
 })
 
 test('parseArgv - inspect-extensions-port flag not present', () => {
-  const argv = []
+  const argv: readonly string[] = []
   const options = ParseArgv.parseArgv(argv)
   expect(options.inspectExtensionsPort).toBe(5870)
 })

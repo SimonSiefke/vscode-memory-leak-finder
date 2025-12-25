@@ -64,12 +64,12 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
     { lang: 'powershell', code: 'Write-Host "Hello"' },
   ]
 
-  const message = `Please analyze these code blocks:\n\n${codeBlocks.map((block) => `\`\`\`${block.lang}\n${block.code}\n\`\`\``).join('\n\n')}`
+  const message = `Please analyze these code blocks:\n\n${codeBlocks.map((block) => `\`\`\`${block.lang}\n${block.code}\n\`\`\``).join('\n\n')}. Okay`
 
   await ChatEditor.sendMessage({
     message,
     verify: true,
-    viewLinesText: /^Please analyze these code blocks/,
+    viewLinesText: /Okay/,
   })
   // @ts-ignore
   await ChatEditor.clearAll()
