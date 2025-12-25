@@ -17,6 +17,11 @@ export interface ActivityBar {
   show(): Promise<void>
   showTooltipExplorer(): Promise<void>
   showView(options?: any): Promise<void>
+  showExplorer(): Promise<void>
+  showExtensions(): Promise<void>
+  showRunAndDebug(): Promise<void>
+  showSearch(): Promise<void>
+  showSourceControl(): Promise<void>
 }
 export interface ChatEditor {
   addContext(initialPrompt: any, secondPrompt: any, confirmText: any): Promise<void>

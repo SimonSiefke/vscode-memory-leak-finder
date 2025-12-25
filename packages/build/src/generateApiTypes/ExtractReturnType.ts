@@ -128,7 +128,7 @@ export const extractReturnType = (content: string, methodStartIndex: number, met
     if (methodSignature[methodBodyEnd] === '}') depth--
     methodBodyEnd++
   }
-  
+
   // Extract only this method's body, not subsequent methods
   const methodBody = methodSignature.substring(methodBodyStart, methodBodyEnd)
 
