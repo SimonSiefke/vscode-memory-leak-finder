@@ -1,6 +1,6 @@
-const disposables: any[] = []
+const disposables: Array<() => Promise<void> | void> = []
 
-export const add = (fn) => {
+export const add = (fn: () => Promise<void> | void) => {
   disposables.push(fn)
 }
 

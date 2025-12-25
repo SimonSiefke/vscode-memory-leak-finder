@@ -12,7 +12,19 @@ export const getVscodeArgs = ({
   inspectSharedProcess,
   inspectSharedProcessPort,
   userDataDir,
-}) => {
+}: {
+  enableExtensions: boolean
+  enableProxy: boolean
+  extensionsDir: string
+  extraLaunchArgs: string[]
+  inspectExtensions: boolean
+  inspectExtensionsPort: number
+  inspectPtyHost: boolean
+  inspectPtyHostPort: number
+  inspectSharedProcess: boolean
+  inspectSharedProcessPort: number
+  userDataDir: string
+}): string[] => {
   const args = [
     ...ChromiumSwitches.chromiumSwitches,
     '--wait',

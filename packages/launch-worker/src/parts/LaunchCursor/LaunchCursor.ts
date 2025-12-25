@@ -28,6 +28,21 @@ export const launchCursor = async ({
   inspectSharedProcessPort,
   useProxyMock,
   vscodePath,
+}: {
+  addDisposable: (fn: () => Promise<void> | void) => void
+  cursorVersion: string
+  cwd: string
+  enableExtensions: boolean
+  enableProxy: boolean
+  headlessMode: boolean
+  inspectExtensions: boolean
+  inspectExtensionsPort: number
+  inspectPtyHost: boolean
+  inspectPtyHostPort: number
+  inspectSharedProcess: boolean
+  inspectSharedProcessPort: number
+  useProxyMock: boolean
+  vscodePath?: string
 }) => {
   try {
     const testWorkspacePath = join(Root.root, '.cursor-test-workspace')

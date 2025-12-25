@@ -1,7 +1,7 @@
 import * as DisableCursorWelcome from '../DisableCursorWelcome/DisableCursorWelcome.ts'
 import * as DownloadWorker from '../DownloadWorker/DownloadWorker.ts'
 
-export const downloadAndUnzipCursor = async (cursorVersion) => {
+export const downloadAndUnzipCursor = async (cursorVersion: string) => {
   const rpc = await DownloadWorker.launch()
   const cursorPath = await rpc.invoke('Download.downloadAndUnzipCursor', cursorVersion)
   await rpc.dispose()
