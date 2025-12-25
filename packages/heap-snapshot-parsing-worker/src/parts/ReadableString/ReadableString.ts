@@ -1,10 +1,10 @@
 import { Readable } from 'node:stream'
 
 class ReadableString extends Readable {
-  str: any
+  str: string
   sent: boolean
 
-  constructor(str) {
+  constructor(str: string) {
     super()
     this.str = str
     this.sent = false
@@ -20,6 +20,6 @@ class ReadableString extends Readable {
   }
 }
 
-export const createReadableString = (string) => {
+export const createReadableString = (string: string): ReadableString => {
   return new ReadableString(string)
 }

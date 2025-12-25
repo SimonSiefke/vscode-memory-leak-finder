@@ -17,7 +17,7 @@ const CHAR_0 = '0'.charCodeAt(0)
  * @returns {{dataIndex: number, arrayIndex: number, done: boolean, currentNumber: number, hasDigits: boolean}} - The new data index, array index, completion status, and parsing state
  * @throws {RangeError} When array index is out of bounds
  */
-export const parseHeapSnapshotArray = (data, array, arrayIndex, currentNumber = 0, hasDigits = false) => {
+export const parseHeapSnapshotArray = (data: Uint8Array, array: Uint32Array, arrayIndex: number, currentNumber = 0, hasDigits = false) => {
   const dataLength = data.length
 
   for (let i = 0; i < dataLength; i++) {

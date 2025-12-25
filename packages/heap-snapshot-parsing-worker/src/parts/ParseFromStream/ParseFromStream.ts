@@ -13,10 +13,11 @@ export const parseFromStream = async (readStream: Readable, options: { parseStri
   const writeStream = createHeapSnapshotWriteStream(options)
   await pipeline(readStream, writeStream)
   const result = writeStream.getResult()
+  const metaData = (writeStream as { metaData: unknown }).metaData
   return {
     edges: result.edges,
     locations: result.locations,
-    metaData: (writeStream as any).metaData,
+    metaData,
     nodes: result.nodes,
     strings: result.strings,
   }

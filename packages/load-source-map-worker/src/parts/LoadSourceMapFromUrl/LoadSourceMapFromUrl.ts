@@ -8,7 +8,7 @@ import { normalizeSourceMap } from '../NormalizeSourceMap/NormalizeSourceMap.ts'
 import { readJson } from '../ReadJson/ReadJson.ts'
 import * as Root from '../Root/Root.ts'
 
-const isNotFoundOrNotAvailableError = (error) => {
+const isNotFoundOrNotAvailableError = (error: unknown): boolean => {
   return error && error.message && isNotFoundOrNotAvailableMessage(error.message)
 }
 
