@@ -65,14 +65,14 @@ test.skip('getCertificateForDomain - returns existing certificate when files exi
     return false
   })
 
-  mockReadFile.mockImplementation((path: string) => {
+  mockReadFile.mockImplementation(async (path: string) => {
     if (path.includes('example_com') && path.includes('cert.pem')) {
-      return Promise.resolve(existingCert)
+      return existingCert
     }
     if (path.includes('example_com') && path.includes('key.pem')) {
-      return Promise.resolve(existingKey)
+      return existingKey
     }
-    return Promise.reject(new Error('Unexpected path'))
+    throw new Error('Unexpected path')
   })
 
   const result = await GetCertificateForDomainModule.getCertificateForDomain('example.com')
@@ -95,14 +95,14 @@ test.skip('getCertificateForDomain - regenerates certificate when validation fai
   const mismatchedCert = '-----BEGIN CERTIFICATE-----\nMISMATCHED CERT\n-----END CERTIFICATE-----'
   const mismatchedKey = '-----BEGIN PRIVATE KEY-----\nMISMATCHED KEY\n-----END PRIVATE KEY-----'
 
-  mockReadFile.mockImplementation((path: string) => {
+  mockReadFile.mockImplementation(async (path: string) => {
     if (path.includes('example_com') && path.includes('cert.pem')) {
-      return Promise.resolve(mismatchedCert)
+      return mismatchedCert
     }
     if (path.includes('example_com') && path.includes('key.pem')) {
-      return Promise.resolve(mismatchedKey)
+      return mismatchedKey
     }
-    return Promise.reject(new Error('Unexpected path'))
+    throw new Error('Unexpected path')
   })
 
   const result = await GetCertificateForDomainModule.getCertificateForDomain('example.com')
@@ -198,14 +198,14 @@ test.skip('getCertificateForDomain - deletes mismatched files even if unlink fai
   const mismatchedCert = '-----BEGIN CERTIFICATE-----\nMISMATCHED CERT\n-----END CERTIFICATE-----'
   const mismatchedKey = '-----BEGIN PRIVATE KEY-----\nMISMATCHED KEY\n-----END PRIVATE KEY-----'
 
-  mockReadFile.mockImplementation((path: string) => {
+  mockReadFile.mockImplementation(async (path: string) => {
     if (path.includes('example_com') && path.includes('cert.pem')) {
-      return Promise.resolve(mismatchedCert)
+      return mismatchedCert
     }
     if (path.includes('example_com') && path.includes('key.pem')) {
-      return Promise.resolve(mismatchedKey)
+      return mismatchedKey
     }
-    return Promise.reject(new Error('Unexpected path'))
+    throw new Error('Unexpected path')
   })
   mockUnlink.mockRejectedValue(new Error('File not found') as never)
 

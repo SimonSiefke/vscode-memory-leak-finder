@@ -102,10 +102,10 @@ export const create = ({ expect, ideVersion, page, VError }) => {
     async sendMessage({
       expectedResponse,
       message,
-      verify = false,
       validateRequest = {
         exists: [],
       },
+      verify = false,
     }) {
       try {
         await page.waitForIdle()

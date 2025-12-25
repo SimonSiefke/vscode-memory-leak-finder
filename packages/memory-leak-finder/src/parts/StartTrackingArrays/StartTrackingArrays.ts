@@ -1,7 +1,7 @@
+import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as PartitionArray from '../PartitionArray/PartitionArray.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
-import type { Session } from '../Session/Session.ts'
 
 const ArrayChunkSize = 100_000
 

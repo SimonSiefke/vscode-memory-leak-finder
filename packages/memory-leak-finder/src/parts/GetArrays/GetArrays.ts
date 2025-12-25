@@ -1,5 +1,5 @@
-import * as GetArrayNameMap from '../GetArrayNameMap/GetArrayNameMap.ts'
 import type { Session } from '../Session/Session.ts'
+import * as GetArrayNameMap from '../GetArrayNameMap/GetArrayNameMap.ts'
 
 // @ts-ignore
 const getAllScopes = async (session: Session, objectGroup: string) => {

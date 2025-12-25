@@ -1,7 +1,7 @@
+import type { Session } from '../Session/Session.ts'
 import * as GetGlobalLexicalScopeNames from '../GetGlobalLexicalScopeNames/GetGlobalLexicalScopeNames.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
-import type { Session } from '../Session/Session.ts'
 
 export const id = MeasureId.GlobalLexicalScopeNames
 
