@@ -42,10 +42,21 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         const editContext = page.locator('.models-search-container .monaco-editor .native-edit-context')
         await editContext.type(searchValue)
         await page.waitForIdle()
+        let now = performance.now()
+        const maxWait = 15_000
+        const end = now + maxWait
+        while (now < end) {
+          const newCount = await rows.count()
+          if (newCount !== count) {
+            break
+          }
+          now = performance.now()
+        }
         const newCount = await rows.count()
-        console.log({ newCount })
-
-        // TODO filter
+        if (newCount === count) {
+          throw new Error(`filter has no effect`)
+        }
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to filter`)
       }
