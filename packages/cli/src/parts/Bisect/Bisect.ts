@@ -19,19 +19,20 @@ export const bisect = async (options: StartRunningOptions): Promise<BisectResult
 
   const rpc = await RunTest.prepare()
 
-  try {
-    const result = await rpc.invoke(TestWorkerCommandType.RunTests, {
-      bisect: true,
-      checkLeaks: options.checkLeaks,
-      color: options.color,
-      commit: options.commit,
-      continueValue: options.continueValue,
-      cwd: options.cwd,
-      enableExtensions: options.enableExtensions,
-      enableProxy: options.enableProxy,
-      filterValue: options.filterValue,
-      headlessMode: options.headlessMode,
-      ide: options.ide,
+    try {
+      const result = await rpc.invoke(TestWorkerCommandType.RunTests, {
+        attachToPageTimeout: options.attachToPageTimeout,
+        bisect: true,
+        checkLeaks: options.checkLeaks,
+        color: options.color,
+        commit: options.commit,
+        continueValue: options.continueValue,
+        cwd: options.cwd,
+        enableExtensions: options.enableExtensions,
+        enableProxy: options.enableProxy,
+        filterValue: options.filterValue,
+        headlessMode: options.headlessMode,
+        ide: options.ide,
       ideVersion: options.ideVersion,
       inspectExtensions: options.inspectExtensions,
       inspectExtensionsPort: options.inspectExtensionsPort,

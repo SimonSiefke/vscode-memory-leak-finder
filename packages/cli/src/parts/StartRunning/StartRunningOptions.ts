@@ -1,4 +1,5 @@
 export interface StartRunningOptions {
+  readonly attachToPageTimeout: number
   readonly bisect: boolean
   readonly checkLeaks: boolean
   readonly color: boolean

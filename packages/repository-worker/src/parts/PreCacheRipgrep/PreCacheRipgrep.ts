@@ -1,5 +1,5 @@
 import { VError } from '@lvce-editor/verror'
-import * as os from 'os'
+import * as os from 'node:os'
 import * as FileSystemWorker from '../FileSystemWorker/FileSystemWorker.ts'
 import * as Logger from '../Logger/Logger.ts'
 import * as Path from '../Path/Path.ts'
@@ -71,9 +71,9 @@ const getVersionForTarget = (target: string): string => {
  * Downloads a file using Node.js built-in modules with retry logic
  */
 const downloadWithRetry = async (url: string, outputPath: string, maxRetries = 3): Promise<void> => {
-  const https = await import('https')
-  const fs = await import('fs')
-  const { URL } = await import('url')
+  const https = await import('node:https')
+  const fs = await import('node:fs')
+  const { URL } = await import('node:url')
 
   let lastError: Error | null = null
 

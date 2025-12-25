@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import { generateKeyPairSync } from 'crypto'
+import { generateKeyPairSync } from 'node:crypto'
 import jwt from 'jsonwebtoken'
 import { replaceJwtToken } from '../src/parts/ReplaceJwtToken/ReplaceJwtToken.ts'
 

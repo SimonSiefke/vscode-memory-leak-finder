@@ -1,6 +1,6 @@
-import { spawn } from 'child_process'
+import { spawn } from 'node:child_process'
 import { setTimeout } from 'node:timers/promises'
-import { join } from 'path'
+import { join } from 'node:path'
 import * as GetExtensionsDir from '../GetExtensionsDir/GetExtensionsDir.js'
 import * as GetUserDataDir from '../GetUserDataDir/GetUserDataDir.js'
 import * as GetVscodeArgs from '../GetVsCodeArgs/GetVsCodeArgs.js'

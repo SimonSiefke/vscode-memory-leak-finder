@@ -1,6 +1,6 @@
 import { VError } from '@lvce-editor/verror'
-import { existsSync } from 'fs'
-import { join } from 'path'
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 import * as ExecuteSql from '../ExecuteSql/ExecuteSql.js'
 import * as GetDb from '../GetDb/GetDb.js'
 import * as LaunchCursorOnce from '../LaunchCursorOnce/LaunchCursorOnce.js'

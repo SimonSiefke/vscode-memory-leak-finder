@@ -25,6 +25,7 @@ const parseArgvString = (argv, name) => {
 
 export const parseArgv = (argv) => {
   const options = {
+    attachToPageTimeout: 40_000,
     bisect: false,
     checkLeaks: false,
     color: true,
@@ -166,6 +167,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--screencast-quality')) {
     options.screencastQuality = parseArgvNumber(argv, '--screencast-quality')
+  }
+  if (argv.includes('--attach-to-page-timeout')) {
+    options.attachToPageTimeout = parseArgvNumber(argv, '--attach-to-page-timeout')
   }
   return options
 }

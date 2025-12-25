@@ -11,6 +11,7 @@ const callback = async (method, ...params) => {
 }
 
 export const runTests = async ({
+  attachToPageTimeout,
   bisect,
   checkLeaks,
   color,
@@ -60,6 +61,7 @@ export const runTests = async ({
       throw new Error('--bisect requires --check-leaks to be enabled')
     }
     const options: RunTestsOptions = {
+      attachToPageTimeout,
       bisect,
       checkLeaks,
       color,
@@ -101,6 +103,7 @@ export const runTests = async ({
 
   return RunTestsWithCallback.runTestsWithCallback({
     addDisposable: Disposables.add,
+    attachToPageTimeout,
     callback,
     checkLeaks,
     clearDisposables: Disposables.disposeAll,

@@ -1,4 +1,4 @@
-import { createGunzip } from 'zlib'
+import { createGunzip } from 'node:zlib'
 
 export const decompressGzip = async (body: Buffer): Promise<{ body: string; wasCompressed: boolean }> => {
   const { promise, reject, resolve } = Promise.withResolvers<{
@@ -17,3 +17,4 @@ export const decompressGzip = async (body: Buffer): Promise<{ body: string; wasC
   gunzip.end()
   return promise
 }
+

@@ -1,7 +1,7 @@
-import { writeFile, mkdir } from 'fs/promises'
+import { writeFile, mkdir } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { readdir, stat } from 'node:fs/promises'
-import { join } from 'path'
+import { join } from 'node:path'
 import * as Root from '../Root/Root.ts'
 
 const baseStructure = `
