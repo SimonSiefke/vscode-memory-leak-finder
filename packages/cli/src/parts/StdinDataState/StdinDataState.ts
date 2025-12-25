@@ -43,6 +43,7 @@ export interface StdinDataState {
   readonly value: string
   readonly watch: boolean
   readonly workers: boolean
+  readonly clearExtensions: boolean
 }
 
 let state: StdinDataState = {
@@ -84,6 +85,7 @@ let state: StdinDataState = {
   value: Character.EmptyString,
   watch: false,
   workers: false,
+  clearExtensions: true,
 }
 
 export const setState = (newState: StdinDataState): void => {
