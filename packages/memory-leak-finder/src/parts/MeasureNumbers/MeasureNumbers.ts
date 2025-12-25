@@ -1,3 +1,4 @@
+import type { Session } from '../Session/Session.ts'
 import * as CompareNumbers from '../CompareNumbers/CompareNumbers.ts'
 import * as GetNumbers from '../GetNumbers/GetNumbers.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
@@ -9,21 +10,21 @@ export const id = MeasureId.Numbers
 
 export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]
 }
 
-export const start = async (session, objectGroup) => {
+export const start = async (session: Session, objectGroup: string) => {
   const result = await GetNumbers.getNumbers(session, objectGroup)
   return result
 }
 
-export const releaseResources = async (session, objectGroup) => {
+export const releaseResources = async (session: Session, objectGroup: string) => {
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 
-export const stop = async (session, objectGroup) => {
+export const stop = async (session: Session, objectGroup: string) => {
   const result = await GetNumbers.getNumbers(session, objectGroup)
   return result
 }

@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs'
 import { readdir } from 'node:fs/promises'
-import { join } from 'path'
+import { join } from 'node:path'
 import { readJson } from '../ReadJson/ReadJson.ts'
 
 const getUniqueName = (usedNames: Set<string>, currentName: string): string => {
@@ -26,18 +26,20 @@ export const getNamedFunctionCountData3 = async (name: string, basePath: string)
     const beforePath = join(resultsPath, dirent)
     const rawData = await readJson(beforePath)
     const usedNames = new Set<string>()
-    const data = (rawData.namedFunctionCount3 || []).map((item) => {
-      const baseName = item.originalName || item.name
-      const uniqueName = getUniqueName(usedNames, baseName)
-      usedNames.add(uniqueName)
+    const data = (rawData.namedFunctionCount3 || []).map(
+      (item: { originalName?: string; name?: string; count?: number; delta?: number }) => {
+        const baseName = item.originalName || item.name || ''
+        const uniqueName = getUniqueName(usedNames, baseName)
+        usedNames.add(uniqueName)
 
-      return {
-        name: uniqueName,
-        count: item.count,
-        delta: item.delta,
-      }
-    })
-    data.sort((a, b) => b.count - a.count)
+        return {
+          count: item.count,
+          delta: item.delta,
+          name: uniqueName,
+        }
+      },
+    )
+    data.sort((a: { count: number }, b: { count: number }) => b.count - a.count)
     // Add filename metadata to the data
     const dataWithFilename = {
       data,

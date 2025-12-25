@@ -1,6 +1,7 @@
+import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
-export const getInstanceCountMap = async (session, objectGroup, objects) => {
+export const getInstanceCountMap = async (session: Session, objectGroup, objects) => {
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
   const instances = this
@@ -16,9 +17,9 @@ export const getInstanceCountMap = async (session, objectGroup, objects) => {
   }
   return map
 }`,
+    objectGroup,
     objectId: objects.objectId,
     returnByValue: false,
-    objectGroup,
   })
   return fnResult1
 }

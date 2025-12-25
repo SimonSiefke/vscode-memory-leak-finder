@@ -1,3 +1,4 @@
+import * as FetchVscodeInsidersMetadata from '../FetchVscodeInsidersMetadata/FetchVscodeInsidersMetadata.ts'
 import * as Ide from '../Ide/Ide.ts'
 import * as LaunchCursor from '../LaunchCursor/LaunchCursor.ts'
 import * as LaunchVsCode from '../LaunchVsCode/LaunchVsCode.ts'
@@ -21,6 +22,24 @@ export const launchIde = async ({
   useProxyMock,
   vscodePath,
   vscodeVersion,
+}: {
+  addDisposable: (fn: () => Promise<void> | void) => void
+  commit: string
+  cwd: string
+  enableExtensions: boolean
+  enableProxy: boolean
+  headlessMode: boolean
+  ide: string
+  insidersCommit: string
+  inspectExtensions: boolean
+  inspectExtensionsPort: number
+  inspectPtyHost: boolean
+  inspectPtyHostPort: number
+  inspectSharedProcess: boolean
+  inspectSharedProcessPort: number
+  useProxyMock: boolean
+  vscodePath: string
+  vscodeVersion: string
 }) => {
   if (ide === Ide.Cursor) {
     const cursorVersion = '0.45.14' // TODO make it configurable
@@ -45,6 +64,14 @@ export const launchIde = async ({
       parsedVersion: ParseVersion.parseVersion(cursorVersion),
     }
   }
+  let versionToParse: string
+  if (insidersCommit) {
+    const metadata = await FetchVscodeInsidersMetadata.fetchVscodeInsidersMetadata(insidersCommit)
+    const { productVersion } = metadata
+    versionToParse = productVersion.replace('-insider', '')
+  } else {
+    versionToParse = vscodeVersion
+  }
   const result = await LaunchVsCode.launchVsCode({
     addDisposable,
     commit,
@@ -63,8 +90,9 @@ export const launchIde = async ({
     vscodePath,
     vscodeVersion,
   })
+
   return {
     ...result,
-    parsedVersion: ParseVersion.parseVersion(vscodeVersion),
+    parsedVersion: ParseVersion.parseVersion(versionToParse),
   }
 }

@@ -1,37 +1,38 @@
 export interface StartRunningOptions {
-  bisect: boolean
-  checkLeaks: boolean
-  color: boolean
-  commit: string
-  continueValue: string
-  cwd: string
-  enableExtensions: boolean
-  enableProxy: boolean
-  filterValue: string
-  headlessMode: boolean
-  ide: string
-  ideVersion: string
-  insidersCommit: string
-  inspectExtensions: boolean
-  inspectExtensionsPort: number
-  inspectPtyHost: boolean
-  inspectPtyHostPort: number
-  inspectSharedProcess: boolean
-  inspectSharedProcessPort: number
-  isWindows: boolean
-  measure: string
-  measureAfter: boolean
-  measureNode: boolean
-  recordVideo: boolean
-  restartBetween: boolean
-  runMode: number
-  runs: number
-  runSkippedTestsAnyway: boolean
-  setupOnly: boolean
-  timeoutBetween: number
-  timeouts: boolean
-  useProxyMock: boolean
-  vscodePath: string
-  vscodeVersion: string
-  workers: boolean
+  readonly bisect: boolean
+  readonly checkLeaks: boolean
+  readonly color: boolean
+  readonly commit: string
+  readonly continueValue: string
+  readonly cwd: string
+  readonly enableExtensions: boolean
+  readonly enableProxy: boolean
+  readonly filterValue: string
+  readonly headlessMode: boolean
+  readonly ide: string
+  readonly ideVersion: string
+  readonly insidersCommit: string
+  readonly inspectExtensions: boolean
+  readonly inspectExtensionsPort: number
+  readonly inspectPtyHost: boolean
+  readonly inspectPtyHostPort: number
+  readonly inspectSharedProcess: boolean
+  readonly inspectSharedProcessPort: number
+  readonly isWindows: boolean
+  readonly measure: string
+  readonly measureAfter: boolean
+  readonly measureNode: boolean
+  readonly recordVideo: boolean
+  readonly restartBetween: boolean
+  readonly runMode: number
+  readonly runs: number
+  readonly runSkippedTestsAnyway: boolean
+  readonly screencastQuality: number
+  readonly setupOnly: boolean
+  readonly timeoutBetween: number
+  readonly timeouts: boolean
+  readonly useProxyMock: boolean
+  readonly vscodePath: string
+  readonly vscodeVersion: string
+  readonly workers: boolean
 }

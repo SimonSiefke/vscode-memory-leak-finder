@@ -12,23 +12,22 @@ const createMockServer = async ({ port }): Promise<MockServer> => {
     res.statusCode = 200
     res.end('<h1>hello world</h1>')
   })
-  const { resolve, promise } = Promise.withResolvers()
+  const { promise, resolve } = Promise.withResolvers()
   server.once('listening', resolve)
   server.listen(port)
   await promise
   return {
     async [Symbol.asyncDispose]() {
-      const { resolve, promise } = Promise.withResolvers()
+      const { promise, resolve } = Promise.withResolvers()
       server.close(resolve)
       await promise
     },
   }
 }
 
-export const create = ({ page, expect, VError }) => {
+export const create = ({ expect, page, VError }) => {
   return {
-    mockServers: Object.create(null),
-    async createMockServer({ port, id }) {
+    async createMockServer({ id, port }) {
       try {
         await page.waitForIdle()
         const server = await createMockServer({ port })
@@ -47,10 +46,11 @@ export const create = ({ page, expect, VError }) => {
         throw new VError(error, `Failed to dispose mock server`)
       }
     },
+    mockServers: Object.create(null),
     async show({ port }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ page, expect, VError })
+        const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.SimpleBrowserShow, {
           pressKeyOnce: true,
           stayVisible: true,
@@ -72,7 +72,7 @@ export const create = ({ page, expect, VError }) => {
         await expect(tab).toHaveCount(1)
         await page.waitForIdle()
 
-        const webView = WebView.create({ page, expect, VError })
+        const webView = WebView.create({ expect, page, VError })
         const subFrame = await webView.shouldBeVisible2({
           extensionId: 'vscode.simple-browser',
           hasLineOfCodeCounter: false,

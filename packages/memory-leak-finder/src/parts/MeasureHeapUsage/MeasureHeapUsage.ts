@@ -1,7 +1,7 @@
+import type { Session } from '../Session/Session.ts'
 import * as CompareHeapUsage from '../CompareHeapUsage/CompareHeapUsage.ts'
 import * as GetHeapUsage from '../GetHeapUsage/GetHeapUsage.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
-import type { Session } from '../Session/Session.ts'
 import * as TargetId from '../TargetId/TargetId.ts'
 
 export const id = MeasureId.HeapUsage
@@ -22,6 +22,6 @@ export const stop = (session: Session) => {
 
 export const compare = CompareHeapUsage.compareHeapUsage
 
-export const isLeak = ({ usedBefore, usedAfter }) => {
-  return usedAfter > usedBefore
+export const isLeak = ({ isLeak }) => {
+  return isLeak
 }

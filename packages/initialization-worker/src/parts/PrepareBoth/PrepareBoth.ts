@@ -43,12 +43,6 @@ export const prepareBoth = async (headlessMode: boolean, attachedToPageTimeout: 
     devtoolsWebSocketUrl,
     electronObjectId,
     monkeyPatchedElectronId,
-    parsedVersion: {
-      // TODO
-      major: 1,
-      minor: 105,
-      patch: 0,
-    },
     sessionId,
     targetId,
     utilityContext: undefined,

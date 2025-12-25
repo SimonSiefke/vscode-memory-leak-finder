@@ -5,16 +5,27 @@ import { VError } from '../VError/VError.ts'
 
 const loadSourceMapWorkerPath: string = join(Root.root, 'packages', 'load-source-map-worker', 'src', 'loadSourceMapWorkerMain.ts')
 
+const launchLoadSourceMapsWorker = async () => {
+  const rpc = await NodeWorkerRpcParent.create({
+    commandMap: {},
+    execArgv: [],
+    path: loadSourceMapWorkerPath,
+    stdio: 'inherit',
+  })
+  return {
+    invoke(method: string, ...params: any[]) {
+      return rpc.invoke(method, ...params)
+    },
+    async [Symbol.asyncDispose]() {
+      await rpc.dispose()
+    },
+  }
+}
+
 export const loadSourceMaps = async (sourceMapUrls: readonly string[]): Promise<void> => {
   try {
-    const rpc = await NodeWorkerRpcParent.create({
-      commandMap: {},
-      execArgv: [],
-      path: loadSourceMapWorkerPath,
-      stdio: 'inherit',
-    })
+    await using rpc = await launchLoadSourceMapsWorker()
     await rpc.invoke('LoadSourceMaps.loadSourceMaps', sourceMapUrls)
-    await rpc.dispose()
   } catch (error) {
     throw new VError(error, `Failed to load source maps`)
   }

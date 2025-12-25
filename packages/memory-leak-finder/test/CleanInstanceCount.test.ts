@@ -4,12 +4,12 @@ import * as CleanInstanceCount from '../src/parts/CleanInstanceCount/CleanInstan
 test('cleanInstanceCount', () => {
   const instance = {}
   const constructorLocation = {
-    scriptId: '16',
-    lineNumber: 1552,
     columnNumber: 2776,
+    lineNumber: 1552,
+    scriptId: '16',
   }
   const scriptMap = {
-    16: { url: 'index.js', sourceMapUrl: 'index.js.map' },
+    16: { sourceMapUrl: 'index.js.map', url: 'index.js' },
   }
   expect(CleanInstanceCount.cleanInstanceCount(instance, constructorLocation, scriptMap)).toEqual({
     columnNumber: 2776,

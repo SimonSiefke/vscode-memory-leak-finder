@@ -1,79 +1,13 @@
-import type { IncomingMessage } from 'http'
-import { decompress as zstdDecompress } from '@mongodb-js/zstd'
-import { mkdir, writeFile } from 'fs/promises'
-import { join } from 'path'
-import { createGunzip, createInflate, createBrotliDecompress } from 'zlib'
+import type { IncomingMessage } from 'node:http'
+import { mkdir, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
+import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
 import * as Root from '../Root/Root.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
+import * as SaveSseData from '../SaveSseData/SaveSseData.ts'
 import * as SaveZipData from '../SaveZipData/SaveZipData.ts'
 
 const REQUESTS_DIR = join(Root.root, '.vscode-requests')
-
-const decompressBody = async (body: Buffer, encoding: string | string[] | undefined): Promise<{ body: string; wasCompressed: boolean }> => {
-  if (!encoding) {
-    return { body: body.toString('utf8'), wasCompressed: false }
-  }
-
-  const encodingStr = Array.isArray(encoding) ? encoding[0] : encoding
-  const normalizedEncoding = encodingStr.toLowerCase().trim()
-
-  if (normalizedEncoding === 'gzip') {
-    return new Promise((resolve, reject) => {
-      const gunzip = createGunzip()
-      const chunks: Buffer[] = []
-      gunzip.on('data', (chunk: Buffer) => chunks.push(chunk))
-      gunzip.on('end', () => {
-        const decompressed = Buffer.concat(chunks).toString('utf8')
-        resolve({ body: decompressed, wasCompressed: true })
-      })
-      gunzip.on('error', reject)
-      gunzip.write(body)
-      gunzip.end()
-    })
-  }
-
-  if (normalizedEncoding === 'deflate') {
-    return new Promise((resolve, reject) => {
-      const inflate = createInflate()
-      const chunks: Buffer[] = []
-      inflate.on('data', (chunk: Buffer) => chunks.push(chunk))
-      inflate.on('end', () => {
-        const decompressed = Buffer.concat(chunks).toString('utf8')
-        resolve({ body: decompressed, wasCompressed: true })
-      })
-      inflate.on('error', reject)
-      inflate.write(body)
-      inflate.end()
-    })
-  }
-
-  if (normalizedEncoding === 'br') {
-    return new Promise((resolve, reject) => {
-      const brotli = createBrotliDecompress()
-      const chunks: Buffer[] = []
-      brotli.on('data', (chunk: Buffer) => chunks.push(chunk))
-      brotli.on('end', () => {
-        const decompressed = Buffer.concat(chunks).toString('utf8')
-        resolve({ body: decompressed, wasCompressed: true })
-      })
-      brotli.on('error', reject)
-      brotli.write(body)
-      brotli.end()
-    })
-  }
-
-  if (normalizedEncoding === 'zstd') {
-    try {
-      const decompressed = await zstdDecompress(body)
-      return { body: decompressed.toString('utf8'), wasCompressed: true }
-    } catch {
-      // If decompression fails, return original body
-      return { body: body.toString('utf8'), wasCompressed: false }
-    }
-  }
-
-  return { body: body.toString('utf8'), wasCompressed: false }
-}
 
 const parseJsonIfApplicable = (body: string, contentType: string | string[] | undefined): string | object => {
   if (!contentType) {
@@ -115,14 +49,20 @@ export const saveRequest = async (
     const contentTypeLower = contentType ? (Array.isArray(contentType) ? contentType[0] : contentType).toLowerCase() : ''
 
     // Handle zip files separately - don't decompress them
+    // Handle SSE (Server-Sent Events) separately - save as text file
     let parsedBody: any
     let wasCompressed = false
     if (contentTypeLower.includes('application/zip')) {
       const zipFilePath = await SaveZipData.saveZipData(responseData, url, timestamp)
       parsedBody = `file-reference:${zipFilePath}`
+    } else if (contentTypeLower.includes('text/event-stream')) {
+      const sseFilePath = await SaveSseData.saveSseData(responseData, url, timestamp)
+      parsedBody = `file-reference:${sseFilePath}`
     } else {
-      const { body: decompressedBody, wasCompressed: wasCompressedResult } = await decompressBody(responseData, contentEncoding)
-      wasCompressed = wasCompressedResult
+      const compressionWorker = await CompressionWorker.getCompressionWorker()
+      const result = await compressionWorker.invoke('Compression.decompressBody', responseData, contentEncoding)
+      const decompressedBody = result.body
+      wasCompressed = result.wasCompressed
       parsedBody = parseJsonIfApplicable(decompressedBody, contentType)
     }
 

@@ -13,8 +13,8 @@ export const createConnection = async (wsUrl: string): Promise<any> => {
     })
     await WaitForWebsocketToBeOpen.waitForWebSocketToBeOpen(webSocket as any)
     const ipc = {
-      send(message: any): void {
-        webSocket.send(Json.stringify(message))
+      dispose() {
+        webSocket.close()
       },
       get onmessage() {
         return webSocket.onmessage
@@ -27,8 +27,8 @@ export const createConnection = async (wsUrl: string): Promise<any> => {
         }
         webSocket.onmessage = handleMessage
       },
-      dispose() {
-        webSocket.close()
+      send(message: any): void {
+        webSocket.send(Json.stringify(message))
       },
     }
     const rpc = createRpc(ipc)

@@ -19,6 +19,7 @@ export const run = async (platform: string, argv: readonly string[], env: NodeJS
     ...StdinDataState.getState(),
     bisect: options.bisect,
     checkLeaks: options.checkLeaks,
+    // @ts-ignore
     commit: options.commit,
     continueValue: options.continueValue,
     cwd: options.cwd,

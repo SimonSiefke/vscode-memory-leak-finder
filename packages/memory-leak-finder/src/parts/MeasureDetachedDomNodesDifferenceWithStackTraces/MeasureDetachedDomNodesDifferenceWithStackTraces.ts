@@ -1,4 +1,5 @@
 import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
+import type { Session } from '../Session/Session.ts'
 import * as Arrays from '../Arrays/Arrays.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as CompareDetachedDomNodesWithStackTraces from '../CompareDetachedDomNodesWithStackTraces/CompareDetachedDomNodesWithStackTraces.ts'
@@ -16,26 +17,26 @@ export const id = MeasureId.DetachedDomNodesDifferenceWithStackTraces
 
 export const targets = [TargetId.Browser]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   const scriptHandler = ScriptHandler.create()
   return [session, objectGroup, scriptHandler]
 }
 
-export const start = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+export const start = async (session: Session, objectGroup: string, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   await StartTrackingDomNodeStackTraces.startTrackingDomNodeStackTraces(session, objectGroup)
-  return GetDetachedDomNodes.getDetachedDomNodes(session, scriptHandler.scriptMap)
+  return GetDetachedDomNodes.getDetachedDomNodes(session, objectGroup)
 }
 
-export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+export const stop = async (session: Session, objectGroup: string, scriptHandler: IScriptHandler) => {
   await scriptHandler.stop(session)
   const result = await GetDetachedDomNodesWithStackTraces.getDetachedDomNodesWithStackTraces(session, objectGroup, scriptHandler.scriptMap)
   await StopTrackingDomNodeStackTraces.stopTrackingDomNodeStackTraces(session, objectGroup)
   return result
 }
 
-export const releaseResources = async (session, objectGroup) => {
+export const releaseResources = async (session: Session, objectGroup: string) => {
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 
@@ -51,6 +52,6 @@ const getTotal = (instance) => {
   return Arrays.sum(counts)
 }
 
-export const isLeak = ({ before, after }) => {
+export const isLeak = ({ after, before }) => {
   return getTotal(after) > getTotal(before)
 }

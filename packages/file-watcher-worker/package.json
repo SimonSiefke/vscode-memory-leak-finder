@@ -1,10 +1,7 @@
 {
   "name": "@vscode-memory-leak-finder/file-watcher-worker",
   "version": "0.0.0-dev",
-  "description": "",
-  "keywords": [],
   "license": "MIT",
-  "author": "",
   "type": "module",
   "main": "src/main.js",
   "scripts": {},

@@ -55,6 +55,7 @@ export const updateState = async (newState: any): Promise<void> => {
       runMode: state.runMode,
       runs: state.runs,
       runSkippedTestsAnyway: state.runSkippedTestsAnyway,
+      screencastQuality: state.screencastQuality,
       setupOnly: false,
       timeoutBetween: state.timeoutBetween,
       timeouts: state.timeouts,

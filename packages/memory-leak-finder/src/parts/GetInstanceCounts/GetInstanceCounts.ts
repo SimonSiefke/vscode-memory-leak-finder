@@ -1,9 +1,10 @@
+import type { Session } from '../Session/Session.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetInstanceCountArray from '../GetInstanceCountArray/GetInstanceCountArray.ts'
 import * as GetInstanceCountMap from '../GetInstanceCountMap/GetInstanceCountMap.ts'
 import * as GetInstances from '../GetInstances/GetInstances.ts'
 
-export const getInstanceCounts = async (session, objectGroup) => {
+export const getInstanceCounts = async (session: Session, objectGroup: string) => {
   Assert.object(session)
   Assert.string(objectGroup)
   const objects = await GetInstances.getInstances(session, objectGroup)

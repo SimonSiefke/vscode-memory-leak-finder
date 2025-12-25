@@ -1,12 +1,12 @@
-import { createServer } from 'http'
+import { createServer } from 'node:http'
 
 const DEFAULT_PORT = 0
 
 export interface ServerInfo {
-  readonly url: string
-  readonly port: number
   readonly dispose: () => Promise<void>
+  readonly port: number
   readonly requests: readonly any[]
+  readonly url: string
 }
 
 export const create = ({ VError }) => {
@@ -33,8 +33,6 @@ export const create = ({ VError }) => {
         const serverUrl = `http://localhost:${actualPort}`
 
         return {
-          url: serverUrl,
-          port: actualPort,
           dispose() {
             const { promise, resolve } = Promise.withResolvers<void>()
 
@@ -44,7 +42,9 @@ export const create = ({ VError }) => {
 
             return promise
           },
+          port: actualPort,
           requests: [],
+          url: serverUrl,
         }
       } catch (error) {
         throw new VError(error, `Failed to start mock server`)

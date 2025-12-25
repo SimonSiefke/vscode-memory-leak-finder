@@ -1,6 +1,6 @@
 import { isFullCommitHash } from '../IsFullCommitHash/IsFullCommitHash.ts'
 
-export const parseCommitHash = (stdout, commitRef) => {
+export const parseCommitHash = (stdout: string, commitRef: string): string => {
   const lines = stdout.trim().split('\n')
   if (lines.length === 0 || lines[0] === '') {
     throw new Error(`No commit found for reference '${commitRef}'`)

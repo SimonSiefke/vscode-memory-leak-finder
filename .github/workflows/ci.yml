@@ -108,9 +108,13 @@ jobs:
           - name: promise-count
             args: --measure promise-count
           - name: promises-with-stack-trace
-            args: --measure promises-with-stack-trace
+            args: --measure promises-with-stack-trace --runs 37  --restart-between --run-skipped-tests-anyway
+          - name: promises-with-stack-trace-extensions
+            args: --measure promises-with-stack-trace --runs 37 --restart-between --run-skipped-tests-anyway --inspect-extensions
           - name: named-array-count
             args: --measure named-array-count
+          - name: array-count
+            args: --measure array-count
           - name: css-rule-count
             args: --measure css-rule-count
           - name: regex-count
@@ -129,6 +133,8 @@ jobs:
             args: --measure mutation-observer-count
           - name: resize-observer-count
             args: --measure resize-observer-count
+          - name: intersection-observer-count
+            args: --measure intersection-observer-count
           - name: weak-map-count
             args: --measure weak-map-count
           - name: number-count
@@ -143,8 +149,18 @@ jobs:
             args: --measure set-size
           - name: canvas-count
             args: --measure canvas-count
+          - name: canvas-rendering-context-2d-count
+            args: --measure canvas-rendering-context-2d-count
+          - name: gpu-canvas-context-count
+            args: --measure gpu-canvas-context-count
+          - name: image-bitmap-count
+            args: --measure image-bitmap-count
+          - name: webgl2-rendering-context-count
+            args: --measure webgl2-rendering-context-count
           - name: iframe-count
             args: --measure iframe-count
+          - name: media-query-list-count
+            args: --measure media-query-list-count
           - name: message-port-count
             args: --measure message-port-count
           - name: symbol-count
@@ -153,6 +169,8 @@ jobs:
             args: --measure object-count
           - name: disposable-count
             args: --measure disposable-count
+          - name: worker-count
+            args: --measure worker-count
     timeout-minutes: 180
     steps:
       - uses: actions/checkout@v6
@@ -260,8 +278,18 @@ jobs:
       - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
+          name: vscode-memory-leak-finder-results-linux-promises-with-stack-trace-extensions
+          path: ./vscode-memory-leak-finder-results-linux-promises-with-stack-trace-extensions
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
           name: vscode-memory-leak-finder-results-linux-named-array-count
           path: ./vscode-memory-leak-finder-results-linux-named-array-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-array-count
+          path: ./vscode-memory-leak-finder-results-linux-array-count
       - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
@@ -310,6 +338,11 @@ jobs:
       - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
+          name: vscode-memory-leak-finder-results-linux-intersection-observer-count
+          path: ./vscode-memory-leak-finder-results-linux-intersection-observer-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
           name: vscode-memory-leak-finder-results-linux-weak-map-count
           path: ./vscode-memory-leak-finder-results-linux-weak-map-count
       - uses: actions/download-artifact@v6
@@ -345,8 +378,33 @@ jobs:
       - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
+          name: vscode-memory-leak-finder-results-linux-canvas-rendering-context-2d-count
+          path: ./vscode-memory-leak-finder-results-linux-canvas-rendering-context-2d-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-gpu-canvas-context-count
+          path: ./vscode-memory-leak-finder-results-linux-gpu-canvas-context-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-image-bitmap-count
+          path: ./vscode-memory-leak-finder-results-linux-image-bitmap-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-webgl2-rendering-context-count
+          path: ./vscode-memory-leak-finder-results-linux-webgl2-rendering-context-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
           name: vscode-memory-leak-finder-results-linux-iframe-count
           path: ./vscode-memory-leak-finder-results-linux-iframe-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-media-query-list-count
+          path: ./vscode-memory-leak-finder-results-linux-media-query-list-count
       - uses: actions/download-artifact@v6
         continue-on-error: true
         with:
@@ -367,6 +425,11 @@ jobs:
         with:
           name: vscode-memory-leak-finder-results-linux-disposable-count
           path: ./vscode-memory-leak-finder-results-linux-disposable-count
+      - uses: actions/download-artifact@v6
+        continue-on-error: true
+        with:
+          name: vscode-memory-leak-finder-results-linux-worker-count
+          path: ./vscode-memory-leak-finder-results-linux-worker-count
       - name: Merge all measure results
         run: node packages/build/src/mergeArtifacts.ts
       - name: Generate charts

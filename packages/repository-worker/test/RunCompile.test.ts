@@ -10,7 +10,7 @@ test('runCompile throws error when main.js not found after compilation', async (
 
   const mockRpc = MockRpc.create({
     commandMap: {},
-    invoke(method, ...params) {
+    invoke(method: string, ...params: unknown[]) {
       if (method === 'FileSystem.readFileContent') {
         return '20'
       }

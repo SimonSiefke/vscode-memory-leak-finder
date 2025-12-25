@@ -1,11 +1,10 @@
 import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/ComputeHeapSnapshotIndices.ts'
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 /**
  * Counts DOM timers (setTimeout/setInterval) from heap snapshot
- * @param {import('../Snapshot/Snapshot.ts').Snapshot} snapshot
- * @returns {number}
  */
-export const getDomTimerCountFromHeapSnapshotInternal = (snapshot) => {
+export const getDomTimerCountFromHeapSnapshotInternal = (snapshot: Snapshot): number => {
   const { nodes, strings, meta } = snapshot
   const { node_types, node_fields, edge_types, edge_fields } = meta
   const { objectTypeIndex, nativeTypeIndex, ITEMS_PER_NODE, typeFieldIndex, nameFieldIndex } = computeHeapSnapshotIndices(

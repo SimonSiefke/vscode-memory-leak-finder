@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join } from 'node:path'
 import { importHeapSnapshotWorker } from './import-heap-snapshot-worker.ts'
 
 const main = async (): Promise<void> => {

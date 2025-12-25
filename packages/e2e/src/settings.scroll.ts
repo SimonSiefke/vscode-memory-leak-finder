@@ -2,13 +2,19 @@ import type { TestContext } from '../types.ts'
 
 export const skip = true
 
-export const setup = async ({ Editor, Settings }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, SettingsEditor, SideBar }: TestContext): Promise<void> => {
   await Editor.closeAll()
-  await Settings.open()
+  await SideBar.hide()
+  await SettingsEditor.open()
+  await SettingsEditor.search({
+    resultCount: 498, // TODO this is very specific
+    value: 'editor',
+  })
 }
 
 export const run = async ({ SettingsEditor }: TestContext): Promise<void> => {
-  // await Editor.closeAll()
-  await SettingsEditor.scrollDown()
-  // await SettingsEditor.scrollUp()
+  // @ts-ignore
+  await SettingsEditor.moveScrollBar(200, 200)
+  // @ts-ignore
+  await SettingsEditor.moveScrollBar(-200, 0)
 }

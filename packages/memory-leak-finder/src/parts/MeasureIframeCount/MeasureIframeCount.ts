@@ -1,3 +1,4 @@
+import type { Session } from '../Session/Session.ts'
 import * as CompareCount from '../CompareCount/CompareCount.ts'
 import * as GetIframeCount from '../GetIframeCount/GetIframeCount.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
@@ -9,17 +10,17 @@ export const id = MeasureId.IframeCount
 
 export const targets = [TargetId.Browser]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]
 }
 
-export const start = (session, objectGroup) => {
-  return GetIframeCount.getIframeCount(session)
+export const start = (session: Session, objectGroup: string) => {
+  return GetIframeCount.getIframeCount(session, objectGroup)
 }
 
-export const stop = (session, objectGroup) => {
-  return GetIframeCount.getIframeCount(session)
+export const stop = (session: Session, objectGroup: string) => {
+  return GetIframeCount.getIframeCount(session, objectGroup)
 }
 
 export const compare = CompareCount.compareCount

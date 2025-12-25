@@ -2,13 +2,13 @@ import * as GetPromiseCountData from '../GetPromiseCountData/GetPromiseCountData
 
 export const name = 'promise-count'
 
-export const getData = (basePath: string) => GetPromiseCountData.getPromiseCountData(basePath)
+export const getData = (basePath: string): Promise<any[]> => GetPromiseCountData.getPromiseCountData(basePath)
 
-export const createChart = () => {
+export const createChart = (): { x: string; xLabel: string; y: string; yLabel: string } => {
   return {
     x: 'index',
-    y: 'count',
     xLabel: 'Index',
+    y: 'count',
     yLabel: 'Promise Count',
   }
 }

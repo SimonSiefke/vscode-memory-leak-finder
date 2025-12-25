@@ -2,13 +2,13 @@ import * as GetEmitterCountData from '../GetEmitterCountData/GetEmitterCountData
 
 export const name = 'emitter-count'
 
-export const getData = (basePath: string) => GetEmitterCountData.getEmitterCountData(basePath)
+export const getData = (basePath: string): Promise<any[]> => GetEmitterCountData.getEmitterCountData(basePath)
 
-export const createChart = () => {
+export const createChart = (): { x: string; xLabel: string; y: string; yLabel: string } => {
   return {
     x: 'index',
-    y: 'count',
     xLabel: 'Index',
+    y: 'count',
     yLabel: 'Emitter Count',
   }
 }

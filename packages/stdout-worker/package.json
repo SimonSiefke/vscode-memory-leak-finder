@@ -2,9 +2,7 @@
   "name": "@vscode-memory-leak-finder/stdout-worker",
   "version": "0.0.0-dev",
   "description": "Write data to stdout",
-  "keywords": [],
   "license": "MIT",
-  "author": "",
   "type": "module",
   "main": "src/main.ts",
   "bin": {

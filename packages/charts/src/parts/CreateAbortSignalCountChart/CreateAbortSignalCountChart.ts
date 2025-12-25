@@ -2,13 +2,13 @@ import * as GetAbortSignalCountData from '../GetAbortSignalCountData/GetAbortSig
 
 export const name = 'abort-signal-count'
 
-export const getData = (basePath: string) => GetAbortSignalCountData.getAbortSignalCountData(basePath)
+export const getData = (basePath: string): Promise<any[]> => GetAbortSignalCountData.getAbortSignalCountData(basePath)
 
-export const createChart = () => {
+export const createChart = (): { x: string; xLabel: string; y: string; yLabel: string } => {
   return {
     x: 'index',
-    y: 'count',
     xLabel: 'Index',
+    y: 'count',
     yLabel: 'AbortSignal Count',
   }
 }

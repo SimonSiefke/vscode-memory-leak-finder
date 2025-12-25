@@ -1,4 +1,4 @@
-export const parseHeapSnapshotArrayHeader = (data, name) => {
+export const parseHeapSnapshotArrayHeader = (data: string, name: string): number => {
   const token = `"${name}":`
   const tokenIndex = data.indexOf(token)
   if (tokenIndex === -1) {

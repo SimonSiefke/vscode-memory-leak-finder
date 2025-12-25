@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join } from 'node:path'
 import * as GetExecutablePath from '../GetExecutablePath/GetExecutablePath.ts'
 import * as Root from '../Root/Root.ts'
 

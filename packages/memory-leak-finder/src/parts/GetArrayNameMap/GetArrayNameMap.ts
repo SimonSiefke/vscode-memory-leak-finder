@@ -1,3 +1,4 @@
+import type { Session } from '../Session/Session.ts'
 import * as Assert from '../Assert/Assert.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as GetAllFunctions from '../GetAllFunctions/GetAllFunctions.ts'
@@ -16,20 +17,20 @@ const isArrayScopeValue = (rawScopeValue) => {
   return rawScopeValue.value.type === 'object' && rawScopeValue.value.subtype === 'array'
 }
 
-const getScopeChildValues = async (session, objectId) => {
+const getScopeChildValues = async (session: Session, objectId: string) => {
   const rawResult = await DevtoolsProtocolRuntime.getProperties(session, {
-    objectId,
     generatePreview: false,
+    objectId,
     ownProperties: true,
   })
   const ownProperties = rawResult.result.filter(IsEnumerable.isEnumerable).filter(isArrayScopeValue).map(parseChildScopeValue)
   return ownProperties
 }
 
-const getScopeValues = async (session, objectId) => {
+const getScopeValues = async (session: Session, objectId: string) => {
   const rawResult = await DevtoolsProtocolRuntime.getProperties(session, {
-    objectId,
     generatePreview: false,
+    objectId,
     ownProperties: true,
   })
   const descriptorValues = GetDescriptorValues.getDescriptorValues(rawResult)
@@ -41,7 +42,7 @@ const getScopeValues = async (session, objectId) => {
   return childScopeArrays
 }
 
-export const getArrayNameMap = async (session, objectGroup) => {
+export const getArrayNameMap = async (session: Session, objectGroup: string) => {
   Assert.object(session)
   Assert.string(objectGroup)
   const functionObjectIds = await GetAllFunctions.getAllFunctions(session, objectGroup)

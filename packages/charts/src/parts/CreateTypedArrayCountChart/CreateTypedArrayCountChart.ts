@@ -2,13 +2,13 @@ import * as GetTypedArrayCountsData from '../GetTypedArrayCountsData/GetTypedArr
 
 export const name = 'typed-array-count'
 
-export const getData = (basePath: string) => GetTypedArrayCountsData.getTypedArrayCountsData(basePath)
+export const getData = (basePath: string): Promise<any[]> => GetTypedArrayCountsData.getTypedArrayCountsData(basePath)
 
-export const createChart = () => {
+export const createChart = (): { x: string; xLabel: string; y: string; yLabel: string } => {
   return {
     x: 'index',
-    y: 'count',
     xLabel: 'Index',
+    y: 'count',
     yLabel: 'Typed Array Count',
   }
 }

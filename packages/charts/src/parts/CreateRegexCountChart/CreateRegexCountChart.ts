@@ -2,13 +2,13 @@ import * as GetRegexCountData from '../GetRegexCountData/GetRegexCountData.ts'
 
 export const name = 'regex-count'
 
-export const getData = (basePath: string) => GetRegexCountData.getRegexCountData(basePath)
+export const getData = (basePath: string): Promise<any[]> => GetRegexCountData.getRegexCountData(basePath)
 
-export const createChart = () => {
+export const createChart = (): { x: string; xLabel: string; y: string; yLabel: string } => {
   return {
     x: 'index',
-    y: 'count',
     xLabel: 'Index',
+    y: 'count',
     yLabel: 'Regex Count',
   }
 }

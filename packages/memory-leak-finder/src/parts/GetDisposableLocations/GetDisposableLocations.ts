@@ -1,10 +1,11 @@
+import type { Session } from '../Session/Session.ts'
 import * as CleanFunctionLocations from '../CleanFunctionLocations/CleanFunctionLocations.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as GetDescriptorValues from '../GetDescriptorValues/GetDescriptorValues.ts'
 import * as GetFunctionLocations from '../GetFunctionLocations/GetFunctionLocations.ts'
 import * as GetFunctionObjectIds from '../GetFunctionObjectIds/GetFunctionObjectIds.ts'
 
-export const getDisposableLocations = async (session, objectGroup, disposables) => {
+export const getDisposableLocations = async (session: Session, objectGroup, disposables) => {
   const fnResult1 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
   const disposables = this
@@ -20,9 +21,9 @@ export const getDisposableLocations = async (session, objectGroup, disposables) 
   const locations = disposables.map(getConstructorOrFunctionLocation)
   return locations
 }`,
+    objectGroup,
     objectId: disposables.objectId,
     returnByValue: false,
-    objectGroup,
   })
   const fnResult2 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
@@ -41,9 +42,9 @@ export const getDisposableLocations = async (session, objectGroup, disposables) 
   const uniqueLocations = unique(locations)
   return uniqueLocations
 }`,
+    objectGroup,
     objectId: fnResult1.objectId,
     returnByValue: false,
-    objectGroup,
   })
   const fnResult5 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
@@ -60,9 +61,9 @@ export const getDisposableLocations = async (session, objectGroup, disposables) 
   const names = getNames(uniqueLocations)
   return names
 }`,
+    objectGroup,
     objectId: fnResult2.objectId,
     returnByValue: true,
-    objectGroup,
   })
   const fnResult3 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){
@@ -85,13 +86,13 @@ export const getDisposableLocations = async (session, objectGroup, disposables) 
   const counts = getCounts(locations)
   return counts
 }`,
+    objectGroup,
     objectId: fnResult1.objectId,
     returnByValue: true,
-    objectGroup,
   })
   const fnResult4 = await DevtoolsProtocolRuntime.getProperties(session, {
-    objectId: fnResult2.objectId,
     generatePreview: false,
+    objectId: fnResult2.objectId,
     ownProperties: true,
   })
   const descriptors = GetDescriptorValues.getDescriptorValues(fnResult4.result)

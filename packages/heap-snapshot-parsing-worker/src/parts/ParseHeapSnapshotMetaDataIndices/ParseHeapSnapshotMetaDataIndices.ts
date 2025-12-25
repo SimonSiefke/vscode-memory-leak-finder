@@ -5,7 +5,7 @@ export const EMPTY_DATA = {
   startIndex: -1,
 }
 
-export const parseHeapSnapshotMetaDataIndices = (data) => {
+export const parseHeapSnapshotMetaDataIndices = (data: string) => {
   const snapshotToken = '"snapshot":'
   const index = data.indexOf(snapshotToken)
   if (index === -1) {

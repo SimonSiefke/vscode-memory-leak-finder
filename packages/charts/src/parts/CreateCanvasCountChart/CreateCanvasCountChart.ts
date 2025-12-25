@@ -2,13 +2,13 @@ import * as GetCanvasCountsData from '../GetCanvasCountsData/GetCanvasCountsData
 
 export const name = 'canvas-count'
 
-export const getData = (basePath: string) => GetCanvasCountsData.getCanvasCountsData(basePath)
+export const getData = (basePath: string): Promise<any[]> => GetCanvasCountsData.getCanvasCountsData(basePath)
 
-export const createChart = () => {
+export const createChart = (): { x: string; xLabel: string; y: string; yLabel: string } => {
   return {
     x: 'index',
-    y: 'count',
     xLabel: 'Index',
+    y: 'count',
     yLabel: 'Canvas Count',
   }
 }

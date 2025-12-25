@@ -1,3 +1,4 @@
+import type { Session } from '../Session/Session.ts'
 import * as CompareCount from '../CompareCount/CompareCount.ts'
 import * as GetSetCount from '../GetSetCount/GetSetCount.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
@@ -9,17 +10,17 @@ export const id = MeasureId.SetCount
 
 export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]
 }
 
-export const start = (session, objectGroup) => {
-  return GetSetCount.getSetCount(session)
+export const start = (session: Session, objectGroup: string) => {
+  return GetSetCount.getSetCount(session, objectGroup)
 }
 
-export const stop = (session, objectGroup) => {
-  return GetSetCount.getSetCount(session)
+export const stop = (session: Session, objectGroup: string) => {
+  return GetSetCount.getSetCount(session, objectGroup)
 }
 
 export const compare = CompareCount.compareCount

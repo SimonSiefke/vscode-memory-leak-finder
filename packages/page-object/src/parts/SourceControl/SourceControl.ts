@@ -1,5 +1,6 @@
-import * as QuickPick from '../QuickPick/QuickPick.ts'
+import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as Editor from '../Editor/Editor.ts'
+import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 
 const getMatchingText = async (styleElements, className) => {
@@ -49,119 +50,8 @@ const getDecorationContent = (text: string, className: string): string => {
   return content
 }
 
-export const create = ({ expect, page, VError, ideVersion }) => {
+export const create = ({ expect, ideVersion, page, VError }) => {
   return {
-    async shouldHaveUnstagedFile(name) {
-      try {
-        const changesPart = page.locator('[role="treeitem"][aria-label="Changes"]')
-        await expect(changesPart).toBeVisible()
-        const file = page.locator(`[role="treeitem"][aria-label^="${name}"]`)
-        await expect(file).toBeVisible()
-      } catch (error) {
-        throw new VError(error, `Failed to check unstaged file`)
-      }
-    },
-    async stageFile(name) {
-      try {
-        const quickPick = QuickPick.create({ expect, page, VError })
-        await quickPick.executeCommand(WellKnownCommands.GitStageAllChanges)
-        const file = page.locator(`[role="treeitem"][aria-label^="${name}"]`)
-        await expect(file).toHaveAttribute('aria-label', `${name}, Index Added`)
-      } catch (error) {
-        throw new VError(error, `Failed to stage file`)
-      }
-    },
-    async unstageFile(name) {
-      try {
-        const quickPick = QuickPick.create({ expect, page, VError })
-        await quickPick.executeCommand(WellKnownCommands.GitUnstageAllChanges)
-        const file = page.locator(`[role="treeitem"][aria-label^="${name}"]`)
-        await expect(file).toHaveAttribute('aria-label', `${name}, Untracked`)
-      } catch (error) {
-        throw new VError(error, `Failed to unstage file`)
-      }
-    },
-    async shouldHaveHistoryItem(name) {
-      try {
-        const history = page.locator('[aria-label="Source Control History"]')
-        await expect(history).toBeVisible()
-        const item = history.locator(`.monaco-list-row[aria-label^="${name}"]`)
-        await expect(item).toBeVisible()
-      } catch (error) {
-        throw new VError(error, `Failed to verify history item`)
-      }
-    },
-    async shouldNotHaveHistoryItem(name) {
-      try {
-        const history = page.locator('[aria-label="Source Control History"]')
-        await expect(history).toBeVisible()
-        const item = history.locator(`.monaco-list-row[aria-label^="${name}"]`)
-        await expect(item).toBeHidden()
-      } catch (error) {
-        throw new VError(error, `Failed to verify that history item is hidden`)
-      }
-    },
-    async undoLastCommit() {
-      try {
-        const quickPick = QuickPick.create({ page, expect, VError })
-        await quickPick.executeCommand(WellKnownCommands.UndoLastCommit)
-      } catch (error) {
-        throw new VError(error, `Failed to undo last commit`)
-      }
-    },
-    async refresh() {
-      try {
-        const quickPick = QuickPick.create({ page, expect, VError })
-        await quickPick.executeCommand(WellKnownCommands.GitRefresh)
-      } catch (error) {
-        throw new VError(error, `Failed to git refresh`)
-      }
-    },
-    async showBranchPicker() {
-      try {
-        await page.waitForIdle()
-        const graphSection = page.locator('[aria-label="Graph Section"]')
-        await expect(graphSection).toBeVisible()
-        const action = graphSection.locator('a.scm-graph-history-item-picker')
-        await expect(action).toHaveAttribute('aria-disabled', null)
-        await expect(action).toBeVisible()
-        await page.waitForIdle()
-        await action.click()
-        await page.waitForIdle()
-        const quickInput = page.locator('.quick-input-widget.show-checkboxes')
-        await expect(quickInput).toBeVisible()
-      } catch (error) {
-        throw new VError(error, `Failed to show branch picker`)
-      }
-    },
-    async hideBranchPicker() {
-      try {
-        await page.waitForIdle()
-        const quickInput = page.locator('.quick-input-widget.show-checkboxes')
-        await expect(quickInput).toBeVisible()
-        await page.keyboard.press('Escape')
-        await page.waitForIdle()
-        await expect(quickInput).toBeHidden()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to hide branch picker`)
-      }
-    },
-    async selectBranch(branchName: string) {
-      try {
-        await page.waitForIdle()
-        const quickInput = page.locator('.quick-input-widget.show-checkboxes')
-        await expect(quickInput).toBeVisible()
-        const option = quickInput.locator('.label-name', {
-          hasExactText: branchName,
-        })
-        await expect(option).toBeVisible()
-        await option.click()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to select branch "${branchName}"`)
-      }
-    },
     async checkoutBranch(branchName: string) {
       try {
         await page.waitForIdle()
@@ -176,13 +66,43 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         throw new VError(error, `Failed to checkout branch "${branchName}"`)
       }
     },
+    async disableInlineBlame() {
+      try {
+        const decoration = page.locator('[class^="ced-1-TextEditorDecorationType"]').nth(1)
+        await expect(decoration).toBeVisible()
+        await page.waitForIdle()
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.ToggleBlameEditorDecoration)
+        await page.waitForIdle()
+        await expect(decoration).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to disable inline`)
+      }
+    },
+    async doMoreAction(name: string) {
+      await page.waitForIdle()
+      const moreActions = page.locator('.sidebar [aria-label^="Views and More Actions"]')
+      await expect(moreActions).toBeVisible()
+      await page.waitForIdle()
+      await moreActions.click()
+      await page.waitForIdle()
+      const contextMenu = ContextMenu.create({
+        expect,
+        page,
+        VError,
+      })
+      await contextMenu.shouldHaveItem(name)
+      await page.waitForIdle()
+      await contextMenu.select(name)
+      await page.waitForIdle()
+    },
     async enableInlineBlame({ expectedDecoration }) {
       try {
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ page, expect, VError })
+        const quickPick = QuickPick.create({ expect, page, VError })
         await quickPick.executeCommand(WellKnownCommands.ToggleBlameEditorDecoration)
         await page.waitForIdle()
-        const editor = Editor.create({ page, expect, VError, ideVersion })
+        const editor = Editor.create({ expect, ideVersion, page, VError })
         await editor.focus()
         await editor.cursorRight()
         await page.waitForIdle()
@@ -203,17 +123,223 @@ export const create = ({ expect, page, VError, ideVersion }) => {
         throw new VError(error, `Failed to enable inline blame`)
       }
     },
-    async disableInlineBlame() {
+    async hideBranchPicker() {
       try {
-        const decoration = page.locator('[class^="ced-1-TextEditorDecorationType"]').nth(1)
-        await expect(decoration).toBeVisible()
         await page.waitForIdle()
-        const quickPick = QuickPick.create({ page, expect, VError })
-        await quickPick.executeCommand(WellKnownCommands.ToggleBlameEditorDecoration)
+        const quickInput = page.locator('.quick-input-widget.show-checkboxes')
+        await expect(quickInput).toBeVisible()
+        await page.keyboard.press('Escape')
         await page.waitForIdle()
-        await expect(decoration).toBeHidden()
+        await expect(quickInput).toBeHidden()
+        await page.waitForIdle()
       } catch (error) {
-        throw new VError(error, `Failed to disable inline`)
+        throw new VError(error, `Failed to hide branch picker`)
+      }
+    },
+    async hideGraph() {
+      try {
+        await page.waitForIdle()
+        const input = page.locator('.scm-input')
+        await expect(input).toBeVisible()
+        await page.waitForIdle()
+        const editContext = input.locator('.native-edit-context')
+        await expect(editContext).toBeVisible()
+        await page.waitForIdle()
+        const management = page.locator('[aria-label="Source Control Management"]')
+        await expect(management).toBeVisible()
+        await page.waitForIdle()
+        const graph = page.locator('[aria-label="Graph Section"]')
+        const count = await graph.count()
+        if (count === 0) {
+          return
+        }
+        const actions = page.locator(`[aria-label="Source Control actions"]`)
+        await expect(actions).toBeVisible()
+        await page.waitForIdle()
+        const moreActions = actions.locator(`[aria-label^="Views and More Actions"]`)
+        await expect(moreActions).toBeVisible()
+        await page.waitForIdle()
+        await moreActions.click()
+        await page.waitForIdle()
+        const contextMenu = ContextMenu.create({
+          expect,
+          page,
+          VError,
+        })
+        await contextMenu.shouldHaveItem(`Graph`)
+        // @ts-ignore
+        await contextMenu.uncheck('Graph')
+        await page.waitForIdle()
+        await contextMenu.close()
+        await page.waitForIdle()
+        await expect(graph).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to hide graph`)
+      }
+    },
+    async showGraph() {
+      try {
+        await page.waitForIdle()
+        const input = page.locator('.scm-input')
+        await expect(input).toBeVisible()
+        await page.waitForIdle()
+        const editContext = input.locator('.native-edit-context')
+        await expect(editContext).toBeVisible()
+        await page.waitForIdle()
+        const management = page.locator('[aria-label="Source Control Management"]')
+        await expect(management).toBeVisible()
+        await page.waitForIdle()
+        const graph = page.locator('[aria-label="Graph Section"]')
+        const count = await graph.count()
+        if (count > 0) {
+          return
+        }
+        const actions = page.locator(`[aria-label="Source Control actions"]`)
+        await expect(actions).toBeVisible()
+        await page.waitForIdle()
+        const moreActions = actions.locator(`[aria-label^="Views and More Actions"]`)
+        await expect(moreActions).toBeVisible()
+        await page.waitForIdle()
+        await moreActions.click()
+        await page.waitForIdle()
+        const contextMenu = ContextMenu.create({
+          expect,
+          page,
+          VError,
+        })
+        await contextMenu.shouldHaveItem(`Graph`)
+        // @ts-ignore
+        await contextMenu.check('Graph')
+        await page.waitForIdle()
+        await contextMenu.close()
+        await page.waitForIdle()
+        await expect(graph).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to show graph`)
+      }
+    },
+    async refresh() {
+      try {
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.GitRefresh)
+      } catch (error) {
+        throw new VError(error, `Failed to git refresh`)
+      }
+    },
+    async selectBranch(branchName: string) {
+      try {
+        await page.waitForIdle()
+        const quickInput = page.locator('.quick-input-widget.show-checkboxes')
+        await expect(quickInput).toBeVisible()
+        const option = quickInput.locator('.label-name', {
+          hasExactText: branchName,
+        })
+        await expect(option).toBeVisible()
+        await option.click()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to select branch "${branchName}"`)
+      }
+    },
+    async shouldHaveHistoryItem(name) {
+      try {
+        const history = page.locator('[aria-label="Source Control History"]')
+        await expect(history).toBeVisible()
+        const item = history.locator(`.monaco-list-row[aria-label^="${name}"]`)
+        await expect(item).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to verify history item`)
+      }
+    },
+    async shouldHaveUnstagedFile(name) {
+      try {
+        const changesPart = page.locator('[role="treeitem"][aria-label="Changes"]')
+        await expect(changesPart).toBeVisible()
+        const file = page.locator(`[role="treeitem"][aria-label^="${name}"]`)
+        await expect(file).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to check unstaged file`)
+      }
+    },
+    async shouldNotHaveHistoryItem(name) {
+      try {
+        const history = page.locator('[aria-label="Source Control History"]')
+        await expect(history).toBeVisible()
+        const item = history.locator(`.monaco-list-row[aria-label^="${name}"]`)
+        await expect(item).toBeHidden()
+      } catch (error) {
+        throw new VError(error, `Failed to verify that history item is hidden`)
+      }
+    },
+    async showBranchPicker() {
+      try {
+        await page.waitForIdle()
+        const graphSection = page.locator('[aria-label="Graph Section"]')
+        await expect(graphSection).toBeVisible()
+        const action = graphSection.locator('a.scm-graph-history-item-picker')
+        await expect(action).toHaveAttribute('aria-disabled', null)
+        await expect(action).toBeVisible()
+        await page.waitForIdle()
+        await action.click()
+        await page.waitForIdle()
+        const quickInput = page.locator('.quick-input-widget.show-checkboxes')
+        await expect(quickInput).toBeVisible()
+      } catch (error) {
+        throw new VError(error, `Failed to show branch picker`)
+      }
+    },
+    async stageFile(name: string, parentFolder?: string) {
+      try {
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.GitStageAllChanges)
+        const file = page.locator(`[role="treeitem"][aria-label^="${name}"]`)
+        if (parentFolder) {
+          await expect(file).toHaveAttribute('aria-label', `${name}, Index Added, ${[parentFolder]}`)
+        } else {
+          await expect(file).toHaveAttribute('aria-label', `${name}, Index Added`)
+        }
+      } catch (error) {
+        throw new VError(error, `Failed to stage file`)
+      }
+    },
+    async undoLastCommit() {
+      try {
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.UndoLastCommit)
+      } catch (error) {
+        throw new VError(error, `Failed to undo last commit`)
+      }
+    },
+    async unstageFile(name) {
+      try {
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.GitUnstageAllChanges)
+        const file = page.locator(`[role="treeitem"][aria-label^="${name}"]`)
+        await expect(file).toHaveAttribute('aria-label', `${name}, Untracked`)
+      } catch (error) {
+        throw new VError(error, `Failed to unstage file`)
+      }
+    },
+    async viewAsList() {
+      try {
+        await this.doMoreAction('View as List')
+        const src = page.locator('[aria-label="src"][aria-expanded="true"]')
+        await expect(src).toBeHidden()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to view as list`)
+      }
+    },
+    async viewAsTree() {
+      try {
+        await this.doMoreAction('View as Tree')
+        const src = page.locator('[aria-label="src"][aria-expanded="true"]')
+        await expect(src).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to view as tree`)
       }
     },
   }

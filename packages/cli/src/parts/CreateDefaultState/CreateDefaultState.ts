@@ -35,6 +35,7 @@ export const createDefaultState = (): StdinDataState => ({
   runMode: TestRunMode.Auto,
   runs: 1,
   runSkippedTestsAnyway: false,
+  screencastQuality: 90,
   stdout: [],
   timeoutBetween: 0,
   timeouts: true,

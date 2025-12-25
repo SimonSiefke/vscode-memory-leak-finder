@@ -1,5 +1,5 @@
 export const emptyFunctionLocation = {
-  scriptId: '',
-  lineNumber: 0,
   columnNumber: 0,
+  lineNumber: 0,
+  scriptId: '',
 }

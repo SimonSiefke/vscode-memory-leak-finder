@@ -6,7 +6,7 @@ import * as MergeStacks from '../MergeStacks/MergeStacks.ts'
 const RE_ES_MODULES_NOT_SUPPORTED = /require\(\) of ES Module .* not supported/
 const RE_PATH = /^(\/.*\.js:\d+)$/
 
-const normalizeLine = (line) => {
+const normalizeLine = (line: string): string => {
   const trimmedLine = line.trim()
   if (trimmedLine === '-') {
     return ''
@@ -14,7 +14,7 @@ const normalizeLine = (line) => {
   return trimmedLine
 }
 
-const maybeAddColon = (line, index, array) => {
+const maybeAddColon = (line: string, index: number, array: string[]): string => {
   if (line.endsWith(':')) {
     return line
   }
@@ -24,11 +24,15 @@ const maybeAddColon = (line, index, array) => {
   return `${line}:`
 }
 
-const isStackLine = (line) => {
+const isStackLine = (line: string): boolean => {
   return line.startsWith('    at ')
 }
 
-export const getElectronErrorMessage = async (firstData: string, stream?: any) => {
+interface ReadableStreamLike {
+  on(event: 'data', listener: (data: string) => void): unknown
+}
+
+export const getElectronErrorMessage = async (firstData: string, stream?: ReadableStreamLike): Promise<Error> => {
   if (firstData.includes('Error launching app')) {
     const normalData = stripAnsi(firstData)
     const lines = normalData.split('\n')
@@ -36,10 +40,12 @@ export const getElectronErrorMessage = async (firstData: string, stream?: any) =
     return new LaunchError(message)
   }
   if (firstData.includes('App threw an error during load')) {
-    const [secondData] = await once(stream, 'data')
-    // @ts-ignore
+    if (!stream) {
+      throw new Error('Stream is required when App threw an error during load')
+    }
+    const dataEvents = await once(stream as NodeJS.ReadableStream, 'data')
+    const secondData = dataEvents[0] as string
     const lines = secondData.trim().split('\n')
-    // @ts-ignore
     if (RE_ES_MODULES_NOT_SUPPORTED.test(secondData)) {
       return new Error(`App threw an error during load: ${lines[0]}`)
     }
@@ -49,7 +55,9 @@ export const getElectronErrorMessage = async (firstData: string, stream?: any) =
       const messageLine = lines[0]
       error.message = `App threw an error during load: ${messageLine}`
       const mergedStack = MergeStacks.mergeStacks(error.stack, lines.slice(stackLineIndex).join('\n'))
-      error.stack = mergedStack
+      if (mergedStack !== undefined) {
+        error.stack = mergedStack
+      }
       return error
     }
     if (RE_PATH.test(lines[0])) {
@@ -57,10 +65,11 @@ export const getElectronErrorMessage = async (firstData: string, stream?: any) =
       const messageLine = lines[stackLineIndex - 1]
       const codeFrameLines = lines.slice(1, stackLineIndex - 1)
       error.message = `App threw an error during load: ${messageLine}`
-      // @ts-ignore
-      error.codeFrame = `${codeFrameLines.join('\n')}`.trim()
+      ;(error as Error & { codeFrame?: string | undefined }).codeFrame = `${codeFrameLines.join('\n')}`.trim()
       const mergedStack = MergeStacks.mergeStacks(error.stack, `    at ${lines[0]}\n${lines.slice(stackLineIndex).join('\n')}`)
-      error.stack = mergedStack
+      if (mergedStack !== undefined) {
+        error.stack = mergedStack
+      }
       return error
     }
     return new Error(`${firstData}${secondData}`)

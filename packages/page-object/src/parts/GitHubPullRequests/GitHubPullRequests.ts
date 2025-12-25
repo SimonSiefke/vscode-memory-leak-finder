@@ -1,34 +1,14 @@
 import * as QuickPick from '../QuickPick/QuickPick.ts'
-import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
 import * as WebView from '../WebView/WebView.ts'
+import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
+
+const indexDelta = 5
 
 export const create = ({ expect, page, VError }) => {
   return {
-    async focusView() {
-      try {
-        const quickPick = QuickPick.create({ expect, page, VError })
-        await quickPick.executeCommand(WellKnownCommands.FocusOnPullRequestsView)
-        await page.waitForIdle()
-        const viewlet = page.locator('#workbench\\.view\\.extension\\.github-pull-requests')
-        await expect(viewlet).toBeVisible()
-        await page.waitForIdle()
-        const pullRequests = page.locator('.monaco-list[aria-label="Pull Requests"]')
-        await expect(pullRequests).toBeVisible()
-        await page.waitForIdle()
-        const allOpen = pullRequests.locator('[aria-label="All open pull requests in the current repository"]')
-        await expect(allOpen).toBeVisible()
-        const index = 0
-        const adjusted = `${index + 5}`
-        const item5 = pullRequests.locator(`.monaco-list-row[data-index="${adjusted}"]`)
-        await expect(item5).toBeVisible()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to focus on Pull Requests view`)
-      }
-    },
     async checkoutIndex(index: number): Promise<void> {
       try {
-        const adjusted = `${index + 5}`
+        const adjusted = `${index + indexDelta}`
         const pullRequests = page.locator('.monaco-list[aria-label="Pull Requests"]')
         const item5 = pullRequests.locator(`.monaco-list-row[data-index="${adjusted}"]`)
         await expect(item5).toBeVisible()
@@ -38,8 +18,8 @@ export const create = ({ expect, page, VError }) => {
         await expect(tab).toBeVisible({ timeout: 15_000 })
         await page.waitForIdle()
         const webView = WebView.create({
-          page,
           expect,
+          page,
           VError,
         })
         const subFrame = await webView.shouldBeVisible2({
@@ -56,6 +36,28 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to find checkout commands`)
+      }
+    },
+    async focusView() {
+      try {
+        const quickPick = QuickPick.create({ expect, page, VError })
+        await quickPick.executeCommand(WellKnownCommands.FocusOnPullRequestsView)
+        await page.waitForIdle()
+        const viewlet = page.locator('#workbench\\.view\\.extension\\.github-pull-requests')
+        await expect(viewlet).toBeVisible()
+        await page.waitForIdle()
+        const pullRequests = page.locator('.monaco-list[aria-label="Pull Requests"]')
+        await expect(pullRequests).toBeVisible()
+        await page.waitForIdle()
+        const allOpen = pullRequests.locator('[aria-label="All open pull requests in the current repository"]')
+        await expect(allOpen).toBeVisible()
+        const index = 0
+        const adjusted = `${index + indexDelta}`
+        const item5 = pullRequests.locator(`.monaco-list-row[data-index="${adjusted}"]`)
+        await expect(item5).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to focus on Pull Requests view`)
       }
     },
   }
