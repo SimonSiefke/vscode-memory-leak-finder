@@ -6,6 +6,7 @@ import * as ParseVersion from '../ParseVersion/ParseVersion.ts'
 
 export const launchIde = async ({
   addDisposable,
+  clearExtensions,
   commit,
   cwd,
   enableExtensions,
@@ -24,6 +25,7 @@ export const launchIde = async ({
   vscodeVersion,
 }: {
   addDisposable: (fn: () => Promise<void> | void) => void
+  clearExtensions: boolean
   commit: string
   cwd: string
   enableExtensions: boolean
@@ -45,6 +47,7 @@ export const launchIde = async ({
     const cursorVersion = '0.45.14' // TODO make it configurable
     const result = await LaunchCursor.launchCursor({
       addDisposable,
+      clearExtensions,
       cursorVersion,
       cwd,
       enableExtensions,
@@ -74,6 +77,7 @@ export const launchIde = async ({
   }
   const result = await LaunchVsCode.launchVsCode({
     addDisposable,
+    clearExtensions,
     commit,
     cwd,
     enableExtensions,
