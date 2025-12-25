@@ -246,6 +246,17 @@ export interface Extensions {
   waitForProgressToBeHidden(): Promise<void>
   first: any
 }
+export interface ExtensionDetailView {
+  disableExtension(): Promise<void>
+  enableExtension(options: any): Promise<void>
+  installExtension(): Promise<void>
+  openFeature(featureName: any): Promise<void>
+  openTab(text: any, options: any): Promise<void>
+  selectCategory(text: any): Promise<void>
+  shouldHaveFeatureHeading(featureText: any): Promise<void>
+  shouldHaveHeading(text: any): Promise<void>
+  shouldHaveTab(text: any): Promise<void>
+}
 export interface Git {
   add(): Promise<void>
   checkoutBranch(branchName: any): Promise<void>
@@ -569,6 +580,7 @@ export interface Workspace {
 export interface PageObjectApi {
   readonly ActivityBar: ActivityBar
   readonly ChatEditor: ChatEditor
+  readonly Colors: any
   readonly ContextMenu: ContextMenu
   readonly CursorChat: CursorChat
   readonly DebugConsole: DebugConsole
@@ -581,6 +593,7 @@ export interface PageObjectApi {
   readonly Electron: Electron
   readonly Explorer: Explorer
   readonly Extensions: Extensions
+  readonly ExtensionDetailView: ExtensionDetailView
   readonly Git: Git
   readonly GitHubPullRequests: GitHubPullRequests
   readonly Hover: Hover
@@ -621,6 +634,7 @@ export interface PageObjectApi {
   readonly WaitForApplicationToBeReady: WaitForApplicationToBeReady
   readonly WebView: WebView
   readonly WelcomePage: WelcomePage
+  readonly WellKnownCommands: any
   readonly Window: Window
   readonly Workbench: Workbench
   readonly Workspace: Workspace

@@ -30,7 +30,35 @@ export const generateApiTypes = async (): Promise<void> => {
 
     // Process each part
     for (const partName of partNames) {
-      const partFile = join(pageObjectDir, partName, `${partName}.ts`)
+      // Try the exact name first, then try variations (e.g., ExtensionDetailView -> ExtensionsDetailView)
+      let partFile = join(pageObjectDir, partName, `${partName}.ts`)
+      let found = false
+
+      // Check if file exists, if not try variations
+      try {
+        readFileSync(partFile, 'utf8')
+        found = true
+      } catch {
+        // Try adding 's' to Extension (e.g., ExtensionDetailView -> ExtensionsDetailView)
+        const alternativeName = partName.replace(/^Extension([A-Z])/, 'Extensions$1')
+        if (alternativeName !== partName) {
+          const alternativeFile = join(pageObjectDir, alternativeName, `${alternativeName}.ts`)
+          try {
+            readFileSync(alternativeFile, 'utf8')
+            partFile = alternativeFile
+            found = true
+          } catch {
+            // Try other variations if needed
+          }
+        }
+      }
+
+      if (!found) {
+        // @ts-ignore
+        console.warn(`Warning: Could not find file for ${partName}, adding as 'any' type`)
+        apiProperties.push(`${partName}: any`)
+        continue
+      }
 
       try {
         const content = readFileSync(partFile, 'utf8')
@@ -41,10 +69,15 @@ export const generateApiTypes = async (): Promise<void> => {
           const interfaceDef = generateInterfaceFromMethods(methods, properties, partName)
           interfaces.push(interfaceDef)
           apiProperties.push(`${partName}: ${partName}`)
+        } else {
+          // Even if no methods/properties, add it as 'any' type
+          apiProperties.push(`${partName}: any`)
         }
       } catch (error) {
         // @ts-ignore
         console.warn(`Warning: Could not process ${partFile}:`, error.message)
+        // Still add it to the API as 'any' type
+        apiProperties.push(`${partName}: any`)
       }
     }
 
