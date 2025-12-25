@@ -1,4 +1,5 @@
 import * as Ide from '../Ide/Ide.ts'
+import * as IsWindows from '../IsWindows/IsWindows.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 import * as VsCodeVersion from '../VsCodeVersion/VsCodeVersion.ts'
 
@@ -61,6 +62,7 @@ export const parseArgv = (argv: readonly string[]) => {
     vscodeVersion: VsCodeVersion.vscodeVersion,
     watch: false,
     workers: false,
+    isWindows: IsWindows.isWindows(process.platform),
   }
   if (argv.includes('--watch')) {
     options.watch = true

@@ -125,7 +125,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
         await editContext.type(message)
         await page.waitForIdle()
-        await new Promise((r) => {})
         const lines = editArea.locator('.view-lines')
         await expect(lines).toBeVisible()
         await page.waitForIdle()

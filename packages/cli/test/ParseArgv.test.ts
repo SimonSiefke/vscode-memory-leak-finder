@@ -68,7 +68,7 @@ test('parseArgv - vscode-path flag empty', () => {
 })
 
 test('parseArgv - vscode-path flag not present', () => {
-  const argv = []
+  const argv: readonly string[] = []
   const options = ParseArgv.parseArgv(argv)
   expect(options.vscodePath).toBe('')
 })
@@ -86,7 +86,7 @@ test('parseArgv - commit flag empty', () => {
 })
 
 test('parseArgv - commit flag not present', () => {
-  const argv = []
+  const argv: readonly string[] = []
   const options = ParseArgv.parseArgv(argv)
   expect(options.commit).toBe('')
 })
@@ -98,7 +98,7 @@ test('parseArgv - setup-only flag', () => {
 })
 
 test('parseArgv - setup-only flag not present', () => {
-  const argv = []
+  const argv: readonly string[] = []
   const options = ParseArgv.parseArgv(argv)
   expect(options.setupOnly).toBe(false)
 })

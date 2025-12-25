@@ -9,7 +9,7 @@ beforeEach(() => {
 
 jest.unstable_mockModule('../src/parts/Stdout/Stdout.ts', () => {
   return {
-    write: jest.fn().mockImplementation(async () => {}),
+    write: jest.fn().mockImplementation(() => Promise.resolve()),
   }
 })
 
@@ -53,7 +53,8 @@ test('initialStart - watch mode - show details', async () => {
   const options = {
     filter: '',
     watch: true,
-  }
+    isWindows: false,
+  } as ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv>
   // @ts-ignore
   WatchUsage.print.mockImplementation(async () => 'watch usage')
   await InitialStart.initialStart(options)
@@ -67,7 +68,8 @@ test('initialStart - watch mode - start running', async () => {
   const options = {
     filter: 'a',
     watch: true,
-  }
+    isWindows: false,
+  } as ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv>
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).toHaveBeenCalledTimes(1)
   expect(Stdout.write).not.toHaveBeenCalled()
@@ -79,7 +81,8 @@ test('initialStart - start running', async () => {
   const options = {
     filter: 'a',
     watch: false,
-  }
+    isWindows: false,
+  } as ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv>
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).not.toHaveBeenCalled()
   expect(Stdout.write).not.toHaveBeenCalled()
