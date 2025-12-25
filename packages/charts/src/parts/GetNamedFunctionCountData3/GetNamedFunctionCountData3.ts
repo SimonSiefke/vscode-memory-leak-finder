@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs'
 import { readdir } from 'node:fs/promises'
-import { join } from 'path'
+import { join } from 'node:path'
 import { readJson } from '../ReadJson/ReadJson.ts'
 
 const getUniqueName = (usedNames: Set<string>, currentName: string): string => {

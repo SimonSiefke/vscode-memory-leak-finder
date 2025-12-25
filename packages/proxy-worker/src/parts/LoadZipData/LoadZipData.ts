@@ -1,5 +1,5 @@
-import { existsSync } from 'fs'
-import { readFile } from 'fs/promises'
+import { existsSync } from 'node:fs'
+import { readFile } from 'node:fs/promises'
 
 export const loadZipData = async (fileReference: string): Promise<Buffer | null> => {
   if (!fileReference.startsWith('file-reference:')) {

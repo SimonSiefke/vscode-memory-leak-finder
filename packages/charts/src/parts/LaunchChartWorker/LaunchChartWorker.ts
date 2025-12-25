@@ -1,5 +1,5 @@
 import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
-import { join } from 'path'
+import { join } from 'node:path'
 import * as Root from '../Root/Root.ts'
 
 export const launchChartWorker = async () => {

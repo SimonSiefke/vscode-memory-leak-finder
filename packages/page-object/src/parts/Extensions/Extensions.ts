@@ -1,5 +1,5 @@
-import { cp } from 'fs/promises'
-import { basename, join } from 'path'
+import { cp } from 'node:fs/promises'
+import { basename, join } from 'node:path'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as Editor from '../Editor/Editor.ts'
 import * as ExtensionDetailView from '../ExtensionsDetailView/ExtensionsDetailView.ts'
