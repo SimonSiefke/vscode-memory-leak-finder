@@ -1,4 +1,4 @@
-import { jest, test, expect } from '@jest/globals'
+import { test, expect } from '@jest/globals'
 import { addOriginalSources } from '../src/parts/AddOriginalSources/AddOriginalSources.ts'
 import { mkdir, writeFile, rm } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'

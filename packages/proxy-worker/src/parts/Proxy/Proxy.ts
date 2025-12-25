@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'fs/promises'
+import { readFile, writeFile } from 'node:fs/promises'
 import { getCACertPath as getCACertPathImpl } from '../GetCACertPath/GetCACertPath.ts'
 import * as HttpProxyServer from '../HttpProxyServer/HttpProxyServer.ts'
 

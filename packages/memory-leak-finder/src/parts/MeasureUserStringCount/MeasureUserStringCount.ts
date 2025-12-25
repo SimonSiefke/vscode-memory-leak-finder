@@ -1,4 +1,5 @@
 import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
+import type { Session } from '../Session/Session.ts'
 import * as CompareCount from '../CompareCount/CompareCount.ts'
 import * as GetUserStringCount from '../GetUserStringCount/GetUserStringCount.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
@@ -12,13 +13,13 @@ export const id = MeasureId.UserStringCount
 
 export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   const scriptHandler = ScriptHandler.create()
   return [session, objectGroup, scriptHandler]
 }
 
-export const start = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+export const start = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   const id = 0
   const result = await GetUserStringCount.getUserStringCount(session, objectGroup, id)
@@ -26,7 +27,7 @@ export const start = async (session, objectGroup, scriptHandler: IScriptHandler)
   return result
 }
 
-export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+export const stop = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
   const id = 1
   const result = await GetUserStringCount.getUserStringCount(session, objectGroup, id)
   await WriteScriptMap.writeScriptMap(scriptHandler.scriptMap, id)

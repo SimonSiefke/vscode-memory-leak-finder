@@ -1,7 +1,8 @@
+import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as GetConstructorInstances from '../GetConstructorInstances/GetConstructorInstances.ts'
 
-export const getDomListeners = async (session, objectGroup) => {
+export const getDomListeners = async (session: Session, objectGroup: string) => {
   const instances = await GetConstructorInstances.getConstructorInstances(session, objectGroup, 'DomListener')
   const fnResult2 = await DevtoolsProtocolRuntime.callFunctionOn(session, {
     functionDeclaration: `function(){

@@ -4,7 +4,6 @@ import * as HeapSnapshotState from '../src/parts/HeapSnapshotState/HeapSnapshotS
 
 test.skip('should count arrays with location information from closures', async () => {
   const snapshotId = 'test-snapshot-1'
-  const ITEMS_PER_NODE = 7
   const mockHeapSnapshot = {
     snapshot: {
       meta: {

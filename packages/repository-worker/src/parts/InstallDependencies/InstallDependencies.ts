@@ -1,5 +1,5 @@
 import { VError } from '@lvce-editor/verror'
-import { dirname } from 'path'
+import { dirname } from 'node:path'
 import { exec } from '../Exec/Exec.ts'
 import * as GetNpmPathFromNvmrc from '../GetNpmPathFromNvmrc/GetNpmPathFromNvmrc.ts'
 

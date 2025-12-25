@@ -35,6 +35,23 @@ export const launchVsCode = async ({
   useProxyMock,
   vscodePath,
   vscodeVersion,
+}: {
+  addDisposable: (fn: () => Promise<void> | void) => void
+  commit: string
+  cwd: string
+  enableExtensions: boolean
+  enableProxy: boolean
+  headlessMode: boolean
+  insidersCommit: string
+  inspectExtensions: boolean
+  inspectExtensionsPort: number
+  inspectPtyHost: boolean
+  inspectPtyHostPort: number
+  inspectSharedProcess: boolean
+  inspectSharedProcessPort: number
+  useProxyMock: boolean
+  vscodePath: string
+  vscodeVersion: string
 }) => {
   console.log(`[LaunchVsCode] enableProxy parameter: ${enableProxy} (type: ${typeof enableProxy})`)
   console.log(`[LaunchVsCode] useProxyMock parameter: ${useProxyMock} (type: ${typeof useProxyMock})`)

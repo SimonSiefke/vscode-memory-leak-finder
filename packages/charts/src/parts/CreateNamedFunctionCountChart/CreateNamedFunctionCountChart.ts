@@ -3,7 +3,7 @@ import * as GetNamedFunctionCountData from '../GetNamedFunctionCountData/GetName
 
 export const name = 'named-function-count'
 
-export const getData = (basePath: string) => GetNamedFunctionCountData.getNamedFunctionCountData(basePath)
+export const getData = (basePath: string): Promise<any[]> => GetNamedFunctionCountData.getNamedFunctionCountData(basePath)
 
 export const skip = 1
 

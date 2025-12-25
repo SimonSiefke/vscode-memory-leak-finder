@@ -1,4 +1,4 @@
-import { createServer } from 'http'
+import { createServer } from 'node:http'
 
 const DEFAULT_PORT = 0
 

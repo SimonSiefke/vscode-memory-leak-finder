@@ -1,9 +1,10 @@
+import type { Session } from '../Session/Session.ts'
 import * as Assert from '../Assert/Assert.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as EmptyFunctionLocation from '../EmptyFunctionLocation/EmptyFunctionLocation.ts'
 import * as IsFunctionLocation from '../IsFunctionLocation/IsFunctionLocation.ts'
 
-export const getFunctionLocation = async (session, objectId) => {
+export const getFunctionLocation = async (session: Session, objectId) => {
   Assert.object(session)
   Assert.string(objectId)
   if (!objectId) {

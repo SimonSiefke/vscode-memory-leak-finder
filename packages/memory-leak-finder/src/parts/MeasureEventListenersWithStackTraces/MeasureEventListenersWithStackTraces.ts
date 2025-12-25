@@ -1,4 +1,5 @@
 import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
+import type { Session } from '../Session/Session.ts'
 import * as AddStackTracesToEventListeners from '../AddStackTracesToEventListeners/AddStackTracesToEventListeners.ts'
 import * as CompareEventListenersWithStackTraces from '../CompareEventListenersWithStackTraces/CompareEventListenersWithStackTraces.ts'
 import * as GetEventListeners from '../GetEventListeners/GetEventListeners.ts'
@@ -19,20 +20,20 @@ export const targets = [TargetId.Browser]
  * @param {any} session
  */
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   const scriptHandler = ScriptHandler.create()
   return [session, objectGroup, scriptHandler]
 }
 
-export const start = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+export const start = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   await StartTrackEventListenerStackTraces.startTrackingEventListenerStackTraces(session, objectGroup)
   const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptHandler.scriptMap)
   return result
 }
 
-export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+export const stop = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.stop(session)
   const result = await GetEventListeners.getEventListeners(session, objectGroup, scriptHandler.scriptMap)
   const resultWithStackTraces = await AddStackTracesToEventListeners.addStackTracesToEventListeners(session, result)
@@ -40,7 +41,7 @@ export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) 
   return resultWithStackTraces
 }
 
-export const releaseResources = async (session, objectGroup) => {
+export const releaseResources = async (session: Session, objectGroup: string) => {
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 

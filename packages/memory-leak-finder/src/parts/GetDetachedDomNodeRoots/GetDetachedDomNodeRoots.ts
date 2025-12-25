@@ -1,7 +1,8 @@
+import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
 
-export const getDetachedDomNodeRoots = async (session, objectGroup) => {
+export const getDetachedDomNodeRoots = async (session: Session, objectGroup: string) => {
   const prototypeDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Node,
     objectGroup,

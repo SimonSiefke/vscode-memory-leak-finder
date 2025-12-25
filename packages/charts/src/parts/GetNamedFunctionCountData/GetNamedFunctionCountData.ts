@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
-import { join } from 'path'
+import { join } from 'node:path'
 
 export const getNamedFunctionCountData = async (basePath: string) => {
   const resultsPath = join(basePath, 'named-function-count2')

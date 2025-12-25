@@ -1,3 +1,4 @@
+import type { Session } from '../Session/Session.ts'
 import * as GetArrays from '../GetArrays/GetArrays.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
 import * as ObjectGroupId from '../ObjectGroupId/ObjectGroupId.ts'
@@ -9,24 +10,24 @@ export const id = MeasureId.GrowingArrays
 
 export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]
 }
 
-export const start = async (session, objectGroup) => {
+export const start = async (session: Session, objectGroup: string) => {
   await StartTrackingArrays.startTrackingArrays(session, objectGroup)
   return GetArrays.getArrays(session, objectGroup)
 }
 
-export const stop = async (session, objectGroup) => {
+export const stop = async (session: Session, objectGroup: string) => {
   // const stackTraces = await GetDisposableStoresWithStackTraces.getDisposableStoresWithStackTraces(session, objectGroup)
   // await StopTrackingDisposableStores.stopTrackingDisposableStores(session, objectGroup)
   // const result = await GetArrays.getArrays(session, objectGroup)
   return []
 }
 
-export const releaseResources = async (session, objectGroup) => {
+export const releaseResources = async (session: Session, objectGroup: string) => {
   await ReleaseObjectGroup.releaseObjectGroup(session, objectGroup)
 }
 

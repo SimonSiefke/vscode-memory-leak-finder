@@ -1,6 +1,6 @@
 import { VError } from '@lvce-editor/verror'
-import { existsSync } from 'fs'
-import { join } from 'path'
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 import * as ExecuteSql from '../ExecuteSql/ExecuteSql.js'
 import * as GetDb from '../GetDb/GetDb.js'
 import * as LaunchCursorOnce from '../LaunchCursorOnce/LaunchCursorOnce.js'
@@ -21,7 +21,7 @@ export const skipCursorWelcome = async () => {
     }
     const db = await GetDb.getDb(storagePath)
     const rows = await ExecuteSql.executeSql(db, 'SELECT * FROM ItemTable')
-    const privacyMode = rows.find((row) => row.key === keyPrivacyMode)
+    const privacyMode = rows.find(/** @param {{ key: string }} row */ (row) => row.key === keyPrivacyMode)
     if (privacyMode === 'true') {
       return
     }

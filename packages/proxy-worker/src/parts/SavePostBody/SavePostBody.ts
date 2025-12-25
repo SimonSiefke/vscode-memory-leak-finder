@@ -1,9 +1,15 @@
+<<<<<<< HEAD
 import { mkdir, writeFile } from 'fs/promises'
 import { join } from 'path'
 import { decompressBody } from '../DecompressBody/DecompressBody.ts'
 <<<<<<< HEAD
 import { parseJsonIfApplicable } from '../HttpProxyServer/HttpProxyServer.ts'
 =======
+>>>>>>> origin/main
+=======
+import { mkdir, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
+import * as CompressionWorker from '../CompressionWorker/CompressionWorker.ts'
 >>>>>>> origin/main
 import * as Root from '../Root/Root.ts'
 import * as SanitizeFilename from '../SanitizeFilename/SanitizeFilename.ts'
@@ -118,6 +124,7 @@ export const savePostBody = async (
         responseBodyFormat = 'sse'
       } else {
 <<<<<<< HEAD
+<<<<<<< HEAD
         const { body: decompressedBody, wasCompressed } = await decompressBody(
           responseData.responseData,
           responseContentEncoding,
@@ -126,6 +133,12 @@ export const savePostBody = async (
 =======
         const { body: decompressedBody, wasCompressed } = await decompressBody(responseData.responseData, responseContentEncoding)
         responseWasCompressed = wasCompressed
+=======
+        const compressionWorker = await CompressionWorker.getCompressionWorker()
+        const result = await compressionWorker.invoke('Compression.decompressBody', responseData.responseData, responseContentEncoding)
+        const decompressedBody = result.body
+        responseWasCompressed = result.wasCompressed
+>>>>>>> origin/main
         // @ts-ignore
 >>>>>>> origin/main
         parsedResponseBody = parseJsonIfApplicable(decompressedBody, responseContentType)

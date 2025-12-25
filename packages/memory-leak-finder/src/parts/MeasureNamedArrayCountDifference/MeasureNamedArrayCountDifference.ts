@@ -1,3 +1,4 @@
+import type { Session } from '../Session/Session.ts'
 import * as CompareNamedArrayCountDifference from '../CompareNamedArrayCountDifference/CompareNamedArrayCountDifference.ts'
 import * as GetNamedArrayCount from '../GetNamedArrayCount/GetNamedArrayCount.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
@@ -8,16 +9,16 @@ export const id = MeasureId.NamedArrayCountDifference
 
 export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]
 }
 
-export const start = async (session, objectGroup) => {
+export const start = async (session: Session, objectGroup: string) => {
   return GetNamedArrayCount.getNamedArrayCount(session, objectGroup, 0 as any)
 }
 
-export const stop = async (session, objectGroup) => {
+export const stop = async (session: Session, objectGroup: string) => {
   return GetNamedArrayCount.getNamedArrayCount(session, objectGroup, 1 as any)
 }
 

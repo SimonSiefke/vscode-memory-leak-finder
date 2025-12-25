@@ -1,3 +1,4 @@
+import type { Session } from '../Session/Session.ts'
 import { DevtoolsProtocolRuntime } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 import * as PartitionArray from '../PartitionArray/PartitionArray.ts'
 import * as PrototypeExpression from '../PrototypeExpression/PrototypeExpression.ts'
@@ -20,7 +21,7 @@ const getEnumerableValues = (result) => {
   return result.filter(isEnumerable).map(getValue)
 }
 
-export const startTrackingArrays = async (session, objectGroup) => {
+export const startTrackingArrays = async (session: Session, objectGroup: string) => {
   const arrayDescriptor = await DevtoolsProtocolRuntime.evaluate(session, {
     expression: PrototypeExpression.Array,
     objectGroup,

@@ -219,11 +219,14 @@ test.skip('detectsPrototypePollution', async () => {
 
   const pollution = analysis.prototypePollution.find((p) => p.propertyName === 'isAdmin')
   expect(pollution).toBeDefined()
-  expect(pollution.affectedObjectCount).toBe(1000)
-  expect(pollution.severity).toBe('critical') // Because 'isAdmin' is security-related
+  if (pollution) {
+    expect(pollution.affectedObjectCount).toBe(1000)
+    expect(pollution.severity).toBe('critical') // Because 'isAdmin' is security-related
+  }
 
   // Should identify it as a security issue
-  expect(analysis.suspiciousPatterns.securityIssues.length).toBeGreaterThan(0)
+  const securityIssues = analysis.suspiciousPatterns.securityIssues as unknown[]
+  expect(securityIssues.length).toBeGreaterThan(0)
 
   // Clean up
   HeapSnapshotState.dispose('test-pollution')

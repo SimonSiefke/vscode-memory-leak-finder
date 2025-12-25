@@ -1,4 +1,5 @@
 import { Readable } from 'node:stream'
+import type { Session } from '../Session/Session.ts'
 import * as DevtoolsEventType from '../DevtoolsEventType/DevtoolsEventType.ts'
 import { DevtoolsProtocolHeapProfiler } from '../DevtoolsProtocol/DevtoolsProtocol.ts'
 
@@ -34,6 +35,6 @@ class CustomStream extends Readable {
   }
 }
 
-export const create = (session, options = {}) => {
+export const create = (session: Session, options = {}) => {
   return new CustomStream(session, options)
 }

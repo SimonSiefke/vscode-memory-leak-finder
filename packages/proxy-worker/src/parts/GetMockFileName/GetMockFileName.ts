@@ -1,10 +1,9 @@
-import { existsSync } from 'fs'
-import { readFile } from 'fs/promises'
-import { join, dirname } from 'path'
-import { fileURLToPath } from 'url'
+import { existsSync } from 'node:fs'
+import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import type { MockConfigEntry } from '../MockConfigEntry/MockConfigEntry.ts'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __dirname = import.meta.dirname
 const MOCK_CONFIG_PATH = join(__dirname, 'mock-config.json')
 const NON_ALPHANUMERIC_REGEX = /[^a-zA-Z0-9]/g
 const LEADING_UNDERSCORES_REGEX = /^_+/

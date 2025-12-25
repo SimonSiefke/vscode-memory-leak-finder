@@ -1,8 +1,9 @@
 import * as Ide from '../Ide/Ide.ts'
+import * as IsWindows from '../IsWindows/IsWindows.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 import * as VsCodeVersion from '../VsCodeVersion/VsCodeVersion.ts'
 
-const parseArgvNumber = (argv, name) => {
+const parseArgvNumber = (argv: readonly string[], name: string): number => {
   const index = argv.indexOf(name)
   const next = index + 1
   const value = argv[next]
@@ -13,7 +14,7 @@ const parseArgvNumber = (argv, name) => {
   return 1
 }
 
-const parseArgvString = (argv, name) => {
+const parseArgvString = (argv: readonly string[], name: string): string => {
   const index = argv.indexOf(name)
   const next = index + 1
   const value = argv[next]
@@ -23,7 +24,7 @@ const parseArgvString = (argv, name) => {
   return ''
 }
 
-export const parseArgv = (argv) => {
+export const parseArgv = (argv: readonly string[]) => {
   const options = {
     bisect: false,
     checkLeaks: false,
@@ -52,6 +53,7 @@ export const parseArgv = (argv) => {
     runMode: TestRunMode.Auto,
     runs: 1,
     runSkippedTestsAnyway: false,
+    screencastQuality: 90,
     setupOnly: false,
     timeoutBetween: 0,
     timeouts: true,
@@ -60,6 +62,7 @@ export const parseArgv = (argv) => {
     vscodeVersion: VsCodeVersion.vscodeVersion,
     watch: false,
     workers: false,
+    isWindows: IsWindows.isWindows(process.platform),
   }
   if (argv.includes('--watch')) {
     options.watch = true
@@ -162,6 +165,9 @@ export const parseArgv = (argv) => {
   }
   if (argv.includes('--bisect')) {
     options.bisect = true
+  }
+  if (argv.includes('--screencast-quality')) {
+    options.screencastQuality = parseArgvNumber(argv, '--screencast-quality')
   }
   return options
 }

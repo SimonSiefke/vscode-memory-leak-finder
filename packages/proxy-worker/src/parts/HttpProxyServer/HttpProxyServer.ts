@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import type { IncomingMessage, ServerResponse } from 'http';
 import { mkdir } from 'fs/promises'
 import type { IncomingMessage, ServerResponse } from 'http'
@@ -10,6 +11,15 @@ import { URL } from 'url'
 import * as GetMockResponse from '../GetMockResponse/GetMockResponse.ts'
 import * as GetOrCreateCA from '../GetOrCreateCA/GetOrCreateCA.ts'
 import * as HandleConnect from '../HandleConnect/HandleConnect.ts'
+=======
+import type { IncomingMessage, ServerResponse } from 'node:http'
+import { mkdir, writeFile } from 'node:fs/promises'
+import { createServer } from 'node:http'
+import { request as httpRequest } from 'node:http'
+import { request as httpsRequest } from 'node:https'
+import { join } from 'node:path'
+import { URL } from 'node:url'
+>>>>>>> origin/main
 import * as Root from '../Root/Root.ts'
 import * as SavePostBody from '../SavePostBody/SavePostBody.ts'
 import * as SaveRequest from '../SaveRequest/SaveRequest.ts'
@@ -392,7 +402,7 @@ const handleConnect = async (req: IncomingMessage, socket: any, head: Buffer): P
   const hostname = parts[0]
   const targetPort = parts[1] ? Number.parseInt(parts[1], 10) : 443
 
-  const { createConnection } = await import('net')
+  const { createConnection } = await import('node:net')
   console.log(`[Proxy] Establishing CONNECT tunnel to ${hostname}:${targetPort}`)
   const proxySocket = createConnection(targetPort, hostname, () => {
     socket.write('HTTP/1.1 200 Connection Established\r\n\r\n')
@@ -537,7 +547,11 @@ export const createHttpProxyServer = async (
     async dispose() {
 =======
     port: actualPort,
+<<<<<<< HEAD
     async [Symbol.asyncDispose]() {
+>>>>>>> origin/main
+=======
+    async [Symbol.asyncDispose](): Promise<void> {
 >>>>>>> origin/main
       const { promise, resolve } = Promise.withResolvers<void>()
       server.close(() => resolve())

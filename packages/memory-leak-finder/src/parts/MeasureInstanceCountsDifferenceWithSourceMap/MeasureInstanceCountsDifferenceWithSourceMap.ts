@@ -1,4 +1,5 @@
 import type { IScriptHandler } from '../IScriptHandler/IScriptHandler.ts'
+import type { Session } from '../Session/Session.ts'
 import * as CompareInstanceCountsDifferenceWithSourceMap from '../CompareInstanceCountsDifferenceWithSourceMap/CompareInstanceCountsDifferenceWithSourceMap.ts'
 import * as GetInstanceCountsWithSourceMap from '../GetInstanceCountsWithSourceMap/GetInstanceCountsWithSourceMap.ts'
 import * as MeasureId from '../MeasureId/MeasureId.ts'
@@ -10,18 +11,18 @@ export const id = MeasureId.InstanceCountsDifferenceWithSourceMap
 
 export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   const scriptHandler = ScriptHandler.create()
   return [session, objectGroup, scriptHandler]
 }
 
-export const start = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+export const start = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.start(session)
   return GetInstanceCountsWithSourceMap.getInstanceCountsWithSourceMap(session, objectGroup, scriptHandler.scriptMap)
 }
 
-export const stop = async (session, objectGroup, scriptHandler: IScriptHandler) => {
+export const stop = async (session: Session, objectGroup, scriptHandler: IScriptHandler) => {
   await scriptHandler.stop(session)
   return GetInstanceCountsWithSourceMap.getInstanceCountsWithSourceMap(session, objectGroup, scriptHandler.scriptMap)
 }

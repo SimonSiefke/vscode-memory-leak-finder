@@ -4,7 +4,7 @@ export const skip = 1
 
 export const requiresNetwork = 1
 
-export const setup = async ({ Workspace, Extensions }: TestContext): Promise<void> => {
+export const setup = async ({ Extensions, Workspace }: TestContext): Promise<void> => {
   await Workspace.setFiles([
     {
       content: `def add(a,b,c):
@@ -19,7 +19,7 @@ export const setup = async ({ Workspace, Extensions }: TestContext): Promise<voi
   })
 }
 
-export const run = async ({ Suggest, Editor, Workspace }: TestContext): Promise<void> => {
+export const run = async ({ Editor, Suggest, Workspace }: TestContext): Promise<void> => {
   await Editor.open('index.py')
   await Editor.shouldHaveBreadCrumb('index.py')
   await Editor.shouldHaveBreadCrumb('add')

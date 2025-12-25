@@ -1,3 +1,4 @@
+import type { Session } from '../Session/Session.ts'
 import * as CompareCount from '../CompareCount/CompareCount.ts'
 import * as GetAbortControllerCount from '../GetAbortControllerCount/GetAbortControllerCount.ts'
 import * as IsLeakCount from '../IsLeakCount/IsLeakCount.ts'
@@ -9,16 +10,16 @@ export const id = MeasureId.AbortControllerCount
 
 export const targets = [TargetId.Browser, TargetId.Node, TargetId.Worker]
 
-export const create = (session) => {
+export const create = (session: Session) => {
   const objectGroup = ObjectGroupId.create()
   return [session, objectGroup]
 }
 
-export const start = (session, objectGroup) => {
+export const start = (session: Session, objectGroup: string) => {
   return GetAbortControllerCount.getAbortControllerCount(session, objectGroup)
 }
 
-export const stop = (session, objectGroup) => {
+export const stop = (session: Session, objectGroup: string) => {
   return GetAbortControllerCount.getAbortControllerCount(session, objectGroup)
 }
 

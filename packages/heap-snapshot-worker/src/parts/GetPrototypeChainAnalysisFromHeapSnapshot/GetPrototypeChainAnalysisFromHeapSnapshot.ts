@@ -82,7 +82,7 @@ const PROTOTYPE_POLLUTION_THRESHOLD = 1000 // If this many objects share unusual
  * @returns {Promise<Object>} Analysis results
  */
 export const getPrototypeChainAnalysisFromHeapSnapshot = async (
-  id: number,
+  id: string | number,
 ): Promise<{
   longPrototypeChains: readonly LongChainResult[]
   prototypePollution: readonly PollutionResult[]

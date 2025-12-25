@@ -29,6 +29,21 @@ export const launchCursor = async ({
   inspectSharedProcessPort,
   useProxyMock,
   vscodePath,
+}: {
+  addDisposable: (fn: () => Promise<void> | void) => void
+  cursorVersion: string
+  cwd: string
+  enableExtensions: boolean
+  enableProxy: boolean
+  headlessMode: boolean
+  inspectExtensions: boolean
+  inspectExtensionsPort: number
+  inspectPtyHost: boolean
+  inspectPtyHostPort: number
+  inspectSharedProcess: boolean
+  inspectSharedProcessPort: number
+  useProxyMock: boolean
+  vscodePath?: string
 }) => {
   console.log(`[LaunchCursor] enableProxy parameter: ${enableProxy} (type: ${typeof enableProxy})`)
   console.log(`[LaunchCursor] useProxyMock parameter: ${useProxyMock} (type: ${typeof useProxyMock})`)
