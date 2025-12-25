@@ -16,6 +16,7 @@ export const compareNamedFunctionCount3 = async (beforePath: string, afterPath: 
       'event.ts',
       'files.ts',
       'functional.ts',
+      'historyService.ts.ts',
       'lazy.ts',
       'lifecycle.ts',
       'linkedList.ts',
