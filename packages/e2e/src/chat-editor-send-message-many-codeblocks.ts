@@ -22,7 +22,10 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
     { lang: 'javascript', code: 'const x = 1;\nconsole.log(x);' },
     { lang: 'typescript', code: 'interface User {\n  name: string;\n  age: number;\n}' },
     { lang: 'python', code: 'def hello():\n    print("Hello, World!")' },
-    { lang: 'java', code: 'public class Hello {\n    public static void main(String[] args) {\n        System.out.println("Hello");\n    }\n}' },
+    {
+      lang: 'java',
+      code: 'public class Hello {\n    public static void main(String[] args) {\n        System.out.println("Hello");\n    }\n}',
+    },
     { lang: 'cpp', code: '#include <iostream>\nint main() {\n    std::cout << "Hello";\n}' },
     { lang: 'c', code: '#include <stdio.h>\nint main() {\n    printf("Hello");\n}' },
     { lang: 'csharp', code: 'using System;\nclass Program {\n    static void Main() {\n        Console.WriteLine("Hello");\n    }\n}' },
@@ -61,7 +64,7 @@ export const run = async ({ ChatEditor }: TestContext): Promise<void> => {
     { lang: 'powershell', code: 'Write-Host "Hello"' },
   ]
 
-  const message = `Please analyze these code blocks:\n\n${codeBlocks.map((block, index) => `\`\`\`${block.lang}\n${block.code}\n\`\`\``).join('\n\n')}`
+  const message = `Please analyze these code blocks:\n\n${codeBlocks.map((block) => `\`\`\`${block.lang}\n${block.code}\n\`\`\``).join('\n\n')}`
 
   await ChatEditor.sendMessage({
     message,
