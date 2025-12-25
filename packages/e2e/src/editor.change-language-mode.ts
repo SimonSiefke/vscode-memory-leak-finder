@@ -17,3 +17,7 @@ export const run = async ({ Editor }: TestContext): Promise<void> => {
   // @ts-ignore
   await Editor.setLanguageMode('Plain Text')
 }
+
+export const teardown = async ({ Editor }: TestContext) => {
+  await Editor.closeAll()
+}
