@@ -7,7 +7,7 @@ export class DisposableStore {
     this.isDisposed = false
   }
 
-  add(fn) {
+  add(fn: () => void | Promise<void>): void {
     if (!fn) {
       throw new Error(`function must be defined`)
     }

@@ -32,6 +32,24 @@ const getBinaryPathFromExtractDir = (extractDir: string): string => {
   return join(extractDir, `VSCode-linux-${archSuffix}`, 'code-insiders')
 }
 
+const getFileSizeInMB = async (url: string): Promise<number | undefined> => {
+  try {
+    const response = await fetch(url, {
+      method: 'HEAD',
+      signal: AbortSignal.timeout(30_000),
+    })
+    const contentLength = response.headers.get('content-length')
+    if (contentLength) {
+      const sizeInBytes = Number.parseInt(contentLength, 10)
+      const sizeInMB = sizeInBytes / (1024 * 1024)
+      return sizeInMB
+    }
+    return undefined
+  } catch {
+    return undefined
+  }
+}
+
 export const downloadAndUnzipInsiders = async (commit: string): Promise<string> => {
   const cachedPath = await GetVscodeRuntimePath.getVscodeRuntimePath(commit)
   if (cachedPath) {
@@ -40,7 +58,12 @@ export const downloadAndUnzipInsiders = async (commit: string): Promise<string> 
   const metadata = await FetchVscodeInsidersMetadata.fetchVscodeInsidersMetadata(commit)
   const insidersVersionsDir = join(Root.root, '.vscode-insiders-versions')
   const extractDir = join(insidersVersionsDir, commit)
-  console.log(`[download-worker] Downloading ${metadata.url}`)
+  const fileSizeMB = await getFileSizeInMB(metadata.url)
+  if (fileSizeMB !== undefined) {
+    console.log(`[download-worker] Downloading ${metadata.url} (${fileSizeMB.toFixed(2)} MB)`)
+  } else {
+    console.log(`[download-worker] Downloading ${metadata.url}`)
+  }
   await DownloadAndExtract.downloadAndExtract('vscode-insiders', [metadata.url], extractDir)
   console.log(`[download-worker] Download complete.`)
   const path = getBinaryPathFromExtractDir(extractDir)

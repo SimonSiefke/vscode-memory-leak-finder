@@ -8,11 +8,11 @@ const state: State = {
   rpc: undefined,
 }
 
-export const set = (rpc) => {
+export const set = (rpc: Rpc): void => {
   state.rpc = rpc
 }
 
-export const invoke = async (method, ...params) => {
+export const invoke = async (method: string, ...params: unknown[]): Promise<unknown> => {
   if (!state.rpc) {
     throw new Error(`cli process rpc is not available`)
   }

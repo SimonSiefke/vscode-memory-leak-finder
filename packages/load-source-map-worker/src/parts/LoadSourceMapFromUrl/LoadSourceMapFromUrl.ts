@@ -9,7 +9,7 @@ import { readJson } from '../ReadJson/ReadJson.ts'
 import * as Root from '../Root/Root.ts'
 
 const isNotFoundOrNotAvailableError = (error: unknown): boolean => {
-  return error && error.message && isNotFoundOrNotAvailableMessage(error.message)
+  return error !== null && typeof error === 'object' && 'message' in error && typeof error.message === 'string' && isNotFoundOrNotAvailableMessage(error.message)
 }
 
 export const loadSourceMap = async (url: string, hash: string): Promise<any> => {
