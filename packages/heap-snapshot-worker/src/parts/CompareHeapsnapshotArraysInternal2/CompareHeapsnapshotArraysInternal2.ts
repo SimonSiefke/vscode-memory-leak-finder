@@ -412,7 +412,8 @@ const compareCounts = (before, after) => {
     const delta = afterCount - oldCount
     if (delta > 0) {
       leaked.push({
-        ...item,
+        name: item.name,
+        count: item.count,
         delta,
       })
     }
