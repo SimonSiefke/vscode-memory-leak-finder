@@ -2,7 +2,7 @@ const RE_VS = /^vs\//
 
 const RE_EXTERNAL_COMMON_JS = /external commonjs "[a-zA-Z\-\d]+"/
 
-const commonJsExternalReplace = (match) => {
+const commonJsExternalReplace = (match: string): string => {
   return match.replaceAll(' ', '/').replaceAll('"', '')
 }
 

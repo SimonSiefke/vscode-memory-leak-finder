@@ -20,7 +20,7 @@ const testNamedMapCount = async (): Promise<void> => {
     }
 
     // Find the specific map mentioned in the requirements
-    const map206045 = maps.find((map) => map.id === 206_045)
+    const map206045 = maps.find((map: { id: number }) => map.id === 206_045)
     if (map206045) {
       console.log('\nMap with ID 206045:')
       console.log(JSON.stringify(map206045, null, 2))

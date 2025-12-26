@@ -106,6 +106,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         exists: [],
       },
       verify = false,
+      viewLinesText = '',
     }) {
       try {
         await page.waitForIdle()
@@ -129,7 +130,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await page.waitForIdle()
         const nonBreakingSpace = String.fromCharCode(160)
         const adjustedMessage = message.replaceAll('\n', '').replaceAll(' ', nonBreakingSpace)
-        await expect(lines).toHaveText(adjustedMessage)
+        await expect(lines).toHaveText(viewLinesText || adjustedMessage)
         await page.waitForIdle()
         const interactiveInput = page.locator('.interactive-input-and-side-toolbar')
         await expect(interactiveInput).toBeVisible()
