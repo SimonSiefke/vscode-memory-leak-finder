@@ -11,7 +11,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to disable extension`)
       }
     },
-    async enableExtension(options) {
+    async enableExtension(options?: any) {
       try {
         const extensionEditor = page.locator('.extension-editor')
         const disabledStatusLabel = extensionEditor.locator('.extension-status-label[aria-label="Disabled"]')

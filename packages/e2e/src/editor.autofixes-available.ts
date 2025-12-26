@@ -21,7 +21,7 @@ const def = abcd + 1
   await Editor.shouldHaveText(`let abc = 1
 
 const def = abc + 1`)
-  await Editor.save()
+  await Editor.save({ viaKeyBoard: true })
   await Editor.closeAll()
 }
 

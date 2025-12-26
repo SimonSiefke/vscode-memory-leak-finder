@@ -12,6 +12,7 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
 }
 
 export const run = async ({ Suggest }: TestContext): Promise<void> => {
+  // @ts-ignore
   await Suggest.open()
   await Suggest.close()
 }

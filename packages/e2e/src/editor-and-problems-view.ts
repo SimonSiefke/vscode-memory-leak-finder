@@ -15,6 +15,8 @@ export const beforeSetup = async ({ join, tmpDir, writeFile }: any) => {
 export const setup = async ({ Editor, expect, page, Problems, StatusBar }: TestContext): Promise<void> => {
   await Editor.open('index.css')
   await Editor.shouldHaveSquigglyError()
+
+  // @ts-ignore
   const problemsButton = await StatusBar.item('status.problems')
   await problemsButton.click()
   const panel = page.locator('.part.panel.bottom')

@@ -15,7 +15,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to close suggest widget`)
       }
     },
-    async open(expectedItem: string) {
+    async open(expectedItem?: string) {
       try {
         await page.waitForIdle()
         const suggestWidget = page.locator('.suggest-widget')
