@@ -117,7 +117,14 @@ export const parseArgv = (argv: readonly string[]) => {
     options.ide = Ide.Cursor
   }
   if (argv.includes('--vscode-version')) {
-    options.vscodeVersion = parseArgvString(argv, '--vscode-version')
+    const vscodeVersionValue = parseArgvString(argv, '--vscode-version')
+    if (vscodeVersionValue.startsWith('insiders:')) {
+      const commitHash = vscodeVersionValue.slice('insiders:'.length)
+      options.vscodeVersion = ''
+      options.insidersCommit = commitHash
+    } else {
+      options.vscodeVersion = vscodeVersionValue
+    }
   }
   if (argv.includes('--vscode-path')) {
     options.vscodePath = parseArgvString(argv, '--vscode-path')
