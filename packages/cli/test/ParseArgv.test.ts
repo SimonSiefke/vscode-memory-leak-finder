@@ -219,3 +219,38 @@ test('parseArgv - multiple inspect flags and ports', () => {
   expect(options.inspectPtyHost).toBe(true)
   expect(options.inspectPtyHostPort).toBe(9999)
 })
+
+test('parseArgv - vscode-version with insiders format', () => {
+  const argv = ['--vscode-version', 'insiders:dojdideiheuh']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.vscodeVersion).toBe('')
+  expect(options.insidersCommit).toBe('dojdideiheuh')
+})
+
+test('parseArgv - vscode-version with insiders format and different commit hash', () => {
+  const argv = ['--vscode-version', 'insiders:abc123def456']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.vscodeVersion).toBe('')
+  expect(options.insidersCommit).toBe('abc123def456')
+})
+
+test('parseArgv - vscode-version with regular version', () => {
+  const argv = ['--vscode-version', '1.80.0']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.vscodeVersion).toBe('1.80.0')
+  expect(options.insidersCommit).toBe('')
+})
+
+test('parseArgv - vscode-version with insiders format and empty commit', () => {
+  const argv = ['--vscode-version', 'insiders:']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.vscodeVersion).toBe('')
+  expect(options.insidersCommit).toBe('')
+})
+
+test('parseArgv - vscode-version with insiders format does not override explicit insiders-commit', () => {
+  const argv = ['--vscode-version', 'insiders:dojdideiheuh', '--insiders-commit', 'othercommit']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.vscodeVersion).toBe('')
+  expect(options.insidersCommit).toBe('othercommit')
+})
