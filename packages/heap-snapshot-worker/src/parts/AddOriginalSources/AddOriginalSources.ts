@@ -1,9 +1,8 @@
 import type { CompareResult } from '../CompareHeapSnapshotsFunctionsInternal2/CompareHeapSnapshotsFunctionsInternal2.ts'
-import { NodeWorkerRpcParent } from '@lvce-editor/rpc'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { readdir, readFile } from 'node:fs/promises'
-import { getSourceMapWorkerPath } from '../SourceMapWorkerPath/SourceMapWorkerPath.ts'
+import * as LaunchSourceMapWorker from '../LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
 
 export interface ScriptInfo {
   readonly url?: string
@@ -36,24 +35,6 @@ const getSourceMapUrl = (script: ScriptInfo): string => {
 const thisDir: string = dirname(fileURLToPath(import.meta.url))
 const packageDir: string = resolve(thisDir, '../../..')
 const repoRoot: string = resolve(packageDir, '../..')
-
-const launchSourceMapWorker = async () => {
-  const sourceMapWorkerPath: string = getSourceMapWorkerPath()
-
-  const rpc = await NodeWorkerRpcParent.create({
-    stdio: 'inherit',
-    path: sourceMapWorkerPath,
-    commandMap: {},
-  })
-  return {
-    invoke(method: string, ...params: readonly any[]) {
-      return rpc.invoke(method, ...params)
-    },
-    async [Symbol.asyncDispose]() {
-      await rpc.dispose()
-    },
-  }
-}
 
 export const addOriginalSources = async (items: readonly CompareResult[]): Promise<readonly any[]> => {
   let scriptMap: Record<number, ScriptInfo> | undefined
@@ -123,7 +104,7 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
   }
 
   try {
-    await using rpc = await launchSourceMapWorker()
+    await using rpc = await LaunchSourceMapWorker.launchSourceMapWorker()
     const extendedOriginalNames = true
     const cleanPositionMap = await rpc.invoke('SourceMap.getCleanPositionsMap', sourceMapUrlToPositions, extendedOriginalNames)
     const offsetMap: Record<string, number> = Object.create(null)

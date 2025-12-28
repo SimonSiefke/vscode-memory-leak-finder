@@ -1,8 +1,9 @@
 import * as os from 'node:os'
-import { join } from 'node:path'
+import { basename, join } from 'node:path'
 import { resolve } from 'node:path'
 import * as AdjustVscodeProductJson from '../AdjustVscodeProductJson/AdjustVscodeProductJson.ts'
 import * as CollectSourceMapUrls from '../CollectSourceMapUrls/CollectSourceMapUrls.ts'
+import * as Download from '../Download/Download.ts'
 import * as DownloadAndExtract from '../DownloadAndExtract/DownloadAndExtract.ts'
 import * as FetchVscodeInsidersMetadata from '../FetchVscodeInsidersMetadata/FetchVscodeInsidersMetadata.ts'
 import * as GetVscodeRuntimePath from '../GetVscodeRuntimePath/GetVscodeRuntimePath.ts'
@@ -41,6 +42,20 @@ export const downloadAndUnzipInsiders = async (commit: string): Promise<string> 
   const insidersVersionsDir = join(Root.root, '.vscode-insiders-versions')
   const extractDir = join(insidersVersionsDir, commit)
   console.log(`[download-worker] Downloading ${metadata.url}`)
+
+  const urlBasename = basename(new URL(metadata.url).pathname)
+  const isExe = process.platform === 'win32' && urlBasename.endsWith('.exe')
+
+  if (isExe) {
+    const tmpDir = join(Root.root, '.vscode-tool-downloads')
+    const tmpFile = join(tmpDir, urlBasename)
+    await Download.download('vscode-insiders', [metadata.url], tmpFile)
+    console.log(`[download-worker] Download complete.`)
+    const path = tmpFile
+    await GetVscodeRuntimePath.setVscodeRuntimePath(commit, path)
+    return path
+  }
+
   await DownloadAndExtract.downloadAndExtract('vscode-insiders', [metadata.url], extractDir)
   console.log(`[download-worker] Download complete.`)
   const path = getBinaryPathFromExtractDir(extractDir)
