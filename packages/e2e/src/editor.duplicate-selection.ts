@@ -21,6 +21,6 @@ export const run = async ({ Editor }: TestContext): Promise<void> => {
 }
 
 export const teardown = async ({ Editor }: TestContext): Promise<void> => {
-  await Editor.save({ viaKeyBoard: true })
+  await Editor.save({ viaKeyBoard: false })
   await Editor.closeAll()
 }
