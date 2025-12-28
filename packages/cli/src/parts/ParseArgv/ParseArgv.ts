@@ -24,41 +24,7 @@ const parseArgvString = (argv: readonly string[], name: string): string => {
   return ''
 }
 
-interface ParsedVscodeVersion {
-  readonly insidersCommit: string
-  readonly vscodeVersion: string
-}
-
-const parseVscodeVersion = (defaultVersionValue: string, argv: readonly string[]): ParsedVscodeVersion => {
-  if (argv.includes('--vscode-version')) {
-    const vscodeVersionValue = parseArgvString(argv, '--vscode-version')
-    if (vscodeVersionValue.startsWith('insiders:')) {
-      const commitHash = vscodeVersionValue.slice('insiders:'.length)
-      return {
-        vscodeVersion: '',
-        insidersCommit: commitHash,
-      }
-    }
-    return {
-      vscodeVersion: vscodeVersionValue,
-      insidersCommit: '',
-    }
-  }
-  if (defaultVersionValue.startsWith('insiders:')) {
-    const commitHash = defaultVersionValue.slice('insiders:'.length)
-    return {
-      vscodeVersion: '',
-      insidersCommit: commitHash,
-    }
-  }
-  return {
-    insidersCommit: '',
-    vscodeVersion: defaultVersionValue,
-  }
-}
-
 export const parseArgv = (argv: readonly string[]) => {
-  const parsedVersion = parseVscodeVersion(VsCodeVersion.vscodeVersion, argv)
   const options = {
     bisect: false,
     checkLeaks: false,
@@ -73,7 +39,7 @@ export const parseArgv = (argv: readonly string[]) => {
     headless: false,
     ide: Ide.VsCode,
     ideVersion: '', // TODO
-    insidersCommit: parsedVersion.insidersCommit,
+    insidersCommit: '',
     inspectExtensions: false,
     inspectExtensionsPort: 5870,
     inspectPtyHost: false,
@@ -94,7 +60,7 @@ export const parseArgv = (argv: readonly string[]) => {
     timeouts: true,
     useProxyMock: false,
     vscodePath: '',
-    vscodeVersion: parsedVersion.vscodeVersion,
+    vscodeVersion: VsCodeVersion.vscodeVersion,
     watch: false,
     workers: false,
     isWindows: IsWindows.isWindows(process.platform),
@@ -149,6 +115,16 @@ export const parseArgv = (argv: readonly string[]) => {
   }
   if (argv.includes('--ide=cursor')) {
     options.ide = Ide.Cursor
+  }
+  if (argv.includes('--vscode-version')) {
+    const vscodeVersionValue = parseArgvString(argv, '--vscode-version')
+    if (vscodeVersionValue.startsWith('insiders:')) {
+      const commitHash = vscodeVersionValue.slice('insiders:'.length)
+      options.vscodeVersion = ''
+      options.insidersCommit = commitHash
+    } else {
+      options.vscodeVersion = vscodeVersionValue
+    }
   }
   if (argv.includes('--vscode-path')) {
     options.vscodePath = parseArgvString(argv, '--vscode-path')
