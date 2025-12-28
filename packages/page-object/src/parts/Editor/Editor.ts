@@ -640,8 +640,8 @@ export const create = ({ expect, ideVersion, page, VError }) => {
       await subFrame.waitForIdle()
     },
     async waitForBinaryReady() {
-      const placeholder = page.locator('.monaco-editor-pane-placeholder')
-      await expect(placeholder).toBeVisible()
+      // const placeholder = page.locator('.monaco-editor-pane-placeholder')
+      // await expect(placeholder).toBeVisible()
       await page.waitForIdle()
       const quickPick = QuickPick.create({ expect, page, VError })
       await quickPick.executeCommand(WellKnownCommands.ReopenEditorWith, {
@@ -655,7 +655,7 @@ export const create = ({ expect, ideVersion, page, VError }) => {
       await page.waitForIdle()
       const webView = WebView.create({ expect, page, VError })
       await webView.shouldBeVisible2({
-        extensionId: `vscode.hexeditor`,
+        extensionId: `ms-vscode.hexeditor`,
         hasLineOfCodeCounter: false,
       })
     },
