@@ -28,20 +28,20 @@ export const generateExtensionSourceMaps = async ({
   // Check if already built
   const sourceMapsOutputPath = join(outputDir, `${extensionName}-${version}`)
   if (existsSync(sourceMapsOutputPath)) {
-    console.log(`Source maps for ${extensionName} ${version} already exist, skipping...`)
+    console.log(`[extension-source-maps] Source maps for ${extensionName} ${version} already exist, skipping...`)
     return
   }
 
   // Clone repository if needed
   if (!existsSync(repoPath)) {
-    console.log(`Cloning ${extensionName} repository...`)
+    console.log(`[extension-source-maps] Cloning ${extensionName} repository...`)
     await CloneRepository.cloneRepository(repoUrl, repoPath, 'main')
   }
 
   // Find commit for version
-  console.log(`Finding commit for version ${version}...`)
+  console.log(`[extension-source-maps] Finding commit for version ${version}...`)
   const commit = await FindCommitForVersion.findCommitForVersion(repoPath, version)
-  console.log(`Found commit: ${commit}`)
+  console.log(`[extension-source-maps] Found commit: ${commit}`)
 
   // Checkout the commit
   const checkoutResult = await Exec.exec('git', ['checkout', commit], { cwd: repoPath })
@@ -50,26 +50,26 @@ export const generateExtensionSourceMaps = async ({
   }
 
   // Get node version
-  console.log(`Getting node version from package.json...`)
+  console.log(`[extension-source-maps] Getting node version from package.json...`)
   const nodeVersion = await GetNodeVersion.getNodeVersion(repoPath)
-  console.log(`Node version: ${nodeVersion}`)
+  console.log(`[extension-source-maps] Node version: ${nodeVersion}`)
 
   // Install node version
-  console.log(`Installing node version ${nodeVersion}...`)
+  console.log(`[extension-source-maps] Installing node version ${nodeVersion}...`)
   await InstallNodeVersion.installNodeVersion(nodeVersion)
 
   // Modify esbuild config
-  console.log(`Modifying esbuild config to generate sourcemaps...`)
+  console.log(`[extension-source-maps] Modifying esbuild config to generate sourcemaps...`)
   await ModifyEsbuildConfig.modifyEsbuildConfig(repoPath)
 
   // Build extension
-  console.log(`Building extension...`)
+  console.log(`[extension-source-maps] Building extension...`)
   await BuildExtension.buildExtension(repoPath, nodeVersion)
 
   // Copy source maps
-  console.log(`Copying source maps...`)
+  console.log(`[extension-source-maps] Copying source maps...`)
   await mkdir(outputDir, { recursive: true })
   await CopySourceMaps.copySourceMaps(repoPath, outputDir, extensionName, version)
 
-  console.log(`Successfully generated source maps for ${extensionName} ${version}`)
+  console.log(`[extension-source-maps] Successfully generated source maps for ${extensionName} ${version}`)
 }
