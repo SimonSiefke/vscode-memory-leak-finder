@@ -5,6 +5,7 @@ import * as CloneRepository from '../CloneRepository/CloneRepository.ts'
 import * as FindCommitForVersion from '../FindCommitForVersion/FindCommitForVersion.ts'
 import * as GetNodeVersion from '../GetNodeVersion/GetNodeVersion.ts'
 import * as InstallNodeVersion from '../InstallNodeVersion/InstallNodeVersion.ts'
+import * as InstallDependencies from '../InstallDependencies/InstallDependencies.ts'
 import * as ModifyEsbuildConfig from '../ModifyEsbuildConfig/ModifyEsbuildConfig.ts'
 import * as BuildExtension from '../BuildExtension/BuildExtension.ts'
 import * as CopySourceMaps from '../CopySourceMaps/CopySourceMaps.ts'
@@ -56,7 +57,13 @@ export const generateExtensionSourceMaps = async ({
 
   // Install node version
   console.log(`[extension-source-maps] Installing node version ${nodeVersion}...`)
-  await InstallNodeVersion.installNodeVersion(nodeVersion)
+  const installedVersion = await InstallNodeVersion.installNodeVersion(nodeVersion)
+  console.log(`[extension-source-maps] Node version ${installedVersion} installed successfully`)
+
+  // Install dependencies
+  console.log(`[extension-source-maps] Installing dependencies...`)
+  await InstallDependencies.installDependencies(repoPath, nodeVersion)
+  console.log(`[extension-source-maps] Dependencies installed successfully`)
 
   // Modify esbuild config
   console.log(`[extension-source-maps] Modifying esbuild config to generate sourcemaps...`)

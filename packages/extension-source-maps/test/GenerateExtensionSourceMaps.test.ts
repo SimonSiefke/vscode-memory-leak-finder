@@ -359,3 +359,93 @@ test('generateExtensionSourceMaps - executes full workflow', async () => {
   await rm(tempOutput, { recursive: true, force: true })
   await rm(tempCache, { recursive: true, force: true })
 })
+
+test('generateExtensionSourceMaps - logs messages correctly', async () => {
+  const tempOutput = join(tmpdir(), `test-generate-${Date.now()}`)
+  const tempCache = join(tmpdir(), `test-cache-${Date.now()}`)
+  const extensionName = 'test-extension'
+  const version = '1.0.0'
+  const repoUrl = 'git@github.com:test/repo.git'
+  const expectedCommit = 'abc123'
+  const nodeVersion = '18.0.0'
+  const installedVersion = 'v18.0.0'
+
+  const repoPath = join(tempCache, `${extensionName}-${version}`)
+  await mkdir(repoPath, { recursive: true })
+
+  const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+
+  const mockRpc = MockRpc.create({
+    commandMap: {},
+    invoke: (method: string, command: string, args: string[]) => {
+      if (method === 'exec.exec' && command === 'git') {
+        return {
+          exitCode: 0,
+          stdout: '',
+          stderr: '',
+        }
+      }
+      throw new Error(`unexpected method ${method}`)
+    },
+  })
+
+  jest.unstable_mockModule('../src/parts/Exec/Exec.ts', () => ({
+    exec: async (command: string, args: string[], options: any) => {
+      return mockRpc.invoke('exec.exec', command, args, options)
+    },
+  }))
+
+  jest.unstable_mockModule('../src/parts/CloneRepository/CloneRepository.ts', () => ({
+    cloneRepository: async () => {},
+  }))
+
+  jest.unstable_mockModule('../src/parts/FindCommitForVersion/FindCommitForVersion.ts', () => ({
+    findCommitForVersion: async () => expectedCommit,
+  }))
+
+  jest.unstable_mockModule('../src/parts/GetNodeVersion/GetNodeVersion.ts', () => ({
+    getNodeVersion: async () => nodeVersion,
+  }))
+
+  jest.unstable_mockModule('../src/parts/InstallNodeVersion/InstallNodeVersion.ts', () => ({
+    installNodeVersion: async () => installedVersion,
+  }))
+
+  jest.unstable_mockModule('../src/parts/ModifyEsbuildConfig/ModifyEsbuildConfig.ts', () => ({
+    modifyEsbuildConfig: async () => {},
+  }))
+
+  jest.unstable_mockModule('../src/parts/BuildExtension/BuildExtension.ts', () => ({
+    buildExtension: async () => {},
+  }))
+
+  jest.unstable_mockModule('../src/parts/CopySourceMaps/CopySourceMaps.ts', () => ({
+    copySourceMaps: async () => {},
+  }))
+
+  const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
+
+  await generateExtensionSourceMaps({
+    extensionName,
+    version,
+    repoUrl,
+    outputDir: tempOutput,
+    cacheDir: tempCache,
+  })
+
+  expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Finding commit for version ${version}...`)
+  expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Found commit: ${expectedCommit}`)
+  expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Getting node version from package.json...`)
+  expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Node version: ${nodeVersion}`)
+  expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Installing node version ${nodeVersion}...`)
+  expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Node version ${installedVersion} installed successfully`)
+  expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Modifying esbuild config to generate sourcemaps...`)
+  expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Building extension...`)
+  expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Copying source maps...`)
+  expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Successfully generated source maps for ${extensionName} ${version}`)
+
+  consoleSpy.mockRestore()
+
+  await rm(tempOutput, { recursive: true, force: true })
+  await rm(tempCache, { recursive: true, force: true })
+})
