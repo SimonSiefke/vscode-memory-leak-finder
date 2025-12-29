@@ -37,6 +37,4 @@ export const isLeak = ({ after, before }) => {
   return true
 }
 
-
-
-export {compareGrowingArrays as compare} from '../CompareGrowingArrays/CompareGrowingArrays.ts'
+export { compareGrowingArrays as compare } from '../CompareGrowingArrays/CompareGrowingArrays.ts'
