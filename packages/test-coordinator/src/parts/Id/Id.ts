@@ -1,4 +1,4 @@
-export const state = {
+const state = {
   id: 1,
 }
 
