@@ -1,3 +1,4 @@
+import * as os from 'node:os'
 import { VError } from '@lvce-editor/verror'
 import * as AdjustVscodeProductJson from '../AdjustVscodeProductJson/AdjustVscodeProductJson.ts'
 import * as CollectSourceMapUrls from '../CollectSourceMapUrls/CollectSourceMapUrls.ts'
@@ -38,12 +39,12 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
     if (typeof options === 'string') {
       vscodeVersion = options
       platform = process.platform
-      arch = require('node:os').arch()
+      arch = os.arch()
     } else {
       vscodeVersion = options.vscodeVersion
       insidersCommit = options.insidersCommit
       platform = options.platform || process.platform
-      arch = options.arch || require('node:os').arch()
+      arch = options.arch || os.arch()
     }
 
     if (insidersCommit) {
