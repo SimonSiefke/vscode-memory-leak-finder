@@ -251,4 +251,3 @@ test('installDependencies - throws VError when exec throws', async () => {
   const { installDependencies } = await import('../src/parts/InstallDependencies/InstallDependencies.ts')
   await expect(installDependencies(repoPath, nodeVersion)).rejects.toThrow(`Failed to install dependencies in '${repoPath}'`)
 })
-
