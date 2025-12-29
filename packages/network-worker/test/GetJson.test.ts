@@ -5,6 +5,7 @@ const mockFetch = jest.fn()
 jest.unstable_mockModule('node:http', () => ({}))
 jest.unstable_mockModule('node:https', () => ({}))
 
+// @ts-ignore
 global.fetch = mockFetch
 
 const { getJson } = await import('../src/parts/GetJson/GetJson.ts')
@@ -17,8 +18,10 @@ test('getJson fetches and returns JSON data', async () => {
   const mockData = { name: 'test', value: 123 }
   const mockResponse = {
     ok: true,
+    // @ts-ignore
     json: jest.fn().mockResolvedValue(mockData),
   }
+  // @ts-ignore
   mockFetch.mockResolvedValue(mockResponse)
 
   const result = await getJson('https://example.com/api/data')
@@ -35,12 +38,14 @@ test('getJson throws error when response is not ok', async () => {
     status: 404,
     statusText: 'Not Found',
   }
+  // @ts-ignore
   mockFetch.mockResolvedValue(mockResponse)
 
   await expect(getJson('https://example.com/api/data')).rejects.toThrow('HTTP 404: Not Found')
 })
 
 test('getJson handles timeout', async () => {
+  // @ts-ignore
   mockFetch.mockRejectedValue(new Error('The operation was aborted'))
 
   await expect(getJson('https://example.com/api/data')).rejects.toThrow()
