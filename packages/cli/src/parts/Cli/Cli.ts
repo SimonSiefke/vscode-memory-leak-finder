@@ -49,6 +49,7 @@ export const run = async (platform: string, arch: string, argv: readonly string[
     setupOnly: options.setupOnly,
     timeoutBetween: options.timeoutBetween,
     timeouts: options.timeouts,
+    updateUrl: options.updateUrl,
     value: options.filter,
     vscodePath: options.vscodePath,
     vscodeVersion: options.vscodeVersion,
