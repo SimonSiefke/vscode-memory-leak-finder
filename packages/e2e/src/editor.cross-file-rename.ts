@@ -2,11 +2,16 @@ import type { TestContext } from '../types.ts'
 
 const initialFiles = [
   {
+    content: `let x:string = 1`,
+    name: 'error.ts',
+  },
+  {
     content: `export function add(a: number, b: number): number {
   return a + b
 }`,
     name: 'add.ts',
   },
+
   {
     content: `import { add } from './add'
 
@@ -46,9 +51,13 @@ console.log(result)
   },
 ]
 
-export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, Workspace, SideBar }: TestContext): Promise<void> => {
   await Editor.closeAll()
+  await SideBar.hide()
   await Workspace.setFiles(initialFiles)
+  await Editor.open('error.ts')
+  await Editor.shouldHaveSquigglyError()
+  await Editor.closeAll()
 }
 
 export const run = async ({ Editor, Workspace }: TestContext): Promise<void> => {
