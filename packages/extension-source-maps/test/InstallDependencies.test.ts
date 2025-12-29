@@ -5,10 +5,31 @@ beforeEach(() => {
   jest.resetModules()
 })
 
+test('installDependencies - skips installation when node_modules exists', async () => {
+  const repoPath = '/tmp/test-repo'
+  const nodeVersion = '18.0.0'
+
+  jest.unstable_mockModule('node:fs', () => ({
+    existsSync: (path: string) => {
+      if (path === '/tmp/test-repo/node_modules') {
+        return true
+      }
+      return false
+    },
+  }))
+
+  const { installDependencies } = await import('../src/parts/InstallDependencies/InstallDependencies.ts')
+  await installDependencies(repoPath, nodeVersion)
+})
+
 test('installDependencies - successfully installs dependencies', async () => {
   const repoPath = '/tmp/test-repo'
   const nodeVersion = '18.0.0'
   const npmPath = '/home/user/.nvm/versions/node/v18.0.0/bin/npm'
+
+  jest.unstable_mockModule('node:fs', () => ({
+    existsSync: () => false,
+  }))
 
   let callCount = 0
   const mockRpc = MockRpc.create({
@@ -51,6 +72,10 @@ test('installDependencies - throws error when npm path not found', async () => {
   const repoPath = '/tmp/test-repo'
   const nodeVersion = '18.0.0'
 
+  jest.unstable_mockModule('node:fs', () => ({
+    existsSync: () => false,
+  }))
+
   const mockRpc = MockRpc.create({
     commandMap: {},
     invoke: (method: string, command: string, args: string[]) => {
@@ -80,6 +105,10 @@ test('installDependencies - throws error when npm path not found', async () => {
 test('installDependencies - throws error when npm path is empty', async () => {
   const repoPath = '/tmp/test-repo'
   const nodeVersion = '18.0.0'
+
+  jest.unstable_mockModule('node:fs', () => ({
+    existsSync: () => false,
+  }))
 
   const mockRpc = MockRpc.create({
     commandMap: {},
@@ -111,6 +140,10 @@ test('installDependencies - throws error when npm ci fails', async () => {
   const repoPath = '/tmp/test-repo'
   const nodeVersion = '18.0.0'
   const npmPath = '/home/user/.nvm/versions/node/v18.0.0/bin/npm'
+
+  jest.unstable_mockModule('node:fs', () => ({
+    existsSync: () => false,
+  }))
 
   const mockRpc = MockRpc.create({
     commandMap: {},
@@ -149,6 +182,10 @@ test('installDependencies - uses npm from .config/nvm when .nvm not found', asyn
   const repoPath = '/tmp/test-repo'
   const nodeVersion = '18.0.0'
   const npmPath = '/home/user/.config/nvm/versions/node/v18.0.0/bin/npm'
+
+  jest.unstable_mockModule('node:fs', () => ({
+    existsSync: () => false,
+  }))
 
   let callCount = 0
   const mockRpc = MockRpc.create({
@@ -190,6 +227,10 @@ test('installDependencies - uses npm from .config/nvm when .nvm not found', asyn
 test('installDependencies - throws VError when exec throws', async () => {
   const repoPath = '/tmp/test-repo'
   const nodeVersion = '18.0.0'
+
+  jest.unstable_mockModule('node:fs', () => ({
+    existsSync: () => false,
+  }))
 
   const mockRpc = MockRpc.create({
     commandMap: {},
