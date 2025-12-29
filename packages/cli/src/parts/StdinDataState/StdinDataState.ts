@@ -8,6 +8,7 @@ export interface StdinDataState {
   readonly bisect: boolean
   readonly buffering: boolean
   readonly checkLeaks: boolean
+  readonly clearExtensions: boolean
   readonly continueValue: string
   readonly cwd: string
   readonly enableExtensions: boolean
@@ -41,11 +42,11 @@ export interface StdinDataState {
   readonly stdout: string[]
   readonly timeoutBetween: number
   readonly timeouts: boolean
+  readonly updateUrl: string
   readonly useProxyMock: boolean
   readonly value: string
   readonly watch: boolean
   readonly workers: boolean
-  readonly clearExtensions: boolean
 }
 
 let state: StdinDataState = {
