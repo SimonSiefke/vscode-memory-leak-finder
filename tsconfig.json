@@ -12,6 +12,7 @@
     { "path": "./packages/devtools-protocol" },
     { "path": "./packages/download-worker" },
     { "path": "./packages/e2e" },
+    { "path": "./packages/exec-worker" },
     { "path": "./packages/file-system-worker" },
     { "path": "./packages/file-watcher-worker" },
     { "path": "./packages/load-source-map-worker" },

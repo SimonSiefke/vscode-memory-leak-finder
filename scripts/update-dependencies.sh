@@ -37,6 +37,7 @@ cd packages/cursor-e2e && updateDependencies && cd ../../ &&
 cd packages/devtools-protocol && updateDependencies && cd ../../ &&
 cd packages/download-worker && updateDependencies && cd ../../ &&
 cd packages/e2e && updateDependencies && cd ../../ &&
+cd packages/exec-worker && updateDependencies && cd ../../ &&
 cd packages/file-system-worker && updateDependencies && cd ../../ &&
 cd packages/file-watcher-worker && updateDependencies && cd ../../ &&
 cd packages/heap-snapshot-parsing-worker && updateDependencies && cd ../../ &&
