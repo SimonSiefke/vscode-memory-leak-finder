@@ -83,6 +83,10 @@ test('generateExtensionSourceMaps - clones repository when it does not exist', a
     installNodeVersion: async () => 'v18.0.0',
   }))
 
+  jest.unstable_mockModule('../src/parts/InstallDependencies/InstallDependencies.ts', () => ({
+    installDependencies: async () => {},
+  }))
+
   jest.unstable_mockModule('../src/parts/ModifyEsbuildConfig/ModifyEsbuildConfig.ts', () => ({
     modifyEsbuildConfig: async () => {},
   }))
@@ -168,6 +172,10 @@ test('generateExtensionSourceMaps - finds commit and checks out', async () => {
 
   jest.unstable_mockModule('../src/parts/InstallNodeVersion/InstallNodeVersion.ts', () => ({
     installNodeVersion: async () => 'v18.0.0',
+  }))
+
+  jest.unstable_mockModule('../src/parts/InstallDependencies/InstallDependencies.ts', () => ({
+    installDependencies: async () => {},
   }))
 
   jest.unstable_mockModule('../src/parts/ModifyEsbuildConfig/ModifyEsbuildConfig.ts', () => ({
@@ -319,6 +327,12 @@ test('generateExtensionSourceMaps - executes full workflow', async () => {
     },
   }))
 
+  jest.unstable_mockModule('../src/parts/InstallDependencies/InstallDependencies.ts', () => ({
+    installDependencies: async () => {
+      workflowCalls.push('installDependencies')
+    },
+  }))
+
   jest.unstable_mockModule('../src/parts/ModifyEsbuildConfig/ModifyEsbuildConfig.ts', () => ({
     modifyEsbuildConfig: async () => {
       workflowCalls.push('modifyEsbuildConfig')
@@ -351,6 +365,7 @@ test('generateExtensionSourceMaps - executes full workflow', async () => {
     'findCommit',
     'getNodeVersion',
     'installNodeVersion',
+    'installDependencies',
     'modifyEsbuildConfig',
     'buildExtension',
     'copySourceMaps',
