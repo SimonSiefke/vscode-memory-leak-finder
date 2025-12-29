@@ -12,15 +12,6 @@ interface ExecResult {
   stdout: string
 }
 
-let execWorkerRpc: Awaited<ReturnType<typeof LaunchExecWorker.launchExecWorker>> | undefined
-
-const getExecWorker = async () => {
-  if (!execWorkerRpc) {
-    execWorkerRpc = await LaunchExecWorker.launchExecWorker()
-  }
-  return execWorkerRpc
-}
-
 export const exec = async (command: string, args: string[], options: ExecOptions = {}): Promise<ExecResult> => {
   try {
     await using rpc = await LaunchExecWorker.launchExecWorker()
