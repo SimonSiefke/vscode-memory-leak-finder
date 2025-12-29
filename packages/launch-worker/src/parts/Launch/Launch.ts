@@ -24,6 +24,7 @@ export interface LaunchOptions {
   readonly inspectSharedProcessPort: number
   readonly isFirstConnection: boolean
   readonly useProxyMock: boolean
+  readonly updateUrl: string
   readonly vscodePath: string
   readonly vscodeVersion: string
 }
@@ -65,6 +66,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     inspectSharedProcess,
     inspectSharedProcessPort,
     useProxyMock,
+    updateUrl,
     vscodePath,
     vscodeVersion,
   } = options
@@ -85,6 +87,7 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     inspectSharedProcess,
     inspectSharedProcessPort,
     useProxyMock,
+    updateUrl,
     vscodePath,
     vscodeVersion,
   })

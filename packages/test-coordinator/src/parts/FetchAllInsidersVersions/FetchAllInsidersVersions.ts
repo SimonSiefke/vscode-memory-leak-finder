@@ -8,8 +8,8 @@ export interface IVersionMetadata {
   readonly version: string
 }
 
-export const fetchAllInsidersVersions = async (): Promise<IVersionMetadata[]> => {
-  const commits = await FetchCommits.fetchCommits()
+export const fetchAllInsidersVersions = async (platform: string, arch: string, updateUrl: string): Promise<IVersionMetadata[]> => {
+  const commits = await FetchCommits.fetchCommits(platform, arch, updateUrl)
   const versions: IVersionMetadata[] = commits.map((commit) => ({
     commit: commit.commit,
     productVersion: '',

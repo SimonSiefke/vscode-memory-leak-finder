@@ -27,6 +27,7 @@ export interface PrepareTestsOptions {
   readonly runMode: number
   readonly timeouts: any
   readonly useProxyMock: boolean
+  readonly updateUrl: string
   readonly vscodePath: string
   readonly vscodeVersion: string
 }
@@ -50,6 +51,7 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
     inspectSharedProcess,
     inspectSharedProcessPort,
     useProxyMock,
+    updateUrl,
     vscodePath,
     vscodeVersion,
   } = options
@@ -77,6 +79,7 @@ export const prepareTests = async (options: PrepareTestsOptions) => {
       inspectSharedProcessPort,
       isFirstConnection,
       useProxyMock,
+      updateUrl,
       vscodePath,
       vscodeVersion,
     })

@@ -1,5 +1,4 @@
 import { VError } from '@lvce-editor/verror'
-import * as os from 'node:os'
 import * as GetVscodePlatformName from '../GetVscodePlatformName/GetVscodePlatformName.ts'
 
 export interface IBuildMetadata {
@@ -9,10 +8,10 @@ export interface IBuildMetadata {
   readonly version: string
 }
 
-export const fetchVscodeInsidersMetadata = async (commit: string): Promise<IBuildMetadata> => {
-  const platformName = GetVscodePlatformName.getVscodePlatformName(process.platform, os.arch())
+export const fetchVscodeInsidersMetadata = async (platform: string, arch: string, commit: string, updateUrl: string): Promise<IBuildMetadata> => {
+  const platformName = GetVscodePlatformName.getVscodePlatformName(platform, arch)
   const quality = 'insider'
-  const url = `https://update.code.visualstudio.com/api/versions/commit:${commit}/${platformName}/${quality}`
+  const url = `${updateUrl}/api/versions/commit:${commit}/${platformName}/${quality}`
 
   try {
     const response = await fetch(url, {

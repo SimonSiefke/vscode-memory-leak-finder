@@ -34,6 +34,7 @@ export const launchVsCode = async ({
   inspectSharedProcess,
   inspectSharedProcessPort,
   useProxyMock,
+  updateUrl,
   vscodePath,
   vscodeVersion,
 }: {
@@ -52,6 +53,7 @@ export const launchVsCode = async ({
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
   useProxyMock: boolean
+  updateUrl: string
   vscodePath: string
   vscodeVersion: string
 }) => {
@@ -73,7 +75,7 @@ export const launchVsCode = async ({
     await mkdir(sourceMapCacheDir, { recursive: true })
     const sourcesDir = join(Root.root, '.vscode-sources')
     await mkdir(sourcesDir, { recursive: true })
-    const binaryPath = await GetBinaryPath.getBinaryPath(vscodeVersion, vscodePath, commit, insidersCommit)
+    const binaryPath = await GetBinaryPath.getBinaryPath(vscodeVersion, vscodePath, commit, insidersCommit, updateUrl)
     const userDataDir = GetUserDataDir.getUserDataDir()
     const extensionsDir = GetExtensionsDir.getExtensionsDir()
     if (clearExtensions) {

@@ -21,6 +21,7 @@ export const launchIde = async ({
   inspectSharedProcess,
   inspectSharedProcessPort,
   useProxyMock,
+  updateUrl,
   vscodePath,
   vscodeVersion,
 }: {
@@ -40,6 +41,7 @@ export const launchIde = async ({
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
   useProxyMock: boolean
+  updateUrl: string
   vscodePath: string
   vscodeVersion: string
 }) => {
@@ -69,7 +71,7 @@ export const launchIde = async ({
   }
   let versionToParse: string
   if (insidersCommit) {
-    const metadata = await FetchVscodeInsidersMetadata.fetchVscodeInsidersMetadata(insidersCommit)
+    const metadata = await FetchVscodeInsidersMetadata.fetchVscodeInsidersMetadata(insidersCommit, updateUrl)
     const { productVersion } = metadata
     versionToParse = productVersion.replace('-insider', '')
   } else {
@@ -91,6 +93,7 @@ export const launchIde = async ({
     inspectSharedProcess,
     inspectSharedProcessPort,
     useProxyMock,
+    updateUrl,
     vscodePath,
     vscodeVersion,
   })

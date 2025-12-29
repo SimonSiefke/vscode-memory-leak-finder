@@ -21,6 +21,7 @@ const automaticallyDownloadSourceMaps = false
 
 export interface DownloadAndUnzipVscodeOptions {
   readonly insidersCommit?: string
+  readonly updateUrl?: string
   readonly vscodeVersion?: string
 }
 
@@ -45,7 +46,8 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
     }
 
     if (insidersCommit) {
-      return await DownloadAndUnzipInsiders.downloadAndUnzipInsiders(insidersCommit)
+      const updateUrl = options.updateUrl || 'https://update.code.visualstudio.com'
+      return await DownloadAndUnzipInsiders.downloadAndUnzipInsiders(insidersCommit, updateUrl)
     }
 
     if (!vscodeVersion) {

@@ -31,6 +31,7 @@ const disposeWorkers = async (workers) => {
 }
 
 export const runTestsWithCallback = async ({
+  arch,
   callback,
   checkLeaks,
   clearExtensions,
@@ -54,6 +55,7 @@ export const runTestsWithCallback = async ({
   measure,
   measureAfter,
   measureNode,
+  platform,
   recordVideo,
   restartBetween,
   root,
@@ -65,6 +67,7 @@ export const runTestsWithCallback = async ({
   timeoutBetween,
   timeouts,
   useProxyMock,
+  updateUrl,
   vscodePath,
   vscodeVersion,
 }: RunTestsWithCallbackOptions): Promise<RunTestsResult> => {
@@ -226,6 +229,7 @@ export const runTestsWithCallback = async ({
           screencastQuality,
           timeouts,
           useProxyMock,
+          updateUrl,
           vscodePath,
           vscodeVersion,
         })

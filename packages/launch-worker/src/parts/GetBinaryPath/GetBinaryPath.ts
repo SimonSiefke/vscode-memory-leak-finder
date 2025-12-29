@@ -4,13 +4,20 @@ import * as DownloadAndUnzipVscode from '../DownloadAndUnzipVscode/DownloadAndUn
 import * as Env from '../Env/Env.ts'
 import * as Root from '../Root/Root.ts'
 
-export const getBinaryPath = async (vscodeVersion: string, vscodePath: string, commit: string, insidersCommit: string): Promise<string> => {
+export const getBinaryPath = async (
+  vscodeVersion: string,
+  vscodePath: string,
+  commit: string,
+  insidersCommit: string,
+  updateUrl: string,
+): Promise<string> => {
   if (vscodePath) {
     return vscodePath
   }
   if (insidersCommit && typeof insidersCommit === 'string' && insidersCommit !== '') {
     return await DownloadAndUnzipVscode.downloadAndUnzipVscode({
       insidersCommit,
+      updateUrl,
     })
   }
   if (commit && typeof commit === 'string' && commit !== '') {
@@ -23,6 +30,7 @@ export const getBinaryPath = async (vscodeVersion: string, vscodePath: string, c
   if (insidersCommit) {
     return await DownloadAndUnzipVscode.downloadAndUnzipVscode({
       insidersCommit,
+      updateUrl,
     })
   }
   if (Env.env.VSCODE_PATH) {

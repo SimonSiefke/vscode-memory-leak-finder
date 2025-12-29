@@ -33,12 +33,12 @@ const getBinaryPathFromExtractDir = (extractDir: string): string => {
   return join(extractDir, `VSCode-linux-${archSuffix}`, 'code-insiders')
 }
 
-export const downloadAndUnzipInsiders = async (commit: string): Promise<string> => {
+export const downloadAndUnzipInsiders = async (commit: string, updateUrl: string): Promise<string> => {
   const cachedPath = await GetVscodeRuntimePath.getVscodeRuntimePath(commit)
   if (cachedPath) {
     return cachedPath
   }
-  const metadata = await FetchVscodeInsidersMetadata.fetchVscodeInsidersMetadata(commit)
+  const metadata = await FetchVscodeInsidersMetadata.fetchVscodeInsidersMetadata(commit, updateUrl)
   const insidersVersionsDir = join(Root.root, '.vscode-insiders-versions')
   const extractDir = join(insidersVersionsDir, commit)
   console.log(`[download-worker] Downloading ${metadata.url}`)
