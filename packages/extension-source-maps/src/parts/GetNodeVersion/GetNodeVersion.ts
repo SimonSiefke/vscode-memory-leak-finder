@@ -2,6 +2,8 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { VError } from '@lvce-editor/verror'
 
+const NODE_VERSION_REGEX = /(\d+)\.?(\d+)?\.?(\d+)?/
+
 export const getNodeVersion = async (repoPath: string): Promise<string> => {
   try {
     const packageJsonPath = join(repoPath, 'package.json')
@@ -13,7 +15,7 @@ export const getNodeVersion = async (repoPath: string): Promise<string> => {
     }
     const nodeVersion = engines.node
     // Extract version number (e.g., ">=18.0.0" -> "18.0.0" or "18" -> "18")
-    const match = nodeVersion.match(/(\d+)\.?(\d+)?\.?(\d+)?/)
+    const match = nodeVersion.match(NODE_VERSION_REGEX)
     if (!match) {
       throw new Error(`Could not parse node version from: ${nodeVersion}`)
     }
