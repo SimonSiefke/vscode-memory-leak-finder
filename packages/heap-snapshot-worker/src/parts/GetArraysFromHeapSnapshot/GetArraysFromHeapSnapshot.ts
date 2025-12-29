@@ -8,11 +8,11 @@ export const getArraysFromHeapSnapshot = async (pathUri: string): Promise<any[]>
     parseStrings: true,
   })
 
-  const { nodes, strings, edges, meta } = snapshot as any
-  const { node_types, node_fields, edge_types, edge_fields } = meta
+  const { edges, meta, nodes, strings } = snapshot
+  const { edge_fields, edge_types, node_fields, node_types } = meta
 
   // Also get parsed nodes and graph for name mapping
-  const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot({ nodes, strings, edges, snapshot: { meta } } as any)
+  const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot({ edges, nodes, snapshot: { meta }, strings } as any)
 
   return getArraysFromHeapSnapshotInternal(strings, nodes, node_types, node_fields, edges, edge_types, edge_fields, parsedNodes, graph)
 }

@@ -1,26 +1,26 @@
 export interface FunctionObject {
-  readonly url: string
-  readonly lineIndex: number
   readonly columnIndex: number
+  readonly lineIndex: number
   readonly name: string
   readonly sourceMapUrl: string | null
+  readonly url: string
 }
 
 export interface NormalizedFunction {
-  readonly url: string
   readonly name: string
   readonly sourceMapUrl: string | null
+  readonly url: string
 }
 
 export const normalizeFunctionObjects = (functionObjects: readonly FunctionObject[]): NormalizedFunction[] => {
   const normalized: NormalizedFunction[] = []
   for (const functionObject of functionObjects) {
-    const { url, lineIndex, columnIndex, name, sourceMapUrl } = functionObject
+    const { columnIndex, lineIndex, name, sourceMapUrl, url } = functionObject
     const displayUrl = `${url}:${lineIndex}:${columnIndex}`
     normalized.push({
-      url: displayUrl,
       name,
       sourceMapUrl,
+      url: displayUrl,
     })
   }
   return normalized

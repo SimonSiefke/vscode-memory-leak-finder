@@ -1,17 +1,17 @@
 import { compareHeapSnapshotFunctionsInternal } from '../CompareHeapSnapshotsFunctionsInternal/CompareHeapSnapshotsFunctionsInternal.ts'
+import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
 import { getUniqueLocationMap } from '../GetUniqueLocationMap/GetUniqueLocationMap.ts'
 import { prepareHeapSnapshot } from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
-import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
 
 const prepareFunctions = async (path: string): Promise<any> => {
   // @ts-ignore minimal typing for migration
   const snapshot: any = await prepareHeapSnapshot(path, {})
-  const { itemsPerLocation, scriptIdOffset, lineOffset, columnOffset } = getLocationFieldOffsets(snapshot.meta.location_fields)
+  const { columnOffset, itemsPerLocation, lineOffset, scriptIdOffset } = getLocationFieldOffsets(snapshot.meta.location_fields)
   const map = getUniqueLocationMap(snapshot.locations, itemsPerLocation, scriptIdOffset, lineOffset, columnOffset)
   return {
     locations: snapshot.locations,
-    meta: snapshot.meta,
     map,
+    meta: snapshot.meta,
   }
 }
 

@@ -1,4 +1,4 @@
-import * as ParseArgv from '../ParseArgv/ParseArgv.ts'
+import type * as ParseArgv from '../ParseArgv/ParseArgv.ts'
 import * as SpecialStdin from '../SpecialStdin/SpecialStdin.ts'
 import * as StartRunning from '../StartRunning/StartRunning.ts'
 import * as Stdout from '../Stdout/Stdout.ts'
@@ -48,8 +48,8 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     setupOnly: options.setupOnly,
     timeoutBetween: options.timeoutBetween,
     timeouts: options.timeouts,
-    useProxyMock: options.useProxyMock,
     updateUrl: options.updateUrl,
+    useProxyMock: options.useProxyMock,
     vscodePath: options.vscodePath,
     vscodeVersion: options.vscodeVersion,
     workers: options.workers,

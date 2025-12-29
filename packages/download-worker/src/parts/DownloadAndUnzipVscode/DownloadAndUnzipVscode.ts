@@ -1,4 +1,3 @@
-import * as os from 'node:os'
 import { VError } from '@lvce-editor/verror'
 import * as AdjustVscodeProductJson from '../AdjustVscodeProductJson/AdjustVscodeProductJson.ts'
 import * as CollectSourceMapUrls from '../CollectSourceMapUrls/CollectSourceMapUrls.ts'
@@ -10,45 +9,37 @@ import * as JsonFile from '../JsonFile/JsonFile.ts'
 import * as LoadSourceMaps from '../LoadSourceMaps/LoadSourceMaps.ts'
 import * as RemoveUnusedFiles from '../RemoveUnusedFiles/RemoveUnusedFiles.ts'
 import * as VscodeTestCachePath from '../VscodeTestCachePath/VscodeTestCachePath.ts'
+import * as Assert from '../Assert/Assert.ts'
 
 const automaticallyDownloadSourceMaps = false
 
 export interface DownloadAndUnzipVscodeOptions {
-  readonly arch?: string
-  readonly insidersCommit?: string
-  readonly platform?: string
-  readonly updateUrl?: string
-  readonly vscodeVersion?: string
+  readonly arch: string
+  readonly insidersCommit: string
+  readonly platform: string
+  readonly updateUrl: string
+  readonly vscodeVersion: string
 }
 
-/**
- * @param {DownloadAndUnzipVscodeOptions} options
- */
-export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOptions | string): Promise<string> => {
+export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOptions): Promise<string> => {
   try {
+    Assert.object(options)
+    Assert.string(options.vscodeVersion)
+    Assert.string(options.insidersCommit)
+    Assert.string(options.platform)
+    Assert.string(options.arch)
     if (Env.env.VSCODE_PATH) {
       console.warn('Warning: Using VSCODE_PATH environment variable is deprecated. Please use --vscode-path CLI flag instead.')
       return Env.env.VSCODE_PATH
     }
 
-    let vscodeVersion: string | undefined
-    let insidersCommit: string | undefined
-    let platform: string | undefined
-    let arch: string | undefined
-
-    if (typeof options === 'string') {
-      vscodeVersion = options
-      platform = process.platform
-      arch = os.arch()
-    } else {
-      vscodeVersion = options.vscodeVersion
-      insidersCommit = options.insidersCommit
-      platform = options.platform || process.platform
-      arch = options.arch || os.arch()
-    }
+    const vscodeVersion = options.vscodeVersion
+    const insidersCommit = options.insidersCommit
+    const platform = options.platform || process.platform
+    const arch = options.arch
+    const updateUrl = options.updateUrl
 
     if (insidersCommit) {
-      const updateUrl = typeof options === 'object' && options.updateUrl ? options.updateUrl : 'https://update.code.visualstudio.com'
       return await DownloadAndUnzipInsiders.downloadAndUnzipInsiders(platform, arch, insidersCommit, updateUrl)
     }
 
