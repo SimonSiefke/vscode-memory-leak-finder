@@ -83,6 +83,7 @@ export const launchIde = async ({
   }
   const result = await LaunchVsCode.launchVsCode({
     addDisposable,
+    arch,
     clearExtensions,
     commit,
     cwd,
@@ -96,6 +97,7 @@ export const launchIde = async ({
     inspectPtyHostPort,
     inspectSharedProcess,
     inspectSharedProcessPort,
+    platform,
     useProxyMock,
     updateUrl,
     vscodePath,

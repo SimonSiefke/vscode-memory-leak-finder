@@ -20,6 +20,7 @@ import { VError } from '../VError/VError.ts'
 
 export const launchVsCode = async ({
   addDisposable,
+  arch,
   clearExtensions,
   commit,
   cwd,
@@ -33,12 +34,14 @@ export const launchVsCode = async ({
   inspectPtyHostPort,
   inspectSharedProcess,
   inspectSharedProcessPort,
+  platform,
   useProxyMock,
   updateUrl,
   vscodePath,
   vscodeVersion,
 }: {
   addDisposable: (fn: () => Promise<void> | void) => void
+  arch: string
   clearExtensions: boolean
   commit: string
   cwd: string
@@ -52,6 +55,7 @@ export const launchVsCode = async ({
   inspectPtyHostPort: number
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
+  platform: string
   useProxyMock: boolean
   updateUrl: string
   vscodePath: string
@@ -75,7 +79,7 @@ export const launchVsCode = async ({
     await mkdir(sourceMapCacheDir, { recursive: true })
     const sourcesDir = join(Root.root, '.vscode-sources')
     await mkdir(sourcesDir, { recursive: true })
-    const binaryPath = await GetBinaryPath.getBinaryPath(vscodeVersion, vscodePath, commit, insidersCommit, updateUrl)
+    const binaryPath = await GetBinaryPath.getBinaryPath(platform, arch, vscodeVersion, vscodePath, commit, insidersCommit, updateUrl)
     const userDataDir = GetUserDataDir.getUserDataDir()
     const extensionsDir = GetExtensionsDir.getExtensionsDir()
     if (clearExtensions) {

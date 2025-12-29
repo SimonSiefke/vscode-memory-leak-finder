@@ -13,7 +13,9 @@ import * as VscodeTestCachePath from '../VscodeTestCachePath/VscodeTestCachePath
 const automaticallyDownloadSourceMaps = false
 
 export interface DownloadAndUnzipVscodeOptions {
+  readonly arch?: string
   readonly insidersCommit?: string
+  readonly platform?: string
   readonly updateUrl?: string
   readonly vscodeVersion?: string
 }
@@ -30,17 +32,23 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
 
     let vscodeVersion: string | undefined
     let insidersCommit: string | undefined
+    let platform: string | undefined
+    let arch: string | undefined
 
     if (typeof options === 'string') {
       vscodeVersion = options
+      platform = process.platform
+      arch = require('node:os').arch()
     } else {
       vscodeVersion = options.vscodeVersion
       insidersCommit = options.insidersCommit
+      platform = options.platform || process.platform
+      arch = options.arch || require('node:os').arch()
     }
 
     if (insidersCommit) {
       const updateUrl = options.updateUrl || 'https://update.code.visualstudio.com'
-      return await DownloadAndUnzipInsiders.downloadAndUnzipInsiders(insidersCommit, updateUrl)
+      return await DownloadAndUnzipInsiders.downloadAndUnzipInsiders(platform, arch, insidersCommit, updateUrl)
     }
 
     if (!vscodeVersion) {
@@ -56,7 +64,7 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
       cachePath: VscodeTestCachePath.vscodeTestCachePath,
       version: vscodeVersion,
     })
-    const productPath = GetProductJsonPath.getProductJsonPath(process.platform, path)
+    const productPath = GetProductJsonPath.getProductJsonPath(platform, path)
     const productJson = await JsonFile.readJson(productPath)
     const newProductJson = AdjustVscodeProductJson.adjustVscodeProductJson(productJson)
     await JsonFile.writeJson(productPath, newProductJson)
