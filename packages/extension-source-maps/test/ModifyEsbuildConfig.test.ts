@@ -165,9 +165,7 @@ test('modifyEsbuildConfig - throws error when config file not found', async () =
 test('modifyEsbuildConfig - throws VError when file operations fail', async () => {
   const tempRepo = '/invalid/path/that/does/not/exist'
 
-  await expect(ModifyEsbuildConfig.modifyEsbuildConfig(tempRepo)).rejects.toThrow(
-    `Failed to modify esbuild config in '${tempRepo}'`
-  )
+  await expect(ModifyEsbuildConfig.modifyEsbuildConfig(tempRepo)).rejects.toThrow(`Failed to modify esbuild config in '${tempRepo}'`)
 })
 
 test('modifyEsbuildConfig - handles buildSync call', async () => {
@@ -233,4 +231,3 @@ esbuild.build({
 
   await rm(tempRepo, { recursive: true, force: true })
 })
-

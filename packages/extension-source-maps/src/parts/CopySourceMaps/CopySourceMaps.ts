@@ -2,12 +2,7 @@ import { cp, mkdir, readdir } from 'node:fs/promises'
 import { dirname, join, relative } from 'node:path'
 import { VError } from '@lvce-editor/verror'
 
-export const copySourceMaps = async (
-  repoPath: string,
-  outputDir: string,
-  extensionName: string,
-  version: string,
-): Promise<void> => {
+export const copySourceMaps = async (repoPath: string, outputDir: string, extensionName: string, version: string): Promise<void> => {
   try {
     // Look for source map files in common locations
     const possibleSourceMapDirs = [

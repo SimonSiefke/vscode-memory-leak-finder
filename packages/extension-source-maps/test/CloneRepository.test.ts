@@ -108,9 +108,7 @@ test('cloneRepository - throws VError when git init fails', async () => {
   }))
 
   const { cloneRepository } = await import('../src/parts/CloneRepository/CloneRepository.ts')
-  await expect(cloneRepository(repoUrl, tempDir, commit)).rejects.toThrow(
-    `Failed to clone repository from '${repoUrl}' to '${tempDir}'`
-  )
+  await expect(cloneRepository(repoUrl, tempDir, commit)).rejects.toThrow(`Failed to clone repository from '${repoUrl}' to '${tempDir}'`)
 
   await rm(tempDir, { recursive: true, force: true }).catch(() => {})
 })
@@ -146,9 +144,7 @@ test('cloneRepository - throws VError when git fetch fails', async () => {
   }))
 
   const { cloneRepository } = await import('../src/parts/CloneRepository/CloneRepository.ts')
-  await expect(cloneRepository(repoUrl, tempDir, commit)).rejects.toThrow(
-    `Failed to clone repository from '${repoUrl}' to '${tempDir}'`
-  )
+  await expect(cloneRepository(repoUrl, tempDir, commit)).rejects.toThrow(`Failed to clone repository from '${repoUrl}' to '${tempDir}'`)
 
   await rm(tempDir, { recursive: true, force: true }).catch(() => {})
 })

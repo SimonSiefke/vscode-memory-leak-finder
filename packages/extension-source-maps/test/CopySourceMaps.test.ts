@@ -120,9 +120,9 @@ test('copySourceMaps - throws error when no source maps found', async () => {
   const tempOutput = join(tmpdir(), `test-copy-source-maps-output-${Date.now()}`)
   await mkdir(tempRepo, { recursive: true })
 
-  await expect(
-    CopySourceMaps.copySourceMaps(tempRepo, tempOutput, 'test-extension', '1.0.0')
-  ).rejects.toThrow('No source map files found in the repository')
+  await expect(CopySourceMaps.copySourceMaps(tempRepo, tempOutput, 'test-extension', '1.0.0')).rejects.toThrow(
+    'No source map files found in the repository',
+  )
 
   await rm(tempRepo, { recursive: true, force: true })
   await rm(tempOutput, { recursive: true, force: true }).catch(() => {})
@@ -155,9 +155,9 @@ test('copySourceMaps - throws VError when copy fails', async () => {
   await mkdir(distDir, { recursive: true })
   await writeFile(join(distDir, 'extension.js.map'), '{"version":3}')
 
-  await expect(
-    CopySourceMaps.copySourceMaps(tempRepo, tempOutput, 'test-extension', '1.0.0')
-  ).rejects.toThrow(`Failed to copy source maps from '${tempRepo}' to '${tempOutput}'`)
+  await expect(CopySourceMaps.copySourceMaps(tempRepo, tempOutput, 'test-extension', '1.0.0')).rejects.toThrow(
+    `Failed to copy source maps from '${tempRepo}' to '${tempOutput}'`,
+  )
 
   await rm(tempRepo, { recursive: true, force: true })
 })
@@ -180,4 +180,3 @@ test('copySourceMaps - checks multiple possible directories', async () => {
   await rm(tempRepo, { recursive: true, force: true })
   await rm(tempOutput, { recursive: true, force: true })
 })
-

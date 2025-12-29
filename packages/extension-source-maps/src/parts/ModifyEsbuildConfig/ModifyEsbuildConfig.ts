@@ -5,13 +5,7 @@ import { VError } from '@lvce-editor/verror'
 export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
   try {
     // Look for esbuild config files - common names: esbuild.js, esbuild.config.js, build.js, etc.
-    const possibleConfigFiles = [
-      'esbuild.js',
-      'esbuild.config.js',
-      'build.js',
-      'scripts/build.js',
-      'src/build.js',
-    ]
+    const possibleConfigFiles = ['esbuild.js', 'esbuild.config.js', 'build.js', 'scripts/build.js', 'src/build.js']
 
     let configPath: string | undefined
     for (const configFile of possibleConfigFiles) {
@@ -86,10 +80,7 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
         if (!options.includes('sourcemap') && !options.includes('sourceMap')) {
           // Add sourcemap before the closing brace
           const lastComma = options.trim().endsWith(',') ? '' : ','
-          const modifiedContent = content.replace(
-            buildCallRegex,
-            `${before}${options}${lastComma}\n    sourcemap: true,${after}`
-          )
+          const modifiedContent = content.replace(buildCallRegex, `${before}${options}${lastComma}\n    sourcemap: true,${after}`)
           await writeFile(configPath, modifiedContent, 'utf8')
           return
         }
@@ -108,10 +99,7 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
 
         if (!config.includes('sourcemap') && !config.includes('sourceMap')) {
           const lastComma = config.trim().endsWith(',') ? '' : ','
-          const modifiedContent = content.replace(
-            configObjectRegex,
-            `${before}${config}${lastComma}\n  sourcemap: true,${after}`
-          )
+          const modifiedContent = content.replace(configObjectRegex, `${before}${config}${lastComma}\n  sourcemap: true,${after}`)
           await writeFile(configPath, modifiedContent, 'utf8')
           return
         }

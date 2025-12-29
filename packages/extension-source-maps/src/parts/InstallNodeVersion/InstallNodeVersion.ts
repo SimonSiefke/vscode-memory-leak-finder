@@ -14,7 +14,11 @@ export const installNodeVersion = async (version: string): Promise<string> => {
     }
 
     // Install and use the node version
-    const installResult = await exec('bash', ['-c', `source ~/.nvm/nvm.sh && nvm install ${version} && nvm use ${version} && node --version`], {})
+    const installResult = await exec(
+      'bash',
+      ['-c', `source ~/.nvm/nvm.sh && nvm install ${version} && nvm use ${version} && node --version`],
+      {},
+    )
     if (installResult.exitCode !== 0) {
       throw new Error(`Failed to install node version ${version}`)
     }

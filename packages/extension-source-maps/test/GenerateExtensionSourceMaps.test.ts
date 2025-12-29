@@ -94,9 +94,7 @@ test('generateExtensionSourceMaps - clones repository when it does not exist', a
     copySourceMaps: async () => {},
   }))
 
-  const { generateExtensionSourceMaps } = await import(
-    '../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts'
-  )
+  const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
   await generateExtensionSourceMaps({
     extensionName,
@@ -183,9 +181,7 @@ test('generateExtensionSourceMaps - finds commit and checks out', async () => {
     copySourceMaps: async () => {},
   }))
 
-  const { generateExtensionSourceMaps } = await import(
-    '../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts'
-  )
+  const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
   await generateExtensionSourceMaps({
     extensionName,
@@ -240,9 +236,7 @@ test('generateExtensionSourceMaps - throws error when checkout fails', async () 
     findCommitForVersion: async () => 'abc123',
   }))
 
-  const { generateExtensionSourceMaps } = await import(
-    '../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts'
-  )
+  const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
   await expect(
     generateExtensionSourceMaps({
@@ -251,7 +245,7 @@ test('generateExtensionSourceMaps - throws error when checkout fails', async () 
       repoUrl,
       outputDir: tempOutput,
       cacheDir: tempCache,
-    })
+    }),
   ).rejects.toThrow('Failed to checkout commit abc123: checkout failed')
 
   await rm(tempOutput, { recursive: true, force: true })
@@ -342,9 +336,7 @@ test('generateExtensionSourceMaps - executes full workflow', async () => {
     },
   }))
 
-  const { generateExtensionSourceMaps } = await import(
-    '../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts'
-  )
+  const { generateExtensionSourceMaps } = await import('../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts')
 
   await generateExtensionSourceMaps({
     extensionName,

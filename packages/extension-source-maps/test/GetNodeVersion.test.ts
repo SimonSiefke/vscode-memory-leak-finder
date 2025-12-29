@@ -130,4 +130,3 @@ test('getNodeVersion - throws VError when package.json is invalid JSON', async (
 
   await expect(getNodeVersion(tempDir)).rejects.toThrow("Failed to get node version from '")
 })
-
