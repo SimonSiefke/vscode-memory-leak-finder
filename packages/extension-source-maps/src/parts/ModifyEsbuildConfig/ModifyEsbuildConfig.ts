@@ -122,18 +122,18 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
       // Look for a config object - handle multi-line objects better
       let match = content.match(CONFIG_OBJECT_REGEX)
       let configRegex = CONFIG_OBJECT_REGEX
-      
+
       // If that doesn't match, try a simpler pattern
       if (!match) {
         match = content.match(SIMPLE_CONFIG_REGEX)
         configRegex = SIMPLE_CONFIG_REGEX
       }
-      
+
       if (match) {
         const before = match[1]
         let config = match[2]
         let after = match[3]
-        
+
         // If config ends with }, extract the content before it
         if (config.endsWith('}')) {
           after = '}'
