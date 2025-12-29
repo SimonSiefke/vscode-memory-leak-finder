@@ -3,8 +3,6 @@ import { mkdir, writeFile, rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { MockRpc } from '@lvce-editor/rpc'
-import * as FindCommitForVersion from '../src/parts/FindCommitForVersion/FindCommitForVersion.ts'
-import * as Exec from '../src/parts/Exec/Exec.ts'
 
 test('findCommitForVersion - finds commit from exact tag', async () => {
   const tempDir = join(tmpdir(), `test-find-commit-${Date.now()}`)
@@ -354,4 +352,3 @@ test('findCommitForVersion - handles package.json with different version', async
 
   await rm(tempDir, { recursive: true, force: true })
 })
-

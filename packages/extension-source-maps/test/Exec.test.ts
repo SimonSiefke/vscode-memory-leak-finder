@@ -1,7 +1,5 @@
 import { expect, test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
-import * as Exec from '../src/parts/Exec/Exec.ts'
-import * as LaunchExecWorker from '../src/parts/LaunchExecWorker/LaunchExecWorker.ts'
 
 test('exec - successfully executes command', async () => {
   const mockRpc = MockRpc.create({
@@ -209,4 +207,3 @@ test('exec - handles multiple args', async () => {
   await exec('git', ['clone', '--depth', '1', 'repo'], {})
   expect(capturedArgs).toEqual(['clone', '--depth', '1', 'repo'])
 })
-

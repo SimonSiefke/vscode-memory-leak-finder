@@ -24,4 +24,3 @@ test('launchExecWorker - dispose can be called multiple times', async () => {
   await rpc[Symbol.asyncDispose]()
   await rpc[Symbol.asyncDispose]()
 })
-

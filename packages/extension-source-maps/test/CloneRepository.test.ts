@@ -3,8 +3,6 @@ import { mkdir, rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { MockRpc } from '@lvce-editor/rpc'
-import * as CloneRepository from '../src/parts/CloneRepository/CloneRepository.ts'
-import * as Exec from '../src/parts/Exec/Exec.ts'
 
 test('cloneRepository - executes git commands in sequence', async () => {
   const tempDir = join(tmpdir(), `test-clone-repo-${Date.now()}`)
@@ -234,4 +232,3 @@ test('cloneRepository - handles different commit hashes', async () => {
 
   await rm(tempDir, { recursive: true, force: true })
 })
-

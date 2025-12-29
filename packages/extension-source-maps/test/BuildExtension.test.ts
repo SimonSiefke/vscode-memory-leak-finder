@@ -1,7 +1,5 @@
 import { expect, test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
-import * as BuildExtension from '../src/parts/BuildExtension/BuildExtension.ts'
-import * as Exec from '../src/parts/Exec/Exec.ts'
 
 test('buildExtension - runs npm ci and npm run compile successfully', async () => {
   const repoPath = '/test/repo'
@@ -218,4 +216,3 @@ test('buildExtension - uses correct node version in commands', async () => {
 
   expect(capturedNodeVersion).toBe(nodeVersion)
 })
-

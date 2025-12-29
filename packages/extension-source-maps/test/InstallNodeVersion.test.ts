@@ -1,7 +1,5 @@
-import { expect, jest, test } from '@jest/globals'
+import { expect, test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
-import * as InstallNodeVersion from '../src/parts/InstallNodeVersion/InstallNodeVersion.ts'
-import * as Exec from '../src/parts/Exec/Exec.ts'
 
 test('installNodeVersion - successfully installs and uses node version', async () => {
   const version = '18.0.0'

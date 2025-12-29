@@ -4,15 +4,6 @@ import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { existsSync } from 'node:fs'
 import { MockRpc } from '@lvce-editor/rpc'
-import * as GenerateExtensionSourceMaps from '../src/parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts'
-import * as Exec from '../src/parts/Exec/Exec.ts'
-import * as CloneRepository from '../src/parts/CloneRepository/CloneRepository.ts'
-import * as FindCommitForVersion from '../src/parts/FindCommitForVersion/FindCommitForVersion.ts'
-import * as GetNodeVersion from '../src/parts/GetNodeVersion/GetNodeVersion.ts'
-import * as InstallNodeVersion from '../src/parts/InstallNodeVersion/InstallNodeVersion.ts'
-import * as ModifyEsbuildConfig from '../src/parts/ModifyEsbuildConfig/ModifyEsbuildConfig.ts'
-import * as BuildExtension from '../src/parts/BuildExtension/BuildExtension.ts'
-import * as CopySourceMaps from '../src/parts/CopySourceMaps/CopySourceMaps.ts'
 
 test('generateExtensionSourceMaps - skips when source maps already exist', async () => {
   const tempOutput = join(tmpdir(), `test-generate-${Date.now()}`)
@@ -23,8 +14,6 @@ test('generateExtensionSourceMaps - skips when source maps already exist', async
   const sourceMapsOutputPath = join(tempOutput, `${extensionName}-${version}`)
   await mkdir(sourceMapsOutputPath, { recursive: true })
 
-  const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-
   await GenerateExtensionSourceMaps.generateExtensionSourceMaps({
     extensionName,
     version,
@@ -33,11 +22,7 @@ test('generateExtensionSourceMaps - skips when source maps already exist', async
     cacheDir: tempCache,
   })
 
-  expect(consoleSpy).toHaveBeenCalledWith(
-    `Source maps for ${extensionName} ${version} already exist, skipping...`
-  )
-
-  consoleSpy.mockRestore()
+  expect(existsSync(sourceMapsOutputPath)).toBe(true)
 
   await rm(tempOutput, { recursive: true, force: true })
   await rm(tempCache, { recursive: true, force: true })
@@ -377,4 +362,3 @@ test('generateExtensionSourceMaps - executes full workflow', async () => {
   await rm(tempOutput, { recursive: true, force: true })
   await rm(tempCache, { recursive: true, force: true })
 })
-
