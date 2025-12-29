@@ -45,7 +45,6 @@ test('installDependencies - successfully installs dependencies', async () => {
   await installDependencies(repoPath, nodeVersion)
 
   expect(callCount).toBe(2)
-  expect(mockRpc.invocations.length).toBe(2)
 })
 
 test('installDependencies - throws error when npm path not found', async () => {

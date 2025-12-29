@@ -9,7 +9,7 @@ export const installDependencies = async (repoPath: string, nodeVersion: string)
     
     // Find npm path for the installed node version
     // nvm stores node versions in ~/.nvm/versions/node/v<version>/bin/npm or ~/.config/nvm/versions/node/v<version>/bin/npm
-    const findNpmPathCommand = `${nvmSourceCommand}NVM_DIR="$([ -z "${NVM_DIR:-}" ] && echo ~/.nvm || echo "${NVM_DIR:-}")"; if [ -d "$NVM_DIR/versions/node/v${nodeVersion}" ]; then echo "$NVM_DIR/versions/node/v${nodeVersion}/bin/npm"; elif [ -d ~/.config/nvm/versions/node/v${nodeVersion} ]; then echo ~/.config/nvm/versions/node/v${nodeVersion}/bin/npm; else exit 1; fi`
+    const findNpmPathCommand = `${nvmSourceCommand}NVM_DIR="$([ -z "\${NVM_DIR:-}" ] && echo ~/.nvm || echo "\${NVM_DIR:-}")"; if [ -d "$NVM_DIR/versions/node/v${nodeVersion}" ]; then echo "$NVM_DIR/versions/node/v${nodeVersion}/bin/npm"; elif [ -d ~/.config/nvm/versions/node/v${nodeVersion} ]; then echo ~/.config/nvm/versions/node/v${nodeVersion}/bin/npm; else exit 1; fi`
     
     const findNpmResult = await exec('bash', ['-c', findNpmPathCommand], {})
     if (findNpmResult.exitCode !== 0) {
