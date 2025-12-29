@@ -1,11 +1,11 @@
-import * as PrepareHeapSnapshot from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 import * as GetStrings from '../GetStrings/GetStrings.ts'
+import * as PrepareHeapSnapshot from '../PrepareHeapSnapshot/PrepareHeapSnapshot.ts'
 
 export const parseHeapSnapshotNumbers = async (path: string): Promise<{ count: number; heapNumbers: any[] }> => {
   // Use the fast parsing function with Uint32Array for nodes
   // @ts-ignore minimal typing for migration
   const { meta, nodes } = (await PrepareHeapSnapshot.prepareHeapSnapshot(path, {})) as any
-  const { node_types, node_fields } = meta
+  const { node_fields, node_types } = meta
 
   // Extract strings from the original JSON file since the fast parser doesn't include them
   const strings = await GetStrings.getStrings(path)
@@ -33,11 +33,11 @@ export const parseHeapSnapshotNumbers = async (path: string): Promise<{ count: n
     // Check if this is a number type with "(heap number)" name
     if (typeIndex === numberTypeIndex && nameIndex === heapNumberStringIndex) {
       heapNumbers.push({
+        edgeCount: nodes[i + edgeCountFieldIndex],
         id: nodes[i + idFieldIndex],
         name: 'heap number',
-        type: 'number',
         selfSize: nodes[i + selfSizeFieldIndex],
-        edgeCount: nodes[i + edgeCountFieldIndex],
+        type: 'number',
       })
     }
   }

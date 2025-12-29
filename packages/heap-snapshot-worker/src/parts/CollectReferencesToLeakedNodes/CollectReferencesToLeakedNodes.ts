@@ -1,17 +1,17 @@
+import type { ReferencePath } from '../ReferencePath/ReferencePath.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
-import { parseNode } from '../ParseNode/ParseNode.ts'
+import { buildReferencePathFromEdge } from '../BuildReferencePathFromEdge/BuildReferencePathFromEdge.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
-import type { ReferencePath } from '../ReferencePath/ReferencePath.ts'
-import { buildReferencePathFromEdge } from '../BuildReferencePathFromEdge/BuildReferencePathFromEdge.ts'
+import { parseNode } from '../ParseNode/ParseNode.ts'
 
 export const collectReferencesToLeakedNodes = (
   snapshot: Snapshot,
   leakedNodeByteOffsets: Set<number>,
   referencesMap: Map<number, Array<ReferencePath>>,
 ): void => {
-  const { nodes, edges, strings, meta } = snapshot
-  const { node_fields, edge_fields, node_types, edge_types } = meta
+  const { edges, meta, nodes, strings } = snapshot
+  const { edge_fields, edge_types, node_fields, node_types } = meta
 
   const ITEMS_PER_NODE = node_fields.length
   const ITEMS_PER_EDGE = edge_fields.length

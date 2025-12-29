@@ -66,8 +66,8 @@ export const runTestsWithCallback = async ({
   setupOnly,
   timeoutBetween,
   timeouts,
-  useProxyMock,
   updateUrl,
+  useProxyMock,
   vscodePath,
   vscodeVersion,
 }: RunTestsWithCallbackOptions): Promise<RunTestsResult> => {
@@ -130,8 +130,8 @@ export const runTestsWithCallback = async ({
         runMode,
         screencastQuality,
         timeouts,
-        useProxyMock,
         updateUrl,
+        useProxyMock,
         vscodePath,
         vscodeVersion,
       })
@@ -233,8 +233,8 @@ export const runTestsWithCallback = async ({
           runMode,
           screencastQuality,
           timeouts,
-          useProxyMock,
           updateUrl,
+          useProxyMock,
           vscodePath,
           vscodeVersion,
         })

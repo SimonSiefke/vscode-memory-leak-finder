@@ -31,32 +31,32 @@ export const computeHeapSnapshotIndices = (node_types, node_fields, edge_types, 
   const edgeToNodeFieldIndex = edge_fields.indexOf('to_node')
 
   return {
-    // Type indices
-    objectTypeIndex,
-    nativeTypeIndex,
     bigintTypeIndex,
-    regexpTypeIndex,
-
-    // Items per record
-    ITEMS_PER_NODE,
-    ITEMS_PER_EDGE,
-
-    // Node field indices
-    typeFieldIndex,
-    nameFieldIndex,
-    idFieldIndex,
-    selfSizeFieldIndex,
-    edgeCountFieldIndex,
     detachednessFieldIndex,
-    traceNodeIdFieldIndex,
+    edgeCountFieldIndex,
+    edgeNameFieldIndex,
 
+    edgeToNodeFieldIndex,
     // Edge field indices
     edgeTypeFieldIndex,
-    edgeNameFieldIndex,
-    edgeToNodeFieldIndex,
 
     // Edge type names for reference
     edgeTypes: edge_types[0],
+    idFieldIndex,
+    ITEMS_PER_EDGE,
+    // Items per record
+    ITEMS_PER_NODE,
+    nameFieldIndex,
+    nativeTypeIndex,
     nodeTypes: node_types[0],
+
+    // Type indices
+    objectTypeIndex,
+    regexpTypeIndex,
+    selfSizeFieldIndex,
+
+    traceNodeIdFieldIndex,
+    // Node field indices
+    typeFieldIndex,
   }
 }

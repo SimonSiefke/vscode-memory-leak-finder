@@ -1,4 +1,4 @@
-import { Worker } from 'node:worker_threads'
+import type { Worker } from 'node:worker_threads'
 
 /**
  * Waits for a result from the worker, either a message or exit event
@@ -6,7 +6,7 @@ import { Worker } from 'node:worker_threads'
  * @returns {Promise<any>} - The result from the worker
  */
 export const waitForResult = (worker: Worker): Promise<any> => {
-  const { promise, resolve, reject } = Promise.withResolvers<any>()
+  const { promise, reject, resolve } = Promise.withResolvers<any>()
 
   const cleanup = () => {
     // Clean up listeners
@@ -25,10 +25,10 @@ export const waitForResult = (worker: Worker): Promise<any> => {
 
   const exitHandler = (code: number) => {
     cleanup()
-    if (code !== 0) {
-      reject(new Error(`Worker stopped with exit code ${code}`))
-    } else {
+    if (code === 0) {
       reject(new Error('Worker exited unexpectedly'))
+    } else {
+      reject(new Error(`Worker stopped with exit code ${code}`))
     }
   }
 

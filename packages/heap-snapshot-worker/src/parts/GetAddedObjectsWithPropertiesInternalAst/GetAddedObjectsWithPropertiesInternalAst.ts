@@ -1,12 +1,12 @@
 import type { AstNode, ObjectNode } from '../AstNode/AstNode.ts'
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { formatAsts } from '../FormatAsts/FormatAsts.ts'
 import { getAsts } from '../GetAsts/GetAsts.ts'
 import { getObjectWithPropertyNodeIndices3 } from '../GetObjectWithPropertyNodeIndices3/GetObjectWithPropertyNodeIndices3.ts'
 import { signatureFor } from '../SignatureForAstNode/SignatureForAstNode.ts'
-import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 const getIds = (snapshot: Snapshot, indices: Uint32Array): Uint32Array => {
-  const nodes = snapshot.nodes
+  const { nodes } = snapshot
   const nodeIdIndex = snapshot.meta.node_fields.indexOf('id')
   if (nodeIdIndex === -1) {
     throw new Error('index must be available')

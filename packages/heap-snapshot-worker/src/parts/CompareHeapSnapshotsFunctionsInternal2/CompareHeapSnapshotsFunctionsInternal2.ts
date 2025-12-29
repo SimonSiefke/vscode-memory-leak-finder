@@ -1,8 +1,8 @@
-import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
-import { getUniqueLocationMap2 } from '../GetUniqueLocationMap2/GetUniqueLocationMap2.ts'
-import { addOriginalSources } from '../AddOriginalSources/AddOriginalSources.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import type { UniqueLocation, UniqueLocationMap } from '../UniqueLocationMap/UniqueLocationMap.ts'
+import { addOriginalSources } from '../AddOriginalSources/AddOriginalSources.ts'
+import { getLocationFieldOffsets } from '../GetLocationFieldOffsets/GetLocationFieldOffsets.ts'
+import { getUniqueLocationMap2 } from '../GetUniqueLocationMap2/GetUniqueLocationMap2.ts'
 
 const emptyItem = {
   count: 0,
@@ -13,23 +13,23 @@ export interface CompareResult {
   readonly count: number
   readonly delta: number
   readonly line: number
-  readonly scriptId: number
   readonly name: string
-  readonly url?: string
-  readonly sourceMapUrl?: string
+  readonly originalColumn?: number | null
+  readonly originalLine?: number | null
+  readonly originalLocation?: string
+  readonly originalName?: string | null
   readonly originalSource?: string | null
   readonly originalUrl?: string | null
-  readonly originalLine?: number | null
-  readonly originalColumn?: number | null
-  readonly originalName?: string | null
+  readonly scriptId: number
   readonly sourceLocation?: string
-  readonly originalLocation?: string
+  readonly sourceMapUrl?: string
+  readonly url?: string
 }
 
 interface UniqueLocationWithDelta extends UniqueLocation {
   readonly delta: number
-  readonly oldIndex: number
   readonly key: string
+  readonly oldIndex: number
 }
 
 // TODO maybe have a different function for functions and closures. keys are not needed for functions
@@ -41,7 +41,7 @@ export const getNewItems = (map1: UniqueLocationMap, map2: UniqueLocationMap, mi
     const newItem = map2[key]
     const delta = newItem.count - oldItem.count
     if (delta >= minCount) {
-      newitems.push({ ...newItem, delta, oldIndex: oldItem.index, key })
+      newitems.push({ ...newItem, delta, key, oldIndex: oldItem.index })
     }
   }
   return newitems
@@ -72,15 +72,15 @@ const formatUniqueLocations = (
       count: newItem.count,
       delta: newItem.delta,
       line,
-      scriptId,
       name: nodeName,
+      scriptId,
     }
   })
 }
 
 export interface CompareFunctionsOptions {
-  readonly minCount?: number
   readonly excludeOriginalPaths?: readonly string[]
+  readonly minCount?: number
 }
 
 const filterOutExcluded = (items: readonly any[], excludes: readonly string[]): readonly any[] => {
@@ -111,9 +111,9 @@ const cleanItem = (item) => {
     count: item.count,
     delta: item.delta,
     name: item.name,
-    sourceLocation: item.sourceLocation,
     originalLocation: item.originalLocation,
     originalName: item.originalName,
+    sourceLocation: item.sourceLocation,
   }
 }
 
@@ -123,7 +123,7 @@ export const compareHeapSnapshotFunctionsInternal2 = async (
   options: CompareFunctionsOptions,
 ): Promise<readonly any[]> => {
   const minCount = options.minCount || 0
-  const { itemsPerLocation, scriptIdOffset, lineOffset, columnOffset, objectIndexOffset } = getLocationFieldOffsets(
+  const { columnOffset, itemsPerLocation, lineOffset, objectIndexOffset, scriptIdOffset } = getLocationFieldOffsets(
     after.meta.location_fields,
   )
   const nodeNameOffset = after.meta.node_fields.indexOf('name')

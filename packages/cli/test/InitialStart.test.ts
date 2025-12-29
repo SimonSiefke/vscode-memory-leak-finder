@@ -52,8 +52,8 @@ const WatchUsage = await import('../src/parts/WatchUsage/WatchUsage.ts')
 test('initialStart - watch mode - show details', async () => {
   const options = {
     filter: '',
-    watch: true,
     isWindows: false,
+    watch: true,
   } as ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv>
   // @ts-ignore
   WatchUsage.print.mockImplementation(async () => 'watch usage')
@@ -67,8 +67,8 @@ test('initialStart - watch mode - show details', async () => {
 test('initialStart - watch mode - start running', async () => {
   const options = {
     filter: 'a',
-    watch: true,
     isWindows: false,
+    watch: true,
   } as ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv>
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).toHaveBeenCalledTimes(1)
@@ -80,8 +80,8 @@ test('initialStart - watch mode - start running', async () => {
 test('initialStart - start running', async () => {
   const options = {
     filter: 'a',
-    watch: false,
     isWindows: false,
+    watch: false,
   } as ReturnType<typeof import('../src/parts/ParseArgv/ParseArgv.ts').parseArgv>
   await InitialStart.initialStart(options)
   expect(SpecialStdin.start).not.toHaveBeenCalled()

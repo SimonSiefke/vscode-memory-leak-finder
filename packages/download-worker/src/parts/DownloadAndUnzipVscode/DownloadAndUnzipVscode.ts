@@ -1,5 +1,5 @@
-import * as os from 'node:os'
 import { VError } from '@lvce-editor/verror'
+import * as os from 'node:os'
 import * as AdjustVscodeProductJson from '../AdjustVscodeProductJson/AdjustVscodeProductJson.ts'
 import * as CollectSourceMapUrls from '../CollectSourceMapUrls/CollectSourceMapUrls.ts'
 import * as DownloadAndUnzipInsiders from '../DownloadAndUnzipInsiders/DownloadAndUnzipInsiders.ts'

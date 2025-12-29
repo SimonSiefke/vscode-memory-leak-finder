@@ -6,7 +6,7 @@ const ITEMS_PER_NODE = 7
 export const getObjectShapeCountFromHeapSnapshot = (id) => {
   const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
-  const { snapshot, nodes } = heapsnapshot
+  const { nodes, snapshot } = heapsnapshot
   const { meta } = snapshot
   const { node_types } = meta
   const objectShapeIndex = node_types[0].indexOf('object shape')

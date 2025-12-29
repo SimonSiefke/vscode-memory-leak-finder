@@ -1,7 +1,7 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
+import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
-import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
 
 // Cache for boolean nodes analysis to avoid re-scanning the entire snapshot
@@ -13,7 +13,7 @@ let booleanNodesCache: Map<string, { trueNodeId: number | null; falseNodeId: num
  * by boolean-like property names
  */
 const analyzeBooleanNodes = (snapshot: Snapshot): { trueNodeId: number | null; falseNodeId: number | null } => {
-  const { nodes, edges, strings, meta } = snapshot
+  const { edges, meta, nodes, strings } = snapshot
   const nodeFields = meta.node_fields
   const edgeFields = meta.edge_fields
 
@@ -98,7 +98,7 @@ const analyzeBooleanNodes = (snapshot: Snapshot): { trueNodeId: number | null; f
 
     // Track references to this hidden node
     if (!hiddenNodeRefs.has(targetNode.id)) {
-      hiddenNodeRefs.set(targetNode.id, { booleanLikeRefs: 0, totalRefs: 0, propertyNames: [] })
+      hiddenNodeRefs.set(targetNode.id, { booleanLikeRefs: 0, propertyNames: [], totalRefs: 0 })
     }
 
     const nodeRef = hiddenNodeRefs.get(targetNode.id)!
@@ -112,7 +112,7 @@ const analyzeBooleanNodes = (snapshot: Snapshot): { trueNodeId: number | null; f
 
   // Find the two hidden nodes with the most boolean-like references
   // These are likely the true/false singletons
-  const candidates = Array.from(hiddenNodeRefs.entries())
+  const candidates = [...hiddenNodeRefs.entries()]
     .filter(([_, ref]) => ref.booleanLikeRefs >= 1) // At least 1 boolean-like reference
     .sort((a, b) => b[1].booleanLikeRefs - a[1].booleanLikeRefs)
     .slice(0, 2) // Take top 2 candidates
@@ -139,7 +139,7 @@ const analyzeBooleanNodes = (snapshot: Snapshot): { trueNodeId: number | null; f
     // We'll leave both as null for now
   }
 
-  const result = { trueNodeId, falseNodeId }
+  const result = { falseNodeId, trueNodeId }
 
   // Cache the result
   if (!booleanNodesCache) {
@@ -182,7 +182,7 @@ export const getBooleanValue = (targetNode: any, snapshot: Snapshot, edgeMap: Ui
   }
 
   // Use snapshot analysis to identify boolean singletons
-  const { trueNodeId, falseNodeId } = analyzeBooleanNodes(snapshot)
+  const { falseNodeId, trueNodeId } = analyzeBooleanNodes(snapshot)
 
   if (targetNode.id === trueNodeId) {
     return 'true'
@@ -223,7 +223,7 @@ export const getBooleanStructure = (
 ): { value: string; hasTypeReference: boolean } | null => {
   if (!sourceNode) return null
 
-  const { nodes, edges, strings } = snapshot
+  const { edges, nodes, strings } = snapshot
 
   // sourceNodeIndex is provided by the caller to avoid a full scan
   if (sourceNodeIndex < 0) return null
@@ -232,7 +232,7 @@ export const getBooleanStructure = (
   const nodeEdges = getNodeEdgesFast(sourceNodeIndex, edgeMap, nodes, edges, ITEMS_PER_NODE, ITEMS_PER_EDGE, edgeCountFieldIndex)
 
   // Find property name index
-  const propertyNameIndex = strings.findIndex((str) => str === propertyName)
+  const propertyNameIndex = strings.indexOf(propertyName)
   if (propertyNameIndex === -1) return null
 
   // Get edge type indices
@@ -271,8 +271,8 @@ export const getBooleanStructure = (
 
   if (booleanValue) {
     return {
-      value: booleanValue,
       hasTypeReference: hasTypeReference,
+      value: booleanValue,
     }
   }
 

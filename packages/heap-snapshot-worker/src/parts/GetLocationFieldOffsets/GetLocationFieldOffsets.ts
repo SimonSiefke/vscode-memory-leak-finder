@@ -5,10 +5,10 @@ export const getLocationFieldOffsets = (locationFields: readonly string[]) => {
   const columnOffset = locationFields.indexOf('column')
 
   return {
+    columnOffset,
     itemsPerLocation: locationFields.length,
+    lineOffset,
     objectIndexOffset,
     scriptIdOffset,
-    lineOffset,
-    columnOffset,
   }
 }
