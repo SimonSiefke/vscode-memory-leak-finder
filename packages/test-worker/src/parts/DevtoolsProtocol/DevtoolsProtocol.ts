@@ -3,4 +3,4 @@ const module = await import(url)
 
 const { DevtoolsProtocolDebugger, DevtoolsProtocolPage, DevtoolsProtocolRuntime, DevtoolsProtocolTarget } = module
 
-export { DevtoolsProtocolPage, DevtoolsProtocolRuntime, DevtoolsProtocolTarget,  }
+export { DevtoolsProtocolPage, DevtoolsProtocolRuntime, DevtoolsProtocolTarget }
