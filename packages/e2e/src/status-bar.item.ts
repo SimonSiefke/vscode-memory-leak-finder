@@ -16,6 +16,7 @@ const extensionPath = join(root, 'packages', 'e2e', 'fixtures', 'sample.status-b
 export const extraLaunchArgs = [`--extensionDevelopmentPath=${extensionPath}`]
 
 export const run = async ({ StatusBar }: TestContext): Promise<void> => {
+  // @ts-ignore
   const counter = await StatusBar.item('test.status-bar-sample')
   await counter.shouldHaveText('0')
   await counter.click()

@@ -18,7 +18,7 @@ export const setup = async ({ Editor, Workspace }: TestContext): Promise<void> =
   --font-size: 10px;
 }`)
   await Editor.shouldHaveToken('--font-size', 'rgb(156, 220, 254)')
-  await Editor.save()
+  await Editor.save({ viaKeyBoard: false })
   await Editor.shouldHaveBreadCrumb(':root')
 }
 

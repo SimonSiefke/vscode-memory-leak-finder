@@ -28,6 +28,7 @@ export const run = async ({ Editor, RunAndDebug }: TestContext): Promise<void> =
     file: 'index.js',
     line: 4,
   })
+  // @ts-ignore
   await RunAndDebug.step('index.js', 5)
   await RunAndDebug.stop()
   await RunAndDebug.removeAllBreakpoints()

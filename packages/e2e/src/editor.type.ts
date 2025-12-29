@@ -20,5 +20,5 @@ export const run = async ({ Editor }: TestContext): Promise<void> => {
   await Editor.shouldHaveText('More sample text')
   await Editor.deleteCharactersLeft({ count: 5 })
   await Editor.shouldHaveText('sample text')
-  await Editor.save()
+  await Editor.save({ viaKeyBoard: false })
 }
