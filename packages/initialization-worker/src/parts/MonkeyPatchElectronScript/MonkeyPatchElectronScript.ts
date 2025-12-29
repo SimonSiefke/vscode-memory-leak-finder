@@ -10,10 +10,9 @@ export const monkeyPatchElectronScript = `function () {
   const originalEmit = app.emit.bind(app)
 
   let readyEventArgs
-  let whenReadyCallback
   let isReady = false
 
-  const whenReadyPromise = (() => { const {resolve, promise} = Promise.withResolvers(); whenReadyCallback = resolve; return promise })()
+  const { resolve, promise } = Promise.withResolvers();
 
   const patchedAppEmit = (event, ...args) => {
     if (event === 'ready') {
@@ -24,7 +23,7 @@ export const monkeyPatchElectronScript = `function () {
   }
 
   const patchedWhenReady = () => {
-    return whenReadyPromise
+    return promise
   }
 
   const patchedIsReady = () => {
@@ -40,7 +39,7 @@ export const monkeyPatchElectronScript = `function () {
   return async () => {
     const event = await originalWhenReady
     isReady = true
-    whenReadyCallback(event)
+    resolve(event)
     originalEmit('ready', ...readyEventArgs)
   }
 }
