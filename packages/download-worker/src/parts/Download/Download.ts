@@ -1,7 +1,7 @@
 import { VError } from '@lvce-editor/verror'
+import got from 'got'
 import { createWriteStream } from 'node:fs'
 import { mkdir } from 'node:fs/promises'
-import got from 'got'
 import { dirname } from 'node:path'
 import { pipeline } from 'node:stream/promises'
 

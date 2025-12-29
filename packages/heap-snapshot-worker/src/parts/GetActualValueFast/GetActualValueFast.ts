@@ -1,10 +1,10 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
+import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
 import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
-import { parseNode } from '../ParseNode/ParseNode.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
-import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
 import { getUndefinedValue } from '../GetUndefinedValue/GetUndefinedValue.ts'
+import { parseNode } from '../ParseNode/ParseNode.ts'
 
 export const getActualValueFast = (
   targetNode: any,
@@ -34,7 +34,7 @@ export const getActualValueFast = (
   }
   visited.add(targetNode.id)
 
-  const { nodes, edges } = snapshot
+  const { edges, nodes } = snapshot
 
   const nodeType = targetNode.type
   const nodeTypeName = getNodeTypeName(targetNode, nodeTypes)
@@ -149,20 +149,30 @@ export const getActualValueFast = (
           const referencedNode = parseNode(referencedNodeIndex, nodes, nodeFields)
           if (referencedNode) {
             const referencedType = referencedNode.type
-            if (referencedType === NODE_TYPE_STRING) {
-              const stringValue = getNodeName(referencedNode, strings)
-              if (stringValue) {
-                internalStringValues.push(stringValue)
+            switch (referencedType) {
+              case NODE_TYPE_ARRAY: {
+                return `[Array ${referencedNode.id}]`
               }
-            } else if (referencedType === NODE_TYPE_NUMBER) {
-              const numberValue = referencedNode.name?.toString()
-              if (numberValue) {
-                numberValues.push(numberValue)
+              case NODE_TYPE_NUMBER: {
+                const numberValue = referencedNode.name?.toString()
+                if (numberValue) {
+                  numberValues.push(numberValue)
+                }
+
+                break
               }
-            } else if (referencedType === NODE_TYPE_OBJECT) {
-              return `[Object ${referencedNode.id}]`
-            } else if (referencedType === NODE_TYPE_ARRAY) {
-              return `[Array ${referencedNode.id}]`
+              case NODE_TYPE_OBJECT: {
+                return `[Object ${referencedNode.id}]`
+              }
+              case NODE_TYPE_STRING: {
+                const stringValue = getNodeName(referencedNode, strings)
+                if (stringValue) {
+                  internalStringValues.push(stringValue)
+                }
+
+                break
+              }
+              // No default
             }
           }
         }

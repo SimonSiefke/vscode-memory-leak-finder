@@ -6,7 +6,7 @@ jest.unstable_mockModule('node:http', () => ({}))
 jest.unstable_mockModule('node:https', () => ({}))
 
 // @ts-ignore
-global.fetch = mockFetch
+globalThis.fetch = mockFetch
 
 const { getJson } = await import('../src/parts/GetJson/GetJson.ts')
 
@@ -17,9 +17,9 @@ beforeEach(() => {
 test('getJson fetches and returns JSON data', async () => {
   const mockData = { name: 'test', value: 123 }
   const mockResponse = {
-    ok: true,
     // @ts-ignore
     json: jest.fn().mockResolvedValue(mockData),
+    ok: true,
   }
   // @ts-ignore
   mockFetch.mockResolvedValue(mockResponse)

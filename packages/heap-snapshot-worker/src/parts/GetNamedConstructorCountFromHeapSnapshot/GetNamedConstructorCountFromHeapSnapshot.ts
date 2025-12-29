@@ -12,8 +12,8 @@ const createCounts = (constructorNodesWithInfo) => {
   }
   const array = Object.entries(map).map(([key, value]) => {
     return {
-      name: key,
       count: value,
+      name: key,
     }
   })
   return array
@@ -22,9 +22,9 @@ const createCounts = (constructorNodesWithInfo) => {
 const isImportantScopeName = (name) => {
   switch (name) {
     case '':
-    case 'Set':
-    case 'Array':
     case '(object properties)':
+    case 'Array':
+    case 'Set':
     case 'system / Context':
       return false
     default:
@@ -33,7 +33,7 @@ const isImportantScopeName = (name) => {
 }
 
 const getDetailedNodeInfo = (parsedNodes, scopeMap, edgeMap, node) => {
-  const { scopeNode, scopeEdge } = GetConstructorScope.getConstructorScope(parsedNodes, scopeMap, edgeMap, node)
+  const { scopeEdge, scopeNode } = GetConstructorScope.getConstructorScope(parsedNodes, scopeMap, edgeMap, node)
   const parentScope = GetConstructorScope.getConstructorScope(parsedNodes, scopeMap, edgeMap, scopeNode)
   if (isImportantScopeName(parentScope.scopeNode.name)) {
     const mergedNamed = `${parentScope.scopeNode.name}.${parentScope.scopeEdge} -> ${scopeNode.name}.${scopeEdge}`
@@ -49,9 +49,9 @@ const getDetailedNodeInfo = (parsedNodes, scopeMap, edgeMap, node) => {
 
 export const getNamedConstructorCountFromHeapSnapshot = async (heapsnapshot, constructorName) => {
   Assert.object(heapsnapshot)
-  const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
+  const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
   const constructorNodes = GetConstructorNodes.getConstructorNodes(parsedNodes, constructorName)
-  const { scopeMap, edgeMap } = GetConstructorScopeMap.getConstructorScopeMap(parsedNodes, graph)
+  const { edgeMap, scopeMap } = GetConstructorScopeMap.getConstructorScopeMap(parsedNodes, graph)
   const constructorNodesWithInfo = constructorNodes.map((node) => {
     return getDetailedNodeInfo(parsedNodes, scopeMap, edgeMap, node)
   })

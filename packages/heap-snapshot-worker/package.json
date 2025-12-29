@@ -2,8 +2,8 @@
   "name": "@vscode-memory-leak-finder/heap-snapshot-worker",
   "version": "0.0.0-dev",
   "license": "MIT",
-  "main": "src/main.ts",
   "type": "module",
+  "main": "src/main.ts",
   "bin": {
     "heap-snapshot-worker": "bin/heap-snapshot-worker.js"
   },

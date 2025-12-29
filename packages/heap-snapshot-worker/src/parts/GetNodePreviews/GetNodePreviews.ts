@@ -1,12 +1,12 @@
+import type { ObjectWithProperty } from '../ObjectWithProperty/ObjectWithProperty.ts'
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { collectObjectProperties } from '../CollectObjectProperties/CollectObjectProperties.ts'
 import { getActualValueFast } from '../GetActualValueFast/GetActualValueFast.ts'
 import { getBooleanStructure } from '../GetBooleanValue/GetBooleanValue.ts'
 import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
-import type { ObjectWithProperty } from '../ObjectWithProperty/ObjectWithProperty.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
-import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import * as Timing from '../Timing/Timing.ts'
 
 /**
@@ -41,7 +41,7 @@ export const getNodePreviews = (
   edgeCountFieldIndexOverride: number,
 ): ObjectWithProperty[] => {
   const tTotal = Timing.timeStart('GetNodePreviews.build')
-  const { nodes, edges } = snapshot
+  const { edges, nodes } = snapshot
 
   const results: ObjectWithProperty[] = []
 
@@ -53,12 +53,12 @@ export const getNodePreviews = (
     }
 
     const result: ObjectWithProperty = {
+      edgeCount: sourceNode.edge_count,
       id: sourceNode.id,
       name: getNodeName(sourceNode, strings),
       propertyValue: null,
-      type: getNodeTypeName(sourceNode, nodeTypes),
       selfSize: sourceNode.self_size,
-      edgeCount: sourceNode.edge_count,
+      type: getNodeTypeName(sourceNode, nodeTypes),
     }
 
     const tBoolean = Timing.timeStart('GetNodePreviews.booleanStructure')

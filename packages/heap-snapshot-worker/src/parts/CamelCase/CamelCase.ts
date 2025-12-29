@@ -5,6 +5,6 @@ const replacer = (g) => {
 }
 
 export const camelCase = (value) => {
-  const camelCased = value.replace(RE_DASH, replacer)
+  const camelCased = value.replaceAll(RE_DASH, replacer)
   return camelCased
 }

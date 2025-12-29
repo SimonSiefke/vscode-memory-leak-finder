@@ -24,7 +24,7 @@ const getName = (node, contextNodes) => {
 export const getNamedClosureCountFromHeapSnapshot = async (id) => {
   const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
-  const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
+  const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
   const closures = parsedNodes.filter(isClosure)
   const mapped = closures.map((node) => {
     const edges = graph[node.id]
@@ -38,8 +38,8 @@ export const getNamedClosureCountFromHeapSnapshot = async (id) => {
     const name = getName(node, contextNodeEdges)
     return {
       ...node,
-      name,
       contextNodeCount,
+      name,
     }
   })
   const sorted = mapped.toSorted((a, b) => {
