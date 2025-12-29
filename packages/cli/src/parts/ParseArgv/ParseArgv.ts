@@ -100,7 +100,9 @@ const parseMeasure = (argv: readonly string[]): string => {
 
 const parseFilter = (argv: readonly string[]): string => {
   if (argv.includes('--only')) {
-    return parseArgvString(argv, '--only')
+    const filterValue = parseArgvString(argv, '--only')
+    // Replace dots with dashes for backwards compatibility
+    return filterValue.replace(/\./g, '-')
   }
   return ''
 }
