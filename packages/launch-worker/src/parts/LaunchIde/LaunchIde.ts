@@ -6,6 +6,7 @@ import * as ParseVersion from '../ParseVersion/ParseVersion.ts'
 
 export const launchIde = async ({
   addDisposable,
+  arch,
   clearExtensions,
   commit,
   cwd,
@@ -20,12 +21,14 @@ export const launchIde = async ({
   inspectPtyHostPort,
   inspectSharedProcess,
   inspectSharedProcessPort,
+  platform,
   useProxyMock,
   updateUrl,
   vscodePath,
   vscodeVersion,
 }: {
   addDisposable: (fn: () => Promise<void> | void) => void
+  arch: string
   clearExtensions: boolean
   commit: string
   cwd: string
@@ -40,6 +43,7 @@ export const launchIde = async ({
   inspectPtyHostPort: number
   inspectSharedProcess: boolean
   inspectSharedProcessPort: number
+  platform: string
   useProxyMock: boolean
   updateUrl: string
   vscodePath: string
@@ -71,7 +75,7 @@ export const launchIde = async ({
   }
   let versionToParse: string
   if (insidersCommit) {
-    const metadata = await FetchVscodeInsidersMetadata.fetchVscodeInsidersMetadata(insidersCommit, updateUrl)
+    const metadata = await FetchVscodeInsidersMetadata.fetchVscodeInsidersMetadata(platform, arch, insidersCommit, updateUrl)
     const { productVersion } = metadata
     versionToParse = productVersion.replace('-insider', '')
   } else {

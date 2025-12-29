@@ -14,37 +14,36 @@ import * as Root from '../Root/Root.ts'
 
 const automaticallyDownloadSourceMaps = false
 
-const getProductJsonPath = (path: string): string => {
-  if (process.platform === 'darwin') {
+const getProductJsonPath = (platform: string, path: string): string => {
+  if (platform === 'darwin') {
     return resolve(path, '..', '..', 'Resources', 'app', 'product.json')
   }
   return resolve(path, '..', 'resources', 'app', 'product.json')
 }
 
-const getBinaryPathFromExtractDir = (extractDir: string): string => {
-  if (process.platform === 'darwin') {
+const getBinaryPathFromExtractDir = (platform: string, arch: string, extractDir: string): string => {
+  if (platform === 'darwin') {
     return join(extractDir, 'Visual Studio Code - Insiders.app', 'Contents', 'MacOS', 'Electron')
   }
-  if (process.platform === 'win32') {
+  if (platform === 'win32') {
     return join(extractDir, 'Code - Insiders', 'Code - Insiders.exe')
   }
-  const arch = os.arch()
   const archSuffix = arch === 'arm64' ? 'arm64' : 'x64'
   return join(extractDir, `VSCode-linux-${archSuffix}`, 'code-insiders')
 }
 
-export const downloadAndUnzipInsiders = async (commit: string, updateUrl: string): Promise<string> => {
+export const downloadAndUnzipInsiders = async (platform: string, arch: string, commit: string, updateUrl: string): Promise<string> => {
   const cachedPath = await GetVscodeRuntimePath.getVscodeRuntimePath(commit)
   if (cachedPath) {
     return cachedPath
   }
-  const metadata = await FetchVscodeInsidersMetadata.fetchVscodeInsidersMetadata(commit, updateUrl)
+  const metadata = await FetchVscodeInsidersMetadata.fetchVscodeInsidersMetadata(platform, arch, commit, updateUrl)
   const insidersVersionsDir = join(Root.root, '.vscode-insiders-versions')
   const extractDir = join(insidersVersionsDir, commit)
   console.log(`[download-worker] Downloading ${metadata.url}`)
 
   const urlBasename = basename(new URL(metadata.url).pathname)
-  const isExe = process.platform === 'win32' && urlBasename.endsWith('.exe')
+  const isExe = platform === 'win32' && urlBasename.endsWith('.exe')
 
   if (isExe) {
     const tmpDir = join(Root.root, '.vscode-tool-downloads')
@@ -58,8 +57,8 @@ export const downloadAndUnzipInsiders = async (commit: string, updateUrl: string
 
   await DownloadAndExtract.downloadAndExtract('vscode-insiders', [metadata.url], extractDir)
   console.log(`[download-worker] Download complete.`)
-  const path = getBinaryPathFromExtractDir(extractDir)
-  const productPath = getProductJsonPath(path)
+  const path = getBinaryPathFromExtractDir(platform, arch, extractDir)
+  const productPath = getProductJsonPath(platform, path)
   const productJson = await JsonFile.readJson(productPath)
   const newProductJson = AdjustVscodeProductJson.adjustVscodeProductJson(productJson)
   await JsonFile.writeJson(productPath, newProductJson)
