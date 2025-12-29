@@ -8,6 +8,7 @@ import * as InstallNodeVersion from '../InstallNodeVersion/InstallNodeVersion.ts
 import * as ModifyEsbuildConfig from '../ModifyEsbuildConfig/ModifyEsbuildConfig.ts'
 import * as BuildExtension from '../BuildExtension/BuildExtension.ts'
 import * as CopySourceMaps from '../CopySourceMaps/CopySourceMaps.ts'
+import * as Exec from '../Exec/Exec.ts'
 
 export const generateExtensionSourceMaps = async ({
   extensionName,
@@ -43,8 +44,7 @@ export const generateExtensionSourceMaps = async ({
   console.log(`Found commit: ${commit}`)
 
   // Checkout the commit
-  const { exec } = await import('../Exec/Exec.ts')
-  const checkoutResult = await exec('git', ['checkout', commit], { cwd: repoPath })
+  const checkoutResult = await Exec.exec('git', ['checkout', commit], { cwd: repoPath })
   if (checkoutResult.exitCode !== 0) {
     throw new Error(`Failed to checkout commit ${commit}: ${checkoutResult.stderr}`)
   }
@@ -70,6 +70,9 @@ export const generateExtensionSourceMaps = async ({
   console.log(`Copying source maps...`)
   await mkdir(outputDir, { recursive: true })
   await CopySourceMaps.copySourceMaps(repoPath, outputDir, extensionName, version)
+
+  // Dispose exec worker
+  await Exec.dispose()
 
   console.log(`Successfully generated source maps for ${extensionName} ${version}`)
 }
