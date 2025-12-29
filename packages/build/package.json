@@ -7,7 +7,8 @@
   "scripts": {
     "build": "rollup -c rollup.config.js",
     "build:watch": "rollup -c rollup.config.js -w",
-    "generate-api-types": "node src/generate-api-types.ts"
+    "generate-api-types": "node src/generate-api-types.ts",
+    "test": "node --unhandled-rejections=warn --experimental-vm-modules ../../node_modules/jest/bin/jest.js --detectOpenHandles --forceExit"
   },
   "devDependencies": {
     "@babel/core": "^7.28.5",

@@ -1,6 +1,8 @@
 export interface StartRunningOptions {
+  readonly arch: string
   readonly bisect: boolean
   readonly checkLeaks: boolean
+  readonly clearExtensions: boolean
   readonly color: boolean
   readonly commit: string
   readonly continueValue: string
@@ -22,6 +24,7 @@ export interface StartRunningOptions {
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode: boolean
+  readonly platform: string
   readonly recordVideo: boolean
   readonly restartBetween: boolean
   readonly runMode: number
@@ -32,6 +35,7 @@ export interface StartRunningOptions {
   readonly timeoutBetween: number
   readonly timeouts: boolean
   readonly useProxyMock: boolean
+  readonly updateUrl: string
   readonly vscodePath: string
   readonly vscodeVersion: string
   readonly workers: boolean

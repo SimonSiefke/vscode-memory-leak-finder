@@ -27,6 +27,7 @@ export const updateState = async (newState: any): Promise<void> => {
   StdinDataState.setState({ ...newState, previousFilters: [], stdout: [] })
   if (state.mode !== ModeType.Running && newState.mode === ModeType.Running) {
     await StartRunning.startRunning({
+      arch: state.arch,
       bisect: state.bisect,
       checkLeaks: state.checkLeaks,
       color: true,
@@ -50,6 +51,7 @@ export const updateState = async (newState: any): Promise<void> => {
       measure: state.measure,
       measureAfter: state.measureAfter,
       measureNode: false,
+      platform: state.platform,
       recordVideo: state.recordVideo,
       restartBetween: state.restartBetween,
       runMode: state.runMode,
@@ -59,10 +61,12 @@ export const updateState = async (newState: any): Promise<void> => {
       setupOnly: false,
       timeoutBetween: state.timeoutBetween,
       timeouts: state.timeouts,
+      updateUrl: 'https://update.code.visualstudio.com',
       useProxyMock: state.useProxyMock,
       vscodePath: '',
       vscodeVersion: VsCodeVersion.vscodeVersion,
       workers: state.workers,
+      clearExtensions: state.clearExtensions,
     })
   }
   if (newState.mode === ModeType.Interrupted) {

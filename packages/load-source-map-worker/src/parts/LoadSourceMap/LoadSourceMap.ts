@@ -11,7 +11,7 @@ const getProtocol = (url: string): string => {
 
 export const loadSourceMap = async (url: string, hash: string): Promise<any> => {
   const protocol = getProtocol(url)
-  const module = await LoadSourceMapModule.getModule(protocol)
-  const data = await module.loadSourceMap(url, hash)
+  const fn = LoadSourceMapModule.getModule(protocol)
+  const data = await fn(url, hash)
   return data
 }

@@ -11,7 +11,7 @@ export const create = ({ expect, page, VError }) => {
         throw new VError(error, `Failed to disable extension`)
       }
     },
-    async enableExtension(options) {
+    async enableExtension(options?: any) {
       try {
         const extensionEditor = page.locator('.extension-editor')
         const disabledStatusLabel = extensionEditor.locator('.extension-status-label[aria-label="Disabled"]')
@@ -31,6 +31,11 @@ export const create = ({ expect, page, VError }) => {
         const extensionEditor = page.locator('.extension-editor')
         await expect(extensionEditor).toBeVisible()
         await page.waitForIdle()
+        const unInstallButton = extensionEditor.locator('.action-label[aria-label^="Uninstall"], .action-label[aria-label*="Uninstall"]')
+        const count = await unInstallButton.count()
+        if (count > 0) {
+          return
+        }
         const installButton = extensionEditor.locator('.action-label[aria-label^="Install"], .action-label[aria-label*="Install"]')
         await expect(installButton).toBeVisible()
         await page.waitForIdle()
@@ -38,7 +43,6 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
         await expect(installButton).toBeHidden()
         await page.waitForIdle()
-        const unInstallButton = extensionEditor.locator('.action-label[aria-label^="Uninstall"], .action-label[aria-label*="Uninstall"]')
         await expect(unInstallButton).toBeVisible({ timeout: 120_000 })
         await page.waitForIdle()
       } catch (error) {

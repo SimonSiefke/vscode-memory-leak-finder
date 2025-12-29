@@ -31,8 +31,10 @@ const disposeWorkers = async (workers) => {
 }
 
 export const runTestsWithCallback = async ({
+  arch,
   callback,
   checkLeaks,
+  clearExtensions,
   color,
   commit,
   continueValue,
@@ -53,6 +55,7 @@ export const runTestsWithCallback = async ({
   measure,
   measureAfter,
   measureNode,
+  platform,
   recordVideo,
   restartBetween,
   root,
@@ -64,6 +67,7 @@ export const runTestsWithCallback = async ({
   timeoutBetween,
   timeouts,
   useProxyMock,
+  updateUrl,
   vscodePath,
   vscodeVersion,
 }: RunTestsWithCallbackOptions): Promise<RunTestsResult> => {
@@ -99,7 +103,9 @@ export const runTestsWithCallback = async ({
 
     if (setupOnly && commit) {
       const { memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
+        arch,
         attachedToPageTimeout,
+        clearExtensions,
         commit,
         connectionId,
         cwd,
@@ -119,11 +125,13 @@ export const runTestsWithCallback = async ({
         measureId: measure,
         measureNode,
         pageObjectPath,
+        platform,
         recordVideo,
         runMode,
         screencastQuality,
         timeouts,
         useProxyMock,
+        updateUrl,
         vscodePath,
         vscodeVersion,
       })
@@ -198,7 +206,9 @@ export const runTestsWithCallback = async ({
         await disposeWorkers(workers)
         PrepareTestsOrAttach.state.promise = undefined
         const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
+          arch,
           attachedToPageTimeout,
+          clearExtensions,
           commit,
           connectionId,
           cwd,
@@ -218,11 +228,13 @@ export const runTestsWithCallback = async ({
           measureId: measure,
           measureNode,
           pageObjectPath,
+          platform,
           recordVideo,
           runMode,
           screencastQuality,
           timeouts,
           useProxyMock,
+          updateUrl,
           vscodePath,
           vscodeVersion,
         })

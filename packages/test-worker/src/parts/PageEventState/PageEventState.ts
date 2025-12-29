@@ -13,7 +13,7 @@ const state = {
   events: [] as any[],
 }
 
-export const addEvent = (event) => {
+const addEvent = (event) => {
   state.events.push(event)
   for (const callback of state.callbacks) {
     for (const event of state.events) {

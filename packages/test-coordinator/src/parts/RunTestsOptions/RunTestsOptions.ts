@@ -1,6 +1,8 @@
 export interface RunTestsOptions {
+  readonly arch: string
   readonly bisect?: boolean
   readonly checkLeaks: boolean
+  readonly clearExtensions: boolean
   readonly color: boolean
   readonly commit: string
   readonly continueValue: string
@@ -21,6 +23,7 @@ export interface RunTestsOptions {
   readonly measure: string
   readonly measureAfter: boolean
   readonly measureNode: boolean
+  readonly platform: string
   readonly recordVideo: boolean
   readonly restartBetween: boolean
   readonly root: string
@@ -32,6 +35,7 @@ export interface RunTestsOptions {
   readonly timeoutBetween: number
   readonly timeouts: any
   readonly useProxyMock: boolean
+  readonly updateUrl: string
   readonly vscodePath: string
   readonly vscodeVersion: string
 }

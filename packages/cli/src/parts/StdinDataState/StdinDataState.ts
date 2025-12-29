@@ -4,6 +4,7 @@ import * as ModeType from '../ModeType/ModeType.ts'
 import * as TestRunMode from '../TestRunMode/TestRunMode.ts'
 
 export interface StdinDataState {
+  readonly arch: string
   readonly bisect: boolean
   readonly buffering: boolean
   readonly checkLeaks: boolean
@@ -29,6 +30,7 @@ export interface StdinDataState {
   readonly measureAfter: boolean
   readonly measureNode?: boolean
   readonly mode: number
+  readonly platform: string
   readonly previousFilters: string[]
   readonly recordVideo: boolean
   readonly restartBetween: boolean
@@ -43,9 +45,11 @@ export interface StdinDataState {
   readonly value: string
   readonly watch: boolean
   readonly workers: boolean
+  readonly clearExtensions: boolean
 }
 
 let state: StdinDataState = {
+  arch: '',
   bisect: false,
   buffering: false,
   checkLeaks: false,
@@ -70,6 +74,7 @@ let state: StdinDataState = {
   measure: Character.EmptyString,
   measureAfter: false,
   mode: ModeType.Waiting,
+  platform: '',
   previousFilters: [],
   recordVideo: false,
   restartBetween: false,
@@ -84,6 +89,7 @@ let state: StdinDataState = {
   value: Character.EmptyString,
   watch: false,
   workers: false,
+  clearExtensions: true,
 }
 
 <<<<<<< HEAD
@@ -93,6 +99,7 @@ export const setState = (newState: StdinDataState): void => {
 >>>>>>> origin/main
   state = {
     ...state,
+<<<<<<< HEAD
     bisect: newState.bisect ?? state.bisect,
     checkLeaks: newState.checkLeaks ?? state.checkLeaks,
     continueValue: newState.continueValue ?? state.continueValue,
@@ -128,6 +135,45 @@ export const setState = (newState: StdinDataState): void => {
     value: newState.value ?? state.value,
     watch: newState.watch ?? state.watch,
     workers: newState.workers ?? state.workers,
+=======
+    arch: newState.arch,
+    bisect: newState.bisect,
+    checkLeaks: newState.checkLeaks,
+    continueValue: newState.continueValue,
+    cwd: newState.cwd,
+    enableExtensions: newState.enableExtensions,
+    enableProxy: newState.enableProxy,
+    headless: newState.headless,
+    ide: newState.ide,
+    ideVersion: newState.ideVersion,
+    insidersCommit: newState.insidersCommit,
+    inspectExtensions: newState.inspectExtensions,
+    inspectExtensionsPort: newState.inspectExtensionsPort,
+    inspectPtyHost: newState.inspectPtyHost,
+    inspectPtyHostPort: newState.inspectPtyHostPort,
+    inspectSharedProcess: newState.inspectSharedProcess,
+    inspectSharedProcessPort: newState.inspectSharedProcessPort,
+    isGithubActions: newState.isGithubActions,
+    isWindows: newState.isWindows,
+    measure: newState.measure,
+    measureAfter: newState.measureAfter,
+    mode: newState.mode,
+    platform: newState.platform,
+    previousFilters: newState.previousFilters,
+    recordVideo: newState.recordVideo,
+    restartBetween: newState.restartBetween,
+    runMode: newState.runMode,
+    runs: newState.runs,
+    runSkippedTestsAnyway: newState.runSkippedTestsAnyway,
+    screencastQuality: newState.screencastQuality,
+    stdout: newState.stdout,
+    timeoutBetween: newState.timeoutBetween,
+    timeouts: newState.timeouts,
+    useProxyMock: newState.useProxyMock,
+    value: newState.value,
+    watch: newState.watch,
+    workers: newState.workers,
+>>>>>>> origin/main
   }
 }
 

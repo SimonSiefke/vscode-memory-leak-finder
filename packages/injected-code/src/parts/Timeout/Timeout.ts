@@ -1,9 +1,3 @@
-export const short = async () => {
-  const { promise, resolve } = Promise.withResolvers<void>()
-  setTimeout(resolve, 1000)
-  await promise
-}
-
 const waitForTimeout = (maxDelay: number) => {
   const { promise, resolve } = Promise.withResolvers<void>()
   const timeout = setTimeout(resolve, maxDelay)

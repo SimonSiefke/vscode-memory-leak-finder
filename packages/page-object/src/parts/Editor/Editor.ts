@@ -1,3 +1,4 @@
+import { basename } from 'node:path'
 import * as Character from '../Character/Character.ts'
 import * as ContextMenu from '../ContextMenu/ContextMenu.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
@@ -375,6 +376,38 @@ export const create = ({
         throw new VError(error, `Failed to format file`)
       }
     },
+    async focusRightEditorGroup() {
+      try {
+        const quickpick = QuickPick.create({ expect, page, VError })
+        await quickpick.executeCommand(WellKnownCommands.FocusRightEditorGroup)
+      } catch (error) {
+        throw new VError(error, `Failed to focus right editor group`)
+      }
+    },
+    async focusLeftEditorGroup() {
+      try {
+        const quickpick = QuickPick.create({ expect, page, VError })
+        await quickpick.executeCommand(WellKnownCommands.FocusLeftEditorGroup)
+      } catch (error) {
+        throw new VError(error, `Failed to focus left editor group`)
+      }
+    },
+    async focusBottomEditorGroup() {
+      try {
+        const quickpick = QuickPick.create({ expect, page, VError })
+        await quickpick.executeCommand(WellKnownCommands.FocusBelowEditorGroup)
+      } catch (error) {
+        throw new VError(error, `Failed to focus bottom editor group`)
+      }
+    },
+    async focusTopEditorGroup() {
+      try {
+        const quickpick = QuickPick.create({ expect, page, VError })
+        await quickpick.executeCommand(WellKnownCommands.FocusAboveEditorGroup)
+      } catch (error) {
+        throw new VError(error, `Failed to focus top editor group`)
+      }
+    },
     async goToDefinition() {
       try {
         await page.waitForIdle()
@@ -583,6 +616,72 @@ export const create = ({
         throw new VError(error, `Failed to create new untitled text file`)
       }
     },
+    async waitForNoteBookReady() {
+      const notebookEditor = page.locator('.notebook-editor')
+      const list = notebookEditor.locator('.monaco-list')
+      await page.waitForIdle()
+      await expect(list).toBeFocused()
+    },
+    async waitForImageReady() {
+      const webView = WebView.create({ expect, page, VError })
+      const subFrame = await webView.shouldBeVisible2({
+        extensionId: `vscode.media-preview`,
+        hasLineOfCodeCounter: false,
+      })
+      await subFrame.waitForIdle()
+      const img = subFrame.locator('img')
+      await expect(img).toBeVisible()
+      await subFrame.waitForIdle()
+    },
+    async waitForVideoReady(hasError) {
+      const webView = WebView.create({ expect, page, VError })
+      const subFrame = await webView.shouldBeVisible2({
+        extensionId: `vscode.media-preview`,
+        hasLineOfCodeCounter: false,
+      })
+      await subFrame.waitForIdle()
+      if (hasError) {
+        const error = subFrame.locator('.loading-error')
+        await expect(error).toBeVisible()
+      } else {
+        const video = subFrame.locator('video')
+        await expect(video).toBeVisible()
+      }
+      await subFrame.waitForIdle()
+    },
+    async waitForBinaryReady() {
+      // const placeholder = page.locator('.monaco-editor-pane-placeholder')
+      // await expect(placeholder).toBeVisible()
+      await page.waitForIdle()
+      const quickPick = QuickPick.create({ expect, page, VError })
+      await quickPick.executeCommand(WellKnownCommands.ReopenEditorWith, {
+        pressKeyOnce: true,
+        stayVisible: true,
+      })
+      await page.waitForIdle()
+      await quickPick.type('hex')
+      await page.waitForIdle()
+      await quickPick.select('Hex Editor') // TODO make this configurable
+      await page.waitForIdle()
+      const webView = WebView.create({ expect, page, VError })
+      await webView.shouldBeVisible2({
+        extensionId: `ms-vscode.hexeditor`,
+        hasLineOfCodeCounter: false,
+      })
+    },
+    async waitforTextFileReady(fileName: string) {
+      const baseName = basename(fileName)
+      const editor = page.locator(`.editor-instance[aria-label^="${baseName}"]`)
+      await expect(editor).toBeVisible()
+
+      if (ideVersion && ideVersion.minor <= 100) {
+        const editorInput = editor.locator('.inputarea')
+        await expect(editorInput).toBeFocused()
+      } else {
+        const editContext = editor.locator('.native-edit-context')
+        await expect(editContext).toBeFocused()
+      }
+    },
     async open(fileName: string, options?: any) {
       try {
         await page.waitForIdle()
@@ -592,67 +691,18 @@ export const create = ({
         await expect(tab).toBeVisible()
         await page.waitForIdle()
         if (isNotebook(fileName)) {
-          const notebookEditor = page.locator('.notebook-editor')
-          const list = notebookEditor.locator('.monaco-list')
-          await page.waitForIdle()
-          await expect(list).toBeFocused()
+          await this.waitForNoteBookReady()
         } else if (isImage(fileName)) {
-          const webView = WebView.create({ expect, page, VError })
-          const subFrame = await webView.shouldBeVisible2({
-            extensionId: `vscode.media-preview`,
-            hasLineOfCodeCounter: false,
-          })
-          await subFrame.waitForIdle()
-          const img = subFrame.locator('img')
-          await expect(img).toBeVisible()
-          await subFrame.waitForIdle()
+          await this.waitForImageReady()
         } else if (options?.hasError) {
           // TODO
           await new Promise((r) => {})
         } else if (isVideo(fileName)) {
-          const webView = WebView.create({ expect, page, VError })
-          const subFrame = await webView.shouldBeVisible2({
-            extensionId: `vscode.media-preview`,
-            hasLineOfCodeCounter: false,
-          })
-          await subFrame.waitForIdle()
-          if (options?.hasError) {
-            const error = subFrame.locator('.loading-error')
-            await expect(error).toBeVisible()
-          } else {
-            const video = subFrame.locator('video')
-            await expect(video).toBeVisible()
-          }
-          await subFrame.waitForIdle()
+          await this.waitForVideoReady(options?.hasError)
         } else if (isBinary(fileName)) {
-          const placeholder = page.locator('.monaco-editor-pane-placeholder')
-          await expect(placeholder).toBeVisible()
-          await page.waitForIdle()
-          const quickPick = QuickPick.create({ expect, page, VError })
-          await quickPick.executeCommand(WellKnownCommands.ReopenEditorWith, {
-            pressKeyOnce: true,
-            stayVisible: true,
-          })
-          await page.waitForIdle()
-          await quickPick.type('hex')
-          await page.waitForIdle()
-          await quickPick.select(/hex.*editor/i)
-          await page.waitForIdle()
-          const webView = WebView.create({ expect, page, VError })
-          await webView.shouldBeVisible2({
-            extensionId: `vscode.hexeditor`,
-            hasLineOfCodeCounter: false,
-          })
+          await this.waitForBinaryReady()
         } else {
-          const editor = page.locator('.editor-instance')
-          await expect(editor).toBeVisible()
-          if (ideVersion && ideVersion.minor <= 100) {
-            const editorInput = editor.locator('.inputarea')
-            await expect(editorInput).toBeFocused()
-          } else {
-            const editContext = editor.locator('.native-edit-context')
-            await expect(editContext).toBeFocused()
-          }
+          await this.waitforTextFileReady(fileName)
         }
         await page.waitForIdle()
       } catch (error) {
@@ -808,7 +858,7 @@ export const create = ({
         throw new VError(error, `Failed to rename with preview ${newText}`)
       }
     },
-    async save(options) {
+    async save(options?: { viaKeyBoard: boolean }) {
       try {
         if (options?.viaKeyBoard) {
           await page.waitForIdle()
@@ -1210,14 +1260,25 @@ export const create = ({
         throw new VError(error, `Failed to verify squiggly error`)
       }
     },
-    async shouldHaveText(text) {
+    async shouldHaveText(text: string, fileName?: string) {
       try {
-        const editor = page.locator('.editor-instance')
+        await page.waitForIdle()
+        let editor
+        if (fileName) {
+          const baseName = basename(fileName)
+          editor = page.locator(`.editor-instance[aria-label^="${baseName}"]`)
+        } else {
+          editor = page.locator(`.editor-instance`)
+        }
+        await expect(editor).toBeVisible()
         const editorLines = editor.locator('.view-lines')
+        await expect(editorLines).toBeVisible()
+        await page.waitForIdle()
         const actualText = text.replaceAll(Character.NewLine, Character.EmptyString).replaceAll(Character.Space, Character.NonBreakingSpace)
         await expect(editorLines).toHaveText(actualText, {
           timeout: 3000,
         })
+        await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to verify editor text ${text}`)
       }
