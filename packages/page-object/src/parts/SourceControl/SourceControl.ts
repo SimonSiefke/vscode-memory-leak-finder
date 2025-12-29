@@ -178,48 +178,6 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         throw new VError(error, `Failed to hide graph`)
       }
     },
-    async showGraph() {
-      try {
-        await page.waitForIdle()
-        const input = page.locator('.scm-input')
-        await expect(input).toBeVisible()
-        await page.waitForIdle()
-        const editContext = input.locator('.native-edit-context')
-        await expect(editContext).toBeVisible()
-        await page.waitForIdle()
-        const management = page.locator('[aria-label="Source Control Management"]')
-        await expect(management).toBeVisible()
-        await page.waitForIdle()
-        const graph = page.locator('[aria-label="Graph Section"]')
-        const count = await graph.count()
-        if (count > 0) {
-          return
-        }
-        const actions = page.locator(`[aria-label="Source Control actions"]`)
-        await expect(actions).toBeVisible()
-        await page.waitForIdle()
-        const moreActions = actions.locator(`[aria-label^="Views and More Actions"]`)
-        await expect(moreActions).toBeVisible()
-        await page.waitForIdle()
-        await moreActions.click()
-        await page.waitForIdle()
-        const contextMenu = ContextMenu.create({
-          expect,
-          page,
-          VError,
-        })
-        await contextMenu.shouldHaveItem(`Graph`)
-        // @ts-ignore
-        await contextMenu.check('Graph')
-        await page.waitForIdle()
-        await contextMenu.close()
-        await page.waitForIdle()
-        await expect(graph).toBeVisible()
-        await page.waitForIdle()
-      } catch (error) {
-        throw new VError(error, `Failed to show graph`)
-      }
-    },
     async refresh() {
       try {
         const quickPick = QuickPick.create({ expect, page, VError })
@@ -288,6 +246,48 @@ export const create = ({ expect, ideVersion, page, VError }) => {
         await expect(quickInput).toBeVisible()
       } catch (error) {
         throw new VError(error, `Failed to show branch picker`)
+      }
+    },
+    async showGraph() {
+      try {
+        await page.waitForIdle()
+        const input = page.locator('.scm-input')
+        await expect(input).toBeVisible()
+        await page.waitForIdle()
+        const editContext = input.locator('.native-edit-context')
+        await expect(editContext).toBeVisible()
+        await page.waitForIdle()
+        const management = page.locator('[aria-label="Source Control Management"]')
+        await expect(management).toBeVisible()
+        await page.waitForIdle()
+        const graph = page.locator('[aria-label="Graph Section"]')
+        const count = await graph.count()
+        if (count > 0) {
+          return
+        }
+        const actions = page.locator(`[aria-label="Source Control actions"]`)
+        await expect(actions).toBeVisible()
+        await page.waitForIdle()
+        const moreActions = actions.locator(`[aria-label^="Views and More Actions"]`)
+        await expect(moreActions).toBeVisible()
+        await page.waitForIdle()
+        await moreActions.click()
+        await page.waitForIdle()
+        const contextMenu = ContextMenu.create({
+          expect,
+          page,
+          VError,
+        })
+        await contextMenu.shouldHaveItem(`Graph`)
+        // @ts-ignore
+        await contextMenu.check('Graph')
+        await page.waitForIdle()
+        await contextMenu.close()
+        await page.waitForIdle()
+        await expect(graph).toBeVisible()
+        await page.waitForIdle()
+      } catch (error) {
+        throw new VError(error, `Failed to show graph`)
       }
     },
     async stageFile(name: string, parentFolder?: string) {

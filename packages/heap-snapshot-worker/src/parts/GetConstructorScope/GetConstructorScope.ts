@@ -5,7 +5,7 @@ export const getConstructorScope = (parsedNodes, constructorScopeMap, edgeMap, n
   const constructorScope = parsedNodes[constructorScopeIndex]
   const edge = edgeMap[nodeIndex]
   return {
-    scopeNode: constructorScope,
     scopeEdge: edge,
+    scopeNode: constructorScope,
   }
 }

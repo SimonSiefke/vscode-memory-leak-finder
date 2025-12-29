@@ -22,8 +22,8 @@ export const launchIde = async ({
   inspectSharedProcess,
   inspectSharedProcessPort,
   platform,
-  useProxyMock,
   updateUrl,
+  useProxyMock,
   vscodePath,
   vscodeVersion,
 }: {
@@ -98,8 +98,8 @@ export const launchIde = async ({
     inspectSharedProcess,
     inspectSharedProcessPort,
     platform,
-    useProxyMock,
     updateUrl,
+    useProxyMock,
     vscodePath,
     vscodeVersion,
   })

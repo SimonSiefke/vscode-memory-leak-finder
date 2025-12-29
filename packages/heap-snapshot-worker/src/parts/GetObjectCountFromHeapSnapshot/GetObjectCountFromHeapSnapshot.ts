@@ -7,9 +7,9 @@ export const getObjectCountFromHeapSnapshot = async (path: string, objectName: s
   const snapshot: any = await prepareHeapSnapshot(path, {
     parseStrings: true,
   })
-  const { nodes, strings, meta } = snapshot as any
-  const { node_types, node_fields, edge_types, edge_fields } = meta
-  const { objectTypeIndex, ITEMS_PER_EDGE, typeFieldIndex, nameFieldIndex } = computeHeapSnapshotIndices(
+  const { meta, nodes, strings } = snapshot
+  const { edge_fields, edge_types, node_fields, node_types } = meta
+  const { ITEMS_PER_EDGE, nameFieldIndex, objectTypeIndex, typeFieldIndex } = computeHeapSnapshotIndices(
     node_types,
     node_fields,
     edge_types,

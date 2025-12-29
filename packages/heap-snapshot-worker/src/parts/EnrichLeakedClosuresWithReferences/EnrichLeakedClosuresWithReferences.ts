@@ -1,9 +1,9 @@
-import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import type { ReferencePath } from '../ReferencePath/ReferencePath.ts'
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { collectLeakedNodeByteOffsets } from '../CollectLeakedNodeByteOffsets/CollectLeakedNodeByteOffsets.ts'
-import { initializeReferencesMap } from '../InitializeReferencesMap/InitializeReferencesMap.ts'
 import { collectReferencesToLeakedNodes } from '../CollectReferencesToLeakedNodes/CollectReferencesToLeakedNodes.ts'
 import { enrichClosuresWithReferences } from '../EnrichClosuresWithReferences/EnrichClosuresWithReferences.ts'
+import { initializeReferencesMap } from '../InitializeReferencesMap/InitializeReferencesMap.ts'
 
 export interface LeakedClosureWithReferences {
   readonly nodeName: string

@@ -22,6 +22,7 @@ export const getBinaryPath = async (
       insidersCommit,
       platform,
       updateUrl,
+      vscodeVersion: '',
     })
   }
   if (commit && typeof commit === 'string' && commit !== '') {
@@ -45,6 +46,7 @@ export const getBinaryPath = async (
       insidersCommit,
       platform,
       updateUrl,
+      vscodeVersion: '',
     })
   }
   if (Env.env.VSCODE_PATH) {
@@ -55,6 +57,8 @@ export const getBinaryPath = async (
     arch,
     platform,
     vscodeVersion,
+    insidersCommit: '',
+    updateUrl: '',
   })
   return path
 }

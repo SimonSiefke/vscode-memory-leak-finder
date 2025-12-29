@@ -1,5 +1,5 @@
-import { convertLocationKeyToUrl } from '../ConvertLocationKeyToUrl/ConvertLocationKeyToUrl.ts'
 import type { LeakedClosureWithReferences } from '../EnrichLeakedClosuresWithReferences/EnrichLeakedClosuresWithReferences.ts'
+import { convertLocationKeyToUrl } from '../ConvertLocationKeyToUrl/ConvertLocationKeyToUrl.ts'
 
 export const addUrls = (
   enriched: Record<string, readonly LeakedClosureWithReferences[]>,

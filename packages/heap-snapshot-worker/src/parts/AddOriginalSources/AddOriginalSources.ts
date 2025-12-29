@@ -1,12 +1,12 @@
-import type { CompareResult } from '../CompareHeapSnapshotsFunctionsInternal2/CompareHeapSnapshotsFunctionsInternal2.ts'
+import { readdir, readFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { readdir, readFile } from 'node:fs/promises'
+import type { CompareResult } from '../CompareHeapSnapshotsFunctionsInternal2/CompareHeapSnapshotsFunctionsInternal2.ts'
 import * as LaunchSourceMapWorker from '../LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
 
 export interface ScriptInfo {
-  readonly url?: string
   readonly sourceMapUrl?: string
+  readonly url?: string
 }
 
 const isRelativeSourceMap = (sourceMapUrl) => {
@@ -52,12 +52,12 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
           for (const [key, value] of Object.entries(parsed)) {
             const numericKey = Number(key)
             const existing = mergedMap[numericKey]
-            if (!existing) {
-              mergedMap[numericKey] = value
-            } else {
+            if (existing) {
               if (!existing.sourceMapUrl && value.sourceMapUrl) {
                 mergedMap[numericKey] = value
               }
+            } else {
+              mergedMap[numericKey] = value
             }
           }
         } catch {
@@ -70,7 +70,7 @@ export const addOriginalSources = async (items: readonly CompareResult[]): Promi
     // ignore if directory not found
   }
 
-  const enriched: CompareResult[] = items.slice()
+  const enriched: CompareResult[] = [...items]
   if (!scriptMap) {
     return enriched
   }

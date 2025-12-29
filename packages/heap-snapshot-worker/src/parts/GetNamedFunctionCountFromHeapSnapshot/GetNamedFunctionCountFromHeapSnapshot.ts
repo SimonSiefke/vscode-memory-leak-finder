@@ -1,11 +1,11 @@
-import * as Assert from '../Assert/Assert.ts'
-import { getFunctionsWithLocations } from '../GetFunctionsWithLocations/GetFunctionsWithLocations.ts'
-import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
-import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
-import { normalizeFunctionObjects } from '../NormalizeFunctionObjects/NormalizeFunctionObjects.ts'
-import { aggregateFunctionObjects } from '../AggregateFunctionObjects/AggregateFunctionObjects.ts'
 import type { AggregatedFunction } from '../AggregateFunctionObjects/AggregateFunctionObjects.ts'
 import type { FunctionObject } from '../NormalizeFunctionObjects/NormalizeFunctionObjects.ts'
+import { aggregateFunctionObjects } from '../AggregateFunctionObjects/AggregateFunctionObjects.ts'
+import * as Assert from '../Assert/Assert.ts'
+import { getFunctionsWithLocations } from '../GetFunctionsWithLocations/GetFunctionsWithLocations.ts'
+import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
+import { normalizeFunctionObjects } from '../NormalizeFunctionObjects/NormalizeFunctionObjects.ts'
+import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 
 export const getNamedFunctionCountFromHeapSnapshot = async (
   id: number,
@@ -14,7 +14,7 @@ export const getNamedFunctionCountFromHeapSnapshot = async (
 ): Promise<readonly AggregatedFunction[]> => {
   const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
-  const { parsedNodes, locations } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
+  const { locations, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
   const functionsWithLocations = getFunctionsWithLocations(parsedNodes, locations, scriptMap)
   const normalized = normalizeFunctionObjects(functionsWithLocations as readonly FunctionObject[])
   const aggregated: readonly AggregatedFunction[] = aggregateFunctionObjects(normalized)

@@ -31,8 +31,8 @@ const getArrayNames = (nameMap) => {
 const getArrayNamesWithCount = (countMap) => {
   const arrayNamesWithCount = Object.entries(countMap).map(([key, value]) => {
     return {
-      name: key,
       count: value,
+      name: key,
     }
   })
   return arrayNamesWithCount
@@ -42,7 +42,7 @@ export const getNamedArrayCountFromHeapSnapshot = async (id, scriptMap = {}) => 
   const heapsnapshot = HeapSnapshotState.get(id)
 
   Assert.object(heapsnapshot)
-  const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
+  const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
   const nameMap = CreateNameMap.createNameMap(parsedNodes, graph)
   const arrayNames = getArrayNames(nameMap)
   const countMap = createCountMap(arrayNames)

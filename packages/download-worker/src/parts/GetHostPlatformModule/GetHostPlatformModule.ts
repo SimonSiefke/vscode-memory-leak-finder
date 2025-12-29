@@ -1,11 +1,19 @@
-export const getHostPlatformModule = (platform: string): Promise<any> => {
+import * as GetHostPlatformDarwin from '../GetHostPlatformDarwin/GetHostPlatformDarwin.ts'
+import * as GetHostPlatformLinux from '../GetHostPlatformLinux/GetHostPlatformLinux.ts'
+import * as GetHostPlatformWindows from '../GetHostPlatformWindows/GetHostPlatformWindows.ts'
+
+interface HostPlatformFn {
+  (): string | Promise<string>
+}
+
+export const getHostPlatformModule = (platform: string): HostPlatformFn => {
   switch (platform) {
     case 'darwin':
-      return import('../GetHostPlatformDarwin/GetHostPlatformDarwin.ts')
+      return GetHostPlatformDarwin.getHostPlatform
     case 'linux':
-      return import('../GetHostPlatformLinux/GetHostPlatformLinux.ts')
+      return GetHostPlatformLinux.getHostPlatform
     case 'win32':
-      return import('../GetHostPlatformWindows/GetHostPlatformWindows.ts')
+      return GetHostPlatformWindows.getHostPlatform
     default:
       throw new Error(`unsupported platform ${platform}`)
   }

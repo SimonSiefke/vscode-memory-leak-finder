@@ -31,9 +31,23 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex, currentNumber = 
     const charType = charTypes[code]
 
     switch (charType) {
+      case CLOSING_BRACKET:
+        if (hasDigits) {
+          array[arrayIndex] = currentNumber
+          arrayIndex++
+        }
+        return {
+          arrayIndex,
+          currentNumber: 0,
+          dataIndex: i + 1,
+          done: true,
+          hasDigits: false,
+        }
       case DIGIT:
         currentNumber = currentNumber * 10 + (code - CHAR_0)
         hasDigits = true
+        break
+      case MINUS:
         break
       case SEPARATOR:
         if (hasDigits) {
@@ -42,20 +56,6 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex, currentNumber = 
           currentNumber = 0
           hasDigits = false
         }
-        break
-      case CLOSING_BRACKET:
-        if (hasDigits) {
-          array[arrayIndex] = currentNumber
-          arrayIndex++
-        }
-        return {
-          dataIndex: i + 1,
-          arrayIndex,
-          done: true,
-          currentNumber: 0,
-          hasDigits: false,
-        }
-      case MINUS:
         break
       default:
         throw new Error(`unexpected token ${code}`)
@@ -67,10 +67,10 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex, currentNumber = 
     // Normal case: backtrack within current chunk
     const digitCount = getDigitCount(currentNumber)
     return {
-      dataIndex: dataLength - digitCount,
       arrayIndex,
-      done: false,
       currentNumber,
+      dataIndex: dataLength - digitCount,
+      done: false,
       hasDigits,
     }
   }
@@ -78,10 +78,10 @@ export const parseHeapSnapshotArray = (data, array, arrayIndex, currentNumber = 
   // If we reach here, we've processed all the data and there's no partial number
   // This means we've successfully parsed all complete numbers in this chunk
   return {
-    dataIndex: dataLength,
     arrayIndex,
-    done: false, // Not done because we haven't seen a closing bracket
     currentNumber: 0,
+    dataIndex: dataLength,
+    done: false, // Not done because we haven't seen a closing bracket
     hasDigits: false,
   }
 }
