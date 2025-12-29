@@ -52,6 +52,7 @@ export const bisect = async (options: StartRunningOptions): Promise<BisectResult
       timeoutBetween: options.timeoutBetween,
       timeouts: options.timeouts,
       useProxyMock: options.useProxyMock,
+      updateUrl: options.updateUrl,
       vscodePath: options.vscodePath,
       vscodeVersion: options.vscodeVersion,
     })
