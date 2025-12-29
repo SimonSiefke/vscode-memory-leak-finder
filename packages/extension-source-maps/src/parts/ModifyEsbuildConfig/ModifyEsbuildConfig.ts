@@ -52,15 +52,16 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
 
     // Check if sourcemap is already enabled
     if (content.includes('sourcemap:') || content.includes('sourceMap:')) {
-      // Detect which case is used (sourcemap or sourceMap)
-      const usesCamelCase = content.includes('sourceMap:')
-      
-      // Already has sourcemap config, modify it
+      // Already has sourcemap config, modify it while preserving case
       let modifiedContent = content
-        .replace(/sourcemap:\s*false/gi, usesCamelCase ? 'sourceMap: true' : 'sourcemap: true')
-        .replace(/sourceMap:\s*false/gi, 'sourceMap: true')
-        .replace(/sourcemap:\s*['"]none['"]/gi, usesCamelCase ? "sourceMap: 'inline'" : "sourcemap: 'inline'")
-        .replace(/sourceMap:\s*['"]none['"]/gi, "sourceMap: 'inline'")
+        .replace(/(sourcemap|sourceMap):\s*false/gi, (match, p1) => {
+          // p1 contains the actual matched property name with its case preserved
+          return `${p1}: true`
+        })
+        .replace(/(sourcemap|sourceMap):\s*['"]none['"]/gi, (match, p1) => {
+          // p1 contains the actual matched property name with its case preserved
+          return `${p1}: 'inline'`
+        })
 
       if (modifiedContent !== content) {
         await writeFile(configPath, modifiedContent, 'utf8')
