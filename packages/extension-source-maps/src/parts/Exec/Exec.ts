@@ -23,17 +23,10 @@ const getExecWorker = async () => {
 
 export const exec = async (command: string, args: string[], options: ExecOptions = {}): Promise<ExecResult> => {
   try {
-    const rpc = await getExecWorker()
+    await using rpc = await LaunchExecWorker.launchExecWorker()
     const result = (await rpc.invoke('exec.exec', command, args, options)) as ExecResult
     return result
   } catch (error) {
     throw new VError(error, `Failed to execute command: ${command} ${args.join(' ')}`)
-  }
-}
-
-export const dispose = async (): Promise<void> => {
-  if (execWorkerRpc) {
-    await execWorkerRpc.dispose()
-    execWorkerRpc = undefined
   }
 }

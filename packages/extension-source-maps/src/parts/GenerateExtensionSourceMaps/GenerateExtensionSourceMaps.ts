@@ -71,8 +71,5 @@ export const generateExtensionSourceMaps = async ({
   await mkdir(outputDir, { recursive: true })
   await CopySourceMaps.copySourceMaps(repoPath, outputDir, extensionName, version)
 
-  // Dispose exec worker
-  await Exec.dispose()
-
   console.log(`Successfully generated source maps for ${extensionName} ${version}`)
 }
