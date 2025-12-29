@@ -15,9 +15,9 @@ export type AstNodeType =
   | 'unknown'
 
 export interface BaseAstNode {
-  type: AstNodeType
   id: number
   name?: string | null
+  type: AstNodeType
 }
 
 export interface NumberNode extends BaseAstNode {
@@ -51,13 +51,13 @@ export interface PropertyEntry {
 }
 
 export interface ObjectNode extends BaseAstNode {
-  type: 'object'
   properties: PropertyEntry[]
+  type: 'object'
 }
 
 export interface ArrayNode extends BaseAstNode {
-  type: 'array'
   elements: AstNode[]
+  type: 'array'
 }
 
 export interface MapEntry {
@@ -66,21 +66,21 @@ export interface MapEntry {
 }
 
 export interface MapNode extends BaseAstNode {
-  type: 'map' | 'weakmap'
   entries: MapEntry[]
+  type: 'map' | 'weakmap'
 }
 
 export interface SetNode extends BaseAstNode {
-  type: 'set' | 'weakset'
   elements: AstNode[]
+  type: 'set' | 'weakset'
 }
 
 export interface CodeNode extends BaseAstNode {
+  column?: number
+  line?: number
+  scriptId?: number
   type: 'code' | 'closure'
   value?: string
-  scriptId?: number
-  line?: number
-  column?: number
 }
 
 export interface UnknownNode extends BaseAstNode {

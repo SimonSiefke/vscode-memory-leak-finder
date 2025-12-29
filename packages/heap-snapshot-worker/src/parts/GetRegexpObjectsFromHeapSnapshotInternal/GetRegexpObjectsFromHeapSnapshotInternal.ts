@@ -6,8 +6,8 @@ export interface RegexpObject {
 }
 
 export const getRegexpObjectsFromHeapSnapshotInternal = (snapshot: Snapshot): readonly RegexpObject[] => {
-  const { nodes, strings, meta } = snapshot
-  const { node_types, node_fields } = meta
+  const { meta, nodes, strings } = snapshot
+  const { node_fields, node_types } = meta
 
   const regexpTypeIndex = node_types[0].indexOf('regexp')
   const ITEMS_PER_NODE = node_fields.length

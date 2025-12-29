@@ -20,9 +20,9 @@ const getName = (closureNameIndex: number, strings: readonly string[], contextNo
 }
 
 interface ClosureInfo {
-  readonly name: string
   readonly contextNodeCount: number
   readonly id: number
+  readonly name: string
   readonly nodeIndex: number
 }
 
@@ -31,17 +31,17 @@ const getClosureCounts = (nodes: Uint32Array, edges: Uint32Array, strings: reado
     console.log('getClosureCounts - Invalid meta:', meta)
     return new Map()
   }
-  const { node_types, node_fields, edge_types, edge_fields } = meta
+  const { edge_fields, edge_types, node_fields, node_types } = meta
   const {
-    ITEMS_PER_NODE,
-    ITEMS_PER_EDGE,
-    typeFieldIndex,
-    nameFieldIndex,
     edgeCountFieldIndex,
     edgeNameFieldIndex,
     edgeToNodeFieldIndex,
-    nodeTypes,
     edgeTypes,
+    ITEMS_PER_EDGE,
+    ITEMS_PER_NODE,
+    nameFieldIndex,
+    nodeTypes,
+    typeFieldIndex,
   } = computeHeapSnapshotIndices(node_types, node_fields, edge_types, edge_fields)
 
   const closureTypeIndex = nodeTypes.indexOf('closure')
@@ -74,7 +74,7 @@ const getClosureCounts = (nodes: Uint32Array, edges: Uint32Array, strings: reado
       const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
       const edgeName = strings[edgeNameIndex] || ''
       // Check if this is a context edge by name (not type)
-      if (edgeName === 'context' || (contextStringIndex >= 0 && edgeNameIndex === contextStringIndex)) {
+      if (edgeName === 'context' || (contextStringIndex !== -1 && edgeNameIndex === contextStringIndex)) {
         contextNodeByteOffset = edges[edgeIndex + edgeToNodeFieldIndex]
         break
       }
@@ -119,18 +119,18 @@ const getClosureCounts = (nodes: Uint32Array, edges: Uint32Array, strings: reado
 }
 
 const getClosureInfos = (nodes: Uint32Array, edges: Uint32Array, strings: readonly string[], meta: any): Map<string, ClosureInfo> => {
-  const { node_types, node_fields, edge_types, edge_fields } = meta
+  const { edge_fields, edge_types, node_fields, node_types } = meta
   const {
-    ITEMS_PER_NODE,
-    ITEMS_PER_EDGE,
-    typeFieldIndex,
-    nameFieldIndex,
-    idFieldIndex,
     edgeCountFieldIndex,
     edgeNameFieldIndex,
     edgeToNodeFieldIndex,
-    nodeTypes,
     edgeTypes,
+    idFieldIndex,
+    ITEMS_PER_EDGE,
+    ITEMS_PER_NODE,
+    nameFieldIndex,
+    nodeTypes,
+    typeFieldIndex,
   } = computeHeapSnapshotIndices(node_types, node_fields, edge_types, edge_fields)
 
   const closureTypeIndex = nodeTypes.indexOf('closure')
@@ -164,7 +164,7 @@ const getClosureInfos = (nodes: Uint32Array, edges: Uint32Array, strings: readon
       const edgeNameIndex = edges[edgeIndex + edgeNameFieldIndex]
       const edgeName = strings[edgeNameIndex] || ''
       // Check if this is a context edge by name (not type)
-      if (edgeName === 'context' || (contextStringIndex >= 0 && edgeNameIndex === contextStringIndex)) {
+      if (edgeName === 'context' || (contextStringIndex !== -1 && edgeNameIndex === contextStringIndex)) {
         contextNodeByteOffset = edges[edgeIndex + edgeToNodeFieldIndex]
         break
       }
@@ -204,9 +204,9 @@ const getClosureInfos = (nodes: Uint32Array, edges: Uint32Array, strings: readon
     // Store first closure info for each name
     if (!nameToClosureInfoMap.has(name)) {
       nameToClosureInfoMap.set(name, {
-        name,
         contextNodeCount,
         id: closureId,
+        name,
         nodeIndex: logicalNodeIndex,
       })
     }
@@ -243,10 +243,10 @@ export const compareNamedClosureCountFromHeapSnapshot = async (pathA: string, pa
       const closureInfo = closureInfosB.get(name)
       if (closureInfo) {
         leakedClosures.push({
-          id: closureInfo.id,
-          name: closureInfo.name,
           contextNodeCount: closureInfo.contextNodeCount,
           delta,
+          id: closureInfo.id,
+          name: closureInfo.name,
         })
       }
     }

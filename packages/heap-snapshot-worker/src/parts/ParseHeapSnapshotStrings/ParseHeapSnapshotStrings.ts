@@ -5,7 +5,7 @@ export const parseHeapSnapshotStrings = (id) => {
 
   const { strings } = heapsnapshot
   if (!Array.isArray(strings)) {
-    throw new Error('no strings found')
+    throw new TypeError('no strings found')
   }
   return strings
 }

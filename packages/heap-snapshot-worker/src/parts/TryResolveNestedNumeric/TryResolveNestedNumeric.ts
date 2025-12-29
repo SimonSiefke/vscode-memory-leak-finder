@@ -1,8 +1,8 @@
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { getActualValueFast } from '../GetActualValueFast/GetActualValueFast.ts'
 import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
 import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
 import { parseNode } from '../ParseNode/ParseNode.ts'
-import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 export const tryResolveNestedNumeric = (
   containerNodeIndex: number,
@@ -11,14 +11,14 @@ export const tryResolveNestedNumeric = (
   propertyName: string,
   visited: Set<number>,
 ): number | null => {
-  const { nodes, edges, strings, meta } = snapshot
+  const { edges, meta, nodes, strings } = snapshot
   const nodeFields = meta.node_fields
   const edgeFields = meta.edge_fields
   const nodeTypes = meta.node_types
   const ITEMS_PER_NODE = nodeFields.length
   const ITEMS_PER_EDGE = edgeFields.length
 
-  const propertyNameIndex = strings.findIndex((s) => s === propertyName)
+  const propertyNameIndex = strings.indexOf(propertyName)
   if (propertyNameIndex === -1) {
     return null
   }

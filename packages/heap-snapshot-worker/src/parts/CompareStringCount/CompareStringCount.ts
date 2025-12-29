@@ -14,7 +14,7 @@ export const compareStringCount = async (beforePath: string, afterPath: string):
   const afterCount = snapshotAfter.strings.length
 
   return {
-    beforeCount,
     afterCount,
+    beforeCount,
   }
 }
