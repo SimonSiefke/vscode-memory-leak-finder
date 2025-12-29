@@ -1,22 +1,30 @@
 import { emptySourceMap } from '../EmptySourceMap/EmptySourceMap.ts'
+import * as LoadSourceMapFromDataUrl from '../LoadSourceMapFromDataUrl/LoadSourceMapFromData.ts'
+import * as LoadSourceMapFromFile from '../LoadSourceMapFromFile/LoadSourceMapFromFile.ts'
+import * as LoadSourceMapFromUrl from '../LoadSourceMapFromUrl/LoadSourceMapFromUrl.ts'
+import * as LoadSourceMapFromVscodeFile from '../LoadSourceMapFromVscodeFile/LoadSourceMapFromVscodeFile.ts'
 
-export const getModule = (protocol: string): Promise<any> | any => {
+interface LoadSourceMap {
+  (url: string, hash: string): Promise<any>
+}
+
+const loadEmptySourceMap: LoadSourceMap = async () => {
+  return emptySourceMap
+}
+
+export const getModule = (protocol: string): LoadSourceMap => {
   switch (protocol) {
     case 'data':
-      return import('../LoadSourceMapFromDataUrl/LoadSourceMapFromData.ts')
+      return LoadSourceMapFromDataUrl.loadSourceMap
     case 'file':
-      return import('../LoadSourceMapFromFile/LoadSourceMapFromFile.ts')
+      return LoadSourceMapFromFile.loadSourceMap
     case 'http':
     case 'https':
-      return import('../LoadSourceMapFromUrl/LoadSourceMapFromUrl.ts')
+      return LoadSourceMapFromUrl.loadSourceMap
     case 'noop':
-      return {
-        loadSourceMap() {
-          return emptySourceMap
-        },
-      }
+      return loadEmptySourceMap
     case 'vscode-file':
-      return import('../LoadSourceMapFromVscodeFile/LoadSourceMapFromVscodeFile.ts')
+      return LoadSourceMapFromVscodeFile.loadSourceMap
     default:
       throw new Error(`unsupported protocol ${protocol}`)
   }
