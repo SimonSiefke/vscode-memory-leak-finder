@@ -4,7 +4,15 @@ import * as DownloadAndUnzipVscode from '../DownloadAndUnzipVscode/DownloadAndUn
 import * as Env from '../Env/Env.ts'
 import * as Root from '../Root/Root.ts'
 
-export const getBinaryPath = async (platform: string, arch: string, vscodeVersion: string, vscodePath: string, commit: string, insidersCommit: string, updateUrl: string): Promise<string> => {
+export const getBinaryPath = async (
+  platform: string,
+  arch: string,
+  vscodeVersion: string,
+  vscodePath: string,
+  commit: string,
+  insidersCommit: string,
+  updateUrl: string,
+): Promise<string> => {
   if (vscodePath) {
     return vscodePath
   }
@@ -21,7 +29,15 @@ export const getBinaryPath = async (platform: string, arch: string, vscodeVersio
     const reposDir = join(Root.root, '.vscode-repos')
     const nodeModulesCacheDir = join(Root.root, '.vscode-node-modules-cache')
     const useNice = platform === 'linux'
-    return await DownloadAndBuildVscodeFromCommit.downloadAndBuildVscodeFromCommit(platform, arch, commit, repoUrl, reposDir, nodeModulesCacheDir, useNice)
+    return await DownloadAndBuildVscodeFromCommit.downloadAndBuildVscodeFromCommit(
+      platform,
+      arch,
+      commit,
+      repoUrl,
+      reposDir,
+      nodeModulesCacheDir,
+      useNice,
+    )
   }
   if (insidersCommit) {
     return await DownloadAndUnzipVscode.downloadAndUnzipVscode({

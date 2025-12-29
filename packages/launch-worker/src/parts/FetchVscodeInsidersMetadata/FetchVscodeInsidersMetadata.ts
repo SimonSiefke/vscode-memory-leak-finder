@@ -8,7 +8,12 @@ export interface IBuildMetadata {
   readonly version: string
 }
 
-export const fetchVscodeInsidersMetadata = async (platform: string, arch: string, commit: string, updateUrl: string): Promise<IBuildMetadata> => {
+export const fetchVscodeInsidersMetadata = async (
+  platform: string,
+  arch: string,
+  commit: string,
+  updateUrl: string,
+): Promise<IBuildMetadata> => {
   const platformName = GetVscodePlatformName.getVscodePlatformName(platform, arch)
   const quality = 'insider'
   const url = `${updateUrl}/api/versions/commit:${commit}/${platformName}/${quality}`
