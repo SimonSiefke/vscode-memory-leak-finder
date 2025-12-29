@@ -56,7 +56,7 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
       cachePath: VscodeTestCachePath.vscodeTestCachePath,
       version: vscodeVersion,
     })
-    const productPath = getProductJsonPath(path)
+    const productPath = GetProductJsonPath.getProductJsonPath(process.platform, path)
     const productJson = await JsonFile.readJson(productPath)
     const newProductJson = AdjustVscodeProductJson.adjustVscodeProductJson(productJson)
     await JsonFile.writeJson(productPath, newProductJson)

@@ -103,6 +103,7 @@ export const runTestsWithCallback = async ({
 
     if (setupOnly && commit) {
       const { memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
+        arch,
         attachedToPageTimeout,
         clearExtensions,
         commit,
@@ -124,11 +125,13 @@ export const runTestsWithCallback = async ({
         measureId: measure,
         measureNode,
         pageObjectPath,
+        platform,
         recordVideo,
         runMode,
         screencastQuality,
         timeouts,
         useProxyMock,
+        updateUrl,
         vscodePath,
         vscodeVersion,
       })
@@ -203,6 +206,7 @@ export const runTestsWithCallback = async ({
         await disposeWorkers(workers)
         PrepareTestsOrAttach.state.promise = undefined
         const { initializationWorkerRpc, memoryRpc, testWorkerRpc, videoRpc } = await PrepareTestsOrAttach.prepareTestsAndAttach({
+          arch,
           attachedToPageTimeout,
           clearExtensions,
           commit,
@@ -224,6 +228,7 @@ export const runTestsWithCallback = async ({
           measureId: measure,
           measureNode,
           pageObjectPath,
+          platform,
           recordVideo,
           runMode,
           screencastQuality,

@@ -45,6 +45,7 @@ export interface PrepareTestsAndAttachOptions {
 
 export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOptions) => {
   const {
+    arch,
     attachedToPageTimeout,
     clearExtensions,
     commit,
@@ -66,6 +67,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
     measureId,
     measureNode,
     pageObjectPath,
+    platform,
     recordVideo,
     runMode,
     screencastQuality,
@@ -78,6 +80,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
   const isFirst = state.promise === undefined
   if (isFirst) {
     state.promise = PrepareTests.prepareTests({
+      arch,
       attachedToPageTimeout,
       clearExtensions,
       commit,
@@ -98,6 +101,7 @@ export const prepareTestsAndAttach = async (options: PrepareTestsAndAttachOption
       inspectSharedProcessPort,
       measureId,
       pageObjectPath,
+      platform,
       recordVideo,
       runMode,
       timeouts,

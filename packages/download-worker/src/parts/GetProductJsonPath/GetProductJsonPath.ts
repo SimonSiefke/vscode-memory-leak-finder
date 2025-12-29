@@ -6,4 +6,3 @@ export const getProductJsonPath = (platform: string, path: string): string => {
   }
   return resolve(path, '..', 'resources', 'app', 'product.json')
 }
-
