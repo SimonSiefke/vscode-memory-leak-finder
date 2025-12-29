@@ -1,15 +1,15 @@
 import { Worker } from 'node:worker_threads'
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { getHeapSnapshotWorkerPath } from '../GetHeapSnapshotWorkerPath/GetHeapSnapshotWorkerPath.ts'
 import { waitForResult } from '../WaitForResult/WaitForResult.ts'
-import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 const createDisposableWorker = (workerPath: string) => {
   const worker = new Worker(workerPath)
   return {
-    worker,
     async [Symbol.asyncDispose]() {
       await worker.terminate()
     },
+    worker,
   }
 }
 

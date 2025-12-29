@@ -27,6 +27,20 @@ const createMockServer = async ({ port }): Promise<MockServer> => {
 
 export const create = ({ expect, page, VError }) => {
   return {
+    async addElementToChat({ selector }) {
+      try {
+        await page.waitForIdle()
+        const add = page.locator('.element-selection-message')
+        await expect(add).toBeVisible()
+        const button = add.locator('[role="button"][aria-label="Click to select an element."]')
+        await expect(button).toBeVisible()
+        await button.click()
+        await page.waitForIdle()
+        await new Promise((r) => {})
+      } catch (error) {
+        throw new VError(error, `Failed to add element to chat`)
+      }
+    },
     async createMockServer({ id, port }) {
       try {
         await page.waitForIdle()
@@ -44,6 +58,20 @@ export const create = ({ expect, page, VError }) => {
         delete this.mockServers[id]
       } catch (error) {
         throw new VError(error, `Failed to dispose mock server`)
+      }
+    },
+    async mockElectronDebugger({ selector }) {
+      try {
+        await page.waitForIdle()
+        const add = page.locator('.element-selection-message')
+        await expect(add).toBeVisible()
+        const button = add.locator('[role="button"][aria-label="Click to select an element."]')
+        await expect(button).toBeVisible()
+        await button.click()
+        await page.waitForIdle()
+        await new Promise((r) => {})
+      } catch (error) {
+        throw new VError(error, `Failed to add element to chat`)
       }
     },
     mockServers: Object.create(null),
@@ -93,34 +121,6 @@ export const create = ({ expect, page, VError }) => {
         await page.waitForIdle()
       } catch (error) {
         throw new VError(error, `Failed to open simple browser`)
-      }
-    },
-    async addElementToChat({ selector }) {
-      try {
-        await page.waitForIdle()
-        const add = page.locator('.element-selection-message')
-        await expect(add).toBeVisible()
-        const button = add.locator('[role="button"][aria-label="Click to select an element."]')
-        await expect(button).toBeVisible()
-        await button.click()
-        await page.waitForIdle()
-        await new Promise((r) => {})
-      } catch (error) {
-        throw new VError(error, `Failed to add element to chat`)
-      }
-    },
-    async mockElectronDebugger({ selector }) {
-      try {
-        await page.waitForIdle()
-        const add = page.locator('.element-selection-message')
-        await expect(add).toBeVisible()
-        const button = add.locator('[role="button"][aria-label="Click to select an element."]')
-        await expect(button).toBeVisible()
-        await button.click()
-        await page.waitForIdle()
-        await new Promise((r) => {})
-      } catch (error) {
-        throw new VError(error, `Failed to add element to chat`)
       }
     },
   }

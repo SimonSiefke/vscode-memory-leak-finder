@@ -8,6 +8,7 @@ export const createDefaultState = (): StdinDataState => ({
   bisect: false,
   buffering: false,
   checkLeaks: false,
+  clearExtensions: true,
   continueValue: '',
   cwd: '',
   enableExtensions: false,
@@ -45,5 +46,4 @@ export const createDefaultState = (): StdinDataState => ({
   value: '',
   watch: false,
   workers: false,
-  clearExtensions: true,
 })

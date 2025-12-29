@@ -51,7 +51,7 @@ console.log(result)
   },
 ]
 
-export const setup = async ({ Editor, Workspace, SideBar }: TestContext): Promise<void> => {
+export const setup = async ({ Editor, SideBar, Workspace }: TestContext): Promise<void> => {
   await Editor.closeAll()
   await SideBar.hide()
   await Workspace.setFiles(initialFiles)

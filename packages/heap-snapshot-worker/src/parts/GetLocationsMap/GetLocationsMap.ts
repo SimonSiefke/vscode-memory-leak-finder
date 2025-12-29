@@ -6,7 +6,7 @@ export const getLocationsMap = (snapshot: Snapshot, indices: readonly number[]):
   }
   const locationFieldCount = snapshot.meta.location_fields.length
   const nodeFieldCount = snapshot.meta.node_fields.length
-  const locations = snapshot.locations
+  const { locations } = snapshot
   const indexOffset = snapshot.meta.location_fields.indexOf('object_index')
   if (indexOffset === -1) {
     throw new Error('index not found')

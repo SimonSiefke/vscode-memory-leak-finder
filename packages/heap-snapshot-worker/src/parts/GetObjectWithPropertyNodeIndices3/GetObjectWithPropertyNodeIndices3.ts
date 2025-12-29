@@ -1,24 +1,24 @@
+import type { Snapshot } from '../Snapshot/Snapshot.ts'
 import { createEdgeMap } from '../CreateEdgeMap/CreateEdgeMap.ts'
 import { matchesProperty } from '../MachesProperty/MatchesProperty.ts'
-import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 /**
  * Returns the node indices for all objects that have the given property name.
  * The returned indices are logical node indices (0-based), not array offsets.
  */
 export const getObjectWithPropertyNodeIndices3 = (snapshot: Snapshot, propertyName: string): Uint32Array => {
-  const { nodes, edges, strings, meta } = snapshot
+  const { edges, meta, nodes, strings } = snapshot
 
   const nodeFields = meta.node_fields
   const edgeFields = meta.edge_fields
   const edgeTypes = meta.edge_types[0] || []
   const nodeTypes = meta.node_types[0] || []
 
-  if (!nodeFields.length || !edgeFields.length) {
+  if (nodeFields.length === 0 || edgeFields.length === 0) {
     return new Uint32Array([])
   }
 
-  const propertyNameIndex = strings.findIndex((str) => str === propertyName)
+  const propertyNameIndex = strings.indexOf(propertyName)
   if (propertyNameIndex === -1) {
     return new Uint32Array([])
   }

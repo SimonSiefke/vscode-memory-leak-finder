@@ -1,6 +1,6 @@
-import { Node } from '../Node/Node.ts'
+import type { Node } from '../Node/Node.ts'
 
 export interface NumberNode extends Node {
-  readonly value: number
   readonly type: 'number'
+  readonly value: number
 }

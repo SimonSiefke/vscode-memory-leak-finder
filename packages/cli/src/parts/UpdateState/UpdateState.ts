@@ -30,6 +30,7 @@ export const updateState = async (newState: any): Promise<void> => {
       arch: state.arch,
       bisect: state.bisect,
       checkLeaks: state.checkLeaks,
+      clearExtensions: state.clearExtensions,
       color: true,
       commit: '',
       continueValue: state.continueValue,
@@ -66,7 +67,6 @@ export const updateState = async (newState: any): Promise<void> => {
       vscodePath: '',
       vscodeVersion: VsCodeVersion.vscodeVersion,
       workers: state.workers,
-      clearExtensions: state.clearExtensions,
     })
   }
   if (newState.mode === ModeType.Interrupted) {

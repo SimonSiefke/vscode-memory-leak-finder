@@ -37,8 +37,8 @@ export const parseHeapSnapshotInternal = (
   const cleanNodes = CleanNodes.cleanNode(parsedNodes)
   const parsedLocations = ParseHeapSnapshotLocations.parseHeapSnapshotLocations(locations, locationFields, nodeFields.length)
   return {
-    parsedNodes: cleanNodes,
     graph,
     locations: parsedLocations,
+    parsedNodes: cleanNodes,
   }
 }

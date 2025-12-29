@@ -14,20 +14,20 @@ export const getArraysFromHeapSnapshotInternal = (
   graph: any,
 ): any[] => {
   const {
-    objectTypeIndex,
-    ITEMS_PER_NODE,
-    ITEMS_PER_EDGE,
-    typeFieldIndex,
-    nameFieldIndex,
-    idFieldIndex,
-    selfSizeFieldIndex,
-    edgeCountFieldIndex,
     detachednessFieldIndex,
-    edgeTypeFieldIndex,
+    edgeCountFieldIndex,
     edgeNameFieldIndex,
     edgeToNodeFieldIndex,
+    edgeTypeFieldIndex,
     edgeTypes,
+    idFieldIndex,
+    ITEMS_PER_EDGE,
+    ITEMS_PER_NODE,
+    nameFieldIndex,
     nodeTypes,
+    objectTypeIndex,
+    selfSizeFieldIndex,
+    typeFieldIndex,
   } = computeHeapSnapshotIndices(node_types, node_fields, edge_types, edge_fields)
 
   const arrayObjects: any[] = []
@@ -48,15 +48,15 @@ export const getArraysFromHeapSnapshotInternal = (
         const detachedness = nodes[i + detachednessFieldIndex]
 
         const arrayObj = {
-          id,
-          name,
-          type: 'array',
-          selfSize,
-          edgeCount,
           detachedness,
-          nodeDataIndex: i,
-          variableNames: [],
+          edgeCount,
+          id,
           length: 0, // Will be calculated
+          name,
+          nodeDataIndex: i,
+          selfSize,
+          type: 'array',
+          variableNames: [],
         }
 
         arrayObjects.push(arrayObj)
@@ -106,8 +106,8 @@ export const getArraysFromHeapSnapshotInternal = (
         ) {
           arrayObj.variableNames.push({
             name: edgeName,
-            sourceType: sourceTypeName,
             sourceName: sourceName,
+            sourceType: sourceTypeName,
           })
         }
       }
@@ -169,8 +169,8 @@ export const getArraysFromHeapSnapshotInternal = (
 
       return {
         id: obj.id,
-        name: displayName,
         length: obj.length,
+        name: displayName,
         type: obj.type,
       }
     })

@@ -52,7 +52,7 @@ class HeapSnapshotWriteStream extends Writable {
   }
 
   writeMetaData(chunk: Uint8Array): void {
-    this.data = concatArray(this.data, chunk) as Uint8Array
+    this.data = concatArray(this.data, chunk)
     const dataString = decodeArray(this.data)
     const metaData = parseHeapSnapshotMetaData(dataString)
     if (metaData === EMPTY_DATA) {
@@ -71,7 +71,7 @@ class HeapSnapshotWriteStream extends Writable {
   }
 
   writeParsingArrayMetaData(chunk: Uint8Array, nodeName: string, nextState: number): void {
-    this.data = concatArray(this.data, chunk) as Uint8Array
+    this.data = concatArray(this.data, chunk)
     const dataString = decodeArray(this.data)
     const endIndex = parseHeapSnapshotArrayHeader(dataString, nodeName)
     if (endIndex === -1) {
@@ -163,7 +163,7 @@ class HeapSnapshotWriteStream extends Writable {
 
     // Concatenate the parsed numbers to the main array
     const parsedNumbers = this.intermediateArray.slice(0, arrayIndex)
-    this.locations = concatUint32Array(this.locations, parsedNumbers) as Uint32Array
+    this.locations = concatUint32Array(this.locations, parsedNumbers)
 
     // Update parsing state for next chunk
     this.currentNumber = currentNumber
@@ -191,7 +191,7 @@ class HeapSnapshotWriteStream extends Writable {
   }
 
   writeParsingStrings(chunk: Uint8Array): void {
-    this.data = concatArray(this.data, chunk) as Uint8Array
+    this.data = concatArray(this.data, chunk)
     // Parse the chunk directly - no concatenation needed due to stateful parsing
     const { dataIndex, done } = parseStringArray(this.data, this.strings)
 
