@@ -1,5 +1,9 @@
-import { expect, jest, test } from '@jest/globals'
+import { beforeEach, expect, jest, test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
+
+beforeEach(() => {
+  jest.resetModules()
+})
 
 test('buildExtension - runs npm ci and npm run compile successfully', async () => {
   const repoPath = '/test/repo'

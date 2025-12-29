@@ -1,5 +1,9 @@
-import { expect, test } from '@jest/globals'
+import { beforeEach, expect, jest, test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
+
+beforeEach(() => {
+  jest.resetModules()
+})
 
 test('installNodeVersion - successfully installs and uses node version', async () => {
   const version = '18.0.0'

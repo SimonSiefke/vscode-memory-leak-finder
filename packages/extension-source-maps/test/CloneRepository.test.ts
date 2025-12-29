@@ -1,8 +1,12 @@
-import { expect, jest, test } from '@jest/globals'
+import { beforeEach, expect, jest, test } from '@jest/globals'
 import { mkdir, rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { MockRpc } from '@lvce-editor/rpc'
+
+beforeEach(() => {
+  jest.resetModules()
+})
 
 test('cloneRepository - executes git commands in sequence', async () => {
   const tempDir = join(tmpdir(), `test-clone-repo-${Date.now()}`)

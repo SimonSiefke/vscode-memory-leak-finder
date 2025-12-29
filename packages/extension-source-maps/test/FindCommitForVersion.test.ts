@@ -1,8 +1,12 @@
-import { expect, jest, test } from '@jest/globals'
+import { beforeEach, expect, jest, test } from '@jest/globals'
 import { mkdir, writeFile, rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { MockRpc } from '@lvce-editor/rpc'
+
+beforeEach(() => {
+  jest.resetModules()
+})
 
 test('findCommitForVersion - finds commit from exact tag', async () => {
   const tempDir = join(tmpdir(), `test-find-commit-${Date.now()}`)

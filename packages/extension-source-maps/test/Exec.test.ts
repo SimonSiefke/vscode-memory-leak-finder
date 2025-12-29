@@ -1,5 +1,9 @@
-import { expect, jest, test } from '@jest/globals'
+import { beforeEach, expect, jest, test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
+
+beforeEach(() => {
+  jest.resetModules()
+})
 
 test('exec - successfully executes command', async () => {
   const mockRpc = MockRpc.create({
