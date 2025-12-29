@@ -13,19 +13,16 @@ export const copySourceMaps = async (repoPath: string, outputDir: string, extens
       join(repoPath, 'extension', 'out'),
     ]
 
-    const sourceMapFiles: string[] = []
-    let sourceMapBaseDir: string | undefined
+    const sourceMapFiles: Array<{ file: string; baseDir: string }> = []
 
     for (const dir of possibleSourceMapDirs) {
       try {
         const entries = await readdir(dir, { recursive: true, withFileTypes: true })
         for (const entry of entries) {
           if (entry.isFile() && entry.name.endsWith('.map')) {
+            // entry.name is the relative path from dir when using recursive: true
             const fullPath = join(dir, entry.name)
-            sourceMapFiles.push(fullPath)
-            if (!sourceMapBaseDir) {
-              sourceMapBaseDir = dir
-            }
+            sourceMapFiles.push({ file: fullPath, baseDir: dir })
           }
         }
       } catch {
@@ -37,10 +34,6 @@ export const copySourceMaps = async (repoPath: string, outputDir: string, extens
       throw new Error('No source map files found in the repository')
     }
 
-    if (!sourceMapBaseDir) {
-      throw new Error('Could not determine source map base directory')
-    }
-
     // Copy source maps to output directory, preserving the directory structure
     // The output should match the extension installation path structure:
     // .vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js.map
@@ -48,8 +41,8 @@ export const copySourceMaps = async (repoPath: string, outputDir: string, extens
     const extensionId = `github.${extensionName}-${version}`
     const extensionOutputDir = join(outputDir, extensionId)
 
-    for (const sourceMapFile of sourceMapFiles) {
-      const relativePath = relative(sourceMapBaseDir, sourceMapFile)
+    for (const { file: sourceMapFile, baseDir } of sourceMapFiles) {
+      const relativePath = relative(baseDir, sourceMapFile)
       const targetPath = join(extensionOutputDir, relativePath)
       const targetDir = dirname(targetPath)
       await mkdir(targetDir, { recursive: true })
@@ -58,10 +51,10 @@ export const copySourceMaps = async (repoPath: string, outputDir: string, extens
 
     // Also copy the corresponding .js files so we have the full context
     // This helps with source map resolution
-    for (const sourceMapFile of sourceMapFiles) {
+    for (const { file: sourceMapFile, baseDir } of sourceMapFiles) {
       const jsFile = sourceMapFile.replace('.map', '')
       try {
-        const relativePath = relative(sourceMapBaseDir, jsFile)
+        const relativePath = relative(baseDir, jsFile)
         const targetPath = join(extensionOutputDir, relativePath)
         const targetDir = dirname(targetPath)
         await mkdir(targetDir, { recursive: true })
