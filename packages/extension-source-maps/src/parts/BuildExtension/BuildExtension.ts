@@ -1,7 +1,10 @@
 import { exec } from '../Exec/Exec.ts'
 import { VError } from '@lvce-editor/verror'
 
-export const buildExtension = async (repoPath: string, nodeVersion: string): Promise<void> => {
+export const buildExtension = async (repoPath: string, nodeVersion: string, platform?: string): Promise<void> => {
+  if (platform === 'win32') {
+    throw new Error('Windows is not supported for this operation')
+  }
   try {
     // Use nvm to switch to the correct node version and run npm ci
     const npmCiResult = await exec('bash', ['-c', `source ~/.nvm/nvm.sh && nvm use ${nodeVersion} && npm ci`], {
