@@ -2,14 +2,14 @@ import { VError } from '@lvce-editor/verror'
 import * as LaunchExecWorker from '../LaunchExecWorker/LaunchExecWorker.ts'
 
 interface ExecOptions {
-  cwd?: string
-  env?: Record<string, string | undefined>
+  readonly cwd?: string
+  readonly env?: Record<string, string | undefined>
 }
 
 interface ExecResult {
-  exitCode: number
-  stderr: string
-  stdout: string
+  readonly exitCode: number
+  readonly stderr: string
+  readonly stdout: string
 }
 
 export const exec = async (command: string, args: string[], options: ExecOptions = {}): Promise<ExecResult> => {
