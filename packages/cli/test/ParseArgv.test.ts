@@ -254,3 +254,45 @@ test('parseArgv - vscode-version with insiders format does not override explicit
   expect(options.vscodeVersion).toBe('')
   expect(options.insidersCommit).toBe('othercommit')
 })
+
+test('parseArgv - only flag', () => {
+  const argv = ['--only', 'editor-open']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.filter).toBe('editor-open')
+})
+
+test('parseArgv - only flag not present', () => {
+  const argv: readonly string[] = []
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.filter).toBe('')
+})
+
+test('parseArgv - only flag empty', () => {
+  const argv = ['--only', '']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.filter).toBe('')
+})
+
+test('parseArgv - only flag replaces dots with dashes for backwards compatibility', () => {
+  const argv = ['--only', 'editor.open']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.filter).toBe('editor-open')
+})
+
+test('parseArgv - only flag replaces multiple dots with dashes', () => {
+  const argv = ['--only', 'activity-bar.switch-views']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.filter).toBe('activity-bar-switch-views')
+})
+
+test('parseArgv - only flag replaces all dots in complex pattern', () => {
+  const argv = ['--only', 'explorer.fs-rename-file']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.filter).toBe('explorer-fs-rename-file')
+})
+
+test('parseArgv - only flag with value that already has dashes', () => {
+  const argv = ['--only', 'editor-open-many-tabs']
+  const options = ParseArgv.parseArgv(argv)
+  expect(options.filter).toBe('editor-open-many-tabs')
+})
