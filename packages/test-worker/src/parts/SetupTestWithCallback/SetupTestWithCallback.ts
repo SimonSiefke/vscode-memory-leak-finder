@@ -2,8 +2,7 @@ import * as Assert from '../Assert/Assert.ts'
 import * as ImportTest from '../ImportTest/ImportTest.ts'
 import * as TestStage from '../TestStage/TestStage.ts'
 
-// @ts-ignore
-export const setupTestWithCallback = async (pageObject, file, forceRun) => {
+export const setupTestWithCallback = async (pageObject: any, file: string, forceRun: boolean, inspectExtensions: boolean) => {
   Assert.object(pageObject)
   Assert.string(file)
   Assert.boolean(forceRun)
@@ -12,6 +11,9 @@ export const setupTestWithCallback = async (pageObject, file, forceRun) => {
   const isCi = process.env.GITHUB_ACTIONS
   if (module.requiresNetwork && isCi) {
     return { error: null, skipped: true, wasOriginallySkipped }
+  }
+  if (inspectExtensions && Array.isArray(module.flags) && module.flags.includes('skipIfInspectExtensions')) {
+    return { skipped: true, wasOriginallySkipped, error: null }
   }
   if (module.skip && !forceRun) {
     return { error: null, skipped: true, wasOriginallySkipped }
