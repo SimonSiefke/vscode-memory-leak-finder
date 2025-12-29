@@ -46,8 +46,8 @@ export const runTests = async ({
   setupOnly,
   timeoutBetween,
   timeouts,
-  useProxyMock,
   updateUrl,
+  useProxyMock,
   vscodePath,
   vscodeVersion,
 }: RunTestsOptions): Promise<RunTestsResult> => {
@@ -99,8 +99,8 @@ export const runTests = async ({
       setupOnly,
       timeoutBetween,
       timeouts,
-      useProxyMock,
       updateUrl,
+      useProxyMock,
       vscodePath,
       vscodeVersion,
     }
@@ -145,8 +145,8 @@ export const runTests = async ({
     setupOnly,
     timeoutBetween,
     timeouts,
-    useProxyMock,
     updateUrl,
+    useProxyMock,
     vscodePath,
     vscodeVersion,
   })

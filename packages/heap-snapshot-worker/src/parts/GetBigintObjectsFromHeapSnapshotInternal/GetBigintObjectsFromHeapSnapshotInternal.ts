@@ -6,38 +6,38 @@ import { computeHeapSnapshotIndices } from '../ComputeHeapSnapshotIndices/Comput
  */
 export interface VariableName {
   readonly name: string
-  readonly sourceType: string
   readonly sourceName: string
+  readonly sourceType: string
 }
 export interface BigintObject {
+  detachedness: number
+  edgeCount: number
   id: number
   name: string
-  value: string
-  selfSize: number
-  edgeCount: number
-  detachedness: number
-  variableNames: VariableName[]
   note: string
+  selfSize: number
+  value: string
+  variableNames: VariableName[]
 }
 
 export const getBigintObjectsFromHeapSnapshotInternal = (snapshot) => {
-  const { nodes, strings, edges, meta } = snapshot
-  const { node_types, node_fields, edge_types, edge_fields } = meta
+  const { edges, meta, nodes, strings } = snapshot
+  const { edge_fields, edge_types, node_fields, node_types } = meta
   const {
     bigintTypeIndex,
-    ITEMS_PER_NODE,
-    ITEMS_PER_EDGE,
-    typeFieldIndex,
-    nameFieldIndex,
-    idFieldIndex,
-    selfSizeFieldIndex,
-    edgeCountFieldIndex,
     detachednessFieldIndex,
-    edgeTypeFieldIndex,
+    edgeCountFieldIndex,
     edgeNameFieldIndex,
     edgeToNodeFieldIndex,
+    edgeTypeFieldIndex,
     edgeTypes,
+    idFieldIndex,
+    ITEMS_PER_EDGE,
+    ITEMS_PER_NODE,
+    nameFieldIndex,
     nodeTypes,
+    selfSizeFieldIndex,
+    typeFieldIndex,
   } = computeHeapSnapshotIndices(node_types, node_fields, edge_types, edge_fields)
 
   if (bigintTypeIndex === -1) {
@@ -58,14 +58,14 @@ export const getBigintObjectsFromHeapSnapshotInternal = (snapshot) => {
       const detachedness = nodes[i + detachednessFieldIndex]
 
       const bigintObj: BigintObject = {
+        detachedness,
+        edgeCount,
         id,
         name,
-        value: name, // This will be "bigint" - the type identifier
-        selfSize,
-        edgeCount,
-        detachedness,
-        variableNames: [], // Will be populated by scanning edges
         note: 'Actual bigint numeric value not accessible via heap snapshot format',
+        selfSize,
+        value: name, // This will be "bigint" - the type identifier
+        variableNames: [], // Will be populated by scanning edges
       }
 
       bigintObjects.push(bigintObj)
@@ -108,8 +108,8 @@ export const getBigintObjectsFromHeapSnapshotInternal = (snapshot) => {
         if (edgeTypeName === 'property' && edgeName !== 'constructor' && edgeName !== '__proto__') {
           bigintObj.variableNames.push({
             name: edgeName,
-            sourceType: sourceTypeName,
             sourceName: sourceName,
+            sourceType: sourceTypeName,
           })
         }
       }

@@ -1,9 +1,9 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
 
 export interface MapNode {
-  readonly nodeIndex: number
-  readonly id: number
   readonly edgeCount: number
+  readonly id: number
+  readonly nodeIndex: number
 }
 export interface ResultItem {
   readonly id: number
@@ -12,8 +12,8 @@ export interface ResultItem {
 }
 
 export const getNamedMapCountFromHeapSnapshotInternal = (snapshot: Snapshot): readonly ResultItem[] => {
-  const { nodes, strings, edges, meta } = snapshot
-  const { node_fields, edge_fields } = meta
+  const { edges, meta, nodes, strings } = snapshot
+  const { edge_fields, node_fields } = meta
 
   const ITEMS_PER_NODE = node_fields.length
   const ITEMS_PER_EDGE = edge_fields.length
@@ -34,9 +34,9 @@ export const getNamedMapCountFromHeapSnapshotInternal = (snapshot: Snapshot): re
     if (nodeType === 4 && nodeNameIndex === mapStringIndex) {
       // type 4 = object
       mapNodes.push({
-        nodeIndex: i / ITEMS_PER_NODE,
-        id: nodeId,
         edgeCount: nodes[i + 4],
+        id: nodeId,
+        nodeIndex: i / ITEMS_PER_NODE,
       })
     }
   }
@@ -53,13 +53,13 @@ export const getNamedMapCountFromHeapSnapshotInternal = (snapshot: Snapshot): re
       const edgeNameOrIndex = edges[i + 1]
       const edgeToNode = edges[i + 2]
 
-      if (edgeToNode === mapNode.nodeIndex) {
-        // This edge points to our Map object
-        if (edgeNameOrIndex < strings.length) {
-          const name = strings[edgeNameOrIndex]
-          if (name && name !== '') {
-            names.add(name)
-          }
+      if (
+        edgeToNode === mapNode.nodeIndex && // This edge points to our Map object
+        edgeNameOrIndex < strings.length
+      ) {
+        const name = strings[edgeNameOrIndex]
+        if (name && name !== '') {
+          names.add(name)
         }
       }
     }
@@ -86,7 +86,7 @@ export const getNamedMapCountFromHeapSnapshotInternal = (snapshot: Snapshot): re
     }
 
     // Convert names Set to array or string
-    const nameArray = Array.from(names)
+    const nameArray = [...names]
     const name = nameArray.length === 1 ? nameArray[0] : nameArray
 
     result.push({

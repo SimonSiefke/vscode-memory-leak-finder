@@ -5,7 +5,7 @@ const emptyItem = {
 }
 
 export const compareHeapSnapshotFunctionsInternal = (result1: any, result2: any, locationFields: readonly string[]): any[] => {
-  const { itemsPerLocation, scriptIdOffset, lineOffset, columnOffset } = getLocationFieldOffsets(locationFields)
+  const { columnOffset, itemsPerLocation, lineOffset, scriptIdOffset } = getLocationFieldOffsets(locationFields)
   const map1 = result1.map
   const map2 = result2.map
   const locations2 = result2.locations

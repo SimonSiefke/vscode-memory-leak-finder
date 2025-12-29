@@ -1,10 +1,10 @@
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
-import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
-import { parseNode } from '../ParseNode/ParseNode.ts'
 import { getActualValueFast } from '../GetActualValueFast/GetActualValueFast.ts'
-import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
-import { getNodeName } from '../GetNodeName/GetNodeName.ts'
 import { getBooleanValue } from '../GetBooleanValue/GetBooleanValue.ts'
+import { getNodeEdgesFast } from '../GetNodeEdgesFast/GetNodeEdgesFast.ts'
+import { getNodeName } from '../GetNodeName/GetNodeName.ts'
+import { getNodeTypeName } from '../GetNodeTypeName/GetNodeTypeName.ts'
+import { parseNode } from '../ParseNode/ParseNode.ts'
 
 /**
  * Collects elements from an array node, returning preview data
@@ -24,7 +24,7 @@ export const collectArrayElements = (
   visited: Set<number> = new Set(),
   maxElements: number = 10,
 ): any[] => {
-  const { nodes, edges, strings, meta } = snapshot
+  const { edges, meta, nodes, strings } = snapshot
   const nodeFields = meta.node_fields
   const edgeFields = meta.edge_fields
   const nodeTypes = meta.node_types
@@ -109,100 +109,113 @@ export const collectArrayElements = (
         } else {
           value = `[Array ${targetNode.id}]`
         }
-      } else if (targetType === 'string' || targetType === 'number') {
-        // For primitives, get the actual value
-        const actual = getActualValueFast(
-          targetNode,
-          snapshot,
-          edgeMap,
-          visited,
-          targetNodeIndex,
-          nodeFields,
-          nodeTypes,
-          edgeFields,
-          strings,
-          ITEMS_PER_NODE,
-          ITEMS_PER_EDGE,
-          idFieldIndex,
-          edgeCountFieldIndex,
-          edgeTypeFieldIndex,
-          edgeNameFieldIndex,
-          edgeToNodeFieldIndex,
-          EDGE_TYPE_INTERNAL,
-          NODE_TYPE_STRING,
-          NODE_TYPE_NUMBER,
-          NODE_TYPE_OBJECT,
-          NODE_TYPE_ARRAY,
-        )
-        if (targetType === 'number') {
-          const parsed = Number(actual)
-          if (Number.isFinite(parsed)) {
-            value = parsed
-          } else {
-            value = actual
+      } else
+        switch (targetType) {
+          case 'code': {
+            // For code objects, try to get the actual value they represent
+            value = getActualValueFast(
+              targetNode,
+              snapshot,
+              edgeMap,
+              visited,
+              targetNodeIndex,
+              nodeFields,
+              nodeTypes,
+              edgeFields,
+              strings,
+              ITEMS_PER_NODE,
+              ITEMS_PER_EDGE,
+              idFieldIndex,
+              edgeCountFieldIndex,
+              edgeTypeFieldIndex,
+              edgeNameFieldIndex,
+              edgeToNodeFieldIndex,
+              EDGE_TYPE_INTERNAL,
+              NODE_TYPE_STRING,
+              NODE_TYPE_NUMBER,
+              NODE_TYPE_OBJECT,
+              NODE_TYPE_ARRAY,
+            )
+
+            break
           }
-        } else {
-          value = actual
+          case 'hidden': {
+            // For hidden nodes, check if it's a boolean or other special value
+            const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap)
+            if (booleanValue) {
+              value = booleanValue
+            } else {
+              value = getActualValueFast(
+                targetNode,
+                snapshot,
+                edgeMap,
+                visited,
+                targetNodeIndex,
+                nodeFields,
+                nodeTypes,
+                edgeFields,
+                strings,
+                ITEMS_PER_NODE,
+                ITEMS_PER_EDGE,
+                idFieldIndex,
+                edgeCountFieldIndex,
+                edgeTypeFieldIndex,
+                edgeNameFieldIndex,
+                edgeToNodeFieldIndex,
+                EDGE_TYPE_INTERNAL,
+                NODE_TYPE_STRING,
+                NODE_TYPE_NUMBER,
+                NODE_TYPE_OBJECT,
+                NODE_TYPE_ARRAY,
+              )
+            }
+
+            break
+          }
+          case 'number':
+          case 'string': {
+            // For primitives, get the actual value
+            const actual = getActualValueFast(
+              targetNode,
+              snapshot,
+              edgeMap,
+              visited,
+              targetNodeIndex,
+              nodeFields,
+              nodeTypes,
+              edgeFields,
+              strings,
+              ITEMS_PER_NODE,
+              ITEMS_PER_EDGE,
+              idFieldIndex,
+              edgeCountFieldIndex,
+              edgeTypeFieldIndex,
+              edgeNameFieldIndex,
+              edgeToNodeFieldIndex,
+              EDGE_TYPE_INTERNAL,
+              NODE_TYPE_STRING,
+              NODE_TYPE_NUMBER,
+              NODE_TYPE_OBJECT,
+              NODE_TYPE_ARRAY,
+            )
+            if (targetType === 'number') {
+              const parsed = Number(actual)
+              if (Number.isFinite(parsed)) {
+                value = parsed
+              } else {
+                value = actual
+              }
+            } else {
+              value = actual
+            }
+
+            break
+          }
+          default: {
+            // For other types
+            value = `[${targetType} ${targetNode.id}]`
+          }
         }
-      } else if (targetType === 'hidden') {
-        // For hidden nodes, check if it's a boolean or other special value
-        const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap)
-        if (booleanValue) {
-          value = booleanValue
-        } else {
-          value = getActualValueFast(
-            targetNode,
-            snapshot,
-            edgeMap,
-            visited,
-            targetNodeIndex,
-            nodeFields,
-            nodeTypes,
-            edgeFields,
-            strings,
-            ITEMS_PER_NODE,
-            ITEMS_PER_EDGE,
-            idFieldIndex,
-            edgeCountFieldIndex,
-            edgeTypeFieldIndex,
-            edgeNameFieldIndex,
-            edgeToNodeFieldIndex,
-            EDGE_TYPE_INTERNAL,
-            NODE_TYPE_STRING,
-            NODE_TYPE_NUMBER,
-            NODE_TYPE_OBJECT,
-            NODE_TYPE_ARRAY,
-          )
-        }
-      } else if (targetType === 'code') {
-        // For code objects, try to get the actual value they represent
-        value = getActualValueFast(
-          targetNode,
-          snapshot,
-          edgeMap,
-          visited,
-          targetNodeIndex,
-          nodeFields,
-          nodeTypes,
-          edgeFields,
-          strings,
-          ITEMS_PER_NODE,
-          ITEMS_PER_EDGE,
-          idFieldIndex,
-          edgeCountFieldIndex,
-          edgeTypeFieldIndex,
-          edgeNameFieldIndex,
-          edgeToNodeFieldIndex,
-          EDGE_TYPE_INTERNAL,
-          NODE_TYPE_STRING,
-          NODE_TYPE_NUMBER,
-          NODE_TYPE_OBJECT,
-          NODE_TYPE_ARRAY,
-        )
-      } else {
-        // For other types
-        value = `[${targetType} ${targetNode.id}]`
-      }
 
       elements.push(value)
     }
@@ -225,7 +238,7 @@ const collectObjectPropertiesInline = (
   depth: number,
   visited: Set<number>,
 ): Record<string, any> => {
-  const { nodes, edges, strings, meta } = snapshot
+  const { edges, meta, nodes, strings } = snapshot
   const nodeFields = meta.node_fields
   const edgeFields = meta.edge_fields
   const nodeTypes = meta.node_types
@@ -297,87 +310,100 @@ const collectObjectPropertiesInline = (
         } else {
           value = `[Array ${targetNode.id}]`
         }
-      } else if (targetType === 'string' || targetType === 'number') {
-        value = getActualValueFast(
-          targetNode,
-          snapshot,
-          edgeMap,
-          visited,
-          targetNodeIndex,
-          nodeFields,
-          nodeTypes,
-          edgeFields,
-          strings,
-          ITEMS_PER_NODE,
-          ITEMS_PER_EDGE,
-          idFieldIndex,
-          edgeCountFieldIndex,
-          edgeTypeFieldIndex,
-          edgeNameFieldIndex,
-          edgeToNodeFieldIndex,
-          EDGE_TYPE_INTERNAL,
-          NODE_TYPE_STRING,
-          NODE_TYPE_NUMBER,
-          NODE_TYPE_OBJECT,
-          NODE_TYPE_ARRAY,
-        )
-      } else if (targetType === 'hidden') {
-        // For hidden nodes, check if it's a boolean or other special value
-        const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap, propertyName)
-        if (booleanValue) {
-          value = booleanValue
-        } else {
-          value = getActualValueFast(
-            targetNode,
-            snapshot,
-            edgeMap,
-            visited,
-            targetNodeIndex,
-            nodeFields,
-            nodeTypes,
-            edgeFields,
-            strings,
-            ITEMS_PER_NODE,
-            ITEMS_PER_EDGE,
-            idFieldIndex,
-            edgeCountFieldIndex,
-            edgeTypeFieldIndex,
-            edgeNameFieldIndex,
-            edgeToNodeFieldIndex,
-            EDGE_TYPE_INTERNAL,
-            NODE_TYPE_STRING,
-            NODE_TYPE_NUMBER,
-            NODE_TYPE_OBJECT,
-            NODE_TYPE_ARRAY,
-          )
+      } else
+        switch (targetType) {
+          case 'code': {
+            value = getActualValueFast(
+              targetNode,
+              snapshot,
+              edgeMap,
+              visited,
+              targetNodeIndex,
+              nodeFields,
+              nodeTypes,
+              edgeFields,
+              strings,
+              ITEMS_PER_NODE,
+              ITEMS_PER_EDGE,
+              idFieldIndex,
+              edgeCountFieldIndex,
+              edgeTypeFieldIndex,
+              edgeNameFieldIndex,
+              edgeToNodeFieldIndex,
+              EDGE_TYPE_INTERNAL,
+              NODE_TYPE_STRING,
+              NODE_TYPE_NUMBER,
+              NODE_TYPE_OBJECT,
+              NODE_TYPE_ARRAY,
+            )
+
+            break
+          }
+          case 'hidden': {
+            // For hidden nodes, check if it's a boolean or other special value
+            const booleanValue = getBooleanValue(targetNode, snapshot, edgeMap, propertyName)
+            if (booleanValue) {
+              value = booleanValue
+            } else {
+              value = getActualValueFast(
+                targetNode,
+                snapshot,
+                edgeMap,
+                visited,
+                targetNodeIndex,
+                nodeFields,
+                nodeTypes,
+                edgeFields,
+                strings,
+                ITEMS_PER_NODE,
+                ITEMS_PER_EDGE,
+                idFieldIndex,
+                edgeCountFieldIndex,
+                edgeTypeFieldIndex,
+                edgeNameFieldIndex,
+                edgeToNodeFieldIndex,
+                EDGE_TYPE_INTERNAL,
+                NODE_TYPE_STRING,
+                NODE_TYPE_NUMBER,
+                NODE_TYPE_OBJECT,
+                NODE_TYPE_ARRAY,
+              )
+            }
+
+            break
+          }
+          case 'number':
+          case 'string': {
+            value = getActualValueFast(
+              targetNode,
+              snapshot,
+              edgeMap,
+              visited,
+              targetNodeIndex,
+              nodeFields,
+              nodeTypes,
+              edgeFields,
+              strings,
+              ITEMS_PER_NODE,
+              ITEMS_PER_EDGE,
+              idFieldIndex,
+              edgeCountFieldIndex,
+              edgeTypeFieldIndex,
+              edgeNameFieldIndex,
+              edgeToNodeFieldIndex,
+              EDGE_TYPE_INTERNAL,
+              NODE_TYPE_STRING,
+              NODE_TYPE_NUMBER,
+              NODE_TYPE_OBJECT,
+              NODE_TYPE_ARRAY,
+            )
+
+            break
+          }
+          default: {
+            value = `[${targetType} ${targetNode.id}]`
+          }
         }
-      } else if (targetType === 'code') {
-        value = getActualValueFast(
-          targetNode,
-          snapshot,
-          edgeMap,
-          visited,
-          targetNodeIndex,
-          nodeFields,
-          nodeTypes,
-          edgeFields,
-          strings,
-          ITEMS_PER_NODE,
-          ITEMS_PER_EDGE,
-          idFieldIndex,
-          edgeCountFieldIndex,
-          edgeTypeFieldIndex,
-          edgeNameFieldIndex,
-          edgeToNodeFieldIndex,
-          EDGE_TYPE_INTERNAL,
-          NODE_TYPE_STRING,
-          NODE_TYPE_NUMBER,
-          NODE_TYPE_OBJECT,
-          NODE_TYPE_ARRAY,
-        )
-      } else {
-        value = `[${targetType} ${targetNode.id}]`
-      }
 
       properties[propertyName] = value
     }

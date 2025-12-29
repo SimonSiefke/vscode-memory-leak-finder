@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
-import { generateKeyPairSync } from 'node:crypto'
 import jwt from 'jsonwebtoken'
+import { generateKeyPairSync } from 'node:crypto'
 import { replaceJwtToken } from '../src/parts/ReplaceJwtToken/ReplaceJwtToken.ts'
 
 test('replaceJwtToken - replaces HS256 token with extended expiration', () => {
