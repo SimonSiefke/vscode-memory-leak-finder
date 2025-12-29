@@ -13,6 +13,7 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     return
   }
   await StartRunning.startRunning({
+    arch: options.arch,
     bisect: options.bisect,
     checkLeaks: options.checkLeaks,
     clearExtensions: options.clearExtensions,
@@ -37,6 +38,7 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     measure: options.measure,
     measureAfter: options.measureAfter,
     measureNode: options.measureNode,
+    platform: options.platform,
     recordVideo: options.recordVideo,
     restartBetween: options.restartBetween,
     runMode: options.runMode,
@@ -47,6 +49,7 @@ export const initialStart = async (options: ReturnType<typeof ParseArgv.parseArg
     timeoutBetween: options.timeoutBetween,
     timeouts: options.timeouts,
     useProxyMock: options.useProxyMock,
+    updateUrl: options.updateUrl,
     vscodePath: options.vscodePath,
     vscodeVersion: options.vscodeVersion,
     workers: options.workers,
