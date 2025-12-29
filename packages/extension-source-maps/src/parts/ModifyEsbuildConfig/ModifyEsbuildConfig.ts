@@ -13,7 +13,7 @@ const BUILD_CALL_REGEX = /(build(?:Sync)?\s*\(\s*\{)([\s\S]*?)(\n\s*\})\)/m
 const SIMPLE_BUILD_REGEX = /(build(?:Sync)?\s*\(\s*\{)([\s\S]*?)(\})/s
 const INDENT_MATCH_REGEX = /\n(\s*)/
 const CONFIG_OBJECT_REGEX = /(export\s+default|module\.exports\s*=\s*)(\{[\s\S]*?)(\n\s*\})/m
-const SIMPLE_CONFIG_REGEX = /(export\s+default|module\.exports\s*=\s*)(\{[\s\S]*?)(\})/s
+const SIMPLE_CONFIG_REGEX = /(export\s+default|module\.exports\s*=\s*)(\{)([\s\S]*?)(\n\s*\})/s
 
 export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
   try {
