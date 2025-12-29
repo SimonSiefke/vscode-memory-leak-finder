@@ -91,6 +91,7 @@ let state: StdinDataState = {
   watch: false,
   workers: false,
   clearExtensions: true,
+  updateUrl: '',
 }
 
 export const setState = (newState: StdinDataState): void => {
@@ -129,6 +130,7 @@ export const setState = (newState: StdinDataState): void => {
     stdout: newState.stdout,
     timeoutBetween: newState.timeoutBetween,
     timeouts: newState.timeouts,
+    updateUrl: newState.updateUrl,
     useProxyMock: newState.useProxyMock,
     value: newState.value,
     watch: newState.watch,
