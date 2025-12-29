@@ -6,8 +6,12 @@ export const buildExtension = async (repoPath: string, nodeVersion: string, plat
     throw new Error('Windows is not supported for this operation')
   }
   try {
+    // nvm is a bash function, so we need to source it first
+    // Try common nvm installation locations
+    const nvmSourceCommand = 'source ~/.nvm/nvm.sh 2>/dev/null || source ~/.config/nvm/nvm.sh 2>/dev/null; '
+
     // Use nvm to switch to the correct node version and run npm ci
-    const npmCiResult = await exec('bash', ['-c', `source ~/.nvm/nvm.sh && nvm use ${nodeVersion} && npm ci`], {
+    const npmCiResult = await exec('bash', ['-c', `${nvmSourceCommand}nvm use ${nodeVersion} && npm ci`], {
       cwd: repoPath,
     })
     if (npmCiResult.exitCode !== 0) {
@@ -15,12 +19,12 @@ export const buildExtension = async (repoPath: string, nodeVersion: string, plat
     }
 
     // Run the build command
-    const buildResult = await exec('bash', ['-c', `source ~/.nvm/nvm.sh && nvm use ${nodeVersion} && npm run compile`], {
+    const buildResult = await exec('bash', ['-c', `${nvmSourceCommand}nvm use ${nodeVersion} && npm run compile`], {
       cwd: repoPath,
     })
     if (buildResult.exitCode !== 0) {
       // Try 'build' if 'compile' fails
-      const buildResult2 = await exec('bash', ['-c', `source ~/.nvm/nvm.sh && nvm use ${nodeVersion} && npm run build`], {
+      const buildResult2 = await exec('bash', ['-c', `${nvmSourceCommand}nvm use ${nodeVersion} && npm run build`], {
         cwd: repoPath,
       })
       if (buildResult2.exitCode !== 0) {
