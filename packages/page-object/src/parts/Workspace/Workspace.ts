@@ -1,8 +1,8 @@
-import { execa } from 'execa'
 import { existsSync } from 'node:fs'
 import { mkdir, readdir, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import * as Electron from '../Electron/Electron.ts'
+import * as Exec from '../Exec/Exec.ts'
 import * as QuickPick from '../QuickPick/QuickPick.ts'
 import * as Root from '../Root/Root.ts'
 import * as WellKnownCommands from '../WellKnownCommands/WellKnownCommands.ts'
@@ -41,9 +41,9 @@ export const create = ({ electronApp, expect, page, VError }) => {
     },
     async initializeGitRepository() {
       const workspace = join(Root.root, '.vscode-test-workspace')
-      await execa('git', ['init'], { cwd: workspace })
-      await execa('git', ['config', 'user.name', 'Test User'], { cwd: workspace })
-      await execa('git', ['config', 'user.email', 'test@example.com'], { cwd: workspace })
+      await Exec.exec('git', ['init'], { cwd: workspace })
+      await Exec.exec('git', ['config', 'user.name', 'Test User'], { cwd: workspace })
+      await Exec.exec('git', ['config', 'user.email', 'test@example.com'], { cwd: workspace })
     },
     async remove(file) {
       const workspace = join(Root.root, '.vscode-test-workspace')
