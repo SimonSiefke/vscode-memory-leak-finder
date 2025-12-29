@@ -1,4 +1,4 @@
-import type { AstNode, MapEntry } from '../AstNode/AstNode.ts'
+import type { AstNode } from '../AstNode/AstNode.ts'
 
 export const signatureFor = (node: AstNode, depth: number): string => {
   switch (node.type) {
