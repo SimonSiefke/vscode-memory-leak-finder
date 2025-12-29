@@ -5,6 +5,7 @@ import { getInitializationWorkerUrl } from '../GetInitializationWorkerUrl/GetIni
 import * as LaunchIde from '../LaunchIde/LaunchIde.ts'
 
 export interface LaunchOptions {
+  readonly arch: string
   readonly attachedToPageTimeout: number
   readonly canUseIdleCallback: boolean
   readonly clearExtensions: boolean
@@ -23,7 +24,9 @@ export interface LaunchOptions {
   readonly inspectSharedProcess: boolean
   readonly inspectSharedProcessPort: number
   readonly isFirstConnection: boolean
+  readonly platform: string
   readonly useProxyMock: boolean
+  readonly updateUrl: string
   readonly vscodePath: string
   readonly vscodeVersion: string
 }
@@ -49,6 +52,7 @@ const launchInitializationWorker = async () => {
 
 export const launch = async (options: LaunchOptions): Promise<any> => {
   const {
+    arch,
     attachedToPageTimeout,
     clearExtensions,
     commit,
@@ -64,12 +68,15 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     inspectPtyHostPort,
     inspectSharedProcess,
     inspectSharedProcessPort,
+    platform,
     useProxyMock,
+    updateUrl,
     vscodePath,
     vscodeVersion,
   } = options
   const { child, parsedVersion } = await LaunchIde.launchIde({
     addDisposable: Disposables.add,
+    arch,
     clearExtensions,
     commit,
     cwd,
@@ -84,7 +91,9 @@ export const launch = async (options: LaunchOptions): Promise<any> => {
     inspectPtyHostPort,
     inspectSharedProcess,
     inspectSharedProcessPort,
+    platform,
     useProxyMock,
+    updateUrl,
     vscodePath,
     vscodeVersion,
   })

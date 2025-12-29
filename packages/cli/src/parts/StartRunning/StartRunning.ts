@@ -23,6 +23,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     return
   }
   const {
+    arch,
     bisect,
     checkLeaks,
     clearExtensions,
@@ -47,6 +48,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     measure,
     measureAfter,
     measureNode,
+    platform,
     recordVideo,
     restartBetween,
     runMode,
@@ -57,6 +59,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     timeoutBetween,
     timeouts,
     useProxyMock,
+    updateUrl,
     vscodePath,
     vscodeVersion,
     workers,
@@ -65,6 +68,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
   await Stdout.write(clear)
   const rpc = await RunTest.prepare()
   const result = await rpc.invoke(TestWorkerCommandType.RunTests, {
+    arch,
     bisect,
     checkLeaks,
     clearExtensions,
@@ -88,6 +92,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     measure,
     measureAfter,
     measureNode,
+    platform,
     recordVideo,
     restartBetween,
     root: cwd,
@@ -99,6 +104,7 @@ export const startRunning = async (options: StartRunningOptions): Promise<void> 
     timeoutBetween,
     timeouts,
     useProxyMock,
+    updateUrl,
     vscodePath,
     vscodeVersion,
     workers,
