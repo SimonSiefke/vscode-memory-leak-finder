@@ -13,7 +13,7 @@ const BUILD_CALL_REGEX = /(build(?:Sync)?\s*\(\s*\{)([\s\S]*?)(\n\s*\})\)/m
 const SIMPLE_BUILD_REGEX = /(build(?:Sync)?\s*\(\s*\{)([\s\S]*?)(\})/s
 const INDENT_MATCH_REGEX = /\n(\s*)/
 const CONFIG_OBJECT_REGEX = /(export\s+default|module\.exports\s*=\s*)(\{[\s\S]*?)(\n\s*\})/m
-const SIMPLE_CONFIG_REGEX = /(export\s+default|module\.exports\s*=\s*)(\{)([\s\S]*?)(\n\s*\})/s
+const SIMPLE_CONFIG_REGEX = /(export\s+default|module\.exports\s*=\s*)\s*(\{[\s\S]*?\n\s*\})/s
 
 export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
   try {
@@ -122,24 +122,31 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
       // Look for a config object - handle multi-line objects better
       let match = content.match(CONFIG_OBJECT_REGEX)
       let configRegex = CONFIG_OBJECT_REGEX
-
+      
       // If that doesn't match, try a simpler pattern
       if (!match) {
         match = content.match(SIMPLE_CONFIG_REGEX)
         configRegex = SIMPLE_CONFIG_REGEX
       }
-
+      
       if (match) {
         const before = match[1]
-        const config = match[2]
-        const after = match[3]
+        let config = match[2]
+        let after = match[3]
+        
+        // If config ends with }, extract the content before it
+        if (config.endsWith('}')) {
+          after = '}'
+          config = config.slice(0, -1)
+        }
 
         if (!config.includes('sourcemap') && !config.includes('sourceMap')) {
           // Detect indentation from the config
           const indentMatch = config.match(INDENT_MATCH_REGEX)
           const indent = indentMatch ? indentMatch[1] : '  '
           const lastComma = config.trim().endsWith(',') || config.trim() === '{' ? '' : ','
-          const modifiedContent = content.replace(configRegex, `${before}${config}${lastComma}\n${indent}sourcemap: true,${after}`)
+          const closingBrace = after || '}'
+          const modifiedContent = content.replace(configRegex, `${before}${config}${lastComma}\n${indent}sourcemap: true${closingBrace}`)
           await writeFile(configPath, modifiedContent, 'utf8')
           return
         }
