@@ -10,6 +10,7 @@ export const state: State = {
 }
 
 export interface PrepareTestsAndAttachOptions {
+  readonly arch: string
   readonly attachedToPageTimeout: number
   readonly clearExtensions: boolean
   readonly commit: string
@@ -31,6 +32,7 @@ export interface PrepareTestsAndAttachOptions {
   readonly measureId: string
   readonly measureNode: boolean
   readonly pageObjectPath: string
+  readonly platform: string
   readonly recordVideo: boolean
   readonly runMode: number
   readonly screencastQuality: number

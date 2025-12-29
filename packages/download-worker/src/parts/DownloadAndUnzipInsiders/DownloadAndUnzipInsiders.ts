@@ -1,11 +1,11 @@
 import * as os from 'node:os'
 import { basename, join } from 'node:path'
-import { resolve } from 'node:path'
 import * as AdjustVscodeProductJson from '../AdjustVscodeProductJson/AdjustVscodeProductJson.ts'
 import * as CollectSourceMapUrls from '../CollectSourceMapUrls/CollectSourceMapUrls.ts'
 import * as Download from '../Download/Download.ts'
 import * as DownloadAndExtract from '../DownloadAndExtract/DownloadAndExtract.ts'
 import * as FetchVscodeInsidersMetadata from '../FetchVscodeInsidersMetadata/FetchVscodeInsidersMetadata.ts'
+import * as GetProductJsonPath from '../GetProductJsonPath/GetProductJsonPath.ts'
 import * as GetVscodeRuntimePath from '../GetVscodeRuntimePath/GetVscodeRuntimePath.ts'
 import * as JsonFile from '../JsonFile/JsonFile.ts'
 import * as LoadSourceMaps from '../LoadSourceMaps/LoadSourceMaps.ts'
@@ -13,13 +13,6 @@ import * as RemoveUnusedFiles from '../RemoveUnusedFiles/RemoveUnusedFiles.ts'
 import * as Root from '../Root/Root.ts'
 
 const automaticallyDownloadSourceMaps = false
-
-const getProductJsonPath = (platform: string, path: string): string => {
-  if (platform === 'darwin') {
-    return resolve(path, '..', '..', 'Resources', 'app', 'product.json')
-  }
-  return resolve(path, '..', 'resources', 'app', 'product.json')
-}
 
 const getBinaryPathFromExtractDir = (platform: string, arch: string, extractDir: string): string => {
   if (platform === 'darwin') {
@@ -58,7 +51,7 @@ export const downloadAndUnzipInsiders = async (platform: string, arch: string, c
   await DownloadAndExtract.downloadAndExtract('vscode-insiders', [metadata.url], extractDir)
   console.log(`[download-worker] Download complete.`)
   const path = getBinaryPathFromExtractDir(platform, arch, extractDir)
-  const productPath = getProductJsonPath(platform, path)
+  const productPath = GetProductJsonPath.getProductJsonPath(platform, path)
   const productJson = await JsonFile.readJson(productPath)
   const newProductJson = AdjustVscodeProductJson.adjustVscodeProductJson(productJson)
   await JsonFile.writeJson(productPath, newProductJson)

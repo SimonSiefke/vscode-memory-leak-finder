@@ -1,21 +1,14 @@
 import { VError } from '@lvce-editor/verror'
-import { resolve } from 'node:path'
 import * as AdjustVscodeProductJson from '../AdjustVscodeProductJson/AdjustVscodeProductJson.ts'
 import * as CollectSourceMapUrls from '../CollectSourceMapUrls/CollectSourceMapUrls.ts'
 import * as DownloadAndUnzipInsiders from '../DownloadAndUnzipInsiders/DownloadAndUnzipInsiders.ts'
 import * as Env from '../Env/Env.ts'
+import * as GetProductJsonPath from '../GetProductJsonPath/GetProductJsonPath.ts'
 import * as GetVscodeRuntimePath from '../GetVscodeRuntimePath/GetVscodeRuntimePath.ts'
 import * as JsonFile from '../JsonFile/JsonFile.ts'
 import * as LoadSourceMaps from '../LoadSourceMaps/LoadSourceMaps.ts'
 import * as RemoveUnusedFiles from '../RemoveUnusedFiles/RemoveUnusedFiles.ts'
 import * as VscodeTestCachePath from '../VscodeTestCachePath/VscodeTestCachePath.ts'
-
-const getProductJsonPath = (path: string): string => {
-  if (process.platform === 'darwin') {
-    return resolve(path, '..', '..', 'Resources', 'app', 'product.json')
-  }
-  return resolve(path, '..', 'resources', 'app', 'product.json')
-}
 
 const automaticallyDownloadSourceMaps = false
 
