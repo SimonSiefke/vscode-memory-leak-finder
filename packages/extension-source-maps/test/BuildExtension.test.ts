@@ -220,3 +220,11 @@ test('buildExtension - uses correct node version in commands', async () => {
 
   expect(capturedNodeVersion).toBe(nodeVersion)
 })
+
+test('buildExtension - throws error when platform is win32', async () => {
+  const repoPath = '/test/repo'
+  const nodeVersion = '18.0.0'
+
+  const { buildExtension } = await import('../src/parts/BuildExtension/BuildExtension.ts')
+  await expect(buildExtension(repoPath, nodeVersion, 'win32')).rejects.toThrow('Windows is not supported for this operation')
+})
