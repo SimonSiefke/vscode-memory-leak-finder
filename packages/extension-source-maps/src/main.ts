@@ -1,8 +1,8 @@
 import { join } from 'node:path'
 import * as GenerateExtensionSourceMaps from './parts/GenerateExtensionSourceMaps/GenerateExtensionSourceMaps.ts'
+import { root } from './parts/Root/Root.ts'
 
 const main = async (): Promise<void> => {
-  const root = join(import.meta.dirname, '../../..')
   const cacheDir = join(root, '.extension-source-maps-cache')
   const outputDir = join(root, '.extension-source-maps')
 
