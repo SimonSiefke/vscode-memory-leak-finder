@@ -18,6 +18,11 @@ export const launchExecWorker = async () => {
     path: url,
     stdio: 'inherit',
   })
-  return rpc
+  return {
+    invoke: rpc.invoke.bind(rpc),
+    async [Symbol.asyncDispose]() {
+      await rpc.dispose()
+    },
+  }
 }
 
