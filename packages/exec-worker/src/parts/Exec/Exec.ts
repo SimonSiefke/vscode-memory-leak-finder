@@ -4,7 +4,7 @@ interface ExecOptions {
   readonly cwd?: string
   readonly env?: Record<string, string | undefined>
   readonly reject?: boolean
-  readonly stdio?: string
+  readonly stdio?: any
 }
 
 interface ExecResult {
