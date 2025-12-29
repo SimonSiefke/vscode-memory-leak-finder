@@ -156,12 +156,12 @@ const downloadWithRetry = async (url: string, outputPath: string, maxRetries = 3
 /**
  * Pre-caches ripgrep binary to avoid GitHub API 403 errors
  */
-export const preCacheRipgrep = async (): Promise<void> => {
+export const preCacheRipgrep = async (platform: string, arch: string): Promise<void> => {
   try {
     Logger.log('[ripgrep] Pre-caching ripgrep binary to avoid GitHub API issues')
 
     // Determine target platform
-    const target = getTarget()
+    const target = getTarget(platform, arch)
     Logger.log(`[ripgrep] Detected target: ${target}`)
 
     // Get appropriate version
@@ -169,7 +169,7 @@ export const preCacheRipgrep = async (): Promise<void> => {
     Logger.log(`[ripgrep] Using version: ${version}`)
 
     // Construct asset name
-    const extension = os.platform() === 'win32' ? '.zip' : '.tar.gz'
+    const extension = platform === 'win32' ? '.zip' : '.tar.gz'
     const assetName = `ripgrep-${version}-${target}${extension}`
     Logger.log(`[ripgrep] Asset name: ${assetName}`)
 
