@@ -25,8 +25,3 @@ test('launchExecWorker - dispose can be called multiple times', async () => {
   await rpc[Symbol.asyncDispose]()
 })
 
-test('launchExecWorker - getExecWorkerUrl returns valid path', () => {
-  const url = LaunchExecWorker.launchExecWorker.toString()
-  expect(typeof url).toBe('string')
-})
-

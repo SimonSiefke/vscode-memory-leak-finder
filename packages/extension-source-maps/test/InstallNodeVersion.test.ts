@@ -1,4 +1,4 @@
-import { expect, test } from '@jest/globals'
+import { expect, jest, test } from '@jest/globals'
 import { MockRpc } from '@lvce-editor/rpc'
 import * as InstallNodeVersion from '../src/parts/InstallNodeVersion/InstallNodeVersion.ts'
 import * as Exec from '../src/parts/Exec/Exec.ts'
@@ -226,4 +226,3 @@ test('installNodeVersion - uses correct version in install command', async () =>
 
   expect(capturedVersion).toBe(version)
 })
-
