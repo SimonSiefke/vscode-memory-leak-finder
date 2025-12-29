@@ -15,19 +15,24 @@ export const copySourceMaps = async (repoPath: string, outputDir: string, extens
 
     const sourceMapFiles: Array<{ file: string; baseDir: string }> = []
 
-    for (const dir of possibleSourceMapDirs) {
+    const collectSourceMaps = async (dir: string, baseDir: string): Promise<void> => {
       try {
-        const entries = await readdir(dir, { recursive: true, withFileTypes: true })
+        const entries = await readdir(dir, { withFileTypes: true })
         for (const entry of entries) {
+          const fullPath = join(dir, entry.name)
           if (entry.isFile() && entry.name.endsWith('.map')) {
-            // entry.name is the relative path from dir when using recursive: true
-            const fullPath = join(dir, entry.name)
-            sourceMapFiles.push({ file: fullPath, baseDir: dir })
+            sourceMapFiles.push({ file: fullPath, baseDir })
+          } else if (entry.isDirectory()) {
+            await collectSourceMaps(fullPath, baseDir)
           }
         }
       } catch {
-        // Directory doesn't exist, skip
+        // Directory doesn't exist or can't be read, skip
       }
+    }
+
+    for (const dir of possibleSourceMapDirs) {
+      await collectSourceMaps(dir, dir)
     }
 
     if (sourceMapFiles.length === 0) {

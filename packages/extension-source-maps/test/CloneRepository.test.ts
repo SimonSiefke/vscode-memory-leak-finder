@@ -158,8 +158,8 @@ test('cloneRepository - handles different repo URLs', async () => {
   const mockRpc = MockRpc.create({
     commandMap: {},
     invoke: (method: string, command: string, args: string[]) => {
-      if (method === 'exec.exec' && command === 'git' && args[0] === 'remote') {
-        capturedRepoUrl = args[2]
+      if (method === 'exec.exec' && command === 'git' && args[0] === 'remote' && args[1] === 'add') {
+        capturedRepoUrl = args[3]
         return {
           exitCode: 0,
           stdout: '',

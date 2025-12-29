@@ -52,15 +52,23 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
 
     // Check if sourcemap is already enabled
     if (content.includes('sourcemap:') || content.includes('sourceMap:')) {
+      // Detect which case is used (sourcemap or sourceMap)
+      const usesCamelCase = content.includes('sourceMap:')
+      
       // Already has sourcemap config, modify it
-      const modifiedContent = content
-        .replace(/sourcemap:\s*false/gi, 'sourcemap: true')
+      let modifiedContent = content
+        .replace(/sourcemap:\s*false/gi, usesCamelCase ? 'sourceMap: true' : 'sourcemap: true')
         .replace(/sourceMap:\s*false/gi, 'sourceMap: true')
-        .replace(/sourcemap:\s*['"]none['"]/gi, "sourcemap: 'inline'")
+        .replace(/sourcemap:\s*['"]none['"]/gi, usesCamelCase ? "sourceMap: 'inline'" : "sourcemap: 'inline'")
         .replace(/sourceMap:\s*['"]none['"]/gi, "sourceMap: 'inline'")
 
       if (modifiedContent !== content) {
         await writeFile(configPath, modifiedContent, 'utf8')
+        return
+      }
+      
+      // Check if sourcemap is already true
+      if (content.match(/sourcemap:\s*true/gi) || content.match(/sourceMap:\s*true/gi)) {
         return
       }
     }
@@ -70,17 +78,28 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
     if (content.includes('build(') || content.includes('buildSync(')) {
       // Try to add sourcemap to the first build options object
       // Match build({ ... }) and add sourcemap if not present
-      const buildCallRegex = /(build(?:Sync)?\s*\(\s*\{)([^}]*?)(\})/s
-      const match = content.match(buildCallRegex)
+      // Use a more sophisticated regex that handles nested objects
+      const buildCallRegex = /(build(?:Sync)?\s*\(\s*\{)([\s\S]*?)(\n\s*\})\)/m
+      let match = content.match(buildCallRegex)
+      
+      // If that doesn't match, try a simpler pattern
+      if (!match) {
+        const simpleBuildRegex = /(build(?:Sync)?\s*\(\s*\{)([\s\S]*?)(\})/s
+        match = content.match(simpleBuildRegex)
+      }
+      
       if (match) {
         const before = match[1]
         const options = match[2]
         const after = match[3]
 
         if (!options.includes('sourcemap') && !options.includes('sourceMap')) {
+          // Detect indentation from the options
+          const indentMatch = options.match(/\n(\s*)/)
+          const indent = indentMatch ? indentMatch[1] : '  '
           // Add sourcemap before the closing brace
-          const lastComma = options.trim().endsWith(',') ? '' : ','
-          const modifiedContent = content.replace(buildCallRegex, `${before}${options}${lastComma}\n    sourcemap: true,${after}`)
+          const lastComma = options.trim().endsWith(',') || options.trim() === '' ? '' : ','
+          const modifiedContent = content.replace(buildCallRegex, `${before}${options}${lastComma}\n${indent}sourcemap: true,${after}`)
           await writeFile(configPath, modifiedContent, 'utf8')
           return
         }
@@ -89,17 +108,27 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
 
     // Try to find export default or module.exports with a config object
     if (content.includes('export default') || content.includes('module.exports')) {
-      // Look for a config object
-      const configObjectRegex = /(export\s+default|module\.exports\s*=\s*)(\{[^}]*?)(\})/s
-      const match = content.match(configObjectRegex)
+      // Look for a config object - handle multi-line objects better
+      const configObjectRegex = /(export\s+default|module\.exports\s*=\s*)(\{[\s\S]*?)(\n\s*\})/m
+      let match = content.match(configObjectRegex)
+      
+      // If that doesn't match, try a simpler pattern
+      if (!match) {
+        const simpleConfigRegex = /(export\s+default|module\.exports\s*=\s*)(\{[\s\S]*?)(\})/s
+        match = content.match(simpleConfigRegex)
+      }
+      
       if (match) {
         const before = match[1]
         const config = match[2]
         const after = match[3]
 
         if (!config.includes('sourcemap') && !config.includes('sourceMap')) {
-          const lastComma = config.trim().endsWith(',') ? '' : ','
-          const modifiedContent = content.replace(configObjectRegex, `${before}${config}${lastComma}\n  sourcemap: true,${after}`)
+          // Detect indentation from the config
+          const indentMatch = config.match(/\n(\s*)/)
+          const indent = indentMatch ? indentMatch[1] : '  '
+          const lastComma = config.trim().endsWith(',') || config.trim() === '{' ? '' : ','
+          const modifiedContent = content.replace(configObjectRegex, `${before}${config}${lastComma}\n${indent}sourcemap: true,${after}`)
           await writeFile(configPath, modifiedContent, 'utf8')
           return
         }
