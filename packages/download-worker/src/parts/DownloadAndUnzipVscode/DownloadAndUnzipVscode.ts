@@ -21,9 +21,6 @@ export interface DownloadAndUnzipVscodeOptions {
   readonly vscodeVersion: string
 }
 
-/**
- * @param {DownloadAndUnzipVscodeOptions} options
- */
 export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOptions): Promise<string> => {
   try {
     Assert.object(options)
