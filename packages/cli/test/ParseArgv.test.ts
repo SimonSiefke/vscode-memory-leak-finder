@@ -3,7 +3,7 @@ import * as ParseArgv from '../src/parts/ParseArgv/ParseArgv.ts'
 
 test('parseArgv - empty', () => {
   const argv: readonly string[] = []
-  expect(ParseArgv.parseArgv(argv)).toMatchObject({})
+  expect(ParseArgv.parseArgv('linux', 'x64', argv)).toMatchObject({})
 })
 
 test('parseArgv - watch mode', () => {

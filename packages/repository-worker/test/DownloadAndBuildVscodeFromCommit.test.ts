@@ -164,7 +164,7 @@ test.skip('downloadVscodeCommit - tests git clone operations with mocked execa',
 
   mockMkdir.mockReturnValue(undefined)
 
-  await downloadAndBuildVscodeFromCommit(testCommitHash, testRepoUrl, testReposDir, '/test/cache', false)
+  await downloadAndBuildVscodeFromCommit('linux', 'x64', testCommitHash, testRepoUrl, testReposDir, '/test/cache', false)
 
   // Verify that makeDirectory was called to create the repos directory
   expect(mockMkdir).toHaveBeenCalledWith(reposDir)

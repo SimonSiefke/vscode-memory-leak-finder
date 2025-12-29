@@ -48,7 +48,7 @@ export const downloadAndUnzipVscode = async (options: DownloadAndUnzipVscodeOpti
     }
 
     if (insidersCommit) {
-      const updateUrl = options.updateUrl || 'https://update.code.visualstudio.com'
+      const updateUrl = typeof options === 'object' && options.updateUrl ? options.updateUrl : 'https://update.code.visualstudio.com'
       return await DownloadAndUnzipInsiders.downloadAndUnzipInsiders(platform, arch, insidersCommit, updateUrl)
     }
 
