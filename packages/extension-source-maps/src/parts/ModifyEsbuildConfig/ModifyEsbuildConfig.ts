@@ -77,7 +77,7 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
         await writeFile(configPath, modifiedContent, 'utf8')
         return
       }
-      
+
       // Check if sourcemap is already true
       if (content.match(SOURCE_MAP_TRUE_CASE_INSENSITIVE_REGEX) || content.match(SOURCE_MAP_TRUE_REGEX)) {
         return
@@ -92,13 +92,13 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
       // Use a more sophisticated regex that handles nested objects
       let match = content.match(BUILD_CALL_REGEX)
       let buildRegex = BUILD_CALL_REGEX
-      
+
       // If that doesn't match, try a simpler pattern
       if (!match) {
         match = content.match(SIMPLE_BUILD_REGEX)
         buildRegex = SIMPLE_BUILD_REGEX
       }
-      
+
       if (match) {
         const before = match[1]
         const options = match[2]
@@ -122,13 +122,13 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
       // Look for a config object - handle multi-line objects better
       let match = content.match(CONFIG_OBJECT_REGEX)
       let configRegex = CONFIG_OBJECT_REGEX
-      
+
       // If that doesn't match, try a simpler pattern
       if (!match) {
         match = content.match(SIMPLE_CONFIG_REGEX)
         configRegex = SIMPLE_CONFIG_REGEX
       }
-      
+
       if (match) {
         const before = match[1]
         const config = match[2]
