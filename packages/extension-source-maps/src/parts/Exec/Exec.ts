@@ -28,4 +28,3 @@ export const exec = async (command: string, args: string[], options: ExecOptions
     throw new VError(error, `Failed to execute command: ${command} ${args.join(' ')}`)
   }
 }
-

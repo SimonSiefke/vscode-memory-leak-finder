@@ -81,4 +81,3 @@ export const copySourceMaps = async (
     throw new VError(error, `Failed to copy source maps from '${repoPath}' to '${outputDir}'`)
   }
 }
-

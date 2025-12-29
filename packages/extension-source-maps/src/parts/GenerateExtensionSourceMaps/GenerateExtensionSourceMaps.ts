@@ -73,4 +73,3 @@ export const generateExtensionSourceMaps = async ({
 
   console.log(`Successfully generated source maps for ${extensionName} ${version}`)
 }
-

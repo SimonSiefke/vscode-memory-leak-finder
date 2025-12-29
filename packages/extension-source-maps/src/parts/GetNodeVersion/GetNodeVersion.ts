@@ -25,4 +25,3 @@ export const getNodeVersion = async (repoPath: string): Promise<string> => {
     throw new VError(error, `Failed to get node version from '${repoPath}'`)
   }
 }
-

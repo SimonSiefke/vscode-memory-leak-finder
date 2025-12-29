@@ -25,4 +25,3 @@ export const installNodeVersion = async (version: string): Promise<string> => {
     throw new VError(error, `Failed to install node version '${version}'`)
   }
 }
-

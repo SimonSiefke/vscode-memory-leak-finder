@@ -31,7 +31,7 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
       const packageJsonContent = await readFile(packageJsonPath, 'utf8')
       const packageJson = JSON.parse(packageJsonContent)
       const scripts = packageJson.scripts || {}
-      
+
       // Check if there's a build script that might reference a config
       const buildScript = scripts.compile || scripts.build
       if (buildScript && buildScript.includes('esbuild')) {
@@ -55,7 +55,7 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
     }
 
     const content = await readFile(configPath, 'utf8')
-    
+
     // Check if sourcemap is already enabled
     if (content.includes('sourcemap:') || content.includes('sourceMap:')) {
       // Already has sourcemap config, modify it
@@ -64,7 +64,7 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
         .replace(/sourceMap:\s*false/gi, 'sourceMap: true')
         .replace(/sourcemap:\s*['"]none['"]/gi, "sourcemap: 'inline'")
         .replace(/sourceMap:\s*['"]none['"]/gi, "sourceMap: 'inline'")
-      
+
       if (modifiedContent !== content) {
         await writeFile(configPath, modifiedContent, 'utf8')
         return
@@ -82,7 +82,7 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
         const before = match[1]
         const options = match[2]
         const after = match[3]
-        
+
         if (!options.includes('sourcemap') && !options.includes('sourceMap')) {
           // Add sourcemap before the closing brace
           const lastComma = options.trim().endsWith(',') ? '' : ','
@@ -95,7 +95,7 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
         }
       }
     }
-    
+
     // Try to find export default or module.exports with a config object
     if (content.includes('export default') || content.includes('module.exports')) {
       // Look for a config object
@@ -105,7 +105,7 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
         const before = match[1]
         const config = match[2]
         const after = match[3]
-        
+
         if (!config.includes('sourcemap') && !config.includes('sourceMap')) {
           const lastComma = config.trim().endsWith(',') ? '' : ','
           const modifiedContent = content.replace(
@@ -124,4 +124,3 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
     throw new VError(error, `Failed to modify esbuild config in '${repoPath}'`)
   }
 }
-

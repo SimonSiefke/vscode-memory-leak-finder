@@ -13,4 +13,3 @@ export const cloneRepository = async (repoUrl: string, repoPath: string, commit:
     throw new VError(error, `Failed to clone repository from '${repoUrl}' to '${repoPath}'`)
   }
 }
-

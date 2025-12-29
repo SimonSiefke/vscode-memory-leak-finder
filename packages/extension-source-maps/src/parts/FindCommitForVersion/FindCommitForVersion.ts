@@ -52,4 +52,3 @@ export const findCommitForVersion = async (repoPath: string, version: string): P
     throw new VError(error, `Failed to find commit for version '${version}'`)
   }
 }
-

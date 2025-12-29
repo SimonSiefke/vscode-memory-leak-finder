@@ -28,4 +28,3 @@ export const buildExtension = async (repoPath: string, nodeVersion: string): Pro
     throw new VError(error, `Failed to build extension in '${repoPath}'`)
   }
 }
-
