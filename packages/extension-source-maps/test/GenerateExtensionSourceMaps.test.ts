@@ -426,6 +426,10 @@ test('generateExtensionSourceMaps - logs messages correctly', async () => {
     installNodeVersion: async () => installedVersion,
   }))
 
+  jest.unstable_mockModule('../src/parts/InstallDependencies/InstallDependencies.ts', () => ({
+    installDependencies: async () => {},
+  }))
+
   jest.unstable_mockModule('../src/parts/ModifyEsbuildConfig/ModifyEsbuildConfig.ts', () => ({
     modifyEsbuildConfig: async () => {},
   }))
@@ -454,6 +458,8 @@ test('generateExtensionSourceMaps - logs messages correctly', async () => {
   expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Node version: ${nodeVersion}`)
   expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Installing node version ${nodeVersion}...`)
   expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Node version ${installedVersion} installed successfully`)
+  expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Installing dependencies...`)
+  expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Dependencies installed successfully`)
   expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Modifying esbuild config to generate sourcemaps...`)
   expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Building extension...`)
   expect(consoleSpy).toHaveBeenCalledWith(`[extension-source-maps] Copying source maps...`)
