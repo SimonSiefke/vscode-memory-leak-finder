@@ -13,7 +13,7 @@ export const compareDomTimerCount = async (beforePath: string, afterPath: string
   const countBefore = getDomTimerCountFromHeapSnapshotInternal(snapshotBefore)
   const countAfter = getDomTimerCountFromHeapSnapshotInternal(snapshotAfter)
   return {
-    beforeCount: countBefore,
     afterCount: countAfter,
+    beforeCount: countBefore,
   }
 }

@@ -5,20 +5,20 @@ import * as HeapSnapshotState from '../HeapSnapshotState/HeapSnapshotState.ts'
 import * as ParseHeapSnapshot from '../ParseHeapSnapshot/ParseHeapSnapshot.ts'
 
 interface GraphEdge {
-  name: string
   index: number
+  name: string
 }
 interface Graph {
   [nodeId: number]: GraphEdge[]
 }
 interface ParsedNode {
   id: number
-  type: string
   name: string
+  type: string
 }
 interface ArrayWithCount {
-  id: number
   count: number
+  id: number
 }
 
 const isArray = (node: ParsedNode): boolean => {
@@ -44,8 +44,8 @@ const getArraysWithCount = (parsedNodes: readonly ParsedNode[], graph: Graph, ar
   for (const arrayNode of arrayNodes) {
     const count = getElementCount(parsedNodes, graph, arrayNode.id)
     withCount.push({
-      id: arrayNode.id,
       count,
+      id: arrayNode.id,
     })
   }
   return withCount
@@ -90,7 +90,7 @@ export const getLargestArraysFromHeapSnapshot = async (id: number): Promise<Arra
   const heapsnapshot = HeapSnapshotState.get(id)
   Assert.object(heapsnapshot)
   const minLength = 1
-  const { parsedNodes, graph } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
+  const { graph, parsedNodes } = ParseHeapSnapshot.parseHeapSnapshot(heapsnapshot)
   const arrayNodes = parsedNodes.filter(isArray)
   const arraysWithLength = getArraysWithCount(parsedNodes, graph, arrayNodes)
   const filtered = filterByMinLength(arraysWithLength, minLength)

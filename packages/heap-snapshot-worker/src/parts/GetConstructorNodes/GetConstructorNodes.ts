@@ -1,8 +1,8 @@
 import * as Assert from '../Assert/Assert.ts'
 
 interface NodeLike {
-  readonly type: string
   readonly name: string
+  readonly type: string
 }
 
 export const getConstructorNodes = <T extends NodeLike>(parsedNodes: readonly T[], constructorName: string): T[] => {

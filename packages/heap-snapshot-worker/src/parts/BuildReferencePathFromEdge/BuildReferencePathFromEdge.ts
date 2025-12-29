@@ -12,48 +12,62 @@ export const buildReferencePathFromEdge = (
   let edgeName = ''
   let path = ''
 
-  if (edgeTypeName === 'property') {
-    edgeName = strings[edgeNameOrIndex] || `<string_${edgeNameOrIndex}>`
-    if (sourceNodeName) {
-      path = `${sourceNodeName}.${edgeName}`
-    } else {
-      path = `[Object ${sourceNodeId}].${edgeName}`
+  switch (edgeTypeName) {
+    case 'context': {
+      edgeName = 'context'
+      if (sourceNodeName) {
+        path = `${sourceNodeName}.context`
+      } else {
+        path = `[Closure ${sourceNodeId}].context`
+      }
+
+      break
     }
-  } else if (edgeTypeName === 'element') {
-    edgeName = `[${edgeNameOrIndex}]`
-    if (sourceNodeName) {
-      path = `${sourceNodeName}${edgeName}`
-    } else {
-      path = `[Array ${sourceNodeId}]${edgeName}`
+    case 'element': {
+      edgeName = `[${edgeNameOrIndex}]`
+      if (sourceNodeName) {
+        path = `${sourceNodeName}${edgeName}`
+      } else {
+        path = `[Array ${sourceNodeId}]${edgeName}`
+      }
+
+      break
     }
-  } else if (edgeTypeName === 'context') {
-    edgeName = 'context'
-    if (sourceNodeName) {
-      path = `${sourceNodeName}.context`
-    } else {
-      path = `[Closure ${sourceNodeId}].context`
+    case 'internal': {
+      edgeName = 'internal'
+      if (sourceNodeName) {
+        path = `${sourceNodeName}.internal`
+      } else {
+        path = `[${sourceNodeType} ${sourceNodeId}].internal`
+      }
+
+      break
     }
-  } else if (edgeTypeName === 'internal') {
-    edgeName = 'internal'
-    if (sourceNodeName) {
-      path = `${sourceNodeName}.internal`
-    } else {
-      path = `[${sourceNodeType} ${sourceNodeId}].internal`
+    case 'property': {
+      edgeName = strings[edgeNameOrIndex] || `<string_${edgeNameOrIndex}>`
+      if (sourceNodeName) {
+        path = `${sourceNodeName}.${edgeName}`
+      } else {
+        path = `[Object ${sourceNodeId}].${edgeName}`
+      }
+
+      break
     }
-  } else {
-    edgeName = edgeTypeName
-    if (sourceNodeName) {
-      path = `${sourceNodeName}.${edgeTypeName}`
-    } else {
-      path = `[${sourceNodeType} ${sourceNodeId}].${edgeTypeName}`
+    default: {
+      edgeName = edgeTypeName
+      if (sourceNodeName) {
+        path = `${sourceNodeName}.${edgeTypeName}`
+      } else {
+        path = `[${sourceNodeType} ${sourceNodeId}].${edgeTypeName}`
+      }
     }
   }
 
   return {
+    edgeName,
+    edgeType: edgeTypeName,
+    path,
     sourceNodeName,
     sourceNodeType,
-    edgeType: edgeTypeName,
-    edgeName,
-    path,
   }
 }

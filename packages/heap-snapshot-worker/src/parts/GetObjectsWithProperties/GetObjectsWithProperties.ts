@@ -1,6 +1,6 @@
-import { getObjectsWithPropertiesInternal } from '../GetObjectsWithPropertiesInternal/GetObjectsWithPropertiesInternal.ts'
 import type { ObjectWithProperty } from '../ObjectWithProperty/ObjectWithProperty.ts'
 import type { Snapshot } from '../Snapshot/Snapshot.ts'
+import { getObjectsWithPropertiesInternal } from '../GetObjectsWithPropertiesInternal/GetObjectsWithPropertiesInternal.ts'
 
 /**
  * Finds objects in a heap snapshot that have a specific property
