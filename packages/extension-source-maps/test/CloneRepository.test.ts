@@ -2,6 +2,7 @@ import { beforeEach, expect, jest, test } from '@jest/globals'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { MockRpc } from '@lvce-editor/rpc'
+import { rm } from 'node:fs/promises'
 
 beforeEach(() => {
   jest.resetModules()
