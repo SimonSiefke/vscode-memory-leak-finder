@@ -52,7 +52,7 @@ export interface LongChainResult {
   readonly suspiciousProperties: readonly SuspiciousProperty[]
 }
 
-export interface PollutionCandidate {
+interface PollutionCandidate {
   readonly prototypeName: string
   readonly propertyName: string
   readonly affectedObjects: number[]
