@@ -9,12 +9,7 @@ beforeEach(() => {
 })
 
 test('getNodeVersion - extracts version from engines.node and fetches latest', async () => {
-  const mockVersions = [
-    { version: 'v18.20.0' },
-    { version: 'v18.19.0' },
-    { version: 'v20.15.0' },
-    { version: 'v19.5.0' },
-  ]
+  const mockVersions = [{ version: 'v18.20.0' }, { version: 'v18.19.0' }, { version: 'v20.15.0' }, { version: 'v19.5.0' }]
 
   const mockRpc = MockRpc.create({
     commandMap: {},
@@ -52,12 +47,7 @@ test('getNodeVersion - extracts version from engines.node and fetches latest', a
 })
 
 test('getNodeVersion - handles version without patch and fetches latest', async () => {
-  const mockVersions = [
-    { version: 'v20.15.0' },
-    { version: 'v20.10.0' },
-    { version: 'v18.20.0' },
-    { version: 'v19.5.0' },
-  ]
+  const mockVersions = [{ version: 'v20.15.0' }, { version: 'v20.10.0' }, { version: 'v18.20.0' }, { version: 'v19.5.0' }]
 
   const mockRpc = MockRpc.create({
     commandMap: {},
@@ -95,12 +85,7 @@ test('getNodeVersion - handles version without patch and fetches latest', async 
 })
 
 test('getNodeVersion - handles version with only major and fetches latest', async () => {
-  const mockVersions = [
-    { version: 'v18.20.0' },
-    { version: 'v18.19.0' },
-    { version: 'v20.15.0' },
-    { version: 'v19.5.0' },
-  ]
+  const mockVersions = [{ version: 'v18.20.0' }, { version: 'v18.19.0' }, { version: 'v20.15.0' }, { version: 'v19.5.0' }]
 
   const mockRpc = MockRpc.create({
     commandMap: {},
@@ -180,12 +165,7 @@ test('getNodeVersion - throws error when version cannot be parsed', async () => 
 })
 
 test('getNodeVersion - handles exact version and fetches latest', async () => {
-  const mockVersions = [
-    { version: 'v20.15.0' },
-    { version: 'v20.10.0' },
-    { version: 'v18.20.0' },
-    { version: 'v19.5.0' },
-  ]
+  const mockVersions = [{ version: 'v20.15.0' }, { version: 'v20.10.0' }, { version: 'v18.20.0' }, { version: 'v19.5.0' }]
 
   const mockRpc = MockRpc.create({
     commandMap: {},
@@ -223,12 +203,7 @@ test('getNodeVersion - handles exact version and fetches latest', async () => {
 })
 
 test('getNodeVersion - handles version with tilde and fetches latest', async () => {
-  const mockVersions = [
-    { version: 'v18.20.0' },
-    { version: 'v18.19.0' },
-    { version: 'v20.15.0' },
-    { version: 'v19.5.0' },
-  ]
+  const mockVersions = [{ version: 'v18.20.0' }, { version: 'v18.19.0' }, { version: 'v20.15.0' }, { version: 'v19.5.0' }]
 
   const mockRpc = MockRpc.create({
     commandMap: {},

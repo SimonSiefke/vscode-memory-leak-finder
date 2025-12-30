@@ -41,11 +41,7 @@ const compareVersions = (a: ParsedVersion, b: ParsedVersion): number => {
 }
 
 export const filterAndSortNodeVersions = (versions: readonly NodeVersionInfo[], majorVersion: number): readonly ParsedVersion[] => {
-  const matchingVersions = versions
-    .filter(filterByMajorVersion(majorVersion))
-    .map(parseVersion)
-    .filter(isNotNull)
-    .sort(compareVersions)
+  const matchingVersions = versions.filter(filterByMajorVersion(majorVersion)).map(parseVersion).filter(isNotNull).sort(compareVersions)
 
   return matchingVersions
 }
