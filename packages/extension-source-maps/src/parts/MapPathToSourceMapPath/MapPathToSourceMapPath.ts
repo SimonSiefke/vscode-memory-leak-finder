@@ -20,11 +20,9 @@ export const mapPathToSourceMapPath = (path: string, root: string): string | nul
   const extensionId = extensionMatch[1]
   const relativePath = extensionMatch[2]
 
-  // Convert extension ID from github.copilot-chat-0.36.2025121004 to copilot-chat-v0.36.2025121004
+  // Convert extension ID from github.copilot-chat-0.36.2025121004 to copilot-chat-0.36.2025121004
   // Remove 'github.' prefix
-  const withoutPrefix = extensionId.replace(GITHUB_PREFIX_REGEX, '')
-  // Add 'v' prefix to version if not present
-  const cacheDirName = withoutPrefix.startsWith('copilot-chat-v') ? withoutPrefix : withoutPrefix.replace(COPILOT_CHAT_PREFIX_REGEX, 'copilot-chat-v')
+  const cacheDirName = extensionId.replace(GITHUB_PREFIX_REGEX, '')
 
   // Map to source maps cache directory
   const sourceMapPath = join(root, '.extension-source-maps-cache', cacheDirName, relativePath + '.map')

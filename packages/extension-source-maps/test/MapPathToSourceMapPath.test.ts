@@ -7,7 +7,7 @@ test('mapPathToSourceMapPath - maps relative copilot extension path', () => {
   const root = tmpdir()
   const path = '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js'
   const result = MapPathToSourceMapPath.mapPathToSourceMapPath(path, root)
-  const expected = join(root, '.extension-source-maps-cache', 'copilot-chat-v0.36.2025121004', 'dist/extension.js.map')
+  const expected = join(root, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/extension.js.map')
   expect(result).toBe(expected)
 })
 
@@ -15,7 +15,7 @@ test('mapPathToSourceMapPath - maps absolute copilot extension path', () => {
   const root = tmpdir()
   const absolutePath = join(root, '.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js')
   const result = MapPathToSourceMapPath.mapPathToSourceMapPath(absolutePath, root)
-  const expected = join(root, '.extension-source-maps-cache', 'copilot-chat-v0.36.2025121004', 'dist/extension.js.map')
+  const expected = join(root, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/extension.js.map')
   expect(result).toBe(expected)
 })
 
@@ -43,7 +43,7 @@ test('mapPathToSourceMapPath - handles nested paths', () => {
   const root = tmpdir()
   const path = '.vscode-extensions/github.copilot-chat-1.0.0/src/utils/helper.js'
   const result = MapPathToSourceMapPath.mapPathToSourceMapPath(path, root)
-  const expected = join(root, '.extension-source-maps-cache', 'copilot-chat-v1.0.0', 'src/utils/helper.js.map')
+  const expected = join(root, '.extension-source-maps-cache', 'copilot-chat-1.0.0', 'src/utils/helper.js.map')
   expect(result).toBe(expected)
 })
 
@@ -105,6 +105,6 @@ test('mapPathToSourceMapPath - handles absolute path with Unix-style root', () =
   const root = '/home/user'
   const absolutePath = '/home/user/.vscode-extensions/github.copilot-chat-0.36.2025121004/dist/extension.js'
   const result = MapPathToSourceMapPath.mapPathToSourceMapPath(absolutePath, root)
-  const expected = join(root, '.extension-source-maps-cache', 'copilot-chat-v0.36.2025121004', 'dist/extension.js.map')
+  const expected = join(root, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/extension.js.map')
   expect(result).toBe(expected)
 })
