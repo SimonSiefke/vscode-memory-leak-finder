@@ -13,7 +13,7 @@ export const installNodeVersion = async (version: string): Promise<string> => {
 
     const checkResult = await exec('bash', ['-c', checkCommand], {})
     if (checkResult.exitCode !== 0) {
-      throw new Error(`Failed to check if node version ${version} is installed: ${checkResult.stderr}`)
+      throw new Error(`Failed to install node version ${version}: ${checkResult.stderr}`)
     }
 
     const isInstalled = checkResult.stdout.trim() === 'installed'
