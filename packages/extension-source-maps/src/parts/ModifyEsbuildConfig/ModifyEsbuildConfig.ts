@@ -16,6 +16,8 @@ const SIMPLE_BUILD_REGEX = /(build(?:Sync)?\s*\(\s*\{)([\s\S]*?)(\})/s
 const INDENT_MATCH_REGEX = /\n(\s*)/
 const CONFIG_OBJECT_REGEX = /(export\s+default|module\.exports\s*=\s*)(\{[\s\S]*?)(\n\s*\})/m
 const SIMPLE_CONFIG_REGEX = /(export\s+default|module\.exports\s*=\s*)\s*(\{[\s\S]*?\n\s*\})/s
+const TYPE_ANNOTATED_CONFIG_REGEX = /(export\s+default|module\.exports\s*=\s*)\s*(\{[\s\S]*?\})\s*:\s*BuildOptions/ms
+const MULTILINE_BUILD_REGEX = /((?:esbuild\.|\.)build(?:Sync)?\s*\(\s*\{)([\s\S]*?)(\}\))/s
 
 export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
   try {
@@ -90,14 +92,19 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
 
     // Add sourcemap config if it doesn't exist
     // Try to find the build function call or config object
-    if (content.includes('build(') || content.includes('buildSync(')) {
+    if (content.includes('build(') || content.includes('buildSync(') || content.includes('.build(') || content.includes('.buildSync(')) {
       // Try to add sourcemap to the first build options object
       // Match build({ ... }) and add sourcemap if not present
       // Use a more sophisticated regex that handles nested objects
-      let match = content.match(BUILD_CALL_REGEX)
-      let buildRegex = BUILD_CALL_REGEX
+      let match = content.match(MULTILINE_BUILD_REGEX)
+      let buildRegex = MULTILINE_BUILD_REGEX
 
-      // If that doesn't match, try a simpler pattern
+      // If that doesn't match, try other patterns
+      if (!match) {
+        match = content.match(BUILD_CALL_REGEX)
+        buildRegex = BUILD_CALL_REGEX
+      }
+
       if (!match) {
         match = content.match(SIMPLE_BUILD_REGEX)
         buildRegex = SIMPLE_BUILD_REGEX
@@ -133,10 +140,16 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
         configRegex = SIMPLE_CONFIG_REGEX
       }
 
+      // Try TypeScript type-annotated config
+      if (!match) {
+        match = content.match(TYPE_ANNOTATED_CONFIG_REGEX)
+        configRegex = TYPE_ANNOTATED_CONFIG_REGEX
+      }
+
       if (match) {
         const before = match[1]
         let config = match[2]
-        let after = match[3]
+        let after = match[3] || ''
 
         // If config ends with }, extract the content before it
         if (config.endsWith('}')) {
@@ -154,6 +167,46 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
           await writeFile(configPath, modifiedContent, 'utf8')
           return
         }
+      }
+    }
+
+    // Last resort: try to find any object literal that looks like an esbuild config
+    // Look for objects with common esbuild properties
+    const esbuildPropertyPatterns = ['entryPoints', 'bundle', 'outfile', 'outdir', 'format', 'platform', 'target']
+    const hasEsbuildProperties = esbuildPropertyPatterns.some((prop) => content.includes(prop))
+    
+    if (hasEsbuildProperties) {
+      // Try to find object literals that look like esbuild configs
+      // Match objects that are likely to be the main config (have multiple esbuild properties)
+      const objectLiteralRegex = /(\{[\s\S]*?)(\n\s*\})/g
+      let bestMatch: { match: RegExpMatchArray; score: number } | null = null
+      let match: RegExpMatchArray | null
+      
+      // Reset regex lastIndex to avoid issues with global regex
+      objectLiteralRegex.lastIndex = 0
+      
+      while ((match = objectLiteralRegex.exec(content)) !== null) {
+        const objContent = match[1]
+        // Check if this object has esbuild properties and doesn't have sourcemap
+        if (!objContent.includes('sourcemap') && !objContent.includes('sourceMap')) {
+          // Score based on how many esbuild properties it has
+          const score = esbuildPropertyPatterns.filter((prop) => objContent.includes(prop)).length
+          // Prefer objects with at least 2 esbuild properties
+          if (score >= 2 && (!bestMatch || score > bestMatch.score)) {
+            bestMatch = { match, score }
+          }
+        }
+      }
+
+      if (bestMatch) {
+        const before = bestMatch.match[1]
+        const after = bestMatch.match[2]
+        const indentMatch = before.match(INDENT_MATCH_REGEX)
+        const indent = indentMatch ? indentMatch[1] : '  '
+        const lastComma = before.trim().endsWith(',') || before.trim() === '{' ? '' : ','
+        const modifiedContent = content.replace(bestMatch.match[0], `${before}${lastComma}\n${indent}sourcemap: true${after}`)
+        await writeFile(configPath, modifiedContent, 'utf8')
+        return
       }
     }
 
