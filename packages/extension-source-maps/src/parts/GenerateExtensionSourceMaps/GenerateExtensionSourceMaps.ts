@@ -32,7 +32,11 @@ export const generateExtensionSourceMaps = async ({
   const extensionId = `github.${extensionName}-${normalizedVersion}`
   const sourceMapsOutputPath = join(outputDir, extensionId)
   if (existsSync(sourceMapsOutputPath)) {
-    console.log(`[extension-source-maps] Source maps for ${extensionName} ${version} already exist, skipping...`)
+    const displayName = extensionName
+      .split('-')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+    console.log(`[extension-source-maps] Source maps for ${displayName} ${version} already exist, skipping...`)
     return
   }
 
