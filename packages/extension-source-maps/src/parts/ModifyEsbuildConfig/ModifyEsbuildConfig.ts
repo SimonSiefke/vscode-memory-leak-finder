@@ -18,7 +18,7 @@ const SIMPLE_CONFIG_REGEX = /(export\s+default|module\.exports\s*=\s*)\s*(\{[\s\
 export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
   try {
     // Look for esbuild config files - common names: esbuild.js, esbuild.config.js, build.js, etc.
-    const possibleConfigFiles = ['esbuild.js', 'esbuild.config.js', 'build.js', 'scripts/build.js', 'src/build.js']
+    const possibleConfigFiles = ['.esbuild.ts', 'esbuild.js', 'esbuild.config.js', 'build.js', 'scripts/build.js', 'src/build.js']
 
     let configPath: string | undefined
     for (const configFile of possibleConfigFiles) {

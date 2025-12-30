@@ -15,9 +15,31 @@ test('installNodeVersion - successfully installs and uses node version', async (
     invoke: (method: string, command: string, args: string[]) => {
       if (method === 'exec.exec' && command === 'bash') {
         callCount++
+        const commandStr = args[1]
+        if (commandStr.includes('versions/node/v')) {
+          return {
+            exitCode: 0,
+            stdout: 'not_installed',
+            stderr: '',
+          }
+        }
+        if (commandStr.includes('nvm install')) {
+          return {
+            exitCode: 0,
+            stdout: '',
+            stderr: '',
+          }
+        }
+        if (commandStr.includes('node --version')) {
+          return {
+            exitCode: 0,
+            stdout: installedVersion,
+            stderr: '',
+          }
+        }
         return {
           exitCode: 0,
-          stdout: installedVersion,
+          stdout: '',
           stderr: '',
         }
       }
@@ -35,22 +57,46 @@ test('installNodeVersion - successfully installs and uses node version', async (
   const result = await installNodeVersion(version)
 
   expect(result).toBe(installedVersion)
-  expect(callCount).toBe(1)
+  expect(callCount).toBe(3)
 })
 
-test('installNodeVersion - sources nvm when command not found', async () => {
+test('installNodeVersion - skips install when version already installed', async () => {
   const version = '18.0.0'
   const installedVersion = 'v18.0.0'
 
   let callCount = 0
+  let installCalled = false
   const mockRpc = MockRpc.create({
     commandMap: {},
     invoke: (method: string, command: string, args: string[]) => {
       if (method === 'exec.exec' && command === 'bash') {
         callCount++
+        const commandStr = args[1]
+        if (commandStr.includes('nvm list')) {
+          return {
+            exitCode: 0,
+            stdout: 'installed',
+            stderr: '',
+          }
+        }
+        if (commandStr.includes('nvm install')) {
+          installCalled = true
+          return {
+            exitCode: 0,
+            stdout: '',
+            stderr: '',
+          }
+        }
+        if (commandStr.includes('node --version')) {
+          return {
+            exitCode: 0,
+            stdout: installedVersion,
+            stderr: '',
+          }
+        }
         return {
           exitCode: 0,
-          stdout: installedVersion,
+          stdout: '',
           stderr: '',
         }
       }
@@ -68,18 +114,17 @@ test('installNodeVersion - sources nvm when command not found', async () => {
   const result = await installNodeVersion(version)
 
   expect(result).toBe(installedVersion)
-  expect(callCount).toBe(1)
+  expect(callCount).toBe(2)
+  expect(installCalled).toBe(false)
 })
 
 test('installNodeVersion - throws error when nvm is not available', async () => {
   const version = '18.0.0'
 
-  let callCount = 0
   const mockRpc = MockRpc.create({
     commandMap: {},
     invoke: (method: string, command: string, args: string[]) => {
       if (method === 'exec.exec' && command === 'bash') {
-        callCount++
         return {
           exitCode: 1,
           stdout: '',
@@ -103,16 +148,29 @@ test('installNodeVersion - throws error when nvm is not available', async () => 
 test('installNodeVersion - throws error when install fails', async () => {
   const version = '18.0.0'
 
-  let callCount = 0
   const mockRpc = MockRpc.create({
     commandMap: {},
     invoke: (method: string, command: string, args: string[]) => {
       if (method === 'exec.exec' && command === 'bash') {
-        callCount++
+        const commandStr = args[1]
+        if (commandStr.includes('nvm list')) {
+          return {
+            exitCode: 0,
+            stdout: 'not_installed',
+            stderr: '',
+          }
+        }
+        if (commandStr.includes('nvm install')) {
+          return {
+            exitCode: 1,
+            stdout: '',
+            stderr: 'install failed',
+          }
+        }
         return {
-          exitCode: 1,
+          exitCode: 0,
           stdout: '',
-          stderr: 'install failed',
+          stderr: '',
         }
       }
       throw new Error(`unexpected method ${method}`)
@@ -162,10 +220,22 @@ test('installNodeVersion - uses correct version in install command', async () =>
     invoke: (method: string, command: string, args: string[]) => {
       if (method === 'exec.exec' && command === 'bash') {
         const commandStr = args[1]
+        if (commandStr.includes('nvm list')) {
+          return {
+            exitCode: 0,
+            stdout: 'not_installed',
+            stderr: '',
+          }
+        }
         if (commandStr.includes('nvm install')) {
           const match = commandStr.match(/nvm install (\S+)/)
           if (match) {
             capturedVersion = match[1]
+          }
+          return {
+            exitCode: 0,
+            stdout: '',
+            stderr: '',
           }
         }
         if (commandStr.includes('node --version')) {
