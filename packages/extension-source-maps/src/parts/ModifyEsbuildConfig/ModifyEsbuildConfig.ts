@@ -9,6 +9,8 @@ const SOURCE_MAP_NONE_REGEX = /sourceMap:\s*['"]none['"]/g
 const SOURCE_MAP_NONE_CASE_INSENSITIVE_REGEX = /sourcemap:\s*['"]none['"]/gi
 const SOURCE_MAP_TRUE_CASE_INSENSITIVE_REGEX = /sourcemap:\s*true/gi
 const SOURCE_MAP_TRUE_REGEX = /sourceMap:\s*true/g
+const SOURCE_MAP_ISDEV_LINKED_FALSE_REGEX = /sourceMap:\s*isDev\s*\?\s*['"]linked['"]\s*:\s*false/g
+const SOURCE_MAP_ISDEV_LINKED_FALSE_CASE_INSENSITIVE_REGEX = /sourcemap:\s*isDev\s*\?\s*['"]linked['"]\s*:\s*false/gi
 const BUILD_CALL_REGEX = /(build(?:Sync)?\s*\(\s*\{)([\s\S]*?)(\n\s*\})\)/m
 const SIMPLE_BUILD_REGEX = /(build(?:Sync)?\s*\(\s*\{)([\s\S]*?)(\})/s
 const INDENT_MATCH_REGEX = /\n(\s*)/
@@ -68,6 +70,8 @@ export const modifyEsbuildConfig = async (repoPath: string): Promise<void> => {
       // Already has sourcemap config, modify it while preserving case
       // Match sourceMap (camelCase) first, then sourcemap (lowercase)
       let modifiedContent = content
+        .replace(SOURCE_MAP_ISDEV_LINKED_FALSE_REGEX, "sourceMap: isDev ? 'linked' : 'linked'")
+        .replace(SOURCE_MAP_ISDEV_LINKED_FALSE_CASE_INSENSITIVE_REGEX, "sourcemap: isDev ? 'linked' : 'linked'")
         .replace(SOURCE_MAP_FALSE_REGEX, 'sourceMap: true')
         .replace(SOURCE_MAP_FALSE_CASE_INSENSITIVE_REGEX, 'sourcemap: true')
         .replace(SOURCE_MAP_NONE_REGEX, "sourceMap: 'inline'")

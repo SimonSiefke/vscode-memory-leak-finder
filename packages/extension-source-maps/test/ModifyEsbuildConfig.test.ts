@@ -256,3 +256,28 @@ esbuild.build({
 
   await rm(tempRepo, { recursive: true, force: true })
 })
+
+test('modifyEsbuildConfig - replaces isDev linked false with linked linked', async () => {
+  const tempRepo = join(tmpdir(), `test-modify-esbuild-${Date.now()}`)
+  await mkdir(tempRepo, { recursive: true })
+
+  const configContent = `import * as esbuild from 'esbuild'
+
+const isDev = process.env.NODE_ENV !== 'production'
+
+esbuild.build({
+  entryPoints: ['src/index.ts'],
+  sourcemap: isDev ? 'linked' : false,
+})
+`
+
+  await writeFile(join(tempRepo, 'esbuild.js'), configContent)
+
+  await ModifyEsbuildConfig.modifyEsbuildConfig(tempRepo)
+
+  const modifiedContent = await readFile(join(tempRepo, 'esbuild.js'), 'utf8')
+  expect(modifiedContent).toContain("sourcemap: isDev ? 'linked' : 'linked'")
+  expect(modifiedContent).not.toContain("sourcemap: isDev ? 'linked' : false")
+
+  await rm(tempRepo, { recursive: true, force: true })
+})
