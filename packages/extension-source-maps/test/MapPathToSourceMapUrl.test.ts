@@ -6,7 +6,7 @@ import * as MapPathToSourceMapUrl from '../src/parts/MapPathToSourceMapUrl/MapPa
 
 test('mapPathToSourceMapUrl - returns file URL when source map exists', async () => {
   const tempRoot = join(tmpdir(), `test-map-path-${Date.now()}`)
-  const extensionSourceMapsDir = join(tempRoot, '.extension-source-maps', 'github.copilot-chat-0.36.2025121004', 'dist')
+  const extensionSourceMapsDir = join(tempRoot, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist')
   await mkdir(extensionSourceMapsDir, { recursive: true })
   await writeFile(join(extensionSourceMapsDir, 'extension.js.map'), '{}')
 

@@ -2,7 +2,6 @@ import { join, resolve } from 'node:path'
 
 const EXTENSION_PATH_REGEX = /\.vscode-extensions\/(github\.copilot-chat-[^/]+)\/(.+)$/
 const GITHUB_PREFIX_REGEX = /^github\./
-const COPILOT_CHAT_PREFIX_REGEX = /^copilot-chat-/
 
 export const mapPathToSourceMapPath = (path: string, root: string): string | null => {
   if (!path) {
