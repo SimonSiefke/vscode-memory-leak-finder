@@ -20,3 +20,4 @@ export const mapPathToSourceMapPath = (path: string, root: string): string | nul
   const sourceMapPath = join(root, '.extension-source-maps', extensionId, relativePath + '.map')
   return sourceMapPath
 }
+

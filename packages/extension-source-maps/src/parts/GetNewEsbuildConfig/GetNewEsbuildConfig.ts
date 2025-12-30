@@ -162,3 +162,4 @@ export const getNewEsbuildConfig = (oldConfig: string): string => {
   // If we couldn't modify automatically, throw an error
   throw new Error(`Could not automatically modify esbuild config. Please add sourcemap: true manually.`)
 }
+

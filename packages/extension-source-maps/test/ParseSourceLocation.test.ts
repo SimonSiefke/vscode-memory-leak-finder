@@ -44,3 +44,4 @@ test('parseSourceLocation - handles paths with colons in filename', () => {
     column: 10,
   })
 })
+

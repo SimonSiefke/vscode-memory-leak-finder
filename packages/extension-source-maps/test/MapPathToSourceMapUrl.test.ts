@@ -39,3 +39,4 @@ test('mapPathToSourceMapUrl - returns null for non-copilot extension path', () =
   const result = MapPathToSourceMapUrl.mapPathToSourceMapUrl(path, tempRoot)
   expect(result).toBeNull()
 })
+
