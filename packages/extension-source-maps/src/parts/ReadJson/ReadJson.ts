@@ -9,3 +9,4 @@ export const readJson = async (path: string): Promise<any> => {
     throw new VError(error, `Failed to read json`)
   }
 }
+
