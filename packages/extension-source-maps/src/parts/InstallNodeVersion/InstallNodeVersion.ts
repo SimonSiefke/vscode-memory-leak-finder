@@ -20,22 +20,14 @@ export const installNodeVersion = async (version: string): Promise<string> => {
 
     // Install only if not already installed
     if (!isInstalled) {
-      const installResult = await exec(
-        'bash',
-        ['-c', `${nvmSourceCommand}nvm install ${version}`],
-        {},
-      )
+      const installResult = await exec('bash', ['-c', `${nvmSourceCommand}nvm install ${version}`], {})
       if (installResult.exitCode !== 0) {
         throw new Error(`Failed to install node version ${version}: ${installResult.stderr}`)
       }
     }
 
     // Use the node version and get the installed version
-    const useResult = await exec(
-      'bash',
-      ['-c', `${nvmSourceCommand}nvm use ${version} && node --version`],
-      {},
-    )
+    const useResult = await exec('bash', ['-c', `${nvmSourceCommand}nvm use ${version} && node --version`], {})
     if (useResult.exitCode !== 0) {
       throw new Error(`Failed to use node version ${version}: ${useResult.stderr}`)
     }
