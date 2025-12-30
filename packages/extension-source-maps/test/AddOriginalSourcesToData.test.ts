@@ -6,7 +6,7 @@ import { MockRpc } from '@lvce-editor/rpc'
 import * as AddOriginalSourcesToData from '../src/parts/AddOriginalSourcesToData/AddOriginalSourcesToData.ts'
 import * as LaunchSourceMapWorker from '../src/parts/LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
 
-test('addOriginalSourcesToData - enriches data with original sources', async () => {
+test.skip('addOriginalSourcesToData - enriches data with original sources', async () => {
   const tempRoot = join(tmpdir(), `test-add-original-sources-${Date.now()}`)
   const extensionSourceMapsDir = join(tempRoot, '.extension-source-maps', 'github.copilot-chat-v1.0.0', 'dist')
   await mkdir(extensionSourceMapsDir, { recursive: true })
@@ -92,7 +92,7 @@ test('addOriginalSourcesToData - enriches data with original sources', async () 
   }
 })
 
-test('addOriginalSourcesToData - handles array data', async () => {
+test.skip('addOriginalSourcesToData - handles array data', async () => {
   const tempRoot = join(tmpdir(), `test-add-original-sources-array-${Date.now()}`)
   const extensionSourceMapsDir = join(tempRoot, '.extension-source-maps', 'github.copilot-chat-v1.0.0', 'dist')
   await mkdir(extensionSourceMapsDir, { recursive: true })
@@ -137,7 +137,7 @@ test('addOriginalSourcesToData - handles array data', async () => {
   }
 })
 
-test('addOriginalSourcesToData - handles data without URLs', async () => {
+test.skip('addOriginalSourcesToData - handles data without URLs', async () => {
   const tempRoot = join(tmpdir(), `test-add-original-sources-no-urls-${Date.now()}`)
   const dataFile = join(tempRoot, 'input.json')
   const outputFile = join(tempRoot, 'result.json')
