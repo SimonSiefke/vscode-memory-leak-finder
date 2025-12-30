@@ -1,5 +1,9 @@
 import { join, resolve } from 'node:path'
 
+const EXTENSION_PATH_REGEX = /\.vscode-extensions\/(github\.copilot-chat-[^/]+)\/(.+)$/
+const GITHUB_PREFIX_REGEX = /^github\./
+const COPILOT_CHAT_PREFIX_REGEX = /^copilot-chat-/
+
 export const mapPathToSourceMapPath = (path: string, root: string): string | null => {
   if (!path) {
     return null
@@ -9,7 +13,7 @@ export const mapPathToSourceMapPath = (path: string, root: string): string | nul
   const absolutePath = path.startsWith('/') ? path : resolve(root, path)
 
   // Check if this is a copilot extension file
-  const extensionMatch = absolutePath.match(/\.vscode-extensions\/(github\.copilot-chat-[^/]+)\/(.+)$/)
+  const extensionMatch = absolutePath.match(EXTENSION_PATH_REGEX)
   if (!extensionMatch) {
     return null
   }
@@ -18,9 +22,9 @@ export const mapPathToSourceMapPath = (path: string, root: string): string | nul
 
   // Convert extension ID from github.copilot-chat-0.36.2025121004 to copilot-chat-v0.36.2025121004
   // Remove 'github.' prefix
-  const withoutPrefix = extensionId.replace(/^github\./, '')
+  const withoutPrefix = extensionId.replace(GITHUB_PREFIX_REGEX, '')
   // Add 'v' prefix to version if not present
-  const cacheDirName = withoutPrefix.startsWith('copilot-chat-v') ? withoutPrefix : withoutPrefix.replace(/^copilot-chat-/, 'copilot-chat-v')
+  const cacheDirName = withoutPrefix.startsWith('copilot-chat-v') ? withoutPrefix : withoutPrefix.replace(COPILOT_CHAT_PREFIX_REGEX, 'copilot-chat-v')
 
   // Map to source maps cache directory
   const sourceMapPath = join(root, '.extension-source-maps-cache', cacheDirName, relativePath + '.map')

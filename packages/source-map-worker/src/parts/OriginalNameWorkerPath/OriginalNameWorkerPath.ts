@@ -1,8 +1,7 @@
 import { resolve } from 'node:path'
+import { root } from '../Root/Root.ts'
 
 export const getOriginalNameWorkerPath = (): string => {
-  const thisDir: string = import.meta.dirname
-  const packageDir: string = resolve(thisDir, '../../..')
-  const workerPath: string = resolve(packageDir, '../original-name-worker/src/originalNameWorkerMain.ts')
+  const workerPath: string = resolve(root, 'packages/original-name-worker/src/originalNameWorkerMain.ts')
   return workerPath
 }
