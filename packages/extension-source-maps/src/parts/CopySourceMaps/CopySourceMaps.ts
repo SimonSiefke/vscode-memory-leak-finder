@@ -2,6 +2,11 @@ import { cp, mkdir, readdir } from 'node:fs/promises'
 import { dirname, join, relative } from 'node:path'
 import { VError } from '@lvce-editor/verror'
 
+interface SourceMapFile {
+  file: string
+  baseDir: string
+}
+
 export const copySourceMaps = async (repoPath: string, outputDir: string, extensionName: string, version: string): Promise<void> => {
   try {
     // Look for source map files in common locations
@@ -13,7 +18,7 @@ export const copySourceMaps = async (repoPath: string, outputDir: string, extens
       join(repoPath, 'extension', 'out'),
     ]
 
-    const sourceMapFiles: Array<{ file: string; baseDir: string }> = []
+    const sourceMapFiles: Array<SourceMapFile> = []
 
     const collectSourceMaps = async (dir: string, baseDir: string): Promise<void> => {
       try {
