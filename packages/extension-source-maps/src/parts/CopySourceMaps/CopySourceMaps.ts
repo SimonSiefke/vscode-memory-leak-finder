@@ -46,7 +46,7 @@ export const copySourceMaps = async (repoPath: string, outputDir: string, extens
     // So we'll create: .extension-source-maps/github.copilot-chat-0.36.2025121004/dist/extension.js.map
     // Note: VS Code extension directories don't have 'v' prefix in version, so strip it if present
     const normalizedVersion = version.startsWith('v') ? version.slice(1) : version
-    const extensionId = `github.${extensionName}-${normalizedVersion}`
+    const extensionId = `${extensionName}-${normalizedVersion}`
     const extensionOutputDir = join(outputDir, extensionId)
 
     for (const { file: sourceMapFile } of sourceMapFiles) {
