@@ -11,12 +11,22 @@ export const mapPathToSourceMapUrl = (path: string, root: string): string | null
     if (!sourceMapPath) {
       return null
     }
-    if (!existsSync(sourceMapPath)) {
-      console.log(`[addOriginalSourcesToData] Source map not found: ${sourceMapPath}`)
-      return null
+    if (existsSync(sourceMapPath)) {
+      const sourceMapUrl = pathToFileURL(sourceMapPath).toString()
+      return sourceMapUrl
     }
-    const sourceMapUrl = pathToFileURL(sourceMapPath).toString()
-    return sourceMapUrl
+    // Fallback: try with 'v' prefix for backward compatibility with legacy directories
+    // This handles cases where directories were created with 'v' prefix before the fix
+    const sourceMapPathWithV = sourceMapPath.replace(
+      '/copilot-chat-',
+      '/copilot-chat-v',
+    )
+    if (existsSync(sourceMapPathWithV)) {
+      const sourceMapUrl = pathToFileURL(sourceMapPathWithV).toString()
+      return sourceMapUrl
+    }
+    console.log(`[addOriginalSourcesToData] Source map not found: ${sourceMapPath}`)
+    return null
   } catch {
     return null
   }

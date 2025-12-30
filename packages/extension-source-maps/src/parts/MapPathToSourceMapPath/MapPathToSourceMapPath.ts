@@ -21,7 +21,15 @@ export const mapPathToSourceMapPath = (path: string, root: string): string | nul
 
   // Convert extension ID from github.copilot-chat-0.36.2025121004 to copilot-chat-0.36.2025121004
   // Remove 'github.' prefix
-  const cacheDirName = extensionId.replace(GITHUB_PREFIX_REGEX, '')
+  let cacheDirName = extensionId.replace(GITHUB_PREFIX_REGEX, '')
+  
+  // Strip 'v' prefix from version if present to match CopySourceMaps behavior
+  // VS Code extension directories don't have 'v' prefix in version, so strip it if present
+  // This ensures consistency: copilot-chat-v0.36.2025121004 -> copilot-chat-0.36.2025121004
+  // Pattern: copilot-chat-v<version> -> copilot-chat-<version>
+  if (cacheDirName.startsWith('copilot-chat-v')) {
+    cacheDirName = cacheDirName.replace('copilot-chat-v', 'copilot-chat-')
+  }
 
   // Map to source maps cache directory
   const sourceMapPath = join(root, '.extension-source-maps-cache', cacheDirName, relativePath + '.map')

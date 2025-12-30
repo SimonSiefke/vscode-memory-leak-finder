@@ -108,3 +108,19 @@ test('mapPathToSourceMapPath - handles absolute path with Unix-style root', () =
   const expected = join(root, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/extension.js.map')
   expect(result).toBe(expected)
 })
+
+test('mapPathToSourceMapPath - strips v prefix from version in path', () => {
+  const root = tmpdir()
+  const path = '.vscode-extensions/github.copilot-chat-v0.36.2025121004/dist/extension.js'
+  const result = MapPathToSourceMapPath.mapPathToSourceMapPath(path, root)
+  const expected = join(root, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/extension.js.map')
+  expect(result).toBe(expected)
+})
+
+test('mapPathToSourceMapPath - strips v prefix from version in absolute path', () => {
+  const root = tmpdir()
+  const absolutePath = join(root, '.vscode-extensions/github.copilot-chat-v0.36.2025121004/dist/extension.js')
+  const result = MapPathToSourceMapPath.mapPathToSourceMapPath(absolutePath, root)
+  const expected = join(root, '.extension-source-maps-cache', 'copilot-chat-0.36.2025121004', 'dist/extension.js.map')
+  expect(result).toBe(expected)
+})
