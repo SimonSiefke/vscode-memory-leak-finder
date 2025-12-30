@@ -2,26 +2,16 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import { VError } from '@lvce-editor/verror'
 import * as Root from '../Root/Root.ts'
-import * as LaunchSourceMapWorker from '../LaunchSourceMapWorker/LaunchSourceMapWorker.ts'
 import * as CollectSourceMapPositions from '../CollectSourceMapPositions/CollectSourceMapPositions.ts'
+import * as ExtractItemsFromData from '../ExtractItemsFromData/ExtractItemsFromData.ts'
+import * as ResolveOriginalPositions from '../ResolveOriginalPositions/ResolveOriginalPositions.ts'
 
 export const addOriginalSourcesToData = async (dataFilePath: string, version: string, outputFilePath: string): Promise<void> => {
   try {
     const rootPath = Root.root
     const dataContent = await readFile(dataFilePath, 'utf8')
     const data = JSON.parse(dataContent)
-
-    // Handle both array and object with array property (namedFunctionCount2 or namedFunctionCount3)
-    let items: readonly any[]
-    if (Array.isArray(data)) {
-      items = data
-    } else if (data.namedFunctionCount3 && Array.isArray(data.namedFunctionCount3)) {
-      items = data.namedFunctionCount3
-    } else if (data.namedFunctionCount2 && Array.isArray(data.namedFunctionCount2)) {
-      items = data.namedFunctionCount2
-    } else {
-      items = []
-    }
+    const items = ExtractItemsFromData.extractItemsFromData(data)
 
     if (items.length === 0) {
       await writeFile(outputFilePath, JSON.stringify(data, null, 2), 'utf8')
@@ -40,33 +30,7 @@ export const addOriginalSourcesToData = async (dataFilePath: string, version: st
       return
     }
 
-    // Resolve original positions using source-map-worker
-    try {
-      await using rpc = await LaunchSourceMapWorker.launchSourceMapWorker()
-      const extendedOriginalNames = true
-      const cleanPositionMap = await rpc.invoke('SourceMap.getCleanPositionsMap', sourceMapUrlToPositions, extendedOriginalNames)
-      const offsetMap: Record<string, number> = Object.create(null)
-      for (const pointer of positionPointers) {
-        const positions = cleanPositionMap[pointer.sourceMapUrl] || []
-        const offset = offsetMap[pointer.sourceMapUrl] || 0
-        const original = positions[offset]
-        offsetMap[pointer.sourceMapUrl] = offset + 1
-        if (original) {
-          const target = enriched[pointer.index] as any
-          target.originalSource = original.source ?? null
-          target.originalUrl = original.source ?? null
-          target.originalLine = original.line ?? null
-          target.originalColumn = original.column ?? null
-          target.originalName = original.name ?? null
-          if (target.originalUrl && target.originalLine !== null && target.originalColumn !== null) {
-            target.originalLocation = `${target.originalUrl}:${target.originalLine}:${target.originalColumn}`
-          }
-        }
-      }
-    } catch (error) {
-      console.log({ error })
-      // ignore sourcemap resolution errors
-    }
+    await ResolveOriginalPositions.resolveOriginalPositions(enriched, sourceMapUrlToPositions, positionPointers)
 
     // Write enriched data
     let outputData: any
