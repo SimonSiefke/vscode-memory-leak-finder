@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { getNodeVersion } from '../src/parts/GetNodeVersion/GetNodeVersion.ts'
 
-test('getNodeVersion - extracts version from engines.node', async () => {
+test('getNodeVersion - extracts version from engines.node and fetches latest', async () => {
   const tempDir = join(tmpdir(), `test-get-node-version-${Date.now()}`)
   await mkdir(tempDir, { recursive: true })
 
@@ -16,10 +16,10 @@ test('getNodeVersion - extracts version from engines.node', async () => {
   await writeFile(join(tempDir, 'package.json'), JSON.stringify(packageJson))
 
   const version = await getNodeVersion(tempDir)
-  expect(version).toBe('18.0.0')
+  expect(version).toMatch(/^18\.\d+\.\d+$/)
 })
 
-test('getNodeVersion - handles version without patch', async () => {
+test('getNodeVersion - handles version without patch and fetches latest', async () => {
   const tempDir = join(tmpdir(), `test-get-node-version-${Date.now()}`)
   await mkdir(tempDir, { recursive: true })
 
@@ -31,10 +31,10 @@ test('getNodeVersion - handles version without patch', async () => {
   await writeFile(join(tempDir, 'package.json'), JSON.stringify(packageJson))
 
   const version = await getNodeVersion(tempDir)
-  expect(version).toBe('20.5.0')
+  expect(version).toMatch(/^20\.\d+\.\d+$/)
 })
 
-test('getNodeVersion - handles version with only major', async () => {
+test('getNodeVersion - handles version with only major and fetches latest', async () => {
   const tempDir = join(tmpdir(), `test-get-node-version-${Date.now()}`)
   await mkdir(tempDir, { recursive: true })
 
@@ -46,7 +46,7 @@ test('getNodeVersion - handles version with only major', async () => {
   await writeFile(join(tempDir, 'package.json'), JSON.stringify(packageJson))
 
   const version = await getNodeVersion(tempDir)
-  expect(version).toBe('18.0.0')
+  expect(version).toMatch(/^18\.\d+\.\d+$/)
 })
 
 test('getNodeVersion - throws error when engines.node is missing', async () => {
@@ -85,7 +85,7 @@ test('getNodeVersion - throws error when version cannot be parsed', async () => 
   await expect(getNodeVersion(tempDir)).rejects.toThrow('Could not parse node version from: invalid-version')
 })
 
-test('getNodeVersion - handles exact version', async () => {
+test('getNodeVersion - handles exact version and fetches latest', async () => {
   const tempDir = join(tmpdir(), `test-get-node-version-${Date.now()}`)
   await mkdir(tempDir, { recursive: true })
 
@@ -97,10 +97,10 @@ test('getNodeVersion - handles exact version', async () => {
   await writeFile(join(tempDir, 'package.json'), JSON.stringify(packageJson))
 
   const version = await getNodeVersion(tempDir)
-  expect(version).toBe('20.10.5')
+  expect(version).toMatch(/^20\.\d+\.\d+$/)
 })
 
-test('getNodeVersion - handles version with tilde', async () => {
+test('getNodeVersion - handles version with tilde and fetches latest', async () => {
   const tempDir = join(tmpdir(), `test-get-node-version-${Date.now()}`)
   await mkdir(tempDir, { recursive: true })
 
@@ -112,7 +112,7 @@ test('getNodeVersion - handles version with tilde', async () => {
   await writeFile(join(tempDir, 'package.json'), JSON.stringify(packageJson))
 
   const version = await getNodeVersion(tempDir)
-  expect(version).toBe('18.5.0')
+  expect(version).toMatch(/^18\.\d+\.\d+$/)
 })
 
 test('getNodeVersion - throws VError when package.json does not exist', async () => {

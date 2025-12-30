@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { VError } from '@lvce-editor/verror'
+import { getLatestNodeVersionForMajor } from '../GetLatestNodeVersionForMajor/GetLatestNodeVersionForMajor.ts'
 
 const NODE_VERSION_REGEX = /(\d+)\.?(\d+)?\.?(\d+)?/
 
@@ -14,15 +15,14 @@ export const getNodeVersion = async (repoPath: string): Promise<string> => {
       throw new Error('No node version specified in package.json engines')
     }
     const nodeVersion = engines.node
-    // Extract version number (e.g., ">=18.0.0" -> "18.0.0" or "18" -> "18")
+    // Extract major version number (e.g., ">=22.14.0" -> "22" or "18" -> "18")
     const match = nodeVersion.match(NODE_VERSION_REGEX)
     if (!match) {
       throw new Error(`Could not parse node version from: ${nodeVersion}`)
     }
     const major = match[1]
-    const minor = match[2] || '0'
-    const patch = match[3] || '0'
-    return `${major}.${minor}.${patch}`
+    // Fetch the latest version for this major version
+    return await getLatestNodeVersionForMajor(major)
   } catch (error) {
     throw new VError(error, `Failed to get node version from '${repoPath}'`)
   }
